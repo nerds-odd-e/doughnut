@@ -19,7 +19,7 @@ describe("Notebooks Page", () => {
         notebooks: [notebook],
         subscriptions: [],
       });
-    helper.component(NotebooksPage).withStorageProps({}).render();
+    helper.component(NotebooksPage).withProps({}).render();
     expect(
       helper.managedApi.restNotebookController.myNotebooks,
     ).toBeCalledTimes(1);

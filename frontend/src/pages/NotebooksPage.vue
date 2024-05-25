@@ -27,10 +27,6 @@ export default defineComponent({
   setup() {
     return useLoadingApi();
   },
-  props: {
-    selectedNoteId: Number,
-  },
-  name: "NotebooksPage",
   components: {
     ContainerPage,
     NotebookViewCards,

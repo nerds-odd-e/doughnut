@@ -33,6 +33,7 @@
       </NoteRecentUpdateIndicator>
     </div>
   </div>
+  <div>Created: {{ noteRealm.note.createdAt }}</div>
   <ChildrenNotes
     v-bind="{ expandChildren, readonly, storageAccessor }"
     :notes="noteRealm.children ?? []"
