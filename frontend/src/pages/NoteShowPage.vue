@@ -81,5 +81,6 @@ aside {
 
 .h-full {
   height: calc(100vh - 4rem);
+  max-width: calc(-webkit-fill-available - 4rem);
 }
 </style>
