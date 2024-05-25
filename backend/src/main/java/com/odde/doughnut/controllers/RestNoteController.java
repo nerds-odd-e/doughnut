@@ -234,7 +234,7 @@ class RestNoteController {
     return new RedirectToNoteResponse(note.getId());
   }
 
-  @PostMapping(value = "/{note}/move-after/{targetNote}/{asFirstChild}")
+  @PostMapping(value = "/move_after/{note}/{targetNote}/{asFirstChild}")
   @Transactional
   public List<NoteRealm> moveAfter(
       @PathVariable @Schema(type = "integer") Note note,

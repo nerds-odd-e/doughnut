@@ -113,31 +113,6 @@ export class RestNoteControllerService {
     }
     /**
      * @param note
-     * @param targetNote
-     * @param asFirstChild
-     * @returns NoteRealm OK
-     * @throws ApiError
-     */
-    public moveAfter(
-        note: number,
-        targetNote: number,
-        asFirstChild: string,
-    ): CancelablePromise<Array<NoteRealm>> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/api/notes/{note}/move-after/{targetNote}/{asFirstChild}',
-            path: {
-                'note': note,
-                'targetNote': targetNote,
-                'asFirstChild': asFirstChild,
-            },
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * @param note
      * @returns NoteRealm OK
      * @throws ApiError
      */
@@ -168,6 +143,31 @@ export class RestNoteControllerService {
             url: '/api/notes/search',
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param note
+     * @param targetNote
+     * @param asFirstChild
+     * @returns NoteRealm OK
+     * @throws ApiError
+     */
+    public moveAfter(
+        note: number,
+        targetNote: number,
+        asFirstChild: string,
+    ): CancelablePromise<Array<NoteRealm>> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/notes/move_after/{note}/{targetNote}/{asFirstChild}',
+            path: {
+                'note': note,
+                'targetNote': targetNote,
+                'asFirstChild': asFirstChild,
+            },
             errors: {
                 500: `Internal Server Error`,
             },

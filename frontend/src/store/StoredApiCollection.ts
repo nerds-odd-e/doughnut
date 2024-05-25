@@ -193,11 +193,14 @@ export default class StoredApiCollection implements StoredApi {
     if (!noteRealm.value) return;
     const { parentId } = noteRealm.value.note;
     if (!parentId) return;
+    const siblings = this.storage.refOfNoteRealm(parentId).value?.children;
+    if (!siblings) return;
+    const currentIndex = siblings.map((n) => n.id).indexOf(noteId);
     (
       await this.managedApi.restNoteController.moveAfter(
         noteId,
-        parentId,
-        "asFirstChild",
+        currentIndex === 1 ? parentId : siblings[currentIndex - 2]!.id,
+        currentIndex === 1 ? "asFirstChild" : "after",
       )
     ).forEach((n) => this.storage.refreshNoteRealm(n));
   }

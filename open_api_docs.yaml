@@ -861,42 +861,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/RedirectToNoteResponse"
-  /api/notes/{note}/move-after/{targetNote}/{asFirstChild}:
-    post:
-      tags:
-      - rest-note-controller
-      operationId: moveAfter
-      parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
-      - name: targetNote
-        in: path
-        required: true
-        schema:
-          type: integer
-      - name: asFirstChild
-        in: path
-        required: true
-        schema:
-          type: string
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/NoteRealm"
   /api/notes/{note}/delete:
     post:
       tags:
@@ -949,6 +913,42 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Note"
+  /api/notes/move_after/{note}/{targetNote}/{asFirstChild}:
+    post:
+      tags:
+      - rest-note-controller
+      operationId: moveAfter
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: targetNote
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: asFirstChild
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NoteRealm"
   /api/notes/convertSrt:
     post:
       tags:
