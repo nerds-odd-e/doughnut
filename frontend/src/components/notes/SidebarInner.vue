@@ -89,10 +89,14 @@ watch(
 
 <style lang="scss" scoped>
 .active-item {
-  border-left: 3px solid #007bff !important;
+  border-left: 1px solid gray !important;
 }
 
 .active-topic {
   font-weight: bold;
+}
+
+.list-group-item {
+  border-radius: 0 !important;
 }
 </style>

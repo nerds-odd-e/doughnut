@@ -4,6 +4,12 @@ import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 
 describe("Notebooks Page", () => {
+  beforeEach(() => {
+    const teleportTarget = document.createElement("div");
+    teleportTarget.id = "head-status";
+    document.body.appendChild(teleportTarget);
+  });
+
   it("fetch API to be called ONCE", async () => {
     const notebook = makeMe.aNotebook.please();
 

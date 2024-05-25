@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar justify-content-between global-bar sticky-top">
+  <nav class="navbar justify-content-between global-bar sticky-top bg-white">
     <div class="container-fluid d-flex">
       <PopButton v-if="user" title="open sidebar" :sidebar="'left'">
         <template #button_face>
