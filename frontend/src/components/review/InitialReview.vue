@@ -4,7 +4,6 @@
     <NoteInfoBar
       v-if="thing.note"
       :note-id="thing.note.id"
-      :expanded="true"
       :key="thing.note.id"
       @level-changed="$emit('reloadNeeded', $event)"
     />

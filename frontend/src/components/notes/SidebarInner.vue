@@ -20,7 +20,7 @@
         <span
           role="button"
           title="expand children"
-          class="badge bg-secondary rounded-pill"
+          class="badge rounded-pill"
           >{{ childrenCount(note.id) ?? "..." }}</span
         >
       </div>
@@ -98,5 +98,11 @@ watch(
 
 .list-group-item {
   border-radius: 0 !important;
+}
+
+.badge {
+  cursor: pointer;
+  background-color: #aaa;
+  font-weight: initial;
 }
 </style>

@@ -17,7 +17,6 @@ describe("note info", () => {
       .component(NoteInfoBar)
       .withProps({
         noteId: 123,
-        expanded: true,
       })
       .mount();
     await flushPromises();
