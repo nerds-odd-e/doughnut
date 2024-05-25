@@ -13,7 +13,7 @@
       <LoginButton v-else />
 
       <div class="d-flex flex-grow-1 justify-content-between">
-        <div class="d-flex" id="head-status" />
+        <div class="d-flex flex-grow-1" id="head-status" />
         <div class="btn-group btn-group-sm">
           <PopButton v-if="user" title="search note">
             <template #button_face>

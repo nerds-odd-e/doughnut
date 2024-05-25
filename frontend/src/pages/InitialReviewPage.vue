@@ -8,12 +8,11 @@
         toRepeatCount: remainingInitialReviewCountForToday,
       }"
     >
-      <template #default v-if="minimized">
+      <template #buttons v-if="minimized">
         <div style="display: flex" @click="resume">
           <a title="Go back to review">
             <SvgResume width="30" height="30" />
           </a>
-          <ThingAbbr v-if="thing" v-bind="{ thing }" />
         </div>
       </template>
     </ProgressBar>
@@ -34,7 +33,6 @@ import timezoneParam from "@/managedApi/window/timezoneParam";
 import useLoadingApi from "@/managedApi/useLoadingApi";
 import ProgressBar from "@/components/commons/ProgressBar.vue";
 import SvgResume from "@/components/svgs/SvgResume.vue";
-import ThingAbbr from "@/components/review/ThingAbbr.vue";
 import InitialReview from "@/components/review/InitialReview.vue";
 import { StorageAccessor } from "@/store/createNoteStorage";
 import ContainerPage from "./commons/ContainerPage.vue";
@@ -55,7 +53,6 @@ export default defineComponent({
     ContainerPage,
     InitialReview,
     ProgressBar,
-    ThingAbbr,
     SvgResume,
   },
   emits: ["update-reviewing"],

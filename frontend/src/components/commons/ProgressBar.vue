@@ -1,7 +1,9 @@
 <template>
-  <div class="review-info-bar">
-    <slot name="buttons" />
-    <div class="review-info-bar-right" @click.prevent="goHome()">
+  <teleport v-if="title" to="#head-status">
+    <div class="flex-shrink-0">
+      <slot name="buttons" />
+    </div>
+    <div class="flex-grow-1 review-info-bar-right" @click.prevent="goHome()">
       <span
         :class="`progress-bar ${!!$slots.default ? 'thin' : ''}`"
         v-if="toRepeatCount !== null"
@@ -15,9 +17,8 @@
           {{ title }}{{ finished }}/{{ finished + toRepeatCount }}
         </span>
       </span>
-      <slot />
     </div>
-  </div>
+  </teleport>
 </template>
 
 <script setup lang="ts">
@@ -36,10 +37,6 @@ const goHome = async () => {
 </script>
 
 <style lang="scss" scoped>
-.review-info-bar {
-  display: flex;
-}
-
 .review-info-bar-right {
   flex-grow: 1;
 }
