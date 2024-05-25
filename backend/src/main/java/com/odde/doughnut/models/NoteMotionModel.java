@@ -1,28 +1,50 @@
 package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.NoteMotion;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
+import com.odde.doughnut.exceptions.MovementNotPossibleException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import lombok.AllArgsConstructor;
 
+@AllArgsConstructor
 public class NoteMotionModel {
-  protected final NoteMotion entity;
+  private final Note subject;
+  private final Note relativeToNote;
+  private final boolean asFirstChildOfNote;
   protected final ModelFactoryService modelFactoryService;
 
-  public NoteMotionModel(NoteMotion noteMotion, ModelFactoryService modelFactoryService) {
-    this.entity = noteMotion;
-    this.modelFactoryService = modelFactoryService;
+  public void execute() throws CyclicLinkDetectedException {
+    Notebook notebook = subject.getNotebook();
+    moveHeadNoteOnly();
+    Note parent = getNewParent();
+    subject.setParentNote(parent);
+    modelFactoryService.save(subject);
+    if (notebook.getHeadNote() == subject) {
+      modelFactoryService.remove(notebook);
+    }
   }
 
-  public void execute() throws CyclicLinkDetectedException {
-    Notebook notebook = entity.getSubject().getNotebook();
-    entity.moveHeadNoteOnly();
-    Note parent = entity.getNewParent();
-    entity.getSubject().setParentNote(parent);
-    modelFactoryService.save(entity.getSubject());
-    if (notebook.getHeadNote() == entity.getSubject()) {
-      modelFactoryService.remove(notebook);
+  private Note getNewParent() {
+    if (asFirstChildOfNote) {
+      return relativeToNote;
+    }
+    return relativeToNote.getParent();
+  }
+
+  private void moveHeadNoteOnly() throws CyclicLinkDetectedException {
+    if (relativeToNote.getAncestors().contains(subject)) {
+      throw new CyclicLinkDetectedException();
+    }
+    subject.updateSiblingOrder(relativeToNote, asFirstChildOfNote);
+  }
+
+  public void validate() throws MovementNotPossibleException {
+    if (relativeToNote.getChildren().stream()
+        .findFirst()
+        .map(n -> n.getId().equals(subject.getId()))
+        .orElse(false)) {
+      throw new MovementNotPossibleException();
     }
   }
 }

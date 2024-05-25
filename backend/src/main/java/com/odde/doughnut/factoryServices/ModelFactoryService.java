@@ -32,7 +32,7 @@ public class ModelFactoryService {
   }
 
   public NoteMotionModel motionOfMoveAfter(Note subject, Note target, Boolean asFirstChild) {
-    return new NoteMotionModel(new NoteMotion(subject, target, asFirstChild), this);
+    return new NoteMotionModel(subject, target, asFirstChild, this);
   }
 
   public NoteMotionModel motionOfMoveUnder(Note sourceNote, Note targetNote, Boolean asFirstChild) {

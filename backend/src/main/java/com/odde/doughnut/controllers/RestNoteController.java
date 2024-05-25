@@ -7,6 +7,7 @@ import com.odde.doughnut.exceptions.DuplicateWikidataIdException;
 import com.odde.doughnut.exceptions.MovementNotPossibleException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.models.NoteMotionModel;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.SearchTermModel;
 import com.odde.doughnut.models.UserModel;
@@ -244,15 +245,11 @@ class RestNoteController {
     currentUser.assertAuthorization(note);
     currentUser.assertAuthorization(targetNote);
 
-    if (targetNote.getChildren().stream()
-        .findFirst()
-        .map(n -> n.getId().equals(note.getId()))
-        .orElse(false)) {
-      throw new MovementNotPossibleException();
-    }
-
     boolean asFirstChildBoolean = asFirstChild.compareToIgnoreCase("asFirstChild") == 0;
-    modelFactoryService.motionOfMoveAfter(note, targetNote, asFirstChildBoolean).execute();
+    NoteMotionModel noteMotion =
+        modelFactoryService.motionOfMoveAfter(note, targetNote, asFirstChildBoolean);
+    noteMotion.validate();
+    noteMotion.execute();
     return new NoteViewer(currentUser.getEntity(), note.getParent()).toJsonObject();
   }
 }
