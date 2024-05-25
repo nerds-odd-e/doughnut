@@ -45,17 +45,6 @@ class RestNoteControllerMotionTests {
     subject = makeMe.aNote("subject").creatorAndOwner(userModel).please();
   }
 
-  @Test
-  void shouldCheckAccessRight() {
-    Note note = makeMe.aNote().please();
-    assertThrows(UnexpectedNoAccessRightException.class, () -> controller.moveUp(note));
-  }
-
-  @Test
-  void shouldNotMoveUpIfThereIsNoPreviousSibling() {
-    assertThrows(MovementNotPossibleException.class, () -> controller.moveUp(subject));
-  }
-
   @Nested
   class NoteWithParent {
     Note parent;
@@ -64,33 +53,48 @@ class RestNoteControllerMotionTests {
     void setup() {
       parent = makeMe.aNote("parent").creatorAndOwner(userModel).please();
       subject = makeMe.theNote(subject).under(parent).please();
+      makeMe.refresh(parent);
     }
 
     @Test
-    void shouldNotMoveUpIfThereIsNoPreviousSibling() {
-      assertThrows(MovementNotPossibleException.class, () -> controller.moveUp(subject));
+    void shouldCheckAccessRight() {
+      Note note = makeMe.aNote().please();
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.moveAfter(note, parent, "asFirstChild"));
+    }
+
+    @Test
+    void shouldNotMoveUpIfTheNoteIsAlreadyTheFirstChild() {
+      assertThrows(
+          MovementNotPossibleException.class,
+          () -> controller.moveAfter(subject, parent, "asFirstChild"));
     }
 
     @Nested
     class NoteWithSiblings {
       Note previousOlder;
-      Note youngerSibling;
+      Note previousYounger;
 
       @BeforeEach
       void setup() {
         makeMe.refresh(parent);
         previousOlder = makeMe.aNote("previous older sibling").asFirstChildOf(parent).please();
-        //        youngerSibling = makeMe.aNote().after(note).please();
+        previousYounger = makeMe.aNote("previous younger sibling").after(subject).please();
         makeMe.refresh(parent);
       }
 
       @Test
-      void shouldMoveUpWhenThereIsOneOlderSibling()
+      void makeSureTheInitialStateIsAsExpected() {
+        assertThat(previousOlder.getSiblingOrder(), lessThan(subject.getSiblingOrder()));
+      }
+
+      @Test
+      void shouldMoveUpToAsFirstChild()
           throws UnexpectedNoAccessRightException,
               CyclicLinkDetectedException,
               MovementNotPossibleException {
-        assertThat(previousOlder.getSiblingOrder(), lessThan(subject.getSiblingOrder()));
-        var noteRealm = controller.moveUp(subject);
+        var noteRealm = controller.moveAfter(subject, parent, "asFirstChild");
         assertThat(noteRealm.getId(), equalTo(parent.getId()));
         assertThat(subject.getSiblingOrder(), lessThan(previousOlder.getSiblingOrder()));
       }

@@ -113,17 +113,23 @@ export class RestNoteControllerService {
     }
     /**
      * @param note
+     * @param targetNote
+     * @param asFirstChild
      * @returns NoteRealm OK
      * @throws ApiError
      */
-    public moveUp(
+    public moveAfter(
         note: number,
+        targetNote: number,
+        asFirstChild: string,
     ): CancelablePromise<NoteRealm> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/notes/{note}/move-up',
+            url: '/api/notes/{note}/move-after/{targetNote}/{asFirstChild}',
             path: {
                 'note': note,
+                'targetNote': targetNote,
+                'asFirstChild': asFirstChild,
             },
             errors: {
                 500: `Internal Server Error`,

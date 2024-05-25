@@ -861,17 +861,27 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/RedirectToNoteResponse"
-  /api/notes/{note}/move-up:
+  /api/notes/{note}/move-after/{targetNote}/{asFirstChild}:
     post:
       tags:
       - rest-note-controller
-      operationId: moveUp
+      operationId: moveAfter
       parameters:
       - name: note
         in: path
         required: true
         schema:
           type: integer
+      - name: targetNote
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: asFirstChild
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         "500":
           description: Internal Server Error

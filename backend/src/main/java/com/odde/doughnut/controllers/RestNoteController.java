@@ -232,19 +232,26 @@ class RestNoteController {
     return new RedirectToNoteResponse(note.getId());
   }
 
-  @PostMapping(value = "/{note}/move-up")
+  @PostMapping(value = "/{note}/move-after/{targetNote}/{asFirstChild}")
   @Transactional
-  public NoteRealm moveUp(@PathVariable @Schema(type = "integer") Note note)
+  public NoteRealm moveAfter(
+      @PathVariable @Schema(type = "integer") Note note,
+      @PathVariable @Schema(type = "integer") Note targetNote,
+      @PathVariable @Schema(type = "string") String asFirstChild)
       throws UnexpectedNoAccessRightException,
           CyclicLinkDetectedException,
           MovementNotPossibleException {
     currentUser.assertAuthorization(note);
+    currentUser.assertAuthorization(targetNote);
 
-    if (!note.getSiblings().stream()
-        .anyMatch(sibling -> sibling.getSiblingOrder() < note.getSiblingOrder())) {
+    if (targetNote.getChildren().stream()
+        .findFirst()
+        .map(n -> n.getId().equals(note.getId()))
+        .orElse(false)) {
       throw new MovementNotPossibleException();
     }
-    modelFactoryService.toNoteMotionModel(new NoteMotion(note.getParent(), true), note).execute();
+
+    modelFactoryService.toNoteMotionModel(new NoteMotion(targetNote, true), note).execute();
     return new NoteViewer(currentUser.getEntity(), note.getParent()).toJsonObject();
   }
 }
