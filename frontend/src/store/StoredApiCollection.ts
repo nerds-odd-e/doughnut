@@ -40,6 +40,8 @@ export interface StoredApi {
     fromTargetPerspective: boolean,
   ): Promise<NoteRealm>;
 
+  moveUp(noteId: Doughnut.ID): Promise<NoteRealm | void>;
+
   updateTextField(
     noteId: Doughnut.ID,
     field: "edit topic" | "edit details",
@@ -184,6 +186,20 @@ export default class StoredApiCollection implements StoredApi {
         fromTargetPerspective ? "tview" : "sview",
       ),
     );
+  }
+
+  async moveUp(noteId: Doughnut.ID) {
+    const noteRealm = this.storage.refOfNoteRealm(noteId);
+    if (!noteRealm.value) return;
+    const { parentId } = noteRealm.value.note;
+    if (!parentId) return;
+    (
+      await this.managedApi.restNoteController.moveAfter(
+        noteId,
+        parentId,
+        "asFirstChild",
+      )
+    ).forEach((n) => this.storage.refreshNoteRealm(n));
   }
 
   async updateTextField(

@@ -126,6 +126,10 @@ export const assumeNotePage = (noteTopic?: string) => {
       this.toolbarButton("Chat with AI").click()
       return assumeChatAboutNotePage()
     },
+    moveUpAmongSiblings() {
+      cy.pageIsNotLoading()
+      this.toolbarButton("Move up").click()
+    },
     wikidataOptions() {
       const openWikidataOptions = () => privateToolbarButton("wikidata options").clickIfNotOpen()
 

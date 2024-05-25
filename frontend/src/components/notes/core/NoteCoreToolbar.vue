@@ -35,6 +35,10 @@
         </template>
       </PopButton>
 
+      <button title="Move up" @click="moveUp">
+        <SvgUp />
+      </button>
+
       <div class="dropdown">
         <button
           id="dropdownMenuButton"
@@ -68,8 +72,8 @@
   </nav>
 </template>
 
-<script lang="ts">
-import { defineComponent, PropType } from "vue";
+<script setup lang="ts">
+import { PropType } from "vue";
 import { StorageAccessor } from "@/store/createNoteStorage";
 import { Note } from "@/generated/backend";
 import NoteNewButton from "./NoteNewButton.vue";
@@ -79,37 +83,27 @@ import SvgSearchForLink from "../../svgs/SvgSearchForLink.vue";
 import LinkNoteDialog from "../../links/LinkNoteDialog.vue";
 import SvgCog from "../../svgs/SvgCog.vue";
 import SvgChat from "../../svgs/SvgChat.vue";
+import SvgUp from "../../svgs/SvgUp.vue";
 import NoteDeleteButton from "./NoteDeleteButton.vue";
 import PopButton from "../../commons/Popups/PopButton.vue";
 import AIGenerateImageDialog from "../AIGenerateImageDialog.vue";
 import NoteDetailsAutoCompletionButton from "./NoteDetailsAutoCompletionButton.vue";
 import NoteChatDialog from "../NoteChatDialog.vue";
 
-export default defineComponent({
-  props: {
-    storageAccessor: {
-      type: Object as PropType<StorageAccessor>,
-      required: true,
-    },
-    note: {
-      type: Object as PropType<Note>,
-      required: true,
-    },
+const props = defineProps({
+  storageAccessor: {
+    type: Object as PropType<StorageAccessor>,
+    required: true,
   },
-  emits: ["note-accessory-updated"],
-  components: {
-    NoteNewButton,
-    SvgAddChild,
-    WikidataButton,
-    SvgSearchForLink,
-    LinkNoteDialog,
-    SvgCog,
-    SvgChat,
-    NoteDeleteButton,
-    PopButton,
-    AIGenerateImageDialog,
-    NoteDetailsAutoCompletionButton,
-    NoteChatDialog,
+  note: {
+    type: Object as PropType<Note>,
+    required: true,
   },
 });
+
+defineEmits(["note-accessory-updated"]);
+
+const moveUp = () => {
+  props.storageAccessor.storedApi().moveUp(props.note.id);
+};
 </script>

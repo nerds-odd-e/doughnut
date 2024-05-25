@@ -18,8 +18,8 @@ Then("I should see the note tree in the sidebar", (data: DataTable) => {
   start.sidebar().expectItems(data.hashes())
 })
 
-Then("I move the note {string} to the top of the siblings", (noteToMove: string) => {
-  start.sidebar().moveItemToTopOfItsSiblings(noteToMove)
+Then("I move the note {string} up among its siblings", (noteToMove: string) => {
+  start.jumpToNotePage(noteToMove).moveUpAmongSiblings()
 })
 
 Then(

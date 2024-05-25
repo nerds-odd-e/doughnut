@@ -16,14 +16,9 @@ export const sidebar = () => {
           })
       })
     },
-    moveItemToTopOfItsSiblings(noteTopic: string) {
-      cy.get("aside").within(() => {
-        cy.findByText(noteTopic)
-      })
-    },
     siblingOrder: (higher: string, lower: string) => {
       cy.get("aside").within(() => {
-        cy.contains(higher).nextAll().contains(lower)
+        cy.contains(higher).parent().parent().nextAll().contains(lower)
       })
     },
   }
