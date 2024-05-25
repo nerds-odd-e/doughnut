@@ -4,6 +4,7 @@ import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.DuplicateWikidataIdException;
+import com.odde.doughnut.exceptions.MovementNotPossibleException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.NoteViewer;
@@ -234,9 +235,15 @@ class RestNoteController {
   @PostMapping(value = "/{note}/move-up")
   @Transactional
   public NoteRealm moveUp(@PathVariable @Schema(type = "integer") Note note)
-      throws UnexpectedNoAccessRightException, CyclicLinkDetectedException {
+      throws UnexpectedNoAccessRightException,
+          CyclicLinkDetectedException,
+          MovementNotPossibleException {
     currentUser.assertAuthorization(note);
 
+    if (!note.getSiblings().stream()
+        .anyMatch(sibling -> sibling.getSiblingOrder() < note.getSiblingOrder())) {
+      throw new MovementNotPossibleException();
+    }
     modelFactoryService.toNoteMotionModel(new NoteMotion(note.getParent(), true), note).execute();
     return new NoteViewer(currentUser.getEntity(), note.getParent()).toJsonObject();
   }

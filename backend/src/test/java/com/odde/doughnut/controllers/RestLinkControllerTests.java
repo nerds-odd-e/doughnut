@@ -10,6 +10,7 @@ import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
+import com.odde.doughnut.exceptions.MovementNotPossibleException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
@@ -57,11 +58,15 @@ class RestLinkControllerTests {
       note2 = makeMe.aNote("flower").creatorAndOwner(userModel).please();
       linkCreation.linkType = LinkType.APPLICATION;
       linkCreation.moveUnder = true;
+      linkCreation.asFirstChild = false;
     }
 
     @Test
     void createdSuccessfully()
-        throws CyclicLinkDetectedException, BindException, UnexpectedNoAccessRightException {
+        throws CyclicLinkDetectedException,
+            BindException,
+            UnexpectedNoAccessRightException,
+            MovementNotPossibleException {
       Note note3 = makeMe.aNote().creatorAndOwner(userModel).please();
       long beforeThingCount = makeMe.modelFactoryService.noteRepository.count();
       controller().linkNoteFinalize(note3, note2, linkCreation, makeMe.successfulBindingResult());
@@ -71,8 +76,12 @@ class RestLinkControllerTests {
 
     @Test
     void createdChildNoteSuccessfully()
-        throws CyclicLinkDetectedException, BindException, UnexpectedNoAccessRightException {
+        throws CyclicLinkDetectedException,
+            BindException,
+            UnexpectedNoAccessRightException,
+            MovementNotPossibleException {
       Note note3 = makeMe.aNote("flower tea").creatorAndOwner(userModel).please();
+      linkCreation.asFirstChild = false;
       controller().linkNoteFinalize(note3, note2, linkCreation, makeMe.successfulBindingResult());
       makeMe.refresh(note3);
       assertThat(note3.getChildren(), hasSize(0));

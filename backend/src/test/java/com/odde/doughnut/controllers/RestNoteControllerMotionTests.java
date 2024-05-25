@@ -3,9 +3,11 @@ package com.odde.doughnut.controllers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
+import com.odde.doughnut.exceptions.MovementNotPossibleException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
@@ -43,6 +45,11 @@ class RestNoteControllerMotionTests {
     subject = makeMe.aNote("subject").please();
   }
 
+  @Test
+  void shouldNotMoveUpIfThereIsNoPreviousSibling() {
+    assertThrows(UnexpectedNoAccessRightException.class, () -> controller.moveUp(subject));
+  }
+
   @Nested
   class NoteWithParent {
     Note parent;
@@ -51,6 +58,11 @@ class RestNoteControllerMotionTests {
     void setup() {
       parent = makeMe.aNote("parent").creatorAndOwner(userModel).please();
       subject = makeMe.theNote(subject).under(parent).please();
+    }
+
+    @Test
+    void shouldNotMoveUpIfThereIsNoPreviousSibling() {
+      assertThrows(MovementNotPossibleException.class, () -> controller.moveUp(subject));
     }
 
     @Nested
@@ -68,7 +80,9 @@ class RestNoteControllerMotionTests {
 
       @Test
       void shouldMoveUpWhenThereIsOneOlderSibling()
-          throws UnexpectedNoAccessRightException, CyclicLinkDetectedException {
+          throws UnexpectedNoAccessRightException,
+              CyclicLinkDetectedException,
+              MovementNotPossibleException {
         assertThat(previousOlder.getSiblingOrder(), lessThan(subject.getSiblingOrder()));
         var noteRealm = controller.moveUp(subject);
         assertThat(noteRealm.getId(), equalTo(parent.getId()));
