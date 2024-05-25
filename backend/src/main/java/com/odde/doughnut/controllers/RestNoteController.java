@@ -252,9 +252,7 @@ class RestNoteController {
     }
 
     boolean asFirstChildBoolean = asFirstChild.compareToIgnoreCase("asFirstChild") == 0;
-    modelFactoryService
-        .toNoteMotionModel(new NoteMotion(targetNote, asFirstChildBoolean), note)
-        .execute();
+    modelFactoryService.motionOfMoveAfter(note, targetNote, asFirstChildBoolean).execute();
     return new NoteViewer(currentUser.getEntity(), note.getParent()).toJsonObject();
   }
 }

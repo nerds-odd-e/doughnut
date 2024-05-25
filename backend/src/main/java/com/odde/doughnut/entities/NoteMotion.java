@@ -1,18 +1,15 @@
 package com.odde.doughnut.entities;
 
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
+@AllArgsConstructor
+@Data
 public class NoteMotion {
-  @Getter @Setter Note subject;
-  @Getter @Setter Note relativeToNote;
-  @Getter @Setter private boolean asFirstChildOfNote;
-
-  public NoteMotion(Note relativeToNote, boolean asFirstChildOfNote) {
-    this.relativeToNote = relativeToNote;
-    this.asFirstChildOfNote = asFirstChildOfNote;
-  }
+  private final Note subject;
+  private final Note relativeToNote;
+  private final boolean asFirstChildOfNote;
 
   public Note getNewParent() {
     if (asFirstChildOfNote) {

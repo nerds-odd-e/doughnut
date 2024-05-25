@@ -76,7 +76,7 @@ class RestLinkController {
     if (linkCreation != null && linkCreation.moveUnder != null && linkCreation.moveUnder) {
       currentUser.assertAuthorization(targetNote);
       modelFactoryService
-          .toNoteMotionModel(sourceNote, targetNote, linkCreation.asFirstChild)
+          .motionOfMoveUnder(sourceNote, targetNote, linkCreation.asFirstChild)
           .execute();
     }
     User user = currentUser.getEntity();

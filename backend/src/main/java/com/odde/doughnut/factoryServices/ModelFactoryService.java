@@ -31,19 +31,18 @@ public class ModelFactoryService {
     return new NoteModel(note, this);
   }
 
-  public NoteMotionModel toNoteMotionModel(NoteMotion noteMotion, Note note) {
-    noteMotion.setSubject(note);
-    return new NoteMotionModel(noteMotion, this);
+  public NoteMotionModel motionOfMoveAfter(Note subject, Note target, Boolean asFirstChild) {
+    return new NoteMotionModel(new NoteMotion(subject, target, asFirstChild), this);
   }
 
-  public NoteMotionModel toNoteMotionModel(Note sourceNote, Note targetNote, Boolean asFirstChild) {
+  public NoteMotionModel motionOfMoveUnder(Note sourceNote, Note targetNote, Boolean asFirstChild) {
     if (!asFirstChild) {
       List<HierarchicalNote> children = targetNote.getChildren();
       if (!children.isEmpty()) {
-        return toNoteMotionModel(new NoteMotion(children.getLast(), false), sourceNote);
+        return motionOfMoveAfter(sourceNote, children.getLast(), false);
       }
     }
-    return toNoteMotionModel(new NoteMotion(targetNote, true), sourceNote);
+    return motionOfMoveAfter(sourceNote, targetNote, true);
   }
 
   public BazaarModel toBazaarModel() {

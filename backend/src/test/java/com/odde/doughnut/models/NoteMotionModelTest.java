@@ -7,7 +7,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.NoteMotion;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.testability.MakeMe;
@@ -42,8 +41,8 @@ public class NoteMotionModelTest {
 
   void move(Note subject, Note relativeNote, boolean asFirstChildOfNote)
       throws CyclicLinkDetectedException {
-    NoteMotion motion = new NoteMotion(relativeNote, asFirstChildOfNote);
-    NoteMotionModel noteMotionModel = modelFactoryService.toNoteMotionModel(motion, subject);
+    NoteMotionModel noteMotionModel =
+        modelFactoryService.motionOfMoveAfter(subject, relativeNote, asFirstChildOfNote);
     noteMotionModel.execute();
   }
 
