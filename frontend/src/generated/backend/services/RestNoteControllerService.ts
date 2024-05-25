@@ -116,6 +116,25 @@ export class RestNoteControllerService {
      * @returns NoteRealm OK
      * @throws ApiError
      */
+    public moveUp(
+        note: number,
+    ): CancelablePromise<NoteRealm> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/notes/{note}/move-up',
+            path: {
+                'note': note,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param note
+     * @returns NoteRealm OK
+     * @throws ApiError
+     */
     public deleteNote(
         note: number,
     ): CancelablePromise<Array<NoteRealm>> {

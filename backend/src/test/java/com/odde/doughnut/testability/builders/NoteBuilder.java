@@ -185,4 +185,16 @@ public class NoteBuilder extends EntityBuilder<Note> {
     this.audioFilename = filename;
     return this;
   }
+
+  public NoteBuilder asFirstChildOf(Note note) {
+    under(note);
+    entity.updateSiblingOrder(note, true);
+    return this;
+  }
+
+  public NoteBuilder after(Note note) {
+    under(note);
+    entity.updateSiblingOrder(note, false);
+    return this;
+  }
 }

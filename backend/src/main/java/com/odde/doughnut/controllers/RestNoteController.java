@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.DuplicateWikidataIdException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -228,5 +229,15 @@ class RestNoteController {
               modelFactoryService.save(link);
             });
     return new RedirectToNoteResponse(note.getId());
+  }
+
+  @PostMapping(value = "/{note}/move-up")
+  @Transactional
+  public NoteRealm moveUp(@PathVariable @Schema(type = "integer") Note note)
+      throws UnexpectedNoAccessRightException, CyclicLinkDetectedException {
+    currentUser.assertAuthorization(note);
+
+    modelFactoryService.toNoteMotionModel(new NoteMotion(note.getParent(), true), note).execute();
+    return new NoteViewer(currentUser.getEntity(), note.getParent()).toJsonObject();
   }
 }
