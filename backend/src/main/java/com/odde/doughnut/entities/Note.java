@@ -227,28 +227,23 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
   }
 
   public void updateSiblingOrder(Note relativeToNote, boolean asFirstChildOfNote) {
-    Long newSiblingOrder =
-        relativeToNote.theSiblingOrderItTakesToMoveRelativeToMe(asFirstChildOfNote);
-    if (newSiblingOrder != null) {
-      this.siblingOrder = newSiblingOrder;
+    if (!asFirstChildOfNote) {
+      this.siblingOrder =
+          relativeToNote
+              .nextSibling()
+              .map(x -> (relativeToNote.siblingOrder + x.getSiblingOrder()) / 2)
+              .orElse(relativeToNote.siblingOrder + SiblingOrder.MINIMUM_SIBLING_ORDER_INCREMENT);
+      return;
+    }
+    Note firstChild = relativeToNote.getFirstChild();
+    if (firstChild != null) {
+      this.siblingOrder =
+          firstChild.getSiblingOrder() - SiblingOrder.MINIMUM_SIBLING_ORDER_INCREMENT;
     }
   }
 
   private Optional<HierarchicalNote> nextSibling() {
     return getSiblings().stream().filter(nc -> nc.getSiblingOrder() > siblingOrder).findFirst();
-  }
-
-  protected Long theSiblingOrderItTakesToMoveRelativeToMe(boolean asFirstChildOfNote) {
-    if (!asFirstChildOfNote) {
-      return nextSibling()
-          .map(x -> (siblingOrder + x.getSiblingOrder()) / 2)
-          .orElse(siblingOrder + SiblingOrder.MINIMUM_SIBLING_ORDER_INCREMENT);
-    }
-    Note firstChild = getFirstChild();
-    if (firstChild != null) {
-      return firstChild.getSiblingOrder() - SiblingOrder.MINIMUM_SIBLING_ORDER_INCREMENT;
-    }
-    return null;
   }
 
   public Optional<Integer> getParentId() {
