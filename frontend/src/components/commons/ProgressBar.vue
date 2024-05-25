@@ -1,8 +1,7 @@
 <template>
   <div class="review-info-bar">
-    <StopRepeatButton />
     <slot name="buttons" />
-    <div class="review-info-bar-right">
+    <div class="review-info-bar-right" @click.prevent="goHome()">
       <span
         :class="`progress-bar ${!!$slots.default ? 'thin' : ''}`"
         v-if="toRepeatCount !== null"
@@ -20,17 +19,19 @@
     </div>
   </div>
 </template>
-<script>
-import StopRepeatButton from "../review/StopRepeatButton.vue";
 
-export default {
-  components: { StopRepeatButton },
-  props: {
-    finished: Number,
-    toRepeatCount: Number,
-    title: String,
-  },
-  methods: {},
+<script setup lang="ts">
+import usePopups from "@/components/commons/Popups/usePopups";
+
+defineProps({
+  finished: { type: Number, required: true },
+  toRepeatCount: { type: Number, required: true },
+  title: String,
+});
+const goHome = async () => {
+  if (await usePopups().popups.confirm("Confirm to leave the reviewing?")) {
+    window.location.href = "/";
+  }
 };
 </script>
 

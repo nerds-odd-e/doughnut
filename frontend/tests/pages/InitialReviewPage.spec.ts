@@ -51,7 +51,6 @@ describe("repeat page", () => {
       await flushPromises();
       // expect(mockRouterPush).toHaveBeenCalledTimes(1);
       expect(wrapper.findAll(".initial-review-paused")).toHaveLength(0);
-      expect(wrapper.findAll(".pause-stop")).toHaveLength(1);
       expect(wrapper.find(".progress-text").text()).toContain(
         "Initial Review: 0/2",
       );
