@@ -16,24 +16,31 @@
       />
     </div>
     <div class="col-md-4 d-flex flex-column p-0">
-      <NoteRecentUpdateIndicator
-        v-bind="{
-          id: noteRealm.id,
-          updatedAt: noteRealm.note.updatedAt,
-        }"
-      >
-        <NoteAccessoryAsync
-          v-bind="{ noteId: noteRealm.id, updatedNoteAccessory, readonly }"
-        />
-        <NoteInfoBar
-          :note-id="noteRealm.id"
-          :expanded="false"
-          :key="noteRealm.id"
-        />
-      </NoteRecentUpdateIndicator>
+      <NoteAccessoryAsync
+        v-bind="{ noteId: noteRealm.id, updatedNoteAccessory, readonly }"
+      />
+      <NoteInfoBar
+        :note-id="noteRealm.id"
+        :expanded="false"
+        :key="noteRealm.id"
+      />
     </div>
   </div>
-  <div>Created: {{ noteRealm.note.createdAt }}</div>
+  <NoteRecentUpdateIndicator
+    v-bind="{
+      id: noteRealm.id,
+      updatedAt: noteRealm.note.updatedAt,
+    }"
+  >
+    <p>
+      <span class="me-3">
+        Created: {{ toLocalDateString(noteRealm.note.createdAt) }}
+      </span>
+      <span>
+        Last updated: {{ toLocalDateString(noteRealm.note.updatedAt) }}
+      </span>
+    </p>
+  </NoteRecentUpdateIndicator>
   <ChildrenNotes
     v-bind="{ expandChildren, readonly, storageAccessor }"
     :notes="noteRealm.children ?? []"
@@ -63,4 +70,8 @@ defineProps({
 });
 
 const updatedNoteAccessory = ref<NoteAccessory | undefined>(undefined);
+
+const toLocalDateString = (date: string) => {
+  return new Date(date).toLocaleDateString();
+};
 </script>

@@ -1,7 +1,7 @@
 <template>
   <div
     class="note-recent-update-indicator h-100 d-flex flex-column"
-    :style="`background-color: ${bgColor}`"
+    :style="`color: ${bgColor}`"
   >
     <slot />
   </div>
