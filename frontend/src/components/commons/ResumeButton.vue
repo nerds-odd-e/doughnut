@@ -1,33 +1,73 @@
 <template>
   <div class="paused" @click="$emit('resume')">
     <a title="Go back to review">
-      <SvgResume width="50" height="50" />
+      <svg :width="svgSize" :height="svgSize" :viewBox="viewBox">
+        <circle
+          :cx="circleCenter"
+          :cy="circleCenter"
+          :r="circleRadius"
+          stroke="grey"
+          :stroke-width="strokeWidth"
+          fill="rgba(255, 128, 128, 0.5)"
+        />
+        <circle
+          :cx="circleCenter"
+          :cy="circleCenter"
+          :r="circleRadius"
+          stroke="blue"
+          :stroke-width="strokeWidth"
+          fill="transparent"
+          :stroke-dasharray="`${calculateStrokeDashArray} ${circleCircumference}`"
+          stroke-dashoffset="0"
+        />
+        <text
+          :x="circleCenter"
+          :y="circleCenter"
+          text-anchor="middle"
+          dominant-baseline="middle"
+          font-size="9"
+        >
+          Resume
+        </text>
+      </svg>
     </a>
   </div>
 </template>
 
 <script setup lang="ts">
-import SvgResume from "@/components/svgs/SvgResume.vue";
+import { toRefs, computed } from "vue";
 
-defineProps({
+const svgSize = 50;
+const viewBox = `0 0 ${svgSize} ${svgSize}`;
+const circleCenter = svgSize / 2;
+const circleRadius = 20;
+const strokeWidth = 4;
+const circleCircumference = 2 * Math.PI * circleRadius;
+
+const props = defineProps({
   finished: { type: Number, required: true },
   toRepeatCount: { type: Number, required: true },
 });
 
+const reactiveProps = toRefs(props);
+
 defineEmits(["resume"]);
+
+const calculateStrokeDashArray = computed(() => {
+  const progress =
+    circleCircumference *
+    (reactiveProps.finished.value /
+      (reactiveProps.finished.value + reactiveProps.toRepeatCount.value));
+  return Math.max(progress, 5);
+});
 </script>
 
 <style lang="scss" scoped>
-.progress {
-  background-color: blue;
-  height: 100%;
-}
-
-.progress-text {
+.paused {
+  cursor: pointer;
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: white;
+  top: 10em;
+  right: 10px;
+  z-index: 99999;
 }
 </style>
