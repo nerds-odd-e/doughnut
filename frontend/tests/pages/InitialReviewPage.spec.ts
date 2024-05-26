@@ -2,13 +2,21 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { flushPromises } from "@vue/test-utils";
 import InitialReviewPage from "@/pages/InitialReviewPage.vue";
 import ShowThing from "@/components/review/ShowThing.vue";
+import { useRouter } from "vue-router";
 import mockBrowserTimeZone from "../helpers/mockBrowserTimeZone";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 import RenderingHelper from "../helpers/RenderingHelper";
 
+const mockedPush = vi.fn();
+
+vitest.mock("vue-router", () => ({
+  useRouter: () => ({
+    push: mockedPush,
+  }),
+}));
+
 let renderer: RenderingHelper;
-const mockRouterPush = vi.fn();
 const mockedInitialReviewCall = vi.fn();
 const mockedNoteInfoCall = vi.fn();
 const mockedGetNoteCall = vi.fn();
@@ -32,10 +40,7 @@ beforeEach(() => {
   helper.managedApi.restNoteController.getNoteInfo =
     mockedNoteInfoCall.mockResolvedValue({});
   helper.managedApi.restNoteController.show1 = mockedGetNoteCall;
-  renderer = helper
-    .component(InitialReviewPage)
-    .withStorageProps({})
-    .withMockRouterPush(mockRouterPush);
+  renderer = helper.component(InitialReviewPage).withStorageProps({});
 });
 
 describe("repeat page", () => {
@@ -43,7 +48,7 @@ describe("repeat page", () => {
     mockedInitialReviewCall.mockResolvedValue([]);
     renderer.currentRoute({ name: "initial" }).mount();
     await flushPromises();
-    expect(mockRouterPush).toHaveBeenCalledWith({ name: "reviews" });
+    expect(useRouter().push).toHaveBeenCalledWith({ name: "reviews" });
     expect(mockedInitialReviewCall).toBeCalledWith("Europe/Amsterdam");
   });
 
@@ -60,7 +65,6 @@ describe("repeat page", () => {
     it("normal view", async () => {
       const wrapper = renderer.currentRoute({ name: "initial" }).mount();
       await flushPromises();
-      // expect(mockRouterPush).toHaveBeenCalledTimes(1);
       expect(wrapper.findAll(".paused")).toHaveLength(0);
       expect(teleportTarget.textContent).toContain("Initial Review: 0/2");
       expect(mockedGetNoteCall).toBeCalledWith(noteRealm.id);
@@ -85,7 +89,7 @@ describe("repeat page", () => {
       .currentRoute({ name: "initial" })
       .mount();
     await flushPromises();
-    expect(mockRouterPush).toHaveBeenCalledTimes(0);
+    expect(useRouter().push).toHaveBeenCalledTimes(0);
     expect(wrapper.findAll(".paused")).toHaveLength(1);
   });
 });

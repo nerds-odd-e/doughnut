@@ -1,14 +1,14 @@
 <template>
-  <div class="paused" v-if="paused" @click="$emit('resume')">
-    <a title="Go back to review">
-      <SvgResume width="50" height="50" />
-    </a>
-  </div>
-  <teleport v-if="title" to="#head-status">
+  <ResumeButton
+    v-if="paused"
+    @resume="$emit('resume')"
+    v-bind="{ finished, toRepeatCount }"
+  />
+  <teleport v-else-if="title" to="#head-status">
     <div class="flex-shrink-0">
       <slot name="buttons" />
     </div>
-    <div class="flex-grow-1 review-info-bar-right" @click.prevent="goHome()">
+    <div class="flex-grow-1" @click.prevent="goHome()">
       <span
         :class="`progress-bar ${!!$slots.default ? 'thin' : ''}`"
         v-if="toRepeatCount !== null"
@@ -28,7 +28,7 @@
 
 <script setup lang="ts">
 import usePopups from "@/components/commons/Popups/usePopups";
-import SvgResume from "@/components/svgs/SvgResume.vue";
+import ResumeButton from "./ResumeButton.vue";
 
 defineProps({
   paused: { type: Boolean, required: true },
@@ -47,10 +47,6 @@ const goHome = async () => {
 </script>
 
 <style lang="scss" scoped>
-.review-info-bar-right {
-  flex-grow: 1;
-}
-
 .progress-bar {
   width: 100%;
   background-color: gray;
