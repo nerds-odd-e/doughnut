@@ -1,5 +1,7 @@
 <template>
-  <ProgressBar v-bind="{ title: `Repetition: `, finished, toRepeatCount }">
+  <ProgressBar
+    v-bind="{ title: `Repetition: `, finished, toRepeatCount, paused: false }"
+  >
     <template #buttons>
       <div class="btn-group">
         <template v-if="previousResultCursor !== undefined">

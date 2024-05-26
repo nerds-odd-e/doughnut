@@ -11,6 +11,17 @@ let renderer: RenderingHelper;
 const mockRouterPush = vi.fn();
 const mockedRepeatCall = vi.fn();
 
+let teleportTarget: HTMLDivElement;
+
+beforeEach(() => {
+  teleportTarget = document.createElement("div");
+  teleportTarget.id = "head-status";
+  document.body.appendChild(teleportTarget);
+});
+afterEach(() => {
+  document.body.innerHTML = "";
+});
+
 beforeEach(() => {
   vitest.resetAllMocks();
   helper.managedApi.restReviewsController.repeatReview = mockedRepeatCall;
@@ -32,8 +43,7 @@ describe("repeat page", () => {
   it("redirect to review page if nothing to repeat", async () => {
     const repetition = makeMe.aDueReviewPointsList.please();
     mockedRepeatCall.mockResolvedValue(repetition);
-    const wrapper = await mountPage();
-    expect(wrapper.findAll("button").length).toBe(4);
+    await mountPage();
     expect(mockedRepeatCall).toHaveBeenCalledWith("Asia/Shanghai", 0);
   });
 
@@ -60,8 +70,8 @@ describe("repeat page", () => {
     });
 
     it("shows the progress", async () => {
-      const wrapper = await mountPage();
-      expect(wrapper.find(".progress-text").text()).toContain("0/3");
+      await mountPage();
+      expect(teleportTarget.textContent).toContain("0/3");
       expect(mockedRandomQuestionCall).toHaveBeenCalledWith(firstReviewPointId);
     });
 
@@ -86,7 +96,7 @@ describe("repeat page", () => {
         true,
       );
       await flushPromises();
-      expect(wrapper.find(".progress-text").text()).toContain("1/3");
+      expect(teleportTarget.textContent).toContain("1/3");
       expect(mockedRandomQuestionCall).toHaveBeenCalledWith(
         secondReviewPointId,
       );

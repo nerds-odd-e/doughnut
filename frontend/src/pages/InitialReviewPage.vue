@@ -1,8 +1,8 @@
 <template>
   <ContainerPage v-bind="{ contentExists: !!thing }">
     <ProgressBar
-      :class="minimized ? 'initial-review-paused' : ''"
       v-bind="{
+        paused: minimized,
         title: `Initial Review: `,
         finished,
         toRepeatCount: remainingInitialReviewCountForToday,

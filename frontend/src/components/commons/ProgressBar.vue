@@ -1,4 +1,6 @@
 <template>
+  <div class="paused" v-if="paused">
+  </div>
   <teleport v-if="title" to="#head-status">
     <div class="flex-shrink-0">
       <slot name="buttons" />
@@ -25,6 +27,7 @@
 import usePopups from "@/components/commons/Popups/usePopups";
 
 defineProps({
+  paused: { type: Boolean, required: true },
   finished: { type: Number, required: true },
   toRepeatCount: { type: Number, required: true },
   title: String,

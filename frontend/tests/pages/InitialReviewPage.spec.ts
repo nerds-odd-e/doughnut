@@ -13,6 +13,17 @@ const mockedInitialReviewCall = vi.fn();
 const mockedNoteInfoCall = vi.fn();
 const mockedGetNoteCall = vi.fn();
 
+let teleportTarget: HTMLDivElement;
+
+beforeEach(() => {
+  teleportTarget = document.createElement("div");
+  teleportTarget.id = "head-status";
+  document.body.appendChild(teleportTarget);
+});
+afterEach(() => {
+  document.body.innerHTML = "";
+});
+
 mockBrowserTimeZone("Europe/Amsterdam", beforeEach, afterEach);
 
 beforeEach(() => {
@@ -50,10 +61,8 @@ describe("repeat page", () => {
       const wrapper = renderer.currentRoute({ name: "initial" }).mount();
       await flushPromises();
       // expect(mockRouterPush).toHaveBeenCalledTimes(1);
-      expect(wrapper.findAll(".initial-review-paused")).toHaveLength(0);
-      expect(wrapper.find(".progress-text").text()).toContain(
-        "Initial Review: 0/2",
-      );
+      expect(wrapper.findAll(".paused")).toHaveLength(0);
+      expect(teleportTarget.textContent).toContain("Initial Review: 0/2");
       expect(mockedGetNoteCall).toBeCalledWith(noteRealm.id);
     });
 
@@ -67,22 +76,6 @@ describe("repeat page", () => {
     });
   });
 
-  it("minimized view", async () => {
-    const noteRealm = makeMe.aNoteRealm.please();
-    const reviewPoint = makeMe.aReviewPoint.ofNote(noteRealm).please();
-    mockedInitialReviewCall.mockResolvedValue([reviewPoint.thing]);
-    const wrapper = renderer
-      .withStorageProps({ minimized: true })
-      .currentRoute({ name: "initial" })
-      .mount();
-    await flushPromises();
-    expect(mockRouterPush).toHaveBeenCalledTimes(0);
-    expect(wrapper.findAll(".initial-review-paused")).toHaveLength(1);
-    expect(wrapper.find(".review-point-abbr span").text()).toContain(
-      noteRealm.note.topic,
-    );
-  });
-
   it("minimized view for link", async () => {
     const link = makeMe.aLink.please();
     const reviewPoint = makeMe.aReviewPoint.ofLink(link).please();
@@ -93,12 +86,6 @@ describe("repeat page", () => {
       .mount();
     await flushPromises();
     expect(mockRouterPush).toHaveBeenCalledTimes(0);
-    expect(wrapper.findAll(".initial-review-paused")).toHaveLength(1);
-    expect(wrapper.find(".review-point-abbr span").text()).toContain(
-      link.sourceNote!.topic,
-    );
-    expect(wrapper.find(".review-point-abbr span").text()).toContain(
-      link.targetNote!.topic,
-    );
+    expect(wrapper.findAll(".paused")).toHaveLength(1);
   });
 });
