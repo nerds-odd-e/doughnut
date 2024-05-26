@@ -83,7 +83,12 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
   @OneToMany(mappedBy = "parent", cascade = CascadeType.DETACH)
   @JsonIgnore
   @OrderBy("siblingOrder")
-  private final List<HierarchicalNote> children = new ArrayList<>();
+  private final List<HierarchicalNote> hierarchicalChildren = new ArrayList<>();
+
+  @OneToMany(mappedBy = "parent", cascade = CascadeType.DETACH)
+  @JsonIgnore
+  @OrderBy("siblingOrder")
+  private final List<Note> children = new ArrayList<>();
 
   @OneToMany(mappedBy = "note")
   @JsonIgnore
@@ -121,7 +126,12 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
   @Embedded @JsonIgnore @Getter private ReviewSetting reviewSetting = new ReviewSetting();
 
   @JsonIgnore
-  public List<HierarchicalNote> getChildren() {
+  public List<HierarchicalNote> getHierarchicalChildren() {
+    return filterDeleted(hierarchicalChildren);
+  }
+
+  @JsonIgnore
+  public List<Note> getChildren() {
     return filterDeleted(children);
   }
 
@@ -156,7 +166,7 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
     if (getParent() == null) {
       return new ArrayList<>();
     }
-    return getParent().getChildren();
+    return getParent().getHierarchicalChildren();
   }
 
   @JsonIgnore
@@ -223,7 +233,7 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   private Note getFirstChild() {
-    return getChildren().stream().findFirst().orElse(null);
+    return getHierarchicalChildren().stream().findFirst().orElse(null);
   }
 
   public void updateSiblingOrder(Note relativeToNote, boolean asFirstChildOfNote) {
@@ -279,7 +289,8 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public Stream<Note> getDescendants() {
-    return getChildren().stream().flatMap(c -> Stream.concat(Stream.of(c), c.getDescendants()));
+    return getHierarchicalChildren().stream()
+        .flatMap(c -> Stream.concat(Stream.of(c), c.getDescendants()));
   }
 
   @JsonIgnore

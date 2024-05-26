@@ -2644,41 +2644,6 @@ components:
         wikidataId:
           pattern: ^$|Q\d+
           type: string
-    HierarchicalNote:
-      required:
-      - createdAt
-      - id
-      - topic
-      - topicConstructor
-      - updatedAt
-      type: object
-      properties:
-        topic:
-          type: string
-        topicConstructor:
-          maxLength: 150
-          minLength: 1
-          type: string
-        details:
-          type: string
-        parentId:
-          type: integer
-          format: int32
-        updatedAt:
-          type: string
-          format: date-time
-        id:
-          type: integer
-          format: int32
-        createdAt:
-          type: string
-          format: date-time
-        deletedAt:
-          type: string
-          format: date-time
-          readOnly: true
-        wikidataId:
-          type: string
     LinkViewed:
       required:
       - direct
@@ -2738,7 +2703,7 @@ components:
         children:
           type: array
           items:
-            $ref: "#/components/schemas/HierarchicalNote"
+            $ref: "#/components/schemas/Note"
     WikidataAssociationCreation:
       required:
       - wikidataId

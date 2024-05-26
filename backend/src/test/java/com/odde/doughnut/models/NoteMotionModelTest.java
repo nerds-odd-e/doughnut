@@ -62,7 +62,7 @@ public class NoteMotionModelTest {
   private void assertOrder(Note note1, Note note2) {
     Note parentNote = note1.getParent();
     makeMe.refresh(parentNote);
-    assertThat(parentNote.getChildren(), containsInRelativeOrder(note1, note2));
+    assertThat(parentNote.getHierarchicalChildren(), containsInRelativeOrder(note1, note2));
   }
 
   @Test

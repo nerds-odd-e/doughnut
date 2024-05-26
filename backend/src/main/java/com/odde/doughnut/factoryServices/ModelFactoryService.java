@@ -37,7 +37,7 @@ public class ModelFactoryService {
 
   public NoteMotionModel motionOfMoveUnder(Note sourceNote, Note targetNote, Boolean asFirstChild) {
     if (!asFirstChild) {
-      List<HierarchicalNote> children = targetNote.getChildren();
+      List<HierarchicalNote> children = targetNote.getHierarchicalChildren();
       if (!children.isEmpty()) {
         return motionOfMoveAfter(sourceNote, children.getLast(), false);
       }

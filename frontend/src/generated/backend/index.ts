@@ -32,7 +32,6 @@ export type { FailureReport } from './models/FailureReport';
 export type { FailureReportForView } from './models/FailureReportForView';
 export type { GithubIssue } from './models/GithubIssue';
 export type { GlobalAiModelSettings } from './models/GlobalAiModelSettings';
-export type { HierarchicalNote } from './models/HierarchicalNote';
 export type { ImageWithMask } from './models/ImageWithMask';
 export type { InitialInfo } from './models/InitialInfo';
 export { LinkCreation } from './models/LinkCreation';
