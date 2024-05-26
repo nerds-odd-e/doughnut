@@ -1,6 +1,5 @@
 <template>
-  <div class="paused" v-if="paused">
-  </div>
+  <div class="paused" v-if="paused"></div>
   <teleport v-if="title" to="#head-status">
     <div class="flex-shrink-0">
       <slot name="buttons" />
