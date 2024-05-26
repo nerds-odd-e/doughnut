@@ -1,5 +1,9 @@
 <template>
-  <div class="paused" v-if="paused"></div>
+  <div class="paused" v-if="paused" @click="$emit('resume')">
+    <a title="Go back to review">
+      <SvgResume width="50" height="50" />
+    </a>
+  </div>
   <teleport v-if="title" to="#head-status">
     <div class="flex-shrink-0">
       <slot name="buttons" />
@@ -24,6 +28,7 @@
 
 <script setup lang="ts">
 import usePopups from "@/components/commons/Popups/usePopups";
+import SvgResume from "@/components/svgs/SvgResume.vue";
 
 defineProps({
   paused: { type: Boolean, required: true },
@@ -31,6 +36,9 @@ defineProps({
   toRepeatCount: { type: Number, required: true },
   title: String,
 });
+
+defineEmits(["resume"]);
+
 const goHome = async () => {
   if (await usePopups().popups.confirm("Confirm to leave the reviewing?")) {
     window.location.href = "/";
