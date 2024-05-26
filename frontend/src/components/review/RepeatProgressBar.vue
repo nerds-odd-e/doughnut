@@ -1,6 +1,7 @@
 <template>
   <ProgressBar
-    v-bind="{ title: `Repetition: `, finished, toRepeatCount, paused: false }"
+    v-bind="{ title: `Repetition: `, finished, toRepeatCount, paused }"
+    @resume="$emit('viewLastResult', undefined)"
   >
     <template #buttons>
       <div class="btn-group">
@@ -27,14 +28,6 @@
           >
             <SvgForward />
           </button>
-
-          <button
-            class="btn large-btn"
-            title="Go back to review"
-            @click="$emit('viewLastResult', undefined)"
-          >
-            <SvgResume />
-          </button>
         </template>
         <button
           v-else
@@ -50,69 +43,30 @@
   </ProgressBar>
 </template>
 
-<script>
+<script setup lang="ts">
+import { computed } from "vue";
+import { useRouter } from "vue-router";
 import ProgressBar from "../commons/ProgressBar.vue";
-import SvgResume from "../svgs/SvgResume.vue";
 import SvgPause from "../svgs/SvgPause.vue";
 import SvgBackward from "../svgs/SvgBackward.vue";
 import SvgForward from "../svgs/SvgForward.vue";
 
-export default {
-  components: {
-    ProgressBar,
-    SvgResume,
-    SvgPause,
-    SvgBackward,
-    SvgForward,
-  },
-  props: {
-    finished: Number,
-    toRepeatCount: Number,
-    previousResultCursor: Number,
-  },
-  emits: ["viewLastResult"],
-  methods: {},
-};
+defineProps({
+  finished: { type: Number, required: true },
+  toRepeatCount: { type: Number, required: true },
+  previousResultCursor: Number,
+});
+defineEmits(["viewLastResult"]);
+
+const router = useRouter();
+
+const paused = computed(() => {
+  const routeName = router.currentRoute.value.name;
+  return routeName !== "repeat" && routeName !== "repeat-answer";
+});
 </script>
 
 <style lang="scss" scoped>
-.review-info-bar {
-  display: flex;
-}
-
-.review-info-bar-right {
-  flex-grow: 1;
-}
-
-.progress-bar {
-  width: 100%;
-  background-color: gray;
-  height: 25px;
-  border-radius: 10px;
-  position: relative;
-
-  &.thin {
-    height: 5px;
-
-    .progress-text {
-      display: none;
-    }
-  }
-}
-
-.progress {
-  background-color: blue;
-  height: 100%;
-}
-
-.progress-text {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: white;
-}
-
 .large-btn {
   svg {
     width: 30px;

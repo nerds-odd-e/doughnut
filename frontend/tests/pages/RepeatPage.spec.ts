@@ -1,11 +1,23 @@
 import { describe, it, vi, expect, beforeEach, afterEach } from "vitest";
 import { flushPromises } from "@vue/test-utils";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { useRouter } from "vue-router";
 import RepeatPage from "@/pages/RepeatPage.vue";
 import { AnsweredQuestion } from "@/generated/backend";
 import mockBrowserTimeZone from "../helpers/mockBrowserTimeZone";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 import RenderingHelper from "../helpers/RenderingHelper";
+
+vitest.mock("vue-router", () => ({
+  useRouter: () => ({
+    currentRoute: {
+      value: {
+        name: "repeat",
+      },
+    },
+  }),
+}));
 
 let renderer: RenderingHelper;
 const mockRouterPush = vi.fn();
