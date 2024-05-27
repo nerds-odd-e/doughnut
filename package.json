@@ -68,7 +68,7 @@
     "eslint-plugin-unused-imports": "^4.0.0",
     "github_action_sound": "^1.0.4",
     "got": "^14.3.0",
-    "jsdom": "^24.0.0",
+    "jsdom": "^24.1.0",
     "mountebank": "^2.9.1",
     "npm-run-all2": "^6.2.0",
     "openapi-typescript-codegen": "^0.29.0",
@@ -79,7 +79,7 @@
     "wait-on": "^7.2.0"
   },
   "dependencies": {
-    "@cucumber/cucumber": "^10.7.0"
+    "@cucumber/cucumber": "^10.8.0"
   },
   "pnpm": {
     "overrides": {
