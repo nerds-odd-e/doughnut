@@ -3,13 +3,33 @@
 </template>
 
 <script setup lang="ts">
-import { Ref, nextTick, onMounted, ref } from "vue";
+import { Ref, nextTick, onMounted, ref, onBeforeUnmount } from "vue";
 
 const scrollRef: Ref<HTMLElement | null> = ref(null);
 
 onMounted(async () => {
   await nextTick();
-  scrollRef.value?.scrollIntoView({ behavior: "smooth" });
+
+  const handleIntersection = (entries: IntersectionObserverEntry[]) => {
+    if (entries[0] && entries[0].isIntersecting === false) {
+      scrollRef.value?.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  const observer = new IntersectionObserver(handleIntersection, {
+    root: null, // Use the viewport as the root
+    threshold: 0, // Trigger when the element is not visible at all
+  });
+
+  if (scrollRef.value) {
+    observer.observe(scrollRef.value);
+  }
+
+  onBeforeUnmount(() => {
+    if (scrollRef.value) {
+      observer.unobserve(scrollRef.value);
+    }
+  });
 });
 </script>
 
