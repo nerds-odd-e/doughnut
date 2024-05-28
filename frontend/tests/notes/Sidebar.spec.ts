@@ -1,4 +1,5 @@
 import { screen } from "@testing-library/vue";
+import "intersection-observer";
 import Sidebar from "@/components/notes/Sidebar.vue";
 import { NoteRealm } from "@/generated/backend";
 import { flushPromises } from "@vue/test-utils";
@@ -35,6 +36,33 @@ describe("Sidebar", () => {
       })
       .render();
   };
+
+  let isIntersecting = false;
+
+  beforeEach(() => {
+    isIntersecting = false;
+    // Mock the IntersectionObserver
+    /* eslint-disable */
+    let observeCallback: IntersectionObserverCallback;
+    global.IntersectionObserver = class {
+      constructor(callback: IntersectionObserverCallback) {
+        observeCallback = callback;
+      }
+
+      observe() {
+        // Call the callback with a mock entry
+        observeCallback(
+          [{ isIntersecting }] as IntersectionObserverEntry[],
+          {} as IntersectionObserver,
+        );
+      }
+
+      disconnect() {}
+
+      unobserve() {}
+    };
+    /* eslint-enable */
+  });
 
   beforeEach(() => {
     window.HTMLElement.prototype.scrollIntoView = vitest.fn();
@@ -78,6 +106,13 @@ describe("Sidebar", () => {
           ?.parentNode,
         /* eslint-enable */
       ).toHaveClass("active-item");
+    });
+
+    it("should not scroll if already visible", async () => {
+      isIntersecting = true;
+      render(firstGeneration);
+      await flushPromises();
+      expect(window.HTMLElement.prototype.scrollIntoView).not.toBeCalled();
     });
 
     it("should have siblings", async () => {

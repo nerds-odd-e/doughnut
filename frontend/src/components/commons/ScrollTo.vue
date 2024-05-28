@@ -3,6 +3,7 @@
 </template>
 
 <script setup lang="ts">
+import "intersection-observer";
 import { Ref, nextTick, onMounted, ref, onBeforeUnmount } from "vue";
 
 const scrollRef: Ref<HTMLElement | null> = ref(null);
