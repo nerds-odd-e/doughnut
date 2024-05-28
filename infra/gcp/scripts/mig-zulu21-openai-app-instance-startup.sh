@@ -14,7 +14,7 @@ gsutil cp gs://"${BUCKET}/backend_app_jar/${ARTIFACT}-${VERSION}.jar" "/opt/doug
 # Stop unneeded salt-minion
 systemctl stop salt-minion
 
-# Make Java 17 default
+# Make Java 21 default
 export JAVA_HOME=/usr/lib/jvm/zre-21-amd64
 export PATH=$PATH:$JAVA_HOME/bin
 
