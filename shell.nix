@@ -160,6 +160,6 @@ in mkShell {
         echo -e "You may choose to SHUTDOWN MySQL Server by issuing 'kill -SIGTERM $MYSQLD_PID'\n"
       fi
     }
-    trap cleanup EXIT
+    #trap cleanup EXIT
   '';
 }

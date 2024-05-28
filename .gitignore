@@ -101,14 +101,12 @@ frontend/app.*.symbols
 frontend/app.*.map.json
 
 # local nix env related e.g. MySQL DB instance folder/files
-.envrc
 .direnv/
 install-nix
 mysql/
 
 # gitpod inteliij-projector
 **/.jetbrains
-.wireit
 
 # mountebank
 mb.log
