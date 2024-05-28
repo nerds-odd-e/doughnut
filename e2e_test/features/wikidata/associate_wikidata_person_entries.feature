@@ -33,7 +33,7 @@ Feature: Note creation should have details if wikidata is a person
     When I create a note belonging to "People":
       | Topic     | Wikidata Id |
       | Confucius | Q4604       |
-    Then On the current page, I should see "Confucius" has link "related to" "Lu"
+    Then [deprecating] On the current page, I should see "Confucius" has link "related to" "Lu"
     And I should see "My Notes/People/Confucius" with these children
       | note-topic |
       | Lu         |

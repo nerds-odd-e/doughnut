@@ -85,6 +85,29 @@ When(
 )
 
 Then(
+  "[deprecating] On the current page, I should see {string} has link {string} {string}",
+  (noteTopic: string, linkType: string, targetNoteTopics: string) => {
+    const targetNoteTopicsList = commonSenseSplit(targetNoteTopics, ",")
+    cy.findByText(commonSenseSplit(targetNoteTopics, ",").pop(), {
+      selector: ".link-title",
+    })
+    const linksForNoteFound: string[] = []
+    cy.findAllByRole("button", { name: linkType })
+      .parent()
+      .parent()
+      .each(($link) => {
+        cy.wrap($link).within(() => {
+          linksForNoteFound.push($link.text())
+        })
+      })
+      .then(() => {
+        expect(targetNoteTopicsList.every((linkItem) => linksForNoteFound.includes(linkItem))).to.be
+          .true
+      })
+  },
+)
+
+Then(
   "On the current page, I should see {string} has link {string} {string}",
   (noteTopic: string, linkType: string, targetNoteTopics: string) => {
     const targetNoteTopicsList = commonSenseSplit(targetNoteTopics, ",")
