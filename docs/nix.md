@@ -60,14 +60,14 @@ Run backend unit tests
 
 ```
 # from doughnut source root dir
-pnpm backend:test
+pnpm backend:verify
 ```
 
 Run frontend unit tests
 
 ```
 # from doughnut source root dir
-pnpm frontend:test
+pnpm frontend:verify
 ```
 
 Run E2E profile with backend server & frontend in dev mode & Cypress IDE (frontend app on port 5173; backend app on port 9081)
@@ -82,5 +82,5 @@ Run headless E2E (doughnut full stack started on port 9081)
 
 ```bash
 # from doughnut source root dir
-pnpm t
+pnpm verify
 ```
