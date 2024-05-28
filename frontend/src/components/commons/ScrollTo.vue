@@ -17,6 +17,7 @@ onMounted(async () => {
     if (entries[0] && entries[0].isIntersecting === false) {
       scrollRef.value?.scrollIntoView({ behavior: "smooth" });
     }
+    observer?.disconnect();
   };
 
   observer = new IntersectionObserver(handleIntersection, {

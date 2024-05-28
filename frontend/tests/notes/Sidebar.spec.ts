@@ -38,9 +38,11 @@ describe("Sidebar", () => {
   };
 
   let isIntersecting = false;
+  let observerDisconnected = false;
 
   beforeEach(() => {
     isIntersecting = false;
+    observerDisconnected = false;
     // Mock the IntersectionObserver
     /* eslint-disable */
     let observeCallback: IntersectionObserverCallback;
@@ -57,7 +59,9 @@ describe("Sidebar", () => {
         );
       }
 
-      disconnect() {}
+      disconnect() {
+        observerDisconnected = true;
+      }
 
       unobserve() {}
     };
@@ -102,6 +106,7 @@ describe("Sidebar", () => {
       render(firstGeneration);
       await flushPromises();
       expect(window.HTMLElement.prototype.scrollIntoView).toBeCalled();
+      expect(observerDisconnected).toBe(true);
       expect(
         /* eslint-disable */
         (await screen.findByText(firstGeneration.note.topic)).parentNode
@@ -115,6 +120,7 @@ describe("Sidebar", () => {
       render(firstGeneration);
       await flushPromises();
       expect(window.HTMLElement.prototype.scrollIntoView).not.toBeCalled();
+      expect(observerDisconnected).toBe(true);
     });
 
     it("should have siblings", async () => {
