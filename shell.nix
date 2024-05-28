@@ -147,8 +147,8 @@ in mkShell {
       rm -rf "$PWD/frontend/node_modules"
     fi
 
-    corepack prepare pnpm@9.1.2 --activate
-    corepack use pnpm@9.1.2
+    corepack prepare pnpm@9.1.3 --activate
+    corepack use pnpm@9.1.3
     pnpm --frozen-lockfile recursive install
 
     cleanup()
