@@ -4,7 +4,7 @@
       This note has been deleted
     </div>
     <NoteEditableTopic
-      :note-id="note.id"
+      :note="note"
       :note-topic-constructor="note.topicConstructor"
       :note-topic="note.topic"
       :storage-accessor="storageAccessor"

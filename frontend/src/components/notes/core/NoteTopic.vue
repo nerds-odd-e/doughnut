@@ -1,9 +1,12 @@
 <template>
-  {{ topic }}
+  {{ note.topic }}
 </template>
 
 <script setup lang="ts">
+import { Note } from "@/generated/backend";
+import { PropType } from "vue";
+
 defineProps({
-  topic: { type: String, required: true },
+  note: { type: Object as PropType<Note>, required: true },
 });
 </script>

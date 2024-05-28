@@ -3,7 +3,7 @@
     :to="{ name: 'noteShow', params: { noteId: note.id } }"
     class="text-decoration-none"
   >
-    <NoteTopic v-bind="{ topic: note.topic }" />
+    <NoteTopic v-bind="{ note }" />
   </router-link>
 </template>
 
