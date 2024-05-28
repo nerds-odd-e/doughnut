@@ -189,7 +189,7 @@ Cypress.Commands.add("expectExactLinkTargets", (targets) => {
 })
 
 Cypress.Commands.add("clickLinkNob", (target: string) => {
-  cy.findByText(target, { selector: "main *" }).siblings(".link-nob").click()
+  cy.findByText(target, { selector: "main .link-title" }).siblings(".link-nob").click()
 })
 
 Cypress.Commands.add("changeLinkType", (targetTitle: string, linkType: string) => {

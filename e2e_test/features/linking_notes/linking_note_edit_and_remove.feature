@@ -16,7 +16,7 @@ Feature: link edit and remove
 
   Scenario: change link type of a reverse link
     When I change the link from "Earth" to "Moon" to "a specialization of"
-    And On the current page, I should see "Earth" has link "a specialization of" "Moon"
+    And [deprecating] On the current page, I should see "Earth" has link "a specialization of" "Moon"
 
   Scenario: delete link
     When I delete the link from "Moon" to "Earth"
