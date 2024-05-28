@@ -70,6 +70,7 @@ export type { SrtDto } from './models/SrtDto';
 export type { Subscription } from './models/Subscription';
 export type { SubscriptionDTO } from './models/SubscriptionDTO';
 export type { SuggestedQuestionForFineTuning } from './models/SuggestedQuestionForFineTuning';
+export type { TargetNoteForTopic } from './models/TargetNoteForTopic';
 export { Thing } from './models/Thing';
 export type { TimeTravel } from './models/TimeTravel';
 export type { TimeTravelRelativeToNow } from './models/TimeTravelRelativeToNow';

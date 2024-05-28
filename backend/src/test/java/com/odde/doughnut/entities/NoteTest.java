@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.testability.MakeMe;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,8 +42,35 @@ public class NoteTest {
   }
 
   @Nested
-  class Image {
+  class TargetNote {
+    Note parent;
+    Note target;
+    Note linkingNote;
 
+    @BeforeEach
+    void setup() {
+      parent = makeMe.aNote().titleConstructor("parent").please();
+      target = makeMe.aNote().please();
+      linkingNote = makeMe.aLink().between(parent, target).please();
+    }
+
+    @Test
+    void replaceParentPlaceholder() {
+      assertThat(
+          linkingNote.getTargetForTopic().getTopicConstructor(),
+          equalTo(target.getTopicConstructor()));
+    }
+
+    @Test
+    void linkOfLink() {
+      Note linkOfLink = makeMe.aLink().between(parent, linkingNote).please();
+      assertThat(
+          linkOfLink.getTargetForTopic().getTargetNoteForTopic().getId(), equalTo(target.getId()));
+    }
+  }
+
+  @Nested
+  class Image {
     @Test
     void useParentImage() {
       Note parent = makeMe.aNote().imageUrl("https://img.com/xxx.jpg").inMemoryPlease();

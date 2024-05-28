@@ -2386,6 +2386,8 @@ components:
           readOnly: true
         wikidataId:
           type: string
+        targetForTopic:
+          $ref: "#/components/schemas/TargetNoteForTopic"
     Notebook:
       required:
       - id
@@ -2432,6 +2434,16 @@ components:
           $ref: "#/components/schemas/Notebook"
         fromDTO:
           $ref: "#/components/schemas/SubscriptionDTO"
+    TargetNoteForTopic:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        topicConstructor:
+          type: string
+        targetNoteForTopic:
+          $ref: "#/components/schemas/TargetNoteForTopic"
     GlobalAiModelSettings:
       type: object
       properties:

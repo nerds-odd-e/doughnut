@@ -10,6 +10,7 @@ import com.odde.doughnut.algorithms.ClozedString;
 import com.odde.doughnut.algorithms.HtmlOrMarkdown;
 import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.algorithms.SiblingOrder;
+import com.odde.doughnut.controllers.dto.TargetNoteForTopic;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.models.NoteViewer;
 import jakarta.persistence.*;
@@ -312,6 +313,20 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
       noteAccessory.setNote(this);
     }
     return noteAccessory;
+  }
+
+  public TargetNoteForTopic getTargetForTopic() {
+    if (getTargetNote() == null) return null;
+    return getTargetNote().asTargetNoteForTopic();
+  }
+
+  @JsonIgnore
+  private TargetNoteForTopic asTargetNoteForTopic() {
+    TargetNoteForTopic targetNoteForTopic = new TargetNoteForTopic();
+    targetNoteForTopic.setId(getId());
+    targetNoteForTopic.setTopicConstructor(getTopicConstructor());
+    targetNoteForTopic.setTargetNoteForTopic(getTargetForTopic());
+    return targetNoteForTopic;
   }
 
   public static class NoteBrief {

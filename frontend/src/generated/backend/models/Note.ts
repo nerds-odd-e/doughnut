@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { TargetNoteForTopic } from './TargetNoteForTopic';
 export type Note = {
     topic: string;
     topicConstructor: string;
@@ -12,5 +13,6 @@ export type Note = {
     createdAt: string;
     readonly deletedAt?: string;
     wikidataId?: string;
+    targetForTopic?: TargetNoteForTopic;
 };
 
