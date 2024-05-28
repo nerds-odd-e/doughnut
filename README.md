@@ -65,10 +65,10 @@ nix develop
 Install packages, build the frontend and start the backend
 
 ```bash
-pnpm --frozen-lockfile recursive install && pnpm frontend:build && pnpm sut
+pnpm sut
 ```
 
-- Rerun it each time you reset the database.
+- Rerun it each time you reset the database or change backend java code (java is still a compiled language).
 
 
 #### 2.1 Run full backend unit tests suite from terminal/CLI
@@ -76,7 +76,7 @@ pnpm --frozen-lockfile recursive install && pnpm frontend:build && pnpm sut
 - From doughnut source root directory:
 
 ```bash
-pnpm backend:test
+pnpm backend:verify
 ```
 
 ### 3. [IntelliJ IDEA settings](./docs/idea.md)
@@ -106,15 +106,15 @@ For MS Windows WSL2 users:
 2. `export NODE_OPTIONS="--max-old-space-size=4096"` before running any cypress related commands (
    e.g. `cy:open` or `cy:run`).
 
-| Purpose                               | Command (run from `doughnut` source root directory)                                                                                            |
-| ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| Install needed e2e tooling            | `pnpm --frozen-lockfile recursive install`                                                                                                                                        |
+| Purpose                               | Command (run from `doughnut` source root directory)                                                                                             |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------  |
+| Install needed e2e tooling            | `pnpm --frozen-lockfile recursive install`                                                                                                      |                               |                                       |                                                                                                                                                 |
 | Start SUT (backend system under test) | `pnpm sut` (starts backend SUT ONLY)                                                                                                            |
 | Start Mock for external backend       | `pnpm start:mb` (starts mocked external backend ONLY)                                                                                           |
-| Start only the Cypress IDE            | `pnpm cy:open` (starts Cypress IDE ONLY)                                                                                                        |
-| Run all e2e test                      | `pnpm t` (compile frontend assets, start backend SUT, mountebank virtual service provider & cypress headless e2e testing)                       |
-| Run cypress IDE                       | `pnpm test:open` (starts frontend SUT in HMR mode, backend SUT, mountebank virtual service provider & cypress IDE)                              |
-| Generate TypeScript Interfaces        | `pnpm generateTypeScript` (Generate TypeScript Interfaces from backend JSON classes. Should run manually every time backend service changes) |
+| Start ONLY the Cypress IDE            | `pnpm cy:open` (starts Cypress IDE ONLY)                                                                                                        |
+| Run all e2e test                      | `pnpm verify` (compile frontend assets, start backend SUT, mountebank virtual service provider & cypress headless e2e testing)                  |
+| Run cypress with Backend & Frontend   | `pnpm test:open` (starts frontend SUT in HMR mode, backend SUT, mountebank virtual service provider & cypress IDE)                              |
+| Generate TypeScript Interfaces        | `pnpm generateTypeScript` (Generate TypeScript Interfaces from backend JSON classes. Should run manually every time backend service changes)    |
 
 #### Structure
 
@@ -161,7 +161,7 @@ If the step 1 is not done, a unit test will fail. If the step 2 is not done, CI 
 From `doughnut` source root directory
 
 ```bash
-pnpm frontend:test
+pnpm frontend:verify
 ```
 
 ##### Run frontend web-app (app will launch on port 5173)
