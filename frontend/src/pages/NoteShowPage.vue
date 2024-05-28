@@ -12,6 +12,7 @@
     </div>
     <NoteRealmLoader v-bind="{ noteId, storageAccessor }">
       <template #default="{ noteRealm }">
+        <ScrollTo />
         <Breadcrumb
           v-if="noteRealm"
           v-bind="{ notePosition: noteRealm?.notePosition }"
@@ -50,6 +51,7 @@
 <script setup lang="ts">
 import { PropType, ref } from "vue";
 import { User } from "@/generated/backend";
+import ScrollTo from "@/components/commons/ScrollTo.vue";
 import NoteShow from "../components/notes/NoteShow.vue";
 import { StorageAccessor } from "../store/createNoteStorage";
 
