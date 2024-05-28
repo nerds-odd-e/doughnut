@@ -1,15 +1,13 @@
 <template>
-  <div class="header" :class="currentResult ? 'repeat-paused' : ''">
-    <RepeatProgressBar
-      v-bind="{
-        finished,
-        toRepeatCount,
-        previousResultCursor,
-      }"
-      @view-last-result="viewLastResult($event)"
-    >
-    </RepeatProgressBar>
-  </div>
+  <RepeatProgressBar
+    v-bind="{
+      finished,
+      toRepeatCount,
+      previousResultCursor,
+    }"
+    @view-last-result="viewLastResult($event)"
+  >
+  </RepeatProgressBar>
   <template v-if="toRepeat != undefined">
     <Quiz
       v-if="toRepeatCount !== 0"
@@ -128,11 +126,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style>
-.repeat-paused {
-  background-color: rgba(50, 150, 50, 0.8);
-  padding: 5px;
-  border-radius: 10px;
-}
-</style>
