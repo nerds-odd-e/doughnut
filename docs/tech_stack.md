@@ -2,6 +2,7 @@
 
 - [Nix](https://nix.dev/)
 - [nix flakes](https://nix.dev/concepts/)
+- [direnv](https://direnv.net/)
 - [Azul Zulu OpenJDK 22](https://docs.azul.com/core/release/22-ga/release-notes/release-notes)
 - [Spring Boot](https://spring.io/guides)
 - [Flyway](https://flywaydb.org)
