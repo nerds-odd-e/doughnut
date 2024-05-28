@@ -69,10 +69,13 @@ export const assumeNotePage = (noteTopic?: string) => {
       })
     },
     expectLinkingChildren: (linkType: string, targetNoteTopics: string) => {
-      // const targetNoteTopicsList = commonSenseSplit(targetNoteTopics, ",")
+      const targetNoteTopicsList = commonSenseSplit(targetNoteTopics, ",")
       cy.get("main").within(() => {
         const target = commonSenseSplit(targetNoteTopics, ",").pop()!
-        cy.findByText(target, { selector: ".card-title" })
+        cy.findByText(target, { selector: ".card-title span" })
+        cy.findAllByText(linkType, {
+          selector: ".card-title span",
+        }).should("have.length", targetNoteTopicsList.length)
       })
       // const linksForNoteFound: string[] = []
       // cy.findAllByRole("button", { name: linkType })

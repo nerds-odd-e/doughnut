@@ -1,6 +1,12 @@
 <template>
   <template v-if="note.targetForTopic">
-    {{ note.targetForTopic.topicConstructor }}
+    <span>
+      {{ note.topicConstructor.substring(1) }}
+    </span>
+    &nbsp;
+    <span>
+      {{ note.targetForTopic.topicConstructor }}
+    </span>
   </template>
   <template v-else>
     {{ note.topic }}
