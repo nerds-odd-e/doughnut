@@ -31,7 +31,7 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   if (scrollRef.value) {
-    observer.unobserve(scrollRef.value);
+    observer?.unobserve(scrollRef.value);
   }
 });
 </script>

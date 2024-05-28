@@ -44,7 +44,7 @@ describe("Sidebar", () => {
     // Mock the IntersectionObserver
     /* eslint-disable */
     let observeCallback: IntersectionObserverCallback;
-    global.IntersectionObserver = class {
+    const MockIntersectionObserver = class {
       constructor(callback: IntersectionObserverCallback) {
         observeCallback = callback;
       }
@@ -61,6 +61,8 @@ describe("Sidebar", () => {
 
       unobserve() {}
     };
+
+    global.IntersectionObserver = MockIntersectionObserver as any;
     /* eslint-enable */
   });
 
