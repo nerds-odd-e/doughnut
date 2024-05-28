@@ -2,15 +2,15 @@
 
 Launch your IntelliJ IDE from your host OS.
 
-### Setup IntelliJ IDEA with JDK21 SDK
+### Setup IntelliJ IDEA with JDK22 SDK
 
 - Locate your `nix develop` installed JDK path location from the header printout on entering ` nix develop` ($JAVA_HOME is printed to stdout on entering `nix develop`).
-  - e.g. On macOS this could look like `/nix/store/x3h7fvpffc98d2bwg3g37vmjcy6zj2mi-zulu21.28.85-ca-jdk-21.0.0/zulu-21.jdk/Contents/Home`.
+  - e.g. On macOS this could look like `/nix/store/2ybgy9h6qh3b7r7j6pmdm0l5j1qfyy39-zulu-ca-jdk-22.0.0/zulu-22.jdk/Contents/Home`.
 - **File -> Project Structure -> Platform Settings -> SDKs -> Add JDK...**
-  - Enter the full path of above (e.g. `/nix/store/x3h7fvpffc98d2bwg3g37vmjcy6zj2mi-zulu21.28.85-ca-jdk-21.0.0/zulu-21.jdk/Contents/Home`).
+  - Enter the full path of above (e.g. `/nix/store/2ybgy9h6qh3b7r7j6pmdm0l5j1qfyy39-zulu-ca-jdk-22.0.0/zulu-22.jdk/Contents/Home`).
     ![Sample `nix develop` JAVA_HOME](./images/01_doughnut_nix_develop_JAVA_HOME.png "Sample nix develop JAVA_HOME")
-  - Ensure JDK level is set to LTS version 21
-    ![Project Structure -> Project SDK -> Language Level](./images/jdk17_language_level.png "Language Level Setting")
+  - Ensure JDK level is set to LTS version 22
+    ![Project Structure -> Project SDK -> Language Level](./images/jdk22_language_level.png "Language Level Setting")
 
 ### Run a single targetted JUnit5 test in IntelliJ IDEA
 
