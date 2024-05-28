@@ -41,6 +41,11 @@ Install Nix package manager if you haven't already with
 ./setup-doughnut-dev.sh
 ```
 
+Install `direnv`
+**macOS:** `brew install direnv`
+**Ubuntu/Debian (includes WSL2 with Ubuntu):** `sudo apt-get install -y direnv`
+**Fedora:** `sudo dnf install direnv`
+
 Ensure your OS (WSL2/Ubuntu/Fedora, etc) has `/bin/sh` point to `bash`.
 If you are using Ubuntu where `/bin/sh` is symlinked to `dash`, please
 run `sudo dpkg-reconfigure dash` and answer "No" to reconfigure to `bash` as default.
