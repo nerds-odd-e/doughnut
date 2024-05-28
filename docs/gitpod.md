@@ -33,13 +33,13 @@ git config user.email "your_email@your_domain.com"
 ### Preparation steps to run doughnut backend unit tests & cypress End-to-End tests
 
 - From the root of the `doughnut` codebase (this should be on path `/workspace/doughnut`), run `pnpm --frozen-lockfile recursive install` to get End-to-End testing tooling setup.
-- From root of `doughnut` source path, execute `pnpm t` to execute the full headless cypress End-to-End test suite.
+- From root of `doughnut` source path, execute `pnpm verify` to execute the full headless cypress End-to-End test suite.
 
 ### Running java springboot unit tests
 
-- From the root of the `doughnut` codebase, run `pnpm backend:test`. This assumes you have had your doughnut DB tables setup from above.
+- From the root of the `doughnut` codebase, run `pnpm backend:verify`. This assumes you have had your doughnut DB tables setup from above.
 
 ### Running frontend Vue3 unit tests
 
-- Navigate to `doughnut` source root directory. Execute `pnpm frontend:test` to run the full frontend unit tests ONCE.
+- Navigate to `doughnut` source root directory. Execute `pnpm frontend:verify` to run the full frontend unit tests ONCE.
 - Navigate to `doughnut` source root directory. Execute `pnpm frontend:test:watch` to run the full frontend unit tests in dev-mode with HMR live reload as you make frontend production/test code changes.
