@@ -1,8 +1,8 @@
 # Technology Stack
 
-- [Nix](https://nixos.org/learn.html)
-- [nix flakes](https://nixos.wiki/wiki/Flakes)
-- [Zulu OpenJDK 21](https://docs.azul.com/core/release/21-ga/release-notes/release-notes)
+- [Nix](https://nix.dev/)
+- [nix flakes](https://nix.dev/concepts/)
+- [Azul Zulu OpenJDK 22](https://docs.azul.com/core/release/22-ga/release-notes/release-notes)
 - [Spring Boot](https://spring.io/guides)
 - [Flyway](https://flywaydb.org)
 - [Gradle](https://gradle.org/)
@@ -14,7 +14,7 @@
 - [pnpm](https://pnpm.io/)
 - [Vue3](https://v3.vuejs.org/guide/introduction.html)
 - [Vite](https://vitejs.dev)
-- [vue-router 4.x](https://router.vuejs.org/)
+- [vue-router 4](https://router.vuejs.org/)
 - [Vitest](https://vitest.dev/)
 - [Vue Testing Library](https://testing-library.com/docs/vue-testing-library/intro/)
 - [Bootstrap 5](https://getbootstrap.com/docs/5.2/getting-started/introduction/)
