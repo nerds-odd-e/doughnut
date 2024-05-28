@@ -3,7 +3,7 @@
 // @ts-check
 
 import { Given, Then, DataTable } from "@badeball/cypress-cucumber-preprocessor"
-import "../support/string.extensions"
+import "../support/string_util"
 import start, { mock_services } from "../start"
 import { MessageToMatch } from "../start/mock_services/MessageToMatch"
 

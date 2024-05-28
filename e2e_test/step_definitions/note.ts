@@ -10,7 +10,7 @@ import {
   When,
 } from "@badeball/cypress-cucumber-preprocessor"
 import NotePath from "../support/NotePath"
-import "../support/string.extensions"
+import "../support/string_util"
 import start from "../start"
 
 defineParameterType({

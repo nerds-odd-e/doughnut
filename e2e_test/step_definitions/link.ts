@@ -4,7 +4,7 @@
 // @ts-check
 
 import { Then, When } from "@badeball/cypress-cucumber-preprocessor"
-import "../support/string.extensions"
+import { commonSenseSplit } from "../support/string_util"
 import start from "../start"
 
 When("I start searching", () => {
@@ -53,14 +53,16 @@ When("I should see the source note as {string}", (noteTopic: string) => {
 
 When("I should see {string} as the possible duplicate", (noteTopicsAsString: string) => {
   cy.tick(500)
-  cy.expectExactLinkTargets(noteTopicsAsString.commonSenseSplit(",").map((i: string) => i.trim()))
+  cy.expectExactLinkTargets(commonSenseSplit(noteTopicsAsString, ",").map((i: string) => i.trim()))
 })
 
 When(
   "I should see {string} as targets only when searching {string}",
   (noteTopicsAsString: string, searchKey: string) => {
     cy.searchNote(searchKey, [])
-    cy.expectExactLinkTargets(noteTopicsAsString.commonSenseSplit(",").map((i: string) => i.trim()))
+    cy.expectExactLinkTargets(
+      commonSenseSplit(noteTopicsAsString, ",").map((i: string) => i.trim()),
+    )
   },
 )
 
@@ -68,7 +70,9 @@ When(
   "I should see {string} as targets only when searching in all my notebooks {string}",
   (noteTopicsAsString: string, searchKey: string) => {
     cy.searchNote(searchKey, ["All My Notebooks And Subscriptions"])
-    cy.expectExactLinkTargets(noteTopicsAsString.commonSenseSplit(",").map((i: string) => i.trim()))
+    cy.expectExactLinkTargets(
+      commonSenseSplit(noteTopicsAsString, ",").map((i: string) => i.trim()),
+    )
   },
 )
 
@@ -83,8 +87,8 @@ When(
 Then(
   "On the current page, I should see {string} has link {string} {string}",
   (noteTopic: string, linkType: string, targetNoteTopics: string) => {
-    const targetNoteTopicsList = targetNoteTopics.commonSenseSplit(",")
-    cy.findByText(targetNoteTopics.commonSenseSplit(",").pop(), {
+    const targetNoteTopicsList = commonSenseSplit(targetNoteTopics, ",")
+    cy.findByText(commonSenseSplit(targetNoteTopics, ",").pop(), {
       selector: ".link-title",
     })
     const linksForNoteFound: string[] = []

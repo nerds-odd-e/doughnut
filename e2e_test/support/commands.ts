@@ -27,7 +27,7 @@
 import "@testing-library/cypress/add-commands"
 import "cypress-file-upload"
 import start from "../start"
-import "./string.extensions"
+import { commonSenseSplit } from "./string_util"
 
 Cypress.Commands.add("pageIsNotLoading", () => {
   cy.get(".loading-bar").should("not.exist")
@@ -69,7 +69,7 @@ Cypress.Commands.add("findUserSettingsButton", (userName: string) => {
 
 Cypress.Commands.add("expectBreadcrumb", (items: string) => {
   cy.get(".breadcrumb").within(() =>
-    items.commonSenseSplit(", ").forEach((noteTopic: string) => cy.findByText(noteTopic)),
+    commonSenseSplit(items, ", ").forEach((noteTopic: string) => cy.findByText(noteTopic)),
   )
 })
 
@@ -226,7 +226,7 @@ Cypress.Commands.add(
 
         case "image note": {
           if (additional_info) {
-            const [expectedDetails, expectedImage] = additional_info.commonSenseSplit("; ")
+            const [expectedDetails, expectedImage] = commonSenseSplit(additional_info, "; ")
             cy.get(".note-details").should("contain", expectedDetails)
             cy.get("#note-image")
               .find("img")
@@ -238,7 +238,7 @@ Cypress.Commands.add(
 
         case "link": {
           if (additional_info) {
-            const [linkType, targetNote] = additional_info.commonSenseSplit("; ")
+            const [linkType, targetNote] = commonSenseSplit(additional_info, "; ")
             cy.findByText(topic)
             cy.findByText(targetNote)
             cy.get(".badge").contains(linkType)
@@ -300,7 +300,7 @@ Cypress.Commands.add("initialReviewInSequence", (reviews) => {
 
 Cypress.Commands.add("initialReviewNotes", (noteTopics: string) => {
   cy.initialReviewInSequence(
-    noteTopics.commonSenseSplit(", ").map((topic: string) => {
+    commonSenseSplit(noteTopics, ", ").map((topic: string) => {
       return {
         review_type: topic === "end" ? "initial done" : "single note",
         topic,
@@ -310,7 +310,7 @@ Cypress.Commands.add("initialReviewNotes", (noteTopics: string) => {
 })
 
 Cypress.Commands.add("repeatReviewNotes", (noteTopics: string) => {
-  noteTopics.commonSenseSplit(",").forEach((topic) => {
+  commonSenseSplit(noteTopics, ",").forEach((topic) => {
     if (topic == "end") {
       cy.findByText("You have finished all repetitions for this half a day!").should("be.visible")
     } else {
@@ -335,7 +335,7 @@ Cypress.Commands.add("shouldSeeQuizWithOptions", (questionParts: string[], optio
   questionParts.forEach((part) => {
     cy.get(".quiz-instruction").contains(part)
   })
-  options.commonSenseSplit(",").forEach((option: string) => cy.findByText(option))
+  commonSenseSplit(options, ",").forEach((option: string) => cy.findByText(option))
 })
 
 Cypress.Commands.add("formField", (label) => {
