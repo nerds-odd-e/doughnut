@@ -5,7 +5,7 @@ import LinkViewedBuilder, { LinksMap } from "./LinkViewedBuilder";
 import NoteRealmBuilder from "./NoteRealmBuilder";
 
 class LinksMapBuilder extends Builder<LinksMap> {
-  from = new NoteRealmBuilder().topicConstructor("source note").do();
+  from = new NoteRealmBuilder().topicConstructor("parent note").do();
 
   protected childrenBuilders: Omit<LinkViewedBuilder, "please">[] = [];
 

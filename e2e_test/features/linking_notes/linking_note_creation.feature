@@ -13,14 +13,14 @@ Feature: link note
 
   @mockBrowserTime
   Scenario: View all linkable notes for a note when no link exists
-    When I am creating link for note "Sedition"
-    Then I should see the source note as "Sedition"
+    When I am creating a linking note under note "Sedition"
+    Then I should see the parent note as "Sedition"
     And I should see "Sedation, Sedative" as targets only when searching in all my notebooks " se "
     And I should see note cannot be found when searching in all my notebooks "Sedition"
 
   @mockBrowserTime
   Scenario Outline: Search note for linking with partial input
-    Given I am creating link for note "Sedition"
+    Given I am creating a linking note under note "Sedition"
     And I should see "<targets>" as targets only when searching in all my notebooks "<search key>"
     Examples:
       | search key | targets            |

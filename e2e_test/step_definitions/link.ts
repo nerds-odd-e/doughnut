@@ -11,7 +11,7 @@ When("I start searching", () => {
   cy.startSearching()
 })
 
-When("I am creating link for note {string}", (noteTopic: string) => {
+When("I am creating a linking note under note {string}", (noteTopic: string) => {
   start.jumpToNotePage(noteTopic).startSearchingAndLinkNote()
 })
 
@@ -47,7 +47,7 @@ When(
   },
 )
 
-When("I should see the source note as {string}", (noteTopic: string) => {
+When("I should see the parent note as {string}", (noteTopic: string) => {
   cy.findByText(noteTopic, { selector: "strong" }).should("be.visible")
 })
 
@@ -104,6 +104,7 @@ Then(
         expect(targetNoteTopicsList.every((linkItem) => linksForNoteFound.includes(linkItem))).to.be
           .true
       })
+    start.assumeNotePage(noteTopic).expectLinkingChildren(linkType, targetNoteTopics)
   },
 )
 

@@ -1,6 +1,7 @@
 import { assumeChatAboutNotePage } from "./chatAboutNotePage"
 import submittableForm from "../submittableForm"
 import noteCreationForm from "./noteForms/noteCreationForm"
+import { commonSenseSplit } from "support/string_util"
 
 function filterAttributes(attributes: Record<string, string>, keysToKeep: string[]) {
   return Object.keys(attributes)
@@ -66,6 +67,26 @@ export const assumeNotePage = (noteTopic?: string) => {
       cy.get("main").within(() => {
         cy.expectNoteCards(children)
       })
+    },
+    expectLinkingChildren: (linkType: string, targetNoteTopics: string) => {
+      // const targetNoteTopicsList = commonSenseSplit(targetNoteTopics, ",")
+      cy.get("main").within(() => {
+        const target = commonSenseSplit(targetNoteTopics, ",").pop()!
+        cy.findByText(target, { selector: ".card-title" })
+      })
+      // const linksForNoteFound: string[] = []
+      // cy.findAllByRole("button", { name: linkType })
+      //   .parent()
+      //   .parent()
+      //   .each(($link) => {
+      //     cy.wrap($link).within(() => {
+      //       linksForNoteFound.push($link.text())
+      //     })
+      //   })
+      //   .then(() => {
+      //     expect(targetNoteTopicsList.every((linkItem) => linksForNoteFound.includes(linkItem))).to.be
+      //       .true
+      //   })
     },
     collapsedChildrenWithCount: (count: number) => {
       cy.findByText(count, { selector: "[role=collapsed-children-count]" })

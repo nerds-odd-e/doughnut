@@ -1,5 +1,10 @@
 <template>
-  {{ note.topic }}
+  <template v-if="note.targetForTopic">
+    {{ note.targetForTopic.topicConstructor }}
+  </template>
+  <template v-else>
+    {{ note.topic }}
+  </template>
 </template>
 
 <script setup lang="ts">
