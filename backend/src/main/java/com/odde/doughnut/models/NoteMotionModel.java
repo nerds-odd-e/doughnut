@@ -41,7 +41,7 @@ public class NoteMotionModel {
 
   public void validate() throws MovementNotPossibleException {
     if (asFirstChildOfNote
-        && relativeToNote.getHierarchicalChildren().stream()
+        && relativeToNote.getChildren().stream()
             .findFirst()
             .map(n -> n.getId().equals(subject.getId()))
             .orElse(false)) {

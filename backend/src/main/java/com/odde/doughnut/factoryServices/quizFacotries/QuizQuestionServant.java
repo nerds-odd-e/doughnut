@@ -41,7 +41,7 @@ public class QuizQuestionServant {
 
   public List<Note> getCohort(Note note, Predicate<Note> notePredicate) {
     List<Note> list =
-        note.getSiblings().stream().filter(notePredicate).collect(Collectors.toList());
+        note.getHierarchicalSiblings().stream().filter(notePredicate).collect(Collectors.toList());
     if (list.size() > 0) return list;
 
     Note grand = note;

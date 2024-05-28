@@ -1,9 +1,7 @@
 package com.odde.doughnut.models;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInRelativeOrder;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.entities.Note;
@@ -62,7 +60,7 @@ public class NoteMotionModelTest {
   private void assertOrder(Note note1, Note note2) {
     Note parentNote = note1.getParent();
     makeMe.refresh(parentNote);
-    assertThat(parentNote.getHierarchicalChildren(), containsInRelativeOrder(note1, note2));
+    assertThat(parentNote.getChildren(), containsInRelativeOrder(note1, note2));
   }
 
   @Test
@@ -139,6 +137,27 @@ public class NoteMotionModelTest {
       move(firstChild, secondChild, false);
       assertOrder(secondChild, firstChild);
       assertOrder(firstChild, thirdChild);
+    }
+
+    @Nested
+    class WhenThereIsALinkingNote {
+      Note linkingNote;
+
+      @BeforeEach
+      void setup() {
+        linkingNote = makeMe.aLink().between(topNote, secondChild).please();
+        makeMe.theNote(linkingNote).after(firstChild).please();
+        makeMe.refresh(topNote);
+      }
+
+      @Test
+      void moveSecondToAfterFirstAndBeforeLinkNote()
+          throws CyclicLinkDetectedException, MovementNotPossibleException {
+        assertThat(linkingNote.getSiblingOrder(), lessThan(secondChild.getSiblingOrder()));
+        move(secondChild, firstChild, false);
+        assertOrder(firstChild, secondChild);
+        assertThat(linkingNote.getSiblingOrder(), greaterThan(secondChild.getSiblingOrder()));
+      }
     }
   }
 }

@@ -162,11 +162,19 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  public List<HierarchicalNote> getSiblings() {
+  public List<HierarchicalNote> getHierarchicalSiblings() {
     if (getParent() == null) {
       return new ArrayList<>();
     }
     return getParent().getHierarchicalChildren();
+  }
+
+  @JsonIgnore
+  public List<Note> getSiblings() {
+    if (getParent() == null) {
+      return new ArrayList<>();
+    }
+    return getParent().getChildren();
   }
 
   @JsonIgnore
@@ -231,11 +239,6 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
     parent = parentNote;
   }
 
-  @JsonIgnore
-  private Note getFirstChild() {
-    return getHierarchicalChildren().stream().findFirst().orElse(null);
-  }
-
   public void updateSiblingOrder(Note relativeToNote, boolean asFirstChildOfNote) {
     if (!asFirstChildOfNote) {
       this.siblingOrder =
@@ -245,14 +248,15 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
               .orElse(relativeToNote.siblingOrder + SiblingOrder.MINIMUM_SIBLING_ORDER_INCREMENT);
       return;
     }
-    Note firstChild = relativeToNote.getFirstChild();
-    if (firstChild != null) {
-      this.siblingOrder =
-          firstChild.getSiblingOrder() - SiblingOrder.MINIMUM_SIBLING_ORDER_INCREMENT;
-    }
+    relativeToNote.getChildren().stream()
+        .findFirst()
+        .ifPresent(
+            firstChild ->
+                this.siblingOrder =
+                    firstChild.getSiblingOrder() - SiblingOrder.MINIMUM_SIBLING_ORDER_INCREMENT);
   }
 
-  private Optional<HierarchicalNote> nextSibling() {
+  private Optional<Note> nextSibling() {
     return getSiblings().stream().filter(nc -> nc.getSiblingOrder() > siblingOrder).findFirst();
   }
 
