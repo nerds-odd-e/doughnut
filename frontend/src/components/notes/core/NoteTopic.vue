@@ -10,7 +10,7 @@
     </span>
   </template>
   <template v-else>
-    {{ noteTopic.topicConstructor }}
+    {{ topic }}
   </template>
 </template>
 
@@ -27,5 +27,11 @@ const reactiveProps = ref(props);
 
 const linkType = computed(() =>
   reactiveProps.value.noteTopic.topicConstructor.substring(1),
+);
+const topic = computed(() =>
+  reactiveProps.value.noteTopic.topicConstructor.replace(
+    "%P",
+    `[${reactiveProps.value.noteTopic.parentNoteTopic?.topicConstructor}]`,
+  ),
 );
 </script>

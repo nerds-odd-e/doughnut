@@ -2420,6 +2420,8 @@ components:
           type: string
         targetNoteTopic:
           $ref: "#/components/schemas/NoteTopic"
+        parentNoteTopic:
+          $ref: "#/components/schemas/NoteTopic"
     Notebook:
       required:
       - id

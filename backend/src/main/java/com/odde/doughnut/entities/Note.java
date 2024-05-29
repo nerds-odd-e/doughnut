@@ -327,6 +327,9 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
     NoteTopic noteTopic = new NoteTopic();
     noteTopic.setId(getId());
     noteTopic.setTopicConstructor(getTopicConstructor());
+    if (getParent() != null) {
+      noteTopic.setParentNoteTopic(getParent().getNoteTopic());
+    }
     if (getTargetNote() != null) {
       noteTopic.setTargetNoteTopic(getTargetNote().getNoteTopic());
     }

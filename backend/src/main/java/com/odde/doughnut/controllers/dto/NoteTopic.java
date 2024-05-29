@@ -10,4 +10,5 @@ public class NoteTopic {
   @NonNull private Integer id;
   @NonNull private String topicConstructor;
   private NoteTopic targetNoteTopic;
+  private NoteTopic parentNoteTopic;
 }
