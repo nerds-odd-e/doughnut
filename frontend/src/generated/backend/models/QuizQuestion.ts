@@ -9,7 +9,7 @@ export type QuizQuestion = {
     id: number;
     stem?: string;
     mainTopic?: string;
-    headNote?: Note;
+    headNote: Note;
     choices?: Array<Choice>;
     imageWithMask?: ImageWithMask;
 };

@@ -16,7 +16,7 @@ public class QuizQuestion {
 
   @Getter public String mainTopic;
 
-  @Getter public Note headNote;
+  @NotNull @Getter public Note headNote;
 
   @Getter public List<Choice> choices;
 

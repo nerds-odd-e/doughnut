@@ -2574,6 +2574,7 @@ components:
           type: string
     QuizQuestion:
       required:
+      - headNote
       - id
       type: object
       properties:
