@@ -6,7 +6,7 @@
       <NoteTopicWithLink
         v-if="link.sourceNote"
         class="link-title"
-        v-bind="{ note: link.sourceNote }"
+        v-bind="{ noteTopic: link.sourceNote.noteTopic }"
       />
     </strong>
   </div>
@@ -24,7 +24,7 @@
       <NoteTopicWithLink
         v-if="link.targetNote"
         class="link-title"
-        v-bind="{ note: link.targetNote }"
+        v-bind="{ noteTopic: link.targetNote.noteTopic }"
       />
     </strong>
   </div>

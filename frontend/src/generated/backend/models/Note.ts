@@ -2,9 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { TargetNoteForTopic } from './TargetNoteForTopic';
+import type { NoteTopic } from './NoteTopic';
 export type Note = {
     topic: string;
+    noteTopic: NoteTopic;
     topicConstructor: string;
     details?: string;
     parentId?: number;
@@ -14,7 +15,6 @@ export type Note = {
     createdAt: string;
     readonly deletedAt?: string;
     wikidataId?: string;
-    targetForTopic?: TargetNoteForTopic;
 };
 export namespace Note {
     export enum linkType {

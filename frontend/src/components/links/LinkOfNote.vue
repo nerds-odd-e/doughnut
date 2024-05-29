@@ -5,7 +5,11 @@
       v-if="!!reverse"
       :inverse-icon="true"
     />
-    <NoteTopicWithLink v-if="note" class="link-title" v-bind="{ note }" />
+    <NoteTopicWithLink
+      v-if="note"
+      class="link-title"
+      v-bind="{ noteTopic: note.noteTopic }"
+    />
     <LinkNob
       v-bind="{ link, colors, storageAccessor }"
       v-if="!reverse"

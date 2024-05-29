@@ -7,7 +7,10 @@
     >
       <div class="card-body">
         <h5>
-          <NoteTopicWithLink v-bind="{ note }" class="card-title" />
+          <NoteTopicWithLink
+            v-bind="{ noteTopic: note.noteTopic }"
+            class="card-title"
+          />
         </h5>
         <NoteShortDetails :details="note.details" />
       </div>

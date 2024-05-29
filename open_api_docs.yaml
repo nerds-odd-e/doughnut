@@ -2355,6 +2355,7 @@ components:
       required:
       - createdAt
       - id
+      - noteTopic
       - topic
       - topicConstructor
       - updatedAt
@@ -2362,6 +2363,8 @@ components:
       properties:
         topic:
           type: string
+        noteTopic:
+          $ref: "#/components/schemas/NoteTopic"
         topicConstructor:
           maxLength: 150
           minLength: 1
@@ -2404,8 +2407,19 @@ components:
           readOnly: true
         wikidataId:
           type: string
-        targetForTopic:
-          $ref: "#/components/schemas/TargetNoteForTopic"
+    NoteTopic:
+      required:
+      - id
+      - topicConstructor
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        topicConstructor:
+          type: string
+        targetNoteTopic:
+          $ref: "#/components/schemas/NoteTopic"
     Notebook:
       required:
       - id
@@ -2452,16 +2466,6 @@ components:
           $ref: "#/components/schemas/Notebook"
         fromDTO:
           $ref: "#/components/schemas/SubscriptionDTO"
-    TargetNoteForTopic:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        topicConstructor:
-          type: string
-        targetNoteForTopic:
-          $ref: "#/components/schemas/TargetNoteForTopic"
     GlobalAiModelSettings:
       type: object
       properties:

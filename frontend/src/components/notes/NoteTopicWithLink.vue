@@ -1,21 +1,21 @@
 <template>
   <router-link
-    :to="{ name: 'noteShow', params: { noteId: note.id } }"
+    :to="{ name: 'noteShow', params: { noteId: noteTopic.id } }"
     class="text-decoration-none"
   >
-    <NoteTopic v-bind="{ note }" />
+    <NoteTopicComponent v-bind="{ noteTopic }" />
   </router-link>
 </template>
 
 <script lang="ts">
 import { PropType, defineComponent } from "vue";
-import { Note } from "@/generated/backend";
-import NoteTopic from "./core/NoteTopic.vue";
+import { NoteTopic } from "@/generated/backend";
+import NoteTopicComponent from "./core/NoteTopic.vue";
 
 export default defineComponent({
   props: {
-    note: { type: Object as PropType<Note>, required: true },
+    noteTopic: { type: Object as PropType<NoteTopic>, required: true },
   },
-  components: { NoteTopic },
+  components: { NoteTopicComponent },
 });
 </script>

@@ -10,7 +10,7 @@ import com.odde.doughnut.algorithms.ClozedString;
 import com.odde.doughnut.algorithms.HtmlOrMarkdown;
 import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.algorithms.SiblingOrder;
-import com.odde.doughnut.controllers.dto.TargetNoteForTopic;
+import com.odde.doughnut.controllers.dto.NoteTopic;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.models.NoteViewer;
 import jakarta.persistence.*;
@@ -26,7 +26,15 @@ import lombok.Setter;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "note")
-@JsonPropertyOrder({"topic", "topicConstructor", "details", "parentId", "linkType", "updatedAt"})
+@JsonPropertyOrder({
+  "topic",
+  "noteTopic",
+  "topicConstructor",
+  "details",
+  "parentId",
+  "linkType",
+  "updatedAt"
+})
 public abstract class Note extends EntityIdentifiedByIdOnly {
   public static final int MAX_TITLE_LENGTH = 150;
 
@@ -314,18 +322,15 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
     return noteAccessory;
   }
 
-  public TargetNoteForTopic getTargetForTopic() {
-    if (getTargetNote() == null) return null;
-    return getTargetNote().asTargetNoteForTopic();
-  }
-
-  @JsonIgnore
-  private TargetNoteForTopic asTargetNoteForTopic() {
-    TargetNoteForTopic targetNoteForTopic = new TargetNoteForTopic();
-    targetNoteForTopic.setId(getId());
-    targetNoteForTopic.setTopicConstructor(getTopicConstructor());
-    targetNoteForTopic.setTargetNoteForTopic(getTargetForTopic());
-    return targetNoteForTopic;
+  @NotNull
+  public NoteTopic getNoteTopic() {
+    NoteTopic noteTopic = new NoteTopic();
+    noteTopic.setId(getId());
+    noteTopic.setTopicConstructor(getTopicConstructor());
+    if (getTargetNote() != null) {
+      noteTopic.setTargetNoteTopic(getTargetNote().getNoteTopic());
+    }
+    return noteTopic;
   }
 
   public static class NoteBrief {

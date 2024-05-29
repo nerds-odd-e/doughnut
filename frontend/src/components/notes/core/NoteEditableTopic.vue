@@ -14,7 +14,7 @@
         @blur="blur"
         :errors="errors.topic"
       >
-        <h2><NoteTopic v-bind="{ note }" /></h2>
+        <h2><NoteTopic v-bind="{ noteTopic: note.noteTopic }" /></h2>
       </EditableText>
     </template>
   </TextContentWrapper>

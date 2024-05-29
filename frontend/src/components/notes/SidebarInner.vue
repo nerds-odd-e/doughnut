@@ -13,7 +13,7 @@
         <NoteTopicWithLink
           class="card-title"
           :class="{ 'active-topic': note.id === activeNoteRealm.note.id }"
-          v-bind="{ note }"
+          v-bind="{ noteTopic: note.noteTopic }"
           @click.stop
         />
         <ScrollTo v-if="note.id === activeNoteRealm.note.id" />
@@ -42,6 +42,7 @@ import { PropType, ref, watch } from "vue";
 import { NoteRealm } from "@/generated/backend";
 import ScrollTo from "@/components/commons/ScrollTo.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
+import NoteTopicWithLink from "./NoteTopicWithLink.vue";
 
 const props = defineProps({
   noteId: { type: Number, required: true },

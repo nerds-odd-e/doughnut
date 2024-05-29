@@ -2,9 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type TargetNoteForTopic = {
-    id?: number;
-    topicConstructor?: string;
-    targetNoteForTopic?: TargetNoteForTopic;
+export type NoteTopic = {
+    id: number;
+    topicConstructor: string;
+    targetNoteTopic?: NoteTopic;
 };
 

@@ -9,7 +9,7 @@
       v-for="note in ancestors"
       :key="note.id"
     >
-      <NoteTopicWithLink v-bind="{ note }" />
+      <NoteTopicWithLink v-bind="{ noteTopic: note.noteTopic }" />
     </li>
     <li class="breadcrumb-item" v-if="$slots.additional">
       <slot name="additional" />
@@ -17,10 +17,12 @@
   </ol>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import { PropType } from "vue";
+import { Note } from "@/generated/backend";
 import NoteTopicWithLink from "../notes/NoteTopicWithLink.vue";
 
-const props = defineProps({ ancestors: Array });
+defineProps({ ancestors: Array as PropType<Note[]> });
 </script>
 
 <style lang="scss" scoped>

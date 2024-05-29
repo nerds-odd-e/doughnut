@@ -57,7 +57,7 @@ public class NoteTest {
     @Test
     void replaceParentPlaceholder() {
       assertThat(
-          linkingNote.getTargetForTopic().getTopicConstructor(),
+          linkingNote.getNoteTopic().getTargetNoteTopic().getTopicConstructor(),
           equalTo(target.getTopicConstructor()));
     }
 
@@ -65,7 +65,8 @@ public class NoteTest {
     void linkOfLink() {
       Note linkOfLink = makeMe.aLink().between(parent, linkingNote).please();
       assertThat(
-          linkOfLink.getTargetForTopic().getTargetNoteForTopic().getId(), equalTo(target.getId()));
+          linkOfLink.getNoteTopic().getTargetNoteTopic().getTargetNoteTopic().getId(),
+          equalTo(target.getId()));
     }
   }
 

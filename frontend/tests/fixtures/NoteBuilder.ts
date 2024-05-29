@@ -7,10 +7,15 @@ class NoteBuilder extends Builder<Note> {
 
   constructor() {
     super();
+    const id = generateId();
     this.data = {
-      id: generateId(),
+      id,
       topic: "Note1.1.1",
       topicConstructor: "Note1.1.1",
+      noteTopic: {
+        id,
+        topicConstructor: "Note1.1.1",
+      },
       details: "<p>Desc</p>",
       wikidataId: "",
       deletedAt: "",
@@ -29,6 +34,7 @@ class NoteBuilder extends Builder<Note> {
   topicConstructor(value: string): NoteBuilder {
     this.data.topic = value;
     this.data.topicConstructor = value;
+    this.data.noteTopic.topicConstructor = value;
     return this;
   }
 
