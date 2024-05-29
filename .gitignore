@@ -102,6 +102,7 @@ frontend/app.*.map.json
 
 # local nix env related e.g. MySQL DB instance folder/files
 .direnv/
+.wireit/
 install-nix
 mysql/
 
