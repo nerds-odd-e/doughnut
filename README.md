@@ -41,10 +41,15 @@ Install Nix package manager if you haven't already with
 ./setup-doughnut-dev.sh
 ```
 
-Install `direnv`
+Install `direnv` and activate `direnv`
 **macOS:** `brew install direnv`
 **Ubuntu/Debian (includes WSL2 with Ubuntu):** `sudo apt-get install -y direnv`
 **Fedora:** `sudo dnf install direnv`
+Change directory to your cloned `doughnut` folder path and run the below:
+```bash
+direnv allow
+```
+Subsequently, each time your change directory into your `doughnut` cloned folder, `nix` flakes will be auto loaded. Each time you change directory away from `doughnut` directory, the `nix` environment will be auto unloaded.
 
 Ensure your OS (WSL2/Ubuntu/Fedora, etc) has `/bin/sh` point to `bash`.
 If you are using Ubuntu where `/bin/sh` is symlinked to `dash`, please
