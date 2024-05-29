@@ -2,8 +2,8 @@
   <div class="row">
     <div class="col-12 col-md-4 link-source">
       <LinkNoteShow
-        v-if="link.sourceNote"
-        :note-topic="link.sourceNote.noteTopic"
+        v-if="link.note?.noteTopic.parentNoteTopic"
+        :note-topic="link.note.noteTopic.parentNoteTopic"
       />
     </div>
     <div class="col-12 col-md-4 text-center">

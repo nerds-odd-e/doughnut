@@ -3,9 +3,7 @@
     <label><strong>Review Point: </strong></label>
 
     <span v-if="thing.note?.noteTopic.targetNoteTopic">
-      <span>
-        {{ sourceNoteTitle }}
-      </span>
+      <NoteTopic :note-topic="thing.note.noteTopic.parentNoteTopic" />
       <NoteTopic :note-topic="thing.note.noteTopic.targetNoteTopic" />
     </span>
     <span v-else>
@@ -32,9 +30,6 @@ export default defineComponent({
     },
     noteTitle() {
       return this.note?.topic;
-    },
-    sourceNoteTitle() {
-      return this.thing.sourceNote?.topic;
     },
   },
 });

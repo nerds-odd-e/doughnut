@@ -4,9 +4,9 @@
     Source:
     <strong>
       <NoteTopicWithLink
-        v-if="link.sourceNote"
+        v-if="link.note?.noteTopic.parentNoteTopic"
         class="link-title"
-        v-bind="{ noteTopic: link.sourceNote.noteTopic }"
+        v-bind="{ noteTopic: link.note.noteTopic.parentNoteTopic }"
       />
     </strong>
   </div>

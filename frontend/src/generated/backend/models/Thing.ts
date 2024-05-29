@@ -5,6 +5,5 @@
 import type { Note } from './Note';
 export type Thing = {
     note?: Note;
-    sourceNote?: Note;
 };
 

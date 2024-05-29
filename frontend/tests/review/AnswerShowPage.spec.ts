@@ -40,7 +40,7 @@ describe("repetition page", () => {
         reviewPoint.thing.note?.noteTopic.targetNoteTopic?.id,
       );
       expect(mockedNotePositionCall).toHaveBeenCalledWith(
-        reviewPoint.thing.sourceNote?.id,
+        reviewPoint.thing.note?.parentId,
       );
       expect(
         JSON.parse(

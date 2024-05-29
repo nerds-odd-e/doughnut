@@ -7,8 +7,4 @@ import lombok.Setter;
 @JsonPropertyOrder({"note", "link", "linkType", "sourceNote", "targetNote", "createdAt"})
 public class Thing {
   @Getter @Setter private Note note;
-
-  public Note getSourceNote() {
-    return getNote().getParent();
-  }
 }

@@ -51,8 +51,13 @@ class NoteBuilder extends Builder<Note> {
   under(value: NoteRealm): NoteBuilder {
     value.children ||= [];
     value.children.push(this.data);
-    this.data.parentId = value.id;
+    this.underNote(value.note);
+    return this;
+  }
 
+  underNote(value: Note): NoteBuilder {
+    this.data.parentId = value.id;
+    this.data.noteTopic.parentNoteTopic = value.noteTopic;
     return this;
   }
 

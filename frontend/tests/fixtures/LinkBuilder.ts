@@ -28,9 +28,9 @@ class LinkBuilder extends Builder<Thing> {
     return {
       note: new NoteBuilder()
         .linkType(this.internalType)
+        .underNote(this.sourceNoteBuilder.do())
         .target(this.targetNoteBuilder.do())
         .do(),
-      sourceNote: this.sourceNoteBuilder.do(),
     };
   }
 }

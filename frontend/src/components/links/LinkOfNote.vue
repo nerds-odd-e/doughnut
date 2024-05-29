@@ -39,7 +39,7 @@ export default defineComponent({
   computed: {
     noteTopic() {
       return this.reverse
-        ? this.link.sourceNote?.noteTopic
+        ? this.link.note?.noteTopic.parentNoteTopic
         : this.link.note?.noteTopic.targetNoteTopic;
     },
     fontColor() {
