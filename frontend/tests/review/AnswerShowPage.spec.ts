@@ -37,10 +37,10 @@ describe("repetition page", () => {
       await flushPromises();
       expect(mockedShowAnswerCall).toHaveBeenCalledWith(1);
       expect(mockedNotePositionCall).toHaveBeenCalledWith(
-        reviewPoint.thing.note?.noteTopic.targetNoteTopic?.id,
+        reviewPoint.note.noteTopic.targetNoteTopic?.id,
       );
       expect(mockedNotePositionCall).toHaveBeenCalledWith(
-        reviewPoint.thing.note?.parentId,
+        reviewPoint.note.parentId,
       );
       expect(
         JSON.parse(

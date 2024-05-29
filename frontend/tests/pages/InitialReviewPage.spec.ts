@@ -55,10 +55,10 @@ describe("repeat page", () => {
   describe("normal view", () => {
     const noteRealm = makeMe.aNoteRealm.please();
     const reviewPoint = makeMe.aReviewPoint.ofNote(noteRealm).please();
-    const { thing } = reviewPoint;
+    const { note } = reviewPoint;
 
     beforeEach(() => {
-      mockedInitialReviewCall.mockResolvedValue([thing, thing]);
+      mockedInitialReviewCall.mockResolvedValue([note, note]);
       mockedGetNoteCall.mockResolvedValue(noteRealm);
     });
 
@@ -82,7 +82,7 @@ describe("repeat page", () => {
   it("minimized view for link", async () => {
     const link = makeMe.aLink.please();
     const reviewPoint = makeMe.aReviewPoint.ofLink(link).please();
-    mockedInitialReviewCall.mockResolvedValue([reviewPoint.thing]);
+    mockedInitialReviewCall.mockResolvedValue([reviewPoint.note]);
     const wrapper = renderer
       .withStorageProps({ minimized: true })
       .currentRoute({ name: "initial" })

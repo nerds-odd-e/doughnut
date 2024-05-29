@@ -17,19 +17,17 @@ class ReviewPointBuilder extends Builder<ReviewPoint> {
       repetitionCount: 0,
       forgettingCurveIndex: 0,
       removedFromReview: false,
-      thing: {
-        note: new NoteBuilder().do(),
-      },
+      note: new NoteBuilder().do(),
     };
   }
 
   ofNote(note: NoteRealm): ReviewPointBuilder {
-    this.data.thing.note = note.note;
+    this.data.note = note.note;
     return this;
   }
 
   ofLink(link: Thing): ReviewPointBuilder {
-    this.data.thing = link;
+    this.data.note = link.note!;
     return this;
   }
 

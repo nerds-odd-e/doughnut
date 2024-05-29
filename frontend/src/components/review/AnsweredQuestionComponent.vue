@@ -2,11 +2,11 @@
   <div v-if="reviewPoint">
     <ThingAbbr
       v-if="!toggleReviewPoint"
-      v-bind="{ thing: reviewPoint.thing }"
+      v-bind="{ note: reviewPoint.note }"
       @click="toggleReviewPoint = true"
     />
     <div v-else>
-      <ShowThing v-bind="{ note: reviewPoint.thing.note!, storageAccessor }" />
+      <ShowThing v-bind="{ note: reviewPoint.note, storageAccessor }" />
       <NoteInfoReviewPoint v-model="reviewPoint" />
     </div>
   </div>

@@ -2,15 +2,15 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { Thing } from './Thing';
+import type { Note } from './Note';
 export type ReviewPoint = {
     id: number;
+    note: Note;
     lastReviewedAt?: string;
     nextReviewAt: string;
     initialReviewedAt?: string;
     repetitionCount?: number;
     forgettingCurveIndex?: number;
     removedFromReview?: boolean;
-    thing: Thing;
 };
 

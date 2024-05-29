@@ -3,7 +3,7 @@
   <ShowThing
     v-else
     v-bind="{
-      note: reviewPoint.thing.note!,
+      note: reviewPoint.note,
       expandInfo: false,
       storageAccessor,
     }"

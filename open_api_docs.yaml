@@ -2489,12 +2489,14 @@ components:
       required:
       - id
       - nextReviewAt
-      - thing
+      - note
       type: object
       properties:
         id:
           type: integer
           format: int32
+        note:
+          $ref: "#/components/schemas/Note"
         lastReviewedAt:
           type: string
           format: date-time
@@ -2512,13 +2514,6 @@ components:
           format: int32
         removedFromReview:
           type: boolean
-        thing:
-          $ref: "#/components/schemas/Thing"
-    Thing:
-      type: object
-      properties:
-        note:
-          $ref: "#/components/schemas/Note"
     SelfEvaluation:
       type: object
       properties:
@@ -2716,6 +2711,11 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Note"
+    Thing:
+      type: object
+      properties:
+        note:
+          $ref: "#/components/schemas/Note"
     WikidataAssociationCreation:
       required:
       - wikidataId

@@ -2,9 +2,9 @@
   <div class="review-point-abbr">
     <label><strong>Review Point: </strong></label>
 
-    <span v-if="thing.note?.noteTopic.targetNoteTopic">
-      <NoteTopic :note-topic="thing.note.noteTopic.parentNoteTopic" />
-      <NoteTopic :note-topic="thing.note.noteTopic.targetNoteTopic" />
+    <span v-if="note.noteTopic.targetNoteTopic">
+      <NoteTopic :note-topic="note.noteTopic.parentNoteTopic" />
+      <NoteTopic :note-topic="note.noteTopic.targetNoteTopic" />
     </span>
     <span v-else>
       {{ noteTitle }}
@@ -13,21 +13,18 @@
 </template>
 
 <script lang="ts">
-import { Thing } from "@/generated/backend";
+import { Note } from "@/generated/backend";
 import { defineComponent, PropType } from "vue";
 import NoteTopic from "../notes/core/NoteTopic.vue";
 
 export default defineComponent({
   props: {
-    thing: {
-      type: Object as PropType<Thing>,
+    note: {
+      type: Object as PropType<Note>,
       required: true,
     },
   },
   computed: {
-    note() {
-      return this.thing.note;
-    },
     noteTitle() {
       return this.note?.topic;
     },
