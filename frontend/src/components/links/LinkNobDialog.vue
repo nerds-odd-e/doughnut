@@ -4,9 +4,9 @@
     Source:
     <strong>
       <NoteTopicWithLink
-        v-if="link.note?.noteTopic.parentNoteTopic"
+        v-if="note.noteTopic.parentNoteTopic"
         class="link-title"
-        v-bind="{ noteTopic: link.note.noteTopic.parentNoteTopic }"
+        v-bind="{ noteTopic: note.noteTopic.parentNoteTopic }"
       />
     </strong>
   </div>
@@ -22,9 +22,9 @@
     Target:
     <strong>
       <NoteTopicWithLink
-        v-if="link.note?.noteTopic.targetNoteTopic"
+        v-if="note.noteTopic.targetNoteTopic"
         class="link-title"
-        v-bind="{ noteTopic: link.note.noteTopic.targetNoteTopic }"
+        v-bind="{ noteTopic: note.noteTopic.targetNoteTopic }"
       />
     </strong>
   </div>
@@ -34,7 +34,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { LinkCreation, Thing } from "@/generated/backend";
+import { LinkCreation, Note } from "@/generated/backend";
 import LinkTypeSelect from "./LinkTypeSelect.vue";
 import NoteTopicWithLink from "../notes/NoteTopicWithLink.vue";
 import usePopups from "../commons/Popups/usePopups";
@@ -45,8 +45,8 @@ export default defineComponent({
     return { ...usePopups() };
   },
   props: {
-    link: {
-      type: Object as PropType<Thing>,
+    note: {
+      type: Object as PropType<Note>,
       required: true,
     },
     storageAccessor: {
@@ -64,7 +64,7 @@ export default defineComponent({
   data() {
     return {
       formData: {
-        linkType: this.link.note?.linkType,
+        linkType: this.note.linkType,
         fromTargetPerspective: this.inverseIcon,
       } as LinkCreation,
       linkFormErrors: { linkType: undefined as string | undefined },
@@ -75,7 +75,7 @@ export default defineComponent({
     updateLink() {
       this.storageAccessor
         .storedApi()
-        .updateLink(this.link.note!.id, this.formData)
+        .updateLink(this.note.id, this.formData)
         .then(() => this.$emit("closeDialog"))
         .catch((error) => {
           this.linkFormErrors = error;
@@ -89,7 +89,7 @@ export default defineComponent({
       }
       await this.storageAccessor
         .storedApi()
-        .deleteLink(this.link.note!.id, this.inverseIcon);
+        .deleteLink(this.note.id, this.inverseIcon);
       this.$emit("closeDialog");
     },
   },

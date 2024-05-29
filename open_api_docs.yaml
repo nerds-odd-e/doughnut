@@ -1878,7 +1878,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Thing"
+                  $ref: "#/components/schemas/Note"
   /api/reviews/answers/{answer}:
     get:
       tags:

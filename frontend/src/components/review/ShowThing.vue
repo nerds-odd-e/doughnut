@@ -1,7 +1,24 @@
 <template>
-  <main v-if="thing.note?.linkType">
+  <main v-if="note.linkType">
     <div class="jumbotron py-4 mb-2">
-      <LinkShow v-bind="{ link: thing, storageAccessor }" />
+      <div class="row">
+        <div class="col-12 col-md-4 link-source">
+          <LinkNoteShow
+            v-if="note.noteTopic.parentNoteTopic"
+            :note-topic="note.noteTopic.parentNoteTopic"
+          />
+        </div>
+        <div class="col-12 col-md-4 text-center">
+          <LinkNob v-bind="{ note, storageAccessor }" />
+          <span class="badge bg-light text-dark"> {{ note.linkType }}</span>
+        </div>
+        <div class="col-12 col-md-4 link-target">
+          <LinkNoteShow
+            v-if="note.noteTopic.targetNoteTopic"
+            :note-topic="note.noteTopic.targetNoteTopic"
+          />
+        </div>
+      </div>
     </div>
     <slot />
   </main>
@@ -29,15 +46,16 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { Thing } from "@/generated/backend";
+import { Note } from "@/generated/backend";
 import NoteRealmLoader from "../notes/NoteRealmLoader.vue";
-import LinkShow from "../links/LinkShow.vue";
+import LinkNoteShow from "../links/LinkNoteShow.vue";
+import LinkNob from "../links/LinkNob.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({
   props: {
-    thing: {
-      type: Object as PropType<Thing>,
+    note: {
+      type: Object as PropType<Note>,
       required: true,
     },
     storageAccessor: {
@@ -45,10 +63,10 @@ export default defineComponent({
       required: true,
     },
   },
-  components: { LinkShow, NoteRealmLoader },
+  components: { NoteRealmLoader },
   computed: {
     noteId() {
-      return this.thing.note?.id;
+      return this.note.id;
     },
   },
 });

@@ -67,7 +67,6 @@ describe("repeat page", () => {
       await flushPromises();
       expect(wrapper.findAll(".paused")).toHaveLength(0);
       expect(teleportTarget.textContent).toContain("Initial Review: 0/2");
-      expect(mockedGetNoteCall).toBeCalledWith(noteRealm.id);
     });
 
     (["levelChanged"] as "levelChanged"[]).forEach((event) => {

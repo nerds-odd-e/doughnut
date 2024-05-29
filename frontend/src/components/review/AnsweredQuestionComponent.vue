@@ -6,7 +6,7 @@
       @click="toggleReviewPoint = true"
     />
     <div v-else>
-      <ShowThing v-bind="{ thing: reviewPoint.thing, storageAccessor }" />
+      <ShowThing v-bind="{ note: reviewPoint.thing.note!, storageAccessor }" />
       <NoteInfoReviewPoint v-model="reviewPoint" />
     </div>
   </div>

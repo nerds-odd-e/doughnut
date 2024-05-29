@@ -1,5 +1,5 @@
 <template>
-  <ContainerPage v-bind="{ contentExists: !!thing }">
+  <ContainerPage v-bind="{ contentExists: !!note }">
     <ProgressBar
       v-bind="{
         paused: minimized,
@@ -11,11 +11,11 @@
     >
     </ProgressBar>
     <InitialReview
-      v-if="!minimized && thing"
-      v-bind="{ thing, storageAccessor }"
+      v-if="!minimized && note"
+      v-bind="{ note, storageAccessor }"
       @initial-review-done="initialReviewDone"
       @reload-needed="onReloadNeeded"
-      :key="thing.note?.id"
+      :key="note.id"
     />
   </ContainerPage>
 </template>
@@ -23,7 +23,7 @@
 <script setup lang="ts">
 import { PropType, ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
-import { Thing } from "@/generated/backend";
+import { Note } from "@/generated/backend";
 import useLoadingApi from "@/managedApi/useLoadingApi";
 import timezoneParam from "@/managedApi/window/timezoneParam";
 import ProgressBar from "@/components/commons/ProgressBar.vue";
@@ -44,17 +44,17 @@ defineProps({
 defineEmits(["update-reviewing"]);
 
 const finished = ref(0);
-const things = ref([] as Thing[]);
+const notes = ref([] as Note[]);
 
-const thing = computed(() => things.value[0]);
-const remainingInitialReviewCountForToday = computed(() => things.value.length);
+const note = computed(() => notes.value[0]);
+const remainingInitialReviewCountForToday = computed(() => notes.value.length);
 const resume = () => {
   router.push({ name: "initial" });
 };
 const initialReviewDone = () => {
   finished.value += 1;
-  things.value.shift();
-  if (things.value.length === 0) {
+  notes.value.shift();
+  if (notes.value.length === 0) {
     router.push({ name: "reviews" });
     return;
   }
@@ -68,7 +68,7 @@ const loadInitialReview = () => {
         router.push({ name: "reviews" });
         return;
       }
-      things.value = resp;
+      notes.value = resp;
     });
 };
 

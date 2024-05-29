@@ -55,13 +55,13 @@ class RestReviewsController {
 
   @GetMapping("/initial")
   @Transactional(readOnly = true)
-  public List<Thing> initialReview(@RequestParam(value = "timezone") String timezone) {
+  public List<Note> initialReview(@RequestParam(value = "timezone") String timezone) {
     currentUser.assertLoggedIn();
     ZoneId timeZone = ZoneId.of(timezone);
     Reviewing reviewing =
         currentUser.createReviewing(testabilitySettings.getCurrentUTCTimestamp(), timeZone);
 
-    return reviewing.getDueInitialReviewPoints().map(Note::buildNoteThing).toList();
+    return reviewing.getDueInitialReviewPoints().toList();
   }
 
   @PostMapping(path = "")

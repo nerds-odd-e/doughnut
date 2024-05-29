@@ -2,7 +2,11 @@
   <ContentLoader v-if="!reviewPoint" />
   <ShowThing
     v-else
-    v-bind="{ thing: reviewPoint.thing, expandInfo: false, storageAccessor }"
+    v-bind="{
+      note: reviewPoint.thing.note!,
+      expandInfo: false,
+      storageAccessor,
+    }"
   />
 </template>
 

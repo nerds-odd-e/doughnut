@@ -5,7 +5,10 @@
       :key="_linkType"
     >
       <li v-for="link in linksOfType.direct" :key="link.note?.id">
-        <LinkOfNote v-bind="{ link, storageAccessor }" :reverse="false" />
+        <LinkOfNote
+          v-bind="{ note: link.note!, storageAccessor }"
+          :reverse="false"
+        />
       </li>
     </template>
     <li
@@ -19,14 +22,14 @@
           class="link-multi"
           v-for="link in direct"
           :key="link.note?.id"
-          v-bind="{ link, storageAccessor }"
+          v-bind="{ note: link.note!, storageAccessor }"
           :reverse="false"
         />
         <LinkOfNote
           class="link-multi"
           v-for="link in reverse"
           :key="link.note?.id"
-          v-bind="{ link, storageAccessor }"
+          v-bind="{ note: link.note!, storageAccessor }"
           :reverse="true"
         />
       </template>
@@ -40,7 +43,7 @@
           class="link-multi"
           v-for="link in linksOfType.direct"
           :key="link.note?.id"
-          v-bind="{ link, storageAccessor }"
+          v-bind="{ note: link.note!, storageAccessor }"
           :reverse="false"
         />
       </li>
@@ -60,7 +63,7 @@
           class="link-multi"
           v-for="link in linksOfType.reverse"
           :key="link.note?.id"
-          v-bind="{ link, storageAccessor }"
+          v-bind="{ note: link.note!, storageAccessor }"
           :reverse="true"
         />
       </li>

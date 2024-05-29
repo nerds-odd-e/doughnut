@@ -5,9 +5,9 @@
 import type { AnsweredQuestion } from '../models/AnsweredQuestion';
 import type { DueReviewPoints } from '../models/DueReviewPoints';
 import type { InitialInfo } from '../models/InitialInfo';
+import type { Note } from '../models/Note';
 import type { ReviewPoint } from '../models/ReviewPoint';
 import type { ReviewStatus } from '../models/ReviewStatus';
-import type { Thing } from '../models/Thing';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestReviewsControllerService {
@@ -73,12 +73,12 @@ export class RestReviewsControllerService {
     }
     /**
      * @param timezone
-     * @returns Thing OK
+     * @returns Note OK
      * @throws ApiError
      */
     public initialReview(
         timezone: string,
-    ): CancelablePromise<Array<Thing>> {
+    ): CancelablePromise<Array<Note>> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/reviews/initial',

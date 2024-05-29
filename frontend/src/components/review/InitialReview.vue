@@ -1,10 +1,9 @@
 <template>
   <ContainerPage v-bind="{ contentExists: true }">
-    <ShowThing v-bind="{ thing, storageAccessor }" />
+    <ShowThing v-bind="{ note, storageAccessor }" />
     <NoteInfoBar
-      v-if="thing.note"
-      :note-id="thing.note.id"
-      :key="thing.note.id"
+      :note-id="note.id"
+      :key="note.id"
       @level-changed="$emit('reloadNeeded', $event)"
     />
     <InitialReviewButtons
@@ -16,7 +15,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { Thing } from "@/generated/backend";
+import { Note } from "@/generated/backend";
 import useLoadingApi from "@/managedApi/useLoadingApi";
 import { StorageAccessor } from "@/store/createNoteStorage";
 import ContainerPage from "@/pages/commons/ContainerPage.vue";
@@ -31,8 +30,8 @@ export default defineComponent({
     return { ...useLoadingApi(), ...usePopups() };
   },
   props: {
-    thing: {
-      type: Object as PropType<Thing>,
+    note: {
+      type: Object as PropType<Note>,
       required: true,
     },
     storageAccessor: {
@@ -49,7 +48,7 @@ export default defineComponent({
   },
   computed: {
     buttonKey() {
-      return this.thing.note?.id;
+      return this.note.id;
     },
   },
 
@@ -65,7 +64,7 @@ export default defineComponent({
       }
       this.managedApi.restReviewsController
         .create({
-          noteId: this.thing.note!.id,
+          noteId: this.note.id,
           skipReview,
         })
         .then((data) => {

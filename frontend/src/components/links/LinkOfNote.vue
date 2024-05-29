@@ -1,7 +1,7 @@
 <template>
   <span class="link-link">
     <LinkNob
-      v-bind="{ link, colors, storageAccessor }"
+      v-bind="{ note, colors, storageAccessor }"
       v-if="!!reverse"
       :inverse-icon="true"
     />
@@ -11,7 +11,7 @@
       v-bind="{ noteTopic }"
     />
     <LinkNob
-      v-bind="{ link, colors, storageAccessor }"
+      v-bind="{ note, colors, storageAccessor }"
       v-if="!reverse"
       :inverse-icon="false"
     />
@@ -20,7 +20,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { Thing } from "@/generated/backend";
+import { Note } from "@/generated/backend";
 import NoteTopicWithLink from "../notes/NoteTopicWithLink.vue";
 import LinkNob from "./LinkNob.vue";
 import { colors } from "../../colors";
@@ -28,7 +28,7 @@ import { StorageAccessor } from "../../store/createNoteStorage";
 
 export default defineComponent({
   props: {
-    link: { type: Object as PropType<Thing>, required: true },
+    note: { type: Object as PropType<Note>, required: true },
     reverse: Boolean,
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
@@ -39,8 +39,8 @@ export default defineComponent({
   computed: {
     noteTopic() {
       return this.reverse
-        ? this.link.note?.noteTopic.parentNoteTopic
-        : this.link.note?.noteTopic.targetNoteTopic;
+        ? this.note.noteTopic.parentNoteTopic
+        : this.note.noteTopic.targetNoteTopic;
     },
     fontColor() {
       return this.reverse ? colors.target : colors.source;
