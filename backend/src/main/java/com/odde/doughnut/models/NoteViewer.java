@@ -36,12 +36,8 @@ public class NoteViewer {
                     type,
                     new LinkViewed() {
                       {
-                        setDirect(
-                            linksOfTypeThroughDirect(List.of(type)).stream()
-                                .map(Note::buildNoteThing)
-                                .toList());
-                        setReverse(
-                            linksOfTypeThroughReverse(type).map(Note::buildNoteThing).toList());
+                        setDirect(linksOfTypeThroughDirect(List.of(type)).stream().toList());
+                        setReverse(linksOfTypeThroughReverse(type).toList());
                       }
                     }))
         .filter(x -> x.getValue().notEmpty())

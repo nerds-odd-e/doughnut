@@ -71,7 +71,6 @@ export type { SrtDto } from './models/SrtDto';
 export type { Subscription } from './models/Subscription';
 export type { SubscriptionDTO } from './models/SubscriptionDTO';
 export type { SuggestedQuestionForFineTuning } from './models/SuggestedQuestionForFineTuning';
-export type { Thing } from './models/Thing';
 export type { TimeTravel } from './models/TimeTravel';
 export type { TimeTravelRelativeToNow } from './models/TimeTravelRelativeToNow';
 export type { User } from './models/User';

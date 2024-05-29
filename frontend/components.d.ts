@@ -55,6 +55,7 @@ declare module 'vue' {
     ManageModel: typeof import('./src/components/admin/ManageModel.vue')['default']
     ManageModelInner: typeof import('./src/components/admin/ManageModelInner.vue')['default']
     Modal: typeof import('./src/components/commons/Modal.vue')['default']
+    NoteAbbr: typeof import('./src/components/review/NoteAbbr.vue')['default']
     NoteAccessoryAsync: typeof import('./src/components/notes/accessory/NoteAccessoryAsync.vue')['default']
     NoteAccessoryDisplay: typeof import('./src/components/notes/accessory/NoteAccessoryDisplay.vue')['default']
     NoteAccessoryToolbar: typeof import('./src/components/notes/accessory/NoteAccessoryToolbar.vue')['default']

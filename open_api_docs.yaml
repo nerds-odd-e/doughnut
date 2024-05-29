@@ -2660,11 +2660,11 @@ components:
         direct:
           type: array
           items:
-            $ref: "#/components/schemas/Thing"
+            $ref: "#/components/schemas/Note"
         reverse:
           type: array
           items:
-            $ref: "#/components/schemas/Thing"
+            $ref: "#/components/schemas/Note"
     NoteCreationRresult:
       required:
       - created
@@ -2711,11 +2711,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Note"
-    Thing:
-      type: object
-      properties:
-        note:
-          $ref: "#/components/schemas/Note"
     WikidataAssociationCreation:
       required:
       - wikidataId

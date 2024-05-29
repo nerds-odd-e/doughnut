@@ -1,8 +1,8 @@
-import { Note, Thing } from "@/generated/backend";
+import { Note } from "@/generated/backend";
 import Builder from "./Builder";
 import NoteBuilder from "./NoteBuilder";
 
-class LinkBuilder extends Builder<Thing> {
+class LinkBuilder extends Builder<Note> {
   sourceNoteBuilder = new NoteBuilder();
 
   targetNoteBuilder = new NoteBuilder();
@@ -24,14 +24,12 @@ class LinkBuilder extends Builder<Thing> {
     return this;
   }
 
-  do(): Thing {
-    return {
-      note: new NoteBuilder()
-        .linkType(this.internalType)
-        .underNote(this.sourceNoteBuilder.do())
-        .target(this.targetNoteBuilder.do())
-        .do(),
-    };
+  do(): Note {
+    return new NoteBuilder()
+      .linkType(this.internalType)
+      .underNote(this.sourceNoteBuilder.do())
+      .target(this.targetNoteBuilder.do())
+      .do();
   }
 }
 

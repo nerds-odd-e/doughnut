@@ -1,7 +1,7 @@
 package com.odde.doughnut.controllers.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.odde.doughnut.entities.Thing;
+import com.odde.doughnut.entities.Note;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.Getter;
@@ -12,13 +12,13 @@ public class LinkViewed {
   @Setter
   @NotNull
   @JsonIgnoreProperties("sourceNote")
-  private List<Thing> direct;
+  private List<? extends Note> direct;
 
   @Getter
   @Setter
   @NotNull
   @JsonIgnoreProperties("targetNote")
-  private List<Thing> reverse;
+  private List<? extends Note> reverse;
 
   public boolean notEmpty() {
     return (direct != null && !direct.isEmpty()) || (reverse != null && !reverse.isEmpty());

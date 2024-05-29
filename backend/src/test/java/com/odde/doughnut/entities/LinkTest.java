@@ -138,9 +138,6 @@ public class LinkTest {
   }
 
   private List<Note> getLinkedNotes(LinkType linkType, Map<LinkType, LinkViewed> allLinks) {
-    return allLinks.get(linkType).getDirect().stream()
-        .map(Thing::getNote)
-        .map(Note::getTargetNote)
-        .toList();
+    return allLinks.get(linkType).getDirect().stream().map(Note::getTargetNote).toList();
   }
 }

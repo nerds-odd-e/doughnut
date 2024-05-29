@@ -1,4 +1,4 @@
-import { NoteRealm, Note, Thing } from "@/generated/backend";
+import { NoteRealm, Note } from "@/generated/backend";
 import LinksMap from "../../src/models/LinksMap";
 import Builder from "./Builder";
 import LinkBuilder from "./LinkBuilder";
@@ -53,7 +53,7 @@ class LinkViewedBuilder extends Builder<LinksMap> {
     };
   }
 
-  private link(): Thing {
+  private link(): Note {
     return new LinkBuilder()
       .from(this.fromNote.note)
       .to(this.toNote.note)

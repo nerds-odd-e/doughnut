@@ -376,10 +376,4 @@ The note of current focus (in JSON format):
   public NoteViewer targetNoteViewer(User user) {
     return new NoteViewer(user, getTargetNote());
   }
-
-  public Thing buildNoteThing() {
-    Thing result = new Thing();
-    result.setNote(this);
-    return result;
-  }
 }

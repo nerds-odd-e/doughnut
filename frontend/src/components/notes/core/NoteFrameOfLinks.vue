@@ -4,11 +4,8 @@
       v-for="(linksOfType, _linkType) in linksReader.hierachyLinks"
       :key="_linkType"
     >
-      <li v-for="link in linksOfType.direct" :key="link.note?.id">
-        <LinkOfNote
-          v-bind="{ note: link.note!, storageAccessor }"
-          :reverse="false"
-        />
+      <li v-for="link in linksOfType.direct" :key="link.id">
+        <LinkOfNote v-bind="{ note: link, storageAccessor }" :reverse="false" />
       </li>
     </template>
     <li
@@ -21,15 +18,15 @@
         <LinkOfNote
           class="link-multi"
           v-for="link in direct"
-          :key="link.note?.id"
-          v-bind="{ note: link.note!, storageAccessor }"
+          :key="link.id"
+          v-bind="{ note: link, storageAccessor }"
           :reverse="false"
         />
         <LinkOfNote
           class="link-multi"
           v-for="link in reverse"
-          :key="link.note?.id"
-          v-bind="{ note: link.note!, storageAccessor }"
+          :key="link.id"
+          v-bind="{ note: link, storageAccessor }"
           :reverse="true"
         />
       </template>
@@ -42,8 +39,8 @@
         <LinkOfNote
           class="link-multi"
           v-for="link in linksOfType.direct"
-          :key="link.note?.id"
-          v-bind="{ note: link.note!, storageAccessor }"
+          :key="link.id"
+          v-bind="{ note: link, storageAccessor }"
           :reverse="false"
         />
       </li>
@@ -62,8 +59,8 @@
         <LinkOfNote
           class="link-multi"
           v-for="link in linksOfType.reverse"
-          :key="link.note?.id"
-          v-bind="{ note: link.note!, storageAccessor }"
+          :key="link.id"
+          v-bind="{ note: link, storageAccessor }"
           :reverse="true"
         />
       </li>
