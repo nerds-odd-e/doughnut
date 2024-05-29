@@ -15,7 +15,7 @@
       v-bind="{ thing, storageAccessor }"
       @initial-review-done="initialReviewDone"
       @reload-needed="onReloadNeeded"
-      :key="thing.id"
+      :key="thing.note?.id"
     />
   </ContainerPage>
 </template>

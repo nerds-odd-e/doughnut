@@ -8,10 +8,6 @@ import lombok.Setter;
 public class Thing {
   @Getter @Setter private Note note;
 
-  public Integer getId() {
-    return getNote().getId();
-  }
-
   public Note getSourceNote() {
     return getNote().getParent();
   }

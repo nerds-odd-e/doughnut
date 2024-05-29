@@ -37,6 +37,9 @@ afterEach(() => {
 
 beforeEach(() => {
   vitest.resetAllMocks();
+  helper.managedApi.restNoteController.show1 = vi
+    .fn()
+    .mockResolvedValue(makeMe.aNote.please());
   helper.managedApi.restReviewsController.repeatReview = mockedRepeatCall;
   renderer = helper
     .component(RepeatPage)

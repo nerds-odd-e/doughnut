@@ -49,7 +49,7 @@ export default defineComponent({
   },
   computed: {
     buttonKey() {
-      return this.thing.id;
+      return this.thing.note?.id;
     },
   },
 

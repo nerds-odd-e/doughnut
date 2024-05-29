@@ -1,7 +1,6 @@
 import { Note, Thing } from "@/generated/backend";
 import Builder from "./Builder";
 import NoteBuilder from "./NoteBuilder";
-import generateId from "./generateId";
 
 class LinkBuilder extends Builder<Thing> {
   sourceNoteBuilder = new NoteBuilder();
@@ -27,7 +26,6 @@ class LinkBuilder extends Builder<Thing> {
 
   do(): Thing {
     return {
-      id: generateId(),
       note: new NoteBuilder().linkType(this.internalType).do(),
       sourceNote: this.sourceNoteBuilder.do(),
       targetNote: this.targetNoteBuilder.do(),

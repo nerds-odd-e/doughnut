@@ -2,6 +2,7 @@ import { Thing } from "@/generated/backend/models/Thing";
 import { NoteRealm, ReviewPoint } from "@/generated/backend";
 import Builder from "./Builder";
 import generateId from "./generateId";
+import NoteBuilder from "./NoteBuilder";
 
 class ReviewPointBuilder extends Builder<ReviewPoint> {
   data: ReviewPoint;
@@ -17,7 +18,7 @@ class ReviewPointBuilder extends Builder<ReviewPoint> {
       forgettingCurveIndex: 0,
       removedFromReview: false,
       thing: {
-        id: generateId(),
+        note: new NoteBuilder().do(),
       },
     };
   }

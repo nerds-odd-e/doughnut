@@ -11,6 +11,9 @@ describe("repeat page", () => {
   beforeEach(() => {
     vi.resetAllMocks();
     vi.useFakeTimers();
+    helper.managedApi.restNoteController.show1 = vi
+      .fn()
+      .mockResolvedValue(makeMe.aNote.please());
     helper.managedApi.restReviewPointController.show = vi
       .fn()
       .mockResolvedValue(makeMe.aReviewPoint.please());

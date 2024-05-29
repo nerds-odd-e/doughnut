@@ -7,6 +7,5 @@ export type Thing = {
     note?: Note;
     sourceNote?: Note;
     targetNote?: Note;
-    id?: number;
 };
 

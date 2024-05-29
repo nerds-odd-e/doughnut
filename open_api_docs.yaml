@@ -2517,9 +2517,6 @@ components:
           $ref: "#/components/schemas/Note"
         targetNote:
           $ref: "#/components/schemas/Note"
-        id:
-          type: integer
-          format: int32
     SelfEvaluation:
       type: object
       properties:
