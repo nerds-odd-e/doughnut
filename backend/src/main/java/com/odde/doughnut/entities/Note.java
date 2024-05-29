@@ -26,7 +26,7 @@ import lombok.Setter;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "note")
-@JsonPropertyOrder({"topic", "topicConstructor", "details", "parentId", "updatedAt"})
+@JsonPropertyOrder({"topic", "topicConstructor", "details", "parentId", "linkType", "updatedAt"})
 public abstract class Note extends EntityIdentifiedByIdOnly {
   public static final int MAX_TITLE_LENGTH = 150;
 

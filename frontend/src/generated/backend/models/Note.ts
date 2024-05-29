@@ -8,12 +8,12 @@ export type Note = {
     topicConstructor: string;
     details?: string;
     parentId?: number;
+    linkType?: Note.linkType;
     updatedAt: string;
     id: number;
     createdAt: string;
     readonly deletedAt?: string;
     wikidataId?: string;
-    linkType?: Note.linkType;
     targetForTopic?: TargetNoteForTopic;
 };
 export namespace Note {

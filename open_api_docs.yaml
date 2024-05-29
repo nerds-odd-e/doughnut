@@ -2371,21 +2371,6 @@ components:
         parentId:
           type: integer
           format: int32
-        updatedAt:
-          type: string
-          format: date-time
-        id:
-          type: integer
-          format: int32
-        createdAt:
-          type: string
-          format: date-time
-        deletedAt:
-          type: string
-          format: date-time
-          readOnly: true
-        wikidataId:
-          type: string
         linkType:
           type: string
           enum:
@@ -2404,6 +2389,21 @@ components:
           - before
           - similar to
           - confused with
+        updatedAt:
+          type: string
+          format: date-time
+        id:
+          type: integer
+          format: int32
+        createdAt:
+          type: string
+          format: date-time
+        deletedAt:
+          type: string
+          format: date-time
+          readOnly: true
+        wikidataId:
+          type: string
         targetForTopic:
           $ref: "#/components/schemas/TargetNoteForTopic"
     Notebook:
