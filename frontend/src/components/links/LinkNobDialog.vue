@@ -64,7 +64,7 @@ export default defineComponent({
   data() {
     return {
       formData: {
-        linkType: this.link.linkType,
+        linkType: this.link.note?.linkType,
         fromTargetPerspective: this.inverseIcon,
       } as LinkCreation,
       linkFormErrors: { linkType: undefined as string | undefined },

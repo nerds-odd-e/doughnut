@@ -1,5 +1,5 @@
 <template>
-  <main v-if="thing.linkType">
+  <main v-if="thing.note?.linkType">
     <div class="jumbotron py-4 mb-2">
       <LinkShow v-bind="{ link: thing, storageAccessor }" />
     </div>

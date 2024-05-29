@@ -9,7 +9,7 @@
         <LinkTypeSelect
           v-bind="{
             scopeName,
-            modelValue: modelValue as string as Thing.linkType,
+            modelValue: modelValue as string as Note.linkType,
             errors,
             allowEmpty,
             field,
@@ -28,7 +28,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { startCase, camelCase } from "lodash";
-import { NoteCreationDTO, Thing } from "@/generated/backend";
+import { NoteCreationDTO, Note } from "@/generated/backend";
 import PopButton from "../commons/Popups/PopButton.vue";
 import SvgLinkTypeIcon from "../svgs/SvgLinkTypeIcon.vue";
 import LinkTypeSelect from "./LinkTypeSelect.vue";
@@ -39,7 +39,7 @@ export default defineComponent({
     scopeName: String,
     modelValue: {
       type: String as PropType<NoteCreationDTO.linkTypeToParent>,
-      default: () => "no link" as Thing.linkType,
+      default: () => "no link" as Note.linkType,
     },
     errors: String,
     allowEmpty: { type: Boolean, default: false },

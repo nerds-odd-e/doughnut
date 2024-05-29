@@ -19,8 +19,4 @@ public class Thing {
   public Note getTargetNote() {
     return getNote().getTargetNote();
   }
-
-  public LinkType getLinkType() {
-    return getNote().getLinkType();
-  }
 }

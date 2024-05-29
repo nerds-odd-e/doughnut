@@ -1,9 +1,9 @@
 <template>
   <span class="link-nob">
-    <PopButton v-if="link.linkType" :title="link.linkType">
+    <PopButton v-if="link.note?.linkType" :title="link.note.linkType">
       <template #button_face>
         <SvgLinkTypeIcon
-          :link-type="link.linkType"
+          :link-type="link.note.linkType"
           :inverse-icon="inverseIcon"
         />
       </template>

@@ -1,4 +1,4 @@
-import { Thing } from "@/generated/backend";
+import { Note } from "@/generated/backend";
 import LinksMap from "./LinksMap";
 import { taggingTypes, groupedTypes } from "./linkTypeOptions";
 
@@ -9,9 +9,9 @@ class LinksReader {
     this.links = links;
   }
 
-  private filterTypes(cond: (t: Thing.linkType) => boolean) {
+  private filterTypes(cond: (t: Note.linkType) => boolean) {
     return Object.fromEntries(
-      Object.entries(this.links).filter((t) => cond(t[0] as Thing.linkType)),
+      Object.entries(this.links).filter((t) => cond(t[0] as Note.linkType)),
     );
   }
 
@@ -34,7 +34,7 @@ class LinksReader {
   get groupedLinks() {
     const tTypes = groupedTypes;
     return Object.entries(this.links)
-      .filter((t) => tTypes.includes(t[0] as Thing.linkType))
+      .filter((t) => tTypes.includes(t[0] as Note.linkType))
       .map((t) => t[1]);
   }
 

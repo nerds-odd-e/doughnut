@@ -1,5 +1,5 @@
-import { LinkViewed, Thing } from "@/generated/backend";
+import { LinkViewed, Note } from "@/generated/backend";
 
-type LinksMap = { [P in Thing.linkType]?: LinkViewed };
+type LinksMap = { [P in Note.linkType]?: LinkViewed };
 
 export default LinksMap;

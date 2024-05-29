@@ -1,4 +1,4 @@
-import { Thing } from "@/generated/backend";
+import { Note } from "@/generated/backend";
 import Builder from "./Builder";
 import generateId from "./generateId";
 import LinkViewedBuilder, { LinksMap } from "./LinkViewedBuilder";
@@ -9,7 +9,7 @@ class LinksMapBuilder extends Builder<LinksMap> {
 
   protected childrenBuilders: Omit<LinkViewedBuilder, "please">[] = [];
 
-  of(linkType: Thing.linkType) {
+  of(linkType: Note.linkType) {
     const child = new LinkViewedBuilder(
       linkType,
       this.from,

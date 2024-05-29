@@ -55,6 +55,12 @@ class NoteBuilder extends Builder<Note> {
     return this;
   }
 
+  linkType(value: Note.linkType): NoteBuilder {
+    this.data.linkType = value;
+    this.topicConstructor(`:${value}`);
+    return this;
+  }
+
   do(): Note {
     return this.data;
   }

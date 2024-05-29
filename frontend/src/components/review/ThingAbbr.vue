@@ -2,11 +2,11 @@
   <div class="review-point-abbr">
     <label><strong>Review Point: </strong></label>
 
-    <span v-if="thing.linkType">
+    <span v-if="thing.note?.linkType">
       <span>
         {{ sourceNoteTitle }}
       </span>
-      <span class="badge mr-1"> {{ thing.linkType }}</span>
+      <span class="badge mr-1"> {{ thing.note?.linkType }}</span>
       <span>
         {{ targetNoteTitle }}
       </span>

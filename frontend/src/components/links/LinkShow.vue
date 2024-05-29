@@ -5,7 +5,7 @@
     </div>
     <div class="col-12 col-md-4 text-center">
       <LinkNob v-bind="{ link, storageAccessor }" />
-      <span class="badge bg-light text-dark"> {{ link.linkType }}</span>
+      <span class="badge bg-light text-dark"> {{ link.note?.linkType }}</span>
     </div>
     <div class="col-12 col-md-4 link-target">
       <LinkNoteShow v-if="link.targetNote" :note="link.targetNote" />

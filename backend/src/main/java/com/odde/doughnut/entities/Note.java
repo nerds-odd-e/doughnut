@@ -190,7 +190,6 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
     return new HtmlOrMarkdown(getDetails()).isBlank();
   }
 
-  @JsonIgnore
   public LinkType getLinkType() {
     if (!getTopicConstructor().startsWith(":")) return null;
     return LinkType.fromLabel(getTopicConstructor().substring(1));

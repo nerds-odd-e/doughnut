@@ -1,7 +1,7 @@
-import { Thing } from "@/generated/backend";
+import { Note } from "@/generated/backend";
 
 interface LinkTypeOption {
-  label: Thing.linkType;
+  label: Note.linkType;
   reversedLabel: string;
 }
 

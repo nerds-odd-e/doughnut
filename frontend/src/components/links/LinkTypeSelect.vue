@@ -14,7 +14,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { Thing } from "@/generated/backend";
+import { Note } from "@/generated/backend";
 import RadioButtons from "../form/RadioButtons.vue";
 import SvgLinkTypeIcon from "../svgs/SvgLinkTypeIcon.vue";
 import { linkTypeOptions } from "../../models/linkTypeOptions";
@@ -24,7 +24,7 @@ export default defineComponent({
   props: {
     scopeName: String,
     modelValue: {
-      type: String as PropType<Thing.linkType>,
+      type: String as PropType<Note.linkType>,
       required: true,
     },
     errors: String,
