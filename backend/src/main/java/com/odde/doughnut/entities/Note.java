@@ -322,7 +322,7 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
     return noteAccessory;
   }
 
-  @NotNull
+  @org.springframework.lang.NonNull
   public NoteTopic getNoteTopic() {
     NoteTopic noteTopic = new NoteTopic();
     noteTopic.setId(getId());
