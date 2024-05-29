@@ -26,9 +26,11 @@ class LinkBuilder extends Builder<Thing> {
 
   do(): Thing {
     return {
-      note: new NoteBuilder().linkType(this.internalType).do(),
+      note: new NoteBuilder()
+        .linkType(this.internalType)
+        .target(this.targetNoteBuilder.do())
+        .do(),
       sourceNote: this.sourceNoteBuilder.do(),
-      targetNote: this.targetNoteBuilder.do(),
     };
   }
 }

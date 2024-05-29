@@ -11,8 +11,4 @@ public class Thing {
   public Note getSourceNote() {
     return getNote().getParent();
   }
-
-  public Note getTargetNote() {
-    return getNote().getTargetNote();
-  }
 }

@@ -1,30 +1,20 @@
 <template>
-  <BreadcrumbAsync v-bind="{ noteId: note.id }" />
-  <Card :note="note">
-    <template #button>
-      <button
-        class="source_btn btn btn-sm btn-secondary"
-        data-bs-toggle="collapse"
-        :data-bs-target="`#note-collapse-${note.id}`"
-        aria-expanded="false"
-      >
-        Toggle Details
-      </button>
-    </template>
-  </Card>
+  <BreadcrumbAsync v-bind="{ noteId: noteTopic.id }" />
+  <h5>
+    <NoteTopicWithLink v-bind="{ noteTopic }" class="card-title" />
+  </h5>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { Note } from "@/generated/backend";
+import { NoteTopic } from "@/generated/backend";
 import BreadcrumbAsync from "../toolbars/BreadcrumbAsync.vue";
-import Card from "../notes/Card.vue";
 
 export default defineComponent({
   name: "LinkNoteShow",
   props: {
-    note: { type: Object as PropType<Note>, required: true },
+    noteTopic: { type: Object as PropType<NoteTopic>, required: true },
   },
-  components: { BreadcrumbAsync, Card },
+  components: { BreadcrumbAsync },
 });
 </script>

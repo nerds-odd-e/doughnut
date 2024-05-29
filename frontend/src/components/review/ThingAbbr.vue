@@ -2,14 +2,11 @@
   <div class="review-point-abbr">
     <label><strong>Review Point: </strong></label>
 
-    <span v-if="thing.note?.linkType">
+    <span v-if="thing.note?.noteTopic.targetNoteTopic">
       <span>
         {{ sourceNoteTitle }}
       </span>
-      <span class="badge mr-1"> {{ thing.note?.linkType }}</span>
-      <span>
-        {{ targetNoteTitle }}
-      </span>
+      <NoteTopic :note-topic="thing.note.noteTopic.targetNoteTopic" />
     </span>
     <span v-else>
       {{ noteTitle }}
@@ -20,6 +17,7 @@
 <script lang="ts">
 import { Thing } from "@/generated/backend";
 import { defineComponent, PropType } from "vue";
+import NoteTopic from "../notes/core/NoteTopic.vue";
 
 export default defineComponent({
   props: {
@@ -37,9 +35,6 @@ export default defineComponent({
     },
     sourceNoteTitle() {
       return this.thing.sourceNote?.topic;
-    },
-    targetNoteTitle() {
-      return this.thing.targetNote?.topic;
     },
   },
 });

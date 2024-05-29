@@ -1,14 +1,20 @@
 <template>
   <div class="row">
     <div class="col-12 col-md-4 link-source">
-      <LinkNoteShow v-if="link.sourceNote" :note="link.sourceNote" />
+      <LinkNoteShow
+        v-if="link.sourceNote"
+        :note-topic="link.sourceNote.noteTopic"
+      />
     </div>
     <div class="col-12 col-md-4 text-center">
       <LinkNob v-bind="{ link, storageAccessor }" />
       <span class="badge bg-light text-dark"> {{ link.note?.linkType }}</span>
     </div>
     <div class="col-12 col-md-4 link-target">
-      <LinkNoteShow v-if="link.targetNote" :note="link.targetNote" />
+      <LinkNoteShow
+        v-if="link.note?.noteTopic.targetNoteTopic"
+        :note-topic="link.note.noteTopic.targetNoteTopic"
+      />
     </div>
   </div>
 </template>

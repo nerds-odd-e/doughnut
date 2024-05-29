@@ -22,9 +22,9 @@
     Target:
     <strong>
       <NoteTopicWithLink
-        v-if="link.targetNote"
+        v-if="link.note?.noteTopic.targetNoteTopic"
         class="link-title"
-        v-bind="{ noteTopic: link.targetNote.noteTopic }"
+        v-bind="{ noteTopic: link.note.noteTopic.targetNoteTopic }"
       />
     </strong>
   </div>

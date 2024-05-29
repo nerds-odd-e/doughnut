@@ -6,9 +6,9 @@
       :inverse-icon="true"
     />
     <NoteTopicWithLink
-      v-if="note"
+      v-if="noteTopic"
       class="link-title"
-      v-bind="{ noteTopic: note.noteTopic }"
+      v-bind="{ noteTopic }"
     />
     <LinkNob
       v-bind="{ link, colors, storageAccessor }"
@@ -37,8 +37,10 @@ export default defineComponent({
   },
   components: { NoteTopicWithLink, LinkNob },
   computed: {
-    note() {
-      return this.reverse ? this.link.sourceNote : this.link.targetNote;
+    noteTopic() {
+      return this.reverse
+        ? this.link.sourceNote?.noteTopic
+        : this.link.note?.noteTopic.targetNoteTopic;
     },
     fontColor() {
       return this.reverse ? colors.target : colors.source;

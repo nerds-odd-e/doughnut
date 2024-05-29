@@ -64,6 +64,16 @@ class NoteBuilder extends Builder<Note> {
   linkType(value: Note.linkType): NoteBuilder {
     this.data.linkType = value;
     this.topicConstructor(`:${value}`);
+    // default target
+    this.data.noteTopic.targetNoteTopic = {
+      id: generateId(),
+      topicConstructor: "a target",
+    };
+    return this;
+  }
+
+  target(note: Note): NoteBuilder {
+    this.data.noteTopic.targetNoteTopic = note.noteTopic;
     return this;
   }
 

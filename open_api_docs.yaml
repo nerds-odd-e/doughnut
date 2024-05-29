@@ -2519,8 +2519,6 @@ components:
           $ref: "#/components/schemas/Note"
         sourceNote:
           $ref: "#/components/schemas/Note"
-        targetNote:
-          $ref: "#/components/schemas/Note"
     SelfEvaluation:
       type: object
       properties:
