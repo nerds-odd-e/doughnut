@@ -1,21 +1,13 @@
 <template>
   <span class="link-link">
-    <LinkNob
-      v-bind="{ note, colors, storageAccessor }"
-      v-if="!!reverse"
-      :inverse-icon="true"
-    />
+    <LinkNob v-bind="{ note }" v-if="!!reverse" :inverse-icon="true" />
     <router-link
       :to="{ name: 'noteShow', params: { noteId: note.id } }"
       class="link-title text-decoration-none"
     >
       <NoteTopicComponent v-if="noteTopic" v-bind="{ noteTopic }" />
     </router-link>
-    <LinkNob
-      v-bind="{ note, colors, storageAccessor }"
-      v-if="!reverse"
-      :inverse-icon="false"
-    />
+    <LinkNob v-bind="{ note }" v-if="!reverse" :inverse-icon="false" />
   </span>
 </template>
 

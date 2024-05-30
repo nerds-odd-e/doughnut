@@ -9,7 +9,7 @@
           />
         </div>
         <div class="col-12 col-md-4 text-center">
-          <LinkNob v-bind="{ note, storageAccessor }" />
+          <LinkNob v-bind="{ note }" />
           <span class="badge bg-light text-dark"> {{ note.linkType }}</span>
         </div>
         <div class="col-12 col-md-4 link-target">
