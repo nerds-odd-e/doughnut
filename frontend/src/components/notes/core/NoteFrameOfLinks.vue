@@ -1,12 +1,9 @@
 <template>
   <slot />
 
-  <ul class="children-links" v-if="linksReader">
-    <template
-      v-for="(linksOfType, linkType) in linksReader.childrenLinks"
-      :key="linkType"
-    >
-      <li v-if="linksOfType.reverse.length > 0">
+  <ul class="children-links" v-if="links">
+    <template v-for="(linksOfType, linkType) in links" :key="linkType">
+      <li v-if="linksOfType && linksOfType.reverse.length > 0">
         <span>{{ reverseLabel(linkType) }} </span>
         <LinkOfNote
           class="link-multi"
@@ -23,7 +20,6 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import LinkOfNote from "../../links/LinkOfNote.vue";
-import LinksReader from "../../../models/LinksReader";
 import { reverseLabel } from "../../../models/linkTypeOptions";
 import { StorageAccessor } from "../../../store/createNoteStorage";
 import LinksMap from "../../../models/LinksMap";
@@ -40,14 +36,6 @@ export default defineComponent({
   methods: {
     reverseLabel(lbl) {
       return reverseLabel(lbl);
-    },
-  },
-  computed: {
-    linksReader() {
-      if (this.links) {
-        return new LinksReader(this.links);
-      }
-      return undefined;
     },
   },
 });

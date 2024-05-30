@@ -105,7 +105,10 @@ Then(
 Then(
   "I should see note {notepath} has link {string} {string}",
   (notePath: NotePath, linkType: string, targetNoteTopics: string) => {
-    start.routerToNotebooksPage().navigateToPath(notePath).expectLinkingChildren(linkType, targetNoteTopics)
+    start
+      .routerToNotebooksPage()
+      .navigateToPath(notePath)
+      .expectLinkingChildren(linkType, targetNoteTopics)
   },
 )
 

@@ -68,20 +68,10 @@ const linkTypeOptions = [
   },
 ] as LinkTypeOption[];
 
-const taggingTypes = linkTypeOptions
-  .filter((t) => t.label === "tagged by")
-  .map((t) => t.label);
-
-const groupedTypes = linkTypeOptions
-  .filter((t) =>
-    ["the opposite of", "similar to", "confused with"].includes(t.label),
-  )
-  .map((t) => t.label);
-
 const reverseLabel = (lbl) => {
   const linkType = linkTypeOptions.find(({ label }) => lbl === label);
   if (linkType) return linkType.reversedLabel;
   return "*unknown link type*";
 };
 
-export { linkTypeOptions, taggingTypes, groupedTypes, reverseLabel };
+export { linkTypeOptions, reverseLabel };
