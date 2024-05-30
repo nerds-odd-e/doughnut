@@ -10,7 +10,6 @@ Feature: link note
       | Sedition         | Incite violence |
       | Sedation         | Put to sleep    |
       | Sedative         | Sleep medicine  |
-
   @mockBrowserTime
   Scenario: View all linkable notes for a note when no link exists
     When I am creating a linking note under note "Sedition"
@@ -31,12 +30,12 @@ Feature: link note
   Scenario: creating link
     When I link note "Sedition" as "similar to" note "Sedation"
     And I link note "Sedition" as "similar to" note "Sedative"
-    Then On the current page, I should see "Sedition" has link "similar to" "Sedation, Sedative"
+    Then I should see "Sedition" has link "similar to" "Sedation, Sedative"
 
   @mockBrowserTime
   Scenario: link and move
     Given I link note "Sedition" as "similar to" note "Sedation" and move under it
     When I navigate to "My Notes/Sedation/Sedition" note
-    Then On the current page, I should see "Sedition" has link "similar to" "Sedation"
+    Then I should see "Sedition" has link "similar to" "Sedation"
     When I visit all my notebooks
     Then I should not see note "Sedition" at the top level of all my notes

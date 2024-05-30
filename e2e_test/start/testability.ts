@@ -102,7 +102,10 @@ const testability = () => {
 
     getSeededNoteIdByTitle(noteTopic: string) {
       return cy.get(`@${seededNoteIdMapAliasName}`).then((seededNoteIdMap) => {
-        expect(seededNoteIdMap).haveOwnPropertyDescriptor(noteTopic)
+        expect(
+          seededNoteIdMap,
+          `"${noteTopic}" is not in the seeded note. Did you created during the test?`,
+        ).haveOwnPropertyDescriptor(noteTopic)
         return seededNoteIdMap[noteTopic]
       })
     },

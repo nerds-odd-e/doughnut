@@ -68,28 +68,35 @@ export const assumeNotePage = (noteTopic?: string) => {
         cy.expectNoteCards(children)
       })
     },
-    expectLinkingChildren: (linkType: string, targetNoteTopics: string) => {
-      const targetNoteTopicsList = commonSenseSplit(targetNoteTopics, ",")
-      cy.get("main").within(() => {
-        const target = commonSenseSplit(targetNoteTopics, ",").pop()!
-        cy.findByText(target, { selector: ".card-title span" })
-        cy.findAllByText(linkType, {
-          selector: ".card-title span",
-        }).should("have.length", targetNoteTopicsList.length)
+    expectLinkingTopic: (linkType: string, target: string) => {
+      cy.findByText(target, { selector: ".card-title span" }).parent().findAllByText(linkType, {
+        selector: ".card-title span",
       })
-      // const linksForNoteFound: string[] = []
-      // cy.findAllByRole("button", { name: linkType })
-      //   .parent()
-      //   .parent()
-      //   .each(($link) => {
-      //     cy.wrap($link).within(() => {
-      //       linksForNoteFound.push($link.text())
-      //     })
-      //   })
-      //   .then(() => {
-      //     expect(targetNoteTopicsList.every((linkItem) => linksForNoteFound.includes(linkItem))).to.be
-      //       .true
-      //   })
+    },
+    expectLinkingChildren: function (linkType: string, targetNoteTopics: string) {
+      cy.get("main").within(() => {
+        commonSenseSplit(targetNoteTopics, ",").forEach((target) => {
+          this.expectLinkingTopic(linkType, target)
+        })
+      })
+    },
+    changeLinkType: function (linkType: string, target: string) {
+      cy.findByRole("topic").click()
+      cy.clickRadioByLabel(linkType)
+      cy.pageIsNotLoading()
+      this.expectLinkingTopic(linkType, target)
+    },
+    navigateToLinkingChild: (targetNoteTopic: string) => {
+      cy.get("main").within(() => {
+        cy.findByText(targetNoteTopic, { selector: ".card-title span" }).click()
+      })
+      return assumeNotePage()
+    },
+    navigateToReference: (referenceTopic: string) => {
+      cy.get("main").within(() => {
+        cy.findByText(referenceTopic, { selector: ".link-title" }).click()
+      })
+      return assumeNotePage()
     },
     collapsedChildrenWithCount: (count: number) => {
       cy.findByText(count, { selector: "[role=collapsed-children-count]" })

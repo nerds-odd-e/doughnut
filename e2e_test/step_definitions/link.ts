@@ -6,6 +6,7 @@
 import { Then, When } from "@badeball/cypress-cucumber-preprocessor"
 import { commonSenseSplit } from "../support/string_util"
 import start from "../start"
+import NotePath from "support/NotePath"
 
 When("I start searching", () => {
   cy.startSearching()
@@ -108,26 +109,19 @@ Then(
 )
 
 Then(
-  "On the current page, I should see {string} has link {string} {string}",
+  "I should see {string} has link {string} {string}",
   (noteTopic: string, linkType: string, targetNoteTopics: string) => {
-    const targetNoteTopicsList = commonSenseSplit(targetNoteTopics, ",")
-    cy.findByText(commonSenseSplit(targetNoteTopics, ",").pop(), {
-      selector: ".link-title",
-    })
-    const linksForNoteFound: string[] = []
-    cy.findAllByRole("button", { name: linkType })
-      .parent()
-      .parent()
-      .each(($link) => {
-        cy.wrap($link).within(() => {
-          linksForNoteFound.push($link.text())
-        })
-      })
-      .then(() => {
-        expect(targetNoteTopicsList.every((linkItem) => linksForNoteFound.includes(linkItem))).to.be
-          .true
-      })
-    start.assumeNotePage(noteTopic).expectLinkingChildren(linkType, targetNoteTopics)
+    start.jumpToNotePage(noteTopic).expectLinkingChildren(linkType, targetNoteTopics)
+  },
+)
+
+Then(
+  "I should see note {notepath} has link {string} {string}",
+  (notePath: NotePath, linkType: string, targetNoteTopics: string) => {
+    start
+      .routerToNotebooksPage()
+      .navigateToPath(notePath)
+      .expectLinkingChildren(linkType, targetNoteTopics)
   },
 )
 
@@ -139,8 +133,20 @@ Then("I should see {string} has no link to {string}", (noteTopic: string, target
 Then(
   "I change the link from {string} to {string} to {string}",
   (noteTopic: string, targetTitle: string, linkType: string) => {
-    start.jumpToNotePage(noteTopic)
-    cy.changeLinkType(targetTitle, linkType)
+    start
+      .jumpToNotePage(noteTopic)
+      .navigateToLinkingChild(targetTitle)
+      .changeLinkType(linkType, targetTitle)
+  },
+)
+
+Then(
+  "I change the reference from {string} to {string} to {string}",
+  (noteTopic: string, referenceTitle: string, linkType: string) => {
+    start
+      .jumpToNotePage(noteTopic)
+      .navigateToReference(referenceTitle)
+      .changeLinkType(linkType, noteTopic)
   },
 )
 
@@ -149,14 +155,6 @@ Then("I should be able to delete the link", () => {
 })
 
 Then("I delete the link from {string} to {string}", (noteTopic: string, targetTitle: string) => {
-  cy.pageIsNotLoading()
-  start.jumpToNotePage(noteTopic)
-  cy.clickLinkNob(targetTitle)
-  cy.findByRole("button", { name: "Delete" }).click()
-  cy.findByRole("button", { name: "Cancel" }).click()
-  cy.clickLinkNob(targetTitle)
-  cy.findByRole("button", { name: "Delete" }).click()
-  cy.findByRole("button", { name: "OK" }).click()
-  cy.get("main").should("not.contain", targetTitle)
+  start.jumpToNotePage(noteTopic).navigateToLinkingChild(targetTitle).deleteNote()
   start.assumeNotePage(noteTopic) // remain on the same note page
 })

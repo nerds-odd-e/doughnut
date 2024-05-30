@@ -43,5 +43,5 @@ Feature: Note creation should have details if wikidata is a person
     When I create a note belonging to "People":
       | Topic           | Wikidata Id |
       | Wang Chien-ming | Q706446     |
-    Then On the current page, I should see "Wang Chien-ming" has link "related to" "Taiwan"
+    Then I should see note "My Notes/People/Wang Chien-ming" has link "related to" "Taiwan"
 # this check is not sufficient, should check new note is not create for taiwan

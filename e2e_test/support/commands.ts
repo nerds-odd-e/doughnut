@@ -188,17 +188,6 @@ Cypress.Commands.add("expectExactLinkTargets", (targets) => {
     .should("deep.equal", targets)
 })
 
-Cypress.Commands.add("clickLinkNob", (target: string) => {
-  cy.findByText(target, { selector: "main .link-title" }).siblings(".link-nob").click()
-})
-
-Cypress.Commands.add("changeLinkType", (targetTitle: string, linkType: string) => {
-  cy.clickLinkNob(targetTitle)
-  cy.clickRadioByLabel(linkType)
-  cy.pageIsNotLoading()
-  cy.findAllByRole("button", { name: linkType }).should("be.visible")
-})
-
 Cypress.Commands.add("findNoteCardButton", (noteTopic, btnTextOrTitle) => {
   return cy
     .findCardTitle(noteTopic)

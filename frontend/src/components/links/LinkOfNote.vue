@@ -5,11 +5,12 @@
       v-if="!!reverse"
       :inverse-icon="true"
     />
-    <NoteTopicWithLink
-      v-if="noteTopic"
-      class="link-title"
-      v-bind="{ noteTopic }"
-    />
+    <router-link
+      :to="{ name: 'noteShow', params: { noteId: note.id } }"
+      class="link-title text-decoration-none"
+    >
+      <NoteTopicComponent v-if="noteTopic" v-bind="{ noteTopic }" />
+    </router-link>
     <LinkNob
       v-bind="{ note, colors, storageAccessor }"
       v-if="!reverse"
@@ -21,10 +22,10 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { Note } from "@/generated/backend";
-import NoteTopicWithLink from "../notes/NoteTopicWithLink.vue";
 import LinkNob from "./LinkNob.vue";
 import { colors } from "../../colors";
 import { StorageAccessor } from "../../store/createNoteStorage";
+import NoteTopicComponent from "../notes/core/NoteTopic.vue";
 
 export default defineComponent({
   props: {
@@ -35,7 +36,7 @@ export default defineComponent({
       required: true,
     },
   },
-  components: { NoteTopicWithLink, LinkNob },
+  components: { NoteTopicComponent, LinkNob },
   computed: {
     noteTopic() {
       return this.reverse

@@ -12,16 +12,12 @@ Feature: link edit and remove
 
   Scenario: change link type
     When I change the link from "Moon" to "Earth" to "a specialization of"
-    And On the current page, I should see "Moon" has link "a specialization of" "Earth"
+    And I should see "Moon" has link "a specialization of" "Earth"
 
   Scenario: change link type of a reverse link
-    When I change the link from "Earth" to "Moon" to "a specialization of"
-    And [deprecating] On the current page, I should see "Earth" has link "a specialization of" "Moon"
+    When I change the reference from "Earth" to "Moon" to "a specialization of"
+    And I should see "Moon" has link "a specialization of" "Earth"
 
   Scenario: delete link
     When I delete the link from "Moon" to "Earth"
-    Then I should see "Moon" has no link to "Earth"
-
-  Scenario: delete reverse link
-    When I delete the link from "Earth" to "Moon"
     Then I should see "Moon" has no link to "Earth"

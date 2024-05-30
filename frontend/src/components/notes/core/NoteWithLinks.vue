@@ -3,7 +3,13 @@
     <div class="alert alert-warning" v-if="note.deletedAt">
       This note has been deleted
     </div>
+    <NoteLinkTopic
+      v-if="note.noteTopic.targetNoteTopic"
+      :note-topic="note.noteTopic"
+      :storage-accessor="storageAccessor"
+    />
     <NoteEditableTopic
+      v-else
       :note="note"
       :note-topic-constructor="note.topicConstructor"
       :note-topic="note.topic"
@@ -19,31 +25,25 @@
   </NoteFrameOfLinks>
 </template>
 
-<script lang="ts">
-import { defineComponent, PropType } from "vue";
+<script setup lang="ts">
+import { PropType } from "vue";
 import { Note } from "@/generated/backend";
 import NoteFrameOfLinks from "./NoteFrameOfLinks.vue";
 import { StorageAccessor } from "../../../store/createNoteStorage";
 import LinksMap from "../../../models/LinksMap";
 import NoteEditableTopic from "./NoteEditableTopic.vue";
+import NoteLinkTopic from "./NoteLinkTopic.vue";
 import NoteEditableDetails from "./NoteEditableDetails.vue";
 
-export default defineComponent({
-  props: {
-    note: { type: Object as PropType<Note>, required: true },
-    links: {
-      type: Object as PropType<LinksMap>,
-    },
-    readonly: { type: Boolean, default: true },
-    storageAccessor: {
-      type: Object as PropType<StorageAccessor>,
-      required: true,
-    },
+defineProps({
+  note: { type: Object as PropType<Note>, required: true },
+  links: {
+    type: Object as PropType<LinksMap>,
   },
-  components: {
-    NoteFrameOfLinks,
-    NoteEditableTopic,
-    NoteEditableDetails,
+  readonly: { type: Boolean, default: true },
+  storageAccessor: {
+    type: Object as PropType<StorageAccessor>,
+    required: true,
   },
 });
 </script>

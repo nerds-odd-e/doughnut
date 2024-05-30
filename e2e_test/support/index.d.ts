@@ -7,8 +7,6 @@ declare namespace Cypress {
     dismissLastErrorMessage(): Chainable<any>
     cleanDownloadFolder(): Chainable<any>
     clickButtonOnCardBody(noteTopic: any, buttonTitle: any): Chainable<any>
-    clickLinkNob(target: string): Chainable<any>
-    changeLinkType(targetNote: string, linkType: string): Chainable<any>
     clickRadioByLabel(labelText: any): Chainable<any>
     deleteNoteViaAPI(): Chainable<Subject>
     dialogDisappeared(): Chainable<any>
