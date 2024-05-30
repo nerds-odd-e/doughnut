@@ -1,4 +1,3 @@
-import LinksMapBuilder from "./LinksMapBuilder";
 import NoteRealmBuilder from "./NoteRealmBuilder";
 import ReviewPointBuilder from "./ReviewPointBuilder";
 import LinkBuilder from "./LinkBuilder";
@@ -17,10 +16,6 @@ import ApiErrorBuilder from "./ApiErrorBuilder";
 class MakeMe {
   static aUser() {
     return new UserBuilder();
-  }
-
-  static get linksMap(): LinksMapBuilder {
-    return new LinksMapBuilder();
   }
 
   static get aNote(): NoteBuilder {

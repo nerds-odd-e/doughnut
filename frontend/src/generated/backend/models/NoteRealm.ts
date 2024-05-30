@@ -3,7 +3,6 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { Circle } from './Circle';
-import type { LinkViewed } from './LinkViewed';
 import type { Note } from './Note';
 export type NoteRealm = {
     id: number;
@@ -11,6 +10,6 @@ export type NoteRealm = {
     fromBazaar?: boolean;
     circle?: Circle;
     children?: Array<Note>;
-    links?: Record<string, LinkViewed>;
+    refers?: Array<Note>;
 };
 

@@ -15,7 +15,6 @@ describe("in place edit on title", () => {
       .component(NoteTextContent)
       .withStorageProps({
         note: n,
-        links: {},
       })
       .mount();
   };

@@ -35,7 +35,6 @@ export type { GlobalAiModelSettings } from './models/GlobalAiModelSettings';
 export type { ImageWithMask } from './models/ImageWithMask';
 export type { InitialInfo } from './models/InitialInfo';
 export { LinkCreation } from './models/LinkCreation';
-export type { LinkViewed } from './models/LinkViewed';
 export type { MCQWithAnswer } from './models/MCQWithAnswer';
 export type { Note } from './models/Note';
 export type { NoteAccessoriesDTO } from './models/NoteAccessoriesDTO';

@@ -25,16 +25,12 @@
 import { PropType } from "vue";
 import { Note } from "@/generated/backend";
 import { StorageAccessor } from "../../../store/createNoteStorage";
-import LinksMap from "../../../models/LinksMap";
 import NoteEditableTopic from "./NoteEditableTopic.vue";
 import NoteLinkTopic from "./NoteLinkTopic.vue";
 import NoteEditableDetails from "./NoteEditableDetails.vue";
 
 defineProps({
   note: { type: Object as PropType<Note>, required: true },
-  links: {
-    type: Object as PropType<LinksMap>,
-  },
   readonly: { type: Boolean, default: true },
   storageAccessor: {
     type: Object as PropType<StorageAccessor>,

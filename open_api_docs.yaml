@@ -2590,15 +2590,6 @@ components:
         wikidataId:
           pattern: ^$|Q\d+
           type: string
-    LinkViewed:
-      required:
-      - reverse
-      type: object
-      properties:
-        reverse:
-          type: array
-          items:
-            $ref: "#/components/schemas/Note"
     NoteCreationRresult:
       required:
       - created
@@ -2628,10 +2619,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Note"
-        links:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/LinkViewed"
+        refers:
+          type: array
+          items:
+            $ref: "#/components/schemas/Note"
     WikidataAssociationCreation:
       required:
       - wikidataId

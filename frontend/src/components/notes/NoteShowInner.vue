@@ -12,7 +12,6 @@
       <NoteTextContent
         v-bind="{
           note: noteRealm.note,
-          links: noteRealm.links,
           readonly,
           storageAccessor,
         }"
@@ -40,23 +39,17 @@
         :notes="noteRealm.children ?? []"
       />
     </div>
-    <div class="col-md-3 refers" v-if="noteRealm.links">
+    <div class="col-md-3 refers" v-if="noteRealm.refers">
       <ul>
-        <template
-          v-for="(linksOfType, linkType) in noteRealm.links"
-          :key="linkType"
-        >
-          <li v-if="linksOfType && linksOfType.reverse.length > 0">
-            <span>{{ reverseLabel(linkType) }} </span>
-            <LinkOfNote
-              class="link-multi"
-              v-for="link in linksOfType.reverse"
-              :key="link.id"
-              v-bind="{ note: link, storageAccessor }"
-              :reverse="true"
-            />
-          </li>
-        </template>
+        <li v-for="link in noteRealm.refers" :key="link.id">
+          <span>{{ reverseLabel(link.noteTopic.linkType) }} </span>
+          <LinkOfNote
+            class="link-multi"
+            :key="link.id"
+            v-bind="{ note: link, storageAccessor }"
+            :reverse="true"
+          />
+        </li>
       </ul>
     </div>
   </div>
@@ -65,7 +58,6 @@
 <script setup lang="ts">
 import { PropType, ref } from "vue";
 import { NoteRealm, NoteAccessory } from "@/generated/backend";
-// eslint-disable-next-line import/no-unresolved
 import NoteTextContent from "./core/NoteTextContent.vue";
 import ChildrenNotes from "./ChildrenNotes.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";

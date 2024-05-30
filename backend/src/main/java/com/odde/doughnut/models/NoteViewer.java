@@ -1,12 +1,8 @@
 package com.odde.doughnut.models;
 
-import com.odde.doughnut.controllers.dto.LinkViewed;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.entities.*;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class NoteViewer {
@@ -21,25 +17,14 @@ public class NoteViewer {
 
   public NoteRealm toJsonObject() {
     NoteRealm nvb = new NoteRealm(note);
-    nvb.setLinks(getAllLinks());
+    nvb.setRefers(getRefers());
     nvb.setFromBazaar(viewer == null || !viewer.owns(note.getNotebook()));
 
     return nvb;
   }
 
-  public Map<LinkType, LinkViewed> getAllLinks() {
-    return Arrays.stream(LinkType.values())
-        .map(
-            type ->
-                Map.entry(
-                    type,
-                    new LinkViewed() {
-                      {
-                        setReverse(linksOfTypeThroughReverse(type).toList());
-                      }
-                    }))
-        .filter(x -> x.getValue().notEmpty())
-        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+  public List<LinkingNote> getRefers() {
+    return note.getRefers().stream().filter(l -> allowed(l)).toList();
   }
 
   public List<LinkingNote> linksOfTypeThroughDirect(List<LinkType> linkTypes) {
@@ -52,11 +37,12 @@ public class NoteViewer {
   public Stream<LinkingNote> linksOfTypeThroughReverse(LinkType linkType) {
     return note.getRefers().stream()
         .filter(l -> l.getLinkType().equals(linkType))
-        .filter(
-            l -> {
-              if (l.getParent().getNotebook() == l.getTargetNote().getNotebook()) return true;
-              if (viewer == null) return false;
-              return viewer.canReferTo(l.getParent().getNotebook());
-            });
+        .filter(l -> allowed(l));
+  }
+
+  private boolean allowed(LinkingNote l) {
+    if (l.getParent().getNotebook() == l.getTargetNote().getNotebook()) return true;
+    if (viewer == null) return false;
+    return viewer.canReferTo(l.getParent().getNotebook());
   }
 }

@@ -21,7 +21,6 @@ describe("undo editing", () => {
       .component(NoteTextContent)
       .withProps({
         note: noteRealm.note,
-        links: noteRealm.links,
         storageAccessor: histories,
       })
       .mount();

@@ -1,7 +1,5 @@
-import { merge } from "lodash";
-import { NoteTopic, NoteRealm } from "@/generated/backend";
+import { NoteRealm } from "@/generated/backend";
 import Builder from "./Builder";
-import LinkViewedBuilder from "./LinkViewedBuilder";
 import NoteBuilder from "./NoteBuilder";
 import generateId from "./generateId";
 
@@ -17,7 +15,7 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
     this.data = {
       id: noteData.id,
       note: noteData,
-      links: {},
+      refers: [],
       children: [],
     };
   }
@@ -60,18 +58,6 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
 
   updatedAt(value: Date): NoteRealmBuilder {
     this.noteBuilder.updatedAt(value);
-    return this;
-  }
-
-  linkToSomeNote(title: string): NoteRealmBuilder {
-    return this.linkTo(new NoteRealmBuilder().topicConstructor(title).do());
-  }
-
-  linkTo(note: NoteRealm): NoteRealmBuilder {
-    merge(
-      this.data.links,
-      new LinkViewedBuilder(NoteTopic.linkType.USING, this.data, note).please(),
-    );
     return this;
   }
 
