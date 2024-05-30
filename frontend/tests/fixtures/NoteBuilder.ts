@@ -32,7 +32,6 @@ class NoteBuilder extends Builder<Note> {
   }
 
   topicConstructor(value: string): NoteBuilder {
-    this.data.topic = value;
     this.data.topicConstructor = value;
     this.data.noteTopic.topicConstructor = value;
     return this;

@@ -80,7 +80,7 @@ describe("Sidebar", () => {
       .mockResolvedValueOnce(topNoteRealm);
     render(topNoteRealm);
     expect(helper.managedApi.restNoteController.show1).toBeCalled();
-    await screen.findByText(firstGeneration.note.topic);
+    await screen.findByText(firstGeneration.note.noteTopic.topicConstructor);
   });
 
   describe("first generation", () => {
@@ -109,7 +109,7 @@ describe("Sidebar", () => {
       expect(observerDisconnected).toBe(true);
       expect(
         /* eslint-disable */
-        (await screen.findByText(firstGeneration.note.topic)).parentNode
+        (await screen.findByText(firstGeneration.note.noteTopic.topicConstructor)).parentNode
           ?.parentNode,
         /* eslint-enable */
       ).toHaveClass("active-item");
@@ -125,14 +125,18 @@ describe("Sidebar", () => {
 
     it("should have siblings", async () => {
       render(firstGeneration);
-      await screen.findByText(firstGenerationSibling.note.topic);
+      await screen.findByText(
+        firstGenerationSibling.note.noteTopic.topicConstructor,
+      );
     });
 
     it("should have child note of active first gen", async () => {
       render(firstGeneration);
-      const secondGen = await screen.findByText(secondGeneration.note.topic);
+      const secondGen = await screen.findByText(
+        secondGeneration.note.noteTopic.topicConstructor,
+      );
       const sibling = await screen.findByText(
-        firstGenerationSibling.note.topic,
+        firstGenerationSibling.note.noteTopic.topicConstructor,
       );
       expect(isBefore(secondGen, sibling)).toBe(true);
     });
@@ -145,8 +149,8 @@ describe("Sidebar", () => {
       .mockResolvedValueOnce(firstGeneration)
       .mockResolvedValueOnce(secondGeneration);
     render(secondGeneration);
-    await screen.findByText(firstGeneration.note.topic);
-    await screen.findByText(secondGeneration.note.topic);
+    await screen.findByText(firstGeneration.note.noteTopic.topicConstructor);
+    await screen.findByText(secondGeneration.note.noteTopic.topicConstructor);
   });
 
   it("should disable the menu and keep the content when loading", async () => {
@@ -157,6 +161,6 @@ describe("Sidebar", () => {
     await flushPromises();
     await rerender({ noteRealm: undefined });
     await flushPromises();
-    await screen.findByText(firstGeneration.note.topic);
+    await screen.findByText(firstGeneration.note.noteTopic.topicConstructor);
   });
 });

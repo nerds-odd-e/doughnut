@@ -21,7 +21,7 @@ describe("all in note show page", () => {
         .component(NoteShowPage)
         .withStorageProps({ noteId: noteRealm.id })
         .render();
-      await screen.findByText(noteRealm.note.topic);
+      await screen.findByText(noteRealm.note.noteTopic.topicConstructor);
       expect(helper.managedApi.restNoteController.show1).toBeCalledWith(
         noteRealm.id,
       );
