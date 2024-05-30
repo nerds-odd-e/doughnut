@@ -147,19 +147,8 @@ in mkShell {
       rm -rf "$PWD/frontend/node_modules"
     fi
 
-    corepack prepare pnpm@9.1.3 --activate
-    corepack use pnpm@9.1.3
+    corepack prepare pnpm@9.1.4 --activate
+    corepack use pnpm@9.1.4
     pnpm --frozen-lockfile recursive install
-
-    cleanup()
-    {
-      echo -e "\nBYE!!! EXITING doughnut NIX DEVELOPMENT ENVIRONMENT."
-      rm -f $MYSQL_HOME/init_doughnut_db.sql
-      if [[ ! -z "$MYSQLD_PID" ]]; then
-        echo -e "MySQL Server still running on Port: $MYSQL_TCP_PORT, Socket: $MYSQL_UNIX_SOCKET at PID: $MYSQLD_PID"
-        echo -e "You may choose to SHUTDOWN MySQL Server by issuing 'kill -SIGTERM $MYSQLD_PID'\n"
-      fi
-    }
-    #trap cleanup EXIT
   '';
 }
