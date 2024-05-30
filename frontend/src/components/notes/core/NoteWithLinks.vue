@@ -10,9 +10,7 @@
     />
     <NoteEditableTopic
       v-else
-      :note="note"
-      :note-topic-constructor="note.topicConstructor"
-      :note-topic="note.topic"
+      :note-topic="note.noteTopic"
       :storage-accessor="storageAccessor"
     />
     <div role="details" class="note-details">

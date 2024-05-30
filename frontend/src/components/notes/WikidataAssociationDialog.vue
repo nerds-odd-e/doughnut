@@ -19,7 +19,8 @@
 
   <form v-else @submit.prevent="save">
     <p>
-      Confirm to associate <strong>{{ note.topic }}</strong> with
+      Confirm to associate
+      <strong>NoteTopic v-bind="{ noteTopic: note.noteTopic }" /></strong> with
       <strong>{{ conflictWikidataTitle }}</strong
       >?
     </p>
@@ -81,7 +82,7 @@ const validateAndSave = async () => {
     if (
       res.WikidataTitleInEnglish !== "" &&
       res.WikidataTitleInEnglish.toUpperCase() !==
-        props.note.topic.toUpperCase()
+        props.note.noteTopic.topicConstructor.toUpperCase()
     ) {
       conflictWikidataTitle.value = res.WikidataTitleInEnglish;
       return;

@@ -3,31 +3,22 @@
     <label><strong>Review Point: </strong></label>
 
     <span v-if="note.noteTopic.targetNoteTopic">
-      <NoteTopic :note-topic="note.noteTopic.parentNoteTopic" />
+      <NoteTopic :note-topic="note.noteTopic.parentNoteTopic!" />
       <NoteTopic :note-topic="note.noteTopic.targetNoteTopic" />
     </span>
-    <span v-else>
-      {{ noteTitle }}
-    </span>
+    <NoteTopic v-else :note-topic="note.noteTopic" />
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { Note } from "@/generated/backend";
-import { defineComponent, PropType } from "vue";
+import { PropType } from "vue";
 import NoteTopic from "../notes/core/NoteTopic.vue";
 
-export default defineComponent({
-  props: {
-    note: {
-      type: Object as PropType<Note>,
-      required: true,
-    },
-  },
-  computed: {
-    noteTitle() {
-      return this.note?.topic;
-    },
+defineProps({
+  note: {
+    type: Object as PropType<Note>,
+    required: true,
   },
 });
 </script>
