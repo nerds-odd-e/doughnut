@@ -104,7 +104,10 @@ describe("in place edit on title", () => {
   it("should change content if there's no unsaved changed but change from prop", async () => {
     const wrapper = mountComponent(note);
     await wrapper.setProps({
-      note: { ...note, topicConstructor: "different value" },
+      note: {
+        ...note,
+        noteTopic: { ...note.noteTopic, topicConstructor: "different value" },
+      },
     });
     await wrapper.find('[role="topic"]').trigger("click");
     expect(
