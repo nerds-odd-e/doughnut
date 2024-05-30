@@ -6,10 +6,10 @@
     <slot name="topLink" />
     <li
       class="breadcrumb-item text-truncate"
-      v-for="note in ancestors"
-      :key="note.id"
+      v-for="noteTopic in ancestors"
+      :key="noteTopic.id"
     >
-      <NoteTopicWithLink v-bind="{ noteTopic: note.noteTopic }" />
+      <NoteTopicWithLink v-bind="{ noteTopic }" />
     </li>
     <li class="breadcrumb-item" v-if="$slots.additional">
       <slot name="additional" />
@@ -19,10 +19,10 @@
 
 <script setup lang="ts">
 import { PropType } from "vue";
-import { Note } from "@/generated/backend";
+import { NoteTopic } from "@/generated/backend";
 import NoteTopicWithLink from "../notes/NoteTopicWithLink.vue";
 
-defineProps({ ancestors: Array as PropType<Note[]> });
+defineProps({ ancestors: Array as PropType<NoteTopic[]> });
 </script>
 
 <style lang="scss" scoped>

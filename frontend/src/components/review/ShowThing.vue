@@ -26,14 +26,7 @@
   </main>
 
   <main v-else-if="noteId">
-    <NoteRealmLoader v-bind="{ noteId, storageAccessor }">
-      <template #default="{ noteRealm }">
-        <Breadcrumb
-          v-if="noteRealm"
-          v-bind="{ notePosition: noteRealm?.notePosition }"
-        />
-      </template>
-    </NoteRealmLoader>
+    <Breadcrumb v-bind="{ noteTopic: note.noteTopic }" />
     <NoteShow
       v-if="noteId"
       v-bind="{
@@ -49,7 +42,6 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { Note } from "@/generated/backend";
-import NoteRealmLoader from "../notes/NoteRealmLoader.vue";
 import LinkNoteShow from "../links/LinkNoteShow.vue";
 import LinkNob from "../links/LinkNob.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
@@ -65,7 +57,6 @@ export default defineComponent({
       required: true,
     },
   },
-  components: { NoteRealmLoader },
   computed: {
     noteId() {
       return this.note.id;

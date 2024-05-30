@@ -15,7 +15,10 @@
         <ScrollTo />
         <Breadcrumb
           v-if="noteRealm"
-          v-bind="{ notePosition: noteRealm?.notePosition }"
+          v-bind="{
+            notePosition: noteRealm?.notePosition,
+            noteTopic: noteRealm?.note.noteTopic,
+          }"
         />
       </template>
     </NoteRealmLoader>
