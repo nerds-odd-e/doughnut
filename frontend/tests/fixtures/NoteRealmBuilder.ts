@@ -16,7 +16,7 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
     super();
     this.noteBuilder = new NoteBuilder();
     const noteData = this.noteBuilder.data;
-    this.notePositionBuilder = new NotePositionBuilder().for(noteData);
+    this.notePositionBuilder = new NotePositionBuilder();
     this.data = {
       id: noteData.id,
       note: noteData,
@@ -55,7 +55,6 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
     value?.children?.push(this.data.note);
     this.data.note.parentId = value.id;
     this.data.note.noteTopic.parentNoteTopic = value.note.noteTopic;
-    this.notePositionBuilder.under(value);
 
     return this;
   }
