@@ -2,11 +2,11 @@
   <div class="review-point-abbr">
     <label><strong>Review Point: </strong></label>
 
-    <span v-if="note.noteTopic.targetNoteTopic">
-      <NoteTopic :note-topic="note.noteTopic.parentNoteTopic!" />
-      <NoteTopic :note-topic="note.noteTopic.targetNoteTopic" />
-    </span>
-    <NoteTopic v-else :note-topic="note.noteTopic" />
+    <NoteTopic
+      v-if="note.noteTopic.targetNoteTopic"
+      :note-topic="note.noteTopic.parentNoteTopic!"
+    />
+    <NoteTopic :note-topic="note.noteTopic" />
   </div>
 </template>
 
