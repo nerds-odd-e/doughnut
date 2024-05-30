@@ -1922,30 +1922,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/QuizQuestion"
-  /api/notes/{note}/position:
-    get:
-      tags:
-      - rest-note-controller
-      operationId: getPosition
-      parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/NotePositionViewedByUser"
   /api/notes/{note}/note-info:
     get:
       tags:

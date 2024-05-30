@@ -494,16 +494,6 @@ class RestNoteControllerTests {
   }
 
   @Nested
-  class gettingPosition {
-    @Test
-    void shouldNotBeAbleToAddCommentToNoteTheUserCannotSee() {
-      User anotherUser = makeMe.aUser().please();
-      Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
-      assertThrows(UnexpectedNoAccessRightException.class, () -> controller.getPosition(note));
-    }
-  }
-
-  @Nested
   class UpdateWikidataId {
     Note note;
     Note parent;

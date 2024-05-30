@@ -207,14 +207,6 @@ class RestNoteController {
     return new NoteViewer(currentUser.getEntity(), note).toJsonObject();
   }
 
-  @GetMapping("/{note}/position")
-  public NotePositionViewedByUser getPosition(
-      @PathVariable("note") @Schema(type = "integer") Note note)
-      throws UnexpectedNoAccessRightException {
-    currentUser.assertAuthorization(note);
-    return new NoteViewer(currentUser.getEntity(), note).jsonNotePosition();
-  }
-
   @PostMapping(value = "/{note}/review-setting")
   @Transactional
   public RedirectToNoteResponse updateReviewSetting(

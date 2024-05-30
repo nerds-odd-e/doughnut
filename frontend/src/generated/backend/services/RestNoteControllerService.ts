@@ -9,7 +9,6 @@ import type { NoteAccessory } from '../models/NoteAccessory';
 import type { NoteCreationDTO } from '../models/NoteCreationDTO';
 import type { NoteCreationRresult } from '../models/NoteCreationRresult';
 import type { NoteInfo } from '../models/NoteInfo';
-import type { NotePositionViewedByUser } from '../models/NotePositionViewedByUser';
 import type { NoteRealm } from '../models/NoteRealm';
 import type { RedirectToNoteResponse } from '../models/RedirectToNoteResponse';
 import type { ReviewSetting } from '../models/ReviewSetting';
@@ -252,25 +251,6 @@ export class RestNoteControllerService {
             },
             formData: formData,
             mediaType: 'multipart/form-data',
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * @param note
-     * @returns NotePositionViewedByUser OK
-     * @throws ApiError
-     */
-    public getPosition(
-        note: number,
-    ): CancelablePromise<NotePositionViewedByUser> {
-        return this.httpRequest.request({
-            method: 'GET',
-            url: '/api/notes/{note}/position',
-            path: {
-                'note': note,
-            },
             errors: {
                 500: `Internal Server Error`,
             },
