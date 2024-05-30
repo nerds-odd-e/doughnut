@@ -4,9 +4,7 @@
 /* eslint-disable */
 import type { NoteTopic } from './NoteTopic';
 export type Note = {
-    topic: string;
     noteTopic: NoteTopic;
-    topicConstructor: string;
     details?: string;
     parentId?: number;
     linkType?: Note.linkType;

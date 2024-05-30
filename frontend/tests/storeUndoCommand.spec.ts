@@ -10,7 +10,7 @@ describe("storeUndoCommand", () => {
       histories.addEditingToUndoHistory(
         note.id,
         "edit topic",
-        note.note.topicConstructor,
+        note.note.noteTopic.topicConstructor,
       );
 
       expect(histories.noteUndoHistories.length).toEqual(1);

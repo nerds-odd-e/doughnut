@@ -10,8 +10,6 @@ class NoteBuilder extends Builder<Note> {
     const id = generateId();
     this.data = {
       id,
-      topic: "Note1.1.1",
-      topicConstructor: "Note1.1.1",
       noteTopic: {
         id,
         topicConstructor: "Note1.1.1",
@@ -32,7 +30,6 @@ class NoteBuilder extends Builder<Note> {
   }
 
   topicConstructor(value: string): NoteBuilder {
-    this.data.topicConstructor = value;
     this.data.noteTopic.topicConstructor = value;
     return this;
   }

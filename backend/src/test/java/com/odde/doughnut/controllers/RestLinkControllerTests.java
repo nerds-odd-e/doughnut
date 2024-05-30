@@ -76,19 +76,13 @@ class RestLinkControllerTests {
 
     @Test
     void createdChildNoteSuccessfully()
-        throws CyclicLinkDetectedException,
-            BindException,
-            UnexpectedNoAccessRightException,
-            MovementNotPossibleException {
+        throws CyclicLinkDetectedException, BindException, UnexpectedNoAccessRightException {
       Note note3 = makeMe.aNote("flower tea").creatorAndOwner(userModel).please();
       linkCreation.asFirstChild = false;
       controller().linkNoteFinalize(note3, note2, linkCreation, makeMe.successfulBindingResult());
       makeMe.refresh(note3);
       assertThat(note3.getHierarchicalChildren(), hasSize(0));
       assertThat(note3.getLinks(), hasSize(1));
-      assertThat(
-          note3.getLinks().get(0).getTopic(),
-          equalTo("[flower tea] is an application of [flower]"));
     }
 
     @Test

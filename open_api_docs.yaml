@@ -2327,19 +2327,11 @@ components:
       - createdAt
       - id
       - noteTopic
-      - topic
-      - topicConstructor
       - updatedAt
       type: object
       properties:
-        topic:
-          type: string
         noteTopic:
           $ref: "#/components/schemas/NoteTopic"
-        topicConstructor:
-          maxLength: 150
-          minLength: 1
-          type: string
         details:
           type: string
         parentId:

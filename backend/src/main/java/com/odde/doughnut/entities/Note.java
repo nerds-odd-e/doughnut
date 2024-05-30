@@ -26,15 +26,7 @@ import lombok.Setter;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "note")
-@JsonPropertyOrder({
-  "topic",
-  "noteTopic",
-  "topicConstructor",
-  "details",
-  "parentId",
-  "linkType",
-  "updatedAt"
-})
+@JsonPropertyOrder({"topic", "noteTopic", "details", "parentId", "linkType", "updatedAt"})
 public abstract class Note extends EntityIdentifiedByIdOnly {
   public static final int MAX_TITLE_LENGTH = 150;
 
@@ -68,6 +60,7 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
   @Setter
   @Column(name = "topic_constructor")
   @NotNull
+  @JsonIgnore
   private String topicConstructor = "";
 
   @Column(name = "created_at")
@@ -220,19 +213,6 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
       p = p.getParent();
     }
     return result;
-  }
-
-  @NotNull
-  public String getTopic() {
-    String constructor = getLinkConstructor();
-    if (!constructor.contains("%P")) return constructor;
-    Note parent = getParent();
-    if (parent == null) return constructor;
-    String target =
-        getTargetNote() == null ? "missing target" : getTargetNote().getTopicConstructor();
-    return constructor
-        .replace("%P", "[" + parent.getTopicConstructor() + "]")
-        .replace("%T", "[" + target + "]");
   }
 
   @Override

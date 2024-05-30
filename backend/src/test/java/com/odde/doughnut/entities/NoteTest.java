@@ -32,16 +32,6 @@ public class NoteTest {
   }
 
   @Nested
-  class TopicConstructor {
-    @Test
-    void replaceParentPlaceholder() {
-      Note parent = makeMe.aNote().titleConstructor("parent").inMemoryPlease();
-      Note child = makeMe.aNote().under(parent).titleConstructor("%P is good").inMemoryPlease();
-      assertThat(child.getTopic(), equalTo("[parent] is good"));
-    }
-  }
-
-  @Nested
   class TargetNote {
     Note parent;
     Note target;

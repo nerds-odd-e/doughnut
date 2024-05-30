@@ -226,7 +226,7 @@ export default class StoredApiCollection implements StoredApi {
     if (currentNote) {
       const old =
         field === "edit topic"
-          ? currentNote.topicConstructor
+          ? currentNote.noteTopic.topicConstructor
           : currentNote.details;
       if (old === value) {
         return;
