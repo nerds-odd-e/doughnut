@@ -78,8 +78,7 @@ When("I change notebook {string} to skip review", (noteTopic: string) => {
 })
 
 Then("I should see it has link to {string}", (noteTopic: string) => {
-  cy.findByText(noteTopic, { selector: ".link-title" }).click({ force: true })
-  start.assumeNotePage(noteTopic)
+  start.assumeNotePage().navigateToReference(noteTopic)
 })
 
 Then("I unsubscribe from notebook {string}", (noteTopic: string) => {
