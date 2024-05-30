@@ -2,11 +2,7 @@ package com.odde.doughnut.algorithms;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -66,25 +62,6 @@ class ClozeDescriptionTest {
     assertThat(
         new ClozedString(clozeReplacement, details).hide(new NoteTitle(title)).clozeDetails(),
         containsString(expectedClozeDescription));
-  }
-
-  @Disabled
-  @ParameterizedTest
-  @CsvSource({
-    "moon,     partner of earth,            partner of earth",
-    "sedition, word sedition means this,    word [...] means this",
-    "sting,    existing,                    existing",
-    "鳴く,     羊はなんて鳴くの？,              羊はなんて[...]の？",
-    "rapport,  你知道rapport是什么吗？,        你知道[…]是什么吗？",
-    "олет,     Это самолет,                 Это самолет",
-    "不客气,    😃不客气,                     😃[...]",
-  })
-  void clozeDescriptionTest(String token, String description, String expectedClozeDescription) {
-    String regex = "(?:(?<=[^\\w-])" + Pattern.quote(token) + "(?=[^\\w-]))";
-    Pattern pattern = Pattern.compile(regex);
-    Matcher matcher = pattern.matcher(description);
-    String result = matcher.replaceAll("[...]");
-    assertThat(result, equalTo(expectedClozeDescription));
   }
 
   @Test

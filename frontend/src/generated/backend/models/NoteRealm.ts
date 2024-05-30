@@ -6,11 +6,11 @@ import type { Circle } from './Circle';
 import type { LinkViewed } from './LinkViewed';
 import type { Note } from './Note';
 export type NoteRealm = {
-    links?: Record<string, LinkViewed>;
+    id: number;
     note: Note;
     fromBazaar?: boolean;
     circle?: Circle;
-    id: number;
     children?: Array<Note>;
+    links?: Record<string, LinkViewed>;
 };
 

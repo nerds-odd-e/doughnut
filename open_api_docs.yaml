@@ -2615,23 +2615,23 @@ components:
       - note
       type: object
       properties:
-        links:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/LinkViewed"
+        id:
+          type: integer
+          format: int32
         note:
           $ref: "#/components/schemas/Note"
         fromBazaar:
           type: boolean
         circle:
           $ref: "#/components/schemas/Circle"
-        id:
-          type: integer
-          format: int32
         children:
           type: array
           items:
             $ref: "#/components/schemas/Note"
+        links:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/LinkViewed"
     WikidataAssociationCreation:
       required:
       - wikidataId

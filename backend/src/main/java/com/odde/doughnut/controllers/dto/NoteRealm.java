@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers.dto;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.entities.Note;
@@ -9,6 +10,7 @@ import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 
+@JsonPropertyOrder({"id", "note", "fromBazaar", "circle", "children", "links"})
 public class NoteRealm {
 
   @Getter @Setter private Map<LinkType, LinkViewed> links;
