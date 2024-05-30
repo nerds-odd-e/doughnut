@@ -7,7 +7,6 @@ describe("repetition page", () => {
   describe("repetition page for a link", () => {
     const link = makeMe.aLink.please();
     const reviewPoint = makeMe.aReviewPoint.ofLink(link).please();
-    const notePosition = makeMe.aNotePosition.please();
     const mockedShowAnswerCall = vitest.fn();
     const mockedNotePositionCall = vitest.fn();
 
@@ -22,8 +21,6 @@ describe("repetition page", () => {
           answerDisplay: "",
           reviewPoint,
         });
-      helper.managedApi.restNoteController.getPosition =
-        mockedNotePositionCall.mockResolvedValue(notePosition);
       helper.managedApi.restNoteController.show1 =
         mockedNotePositionCall.mockResolvedValue(makeMe.aNoteRealm.please());
     });
