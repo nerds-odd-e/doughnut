@@ -33,67 +33,60 @@
   </form>
 </template>
 
-<script lang="ts">
-import { defineComponent, PropType } from "vue";
+<script setup lang="ts">
+import { PropType, ref } from "vue";
 import { Note, WikidataAssociationCreation } from "@/generated/backend";
 import useLoadingApi from "@/managedApi/useLoadingApi";
 import { StorageAccessor } from "@/store/createNoteStorage";
 import TextInput from "../form/TextInput.vue";
 
-export default defineComponent({
-  setup() {
-    return { ...useLoadingApi() };
-  },
-  props: {
-    note: { type: Object as PropType<Note>, required: true },
-    storageAccessor: {
-      type: Object as PropType<StorageAccessor>,
-      required: true,
-    },
-  },
-  emits: ["closeDialog"],
-  components: { TextInput },
-  data() {
-    return {
-      associationData: {
-        wikidataId: this.note.wikidataId,
-      } as WikidataAssociationCreation,
-      conflictWikidataTitle: undefined as undefined | string,
-      wikidataIdError: undefined as undefined | string,
-    };
-  },
-  methods: {
-    async validateAndSave() {
-      try {
-        const res =
-          await this.managedApi.restWikidataController.fetchWikidataEntityDataById(
-            this.associationData.wikidataId,
-          );
-        if (
-          res.WikidataTitleInEnglish !== "" &&
-          res.WikidataTitleInEnglish.toUpperCase() !==
-            this.note.topic.toUpperCase()
-        ) {
-          this.conflictWikidataTitle = res.WikidataTitleInEnglish;
-          return;
-        }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (e: any) {
-        this.wikidataIdError = e.body.message;
-      }
-      await this.save();
-    },
-    async save() {
-      try {
-        await this.storageAccessor
-          .storedApi()
-          .updateWikidataId(this.note.id, this.associationData);
-        this.$emit("closeDialog");
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (e: any) {
-        this.wikidataIdError = e.wikidataId;
-      }
-    },
+const { managedApi } = useLoadingApi();
+const props = defineProps({
+  note: { type: Object as PropType<Note>, required: true },
+  storageAccessor: {
+    type: Object as PropType<StorageAccessor>,
+    required: true,
   },
 });
+
+const emit = defineEmits(["closeDialog"]);
+
+const associationData = ref<WikidataAssociationCreation>({
+  wikidataId: props.note.wikidataId!,
+});
+const conflictWikidataTitle = ref<string | undefined>(undefined);
+const wikidataIdError = ref<string | undefined>(undefined);
+
+const save = async () => {
+  try {
+    await props.storageAccessor
+      .storedApi()
+      .updateWikidataId(props.note.id, associationData.value);
+    emit("closeDialog");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (e: any) {
+    wikidataIdError.value = e.wikidataId;
+  }
+};
+
+const validateAndSave = async () => {
+  try {
+    const res =
+      await managedApi.restWikidataController.fetchWikidataEntityDataById(
+        associationData.value.wikidataId,
+      );
+    if (
+      res.WikidataTitleInEnglish !== "" &&
+      res.WikidataTitleInEnglish.toUpperCase() !==
+        props.note.topic.toUpperCase()
+    ) {
+      conflictWikidataTitle.value = res.WikidataTitleInEnglish;
+      return;
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (e: any) {
+    wikidataIdError.value = e.body.message;
+  }
+  await save();
+};
 </script>

@@ -8,7 +8,10 @@
       :inverse-icon="true"
     />
     <div>
-      Target: <strong>{{ targetNote.topic }}</strong>
+      Target:
+      <strong
+        ><NoteTopic v-bind="{ noteTopic: targetNote.noteTopic }"
+      /></strong>
     </div>
     <CheckInput
       scope-name="link"
@@ -41,6 +44,7 @@
 import { PropType, ref } from "vue";
 import { LinkCreation, Note } from "@/generated/backend";
 import LinkTypeSelect from "./LinkTypeSelect.vue";
+import NoteTopic from "../notes/core/NoteTopic.vue";
 import CheckInput from "../form/CheckInput.vue";
 import RadioButtons from "../form/RadioButtons.vue";
 import SvgGoBack from "../svgs/SvgGoBack.vue";
@@ -74,7 +78,7 @@ const createLink = async () => {
   if (formData.value.moveUnder && props.note.parentId === null) {
     if (
       !(await popups.confirm(
-        `"${props.note.topic}" is a top level notebook. Do you want to move it under other notebook?`,
+        `"${props.note.noteTopic.topicConstructor}" is a top level notebook. Do you want to move it under other notebook?`,
       ))
     ) {
       return;

@@ -32,7 +32,7 @@ export default defineComponent({
   },
   data() {
     return {
-      prompt: this.note.topic,
+      prompt: this.note.noteTopic.topicConstructor,
       b64Json: undefined as string | undefined,
       promptError: undefined as string | undefined,
     };
