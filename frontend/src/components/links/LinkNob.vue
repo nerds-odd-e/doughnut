@@ -1,26 +1,23 @@
 <template>
-  <span class="link-nob" :title="note.linkType">
+  <span class="link-nob" :title="noteTopic.linkType">
     <SvgLinkTypeIcon
-      v-if="note.linkType"
-      :link-type="note.linkType"
+      v-if="noteTopic.linkType"
+      :link-type="noteTopic.linkType"
       :inverse-icon="inverseIcon"
     />
   </span>
 </template>
 
-<script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { Note } from "@/generated/backend";
+<script setup lang="ts">
+import { PropType } from "vue";
+import { NoteTopic } from "@/generated/backend";
 import SvgLinkTypeIcon from "../svgs/SvgLinkTypeIcon.vue";
 
-export default defineComponent({
-  props: {
-    note: {
-      type: Object as PropType<Note>,
-      required: true,
-    },
-    inverseIcon: Boolean,
+defineProps({
+  noteTopic: {
+    type: Object as PropType<NoteTopic>,
+    required: true,
   },
-  components: { SvgLinkTypeIcon },
+  inverseIcon: Boolean,
 });
 </script>

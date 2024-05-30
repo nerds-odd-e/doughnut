@@ -10,7 +10,7 @@
     <div>
       Target:
       <strong
-        ><NoteTopic
+        ><NoteTopicComp
           v-if="targetNote.noteTopic"
           v-bind="{ noteTopic: targetNote.noteTopic }"
       /></strong>
@@ -44,9 +44,9 @@
 
 <script setup lang="ts">
 import { PropType, ref } from "vue";
-import { LinkCreation, Note } from "@/generated/backend";
+import { LinkCreation, Note, NoteTopic } from "@/generated/backend";
 import LinkTypeSelect from "./LinkTypeSelect.vue";
-import NoteTopic from "../notes/core/NoteTopic.vue";
+import NoteTopicComp from "../notes/core/NoteTopic.vue";
 import CheckInput from "../form/CheckInput.vue";
 import RadioButtons from "../form/RadioButtons.vue";
 import SvgGoBack from "../svgs/SvgGoBack.vue";
@@ -67,7 +67,7 @@ const emit = defineEmits(["success", "goBack"]);
 const formData = ref<LinkCreation>({
   asFirstChild: false,
   moveUnder: false,
-  linkType: Note.linkType.NO_LINK,
+  linkType: NoteTopic.linkType.NO_LINK,
 });
 
 const linkFormErrors = ref({

@@ -1,10 +1,10 @@
-import { NoteRealm, Note } from "@/generated/backend";
+import { NoteRealm, Note, NoteTopic } from "@/generated/backend";
 import LinksMap from "../../src/models/LinksMap";
 import Builder from "./Builder";
 import LinkBuilder from "./LinkBuilder";
 
 class LinkViewedBuilder extends Builder<LinksMap> {
-  linkType: Note.linkType;
+  linkType: NoteTopic.linkType;
 
   cnt: number;
 
@@ -14,7 +14,7 @@ class LinkViewedBuilder extends Builder<LinksMap> {
 
   toNote: NoteRealm;
 
-  constructor(linkType: Note.linkType, from: NoteRealm, to: NoteRealm) {
+  constructor(linkType: NoteTopic.linkType, from: NoteRealm, to: NoteRealm) {
     super();
     this.linkType = linkType;
     this.cnt = 1;
@@ -57,7 +57,7 @@ class LinkViewedBuilder extends Builder<LinksMap> {
     return new LinkBuilder()
       .from(this.fromNote.note)
       .to(this.toNote.note)
-      .type(Note.linkType.USING)
+      .type(NoteTopic.linkType.USING)
       .do();
   }
 }

@@ -1,4 +1,4 @@
-import { Note, NoteRealm } from "@/generated/backend";
+import { Note, NoteTopic, NoteRealm } from "@/generated/backend";
 import Builder from "./Builder";
 import generateId from "./generateId";
 
@@ -62,12 +62,12 @@ class NoteBuilder extends Builder<Note> {
     return this;
   }
 
-  linkType(value: Note.linkType): NoteBuilder {
-    this.data.linkType = value;
+  linkType(value: NoteTopic.linkType): NoteBuilder {
     this.topicConstructor(`:${value}`);
     // default target
     this.data.noteTopic.targetNoteTopic = {
       id: generateId(),
+      linkType: value,
       topicConstructor: "a target",
     };
     return this;

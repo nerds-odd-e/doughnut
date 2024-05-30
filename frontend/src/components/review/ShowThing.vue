@@ -1,5 +1,5 @@
 <template>
-  <main v-if="note.linkType">
+  <main v-if="note.noteTopic.linkType">
     <div class="jumbotron py-4 mb-2">
       <div class="row">
         <div class="col-12 col-md-4 link-source">
@@ -9,8 +9,10 @@
           />
         </div>
         <div class="col-12 col-md-4 text-center">
-          <LinkNob v-bind="{ note }" />
-          <span class="badge bg-light text-dark"> {{ note.linkType }}</span>
+          <LinkNob v-bind="{ noteTopic: note.noteTopic }" />
+          <span class="badge bg-light text-dark">
+            {{ note.noteTopic.linkType }}</span
+          >
         </div>
         <div class="col-12 col-md-4 link-target">
           <LinkNoteShow

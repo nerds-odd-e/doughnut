@@ -1,5 +1,5 @@
-import { LinkViewed, Note } from "@/generated/backend";
+import { LinkViewed, NoteTopic } from "@/generated/backend";
 
-type LinksMap = { [P in Note.linkType]?: LinkViewed };
+type LinksMap = { [P in NoteTopic.linkType]?: LinkViewed };
 
 export default LinksMap;

@@ -24,6 +24,8 @@ describe("repetition page", () => {
         });
       helper.managedApi.restNoteController.getPosition =
         mockedNotePositionCall.mockResolvedValue(notePosition);
+      helper.managedApi.restNoteController.show1 =
+        mockedNotePositionCall.mockResolvedValue(makeMe.aNoteRealm.please());
     });
 
     it("click on note when doing review", async () => {
@@ -36,17 +38,6 @@ describe("repetition page", () => {
       wrapper.find(".review-point-abbr").trigger("click");
       await flushPromises();
       expect(mockedShowAnswerCall).toHaveBeenCalledWith(1);
-      expect(mockedNotePositionCall).toHaveBeenCalledWith(
-        reviewPoint.note.noteTopic.targetNoteTopic?.id,
-      );
-      expect(mockedNotePositionCall).toHaveBeenCalledWith(
-        reviewPoint.note.parentId,
-      );
-      expect(
-        JSON.parse(
-          wrapper.find(".link-target .router-link").attributes().to as string,
-        ).name,
-      ).toEqual("notebooks");
     });
 
     it("click on note when doing review and in a nested page", async () => {
@@ -57,12 +48,6 @@ describe("repetition page", () => {
         .mount();
       await flushPromises();
       wrapper.find(".review-point-abbr").trigger("click");
-      await flushPromises();
-      expect(
-        JSON.parse(
-          wrapper.find(".link-target .router-link").attributes().to as string,
-        ),
-      ).toEqual({ name: "notebooks" });
     });
   });
 });

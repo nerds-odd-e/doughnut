@@ -1,5 +1,5 @@
 import NoteFrameOfLinks from "@/components/notes/core/NoteFrameOfLinks.vue";
-import { Note } from "@/generated/backend";
+import { NoteTopic } from "@/generated/backend";
 import makeMe from "../fixtures/makeMe";
 import RenderingHelper from "../helpers/RenderingHelper";
 import helper from "../helpers";
@@ -13,7 +13,7 @@ describe("a link lists of a note", () => {
 
   it("taggings (reverse of tagged by) are grouped", async () => {
     const links = makeMe.linksMap
-      .of(Note.linkType.TAGGED_BY)
+      .of(NoteTopic.linkType.TAGGED_BY)
       .reverse.count(2)
       .please();
     const wrapper = renderer.withStorageProps({ links }).mount();

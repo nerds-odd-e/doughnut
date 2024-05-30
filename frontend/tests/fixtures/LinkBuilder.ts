@@ -1,4 +1,4 @@
-import { Note } from "@/generated/backend";
+import { Note, NoteTopic } from "@/generated/backend";
 import Builder from "./Builder";
 import NoteBuilder from "./NoteBuilder";
 
@@ -7,7 +7,7 @@ class LinkBuilder extends Builder<Note> {
 
   targetNoteBuilder = new NoteBuilder();
 
-  internalType = Note.linkType.RELATED_TO;
+  internalType = NoteTopic.linkType.RELATED_TO;
 
   from(note: Note): LinkBuilder {
     this.sourceNoteBuilder.data = note;
@@ -19,7 +19,7 @@ class LinkBuilder extends Builder<Note> {
     return this;
   }
 
-  type(t: Note.linkType): LinkBuilder {
+  type(t: NoteTopic.linkType): LinkBuilder {
     this.internalType = t;
     return this;
   }
