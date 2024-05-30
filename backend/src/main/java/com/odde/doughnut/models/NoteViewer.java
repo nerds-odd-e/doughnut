@@ -66,7 +66,6 @@ public class NoteViewer {
     nvb.setNoteId(note.getId());
     nvb.setFromBazaar(viewer == null || !viewer.owns(note.getNotebook()));
     nvb.setCircle(note.getNotebook().getOwnership().getCircle());
-    nvb.setAncestors(note.getAncestors());
     return nvb;
   }
 }

@@ -2643,10 +2643,6 @@ components:
           type: boolean
         circle:
           $ref: "#/components/schemas/Circle"
-        ancestors:
-          type: array
-          items:
-            $ref: "#/components/schemas/Note"
     NoteRealm:
       required:
       - id

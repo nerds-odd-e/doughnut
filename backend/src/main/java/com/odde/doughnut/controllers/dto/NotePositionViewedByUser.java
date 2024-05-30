@@ -13,6 +13,4 @@ public class NotePositionViewedByUser {
   @Getter @Setter private Boolean fromBazaar;
 
   @Getter @Setter private Circle circle;
-
-  @Getter @Setter private List<Note> ancestors = new ArrayList<>();
 }

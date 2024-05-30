@@ -202,10 +202,6 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
     setTopicConstructor(":" + linkType.label);
   }
 
-  protected String getLinkConstructor() {
-    return getTopicConstructor();
-  }
-
   @JsonIgnore
   public List<Note> getAncestors() {
     List<Note> result = new ArrayList<>();
