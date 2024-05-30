@@ -49,7 +49,7 @@ export type { NoteCreationRresult } from './models/NoteCreationRresult';
 export type { NoteInfo } from './models/NoteInfo';
 export type { NotePositionViewedByUser } from './models/NotePositionViewedByUser';
 export type { NoteRealm } from './models/NoteRealm';
-export type { NoteTopic } from './models/NoteTopic';
+export { NoteTopic } from './models/NoteTopic';
 export type { NoteUpdateDetailsDTO } from './models/NoteUpdateDetailsDTO';
 export type { NoteUpdateTopicDTO } from './models/NoteUpdateTopicDTO';
 export type { Ownership } from './models/Ownership';

@@ -9,7 +9,12 @@
       </template>
       <template #default="{ closer }">
         <LinkNobDialog
-          v-bind="{ note, inverseIcon, colors, storageAccessor }"
+          v-bind="{
+            noteTopic: note.noteTopic,
+            inverseIcon,
+            colors,
+            storageAccessor,
+          }"
           @close-dialog="closer"
         />
       </template>
