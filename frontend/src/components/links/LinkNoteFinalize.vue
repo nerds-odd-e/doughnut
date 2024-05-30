@@ -10,7 +10,9 @@
     <div>
       Target:
       <strong
-        ><NoteTopic v-bind="{ noteTopic: targetNote.noteTopic }"
+        ><NoteTopic
+          v-if="targetNote.noteTopic"
+          v-bind="{ noteTopic: targetNote.noteTopic }"
       /></strong>
     </div>
     <CheckInput
