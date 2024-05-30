@@ -91,7 +91,7 @@ Then(
     cy.findByText(commonSenseSplit(targetNoteTopics, ",").pop(), {
       selector: ".link-title",
     })
-    cy.findAllByTitle(linkType)
+    cy.findAllByText(linkType)
   },
 )
 

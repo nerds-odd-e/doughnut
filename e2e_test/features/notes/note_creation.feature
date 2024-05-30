@@ -40,4 +40,4 @@ Feature: Nested Note creation
       | team       |
       | tech       |
       | Re-Design  |
-    And [deprecating] On the current page, I should see "LeSS in Action" has link "a specialization of" "Re-Design"
+    And [deprecating] On the current page, I should see "LeSS in Action" has link "a generalization of" "Re-Design"
