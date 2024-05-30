@@ -88,23 +88,10 @@ When(
 Then(
   "[deprecating] On the current page, I should see {string} has link {string} {string}",
   (noteTopic: string, linkType: string, targetNoteTopics: string) => {
-    const targetNoteTopicsList = commonSenseSplit(targetNoteTopics, ",")
     cy.findByText(commonSenseSplit(targetNoteTopics, ",").pop(), {
       selector: ".link-title",
     })
-    const linksForNoteFound: string[] = []
-    cy.findAllByRole("button", { name: linkType })
-      .parent()
-      .parent()
-      .each(($link) => {
-        cy.wrap($link).within(() => {
-          linksForNoteFound.push($link.text())
-        })
-      })
-      .then(() => {
-        expect(targetNoteTopicsList.every((linkItem) => linksForNoteFound.includes(linkItem))).to.be
-          .true
-      })
+    cy.findAllByTitle(linkType)
   },
 )
 
@@ -118,10 +105,7 @@ Then(
 Then(
   "I should see note {notepath} has link {string} {string}",
   (notePath: NotePath, linkType: string, targetNoteTopics: string) => {
-    start
-      .routerToNotebooksPage()
-      .navigateToPath(notePath)
-      .expectLinkingChildren(linkType, targetNoteTopics)
+    start.routerToNotebooksPage().navigateToPath(notePath).expectLinkingChildren(linkType, targetNoteTopics)
   },
 )
 

@@ -1,5 +1,5 @@
 <template>
-  <span class="link-nob">
+  <span class="link-nob" :title="note.linkType">
     <SvgLinkTypeIcon
       v-if="note.linkType"
       :link-type="note.linkType"
