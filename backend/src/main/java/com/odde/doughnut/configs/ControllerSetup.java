@@ -9,13 +9,10 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ControllerAdvice
@@ -33,12 +30,12 @@ public class ControllerSetup {
     this.testabilitySettings = testabilitySettings;
   }
 
-  @InitBinder
-  public void initBinder(WebDataBinder binder) {
-    // trimming all strings coming from any user form
-    StringTrimmerEditor stringTrimmerEditor = new StringTrimmerEditor(false);
-    binder.registerCustomEditor(String.class, stringTrimmerEditor);
-  }
+  //  @InitBinder
+  //  public void initBinder(WebDataBinder binder) {
+  //    // trimming all strings coming from any user form
+  //    StringTrimmerEditor stringTrimmerEditor = new StringTrimmerEditor(false);
+  //    binder.registerCustomEditor(String.class, stringTrimmerEditor);
+  //  }
 
   @SneakyThrows
   @ExceptionHandler(Exception.class)
