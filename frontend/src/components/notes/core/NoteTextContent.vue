@@ -1,32 +1,29 @@
 <template>
-  <NoteFrameOfLinks v-if="links" v-bind="{ links, storageAccessor }">
-    <div class="alert alert-warning" v-if="note.deletedAt">
-      This note has been deleted
-    </div>
-    <NoteLinkTopic
-      v-if="note.noteTopic.targetNoteTopic"
-      :note-topic="note.noteTopic"
+  <div class="alert alert-warning" v-if="note.deletedAt">
+    This note has been deleted
+  </div>
+  <NoteLinkTopic
+    v-if="note.noteTopic.targetNoteTopic"
+    :note-topic="note.noteTopic"
+    :storage-accessor="storageAccessor"
+  />
+  <NoteEditableTopic
+    v-else
+    :note-topic="note.noteTopic"
+    :storage-accessor="storageAccessor"
+  />
+  <div role="details" class="note-details">
+    <NoteEditableDetails
+      :note-id="note.id"
+      :note-details="note.details"
       :storage-accessor="storageAccessor"
     />
-    <NoteEditableTopic
-      v-else
-      :note-topic="note.noteTopic"
-      :storage-accessor="storageAccessor"
-    />
-    <div role="details" class="note-details">
-      <NoteEditableDetails
-        :note-id="note.id"
-        :note-details="note.details"
-        :storage-accessor="storageAccessor"
-      />
-    </div>
-  </NoteFrameOfLinks>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { PropType } from "vue";
 import { Note } from "@/generated/backend";
-import NoteFrameOfLinks from "./NoteFrameOfLinks.vue";
 import { StorageAccessor } from "../../../store/createNoteStorage";
 import LinksMap from "../../../models/LinksMap";
 import NoteEditableTopic from "./NoteEditableTopic.vue";

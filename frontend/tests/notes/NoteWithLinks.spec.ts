@@ -1,5 +1,5 @@
 import { flushPromises } from "@vue/test-utils";
-import NoteWithLinks from "@/components/notes/core/NoteWithLinks.vue";
+import NoteTextContent from "@/components/notes/core/NoteTextContent.vue";
 import ManagedApi from "@/managedApi/ManagedApi";
 import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";
@@ -18,7 +18,7 @@ describe("undo editing", () => {
 
     const updatedTitle = "updated";
     const wrapper = helper
-      .component(NoteWithLinks)
+      .component(NoteTextContent)
       .withProps({
         note: noteRealm.note,
         links: noteRealm.links,

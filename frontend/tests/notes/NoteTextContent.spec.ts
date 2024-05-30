@@ -1,8 +1,8 @@
 import { VueWrapper, flushPromises } from "@vue/test-utils";
 import { ComponentPublicInstance } from "vue";
-import NoteWithLinks from "@/components/notes/core/NoteWithLinks.vue";
 import TextContentWrapper from "@/components/notes/core/TextContentWrapper.vue";
 import { Note } from "@/generated/backend";
+import NoteTextContent from "@/components/notes/core/NoteTextContent.vue";
 import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";
 
@@ -12,7 +12,7 @@ describe("in place edit on title", () => {
   const note = makeMe.aNote.topicConstructor("Dummy Title").please();
   const mountComponent = (n: Note): VueWrapper<ComponentPublicInstance> => {
     return helper
-      .component(NoteWithLinks)
+      .component(NoteTextContent)
       .withStorageProps({
         note: n,
         links: {},
