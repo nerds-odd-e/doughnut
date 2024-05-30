@@ -14,7 +14,6 @@
 <script setup lang="ts">
 import { PropType, Ref, computed, ref, toRefs, watch } from "vue";
 import { NoteRealm } from "@/generated/backend";
-import { first } from "lodash";
 import SidebarInner from "./SidebarInner.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 
@@ -43,8 +42,11 @@ watch(
 const headNoteId = computed(() => {
   const noteRealm = lastDefinedNoteRealm.value;
   if (!noteRealm) return undefined;
-  const { ancestors } = noteRealm.notePosition;
-  return first(ancestors)?.id ?? noteRealm.note.id;
+  let cursor = noteRealm.note.noteTopic;
+  while (cursor.parentNoteTopic) {
+    cursor = cursor.parentNoteTopic;
+  }
+  return cursor.id;
 });
 </script>
 

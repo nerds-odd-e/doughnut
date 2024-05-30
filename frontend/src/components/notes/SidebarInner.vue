@@ -75,13 +75,17 @@ const childrenCount = (noteId: number) => {
 };
 
 watch(
-  () => props.activeNoteRealm.notePosition.ancestors,
-  (newAncestors) => {
+  () => props.activeNoteRealm.note.noteTopic.parentNoteTopic,
+  (parentNoteTopic) => {
     const uniqueIds = new Set([
       ...expandedIds.value,
-      ...(newAncestors?.map((note) => note.id) ?? []),
       props.activeNoteRealm.note.id,
     ]);
+    let cursor = parentNoteTopic;
+    while (cursor) {
+      uniqueIds.add(cursor.id);
+      cursor = cursor.parentNoteTopic;
+    }
     expandedIds.value = Array.from(uniqueIds);
   },
   { immediate: true },

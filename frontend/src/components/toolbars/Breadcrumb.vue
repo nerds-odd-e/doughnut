@@ -24,20 +24,15 @@
   </BasicBreadcrumb>
 </template>
 
-<script lang="ts">
-import { defineComponent, PropType } from "vue";
+<script setup lang="ts">
+import { PropType } from "vue";
 import { NotePositionViewedByUser } from "@/generated/backend";
 import BasicBreadcrumb from "../commons/BasicBreadcrumb.vue";
 
-export default defineComponent({
-  props: {
-    notePosition: {
-      type: Object as PropType<NotePositionViewedByUser>,
-      required: true,
-    },
-  },
-  components: {
-    BasicBreadcrumb,
+defineProps({
+  notePosition: {
+    type: Object as PropType<NotePositionViewedByUser>,
+    required: true,
   },
 });
 </script>
