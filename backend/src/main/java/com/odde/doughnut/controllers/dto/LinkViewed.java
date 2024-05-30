@@ -11,16 +11,10 @@ public class LinkViewed {
   @Getter
   @Setter
   @NotNull
-  @JsonIgnoreProperties("sourceNote")
-  private List<? extends Note> direct;
-
-  @Getter
-  @Setter
-  @NotNull
   @JsonIgnoreProperties("targetNote")
   private List<? extends Note> reverse;
 
   public boolean notEmpty() {
-    return (direct != null && !direct.isEmpty()) || (reverse != null && !reverse.isEmpty());
+    return (reverse != null && !reverse.isEmpty());
   }
 }

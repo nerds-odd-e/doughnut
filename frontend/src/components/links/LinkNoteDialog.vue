@@ -1,6 +1,7 @@
 <template>
   <h3 v-if="note">
-    Link <strong>{{ note.topic }}</strong> to
+    Link
+    <strong><NoteTopic v-bind="{ noteTopic: note.noteTopic }" /></strong> to
   </h3>
   <h3 v-else>Searching</h3>
   <SearchNote
@@ -16,29 +17,22 @@
   />
 </template>
 
-<script lang="ts">
-import { defineComponent, PropType } from "vue";
+<script setup lang="ts">
+import { PropType, ref } from "vue";
 import { Note } from "@/generated/backend";
 import LinkNoteFinalize from "./LinkNoteFinalize.vue";
+import NoteTopic from "../notes/core/NoteTopic.vue";
 import SearchNote from "../search/SearchNote.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 
-export default defineComponent({
-  props: {
-    note: Object as PropType<Note>,
-    storageAccessor: {
-      type: Object as PropType<StorageAccessor>,
-      required: true,
-    },
-  },
-  emits: ["closeDialog"],
-  components: { LinkNoteFinalize, SearchNote },
-  data() {
-    return {
-      targetNote: undefined,
-    } as {
-      targetNote: Note | undefined;
-    };
+defineProps({
+  note: Object as PropType<Note>,
+  storageAccessor: {
+    type: Object as PropType<StorageAccessor>,
+    required: true,
   },
 });
+defineEmits(["closeDialog"]);
+
+const targetNote = ref<Note | undefined>(undefined);
 </script>

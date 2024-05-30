@@ -1,6 +1,5 @@
 package com.odde.doughnut.entities;
 
-import static com.odde.doughnut.entities.LinkType.RELATED_TO;
 import static com.odde.doughnut.entities.LinkType.SPECIALIZE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -12,7 +11,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.odde.doughnut.controllers.dto.LinkViewed;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.testability.MakeMe;
-import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -42,32 +40,10 @@ public class LinkTest {
     }
 
     @Nested
-    class Related {
-      @BeforeEach
-      void setup() {
-        makeMe.theNote(noteA).linkTo(noteB, RELATED_TO).please();
-      }
-
-      @Test
-      void AIsRelatedToB() {
-        final Map<LinkType, LinkViewed> allLinks = new NoteViewer(null, noteA).getAllLinks();
-        assertThat(allLinks.keySet(), contains(RELATED_TO));
-        assertThat(getLinkedNotes(RELATED_TO, allLinks), contains(noteB));
-      }
-    }
-
-    @Nested
     class BelongsTo {
       @BeforeEach
       void setup() {
         makeMe.theNote(noteA).linkTo(noteB, SPECIALIZE).please();
-      }
-
-      @Test
-      void ABelongToB() {
-        final Map<LinkType, LinkViewed> allLinks = new NoteViewer(null, noteA).getAllLinks();
-        assertThat(allLinks.keySet(), contains(SPECIALIZE));
-        assertThat(getLinkedNotes(SPECIALIZE, allLinks), contains(noteB));
       }
 
       @Test
@@ -135,9 +111,5 @@ public class LinkTest {
       Note link = makeMe.aLink().between(source, target).inMemoryPlease();
       assertThat(link.getReviewSetting().getLevel(), is(5));
     }
-  }
-
-  private List<Note> getLinkedNotes(LinkType linkType, Map<LinkType, LinkViewed> allLinks) {
-    return allLinks.get(linkType).getDirect().stream().map(Note::getTargetNote).toList();
   }
 }

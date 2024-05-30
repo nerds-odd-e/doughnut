@@ -36,7 +36,6 @@ public class NoteViewer {
                     type,
                     new LinkViewed() {
                       {
-                        setDirect(linksOfTypeThroughDirect(List.of(type)).stream().toList());
                         setReverse(linksOfTypeThroughReverse(type).toList());
                       }
                     }))

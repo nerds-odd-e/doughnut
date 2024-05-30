@@ -4,7 +4,6 @@
 /* eslint-disable */
 import type { Note } from './Note';
 export type LinkViewed = {
-    direct: Array<Note>;
     reverse: Array<Note>;
 };
 

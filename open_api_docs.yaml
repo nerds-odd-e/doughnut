@@ -2642,14 +2642,9 @@ components:
           type: string
     LinkViewed:
       required:
-      - direct
       - reverse
       type: object
       properties:
-        direct:
-          type: array
-          items:
-            $ref: "#/components/schemas/Note"
         reverse:
           type: array
           items:

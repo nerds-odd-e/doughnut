@@ -11,7 +11,7 @@ plugins {
   // Spotless for the code style
   id "com.diffplug.spotless" version "6.25.0"
   // Gradle Doctor
-  id "com.osacky.doctor" version "0.10.0"
+//  id "com.osacky.doctor" version "0.10.0"
 }
 
 group = 'com.odde'
