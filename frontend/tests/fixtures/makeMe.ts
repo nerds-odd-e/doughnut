@@ -1,6 +1,5 @@
 import LinksMapBuilder from "./LinksMapBuilder";
 import NoteRealmBuilder from "./NoteRealmBuilder";
-import NotePositionBuilder from "./NotePositionBuilder";
 import ReviewPointBuilder from "./ReviewPointBuilder";
 import LinkBuilder from "./LinkBuilder";
 import DueReviewPointsBuilder from "./DueReviewPointsBuilder";
@@ -30,10 +29,6 @@ class MakeMe {
 
   static get aNoteRealm(): NoteRealmBuilder {
     return new NoteRealmBuilder();
-  }
-
-  static get aNotePosition(): NotePositionBuilder {
-    return new NotePositionBuilder();
   }
 
   static get aReviewPoint(): ReviewPointBuilder {

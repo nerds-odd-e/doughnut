@@ -3,26 +3,22 @@ import { NoteTopic, NoteRealm } from "@/generated/backend";
 import Builder from "./Builder";
 import LinkViewedBuilder from "./LinkViewedBuilder";
 import NoteBuilder from "./NoteBuilder";
-import NotePositionBuilder from "./NotePositionBuilder";
+import generateId from "./generateId";
 
 class NoteRealmBuilder extends Builder<NoteRealm> {
   data: NoteRealm;
 
   noteBuilder;
 
-  notePositionBuilder;
-
   constructor() {
     super();
     this.noteBuilder = new NoteBuilder();
     const noteData = this.noteBuilder.data;
-    this.notePositionBuilder = new NotePositionBuilder();
     this.data = {
       id: noteData.id,
       note: noteData,
       links: {},
       children: [],
-      notePosition: this.notePositionBuilder.data,
     };
   }
 
@@ -32,7 +28,10 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
   }
 
   inCircle(circleName: string) {
-    this.notePositionBuilder.inCircle(circleName);
+    this.data.circle = {
+      id: generateId(),
+      name: circleName,
+    };
     return this;
   }
 
@@ -78,7 +77,6 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
 
   do(): NoteRealm {
     this.data.note = this.noteBuilder.do();
-    this.data.notePosition = this.notePositionBuilder.do();
     return this.data;
   }
 }

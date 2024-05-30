@@ -16,7 +16,8 @@
         <Breadcrumb
           v-if="noteRealm"
           v-bind="{
-            notePosition: noteRealm?.notePosition,
+            fromBazaar: noteRealm?.fromBazaar,
+            circle: noteRealm?.circle,
             noteTopic: noteRealm?.note.noteTopic,
           }"
         />
@@ -56,6 +57,7 @@ import { PropType, ref } from "vue";
 import { User } from "@/generated/backend";
 import ScrollTo from "@/components/commons/ScrollTo.vue";
 import NoteShow from "../components/notes/NoteShow.vue";
+import Breadcrumb from "../components/toolbars/Breadcrumb.vue";
 import { StorageAccessor } from "../store/createNoteStorage";
 
 defineProps({

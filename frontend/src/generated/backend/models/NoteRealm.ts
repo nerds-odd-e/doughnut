@@ -2,13 +2,14 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { Circle } from './Circle';
 import type { LinkViewed } from './LinkViewed';
 import type { Note } from './Note';
-import type { NotePositionViewedByUser } from './NotePositionViewedByUser';
 export type NoteRealm = {
     links?: Record<string, LinkViewed>;
     note: Note;
-    notePosition: NotePositionViewedByUser;
+    fromBazaar?: boolean;
+    circle?: Circle;
     id: number;
     children?: Array<Note>;
 };

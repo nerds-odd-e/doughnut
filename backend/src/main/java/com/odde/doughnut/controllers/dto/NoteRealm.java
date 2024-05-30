@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers.dto;
 
+import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.entities.Note;
 import jakarta.validation.constraints.NotNull;
@@ -14,7 +15,7 @@ public class NoteRealm {
 
   @NotNull @Getter private Note note;
 
-  @NotNull @Getter @Setter private NotePositionViewedByUser notePosition;
+  @Getter @Setter private Boolean fromBazaar;
 
   public NoteRealm(Note note) {
     this.note = note;
@@ -27,5 +28,9 @@ public class NoteRealm {
 
   public List<Note> getChildren() {
     return note.getChildren();
+  }
+
+  public Circle getCircle() {
+    return note.getNotebook().getOwnership().getCircle();
   }
 }

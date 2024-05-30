@@ -1,11 +1,11 @@
 <template>
   <BasicBreadcrumb v-bind="{ ancestors }">
-    <template v-if="notePosition" #topLink>
-      <li v-if="notePosition.fromBazaar" class="breadcrumb-item">
+    <template #topLink>
+      <li v-if="fromBazaar" class="breadcrumb-item">
         <router-link :to="{ name: 'bazaar' }">Bazaar</router-link>
       </li>
       <template v-else>
-        <li class="breadcrumb-item" v-if="!notePosition.circle">
+        <li class="breadcrumb-item" v-if="!circle">
           <router-link :to="{ name: 'notebooks' }">My Notes</router-link>
         </li>
         <template v-else>
@@ -13,9 +13,9 @@
             <router-link
               :to="{
                 name: 'circleShow',
-                params: { circleId: notePosition.circle.id },
+                params: { circleId: circle.id },
               }"
-              >{{ notePosition.circle.name }}</router-link
+              >{{ circle.name }}</router-link
             >
           </li>
         </template>
@@ -26,7 +26,7 @@
 
 <script setup lang="ts">
 import { PropType, computed } from "vue";
-import { NotePositionViewedByUser, NoteTopic } from "@/generated/backend";
+import { NoteTopic, Circle } from "@/generated/backend";
 import BasicBreadcrumb from "../commons/BasicBreadcrumb.vue";
 
 const props = defineProps({
@@ -34,8 +34,12 @@ const props = defineProps({
     type: Object as PropType<NoteTopic>,
     required: true,
   },
-  notePosition: {
-    type: Object as PropType<NotePositionViewedByUser>,
+  circle: {
+    type: Object as PropType<Circle>,
+    required: false,
+  },
+  fromBazaar: {
+    type: Boolean,
     required: false,
   },
 });

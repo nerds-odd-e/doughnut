@@ -47,7 +47,6 @@ export type { NotebookViewedByUser } from './models/NotebookViewedByUser';
 export { NoteCreationDTO } from './models/NoteCreationDTO';
 export type { NoteCreationRresult } from './models/NoteCreationRresult';
 export type { NoteInfo } from './models/NoteInfo';
-export type { NotePositionViewedByUser } from './models/NotePositionViewedByUser';
 export type { NoteRealm } from './models/NoteRealm';
 export { NoteTopic } from './models/NoteTopic';
 export type { NoteUpdateDetailsDTO } from './models/NoteUpdateDetailsDTO';

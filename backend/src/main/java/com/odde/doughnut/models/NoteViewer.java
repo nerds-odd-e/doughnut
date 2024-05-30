@@ -1,7 +1,6 @@
 package com.odde.doughnut.models;
 
 import com.odde.doughnut.controllers.dto.LinkViewed;
-import com.odde.doughnut.controllers.dto.NotePositionViewedByUser;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.entities.*;
 import java.util.Arrays;
@@ -23,7 +22,7 @@ public class NoteViewer {
   public NoteRealm toJsonObject() {
     NoteRealm nvb = new NoteRealm(note);
     nvb.setLinks(getAllLinks());
-    nvb.setNotePosition(jsonNotePosition());
+    nvb.setFromBazaar(viewer == null || !viewer.owns(note.getNotebook()));
 
     return nvb;
   }
@@ -59,13 +58,5 @@ public class NoteViewer {
               if (viewer == null) return false;
               return viewer.canReferTo(l.getParent().getNotebook());
             });
-  }
-
-  public NotePositionViewedByUser jsonNotePosition() {
-    NotePositionViewedByUser nvb = new NotePositionViewedByUser();
-    nvb.setNoteId(note.getId());
-    nvb.setFromBazaar(viewer == null || !viewer.owns(note.getNotebook()));
-    nvb.setCircle(note.getNotebook().getOwnership().getCircle());
-    return nvb;
   }
 }

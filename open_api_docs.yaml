@@ -2609,21 +2609,10 @@ components:
           $ref: "#/components/schemas/NoteRealm"
         parent:
           $ref: "#/components/schemas/NoteRealm"
-    NotePositionViewedByUser:
-      type: object
-      properties:
-        noteId:
-          type: integer
-          format: int32
-        fromBazaar:
-          type: boolean
-        circle:
-          $ref: "#/components/schemas/Circle"
     NoteRealm:
       required:
       - id
       - note
-      - notePosition
       type: object
       properties:
         links:
@@ -2632,8 +2621,10 @@ components:
             $ref: "#/components/schemas/LinkViewed"
         note:
           $ref: "#/components/schemas/Note"
-        notePosition:
-          $ref: "#/components/schemas/NotePositionViewedByUser"
+        fromBazaar:
+          type: boolean
+        circle:
+          $ref: "#/components/schemas/Circle"
         id:
           type: integer
           format: int32
