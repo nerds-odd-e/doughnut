@@ -32,28 +32,6 @@ export class RestLinkControllerService {
         });
     }
     /**
-     * @param link
-     * @param perspective
-     * @returns NoteRealm OK
-     * @throws ApiError
-     */
-    public deleteLink(
-        link: number,
-        perspective: string,
-    ): CancelablePromise<NoteRealm> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/api/links/{link}/{perspective}/delete',
-            path: {
-                'link': link,
-                'perspective': perspective,
-            },
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
      * @param sourceNote
      * @param targetNote
      * @param requestBody

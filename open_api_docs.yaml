@@ -1080,35 +1080,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NoteRealm"
-  /api/links/{link}/{perspective}/delete:
-    post:
-      tags:
-      - rest-link-controller
-      operationId: deleteLink
-      parameters:
-      - name: link
-        in: path
-        required: true
-        schema:
-          type: integer
-      - name: perspective
-        in: path
-        required: true
-        schema:
-          type: string
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/NoteRealm"
   /api/links/create/{sourceNote}/{targetNote}:
     post:
       tags:

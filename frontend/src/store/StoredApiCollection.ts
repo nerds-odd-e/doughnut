@@ -35,11 +35,6 @@ export interface StoredApi {
 
   updateLink(linkId: Doughnut.ID, data: LinkCreation): Promise<NoteRealm>;
 
-  deleteLink(
-    linkId: Doughnut.ID,
-    fromTargetPerspective: boolean,
-  ): Promise<NoteRealm>;
-
   moveUp(noteId: Doughnut.ID): Promise<NoteRealm | void>;
 
   moveDown(noteId: Doughnut.ID): Promise<NoteRealm | void>;
@@ -178,15 +173,6 @@ export default class StoredApiCollection implements StoredApi {
   async updateLink(linkId: Doughnut.ID, data: LinkCreation) {
     return this.storage.refreshNoteRealm(
       await this.managedApi.restLinkController.updateLink(linkId, data),
-    );
-  }
-
-  async deleteLink(linkId: Doughnut.ID, fromTargetPerspective: boolean) {
-    return this.storage.refreshNoteRealm(
-      await this.managedApi.restLinkController.deleteLink(
-        linkId,
-        fromTargetPerspective ? "tview" : "sview",
-      ),
     );
   }
 

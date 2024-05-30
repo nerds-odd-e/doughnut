@@ -52,16 +52,6 @@ class RestLinkController {
     return getNoteRealm(link, currentUser.getEntity(), linkCreation.fromTargetPerspective);
   }
 
-  @PostMapping(value = "/{link}/{perspective}/delete")
-  @Transactional
-  public NoteRealm deleteLink(
-      @PathVariable @Schema(type = "integer") Note link, @PathVariable String perspective)
-      throws UnexpectedNoAccessRightException {
-    currentUser.assertAuthorization(link);
-    modelFactoryService.remove(link);
-    return getNoteRealm(link, currentUser.getEntity(), perspective.equals("tview"));
-  }
-
   @PostMapping(value = "/create/{sourceNote}/{targetNote}")
   @Transactional
   public NoteRealm linkNoteFinalize(

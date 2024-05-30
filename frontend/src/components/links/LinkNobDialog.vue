@@ -28,8 +28,6 @@
       />
     </strong>
   </div>
-
-  <button class="btn btn-danger" @click="deleteLink()">Delete</button>
 </template>
 
 <script lang="ts">
@@ -80,17 +78,6 @@ export default defineComponent({
         .catch((error) => {
           this.linkFormErrors = error;
         });
-    },
-
-    async deleteLink() {
-      if (!(await this.popups.confirm("Confirm to delete this link?"))) {
-        this.$emit("closeDialog");
-        return;
-      }
-      await this.storageAccessor
-        .storedApi()
-        .deleteLink(this.noteTopic.id, this.inverseIcon);
-      this.$emit("closeDialog");
     },
   },
 });
