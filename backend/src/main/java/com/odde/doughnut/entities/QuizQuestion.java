@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
+import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.sql.Timestamp;
@@ -37,7 +38,6 @@ public class QuizQuestion extends EntityIdentifiedByIdOnly {
 
   @Column(name = "correct_answer_index")
   @Getter
-  @Setter
   @JsonIgnore
   private Integer correctAnswerIndex;
 
@@ -56,7 +56,20 @@ public class QuizQuestion extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public MCQWithAnswer getMcqWithAnswer() {
     try {
-      return new ObjectMapper().readValue(this.rawJsonQuestion, MCQWithAnswer.class);
+      MultipleChoicesQuestion mcq =
+          new ObjectMapper().readValue(this.rawJsonQuestion, MultipleChoicesQuestion.class);
+      MCQWithAnswer mcqWithAnswer = new MCQWithAnswer();
+      mcq.populate(mcqWithAnswer);
+      return mcqWithAnswer;
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @JsonIgnore
+  private MultipleChoicesQuestion getMultipleChoicesQuestion() {
+    try {
+      return new ObjectMapper().readValue(this.rawJsonQuestion, MultipleChoicesQuestion.class);
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }
@@ -64,7 +77,7 @@ public class QuizQuestion extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public void setMcqWithAnswer(MCQWithAnswer mcqWithAnswer) {
-    this.rawJsonQuestion = mcqWithAnswer.toJsonString();
+    this.rawJsonQuestion = mcqWithAnswer.cloneQuestion().toJsonString();
     this.correctAnswerIndex = mcqWithAnswer.correctChoiceIndex;
   }
 
@@ -77,7 +90,7 @@ public class QuizQuestion extends EntityIdentifiedByIdOnly {
   }
 
   public String getStem() {
-    return getMcqWithAnswer().stem;
+    return getMultipleChoicesQuestion().stem;
   }
 
   public ImageWithMask getImageWithMask() {
@@ -86,11 +99,11 @@ public class QuizQuestion extends EntityIdentifiedByIdOnly {
   }
 
   public List<Choice> getChoices() {
-    MCQWithAnswer mcqWithAnswer = getMcqWithAnswer();
-    if (mcqWithAnswer.choices == null) {
+    MultipleChoicesQuestion mcq = getMultipleChoicesQuestion();
+    if (mcq.choices == null) {
       return List.of();
     }
-    return mcqWithAnswer.choices.stream()
+    return mcq.choices.stream()
         .map(
             choice -> {
               Choice option = new Choice();

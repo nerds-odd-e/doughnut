@@ -26,6 +26,7 @@ export default defineComponent({
   props: {
     noteId: { type: Number, required: true },
     noteDetails: { type: String, required: false },
+    readonly: { type: Boolean, default: true },
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
       required: true,

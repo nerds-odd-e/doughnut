@@ -18,4 +18,14 @@ public class MultipleChoicesQuestion {
   public String toJsonString() {
     return new ObjectMapper().valueToTree(this).toString();
   }
+
+  public MultipleChoicesQuestion cloneQuestion() {
+    return populate(new MultipleChoicesQuestion());
+  }
+
+  public MultipleChoicesQuestion populate(MultipleChoicesQuestion clone) {
+    clone.stem = stem;
+    clone.choices = choices;
+    return clone;
+  }
 }

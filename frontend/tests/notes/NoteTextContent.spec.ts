@@ -10,10 +10,14 @@ const mockedUpdateTopicCall = vi.fn();
 
 describe("in place edit on title", () => {
   const note = makeMe.aNote.topicConstructor("Dummy Title").please();
-  const mountComponent = (n: Note): VueWrapper<ComponentPublicInstance> => {
+  const mountComponent = (
+    n: Note,
+    readonly: boolean = false,
+  ): VueWrapper<ComponentPublicInstance> => {
     return helper
       .component(NoteTextContent)
       .withStorageProps({
+        readonly,
         note: n,
       })
       .mount();
@@ -50,6 +54,12 @@ describe("in place edit on title", () => {
     await wrapper.find('[role="topic"] input').setValue("updated");
     wrapper.unmount();
     mockUnmounted.mockRestore();
+  });
+
+  it("is not editable when readonly", async () => {
+    const wrapper = mountComponent(note, true);
+    await wrapper.find('[role="topic"]').trigger("click");
+    expect(await wrapper.findAll("input")).toHaveLength(0);
   });
 
   it("should save change when unmount", async () => {

@@ -20,6 +20,7 @@ describe("undo editing", () => {
     const wrapper = helper
       .component(NoteTextContent)
       .withProps({
+        readonly: false,
         note: noteRealm.note,
         storageAccessor: histories,
       })

@@ -2,7 +2,7 @@
   <h2 role="topic" @click="editingLink = true">
     <NoteTopicComp v-bind="{ noteTopic: noteTopic }" />
   </h2>
-  <Modal v-if="editingLink" @close_request="editingLink = false">
+  <Modal v-if="!readonly && editingLink" @close_request="editingLink = false">
     <template #body>
       <LinkNobDialog
         v-bind="{ noteTopic, inverseIcon: false, storageAccessor }"
@@ -22,6 +22,7 @@ import LinkNobDialog from "../../links/LinkNobDialog.vue";
 
 defineProps({
   noteTopic: { type: Object as PropType<NoteTopic>, required: true },
+  readonly: { type: Boolean, default: false },
   storageAccessor: {
     type: Object as PropType<StorageAccessor>,
     required: true,

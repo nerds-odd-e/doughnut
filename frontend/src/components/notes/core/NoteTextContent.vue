@@ -4,16 +4,15 @@
   </div>
   <NoteLinkTopic
     v-if="note.noteTopic.targetNoteTopic"
-    :note-topic="note.noteTopic"
-    :storage-accessor="storageAccessor"
+    v-bind="{ noteTopic: note.noteTopic, readonly, storageAccessor }"
   />
   <NoteEditableTopic
     v-else
-    :note-topic="note.noteTopic"
-    :storage-accessor="storageAccessor"
+    v-bind="{ noteTopic: note.noteTopic, readonly, storageAccessor }"
   />
   <div role="details" class="note-details">
     <NoteEditableDetails
+      v-bind="{ readonly }"
       :note-id="note.id"
       :note-details="note.details"
       :storage-accessor="storageAccessor"

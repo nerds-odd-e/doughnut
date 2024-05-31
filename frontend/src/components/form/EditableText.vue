@@ -1,6 +1,6 @@
 <template>
   <div class="text" @click="startEditing">
-    <template v-if="!isEditing">
+    <template v-if="readonly || !isEditing">
       <InputWithType v-bind="{ scopeName, field, title, errors }">
         <slot v-if="!!modelValue" />
         <SvgEditText v-else />
@@ -36,6 +36,7 @@ export default defineComponent({
     field: String,
     title: String,
     errors: String,
+    readonly: Boolean,
   },
   emits: ["update:modelValue", "blur"],
   components: {
