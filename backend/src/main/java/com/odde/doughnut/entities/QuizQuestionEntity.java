@@ -28,8 +28,6 @@ public abstract class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
   private Note note;
 
   @Column(name = "raw_json_question")
-  @Getter
-  @Setter
   private String rawJsonQuestion;
 
   @Column(name = "created_at")
@@ -40,10 +38,15 @@ public abstract class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public MCQWithAnswer getMcqWithAnswer() {
     try {
-      return new ObjectMapper().readValue(getRawJsonQuestion(), MCQWithAnswer.class);
+      return new ObjectMapper().readValue(this.rawJsonQuestion, MCQWithAnswer.class);
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  @JsonIgnore
+  public void setMcqWithAnswer(MCQWithAnswer mcqWithAnswer) {
+    this.rawJsonQuestion = mcqWithAnswer.toJsonString();
   }
 
   public boolean checkAnswer(Answer answer) {
@@ -66,5 +69,14 @@ public abstract class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
     return null;
   }
 
-  public abstract List<QuizQuestion.Choice> getOptions(ModelFactoryService modelFactoryService);
+  public List<QuizQuestion.Choice> getOptions(ModelFactoryService modelFactoryService) {
+    return getMcqWithAnswer().choices.stream()
+        .map(
+            choice -> {
+              QuizQuestion.Choice option = new QuizQuestion.Choice();
+              option.setDisplay(choice);
+              return option;
+            })
+        .toList();
+  }
 }

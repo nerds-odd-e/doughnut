@@ -27,7 +27,7 @@ public class AiQuestionFactory implements QuizQuestionFactory {
     if (MCQWithAnswer == null) {
       throw new QuizQuestionNotPossibleException();
     }
-    quizQuestionAIQuestion.setRawJsonQuestion(MCQWithAnswer.toJsonString());
+    quizQuestionAIQuestion.setMcqWithAnswer(MCQWithAnswer);
     return quizQuestionAIQuestion;
   }
 }

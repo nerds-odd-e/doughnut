@@ -64,12 +64,4 @@ public abstract class QuizQuestionWithNoteChoices extends QuizQuestionEntity {
     choice.setDisplay(note.getTopicConstructor());
     return choice;
   }
-
-  public ImageWithMask getImageWithMask() {
-    return null;
-  }
-
-  public String getMainTopic() {
-    return null;
-  }
 }
