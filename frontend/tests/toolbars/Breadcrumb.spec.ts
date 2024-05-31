@@ -4,31 +4,30 @@ import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 
 describe("breadcrumb with circles", () => {
+  const parentNote = makeMe.aNote.topicConstructor("parent").please();
+  const child = makeMe.aNote
+    .topicConstructor("child")
+    .underNote(parentNote)
+    .please();
+  const grandChild = makeMe.aNote.underNote(child).please();
+
   it("render the breadcrumber", async () => {
-    const note = makeMe.aNote.please();
     const wrapper = helper
       .component(Breadcrumb)
-      .withProps({ noteTopic: note.noteTopic })
+      .withProps({ noteTopic: parentNote.noteTopic })
       .mount();
     expect(wrapper.find(".breadcrumb-item").text()).toEqual("My Notes");
   });
 
   it("view note belongs to other people in bazaar", async () => {
-    const note = makeMe.aNote.please();
     helper
       .component(Breadcrumb)
-      .withProps({ fromBazaar: true, noteTopic: note.noteTopic })
+      .withProps({ fromBazaar: true, noteTopic: parentNote.noteTopic })
       .render();
     await screen.findByText("Bazaar");
   });
 
   it("show ancestors in correct order", async () => {
-    const parentNote = makeMe.aNote.topicConstructor("parent").please();
-    const child = makeMe.aNote
-      .topicConstructor("child")
-      .underNote(parentNote)
-      .please();
-    const grandChild = makeMe.aNote.underNote(child).please();
     helper
       .component(Breadcrumb)
       .withProps({ noteTopic: grandChild.noteTopic })
