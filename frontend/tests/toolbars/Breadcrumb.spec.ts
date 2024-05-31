@@ -1,5 +1,5 @@
 import { screen } from "@testing-library/vue";
-import Breadcrumb from "@/components/toolbars/Breadcrumb.vue";
+import BreadcrumbWithCircle from "@/components/toolbars/BreadcrumbWithCircle.vue";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 
@@ -13,15 +13,15 @@ describe("breadcrumb with circles", () => {
 
   it("render the breadcrumber", async () => {
     const wrapper = helper
-      .component(Breadcrumb)
-      .withProps({ noteTopic: parentNote.noteTopic })
+      .component(BreadcrumbWithCircle)
+      .withProps({ fromBazaar: false, noteTopic: parentNote.noteTopic })
       .mount();
     expect(wrapper.find(".breadcrumb-item").text()).toEqual("My Notes");
   });
 
   it("view note belongs to other people in bazaar", async () => {
     helper
-      .component(Breadcrumb)
+      .component(BreadcrumbWithCircle)
       .withProps({ fromBazaar: true, noteTopic: parentNote.noteTopic })
       .render();
     await screen.findByText("Bazaar");
@@ -29,8 +29,8 @@ describe("breadcrumb with circles", () => {
 
   it("show ancestors in correct order", async () => {
     helper
-      .component(Breadcrumb)
-      .withProps({ noteTopic: grandChild.noteTopic })
+      .component(BreadcrumbWithCircle)
+      .withProps({ fromBazaar: false, noteTopic: grandChild.noteTopic })
       .render();
     const items = screen.getAllByText(/parent|child/);
     expect(items[0]).toHaveTextContent("parent");

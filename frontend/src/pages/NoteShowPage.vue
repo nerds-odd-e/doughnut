@@ -13,7 +13,7 @@
     <NoteRealmLoader v-bind="{ noteId, storageAccessor }">
       <template #default="{ noteRealm }">
         <ScrollTo />
-        <Breadcrumb
+        <BreadcrumbWithCircle
           v-if="noteRealm"
           v-bind="{
             fromBazaar: noteRealm?.fromBazaar,
@@ -57,7 +57,7 @@ import { PropType, ref } from "vue";
 import { User } from "@/generated/backend";
 import ScrollTo from "@/components/commons/ScrollTo.vue";
 import NoteShow from "../components/notes/NoteShow.vue";
-import Breadcrumb from "../components/toolbars/Breadcrumb.vue";
+import BreadcrumbWithCircle from "../components/toolbars/BreadcrumbWithCircle.vue";
 import { StorageAccessor } from "../store/createNoteStorage";
 
 defineProps({
