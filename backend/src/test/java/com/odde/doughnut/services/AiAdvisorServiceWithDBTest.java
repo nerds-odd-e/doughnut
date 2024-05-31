@@ -6,7 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.QuizQuestionContestResult;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestionEntity;
+import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
@@ -44,7 +44,7 @@ class AiAdvisorServiceWithDBTest {
   @Nested
   class ContestQuestion {
     private OpenAIChatCompletionMock openAIChatCompletionMock;
-    QuizQuestionEntity quizQuestionEntity;
+    QuizQuestion quizQuestion;
     QuestionEvaluation questionEvaluation = new QuestionEvaluation();
 
     @BeforeEach
@@ -62,15 +62,14 @@ class AiAdvisorServiceWithDBTest {
               .correctChoiceIndex(0)
               .please();
       Note note = makeMe.aNote().please();
-      quizQuestionEntity =
-          makeMe.aQuestion().ofAIGeneratedQuestion(aiGeneratedQuestion, note).please();
+      quizQuestion = makeMe.aQuestion().ofAIGeneratedQuestion(aiGeneratedQuestion, note).please();
     }
 
     @Test
     void rejected() {
       openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(questionEvaluation, "");
       QuizQuestionContestResult contest =
-          aiQuestionGenerator.getQuizQuestionContestResult(quizQuestionEntity);
+          aiQuestionGenerator.getQuizQuestionContestResult(quizQuestion);
       assertTrue(contest.rejected);
       Assertions.assertThat(contest.reason)
           .isEqualTo("This seems to be a legitimate question. Please answer it.");
@@ -81,7 +80,7 @@ class AiAdvisorServiceWithDBTest {
       questionEvaluation.feasibleQuestion = false;
       openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(questionEvaluation, "");
       QuizQuestionContestResult contest =
-          aiQuestionGenerator.getQuizQuestionContestResult(quizQuestionEntity);
+          aiQuestionGenerator.getQuizQuestionContestResult(quizQuestion);
       assertFalse(contest.rejected);
     }
 
@@ -91,7 +90,7 @@ class AiAdvisorServiceWithDBTest {
           new ObjectMapper().readTree(""), "");
       assertThrows(
           RuntimeException.class,
-          () -> aiQuestionGenerator.getQuizQuestionContestResult(quizQuestionEntity));
+          () -> aiQuestionGenerator.getQuizQuestionContestResult(quizQuestion));
     }
   }
 }

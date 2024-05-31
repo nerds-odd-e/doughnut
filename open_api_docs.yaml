@@ -2523,6 +2523,9 @@ components:
             $ref: "#/components/schemas/Choice"
         imageWithMask:
           $ref: "#/components/schemas/ImageWithMask"
+        createdAt:
+          type: string
+          format: date-time
     QuizQuestionContestResult:
       type: object
       properties:

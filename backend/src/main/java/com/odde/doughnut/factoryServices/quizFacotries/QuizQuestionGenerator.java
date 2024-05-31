@@ -13,17 +13,17 @@ import org.springframework.web.server.ResponseStatusException;
 public record QuizQuestionGenerator(
     User user, Note note, Randomizer randomizer, ModelFactoryService modelFactoryService) {
 
-  private Optional<QuizQuestionEntity> getQuizQuestionEntity(
+  private Optional<QuizQuestion> getQuizQuestionEntity(
       QuizQuestionFactory quizQuestionFactory, QuizQuestionServant servant) {
     try {
-      QuizQuestionEntity quizQuestion = quizQuestionFactory.buildQuizQuestion(servant);
+      QuizQuestion quizQuestion = quizQuestionFactory.buildQuizQuestion(servant);
       return Optional.of(quizQuestion);
     } catch (QuizQuestionNotPossibleException e) {
       return Optional.empty();
     }
   }
 
-  private QuizQuestionEntity generateAQuestionOfFirstPossibleType(
+  private QuizQuestion generateAQuestionOfFirstPossibleType(
       List<QuizQuestionFactory> quizQuestionFactoryStream, QuizQuestionServant servant) {
     return quizQuestionFactoryStream.stream()
         .map(quizQuestionFactory -> getQuizQuestionEntity(quizQuestionFactory, servant))
@@ -32,9 +32,9 @@ public record QuizQuestionGenerator(
         .orElse(null);
   }
 
-  public QuizQuestionEntity generateAQuestionOfRandomType(AiQuestionGenerator questionGenerator) {
+  public QuizQuestion generateAQuestionOfRandomType(AiQuestionGenerator questionGenerator) {
     QuizQuestionServant servant = new QuizQuestionServant(user, randomizer, modelFactoryService);
-    QuizQuestionEntity result;
+    QuizQuestion result;
 
     List<QuizQuestionFactory> shuffled;
     if (note instanceof HierarchicalNote && user.getAiQuestionTypeOnlyForReview()) {

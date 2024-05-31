@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.odde.doughnut.controllers.dto.QuizQuestion;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -17,8 +16,8 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "quiz_question")
-@JsonPropertyOrder({"id", "stem", "options", "correctAnswerIndex", "mainTopic", "imageWithMask"})
-public class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
+@JsonPropertyOrder({"id", "stem", "headNote", "choices", "imageWithMask"})
+public class QuizQuestion extends EntityIdentifiedByIdOnly {
 
   @ManyToOne(cascade = CascadeType.DETACH)
   @JoinColumn(name = "note_id", referencedColumnName = "id")
@@ -86,7 +85,6 @@ public class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
     return null;
   }
 
-  @JsonIgnore
   public List<Choice> getChoices() {
     MCQWithAnswer mcqWithAnswer = getMcqWithAnswer();
     if (mcqWithAnswer.choices == null) {
@@ -104,12 +102,7 @@ public class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public QuizQuestion getQuizQuestion() {
-    return new QuizQuestion(
-        getId(),
-        getStem(),
-        getNote().getNotebook().getHeadNote(),
-        getChoices(),
-        getImageWithMask());
+    return this;
   }
 
   @NotNull

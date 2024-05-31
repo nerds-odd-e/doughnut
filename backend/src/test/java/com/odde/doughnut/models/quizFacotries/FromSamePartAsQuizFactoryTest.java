@@ -6,7 +6,6 @@ import static org.hamcrest.Matchers.in;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 
-import com.odde.doughnut.controllers.dto.QuizQuestion;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.FromSamePartAsQuizFactory;
 import com.odde.doughnut.models.UserModel;
@@ -118,7 +117,7 @@ class FromSamePartAsQuizFactoryTest {
   }
 
   private List<String> toOptionStrings(QuizQuestion quizQuestion) {
-    List<QuizQuestionEntity.Choice> choices = quizQuestion.getChoices();
-    return choices.stream().map(QuizQuestionEntity.Choice::getDisplay).toList();
+    List<QuizQuestion.Choice> choices = quizQuestion.getChoices();
+    return choices.stream().map(QuizQuestion.Choice::getDisplay).toList();
   }
 }

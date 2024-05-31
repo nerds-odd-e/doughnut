@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.odde.doughnut.controllers.dto.QuizQuestion;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
@@ -217,7 +216,7 @@ class FromDifferentPartAsQuizFactoryTest {
   }
 
   private List<String> toOptionStrings(QuizQuestion quizQuestion) {
-    List<QuizQuestionEntity.Choice> choices = quizQuestion.getChoices();
-    return choices.stream().map(QuizQuestionEntity.Choice::getDisplay).toList();
+    List<QuizQuestion.Choice> choices = quizQuestion.getChoices();
+    return choices.stream().map(QuizQuestion.Choice::getDisplay).toList();
   }
 }

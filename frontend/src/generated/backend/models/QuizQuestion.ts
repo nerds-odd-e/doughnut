@@ -11,5 +11,6 @@ export type QuizQuestion = {
     headNote: Note;
     choices?: Array<Choice>;
     imageWithMask?: ImageWithMask;
+    createdAt?: string;
 };
 

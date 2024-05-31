@@ -1,7 +1,7 @@
 package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestionEntity;
+import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewSetting;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
@@ -17,7 +17,7 @@ public class SpellingQuizFactory extends QuizQuestionFactory {
   }
 
   @Override
-  public QuizQuestionEntity buildQuizQuestion(QuizQuestionServant servant)
+  public QuizQuestion buildQuizQuestion(QuizQuestionServant servant)
       throws QuizQuestionNotPossibleException {
     if (!needSpellingQuiz()) {
       throw new QuizQuestionNotPossibleException();
@@ -38,8 +38,8 @@ public class SpellingQuizFactory extends QuizQuestionFactory {
     return answerNote.getClozeDescription().clozeDetails();
   }
 
-  public QuizQuestionEntity buildSpellingQuestion() {
-    QuizQuestionEntity quizQuestionSpelling = new QuizQuestionEntity();
+  public QuizQuestion buildSpellingQuestion() {
+    QuizQuestion quizQuestionSpelling = new QuizQuestion();
     quizQuestionSpelling.setNote(answerNote);
     quizQuestionSpelling.setCheckSpell(true);
     MCQWithAnswer mcqWithAnswer = new MCQWithAnswer();

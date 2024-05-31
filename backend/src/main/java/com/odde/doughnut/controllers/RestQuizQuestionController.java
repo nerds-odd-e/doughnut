@@ -2,7 +2,6 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.QuestionSuggestionCreationParams;
-import com.odde.doughnut.controllers.dto.QuizQuestion;
 import com.odde.doughnut.controllers.dto.QuizQuestionContestResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -58,27 +57,25 @@ class RestQuizQuestionController {
   @PostMapping("/{quizQuestion}/contest")
   @Transactional
   public QuizQuestionContestResult contest(
-      @PathVariable("quizQuestion") @Schema(type = "integer")
-          QuizQuestionEntity quizQuestionEntity) {
+      @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion) {
     currentUser.assertLoggedIn();
-    return aiQuestionGenerator.getQuizQuestionContestResult(quizQuestionEntity);
+    return aiQuestionGenerator.getQuizQuestionContestResult(quizQuestion);
   }
 
   @PostMapping("/{quizQuestion}/regenerate")
   @Transactional
   public QuizQuestion regenerate(
-      @PathVariable("quizQuestion") @Schema(type = "integer")
-          QuizQuestionEntity quizQuestionEntity) {
+      @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion) {
     currentUser.assertLoggedIn();
-    return generateAIQuestion(quizQuestionEntity.getNote());
+    return generateAIQuestion(quizQuestion.getNote());
   }
 
   private QuizQuestion generateAIQuestion(Note note) {
     AiQuestionFactory aiQuestionFactory = new AiQuestionFactory(note, aiQuestionGenerator);
     try {
-      QuizQuestionEntity quizQuestionEntity = aiQuestionFactory.buildQuizQuestion(null);
-      modelFactoryService.save(quizQuestionEntity);
-      return quizQuestionEntity.getQuizQuestion();
+      QuizQuestion quizQuestion = aiQuestionFactory.buildQuizQuestion(null);
+      modelFactoryService.save(quizQuestion);
+      return quizQuestion;
     } catch (QuizQuestionNotPossibleException e) {
       throw (new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated"));
     }
@@ -87,11 +84,11 @@ class RestQuizQuestionController {
   @PostMapping("/{quizQuestion}/answer")
   @Transactional
   public AnsweredQuestion answerQuiz(
-      @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestionEntity quizQuestionEntity,
+      @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion,
       @Valid @RequestBody AnswerDTO answerDTO) {
     currentUser.assertLoggedIn();
     Answer answer = new Answer();
-    answer.setQuestion(quizQuestionEntity);
+    answer.setQuestion(quizQuestion);
     answer.setFromDTO(answerDTO);
     AnswerModel answerModel = modelFactoryService.toAnswerModel(answer);
     answerModel.makeAnswerToQuestion(
@@ -102,13 +99,13 @@ class RestQuizQuestionController {
   @PostMapping("/{quizQuestion}/suggest-fine-tuning")
   @Transactional
   public SuggestedQuestionForFineTuning suggestQuestionForFineTuning(
-      @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestionEntity quizQuestionEntity,
+      @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion,
       @Valid @RequestBody QuestionSuggestionCreationParams suggestion) {
     SuggestedQuestionForFineTuning sqft = new SuggestedQuestionForFineTuning();
     var suggestedQuestionForFineTuningService =
         modelFactoryService.toSuggestedQuestionForFineTuningService(sqft);
     return suggestedQuestionForFineTuningService.suggestQuestionForFineTuning(
-        quizQuestionEntity,
+        quizQuestion,
         suggestion,
         currentUser.getEntity(),
         testabilitySettings.getCurrentUTCTimestamp());

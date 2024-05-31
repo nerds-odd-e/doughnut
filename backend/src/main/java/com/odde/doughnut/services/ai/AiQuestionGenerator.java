@@ -2,7 +2,7 @@ package com.odde.doughnut.services.ai;
 
 import com.odde.doughnut.controllers.dto.QuizQuestionContestResult;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestionEntity;
+import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
@@ -22,13 +22,11 @@ public record AiQuestionGenerator(
         .getAiGeneratedQuestion();
   }
 
-  public QuizQuestionContestResult getQuizQuestionContestResult(
-      QuizQuestionEntity quizQuestionEntity) {
+  public QuizQuestionContestResult getQuizQuestionContestResult(QuizQuestion quizQuestion) {
     return forNote(
-            quizQuestionEntity.getNote(),
-            globalSettingsService.getGlobalSettingEvaluation().getValue())
-        .evaluateQuestion(quizQuestionEntity.getMcqWithAnswer())
-        .map(e -> e.getQuizQuestionContestResult(quizQuestionEntity.getCorrectAnswerIndex()))
+            quizQuestion.getNote(), globalSettingsService.getGlobalSettingEvaluation().getValue())
+        .evaluateQuestion(quizQuestion.getMcqWithAnswer())
+        .map(e -> e.getQuizQuestionContestResult(quizQuestion.getCorrectAnswerIndex()))
         .orElse(null);
   }
 }

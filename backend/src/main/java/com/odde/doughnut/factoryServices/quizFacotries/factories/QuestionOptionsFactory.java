@@ -1,7 +1,7 @@
 package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestionEntity;
+import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
@@ -17,9 +17,9 @@ public abstract class QuestionOptionsFactory extends QuizQuestionFactory {
   }
 
   @Override
-  public QuizQuestionEntity buildQuizQuestion(QuizQuestionServant servant)
+  public QuizQuestion buildQuizQuestion(QuizQuestionServant servant)
       throws QuizQuestionNotPossibleException {
-    QuizQuestionEntity quizQuestion = new QuizQuestionEntity();
+    QuizQuestion quizQuestion = new QuizQuestion();
     quizQuestion.setNote(note);
     quizQuestion.setHasImage(this instanceof ImageSelectionQuizFactory);
     this.findCategoricalLink(servant);
@@ -39,10 +39,7 @@ public abstract class QuestionOptionsFactory extends QuizQuestionFactory {
     mcqWithAnswer.stem = getStem();
     mcqWithAnswer.correctChoiceIndex = shuffled.indexOf(answerNote);
     mcqWithAnswer.choices =
-        shuffled.stream()
-            .map(this::noteToChoice)
-            .map(QuizQuestionEntity.Choice::getDisplay)
-            .toList();
+        shuffled.stream().map(this::noteToChoice).map(QuizQuestion.Choice::getDisplay).toList();
     quizQuestion.setMcqWithAnswer(mcqWithAnswer);
     return quizQuestion;
   }
@@ -59,8 +56,8 @@ public abstract class QuestionOptionsFactory extends QuizQuestionFactory {
     return 2;
   }
 
-  public QuizQuestionEntity.Choice noteToChoice(Note note) {
-    QuizQuestionEntity.Choice choice = new QuizQuestionEntity.Choice();
+  public QuizQuestion.Choice noteToChoice(Note note) {
+    QuizQuestion.Choice choice = new QuizQuestion.Choice();
     choice.setDisplay(note.getTopicConstructor());
     return choice;
   }

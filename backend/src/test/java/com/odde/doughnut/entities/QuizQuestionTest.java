@@ -8,7 +8,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.odde.doughnut.controllers.dto.QuizQuestion;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionGenerator;
 import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.models.UserModel;
@@ -67,7 +66,7 @@ class QuizQuestionTest {
   class ClozeSelectionQuiz {
     private List<String> getOptions(Note note) {
       QuizQuestion quizQuestion = generateQuizQuestion(note);
-      return quizQuestion.getChoices().stream().map(QuizQuestionEntity.Choice::getDisplay).toList();
+      return quizQuestion.getChoices().stream().map(QuizQuestion.Choice::getDisplay).toList();
     }
 
     @Test
@@ -142,18 +141,17 @@ class QuizQuestionTest {
       userModel.getEntity().setAiQuestionTypeOnlyForReview(true);
       AiQuestionGenerator questionGenerator = mock(AiQuestionGenerator.class);
       when(questionGenerator.getAiGeneratedQuestion(any())).thenReturn(mcqWithAnswer);
-      QuizQuestionEntity randomQuizQuestion =
+      QuizQuestion randomQuizQuestion =
           generateQuizQuestion(note, new RealRandomizer(), questionGenerator);
-      assertThat(randomQuizQuestion, instanceOf(QuizQuestionEntity.class));
+      assertThat(randomQuizQuestion, instanceOf(QuizQuestion.class));
       QuizQuestion qq = randomQuizQuestion.getQuizQuestion();
-      assertThat(qq.stem, containsString(mcqWithAnswer.stem));
+      assertThat(qq.getStem(), containsString(mcqWithAnswer.stem));
     }
 
     @Test
     void shouldReturnTheSameType() {
-      QuizQuestionEntity randomQuizQuestion =
-          generateQuizQuestion(note, new RealRandomizer(), null);
-      Set<Class<? extends QuizQuestionEntity>> types = new HashSet<>();
+      QuizQuestion randomQuizQuestion = generateQuizQuestion(note, new RealRandomizer(), null);
+      Set<Class<? extends QuizQuestion>> types = new HashSet<>();
       for (int i = 0; i < 3; i++) {
         types.add(randomQuizQuestion.getClass());
       }
@@ -164,8 +162,7 @@ class QuizQuestionTest {
     void shouldChooseTypeRandomly() {
       int spellingCount = 0;
       for (int i = 0; i < 20; i++) {
-        QuizQuestionEntity randomQuizQuestion =
-            generateQuizQuestion(note, new RealRandomizer(), null);
+        QuizQuestion randomQuizQuestion = generateQuizQuestion(note, new RealRandomizer(), null);
         if (randomQuizQuestion.getCheckSpell() != null && randomQuizQuestion.getCheckSpell()) {
           spellingCount++;
         }
@@ -175,7 +172,7 @@ class QuizQuestionTest {
     }
   }
 
-  private QuizQuestionEntity generateQuizQuestion(
+  private QuizQuestion generateQuizQuestion(
       Note note, Randomizer randomizer1, AiQuestionGenerator aiQuestionGenerator) {
     QuizQuestionGenerator quizQuestionGenerator =
         new QuizQuestionGenerator(
@@ -183,7 +180,7 @@ class QuizQuestionTest {
     return quizQuestionGenerator.generateAQuestionOfRandomType(aiQuestionGenerator);
   }
 
-  private QuizQuestionEntity generateQuizQuestionEntity(Note note) {
+  private QuizQuestion generateQuizQuestionEntity(Note note) {
     return generateQuizQuestion(note, randomizer, null);
   }
 

@@ -3,9 +3,9 @@ package com.odde.doughnut.models.quizFacotries;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-import com.odde.doughnut.controllers.dto.QuizQuestion;
 import com.odde.doughnut.entities.LinkingNote;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.ClozeLinkTargetQuizFactory;
 import com.odde.doughnut.models.UserModel;

@@ -36,7 +36,7 @@ public class AnswerBuilder extends EntityBuilder<Answer> {
     return this;
   }
 
-  public AnswerBuilder forQuestion(QuizQuestionEntity quizQuestion) {
+  public AnswerBuilder forQuestion(QuizQuestion quizQuestion) {
     entity.setQuestion(quizQuestion);
     return this;
   }

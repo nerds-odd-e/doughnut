@@ -2,7 +2,7 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.controllers.dto.QuestionSuggestionCreationParams;
 import com.odde.doughnut.controllers.dto.QuestionSuggestionParams;
-import com.odde.doughnut.entities.QuizQuestionEntity;
+import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -28,7 +28,7 @@ public class SuggestedQuestionForFineTuningModel {
   }
 
   public SuggestedQuestionForFineTuning suggestQuestionForFineTuning(
-      QuizQuestionEntity quizQuestion,
+      QuizQuestion quizQuestion,
       QuestionSuggestionCreationParams suggestionCreationParams,
       User user,
       Timestamp currentUTCTimestamp) {

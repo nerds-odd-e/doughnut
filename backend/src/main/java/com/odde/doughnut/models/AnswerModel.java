@@ -29,7 +29,7 @@ public class AnswerModel {
     return answerResult;
   }
 
-  private QuizQuestionEntity getQuestion() {
+  private QuizQuestion getQuestion() {
     return answer.getQuestion();
   }
 

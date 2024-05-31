@@ -31,8 +31,8 @@ public class LinkSourceWithinSameLinkTypeQuizFactory extends QuestionOptionsFact
   }
 
   @Override
-  public QuizQuestionEntity.Choice noteToChoice(Note note) {
-    QuizQuestionEntity.Choice choice = new QuizQuestionEntity.Choice();
+  public QuizQuestion.Choice noteToChoice(Note note) {
+    QuizQuestion.Choice choice = new QuizQuestion.Choice();
     Note source = note.getParent();
     Note target = note.getTargetNote();
     choice.setDisplay(

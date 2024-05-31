@@ -1,8 +1,7 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.dto.QuizQuestion;
 import com.odde.doughnut.controllers.dto.SelfEvaluation;
-import com.odde.doughnut.entities.QuizQuestionEntity;
+import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -62,9 +61,9 @@ class RestReviewPointController {
     QuizQuestionGenerator quizQuestionGenerator =
         new QuizQuestionGenerator(
             reviewPoint.getUser(), reviewPoint.getNote(), randomizer, modelFactoryService);
-    QuizQuestionEntity quizQuestionEntity =
+    QuizQuestion quizQuestion =
         quizQuestionGenerator.generateAQuestionOfRandomType(questionGenerator);
-    return quizQuestionEntity.getQuizQuestion();
+    return quizQuestion.getQuizQuestion();
   }
 
   @PostMapping(path = "/{reviewPoint}/remove")

@@ -10,7 +10,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.QuestionSuggestionCreationParams;
-import com.odde.doughnut.controllers.dto.QuizQuestion;
 import com.odde.doughnut.controllers.dto.QuizQuestionContestResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -69,7 +68,7 @@ class RestQuizQuestionControllerTests {
   @Nested
   class answer {
     ReviewPoint reviewPoint;
-    QuizQuestionEntity quizQuestionEntity;
+    QuizQuestion quizQuestion;
     AnswerDTO answerDTO = new AnswerDTO();
 
     @BeforeEach
@@ -81,14 +80,14 @@ class RestQuizQuestionControllerTests {
               .by(currentUser)
               .forgettingCurveAndNextReviewAt(200)
               .please();
-      quizQuestionEntity = makeMe.aQuestion().spellingQuestionOfReviewPoint(answerNote).please();
+      quizQuestion = makeMe.aQuestion().spellingQuestionOfReviewPoint(answerNote).please();
       answerDTO.setSpellingAnswer(answerNote.getTopicConstructor());
     }
 
     @Test
     void shouldValidateTheAnswerAndUpdateReviewPoint() {
       Integer oldRepetitionCount = reviewPoint.getRepetitionCount();
-      AnsweredQuestion answerResult = controller.answerQuiz(quizQuestionEntity, answerDTO);
+      AnsweredQuestion answerResult = controller.answerQuiz(quizQuestion, answerDTO);
       assertTrue(answerResult.correct);
       assertThat(reviewPoint.getRepetitionCount(), greaterThan(oldRepetitionCount));
     }
@@ -97,7 +96,7 @@ class RestQuizQuestionControllerTests {
     void shouldNoteIncreaseIndexIfRepeatImmediately() {
       testabilitySettings.timeTravelTo(reviewPoint.getLastReviewedAt());
       Integer oldForgettingCurveIndex = reviewPoint.getForgettingCurveIndex();
-      controller.answerQuiz(quizQuestionEntity, answerDTO);
+      controller.answerQuiz(quizQuestion, answerDTO);
       assertThat(reviewPoint.getForgettingCurveIndex(), equalTo(oldForgettingCurveIndex));
     }
 
@@ -105,7 +104,7 @@ class RestQuizQuestionControllerTests {
     void shouldIncreaseTheIndex() {
       testabilitySettings.timeTravelTo(reviewPoint.getNextReviewAt());
       Integer oldForgettingCurveIndex = reviewPoint.getForgettingCurveIndex();
-      controller.answerQuiz(quizQuestionEntity, answerDTO);
+      controller.answerQuiz(quizQuestion, answerDTO);
       assertThat(reviewPoint.getForgettingCurveIndex(), greaterThan(oldForgettingCurveIndex));
       assertThat(
           reviewPoint.getLastReviewedAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
@@ -116,14 +115,14 @@ class RestQuizQuestionControllerTests {
       AnswerDTO answer = new AnswerDTO();
       assertThrows(
           ResponseStatusException.class,
-          () -> nullUserController().answerQuiz(quizQuestionEntity, answer));
+          () -> nullUserController().answerQuiz(quizQuestion, answer));
     }
 
     @Nested
     class WrongAnswer {
       @BeforeEach
       void setup() {
-        quizQuestionEntity =
+        quizQuestion =
             makeMe.aQuestion().spellingQuestionOfReviewPoint(reviewPoint.getNote()).please();
         answerDTO.setSpellingAnswer("wrong");
       }
@@ -132,7 +131,7 @@ class RestQuizQuestionControllerTests {
       void shouldValidateTheWrongAnswer() {
         testabilitySettings.timeTravelTo(reviewPoint.getNextReviewAt());
         Integer oldRepetitionCount = reviewPoint.getRepetitionCount();
-        AnsweredQuestion answerResult = controller.answerQuiz(quizQuestionEntity, answerDTO);
+        AnsweredQuestion answerResult = controller.answerQuiz(quizQuestion, answerDTO);
         assertFalse(answerResult.correct);
         assertThat(reviewPoint.getRepetitionCount(), greaterThan(oldRepetitionCount));
       }
@@ -142,14 +141,14 @@ class RestQuizQuestionControllerTests {
         testabilitySettings.timeTravelTo(reviewPoint.getNextReviewAt());
         Timestamp lastReviewedAt = reviewPoint.getLastReviewedAt();
         Integer oldForgettingCurveIndex = reviewPoint.getForgettingCurveIndex();
-        controller.answerQuiz(quizQuestionEntity, answerDTO);
+        controller.answerQuiz(quizQuestion, answerDTO);
         assertThat(reviewPoint.getForgettingCurveIndex(), lessThan(oldForgettingCurveIndex));
         assertThat(reviewPoint.getLastReviewedAt(), equalTo(lastReviewedAt));
       }
 
       @Test
       void shouldRepeatTheNextDay() {
-        controller.answerQuiz(quizQuestionEntity, answerDTO);
+        controller.answerQuiz(quizQuestion, answerDTO);
         assertThat(
             reviewPoint.getNextReviewAt(),
             lessThan(
@@ -161,7 +160,7 @@ class RestQuizQuestionControllerTests {
 
   @Nested
   class SuggestQuestionForFineTuning {
-    QuizQuestionEntity quizQuestionEntity;
+    QuizQuestion quizQuestion;
     MCQWithAnswer mcqWithAnswer;
     Note note;
 
@@ -175,18 +174,17 @@ class RestQuizQuestionControllerTests {
     void setup() throws QuizQuestionNotPossibleException {
       note = makeMe.aNote().creatorAndOwner(currentUser).please();
       mcqWithAnswer = makeMe.aMCQWithAnswer().please();
-      quizQuestionEntity = makeMe.aQuestion().ofAIGeneratedQuestion(mcqWithAnswer, note).please();
+      quizQuestion = makeMe.aQuestion().ofAIGeneratedQuestion(mcqWithAnswer, note).please();
     }
 
     @Test
     void suggestQuestionWithAPositiveFeedback() {
 
       SuggestedQuestionForFineTuning suggestedQuestionForFineTuning =
-          controller.suggestQuestionForFineTuning(
-              quizQuestionEntity, suggestionWithPositiveFeedback);
+          controller.suggestQuestionForFineTuning(quizQuestion, suggestionWithPositiveFeedback);
       assert suggestedQuestionForFineTuning != null;
       assertEquals(
-          quizQuestionEntity.getMcqWithAnswer().toJsonString(),
+          quizQuestion.getMcqWithAnswer().toJsonString(),
           suggestedQuestionForFineTuning.getPreservedQuestion().toJsonString());
       assertEquals("this is a comment", suggestedQuestionForFineTuning.getComment());
       assertTrue(suggestedQuestionForFineTuning.isPositiveFeedback(), "Incorrect Feedback");
@@ -196,11 +194,10 @@ class RestQuizQuestionControllerTests {
     @Test
     void suggestQuestionWithANegativeFeedback() {
       SuggestedQuestionForFineTuning suggestedQuestionForFineTuning =
-          controller.suggestQuestionForFineTuning(
-              quizQuestionEntity, suggestionWithNegativeFeedback);
+          controller.suggestQuestionForFineTuning(quizQuestion, suggestionWithNegativeFeedback);
       assert suggestedQuestionForFineTuning != null;
       assertEquals(
-          quizQuestionEntity.getMcqWithAnswer().toJsonString(),
+          quizQuestion.getMcqWithAnswer().toJsonString(),
           suggestedQuestionForFineTuning.getPreservedQuestion().toJsonString());
       assertEquals("this is a comment", suggestedQuestionForFineTuning.getComment());
       assertFalse(suggestedQuestionForFineTuning.isPositiveFeedback(), "Incorrect Feedback");
@@ -210,8 +207,7 @@ class RestQuizQuestionControllerTests {
     @Test
     void suggestQuestionWithSnapshotQuestionStem() {
       var suggestedQuestionForFineTuning =
-          controller.suggestQuestionForFineTuning(
-              quizQuestionEntity, suggestionWithPositiveFeedback);
+          controller.suggestQuestionForFineTuning(quizQuestion, suggestionWithPositiveFeedback);
       assert suggestedQuestionForFineTuning != null;
       assertThat(
           suggestedQuestionForFineTuning.getPreservedQuestion().stem, equalTo(mcqWithAnswer.stem));
@@ -220,7 +216,7 @@ class RestQuizQuestionControllerTests {
     @Test
     void createMarkedQuestionInDatabase() {
       long oldCount = modelFactoryService.questionSuggestionForFineTuningRepository.count();
-      controller.suggestQuestionForFineTuning(quizQuestionEntity, suggestionWithPositiveFeedback);
+      controller.suggestQuestionForFineTuning(quizQuestion, suggestionWithPositiveFeedback);
       assertThat(
           modelFactoryService.questionSuggestionForFineTuningRepository.count(),
           equalTo(oldCount + 1));
@@ -264,7 +260,8 @@ class RestQuizQuestionControllerTests {
       openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(jsonQuestion, "");
       QuizQuestion quizQuestion = controller.generateQuestion(note);
 
-      Assertions.assertThat(quizQuestion.stem).contains("What is the first color in the rainbow?");
+      Assertions.assertThat(quizQuestion.getStem())
+          .contains("What is the first color in the rainbow?");
     }
 
     @Test
@@ -292,14 +289,14 @@ class RestQuizQuestionControllerTests {
 
   @Nested
   class RegenerateQuestion {
-    QuizQuestionEntity quizQuestionEntity;
+    QuizQuestion quizQuestion;
     Note note;
 
     @BeforeEach
     void setUp() {
       note = makeMe.aNote().please();
 
-      quizQuestionEntity = makeMe.aQuestion().spellingQuestionOfNote(note).please();
+      quizQuestion = makeMe.aQuestion().spellingQuestionOfNote(note).please();
     }
 
     @Test
@@ -313,7 +310,7 @@ class RestQuizQuestionControllerTests {
                     makeMe.modelFactoryService,
                     makeMe.aNullUserModel(),
                     testabilitySettings);
-            restAiController.regenerate(quizQuestionEntity);
+            restAiController.regenerate(quizQuestion);
           });
     }
 
@@ -323,15 +320,16 @@ class RestQuizQuestionControllerTests {
           makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
 
       openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(jsonQuestion, "");
-      QuizQuestion quizQuestion = controller.regenerate(quizQuestionEntity);
+      QuizQuestion quizQuestion = controller.regenerate(this.quizQuestion);
 
-      Assertions.assertThat(quizQuestion.stem).contains("What is the first color in the rainbow?");
+      Assertions.assertThat(quizQuestion.getStem())
+          .contains("What is the first color in the rainbow?");
     }
   }
 
   @Nested
   class Contest {
-    QuizQuestionEntity quizQuestionEntity;
+    QuizQuestion quizQuestion;
     QuestionEvaluation questionEvaluation = new QuestionEvaluation();
 
     @BeforeEach
@@ -342,8 +340,7 @@ class RestQuizQuestionControllerTests {
 
       MCQWithAnswer aiGeneratedQuestion = makeMe.aMCQWithAnswer().please();
       Note note = makeMe.aNote().please();
-      quizQuestionEntity =
-          makeMe.aQuestion().ofAIGeneratedQuestion(aiGeneratedQuestion, note).please();
+      quizQuestion = makeMe.aQuestion().ofAIGeneratedQuestion(aiGeneratedQuestion, note).please();
     }
 
     @Test
@@ -357,14 +354,14 @@ class RestQuizQuestionControllerTests {
                     makeMe.modelFactoryService,
                     makeMe.aNullUserModel(),
                     testabilitySettings);
-            restAiController.contest(quizQuestionEntity);
+            restAiController.contest(quizQuestion);
           });
     }
 
     @Test
     void rejected() {
       openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(questionEvaluation, "");
-      QuizQuestionContestResult contest = controller.contest(quizQuestionEntity);
+      QuizQuestionContestResult contest = controller.contest(quizQuestion);
       assertTrue(contest.rejected);
     }
 
@@ -375,7 +372,7 @@ class RestQuizQuestionControllerTests {
       globalSettingsService
           .getGlobalSettingEvaluation()
           .setKeyValue(makeMe.aTimestamp().please(), "gpt-new");
-      controller.contest(quizQuestionEntity);
+      controller.contest(quizQuestion);
       ArgumentCaptor<ChatCompletionRequest> argumentCaptor =
           ArgumentCaptor.forClass(ChatCompletionRequest.class);
       verify(openAiApi, times(1)).createChatCompletion(argumentCaptor.capture());
@@ -386,7 +383,7 @@ class RestQuizQuestionControllerTests {
     void acceptTheContest() {
       questionEvaluation.feasibleQuestion = false;
       openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(questionEvaluation, "");
-      QuizQuestionContestResult contest = controller.contest(quizQuestionEntity);
+      QuizQuestionContestResult contest = controller.contest(quizQuestion);
       assertFalse(contest.rejected);
     }
   }
