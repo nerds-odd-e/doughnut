@@ -50,4 +50,9 @@ public class LinkSourceWithinSameLinkTypeQuizFactory extends QuestionOptionsFact
             .clozeTitle());
     return choice;
   }
+
+  @Override
+  public String getStem() {
+    return "Which one <em>is immediately " + link.getLinkType().label + "</em>:";
+  }
 }

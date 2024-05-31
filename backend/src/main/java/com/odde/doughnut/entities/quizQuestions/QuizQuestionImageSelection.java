@@ -11,8 +11,4 @@ public class QuizQuestionImageSelection extends QuizQuestionWithNoteChoices {
   public String getMainTopic() {
     return getNote().getTopicConstructor();
   }
-
-  public String getStem() {
-    return "";
-  }
 }

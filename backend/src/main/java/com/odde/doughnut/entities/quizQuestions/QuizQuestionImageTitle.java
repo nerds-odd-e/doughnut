@@ -13,10 +13,6 @@ public class QuizQuestionImageTitle extends QuizQuestionWithNoteChoices {
     return getNote().getImageWithMask();
   }
 
-  public String getStem() {
-    return getNote().getClozeDescription().clozeDetails();
-  }
-
   public String getMainTopic() {
     return "";
   }

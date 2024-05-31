@@ -2,8 +2,13 @@ package com.odde.doughnut.factoryServices.quizFacotries;
 
 import com.odde.doughnut.entities.QuizQuestionEntity;
 
-public interface QuizQuestionFactory {
+public abstract class QuizQuestionFactory {
+  public String getStem() {
+    return "";
+  }
 
-  QuizQuestionEntity buildQuizQuestion(QuizQuestionServant servant)
-      throws QuizQuestionNotPossibleException;
+  public QuizQuestionEntity buildQuizQuestion(QuizQuestionServant servant)
+      throws QuizQuestionNotPossibleException {
+    return null;
+  }
 }

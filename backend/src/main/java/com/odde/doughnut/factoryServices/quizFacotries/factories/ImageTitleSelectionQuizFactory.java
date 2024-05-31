@@ -24,4 +24,9 @@ public class ImageTitleSelectionQuizFactory extends ClozeTitleSelectionQuizFacto
     quizQuestionImageTitle.setNote(note);
     return quizQuestionImageTitle;
   }
+
+  @Override
+  public String getStem() {
+    return note.getClozeDescription().clozeDetails();
+  }
 }

@@ -1,5 +1,6 @@
 package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
+import com.odde.doughnut.algorithms.ClozedString;
 import com.odde.doughnut.entities.LinkingNote;
 import com.odde.doughnut.entities.quizQuestions.QuizQuestionDescriptionLinkTarget;
 import com.odde.doughnut.entities.quizQuestions.QuizQuestionWithNoteChoices;
@@ -26,5 +27,15 @@ public class DescriptionLinkTargetQuizFactory extends LinkTargetQuizFactory {
         new QuizQuestionDescriptionLinkTarget();
     quizQuestionDescriptionLinkTarget.setNote(link);
     return quizQuestionDescriptionLinkTarget;
+  }
+
+  @Override
+  public String getStem() {
+    ClozedString clozeDescription =
+        link.getParent().getClozeDescription().hide(link.getTargetNote().getNoteTitle());
+    return "<p>The following descriptions is "
+        + link.getLinkType().label
+        + ":</p>"
+        + clozeDescription.clozeDetails();
   }
 }

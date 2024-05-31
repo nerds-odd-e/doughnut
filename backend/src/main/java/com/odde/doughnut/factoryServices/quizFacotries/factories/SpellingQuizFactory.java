@@ -7,8 +7,9 @@ import com.odde.doughnut.entities.quizQuestions.QuizQuestionSpelling;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
+import com.odde.doughnut.services.ai.MCQWithAnswer;
 
-public class SpellingQuizFactory implements QuizQuestionFactory {
+public class SpellingQuizFactory extends QuizQuestionFactory {
 
   protected final Note answerNote;
 
@@ -22,9 +23,7 @@ public class SpellingQuizFactory implements QuizQuestionFactory {
     if (!needSpellingQuiz()) {
       throw new QuizQuestionNotPossibleException();
     }
-    QuizQuestionSpelling quizQuestionSpelling = new QuizQuestionSpelling();
-    quizQuestionSpelling.setNote(answerNote);
-    return quizQuestionSpelling;
+    return buildSpellingQuestion();
   }
 
   private boolean needSpellingQuiz() {
@@ -33,5 +32,19 @@ public class SpellingQuizFactory implements QuizQuestionFactory {
     }
     ReviewSetting reviewSetting = answerNote.getReviewSetting();
     return reviewSetting != null && reviewSetting.getRememberSpelling();
+  }
+
+  @Override
+  public String getStem() {
+    return answerNote.getClozeDescription().clozeDetails();
+  }
+
+  public QuizQuestionSpelling buildSpellingQuestion() {
+    QuizQuestionSpelling quizQuestionSpelling = new QuizQuestionSpelling();
+    quizQuestionSpelling.setNote(answerNote);
+    MCQWithAnswer mcqWithAnswer = new MCQWithAnswer();
+    mcqWithAnswer.stem = getStem();
+    quizQuestionSpelling.setMcqWithAnswer(mcqWithAnswer);
+    return quizQuestionSpelling;
   }
 }

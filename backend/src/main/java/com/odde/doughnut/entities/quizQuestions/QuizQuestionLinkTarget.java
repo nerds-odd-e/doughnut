@@ -7,14 +7,6 @@ import jakarta.persistence.Entity;
 @DiscriminatorValue("5")
 public class QuizQuestionLinkTarget extends QuizQuestionWithNoteChoices {
 
-  public String getStem() {
-    return "<mark>"
-        + getNote().getParent().getTopicConstructor()
-        + "</mark> is "
-        + getNote().getLinkType().label
-        + ":";
-  }
-
   public String getMainTopic() {
     return "";
   }

@@ -6,10 +6,6 @@ import jakarta.persistence.*;
 @DiscriminatorValue("1")
 public class QuizQuestionClozeSelection extends QuizQuestionWithNoteChoices {
 
-  public String getStem() {
-    return getNote().getClozeDescription().clozeDetails();
-  }
-
   public String getMainTopic() {
     return "";
   }

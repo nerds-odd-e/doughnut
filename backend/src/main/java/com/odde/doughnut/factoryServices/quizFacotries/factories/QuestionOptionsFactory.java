@@ -11,7 +11,7 @@ import com.odde.doughnut.services.ai.MCQWithAnswer;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class QuestionOptionsFactory implements QuizQuestionFactory {
+public abstract class QuestionOptionsFactory extends QuizQuestionFactory {
   @Override
   public QuizQuestionEntity buildQuizQuestion(QuizQuestionServant servant)
       throws QuizQuestionNotPossibleException {
@@ -29,7 +29,7 @@ public abstract class QuestionOptionsFactory implements QuizQuestionFactory {
     optionsEntities.add(answerNote);
     List<Note> shuffled = servant.randomizer.shuffle(optionsEntities);
     MCQWithAnswer mcqWithAnswer = new MCQWithAnswer();
-    mcqWithAnswer.stem = quizQuestion.getStem();
+    mcqWithAnswer.stem = getStem();
     mcqWithAnswer.correctChoiceIndex = shuffled.indexOf(answerNote);
     mcqWithAnswer.choices =
         shuffled.stream().map(this::noteToChoice).map(QuizQuestion.Choice::getDisplay).toList();

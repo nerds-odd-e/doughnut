@@ -36,4 +36,13 @@ public class LinkTargetQuizFactory extends QuestionOptionsFactory {
     quizQuestion.setNote(link);
     return quizQuestion;
   }
+
+  @Override
+  public String getStem() {
+    return "<mark>"
+        + link.getParent().getTopicConstructor()
+        + "</mark> is "
+        + link.getLinkType().label
+        + ":";
+  }
 }

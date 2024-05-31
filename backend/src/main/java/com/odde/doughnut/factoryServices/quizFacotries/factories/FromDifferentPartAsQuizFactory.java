@@ -49,4 +49,15 @@ public class FromDifferentPartAsQuizFactory extends QuestionOptionsFactory {
         .map(Note::getParent)
         .orElse(null);
   }
+
+  @Override
+  public String getStem() {
+    return "<p>Which one <mark>is "
+        + link.getLinkType().label
+        + "</mark> a <em>DIFFERENT</em> "
+        + parentGrandLink.getLinkType().nameOfSource
+        + " of <mark>"
+        + parentGrandLink.getTargetNote().getTopicConstructor()
+        + "</mark> than:";
+  }
 }

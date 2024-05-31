@@ -32,4 +32,9 @@ public class LinkSourceQuizFactory extends QuestionOptionsFactory {
     quizQuestion.setNote(link);
     return quizQuestion;
   }
+
+  @Override
+  public String getStem() {
+    return "Which one <em>is immediately " + link.getLinkType().label + "</em>:";
+  }
 }

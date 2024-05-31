@@ -9,7 +9,7 @@ import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 
-public class AiQuestionFactory implements QuizQuestionFactory {
+public class AiQuestionFactory extends QuizQuestionFactory {
   private Note note;
   AiQuestionGenerator aiQuestionGenerator;
 

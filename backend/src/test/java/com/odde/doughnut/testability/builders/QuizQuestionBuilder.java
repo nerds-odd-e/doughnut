@@ -9,6 +9,7 @@ import com.odde.doughnut.entities.quizQuestions.QuizQuestionSpelling;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
+import com.odde.doughnut.factoryServices.quizFacotries.factories.SpellingQuizFactory;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.EntityBuilder;
@@ -46,8 +47,8 @@ public class QuizQuestionBuilder extends EntityBuilder<QuizQuestionEntity> {
   }
 
   public QuizQuestionBuilder spellingQuestionOfReviewPoint(Note note) {
-    QuizQuestionSpelling quizQuestionSpelling = new QuizQuestionSpelling();
-    quizQuestionSpelling.setNote(note);
+    QuizQuestionSpelling quizQuestionSpelling =
+        new SpellingQuizFactory(note).buildSpellingQuestion();
     this.entity = quizQuestionSpelling;
     return this;
   }

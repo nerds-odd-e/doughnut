@@ -11,9 +11,4 @@ public class QuizQuestionLinkSourceWithSameLinkType extends QuizQuestionWithNote
   public String getMainTopic() {
     return getNote().getTargetNote().getTopicConstructor();
   }
-
-  @Override
-  public String getStem() {
-    return "Which one <em>is immediately " + getNote().getLinkType().label + "</em>:";
-  }
 }

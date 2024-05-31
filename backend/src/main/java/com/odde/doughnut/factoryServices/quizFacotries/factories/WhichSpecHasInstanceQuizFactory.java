@@ -41,4 +41,16 @@ public class WhichSpecHasInstanceQuizFactory extends QuestionOptionsFactory {
     if (instanceLink == null) return null;
     return instanceLink.getParent();
   }
+
+  public String getStem() {
+    return "<p>Which one is "
+        + link.getLinkType().label
+        + " <mark>"
+        + link.getTargetNote().getTopicConstructor()
+        + "</mark> <em>and</em> is "
+        + instanceLink.getLinkType().label
+        + " <mark>"
+        + instanceLink.getTargetNote().getTopicConstructor()
+        + "</mark>:";
+  }
 }

@@ -22,10 +22,6 @@ public class QuizQuestionSpelling extends QuizQuestionEntity {
     return List.of();
   }
 
-  public String getStem() {
-    return getNote().getClozeDescription().clozeDetails();
-  }
-
   public String getMainTopic() {
     return "";
   }

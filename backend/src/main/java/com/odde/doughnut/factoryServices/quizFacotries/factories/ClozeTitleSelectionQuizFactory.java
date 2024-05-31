@@ -38,4 +38,9 @@ public class ClozeTitleSelectionQuizFactory extends QuestionOptionsFactory {
     quizQuestionClozeSelection.setNote(note);
     return quizQuestionClozeSelection;
   }
+
+  @Override
+  public String getStem() {
+    return note.getClozeDescription().clozeDetails();
+  }
 }

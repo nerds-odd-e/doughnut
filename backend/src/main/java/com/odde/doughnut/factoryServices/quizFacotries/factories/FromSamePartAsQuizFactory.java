@@ -52,4 +52,15 @@ public class FromSamePartAsQuizFactory extends QuestionOptionsFactory {
     }
     return cachedAnswerLink;
   }
+
+  @Override
+  public String getStem() {
+    return "<p>Which one <mark>is "
+        + link.getLinkType().label
+        + "</mark> the same "
+        + parentGrandLink.getLinkType().nameOfSource
+        + " of <mark>"
+        + parentGrandLink.getTargetNote().getTopicConstructor()
+        + "</mark> as:";
+  }
 }
