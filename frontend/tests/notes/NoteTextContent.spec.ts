@@ -59,7 +59,30 @@ describe("in place edit on title", () => {
   it("is not editable when readonly", async () => {
     const wrapper = mountComponent(note, true);
     await wrapper.find('[role="topic"]').trigger("click");
-    expect(await wrapper.findAll("input")).toHaveLength(0);
+    expect(wrapper.findAll("input")).toHaveLength(0);
+  });
+
+  const getPlaceholder = (wrapper: VueWrapper<ComponentPublicInstance>) => {
+    return wrapper.get("[data-placeholder]").attributes("data-placeholder");
+  };
+
+  it("should prompt people to add details", async () => {
+    note.details = "";
+    const wrapper = mountComponent(note);
+    const placeholder = getPlaceholder(wrapper);
+    expect(placeholder).toBe("Enter note details here...");
+  });
+
+  it("should not prompt people to add details if readonly", async () => {
+    note.details = "";
+    const wrapper = mountComponent(note, true);
+    try {
+      getPlaceholder(wrapper);
+      expect(true, "there should not be placehodler for readonly").toBe(false);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (e: any) {
+      expect(e.message).toContain("Unable to get");
+    }
   });
 
   it("should save change when unmount", async () => {

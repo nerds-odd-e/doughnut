@@ -46,7 +46,7 @@ export default defineComponent({
             },
           },
         },
-        placeholder: "Enter note details here...",
+        placeholder: this.readonly ? "" : "Enter note details here...",
       },
       localValue: this.modelValue,
       hadFocus: false as boolean,
