@@ -2,8 +2,8 @@ package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.entities.LinkingNote;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.quizQuestions.QuizQuestionWhichSpecHasInstance;
-import com.odde.doughnut.entities.quizQuestions.QuizQuestionWithNoteChoices;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import java.util.List;
 
@@ -17,13 +17,12 @@ public class WhichSpecHasInstanceQuizFactory extends QuestionOptionsFactory {
   }
 
   @Override
-  public QuizQuestionWithNoteChoices buildQuizQuestionObj(QuizQuestionServant servant) {
+  public QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant) {
     List<LinkingNote> candidates = servant.getLinksFromSameSourceHavingReviewPoint(link).toList();
     instanceLink = servant.randomizer.chooseOneRandomly(candidates).orElse(null);
     QuizQuestionWhichSpecHasInstance quizQuestionWhichSpecHasInstance =
         new QuizQuestionWhichSpecHasInstance();
     quizQuestionWhichSpecHasInstance.setNote(link);
-    quizQuestionWhichSpecHasInstance.setCategoryLink(instanceLink);
     return quizQuestionWhichSpecHasInstance;
   }
 

@@ -21,7 +21,6 @@ public class FromSamePartAsQuizFactory extends QuestionOptionsFactory {
     QuizQuestionFromSamePartAs quizQuestionFromSamePartAs = new QuizQuestionFromSamePartAs();
     quizQuestionFromSamePartAs.setNote(link);
     this.parentGrandLink = servant.getParentGrandLink(link);
-    quizQuestionFromSamePartAs.setCategoryLink(parentGrandLink);
     return quizQuestionFromSamePartAs;
   }
 

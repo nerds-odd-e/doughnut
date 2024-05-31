@@ -3,7 +3,6 @@ package com.odde.doughnut.factoryServices.quizFacotries.factories;
 import com.odde.doughnut.controllers.dto.QuizQuestion;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
-import com.odde.doughnut.entities.quizQuestions.QuizQuestionWithNoteChoices;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
@@ -15,7 +14,7 @@ public abstract class QuestionOptionsFactory extends QuizQuestionFactory {
   @Override
   public QuizQuestionEntity buildQuizQuestion(QuizQuestionServant servant)
       throws QuizQuestionNotPossibleException {
-    QuizQuestionWithNoteChoices quizQuestion = this.buildQuizQuestionObj(servant);
+    QuizQuestionEntity quizQuestion = this.buildQuizQuestionObj(servant);
     this.validateBasicPossibility();
     Note answerNote = this.generateAnswer(servant);
     if (answerNote == null) {
@@ -39,7 +38,7 @@ public abstract class QuestionOptionsFactory extends QuizQuestionFactory {
 
   public void validateBasicPossibility() throws QuizQuestionNotPossibleException {}
 
-  public abstract QuizQuestionWithNoteChoices buildQuizQuestionObj(QuizQuestionServant servant)
+  public abstract QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant)
       throws QuizQuestionNotPossibleException;
 
   public abstract Note generateAnswer(QuizQuestionServant servant);

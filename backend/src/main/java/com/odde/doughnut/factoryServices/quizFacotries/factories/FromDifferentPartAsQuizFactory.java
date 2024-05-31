@@ -20,7 +20,6 @@ public class FromDifferentPartAsQuizFactory extends QuestionOptionsFactory {
     parentGrandLink = servant.getParentGrandLink(link);
     QuizQuestionFromDifferentPartAs quizQuestion = new QuizQuestionFromDifferentPartAs();
     quizQuestion.setNote(link);
-    quizQuestion.setCategoryLink(parentGrandLink);
     return quizQuestion;
   }
 
