@@ -18,7 +18,7 @@ public class AiQuestionFactory extends QuizQuestionFactory {
   }
 
   @Override
-  public QuizQuestion buildQuizQuestion(QuizQuestionServant servant)
+  public QuizQuestion buildValidQuizQuestion(QuizQuestionServant servant)
       throws QuizQuestionNotPossibleException {
     QuizQuestion quizQuestionAIQuestion = new QuizQuestion();
     quizQuestionAIQuestion.setNote(note);

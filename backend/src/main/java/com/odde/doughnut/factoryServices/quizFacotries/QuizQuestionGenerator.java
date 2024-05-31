@@ -16,7 +16,7 @@ public record QuizQuestionGenerator(
   private Optional<QuizQuestion> getQuizQuestionEntity(
       QuizQuestionFactory quizQuestionFactory, QuizQuestionServant servant) {
     try {
-      QuizQuestion quizQuestion = quizQuestionFactory.buildQuizQuestion(servant);
+      QuizQuestion quizQuestion = quizQuestionFactory.buildValidQuizQuestion(servant);
       return Optional.of(quizQuestion);
     } catch (QuizQuestionNotPossibleException e) {
       return Optional.empty();

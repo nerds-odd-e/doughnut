@@ -23,7 +23,7 @@ public class QuizQuestionBuilder extends EntityBuilder<QuizQuestion> {
         new QuizQuestionServant(
             reviewPoint.getUser(), new NonRandomizer(), makeMe.modelFactoryService);
     try {
-      this.entity = quizQuestionFactory.buildQuizQuestion(servant);
+      this.entity = quizQuestionFactory.buildValidQuizQuestion(servant);
     } catch (QuizQuestionNotPossibleException e) {
       this.entity = null;
     }

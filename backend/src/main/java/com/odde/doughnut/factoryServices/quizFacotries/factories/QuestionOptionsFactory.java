@@ -17,7 +17,7 @@ public abstract class QuestionOptionsFactory extends QuizQuestionFactory {
   }
 
   @Override
-  public QuizQuestion buildQuizQuestion(QuizQuestionServant servant)
+  public QuizQuestion buildValidQuizQuestion(QuizQuestionServant servant)
       throws QuizQuestionNotPossibleException {
     QuizQuestion quizQuestion = new QuizQuestion();
     quizQuestion.setNote(note);
@@ -61,4 +61,6 @@ public abstract class QuestionOptionsFactory extends QuizQuestionFactory {
     choice.setDisplay(note.getTopicConstructor());
     return choice;
   }
+
+  protected abstract String getStem();
 }

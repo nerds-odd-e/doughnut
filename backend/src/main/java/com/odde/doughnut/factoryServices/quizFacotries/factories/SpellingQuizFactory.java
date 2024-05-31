@@ -17,7 +17,7 @@ public class SpellingQuizFactory extends QuizQuestionFactory {
   }
 
   @Override
-  public QuizQuestion buildQuizQuestion(QuizQuestionServant servant)
+  public QuizQuestion buildValidQuizQuestion(QuizQuestionServant servant)
       throws QuizQuestionNotPossibleException {
     if (!needSpellingQuiz()) {
       throw new QuizQuestionNotPossibleException();
@@ -33,8 +33,7 @@ public class SpellingQuizFactory extends QuizQuestionFactory {
     return reviewSetting != null && reviewSetting.getRememberSpelling();
   }
 
-  @Override
-  public String getStem() {
+  private String getStem() {
     return answerNote.getClozeDescription().clozeDetails();
   }
 
