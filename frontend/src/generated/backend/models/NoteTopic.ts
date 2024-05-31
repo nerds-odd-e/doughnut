@@ -5,6 +5,7 @@
 export type NoteTopic = {
     id: number;
     topicConstructor: string;
+    shortDetails?: string;
     linkType?: NoteTopic.linkType;
     targetNoteTopic?: NoteTopic;
     parentNoteTopic?: NoteTopic;

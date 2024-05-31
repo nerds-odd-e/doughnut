@@ -5,7 +5,7 @@
     <div class="col" v-for="note in notes" :key="note.id">
       <Card v-bind="{ note }">
         <template #cardHeader>
-          <slot name="cardHeader" :note="note" />
+          <slot name="cardHeader" :note-topic="note.noteTopic" />
         </template>
         <template #button v-if="$slots.button">
           <slot name="button" :note="note" />

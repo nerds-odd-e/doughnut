@@ -8,10 +8,10 @@
       v-focus
     />
     <SearchResults v-bind="{ noteId, inputSearchKey }">
-      <template #button="{ note }">
+      <template #button="{ noteTopic }">
         <button
           class="btn btn-primary"
-          @click.prevent="$emit('selected', note)"
+          @click.prevent="$emit('selected', noteTopic)"
         >
           Select
         </button>

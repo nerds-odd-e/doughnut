@@ -17,8 +17,8 @@
     <em>No matching notes found.</em>
   </div>
   <Cards v-else class="search-result" :notes="searchResult" :columns="3">
-    <template #button="{ note }">
-      <slot name="button" :note="note" />
+    <template #button="{ noteTopic }">
+      <slot name="button" :note-topic="noteTopic" />
     </template>
   </Cards>
 </template>

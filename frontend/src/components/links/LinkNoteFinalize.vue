@@ -11,8 +11,8 @@
       Target:
       <strong
         ><NoteTopicComp
-          v-if="targetNote.noteTopic"
-          v-bind="{ noteTopic: targetNote.noteTopic }"
+          v-if="targetNoteTopic"
+          v-bind="{ noteTopic: targetNoteTopic }"
       /></strong>
     </div>
     <CheckInput
@@ -56,7 +56,7 @@ import { StorageAccessor } from "../../store/createNoteStorage";
 const { popups } = usePopups();
 const props = defineProps({
   note: { type: Object as PropType<Note>, required: true },
-  targetNote: { type: Object as PropType<Note>, required: true },
+  targetNoteTopic: { type: Object as PropType<NoteTopic>, required: true },
   storageAccessor: {
     type: Object as PropType<StorageAccessor>,
     required: true,
@@ -88,7 +88,7 @@ const createLink = async () => {
   }
   props.storageAccessor
     .storedApi()
-    .createLink(props.note.id, props.targetNote.id, formData.value)
+    .createLink(props.note.id, props.targetNoteTopic.id, formData.value)
     .then((r) => emit("success", r))
     .catch((res) => {
       linkFormErrors.value = res;

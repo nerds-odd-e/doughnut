@@ -2339,6 +2339,8 @@ components:
           format: int32
         topicConstructor:
           type: string
+        shortDetails:
+          type: string
         linkType:
           type: string
           enum:

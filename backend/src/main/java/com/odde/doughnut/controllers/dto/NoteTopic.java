@@ -10,6 +10,7 @@ import org.springframework.lang.NonNull;
 public class NoteTopic {
   @NonNull private Integer id;
   @NonNull private String topicConstructor;
+  private String shortDetails;
   private LinkType linkType;
   private NoteTopic targetNoteTopic;
   private NoteTopic parentNoteTopic;

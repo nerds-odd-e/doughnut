@@ -23,4 +23,11 @@ public record HtmlOrMarkdown(String htmlOrMarkdown) {
 
     return matcher.matches();
   }
+
+public String beginning(int charCount) {
+    if (isBlank()) return null;
+    String withoutHtmlTags = htmlOrMarkdown.replaceAll("<[^>]*>", "");
+    if (withoutHtmlTags.length() <= charCount) return withoutHtmlTags;
+    return withoutHtmlTags.substring(0, charCount) + "...";
+}
 }
