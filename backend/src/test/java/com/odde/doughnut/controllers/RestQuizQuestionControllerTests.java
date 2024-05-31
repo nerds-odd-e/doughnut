@@ -13,7 +13,6 @@ import com.odde.doughnut.controllers.dto.QuestionSuggestionCreationParams;
 import com.odde.doughnut.controllers.dto.QuizQuestion;
 import com.odde.doughnut.controllers.dto.QuizQuestionContestResult;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.quizQuestions.QuizQuestionAIQuestion;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.models.TimestampOperations;
@@ -162,7 +161,7 @@ class RestQuizQuestionControllerTests {
 
   @Nested
   class SuggestQuestionForFineTuning {
-    QuizQuestionAIQuestion quizQuestionEntity;
+    QuizQuestionEntity quizQuestionEntity;
     MCQWithAnswer mcqWithAnswer;
     Note note;
 
@@ -176,9 +175,7 @@ class RestQuizQuestionControllerTests {
     void setup() throws QuizQuestionNotPossibleException {
       note = makeMe.aNote().creatorAndOwner(currentUser).please();
       mcqWithAnswer = makeMe.aMCQWithAnswer().please();
-      quizQuestionEntity =
-          (QuizQuestionAIQuestion)
-              makeMe.aQuestion().ofAIGeneratedQuestion(mcqWithAnswer, note).please();
+      quizQuestionEntity = makeMe.aQuestion().ofAIGeneratedQuestion(mcqWithAnswer, note).please();
     }
 
     @Test
@@ -334,7 +331,7 @@ class RestQuizQuestionControllerTests {
 
   @Nested
   class Contest {
-    QuizQuestionAIQuestion quizQuestionEntity;
+    QuizQuestionEntity quizQuestionEntity;
     QuestionEvaluation questionEvaluation = new QuestionEvaluation();
 
     @BeforeEach
@@ -346,8 +343,7 @@ class RestQuizQuestionControllerTests {
       MCQWithAnswer aiGeneratedQuestion = makeMe.aMCQWithAnswer().please();
       Note note = makeMe.aNote().please();
       quizQuestionEntity =
-          (QuizQuestionAIQuestion)
-              makeMe.aQuestion().ofAIGeneratedQuestion(aiGeneratedQuestion, note).please();
+          makeMe.aQuestion().ofAIGeneratedQuestion(aiGeneratedQuestion, note).please();
     }
 
     @Test

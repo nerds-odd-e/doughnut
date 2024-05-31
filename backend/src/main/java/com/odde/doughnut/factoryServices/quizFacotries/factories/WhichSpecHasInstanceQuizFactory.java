@@ -3,7 +3,6 @@ package com.odde.doughnut.factoryServices.quizFacotries.factories;
 import com.odde.doughnut.entities.LinkingNote;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
-import com.odde.doughnut.entities.quizQuestions.QuizQuestionWhichSpecHasInstance;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import java.util.List;
 
@@ -20,8 +19,7 @@ public class WhichSpecHasInstanceQuizFactory extends QuestionOptionsFactory {
   public QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant) {
     List<LinkingNote> candidates = servant.getLinksFromSameSourceHavingReviewPoint(link).toList();
     instanceLink = servant.randomizer.chooseOneRandomly(candidates).orElse(null);
-    QuizQuestionWhichSpecHasInstance quizQuestionWhichSpecHasInstance =
-        new QuizQuestionWhichSpecHasInstance();
+    QuizQuestionEntity quizQuestionWhichSpecHasInstance = new QuizQuestionEntity();
     quizQuestionWhichSpecHasInstance.setNote(link);
     return quizQuestionWhichSpecHasInstance;
   }

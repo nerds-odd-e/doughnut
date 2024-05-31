@@ -3,7 +3,6 @@ package com.odde.doughnut.factoryServices.quizFacotries.factories;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.ReviewSetting;
-import com.odde.doughnut.entities.quizQuestions.QuizQuestionSpelling;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
@@ -39,9 +38,10 @@ public class SpellingQuizFactory extends QuizQuestionFactory {
     return answerNote.getClozeDescription().clozeDetails();
   }
 
-  public QuizQuestionSpelling buildSpellingQuestion() {
-    QuizQuestionSpelling quizQuestionSpelling = new QuizQuestionSpelling();
+  public QuizQuestionEntity buildSpellingQuestion() {
+    QuizQuestionEntity quizQuestionSpelling = new QuizQuestionEntity();
     quizQuestionSpelling.setNote(answerNote);
+    quizQuestionSpelling.setCheckSpell(true);
     MCQWithAnswer mcqWithAnswer = new MCQWithAnswer();
     mcqWithAnswer.stem = getStem();
     quizQuestionSpelling.setMcqWithAnswer(mcqWithAnswer);

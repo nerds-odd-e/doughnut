@@ -3,14 +3,12 @@ package com.odde.doughnut.entities;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.controllers.dto.QuizQuestion;
-import com.odde.doughnut.entities.quizQuestions.QuizQuestionAIQuestion;
-import com.odde.doughnut.entities.quizQuestions.QuizQuestionClozeSelection;
-import com.odde.doughnut.entities.quizQuestions.QuizQuestionSpelling;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionGenerator;
 import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.models.UserModel;
@@ -135,7 +133,7 @@ class QuizQuestionTest {
 
     @Test
     void typeShouldBeSpellingQuiz() {
-      assertThat(generateQuizQuestionEntity(note), instanceOf(QuizQuestionSpelling.class));
+      assertTrue(generateQuizQuestionEntity(note).getCheckSpell());
     }
 
     @Test
@@ -146,7 +144,7 @@ class QuizQuestionTest {
       when(questionGenerator.getAiGeneratedQuestion(any())).thenReturn(mcqWithAnswer);
       QuizQuestionEntity randomQuizQuestion =
           generateQuizQuestion(note, new RealRandomizer(), questionGenerator);
-      assertThat(randomQuizQuestion, instanceOf(QuizQuestionAIQuestion.class));
+      assertThat(randomQuizQuestion, instanceOf(QuizQuestionEntity.class));
       QuizQuestion qq = randomQuizQuestion.getQuizQuestion();
       assertThat(qq.stem, containsString(mcqWithAnswer.stem));
     }
@@ -164,14 +162,16 @@ class QuizQuestionTest {
 
     @Test
     void shouldChooseTypeRandomly() {
-      Set<Class<? extends QuizQuestionEntity>> types = new HashSet<>();
+      int spellingCount = 0;
       for (int i = 0; i < 20; i++) {
         QuizQuestionEntity randomQuizQuestion =
             generateQuizQuestion(note, new RealRandomizer(), null);
-        types.add(randomQuizQuestion.getClass());
+        if (randomQuizQuestion.getCheckSpell() != null && randomQuizQuestion.getCheckSpell()) {
+          spellingCount++;
+        }
       }
-      assertThat(
-          types, containsInAnyOrder(QuizQuestionSpelling.class, QuizQuestionClozeSelection.class));
+      assertThat(spellingCount, greaterThan(0));
+      assertThat(spellingCount, lessThan(20));
     }
   }
 

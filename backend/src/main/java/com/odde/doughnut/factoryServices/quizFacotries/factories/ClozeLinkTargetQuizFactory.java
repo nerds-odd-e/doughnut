@@ -2,7 +2,7 @@ package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.algorithms.ClozedString;
 import com.odde.doughnut.entities.LinkingNote;
-import com.odde.doughnut.entities.quizQuestions.QuizQuestionClozeLinkTarget;
+import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 
 public class ClozeLinkTargetQuizFactory extends LinkTargetQuizFactory {
@@ -12,8 +12,8 @@ public class ClozeLinkTargetQuizFactory extends LinkTargetQuizFactory {
   }
 
   @Override
-  public QuizQuestionClozeLinkTarget buildQuizQuestionObj(QuizQuestionServant servant) {
-    QuizQuestionClozeLinkTarget quizQuestionClozeLinkTarget = new QuizQuestionClozeLinkTarget();
+  public QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant) {
+    QuizQuestionEntity quizQuestionClozeLinkTarget = new QuizQuestionEntity();
     quizQuestionClozeLinkTarget.setNote(link);
     return quizQuestionClozeLinkTarget;
   }

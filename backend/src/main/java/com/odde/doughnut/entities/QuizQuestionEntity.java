@@ -15,10 +15,8 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "quiz_question")
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "question_type", discriminatorType = DiscriminatorType.INTEGER)
 @JsonPropertyOrder({"id", "stem", "options", "correctAnswerIndex", "mainTopic", "imageWithMask"})
-public abstract class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
+public class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
 
   @ManyToOne(cascade = CascadeType.DETACH)
   @JoinColumn(name = "note_id", referencedColumnName = "id")
@@ -39,6 +37,16 @@ public abstract class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
   @Setter
   private Integer correctAnswerIndex;
 
+  @Column(name = "check_spell")
+  @Getter
+  @Setter
+  private Boolean checkSpell;
+
+  @Column(name = "has_image")
+  @Getter
+  @Setter
+  private Boolean hasImage;
+
   @JsonIgnore
   public MCQWithAnswer getMcqWithAnswer() {
     try {
@@ -55,6 +63,9 @@ public abstract class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
   }
 
   public boolean checkAnswer(Answer answer) {
+    if (checkSpell != null && checkSpell) {
+      return getNote().matchAnswer(answer.getSpellingAnswer());
+    }
     return Objects.equals(answer.getChoiceIndex(), getCorrectAnswerIndex());
   }
 
@@ -63,6 +74,7 @@ public abstract class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
   }
 
   public ImageWithMask getImageWithMask() {
+    if (hasImage != null && hasImage) return getNote().getImageWithMask();
     return null;
   }
 

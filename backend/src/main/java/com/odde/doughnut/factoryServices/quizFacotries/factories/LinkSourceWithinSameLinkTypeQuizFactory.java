@@ -3,7 +3,6 @@ package com.odde.doughnut.factoryServices.quizFacotries.factories;
 import com.odde.doughnut.algorithms.ClozedString;
 import com.odde.doughnut.controllers.dto.QuizQuestion;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.quizQuestions.QuizQuestionLinkSourceWithSameLinkType;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import java.util.List;
 
@@ -32,9 +31,8 @@ public class LinkSourceWithinSameLinkTypeQuizFactory extends QuestionOptionsFact
   }
 
   @Override
-  public QuizQuestionLinkSourceWithSameLinkType buildQuizQuestionObj(QuizQuestionServant servant) {
-    QuizQuestionLinkSourceWithSameLinkType quizQuestionLinkSourceWithSameLinkType =
-        new QuizQuestionLinkSourceWithSameLinkType();
+  public QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant) {
+    QuizQuestionEntity quizQuestionLinkSourceWithSameLinkType = new QuizQuestionEntity();
     quizQuestionLinkSourceWithSameLinkType.setNote(link);
     return quizQuestionLinkSourceWithSameLinkType;
   }

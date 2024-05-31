@@ -3,7 +3,6 @@ package com.odde.doughnut.factoryServices.quizFacotries.factories;
 import com.odde.doughnut.entities.LinkingNote;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
-import com.odde.doughnut.entities.quizQuestions.QuizQuestionLinkTarget;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import java.util.List;
 
@@ -32,7 +31,7 @@ public class LinkTargetQuizFactory extends QuestionOptionsFactory {
 
   @Override
   public QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant) {
-    QuizQuestionLinkTarget quizQuestion = new QuizQuestionLinkTarget();
+    QuizQuestionEntity quizQuestion = new QuizQuestionEntity();
     quizQuestion.setNote(link);
     return quizQuestion;
   }

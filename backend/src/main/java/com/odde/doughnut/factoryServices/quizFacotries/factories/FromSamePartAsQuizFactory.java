@@ -1,7 +1,6 @@
 package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.quizQuestions.QuizQuestionFromSamePartAs;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import java.util.List;
 
@@ -17,8 +16,8 @@ public class FromSamePartAsQuizFactory extends QuestionOptionsFactory {
   }
 
   @Override
-  public QuizQuestionFromSamePartAs buildQuizQuestionObj(QuizQuestionServant servant) {
-    QuizQuestionFromSamePartAs quizQuestionFromSamePartAs = new QuizQuestionFromSamePartAs();
+  public QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant) {
+    QuizQuestionEntity quizQuestionFromSamePartAs = new QuizQuestionEntity();
     quizQuestionFromSamePartAs.setNote(link);
     this.parentGrandLink = servant.getParentGrandLink(link);
     return quizQuestionFromSamePartAs;

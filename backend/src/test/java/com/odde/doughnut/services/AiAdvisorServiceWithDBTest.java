@@ -6,7 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.QuizQuestionContestResult;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.quizQuestions.QuizQuestionAIQuestion;
+import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
@@ -44,7 +44,7 @@ class AiAdvisorServiceWithDBTest {
   @Nested
   class ContestQuestion {
     private OpenAIChatCompletionMock openAIChatCompletionMock;
-    QuizQuestionAIQuestion quizQuestionEntity;
+    QuizQuestionEntity quizQuestionEntity;
     QuestionEvaluation questionEvaluation = new QuestionEvaluation();
 
     @BeforeEach
@@ -63,8 +63,7 @@ class AiAdvisorServiceWithDBTest {
               .please();
       Note note = makeMe.aNote().please();
       quizQuestionEntity =
-          (QuizQuestionAIQuestion)
-              makeMe.aQuestion().ofAIGeneratedQuestion(aiGeneratedQuestion, note).please();
+          makeMe.aQuestion().ofAIGeneratedQuestion(aiGeneratedQuestion, note).please();
     }
 
     @Test
