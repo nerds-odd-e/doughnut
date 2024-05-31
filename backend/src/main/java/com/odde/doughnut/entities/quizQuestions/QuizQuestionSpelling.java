@@ -22,10 +22,6 @@ public class QuizQuestionSpelling extends QuizQuestionEntity {
     return List.of();
   }
 
-  public String getMainTopic() {
-    return "";
-  }
-
   public ImageWithMask getImageWithMask() {
     return null;
   }

@@ -6,9 +6,4 @@ import jakarta.persistence.Entity;
 
 @Entity
 @DiscriminatorValue("7")
-public class QuizQuestionClozeLinkTarget extends QuizQuestionEntity {
-
-  public String getMainTopic() {
-    return "";
-  }
-}
+public class QuizQuestionClozeLinkTarget extends QuizQuestionEntity {}

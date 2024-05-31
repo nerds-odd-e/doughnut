@@ -6,9 +6,4 @@ import jakarta.persistence.Entity;
 
 @Entity
 @DiscriminatorValue("9")
-public class QuizQuestionWhichSpecHasInstance extends QuizQuestionEntity {
-
-  public String getMainTopic() {
-    return null;
-  }
-}
+public class QuizQuestionWhichSpecHasInstance extends QuizQuestionEntity {}

@@ -13,8 +13,4 @@ public class QuizQuestionImageTitle extends QuizQuestionEntity {
   public ImageWithMask getImageWithMask() {
     return getNote().getImageWithMask();
   }
-
-  public String getMainTopic() {
-    return "";
-  }
 }

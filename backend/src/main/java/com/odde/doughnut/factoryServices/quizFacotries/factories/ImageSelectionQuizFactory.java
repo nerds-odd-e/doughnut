@@ -47,4 +47,9 @@ public class ImageSelectionQuizFactory extends QuestionOptionsFactory {
     choice.setImage(true);
     return choice;
   }
+
+  @Override
+  public String getStem() {
+    return "<strong>" + answerNote.getTopicConstructor() + "</strong>";
+  }
 }

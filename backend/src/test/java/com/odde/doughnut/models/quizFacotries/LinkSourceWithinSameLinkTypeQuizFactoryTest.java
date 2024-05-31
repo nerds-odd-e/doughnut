@@ -65,8 +65,8 @@ class LinkSourceWithinSameLinkTypeQuizFactoryTest {
       QuizQuestion quizQuestion = buildLinkTargetQuizQuestion();
       assertThat(
           quizQuestion.getStem(),
-          equalTo("Which one <em>is immediately a specialization of</em>:"));
-      assertThat(quizQuestion.getMainTopic(), equalTo(target.getTopicConstructor()));
+          containsString("Which one <em>is immediately a specialization of</em>:"));
+      assertThat(quizQuestion.getStem(), containsString(target.getTopicConstructor()));
       List<String> options = toOptionStrings(quizQuestion);
       assertThat(anotherSource.getTopicConstructor(), in(options));
       assertThat(

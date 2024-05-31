@@ -5,9 +5,4 @@ import jakarta.persistence.*;
 
 @Entity
 @DiscriminatorValue("1")
-public class QuizQuestionClozeSelection extends QuizQuestionEntity {
-
-  public String getMainTopic() {
-    return "";
-  }
-}
+public class QuizQuestionClozeSelection extends QuizQuestionEntity {}

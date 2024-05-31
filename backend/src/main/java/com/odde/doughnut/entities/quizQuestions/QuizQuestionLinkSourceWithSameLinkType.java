@@ -6,10 +6,4 @@ import jakarta.persistence.Entity;
 
 @Entity
 @DiscriminatorValue("14")
-public class QuizQuestionLinkSourceWithSameLinkType extends QuizQuestionEntity {
-
-  @Override
-  public String getMainTopic() {
-    return getNote().getTargetNote().getTopicConstructor();
-  }
-}
+public class QuizQuestionLinkSourceWithSameLinkType extends QuizQuestionEntity {}

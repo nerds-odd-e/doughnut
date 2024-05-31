@@ -57,6 +57,9 @@ public class FromDifferentPartAsQuizFactory extends QuestionOptionsFactory {
         + parentGrandLink.getLinkType().nameOfSource
         + " of <mark>"
         + parentGrandLink.getTargetNote().getTopicConstructor()
-        + "</mark> than:";
+        + "</mark> than:"
+        + "<strong>"
+        + link.getParent().getTopicConstructor()
+        + "</strong>";
   }
 }

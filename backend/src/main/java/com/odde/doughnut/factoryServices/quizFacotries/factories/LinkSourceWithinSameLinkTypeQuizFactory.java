@@ -53,6 +53,12 @@ public class LinkSourceWithinSameLinkTypeQuizFactory extends QuestionOptionsFact
 
   @Override
   public String getStem() {
-    return "Which one <em>is immediately " + link.getLinkType().label + "</em>:";
+    return "Which one <em>is immediately "
+        + link.getLinkType().label
+        + "</em>:"
+        + "<br><br>"
+        + "<strong>"
+        + link.getTargetNote().getTopicConstructor()
+        + "</strong>";
   }
 }

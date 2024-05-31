@@ -60,6 +60,9 @@ public class FromSamePartAsQuizFactory extends QuestionOptionsFactory {
         + parentGrandLink.getLinkType().nameOfSource
         + " of <mark>"
         + parentGrandLink.getTargetNote().getTopicConstructor()
-        + "</mark> as:";
+        + "</mark> as:"
+        + "<strong>"
+        + link.getParent().getTopicConstructor()
+        + "</strong>";
   }
 }

@@ -71,8 +71,7 @@ class ImageSelectionQuizFactoryTest {
       @Test
       void shouldIncludeRightAnswers() {
         QuizQuestion quizQuestion = buildQuestion();
-        assertThat(quizQuestion.getStem(), equalTo(""));
-        assertThat(quizQuestion.getMainTopic(), equalTo("source"));
+        assertThat(quizQuestion.getStem(), containsString("source"));
         List<String> options = toOptionStrings(quizQuestion);
         assertThat(source.getTopicConstructor(), in(options));
       }

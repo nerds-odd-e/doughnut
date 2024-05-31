@@ -64,7 +64,6 @@ class LinkTargetQuizFactoryTest {
     void shouldIncludeRightAnswers() {
       QuizQuestion quizQuestion = buildLinkTargetQuizQuestion();
       assertThat(quizQuestion.getStem(), equalTo("<mark>source</mark> is a specialization of:"));
-      assertThat(quizQuestion.getMainTopic(), equalTo(""));
       List<String> options = toOptionStrings(quizQuestion);
       assertThat(anotherTarget.getTopicConstructor(), in(options));
       assertThat(target.getTopicConstructor(), in(options));

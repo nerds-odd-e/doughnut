@@ -6,10 +6,4 @@ import jakarta.persistence.Entity;
 
 @Entity
 @DiscriminatorValue("4")
-public class QuizQuestionImageSelection extends QuizQuestionEntity {
-
-  @Override
-  public String getMainTopic() {
-    return getNote().getTopicConstructor();
-  }
-}
+public class QuizQuestionImageSelection extends QuizQuestionEntity {}
