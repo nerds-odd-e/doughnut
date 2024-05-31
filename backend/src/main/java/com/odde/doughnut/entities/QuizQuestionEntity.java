@@ -35,6 +35,11 @@ public abstract class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
   @Setter
   private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
+  @Column(name = "correct_answer_index")
+  @Getter
+  @Setter
+  private Integer correctAnswerIndex;
+
   @JsonIgnore
   public MCQWithAnswer getMcqWithAnswer() {
     try {
@@ -47,6 +52,7 @@ public abstract class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public void setMcqWithAnswer(MCQWithAnswer mcqWithAnswer) {
     this.rawJsonQuestion = mcqWithAnswer.toJsonString();
+    this.correctAnswerIndex = mcqWithAnswer.correctChoiceIndex;
   }
 
   public boolean checkAnswer(Answer answer) {
@@ -55,10 +61,6 @@ public abstract class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
 
   public String getStem() {
     return getMcqWithAnswer().stem;
-  }
-
-  public Integer getCorrectAnswerIndex() {
-    return getMcqWithAnswer().correctChoiceIndex;
   }
 
   public String getMainTopic() {
