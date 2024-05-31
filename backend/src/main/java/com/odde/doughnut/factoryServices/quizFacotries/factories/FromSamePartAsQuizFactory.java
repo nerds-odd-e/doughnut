@@ -12,15 +12,13 @@ public class FromSamePartAsQuizFactory extends QuestionOptionsFactory {
   private final LinkingNote link;
 
   public FromSamePartAsQuizFactory(LinkingNote note) {
+    super(note);
     link = note;
   }
 
   @Override
-  public QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant) {
-    QuizQuestionEntity quizQuestionFromSamePartAs = new QuizQuestionEntity();
-    quizQuestionFromSamePartAs.setNote(link);
+  public void findCategoricalLink(QuizQuestionServant servant) {
     this.parentGrandLink = servant.getParentGrandLink(link);
-    return quizQuestionFromSamePartAs;
   }
 
   @Override

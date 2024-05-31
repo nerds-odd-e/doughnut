@@ -11,6 +11,7 @@ public class LinkSourceWithinSameLinkTypeQuizFactory extends QuestionOptionsFact
   private List<LinkingNote> cachedFillingOptions = null;
 
   public LinkSourceWithinSameLinkTypeQuizFactory(LinkingNote note) {
+    super(note);
     this.link = note;
   }
 
@@ -28,13 +29,6 @@ public class LinkSourceWithinSameLinkTypeQuizFactory extends QuestionOptionsFact
   @Override
   public Note generateAnswer(QuizQuestionServant servant) {
     return link;
-  }
-
-  @Override
-  public QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant) {
-    QuizQuestionEntity quizQuestionLinkSourceWithSameLinkType = new QuizQuestionEntity();
-    quizQuestionLinkSourceWithSameLinkType.setNote(link);
-    return quizQuestionLinkSourceWithSameLinkType;
   }
 
   @Override

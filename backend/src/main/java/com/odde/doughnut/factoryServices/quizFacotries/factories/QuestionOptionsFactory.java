@@ -11,10 +11,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class QuestionOptionsFactory extends QuizQuestionFactory {
+  protected Note note;
+
+  public QuestionOptionsFactory(Note note) {
+    this.note = note;
+  }
+
   @Override
   public QuizQuestionEntity buildQuizQuestion(QuizQuestionServant servant)
       throws QuizQuestionNotPossibleException {
-    QuizQuestionEntity quizQuestion = this.buildQuizQuestionObj(servant);
+    QuizQuestionEntity quizQuestion = new QuizQuestionEntity();
+    quizQuestion.setNote(note);
+    quizQuestion.setHasImage(this instanceof ImageSelectionQuizFactory);
+    this.findCategoricalLink(servant);
     this.validateBasicPossibility();
     Note answerNote = this.generateAnswer(servant);
     if (answerNote == null) {
@@ -38,8 +47,7 @@ public abstract class QuestionOptionsFactory extends QuizQuestionFactory {
 
   public void validateBasicPossibility() throws QuizQuestionNotPossibleException {}
 
-  public abstract QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant)
-      throws QuizQuestionNotPossibleException;
+  public void findCategoricalLink(QuizQuestionServant servant) {}
 
   public abstract Note generateAnswer(QuizQuestionServant servant);
 

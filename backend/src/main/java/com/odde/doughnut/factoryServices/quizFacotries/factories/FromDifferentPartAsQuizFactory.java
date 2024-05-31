@@ -11,15 +11,13 @@ public class FromDifferentPartAsQuizFactory extends QuestionOptionsFactory {
   private final LinkingNote link;
 
   public FromDifferentPartAsQuizFactory(LinkingNote note) {
+    super(note);
     link = note;
   }
 
   @Override
-  public QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant) {
+  public void findCategoricalLink(QuizQuestionServant servant) {
     parentGrandLink = servant.getParentGrandLink(link);
-    QuizQuestionEntity quizQuestion = new QuizQuestionEntity();
-    quizQuestion.setNote(link);
-    return quizQuestion;
   }
 
   @Override

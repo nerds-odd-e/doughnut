@@ -1,17 +1,13 @@
 package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import java.util.List;
 
 public class ClozeTitleSelectionQuizFactory extends QuestionOptionsFactory {
-
-  protected final Note note;
-
   public ClozeTitleSelectionQuizFactory(Note note) {
-    this.note = note;
+    super(note);
   }
 
   @Override
@@ -29,13 +25,6 @@ public class ClozeTitleSelectionQuizFactory extends QuestionOptionsFactory {
     if (note.isDetailsBlankHtml()) {
       throw new QuizQuestionNotPossibleException();
     }
-  }
-
-  @Override
-  public QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant) {
-    QuizQuestionEntity quizQuestionClozeSelection = new QuizQuestionEntity();
-    quizQuestionClozeSelection.setNote(note);
-    return quizQuestionClozeSelection;
   }
 
   @Override

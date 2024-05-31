@@ -2,54 +2,44 @@ package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.controllers.dto.QuizQuestion;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import java.util.List;
 
 public class ImageSelectionQuizFactory extends QuestionOptionsFactory {
-  private final Note answerNote;
 
   public ImageSelectionQuizFactory(Note note) {
-    this.answerNote = note;
+    super(note);
   }
 
   @Override
   public List<Note> generateFillingOptions(QuizQuestionServant servant) {
-    return servant.chooseFromCohort(answerNote, n -> n.getImageWithMask() != null);
+    return servant.chooseFromCohort(note, n -> n.getImageWithMask() != null);
   }
 
   @Override
   public Note generateAnswer(QuizQuestionServant servant) {
-    return answerNote;
+    return note;
   }
 
   @Override
   public void validateBasicPossibility() throws QuizQuestionNotPossibleException {
-    if (answerNote.getImageWithMask() == null) {
+    if (note.getImageWithMask() == null) {
       throw new QuizQuestionNotPossibleException();
     }
   }
 
   @Override
-  public QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant) {
-
-    QuizQuestionEntity quizQuestion = new QuizQuestionEntity();
-    quizQuestion.setNote(answerNote);
-    return quizQuestion;
-  }
-
-  @Override
-  public QuizQuestion.Choice noteToChoice(Note note) {
+  public QuizQuestion.Choice noteToChoice(Note n) {
     QuizQuestion.Choice choice = new QuizQuestion.Choice();
-    choice.setDisplay(note.getTopicConstructor());
-    choice.setImageWithMask(note.getImageWithMask());
+    choice.setDisplay(n.getTopicConstructor());
+    choice.setImageWithMask(n.getImageWithMask());
     choice.setImage(true);
     return choice;
   }
 
   @Override
   public String getStem() {
-    return "<strong>" + answerNote.getTopicConstructor() + "</strong>";
+    return "<strong>" + note.getTopicConstructor() + "</strong>";
   }
 }

@@ -9,6 +9,7 @@ public class LinkSourceQuizFactory extends QuestionOptionsFactory {
   private List<Note> cachedFillingOptions = null;
 
   public LinkSourceQuizFactory(LinkingNote link) {
+    super(link);
     this.link = link;
   }
 
@@ -23,13 +24,6 @@ public class LinkSourceQuizFactory extends QuestionOptionsFactory {
   @Override
   public Note generateAnswer(QuizQuestionServant servant) {
     return link.getParent();
-  }
-
-  @Override
-  public QuizQuestionEntity buildQuizQuestionObj(QuizQuestionServant servant) {
-    QuizQuestionEntity quizQuestion = new QuizQuestionEntity();
-    quizQuestion.setNote(link);
-    return quizQuestion;
   }
 
   @Override
