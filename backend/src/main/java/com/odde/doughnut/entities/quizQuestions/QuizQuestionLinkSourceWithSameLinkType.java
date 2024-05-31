@@ -3,7 +3,6 @@ package com.odde.doughnut.entities.quizQuestions;
 import com.odde.doughnut.algorithms.ClozedString;
 import com.odde.doughnut.controllers.dto.QuizQuestion;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestionWithNoteChoices;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 

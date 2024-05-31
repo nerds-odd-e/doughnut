@@ -2,8 +2,8 @@ package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.entities.LinkingNote;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestionWithNoteChoices;
 import com.odde.doughnut.entities.quizQuestions.QuizQuestionWhichSpecHasInstance;
+import com.odde.doughnut.entities.quizQuestions.QuizQuestionWithNoteChoices;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import java.util.List;
 

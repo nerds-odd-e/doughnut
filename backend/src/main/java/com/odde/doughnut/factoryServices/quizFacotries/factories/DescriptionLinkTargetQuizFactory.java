@@ -1,8 +1,8 @@
 package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.entities.LinkingNote;
-import com.odde.doughnut.entities.QuizQuestionWithNoteChoices;
 import com.odde.doughnut.entities.quizQuestions.QuizQuestionDescriptionLinkTarget;
+import com.odde.doughnut.entities.quizQuestions.QuizQuestionWithNoteChoices;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 

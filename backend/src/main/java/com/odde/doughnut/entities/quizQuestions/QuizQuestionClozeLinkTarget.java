@@ -1,7 +1,6 @@
 package com.odde.doughnut.entities.quizQuestions;
 
 import com.odde.doughnut.algorithms.ClozedString;
-import com.odde.doughnut.entities.QuizQuestionWithNoteChoices;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
