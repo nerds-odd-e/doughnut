@@ -9,6 +9,7 @@
         :multiple-line="true"
         scope-name="note"
         :model-value="value"
+        :readonly="readonly"
         @update:model-value="update(noteId, $event)"
         @blur="blur"
       />

@@ -2,13 +2,14 @@
   <RichHtmlEditor
     v-bind="{ multipleLine, scopeName, field, title, errors }"
     :model-value="htmlValue"
+    :readonly="readonly"
     @update:model-value="htmlValueUpdated($event)"
     @blur="$emit('blur')"
   />
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, readonly } from "vue";
 import "quill/dist/quill.snow.css";
 import RichHtmlEditor from "./RichHtmlEditor.vue";
 import markdownizer from "./markdownizer";
@@ -21,6 +22,7 @@ export default defineComponent({
     field: String,
     title: String,
     errors: Object,
+    readonly: Boolean,
   },
   emits: ["update:modelValue", "blur"],
   components: {

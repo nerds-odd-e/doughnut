@@ -4,6 +4,7 @@
     v-model:content="localValue"
     :options="editorOptions"
     :content-type="'html'"
+    :read-only="readonly"
     @blur="onBlurTextField"
     @update:content="onUpdateContent"
     @focus="hadFocus = true"
@@ -24,6 +25,7 @@ export default defineComponent({
     field: String,
     title: String,
     errors: Object,
+    readonly: Boolean,
   },
   emits: ["update:modelValue", "blur"],
   components: {
