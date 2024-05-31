@@ -1,6 +1,5 @@
 package com.odde.doughnut.factoryServices;
 
-import com.odde.doughnut.controllers.dto.QuizQuestion;
 import com.odde.doughnut.controllers.dto.SearchTerm;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.*;
@@ -87,15 +86,6 @@ public class ModelFactoryService {
 
   public AnswerModel toAnswerModel(Answer answer) {
     return new AnswerModel(answer, this);
-  }
-
-  public QuizQuestion toQuizQuestion(QuizQuestionEntity quizQuestionEntity) {
-    return new QuizQuestion(
-        quizQuestionEntity.getId(),
-        quizQuestionEntity.getStem(),
-        quizQuestionEntity.getNote().getNotebook().getHeadNote(),
-        quizQuestionEntity.getOptions(this),
-        quizQuestionEntity.getImageWithMask());
   }
 
   public SuggestedQuestionForFineTuningModel toSuggestedQuestionForFineTuningService(

@@ -20,12 +20,12 @@ public class AnswerModel {
   public AnsweredQuestion getAnswerViewedByUser(User user) {
     AnsweredQuestion answerResult = new AnsweredQuestion();
     answerResult.answerId = answer.getId();
-    answerResult.answerDisplay = answer.getAnswerDisplay(modelFactoryService);
+    answerResult.answerDisplay = answer.getAnswerDisplay();
     answerResult.reviewPoint = getReviewPoint(user);
     answerResult.correct = answer.isCorrect();
     answerResult.correctChoiceIndex = getQuestion().getCorrectAnswerIndex();
     answerResult.choiceIndex = answer.getChoiceIndex();
-    answerResult.quizQuestion = modelFactoryService.toQuizQuestion(getQuestion());
+    answerResult.quizQuestion = getQuestion().getQuizQuestion();
     return answerResult;
   }
 

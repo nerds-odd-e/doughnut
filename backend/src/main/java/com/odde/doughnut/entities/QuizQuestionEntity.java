@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.QuizQuestion;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import jakarta.persistence.*;
 import java.sql.Timestamp;
@@ -67,8 +66,12 @@ public abstract class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
     return null;
   }
 
-  public List<QuizQuestion.Choice> getOptions(ModelFactoryService modelFactoryService) {
-    return getMcqWithAnswer().choices.stream()
+  public List<QuizQuestion.Choice> getOptions() {
+    MCQWithAnswer mcqWithAnswer = getMcqWithAnswer();
+    if (mcqWithAnswer.choices == null) {
+      return List.of();
+    }
+    return mcqWithAnswer.choices.stream()
         .map(
             choice -> {
               QuizQuestion.Choice option = new QuizQuestion.Choice();
@@ -76,5 +79,14 @@ public abstract class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
               return option;
             })
         .toList();
+  }
+
+  public QuizQuestion getQuizQuestion() {
+    return new QuizQuestion(
+        getId(),
+        getStem(),
+        getNote().getNotebook().getHeadNote(),
+        getOptions(),
+        getImageWithMask());
   }
 }
