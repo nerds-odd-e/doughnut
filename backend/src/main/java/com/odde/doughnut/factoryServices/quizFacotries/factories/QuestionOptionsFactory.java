@@ -1,6 +1,5 @@
 package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
-import com.odde.doughnut.controllers.dto.QuizQuestion;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
@@ -40,7 +39,10 @@ public abstract class QuestionOptionsFactory extends QuizQuestionFactory {
     mcqWithAnswer.stem = getStem();
     mcqWithAnswer.correctChoiceIndex = shuffled.indexOf(answerNote);
     mcqWithAnswer.choices =
-        shuffled.stream().map(this::noteToChoice).map(QuizQuestion.Choice::getDisplay).toList();
+        shuffled.stream()
+            .map(this::noteToChoice)
+            .map(QuizQuestionEntity.Choice::getDisplay)
+            .toList();
     quizQuestion.setMcqWithAnswer(mcqWithAnswer);
     return quizQuestion;
   }
@@ -57,8 +59,8 @@ public abstract class QuestionOptionsFactory extends QuizQuestionFactory {
     return 2;
   }
 
-  public QuizQuestion.Choice noteToChoice(Note note) {
-    QuizQuestion.Choice choice = new QuizQuestion.Choice();
+  public QuizQuestionEntity.Choice noteToChoice(Note note) {
+    QuizQuestionEntity.Choice choice = new QuizQuestionEntity.Choice();
     choice.setDisplay(note.getTopicConstructor());
     return choice;
   }

@@ -1,7 +1,6 @@
 package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.algorithms.ClozedString;
-import com.odde.doughnut.controllers.dto.QuizQuestion;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import java.util.List;
@@ -32,8 +31,8 @@ public class LinkSourceWithinSameLinkTypeQuizFactory extends QuestionOptionsFact
   }
 
   @Override
-  public QuizQuestion.Choice noteToChoice(Note note) {
-    QuizQuestion.Choice choice = new QuizQuestion.Choice();
+  public QuizQuestionEntity.Choice noteToChoice(Note note) {
+    QuizQuestionEntity.Choice choice = new QuizQuestionEntity.Choice();
     Note source = note.getParent();
     Note target = note.getTargetNote();
     choice.setDisplay(

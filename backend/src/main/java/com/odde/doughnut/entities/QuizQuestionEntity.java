@@ -7,9 +7,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.QuizQuestion;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Objects;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,9 +24,11 @@ public class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
   @JoinColumn(name = "note_id", referencedColumnName = "id")
   @Getter
   @Setter
+  @JsonIgnore
   private Note note;
 
   @Column(name = "raw_json_question")
+  @JsonIgnore
   private String rawJsonQuestion;
 
   @Column(name = "created_at")
@@ -35,16 +39,19 @@ public class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
   @Column(name = "correct_answer_index")
   @Getter
   @Setter
+  @JsonIgnore
   private Integer correctAnswerIndex;
 
   @Column(name = "check_spell")
   @Getter
   @Setter
+  @JsonIgnore
   private Boolean checkSpell;
 
   @Column(name = "has_image")
   @Getter
   @Setter
+  @JsonIgnore
   private Boolean hasImage;
 
   @JsonIgnore
@@ -62,6 +69,7 @@ public class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
     this.correctAnswerIndex = mcqWithAnswer.correctChoiceIndex;
   }
 
+  @JsonIgnore
   public boolean checkAnswer(Answer answer) {
     if (checkSpell != null && checkSpell) {
       return getNote().matchAnswer(answer.getSpellingAnswer());
@@ -78,7 +86,8 @@ public class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
     return null;
   }
 
-  public List<QuizQuestion.Choice> getOptions() {
+  @JsonIgnore
+  public List<Choice> getChoices() {
     MCQWithAnswer mcqWithAnswer = getMcqWithAnswer();
     if (mcqWithAnswer.choices == null) {
       return List.of();
@@ -86,19 +95,32 @@ public class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
     return mcqWithAnswer.choices.stream()
         .map(
             choice -> {
-              QuizQuestion.Choice option = new QuizQuestion.Choice();
+              Choice option = new Choice();
               option.setDisplay(choice);
               return option;
             })
         .toList();
   }
 
+  @JsonIgnore
   public QuizQuestion getQuizQuestion() {
     return new QuizQuestion(
         getId(),
         getStem(),
         getNote().getNotebook().getHeadNote(),
-        getOptions(),
+        getChoices(),
         getImageWithMask());
+  }
+
+  @NotNull
+  public Note getHeadNote() {
+    return getNote().getNotebook().getHeadNote();
+  }
+
+  @Data
+  public static class Choice {
+    private boolean isImage = false;
+    private String display;
+    private ImageWithMask imageWithMask;
   }
 }

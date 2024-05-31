@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.*;
 
 import com.odde.doughnut.controllers.dto.QuizQuestion;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.ImageSelectionQuizFactory;
 import com.odde.doughnut.models.UserModel;
@@ -106,6 +107,6 @@ class ImageSelectionQuizFactoryTest {
   }
 
   private List<String> toOptionStrings(QuizQuestion quizQuestion) {
-    return quizQuestion.getChoices().stream().map(QuizQuestion.Choice::getDisplay).toList();
+    return quizQuestion.getChoices().stream().map(QuizQuestionEntity.Choice::getDisplay).toList();
   }
 }

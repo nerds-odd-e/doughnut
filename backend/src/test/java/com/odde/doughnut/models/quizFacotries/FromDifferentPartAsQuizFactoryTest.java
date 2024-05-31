@@ -217,7 +217,7 @@ class FromDifferentPartAsQuizFactoryTest {
   }
 
   private List<String> toOptionStrings(QuizQuestion quizQuestion) {
-    List<QuizQuestion.Choice> choices = quizQuestion.getChoices();
-    return choices.stream().map(QuizQuestion.Choice::getDisplay).toList();
+    List<QuizQuestionEntity.Choice> choices = quizQuestion.getChoices();
+    return choices.stream().map(QuizQuestionEntity.Choice::getDisplay).toList();
   }
 }

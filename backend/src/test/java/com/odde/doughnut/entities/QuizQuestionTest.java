@@ -67,7 +67,7 @@ class QuizQuestionTest {
   class ClozeSelectionQuiz {
     private List<String> getOptions(Note note) {
       QuizQuestion quizQuestion = generateQuizQuestion(note);
-      return quizQuestion.getChoices().stream().map(QuizQuestion.Choice::getDisplay).toList();
+      return quizQuestion.getChoices().stream().map(QuizQuestionEntity.Choice::getDisplay).toList();
     }
 
     @Test
