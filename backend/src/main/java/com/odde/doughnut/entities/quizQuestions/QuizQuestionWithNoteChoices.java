@@ -1,10 +1,13 @@
 package com.odde.doughnut.entities.quizQuestions;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.QuizQuestion;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.Randomizer;
+import com.odde.doughnut.services.ai.MCQWithAnswer;
 import jakarta.persistence.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -42,7 +45,7 @@ public abstract class QuizQuestionWithNoteChoices extends QuizQuestionEntity {
   }
 
   @JsonIgnore
-  public List<Integer> getChoiceNoteIds() {
+  private List<Integer> getChoiceNoteIds() {
     if (Strings.isBlank(optionNoteIds)) return List.of();
     return Arrays.stream(optionNoteIds.split(","))
         .map(Integer::parseInt)
@@ -69,7 +72,30 @@ public abstract class QuizQuestionWithNoteChoices extends QuizQuestionEntity {
     return null;
   }
 
+  @Override
   public boolean checkAnswer(Answer answer) {
     return Objects.equals(answer.getChoiceIndex(), getCorrectAnswerIndex());
+  }
+
+  @Column(name = "raw_json_question")
+  @Getter
+  @Setter
+  private String rawJsonQuestion;
+
+  @JsonIgnore
+  public MCQWithAnswer getMcqWithAnswer() {
+    try {
+      return new ObjectMapper().readValue(getRawJsonQuestion(), MCQWithAnswer.class);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public String getMainTopic() {
+    return null;
+  }
+
+  public String getStem() {
+    return getMcqWithAnswer().stem;
   }
 }
