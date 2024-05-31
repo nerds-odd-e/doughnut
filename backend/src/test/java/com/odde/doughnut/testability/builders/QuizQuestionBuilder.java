@@ -36,7 +36,7 @@ public class QuizQuestionBuilder extends EntityBuilder<QuizQuestion> {
   public QuizQuestion ViewedByUserPlease() {
     QuizQuestion quizQuestion = inMemoryPlease();
     if (quizQuestion == null) return null;
-    return quizQuestion.getQuizQuestion();
+    return quizQuestion;
   }
 
   public QuizQuestionBuilder spellingQuestionOfNote(Note note) {

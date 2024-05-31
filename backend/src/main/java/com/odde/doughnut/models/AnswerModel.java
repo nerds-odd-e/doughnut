@@ -25,7 +25,7 @@ public class AnswerModel {
     answerResult.correct = answer.isCorrect();
     answerResult.correctChoiceIndex = getQuestion().getCorrectAnswerIndex();
     answerResult.choiceIndex = answer.getChoiceIndex();
-    answerResult.quizQuestion = getQuestion().getQuizQuestion();
+    answerResult.quizQuestion = getQuestion();
     return answerResult;
   }
 

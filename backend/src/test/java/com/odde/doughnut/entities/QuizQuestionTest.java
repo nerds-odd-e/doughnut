@@ -144,7 +144,7 @@ class QuizQuestionTest {
       QuizQuestion randomQuizQuestion =
           generateQuizQuestion(note, new RealRandomizer(), questionGenerator);
       assertThat(randomQuizQuestion, instanceOf(QuizQuestion.class));
-      QuizQuestion qq = randomQuizQuestion.getQuizQuestion();
+      QuizQuestion qq = randomQuizQuestion;
       assertThat(qq.getStem(), containsString(mcqWithAnswer.stem));
     }
 
@@ -185,6 +185,6 @@ class QuizQuestionTest {
   }
 
   private QuizQuestion generateQuizQuestion(Note note) {
-    return generateQuizQuestionEntity(note).getQuizQuestion();
+    return generateQuizQuestionEntity(note);
   }
 }

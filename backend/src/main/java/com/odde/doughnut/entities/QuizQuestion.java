@@ -100,11 +100,6 @@ public class QuizQuestion extends EntityIdentifiedByIdOnly {
         .toList();
   }
 
-  @JsonIgnore
-  public QuizQuestion getQuizQuestion() {
-    return this;
-  }
-
   @NotNull
   public Note getHeadNote() {
     return getNote().getNotebook().getHeadNote();
