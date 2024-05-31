@@ -1,11 +1,14 @@
 package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
+import com.odde.doughnut.controllers.dto.QuizQuestion;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionEntity;
 import com.odde.doughnut.entities.quizQuestions.QuizQuestionWithNoteChoices;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
+import com.odde.doughnut.services.ai.MCQWithAnswer;
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class QuestionOptionsFactory implements QuizQuestionFactory {
@@ -22,7 +25,15 @@ public abstract class QuestionOptionsFactory implements QuizQuestionFactory {
     if (options.size() < this.minimumOptionCount() - 1) {
       throw new QuizQuestionNotPossibleException();
     }
-    quizQuestion.setChoicesAndRightAnswer(answerNote, options, servant.randomizer);
+    List<Note> optionsEntities = new ArrayList<>(options);
+    optionsEntities.add(answerNote);
+    List<Note> shuffled = servant.randomizer.shuffle(optionsEntities);
+    MCQWithAnswer mcqWithAnswer = new MCQWithAnswer();
+    mcqWithAnswer.stem = quizQuestion.getStem();
+    mcqWithAnswer.correctChoiceIndex = shuffled.indexOf(answerNote);
+    mcqWithAnswer.choices =
+        shuffled.stream().map(this::noteToChoice).map(QuizQuestion.Choice::getDisplay).toList();
+    quizQuestion.setMcqWithAnswer(mcqWithAnswer);
     return quizQuestion;
   }
 
@@ -38,5 +49,10 @@ public abstract class QuestionOptionsFactory implements QuizQuestionFactory {
   public int minimumOptionCount() {
     return 2;
   }
-  ;
+
+  public QuizQuestion.Choice noteToChoice(Note note) {
+    QuizQuestion.Choice choice = new QuizQuestion.Choice();
+    choice.setDisplay(note.getTopicConstructor());
+    return choice;
+  }
 }

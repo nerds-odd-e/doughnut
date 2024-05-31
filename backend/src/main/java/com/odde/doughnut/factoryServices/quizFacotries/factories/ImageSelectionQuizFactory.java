@@ -1,5 +1,6 @@
 package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
+import com.odde.doughnut.controllers.dto.QuizQuestion;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.quizQuestions.QuizQuestionImageSelection;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
@@ -36,5 +37,14 @@ public class ImageSelectionQuizFactory extends QuestionOptionsFactory {
     QuizQuestionImageSelection quizQuestion = new QuizQuestionImageSelection();
     quizQuestion.setNote(answerNote);
     return quizQuestion;
+  }
+
+  @Override
+  public QuizQuestion.Choice noteToChoice(Note note) {
+    QuizQuestion.Choice choice = new QuizQuestion.Choice();
+    choice.setDisplay(note.getTopicConstructor());
+    choice.setImageWithMask(note.getImageWithMask());
+    choice.setImage(true);
+    return choice;
   }
 }

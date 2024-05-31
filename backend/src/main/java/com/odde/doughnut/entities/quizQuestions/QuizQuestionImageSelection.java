@@ -1,7 +1,5 @@
 package com.odde.doughnut.entities.quizQuestions;
 
-import com.odde.doughnut.controllers.dto.QuizQuestion;
-import com.odde.doughnut.entities.Note;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
@@ -12,15 +10,6 @@ public class QuizQuestionImageSelection extends QuizQuestionWithNoteChoices {
   @Override
   public String getMainTopic() {
     return getNote().getTopicConstructor();
-  }
-
-  @Override
-  protected QuizQuestion.Choice noteToChoice(Note note) {
-    QuizQuestion.Choice choice = new QuizQuestion.Choice();
-    choice.setDisplay(note.getTopicConstructor());
-    choice.setImageWithMask(note.getImageWithMask());
-    choice.setImage(true);
-    return choice;
   }
 
   public String getStem() {

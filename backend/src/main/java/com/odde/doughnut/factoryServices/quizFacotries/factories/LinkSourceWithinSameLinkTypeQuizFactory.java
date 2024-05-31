@@ -1,5 +1,7 @@
 package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
+import com.odde.doughnut.algorithms.ClozedString;
+import com.odde.doughnut.controllers.dto.QuizQuestion;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.quizQuestions.QuizQuestionLinkSourceWithSameLinkType;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
@@ -35,5 +37,17 @@ public class LinkSourceWithinSameLinkTypeQuizFactory extends QuestionOptionsFact
         new QuizQuestionLinkSourceWithSameLinkType();
     quizQuestionLinkSourceWithSameLinkType.setNote(link);
     return quizQuestionLinkSourceWithSameLinkType;
+  }
+
+  @Override
+  public QuizQuestion.Choice noteToChoice(Note note) {
+    QuizQuestion.Choice choice = new QuizQuestion.Choice();
+    Note source = note.getParent();
+    Note target = note.getTargetNote();
+    choice.setDisplay(
+        ClozedString.htmlClozedString(source.getTopicConstructor())
+            .hide(target.getNoteTitle())
+            .clozeTitle());
+    return choice;
   }
 }
