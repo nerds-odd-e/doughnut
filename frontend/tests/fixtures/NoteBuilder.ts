@@ -41,6 +41,7 @@ class NoteBuilder extends Builder<Note> {
 
   details(value: string): NoteBuilder {
     this.data.details = value;
+    this.data.noteTopic.shortDetails = `${value}, just shorter`;
     return this;
   }
 

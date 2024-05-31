@@ -4,7 +4,7 @@
       <NotebookNewButton>Add New Notebook</NotebookNewButton>
     </p>
     <main>
-      <NotebookViewCards :notebooks="notebooks" />
+      <NotebookViewCards v-if="notebooks" :notebooks="notebooks" />
     </main>
     <h2>Subscribed Notes</h2>
     <NotebookSubscriptionCards

@@ -9,7 +9,7 @@ describe("LinkNoteFinalize", () => {
       .component(LinkNoteFinalize)
       .withStorageProps({
         note,
-        targetNote: note,
+        targetNoteTopic: note.note.noteTopic,
       })
       .mount();
     await wrapper.find(".go-back-button").trigger("click");

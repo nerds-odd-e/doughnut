@@ -5,7 +5,7 @@
       v-for="notebook in notebooks"
       :key="notebook.id"
     >
-      <Card :note="notebook.headNote">
+      <Card :note-topic="notebook.headNote.noteTopic">
         <template #cardHeader>
           <span class="card-header d-flex flex-row-reverse p-0">
             <slot :notebook="notebook" />

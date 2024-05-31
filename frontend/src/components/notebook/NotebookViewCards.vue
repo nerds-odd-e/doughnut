@@ -7,13 +7,16 @@
   </NotebookCardsWithButtons>
 </template>
 
-<script>
+<script setup lang="ts">
+import { PropType } from "vue";
+import { NotebookViewedByUser } from "@/generated/backend";
 import NotebookCardsWithButtons from "./NotebookCardsWithButtons.vue";
 import NotebookButtons from "./NotebookButtons.vue";
 
-export default {
-  name: "NotebookViewCards",
-  props: { notebooks: Array },
-  components: { NotebookCardsWithButtons, NotebookButtons },
-};
+defineProps({
+  notebooks: {
+    type: Array as PropType<NotebookViewedByUser[]>,
+    required: true,
+  },
+});
 </script>

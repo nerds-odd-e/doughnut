@@ -2,39 +2,31 @@
   <div class="card">
     <slot name="cardHeader" />
     <router-link
-      :to="{ name: 'noteShow', params: { noteId: note.id } }"
+      :to="{ name: 'noteShow', params: { noteId: noteTopic.id } }"
       class="text-decoration-none"
     >
       <div class="card-body">
         <h5>
-          <NoteTopicWithLink
-            v-bind="{ noteTopic: note.noteTopic }"
-            class="card-title"
-          />
+          <NoteTopicWithLink v-bind="{ noteTopic }" class="card-title" />
         </h5>
-        <NoteShortDetails :details="note.details" />
+        <p v-if="noteTopic.shortDetails" class="note-short-details">
+          {{ noteTopic.shortDetails }}
+        </p>
       </div>
     </router-link>
     <div class="card-footer" v-if="$slots.button">
-      <slot name="button" :note="note" />
+      <slot name="button" :note-topic="noteTopic" />
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { Note } from "@/generated/backend";
+<script setup lang="ts">
+import { PropType } from "vue";
+import { NoteTopic } from "@/generated/backend";
 import NoteTopicWithLink from "./NoteTopicWithLink.vue";
-import NoteShortDetails from "./NoteShortDetails.vue";
 
-export default defineComponent({
-  props: {
-    note: { type: Object as PropType<Note>, required: true },
-  },
-  components: {
-    NoteTopicWithLink,
-    NoteShortDetails,
-  },
+defineProps({
+  noteTopic: { type: Object as PropType<NoteTopic>, required: true },
 });
 </script>
 

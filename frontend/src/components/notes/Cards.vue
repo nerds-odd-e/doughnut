@@ -3,12 +3,9 @@
     :class="`row row-cols-1 row-cols-md-${columns - 1} row-cols-lg-${columns} g-3`"
   >
     <div class="col" v-for="note in notes" :key="note.id">
-      <Card v-bind="{ note }">
-        <template #cardHeader>
-          <slot name="cardHeader" :note-topic="note.noteTopic" />
-        </template>
+      <Card v-bind="{ noteTopic: note.noteTopic }">
         <template #button v-if="$slots.button">
-          <slot name="button" :note="note" />
+          <slot name="button" :note-topic="note.noteTopic" />
         </template>
       </Card>
     </div>

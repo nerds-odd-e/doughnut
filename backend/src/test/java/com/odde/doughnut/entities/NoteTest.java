@@ -33,8 +33,15 @@ public class NoteTest {
 
   @Test
   void shortDetails() {
-    Note note = makeMe.aNote().details("<strong>this is a very long sentence</strong> that contains very little meaning. The purpose is to test the truncate.").please();
-    assertThat(note.getNoteTopic().getShortDetails(), equalTo("this is a very long sentence that contains very li..."));
+    Note note =
+        makeMe
+            .aNote()
+            .details(
+                "<strong>this is a very long sentence</strong> that contains very little meaning. The purpose is to test the truncate.")
+            .please();
+    assertThat(
+        note.getNoteTopic().getShortDetails(),
+        equalTo("this is a very long sentence that contains very li..."));
   }
 
   @Test
