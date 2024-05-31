@@ -21,4 +21,20 @@ describe("breadcrumb with circles", () => {
       .render();
     await screen.findByText("Bazaar");
   });
+
+  it("show ancestors in correct order", async () => {
+    const parentNote = makeMe.aNote.topicConstructor("parent").please();
+    const child = makeMe.aNote
+      .topicConstructor("child")
+      .underNote(parentNote)
+      .please();
+    const grandChild = makeMe.aNote.underNote(child).please();
+    helper
+      .component(Breadcrumb)
+      .withProps({ noteTopic: grandChild.noteTopic })
+      .render();
+    const items = screen.getAllByText(/parent|child/);
+    expect(items[0]).toHaveTextContent("parent");
+    expect(items[1]).toHaveTextContent("child");
+  });
 });

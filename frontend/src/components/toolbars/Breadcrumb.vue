@@ -48,7 +48,7 @@ const ancestors = computed(() => {
   const result: NoteTopic[] = [];
   let currentColor = props.noteTopic;
   while (currentColor.parentNoteTopic) {
-    result.push(currentColor.parentNoteTopic);
+    result.unshift(currentColor.parentNoteTopic);
     currentColor = currentColor.parentNoteTopic;
   }
   return result;
