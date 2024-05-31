@@ -6,9 +6,6 @@
       v-bind="quizQuestion.imageWithMask"
       :opacity="1"
     />
-    <h2 v-if="!!quizQuestion.mainTopic" class="text-center">
-      {{ quizQuestion.mainTopic }}
-    </h2>
     <div
       style="white-space: pre-wrap"
       v-if="quizQuestion.stem"

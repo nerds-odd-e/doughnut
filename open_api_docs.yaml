@@ -2515,8 +2515,6 @@ components:
           format: int32
         stem:
           type: string
-        mainTopic:
-          type: string
         headNote:
           $ref: "#/components/schemas/Note"
         choices:

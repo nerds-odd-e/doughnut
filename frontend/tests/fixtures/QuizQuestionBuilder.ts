@@ -8,7 +8,6 @@ class QuizQuestionBuilder extends Builder<QuizQuestion> {
     id: generateId(),
     choices: [],
     stem: "answer",
-    mainTopic: "",
     headNote: new NoteBuilder().do(),
   };
 

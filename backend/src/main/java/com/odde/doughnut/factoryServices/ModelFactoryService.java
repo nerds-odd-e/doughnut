@@ -93,7 +93,6 @@ public class ModelFactoryService {
     return new QuizQuestion(
         quizQuestionEntity.getId(),
         quizQuestionEntity.getStem(),
-        quizQuestionEntity.getMainTopic(),
         quizQuestionEntity.getNote().getNotebook().getHeadNote(),
         quizQuestionEntity.getOptions(this),
         quizQuestionEntity.getImageWithMask());

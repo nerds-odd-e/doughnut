@@ -8,7 +8,6 @@ import type { Note } from './Note';
 export type QuizQuestion = {
     id: number;
     stem?: string;
-    mainTopic?: string;
     headNote: Note;
     choices?: Array<Choice>;
     imageWithMask?: ImageWithMask;

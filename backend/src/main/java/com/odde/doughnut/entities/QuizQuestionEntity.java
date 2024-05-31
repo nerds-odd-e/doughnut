@@ -63,10 +63,6 @@ public abstract class QuizQuestionEntity extends EntityIdentifiedByIdOnly {
     return getMcqWithAnswer().stem;
   }
 
-  public String getMainTopic() {
-    return null;
-  }
-
   public ImageWithMask getImageWithMask() {
     return null;
   }

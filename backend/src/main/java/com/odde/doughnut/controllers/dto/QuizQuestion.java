@@ -14,8 +14,6 @@ public class QuizQuestion {
 
   @Getter public String stem;
 
-  @Getter public String mainTopic;
-
   @NotNull @Getter public Note headNote;
 
   @Getter public List<Choice> choices;
