@@ -24,7 +24,6 @@ public class CurrentUserFetcherFromRequest implements CurrentUserFetcher {
     if (userPrincipal != null) {
       externalId = userPrincipal.getName();
     }
-    request.setAttribute("currentUserFetcher", this);
   }
 
   @Override
