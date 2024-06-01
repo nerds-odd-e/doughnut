@@ -171,6 +171,7 @@ Cypress.Commands.add("clickButtonOnCardBody", (noteTopic, buttonTitle) => {
       .parent()
       .parent()
       .parent()
+      .parent()
       .findByText(buttonTitle)
       .then(($button) => {
         cy.wrap($button).click()
@@ -248,7 +249,9 @@ Cypress.Commands.add(
   },
 )
 
-Cypress.Commands.add("findCardTitle", (topic) => cy.findByText(topic, { selector: ".card-title" }))
+Cypress.Commands.add("findCardTitle", (topic) =>
+  cy.findByText(topic, { selector: ".card-title .topic-text" }),
+)
 
 Cypress.Commands.add("yesIRemember", () => {
   cy.findByRole("button", { name: "Yes, I remember" })

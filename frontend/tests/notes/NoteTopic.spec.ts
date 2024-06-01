@@ -32,6 +32,16 @@ describe("note topic", () => {
         name: "noteShow",
         params: { noteId: target.id },
       });
+      expect(link.text()).toBe(target.noteTopic.topicConstructor);
+    });
+
+    it("if linking note has details the link is an icon", async () => {
+      linkingNote.noteTopic.shortDetails = "exist";
+      const wrapper = mountComponent(linkingNote);
+      const link = wrapper.find("a.router-link");
+      expect(link.exists()).toBe(true);
+      expect(link.text()).toBe("🔗");
+      expect(wrapper.text()).toContain(target.noteTopic.topicConstructor);
     });
   });
 });

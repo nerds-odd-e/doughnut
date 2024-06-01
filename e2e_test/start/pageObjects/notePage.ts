@@ -68,10 +68,29 @@ export const assumeNotePage = (noteTopic?: string) => {
         cy.expectNoteCards(children)
       })
     },
-    expectLinkingTopic: (linkType: string, target: string) => {
-      cy.findByText(target, { selector: ".card-title span" }).parent().findAllByText(linkType, {
-        selector: ".card-title span",
-      })
+
+    linkNoteTo: (target: string) => {
+      const findLink = () =>
+        cy.findByText(target, { selector: "main .topic-text" }).parent().parent().parent()
+      return {
+        linkType: (linkType: string) => {
+          findLink().findAllByText(linkType, {
+            selector: ".link-type",
+          })
+        },
+        goto: () => {
+          findLink().get(".link-type").click()
+        },
+      }
+    },
+
+    expectLinkingTopic: function (linkType: string, target: string) {
+      this.linkNoteTo(target).linkType(linkType)
+    },
+
+    navigateToLinkingChild: function (targetNoteTopic: string) {
+      this.linkNoteTo(targetNoteTopic).goto()
+      return assumeNotePage()
     },
     expectLinkingChildren: function (linkType: string, targetNoteTopics: string) {
       cy.get("main").within(() => {
@@ -86,15 +105,10 @@ export const assumeNotePage = (noteTopic?: string) => {
       cy.pageIsNotLoading()
       this.expectLinkingTopic(linkType, target)
     },
-    navigateToLinkingChild: (targetNoteTopic: string) => {
-      cy.get("main").within(() => {
-        cy.findByText(targetNoteTopic, { selector: ".card-title span" }).click()
-      })
-      return assumeNotePage()
-    },
+
     navigateToReference: (referenceTopic: string) => {
       cy.get("main").within(() => {
-        cy.findByText(referenceTopic, { selector: ".link-title" }).click()
+        cy.findByText(referenceTopic, { selector: ".topic-text" }).click()
       })
       return assumeNotePage()
     },

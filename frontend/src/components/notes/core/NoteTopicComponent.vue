@@ -1,16 +1,25 @@
 <template>
   <template v-if="noteTopic.targetNoteTopic">
-    <span style="font-size: 50%">
+    <span class="link-type" style="font-size: 50%">
       {{ linkType }}
     </span>
     <SvgLinkTypeIcon :link-type="linkType" :inverse-icon="true" />
     &nbsp;
     <span>
-      <NoteTopicWithLink v-bind="{ noteTopic: noteTopic.targetNoteTopic }" />
+      <NoteTopicComponent
+        v-if="iconizedTarget"
+        v-bind="{ noteTopic: noteTopic.targetNoteTopic }"
+      />
+      <NoteTopicWithLink
+        v-bind="{
+          noteTopic: noteTopic.targetNoteTopic,
+          iconized: iconizedTarget,
+        }"
+      />
     </span>
   </template>
   <template v-else>
-    {{ topic }}
+    <span class="topic-text">{{ topic }} </span>
   </template>
 </template>
 
@@ -34,5 +43,8 @@ const topic = computed(() =>
     "%P",
     `[${reactiveProps.value.noteTopic.parentNoteTopic?.topicConstructor}]`,
   ),
+);
+const iconizedTarget = computed(
+  () => !!reactiveProps.value.noteTopic.shortDetails,
 );
 </script>

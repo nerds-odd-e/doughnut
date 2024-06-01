@@ -49,7 +49,7 @@ When(
 )
 
 When("I should see the parent note as {string}", (noteTopic: string) => {
-  cy.findByText(noteTopic, { selector: "strong" }).should("be.visible")
+  cy.findByText(noteTopic, { selector: "strong .topic-text" }).should("be.visible")
 })
 
 When("I should see {string} as the possible duplicate", (noteTopicsAsString: string) => {
@@ -89,7 +89,7 @@ Then(
   "[deprecating] On the current page, I should see {string} has link {string} {string}",
   (noteTopic: string, linkType: string, targetNoteTopics: string) => {
     cy.findByText(commonSenseSplit(targetNoteTopics, ",").pop(), {
-      selector: ".link-title",
+      selector: ".card .topic-text",
     })
     cy.findAllByText(linkType)
   },

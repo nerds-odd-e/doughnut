@@ -110,7 +110,7 @@ describe("Sidebar", () => {
       expect(
         /* eslint-disable */
         (await screen.findByText(firstGeneration.note.noteTopic.topicConstructor)).parentNode
-          ?.parentNode,
+          ?.parentNode?.parentNode,
         /* eslint-enable */
       ).toHaveClass("active-item");
     });
