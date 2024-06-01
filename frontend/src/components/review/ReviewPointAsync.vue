@@ -1,12 +1,16 @@
 <template>
   <ContentLoader v-if="!reviewPoint" />
-  <ShowThing
-    v-else
-    v-bind="{
-      note: reviewPoint.note,
-      expandInfo: false,
-      storageAccessor,
-    }"
+  <main v-else>
+    <Breadcrumb v-bind="{ noteTopic: reviewPoint.note.noteTopic }" />
+    <NoteShow
+      v-bind="{
+        noteId: reviewPoint.note.id,
+        expandChildren: false,
+        readonly: false,
+        storageAccessor,
+      }"
+    />
+  </main>
   />
 </template>
 
@@ -16,7 +20,7 @@ import { ReviewPoint } from "@/generated/backend";
 import useLoadingApi from "@/managedApi/useLoadingApi";
 import { StorageAccessor } from "@/store/createNoteStorage";
 import ContentLoader from "@/components/commons/ContentLoader.vue";
-import ShowThing from "./ShowThing.vue";
+import NoteShow from "../notes/NoteShow.vue";
 
 export default defineComponent({
   setup() {
@@ -31,7 +35,7 @@ export default defineComponent({
   },
   components: {
     ContentLoader,
-    ShowThing,
+    NoteShow,
   },
   data() {
     return {
