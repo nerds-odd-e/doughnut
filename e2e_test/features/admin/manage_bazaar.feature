@@ -15,5 +15,5 @@ Feature: Manage Bazaar
   @ignore
   Scenario: Remove the notebook from Bazaar
     * I should see "Romance, Classics" shared in the Bazaar
-    When I remove the notebook "Shape" from the bazaar
+    When I remove the notebook "Romance" from the bazaar
     Then I should see "Classics" shared in the Bazaar

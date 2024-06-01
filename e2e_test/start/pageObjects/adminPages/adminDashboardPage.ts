@@ -34,7 +34,14 @@ export function assumeAdminDashboardPage() {
     goToBazaarManagement() {
       this.goToTabInAdminDashboard("Manage Bazaar")
       return {
-        delete(_notebook: string) {},
+        removeFromBazaar(notebook: string) {
+          cy.findByText(notebook)
+            .parentsUntil("tr")
+            .parent()
+            .findByRole("button", { name: "Remove" })
+            .click()
+          cy.findByRole("button", { name: "OK" }).click()
+        },
       }
     },
 

@@ -55,33 +55,25 @@
   <FailureReportList v-if="activePage === 'failureReport'" />
   <ManageModel v-if="activePage === 'manageModel'" />
   <ManageAssistant v-if="activePage === 'manageAssistant'" />
+  <ManageBazaar v-if="activePage === 'manageBazaar'" />
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
+import { ref } from "vue";
 import FineTuningData from "../components/admin/FineTuningData.vue";
 import FailureReportList from "../components/admin/FailureReportList.vue";
 import ManageModel from "../components/admin/ManageModel.vue";
 import ManageAssistant from "../components/admin/ManageAssistant.vue";
+import ManageBazaar from "../components/admin/ManageBazaar.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 
-export default {
-  data() {
-    return {
-      activePage: "fineTuningData" as
-        | "fineTuningData"
-        | "failureReport"
-        | "manageModel"
-        | "manageAssistant"
-        | "manageBazaar"
-        | undefined,
-    };
-  },
-  components: {
-    FineTuningData,
-    FailureReportList,
-    ManageModel,
-    ManageAssistant,
-    ContainerPage,
-  },
-};
+const activePage = ref(
+  "fineTuningData" as
+    | "fineTuningData"
+    | "failureReport"
+    | "manageModel"
+    | "manageAssistant"
+    | "manageBazaar"
+    | undefined,
+);
 </script>
