@@ -1,4 +1,4 @@
-import { CircleForUserView, NotebookViewedByUser } from "@/generated/backend";
+import { CircleForUserView, Notebook } from "@/generated/backend";
 import Builder from "./Builder";
 import generateId from "./generateId";
 import NotebooksBuilder from "./NotebooksBuilder";
@@ -6,7 +6,7 @@ import NotebooksBuilder from "./NotebooksBuilder";
 class CircleNoteBuilder extends Builder<CircleForUserView> {
   notebooksBuilder: NotebooksBuilder = new NotebooksBuilder();
 
-  notebooks(notebook: NotebookViewedByUser) {
+  notebooks(notebook: Notebook) {
     this.notebooksBuilder.notebooks(notebook);
     return this;
   }

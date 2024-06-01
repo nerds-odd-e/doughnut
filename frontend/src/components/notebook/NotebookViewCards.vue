@@ -9,13 +9,13 @@
 
 <script setup lang="ts">
 import { PropType } from "vue";
-import { NotebookViewedByUser } from "@/generated/backend";
+import { Notebook } from "@/generated/backend";
 import NotebookCardsWithButtons from "./NotebookCardsWithButtons.vue";
 import NotebookButtons from "./NotebookButtons.vue";
 
 defineProps({
   notebooks: {
-    type: Array as PropType<NotebookViewedByUser[]>,
+    type: Array as PropType<Notebook[]>,
     required: true,
   },
 });

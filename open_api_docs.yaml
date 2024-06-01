@@ -2734,21 +2734,6 @@ components:
           maxLength: 20
           minLength: 10
           type: string
-    NotebookViewedByUser:
-      required:
-      - headNote
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        headNoteId:
-          type: integer
-          format: int32
-        headNote:
-          $ref: "#/components/schemas/Note"
-        skipReviewEntirely:
-          type: boolean
     NotebooksViewedByUser:
       required:
       - notebooks
@@ -2757,7 +2742,7 @@ components:
         notebooks:
           type: array
           items:
-            $ref: "#/components/schemas/NotebookViewedByUser"
+            $ref: "#/components/schemas/Notebook"
         subscriptions:
           type: array
           items:

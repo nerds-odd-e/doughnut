@@ -1,7 +1,4 @@
-import {
-  NotebookViewedByUser,
-  NotebooksViewedByUser,
-} from "@/generated/backend";
+import { Notebook, NotebooksViewedByUser } from "@/generated/backend";
 import Builder from "./Builder";
 
 class NotebooksBuilder extends Builder<NotebooksViewedByUser> {
@@ -15,7 +12,7 @@ class NotebooksBuilder extends Builder<NotebooksViewedByUser> {
     };
   }
 
-  notebooks(notebook: NotebookViewedByUser) {
+  notebooks(notebook: Notebook) {
     this.data.notebooks = [...this.data.notebooks, notebook];
     return this;
   }

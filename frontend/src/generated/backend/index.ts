@@ -42,7 +42,6 @@ export type { NoteAccessory } from './models/NoteAccessory';
 export type { Notebook } from './models/Notebook';
 export type { NotebookDTO } from './models/NotebookDTO';
 export type { NotebooksViewedByUser } from './models/NotebooksViewedByUser';
-export type { NotebookViewedByUser } from './models/NotebookViewedByUser';
 export { NoteCreationDTO } from './models/NoteCreationDTO';
 export type { NoteCreationRresult } from './models/NoteCreationRresult';
 export type { NoteInfo } from './models/NoteInfo';

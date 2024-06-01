@@ -2,10 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { NotebookViewedByUser } from './NotebookViewedByUser';
+import type { Notebook } from './Notebook';
 import type { Subscription } from './Subscription';
 export type NotebooksViewedByUser = {
-    notebooks: Array<NotebookViewedByUser>;
+    notebooks: Array<Notebook>;
     subscriptions?: Array<Subscription>;
 };
 

@@ -1,10 +1,10 @@
-import { Note, NotebookViewedByUser } from "@/generated/backend";
+import { Note, Notebook } from "@/generated/backend";
 import Builder from "./Builder";
 import generateId from "./generateId";
 import NoteBuilder from "./NoteBuilder";
 
-class NotebookBuilder extends Builder<NotebookViewedByUser> {
-  data: NotebookViewedByUser;
+class NotebookBuilder extends Builder<Notebook> {
+  data: Notebook;
 
   notebuilder = new NoteBuilder();
 
@@ -23,7 +23,7 @@ class NotebookBuilder extends Builder<NotebookViewedByUser> {
     return this;
   }
 
-  do(): NotebookViewedByUser {
+  do(): Notebook {
     this.data.headNote = this.notebuilder.do();
     this.data.headNoteId = this.data.headNote.id;
     return this.data;

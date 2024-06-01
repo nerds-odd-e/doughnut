@@ -16,7 +16,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { NotebookViewedByUser, Subscription } from "@/generated/backend";
+import { Notebook, Subscription } from "@/generated/backend";
 import useLoadingApi from "@/managedApi/useLoadingApi";
 import NotebookViewCards from "@/components/notebook/NotebookViewCards.vue";
 import NotebookNewButton from "@/components/notebook/NotebookNewButton.vue";
@@ -36,7 +36,7 @@ export default defineComponent({
   data() {
     return {
       subscriptions: undefined as Subscription[] | undefined,
-      notebooks: undefined as NotebookViewedByUser[] | undefined,
+      notebooks: undefined as Notebook[] | undefined,
     };
   },
   methods: {

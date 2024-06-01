@@ -20,10 +20,7 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue";
 import useLoadingApi from "@/managedApi/useLoadingApi";
-import {
-  NotebookViewedByUser,
-  NotebooksViewedByUser,
-} from "@/generated/backend";
+import { Notebook, NotebooksViewedByUser } from "@/generated/backend";
 import NoteTopicWithLink from "../notes/NoteTopicWithLink.vue";
 import usePopups from "../commons/Popups/usePopups";
 
@@ -36,7 +33,7 @@ const fetchData = async () => {
   notebooks.value = await managedApi.restBazaarController.bazaar();
 };
 
-const removeFromBazaar = async (notebook: NotebookViewedByUser) => {
+const removeFromBazaar = async (notebook: Notebook) => {
   if (
     await popups.confirm(
       `Are you sure you want to remove "${notebook.headNote.noteTopic.topicConstructor}" from the bazaar?`,
