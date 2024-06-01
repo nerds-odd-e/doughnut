@@ -232,7 +232,7 @@ Cypress.Commands.add(
             const [linkType, targetNote] = commonSenseSplit(additional_info, "; ")
             cy.findByText(topic)
             cy.findByText(targetNote)
-            cy.get(".badge").contains(linkType)
+            cy.get(".link-type").contains(linkType)
           }
           break
         }
