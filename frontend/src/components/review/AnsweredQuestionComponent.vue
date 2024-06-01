@@ -1,12 +1,17 @@
 <template>
   <div v-if="reviewPoint">
-    <NoteAbbr
+    <div
       v-if="!toggleReviewPoint"
-      v-bind="{ note: reviewPoint.note }"
+      class="review-point-abbr"
       @click="toggleReviewPoint = true"
-    />
+    >
+      <label class="me-1"><strong>Review Point: </strong></label>
+      <NoteTopicComponent v-bind="{ noteTopic: reviewPoint.note.noteTopic }" />
+    </div>
     <div v-else>
-      <ShowThing v-bind="{ note: reviewPoint.note, storageAccessor }" />
+      <NoteWithBreadcrumb
+        v-bind="{ note: reviewPoint.note, storageAccessor }"
+      />
       <NoteInfoReviewPoint v-model="reviewPoint" />
     </div>
   </div>
@@ -21,43 +26,34 @@
   <AnswerResult v-bind="{ answeredQuestion }" />
 </template>
 
-<script lang="ts">
-import { defineComponent, PropType } from "vue";
-import NoteInfoReviewPoint from "@/components/notes/NoteInfoReviewPoint.vue";
+<script setup lang="ts">
+import { PropType, computed, ref } from "vue";
 import { AnsweredQuestion } from "@/generated/backend";
 import AnswerResult from "./AnswerResult.vue";
 import QuizQuestion from "./QuizQuestion.vue";
-import ShowThing from "./ShowThing.vue";
-import NoteAbbr from "./NoteAbbr.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
+import NoteTopicComponent from "../notes/core/NoteTopicComponent.vue";
+import NoteWithBreadcrumb from "./NoteWithBreadcrumb.vue";
 
-export default defineComponent({
-  props: {
-    answeredQuestion: {
-      type: Object as PropType<AnsweredQuestion>,
-      required: true,
-    },
-    storageAccessor: {
-      type: Object as PropType<StorageAccessor>,
-      required: true,
-    },
+const props = defineProps({
+  answeredQuestion: {
+    type: Object as PropType<AnsweredQuestion>,
+    required: true,
   },
-  components: {
-    AnswerResult,
-    QuizQuestion,
-    ShowThing,
-    NoteInfoReviewPoint,
-    NoteAbbr,
-  },
-  data() {
-    return {
-      toggleReviewPoint: false,
-    };
-  },
-  computed: {
-    reviewPoint() {
-      return this.answeredQuestion?.reviewPoint;
-    },
+  storageAccessor: {
+    type: Object as PropType<StorageAccessor>,
+    required: true,
   },
 });
+
+const toggleReviewPoint = ref(false);
+const reviewPoint = computed(() => props.answeredQuestion?.reviewPoint);
 </script>
+
+<style lang="sass" scoped>
+.review-point-abbr
+  border: 1px solid #ccc
+  width: 100%
+  border-radius: 5px
+  padding: 2px
+</style>

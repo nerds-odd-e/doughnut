@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { flushPromises } from "@vue/test-utils";
 import InitialReviewPage from "@/pages/InitialReviewPage.vue";
-import ShowThing from "@/components/review/ShowThing.vue";
 import { useRouter } from "vue-router";
 import mockBrowserTimeZone from "../helpers/mockBrowserTimeZone";
 import helper from "../helpers";
@@ -67,15 +66,6 @@ describe("repeat page", () => {
       await flushPromises();
       expect(wrapper.findAll(".paused")).toHaveLength(0);
       expect(teleportTarget.textContent).toContain("Initial Review: 0/2");
-    });
-
-    (["levelChanged"] as "levelChanged"[]).forEach((event) => {
-      it(`reloads when ${event}`, async () => {
-        const wrapper = renderer.currentRoute({ name: "initial" }).mount();
-        await flushPromises();
-        mockedInitialReviewCall.mockResolvedValue([]);
-        wrapper.findComponent(ShowThing).vm.$emit(event);
-      });
     });
   });
 

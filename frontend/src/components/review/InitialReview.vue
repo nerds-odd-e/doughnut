@@ -1,6 +1,8 @@
 <template>
   <ContainerPage v-bind="{ contentExists: true }">
-    <ShowThing v-bind="{ note, storageAccessor }" />
+    <main>
+      <NoteWithBreadcrumb v-bind="{ note, storageAccessor }" />
+    </main>
     <NoteInfoBar
       :note-id="note.id"
       :key="note.id"
@@ -19,10 +21,10 @@ import { Note } from "@/generated/backend";
 import useLoadingApi from "@/managedApi/useLoadingApi";
 import { StorageAccessor } from "@/store/createNoteStorage";
 import ContainerPage from "@/pages/commons/ContainerPage.vue";
-import ShowThing from "./ShowThing.vue";
 import NoteInfoBar from "../notes/NoteInfoBar.vue";
 import InitialReviewButtons from "./InitialReviewButtons.vue";
 import usePopups from "../commons/Popups/usePopups";
+import NoteWithBreadcrumb from "./NoteWithBreadcrumb.vue";
 
 export default defineComponent({
   name: "InitialReview",
@@ -41,7 +43,7 @@ export default defineComponent({
   },
   emits: ["reloadNeeded", "initialReviewDone"],
   components: {
-    ShowThing,
+    NoteWithBreadcrumb,
     ContainerPage,
     NoteInfoBar,
     InitialReviewButtons,
