@@ -209,4 +209,20 @@ describe("in place edit on title", () => {
       );
     });
   });
+  describe("for a linking note", () => {
+    const target = makeMe.aNote.underNote(note).please();
+    const linkingNote = makeMe.aLink.to(target).please();
+
+    it("should dispay target", async () => {
+      const wrapper = mountComponent(linkingNote);
+      expect(wrapper.text()).toContain(
+        linkingNote.noteTopic.targetNoteTopic?.topicConstructor,
+      );
+    });
+
+    it("should dispay breadcrumbs", async () => {
+      const wrapper = mountComponent(linkingNote);
+      expect(wrapper.text()).toContain(note.noteTopic.topicConstructor);
+    });
+  });
 });
