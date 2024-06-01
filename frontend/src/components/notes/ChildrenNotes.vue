@@ -24,7 +24,7 @@
       <div v-if="!internalExpandChildren">
         <div role="collapsed-children-count">{{ notes.length }}</div>
       </div>
-      <Cards v-else :notes="notes" :columns="2" />
+      <Cards v-else :notes="notes.map((n) => n.noteTopic)" :columns="2" />
     </div>
   </div>
 </template>

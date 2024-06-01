@@ -11,5 +11,5 @@ Feature: Note display
       | Potentially shippable product increment | The output of every Sprint is called a Potentially Shippable Product Increment. The work of all the teams must be integrated before the end of every Sprint—the integration must be done during the Sprint. |
     Then I should see these notes belonging to the user at the top level of all my notes
       | note-topic                              | note-details                                       |
-      | Potentially shippable product increment | The output of every Sprint is called a Potentia... |
+      | Potentially shippable product increment | The output of every Sprint is called a Potentially... |
 

@@ -16,7 +16,7 @@
   <div v-if="!searchResult || searchResult.length === 0">
     <em>No matching notes found.</em>
   </div>
-  <Cards v-else class="search-result" :notes="searchResult" :columns="3">
+  <Cards v-else class="search-result" :note-topics="searchResult1" :columns="3">
     <template #button="{ noteTopic }">
       <slot name="button" :note-topic="noteTopic" />
     </template>
@@ -103,6 +103,9 @@ export default defineComponent({
     searchResult() {
       return this.cachedResult ? this.cachedResult : this.recentResult;
     },
+    searchResult1() {
+      return this.searchResult ? this.searchResult.map((n) => n.noteTopic) : [];
+    },
   },
   methods: {
     async relativeSearch(
@@ -110,14 +113,12 @@ export default defineComponent({
       searchTerm: SearchTerm,
     ) {
       if (noteId) {
-        return (await this.managedApi.restNoteController.searchForLinkTargetWithin(
+        return this.managedApi.restNoteController.searchForLinkTargetWithin(
           noteId,
           searchTerm,
-        )) as Note[];
+        );
       }
-      return (await this.managedApi.restNoteController.searchForLinkTarget(
-        searchTerm,
-      )) as Note[];
+      return this.managedApi.restNoteController.searchForLinkTarget(searchTerm);
     },
 
     search() {
