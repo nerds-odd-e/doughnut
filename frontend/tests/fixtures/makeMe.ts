@@ -4,7 +4,7 @@ import LinkBuilder from "./LinkBuilder";
 import DueReviewPointsBuilder from "./DueReviewPointsBuilder";
 import NotebookBuilder from "./NotebookBuilder";
 import CircleNoteBuilder from "./CircleNoteBuilder";
-import BazaarNoteBuilder from "./NotebooksBuilder";
+import BazaarNotebooksBuilder from "./BazaarNotebooksBuilder";
 import NoteBuilder from "./NoteBuilder";
 import UserBuilder from "./UserBuilder";
 import WikidataEntityBuilder from "./WikidataEntityBuilder";
@@ -50,8 +50,8 @@ class MakeMe {
     return new NotebookBuilder();
   }
 
-  static get bazaarNotebooks(): BazaarNoteBuilder {
-    return new BazaarNoteBuilder();
+  static get bazaarNotebooks(): BazaarNotebooksBuilder {
+    return new BazaarNotebooksBuilder();
   }
 
   static get aWikidataEntity(): WikidataEntityBuilder {

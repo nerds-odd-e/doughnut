@@ -1,7 +1,7 @@
 import { CircleForUserView, Notebook } from "@/generated/backend";
 import Builder from "./Builder";
 import generateId from "./generateId";
-import NotebooksBuilder from "./NotebooksBuilder";
+import NotebooksBuilder from "./BazaarNotebooksBuilder";
 
 class CircleNoteBuilder extends Builder<CircleForUserView> {
   notebooksBuilder: NotebooksBuilder = new NotebooksBuilder();
@@ -16,7 +16,11 @@ class CircleNoteBuilder extends Builder<CircleForUserView> {
       id: generateId(),
       name: "",
       invitationCode: "",
-      notebooks: this.notebooksBuilder.do(),
+      notebooks: {
+        notebooks: this.notebooksBuilder
+          .do()
+          .map((bazaarNotebook) => bazaarNotebook.notebook),
+      },
       members: [],
     };
   }
