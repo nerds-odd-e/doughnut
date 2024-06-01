@@ -8,11 +8,11 @@ import static org.mockito.Mockito.when;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.theokanning.openai.OpenAiResponse;
+import com.theokanning.openai.assistants.run.*;
 import com.theokanning.openai.client.OpenAiApi;
-import com.theokanning.openai.messages.Message;
-import com.theokanning.openai.messages.MessageContent;
-import com.theokanning.openai.messages.content.Text;
-import com.theokanning.openai.runs.*;
+import com.theokanning.openai.assistants.message.Message;
+import com.theokanning.openai.assistants.message.MessageContent;
+import com.theokanning.openai.assistants.message.content.Text;
 import io.reactivex.Single;
 import java.util.List;
 import org.mockito.ArgumentMatchers;
@@ -40,7 +40,7 @@ public record OpenAIAssistantMock(OpenAiApi openAiApi) {
     List<MessageContent> contentList = List.of(cnt);
     OpenAiResponse<Message> msgs = new OpenAiResponse<>();
     msgs.setData(List.of(Message.builder().content(contentList).build()));
-    Mockito.doReturn(Single.just(msgs)).when(openAiApi).listMessages(retrievedRun.getThreadId());
+    Mockito.doReturn(Single.just(msgs)).when(openAiApi).listMessages(retrievedRun.getThreadId(), null);
   }
 
   public void mockSubmitOutputAndCompletion(Object result, String runId) {
@@ -51,13 +51,13 @@ public record OpenAIAssistantMock(OpenAiApi openAiApi) {
   public void mockSubmitOutputAndRequiredMoreAction(Object result, String runId) {
     Run run =
         getRunThatRequiresAction(
-            new ObjectMapper().valueToTree(result).toString(), runId, askClarificationQuestion);
+            new ObjectMapper().valueToTree(result), runId, askClarificationQuestion);
     when(openAiApi.submitToolOutputs(any(), any(), any())).thenReturn(Single.just(run));
   }
 
   private static Run getRunThatCallCompletionTool(String runId, Object result) {
     JsonNode arguments = new ObjectMapper().valueToTree(result);
-    return getRunThatRequiresAction(arguments.toString(), runId, COMPLETE_NOTE_DETAILS);
+    return getRunThatRequiresAction(arguments, runId, COMPLETE_NOTE_DETAILS);
   }
 
   private void mockCreateRunInProcess(String runId) {
@@ -77,7 +77,7 @@ public record OpenAIAssistantMock(OpenAiApi openAiApi) {
   }
 
   private static Run getRunThatRequiresAction(
-      String arguments, String runId, String function_name) {
+      JsonNode arguments, String runId, String function_name) {
     Run retrievedRun = new Run();
     retrievedRun.setId(runId);
     retrievedRun.setStatus("requires_action");

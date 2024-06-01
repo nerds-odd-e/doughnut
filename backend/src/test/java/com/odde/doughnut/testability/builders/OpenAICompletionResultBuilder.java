@@ -12,7 +12,7 @@ public class OpenAICompletionResultBuilder {
     choices.add(
         new ChatCompletionChoice() {
           {
-            this.setMessage(new ChatMessage(ChatMessageRole.USER.value(), text));
+            this.setMessage(new AssistantMessage(text));
           }
         });
     return this;
@@ -22,7 +22,7 @@ public class OpenAICompletionResultBuilder {
     choices.add(
         new ChatCompletionChoice() {
           {
-            this.setMessage(new ChatMessage(ChatMessageRole.USER.value(), incompleteText));
+            this.setMessage(new AssistantMessage(incompleteText));
             this.setFinishReason("length");
           }
         });
@@ -30,7 +30,7 @@ public class OpenAICompletionResultBuilder {
   }
 
   public OpenAICompletionResultBuilder functionCall(String name, JsonNode arguments) {
-    ChatMessage message = new ChatMessage(ChatMessageRole.FUNCTION.value(), "");
+    AssistantMessage message = new AssistantMessage( "");
     message.setFunctionCall(new ChatFunctionCall(name, arguments));
     choices.add(
         new ChatCompletionChoice() {

@@ -89,14 +89,14 @@ public class RestAiControllerChatTests {
     void chatRequestShouldContainTheNoteDetails() {
       ChatMessage systemMessage = argumentCaptor.getValue().getMessages().get(1);
       assertThat(systemMessage.getRole()).isEqualTo("system");
-      assertThat(systemMessage.getContent()).contains(note.getTopicConstructor());
+      assertThat(systemMessage.getTextContent()).contains(note.getTopicConstructor());
     }
 
     @Test
     void chatRequestShouldContainTheUserQuestion() {
       ChatMessage userMessage = argumentCaptor.getValue().getMessages().get(2);
       assertThat(userMessage.getRole()).isEqualTo("user");
-      assertThat(userMessage.getContent()).isEqualTo("What's your name?");
+      assertThat(userMessage.getTextContent()).isEqualTo("What's your name?");
     }
   }
 }

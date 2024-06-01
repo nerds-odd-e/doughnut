@@ -17,7 +17,7 @@ import retrofit2.http.POST;
 // If the OpenAI API Java project is continued to be not actively maintained,
 // we can consider forking the project and maintaining it ourselves.
 public interface OpenAiApiExtended extends OpenAiApi {
-  @POST("/v1/audio/transcriptions")
+  @POST("audio/transcriptions")
   @Headers("Accept: text/plain")
   Single<ResponseBody> createTranscriptionSrt(@Body RequestBody var1);
 }

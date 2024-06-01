@@ -8,8 +8,9 @@ import com.odde.doughnut.controllers.dto.AiCompletionAnswerClarifyingQuestionPar
 import com.odde.doughnut.controllers.dto.SrtDto;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
-import com.theokanning.openai.assistants.Assistant;
-import com.theokanning.openai.assistants.AssistantRequest;
+import com.theokanning.openai.assistants.assistant.Assistant;
+import com.theokanning.openai.assistants.assistant.AssistantRequest;
+import com.theokanning.openai.assistants.message.MessageListSearchParameters;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.*;
 import com.theokanning.openai.fine_tuning.FineTuningJob;
@@ -17,15 +18,15 @@ import com.theokanning.openai.fine_tuning.FineTuningJobRequest;
 import com.theokanning.openai.fine_tuning.Hyperparameters;
 import com.theokanning.openai.image.CreateImageRequest;
 import com.theokanning.openai.image.ImageResult;
-import com.theokanning.openai.messages.Message;
-import com.theokanning.openai.messages.MessageRequest;
+import com.theokanning.openai.assistants.message.Message;
+import com.theokanning.openai.assistants.message.MessageRequest;
 import com.theokanning.openai.model.Model;
-import com.theokanning.openai.runs.Run;
-import com.theokanning.openai.runs.RunCreateRequest;
-import com.theokanning.openai.runs.SubmitToolOutputRequestItem;
-import com.theokanning.openai.runs.SubmitToolOutputsRequest;
-import com.theokanning.openai.threads.Thread;
-import com.theokanning.openai.threads.ThreadRequest;
+import com.theokanning.openai.assistants.run.Run;
+import com.theokanning.openai.assistants.run.RunCreateRequest;
+import com.theokanning.openai.assistants.run.SubmitToolOutputRequestItem;
+import com.theokanning.openai.assistants.run.SubmitToolOutputsRequest;
+import com.theokanning.openai.assistants.thread.Thread;
+import com.theokanning.openai.assistants.thread.ThreadRequest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +62,7 @@ public class OpenAiApiHandler {
         //          return x;
         //        })
         .map(ChatCompletionChoice::getMessage)
-        .map(ChatMessage::getFunctionCall);
+        .map(AssistantMessage::getFunctionCall);
   }
 
   public Optional<ChatCompletionChoice> chatCompletion(ChatCompletionRequest request) {
@@ -92,7 +93,7 @@ public class OpenAiApiHandler {
     fineTuningJobRequest.setTrainingFile(fileId);
     fineTuningJobRequest.setModel("gpt-3.5-turbo-1106");
     fineTuningJobRequest.setHyperparameters(
-        new Hyperparameters(3)); // not sure what should be the nEpochs value
+        new Hyperparameters()); // not sure what should be the nEpochs value
 
     FineTuningJob fineTuningJob = blockGet(openAiApi.createFineTuningJob(fineTuningJobRequest));
     if (List.of("failed", "cancelled").contains(fineTuningJob.getStatus())) {
@@ -170,7 +171,7 @@ public class OpenAiApiHandler {
   }
 
   public Message getThreadLastMessage(String threadId) {
-    return blockGet(openAiApi.listMessages(threadId)).getData().getLast();
+    return blockGet(openAiApi.listMessages(threadId, null)).getData().getLast();
   }
 
   public SrtDto getTranscription(RequestBody requestBody) throws IOException {

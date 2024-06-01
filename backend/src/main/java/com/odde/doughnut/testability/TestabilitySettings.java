@@ -26,7 +26,7 @@ public class TestabilitySettings {
       new HashMap<>() {
         {
           put("wikidata", "https://www.wikidata.org");
-          put("openAi", "https://api.openai.com/");
+          put("openAi", "https://api.openai.com/v1/");
         }
       };
 

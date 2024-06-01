@@ -59,18 +59,18 @@ public class OpenAIChatRequestBuilder {
   }
 
   public OpenAIChatRequestBuilder addSystemMessage(String message) {
-    messages.add(new ChatMessage(ChatMessageRole.SYSTEM.value(), message));
+    messages.add(new SystemMessage(message));
     return this;
   }
 
   public OpenAIChatRequestBuilder addUserMessage(String message) {
-    messages.add(new ChatMessage(ChatMessageRole.USER.value(), message));
+    messages.add(new UserMessage(message));
     return this;
   }
 
   public OpenAIChatRequestBuilder addFunctionCallMessage(
       Object arguments, String evaluateQuestion) {
-    ChatMessage msg = new ChatMessage(ChatMessageRole.ASSISTANT.value(), null);
+    AssistantMessage msg = new AssistantMessage( null);
     msg.setFunctionCall(
         new ChatFunctionCall(evaluateQuestion, new ObjectMapper().valueToTree(arguments)));
     messages.add(msg);

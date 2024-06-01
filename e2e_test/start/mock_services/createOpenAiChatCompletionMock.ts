@@ -31,7 +31,7 @@ const openAiChatCompletionStubber = (
     finishReason: "length" | "stop" | "function_call",
   ): Promise<void> => {
     return serviceMocker.mockMatchsAndNotMatches(
-      `/v1/chat/completions`,
+      `/chat/completions`,
       bodyToMatch,
       bodyNotToMatch,
       {

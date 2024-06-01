@@ -31,6 +31,6 @@ class OpenAIChatAboutNoteRequestBuilderBaseTest {
   private static String getNoteOfFocusDescription(Note note) {
     ChatCompletionRequest request =
         OpenAIChatRequestBuilder.chatAboutNoteRequestBuilder("gpt", note).build();
-    return request.getMessages().get(1).getContent();
+    return request.getMessages().get(1).getTextContent();
   }
 }

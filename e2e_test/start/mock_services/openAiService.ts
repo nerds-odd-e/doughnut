@@ -21,7 +21,7 @@ const openAiService = () => {
     },
 
     stubCreateImage() {
-      return serviceMocker.stubPoster(`/v1/images/generations`, {
+      return serviceMocker.stubPoster(`/images/generations`, {
         created: 1589478378,
         data: [
           {
@@ -50,7 +50,7 @@ const openAiService = () => {
 
     stubOpenAiUploadResponse(shouldSuccess: boolean) {
       if (shouldSuccess) {
-        return serviceMocker.stubPoster(`/v1/files`, {
+        return serviceMocker.stubPoster(`/files`, {
           id: "file-abc123",
           object: "file",
           bytes: 175,
@@ -65,7 +65,7 @@ const openAiService = () => {
 
     async stubCreateAssistant(newId: string, _nameOfAssistant: string, modelName: string) {
       return await serviceMocker.mockMatchsAndNotMatches(
-        `/v1/assistants`,
+        `/assistants`,
         {
           name: _nameOfAssistant,
           model: modelName,
@@ -80,21 +80,21 @@ const openAiService = () => {
     thread(threadId: string) {
       return {
         async stubCreateThreadRunAndSubmitOutput() {
-          await serviceMocker.stubPoster(`/v1/threads`, {
+          await serviceMocker.stubPoster(`/threads`, {
             id: threadId,
           })
-          await serviceMocker.stubPoster(`/v1/threads/${threadId}/messages`, {
+          await serviceMocker.stubPoster(`/threads/${threadId}/messages`, {
             id: "msg-abc123",
           })
-          await serviceMocker.stubPoster(`/v1/threads/${threadId}/messages`, {
+          await serviceMocker.stubPoster(`/threads/${threadId}/messages`, {
             id: "msg-abc123",
           })
-          await serviceMocker.stubPoster(`/v1/threads/${threadId}/runs`, {
+          await serviceMocker.stubPoster(`/threads/${threadId}/runs`, {
             id: "run-abc123",
             status: "queued",
           })
           return await serviceMocker.stubPoster(
-            `/v1/threads/${threadId}/runs/run-abc123/submit_tool_outputs`,
+            `/threads/${threadId}/runs/run-abc123/submit_tool_outputs`,
             {
               id: "run-abc123",
               status: "queued",
@@ -139,7 +139,7 @@ const openAiService = () => {
           })
 
           return await serviceMocker.stubGetterWithMutipleResponses(
-            `/v1/threads/${threadId}/runs/run-abc123`,
+            `/threads/${threadId}/runs/run-abc123`,
             {},
             responses,
           )
@@ -148,7 +148,7 @@ const openAiService = () => {
     },
 
     async stubFineTuningStatus(successful: boolean) {
-      return await serviceMocker.stubPoster(`/v1/fine_tuning/jobs`, {
+      return await serviceMocker.stubPoster(`/fine_tuning/jobs`, {
         object: "fine_tuning.job",
         id: "ftjob-abc123",
         model: "gpt-3.5-turbo-0613",
@@ -163,7 +163,7 @@ const openAiService = () => {
     },
 
     async stubGetModels(modelNames: string) {
-      return await serviceMocker.stubGetter(`/v1/models`, undefined, {
+      return await serviceMocker.stubGetter(`/models`, undefined, {
         object: "list",
         data: modelNames.split(",").map((modelName) => {
           return {

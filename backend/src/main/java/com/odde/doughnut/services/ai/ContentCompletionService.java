@@ -9,12 +9,14 @@ import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.assistants.*;
-import com.theokanning.openai.messages.MessageRequest;
-import com.theokanning.openai.runs.RequiredAction;
-import com.theokanning.openai.runs.Run;
-import com.theokanning.openai.runs.ToolCall;
-import com.theokanning.openai.threads.Thread;
-import com.theokanning.openai.threads.ThreadRequest;
+import com.theokanning.openai.assistants.assistant.Assistant;
+import com.theokanning.openai.assistants.assistant.AssistantRequest;
+import com.theokanning.openai.assistants.message.MessageRequest;
+import com.theokanning.openai.assistants.run.RequiredAction;
+import com.theokanning.openai.assistants.run.Run;
+import com.theokanning.openai.assistants.run.ToolCall;
+import com.theokanning.openai.assistants.thread.Thread;
+import com.theokanning.openai.assistants.thread.ThreadRequest;
 import java.util.stream.Stream;
 
 public record ContentCompletionService(OpenAiApiHandler openAiApiHandler) {

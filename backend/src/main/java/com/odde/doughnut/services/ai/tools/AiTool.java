@@ -7,11 +7,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kjetland.jackson.jsonSchema.JsonSchemaGenerator;
 import com.odde.doughnut.controllers.dto.AiCompletionRequiredAction;
-import com.theokanning.openai.assistants.AssistantFunction;
-import com.theokanning.openai.assistants.AssistantToolsEnum;
-import com.theokanning.openai.assistants.Tool;
-import com.theokanning.openai.runs.ToolCall;
-import com.theokanning.openai.runs.ToolCallFunction;
+import com.theokanning.openai.assistants.assistant.FunctionTool;
+import com.theokanning.openai.function.FunctionDefinition;
+import com.theokanning.openai.assistants.assistant.Tool;
+import com.theokanning.openai.assistants.run.ToolCall;
+import com.theokanning.openai.assistants.run.ToolCallFunction;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -31,12 +31,11 @@ public record AiTool(
   }
 
   public Tool getTool() {
-    return new Tool(
-        AssistantToolsEnum.FUNCTION,
-        AssistantFunction.builder()
+    return new FunctionTool(
+      FunctionDefinition.builder()
             .name(name)
             .description(description)
-            .parameters(serializeClassSchema(parameterClass))
+        .parametersDefinition(serializeClassSchema(parameterClass))
             .build());
   }
 
@@ -57,9 +56,8 @@ public record AiTool(
   }
 
   private Object convertArguments(ToolCallFunction function) {
-    String arguments = function.getArguments();
+    JsonNode jsonNode = function.getArguments();
     try {
-      JsonNode jsonNode = defaultObjectMapper().readTree(arguments);
       return defaultObjectMapper().treeToValue(jsonNode, parameterClass);
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
