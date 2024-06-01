@@ -47,7 +47,7 @@ class RestCircleController {
       @PathVariable("circle") @Schema(type = "integer") Circle circle)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(circle);
-    JsonViewer jsonViewer = new JsonViewer(currentUser.getEntity());
+    JsonViewer jsonViewer = new JsonViewer();
     return jsonViewer.jsonCircleForUserView(circle);
   }
 

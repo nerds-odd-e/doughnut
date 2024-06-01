@@ -25,8 +25,7 @@ class RestBazaarController {
   @GetMapping("")
   public NotebooksViewedByUser bazaar() {
     BazaarModel bazaar = modelFactoryService.toBazaarModel();
-    return new JsonViewer(currentUser.getEntity())
-        .jsonNotebooksViewedByUser(bazaar.getAllNotebooks());
+    return new JsonViewer().jsonNotebooksViewedByUser(bazaar.getAllNotebooks());
   }
 
   @PostMapping("/{notebook}/remove")

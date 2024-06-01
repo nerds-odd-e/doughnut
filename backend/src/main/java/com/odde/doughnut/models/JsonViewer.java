@@ -6,17 +6,12 @@ import com.odde.doughnut.controllers.dto.NotebooksViewedByUser;
 import com.odde.doughnut.controllers.dto.UserForOtherUserView;
 import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.entities.User;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class JsonViewer {
-  private User viewer;
 
-  public JsonViewer(User viewer) {
-
-    this.viewer = viewer;
-  }
+  public JsonViewer() {}
 
   public NotebookViewedByUser jsonNotebookViewedByUser(Notebook notebook) {
     NotebookViewedByUser notebookViewedByUser = new NotebookViewedByUser();

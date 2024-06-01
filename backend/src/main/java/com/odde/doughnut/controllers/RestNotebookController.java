@@ -43,7 +43,7 @@ class RestNotebookController {
 
     User user = currentUser.getEntity();
     NotebooksViewedByUser notebooksViewedByUser =
-        new JsonViewer(user).jsonNotebooksViewedByUser(user.getOwnership().getNotebooks());
+        new JsonViewer().jsonNotebooksViewedByUser(user.getOwnership().getNotebooks());
     notebooksViewedByUser.subscriptions = user.getSubscriptions();
     return notebooksViewedByUser;
   }
