@@ -1,6 +1,8 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.NotebooksViewedByUser;
+import com.odde.doughnut.entities.Notebook;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.BazaarModel;
 import com.odde.doughnut.models.JsonViewer;
@@ -25,5 +27,12 @@ class RestBazaarController {
     BazaarModel bazaar = modelFactoryService.toBazaarModel();
     return new JsonViewer(currentUser.getEntity())
         .jsonNotebooksViewedByUser(bazaar.getAllNotebooks());
+  }
+
+  public void removeFromBazaar(Notebook notebook) throws UnexpectedNoAccessRightException {
+    currentUser.assertAuthorization(notebook);
+
+    BazaarModel bazaar = modelFactoryService.toBazaarModel();
+    bazaar.removeFromBazaar(notebook);
   }
 }

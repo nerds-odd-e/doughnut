@@ -25,4 +25,9 @@ public class BazaarModel {
     bazaarNotebook.setNotebook(notebook);
     modelFactoryService.save(bazaarNotebook);
   }
+
+  public void removeFromBazaar(Notebook notebook) {
+    modelFactoryService.remove(
+        modelFactoryService.bazaarNotebookRepository.findByNotebook(notebook));
+  }
 }
