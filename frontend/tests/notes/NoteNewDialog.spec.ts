@@ -27,7 +27,7 @@ describe("adding new note", () => {
   const note = makeMe.aNote.topicConstructor("mythical").please();
 
   it("search for duplicate", async () => {
-    mockedSearchWithin.mockResolvedValue([note]);
+    mockedSearchWithin.mockResolvedValue([note.noteTopic]);
     const wrapper = helper
       .component(NoteNewDialog)
       .withStorageProps({ parentId: 123 })

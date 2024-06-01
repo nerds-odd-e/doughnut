@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.odde.doughnut.controllers.dto.NoteTopic;
 import com.odde.doughnut.controllers.dto.SearchTerm;
 import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.Note;
@@ -41,7 +42,7 @@ public class UserModelSearchTest {
     anotherUser = makeMe.aUser().toModelPlease();
   }
 
-  private List<Note> search() {
+  private List<NoteTopic> search() {
     return searchTermModel.searchForNotesInRelateTo(note);
   }
 
@@ -60,7 +61,7 @@ public class UserModelSearchTest {
   void theSearchIsCaseInsensitive() {
     Note anotherNote = makeMe.aNote("Some Note").under(note).please();
     searchTerm.setSearchKey("not");
-    assertThat(search(), contains(anotherNote));
+    assertThat(search(), contains(anotherNote.getNoteTopic()));
   }
 
   @Test
@@ -114,7 +115,7 @@ public class UserModelSearchTest {
       searchTerm.setSearchKey(commonPhrase);
       searchTerm.setAllMyNotebooksAndSubscriptions(allMyNotebooksAndSubscriptions);
       searchTerm.setAllMyCircles(allMyCircle);
-      List<Note> actual = search();
+      List<NoteTopic> actual = search();
       assertThat(actual, hasSize(expectedCount));
       assertThat(
           actual,
@@ -124,11 +125,11 @@ public class UserModelSearchTest {
 
     Object[] expectedNotes(
         boolean expectOtherNotebooks, boolean expectSubscription, boolean expectCircleNote) {
-      List<Note> result = new ArrayList<>();
-      result.add(noteInTheSameNotebook);
-      if (expectOtherNotebooks) result.add(noteFromMyOtherNotebook);
-      if (expectSubscription) result.add(subscribedBazaarNote);
-      if (expectCircleNote) result.add(circleNote);
+      List<NoteTopic> result = new ArrayList<>();
+      result.add(noteInTheSameNotebook.getNoteTopic());
+      if (expectOtherNotebooks) result.add(noteFromMyOtherNotebook.getNoteTopic());
+      if (expectSubscription) result.add(subscribedBazaarNote.getNoteTopic());
+      if (expectCircleNote) result.add(circleNote.getNoteTopic());
       return result.toArray();
     }
   }

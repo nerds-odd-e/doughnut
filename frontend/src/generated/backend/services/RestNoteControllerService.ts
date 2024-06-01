@@ -3,13 +3,13 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { AudioUploadDTO } from '../models/AudioUploadDTO';
-import type { Note } from '../models/Note';
 import type { NoteAccessoriesDTO } from '../models/NoteAccessoriesDTO';
 import type { NoteAccessory } from '../models/NoteAccessory';
 import type { NoteCreationDTO } from '../models/NoteCreationDTO';
 import type { NoteCreationRresult } from '../models/NoteCreationRresult';
 import type { NoteInfo } from '../models/NoteInfo';
 import type { NoteRealm } from '../models/NoteRealm';
+import type { NoteTopic } from '../models/NoteTopic';
 import type { RedirectToNoteResponse } from '../models/RedirectToNoteResponse';
 import type { ReviewSetting } from '../models/ReviewSetting';
 import type { SearchTerm } from '../models/SearchTerm';
@@ -67,13 +67,13 @@ export class RestNoteControllerService {
     /**
      * @param note
      * @param requestBody
-     * @returns Note OK
+     * @returns NoteTopic OK
      * @throws ApiError
      */
     public searchForLinkTargetWithin(
         note: number,
         requestBody: SearchTerm,
-    ): CancelablePromise<Array<Note>> {
+    ): CancelablePromise<Array<NoteTopic>> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/notes/{note}/search',
@@ -131,12 +131,12 @@ export class RestNoteControllerService {
     }
     /**
      * @param requestBody
-     * @returns Note OK
+     * @returns NoteTopic OK
      * @throws ApiError
      */
     public searchForLinkTarget(
         requestBody: SearchTerm,
-    ): CancelablePromise<Array<Note>> {
+    ): CancelablePromise<Array<NoteTopic>> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/notes/search',

@@ -830,7 +830,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Note"
+                  $ref: "#/components/schemas/NoteTopic"
   /api/notes/{note}/review-setting:
     post:
       tags:
@@ -912,7 +912,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Note"
+                  $ref: "#/components/schemas/NoteTopic"
   /api/notes/move_after/{note}/{targetNote}/{asFirstChild}:
     post:
       tags:

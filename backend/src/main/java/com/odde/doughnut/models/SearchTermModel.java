@@ -1,5 +1,6 @@
 package com.odde.doughnut.models;
 
+import com.odde.doughnut.controllers.dto.NoteTopic;
 import com.odde.doughnut.controllers.dto.SearchTerm;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
@@ -45,7 +46,7 @@ public class SearchTermModel {
     return "%" + searchTerm.getTrimmedSearchKey() + "%";
   }
 
-  public List<Note> searchForNotesInRelateTo(Note note) {
+  public List<NoteTopic> searchForNotesInRelateTo(Note note) {
     if (Strings.isBlank(searchTerm.getTrimmedSearchKey())) {
       return List.of();
     }
@@ -56,13 +57,14 @@ public class SearchTermModel {
     Integer finalAvoidNoteId = avoidNoteId;
     return search(note.getNotebook().getId())
         .filter(n -> !n.getId().equals(finalAvoidNoteId))
+        .map(Note::getNoteTopic)
         .toList();
   }
 
-  public List<Note> searchForNotes() {
+  public List<NoteTopic> searchForNotes() {
     if (Strings.isBlank(searchTerm.getTrimmedSearchKey())) {
       return List.of();
     }
-    return search(null).toList();
+    return search(null).map(Note::getNoteTopic).toList();
   }
 }

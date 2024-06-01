@@ -166,7 +166,7 @@ class RestNoteController {
 
   @PostMapping("/search")
   @Transactional
-  public List<Note> searchForLinkTarget(@Valid @RequestBody SearchTerm searchTerm) {
+  public List<NoteTopic> searchForLinkTarget(@Valid @RequestBody SearchTerm searchTerm) {
     SearchTermModel searchTermModel =
         modelFactoryService.toSearchTermModel(currentUser.getEntity(), searchTerm);
     return searchTermModel.searchForNotes();
@@ -174,7 +174,7 @@ class RestNoteController {
 
   @PostMapping("/{note}/search")
   @Transactional
-  public List<Note> searchForLinkTargetWithin(
+  public List<NoteTopic> searchForLinkTargetWithin(
       @PathVariable("note") @Schema(type = "integer") Note note,
       @Valid @RequestBody SearchTerm searchTerm) {
     SearchTermModel searchTermModel =

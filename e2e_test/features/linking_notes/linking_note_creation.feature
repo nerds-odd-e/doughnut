@@ -10,6 +10,7 @@ Feature: link note
       | Sedition         | Incite violence |
       | Sedation         | Put to sleep    |
       | Sedative         | Sleep medicine  |
+
   @mockBrowserTime
   Scenario: View all linkable notes for a note when no link exists
     When I am creating a linking note under note "Sedition"

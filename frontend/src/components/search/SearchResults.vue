@@ -16,7 +16,7 @@
   <div v-if="!searchResult || searchResult.length === 0">
     <em>No matching notes found.</em>
   </div>
-  <Cards v-else class="search-result" :note-topics="searchResult1" :columns="3">
+  <Cards v-else class="search-result" :note-topics="searchResult" :columns="3">
     <template #button="{ noteTopic }">
       <slot name="button" :note-topic="noteTopic" />
     </template>
@@ -26,7 +26,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { debounce } from "mini-debounce";
-import { Note, SearchTerm } from "@/generated/backend";
+import { NoteTopic, SearchTerm } from "@/generated/backend";
 import useLoadingApi from "@/managedApi/useLoadingApi";
 import CheckInput from "../form/CheckInput.vue";
 import Cards from "../notes/Cards.vue";
@@ -56,10 +56,10 @@ export default defineComponent({
         global: {},
         local: {},
       } as {
-        global: Record<string, Note[]>;
-        local: Record<string, Note[]>;
+        global: Record<string, NoteTopic[]>;
+        local: Record<string, NoteTopic[]>;
       },
-      recentResult: undefined as Note[] | undefined,
+      recentResult: undefined as NoteTopic[] | undefined,
       timeoutId: null as unknown as ReturnType<typeof setTimeout>,
     };
   },
@@ -102,9 +102,6 @@ export default defineComponent({
     },
     searchResult() {
       return this.cachedResult ? this.cachedResult : this.recentResult;
-    },
-    searchResult1() {
-      return this.searchResult ? this.searchResult.map((n) => n.noteTopic) : [];
     },
   },
   methods: {
