@@ -1079,7 +1079,9 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/NoteRealm"
+                type: array
+                items:
+                  $ref: "#/components/schemas/NoteRealm"
   /api/links/create/{sourceNote}/{targetNote}:
     post:
       tags:
@@ -1114,7 +1116,9 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/NoteRealm"
+                type: array
+                items:
+                  $ref: "#/components/schemas/NoteRealm"
   /api/fine-tuning/{suggestedQuestion}/duplicate:
     post:
       tags:
@@ -2696,8 +2700,6 @@ components:
           - before
           - similar to
           - confused with
-        fromTargetPerspective:
-          type: boolean
         moveUnder:
           type: boolean
         asFirstChild:

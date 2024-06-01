@@ -13,6 +13,7 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
@@ -43,18 +44,18 @@ class RestLinkController {
 
   @PostMapping(value = "/{link}")
   @Transactional
-  public NoteRealm updateLink(
+  public List<NoteRealm> updateLink(
       @PathVariable @Schema(type = "integer") Note link, @RequestBody LinkCreation linkCreation)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(link);
     link.setLinkType(linkCreation.linkType);
     modelFactoryService.save(link);
-    return getNoteRealm(link, currentUser.getEntity(), linkCreation.fromTargetPerspective);
+    return getNoteRealm(link, currentUser.getEntity());
   }
 
   @PostMapping(value = "/create/{sourceNote}/{targetNote}")
   @Transactional
-  public NoteRealm linkNoteFinalize(
+  public List<NoteRealm> linkNoteFinalize(
       @PathVariable @Schema(type = "integer") Note sourceNote,
       @PathVariable @Schema(type = "integer") Note targetNote,
       @RequestBody @Valid LinkCreation linkCreation,
@@ -78,12 +79,15 @@ class RestLinkController {
             linkCreation.linkType,
             testabilitySettings.getCurrentUTCTimestamp());
 
-    return getNoteRealm(link, user, linkCreation.fromTargetPerspective);
+    return getNoteRealm(link, user);
   }
 
-  private NoteRealm getNoteRealm(Note link, User user, Boolean fromTargetPerspective) {
-    Note note = fromTargetPerspective ? link.getTargetNote() : link.getParent();
-    Note nn = modelFactoryService.entityManager.find(Note.class, note.getId());
-    return new NoteViewer(user, nn).toJsonObject();
+  private List<NoteRealm> getNoteRealm(Note link, User user) {
+    Note nt = modelFactoryService.entityManager.find(Note.class, link.getTargetNote().getId());
+    Note np = modelFactoryService.entityManager.find(Note.class, link.getParent().getId());
+    return List.of(
+        new NoteViewer(user, link).toJsonObject(),
+        new NoteViewer(user, nt).toJsonObject(),
+        new NoteViewer(user, np).toJsonObject());
   }
 }

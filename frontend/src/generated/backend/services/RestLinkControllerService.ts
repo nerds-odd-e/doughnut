@@ -17,7 +17,7 @@ export class RestLinkControllerService {
     public updateLink(
         link: number,
         requestBody: LinkCreation,
-    ): CancelablePromise<NoteRealm> {
+    ): CancelablePromise<Array<NoteRealm>> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/links/{link}',
@@ -42,7 +42,7 @@ export class RestLinkControllerService {
         sourceNote: number,
         targetNote: number,
         requestBody: LinkCreation,
-    ): CancelablePromise<NoteRealm> {
+    ): CancelablePromise<Array<NoteRealm>> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/links/create/{sourceNote}/{targetNote}',

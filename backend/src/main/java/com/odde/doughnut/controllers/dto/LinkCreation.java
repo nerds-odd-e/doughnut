@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotNull;
 
 public class LinkCreation {
   @NotNull public LinkType linkType;
-  public Boolean fromTargetPerspective = false;
   public Boolean moveUnder;
   public Boolean asFirstChild = false;
 }

@@ -4,7 +4,6 @@
 /* eslint-disable */
 export type LinkCreation = {
     linkType: LinkCreation.linkType;
-    fromTargetPerspective?: boolean;
     moveUnder?: boolean;
     asFirstChild?: boolean;
 };
