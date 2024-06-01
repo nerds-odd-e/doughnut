@@ -12,5 +12,5 @@ Feature: Bazaar sharing
       | Square           | four equal straight sides | Shape         |
       | Triangle         | three sides shape         | Shape         |
     When I choose to share my notebook "Shape"
-    Then I should see "Shape" is shared in the Bazaar
+    Then I should see "Shape" shared in the Bazaar
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="card">
+  <div role="card" class="card">
     <slot name="cardHeader" />
     <router-link
       :to="{ name: 'noteShow', params: { noteId: noteTopic.id } }"

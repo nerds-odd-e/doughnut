@@ -9,11 +9,11 @@ Feature: Manage Bazaar
       | Romance          |
       | Classics         |
     And notebook "Romance" is shared to the Bazaar
-    And notebook "Classsics" is shared to the Bazaar
+    And notebook "Classics" is shared to the Bazaar
     And I am logged in as an admin
 
   @ignore
   Scenario: Remove the notebook from Bazaar
-    * I should see "Romance, Classics" is shared in the Bazaar
-    When I remove to notebook "Shape" from the bazaar
-    Then I should see "Classics" is shared in the Bazaar
+    * I should see "Romance, Classics" shared in the Bazaar
+    When I remove the notebook "Shape" from the bazaar
+    Then I should see "Classics" shared in the Bazaar

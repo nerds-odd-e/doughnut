@@ -6,4 +6,4 @@ Feature: Bazaar browsing
 
   Scenario: Browsing as non-user
     When I haven't login
-    Then I should see "Shape" is shared in the Bazaar
+    Then I should see "Shape" shared in the Bazaar

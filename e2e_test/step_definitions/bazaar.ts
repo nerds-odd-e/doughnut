@@ -12,9 +12,8 @@ Given("I choose to share my notebook {string}", (noteTopic: string) => {
   cy.findByRole("button", { name: "OK" }).click()
 })
 
-Then("I should see {string} is shared in the Bazaar", (noteTopic: string) => {
-  cy.visit("/bazaar")
-  cy.findCardTitle(noteTopic)
+Then("I should see {string} shared in the Bazaar", (notebooks: string) => {
+  start.bazaar().sharedNotebooks(notebooks)
 })
 
 Then("notebook {string} is shared to the Bazaar", (noteTopic: string) => {

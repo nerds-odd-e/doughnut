@@ -16,7 +16,7 @@ List<StepDefinitionGeneric> bazaarSteps() {
       (context) async {},
     ),
     then1<String, FlutterWorld>(
-      "I should see {string} is shared in the Bazaar",
+      "I should see {string} shared in the Bazaar",
       (notebookName, context) async {
         final isPresent = await FlutterDriverUtils.isPresent(
           context.world.driver,
@@ -27,4 +27,3 @@ List<StepDefinitionGeneric> bazaarSteps() {
     ),
   ];
 }
-
