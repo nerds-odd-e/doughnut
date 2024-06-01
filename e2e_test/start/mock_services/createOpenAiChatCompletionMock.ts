@@ -2,7 +2,7 @@ import ServiceMocker from "../../support/ServiceMocker"
 import { MessageToMatch } from "./MessageToMatch"
 
 type FunctionCall = {
-  role: "function"
+  role: "assistant"
   function_call: {
     name: string
     arguments: string
@@ -30,27 +30,22 @@ const openAiChatCompletionStubber = (
     message: ChatMessageInResponse,
     finishReason: "length" | "stop" | "function_call",
   ): Promise<void> => {
-    return serviceMocker.mockMatchsAndNotMatches(
-      `/chat/completions`,
-      bodyToMatch,
-      bodyNotToMatch,
-      {
-        object: "chat.completion",
-        choices: [
-          {
-            message,
-            index: 0,
-            finish_reason: finishReason,
-          },
-        ],
-      },
-    )
+    return serviceMocker.mockMatchsAndNotMatches(`/chat/completions`, bodyToMatch, bodyNotToMatch, {
+      object: "chat.completion",
+      choices: [
+        {
+          message,
+          index: 0,
+          finish_reason: finishReason,
+        },
+      ],
+    })
   }
 
   const stubFunctionCall = (functionName: string, argumentsString: string) => {
     return stubChatCompletion(
       {
-        role: "function",
+        role: "assistant",
         function_call: {
           name: functionName,
           arguments: argumentsString,

@@ -21,7 +21,8 @@ public class ChatMessageForFineTuning {
     var chatMessageForFineTuning = new ChatMessageForFineTuning();
     chatMessageForFineTuning.role = chatMessage.getRole();
     chatMessageForFineTuning.content = chatMessage.getTextContent();
-    if (chatMessage instanceof AssistantMessage assistantMessage && assistantMessage.getFunctionCall() != null) {
+    if (chatMessage instanceof AssistantMessage assistantMessage
+        && assistantMessage.getFunctionCall() != null) {
       chatMessageForFineTuning.functionCall =
           ChatFunctionCallForFineTuning.from(assistantMessage.getFunctionCall());
     }

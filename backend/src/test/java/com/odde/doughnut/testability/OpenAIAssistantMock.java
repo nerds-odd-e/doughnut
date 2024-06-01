@@ -8,11 +8,11 @@ import static org.mockito.Mockito.when;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.theokanning.openai.OpenAiResponse;
-import com.theokanning.openai.assistants.run.*;
-import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.assistants.message.Message;
 import com.theokanning.openai.assistants.message.MessageContent;
 import com.theokanning.openai.assistants.message.content.Text;
+import com.theokanning.openai.assistants.run.*;
+import com.theokanning.openai.client.OpenAiApi;
 import io.reactivex.Single;
 import java.util.List;
 import org.mockito.ArgumentMatchers;
@@ -40,7 +40,9 @@ public record OpenAIAssistantMock(OpenAiApi openAiApi) {
     List<MessageContent> contentList = List.of(cnt);
     OpenAiResponse<Message> msgs = new OpenAiResponse<>();
     msgs.setData(List.of(Message.builder().content(contentList).build()));
-    Mockito.doReturn(Single.just(msgs)).when(openAiApi).listMessages(retrievedRun.getThreadId(), null);
+    Mockito.doReturn(Single.just(msgs))
+        .when(openAiApi)
+        .listMessages(retrievedRun.getThreadId(), null);
   }
 
   public void mockSubmitOutputAndCompletion(Object result, String runId) {

@@ -8,10 +8,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kjetland.jackson.jsonSchema.JsonSchemaGenerator;
 import com.odde.doughnut.controllers.dto.AiCompletionRequiredAction;
 import com.theokanning.openai.assistants.assistant.FunctionTool;
-import com.theokanning.openai.function.FunctionDefinition;
 import com.theokanning.openai.assistants.assistant.Tool;
 import com.theokanning.openai.assistants.run.ToolCall;
 import com.theokanning.openai.assistants.run.ToolCallFunction;
+import com.theokanning.openai.function.FunctionDefinition;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -32,10 +32,10 @@ public record AiTool(
 
   public Tool getTool() {
     return new FunctionTool(
-      FunctionDefinition.builder()
+        FunctionDefinition.builder()
             .name(name)
             .description(description)
-        .parametersDefinition(serializeClassSchema(parameterClass))
+            .parametersDefinition(serializeClassSchema(parameterClass))
             .build());
   }
 

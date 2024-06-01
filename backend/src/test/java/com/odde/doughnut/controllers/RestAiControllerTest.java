@@ -19,15 +19,15 @@ import com.odde.doughnut.testability.OpenAIAssistantMock;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.OpenAiResponse;
 import com.theokanning.openai.assistants.assistant.Assistant;
+import com.theokanning.openai.assistants.message.Message;
+import com.theokanning.openai.assistants.message.MessageRequest;
+import com.theokanning.openai.assistants.run.RunCreateRequest;
+import com.theokanning.openai.assistants.thread.Thread;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.image.Image;
 import com.theokanning.openai.image.ImageResult;
-import com.theokanning.openai.assistants.message.Message;
-import com.theokanning.openai.assistants.message.MessageRequest;
 import com.theokanning.openai.model.Model;
-import com.theokanning.openai.assistants.run.RunCreateRequest;
-import com.theokanning.openai.assistants.thread.Thread;
 import io.reactivex.Single;
 import java.util.ArrayList;
 import java.util.List;
@@ -131,10 +131,12 @@ class RestAiControllerTest {
         ArgumentCaptor<MessageRequest> captor = ArgumentCaptor.forClass(MessageRequest.class);
         controller.getCompletion(note, params);
         verify(openAiApi, times(1)).createMessage(any(), captor.capture());
-        assertThat(captor.getAllValues().get(0).getContent().toString()).contains("cosmos › solar system");
+        assertThat(captor.getAllValues().get(0).getContent().toString())
+            .contains("cosmos › solar system");
         assertThat(captor.getAllValues().get(0).getContent().toString())
             .contains(" \"details_to_complete\" : \"\"");
-        assertThat(captor.getAllValues().get(0).getContent().toString()).contains("Don't make assumptions");
+        assertThat(captor.getAllValues().get(0).getContent().toString())
+            .contains("Don't make assumptions");
       }
     }
 

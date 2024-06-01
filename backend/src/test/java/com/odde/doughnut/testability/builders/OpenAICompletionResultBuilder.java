@@ -30,7 +30,7 @@ public class OpenAICompletionResultBuilder {
   }
 
   public OpenAICompletionResultBuilder functionCall(String name, JsonNode arguments) {
-    AssistantMessage message = new AssistantMessage( "");
+    AssistantMessage message = new AssistantMessage("");
     message.setFunctionCall(new ChatFunctionCall(name, arguments));
     choices.add(
         new ChatCompletionChoice() {
