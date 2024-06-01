@@ -13,11 +13,11 @@ public class BazaarModel {
     this.modelFactoryService = modelFactoryService;
   }
 
-  public List<Notebook> getAllNotebooks() {
+  public List<BazaarNotebook> getAllBazaarNotebooks() {
     Iterable<BazaarNotebook> all = modelFactoryService.bazaarNotebookRepository.findAllNonDeleted();
-    List<Notebook> notes = new ArrayList<>();
-    all.forEach(bn -> notes.add(bn.getNotebook()));
-    return notes;
+    List<BazaarNotebook> bazaarNotebooks = new ArrayList<>();
+    all.forEach(bazaarNotebooks::add);
+    return bazaarNotebooks;
   }
 
   public void shareNotebook(Notebook notebook) {
@@ -26,8 +26,7 @@ public class BazaarModel {
     modelFactoryService.save(bazaarNotebook);
   }
 
-  public void removeFromBazaar(Notebook notebook) {
-    modelFactoryService.remove(
-        modelFactoryService.bazaarNotebookRepository.findByNotebook(notebook));
+  public void removeFromBazaar(BazaarNotebook notebook) {
+    modelFactoryService.remove(notebook);
   }
 }

@@ -1,13 +1,12 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.dto.NotebooksViewedByUser;
-import com.odde.doughnut.entities.Notebook;
+import com.odde.doughnut.entities.BazaarNotebook;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.BazaarModel;
-import com.odde.doughnut.models.JsonViewer;
 import com.odde.doughnut.models.UserModel;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,22 +22,20 @@ class RestBazaarController {
   }
 
   @GetMapping("")
-  public NotebooksViewedByUser bazaar() {
+  public List<BazaarNotebook> bazaar() {
     BazaarModel bazaar = modelFactoryService.toBazaarModel();
-    return new JsonViewer().jsonNotebooksViewedByUser(bazaar.getAllNotebooks());
+    return bazaar.getAllBazaarNotebooks();
   }
 
-  @PostMapping("/{notebook}/remove")
+  @PostMapping("/{bazaarNotebook}/remove")
   @Transactional
-  public NotebooksViewedByUser removeFromBazaar(
-      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
+  public List<BazaarNotebook> removeFromBazaar(
+      @PathVariable("bazaarNotebook") @Schema(type = "integer") BazaarNotebook bazaarNotebook)
       throws UnexpectedNoAccessRightException {
-    if (!currentUser.isAdmin()) {
-      currentUser.assertAuthorization(notebook);
-    }
+    currentUser.assertAuthorization(bazaarNotebook);
 
     BazaarModel bazaar = modelFactoryService.toBazaarModel();
-    bazaar.removeFromBazaar(notebook);
+    bazaar.removeFromBazaar(bazaarNotebook);
     return bazaar();
   }
 }

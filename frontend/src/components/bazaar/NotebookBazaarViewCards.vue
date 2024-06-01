@@ -6,9 +6,21 @@
   </NotebookCardsWithButtons>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import { PropType } from "vue";
+import { BazaarNotebook } from "@/generated/backend";
 import NotebookCardsWithButtons from "../notebook/NotebookCardsWithButtons.vue";
 import BazaarNotebookButtons from "./BazaarNotebookButtons.vue";
 
-const props = defineProps({ notebooks: Array, loggedIn: Boolean });
+const props = defineProps({
+  bazaarNotebooks: {
+    type: Array as PropType<BazaarNotebook[]>,
+    required: true,
+  },
+  loggedIn: Boolean,
+});
+
+const notebooks = props.bazaarNotebooks.map(
+  (bazaarNotebook) => bazaarNotebook.notebook,
+);
 </script>

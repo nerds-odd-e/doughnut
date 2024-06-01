@@ -1,14 +1,14 @@
 <template>
   <ContainerPage
     v-bind="{
-      contentExists: !!notebooksViewedByUser,
+      contentExists: !!bazaarNotebooks,
       title: 'Welcome To The Bazaar',
     }"
   >
     <p>These are shared notes from doughnut users.</p>
-    <div v-if="notebooksViewedByUser">
+    <div v-if="bazaarNotebooks">
       <NotebookBazaarViewCards
-        :notebooks="notebooksViewedByUser.notebooks"
+        :bazaar-notebooks="bazaarNotebooks"
         :logged-in="!!user"
       />
     </div>
@@ -17,7 +17,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { NotebooksViewedByUser, User } from "@/generated/backend";
+import { BazaarNotebook, User } from "@/generated/backend";
 import useLoadingApi from "@/managedApi/useLoadingApi";
 import NotebookBazaarViewCards from "@/components/bazaar/NotebookBazaarViewCards.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
@@ -35,14 +35,14 @@ export default defineComponent({
   },
   data() {
     return {
-      notebooksViewedByUser: null as NotebooksViewedByUser | null,
+      bazaarNotebooks: null as BazaarNotebook[] | null,
     };
   },
 
   methods: {
     fetchData() {
       this.managedApi.restBazaarController.bazaar().then((res) => {
-        this.notebooksViewedByUser = res;
+        this.bazaarNotebooks = res;
       });
     },
   },

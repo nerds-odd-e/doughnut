@@ -2,24 +2,24 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { NotebooksViewedByUser } from '../models/NotebooksViewedByUser';
+import type { BazaarNotebook } from '../models/BazaarNotebook';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestBazaarControllerService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
-     * @param notebook
-     * @returns NotebooksViewedByUser OK
+     * @param bazaarNotebook
+     * @returns BazaarNotebook OK
      * @throws ApiError
      */
     public removeFromBazaar(
-        notebook: number,
-    ): CancelablePromise<NotebooksViewedByUser> {
+        bazaarNotebook: number,
+    ): CancelablePromise<Array<BazaarNotebook>> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/bazaar/{notebook}/remove',
+            url: '/api/bazaar/{bazaarNotebook}/remove',
             path: {
-                'notebook': notebook,
+                'bazaarNotebook': bazaarNotebook,
             },
             errors: {
                 500: `Internal Server Error`,
@@ -27,10 +27,10 @@ export class RestBazaarControllerService {
         });
     }
     /**
-     * @returns NotebooksViewedByUser OK
+     * @returns BazaarNotebook OK
      * @throws ApiError
      */
-    public bazaar(): CancelablePromise<NotebooksViewedByUser> {
+    public bazaar(): CancelablePromise<Array<BazaarNotebook>> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/bazaar',

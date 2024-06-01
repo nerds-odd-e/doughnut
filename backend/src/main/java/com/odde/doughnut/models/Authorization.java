@@ -13,6 +13,8 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
       assertAuthorizationNote((Note) object);
     } else if (object instanceof Notebook) {
       assertAuthorizationNotebook((Notebook) object);
+    } else if (object instanceof BazaarNotebook) {
+      assertAuthorizationBazaarNotebook((BazaarNotebook) object);
     } else if (object instanceof Circle) {
       assertAuthorizationCircle((Circle) object);
     } else if (object instanceof Subscription) {
@@ -21,6 +23,13 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
       assertAuthorizationUser((User) object);
     } else {
       throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unknown object type");
+    }
+  }
+
+  private void assertAuthorizationBazaarNotebook(BazaarNotebook object)
+      throws UnexpectedNoAccessRightException {
+    if (!isAdmin()) {
+      assertAuthorizationNotebook(object.getNotebook());
     }
   }
 

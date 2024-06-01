@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import javax.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,5 +16,6 @@ public class BazaarNotebook extends EntityIdentifiedByIdOnly {
   @JoinColumn(name = "notebook_id", referencedColumnName = "id")
   @Getter
   @Setter
+  @NotNull
   private Notebook notebook;
 }

@@ -1278,13 +1278,13 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Circle"
-  /api/bazaar/{notebook}/remove:
+  /api/bazaar/{bazaarNotebook}/remove:
     post:
       tags:
       - rest-bazaar-controller
       operationId: removeFromBazaar
       parameters:
-      - name: notebook
+      - name: bazaarNotebook
         in: path
         required: true
         schema:
@@ -1301,7 +1301,9 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/NotebooksViewedByUser"
+                type: array
+                items:
+                  $ref: "#/components/schemas/BazaarNotebook"
   /api/ai/{note}/completion:
     post:
       tags:
@@ -2157,7 +2159,9 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/NotebooksViewedByUser"
+                type: array
+                items:
+                  $ref: "#/components/schemas/BazaarNotebook"
   /api/ai/available-gpt-models:
     get:
       tags:
@@ -2734,19 +2738,17 @@ components:
           maxLength: 20
           minLength: 10
           type: string
-    NotebooksViewedByUser:
+    BazaarNotebook:
       required:
-      - notebooks
+      - id
+      - notebook
       type: object
       properties:
-        notebooks:
-          type: array
-          items:
-            $ref: "#/components/schemas/Notebook"
-        subscriptions:
-          type: array
-          items:
-            $ref: "#/components/schemas/Subscription"
+        id:
+          type: integer
+          format: int32
+        notebook:
+          $ref: "#/components/schemas/Notebook"
     AiCompletionParams:
       type: object
       properties:
@@ -2962,6 +2964,19 @@ components:
           format: date-time
         reviewSetting:
           $ref: "#/components/schemas/ReviewSetting"
+    NotebooksViewedByUser:
+      required:
+      - notebooks
+      type: object
+      properties:
+        notebooks:
+          type: array
+          items:
+            $ref: "#/components/schemas/Notebook"
+        subscriptions:
+          type: array
+          items:
+            $ref: "#/components/schemas/Subscription"
     FailureReport:
       required:
       - createDatetime

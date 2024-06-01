@@ -4,12 +4,13 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.odde.doughnut.controllers.dto.NotebooksViewedByUser;
+import com.odde.doughnut.entities.BazaarNotebook;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -28,6 +29,7 @@ class RestBazaarControllerTest {
   private RestBazaarController controller;
   private Note topNote;
   private Notebook notebook;
+  private BazaarNotebook bazaarNotebook;
 
   @BeforeEach
   void setup() {
@@ -35,7 +37,7 @@ class RestBazaarControllerTest {
     notebookOwner = makeMe.aUser().toModelPlease();
     topNote = makeMe.aNote().creatorAndOwner(notebookOwner).please();
     notebook = topNote.getNotebook();
-    makeMe.aBazaarNodebook(notebook).please();
+    bazaarNotebook = makeMe.aBazaarNodebook(notebook).please();
     controller = new RestBazaarController(makeMe.modelFactoryService, adminUser);
   }
 
@@ -46,27 +48,33 @@ class RestBazaarControllerTest {
       controller =
           new RestBazaarController(makeMe.modelFactoryService, makeMe.aUser().toModelPlease());
       assertThrows(
-          UnexpectedNoAccessRightException.class, () -> controller.removeFromBazaar(notebook));
-      assertThat(makeMe.modelFactoryService.toBazaarModel().getAllNotebooks(), hasItem(notebook));
+          UnexpectedNoAccessRightException.class,
+          () -> controller.removeFromBazaar(bazaarNotebook));
+      assertThat(getAllBazaarNotebooks(), hasItem(notebook));
     }
 
     @Test
     void notebookOwnerCan() throws UnexpectedNoAccessRightException {
       controller = new RestBazaarController(makeMe.modelFactoryService, notebookOwner);
-      controller.removeFromBazaar(notebook);
+      controller.removeFromBazaar(bazaarNotebook);
     }
 
     @Test
     void removeFromBazaarSuccessfully() throws UnexpectedNoAccessRightException {
-      controller.removeFromBazaar(notebook);
-      assertThat(
-          makeMe.modelFactoryService.toBazaarModel().getAllNotebooks(), not(hasItem(notebook)));
+      controller.removeFromBazaar(bazaarNotebook);
+      assertThat(getAllBazaarNotebooks(), not(hasItem(notebook)));
     }
 
     @Test
     void returnCurrentBazaarNotes() throws UnexpectedNoAccessRightException {
-      NotebooksViewedByUser notebooksViewedByUser = controller.removeFromBazaar(notebook);
-      assertThat(notebooksViewedByUser.notebooks, hasSize(0));
+      List<BazaarNotebook> notebooksViewedByUser = controller.removeFromBazaar(bazaarNotebook);
+      assertThat(notebooksViewedByUser, hasSize(0));
     }
+  }
+
+  private List<Notebook> getAllBazaarNotebooks() {
+    return makeMe.modelFactoryService.toBazaarModel().getAllBazaarNotebooks().stream()
+        .map(BazaarNotebook::getNotebook)
+        .toList();
   }
 }
