@@ -31,6 +31,13 @@ export function assumeAdminDashboardPage() {
       }
     },
 
+    goToBazaarManagement() {
+      this.goToTabInAdminDashboard("Manage Bazaar")
+      return {
+        delete(_notebook: string) {},
+      }
+    },
+
     goToAssistantManagement() {
       this.goToTabInAdminDashboard("Manage Assistant")
       return {

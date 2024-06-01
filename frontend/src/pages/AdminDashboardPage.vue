@@ -40,6 +40,16 @@
         Manage Assistant</a
       >
     </li>
+    <li class="nav-item">
+      <a
+        :class="`nav-link ${activePage === 'manageBazaar' ? 'active' : ''}`"
+        role="button"
+        href="#"
+        @click="activePage = 'manageBazaar'"
+      >
+        Manage Bazaar</a
+      >
+    </li>
   </ul>
   <FineTuningData v-if="activePage === 'fineTuningData'" />
   <FailureReportList v-if="activePage === 'failureReport'" />
@@ -62,6 +72,7 @@ export default {
         | "failureReport"
         | "manageModel"
         | "manageAssistant"
+        | "manageBazaar"
         | undefined,
     };
   },

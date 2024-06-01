@@ -128,3 +128,7 @@ When(
       .expectNewAssistant(newId, nameOfAssistant)
   },
 )
+
+When("I remove the notebook {string} from the bazaar", (notebook: string) => {
+  start.goToAdminDashboard().goToBazaarManagement().delete(notebook)
+})
