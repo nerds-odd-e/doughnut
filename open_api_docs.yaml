@@ -2393,27 +2393,19 @@ components:
           $ref: "#/components/schemas/NoteTopic"
     Notebook:
       required:
+      - headNote
+      - headNoteId
       - id
       type: object
       properties:
         id:
           type: integer
           format: int32
-        ownership:
-          $ref: "#/components/schemas/Ownership"
+        headNoteId:
+          type: integer
+          format: int32
         headNote:
           $ref: "#/components/schemas/Note"
-        skipReviewEntirely:
-          type: boolean
-        deletedAt:
-          type: string
-          format: date-time
-          writeOnly: true
-        fromDTO:
-          $ref: "#/components/schemas/NotebookDTO"
-    NotebookDTO:
-      type: object
-      properties:
         skipReviewEntirely:
           type: boolean
     Subscription:
@@ -2701,6 +2693,11 @@ components:
       properties:
         srt:
           type: string
+    NotebookDTO:
+      type: object
+      properties:
+        skipReviewEntirely:
+          type: boolean
     LinkCreation:
       required:
       - linkType

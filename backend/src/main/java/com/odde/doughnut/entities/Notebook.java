@@ -1,15 +1,18 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.doughnut.controllers.dto.NotebookDTO;
 import jakarta.persistence.*;
 import java.sql.Timestamp;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.lang.NonNull;
 
 @Entity
 @Table(name = "notebook")
+@JsonPropertyOrder({"id", "headNoteId", "headNote", "skipReviewEntirely"})
 public class Notebook extends EntityIdentifiedByIdOnly {
   @OneToOne
   @JoinColumn(name = "creator_id")
@@ -22,6 +25,7 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @JoinColumn(name = "ownership_id")
   @Getter
   @Setter
+  @JsonIgnore
   private Ownership ownership;
 
   @JoinTable(
@@ -31,6 +35,7 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @OneToOne
   @Getter
   @Setter
+  @NonNull
   private Note headNote;
 
   @Column(name = "skip_review_entirely")
@@ -40,13 +45,20 @@ public class Notebook extends EntityIdentifiedByIdOnly {
 
   @Column(name = "deleted_at")
   @Setter
+  @JsonIgnore
   private Timestamp deletedAt;
 
   @OneToMany(mappedBy = "notebook", cascade = CascadeType.DETACH)
   @JsonIgnore
   private List<Subscription> subscriptions;
 
+  @JsonIgnore
   public void setFromDTO(NotebookDTO notebookDTO) {
     setSkipReviewEntirely(notebookDTO.getSkipReviewEntirely());
+  }
+
+  @NonNull
+  public Integer getHeadNoteId() {
+    return headNote.getId();
   }
 }
