@@ -97,4 +97,8 @@ public class UserModel implements ReviewScope {
   public void assertLoggedIn() {
     getAuthorization().assertLoggedIn();
   }
+
+  public boolean isAdmin() {
+    return getAuthorization().isAdmin();
+  }
 }

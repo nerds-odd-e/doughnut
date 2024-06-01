@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class RestBazaarControllerTest {
   @Autowired private MakeMe makeMe;
-  private UserModel currentUser;
+  private UserModel adminUser;
   private UserModel notebookOwner;
   private RestBazaarController controller;
   private Note topNote;
@@ -30,25 +30,32 @@ class RestBazaarControllerTest {
 
   @BeforeEach
   void setup() {
-    currentUser = makeMe.aUser().toModelPlease();
+    adminUser = makeMe.anAdmin().toModelPlease();
     notebookOwner = makeMe.aUser().toModelPlease();
     topNote = makeMe.aNote().creatorAndOwner(notebookOwner).please();
     notebook = topNote.getNotebook();
     makeMe.aBazaarNodebook(notebook).please();
-    controller = new RestBazaarController(makeMe.modelFactoryService, currentUser);
+    controller = new RestBazaarController(makeMe.modelFactoryService, adminUser);
   }
 
   @Nested
   class RemoveFromBazaar {
     @Test
     void otherPeopleCannot() {
+      controller =
+          new RestBazaarController(makeMe.modelFactoryService, makeMe.aUser().toModelPlease());
       assertThrows(
           UnexpectedNoAccessRightException.class, () -> controller.removeFromBazaar(notebook));
     }
 
     @Test
-    void removeFromBazaarSuccessfully() throws UnexpectedNoAccessRightException {
+    void notebookOwnerCan() throws UnexpectedNoAccessRightException {
       controller = new RestBazaarController(makeMe.modelFactoryService, notebookOwner);
+      controller.removeFromBazaar(notebook);
+    }
+
+    @Test
+    void removeFromBazaarSuccessfully() throws UnexpectedNoAccessRightException {
       controller.removeFromBazaar(notebook);
       assertThat(
           makeMe.modelFactoryService.toBazaarModel().getAllNotebooks(), not(hasItem(notebook)));

@@ -30,7 +30,9 @@ class RestBazaarController {
   }
 
   public void removeFromBazaar(Notebook notebook) throws UnexpectedNoAccessRightException {
-    currentUser.assertAuthorization(notebook);
+    if (!currentUser.isAdmin()) {
+      currentUser.assertAuthorization(notebook);
+    }
 
     BazaarModel bazaar = modelFactoryService.toBazaarModel();
     bazaar.removeFromBazaar(notebook);
