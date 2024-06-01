@@ -10,7 +10,7 @@
     <div>
       Target:
       <strong
-        ><NoteTopicComp
+        ><NoteTopicComponent
           v-if="targetNoteTopic"
           v-bind="{ noteTopic: targetNoteTopic }"
       /></strong>
@@ -46,7 +46,7 @@
 import { PropType, ref } from "vue";
 import { LinkCreation, Note, NoteTopic } from "@/generated/backend";
 import LinkTypeSelect from "./LinkTypeSelect.vue";
-import NoteTopicComp from "../notes/core/NoteTopic.vue";
+import NoteTopicComponent from "../notes/core/NoteTopicComponent.vue";
 import CheckInput from "../form/CheckInput.vue";
 import RadioButtons from "../form/RadioButtons.vue";
 import SvgGoBack from "../svgs/SvgGoBack.vue";

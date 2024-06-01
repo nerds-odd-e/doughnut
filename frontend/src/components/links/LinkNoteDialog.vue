@@ -1,7 +1,10 @@
 <template>
   <h3 v-if="note">
     Link
-    <strong><NoteTopicComp v-bind="{ noteTopic: note.noteTopic }" /></strong> to
+    <strong
+      ><NoteTopicComponent v-bind="{ noteTopic: note.noteTopic }"
+    /></strong>
+    to
   </h3>
   <h3 v-else>Searching</h3>
   <SearchNote
@@ -21,7 +24,7 @@
 import { PropType, ref } from "vue";
 import { Note, NoteTopic } from "@/generated/backend";
 import LinkNoteFinalize from "./LinkNoteFinalize.vue";
-import NoteTopicComp from "../notes/core/NoteTopic.vue";
+import NoteTopicComponent from "../notes/core/NoteTopicComponent.vue";
 import SearchNote from "../search/SearchNote.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 

@@ -17,7 +17,7 @@ import { Note } from "@/generated/backend";
 import LinkNob from "./LinkNob.vue";
 import { colors } from "../../colors";
 import { StorageAccessor } from "../../store/createNoteStorage";
-import NoteTopicComponent from "../notes/core/NoteTopic.vue";
+import NoteTopicComponent from "../notes/core/NoteTopicComponent.vue";
 
 export default defineComponent({
   props: {

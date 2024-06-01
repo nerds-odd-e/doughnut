@@ -90,6 +90,7 @@ declare module 'vue' {
     NoteSidebar: typeof import('./src/components/notes/NoteSidebar.vue')['default']
     NoteTextContent: typeof import('./src/components/notes/core/NoteTextContent.vue')['default']
     NoteTopic: typeof import('./src/components/notes/core/NoteTopic.vue')['default']
+    NoteTopicComponent: typeof import('./src/components/notes/core/NoteTopicComponent.vue')['default']
     NoteTopicWithLink: typeof import('./src/components/notes/NoteTopicWithLink.vue')['default']
     NoteUndoButton: typeof import('./src/components/toolbars/NoteUndoButton.vue')['default']
     NoteUploadAudioForm: typeof import('./src/components/notes/accessory/NoteUploadAudioForm.vue')['default']

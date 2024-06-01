@@ -1,7 +1,9 @@
 <template>
   <h3>
     Associate
-    <strong><NoteTopic v-bind="{ noteTopic: note.noteTopic }" /></strong> to
+    <strong
+      ><NoteTopicComponent v-bind="{ noteTopic: note.noteTopic }"
+    /></strong>
     Wikidata
   </h3>
   <form v-if="!conflictWikidataTitle" @submit.prevent="validateAndSave">
@@ -42,7 +44,7 @@ import { Note, WikidataAssociationCreation } from "@/generated/backend";
 import useLoadingApi from "@/managedApi/useLoadingApi";
 import { StorageAccessor } from "@/store/createNoteStorage";
 import TextInput from "../form/TextInput.vue";
-import NoteTopic from "./core/NoteTopic.vue";
+import NoteTopicComponent from "./core/NoteTopicComponent.vue";
 
 const { managedApi } = useLoadingApi();
 const props = defineProps({

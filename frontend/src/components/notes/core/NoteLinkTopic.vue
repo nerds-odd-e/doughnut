@@ -1,6 +1,6 @@
 <template>
   <h2 role="topic" @click="editingLink = true">
-    <NoteTopicComp v-bind="{ noteTopic: noteTopic }" />
+    <NoteTopicComponent v-bind="{ noteTopic: noteTopic }" />
   </h2>
   <Breadcrumb
     v-if="noteTopic.targetNoteTopic"
@@ -20,7 +20,7 @@
 import { PropType, ref } from "vue";
 import { NoteTopic } from "@/generated/backend";
 import { type StorageAccessor } from "../../../store/createNoteStorage";
-import NoteTopicComp from "./NoteTopic.vue";
+import NoteTopicComponent from "./NoteTopicComponent.vue";
 import Modal from "../../commons/Modal.vue";
 import LinkNobDialog from "../../links/LinkNobDialog.vue";
 import Breadcrumb from "../../toolbars/Breadcrumb.vue";

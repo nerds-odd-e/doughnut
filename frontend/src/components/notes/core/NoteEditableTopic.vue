@@ -15,7 +15,7 @@
         @blur="blur"
         :errors="errors.topic"
       >
-        <h2><NoteTopicComp v-bind="{ noteTopic }" /></h2>
+        <h2><NoteTopicComponent v-bind="{ noteTopic }" /></h2>
       </EditableText>
     </template>
   </TextContentWrapper>
@@ -27,7 +27,7 @@ import { NoteTopic } from "@/generated/backend";
 import EditableText from "../../form/EditableText.vue";
 import { type StorageAccessor } from "../../../store/createNoteStorage";
 import TextContentWrapper from "./TextContentWrapper.vue";
-import NoteTopicComp from "./NoteTopic.vue";
+import NoteTopicComponent from "./NoteTopicComponent.vue";
 
 defineProps({
   noteTopic: { type: Object as PropType<NoteTopic>, required: true },
