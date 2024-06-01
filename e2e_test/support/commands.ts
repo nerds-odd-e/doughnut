@@ -196,6 +196,7 @@ Cypress.Commands.add("findNoteCardButton", (noteTopic, btnTextOrTitle) => {
     .parent()
     .parent()
     .parent()
+    .parent()
     .findByRole("button", { name: btnTextOrTitle })
 })
 
@@ -306,7 +307,7 @@ Cypress.Commands.add("repeatReviewNotes", (noteTopics: string) => {
     if (topic == "end") {
       cy.findByText("You have finished all repetitions for this half a day!").should("be.visible")
     } else {
-      cy.findByText(topic, { selector: "h2" })
+      cy.findByText(topic, { selector: "h2 *" })
       cy.yesIRemember()
     }
   })
@@ -372,6 +373,7 @@ Cypress.Commands.add("deleteNoteViaAPI", { prevSubject: true }, (subject) => {
 Cypress.Commands.add("noteByTitle", (noteTopic: string) => {
   return cy
     .findCardTitle(noteTopic)
+    .parent()
     .invoke("attr", "href")
     .then(($attr) => /notes\/(\d+)/g.exec($attr)[1])
 })

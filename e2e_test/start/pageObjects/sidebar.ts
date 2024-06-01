@@ -11,6 +11,7 @@ export const sidebar = () => {
       cy.get("aside").within(() => {
         cy.findByText(noteTopic)
           .parent()
+          .parent()
           .within(() => {
             cy.findByTitle("expand children").click()
           })

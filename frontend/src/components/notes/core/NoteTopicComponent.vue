@@ -11,6 +11,7 @@
         v-bind="{ noteTopic: noteTopic.targetNoteTopic }"
       />
       <NoteTopicWithLink
+        class="hover-underline"
         v-bind="{
           noteTopic: noteTopic.targetNoteTopic,
           iconized: iconizedTarget,
@@ -48,3 +49,9 @@ const iconizedTarget = computed(
   () => !!reactiveProps.value.noteTopic.shortDetails,
 );
 </script>
+
+<style scoped>
+.hover-underline:hover {
+  text-decoration: underline !important;
+}
+</style>
