@@ -12,7 +12,6 @@ Feature: Manage Bazaar
     And notebook "Classics" is shared to the Bazaar
     And I am logged in as an admin
 
-  @ignore
   Scenario: Remove the notebook from Bazaar
     * I should see "Romance, Classics" shared in the Bazaar
     When I remove the notebook "Romance" from the bazaar

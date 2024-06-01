@@ -41,6 +41,7 @@ export function assumeAdminDashboardPage() {
             .findByRole("button", { name: "Remove" })
             .click()
           cy.findByRole("button", { name: "OK" }).click()
+          cy.pageIsNotLoading()
         },
       }
     },

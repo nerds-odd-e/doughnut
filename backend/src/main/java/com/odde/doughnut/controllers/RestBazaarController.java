@@ -7,9 +7,9 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.BazaarModel;
 import com.odde.doughnut.models.JsonViewer;
 import com.odde.doughnut.models.UserModel;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/bazaar")
@@ -29,12 +29,17 @@ class RestBazaarController {
         .jsonNotebooksViewedByUser(bazaar.getAllNotebooks());
   }
 
-  public void removeFromBazaar(Notebook notebook) throws UnexpectedNoAccessRightException {
+  @PostMapping("/{notebook}/remove")
+  @Transactional
+  public NotebooksViewedByUser removeFromBazaar(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
+      throws UnexpectedNoAccessRightException {
     if (!currentUser.isAdmin()) {
       currentUser.assertAuthorization(notebook);
     }
 
     BazaarModel bazaar = modelFactoryService.toBazaarModel();
     bazaar.removeFromBazaar(notebook);
+    return bazaar();
   }
 }

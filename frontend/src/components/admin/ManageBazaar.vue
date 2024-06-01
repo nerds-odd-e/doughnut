@@ -42,7 +42,9 @@ const removeFromBazaar = async (notebook: NotebookViewedByUser) => {
       `Are you sure you want to remove "${notebook.headNote.noteTopic.topicConstructor}" from the bazaar?`,
     )
   ) {
-    //
+    notebooks.value = await managedApi.restBazaarController.removeFromBazaar(
+      notebook.id!,
+    );
   }
 };
 

@@ -8,6 +8,25 @@ import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestBazaarControllerService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
+     * @param notebook
+     * @returns NotebooksViewedByUser OK
+     * @throws ApiError
+     */
+    public removeFromBazaar(
+        notebook: number,
+    ): CancelablePromise<NotebooksViewedByUser> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/bazaar/{notebook}/remove',
+            path: {
+                'notebook': notebook,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
      * @returns NotebooksViewedByUser OK
      * @throws ApiError
      */

@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.odde.doughnut.controllers.dto.NotebooksViewedByUser;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -46,6 +47,7 @@ class RestBazaarControllerTest {
           new RestBazaarController(makeMe.modelFactoryService, makeMe.aUser().toModelPlease());
       assertThrows(
           UnexpectedNoAccessRightException.class, () -> controller.removeFromBazaar(notebook));
+      assertThat(makeMe.modelFactoryService.toBazaarModel().getAllNotebooks(), hasItem(notebook));
     }
 
     @Test
@@ -59,6 +61,12 @@ class RestBazaarControllerTest {
       controller.removeFromBazaar(notebook);
       assertThat(
           makeMe.modelFactoryService.toBazaarModel().getAllNotebooks(), not(hasItem(notebook)));
+    }
+
+    @Test
+    void returnCurrentBazaarNotes() throws UnexpectedNoAccessRightException {
+      NotebooksViewedByUser notebooksViewedByUser = controller.removeFromBazaar(notebook);
+      assertThat(notebooksViewedByUser.notebooks, hasSize(0));
     }
   }
 }
