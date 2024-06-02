@@ -39,8 +39,7 @@ class QuizQuestionGeneratorTest {
         contains(
             SpellingQuizFactory.class,
             ClozeTitleSelectionQuizFactory.class,
-            ImageTitleSelectionQuizFactory.class,
-            ImageSelectionQuizFactory.class));
+            ImageTitleSelectionQuizFactory.class));
   }
 
   @Test

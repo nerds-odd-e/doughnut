@@ -21,7 +21,7 @@ public abstract class QuestionOptionsFactory extends QuizQuestionFactory {
       throws QuizQuestionNotPossibleException {
     QuizQuestion quizQuestion = new QuizQuestion();
     quizQuestion.setNote(note);
-    quizQuestion.setHasImage(this instanceof ImageSelectionQuizFactory);
+    quizQuestion.setHasImage(this instanceof ImageTitleSelectionQuizFactory);
     this.findCategoricalLink(servant);
     this.validateBasicPossibility();
     Note answerNote = this.generateAnswer(servant);

@@ -124,10 +124,6 @@ Then(
   },
 )
 
-Then("I should be asked image selection question {string} with {string}", (question: string) => {
-  cy.shouldSeeQuizWithOptions([question], "")
-})
-
 Then(
   "I should be asked spelling question {string} from notebook {string}",
   (question: string, notebook: string) => {

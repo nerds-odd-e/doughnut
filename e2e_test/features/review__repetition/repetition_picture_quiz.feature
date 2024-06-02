@@ -15,11 +15,3 @@ Feature: Repetition Image Quiz
     When I am repeat-reviewing my old note on day 2
     Then I should be asked image question "example.png" with options "Earth, Moon"
     And I should see the screenshot matches
-
-  Scenario: Image selection question
-    Given The randomizer always choose the last
-    Given I learned one note "Earth" on day 1
-    When I am repeat-reviewing my old note on day 2
-    Then I should be asked image selection question "Earth" with "example.png, moon.jpg"
-    And I should see the screenshot matches
-

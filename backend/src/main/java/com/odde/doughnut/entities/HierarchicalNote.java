@@ -26,7 +26,6 @@ public class HierarchicalNote extends Note {
     return List.of(
         new SpellingQuizFactory(this),
         new ClozeTitleSelectionQuizFactory(this),
-        new ImageTitleSelectionQuizFactory(this),
-        new ImageSelectionQuizFactory(this));
+        new ImageTitleSelectionQuizFactory(this));
   }
 }
