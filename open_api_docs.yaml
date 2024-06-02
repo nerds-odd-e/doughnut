@@ -2542,6 +2542,8 @@ components:
         id:
           type: integer
           format: int32
+        multipleChoicesQuestion:
+          $ref: "#/components/schemas/MultipleChoicesQuestion"
         headNote:
           $ref: "#/components/schemas/Note"
         imageWithMask:
@@ -2549,8 +2551,6 @@ components:
         createdAt:
           type: string
           format: date-time
-        multipleChoicesQuestion:
-          $ref: "#/components/schemas/MultipleChoicesQuestion"
     QuizQuestionContestResult:
       type: object
       properties:

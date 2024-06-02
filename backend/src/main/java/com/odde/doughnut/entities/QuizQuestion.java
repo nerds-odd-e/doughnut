@@ -2,8 +2,7 @@ package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.doughnut.entities.converters.MCQToJsonConverter;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
 import jakarta.persistence.*;
@@ -16,7 +15,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "quiz_question")
-@JsonPropertyOrder({"id", "stem", "headNote", "choices", "imageWithMask"})
+@JsonPropertyOrder({"id", "multipleChoicesQuestion", "headNote", "imageWithMask"})
 public class QuizQuestion extends EntityIdentifiedByIdOnly {
 
   @ManyToOne(cascade = CascadeType.DETACH)
@@ -27,8 +26,11 @@ public class QuizQuestion extends EntityIdentifiedByIdOnly {
   private Note note;
 
   @Column(name = "raw_json_question")
-  @JsonIgnore
-  private String rawJsonQuestion;
+  @Convert(converter = MCQToJsonConverter.class)
+  @Getter
+  @Setter
+  @NotNull
+  private MultipleChoicesQuestion multipleChoicesQuestion;
 
   @Column(name = "created_at")
   @Getter
@@ -61,18 +63,9 @@ public class QuizQuestion extends EntityIdentifiedByIdOnly {
     return mcqWithAnswer;
   }
 
-  @NotNull
-  public MultipleChoicesQuestion getMultipleChoicesQuestion() {
-    try {
-      return new ObjectMapper().readValue(this.rawJsonQuestion, MultipleChoicesQuestion.class);
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
   @JsonIgnore
   public void setMcqWithAnswer(MCQWithAnswer mcqWithAnswer) {
-    this.rawJsonQuestion = mcqWithAnswer.cloneQuestion().toJsonString();
+    this.multipleChoicesQuestion = mcqWithAnswer;
     this.correctAnswerIndex = mcqWithAnswer.correctChoiceIndex;
   }
 

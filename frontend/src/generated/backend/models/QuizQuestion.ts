@@ -7,9 +7,9 @@ import type { MultipleChoicesQuestion } from './MultipleChoicesQuestion';
 import type { Note } from './Note';
 export type QuizQuestion = {
     id: number;
+    multipleChoicesQuestion: MultipleChoicesQuestion;
     headNote: Note;
     imageWithMask?: ImageWithMask;
     createdAt?: string;
-    multipleChoicesQuestion: MultipleChoicesQuestion;
 };
 
