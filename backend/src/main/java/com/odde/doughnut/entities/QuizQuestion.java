@@ -9,7 +9,6 @@ import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.sql.Timestamp;
-import java.util.List;
 import java.util.Objects;
 import lombok.Data;
 import lombok.Getter;
@@ -85,21 +84,9 @@ public class QuizQuestion extends EntityIdentifiedByIdOnly {
     return Objects.equals(answer.getChoiceIndex(), getCorrectAnswerIndex());
   }
 
-  public String getStem() {
-    return getMultipleChoicesQuestion().stem;
-  }
-
   public ImageWithMask getImageWithMask() {
     if (hasImage != null && hasImage) return getNote().getImageWithMask();
     return null;
-  }
-
-  public List<String> getChoices() {
-    MultipleChoicesQuestion mcq = getMultipleChoicesQuestion();
-    if (mcq.choices == null) {
-      return List.of();
-    }
-    return mcq.choices;
   }
 
   @NotNull

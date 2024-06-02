@@ -6,8 +6,6 @@ import generateId from "./generateId";
 class QuizQuestionBuilder extends Builder<QuizQuestion> {
   quizQuestion: QuizQuestion = {
     id: generateId(),
-    choices: [],
-    stem: "answer",
     headNote: new NoteBuilder().do(),
     multipleChoicesQuestion: {
       stem: "answer",
@@ -16,13 +14,11 @@ class QuizQuestionBuilder extends Builder<QuizQuestion> {
   };
 
   withQuestionStem(stem: string) {
-    this.quizQuestion.stem = stem;
     this.quizQuestion.multipleChoicesQuestion.stem = stem;
     return this;
   }
 
   withChoices(choices: string[]) {
-    this.quizQuestion.choices = [...choices];
     this.quizQuestion.multipleChoicesQuestion.choices = [...choices];
     return this;
   }

@@ -2542,14 +2542,8 @@ components:
         id:
           type: integer
           format: int32
-        stem:
-          type: string
         headNote:
           $ref: "#/components/schemas/Note"
-        choices:
-          type: array
-          items:
-            type: string
         imageWithMask:
           $ref: "#/components/schemas/ImageWithMask"
         createdAt:

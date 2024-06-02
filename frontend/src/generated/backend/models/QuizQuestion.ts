@@ -7,9 +7,7 @@ import type { MultipleChoicesQuestion } from './MultipleChoicesQuestion';
 import type { Note } from './Note';
 export type QuizQuestion = {
     id: number;
-    stem?: string;
     headNote: Note;
-    choices?: Array<string>;
     imageWithMask?: ImageWithMask;
     createdAt?: string;
     multipleChoicesQuestion: MultipleChoicesQuestion;

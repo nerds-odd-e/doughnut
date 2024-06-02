@@ -8,11 +8,16 @@
     />
     <div
       style="white-space: pre-wrap"
-      v-if="quizQuestion.stem"
-      v-html="quizQuestion.stem"
+      v-if="quizQuestion.multipleChoicesQuestion.stem"
+      v-html="quizQuestion.multipleChoicesQuestion.stem"
     ></div>
 
-    <div v-if="!quizQuestion.choices || quizQuestion.choices.length === 0">
+    <div
+      v-if="
+        !quizQuestion.multipleChoicesQuestion.choices ||
+        quizQuestion.multipleChoicesQuestion.choices.length === 0
+      "
+    >
       <form @submit.prevent.once="submitAnswer({ spellingAnswer: answer })">
         <TextInput
           scope-name="review_point"
@@ -29,8 +34,8 @@
       </form>
     </div>
     <QuizQuestionChoices
-      v-if="quizQuestion.choices"
-      :choices="quizQuestion.choices"
+      v-if="quizQuestion.multipleChoicesQuestion.choices"
+      :choices="quizQuestion.multipleChoicesQuestion.choices"
       :correct-choice-index="correctChoiceIndex"
       :answer-choice-index="answerChoiceIndex"
       :disabled="disabled"
