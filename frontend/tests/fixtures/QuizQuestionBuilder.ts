@@ -9,10 +9,15 @@ class QuizQuestionBuilder extends Builder<QuizQuestion> {
     choices: [],
     stem: "answer",
     headNote: new NoteBuilder().do(),
+    multipleChoicesQuestion: {
+      stem: "answer",
+      choices: [],
+    },
   };
 
   withQuestionStem(stem: string) {
     this.quizQuestion.stem = stem;
+    this.quizQuestion.multipleChoicesQuestion.stem = stem;
     return this;
   }
 
@@ -21,6 +26,7 @@ class QuizQuestionBuilder extends Builder<QuizQuestion> {
       image: false,
       display: choice,
     }));
+    this.quizQuestion.multipleChoicesQuestion.choices = choices;
     return this;
   }
 

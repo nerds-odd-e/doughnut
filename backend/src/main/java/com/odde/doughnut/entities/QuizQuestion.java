@@ -55,19 +55,15 @@ public class QuizQuestion extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public MCQWithAnswer getMcqWithAnswer() {
-    try {
-      MultipleChoicesQuestion mcq =
-          new ObjectMapper().readValue(this.rawJsonQuestion, MultipleChoicesQuestion.class);
-      MCQWithAnswer mcqWithAnswer = new MCQWithAnswer();
-      mcq.populate(mcqWithAnswer);
-      return mcqWithAnswer;
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
-    }
+    MultipleChoicesQuestion mcq = getMultipleChoicesQuestion();
+    MCQWithAnswer mcqWithAnswer = new MCQWithAnswer();
+    mcq.populate(mcqWithAnswer);
+    mcqWithAnswer.correctChoiceIndex = correctAnswerIndex;
+    return mcqWithAnswer;
   }
 
-  @JsonIgnore
-  private MultipleChoicesQuestion getMultipleChoicesQuestion() {
+  @NotNull
+  public MultipleChoicesQuestion getMultipleChoicesQuestion() {
     try {
       return new ObjectMapper().readValue(this.rawJsonQuestion, MultipleChoicesQuestion.class);
     } catch (JsonProcessingException e) {

@@ -2530,10 +2530,22 @@ components:
           type: string
         imageMask:
           type: string
+    MultipleChoicesQuestion:
+      required:
+      - choices
+      type: object
+      properties:
+        stem:
+          type: string
+        choices:
+          type: array
+          items:
+            type: string
     QuizQuestion:
       required:
       - headNote
       - id
+      - multipleChoicesQuestion
       type: object
       properties:
         id:
@@ -2552,6 +2564,8 @@ components:
         createdAt:
           type: string
           format: date-time
+        multipleChoicesQuestion:
+          $ref: "#/components/schemas/MultipleChoicesQuestion"
     QuizQuestionContestResult:
       type: object
       properties:

@@ -4,6 +4,7 @@
 /* eslint-disable */
 import type { Choice } from './Choice';
 import type { ImageWithMask } from './ImageWithMask';
+import type { MultipleChoicesQuestion } from './MultipleChoicesQuestion';
 import type { Note } from './Note';
 export type QuizQuestion = {
     id: number;
@@ -12,5 +13,6 @@ export type QuizQuestion = {
     choices?: Array<Choice>;
     imageWithMask?: ImageWithMask;
     createdAt?: string;
+    multipleChoicesQuestion: MultipleChoicesQuestion;
 };
 

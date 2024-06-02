@@ -37,6 +37,7 @@ export type { ImageWithMask } from './models/ImageWithMask';
 export type { InitialInfo } from './models/InitialInfo';
 export { LinkCreation } from './models/LinkCreation';
 export type { MCQWithAnswer } from './models/MCQWithAnswer';
+export type { MultipleChoicesQuestion } from './models/MultipleChoicesQuestion';
 export type { Note } from './models/Note';
 export type { NoteAccessoriesDTO } from './models/NoteAccessoriesDTO';
 export type { NoteAccessory } from './models/NoteAccessory';
