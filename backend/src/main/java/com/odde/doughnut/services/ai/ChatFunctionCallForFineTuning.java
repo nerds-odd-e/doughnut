@@ -10,8 +10,8 @@ public class ChatFunctionCallForFineTuning {
   private String name;
   private String arguments;
 
-  public static ChatFunctionCallForFineTuning from(ChatFunctionCall functionCall) {
+  public static ChatFunctionCallForFineTuning from(ChatFunctionCall function) {
     return new ChatFunctionCallForFineTuning(
-        functionCall.getName(), functionCall.getArguments().toString());
+        function.getName(), function.getArguments().toString());
   }
 }

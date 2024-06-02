@@ -73,8 +73,11 @@ public class OpenAIChatRequestBuilder {
   public OpenAIChatRequestBuilder addFunctionCallMessage(
       Object arguments, String evaluateQuestion) {
     AssistantMessage msg = new AssistantMessage(null);
-    msg.setFunctionCall(
-        new ChatFunctionCall(evaluateQuestion, new ObjectMapper().valueToTree(arguments)));
+    ChatFunctionCall chatFunctionCall =
+        new ChatFunctionCall(evaluateQuestion, new ObjectMapper().valueToTree(arguments));
+    ChatToolCall call = new ChatToolCall();
+    call.setFunction(chatFunctionCall);
+    msg.setToolCalls(List.of(call));
     messages.add(msg);
     return this;
   }
