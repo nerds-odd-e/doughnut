@@ -27,6 +27,6 @@ public record AiQuestionGeneratorForNote(
   private Optional<JsonNode> requestAndGetFunctionCallArguments(AiToolList tool) {
     ChatCompletionRequest chatRequest =
         chatAboutNoteRequestBuilder.addTool(tool).maxTokens(1500).build();
-    return openAiApiHandler.getFunctionCallArguments(chatRequest);
+    return openAiApiHandler.getFirstToolCallArguments(chatRequest);
   }
 }

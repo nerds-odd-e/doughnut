@@ -49,11 +49,13 @@ public class OpenAiApiHandler {
     return choices.getData().get(0).getB64Json();
   }
 
-  public Optional<JsonNode> getFunctionCallArguments(ChatCompletionRequest chatRequest) {
-    return getFunctionCall(chatRequest).map(ChatFunctionCall::getArguments);
+  public Optional<JsonNode> getFirstToolCallArguments(ChatCompletionRequest chatRequest) {
+    return getFirstToolCalls(chatRequest)
+        .map(ChatToolCall::getFunction)
+        .map(ChatFunctionCall::getArguments);
   }
 
-  public Optional<ChatFunctionCall> getFunctionCall(ChatCompletionRequest chatRequest) {
+  private Optional<ChatToolCall> getFirstToolCalls(ChatCompletionRequest chatRequest) {
     return chatCompletion(chatRequest)
         //        .map(x->{
         //          System.out.println(chatRequest);
@@ -61,7 +63,8 @@ public class OpenAiApiHandler {
         //          return x;
         //        })
         .map(ChatCompletionChoice::getMessage)
-        .map(AssistantMessage::getFunctionCall);
+        .map(AssistantMessage::getToolCalls)
+        .flatMap(x -> x.stream().findFirst());
   }
 
   public Optional<ChatCompletionChoice> chatCompletion(ChatCompletionRequest request) {

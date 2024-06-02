@@ -67,7 +67,7 @@ class AiAdvisorServiceWithDBTest {
 
     @Test
     void rejected() {
-      openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(questionEvaluation, "");
+      openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(questionEvaluation, "");
       QuizQuestionContestResult contest =
           aiQuestionGenerator.getQuizQuestionContestResult(quizQuestion);
       assertTrue(contest.rejected);
@@ -78,7 +78,7 @@ class AiAdvisorServiceWithDBTest {
     @Test
     void acceptTheContest() {
       questionEvaluation.feasibleQuestion = false;
-      openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(questionEvaluation, "");
+      openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(questionEvaluation, "");
       QuizQuestionContestResult contest =
           aiQuestionGenerator.getQuizQuestionContestResult(quizQuestion);
       assertFalse(contest.rejected);
@@ -86,7 +86,7 @@ class AiAdvisorServiceWithDBTest {
 
     @Test
     void noFunctionCallInvoked() throws JsonProcessingException {
-      openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCallJsonNode(
+      openAIChatCompletionMock.mockChatCompletionAndReturnToolCallJsonNode(
           new ObjectMapper().readTree(""), "");
       assertThrows(
           RuntimeException.class,

@@ -29,14 +29,18 @@ public class OpenAICompletionResultBuilder {
     return this;
   }
 
-  public OpenAICompletionResultBuilder functionCall(String name, JsonNode arguments) {
+  public OpenAICompletionResultBuilder toolCall(String name, JsonNode arguments) {
     AssistantMessage message = new AssistantMessage("");
-    message.setFunctionCall(new ChatFunctionCall(name, arguments));
+    ChatToolCall toolCall = new ChatToolCall();
+    ChatFunctionCall function = new ChatFunctionCall(name, arguments);
+    toolCall.setFunction(function);
+    toolCall.setFunction(function);
+    message.setToolCalls(List.of(toolCall));
     choices.add(
         new ChatCompletionChoice() {
           {
             this.setMessage(message);
-            this.setFinishReason("function call");
+            this.setFinishReason("tool_calls");
           }
         });
     return this;

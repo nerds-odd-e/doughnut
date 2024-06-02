@@ -6,6 +6,7 @@ import com.odde.doughnut.services.ai.tools.AiToolList;
 import com.theokanning.openai.completion.chat.*;
 import com.theokanning.openai.function.FunctionDefinition;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class OpenAIChatRequestBuilder {
@@ -13,7 +14,7 @@ public class OpenAIChatRequestBuilder {
   public static final String systemInstruction =
       "This is a PKM system using hierarchical notes, each with a topic and details, to capture atomic concepts.";
   public final List<ChatMessage> messages = new ArrayList<>();
-  public final List<FunctionDefinition> functions = new ArrayList<>();
+  private final List<ChatTool> chatTools = new ArrayList<>();
   ChatCompletionRequest.ChatCompletionRequestBuilder builder = ChatCompletionRequest.builder();
 
   public static OpenAIChatRequestBuilder chatAboutNoteRequestBuilder(String modelName, Note note) {
@@ -53,8 +54,8 @@ public class OpenAIChatRequestBuilder {
             //    https://github.com/TheoKanning/openai-java/issues/83
             .stream(false)
             .n(1);
-    if (!functions.isEmpty()) {
-      requestBuilder.functions(functions);
+    if (!chatTools.isEmpty()) {
+      requestBuilder.tools(chatTools);
     }
     return requestBuilder.build();
   }
@@ -76,5 +77,9 @@ public class OpenAIChatRequestBuilder {
         new ChatFunctionCall(evaluateQuestion, new ObjectMapper().valueToTree(arguments)));
     messages.add(msg);
     return this;
+  }
+
+  public void addChatTools(Collection<FunctionDefinition> values) {
+    this.chatTools.addAll(values.stream().map(ChatTool::new).toList());
   }
 }

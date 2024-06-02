@@ -18,7 +18,7 @@ public class AiToolList {
   }
 
   public void addToChat(OpenAIChatRequestBuilder openAIChatRequestBuilder) {
-    openAIChatRequestBuilder.functions.addAll(functions.values());
+    openAIChatRequestBuilder.addChatTools(functions.values());
     openAIChatRequestBuilder.addUserMessage(messageBody);
   }
 }

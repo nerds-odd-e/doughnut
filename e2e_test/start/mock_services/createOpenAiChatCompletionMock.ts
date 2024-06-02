@@ -1,12 +1,18 @@
 import ServiceMocker from "../../support/ServiceMocker"
 import { MessageToMatch } from "./MessageToMatch"
 
-type FunctionCall = {
-  role: "assistant"
-  function_call: {
+type ToolCall = {
+  id: string
+  type: "function"
+  function: {
     name: string
     arguments: string
   }
+}
+
+type ToolCalls = {
+  role: "assistant"
+  tool_calls: ToolCall[]
 }
 
 type TextBasedMessage = {
@@ -19,7 +25,7 @@ type BodyToMatch = {
   model?: string
 }
 
-type ChatMessageInResponse = TextBasedMessage | FunctionCall
+type ChatMessageInResponse = TextBasedMessage | ToolCalls
 
 const openAiChatCompletionStubber = (
   serviceMocker: ServiceMocker,
@@ -42,14 +48,21 @@ const openAiChatCompletionStubber = (
     })
   }
 
-  const stubFunctionCall = (functionName: string, argumentsString: string) => {
+  const stubSingleToolCall = (functionName: string, argumentsString: string) => {
     return stubChatCompletion(
       {
         role: "assistant",
-        function_call: {
-          name: functionName,
-          arguments: argumentsString,
-        },
+        tool_calls: [
+          {
+            id: "tool-abc123",
+            type: "function",
+
+            function: {
+              name: functionName,
+              arguments: argumentsString,
+            },
+          },
+        ],
       },
       "function_call",
     )
@@ -63,13 +76,13 @@ const openAiChatCompletionStubber = (
       return stubChatCompletion({ role: "assistant", content: reply }, finishReason)
     },
     stubNoteDetailsCompletion(argumentsString: string) {
-      return stubFunctionCall("note_details_completion", argumentsString)
+      return stubSingleToolCall("note_details_completion", argumentsString)
     },
     stubQuestionGeneration(argumentsString: string) {
-      return stubFunctionCall("ask_single_answer_multiple_choice_question", argumentsString)
+      return stubSingleToolCall("ask_single_answer_multiple_choice_question", argumentsString)
     },
     stubQuestionEvaluation(argumentsString: string) {
-      return stubFunctionCall("evaluate_question", argumentsString)
+      return stubSingleToolCall("evaluate_question", argumentsString)
     },
   }
 }

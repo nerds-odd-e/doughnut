@@ -257,7 +257,7 @@ class RestQuizQuestionControllerTests {
 
     @Test
     void createQuizQuestion() {
-      openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(jsonQuestion, "");
+      openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(jsonQuestion, "");
       QuizQuestion quizQuestion = controller.generateQuestion(note);
 
       Assertions.assertThat(quizQuestion.getStem())
@@ -266,7 +266,7 @@ class RestQuizQuestionControllerTests {
 
     @Test
     void createQuizQuestionFailedWithGpt35WillNotTryAgain() throws JsonProcessingException {
-      openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCallJsonNode(
+      openAIChatCompletionMock.mockChatCompletionAndReturnToolCallJsonNode(
           new ObjectMapper().readTree("{\"stem\": \"\"}"), "");
       assertThrows(ResponseStatusException.class, () -> controller.generateQuestion(note));
       verify(openAiApi, Mockito.times(1)).createChatCompletion(any());
@@ -274,7 +274,7 @@ class RestQuizQuestionControllerTests {
 
     @Test
     void mustUseTheRightModel() {
-      openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(jsonQuestion, "");
+      openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(jsonQuestion, "");
       GlobalSettingsService globalSettingsService = new GlobalSettingsService(modelFactoryService);
       globalSettingsService
           .getGlobalSettingQuestionGeneration()
@@ -319,7 +319,7 @@ class RestQuizQuestionControllerTests {
       MCQWithAnswer jsonQuestion =
           makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
 
-      openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(jsonQuestion, "");
+      openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(jsonQuestion, "");
       QuizQuestion quizQuestion = controller.regenerate(this.quizQuestion);
 
       Assertions.assertThat(quizQuestion.getStem())
@@ -360,14 +360,14 @@ class RestQuizQuestionControllerTests {
 
     @Test
     void rejected() {
-      openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(questionEvaluation, "");
+      openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(questionEvaluation, "");
       QuizQuestionContestResult contest = controller.contest(quizQuestion);
       assertTrue(contest.rejected);
     }
 
     @Test
     void useTheRightModel() {
-      openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(questionEvaluation, "");
+      openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(questionEvaluation, "");
       GlobalSettingsService globalSettingsService = new GlobalSettingsService(modelFactoryService);
       globalSettingsService
           .getGlobalSettingEvaluation()
@@ -382,7 +382,7 @@ class RestQuizQuestionControllerTests {
     @Test
     void acceptTheContest() {
       questionEvaluation.feasibleQuestion = false;
-      openAIChatCompletionMock.mockChatCompletionAndReturnFunctionCall(questionEvaluation, "");
+      openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(questionEvaluation, "");
       QuizQuestionContestResult contest = controller.contest(quizQuestion);
       assertFalse(contest.rejected);
     }
