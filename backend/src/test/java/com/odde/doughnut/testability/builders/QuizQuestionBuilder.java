@@ -51,7 +51,8 @@ public class QuizQuestionBuilder extends EntityBuilder<QuizQuestion> {
   public QuizQuestionBuilder ofAIGeneratedQuestion(MCQWithAnswer mcqWithAnswer, Note note) {
     QuizQuestion quizQuestionAIQuestion = new QuizQuestion();
     quizQuestionAIQuestion.setNote(note);
-    quizQuestionAIQuestion.setMcqWithAnswer(mcqWithAnswer);
+    quizQuestionAIQuestion.setMultipleChoicesQuestion(mcqWithAnswer);
+    quizQuestionAIQuestion.setCorrectAnswerIndex(mcqWithAnswer.correctChoiceIndex);
     this.entity = quizQuestionAIQuestion;
     return this;
   }

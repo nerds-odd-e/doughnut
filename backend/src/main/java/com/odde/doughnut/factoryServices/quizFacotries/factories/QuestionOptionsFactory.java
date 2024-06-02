@@ -6,6 +6,7 @@ import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
+import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,12 +36,12 @@ public abstract class QuestionOptionsFactory extends QuizQuestionFactory {
     List<Note> optionsEntities = new ArrayList<>(options);
     optionsEntities.add(answerNote);
     List<Note> shuffled = servant.randomizer.shuffle(optionsEntities);
-    MCQWithAnswer mcqWithAnswer = new MCQWithAnswer();
-    mcqWithAnswer.stem = getStem();
-    mcqWithAnswer.correctChoiceIndex = shuffled.indexOf(answerNote);
-    mcqWithAnswer.choices =
+    quizQuestion.setCorrectAnswerIndex(shuffled.indexOf(answerNote));
+    MultipleChoicesQuestion mcq = new MCQWithAnswer();
+    mcq.stem = getStem();
+    mcq.choices =
         shuffled.stream().map(this::noteToChoice).map(QuizQuestion.Choice::getDisplay).toList();
-    quizQuestion.setMcqWithAnswer(mcqWithAnswer);
+    quizQuestion.setMultipleChoicesQuestion(mcq);
     return quizQuestion;
   }
 

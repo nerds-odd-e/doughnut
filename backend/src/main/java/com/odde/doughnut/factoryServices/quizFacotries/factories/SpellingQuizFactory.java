@@ -7,6 +7,7 @@ import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
+import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
 
 public class SpellingQuizFactory extends QuizQuestionFactory {
 
@@ -41,9 +42,9 @@ public class SpellingQuizFactory extends QuizQuestionFactory {
     QuizQuestion quizQuestionSpelling = new QuizQuestion();
     quizQuestionSpelling.setNote(answerNote);
     quizQuestionSpelling.setCheckSpell(true);
-    MCQWithAnswer mcqWithAnswer = new MCQWithAnswer();
-    mcqWithAnswer.stem = getStem();
-    quizQuestionSpelling.setMcqWithAnswer(mcqWithAnswer);
+    MultipleChoicesQuestion mcq = new MCQWithAnswer();
+    mcq.stem = getStem();
+    quizQuestionSpelling.setMultipleChoicesQuestion(mcq);
     return quizQuestionSpelling;
   }
 }

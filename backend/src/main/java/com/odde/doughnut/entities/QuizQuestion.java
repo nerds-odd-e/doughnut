@@ -39,6 +39,7 @@ public class QuizQuestion extends EntityIdentifiedByIdOnly {
 
   @Column(name = "correct_answer_index")
   @Getter
+  @Setter
   @JsonIgnore
   private Integer correctAnswerIndex;
 
@@ -61,12 +62,6 @@ public class QuizQuestion extends EntityIdentifiedByIdOnly {
     mcq.populate(mcqWithAnswer);
     mcqWithAnswer.correctChoiceIndex = correctAnswerIndex;
     return mcqWithAnswer;
-  }
-
-  @JsonIgnore
-  public void setMcqWithAnswer(MCQWithAnswer mcqWithAnswer) {
-    this.multipleChoicesQuestion = mcqWithAnswer;
-    this.correctAnswerIndex = mcqWithAnswer.correctChoiceIndex;
   }
 
   @JsonIgnore
