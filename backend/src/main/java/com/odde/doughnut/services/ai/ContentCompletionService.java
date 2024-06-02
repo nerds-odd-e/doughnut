@@ -8,7 +8,6 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
-import com.theokanning.openai.assistants.*;
 import com.theokanning.openai.assistants.assistant.Assistant;
 import com.theokanning.openai.assistants.assistant.AssistantRequest;
 import com.theokanning.openai.assistants.message.MessageRequest;
@@ -64,7 +63,7 @@ public record ContentCompletionService(OpenAiApiHandler openAiApiHandler) {
       if (size != 1) {
         throw new RuntimeException("Unexpected number of tool calls: " + size);
       }
-      ToolCall toolCall = requiredAction.getSubmitToolOutputs().getToolCalls().get(0);
+      ToolCall toolCall = requiredAction.getSubmitToolOutputs().getToolCalls().getFirst();
 
       AiCompletionRequiredAction actionRequired =
           getTools()

@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.theokanning.openai.assistants.assistant.Assistant;
 import com.theokanning.openai.assistants.assistant.AssistantRequest;
+import com.theokanning.openai.assistants.assistant.Tool;
 import com.theokanning.openai.client.OpenAiApi;
 import io.reactivex.Single;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,17 +31,29 @@ class AiAdvisorServiceCompletionAssistantTest {
 
   @Nested
   class CreateNoteCompletionAssistant {
-    @Test
-    void getAiSuggestion_givenAString_returnsAiSuggestionObject() {
+    AssistantRequest assistantRequest;
+
+    @BeforeEach
+    void captureTheRequest() {
       when(openAiApi.createAssistant(ArgumentMatchers.any()))
           .thenReturn(Single.just(new Assistant()));
       aiAdvisorService.createNoteCompletionAssistant("gpt");
       ArgumentCaptor<AssistantRequest> captor = ArgumentCaptor.forClass(AssistantRequest.class);
       verify(openAiApi).createAssistant(captor.capture());
-      AssistantRequest assistantRequest = captor.getValue();
+      assistantRequest = captor.getValue();
+    }
+
+    @Test
+    void getAiSuggestion_givenAString_returnsAiSuggestionObject() {
       assertThat(assistantRequest.getName(), is("Note details completion"));
       assertThat(assistantRequest.getInstructions(), containsString("PKM system"));
       assertThat(assistantRequest.getTools(), hasSize(2));
+    }
+
+    @Test
+    void parameters() {
+      Tool tool = assistantRequest.getTools().get(0);
+      assertThat(tool.getType(), is("function"));
     }
   }
 }
