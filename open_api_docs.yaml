@@ -2519,10 +2519,6 @@ components:
       properties:
         display:
           type: string
-        imageWithMask:
-          $ref: "#/components/schemas/ImageWithMask"
-        image:
-          type: boolean
     ImageWithMask:
       type: object
       properties:

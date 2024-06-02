@@ -10,10 +10,7 @@
         @click.once="submitAnswer({ choiceIndex: index })"
         :disabled="disabled"
       >
-        <div v-if="!choice.image" v-html="choice.display" />
-        <div v-else>
-          <ShowImage v-bind="choice.imageWithMask" :opacity="1" />
-        </div>
+        <div v-html="choice.display" />
       </button>
     </li>
   </ol>
@@ -68,7 +65,6 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { AnswerDTO, Choice } from "@/generated/backend";
-import ShowImage from "../notes/accessory/ShowImage.vue";
 
 export default defineComponent({
   props: {
@@ -78,9 +74,6 @@ export default defineComponent({
     correctChoiceIndex: Number,
     answerChoiceIndex: Number,
     disabled: Boolean,
-  },
-  components: {
-    ShowImage,
   },
   emits: ["answer"],
   data() {
