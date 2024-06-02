@@ -90,7 +90,7 @@ class WhichSpecHasInstanceQuizFactoryTest {
               quizQuestion.getStem(),
               containsString(
                   "<p>Which one is a specialization of <mark>element</mark> <em>and</em> is an instance of <mark>non-official name</mark>:"));
-          List<String> strings = toOptionStrings(quizQuestion);
+          List<String> strings = quizQuestion.getChoices();
           assertThat("metal", in(strings));
           assertThat(source.getTopicConstructor(), in(strings));
         }
@@ -124,7 +124,8 @@ class WhichSpecHasInstanceQuizFactoryTest {
 
           @Test
           void options() {
-            List<String> strings = toOptionStrings(buildQuestion());
+            QuizQuestion quizQuestion = buildQuestion();
+            List<String> strings = quizQuestion.getChoices();
             assertThat("something else", in(strings));
           }
         }
@@ -136,10 +137,5 @@ class WhichSpecHasInstanceQuizFactoryTest {
     return makeMe.buildAQuestion(
         new WhichSpecHasInstanceQuizFactory((LinkingNote) this.reviewPoint.getNote()),
         this.reviewPoint);
-  }
-
-  private List<String> toOptionStrings(QuizQuestion quizQuestion) {
-    List<QuizQuestion.Choice> choices = quizQuestion.getChoices();
-    return choices.stream().map(QuizQuestion.Choice::getDisplay).toList();
   }
 }

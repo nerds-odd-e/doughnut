@@ -51,7 +51,7 @@ class QuizQuestionTypesClozeSelectionTest {
       makeMe.refresh(top);
       QuizQuestion quizQuestion = buildClozeQuizQuestion();
       assertThat(quizQuestion.getStem(), containsString("descrption"));
-      List<String> options = toOptionStrings(quizQuestion);
+      List<String> options = quizQuestion.getChoices();
       assertThat(note2.getTopicConstructor(), in(options));
       assertThat(note1.getTopicConstructor(), in(options));
     }
@@ -59,10 +59,6 @@ class QuizQuestionTypesClozeSelectionTest {
     private QuizQuestion buildClozeQuizQuestion() {
       return makeMe.buildAQuestion(
           new ClozeTitleSelectionQuizFactory(reviewPoint.getNote()), reviewPoint);
-    }
-
-    private List<String> toOptionStrings(QuizQuestion quizQuestion) {
-      return quizQuestion.getChoices().stream().map(QuizQuestion.Choice::getDisplay).toList();
     }
   }
 }

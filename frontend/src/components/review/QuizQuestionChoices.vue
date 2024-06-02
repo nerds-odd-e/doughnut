@@ -10,7 +10,7 @@
         @click.once="submitAnswer({ choiceIndex: index })"
         :disabled="disabled"
       >
-        <div v-html="choice.display" />
+        <div v-html="choice" />
       </button>
     </li>
   </ol>
@@ -63,13 +63,13 @@
 </style>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { AnswerDTO, Choice } from "@/generated/backend";
+import { defineComponent } from "vue";
+import { AnswerDTO } from "@/generated/backend";
 
 export default defineComponent({
   props: {
     choices: {
-      type: Object as PropType<Choice[]>,
+      type: Array<string>,
     },
     correctChoiceIndex: Number,
     answerChoiceIndex: Number,

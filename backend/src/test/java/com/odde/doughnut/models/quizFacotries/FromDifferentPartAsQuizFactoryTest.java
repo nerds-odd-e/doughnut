@@ -110,7 +110,7 @@ class FromDifferentPartAsQuizFactoryTest {
               containsString(
                   "<p>Which one <mark>is tagged by</mark> a <em>DIFFERENT</em> part of <mark>perspective</mark> than:"));
           assertThat(quizQuestion.getStem(), containsString(ugly.getTopicConstructor()));
-          List<String> strings = toOptionStrings(quizQuestion);
+          List<String> strings = quizQuestion.getChoices();
           assertThat(tall.getTopicConstructor(), in(strings));
           assertThat(kind.getTopicConstructor(), in(strings));
           assertThat(pretty.getTopicConstructor(), in(strings));
@@ -213,10 +213,5 @@ class FromDifferentPartAsQuizFactoryTest {
     QuizQuestionFactory quizQuestionFactory =
         new FromDifferentPartAsQuizFactory((LinkingNote) uglySubjectiveRp.getNote());
     return makeMe.buildAQuestion(quizQuestionFactory, uglySubjectiveRp);
-  }
-
-  private List<String> toOptionStrings(QuizQuestion quizQuestion) {
-    List<QuizQuestion.Choice> choices = quizQuestion.getChoices();
-    return choices.stream().map(QuizQuestion.Choice::getDisplay).toList();
   }
 }

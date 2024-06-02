@@ -94,19 +94,12 @@ public class QuizQuestion extends EntityIdentifiedByIdOnly {
     return null;
   }
 
-  public List<Choice> getChoices() {
+  public List<String> getChoices() {
     MultipleChoicesQuestion mcq = getMultipleChoicesQuestion();
     if (mcq.choices == null) {
       return List.of();
     }
-    return mcq.choices.stream()
-        .map(
-            choice -> {
-              Choice option = new Choice();
-              option.setDisplay(choice);
-              return option;
-            })
-        .toList();
+    return mcq.choices;
   }
 
   @NotNull

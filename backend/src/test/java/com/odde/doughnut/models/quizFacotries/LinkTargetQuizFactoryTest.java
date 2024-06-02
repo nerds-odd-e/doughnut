@@ -64,7 +64,7 @@ class LinkTargetQuizFactoryTest {
     void shouldIncludeRightAnswers() {
       QuizQuestion quizQuestion = buildLinkTargetQuizQuestion();
       assertThat(quizQuestion.getStem(), equalTo("<mark>source</mark> is a specialization of:"));
-      List<String> options = toOptionStrings(quizQuestion);
+      List<String> options = quizQuestion.getChoices();
       assertThat(anotherTarget.getTopicConstructor(), in(options));
       assertThat(target.getTopicConstructor(), in(options));
     }
@@ -73,9 +73,5 @@ class LinkTargetQuizFactoryTest {
   private QuizQuestion buildLinkTargetQuizQuestion() {
     return makeMe.buildAQuestion(
         new LinkTargetQuizFactory((LinkingNote) reviewPoint.getNote()), reviewPoint);
-  }
-
-  private List<String> toOptionStrings(QuizQuestion quizQuestion) {
-    return quizQuestion.getChoices().stream().map(QuizQuestion.Choice::getDisplay).toList();
   }
 }

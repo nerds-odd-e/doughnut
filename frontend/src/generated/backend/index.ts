@@ -22,7 +22,6 @@ export type { AudioUploadDTO } from './models/AudioUploadDTO';
 export type { BazaarNotebook } from './models/BazaarNotebook';
 export type { ChatRequest } from './models/ChatRequest';
 export type { ChatResponse } from './models/ChatResponse';
-export type { Choice } from './models/Choice';
 export type { Circle } from './models/Circle';
 export type { CircleForUserView } from './models/CircleForUserView';
 export type { CircleJoiningByInvitation } from './models/CircleJoiningByInvitation';

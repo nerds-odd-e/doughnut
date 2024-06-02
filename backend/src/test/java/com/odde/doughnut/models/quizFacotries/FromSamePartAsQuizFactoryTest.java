@@ -102,7 +102,7 @@ class FromSamePartAsQuizFactoryTest {
               containsString(
                   "<p>Which one <mark>is tagged by</mark> the same part of <mark>perspective</mark> as:"));
           assertThat(quizQuestion.getStem(), containsString(ugly.getTopicConstructor()));
-          List<String> strings = toOptionStrings(quizQuestion);
+          List<String> strings = quizQuestion.getChoices();
           assertThat(pretty.getTopicConstructor(), in(strings));
           assertThat(tall.getTopicConstructor(), in(strings));
           assertThat(ugly.getTopicConstructor(), not(in(strings)));
@@ -114,10 +114,5 @@ class FromSamePartAsQuizFactoryTest {
   private QuizQuestion buildQuestion() {
     return makeMe.buildAQuestion(
         new FromSamePartAsQuizFactory((LinkingNote) reviewPoint.getNote()), reviewPoint);
-  }
-
-  private List<String> toOptionStrings(QuizQuestion quizQuestion) {
-    List<QuizQuestion.Choice> choices = quizQuestion.getChoices();
-    return choices.stream().map(QuizQuestion.Choice::getDisplay).toList();
   }
 }

@@ -64,10 +64,6 @@ class QuizQuestionTest {
 
   @Nested
   class ClozeSelectionQuiz {
-    private List<String> getOptions(Note note) {
-      QuizQuestion quizQuestion = generateQuizQuestion(note);
-      return quizQuestion.getChoices().stream().map(QuizQuestion.Choice::getDisplay).toList();
-    }
 
     @Test
     void aNoteWithNoSiblingsShouldNotGenerateAnyQuestion() {
@@ -90,7 +86,7 @@ class QuizQuestionTest {
 
       @Test
       void descendingRandomizer() {
-        List<String> options = getOptions(note1);
+        List<String> options = generateQuizQuestion(note1).getChoices();
         assertThat(
             options,
             containsInRelativeOrder(note2.getTopicConstructor(), note1.getTopicConstructor()));
@@ -99,7 +95,7 @@ class QuizQuestionTest {
       @Test
       void ascendingRandomizer() {
         randomizer.alwaysChoose = "last";
-        List<String> options = getOptions(note1);
+        List<String> options = generateQuizQuestion(note1).getChoices();
         assertThat(
             options,
             containsInRelativeOrder(note1.getTopicConstructor(), note2.getTopicConstructor()));
@@ -112,7 +108,7 @@ class QuizQuestionTest {
       makeMe.theNote(top).with10Children().please();
       Note note = makeMe.aNote().under(top).please();
       makeMe.refresh(top);
-      List<String> options = getOptions(note);
+      List<String> options = generateQuizQuestion(note).getChoices();
       assertThat(options.size(), equalTo(3));
       assertThat(options.contains(note.getTopicConstructor()), is(true));
     }

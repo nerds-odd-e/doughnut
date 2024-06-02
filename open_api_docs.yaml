@@ -2514,11 +2514,6 @@ components:
           format: date-time
         positiveFeedback:
           type: boolean
-    Choice:
-      type: object
-      properties:
-        display:
-          type: string
     ImageWithMask:
       type: object
       properties:
@@ -2554,7 +2549,7 @@ components:
         choices:
           type: array
           items:
-            $ref: "#/components/schemas/Choice"
+            type: string
         imageWithMask:
           $ref: "#/components/schemas/ImageWithMask"
         createdAt:
