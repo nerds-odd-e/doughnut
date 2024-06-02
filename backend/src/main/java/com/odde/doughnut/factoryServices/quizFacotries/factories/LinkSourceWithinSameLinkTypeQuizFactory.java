@@ -31,15 +31,12 @@ public class LinkSourceWithinSameLinkTypeQuizFactory extends QuestionOptionsFact
   }
 
   @Override
-  public QuizQuestion.Choice noteToChoice(Note note) {
-    QuizQuestion.Choice choice = new QuizQuestion.Choice();
+  public String noteToChoice(Note note) {
     Note source = note.getParent();
     Note target = note.getTargetNote();
-    choice.setDisplay(
-        ClozedString.htmlClozedString(source.getTopicConstructor())
-            .hide(target.getNoteTitle())
-            .clozeTitle());
-    return choice;
+    return ClozedString.htmlClozedString(source.getTopicConstructor())
+        .hide(target.getNoteTitle())
+        .clozeTitle();
   }
 
   @Override

@@ -39,8 +39,7 @@ public abstract class QuestionOptionsFactory extends QuizQuestionFactory {
     quizQuestion.setCorrectAnswerIndex(shuffled.indexOf(answerNote));
     MultipleChoicesQuestion mcq = new MCQWithAnswer();
     mcq.stem = getStem();
-    mcq.choices =
-        shuffled.stream().map(this::noteToChoice).map(QuizQuestion.Choice::getDisplay).toList();
+    mcq.choices = shuffled.stream().map(this::noteToChoice).toList();
     quizQuestion.setMultipleChoicesQuestion(mcq);
     return quizQuestion;
   }
@@ -57,10 +56,8 @@ public abstract class QuestionOptionsFactory extends QuizQuestionFactory {
     return 2;
   }
 
-  public QuizQuestion.Choice noteToChoice(Note note) {
-    QuizQuestion.Choice choice = new QuizQuestion.Choice();
-    choice.setDisplay(note.getTopicConstructor());
-    return choice;
+  public String noteToChoice(Note note) {
+    return note.getTopicConstructor();
   }
 
   protected abstract String getStem();
