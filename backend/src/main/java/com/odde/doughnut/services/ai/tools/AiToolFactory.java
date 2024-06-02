@@ -1,7 +1,7 @@
 package com.odde.doughnut.services.ai.tools;
 
 import com.odde.doughnut.services.ai.*;
-import com.theokanning.openai.completion.chat.ChatFunction;
+import com.theokanning.openai.function.FunctionDefinition;
 import java.util.List;
 
 public class AiToolFactory {
@@ -22,10 +22,10 @@ public class AiToolFactory {
       Note: The specific note of focus and its more detailed contexts are not known. Focus on memory reinforcement and recall across various subjects.
       """,
         List.of(
-            ChatFunction.builder()
+            FunctionDefinition.<MCQWithAnswer>builder()
                 .name("ask_single_answer_multiple_choice_question")
                 .description("Ask a single-answer multiple-choice question to the user")
-                .executor(MCQWithAnswer.class, null)
+                .parametersDefinitionByClass(MCQWithAnswer.class)
                 .build()));
   }
 
@@ -47,10 +47,10 @@ please critically check if the following question makes sense and is possible to
     return new AiToolList(
         messageBody,
         List.of(
-            ChatFunction.builder()
+            FunctionDefinition.<QuestionEvaluation>builder()
                 .name("evaluate_question")
                 .description("answer and evaluate the feasibility of the question")
-                .executor(QuestionEvaluation.class, null)
+                .parametersDefinitionByClass(QuestionEvaluation.class)
                 .build()));
   }
 }

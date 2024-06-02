@@ -1,14 +1,14 @@
 package com.odde.doughnut.services.ai.tools;
 
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
-import com.theokanning.openai.completion.chat.ChatFunction;
+import com.theokanning.openai.function.FunctionDefinition;
 import java.util.*;
 
 public class AiToolList {
-  final Map<String, ChatFunction> functions = new HashMap<>();
+  final Map<String, FunctionDefinition> functions = new HashMap<>();
   private String messageBody;
 
-  public AiToolList(String message, List<ChatFunction> functions) {
+  public AiToolList(String message, List<FunctionDefinition> functions) {
     this.messageBody = message;
     functions.forEach(f -> this.functions.put(f.getName(), f));
   }

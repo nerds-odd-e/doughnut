@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.tools.AiToolList;
 import com.theokanning.openai.completion.chat.*;
+import com.theokanning.openai.function.FunctionDefinition;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +13,7 @@ public class OpenAIChatRequestBuilder {
   public static final String systemInstruction =
       "This is a PKM system using hierarchical notes, each with a topic and details, to capture atomic concepts.";
   public final List<ChatMessage> messages = new ArrayList<>();
-  public final List<ChatFunction> functions = new ArrayList<>();
+  public final List<FunctionDefinition> functions = new ArrayList<>();
   ChatCompletionRequest.ChatCompletionRequestBuilder builder = ChatCompletionRequest.builder();
 
   public static OpenAIChatRequestBuilder chatAboutNoteRequestBuilder(String modelName, Note note) {
