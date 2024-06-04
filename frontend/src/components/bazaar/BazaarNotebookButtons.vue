@@ -11,6 +11,17 @@
         />
       </template>
     </PopButton>
+    <PopButton title="Generate assessment questions">
+      <template #button_face>
+        <SvgClipboard />
+      </template>
+      <template #default="{ closer }">
+        <AssessmentDialog
+          v-bind="{ notebook, loggedIn }"
+          @close-dialog="closer"
+        />
+      </template>
+    </PopButton>
   </div>
 </template>
 
@@ -19,7 +30,9 @@ import { defineComponent, PropType } from "vue";
 import { Notebook } from "@/generated/backend";
 import PopButton from "../commons/Popups/PopButton.vue";
 import SubscribeDialog from "./SubscribeDialog.vue";
+import AssessmentDialog from "./AssessmentDialog.vue";
 import SvgAdd from "../svgs/SvgAdd.vue";
+import SvgClipboard from "../svgs/SvgClipboard.vue";
 
 export default defineComponent({
   props: {
@@ -29,7 +42,9 @@ export default defineComponent({
   components: {
     PopButton,
     SvgAdd,
+    SvgClipboard,
     SubscribeDialog,
+    AssessmentDialog,
   },
 });
 </script>

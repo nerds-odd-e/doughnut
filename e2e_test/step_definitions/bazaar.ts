@@ -46,6 +46,12 @@ Then(
     cy.findNoteCardButton(noteTopic, btnTitle).should("not.exist")
   },
 )
+Then(
+  "I should see the {string} button on notebook {string}",
+  (btnTitle: string, noteTopic: string) => {
+    cy.findNoteCardButton(noteTopic, btnTitle).should("exist")
+  },
+)
 
 Then("I should see readonly notebook {string} in my notes", (noteTopic: string) => {
   start.routerToNotebooksPage()
