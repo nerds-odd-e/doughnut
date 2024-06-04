@@ -210,6 +210,33 @@ paths:
             '*/*':
               schema:
                 type: string
+  /api/testability/seed_quiz_questions:
+    post:
+      tags:
+      - testability-rest-controller
+      operationId: seedQuizQuestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SeedQuizQuestion"
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: integer
+                  format: int32
   /api/testability/seed_notes:
     post:
       tags:
@@ -2303,6 +2330,19 @@ components:
           writeOnly: true
           items:
             $ref: "#/components/schemas/QuestionSuggestionParams"
+    SeedQuizQuestion:
+      type: object
+      properties:
+        seedQuizQuestions:
+          type: array
+          items:
+            type: object
+            additionalProperties:
+              type: string
+        externalIdentifier:
+          type: string
+        circleName:
+          type: string
     SeedInfo:
       type: object
       properties:

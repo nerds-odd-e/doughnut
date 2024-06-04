@@ -63,6 +63,7 @@ export type { ReviewStatus } from './models/ReviewStatus';
 export type { SearchTerm } from './models/SearchTerm';
 export type { SeedInfo } from './models/SeedInfo';
 export type { SeedNote } from './models/SeedNote';
+export type { SeedQuizQuestion } from './models/SeedQuizQuestion';
 export type { SeedSuggestedQuestions } from './models/SeedSuggestedQuestions';
 export type { SelfEvaluation } from './models/SelfEvaluation';
 export type { SrtDto } from './models/SrtDto';

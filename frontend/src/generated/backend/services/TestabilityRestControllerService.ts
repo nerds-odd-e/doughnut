@@ -4,6 +4,7 @@
 /* eslint-disable */
 import type { Randomization } from '../models/Randomization';
 import type { SeedInfo } from '../models/SeedInfo';
+import type { SeedQuizQuestion } from '../models/SeedQuizQuestion';
 import type { SeedSuggestedQuestions } from '../models/SeedSuggestedQuestions';
 import type { TimeTravel } from '../models/TimeTravel';
 import type { TimeTravelRelativeToNow } from '../models/TimeTravelRelativeToNow';
@@ -120,6 +121,24 @@ export class TestabilityRestControllerService {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/testability/seed_suggested_questions',
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param requestBody
+     * @returns number OK
+     * @throws ApiError
+     */
+    public seedQuizQuestion(
+        requestBody: SeedQuizQuestion,
+    ): CancelablePromise<Record<string, number>> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/testability/seed_quiz_questions',
             body: requestBody,
             mediaType: 'application/json',
             errors: {
