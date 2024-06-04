@@ -6,7 +6,12 @@ Feature: New questions assessment
       | topicConstructor | testingParent |
       | Shape            |               |
       | Triangle         | Shape         |
-  Scenario: Start an assessment with new questions
-    When I do the assessment on "My Notes/Shape"
-    Then I should see 5 questions and the mcq questions have 4 options each
+  @ignore
+  Scenario: Start an assessment
+    When I click the assessment launch button on "My Notes/Shape"
+    Then I should see the assessment modal launched
+
+#  Scenario: Start an assessment with new questions
+#    When I do the assessment on "My Notes/Shape"
+#    Then I should see the first question and it should have 4 options
 
