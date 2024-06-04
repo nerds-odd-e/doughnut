@@ -16,16 +16,14 @@ import org.springframework.web.bind.annotation.RestController;
 class RestAssessmentController {
   private final UserModel currentUser;
 
-  public RestAssessmentController(
-      UserModel currentUser) {
+  public RestAssessmentController(UserModel currentUser) {
     this.currentUser = currentUser;
   }
 
   @PostMapping("/generate-assessment/{notebook}")
   @Transactional
-  public QuizQuestion generateAssessment(
-    @PathVariable @Schema(type = "integer") Notebook notebook
-  ) throws UnexpectedNoAccessRightException {
+  public QuizQuestion generateAssessment(@PathVariable @Schema(type = "integer") Notebook notebook)
+      throws UnexpectedNoAccessRightException {
     currentUser.assertLoggedIn();
     currentUser.assertAuthorization(notebook);
     return null;

@@ -23,14 +23,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ActiveProfiles("test")
 @Transactional
 public class RestAssessmentControllerTests {
-  @Mock
-  OpenAiApi openAiApi;
+  @Mock OpenAiApi openAiApi;
 
-  @Autowired
-  ModelFactoryService modelFactoryService;
+  @Autowired ModelFactoryService modelFactoryService;
 
-  @Autowired
-  MakeMe makeMe;
+  @Autowired MakeMe makeMe;
   private UserModel userModel;
   private Notebook notebook;
   private Note topNote;
@@ -51,6 +48,7 @@ public class RestAssessmentControllerTests {
     void setup() {
       notebook = topNote.getNotebook();
     }
+
     @Test
     void whenNotLogin() {
       userModel = modelFactoryService.toUserModel(null);
