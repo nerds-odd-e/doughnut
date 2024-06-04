@@ -37,6 +37,7 @@ const cleanAndReset = (cy: Cypress.cy & CyEventEmitter, countdown: number) => {
 }
 
 const seededNoteIdMapAliasName = "seededNoteIdMap"
+const seededQuizQuestionIdMapAliasName = "seededQuizQuestionIdMap"
 
 const testability = () => {
   return {
@@ -58,6 +59,19 @@ const testability = () => {
       }).then((response) => {
         expect(Object.keys(response.body).length).to.equal(seedNotes.length)
         cy.wrap(response.body).as(seededNoteIdMapAliasName)
+      })
+    },
+
+    seedQuizQuestions(seedQuizQuestions: unknown[], externalIdentifier = "", circleName = null) {
+      postToTestabilityApi(cy, "seed_quiz_questions", {
+        body: {
+          externalIdentifier,
+          circleName,
+          seedQuizQuestions,
+        },
+      }).then((response) => {
+        expect(Object.keys(response.body).length).to.equal(seedQuizQuestions.length)
+        cy.wrap(response.body).as(seededQuizQuestionIdMapAliasName)
       })
     },
 

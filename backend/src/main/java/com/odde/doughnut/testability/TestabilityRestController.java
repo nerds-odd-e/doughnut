@@ -2,7 +2,6 @@ package com.odde.doughnut.testability;
 
 import com.odde.doughnut.controllers.dto.QuestionSuggestionParams;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -11,28 +10,20 @@ import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GithubService;
 import jakarta.persistence.EntityManagerFactory;
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @Profile({"e2e", "test"})
@@ -166,6 +157,11 @@ class TestabilityRestController {
     seedInfo.saveByOriginalOrder(titleNoteMap, this.modelFactoryService);
     return titleNoteMap.values().stream()
         .collect(Collectors.toMap(note -> note.getTopicConstructor(), Note::getId));
+  }
+
+  @PostMapping("/seed_quiz_questions")
+  public Map<String, Integer> seedQuizQuestion(@RequestBody SeedQuizQuestion seedQuizQuestion) {
+    throw new RuntimeException("Not yet implemented");
   }
 
   private Ownership getOwnership(SeedInfo seedInfo, User user) {
