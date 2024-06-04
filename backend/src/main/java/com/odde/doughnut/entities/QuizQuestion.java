@@ -11,7 +11,6 @@ import java.sql.Timestamp;
 import java.util.Objects;
 import lombok.Data;
 
-
 @Entity
 @Data
 @Table(name = "quiz_question")
@@ -69,8 +68,4 @@ public class QuizQuestion extends EntityIdentifiedByIdOnly {
   public Note getHeadNote() {
     return getNote().getNotebook().getHeadNote();
   }
-
-  @Column(name = "approved")
-  @NotNull
-  private boolean isApproved;
 }
