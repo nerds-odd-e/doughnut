@@ -5,11 +5,10 @@ import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
-import org.apache.logging.log4j.util.Strings;
-
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.logging.log4j.util.Strings;
 
 public class NoteBuilder extends EntityBuilder<Note> {
   static final TestObjectCounter titleCounter = new TestObjectCounter(n -> "title" + n);
