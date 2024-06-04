@@ -80,6 +80,7 @@ export type { WikidataSearchEntity } from './models/WikidataSearchEntity';
 
 export { RestAiAudioControllerService } from './services/RestAiAudioControllerService';
 export { RestAiControllerService } from './services/RestAiControllerService';
+export { RestAssessmentControllerService } from './services/RestAssessmentControllerService';
 export { RestBazaarControllerService } from './services/RestBazaarControllerService';
 export { RestCircleControllerService } from './services/RestCircleControllerService';
 export { RestCurrentUserInfoControllerService } from './services/RestCurrentUserInfoControllerService';

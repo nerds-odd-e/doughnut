@@ -1304,6 +1304,30 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BazaarNotebook"
+  /api/assessment/generate-assessment/{notebook}:
+    post:
+      tags:
+      - rest-assessment-controller
+      operationId: generateAssessment
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/QuizQuestion"
   /api/ai/{note}/completion:
     post:
       tags:

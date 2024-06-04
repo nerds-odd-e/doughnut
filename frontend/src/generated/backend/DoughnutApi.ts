@@ -7,6 +7,7 @@ import type { OpenAPIConfig } from './core/OpenAPI';
 import { FetchHttpRequest } from './core/FetchHttpRequest';
 import { RestAiAudioControllerService } from './services/RestAiAudioControllerService';
 import { RestAiControllerService } from './services/RestAiControllerService';
+import { RestAssessmentControllerService } from './services/RestAssessmentControllerService';
 import { RestBazaarControllerService } from './services/RestBazaarControllerService';
 import { RestCircleControllerService } from './services/RestCircleControllerService';
 import { RestCurrentUserInfoControllerService } from './services/RestCurrentUserInfoControllerService';
@@ -29,6 +30,7 @@ type HttpRequestConstructor = new (config: OpenAPIConfig) => BaseHttpRequest;
 export class DoughnutApi {
     public readonly restAiAudioController: RestAiAudioControllerService;
     public readonly restAiController: RestAiControllerService;
+    public readonly restAssessmentController: RestAssessmentControllerService;
     public readonly restBazaarController: RestBazaarControllerService;
     public readonly restCircleController: RestCircleControllerService;
     public readonly restCurrentUserInfoController: RestCurrentUserInfoControllerService;
@@ -62,6 +64,7 @@ export class DoughnutApi {
         });
         this.restAiAudioController = new RestAiAudioControllerService(this.request);
         this.restAiController = new RestAiControllerService(this.request);
+        this.restAssessmentController = new RestAssessmentControllerService(this.request);
         this.restBazaarController = new RestBazaarControllerService(this.request);
         this.restCircleController = new RestCircleControllerService(this.request);
         this.restCurrentUserInfoController = new RestCurrentUserInfoControllerService(this.request);
