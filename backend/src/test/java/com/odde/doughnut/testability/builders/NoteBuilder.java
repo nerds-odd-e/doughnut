@@ -5,10 +5,11 @@ import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
+import org.apache.logging.log4j.util.Strings;
+
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.logging.log4j.util.Strings;
 
 public class NoteBuilder extends EntityBuilder<Note> {
   static final TestObjectCounter titleCounter = new TestObjectCounter(n -> "title" + n);
@@ -130,6 +131,9 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder with10Children() {
+    if (entity.getId() == null) {
+      throw new RuntimeException("Unable to create children note for note with no ID");
+    }
     for (int i = 0; i < 10; i++) {
       makeMe.aNote().under(entity).please();
     }
