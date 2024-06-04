@@ -27,6 +27,9 @@ Then("there shouldn't be any note edit button", () => {
 When("I open the notebook {string} in the Bazaar", (noteTopic: string) => {
   cy.findCardTitle(noteTopic).click()
 })
+When("I click on generate assessment questions button on notebook {string}", (notebookTitle: string) => {
+    cy.findNoteCardButton(notebookTitle, "Generate assessment questions").click()
+})
 
 When("I go to the bazaar", () => {
   cy.visit("/bazaar")
@@ -62,6 +65,10 @@ Then("I should see readonly notebook {string} in my notes", (noteTopic: string) 
 
 Then("I should see I've subscribed to {string}", (noteTopic: string) => {
   cy.findCardTitle(noteTopic)
+})
+
+Then("I should see message that says {string}", (message: string) => {
+  cy.findByText(message).should("exist")
 })
 
 Then("I should see I've not subscribed to {string}", (noteTopic: string) => {
