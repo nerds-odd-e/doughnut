@@ -13,7 +13,7 @@
     </PopButton>
     <PopButton title="Generate assessment questions">
       <template #button_face>
-        <SvgClipboard />
+        <SvgAssociation />
       </template>
       <template #default="{ closer }">
         <AssessmentDialog
@@ -32,7 +32,7 @@ import PopButton from "../commons/Popups/PopButton.vue";
 import SubscribeDialog from "./SubscribeDialog.vue";
 import AssessmentDialog from "./AssessmentDialog.vue";
 import SvgAdd from "../svgs/SvgAdd.vue";
-import SvgClipboard from "../svgs/SvgClipboard.vue";
+import SvgAssociation from "../svgs/SvgAssociation.vue";
 
 export default defineComponent({
   props: {
@@ -42,7 +42,7 @@ export default defineComponent({
   components: {
     PopButton,
     SvgAdd,
-    SvgClipboard,
+    SvgAssociation,
     SubscribeDialog,
     AssessmentDialog,
   },
