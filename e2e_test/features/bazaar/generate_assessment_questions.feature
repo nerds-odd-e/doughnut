@@ -34,6 +34,21 @@ Background:
     And I click on generate assessment questions button on notebook "LeSS in Action"
     Then I should see message that says "Please login first"
 
+  Scenario: display button to generate questions from notebook
+    Given I am logged in as an existing user
+    And there are some notes for the current user:
+    | topicConstructor | testingParent  | details             |
+    | LeSS in Action   |                | An awesome training |
+    | team             | LeSS in Action |                     |
+    | tech             | LeSS in Action |                     |
+    | airgile          | LeSS in Action |                     |
+    | scrum            | LeSS in Action |                     |
+    | PO               | LeSS in Action |                     |
+    And notebook "LeSS in Action" is shared to the Bazaar
+    When I go to the bazaar
+    And I click on generate assessment questions button on notebook "LeSS in Action"
+    Then I should see message that says "Do you want to generate assessment questions?"
+    And I should see "Generate" button
 
   @ignore
   Scenario: generate questions from notebook

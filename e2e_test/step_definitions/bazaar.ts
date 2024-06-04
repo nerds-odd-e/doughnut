@@ -27,9 +27,12 @@ Then("there shouldn't be any note edit button", () => {
 When("I open the notebook {string} in the Bazaar", (noteTopic: string) => {
   cy.findCardTitle(noteTopic).click()
 })
-When("I click on generate assessment questions button on notebook {string}", (notebookTitle: string) => {
+When(
+  "I click on generate assessment questions button on notebook {string}",
+  (notebookTitle: string) => {
     cy.findNoteCardButton(notebookTitle, "Generate assessment questions").click()
-})
+  },
+)
 
 When("I go to the bazaar", () => {
   cy.visit("/bazaar")
@@ -49,6 +52,11 @@ Then(
     cy.findNoteCardButton(noteTopic, btnTitle).should("not.exist")
   },
 )
+
+Then("I should see {string} button", (btnTitle: string) => {
+  cy.findByRole("button", { name: btnTitle }).should("exist")
+})
+
 Then(
   "I should see the {string} button on notebook {string}",
   (btnTitle: string, noteTopic: string) => {

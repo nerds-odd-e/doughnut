@@ -1,14 +1,9 @@
 <template>
-  <h3>Generate assessment questions</h3>
+  <h3>Assessment</h3>
   <p v-if="!loggedIn">Please login first</p>
   <form v-else @submit.prevent.once="processForm">
-    <TextInput
-      scope-name="subscription"
-      field="dailyTargetOfNewNotes"
-      v-model="formData.dailyTargetOfNewNotes"
-      :errors="errors['dailyTargetOfNewNotes']"
-    />
-    <input type="submit" value="Submit" class="btn btn-primary" />
+    <p>Do you want to generate assessment questions?</p>
+    <input type="button" value="Generate" class="btn btn-primary" />
   </form>
 </template>
 
@@ -16,7 +11,6 @@
 import { defineComponent, PropType } from "vue";
 import { Notebook, SubscriptionDTO } from "@/generated/backend";
 import useLoadingApi from "@/managedApi/useLoadingApi";
-import TextInput from "@/components/form/TextInput.vue";
 
 export default defineComponent({
   setup() {
@@ -27,7 +21,6 @@ export default defineComponent({
     loggedIn: Boolean,
   },
   emits: ["closeDialog"],
-  components: { TextInput },
   data() {
     return {
       formData: { dailyTargetOfNewNotes: 5 } as SubscriptionDTO,
