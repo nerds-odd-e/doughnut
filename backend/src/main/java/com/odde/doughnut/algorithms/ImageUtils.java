@@ -8,8 +8,8 @@ import javax.imageio.ImageIO;
 import org.springframework.core.io.InputStreamSource;
 
 public class ImageUtils {
-  private final int MAX_WIDTH = 1000;
-  private final int MAX_HEIGHT = 1000;
+  private final int MAX_WIDTH = 2000;
+  private final int MAX_HEIGHT = 2000;
 
   public ImageUtils() {}
 
