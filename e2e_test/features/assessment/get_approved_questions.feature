@@ -14,7 +14,7 @@ Feature: Get approved questions
       | Kitty cat        | Animals       |
       | Merlion          | Animals       |
       | Unicorn          | Animals       |
-    And there are questions for the notes:
+    And there are some questions for the notes:
       | Question            | Note      | Status   |
       | Zebra Question 1    | Zebra     | Approved |
       | Flamingo Question 1 | Flamingo  | Approved |

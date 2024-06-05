@@ -42,7 +42,7 @@ Given("there are notes from Note {int} to Note {int}", (from: number, to: number
   start.testability().seedNotes(notes)
 })
 
-Given("there are questions for the notes:", (data: DataTable) => {
+Given("there are some questions for the notes:", (data: DataTable) => {
   start.testability().seedQuizQuestions(data.hashes())
 })
 
