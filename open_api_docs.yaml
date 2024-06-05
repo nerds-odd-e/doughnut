@@ -2005,11 +2005,11 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/QuizQuestion"
-  /api/quiz-questions/{headNote}/questions:
+  /api/quiz-questions/{headNote}/note-book-questions:
     get:
       tags:
       - rest-quiz-question-controller
-      operationId: getAllQuizQuestion
+      operationId: getAllQuizQuestionByNoteBook
       parameters:
       - name: headNote
         in: path

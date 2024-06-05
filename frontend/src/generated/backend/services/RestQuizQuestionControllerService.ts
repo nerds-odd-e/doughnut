@@ -120,12 +120,12 @@ export class RestQuizQuestionControllerService {
      * @returns QuizQuestion OK
      * @throws ApiError
      */
-    public getAllQuizQuestion(
+    public getAllQuizQuestionByNoteBook(
         headNote: number,
     ): CancelablePromise<Array<QuizQuestion>> {
         return this.httpRequest.request({
             method: 'GET',
-            url: '/api/quiz-questions/{headNote}/questions',
+            url: '/api/quiz-questions/{headNote}/note-book-questions',
             path: {
                 'headNote': headNote,
             },

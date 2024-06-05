@@ -391,10 +391,11 @@ class RestQuizQuestionControllerTests {
   }
 
   @Nested
-  class GetListOfQuizQuestion {
+  class GetListOfQuizQuestionForNoteBook {
     List<QuizQuestion> quizQuestionList = new ArrayList<>();
     Note headNote1;
     Note headNote2;
+    Note note;
 
     @BeforeEach
     void setUp() {
@@ -407,11 +408,13 @@ class RestQuizQuestionControllerTests {
 
       makeMe.refresh(headNote1);
       makeMe.refresh(headNote2);
+
+      note = makeMe.aNote("a note").please();
     }
 
     @Test
     void getEmptyListOfQuizQuestions() {
-      List<QuizQuestion> results = controller.getAllQuizQuestion(headNote1);
+      List<QuizQuestion> results = controller.getAllQuizQuestionByNoteBook(headNote1);
       assertThat(results, hasSize(0));
     }
 
@@ -420,16 +423,26 @@ class RestQuizQuestionControllerTests {
       for (Note note : headNote1.getChildren()) {
         quizQuestionList.add(makeMe.aQuestion().spellingQuestionOfNote(note).please());
       }
-
       for (Note note : headNote2.getChildren()) {
         makeMe.aQuestion().spellingQuestionOfNote(note).please();
       }
-
       makeMe.refresh(headNote1);
       makeMe.refresh(headNote2);
-
-      List<QuizQuestion> results = controller.getAllQuizQuestion(headNote1);
+      List<QuizQuestion> results = controller.getAllQuizQuestionByNoteBook(headNote1);
       assertThat(results, equalTo(quizQuestionList));
+    }
+
+    @Test
+    void getQuestionsOfANoteWhenThereIsNotQuestion() {
+      List<QuizQuestion> results = controller.getAllQuizQuestionByNote(note);
+      assertThat(results, hasSize(0));
+    }
+
+    @Test
+    void getQuestionsOfANoteWhenThereIsOneQuestion() {
+      QuizQuestion questionOfNote = makeMe.aQuestion().spellingQuestionOfNote(note).please();
+      List<QuizQuestion> results = controller.getAllQuizQuestionByNote(note);
+      assertThat(results, contains(questionOfNote));
     }
   }
 }

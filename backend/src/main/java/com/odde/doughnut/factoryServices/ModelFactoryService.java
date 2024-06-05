@@ -95,7 +95,7 @@ public class ModelFactoryService {
     return new SuggestedQuestionForFineTuningModel(suggestion, this);
   }
 
-  public List<QuizQuestion> GetQuizQuestionsByHeadNote(Note headNote) {
+  public List<QuizQuestion> getQuizQuestionsByHeadNote(Note headNote) {
     // Get the iterable
     Iterable<QuizQuestion> iterable = quizQuestionRepository.findAll();
 
@@ -103,6 +103,21 @@ public class ModelFactoryService {
     List<QuizQuestion> questionList = new ArrayList<>();
     for (QuizQuestion question : iterable) {
       if (question.getHeadNote().getId().equals(headNote.getId())) {
+        questionList.add(question);
+      }
+    }
+
+    return questionList;
+  }
+
+  public List<QuizQuestion> getQuizQuestionsByNote(Note note) {
+    // Get the iterable
+    Iterable<QuizQuestion> iterable = quizQuestionRepository.findAll();
+
+    // Convert iterable to list
+    List<QuizQuestion> questionList = new ArrayList<>();
+    for (QuizQuestion question : iterable) {
+      if (question.getNote().getId().equals(note.getId())) {
         questionList.add(question);
       }
     }

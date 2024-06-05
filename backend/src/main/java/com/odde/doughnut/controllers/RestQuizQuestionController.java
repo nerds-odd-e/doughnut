@@ -15,6 +15,8 @@ import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.transaction.annotation.Transactional;
@@ -100,9 +102,13 @@ class RestQuizQuestionController {
         testabilitySettings.getCurrentUTCTimestamp());
   }
 
-  @GetMapping("/{headNote}/questions")
-  public List<QuizQuestion> getAllQuizQuestion(
+  @GetMapping("/{headNote}/note-book-questions")
+  public List<QuizQuestion> getAllQuizQuestionByNoteBook(
       @PathVariable("headNote") @Schema(type = "integer") Note headNote) {
-    return modelFactoryService.GetQuizQuestionsByHeadNote(headNote);
+    return modelFactoryService.getQuizQuestionsByHeadNote(headNote);
+  }
+
+  public List<QuizQuestion> getAllQuizQuestionByNote(Note note) {
+    return modelFactoryService.getQuizQuestionsByNote(note);
   }
 }
