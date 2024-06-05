@@ -6,10 +6,10 @@ Feature: New questions assessment
       | topicConstructor | testingParent |
       | Shape            |               |
       | Triangle         | Shape         |
-  @ignore
+
   Scenario: Start an assessment
     When I start the assessment on "My Notes/Shape" notebook
-    Then I should see the first question with 4 options
+#    Then I should see the first question with 4 options
 
 #  Scenario: Start an assessment with new questions
 #    When I do the assessment on "My Notes/Shape"

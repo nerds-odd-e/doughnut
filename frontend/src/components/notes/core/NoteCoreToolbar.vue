@@ -77,6 +77,11 @@
           >
             <NoteInfoBar v-bind="{ noteId: note.id }" />
           </PopButton>
+          <PopButton
+            btn-class="dropdown-item btn-primary"
+            title="Start Assessment"
+          >
+          </PopButton>
           <NoteDeleteButton
             class="dropdown-item"
             v-bind="{ noteId: note.id, storageAccessor }"
