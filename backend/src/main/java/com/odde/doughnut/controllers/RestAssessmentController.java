@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.SearchTerm;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -47,18 +48,18 @@ class RestAssessmentController {
     currentUser.assertAuthorization(notebook);
     SearchTermModel searchTermModel =
         this.modelFactoryService.toSearchTermModel(currentUser.getEntity(), new SearchTerm());
-    List<QuizQuestion> quizQuestions =
-        searchTermModel
-            .search(notebook.getId())
-            .limit(5)
-            .map(quizQuestionService::generateAIQuestion)
-            .collect((Collectors.toList()));
 
-    if (quizQuestions.size() < 5) {
+    List<Note> notes =
+        searchTermModel.search(notebook.getId()).limit(5).collect((Collectors.toList()));
+
+    if (notes.size() < 5) {
       throw new ResponseStatusException(
           HttpStatusCode.valueOf(500),
           "Notebook has less than 5 notes. Unable to generate sufficient quiz questions");
     }
-    return quizQuestions;
+
+    return notes.stream()
+        .map(quizQuestionService::generateAIQuestion)
+        .collect((Collectors.toList()));
   }
 }
