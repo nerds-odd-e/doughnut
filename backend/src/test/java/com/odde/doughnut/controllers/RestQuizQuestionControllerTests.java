@@ -27,7 +27,6 @@ import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -418,11 +417,11 @@ class RestQuizQuestionControllerTests {
 
     @Test
     void getListOfQuizQuestions() {
-      for(Note note: headNote1.getChildren()) {
+      for (Note note : headNote1.getChildren()) {
         quizQuestionList.add(makeMe.aQuestion().spellingQuestionOfNote(note).please());
       }
 
-      for(Note note: headNote2.getChildren()) {
+      for (Note note : headNote2.getChildren()) {
         makeMe.aQuestion().spellingQuestionOfNote(note).please();
       }
 
