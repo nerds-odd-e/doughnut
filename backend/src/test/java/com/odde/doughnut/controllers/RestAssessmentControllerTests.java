@@ -92,5 +92,18 @@ public class RestAssessmentControllerTests {
       List<QuizQuestion> assessment = controller.generateAiQuestions(notebook);
       assertEquals(5, assessment.size());
     }
+
+    @Test
+    void shouldReturn5QuestionsGiven10Notes() throws UnexpectedNoAccessRightException {
+      generateNotebookWithXNotes(10);
+      List<QuizQuestion> assessment = controller.generateAiQuestions(notebook);
+      assertEquals(5, assessment.size());
+    }
+
+    @Test
+    void shouldThrowErrorGiven4Notes() {
+      generateNotebookWithXNotes(3);
+      assertThrows(ResponseStatusException.class, () -> controller.generateAiQuestions(notebook));
+    }
   }
 }

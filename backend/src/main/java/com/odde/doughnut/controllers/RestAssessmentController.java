@@ -13,11 +13,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/assessment")
@@ -45,9 +47,18 @@ class RestAssessmentController {
     currentUser.assertAuthorization(notebook);
     SearchTermModel searchTermModel =
         this.modelFactoryService.toSearchTermModel(currentUser.getEntity(), new SearchTerm());
-    return searchTermModel
-        .search(notebook.getId())
-        .map(quizQuestionService::generateAIQuestion)
-        .collect((Collectors.toList()));
+    List<QuizQuestion> quizQuestions =
+        searchTermModel
+            .search(notebook.getId())
+            .limit(5)
+            .map(quizQuestionService::generateAIQuestion)
+            .collect((Collectors.toList()));
+
+    if (quizQuestions.size() < 5) {
+      throw new ResponseStatusException(
+          HttpStatusCode.valueOf(500),
+          "Notebook has less than 5 notes. Unable to generate sufficient quiz questions");
+    }
+    return quizQuestions;
   }
 }
