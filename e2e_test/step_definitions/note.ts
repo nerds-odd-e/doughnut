@@ -33,6 +33,20 @@ Given("there are some notes for existing user {string}", (externalIdentifier, da
   start.testability().seedNotes(data.hashes(), externalIdentifier)
 })
 
+Given(
+  "there are {int} notes under notebook {string} for the user",
+  (notesCount: number, noteTopic: string) => {
+    let notes = Array(notesCount - 1)
+      .fill(0)
+      .map((_, i) => {
+        return { topicConstructor: `Note ${i}`, testingParent: noteTopic }
+      })
+
+    notes.push({ topicConstructor: noteTopic, testingParent: "" })
+    start.testability().seedNotes(notes)
+  },
+)
+
 Given("there are notes from Note {int} to Note {int}", (from: number, to: number) => {
   const notes = Array(to - from + 1)
     .fill(0)
@@ -161,6 +175,10 @@ Then("I should see {notepath} with these children", (notePath: NotePath, data: D
 })
 
 When("I delete notebook {string}", (noteTopic: string) => {
+  start.jumpToNotePage(noteTopic).deleteNote()
+})
+
+Then("I should see the assessment questions: {bool}", (noteTopic: string) => {
   start.jumpToNotePage(noteTopic).deleteNote()
 })
 

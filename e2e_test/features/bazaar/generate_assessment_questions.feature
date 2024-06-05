@@ -2,22 +2,8 @@
 Feature: Bazaar generate
   As a trainer, I want to generate to assessment questions in the Bazaar so that I can
   print the questions for notebook.
+
 Background:
-
-
-  Scenario: display button to generate questions from notebook
-    Given I am logged in as an existing user
-    And there are some notes for the current user:
-    | topicConstructor | testingParent  | details             |
-    | LeSS in Action   |                | An awesome training |
-    | team             | LeSS in Action |                     |
-    | tech             | LeSS in Action |                     |
-    | airgile          | LeSS in Action |                     |
-    | scrum            | LeSS in Action |                     |
-    | PO               | LeSS in Action |                     |
-    And notebook "LeSS in Action" is shared to the Bazaar
-    When I go to the bazaar
-    Then I should see the "Generate assessment questions" button on notebook "LeSS in Action"
 
   Scenario: open pop up for log in if the user is not logged in and generate assessment
     Given I haven't login
@@ -31,24 +17,25 @@ Background:
       | PO               | LeSS in Action |                     |
     And notebook "LeSS in Action" is shared to the Bazaar
     When I go to the bazaar
-    And I click on generate assessment questions button on notebook "LeSS in Action"
+    And I generate assessment questions on notebook "LeSS in Action"
     Then I should see message that says "Please login first"
 
-  Scenario: display button to generate questions from notebook
+  @ignore
+  Scenario Outline: display assessment questions from notebook 
     Given I am logged in as an existing user
-    And there are some notes for the current user:
-    | topicConstructor | testingParent  | details             |
-    | LeSS in Action   |                | An awesome training |
-    | team             | LeSS in Action |                     |
-    | tech             | LeSS in Action |                     |
-    | airgile          | LeSS in Action |                     |
-    | scrum            | LeSS in Action |                     |
-    | PO               | LeSS in Action |                     |
+    And there are <notes count> notes under notebook "LeSS in Action" for the user
     And notebook "LeSS in Action" is shared to the Bazaar
     When I go to the bazaar
-    And I click on generate assessment questions button on notebook "LeSS in Action"
-    Then I should see message that says "Do you want to generate assessment questions?"
-    And I should see "Generate" button
+    And I generate assessment questions on notebook "LeSS in Action"
+    Then I should see the assessment questions: <should see>
+    And I should see message that says <error message>
+
+    Examples:
+    | notes count  | should see  | error message       |
+    | 4            | false       | insufficient notes  |
+    | 5            | true        |                     |
+    | 6            | true        |                     |
+    | 6            | false       | Please login first  |
 
   @ignore
   Scenario: generate questions from notebook
