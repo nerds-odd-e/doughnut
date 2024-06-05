@@ -47,11 +47,11 @@ public class RestAssessmentControllerTests {
     controller = new RestAssessmentController(openAiApi, makeMe.modelFactoryService, userModel);
   }
 
-  private void generateNotebookWithXNotes(int numNotes) {
+  private void generateNotebookWithXNotes(Note note, int numNotes) {
     for (int i = 0; i < numNotes; i++) {
-      makeMe.aNote().under(topNote).please();
+      makeMe.aNote().under(note).please();
     }
-    makeMe.refresh(topNote);
+    makeMe.refresh(note);
   }
 
   @Nested
@@ -88,21 +88,21 @@ public class RestAssessmentControllerTests {
 
     @Test
     void shouldReturnAssessment() throws UnexpectedNoAccessRightException {
-      generateNotebookWithXNotes(4);
+      generateNotebookWithXNotes(topNote, 4);
       List<QuizQuestion> assessment = controller.generateAiQuestions(notebook);
       assertEquals(5, assessment.size());
     }
 
     @Test
     void shouldReturn5QuestionsGiven10Notes() throws UnexpectedNoAccessRightException {
-      generateNotebookWithXNotes(10);
+      generateNotebookWithXNotes(topNote, 10);
       List<QuizQuestion> assessment = controller.generateAiQuestions(notebook);
       assertEquals(5, assessment.size());
     }
 
     @Test
     void shouldThrowErrorGiven4Notes() {
-      generateNotebookWithXNotes(3);
+      generateNotebookWithXNotes(topNote, 3);
       assertThrows(ResponseStatusException.class, () -> controller.generateAiQuestions(notebook));
     }
   }
