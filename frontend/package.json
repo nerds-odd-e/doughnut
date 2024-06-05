@@ -61,7 +61,7 @@
     "jsdom": "^24.1.0",
     "optionator": "^0.9.4",
     "postcss": "^8.4.38",
-    "prettier": "^3.3.0",
+    "prettier": "^3.3.1",
     "sass": "^1.77.4",
     "sass-loader": "14.2.1",
     "style-loader": "^4.0.0",
