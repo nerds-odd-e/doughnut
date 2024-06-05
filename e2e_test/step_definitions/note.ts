@@ -62,12 +62,14 @@ Given("I access the add question form for the note {string}", (noteTopic: string
   cy.get("#dropdownMenuButton").click()
   cy.get(".dropdown-menu").should("exist")
   cy.get(".dropdown-menu").should("contain.text", "Add Question")
-  cy.get(".dropdown-menu").should("contain.text", "View Questions")
-  // Assert button existI access the add question form for note
-  // Click on dropdown
-  // Assert question exist
-  // Click add question button
-  // Assert Add question form exist
+  cy.findAllByTitle("Add Question").click()
+  cy.findAllByText("Question:").should("exist")
+  cy.findAllByText("Option 1 (Correct Answer)").should("exist")
+  cy.findAllByText("Option 2").should("exist")
+  cy.findAllByText("Option 3").should("not.exist")
+  cy.contains("button", "+").should("exist")
+  cy.contains("button", "-").should("exist")
+  cy.contains("button", "Submit").should("exist")
 })
 
 When("I create a notebook with topic {string}", (notebookTopic: string) => {
