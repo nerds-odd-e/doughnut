@@ -6,13 +6,13 @@ import "../support/string_util"
 import start from "../start"
 import NotePath from "support/NotePath"
 
-When('I click the assessment launch button on {notepath}', function (notePath: NotePath) {
+When('I start the assessment on {notepath} notebook', function (notePath: NotePath) {
   start.routerToNotebooksPage().navigateToPath(notePath)
   cy.get(".assessment-button").should("be.visible")
   cy.get('.assessment-launch-button').click();
 });
 
-Then('I should see the assessment modal launched', function () {
+Then('I should see the first question with 4 options', function () {
   cy.get('.assessment-modal').should('be.visible');
 });
 

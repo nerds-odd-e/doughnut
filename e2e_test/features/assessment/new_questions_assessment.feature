@@ -8,8 +8,8 @@ Feature: New questions assessment
       | Triangle         | Shape         |
   @ignore
   Scenario: Start an assessment
-    When I click the assessment launch button on "My Notes/Shape"
-    Then I should see the assessment modal launched
+    When I start the assessment on "My Notes/Shape" notebook
+    Then I should see the first question with 4 options
 
 #  Scenario: Start an assessment with new questions
 #    When I do the assessment on "My Notes/Shape"
