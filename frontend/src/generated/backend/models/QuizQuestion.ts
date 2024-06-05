@@ -12,5 +12,6 @@ export type QuizQuestion = {
     imageWithMask?: ImageWithMask;
     createdAt?: string;
     approved?: boolean;
+    reviewed?: boolean;
 };
 

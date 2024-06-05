@@ -2619,6 +2619,8 @@ components:
           format: date-time
         approved:
           type: boolean
+        reviewed:
+          type: boolean
     QuizQuestionContestResult:
       type: object
       properties:
