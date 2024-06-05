@@ -9,7 +9,6 @@ Feature: New questions assessment
       | Vietnam          | Countries     | Most famous food of Vietnam?   | Pho    |
 
   Scenario: Start an assessment
-    Given I start the assessment on "My Notes/Countries" notebook
-    When I answer the question "Where in the world is Singapore?" with "Asia"
-    When I answer the question "Most famous food of Vietnam?" with "Pho"
-    # Then I should see the next question\
+    When I start the assessment on "My Notes/Countries" notebook
+    Then I answer the question "Where in the world is Singapore?" with "Asia"
+    And I answer the question "Most famous food of Vietnam?" with "Pho"
