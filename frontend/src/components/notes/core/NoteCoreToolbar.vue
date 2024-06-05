@@ -88,19 +88,6 @@
           />
         </div>
       </div>
-      <div class="assessment-button">
-        <PopButton title="Assessment with new questions">
-          <template #button_face>
-            <SvgHappy />
-          </template>
-          <template #default="{ closer }">
-            <NoteChatDialog
-              v-bind="{ selectedNote: note, storageAccessor }"
-              @close-dialog="closer"
-            />
-          </template>
-        </PopButton>
-      </div>
     </div>
     <NoteAccessoryToolbar
       v-bind="{ noteId: note.id }"
