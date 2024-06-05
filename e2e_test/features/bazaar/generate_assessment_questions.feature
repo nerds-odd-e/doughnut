@@ -20,22 +20,20 @@ Background:
     And I generate assessment questions on notebook "LeSS in Action"
     Then I should see message that says "Please login first"
 
-  @ignore
-  Scenario Outline: display assessment questions from notebook 
-    Given I am logged in as an existing user
-    And there are <notes count> notes under notebook "LeSS in Action" for the user
-    And notebook "LeSS in Action" is shared to the Bazaar
-    When I go to the bazaar
-    And I generate assessment questions on notebook "LeSS in Action"
-    Then I should see the assessment questions: <should see>
-    And I should see message that says <error message>
-
-    Examples:
-    | notes count  | should see  | error message       |
-    | 4            | false       | insufficient notes  |
-    | 5            | true        |                     |
-    | 6            | true        |                     |
-    | 6            | false       | Please login first  |
+#  @ignore
+#  Scenario Outline: display assessment questions from notebook
+#    Given I am logged in as an existing user
+#    And there are <notes count> notes under notebook "LeSS in Action" for the user
+#    And notebook "LeSS in Action" is shared to the Bazaar
+#    When I go to the bazaar
+#    And I generate assessment questions on notebook "LeSS in Action"
+#    Then I should see message that says <message>
+#
+#    Examples:
+#    | notes count  | message       |
+#    | 4            | Insufficient notes  |
+#    | 5            | Assessment For LeSS in Action                     |
+#    | 6            | Assessment For LeSS in Action             |
 
   @ignore
   Scenario: generate questions from notebook
