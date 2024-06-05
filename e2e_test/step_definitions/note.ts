@@ -188,7 +188,6 @@ When("I delete notebook {string}", (noteTopic: string) => {
   start.jumpToNotePage(noteTopic).deleteNote()
 })
 
-
 When("I delete note {string} at {int}:00", (noteTopic: string, hour: number) => {
   start.testability().backendTimeTravelTo(0, hour)
   start.jumpToNotePage(noteTopic).deleteNote()
