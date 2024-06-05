@@ -1331,11 +1331,11 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BazaarNotebook"
-  /api/assessment/generate-assessment/{notebook}:
+  /api/assessment/ai-questions/{notebook}:
     post:
       tags:
       - rest-assessment-controller
-      operationId: generateAssessment
+      operationId: generateAiQuestions
       parameters:
       - name: notebook
         in: path
@@ -1354,7 +1354,9 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/QuizQuestion"
+                type: array
+                items:
+                  $ref: "#/components/schemas/QuizQuestion"
   /api/ai/{note}/completion:
     post:
       tags:

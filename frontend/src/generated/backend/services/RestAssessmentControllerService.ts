@@ -12,12 +12,12 @@ export class RestAssessmentControllerService {
      * @returns QuizQuestion OK
      * @throws ApiError
      */
-    public generateAssessment(
+    public generateAiQuestions(
         notebook: number,
-    ): CancelablePromise<QuizQuestion> {
+    ): CancelablePromise<Array<QuizQuestion>> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/assessment/generate-assessment/{notebook}',
+            url: '/api/assessment/ai-questions/{notebook}',
             path: {
                 'notebook': notebook,
             },
