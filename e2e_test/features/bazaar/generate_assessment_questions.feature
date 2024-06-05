@@ -40,14 +40,4 @@ Background:
     When I click on generate assessment questions button
     Then generate "5" questions
 
-  @ignore
-  Scenario: show error message if there are less than 5 notes in a notebook when generating questions
-    Given I am logged in as an existing user
-    And there are some notes for the current user:
-      | topicConstructor | testingParent  | details             |
-      | LeSS in Action   |                | An awesome training |
-      | team             | LeSS in Action |                     |
-      | tech             | LeSS in Action |                     |
-    When I click on generate assessment questions button
-    Then display error message that says ""
 

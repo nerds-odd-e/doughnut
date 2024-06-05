@@ -15,11 +15,10 @@
       <template #button_face>
         <SvgAssociation />
       </template>
+
       <template #default="{ closer }">
-        <AssessmentDialog
-          v-bind="{ notebook, loggedIn }"
-          @close-dialog="closer"
-        />
+        <AssessmentDialog v-if="!loggedIn" @close-dialog="closer" />
+        <OfflineAssessment v-else v-bind="{ notebook }" />
       </template>
     </PopButton>
   </div>
@@ -31,6 +30,7 @@ import { Notebook } from "@/generated/backend";
 import PopButton from "../commons/Popups/PopButton.vue";
 import SubscribeDialog from "./SubscribeDialog.vue";
 import AssessmentDialog from "./AssessmentDialog.vue";
+import OfflineAssessment from "../assessment/OfflineAssessment.vue";
 import SvgAdd from "../svgs/SvgAdd.vue";
 import SvgAssociation from "../svgs/SvgAssociation.vue";
 
@@ -45,6 +45,7 @@ export default defineComponent({
     SvgAssociation,
     SubscribeDialog,
     AssessmentDialog,
+    OfflineAssessment,
   },
 });
 </script>
