@@ -49,7 +49,6 @@ export class DoughnutApi {
     public readonly restUserController: RestUserControllerService;
     public readonly restWikidataController: RestWikidataControllerService;
     public readonly testabilityRestController: TestabilityRestControllerService;
-    public readonly restAssessmentControllerService: RestAssessmentControllerService;
     public readonly request: BaseHttpRequest;
     constructor(config?: Partial<OpenAPIConfig>, HttpRequest: HttpRequestConstructor = FetchHttpRequest) {
         this.request = new HttpRequest({
@@ -84,7 +83,6 @@ export class DoughnutApi {
         this.restUserController = new RestUserControllerService(this.request);
         this.restWikidataController = new RestWikidataControllerService(this.request);
         this.testabilityRestController = new TestabilityRestControllerService(this.request);
-        this.restAssessmentControllerService = new RestAssessmentControllerService(this.request);
     }
 }
 
