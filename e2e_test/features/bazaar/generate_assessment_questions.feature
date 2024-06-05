@@ -20,7 +20,6 @@ Background:
     And I generate assessment questions on notebook "LeSS in Action"
     Then I should see message that says "Please login first"
 
- @ignore
  Scenario Outline: display assessment questions from notebook
    Given I am logged in as an existing user
    And there are <notes count> notes under notebook "LeSS in Action" for the user
@@ -30,10 +29,10 @@ Background:
    Then I should see message that says "<message>"
 
    Examples:
-   | notes count  | message       |
-   | 4            | Insufficient notes  |
-   | 5            | Assessment For LeSS in Action                     |
-   | 6            | Assessment For LeSS in Action             |
+   | notes count  | message                       |
+   | 5            | Assessment For LeSS in Action |
+   | 6            | Assessment For LeSS in Action |
+    # | 4            | Insufficient notes            |
 
   @ignore
   Scenario: generate questions from notebook
