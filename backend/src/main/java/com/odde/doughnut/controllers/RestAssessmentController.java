@@ -42,7 +42,7 @@ class RestAssessmentController {
   @PostMapping("/ai-questions/{notebook}")
   @Transactional
   public List<QuizQuestion> generateAiQuestions(
-      @PathVariable @Schema(type = "integer") Notebook notebook)
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
     currentUser.assertLoggedIn();
     currentUser.assertAuthorization(notebook);
