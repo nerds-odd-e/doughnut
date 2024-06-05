@@ -72,6 +72,15 @@
             class="dropdown-item"
             v-bind="{ noteId: note.id, storageAccessor }"
           />
+          <PopButton btn-class="dropdown-item btn-primary" title="Add Question">
+            <NoteInfoBar v-bind="{ noteId: note.id }" />
+          </PopButton>
+          <PopButton
+            btn-class="dropdown-item btn-primary"
+            title="View Questions"
+          >
+            <NoteInfoBar v-bind="{ noteId: note.id }" />
+          </PopButton>
         </div>
       </div>
       <div class="assessment-button">
