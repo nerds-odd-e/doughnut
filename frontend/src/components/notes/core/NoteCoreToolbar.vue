@@ -81,6 +81,7 @@
             btn-class="dropdown-item btn-primary"
             title="Start Assessment"
           >
+            <AssessmentDialog />
           </PopButton>
           <NoteDeleteButton
             class="dropdown-item"
@@ -115,6 +116,7 @@ import AIGenerateImageDialog from "../AIGenerateImageDialog.vue";
 import NoteDetailsAutoCompletionButton from "./NoteDetailsAutoCompletionButton.vue";
 import NoteChatDialog from "../NoteChatDialog.vue";
 import NoteInfoBar from "../NoteInfoBar.vue";
+import AssessmentDialog from "../AssessmentDialog.vue";
 
 const props = defineProps({
   storageAccessor: {

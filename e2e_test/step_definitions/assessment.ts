@@ -10,3 +10,8 @@ When("I start the assessment on {notepath} notebook", (notePath: NotePath) => {
 
   cy.contains("Start Assessment").click()
 })
+
+When('I answer the first question', function () {
+  cy.findByText("Where in the world is Singapore?")
+  cy.findByText("Asia").click()
+})
