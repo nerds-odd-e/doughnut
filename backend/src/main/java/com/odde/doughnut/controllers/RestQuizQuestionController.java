@@ -5,11 +5,10 @@ import com.odde.doughnut.controllers.dto.QuestionSuggestionCreationParams;
 import com.odde.doughnut.controllers.dto.QuizQuestionContestResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
-import com.odde.doughnut.factoryServices.quizFacotries.factories.AiQuestionFactory;
 import com.odde.doughnut.models.AnswerModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GlobalSettingsService;
+import com.odde.doughnut.services.QuizQuestionService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
@@ -17,15 +16,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/quiz-questions")
 class RestQuizQuestionController {
   private final ModelFactoryService modelFactoryService;
+  private final QuizQuestionService quizQuestionService;
 
   private final UserModel currentUser;
 
@@ -44,6 +42,7 @@ class RestQuizQuestionController {
     this.testabilitySettings = testabilitySettings;
     this.aiQuestionGenerator =
         new AiQuestionGenerator(openAiApi, new GlobalSettingsService(modelFactoryService));
+    this.quizQuestionService = new QuizQuestionService(openAiApi, modelFactoryService);
   }
 
   @PostMapping("/generate-question")
@@ -51,7 +50,7 @@ class RestQuizQuestionController {
   public QuizQuestion generateQuestion(
       @RequestParam(value = "note") @Schema(type = "integer") Note note) {
     currentUser.assertLoggedIn();
-    return generateAIQuestion(note);
+    return quizQuestionService.generateAIQuestion(note);
   }
 
   @PostMapping("/{quizQuestion}/contest")
@@ -67,18 +66,7 @@ class RestQuizQuestionController {
   public QuizQuestion regenerate(
       @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion) {
     currentUser.assertLoggedIn();
-    return generateAIQuestion(quizQuestion.getNote());
-  }
-
-  private QuizQuestion generateAIQuestion(Note note) {
-    AiQuestionFactory aiQuestionFactory = new AiQuestionFactory(note, aiQuestionGenerator);
-    try {
-      QuizQuestion quizQuestion = aiQuestionFactory.buildValidQuizQuestion(null);
-      modelFactoryService.save(quizQuestion);
-      return quizQuestion;
-    } catch (QuizQuestionNotPossibleException e) {
-      throw (new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated"));
-    }
+    return quizQuestionService.generateAIQuestion(quizQuestion.getNote());
   }
 
   @PostMapping("/{quizQuestion}/answer")
