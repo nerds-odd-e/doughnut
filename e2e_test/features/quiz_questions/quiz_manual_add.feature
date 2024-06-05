@@ -1,4 +1,3 @@
-@ignore
 Feature: User Manually Add Questions
   As a user, I want to add to be able to add new questions manually from the note page.
 
@@ -9,20 +8,21 @@ Feature: User Manually Add Questions
       | LeSS in Action   |                | An awesome training |
       | team             | LeSS in Action |                     |
       | tech             | LeSS in Action |                     |
-    And there are some notes that are not created for the current user:
-      | topicConstructor | testingParent  | details  |
-      | NotMyNote        | LeSS in Action | FunTimes |
+    #And there are some notes that are not created for the current user:
+     # | topicConstructor | testingParent  | details  |
+      #| NotMyNote        | LeSS in Action | FunTimes |
 
   Scenario: Manually add questions to the note with valid question and answer should return success and add question
-    Given I have note "team" opened
-    When I add the question with the following:
-      | Question Stem                                       | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
-      | What is the most common scuba diving certification? | Rescue Diver   | Divemaster         | Open Water Diver   |
-    Then I should be able to see a sucess message
-    And I should be able to see the question in the qusestion list of the note
-      | note-topic | question stem                                       |
-      | team       | What is the most common scuba diving certification? |
+    Given I access the add question form for the note "team"
+#    When I add submit question with the following:
+#      | Question Stem                                       | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
+#      | What is the most common scuba diving certification? | Rescue Diver   | Divemaster         | Open Water Diver   |
+#    Then I should be able to see a sucess message
+#    And I should be able to see the question in the qusestion list of the note
+#      | note-topic | question stem                                       |
+#      | team       | What is the most common scuba diving certification? |
 
+  @ignore
   Scenario: Manually add questions to the note without answer should show error and not add question
     Given I have note "team" opened
     When I add the question with the following:
@@ -35,6 +35,7 @@ Feature: User Manually Add Questions
       | note-topic | question stem                                       |
       | team       | What is the most common scuba diving certification? |
 
+  @ignore
   Scenario: Manually add questions to the note with less than 2 options should show error and not add question
     Given I have note "team" opened
     When I add the question with the following:
@@ -47,6 +48,7 @@ Feature: User Manually Add Questions
       | note-topic | question stem                                       |
       | team       | What is the most common scuba diving certification? |
 
+  @ignore
   Scenario: Manually add questions to the note that does not belong to user should show error and not add question
     Given I have note "NotMyNote" opened
     When I add the question with the following:
@@ -59,6 +61,7 @@ Feature: User Manually Add Questions
       | note-topic | question stem                                       |
       | team       | What is the most common scuba diving certification? |
 
+  @ignore
   Scenario: When the user is logged out, when user manually add questions to the note should show error message and not add question
     Given I logged out
     And I have note "team" opened

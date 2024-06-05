@@ -36,7 +36,7 @@ Given("there are some notes for existing user {string}", (externalIdentifier, da
 Given(
   "there are {int} notes under notebook {string} for the user",
   (notesCount: number, noteTopic: string) => {
-    const notes = Array(notesCount - 1)
+    let notes = Array(notesCount - 1)
       .fill(0)
       .map((_, i) => {
         return { topicConstructor: `Note ${i}`, testingParent: noteTopic }
@@ -54,6 +54,20 @@ Given("there are notes from Note {int} to Note {int}", (from: number, to: number
       return { topicConstructor: `Note ${i + from}` }
     })
   start.testability().seedNotes(notes)
+})
+
+Given("I access the add question form for the note {string}", (noteTopic: string) => {
+  //Go to note page
+  start.jumpToNotePage(noteTopic)
+  cy.get("#dropdownMenuButton").click()
+  cy.get(".dropdown-menu").should("exist")
+  cy.get(".dropdown-menu").should("contain.text", "Add Question")
+  cy.get(".dropdown-menu").should("contain.text", "View Questions")
+  // Assert button existI access the add question form for note
+  // Click on dropdown
+  // Assert question exist
+  // Click add question button
+  // Assert Add question form exist
 })
 
 When("I create a notebook with topic {string}", (notebookTopic: string) => {
@@ -173,6 +187,7 @@ Then("I should see {notepath} with these children", (notePath: NotePath, data: D
 When("I delete notebook {string}", (noteTopic: string) => {
   start.jumpToNotePage(noteTopic).deleteNote()
 })
+
 
 When("I delete note {string} at {int}:00", (noteTopic: string, hour: number) => {
   start.testability().backendTimeTravelTo(0, hour)

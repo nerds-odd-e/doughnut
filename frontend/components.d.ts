@@ -59,6 +59,7 @@ declare module 'vue' {
     NoteAccessoryAsync: typeof import('./src/components/notes/accessory/NoteAccessoryAsync.vue')['default']
     NoteAccessoryDisplay: typeof import('./src/components/notes/accessory/NoteAccessoryDisplay.vue')['default']
     NoteAccessoryToolbar: typeof import('./src/components/notes/accessory/NoteAccessoryToolbar.vue')['default']
+    NoteAddQuestion: typeof import('./src/components/notes/NoteAddQuestion.vue')['default']
     NotebookBazaarViewCards: typeof import('./src/components/bazaar/NotebookBazaarViewCards.vue')['default']
     NotebookButtons: typeof import('./src/components/notebook/NotebookButtons.vue')['default']
     NotebookCardsWithButtons: typeof import('./src/components/notebook/NotebookCardsWithButtons.vue')['default']
