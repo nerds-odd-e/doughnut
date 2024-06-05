@@ -1,0 +1,2 @@
+ALTER TABLE quiz_question
+ADD COLUMN approved BOOLEAN DEFAULT FALSE;

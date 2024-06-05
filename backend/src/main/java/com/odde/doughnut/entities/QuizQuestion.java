@@ -42,6 +42,9 @@ public class QuizQuestion extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   private Boolean hasImage;
 
+  @Column(name = "approved")
+  public boolean approved = false;
+
   @JsonIgnore
   public MCQWithAnswer getMcqWithAnswer() {
     MultipleChoicesQuestion mcq = getMultipleChoicesQuestion();

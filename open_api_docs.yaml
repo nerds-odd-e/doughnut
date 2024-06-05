@@ -2615,6 +2615,8 @@ components:
         createdAt:
           type: string
           format: date-time
+        approved:
+          type: boolean
     QuizQuestionContestResult:
       type: object
       properties:
