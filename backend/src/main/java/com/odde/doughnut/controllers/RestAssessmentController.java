@@ -45,7 +45,7 @@ class RestAssessmentController {
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
     currentUser.assertLoggedIn();
-    currentUser.assertAuthorization(notebook);
+    currentUser.assertReadAuthorization(notebook);
     SearchTermModel searchTermModel =
         this.modelFactoryService.toSearchTermModel(currentUser.getEntity(), new SearchTerm());
 

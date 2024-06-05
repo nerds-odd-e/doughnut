@@ -3,10 +3,7 @@ package com.odde.doughnut.controllers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.entities.QuizQuestion;
-import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
@@ -78,7 +75,17 @@ public class RestAssessmentControllerTests {
     }
 
     @Test
-    void shouldNotBeAbleToAccessNotebookThatBelongsToOtherUser() {
+    void shouldBeAbleToAccessNotebookThatIsInTheBazaar() throws UnexpectedNoAccessRightException {
+      User anotherUser = makeMe.aUser().please();
+      Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
+      BazaarNotebook bazaarNotebook = makeMe.aBazaarNodebook(note.getNotebook()).please();
+      generateNotebookWithXNotes(bazaarNotebook.getNotebook().getHeadNote(), 4);
+      List<QuizQuestion> assessment = controller.generateAiQuestions(bazaarNotebook.getNotebook());
+      assertEquals(5, assessment.size());
+    }
+
+    @Test
+    void shouldNotBeAbleToAccessNotebookThatIsNotInTheBazaar() {
       User anotherUser = makeMe.aUser().please();
       Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
       assertThrows(
