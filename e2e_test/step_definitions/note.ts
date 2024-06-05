@@ -36,7 +36,7 @@ Given("there are some notes for existing user {string}", (externalIdentifier, da
 Given(
   "there are {int} notes under notebook {string} for the user",
   (notesCount: number, noteTopic: string) => {
-    let notes = Array(notesCount - 1)
+    const notes = Array(notesCount - 1)
       .fill(0)
       .map((_, i) => {
         return { topicConstructor: `Note ${i}`, testingParent: noteTopic }
