@@ -18,10 +18,21 @@ export default defineComponent({
     notebook: { type: Object as PropType<Notebook>, required: true },
     loggedIn: Boolean,
   },
+  emits: ["closeDialog"],
   data() {
     return {
       errors: {},
     };
+  },
+  methods: {
+    generateAssessmentQuestions() {
+      this.managedApi.restAssessmentController
+        .generateAiQuestions(this.notebook.id)
+        .then(() => {
+          this.$emit("closeDialog");
+        })
+        .catch((res) => (this.errors = res));
+    },
   },
 });
 </script>

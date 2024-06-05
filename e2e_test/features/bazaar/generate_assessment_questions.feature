@@ -32,7 +32,7 @@ Background:
    | notes count  | message                       |
    | 5            | Assessment For LeSS in Action |
    | 6            | Assessment For LeSS in Action |
-    # | 4            | Insufficient notes            |
+  #  | 4            | Insufficient notes            |
 
   @ignore
   Scenario: generate questions from notebook
