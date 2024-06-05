@@ -115,4 +115,23 @@ export class RestQuizQuestionControllerService {
             },
         });
     }
+    /**
+     * @param headNote
+     * @returns QuizQuestion OK
+     * @throws ApiError
+     */
+    public getAllQuizQuestion(
+        headNote: number,
+    ): CancelablePromise<Array<QuizQuestion>> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/quiz-questions/{headNote}/questions',
+            path: {
+                'headNote': headNote,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
 }

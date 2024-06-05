@@ -25,6 +25,9 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -385,6 +388,49 @@ class RestQuizQuestionControllerTests {
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(questionEvaluation, "");
       QuizQuestionContestResult contest = controller.contest(quizQuestion);
       assertFalse(contest.rejected);
+    }
+  }
+
+  @Nested
+  class GetListOfQuizQuestion {
+    List<QuizQuestion> quizQuestionList = new ArrayList<>();
+    Note headNote1;
+    Note headNote2;
+
+    @BeforeEach
+    void setUp() {
+      headNote1 = makeMe.aHeadNote("headNote1").please();
+      makeMe.theNote(headNote1).with10Children().please();
+
+      headNote2 = makeMe.aHeadNote("headNote2").please();
+      makeMe.theNote(headNote2).with10Children().please();
+      makeMe.theNote(headNote2).with10Children().please();
+
+      makeMe.refresh(headNote1);
+      makeMe.refresh(headNote2);
+    }
+
+    @Test
+    void getEmptyListOfQuizQuestions() {
+      List<QuizQuestion> results = controller.getAllQuizQuestion(headNote1);
+      assertThat(results, hasSize(0));
+    }
+
+    @Test
+    void getListOfQuizQuestions() {
+      for(Note note: headNote1.getChildren()) {
+        quizQuestionList.add(makeMe.aQuestion().spellingQuestionOfNote(note).please());
+      }
+
+      for(Note note: headNote2.getChildren()) {
+        makeMe.aQuestion().spellingQuestionOfNote(note).please();
+      }
+
+      makeMe.refresh(headNote1);
+      makeMe.refresh(headNote2);
+
+      List<QuizQuestion> results = controller.getAllQuizQuestion(headNote1);
+      assertThat(results, equalTo(quizQuestionList));
     }
   }
 }

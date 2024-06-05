@@ -19,6 +19,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/quiz-questions")
 class RestQuizQuestionController {
@@ -97,5 +99,12 @@ class RestQuizQuestionController {
         suggestion,
         currentUser.getEntity(),
         testabilitySettings.getCurrentUTCTimestamp());
+  }
+
+  @GetMapping("/{headNote}/questions")
+  public List<QuizQuestion> getAllQuizQuestion(
+      @PathVariable("headNote") @Schema(type = "integer") Note headNote
+  ) {
+    return modelFactoryService.GetQuizQuestionsByHeadNote(headNote);
   }
 }

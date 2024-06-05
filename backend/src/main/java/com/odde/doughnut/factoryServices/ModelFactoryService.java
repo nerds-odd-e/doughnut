@@ -6,6 +6,7 @@ import com.odde.doughnut.entities.repositories.*;
 import com.odde.doughnut.models.*;
 import jakarta.persistence.EntityManager;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ public class ModelFactoryService {
   @Autowired public EntityManager entityManager;
   @Autowired public FailureReportRepository failureReportRepository;
   @Autowired public GlobalSettingRepository globalSettingRepository;
+  @Autowired public QuizQuestionRepository quizQuestionRepository;
 
   @Autowired
   public QuestionSuggestionForFineTuningRepository questionSuggestionForFineTuningRepository;
@@ -91,6 +93,21 @@ public class ModelFactoryService {
   public SuggestedQuestionForFineTuningModel toSuggestedQuestionForFineTuningService(
       SuggestedQuestionForFineTuning suggestion) {
     return new SuggestedQuestionForFineTuningModel(suggestion, this);
+  }
+
+  public List<QuizQuestion> GetQuizQuestionsByHeadNote(Note headNote) {
+    // Get the iterable
+    Iterable<QuizQuestion> iterable = quizQuestionRepository.findAll();
+
+    // Convert iterable to list
+    List<QuizQuestion> questionList = new ArrayList<>();
+    for (QuizQuestion question : iterable) {
+      if (question.getHeadNote().getId().equals(headNote.getId())) {
+        questionList.add(question);
+      }
+    }
+
+    return questionList;
   }
 
   public <T extends EntityIdentifiedByIdOnly> T save(T entity) {
