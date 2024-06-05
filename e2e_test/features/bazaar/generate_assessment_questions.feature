@@ -20,26 +20,27 @@ Background:
     And I generate assessment questions on notebook "LeSS in Action"
     Then I should see message that says "Please login first"
 
-#  @ignore
-#  Scenario Outline: display assessment questions from notebook
-#    Given I am logged in as an existing user
-#    And there are <notes count> notes under notebook "LeSS in Action" for the user
-#    And notebook "LeSS in Action" is shared to the Bazaar
-#    When I go to the bazaar
-#    And I generate assessment questions on notebook "LeSS in Action"
-#    Then I should see message that says <message>
-#
-#    Examples:
-#    | notes count  | message       |
-#    | 4            | Insufficient notes  |
-#    | 5            | Assessment For LeSS in Action                     |
-#    | 6            | Assessment For LeSS in Action             |
+ @ignore
+ Scenario Outline: display assessment questions from notebook
+   Given I am logged in as an existing user
+   And there are <notes count> notes under notebook "LeSS in Action" for the user
+   And notebook "LeSS in Action" is shared to the Bazaar
+   When I go to the bazaar
+   And I generate assessment questions on notebook "LeSS in Action"
+   Then I should see message that says "<message>"
+
+   Examples:
+   | notes count  | message       |
+   | 4            | Insufficient notes  |
+   | 5            | Assessment For LeSS in Action                     |
+   | 6            | Assessment For LeSS in Action             |
 
   @ignore
   Scenario: generate questions from notebook
     Given I am logged in as an existing user
     When I click on generate assessment questions button
     Then generate "5" questions
+
   @ignore
   Scenario: show error message if there are less than 5 notes in a notebook when generating questions
     Given I am logged in as an existing user
