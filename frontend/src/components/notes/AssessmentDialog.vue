@@ -1,6 +1,10 @@
 <template>
   <div>
     <p>Where in the world is Singapore?</p>
+    <button>Asia</button>
   </div>
-  <button>Asia</button>
+  <div>
+    <p>Most famous food of Vietnam?</p>
+    <button>Pho</button>
+  </div>
 </template>
