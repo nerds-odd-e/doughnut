@@ -4,8 +4,7 @@ Feature: Get approved questions
 
   Background:
     Given I am logged in as an existing user
-  Scenario: Generating an Assessment with Random Approved Questions
-    Given there are some notes for the current user:
+    And there are some notes for the current user:
       | topicConstructor | testingParent |
       | Animals          |               |
       | Zebra            | Animals       |
@@ -14,32 +13,19 @@ Feature: Get approved questions
       | Kitty cat        | Animals       |
       | Merlion          | Animals       |
       | Unicorn          | Animals       |
-    And there are some questions for the notes:
-      | Question            | Note      | Status   |
-      | Zebra Question 1    | Zebra     | Approved |
-      | Flamingo Question 1 | Flamingo  | Approved |
-      | Elephant Question 1 | Elephant  | Approved |
-      | Cat Question 1      | Kitty cat | Approved |
-      | Merlion Question 1  | Merlion   | Approved |
-      | Unicorn Question 1  | Unicorn   | Approved |
-    When an assessment is generated
-    Then the assessment should include 5 randomly selected approved questions
-    And each question should pertain to a different note
 
-  Scenario: Generating an Assessment with Insufficient Approved Questions
-    Given that there are less than 5 approved questions in the notebook titled "Shape"
-    And these questions are assigned to different notes
-    When an assessment is generated
-    Then the system should notify about the insufficient number of questions
+  Scenario Outline: Generating an assessment with varying number of approved questions
+    Given that there are "<num_approved>" approved questions from at least 5 different notes in a notebook
+    When generating an assessment
+    Then should <be_able_to_generate> able to generate the assessment with 5 randomly selected approved questions
 
-  Scenario: Generating an Assessment with More than 5 Approved Questions
-    Given that there are more than 5 approved questions in the notebook titled "Shape"
-    And these questions are assigned to different notes
-    When an assessment is generated
-    Then the assessment should include only 5 randomly selected approved questions
+    Examples:
+      | num_approved | be_able_to_generate |
+      | 1            | not be              |
+      | 5            | be                  |
+      | 6            | be                  |
 
-  Scenario: Generating an Assessment with only Unapproved Questions
-    Given that there are 5 unapproved questions in the notebook titled "Shape"
-    And these questions are assigned to different notes
-    When an assessment is generated
-    Then the system should notify about the insufficient number of questions
+  Scenario: Fail to generate an assessment with sufficient approved questions but insufficient notes
+    Given that there are 5 approved questions from only 4 different notes in a notebook
+    When generating an assessment
+    Then should not be able to generate the assessment with 5 randomly selected approved questions
