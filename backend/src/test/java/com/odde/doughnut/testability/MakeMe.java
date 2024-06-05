@@ -47,7 +47,7 @@ public class MakeMe extends MakeMeWithoutDB {
     return new NoteBuilder(note, this);
   }
 
-  public BazaarNotebookBuilder aBazaarNodebook(Notebook notebook) {
+  public BazaarNotebookBuilder aBazaarNotebook(Notebook notebook) {
     return new BazaarNotebookBuilder(this, notebook);
   }
 

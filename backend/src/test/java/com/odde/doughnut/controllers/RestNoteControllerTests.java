@@ -1,14 +1,7 @@
 package com.odde.doughnut.controllers;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.TimestampOperations;
@@ -18,10 +11,6 @@ import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.MakeMeWithoutDB;
 import com.odde.doughnut.testability.TestabilitySettings;
 import jakarta.validation.Valid;
-import java.io.IOException;
-import java.net.URI;
-import java.sql.Timestamp;
-import java.util.List;
 import org.apache.logging.log4j.util.Strings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -36,6 +25,17 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;
+
+import java.io.IOException;
+import java.net.URI;
+import java.sql.Timestamp;
+import java.util.List;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -94,7 +94,7 @@ class RestNoteControllerTests {
     void shouldReturnTheNoteInfoIfHavingReadingAuth() throws UnexpectedNoAccessRightException {
       User otherUser = makeMe.aUser().please();
       Note note = makeMe.aNote().creatorAndOwner(otherUser).please();
-      makeMe.aBazaarNodebook(note.getNotebook()).please();
+      makeMe.aBazaarNotebook(note.getNotebook()).please();
       makeMe.refresh(userModel.getEntity());
       final NoteRealm noteRealm = controller.show(note);
       assertThat(noteRealm.getNote().getTopicConstructor(), equalTo(note.getTopicConstructor()));
