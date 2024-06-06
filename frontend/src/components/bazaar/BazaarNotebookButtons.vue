@@ -13,12 +13,11 @@
     </PopButton>
     <PopButton title="Generate assessment questions">
       <template #button_face>
-        <SvgAssociation />
+        <SvgAssociation @click="generateAssessmentQuestions" />
       </template>
 
       <template #default="{ closer }">
         <AssessmentDialog v-if="!loggedIn" @close-dialog="closer" />
-        <OfflineAssessment v-else v-bind="{ notebook }" />
       </template>
     </PopButton>
   </div>
@@ -26,15 +25,18 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import useLoadingApi from "@/managedApi/useLoadingApi";
 import { Notebook } from "@/generated/backend";
 import PopButton from "../commons/Popups/PopButton.vue";
 import SubscribeDialog from "./SubscribeDialog.vue";
 import AssessmentDialog from "./AssessmentDialog.vue";
-import OfflineAssessment from "../assessment/OfflineAssessment.vue";
 import SvgAdd from "../svgs/SvgAdd.vue";
 import SvgAssociation from "../svgs/SvgAssociation.vue";
 
 export default defineComponent({
+  setup() {
+    return { ...useLoadingApi() };
+  },
   props: {
     notebook: { type: Object as PropType<Notebook>, required: true },
     loggedIn: Boolean,
@@ -45,7 +47,20 @@ export default defineComponent({
     SvgAssociation,
     SubscribeDialog,
     AssessmentDialog,
-    OfflineAssessment,
+  },
+
+  methods: {
+    generateAssessmentQuestions() {
+      if (!this.loggedIn) {
+        return;
+      }
+      this.managedApi.restAssessmentController
+        .generateAiQuestions(this.notebook.id)
+        .then((response) => {
+          this.$router.push({ name: "assessment" });
+        })
+        .catch((res) => console.log(res));
+    },
   },
 });
 </script>

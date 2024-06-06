@@ -3,6 +3,7 @@ import HomePage from "@/pages/HomePage.vue";
 import BazaarPage from "@/pages/BazaarPage.vue";
 import NotebooksPage from "@/pages/NotebooksPage.vue";
 import NoteShowPage from "@/pages/NoteShowPage.vue";
+import OfflineAssessmentPage from "@/pages/OfflineAssessmentPage.vue";
 import ReviewHome from "@/pages/ReviewHome.vue";
 import RepeatPage from "@/pages/RepeatPage.vue";
 import InitialReviewPage from "@/pages/InitialReviewPage.vue";
@@ -77,6 +78,12 @@ const routes = [
     path: "/bazaar/notes/:noteId",
     name: "bnoteShow",
     component: NoteShowPage,
+    props: true,
+  },
+  {
+    path: "/bazaar/notebook/:notebookId/assessment",
+    name: "assessment",
+    component: OfflineAssessmentPage,
     props: true,
   },
   { path: "/reviews", name: "reviews", component: ReviewHome },

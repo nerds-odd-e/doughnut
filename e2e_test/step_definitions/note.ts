@@ -43,7 +43,7 @@ Given(
       })
 
     notes.push({ topicConstructor: noteTopic, testingParent: "" })
-    start.testability().seedNotes(notes)
+    start.testability().seedNotes(notes, "old_learner")
   },
 )
 

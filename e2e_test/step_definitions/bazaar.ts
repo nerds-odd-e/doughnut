@@ -102,3 +102,15 @@ Then("I unsubscribe from notebook {string}", (noteTopic: string) => {
   cy.unsubscribeFromNotebook(noteTopic)
   cy.findByRole("button", { name: "OK" }).click()
 })
+
+Given("There is a notebook with topic {string}", (notebookTopic: string) => {
+  start.routerToNotebooksPage().creatingNotebook(notebookTopic)
+})
+
+Given("There are {int} notes belonging to {string}", (noteCount: number, notebookTopic: string) => {
+  for (let i = 0; i < noteCount; i++) {
+    const noteTopic = "Note " + i
+    start.jumpToNotePage(notebookTopic).addingChildNote().createNote(noteTopic)
+  }
+
+})
