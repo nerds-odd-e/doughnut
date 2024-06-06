@@ -11,7 +11,7 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.QuizQuestionService;
 import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.ArrayList;
+
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -52,7 +52,9 @@ class RestAssessmentController {
         searchTermModel.search(notebook.getId()).limit(5).collect((Collectors.toList()));
 
     if (notes.size() < 5) {
-      return new ArrayList<>();
+      throw new ResponseStatusException(
+          HttpStatusCode.valueOf(500),
+          "Notebook has less than 5 notes. Unable to generate sufficient quiz questions");
     }
 
     return notes.stream()

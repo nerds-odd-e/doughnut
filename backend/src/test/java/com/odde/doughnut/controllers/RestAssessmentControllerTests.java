@@ -46,7 +46,7 @@ public class RestAssessmentControllerTests {
   }
 
   @Nested
-  class generateAssessmentTest {
+  class generateOfflineAssessmentTest {
     @BeforeEach
     void setup() {
       MCQWithAnswer jsonQuestion =
@@ -110,6 +110,35 @@ public class RestAssessmentControllerTests {
       makeMe.theNote(topNote).withNChildren(3);
       makeMe.refresh(topNote);
       assertEquals(controller.generateAiQuestions(notebook), new ArrayList<>());
+    }
+  }
+
+  @Nested
+  class generateOnlineAssessmentTest {
+    @BeforeEach
+    void setup() {
+      topNote = makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(userModel).please();
+      notebook = topNote.getNotebook();
+      makeMe.theNote(topNote).withNChildren(10).please();
+
+      makeMe.refresh(topNote);
+
+      for(Note note: topNote.getChildren()) {
+        if (note.getId() % 2 == 0) {
+          makeMe.aQuestion().spellingQuestionOfNote(note).approveQuestion().please();
+        } else {
+          makeMe.aQuestion().spellingQuestionOfNote(note).please();
+        }
+      }
+
+      makeMe.refresh(topNote);
+    }
+
+    @Test
+    void shouldReturn5ApprovedQuestionsWhenThereAreMoreThan5NotesWithQuestions() throws UnexpectedNoAccessRightException {
+      List<QuizQuestion> assessment = controller.generateAssessment(notebook);
+      assertEquals(assessment.size(), 5);
+      assertEquals(assessment.stream().filter(x -> x.approved).count(), 5);
     }
   }
 }

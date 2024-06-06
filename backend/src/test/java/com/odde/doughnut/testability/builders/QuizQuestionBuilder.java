@@ -56,4 +56,9 @@ public class QuizQuestionBuilder extends EntityBuilder<QuizQuestion> {
     this.entity = quizQuestionAIQuestion;
     return this;
   }
+
+  public QuizQuestionBuilder approveQuestion() {
+    this.entity.setApproved(true);
+    return this;
+  }
 }
