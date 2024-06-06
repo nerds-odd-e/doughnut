@@ -75,7 +75,7 @@
             btn-class="dropdown-item btn-primary"
             title="View Questions"
           >
-            <NoteInfoBar v-bind="{ noteId: note.id }" />
+            <Questions v-bind="{ noteId: note.id }" />
           </PopButton>
           <PopButton
             btn-class="dropdown-item btn-primary"
@@ -116,6 +116,7 @@ import AIGenerateImageDialog from "../AIGenerateImageDialog.vue";
 import NoteDetailsAutoCompletionButton from "./NoteDetailsAutoCompletionButton.vue";
 import NoteChatDialog from "../NoteChatDialog.vue";
 import NoteInfoBar from "../NoteInfoBar.vue";
+import Questions from "../Questions.vue";
 import AssessmentDialog from "../AssessmentDialog.vue";
 
 const props = defineProps({

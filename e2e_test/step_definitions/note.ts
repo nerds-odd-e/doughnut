@@ -92,7 +92,7 @@ When(
   },
 )
 
-When("I submit the following question:", (data: DataTable) => {
+When("I add the question with the following:",(data: DataTable) => {
   console.log(data)
   // start.updateQuestion()
   // cy.findAllByText("Submit").click()
@@ -400,3 +400,12 @@ Then("I should see the children notes:", (data: DataTable) => {
 When("I route to the note {string}", (noteTopic: string) => {
   start.jumpToNotePage(noteTopic)
 })
+
+When("I should see the question in the question list of the note", (data: DataTable) => {
+    const row = data.hashes()[0];
+    start.jumpToNotePage(row['note-topic']);
+    cy.findAllByTitle("more options").click()
+    cy.findAllByTitle("View Questions").click()
+
+  }
+)
