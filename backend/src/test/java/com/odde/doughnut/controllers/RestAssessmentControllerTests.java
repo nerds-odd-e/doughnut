@@ -1,8 +1,5 @@
 package com.odde.doughnut.controllers;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -11,7 +8,6 @@ import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.theokanning.openai.client.OpenAiApi;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -21,6 +17,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -105,10 +107,10 @@ public class RestAssessmentControllerTests {
     }
 
     @Test
-    void shouldThrowErrorWhenThereAreLessThan5Notes() {
+    void shouldReturnEmptyListWhenThereAreLessThan5Notes() throws UnexpectedNoAccessRightException {
       makeMe.theNote(topNote).withNChildren(3);
       makeMe.refresh(topNote);
-      assertThrows(ResponseStatusException.class, () -> controller.generateAiQuestions(notebook));
+      assertEquals(controller.generateAiQuestions(notebook), new ArrayList<>());
     }
   }
 }
