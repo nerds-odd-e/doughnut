@@ -162,7 +162,8 @@ class TestabilityRestController {
   @PostMapping("/seed_quiz_questions")
   @Transactional
   public List<QuizQuestion> seedQuizQuestion(@RequestBody SeedQuizQuestions seedQuizQuestions) {
-    List<QuizQuestion> quizQuestions = seedQuizQuestions.buildQuizQuestions(this.modelFactoryService);
+    List<QuizQuestion> quizQuestions =
+        seedQuizQuestions.buildQuizQuestions(this.modelFactoryService);
     quizQuestions.forEach(question -> modelFactoryService.quizQuestionRepository.save(question));
     return quizQuestions;
   }
