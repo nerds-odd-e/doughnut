@@ -57,6 +57,7 @@ export default defineComponent({
       this.managedApi.restAssessmentController
         .generateAiQuestions(this.notebook.id)
         .then((response) => {
+          console.log(response);
           this.$router.push({ name: "assessment" });
         })
         .catch((res) => console.log(res));
