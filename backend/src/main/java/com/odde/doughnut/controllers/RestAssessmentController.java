@@ -53,7 +53,7 @@ class RestAssessmentController {
         searchTermModel.search(notebook.getId()).limit(5).collect((Collectors.toList()));
 
     if (notes.size() < 5) {
-      return new ArrayList<QuizQuestion>();
+      return new ArrayList<>();
     }
 
     return notes.stream()

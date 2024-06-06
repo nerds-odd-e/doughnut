@@ -74,6 +74,7 @@ export default defineComponent({
             this.noAssessmentQuestions = true;
           }
           this.$router.push({ name: "assessment" });
+        });
     },
   },
 });
