@@ -195,5 +195,19 @@ public class RestAssessmentControllerTests {
       assertEquals(distinctMap.values().size(), 5);
       assertEquals(assessment.size(), 5);
     }
+
+    @Test
+    void shouldThrowExceptionWhenThereAreNotEnoughUniqueQuestions() {
+      makeMe.theNote(topNote).withNChildren(3).please();
+      makeMe.refresh(topNote);
+      for (Note note : topNote.getChildren()) {
+        makeMe.aQuestion().spellingQuestionOfNote(note).approveQuestion().please();
+        makeMe.aQuestion().spellingQuestionOfNote(note).approveQuestion().please();
+        makeMe.aQuestion().spellingQuestionOfNote(note).approveQuestion().please();
+      }
+      makeMe.refresh(topNote);
+
+      assertThrows(ApiException.class, () -> controller.generateAssessmentQuestions(notebook));
+    }
   }
 }

@@ -67,11 +67,11 @@ class RestAssessmentController {
     currentUser.assertLoggedIn();
     currentUser.assertReadAuthorization(notebook);
 
-    List<QuizQuestion> questionList =
+    List<QuizQuestion> approvedQuestionList =
         quizQuestionService.getApprovedAssessmentQuestion(notebook.getHeadNote().getChildren());
 
     List<QuizQuestion> filteredQuestionList =
-        questionList.stream()
+        approvedQuestionList.stream()
             .collect(
                 Collectors.groupingBy(
                     s -> s.getNote().getId(),
@@ -81,7 +81,7 @@ class RestAssessmentController {
             .stream()
             .toList();
 
-    if (questionList.size() < 5) {
+    if (filteredQuestionList.size() < 5) {
       throw new ApiException(
           "Not enough approved questions",
           ASSESSMENT_SERVICE_ERROR,
