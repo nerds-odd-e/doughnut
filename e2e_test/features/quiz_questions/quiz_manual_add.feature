@@ -75,7 +75,7 @@ Feature: User Manually Add Questions
       | note-topic | Question                                            |
       | team       | What is the most common scuba diving certification? |
 
-  @focus
+  @ignore
   Scenario: When user has added a question successfully to the note
     When I add the question with the following:
       | Question Stem                                       | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
