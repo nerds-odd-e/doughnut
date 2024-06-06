@@ -112,5 +112,4 @@ Given("There are {int} notes belonging to {string}", (noteCount: number, noteboo
     const noteTopic = "Note " + i
     start.jumpToNotePage(notebookTopic).addingChildNote().createNote(noteTopic)
   }
-
 })

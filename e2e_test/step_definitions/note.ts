@@ -92,7 +92,7 @@ When(
   },
 )
 
-When("I submit the following question:",(data: DataTable) => {
+When("I submit the following question:", (data: DataTable) => {
   console.log(data)
   // start.updateQuestion()
   // cy.findAllByText("Submit").click()
