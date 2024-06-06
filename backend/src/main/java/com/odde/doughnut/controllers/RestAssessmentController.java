@@ -54,7 +54,7 @@ class RestAssessmentController {
 
     if (notes.size() < 5) {
       return new ArrayList<QuizQuestion>();
- }
+    }
 
     return notes.stream()
         .map(quizQuestionService::generateAIQuestion)
