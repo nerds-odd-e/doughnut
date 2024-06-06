@@ -10,9 +10,11 @@ import jakarta.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.util.Objects;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Entity
 @Data
+@EqualsAndHashCode(callSuper=false)
 @Table(name = "quiz_question")
 @JsonPropertyOrder({"id", "multipleChoicesQuestion", "headNote", "imageWithMask"})
 public class QuizQuestion extends EntityIdentifiedByIdOnly {
