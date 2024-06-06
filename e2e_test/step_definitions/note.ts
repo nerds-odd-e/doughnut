@@ -92,6 +92,12 @@ When(
   },
 )
 
+When("I submit the following question:",(data: DataTable) => {
+  console.log(data)
+  // start.updateQuestion()
+  // cy.findAllByText("Submit").click()
+})
+
 Then(
   "I must be able to download the {string} from the note {string}",
   (fileName: string, noteTopic: string) => {
