@@ -135,6 +135,13 @@ public class RestAssessmentControllerTests {
     }
 
     @Test
+    void whenNotLogin() {
+      userModel = modelFactoryService.toUserModel(null);
+      controller = new RestAssessmentController(openAiApi, makeMe.modelFactoryService, userModel);
+      assertThrows(ResponseStatusException.class, () -> controller.generateAssessment(notebook));
+    }
+    
+    @Test
     void shouldReturn5ApprovedQuestionsWhenThereAreMoreThan5NotesWithQuestions()
         throws UnexpectedNoAccessRightException {
       List<QuizQuestion> assessment = controller.generateAssessment(notebook);

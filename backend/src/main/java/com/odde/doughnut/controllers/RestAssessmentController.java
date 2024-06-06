@@ -68,6 +68,7 @@ class RestAssessmentController {
   public List<QuizQuestion> generateAssessment(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
+<<<<<<< HEAD
 //    currentUser.assertLoggedIn();
 //    currentUser.assertReadAuthorization(notebook);
 //
@@ -79,6 +80,19 @@ class RestAssessmentController {
 //        HttpStatusCode.valueOf(500),
 //        "Notebook has less than 5 notes. Unable to generate sufficient quiz questions");
 //    }
+=======
+        currentUser.assertLoggedIn();
+    //    currentUser.assertReadAuthorization(notebook);
+    //
+    //    //get 5 random notes, random approved questions
+    //    List<Note> notes = notebook.getHeadNote().getDescendants().toList();
+    //
+    //    if (notes.size() < 5) {
+    //      throw new ResponseStatusException(
+    //        HttpStatusCode.valueOf(500),
+    //        "Notebook has less than 5 notes. Unable to generate sufficient quiz questions");
+    //    }
+>>>>>>> a355e1f25 (add test to validate login)
 
     QuizQuestion question = new QuizQuestion();
     question.approved = true;
