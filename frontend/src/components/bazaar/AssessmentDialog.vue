@@ -14,7 +14,6 @@
 import { defineComponent } from "vue";
 
 export default defineComponent({
-  emits: ["closeDialog"],
   props: {
     isLoggedIn: Boolean,
     errorMessage: String,

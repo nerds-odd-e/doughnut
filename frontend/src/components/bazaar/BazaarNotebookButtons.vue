@@ -22,16 +22,14 @@
         <SvgAssociation @click="generateAssessmentQuestions" />
       </template>
 
-      <template #default="{ closer }">
+      <template #default>
         <AssessmentDialog
           v-if="!loggedIn"
-          @close-dialog="closer"
           :is-logged-in="loggedIn"
           error-message="Please login first"
         />
         <AssessmentDialog
           v-if="loggedIn && noAssessmentQuestions"
-          @close-dialog="closer"
           :is-logged-in="loggedIn"
           error-message="Insufficient notes to create assessment!"
         />
