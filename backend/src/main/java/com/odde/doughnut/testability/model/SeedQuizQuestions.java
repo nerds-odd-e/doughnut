@@ -39,9 +39,9 @@ public class SeedQuizQuestions {
     }
   }
 
-  public Map<String, QuizQuestion> buildQuizQuestions(ModelFactoryService factoryService) {
+  public List<QuizQuestion> buildQuizQuestions(ModelFactoryService factoryService) {
     return seedQuizQuestions.stream()
         .map(question -> question.buildQuizQuestion(factoryService.noteRepository.findFirstByTopicConstructor(question.topicConstructor)))
-        .collect(Collectors.toMap(question -> question.getMultipleChoicesQuestion().stem, n -> n));
+        .collect(Collectors.toList());
   }
 }

@@ -160,9 +160,11 @@ class TestabilityRestController {
   }
 
   @PostMapping("/seed_quiz_questions")
-  public Map<String, Integer> seedQuizQuestion(@RequestBody SeedQuizQuestions seedQuizQuestions) {
-    Map<String, QuizQuestion> quizQuestionMap = seedQuizQuestions.buildQuizQuestions(this.modelFactoryService);
-    throw new RuntimeException("Not yet implemented");
+  @Transactional
+  public List<QuizQuestion> seedQuizQuestion(@RequestBody SeedQuizQuestions seedQuizQuestions) {
+    List<QuizQuestion> quizQuestions = seedQuizQuestions.buildQuizQuestions(this.modelFactoryService);
+    quizQuestions.forEach(question -> modelFactoryService.quizQuestionRepository.save(question));
+    return quizQuestions;
   }
 
   private Ownership getOwnership(SeedInfo seedInfo, User user) {

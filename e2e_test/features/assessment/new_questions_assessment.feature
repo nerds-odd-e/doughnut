@@ -7,10 +7,10 @@ Feature: New questions assessment
       | Countries        |               |
       | Singapore        | Countries     |
       | Vietnam          | Countries     |
-#    And there are questions for the note:
-#      | topicConstructor | question                         | answer | option |
-#      | Singapore        | Where in the world is Singapore? | Asia   | euro   |
-#      | Vietnam          | Most famous food of Vietnam?     | Pho    | bread  |
+   And there are questions for the note:
+     | topicConstructor | question                         | answer | option |
+     | Singapore        | Where in the world is Singapore? | Asia   | euro   |
+     | Vietnam          | Most famous food of Vietnam?     | Pho    | bread  |
 
   Scenario: Start an assessment
     When I start the assessment on "My Notes/Countries" notebook
