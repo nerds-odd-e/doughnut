@@ -106,7 +106,9 @@ class RestQuizQuestionController {
     return modelFactoryService.getQuizQuestionsByHeadNote(headNote);
   }
 
-  public List<QuizQuestion> getAllQuizQuestionByNote(Note note) {
+  @GetMapping("/{note}/note-questions")
+  public List<QuizQuestion> getAllQuizQuestionByNote(
+      @PathVariable("note") @Schema(type = "integer") Note note) {
     return modelFactoryService.getQuizQuestionsByNote(note);
   }
 }

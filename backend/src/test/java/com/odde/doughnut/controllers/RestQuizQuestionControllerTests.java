@@ -395,7 +395,8 @@ class RestQuizQuestionControllerTests {
     List<QuizQuestion> quizQuestionList = new ArrayList<>();
     Note headNote1;
     Note headNote2;
-    Note note;
+    Note noteWithoutQuestions;
+    Note noteWithQuestions;
 
     @BeforeEach
     void setUp() {
@@ -408,7 +409,9 @@ class RestQuizQuestionControllerTests {
       makeMe.refresh(headNote1);
       makeMe.refresh(headNote2);
 
-      note = makeMe.aNote("a note").please();
+      noteWithoutQuestions = makeMe.aNote("a note").please();
+      noteWithQuestions = makeMe.aNote("a note with questions").please();
+      makeMe.aQuestion().spellingQuestionOfNote(noteWithQuestions).please();
     }
 
     @Test
@@ -433,15 +436,25 @@ class RestQuizQuestionControllerTests {
 
     @Test
     void getQuestionsOfANoteWhenThereIsNotQuestion() {
-      List<QuizQuestion> results = controller.getAllQuizQuestionByNote(note);
+      List<QuizQuestion> results = controller.getAllQuizQuestionByNote(noteWithoutQuestions);
       assertThat(results, hasSize(0));
     }
 
     @Test
     void getQuestionsOfANoteWhenThereIsOneQuestion() {
-      QuizQuestion questionOfNote = makeMe.aQuestion().spellingQuestionOfNote(note).please();
-      List<QuizQuestion> results = controller.getAllQuizQuestionByNote(note);
+      QuizQuestion questionOfNote =
+          makeMe.aQuestion().spellingQuestionOfNote(noteWithoutQuestions).please();
+      makeMe.refresh(noteWithoutQuestions);
+      List<QuizQuestion> results = controller.getAllQuizQuestionByNote(noteWithoutQuestions);
       assertThat(results, contains(questionOfNote));
+    }
+
+    @Test
+    void getAllQuestionsOfANoteWhenThereIsMoreThanOneQuestion() {
+      QuizQuestion questionOfNote =
+          makeMe.aQuestion().spellingQuestionOfNote(noteWithQuestions).please();
+      List<QuizQuestion> results = controller.getAllQuizQuestionByNote(noteWithQuestions);
+      assertThat(results, hasSize(2));
     }
   }
 }
