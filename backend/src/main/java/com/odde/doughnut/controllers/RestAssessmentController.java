@@ -11,7 +11,6 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.QuizQuestionService;
 import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -68,34 +67,11 @@ class RestAssessmentController {
   public List<QuizQuestion> generateAssessment(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
-<<<<<<< HEAD
-//    currentUser.assertLoggedIn();
-//    currentUser.assertReadAuthorization(notebook);
-//
-//    //get 5 random notes, random approved questions
-//    List<Note> notes = notebook.getHeadNote().getDescendants().toList();
-//
-//    if (notes.size() < 5) {
-//      throw new ResponseStatusException(
-//        HttpStatusCode.valueOf(500),
-//        "Notebook has less than 5 notes. Unable to generate sufficient quiz questions");
-//    }
-=======
-        currentUser.assertLoggedIn();
-    //    currentUser.assertReadAuthorization(notebook);
-    //
-    //    //get 5 random notes, random approved questions
-    //    List<Note> notes = notebook.getHeadNote().getDescendants().toList();
-    //
-    //    if (notes.size() < 5) {
-    //      throw new ResponseStatusException(
-    //        HttpStatusCode.valueOf(500),
-    //        "Notebook has less than 5 notes. Unable to generate sufficient quiz questions");
-    //    }
->>>>>>> a355e1f25 (add test to validate login)
+    currentUser.assertLoggedIn();
+    currentUser.assertReadAuthorization(notebook);
 
     QuizQuestion question = new QuizQuestion();
     question.approved = true;
-    return Arrays.asList(question,question,question,question,question);
+    return Arrays.asList(question, question, question, question, question);
   }
 }

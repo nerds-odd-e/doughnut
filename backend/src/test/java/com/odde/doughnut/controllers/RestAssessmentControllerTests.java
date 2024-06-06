@@ -140,7 +140,15 @@ public class RestAssessmentControllerTests {
       controller = new RestAssessmentController(openAiApi, makeMe.modelFactoryService, userModel);
       assertThrows(ResponseStatusException.class, () -> controller.generateAssessment(notebook));
     }
-    
+
+    @Test
+    void shouldNotBeAbleToAccessNotebookWhenUserHasNoPermission() {
+      User anotherUser = makeMe.aUser().please();
+      notebook.setOwnership(anotherUser.getOwnership());
+      assertThrows(
+          UnexpectedNoAccessRightException.class, () -> controller.generateAssessment(notebook));
+    }
+
     @Test
     void shouldReturn5ApprovedQuestionsWhenThereAreMoreThan5NotesWithQuestions()
         throws UnexpectedNoAccessRightException {
