@@ -1,18 +1,55 @@
 <template>
   <h3>Assessment For LeSS in Action</h3>
-  <p>{{ result }}</p>
-  <p>{{ errors }}</p>
+  <p v-if="fetchingAssessment">Generating Questions.. Please Wait A Moment.</p>
+  <p v-if="noAssessmentQuestions">Insufficient notes to create assessment!</p>
+
+  <div v-else>
+    <p>{{ result }}</p>
+    <p>{{ errors }}</p>
+  </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import useLoadingApi from "@/managedApi/useLoadingApi";
+import { QuizQuestion } from "@/generated/backend";
 
 export default defineComponent({
+  setup() {
+    return { ...useLoadingApi() };
+  },
+  props: {
+    notebookId: { type: Number, required: true },
+  },
+
   data() {
     return {
-      result: {},
+      fetchingAssessment: false,
+      noAssessmentQuestions: false,
+      result: [] as QuizQuestion[],
       errors: {},
     };
+  },
+  mounted() {
+    this.generateAssessmentQuestions();
+  },
+  methods: {
+    generateAssessmentQuestions() {
+      this.fetchingAssessment = true;
+      this.managedApi.restAssessmentController
+        .generateAiQuestions(this.notebookId)
+        .then((response) => {
+          if (!response || response.length === 0) {
+            this.noAssessmentQuestions = true;
+          } else {
+            this.result = response;
+          }
+        })
+        .catch((res) => {
+          this.errors = res;
+        });
+      this.fetchingAssessment = false;
+    },
   },
 });
 </script>

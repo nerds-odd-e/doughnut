@@ -19,19 +19,13 @@
     </PopButton>
     <PopButton title="Generate assessment questions">
       <template #button_face>
-        <SvgAssociation @click="generateAssessmentQuestions" />
+        <SvgAssociation @click="openAssessmentPage" />
       </template>
-
       <template #default>
         <AssessmentDialog
           v-if="!loggedIn"
           :is-logged-in="loggedIn"
           error-message="Please login first"
-        />
-        <AssessmentDialog
-          v-if="loggedIn && noAssessmentQuestions"
-          :is-logged-in="loggedIn"
-          error-message="Insufficient notes to create assessment!"
         />
       </template>
     </PopButton>
@@ -40,7 +34,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import useLoadingApi from "@/managedApi/useLoadingApi";
+
 import { Notebook } from "@/generated/backend";
 import PopButton from "../commons/Popups/PopButton.vue";
 import SubscribeDialog from "./SubscribeDialog.vue";
@@ -51,9 +45,6 @@ import SvgChat from "../svgs/SvgChat.vue";
 import SvgAssociation from "../svgs/SvgAssociation.vue";
 
 export default defineComponent({
-  setup() {
-    return { ...useLoadingApi() };
-  },
   props: {
     notebook: { type: Object as PropType<Notebook>, required: true },
     loggedIn: Boolean,
@@ -65,24 +56,14 @@ export default defineComponent({
     SubscribeDialog,
     AssessmentDialog,
   },
-  data() {
-    return {
-      noAssessmentQuestions: false,
-    };
-  },
   methods: {
-    generateAssessmentQuestions() {
-      if (!this.loggedIn) {
-        return;
-      }
-      this.managedApi.restAssessmentController
-        .generateAiQuestions(this.notebook.id)
-        .then((response) => {
-          if (!response || response.length === 0) {
-            this.noAssessmentQuestions = true;
-          }
-          this.$router.push({ name: "assessment" });
+    openAssessmentPage() {
+      if (this.loggedIn) {
+        this.$router.push({
+          name: "assessment",
+          params: { notebookId: this.notebook.id },
         });
+      }
     },
   },
 });
