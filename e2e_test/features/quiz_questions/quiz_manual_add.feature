@@ -1,4 +1,4 @@
-Feature: User Manually Add Questions
+Feature: User Manually Add Questionsaaaa
   As a user, I want to add to be able to add new questions manually from the note page.
 
   Background:
@@ -14,9 +14,9 @@ Feature: User Manually Add Questions
 
   Scenario: Manually add questions to the note with valid question and answer should return success and add question
     Given I access the add question page for the note "team"
-    # When I submit the following question:
-    #   | Question                                            | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
-    #   | What is the most common scuba diving certification? | Rescue Diver   | Divemaster         | Open Water Diver   |
+    When I add the question with the following:
+      | Question                                            | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
+      | What is the most common scuba diving certification? | Rescue Diver   | Divemaster         | Open Water Diver   |
   #    Then I should be able to see a sucess message
   #    And I should be able to see the question in the qusestion list of the note
   #      | note-topic | Question                                      |

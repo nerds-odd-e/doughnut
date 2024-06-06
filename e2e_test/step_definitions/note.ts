@@ -97,9 +97,17 @@ When(
 )
 
 When("I add the question with the following:", (data: DataTable) => {
-  console.log(data)
-  // start.updateQuestion()
-  // cy.findAllByText("Submit").click()
+  const row = data.hashes()[0]
+  cy.get("label").contains("Question:").next().as("questionTextarea")
+  cy.get("@questionTextarea").type(row["Question"] as string)
+  cy.get("label").contains("Option 1 (Correct Answer)").next().as("questionTextarea")
+  cy.get("@questionTextarea").type(row["Correct Choice"] as string)
+  cy.get("label").contains("Option 2").next().as("questionTextarea")
+  cy.get("@questionTextarea").type(row["Incorrect Choice 1"] as string)
+  cy.get("button").contains("+").click()
+  cy.get("label").contains("Option 3").next().as("questionTextarea")
+  cy.get("@questionTextarea").type(row["Incorrect Choice 2"] as string)
+  cy.get("button").contains("Submit").click()
 })
 
 Then(
