@@ -12,8 +12,7 @@ import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.theokanning.openai.client.OpenAiApi;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -126,7 +125,8 @@ public class RestAssessmentControllerTests {
     void whenNotLogin() {
       userModel = modelFactoryService.toUserModel(null);
       controller = new RestAssessmentController(openAiApi, makeMe.modelFactoryService, userModel);
-      assertThrows(ResponseStatusException.class, () -> controller.generateAssessment(notebook));
+      assertThrows(
+          ResponseStatusException.class, () -> controller.generateAssessmentQuestions(notebook));
     }
 
     @Test
@@ -134,7 +134,8 @@ public class RestAssessmentControllerTests {
       User anotherUser = makeMe.aUser().please();
       notebook.setOwnership(anotherUser.getOwnership());
       assertThrows(
-          UnexpectedNoAccessRightException.class, () -> controller.generateAssessment(notebook));
+          UnexpectedNoAccessRightException.class,
+          () -> controller.generateAssessmentQuestions(notebook));
     }
 
     @Test
@@ -151,7 +152,7 @@ public class RestAssessmentControllerTests {
       }
       makeMe.refresh(topNote);
 
-      List<QuizQuestion> assessment = controller.generateAssessment(notebook);
+      List<QuizQuestion> assessment = controller.generateAssessmentQuestions(notebook);
 
       assertEquals(assessment.size(), 5);
       assertEquals(assessment.stream().filter(x -> x.approved).count(), 5);
@@ -166,7 +167,33 @@ public class RestAssessmentControllerTests {
       }
       makeMe.refresh(topNote);
 
-      assertThrows(ApiException.class, () -> controller.generateAssessment(notebook));
+      assertThrows(ApiException.class, () -> controller.generateAssessmentQuestions(notebook));
+    }
+
+    @Test
+    void shouldReturn5ApprovedQuestionsFromDifferentNotesWhenThereAreMoreThan5NotesWithQuestions()
+        throws UnexpectedNoAccessRightException {
+      makeMe.theNote(topNote).withNChildren(10).please();
+      makeMe.refresh(topNote);
+      for (Note note : topNote.getChildren()) {
+        if (note.getId() % 2 == 0) {
+          makeMe.aQuestion().spellingQuestionOfNote(note).approveQuestion().please();
+          makeMe.aQuestion().spellingQuestionOfNote(note).approveQuestion().please();
+        } else {
+          makeMe.aQuestion().spellingQuestionOfNote(note).please();
+        }
+      }
+      makeMe.refresh(topNote);
+
+      List<QuizQuestion> assessment = controller.generateAssessmentQuestions(notebook);
+
+      Map<Integer, QuizQuestion> distinctMap = new HashMap<>();
+      for (QuizQuestion question : assessment) {
+        distinctMap.putIfAbsent(question.getNote().getId(), question);
+      }
+
+      assertEquals(distinctMap.values().size(), 5);
+      assertEquals(assessment.size(), 5);
     }
   }
 }

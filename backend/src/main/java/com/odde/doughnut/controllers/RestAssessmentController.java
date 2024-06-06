@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import static com.odde.doughnut.controllers.dto.ApiError.ErrorType.ASSESSMENT_SERVICE_ERROR;
+import static java.util.stream.Collectors.toList;
 
 import com.odde.doughnut.controllers.dto.SearchTerm;
 import com.odde.doughnut.entities.Note;
@@ -51,19 +52,16 @@ class RestAssessmentController {
     SearchTermModel searchTermModel =
         this.modelFactoryService.toSearchTermModel(currentUser.getEntity(), new SearchTerm());
 
-    List<Note> notes =
-        searchTermModel.search(notebook.getId()).limit(5).collect((Collectors.toList()));
+    List<Note> notes = searchTermModel.search(notebook.getId()).limit(5).collect((toList()));
 
     if (notes.size() < 5) {
       return new ArrayList<>();
     }
 
-    return notes.stream()
-        .map(quizQuestionService::generateAIQuestion)
-        .collect((Collectors.toList()));
+    return notes.stream().map(quizQuestionService::generateAIQuestion).collect((toList()));
   }
 
-  public List<QuizQuestion> generateAssessment(
+  public List<QuizQuestion> generateAssessmentQuestions(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
     currentUser.assertLoggedIn();
@@ -72,6 +70,17 @@ class RestAssessmentController {
     List<QuizQuestion> questionList =
         quizQuestionService.getApprovedAssessmentQuestion(notebook.getHeadNote().getChildren());
 
+    List<QuizQuestion> filteredQuestionList =
+        questionList.stream()
+            .collect(
+                Collectors.groupingBy(
+                    s -> s.getNote().getId(),
+                    Collectors.collectingAndThen(
+                        Collectors.mapping(q -> q, Collectors.toList()), List::getFirst)))
+            .values()
+            .stream()
+            .toList();
+
     if (questionList.size() < 5) {
       throw new ApiException(
           "Not enough approved questions",
@@ -79,6 +88,6 @@ class RestAssessmentController {
           "Not enough approved questions");
     }
 
-    return questionList;
+    return filteredQuestionList;
   }
 }
