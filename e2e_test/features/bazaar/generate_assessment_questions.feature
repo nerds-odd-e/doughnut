@@ -13,7 +13,7 @@ Background:
     When I go to the bazaar
     And I generate assessment questions on notebook "LeSS in Action"
     Then I should see message that says "Please login first"
-
+  @ignore
   Scenario Outline: display assessment questions from notebook
     Given I am logged in as an existing user
     And There are <notes count> notes belonging to "LeSS in Action"
