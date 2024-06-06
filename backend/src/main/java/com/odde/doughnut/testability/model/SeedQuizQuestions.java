@@ -2,6 +2,7 @@ package com.odde.doughnut.testability.model;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestion;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
 import java.util.List;
 import java.util.Map;
@@ -38,9 +39,9 @@ public class SeedQuizQuestions {
     }
   }
 
-  public Map<String, QuizQuestion> buildQuizQuestions(Map<String, Note> notes) {
+  public Map<String, QuizQuestion> buildQuizQuestions(ModelFactoryService factoryService) {
     return seedQuizQuestions.stream()
-        .map(question -> question.buildQuizQuestion(notes.get(question.topicConstructor)))
+        .map(question -> question.buildQuizQuestion(factoryService.noteRepository.findFirstByTopicConstructor(question.topicConstructor)))
         .collect(Collectors.toMap(question -> question.getMultipleChoicesQuestion().stem, n -> n));
   }
 }

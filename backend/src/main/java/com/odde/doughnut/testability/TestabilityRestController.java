@@ -161,8 +161,7 @@ class TestabilityRestController {
 
   @PostMapping("/seed_quiz_questions")
   public Map<String, Integer> seedQuizQuestion(@RequestBody SeedQuizQuestions seedQuizQuestions) {
-    Map<String, Note> notes = Collections.emptyMap();
-    Map<String, QuizQuestion> quizQuestionMap = seedQuizQuestions.buildQuizQuestions(notes);
+    Map<String, QuizQuestion> quizQuestionMap = seedQuizQuestions.buildQuizQuestions(this.modelFactoryService);
     throw new RuntimeException("Not yet implemented");
   }
 
