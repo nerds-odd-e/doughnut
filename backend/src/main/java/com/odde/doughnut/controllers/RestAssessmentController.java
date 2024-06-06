@@ -1,9 +1,12 @@
 package com.odde.doughnut.controllers;
 
+import static com.odde.doughnut.controllers.dto.ApiError.ErrorType.ASSESSMENT_SERVICE_ERROR;
+
 import com.odde.doughnut.controllers.dto.SearchTerm;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.QuizQuestion;
+import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.SearchTermModel;
@@ -11,7 +14,6 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.QuizQuestionService;
 import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -70,8 +72,16 @@ class RestAssessmentController {
     currentUser.assertLoggedIn();
     currentUser.assertReadAuthorization(notebook);
 
-    QuizQuestion question = new QuizQuestion();
-    question.approved = true;
-    return Arrays.asList(question, question, question, question, question);
+    List<QuizQuestion> questionList =
+        quizQuestionService.getApprovedAssessmentQuestion(notebook.getHeadNote().getChildren());
+
+    if (questionList.size() < 5) {
+      throw new ApiException(
+          "Not enough approved questions",
+          ASSESSMENT_SERVICE_ERROR,
+          "Not enough approved questions");
+    }
+
+    return questionList;
   }
 }

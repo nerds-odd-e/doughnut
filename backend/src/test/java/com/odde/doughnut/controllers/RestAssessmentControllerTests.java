@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
@@ -119,19 +120,6 @@ public class RestAssessmentControllerTests {
     void setup() {
       topNote = makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(userModel).please();
       notebook = topNote.getNotebook();
-      makeMe.theNote(topNote).withNChildren(10).please();
-
-      makeMe.refresh(topNote);
-
-      for (Note note : topNote.getChildren()) {
-        if (note.getId() % 2 == 0) {
-          makeMe.aQuestion().spellingQuestionOfNote(note).approveQuestion().please();
-        } else {
-          makeMe.aQuestion().spellingQuestionOfNote(note).please();
-        }
-      }
-
-      makeMe.refresh(topNote);
     }
 
     @Test
@@ -152,9 +140,33 @@ public class RestAssessmentControllerTests {
     @Test
     void shouldReturn5ApprovedQuestionsWhenThereAreMoreThan5NotesWithQuestions()
         throws UnexpectedNoAccessRightException {
+      makeMe.theNote(topNote).withNChildren(10).please();
+      makeMe.refresh(topNote);
+      for (Note note : topNote.getChildren()) {
+        if (note.getId() % 2 == 0) {
+          makeMe.aQuestion().spellingQuestionOfNote(note).approveQuestion().please();
+        } else {
+          makeMe.aQuestion().spellingQuestionOfNote(note).please();
+        }
+      }
+      makeMe.refresh(topNote);
+
       List<QuizQuestion> assessment = controller.generateAssessment(notebook);
+
       assertEquals(assessment.size(), 5);
       assertEquals(assessment.stream().filter(x -> x.approved).count(), 5);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenThereAreNotEnoughApprovedQuestions() {
+      makeMe.theNote(topNote).withNChildren(10).please();
+      makeMe.refresh(topNote);
+      for (Note note : topNote.getChildren()) {
+        makeMe.aQuestion().spellingQuestionOfNote(note).please();
+      }
+      makeMe.refresh(topNote);
+
+      assertThrows(ApiException.class, () -> controller.generateAssessment(notebook));
     }
   }
 }
