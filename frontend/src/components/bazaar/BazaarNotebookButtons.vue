@@ -17,7 +17,16 @@
       </template>
 
       <template #default="{ closer }">
-        <AssessmentDialog v-if="!loggedIn" @close-dialog="closer" />
+        <AssessmentDialog
+          v-if="!loggedIn"
+          @close-dialog="closer"
+          error-message="Please login first"
+        />
+        <AssessmentDialog
+          v-if="loggedIn && noAssessmentQuestions"
+          @close-dialog="closer"
+          error-message="Insufficient notes to create assessment!"
+        />
       </template>
     </PopButton>
   </div>
@@ -48,7 +57,11 @@ export default defineComponent({
     SubscribeDialog,
     AssessmentDialog,
   },
-
+  data() {
+    return {
+      noAssessmentQuestions: false,
+    };
+  },
   methods: {
     generateAssessmentQuestions() {
       if (!this.loggedIn) {
@@ -56,11 +69,11 @@ export default defineComponent({
       }
       this.managedApi.restAssessmentController
         .generateAiQuestions(this.notebook.id)
-        .then(() => {
-          // console.log(response);
+        .then((response) => {
+          if (!response || response.length === 0) {
+            this.noAssessmentQuestions = true;
+          }
           this.$router.push({ name: "assessment" });
-        });
-      // .catch((res) => {});
     },
   },
 });
