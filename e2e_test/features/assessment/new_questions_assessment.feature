@@ -7,12 +7,14 @@ Feature: New questions assessment
       | Countries        |               |
       | Singapore        | Countries     |
       | Vietnam          | Countries     |
-   And there are questions for the note:
-     | topicConstructor | question                         | answer | option |
-     | Singapore        | Where in the world is Singapore? | Asia   | euro   |
-     | Vietnam          | Most famous food of Vietnam?     | Pho    | bread  |
+    And notebook "Countries" is shared to the Bazaar
+    And there are questions for the note:
+      | topicConstructor | question                         | answer | option |
+      | Singapore        | Where in the world is Singapore? | Asia   | euro   |
+      | Vietnam          | Most famous food of Vietnam?     | Pho    | bread  |
+    When I go to the bazaar
 
   Scenario: Start an assessment
-    When I start the assessment on "My Notes/Countries" notebook
+    When I start the assessment on the "Countries" notebook
     Then I answer the question "Where in the world is Singapore?" with "Asia"
     And I answer the question "Most famous food of Vietnam?" with "Pho"

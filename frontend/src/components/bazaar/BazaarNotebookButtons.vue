@@ -11,6 +11,12 @@
         />
       </template>
     </PopButton>
+    <PopButton title="Start Assessment">
+      <template #button_face>
+        <SvgChat />
+      </template>
+      <OnlineAssessmentDialog v-if="loggedIn" />
+    </PopButton>
     <PopButton title="Generate assessment questions">
       <template #button_face>
         <SvgAssociation @click="generateAssessmentQuestions" />
@@ -39,7 +45,9 @@ import { Notebook } from "@/generated/backend";
 import PopButton from "../commons/Popups/PopButton.vue";
 import SubscribeDialog from "./SubscribeDialog.vue";
 import AssessmentDialog from "./AssessmentDialog.vue";
+import OnlineAssessmentDialog from "../notes/OnlineAssessmentDialog.vue";
 import SvgAdd from "../svgs/SvgAdd.vue";
+import SvgChat from "../svgs/SvgChat.vue";
 import SvgAssociation from "../svgs/SvgAssociation.vue";
 
 export default defineComponent({

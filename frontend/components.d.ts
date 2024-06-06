@@ -102,6 +102,7 @@ declare module 'vue' {
     ObjectConfuse: typeof import('./src/components/svgs/link_types/ObjectConfuse.vue')['default']
     ObjectLeft: typeof import('./src/components/svgs/link_types/ObjectLeft.vue')['default']
     ObjectRight: typeof import('./src/components/svgs/link_types/ObjectRight.vue')['default']
+    OnlineAssessmentDialog: typeof import('./src/components/notes/OnlineAssessmentDialog.vue')['default']
     Person: typeof import('./src/components/svgs/link_types/Person.vue')['default']
     PopButton: typeof import('./src/components/commons/Popups/PopButton.vue')['default']
     Popups: typeof import('./src/components/commons/Popups/Popups.vue')['default']
