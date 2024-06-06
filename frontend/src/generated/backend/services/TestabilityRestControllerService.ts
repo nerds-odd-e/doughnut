@@ -4,7 +4,7 @@
 /* eslint-disable */
 import type { Randomization } from '../models/Randomization';
 import type { SeedInfo } from '../models/SeedInfo';
-import type { SeedQuizQuestion } from '../models/SeedQuizQuestion';
+import type { SeedQuizQuestions } from '../models/SeedQuizQuestions';
 import type { SeedSuggestedQuestions } from '../models/SeedSuggestedQuestions';
 import type { TimeTravel } from '../models/TimeTravel';
 import type { TimeTravelRelativeToNow } from '../models/TimeTravelRelativeToNow';
@@ -133,8 +133,8 @@ export class TestabilityRestControllerService {
      * @returns number OK
      * @throws ApiError
      */
-    public seedQuizQuestions(
-        requestBody: SeedQuizQuestion,
+    public seedQuizQuestion(
+        requestBody: SeedQuizQuestions,
     ): CancelablePromise<Record<string, number>> {
         return this.httpRequest.request({
             method: 'POST',

@@ -3,8 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 export type SeedQuizQuestion = {
-    seedQuizQuestions?: Array<Record<string, string>>;
-    externalIdentifier?: string;
-    circleName?: string;
+    topicConstructor?: string;
+    question?: string;
+    answer?: string;
+    option?: string;
 };
 
