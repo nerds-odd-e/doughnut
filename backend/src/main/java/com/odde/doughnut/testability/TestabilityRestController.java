@@ -9,6 +9,7 @@ import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GithubService;
+import com.odde.doughnut.testability.model.SeedQuizQuestions;
 import jakarta.persistence.EntityManagerFactory;
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -159,7 +160,9 @@ class TestabilityRestController {
   }
 
   @PostMapping("/seed_quiz_questions")
-  public Map<String, Integer> seedQuizQuestion(@RequestBody SeedQuizQuestion seedQuizQuestion) {
+  public Map<String, Integer> seedQuizQuestion(@RequestBody SeedQuizQuestions seedQuizQuestions) {
+    Map<String, Note> notes = Collections.emptyMap();
+    Map<String, QuizQuestion> quizQuestionMap = seedQuizQuestions.buildQuizQuestions(notes);
     throw new RuntimeException("Not yet implemented");
   }
 

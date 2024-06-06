@@ -133,7 +133,7 @@ export class TestabilityRestControllerService {
      * @returns number OK
      * @throws ApiError
      */
-    public seedQuizQuestion(
+    public seedQuizQuestions(
         requestBody: SeedQuizQuestion,
     ): CancelablePromise<Record<string, number>> {
         return this.httpRequest.request({
