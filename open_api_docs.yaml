@@ -233,10 +233,9 @@ paths:
           content:
             '*/*':
               schema:
-                type: object
-                additionalProperties:
-                  type: integer
-                  format: int32
+                type: array
+                items:
+                  $ref: "#/components/schemas/QuizQuestion"
   /api/testability/seed_notes:
     post:
       tags:
@@ -2384,57 +2383,24 @@ components:
           type: string
         circleName:
           type: string
-    SeedInfo:
+    ImageWithMask:
       type: object
       properties:
-        seedNotes:
-          type: array
-          writeOnly: true
-          items:
-            $ref: "#/components/schemas/SeedNote"
-        externalIdentifier:
+        noteImage:
           type: string
-          writeOnly: true
-        circleName:
-          type: string
-          writeOnly: true
-    SeedNote:
-      type: object
-      properties:
-        topicConstructor:
-          type: string
-        details:
-          type: string
-          writeOnly: true
-        testingParent:
-          type: string
-          writeOnly: true
-        skipReview:
-          type: boolean
-          writeOnly: true
-        url:
-          type: string
-          writeOnly: true
-        imageUrl:
-          type: string
-          writeOnly: true
         imageMask:
           type: string
-          writeOnly: true
-        wikidataId:
-          type: string
-          writeOnly: true
-    Randomization:
+    MultipleChoicesQuestion:
+      required:
+      - choices
       type: object
       properties:
-        choose:
+        stem:
           type: string
-    SubscriptionDTO:
-      type: object
-      properties:
-        dailyTargetOfNewNotes:
-          type: integer
-          format: int32
+        choices:
+          type: array
+          items:
+            type: string
     Note:
       required:
       - createdAt
@@ -2500,6 +2466,80 @@ components:
           $ref: "#/components/schemas/NoteTopic"
         parentNoteTopic:
           $ref: "#/components/schemas/NoteTopic"
+    QuizQuestion:
+      required:
+      - headNote
+      - id
+      - multipleChoicesQuestion
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        multipleChoicesQuestion:
+          $ref: "#/components/schemas/MultipleChoicesQuestion"
+        headNote:
+          $ref: "#/components/schemas/Note"
+        imageWithMask:
+          $ref: "#/components/schemas/ImageWithMask"
+        createdAt:
+          type: string
+          format: date-time
+        approved:
+          type: boolean
+        reviewed:
+          type: boolean
+    SeedInfo:
+      type: object
+      properties:
+        seedNotes:
+          type: array
+          writeOnly: true
+          items:
+            $ref: "#/components/schemas/SeedNote"
+        externalIdentifier:
+          type: string
+          writeOnly: true
+        circleName:
+          type: string
+          writeOnly: true
+    SeedNote:
+      type: object
+      properties:
+        topicConstructor:
+          type: string
+        details:
+          type: string
+          writeOnly: true
+        testingParent:
+          type: string
+          writeOnly: true
+        skipReview:
+          type: boolean
+          writeOnly: true
+        url:
+          type: string
+          writeOnly: true
+        imageUrl:
+          type: string
+          writeOnly: true
+        imageMask:
+          type: string
+          writeOnly: true
+        wikidataId:
+          type: string
+          writeOnly: true
+    Randomization:
+      type: object
+      properties:
+        choose:
+          type: string
+    SubscriptionDTO:
+      type: object
+      properties:
+        dailyTargetOfNewNotes:
+          type: integer
+          format: int32
     Notebook:
       required:
       - headNote
@@ -2618,47 +2658,6 @@ components:
           type: string
           format: date-time
         positiveFeedback:
-          type: boolean
-    ImageWithMask:
-      type: object
-      properties:
-        noteImage:
-          type: string
-        imageMask:
-          type: string
-    MultipleChoicesQuestion:
-      required:
-      - choices
-      type: object
-      properties:
-        stem:
-          type: string
-        choices:
-          type: array
-          items:
-            type: string
-    QuizQuestion:
-      required:
-      - headNote
-      - id
-      - multipleChoicesQuestion
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        multipleChoicesQuestion:
-          $ref: "#/components/schemas/MultipleChoicesQuestion"
-        headNote:
-          $ref: "#/components/schemas/Note"
-        imageWithMask:
-          $ref: "#/components/schemas/ImageWithMask"
-        createdAt:
-          type: string
-          format: date-time
-        approved:
-          type: boolean
-        reviewed:
           type: boolean
     QuizQuestionContestResult:
       type: object

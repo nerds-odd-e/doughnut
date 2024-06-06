@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { QuizQuestion } from '../models/QuizQuestion';
 import type { Randomization } from '../models/Randomization';
 import type { SeedInfo } from '../models/SeedInfo';
 import type { SeedQuizQuestions } from '../models/SeedQuizQuestions';
@@ -130,12 +131,12 @@ export class TestabilityRestControllerService {
     }
     /**
      * @param requestBody
-     * @returns number OK
+     * @returns QuizQuestion OK
      * @throws ApiError
      */
     public seedQuizQuestion(
         requestBody: SeedQuizQuestions,
-    ): CancelablePromise<Record<string, number>> {
+    ): CancelablePromise<Array<QuizQuestion>> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/testability/seed_quiz_questions',
