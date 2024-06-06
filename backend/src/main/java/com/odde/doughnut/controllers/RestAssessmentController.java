@@ -12,14 +12,17 @@ import com.odde.doughnut.services.QuizQuestionService;
 import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/assessment")
@@ -60,5 +63,25 @@ class RestAssessmentController {
     return notes.stream()
         .map(quizQuestionService::generateAIQuestion)
         .collect((Collectors.toList()));
+  }
+
+  public List<QuizQuestion> generateAssessment(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
+      throws UnexpectedNoAccessRightException {
+//    currentUser.assertLoggedIn();
+//    currentUser.assertReadAuthorization(notebook);
+//
+//    //get 5 random notes, random approved questions
+//    List<Note> notes = notebook.getHeadNote().getDescendants().toList();
+//
+//    if (notes.size() < 5) {
+//      throw new ResponseStatusException(
+//        HttpStatusCode.valueOf(500),
+//        "Notebook has less than 5 notes. Unable to generate sufficient quiz questions");
+//    }
+
+    QuizQuestion question = new QuizQuestion();
+    question.approved = true;
+    return Arrays.asList(question,question,question,question,question);
   }
 }

@@ -123,7 +123,7 @@ public class RestAssessmentControllerTests {
 
       makeMe.refresh(topNote);
 
-      for(Note note: topNote.getChildren()) {
+      for (Note note : topNote.getChildren()) {
         if (note.getId() % 2 == 0) {
           makeMe.aQuestion().spellingQuestionOfNote(note).approveQuestion().please();
         } else {
@@ -135,7 +135,8 @@ public class RestAssessmentControllerTests {
     }
 
     @Test
-    void shouldReturn5ApprovedQuestionsWhenThereAreMoreThan5NotesWithQuestions() throws UnexpectedNoAccessRightException {
+    void shouldReturn5ApprovedQuestionsWhenThereAreMoreThan5NotesWithQuestions()
+        throws UnexpectedNoAccessRightException {
       List<QuizQuestion> assessment = controller.generateAssessment(notebook);
       assertEquals(assessment.size(), 5);
       assertEquals(assessment.stream().filter(x -> x.approved).count(), 5);
