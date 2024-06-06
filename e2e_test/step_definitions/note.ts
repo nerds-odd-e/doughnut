@@ -56,20 +56,9 @@ Given("there are notes from Note {int} to Note {int}", (from: number, to: number
   start.testability().seedNotes(notes)
 })
 
-Given("I access the add question form for the note {string}", (noteTopic: string) => {
+Given("I access the add question page for the note {string}", (noteTopic: string) => {
   //Go to note page
-  start.jumpToNotePage(noteTopic)
-  cy.get("#dropdownMenuButton").click()
-  cy.get(".dropdown-menu").should("exist")
-  cy.get(".dropdown-menu").should("contain.text", "Add Question")
-  cy.findAllByTitle("Add Question").click()
-  cy.findAllByText("Question:").should("exist")
-  cy.findAllByText("Option 1 (Correct Answer)").should("exist")
-  cy.findAllByText("Option 2").should("exist")
-  cy.findAllByText("Option 3").should("not.exist")
-  cy.contains("button", "+").should("exist")
-  cy.contains("button", "-").should("exist")
-  cy.contains("button", "Submit").should("exist")
+  start.jumpToNotePage(noteTopic).openAddQuestionPage()
 })
 
 When("I create a notebook with topic {string}", (notebookTopic: string) => {

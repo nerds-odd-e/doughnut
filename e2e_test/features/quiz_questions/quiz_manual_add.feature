@@ -13,7 +13,7 @@ Feature: User Manually Add Questions
       #| NotMyNote        | LeSS in Action | FunTimes |
 
   Scenario: Manually add questions to the note with valid question and answer should return success and add question
-    Given I access the add question form for the note "team"
+    Given I access the add question page for the note "team"
 #    When I add submit question with the following:
 #      | Question Stem                                       | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
 #      | What is the most common scuba diving certification? | Rescue Diver   | Divemaster         | Open Water Diver   |

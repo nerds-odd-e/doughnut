@@ -161,6 +161,10 @@ export const assumeNotePage = (noteTopic?: string) => {
       cy.findByRole("button", { name: "OK" }).click()
       cy.pageIsNotLoading()
     },
+    openAddQuestionPage() {
+      cy.findAllByTitle("more options").click()
+      cy.findAllByTitle("Add Question").click()
+    },
     aiSuggestDetailsForNote: () => {
       cy.on("uncaught:exception", () => {
         return false
