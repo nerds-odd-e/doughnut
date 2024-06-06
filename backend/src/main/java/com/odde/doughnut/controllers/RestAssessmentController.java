@@ -20,10 +20,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/assessment")
@@ -61,6 +58,7 @@ class RestAssessmentController {
     return notes.stream().map(quizQuestionService::generateAIQuestion).collect((toList()));
   }
 
+  @GetMapping("/questions/{notebook}")
   public List<QuizQuestion> generateAssessmentQuestions(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {

@@ -26,4 +26,23 @@ export class RestAssessmentControllerService {
             },
         });
     }
+    /**
+     * @param notebook
+     * @returns QuizQuestion OK
+     * @throws ApiError
+     */
+    public generateAssessmentQuestions(
+        notebook: number,
+    ): CancelablePromise<Array<QuizQuestion>> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/assessment/questions/{notebook}',
+            path: {
+                'notebook': notebook,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
 }
