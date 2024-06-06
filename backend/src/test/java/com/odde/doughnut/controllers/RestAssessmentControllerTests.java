@@ -44,13 +44,6 @@ public class RestAssessmentControllerTests {
     controller = new RestAssessmentController(openAiApi, makeMe.modelFactoryService, userModel);
   }
 
-  private void generateNotebookWithXNotes(Note note, int numNotes) {
-    for (int i = 0; i < numNotes; i++) {
-      makeMe.aNote().under(note).please();
-    }
-    makeMe.refresh(note);
-  }
-
   @Nested
   class generateAssessmentTest {
     @BeforeEach
@@ -78,8 +71,9 @@ public class RestAssessmentControllerTests {
     void shouldBeAbleToAccessNotebookThatIsInTheBazaar() throws UnexpectedNoAccessRightException {
       User anotherUser = makeMe.aUser().please();
       Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
+      makeMe.theNote(note).withNChildren(4);
+      makeMe.refresh(note);
       BazaarNotebook bazaarNotebook = makeMe.aBazaarNotebook(note.getNotebook()).please();
-      generateNotebookWithXNotes(bazaarNotebook.getNotebook().getHeadNote(), 4);
       List<QuizQuestion> assessment = controller.generateAiQuestions(bazaarNotebook.getNotebook());
       assertEquals(5, assessment.size());
     }
@@ -94,22 +88,26 @@ public class RestAssessmentControllerTests {
     }
 
     @Test
-    void shouldReturnAssessment() throws UnexpectedNoAccessRightException {
-      generateNotebookWithXNotes(topNote, 4);
+    void shouldReturn5QuestionsWhenThereAre5Notes() throws UnexpectedNoAccessRightException {
+      makeMe.theNote(topNote).withNChildren(4);
+      makeMe.refresh(topNote);
       List<QuizQuestion> assessment = controller.generateAiQuestions(notebook);
       assertEquals(5, assessment.size());
     }
 
     @Test
-    void shouldReturn5QuestionsGiven10Notes() throws UnexpectedNoAccessRightException {
-      generateNotebookWithXNotes(topNote, 10);
+    void shouldReturn5QuestionsWhenThereAreMoreThan5Notes()
+        throws UnexpectedNoAccessRightException {
+      makeMe.theNote(topNote).withNChildren(10);
+      makeMe.refresh(topNote);
       List<QuizQuestion> assessment = controller.generateAiQuestions(notebook);
       assertEquals(5, assessment.size());
     }
 
     @Test
-    void shouldThrowErrorGiven4Notes() {
-      generateNotebookWithXNotes(topNote, 3);
+    void shouldThrowErrorWhenThereAreLessThan5Notes() {
+      makeMe.theNote(topNote).withNChildren(3);
+      makeMe.refresh(topNote);
       assertThrows(ResponseStatusException.class, () -> controller.generateAiQuestions(notebook));
     }
   }

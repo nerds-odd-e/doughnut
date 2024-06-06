@@ -107,7 +107,7 @@ class QuizQuestionTest {
     @Test
     void aNoteWithManySiblings() {
       Note top = makeMe.aNote().please();
-      makeMe.theNote(top).with10Children().please();
+      makeMe.theNote(top).withNChildren(10).please();
       Note note = makeMe.aNote().under(top).please();
       makeMe.refresh(top);
       QuizQuestion quizQuestion = generateQuizQuestion(note);

@@ -400,11 +400,10 @@ class RestQuizQuestionControllerTests {
     @BeforeEach
     void setUp() {
       headNote1 = makeMe.aHeadNote("headNote1").please();
-      makeMe.theNote(headNote1).with10Children().please();
+      makeMe.theNote(headNote1).withNChildren(10).please();
 
       headNote2 = makeMe.aHeadNote("headNote2").please();
-      makeMe.theNote(headNote2).with10Children().please();
-      makeMe.theNote(headNote2).with10Children().please();
+      makeMe.theNote(headNote2).withNChildren(20).please();
 
       makeMe.refresh(headNote1);
       makeMe.refresh(headNote2);

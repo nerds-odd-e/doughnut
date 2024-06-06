@@ -129,11 +129,11 @@ public class NoteBuilder extends EntityBuilder<Note> {
     return this;
   }
 
-  public NoteBuilder with10Children() {
+  public NoteBuilder withNChildren(int numNotes) {
     if (entity.getId() == null) {
       throw new RuntimeException("Unable to create children note for note with no ID");
     }
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < numNotes; i++) {
       makeMe.aNote().under(entity).please();
     }
     return this;
