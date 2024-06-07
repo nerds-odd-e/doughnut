@@ -21,6 +21,7 @@ Background:
     When I go to the bazaar
     And I generate assessment questions on notebook "LeSS in Action"
     Then I should see message that says "<message>"
+    
 
     Examples:
     | notes count  | message                       |

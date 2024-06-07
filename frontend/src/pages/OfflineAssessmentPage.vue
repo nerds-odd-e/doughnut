@@ -5,17 +5,23 @@
 
   <div v-else>
     <div v-for="(question, index) in result" :key="index">
-      <p><strong>Question {{ index + 1 }}:</strong> {{ question.multipleChoicesQuestion.stem }}</p>
+      <p>
+        <strong>Question {{ index + 1 }}:</strong>
+        {{ question.multipleChoicesQuestion.stem }}
+      </p>
       <ol>
-        <li v-for="(choice, choiceIndex) in question.multipleChoicesQuestion.choices" :key="choiceIndex">
+        <li
+          v-for="(choice, choiceIndex) in question.multipleChoicesQuestion
+            .choices"
+          :key="choiceIndex"
+        >
           {{ choice }}
         </li>
       </ol>
-      <hr>
+      <hr />
     </div>
   </div>
 </template>
-
 
 <script lang="ts">
 import { defineComponent } from "vue";
