@@ -1,5 +1,5 @@
 <template>
-  <h3>Assessment For LeSS in Action</h3>
+  <h3>Assessment For {{ topicConstructor }}</h3>
   <p v-if="fetchingAssessment">Generating Questions.. Please Wait A Moment.</p>
   <p v-if="noAssessmentQuestions">Insufficient notes to create assessment!</p>
 
@@ -35,21 +35,25 @@ export default defineComponent({
   props: {
     notebookId: { type: Number, required: true },
   },
-
+  computed: {
+    topicConstructor() {
+      return this.$route.query.topic;
+    },
+  },
   data() {
     return {
-      fetchingAssessment: true,
+      fetchingAssessment: false,
       noAssessmentQuestions: false,
       result: [] as QuizQuestion[],
       errors: {},
     };
   },
   mounted() {
+    this.fetchingAssessment = true;
     this.generateAssessmentQuestions();
   },
   methods: {
     generateAssessmentQuestions() {
-      this.fetchingAssessment = true;
       this.managedApi.restAssessmentController
         .generateAiQuestions(this.notebookId)
         .then((response) => {

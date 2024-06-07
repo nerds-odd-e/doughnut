@@ -61,7 +61,12 @@ export default defineComponent({
       if (this.loggedIn) {
         this.$router.push({
           name: "assessment",
-          params: { notebookId: this.notebook.id },
+          query: {
+            topic: this.notebook.headNote.noteTopic.topicConstructor,
+          },
+          params: {
+            notebookId: this.notebook.id,
+          },
         });
       }
     },
