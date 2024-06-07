@@ -28,9 +28,9 @@ Feature: Bazaar generate
     And I should see <question count> questions
 
     Examples:
-      | notes count | message                       | question count |
-      | 5           | Assessment For LeSS in Action | 5              |
-      | 6           | Assessment For LeSS in Action | 5              |
-# | 4           | Insufficient notes to create assessment! | 0              |
+      | notes count | message                                  | question count |
+      | 5           | Assessment For LeSS in Action            | 5              |
+      | 6           | Assessment For LeSS in Action            | 5              |
+      | 4           | Insufficient notes to create assessment! | 0              |
 
 

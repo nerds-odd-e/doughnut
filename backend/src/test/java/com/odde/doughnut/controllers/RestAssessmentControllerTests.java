@@ -72,7 +72,7 @@ public class RestAssessmentControllerTests {
     void shouldBeAbleToAccessNotebookThatIsInTheBazaar() throws UnexpectedNoAccessRightException {
       User anotherUser = makeMe.aUser().please();
       Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
-      makeMe.theNote(note).withNChildren(4);
+      makeMe.theNote(note).withNChildren(5);
       makeMe.refresh(note);
       BazaarNotebook bazaarNotebook = makeMe.aBazaarNotebook(note.getNotebook()).please();
       List<QuizQuestion> assessment = controller.generateAiQuestions(bazaarNotebook.getNotebook());
@@ -90,7 +90,7 @@ public class RestAssessmentControllerTests {
 
     @Test
     void shouldReturn5QuestionsWhenThereAre5Notes() throws UnexpectedNoAccessRightException {
-      makeMe.theNote(topNote).withNChildren(4);
+      makeMe.theNote(topNote).withNChildren(5);
       makeMe.refresh(topNote);
       List<QuizQuestion> assessment = controller.generateAiQuestions(notebook);
       assertEquals(5, assessment.size());
@@ -107,7 +107,7 @@ public class RestAssessmentControllerTests {
 
     @Test
     void shouldReturnEmptyListWhenThereAreLessThan5Notes() throws UnexpectedNoAccessRightException {
-      makeMe.theNote(topNote).withNChildren(3);
+      makeMe.theNote(topNote).withNChildren(4);
       makeMe.refresh(topNote);
       assertEquals(controller.generateAiQuestions(notebook), new ArrayList<>());
     }

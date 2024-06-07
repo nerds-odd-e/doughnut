@@ -3,14 +3,12 @@ package com.odde.doughnut.controllers;
 import static com.odde.doughnut.controllers.dto.ApiError.ErrorType.ASSESSMENT_SERVICE_ERROR;
 import static java.util.stream.Collectors.toList;
 
-import com.odde.doughnut.controllers.dto.SearchTerm;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.SearchTermModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.QuizQuestionService;
 import com.theokanning.openai.client.OpenAiApi;
@@ -46,10 +44,9 @@ class RestAssessmentController {
       throws UnexpectedNoAccessRightException {
     currentUser.assertLoggedIn();
     currentUser.assertReadAuthorization(notebook);
-    SearchTermModel searchTermModel =
-        this.modelFactoryService.toSearchTermModel(currentUser.getEntity(), new SearchTerm());
 
-    List<Note> notes = searchTermModel.search(notebook.getId()).limit(5).collect((toList()));
+    List<Note> notes =
+        notebook.getHeadNote().getChildren().stream().limit(5).collect(Collectors.toList());
 
     if (notes.size() < 5) {
       return new ArrayList<>();
