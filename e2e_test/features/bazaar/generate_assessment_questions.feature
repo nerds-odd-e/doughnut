@@ -14,10 +14,12 @@ Feature: Bazaar generate
     And I generate assessment questions on notebook "LeSS in Action"
     Then I should see message that says "Please login first"
 
-  @ignore
   @usingMockedOpenAiService
   Scenario Outline: display assessment questions from notebook
-    Given I am logged in as an existing user
+    Given OpenAI now generates this question:
+      | Question Stem | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
+      | What is LeSS? | Rescue Diver   | Divemaster         | Open Water Diver   |
+    And I am logged in as an existing user
     And There are <notes count> notes belonging to "LeSS in Action"
     And notebook "LeSS in Action" is shared to the Bazaar
     When I go to the bazaar
@@ -26,9 +28,9 @@ Feature: Bazaar generate
     And I should see <question count> questions
 
     Examples:
-      | notes count | message                                  | question count |
-      | 5           | Assessment For LeSS in Action            | 5              |
-      | 6           | Assessment For LeSS in Action            | 5              |
-      | 4           | Insufficient notes to create assessment! | 0              |
+      | notes count | message                       | question count |
+      | 5           | Assessment For LeSS in Action | 5              |
+      | 6           | Assessment For LeSS in Action | 5              |
+# | 4           | Insufficient notes to create assessment! | 0              |
 
 

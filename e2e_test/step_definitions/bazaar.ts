@@ -116,10 +116,8 @@ Given("There are {int} notes belonging to {string}", (noteCount: number, noteboo
 
 Then("I should see {int} questions", (questionCount: number) => {
   for (let i = 1; i <= questionCount; i++) {
-    const questionTitle = "Question " + i
-    cy.findByText(questionTitle).should("exist")
+    cy.findByText(`Question ${i}:`).should("exist")
   }
 
-  const outOfBoundIndex = questionCount + 1
-  cy.findByText("Question " + outOfBoundIndex).should("not.exist")
+  cy.findByText(`Question ${questionCount + 1}:`).should("not.exist")
 })
