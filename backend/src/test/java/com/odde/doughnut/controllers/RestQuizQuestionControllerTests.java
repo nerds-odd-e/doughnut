@@ -521,7 +521,7 @@ class RestQuizQuestionControllerTests {
         throws UnexpectedNoAccessRightException {
       List<QuizQuestion> questions = new ArrayList<>();
       questions.add(oneQuizQuestion);
-      controller.approveQuizQuestion(questions);
+      controller.reviewQuizQuestion(questions);
 
       makeMe.refresh(oneQuizQuestion);
 
@@ -536,7 +536,7 @@ class RestQuizQuestionControllerTests {
       List<QuizQuestion> questions = new ArrayList<>();
       questions.add(quizQuestion);
       assertThrows(
-          UnexpectedNoAccessRightException.class, () -> controller.approveQuizQuestion(questions));
+          UnexpectedNoAccessRightException.class, () -> controller.reviewQuizQuestion(questions));
     }
 
     @Test
@@ -550,7 +550,7 @@ class RestQuizQuestionControllerTests {
 
       assertFalse(quizQuestion1.isReviewed());
       assertFalse(quizQuestion2.isReviewed());
-      controller.approveQuizQuestion(List.of(quizQuestion1, quizQuestion2));
+      controller.reviewQuizQuestion(List.of(quizQuestion1, quizQuestion2));
 
       assertTrue(quizQuestion1.isReviewed());
       assertTrue(quizQuestion2.isReviewed());
