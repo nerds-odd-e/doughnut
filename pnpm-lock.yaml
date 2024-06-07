@@ -19,8 +19,8 @@ importers:
         specifier: 1.8.0
         version: 1.8.0
       '@badeball/cypress-cucumber-preprocessor':
-        specifier: ^20.0.5
-        version: 20.0.5(cypress@13.11.0)(typescript@5.4.5)
+        specifier: ^20.0.6
+        version: 20.0.6(cypress@13.11.0)(typescript@5.4.5)
       '@bahmutov/cypress-esbuild-preprocessor':
         specifier: ^2.2.1
         version: 2.2.1(esbuild@0.21.4)
@@ -76,8 +76,8 @@ importers:
         specifier: ^1.0.4
         version: 1.0.4
       got:
-        specifier: ^14.4.0
-        version: 14.4.0
+        specifier: ^14.4.1
+        version: 14.4.1
       jsdom:
         specifier: ^24.1.0
         version: 24.1.0
@@ -472,8 +472,8 @@ packages:
   '@badeball/cypress-configuration@6.1.1':
     resolution: {integrity: sha512-0IcJFMiCRo33Ofrvxxojt5QRJWyxApymHuuy981FeXnOGz4UsWKgr/hRupeXkw2cKXvah+j+880kXliygxPOSQ==}
 
-  '@badeball/cypress-cucumber-preprocessor@20.0.5':
-    resolution: {integrity: sha512-KmlyvOOq5XjVbCIiCmY/+QyUA2CQPeBoa9AJD7N1UrnuI9EDvZkO11UHdcu+uG2x2V5k8ZBijIqYW/xvsHK4Wg==}
+  '@badeball/cypress-cucumber-preprocessor@20.0.6':
+    resolution: {integrity: sha512-e95/LciUMJIrBj6PkbYq83efmbyBBg3v/aUT/IbuK7KhpWYtZ3Kqgv7Ychul6zGNsXy7q092dCg0frX/QEhSVw==}
     engines: {node: '>=18.0.0'}
     hasBin: true
     peerDependencies:
@@ -2956,8 +2956,8 @@ packages:
     resolution: {integrity: sha512-6tfZ91bOr7bOXnK7PRDCGBLa1H4U080YHNaAQ2KsMGlLEzRbk44nsZF2E1IeRc3vtJHPVbKCYgdFbaGO2ljd8g==}
     engines: {node: '>=10.19.0'}
 
-  got@14.4.0:
-    resolution: {integrity: sha512-baa2HMfREJ9UQSXOPwWe0DNK+FT8Okcxe9kmTJvaetv2q/MUxq0qFzEnfSbxo+wj45/QioGcH5ZhuT9VBIPJ5Q==}
+  got@14.4.1:
+    resolution: {integrity: sha512-IvDJbJBUeexX74xNQuMIVgCRRuNOm5wuK+OC3Dc2pnSoh1AOmgc7JVj7WC+cJ4u0aPcO9KZ2frTXcqK4W/5qTQ==}
     engines: {node: '>=20'}
 
   graceful-fs@4.2.11:
@@ -5640,7 +5640,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@badeball/cypress-cucumber-preprocessor@20.0.5(cypress@13.11.0)(typescript@5.4.5)':
+  '@badeball/cypress-cucumber-preprocessor@20.0.6(cypress@13.11.0)(typescript@5.4.5)':
     dependencies:
       '@badeball/cypress-configuration': 6.1.1
       '@cucumber/ci-environment': 10.0.1
@@ -8297,7 +8297,7 @@ snapshots:
       fs.realpath: 1.0.0
       inflight: 1.0.6
       inherits: 2.0.4
-      minimatch: 5.0.1
+      minimatch: 5.1.6
       once: 1.4.0
 
   global-dirs@3.0.1:
@@ -8348,7 +8348,7 @@ snapshots:
       p-cancelable: 2.1.1
       responselike: 2.0.1
 
-  got@14.4.0:
+  got@14.4.1:
     dependencies:
       '@sindresorhus/is': 6.3.1
       '@szmarczak/http-timer': 5.0.1
@@ -8361,6 +8361,7 @@ snapshots:
       lowercase-keys: 3.0.0
       p-cancelable: 4.0.1
       responselike: 3.0.0
+      type-fest: 4.19.0
 
   graceful-fs@4.2.11: {}
 
