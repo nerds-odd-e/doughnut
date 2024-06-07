@@ -415,7 +415,7 @@ When("I route to the note {string}", (noteTopic: string) => {
 
 When("I should see the question in the question list of the note", (data: DataTable) => {
   const row = data.hashes()[0]
-  start.jumpToNotePage(row["note-topic"])
+  start.jumpToNotePage(row?.["note-topic"] as string)
   cy.findAllByTitle("more options").click()
   cy.findAllByTitle("View Questions").click()
   cy.findByText(row["question stem"])

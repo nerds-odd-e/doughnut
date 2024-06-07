@@ -15,7 +15,9 @@ import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -110,5 +112,14 @@ class RestQuizQuestionController {
   public List<QuizQuestion> getAllQuizQuestionByNote(
       @PathVariable("note") @Schema(type = "integer") Note note) {
     return modelFactoryService.getQuizQuestionsByNote(note);
+  }
+
+  @GetMapping("/{headNote}/note-book-pending-questions")
+  public List<QuizQuestion> getAllPendingQuizQuestionByNoteBook(
+      @PathVariable("headNote") @Schema(type = "integer") @NotNull Note headNote) {
+    User requestUser = currentUser.getEntity();
+    User notebookOwner = headNote.getNotebook().getOwnership().getUser();
+    assert requestUser.equals(notebookOwner);
+    return new ArrayList<>();
   }
 }

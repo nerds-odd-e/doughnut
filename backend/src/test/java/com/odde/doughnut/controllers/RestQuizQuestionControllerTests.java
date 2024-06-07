@@ -400,16 +400,16 @@ class RestQuizQuestionControllerTests {
 
     @BeforeEach
     void setUp() {
-      headNote1 = makeMe.aHeadNote("headNote1").please();
+      headNote1 = makeMe.aHeadNote("headNote1").creatorAndOwner(currentUser).please();
       makeMe.theNote(headNote1).withNChildren(10).please();
 
-      headNote2 = makeMe.aHeadNote("headNote2").please();
+      headNote2 = makeMe.aHeadNote("headNote2").creatorAndOwner(currentUser).please();
       makeMe.theNote(headNote2).withNChildren(20).please();
 
       makeMe.refresh(headNote1);
       makeMe.refresh(headNote2);
 
-      noteWithoutQuestions = makeMe.aNote("a note").please();
+      noteWithoutQuestions = makeMe.aNote("a note").under(headNote1).please();
       noteWithQuestions = makeMe.aNote("a note with questions").please();
       makeMe.aQuestion().spellingQuestionOfNote(noteWithQuestions).please();
     }
@@ -455,6 +455,13 @@ class RestQuizQuestionControllerTests {
           makeMe.aQuestion().spellingQuestionOfNote(noteWithQuestions).please();
       List<QuizQuestion> results = controller.getAllQuizQuestionByNote(noteWithQuestions);
       assertThat(results, hasSize(2));
+    }
+
+    @Test
+    void getPendingQuestionsOfANoteWhenThereIsNotQuestion() {
+      List<QuizQuestion> results =
+          controller.getAllPendingQuizQuestionByNoteBook(noteWithoutQuestions);
+      assertThat(results, hasSize(0));
     }
   }
 }
