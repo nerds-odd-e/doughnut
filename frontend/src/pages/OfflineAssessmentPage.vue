@@ -70,5 +70,12 @@ export default defineComponent({
         });
     },
   },
+  watch: {
+    fetchingAssessment(newValue, oldValue) {
+      if (newValue !== oldValue) {
+        this.fetchingAssessment = newValue;
+      }
+    },
+  },
 });
 </script>
