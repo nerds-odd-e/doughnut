@@ -4,6 +4,7 @@ import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.QuestionSuggestionCreationParams;
 import com.odde.doughnut.controllers.dto.QuizQuestionContestResult;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.AnswerModel;
 import com.odde.doughnut.models.UserModel;
@@ -15,7 +16,6 @@ import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -116,10 +116,11 @@ class RestQuizQuestionController {
 
   @GetMapping("/{headNote}/note-book-pending-questions")
   public List<QuizQuestion> getAllPendingQuizQuestionByNoteBook(
-      @PathVariable("headNote") @Schema(type = "integer") @NotNull Note headNote) {
-    User requestUser = currentUser.getEntity();
-    User notebookOwner = headNote.getNotebook().getOwnership().getUser();
-    assert requestUser.equals(notebookOwner);
-    return new ArrayList<>();
+      @PathVariable("headNote") @Schema(type = "integer") @NotNull Note headNote)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertAuthorization(headNote.getNotebook());
+    return modelFactoryService.getQuizQuestionsByHeadNote(headNote).stream()
+        .filter(x -> !x.isApproved() && !x.isReviewed())
+        .toList();
   }
 }

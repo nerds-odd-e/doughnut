@@ -12,6 +12,7 @@ import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.QuestionSuggestionCreationParams;
 import com.odde.doughnut.controllers.dto.QuizQuestionContestResult;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.models.TimestampOperations;
@@ -458,10 +459,20 @@ class RestQuizQuestionControllerTests {
     }
 
     @Test
-    void getPendingQuestionsOfANoteWhenThereIsNotQuestion() {
+    void getPendingQuestionsOfANotebookWhenThereIsNotQuestion()
+        throws UnexpectedNoAccessRightException {
       List<QuizQuestion> results =
           controller.getAllPendingQuizQuestionByNoteBook(noteWithoutQuestions);
       assertThat(results, hasSize(0));
+    }
+
+    @Test
+    void getPendingQuestionsOfANotebookWhenThereIsOneQuestion()
+        throws UnexpectedNoAccessRightException {
+      QuizQuestion questionOfNote = makeMe.aQuestion().spellingQuestionOfNote(headNote1).please();
+      makeMe.refresh(headNote1);
+      List<QuizQuestion> results = controller.getAllPendingQuizQuestionByNoteBook(headNote1);
+      assertThat(results, contains(questionOfNote));
     }
   }
 }
