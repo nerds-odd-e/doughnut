@@ -1,12 +1,17 @@
 <template>
   <div>
-    <div v-if="currentQuestion === 1">
-      <p role="question">Where in the world is Singapore?</p>
-      <button @click="nextQuestion">Asia</button>
-    </div>
-    <div v-else-if="currentQuestion === 2">
-      <p role="question">Most famous food of Vietnam?</p>
-      <button @click="nextQuestion">Pho</button>
+    <div v-if="currentQuestion < quizQuestions.length">
+      <p role="question">
+        {{ quizQuestions[currentQuestion]?.multipleChoicesQuestion.stem }}
+      </p>
+      <button
+        v-for="(choice, index) in quizQuestions[currentQuestion]
+          ?.multipleChoicesQuestion.choices"
+        :key="index"
+        @click="selectAnswer()"
+      >
+        {{ choice }}
+      </button>
     </div>
     <div v-else>
       <p>End of questions</p>
@@ -21,15 +26,18 @@ import { QuizQuestion } from "@/generated/backend";
 export default defineComponent({
   data() {
     return {
-      quizQuestions: undefined as QuizQuestion[] | undefined,
+      quizQuestions: [] as QuizQuestion[],
       answered: false,
-      currentQuestion: 1,
+      currentQuestion: 0,
     };
   },
   created() {
     this.quizQuestions = this.getQuizQuestions();
   },
   methods: {
+    selectAnswer() {
+      this.nextQuestion();
+    },
     nextQuestion() {
       this.currentQuestion += 1;
     },
@@ -38,13 +46,13 @@ export default defineComponent({
         {
           id: 1,
           multipleChoicesQuestion: {
-            stem: "What is the capital of France?",
-            choices: ["Paris", "London", "Berlin", "Rome"],
+            stem: "Where in the world is Singapore?",
+            choices: ["Asia", "euro"],
           },
           headNote: {
             noteTopic: {
               id: 1,
-              topicConstructor: "France",
+              topicConstructor: "Singapore",
             },
             updatedAt: "2022-06-01T12:00:00Z",
             id: 1,
@@ -56,18 +64,13 @@ export default defineComponent({
         {
           id: 2,
           multipleChoicesQuestion: {
-            stem: "Who painted the Mona Lisa?",
-            choices: [
-              "Leonardo da Vinci",
-              "Pablo Picasso",
-              "Vincent van Gogh",
-              "Michelangelo",
-            ],
+            stem: "Most famous food of Vietnam?",
+            choices: ["Pho", "bread"],
           },
           headNote: {
             noteTopic: {
-              id: 1,
-              topicConstructor: "France",
+              id: 2,
+              topicConstructor: "Vietnam",
             },
             updatedAt: "2022-06-01T12:00:00Z",
             id: 1,
