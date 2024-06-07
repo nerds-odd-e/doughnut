@@ -43,7 +43,6 @@ export default defineComponent({
     return {
       noAssessmentQuestions: false,
       result: [] as QuizQuestion[],
-      errors: {},
     };
   },
   mounted() {
@@ -59,9 +58,6 @@ export default defineComponent({
           } else {
             this.result = response;
           }
-        })
-        .catch((res) => {
-          this.errors = res;
         });
     },
   },
