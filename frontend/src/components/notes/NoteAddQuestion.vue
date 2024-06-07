@@ -39,7 +39,11 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import useLoadingApi from "@/managedApi/useLoadingApi";
-import { ApiError, Note, QuizQuestion } from "@/generated/backend";
+import {
+  ApiError,
+  Note,
+  QuizQuestionCreationParams,
+} from "@/generated/backend";
 import TextArea from "../form/TextArea.vue";
 
 export default defineComponent({
@@ -84,15 +88,16 @@ export default defineComponent({
         this.options.pop();
       }
     },
-    convertFormResponseToMultipleChoice(note: Note): QuizQuestion {
-      const quizQuestion: QuizQuestion = {
-        id: note.id,
+    convertFormResponseToMultipleChoice(
+      note: Note,
+    ): QuizQuestionCreationParams {
+      const quizQuestion: QuizQuestionCreationParams = {
+        noteId: note.id,
         correctAnswerIndex: 0,
         multipleChoicesQuestion: {
           stem: this.question,
           choices: this.options,
         },
-        headNote: note,
       };
 
       return quizQuestion;

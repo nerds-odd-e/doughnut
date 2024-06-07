@@ -2,7 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { MultipleChoicesQuestion } from './MultipleChoicesQuestion';
 export type QuizQuestionCreationParams = {
     noteId?: number;
+    correctAnswerIndex?: number;
+    multipleChoicesQuestion?: MultipleChoicesQuestion;
 };
 

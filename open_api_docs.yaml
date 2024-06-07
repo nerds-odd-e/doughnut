@@ -2827,6 +2827,11 @@ components:
         noteId:
           type: integer
           format: int32
+        correctAnswerIndex:
+          type: integer
+          format: int32
+        multipleChoicesQuestion:
+          $ref: "#/components/schemas/MultipleChoicesQuestion"
     NoteCreationDTO:
       required:
       - topicConstructor
