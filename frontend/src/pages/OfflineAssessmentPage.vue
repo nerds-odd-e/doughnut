@@ -4,10 +4,18 @@
   <p v-if="noAssessmentQuestions">Insufficient notes to create assessment!</p>
 
   <div v-else>
-    <p>{{ result }}</p>
-    <p>{{ errors }}</p>
+    <div v-for="(question, index) in result" :key="index">
+      <p><strong>Question {{ index + 1 }}:</strong> {{ question.multipleChoicesQuestion.stem }}</p>
+      <ol>
+        <li v-for="(choice, choiceIndex) in question.multipleChoicesQuestion.choices" :key="choiceIndex">
+          {{ choice }}
+        </li>
+      </ol>
+      <hr>
+    </div>
   </div>
 </template>
+
 
 <script lang="ts">
 import { defineComponent } from "vue";
@@ -24,7 +32,7 @@ export default defineComponent({
 
   data() {
     return {
-      fetchingAssessment: false,
+      fetchingAssessment: true,
       noAssessmentQuestions: false,
       result: [] as QuizQuestion[],
       errors: {},
