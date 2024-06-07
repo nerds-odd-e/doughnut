@@ -19,7 +19,7 @@
     </PopButton>
     <PopButton title="Generate assessment questions">
       <template #button_face>
-        <SvgAssociation @click="openAssessmentPage" />
+        <SvgAssessment @click="openAssessmentPage" />
       </template>
       <template #default>
         <AssessmentDialog
@@ -42,7 +42,7 @@ import AssessmentDialog from "./AssessmentDialog.vue";
 import OnlineAssessmentDialog from "../notes/OnlineAssessmentDialog.vue";
 import SvgAdd from "../svgs/SvgAdd.vue";
 import SvgChat from "../svgs/SvgChat.vue";
-import SvgAssociation from "../svgs/SvgAssociation.vue";
+import SvgAssessment from "../svgs/SvgAssessment.vue";
 
 export default defineComponent({
   props: {
@@ -52,7 +52,7 @@ export default defineComponent({
   components: {
     PopButton,
     SvgAdd,
-    SvgAssociation,
+    SvgAssessment,
     SubscribeDialog,
     AssessmentDialog,
   },
