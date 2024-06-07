@@ -33,9 +33,12 @@ Given("I have a note with the topic {string}", (noteTopic: string) => {
   start.testability().seedNotes([{ topicConstructor: noteTopic }])
 })
 
-Given("there are some notes for existing user {string}", (externalIdentifier, data: DataTable) => {
-  start.testability().seedNotes(data.hashes(), externalIdentifier)
-})
+Given(
+  "there are some notes for existing user {string}",
+  (externalIdentifier: string | undefined, data: DataTable) => {
+    start.testability().seedNotes(data.hashes(), externalIdentifier)
+  },
+)
 
 Given(
   "there are {int} notes under notebook {string} for the user",
@@ -99,14 +102,14 @@ When(
 When("I add the question with the following:", (data: DataTable) => {
   const row = data.hashes()[0]
   cy.get("label").contains("Question:").next().as("questionTextarea")
-  cy.get("@questionTextarea").type(row["Question"] as string)
+  cy.get("@questionTextarea").type(row?.["Question"] as string)
   cy.get("label").contains("Option 1 (Correct Answer)").next().as("questionTextarea")
-  cy.get("@questionTextarea").type(row["Correct Choice"] as string)
+  cy.get("@questionTextarea").type(row?.["Correct Choice"] as string)
   cy.get("label").contains("Option 2").next().as("questionTextarea")
-  cy.get("@questionTextarea").type(row["Incorrect Choice 1"] as string)
+  cy.get("@questionTextarea").type(row?.["Incorrect Choice 1"] as string)
   cy.get("button").contains("+").click()
   cy.get("label").contains("Option 3").next().as("questionTextarea")
-  cy.get("@questionTextarea").type(row["Incorrect Choice 2"] as string)
+  cy.get("@questionTextarea").type(row?.["Incorrect Choice 2"] as string)
   cy.get("button").contains("Submit").click()
 })
 
@@ -293,7 +296,7 @@ When("I should be asked to log in again when I click the link {string}", (noteTo
 Then(
   "I should see {string} is {string} than {string}",
   (left: string, aging: string, right: string) => {
-    let leftColor: string
+    let leftColor
     cy.pageIsNotLoading()
     start.jumpToNotePage(left)
     cy.get(".note-recent-update-indicator")
@@ -304,7 +307,7 @@ Then(
       .invoke("css", "color")
       .then((val) => {
         const leftColorIndex = parseInt(leftColor.match(/\d+/)[0])
-        const rightColorIndex = parseInt(val.match(/\d+/)[0])
+        const rightColorIndex = parseInt((JSON.stringify(val)).match(/\d+/)?.[0]??"")
         if (aging === "newer") {
           expect(leftColorIndex).to.greaterThan(rightColorIndex)
         } else {
@@ -432,5 +435,5 @@ When("I should see the question in the question list of the note", (data: DataTa
   start.jumpToNotePage(row?.["note-topic"] as string)
   cy.findAllByTitle("more options").click()
   cy.findAllByTitle("View Questions").click()
-  cy.findByText(row["question stem"])
+  cy.findByText(row?.["question stem"] as string)
 })

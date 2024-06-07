@@ -76,10 +76,10 @@ Feature: User Manually Add Questionsaaaa
       | note-topic | Question                                            |
       | team       | What is the most common scuba diving certification? |
 
-  @ignore
   Scenario: When user has added a question successfully to the note
+    Given I access the add question page for the note "team"
     When I add the question with the following:
-      | Question Stem                                       | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
+      | Question                                            | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
       | What is the most common scuba diving certification? | Rescue Diver   | Divemaster         | Open Water Diver   |
     Then I should see the question in the question list of the note
       | note-topic | question stem                                       |
