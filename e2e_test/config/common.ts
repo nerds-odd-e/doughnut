@@ -3,7 +3,6 @@ import createBundler from "@bahmutov/cypress-esbuild-preprocessor";
 import { addCucumberPreprocessorPlugin } from "@badeball/cypress-cucumber-preprocessor";
 import { createEsbuildPlugin } from "@badeball/cypress-cucumber-preprocessor/esbuild";
 import { existsSync, rmdir } from "fs";
-import { count } from "console";
 
 const commonConfig = {
   chromeWebSecurity: false,
