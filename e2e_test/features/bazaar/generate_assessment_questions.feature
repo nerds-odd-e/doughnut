@@ -17,8 +17,8 @@ Feature: Bazaar generate
   @usingMockedOpenAiService
   Scenario Outline: display assessment questions from notebook
     Given OpenAI now generates this question:
-      | Question Stem | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
-      | What is LeSS? | Rescue Diver   | Divemaster         | Open Water Diver   |
+      | Question Stem | Correct Choice    | Incorrect Choice 1 | Incorrect Choice 2 |
+      | What is LeSS? | Large-scale Scrum | Small-scale scrum  | Less scrum         |
     And I am logged in as an existing user
     And There are <notes count> notes belonging to "LeSS in Action"
     And notebook "LeSS in Action" is shared to the Bazaar
