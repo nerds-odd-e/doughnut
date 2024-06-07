@@ -113,3 +113,13 @@ Given("There are {int} notes belonging to {string}", (noteCount: number, noteboo
     start.jumpToNotePage(notebookTopic).addingChildNote().createNote(noteTopic)
   }
 })
+
+Then("I should see {int} questions", (questionCount: number) => {
+  for (let i = 1; i <= questionCount; i++) {
+    const questionTitle = "Question " + i
+    cy.findByText(questionTitle).should("exist")
+  }
+
+  const outOfBoundIndex = questionCount + 1
+  cy.findByText("Question " + outOfBoundIndex).should("not.exist")
+})
