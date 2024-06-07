@@ -515,6 +515,7 @@ class RestQuizQuestionControllerTests {
     void shouldReviewOnePendingQuestionWhenReviewingQuestions()
         throws UnexpectedNoAccessRightException {
       List<QuizQuestion> questions = new ArrayList<>();
+      oneQuizQuestion.setApproved(true);
       questions.add(oneQuizQuestion);
       controller.reviewQuizQuestion(questions);
 
