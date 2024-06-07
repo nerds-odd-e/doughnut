@@ -18,3 +18,4 @@ Feature: New questions assessment
     When I start the assessment on the "Countries" notebook
     Then I answer the question "Where in the world is Singapore?" with "Asia"
     And I answer the question "Most famous food of Vietnam?" with "Pho"
+    And I should see end of questions in the end

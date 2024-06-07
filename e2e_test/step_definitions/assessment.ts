@@ -10,3 +10,7 @@ Then("I answer the question {string} with {string}", function (stem: string, ans
   cy.findByText(stem)
   cy.findByText(answer).click()
 })
+
+Then("I should see end of questions in the end", () => {
+  cy.findByText("End of questions")
+})
