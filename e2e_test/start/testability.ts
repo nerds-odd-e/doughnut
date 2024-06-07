@@ -1,5 +1,6 @@
 /// <reference types="Cypress" />
 // @ts-check
+import { QuestionSuggestionParams } from "../../frontend/src/generated/backend/models/QuestionSuggestionParams"
 import ServiceMocker from "../support/ServiceMocker"
 
 const hourOfDay = (days: number, hours: number) => {
@@ -91,7 +92,7 @@ const testability = () => {
       })
     },
 
-    seedSuggestedQuestions(examples: unknown[]) {
+    seedSuggestedQuestions(examples: Array<QuestionSuggestionParams>) {
       postToTestabilityApiSuccessfully(cy, "seed_suggested_questions", {
         body: {
           examples,
