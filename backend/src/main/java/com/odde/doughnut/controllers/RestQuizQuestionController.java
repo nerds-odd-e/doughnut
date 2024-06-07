@@ -122,15 +122,17 @@ class RestQuizQuestionController {
     return quizQuestionService.getPendingQuestionsByHeadNote(headNote);
   }
 
-  public void approveQuizQuestion(List<QuizQuestion> quizQuestion)
+  @PostMapping("/review")
+  @Transactional
+  public void reviewQuizQuestion(@Valid @RequestBody List<QuizQuestion> quizQuestions)
       throws UnexpectedNoAccessRightException {
-    List<Note> distinctHeadNote = quizQuestion.stream().map(QuizQuestion::getHeadNote).toList();
+    List<Note> distinctHeadNote = quizQuestions.stream().map(QuizQuestion::getHeadNote).toList();
 
     for (Note headNote : distinctHeadNote) {
       currentUser.assertAuthorization(headNote.getNotebook());
     }
 
-    quizQuestion.forEach(
+    quizQuestions.forEach(
         x -> {
           x.reviewed = true;
           modelFactoryService.save(x);
