@@ -1,24 +1,83 @@
 <template>
   <div>
-    <div>Questions here</div>
+    <table class="question-table">
+      <thead>
+        <tr>
+          <th>Question ID</th>
+          <th>Question Text</th>
+          <th>A</th>
+          <th>B</th>
+          <th>C</th>
+          <th>D</th>
+          <th>Approved?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="question in questions" :key="question.id">
+          <td>{{ question.id }}</td>
+          <td>{{ question.multipleChoicesQuestion.stem }}</td>
+          <td>{{ question.multipleChoicesQuestion.choices[0] }}</td>
+          <td>{{ question.multipleChoicesQuestion.choices[1] }}</td>
+          <td>{{ question.multipleChoicesQuestion.choices[2] }}</td>
+          <td>{{ question.multipleChoicesQuestion.choices[3] }}</td>
+          <td><input type="checkbox" v-model="question.approved" /></td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 
 <script>
-export default {
-  // data function defines initial state of the component
+import { defineComponent } from "vue";
+import useLoadingApi from "@/managedApi/useLoadingApi";
+
+export default defineComponent({
+  setup() {
+    return useLoadingApi();
+  },
+  props: {
+    noteId: { type: Number, required: true },
+  },
   data() {
     return {
       currentQuestion: 1,
+      questions: [],
     };
   },
-  // method property defines methods that can be called within the component.
   methods: {
     nextQuestion() {
       if (this.currentQuestion < 2) {
         this.currentQuestion += 1;
       }
     },
+    fetchQuestions() {
+      this.managedApi.restQuizQuestionController
+        .getAllQuizQuestionByNote(this.noteId)
+        .then((questions) => {
+          this.questions = questions;
+        });
+    },
   },
-};
+  mounted() {
+    this.fetchQuestions();
+  },
+});
 </script>
+
+<style scoped>
+.question-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.question-table th,
+.question-table td {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+.question-table th {
+  background-color: #f2f2f2;
+}
+</style>
