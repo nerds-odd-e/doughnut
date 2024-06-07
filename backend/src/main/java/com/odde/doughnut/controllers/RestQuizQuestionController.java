@@ -121,4 +121,13 @@ class RestQuizQuestionController {
     currentUser.assertAuthorization(headNote.getNotebook());
     return quizQuestionService.getPendingQuestionsByHeadNote(headNote);
   }
+
+  public void approveQuizQuestion(List<QuizQuestion> quizQuestion) {
+    quizQuestion.forEach(
+        x -> {
+          x.approved = true;
+          x.reviewed = true;
+          modelFactoryService.save(x);
+        });
+  }
 }

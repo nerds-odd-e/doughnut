@@ -475,4 +475,44 @@ class RestQuizQuestionControllerTests {
       assertThat(results, contains(questionOfNote));
     }
   }
+
+  @Nested
+  class approveQuestionsForAssessment {
+
+    List<QuizQuestion> quizQuestionList = new ArrayList<>();
+    Note headNote1;
+    Note headNote2;
+    Note noteWithoutQuestions;
+    Note noteWithOneQuestion;
+    QuizQuestion oneQuizQuestion;
+
+    @BeforeEach
+    void setUp() {
+      headNote1 = makeMe.aHeadNote("headNote1").creatorAndOwner(currentUser).please();
+      makeMe.theNote(headNote1).withNChildren(10).please();
+
+      headNote2 = makeMe.aHeadNote("headNote2").creatorAndOwner(currentUser).please();
+      makeMe.theNote(headNote2).withNChildren(20).please();
+
+      makeMe.refresh(headNote1);
+      makeMe.refresh(headNote2);
+
+      noteWithoutQuestions = makeMe.aNote("a note").under(headNote1).please();
+      noteWithOneQuestion =
+          makeMe.aNote("a note with 1 questions").creatorAndOwner(currentUser).please();
+      oneQuizQuestion = makeMe.aQuestion().spellingQuestionOfNote(noteWithOneQuestion).please();
+    }
+
+    @Test
+    void shouldApproveOnePendingQuestionWhenApprovingQuestions() {
+      List<QuizQuestion> questions = new ArrayList<>();
+      questions.add(oneQuizQuestion);
+      controller.approveQuizQuestion(questions);
+
+      makeMe.refresh(oneQuizQuestion);
+
+      assertTrue(oneQuizQuestion.isApproved());
+      assertTrue(oneQuizQuestion.isReviewed());
+    }
+  }
 }
