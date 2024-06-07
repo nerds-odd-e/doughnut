@@ -57,12 +57,13 @@ export default defineComponent({
             this.noAssessmentQuestions = true;
           } else {
             this.result = response;
+            this.fetchingAssessment = false;
           }
         })
         .catch((res) => {
           this.errors = res;
+          this.fetchingAssessment = false;
         });
-      this.fetchingAssessment = false;
     },
   },
 });
