@@ -11,16 +11,16 @@ Feature: New questions assessment
       | Korea            | Countries     |
       | China            | Countries     |
     And notebook "Countries" is shared to the Bazaar
-    And there are questions for the note:
+    When I go to the bazaar
+
+  Scenario: Start an assessment with 5 approved questions
+    Given there are questions for the note:
       | topicConstructor | question                           | answer  | option   |
-      | Singapore        | Where in the world is Singapore?   | Asia    | euro     |
+      | Singapore        | Where in the world is Singapore?   | Asia    | euro     | 
       | Vietnam          | Most famous food of Vietnam?       | Pho     | bread    |
       | Japan            | What is the capital city of Japan? | Tokyo   | Kyoto    |
       | Korea            | What is the capital city of Korea? | Seoul   | Busan    |
       | China            | What is the capital city of China? | Beijing | Shanghai |
-    When I go to the bazaar
-
-  Scenario: Start an assessment
     When I start the assessment on the "Countries" notebook
     Then I answer the question "Where in the world is Singapore?" with "Asia"
     And I answer the question "Most famous food of Vietnam?" with "Pho"
@@ -28,3 +28,4 @@ Feature: New questions assessment
     And I answer the question "What is the capital city of Korea?" with "Busan"
     And I answer the question "What is the capital city of China?" with "Shanghai"
     And I should see end of questions in the end
+
