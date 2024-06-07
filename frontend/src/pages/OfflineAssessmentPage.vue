@@ -1,6 +1,5 @@
 <template>
   <h3>Assessment For {{ topicConstructor }}</h3>
-  <p v-if="fetchingAssessment">Generating Questions.. Please Wait A Moment.</p>
   <p v-if="noAssessmentQuestions">Insufficient notes to create assessment!</p>
 
   <div v-else>
@@ -42,14 +41,12 @@ export default defineComponent({
   },
   data() {
     return {
-      fetchingAssessment: false,
       noAssessmentQuestions: false,
       result: [] as QuizQuestion[],
       errors: {},
     };
   },
   mounted() {
-    this.fetchingAssessment = true;
     this.generateAssessmentQuestions();
   },
   methods: {
@@ -61,20 +58,11 @@ export default defineComponent({
             this.noAssessmentQuestions = true;
           } else {
             this.result = response;
-            this.fetchingAssessment = false;
           }
         })
         .catch((res) => {
           this.errors = res;
-          this.fetchingAssessment = false;
         });
-    },
-  },
-  watch: {
-    fetchingAssessment(newValue, oldValue) {
-      if (newValue !== oldValue) {
-        this.fetchingAssessment = newValue;
-      }
     },
   },
 });
