@@ -119,8 +119,6 @@ class RestQuizQuestionController {
       @PathVariable("headNote") @Schema(type = "integer") @NotNull Note headNote)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(headNote.getNotebook());
-    return modelFactoryService.getQuizQuestionsByHeadNote(headNote).stream()
-        .filter(x -> !x.isApproved() && !x.isReviewed())
-        .toList();
+    return quizQuestionService.getPendingQuestionsByHeadNote(headNote);
   }
 }

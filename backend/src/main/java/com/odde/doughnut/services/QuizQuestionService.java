@@ -41,4 +41,10 @@ public class QuizQuestionService {
         .filter(question -> question.approved)
         .collect(Collectors.toList());
   }
+
+  public List<QuizQuestion> getPendingQuestionsByHeadNote(Note headNote) {
+    return modelFactoryService.getQuizQuestionsByHeadNote(headNote).stream()
+        .filter(x -> !x.isApproved() && !x.isReviewed())
+        .toList();
+  }
 }
