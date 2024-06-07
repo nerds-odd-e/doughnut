@@ -22,17 +22,25 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { QuizQuestion } from "@/generated/backend";
+import useLoadingApi from "@/managedApi/useLoadingApi";
 
 export default defineComponent({
+  props: {
+    notebookId: { type: Number, required: true },
+  },
+  setup() {
+    return { ...useLoadingApi() };
+  },
   data() {
     return {
       quizQuestions: [] as QuizQuestion[],
       answered: false,
       currentQuestion: 0,
+      errors: {},
     };
   },
   created() {
-    this.quizQuestions = this.getQuizQuestions();
+    this.generateAssessmentQuestions();
   },
   methods: {
     selectAnswer() {
@@ -40,6 +48,16 @@ export default defineComponent({
     },
     nextQuestion() {
       this.currentQuestion += 1;
+    },
+    generateAssessmentQuestions() {
+      this.managedApi.restAssessmentController
+        .generateAssessmentQuestions(this.notebookId)
+        .then((response) => {
+          this.quizQuestions = response;
+        })
+        .catch((res) => {
+          this.errors = res;
+        });
     },
     getQuizQuestions() {
       return [

@@ -15,7 +15,7 @@
       <template #button_face>
         <SvgChat />
       </template>
-      <OnlineAssessmentDialog v-if="loggedIn" />
+      <OnlineAssessmentDialog v-if="loggedIn" :notebook-id="notebook.id" />
     </PopButton>
     <PopButton title="Generate assessment questions">
       <template #button_face>
