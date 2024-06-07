@@ -29,3 +29,13 @@ Feature: New questions assessment
     And I answer the question "What is the capital city of China?" with "Shanghai"
     And I should see end of questions in the end
 
+  @ignore
+  Scenario: Fail to start assessment with 4 approved questions
+    Given there are questions for the note:
+      | topicConstructor | question                           | answer  | option   |
+      | Vietnam          | Most famous food of Vietnam?       | Pho     | bread    |
+      | Japan            | What is the capital city of Japan? | Tokyo   | Kyoto    |
+      | Korea            | What is the capital city of Korea? | Seoul   | Busan    |
+      | China            | What is the capital city of China? | Beijing | Shanghai |
+    When I start the assessment on the "Countries" notebook
+    Then I see error message Not enough approved questions

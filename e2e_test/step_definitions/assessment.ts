@@ -14,3 +14,7 @@ Then("I answer the question {string} with {string}", function (stem: string, ans
 Then("I should see end of questions in the end", () => {
   cy.findByText("End of questions")
 })
+
+Then("I see error message Not enough approved questions", () => {
+  cy.findByText("Not enough approved questions").should("be.visible")
+})
