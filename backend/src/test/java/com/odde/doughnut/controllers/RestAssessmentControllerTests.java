@@ -111,6 +111,18 @@ public class RestAssessmentControllerTests {
       makeMe.refresh(topNote);
       assertEquals(controller.generateAiQuestions(notebook), new ArrayList<>());
     }
+
+    @Test
+    void shouldReturn5QuestionsWhenThereAreMoreThan5SubNotesInTotal()
+        throws UnexpectedNoAccessRightException {
+      makeMe.theNote(topNote).withNChildren(2);
+      makeMe.refresh(topNote);
+      Note firstChild = topNote.getChildren().get(0);
+      makeMe.theNote(firstChild).withNChildren(3);
+      makeMe.refresh(firstChild);
+      List<QuizQuestion> assessment = controller.generateAiQuestions(notebook);
+      assertEquals(5, assessment.size());
+    }
   }
 
   @Nested
