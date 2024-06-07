@@ -122,7 +122,14 @@ class RestQuizQuestionController {
     return quizQuestionService.getPendingQuestionsByHeadNote(headNote);
   }
 
-  public void approveQuizQuestion(List<QuizQuestion> quizQuestion) {
+  public void approveQuizQuestion(List<QuizQuestion> quizQuestion)
+      throws UnexpectedNoAccessRightException {
+    List<Note> distinctHeadNote = quizQuestion.stream().map(QuizQuestion::getHeadNote).toList();
+
+    for (Note headNote : distinctHeadNote) {
+      currentUser.assertAuthorization(headNote.getNotebook());
+    }
+
     quizQuestion.forEach(
         x -> {
           x.approved = true;

@@ -504,7 +504,8 @@ class RestQuizQuestionControllerTests {
     }
 
     @Test
-    void shouldApproveOnePendingQuestionWhenApprovingQuestions() {
+    void shouldApproveOnePendingQuestionWhenApprovingQuestions()
+        throws UnexpectedNoAccessRightException {
       List<QuizQuestion> questions = new ArrayList<>();
       questions.add(oneQuizQuestion);
       controller.approveQuizQuestion(questions);
@@ -513,6 +514,16 @@ class RestQuizQuestionControllerTests {
 
       assertTrue(oneQuizQuestion.isApproved());
       assertTrue(oneQuizQuestion.isReviewed());
+    }
+
+    @Test
+    void shouldNotApproveQuizQuestionWhenNotOwner() {
+      Note note = makeMe.aNote().please();
+      QuizQuestion quizQuestion = makeMe.aQuestion().spellingQuestionOfNote(note).please();
+      List<QuizQuestion> questions = new ArrayList<>();
+      questions.add(quizQuestion);
+      assertThrows(
+          UnexpectedNoAccessRightException.class, () -> controller.approveQuizQuestion(questions));
     }
   }
 }
