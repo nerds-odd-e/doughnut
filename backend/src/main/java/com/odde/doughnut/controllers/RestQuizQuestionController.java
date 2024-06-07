@@ -37,22 +37,22 @@ class RestQuizQuestionController {
   private AiQuestionGenerator aiQuestionGenerator;
 
   public RestQuizQuestionController(
-    @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
-    ModelFactoryService modelFactoryService,
-    UserModel currentUser,
-    TestabilitySettings testabilitySettings) {
+      @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
+      ModelFactoryService modelFactoryService,
+      UserModel currentUser,
+      TestabilitySettings testabilitySettings) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
     this.aiQuestionGenerator =
-      new AiQuestionGenerator(openAiApi, new GlobalSettingsService(modelFactoryService));
+        new AiQuestionGenerator(openAiApi, new GlobalSettingsService(modelFactoryService));
     this.quizQuestionService = new QuizQuestionService(openAiApi, modelFactoryService);
   }
 
   @PostMapping("/generate-question")
   @Transactional
   public QuizQuestion generateQuestion(
-    @RequestParam(value = "note") @Schema(type = "integer") Note note) {
+      @RequestParam(value = "note") @Schema(type = "integer") Note note) {
     currentUser.assertLoggedIn();
     return quizQuestionService.generateAIQuestion(note);
   }
@@ -60,7 +60,7 @@ class RestQuizQuestionController {
   @PostMapping("/{quizQuestion}/contest")
   @Transactional
   public QuizQuestionContestResult contest(
-    @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion) {
+      @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion) {
     currentUser.assertLoggedIn();
     return aiQuestionGenerator.getQuizQuestionContestResult(quizQuestion);
   }
@@ -68,7 +68,7 @@ class RestQuizQuestionController {
   @PostMapping("/{quizQuestion}/regenerate")
   @Transactional
   public QuizQuestion regenerate(
-    @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion) {
+      @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion) {
     currentUser.assertLoggedIn();
     return quizQuestionService.generateAIQuestion(quizQuestion.getNote());
   }
@@ -76,49 +76,49 @@ class RestQuizQuestionController {
   @PostMapping("/{quizQuestion}/answer")
   @Transactional
   public AnsweredQuestion answerQuiz(
-    @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion,
-    @Valid @RequestBody AnswerDTO answerDTO) {
+      @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion,
+      @Valid @RequestBody AnswerDTO answerDTO) {
     currentUser.assertLoggedIn();
     Answer answer = new Answer();
     answer.setQuestion(quizQuestion);
     answer.setFromDTO(answerDTO);
     AnswerModel answerModel = modelFactoryService.toAnswerModel(answer);
     answerModel.makeAnswerToQuestion(
-      testabilitySettings.getCurrentUTCTimestamp(), currentUser.getEntity());
+        testabilitySettings.getCurrentUTCTimestamp(), currentUser.getEntity());
     return answerModel.getAnswerViewedByUser(currentUser.getEntity());
   }
 
   @PostMapping("/{quizQuestion}/suggest-fine-tuning")
   @Transactional
   public SuggestedQuestionForFineTuning suggestQuestionForFineTuning(
-    @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion,
-    @Valid @RequestBody QuestionSuggestionCreationParams suggestion) {
+      @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion,
+      @Valid @RequestBody QuestionSuggestionCreationParams suggestion) {
     SuggestedQuestionForFineTuning sqft = new SuggestedQuestionForFineTuning();
     var suggestedQuestionForFineTuningService =
-      modelFactoryService.toSuggestedQuestionForFineTuningService(sqft);
+        modelFactoryService.toSuggestedQuestionForFineTuningService(sqft);
     return suggestedQuestionForFineTuningService.suggestQuestionForFineTuning(
-      quizQuestion,
-      suggestion,
-      currentUser.getEntity(),
-      testabilitySettings.getCurrentUTCTimestamp());
+        quizQuestion,
+        suggestion,
+        currentUser.getEntity(),
+        testabilitySettings.getCurrentUTCTimestamp());
   }
 
   @GetMapping("/{headNote}/note-book-questions")
   public List<QuizQuestion> getAllQuizQuestionByNoteBook(
-    @PathVariable("headNote") @Schema(type = "integer") Note headNote) {
+      @PathVariable("headNote") @Schema(type = "integer") Note headNote) {
     return modelFactoryService.getQuizQuestionsByHeadNote(headNote);
   }
 
   @GetMapping("/{note}/note-questions")
   public List<QuizQuestion> getAllQuizQuestionByNote(
-    @PathVariable("note") @Schema(type = "integer") Note note) {
+      @PathVariable("note") @Schema(type = "integer") Note note) {
     return modelFactoryService.getQuizQuestionsByNote(note);
   }
 
   @PostMapping("/add-question-manually")
   @Transactional
   public boolean addQuestionManually(
-    @Valid @RequestBody QuizQuestionCreationParams manualQuestion) {
+      @Valid @RequestBody QuizQuestionCreationParams manualQuestion) {
     return true;
   }
 

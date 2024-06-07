@@ -25,11 +25,9 @@ import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
-
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -47,12 +45,9 @@ import org.springframework.web.server.ResponseStatusException;
 @ActiveProfiles("test")
 @Transactional
 class RestQuizQuestionControllerTests {
-  @Mock
-  OpenAiApi openAiApi;
-  @Autowired
-  ModelFactoryService modelFactoryService;
-  @Autowired
-  MakeMe makeMe;
+  @Mock OpenAiApi openAiApi;
+  @Autowired ModelFactoryService modelFactoryService;
+  @Autowired MakeMe makeMe;
   private UserModel currentUser;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
   OpenAIChatCompletionMock openAIChatCompletionMock;
@@ -64,13 +59,13 @@ class RestQuizQuestionControllerTests {
     openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
     currentUser = makeMe.aUser().toModelPlease();
     controller =
-      new RestQuizQuestionController(
-        openAiApi, modelFactoryService, currentUser, testabilitySettings);
+        new RestQuizQuestionController(
+            openAiApi, modelFactoryService, currentUser, testabilitySettings);
   }
 
   RestQuizQuestionController nullUserController() {
     return new RestQuizQuestionController(
-      openAiApi, modelFactoryService, makeMe.aNullUserModel(), testabilitySettings);
+        openAiApi, modelFactoryService, makeMe.aNullUserModel(), testabilitySettings);
   }
 
   @Nested
@@ -83,11 +78,11 @@ class RestQuizQuestionControllerTests {
     void setup() {
       Note answerNote = makeMe.aNote().rememberSpelling().please();
       reviewPoint =
-        makeMe
-          .aReviewPointFor(answerNote)
-          .by(currentUser)
-          .forgettingCurveAndNextReviewAt(200)
-          .please();
+          makeMe
+              .aReviewPointFor(answerNote)
+              .by(currentUser)
+              .forgettingCurveAndNextReviewAt(200)
+              .please();
       quizQuestion = makeMe.aQuestion().spellingQuestionOfReviewPoint(answerNote).please();
       answerDTO.setSpellingAnswer(answerNote.getTopicConstructor());
     }
@@ -115,15 +110,15 @@ class RestQuizQuestionControllerTests {
       controller.answerQuiz(quizQuestion, answerDTO);
       assertThat(reviewPoint.getForgettingCurveIndex(), greaterThan(oldForgettingCurveIndex));
       assertThat(
-        reviewPoint.getLastReviewedAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
+          reviewPoint.getLastReviewedAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
     }
 
     @Test
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
       AnswerDTO answer = new AnswerDTO();
       assertThrows(
-        ResponseStatusException.class,
-        () -> nullUserController().answerQuiz(quizQuestion, answer));
+          ResponseStatusException.class,
+          () -> nullUserController().answerQuiz(quizQuestion, answer));
     }
 
     @Nested
@@ -131,7 +126,7 @@ class RestQuizQuestionControllerTests {
       @BeforeEach
       void setup() {
         quizQuestion =
-          makeMe.aQuestion().spellingQuestionOfReviewPoint(reviewPoint.getNote()).please();
+            makeMe.aQuestion().spellingQuestionOfReviewPoint(reviewPoint.getNote()).please();
         answerDTO.setSpellingAnswer("wrong");
       }
 
@@ -158,10 +153,10 @@ class RestQuizQuestionControllerTests {
       void shouldRepeatTheNextDay() {
         controller.answerQuiz(quizQuestion, answerDTO);
         assertThat(
-          reviewPoint.getNextReviewAt(),
-          lessThan(
-            TimestampOperations.addHoursToTimestamp(
-              testabilitySettings.getCurrentUTCTimestamp(), 25)));
+            reviewPoint.getNextReviewAt(),
+            lessThan(
+                TimestampOperations.addHoursToTimestamp(
+                    testabilitySettings.getCurrentUTCTimestamp(), 25)));
       }
     }
   }
@@ -173,10 +168,10 @@ class RestQuizQuestionControllerTests {
     Note note;
 
     QuestionSuggestionCreationParams suggestionWithPositiveFeedback =
-      new QuestionSuggestionCreationParams("this is a comment", true);
+        new QuestionSuggestionCreationParams("this is a comment", true);
 
     QuestionSuggestionCreationParams suggestionWithNegativeFeedback =
-      new QuestionSuggestionCreationParams("this is a comment", false);
+        new QuestionSuggestionCreationParams("this is a comment", false);
 
     @BeforeEach
     void setup() throws QuizQuestionNotPossibleException {
@@ -189,11 +184,11 @@ class RestQuizQuestionControllerTests {
     void suggestQuestionWithAPositiveFeedback() {
 
       SuggestedQuestionForFineTuning suggestedQuestionForFineTuning =
-        controller.suggestQuestionForFineTuning(quizQuestion, suggestionWithPositiveFeedback);
+          controller.suggestQuestionForFineTuning(quizQuestion, suggestionWithPositiveFeedback);
       assert suggestedQuestionForFineTuning != null;
       assertEquals(
-        quizQuestion.getMcqWithAnswer().toJsonString(),
-        suggestedQuestionForFineTuning.getPreservedQuestion().toJsonString());
+          quizQuestion.getMcqWithAnswer().toJsonString(),
+          suggestedQuestionForFineTuning.getPreservedQuestion().toJsonString());
       assertEquals("this is a comment", suggestedQuestionForFineTuning.getComment());
       assertTrue(suggestedQuestionForFineTuning.isPositiveFeedback(), "Incorrect Feedback");
       assertEquals("0", suggestedQuestionForFineTuning.getRealCorrectAnswers());
@@ -202,11 +197,11 @@ class RestQuizQuestionControllerTests {
     @Test
     void suggestQuestionWithANegativeFeedback() {
       SuggestedQuestionForFineTuning suggestedQuestionForFineTuning =
-        controller.suggestQuestionForFineTuning(quizQuestion, suggestionWithNegativeFeedback);
+          controller.suggestQuestionForFineTuning(quizQuestion, suggestionWithNegativeFeedback);
       assert suggestedQuestionForFineTuning != null;
       assertEquals(
-        quizQuestion.getMcqWithAnswer().toJsonString(),
-        suggestedQuestionForFineTuning.getPreservedQuestion().toJsonString());
+          quizQuestion.getMcqWithAnswer().toJsonString(),
+          suggestedQuestionForFineTuning.getPreservedQuestion().toJsonString());
       assertEquals("this is a comment", suggestedQuestionForFineTuning.getComment());
       assertFalse(suggestedQuestionForFineTuning.isPositiveFeedback(), "Incorrect Feedback");
       assertEquals("", suggestedQuestionForFineTuning.getRealCorrectAnswers());
@@ -215,10 +210,10 @@ class RestQuizQuestionControllerTests {
     @Test
     void suggestQuestionWithSnapshotQuestionStem() {
       var suggestedQuestionForFineTuning =
-        controller.suggestQuestionForFineTuning(quizQuestion, suggestionWithPositiveFeedback);
+          controller.suggestQuestionForFineTuning(quizQuestion, suggestionWithPositiveFeedback);
       assert suggestedQuestionForFineTuning != null;
       assertThat(
-        suggestedQuestionForFineTuning.getPreservedQuestion().stem, equalTo(mcqWithAnswer.stem));
+          suggestedQuestionForFineTuning.getPreservedQuestion().stem, equalTo(mcqWithAnswer.stem));
     }
 
     @Test
@@ -226,8 +221,8 @@ class RestQuizQuestionControllerTests {
       long oldCount = modelFactoryService.questionSuggestionForFineTuningRepository.count();
       controller.suggestQuestionForFineTuning(quizQuestion, suggestionWithPositiveFeedback);
       assertThat(
-        modelFactoryService.questionSuggestionForFineTuningRepository.count(),
-        equalTo(oldCount + 1));
+          modelFactoryService.questionSuggestionForFineTuningRepository.count(),
+          equalTo(oldCount + 1));
     }
   }
 
@@ -240,27 +235,27 @@ class RestQuizQuestionControllerTests {
     void setUp() {
       note = makeMe.aNote().please();
       jsonQuestion =
-        makeMe
-          .aMCQWithAnswer()
-          .stem("What is the first color in the rainbow?")
-          .choices("red", "black", "green")
-          .correctChoiceIndex(0)
-          .please();
+          makeMe
+              .aMCQWithAnswer()
+              .stem("What is the first color in the rainbow?")
+              .choices("red", "black", "green")
+              .correctChoiceIndex(0)
+              .please();
     }
 
     @Test
     void askWithNoteThatCannotAccess() {
       assertThrows(
-        ResponseStatusException.class,
-        () -> {
-          RestQuizQuestionController restAiController =
-            new RestQuizQuestionController(
-              openAiApi,
-              makeMe.modelFactoryService,
-              makeMe.aNullUserModel(),
-              testabilitySettings);
-          restAiController.generateQuestion(note);
-        });
+          ResponseStatusException.class,
+          () -> {
+            RestQuizQuestionController restAiController =
+                new RestQuizQuestionController(
+                    openAiApi,
+                    makeMe.modelFactoryService,
+                    makeMe.aNullUserModel(),
+                    testabilitySettings);
+            restAiController.generateQuestion(note);
+          });
     }
 
     @Test
@@ -269,13 +264,13 @@ class RestQuizQuestionControllerTests {
       QuizQuestion quizQuestion = controller.generateQuestion(note);
 
       Assertions.assertThat(quizQuestion.getMultipleChoicesQuestion().stem)
-        .contains("What is the first color in the rainbow?");
+          .contains("What is the first color in the rainbow?");
     }
 
     @Test
     void createQuizQuestionFailedWithGpt35WillNotTryAgain() throws JsonProcessingException {
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCallJsonNode(
-        new ObjectMapper().readTree("{\"stem\": \"\"}"), "");
+          new ObjectMapper().readTree("{\"stem\": \"\"}"), "");
       assertThrows(ResponseStatusException.class, () -> controller.generateQuestion(note));
       verify(openAiApi, Mockito.times(1)).createChatCompletion(any());
     }
@@ -285,11 +280,11 @@ class RestQuizQuestionControllerTests {
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(jsonQuestion, "");
       GlobalSettingsService globalSettingsService = new GlobalSettingsService(modelFactoryService);
       globalSettingsService
-        .getGlobalSettingQuestionGeneration()
-        .setKeyValue(makeMe.aTimestamp().please(), "gpt-new");
+          .getGlobalSettingQuestionGeneration()
+          .setKeyValue(makeMe.aTimestamp().please(), "gpt-new");
       controller.generateQuestion(note);
       ArgumentCaptor<ChatCompletionRequest> captor =
-        ArgumentCaptor.forClass(ChatCompletionRequest.class);
+          ArgumentCaptor.forClass(ChatCompletionRequest.class);
       verify(openAiApi).createChatCompletion(captor.capture());
       assertThat(captor.getValue().getModel(), equalTo("gpt-new"));
     }
@@ -310,28 +305,28 @@ class RestQuizQuestionControllerTests {
     @Test
     void askWithNoteThatCannotAccess() {
       assertThrows(
-        ResponseStatusException.class,
-        () -> {
-          RestQuizQuestionController restAiController =
-            new RestQuizQuestionController(
-              openAiApi,
-              makeMe.modelFactoryService,
-              makeMe.aNullUserModel(),
-              testabilitySettings);
-          restAiController.regenerate(quizQuestion);
-        });
+          ResponseStatusException.class,
+          () -> {
+            RestQuizQuestionController restAiController =
+                new RestQuizQuestionController(
+                    openAiApi,
+                    makeMe.modelFactoryService,
+                    makeMe.aNullUserModel(),
+                    testabilitySettings);
+            restAiController.regenerate(quizQuestion);
+          });
     }
 
     @Test
     void createQuizQuestion() {
       MCQWithAnswer jsonQuestion =
-        makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
+          makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
 
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(jsonQuestion, "");
       QuizQuestion quizQuestion = controller.regenerate(this.quizQuestion);
 
       Assertions.assertThat(quizQuestion.getMultipleChoicesQuestion().stem)
-        .contains("What is the first color in the rainbow?");
+          .contains("What is the first color in the rainbow?");
     }
   }
 
@@ -342,7 +337,7 @@ class RestQuizQuestionControllerTests {
 
     @BeforeEach
     void setUp() {
-      questionEvaluation.correctChoices = new int[]{0};
+      questionEvaluation.correctChoices = new int[] {0};
       questionEvaluation.feasibleQuestion = true;
       questionEvaluation.comment = "what a horrible question!";
 
@@ -354,16 +349,16 @@ class RestQuizQuestionControllerTests {
     @Test
     void askWithNoteThatCannotAccess() {
       assertThrows(
-        ResponseStatusException.class,
-        () -> {
-          RestQuizQuestionController restAiController =
-            new RestQuizQuestionController(
-              openAiApi,
-              makeMe.modelFactoryService,
-              makeMe.aNullUserModel(),
-              testabilitySettings);
-          restAiController.contest(quizQuestion);
-        });
+          ResponseStatusException.class,
+          () -> {
+            RestQuizQuestionController restAiController =
+                new RestQuizQuestionController(
+                    openAiApi,
+                    makeMe.modelFactoryService,
+                    makeMe.aNullUserModel(),
+                    testabilitySettings);
+            restAiController.contest(quizQuestion);
+          });
     }
 
     @Test
@@ -378,11 +373,11 @@ class RestQuizQuestionControllerTests {
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(questionEvaluation, "");
       GlobalSettingsService globalSettingsService = new GlobalSettingsService(modelFactoryService);
       globalSettingsService
-        .getGlobalSettingEvaluation()
-        .setKeyValue(makeMe.aTimestamp().please(), "gpt-new");
+          .getGlobalSettingEvaluation()
+          .setKeyValue(makeMe.aTimestamp().please(), "gpt-new");
       controller.contest(quizQuestion);
       ArgumentCaptor<ChatCompletionRequest> argumentCaptor =
-        ArgumentCaptor.forClass(ChatCompletionRequest.class);
+          ArgumentCaptor.forClass(ChatCompletionRequest.class);
       verify(openAiApi, times(1)).createChatCompletion(argumentCaptor.capture());
       assertThat(argumentCaptor.getValue().getModel(), equalTo("gpt-new"));
     }
@@ -449,7 +444,7 @@ class RestQuizQuestionControllerTests {
     @Test
     void getQuestionsOfANoteWhenThereIsOneQuestion() {
       QuizQuestion questionOfNote =
-        makeMe.aQuestion().spellingQuestionOfNote(noteWithoutQuestions).please();
+          makeMe.aQuestion().spellingQuestionOfNote(noteWithoutQuestions).please();
       makeMe.refresh(noteWithoutQuestions);
       List<QuizQuestion> results = controller.getAllQuizQuestionByNote(noteWithoutQuestions);
       assertThat(results, contains(questionOfNote));
@@ -458,7 +453,7 @@ class RestQuizQuestionControllerTests {
     @Test
     void getAllQuestionsOfANoteWhenThereIsMoreThanOneQuestion() {
       QuizQuestion questionOfNote =
-        makeMe.aQuestion().spellingQuestionOfNote(noteWithQuestions).please();
+          makeMe.aQuestion().spellingQuestionOfNote(noteWithQuestions).please();
       List<QuizQuestion> results = controller.getAllQuizQuestionByNote(noteWithQuestions);
       assertThat(results, hasSize(2));
     }
@@ -466,7 +461,7 @@ class RestQuizQuestionControllerTests {
     @Test
     void addQuestionManually() {
       QuizQuestion questionOfNote =
-        makeMe.aQuestion().spellingQuestionOfNote(noteWithQuestions).please();
+          makeMe.aQuestion().spellingQuestionOfNote(noteWithQuestions).please();
       List<QuizQuestion> results = controller.getAllQuizQuestionByNote(noteWithQuestions);
       assertThat(results, hasSize(2));
     }
