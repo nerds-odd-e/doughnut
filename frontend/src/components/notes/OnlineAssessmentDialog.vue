@@ -1,6 +1,9 @@
 <template>
   <div>
-    <div v-if="currentQuestion < quizQuestions.length">
+    <div v-if="errors != ''">
+      {{ errors }}
+    </div>
+    <div v-else-if="currentQuestion < quizQuestions.length">
       <p role="question">
         {{ quizQuestions[currentQuestion]?.multipleChoicesQuestion.stem }}
       </p>
@@ -36,7 +39,7 @@ export default defineComponent({
       quizQuestions: [] as QuizQuestion[],
       answered: false,
       currentQuestion: 0,
-      errors: {},
+      errors: "",
     };
   },
   created() {
@@ -56,48 +59,8 @@ export default defineComponent({
           this.quizQuestions = response;
         })
         .catch((res) => {
-          this.errors = res;
+          this.errors = res.body.message;
         });
-    },
-    getQuizQuestions() {
-      return [
-        {
-          id: 1,
-          multipleChoicesQuestion: {
-            stem: "Where in the world is Singapore?",
-            choices: ["Asia", "euro"],
-          },
-          headNote: {
-            noteTopic: {
-              id: 1,
-              topicConstructor: "Singapore",
-            },
-            updatedAt: "2022-06-01T12:00:00Z",
-            id: 1,
-            createdAt: "2022-06-01T12:00:00Z",
-          },
-          approved: true,
-          reviewed: true,
-        },
-        {
-          id: 2,
-          multipleChoicesQuestion: {
-            stem: "Most famous food of Vietnam?",
-            choices: ["Pho", "bread"],
-          },
-          headNote: {
-            noteTopic: {
-              id: 2,
-              topicConstructor: "Vietnam",
-            },
-            updatedAt: "2022-06-01T12:00:00Z",
-            id: 1,
-            createdAt: "2022-06-01T12:00:00Z",
-          },
-          approved: true,
-          reviewed: true,
-        },
-      ];
     },
   },
 });
