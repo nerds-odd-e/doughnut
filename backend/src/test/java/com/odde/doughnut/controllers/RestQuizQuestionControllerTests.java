@@ -483,7 +483,7 @@ class RestQuizQuestionControllerTests {
     Note headNote1;
     Note headNote2;
     Note noteWithoutQuestions;
-    Note noteWithOneQuestion;
+    Note noteWithQuestions;
     QuizQuestion oneQuizQuestion;
 
     @BeforeEach
@@ -498,9 +498,9 @@ class RestQuizQuestionControllerTests {
       makeMe.refresh(headNote2);
 
       noteWithoutQuestions = makeMe.aNote("a note").under(headNote1).please();
-      noteWithOneQuestion =
+      noteWithQuestions =
           makeMe.aNote("a note with 1 questions").creatorAndOwner(currentUser).please();
-      oneQuizQuestion = makeMe.aQuestion().spellingQuestionOfNote(noteWithOneQuestion).please();
+      oneQuizQuestion = makeMe.aQuestion().spellingQuestionOfNote(noteWithQuestions).please();
     }
 
     @Test
@@ -525,5 +525,24 @@ class RestQuizQuestionControllerTests {
       assertThrows(
           UnexpectedNoAccessRightException.class, () -> controller.approveQuizQuestion(questions));
     }
+
+    @Test
+    void reviewedQuizQuestionsShouldBeReviewed() throws UnexpectedNoAccessRightException {
+      QuizQuestion quizQuestion1 = makeMe.aQuestion().spellingQuestionOfNote(noteWithQuestions).please();
+      quizQuestion1.setApproved(true);
+      makeMe.refresh(quizQuestion1);
+      QuizQuestion quizQuestion2 = makeMe.aQuestion().spellingQuestionOfNote(noteWithQuestions).please();
+
+      assertFalse(quizQuestion1.isReviewed());
+      assertFalse(quizQuestion2.isReviewed());
+      controller.approveQuizQuestion(List.of(quizQuestion1, quizQuestion2));
+
+      assertTrue(quizQuestion1.isReviewed());
+      assertTrue(quizQuestion2.isReviewed());
+
+      assertTrue(quizQuestion1.isApproved());
+      assertFalse(quizQuestion2.isApproved());
+    }
   }
+
 }

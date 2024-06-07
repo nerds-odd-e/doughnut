@@ -132,7 +132,6 @@ class RestQuizQuestionController {
 
     quizQuestion.forEach(
         x -> {
-          x.approved = true;
           x.reviewed = true;
           modelFactoryService.save(x);
         });
