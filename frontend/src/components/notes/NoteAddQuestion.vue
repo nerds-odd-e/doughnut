@@ -29,15 +29,17 @@
     <button @click="removeOption" :disabled="options.length <= minOptions">
       -
     </button>
-    <button @click="submitQuestions" :disabled="isInvalidQuestion">
+    <button @click="submitQuestion" :disabled="isInvalidQuestion">
       Submit
     </button>
+    <span v-if="showAlert">{{ addQuestionManuallyResultMsg }}</span>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, PropType } from "vue";
 import useLoadingApi from "@/managedApi/useLoadingApi";
+import { ApiError, Note, QuizQuestion } from "@/generated/backend";
 import TextArea from "../form/TextArea.vue";
 
 export default defineComponent({
@@ -45,7 +47,10 @@ export default defineComponent({
     return useLoadingApi();
   },
   props: {
-    noteId: { type: Number, required: true },
+    note: {
+      type: Object as PropType<Note>,
+      required: true,
+    },
   },
   data() {
     return {
@@ -54,6 +59,8 @@ export default defineComponent({
       minOptions: 2, // Minimum number of options
       maxOptions: 10, // Maximum number of options
       placeHolder: { type: "Correct Answer", default: "-" },
+      addQuestionManuallyResultMsg: "",
+      showAlert: false,
     };
   },
   computed: {
@@ -71,12 +78,42 @@ export default defineComponent({
         this.options.push("");
       }
     },
+
     removeOption() {
       if (this.options.length > this.minOptions) {
         this.options.pop();
       }
     },
-    submitQuestions() {},
+    convertFormResponseToMultipleChoice(note: Note): QuizQuestion {
+      const quizQuestion: QuizQuestion = {
+        id: note.id,
+        correctAnswerIndex: 0,
+        multipleChoicesQuestion: {
+          stem: this.question,
+          choices: this.options,
+        },
+        headNote: note,
+      };
+
+      return quizQuestion;
+    },
+    async submitQuestion() {
+      try {
+        const quizQuestion = this.convertFormResponseToMultipleChoice(
+          this.note,
+        );
+        const response =
+          await this.managedApi.restQuizQuestionController.addQuestionManually(
+            quizQuestion,
+          );
+        this.showAlert = !response;
+        this.addQuestionManuallyResultMsg = "";
+      } catch (error) {
+        const errorInstance = error as ApiError;
+        this.addQuestionManuallyResultMsg = errorInstance.body.message;
+        this.showAlert = true;
+      }
+    },
   },
 });
 </script>

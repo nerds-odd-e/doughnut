@@ -69,7 +69,7 @@
             <AIGenerateImageDialog v-bind="{ note, storageAccessor }" />
           </PopButton>
           <PopButton btn-class="dropdown-item btn-primary" title="Add Question">
-            <NoteAddQuestion v-bind="{ noteId: note.id }" />
+            <NoteAddQuestion v-bind="{ note: note }" />
           </PopButton>
           <PopButton
             btn-class="dropdown-item btn-primary"

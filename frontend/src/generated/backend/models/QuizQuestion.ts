@@ -11,6 +11,7 @@ export type QuizQuestion = {
     headNote: Note;
     imageWithMask?: ImageWithMask;
     createdAt?: string;
+    correctAnswerIndex?: number;
     approved?: boolean;
     reviewed?: boolean;
 };

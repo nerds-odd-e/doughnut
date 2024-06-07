@@ -17,7 +17,8 @@ Feature: User Manually Add Questionsaaaa
     When I add the question with the following:
       | Question                                            | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
       | What is the most common scuba diving certification? | Rescue Diver   | Divemaster         | Open Water Diver   |
-  #    Then I should be able to see a sucess message
+    
+#      Then I should be able to see a success message
   #    And I should be able to see the question in the qusestion list of the note
   #      | note-topic | Question                                      |
   #      | team       | What is the most common scuba diving certification? |

@@ -7,8 +7,10 @@ import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+
 import java.sql.Timestamp;
 import java.util.Objects;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -33,7 +35,6 @@ public class QuizQuestion extends EntityIdentifiedByIdOnly {
   private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
   @Column(name = "correct_answer_index")
-  @JsonIgnore
   private Integer correctAnswerIndex;
 
   @Column(name = "check_spell")

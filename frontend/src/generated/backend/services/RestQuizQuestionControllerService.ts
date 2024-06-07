@@ -7,6 +7,7 @@ import type { AnsweredQuestion } from '../models/AnsweredQuestion';
 import type { QuestionSuggestionCreationParams } from '../models/QuestionSuggestionCreationParams';
 import type { QuizQuestion } from '../models/QuizQuestion';
 import type { QuizQuestionContestResult } from '../models/QuizQuestionContestResult';
+import type { QuizQuestionCreationParams } from '../models/QuizQuestionCreationParams';
 import type { SuggestedQuestionForFineTuning } from '../models/SuggestedQuestionForFineTuning';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -128,6 +129,24 @@ export class RestQuizQuestionControllerService {
             query: {
                 'note': note,
             },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param requestBody
+     * @returns boolean OK
+     * @throws ApiError
+     */
+    public addQuestionManually(
+        requestBody: QuizQuestionCreationParams,
+    ): CancelablePromise<boolean> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/quiz-questions/add-question-manually',
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
                 500: `Internal Server Error`,
             },

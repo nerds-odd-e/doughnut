@@ -216,6 +216,11 @@ Then("I should see the note {string} is marked as deleted", (noteTopic: string) 
   cy.findByText("This note has been deleted")
 })
 
+Then("I should see the note {string} is marked as deleted", (noteTopic: string) => {
+  start.jumpToNotePage(noteTopic)
+  cy.findByText("This note has been deleted")
+})
+
 Then("I should not see note {string} at the top level of all my notes", (noteTopic: string) => {
   cy.pageIsNotLoading()
   cy.findByText("Notebooks")
@@ -235,7 +240,16 @@ When("I move note {string} left", (noteTopic: string) => {
   cy.findByText("Move This Note").click()
   cy.findByRole("button", { name: "Move Left" }).click()
 })
-
+When(
+  "I upload an audio-file {string} to the note {string}",
+  (fileName: string, noteTopic: string) => {
+    start.jumpToNotePage(noteTopic)
+    start.assumeNotePage().editAudioButton().click()
+    cy.get("#note-uploadAudioFile").attachFile(fileName)
+    cy.findAllByText("Save").click()
+    cy.pageIsNotLoading()
+  },
+)
 When("I should see the screenshot matches", () => {
   // cy.get('.content').compareSnapshot('page-snapshot', 0.001);
 })
