@@ -3,7 +3,7 @@
   "compilerOptions": {
     "module": "NodeNext",
     "target": "ES2017",
-    "moduleResolution": "node16",
+    "moduleResolution": "node",
     "resolveJsonModule": true,
     "baseUrl": "../e2e_test",
     "lib": ["dom", "dom.iterable", "ESNext"],

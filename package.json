@@ -2,6 +2,7 @@
   "name": "doughnut",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "repository": "https://github.com/nerds-odd-e/doughnut.git",
   "author": "Terry Yin <terry.yinzhe@gmail.com>",
   "license": "MIT",
