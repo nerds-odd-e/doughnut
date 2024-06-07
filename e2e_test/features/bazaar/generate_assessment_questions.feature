@@ -31,10 +31,4 @@ Feature: Bazaar generate
       | 6           | Assessment For LeSS in Action            | 5              |
       | 4           | Insufficient notes to create assessment! | 0              |
 
-  @ignore
-  Scenario: generate questions from notebook
-    Given I am logged in as an existing user
-    When I click on generate assessment questions button
-    Then generate "5" questions
-
 
