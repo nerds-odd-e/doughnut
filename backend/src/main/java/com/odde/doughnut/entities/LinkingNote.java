@@ -35,12 +35,6 @@ public class LinkingNote extends Note {
     return getSiblingLinksOfSameLinkType(user).map(Note::getParent).toList();
   }
 
-  protected String getLinkConstructor() {
-    LinkType linkType = getLinkType();
-    if (linkType == null) throw new RuntimeException("Invalid link type: " + getTopicConstructor());
-    return "%P is " + linkType.label + " %T";
-  }
-
   @Override
   public List<QuizQuestionFactory> getQuizQuestionFactories() {
     return Arrays.stream(getLinkType().getQuestionTypes())

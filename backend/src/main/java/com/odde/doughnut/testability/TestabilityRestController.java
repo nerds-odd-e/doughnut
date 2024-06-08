@@ -9,6 +9,7 @@ import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GithubService;
+import com.odde.doughnut.services.NoteConstructionService;
 import com.odde.doughnut.testability.model.SeedQuizQuestions;
 import jakarta.persistence.EntityManagerFactory;
 import java.io.IOException;
@@ -81,7 +82,9 @@ class TestabilityRestController {
     @Setter private String wikidataId;
 
     private Note buildNote(User user, Timestamp currentUTCTimestamp) {
-      Note note = HierarchicalNote.createNote(user, null, currentUTCTimestamp, "");
+      Note note =
+          new NoteConstructionService(user, currentUTCTimestamp, null)
+              .createNote(null, topicConstructor);
       NoteAccessory content = note.getOrInitializeNoteAccessory();
 
       note.setTopicConstructor(topicConstructor);

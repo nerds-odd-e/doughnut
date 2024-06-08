@@ -85,11 +85,6 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
   @OneToMany(mappedBy = "parent", cascade = CascadeType.DETACH)
   @JsonIgnore
   @OrderBy("siblingOrder")
-  private final List<HierarchicalNote> hierarchicalChildren = new ArrayList<>();
-
-  @OneToMany(mappedBy = "parent", cascade = CascadeType.DETACH)
-  @JsonIgnore
-  @OrderBy("siblingOrder")
   private final List<Note> children = new ArrayList<>();
 
   @OneToMany(mappedBy = "note")

@@ -15,15 +15,22 @@ import lombok.SneakyThrows;
 public record NoteConstructionService(
     User user, Timestamp currentUTCTimestamp, ModelFactoryService modelFactoryService) {
 
+  public Note createNote(Note parentNote, String topicConstructor) {
+    Note note =
+        HierarchicalNote.createNote(user, parentNote, currentUTCTimestamp, topicConstructor);
+    if (modelFactoryService != null) {
+      modelFactoryService.save(note);
+    }
+    return note;
+  }
+
   public Note createNoteWithWikidataInfo(
       Note parentNote,
       WikidataIdWithApi wikidataIdWithApi,
       LinkType linkTypeToParent,
       String topicConstructor)
       throws DuplicateWikidataIdException, IOException, InterruptedException {
-    Note note =
-        HierarchicalNote.createNote(user, parentNote, currentUTCTimestamp, topicConstructor);
-    modelFactoryService.save(note);
+    Note note = createNote(parentNote, topicConstructor);
     modelFactoryService.createLink(
         note, note.getParent(), user, linkTypeToParent, currentUTCTimestamp);
     if (wikidataIdWithApi != null) {

@@ -3,6 +3,7 @@ package com.odde.doughnut.testability.builders;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.NoteConstructionService;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
@@ -24,7 +25,8 @@ public class NoteBuilder extends EntityBuilder<Note> {
   public NoteBuilder(MakeMe makeMe) {
     super(
         makeMe,
-        HierarchicalNote.createNote(null, null, new Timestamp(System.currentTimeMillis()), ""));
+        new NoteConstructionService(null, new Timestamp(System.currentTimeMillis()), null)
+            .createNote(null, ""));
     if (Strings.isEmpty(entity.getTopicConstructor())) titleConstructor(titleCounter.generate());
     details("descrption");
     updatedAt(entity.getCreatedAt());
