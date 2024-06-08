@@ -5,14 +5,14 @@ Feature: Get approved questions
   Background:
     Given I am logged in as an existing user
     And there are some notes for the current user:
-      | topicConstructor | testingParent |
-      | Animals          |               |
-      | Zebra            | Animals       |
-      | Flamingo         | Animals       |
-      | Elephant         | Animals       |
-      | Kitty cat        | Animals       |
-      | Merlion          | Animals       |
-      | Unicorn          | Animals       |
+      | topicConstructor | parentTopic |
+      | Animals          |             |
+      | Zebra            | Animals     |
+      | Flamingo         | Animals     |
+      | Elephant         | Animals     |
+      | Kitty cat        | Animals     |
+      | Merlion          | Animals     |
+      | Unicorn          | Animals     |
 
   Scenario Outline: Generating an assessment with varying number of approved questions
     Given that there are "<num_approved>" approved questions from at least 5 different notes in a notebook

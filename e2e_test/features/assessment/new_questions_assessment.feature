@@ -3,13 +3,13 @@ Feature: New questions assessment
   Background:
     Given I am logged in as an existing user
     And there are some notes for the current user:
-      | topicConstructor | testingParent |
-      | Countries        |               |
-      | Singapore        | Countries     |
-      | Vietnam          | Countries     |
-      | Japan            | Countries     |
-      | Korea            | Countries     |
-      | China            | Countries     |
+      | topicConstructor | parentTopic |
+      | Countries        |             |
+      | Singapore        | Countries   |
+      | Vietnam          | Countries   |
+      | Japan            | Countries   |
+      | Korea            | Countries   |
+      | China            | Countries   |
     And notebook "Countries" is shared to the Bazaar
     When I go to the bazaar
 

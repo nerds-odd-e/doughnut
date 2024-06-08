@@ -2522,7 +2522,7 @@ components:
         details:
           type: string
           writeOnly: true
-        testingParent:
+        parentTopic:
           type: string
           writeOnly: true
         skipReview:

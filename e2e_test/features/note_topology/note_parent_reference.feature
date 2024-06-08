@@ -5,7 +5,7 @@ Feature: Note parent reference
   Background:
     Given I am logged in as an existing user
     And there are some notes for the current user:
-      | topicConstructor         | testingParent  |
+      | topicConstructor         | parentTopic    |
       | LeSS in Action           |                |
       | Usually, %P is in-person | LeSS in Action |
 

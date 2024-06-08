@@ -4,11 +4,11 @@ Feature: Repetition Quiz
   Background:
     Given I am logged in as an existing user
     And there are some notes for the current user:
-      | topicConstructor | details                        | skipReview | testingParent |
-      | English          |                                | true       |               |
-      | sedition         | Sedition means incite violence | false      | English       |
-      | sedation         | Put to sleep is sedation       | false      | English       |
-      | medical          |                                | true       | English       |
+      | topicConstructor | details                        | skipReview | parentTopic |
+      | English          |                                | true       |             |
+      | sedition         | Sedition means incite violence | false      | English     |
+      | sedation         | Put to sleep is sedation       | false      | English     |
+      | medical          |                                | true       | English     |
 
   @usingMockedOpenAiService
   Scenario Outline: AI generated question

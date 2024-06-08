@@ -4,14 +4,14 @@ Feature: Bazaar generate
 
   Background:
     Given there are some notes for existing user "old_learner"
-      | topicConstructor | testingParent |
-      | Countries        |               |
-      | Singapore        | Countries     |
-      | Vietnam          | Countries     |
-      | Japan            | Countries     |
-      | Korea            | Countries     |
-      | China            | Countries     |
-      | Mars             | Countries     |
+      | topicConstructor | parentTopic |
+      | Countries        |             |
+      | Singapore        | Countries   |
+      | Vietnam          | Countries   |
+      | Japan            | Countries   |
+      | Korea            | Countries   |
+      | China            | Countries   |
+      | Mars             | Countries   |
     And notebook "Countries" is shared to the Bazaar
 
   Scenario: open pop up for log in if the user is not logged in and generate assessment

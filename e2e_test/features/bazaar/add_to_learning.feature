@@ -4,11 +4,11 @@ Feature: Bazaar subscription
 
   Background:
     Given there are some notes for existing user "another_old_learner"
-      | topicConstructor | testingParent | skipReview |
-      | Shape            |               | true       |
-      | Square           | Shape         |            |
-      | Triangle         | Shape         |            |
-      | Big Square       | Square        |            |
+      | topicConstructor | parentTopic | skipReview |
+      | Shape            |             | true       |
+      | Square           | Shape       |            |
+      | Triangle         | Shape       |            |
+      | Big Square       | Square      |            |
     And notebook "Shape" is shared to the Bazaar
 
   @ignore

@@ -5,7 +5,7 @@
 export type NoteTestData = {
     topicConstructor?: string;
     details?: string;
-    testingParent?: string;
+    parentTopic?: string;
     skipReview?: boolean;
     url?: string;
     imageUrl?: string;

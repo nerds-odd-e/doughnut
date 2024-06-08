@@ -46,10 +46,10 @@ Given(
     const notes = Array(notesCount - 1)
       .fill(0)
       .map((_, i) => {
-        return { topicConstructor: `Note ${i}`, testingParent: noteTopic }
+        return { topicConstructor: `Note ${i}`, parentTopic: noteTopic }
       })
 
-    notes.push({ topicConstructor: noteTopic, testingParent: "" })
+    notes.push({ topicConstructor: noteTopic, parentTopic: "" })
     start.testability().injectNotes(notes, "old_learner")
   },
 )

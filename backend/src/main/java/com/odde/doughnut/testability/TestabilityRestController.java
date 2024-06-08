@@ -74,7 +74,7 @@ class TestabilityRestController {
   static class NoteTestData {
     public String topicConstructor;
     @Setter private String details;
-    @Setter private String testingParent;
+    @Setter private String parentTopic;
     @Setter private Boolean skipReview;
     @Setter private String url;
     @Setter private String imageUrl;
@@ -123,22 +123,22 @@ class TestabilityRestController {
           seed -> {
             Note note = titleNoteMap.get(seed.topicConstructor);
 
-            if (Strings.isBlank(seed.testingParent)) {
+            if (Strings.isBlank(seed.parentTopic)) {
               note.buildNotebookForHeadNote(ownership, user);
               modelFactoryService.save(note.getNotebook());
             } else {
               note.setParentNote(
                   getParentNote(
-                      titleNoteMap, modelFactoryService.noteRepository, seed.testingParent));
+                      titleNoteMap, modelFactoryService.noteRepository, seed.parentTopic));
             }
           });
     }
 
     private Note getParentNote(
-        Map<String, Note> titleNoteMap, NoteRepository noteRepository, String testingParent) {
-      Note parentNote = titleNoteMap.get(testingParent);
+        Map<String, Note> titleNoteMap, NoteRepository noteRepository, String parentTopic) {
+      Note parentNote = titleNoteMap.get(parentTopic);
       if (parentNote != null) return parentNote;
-      return noteRepository.findFirstByTopicConstructor(testingParent);
+      return noteRepository.findFirstByTopicConstructor(parentTopic);
     }
 
     private void saveByOriginalOrder(

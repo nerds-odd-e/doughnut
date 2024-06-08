@@ -4,10 +4,10 @@ Feature: Note details completion
   Background:
     Given I am logged in as an existing user
     And there are some notes for the current user:
-      | topicConstructor | details    | testingParent |
-      | Taiwan           |            |               |
-      | Taipei           | It is a    | Taiwan        |
-      | Weather          | It rains a | Taipei        |
+      | topicConstructor | details    | parentTopic |
+      | Taiwan           |            |             |
+      | Taipei           | It is a    | Taiwan      |
+      | Weather          | It rains a | Taipei      |
 
   Scenario: OpenAI Service Unavailability
     Given the OpenAI service is unavailable due to invalid system token
