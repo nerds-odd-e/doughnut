@@ -13,8 +13,9 @@ export const questionListPage = () => {
       cy.get("@questionTextarea").type(row?.["Incorrect Choice 2"] as string)
       cy.get("button").contains("Submit").click()
     },
-    expectQuestion(_row: Record<string, string>) {
+    expectQuestion(row: Record<string, string>) {
       cy.get(".question-table").should("exist")
+      cy.findByText(row["question stem"]!)
     },
   }
 }
