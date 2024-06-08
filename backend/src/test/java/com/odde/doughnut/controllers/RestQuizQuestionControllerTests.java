@@ -472,6 +472,27 @@ class RestQuizQuestionControllerTests {
   }
 
   @Nested
+  class addQuestionToNote {
+    @Test
+    void authorization() {
+      Note note = makeMe.aNote().please();
+      MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.addQuestionManually(note, mcqWithAnswer));
+    }
+
+    @Test
+    void persistent() throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
+      MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
+      QuizQuestion quizQuestion = controller.addQuestionManually(note, mcqWithAnswer);
+      assertThat(quizQuestion.getNote(), equalTo(note));
+      assertThat(quizQuestion.getId(), notNullValue());
+    }
+  }
+
+  @Nested
   class approveQuestionsForAssessment {
 
     Note headNote1;

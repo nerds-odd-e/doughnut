@@ -115,7 +115,9 @@ class RestQuizQuestionController {
   @Transactional
   public QuizQuestion addQuestionManually(
       @PathVariable("note") @Schema(type = "integer") Note note,
-      @Valid @RequestBody MCQWithAnswer manualQuestion) {
+      @Valid @RequestBody MCQWithAnswer manualQuestion)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertAuthorization(note);
     return quizQuestionService.addQuestion(note, manualQuestion);
   }
 
