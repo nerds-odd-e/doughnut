@@ -120,6 +120,11 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
   @Getter
   private Note parent;
 
+  @OneToMany(mappedBy = "note")
+  @Getter
+  @JsonIgnore
+  private List<QuizQuestion> quizQuestions = new ArrayList<>();
+
   @Embedded @JsonIgnore @Getter private ReviewSetting reviewSetting = new ReviewSetting();
 
   @JsonIgnore

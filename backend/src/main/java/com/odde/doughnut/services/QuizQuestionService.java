@@ -40,9 +40,6 @@ public class QuizQuestionService {
   }
 
   QuizQuestion selectQuizQuestionForANote(Note note) {
-    return this.modelFactoryService.getQuizQuestionsByNote(note).stream()
-        .filter(q -> q.approved)
-        .findFirst()
-        .orElse(null);
+    return note.getQuizQuestions().stream().filter(q -> q.approved).findFirst().orElse(null);
   }
 }

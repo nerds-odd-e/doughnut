@@ -110,21 +110,6 @@ public class ModelFactoryService {
     return questionList;
   }
 
-  public List<QuizQuestion> getQuizQuestionsByNote(Note note) {
-    // Get the iterable
-    Iterable<QuizQuestion> iterable = quizQuestionRepository.findAll();
-
-    // Convert iterable to list
-    List<QuizQuestion> questionList = new ArrayList<>();
-    for (QuizQuestion question : iterable) {
-      if (question.getNote().getId().equals(note.getId())) {
-        questionList.add(question);
-      }
-    }
-
-    return questionList;
-  }
-
   public <T extends EntityIdentifiedByIdOnly> T save(T entity) {
     if (entity.getId() == null) {
       entityManager.persist(entity);
