@@ -63,10 +63,13 @@ Given("there are notes from Note {int} to Note {int}", (from: number, to: number
   start.testability().seedNotes(notes)
 })
 
-Given("I access the add question page for the note {string}", (noteTopic: string) => {
-  //Go to note page
-  start.jumpToNotePage(noteTopic).openAddQuestionPage()
-})
+Given(
+  "I add the following question for the note {string}:",
+  (noteTopic: string, data: DataTable) => {
+    expect(data.hashes().length, "please add one question at a time.").to.equal(1)
+    start.jumpToNotePage(noteTopic).addQuestionPage(data.hashes()[0]!)
+  },
+)
 
 When("I create a notebook with topic {string}", (notebookTopic: string) => {
   start.routerToNotebooksPage().creatingNotebook(notebookTopic)
@@ -98,20 +101,6 @@ When(
     cy.pageIsNotLoading()
   },
 )
-
-When("I add the question with the following:", (data: DataTable) => {
-  const row = data.hashes()[0]
-  cy.get("label").contains("Question:").next().as("questionTextarea")
-  cy.get("@questionTextarea").type(row?.["Question"] as string)
-  cy.get("label").contains("Option 1 (Correct Answer)").next().as("questionTextarea")
-  cy.get("@questionTextarea").type(row?.["Correct Choice"] as string)
-  cy.get("label").contains("Option 2").next().as("questionTextarea")
-  cy.get("@questionTextarea").type(row?.["Incorrect Choice 1"] as string)
-  cy.get("button").contains("+").click()
-  cy.get("label").contains("Option 3").next().as("questionTextarea")
-  cy.get("@questionTextarea").type(row?.["Incorrect Choice 2"] as string)
-  cy.get("button").contains("Submit").click()
-})
 
 Then(
   "I must be able to download the {string} from the note {string}",

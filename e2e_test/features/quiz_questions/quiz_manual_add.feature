@@ -3,21 +3,13 @@ Feature: User Manually Add Questionsaaaa
 
   Background:
     Given I am logged in as an existing user
-    And there are some notes for the current user:
-      | topicConstructor | testingParent  | details             |
-      | LeSS in Action   |                | An awesome training |
-      | team             | LeSS in Action |                     |
-      | tech             | LeSS in Action |                     |
-  #And there are some notes that are not created for the current user:
-  # | topicConstructor | testingParent  | details  |
-  #| NotMyNote        | LeSS in Action | FunTimes |
+    And I have a note with the topic "team"
 
-  Scenario: Manually add questions to the note with valid question and answer should return success and add question
-    Given I access the add question page for the note "team"
-    When I add the question with the following:
+  Scenario: Manually add a question to the note successfully
+    Given I add the following question for the note "team":
       | Question                                            | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
       | What is the most common scuba diving certification? | Rescue Diver   | Divemaster         | Open Water Diver   |
-    
+
 #      Then I should be able to see a success message
   #    And I should be able to see the question in the qusestion list of the note
   #      | note-topic | Question                                      |
@@ -25,8 +17,7 @@ Feature: User Manually Add Questionsaaaa
 
   @ignore
   Scenario: Manually add questions to the note without answer should show error and not add question
-    Given I have note "team" opened
-    When I add the question with the following:
+    Given I add the following question for the note "team":
       | Question                                            | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
       | What is the most common scuba diving certification? |                | Divemaster         | Open Water Diver   |
     Then I should see an error message with the text
@@ -38,8 +29,7 @@ Feature: User Manually Add Questionsaaaa
 
   @ignore
   Scenario: Manually add questions to the note with less than 2 options should show error and not add question
-    Given I have note "team" opened
-    When I add the question with the following:
+    Given I add the following question for the note "team":
       | Question                                            | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
       | What is the most common scuba diving certification? | Rescue Diver   |                    |                    |
     Then I should see an error message with the text
@@ -77,8 +67,7 @@ Feature: User Manually Add Questionsaaaa
       | team       | What is the most common scuba diving certification? |
 
   Scenario: When user has added a question successfully to the note
-    Given I access the add question page for the note "team"
-    When I add the question with the following:
+    Given I add the following question for the note "team":
       | Question                                            | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
       | What is the most common scuba diving certification? | Rescue Diver   | Divemaster         | Open Water Diver   |
     Then I should see the question in the question list of the note
