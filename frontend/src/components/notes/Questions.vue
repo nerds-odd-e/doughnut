@@ -16,10 +16,15 @@
         <tr v-for="question in questions" :key="question.id">
           <td>{{ question.id }}</td>
           <td>{{ question.multipleChoicesQuestion.stem }}</td>
-          <td>{{ question.multipleChoicesQuestion.choices[0] }}</td>
-          <td>{{ question.multipleChoicesQuestion.choices[1] }}</td>
-          <td>{{ question.multipleChoicesQuestion.choices[2] }}</td>
-          <td>{{ question.multipleChoicesQuestion.choices[3] }}</td>
+          <template v-if="question.multipleChoicesQuestion.choices">
+            <td
+              v-for="(choice, index) in question.multipleChoicesQuestion
+                .choices"
+              :key="index"
+            >
+              {{ choice }}
+            </td>
+          </template>
           <td><input type="checkbox" v-model="question.approved" /></td>
         </tr>
       </tbody>
