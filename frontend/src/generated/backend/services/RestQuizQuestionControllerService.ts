@@ -140,24 +140,6 @@ export class RestQuizQuestionControllerService {
         });
     }
     /**
-     * @param requestBody
-     * @returns any OK
-     * @throws ApiError
-     */
-    public reviewQuizQuestion(
-        requestBody: Array<QuizQuestion>,
-    ): CancelablePromise<any> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/api/quiz-questions/review',
-            body: requestBody,
-            mediaType: 'application/json',
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
      * @param note
      * @returns QuizQuestion OK
      * @throws ApiError

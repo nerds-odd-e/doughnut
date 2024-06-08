@@ -26,7 +26,6 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -439,14 +438,14 @@ class RestQuizQuestionControllerTests {
     @Test
     void getAllQuestionsOfANoteWhenThereIsMoreThanOneQuestion()
         throws UnexpectedNoAccessRightException {
-          makeMe.aQuestion().spellingQuestionOfNote(noteWithQuestions).please();
+      makeMe.aQuestion().spellingQuestionOfNote(noteWithQuestions).please();
       List<QuizQuestion> results = controller.getAllQuizQuestionByNote(noteWithQuestions);
       assertThat(results, hasSize(2));
     }
 
     @Test
     void addQuestionManually() throws UnexpectedNoAccessRightException {
-          makeMe.aQuestion().spellingQuestionOfNote(noteWithQuestions).please();
+      makeMe.aQuestion().spellingQuestionOfNote(noteWithQuestions).please();
       List<QuizQuestion> results = controller.getAllQuizQuestionByNote(noteWithQuestions);
       assertThat(results, hasSize(2));
     }
@@ -470,77 +469,6 @@ class RestQuizQuestionControllerTests {
       QuizQuestion quizQuestion = controller.addQuestionManually(note, mcqWithAnswer);
       assertThat(quizQuestion.getNote(), equalTo(note));
       assertThat(quizQuestion.getId(), notNullValue());
-    }
-  }
-
-  @Nested
-  class approveQuestionsForAssessment {
-
-    Note headNote1;
-    Note headNote2;
-    Note noteWithoutQuestions;
-    Note noteWithQuestions;
-    QuizQuestion oneQuizQuestion;
-
-    @BeforeEach
-    void setUp() {
-      headNote1 = makeMe.aHeadNote("headNote1").creatorAndOwner(currentUser).please();
-      makeMe.theNote(headNote1).withNChildren(10).please();
-
-      headNote2 = makeMe.aHeadNote("headNote2").creatorAndOwner(currentUser).please();
-      makeMe.theNote(headNote2).withNChildren(20).please();
-
-      makeMe.refresh(headNote1);
-      makeMe.refresh(headNote2);
-
-      noteWithoutQuestions = makeMe.aNote("a note").under(headNote1).please();
-      noteWithQuestions =
-          makeMe.aNote("a note with 1 questions").creatorAndOwner(currentUser).please();
-      oneQuizQuestion = makeMe.aQuestion().spellingQuestionOfNote(noteWithQuestions).please();
-    }
-
-    @Test
-    void shouldReviewOnePendingQuestionWhenReviewingQuestions()
-        throws UnexpectedNoAccessRightException {
-      List<QuizQuestion> questions = new ArrayList<>();
-      oneQuizQuestion.setApproved(true);
-      questions.add(oneQuizQuestion);
-      controller.reviewQuizQuestion(questions);
-
-      makeMe.refresh(oneQuizQuestion);
-
-      assertTrue(oneQuizQuestion.isApproved());
-      assertTrue(oneQuizQuestion.isReviewed());
-    }
-
-    @Test
-    void shouldNotReviewQuizQuestionWhenNotOwner() {
-      Note note = makeMe.aNote().please();
-      QuizQuestion quizQuestion = makeMe.aQuestion().spellingQuestionOfNote(note).please();
-      List<QuizQuestion> questions = new ArrayList<>();
-      questions.add(quizQuestion);
-      assertThrows(
-          UnexpectedNoAccessRightException.class, () -> controller.reviewQuizQuestion(questions));
-    }
-
-    @Test
-    void reviewedQuizQuestionsShouldBeReviewed() throws UnexpectedNoAccessRightException {
-      QuizQuestion quizQuestion1 =
-          makeMe.aQuestion().spellingQuestionOfNote(noteWithQuestions).please();
-      quizQuestion1.setApproved(true);
-      makeMe.refresh(quizQuestion1);
-      QuizQuestion quizQuestion2 =
-          makeMe.aQuestion().spellingQuestionOfNote(noteWithQuestions).please();
-
-      assertFalse(quizQuestion1.isReviewed());
-      assertFalse(quizQuestion2.isReviewed());
-      controller.reviewQuizQuestion(List.of(quizQuestion1, quizQuestion2));
-
-      assertTrue(quizQuestion1.isReviewed());
-      assertTrue(quizQuestion2.isReviewed());
-
-      assertTrue(quizQuestion1.isApproved());
-      assertFalse(quizQuestion2.isApproved());
     }
   }
 }

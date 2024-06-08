@@ -18,7 +18,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.List;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -119,22 +118,5 @@ class RestQuizQuestionController {
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
     return quizQuestionService.addQuestion(note, manualQuestion);
-  }
-
-  @PostMapping("/review")
-  @Transactional
-  public void reviewQuizQuestion(@Valid @RequestBody List<QuizQuestion> quizQuestions)
-      throws UnexpectedNoAccessRightException {
-    List<Note> distinctHeadNote = quizQuestions.stream().map(QuizQuestion::getHeadNote).toList();
-
-    for (Note headNote : distinctHeadNote) {
-      currentUser.assertAuthorization(headNote.getNotebook());
-    }
-
-    quizQuestions.forEach(
-        x -> {
-          x.reviewed = true;
-          modelFactoryService.save(x);
-        });
   }
 }
