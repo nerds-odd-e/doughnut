@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.doughnut.controllers.dto.NotebookDTO;
 import jakarta.persistence.*;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
@@ -38,6 +39,10 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @NonNull
   private Note headNote;
 
+  @OneToMany(mappedBy = "notebook", cascade = CascadeType.DETACH)
+  @JsonIgnore
+  private final List<Note> notes = new ArrayList<>();
+
   @Column(name = "skip_review_entirely")
   @Getter
   @Setter
@@ -60,5 +65,10 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @NonNull
   public Integer getHeadNoteId() {
     return headNote.getId();
+  }
+
+  @JsonIgnore
+  public List<Note> getNotes() {
+    return Note.filterDeleted(notes);
   }
 }

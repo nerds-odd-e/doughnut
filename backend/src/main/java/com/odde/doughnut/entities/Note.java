@@ -137,7 +137,7 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
     return filterDeleted(refers);
   }
 
-  private static <T extends Note> List<T> filterDeleted(List<T> notes) {
+  public static <T extends Note> List<T> filterDeleted(List<T> notes) {
     return notes.stream().filter(n -> n.getDeletedAt() == null).toList();
   }
 
