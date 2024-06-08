@@ -89,7 +89,7 @@ class RestAiControllerTest {
               new RestAiController(
                       openAiApi,
                       makeMe.modelFactoryService,
-                      makeMe.aNullUserModel(),
+                      makeMe.aNullUserModelPlease(),
                       testabilitySettings)
                   .getCompletion(note, params));
     }
@@ -185,7 +185,7 @@ class RestAiControllerTest {
               new RestAiController(
                       openAiApi,
                       makeMe.modelFactoryService,
-                      makeMe.aNullUserModel(),
+                      makeMe.aNullUserModelPlease(),
                       testabilitySettings)
                   .generateImage("create an image"));
     }

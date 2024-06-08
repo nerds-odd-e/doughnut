@@ -99,7 +99,8 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
     @Test
     void shouldThrowExceptionIfUserDoesNotHaveReadingAuth_whenCallGetGoodTrainingData() {
       controller =
-          new RestFineTuningDataController(modelFactoryService, makeMe.aNullUserModel(), openAiApi);
+          new RestFineTuningDataController(
+              modelFactoryService, makeMe.aNullUserModelPlease(), openAiApi);
       assertThrows(
           UnexpectedNoAccessRightException.class, () -> controller.getAllSuggestedQuestions());
     }

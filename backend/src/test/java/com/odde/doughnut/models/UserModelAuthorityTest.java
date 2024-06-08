@@ -65,7 +65,7 @@ public class UserModelAuthorityTest {
     void userCanNotAccessNotesBelongToCircle() {
       assertThrows(
           ResponseStatusException.class,
-          () -> makeMe.aNullUserModel().assertReadAuthorization(note));
+          () -> makeMe.aNullUserModelPlease().assertReadAuthorization(note));
     }
   }
 }

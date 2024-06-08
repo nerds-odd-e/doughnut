@@ -86,7 +86,7 @@ class RestLinkControllerTests {
 
     @Test
     void userNotLoggedIn() {
-      userModel = makeMe.aNullUserModel();
+      userModel = makeMe.aNullUserModelPlease();
       assertThrows(
           ResponseStatusException.class,
           () ->

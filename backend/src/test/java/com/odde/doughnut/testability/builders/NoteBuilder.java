@@ -111,12 +111,13 @@ public class NoteBuilder extends EntityBuilder<Note> {
   @Override
   protected void afterCreate(boolean needPersist) {
     linkBuilders.forEach(linkBuilder -> linkBuilder.please(needPersist));
-    if (needPersist) makeMe.refresh(entity);
     quizQuestionBuilders.forEach(bu -> bu.please(needPersist));
     childrenBuilders.forEach(bu -> bu.please(needPersist));
-    if (linkBuilders.isEmpty() && quizQuestionBuilders.isEmpty() && childrenBuilders.isEmpty())
-      return;
-    if (needPersist) makeMe.refresh(entity);
+    if (linkBuilders.isEmpty()
+        && quizQuestionBuilders.isEmpty()
+        && childrenBuilders.isEmpty()
+        && !needPersist) return;
+    makeMe.refresh(entity);
   }
 
   public NoteBuilder skipReview() {

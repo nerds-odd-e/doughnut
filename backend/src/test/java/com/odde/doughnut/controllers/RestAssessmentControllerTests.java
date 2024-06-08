@@ -6,9 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.builders.NoteBuilder;
 import com.theokanning.openai.client.OpenAiApi;
 import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,33 +26,32 @@ import org.springframework.web.server.ResponseStatusException;
 @Transactional
 public class RestAssessmentControllerTests {
   @Mock OpenAiApi openAiApi;
-
-  @Autowired ModelFactoryService modelFactoryService;
-
   @Autowired MakeMe makeMe;
-  private UserModel userModel;
-  private Notebook notebook;
-  private Note topNote;
+  private UserModel currentUser;
   private RestAssessmentController controller;
 
   @BeforeEach
   void setup() {
-    userModel = makeMe.aUser().toModelPlease();
-    controller = new RestAssessmentController(openAiApi, makeMe.modelFactoryService, userModel);
+    currentUser = makeMe.aUser().toModelPlease();
+    controller = new RestAssessmentController(openAiApi, makeMe.modelFactoryService, currentUser);
   }
 
   @Nested
   class generateOnlineAssessmentTest {
+    private Notebook notebook;
+    private Note topNote;
+
     @BeforeEach
     void setup() {
-      topNote = makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(userModel).please();
+      topNote = makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser).please();
       notebook = topNote.getNotebook();
     }
 
     @Test
     void whenNotLogin() {
-      userModel = modelFactoryService.toUserModel(null);
-      controller = new RestAssessmentController(openAiApi, makeMe.modelFactoryService, userModel);
+      controller =
+          new RestAssessmentController(
+              openAiApi, makeMe.modelFactoryService, makeMe.aNullUserModelPlease());
       assertThrows(
           ResponseStatusException.class, () -> controller.generateAssessmentQuestions(notebook));
     }
@@ -68,11 +67,11 @@ public class RestAssessmentControllerTests {
 
     @Test
     void shouldBeAbleToAccessNotebookThatIsInTheBazaar() throws UnexpectedNoAccessRightException {
-      User anotherUser = makeMe.aUser().please();
-      Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
-      makeMe.theNote(note).withNChildrenThat(6, noteBuilder -> noteBuilder.hasAQuestion()).please();
-      makeMe.refresh(note.getNotebook());
-      BazaarNotebook bazaarNotebook = makeMe.aBazaarNotebook(note.getNotebook()).please();
+      Note noteOwnedByOtherUser = makeMe.aNote().please();
+      makeMe.theNote(noteOwnedByOtherUser).withNChildrenThat(6, NoteBuilder::hasAQuestion).please();
+      makeMe.refresh(noteOwnedByOtherUser.getNotebook());
+      BazaarNotebook bazaarNotebook =
+          makeMe.aBazaarNotebook(noteOwnedByOtherUser.getNotebook()).please();
       List<QuizQuestion> assessment =
           controller.generateAssessmentQuestions(bazaarNotebook.getNotebook());
       assertEquals(5, assessment.size());
@@ -81,21 +80,15 @@ public class RestAssessmentControllerTests {
     @Test
     void shouldReturn5QuestionsWhenThereAreMoreThan5NotesWithQuestions()
         throws UnexpectedNoAccessRightException {
-      makeMe
-          .theNote(topNote)
-          .withNChildrenThat(5, noteBuilder -> noteBuilder.hasAQuestion())
-          .please();
+      makeMe.theNote(topNote).withNChildrenThat(5, NoteBuilder::hasAQuestion).please();
       makeMe.refresh(notebook);
       List<QuizQuestion> assessment = controller.generateAssessmentQuestions(notebook);
-      assertEquals(assessment.size(), 5);
+      assertEquals(5, assessment.size());
     }
 
     @Test
     void shouldThrowExceptionWhenThereAreNotEnoughQuestions() {
-      makeMe
-          .theNote(topNote)
-          .withNChildrenThat(4, noteBuilder -> noteBuilder.hasAQuestion())
-          .please();
+      makeMe.theNote(topNote).withNChildrenThat(4, NoteBuilder::hasAQuestion).please();
       makeMe.refresh(notebook);
       assertThrows(ApiException.class, () -> controller.generateAssessmentQuestions(notebook));
     }

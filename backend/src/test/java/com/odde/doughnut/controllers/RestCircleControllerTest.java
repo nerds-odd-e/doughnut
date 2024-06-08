@@ -48,7 +48,7 @@ class RestCircleControllerTest {
     void itShouldNotAllowNonMemberToSeeACircle() {
       controller =
           new RestCircleController(
-              modelFactoryService, testabilitySettings, makeMe.aNullUserModel());
+              modelFactoryService, testabilitySettings, makeMe.aNullUserModelPlease());
       assertThrows(
           ResponseStatusException.class,
           () -> {
@@ -100,7 +100,7 @@ class RestCircleControllerTest {
       Circle circle = makeMe.aCircle().please();
       controller =
           new RestCircleController(
-              modelFactoryService, testabilitySettings, makeMe.aNullUserModel());
+              modelFactoryService, testabilitySettings, makeMe.aNullUserModelPlease());
       assertThrows(
           ResponseStatusException.class,
           () -> {

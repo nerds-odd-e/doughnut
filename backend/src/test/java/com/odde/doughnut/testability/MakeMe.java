@@ -101,7 +101,7 @@ public class MakeMe extends MakeMeWithoutDB {
     return new LinkBuilder(this);
   }
 
-  public UserModel aNullUserModel() {
+  public UserModel aNullUserModelPlease() {
     return modelFactoryService.toUserModel(null);
   }
 

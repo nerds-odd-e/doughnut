@@ -77,7 +77,7 @@ class RestReviewPointControllerTest {
 
     @Test
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
-      userModel = makeMe.aNullUserModel();
+      userModel = makeMe.aNullUserModelPlease();
       ReviewPoint reviewPoint = makeMe.aReviewPointFor(makeMe.aNote().please()).inMemoryPlease();
       SelfEvaluation selfEvaluation =
           new SelfEvaluation() {

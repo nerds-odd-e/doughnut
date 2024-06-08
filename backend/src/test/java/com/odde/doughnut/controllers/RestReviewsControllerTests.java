@@ -47,7 +47,7 @@ class RestReviewsControllerTests {
 
   RestReviewsController nullUserController() {
     return new RestReviewsController(
-        modelFactoryService, makeMe.aNullUserModel(), testabilitySettings);
+        modelFactoryService, makeMe.aNullUserModelPlease(), testabilitySettings);
   }
 
   @Nested

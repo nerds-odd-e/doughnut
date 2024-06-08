@@ -64,7 +64,7 @@ class RestQuizQuestionControllerTests {
 
   RestQuizQuestionController nullUserController() {
     return new RestQuizQuestionController(
-        openAiApi, modelFactoryService, makeMe.aNullUserModel(), testabilitySettings);
+        openAiApi, modelFactoryService, makeMe.aNullUserModelPlease(), testabilitySettings);
   }
 
   @Nested
@@ -253,7 +253,7 @@ class RestQuizQuestionControllerTests {
                 new RestQuizQuestionController(
                     openAiApi,
                     makeMe.modelFactoryService,
-                    makeMe.aNullUserModel(),
+                    makeMe.aNullUserModelPlease(),
                     testabilitySettings);
             restAiController.generateQuestion(note);
           });
@@ -312,7 +312,7 @@ class RestQuizQuestionControllerTests {
                 new RestQuizQuestionController(
                     openAiApi,
                     makeMe.modelFactoryService,
-                    makeMe.aNullUserModel(),
+                    makeMe.aNullUserModelPlease(),
                     testabilitySettings);
             restAiController.regenerate(quizQuestion);
           });
@@ -356,7 +356,7 @@ class RestQuizQuestionControllerTests {
                 new RestQuizQuestionController(
                     openAiApi,
                     makeMe.modelFactoryService,
-                    makeMe.aNullUserModel(),
+                    makeMe.aNullUserModelPlease(),
                     testabilitySettings);
             restAiController.contest(quizQuestion);
           });
