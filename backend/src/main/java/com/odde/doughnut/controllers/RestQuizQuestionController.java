@@ -113,10 +113,10 @@ class RestQuizQuestionController {
 
   @PostMapping("/{note}/note-questions")
   @Transactional
-  public boolean addQuestionManually(
+  public QuizQuestion addQuestionManually(
       @PathVariable("note") @Schema(type = "integer") Note note,
       @Valid @RequestBody MCQWithAnswer manualQuestion) {
-    return true;
+    return quizQuestionService.addQuestion(note, manualQuestion);
   }
 
   @GetMapping("/{headNote}/note-book-pending-questions")

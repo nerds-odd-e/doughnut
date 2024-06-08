@@ -20,14 +20,10 @@ public class AiQuestionFactory extends QuizQuestionFactory {
   @Override
   public QuizQuestion buildValidQuizQuestion(QuizQuestionServant servant)
       throws QuizQuestionNotPossibleException {
-    QuizQuestion quizQuestionAIQuestion = new QuizQuestion();
-    quizQuestionAIQuestion.setNote(note);
     MCQWithAnswer MCQWithAnswer = aiQuestionGenerator.getAiGeneratedQuestion(note);
     if (MCQWithAnswer == null) {
       throw new QuizQuestionNotPossibleException();
     }
-    quizQuestionAIQuestion.setMultipleChoicesQuestion(MCQWithAnswer.multipleChoicesQuestion);
-    quizQuestionAIQuestion.setCorrectAnswerIndex(MCQWithAnswer.correctChoiceIndex);
-    return quizQuestionAIQuestion;
+    return QuizQuestion.fromMCQWithAnswer(MCQWithAnswer, note);
   }
 }

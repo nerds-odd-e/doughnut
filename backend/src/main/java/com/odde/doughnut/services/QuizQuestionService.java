@@ -6,6 +6,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.AiQuestionFactory;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
+import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.theokanning.openai.client.OpenAiApi;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -41,5 +42,11 @@ public class QuizQuestionService {
 
   QuizQuestion selectQuizQuestionForANote(Note note) {
     return note.getQuizQuestions().stream().filter(q -> q.approved).findFirst().orElse(null);
+  }
+
+  public QuizQuestion addQuestion(Note note, MCQWithAnswer mcqWithAnswer) {
+    QuizQuestion quizQuestion = QuizQuestion.fromMCQWithAnswer(mcqWithAnswer, note);
+    modelFactoryService.save(quizQuestion);
+    return quizQuestion;
   }
 }

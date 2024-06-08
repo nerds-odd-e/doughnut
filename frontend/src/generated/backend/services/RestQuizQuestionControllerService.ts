@@ -119,13 +119,13 @@ export class RestQuizQuestionControllerService {
     /**
      * @param note
      * @param requestBody
-     * @returns boolean OK
+     * @returns QuizQuestion OK
      * @throws ApiError
      */
     public addQuestionManually(
         note: number,
         requestBody: MCQWithAnswer,
-    ): CancelablePromise<boolean> {
+    ): CancelablePromise<QuizQuestion> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/quiz-questions/{note}/note-questions',

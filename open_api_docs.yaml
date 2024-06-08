@@ -795,7 +795,7 @@ paths:
           content:
             '*/*':
               schema:
-                type: boolean
+                $ref: "#/components/schemas/QuizQuestion"
   /api/quiz-questions/review:
     post:
       tags:

@@ -72,4 +72,12 @@ public class QuizQuestion extends EntityIdentifiedByIdOnly {
   public Note getHeadNote() {
     return getNote().getNotebook().getHeadNote();
   }
+
+  public static QuizQuestion fromMCQWithAnswer(MCQWithAnswer MCQWithAnswer, Note note) {
+    QuizQuestion quizQuestionAIQuestion = new QuizQuestion();
+    quizQuestionAIQuestion.setNote(note);
+    quizQuestionAIQuestion.setMultipleChoicesQuestion(MCQWithAnswer.multipleChoicesQuestion);
+    quizQuestionAIQuestion.setCorrectAnswerIndex(MCQWithAnswer.correctChoiceIndex);
+    return quizQuestionAIQuestion;
+  }
 }

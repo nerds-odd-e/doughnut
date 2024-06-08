@@ -2,7 +2,13 @@
   <div>
     <PopButton btn-class="btn btn-primary" title="Add Question">
       <template #default="{ closer }">
-        <NoteAddQuestion v-bind="{ note }" @close-dialog="closer($event)" />
+        <NoteAddQuestion
+          v-bind="{ note }"
+          @close-dialog="
+            closer($event);
+            questionAdded($event);
+          "
+        />
       </template>
     </PopButton>
     <table class="question-table">
@@ -54,22 +60,22 @@ export default defineComponent({
   },
   data() {
     return {
-      currentQuestion: 1,
       questions: [] as QuizQuestion[],
     };
   },
   methods: {
-    nextQuestion() {
-      if (this.currentQuestion < 2) {
-        this.currentQuestion += 1;
-      }
-    },
     fetchQuestions() {
       this.managedApi.restQuizQuestionController
         .getAllQuizQuestionByNote(this.note.id)
         .then((questions) => {
           this.questions = questions;
         });
+    },
+    questionAdded(newQuestion: QuizQuestion) {
+      if (newQuestion == null) {
+        return;
+      }
+      this.questions.push(newQuestion);
     },
   },
   mounted() {
