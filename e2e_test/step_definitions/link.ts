@@ -44,7 +44,7 @@ When(
 When(
   "there is {string} link between note {string} and {string}",
   (linkType: string, fromNoteTopic: string, toNoteTopic: string) => {
-    start.testability().seedLink(linkType, fromNoteTopic, toNoteTopic)
+    start.testability().injectLink(linkType, fromNoteTopic, toNoteTopic)
   },
 )
 

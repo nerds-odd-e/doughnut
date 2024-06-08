@@ -74,12 +74,12 @@ const testability = () => {
       })
     },
 
-    seedLink(type: string, fromNoteTopic: string, toNoteTopic: string) {
-      cy.get(`@${injectedNoteIdMapAliasName}`).then((seededNoteIdMap) => {
-        expect(seededNoteIdMap).haveOwnPropertyDescriptor(fromNoteTopic)
-        expect(seededNoteIdMap).haveOwnPropertyDescriptor(toNoteTopic)
-        const fromNoteId = seededNoteIdMap[fromNoteTopic]
-        const toNoteId = seededNoteIdMap[toNoteTopic]
+    injectLink(type: string, fromNoteTopic: string, toNoteTopic: string) {
+      cy.get(`@${injectedNoteIdMapAliasName}`).then((injectedNoteIdMap) => {
+        expect(injectedNoteIdMap).haveOwnPropertyDescriptor(fromNoteTopic)
+        expect(injectedNoteIdMap).haveOwnPropertyDescriptor(toNoteTopic)
+        const fromNoteId = injectedNoteIdMap[fromNoteTopic]
+        const toNoteId = injectedNoteIdMap[toNoteTopic]
         postToTestabilityApiSuccessfully(cy, "link_notes", {
           body: {
             type,
@@ -116,12 +116,12 @@ const testability = () => {
     },
 
     getInjectedNoteIdByTitle(noteTopic: string) {
-      return cy.get(`@${injectedNoteIdMapAliasName}`).then((seededNoteIdMap) => {
+      return cy.get(`@${injectedNoteIdMapAliasName}`).then((injectedNoteIdMap) => {
         expect(
-          seededNoteIdMap,
-          `"${noteTopic}" is not in the seeded note. Did you created during the test?`,
+          injectedNoteIdMap,
+          `"${noteTopic}" is not in the injected note. Did you created during the test?`,
         ).haveOwnPropertyDescriptor(noteTopic)
-        return seededNoteIdMap[noteTopic]
+        return injectedNoteIdMap[noteTopic]
       })
     },
 
