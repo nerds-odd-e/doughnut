@@ -6,7 +6,6 @@ import com.odde.doughnut.controllers.dto.NotebookDTO;
 import jakarta.persistence.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
@@ -70,7 +69,7 @@ public class Notebook extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public List<Note> getNotes() {
-    return Collections.unmodifiableList(Note.filterDeleted(notes));
+    return Note.filterDeletedUnmodifiableNoteList(notes);
   }
 
   // Hibernate and JPA does not maintain the consistency of the bidirectional relationships

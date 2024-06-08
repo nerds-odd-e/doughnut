@@ -52,13 +52,9 @@ public class MakeMe extends MakeMeWithoutDB {
   }
 
   public <T> T refresh(T object) {
-    flush();
+    modelFactoryService.entityManager.flush();
     modelFactoryService.entityManager.refresh(object);
     return object;
-  }
-
-  public void flush() {
-    modelFactoryService.entityManager.flush();
   }
 
   public ReviewPointBuilder aReviewPointFor(Note note) {

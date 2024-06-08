@@ -68,7 +68,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
   public NoteBuilder under(Note parentNote) {
     entity.setParentNote(parentNote);
     if (entity.getCreator() == null) creator(parentNote.getCreator());
-    parentNote.getNotebook().addNoteInMemoryToSupportUnitTestOnly(entity);
+    parentNote.addChildInMemoryToSupportUnitTestOnly(entity);
     return this;
   }
 

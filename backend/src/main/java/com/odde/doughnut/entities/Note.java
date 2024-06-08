@@ -128,20 +128,20 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public List<Note> getChildren() {
-    return filterDeleted(children);
+    return filterDeletedUnmodifiableNoteList(children);
   }
 
   @JsonIgnore
   public List<LinkingNote> getLinks() {
-    return filterDeleted(links);
+    return filterDeletedUnmodifiableNoteList(links);
   }
 
   @JsonIgnore
   public List<LinkingNote> getRefers() {
-    return filterDeleted(refers);
+    return filterDeletedUnmodifiableNoteList(refers);
   }
 
-  public static <T extends Note> List<T> filterDeleted(List<T> notes) {
+  public static <T extends Note> List<T> filterDeletedUnmodifiableNoteList(List<T> notes) {
     return notes.stream().filter(n -> n.getDeletedAt() == null).toList();
   }
 
@@ -358,5 +358,13 @@ The note of current focus (in JSON format):
 
   public NoteViewer targetNoteViewer(User user) {
     return new NoteViewer(user, getTargetNote());
+  }
+
+  // Hibernate and JPA does not maintain the consistency of the bidirectional relationships
+  // Here we add the note to the children of note in memory to avoid reload the note from
+  // database
+  public void addChildInMemoryToSupportUnitTestOnly(Note note) {
+    //    this.children.add(note);
+    this.notebook.addNoteInMemoryToSupportUnitTestOnly(note);
   }
 }

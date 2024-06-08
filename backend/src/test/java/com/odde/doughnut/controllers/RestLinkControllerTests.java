@@ -80,7 +80,6 @@ class RestLinkControllerTests {
       Note note3 = makeMe.aNote("flower tea").creatorAndOwner(userModel).please();
       linkCreation.asFirstChild = false;
       controller().linkNoteFinalize(note3, note2, linkCreation, makeMe.successfulBindingResult());
-      makeMe.refresh(note3);
       assertThat(note3.getLinks(), hasSize(1));
     }
 

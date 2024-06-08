@@ -94,7 +94,6 @@ class RestNoteControllerTests {
       User otherUser = makeMe.aUser().please();
       Note note = makeMe.aNote().creatorAndOwner(otherUser).please();
       makeMe.aBazaarNotebook(note.getNotebook()).please();
-      makeMe.refresh(userModel.getEntity());
       final NoteRealm noteRealm = controller.show(note);
       assertThat(noteRealm.getNote().getTopicConstructor(), equalTo(note.getTopicConstructor()));
       assertThat(noteRealm.getFromBazaar(), is(true));
@@ -103,7 +102,6 @@ class RestNoteControllerTests {
     @Test
     void shouldBeAbleToSeeOwnNote() throws UnexpectedNoAccessRightException {
       Note note = makeMe.aNote().creatorAndOwner(userModel).please();
-      makeMe.refresh(userModel.getEntity());
       final NoteRealm noteRealm = controller.show(note);
       assertThat(noteRealm.getId(), equalTo(note.getId()));
       assertThat(noteRealm.getFromBazaar(), is(false));
@@ -128,7 +126,6 @@ class RestNoteControllerTests {
           .forUser(userModel.getEntity())
           .forNotebook(note.getNotebook())
           .please();
-      makeMe.flush();
       makeMe.refresh(userModel.getEntity());
       assertThat(controller.getNoteInfo(note).getNote().getId(), equalTo(note.getId()));
     }

@@ -53,7 +53,6 @@ class RestNoteControllerMotionTests {
     void setup() {
       parent = makeMe.aNote("parent").creatorAndOwner(userModel).please();
       subject = makeMe.theNote(subject).under(parent).please();
-      makeMe.refresh(parent);
     }
 
     @Test
@@ -78,9 +77,9 @@ class RestNoteControllerMotionTests {
 
       @BeforeEach
       void setup() {
-        makeMe.refresh(parent);
         previousOlder = makeMe.aNote("previous older sibling").asFirstChildOf(parent).please();
         previousYounger = makeMe.aNote("previous younger sibling").after(subject).please();
+        // make sure the children are in the right order, by reloading from db
         makeMe.refresh(parent);
       }
 
@@ -118,9 +117,7 @@ class RestNoteControllerMotionTests {
               CyclicLinkDetectedException,
               MovementNotPossibleException {
         Note grand = makeMe.aNote("grand").under(subject).please();
-        makeMe.refresh(subject);
         var noteRealms = controller.moveAfter(grand, subject, "");
-        makeMe.refresh(subject);
         assertThat(grand.getParent(), equalTo(parent));
         assertThat(noteRealms.size(), equalTo(2));
       }
