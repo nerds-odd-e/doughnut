@@ -2055,32 +2055,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/QuizQuestion"
-  /api/quiz-questions/{headNote}/note-book-questions:
-    get:
-      tags:
-      - rest-quiz-question-controller
-      operationId: getAllQuizQuestionByNoteBook
-      parameters:
-      - name: headNote
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/QuizQuestion"
   /api/quiz-questions/{headNote}/note-book-pending-questions:
     get:
       tags:

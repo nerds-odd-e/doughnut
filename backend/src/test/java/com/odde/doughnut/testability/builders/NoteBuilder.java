@@ -1,6 +1,5 @@
 package com.odde.doughnut.testability.builders;
 
-import com.odde.doughnut.controllers.dto.ApiError;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.UserModel;
@@ -11,7 +10,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
-
 import org.apache.logging.log4j.util.Strings;
 
 public class NoteBuilder extends EntityBuilder<Note> {
@@ -116,7 +114,8 @@ public class NoteBuilder extends EntityBuilder<Note> {
     if (needPersist) makeMe.refresh(entity);
     quizQuestionBuilders.forEach(bu -> bu.please(needPersist));
     childrenBuilders.forEach(bu -> bu.please(needPersist));
-    if (linkBuilders.isEmpty() && quizQuestionBuilders.isEmpty() && childrenBuilders.isEmpty()) return;
+    if (linkBuilders.isEmpty() && quizQuestionBuilders.isEmpty() && childrenBuilders.isEmpty())
+      return;
     if (needPersist) makeMe.refresh(entity);
   }
 
@@ -221,9 +220,9 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder hasAnApprovedQuestion() {
-    QuizQuestionBuilder quizQuestionBuilder = makeMe.aQuestion().spellingQuestionOfNote(entity).approveQuestion();
+    QuizQuestionBuilder quizQuestionBuilder =
+        makeMe.aQuestion().spellingQuestionOfNote(entity).approveQuestion();
     this.quizQuestionBuilders.add(quizQuestionBuilder);
     return this;
   }
-
 }

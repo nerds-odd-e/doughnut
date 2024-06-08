@@ -10,7 +10,6 @@ import jakarta.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.util.Objects;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 @Entity
 @Data

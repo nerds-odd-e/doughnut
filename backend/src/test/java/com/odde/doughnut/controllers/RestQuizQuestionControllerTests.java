@@ -392,7 +392,6 @@ class RestQuizQuestionControllerTests {
 
   @Nested
   class GetListOfQuizQuestionForNoteBook {
-    List<QuizQuestion> quizQuestionList = new ArrayList<>();
     Note headNote1;
     Note headNote2;
     Note noteWithoutQuestions;
@@ -412,26 +411,6 @@ class RestQuizQuestionControllerTests {
       noteWithoutQuestions = makeMe.aNote("a note").under(headNote1).please();
       noteWithQuestions = makeMe.aNote("a note with questions").please();
       makeMe.aQuestion().spellingQuestionOfNote(noteWithQuestions).please();
-    }
-
-    @Test
-    void getEmptyListOfQuizQuestions() {
-      List<QuizQuestion> results = controller.getAllQuizQuestionByNoteBook(headNote1);
-      assertThat(results, hasSize(0));
-    }
-
-    @Test
-    void getListOfQuizQuestions() {
-      for (Note note : headNote1.getChildren()) {
-        quizQuestionList.add(makeMe.aQuestion().spellingQuestionOfNote(note).please());
-      }
-      for (Note note : headNote2.getChildren()) {
-        makeMe.aQuestion().spellingQuestionOfNote(note).please();
-      }
-      makeMe.refresh(headNote1);
-      makeMe.refresh(headNote2);
-      List<QuizQuestion> results = controller.getAllQuizQuestionByNoteBook(headNote1);
-      assertThat(results, equalTo(quizQuestionList));
     }
 
     @Test
@@ -486,7 +465,6 @@ class RestQuizQuestionControllerTests {
   @Nested
   class approveQuestionsForAssessment {
 
-    List<QuizQuestion> quizQuestionList = new ArrayList<>();
     Note headNote1;
     Note headNote2;
     Note noteWithoutQuestions;

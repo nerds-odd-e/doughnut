@@ -103,12 +103,6 @@ class RestQuizQuestionController {
         testabilitySettings.getCurrentUTCTimestamp());
   }
 
-  @GetMapping("/{headNote}/note-book-questions")
-  public List<QuizQuestion> getAllQuizQuestionByNoteBook(
-      @PathVariable("headNote") @Schema(type = "integer") Note headNote) {
-    return modelFactoryService.getQuizQuestionsByHeadNote(headNote);
-  }
-
   @GetMapping("/{note}/note-questions")
   public List<QuizQuestion> getAllQuizQuestionByNote(
       @PathVariable("note") @Schema(type = "integer") Note note) {

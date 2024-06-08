@@ -100,11 +100,16 @@ public class RestAssessmentControllerTests {
 
     @Test
     void shouldGetOneQuestionFromEachNoteOnly() {
-      makeMe.theNote(topNote).withNChildrenThat(3, noteBuilder -> {
-        noteBuilder.hasAnApprovedQuestion();
-        noteBuilder.hasAnApprovedQuestion();
-        noteBuilder.hasAnApprovedQuestion();
-      }).please();
+      makeMe
+          .theNote(topNote)
+          .withNChildrenThat(
+              3,
+              noteBuilder -> {
+                noteBuilder.hasAnApprovedQuestion();
+                noteBuilder.hasAnApprovedQuestion();
+                noteBuilder.hasAnApprovedQuestion();
+              })
+          .please();
       makeMe.refresh(notebook);
 
       assertThrows(ApiException.class, () -> controller.generateAssessmentQuestions(notebook));
