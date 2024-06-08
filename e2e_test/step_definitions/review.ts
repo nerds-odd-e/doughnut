@@ -207,11 +207,11 @@ When(
 )
 
 When("I have the true false question {string} rated as a good example", (questionStem: string) => {
-  start.testability().seedSuggestedQuestion(questionStem, true)
+  start.testability().injectSuggestedQuestion(questionStem, true)
 })
 
 When("I have the true false question {string} rated as a bad example", (questionStem: string) => {
-  start.testability().seedSuggestedQuestion(questionStem, false)
+  start.testability().injectSuggestedQuestion(questionStem, false)
 })
 
 Then("I should be asked {string}", (expectedQuestionStem: string) => {

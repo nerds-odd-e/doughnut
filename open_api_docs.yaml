@@ -186,30 +186,6 @@ paths:
             '*/*':
               schema:
                 type: string
-  /api/testability/seed_suggested_questions:
-    post:
-      tags:
-      - testability-rest-controller
-      operationId: seedSuggestedQuestion
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/SeedSuggestedQuestions"
-        required: true
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: string
   /api/testability/replace_service_url:
     post:
       tags:
@@ -276,6 +252,30 @@ paths:
               type: object
               additionalProperties:
                 type: string
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/testability/inject_suggested_questions:
+    post:
+      tags:
+      - testability-rest-controller
+      operationId: injectSuggestedQuestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SuggestedQuestionsData"
         required: true
       responses:
         "500":
@@ -2347,6 +2347,11 @@ components:
       properties:
         travel_to:
           type: string
+    Randomization:
+      type: object
+      properties:
+        choose:
+          type: string
     MCQWithAnswer:
       required:
       - correctChoiceIndex
@@ -2385,7 +2390,7 @@ components:
           type: boolean
         realCorrectAnswers:
           type: string
-    SeedSuggestedQuestions:
+    SuggestedQuestionsData:
       type: object
       properties:
         examples:
@@ -2393,11 +2398,6 @@ components:
           writeOnly: true
           items:
             $ref: "#/components/schemas/QuestionSuggestionParams"
-    Randomization:
-      type: object
-      properties:
-        choose:
-          type: string
     QuizQuestionTestData:
       type: object
       properties:

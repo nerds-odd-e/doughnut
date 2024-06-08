@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { QuestionSuggestionParams } from './QuestionSuggestionParams';
-export type SeedSuggestedQuestions = {
+export type SuggestedQuestionsData = {
     examples?: Array<QuestionSuggestionParams>;
 };
 

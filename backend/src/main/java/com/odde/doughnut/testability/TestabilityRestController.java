@@ -120,16 +120,16 @@ class TestabilityRestController {
         Map<String, Note> titleNoteMap,
         ModelFactoryService modelFactoryService) {
       noteTestData.forEach(
-          seed -> {
-            Note note = titleNoteMap.get(seed.topicConstructor);
+          injection -> {
+            Note note = titleNoteMap.get(injection.topicConstructor);
 
-            if (Strings.isBlank(seed.parentTopic)) {
+            if (Strings.isBlank(injection.parentTopic)) {
               note.buildNotebookForHeadNote(ownership, user);
               modelFactoryService.save(note.getNotebook());
             } else {
               note.setParentNote(
                   getParentNote(
-                      titleNoteMap, modelFactoryService.noteRepository, seed.parentTopic));
+                      titleNoteMap, modelFactoryService.noteRepository, injection.parentTopic));
             }
           });
     }
@@ -244,14 +244,14 @@ class TestabilityRestController {
     return "OK";
   }
 
-  static class SeedSuggestedQuestions {
+  static class SuggestedQuestionsData {
     @Setter private List<QuestionSuggestionParams> examples;
   }
 
-  @PostMapping("/seed_suggested_questions")
+  @PostMapping("/inject_suggested_questions")
   @Transactional
-  public String seedSuggestedQuestion(@RequestBody SeedSuggestedQuestions seed) {
-    seed.examples.forEach(
+  public String injectSuggestedQuestion(@RequestBody SuggestedQuestionsData testData) {
+    testData.examples.forEach(
         example -> {
           SuggestedQuestionForFineTuning suggestion = new SuggestedQuestionForFineTuning();
           suggestion.setUser(currentUser.getEntity());

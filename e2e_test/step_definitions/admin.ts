@@ -103,7 +103,7 @@ Given(
       },
     }))
 
-    start.testability().seedSuggestedQuestions(positives.concat(negatives))
+    start.testability().injectSuggestedQuestions(positives.concat(negatives))
   },
 )
 

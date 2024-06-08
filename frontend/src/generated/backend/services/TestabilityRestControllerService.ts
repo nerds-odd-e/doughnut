@@ -6,7 +6,7 @@ import type { NotesTestData } from '../models/NotesTestData';
 import type { QuizQuestion } from '../models/QuizQuestion';
 import type { QuizQuestionsTestData } from '../models/QuizQuestionsTestData';
 import type { Randomization } from '../models/Randomization';
-import type { SeedSuggestedQuestions } from '../models/SeedSuggestedQuestions';
+import type { SuggestedQuestionsData } from '../models/SuggestedQuestionsData';
 import type { TimeTravel } from '../models/TimeTravel';
 import type { TimeTravelRelativeToNow } from '../models/TimeTravelRelativeToNow';
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -116,24 +116,6 @@ export class TestabilityRestControllerService {
      * @returns string OK
      * @throws ApiError
      */
-    public seedSuggestedQuestion(
-        requestBody: SeedSuggestedQuestions,
-    ): CancelablePromise<string> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/api/testability/seed_suggested_questions',
-            body: requestBody,
-            mediaType: 'application/json',
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * @param requestBody
-     * @returns string OK
-     * @throws ApiError
-     */
     public replaceServiceUrl(
         requestBody: Record<string, string>,
     ): CancelablePromise<Record<string, string>> {
@@ -176,6 +158,24 @@ export class TestabilityRestControllerService {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/testability/link_notes',
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param requestBody
+     * @returns string OK
+     * @throws ApiError
+     */
+    public injectSuggestedQuestion(
+        requestBody: SuggestedQuestionsData,
+    ): CancelablePromise<string> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/testability/inject_suggested_questions',
             body: requestBody,
             mediaType: 'application/json',
             errors: {

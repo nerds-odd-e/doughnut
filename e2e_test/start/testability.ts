@@ -39,7 +39,7 @@ const cleanAndReset = (cy: Cypress.cy & CyEventEmitter, countdown: number) => {
   })
 }
 
-const seededNoteIdMapAliasName = "seededNoteIdMap"
+const injectedNoteIdMapAliasName = "injectedNoteIdMap"
 const seededQuizQuestionIdMapAliasName = "seededQuizQuestionIdMap"
 
 const testability = () => {
@@ -61,7 +61,7 @@ const testability = () => {
         },
       }).then((response) => {
         expect(Object.keys(response.body).length).to.equal(noteTestData.length)
-        cy.wrap(response.body).as(seededNoteIdMapAliasName)
+        cy.wrap(response.body).as(injectedNoteIdMapAliasName)
       })
     },
 
@@ -77,7 +77,7 @@ const testability = () => {
     },
 
     seedLink(type: string, fromNoteTopic: string, toNoteTopic: string) {
-      cy.get(`@${seededNoteIdMapAliasName}`).then((seededNoteIdMap) => {
+      cy.get(`@${injectedNoteIdMapAliasName}`).then((seededNoteIdMap) => {
         expect(seededNoteIdMap).haveOwnPropertyDescriptor(fromNoteTopic)
         expect(seededNoteIdMap).haveOwnPropertyDescriptor(toNoteTopic)
         const fromNoteId = seededNoteIdMap[fromNoteTopic]
@@ -92,16 +92,16 @@ const testability = () => {
       })
     },
 
-    seedSuggestedQuestions(examples: Array<QuestionSuggestionParams>) {
-      postToTestabilityApiSuccessfully(cy, "seed_suggested_questions", {
+    injectSuggestedQuestions(examples: Array<QuestionSuggestionParams>) {
+      postToTestabilityApiSuccessfully(cy, "inject_suggested_questions", {
         body: {
           examples,
         },
       })
     },
 
-    seedSuggestedQuestion(questionStem: string, positiveFeedback: boolean) {
-      this.seedSuggestedQuestions([
+    injectSuggestedQuestion(questionStem: string, positiveFeedback: boolean) {
+      this.injectSuggestedQuestions([
         {
           positiveFeedback,
           preservedNoteContent: "note content",
@@ -117,8 +117,8 @@ const testability = () => {
       ])
     },
 
-    getSeededNoteIdByTitle(noteTopic: string) {
-      return cy.get(`@${seededNoteIdMapAliasName}`).then((seededNoteIdMap) => {
+    getInjectedNoteIdByTitle(noteTopic: string) {
+      return cy.get(`@${injectedNoteIdMapAliasName}`).then((seededNoteIdMap) => {
         expect(
           seededNoteIdMap,
           `"${noteTopic}" is not in the seeded note. Did you created during the test?`,

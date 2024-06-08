@@ -25,7 +25,7 @@ export default {
   //    it uses the note id memorized when creating them with testability api
   jumpToNotePage: (noteTopic: string, forceLoadPage = false) => {
     testability()
-      .getSeededNoteIdByTitle(noteTopic)
+      .getInjectedNoteIdByTitle(noteTopic)
       .then((noteId) => {
         const url = `/notes/${noteId}`
         if (forceLoadPage) cy.visit(url)
