@@ -2415,10 +2415,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SeedQuizQuestion"
-        externalIdentifier:
-          type: string
-        circleName:
-          type: string
     ImageWithMask:
       type: object
       properties:

@@ -5,7 +5,5 @@
 import type { SeedQuizQuestion } from './SeedQuizQuestion';
 export type SeedQuizQuestions = {
     seedQuizQuestions?: Array<SeedQuizQuestion>;
-    externalIdentifier?: string;
-    circleName?: string;
 };
 

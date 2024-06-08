@@ -11,13 +11,7 @@ import lombok.Setter;
 
 @Data
 public class SeedQuizQuestions {
-  // initialize a variable of noteTitleNotesMap<notebook title, notes>
-  // private function to fetch the data from database and build the noteTitleNotesMap
-  // tbc, to check if there are at least 5 questions from different 5 notes
-  //
   private List<SeedQuizQuestion> seedQuizQuestions;
-  private String externalIdentifier;
-  private String circleName;
 
   @Setter
   static class SeedQuizQuestion {

@@ -14,7 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class QuizQuestionService {
   private final ModelFactoryService modelFactoryService;
 
-  private AiQuestionGenerator aiQuestionGenerator;
+  private final AiQuestionGenerator aiQuestionGenerator;
 
   public QuizQuestionService(OpenAiApi openAiApi, ModelFactoryService modelFactoryService) {
     this.modelFactoryService = modelFactoryService;
