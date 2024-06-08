@@ -38,4 +38,11 @@ public class QuizQuestionService {
         .filter(x -> !x.isApproved() && !x.isReviewed())
         .toList();
   }
+
+  QuizQuestion selectQuizQuestionForANote(Note note) {
+    return this.modelFactoryService.getQuizQuestionsByNote(note).stream()
+        .filter(q -> q.approved)
+        .findFirst()
+        .orElse(null);
+  }
 }

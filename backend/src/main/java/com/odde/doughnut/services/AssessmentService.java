@@ -2,7 +2,6 @@ package com.odde.doughnut.services;
 
 import static com.odde.doughnut.controllers.dto.ApiError.ErrorType.ASSESSMENT_SERVICE_ERROR;
 
-import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.exceptions.ApiException;
@@ -12,19 +11,10 @@ import java.util.List;
 import java.util.Objects;
 
 public class AssessmentService {
-  private final ModelFactoryService modelFactoryService;
   private final QuizQuestionService quizQuestionService;
 
   public AssessmentService(OpenAiApi openAiApi, ModelFactoryService modelFactoryService) {
     this.quizQuestionService = new QuizQuestionService(openAiApi, modelFactoryService);
-    this.modelFactoryService = modelFactoryService;
-  }
-
-  private QuizQuestion getQuizQuestion(Note note) {
-    return this.modelFactoryService.getQuizQuestionsByNote(note).stream()
-        .filter(q -> q.approved)
-        .findFirst()
-        .orElse(null);
   }
 
   public List<QuizQuestion> generateAssessment(Notebook notebook, boolean newAIQuestionsOnly) {
@@ -34,7 +24,7 @@ public class AssessmentService {
                 n ->
                     newAIQuestionsOnly
                         ? quizQuestionService.generateAIQuestion(n)
-                        : getQuizQuestion(n))
+                        : quizQuestionService.selectQuizQuestionForANote(n))
             .filter(Objects::nonNull)
             .limit(5)
             .toList();
