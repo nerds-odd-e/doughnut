@@ -106,10 +106,10 @@ public class RestAssessmentControllerTests {
     }
 
     @Test
-    void shouldReturnEmptyListWhenThereAreLessThan5Notes() throws UnexpectedNoAccessRightException {
+    void shouldReturnEmptyListWhenThereAreLessThan5Notes() {
       makeMe.theNote(topNote).withNChildren(4);
       makeMe.refresh(notebook);
-      assertEquals(controller.generateAiQuestions(notebook), new ArrayList<>());
+      assertThrows(ApiException.class, () -> controller.generateAiQuestions(notebook));
     }
 
     @Test

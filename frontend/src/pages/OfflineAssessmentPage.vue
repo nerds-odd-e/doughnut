@@ -53,11 +53,10 @@ export default defineComponent({
       this.managedApi.restAssessmentController
         .generateAiQuestions(this.notebookId)
         .then((response) => {
-          if (!response || response.length === 0) {
-            this.noAssessmentQuestions = true;
-          } else {
-            this.result = response;
-          }
+          this.result = response;
+        })
+        .catch(() => {
+          this.noAssessmentQuestions = true;
         });
     },
   },

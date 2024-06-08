@@ -13,7 +13,6 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.QuizQuestionService;
 import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -51,11 +50,16 @@ class RestAssessmentController {
             .limit(5)
             .collect((Collectors.toList()));
 
-    if (notes.size() < 5) {
-      return new ArrayList<>();
+    List<QuizQuestion> questions =
+        notes.stream().map(quizQuestionService::generateAIQuestion).collect((toList()));
+    if (questions.size() < 5) {
+      throw new ApiException(
+          "Not enough approved questions",
+          ASSESSMENT_SERVICE_ERROR,
+          "Not enough approved questions");
     }
 
-    return notes.stream().map(quizQuestionService::generateAIQuestion).collect((toList()));
+    return questions;
   }
 
   @GetMapping("/questions/{notebook}")
