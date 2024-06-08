@@ -14,7 +14,8 @@ import com.odde.doughnut.services.QuizQuestionService;
 import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
+import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -44,14 +45,12 @@ class RestAssessmentController {
     currentUser.assertLoggedIn();
     currentUser.assertReadAuthorization(notebook);
 
-    List<Note> notes =
-        notebook.getNotes().stream()
-            .filter(note -> note.getParent() != null)
-            .limit(5)
-            .collect((Collectors.toList()));
+    Function<Note, QuizQuestion> generateAIQuestion = quizQuestionService::generateAIQuestion;
 
-    List<QuizQuestion> questions =
-        notes.stream().map(quizQuestionService::generateAIQuestion).collect((toList()));
+    List<Note> notes =
+        notebook.getNotes().stream().filter(note -> note.getParent() != null).limit(5).toList();
+
+    List<QuizQuestion> questions = notes.stream().map(generateAIQuestion).collect((toList()));
     if (questions.size() < 5) {
       throw new ApiException(
           "Not enough approved questions",
@@ -71,16 +70,14 @@ class RestAssessmentController {
 
     List<QuizQuestion> filteredQuestionList =
         notebook.getNotes().stream()
-            .map(modelFactoryService::getQuizQuestionsByNote)
-            .flatMap(List::stream)
-            .filter(question -> question.approved)
-            .collect(
-                Collectors.groupingBy(
-                    s -> s.getNote().getId(),
-                    Collectors.collectingAndThen(
-                        Collectors.mapping(q -> q, Collectors.toList()), List::getFirst)))
-            .values()
-            .stream()
+            .map(
+                note ->
+                    modelFactoryService.getQuizQuestionsByNote(note).stream()
+                        .filter(q -> q.approved)
+                        .findFirst()
+                        .orElse(null))
+            .filter(Objects::nonNull)
+            .limit(5)
             .toList();
 
     if (filteredQuestionList.size() < 5) {
