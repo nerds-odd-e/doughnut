@@ -31,7 +31,9 @@
             <td
               v-for="(choice, index) in question.multipleChoicesQuestion
                 .choices"
-              :class="{ 'correct-choice': index === 0 }"
+              :class="{
+                'correct-choice': index === question.correctAnswerIndex,
+              }"
               :key="index"
             >
               {{ choice }}

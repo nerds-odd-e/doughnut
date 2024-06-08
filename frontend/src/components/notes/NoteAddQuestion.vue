@@ -1,45 +1,55 @@
 <template>
   <div>
-    <label for="question">Question:</label>
-    <TextArea id="question" rows="2" v-model="question" /><br />
+    <TextArea
+      rows="2"
+      field="stem"
+      v-model="mcqWithAnswer.multipleChoicesQuestion.stem"
+    /><br />
 
-    <div v-for="(_, index) in options" :key="index">
-      <div v-if="index == 0">
-        <label :for="'option' + (index + 1)">Option 1 (Correct Answer)</label>
-        <TextArea
-          :id="'option' + (index + 1)"
-          :rows="1"
-          v-model="options[index]"
-        />
-      </div>
-      <div v-else>
-        <label :for="'option' + (index + 1)">Option {{ index + 1 }}</label>
-        <TextArea
-          :id="'option' + (index + 1)"
-          :rows="1"
-          v-model="options[index]"
-        />
-      </div>
+    <div
+      v-for="(_, index) in mcqWithAnswer.multipleChoicesQuestion.choices"
+      :key="index"
+    >
+      <TextArea
+        :field="'choice ' + index"
+        :rows="1"
+        v-model="mcqWithAnswer.multipleChoicesQuestion.choices[index]"
+      />
       <br />
     </div>
 
-    <button @click="addOption" :disabled="options.length >= maxOptions">
+    <TextInput
+      rows="2"
+      field="correctChoiceIndex"
+      v-model="mcqWithAnswer.correctChoiceIndex"
+    /><br />
+
+    <button
+      @click="addOption"
+      :disabled="
+        mcqWithAnswer.multipleChoicesQuestion.choices.length >= maxOptions
+      "
+    >
       +
     </button>
-    <button @click="removeOption" :disabled="options.length <= minOptions">
+    <button
+      @click="removeOption"
+      :disabled="
+        mcqWithAnswer.multipleChoicesQuestion.choices.length <= minOptions
+      "
+    >
       -
     </button>
     <button @click="submitQuestion" :disabled="isInvalidQuestion">
       Submit
     </button>
-    <span v-if="showAlert">{{ addQuestionManuallyResultMsg }}</span>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import useLoadingApi from "@/managedApi/useLoadingApi";
-import { ApiError, Note, MCQWithAnswer } from "@/generated/backend";
+import { Note, MCQWithAnswer } from "@/generated/backend";
 import TextArea from "../form/TextArea.vue";
 
 export default defineComponent({
@@ -54,64 +64,61 @@ export default defineComponent({
   },
   data() {
     return {
-      question: "", // Initialize the question data property
-      options: ["", ""], // Initialize with two options
+      mcqWithAnswer: <MCQWithAnswer>{
+        correctChoiceIndex: 0,
+        multipleChoicesQuestion: {
+          stem: "",
+          choices: ["", ""],
+        },
+      },
       minOptions: 2, // Minimum number of options
       maxOptions: 10, // Maximum number of options
-      placeHolder: { type: "Correct Answer", default: "-" },
-      addQuestionManuallyResultMsg: "",
-      showAlert: false,
     };
   },
   emits: ["close-dialog"],
   computed: {
     isInvalidQuestion() {
-      // Check if any question or option is null or empty
-      if (this.question.trim().length === 0) {
+      if (
+        this.mcqWithAnswer.multipleChoicesQuestion.stem?.trim().length === 0
+      ) {
         return true;
       }
-      return this.options.some((option) => option.trim().length === 0);
+      return (
+        this.mcqWithAnswer.multipleChoicesQuestion.choices.some(
+          (option) => option.trim().length === 0,
+        ) ||
+        this.mcqWithAnswer.correctChoiceIndex < 0 ||
+        this.mcqWithAnswer.correctChoiceIndex >=
+          this.mcqWithAnswer.multipleChoicesQuestion.choices.length
+      );
     },
   },
   methods: {
     addOption() {
-      if (this.options.length < this.maxOptions) {
-        this.options.push("");
+      if (
+        this.mcqWithAnswer.multipleChoicesQuestion.choices.length <
+        this.maxOptions
+      ) {
+        this.mcqWithAnswer.multipleChoicesQuestion.choices.push("");
       }
     },
 
     removeOption() {
-      if (this.options.length > this.minOptions) {
-        this.options.pop();
+      if (
+        this.mcqWithAnswer.multipleChoicesQuestion.choices.length >
+        this.minOptions
+      ) {
+        this.mcqWithAnswer.multipleChoicesQuestion.choices.pop();
       }
-    },
-    convertFormResponseToMultipleChoice(): MCQWithAnswer {
-      const quizQuestion: MCQWithAnswer = {
-        correctChoiceIndex: 0,
-        multipleChoicesQuestion: {
-          stem: this.question,
-          choices: this.options,
-        },
-      };
-
-      return quizQuestion;
     },
     async submitQuestion() {
-      try {
-        const quizQuestion = this.convertFormResponseToMultipleChoice();
-        const response =
-          await this.managedApi.restQuizQuestionController.addQuestionManually(
-            this.note.id,
-            quizQuestion,
-          );
-        this.showAlert = !response;
-        this.addQuestionManuallyResultMsg = "";
-        this.$emit("close-dialog", response);
-      } catch (error) {
-        const errorInstance = error as ApiError;
-        this.addQuestionManuallyResultMsg = errorInstance.body?.message;
-        this.showAlert = true;
-      }
+      const quizQuestion = this.mcqWithAnswer;
+      const response =
+        await this.managedApi.restQuizQuestionController.addQuestionManually(
+          this.note.id,
+          quizQuestion,
+        );
+      this.$emit("close-dialog", response);
     },
   },
 });

@@ -2,16 +2,13 @@ export const questionListPage = () => {
   return {
     addQuestion(row: Record<string, string>) {
       cy.findByRole("button", { name: "Add Question" }).click()
-      cy.get("label").contains("Question:").next().as("questionTextarea")
-      cy.get("@questionTextarea").type(row?.["Question"] as string)
-      cy.get("label").contains("Option 1 (Correct Answer)").next().as("questionTextarea")
-      cy.get("@questionTextarea").type(row?.["Correct Choice"] as string)
-      cy.get("label").contains("Option 2").next().as("questionTextarea")
-      cy.get("@questionTextarea").type(row?.["Incorrect Choice 1"] as string)
-      cy.get("button").contains("+").click()
-      cy.get("label").contains("Option 3").next().as("questionTextarea")
-      cy.get("@questionTextarea").type(row?.["Incorrect Choice 2"] as string)
-      cy.get("button").contains("Submit").click()
+      cy.findByLabelText("Stem").type(row["Question"]!)
+      cy.findByLabelText("Choice 0").type(row["Incorrect Choice 1"]!)
+      cy.findByLabelText("Choice 1").type(row["Incorrect Choice 2"]!)
+      cy.findByRole("button", { name: "+" }).click()
+      cy.findByLabelText("Choice 2").type(row["Correct Choice"]!)
+      cy.findByLabelText("Correct Choice Index").clear().type("2")
+      cy.findByRole("button", { name: "Submit" }).click()
     },
     expectQuestion(row: Record<string, string>) {
       cy.findByText(row["Question"]!)
