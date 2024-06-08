@@ -4,10 +4,10 @@
 /* eslint-disable */
 import type { AnswerDTO } from '../models/AnswerDTO';
 import type { AnsweredQuestion } from '../models/AnsweredQuestion';
+import type { MCQWithAnswer } from '../models/MCQWithAnswer';
 import type { QuestionSuggestionCreationParams } from '../models/QuestionSuggestionCreationParams';
 import type { QuizQuestion } from '../models/QuizQuestion';
 import type { QuizQuestionContestResult } from '../models/QuizQuestionContestResult';
-import type { QuizQuestionCreationParams } from '../models/QuizQuestionCreationParams';
 import type { SuggestedQuestionForFineTuning } from '../models/SuggestedQuestionForFineTuning';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -124,7 +124,7 @@ export class RestQuizQuestionControllerService {
      */
     public addQuestionManually(
         note: number,
-        requestBody: QuizQuestionCreationParams,
+        requestBody: MCQWithAnswer,
     ): CancelablePromise<boolean> {
         return this.httpRequest.request({
             method: 'POST',

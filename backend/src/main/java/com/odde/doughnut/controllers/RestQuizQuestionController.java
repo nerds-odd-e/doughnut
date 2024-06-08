@@ -3,7 +3,6 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.QuestionSuggestionCreationParams;
 import com.odde.doughnut.controllers.dto.QuizQuestionContestResult;
-import com.odde.doughnut.controllers.dto.QuizQuestionCreationParams;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -12,6 +11,7 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.QuizQuestionService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
+import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -119,7 +119,7 @@ class RestQuizQuestionController {
   @Transactional
   public boolean addQuestionManually(
       @PathVariable("note") @Schema(type = "integer") Note note,
-      @Valid @RequestBody QuizQuestionCreationParams manualQuestion) {
+      @Valid @RequestBody MCQWithAnswer manualQuestion) {
     return true;
   }
 

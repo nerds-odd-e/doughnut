@@ -39,11 +39,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import useLoadingApi from "@/managedApi/useLoadingApi";
-import {
-  ApiError,
-  Note,
-  QuizQuestionCreationParams,
-} from "@/generated/backend";
+import { ApiError, Note, MCQWithAnswer } from "@/generated/backend";
 import TextArea from "../form/TextArea.vue";
 
 export default defineComponent({
@@ -88,12 +84,9 @@ export default defineComponent({
         this.options.pop();
       }
     },
-    convertFormResponseToMultipleChoice(
-      note: Note,
-    ): QuizQuestionCreationParams {
-      const quizQuestion: QuizQuestionCreationParams = {
-        noteId: note.id,
-        correctAnswerIndex: 0,
+    convertFormResponseToMultipleChoice(): MCQWithAnswer {
+      const quizQuestion: MCQWithAnswer = {
+        correctChoiceIndex: 0,
         multipleChoicesQuestion: {
           stem: this.question,
           choices: this.options,
@@ -104,9 +97,7 @@ export default defineComponent({
     },
     async submitQuestion() {
       try {
-        const quizQuestion = this.convertFormResponseToMultipleChoice(
-          this.note,
-        );
+        const quizQuestion = this.convertFormResponseToMultipleChoice();
         const response =
           await this.managedApi.restQuizQuestionController.addQuestionManually(
             this.note.id,

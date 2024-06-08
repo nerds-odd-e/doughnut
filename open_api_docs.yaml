@@ -781,7 +781,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/QuizQuestionCreationParams"
+              $ref: "#/components/schemas/MCQWithAnswer"
         required: true
       responses:
         "500":
@@ -2822,17 +2822,6 @@ components:
           $ref: "#/components/schemas/ReviewPoint"
         quizQuestion:
           $ref: "#/components/schemas/QuizQuestion"
-    QuizQuestionCreationParams:
-      type: object
-      properties:
-        noteId:
-          type: integer
-          format: int32
-        correctAnswerIndex:
-          type: integer
-          format: int32
-        multipleChoicesQuestion:
-          $ref: "#/components/schemas/MultipleChoicesQuestion"
     NoteCreationDTO:
       required:
       - topicConstructor

@@ -55,7 +55,6 @@ export type { QuestionSuggestionCreationParams } from './models/QuestionSuggesti
 export type { QuestionSuggestionParams } from './models/QuestionSuggestionParams';
 export type { QuizQuestion } from './models/QuizQuestion';
 export type { QuizQuestionContestResult } from './models/QuizQuestionContestResult';
-export type { QuizQuestionCreationParams } from './models/QuizQuestionCreationParams';
 export type { Randomization } from './models/Randomization';
 export type { RedirectToNoteResponse } from './models/RedirectToNoteResponse';
 export type { ReviewPoint } from './models/ReviewPoint';
