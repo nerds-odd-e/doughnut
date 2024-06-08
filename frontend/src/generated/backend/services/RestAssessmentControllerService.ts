@@ -12,25 +12,6 @@ export class RestAssessmentControllerService {
      * @returns QuizQuestion OK
      * @throws ApiError
      */
-    public generateAiQuestions(
-        notebook: number,
-    ): CancelablePromise<Array<QuizQuestion>> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/api/assessment/ai-questions/{notebook}',
-            path: {
-                'notebook': notebook,
-            },
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * @param notebook
-     * @returns QuizQuestion OK
-     * @throws ApiError
-     */
     public generateAssessmentQuestions(
         notebook: number,
     ): CancelablePromise<Array<QuizQuestion>> {

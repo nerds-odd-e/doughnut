@@ -10,7 +10,6 @@ import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -27,17 +26,6 @@ class RestAssessmentController {
     this.assessmentService = new AssessmentService(openAiApi, modelFactoryService);
   }
 
-  @PostMapping("/ai-questions/{notebook}")
-  @Transactional
-  public List<QuizQuestion> generateAiQuestions(
-      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
-      throws UnexpectedNoAccessRightException {
-    currentUser.assertLoggedIn();
-    currentUser.assertReadAuthorization(notebook);
-
-    return assessmentService.generateAssessment(notebook, true);
-  }
-
   @GetMapping("/questions/{notebook}")
   public List<QuizQuestion> generateAssessmentQuestions(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
@@ -45,6 +33,6 @@ class RestAssessmentController {
     currentUser.assertLoggedIn();
     currentUser.assertReadAuthorization(notebook);
 
-    return assessmentService.generateAssessment(notebook, false);
+    return assessmentService.generateAssessment(notebook);
   }
 }

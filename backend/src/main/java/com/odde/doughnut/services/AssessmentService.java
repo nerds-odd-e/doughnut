@@ -17,14 +17,10 @@ public class AssessmentService {
     this.quizQuestionService = new QuizQuestionService(openAiApi, modelFactoryService);
   }
 
-  public List<QuizQuestion> generateAssessment(Notebook notebook, boolean newAIQuestionsOnly) {
+  public List<QuizQuestion> generateAssessment(Notebook notebook) {
     List<QuizQuestion> questions =
         notebook.getNotes().stream()
-            .map(
-                n ->
-                    newAIQuestionsOnly
-                        ? quizQuestionService.generateAIQuestion(n)
-                        : quizQuestionService.selectQuizQuestionForANote(n))
+            .map(quizQuestionService::selectQuizQuestionForANote)
             .filter(Objects::nonNull)
             .limit(5)
             .toList();

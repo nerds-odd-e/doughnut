@@ -8,9 +8,7 @@ import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.MakeMe;
-import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.theokanning.openai.client.OpenAiApi;
 import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,93 +34,11 @@ public class RestAssessmentControllerTests {
   private Notebook notebook;
   private Note topNote;
   private RestAssessmentController controller;
-  OpenAIChatCompletionMock openAIChatCompletionMock;
 
   @BeforeEach
   void setup() {
-    openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
     userModel = makeMe.aUser().toModelPlease();
     controller = new RestAssessmentController(openAiApi, makeMe.modelFactoryService, userModel);
-  }
-
-  @Nested
-  class generateOfflineAssessmentTest {
-    @BeforeEach
-    void setup() {
-      MCQWithAnswer jsonQuestion =
-          makeMe
-              .aMCQWithAnswer()
-              .stem("What is the first color in the rainbow?")
-              .choices("red", "black", "green")
-              .correctChoiceIndex(0)
-              .please();
-      topNote = makeMe.aNote().creatorAndOwner(userModel).please();
-      notebook = topNote.getNotebook();
-      openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(jsonQuestion, "");
-    }
-
-    @Test
-    void whenNotLogin() {
-      userModel = modelFactoryService.toUserModel(null);
-      controller = new RestAssessmentController(openAiApi, makeMe.modelFactoryService, userModel);
-      assertThrows(ResponseStatusException.class, () -> controller.generateAiQuestions(notebook));
-    }
-
-    @Test
-    void shouldBeAbleToAccessNotebookThatIsInTheBazaar() throws UnexpectedNoAccessRightException {
-      User anotherUser = makeMe.aUser().please();
-      Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
-      makeMe.theNote(note).withNChildren(5);
-      makeMe.refresh(note.getNotebook());
-      BazaarNotebook bazaarNotebook = makeMe.aBazaarNotebook(note.getNotebook()).please();
-      List<QuizQuestion> assessment = controller.generateAiQuestions(bazaarNotebook.getNotebook());
-      assertEquals(5, assessment.size());
-    }
-
-    @Test
-    void shouldNotBeAbleToAccessNotebookThatIsNotInTheBazaar() {
-      User anotherUser = makeMe.aUser().please();
-      Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
-      assertThrows(
-          UnexpectedNoAccessRightException.class,
-          () -> controller.generateAiQuestions(note.getNotebook()));
-    }
-
-    @Test
-    void shouldReturn5QuestionsWhenThereAre5Notes() throws UnexpectedNoAccessRightException {
-      makeMe.theNote(topNote).withNChildren(5);
-      makeMe.refresh(notebook);
-      List<QuizQuestion> assessment = controller.generateAiQuestions(notebook);
-      assertEquals(5, assessment.size());
-    }
-
-    @Test
-    void shouldReturn5QuestionsWhenThereAreMoreThan5Notes()
-        throws UnexpectedNoAccessRightException {
-      makeMe.theNote(topNote).withNChildren(10);
-      makeMe.refresh(notebook);
-      List<QuizQuestion> assessment = controller.generateAiQuestions(notebook);
-      assertEquals(5, assessment.size());
-    }
-
-    @Test
-    void shouldReturnEmptyListWhenThereAreLessThan5Notes() {
-      makeMe.theNote(topNote).withNChildren(3);
-      makeMe.refresh(notebook);
-      assertThrows(ApiException.class, () -> controller.generateAiQuestions(notebook));
-    }
-
-    @Test
-    void shouldReturn5QuestionsWhenThereAreMoreThan5SubNotesInTotal()
-        throws UnexpectedNoAccessRightException {
-      makeMe.theNote(topNote).withNChildren(2);
-      makeMe.refresh(topNote);
-      Note firstChild = topNote.getChildren().get(0);
-      makeMe.theNote(firstChild).withNChildren(3);
-      makeMe.refresh(notebook);
-      List<QuizQuestion> assessment = controller.generateAiQuestions(notebook);
-      assertEquals(5, assessment.size());
-    }
   }
 
   @Nested
@@ -148,6 +64,22 @@ public class RestAssessmentControllerTests {
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.generateAssessmentQuestions(notebook));
+    }
+
+    @Test
+    void shouldBeAbleToAccessNotebookThatIsInTheBazaar() throws UnexpectedNoAccessRightException {
+      User anotherUser = makeMe.aUser().please();
+      Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
+      makeMe.theNote(note).withNChildren(6);
+      makeMe.refresh(note);
+      for (Note n : note.getChildren()) {
+        makeMe.aQuestion().spellingQuestionOfNote(n).approveQuestion().please();
+      }
+      makeMe.refresh(note.getNotebook());
+      BazaarNotebook bazaarNotebook = makeMe.aBazaarNotebook(note.getNotebook()).please();
+      List<QuizQuestion> assessment =
+          controller.generateAssessmentQuestions(bazaarNotebook.getNotebook());
+      assertEquals(5, assessment.size());
     }
 
     @Test
@@ -189,7 +121,6 @@ public class RestAssessmentControllerTests {
       makeMe.refresh(topNote);
       for (Note note : topNote.getChildren()) {
         if (note.getId() % 2 == 0) {
-          makeMe.aQuestion().spellingQuestionOfNote(note).approveQuestion().please();
           makeMe.aQuestion().spellingQuestionOfNote(note).approveQuestion().please();
         } else {
           makeMe.aQuestion().spellingQuestionOfNote(note).please();

@@ -1407,32 +1407,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BazaarNotebook"
-  /api/assessment/ai-questions/{notebook}:
-    post:
-      tags:
-      - rest-assessment-controller
-      operationId: generateAiQuestions
-      parameters:
-      - name: notebook
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/QuizQuestion"
   /api/ai/{note}/completion:
     post:
       tags:
