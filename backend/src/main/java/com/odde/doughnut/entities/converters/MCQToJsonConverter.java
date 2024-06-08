@@ -11,8 +11,8 @@ import java.io.IOException;
 @Converter
 public class MCQToJsonConverter implements AttributeConverter<MultipleChoicesQuestion, String> {
 
-  private final ObjectMapper objectMapper = new ObjectMapper()
-    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+  private final ObjectMapper objectMapper =
+      new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
   @Override
   public String convertToDatabaseColumn(MultipleChoicesQuestion attribute) {
