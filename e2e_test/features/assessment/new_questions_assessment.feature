@@ -15,12 +15,12 @@ Feature: New questions assessment
 
   Scenario: Start an assessment with 5 approved questions
     Given there are questions for the note:
-      | topicConstructor | question                           | answer  | oneWrongChoice |
-      | Singapore        | Where in the world is Singapore?   | Asia    | euro           |
-      | Vietnam          | Most famous food of Vietnam?       | Pho     | bread          |
-      | Japan            | What is the capital city of Japan? | Tokyo   | Kyoto          |
-      | Korea            | What is the capital city of Korea? | Seoul   | Busan          |
-      | China            | What is the capital city of China? | Beijing | Shanghai       |
+      | noteTopic | question                           | answer  | oneWrongChoice |
+      | Singapore | Where in the world is Singapore?   | Asia    | euro           |
+      | Vietnam   | Most famous food of Vietnam?       | Pho     | bread          |
+      | Japan     | What is the capital city of Japan? | Tokyo   | Kyoto          |
+      | Korea     | What is the capital city of Korea? | Seoul   | Busan          |
+      | China     | What is the capital city of China? | Beijing | Shanghai       |
     When I start the assessment on the "Countries" notebook
     Then I answer the question "Where in the world is Singapore?" with "Asia"
     And I answer the question "Most famous food of Vietnam?" with "Pho"
@@ -31,10 +31,10 @@ Feature: New questions assessment
 
   Scenario: Fail to start assessment with 4 approved questions
     Given there are questions for the note:
-      | topicConstructor | question                           | answer  | oneWrongChoice |
-      | Vietnam          | Most famous food of Vietnam?       | Pho     | bread          |
-      | Japan            | What is the capital city of Japan? | Tokyo   | Kyoto          |
-      | Korea            | What is the capital city of Korea? | Seoul   | Busan          |
-      | China            | What is the capital city of China? | Beijing | Shanghai       |
+      | noteTopic | question                           | answer  | oneWrongChoice |
+      | Vietnam   | Most famous food of Vietnam?       | Pho     | bread          |
+      | Japan     | What is the capital city of Japan? | Tokyo   | Kyoto          |
+      | Korea     | What is the capital city of Korea? | Seoul   | Busan          |
+      | China     | What is the capital city of China? | Beijing | Shanghai       |
     When I start the assessment on the "Countries" notebook
     Then I see error message Not enough approved questions

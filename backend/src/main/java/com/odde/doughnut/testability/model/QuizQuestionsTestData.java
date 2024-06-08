@@ -15,7 +15,7 @@ public class QuizQuestionsTestData {
 
   @Setter
   static class QuizQuestionTestData {
-    private String topicConstructor;
+    private String noteTopic;
     private String question;
     private String answer;
     private String oneWrongChoice;
@@ -37,8 +37,7 @@ public class QuizQuestionsTestData {
         .map(
             question ->
                 question.buildQuizQuestion(
-                    factoryService.noteRepository.findFirstByTopicConstructor(
-                        question.topicConstructor)))
+                    factoryService.noteRepository.findFirstByTopicConstructor(question.noteTopic)))
         .collect(Collectors.toList());
   }
 }

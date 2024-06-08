@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type QuizQuestionTestData = {
-    topicConstructor?: string;
+    noteTopic?: string;
     question?: string;
     answer?: string;
     oneWrongChoice?: string;
