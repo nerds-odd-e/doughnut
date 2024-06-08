@@ -10,7 +10,6 @@ import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.SearchTermModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.QuizQuestionService;
 import com.theokanning.openai.client.OpenAiApi;
@@ -47,13 +46,11 @@ class RestAssessmentController {
     currentUser.assertLoggedIn();
     currentUser.assertReadAuthorization(notebook);
 
-    SearchTermModel searchTermModel =
-        this.modelFactoryService.toSearchTermModel(currentUser.getEntity(), new SearchTerm());
-
     List<Note> notes =
-        searchTermModel
+        this.modelFactoryService
+            .toSearchTermModel(currentUser.getEntity(), new SearchTerm())
             .search(notebook.getId())
-            .filter(note -> note.getParent() != null && note.getDeletedAt() == null)
+            .filter(note -> note.getParent() != null)
             .limit(5)
             .collect((Collectors.toList()));
 
@@ -71,11 +68,13 @@ class RestAssessmentController {
     currentUser.assertLoggedIn();
     currentUser.assertReadAuthorization(notebook);
 
-    List<QuizQuestion> approvedQuestionList =
-        quizQuestionService.getApprovedAssessmentQuestion(notebook.getHeadNote().getChildren());
+    List<Note> notes = notebook.getHeadNote().getChildren();
 
     List<QuizQuestion> filteredQuestionList =
-        approvedQuestionList.stream()
+        notes.stream()
+            .map(modelFactoryService::getQuizQuestionsByNote)
+            .flatMap(List::stream)
+            .filter(question -> question.approved)
             .collect(
                 Collectors.groupingBy(
                     s -> s.getNote().getId(),

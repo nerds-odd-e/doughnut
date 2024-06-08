@@ -8,7 +8,6 @@ import com.odde.doughnut.factoryServices.quizFacotries.factories.AiQuestionFacto
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.theokanning.openai.client.OpenAiApi;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -32,14 +31,6 @@ public class QuizQuestionService {
     } catch (QuizQuestionNotPossibleException e) {
       throw (new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated"));
     }
-  }
-
-  public List<QuizQuestion> getApprovedAssessmentQuestion(List<Note> notes) {
-    return notes.stream()
-        .map(modelFactoryService::getQuizQuestionsByNote)
-        .flatMap(List::stream)
-        .filter(question -> question.approved)
-        .collect(Collectors.toList());
   }
 
   public List<QuizQuestion> getPendingQuestionsByHeadNote(Note headNote) {
