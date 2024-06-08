@@ -1,21 +1,14 @@
 package com.odde.doughnut.controllers;
 
-import static com.odde.doughnut.controllers.dto.ApiError.ErrorType.ASSESSMENT_SERVICE_ERROR;
-
-import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.QuizQuestion;
-import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AssessmentService;
-import com.odde.doughnut.services.QuizQuestionService;
 import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
-import java.util.Objects;
-import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/assessment")
 class RestAssessmentController {
-  private final QuizQuestionService quizQuestionService;
   private final UserModel currentUser;
   private final AssessmentService assessmentService;
 
@@ -32,7 +24,6 @@ class RestAssessmentController {
       ModelFactoryService modelFactoryService,
       UserModel currentUser) {
     this.currentUser = currentUser;
-    this.quizQuestionService = new QuizQuestionService(openAiApi, modelFactoryService);
     this.assessmentService = new AssessmentService(openAiApi, modelFactoryService);
   }
 
@@ -44,25 +35,7 @@ class RestAssessmentController {
     currentUser.assertLoggedIn();
     currentUser.assertReadAuthorization(notebook);
 
-    return generateAssessment(notebook, quizQuestionService::generateAIQuestion);
-  }
-
-  private static List<QuizQuestion> generateAssessment(
-      Notebook notebook, Function<Note, QuizQuestion> generateAIQuestion) {
-    List<QuizQuestion> questions =
-        notebook.getNotes().stream()
-            .map(generateAIQuestion)
-            .filter(Objects::nonNull)
-            .limit(5)
-            .toList();
-    if (questions.size() < 5) {
-      throw new ApiException(
-          "Not enough approved questions",
-          ASSESSMENT_SERVICE_ERROR,
-          "Not enough approved questions");
-    }
-
-    return questions;
+    return assessmentService.generateAssessment(notebook, true);
   }
 
   @GetMapping("/questions/{notebook}")
@@ -72,6 +45,6 @@ class RestAssessmentController {
     currentUser.assertLoggedIn();
     currentUser.assertReadAuthorization(notebook);
 
-    return generateAssessment(notebook, assessmentService::getQuizQuestion);
+    return assessmentService.generateAssessment(notebook, false);
   }
 }
