@@ -45,7 +45,7 @@ public class Answer extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public String getAnswerDisplay() {
     if (question != null && choiceIndex != null) {
-      return question.getMultipleChoicesQuestion().choices.get(choiceIndex);
+      return question.getMultipleChoicesQuestion().getChoices().get(choiceIndex);
     }
     return getSpellingAnswer();
   }

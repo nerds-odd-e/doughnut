@@ -44,8 +44,8 @@ public class QuizQuestion extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public MCQWithAnswer getMcqWithAnswer() {
     MCQWithAnswer mcqWithAnswer = new MCQWithAnswer();
-    mcqWithAnswer.multipleChoicesQuestion = getMultipleChoicesQuestion();
-    mcqWithAnswer.correctChoiceIndex = correctAnswerIndex;
+    mcqWithAnswer.setMultipleChoicesQuestion(getMultipleChoicesQuestion());
+    mcqWithAnswer.setCorrectChoiceIndex(correctAnswerIndex);
     return mcqWithAnswer;
   }
 
@@ -70,8 +70,8 @@ public class QuizQuestion extends EntityIdentifiedByIdOnly {
   public static QuizQuestion fromMCQWithAnswer(MCQWithAnswer MCQWithAnswer, Note note) {
     QuizQuestion quizQuestionAIQuestion = new QuizQuestion();
     quizQuestionAIQuestion.setNote(note);
-    quizQuestionAIQuestion.setMultipleChoicesQuestion(MCQWithAnswer.multipleChoicesQuestion);
-    quizQuestionAIQuestion.setCorrectAnswerIndex(MCQWithAnswer.correctChoiceIndex);
+    quizQuestionAIQuestion.setMultipleChoicesQuestion(MCQWithAnswer.getMultipleChoicesQuestion());
+    quizQuestionAIQuestion.setCorrectAnswerIndex(MCQWithAnswer.getCorrectChoiceIndex());
     return quizQuestionAIQuestion;
   }
 }

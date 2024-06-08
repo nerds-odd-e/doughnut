@@ -64,12 +64,12 @@ class LinkSourceWithinSameLinkTypeQuizFactoryTest {
     void shouldIncludeRightAnswers() {
       QuizQuestion quizQuestion = buildLinkTargetQuizQuestion();
       assertThat(
-          quizQuestion.getMultipleChoicesQuestion().stem,
+          quizQuestion.getMultipleChoicesQuestion().getStem(),
           containsString("Which one <em>is immediately a specialization of</em>:"));
       assertThat(
-          quizQuestion.getMultipleChoicesQuestion().stem,
+          quizQuestion.getMultipleChoicesQuestion().getStem(),
           containsString(target.getTopicConstructor()));
-      List<String> options = quizQuestion.getMultipleChoicesQuestion().choices;
+      List<String> options = quizQuestion.getMultipleChoicesQuestion().getChoices();
       assertThat(anotherSource.getTopicConstructor(), in(options));
       assertThat(
           "tomato <mark title='Hidden text that is matching the answer'>[...]</mark>", in(options));
@@ -79,7 +79,7 @@ class LinkSourceWithinSameLinkTypeQuizFactoryTest {
     void shouldIncludeOneLinkFromEachFillingOptions() {
       makeMe.aLink().between(anotherSource, top).please();
       QuizQuestion quizQuestion = buildLinkTargetQuizQuestion();
-      List<String> options = quizQuestion.getMultipleChoicesQuestion().choices;
+      List<String> options = quizQuestion.getMultipleChoicesQuestion().getChoices();
       assertThat(options, hasSize(2));
     }
   }

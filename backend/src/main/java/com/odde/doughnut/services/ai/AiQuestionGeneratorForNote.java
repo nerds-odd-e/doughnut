@@ -24,8 +24,8 @@ public record AiQuestionGeneratorForNote(
   private static Optional<MCQWithAnswer> getValidQuestion(JsonNode question) {
     try {
       MCQWithAnswer mcqWithAnswer = new ObjectMapper().treeToValue(question, MCQWithAnswer.class);
-      if (mcqWithAnswer.multipleChoicesQuestion.stem != null
-          && !Strings.isBlank(mcqWithAnswer.multipleChoicesQuestion.stem)) {
+      if (mcqWithAnswer.getMultipleChoicesQuestion().getStem() != null
+          && !Strings.isBlank(mcqWithAnswer.getMultipleChoicesQuestion().getStem())) {
         return Optional.of(mcqWithAnswer);
       }
     } catch (JsonProcessingException e) {

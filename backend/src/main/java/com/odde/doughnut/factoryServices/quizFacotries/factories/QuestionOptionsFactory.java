@@ -37,8 +37,8 @@ public abstract class QuestionOptionsFactory extends QuizQuestionFactory {
     List<Note> shuffled = servant.randomizer.shuffle(optionsEntities);
     quizQuestion.setCorrectAnswerIndex(shuffled.indexOf(answerNote));
     MultipleChoicesQuestion mcq = new MultipleChoicesQuestion();
-    mcq.stem = getStem();
-    mcq.choices = shuffled.stream().map(this::noteToChoice).toList();
+    mcq.setStem(getStem());
+    mcq.setChoices(shuffled.stream().map(this::noteToChoice).toList());
     quizQuestion.setMultipleChoicesQuestion(mcq);
     return quizQuestion;
   }

@@ -31,7 +31,7 @@ public class AiToolFactory {
   }
 
   public static AiToolList questionEvaluationAiTool(MCQWithAnswer question) {
-    MultipleChoicesQuestion mcq = question.multipleChoicesQuestion;
+    MultipleChoicesQuestion mcq = question.getMultipleChoicesQuestion();
 
     String messageBody =
         """

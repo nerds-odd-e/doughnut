@@ -47,7 +47,7 @@ class ClozeLinkTargetQuizFactoryTest {
     void shouldIncludeRightAnswers() {
       QuizQuestion quizQuestion = (buildQuestion());
       assertThat(
-          quizQuestion.getMultipleChoicesQuestion().stem,
+          quizQuestion.getMultipleChoicesQuestion().getStem(),
           equalTo(
               "<mark><mark title='Hidden text that is matching the answer'>[...]</mark> is not built in a day</mark> is a specialization of:"));
     }

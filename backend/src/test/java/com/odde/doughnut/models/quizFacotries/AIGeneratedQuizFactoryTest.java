@@ -47,7 +47,7 @@ class AIGeneratedQuizFactoryTest {
   void shouldIncludeQuestionStem() {
     QuizQuestion quizQuestion = buildQuestion();
     assertThat(
-        quizQuestion.getMultipleChoicesQuestion().stem,
+        quizQuestion.getMultipleChoicesQuestion().getStem(),
         containsString("How long did it take to build Rome?"));
   }
 
@@ -71,7 +71,7 @@ class AIGeneratedQuizFactoryTest {
           makeMe
               .anAnswerViewedByUser()
               .forQuestion(questionBuilder().inMemoryPlease())
-              .choiceIndex(mcqWithAnswer.correctChoiceIndex)
+              .choiceIndex(mcqWithAnswer.getCorrectChoiceIndex())
               .inMemoryPlease();
       assertTrue(answerResult.correct);
     }

@@ -37,7 +37,7 @@ class SuggestedQuestionForFineTuningTest {
     assertThat(goodTrainingData.get(0).getContent(), containsString("note content"));
     assertThat(
         goodTrainingData.get(1).getContent(),
-        containsString(mcqWithAnswer.multipleChoicesQuestion.stem));
+        containsString(mcqWithAnswer.getMultipleChoicesQuestion().getStem()));
     assertThat(goodTrainingData.get(2).getContent(), nullValue());
     assertThat(goodTrainingData.get(2).getFunctionCall().getName(), equalTo("evaluate_question"));
   }
@@ -65,7 +65,8 @@ class SuggestedQuestionForFineTuningTest {
     assertThat(questionEvaluation.comment, equalTo("a comment"));
     assertThat(questionEvaluation.feasibleQuestion, equalTo(true));
     assertThat(
-        questionEvaluation.correctChoices, equalTo(new int[] {mcqWithAnswer.correctChoiceIndex}));
+        questionEvaluation.correctChoices,
+        equalTo(new int[] {mcqWithAnswer.getCorrectChoiceIndex()}));
   }
 
   private QuestionEvaluation getQuestionEvaluation(List<ChatMessageForFineTuning> goodTrainingData)

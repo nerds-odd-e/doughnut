@@ -210,8 +210,11 @@ class RestQuizQuestionControllerTests {
           controller.suggestQuestionForFineTuning(quizQuestion, suggestionWithPositiveFeedback);
       assert suggestedQuestionForFineTuning != null;
       assertThat(
-          suggestedQuestionForFineTuning.getPreservedQuestion().multipleChoicesQuestion.stem,
-          equalTo(mcqWithAnswer.multipleChoicesQuestion.stem));
+          suggestedQuestionForFineTuning
+              .getPreservedQuestion()
+              .getMultipleChoicesQuestion()
+              .getStem(),
+          equalTo(mcqWithAnswer.getMultipleChoicesQuestion().getStem()));
     }
 
     @Test
@@ -261,7 +264,7 @@ class RestQuizQuestionControllerTests {
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(jsonQuestion, "");
       QuizQuestion quizQuestion = controller.generateQuestion(note);
 
-      Assertions.assertThat(quizQuestion.getMultipleChoicesQuestion().stem)
+      Assertions.assertThat(quizQuestion.getMultipleChoicesQuestion().getStem())
           .contains("What is the first color in the rainbow?");
     }
 
@@ -323,7 +326,7 @@ class RestQuizQuestionControllerTests {
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(jsonQuestion, "");
       QuizQuestion quizQuestion = controller.regenerate(this.quizQuestion);
 
-      Assertions.assertThat(quizQuestion.getMultipleChoicesQuestion().stem)
+      Assertions.assertThat(quizQuestion.getMultipleChoicesQuestion().getStem())
           .contains("What is the first color in the rainbow?");
     }
   }

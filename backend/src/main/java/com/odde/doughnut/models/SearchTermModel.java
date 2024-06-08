@@ -20,7 +20,7 @@ public class SearchTermModel {
     this.noteRepository = noteRepository;
   }
 
-  public Stream<Note> search(Integer notebookId) {
+  private Stream<Note> search(Integer notebookId) {
     if (searchTerm.getAllMyCircles()) {
       return Stream.concat(
           searchInMyNotebooksAndSubscriptions(),

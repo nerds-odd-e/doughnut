@@ -57,7 +57,7 @@ class QuizQuestionTest {
     makeMe.refresh(top);
     QuizQuestion quizQuestion = generateQuizQuestion(note);
     assertThat(
-        quizQuestion.getMultipleChoicesQuestion().stem,
+        quizQuestion.getMultipleChoicesQuestion().getStem(),
         containsString(
             "<mark title='Hidden text that is matching the answer'>[...]</mark> has 3 letters"));
   }
@@ -87,7 +87,7 @@ class QuizQuestionTest {
       @Test
       void descendingRandomizer() {
         QuizQuestion quizQuestion = generateQuizQuestion(note1);
-        List<String> options = quizQuestion.getMultipleChoicesQuestion().choices;
+        List<String> options = quizQuestion.getMultipleChoicesQuestion().getChoices();
         assertThat(
             options,
             containsInRelativeOrder(note2.getTopicConstructor(), note1.getTopicConstructor()));
@@ -97,7 +97,7 @@ class QuizQuestionTest {
       void ascendingRandomizer() {
         randomizer.alwaysChoose = "last";
         QuizQuestion quizQuestion = generateQuizQuestion(note1);
-        List<String> options = quizQuestion.getMultipleChoicesQuestion().choices;
+        List<String> options = quizQuestion.getMultipleChoicesQuestion().getChoices();
         assertThat(
             options,
             containsInRelativeOrder(note1.getTopicConstructor(), note2.getTopicConstructor()));
@@ -111,7 +111,7 @@ class QuizQuestionTest {
       Note note = makeMe.aNote().under(top).please();
       makeMe.refresh(top);
       QuizQuestion quizQuestion = generateQuizQuestion(note);
-      List<String> options = quizQuestion.getMultipleChoicesQuestion().choices;
+      List<String> options = quizQuestion.getMultipleChoicesQuestion().getChoices();
       assertThat(options.size(), equalTo(3));
       assertThat(options.contains(note.getTopicConstructor()), is(true));
     }
@@ -145,8 +145,8 @@ class QuizQuestionTest {
       assertThat(randomQuizQuestion, instanceOf(QuizQuestion.class));
       QuizQuestion qq = randomQuizQuestion;
       assertThat(
-          qq.getMultipleChoicesQuestion().stem,
-          containsString(mcqWithAnswer.multipleChoicesQuestion.stem));
+          qq.getMultipleChoicesQuestion().getStem(),
+          containsString(mcqWithAnswer.getMultipleChoicesQuestion().getStem()));
     }
 
     @Test

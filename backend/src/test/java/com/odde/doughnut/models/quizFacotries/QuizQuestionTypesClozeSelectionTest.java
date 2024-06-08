@@ -50,8 +50,8 @@ class QuizQuestionTypesClozeSelectionTest {
     void shouldIncludeRightAnswers() {
       makeMe.refresh(top);
       QuizQuestion quizQuestion = buildClozeQuizQuestion();
-      assertThat(quizQuestion.getMultipleChoicesQuestion().stem, containsString("descrption"));
-      List<String> options = quizQuestion.getMultipleChoicesQuestion().choices;
+      assertThat(quizQuestion.getMultipleChoicesQuestion().getStem(), containsString("descrption"));
+      List<String> options = quizQuestion.getMultipleChoicesQuestion().getChoices();
       assertThat(note2.getTopicConstructor(), in(options));
       assertThat(note1.getTopicConstructor(), in(options));
     }

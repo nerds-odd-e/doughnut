@@ -42,7 +42,7 @@ public class SpellingQuizFactory extends QuizQuestionFactory {
     quizQuestionSpelling.setNote(answerNote);
     quizQuestionSpelling.setCheckSpell(true);
     MultipleChoicesQuestion mcq = new MultipleChoicesQuestion();
-    mcq.stem = getStem();
+    mcq.setStem(getStem());
     quizQuestionSpelling.setMultipleChoicesQuestion(mcq);
     return quizQuestionSpelling;
   }
