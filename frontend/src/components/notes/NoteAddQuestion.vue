@@ -40,9 +40,7 @@
     >
       -
     </button>
-    <button @click="submitQuestion" :disabled="isInvalidQuestion">
-      Submit
-    </button>
+    <button @click="submitQuestion" :disabled="!isValidQuestion">Submit</button>
   </div>
 </template>
 
@@ -50,6 +48,7 @@
 import { defineComponent, PropType } from "vue";
 import useLoadingApi from "@/managedApi/useLoadingApi";
 import { Note, MCQWithAnswer } from "@/generated/backend";
+import isMCQWithAnswerValid from "@/models/isMCQWithAnswerValid";
 import TextArea from "../form/TextArea.vue";
 
 export default defineComponent({
@@ -77,20 +76,8 @@ export default defineComponent({
   },
   emits: ["close-dialog"],
   computed: {
-    isInvalidQuestion() {
-      if (
-        this.mcqWithAnswer.multipleChoicesQuestion.stem?.trim().length === 0
-      ) {
-        return true;
-      }
-      return (
-        this.mcqWithAnswer.multipleChoicesQuestion.choices.some(
-          (option) => option.trim().length === 0,
-        ) ||
-        this.mcqWithAnswer.correctChoiceIndex < 0 ||
-        this.mcqWithAnswer.correctChoiceIndex >=
-          this.mcqWithAnswer.multipleChoicesQuestion.choices.length
-      );
+    isValidQuestion() {
+      return isMCQWithAnswerValid(this.mcqWithAnswer);
     },
   },
   methods: {
