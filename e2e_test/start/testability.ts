@@ -158,8 +158,8 @@ const testability = () => {
       postToTestabilityApiSuccessfully(cy, "share_to_bazaar", { body: { noteTopic } })
     },
 
-    seedCircle(circleInfo: Record<string, string>) {
-      postToTestabilityApiSuccessfully(cy, "seed_circle", { body: circleInfo })
+    injectCircle(circleInfo: Record<string, string>) {
+      postToTestabilityApiSuccessfully(cy, "inject_circle", { body: circleInfo })
     },
 
     updateCurrentUserSettingsWith(hash: Record<string, string>) {

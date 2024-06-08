@@ -210,32 +210,6 @@ paths:
             '*/*':
               schema:
                 type: string
-  /api/testability/seed_circle:
-    post:
-      tags:
-      - testability-rest-controller
-      operationId: seedCircle
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              additionalProperties:
-                type: string
-        required: true
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: string
   /api/testability/replace_service_url:
     post:
       tags:
@@ -346,7 +320,7 @@ paths:
     post:
       tags:
       - testability-rest-controller
-      operationId: seedNote
+      operationId: injectNotes
       requestBody:
         content:
           application/json:
@@ -369,6 +343,32 @@ paths:
                 additionalProperties:
                   type: integer
                   format: int32
+  /api/testability/inject_circle:
+    post:
+      tags:
+      - testability-rest-controller
+      operationId: injectCircle
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
   /api/testability/feature_toggle:
     get:
       tags:

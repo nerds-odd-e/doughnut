@@ -134,24 +134,6 @@ export class TestabilityRestControllerService {
      * @returns string OK
      * @throws ApiError
      */
-    public seedCircle(
-        requestBody: Record<string, string>,
-    ): CancelablePromise<string> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/api/testability/seed_circle',
-            body: requestBody,
-            mediaType: 'application/json',
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * @param requestBody
-     * @returns string OK
-     * @throws ApiError
-     */
     public replaceServiceUrl(
         requestBody: Record<string, string>,
     ): CancelablePromise<Record<string, string>> {
@@ -224,12 +206,30 @@ export class TestabilityRestControllerService {
      * @returns number OK
      * @throws ApiError
      */
-    public seedNote(
+    public injectNotes(
         requestBody: NotesTestData,
     ): CancelablePromise<Record<string, number>> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/testability/inject_notes',
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param requestBody
+     * @returns string OK
+     * @throws ApiError
+     */
+    public injectCircle(
+        requestBody: Record<string, string>,
+    ): CancelablePromise<string> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/testability/inject_circle',
             body: requestBody,
             mediaType: 'application/json',
             errors: {

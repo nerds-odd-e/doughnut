@@ -144,13 +144,13 @@ class TestabilityRestController {
     private void saveByOriginalOrder(
         Map<String, Note> titleNoteMap, ModelFactoryService modelFactoryService) {
       noteTestData.forEach(
-          (seed -> modelFactoryService.save(titleNoteMap.get(seed.topicConstructor))));
+          (inject -> modelFactoryService.save(titleNoteMap.get(inject.topicConstructor))));
     }
   }
 
   @PostMapping("/inject_notes")
   @Transactional
-  public Map<String, Integer> seedNote(@RequestBody NotesTestData notesTestData) {
+  public Map<String, Integer> injectNotes(@RequestBody NotesTestData notesTestData) {
     final User user =
         getUserModelByExternalIdentifierOrCurrentUser(notesTestData.externalIdentifier);
     Ownership ownership = getOwnership(notesTestData, user);
@@ -229,9 +229,9 @@ class TestabilityRestController {
     return "OK";
   }
 
-  @PostMapping("/seed_circle")
+  @PostMapping("/inject_circle")
   @Transactional
-  public String seedCircle(@RequestBody HashMap<String, String> circleInfo) {
+  public String injectCircle(@RequestBody HashMap<String, String> circleInfo) {
     Circle entity = new Circle();
     entity.setName(circleInfo.get("circleName"));
     CircleModel circleModel = modelFactoryService.toCircleModel(entity);
