@@ -2,7 +2,6 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { FailureReport } from '../models/FailureReport';
 import type { FailureReportForView } from '../models/FailureReportForView';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -27,12 +26,12 @@ export class RestFailureReportControllerService {
      * @throws ApiError
      */
     public show2(
-        failureReport: FailureReport,
+        failureReport: number,
     ): CancelablePromise<FailureReportForView> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/failure-reports/{failureReport}',
-            query: {
+            path: {
                 'failureReport': failureReport,
             },
             errors: {

@@ -2210,10 +2210,10 @@ paths:
       operationId: show_2
       parameters:
       - name: failureReport
-        in: query
+        in: path
         required: true
         schema:
-          $ref: "#/components/schemas/FailureReport"
+          type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -3182,19 +3182,19 @@ components:
           format: date-time
         githubIssue:
           $ref: "#/components/schemas/GithubIssue"
-    GithubIssue:
-      type: object
-      properties:
-        title:
-          type: string
-        body:
-          type: string
     FailureReportForView:
       type: object
       properties:
         failureReport:
           $ref: "#/components/schemas/FailureReport"
         githubIssueUrl:
+          type: string
+    GithubIssue:
+      type: object
+      properties:
+        title:
+          type: string
+        body:
           type: string
     CircleForUserView:
       required:

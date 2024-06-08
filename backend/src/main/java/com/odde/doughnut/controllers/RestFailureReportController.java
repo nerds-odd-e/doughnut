@@ -5,7 +5,9 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GithubService;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,7 +40,8 @@ class RestFailureReportController {
   }
 
   @GetMapping("/{failureReport}")
-  public FailureReportForView show(FailureReport failureReport)
+  public FailureReportForView show(
+      @PathVariable("failureReport") @Schema(type = "integer") FailureReport failureReport)
       throws UnexpectedNoAccessRightException {
     currentUser.assertLoggedIn();
     currentUser.assertAdminAuthorization();
