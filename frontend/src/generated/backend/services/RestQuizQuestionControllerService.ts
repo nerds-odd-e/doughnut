@@ -176,23 +176,4 @@ export class RestQuizQuestionControllerService {
             },
         });
     }
-    /**
-     * @param headNote
-     * @returns QuizQuestion OK
-     * @throws ApiError
-     */
-    public getAllPendingQuizQuestionByNoteBook(
-        headNote: number,
-    ): CancelablePromise<Array<QuizQuestion>> {
-        return this.httpRequest.request({
-            method: 'GET',
-            url: '/api/quiz-questions/{headNote}/note-book-pending-questions',
-            path: {
-                'headNote': headNote,
-            },
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
 }

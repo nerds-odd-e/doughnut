@@ -121,14 +121,6 @@ class RestQuizQuestionController {
     return quizQuestionService.addQuestion(note, manualQuestion);
   }
 
-  @GetMapping("/{headNote}/note-book-pending-questions")
-  public List<QuizQuestion> getAllPendingQuizQuestionByNoteBook(
-      @PathVariable("headNote") @Schema(type = "integer") @NotNull Note headNote)
-      throws UnexpectedNoAccessRightException {
-    currentUser.assertAuthorization(headNote.getNotebook());
-    return quizQuestionService.getPendingQuestionsByHeadNote(headNote);
-  }
-
   @PostMapping("/review")
   @Transactional
   public void reviewQuizQuestion(@Valid @RequestBody List<QuizQuestion> quizQuestions)

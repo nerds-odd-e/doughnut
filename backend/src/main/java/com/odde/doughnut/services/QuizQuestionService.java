@@ -34,12 +34,6 @@ public class QuizQuestionService {
     }
   }
 
-  public List<QuizQuestion> getPendingQuestionsByHeadNote(Note headNote) {
-    return modelFactoryService.getQuizQuestionsByHeadNote(headNote).stream()
-        .filter(x -> !x.isApproved() && !x.isReviewed())
-        .toList();
-  }
-
   QuizQuestion selectQuizQuestionForANote(Note note) {
     return note.getQuizQuestions().stream().filter(q -> q.approved).findFirst().orElse(null);
   }

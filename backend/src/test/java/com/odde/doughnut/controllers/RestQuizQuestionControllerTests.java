@@ -439,7 +439,6 @@ class RestQuizQuestionControllerTests {
     @Test
     void getAllQuestionsOfANoteWhenThereIsMoreThanOneQuestion()
         throws UnexpectedNoAccessRightException {
-      QuizQuestion questionOfNote =
           makeMe.aQuestion().spellingQuestionOfNote(noteWithQuestions).please();
       List<QuizQuestion> results = controller.getAllQuizQuestionByNote(noteWithQuestions);
       assertThat(results, hasSize(2));
@@ -447,27 +446,9 @@ class RestQuizQuestionControllerTests {
 
     @Test
     void addQuestionManually() throws UnexpectedNoAccessRightException {
-      QuizQuestion questionOfNote =
           makeMe.aQuestion().spellingQuestionOfNote(noteWithQuestions).please();
       List<QuizQuestion> results = controller.getAllQuizQuestionByNote(noteWithQuestions);
       assertThat(results, hasSize(2));
-    }
-
-    @Test
-    void getPendingQuestionsOfANotebookWhenThereIsNotQuestion()
-        throws UnexpectedNoAccessRightException {
-      List<QuizQuestion> results =
-          controller.getAllPendingQuizQuestionByNoteBook(noteWithoutQuestions);
-      assertThat(results, hasSize(0));
-    }
-
-    @Test
-    void getPendingQuestionsOfANotebookWhenThereIsOneQuestion()
-        throws UnexpectedNoAccessRightException {
-      QuizQuestion questionOfNote = makeMe.aQuestion().spellingQuestionOfNote(headNote1).please();
-      makeMe.refresh(headNote1);
-      List<QuizQuestion> results = controller.getAllPendingQuizQuestionByNoteBook(headNote1);
-      assertThat(results, contains(questionOfNote));
     }
   }
 
