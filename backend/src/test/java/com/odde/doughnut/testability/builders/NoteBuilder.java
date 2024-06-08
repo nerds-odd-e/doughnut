@@ -1,5 +1,6 @@
 package com.odde.doughnut.testability.builders;
 
+import com.odde.doughnut.controllers.dto.ApiError;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.UserModel;
@@ -9,6 +10,8 @@ import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
+
 import org.apache.logging.log4j.util.Strings;
 
 public class NoteBuilder extends EntityBuilder<Note> {
@@ -17,6 +20,8 @@ public class NoteBuilder extends EntityBuilder<Note> {
   UserBuilder creatorBuilder = null;
   List<LinkBuilder> linkBuilders = new ArrayList<>();
   private String audioFilename = null;
+  private List<QuizQuestionBuilder> quizQuestionBuilders = new ArrayList<>();
+  private List<NoteBuilder> childrenBuilders = new ArrayList<>();
 
   public NoteBuilder(Note note, MakeMe makeMe) {
     super(makeMe, note);
@@ -107,8 +112,11 @@ public class NoteBuilder extends EntityBuilder<Note> {
 
   @Override
   protected void afterCreate(boolean needPersist) {
-    if (linkBuilders.isEmpty()) return;
     linkBuilders.forEach(linkBuilder -> linkBuilder.please(needPersist));
+    if (needPersist) makeMe.refresh(entity);
+    quizQuestionBuilders.forEach(bu -> bu.please(needPersist));
+    childrenBuilders.forEach(bu -> bu.please(needPersist));
+    if (linkBuilders.isEmpty() && quizQuestionBuilders.isEmpty() && childrenBuilders.isEmpty()) return;
     if (needPersist) makeMe.refresh(entity);
   }
 
@@ -132,11 +140,14 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder withNChildren(int numNotes) {
-    if (entity.getId() == null) {
-      throw new RuntimeException("Unable to create children note for note with no ID");
-    }
+    return withNChildrenThat(numNotes, _ -> {});
+  }
+
+  public NoteBuilder withNChildrenThat(int numNotes, Consumer<NoteBuilder> childNoteThat) {
     for (int i = 0; i < numNotes; i++) {
-      makeMe.aNote().under(entity).please();
+      NoteBuilder childBuilder = makeMe.aNote().under(entity);
+      childNoteThat.accept(childBuilder);
+      this.childrenBuilders.add(childBuilder);
     }
     return this;
   }
@@ -202,4 +213,17 @@ public class NoteBuilder extends EntityBuilder<Note> {
     entity.updateSiblingOrder(note, false);
     return this;
   }
+
+  public NoteBuilder hasAQuestion() {
+    QuizQuestionBuilder quizQuestionBuilder = makeMe.aQuestion().spellingQuestionOfNote(entity);
+    this.quizQuestionBuilders.add(quizQuestionBuilder);
+    return this;
+  }
+
+  public NoteBuilder hasAnApprovedQuestion() {
+    QuizQuestionBuilder quizQuestionBuilder = makeMe.aQuestion().spellingQuestionOfNote(entity).approveQuestion();
+    this.quizQuestionBuilders.add(quizQuestionBuilder);
+    return this;
+  }
+
 }

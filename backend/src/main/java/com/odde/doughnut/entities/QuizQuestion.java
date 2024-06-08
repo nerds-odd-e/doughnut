@@ -14,7 +14,6 @@ import lombok.EqualsAndHashCode;
 
 @Entity
 @Data
-@EqualsAndHashCode(callSuper = false)
 @Table(name = "quiz_question")
 @JsonPropertyOrder({"id", "multipleChoicesQuestion", "headNote", "imageWithMask"})
 public class QuizQuestion extends EntityIdentifiedByIdOnly {

@@ -9,6 +9,7 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.builders.NoteBuilder;
 import com.theokanning.openai.client.OpenAiApi;
 import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -70,11 +71,8 @@ public class RestAssessmentControllerTests {
     void shouldBeAbleToAccessNotebookThatIsInTheBazaar() throws UnexpectedNoAccessRightException {
       User anotherUser = makeMe.aUser().please();
       Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
-      makeMe.theNote(note).withNChildren(6);
+      makeMe.theNote(note).withNChildrenThat(6, NoteBuilder::hasAnApprovedQuestion).please();
       makeMe.refresh(note);
-      for (Note n : note.getChildren()) {
-        makeMe.aQuestion().spellingQuestionOfNote(n).approveQuestion().please();
-      }
       makeMe.refresh(note.getNotebook());
       BazaarNotebook bazaarNotebook = makeMe.aBazaarNotebook(note.getNotebook()).please();
       List<QuizQuestion> assessment =
@@ -85,69 +83,28 @@ public class RestAssessmentControllerTests {
     @Test
     void shouldReturn5ApprovedQuestionsWhenThereAreMoreThan5NotesWithQuestions()
         throws UnexpectedNoAccessRightException {
-      makeMe.theNote(topNote).withNChildren(10).please();
-      makeMe.refresh(topNote);
-      for (Note note : topNote.getChildren()) {
-        if (note.getId() % 2 == 0) {
-          makeMe.aQuestion().spellingQuestionOfNote(note).approveQuestion().please();
-        } else {
-          makeMe.aQuestion().spellingQuestionOfNote(note).please();
-        }
-      }
+      makeMe.theNote(topNote).withNChildrenThat(5, NoteBuilder::hasAnApprovedQuestion).please();
+      makeMe.theNote(topNote).withNChildrenThat(5, NoteBuilder::hasAQuestion).please();
       makeMe.refresh(notebook);
-
       List<QuizQuestion> assessment = controller.generateAssessmentQuestions(notebook);
-
       assertEquals(assessment.size(), 5);
       assertEquals(assessment.stream().filter(x -> x.approved).count(), 5);
     }
 
     @Test
     void shouldThrowExceptionWhenThereAreNotEnoughApprovedQuestions() {
-      makeMe.theNote(topNote).withNChildren(10).please();
-      makeMe.refresh(topNote);
-      for (Note note : topNote.getChildren()) {
-        makeMe.aQuestion().spellingQuestionOfNote(note).please();
-      }
+      makeMe.theNote(topNote).withNChildrenThat(6, NoteBuilder::hasAQuestion).please();
       makeMe.refresh(notebook);
-
       assertThrows(ApiException.class, () -> controller.generateAssessmentQuestions(notebook));
     }
 
     @Test
-    void shouldReturn5ApprovedQuestionsFromDifferentNotesWhenThereAreMoreThan5NotesWithQuestions()
-        throws UnexpectedNoAccessRightException {
-      makeMe.theNote(topNote).withNChildren(10).please();
-      makeMe.refresh(topNote);
-      for (Note note : topNote.getChildren()) {
-        if (note.getId() % 2 == 0) {
-          makeMe.aQuestion().spellingQuestionOfNote(note).approveQuestion().please();
-        } else {
-          makeMe.aQuestion().spellingQuestionOfNote(note).please();
-        }
-      }
-      makeMe.refresh(notebook);
-
-      List<QuizQuestion> assessment = controller.generateAssessmentQuestions(notebook);
-
-      Map<Integer, QuizQuestion> distinctMap = new HashMap<>();
-      for (QuizQuestion question : assessment) {
-        distinctMap.putIfAbsent(question.getNote().getId(), question);
-      }
-
-      assertEquals(distinctMap.values().size(), 5);
-      assertEquals(assessment.size(), 5);
-    }
-
-    @Test
-    void shouldThrowExceptionWhenThereAreNotEnoughUniqueQuestions() {
-      makeMe.theNote(topNote).withNChildren(3).please();
-      makeMe.refresh(topNote);
-      for (Note note : topNote.getChildren()) {
-        makeMe.aQuestion().spellingQuestionOfNote(note).approveQuestion().please();
-        makeMe.aQuestion().spellingQuestionOfNote(note).approveQuestion().please();
-        makeMe.aQuestion().spellingQuestionOfNote(note).approveQuestion().please();
-      }
+    void shouldGetOneQuestionFromEachNoteOnly() {
+      makeMe.theNote(topNote).withNChildrenThat(3, noteBuilder -> {
+        noteBuilder.hasAnApprovedQuestion();
+        noteBuilder.hasAnApprovedQuestion();
+        noteBuilder.hasAnApprovedQuestion();
+      }).please();
       makeMe.refresh(notebook);
 
       assertThrows(ApiException.class, () -> controller.generateAssessmentQuestions(notebook));
