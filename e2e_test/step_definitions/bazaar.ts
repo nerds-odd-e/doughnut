@@ -107,13 +107,6 @@ Given("There is a notebook with topic {string}", (notebookTopic: string) => {
   start.routerToNotebooksPage().creatingNotebook(notebookTopic)
 })
 
-Given("There are {int} notes belonging to {string}", (noteCount: number, notebookTopic: string) => {
-  for (let i = 0; i < noteCount; i++) {
-    const noteTopic = "Note " + i
-    start.jumpToNotePage(notebookTopic).addingChildNote().createNote(noteTopic)
-  }
-})
-
 Then("I should see {int} questions", (questionCount: number) => {
   for (let i = 1; i <= questionCount; i++) {
     cy.findByText(`Question ${i}:`).should("exist")

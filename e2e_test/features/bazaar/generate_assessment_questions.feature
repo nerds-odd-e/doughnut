@@ -4,33 +4,44 @@ Feature: Bazaar generate
 
   Background:
     Given there are some notes for existing user "old_learner"
-      | topicConstructor | testingParent | skipReview |
-      | LeSS in Action   |               | true       |
+      | topicConstructor | testingParent |
+      | Countries        |               |
+      | Singapore        | Countries     |
+      | Vietnam          | Countries     |
+      | Japan            | Countries     |
+      | Korea            | Countries     |
+      | China            | Countries     |
+      | Mars             | Countries     |
+    And notebook "Countries" is shared to the Bazaar
 
   Scenario: open pop up for log in if the user is not logged in and generate assessment
     Given I haven't login
-    And notebook "LeSS in Action" is shared to the Bazaar
     When I go to the bazaar
-    And I generate assessment questions on notebook "LeSS in Action"
+    And I generate assessment questions on notebook "Countries"
     Then I should see message that says "Please login first"
 
-  @usingMockedOpenAiService
-  Scenario Outline: display assessment questions from notebook
-    Given OpenAI now generates this question:
-      | Question Stem | Correct Choice    | Incorrect Choice 1 | Incorrect Choice 2 |
-      | What is LeSS? | Large-scale Scrum | Small-scale scrum  | Less scrum         |
+  Scenario: display assessment questions from notebook
+    Given there are questions for the note:
+      | topicConstructor | question                           | answer  | option   |
+      | Singapore        | Where in the world is Singapore?   | Asia    | euro     |
+      | Vietnam          | Most famous food of Vietnam?       | Pho     | bread    |
     And I am logged in as an existing user
-    And There are <notes count> notes belonging to "LeSS in Action"
-    And notebook "LeSS in Action" is shared to the Bazaar
     When I go to the bazaar
-    And I generate assessment questions on notebook "LeSS in Action"
-    Then I should see message that says "<message>"
-    And I should see <question count> questions
+    And I generate assessment questions on notebook "Countries"
+    Then I should see message that says "Insufficient notes to create assessment!"
+    And I should see 0 questions
 
-    Examples:
-      | notes count | message                                  | question count |
-      | 3           | Insufficient notes to create assessment! | 0              |
-      | 6           | Assessment For LeSS in Action            | 5              |
-
-
-
+  Scenario: display assessment questions from notebook
+    Given there are questions for the note:
+      | topicConstructor | question                           | answer  | option   |
+      | Singapore        | Where in the world is Singapore?   | Asia    | euro     |
+      | Vietnam          | Most famous food of Vietnam?       | Pho     | bread    |
+      | Japan            | What is the capital city of Japan? | Tokyo   | Kyoto    |
+      | Korea            | What is the capital city of Korea? | Seoul   | Busan    |
+      | China            | What is the capital city of China? | Beijing | Shanghai |
+      | Mars             | What is the capital city of Mars?  | X       | Y        |
+    And I am logged in as an existing user
+    When I go to the bazaar
+    And I generate assessment questions on notebook "Countries"
+    Then I should see message that says "Assessment For Countries"
+    And I should see 5 questions

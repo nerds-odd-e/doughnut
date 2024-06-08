@@ -51,7 +51,7 @@ export default defineComponent({
   methods: {
     generateAssessmentQuestions() {
       this.managedApi.restAssessmentController
-        .generateAiQuestions(this.notebookId)
+        .generateAssessmentQuestions(this.notebookId)
         .then((response) => {
           this.result = response;
         })
