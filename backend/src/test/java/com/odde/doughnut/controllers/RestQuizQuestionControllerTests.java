@@ -409,18 +409,26 @@ class RestQuizQuestionControllerTests {
       makeMe.refresh(headNote2);
 
       noteWithoutQuestions = makeMe.aNote("a note").under(headNote1).please();
-      noteWithQuestions = makeMe.aNote("a note with questions").please();
+      noteWithQuestions =
+          makeMe.aNote("a note with questions").creatorAndOwner(currentUser).please();
       makeMe.aQuestion().spellingQuestionOfNote(noteWithQuestions).please();
     }
 
     @Test
-    void getQuestionsOfANoteWhenThereIsNotQuestion() {
+    void authorization() {
+      Note note = makeMe.aNote().please();
+      assertThrows(
+          UnexpectedNoAccessRightException.class, () -> controller.getAllQuizQuestionByNote(note));
+    }
+
+    @Test
+    void getQuestionsOfANoteWhenThereIsNotQuestion() throws UnexpectedNoAccessRightException {
       List<QuizQuestion> results = controller.getAllQuizQuestionByNote(noteWithoutQuestions);
       assertThat(results, hasSize(0));
     }
 
     @Test
-    void getQuestionsOfANoteWhenThereIsOneQuestion() {
+    void getQuestionsOfANoteWhenThereIsOneQuestion() throws UnexpectedNoAccessRightException {
       QuizQuestion questionOfNote =
           makeMe.aQuestion().spellingQuestionOfNote(noteWithoutQuestions).please();
       makeMe.refresh(noteWithoutQuestions);
@@ -429,7 +437,8 @@ class RestQuizQuestionControllerTests {
     }
 
     @Test
-    void getAllQuestionsOfANoteWhenThereIsMoreThanOneQuestion() {
+    void getAllQuestionsOfANoteWhenThereIsMoreThanOneQuestion()
+        throws UnexpectedNoAccessRightException {
       QuizQuestion questionOfNote =
           makeMe.aQuestion().spellingQuestionOfNote(noteWithQuestions).please();
       List<QuizQuestion> results = controller.getAllQuizQuestionByNote(noteWithQuestions);
@@ -437,7 +446,7 @@ class RestQuizQuestionControllerTests {
     }
 
     @Test
-    void addQuestionManually() {
+    void addQuestionManually() throws UnexpectedNoAccessRightException {
       QuizQuestion questionOfNote =
           makeMe.aQuestion().spellingQuestionOfNote(noteWithQuestions).please();
       List<QuizQuestion> results = controller.getAllQuizQuestionByNote(noteWithQuestions);

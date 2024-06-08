@@ -105,7 +105,9 @@ class RestQuizQuestionController {
 
   @GetMapping("/{note}/note-questions")
   public List<QuizQuestion> getAllQuizQuestionByNote(
-      @PathVariable("note") @Schema(type = "integer") Note note) {
+      @PathVariable("note") @Schema(type = "integer") Note note)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertAuthorization(note);
     return note.getQuizQuestions();
   }
 
