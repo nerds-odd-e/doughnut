@@ -393,23 +393,23 @@ class RestQuizQuestionControllerTests {
   }
 
   @Nested
-  class GetListOfQuizQuestionForNoteBook {
-    Note headNote1;
-    Note headNote2;
+  class GetListOfQuizQuestionForNotebook {
     Note noteWithoutQuestions;
     Note noteWithQuestions;
 
     @BeforeEach
     void setUp() {
-      headNote1 = makeMe.aHeadNote("headNote1").creatorAndOwner(currentUser).please();
-      makeMe.theNote(headNote1).withNChildren(10).please();
 
+      Note headNote2;
       headNote2 = makeMe.aHeadNote("headNote2").creatorAndOwner(currentUser).please();
       makeMe.theNote(headNote2).withNChildren(20).please();
 
-      makeMe.refresh(headNote1);
       makeMe.refresh(headNote2);
 
+      Note headNote1;
+      headNote1 = makeMe.aHeadNote("headNote1").creatorAndOwner(currentUser).please();
+      makeMe.theNote(headNote1).withNChildren(10).please();
+      makeMe.refresh(headNote1);
       noteWithoutQuestions = makeMe.aNote("a note").under(headNote1).please();
       noteWithQuestions =
           makeMe.aNote("a note with questions").creatorAndOwner(currentUser).please();
