@@ -26,7 +26,7 @@ Given("there are some notes for the current user:", (data: DataTable) => {
 })
 
 Given("there are questions for the note:", (data: DataTable) => {
-  start.testability().seedQuizQuestions(data.hashes())
+  start.testability().injectQuizQuestions(data.hashes())
 })
 
 Given("I have a note with the topic {string}", (noteTopic: string) => {

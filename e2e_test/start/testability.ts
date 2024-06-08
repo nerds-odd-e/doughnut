@@ -64,8 +64,8 @@ const testability = () => {
       })
     },
 
-    seedQuizQuestions(quizQuestionTestData: QuizQuestionTestData[]) {
-      postToTestabilityApi(cy, "seed_quiz_questions", {
+    injectQuizQuestions(quizQuestionTestData: QuizQuestionTestData[]) {
+      postToTestabilityApi(cy, "inject_quiz_questions", {
         body: {
           quizQuestionTestData,
         },

@@ -210,32 +210,6 @@ paths:
             '*/*':
               schema:
                 type: string
-  /api/testability/seed_quiz_questions:
-    post:
-      tags:
-      - testability-rest-controller
-      operationId: seedQuizQuestion
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/QuizQuestionsTestData"
-        required: true
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/QuizQuestion"
   /api/testability/seed_notes:
     post:
       tags:
@@ -369,6 +343,32 @@ paths:
             '*/*':
               schema:
                 type: string
+  /api/testability/inject_quiz_questions:
+    post:
+      tags:
+      - testability-rest-controller
+      operationId: injectQuizQuestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuizQuestionsTestData"
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/QuizQuestion"
   /api/testability/feature_toggle:
     get:
       tags:
@@ -2393,6 +2393,51 @@ components:
           writeOnly: true
           items:
             $ref: "#/components/schemas/QuestionSuggestionParams"
+    SeedInfo:
+      type: object
+      properties:
+        seedNotes:
+          type: array
+          writeOnly: true
+          items:
+            $ref: "#/components/schemas/SeedNote"
+        externalIdentifier:
+          type: string
+          writeOnly: true
+        circleName:
+          type: string
+          writeOnly: true
+    SeedNote:
+      type: object
+      properties:
+        topicConstructor:
+          type: string
+        details:
+          type: string
+          writeOnly: true
+        testingParent:
+          type: string
+          writeOnly: true
+        skipReview:
+          type: boolean
+          writeOnly: true
+        url:
+          type: string
+          writeOnly: true
+        imageUrl:
+          type: string
+          writeOnly: true
+        imageMask:
+          type: string
+          writeOnly: true
+        wikidataId:
+          type: string
+          writeOnly: true
+    Randomization:
+      type: object
+      properties:
+        choose:
+          type: string
     QuizQuestionTestData:
       type: object
       properties:
@@ -2509,51 +2554,6 @@ components:
         correctAnswerIndex:
           type: integer
           format: int32
-    SeedInfo:
-      type: object
-      properties:
-        seedNotes:
-          type: array
-          writeOnly: true
-          items:
-            $ref: "#/components/schemas/SeedNote"
-        externalIdentifier:
-          type: string
-          writeOnly: true
-        circleName:
-          type: string
-          writeOnly: true
-    SeedNote:
-      type: object
-      properties:
-        topicConstructor:
-          type: string
-        details:
-          type: string
-          writeOnly: true
-        testingParent:
-          type: string
-          writeOnly: true
-        skipReview:
-          type: boolean
-          writeOnly: true
-        url:
-          type: string
-          writeOnly: true
-        imageUrl:
-          type: string
-          writeOnly: true
-        imageMask:
-          type: string
-          writeOnly: true
-        wikidataId:
-          type: string
-          writeOnly: true
-    Randomization:
-      type: object
-      properties:
-        choose:
-          type: string
     SubscriptionDTO:
       type: object
       properties:

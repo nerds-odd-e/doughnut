@@ -131,24 +131,6 @@ export class TestabilityRestControllerService {
     }
     /**
      * @param requestBody
-     * @returns QuizQuestion OK
-     * @throws ApiError
-     */
-    public seedQuizQuestion(
-        requestBody: QuizQuestionsTestData,
-    ): CancelablePromise<Array<QuizQuestion>> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/api/testability/seed_quiz_questions',
-            body: requestBody,
-            mediaType: 'application/json',
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * @param requestBody
      * @returns number OK
      * @throws ApiError
      */
@@ -230,6 +212,24 @@ export class TestabilityRestControllerService {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/testability/link_notes',
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param requestBody
+     * @returns QuizQuestion OK
+     * @throws ApiError
+     */
+    public injectQuizQuestion(
+        requestBody: QuizQuestionsTestData,
+    ): CancelablePromise<Array<QuizQuestion>> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/testability/inject_quiz_questions',
             body: requestBody,
             mediaType: 'application/json',
             errors: {

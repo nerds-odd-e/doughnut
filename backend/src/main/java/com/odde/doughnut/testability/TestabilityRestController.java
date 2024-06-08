@@ -162,9 +162,9 @@ class TestabilityRestController {
         .collect(Collectors.toMap(note -> note.getTopicConstructor(), Note::getId));
   }
 
-  @PostMapping("/seed_quiz_questions")
+  @PostMapping("/inject_quiz_questions")
   @Transactional
-  public List<QuizQuestion> seedQuizQuestion(
+  public List<QuizQuestion> injectQuizQuestion(
       @RequestBody QuizQuestionsTestData quizQuestionsTestData) {
     List<QuizQuestion> quizQuestions =
         quizQuestionsTestData.buildQuizQuestions(this.modelFactoryService);
