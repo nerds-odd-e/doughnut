@@ -51,9 +51,8 @@ public class QuizQuestion extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public MCQWithAnswer getMcqWithAnswer() {
-    MultipleChoicesQuestion mcq = getMultipleChoicesQuestion();
     MCQWithAnswer mcqWithAnswer = new MCQWithAnswer();
-    mcq.populate(mcqWithAnswer);
+    mcqWithAnswer.multipleChoicesQuestion = getMultipleChoicesQuestion();
     mcqWithAnswer.correctChoiceIndex = correctAnswerIndex;
     return mcqWithAnswer;
   }

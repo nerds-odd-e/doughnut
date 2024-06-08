@@ -107,8 +107,10 @@ const testability = () => {
           preservedNoteContent: "note content",
           realCorrectAnswers: "",
           preservedQuestion: {
-            stem: questionStem,
-            choices: ["choice 1", "choice 2"],
+            multipleChoicesQuestion: {
+              stem: questionStem,
+              choices: ["choice 1", "choice 2"],
+            },
             correctChoiceIndex: 0,
           },
         },

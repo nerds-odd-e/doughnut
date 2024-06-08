@@ -1,28 +1,30 @@
 package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.services.ai.MCQWithAnswer;
+import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
 import java.util.List;
 
 public class MCQWithAnswerBuilder {
   MCQWithAnswer mcqWithAnswer = new MCQWithAnswer();
 
   public MCQWithAnswer please() {
-    if (mcqWithAnswer.stem == null) {
-      mcqWithAnswer.stem = "a default question stem";
+    MultipleChoicesQuestion mcq = mcqWithAnswer.multipleChoicesQuestion;
+    if (mcq.stem == null) {
+      mcq.stem = "a default question stem";
     }
-    if (mcqWithAnswer.choices == null) {
-      mcqWithAnswer.choices = List.of("choice1", "choice2", "choice3");
+    if (mcq.choices == null) {
+      mcq.choices = List.of("choice1", "choice2", "choice3");
     }
     return mcqWithAnswer;
   }
 
   public MCQWithAnswerBuilder stem(String stem) {
-    mcqWithAnswer.stem = stem;
+    mcqWithAnswer.multipleChoicesQuestion.stem = stem;
     return this;
   }
 
   public MCQWithAnswerBuilder choices(String... choices) {
-    mcqWithAnswer.choices = List.of(choices);
+    mcqWithAnswer.multipleChoicesQuestion.choices = List.of(choices);
     return this;
   }
 

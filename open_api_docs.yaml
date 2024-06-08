@@ -2444,8 +2444,18 @@ components:
           type: string
     MCQWithAnswer:
       required:
-      - choices
       - correctChoiceIndex
+      - multipleChoicesQuestion
+      type: object
+      properties:
+        multipleChoicesQuestion:
+          $ref: "#/components/schemas/MultipleChoicesQuestion"
+        correctChoiceIndex:
+          type: integer
+          format: int32
+    MultipleChoicesQuestion:
+      required:
+      - choices
       type: object
       properties:
         stem:
@@ -2454,9 +2464,6 @@ components:
           type: array
           items:
             type: string
-        correctChoiceIndex:
-          type: integer
-          format: int32
     QuestionSuggestionParams:
       required:
       - preservedQuestion
@@ -2514,17 +2521,6 @@ components:
           type: string
         imageMask:
           type: string
-    MultipleChoicesQuestion:
-      required:
-      - choices
-      type: object
-      properties:
-        stem:
-          type: string
-        choices:
-          type: array
-          items:
-            type: string
     Note:
       required:
       - createdAt

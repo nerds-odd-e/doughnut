@@ -187,8 +187,7 @@ class RestQuizQuestionControllerTests {
           controller.suggestQuestionForFineTuning(quizQuestion, suggestionWithPositiveFeedback);
       assert suggestedQuestionForFineTuning != null;
       assertEquals(
-          quizQuestion.getMcqWithAnswer().toJsonString(),
-          suggestedQuestionForFineTuning.getPreservedQuestion().toJsonString());
+          quizQuestion.getMcqWithAnswer(), suggestedQuestionForFineTuning.getPreservedQuestion());
       assertEquals("this is a comment", suggestedQuestionForFineTuning.getComment());
       assertTrue(suggestedQuestionForFineTuning.isPositiveFeedback(), "Incorrect Feedback");
       assertEquals("0", suggestedQuestionForFineTuning.getRealCorrectAnswers());
@@ -200,8 +199,7 @@ class RestQuizQuestionControllerTests {
           controller.suggestQuestionForFineTuning(quizQuestion, suggestionWithNegativeFeedback);
       assert suggestedQuestionForFineTuning != null;
       assertEquals(
-          quizQuestion.getMcqWithAnswer().toJsonString(),
-          suggestedQuestionForFineTuning.getPreservedQuestion().toJsonString());
+          quizQuestion.getMcqWithAnswer(), suggestedQuestionForFineTuning.getPreservedQuestion());
       assertEquals("this is a comment", suggestedQuestionForFineTuning.getComment());
       assertFalse(suggestedQuestionForFineTuning.isPositiveFeedback(), "Incorrect Feedback");
       assertEquals("", suggestedQuestionForFineTuning.getRealCorrectAnswers());
@@ -213,7 +211,8 @@ class RestQuizQuestionControllerTests {
           controller.suggestQuestionForFineTuning(quizQuestion, suggestionWithPositiveFeedback);
       assert suggestedQuestionForFineTuning != null;
       assertThat(
-          suggestedQuestionForFineTuning.getPreservedQuestion().stem, equalTo(mcqWithAnswer.stem));
+          suggestedQuestionForFineTuning.getPreservedQuestion().multipleChoicesQuestion.stem,
+          equalTo(mcqWithAnswer.multipleChoicesQuestion.stem));
     }
 
     @Test

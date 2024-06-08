@@ -2,9 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { MultipleChoicesQuestion } from './MultipleChoicesQuestion';
 export type MCQWithAnswer = {
-    stem?: string;
-    choices: Array<string>;
+    multipleChoicesQuestion: MultipleChoicesQuestion;
     correctChoiceIndex: number;
 };
 

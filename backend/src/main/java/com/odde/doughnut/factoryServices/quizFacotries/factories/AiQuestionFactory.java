@@ -26,7 +26,7 @@ public class AiQuestionFactory extends QuizQuestionFactory {
     if (MCQWithAnswer == null) {
       throw new QuizQuestionNotPossibleException();
     }
-    quizQuestionAIQuestion.setMultipleChoicesQuestion(MCQWithAnswer);
+    quizQuestionAIQuestion.setMultipleChoicesQuestion(MCQWithAnswer.multipleChoicesQuestion);
     quizQuestionAIQuestion.setCorrectAnswerIndex(MCQWithAnswer.correctChoiceIndex);
     return quizQuestionAIQuestion;
   }

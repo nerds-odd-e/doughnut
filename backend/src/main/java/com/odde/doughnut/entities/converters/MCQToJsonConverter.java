@@ -15,7 +15,7 @@ public class MCQToJsonConverter implements AttributeConverter<MultipleChoicesQue
   @Override
   public String convertToDatabaseColumn(MultipleChoicesQuestion attribute) {
     try {
-      return objectMapper.writeValueAsString(attribute.cloneQuestion());
+      return objectMapper.writeValueAsString(attribute);
     } catch (JsonProcessingException e) {
       throw new IllegalArgumentException("Error converting list to JSON", e);
     }

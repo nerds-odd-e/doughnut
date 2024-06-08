@@ -9,8 +9,10 @@ class SuggestQuestionForFineTuningBuilder extends Builder<SuggestedQuestionForFi
     this.data = {
       id: 1357,
       preservedQuestion: {
-        stem: "What is the capital of France?",
-        choices: ["Paris", "London", "Berlin"],
+        multipleChoicesQuestion: {
+          stem: "What is the capital of France?",
+          choices: ["Paris", "London", "Berlin"],
+        },
         correctChoiceIndex: 1,
       },
       preservedNoteContent: "this is the note content",

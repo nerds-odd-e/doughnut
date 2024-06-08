@@ -2,7 +2,6 @@ package com.odde.doughnut.services.ai;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import lombok.Data;
 
@@ -16,18 +15,4 @@ public class MultipleChoicesQuestion {
   @JsonPropertyDescription("All choices. Only one should be correct.")
   @JsonProperty(required = true)
   public List<String> choices;
-
-  public String toJsonString() {
-    return new ObjectMapper().valueToTree(this).toString();
-  }
-
-  public MultipleChoicesQuestion cloneQuestion() {
-    return populate(new MultipleChoicesQuestion());
-  }
-
-  public MultipleChoicesQuestion populate(MultipleChoicesQuestion clone) {
-    clone.stem = stem;
-    clone.choices = choices;
-    return clone;
-  }
 }

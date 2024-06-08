@@ -1,5 +1,6 @@
 package com.odde.doughnut.services.ai.tools;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.services.ai.*;
 import com.theokanning.openai.function.FunctionDefinition;
 import java.util.List;
@@ -30,7 +31,7 @@ public class AiToolFactory {
   }
 
   public static AiToolList questionEvaluationAiTool(MCQWithAnswer question) {
-    MultipleChoicesQuestion clone = question.getMultipleChoicesQuestion();
+    MultipleChoicesQuestion mcq = question.multipleChoicesQuestion;
 
     String messageBody =
         """
@@ -42,7 +43,7 @@ please critically check if the following question makes sense and is possible to
 %s
 
 """
-            .formatted(clone.toJsonString());
+            .formatted(new ObjectMapper().valueToTree(mcq).toString());
 
     return new AiToolList(
         messageBody,

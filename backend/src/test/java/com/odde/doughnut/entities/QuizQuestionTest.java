@@ -144,7 +144,9 @@ class QuizQuestionTest {
           generateQuizQuestion(note, new RealRandomizer(), questionGenerator);
       assertThat(randomQuizQuestion, instanceOf(QuizQuestion.class));
       QuizQuestion qq = randomQuizQuestion;
-      assertThat(qq.getMultipleChoicesQuestion().stem, containsString(mcqWithAnswer.stem));
+      assertThat(
+          qq.getMultipleChoicesQuestion().stem,
+          containsString(mcqWithAnswer.multipleChoicesQuestion.stem));
     }
 
     @Test

@@ -4,13 +4,15 @@ import mock_services from "./mock_services"
 export const questionGenerationService = () => ({
   resetAndStubAskingMCQ: (record: Record<string, string>) => {
     const mcqWithAnswer: MCQWithAnswer = {
-      stem: record["Question Stem"],
       correctChoiceIndex: 0,
-      choices: [
-        record["Correct Choice"]!,
-        record["Incorrect Choice 1"]!,
-        record["Incorrect Choice 2"]!,
-      ],
+      multipleChoicesQuestion: {
+        stem: record["Question Stem"],
+        choices: [
+          record["Correct Choice"]!,
+          record["Incorrect Choice 1"]!,
+          record["Incorrect Choice 2"]!,
+        ],
+      },
     }
     const reply = JSON.stringify(mcqWithAnswer)
     cy.then(async () => {

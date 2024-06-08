@@ -67,7 +67,7 @@ public class SuggestedQuestionForFineTuning extends EntityIdentifiedByIdOnly {
   }
 
   public void preserveQuestion(MCQWithAnswer mcqWithAnswer) {
-    this.preservedQuestion = mcqWithAnswer.toJsonString();
+    this.preservedQuestion = new ObjectMapper().valueToTree(mcqWithAnswer).toString();
   }
 
   public void preserveNoteContent(Note note) {

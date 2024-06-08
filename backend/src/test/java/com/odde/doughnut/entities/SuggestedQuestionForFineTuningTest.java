@@ -35,7 +35,9 @@ class SuggestedQuestionForFineTuningTest {
     List<ChatMessageForFineTuning> goodTrainingData =
         questionEvaluationFineTuningData.getMessages();
     assertThat(goodTrainingData.get(0).getContent(), containsString("note content"));
-    assertThat(goodTrainingData.get(1).getContent(), containsString(mcqWithAnswer.stem));
+    assertThat(
+        goodTrainingData.get(1).getContent(),
+        containsString(mcqWithAnswer.multipleChoicesQuestion.stem));
     assertThat(goodTrainingData.get(2).getContent(), nullValue());
     assertThat(goodTrainingData.get(2).getFunctionCall().getName(), equalTo("evaluate_question"));
   }
@@ -47,13 +49,15 @@ class SuggestedQuestionForFineTuningTest {
   @Test
   void testMCQWithLegacyDataStructure() {
     MCQWithAnswer legacyMcq = new LegacyMCQWithAnswer();
-    legacyMcq.stem = "stem";
+    legacyMcq.multipleChoicesQuestion.stem = "stem";
     suggestedQuestionForFineTuning.preserveQuestion(legacyMcq);
     OpenAIChatGPTFineTuningExample questionEvaluationFineTuningData =
         suggestedQuestionForFineTuning.toQuestionEvaluationFineTuningData();
     List<ChatMessageForFineTuning> goodTrainingData =
         questionEvaluationFineTuningData.getMessages();
-    assertThat(goodTrainingData.get(1).getContent(), containsString(legacyMcq.stem));
+    assertThat(
+        goodTrainingData.get(1).getContent(),
+        containsString(legacyMcq.multipleChoicesQuestion.stem));
   }
 
   @Test

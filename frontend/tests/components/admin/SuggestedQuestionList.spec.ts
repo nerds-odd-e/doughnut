@@ -37,7 +37,9 @@ describe("Edit Suggested Question", () => {
           .mount();
         matchByText(wrapper, /Chat/, "button")!.trigger("click");
         const alertMsg = usePopups().popups.peek()[0]!.message;
-        expect(alertMsg).toContain(suggestedQuestion.preservedQuestion.stem);
+        expect(alertMsg).toContain(
+          suggestedQuestion.preservedQuestion.multipleChoicesQuestion.stem,
+        );
         expect(alertMsg).toContain(suggestedQuestion.preservedNoteContent);
       });
 

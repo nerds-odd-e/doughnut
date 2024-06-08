@@ -1,6 +1,8 @@
 <template>
   <tr>
-    <td>{{ suggestedQuestion.preservedQuestion.stem }}</td>
+    <td>
+      {{ suggestedQuestion.preservedQuestion.multipleChoicesQuestion.stem }}
+    </td>
     <td>{{ suggestedQuestion.positiveFeedback ? "Positive" : "Negative" }}</td>
     <td>{{ suggestedQuestion.comment }}</td>
     <td>
@@ -75,7 +77,7 @@ export default {
     async deleteSuggestedQuestion(suggested: SuggestedQuestionForFineTuning) {
       if (
         await this.popups.confirm(
-          `Are you sure to delete this suggestion (${suggested.preservedQuestion.stem})?`,
+          `Are you sure to delete this suggestion (${suggested.preservedQuestion.multipleChoicesQuestion.stem})?`,
         )
       ) {
         await this.managedApi.restFineTuningDataController.delete(suggested.id);
