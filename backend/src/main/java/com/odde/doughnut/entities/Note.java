@@ -128,11 +128,6 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
   @Embedded @JsonIgnore @Getter private ReviewSetting reviewSetting = new ReviewSetting();
 
   @JsonIgnore
-  public List<Note> getHierarchicalChildren() {
-    return filterDeleted(children).stream().filter(c -> c.getLinkType() == null).toList();
-  }
-
-  @JsonIgnore
   public List<Note> getChildren() {
     return filterDeleted(children);
   }
@@ -270,16 +265,21 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  public List<Note> getHierarchicalSiblings() {
+  private List<Note> getNoneLinkChildren() {
+    return getChildren().stream().filter(c -> c.getLinkType() == null).toList();
+  }
+
+  @JsonIgnore
+  public List<Note> getNoneLinkSiblings() {
     if (getParent() == null) {
       return new ArrayList<>();
     }
-    return getParent().getHierarchicalChildren();
+    return getParent().getNoneLinkChildren();
   }
 
   @JsonIgnore
   public Stream<Note> getAllNoneLinkDescendants() {
-    return getHierarchicalChildren().stream()
+    return getNoneLinkChildren().stream()
         .flatMap(c -> Stream.concat(Stream.of(c), c.getAllNoneLinkDescendants()));
   }
 

@@ -307,8 +307,7 @@ class RestNoteControllerTests {
 
         assertEquals("Johnny boy", note.getNote().getTopicConstructor());
         assertEquals("Q8337", note.getNote().getWikidataId());
-        assertEquals(
-            "Canada", note.getNote().getHierarchicalChildren().get(0).getTopicConstructor());
+        assertEquals("Canada", note.getNote().getChildren().get(0).getTopicConstructor());
       }
     }
 
@@ -335,8 +334,7 @@ class RestNoteControllerTests {
 
         assertEquals("Harry Potter", note.getNote().getTopicConstructor());
         assertEquals("Q8337", note.getNote().getWikidataId());
-        assertEquals(
-            "J. K. Rowling", note.getNote().getHierarchicalChildren().get(0).getTopicConstructor());
+        assertEquals("J. K. Rowling", note.getNote().getChildren().get(0).getTopicConstructor());
       }
 
       @Test
@@ -356,7 +354,7 @@ class RestNoteControllerTests {
 
         assertEquals(
             "The girl sat next to the window",
-            note.getNote().getHierarchicalChildren().get(1).getTopicConstructor());
+            note.getNote().getChildren().get(1).getTopicConstructor());
       }
     }
   }
@@ -448,7 +446,7 @@ class RestNoteControllerTests {
     void shouldDeleteTheNoteButNotTheUser() throws UnexpectedNoAccessRightException {
       controller.deleteNote(subject);
       makeMe.refresh(parent);
-      assertThat(parent.getHierarchicalChildren(), hasSize(0));
+      assertThat(parent.getChildren(), hasSize(0));
       assertTrue(modelFactoryService.findUserById(userModel.getEntity().getId()).isPresent());
     }
 
@@ -457,7 +455,7 @@ class RestNoteControllerTests {
       makeMe.aNote("silbling").under(parent).please();
       controller.deleteNote(subject);
       makeMe.refresh(parent);
-      assertThat(parent.getHierarchicalChildren(), hasSize(1));
+      assertThat(parent.getChildren(), hasSize(1));
       assertThat(parent.getAllNoneLinkDescendants().toList(), hasSize(1));
     }
 
@@ -469,7 +467,7 @@ class RestNoteControllerTests {
         makeMe.refresh(subject);
         controller.undoDeleteNote(subject);
         makeMe.refresh(parent);
-        assertThat(parent.getHierarchicalChildren(), hasSize(1));
+        assertThat(parent.getChildren(), hasSize(1));
         assertThat(parent.getAllNoneLinkDescendants().toList(), hasSize(2));
       }
 

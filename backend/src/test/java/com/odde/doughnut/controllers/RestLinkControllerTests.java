@@ -81,7 +81,6 @@ class RestLinkControllerTests {
       linkCreation.asFirstChild = false;
       controller().linkNoteFinalize(note3, note2, linkCreation, makeMe.successfulBindingResult());
       makeMe.refresh(note3);
-      assertThat(note3.getHierarchicalChildren(), hasSize(0));
       assertThat(note3.getLinks(), hasSize(1));
     }
 

@@ -28,7 +28,7 @@ public class NoteTest {
     Note note2 = makeMe.aNote().under(parent).please();
     makeMe.flush();
     makeMe.refresh(parent);
-    assertThat(parent.getHierarchicalChildren(), containsInRelativeOrder(note1, note2));
+    assertThat(parent.getChildren(), containsInRelativeOrder(note1, note2));
   }
 
   @Test
