@@ -1,6 +1,7 @@
 /// <reference types="Cypress" />
 // @ts-check
 import { QuestionSuggestionParams } from "../../frontend/src/generated/backend/models/QuestionSuggestionParams"
+import { QuizQuestionTestData } from "./../../frontend/src/generated/backend/models/QuizQuestionTestData"
 import ServiceMocker from "../support/ServiceMocker"
 
 const hourOfDay = (days: number, hours: number) => {
@@ -63,15 +64,13 @@ const testability = () => {
       })
     },
 
-    seedQuizQuestions(seedQuizQuestions: unknown[], externalIdentifier = "", circleName = null) {
+    seedQuizQuestions(quizQuestionTestData: QuizQuestionTestData[]) {
       postToTestabilityApi(cy, "seed_quiz_questions", {
         body: {
-          externalIdentifier,
-          circleName,
-          seedQuizQuestions,
+          quizQuestionTestData,
         },
       }).then((response) => {
-        expect(Object.keys(response.body).length).to.equal(seedQuizQuestions.length)
+        expect(Object.keys(response.body).length).to.equal(quizQuestionTestData.length)
         cy.wrap(response.body).as(seededQuizQuestionIdMapAliasName)
       })
     },

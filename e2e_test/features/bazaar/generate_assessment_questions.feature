@@ -22,9 +22,9 @@ Feature: Bazaar generate
 
   Scenario: display assessment questions from notebook
     Given there are questions for the note:
-      | topicConstructor | question                           | answer  | option   |
-      | Singapore        | Where in the world is Singapore?   | Asia    | euro     |
-      | Vietnam          | Most famous food of Vietnam?       | Pho     | bread    |
+      | topicConstructor | question                         | answer | oneWrongChoice |
+      | Singapore        | Where in the world is Singapore? | Asia   | euro           |
+      | Vietnam          | Most famous food of Vietnam?     | Pho    | bread          |
     And I am logged in as an existing user
     When I go to the bazaar
     And I generate assessment questions on notebook "Countries"
@@ -33,13 +33,13 @@ Feature: Bazaar generate
 
   Scenario: display assessment questions from notebook
     Given there are questions for the note:
-      | topicConstructor | question                           | answer  | option   |
-      | Singapore        | Where in the world is Singapore?   | Asia    | euro     |
-      | Vietnam          | Most famous food of Vietnam?       | Pho     | bread    |
-      | Japan            | What is the capital city of Japan? | Tokyo   | Kyoto    |
-      | Korea            | What is the capital city of Korea? | Seoul   | Busan    |
-      | China            | What is the capital city of China? | Beijing | Shanghai |
-      | Mars             | What is the capital city of Mars?  | X       | Y        |
+      | topicConstructor | question                           | answer  | oneWrongChoice |
+      | Singapore        | Where in the world is Singapore?   | Asia    | euro           |
+      | Vietnam          | Most famous food of Vietnam?       | Pho     | bread          |
+      | Japan            | What is the capital city of Japan? | Tokyo   | Kyoto          |
+      | Korea            | What is the capital city of Korea? | Seoul   | Busan          |
+      | China            | What is the capital city of China? | Beijing | Shanghai       |
+      | Mars             | What is the capital city of Mars?  | X       | Y              |
     And I am logged in as an existing user
     When I go to the bazaar
     And I generate assessment questions on notebook "Countries"

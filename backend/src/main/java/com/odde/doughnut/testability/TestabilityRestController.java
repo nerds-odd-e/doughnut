@@ -10,7 +10,7 @@ import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GithubService;
 import com.odde.doughnut.services.NoteConstructionService;
-import com.odde.doughnut.testability.model.SeedQuizQuestions;
+import com.odde.doughnut.testability.model.QuizQuestionsTestData;
 import jakarta.persistence.EntityManagerFactory;
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -164,9 +164,10 @@ class TestabilityRestController {
 
   @PostMapping("/seed_quiz_questions")
   @Transactional
-  public List<QuizQuestion> seedQuizQuestion(@RequestBody SeedQuizQuestions seedQuizQuestions) {
+  public List<QuizQuestion> seedQuizQuestion(
+      @RequestBody QuizQuestionsTestData quizQuestionsTestData) {
     List<QuizQuestion> quizQuestions =
-        seedQuizQuestions.buildQuizQuestions(this.modelFactoryService);
+        quizQuestionsTestData.buildQuizQuestions(this.modelFactoryService);
     quizQuestions.forEach(question -> modelFactoryService.quizQuestionRepository.save(question));
     return quizQuestions;
   }

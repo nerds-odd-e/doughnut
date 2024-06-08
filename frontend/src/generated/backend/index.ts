@@ -55,6 +55,8 @@ export type { QuestionSuggestionCreationParams } from './models/QuestionSuggesti
 export type { QuestionSuggestionParams } from './models/QuestionSuggestionParams';
 export type { QuizQuestion } from './models/QuizQuestion';
 export type { QuizQuestionContestResult } from './models/QuizQuestionContestResult';
+export type { QuizQuestionsTestData } from './models/QuizQuestionsTestData';
+export type { QuizQuestionTestData } from './models/QuizQuestionTestData';
 export type { Randomization } from './models/Randomization';
 export type { RedirectToNoteResponse } from './models/RedirectToNoteResponse';
 export type { ReviewPoint } from './models/ReviewPoint';
@@ -63,8 +65,6 @@ export type { ReviewStatus } from './models/ReviewStatus';
 export type { SearchTerm } from './models/SearchTerm';
 export type { SeedInfo } from './models/SeedInfo';
 export type { SeedNote } from './models/SeedNote';
-export type { SeedQuizQuestion } from './models/SeedQuizQuestion';
-export type { SeedQuizQuestions } from './models/SeedQuizQuestions';
 export type { SeedSuggestedQuestions } from './models/SeedSuggestedQuestions';
 export type { SelfEvaluation } from './models/SelfEvaluation';
 export type { SrtDto } from './models/SrtDto';

@@ -219,7 +219,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/SeedQuizQuestions"
+              $ref: "#/components/schemas/QuizQuestionsTestData"
         required: true
       responses:
         "500":
@@ -2393,7 +2393,7 @@ components:
           writeOnly: true
           items:
             $ref: "#/components/schemas/QuestionSuggestionParams"
-    SeedQuizQuestion:
+    QuizQuestionTestData:
       type: object
       properties:
         topicConstructor:
@@ -2405,16 +2405,16 @@ components:
         answer:
           type: string
           writeOnly: true
-        option:
+        oneWrongChoice:
           type: string
           writeOnly: true
-    SeedQuizQuestions:
+    QuizQuestionsTestData:
       type: object
       properties:
-        seedQuizQuestions:
+        quizQuestionTestData:
           type: array
           items:
-            $ref: "#/components/schemas/SeedQuizQuestion"
+            $ref: "#/components/schemas/QuizQuestionTestData"
     ImageWithMask:
       type: object
       properties:

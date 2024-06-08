@@ -2,10 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type SeedQuizQuestion = {
+export type QuizQuestionTestData = {
     topicConstructor?: string;
     question?: string;
     answer?: string;
-    option?: string;
+    oneWrongChoice?: string;
 };
 
