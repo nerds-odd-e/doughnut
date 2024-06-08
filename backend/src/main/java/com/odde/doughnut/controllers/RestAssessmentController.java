@@ -1,7 +1,6 @@
 package com.odde.doughnut.controllers;
 
 import static com.odde.doughnut.controllers.dto.ApiError.ErrorType.ASSESSMENT_SERVICE_ERROR;
-import static java.util.stream.Collectors.toList;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
@@ -47,10 +46,8 @@ class RestAssessmentController {
 
     Function<Note, QuizQuestion> generateAIQuestion = quizQuestionService::generateAIQuestion;
 
-    List<Note> notes =
-        notebook.getNotes().stream().filter(note -> note.getParent() != null).limit(5).toList();
-
-    List<QuizQuestion> questions = notes.stream().map(generateAIQuestion).collect((toList()));
+    List<QuizQuestion> questions =
+        notebook.getNotes().stream().limit(5).toList().stream().map(generateAIQuestion).toList();
     if (questions.size() < 5) {
       throw new ApiException(
           "Not enough approved questions",

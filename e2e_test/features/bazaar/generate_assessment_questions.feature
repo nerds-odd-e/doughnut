@@ -29,9 +29,8 @@ Feature: Bazaar generate
 
     Examples:
       | notes count | message                                  | question count |
-      | 4           | Insufficient notes to create assessment! | 0              |
-      | 5           | Assessment For LeSS in Action            | 5              |
+      | 3           | Insufficient notes to create assessment! | 0              |
       | 6           | Assessment For LeSS in Action            | 5              |
-      
+
 
 

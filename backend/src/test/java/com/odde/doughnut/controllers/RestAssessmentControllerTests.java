@@ -107,7 +107,7 @@ public class RestAssessmentControllerTests {
 
     @Test
     void shouldReturnEmptyListWhenThereAreLessThan5Notes() {
-      makeMe.theNote(topNote).withNChildren(4);
+      makeMe.theNote(topNote).withNChildren(3);
       makeMe.refresh(notebook);
       assertThrows(ApiException.class, () -> controller.generateAiQuestions(notebook));
     }
