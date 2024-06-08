@@ -10,8 +10,8 @@ Feature: User Manually Add Questionsaaaa
       | Question                             | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
       | What do you call a cow with not leg? | Ground beef    | Cowboy             | Oxford             |
     Then I should see the question in the question list of the note "The cow joke":
-      | question stem                        |
-      | What do you call a cow with not leg? |
+      | Question                             | Correct Choice |
+      | What do you call a cow with not leg? | Ground beef    |
 
   @ignore
   Scenario: Manually add questions to the note without answer should show error and not add question

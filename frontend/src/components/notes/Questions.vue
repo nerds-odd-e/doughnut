@@ -31,6 +31,7 @@
             <td
               v-for="(choice, index) in question.multipleChoicesQuestion
                 .choices"
+              :class="{ 'correct-choice': index === 0 }"
               :key="index"
             >
               {{ choice }}
@@ -99,5 +100,9 @@ export default defineComponent({
 
 .question-table th {
   background-color: #f2f2f2;
+}
+
+.correct-choice {
+  background-color: #4caf50;
 }
 </style>

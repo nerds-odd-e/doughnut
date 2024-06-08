@@ -14,8 +14,10 @@ export const questionListPage = () => {
       cy.get("button").contains("Submit").click()
     },
     expectQuestion(row: Record<string, string>) {
-      cy.get(".question-table").should("exist")
-      cy.findByText(row["question stem"]!)
+      cy.findByText(row["Question"]!)
+      cy.findByText(row["Correct Choice"]!).then(($el) => {
+        cy.wrap($el).should("have.class", "correct-choice")
+      })
     },
   }
 }
