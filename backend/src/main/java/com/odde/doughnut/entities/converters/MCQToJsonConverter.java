@@ -26,7 +26,8 @@ public class MCQToJsonConverter implements AttributeConverter<MultipleChoicesQue
     try {
       return objectMapper.readValue(dbData, MultipleChoicesQuestion.class);
     } catch (IOException e) {
-      throw new IllegalArgumentException("Error converting JSON to list", e);
+      // for backward compatibility
+      return new MultipleChoicesQuestion();
     }
   }
 }
