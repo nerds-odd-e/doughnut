@@ -44,9 +44,6 @@ public class QuizQuestion extends EntityIdentifiedByIdOnly {
   @Column(name = "approved")
   public boolean approved = false;
 
-  @Column(name = "reviewed")
-  public boolean reviewed = false;
-
   @JsonIgnore
   public MCQWithAnswer getMcqWithAnswer() {
     MCQWithAnswer mcqWithAnswer = new MCQWithAnswer();

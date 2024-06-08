@@ -218,11 +218,4 @@ public class NoteBuilder extends EntityBuilder<Note> {
     this.quizQuestionBuilders.add(quizQuestionBuilder);
     return this;
   }
-
-  public NoteBuilder hasAnApprovedQuestion() {
-    QuizQuestionBuilder quizQuestionBuilder =
-        makeMe.aQuestion().spellingQuestionOfNote(entity).approveQuestion();
-    this.quizQuestionBuilders.add(quizQuestionBuilder);
-    return this;
-  }
 }

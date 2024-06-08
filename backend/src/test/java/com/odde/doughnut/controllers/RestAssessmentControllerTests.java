@@ -9,7 +9,6 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
-import com.odde.doughnut.testability.builders.NoteBuilder;
 import com.theokanning.openai.client.OpenAiApi;
 import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -71,8 +70,7 @@ public class RestAssessmentControllerTests {
     void shouldBeAbleToAccessNotebookThatIsInTheBazaar() throws UnexpectedNoAccessRightException {
       User anotherUser = makeMe.aUser().please();
       Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
-      makeMe.theNote(note).withNChildrenThat(6, NoteBuilder::hasAnApprovedQuestion).please();
-      makeMe.refresh(note);
+      makeMe.theNote(note).withNChildrenThat(6, noteBuilder -> noteBuilder.hasAQuestion()).please();
       makeMe.refresh(note.getNotebook());
       BazaarNotebook bazaarNotebook = makeMe.aBazaarNotebook(note.getNotebook()).please();
       List<QuizQuestion> assessment =
@@ -81,19 +79,23 @@ public class RestAssessmentControllerTests {
     }
 
     @Test
-    void shouldReturn5ApprovedQuestionsWhenThereAreMoreThan5NotesWithQuestions()
+    void shouldReturn5QuestionsWhenThereAreMoreThan5NotesWithQuestions()
         throws UnexpectedNoAccessRightException {
-      makeMe.theNote(topNote).withNChildrenThat(5, NoteBuilder::hasAnApprovedQuestion).please();
-      makeMe.theNote(topNote).withNChildrenThat(5, NoteBuilder::hasAQuestion).please();
+      makeMe
+          .theNote(topNote)
+          .withNChildrenThat(5, noteBuilder -> noteBuilder.hasAQuestion())
+          .please();
       makeMe.refresh(notebook);
       List<QuizQuestion> assessment = controller.generateAssessmentQuestions(notebook);
       assertEquals(assessment.size(), 5);
-      assertEquals(assessment.stream().filter(x -> x.approved).count(), 5);
     }
 
     @Test
-    void shouldThrowExceptionWhenThereAreNotEnoughApprovedQuestions() {
-      makeMe.theNote(topNote).withNChildrenThat(6, NoteBuilder::hasAQuestion).please();
+    void shouldThrowExceptionWhenThereAreNotEnoughQuestions() {
+      makeMe
+          .theNote(topNote)
+          .withNChildrenThat(4, noteBuilder -> noteBuilder.hasAQuestion())
+          .please();
       makeMe.refresh(notebook);
       assertThrows(ApiException.class, () -> controller.generateAssessmentQuestions(notebook));
     }
@@ -105,9 +107,9 @@ public class RestAssessmentControllerTests {
           .withNChildrenThat(
               3,
               noteBuilder -> {
-                noteBuilder.hasAnApprovedQuestion();
-                noteBuilder.hasAnApprovedQuestion();
-                noteBuilder.hasAnApprovedQuestion();
+                noteBuilder.hasAQuestion();
+                noteBuilder.hasAQuestion();
+                noteBuilder.hasAQuestion();
               })
           .please();
       makeMe.refresh(notebook);

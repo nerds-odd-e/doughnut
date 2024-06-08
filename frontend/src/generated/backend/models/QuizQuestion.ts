@@ -13,6 +13,5 @@ export type QuizQuestion = {
     createdAt?: string;
     correctAnswerIndex?: number;
     approved?: boolean;
-    reviewed?: boolean;
 };
 

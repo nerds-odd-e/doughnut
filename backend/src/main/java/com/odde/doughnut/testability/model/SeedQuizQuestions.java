@@ -34,8 +34,6 @@ public class SeedQuizQuestions {
       question.setNote(note);
       question.setCorrectAnswerIndex(0);
       question.setMultipleChoicesQuestion(mcq);
-      question.setApproved(true);
-      question.setReviewed(true);
       return question;
     }
   }

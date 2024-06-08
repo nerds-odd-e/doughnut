@@ -34,7 +34,7 @@ public class QuizQuestionService {
   }
 
   QuizQuestion selectQuizQuestionForANote(Note note) {
-    return note.getQuizQuestions().stream().filter(q -> q.approved).findFirst().orElse(null);
+    return note.getQuizQuestions().stream().findFirst().orElse(null);
   }
 
   public QuizQuestion addQuestion(Note note, MCQWithAnswer mcqWithAnswer) {

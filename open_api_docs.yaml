@@ -2515,8 +2515,6 @@ components:
           format: int32
         approved:
           type: boolean
-        reviewed:
-          type: boolean
     SeedInfo:
       type: object
       properties:
