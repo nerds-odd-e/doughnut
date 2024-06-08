@@ -278,9 +278,10 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  public Stream<Note> getDescendants() {
-    return getHierarchicalChildren().stream()
-        .flatMap(c -> Stream.concat(Stream.of(c), c.getDescendants()));
+  public Stream<Note> getAllNoneLinkDescendants() {
+    return getChildren().stream()
+        .filter(c -> c.getLinkType() == null)
+        .flatMap(c -> Stream.concat(Stream.of(c), c.getAllNoneLinkDescendants()));
   }
 
   @JsonIgnore

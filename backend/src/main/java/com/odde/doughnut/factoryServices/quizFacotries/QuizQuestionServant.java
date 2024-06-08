@@ -49,7 +49,7 @@ public class QuizQuestionServant {
       if (grand.getParent() != null) {
         grand = grand.getParent();
       }
-    return grand.getDescendants().filter(notePredicate).collect(Collectors.toList());
+    return grand.getAllNoneLinkDescendants().filter(notePredicate).collect(Collectors.toList());
   }
 
   public <T> List<T> chooseFillingOptionsRandomly(List<T> candidates) {

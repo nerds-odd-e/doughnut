@@ -458,7 +458,7 @@ class RestNoteControllerTests {
       controller.deleteNote(subject);
       makeMe.refresh(parent);
       assertThat(parent.getHierarchicalChildren(), hasSize(1));
-      assertThat(parent.getDescendants().toList(), hasSize(1));
+      assertThat(parent.getAllNoneLinkDescendants().toList(), hasSize(1));
     }
 
     @Nested
@@ -470,7 +470,7 @@ class RestNoteControllerTests {
         controller.undoDeleteNote(subject);
         makeMe.refresh(parent);
         assertThat(parent.getHierarchicalChildren(), hasSize(1));
-        assertThat(parent.getDescendants().toList(), hasSize(2));
+        assertThat(parent.getAllNoneLinkDescendants().toList(), hasSize(2));
       }
 
       @Test
@@ -487,7 +487,7 @@ class RestNoteControllerTests {
 
         controller.undoDeleteNote(subject);
         makeMe.refresh(parent);
-        assertThat(parent.getDescendants().toList(), hasSize(1));
+        assertThat(parent.getAllNoneLinkDescendants().toList(), hasSize(1));
       }
     }
   }
