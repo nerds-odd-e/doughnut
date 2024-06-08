@@ -1,5 +1,10 @@
 <template>
   <div>
+    <PopButton btn-class="btn btn-primary" title="Add Question">
+      <template #default="{ closer }">
+        <NoteAddQuestion v-bind="{ note }" @close-dialog="closer($event)" />
+      </template>
+    </PopButton>
     <table class="question-table">
       <thead>
         <tr>
@@ -32,8 +37,9 @@
   </div>
 </template>
 
-<script>
-import { defineComponent } from "vue";
+<script lang="ts">
+import { defineComponent, PropType } from "vue";
+import { Note, QuizQuestion } from "@/generated/backend";
 import useLoadingApi from "@/managedApi/useLoadingApi";
 
 export default defineComponent({
@@ -41,12 +47,15 @@ export default defineComponent({
     return useLoadingApi();
   },
   props: {
-    noteId: { type: Number, required: true },
+    note: {
+      type: Object as PropType<Note>,
+      required: true,
+    },
   },
   data() {
     return {
       currentQuestion: 1,
-      questions: [],
+      questions: [] as QuizQuestion[],
     };
   },
   methods: {
@@ -57,7 +66,7 @@ export default defineComponent({
     },
     fetchQuestions() {
       this.managedApi.restQuizQuestionController
-        .getAllQuizQuestionByNote(this.noteId)
+        .getAllQuizQuestionByNote(this.note.id)
         .then((questions) => {
           this.questions = questions;
         });

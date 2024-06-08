@@ -63,6 +63,7 @@ export default defineComponent({
       showAlert: false,
     };
   },
+  emits: ["close-dialog"],
   computed: {
     isInvalidQuestion() {
       // Check if any question or option is null or empty
@@ -105,9 +106,10 @@ export default defineComponent({
           );
         this.showAlert = !response;
         this.addQuestionManuallyResultMsg = "";
+        this.$emit("close-dialog", response);
       } catch (error) {
         const errorInstance = error as ApiError;
-        this.addQuestionManuallyResultMsg = errorInstance.body.message;
+        this.addQuestionManuallyResultMsg = errorInstance.body?.message;
         this.showAlert = true;
       }
     },

@@ -2,6 +2,7 @@ import { assumeChatAboutNotePage } from "./chatAboutNotePage"
 import submittableForm from "../submittableForm"
 import noteCreationForm from "./noteForms/noteCreationForm"
 import { commonSenseSplit } from "support/string_util"
+import { questionListPage } from "./questionListPage"
 
 function filterAttributes(attributes: Record<string, string>, keysToKeep: string[]) {
   return Object.keys(attributes)
@@ -161,18 +162,15 @@ export const assumeNotePage = (noteTopic?: string) => {
       cy.findByRole("button", { name: "OK" }).click()
       cy.pageIsNotLoading()
     },
-    addQuestionPage(row: Record<string, string>) {
-      clickNotePageMoreOptionsButton("Add Question")
-      cy.get("label").contains("Question:").next().as("questionTextarea")
-      cy.get("@questionTextarea").type(row?.["Question"] as string)
-      cy.get("label").contains("Option 1 (Correct Answer)").next().as("questionTextarea")
-      cy.get("@questionTextarea").type(row?.["Correct Choice"] as string)
-      cy.get("label").contains("Option 2").next().as("questionTextarea")
-      cy.get("@questionTextarea").type(row?.["Incorrect Choice 1"] as string)
-      cy.get("button").contains("+").click()
-      cy.get("label").contains("Option 3").next().as("questionTextarea")
-      cy.get("@questionTextarea").type(row?.["Incorrect Choice 2"] as string)
-      cy.get("button").contains("Submit").click()
+    openQuestionList() {
+      clickNotePageMoreOptionsButton("Questions for the note")
+      return questionListPage()
+    },
+    addQuestion(row: Record<string, string>) {
+      this.openQuestionList().addQuestion(row)
+    },
+    expectQuestionInList(row: Record<string, string>) {
+      this.openQuestionList().expectQuestion(row)
     },
     aiSuggestDetailsForNote: () => {
       cy.on("uncaught:exception", () => {

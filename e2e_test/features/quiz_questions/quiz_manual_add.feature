@@ -3,17 +3,15 @@ Feature: User Manually Add Questionsaaaa
 
   Background:
     Given I am logged in as an existing user
-    And I have a note with the topic "team"
+    And I have a note with the topic "The cow joke"
 
   Scenario: Manually add a question to the note successfully
-    Given I add the following question for the note "team":
-      | Question                                            | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
-      | What is the most common scuba diving certification? | Rescue Diver   | Divemaster         | Open Water Diver   |
-
-#      Then I should be able to see a success message
-  #    And I should be able to see the question in the qusestion list of the note
-  #      | note-topic | Question                                      |
-  #      | team       | What is the most common scuba diving certification? |
+    When I add the following question for the note "The cow joke":
+      | Question                             | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
+      | What do you call a cow with not leg? | Ground beef    | Cowboy             | Oxford             |
+    Then I should see the question in the question list of the note "The cow joke":
+      | question stem                                       |
+      | What is the most common scuba diving certification? |
 
   @ignore
   Scenario: Manually add questions to the note without answer should show error and not add question
@@ -64,12 +62,4 @@ Feature: User Manually Add Questionsaaaa
       | Error: You are logged out, please log in to use this function. |
     And I should not be able to see the question in the question list of the note
       | note-topic | Question                                            |
-      | team       | What is the most common scuba diving certification? |
-
-  Scenario: When user has added a question successfully to the note
-    Given I add the following question for the note "team":
-      | Question                                            | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
-      | What is the most common scuba diving certification? | Rescue Diver   | Divemaster         | Open Water Diver   |
-    Then I should see the question in the question list of the note
-      | note-topic | question stem                                       |
       | team       | What is the most common scuba diving certification? |

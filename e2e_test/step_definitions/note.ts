@@ -67,7 +67,7 @@ Given(
   "I add the following question for the note {string}:",
   (noteTopic: string, data: DataTable) => {
     expect(data.hashes().length, "please add one question at a time.").to.equal(1)
-    start.jumpToNotePage(noteTopic).addQuestionPage(data.hashes()[0]!)
+    start.jumpToNotePage(noteTopic).addQuestion(data.hashes()[0]!)
   },
 )
 
@@ -405,10 +405,10 @@ When("I route to the note {string}", (noteTopic: string) => {
   start.jumpToNotePage(noteTopic)
 })
 
-When("I should see the question in the question list of the note", (data: DataTable) => {
-  const row = data.hashes()[0]
-  start.jumpToNotePage(row?.["note-topic"] as string)
-  cy.findAllByTitle("more options").click()
-  cy.findAllByTitle("View Questions").click()
-  cy.get(".question-table").should("exist")
-})
+When(
+  "I should see the question in the question list of the note {string}:",
+  (noteTopic: string, data: DataTable) => {
+    const row = data.hashes()[0]
+    start.jumpToNotePage(noteTopic).expectQuestionInList(row)
+  },
+)
