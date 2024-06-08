@@ -12,6 +12,5 @@ export type QuizQuestion = {
     imageWithMask?: ImageWithMask;
     createdAt?: string;
     correctAnswerIndex?: number;
-    approved?: boolean;
 };
 

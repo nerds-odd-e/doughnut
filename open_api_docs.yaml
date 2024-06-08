@@ -2513,8 +2513,6 @@ components:
         correctAnswerIndex:
           type: integer
           format: int32
-        approved:
-          type: boolean
     SeedInfo:
       type: object
       properties:

@@ -20,7 +20,6 @@
           <th>B</th>
           <th>C</th>
           <th>D</th>
-          <th>Approved?</th>
         </tr>
       </thead>
       <tbody>
@@ -39,7 +38,6 @@
               {{ choice }}
             </td>
           </template>
-          <td><input type="checkbox" v-model="question.approved" /></td>
         </tr>
       </tbody>
     </table>
