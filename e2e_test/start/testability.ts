@@ -40,7 +40,6 @@ const cleanAndReset = (cy: Cypress.cy & CyEventEmitter, countdown: number) => {
 }
 
 const injectedNoteIdMapAliasName = "injectedNoteIdMap"
-const seededQuizQuestionIdMapAliasName = "seededQuizQuestionIdMap"
 
 const testability = () => {
   return {
@@ -72,7 +71,6 @@ const testability = () => {
         },
       }).then((response) => {
         expect(Object.keys(response.body).length).to.equal(quizQuestionTestData.length)
-        cy.wrap(response.body).as(seededQuizQuestionIdMapAliasName)
       })
     },
 
