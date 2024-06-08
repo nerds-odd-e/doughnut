@@ -2,6 +2,7 @@
 // @ts-check
 import { QuestionSuggestionParams } from "../../frontend/src/generated/backend/models/QuestionSuggestionParams"
 import { QuizQuestionTestData } from "./../../frontend/src/generated/backend/models/QuizQuestionTestData"
+import { NoteTestData } from "./../../frontend/src/generated/backend/models/NoteTestData"
 import ServiceMocker from "../support/ServiceMocker"
 
 const hourOfDay = (days: number, hours: number) => {
@@ -51,15 +52,15 @@ const testability = () => {
       postToTestabilityApiSuccessfully(cy, "feature_toggle", { body: { enabled } })
     },
 
-    injectNotes(seedNotes: unknown[], externalIdentifier = "", circleName = null) {
+    injectNotes(noteTestData: NoteTestData[], externalIdentifier = "", circleName = null) {
       postToTestabilityApi(cy, "inject_notes", {
         body: {
           externalIdentifier,
           circleName,
-          seedNotes,
+          noteTestData,
         },
       }).then((response) => {
-        expect(Object.keys(response.body).length).to.equal(seedNotes.length)
+        expect(Object.keys(response.body).length).to.equal(noteTestData.length)
         cy.wrap(response.body).as(seededNoteIdMapAliasName)
       })
     },

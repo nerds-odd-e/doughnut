@@ -351,7 +351,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/SeedInfo"
+              $ref: "#/components/schemas/NotesTestData"
         required: true
       responses:
         "500":
@@ -2514,21 +2514,7 @@ components:
         correctAnswerIndex:
           type: integer
           format: int32
-    SeedInfo:
-      type: object
-      properties:
-        seedNotes:
-          type: array
-          writeOnly: true
-          items:
-            $ref: "#/components/schemas/SeedNote"
-        externalIdentifier:
-          type: string
-          writeOnly: true
-        circleName:
-          type: string
-          writeOnly: true
-    SeedNote:
+    NoteTestData:
       type: object
       properties:
         topicConstructor:
@@ -2552,6 +2538,20 @@ components:
           type: string
           writeOnly: true
         wikidataId:
+          type: string
+          writeOnly: true
+    NotesTestData:
+      type: object
+      properties:
+        noteTestData:
+          type: array
+          writeOnly: true
+          items:
+            $ref: "#/components/schemas/NoteTestData"
+        externalIdentifier:
+          type: string
+          writeOnly: true
+        circleName:
           type: string
           writeOnly: true
     SubscriptionDTO:

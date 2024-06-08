@@ -71,7 +71,7 @@ class TestabilityRestController {
     modelFactoryService.save(user);
   }
 
-  static class SeedNote {
+  static class NoteTestData {
     public String topicConstructor;
     @Setter private String details;
     @Setter private String testingParent;
@@ -103,14 +103,14 @@ class TestabilityRestController {
     }
   }
 
-  static class SeedInfo {
-    @Setter private List<SeedNote> seedNotes;
+  static class NotesTestData {
+    @Setter private List<NoteTestData> noteTestData;
     @Setter private String externalIdentifier;
     @Setter private String circleName; // optional
 
     private Map<String, Note> buildIndividualNotes(User user, Timestamp currentUTCTimestamp) {
-      return seedNotes.stream()
-          .map(seedNote -> seedNote.buildNote(user, currentUTCTimestamp))
+      return noteTestData.stream()
+          .map(noteTestData -> noteTestData.buildNote(user, currentUTCTimestamp))
           .collect(Collectors.toMap(note -> note.getTopicConstructor(), n -> n));
     }
 
@@ -119,7 +119,7 @@ class TestabilityRestController {
         Ownership ownership,
         Map<String, Note> titleNoteMap,
         ModelFactoryService modelFactoryService) {
-      seedNotes.forEach(
+      noteTestData.forEach(
           seed -> {
             Note note = titleNoteMap.get(seed.topicConstructor);
 
@@ -143,21 +143,22 @@ class TestabilityRestController {
 
     private void saveByOriginalOrder(
         Map<String, Note> titleNoteMap, ModelFactoryService modelFactoryService) {
-      seedNotes.forEach(
+      noteTestData.forEach(
           (seed -> modelFactoryService.save(titleNoteMap.get(seed.topicConstructor))));
     }
   }
 
   @PostMapping("/inject_notes")
   @Transactional
-  public Map<String, Integer> seedNote(@RequestBody SeedInfo seedInfo) {
-    final User user = getUserModelByExternalIdentifierOrCurrentUser(seedInfo.externalIdentifier);
-    Ownership ownership = getOwnership(seedInfo, user);
+  public Map<String, Integer> seedNote(@RequestBody NotesTestData notesTestData) {
+    final User user =
+        getUserModelByExternalIdentifierOrCurrentUser(notesTestData.externalIdentifier);
+    Ownership ownership = getOwnership(notesTestData, user);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
 
-    Map<String, Note> titleNoteMap = seedInfo.buildIndividualNotes(user, currentUTCTimestamp);
-    seedInfo.buildNoteTree(user, ownership, titleNoteMap, this.modelFactoryService);
-    seedInfo.saveByOriginalOrder(titleNoteMap, this.modelFactoryService);
+    Map<String, Note> titleNoteMap = notesTestData.buildIndividualNotes(user, currentUTCTimestamp);
+    notesTestData.buildNoteTree(user, ownership, titleNoteMap, this.modelFactoryService);
+    notesTestData.saveByOriginalOrder(titleNoteMap, this.modelFactoryService);
     return titleNoteMap.values().stream()
         .collect(Collectors.toMap(note -> note.getTopicConstructor(), Note::getId));
   }
@@ -172,9 +173,9 @@ class TestabilityRestController {
     return quizQuestions;
   }
 
-  private Ownership getOwnership(SeedInfo seedInfo, User user) {
-    if (seedInfo.circleName != null) {
-      Circle circle = modelFactoryService.circleRepository.findByName(seedInfo.circleName);
+  private Ownership getOwnership(NotesTestData notesTestData, User user) {
+    if (notesTestData.circleName != null) {
+      Circle circle = modelFactoryService.circleRepository.findByName(notesTestData.circleName);
       return circle.getOwnership();
     }
     return user.getOwnership();

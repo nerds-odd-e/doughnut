@@ -2,10 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { NotesTestData } from '../models/NotesTestData';
 import type { QuizQuestion } from '../models/QuizQuestion';
 import type { QuizQuestionsTestData } from '../models/QuizQuestionsTestData';
 import type { Randomization } from '../models/Randomization';
-import type { SeedInfo } from '../models/SeedInfo';
 import type { SeedSuggestedQuestions } from '../models/SeedSuggestedQuestions';
 import type { TimeTravel } from '../models/TimeTravel';
 import type { TimeTravelRelativeToNow } from '../models/TimeTravelRelativeToNow';
@@ -225,7 +225,7 @@ export class TestabilityRestControllerService {
      * @throws ApiError
      */
     public seedNote(
-        requestBody: SeedInfo,
+        requestBody: NotesTestData,
     ): CancelablePromise<Record<string, number>> {
         return this.httpRequest.request({
             method: 'POST',

@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type SeedNote = {
+export type NoteTestData = {
     topicConstructor?: string;
     details?: string;
     testingParent?: string;
