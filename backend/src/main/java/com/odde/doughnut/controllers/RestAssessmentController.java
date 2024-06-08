@@ -9,6 +9,7 @@ import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AssessmentService;
 import com.odde.doughnut.services.QuizQuestionService;
 import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -24,16 +25,15 @@ import org.springframework.web.bind.annotation.*;
 class RestAssessmentController {
   private final QuizQuestionService quizQuestionService;
   private final UserModel currentUser;
-
-  private final ModelFactoryService modelFactoryService;
+  private final AssessmentService assessmentService;
 
   public RestAssessmentController(
       @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
       ModelFactoryService modelFactoryService,
       UserModel currentUser) {
     this.currentUser = currentUser;
-    this.modelFactoryService = modelFactoryService;
     this.quizQuestionService = new QuizQuestionService(openAiApi, modelFactoryService);
+    this.assessmentService = new AssessmentService(openAiApi, modelFactoryService);
   }
 
   @PostMapping("/ai-questions/{notebook}")
@@ -72,13 +72,6 @@ class RestAssessmentController {
     currentUser.assertLoggedIn();
     currentUser.assertReadAuthorization(notebook);
 
-    return generateAssessment(notebook, this::getQuizQuestion);
-  }
-
-  private QuizQuestion getQuizQuestion(Note note) {
-    return modelFactoryService.getQuizQuestionsByNote(note).stream()
-        .filter(q -> q.approved)
-        .findFirst()
-        .orElse(null);
+    return generateAssessment(notebook, assessmentService::getQuizQuestion);
   }
 }
