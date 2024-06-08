@@ -49,7 +49,6 @@ class AttachmentControllerTests {
   void unauthorizedAccess() {
     User anotherUser = makeMe.aUser().please();
     Audio audio = makeMe.anAudio().user(anotherUser).please();
-    makeMe.refresh(audio);
     assertThrows(
         UnexpectedNoAccessRightException.class,
         () -> controller.downloadAudio(audio),

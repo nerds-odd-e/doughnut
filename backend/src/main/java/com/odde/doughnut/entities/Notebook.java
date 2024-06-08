@@ -6,6 +6,7 @@ import com.odde.doughnut.controllers.dto.NotebookDTO;
 import jakarta.persistence.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
@@ -69,6 +70,13 @@ public class Notebook extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public List<Note> getNotes() {
-    return Note.filterDeleted(notes);
+    return Collections.unmodifiableList(Note.filterDeleted(notes));
+  }
+
+  // Hibernate and JPA does not maintain the consistency of the bidirectional relationships
+  // Here we add the note to the notes of notebook in memory to avoid reload the notebook from
+  // database
+  public void addNoteInMemoryToSupportUnitTestOnly(Note note) {
+    this.notes.add(note);
   }
 }

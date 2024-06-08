@@ -69,7 +69,6 @@ public class RestAssessmentControllerTests {
     void shouldBeAbleToAccessNotebookThatIsInTheBazaar() throws UnexpectedNoAccessRightException {
       Note noteOwnedByOtherUser = makeMe.aNote().please();
       makeMe.theNote(noteOwnedByOtherUser).withNChildrenThat(6, NoteBuilder::hasAQuestion).please();
-      makeMe.refresh(noteOwnedByOtherUser.getNotebook());
       BazaarNotebook bazaarNotebook =
           makeMe.aBazaarNotebook(noteOwnedByOtherUser.getNotebook()).please();
       List<QuizQuestion> assessment =
@@ -81,7 +80,6 @@ public class RestAssessmentControllerTests {
     void shouldReturn5QuestionsWhenThereAreMoreThan5NotesWithQuestions()
         throws UnexpectedNoAccessRightException {
       makeMe.theNote(topNote).withNChildrenThat(5, NoteBuilder::hasAQuestion).please();
-      makeMe.refresh(notebook);
       List<QuizQuestion> assessment = controller.generateAssessmentQuestions(notebook);
       assertEquals(5, assessment.size());
     }
@@ -89,7 +87,6 @@ public class RestAssessmentControllerTests {
     @Test
     void shouldThrowExceptionWhenThereAreNotEnoughQuestions() {
       makeMe.theNote(topNote).withNChildrenThat(4, NoteBuilder::hasAQuestion).please();
-      makeMe.refresh(notebook);
       assertThrows(ApiException.class, () -> controller.generateAssessmentQuestions(notebook));
     }
 
@@ -105,7 +102,6 @@ public class RestAssessmentControllerTests {
                 noteBuilder.hasAQuestion();
               })
           .please();
-      makeMe.refresh(notebook);
 
       assertThrows(ApiException.class, () -> controller.generateAssessmentQuestions(notebook));
     }

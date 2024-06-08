@@ -41,7 +41,6 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
   @JoinColumn(name = "notebook_id", referencedColumnName = "id")
   @JsonIgnore
   @Getter
-  @Setter
   private Notebook notebook;
 
   @OneToOne(mappedBy = "note", cascade = CascadeType.ALL)
@@ -209,7 +208,11 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
   public void setParentNote(Note parentNote) {
     if (parentNote == null) return;
     setNotebook(parentNote.getNotebook());
-    parent = parentNote;
+    this.parent = parentNote;
+  }
+
+  private void setNotebook(Notebook notebook) {
+    this.notebook = notebook;
   }
 
   public void updateSiblingOrder(Note relativeToNote, boolean asFirstChildOfNote) {
