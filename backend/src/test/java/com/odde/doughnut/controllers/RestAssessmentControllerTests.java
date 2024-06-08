@@ -73,7 +73,7 @@ public class RestAssessmentControllerTests {
       User anotherUser = makeMe.aUser().please();
       Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
       makeMe.theNote(note).withNChildren(5);
-      makeMe.refresh(note);
+      makeMe.refresh(note.getNotebook());
       BazaarNotebook bazaarNotebook = makeMe.aBazaarNotebook(note.getNotebook()).please();
       List<QuizQuestion> assessment = controller.generateAiQuestions(bazaarNotebook.getNotebook());
       assertEquals(5, assessment.size());
@@ -91,7 +91,7 @@ public class RestAssessmentControllerTests {
     @Test
     void shouldReturn5QuestionsWhenThereAre5Notes() throws UnexpectedNoAccessRightException {
       makeMe.theNote(topNote).withNChildren(5);
-      makeMe.refresh(topNote);
+      makeMe.refresh(notebook);
       List<QuizQuestion> assessment = controller.generateAiQuestions(notebook);
       assertEquals(5, assessment.size());
     }
@@ -100,7 +100,7 @@ public class RestAssessmentControllerTests {
     void shouldReturn5QuestionsWhenThereAreMoreThan5Notes()
         throws UnexpectedNoAccessRightException {
       makeMe.theNote(topNote).withNChildren(10);
-      makeMe.refresh(topNote);
+      makeMe.refresh(notebook);
       List<QuizQuestion> assessment = controller.generateAiQuestions(notebook);
       assertEquals(5, assessment.size());
     }
@@ -108,7 +108,7 @@ public class RestAssessmentControllerTests {
     @Test
     void shouldReturnEmptyListWhenThereAreLessThan5Notes() throws UnexpectedNoAccessRightException {
       makeMe.theNote(topNote).withNChildren(4);
-      makeMe.refresh(topNote);
+      makeMe.refresh(notebook);
       assertEquals(controller.generateAiQuestions(notebook), new ArrayList<>());
     }
 
@@ -119,7 +119,7 @@ public class RestAssessmentControllerTests {
       makeMe.refresh(topNote);
       Note firstChild = topNote.getChildren().get(0);
       makeMe.theNote(firstChild).withNChildren(3);
-      makeMe.refresh(firstChild);
+      makeMe.refresh(notebook);
       List<QuizQuestion> assessment = controller.generateAiQuestions(notebook);
       assertEquals(5, assessment.size());
     }
@@ -162,7 +162,7 @@ public class RestAssessmentControllerTests {
           makeMe.aQuestion().spellingQuestionOfNote(note).please();
         }
       }
-      makeMe.refresh(topNote);
+      makeMe.refresh(notebook);
 
       List<QuizQuestion> assessment = controller.generateAssessmentQuestions(notebook);
 
@@ -177,7 +177,7 @@ public class RestAssessmentControllerTests {
       for (Note note : topNote.getChildren()) {
         makeMe.aQuestion().spellingQuestionOfNote(note).please();
       }
-      makeMe.refresh(topNote);
+      makeMe.refresh(notebook);
 
       assertThrows(ApiException.class, () -> controller.generateAssessmentQuestions(notebook));
     }
@@ -195,7 +195,7 @@ public class RestAssessmentControllerTests {
           makeMe.aQuestion().spellingQuestionOfNote(note).please();
         }
       }
-      makeMe.refresh(topNote);
+      makeMe.refresh(notebook);
 
       List<QuizQuestion> assessment = controller.generateAssessmentQuestions(notebook);
 
@@ -217,7 +217,7 @@ public class RestAssessmentControllerTests {
         makeMe.aQuestion().spellingQuestionOfNote(note).approveQuestion().please();
         makeMe.aQuestion().spellingQuestionOfNote(note).approveQuestion().please();
       }
-      makeMe.refresh(topNote);
+      makeMe.refresh(notebook);
 
       assertThrows(ApiException.class, () -> controller.generateAssessmentQuestions(notebook));
     }

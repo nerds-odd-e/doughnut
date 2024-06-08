@@ -3,7 +3,6 @@ package com.odde.doughnut.controllers;
 import static com.odde.doughnut.controllers.dto.ApiError.ErrorType.ASSESSMENT_SERVICE_ERROR;
 import static java.util.stream.Collectors.toList;
 
-import com.odde.doughnut.controllers.dto.SearchTerm;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.QuizQuestion;
@@ -47,9 +46,7 @@ class RestAssessmentController {
     currentUser.assertReadAuthorization(notebook);
 
     List<Note> notes =
-        this.modelFactoryService
-            .toSearchTermModel(currentUser.getEntity(), new SearchTerm())
-            .search(notebook.getId())
+        notebook.getNotes().stream()
             .filter(note -> note.getParent() != null)
             .limit(5)
             .collect((Collectors.toList()));
@@ -68,10 +65,8 @@ class RestAssessmentController {
     currentUser.assertLoggedIn();
     currentUser.assertReadAuthorization(notebook);
 
-    List<Note> notes = notebook.getHeadNote().getChildren();
-
     List<QuizQuestion> filteredQuestionList =
-        notes.stream()
+        notebook.getNotes().stream()
             .map(modelFactoryService::getQuizQuestionsByNote)
             .flatMap(List::stream)
             .filter(question -> question.approved)
