@@ -41,7 +41,7 @@ abstract class TestabilityBase {
 
   Future<void> seedNotebookInBazaar(String notebookName) async {
     http.Response response = await testabilityPost(
-        'seed_notes',
+        'inject_notes',
         bodyObject: {
           external_identifier: 'old_learner',
           seedNotes: [

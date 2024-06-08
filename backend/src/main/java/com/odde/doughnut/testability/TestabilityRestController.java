@@ -148,7 +148,7 @@ class TestabilityRestController {
     }
   }
 
-  @PostMapping("/seed_notes")
+  @PostMapping("/inject_notes")
   @Transactional
   public Map<String, Integer> seedNote(@RequestBody SeedInfo seedInfo) {
     final User user = getUserModelByExternalIdentifierOrCurrentUser(seedInfo.externalIdentifier);

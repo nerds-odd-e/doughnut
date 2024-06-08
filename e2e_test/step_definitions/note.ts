@@ -22,7 +22,7 @@ defineParameterType({
 })
 
 Given("there are some notes for the current user:", (data: DataTable) => {
-  start.testability().seedNotes(data.hashes())
+  start.testability().injectNotes(data.hashes())
 })
 
 Given("there are questions for the note:", (data: DataTable) => {
@@ -30,13 +30,13 @@ Given("there are questions for the note:", (data: DataTable) => {
 })
 
 Given("I have a note with the topic {string}", (noteTopic: string) => {
-  start.testability().seedNotes([{ topicConstructor: noteTopic }])
+  start.testability().injectNotes([{ topicConstructor: noteTopic }])
 })
 
 Given(
   "there are some notes for existing user {string}",
   (externalIdentifier: string | undefined, data: DataTable) => {
-    start.testability().seedNotes(data.hashes(), externalIdentifier)
+    start.testability().injectNotes(data.hashes(), externalIdentifier)
   },
 )
 
@@ -50,7 +50,7 @@ Given(
       })
 
     notes.push({ topicConstructor: noteTopic, testingParent: "" })
-    start.testability().seedNotes(notes, "old_learner")
+    start.testability().injectNotes(notes, "old_learner")
   },
 )
 
@@ -60,7 +60,7 @@ Given("there are notes from Note {int} to Note {int}", (from: number, to: number
     .map((_, i) => {
       return { topicConstructor: `Note ${i + from}` }
     })
-  start.testability().seedNotes(notes)
+  start.testability().injectNotes(notes)
 })
 
 Given(

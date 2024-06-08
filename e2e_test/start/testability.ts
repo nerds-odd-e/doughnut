@@ -51,8 +51,8 @@ const testability = () => {
       postToTestabilityApiSuccessfully(cy, "feature_toggle", { body: { enabled } })
     },
 
-    seedNotes(seedNotes: unknown[], externalIdentifier = "", circleName = null) {
-      postToTestabilityApi(cy, "seed_notes", {
+    injectNotes(seedNotes: unknown[], externalIdentifier = "", circleName = null) {
+      postToTestabilityApi(cy, "inject_notes", {
         body: {
           externalIdentifier,
           circleName,

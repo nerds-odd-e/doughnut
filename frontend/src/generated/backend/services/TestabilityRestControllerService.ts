@@ -131,24 +131,6 @@ export class TestabilityRestControllerService {
     }
     /**
      * @param requestBody
-     * @returns number OK
-     * @throws ApiError
-     */
-    public seedNote(
-        requestBody: SeedInfo,
-    ): CancelablePromise<Record<string, number>> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/api/testability/seed_notes',
-            body: requestBody,
-            mediaType: 'application/json',
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * @param requestBody
      * @returns string OK
      * @throws ApiError
      */
@@ -230,6 +212,24 @@ export class TestabilityRestControllerService {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/testability/inject_quiz_questions',
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param requestBody
+     * @returns number OK
+     * @throws ApiError
+     */
+    public seedNote(
+        requestBody: SeedInfo,
+    ): CancelablePromise<Record<string, number>> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/testability/inject_notes',
             body: requestBody,
             mediaType: 'application/json',
             errors: {
