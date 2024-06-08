@@ -741,6 +741,61 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/AnsweredQuestion"
+  /api/quiz-questions/{note}/note-questions:
+    get:
+      tags:
+      - rest-quiz-question-controller
+      operationId: getAllQuizQuestionByNote
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/QuizQuestion"
+    post:
+      tags:
+      - rest-quiz-question-controller
+      operationId: addQuestionManually
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuizQuestionCreationParams"
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: boolean
   /api/quiz-questions/review:
     post:
       tags:
@@ -787,30 +842,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/QuizQuestion"
-  /api/quiz-questions/add-question-manually:
-    post:
-      tags:
-      - rest-quiz-question-controller
-      operationId: addQuestionManually
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/QuizQuestionCreationParams"
-        required: true
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: boolean
   /api/notes/{parentNote}/create:
     post:
       tags:
@@ -2050,32 +2081,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/QuizQuestion"
-  /api/quiz-questions/{note}/note-questions:
-    get:
-      tags:
-      - rest-quiz-question-controller
-      operationId: getAllQuizQuestionByNote
-      parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/QuizQuestion"
   /api/quiz-questions/{headNote}/note-book-questions:
     get:
       tags:

@@ -98,6 +98,48 @@ export class RestQuizQuestionControllerService {
         });
     }
     /**
+     * @param note
+     * @returns QuizQuestion OK
+     * @throws ApiError
+     */
+    public getAllQuizQuestionByNote(
+        note: number,
+    ): CancelablePromise<Array<QuizQuestion>> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/quiz-questions/{note}/note-questions',
+            path: {
+                'note': note,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param note
+     * @param requestBody
+     * @returns boolean OK
+     * @throws ApiError
+     */
+    public addQuestionManually(
+        note: number,
+        requestBody: QuizQuestionCreationParams,
+    ): CancelablePromise<boolean> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/quiz-questions/{note}/note-questions',
+            path: {
+                'note': note,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
      * @param requestBody
      * @returns any OK
      * @throws ApiError
@@ -127,43 +169,6 @@ export class RestQuizQuestionControllerService {
             method: 'POST',
             url: '/api/quiz-questions/generate-question',
             query: {
-                'note': note,
-            },
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * @param requestBody
-     * @returns boolean OK
-     * @throws ApiError
-     */
-    public addQuestionManually(
-        requestBody: QuizQuestionCreationParams,
-    ): CancelablePromise<boolean> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/api/quiz-questions/add-question-manually',
-            body: requestBody,
-            mediaType: 'application/json',
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * @param note
-     * @returns QuizQuestion OK
-     * @throws ApiError
-     */
-    public getAllQuizQuestionByNote(
-        note: number,
-    ): CancelablePromise<Array<QuizQuestion>> {
-        return this.httpRequest.request({
-            method: 'GET',
-            url: '/api/quiz-questions/{note}/note-questions',
-            path: {
                 'note': note,
             },
             errors: {

@@ -109,6 +109,7 @@ export default defineComponent({
         );
         const response =
           await this.managedApi.restQuizQuestionController.addQuestionManually(
+            this.note.id,
             quizQuestion,
           );
         this.showAlert = !response;

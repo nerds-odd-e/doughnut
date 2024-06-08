@@ -115,9 +115,10 @@ class RestQuizQuestionController {
     return modelFactoryService.getQuizQuestionsByNote(note);
   }
 
-  @PostMapping("/add-question-manually")
+  @PostMapping("/{note}/note-questions")
   @Transactional
   public boolean addQuestionManually(
+      @PathVariable("note") @Schema(type = "integer") Note note,
       @Valid @RequestBody QuizQuestionCreationParams manualQuestion) {
     return true;
   }
