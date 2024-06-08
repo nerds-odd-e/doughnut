@@ -44,10 +44,17 @@ class RestAssessmentController {
     currentUser.assertLoggedIn();
     currentUser.assertReadAuthorization(notebook);
 
-    Function<Note, QuizQuestion> generateAIQuestion = quizQuestionService::generateAIQuestion;
+    return generateAssessment(notebook, quizQuestionService::generateAIQuestion);
+  }
 
+  private static List<QuizQuestion> generateAssessment(
+      Notebook notebook, Function<Note, QuizQuestion> generateAIQuestion) {
     List<QuizQuestion> questions =
-        notebook.getNotes().stream().limit(5).toList().stream().map(generateAIQuestion).toList();
+        notebook.getNotes().stream()
+            .map(generateAIQuestion)
+            .filter(Objects::nonNull)
+            .limit(5)
+            .toList();
     if (questions.size() < 5) {
       throw new ApiException(
           "Not enough approved questions",
@@ -65,25 +72,13 @@ class RestAssessmentController {
     currentUser.assertLoggedIn();
     currentUser.assertReadAuthorization(notebook);
 
-    List<QuizQuestion> filteredQuestionList =
-        notebook.getNotes().stream()
-            .map(
-                note ->
-                    modelFactoryService.getQuizQuestionsByNote(note).stream()
-                        .filter(q -> q.approved)
-                        .findFirst()
-                        .orElse(null))
-            .filter(Objects::nonNull)
-            .limit(5)
-            .toList();
+    return generateAssessment(notebook, this::getQuizQuestion);
+  }
 
-    if (filteredQuestionList.size() < 5) {
-      throw new ApiException(
-          "Not enough approved questions",
-          ASSESSMENT_SERVICE_ERROR,
-          "Not enough approved questions");
-    }
-
-    return filteredQuestionList;
+  private QuizQuestion getQuizQuestion(Note note) {
+    return modelFactoryService.getQuizQuestionsByNote(note).stream()
+        .filter(q -> q.approved)
+        .findFirst()
+        .orElse(null);
   }
 }
