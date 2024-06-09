@@ -44,22 +44,15 @@ When(
 )
 
 Then(
-  "I should not see the {string} button on notebook {string}",
-  (btnTitle: string, noteTopic: string) => {
-    cy.findNoteCardButton(noteTopic, btnTitle).should("not.exist")
+  "I can not see add the notebook {string} to my learning in the bazaar",
+  (noteTopic: string) => {
+    start.bazaar().expectNoAddToMyLearningButton(noteTopic)
   },
 )
 
 Then("I should see {string} button", (btnTitle: string) => {
   cy.findByRole("button", { name: btnTitle }).should("exist")
 })
-
-Then(
-  "I should see the {string} button on notebook {string}",
-  (btnTitle: string, noteTopic: string) => {
-    cy.findNoteCardButton(noteTopic, btnTitle).should("exist")
-  },
-)
 
 Then("I should see readonly notebook {string} in my notes", (noteTopic: string) => {
   start.routerToNotebooksPage()

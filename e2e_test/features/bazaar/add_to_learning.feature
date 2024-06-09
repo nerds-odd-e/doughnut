@@ -34,6 +34,5 @@ Feature: Bazaar subscription
   Scenario: No "add to learning" button for skip-review notebook
     Given I am logged in as "another_old_learner"
     When I change notebook "Shape" to skip review
-    Then I go to the bazaar
-    And I should not see the "Add to my learning" button on notebook "Shape"
+    Then I can not see add the notebook "Shape" to my learning in the bazaar
 

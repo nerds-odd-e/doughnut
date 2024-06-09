@@ -14,5 +14,8 @@ export const bazaar = () => {
     selfAssessmentOnNotebook: (notebook: string) => {
       cy.contains(notebook).parents(".card").findByTitle("Start Assessment").click()
     },
+    expectNoAddToMyLearningButton: (noteTopic: string) => {
+      cy.findNoteCardButton(noteTopic, "Add to my learning").should("not.exist")
+    },
   }
 }
