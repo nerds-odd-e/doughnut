@@ -1,4 +1,5 @@
 <template>
+  <h3>Assessment For {{ topicConstructor }}</h3>
   <div>
     <div v-if="errors != ''">
       {{ errors }}
@@ -24,15 +25,20 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { QuizQuestion } from "@/generated/backend";
 import useLoadingApi from "@/managedApi/useLoadingApi";
+import { QuizQuestion } from "@/generated/backend";
 
 export default defineComponent({
+  setup() {
+    return { ...useLoadingApi() };
+  },
   props: {
     notebookId: { type: Number, required: true },
   },
-  setup() {
-    return { ...useLoadingApi() };
+  computed: {
+    topicConstructor() {
+      return this.$route.query.topic;
+    },
   },
   data() {
     return {

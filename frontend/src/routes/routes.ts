@@ -3,7 +3,7 @@ import HomePage from "@/pages/HomePage.vue";
 import BazaarPage from "@/pages/BazaarPage.vue";
 import NotebooksPage from "@/pages/NotebooksPage.vue";
 import NoteShowPage from "@/pages/NoteShowPage.vue";
-import OfflineAssessmentPage from "@/pages/OfflineAssessmentPage.vue";
+import AssessmentPage from "@/pages/AssessmentPage.vue";
 import ReviewHome from "@/pages/ReviewHome.vue";
 import RepeatPage from "@/pages/RepeatPage.vue";
 import InitialReviewPage from "@/pages/InitialReviewPage.vue";
@@ -83,7 +83,7 @@ const routes = [
   {
     path: "/bazaar/notebook/:notebookId/assessment",
     name: "assessment",
-    component: OfflineAssessmentPage,
+    component: AssessmentPage,
     props: true,
   },
   { path: "/reviews", name: "reviews", component: ReviewHome },
