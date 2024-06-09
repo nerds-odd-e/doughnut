@@ -409,6 +409,6 @@ When(
   "I should see the question in the question list of the note {string}:",
   (noteTopic: string, data: DataTable) => {
     const row = data.hashes()[0]
-    start.jumpToNotePage(noteTopic).expectQuestionInList(row)
+    start.jumpToNotePage(noteTopic).expectQuestionInList(row!)
   },
 )
