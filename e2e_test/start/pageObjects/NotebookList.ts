@@ -26,8 +26,8 @@ export const notebookList = () => {
         click() {
           finder().click()
         },
-        shouldExist() {
-          finder().should("exist")
+        shouldNotExist() {
+          finder().should("not.exist")
         },
       }
     },
@@ -44,7 +44,7 @@ export const bazaarOrCircle = () => {
       this.findNotebookCardButton(notebook, "Generate assessment questions").click()
     },
     expectNoAddToMyLearningButton(noteTopic: string) {
-      this.findNotebookCardButton(noteTopic, addToMyLearning).shouldExist()
+      this.findNotebookCardButton(noteTopic, addToMyLearning).shouldNotExist()
     },
     subscribe(notebook: string, dailyLearningCount: string) {
       this.findNotebookCardButton(notebook, addToMyLearning).click()
