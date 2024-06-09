@@ -1,3 +1,4 @@
+import { bazaarOrCircle } from "./bazaarOrCircle"
 import noteCreationForm from "./noteForms/noteCreationForm"
 
 export const navigateToCircle = (circleName: string) => {
@@ -14,5 +15,6 @@ export const navigateToCircle = (circleName: string) => {
     haveMembers(count: number) {
       cy.get("body").find(".circle-member").should("have.length", count)
     },
+    ...bazaarOrCircle(),
   }
 }

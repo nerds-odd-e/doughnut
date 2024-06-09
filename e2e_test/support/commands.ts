@@ -335,12 +335,6 @@ Cypress.Commands.add("formField", (label) => {
   return cy.findByLabelText(label)
 })
 
-Cypress.Commands.add("subscribeToNotebook", (notebookTitle: string, dailyLearningCount: string) => {
-  cy.findNoteCardButton(notebookTitle, "Add to my learning").click()
-  cy.get("#subscription-dailyTargetOfNewNotes").clear().type(dailyLearningCount)
-  cy.findByRole("button", { name: "Submit" }).click()
-})
-
 Cypress.Commands.add("unsubscribeFromNotebook", (noteTopic) => {
   start.routerToNotebooksPage()
   cy.findNoteCardButton(noteTopic, "Unsubscribe").click()

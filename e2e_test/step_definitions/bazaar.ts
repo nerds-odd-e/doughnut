@@ -13,7 +13,7 @@ Given("I choose to share my notebook {string}", (noteTopic: string) => {
 })
 
 Then("I should see {string} shared in the Bazaar", (notebooks: string) => {
-  start.bazaar().sharedNotebooks(notebooks)
+  start.bazaar().expectNotebooks(notebooks)
 })
 
 Then("notebook {string} is shared to the Bazaar", (noteTopic: string) => {
@@ -31,17 +31,13 @@ When(
   "I generate assessment questions on notebook {string} in the bazaar",
   (notebookTitle: string) => {
     start.bazaar().generateAssessmentQuestions(notebookTitle)
-})
-
-When("I go to the bazaar", () => {
-  start.bazaar()
-})
+  },
+)
 
 When(
   "I subscribe to notebook {string} in the bazaar, with target of learning {int} notes per day",
   (notebookTitle: string, count: string) => {
-    cy.visit("/bazaar")
-    cy.subscribeToNotebook(notebookTitle, count)
+    start.bazaar().subscribe(notebookTitle, count)
   },
 )
 

@@ -49,7 +49,6 @@ declare namespace Cypress {
     searchNote(searchKey: any, options: any): Chainable<any>
     shouldSeeQuizWithOptions(questionParts: any, options: any): Chainable<any>
     startSearching(): Chainable<any>
-    subscribeToNotebook(notebookTitle: string, dailyLearningCount: string): Chinputainable<any>
     undoLast(undoThpe: string): Chainable<any>
     unsubscribeFromNotebook(noteTopic: string): Chainable<any>
     yesIRemember(): Chainable<any>
