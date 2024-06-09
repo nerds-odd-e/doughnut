@@ -3,7 +3,7 @@ import "../support/string_util"
 import start from "../start"
 
 When("I start the assessment on the {string} notebook in the bazaar", (notebook: string) => {
-  start.bazaar().selfAssessmentOnNotebook(notebook)
+  start.navigateToBazaar().selfAssessmentOnNotebook(notebook)
 })
 
 Then("I answer the question {string} with {string}", function (stem: string, answer: string) {

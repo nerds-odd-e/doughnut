@@ -1,6 +1,6 @@
 import { bazaarOrCircle } from "./bazaarOrCircle"
 
-export const bazaar = () => {
+export const navigateToBazaar = () => {
   cy.visit("/bazaar")
 
   return bazaarOrCircle()

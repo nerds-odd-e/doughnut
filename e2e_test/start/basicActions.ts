@@ -1,7 +1,7 @@
 import { assumeAdminDashboardPage } from "./pageObjects/adminPages/adminDashboardPage"
 import { assumeChatAboutNotePage } from "./pageObjects/chatAboutNotePage"
 import { assumeNotePage } from "./pageObjects/notePage"
-import { bazaar } from "./pageObjects/bazaar"
+import { navigateToBazaar } from "./pageObjects/bazaarPage"
 import { sidebar } from "./pageObjects/sidebar"
 import { routerToNotebooksPage } from "./pageObjects/notebooksPage"
 import { navigateToCircle } from "./pageObjects/circlePage"
@@ -11,7 +11,7 @@ import { assumeClarifyingQuestionDialog } from "./pageObjects/clarifyingQuestion
 import testability from "./testability"
 
 export default {
-  bazaar,
+  navigateToBazaar,
   sidebar,
   assumeNotePage,
   assumeAnsweredQuestionPage,

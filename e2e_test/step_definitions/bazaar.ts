@@ -13,7 +13,7 @@ Given("I choose to share my notebook {string}", (noteTopic: string) => {
 })
 
 Then("I should see {string} shared in the Bazaar", (notebooks: string) => {
-  start.bazaar().expectNotebooks(notebooks)
+  start.navigateToBazaar().expectNotebooks(notebooks)
 })
 
 Then("notebook {string} is shared to the Bazaar", (noteTopic: string) => {
@@ -30,21 +30,21 @@ When("I open the notebook {string} in the Bazaar", (noteTopic: string) => {
 When(
   "I generate assessment questions on notebook {string} in the bazaar",
   (notebookTitle: string) => {
-    start.bazaar().generateAssessmentQuestions(notebookTitle)
+    start.navigateToBazaar().generateAssessmentQuestions(notebookTitle)
   },
 )
 
 When(
   "I subscribe to notebook {string} in the bazaar, with target of learning {int} notes per day",
   (notebookTitle: string, count: string) => {
-    start.bazaar().subscribe(notebookTitle, count)
+    start.navigateToBazaar().subscribe(notebookTitle, count)
   },
 )
 
 Then(
   "I can not see add the notebook {string} to my learning in the bazaar",
   (noteTopic: string) => {
-    start.bazaar().expectNoAddToMyLearningButton(noteTopic)
+    start.navigateToBazaar().expectNoAddToMyLearningButton(noteTopic)
   },
 )
 
