@@ -39,13 +39,11 @@ class LinkSourceQuizFactoryTest {
     source = makeMe.aNote("tomato sauce").under(top).linkTo(target).please();
     anotherSource = makeMe.aNote("blue cheese").under(top).please();
     reviewPoint = makeMe.aReviewPointFor(source.getLinks().get(0)).inMemoryPlease();
-    makeMe.refresh(top);
   }
 
   @Test
   void shouldReturnNullIfCannotFindEnoughOptions() {
     makeMe.aLink().between(anotherSource, target).please();
-    makeMe.refresh(top);
     QuizQuestion actual = buildLinkSourceQuizQuestion();
     assertThat(actual, is(nullValue()));
   }

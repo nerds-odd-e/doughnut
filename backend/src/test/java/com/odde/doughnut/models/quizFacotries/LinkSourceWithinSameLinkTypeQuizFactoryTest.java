@@ -42,24 +42,16 @@ class LinkSourceWithinSameLinkTypeQuizFactoryTest {
     Note cheese = makeMe.aNote("Note cheese").under(top).please();
     anotherSource = makeMe.aNote("blue cheese").under(top).linkTo(cheese).please();
     reviewPoint = makeMe.aReviewPointFor(sourceTarget).inMemoryPlease();
-    makeMe.refresh(top);
-    makeMe.refresh(anotherSource);
   }
 
   @Test
   void shouldReturnNullIfCannotFindEnoughOptions() {
     makeMe.aLink().between(anotherSource, target).please();
-    makeMe.refresh(top);
     assertThat(buildLinkTargetQuizQuestion(), is(nullValue()));
   }
 
   @Nested
   class WhenThereAreMoreThanOneOptions {
-    @BeforeEach
-    void setup() {
-      makeMe.refresh(top);
-    }
-
     @Test
     void shouldIncludeRightAnswers() {
       QuizQuestion quizQuestion = buildLinkTargetQuizQuestion();

@@ -41,14 +41,12 @@ class QuizQuestionTypesClozeSelectionTest {
     @Test
     void NotForNoteWithoutVisibleDescription() {
       makeMe.theNote(note1).details("<p>  <br>  <br/>  </p>  <br>").please();
-      makeMe.refresh(top);
       QuizQuestion quizQuestion = buildClozeQuizQuestion();
       assertThat(quizQuestion, nullValue());
     }
 
     @Test
     void shouldIncludeRightAnswers() {
-      makeMe.refresh(top);
       QuizQuestion quizQuestion = buildClozeQuizQuestion();
       assertThat(quizQuestion.getMultipleChoicesQuestion().getStem(), containsString("descrption"));
       List<String> options = quizQuestion.getMultipleChoicesQuestion().getChoices();

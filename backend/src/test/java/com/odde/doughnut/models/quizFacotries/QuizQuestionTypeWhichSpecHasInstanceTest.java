@@ -38,7 +38,6 @@ class WhichSpecHasInstanceQuizFactoryTest {
     source = makeMe.aNote("noble gas").under(top).linkTo(target, LinkType.SPECIALIZE).please();
     anotherSource = makeMe.aNote("non-official name").under(top).please();
     reviewPoint = makeMe.aReviewPointFor(source.getLinks().get(0)).by(userModel).inMemoryPlease();
-    makeMe.refresh(top);
   }
 
   @Test
@@ -80,7 +79,6 @@ class WhichSpecHasInstanceQuizFactoryTest {
           Note link = source.getLinks().get(1);
 
           makeMe.aReviewPointFor(link).by(userModel).please();
-          makeMe.refresh(userModel.getEntity());
         }
 
         @Test
@@ -119,7 +117,6 @@ class WhichSpecHasInstanceQuizFactoryTest {
                 .under(top)
                 .linkTo(anotherSource, LinkType.INSTANCE)
                 .please();
-            makeMe.refresh(top);
           }
 
           @Test

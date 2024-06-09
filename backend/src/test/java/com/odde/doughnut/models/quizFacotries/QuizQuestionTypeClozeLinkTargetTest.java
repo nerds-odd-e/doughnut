@@ -38,7 +38,6 @@ class ClozeLinkTargetQuizFactoryTest {
     source = makeMe.aNote("Rome is not built in a day").under(top).linkTo(target).please();
     reviewPoint = makeMe.aReviewPointFor(source.getLinks().get(0)).inMemoryPlease();
     anotherSource = makeMe.aNote("pompeii").under(top).please();
-    makeMe.refresh(top);
   }
 
   @Nested

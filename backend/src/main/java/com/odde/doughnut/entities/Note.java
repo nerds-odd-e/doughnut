@@ -359,12 +359,4 @@ The note of current focus (in JSON format):
   public NoteViewer targetNoteViewer(User user) {
     return new NoteViewer(user, getTargetNote());
   }
-
-  // Hibernate and JPA does not maintain the consistency of the bidirectional relationships
-  // Here we add the note to the children of note in memory to avoid reload the note from
-  // database
-  public void addChildInMemoryToSupportUnitTestOnly(Note note) {
-    //        this.children.add(note);
-    this.notebook.addNoteInMemoryToSupportUnitTestOnly(note);
-  }
 }
