@@ -410,12 +410,12 @@ class RestQuizQuestionControllerTests {
     void authorization() {
       Note note = makeMe.aNote().please();
       assertThrows(
-          UnexpectedNoAccessRightException.class, () -> controller.getAllQuizQuestionByNote(note));
+          UnexpectedNoAccessRightException.class, () -> controller.getAllQuestionByNote(note));
     }
 
     @Test
     void getQuestionsOfANoteWhenThereIsNotQuestion() throws UnexpectedNoAccessRightException {
-      List<QuizQuestion> results = controller.getAllQuizQuestionByNote(noteWithoutQuestions);
+      List<MCQWithAnswer> results = controller.getAllQuestionByNote(noteWithoutQuestions);
       assertThat(results, hasSize(0));
     }
 
@@ -423,15 +423,15 @@ class RestQuizQuestionControllerTests {
     void getQuestionsOfANoteWhenThereIsOneQuestion() throws UnexpectedNoAccessRightException {
       QuizQuestion questionOfNote =
           makeMe.aQuestion().spellingQuestionOfNote(noteWithoutQuestions).please();
-      List<QuizQuestion> results = controller.getAllQuizQuestionByNote(noteWithoutQuestions);
-      assertThat(results, contains(questionOfNote));
+      List<MCQWithAnswer> results = controller.getAllQuestionByNote(noteWithoutQuestions);
+      assertThat(results, contains(questionOfNote.getMcqWithAnswer()));
     }
 
     @Test
     void getAllQuestionsOfANoteWhenThereIsMoreThanOneQuestion()
         throws UnexpectedNoAccessRightException {
       makeMe.aQuestion().spellingQuestionOfNote(noteWithQuestions).please();
-      List<QuizQuestion> results = controller.getAllQuizQuestionByNote(noteWithQuestions);
+      List<MCQWithAnswer> results = controller.getAllQuestionByNote(noteWithQuestions);
       assertThat(results, hasSize(2));
     }
   }
@@ -451,9 +451,9 @@ class RestQuizQuestionControllerTests {
     void persistent() throws UnexpectedNoAccessRightException {
       Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
-      QuizQuestion quizQuestion = controller.addQuestionManually(note, mcqWithAnswer);
-      assertThat(quizQuestion.getNote(), equalTo(note));
-      assertThat(quizQuestion.getId(), notNullValue());
+      controller.addQuestionManually(note, mcqWithAnswer);
+      makeMe.refresh(note);
+      assertThat(note.getQuizQuestions(), hasSize(1));
     }
   }
 }

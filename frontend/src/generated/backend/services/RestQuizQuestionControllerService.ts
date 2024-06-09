@@ -99,12 +99,12 @@ export class RestQuizQuestionControllerService {
     }
     /**
      * @param note
-     * @returns QuizQuestion OK
+     * @returns MCQWithAnswer OK
      * @throws ApiError
      */
-    public getAllQuizQuestionByNote(
+    public getAllQuestionByNote(
         note: number,
-    ): CancelablePromise<Array<QuizQuestion>> {
+    ): CancelablePromise<Array<MCQWithAnswer>> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/quiz-questions/{note}/note-questions',
@@ -119,13 +119,13 @@ export class RestQuizQuestionControllerService {
     /**
      * @param note
      * @param requestBody
-     * @returns QuizQuestion OK
+     * @returns MCQWithAnswer OK
      * @throws ApiError
      */
     public addQuestionManually(
         note: number,
         requestBody: MCQWithAnswer,
-    ): CancelablePromise<QuizQuestion> {
+    ): CancelablePromise<MCQWithAnswer> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/quiz-questions/{note}/note-questions',

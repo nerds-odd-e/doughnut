@@ -103,20 +103,20 @@ class RestQuizQuestionController {
   }
 
   @GetMapping("/{note}/note-questions")
-  public List<QuizQuestion> getAllQuizQuestionByNote(
+  public List<MCQWithAnswer> getAllQuestionByNote(
       @PathVariable("note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
-    return note.getQuizQuestions();
+    return note.getQuizQuestions().stream().map(QuizQuestion::getMcqWithAnswer).toList();
   }
 
   @PostMapping("/{note}/note-questions")
   @Transactional
-  public QuizQuestion addQuestionManually(
+  public MCQWithAnswer addQuestionManually(
       @PathVariable("note") @Schema(type = "integer") Note note,
       @Valid @RequestBody MCQWithAnswer manualQuestion)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
-    return quizQuestionService.addQuestion(note, manualQuestion);
+    return quizQuestionService.addQuestion(note, manualQuestion).getMcqWithAnswer();
   }
 }

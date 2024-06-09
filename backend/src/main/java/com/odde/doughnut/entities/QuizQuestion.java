@@ -31,6 +31,7 @@ public class QuizQuestion extends EntityIdentifiedByIdOnly {
   private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
   @Column(name = "correct_answer_index")
+  @JsonIgnore
   private Integer correctAnswerIndex;
 
   @Column(name = "check_spell")
@@ -45,7 +46,7 @@ public class QuizQuestion extends EntityIdentifiedByIdOnly {
   public MCQWithAnswer getMcqWithAnswer() {
     MCQWithAnswer mcqWithAnswer = new MCQWithAnswer();
     mcqWithAnswer.setMultipleChoicesQuestion(getMultipleChoicesQuestion());
-    mcqWithAnswer.setCorrectChoiceIndex(correctAnswerIndex);
+    mcqWithAnswer.setCorrectChoiceIndex(correctAnswerIndex == null ? -1 : correctAnswerIndex);
     return mcqWithAnswer;
   }
 

@@ -745,7 +745,7 @@ paths:
     get:
       tags:
       - rest-quiz-question-controller
-      operationId: getAllQuizQuestionByNote
+      operationId: getAllQuestionByNote
       parameters:
       - name: note
         in: path
@@ -766,7 +766,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/QuizQuestion"
+                  $ref: "#/components/schemas/MCQWithAnswer"
     post:
       tags:
       - rest-quiz-question-controller
@@ -795,7 +795,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/QuizQuestion"
+                $ref: "#/components/schemas/MCQWithAnswer"
   /api/quiz-questions/generate-question:
     post:
       tags:
@@ -2511,9 +2511,6 @@ components:
         createdAt:
           type: string
           format: date-time
-        correctAnswerIndex:
-          type: integer
-          format: int32
     NoteTestData:
       type: object
       properties:

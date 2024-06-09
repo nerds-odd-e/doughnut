@@ -22,14 +22,17 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="question in questions" :key="question.id">
+        <tr
+          v-for="question in questions"
+          :key="question.multipleChoicesQuestion.stem"
+        >
           <td>{{ question.multipleChoicesQuestion.stem }}</td>
           <template v-if="question.multipleChoicesQuestion.choices">
             <td
               v-for="(choice, index) in question.multipleChoicesQuestion
                 .choices"
               :class="{
-                'correct-choice': index === question.correctAnswerIndex,
+                'correct-choice': index === question.correctChoiceIndex,
               }"
               :key="index"
             >
@@ -44,7 +47,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { Note, QuizQuestion } from "@/generated/backend";
+import { MCQWithAnswer, Note } from "@/generated/backend";
 import useLoadingApi from "@/managedApi/useLoadingApi";
 
 export default defineComponent({
@@ -59,18 +62,18 @@ export default defineComponent({
   },
   data() {
     return {
-      questions: [] as QuizQuestion[],
+      questions: [] as MCQWithAnswer[],
     };
   },
   methods: {
     fetchQuestions() {
       this.managedApi.restQuizQuestionController
-        .getAllQuizQuestionByNote(this.note.id)
+        .getAllQuestionByNote(this.note.id)
         .then((questions) => {
           this.questions = questions;
         });
     },
-    questionAdded(newQuestion: QuizQuestion) {
+    questionAdded(newQuestion: MCQWithAnswer) {
       if (newQuestion == null) {
         return;
       }
