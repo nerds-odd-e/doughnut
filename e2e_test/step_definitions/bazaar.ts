@@ -27,8 +27,10 @@ Then("there shouldn't be any note edit button", () => {
 When("I open the notebook {string} in the Bazaar", (noteTopic: string) => {
   cy.findCardTitle(noteTopic).click()
 })
-When("I generate assessment questions on notebook {string}", (notebookTitle: string) => {
-  cy.findNoteCardButton(notebookTitle, "Generate assessment questions").click()
+When(
+  "I generate assessment questions on notebook {string} in the bazaar",
+  (notebookTitle: string) => {
+    start.bazaar().generateAssessmentQuestions(notebookTitle)
 })
 
 When("I go to the bazaar", () => {

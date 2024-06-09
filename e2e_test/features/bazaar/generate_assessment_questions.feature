@@ -16,8 +16,7 @@ Feature: Bazaar generate
 
   Scenario: open pop up for log in if the user is not logged in and generate assessment
     Given I haven't login
-    When I go to the bazaar
-    And I generate assessment questions on notebook "Countries"
+    When I generate assessment questions on notebook "Countries" in the bazaar
     Then I should see message that says "Please login first"
 
   Scenario: display assessment questions from notebook
@@ -26,8 +25,7 @@ Feature: Bazaar generate
       | Singapore | Where in the world is Singapore? | Asia   | euro           |
       | Vietnam   | Most famous food of Vietnam?     | Pho    | bread          |
     And I am logged in as an existing user
-    When I go to the bazaar
-    And I generate assessment questions on notebook "Countries"
+    When I generate assessment questions on notebook "Countries" in the bazaar
     Then I should see message that says "Insufficient notes to create assessment!"
     And I should see 0 questions
 
@@ -41,7 +39,6 @@ Feature: Bazaar generate
       | China     | What is the capital city of China? | Beijing | Shanghai       |
       | Mars      | What is the capital city of Mars?  | X       | Y              |
     And I am logged in as an existing user
-    When I go to the bazaar
-    And I generate assessment questions on notebook "Countries"
+    When I generate assessment questions on notebook "Countries" in the bazaar
     Then I should see message that says "Assessment For Countries"
     And I should see 5 questions
