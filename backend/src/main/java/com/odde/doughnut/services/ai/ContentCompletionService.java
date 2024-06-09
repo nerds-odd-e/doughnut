@@ -19,9 +19,8 @@ import com.theokanning.openai.assistants.thread.ThreadRequest;
 import java.util.stream.Stream;
 
 public record ContentCompletionService(OpenAiApiHandler openAiApiHandler) {
-  public AiAssistantResponse getAiCompletion(
-      AiCompletionParams aiCompletionParams, Note note, String assistantId) {
-    String threadId = createThread(note, aiCompletionParams.getCompletionPrompt());
+  public AiAssistantResponse initiateAThread(Note note, String assistantId, String prompt) {
+    String threadId = createThread(note, prompt);
     Run run = openAiApiHandler.createRun(threadId, assistantId);
     return getThreadResponse(threadId, run);
   }
@@ -87,7 +86,7 @@ public record ContentCompletionService(OpenAiApiHandler openAiApiHandler) {
     return completionResponse;
   }
 
-  public Assistant createNoteCompletionAssistant(String modelName) {
+  public Assistant createNoteAssistant(String modelName) {
     AssistantRequest assistantRequest =
         AssistantRequest.builder()
             .model(modelName)

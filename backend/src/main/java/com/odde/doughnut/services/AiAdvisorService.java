@@ -29,9 +29,10 @@ public class AiAdvisorService {
     return openAiApiHandler.getOpenAiImage(prompt);
   }
 
-  public AiAssistantResponse getAiCompletion(
+  public AiAssistantResponse initiateAiCompletion(
       AiCompletionParams aiCompletionParams, Note note, String assistantId) {
-    return getContentCompletionService().getAiCompletion(aiCompletionParams, note, assistantId);
+    return getContentCompletionService()
+        .initiateAThread(note, assistantId, aiCompletionParams.getCompletionPrompt());
   }
 
   public AiAssistantResponse answerAiCompletionClarifyingQuestion(
@@ -40,8 +41,8 @@ public class AiAdvisorService {
         .answerAiCompletionClarifyingQuestion(answerClarifyingQuestionParams);
   }
 
-  public Assistant createNoteCompletionAssistant(String modelName) {
-    return getContentCompletionService().createNoteCompletionAssistant(modelName);
+  public Assistant createNoteAssistant(String modelName) {
+    return getContentCompletionService().createNoteAssistant(modelName);
   }
 
   public String chatWithAi(Note note, String userMessage, String modelName) {

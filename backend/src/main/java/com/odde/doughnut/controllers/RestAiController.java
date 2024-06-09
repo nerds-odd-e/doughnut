@@ -49,7 +49,7 @@ public class RestAiController {
       @PathVariable(name = "note") @Schema(type = "integer") Note note,
       @RequestBody AiCompletionParams aiCompletionParams) {
     currentUser.assertLoggedIn();
-    return aiAdvisorService.getAiCompletion(aiCompletionParams, note, getAssistantId());
+    return aiAdvisorService.initiateAiCompletion(aiCompletionParams, note, getAssistantId());
   }
 
   @PostMapping("/answer-clarifying-question")
@@ -91,7 +91,7 @@ public class RestAiController {
     currentUser.assertAdminAuthorization();
     Map<String, String> result = new HashMap<>();
     Assistant noteCompletionAssistant =
-        aiAdvisorService.createNoteCompletionAssistant(getDefaultOpenAiChatModel());
+        aiAdvisorService.createNoteAssistant(getDefaultOpenAiChatModel());
     String id = noteCompletionAssistant.getId();
     getGlobalSettingsService()
         .getNoteCompletionAssistantId()
