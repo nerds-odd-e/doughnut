@@ -33,9 +33,6 @@ public class NoteMotionModelTest {
     topNote = makeMe.aHeadNote("topNote").please();
     firstChild = makeMe.aNote("firstChild").under(topNote).please();
     secondChild = makeMe.aNote("secondChild").under(topNote).please();
-    makeMe.refresh(topNote);
-    makeMe.refresh(firstChild);
-    makeMe.refresh(secondChild);
   }
 
   void move(Note subject, Note relativeNote, boolean asFirstChildOfNote)

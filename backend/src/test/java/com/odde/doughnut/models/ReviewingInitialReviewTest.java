@@ -53,7 +53,6 @@ public class ReviewingInitialReviewTest {
     void setup() {
       note1 = makeMe.aNote("note1").creatorAndOwner(userModel).please();
       note2 = makeMe.aNote("note2").creatorAndOwner(userModel).please();
-      makeMe.refresh(userModel.getEntity());
     }
 
     @Test
@@ -87,7 +86,6 @@ public class ReviewingInitialReviewTest {
       void thereIsALinkAndAnotherNote() {
         note1ToNote2 = makeMe.aLink().between(note1, note2).please();
         anotherNote = makeMe.aNote("another note").creatorAndOwner(userModel).please();
-        makeMe.refresh(userModel.getEntity());
       }
 
       private List<Note> getAllDueReviewPoints() {
@@ -126,7 +124,6 @@ public class ReviewingInitialReviewTest {
         @Test
         void shouldReturnLinksOrderedByLevels() {
           Note aLevel2Link = makeMe.aLink().between(anotherNote, note2).please();
-          makeMe.refresh(userModel.getEntity());
           List<Note> reviewPoints = getAllDueReviewPoints();
           assertThat(reviewPoints, hasSize(5));
           assertThat(reviewPoints.get(0), equalTo(anotherNote));
@@ -138,7 +135,6 @@ public class ReviewingInitialReviewTest {
         @Test
         void shouldNotReturnReviewPointForLinkIfCreatedByOtherPeople() {
           makeMe.theNote(note1).notebookOwnership(makeMe.aUser().please()).please();
-          makeMe.refresh(userModel.getEntity());
           List<Note> reviewPoints = getAllDueReviewPoints();
           assertThat(reviewPoints, hasSize(2));
           assertThat(reviewPoints.get(0), equalTo(anotherNote));

@@ -33,7 +33,6 @@ class AnsweredQuestionTest {
       makeMe.aNote().under(top).please();
       reviewPoint = makeMe.aReviewPointFor(note).by(user).please();
       spellingQuizFactory = new SpellingQuizFactory(reviewPoint.getNote());
-      makeMe.refresh(top);
     }
 
     @Test

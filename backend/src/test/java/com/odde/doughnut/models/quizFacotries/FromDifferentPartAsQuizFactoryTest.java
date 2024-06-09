@@ -54,7 +54,6 @@ class FromDifferentPartAsQuizFactoryTest {
     kindSubjective = makeMe.aLink().between(kind, subjective, LinkType.TAGGED_BY).please();
     Note uglySubjective = makeMe.aLink().between(ugly, subjective, LinkType.TAGGED_BY).please();
     uglySubjectiveRp = makeMe.aReviewPointFor(uglySubjective).by(userModel).inMemoryPlease();
-    makeMe.refresh(top);
   }
 
   @Test
@@ -69,7 +68,6 @@ class FromDifferentPartAsQuizFactoryTest {
     @BeforeEach
     void setup() {
       prettySubjective = makeMe.aLink().between(pretty, subjective, LinkType.TAGGED_BY).please();
-      makeMe.refresh(userModel.getEntity());
     }
 
     @Test
@@ -84,12 +82,10 @@ class FromDifferentPartAsQuizFactoryTest {
       void setup() {
         makeMe.aLink().between(tall, objective, LinkType.TAGGED_BY).please();
         makeMe.aReviewPointFor(kindSubjective).by(userModel).please();
-        makeMe.refresh(userModel.getEntity());
       }
 
       @Test
       void noRightAnswers() {
-        makeMe.refresh(userModel.getEntity());
         assertThat(buildQuestion(), nullValue());
       }
 
@@ -99,7 +95,6 @@ class FromDifferentPartAsQuizFactoryTest {
         @BeforeEach
         void setup() {
           makeMe.aReviewPointFor(prettySubjective).by(userModel).please();
-          makeMe.refresh(userModel.getEntity());
         }
 
         @Test
@@ -128,7 +123,6 @@ class FromDifferentPartAsQuizFactoryTest {
 
           @Test
           void noRightAnswers() {
-            makeMe.refresh(userModel.getEntity());
             assertThat(buildQuestion(), nullValue());
           }
         }
@@ -143,7 +137,6 @@ class FromDifferentPartAsQuizFactoryTest {
 
           @Test
           void noRightAnswers() {
-            makeMe.refresh(userModel.getEntity());
             QuizQuestion actual = buildQuestion();
             assertThat(actual, nullValue());
           }
@@ -162,14 +155,12 @@ class FromDifferentPartAsQuizFactoryTest {
 
             @Test
             void thereIsAThirdPerspective() {
-              makeMe.refresh(userModel.getEntity());
               assertThat(buildQuestion(), not(nullValue()));
             }
 
             @Test
             void whenTheOptionOfTheThirdPerspectiveIsAlsoObjective() {
               makeMe.aLink().between(pi, objective, LinkType.TAGGED_BY).please();
-              makeMe.refresh(userModel.getEntity());
               assertThat(buildQuestion(), not(nullValue())); // wrong, this should be null
             }
           }

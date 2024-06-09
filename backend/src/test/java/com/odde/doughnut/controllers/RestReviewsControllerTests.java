@@ -64,7 +64,6 @@ class RestReviewsControllerTests {
     @Test
     void initialReview() {
       Note n = makeMe.aNote().creatorAndOwner(currentUser).please();
-      makeMe.refresh(n);
       assertThat(n.getId(), notNullValue());
       List<Note> reviewPointWithReviewSettings = controller.initialReview("Asia/Shanghai");
       assertThat(reviewPointWithReviewSettings, hasSize(1));

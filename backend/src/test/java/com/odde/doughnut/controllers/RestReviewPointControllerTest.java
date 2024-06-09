@@ -139,7 +139,6 @@ class RestReviewPointControllerTest {
       // question cannot be generated.
       makeMe.aNote().under(note).please();
       ReviewPoint rp = makeMe.aReviewPointFor(note).by(userModel).please();
-      makeMe.refresh(note);
       QuizQuestion quizQuestion = controller.generateRandomQuestion(rp);
       assertThat(quizQuestion.getId(), notNullValue());
     }

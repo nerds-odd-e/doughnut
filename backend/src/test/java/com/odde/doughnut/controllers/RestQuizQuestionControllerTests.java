@@ -404,12 +404,9 @@ class RestQuizQuestionControllerTests {
       headNote2 = makeMe.aHeadNote("headNote2").creatorAndOwner(currentUser).please();
       makeMe.theNote(headNote2).withNChildren(20).please();
 
-      makeMe.refresh(headNote2);
-
       Note headNote1;
       headNote1 = makeMe.aHeadNote("headNote1").creatorAndOwner(currentUser).please();
       makeMe.theNote(headNote1).withNChildren(10).please();
-      makeMe.refresh(headNote1);
       noteWithoutQuestions = makeMe.aNote("a note").under(headNote1).please();
       noteWithQuestions =
           makeMe.aNote("a note with questions").creatorAndOwner(currentUser).please();
@@ -433,7 +430,6 @@ class RestQuizQuestionControllerTests {
     void getQuestionsOfANoteWhenThereIsOneQuestion() throws UnexpectedNoAccessRightException {
       QuizQuestion questionOfNote =
           makeMe.aQuestion().spellingQuestionOfNote(noteWithoutQuestions).please();
-      makeMe.refresh(noteWithoutQuestions);
       List<QuizQuestion> results = controller.getAllQuizQuestionByNote(noteWithoutQuestions);
       assertThat(results, contains(questionOfNote));
     }

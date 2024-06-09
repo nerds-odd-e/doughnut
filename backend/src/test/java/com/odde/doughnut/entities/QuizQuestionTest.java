@@ -54,7 +54,6 @@ class QuizQuestionTest {
     makeMe.aNote().under(top).please();
     Note note =
         makeMe.aNote().under(top).titleConstructor("abc").details("abc has 3 letters").please();
-    makeMe.refresh(top);
     QuizQuestion quizQuestion = generateQuizQuestion(note);
     assertThat(
         quizQuestion.getMultipleChoicesQuestion().getStem(),
@@ -81,7 +80,6 @@ class QuizQuestionTest {
         Note top = makeMe.aNote().please();
         note1 = makeMe.aNote().under(top).please();
         note2 = makeMe.aNote().under(top).please();
-        makeMe.refresh(top);
       }
 
       @Test
@@ -109,7 +107,6 @@ class QuizQuestionTest {
       Note top = makeMe.aNote().please();
       makeMe.theNote(top).withNChildren(10).please();
       Note note = makeMe.aNote().under(top).please();
-      makeMe.refresh(top);
       QuizQuestion quizQuestion = generateQuizQuestion(note);
       List<String> options = quizQuestion.getMultipleChoicesQuestion().getChoices();
       assertThat(options.size(), equalTo(3));
@@ -126,7 +123,6 @@ class QuizQuestionTest {
       Note top = makeMe.aNote().please();
       note = makeMe.aNote().under(top).rememberSpelling().please();
       makeMe.aNote("a necessary sibling as filling option").under(top).please();
-      makeMe.refresh(top);
     }
 
     @Test

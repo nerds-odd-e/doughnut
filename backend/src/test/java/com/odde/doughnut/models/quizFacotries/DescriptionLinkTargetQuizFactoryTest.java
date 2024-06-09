@@ -45,7 +45,6 @@ class DescriptionLinkTargetQuizFactoryTest {
             .please();
     reviewPoint = makeMe.aReviewPointFor(source.getLinks().get(0)).by(userModel).inMemoryPlease();
     anotherSource = makeMe.aNote("pompeii").under(top).please();
-    makeMe.refresh(top);
   }
 
   @Nested

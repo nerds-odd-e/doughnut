@@ -49,7 +49,6 @@ class FromSamePartAsQuizFactoryTest {
     makeMe.aLink().between(objective, perspective, LinkType.PART).please();
     Note uglySubjective = makeMe.aLink().between(ugly, subjective, LinkType.TAGGED_BY).please();
     reviewPoint = makeMe.aReviewPointFor(uglySubjective).by(userModel).inMemoryPlease();
-    makeMe.refresh(top);
   }
 
   @Test
@@ -64,7 +63,6 @@ class FromSamePartAsQuizFactoryTest {
     @BeforeEach
     void setup() {
       cousin = makeMe.aLink().between(pretty, subjective, LinkType.TAGGED_BY).please();
-      makeMe.refresh(userModel.getEntity());
     }
 
     @Test
@@ -78,7 +76,6 @@ class FromSamePartAsQuizFactoryTest {
       @BeforeEach
       void setup() {
         makeMe.aLink().between(tall, objective, LinkType.TAGGED_BY).please();
-        makeMe.refresh(userModel.getEntity());
       }
 
       @Test
@@ -91,7 +88,6 @@ class FromSamePartAsQuizFactoryTest {
         @BeforeEach
         void setup() {
           makeMe.aReviewPointFor(cousin).by(userModel).please();
-          makeMe.refresh(userModel.getEntity());
         }
 
         @Test
