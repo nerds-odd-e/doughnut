@@ -26,7 +26,7 @@ import { defineComponent, PropType } from "vue";
 import useLoadingApi from "@/managedApi/useLoadingApi";
 import { StorageAccessor } from "@/store/createNoteStorage";
 import {
-  AiCompletionResponse,
+  AiAssistantResponse,
   ClarifyingQuestion,
   Note,
 } from "@/generated/backend";
@@ -59,7 +59,7 @@ export default defineComponent({
   data() {
     return {
       isUnmounted: false,
-      threadRespons: undefined as undefined | AiCompletionResponse,
+      threadRespons: undefined as undefined | AiAssistantResponse,
       clarifyingQuestion: undefined as undefined | ClarifyingQuestion,
       clarifyingHistory: [] as ClarifyingQuestionAndAnswer[],
     };
@@ -75,7 +75,7 @@ export default defineComponent({
 
       return this.autoCompleteDetails(response);
     },
-    async autoCompleteDetails(response: AiCompletionResponse) {
+    async autoCompleteDetails(response: AiAssistantResponse) {
       if (this.isUnmounted) return;
 
       if (response.requiredAction?.clarifyingQuestion) {

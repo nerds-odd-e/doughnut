@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public final class AiCompletionResponse {
+public final class AiAssistantResponse {
   String threadId;
   String runId;
   AiCompletionRequiredAction requiredAction;

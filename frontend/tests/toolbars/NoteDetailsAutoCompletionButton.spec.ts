@@ -2,7 +2,7 @@ import { flushPromises } from "@vue/test-utils";
 import AIClarifyingQuestionDialog from "@/components/notes/AIClarifyingQuestionDialog.vue";
 import {
   AiCompletionParams,
-  AiCompletionResponse,
+  AiAssistantResponse,
   CancelablePromise,
   Note,
 } from "@/generated/backend";
@@ -14,7 +14,7 @@ describe("NoteDetailsAutoCompletionButton", () => {
   const note = makeMe.aNote.please();
   const mockedGetCompletion = vitest.fn<
     [number, AiCompletionParams],
-    CancelablePromise<AiCompletionResponse>
+    CancelablePromise<AiAssistantResponse>
   >();
   const mockedAnswerClarifyingQuestion = vitest.fn().mockResolvedValue({
     requiredAction: {

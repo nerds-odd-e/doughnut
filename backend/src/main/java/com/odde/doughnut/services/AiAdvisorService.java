@@ -29,12 +29,12 @@ public class AiAdvisorService {
     return openAiApiHandler.getOpenAiImage(prompt);
   }
 
-  public AiCompletionResponse getAiCompletion(
+  public AiAssistantResponse getAiCompletion(
       AiCompletionParams aiCompletionParams, Note note, String assistantId) {
     return getContentCompletionService().getAiCompletion(aiCompletionParams, note, assistantId);
   }
 
-  public AiCompletionResponse answerAiCompletionClarifyingQuestion(
+  public AiAssistantResponse answerAiCompletionClarifyingQuestion(
       AiCompletionAnswerClarifyingQuestionParams answerClarifyingQuestionParams) {
     return getContentCompletionService()
         .answerAiCompletionClarifyingQuestion(answerClarifyingQuestionParams);

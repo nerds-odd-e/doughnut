@@ -19,14 +19,14 @@ import com.theokanning.openai.assistants.thread.ThreadRequest;
 import java.util.stream.Stream;
 
 public record ContentCompletionService(OpenAiApiHandler openAiApiHandler) {
-  public AiCompletionResponse getAiCompletion(
+  public AiAssistantResponse getAiCompletion(
       AiCompletionParams aiCompletionParams, Note note, String assistantId) {
-    String threadId = createThread(aiCompletionParams, note);
+    String threadId = createThread(note, aiCompletionParams.getCompletionPrompt());
     Run run = openAiApiHandler.createRun(threadId, assistantId);
     return getThreadResponse(threadId, run);
   }
 
-  public AiCompletionResponse answerAiCompletionClarifyingQuestion(
+  public AiAssistantResponse answerAiCompletionClarifyingQuestion(
       AiCompletionAnswerClarifyingQuestionParams answerClarifyingQuestionParams) {
     String threadId = answerClarifyingQuestionParams.getThreadId();
 
@@ -35,25 +35,22 @@ public record ContentCompletionService(OpenAiApiHandler openAiApiHandler) {
     return getThreadResponse(threadId, retrievedRun);
   }
 
-  private String createThread(AiCompletionParams aiCompletionParams, Note note) {
+  private String createThread(Note note, String completionPrompt) {
     ThreadRequest threadRequest = ThreadRequest.builder().build();
     Thread thread = openAiApiHandler.createThread(threadRequest);
     MessageRequest messageRequest =
         MessageRequest.builder()
-            .content(
-                note.getNoteDescription()
-                    + "------------\n"
-                    + aiCompletionParams.getCompletionPrompt())
+            .content(note.getNoteDescription() + "------------\n" + completionPrompt)
             .build();
 
     openAiApiHandler.createMessage(thread.getId(), messageRequest);
     return thread.getId();
   }
 
-  private AiCompletionResponse getThreadResponse(String threadId, Run currentRun) {
+  private AiAssistantResponse getThreadResponse(String threadId, Run currentRun) {
     Run run = openAiApiHandler.retrieveUntilCompletedOrRequiresAction(threadId, currentRun);
 
-    AiCompletionResponse completionResponse = new AiCompletionResponse();
+    AiAssistantResponse completionResponse = new AiAssistantResponse();
     completionResponse.setThreadId(threadId);
     completionResponse.setRunId(currentRun.getId());
 

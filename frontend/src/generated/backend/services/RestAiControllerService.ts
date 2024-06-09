@@ -2,9 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { AiAssistantResponse } from '../models/AiAssistantResponse';
 import type { AiCompletionAnswerClarifyingQuestionParams } from '../models/AiCompletionAnswerClarifyingQuestionParams';
 import type { AiCompletionParams } from '../models/AiCompletionParams';
-import type { AiCompletionResponse } from '../models/AiCompletionResponse';
 import type { AiGeneratedImage } from '../models/AiGeneratedImage';
 import type { ChatRequest } from '../models/ChatRequest';
 import type { ChatResponse } from '../models/ChatResponse';
@@ -15,13 +15,13 @@ export class RestAiControllerService {
     /**
      * @param note
      * @param requestBody
-     * @returns AiCompletionResponse OK
+     * @returns AiAssistantResponse OK
      * @throws ApiError
      */
     public getCompletion(
         note: number,
         requestBody: AiCompletionParams,
-    ): CancelablePromise<AiCompletionResponse> {
+    ): CancelablePromise<AiAssistantResponse> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/ai/{note}/completion',
@@ -78,8 +78,8 @@ export class RestAiControllerService {
     ): CancelablePromise<ChatResponse> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/ai/chat',
-            query: {
+            url: '/api/ai/chat/{note}',
+            path: {
                 'note': note,
             },
             body: requestBody,
@@ -91,12 +91,12 @@ export class RestAiControllerService {
     }
     /**
      * @param requestBody
-     * @returns AiCompletionResponse OK
+     * @returns AiAssistantResponse OK
      * @throws ApiError
      */
     public answerCompletionClarifyingQuestion(
         requestBody: AiCompletionAnswerClarifyingQuestionParams,
-    ): CancelablePromise<AiCompletionResponse> {
+    ): CancelablePromise<AiAssistantResponse> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/ai/answer-clarifying-question',

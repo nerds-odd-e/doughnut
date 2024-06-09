@@ -114,7 +114,7 @@ class AiAdvisorServiceAutoCompleteTest {
       return getAiCompletionResponse(incompleteContent).getRequiredAction().getContentToAppend();
     }
 
-    private AiCompletionResponse getAiCompletionResponse(String incompleteContent) {
+    private AiAssistantResponse getAiCompletionResponse(String incompleteContent) {
       Note note = makeMe.aNote().inMemoryPlease();
       AiCompletionParams aiCompletionParams = new AiCompletionParams();
       aiCompletionParams.setDetailsToComplete(incompleteContent);
@@ -142,12 +142,12 @@ class AiAdvisorServiceAutoCompleteTest {
           new ClarifyingQuestion(
               "Are you referring to American football or association football (soccer) ?"),
           "my-run-id");
-      AiCompletionResponse aiCompletionResponse =
+      AiAssistantResponse aiAssistantResponse =
           aiAdvisorService.answerAiCompletionClarifyingQuestion(params);
-      assertEquals("mocked-tool-call-id", aiCompletionResponse.getRequiredAction().toolCallId);
+      assertEquals("mocked-tool-call-id", aiAssistantResponse.getRequiredAction().toolCallId);
       assertEquals(
           "Are you referring to American football or association football (soccer) ?",
-          aiCompletionResponse.getRequiredAction().getClarifyingQuestion().question);
+          aiAssistantResponse.getRequiredAction().getClarifyingQuestion().question);
     }
 
     @Nested
@@ -178,11 +178,11 @@ class AiAdvisorServiceAutoCompleteTest {
         openAIAssistantMock.mockSubmitOutputAndCompletion(
             new NoteDetailsCompletion(" is common in China, if you are referring to green tea."),
             "my-run-id");
-        AiCompletionResponse aiCompletionResponse =
+        AiAssistantResponse aiAssistantResponse =
             aiAdvisorService.answerAiCompletionClarifyingQuestion(params);
         assertEquals(
             " is common in China, if you are referring to green tea.",
-            aiCompletionResponse.getRequiredAction().getContentToAppend());
+            aiAssistantResponse.getRequiredAction().getContentToAppend());
       }
     }
   }

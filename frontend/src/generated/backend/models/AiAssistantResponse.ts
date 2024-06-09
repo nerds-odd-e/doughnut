@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { AiCompletionRequiredAction } from './AiCompletionRequiredAction';
-export type AiCompletionResponse = {
+export type AiAssistantResponse = {
     threadId?: string;
     runId?: string;
     requiredAction?: AiCompletionRequiredAction;

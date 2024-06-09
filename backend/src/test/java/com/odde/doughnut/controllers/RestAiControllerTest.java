@@ -6,9 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+import com.odde.doughnut.controllers.dto.AiAssistantResponse;
 import com.odde.doughnut.controllers.dto.AiCompletionAnswerClarifyingQuestionParams;
 import com.odde.doughnut.controllers.dto.AiCompletionParams;
-import com.odde.doughnut.controllers.dto.AiCompletionResponse;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
@@ -121,9 +121,9 @@ class RestAiControllerTest {
 
       @Test
       void mustCreateANewThreadIfNoThreadIDGiven() {
-        AiCompletionResponse aiCompletionResponse = controller.getCompletion(note, params);
-        assertEquals("this-thread", aiCompletionResponse.getThreadId());
-        assertEquals("my-run-id", aiCompletionResponse.getRunId());
+        AiAssistantResponse aiAssistantResponse = controller.getCompletion(note, params);
+        assertEquals("this-thread", aiAssistantResponse.getThreadId());
+        assertEquals("my-run-id", aiAssistantResponse.getRunId());
       }
 
       @Test
@@ -154,16 +154,16 @@ class RestAiControllerTest {
 
       @Test
       void askCompletionAndUseStopResponse() {
-        AiCompletionResponse aiCompletionResponse =
+        AiAssistantResponse aiAssistantResponse =
             controller.answerCompletionClarifyingQuestion(params);
-        assertEquals("blue planet", aiCompletionResponse.getRequiredAction().getContentToAppend());
+        assertEquals("blue planet", aiAssistantResponse.getRequiredAction().getContentToAppend());
       }
 
       @Test
       void itMustPassTheThreadIdBack() {
-        AiCompletionResponse aiCompletionResponse =
+        AiAssistantResponse aiAssistantResponse =
             controller.answerCompletionClarifyingQuestion(params);
-        assertEquals("any-thread-id", aiCompletionResponse.getThreadId());
+        assertEquals("any-thread-id", aiAssistantResponse.getThreadId());
       }
     }
   }

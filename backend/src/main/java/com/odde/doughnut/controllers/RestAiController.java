@@ -45,7 +45,7 @@ public class RestAiController {
 
   @PostMapping("/{note}/completion")
   @Transactional
-  public AiCompletionResponse getCompletion(
+  public AiAssistantResponse getCompletion(
       @PathVariable(name = "note") @Schema(type = "integer") Note note,
       @RequestBody AiCompletionParams aiCompletionParams) {
     currentUser.assertLoggedIn();
@@ -54,16 +54,16 @@ public class RestAiController {
 
   @PostMapping("/answer-clarifying-question")
   @Transactional
-  public AiCompletionResponse answerCompletionClarifyingQuestion(
+  public AiAssistantResponse answerCompletionClarifyingQuestion(
       @RequestBody AiCompletionAnswerClarifyingQuestionParams answerClarifyingQuestionParams) {
     currentUser.assertLoggedIn();
     return aiAdvisorService.answerAiCompletionClarifyingQuestion(answerClarifyingQuestionParams);
   }
 
-  @PostMapping("/chat")
+  @PostMapping("/chat/{note}")
   @Transactional
   public ChatResponse chat(
-      @RequestParam(value = "note") @Schema(type = "integer") Note note,
+      @PathVariable(value = "note") @Schema(type = "integer") Note note,
       @RequestBody ChatRequest request)
       throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(note);

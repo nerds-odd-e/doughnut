@@ -10,10 +10,10 @@ export { CancelablePromise, CancelError } from './core/CancelablePromise';
 export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
+export type { AiAssistantResponse } from './models/AiAssistantResponse';
 export type { AiCompletionAnswerClarifyingQuestionParams } from './models/AiCompletionAnswerClarifyingQuestionParams';
 export type { AiCompletionParams } from './models/AiCompletionParams';
 export type { AiCompletionRequiredAction } from './models/AiCompletionRequiredAction';
-export type { AiCompletionResponse } from './models/AiCompletionResponse';
 export type { AiGeneratedImage } from './models/AiGeneratedImage';
 export type { AnswerDTO } from './models/AnswerDTO';
 export type { AnsweredQuestion } from './models/AnsweredQuestion';
