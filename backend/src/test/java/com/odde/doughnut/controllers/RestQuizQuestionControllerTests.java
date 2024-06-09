@@ -399,18 +399,11 @@ class RestQuizQuestionControllerTests {
 
     @BeforeEach
     void setUp() {
-
-      Note headNote2;
-      headNote2 = makeMe.aHeadNote("headNote2").creatorAndOwner(currentUser).please();
-      makeMe.theNote(headNote2).withNChildren(20).please();
-
-      Note headNote1;
-      headNote1 = makeMe.aHeadNote("headNote1").creatorAndOwner(currentUser).please();
-      makeMe.theNote(headNote1).withNChildren(10).please();
-      noteWithoutQuestions = makeMe.aNote("a note").under(headNote1).please();
-      noteWithQuestions =
-          makeMe.aNote("a note with questions").creatorAndOwner(currentUser).please();
-      makeMe.aQuestion().spellingQuestionOfNote(noteWithQuestions).please();
+      Note headNote = makeMe.aHeadNote("My reading list").creatorAndOwner(currentUser).please();
+      makeMe.theNote(headNote).withNChildren(10).please();
+      noteWithoutQuestions =
+          makeMe.aNote("Zen and the Art of Motorcycle Maintenance").under(headNote).please();
+      noteWithQuestions = makeMe.aNote("Lila").creatorAndOwner(currentUser).hasAQuestion().please();
     }
 
     @Test
@@ -437,13 +430,6 @@ class RestQuizQuestionControllerTests {
     @Test
     void getAllQuestionsOfANoteWhenThereIsMoreThanOneQuestion()
         throws UnexpectedNoAccessRightException {
-      makeMe.aQuestion().spellingQuestionOfNote(noteWithQuestions).please();
-      List<QuizQuestion> results = controller.getAllQuizQuestionByNote(noteWithQuestions);
-      assertThat(results, hasSize(2));
-    }
-
-    @Test
-    void addQuestionManually() throws UnexpectedNoAccessRightException {
       makeMe.aQuestion().spellingQuestionOfNote(noteWithQuestions).please();
       List<QuizQuestion> results = controller.getAllQuizQuestionByNote(noteWithQuestions);
       assertThat(results, hasSize(2));
