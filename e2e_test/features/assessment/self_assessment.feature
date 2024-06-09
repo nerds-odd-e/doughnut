@@ -1,4 +1,6 @@
 Feature: New questions assessment
+  As a trainer, I want to create a notebook with knowledge and questions
+  and share it in the Bazaar, so that people can use it to assess their knowledge
 
   Background:
     Given I am logged in as an existing user
@@ -37,3 +39,8 @@ Feature: New questions assessment
       | China     | What is the capital city of China? | Beijing | Shanghai       |
     When I start the assessment on the "Countries" notebook in the bazaar
     Then I see error message Not enough approved questions
+
+  Scenario: Must login to generate assessment
+    Given I haven't login
+    When I start the assessment on the "Countries" notebook in the bazaar
+    Then I should see message that says "Please login first"
