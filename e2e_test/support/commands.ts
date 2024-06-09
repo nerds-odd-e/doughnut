@@ -353,7 +353,7 @@ Cypress.Commands.add("noteByTitle", (noteTopic: string) => {
     .findCardTitle(noteTopic)
     .parent()
     .invoke("attr", "href")
-    .then(($attr) => /notes\/(\d+)/g.exec($attr)[1])
+    .then(($attr) => /n(\d+)/g.exec($attr)[1])
 })
 
 Cypress.Commands.add("expectFieldErrorMessage", (field: string, message: string) => {
