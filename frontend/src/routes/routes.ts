@@ -75,13 +75,7 @@ const routes = [
     meta: { userProp: true },
   },
   {
-    path: "/bazaar/notes/:noteId",
-    name: "bnoteShow",
-    component: NoteShowPage,
-    props: true,
-  },
-  {
-    path: "/bazaar/notebook/:notebookId/assessment",
+    path: "/assessment/notebook/:notebookId",
     name: "assessment",
     component: AssessmentPage,
     props: true,
