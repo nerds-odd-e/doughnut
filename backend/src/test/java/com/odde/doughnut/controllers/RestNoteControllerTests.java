@@ -300,7 +300,6 @@ class RestNoteControllerTests {
         noteCreation.setWikidataId("Q8337");
         noteCreation.setTopicConstructor("Johnny boy");
         NoteRealm note = controller.createNote(parent, noteCreation).getCreated();
-        makeMe.refresh(note.getNote());
 
         assertEquals("Johnny boy", note.getNote().getTopicConstructor());
         assertEquals("Q8337", note.getNote().getWikidataId());
@@ -327,7 +326,6 @@ class RestNoteControllerTests {
         mockWikidataWBGetEntity(
             "Q8337", makeMe.wikidataClaimsJson("Q8337").asABookWithSingleAuthor("Q34660").please());
         NoteRealm note = controller.createNote(parent, noteCreation).getCreated();
-        makeMe.refresh(note.getNote());
 
         assertEquals("Harry Potter", note.getNote().getTopicConstructor());
         assertEquals("Q8337", note.getNote().getWikidataId());
@@ -347,7 +345,6 @@ class RestNoteControllerTests {
                 .asABookWithMultipleAuthors(List.of("Q34660", "Q12345"))
                 .please());
         NoteRealm note = controller.createNote(parent, noteCreation).getCreated();
-        makeMe.refresh(note.getNote());
 
         assertEquals(
             "The girl sat next to the window",
@@ -429,7 +426,6 @@ class RestNoteControllerTests {
       parent = makeMe.aNote().creatorAndOwner(userModel).please();
       subject = makeMe.aNote().under(parent).please();
       child = makeMe.aNote("child").under(subject).please();
-      makeMe.refresh(subject);
     }
 
     @Test
@@ -442,7 +438,6 @@ class RestNoteControllerTests {
     @Test
     void shouldDeleteTheNoteButNotTheUser() throws UnexpectedNoAccessRightException {
       controller.deleteNote(subject);
-      makeMe.refresh(parent);
       assertThat(parent.getChildren(), hasSize(0));
       assertTrue(modelFactoryService.findUserById(userModel.getEntity().getId()).isPresent());
     }
@@ -451,7 +446,6 @@ class RestNoteControllerTests {
     void shouldDeleteTheChildNoteButNotSibling() throws UnexpectedNoAccessRightException {
       makeMe.aNote("silbling").under(parent).please();
       controller.deleteNote(subject);
-      makeMe.refresh(parent);
       assertThat(parent.getChildren(), hasSize(1));
       assertThat(parent.getAllNoneLinkDescendants().toList(), hasSize(1));
     }
@@ -461,9 +455,7 @@ class RestNoteControllerTests {
       @Test
       void shouldUndoDeleteTheNote() throws UnexpectedNoAccessRightException {
         controller.deleteNote(subject);
-        makeMe.refresh(subject);
         controller.undoDeleteNote(subject);
-        makeMe.refresh(parent);
         assertThat(parent.getChildren(), hasSize(1));
         assertThat(parent.getAllNoneLinkDescendants().toList(), hasSize(2));
       }
@@ -473,15 +465,12 @@ class RestNoteControllerTests {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         testabilitySettings.timeTravelTo(timestamp);
         controller.deleteNote(child);
-        makeMe.refresh(subject);
 
         timestamp = TimestampOperations.addHoursToTimestamp(timestamp, 1);
         testabilitySettings.timeTravelTo(timestamp);
         controller.deleteNote(subject);
-        makeMe.refresh(subject);
 
         controller.undoDeleteNote(subject);
-        makeMe.refresh(parent);
         assertThat(parent.getAllNoneLinkDescendants().toList(), hasSize(1));
       }
     }
@@ -542,7 +531,6 @@ class RestNoteControllerTests {
       @Valid ReviewSetting reviewSetting = new ReviewSetting();
       reviewSetting.setLevel(4);
       controller.updateReviewSetting(source, reviewSetting);
-      makeMe.refresh(link);
       assertThat(getLevel(link), is(4));
     }
 
@@ -551,7 +539,6 @@ class RestNoteControllerTests {
       @Valid ReviewSetting reviewSetting = new ReviewSetting();
       reviewSetting.setLevel(4);
       controller.updateReviewSetting(target, reviewSetting);
-      makeMe.refresh(link);
       assertThat(getLevel(link), is(4));
     }
 

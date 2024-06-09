@@ -364,7 +364,7 @@ The note of current focus (in JSON format):
   // Here we add the note to the children of note in memory to avoid reload the note from
   // database
   public void addChildInMemoryToSupportUnitTestOnly(Note note) {
-    //    this.children.add(note);
+    //        this.children.add(note);
     this.notebook.addNoteInMemoryToSupportUnitTestOnly(note);
   }
 }
