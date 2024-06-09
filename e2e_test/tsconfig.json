@@ -1,9 +1,7 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    "module": "NodeNext",
-    "target": "ES2017",
-    "moduleResolution": "node",
+    "target": "ES2022",
     "resolveJsonModule": true,
     "baseUrl": "../e2e_test",
     "lib": ["dom", "dom.iterable", "ESNext"],

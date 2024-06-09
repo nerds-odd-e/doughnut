@@ -2,7 +2,6 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "module": "ESNext",
-    "moduleResolution": "Node",
     "jsx": "preserve",
     "resolveJsonModule": true,
     "baseUrl": ".",
@@ -18,8 +17,10 @@
       "node"
     ],
     "paths": {
-      "@/*": ["src/*"]
-    },
+      "@/*": [
+        "src/*"
+      ]
+    }
   },
   "compileOnSave": true,
   "typeAcquisition": {

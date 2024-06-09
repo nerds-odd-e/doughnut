@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "sourceMap": true,
-    "target": "es2017",
-    "moduleResolution": "node",
+    "target": "ES2022",
+    "moduleResolution": "Node",
     "esModuleInterop": true,
     "useDefineForClassFields": true,
     "strict": true,
