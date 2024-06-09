@@ -18,7 +18,7 @@
       </button>
     </div>
     <div v-else>
-      <p>End of questions</p>
+      <p>End of assessment</p>
     </div>
   </div>
 </template>

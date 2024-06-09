@@ -10,8 +10,8 @@ Then("I answer the question {string} with {string}", function (stem: string, ans
   start.assumeAssessmentPage().expectQuestion(stem).answer(answer)
 })
 
-Then("I should see end of questions in the end", () => {
-  cy.findByText("End of questions")
+Then("I should see end of assessment in the end", () => {
+  start.assumeAssessmentPage().expectEndOfAssessment()
 })
 
 Then("I see error message Not enough approved questions", () => {
