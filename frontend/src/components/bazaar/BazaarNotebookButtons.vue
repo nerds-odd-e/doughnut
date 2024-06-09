@@ -11,13 +11,9 @@
         />
       </template>
     </PopButton>
-    <PopButton title="Start Assessment">
-      <template #button_face>
-        <SvgAssessment />
-      </template>
-      <OnlineAssessmentDialog v-if="loggedIn" :notebook-id="notebook.id" />
-      <span v-else>Please login first</span>
-    </PopButton>
+    <button class="btn" title="Start Assessment" @click="openAssessmentPage">
+      <SvgAssessment />
+    </button>
   </div>
 </template>
 
@@ -27,11 +23,14 @@ import { defineComponent, PropType } from "vue";
 import { Notebook } from "@/generated/backend";
 import PopButton from "../commons/Popups/PopButton.vue";
 import SubscribeDialog from "./SubscribeDialog.vue";
-import OnlineAssessmentDialog from "../notes/OnlineAssessmentDialog.vue";
 import SvgAdd from "../svgs/SvgAdd.vue";
 import SvgAssessment from "../svgs/SvgAssessment.vue";
+import usePopups from "../commons/Popups/usePopups";
 
 export default defineComponent({
+  setup() {
+    return usePopups();
+  },
   props: {
     notebook: { type: Object as PropType<Notebook>, required: true },
     loggedIn: Boolean,
@@ -44,17 +43,19 @@ export default defineComponent({
   },
   methods: {
     openAssessmentPage() {
-      if (this.loggedIn) {
-        this.$router.push({
-          name: "assessment",
-          query: {
-            topic: this.notebook.headNote.noteTopic.topicConstructor,
-          },
-          params: {
-            notebookId: this.notebook.id,
-          },
-        });
+      if (!this.loggedIn) {
+        this.popups.alert("Please login first");
+        return;
       }
+      this.$router.push({
+        name: "assessment",
+        query: {
+          topic: this.notebook.headNote.noteTopic.topicConstructor,
+        },
+        params: {
+          notebookId: this.notebook.id,
+        },
+      });
     },
   },
 });
