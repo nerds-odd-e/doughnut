@@ -7,9 +7,7 @@ When("I start the assessment on the {string} notebook in the bazaar", (notebook:
 })
 
 Then("I answer the question {string} with {string}", function (stem: string, answer: string) {
-  cy.findByRole("question")
-  cy.findByText(stem)
-  cy.findByText(answer).click()
+  start.assumeAssessmentPage().expectQuestion(stem).answer(answer)
 })
 
 Then("I should see end of questions in the end", () => {

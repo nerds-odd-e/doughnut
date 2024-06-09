@@ -1,6 +1,7 @@
 import { assumeAdminDashboardPage } from "./pageObjects/adminPages/adminDashboardPage"
 import { assumeChatAboutNotePage } from "./pageObjects/chatAboutNotePage"
 import { assumeNotePage } from "./pageObjects/notePage"
+import { assumeAssessmentPage } from "./pageObjects/AssessmentPage"
 import { navigateToBazaar } from "./pageObjects/bazaarPage"
 import { sidebar } from "./pageObjects/sidebar"
 import { routerToNotebooksPage } from "./pageObjects/notebooksPage"
@@ -14,6 +15,7 @@ export default {
   navigateToBazaar,
   sidebar,
   assumeNotePage,
+  assumeAssessmentPage,
   assumeAnsweredQuestionPage,
   assumeChatAboutNotePage,
   assumeQuestionPage,

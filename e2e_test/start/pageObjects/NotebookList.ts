@@ -1,4 +1,5 @@
 import { commonSenseSplit } from "support/string_util"
+import { assumeAssessmentPage } from "./AssessmentPage"
 
 const addToMyLearning = "Add to my learning"
 
@@ -39,6 +40,7 @@ export const bazaarOrCircle = () => {
     ...notebookList(),
     selfAssessmentOnNotebook(notebook: string) {
       this.findNotebookCardButton(notebook, "Start Assessment").click()
+      return assumeAssessmentPage(notebook)
     },
     expectNoAddToMyLearningButton(noteTopic: string) {
       this.findNotebookCardButton(noteTopic, addToMyLearning).shouldNotExist()
