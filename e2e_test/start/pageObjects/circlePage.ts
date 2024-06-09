@@ -1,4 +1,4 @@
-import { bazaarOrCircle } from "./bazaarOrCircle"
+import { bazaarOrCircle } from "./NotebookList"
 import noteCreationForm from "./noteForms/noteCreationForm"
 
 export const navigateToCircle = (circleName: string) => {
