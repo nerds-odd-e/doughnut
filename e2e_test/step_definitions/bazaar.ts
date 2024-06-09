@@ -32,7 +32,7 @@ When("I generate assessment questions on notebook {string}", (notebookTitle: str
 })
 
 When("I go to the bazaar", () => {
-  cy.visit("/bazaar")
+  start.bazaar()
 })
 
 When(

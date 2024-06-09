@@ -11,7 +11,6 @@ Feature: New questions assessment
       | Korea            | Countries   |
       | China            | Countries   |
     And notebook "Countries" is shared to the Bazaar
-    When I go to the bazaar
 
   Scenario: Start an assessment with 5 approved questions
     Given there are questions for the note:
@@ -21,7 +20,7 @@ Feature: New questions assessment
       | Japan     | What is the capital city of Japan? | Tokyo   | Kyoto          |
       | Korea     | What is the capital city of Korea? | Seoul   | Busan          |
       | China     | What is the capital city of China? | Beijing | Shanghai       |
-    When I start the assessment on the "Countries" notebook
+    When I start the assessment on the "Countries" notebook in the bazaar
     Then I answer the question "Where in the world is Singapore?" with "Asia"
     And I answer the question "Most famous food of Vietnam?" with "Pho"
     And I answer the question "What is the capital city of Japan?" with "Kyoto"
@@ -36,5 +35,5 @@ Feature: New questions assessment
       | Japan     | What is the capital city of Japan? | Tokyo   | Kyoto          |
       | Korea     | What is the capital city of Korea? | Seoul   | Busan          |
       | China     | What is the capital city of China? | Beijing | Shanghai       |
-    When I start the assessment on the "Countries" notebook
+    When I start the assessment on the "Countries" notebook in the bazaar
     Then I see error message Not enough approved questions

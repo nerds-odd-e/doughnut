@@ -1,8 +1,9 @@
 import { Then, When } from "@badeball/cypress-cucumber-preprocessor"
 import "../support/string_util"
+import start from "../start"
 
-When("I start the assessment on the {string} notebook", (notebook: string) => {
-  cy.contains(notebook).parents(".card").findByTitle("Start Assessment").click()
+When("I start the assessment on the {string} notebook in the bazaar", (notebook: string) => {
+  start.bazaar().selfAssessmentOnNotebook(notebook)
 })
 
 Then("I answer the question {string} with {string}", function (stem: string, answer: string) {

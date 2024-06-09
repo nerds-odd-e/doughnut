@@ -11,5 +11,8 @@ export const bazaar = () => {
         expect(cardTitles).to.deep.eq(commonSenseSplit(notebooks, ","))
       })
     },
+    selfAssessmentOnNotebook: (notebook: string) => {
+      cy.contains(notebook).parents(".card").findByTitle("Start Assessment").click()
+    },
   }
 }
