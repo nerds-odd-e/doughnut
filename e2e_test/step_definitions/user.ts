@@ -67,7 +67,7 @@ Then("my space setting is {string}", (number: string) => {
 })
 
 Then("I haven't login", () => {
-  cy.log("I haven't login!!!")
+  cy.logout()
 })
 
 When("I visit the falure reports on the admin page", () => {
