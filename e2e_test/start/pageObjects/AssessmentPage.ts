@@ -5,7 +5,7 @@ export const assumeAssessmentPage = (notebook?: string) => {
 
   return {
     expectQuestion(stem: string) {
-      cy.findByRole("question").findByText(stem)
+      cy.findByText(stem)
       return {
         answer(answer: string) {
           cy.findByText(answer).click()

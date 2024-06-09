@@ -4,19 +4,11 @@
     <div v-if="errors != ''">
       {{ errors }}
     </div>
-    <div v-else-if="currentQuestion < quizQuestions.length">
-      <p role="question">
-        {{ quizQuestions[currentQuestion]?.multipleChoicesQuestion.stem }}
-      </p>
-      <button
-        v-for="(choice, index) in quizQuestions[currentQuestion]
-          ?.multipleChoicesQuestion.choices"
-        :key="index"
-        @click="selectAnswer()"
-      >
-        {{ choice }}
-      </button>
-    </div>
+    <QuizQuestionComp
+      v-else-if="currentQuestion < quizQuestions.length"
+      :quiz-question="quizQuestions[currentQuestion]!"
+      @answered="questionAnswered"
+    />
     <div v-else>
       <p>End of assessment</p>
     </div>
@@ -27,6 +19,7 @@
 import { defineComponent } from "vue";
 import useLoadingApi from "@/managedApi/useLoadingApi";
 import { QuizQuestion } from "@/generated/backend";
+import QuizQuestionComp from "../components/review/QuizQuestion.vue";
 
 export default defineComponent({
   setup() {
@@ -40,10 +33,12 @@ export default defineComponent({
       return this.$route.query?.topic;
     },
   },
+  components: {
+    QuizQuestionComp,
+  },
   data() {
     return {
       quizQuestions: [] as QuizQuestion[],
-      answered: false,
       currentQuestion: 0,
       errors: "",
     };
@@ -52,10 +47,7 @@ export default defineComponent({
     this.generateAssessmentQuestions();
   },
   methods: {
-    selectAnswer() {
-      this.nextQuestion();
-    },
-    nextQuestion() {
+    questionAnswered() {
       this.currentQuestion += 1;
     },
     generateAssessmentQuestions() {

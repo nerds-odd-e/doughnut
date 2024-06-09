@@ -1,6 +1,6 @@
 <template>
   <BasicBreadcrumb :ancestors="[quizQuestion.headNote.noteTopic]" />
-  <div class="quiz-instruction">
+  <div class="quiz-instruction" :key="quizQuestion.id">
     <ShowImage
       v-if="quizQuestion.imageWithMask"
       v-bind="quizQuestion.imageWithMask"
