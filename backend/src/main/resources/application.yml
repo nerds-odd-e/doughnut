@@ -1,8 +1,16 @@
+---
 spring:
   profiles:
     active: "test"
   config:
     import: db-test.properties
+  logging:
+    level:
+      root: OFF
+      org.springframework: OFF
+      org.springframework.web: ERROR
+      com.odde.doughnut: ERROR
+      org.hibernate: ERROR
   web:
     resources:
       cache:
@@ -46,6 +54,13 @@ spring:
     import: db-e2e.properties
     activate:
       on-profile: e2e
+  logging:
+    level:
+      root: OFF
+      org.springframework: OFF
+      org.springframework.web: ERROR
+      com.odde.doughnut: ERROR
+      org.hibernate: ERROR
   web:
     resources:
       cache:
