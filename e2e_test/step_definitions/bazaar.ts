@@ -25,12 +25,6 @@ Then("there shouldn't be any note edit button", () => {
 When("I open the notebook {string} in the Bazaar", (noteTopic: string) => {
   cy.findCardTitle(noteTopic).click()
 })
-When(
-  "I generate assessment questions on notebook {string} in the bazaar",
-  (notebookTitle: string) => {
-    start.navigateToBazaar().generateAssessmentQuestions(notebookTitle)
-  },
-)
 
 When(
   "I subscribe to notebook {string} in the bazaar, with target of learning {int} notes per day",
@@ -62,7 +56,7 @@ Then("I should see I've subscribed to {string}", (noteTopic: string) => {
 })
 
 Then("I should see message that says {string}", (message: string) => {
-  cy.findByText(message).should("exist")
+  cy.findByText(message)
 })
 
 Then("I should see I've not subscribed to {string}", (noteTopic: string) => {
@@ -88,12 +82,4 @@ Then("I unsubscribe from notebook {string}", (noteTopic: string) => {
 
 Given("There is a notebook with topic {string}", (notebookTopic: string) => {
   start.routerToNotebooksPage().creatingNotebook(notebookTopic)
-})
-
-Then("I should see {int} questions", (questionCount: number) => {
-  for (let i = 1; i <= questionCount; i++) {
-    cy.findByText(`Question ${i}:`).should("exist")
-  }
-
-  cy.findByText(`Question ${questionCount + 1}:`).should("not.exist")
 })

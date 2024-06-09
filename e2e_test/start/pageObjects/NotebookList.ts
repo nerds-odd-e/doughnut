@@ -40,9 +40,6 @@ export const bazaarOrCircle = () => {
     selfAssessmentOnNotebook(notebook: string) {
       this.findNotebookCardButton(notebook, "Start Assessment").click()
     },
-    generateAssessmentQuestions(notebook: string) {
-      this.findNotebookCardButton(notebook, "Generate assessment questions").click()
-    },
     expectNoAddToMyLearningButton(noteTopic: string) {
       this.findNotebookCardButton(noteTopic, addToMyLearning).shouldNotExist()
     },
