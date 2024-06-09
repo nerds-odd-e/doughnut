@@ -37,7 +37,7 @@ export default defineComponent({
   },
   computed: {
     topicConstructor() {
-      return this.$route.query.topic;
+      return this.$route.query?.topic;
     },
   },
   data() {
