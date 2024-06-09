@@ -14,7 +14,6 @@
     <table class="question-table">
       <thead>
         <tr>
-          <th>Question ID</th>
           <th>Question Text</th>
           <th>A</th>
           <th>B</th>
@@ -24,7 +23,6 @@
       </thead>
       <tbody>
         <tr v-for="question in questions" :key="question.id">
-          <td>{{ question.id }}</td>
           <td>{{ question.multipleChoicesQuestion.stem }}</td>
           <template v-if="question.multipleChoicesQuestion.choices">
             <td

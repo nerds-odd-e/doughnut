@@ -169,8 +169,8 @@ export const assumeNotePage = (noteTopic?: string) => {
     addQuestion(row: Record<string, string>) {
       this.openQuestionList().addQuestion(row)
     },
-    expectQuestionInList(row: Record<string, string>) {
-      this.openQuestionList().expectQuestion(row)
+    expectQuestionsInList(expectedQuestions: Record<string, string>[]) {
+      this.openQuestionList().expectQuestion(expectedQuestions)
     },
     aiSuggestDetailsForNote: () => {
       cy.on("uncaught:exception", () => {

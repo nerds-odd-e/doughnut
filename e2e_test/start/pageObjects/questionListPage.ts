@@ -10,10 +10,12 @@ export const questionListPage = () => {
       cy.findByLabelText("Correct Choice Index").clear().type("2")
       cy.findByRole("button", { name: "Submit" }).click()
     },
-    expectQuestion(row: Record<string, string>) {
-      cy.findByText(row["Question"]!)
-      cy.findByText(row["Correct Choice"]!).then(($el) => {
-        cy.wrap($el).should("have.class", "correct-choice")
+    expectQuestion(expectedQuestions: Record<string, string>[]) {
+      expectedQuestions.forEach((row) => {
+        cy.findByText(row["Question"]!)
+        cy.findByText(row["Correct Choice"]!).then(($el) => {
+          cy.wrap($el).should("have.class", "correct-choice")
+        })
       })
     },
   }

@@ -406,9 +406,8 @@ When("I route to the note {string}", (noteTopic: string) => {
 })
 
 When(
-  "I should see the question in the question list of the note {string}:",
+  "I should see the questions in the question list of the note {string}:",
   (noteTopic: string, data: DataTable) => {
-    const row = data.hashes()[0]
-    start.jumpToNotePage(noteTopic).expectQuestionInList(row!)
+    start.jumpToNotePage(noteTopic).expectQuestionsInList(data.hashes())
   },
 )
