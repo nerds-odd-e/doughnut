@@ -40,20 +40,6 @@ Given(
   },
 )
 
-Given(
-  "there are {int} notes under notebook {string} for the user",
-  (notesCount: number, noteTopic: string) => {
-    const notes = Array(notesCount - 1)
-      .fill(0)
-      .map((_, i) => {
-        return { topicConstructor: `Note ${i}`, parentTopic: noteTopic }
-      })
-
-    notes.push({ topicConstructor: noteTopic, parentTopic: "" })
-    start.testability().injectNotes(notes, "old_learner")
-  },
-)
-
 Given("there are notes from Note {int} to Note {int}", (from: number, to: number) => {
   const notes = Array(to - from + 1)
     .fill(0)

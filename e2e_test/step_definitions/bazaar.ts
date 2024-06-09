@@ -40,10 +40,6 @@ Then(
   },
 )
 
-Then("I should see {string} button", (btnTitle: string) => {
-  cy.findByRole("button", { name: btnTitle }).should("exist")
-})
-
 Then("I should see readonly notebook {string} in my notes", (noteTopic: string) => {
   start.routerToNotebooksPage()
   cy.findByText(noteTopic).click()
@@ -78,8 +74,4 @@ Then("I should see it has link to {string}", (noteTopic: string) => {
 
 Then("I unsubscribe from notebook {string}", (noteTopic: string) => {
   start.routerToNotebooksPage().unsubscribe(noteTopic)
-})
-
-Given("There is a notebook with topic {string}", (notebookTopic: string) => {
-  start.routerToNotebooksPage().creatingNotebook(notebookTopic)
 })

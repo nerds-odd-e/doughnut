@@ -38,7 +38,7 @@ Feature: New questions assessment
       | Korea     | What is the capital city of Korea? | Seoul   | Busan          |
       | China     | What is the capital city of China? | Beijing | Shanghai       |
     When I start the assessment on the "Countries" notebook in the bazaar
-    Then I see error message Not enough approved questions
+    Then I should see error message Not enough approved questions
 
   Scenario: Must login to generate assessment
     Given I haven't login
