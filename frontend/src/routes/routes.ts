@@ -26,7 +26,7 @@ const noteAndLinkRoutes = [
     component: NotebooksPage,
   },
   {
-    path: `notes/:noteId`,
+    path: `n:noteId`,
     name: "noteShow",
     component: NoteShowPage,
     props: (route: RouteLocation) => ({ noteId: Number(route.params.noteId) }),

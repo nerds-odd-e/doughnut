@@ -29,7 +29,7 @@ export default {
     testability()
       .getInjectedNoteIdByTitle(noteTopic)
       .then((noteId) => {
-        const url = `/notes/${noteId}`
+        const url = `/n${noteId}`
         if (forceLoadPage) cy.visit(url)
         else cy.routerPush(url, "noteShow", { noteId: noteId })
       })
