@@ -12,7 +12,16 @@ export const notebookList = () => {
       })
     },
     findNotebookCardButton: (notebook: string, name: string) => {
-      const finder = () => cy.findNoteCardButton(notebook, name)
+      const finder = () =>
+        cy
+          .findCardTitle(notebook)
+          .parent()
+          .parent()
+          .parent()
+          .parent()
+          .parent()
+          .findByRole("button", { name: name })
+
       return {
         click() {
           finder().click()

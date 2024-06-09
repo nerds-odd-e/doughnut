@@ -189,17 +189,6 @@ Cypress.Commands.add("expectExactLinkTargets", (targets) => {
     .should("deep.equal", targets)
 })
 
-Cypress.Commands.add("findNoteCardButton", (noteTopic, btnTextOrTitle) => {
-  return cy
-    .findCardTitle(noteTopic)
-    .parent()
-    .parent()
-    .parent()
-    .parent()
-    .parent()
-    .findByRole("button", { name: btnTextOrTitle })
-})
-
 Cypress.Commands.add(
   "initialReviewOneNoteIfThereIs",
   ({ review_type, topic, additional_info, skip }) => {
@@ -333,11 +322,6 @@ Cypress.Commands.add("shouldSeeQuizWithOptions", (questionParts: string[], optio
 
 Cypress.Commands.add("formField", (label) => {
   return cy.findByLabelText(label)
-})
-
-Cypress.Commands.add("unsubscribeFromNotebook", (noteTopic) => {
-  start.routerToNotebooksPage()
-  cy.findNoteCardButton(noteTopic, "Unsubscribe").click()
 })
 
 Cypress.Commands.add("searchNote", (searchKey: string, options: string[]) => {

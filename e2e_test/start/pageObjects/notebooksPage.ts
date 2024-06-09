@@ -23,5 +23,18 @@ export const routerToNotebooksPage = () => {
       this.findNotebookCardButton(notebook, "Share notebook to bazaar").click()
       cy.findByRole("button", { name: "OK" }).click()
     },
+    updateSubscription(notebook: string) {
+      this.findNotebookCardButton(notebook, "Edit subscription").click()
+      cy.findByRole("button", { name: "Update" }).click()
+    },
+    skipReview(notebook: string) {
+      this.findNotebookCardButton(notebook, "Edit notebook settings").click()
+      cy.formField("Skip Review Entirely").check()
+      cy.findByRole("button", { name: "Update" }).click()
+    },
+    unsubscribe(notebook: string) {
+      this.findNotebookCardButton(notebook, "Unsubscribe").click()
+      cy.findByRole("button", { name: "OK" }).click()
+    },
   }
 }

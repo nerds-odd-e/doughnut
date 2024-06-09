@@ -71,16 +71,11 @@ Then("I should see I've not subscribed to {string}", (noteTopic: string) => {
 })
 
 Then("I should be able to edit the subscription to notebook {string}", (noteTopic: string) => {
-  start.routerToNotebooksPage()
-  cy.findNoteCardButton(noteTopic, "Edit subscription").click()
-  cy.findByRole("button", { name: "Update" }).click()
+  start.routerToNotebooksPage().updateSubscription(noteTopic)
 })
 
 When("I change notebook {string} to skip review", (noteTopic: string) => {
-  start.routerToNotebooksPage()
-  cy.findNoteCardButton(noteTopic, "Edit notebook settings").click()
-  cy.formField("Skip Review Entirely").check()
-  cy.findByRole("button", { name: "Update" }).click()
+  start.routerToNotebooksPage().skipReview(noteTopic)
 })
 
 Then("I should see it has link to {string}", (noteTopic: string) => {
@@ -88,8 +83,7 @@ Then("I should see it has link to {string}", (noteTopic: string) => {
 })
 
 Then("I unsubscribe from notebook {string}", (noteTopic: string) => {
-  cy.unsubscribeFromNotebook(noteTopic)
-  cy.findByRole("button", { name: "OK" }).click()
+  start.routerToNotebooksPage().unsubscribe(noteTopic)
 })
 
 Given("There is a notebook with topic {string}", (notebookTopic: string) => {

@@ -18,7 +18,6 @@ declare namespace Cypress {
     expectAMapTo(latitude: string, longitude: string): Chainable<any>
     findUserSettingsButton(userName: string): Chainable<any>
     failure(): Chainable<any>
-    findNoteCardButton(noteTopic: string, btnTextOrTitle: string): Chainable<any>
     formField(label: string): Chainable<any>
     assignFieldValue(value: string): Chainable<any>
     fieldShouldHaveValue(value: string): Chainable<any>
@@ -50,7 +49,6 @@ declare namespace Cypress {
     shouldSeeQuizWithOptions(questionParts: any, options: any): Chainable<any>
     startSearching(): Chainable<any>
     undoLast(undoThpe: string): Chainable<any>
-    unsubscribeFromNotebook(noteTopic: string): Chainable<any>
     yesIRemember(): Chainable<any>
   }
 }
