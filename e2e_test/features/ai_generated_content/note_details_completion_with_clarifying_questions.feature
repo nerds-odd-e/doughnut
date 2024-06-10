@@ -11,9 +11,9 @@ Feature: AI Asks Clarifying Questions When Auto-Generating Note Details
   @usingMockedOpenAiService
   Scenario Outline: Responding to AI's Clarification Question
     Given the OpenAI assistant in thread "thread-111" is set to:
-      | response | arguments                                           |
-      | ask      | Do you mean American Football or European Football? |
-      | complete | " originated from England."                         |
+      | response                   | arguments                                           |
+      | ask clarification question | Do you mean American Football or European Football? |
+      | complete note details      | " originated from England."                         |
     When I request to complete the details for the note "Sports"
     And I <respond> to the clarifying question "Do you mean American Football or European Football?"
     Then the note details on the current page should be "<note details>"
@@ -26,9 +26,9 @@ Feature: AI Asks Clarifying Questions When Auto-Generating Note Details
   @usingMockedOpenAiService
   Scenario: Managing Extended Clarification Dialogue
     Given the OpenAI assistant in thread "thread-111" is set to:
-      | response | arguments                                           |
-      | ask      | Do you mean American Football or European Football? |
-      | ask      | Do you mean the American version?                   |
+      | response                   | arguments                                           |
+      | ask clarification question | Do you mean American Football or European Football? |
+      | ask clarification question | Do you mean the American version?                   |
     When I request to complete the details for the note "Sports"
     And I answer "Ameriland" to the clarifying question "Do you mean American Football or European Football?"
     Then I should see a follow-up question "Do you mean the American version?"

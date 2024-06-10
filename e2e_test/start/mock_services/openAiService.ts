@@ -125,11 +125,11 @@ const openAiService = () => {
           }
           const responses = hashes.map((hash) => {
             switch (hash["response"]) {
-              case "ask":
+              case "ask clarification question":
                 return createRequiresActionRun("ask_clarification_question", {
                   question: hash["arguments"],
                 })
-              case "complete":
+              case "complete note details":
                 return createRequiresActionRun("complete_note_details", {
                   completion: hash["arguments"]?.match(/"(.*)"/)?.[1],
                 })

@@ -17,7 +17,7 @@ Feature: Note details completion
   Scenario: Completing Note Details Using OpenAI
     Given OpenAI service can create thread and run with id "thread-111" when requested
     Given the OpenAI assistant in thread "thread-111" is set to:
-      | response | arguments         |
-      | complete | " vigorous city." |
+      | response              | arguments         |
+      | complete note details | " vigorous city." |
     When I request to complete the details for the note "Taipei"
     Then the note details on the current page should be "It is a vigorous city."
