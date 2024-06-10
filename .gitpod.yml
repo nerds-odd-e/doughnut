@@ -61,3 +61,4 @@ vscode:
     - unifiedjs.vscode-mdx
     - antfu.vite
     - vitest.explorer
+    - vmware.vscode-boot-dev-pack
