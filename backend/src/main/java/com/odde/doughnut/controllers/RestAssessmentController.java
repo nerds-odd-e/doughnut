@@ -38,8 +38,7 @@ class RestAssessmentController {
 
   @GetMapping("/questions_count/{notebook}")
   public Long countQuizQuestions(
-    @PathVariable("notebook") @Schema(type = "integer") Notebook notebook
-  ) {
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook) {
     currentUser.assertLoggedIn();
 
     return assessmentService.countQuizQuestions(notebook);
