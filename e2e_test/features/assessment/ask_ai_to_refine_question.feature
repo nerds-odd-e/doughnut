@@ -7,9 +7,7 @@ Feature: Ask AI to refine the question
     And I have a note with the topic "Countries"
     And I want to create a question for the note "Countries"
 
-  @ignore
   Scenario: Cannot refine the question without any data
-    When I don't fill any data
     Then The "Refine" button should be disabled
 
   @ignore

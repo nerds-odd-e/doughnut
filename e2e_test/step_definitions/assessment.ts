@@ -1,4 +1,4 @@
-import { Then, When } from "@badeball/cypress-cucumber-preprocessor"
+import { Then, When, Given } from "@badeball/cypress-cucumber-preprocessor"
 import "../support/string_util"
 import start from "../start"
 
@@ -16,4 +16,13 @@ Then("I should see the score {string} at the end of assessment", (expectedScore:
 
 Then("I should see error message Not enough approved questions", () => {
   cy.findByText("Not enough approved questions").should("be.visible")
+})
+
+Given("I want to create a question for the note {string}", (country: string) => {
+  start.jumpToNotePage(country)
+  start.assumeAssessmentPage().goToAddQuestion()
+})
+
+Then("The {string} button should be disabled", (buttonName: string) => {
+  cy.findByRole("button", { name: buttonName }).should("be.disabled")
 })

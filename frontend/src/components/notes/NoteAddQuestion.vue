@@ -40,6 +40,7 @@
     >
       -
     </button>
+    <button @click="refineQuestion" :disabled="!isValidRefine">Refine</button>
     <button @click="submitQuestion" :disabled="!isValidQuestion">Submit</button>
   </div>
 </template>
@@ -49,6 +50,7 @@ import { defineComponent, PropType } from "vue";
 import useLoadingApi from "@/managedApi/useLoadingApi";
 import { Note, MCQWithAnswer } from "@/generated/backend";
 import isMCQWithAnswerValid from "@/models/isMCQWithAnswerValid";
+import isRefineMCQWithAnswerValid from "@/models/isRefineMCQWithAnswerValid";
 import TextArea from "../form/TextArea.vue";
 
 export default defineComponent({
@@ -79,6 +81,9 @@ export default defineComponent({
     isValidQuestion() {
       return isMCQWithAnswerValid(this.mcqWithAnswer);
     },
+    isValidRefine() {
+      return isRefineMCQWithAnswerValid(this.mcqWithAnswer);
+    },
   },
   methods: {
     addOption() {
@@ -106,6 +111,15 @@ export default defineComponent({
           quizQuestion,
         );
       this.$emit("close-dialog", response);
+    },
+    async refineQuestion() {
+      // const quizQuestion = this.mcqWithAnswer;
+      // const response =
+      //   await this.managedApi.restQuizQuestionController.addQuestionManually(
+      //     this.note.id,
+      //     quizQuestion,
+      //   );
+      // this.$emit("close-dialog", response);
     },
   },
 });
