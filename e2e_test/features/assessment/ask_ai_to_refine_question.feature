@@ -18,11 +18,43 @@ Feature: Ask AI to refine the question
     | Stem | Choice 0 | Choice 1 | Correct Choice Index |
     | Vietnam food | Pho | Pizza | 0 |
     When I click on the "Refine" button
-    Then The refine result popup should be shown
+    Then The refine result should be shown in the popup
     And The Correct Choice Index should be same as the request
     When I click on the "Accept" button
     Then The popup should be closed
     And The refined question should be filled in the form
 
+  @ignore
+  Scenario: Can refine the question with the only fill data for "Stem", "number of choices" and "Correct Choice Index"
+    Given I input data to "Stem" and "Correct Choice Index" of question:
+      | Stem | Choice 0 | Choice 1 | Correct Choice Index |
+      | Vietnam food |  |  | 1 |
+    When I click on the "Refine" button
+    Then The refine result should be shown in the popup
+    And The Correct Choice Index should be same as the request
+    When I click on the "Accept" button
+    Then The popup should be closed
+    And The refined question should be filled in the form
 
+  @ignore
+  Scenario: Can refine the question with the only fill data for "Choices", "number of choices" and "Correct Choice Index"
+    Given I input data to "Choice 0", "Choice 1" and "Correct Choice Index" of question:
+      | Stem | Choice 0 | Choice 1 | Correct Choice Index |
+      |  | Pho | Pizza | 0 |
+    When I click on the "Refine" button
+    Then The refine result should be shown in the popup
+    And The Correct Choice Index should be same as the request
+    When I click on the "Accept" button
+    Then The popup should be closed
+    And The refined question should be filled in the form
 
+  @ignore
+  Scenario: Can refine the question with the only fill data for "Stem" and "number of choices"
+    Given I input data to "Stem" of question:
+      | Stem | Choice 0 | Choice 1 | Correct Choice Index |
+      | Vietnam food |  |  |  |
+    When I click on the "Refine" button
+    Then The refine result should be shown in the popup
+    When I click on the "Accept" button
+    Then The popup should be closed
+    And The refined question should be filled in the form
