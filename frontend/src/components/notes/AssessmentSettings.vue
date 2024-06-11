@@ -24,8 +24,13 @@ export default defineComponent({
       numberOfQuestion: 0,
     };
   },
+  methods: {
+  },
+  mounted() {
+  },
 });
 </script>
 
 <style scoped>
+
 </style>
