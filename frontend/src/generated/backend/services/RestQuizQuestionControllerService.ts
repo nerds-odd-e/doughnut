@@ -109,7 +109,7 @@ export class RestQuizQuestionControllerService {
     ): CancelablePromise<MCQWithAnswer> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/quiz-questions/{note}/refine-note-questions',
+            url: '/api/quiz-questions/{note}/refine-question',
             path: {
                 'note': note,
             },

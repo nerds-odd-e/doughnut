@@ -741,7 +741,7 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/AnsweredQuestion"
-  /api/quiz-questions/{note}/refine-note-questions:
+  /api/quiz-questions/{note}/refine-question:
     post:
       tags:
       - rest-quiz-question-controller

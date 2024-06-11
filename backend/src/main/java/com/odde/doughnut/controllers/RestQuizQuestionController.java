@@ -120,7 +120,7 @@ class RestQuizQuestionController {
     return quizQuestionService.addQuestion(note, manualQuestion).getMcqWithAnswer();
   }
 
-  @PostMapping("/{note}/refine-note-questions")
+  @PostMapping("/{note}/refine-question")
   @Transactional
   public MCQWithAnswer refineQuestion(
       @PathVariable("note") @Schema(type = "integer") Note note,
