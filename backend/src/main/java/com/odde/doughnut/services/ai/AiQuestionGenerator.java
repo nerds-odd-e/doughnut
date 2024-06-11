@@ -22,6 +22,12 @@ public record AiQuestionGenerator(
         .getAiGeneratedQuestion();
   }
 
+  public MCQWithAnswer getAiGeneratedQuestion(Note note, MCQWithAnswer mcqWithAnswer) {
+    return forNote(note, globalSettingsService.getGlobalSettingQuestionGeneration().getValue())
+        .refineQuestion(mcqWithAnswer)
+        .orElse(null);
+  }
+
   public QuizQuestionContestResult getQuizQuestionContestResult(QuizQuestion quizQuestion) {
     return forNote(
             quizQuestion.getNote(), globalSettingsService.getGlobalSettingEvaluation().getValue())

@@ -26,4 +26,14 @@ public class AiQuestionFactory extends QuizQuestionFactory {
     }
     return QuizQuestion.fromMCQWithAnswer(MCQWithAnswer, note);
   }
+
+  @Override
+  public QuizQuestion refineQuestion(MCQWithAnswer mcqWithAnswer)
+      throws QuizQuestionNotPossibleException {
+    MCQWithAnswer MCQWithAnswer = aiQuestionGenerator.getAiGeneratedQuestion(note, mcqWithAnswer);
+    if (MCQWithAnswer == null) {
+      throw new QuizQuestionNotPossibleException();
+    }
+    return QuizQuestion.fromMCQWithAnswer(MCQWithAnswer, note);
+  }
 }

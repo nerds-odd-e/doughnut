@@ -54,4 +54,29 @@ please critically check if the following question makes sense and is possible to
                 .parametersDefinitionByClass(QuestionEvaluation.class)
                 .build()));
   }
+
+  public static AiToolList questionRefineAiTool(MCQWithAnswer question) {
+    MultipleChoicesQuestion mcq = question.getMultipleChoicesQuestion();
+
+    String messageBody =
+        """
+Please take on the role of reading and understanding my notes. Help me review and refine my question.
+Only the top-level of the context path is visible to you.
+Without the specific note of focus and its more detailed contexts revealed to you,
+please critically check if the following question makes sense and is possible to you:
+
+%s
+
+"""
+            .formatted(new ObjectMapper().valueToTree(mcq).toString());
+
+    return new AiToolList(
+        messageBody,
+        List.of(
+            FunctionDefinition.<QuestionEvaluation>builder()
+                .name("evaluate_question")
+                .description("answer and evaluate the feasibility of the question")
+                .parametersDefinitionByClass(QuestionEvaluation.class)
+                .build()));
+  }
 }

@@ -459,7 +459,7 @@ class RestQuizQuestionControllerTests {
   }
 
   @Nested
-  class refineQuestion {
+  class RefineQuestion {
     @Test
     void authorization() {
       Note note = makeMe.aNote().please();
@@ -470,13 +470,17 @@ class RestQuizQuestionControllerTests {
     }
 
     @Test
-    void givenQuestion_thenReturnSameStem() throws UnexpectedNoAccessRightException {
+    void givenQuestion_thenReturnRefineQuestion() throws UnexpectedNoAccessRightException {
       Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
+      openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(mcqWithAnswer, "");
       MCQWithAnswer result = controller.refineQuestion(note, mcqWithAnswer);
+
       assertEquals(0, result.getCorrectChoiceIndex());
-      assertEquals("New refine Question?", result.getMultipleChoicesQuestion().getStem());
-      assertEquals(List.of("A", "B", "C", "D"), result.getMultipleChoicesQuestion().getChoices());
+      assertEquals("a default question stem", result.getMultipleChoicesQuestion().getStem());
+      assertEquals(
+          List.of("choice1", "choice2", "choice3"),
+          result.getMultipleChoicesQuestion().getChoices());
     }
   }
 }

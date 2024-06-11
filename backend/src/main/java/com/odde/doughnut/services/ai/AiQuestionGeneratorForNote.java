@@ -40,6 +40,12 @@ public record AiQuestionGeneratorForNote(
         .flatMap(QuestionEvaluation::getQuestionEvaluation);
   }
 
+  public Optional<MCQWithAnswer> refineQuestion(MCQWithAnswer question) {
+    AiToolList questionEvaluationAiTool = AiToolFactory.questionRefineAiTool(question);
+    return requestAndGetFunctionCallArguments(questionEvaluationAiTool)
+        .flatMap(MCQWithAnswer::getRefineQuestion);
+  }
+
   private Optional<JsonNode> requestAndGetFunctionCallArguments(AiToolList tool) {
     ChatCompletionRequest chatRequest =
         chatAboutNoteRequestBuilder.addTool(tool).maxTokens(1500).build();

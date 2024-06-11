@@ -7,9 +7,7 @@ import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleEx
 import com.odde.doughnut.factoryServices.quizFacotries.factories.AiQuestionFactory;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
-import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
 import com.theokanning.openai.client.OpenAiApi;
-import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -46,21 +44,11 @@ public class QuizQuestionService {
   }
 
   public QuizQuestion refineQuestion(Note note, MCQWithAnswer mcqWithAnswer) {
-    //    AiQuestionFactory aiQuestionFactory = new AiQuestionFactory(note, aiQuestionGenerator);
-    //    try {
-    QuizQuestion quizQuestion = new QuizQuestion();
-    MultipleChoicesQuestion multipleChoicesQuestion = new MultipleChoicesQuestion();
-    multipleChoicesQuestion.setStem("New refine Question?");
-    multipleChoicesQuestion.setChoices(List.of("A", "B", "C", "D"));
-
-    quizQuestion.setNote(note);
-
-    quizQuestion.setMultipleChoicesQuestion(multipleChoicesQuestion);
-    quizQuestion.setCorrectAnswerIndex(0);
-    return quizQuestion;
-    //      return aiQuestionFactory.buildRefineQuizQuestion(note, mcqWithAnswer);
-    //    } catch (QuizQuestionNotPossibleException e) {
-    //      throw (new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated"));
-    //    }
+    AiQuestionFactory aiQuestionFactory = new AiQuestionFactory(note, aiQuestionGenerator);
+    try {
+      return aiQuestionFactory.refineQuestion(mcqWithAnswer);
+    } catch (QuizQuestionNotPossibleException e) {
+      throw (new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated"));
+    }
   }
 }
