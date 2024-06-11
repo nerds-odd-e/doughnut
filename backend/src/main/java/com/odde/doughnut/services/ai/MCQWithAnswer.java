@@ -21,6 +21,10 @@ public class MCQWithAnswer {
   @JsonProperty(required = true)
   private int correctChoiceIndex;
 
+  @JsonPropertyDescription("is_approved")
+  @JsonProperty
+  private boolean approved;
+
   public static Optional<MCQWithAnswer> getRefineQuestion(JsonNode jsonNode) {
     try {
       return Optional.of(new ObjectMapper().treeToValue(jsonNode, MCQWithAnswer.class));

@@ -11,9 +11,10 @@
         />
       </template>
     </PopButton>
-    <table class="question-table">
+    <table class="question-table mt-2">
       <thead>
         <tr>
+          <th>Approved</th>
           <th>Question Text</th>
           <th>A</th>
           <th>B</th>
@@ -26,6 +27,7 @@
           v-for="question in questions"
           :key="question.multipleChoicesQuestion.stem"
         >
+          <td><input type="checkbox" :checked="question.approved" /></td>
           <td>{{ question.multipleChoicesQuestion.stem }}</td>
           <template v-if="question.multipleChoicesQuestion.choices">
             <td
