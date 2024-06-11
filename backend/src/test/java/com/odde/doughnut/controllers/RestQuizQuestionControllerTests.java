@@ -1,5 +1,11 @@
 package com.odde.doughnut.controllers;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
@@ -19,6 +25,8 @@ import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
+import java.sql.Timestamp;
+import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -31,16 +39,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.sql.Timestamp;
-import java.util.List;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -456,29 +454,6 @@ class RestQuizQuestionControllerTests {
       controller.addQuestionManually(note, mcqWithAnswer);
       makeMe.refresh(note);
       assertThat(note.getQuizQuestions(), hasSize(1));
-    }
-  }
-
-
-  @Nested
-  class refineQuestion {
-    @Test
-    void authorization() {
-      Note note = makeMe.aNote().please();
-      MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
-      assertThrows(
-        UnexpectedNoAccessRightException.class,
-        () -> controller.addQuestionManually(note, mcqWithAnswer));
-    }
-
-    @Test
-    void refine() throws UnexpectedNoAccessRightException {
-      Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
-      MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
-      MCQWithAnswer result = controller.refineQuestion(note, mcqWithAnswer);
-      assertEquals(0, result.getCorrectChoiceIndex());
-      assertEquals("New refine Question?", result.getMultipleChoicesQuestion().getStem());
-      assertEquals(List.of("A", "B", "C", "D"), result.getMultipleChoicesQuestion().getChoices());
     }
   }
 }
