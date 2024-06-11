@@ -11,6 +11,8 @@ import com.theokanning.openai.client.OpenAiApi;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+
 public class QuizQuestionService {
   private final ModelFactoryService modelFactoryService;
 
@@ -35,6 +37,10 @@ public class QuizQuestionService {
 
   QuizQuestion selectQuizQuestionForANote(Note note) {
     return note.getQuizQuestions().stream().findFirst().orElse(null);
+  }
+
+  List<QuizQuestion> selectQuizQuestionsForANote(Note note) {
+    return note.getQuizQuestions();
   }
 
   public QuizQuestion addQuestion(Note note, MCQWithAnswer mcqWithAnswer) {

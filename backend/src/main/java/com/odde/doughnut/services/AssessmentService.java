@@ -2,13 +2,17 @@ package com.odde.doughnut.services;
 
 import static com.odde.doughnut.controllers.dto.ApiError.ErrorType.ASSESSMENT_SERVICE_ERROR;
 
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.theokanning.openai.client.OpenAiApi;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 public class AssessmentService {
   private final QuizQuestionService quizQuestionService;
@@ -18,12 +22,18 @@ public class AssessmentService {
   }
 
   public List<QuizQuestion> generateAssessment(Notebook notebook) {
-    List<QuizQuestion> questions =
-        notebook.getNotes().stream()
-            .map(quizQuestionService::selectQuizQuestionForANote)
-            .filter(Objects::nonNull)
-            .limit(5)
-            .toList();
+
+    System.out.println("########## SIZE: " + notebook.getNotes().size());
+
+    List<Note> notes = notebook.getNotes();
+    List<QuizQuestion> finalQuizQuestionList = new ArrayList<>();
+    for (Note note : notes) {
+      List<QuizQuestion> quizQuestionList = quizQuestionService.selectQuizQuestionsForANote(note);
+      finalQuizQuestionList.addAll(quizQuestionList);
+    }
+
+    List<QuizQuestion> questions = finalQuizQuestionList.stream().filter(QuizQuestion::isApproved).toList();
+
     if (questions.size() < 5) {
       throw new ApiException(
           "Not enough approved questions",
