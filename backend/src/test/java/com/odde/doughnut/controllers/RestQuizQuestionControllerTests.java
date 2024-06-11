@@ -470,7 +470,7 @@ class RestQuizQuestionControllerTests {
     }
 
     @Test
-    void refine() throws UnexpectedNoAccessRightException {
+    void givenQuestion_thenReturnSameStem() throws UnexpectedNoAccessRightException {
       Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
       MCQWithAnswer result = controller.refineQuestion(note, mcqWithAnswer);

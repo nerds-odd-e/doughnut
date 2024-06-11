@@ -12,7 +12,6 @@ import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.QuizQuestionService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
-import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -128,13 +127,6 @@ class RestQuizQuestionController {
       @Valid @RequestBody MCQWithAnswer manualQuestion)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
-    MCQWithAnswer mcqWithAnswer = new MCQWithAnswer();
-    mcqWithAnswer.setCorrectChoiceIndex(0);
-    MultipleChoicesQuestion multipleChoicesQuestion = new MultipleChoicesQuestion();
-    multipleChoicesQuestion.setStem("New refine Question?");
-    multipleChoicesQuestion.setChoices(List.of("A", "B", "C", "D"));
-    mcqWithAnswer.setMultipleChoicesQuestion(multipleChoicesQuestion);
-    //    quizQuestionService.refineQuestion(note, manualQuestion).getMcqWithAnswer();
-    return mcqWithAnswer;
+    return quizQuestionService.refineQuestion(note, manualQuestion).getMcqWithAnswer();
   }
 }
