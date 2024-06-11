@@ -10,6 +10,8 @@ import jakarta.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.util.Objects;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Data
@@ -41,6 +43,12 @@ public class QuizQuestion extends EntityIdentifiedByIdOnly {
   @Column(name = "has_image")
   @JsonIgnore
   private Boolean hasImage;
+
+  @Column(name = "is_approved")
+  @Getter
+  @Setter
+  @JsonIgnore
+  private boolean approved;
 
   @JsonIgnore
   public MCQWithAnswer getMcqWithAnswer() {
@@ -75,4 +83,5 @@ public class QuizQuestion extends EntityIdentifiedByIdOnly {
     quizQuestionAIQuestion.setCorrectAnswerIndex(MCQWithAnswer.getCorrectChoiceIndex());
     return quizQuestionAIQuestion;
   }
+
 }
