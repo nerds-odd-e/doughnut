@@ -44,6 +44,8 @@
         </tr>
       </tbody>
     </table>
+
+    <input type="submit" value="Update" class="btn btn-primary" />
   </div>
 </template>
 
