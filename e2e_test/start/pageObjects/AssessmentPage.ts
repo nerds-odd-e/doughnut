@@ -12,8 +12,8 @@ export const assumeAssessmentPage = (notebook?: string) => {
         },
       }
     },
-    expectEndOfAssessment() {
-      cy.findByText("End of assessment")
+    expectEndOfAssessment(expectedScore: string) {
+      cy.findByText(expectedScore)
     },
   }
 }

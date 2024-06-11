@@ -4,7 +4,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -454,6 +455,28 @@ class RestQuizQuestionControllerTests {
       controller.addQuestionManually(note, mcqWithAnswer);
       makeMe.refresh(note);
       assertThat(note.getQuizQuestions(), hasSize(1));
+    }
+  }
+
+  @Nested
+  class refineQuestion {
+    @Test
+    void authorization() {
+      Note note = makeMe.aNote().please();
+      MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.addQuestionManually(note, mcqWithAnswer));
+    }
+
+    @Test
+    void refine() throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
+      MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
+      MCQWithAnswer result = controller.refineQuestion(note, mcqWithAnswer);
+      assertEquals(0, result.getCorrectChoiceIndex());
+      assertEquals("New refine Question?", result.getMultipleChoicesQuestion().getStem());
+      assertEquals(List.of("A", "B", "C", "D"), result.getMultipleChoicesQuestion().getChoices());
     }
   }
 }

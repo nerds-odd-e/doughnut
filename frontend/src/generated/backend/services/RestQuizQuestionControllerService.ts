@@ -99,6 +99,29 @@ export class RestQuizQuestionControllerService {
     }
     /**
      * @param note
+     * @param requestBody
+     * @returns MCQWithAnswer OK
+     * @throws ApiError
+     */
+    public refineQuestion(
+        note: number,
+        requestBody: MCQWithAnswer,
+    ): CancelablePromise<MCQWithAnswer> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/quiz-questions/{note}/refine-note-questions',
+            path: {
+                'note': note,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param note
      * @returns MCQWithAnswer OK
      * @throws ApiError
      */
