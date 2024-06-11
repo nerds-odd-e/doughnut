@@ -459,7 +459,6 @@ class RestQuizQuestionControllerTests {
     }
   }
 
-
   @Nested
   class refineQuestion {
     @Test
@@ -467,8 +466,8 @@ class RestQuizQuestionControllerTests {
       Note note = makeMe.aNote().please();
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
       assertThrows(
-        UnexpectedNoAccessRightException.class,
-        () -> controller.addQuestionManually(note, mcqWithAnswer));
+          UnexpectedNoAccessRightException.class,
+          () -> controller.addQuestionManually(note, mcqWithAnswer));
     }
 
     @Test
