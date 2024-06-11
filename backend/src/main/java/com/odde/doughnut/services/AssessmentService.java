@@ -33,4 +33,11 @@ public class AssessmentService {
 
     return questions;
   }
+
+  public long countQuizQuestions(Notebook notebook) {
+    return notebook.getNotes().stream()
+        .map(quizQuestionService::selectQuizQuestionForANote)
+        .filter(Objects::nonNull)
+        .count();
+  }
 }
