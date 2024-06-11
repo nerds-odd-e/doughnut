@@ -10,7 +10,7 @@
       @answered="questionAnswered"
     />
     <div v-else>
-      <p>End of assessment</p>
+      <p>Yours score: {{ correctAnswers }} / {{ quizQuestions.length }}</p>
     </div>
   </div>
 </template>
@@ -41,14 +41,18 @@ export default defineComponent({
       quizQuestions: [] as QuizQuestion[],
       currentQuestion: 0,
       errors: "",
+      correctAnswers: 0,
     };
   },
   created() {
     this.generateAssessmentQuestions();
   },
   methods: {
-    questionAnswered() {
+    questionAnswered(answerResult) {
       this.currentQuestion += 1;
+      if (answerResult.correct) {
+        this.correctAnswers += 1;
+      }
     },
     generateAssessmentQuestions() {
       this.managedApi.restAssessmentController

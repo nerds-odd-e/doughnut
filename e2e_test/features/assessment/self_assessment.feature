@@ -28,7 +28,7 @@ Feature: New questions assessment
     And I answer the question "What is the capital city of Japan?" with "Kyoto"
     And I answer the question "What is the capital city of Korea?" with "Busan"
     And I answer the question "What is the capital city of China?" with "Shanghai"
-    And I should see end of assessment in the end
+    And I should see the score "Yours score: 2 / 5" at the end of assessment
 
   Scenario: Fail to start assessment with 4 approved questions
     Given there are questions for the note:
