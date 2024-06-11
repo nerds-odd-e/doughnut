@@ -2273,6 +2273,31 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BazaarNotebook"
+  /api/assessment/questions_count/{notebook}:
+    get:
+      tags:
+      - rest-assessment-controller
+      operationId: countQuizQuestions
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: integer
+                format: int64
   /api/assessment/questions/{notebook}:
     get:
       tags:
