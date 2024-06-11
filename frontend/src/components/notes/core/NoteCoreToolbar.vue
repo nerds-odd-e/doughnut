@@ -74,6 +74,12 @@
           >
             <Questions v-bind="{ note }" />
           </PopButton>
+          <PopButton
+            btn-class="dropdown-item btn-primary"
+            title="Assessment Settings"
+          >
+            <AssessmentSettings v-bind="{ note }" />
+          </PopButton>
           <NoteDeleteButton
             class="dropdown-item"
             v-bind="{ noteId: note.id, storageAccessor }"
@@ -108,6 +114,7 @@ import NoteDetailsAutoCompletionButton from "./NoteDetailsAutoCompletionButton.v
 import NoteChatDialog from "../NoteChatDialog.vue";
 import Questions from "../Questions.vue";
 import NoteInfoBar from "../NoteInfoBar.vue";
+import AssessmentSettings from "../AssessmentSettings.vue";
 
 const props = defineProps({
   storageAccessor: {
