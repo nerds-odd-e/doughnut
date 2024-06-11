@@ -83,5 +83,4 @@ public class QuizQuestion extends EntityIdentifiedByIdOnly {
     quizQuestionAIQuestion.setCorrectAnswerIndex(MCQWithAnswer.getCorrectChoiceIndex());
     return quizQuestionAIQuestion;
   }
-
 }

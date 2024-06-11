@@ -11,7 +11,7 @@ Then("I answer the question {string} with {string}", function (stem: string, ans
 })
 
 Then("I should see the score {string} at the end of assessment", (expectedScore: string) => {
-  start.assumeAssessmentPage().expectEndOf  Assessment(expectedScore)
+  start.assumeAssessmentPage().expectEndOfAssessment(expectedScore)
 })
 
 Then("I should see error message Not enough approved questions", () => {
