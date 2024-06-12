@@ -483,7 +483,7 @@ class RestQuizQuestionControllerTests {
     }
 
     @Test
-    void refineQuizQuestionFailedWithGpt35WillNotTryAgain() throws JsonProcessingException {
+    void refineQuestionFailedWithGpt35WillNotTryAgain() throws JsonProcessingException {
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
       Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCallJsonNode(
@@ -493,6 +493,21 @@ class RestQuizQuestionControllerTests {
           "");
       assertThrows(RuntimeException.class, () -> controller.refineQuestion(note, mcqWithAnswer));
       verify(openAiApi, Mockito.times(1)).createChatCompletion(any());
+    }
+
+    @Test
+    void givenQuestion_whenMCQWithAnswerIsNull_thenReturnAnException()
+        throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
+      MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
+      openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(mcqWithAnswer, "");
+      MCQWithAnswer result = controller.refineQuestion(note, mcqWithAnswer);
+
+      assertEquals(0, result.getCorrectChoiceIndex());
+      assertEquals("a default question stem", result.getMultipleChoicesQuestion().getStem());
+      assertEquals(
+          List.of("choice1", "choice2", "choice3"),
+          result.getMultipleChoicesQuestion().getChoices());
     }
   }
 }

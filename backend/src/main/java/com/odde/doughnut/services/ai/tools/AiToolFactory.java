@@ -73,10 +73,10 @@ please critically check if the following question makes sense and is possible to
     return new AiToolList(
         messageBody,
         List.of(
-            FunctionDefinition.<QuestionEvaluation>builder()
+            FunctionDefinition.<MCQWithAnswer>builder()
                 .name("evaluate_question")
                 .description("answer and evaluate the feasibility of the question")
-                .parametersDefinitionByClass(QuestionEvaluation.class)
+                .parametersDefinitionByClass(MCQWithAnswer.class)
                 .build()));
   }
 }
