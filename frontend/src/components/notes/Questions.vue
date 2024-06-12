@@ -2,10 +2,13 @@
   <div>
     <PopButton btn-class="btn btn-primary" title="Add Question">
       <template #default="{ closer }">
-        <NoteAddQuestion v-bind="{ note }" @close-dialog="
-        closer($event);
-      questionAdded($event);
-      " />
+        <NoteAddQuestion
+          v-bind="{ note }"
+          @close-dialog="
+            closer($event);
+            questionAdded($event);
+          "
+        />
       </template>
     </PopButton>
     <table class="question-table mt-2">
@@ -20,16 +23,27 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="question in questions" :key="question.multipleChoicesQuestion.stem">
+        <tr
+          v-for="question in questions"
+          :key="question.multipleChoicesQuestion.stem"
+        >
           <td>
-            <input :id="'checkbox-' + question.multipleChoicesQuestion.stem" type="checkbox"
-              :checked="question.approved" />
+            <input
+              :id="'checkbox-' + question.multipleChoicesQuestion.stem"
+              type="checkbox"
+              :checked="question.approved"
+            />
           </td>
           <td>{{ question.multipleChoicesQuestion.stem }}</td>
           <template v-if="question.multipleChoicesQuestion.choices">
-            <td v-for="(choice, index) in question.multipleChoicesQuestion.choices" :class="{
-        'correct-choice': index === question.correctChoiceIndex,
-      }" :key="index">
+            <td
+              v-for="(choice, index) in question.multipleChoicesQuestion
+                .choices"
+              :class="{
+                'correct-choice': index === question.correctChoiceIndex,
+              }"
+              :key="index"
+            >
               {{ choice }}
             </td>
           </template>
