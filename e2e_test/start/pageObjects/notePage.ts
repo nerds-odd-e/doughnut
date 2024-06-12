@@ -239,5 +239,14 @@ export const assumeNotePage = (noteTopic?: string) => {
       cy.findByRole("button", { name: "Questions for the note" }).click()
       cy.findByRole("button", { name: "Add Question" }).click()
     },
+    injectSomeDataQuestion(row: Record<string, string>) {
+      cy.findByLabelText("Stem").type(row["Stem"]!)
+      cy.findByLabelText("Choice 0").type(row["Choice 0"]!)
+      cy.findByLabelText("Choice 1").type(row["Choice 1"]!)
+      cy.findByLabelText("Correct Choice Index").clear().type(row["Correct Choice Index"]!)
+    },
+    verifyRefineQuestion(row: Record<string, string>) {
+      cy.findByLabelText("Stem").invoke("val").should("not.eq",row["Stem"]!)
+    },
   }
 }

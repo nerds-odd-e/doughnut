@@ -12,19 +12,18 @@ Feature: Ask AI to refine the question
 
   @ignore
   Scenario: Can refine the question with all data filled
-    Given I input data into all items of question:
+    Given I input data into items of question:
     | Stem | Choice 0 | Choice 1 | Correct Choice Index |
     | Vietnam food | Pho | Pizza | 0 |
     When I refine the question
-    Then The result should be shown in the popup
-    And The Correct Choice Index's result should be same as the request
-    When I accept the result
-    Then The popup should be closed
-    And The result should be filled into the form
+    Then The refined question should be filled into the form and different from the original question:
+    | Stem | Choice 0 | Choice 1 | Correct Choice Index |
+    | Vietnam food | Pho | Pizza | 0 |
+    And The Correct Choice Index of refined question should be same as the original question
 
   @ignore
   Scenario: Can refine the question with filling data for "Stem", "number of choices" and "Correct Choice Index" only
-    Given I input data into "Stem" and "Correct Choice Index" of question:
+    Given I input data into items of question:
       | Stem | Choice 0 | Choice 1 | Correct Choice Index |
       | Vietnam food |  |  | 1 |
     When I refine the question
@@ -36,7 +35,7 @@ Feature: Ask AI to refine the question
 
   @ignore
   Scenario: Can refine the question with filling data for "Choices", "number of choices" and "Correct Choice Index" only
-    Given I input data into "Choice 0", "Choice 1" and "Correct Choice Index" of question:
+    Given I input data into items of question:
       | Stem | Choice 0 | Choice 1 | Correct Choice Index |
       |  | Pho | Pizza | 0 |
     When I refine the question
@@ -48,7 +47,7 @@ Feature: Ask AI to refine the question
 
   @ignore
   Scenario: Can refine the question with filling data for "Stem" and "number of choices" only
-    Given I input data into "Stem" of the question:
+    Given I input data into items of question:
       | Stem | Choice 0 | Choice 1 | Correct Choice Index |
       | Vietnam food |  |  |  |
     When I refine the question

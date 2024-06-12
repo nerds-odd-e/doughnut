@@ -29,3 +29,18 @@ Given("I want to create a question for the note {string}", (noteName: string) =>
 Then("The {string} button should be disabled", (buttonName: string) => {
   cy.findByRole("button", { name: buttonName }).should("be.disabled")
 })
+
+Given("I input data into items of question:", (data: DataTable) => {
+  start.assumeNotePage().injectSomeDataQuestion(data.hashes()[0]!)
+})
+
+When("I refine the question", () => {
+  cy.findByRole("button", { name: "Refine" }).click()
+})
+
+Then(
+  "The refined question should be filled into the form and different from the original question:",
+  (data: DataTable) => {
+    start.assumeNotePage().verifyRefineQuestion(data.hashes()[0]!)
+  },
+)
