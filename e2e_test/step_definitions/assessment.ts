@@ -18,6 +18,10 @@ Then("I should see error message Not enough approved questions", () => {
   cy.findByText("Not enough approved questions").should("be.visible")
 })
 
+Then("I should see error message The assessment is not available", () => {
+  cy.findByText("The assessment is not available").should("be.visible")
+})
+
 Given("I want to create a question for the note {string}", (noteName: string) => {
   start.jumpToNotePage(noteName).goToAddQuestion()
 })

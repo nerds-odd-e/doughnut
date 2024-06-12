@@ -32,6 +32,11 @@ export const routerToNotebooksPage = () => {
       cy.formField("Skip Review Entirely").check()
       cy.findByRole("button", { name: "Update" }).click()
     },
+    updateAssessmentSettings(notebook: string, numberOfQuestion: string) {
+      this.findNotebookCardButton(notebook, "Edit notebook settings").click()
+      cy.formField("Number Of Questions").assignFieldValue(numberOfQuestion)
+      cy.findByRole("button", { name: "Update" }).click()
+    },
     unsubscribe(notebook: string) {
       this.findNotebookCardButton(notebook, "Unsubscribe").click()
       cy.findByRole("button", { name: "OK" }).click()

@@ -4,5 +4,6 @@
 /* eslint-disable */
 export type NotebookDTO = {
     skipReviewEntirely?: boolean;
+    numberOfQuestions?: number;
 };
 

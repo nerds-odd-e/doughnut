@@ -27,7 +27,7 @@
           v-for="question in questions"
           :key="question.multipleChoicesQuestion.stem"
         >
-          <td><input type="checkbox" :checked="question.approved" /></td>
+          <td><input type="checkbox" /></td>
           <td>{{ question.multipleChoicesQuestion.stem }}</td>
           <template v-if="question.multipleChoicesQuestion.choices">
             <td

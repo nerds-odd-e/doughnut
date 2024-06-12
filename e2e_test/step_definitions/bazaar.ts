@@ -75,3 +75,7 @@ Then("I should see it has link to {string}", (noteTopic: string) => {
 Then("I unsubscribe from notebook {string}", (noteTopic: string) => {
   start.routerToNotebooksPage().unsubscribe(noteTopic)
 })
+
+Given("I set the number of question for the {string} note is {string}", (notebook: string, numberOfQuestion: string) => {
+  start.routerToNotebooksPage().updateAssessmentSettings(notebook, numberOfQuestion)
+})

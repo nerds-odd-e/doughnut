@@ -7,6 +7,12 @@
       v-model="formData.skipReviewEntirely"
       :errors="errors.skipReviewEntirely"
     />
+    <TextInput
+      scope-name="notebook"
+      field="numberOfQuestions"
+      v-model="formData.numberOfQuestions"
+      :errors="errors.numberOfQuestions"
+    />
     <input type="submit" value="Update" class="btn btn-primary" />
   </form>
 </template>
@@ -14,17 +20,18 @@
 <script>
 import useLoadingApi from "@/managedApi/useLoadingApi";
 import CheckInput from "@/components/form/CheckInput.vue";
+import TextInput from "../form/TextInput.vue";
 
 export default {
   setup() {
     return useLoadingApi();
   },
   props: { notebook: Object },
-  components: { CheckInput },
+  components: { CheckInput, TextInput },
   data() {
-    const { skipReviewEntirely } = this.notebook;
+    const { skipReviewEntirely, numberOfQuestions } = this.notebook;
     return {
-      formData: { skipReviewEntirely },
+      formData: { skipReviewEntirely, numberOfQuestions },
       errors: {},
     };
   },

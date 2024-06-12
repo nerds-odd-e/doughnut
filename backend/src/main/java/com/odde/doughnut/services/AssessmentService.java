@@ -18,26 +18,28 @@ public class AssessmentService {
   }
 
   public List<QuizQuestion> generateAssessment(Notebook notebook) {
+
     List<QuizQuestion> questions =
-        notebook.getNotes().stream()
-            .map(quizQuestionService::selectQuizQuestionForANote)
-            .filter(Objects::nonNull)
-            .limit(5)
-            .toList();
-    if (questions.size() < 5) {
-      throw new ApiException(
-          "Not enough approved questions",
-          ASSESSMENT_SERVICE_ERROR,
-          "Not enough approved questions");
-    }
-
-    return questions;
-  }
-
-  public long countQuizQuestions(Notebook notebook) {
-    return notebook.getNotes().stream()
+      notebook.getNotes().stream()
         .map(quizQuestionService::selectQuizQuestionForANote)
         .filter(Objects::nonNull)
-        .count();
+        .toList();
+
+    Integer numberOfQuestion = notebook.getNumberOfQuestions();
+    if (numberOfQuestion == null || numberOfQuestion == 0) {
+      throw new ApiException(
+        "The assessment is not available",
+        ASSESSMENT_SERVICE_ERROR,
+        "The assessment is not available");
+    }
+
+    if (questions.size() < numberOfQuestion) {
+      throw new ApiException(
+        "Not enough approved questions",
+        ASSESSMENT_SERVICE_ERROR,
+        "Not enough approved questions");
+    }
+
+    return questions.stream().limit(numberOfQuestion).toList();
   }
 }

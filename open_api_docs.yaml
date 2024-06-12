@@ -2634,6 +2634,9 @@ components:
           $ref: "#/components/schemas/Note"
         skipReviewEntirely:
           type: boolean
+        numberOfQuestions:
+          type: integer
+          format: int32
     Subscription:
       required:
       - id
@@ -2886,6 +2889,9 @@ components:
       properties:
         skipReviewEntirely:
           type: boolean
+        numberOfQuestions:
+          type: integer
+          format: int32
     LinkCreation:
       required:
       - linkType

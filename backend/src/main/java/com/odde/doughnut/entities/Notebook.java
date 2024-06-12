@@ -48,6 +48,11 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @Setter
   Boolean skipReviewEntirely = false;
 
+  @Column(name = "number_of_questions")
+  @Getter
+  @Setter
+  Integer numberOfQuestions;
+
   @Column(name = "deleted_at")
   @Setter
   @JsonIgnore
@@ -60,6 +65,7 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public void setFromDTO(NotebookDTO notebookDTO) {
     setSkipReviewEntirely(notebookDTO.getSkipReviewEntirely());
+    setNumberOfQuestions(notebookDTO.getNumberOfQuestions());
   }
 
   @NonNull
