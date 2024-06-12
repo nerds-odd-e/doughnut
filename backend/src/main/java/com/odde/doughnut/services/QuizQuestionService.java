@@ -8,10 +8,9 @@ import com.odde.doughnut.factoryServices.quizFacotries.factories.AiQuestionFacto
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.theokanning.openai.client.OpenAiApi;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.util.List;
 
 public class QuizQuestionService {
   private final ModelFactoryService modelFactoryService;

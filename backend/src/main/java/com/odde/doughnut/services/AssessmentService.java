@@ -2,17 +2,13 @@ package com.odde.doughnut.services;
 
 import static com.odde.doughnut.controllers.dto.ApiError.ErrorType.ASSESSMENT_SERVICE_ERROR;
 
-import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.theokanning.openai.client.OpenAiApi;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Stream;
 
 public class AssessmentService {
   private final QuizQuestionService quizQuestionService;
