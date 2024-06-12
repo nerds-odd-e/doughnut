@@ -18,5 +18,3 @@ RUN . /home/gitpod/.nix-profile/etc/profile.d/nix.sh
 RUN DEBIAN_FRONTEND=noninteractive sudo apt-get install -y direnv
 RUN echo 'eval "$(direnv hook bash)"' >> ~/.bashrc
 RUN echo 'eval "$(direnv hook zsh)"' >> ~/.zshrc
-RUN cd /workspace/doughnut && direnv allow
-
