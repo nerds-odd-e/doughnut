@@ -10,16 +10,15 @@ Feature: Ask AI to refine the question
   Scenario: Cannot refine the question without any information
     Then The "Refine" button should be disabled
 
-  @ignore
   Scenario: Can refine the question with all data filled
     Given I input data into items of question:
     | Stem | Choice 0 | Choice 1 | Correct Choice Index |
-    | Vietnam food | Pho | Pizza | 0 |
+    | Vietnam food | Com Tam | Hambuger | 0 |
     When I refine the question
     Then The refined question should be filled into the form and different from the original question:
     | Stem | Choice 0 | Choice 1 | Correct Choice Index |
-    | Vietnam food | Pho | Pizza | 0 |
-    And The Correct Choice Index of refined question should be same as the original question
+    | Vietnam food | Com Tam | Hambuger | 0 |
+    And The Correct Choice Index of refined question should be "0"
 
   @ignore
   Scenario: Can refine the question with filling data for "Stem", "number of choices" and "Correct Choice Index" only

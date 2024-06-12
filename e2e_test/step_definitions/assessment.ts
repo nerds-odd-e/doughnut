@@ -44,3 +44,6 @@ Then(
     start.assumeNotePage().verifyRefineQuestion(data.hashes()[0]!)
   },
 )
+Then("The Correct Choice Index of refined question should be {string}", (correctIndex: string) => {
+  start.assumeNotePage().verifyCorrectIndex(correctIndex)
+})

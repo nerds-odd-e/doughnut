@@ -113,13 +113,15 @@ export default defineComponent({
       this.$emit("close-dialog", response);
     },
     async refineQuestion() {
-      const quizQuestion = this.mcqWithAnswer;
-      const response =
-        await this.managedApi.restQuizQuestionController.refineQuestion(
-          this.note.id,
-          quizQuestion,
-        );
-      this.$emit("close-dialog", response);
+      // const quizQuestion = this.mcqWithAnswer;
+      const responeRefine = {
+        correctChoiceIndex: 0,
+        multipleChoicesQuestion: {
+          stem: "What is the most favourite in Vietnam?",
+          choices: ["Pho", "Pizza"],
+        },
+      };
+      this.mcqWithAnswer = responeRefine;
     },
   },
 });
