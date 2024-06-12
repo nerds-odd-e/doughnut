@@ -80,6 +80,7 @@ public class RestAssessmentControllerTests {
     void shouldReturn5QuestionsWhenThereAreMoreThan5NotesWithQuestions()
         throws UnexpectedNoAccessRightException {
       makeMe.theNote(topNote).withNChildrenThat(5, NoteBuilder::hasAQuestion).please();
+      notebook.setNumberOfQuestions(5);
       List<QuizQuestion> assessment = controller.generateAssessmentQuestions(notebook);
       assertEquals(5, assessment.size());
     }
