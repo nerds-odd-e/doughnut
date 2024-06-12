@@ -8,6 +8,7 @@ import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.theokanning.openai.client.OpenAiApi;
 import java.util.List;
+import java.util.Objects;
 
 public class AssessmentService {
   private final QuizQuestionService quizQuestionService;
@@ -21,7 +22,7 @@ public class AssessmentService {
     List<QuizQuestion> questions =
         notebook.getNotes().stream()
             .map(quizQuestionService::selectQuizQuestionForANote)
-            .filter(QuizQuestion::isApproved)
+            .filter(Objects::nonNull)
             .toList();
 
     Integer numberOfQuestion = notebook.getNumberOfQuestions();
