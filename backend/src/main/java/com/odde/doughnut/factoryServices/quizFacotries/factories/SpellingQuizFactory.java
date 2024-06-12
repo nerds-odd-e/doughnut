@@ -22,7 +22,7 @@ public class SpellingQuizFactory extends QuizQuestionFactory {
     if (!needSpellingQuiz()) {
       throw new QuizQuestionNotPossibleException();
     }
-    return buildSpellingQuestion();
+    return buildSpellingApprovedQuestion();
   }
 
   private boolean needSpellingQuiz() {
@@ -37,9 +37,10 @@ public class SpellingQuizFactory extends QuizQuestionFactory {
     return answerNote.getClozeDescription().clozeDetails();
   }
 
-  public QuizQuestion buildSpellingQuestion() {
+  public QuizQuestion buildSpellingApprovedQuestion() {
     QuizQuestion quizQuestionSpelling = new QuizQuestion();
     quizQuestionSpelling.setNote(answerNote);
+    quizQuestionSpelling.setApproved(true);
     quizQuestionSpelling.setCheckSpell(true);
     MultipleChoicesQuestion mcq = new MultipleChoicesQuestion();
     mcq.setStem(getStem());

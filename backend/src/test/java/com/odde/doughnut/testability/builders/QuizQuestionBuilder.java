@@ -44,7 +44,7 @@ public class QuizQuestionBuilder extends EntityBuilder<QuizQuestion> {
   }
 
   public QuizQuestionBuilder spellingQuestionOfReviewPoint(Note note) {
-    this.entity = new SpellingQuizFactory(note).buildSpellingQuestion();
+    this.entity = new SpellingQuizFactory(note).buildSpellingApprovedQuestion();
     return this;
   }
 

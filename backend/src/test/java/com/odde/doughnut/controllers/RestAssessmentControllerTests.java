@@ -68,7 +68,10 @@ public class RestAssessmentControllerTests {
     @Test
     void shouldBeAbleToAccessNotebookThatIsInTheBazaar() throws UnexpectedNoAccessRightException {
       Note noteOwnedByOtherUser = makeMe.aNote().please();
-      makeMe.theNote(noteOwnedByOtherUser).withNChildrenThat(6, NoteBuilder::hasAQuestion).please();
+      makeMe
+          .theNote(noteOwnedByOtherUser)
+          .withNChildrenThat(6, NoteBuilder::hasAnApprovedQuestion)
+          .please();
       noteOwnedByOtherUser.getNotebook().setNumberOfQuestions(5);
       BazaarNotebook bazaarNotebook =
           makeMe.aBazaarNotebook(noteOwnedByOtherUser.getNotebook()).please();
@@ -80,7 +83,7 @@ public class RestAssessmentControllerTests {
     @Test
     void shouldReturn5QuestionsWhenThereAreMoreThan5NotesWithQuestions()
         throws UnexpectedNoAccessRightException {
-      makeMe.theNote(topNote).withNChildrenThat(5, NoteBuilder::hasAQuestion).please();
+      makeMe.theNote(topNote).withNChildrenThat(5, NoteBuilder::hasAnApprovedQuestion).please();
       notebook.setNumberOfQuestions(5);
       List<QuizQuestion> assessment = controller.generateAssessmentQuestions(notebook);
       assertEquals(5, assessment.size());
@@ -88,7 +91,7 @@ public class RestAssessmentControllerTests {
 
     @Test
     void shouldThrowExceptionWhenThereAreNotEnoughQuestions() {
-      makeMe.theNote(topNote).withNChildrenThat(4, NoteBuilder::hasAQuestion).please();
+      makeMe.theNote(topNote).withNChildrenThat(4, NoteBuilder::hasAnApprovedQuestion).please();
       assertThrows(ApiException.class, () -> controller.generateAssessmentQuestions(notebook));
     }
 
@@ -99,9 +102,9 @@ public class RestAssessmentControllerTests {
           .withNChildrenThat(
               3,
               noteBuilder -> {
-                noteBuilder.hasAQuestion();
-                noteBuilder.hasAQuestion();
-                noteBuilder.hasAQuestion();
+                noteBuilder.hasAnApprovedQuestion();
+                noteBuilder.hasAnApprovedQuestion();
+                noteBuilder.hasAnApprovedQuestion();
               })
           .please();
 
