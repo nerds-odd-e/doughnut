@@ -62,3 +62,5 @@ vscode:
     - antfu.vite
     - vitest.explorer
     - vmware.vscode-boot-dev-pack
+    - mkhl.direnv
+    - pinage404.nix-extension-pack

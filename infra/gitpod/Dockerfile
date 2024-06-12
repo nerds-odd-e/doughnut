@@ -85,10 +85,6 @@ RUN mkdir -p /home/gitpod/.config/nix \
 RUN echo "test -f ./sh_profile && source ./sh_profile" >> /home/gitpod/.bashrc \
     && echo "test -f ./sh_profile && source ./sh_profile" >> /home/gitpod/.zshrc
 
-# atuin
-RUN echo 'eval "$(atuin init bash)"' >> ~/.bashrc \
-    && echo 'eval "$(atuin init zsh)"' >> ~/.zshrc
-
 EXPOSE 5173
 EXPOSE 3309
 EXPOSE 5900
