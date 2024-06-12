@@ -9,13 +9,12 @@ Feature: Approve Quiz Question
       | noteTopic    | question             | answer | oneWrongChoice | approved |
       | The cow joke | What does a cow say? | moo    | woo            | false    |
 
-  @ignore
   Scenario: Approve quiz question
     When I approve question "What does a cow say?" of topic "The cow joke":
-      | question             | approved |
+      | question             | Approved |
       | What does a cow say? | true     |
-    Then I should see the questions in the question list of the note "The cow joke":
-      | Question             | approved |
+    Then I should see the approved questions in the question list of the note "The cow joke":
+      | Question             | Approved |
       | What does a cow say? | true     |
 
   @ignore

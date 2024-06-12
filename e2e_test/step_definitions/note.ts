@@ -398,6 +398,13 @@ When(
   },
 )
 
+When(
+  "I should see the approved questions in the question list of the note {string}:",
+  (noteTopic: string, data: DataTable) => {
+    start.jumpToNotePage(noteTopic).expectApprovedQuestionsInList(data.hashes())
+  },
+)
+
 Given(
   "I approve question {string} of topic {string}:",
   (quizQuestion: string, noteTopic: string, data: DataTable) => {
