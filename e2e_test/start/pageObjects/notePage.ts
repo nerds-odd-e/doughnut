@@ -229,5 +229,10 @@ export const assumeNotePage = (noteTopic?: string) => {
         },
       }
     },
+    goToAddQuestion() {
+      cy.findByRole("button", { name: "more options" }).click()
+      cy.findByRole("button", { name: "Questions for the note" }).click()
+      cy.findByRole("button", { name: "Add Question" }).click()
+    },
   }
 }

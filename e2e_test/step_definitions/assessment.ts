@@ -18,9 +18,8 @@ Then("I should see error message Not enough approved questions", () => {
   cy.findByText("Not enough approved questions").should("be.visible")
 })
 
-Given("I want to create a question for the note {string}", (country: string) => {
-  start.jumpToNotePage(country)
-  start.assumeAssessmentPage().goToAddQuestion()
+Given("I want to create a question for the note {string}", (noteName: string) => {
+  start.jumpToNotePage(noteName).goToAddQuestion()
 })
 
 Then("The {string} button should be disabled", (buttonName: string) => {
