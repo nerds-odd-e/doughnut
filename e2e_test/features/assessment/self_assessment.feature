@@ -22,6 +22,7 @@ Feature: New questions assessment
       | Japan     | What is the capital city of Japan? | Tokyo   | Kyoto          |
       | Korea     | What is the capital city of Korea? | Seoul   | Busan          |
       | China     | What is the capital city of China? | Beijing | Shanghai       |
+    And I set the number of question for the "Countries" note is "5"
     When I start the assessment on the "Countries" notebook in the bazaar
     Then I answer the question "Where in the world is Singapore?" with "Asia"
     And I answer the question "Most famous food of Vietnam?" with "Pho"
@@ -37,8 +38,9 @@ Feature: New questions assessment
       | Japan     | What is the capital city of Japan? | Tokyo   | Kyoto          |
       | Korea     | What is the capital city of Korea? | Seoul   | Busan          |
       | China     | What is the capital city of China? | Beijing | Shanghai       |
+    And I set the number of question for the "Countries" note is "5"
     When I start the assessment on the "Countries" notebook in the bazaar
-    Then I should see error message Not enough approved questions
+    Then I should see error message Not enough questions
 
   Scenario: Must login to generate assessment
     Given I haven't login
