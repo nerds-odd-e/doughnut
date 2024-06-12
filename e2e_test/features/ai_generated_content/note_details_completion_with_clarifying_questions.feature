@@ -6,11 +6,10 @@ Feature: AI Asks Clarifying Questions When Auto-Generating Note Details
     And there are some notes for the current user:
       | topicConstructor | details     |
       | Sports           | Football is |
-    And OpenAI service can create thread and run with id "thread-111" when requested
 
   @usingMockedOpenAiService
   Scenario Outline: Responding to AI's Clarification Question
-    Given the OpenAI assistant in thread "thread-111" is set to:
+    Given the OpenAI assistant will create a thread and request for the following actions:
       | response                   | arguments                                           |
       | ask clarification question | Do you mean American Football or European Football? |
       | complete note details      | " originated from England."                         |
@@ -25,7 +24,7 @@ Feature: AI Asks Clarifying Questions When Auto-Generating Note Details
 
   @usingMockedOpenAiService
   Scenario: Managing Extended Clarification Dialogue
-    Given the OpenAI assistant in thread "thread-111" is set to:
+    Given the OpenAI assistant will create a thread and request for the following actions:
       | response                   | arguments                                           |
       | ask clarification question | Do you mean American Football or European Football? |
       | ask clarification question | Do you mean the American version?                   |

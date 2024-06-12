@@ -15,8 +15,7 @@ Feature: Note details completion
     Then I should see a notification of OpenAI service unavailability in the controller bar
 
   Scenario: Completing Note Details Using OpenAI
-    Given OpenAI service can create thread and run with id "thread-111" when requested
-    Given the OpenAI assistant in thread "thread-111" is set to:
+    Given the OpenAI assistant will create a thread and request for the following actions:
       | response              | arguments         |
       | complete note details | " vigorous city." |
     When I request to complete the details for the note "Taipei"

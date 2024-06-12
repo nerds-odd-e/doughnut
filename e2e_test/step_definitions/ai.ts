@@ -79,13 +79,11 @@ Then("I contest the question", () => {
   cy.findByRole("button", { name: "Doesn't make sense?" }).click()
 })
 
-Given("the OpenAI assistant in thread {string} is set to:", (threadId: string, data: DataTable) => {
-  mock_services.openAi().thread(threadId).stubRetrieveRuns(data.hashes())
-})
-
 Given(
-  "OpenAI service can create thread and run with id {string} when requested",
-  (threadId: string) => {
+  "the OpenAI assistant will create a thread and request for the following actions:",
+  (data: DataTable) => {
+    const threadId = "thread-abc123"
     mock_services.openAi().thread(threadId).stubCreateThreadRunAndSubmitOutput()
+    mock_services.openAi().thread(threadId).stubRetrieveRuns(data.hashes())
   },
 )
