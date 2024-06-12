@@ -30,7 +30,8 @@ public class AiQuestionFactory extends QuizQuestionFactory {
   @Override
   public QuizQuestion refineQuestion(MCQWithAnswer mcqWithAnswer)
       throws QuizQuestionNotPossibleException {
-    MCQWithAnswer MCQWithAnswer = aiQuestionGenerator.getAiGeneratedRefineQuestion(note, mcqWithAnswer);
+    MCQWithAnswer MCQWithAnswer =
+        aiQuestionGenerator.getAiGeneratedRefineQuestion(note, mcqWithAnswer);
     if (MCQWithAnswer == null) {
       throw new QuizQuestionNotPossibleException();
     }

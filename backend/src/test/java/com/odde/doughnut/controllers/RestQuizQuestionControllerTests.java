@@ -4,8 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -481,6 +480,19 @@ class RestQuizQuestionControllerTests {
       assertEquals(
           List.of("choice1", "choice2", "choice3"),
           result.getMultipleChoicesQuestion().getChoices());
+    }
+
+    @Test
+    void refineQuizQuestionFailedWithGpt35WillNotTryAgain() throws JsonProcessingException {
+      MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
+      Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
+      openAIChatCompletionMock.mockChatCompletionAndReturnToolCallJsonNode(
+          new ObjectMapper()
+              .readTree(
+                  "{\"multipleChoicesQuestion\":{\"stem\":null,\"choices\":null},\"correctChoiceIndex\":0,\"approve\":false}"),
+          "");
+      assertThrows(RuntimeException.class, () -> controller.refineQuestion(note, mcqWithAnswer));
+      verify(openAiApi, Mockito.times(1)).createChatCompletion(any());
     }
   }
 }
