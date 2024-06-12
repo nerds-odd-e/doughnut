@@ -16,12 +16,12 @@ Feature: New questions assessment
 
   Scenario: Start an assessment with 5 approved questions
     Given there are questions for the note:
-      | noteTopic | question                           | answer  | oneWrongChoice |
-      | Singapore | Where in the world is Singapore?   | Asia    | euro           |
-      | Vietnam   | Most famous food of Vietnam?       | Pho     | bread          |
-      | Japan     | What is the capital city of Japan? | Tokyo   | Kyoto          |
-      | Korea     | What is the capital city of Korea? | Seoul   | Busan          |
-      | China     | What is the capital city of China? | Beijing | Shanghai       |
+      | noteTopic | question                           | answer  | oneWrongChoice | approved |
+      | Singapore | Where in the world is Singapore?   | Asia    | euro           | true     |
+      | Vietnam   | Most famous food of Vietnam?       | Pho     | bread          | true     |
+      | Japan     | What is the capital city of Japan? | Tokyo   | Kyoto          | true     |
+      | Korea     | What is the capital city of Korea? | Seoul   | Busan          | true     |
+      | China     | What is the capital city of China? | Beijing | Shanghai       | true     |
     And I set the number of question for the "Countries" note is "5"
     When I start the assessment on the "Countries" notebook in the bazaar
     Then I answer the question "Where in the world is Singapore?" with "Asia"

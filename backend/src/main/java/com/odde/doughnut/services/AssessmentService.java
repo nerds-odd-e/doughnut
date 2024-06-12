@@ -23,6 +23,7 @@ public class AssessmentService {
         notebook.getNotes().stream()
             .map(quizQuestionService::selectQuizQuestionForANote)
             .filter(Objects::nonNull)
+            .filter(QuizQuestion::isApproved)
             .toList();
 
     Integer numberOfQuestion = notebook.getNumberOfQuestions();

@@ -246,7 +246,7 @@ export const assumeNotePage = (noteTopic?: string) => {
       cy.findByLabelText("Correct Choice Index").clear().type(row["Correct Choice Index"]!)
     },
     verifyRefineQuestion(row: Record<string, string>) {
-      cy.findByLabelText("Stem").invoke("val").should("not.eq",row["Stem"]!)
+      cy.findByLabelText("Stem").invoke("val").should("not.eq", row["Stem"]!)
     },
   }
 }
