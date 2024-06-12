@@ -14,8 +14,8 @@ Then("I should see the score {string} at the end of assessment", (expectedScore:
   start.assumeAssessmentPage().expectEndOfAssessment(expectedScore)
 })
 
-Then("I should see error message Not enough approved questions", () => {
-  cy.findByText("Not enough approved questions").should("be.visible")
+Then("I should see error message Not enough questions", () => {
+  cy.findByText("Not enough questions").should("be.visible")
 })
 
 Then("I should see error message The assessment is not available", () => {

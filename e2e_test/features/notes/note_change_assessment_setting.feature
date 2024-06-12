@@ -25,7 +25,14 @@ Feature: Nested Note creation
     When I start the assessment on the "Countries" notebook in the bazaar
     Then I should see error message The assessment is not available
 
-  Scenario: Set 6 question for the assessment
+  Scenario: Set 6 questions for the assessment
     Given I set the number of question for the "Countries" note is "6"
     When I start the assessment on the "Countries" notebook in the bazaar
-    Then I should see error message Not enough approved questions
+    Then I should see error message Not enough questions
+
+  Scenario: Set 2 questions for the assessment
+    Given I set the number of question for the "Countries" note is "2"
+    When I start the assessment on the "Countries" notebook in the bazaar
+    Then I answer the question "Where in the world is Singapore?" with "Asia"
+    And I answer the question "Most famous food of Vietnam?" with "Pho"
+    And I should see the score "Yours score: 2 / 2" at the end of assessment
