@@ -22,18 +22,12 @@ public class AssessmentService {
   }
 
   public List<QuizQuestion> generateAssessment(Notebook notebook) {
-
-    System.out.println("########## SIZE: " + notebook.getNotes().size());
-
-    List<Note> notes = notebook.getNotes();
-    List<QuizQuestion> finalQuizQuestionList = new ArrayList<>();
-    for (Note note : notes) {
-      List<QuizQuestion> quizQuestionList = quizQuestionService.selectQuizQuestionsForANote(note);
-      finalQuizQuestionList.addAll(quizQuestionList);
-    }
-
-    List<QuizQuestion> questions = finalQuizQuestionList.stream().filter(QuizQuestion::isApproved).toList();
-
+    List<QuizQuestion> questions =
+        notebook.getNotes().stream()
+            .map(quizQuestionService::selectQuizQuestionForANote)
+            .filter(Objects::nonNull)
+            .limit(5)
+            .toList();
     if (questions.size() < 5) {
       throw new ApiException(
           "Not enough approved questions",

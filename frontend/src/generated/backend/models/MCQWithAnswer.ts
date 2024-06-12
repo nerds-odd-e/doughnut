@@ -6,5 +6,6 @@ import type { MultipleChoicesQuestion } from './MultipleChoicesQuestion';
 export type MCQWithAnswer = {
     multipleChoicesQuestion: MultipleChoicesQuestion;
     correctChoiceIndex: number;
+    approved?: boolean;
 };
 
