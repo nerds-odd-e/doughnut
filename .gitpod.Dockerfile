@@ -1,5 +1,5 @@
-# syntax=docker.io/docker/dockerfile:1.7.1
-FROM yeongsheng/doughnut-gitpod:2024-05-22
+# syntax=docker.io/docker/dockerfile:1.8.0
+FROM yeongsheng/doughnut-gitpod:2024-06-12
 
 # -----------------------------------------------------
 # -------------------- USER gitpod --------------------
@@ -13,6 +13,10 @@ WORKDIR /home/gitpod
 
 # activate nix
 RUN . /home/gitpod/.nix-profile/etc/profile.d/nix.sh
+
+# direnv
+RUN echo 'eval "$(direnv hook bash)"' >> ~/.bashrc
+RUN echo 'eval "$(direnv hook zsh)"' >> ~/.zshrc
 
 # atuin
 RUN curl -o install-atuin --proto '=https' --tlsv1.2 -sSf https://setup.atuin.sh \
