@@ -12,12 +12,12 @@ Feature: Nested Note creation
       | Korea            | Countries   |
       | China            | Countries   |
     And there are questions for the note:
-      | noteTopic | question                           | answer  | oneWrongChoice |
-      | Singapore | Where in the world is Singapore?   | Asia    | euro           |
-      | Vietnam   | Most famous food of Vietnam?       | Pho     | bread          |
-      | Japan     | What is the capital city of Japan? | Tokyo   | Kyoto          |
-      | Korea     | What is the capital city of Korea? | Seoul   | Busan          |
-      | China     | What is the capital city of China? | Beijing | Shanghai       |
+      | noteTopic | question                           | answer  | oneWrongChoice | approved |
+      | Singapore | Where in the world is Singapore?   | Asia    | euro           | true     |
+      | Vietnam   | Most famous food of Vietnam?       | Pho     | bread          | true     |
+      | Japan     | What is the capital city of Japan? | Tokyo   | Kyoto          | true     |
+      | Korea     | What is the capital city of Korea? | Seoul   | Busan          | true     |
+      | China     | What is the capital city of China? | Beijing | Shanghai       | true     |
     And notebook "Countries" is shared to the Bazaar
 
   Scenario: Set 0 question for the assessment
