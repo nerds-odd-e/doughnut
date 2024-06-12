@@ -22,7 +22,7 @@ public record AiQuestionGenerator(
         .getAiGeneratedQuestion();
   }
 
-  public MCQWithAnswer getAiGeneratedQuestion(Note note, MCQWithAnswer mcqWithAnswer) {
+  public MCQWithAnswer getAiGeneratedRefineQuestion(Note note, MCQWithAnswer mcqWithAnswer) {
     return forNote(note, globalSettingsService.getGlobalSettingQuestionGeneration().getValue())
         .refineQuestion(mcqWithAnswer)
         .orElse(null);
