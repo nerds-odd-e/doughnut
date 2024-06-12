@@ -169,6 +169,11 @@ export const assumeNotePage = (noteTopic?: string) => {
     addQuestion(row: Record<string, string>) {
       this.openQuestionList().addQuestion(row)
     },
+    approveQuiz(question: String) {
+        this.openQuestionList()
+        cy.findByText(question)
+        cy.findByRole("button", { name: "Approve" }).click()
+    },
     expectQuestionsInList(expectedQuestions: Record<string, string>[]) {
       this.openQuestionList().expectQuestion(expectedQuestions)
     },

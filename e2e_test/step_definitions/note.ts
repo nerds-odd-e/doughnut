@@ -397,3 +397,10 @@ When(
     start.jumpToNotePage(noteTopic).expectQuestionsInList(data.hashes())
   },
 )
+
+Given(
+  "I approve question {string} of topic {string}:",
+  (quizQuestion: string, noteTopic: string, data: DataTable) => {
+    start.jumpToNotePage(noteTopic).approveQuiz(quizQuestion)
+  },
+)

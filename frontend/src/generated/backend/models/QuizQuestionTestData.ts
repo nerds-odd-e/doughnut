@@ -7,5 +7,6 @@ export type QuizQuestionTestData = {
     question?: string;
     answer?: string;
     oneWrongChoice?: string;
+    approved?: boolean;
 };
 

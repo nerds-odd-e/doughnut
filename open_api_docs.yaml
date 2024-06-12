@@ -2470,6 +2470,9 @@ components:
         oneWrongChoice:
           type: string
           writeOnly: true
+        approved:
+          type: boolean
+          writeOnly: true
     QuizQuestionsTestData:
       type: object
       properties:

@@ -45,7 +45,7 @@
       </tbody>
     </table>
 
-    <input type="submit" value="Update" class="btn btn-primary" />
+    <input type="submit" value="Approve" class="btn btn-primary" />
   </div>
 </template>
 

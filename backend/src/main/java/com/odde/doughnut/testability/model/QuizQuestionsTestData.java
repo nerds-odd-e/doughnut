@@ -4,8 +4,10 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
+
 import java.util.List;
 import java.util.stream.Collectors;
+
 import lombok.Data;
 import lombok.Setter;
 
@@ -19,6 +21,7 @@ public class QuizQuestionsTestData {
     private String question;
     private String answer;
     private String oneWrongChoice;
+    private boolean approved;
 
     public QuizQuestion buildQuizQuestion(Note note) {
       MultipleChoicesQuestion mcq = new MultipleChoicesQuestion();
@@ -28,16 +31,17 @@ public class QuizQuestionsTestData {
       question.setNote(note);
       question.setCorrectAnswerIndex(0);
       question.setMultipleChoicesQuestion(mcq);
+      question.setApproved(approved);
       return question;
     }
   }
 
   public List<QuizQuestion> buildQuizQuestions(ModelFactoryService factoryService) {
     return quizQuestionTestData.stream()
-        .map(
-            question ->
-                question.buildQuizQuestion(
-                    factoryService.noteRepository.findFirstByTopicConstructor(question.noteTopic)))
-        .collect(Collectors.toList());
+      .map(
+        question ->
+          question.buildQuizQuestion(
+            factoryService.noteRepository.findFirstByTopicConstructor(question.noteTopic)))
+      .collect(Collectors.toList());
   }
 }
