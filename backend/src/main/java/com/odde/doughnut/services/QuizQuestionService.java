@@ -56,4 +56,16 @@ public class QuizQuestionService {
       throw (new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated"));
     }
   }
+
+  public QuizQuestion approveQuestion(QuizQuestion question) {
+    QuizQuestion quizQuestion =
+        modelFactoryService
+            .quizQuestionRepository
+            .findById(question.getId())
+            .orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found question"));
+    quizQuestion.setApproved(true);
+
+    return quizQuestion;
+  }
 }

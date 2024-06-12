@@ -129,4 +129,12 @@ class RestQuizQuestionController {
     currentUser.assertAuthorization(note);
     return quizQuestionService.refineQuestion(note, manualQuestion).getMcqWithAnswer();
   }
+
+  @PostMapping("/{quizQuestion}/approve")
+  @Transactional
+  public QuizQuestion approveQuestion(
+      @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion) {
+    currentUser.assertLoggedIn();
+    return quizQuestionService.approveQuestion(quizQuestion);
+  }
 }
