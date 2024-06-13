@@ -47,6 +47,8 @@ Install `direnv` and activate `direnv`
 **Fedora:** `sudo dnf install direnv`
 Change directory to your cloned `doughnut` folder path and run the below:
 ```bash
+echo 'eval "$(direnv hook bash)"' >> ~/.bashrc
+echo 'eval "$(direnv hook zsh)"' >> ~/.zshrc
 direnv allow
 ```
 Subsequently, each time your change directory into your `doughnut` cloned folder, `nix` flakes will be auto loaded. Each time you change directory away from `doughnut` directory, the `nix` environment will be auto unloaded.
