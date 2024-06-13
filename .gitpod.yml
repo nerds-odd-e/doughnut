@@ -14,6 +14,8 @@ tasks:
       sed -i '/NVM_DIR/d' /home/gitpod/.bashrc
       sed -i '/NVM_DIR/d' /home/gitpod/.bash_profile
       sed -i '/NVM_DIR/d' /home/gitpod/.profile
+      nix-env -iA nixpkgs.direnv
+      nix-env -iA nixpkgs.nix-direnv
       . /home/gitpod/.bashrc
       . /home/gitpod/.nix-profile/etc/profile.d/nix.sh
       cd /workspace/doughnut && direnv allow

@@ -19,7 +19,5 @@ RUN echo 'eval "$(fasd --init auto)"' >> ~/.bashrc
 RUN echo 'eval "$(fasd --init auto)"' >> ~/.zshrc
 
 # direnv
-RUN nix-env -iA nixpkgs.direnv
-RUN nix-env -iA nixpkgs.nix-direnv
 RUN echo 'eval "$(direnv hook bash)"' >> ~/.bashrc
 RUN echo 'eval "$(direnv hook zsh)"' >> ~/.zshrc
