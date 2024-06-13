@@ -70,11 +70,12 @@ the [local development environment nix setup](./docs/nix.md).
 
 From the root of your doughnut directory, start your doughnut nix development environment with
 
+If you have `direnv` installed & configured right, just `cd` to the path where you cloned `doughnut` Github source code and the `nix` develop environment will autoload, **OTHERWISE** run:
 ```bash
 nix develop
 ```
 
-Install packages, build the frontend and start the backend
+Start the backend service/application
 
 ```bash
 pnpm sut

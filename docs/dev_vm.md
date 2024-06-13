@@ -5,8 +5,8 @@
 3. Log in with user/password (lia/lia)
 4. First time login you will be greeted with "Welcome to Ubuntu 22.04!". Click on "Start setup", then "Next" twice (keep default options).
 5. Open a terminal window (press ⌘ (CMD) or ⊞ (Win) to see installed applications) or launch IntelliJ or VScode and open embedded terminal from there. (see fig. below)
-6. Run `cd ~/doughnut && nix develop`
-7. Run `pnpm test`. This will run all end-to-end tests in headless mode. 
+6. Run `cd ~/doughnut` (`direnv` should autoload your `nix` development environment, else `nix develop`)
+7. Run `pnpm verify`. This will run all end-to-end tests in headless mode. 
 8. Setup GitHub Personal Access Token (since the doughnut repo is cloned via HTTPS).
   * Go to your GitHub settings
   * Click on "Developer settings"
@@ -17,4 +17,3 @@
   * **Important:** Make sure to copy your new personal access token. You won’t be able to see it again!
   * run `git config --global credential.helper cache`
   * Each time you're prompted for a username and password, use your GitHub username and the personal access token, respectively.
-

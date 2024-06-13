@@ -25,4 +25,4 @@ Since this is a monorepo project managed by PNPM, each sub-project (like `fronte
 
 Now, each sub-project in your workspace should have its own isolated environment, and VSCode should use the correct `package.json` file for each sub-project.
 
-Remember to run `pnpm install` in the terminal at the root level of your project to ensure all dependencies are correctly installed.
+Remember to run `pnpm recursive install` in the terminal at the root level of your project to ensure all dependencies are correctly installed.
