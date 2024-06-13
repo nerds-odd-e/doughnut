@@ -24,12 +24,12 @@
       </thead>
       <tbody>
         <tr
-          v-for="question in questions"
+          v-for="(question, outerIndex) in questions"
           :key="question.multipleChoicesQuestion.stem"
         >
           <td>
             <input
-              :id="'checkbox-' + question.multipleChoicesQuestion.stem"
+              :id="'checkbox-' + outerIndex"
               type="checkbox"
               v-model="question.approved"
               @change="approveQuestion(question.id)"

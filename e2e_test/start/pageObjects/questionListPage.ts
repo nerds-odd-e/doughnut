@@ -18,13 +18,12 @@ export const questionListPage = () => {
         })
       })
     },
-    expectApprovedQuestion(expectedQuestions: Record<string, boolean>[]) {
-      expectedQuestions.forEach((row) => {
-        const dynamicId = "checkbox-" + row["Question"]!
-        const checkbox = document.getElementById(`#${dynamicId}`) as HTMLInputElement
-        if (!checkbox) {
-        }
-      })
+    expectApprovedStatusQuestion(question: string, approval: string) {
+      if (approval == "approve") {
+        cy.findByText(question).parent("tr").find('input[type="checkbox"]').should("be.checked")
+      } else {
+        cy.findByText(question).parent("tr").find('input[type="checkbox"]').should("not.be.checked")
+      }
     },
     fillQuestion(row: Record<string, string>) {
       cy.findByRole("button", { name: "Add Question" }).click()

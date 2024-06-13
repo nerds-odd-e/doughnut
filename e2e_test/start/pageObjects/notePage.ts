@@ -174,15 +174,17 @@ export const assumeNotePage = (noteTopic?: string) => {
     },
     approveQuiz(question: string) {
       this.openQuestionList()
-      const id = "checkbox-" + question
-      const escapedId = id.replace(/\s/g, "\\ ")
-      cy.get(`[type="checkbox"][id="${escapedId}"]`).check() //call api to save data
+      cy.findByText(question).parent("tr").find('input[type="checkbox"]').check()
+    },
+    unApproveQuiz(question: string) {
+      this.openQuestionList()
+      cy.findByText(question).parent("tr").find('input[type="checkbox"]').uncheck()
     },
     expectQuestionsInList(expectedQuestions: Record<string, string>[]) {
       this.openQuestionList().expectQuestion(expectedQuestions)
     },
-    expectApprovedQuestionsInList(expectedQuestions: Record<string, boolean>[]) {
-      this.openQuestionList().expectApprovedQuestion(expectedQuestions)
+    expectApprovedStatusQuestion(noteTopic: string, question: string, approval: string) {
+      this.openQuestionList().expectApprovedStatusQuestion(question, approval)
     },
     aiSuggestDetailsForNote: () => {
       cy.on("uncaught:exception", () => {

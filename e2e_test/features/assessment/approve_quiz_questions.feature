@@ -4,33 +4,18 @@ Feature: Approve Quiz Question
 
   Background:
     Given I am logged in as an existing user
-    And I have a note with the topic "The cow joke"
+    And I have a note with the topic "Animal joking"
     And there are questions for the note:
-      | noteTopic    | question             | answer | oneWrongChoice | approved |
-      | The cow joke | What does a cow say? | moo    | woo            | false    |
+      | noteTopic     | question             | answer | oneWrongChoice | approved |
+      | Animal joking | What does a cow say? | moo    | woo            | false    |
+      | Animal joking | What does a dog say? | quo    | huo            | false    |
+      | Animal joking | What does a cat say? | meo    | huo            | false    |
 
-  Scenario: Approve quiz question
-    When I approve question "What does a cow say?" of topic "The cow joke":
-      | question             | Approved |
-      | What does a cow say? | true     |
-    Then I should see the approved questions in the question list of the note "The cow joke":
-      | Question             | Approved |
-      | What does a cow say? | true     |
-
-  @ignore
-  Scenario: Approve all quiz question of topic
-    When I approve question "What does a cow say?" of topic "The cow joke":
-      | question             | approved |
-      | What does a cow say? | true     |
-    Then I should see the questions in the question list of the note "The cow joke":
-      | Question             | approved |
-      | What does a cow say? | true     |
-
-  @ignore
-  Scenario: UnApprove quiz question
-    When I unapprove question "What does a cow say?" of topic "The cow joke":
-      | question             | approved |
-      | What does a cow say? | true     |
-    Then I should see the questions in the question list of the note "The cow joke":
-      | Question             | approved |
-      | What does a cow say? | true     |
+  Scenario Outline: Approve quiz question
+    When I <approval> question "<question>" of topic "<note>":
+    Then I see the "<question>" question of the "<note>" note has "<approval>"
+    Examples:
+      | note          | question             | approval  |
+      | Animal joking | What does a cow say? | approve   |
+      | Animal joking | What does a dog say? | approve   |
+      | Animal joking | What does a cat say? | unapprove |

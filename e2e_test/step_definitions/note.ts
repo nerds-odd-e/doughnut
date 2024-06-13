@@ -407,9 +407,9 @@ When(
 )
 
 When(
-  "I should see the approved questions in the question list of the note {string}:",
-  (noteTopic: string, data: DataTable) => {
-    start.jumpToNotePage(noteTopic).expectApprovedQuestionsInList(data.hashes())
+  "I see the {string} question of the {string} note has {string}",
+  (question: string, noteTopic: string, approval: string) => {
+    start.jumpToNotePage(noteTopic).expectApprovedStatusQuestion(noteTopic, question, approval)
   },
 )
 
@@ -417,6 +417,13 @@ Given(
   "I approve question {string} of topic {string}:",
   (quizQuestion: string, noteTopic: string) => {
     start.jumpToNotePage(noteTopic).approveQuiz(quizQuestion)
+  },
+)
+
+Given(
+  "I unapprove question {string} of topic {string}:",
+  (quizQuestion: string, noteTopic: string) => {
+    start.jumpToNotePage(noteTopic).unApproveQuiz(quizQuestion)
   },
 )
 

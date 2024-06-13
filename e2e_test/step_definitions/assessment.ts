@@ -52,9 +52,8 @@ When("I refine the question", () => {
 })
 
 Then("The refined question's {string} should not empty", (questionField: string) => {
-    start.assumeNotePage().verifyRefineQuestionField(questionField)
-  },
-)
+  start.assumeNotePage().verifyRefineQuestionField(questionField)
+})
 
 Then(
   "The refined question's Correct Choice Index should have the same {string} as the original question if it isn't empty",
