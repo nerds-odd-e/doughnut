@@ -58,14 +58,8 @@ public class QuizQuestionService {
   }
 
   public QuizQuestion approveQuestion(QuizQuestion question) {
-    QuizQuestion quizQuestion =
-        modelFactoryService
-            .quizQuestionRepository
-            .findById(question.getId())
-            .orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Not found question"));
-    quizQuestion.setApproved(true);
-
-    return quizQuestion;
+    question.setApproved(true);
+    modelFactoryService.save(question);
+    return question;
   }
 }

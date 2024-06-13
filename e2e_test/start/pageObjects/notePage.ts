@@ -250,12 +250,12 @@ export const assumeNotePage = (noteTopic?: string) => {
       cy.findByLabelText("Correct Choice Index").clear().type(row["Correct Choice Index"]!)
     },
     verifyRefineQuestion(row: Record<string, string>) {
-      cy.findByLabelText("Stem").invoke("val").should("not.eq",row["Stem"]!)
-      cy.findByLabelText("Choice 0").invoke("val").should("not.eq",row["Choice 0"]!)
-      cy.findByLabelText("Choice 1").invoke("val").should("not.eq",row["Choice 1"]!)
+      cy.findByLabelText("Stem").invoke("val").should("not.eq", row["Stem"]!)
+      cy.findByLabelText("Choice 0").invoke("val").should("not.eq", row["Choice 0"]!)
+      cy.findByLabelText("Choice 1").invoke("val").should("not.eq", row["Choice 1"]!)
     },
-    verifyCorrectIndex: (index : string) => {
-      cy.findByLabelText("Correct Choice Index").invoke("val").should("eq",index)
+    verifyCorrectIndex: (index: string) => {
+      cy.findByLabelText("Correct Choice Index").invoke("val").should("eq", index)
     },
   }
 }

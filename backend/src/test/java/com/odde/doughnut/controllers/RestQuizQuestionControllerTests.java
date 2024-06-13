@@ -511,4 +511,25 @@ class RestQuizQuestionControllerTests {
           result.getMultipleChoicesQuestion().getChoices());
     }
   }
+
+  @Nested
+  class ApproveQuestion {
+    Note noteWithoutQuestions;
+
+    @BeforeEach
+    void setUp() {
+      Note headNote = makeMe.aHeadNote("My reading list").creatorAndOwner(currentUser).please();
+      makeMe.theNote(headNote).withNChildren(10).please();
+      noteWithoutQuestions =
+          makeMe.aNote("Zen and the Art of Motorcycle Maintenance").under(headNote).please();
+    }
+
+    @Test
+    void approveQuestion() {
+      QuizQuestion quizQuestion =
+          makeMe.aQuestion().spellingQuestionOfNote(noteWithoutQuestions).please();
+      QuizQuestion approvedQuestion = controller.approveQuestion(quizQuestion);
+      assertTrue(approvedQuestion.isApproved());
+    }
+  }
 }
