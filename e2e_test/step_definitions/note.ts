@@ -407,7 +407,7 @@ When(
 
 Given(
   "I approve question {string} of topic {string}:",
-  (quizQuestion: string, noteTopic: string, data: DataTable) => {
+  (quizQuestion: string, noteTopic: string) => {
     start.jumpToNotePage(noteTopic).approveQuiz(quizQuestion)
   },
 )

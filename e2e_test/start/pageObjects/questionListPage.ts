@@ -19,13 +19,12 @@ export const questionListPage = () => {
       })
     },
     expectApprovedQuestion(expectedQuestions: Record<string, boolean>[]) {
-        expectedQuestions.forEach((row) => {
+      expectedQuestions.forEach((row) => {
         const dynamicId = "checkbox-" + row["Question"]!
-        const checkbox = document.getElementById(`#${dynamicId}`) as HTMLInputElement;
+        const checkbox = document.getElementById(`#${dynamicId}`) as HTMLInputElement
         if (!checkbox) {
-
         }
-        })
-      },
+      })
+    },
   }
 }

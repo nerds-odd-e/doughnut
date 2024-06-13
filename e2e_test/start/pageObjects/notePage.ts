@@ -169,11 +169,11 @@ export const assumeNotePage = (noteTopic?: string) => {
     addQuestion(row: Record<string, string>) {
       this.openQuestionList().addQuestion(row)
     },
-    approveQuiz(question: String) {
-        this.openQuestionList()
-        const id = "checkbox-" + question;
-        const escapedId = id.replace(/\s/g, '\\ ');
-        cy.get(`[type="checkbox"][id="${escapedId}"]`).check() //call api to save data
+    approveQuiz(question: string) {
+      this.openQuestionList()
+      const id = "checkbox-" + question
+      const escapedId = id.replace(/\s/g, "\\ ")
+      cy.get(`[type="checkbox"][id="${escapedId}"]`).check() //call api to save data
     },
     expectQuestionsInList(expectedQuestions: Record<string, string>[]) {
       this.openQuestionList().expectQuestion(expectedQuestions)
