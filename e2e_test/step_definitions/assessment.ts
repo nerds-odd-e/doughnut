@@ -30,20 +30,20 @@ Then("The {string} button should be disabled", (buttonName: string) => {
   cy.findByRole("button", { name: buttonName }).should("be.disabled")
 })
 
-Given("I fill {string} to the Stem of the question", (data: string) => {
-  start.assumeNotePage().injectDataToQuestion("Stem", data)
+Given("I fill {string} to the Stem of the question", (stem: string) => {
+  start.assumeNotePage().injectDataToQuestion("Stem", stem)
 })
 
-Given("I fill {string} to the Choice 0 of the question", (data: string) => {
-  start.assumeNotePage().injectDataToQuestion("Choice 0", data)
+Given("I fill {string} to the Choice 0 of the question", (choice: string) => {
+  start.assumeNotePage().injectDataToQuestion("Choice 0", choice)
 })
 
-Given("I fill {string} to the Choice 1 of the question", (data: string) => {
-  start.assumeNotePage().injectDataToQuestion("Choice 1", data)
+Given("I fill {string} to the Choice 1 of the question", (choice: string) => {
+  start.assumeNotePage().injectDataToQuestion("Choice 1", choice)
 })
 
-Given("I fill {string} to the Correct Choice Index of the question", (data: string) => {
-  start.assumeNotePage().injectDataToQuestion("Correct Choice Index", data)
+Given("I fill {string} to the Correct Choice Index of the question", (correctIndex: string) => {
+  start.assumeNotePage().injectDataToQuestion("Correct Choice Index", correctIndex)
 })
 
 When("I refine the question", () => {
@@ -52,22 +52,22 @@ When("I refine the question", () => {
 
 Then(
   "The refined question's Stem should not have the same {string} as the original question",
-  (data: string) => {
-    start.assumeNotePage().verifyRefineQuestionField("Stem", data)
+  (stem: string) => {
+    start.assumeNotePage().verifyRefineQuestionField("Stem", stem)
   },
 )
 
 Then(
   "The refined question's Choice 0 should not have the same {string} as the original question",
-  (data: string) => {
-    start.assumeNotePage().verifyRefineQuestionField("Choice 0", data)
+  (choice: string) => {
+    start.assumeNotePage().verifyRefineQuestionField("Choice 0", choice)
   },
 )
 
 Then(
   "The refined question's Choice 1 should not have the same {string} as the original question",
-  (data: string) => {
-    start.assumeNotePage().verifyRefineQuestionField("Choice 1", data)
+  (choice: string) => {
+    start.assumeNotePage().verifyRefineQuestionField("Choice 1", choice)
   },
 )
 
