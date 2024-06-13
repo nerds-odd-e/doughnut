@@ -58,7 +58,8 @@ public class QuizQuestionService {
   }
 
   public QuizQuestion approveQuestion(QuizQuestion question) {
-    question.setApproved(true);
+    question.setApproved(!question.isApproved());
+
     modelFactoryService.save(question);
     return question;
   }

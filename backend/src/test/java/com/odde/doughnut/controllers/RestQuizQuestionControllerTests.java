@@ -528,8 +528,18 @@ class RestQuizQuestionControllerTests {
     void approveQuestion() {
       QuizQuestion quizQuestion =
           makeMe.aQuestion().spellingQuestionOfNote(noteWithoutQuestions).please();
+      quizQuestion.setApproved(false);
       QuizQuestion approvedQuestion = controller.approveQuestion(quizQuestion);
       assertTrue(approvedQuestion.isApproved());
+    }
+
+    @Test
+    void unApproveQuestion() {
+      QuizQuestion quizQuestion =
+          makeMe.aQuestion().spellingQuestionOfNote(noteWithoutQuestions).please();
+      quizQuestion.setApproved(true);
+      QuizQuestion approvedQuestion = controller.approveQuestion(quizQuestion);
+      assertFalse(approvedQuestion.isApproved());
     }
   }
 }
