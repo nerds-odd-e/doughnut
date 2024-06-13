@@ -30,8 +30,20 @@ Then("The {string} button should be disabled", (buttonName: string) => {
   cy.findByRole("button", { name: buttonName }).should("be.disabled")
 })
 
-Given("I input data into items of question:", (data: DataTable) => {
-  start.assumeNotePage().injectSomeDataQuestion(data.hashes()[0]!)
+Given("I fill {string} to the Stem of the question", (data: string) => {
+  start.assumeNotePage().injectDataToQuestion("Stem", data)
+})
+
+Given("I fill {string} to the Choice 0 of the question", (data: string) => {
+  start.assumeNotePage().injectDataToQuestion("Choice 0", data)
+})
+
+Given("I fill {string} to the Choice 1 of the question", (data: string) => {
+  start.assumeNotePage().injectDataToQuestion("Choice 1", data)
+})
+
+Given("I fill {string} to the Correct Choice Index of the question", (data: string) => {
+  start.assumeNotePage().injectDataToQuestion("Correct Choice Index", data)
 })
 
 When("I refine the question", () => {
@@ -39,11 +51,26 @@ When("I refine the question", () => {
 })
 
 Then(
-  "The refined question should be filled into the form and different from the original question:",
-  (data: DataTable) => {
-    start.assumeNotePage().verifyRefineQuestion(data.hashes()[0]!)
+  "The refined question's Stem should not have the same {string} as the original question",
+  (data: string) => {
+    start.assumeNotePage().verifyRefineQuestionField("Stem", data)
   },
 )
-Then("The Correct Choice Index of refined question should be {string}", (correctIndex: string) => {
+
+Then(
+  "The refined question's Choice 0 should not have the same {string} as the original question",
+  (data: string) => {
+    start.assumeNotePage().verifyRefineQuestionField("Choice 0", data)
+  },
+)
+
+Then(
+  "The refined question's Choice 1 should not have the same {string} as the original question",
+  (data: string) => {
+    start.assumeNotePage().verifyRefineQuestionField("Choice 1", data)
+  },
+)
+
+Then("The refined question's Correct Choice Index should have the same {string} as the original question", (correctIndex: string) => {
   start.assumeNotePage().verifyCorrectIndex(correctIndex)
 })
