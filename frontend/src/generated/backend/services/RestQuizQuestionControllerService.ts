@@ -76,6 +76,25 @@ export class RestQuizQuestionControllerService {
     }
     /**
      * @param quizQuestion
+     * @returns QuizQuestion OK
+     * @throws ApiError
+     */
+    public approveQuestion(
+        quizQuestion: number,
+    ): CancelablePromise<QuizQuestion> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/quiz-questions/{quizQuestion}/approve',
+            path: {
+                'quizQuestion': quizQuestion,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param quizQuestion
      * @param requestBody
      * @returns AnsweredQuestion OK
      * @throws ApiError
