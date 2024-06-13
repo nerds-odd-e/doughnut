@@ -57,6 +57,14 @@ Given(
   },
 )
 
+When(
+  "I fill question the following question for the note {string}:",
+  (noteTopic: string, data: DataTable) => {
+    expect(data.hashes().length, "please fill one question at a time.").to.equal(1)
+    start.jumpToNotePage(noteTopic).fillQuestion(data.hashes()[0]!)
+  },
+)
+
 When("I create a notebook with topic {string}", (notebookTopic: string) => {
   start.routerToNotebooksPage().creatingNotebook(notebookTopic)
 })
@@ -411,3 +419,15 @@ Given(
     start.jumpToNotePage(noteTopic).approveQuiz(quizQuestion)
   },
 )
+
+When("I generate question by AI", () => {
+  cy.findByRole("button", { name: "Generate by AI" }).click()
+})
+
+Then("The generated question by AI will show:", (questionTable: DataTable) => {
+  cy.get('textarea[name="stem"').should("have.value", questionTable.hashes()[0])
+  cy.get('textarea[name="choice 0"]').should("have.value", questionTable.hashes()[1])
+  cy.get('textarea[name="choice 1"]').should("have.value", questionTable.hashes()[2])
+  cy.get('textarea[name="choice 2"]').should("have.value", questionTable.hashes()[3])
+  cy.get('textarea[name="correctChoiceIndex"]').should("have.value", questionTable.hashes()[2])
+})

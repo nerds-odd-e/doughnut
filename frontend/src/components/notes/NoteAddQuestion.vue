@@ -42,6 +42,9 @@
     </button>
     <button @click="refineQuestion" :disabled="!isValidRefine">Refine</button>
     <button @click="submitQuestion" :disabled="!isValidQuestion">Submit</button>
+    <button @click="submitQuestion" :disabled="isValidGenerateByAI">
+      Generate by AI
+    </button>
   </div>
 </template>
 
@@ -51,6 +54,7 @@ import useLoadingApi from "@/managedApi/useLoadingApi";
 import { Note, MCQWithAnswer } from "@/generated/backend";
 import isMCQWithAnswerValid from "@/models/isMCQWithAnswerValid";
 import isRefineMCQWithAnswerValid from "@/models/isRefineMCQWithAnswerValid";
+import isGenerateMCQWithAnswerValid from "@/models/isGenerateMCQWithAnswerValid";
 import TextArea from "../form/TextArea.vue";
 
 export default defineComponent({
@@ -83,6 +87,9 @@ export default defineComponent({
     },
     isValidRefine() {
       return isRefineMCQWithAnswerValid(this.mcqWithAnswer);
+    },
+    isValidGenerateByAI() {
+      return isGenerateMCQWithAnswerValid(this.mcqWithAnswer);
     },
   },
   methods: {
@@ -120,6 +127,15 @@ export default defineComponent({
           quizQuestion,
         );
       this.mcqWithAnswer = response;
+    },
+    async generateQuestionByAI() {
+      // const quizQuestion = this.mcqWithAnswer;
+      // const response =
+      //   await this.managedApi.restQuizQuestionController.addQuestionManually(
+      //     this.note.id,
+      //     quizQuestion,
+      //   );
+      // this.$emit("close-dialog", response);
     },
   },
 });

@@ -169,6 +169,9 @@ export const assumeNotePage = (noteTopic?: string) => {
     addQuestion(row: Record<string, string>) {
       this.openQuestionList().addQuestion(row)
     },
+    fillQuestion(row: Record<string, string>) {
+      this.openQuestionList().fillQuestion(row)
+    },
     approveQuiz(question: string) {
       this.openQuestionList()
       const id = "checkbox-" + question
