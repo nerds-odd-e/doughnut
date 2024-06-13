@@ -43,7 +43,6 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
     xclip \
     fasd \
     fzf \
-    direnv \
     && apt-get autoremove \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /var/cache/apt \
