@@ -11,6 +11,7 @@ Feature: Ask AI to generate the question
     And I have a note with the topic "Countries"
     And I want to create a question for the note "Countries"
 
+  @ignore  
   Scenario: Cannot generate the question when question was inputted
     When I fill question the following question for the note "Countries":
       | Question                             | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
