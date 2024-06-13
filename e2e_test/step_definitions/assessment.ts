@@ -71,6 +71,9 @@ Then(
   },
 )
 
-Then("The refined question's Correct Choice Index should have the same {string} as the original question", (correctIndex: string) => {
-  start.assumeNotePage().verifyCorrectIndex(correctIndex)
-})
+Then(
+  "The refined question's Correct Choice Index should have the same {string} as the original question",
+  (correctIndex: string) => {
+    start.assumeNotePage().verifyCorrectIndex(correctIndex)
+  },
+)
