@@ -874,6 +874,30 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/QuizQuestion"
+  /api/quiz-questions/generate-question-without-save:
+    post:
+      tags:
+      - rest-quiz-question-controller
+      operationId: generateQuestionForAssessmentWithoutSave
+      parameters:
+      - name: note
+        in: query
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/QuizQuestionDTO"
   /api/notes/{parentNote}/create:
     post:
       tags:
@@ -2773,6 +2797,17 @@ components:
           $ref: "#/components/schemas/ReviewPoint"
         quizQuestion:
           $ref: "#/components/schemas/QuizQuestion"
+    QuizQuestionDTO:
+      type: object
+      properties:
+        multipleChoicesQuestion:
+          $ref: "#/components/schemas/MultipleChoicesQuestion"
+        createdAt:
+          type: string
+          format: date-time
+        correctAnswerIndex:
+          type: integer
+          format: int32
     NoteCreationDTO:
       required:
       - topicConstructor

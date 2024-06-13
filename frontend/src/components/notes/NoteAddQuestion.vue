@@ -42,7 +42,10 @@
     </button>
     <button @click="refineQuestion" :disabled="!isValidRefine">Refine</button>
     <button @click="submitQuestion" :disabled="!isValidQuestion">Submit</button>
-    <button @click="submitQuestion" :disabled="isValidGenerateByAI">
+    <button
+      @click="generateQuestionByAI"
+      :disabled="isUserDidInputQuestion || isUserDidInputChoices"
+    >
       Generate by AI
     </button>
   </div>
@@ -54,7 +57,6 @@ import useLoadingApi from "@/managedApi/useLoadingApi";
 import { Note, MCQWithAnswer } from "@/generated/backend";
 import isMCQWithAnswerValid from "@/models/isMCQWithAnswerValid";
 import isRefineMCQWithAnswerValid from "@/models/isRefineMCQWithAnswerValid";
-import isGenerateMCQWithAnswerValid from "@/models/isGenerateMCQWithAnswerValid";
 import TextArea from "../form/TextArea.vue";
 
 export default defineComponent({
@@ -88,8 +90,23 @@ export default defineComponent({
     isValidRefine() {
       return isRefineMCQWithAnswerValid(this.mcqWithAnswer);
     },
-    isValidGenerateByAI() {
-      return isGenerateMCQWithAnswerValid(this.mcqWithAnswer);
+    isUserDidInputQuestion() {
+      return (
+        this.mcqWithAnswer.multipleChoicesQuestion.stem &&
+        this.mcqWithAnswer.multipleChoicesQuestion.stem.trim.length > 0
+      );
+    },
+    isUserDidInputChoices() {
+      for (
+        let i = 0;
+        i < this.mcqWithAnswer.multipleChoicesQuestion.choices.length;
+        i += 1
+      ) {
+        if (this.mcqWithAnswer.multipleChoicesQuestion.choices[i]) {
+          return true;
+        }
+      }
+      return false;
     },
   },
   methods: {
@@ -126,16 +143,23 @@ export default defineComponent({
           this.note.id,
           quizQuestion,
         );
-      this.mcqWithAnswer = response;
+      this.$emit("close-dialog", response);
     },
     async generateQuestionByAI() {
-      // const quizQuestion = this.mcqWithAnswer;
-      // const response =
-      //   await this.managedApi.restQuizQuestionController.addQuestionManually(
-      //     this.note.id,
-      //     quizQuestion,
-      //   );
-      // this.$emit("close-dialog", response);
+      const response =
+        await this.managedApi.restQuizQuestionController.generateQuestionForAssessmentWithoutSave(
+          this.note.id,
+        );
+      this.mcqWithAnswer.multipleChoicesQuestion.stem =
+        response.multipleChoicesQuestion?.stem;
+      const choices = response.multipleChoicesQuestion;
+      if (choices) {
+        for (let i = 0; i < choices.choices.length; i += 1) {
+          this.mcqWithAnswer.multipleChoicesQuestion.choices[i] =
+            response.multipleChoicesQuestion?.choices[i] || "";
+        }
+      }
+      this.mcqWithAnswer.correctChoiceIndex = response.correctAnswerIndex || 0;
     },
   },
 });

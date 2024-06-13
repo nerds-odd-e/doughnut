@@ -4,6 +4,7 @@ import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.QuestionSuggestionCreationParams;
 import com.odde.doughnut.controllers.dto.QuizQuestionContestResult;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.QuizQuestionDTO;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.AnswerModel;
@@ -54,6 +55,13 @@ class RestQuizQuestionController {
       @RequestParam(value = "note") @Schema(type = "integer") Note note) {
     currentUser.assertLoggedIn();
     return quizQuestionService.generateAIQuestion(note);
+  }
+
+  @PostMapping("/generate-question-without-save")
+  public QuizQuestionDTO generateQuestionForAssessmentWithoutSave(
+      @RequestParam(value = "note") @Schema(type = "integer") Note note) {
+    currentUser.assertLoggedIn();
+    return quizQuestionService.generateAIQuestionWithoutSave(note);
   }
 
   @PostMapping("/{quizQuestion}/contest")
