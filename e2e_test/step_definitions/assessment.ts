@@ -52,7 +52,6 @@ Given("I fill {string} to the Correct Choice Index of the question", (correctInd
 
 When("I refine the question", () => {
   cy.findByRole("button", { name: "Refine" }).click()
-  cy.pageIsNotLoading() // wait for the response
 })
 
 Then("The refined question's {string} should not empty", (questionField: string) => {

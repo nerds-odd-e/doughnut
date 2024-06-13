@@ -1,3 +1,4 @@
+@usingMockedOpenAiService
 Feature: Ask AI to refine the question
   As a trainer, I want to create questions by asking the AI to adjust them properly,
   so that I can use them for our assessments.
