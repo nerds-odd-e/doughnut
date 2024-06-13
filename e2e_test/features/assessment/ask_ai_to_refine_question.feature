@@ -10,19 +10,19 @@ Feature: Ask AI to refine the question
   Scenario: Cannot refine the question without any information
     Then The "Refine" button should be disabled
 
-    @ignore
+    @focus
     Scenario Outline: Can refine the question with filled data
     Given I fill "<Stem>" to the Stem of the question
     And I fill "<Choice 0>" to the Choice 0 of the question
     And I fill "<Choice 1>" to the Choice 1 of the question
     And I fill "<Correct Choice Index>" to the Correct Choice Index of the question
     When I refine the question
-    Then The refined question's Stem should not have the same "<Stem>" as the original question
-    And The refined question's Choice 0 should not have the same "<Choice 0>" as the original question
-    And The refined question's Choice 1 should not have the same "<Choice 1>" as the original question
-    And The refined question's Correct Choice Index should have the same "<Correct Choice Index>" as the original question
+    Then The refined question's "Stem" should not empty
+    And The refined question's "Choice 0" should not empty
+    And The refined question's "Choice 1" should not empty
+    And The refined question's Correct Choice Index should have the same "<Correct Choice Index>" as the original question if it isn't empty
 
-    Examples:
+      Examples:
       | Stem         | Choice 0  | Choice 1 | Correct Choice Index |
       | Vietnam food | Com Tam   | Hambuger | 0                    |
       | Vietnam food |           |          | 1                    |

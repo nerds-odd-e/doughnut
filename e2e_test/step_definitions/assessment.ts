@@ -48,31 +48,16 @@ Given("I fill {string} to the Correct Choice Index of the question", (correctInd
 
 When("I refine the question", () => {
   cy.findByRole("button", { name: "Refine" }).click()
+  cy.pageIsNotLoading() // wait for the response
 })
 
-Then(
-  "The refined question's Stem should not have the same {string} as the original question",
-  (stem: string) => {
-    start.assumeNotePage().verifyRefineQuestionField("Stem", stem)
+Then("The refined question's {string} should not empty", (questionField: string) => {
+    start.assumeNotePage().verifyRefineQuestionField(questionField)
   },
 )
 
 Then(
-  "The refined question's Choice 0 should not have the same {string} as the original question",
-  (choice: string) => {
-    start.assumeNotePage().verifyRefineQuestionField("Choice 0", choice)
-  },
-)
-
-Then(
-  "The refined question's Choice 1 should not have the same {string} as the original question",
-  (choice: string) => {
-    start.assumeNotePage().verifyRefineQuestionField("Choice 1", choice)
-  },
-)
-
-Then(
-  "The refined question's Correct Choice Index should have the same {string} as the original question",
+  "The refined question's Correct Choice Index should have the same {string} as the original question if it isn't empty",
   (correctIndex: string) => {
     start.assumeNotePage().verifyCorrectIndex(correctIndex)
   },

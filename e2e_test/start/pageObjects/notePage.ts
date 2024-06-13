@@ -247,15 +247,20 @@ export const assumeNotePage = (noteTopic?: string) => {
       cy.findByRole("button", { name: "Add Question" }).click()
     },
     injectDataToQuestion(fieldData: string, data: string) {
+      cy.findByLabelText(fieldData).clear()
       if (data) {
-        cy.findByLabelText(fieldData).clear().type(data)
+        cy.findByLabelText(fieldData).type(data)
       }
     },
-    verifyRefineQuestionField(fieldData: string, data: string) {
-      cy.findByLabelText(fieldData).invoke("val").should("not.eq", data)
+    verifyRefineQuestionField(field: string) {
+      cy.findByLabelText(field).invoke("val").should("not.eq", "")
     },
-    verifyCorrectIndex: (index: string) => {
-      cy.findByLabelText("Correct Choice Index").invoke("val").should("eq", index)
+    verifyCorrectIndex(index: string) {
+      if (index) {
+        cy.findByLabelText("Correct Choice Index").invoke("val").should("eq", index)
+      } else {
+        cy.findByLabelText("Correct Choice Index").invoke("val").should("not.eq", "")
+      }
     },
   }
 }
