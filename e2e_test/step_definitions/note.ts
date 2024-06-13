@@ -427,14 +427,7 @@ Given(
   },
 )
 
-When("I generate question by AI", () => {
+When("I generate question by AI {string}", (noteName: string) => {
+  start.jumpToNotePage(noteName).goToAddQuestion()
   cy.findByRole("button", { name: "Generate by AI" }).click()
-})
-
-Then("The generated question by AI will show:", (questionTable: DataTable) => {
-  cy.get('textarea[name="stem"').should("have.value", questionTable.hashes()[0])
-  cy.get('textarea[name="choice 0"]').should("have.value", questionTable.hashes()[1])
-  cy.get('textarea[name="choice 1"]').should("have.value", questionTable.hashes()[2])
-  cy.get('textarea[name="choice 2"]').should("have.value", questionTable.hashes()[3])
-  cy.get('textarea[name="correctChoiceIndex"]').should("have.value", questionTable.hashes()[2])
 })

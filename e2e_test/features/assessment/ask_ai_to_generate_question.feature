@@ -11,17 +11,15 @@ Feature: Ask AI to generate the question
     And I have a note with the topic "Countries"
     And I want to create a question for the note "Countries"
 
-  @ignore  
   Scenario: Cannot generate the question when question was inputted
     When I fill question the following question for the note "Countries":
       | Question                             | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
       | What do you call a cow with not leg? | Ground beef    | Cowboy             | Oxford             |
     Then The "Generate by AI" button should be disabled
 
-  @ignore
   Scenario: Can generate the question with the all full fill data
-    When I generate question by AI
-    Then The generated question by AI will show:
-      | Question                | Choice 0       | Choice 1   | Choice 2          |
-      | What is scuba diving?   | Rescue Diver   | Divemaster | Open Water Diver  |
+    When I generate question by AI "Countries"
+    Then The generated question for the note by AI will show:
+      | Question                | Choice 0       | Choice 1   | Choice 2          | Correct Choice  |
+      | What is scuba diving?   | Rescue Diver   | Divemaster | Open Water Diver  | 0               |
 

@@ -239,3 +239,7 @@ Then("I suggest the displayed question {string} as a bad example", (questionStem
     .suggestingThisQuestionForFineTuning()
     .suggestingNegativeFeedbackFineTuningExclusion()
 })
+
+Then("The generated question for the note by AI will show:", (data: DataTable) => {
+  start.assumeQuestionPage().expectQuestionGeneratedByAI(data.hashes()[0]!)
+})
