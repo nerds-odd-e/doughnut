@@ -2443,6 +2443,9 @@ components:
           format: int32
         approved:
           type: boolean
+        id:
+          type: integer
+          format: int32
     MultipleChoicesQuestion:
       required:
       - choices

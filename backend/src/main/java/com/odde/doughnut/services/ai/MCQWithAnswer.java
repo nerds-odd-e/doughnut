@@ -25,6 +25,10 @@ public class MCQWithAnswer {
   @JsonProperty
   private boolean approved;
 
+  @JsonPropertyDescription("id")
+  @JsonProperty
+  private Integer id;
+
   public static Optional<MCQWithAnswer> getRefineQuestion(JsonNode jsonNode) {
     try {
       return Optional.of(new ObjectMapper().treeToValue(jsonNode, MCQWithAnswer.class));

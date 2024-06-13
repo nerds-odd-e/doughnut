@@ -31,7 +31,8 @@
             <input
               :id="'checkbox-' + question.multipleChoicesQuestion.stem"
               type="checkbox"
-              :checked="question.approved"
+              v-model="question.approved"
+              @change="approveQuestion(question.id)"
             />
           </td>
           <td>{{ question.multipleChoicesQuestion.stem }}</td>
@@ -86,6 +87,11 @@ export default defineComponent({
         return;
       }
       this.questions.push(newQuestion);
+    },
+    async approveQuestion(questionId?: number) {
+      if (questionId) {
+        this.managedApi.restQuizQuestionController.approveQuestion(questionId);
+      }
     },
   },
   mounted() {
