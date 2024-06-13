@@ -7,9 +7,6 @@ Feature: Ask AI to refine the question
     And OpenAI now generates refine question:
       | Stem         | Choice 0 | Choice 1 | Correct Choice Index |
       | Vietnam food | Com Tam  | Hambuger | 0                    |
-      | Vietnam food |          |          | 1                    |
-      |              | Pho      | Pizza    | 0                    |
-      | Vietnam food |          |          |                      |
     And I have a note with the topic "Countries"
     And I want to create a question for the note "Countries"
 

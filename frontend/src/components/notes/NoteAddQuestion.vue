@@ -143,7 +143,7 @@ export default defineComponent({
           this.note.id,
           quizQuestion,
         );
-      this.$emit("close-dialog", response);
+      this.mcqWithAnswer = response;
     },
     async generateQuestionByAI() {
       const response =
