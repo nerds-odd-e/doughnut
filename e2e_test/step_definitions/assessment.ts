@@ -34,6 +34,10 @@ Given("I fill {string} to the Stem of the question", (stem: string) => {
   start.assumeNotePage().injectDataToQuestion("Stem", stem)
 })
 
+Given("OpenAI now generates refine question:", (questionTable: DataTable) => {
+  start.questionGenerationService().resetAndStubAskingMCQ(questionTable.hashes()[0])
+})
+
 Given("I fill {string} to the Choice 0 of the question", (choice: string) => {
   start.assumeNotePage().injectDataToQuestion("Choice 0", choice)
 })
