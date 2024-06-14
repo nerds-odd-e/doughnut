@@ -53,10 +53,6 @@ public class QuizQuestionService {
     return note.getQuizQuestions().stream().findFirst().orElse(null);
   }
 
-  List<QuizQuestion> selectQuizQuestionsForANote(Note note) {
-    return note.getQuizQuestions();
-  }
-
   public QuizQuestion addQuestion(Note note, MCQWithAnswer mcqWithAnswer) {
     QuizQuestion quizQuestion = QuizQuestion.fromMCQWithAnswer(mcqWithAnswer, note);
     modelFactoryService.save(quizQuestion);
