@@ -257,5 +257,10 @@ export const assumeNotePage = (noteTopic?: string) => {
     verifyRefineQuestionField(field: string) {
       cy.findByLabelText(field).invoke("val").should("not.eq", "")
     },
+    clearQuestion() {
+      cy.findByLabelText("Stem").clear()
+      cy.findByLabelText("Choice 0").clear()
+      cy.findByLabelText("Choice 1").clear()
+    },
   }
 }

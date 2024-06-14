@@ -12,6 +12,7 @@ Feature: Ask AI to refine the question
     And I want to create a question for the note "Countries"
 
   Scenario: Cannot refine the question without any information
+    Given Empty question
     Then The "Refine" button should be disabled
 
   Scenario Outline: Can refine the question with filled data
