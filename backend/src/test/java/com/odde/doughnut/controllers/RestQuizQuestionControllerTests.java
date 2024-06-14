@@ -513,11 +513,9 @@ class RestQuizQuestionControllerTests {
     void refineQuestionFailedWithGpt35WillNotTryAgain() throws JsonProcessingException {
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
       Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
+
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCallJsonNode(
-          new ObjectMapper()
-              .readTree(
-                  "{\"multipleChoicesQuestion\":{\"stem\":null,\"choices\":null},\"correctChoiceIndex\":0,\"approve\":false}"),
-          "");
+          new ObjectMapper().readTree(""), "");
       assertThrows(RuntimeException.class, () -> controller.refineQuestion(note, mcqWithAnswer));
       verify(openAiApi, Mockito.times(1)).createChatCompletion(any());
     }
