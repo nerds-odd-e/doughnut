@@ -59,9 +59,13 @@ public class QuizQuestionService {
   }
 
   public QuizQuestion refineQuestion(Note note, MCQWithAnswer mcqWithAnswer) {
-    AiQuestionFactory aiQuestionFactory = new AiQuestionFactory(note, aiQuestionGenerator);
     try {
-      return aiQuestionFactory.refineQuestion(mcqWithAnswer);
+      MCQWithAnswer MCQWithAnswer =
+          aiQuestionGenerator.getAiGeneratedRefineQuestion(note, mcqWithAnswer);
+      if (MCQWithAnswer == null) {
+        throw new QuizQuestionNotPossibleException();
+      }
+      return QuizQuestion.fromMCQWithAnswer(MCQWithAnswer, note);
     } catch (QuizQuestionNotPossibleException e) {
       throw (new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated"));
     }
