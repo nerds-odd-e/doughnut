@@ -93,7 +93,7 @@ export default defineComponent({
     isUserDidInputQuestion() {
       return (
         this.mcqWithAnswer.multipleChoicesQuestion.stem &&
-        this.mcqWithAnswer.multipleChoicesQuestion.stem.trim.length > 0
+        this.mcqWithAnswer.multipleChoicesQuestion.stem.trim().length > 0
       );
     },
     isUserDidInputChoices() {
