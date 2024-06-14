@@ -257,12 +257,5 @@ export const assumeNotePage = (noteTopic?: string) => {
     verifyRefineQuestionField(field: string) {
       cy.findByLabelText(field).invoke("val").should("not.eq", "")
     },
-    verifyCorrectIndex(index: string) {
-      if (index) {
-        cy.findByLabelText("Correct Choice Index").invoke("val").should("eq", index)
-      } else {
-        cy.findByLabelText("Correct Choice Index").invoke("val").should("not.eq", "")
-      }
-    },
   }
 }
