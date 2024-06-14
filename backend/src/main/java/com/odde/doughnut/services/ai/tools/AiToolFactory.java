@@ -66,8 +66,7 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
       2. Only the top-level of the context path is visible to the user.
       3. Provide 2 to 4 choices with only 1 correct answer.
       4. Vary the lengths of the choice texts so that the correct answer isn't consistently the longest.
-      5. If there's insufficient information in the note to create a question, keep the existing question as it is.
-      6. Provide a better question based on my question and the note. Please correct any grammar.
+      5. Provide a better question based on my question and the note. Please correct any grammar.
 
       Note: The specific note of focus and its more detailed contexts are not known. Focus on memory reinforcement and recall across various subjects.
 %s
