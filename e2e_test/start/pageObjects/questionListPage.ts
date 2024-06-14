@@ -25,13 +25,26 @@ export const questionListPage = () => {
         cy.findByText(question).parent("tr").find('input[type="checkbox"]').should("not.be.checked")
       }
     },
-    fillQuestion(row: Record<string, string>) {
+    fillQuestion(
+      question: string,
+      correctChoice: string,
+      incorrectChoice1: string,
+      incorrectChoice2: string,
+    ) {
       cy.findByRole("button", { name: "Add Question" }).click()
-      cy.findByLabelText("Stem").type(row["Question"]!)
-      cy.findByLabelText("Choice 0").type(row["Incorrect Choice 1"]!)
-      cy.findByLabelText("Choice 1").type(row["Incorrect Choice 2"]!)
+      if (question) {
+        cy.findByLabelText("Stem").type(question)
+      }
+      if (incorrectChoice1) {
+        cy.findByLabelText("Choice 0").type(incorrectChoice1)
+      }
+      if (incorrectChoice2) {
+        cy.findByLabelText("Choice 1").type(incorrectChoice2)
+      }
       cy.findByRole("button", { name: "+" }).click()
-      cy.findByLabelText("Choice 2").type(row["Correct Choice"]!)
+      if (correctChoice) {
+        cy.findByLabelText("Choice 2").type(correctChoice)
+      }
       cy.findByLabelText("Correct Choice Index").clear().type("2")
     },
   }

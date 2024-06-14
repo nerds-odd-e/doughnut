@@ -169,8 +169,18 @@ export const assumeNotePage = (noteTopic?: string) => {
     addQuestion(row: Record<string, string>) {
       this.openQuestionList().addQuestion(row)
     },
-    fillQuestion(row: Record<string, string>) {
-      this.openQuestionList().fillQuestion(row)
+    fillQuestion(
+      question: string,
+      correctChoice: string,
+      incorrectChoice1: string,
+      incorrectChoice2: string,
+    ) {
+      this.openQuestionList().fillQuestion(
+        question,
+        correctChoice,
+        incorrectChoice1,
+        incorrectChoice2,
+      )
     },
     changeApprovalStatus(question: string, approval: string) {
       this.openQuestionList()

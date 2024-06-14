@@ -58,10 +58,17 @@ Given(
 )
 
 When(
-  "I fill question the following question for the note {string}:",
-  (noteTopic: string, data: DataTable) => {
-    expect(data.hashes().length, "please fill one question at a time.").to.equal(1)
-    start.jumpToNotePage(noteTopic).fillQuestion(data.hashes()[0]!)
+  "I fill {string} and {string} and {string} and {string} the following question for the note {string}:",
+  (
+    question: string,
+    correctChoice: string,
+    incorrectChoice1: string,
+    incorrectChoice2: string,
+    noteTopic: string,
+  ) => {
+    start
+      .jumpToNotePage(noteTopic)
+      .fillQuestion(question, correctChoice, incorrectChoice1, incorrectChoice2, noteTopic)
   },
 )
 
