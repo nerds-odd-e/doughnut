@@ -414,16 +414,9 @@ When(
 )
 
 Given(
-  "I approve question {string} of topic {string}:",
-  (quizQuestion: string, noteTopic: string) => {
-    start.jumpToNotePage(noteTopic).approveQuiz(quizQuestion)
-  },
-)
-
-Given(
-  "I unapprove question {string} of topic {string}:",
-  (quizQuestion: string, noteTopic: string) => {
-    start.jumpToNotePage(noteTopic).unApproveQuiz(quizQuestion)
+  "I change approval status of the question {string} of the topic {string} to {string}:",
+  (quizQuestion: string, noteTopic: string, approval: string) => {
+    start.jumpToNotePage(noteTopic).changeApprovalStatus(quizQuestion, approval)
   },
 )
 

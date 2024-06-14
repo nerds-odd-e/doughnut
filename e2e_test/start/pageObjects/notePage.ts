@@ -172,13 +172,13 @@ export const assumeNotePage = (noteTopic?: string) => {
     fillQuestion(row: Record<string, string>) {
       this.openQuestionList().fillQuestion(row)
     },
-    approveQuiz(question: string) {
+    changeApprovalStatus(question: string, approval: string) {
       this.openQuestionList()
-      cy.findByText(question).parent("tr").find('input[type="checkbox"]').check()
-    },
-    unApproveQuiz(question: string) {
-      this.openQuestionList()
-      cy.findByText(question).parent("tr").find('input[type="checkbox"]').uncheck()
+      if (approval == "approve") {
+        cy.findByText(question).parent("tr").find('input[type="checkbox"]').check()
+      } else {
+        cy.findByText(question).parent("tr").find('input[type="checkbox"]').uncheck()
+      }
     },
     expectQuestionsInList(expectedQuestions: Record<string, string>[]) {
       this.openQuestionList().expectQuestion(expectedQuestions)
