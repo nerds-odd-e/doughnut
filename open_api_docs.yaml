@@ -878,7 +878,7 @@ paths:
     post:
       tags:
       - rest-quiz-question-controller
-      operationId: generateQuestionForAssessmentWithoutSave
+      operationId: generateAIQuestionWithoutSave
       parameters:
       - name: note
         in: query

@@ -302,14 +302,14 @@ class RestQuizQuestionControllerTests {
                     makeMe.modelFactoryService,
                     makeMe.aNullUserModelPlease(),
                     testabilitySettings);
-            restAiController.generateQuestionForAssessmentWithoutSave(note);
+            restAiController.generateAIQuestionWithoutSave(note);
           });
     }
 
     @Test
     void generateQuestionForAssessmentOfNote() {
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(jsonQuestion, "");
-      QuizQuestionDTO quizQuestionDTO = controller.generateQuestionForAssessmentWithoutSave(note);
+      QuizQuestionDTO quizQuestionDTO = controller.generateAIQuestionWithoutSave(note);
 
       Assertions.assertThat(quizQuestionDTO.getMultipleChoicesQuestion().getStem())
           .contains("What is the first color in the rainbow?");

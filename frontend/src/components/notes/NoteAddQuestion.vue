@@ -147,7 +147,7 @@ export default defineComponent({
     },
     async generateQuestionByAI() {
       const response =
-        await this.managedApi.restQuizQuestionController.generateQuestionForAssessmentWithoutSave(
+        await this.managedApi.restQuizQuestionController.generateAiQuestionWithoutSave(
           this.note.id,
         );
       this.mcqWithAnswer.multipleChoicesQuestion.stem =

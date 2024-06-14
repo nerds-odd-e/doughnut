@@ -58,7 +58,7 @@ class RestQuizQuestionController {
   }
 
   @PostMapping("/generate-question-without-save")
-  public QuizQuestionDTO generateQuestionForAssessmentWithoutSave(
+  public QuizQuestionDTO generateAIQuestionWithoutSave(
       @RequestParam(value = "note") @Schema(type = "integer") Note note) {
     currentUser.assertLoggedIn();
     return quizQuestionService.generateAIQuestionWithoutSave(note);

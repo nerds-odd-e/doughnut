@@ -206,7 +206,7 @@ export class RestQuizQuestionControllerService {
      * @returns QuizQuestionDTO OK
      * @throws ApiError
      */
-    public generateQuestionForAssessmentWithoutSave(
+    public generateAiQuestionWithoutSave(
         note: number,
     ): CancelablePromise<QuizQuestionDTO> {
         return this.httpRequest.request({
