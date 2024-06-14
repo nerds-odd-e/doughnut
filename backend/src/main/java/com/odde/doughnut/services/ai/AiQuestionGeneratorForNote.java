@@ -43,7 +43,14 @@ public record AiQuestionGeneratorForNote(
   public Optional<MCQWithAnswer> refineQuestion(MCQWithAnswer question) {
     AiToolList questionEvaluationAiTool = AiToolFactory.questionRefineAiTool(question);
     return requestAndGetFunctionCallArguments(questionEvaluationAiTool)
-        .flatMap(MCQWithAnswer::getRefineQuestion);
+        .flatMap(
+            jsonNode -> {
+              try {
+                return Optional.of(new ObjectMapper().treeToValue(jsonNode, MCQWithAnswer.class));
+              } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+              }
+            });
   }
 
   private Optional<JsonNode> requestAndGetFunctionCallArguments(AiToolList tool) {
