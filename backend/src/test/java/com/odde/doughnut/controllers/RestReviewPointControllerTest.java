@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -84,7 +85,9 @@ class RestReviewPointControllerTest {
               this.adjustment = 1;
             }
           };
-      assertThat(controller.selfEvaluate(reviewPoint, selfEvaluation), nullValue());
+      assertThrows(
+          ResponseStatusException.class,
+          () -> controller.selfEvaluate(reviewPoint, selfEvaluation));
     }
 
     @Test
@@ -95,7 +98,8 @@ class RestReviewPointControllerTest {
               this.adjustment = 1;
             }
           };
-      assertThat(controller.selfEvaluate(null, selfEvaluation), nullValue());
+      assertThrows(
+          ResponseStatusException.class, () -> controller.selfEvaluate(null, selfEvaluation));
     }
 
     @Nested

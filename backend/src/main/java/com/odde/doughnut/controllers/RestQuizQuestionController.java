@@ -1,6 +1,5 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.configs.NullToNotFound;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.QuestionSuggestionCreationParams;
 import com.odde.doughnut.controllers.dto.QuizQuestionContestResult;
@@ -51,24 +50,21 @@ class RestQuizQuestionController {
 
   @PostMapping("/generate-question")
   @Transactional
-  @NullToNotFound(message = "No question generated")
   public QuizQuestion generateQuestion(
       @RequestParam(value = "note") @Schema(type = "integer") Note note) {
     currentUser.assertLoggedIn();
-    return quizQuestionService.generateQuestionForNote(note);
+    return generateQuestionForNote(note);
   }
 
   @PostMapping("/{quizQuestion}/regenerate")
   @Transactional
-  @NullToNotFound(message = "No question generated")
   public QuizQuestion regenerate(
       @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion) {
     currentUser.assertLoggedIn();
-    return quizQuestionService.generateQuestionForNote(quizQuestion.getNote());
+    return generateQuestionForNote(quizQuestion.getNote());
   }
 
   @PostMapping("/generate-question-without-save")
-  @NullToNotFound(message = "No question generated")
   public MCQWithAnswer generateAIQuestionWithoutSave(
       @RequestParam(value = "note") @Schema(type = "integer") Note note) {
     currentUser.assertLoggedIn();
@@ -133,7 +129,6 @@ class RestQuizQuestionController {
 
   @PostMapping("/{note}/refine-question")
   @Transactional
-  @NullToNotFound(message = "No question generated")
   public MCQWithAnswer refineQuestion(
       @PathVariable("note") @Schema(type = "integer") Note note,
       @RequestBody MCQWithAnswer manualQuestion)
@@ -149,5 +144,11 @@ class RestQuizQuestionController {
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(quizQuestion.getNote());
     return quizQuestionService.approveQuestion(quizQuestion);
+  }
+
+  private QuizQuestion generateQuestionForNote(Note note) {
+    MCQWithAnswer MCQWithAnswer = quizQuestionService.generateMcqWithAnswer(note);
+    QuizQuestion quizQuestion = QuizQuestion.fromMCQWithAnswer(MCQWithAnswer, note);
+    return modelFactoryService.save(quizQuestion);
   }
 }

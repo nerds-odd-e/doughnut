@@ -1,6 +1,5 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.configs.NullToNotFound;
 import com.odde.doughnut.controllers.dto.SelfEvaluation;
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
@@ -16,8 +15,10 @@ import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/review-points")
@@ -76,12 +77,11 @@ class RestReviewPointController {
 
   @PostMapping(path = "/{reviewPoint}/self-evaluate")
   @Transactional
-  @NullToNotFound(message = "The review point does not exist.")
   public ReviewPoint selfEvaluate(
       @PathVariable("reviewPoint") @Schema(type = "integer") ReviewPoint reviewPoint,
       @RequestBody SelfEvaluation selfEvaluation) {
     if (reviewPoint == null || reviewPoint.getId() == null) {
-      return null;
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The review point does not exist.");
     }
     currentUser.assertLoggedIn();
     modelFactoryService

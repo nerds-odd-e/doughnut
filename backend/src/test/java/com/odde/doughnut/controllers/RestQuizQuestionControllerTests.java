@@ -275,7 +275,7 @@ class RestQuizQuestionControllerTests {
     void createQuizQuestionFailedWithGpt35WillNotTryAgain() throws JsonProcessingException {
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCallJsonNode(
           new ObjectMapper().readTree("{\"stem\": \"\"}"), "");
-      assertThat(controller.generateQuestion(note), nullValue());
+      assertThrows(ResponseStatusException.class, () -> controller.generateQuestion(note));
       verify(openAiApi, Mockito.times(1)).createChatCompletion(any());
     }
 
@@ -503,6 +503,7 @@ class RestQuizQuestionControllerTests {
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(mcqWithAnswer, "");
       MCQWithAnswer result = controller.refineQuestion(note, mcqWithAnswer);
+
       assertEquals(0, result.getCorrectChoiceIndex());
       assertEquals("a default question stem", result.getMultipleChoicesQuestion().getStem());
       assertEquals(
