@@ -19,10 +19,8 @@ import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/quiz-questions")
@@ -70,7 +68,7 @@ class RestQuizQuestionController {
   public MCQWithAnswer generateAIQuestionWithoutSave(
       @RequestParam(value = "note") @Schema(type = "integer") Note note) {
     currentUser.assertLoggedIn();
-    return generateMcqWithAnswer(note);
+    return quizQuestionService.generateMcqWithAnswer(note);
   }
 
   @PostMapping("/{quizQuestion}/contest")
@@ -133,10 +131,10 @@ class RestQuizQuestionController {
   @Transactional
   public MCQWithAnswer refineQuestion(
       @PathVariable("note") @Schema(type = "integer") Note note,
-      @Valid @RequestBody MCQWithAnswer manualQuestion)
+      @RequestBody MCQWithAnswer manualQuestion)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
-    return quizQuestionService.refineQuestion(note, manualQuestion).getMcqWithAnswer();
+    return quizQuestionService.refineQuestion(note, manualQuestion);
   }
 
   @PostMapping("/{quizQuestion}/approve")
@@ -149,16 +147,8 @@ class RestQuizQuestionController {
   }
 
   private QuizQuestion generateQuestionForNote(Note note) {
-    MCQWithAnswer MCQWithAnswer = generateMcqWithAnswer(note);
+    MCQWithAnswer MCQWithAnswer = quizQuestionService.generateMcqWithAnswer(note);
     QuizQuestion quizQuestion = QuizQuestion.fromMCQWithAnswer(MCQWithAnswer, note);
     return modelFactoryService.save(quizQuestion);
-  }
-
-  private MCQWithAnswer generateMcqWithAnswer(Note note) {
-    MCQWithAnswer MCQWithAnswer = aiQuestionGenerator.getAiGeneratedQuestion(note);
-    if (MCQWithAnswer == null) {
-      throw (new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated"));
-    }
-    return MCQWithAnswer;
   }
 }
