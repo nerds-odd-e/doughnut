@@ -524,29 +524,32 @@ class RestQuizQuestionControllerTests {
 
   @Nested
   class ApproveQuestion {
-    Note noteWithoutQuestions;
+    Note subjectNote;
 
     @BeforeEach
     void setUp() {
-      Note headNote = makeMe.aHeadNote("My reading list").creatorAndOwner(currentUser).please();
-      makeMe.theNote(headNote).withNChildren(10).please();
-      noteWithoutQuestions =
-          makeMe.aNote("Zen and the Art of Motorcycle Maintenance").under(headNote).please();
+      subjectNote = makeMe.aNote().creatorAndOwner(currentUser).please();
     }
 
     @Test
-    void approveQuestion() {
-      QuizQuestion quizQuestion =
-          makeMe.aQuestion().spellingQuestionOfNote(noteWithoutQuestions).please();
+    void mustNotBeAbleToApproveOtherPeoplesNoteQuestion() {
+      Note note = makeMe.aNote().creatorAndOwner(makeMe.aUser().please()).please();
+      QuizQuestion quizQuestion = makeMe.aQuestion().spellingQuestionOfNote(note).please();
+      assertThrows(
+          UnexpectedNoAccessRightException.class, () -> controller.approveQuestion(quizQuestion));
+    }
+
+    @Test
+    void approveQuestion() throws UnexpectedNoAccessRightException {
+      QuizQuestion quizQuestion = makeMe.aQuestion().spellingQuestionOfNote(subjectNote).please();
       quizQuestion.setApproved(false);
       QuizQuestion approvedQuestion = controller.approveQuestion(quizQuestion);
       assertTrue(approvedQuestion.isApproved());
     }
 
     @Test
-    void unApproveQuestion() {
-      QuizQuestion quizQuestion =
-          makeMe.aQuestion().spellingQuestionOfNote(noteWithoutQuestions).please();
+    void unApproveQuestion() throws UnexpectedNoAccessRightException {
+      QuizQuestion quizQuestion = makeMe.aQuestion().spellingQuestionOfNote(subjectNote).please();
       quizQuestion.setApproved(true);
       QuizQuestion approvedQuestion = controller.approveQuestion(quizQuestion);
       assertFalse(approvedQuestion.isApproved());

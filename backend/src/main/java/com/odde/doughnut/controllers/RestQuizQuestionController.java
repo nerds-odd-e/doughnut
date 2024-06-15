@@ -142,16 +142,16 @@ class RestQuizQuestionController {
   @PostMapping("/{quizQuestion}/approve")
   @Transactional
   public QuizQuestion approveQuestion(
-      @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion) {
-    currentUser.assertLoggedIn();
+      @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertAuthorization(quizQuestion.getNote());
     return quizQuestionService.approveQuestion(quizQuestion);
   }
 
   private QuizQuestion generateQuestionForNote(Note note) {
     MCQWithAnswer MCQWithAnswer = generateMcqWithAnswer(note);
     QuizQuestion quizQuestion = QuizQuestion.fromMCQWithAnswer(MCQWithAnswer, note);
-    modelFactoryService.save(quizQuestion);
-    return quizQuestion;
+    return modelFactoryService.save(quizQuestion);
   }
 
   private MCQWithAnswer generateMcqWithAnswer(Note note) {
