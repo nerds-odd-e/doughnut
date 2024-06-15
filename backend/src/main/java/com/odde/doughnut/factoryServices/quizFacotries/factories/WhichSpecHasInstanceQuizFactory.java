@@ -10,7 +10,7 @@ public class WhichSpecHasInstanceQuizFactory extends QuestionOptionsFactory {
   private List<Note> cachedFillingOptions = null;
   private final LinkingNote link;
 
-  public WhichSpecHasInstanceQuizFactory(LinkingNote note) {
+  public WhichSpecHasInstanceQuizFactory(LinkingNote note, QuizQuestionServant servant) {
     super(note);
     this.link = note;
   }

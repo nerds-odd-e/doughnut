@@ -3,11 +3,12 @@ package com.odde.doughnut.factoryServices.quizFacotries.factories;
 import com.odde.doughnut.algorithms.ClozedString;
 import com.odde.doughnut.entities.LinkingNote;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
+import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 
 public class DescriptionLinkTargetQuizFactory extends LinkTargetQuizFactory {
 
-  public DescriptionLinkTargetQuizFactory(LinkingNote note) {
-    super(note);
+  public DescriptionLinkTargetQuizFactory(LinkingNote note, QuizQuestionServant servant) {
+    super(note, servant);
   }
 
   @Override

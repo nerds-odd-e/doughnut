@@ -132,7 +132,7 @@ class WhichSpecHasInstanceQuizFactoryTest {
 
   private QuizQuestion buildQuestion() {
     return makeMe.buildAQuestion(
-        new WhichSpecHasInstanceQuizFactory((LinkingNote) this.reviewPoint.getNote()),
+        new WhichSpecHasInstanceQuizFactory((LinkingNote) this.reviewPoint.getNote(), null),
         this.reviewPoint);
   }
 }

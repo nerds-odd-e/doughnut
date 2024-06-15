@@ -10,7 +10,7 @@ public class FromDifferentPartAsQuizFactory extends QuestionOptionsFactory {
   private LinkingNote parentGrandLink;
   private final LinkingNote link;
 
-  public FromDifferentPartAsQuizFactory(LinkingNote note) {
+  public FromDifferentPartAsQuizFactory(LinkingNote note, QuizQuestionServant servant) {
     super(note);
     link = note;
   }

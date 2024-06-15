@@ -87,7 +87,7 @@ class DescriptionLinkTargetQuizFactoryTest {
               .anAnswerViewedByUser()
               .validQuestionOfType(
                   reviewPoint,
-                  new DescriptionLinkTargetQuizFactory((LinkingNote) reviewPoint.getNote()))
+                  new DescriptionLinkTargetQuizFactory((LinkingNote) reviewPoint.getNote(), null))
               .choiceIndex(1)
               .inMemoryPlease();
       assertTrue(answerResult.correct);
@@ -95,8 +95,8 @@ class DescriptionLinkTargetQuizFactoryTest {
   }
 
   private QuizQuestion buildQuestion() {
-    LinkingNote note1 = (LinkingNote) reviewPoint.getNote();
-    QuizQuestionFactory quizQuestionFactory = new DescriptionLinkTargetQuizFactory(note1);
+    LinkingNote note = (LinkingNote) reviewPoint.getNote();
+    QuizQuestionFactory quizQuestionFactory = new DescriptionLinkTargetQuizFactory(note, null);
     return makeMe.buildAQuestion(quizQuestionFactory, reviewPoint);
   }
 }

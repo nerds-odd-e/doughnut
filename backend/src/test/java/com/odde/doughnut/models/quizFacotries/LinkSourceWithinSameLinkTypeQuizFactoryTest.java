@@ -78,7 +78,7 @@ class LinkSourceWithinSameLinkTypeQuizFactoryTest {
 
   private QuizQuestion buildLinkTargetQuizQuestion() {
     return makeMe.buildAQuestion(
-        new LinkSourceWithinSameLinkTypeQuizFactory((LinkingNote) reviewPoint.getNote()),
+        new LinkSourceWithinSameLinkTypeQuizFactory((LinkingNote) reviewPoint.getNote(), null),
         reviewPoint);
   }
 }

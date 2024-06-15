@@ -10,7 +10,7 @@ public class LinkTargetQuizFactory extends QuestionOptionsFactory {
   protected final Note answerNote;
   private List<Note> cachedFillingOptions = null;
 
-  public LinkTargetQuizFactory(LinkingNote note) {
+  public LinkTargetQuizFactory(LinkingNote note, QuizQuestionServant servant) {
     super(note);
     this.link = note;
     this.answerNote = link.getTargetNote();

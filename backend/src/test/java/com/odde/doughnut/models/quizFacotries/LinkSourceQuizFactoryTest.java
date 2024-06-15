@@ -68,6 +68,6 @@ class LinkSourceQuizFactoryTest {
 
   private QuizQuestion buildLinkSourceQuizQuestion() {
     return makeMe.buildAQuestion(
-        new LinkSourceQuizFactory((LinkingNote) reviewPoint.getNote()), reviewPoint);
+        new LinkSourceQuizFactory((LinkingNote) reviewPoint.getNote(), null), reviewPoint);
   }
 }

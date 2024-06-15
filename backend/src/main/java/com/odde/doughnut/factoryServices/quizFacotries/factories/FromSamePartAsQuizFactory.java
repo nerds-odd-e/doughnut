@@ -11,7 +11,7 @@ public class FromSamePartAsQuizFactory extends QuestionOptionsFactory {
   private List<Note> cachedFillingOptions = null;
   private final LinkingNote link;
 
-  public FromSamePartAsQuizFactory(LinkingNote note) {
+  public FromSamePartAsQuizFactory(LinkingNote note, QuizQuestionServant servant) {
     super(note);
     link = note;
   }

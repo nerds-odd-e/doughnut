@@ -9,7 +9,7 @@ public class LinkSourceWithinSameLinkTypeQuizFactory extends QuestionOptionsFact
   protected final LinkingNote link;
   private List<LinkingNote> cachedFillingOptions = null;
 
-  public LinkSourceWithinSameLinkTypeQuizFactory(LinkingNote note) {
+  public LinkSourceWithinSameLinkTypeQuizFactory(LinkingNote note, QuizQuestionServant servant) {
     super(note);
     this.link = note;
   }

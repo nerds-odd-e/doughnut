@@ -173,7 +173,7 @@ class FromDifferentPartAsQuizFactoryTest {
           @BeforeEach
           void setup() {
             quizQuestionFactory =
-                new FromDifferentPartAsQuizFactory((LinkingNote) uglySubjectiveRp.getNote());
+                new FromDifferentPartAsQuizFactory((LinkingNote) uglySubjectiveRp.getNote(), null);
           }
 
           @Test
@@ -204,7 +204,7 @@ class FromDifferentPartAsQuizFactoryTest {
 
   private QuizQuestion buildQuestion() {
     QuizQuestionFactory quizQuestionFactory =
-        new FromDifferentPartAsQuizFactory((LinkingNote) uglySubjectiveRp.getNote());
+        new FromDifferentPartAsQuizFactory((LinkingNote) uglySubjectiveRp.getNote(), null);
     return makeMe.buildAQuestion(quizQuestionFactory, uglySubjectiveRp);
   }
 }

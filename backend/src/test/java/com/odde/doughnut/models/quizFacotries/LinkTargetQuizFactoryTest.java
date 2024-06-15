@@ -67,6 +67,6 @@ class LinkTargetQuizFactoryTest {
 
   private QuizQuestion buildLinkTargetQuizQuestion() {
     return makeMe.buildAQuestion(
-        new LinkTargetQuizFactory((LinkingNote) reviewPoint.getNote()), reviewPoint);
+        new LinkTargetQuizFactory((LinkingNote) reviewPoint.getNote(), null), reviewPoint);
   }
 }

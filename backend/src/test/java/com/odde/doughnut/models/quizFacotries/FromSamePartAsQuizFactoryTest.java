@@ -111,6 +111,6 @@ class FromSamePartAsQuizFactoryTest {
 
   private QuizQuestion buildQuestion() {
     return makeMe.buildAQuestion(
-        new FromSamePartAsQuizFactory((LinkingNote) reviewPoint.getNote()), reviewPoint);
+        new FromSamePartAsQuizFactory((LinkingNote) reviewPoint.getNote(), null), reviewPoint);
   }
 }

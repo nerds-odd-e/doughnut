@@ -54,6 +54,6 @@ class ClozeLinkTargetQuizFactoryTest {
 
   private QuizQuestion buildQuestion() {
     return makeMe.buildAQuestion(
-        new ClozeLinkTargetQuizFactory((LinkingNote) reviewPoint.getNote()), reviewPoint);
+        new ClozeLinkTargetQuizFactory((LinkingNote) reviewPoint.getNote(), null), reviewPoint);
   }
 }
