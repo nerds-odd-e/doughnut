@@ -82,6 +82,6 @@ class AIGeneratedQuizFactoryTest {
   }
 
   private QuizQuestion buildQuestion() {
-    return questionBuilder().ViewedByUserPlease();
+    return questionBuilder().inMemoryPlease();
   }
 }

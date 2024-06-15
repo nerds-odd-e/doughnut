@@ -109,7 +109,7 @@ public class MakeMe extends MakeMeWithoutDB {
   }
 
   public QuizQuestion buildAQuestion(QuizQuestionFactory factory) {
-    return aQuestion().buildValid(factory).ViewedByUserPlease();
+    return aQuestion().buildValid(factory).inMemoryPlease();
   }
 
   public QuizQuestion buildAQuestionForLinkingNote(
@@ -118,7 +118,7 @@ public class MakeMe extends MakeMeWithoutDB {
         new QuizQuestionServant(user, new NonRandomizer(), modelFactoryService);
     return aQuestion()
         .buildValid(linkQuestionType.factoryForLinkingNote.apply(linkingNote, servant))
-        .ViewedByUserPlease();
+        .inMemoryPlease();
   }
 
   public FailureReportBuilder aFailureReport() {

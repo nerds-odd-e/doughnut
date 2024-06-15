@@ -26,12 +26,6 @@ public class QuizQuestionBuilder extends EntityBuilder<QuizQuestion> {
   @Override
   protected void beforeCreate(boolean needPersist) {}
 
-  public QuizQuestion ViewedByUserPlease() {
-    QuizQuestion quizQuestion = inMemoryPlease();
-    if (quizQuestion == null) return null;
-    return quizQuestion;
-  }
-
   public QuizQuestionBuilder spellingQuestionOfNote(Note note) {
     return spellingQuestionOfReviewPoint(note);
   }
