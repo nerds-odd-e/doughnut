@@ -9,9 +9,9 @@
     />
     <TextInput
       scope-name="notebook"
-      field="numberOfQuestions"
-      v-model="formData.numberOfQuestions"
-      :errors="errors.numberOfQuestions"
+      field="numberOfQuestionsInAssessment"
+      v-model="formData.numberOfQuestionsInAssessment"
+      :errors="errors.numberOfQuestionsInAssessment"
     />
     <input type="submit" value="Update" class="btn btn-primary" />
   </form>
@@ -29,9 +29,9 @@ export default {
   props: { notebook: Object },
   components: { CheckInput, TextInput },
   data() {
-    const { skipReviewEntirely, numberOfQuestions } = this.notebook;
+    const { skipReviewEntirely, numberOfQuestionsInAssessment } = this.notebook;
     return {
-      formData: { skipReviewEntirely, numberOfQuestions },
+      formData: { skipReviewEntirely, numberOfQuestionsInAssessment },
       errors: {},
     };
   },

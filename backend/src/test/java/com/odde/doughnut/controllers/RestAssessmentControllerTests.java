@@ -72,7 +72,7 @@ public class RestAssessmentControllerTests {
           .theNote(noteOwnedByOtherUser)
           .withNChildrenThat(6, NoteBuilder::hasAnApprovedQuestion)
           .please();
-      noteOwnedByOtherUser.getNotebook().setNumberOfQuestions(5);
+      noteOwnedByOtherUser.getNotebook().setNumberOfQuestionsInAssessment(5);
       BazaarNotebook bazaarNotebook =
           makeMe.aBazaarNotebook(noteOwnedByOtherUser.getNotebook()).please();
       List<QuizQuestion> assessment =
@@ -84,7 +84,7 @@ public class RestAssessmentControllerTests {
     void shouldReturn5QuestionsWhenThereAreMoreThan5NotesWithQuestions()
         throws UnexpectedNoAccessRightException {
       makeMe.theNote(topNote).withNChildrenThat(5, NoteBuilder::hasAnApprovedQuestion).please();
-      notebook.setNumberOfQuestions(5);
+      notebook.setNumberOfQuestionsInAssessment(5);
       List<QuizQuestion> assessment = controller.generateAssessmentQuestions(notebook);
       assertEquals(5, assessment.size());
     }

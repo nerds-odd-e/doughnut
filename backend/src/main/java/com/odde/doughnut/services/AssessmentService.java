@@ -26,7 +26,7 @@ public class AssessmentService {
             .filter(QuizQuestion::isApproved)
             .toList();
 
-    Integer numberOfQuestion = notebook.getNumberOfQuestions();
+    Integer numberOfQuestion = notebook.getNumberOfQuestionsInAssessment();
     if (numberOfQuestion == null || numberOfQuestion == 0) {
       throw new ApiException(
           "The assessment is not available",

@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { Notebook } from '../models/Notebook';
-import type { NotebookDTO } from '../models/NotebookDTO';
+import type { NotebookSettings } from '../models/NotebookSettings';
 import type { NotebooksViewedByUser } from '../models/NotebooksViewedByUser';
 import type { NoteCreationDTO } from '../models/NoteCreationDTO';
 import type { RedirectToNoteResponse } from '../models/RedirectToNoteResponse';
@@ -19,7 +19,7 @@ export class RestNotebookControllerService {
      */
     public update1(
         notebook: number,
-        requestBody: NotebookDTO,
+        requestBody: NotebookSettings,
     ): CancelablePromise<Notebook> {
         return this.httpRequest.request({
             method: 'POST',

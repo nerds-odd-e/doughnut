@@ -8,6 +8,6 @@ export type Notebook = {
     headNoteId: number;
     headNote: Note;
     skipReviewEntirely?: boolean;
-    numberOfQuestions?: number;
+    numberOfQuestionsInAssessment?: number;
 };
 

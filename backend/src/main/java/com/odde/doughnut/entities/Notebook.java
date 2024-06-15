@@ -2,7 +2,7 @@ package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.odde.doughnut.controllers.dto.NotebookDTO;
+import com.odde.doughnut.controllers.dto.NotebookSettings;
 import jakarta.persistence.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -51,7 +51,7 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @Column(name = "number_of_questions")
   @Getter
   @Setter
-  Integer numberOfQuestions;
+  Integer numberOfQuestionsInAssessment;
 
   @Column(name = "deleted_at")
   @Setter
@@ -63,9 +63,9 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   private List<Subscription> subscriptions;
 
   @JsonIgnore
-  public void setFromDTO(NotebookDTO notebookDTO) {
-    setSkipReviewEntirely(notebookDTO.getSkipReviewEntirely());
-    setNumberOfQuestions(notebookDTO.getNumberOfQuestions());
+  public void setFromDTO(NotebookSettings notebookSettings) {
+    setSkipReviewEntirely(notebookSettings.getSkipReviewEntirely());
+    setNumberOfQuestionsInAssessment(notebookSettings.getNumberOfQuestionsInAssessment());
   }
 
   @NonNull

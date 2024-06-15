@@ -1146,7 +1146,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/NotebookDTO"
+              $ref: "#/components/schemas/NotebookSettings"
         required: true
       responses:
         "500":
@@ -2660,7 +2660,7 @@ components:
           $ref: "#/components/schemas/Note"
         skipReviewEntirely:
           type: boolean
-        numberOfQuestions:
+        numberOfQuestionsInAssessment:
           type: integer
           format: int32
     Subscription:
@@ -2921,12 +2921,12 @@ components:
       properties:
         srt:
           type: string
-    NotebookDTO:
+    NotebookSettings:
       type: object
       properties:
         skipReviewEntirely:
           type: boolean
-        numberOfQuestions:
+        numberOfQuestionsInAssessment:
           type: integer
           format: int32
     LinkCreation:

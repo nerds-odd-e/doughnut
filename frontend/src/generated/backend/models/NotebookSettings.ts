@@ -2,8 +2,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type NotebookDTO = {
+export type NotebookSettings = {
     skipReviewEntirely?: boolean;
-    numberOfQuestions?: number;
+    numberOfQuestionsInAssessment?: number;
 };
 
