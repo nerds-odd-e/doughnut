@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
+import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.DescriptionLinkTargetQuizFactory;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
@@ -96,8 +97,11 @@ class DescriptionLinkTargetQuizFactoryTest {
   }
 
   private QuizQuestion buildQuestion() {
-    QuizQuestionFactory quizQuestionFactory = getQuizQuestionFactory();
-    return makeMe.buildAQuestion(quizQuestionFactory);
+    try {
+      return getQuizQuestionFactory().buildValidQuizQuestion();
+    } catch (QuizQuestionNotPossibleException e) {
+      return null;
+    }
   }
 
   private QuizQuestionFactory getQuizQuestionFactory() {

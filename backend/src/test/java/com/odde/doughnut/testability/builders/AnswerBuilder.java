@@ -2,6 +2,7 @@ package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
+import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 
@@ -20,12 +21,14 @@ public class AnswerBuilder extends EntityBuilder<Answer> {
   }
 
   public AnswerBuilder withValidQuestion(QuizQuestionFactory quizQuestionFactory) {
-    entity.setQuestion(makeMe.aQuestion().buildValid(quizQuestionFactory).inMemoryPlease());
-    if (entity.getQuestion() == null)
+    try {
+      entity.setQuestion(quizQuestionFactory.buildValidQuizQuestion());
+    } catch (QuizQuestionNotPossibleException e) {
       throw new RuntimeException(
           "Failed to generate a question of type "
               + quizQuestionFactory.getClass().getSimpleName()
               + ", perhaps no enough data.");
+    }
     return this;
   }
 

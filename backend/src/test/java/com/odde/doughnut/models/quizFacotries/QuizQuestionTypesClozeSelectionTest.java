@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.*;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestion;
+import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.ClozeTitleSelectionQuizFactory;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
@@ -56,7 +57,11 @@ class QuizQuestionTypesClozeSelectionTest {
     private QuizQuestion buildClozeQuizQuestion() {
       QuizQuestionServant servant =
           new QuizQuestionServant(null, new NonRandomizer(), makeMe.modelFactoryService);
-      return makeMe.buildAQuestion(new ClozeTitleSelectionQuizFactory(note1, servant));
+      try {
+        return new ClozeTitleSelectionQuizFactory(note1, servant).buildValidQuizQuestion();
+      } catch (QuizQuestionNotPossibleException e) {
+        return null;
+      }
     }
   }
 }
