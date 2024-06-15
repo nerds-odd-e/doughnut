@@ -6,7 +6,6 @@ import type { Note } from './Note';
 import type { NotebookSettings } from './NotebookSettings';
 export type Notebook = {
     id: number;
-    headNoteId: number;
     headNote: Note;
     notebookSettings: NotebookSettings;
 };

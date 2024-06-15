@@ -2646,15 +2646,11 @@ components:
     Notebook:
       required:
       - headNote
-      - headNoteId
       - id
       - notebookSettings
       type: object
       properties:
         id:
-          type: integer
-          format: int32
-        headNoteId:
           type: integer
           format: int32
         headNote:

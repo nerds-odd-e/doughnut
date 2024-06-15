@@ -12,7 +12,7 @@ import org.springframework.lang.NonNull;
 
 @Entity
 @Table(name = "notebook")
-@JsonPropertyOrder({"id", "headNoteId", "headNote"})
+@JsonPropertyOrder({"id", "headNote"})
 public class Notebook extends EntityIdentifiedByIdOnly {
   @OneToOne
   @JoinColumn(name = "creator_id")
@@ -52,11 +52,6 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @OneToMany(mappedBy = "notebook", cascade = CascadeType.DETACH)
   @JsonIgnore
   private List<Subscription> subscriptions;
-
-  @NonNull
-  public Integer getHeadNoteId() {
-    return headNote.getId();
-  }
 
   @JsonIgnore
   public List<Note> getNotes() {
