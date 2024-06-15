@@ -69,7 +69,7 @@ class RestNotebookController {
       @Valid @RequestBody NotebookSettings notebookSettings)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(notebook);
-    notebook.updateSettings(notebookSettings);
+    notebook.getNotebookSettings().update(notebookSettings);
     modelFactoryService.save(notebook);
     return notebook;
   }

@@ -12,7 +12,7 @@ import org.springframework.lang.NonNull;
 
 @Entity
 @Table(name = "notebook")
-@JsonPropertyOrder({"id", "headNoteId", "headNote", "skipReviewEntirely"})
+@JsonPropertyOrder({"id", "headNoteId", "headNote"})
 public class Notebook extends EntityIdentifiedByIdOnly {
   @OneToOne
   @JoinColumn(name = "creator_id")
@@ -52,13 +52,6 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @OneToMany(mappedBy = "notebook", cascade = CascadeType.DETACH)
   @JsonIgnore
   private List<Subscription> subscriptions;
-
-  @JsonIgnore
-  public void updateSettings(NotebookSettings notebookSettings) {
-    this.getNotebookSettings().setSkipReviewEntirely(notebookSettings.getSkipReviewEntirely());
-    this.getNotebookSettings()
-        .setNumberOfQuestionsInAssessment(notebookSettings.getNumberOfQuestionsInAssessment());
-  }
 
   @NonNull
   public Integer getHeadNoteId() {
