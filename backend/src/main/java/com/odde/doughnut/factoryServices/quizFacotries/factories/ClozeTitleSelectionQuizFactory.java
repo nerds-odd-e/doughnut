@@ -6,7 +6,7 @@ import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import java.util.List;
 
 public class ClozeTitleSelectionQuizFactory extends QuestionOptionsFactory {
-  public ClozeTitleSelectionQuizFactory(Note note) {
+  public ClozeTitleSelectionQuizFactory(Note note, QuizQuestionServant servant) {
     super(note);
   }
 

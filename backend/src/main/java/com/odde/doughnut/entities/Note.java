@@ -12,6 +12,7 @@ import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.algorithms.SiblingOrder;
 import com.odde.doughnut.controllers.dto.NoteTopic;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
+import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import com.odde.doughnut.models.NoteViewer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -292,7 +293,7 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  public abstract List<QuizQuestionFactory> getQuizQuestionFactories();
+  public abstract List<QuizQuestionFactory> getQuizQuestionFactories(QuizQuestionServant servant);
 
   @JsonIgnore
   public NoteAccessory getOrInitializeNoteAccessory() {

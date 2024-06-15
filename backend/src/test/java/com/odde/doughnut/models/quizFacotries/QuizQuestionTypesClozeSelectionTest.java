@@ -56,7 +56,7 @@ class QuizQuestionTypesClozeSelectionTest {
 
     private QuizQuestion buildClozeQuizQuestion() {
       return makeMe.buildAQuestion(
-          new ClozeTitleSelectionQuizFactory(reviewPoint.getNote()), reviewPoint);
+          new ClozeTitleSelectionQuizFactory(reviewPoint.getNote(), null), reviewPoint);
     }
   }
 }

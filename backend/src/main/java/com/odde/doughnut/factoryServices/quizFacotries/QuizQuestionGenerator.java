@@ -40,7 +40,7 @@ public record QuizQuestionGenerator(
     if (note instanceof HierarchicalNote && user.getAiQuestionTypeOnlyForReview()) {
       shuffled = List.of(new AiQuestionFactory(note, questionGenerator));
     } else {
-      shuffled = randomizer.shuffle(note.getQuizQuestionFactories());
+      shuffled = randomizer.shuffle(note.getQuizQuestionFactories(servant));
     }
     result = generateAQuestionOfFirstPossibleType(shuffled, servant);
     if (result == null) {
