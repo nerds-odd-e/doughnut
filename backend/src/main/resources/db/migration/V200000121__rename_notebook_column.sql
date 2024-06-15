@@ -1,0 +1,2 @@
+ALTER TABLE notebook
+RENAME COLUMN number_of_questions TO number_of_questions_in_assessment;

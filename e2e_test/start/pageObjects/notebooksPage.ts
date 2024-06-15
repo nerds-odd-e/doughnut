@@ -34,7 +34,7 @@ export const routerToNotebooksPage = () => {
     },
     updateAssessmentSettings(notebook: string, numberOfQuestion: string) {
       this.findNotebookCardButton(notebook, "Edit notebook settings").click()
-      cy.formField("Number Of Questions").assignFieldValue(numberOfQuestion)
+      cy.formField("Number Of Questions In Assessment").assignFieldValue(numberOfQuestion)
       cy.findByRole("button", { name: "Update" }).click()
     },
     unsubscribe(notebook: string) {

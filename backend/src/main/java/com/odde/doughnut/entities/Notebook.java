@@ -48,7 +48,7 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @Setter
   Boolean skipReviewEntirely = false;
 
-  @Column(name = "number_of_questions")
+  @Column(name = "number_of_questions_in_assessment")
   @Getter
   @Setter
   Integer numberOfQuestionsInAssessment;
