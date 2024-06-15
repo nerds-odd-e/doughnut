@@ -32,7 +32,7 @@
               :id="'checkbox-' + outerIndex"
               type="checkbox"
               v-model="question.approved"
-              @change="approveQuestion(question.id)"
+              @change="toggleApproval(question.id)"
             />
           </td>
           <td>{{ question.multipleChoicesQuestion.stem }}</td>
@@ -88,9 +88,9 @@ export default defineComponent({
       }
       this.questions.push(newQuestion);
     },
-    async approveQuestion(questionId?: number) {
+    async toggleApproval(questionId?: number) {
       if (questionId) {
-        this.managedApi.restQuizQuestionController.approveQuestion(questionId);
+        this.managedApi.restQuizQuestionController.toggleApproval(questionId);
       }
     },
   },

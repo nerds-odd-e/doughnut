@@ -539,7 +539,7 @@ class RestQuizQuestionControllerTests {
       Note note = makeMe.aNote().creatorAndOwner(makeMe.aUser().please()).please();
       QuizQuestion quizQuestion = makeMe.aQuestion().approvedSpellingQuestionOf(note).please();
       assertThrows(
-          UnexpectedNoAccessRightException.class, () -> controller.approveQuestion(quizQuestion));
+          UnexpectedNoAccessRightException.class, () -> controller.toggleApproval(quizQuestion));
     }
 
     @Test
@@ -547,7 +547,7 @@ class RestQuizQuestionControllerTests {
       QuizQuestion quizQuestion =
           makeMe.aQuestion().approvedSpellingQuestionOf(subjectNote).please();
       quizQuestion.setApproved(false);
-      QuizQuestion approvedQuestion = controller.approveQuestion(quizQuestion);
+      QuizQuestion approvedQuestion = controller.toggleApproval(quizQuestion);
       assertTrue(approvedQuestion.isApproved());
     }
 
@@ -556,7 +556,7 @@ class RestQuizQuestionControllerTests {
       QuizQuestion quizQuestion =
           makeMe.aQuestion().approvedSpellingQuestionOf(subjectNote).please();
       quizQuestion.setApproved(true);
-      QuizQuestion approvedQuestion = controller.approveQuestion(quizQuestion);
+      QuizQuestion approvedQuestion = controller.toggleApproval(quizQuestion);
       assertFalse(approvedQuestion.isApproved());
     }
   }

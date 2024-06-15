@@ -15,6 +15,25 @@ export class RestQuizQuestionControllerService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
      * @param quizQuestion
+     * @returns QuizQuestion OK
+     * @throws ApiError
+     */
+    public toggleApproval(
+        quizQuestion: number,
+    ): CancelablePromise<QuizQuestion> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/quiz-questions/{quizQuestion}/toggle-approval',
+            path: {
+                'quizQuestion': quizQuestion,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param quizQuestion
      * @param requestBody
      * @returns SuggestedQuestionForFineTuning OK
      * @throws ApiError
@@ -66,25 +85,6 @@ export class RestQuizQuestionControllerService {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/quiz-questions/{quizQuestion}/contest',
-            path: {
-                'quizQuestion': quizQuestion,
-            },
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * @param quizQuestion
-     * @returns QuizQuestion OK
-     * @throws ApiError
-     */
-    public approveQuestion(
-        quizQuestion: number,
-    ): CancelablePromise<QuizQuestion> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/api/quiz-questions/{quizQuestion}/approve',
             path: {
                 'quizQuestion': quizQuestion,
             },

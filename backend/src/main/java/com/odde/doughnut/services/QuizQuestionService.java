@@ -32,9 +32,8 @@ public class QuizQuestionService {
     return aiQuestionGenerator.getAiGeneratedRefineQuestion(note, mcqWithAnswer);
   }
 
-  public QuizQuestion approveQuestion(QuizQuestion question) {
+  public QuizQuestion toggleApproval(QuizQuestion question) {
     question.setApproved(!question.isApproved());
-
     modelFactoryService.save(question);
     return question;
   }

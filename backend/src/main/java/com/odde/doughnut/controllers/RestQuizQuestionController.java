@@ -137,12 +137,12 @@ class RestQuizQuestionController {
     return quizQuestionService.refineQuestion(note, manualQuestion);
   }
 
-  @PostMapping("/{quizQuestion}/approve")
+  @PostMapping("/{quizQuestion}/toggle-approval")
   @Transactional
-  public QuizQuestion approveQuestion(
+  public QuizQuestion toggleApproval(
       @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(quizQuestion.getNote());
-    return quizQuestionService.approveQuestion(quizQuestion);
+    return quizQuestionService.toggleApproval(quizQuestion);
   }
 }
