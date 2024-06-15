@@ -10,11 +10,11 @@ import jakarta.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.util.Objects;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.EqualsAndHashCode;
 
 @Entity
 @Data
+@EqualsAndHashCode(callSuper = false)
 @Table(name = "quiz_question")
 @JsonPropertyOrder({"id", "multipleChoicesQuestion", "headNote", "imageWithMask"})
 public class QuizQuestion extends EntityIdentifiedByIdOnly {
@@ -45,8 +45,6 @@ public class QuizQuestion extends EntityIdentifiedByIdOnly {
   private Boolean hasImage;
 
   @Column(name = "is_approved")
-  @Getter
-  @Setter
   @JsonIgnore
   private boolean approved;
 
