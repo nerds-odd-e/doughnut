@@ -80,10 +80,10 @@ class RestReviewPointController {
   public ReviewPoint selfEvaluate(
       @PathVariable("reviewPoint") @Schema(type = "integer") ReviewPoint reviewPoint,
       @RequestBody SelfEvaluation selfEvaluation) {
+    currentUser.assertLoggedIn();
     if (reviewPoint == null || reviewPoint.getId() == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The review point does not exist.");
     }
-    currentUser.assertLoggedIn();
     modelFactoryService
         .toReviewPointModel(reviewPoint)
         .updateForgettingCurve(selfEvaluation.adjustment);

@@ -6,8 +6,6 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.theokanning.openai.client.OpenAiApi;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
 public class QuizQuestionService {
   private final ModelFactoryService modelFactoryService;
@@ -31,12 +29,7 @@ public class QuizQuestionService {
   }
 
   public MCQWithAnswer refineQuestion(Note note, MCQWithAnswer mcqWithAnswer) {
-    MCQWithAnswer MCQWithAnswer =
-        aiQuestionGenerator.getAiGeneratedRefineQuestion(note, mcqWithAnswer);
-    if (MCQWithAnswer == null) {
-      throw (new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated"));
-    }
-    return MCQWithAnswer;
+    return aiQuestionGenerator.getAiGeneratedRefineQuestion(note, mcqWithAnswer);
   }
 
   public QuizQuestion approveQuestion(QuizQuestion question) {
@@ -47,10 +40,15 @@ public class QuizQuestionService {
   }
 
   public MCQWithAnswer generateMcqWithAnswer(Note note) {
-    MCQWithAnswer MCQWithAnswer = aiQuestionGenerator.getAiGeneratedQuestion(note);
+    return aiQuestionGenerator.getAiGeneratedQuestion(note);
+  }
+
+  public QuizQuestion generateQuestionForNote(Note note) {
+    MCQWithAnswer MCQWithAnswer = generateMcqWithAnswer(note);
     if (MCQWithAnswer == null) {
-      throw (new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated"));
+      return null;
     }
-    return MCQWithAnswer;
+    QuizQuestion quizQuestion = QuizQuestion.fromMCQWithAnswer(MCQWithAnswer, note);
+    return modelFactoryService.save(quizQuestion);
   }
 }

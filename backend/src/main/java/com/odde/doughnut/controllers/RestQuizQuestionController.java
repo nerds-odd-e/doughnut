@@ -53,7 +53,7 @@ class RestQuizQuestionController {
   public QuizQuestion generateQuestion(
       @RequestParam(value = "note") @Schema(type = "integer") Note note) {
     currentUser.assertLoggedIn();
-    return generateQuestionForNote(note);
+    return quizQuestionService.generateQuestionForNote(note);
   }
 
   @PostMapping("/{quizQuestion}/regenerate")
@@ -61,7 +61,7 @@ class RestQuizQuestionController {
   public QuizQuestion regenerate(
       @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion) {
     currentUser.assertLoggedIn();
-    return generateQuestionForNote(quizQuestion.getNote());
+    return quizQuestionService.generateQuestionForNote(quizQuestion.getNote());
   }
 
   @PostMapping("/generate-question-without-save")
@@ -144,11 +144,5 @@ class RestQuizQuestionController {
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(quizQuestion.getNote());
     return quizQuestionService.approveQuestion(quizQuestion);
-  }
-
-  private QuizQuestion generateQuestionForNote(Note note) {
-    MCQWithAnswer MCQWithAnswer = quizQuestionService.generateMcqWithAnswer(note);
-    QuizQuestion quizQuestion = QuizQuestion.fromMCQWithAnswer(MCQWithAnswer, note);
-    return modelFactoryService.save(quizQuestion);
   }
 }
