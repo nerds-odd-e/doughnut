@@ -216,7 +216,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder hasAnApprovedQuestion() {
-    QuizQuestionBuilder quizQuestionBuilder = makeMe.aQuestion().spellingQuestionOfNote(entity);
+    QuizQuestionBuilder quizQuestionBuilder = makeMe.aQuestion().approvedSpellingQuestionOf(entity);
     this.quizQuestionBuilders.add(quizQuestionBuilder);
     return this;
   }

@@ -23,6 +23,7 @@ import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.odde.doughnut.testability.TestabilitySettings;
+import com.odde.doughnut.testability.builders.QuizQuestionBuilder;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import java.sql.Timestamp;
@@ -82,7 +83,8 @@ class RestQuizQuestionControllerTests {
               .by(currentUser)
               .forgettingCurveAndNextReviewAt(200)
               .please();
-      quizQuestion = makeMe.aQuestion().spellingQuestionOfReviewPoint(answerNote).please();
+      QuizQuestionBuilder quizQuestionBuilder = makeMe.aQuestion();
+      quizQuestion = quizQuestionBuilder.approvedSpellingQuestionOf(answerNote).please();
       answerDTO.setSpellingAnswer(answerNote.getTopicConstructor());
     }
 
@@ -124,8 +126,9 @@ class RestQuizQuestionControllerTests {
     class WrongAnswer {
       @BeforeEach
       void setup() {
+        QuizQuestionBuilder quizQuestionBuilder = makeMe.aQuestion();
         quizQuestion =
-            makeMe.aQuestion().spellingQuestionOfReviewPoint(reviewPoint.getNote()).please();
+            quizQuestionBuilder.approvedSpellingQuestionOf(reviewPoint.getNote()).please();
         answerDTO.setSpellingAnswer("wrong");
       }
 
@@ -325,7 +328,7 @@ class RestQuizQuestionControllerTests {
     void setUp() {
       note = makeMe.aNote().please();
 
-      quizQuestion = makeMe.aQuestion().spellingQuestionOfNote(note).please();
+      quizQuestion = makeMe.aQuestion().approvedSpellingQuestionOf(note).please();
     }
 
     @Test
@@ -448,7 +451,7 @@ class RestQuizQuestionControllerTests {
     @Test
     void getQuestionsOfANoteWhenThereIsOneQuestion() throws UnexpectedNoAccessRightException {
       QuizQuestion questionOfNote =
-          makeMe.aQuestion().spellingQuestionOfNote(noteWithoutQuestions).please();
+          makeMe.aQuestion().approvedSpellingQuestionOf(noteWithoutQuestions).please();
       List<MCQWithAnswer> results = controller.getAllQuestionByNote(noteWithoutQuestions);
       assertThat(results, contains(questionOfNote.getMcqWithAnswer()));
     }
@@ -456,7 +459,7 @@ class RestQuizQuestionControllerTests {
     @Test
     void getAllQuestionsOfANoteWhenThereIsMoreThanOneQuestion()
         throws UnexpectedNoAccessRightException {
-      makeMe.aQuestion().spellingQuestionOfNote(noteWithQuestions).please();
+      makeMe.aQuestion().approvedSpellingQuestionOf(noteWithQuestions).please();
       List<MCQWithAnswer> results = controller.getAllQuestionByNote(noteWithQuestions);
       assertThat(results, hasSize(2));
     }
@@ -533,14 +536,15 @@ class RestQuizQuestionControllerTests {
     @Test
     void mustNotBeAbleToApproveOtherPeoplesNoteQuestion() {
       Note note = makeMe.aNote().creatorAndOwner(makeMe.aUser().please()).please();
-      QuizQuestion quizQuestion = makeMe.aQuestion().spellingQuestionOfNote(note).please();
+      QuizQuestion quizQuestion = makeMe.aQuestion().approvedSpellingQuestionOf(note).please();
       assertThrows(
           UnexpectedNoAccessRightException.class, () -> controller.approveQuestion(quizQuestion));
     }
 
     @Test
     void approveQuestion() throws UnexpectedNoAccessRightException {
-      QuizQuestion quizQuestion = makeMe.aQuestion().spellingQuestionOfNote(subjectNote).please();
+      QuizQuestion quizQuestion =
+          makeMe.aQuestion().approvedSpellingQuestionOf(subjectNote).please();
       quizQuestion.setApproved(false);
       QuizQuestion approvedQuestion = controller.approveQuestion(quizQuestion);
       assertTrue(approvedQuestion.isApproved());
@@ -548,7 +552,8 @@ class RestQuizQuestionControllerTests {
 
     @Test
     void unApproveQuestion() throws UnexpectedNoAccessRightException {
-      QuizQuestion quizQuestion = makeMe.aQuestion().spellingQuestionOfNote(subjectNote).please();
+      QuizQuestion quizQuestion =
+          makeMe.aQuestion().approvedSpellingQuestionOf(subjectNote).please();
       quizQuestion.setApproved(true);
       QuizQuestion approvedQuestion = controller.approveQuestion(quizQuestion);
       assertFalse(approvedQuestion.isApproved());

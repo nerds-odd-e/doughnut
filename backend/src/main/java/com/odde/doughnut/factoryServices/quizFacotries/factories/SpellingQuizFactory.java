@@ -20,7 +20,7 @@ public class SpellingQuizFactory extends QuizQuestionFactory {
     if (!needSpellingQuiz()) {
       throw new QuizQuestionNotPossibleException();
     }
-    return buildSpellingApprovedQuestion();
+    return buildSpellingQuestion();
   }
 
   private boolean needSpellingQuiz() {
@@ -35,7 +35,7 @@ public class SpellingQuizFactory extends QuizQuestionFactory {
     return answerNote.getClozeDescription().clozeDetails();
   }
 
-  public QuizQuestion buildSpellingApprovedQuestion() {
+  public QuizQuestion buildSpellingQuestion() {
     QuizQuestion quizQuestionSpelling = new QuizQuestion();
     quizQuestionSpelling.setNote(answerNote);
     quizQuestionSpelling.setApproved(true);

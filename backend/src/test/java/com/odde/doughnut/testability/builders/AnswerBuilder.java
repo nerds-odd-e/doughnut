@@ -33,7 +33,8 @@ public class AnswerBuilder extends EntityBuilder<Answer> {
   }
 
   public AnswerBuilder ofSpellingQuestion(Note note) {
-    entity.setQuestion(makeMe.aQuestion().spellingQuestionOfReviewPoint(note).inMemoryPlease());
+    QuizQuestionBuilder quizQuestionBuilder = makeMe.aQuestion();
+    entity.setQuestion(quizQuestionBuilder.approvedSpellingQuestionOf(note).inMemoryPlease());
     return this;
   }
 

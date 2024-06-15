@@ -15,12 +15,9 @@ public class QuizQuestionBuilder extends EntityBuilder<QuizQuestion> {
   @Override
   protected void beforeCreate(boolean needPersist) {}
 
-  public QuizQuestionBuilder spellingQuestionOfNote(Note note) {
-    return spellingQuestionOfReviewPoint(note);
-  }
-
-  public QuizQuestionBuilder spellingQuestionOfReviewPoint(Note note) {
-    this.entity = new SpellingQuizFactory(note).buildSpellingApprovedQuestion();
+  public QuizQuestionBuilder approvedSpellingQuestionOf(Note note) {
+    this.entity = new SpellingQuizFactory(note).buildSpellingQuestion();
+    this.entity.setApproved(true);
     return this;
   }
 
