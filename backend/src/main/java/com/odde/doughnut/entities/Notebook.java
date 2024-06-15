@@ -43,13 +43,9 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   private final List<Note> notes = new ArrayList<>();
 
   @Column(name = "skip_review_entirely")
-  @Getter
-  @Setter
   Boolean skipReviewEntirely = false;
 
   @Column(name = "number_of_questions_in_assessment")
-  @Getter
-  @Setter
   Integer numberOfQuestionsInAssessment;
 
   @Column(name = "deleted_at")
@@ -65,6 +61,22 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   public void updateSettings(NotebookSettings notebookSettings) {
     setSkipReviewEntirely(notebookSettings.getSkipReviewEntirely());
     setNumberOfQuestionsInAssessment(notebookSettings.getNumberOfQuestionsInAssessment());
+  }
+
+  public Boolean getSkipReviewEntirely() {
+    return skipReviewEntirely;
+  }
+
+  public void setSkipReviewEntirely(Boolean skipReviewEntirely) {
+    this.skipReviewEntirely = skipReviewEntirely;
+  }
+
+  public Integer getNumberOfQuestionsInAssessment() {
+    return numberOfQuestionsInAssessment;
+  }
+
+  public void setNumberOfQuestionsInAssessment(Integer numberOfQuestionsInAssessment) {
+    this.numberOfQuestionsInAssessment = numberOfQuestionsInAssessment;
   }
 
   @NonNull
