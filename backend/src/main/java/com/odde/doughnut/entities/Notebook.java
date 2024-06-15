@@ -58,10 +58,6 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   private Timestamp deletedAt;
 
-  @OneToMany(mappedBy = "notebook", cascade = CascadeType.DETACH)
-  @JsonIgnore
-  private List<Subscription> subscriptions;
-
   @JsonIgnore
   public void setFromDTO(NotebookSettings notebookSettings) {
     setSkipReviewEntirely(notebookSettings.getSkipReviewEntirely());
