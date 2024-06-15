@@ -35,7 +35,7 @@ class RestQuizQuestionController {
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
-  private AiQuestionGenerator aiQuestionGenerator;
+  private final AiQuestionGenerator aiQuestionGenerator;
 
   public RestQuizQuestionController(
       @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
@@ -55,13 +55,7 @@ class RestQuizQuestionController {
   public QuizQuestion generateQuestion(
       @RequestParam(value = "note") @Schema(type = "integer") Note note) {
     currentUser.assertLoggedIn();
-    MCQWithAnswer MCQWithAnswer = aiQuestionGenerator.getAiGeneratedQuestion(note);
-    if (MCQWithAnswer == null) {
-      throw (new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated"));
-    }
-    QuizQuestion quizQuestion = QuizQuestion.fromMCQWithAnswer(MCQWithAnswer, note);
-    modelFactoryService.save(quizQuestion);
-    return quizQuestion;
+    return generateQuestionForNote(note);
   }
 
   @PostMapping("/{quizQuestion}/regenerate")
@@ -69,25 +63,14 @@ class RestQuizQuestionController {
   public QuizQuestion regenerate(
       @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion) {
     currentUser.assertLoggedIn();
-    Note note = quizQuestion.getNote();
-    MCQWithAnswer MCQWithAnswer = aiQuestionGenerator.getAiGeneratedQuestion(note);
-    if (MCQWithAnswer == null) {
-      throw (new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated"));
-    }
-    QuizQuestion quizQuestion1 = QuizQuestion.fromMCQWithAnswer(MCQWithAnswer, note);
-    modelFactoryService.save(quizQuestion1);
-    return quizQuestion1;
+    return generateQuestionForNote(quizQuestion.getNote());
   }
 
   @PostMapping("/generate-question-without-save")
   public MCQWithAnswer generateAIQuestionWithoutSave(
       @RequestParam(value = "note") @Schema(type = "integer") Note note) {
     currentUser.assertLoggedIn();
-    MCQWithAnswer MCQWithAnswer = aiQuestionGenerator.getAiGeneratedQuestion(note);
-    if (MCQWithAnswer == null) {
-      throw (new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated"));
-    }
-    return MCQWithAnswer;
+    return generateMcqWithAnswer(note);
   }
 
   @PostMapping("/{quizQuestion}/contest")
@@ -162,5 +145,20 @@ class RestQuizQuestionController {
       @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion) {
     currentUser.assertLoggedIn();
     return quizQuestionService.approveQuestion(quizQuestion);
+  }
+
+  private QuizQuestion generateQuestionForNote(Note note) {
+    MCQWithAnswer MCQWithAnswer = generateMcqWithAnswer(note);
+    QuizQuestion quizQuestion = QuizQuestion.fromMCQWithAnswer(MCQWithAnswer, note);
+    modelFactoryService.save(quizQuestion);
+    return quizQuestion;
+  }
+
+  private MCQWithAnswer generateMcqWithAnswer(Note note) {
+    MCQWithAnswer MCQWithAnswer = aiQuestionGenerator.getAiGeneratedQuestion(note);
+    if (MCQWithAnswer == null) {
+      throw (new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated"));
+    }
+    return MCQWithAnswer;
   }
 }

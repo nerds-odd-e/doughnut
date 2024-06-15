@@ -96,7 +96,7 @@ export default defineComponent({
           badQuestionReason: contestResult.reason,
         });
         this.currentQuestion =
-          await this.managedApi.restQuizQuestionController.regenerate(
+          await this.managedApi.restQuizQuestionController.generateQuestion(
             this.currentQuestion.id,
           );
       } else {
