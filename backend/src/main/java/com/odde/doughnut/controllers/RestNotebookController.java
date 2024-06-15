@@ -1,11 +1,11 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
-import com.odde.doughnut.controllers.dto.NotebookSettings;
 import com.odde.doughnut.controllers.dto.NotebooksViewedByUser;
 import com.odde.doughnut.controllers.dto.RedirectToNoteResponse;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
+import com.odde.doughnut.entities.NotebookSettings;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -69,7 +69,7 @@ class RestNotebookController {
       @Valid @RequestBody NotebookSettings notebookSettings)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(notebook);
-    notebook.setFromDTO(notebookSettings);
+    notebook.updateSettings(notebookSettings);
     modelFactoryService.save(notebook);
     return notebook;
   }

@@ -1,4 +1,4 @@
-package com.odde.doughnut.controllers.dto;
+package com.odde.doughnut.entities;
 
 import lombok.Getter;
 import lombok.Setter;
