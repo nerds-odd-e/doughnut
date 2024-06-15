@@ -14,7 +14,9 @@ class NotebookBuilder extends Builder<Notebook> {
       id: generateId(),
       headNote: this.notebuilder.data,
       headNoteId: this.notebuilder.data.id,
-      skipReviewEntirely: false,
+      notebookSettings: {
+        skipReviewEntirely: false,
+      },
     };
   }
 

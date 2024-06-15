@@ -2648,6 +2648,7 @@ components:
       - headNote
       - headNoteId
       - id
+      - notebookSettings
       type: object
       properties:
         id:
@@ -2658,6 +2659,11 @@ components:
           format: int32
         headNote:
           $ref: "#/components/schemas/Note"
+        notebookSettings:
+          $ref: "#/components/schemas/NotebookSettings"
+    NotebookSettings:
+      type: object
+      properties:
         skipReviewEntirely:
           type: boolean
         numberOfQuestionsInAssessment:
@@ -2921,14 +2927,6 @@ components:
       properties:
         srt:
           type: string
-    NotebookSettings:
-      type: object
-      properties:
-        skipReviewEntirely:
-          type: boolean
-        numberOfQuestionsInAssessment:
-          type: integer
-          format: int32
     LinkCreation:
       required:
       - linkType

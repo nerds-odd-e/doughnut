@@ -1,6 +1,9 @@
 <template>
   <div class="btn-group btn-group-sm">
-    <PopButton v-if="!notebook.skipReviewEntirely" title="Add to my learning">
+    <PopButton
+      v-if="!notebook.notebookSettings.skipReviewEntirely"
+      title="Add to my learning"
+    >
       <template #button_face>
         <SvgAdd />
       </template>

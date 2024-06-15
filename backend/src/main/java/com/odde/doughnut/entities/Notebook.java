@@ -42,8 +42,7 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   private final List<Note> notes = new ArrayList<>();
 
-  @Embedded @Getter @NonNull @JsonIgnore
-  private NotebookSettings notebookSettings = new NotebookSettings();
+  @Embedded @Getter @NonNull private NotebookSettings notebookSettings = new NotebookSettings();
 
   @Column(name = "deleted_at")
   @Setter
@@ -56,24 +55,9 @@ public class Notebook extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public void updateSettings(NotebookSettings notebookSettings) {
-    setSkipReviewEntirely(notebookSettings.getSkipReviewEntirely());
-    setNumberOfQuestionsInAssessment(notebookSettings.getNumberOfQuestionsInAssessment());
-  }
-
-  public Boolean getSkipReviewEntirely() {
-    return this.getNotebookSettings().getSkipReviewEntirely();
-  }
-
-  public void setSkipReviewEntirely(Boolean skipReviewEntirely) {
-    this.getNotebookSettings().setSkipReviewEntirely(skipReviewEntirely);
-  }
-
-  public Integer getNumberOfQuestionsInAssessment() {
-    return this.getNotebookSettings().getNumberOfQuestionsInAssessment();
-  }
-
-  public void setNumberOfQuestionsInAssessment(Integer numberOfQuestionsInAssessment) {
-    this.getNotebookSettings().setNumberOfQuestionsInAssessment(numberOfQuestionsInAssessment);
+    this.getNotebookSettings().setSkipReviewEntirely(notebookSettings.getSkipReviewEntirely());
+    this.getNotebookSettings()
+        .setNumberOfQuestionsInAssessment(notebookSettings.getNumberOfQuestionsInAssessment());
   }
 
   @NonNull

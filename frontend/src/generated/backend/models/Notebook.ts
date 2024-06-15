@@ -3,11 +3,11 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { Note } from './Note';
+import type { NotebookSettings } from './NotebookSettings';
 export type Notebook = {
     id: number;
     headNoteId: number;
     headNote: Note;
-    skipReviewEntirely?: boolean;
-    numberOfQuestionsInAssessment?: number;
+    notebookSettings: NotebookSettings;
 };
 
