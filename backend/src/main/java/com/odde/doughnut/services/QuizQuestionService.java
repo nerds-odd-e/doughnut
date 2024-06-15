@@ -4,7 +4,6 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
-import com.odde.doughnut.factoryServices.quizFacotries.factories.AiQuestionFactory;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.theokanning.openai.client.OpenAiApi;
@@ -20,27 +19,6 @@ public class QuizQuestionService {
     this.modelFactoryService = modelFactoryService;
     this.aiQuestionGenerator =
         new AiQuestionGenerator(openAiApi, new GlobalSettingsService(modelFactoryService));
-  }
-
-  public QuizQuestion generateAIQuestion(Note note) {
-    AiQuestionFactory aiQuestionFactory = new AiQuestionFactory(note, aiQuestionGenerator);
-    try {
-      QuizQuestion quizQuestion = aiQuestionFactory.buildValidQuizQuestion();
-      modelFactoryService.save(quizQuestion);
-      return quizQuestion;
-    } catch (QuizQuestionNotPossibleException e) {
-      throw (new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated"));
-    }
-  }
-
-  public MCQWithAnswer generateAIQuestionWithoutSave(Note note) {
-    AiQuestionFactory aiQuestionFactory = new AiQuestionFactory(note, aiQuestionGenerator);
-    try {
-      QuizQuestion quizQuestion = aiQuestionFactory.buildValidQuizQuestion();
-      return quizQuestion.getMcqWithAnswer();
-    } catch (QuizQuestionNotPossibleException e) {
-      throw (new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated"));
-    }
   }
 
   QuizQuestion selectQuizQuestionForANote(Note note) {
