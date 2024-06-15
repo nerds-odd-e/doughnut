@@ -6,8 +6,7 @@ import static org.hamcrest.Matchers.in;
 import static org.hamcrest.Matchers.nullValue;
 
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.factoryServices.quizFacotries.factories.WhichSpecHasInstanceQuizFactory;
-import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.LinkQuestionType;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,21 +22,21 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class WhichSpecHasInstanceQuizFactoryTest {
   @Autowired MakeMe makeMe;
-  UserModel userModel;
+  User user;
   Note top;
   Note target;
   Note source;
   Note anotherSource;
-  ReviewPoint reviewPoint;
+  LinkingNote subjectNote;
 
   @BeforeEach
   void setup() {
-    userModel = makeMe.aUser().toModelPlease();
-    top = makeMe.aNote("top").creatorAndOwner(userModel).please();
+    user = makeMe.aUser().please();
+    top = makeMe.aNote("top").creatorAndOwner(user).please();
     target = makeMe.aNote("element").under(top).please();
     source = makeMe.aNote("noble gas").under(top).linkTo(target, LinkType.SPECIALIZE).please();
     anotherSource = makeMe.aNote("non-official name").under(top).please();
-    reviewPoint = makeMe.aReviewPointFor(source.getLinks().get(0)).by(userModel).inMemoryPlease();
+    subjectNote = source.getLinks().get(0);
   }
 
   @Test
@@ -78,7 +77,7 @@ class WhichSpecHasInstanceQuizFactoryTest {
         void setup() {
           Note link = source.getLinks().get(1);
 
-          makeMe.aReviewPointFor(link).by(userModel).please();
+          makeMe.aReviewPointFor(link).by(user).please();
         }
 
         @Test
@@ -131,8 +130,7 @@ class WhichSpecHasInstanceQuizFactoryTest {
   }
 
   private QuizQuestion buildQuestion() {
-    return makeMe.buildAQuestion(
-        new WhichSpecHasInstanceQuizFactory((LinkingNote) this.reviewPoint.getNote(), null),
-        this.reviewPoint);
+    return makeMe.buildAQuestionForLinkingNote(
+        LinkQuestionType.WHICH_SPEC_HAS_INSTANCE, subjectNote, user);
   }
 }

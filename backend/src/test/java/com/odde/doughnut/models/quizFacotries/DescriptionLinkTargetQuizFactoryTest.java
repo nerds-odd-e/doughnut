@@ -7,8 +7,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
+import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.DescriptionLinkTargetQuizFactory;
-import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -24,17 +25,18 @@ import org.springframework.transaction.annotation.Transactional;
 class DescriptionLinkTargetQuizFactoryTest {
 
   @Autowired MakeMe makeMe;
-  UserModel userModel;
+  User user;
   Note top;
   Note target;
   Note source;
   Note anotherSource;
   ReviewPoint reviewPoint;
+  LinkingNote subjectNote;
 
   @BeforeEach
   void setup() {
-    userModel = makeMe.aUser().toModelPlease();
-    top = makeMe.aNote().creatorAndOwner(userModel).please();
+    user = makeMe.aUser().please();
+    top = makeMe.aNote().creatorAndOwner(user).please();
     target = makeMe.aNote("rome").under(top).please();
     source =
         makeMe
@@ -43,7 +45,8 @@ class DescriptionLinkTargetQuizFactoryTest {
             .under(top)
             .linkTo(target)
             .please();
-    reviewPoint = makeMe.aReviewPointFor(source.getLinks().get(0)).by(userModel).inMemoryPlease();
+    subjectNote = source.getLinks().get(0);
+    reviewPoint = makeMe.aReviewPointFor(subjectNote).by(user).inMemoryPlease();
     anotherSource = makeMe.aNote("pompeii").under(top).please();
   }
 
@@ -85,9 +88,7 @@ class DescriptionLinkTargetQuizFactoryTest {
       AnsweredQuestion answerResult =
           makeMe
               .anAnswerViewedByUser()
-              .validQuestionOfType(
-                  reviewPoint,
-                  new DescriptionLinkTargetQuizFactory((LinkingNote) reviewPoint.getNote(), null))
+              .validQuestionOfType(getQuizQuestionFactory())
               .choiceIndex(1)
               .inMemoryPlease();
       assertTrue(answerResult.correct);
@@ -95,8 +96,13 @@ class DescriptionLinkTargetQuizFactoryTest {
   }
 
   private QuizQuestion buildQuestion() {
-    LinkingNote note = (LinkingNote) reviewPoint.getNote();
-    QuizQuestionFactory quizQuestionFactory = new DescriptionLinkTargetQuizFactory(note, null);
-    return makeMe.buildAQuestion(quizQuestionFactory, reviewPoint);
+    QuizQuestionFactory quizQuestionFactory = getQuizQuestionFactory();
+    return makeMe.buildAQuestion(quizQuestionFactory);
+  }
+
+  private QuizQuestionFactory getQuizQuestionFactory() {
+    QuizQuestionServant servant =
+        new QuizQuestionServant(user, new NonRandomizer(), makeMe.modelFactoryService);
+    return new DescriptionLinkTargetQuizFactory(subjectNote, servant);
   }
 }

@@ -25,7 +25,7 @@ public class QuizQuestionService {
   public QuizQuestion generateAIQuestion(Note note) {
     AiQuestionFactory aiQuestionFactory = new AiQuestionFactory(note, aiQuestionGenerator);
     try {
-      QuizQuestion quizQuestion = aiQuestionFactory.buildValidQuizQuestion(null);
+      QuizQuestion quizQuestion = aiQuestionFactory.buildValidQuizQuestion();
       modelFactoryService.save(quizQuestion);
       return quizQuestion;
     } catch (QuizQuestionNotPossibleException e) {
@@ -36,7 +36,7 @@ public class QuizQuestionService {
   public MCQWithAnswer generateAIQuestionWithoutSave(Note note) {
     AiQuestionFactory aiQuestionFactory = new AiQuestionFactory(note, aiQuestionGenerator);
     try {
-      QuizQuestion quizQuestion = aiQuestionFactory.buildValidQuizQuestion(null);
+      QuizQuestion quizQuestion = aiQuestionFactory.buildValidQuizQuestion();
       return quizQuestion.getMcqWithAnswer();
     } catch (QuizQuestionNotPossibleException e) {
       throw (new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated"));

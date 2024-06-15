@@ -3,12 +3,8 @@ package com.odde.doughnut.models.quizFacotries;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
-import com.odde.doughnut.entities.LinkingNote;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestion;
-import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.factoryServices.quizFacotries.factories.LinkSourceWithinSameLinkTypeQuizFactory;
-import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.entities.*;
+import com.odde.doughnut.services.LinkQuestionType;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,24 +20,22 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class LinkSourceWithinSameLinkTypeQuizFactoryTest {
   @Autowired MakeMe makeMe;
-  UserModel userModel;
+  User user;
   Note top;
   Note target;
   Note source;
   Note anotherSource;
-  Note sourceTarget;
-  ReviewPoint reviewPoint;
+  LinkingNote sourceTarget;
 
   @BeforeEach
   void setup() {
-    userModel = makeMe.aUser().toModelPlease();
-    top = makeMe.aNote().creatorAndOwner(userModel).please();
+    user = makeMe.aUser().please();
+    top = makeMe.aNote().creatorAndOwner(user).please();
     target = makeMe.aNote("sauce").under(top).please();
     source = makeMe.aNote("tomato sauce").under(top).please();
     sourceTarget = makeMe.aLink().between(source, target).please();
     Note cheese = makeMe.aNote("Note cheese").under(top).please();
     anotherSource = makeMe.aNote("blue cheese").under(top).linkTo(cheese).please();
-    reviewPoint = makeMe.aReviewPointFor(sourceTarget).inMemoryPlease();
   }
 
   @Test
@@ -77,8 +71,7 @@ class LinkSourceWithinSameLinkTypeQuizFactoryTest {
   }
 
   private QuizQuestion buildLinkTargetQuizQuestion() {
-    return makeMe.buildAQuestion(
-        new LinkSourceWithinSameLinkTypeQuizFactory((LinkingNote) reviewPoint.getNote(), null),
-        reviewPoint);
+    return makeMe.buildAQuestionForLinkingNote(
+        LinkQuestionType.LINK_SOURCE_WITHIN_SAME_LINK_TYPE, sourceTarget, user);
   }
 }

@@ -6,12 +6,8 @@ import static org.hamcrest.Matchers.in;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 
-import com.odde.doughnut.entities.LinkingNote;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestion;
-import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.factoryServices.quizFacotries.factories.LinkTargetQuizFactory;
-import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.entities.*;
+import com.odde.doughnut.services.LinkQuestionType;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,21 +23,21 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class LinkTargetQuizFactoryTest {
   @Autowired MakeMe makeMe;
-  UserModel userModel;
+  User user;
   Note top;
   Note target;
   Note source;
   Note anotherTarget;
-  ReviewPoint reviewPoint;
+  LinkingNote subjectNote;
 
   @BeforeEach
   void setup() {
-    userModel = makeMe.aUser().toModelPlease();
-    top = makeMe.aNote().creatorAndOwner(userModel).please();
+    user = makeMe.aUser().please();
+    top = makeMe.aNote().creatorAndOwner(user).please();
     target = makeMe.aNote("target").under(top).please();
     source = makeMe.aNote("source").under(top).linkTo(target).please();
     anotherTarget = makeMe.aNote("another note").under(top).please();
-    reviewPoint = makeMe.aReviewPointFor(source.getLinks().get(0)).inMemoryPlease();
+    subjectNote = source.getLinks().get(0);
   }
 
   @Test
@@ -66,7 +62,6 @@ class LinkTargetQuizFactoryTest {
   }
 
   private QuizQuestion buildLinkTargetQuizQuestion() {
-    return makeMe.buildAQuestion(
-        new LinkTargetQuizFactory((LinkingNote) reviewPoint.getNote(), null), reviewPoint);
+    return makeMe.buildAQuestionForLinkingNote(LinkQuestionType.LINK_TARGET, subjectNote, user);
   }
 }

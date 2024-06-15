@@ -21,7 +21,6 @@ class AnsweredQuestionTest {
   @Nested
   class ClozeSelectionQuestion {
     Note note;
-    ReviewPoint reviewPoint;
     SpellingQuizFactory spellingQuizFactory;
 
     @BeforeEach
@@ -31,8 +30,7 @@ class AnsweredQuestionTest {
       note =
           makeMe.aNote("this / that").details("description").under(top).rememberSpelling().please();
       makeMe.aNote().under(top).please();
-      reviewPoint = makeMe.aReviewPointFor(note).by(user).please();
-      spellingQuizFactory = new SpellingQuizFactory(reviewPoint.getNote());
+      spellingQuizFactory = new SpellingQuizFactory(note);
     }
 
     @Test
@@ -40,7 +38,7 @@ class AnsweredQuestionTest {
       AnsweredQuestion answer =
           makeMe
               .anAnswerViewedByUser()
-              .validQuestionOfType(reviewPoint, spellingQuizFactory)
+              .validQuestionOfType(spellingQuizFactory)
               .answerWithSpelling("this")
               .inMemoryPlease();
       assertTrue(answer.correct);
@@ -51,7 +49,7 @@ class AnsweredQuestionTest {
       AnsweredQuestion answer =
           makeMe
               .anAnswerViewedByUser()
-              .validQuestionOfType(reviewPoint, spellingQuizFactory)
+              .validQuestionOfType(spellingQuizFactory)
               .answerWithSpelling("this ")
               .inMemoryPlease();
       assertTrue(answer.correct);
@@ -62,7 +60,7 @@ class AnsweredQuestionTest {
       AnsweredQuestion answerResult =
           makeMe
               .anAnswerViewedByUser()
-              .validQuestionOfType(reviewPoint, spellingQuizFactory)
+              .validQuestionOfType(spellingQuizFactory)
               .answerWithSpelling("this / that")
               .inMemoryPlease();
       assertTrue(answerResult.correct);

@@ -11,7 +11,7 @@ public class WhichSpecHasInstanceQuizFactory extends QuestionOptionsFactory {
   private final LinkingNote link;
 
   public WhichSpecHasInstanceQuizFactory(LinkingNote note, QuizQuestionServant servant) {
-    super(note);
+    super(note, servant);
     this.link = note;
   }
 

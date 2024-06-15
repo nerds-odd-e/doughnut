@@ -2,7 +2,6 @@ package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.AnsweredQuestion;
 import com.odde.doughnut.entities.QuizQuestion;
-import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
@@ -24,9 +23,8 @@ public class AnswerViewedByUserBuilder extends EntityBuilder<AnsweredQuestion> {
             .getAnswerViewedByUser(null);
   }
 
-  public AnswerViewedByUserBuilder validQuestionOfType(
-      ReviewPoint reviewPoint, QuizQuestionFactory quizQuestionFactory) {
-    answerBuilder.withValidQuestion(reviewPoint, quizQuestionFactory);
+  public AnswerViewedByUserBuilder validQuestionOfType(QuizQuestionFactory quizQuestionFactory) {
+    answerBuilder.withValidQuestion(quizQuestionFactory);
     return this;
   }
 

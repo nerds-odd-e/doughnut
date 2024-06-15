@@ -11,14 +11,15 @@ import java.util.List;
 
 public abstract class QuestionOptionsFactory extends QuizQuestionFactory {
   protected Note note;
+  private final QuizQuestionServant servant;
 
-  public QuestionOptionsFactory(Note note) {
+  public QuestionOptionsFactory(Note note, QuizQuestionServant servant) {
     this.note = note;
+    this.servant = servant;
   }
 
   @Override
-  public QuizQuestion buildValidQuizQuestion(QuizQuestionServant servant)
-      throws QuizQuestionNotPossibleException {
+  public QuizQuestion buildValidQuizQuestion() throws QuizQuestionNotPossibleException {
     QuizQuestion quizQuestion = new QuizQuestion();
     quizQuestion.setNote(note);
     quizQuestion.setHasImage(this instanceof ImageTitleSelectionQuizFactory);

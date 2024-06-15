@@ -7,8 +7,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.factoryServices.quizFacotries.factories.FromSamePartAsQuizFactory;
-import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.LinkQuestionType;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class FromSamePartAsQuizFactoryTest {
   @Autowired MakeMe makeMe;
-  UserModel userModel;
+  User user;
   Note top;
   Note perspective;
   Note subjective;
@@ -33,12 +32,12 @@ class FromSamePartAsQuizFactoryTest {
   Note pretty;
   Note tall;
   Note subjectivePerspective;
-  ReviewPoint reviewPoint;
+  LinkingNote uglySubjective;
 
   @BeforeEach
   void setup() {
-    userModel = makeMe.aUser().toModelPlease();
-    top = makeMe.aNote("top").creatorAndOwner(userModel).please();
+    user = makeMe.aUser().please();
+    top = makeMe.aNote("top").creatorAndOwner(user).please();
     perspective = makeMe.aNote("perspective").under(top).please();
     subjective = makeMe.aNote("subjective").under(top).please();
     objective = makeMe.aNote("objective").under(top).please();
@@ -47,8 +46,7 @@ class FromSamePartAsQuizFactoryTest {
     tall = makeMe.aNote("tall").under(top).please();
     subjectivePerspective = makeMe.aLink().between(subjective, perspective, LinkType.PART).please();
     makeMe.aLink().between(objective, perspective, LinkType.PART).please();
-    Note uglySubjective = makeMe.aLink().between(ugly, subjective, LinkType.TAGGED_BY).please();
-    reviewPoint = makeMe.aReviewPointFor(uglySubjective).by(userModel).inMemoryPlease();
+    uglySubjective = makeMe.aLink().between(ugly, subjective, LinkType.TAGGED_BY).please();
   }
 
   @Test
@@ -87,7 +85,7 @@ class FromSamePartAsQuizFactoryTest {
       class WhenThereIsViceReviewPoint {
         @BeforeEach
         void setup() {
-          makeMe.aReviewPointFor(cousin).by(userModel).please();
+          makeMe.aReviewPointFor(cousin).by(user).please();
         }
 
         @Test
@@ -110,7 +108,7 @@ class FromSamePartAsQuizFactoryTest {
   }
 
   private QuizQuestion buildQuestion() {
-    return makeMe.buildAQuestion(
-        new FromSamePartAsQuizFactory((LinkingNote) reviewPoint.getNote(), null), reviewPoint);
+    return makeMe.buildAQuestionForLinkingNote(
+        LinkQuestionType.FROM_SAME_PART_AS, uglySubjective, user);
   }
 }

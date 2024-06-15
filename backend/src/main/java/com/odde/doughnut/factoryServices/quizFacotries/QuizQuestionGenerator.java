@@ -13,10 +13,9 @@ import org.springframework.web.server.ResponseStatusException;
 public record QuizQuestionGenerator(
     User user, Note note, Randomizer randomizer, ModelFactoryService modelFactoryService) {
 
-  private Optional<QuizQuestion> getQuizQuestionEntity(
-      QuizQuestionFactory quizQuestionFactory, QuizQuestionServant servant) {
+  private Optional<QuizQuestion> getQuizQuestionEntity(QuizQuestionFactory quizQuestionFactory) {
     try {
-      QuizQuestion quizQuestion = quizQuestionFactory.buildValidQuizQuestion(servant);
+      QuizQuestion quizQuestion = quizQuestionFactory.buildValidQuizQuestion();
       return Optional.of(quizQuestion);
     } catch (QuizQuestionNotPossibleException e) {
       return Optional.empty();
@@ -24,25 +23,25 @@ public record QuizQuestionGenerator(
   }
 
   private QuizQuestion generateAQuestionOfFirstPossibleType(
-      List<QuizQuestionFactory> quizQuestionFactoryStream, QuizQuestionServant servant) {
+      List<QuizQuestionFactory> quizQuestionFactoryStream) {
     return quizQuestionFactoryStream.stream()
-        .map(quizQuestionFactory -> getQuizQuestionEntity(quizQuestionFactory, servant))
+        .map(this::getQuizQuestionEntity)
         .flatMap(Optional::stream)
         .findFirst()
         .orElse(null);
   }
 
   public QuizQuestion generateAQuestionOfRandomType(AiQuestionGenerator questionGenerator) {
-    QuizQuestionServant servant = new QuizQuestionServant(user, randomizer, modelFactoryService);
-    QuizQuestion result;
-
     List<QuizQuestionFactory> shuffled;
     if (note instanceof HierarchicalNote && user.getAiQuestionTypeOnlyForReview()) {
       shuffled = List.of(new AiQuestionFactory(note, questionGenerator));
     } else {
-      shuffled = randomizer.shuffle(note.getQuizQuestionFactories(servant));
+      shuffled =
+          randomizer.shuffle(
+              note.getQuizQuestionFactories(
+                  new QuizQuestionServant(user, randomizer, modelFactoryService)));
     }
-    result = generateAQuestionOfFirstPossibleType(shuffled, servant);
+    QuizQuestion result = generateAQuestionOfFirstPossibleType(shuffled);
     if (result == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated");
     }

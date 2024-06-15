@@ -9,7 +9,7 @@ public class LinkSourceQuizFactory extends QuestionOptionsFactory {
   private List<Note> cachedFillingOptions = null;
 
   public LinkSourceQuizFactory(LinkingNote link, QuizQuestionServant servant) {
-    super(link);
+    super(link, servant);
     this.link = link;
   }
 

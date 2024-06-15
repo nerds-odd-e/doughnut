@@ -5,8 +5,9 @@ import static org.hamcrest.Matchers.*;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestion;
-import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.ClozeTitleSelectionQuizFactory;
+import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,14 +29,12 @@ class QuizQuestionTypesClozeSelectionTest {
     Note top;
     Note note1;
     Note note2;
-    ReviewPoint reviewPoint;
 
     @BeforeEach
     void setup() {
       top = makeMe.aNote().please();
       note1 = makeMe.aNote("target").under(top).please();
       note2 = makeMe.aNote("source").under(top).please();
-      reviewPoint = makeMe.aReviewPointFor(note1).inMemoryPlease();
     }
 
     @Test
@@ -55,8 +54,9 @@ class QuizQuestionTypesClozeSelectionTest {
     }
 
     private QuizQuestion buildClozeQuizQuestion() {
-      return makeMe.buildAQuestion(
-          new ClozeTitleSelectionQuizFactory(reviewPoint.getNote(), null), reviewPoint);
+      QuizQuestionServant servant =
+          new QuizQuestionServant(null, new NonRandomizer(), makeMe.modelFactoryService);
+      return makeMe.buildAQuestion(new ClozeTitleSelectionQuizFactory(note1, servant));
     }
   }
 }

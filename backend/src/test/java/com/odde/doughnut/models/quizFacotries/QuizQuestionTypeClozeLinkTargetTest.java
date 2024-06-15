@@ -3,12 +3,8 @@ package com.odde.doughnut.models.quizFacotries;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-import com.odde.doughnut.entities.LinkingNote;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestion;
-import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.factoryServices.quizFacotries.factories.ClozeLinkTargetQuizFactory;
-import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.entities.*;
+import com.odde.doughnut.services.LinkQuestionType;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -23,20 +19,20 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class ClozeLinkTargetQuizFactoryTest {
   @Autowired MakeMe makeMe;
-  UserModel userModel;
+  User user;
   Note top;
   Note target;
   Note source;
   Note anotherSource;
-  ReviewPoint reviewPoint;
+  LinkingNote subjectNote;
 
   @BeforeEach
   void setup() {
-    userModel = makeMe.aUser().toModelPlease();
-    top = makeMe.aNote().creatorAndOwner(userModel).please();
+    user = makeMe.aUser().please();
+    top = makeMe.aNote().creatorAndOwner(user).please();
     target = makeMe.aNote("rome").under(top).please();
     source = makeMe.aNote("Rome is not built in a day").under(top).linkTo(target).please();
-    reviewPoint = makeMe.aReviewPointFor(source.getLinks().get(0)).inMemoryPlease();
+    subjectNote = source.getLinks().get(0);
     anotherSource = makeMe.aNote("pompeii").under(top).please();
   }
 
@@ -53,7 +49,7 @@ class ClozeLinkTargetQuizFactoryTest {
   }
 
   private QuizQuestion buildQuestion() {
-    return makeMe.buildAQuestion(
-        new ClozeLinkTargetQuizFactory((LinkingNote) reviewPoint.getNote(), null), reviewPoint);
+    return makeMe.buildAQuestionForLinkingNote(
+        LinkQuestionType.CLOZE_LINK_TARGET, subjectNote, user);
   }
 }

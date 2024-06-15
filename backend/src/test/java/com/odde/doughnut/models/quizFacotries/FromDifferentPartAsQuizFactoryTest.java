@@ -8,8 +8,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
+import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.FromDifferentPartAsQuizFactory;
-import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class FromDifferentPartAsQuizFactoryTest {
   @Autowired MakeMe makeMe;
-  UserModel userModel;
+  User user;
   Note top;
   Note perspective;
   Note subjective;
@@ -36,12 +37,12 @@ class FromDifferentPartAsQuizFactoryTest {
   Note kind;
   Note subjectivePerspective;
   Note kindSubjective;
-  ReviewPoint uglySubjectiveRp;
+  LinkingNote uglySubjective;
 
   @BeforeEach
   void setup() {
-    userModel = makeMe.aUser().toModelPlease();
-    top = makeMe.aNote("top").creatorAndOwner(userModel).please();
+    user = makeMe.aUser().please();
+    top = makeMe.aNote("top").creatorAndOwner(user).please();
     perspective = makeMe.aNote("perspective").under(top).please();
     subjective = makeMe.aNote("subjective").under(top).please();
     objective = makeMe.aNote("objective").under(top).please();
@@ -52,8 +53,7 @@ class FromDifferentPartAsQuizFactoryTest {
     subjectivePerspective = makeMe.aLink().between(subjective, perspective, LinkType.PART).please();
     makeMe.aLink().between(objective, perspective, LinkType.PART).please();
     kindSubjective = makeMe.aLink().between(kind, subjective, LinkType.TAGGED_BY).please();
-    Note uglySubjective = makeMe.aLink().between(ugly, subjective, LinkType.TAGGED_BY).please();
-    uglySubjectiveRp = makeMe.aReviewPointFor(uglySubjective).by(userModel).inMemoryPlease();
+    uglySubjective = makeMe.aLink().between(ugly, subjective, LinkType.TAGGED_BY).please();
   }
 
   @Test
@@ -81,7 +81,7 @@ class FromDifferentPartAsQuizFactoryTest {
       @BeforeEach
       void setup() {
         makeMe.aLink().between(tall, objective, LinkType.TAGGED_BY).please();
-        makeMe.aReviewPointFor(kindSubjective).by(userModel).please();
+        makeMe.aReviewPointFor(kindSubjective).by(user).please();
       }
 
       @Test
@@ -94,7 +94,7 @@ class FromDifferentPartAsQuizFactoryTest {
 
         @BeforeEach
         void setup() {
-          makeMe.aReviewPointFor(prettySubjective).by(userModel).please();
+          makeMe.aReviewPointFor(prettySubjective).by(user).please();
         }
 
         @Test
@@ -168,12 +168,11 @@ class FromDifferentPartAsQuizFactoryTest {
 
         @Nested
         class Answer {
-          FromDifferentPartAsQuizFactory quizQuestionFactory;
+          QuizQuestionFactory quizQuestionFactory;
 
           @BeforeEach
           void setup() {
-            quizQuestionFactory =
-                new FromDifferentPartAsQuizFactory((LinkingNote) uglySubjectiveRp.getNote(), null);
+            quizQuestionFactory = getQuizQuestionFactory();
           }
 
           @Test
@@ -181,7 +180,7 @@ class FromDifferentPartAsQuizFactoryTest {
             AnsweredQuestion answerResult =
                 makeMe
                     .anAnswerViewedByUser()
-                    .validQuestionOfType(uglySubjectiveRp, quizQuestionFactory)
+                    .validQuestionOfType(quizQuestionFactory)
                     .choiceIndex(2)
                     .inMemoryPlease();
             assertTrue(answerResult.correct);
@@ -192,7 +191,7 @@ class FromDifferentPartAsQuizFactoryTest {
             AnsweredQuestion answerResult =
                 makeMe
                     .anAnswerViewedByUser()
-                    .validQuestionOfType(uglySubjectiveRp, quizQuestionFactory)
+                    .validQuestionOfType(quizQuestionFactory)
                     .choiceIndex(1)
                     .inMemoryPlease();
             assertFalse(answerResult.correct);
@@ -203,8 +202,13 @@ class FromDifferentPartAsQuizFactoryTest {
   }
 
   private QuizQuestion buildQuestion() {
-    QuizQuestionFactory quizQuestionFactory =
-        new FromDifferentPartAsQuizFactory((LinkingNote) uglySubjectiveRp.getNote(), null);
-    return makeMe.buildAQuestion(quizQuestionFactory, uglySubjectiveRp);
+    QuizQuestionFactory quizQuestionFactory = getQuizQuestionFactory();
+    return makeMe.buildAQuestion(quizQuestionFactory);
+  }
+
+  private QuizQuestionFactory getQuizQuestionFactory() {
+    QuizQuestionServant servant =
+        new QuizQuestionServant(user, new NonRandomizer(), makeMe.modelFactoryService);
+    return new FromDifferentPartAsQuizFactory(uglySubjective, servant);
   }
 }

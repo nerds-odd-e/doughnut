@@ -11,7 +11,7 @@ public class FromDifferentPartAsQuizFactory extends QuestionOptionsFactory {
   private final LinkingNote link;
 
   public FromDifferentPartAsQuizFactory(LinkingNote note, QuizQuestionServant servant) {
-    super(note);
+    super(note, servant);
     link = note;
   }
 

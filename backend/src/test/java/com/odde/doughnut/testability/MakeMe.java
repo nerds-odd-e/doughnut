@@ -3,8 +3,11 @@ package com.odde.doughnut.testability;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
+import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.models.randomizers.NonRandomizer;
+import com.odde.doughnut.services.LinkQuestionType;
 import com.odde.doughnut.testability.builders.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -105,8 +108,17 @@ public class MakeMe extends MakeMeWithoutDB {
     return new QuizQuestionBuilder(this);
   }
 
-  public QuizQuestion buildAQuestion(QuizQuestionFactory factory, ReviewPoint reviewPoint) {
-    return aQuestion().buildValid(reviewPoint, factory).ViewedByUserPlease();
+  public QuizQuestion buildAQuestion(QuizQuestionFactory factory) {
+    return aQuestion().buildValid(factory).ViewedByUserPlease();
+  }
+
+  public QuizQuestion buildAQuestionForLinkingNote(
+      LinkQuestionType linkQuestionType, LinkingNote linkingNote, User user) {
+    QuizQuestionServant servant =
+        new QuizQuestionServant(user, new NonRandomizer(), modelFactoryService);
+    return aQuestion()
+        .buildValid(linkQuestionType.factoryForLinkingNote.apply(linkingNote, servant))
+        .ViewedByUserPlease();
   }
 
   public FailureReportBuilder aFailureReport() {

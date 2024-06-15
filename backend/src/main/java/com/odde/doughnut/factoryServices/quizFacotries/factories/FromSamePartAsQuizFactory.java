@@ -12,7 +12,7 @@ public class FromSamePartAsQuizFactory extends QuestionOptionsFactory {
   private final LinkingNote link;
 
   public FromSamePartAsQuizFactory(LinkingNote note, QuizQuestionServant servant) {
-    super(note);
+    super(note, servant);
     link = note;
   }
 

@@ -7,7 +7,7 @@ import java.util.List;
 
 public class ClozeTitleSelectionQuizFactory extends QuestionOptionsFactory {
   public ClozeTitleSelectionQuizFactory(Note note, QuizQuestionServant servant) {
-    super(note);
+    super(note, servant);
   }
 
   @Override
