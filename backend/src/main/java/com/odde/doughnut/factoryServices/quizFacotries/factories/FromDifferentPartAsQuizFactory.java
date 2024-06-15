@@ -16,7 +16,7 @@ public class FromDifferentPartAsQuizFactory extends QuestionOptionsFactory {
   }
 
   @Override
-  public void findCategoricalLink(QuizQuestionServant servant) {
+  public void findCategoricalLink() {
     parentGrandLink = servant.getParentGrandLink(link);
   }
 
@@ -26,7 +26,7 @@ public class FromDifferentPartAsQuizFactory extends QuestionOptionsFactory {
   }
 
   @Override
-  public List<Note> generateFillingOptions(QuizQuestionServant servant) {
+  public List<Note> generateFillingOptions() {
     if (parentGrandLink == null) {
       return null;
     }
@@ -38,7 +38,7 @@ public class FromDifferentPartAsQuizFactory extends QuestionOptionsFactory {
   }
 
   @Override
-  public Note generateAnswer(QuizQuestionServant servant) {
+  public Note generateAnswer() {
     return servant
         .randomizer
         .chooseOneRandomly(servant.getCousinLinksAvoidingSiblings(link, parentGrandLink))

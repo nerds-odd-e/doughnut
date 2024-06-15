@@ -15,7 +15,7 @@ public class LinkSourceWithinSameLinkTypeQuizFactory extends QuestionOptionsFact
   }
 
   @Override
-  public List<LinkingNote> generateFillingOptions(QuizQuestionServant servant) {
+  public List<LinkingNote> generateFillingOptions() {
     if (cachedFillingOptions == null) {
       cachedFillingOptions =
           servant.chooseFromCohortAvoidSiblings(link).stream()
@@ -26,7 +26,7 @@ public class LinkSourceWithinSameLinkTypeQuizFactory extends QuestionOptionsFact
   }
 
   @Override
-  public Note generateAnswer(QuizQuestionServant servant) {
+  public Note generateAnswer() {
     return link;
   }
 

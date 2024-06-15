@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class QuestionOptionsFactory extends QuizQuestionFactory {
-  protected Note note;
-  private final QuizQuestionServant servant;
+  protected final Note note;
+  protected final QuizQuestionServant servant;
 
   public QuestionOptionsFactory(Note note, QuizQuestionServant servant) {
     this.note = note;
@@ -23,13 +23,13 @@ public abstract class QuestionOptionsFactory extends QuizQuestionFactory {
     QuizQuestion quizQuestion = new QuizQuestion();
     quizQuestion.setNote(note);
     quizQuestion.setHasImage(this instanceof ImageTitleSelectionQuizFactory);
-    this.findCategoricalLink(servant);
+    this.findCategoricalLink();
     this.validateBasicPossibility();
-    Note answerNote = this.generateAnswer(servant);
+    Note answerNote = this.generateAnswer();
     if (answerNote == null) {
       throw new QuizQuestionNotPossibleException();
     }
-    List<? extends Note> options = this.generateFillingOptions(servant);
+    List<? extends Note> options = this.generateFillingOptions();
     if (options.size() < this.minimumOptionCount() - 1) {
       throw new QuizQuestionNotPossibleException();
     }
@@ -46,11 +46,11 @@ public abstract class QuestionOptionsFactory extends QuizQuestionFactory {
 
   public void validateBasicPossibility() throws QuizQuestionNotPossibleException {}
 
-  public void findCategoricalLink(QuizQuestionServant servant) {}
+  public void findCategoricalLink() {}
 
-  public abstract Note generateAnswer(QuizQuestionServant servant);
+  public abstract Note generateAnswer();
 
-  public abstract List<? extends Note> generateFillingOptions(QuizQuestionServant servant);
+  public abstract List<? extends Note> generateFillingOptions();
 
   public int minimumOptionCount() {
     return 2;

@@ -17,7 +17,7 @@ public class LinkTargetQuizFactory extends QuestionOptionsFactory {
   }
 
   @Override
-  public List<Note> generateFillingOptions(QuizQuestionServant servant) {
+  public List<Note> generateFillingOptions() {
     if (cachedFillingOptions == null) {
       cachedFillingOptions = servant.chooseFromCohortAvoidUncles(link, answerNote);
     }
@@ -25,7 +25,7 @@ public class LinkTargetQuizFactory extends QuestionOptionsFactory {
   }
 
   @Override
-  public Note generateAnswer(QuizQuestionServant servant) {
+  public Note generateAnswer() {
     return answerNote;
   }
 

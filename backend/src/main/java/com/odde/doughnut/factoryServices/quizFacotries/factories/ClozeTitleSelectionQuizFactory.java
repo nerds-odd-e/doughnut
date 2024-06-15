@@ -11,12 +11,12 @@ public class ClozeTitleSelectionQuizFactory extends QuestionOptionsFactory {
   }
 
   @Override
-  public Note generateAnswer(QuizQuestionServant servant) {
+  public Note generateAnswer() {
     return note;
   }
 
   @Override
-  public List<Note> generateFillingOptions(QuizQuestionServant servant) {
+  public List<Note> generateFillingOptions() {
     return servant.chooseFromCohort(note, n -> true);
   }
 

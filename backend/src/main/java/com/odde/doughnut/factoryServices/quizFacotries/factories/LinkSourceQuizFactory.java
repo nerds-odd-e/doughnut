@@ -14,7 +14,7 @@ public class LinkSourceQuizFactory extends QuestionOptionsFactory {
   }
 
   @Override
-  public List<Note> generateFillingOptions(QuizQuestionServant servant) {
+  public List<Note> generateFillingOptions() {
     if (cachedFillingOptions == null) {
       cachedFillingOptions = servant.chooseFromCohortAvoidSiblings(link);
     }
@@ -22,7 +22,7 @@ public class LinkSourceQuizFactory extends QuestionOptionsFactory {
   }
 
   @Override
-  public Note generateAnswer(QuizQuestionServant servant) {
+  public Note generateAnswer() {
     return link.getParent();
   }
 

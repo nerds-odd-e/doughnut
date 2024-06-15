@@ -17,12 +17,12 @@ public class FromSamePartAsQuizFactory extends QuestionOptionsFactory {
   }
 
   @Override
-  public void findCategoricalLink(QuizQuestionServant servant) {
+  public void findCategoricalLink() {
     this.parentGrandLink = servant.getParentGrandLink(link);
   }
 
   @Override
-  public List<Note> generateFillingOptions(QuizQuestionServant servant) {
+  public List<Note> generateFillingOptions() {
     if (cachedFillingOptions == null) {
       List<LinkingNote> remoteCousins =
           servant.getCousinLinksAvoidingSiblings(link, parentGrandLink);
@@ -35,7 +35,7 @@ public class FromSamePartAsQuizFactory extends QuestionOptionsFactory {
   }
 
   @Override
-  public Note generateAnswer(QuizQuestionServant servant) {
+  public Note generateAnswer() {
     if (getAnswerLink(servant) == null) return null;
     return getAnswerLink(servant).getParent();
   }

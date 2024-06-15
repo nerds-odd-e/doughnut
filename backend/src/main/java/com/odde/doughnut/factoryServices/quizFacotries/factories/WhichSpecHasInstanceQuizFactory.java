@@ -16,13 +16,13 @@ public class WhichSpecHasInstanceQuizFactory extends QuestionOptionsFactory {
   }
 
   @Override
-  public void findCategoricalLink(QuizQuestionServant servant) {
+  public void findCategoricalLink() {
     List<LinkingNote> candidates = servant.getLinksFromSameSourceHavingReviewPoint(link).toList();
     instanceLink = servant.randomizer.chooseOneRandomly(candidates).orElse(null);
   }
 
   @Override
-  public List<Note> generateFillingOptions(QuizQuestionServant servant) {
+  public List<Note> generateFillingOptions() {
     if (cachedFillingOptions != null) {
       return cachedFillingOptions;
     }
@@ -31,7 +31,7 @@ public class WhichSpecHasInstanceQuizFactory extends QuestionOptionsFactory {
   }
 
   @Override
-  public Note generateAnswer(QuizQuestionServant servant) {
+  public Note generateAnswer() {
     if (instanceLink == null) return null;
     return instanceLink.getParent();
   }
