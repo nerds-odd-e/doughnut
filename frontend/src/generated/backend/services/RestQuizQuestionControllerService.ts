@@ -8,7 +8,6 @@ import type { MCQWithAnswer } from '../models/MCQWithAnswer';
 import type { QuestionSuggestionCreationParams } from '../models/QuestionSuggestionCreationParams';
 import type { QuizQuestion } from '../models/QuizQuestion';
 import type { QuizQuestionContestResult } from '../models/QuizQuestionContestResult';
-import type { QuizQuestionDTO } from '../models/QuizQuestionDTO';
 import type { SuggestedQuestionForFineTuning } from '../models/SuggestedQuestionForFineTuning';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -203,12 +202,12 @@ export class RestQuizQuestionControllerService {
     }
     /**
      * @param note
-     * @returns QuizQuestionDTO OK
+     * @returns MCQWithAnswer OK
      * @throws ApiError
      */
     public generateAiQuestionWithoutSave(
         note: number,
-    ): CancelablePromise<QuizQuestionDTO> {
+    ): CancelablePromise<MCQWithAnswer> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/quiz-questions/generate-question-without-save',

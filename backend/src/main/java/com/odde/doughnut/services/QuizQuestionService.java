@@ -2,7 +2,6 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestion;
-import com.odde.doughnut.entities.QuizQuestionDTO;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.AiQuestionFactory;
@@ -34,15 +33,11 @@ public class QuizQuestionService {
     }
   }
 
-  public QuizQuestionDTO generateAIQuestionWithoutSave(Note note) {
+  public MCQWithAnswer generateAIQuestionWithoutSave(Note note) {
     AiQuestionFactory aiQuestionFactory = new AiQuestionFactory(note, aiQuestionGenerator);
     try {
       QuizQuestion quizQuestion = aiQuestionFactory.buildValidQuizQuestion(null);
-      return QuizQuestionDTO.builder()
-          .multipleChoicesQuestion(quizQuestion.getMultipleChoicesQuestion())
-          .correctAnswerIndex(quizQuestion.getCorrectAnswerIndex())
-          .createdAt(quizQuestion.getCreatedAt())
-          .build();
+      return quizQuestion.getMcqWithAnswer();
     } catch (QuizQuestionNotPossibleException e) {
       throw (new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated"));
     }

@@ -897,7 +897,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/QuizQuestionDTO"
+                $ref: "#/components/schemas/MCQWithAnswer"
   /api/notes/{parentNote}/create:
     post:
       tags:
@@ -2802,17 +2802,6 @@ components:
           $ref: "#/components/schemas/ReviewPoint"
         quizQuestion:
           $ref: "#/components/schemas/QuizQuestion"
-    QuizQuestionDTO:
-      type: object
-      properties:
-        multipleChoicesQuestion:
-          $ref: "#/components/schemas/MultipleChoicesQuestion"
-        createdAt:
-          type: string
-          format: date-time
-        correctAnswerIndex:
-          type: integer
-          format: int32
     NoteCreationDTO:
       required:
       - topicConstructor

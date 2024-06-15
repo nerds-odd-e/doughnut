@@ -12,7 +12,6 @@ import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.QuestionSuggestionCreationParams;
 import com.odde.doughnut.controllers.dto.QuizQuestionContestResult;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.QuizQuestionDTO;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
@@ -309,11 +308,11 @@ class RestQuizQuestionControllerTests {
     @Test
     void generateQuestionForAssessmentOfNote() {
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(jsonQuestion, "");
-      QuizQuestionDTO quizQuestionDTO = controller.generateAIQuestionWithoutSave(note);
+      MCQWithAnswer quizQuestionDTO = controller.generateAIQuestionWithoutSave(note);
 
       Assertions.assertThat(quizQuestionDTO.getMultipleChoicesQuestion().getStem())
           .contains("What is the first color in the rainbow?");
-      Assertions.assertThat(quizQuestionDTO.getCorrectAnswerIndex()).isEqualTo(0);
+      Assertions.assertThat(quizQuestionDTO.getCorrectChoiceIndex()).isEqualTo(0);
     }
   }
 

@@ -57,7 +57,6 @@ export type { QuestionSuggestionCreationParams } from './models/QuestionSuggesti
 export type { QuestionSuggestionParams } from './models/QuestionSuggestionParams';
 export type { QuizQuestion } from './models/QuizQuestion';
 export type { QuizQuestionContestResult } from './models/QuizQuestionContestResult';
-export type { QuizQuestionDTO } from './models/QuizQuestionDTO';
 export type { QuizQuestionsTestData } from './models/QuizQuestionsTestData';
 export type { QuizQuestionTestData } from './models/QuizQuestionTestData';
 export type { Randomization } from './models/Randomization';

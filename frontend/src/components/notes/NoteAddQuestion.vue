@@ -146,20 +146,10 @@ export default defineComponent({
       this.mcqWithAnswer = response;
     },
     async generateQuestionByAI() {
-      const response =
+      this.mcqWithAnswer =
         await this.managedApi.restQuizQuestionController.generateAiQuestionWithoutSave(
           this.note.id,
         );
-      this.mcqWithAnswer.multipleChoicesQuestion.stem =
-        response.multipleChoicesQuestion?.stem;
-      const choices = response.multipleChoicesQuestion;
-      if (choices) {
-        for (let i = 0; i < choices.choices.length; i += 1) {
-          this.mcqWithAnswer.multipleChoicesQuestion.choices[i] =
-            response.multipleChoicesQuestion?.choices[i] || "";
-        }
-      }
-      this.mcqWithAnswer.correctChoiceIndex = response.correctAnswerIndex || 0;
     },
   },
 });
