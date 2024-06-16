@@ -13,15 +13,16 @@ Feature: New questions assessment
       | Korea            | Countries   |
       | China            | Countries   |
     And notebook "Countries" is shared to the Bazaar
-
-  Scenario: Start an assessment with 5 approved questions
-    Given there are questions for the note:
+    And there are questions for the note:
       | noteTopic | question                           | answer  | oneWrongChoice | approved |
       | Singapore | Where in the world is Singapore?   | Asia    | euro           | true     |
       | Vietnam   | Most famous food of Vietnam?       | Pho     | bread          | true     |
       | Japan     | What is the capital city of Japan? | Tokyo   | Kyoto          | true     |
       | Korea     | What is the capital city of Korea? | Seoul   | Busan          | true     |
       | China     | What is the capital city of China? | Beijing | Shanghai       | true     |
+
+
+  Scenario: Start an assessment with 5 approved questions
     And I set the number of question for the "Countries" note is "5"
     When I start the assessment on the "Countries" notebook in the bazaar
     Then I answer the question "Where in the world is Singapore?" with "Asia"
@@ -31,14 +32,10 @@ Feature: New questions assessment
     And I answer the question "What is the capital city of China?" with "Shanghai"
     And I should see the score "Yours score: 2 / 5" at the end of assessment
 
-  Scenario: Fail to start assessment with 4 approved questions
-    Given there are questions for the note:
-      | noteTopic | question                           | answer  | oneWrongChoice |
-      | Vietnam   | Most famous food of Vietnam?       | Pho     | bread          |
-      | Japan     | What is the capital city of Japan? | Tokyo   | Kyoto          |
-      | Korea     | What is the capital city of Korea? | Seoul   | Busan          |
-      | China     | What is the capital city of China? | Beijing | Shanghai       |
-    And I set the number of question for the "Countries" note is "5"
+  Scenario: Fail to start assessment not enough approve questions
+    Given I change approval status of the question "What is the capital city of China?" of the topic "China" to "unapproved":
+    And I change approval status of the question "Most famous food of Vietnam?" of the topic "Vietnam" to "unapproved":
+    And I set the number of question for the "Countries" note is "4"
     When I start the assessment on the "Countries" notebook in the bazaar
     Then I should see error message Not enough questions
 
