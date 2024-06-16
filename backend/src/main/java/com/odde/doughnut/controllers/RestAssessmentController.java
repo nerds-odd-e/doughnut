@@ -1,7 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.entities.QuizQuestion;
+import com.odde.doughnut.entities.QuizQuestion1;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
@@ -27,7 +27,7 @@ class RestAssessmentController {
   }
 
   @GetMapping("/questions/{notebook}")
-  public List<QuizQuestion> generateAssessmentQuestions(
+  public List<QuizQuestion1> generateAssessmentQuestions(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
     currentUser.assertLoggedIn();

@@ -75,7 +75,7 @@ public class RestAssessmentControllerTests {
       noteOwnedByOtherUser.getNotebook().getNotebookSettings().setNumberOfQuestionsInAssessment(5);
       BazaarNotebook bazaarNotebook =
           makeMe.aBazaarNotebook(noteOwnedByOtherUser.getNotebook()).please();
-      List<QuizQuestion> assessment =
+      List<QuizQuestion1> assessment =
           controller.generateAssessmentQuestions(bazaarNotebook.getNotebook());
       assertEquals(5, assessment.size());
     }
@@ -85,7 +85,7 @@ public class RestAssessmentControllerTests {
         throws UnexpectedNoAccessRightException {
       makeMe.theNote(topNote).withNChildrenThat(5, NoteBuilder::hasAnApprovedQuestion).please();
       notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(5);
-      List<QuizQuestion> assessment = controller.generateAssessmentQuestions(notebook);
+      List<QuizQuestion1> assessment = controller.generateAssessmentQuestions(notebook);
       assertEquals(5, assessment.size());
     }
 

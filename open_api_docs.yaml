@@ -2346,7 +2346,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/QuizQuestion"
+                  $ref: "#/components/schemas/QuizQuestion1"
   /api/ai/available-gpt-models:
     get:
       tags:
