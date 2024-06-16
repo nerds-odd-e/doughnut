@@ -1,7 +1,6 @@
 import { screen } from "@testing-library/vue";
 import userEvent from "@testing-library/user-event";
 import { flushPromises } from "@vue/test-utils";
-import { beforeEach } from "vitest";
 import NoteAddQuestion from "@/components/notes/NoteAddQuestion.vue";
 import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";
@@ -18,13 +17,6 @@ const createWrapper = async () => {
 };
 
 describe("NoteAddQuestion", () => {
-  const mockedGenerateQuestion = vitest.fn();
-
-  beforeEach(() => {
-    helper.managedApi.restQuizQuestionController.generateQuestion =
-      mockedGenerateQuestion;
-  });
-
   interface Case {
     question: Record<string, string>;
     expectedRefineButton: boolean;
@@ -32,27 +24,39 @@ describe("NoteAddQuestion", () => {
   }
   [
     {
-      question: { Stem: "abc" },
+      question: {} as Record<string, string>,
       expectedRefineButton: false,
       expectedGenerateButton: true,
+    },
+    {
+      question: { Stem: "abc" },
+      expectedRefineButton: true,
+      expectedGenerateButton: false,
+    },
+    {
+      question: { "Choice 1": "abc" },
+      expectedRefineButton: true,
+      expectedGenerateButton: false,
     },
   ].forEach(async (testCase: Case) => {
     it("only allow generation when no changes", async () => {
       await createWrapper();
-      Object.keys(testCase.question).forEach(async (key) => {
+      // eslint-disable-next-line no-restricted-syntax
+      for (const key of Object.keys(testCase.question)) {
+        // eslint-disable-next-line no-await-in-loop
         const ctrl = await screen.findByLabelText(key);
+        // eslint-disable-next-line no-await-in-loop
         await userEvent.type(ctrl, testCase.question[key]!);
-        // Check the state of the buttons after typing
-        const refineButton = screen.getByRole<HTMLInputElement>("button", {
-          name: /refine/i,
-        });
-        const generateButton = screen.getByRole<HTMLInputElement>("button", {
-          name: /generate/i,
-        });
-
-        expect(refineButton.disabled).toBe(testCase.expectedGenerateButton);
-        expect(generateButton.disabled).toBe(testCase.expectedGenerateButton);
+      }
+      await flushPromises();
+      const refineButton = screen.getByRole<HTMLInputElement>("button", {
+        name: /refine/i,
       });
+      const generateButton = screen.getByRole<HTMLInputElement>("button", {
+        name: /generate/i,
+      });
+      expect(refineButton.disabled).toBe(!testCase.expectedRefineButton);
+      expect(generateButton.disabled).toBe(!testCase.expectedGenerateButton);
     });
   });
 });
