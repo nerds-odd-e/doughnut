@@ -167,10 +167,10 @@ export const assumeNotePage = (noteTopic?: string) => {
       return questionListPage()
     },
     addQuestion(row: Record<string, string>) {
-      this.openQuestionList().addQuestion(row)
+      this.openQuestionList().addQuestionPage().addQuestion(row)
     },
     refineQuestion(row: Record<string, string>) {
-      this.openQuestionList().refineQuestion(row)
+      this.openQuestionList().addQuestionPage().refineQuestion(row)
     },
     toggleApproval(question: string) {
       this.openQuestionList()

@@ -414,5 +414,5 @@ Given(
 )
 
 When("I generate question by AI for note {string}", (noteName: string) => {
-  start.jumpToNotePage(noteName).openQuestionList().generateQuestionByAI()
+  start.jumpToNotePage(noteName).openQuestionList().addQuestionPage().generateQuestionByAI()
 })
