@@ -431,8 +431,8 @@ class RestQuizQuestionControllerTests {
       makeMe.theNote(headNote).withNChildren(10).please();
       noteWithoutQuestions =
           makeMe.aNote("Zen and the Art of Motorcycle Maintenance").under(headNote).please();
-      noteWithQuestions =
-          makeMe.aNote("Lila").creatorAndOwner(currentUser).hasAnApprovedQuestion().please();
+      Note lila = makeMe.aNote("Lila").creatorAndOwner(currentUser).please();
+      noteWithQuestions = makeMe.theNote(lila).hasAnApprovedQuestion().please();
     }
 
     @Test

@@ -8,9 +8,9 @@ import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.sql.Timestamp;
-import java.util.Objects;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.hibernate.annotations.JoinFormula;
 
 @Embeddable
 @Data
@@ -21,10 +21,10 @@ public class QuizQuestion1 {
   @JsonIgnore
   private Integer id;
 
-  @ManyToOne(cascade = CascadeType.DETACH)
-  @JoinColumn(name = "note_id", referencedColumnName = "id", insertable = false, updatable = false)
+  @ManyToOne
+  @JoinFormula("(SELECT n.notebook_id FROM Note n WHERE n.id = note_id)")
   @JsonIgnore
-  private Note note;
+  private Notebook notebook;
 
   @Column(name = "raw_json_question")
   @Convert(converter = MCQToJsonConverter.class)
@@ -58,16 +58,8 @@ public class QuizQuestion1 {
     return mcqWithAnswer;
   }
 
-  @JsonIgnore
-  public boolean checkAnswer(Answer answer) {
-    if (checkSpell != null && checkSpell) {
-      return getNote().matchAnswer(answer.getSpellingAnswer());
-    }
-    return Objects.equals(answer.getChoiceIndex(), getCorrectAnswerIndex());
-  }
-
   @NotNull
   public Note getHeadNote() {
-    return getNote().getNotebook().getHeadNote();
+    return getNotebook().getHeadNote();
   }
 }

@@ -6,6 +6,7 @@ import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import java.util.Objects;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -30,7 +31,10 @@ public class QuizQuestion extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public boolean checkAnswer(Answer answer) {
-    return quizQuestion1.checkAnswer(answer);
+    if (quizQuestion1.getCheckSpell() != null && quizQuestion1.getCheckSpell()) {
+      return getNote().matchAnswer(answer.getSpellingAnswer());
+    }
+    return Objects.equals(answer.getChoiceIndex(), quizQuestion1.getCorrectAnswerIndex());
   }
 
   public ImageWithMask getImageWithMask() {
@@ -76,7 +80,8 @@ public class QuizQuestion extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public void setNote(Note value) {
     this.note = value;
-    this.getQuizQuestion1().setNote(value);
+    // the following is to keep the readonly field in embedded object in sync
+    this.getQuizQuestion1().setNotebook(value.getNotebook());
   }
 
   @JsonIgnore
