@@ -2519,10 +2519,10 @@ components:
           format: int32
         multipleChoicesQuestion:
           $ref: "#/components/schemas/MultipleChoicesQuestion"
-        imageWithMask:
-          $ref: "#/components/schemas/ImageWithMask"
         checkSpell:
           type: boolean
+        imageWithMask:
+          $ref: "#/components/schemas/ImageWithMask"
     QuizQuestionAndAnswer:
       required:
       - id

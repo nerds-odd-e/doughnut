@@ -13,14 +13,17 @@ import lombok.EqualsAndHashCode;
 @Entity
 @Data
 @EqualsAndHashCode(callSuper = false)
-@Table(name = "quiz_question")
+@Table(name = "quiz_question_and_answer")
 public class QuizQuestionAndAnswer extends EntityIdentifiedByIdOnly {
   @ManyToOne(cascade = CascadeType.DETACH)
   @JoinColumn(name = "note_id", referencedColumnName = "id")
   @JsonIgnore
   private Note note;
 
-  @Embedded @NotNull private QuizQuestion quizQuestion = new QuizQuestion();
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "quiz_question_id", referencedColumnName = "id")
+  @NotNull
+  private QuizQuestion quizQuestion = new QuizQuestion();
 
   @Column(name = "created_at")
   @JsonIgnore
@@ -55,14 +58,16 @@ public class QuizQuestionAndAnswer extends EntityIdentifiedByIdOnly {
         .getQuizQuestion()
         .setMultipleChoicesQuestion(MCQWithAnswer.getMultipleChoicesQuestion());
     quizQuestionAIQuestionAndAnswer.setCorrectAnswerIndex(MCQWithAnswer.getCorrectChoiceIndex());
+    // for in memory consistency
+    quizQuestionAIQuestionAndAnswer
+        .getQuizQuestion()
+        .setQuizQuestionAndAnswer(quizQuestionAIQuestionAndAnswer);
     return quizQuestionAIQuestionAndAnswer;
   }
 
   public QuizQuestionInNotebook toQuizQuestionInNotebook() {
     QuizQuestionInNotebook quizQuestionInNotebook = new QuizQuestionInNotebook();
     quizQuestionInNotebook.setNotebook(getNote().getNotebook());
-    // make sure the id is the same as the quiz question id
-    getQuizQuestion().setId(getId());
     quizQuestionInNotebook.setQuizQuestion(getQuizQuestion());
     return quizQuestionInNotebook;
   }

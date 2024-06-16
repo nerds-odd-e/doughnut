@@ -63,11 +63,10 @@ class RestQuizQuestionController {
   @PostMapping("/{quizQuestion}/regenerate")
   @Transactional
   public QuizQuestion regenerate(
-      @PathVariable("quizQuestion") @Schema(type = "integer")
-          QuizQuestionAndAnswer quizQuestionAndAnswer) {
+      @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion) {
     currentUser.assertLoggedIn();
     return quizQuestionService
-        .generateQuestionForNote(quizQuestionAndAnswer.getNote())
+        .generateQuestionForNote(quizQuestion.getQuizQuestionAndAnswer().getNote())
         .getQuizQuestion();
   }
 
@@ -81,21 +80,20 @@ class RestQuizQuestionController {
   @PostMapping("/{quizQuestion}/contest")
   @Transactional
   public QuizQuestionContestResult contest(
-      @PathVariable("quizQuestion") @Schema(type = "integer")
-          QuizQuestionAndAnswer quizQuestionAndAnswer) {
+      @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion) {
     currentUser.assertLoggedIn();
-    return aiQuestionGenerator.getQuizQuestionContestResult(quizQuestionAndAnswer);
+    return aiQuestionGenerator.getQuizQuestionContestResult(
+        quizQuestion.getQuizQuestionAndAnswer());
   }
 
   @PostMapping("/{quizQuestion}/answer")
   @Transactional
   public AnsweredQuestion answerQuiz(
-      @PathVariable("quizQuestion") @Schema(type = "integer")
-          QuizQuestionAndAnswer quizQuestionAndAnswer,
+      @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion,
       @Valid @RequestBody AnswerDTO answerDTO) {
     currentUser.assertLoggedIn();
     Answer answer = new Answer();
-    answer.setQuestion(quizQuestionAndAnswer);
+    answer.setQuestion(quizQuestion.getQuizQuestionAndAnswer());
     answer.setFromDTO(answerDTO);
     AnswerModel answerModel = modelFactoryService.toAnswerModel(answer);
     answerModel.makeAnswerToQuestion(

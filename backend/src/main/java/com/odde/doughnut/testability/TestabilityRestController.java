@@ -169,8 +169,7 @@ class TestabilityRestController {
       @RequestBody QuizQuestionsTestData quizQuestionsTestData) {
     List<QuizQuestionAndAnswer> quizQuestionAndAnswers =
         quizQuestionsTestData.buildQuizQuestions(this.modelFactoryService);
-    quizQuestionAndAnswers.forEach(
-        question -> modelFactoryService.quizQuestionRepository.save(question));
+    quizQuestionAndAnswers.forEach(question -> modelFactoryService.save(question));
     return quizQuestionAndAnswers;
   }
 

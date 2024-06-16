@@ -1,20 +1,16 @@
 package com.odde.doughnut.entities;
 
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.entities.converters.MCQToJsonConverter;
 import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-@Embeddable
+@Entity
+@Table(name = "quiz_question")
 @Data
-@JsonPropertyOrder({"id", "multipleChoicesQuestion", "imageWithMask"})
-public class QuizQuestion {
-  @Column(name = "id", updatable = false, insertable = false)
-  @NotNull
-  private Integer id;
-
+public class QuizQuestion extends EntityIdentifiedByIdOnly {
   @Column(name = "raw_json_question")
   @Convert(converter = MCQToJsonConverter.class)
   @NotNull
@@ -24,4 +20,8 @@ public class QuizQuestion {
   private Boolean checkSpell;
 
   @Embedded ImageWithMask imageWithMask;
+
+  @OneToOne(mappedBy = "quizQuestion")
+  @JsonIgnore
+  private QuizQuestionAndAnswer quizQuestionAndAnswer;
 }

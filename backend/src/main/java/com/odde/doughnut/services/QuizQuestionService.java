@@ -59,9 +59,6 @@ public class QuizQuestionService {
     if (question == null) {
       return null;
     }
-    // make sure the id is the same as the quiz question id
-    QuizQuestionAndAnswer saved = modelFactoryService.save(question);
-    saved.getQuizQuestion().setId(saved.getId());
-    return saved;
+    return modelFactoryService.save(question);
   }
 }

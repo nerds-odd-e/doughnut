@@ -92,7 +92,8 @@ class RestQuizQuestionAndAnswerControllerTests {
     @Test
     void shouldValidateTheAnswerAndUpdateReviewPoint() {
       Integer oldRepetitionCount = reviewPoint.getRepetitionCount();
-      AnsweredQuestion answerResult = controller.answerQuiz(quizQuestionAndAnswer, answerDTO);
+      AnsweredQuestion answerResult =
+          controller.answerQuiz(quizQuestionAndAnswer.getQuizQuestion(), answerDTO);
       assertTrue(answerResult.correct);
       assertThat(reviewPoint.getRepetitionCount(), greaterThan(oldRepetitionCount));
     }
@@ -101,7 +102,7 @@ class RestQuizQuestionAndAnswerControllerTests {
     void shouldNoteIncreaseIndexIfRepeatImmediately() {
       testabilitySettings.timeTravelTo(reviewPoint.getLastReviewedAt());
       Integer oldForgettingCurveIndex = reviewPoint.getForgettingCurveIndex();
-      controller.answerQuiz(quizQuestionAndAnswer, answerDTO);
+      controller.answerQuiz(quizQuestionAndAnswer.getQuizQuestion(), answerDTO);
       assertThat(reviewPoint.getForgettingCurveIndex(), equalTo(oldForgettingCurveIndex));
     }
 
@@ -109,7 +110,7 @@ class RestQuizQuestionAndAnswerControllerTests {
     void shouldIncreaseTheIndex() {
       testabilitySettings.timeTravelTo(reviewPoint.getNextReviewAt());
       Integer oldForgettingCurveIndex = reviewPoint.getForgettingCurveIndex();
-      controller.answerQuiz(quizQuestionAndAnswer, answerDTO);
+      controller.answerQuiz(quizQuestionAndAnswer.getQuizQuestion(), answerDTO);
       assertThat(reviewPoint.getForgettingCurveIndex(), greaterThan(oldForgettingCurveIndex));
       assertThat(
           reviewPoint.getLastReviewedAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
@@ -120,7 +121,7 @@ class RestQuizQuestionAndAnswerControllerTests {
       AnswerDTO answer = new AnswerDTO();
       assertThrows(
           ResponseStatusException.class,
-          () -> nullUserController().answerQuiz(quizQuestionAndAnswer, answer));
+          () -> nullUserController().answerQuiz(quizQuestionAndAnswer.getQuizQuestion(), answer));
     }
 
     @Nested
@@ -137,7 +138,8 @@ class RestQuizQuestionAndAnswerControllerTests {
       void shouldValidateTheWrongAnswer() {
         testabilitySettings.timeTravelTo(reviewPoint.getNextReviewAt());
         Integer oldRepetitionCount = reviewPoint.getRepetitionCount();
-        AnsweredQuestion answerResult = controller.answerQuiz(quizQuestionAndAnswer, answerDTO);
+        AnsweredQuestion answerResult =
+            controller.answerQuiz(quizQuestionAndAnswer.getQuizQuestion(), answerDTO);
         assertFalse(answerResult.correct);
         assertThat(reviewPoint.getRepetitionCount(), greaterThan(oldRepetitionCount));
       }
@@ -147,14 +149,14 @@ class RestQuizQuestionAndAnswerControllerTests {
         testabilitySettings.timeTravelTo(reviewPoint.getNextReviewAt());
         Timestamp lastReviewedAt = reviewPoint.getLastReviewedAt();
         Integer oldForgettingCurveIndex = reviewPoint.getForgettingCurveIndex();
-        controller.answerQuiz(quizQuestionAndAnswer, answerDTO);
+        controller.answerQuiz(quizQuestionAndAnswer.getQuizQuestion(), answerDTO);
         assertThat(reviewPoint.getForgettingCurveIndex(), lessThan(oldForgettingCurveIndex));
         assertThat(reviewPoint.getLastReviewedAt(), equalTo(lastReviewedAt));
       }
 
       @Test
       void shouldRepeatTheNextDay() {
-        controller.answerQuiz(quizQuestionAndAnswer, answerDTO);
+        controller.answerQuiz(quizQuestionAndAnswer.getQuizQuestion(), answerDTO);
         assertThat(
             reviewPoint.getNextReviewAt(),
             lessThan(
@@ -351,7 +353,7 @@ class RestQuizQuestionAndAnswerControllerTests {
                     makeMe.modelFactoryService,
                     makeMe.aNullUserModelPlease(),
                     testabilitySettings);
-            restAiController.regenerate(quizQuestionAndAnswer);
+            restAiController.regenerate(quizQuestionAndAnswer.getQuizQuestion());
           });
     }
 
@@ -361,7 +363,8 @@ class RestQuizQuestionAndAnswerControllerTests {
           makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
 
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(jsonQuestion, "");
-      QuizQuestion quizQuestion = controller.regenerate(this.quizQuestionAndAnswer);
+      QuizQuestion quizQuestion =
+          controller.regenerate(this.quizQuestionAndAnswer.getQuizQuestion());
 
       Assertions.assertThat(quizQuestion.getMultipleChoicesQuestion().getStem())
           .contains("What is the first color in the rainbow?");
@@ -395,14 +398,14 @@ class RestQuizQuestionAndAnswerControllerTests {
                     makeMe.modelFactoryService,
                     makeMe.aNullUserModelPlease(),
                     testabilitySettings);
-            restAiController.contest(quizQuestion);
+            restAiController.contest(quizQuestion.getQuizQuestion());
           });
     }
 
     @Test
     void rejected() {
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(questionEvaluation, "");
-      QuizQuestionContestResult contest = controller.contest(quizQuestion);
+      QuizQuestionContestResult contest = controller.contest(quizQuestion.getQuizQuestion());
       assertTrue(contest.rejected);
     }
 
@@ -413,7 +416,7 @@ class RestQuizQuestionAndAnswerControllerTests {
       globalSettingsService
           .getGlobalSettingEvaluation()
           .setKeyValue(makeMe.aTimestamp().please(), "gpt-new");
-      controller.contest(quizQuestion);
+      controller.contest(quizQuestion.getQuizQuestion());
       ArgumentCaptor<ChatCompletionRequest> argumentCaptor =
           ArgumentCaptor.forClass(ChatCompletionRequest.class);
       verify(openAiApi, times(1)).createChatCompletion(argumentCaptor.capture());
@@ -424,7 +427,7 @@ class RestQuizQuestionAndAnswerControllerTests {
     void acceptTheContest() {
       questionEvaluation.feasibleQuestion = false;
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(questionEvaluation, "");
-      QuizQuestionContestResult contest = controller.contest(quizQuestion);
+      QuizQuestionContestResult contest = controller.contest(quizQuestion.getQuizQuestion());
       assertFalse(contest.rejected);
     }
   }
