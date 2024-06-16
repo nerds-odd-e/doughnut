@@ -27,7 +27,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import _ from "lodash";
-import { AnsweredQuestion, QuizQuestion } from "@/generated/backend";
+import { AnsweredQuestion, QuizQuestionInNotebook } from "@/generated/backend";
 import useLoadingApi from "@/managedApi/useLoadingApi";
 import { StorageAccessor } from "@/store/createNoteStorage";
 import ContentLoader from "@/components/commons/ContentLoader.vue";
@@ -65,7 +65,7 @@ export default defineComponent({
   },
   data() {
     return {
-      quizQuestionCache: [] as (QuizQuestion | undefined)[],
+      quizQuestionCache: [] as (QuizQuestionInNotebook | undefined)[],
       eagerFetchUntil: 0,
       fetching: false,
     };
