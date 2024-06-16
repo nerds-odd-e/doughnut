@@ -23,7 +23,7 @@ Feature: New questions assessment
 
 
   Scenario: Start an assessment with 5 approved questions
-    Given I set the number of question for the "Countries" note is "5"
+    Given I set the number of questions per assessment of the notebook "Countries" to 5
     When I start the assessment on the "Countries" notebook in the bazaar
     Then I answer the question "Where in the world is Singapore?" with "Asia"
     And I answer the question "Most famous food of Vietnam?" with "Pho"
@@ -35,12 +35,12 @@ Feature: New questions assessment
   Scenario: Fail to start assessment not enough approve questions
     Given I toggle the approval of the question "What is the capital city of China?" of the topic "China"
     And I toggle the approval of the question "Most famous food of Vietnam?" of the topic "Vietnam"
-    And I set the number of question for the "Countries" note is "4"
+    And I set the number of questions per assessment of the notebook "Countries" to 4
     When I start the assessment on the "Countries" notebook in the bazaar
     Then I should see error message Not enough questions
 
   Scenario: Cannot start assessment with 0 questions
-    Given I set the number of question for the "Countries" note is "0"
+    Given I set the number of questions per assessment of the notebook "Countries" to 0
     When I start the assessment on the "Countries" notebook in the bazaar
     Then I should see error message The assessment is not available
 

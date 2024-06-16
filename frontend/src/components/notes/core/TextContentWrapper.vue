@@ -83,7 +83,7 @@ export default defineComponent({
       this.localValue = this.value;
     },
   },
-  beforeUnmount() {
+  unmounted() {
     this.changer.flush();
     this.changer.cancel();
   },
