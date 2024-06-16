@@ -4,6 +4,14 @@ import AssessmentPage from "@/pages/AssessmentPage.vue";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 
+vitest.mock("vue-router", () => ({
+  useRouter: () => ({
+    currentRoute: {
+      value: {},
+    },
+  }),
+}));
+
 describe("assessment page", () => {
   beforeEach(() => {
     const teleportTarget = document.createElement("div");
