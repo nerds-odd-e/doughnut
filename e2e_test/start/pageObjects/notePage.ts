@@ -169,6 +169,9 @@ export const assumeNotePage = (noteTopic?: string) => {
     addQuestion(row: Record<string, string>) {
       this.openQuestionList().addQuestion(row)
     },
+    refineQuestion(row: Record<string, string>) {
+      this.openQuestionList().refineQuestion(row)
+    },
     toggleApproval(question: string) {
       this.openQuestionList()
       cy.findByText(question).parent("tr").find('input[type="checkbox"]').click()
@@ -237,15 +240,6 @@ export const assumeNotePage = (noteTopic?: string) => {
       cy.findByRole("button", { name: "more options" }).click()
       cy.findByRole("button", { name: "Questions for the note" }).click()
       cy.findByRole("button", { name: "Add Question" }).click()
-    },
-    injectDataToQuestion(fieldData: string, data: string) {
-      cy.findByLabelText(fieldData).clear()
-      if (data) {
-        cy.findByLabelText(fieldData).type(data)
-      }
-    },
-    verifyRefineQuestionField(field: string) {
-      cy.findByLabelText(field).invoke("val").should("not.eq", "")
     },
   }
 }

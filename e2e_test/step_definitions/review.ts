@@ -240,6 +240,6 @@ Then("I suggest the displayed question {string} as a bad example", (questionStem
     .suggestingNegativeFeedbackFineTuningExclusion()
 })
 
-Then("The generated question for the note by AI will show:", (data: DataTable) => {
+Then("the question in the form becomes:", (data: DataTable) => {
   start.assumeQuestionPage().expectQuestionForm(data.hashes()[0]!)
 })

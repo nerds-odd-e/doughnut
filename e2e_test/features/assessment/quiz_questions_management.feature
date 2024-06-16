@@ -11,8 +11,8 @@ Feature: Quiz Question Management
 
   Scenario: Manually add a question to the note successfully
     When I add the following question for the note "The cow joke":
-      | Question                             | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
-      | What do you call a cow with not leg? | Ground beef    | Cowboy             | Oxford             |
+      | Stem                                 | Choice 0    | Choice 1 | Choice 2 | Correct Choice Index |
+      | What do you call a cow with not leg? | Ground beef | Cowboy   | Oxford   | 0                    |
     Then I should see the questions in the question list of the note "The cow joke":
       | Question                             | Correct Choice |
       | What does a cow say?                 | moo            |
@@ -23,7 +23,18 @@ Feature: Quiz Question Management
       | Question Stem                            | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
       | Why do cows have hooves instead of feet? | they lactose   | they moo           | they have          |
     When I generate question by AI for note "The cow joke"
-    Then The generated question for the note by AI will show:
+    Then the question in the form becomes:
       | Stem                                     | Choice 0     | Choice 1 | Choice 2  | Correct Choice Index |
       | Why do cows have hooves instead of feet? | they lactose | they moo | they have | 0                    |
 
+
+  Scenario: Can refine the question by AI
+    Given OpenAI now refines the question to become:
+      | Question Stem                   | Correct Choice           | Incorrect Choice 1 | Incorrect Choice 2 |
+      | Why did the cow cross the road? | To get to the udder side | To see the chicken | To find grass      |
+    When I refine the following question for the note "The cow joke":
+      | Stem                                 | Choice 1 | Correct Choice Index |
+      | What do you call a cow with no legs? | Cowboy   | 0                    |
+    Then the question in the form becomes:
+      | Stem                            | Choice 0                 | Choice 1           | Choice 2      | Correct Choice Index |
+      | Why did the cow cross the road? | To get to the udder side | To see the chicken | To find grass | 0                    |

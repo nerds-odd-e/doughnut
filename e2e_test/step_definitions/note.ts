@@ -57,6 +57,14 @@ Given(
   },
 )
 
+Given(
+  "I refine the following question for the note {string}:",
+  (noteTopic: string, data: DataTable) => {
+    expect(data.hashes().length, "please add one question at a time.").to.equal(1)
+    start.jumpToNotePage(noteTopic).refineQuestion(data.hashes()[0]!)
+  },
+)
+
 When("I create a notebook with topic {string}", (notebookTopic: string) => {
   start.routerToNotebooksPage().creatingNotebook(notebookTopic)
 })
