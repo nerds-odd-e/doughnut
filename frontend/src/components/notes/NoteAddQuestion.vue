@@ -1,7 +1,7 @@
 <template>
   <div>
     <TextArea
-      rows="2"
+      :rows="2"
       field="stem"
       v-model="multipleChoicesQuestion.stem"
     /><br />
