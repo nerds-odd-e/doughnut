@@ -319,11 +319,12 @@ class RestQuizQuestionAndAnswerControllerTests {
     @Test
     void generateQuestionForAssessmentOfNote() {
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(jsonQuestion, "");
-      MCQWithAnswer quizQuestionDTO = controller.generateAIQuestionWithoutSave(note);
+      QuizQuestionAndAnswer quizQuestionDTO = controller.generateAIQuestionWithoutSave(note);
 
-      Assertions.assertThat(quizQuestionDTO.getMultipleChoicesQuestion().getStem())
+      Assertions.assertThat(
+              quizQuestionDTO.getQuizQuestion().getMultipleChoicesQuestion().getStem())
           .contains("What is the first color in the rainbow?");
-      Assertions.assertThat(quizQuestionDTO.getCorrectChoiceIndex()).isEqualTo(0);
+      Assertions.assertThat(quizQuestionDTO.getCorrectAnswerIndex()).isEqualTo(0);
     }
   }
 
@@ -452,7 +453,7 @@ class RestQuizQuestionAndAnswerControllerTests {
 
     @Test
     void getQuestionsOfANoteWhenThereIsNotQuestion() throws UnexpectedNoAccessRightException {
-      List<MCQWithAnswer> results = controller.getAllQuestionByNote(noteWithoutQuestions);
+      List<QuizQuestionAndAnswer> results = controller.getAllQuestionByNote(noteWithoutQuestions);
       assertThat(results, hasSize(0));
     }
 
@@ -460,15 +461,15 @@ class RestQuizQuestionAndAnswerControllerTests {
     void getQuestionsOfANoteWhenThereIsOneQuestion() throws UnexpectedNoAccessRightException {
       QuizQuestionAndAnswer questionOfNote =
           makeMe.aQuestion().approvedSpellingQuestionOf(noteWithoutQuestions).please();
-      List<MCQWithAnswer> results = controller.getAllQuestionByNote(noteWithoutQuestions);
-      assertThat(results, contains(questionOfNote.getMcqWithAnswer()));
+      List<QuizQuestionAndAnswer> results = controller.getAllQuestionByNote(noteWithoutQuestions);
+      assertThat(results, contains(questionOfNote));
     }
 
     @Test
     void getAllQuestionsOfANoteWhenThereIsMoreThanOneQuestion()
         throws UnexpectedNoAccessRightException {
       makeMe.aQuestion().approvedSpellingQuestionOf(noteWithQuestions).please();
-      List<MCQWithAnswer> results = controller.getAllQuestionByNote(noteWithQuestions);
+      List<QuizQuestionAndAnswer> results = controller.getAllQuestionByNote(noteWithQuestions);
       assertThat(results, hasSize(2));
     }
   }
@@ -478,7 +479,7 @@ class RestQuizQuestionAndAnswerControllerTests {
     @Test
     void authorization() {
       Note note = makeMe.aNote().please();
-      MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
+      QuizQuestionAndAnswer mcqWithAnswer = makeMe.aQuestion().please();
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.addQuestionManually(note, mcqWithAnswer));
@@ -487,7 +488,7 @@ class RestQuizQuestionAndAnswerControllerTests {
     @Test
     void persistent() throws UnexpectedNoAccessRightException {
       Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
-      MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
+      QuizQuestionAndAnswer mcqWithAnswer = makeMe.aQuestion().please();
       controller.addQuestionManually(note, mcqWithAnswer);
       makeMe.refresh(note);
       assertThat(note.getQuizQuestionAndAnswers(), hasSize(1));
@@ -499,7 +500,7 @@ class RestQuizQuestionAndAnswerControllerTests {
     @Test
     void authorization() {
       Note note = makeMe.aNote().please();
-      MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
+      QuizQuestionAndAnswer mcqWithAnswer = makeMe.aQuestion().please();
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.addQuestionManually(note, mcqWithAnswer));
@@ -508,20 +509,23 @@ class RestQuizQuestionAndAnswerControllerTests {
     @Test
     void givenQuestion_thenReturnRefineQuestion() throws UnexpectedNoAccessRightException {
       Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
+      QuizQuestionAndAnswer questionAndAnswer = makeMe.aQuestion().please();
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(mcqWithAnswer, "");
-      MCQWithAnswer result = controller.refineQuestion(note, mcqWithAnswer);
+      QuizQuestionAndAnswer result = controller.refineQuestion(note, questionAndAnswer);
 
-      assertEquals(0, result.getCorrectChoiceIndex());
-      assertEquals("a default question stem", result.getMultipleChoicesQuestion().getStem());
+      assertEquals(0, result.getCorrectAnswerIndex());
+      assertEquals(
+          "a default question stem",
+          result.getQuizQuestion().getMultipleChoicesQuestion().getStem());
       assertEquals(
           List.of("choice1", "choice2", "choice3"),
-          result.getMultipleChoicesQuestion().getChoices());
+          result.getQuizQuestion().getMultipleChoicesQuestion().getChoices());
     }
 
     @Test
     void refineQuestionFailedWithGpt35WillNotTryAgain() throws JsonProcessingException {
-      MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
+      QuizQuestionAndAnswer mcqWithAnswer = makeMe.aQuestion().please();
       Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCallJsonNode(
           new ObjectMapper()

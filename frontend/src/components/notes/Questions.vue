@@ -25,7 +25,7 @@
       <tbody>
         <tr
           v-for="(question, outerIndex) in questions"
-          :key="question.multipleChoicesQuestion.stem"
+          :key="question.quizQuestion.multipleChoicesQuestion.stem"
         >
           <td>
             <input
@@ -35,13 +35,15 @@
               @change="toggleApproval(question.id)"
             />
           </td>
-          <td>{{ question.multipleChoicesQuestion.stem }}</td>
-          <template v-if="question.multipleChoicesQuestion.choices">
+          <td>{{ question.quizQuestion.multipleChoicesQuestion.stem }}</td>
+          <template
+            v-if="question.quizQuestion.multipleChoicesQuestion.choices"
+          >
             <td
-              v-for="(choice, index) in question.multipleChoicesQuestion
-                .choices"
+              v-for="(choice, index) in question.quizQuestion
+                .multipleChoicesQuestion.choices"
               :class="{
-                'correct-choice': index === question.correctChoiceIndex,
+                'correct-choice': index === question.correctAnswerIndex,
               }"
               :key="index"
             >
@@ -56,7 +58,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { MCQWithAnswer, Note } from "@/generated/backend";
+import { Note, QuizQuestionAndAnswer } from "@/generated/backend";
 import useLoadingApi from "@/managedApi/useLoadingApi";
 
 export default defineComponent({
@@ -71,7 +73,7 @@ export default defineComponent({
   },
   data() {
     return {
-      questions: [] as MCQWithAnswer[],
+      questions: [] as QuizQuestionAndAnswer[],
     };
   },
   methods: {
@@ -82,7 +84,7 @@ export default defineComponent({
           this.questions = questions;
         });
     },
-    questionAdded(newQuestion: MCQWithAnswer) {
+    questionAdded(newQuestion: QuizQuestionAndAnswer) {
       if (newQuestion == null) {
         return;
       }

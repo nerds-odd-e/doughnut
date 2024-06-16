@@ -13,7 +13,11 @@ public class QuizQuestionBuilder extends EntityBuilder<QuizQuestionAndAnswer> {
   }
 
   @Override
-  protected void beforeCreate(boolean needPersist) {}
+  protected void beforeCreate(boolean needPersist) {
+    if (entity == null) {
+      approvedSpellingQuestionOf(makeMe.aNote().please(needPersist));
+    }
+  }
 
   public QuizQuestionBuilder approvedSpellingQuestionOf(Note note) {
     this.entity = new SpellingQuizFactory(note).buildSpellingQuestion();

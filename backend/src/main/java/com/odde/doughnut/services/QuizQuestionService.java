@@ -6,6 +6,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.theokanning.openai.client.OpenAiApi;
+import jakarta.validation.Valid;
 
 public class QuizQuestionService {
   private final ModelFactoryService modelFactoryService;
@@ -22,15 +23,21 @@ public class QuizQuestionService {
     return note.getQuizQuestionAndAnswers().stream().findFirst().orElse(null);
   }
 
-  public QuizQuestionAndAnswer addQuestion(Note note, MCQWithAnswer mcqWithAnswer) {
-    QuizQuestionAndAnswer quizQuestionAndAnswer =
-        QuizQuestionAndAnswer.fromMCQWithAnswer(mcqWithAnswer, note);
-    modelFactoryService.save(quizQuestionAndAnswer);
-    return quizQuestionAndAnswer;
+  public QuizQuestionAndAnswer addQuestion(
+      Note note, @Valid QuizQuestionAndAnswer questionAndAnswer) {
+    questionAndAnswer.setNote(note);
+    modelFactoryService.save(questionAndAnswer);
+    return questionAndAnswer;
   }
 
-  public MCQWithAnswer refineQuestion(Note note, MCQWithAnswer mcqWithAnswer) {
-    return aiQuestionGenerator.getAiGeneratedRefineQuestion(note, mcqWithAnswer);
+  public QuizQuestionAndAnswer refineQuestion(Note note, QuizQuestionAndAnswer questionAndAnswer) {
+    MCQWithAnswer aiGeneratedRefineQuestion =
+        aiQuestionGenerator.getAiGeneratedRefineQuestion(
+            note, questionAndAnswer.getMcqWithAnswer());
+    if (aiGeneratedRefineQuestion == null) {
+      return null;
+    }
+    return QuizQuestionAndAnswer.fromMCQWithAnswer(aiGeneratedRefineQuestion, note);
   }
 
   public QuizQuestionAndAnswer toggleApproval(QuizQuestionAndAnswer question) {
@@ -39,19 +46,21 @@ public class QuizQuestionService {
     return question;
   }
 
-  public MCQWithAnswer generateMcqWithAnswer(Note note) {
-    return aiQuestionGenerator.getAiGeneratedQuestion(note);
-  }
-
-  public QuizQuestionAndAnswer generateQuestionForNote(Note note) {
-    MCQWithAnswer MCQWithAnswer = generateMcqWithAnswer(note);
+  public QuizQuestionAndAnswer generateMcqWithAnswer(Note note) {
+    MCQWithAnswer MCQWithAnswer = aiQuestionGenerator.getAiGeneratedQuestion(note);
     if (MCQWithAnswer == null) {
       return null;
     }
-    QuizQuestionAndAnswer quizQuestionAndAnswer =
-        QuizQuestionAndAnswer.fromMCQWithAnswer(MCQWithAnswer, note);
+    return QuizQuestionAndAnswer.fromMCQWithAnswer(MCQWithAnswer, note);
+  }
+
+  public QuizQuestionAndAnswer generateQuestionForNote(Note note) {
+    QuizQuestionAndAnswer question = generateMcqWithAnswer(note);
+    if (question == null) {
+      return null;
+    }
     // make sure the id is the same as the quiz question id
-    QuizQuestionAndAnswer saved = modelFactoryService.save(quizQuestionAndAnswer);
+    QuizQuestionAndAnswer saved = modelFactoryService.save(question);
     saved.getQuizQuestion().setId(saved.getId());
     return saved;
   }

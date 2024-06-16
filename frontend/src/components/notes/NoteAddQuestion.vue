@@ -3,17 +3,14 @@
     <TextArea
       rows="2"
       field="stem"
-      v-model="mcqWithAnswer.multipleChoicesQuestion.stem"
+      v-model="multipleChoicesQuestion.stem"
     /><br />
 
-    <div
-      v-for="(_, index) in mcqWithAnswer.multipleChoicesQuestion.choices"
-      :key="index"
-    >
+    <div v-for="(_, index) in multipleChoicesQuestion.choices" :key="index">
       <TextArea
         :field="'choice ' + index"
         :rows="1"
-        v-model="mcqWithAnswer.multipleChoicesQuestion.choices[index]"
+        v-model="multipleChoicesQuestion.choices[index]"
       />
       <br />
     </div>
@@ -21,22 +18,18 @@
     <TextInput
       rows="2"
       field="correctChoiceIndex"
-      v-model="mcqWithAnswer.correctChoiceIndex"
+      v-model="quizQuestionAndAnswer.correctAnswerIndex"
     /><br />
 
     <button
       @click="addOption"
-      :disabled="
-        mcqWithAnswer.multipleChoicesQuestion.choices.length >= maxOptions
-      "
+      :disabled="multipleChoicesQuestion.choices.length >= maxOptions"
     >
       +
     </button>
     <button
       @click="removeOption"
-      :disabled="
-        mcqWithAnswer.multipleChoicesQuestion.choices.length <= minOptions
-      "
+      :disabled="multipleChoicesQuestion.choices.length <= minOptions"
     >
       -
     </button>
@@ -54,7 +47,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import useLoadingApi from "@/managedApi/useLoadingApi";
-import { Note, MCQWithAnswer } from "@/generated/backend";
+import { Note, QuizQuestionAndAnswer } from "@/generated/backend";
 import isMCQWithAnswerValid from "@/models/isMCQWithAnswerValid";
 import isRefineMCQWithAnswerValid from "@/models/isRefineMCQWithAnswerValid";
 import TextArea from "../form/TextArea.vue";
@@ -71,11 +64,13 @@ export default defineComponent({
   },
   data() {
     return {
-      mcqWithAnswer: <MCQWithAnswer>{
-        correctChoiceIndex: 0,
-        multipleChoicesQuestion: {
-          stem: "",
-          choices: ["", ""],
+      quizQuestionAndAnswer: <QuizQuestionAndAnswer>{
+        correctAnswerIndex: 0,
+        quizQuestion: {
+          multipleChoicesQuestion: {
+            stem: "",
+            choices: ["", ""],
+          },
         },
       },
       minOptions: 2, // Minimum number of options
@@ -85,24 +80,24 @@ export default defineComponent({
   emits: ["close-dialog"],
   computed: {
     isValidQuestion() {
-      return isMCQWithAnswerValid(this.mcqWithAnswer);
+      return isMCQWithAnswerValid(this.quizQuestionAndAnswer);
     },
     isValidRefine() {
-      return isRefineMCQWithAnswerValid(this.mcqWithAnswer);
+      return isRefineMCQWithAnswerValid(this.quizQuestionAndAnswer);
+    },
+    multipleChoicesQuestion() {
+      return this.quizQuestionAndAnswer.quizQuestion.multipleChoicesQuestion;
     },
     isUserDidInputQuestion() {
       return (
-        this.mcqWithAnswer.multipleChoicesQuestion.stem &&
-        this.mcqWithAnswer.multipleChoicesQuestion.stem.trim().length > 0
+        this.multipleChoicesQuestion.stem &&
+        this.multipleChoicesQuestion.stem.trim().length > 0
       );
     },
+
     isUserDidInputChoices() {
-      for (
-        let i = 0;
-        i < this.mcqWithAnswer.multipleChoicesQuestion.choices.length;
-        i += 1
-      ) {
-        if (this.mcqWithAnswer.multipleChoicesQuestion.choices[i]) {
+      for (let i = 0; i < this.multipleChoicesQuestion.choices.length; i += 1) {
+        if (this.multipleChoicesQuestion.choices[i]) {
           return true;
         }
       }
@@ -111,24 +106,18 @@ export default defineComponent({
   },
   methods: {
     addOption() {
-      if (
-        this.mcqWithAnswer.multipleChoicesQuestion.choices.length <
-        this.maxOptions
-      ) {
-        this.mcqWithAnswer.multipleChoicesQuestion.choices.push("");
+      if (this.multipleChoicesQuestion.choices.length < this.maxOptions) {
+        this.multipleChoicesQuestion.choices.push("");
       }
     },
 
     removeOption() {
-      if (
-        this.mcqWithAnswer.multipleChoicesQuestion.choices.length >
-        this.minOptions
-      ) {
-        this.mcqWithAnswer.multipleChoicesQuestion.choices.pop();
+      if (this.multipleChoicesQuestion.choices.length > this.minOptions) {
+        this.multipleChoicesQuestion.choices.pop();
       }
     },
     async submitQuestion() {
-      const quizQuestion = this.mcqWithAnswer;
+      const quizQuestion = this.quizQuestionAndAnswer;
       const response =
         await this.managedApi.restQuizQuestionController.addQuestionManually(
           this.note.id,
@@ -137,16 +126,16 @@ export default defineComponent({
       this.$emit("close-dialog", response);
     },
     async refineQuestion() {
-      const quizQuestion = this.mcqWithAnswer;
+      const quizQuestion = this.quizQuestionAndAnswer;
       const response =
         await this.managedApi.restQuizQuestionController.refineQuestion(
           this.note.id,
           quizQuestion,
         );
-      this.mcqWithAnswer = response;
+      this.quizQuestionAndAnswer = response;
     },
     async generateQuestionByAI() {
-      this.mcqWithAnswer =
+      this.quizQuestionAndAnswer =
         await this.managedApi.restQuizQuestionController.generateAiQuestionWithoutSave(
           this.note.id,
         );

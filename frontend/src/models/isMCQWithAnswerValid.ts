@@ -1,13 +1,15 @@
-import { MCQWithAnswer } from "@/generated/backend";
+import { QuizQuestionAndAnswer } from "@/generated/backend";
 
-function isMCQWithAnswerValid(mcqWithAnswer: MCQWithAnswer): boolean {
-  const { stem, choices } = mcqWithAnswer.multipleChoicesQuestion;
-  const { correctChoiceIndex } = mcqWithAnswer;
+function isMCQWithAnswerValid(mcqWithAnswer: QuizQuestionAndAnswer): boolean {
+  const { stem, choices } = mcqWithAnswer.quizQuestion.multipleChoicesQuestion;
+  const { correctAnswerIndex } = mcqWithAnswer;
 
   const isStemNotEmpty = !!stem?.trim();
   const allChoicesFilled = choices.every((option) => option.trim());
   const isValidChoiceIndex =
-    correctChoiceIndex >= 0 && correctChoiceIndex < choices.length;
+    correctAnswerIndex !== undefined &&
+    correctAnswerIndex >= 0 &&
+    correctAnswerIndex < choices.length;
 
   return isStemNotEmpty && allChoicesFilled && isValidChoiceIndex;
 }

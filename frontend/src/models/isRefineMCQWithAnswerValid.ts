@@ -1,7 +1,9 @@
-import { MCQWithAnswer } from "@/generated/backend";
+import { QuizQuestionAndAnswer } from "@/generated/backend";
 
-function isRefineMCQWithAnswerValid(mcqWithAnswer: MCQWithAnswer): boolean {
-  const { stem, choices } = mcqWithAnswer.multipleChoicesQuestion;
+function isRefineMCQWithAnswerValid(
+  mcqWithAnswer: QuizQuestionAndAnswer,
+): boolean {
+  const { stem, choices } = mcqWithAnswer.quizQuestion.multipleChoicesQuestion;
 
   const isStemNotEmpty = !!stem?.trim();
   let isChoiceNotEmpty = false;

@@ -37,8 +37,6 @@ public class QuizQuestionAndAnswer extends EntityIdentifiedByIdOnly {
     MCQWithAnswer mcqWithAnswer = new MCQWithAnswer();
     mcqWithAnswer.setMultipleChoicesQuestion(quizQuestion.getMultipleChoicesQuestion());
     mcqWithAnswer.setCorrectChoiceIndex(correctAnswerIndex == null ? -1 : correctAnswerIndex);
-    mcqWithAnswer.setApproved(approved);
-    mcqWithAnswer.setId(id);
     return mcqWithAnswer;
   }
 

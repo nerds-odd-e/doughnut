@@ -12,7 +12,6 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.QuizQuestionService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
-import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -73,7 +72,7 @@ class RestQuizQuestionController {
   }
 
   @PostMapping("/generate-question-without-save")
-  public MCQWithAnswer generateAIQuestionWithoutSave(
+  public QuizQuestionAndAnswer generateAIQuestionWithoutSave(
       @RequestParam(value = "note") @Schema(type = "integer") Note note) {
     currentUser.assertLoggedIn();
     return quizQuestionService.generateMcqWithAnswer(note);
@@ -121,33 +120,31 @@ class RestQuizQuestionController {
   }
 
   @GetMapping("/{note}/note-questions")
-  public List<MCQWithAnswer> getAllQuestionByNote(
+  public List<QuizQuestionAndAnswer> getAllQuestionByNote(
       @PathVariable("note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
-    return note.getQuizQuestionAndAnswers().stream()
-        .map(QuizQuestionAndAnswer::getMcqWithAnswer)
-        .toList();
+    return note.getQuizQuestionAndAnswers().stream().toList();
   }
 
   @PostMapping("/{note}/note-questions")
   @Transactional
-  public MCQWithAnswer addQuestionManually(
+  public QuizQuestionAndAnswer addQuestionManually(
       @PathVariable("note") @Schema(type = "integer") Note note,
-      @Valid @RequestBody MCQWithAnswer manualQuestion)
+      @Valid @RequestBody QuizQuestionAndAnswer questionAndAnswer)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
-    return quizQuestionService.addQuestion(note, manualQuestion).getMcqWithAnswer();
+    return quizQuestionService.addQuestion(note, questionAndAnswer);
   }
 
   @PostMapping("/{note}/refine-question")
   @Transactional
-  public MCQWithAnswer refineQuestion(
+  public QuizQuestionAndAnswer refineQuestion(
       @PathVariable("note") @Schema(type = "integer") Note note,
-      @RequestBody MCQWithAnswer manualQuestion)
+      @RequestBody QuizQuestionAndAnswer questionAndAnswer)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
-    return quizQuestionService.refineQuestion(note, manualQuestion);
+    return quizQuestionService.refineQuestion(note, questionAndAnswer);
   }
 
   @PostMapping("/{quizQuestion}/toggle-approval")
