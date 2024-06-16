@@ -1,4 +1,7 @@
 <template>
+  <BasicBreadcrumb
+    :ancestors="[quizQuestionInNotebook.notebook.headNote.noteTopic]"
+  />
   <div v-for="(q, index) in prevQuizQuestions" :key="index">
     <h3>Previous Question Contested ...</h3>
     <p>{{ q.badQuestionReason }}</p>
@@ -34,18 +37,23 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import type { StorageAccessor } from "@/store/createNoteStorage";
-import { AnsweredQuestion, QuizQuestion } from "@/generated/backend";
+import {
+  AnsweredQuestion,
+  QuizQuestion,
+  QuizQuestionInNotebook,
+} from "@/generated/backend";
 import useLoadingApi from "@/managedApi/useLoadingApi";
 import QuizQuestionC from "./QuizQuestion.vue";
 import AnsweredQuestionComponent from "./AnsweredQuestionComponent.vue";
+import BasicBreadcrumb from "../commons/BasicBreadcrumb.vue";
 
 export default defineComponent({
   setup() {
     return useLoadingApi();
   },
   props: {
-    quizQuestion: {
-      type: Object as PropType<QuizQuestion>,
+    quizQuestionInNotebook: {
+      type: Object as PropType<QuizQuestionInNotebook>,
       required: true,
     },
     storageAccessor: {
@@ -56,13 +64,14 @@ export default defineComponent({
   emits: ["need-scroll", "answered"],
   components: {
     QuizQuestionC,
+    BasicBreadcrumb,
     AnsweredQuestionComponent,
   },
   data() {
     return {
       regenerating: false,
       currentQuestionLegitMessage: undefined as string | undefined,
-      currentQuestion: this.quizQuestion,
+      currentQuestion: this.quizQuestionInNotebook,
       answeredQuestion: undefined as AnsweredQuestion | undefined,
       prevQuizQuestions: [] as {
         quizeQuestion: QuizQuestion;
@@ -95,10 +104,12 @@ export default defineComponent({
           quizeQuestion: this.currentQuestion,
           badQuestionReason: contestResult.reason,
         });
-        this.currentQuestion =
-          await this.managedApi.restQuizQuestionController.regenerate(
+        this.currentQuestion = {
+          ...this.currentQuestion,
+          ...(await this.managedApi.restQuizQuestionController.regenerate(
             this.currentQuestion.id,
-          );
+          )),
+        };
       } else {
         this.currentQuestionLegitMessage = contestResult.reason;
       }

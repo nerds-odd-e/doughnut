@@ -1,10 +1,10 @@
-import { QuizQuestion } from "@/generated/backend";
+import { QuizQuestionInNotebook } from "@/generated/backend";
 import Builder from "./Builder";
 import generateId from "./generateId";
 import NotebookBuilder from "./NotebookBuilder";
 
-class QuizQuestionBuilder extends Builder<QuizQuestion> {
-  quizQuestion: QuizQuestion = {
+class QuizQuestionBuilder extends Builder<QuizQuestionInNotebook> {
+  quizQuestion: QuizQuestionInNotebook = {
     id: generateId(),
     notebook: new NotebookBuilder().do(),
     multipleChoicesQuestion: {
@@ -23,7 +23,7 @@ class QuizQuestionBuilder extends Builder<QuizQuestion> {
     return this;
   }
 
-  do(): QuizQuestion {
+  do(): QuizQuestionInNotebook {
     return this.quizQuestion;
   }
 }

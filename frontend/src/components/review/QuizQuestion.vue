@@ -1,5 +1,4 @@
 <template>
-  <BasicBreadcrumb :ancestors="[quizQuestion.notebook.headNote.noteTopic]" />
   <div class="quiz-instruction" :key="quizQuestion.id">
     <ShowImage
       v-if="quizQuestion.imageWithMask"
@@ -69,7 +68,6 @@ import TextInput from "../form/TextInput.vue";
 import usePopups from "../commons/Popups/usePopups";
 import QuizQuestionChoices from "./QuizQuestionChoices.vue";
 import SuggestQuestionForFineTuning from "../ai/SuggestQuestionForFineTuning.vue";
-import BasicBreadcrumb from "../commons/BasicBreadcrumb.vue";
 import SvgRaiseHand from "../svgs/SvgRaiseHand.vue";
 
 export default defineComponent({
@@ -90,7 +88,6 @@ export default defineComponent({
     ShowImage,
     TextInput,
     QuizQuestionChoices,
-    BasicBreadcrumb,
     SvgRaiseHand,
     SuggestQuestionForFineTuning,
   },

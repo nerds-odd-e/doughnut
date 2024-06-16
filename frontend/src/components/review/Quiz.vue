@@ -14,7 +14,7 @@
       <ContestableQuestion
         v-else
         v-bind="{
-          quizQuestion: currentQuizQuestion,
+          quizQuestionInNotebook: currentQuizQuestion,
           storageAccessor,
         }"
         @answered="onAnswered($event)"

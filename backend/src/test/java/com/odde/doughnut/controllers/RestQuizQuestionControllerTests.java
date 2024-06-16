@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.QuestionSuggestionCreationParams;
 import com.odde.doughnut.controllers.dto.QuizQuestionContestResult;
+import com.odde.doughnut.controllers.dto.QuizQuestionInNotebook;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -265,7 +266,7 @@ class RestQuizQuestionControllerTests {
     @Test
     void createQuizQuestion() {
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(jsonQuestion, "");
-      QuizQuestion quizQuestion = controller.generateQuestion(note);
+      QuizQuestionInNotebook quizQuestion = controller.generateQuestion(note);
 
       Assertions.assertThat(quizQuestion.getMultipleChoicesQuestion().getStem())
           .contains("What is the first color in the rainbow?");

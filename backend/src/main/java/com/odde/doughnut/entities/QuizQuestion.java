@@ -42,11 +42,6 @@ public class QuizQuestion extends EntityIdentifiedByIdOnly {
     return quizQuestion1.getImageWithMask();
   }
 
-  @NotNull
-  public Notebook getNotebook() {
-    return getNote().getNotebook();
-  }
-
   public static QuizQuestion fromMCQWithAnswer(MCQWithAnswer MCQWithAnswer, Note note) {
     QuizQuestion quizQuestionAIQuestion = new QuizQuestion();
     quizQuestionAIQuestion.setNote(note);
@@ -100,7 +95,7 @@ public class QuizQuestion extends EntityIdentifiedByIdOnly {
 
   public QuizQuestionInNotebook toQuizQuestionInNotebook() {
     QuizQuestionInNotebook quizQuestionInNotebook = new QuizQuestionInNotebook();
-    quizQuestionInNotebook.setNotebook(getNotebook());
+    quizQuestionInNotebook.setNotebook(getNote().getNotebook());
     quizQuestionInNotebook.setMultipleChoicesQuestion(getMultipleChoicesQuestion());
     quizQuestionInNotebook.setId(getId());
     quizQuestionInNotebook.setImageWithMask(getImageWithMask());

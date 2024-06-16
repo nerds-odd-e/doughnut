@@ -1,7 +1,7 @@
 <template>
   <ContestableQuestion
-    v-if="quizQuestion"
-    v-bind="{ quizQuestion, storageAccessor }"
+    v-if="quizQuestionInNotebook"
+    v-bind="{ quizQuestionInNotebook, storageAccessor }"
     @need-scroll="scrollToBottom"
   />
   <div v-show="answered" class="chat-answer-container">
@@ -14,7 +14,7 @@
 
   <div class="container">
     <button
-      v-if="!quizQuestion"
+      v-if="!quizQuestionInNotebook"
       class="btn btn-secondary"
       @click="generateQuestion"
     >
@@ -63,7 +63,7 @@ export default defineComponent({
   },
   data() {
     return {
-      quizQuestion: undefined as QuizQuestionInNotebook | undefined,
+      quizQuestionInNotebook: undefined as QuizQuestionInNotebook | undefined,
       chatInput: "",
       assistantMessage: "" as string | undefined,
       answered: false,
@@ -82,7 +82,7 @@ export default defineComponent({
       }
     },
     async generateQuestion() {
-      this.quizQuestion =
+      this.quizQuestionInNotebook =
         await this.managedApi.restQuizQuestionController.generateQuestion(
           this.selectedNote.id,
         );
