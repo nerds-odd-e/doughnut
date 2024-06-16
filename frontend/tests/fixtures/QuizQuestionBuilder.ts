@@ -1,9 +1,9 @@
-import { QuizQuestion1 } from "@/generated/backend";
+import { QuizQuestion } from "@/generated/backend";
 import Builder from "./Builder";
 import generateId from "./generateId";
 
-class QuizQuestionBuilder extends Builder<QuizQuestion1> {
-  quizQuestion: QuizQuestion1 = {
+class QuizQuestionBuilder extends Builder<QuizQuestion> {
+  quizQuestion: QuizQuestion = {
     id: generateId(),
     multipleChoicesQuestion: {
       stem: "answer",
@@ -21,7 +21,7 @@ class QuizQuestionBuilder extends Builder<QuizQuestion1> {
     return this;
   }
 
-  do(): QuizQuestion1 {
+  do(): QuizQuestion {
     return this.quizQuestion;
   }
 }

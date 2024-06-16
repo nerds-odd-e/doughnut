@@ -360,7 +360,7 @@ class RestQuizQuestionAndAnswerControllerTests {
           makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
 
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(jsonQuestion, "");
-      QuizQuestion1 quizQuestion = controller.regenerate(this.quizQuestionAndAnswer);
+      QuizQuestion quizQuestion = controller.regenerate(this.quizQuestionAndAnswer);
 
       Assertions.assertThat(quizQuestion.getMultipleChoicesQuestion().getStem())
           .contains("What is the first color in the rainbow?");

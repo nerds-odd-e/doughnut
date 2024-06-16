@@ -13,7 +13,7 @@ public class ImageTitleSelectionQuizFactory extends ClozeTitleSelectionQuizFacto
   @Override
   public QuizQuestionAndAnswer buildValidQuizQuestion() throws QuizQuestionNotPossibleException {
     QuizQuestionAndAnswer quizQuestionAndAnswer = super.buildValidQuizQuestion();
-    quizQuestionAndAnswer.getQuizQuestion1().setImageWithMask(note.getImageWithMask());
+    quizQuestionAndAnswer.getQuizQuestion().setImageWithMask(note.getImageWithMask());
     return quizQuestionAndAnswer;
   }
 

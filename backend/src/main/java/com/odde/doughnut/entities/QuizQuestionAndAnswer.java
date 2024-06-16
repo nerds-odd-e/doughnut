@@ -23,54 +23,54 @@ public class QuizQuestionAndAnswer extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   private Note note;
 
-  @Embedded @NotNull private QuizQuestion1 quizQuestion1 = new QuizQuestion1();
+  @Embedded @NotNull private QuizQuestion quizQuestion = new QuizQuestion();
 
   @JsonIgnore
   public MCQWithAnswer getMcqWithAnswer() {
-    return quizQuestion1.getMcqWithAnswer();
+    return quizQuestion.getMcqWithAnswer();
   }
 
   @JsonIgnore
   public boolean checkAnswer(Answer answer) {
-    if (quizQuestion1.getCheckSpell() != null && quizQuestion1.getCheckSpell()) {
+    if (quizQuestion.getCheckSpell() != null && quizQuestion.getCheckSpell()) {
       return getNote().matchAnswer(answer.getSpellingAnswer());
     }
-    return Objects.equals(answer.getChoiceIndex(), quizQuestion1.getCorrectAnswerIndex());
+    return Objects.equals(answer.getChoiceIndex(), quizQuestion.getCorrectAnswerIndex());
   }
 
   public ImageWithMask getImageWithMask() {
-    return quizQuestion1.getImageWithMask();
+    return quizQuestion.getImageWithMask();
   }
 
   public static QuizQuestionAndAnswer fromMCQWithAnswer(MCQWithAnswer MCQWithAnswer, Note note) {
     QuizQuestionAndAnswer quizQuestionAIQuestionAndAnswer = new QuizQuestionAndAnswer();
     quizQuestionAIQuestionAndAnswer.setNote(note);
     quizQuestionAIQuestionAndAnswer
-        .getQuizQuestion1()
+        .getQuizQuestion()
         .setMultipleChoicesQuestion(MCQWithAnswer.getMultipleChoicesQuestion());
     quizQuestionAIQuestionAndAnswer
-        .getQuizQuestion1()
+        .getQuizQuestion()
         .setCorrectAnswerIndex(MCQWithAnswer.getCorrectChoiceIndex());
     return quizQuestionAIQuestionAndAnswer;
   }
 
   @JsonIgnore
   public void setCorrectAnswerIndex(int i) {
-    getQuizQuestion1().setCorrectAnswerIndex(i);
+    getQuizQuestion().setCorrectAnswerIndex(i);
   }
 
   public void setMultipleChoicesQuestion(MultipleChoicesQuestion mcq) {
-    getQuizQuestion1().setMultipleChoicesQuestion(mcq);
+    getQuizQuestion().setMultipleChoicesQuestion(mcq);
   }
 
   @NotNull
   public MultipleChoicesQuestion getMultipleChoicesQuestion() {
-    return getQuizQuestion1().getMultipleChoicesQuestion();
+    return getQuizQuestion().getMultipleChoicesQuestion();
   }
 
   @JsonIgnore
   public void setApproved(boolean approved) {
-    getQuizQuestion1().setApproved(approved);
+    getQuizQuestion().setApproved(approved);
   }
 
   @JsonIgnore
@@ -80,25 +80,25 @@ public class QuizQuestionAndAnswer extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public Integer getCorrectAnswerIndex() {
-    return getQuizQuestion1().getCorrectAnswerIndex();
+    return getQuizQuestion().getCorrectAnswerIndex();
   }
 
   @JsonIgnore
   public void setCheckSpell(boolean b) {
-    getQuizQuestion1().setCheckSpell(b);
+    getQuizQuestion().setCheckSpell(b);
   }
 
   @JsonIgnore
   public boolean isApproved() {
-    return getQuizQuestion1().isApproved();
+    return getQuizQuestion().isApproved();
   }
 
   public QuizQuestionInNotebook toQuizQuestionInNotebook() {
     QuizQuestionInNotebook quizQuestionInNotebook = new QuizQuestionInNotebook();
     quizQuestionInNotebook.setNotebook(getNote().getNotebook());
     // make sure the id is the same as the quiz question id
-    getQuizQuestion1().setId(getId());
-    quizQuestionInNotebook.setQuizQuestion(getQuizQuestion1());
+    getQuizQuestion().setId(getId());
+    quizQuestionInNotebook.setQuizQuestion(getQuizQuestion());
     return quizQuestionInNotebook;
   }
 }

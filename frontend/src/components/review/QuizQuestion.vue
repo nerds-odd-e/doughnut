@@ -61,7 +61,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { AnswerDTO, QuizQuestion1 } from "@/generated/backend";
+import { AnswerDTO, QuizQuestion } from "@/generated/backend";
 import useLoadingApi from "@/managedApi/useLoadingApi";
 import ShowImage from "../notes/accessory/ShowImage.vue";
 import TextInput from "../form/TextInput.vue";
@@ -77,7 +77,7 @@ export default defineComponent({
   },
   props: {
     quizQuestion: {
-      type: Object as PropType<QuizQuestion1>,
+      type: Object as PropType<QuizQuestion>,
       required: true,
     },
     correctChoiceIndex: Number,

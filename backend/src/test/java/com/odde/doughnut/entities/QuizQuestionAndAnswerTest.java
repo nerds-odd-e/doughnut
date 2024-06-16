@@ -127,7 +127,7 @@ class QuizQuestionAndAnswerTest {
 
     @Test
     void typeShouldBeSpellingQuiz() {
-      assertTrue(generateQuizQuestionEntity(note).getQuizQuestion1().getCheckSpell());
+      assertTrue(generateQuizQuestionEntity(note).getQuizQuestion().getCheckSpell());
     }
 
     @Test
@@ -162,8 +162,8 @@ class QuizQuestionAndAnswerTest {
       for (int i = 0; i < 20; i++) {
         QuizQuestionAndAnswer randomQuizQuestion =
             generateQuizQuestion(note, new RealRandomizer(), null);
-        if (randomQuizQuestion.getQuizQuestion1().getCheckSpell() != null
-            && randomQuizQuestion.getQuizQuestion1().getCheckSpell()) {
+        if (randomQuizQuestion.getQuizQuestion().getCheckSpell() != null
+            && randomQuizQuestion.getQuizQuestion().getCheckSpell()) {
           spellingCount++;
         }
       }

@@ -19,7 +19,7 @@ class QuizQuestionAndAnswerBuilder extends Builder<QuizQuestionAndAnswer> {
     const quizQuestion = this.quizQuestionBuilder.do();
     return {
       ...quizQuestion,
-      quizQuestion1: quizQuestion,
+      quizQuestion,
     };
   }
 }

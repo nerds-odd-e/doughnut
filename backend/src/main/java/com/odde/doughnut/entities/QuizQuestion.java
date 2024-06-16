@@ -14,8 +14,8 @@ import lombok.EqualsAndHashCode;
 @Embeddable
 @Data
 @EqualsAndHashCode(callSuper = false)
-@JsonPropertyOrder({"id", "multipleChoicesQuestion", "headNote", "imageWithMask"})
-public class QuizQuestion1 {
+@JsonPropertyOrder({"id", "multipleChoicesQuestion", "imageWithMask"})
+public class QuizQuestion {
   @Column(name = "id", updatable = false, insertable = false)
   @NotNull
   private Integer id;

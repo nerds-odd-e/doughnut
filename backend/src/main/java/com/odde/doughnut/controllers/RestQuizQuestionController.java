@@ -63,13 +63,13 @@ class RestQuizQuestionController {
 
   @PostMapping("/{quizQuestion}/regenerate")
   @Transactional
-  public QuizQuestion1 regenerate(
+  public QuizQuestion regenerate(
       @PathVariable("quizQuestion") @Schema(type = "integer")
           QuizQuestionAndAnswer quizQuestionAndAnswer) {
     currentUser.assertLoggedIn();
     return quizQuestionService
         .generateQuestionForNote(quizQuestionAndAnswer.getNote())
-        .getQuizQuestion1();
+        .getQuizQuestion();
   }
 
   @PostMapping("/generate-question-without-save")

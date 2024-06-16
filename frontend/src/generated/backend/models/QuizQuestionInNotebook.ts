@@ -3,9 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { Notebook } from './Notebook';
-import type { QuizQuestion1 } from './QuizQuestion1';
+import type { QuizQuestion } from './QuizQuestion';
 export type QuizQuestionInNotebook = {
     notebook: Notebook;
-    quizQuestion: QuizQuestion1;
+    quizQuestion: QuizQuestion;
 };
 

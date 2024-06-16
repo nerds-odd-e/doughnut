@@ -18,7 +18,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import useLoadingApi from "@/managedApi/useLoadingApi";
-import { QuizQuestion1 } from "@/generated/backend";
+import { QuizQuestion } from "@/generated/backend";
 import QuizQuestionComp from "../components/review/QuizQuestion.vue";
 
 export default defineComponent({
@@ -38,7 +38,7 @@ export default defineComponent({
   },
   data() {
     return {
-      quizQuestions: [] as QuizQuestion1[],
+      quizQuestions: [] as QuizQuestion[],
       currentQuestion: 0,
       errors: "",
       correctAnswers: 0,

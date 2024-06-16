@@ -710,7 +710,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/QuizQuestion1"
+                $ref: "#/components/schemas/QuizQuestion"
   /api/quiz-questions/{quizQuestion}/contest:
     post:
       tags:
@@ -2346,7 +2346,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/QuizQuestion1"
+                  $ref: "#/components/schemas/QuizQuestion"
   /api/ai/available-gpt-models:
     get:
       tags:
@@ -2513,7 +2513,7 @@ components:
           type: string
         imageMask:
           type: string
-    QuizQuestion1:
+    QuizQuestion:
       required:
       - id
       - multipleChoicesQuestion
@@ -2530,7 +2530,7 @@ components:
       required:
       - id
       - multipleChoicesQuestion
-      - quizQuestion1
+      - quizQuestion
       type: object
       properties:
         id:
@@ -2540,8 +2540,8 @@ components:
           $ref: "#/components/schemas/MultipleChoicesQuestion"
         imageWithMask:
           $ref: "#/components/schemas/ImageWithMask"
-        quizQuestion1:
-          $ref: "#/components/schemas/QuizQuestion1"
+        quizQuestion:
+          $ref: "#/components/schemas/QuizQuestion"
     NoteTestData:
       type: object
       properties:
@@ -2821,7 +2821,7 @@ components:
         notebook:
           $ref: "#/components/schemas/Notebook"
         quizQuestion:
-          $ref: "#/components/schemas/QuizQuestion1"
+          $ref: "#/components/schemas/QuizQuestion"
     NoteCreationDTO:
       required:
       - topicConstructor

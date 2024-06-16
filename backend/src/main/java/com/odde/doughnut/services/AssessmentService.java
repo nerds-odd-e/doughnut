@@ -3,7 +3,7 @@ package com.odde.doughnut.services;
 import static com.odde.doughnut.controllers.dto.ApiError.ErrorType.ASSESSMENT_SERVICE_ERROR;
 
 import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.entities.QuizQuestion1;
+import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.QuizQuestionAndAnswer;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -18,7 +18,7 @@ public class AssessmentService {
     this.quizQuestionService = new QuizQuestionService(openAiApi, modelFactoryService);
   }
 
-  public List<QuizQuestion1> generateAssessment(Notebook notebook) {
+  public List<QuizQuestion> generateAssessment(Notebook notebook) {
 
     List<QuizQuestionAndAnswer> questions =
         notebook.getNotes().stream()
@@ -42,7 +42,7 @@ public class AssessmentService {
 
     return questions.stream()
         .limit(numberOfQuestion)
-        .map(QuizQuestionAndAnswer::getQuizQuestion1)
+        .map(QuizQuestionAndAnswer::getQuizQuestion)
         .toList();
   }
 }

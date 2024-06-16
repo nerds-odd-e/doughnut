@@ -2,19 +2,19 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { QuizQuestion1 } from '../models/QuizQuestion1';
+import type { QuizQuestion } from '../models/QuizQuestion';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestAssessmentControllerService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
      * @param notebook
-     * @returns QuizQuestion1 OK
+     * @returns QuizQuestion OK
      * @throws ApiError
      */
     public generateAssessmentQuestions(
         notebook: number,
-    ): CancelablePromise<Array<QuizQuestion1>> {
+    ): CancelablePromise<Array<QuizQuestion>> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/assessment/questions/{notebook}',
