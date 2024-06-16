@@ -1,13 +1,10 @@
 package com.odde.doughnut.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.doughnut.entities.converters.MCQToJsonConverter;
-import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import java.sql.Timestamp;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -25,31 +22,8 @@ public class QuizQuestion {
   @NotNull
   private MultipleChoicesQuestion multipleChoicesQuestion;
 
-  @Column(name = "created_at")
-  @JsonIgnore
-  private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
-
-  @Column(name = "correct_answer_index")
-  @JsonIgnore
-  private Integer correctAnswerIndex;
-
   @Column(name = "check_spell")
-  @JsonIgnore
   private Boolean checkSpell;
 
-  @Column(name = "is_approved")
-  @JsonIgnore
-  private boolean approved;
-
   @Embedded ImageWithMask imageWithMask;
-
-  @JsonIgnore
-  public MCQWithAnswer getMcqWithAnswer() {
-    MCQWithAnswer mcqWithAnswer = new MCQWithAnswer();
-    mcqWithAnswer.setMultipleChoicesQuestion(getMultipleChoicesQuestion());
-    mcqWithAnswer.setCorrectChoiceIndex(correctAnswerIndex == null ? -1 : correctAnswerIndex);
-    mcqWithAnswer.setApproved(approved);
-    mcqWithAnswer.setId(id);
-    return mcqWithAnswer;
-  }
 }

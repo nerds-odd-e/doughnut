@@ -8,5 +8,6 @@ export type QuizQuestion = {
     id: number;
     multipleChoicesQuestion: MultipleChoicesQuestion;
     imageWithMask?: ImageWithMask;
+    checkSpell?: boolean;
 };
 

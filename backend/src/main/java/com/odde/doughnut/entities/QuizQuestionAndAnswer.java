@@ -7,6 +7,7 @@ import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import java.sql.Timestamp;
 import java.util.Objects;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -25,9 +26,26 @@ public class QuizQuestionAndAnswer extends EntityIdentifiedByIdOnly {
 
   @Embedded @NotNull private QuizQuestion quizQuestion = new QuizQuestion();
 
+  @Column(name = "created_at")
+  @JsonIgnore
+  private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
+
+  @Column(name = "correct_answer_index")
+  @JsonIgnore
+  private Integer correctAnswerIndex;
+
+  @Column(name = "is_approved")
+  @JsonIgnore
+  private boolean approved;
+
   @JsonIgnore
   public MCQWithAnswer getMcqWithAnswer() {
-    return quizQuestion.getMcqWithAnswer();
+    MCQWithAnswer mcqWithAnswer = new MCQWithAnswer();
+    mcqWithAnswer.setMultipleChoicesQuestion(quizQuestion.getMultipleChoicesQuestion());
+    mcqWithAnswer.setCorrectChoiceIndex(correctAnswerIndex == null ? -1 : correctAnswerIndex);
+    mcqWithAnswer.setApproved(approved);
+    mcqWithAnswer.setId(id);
+    return mcqWithAnswer;
   }
 
   @JsonIgnore
@@ -35,7 +53,7 @@ public class QuizQuestionAndAnswer extends EntityIdentifiedByIdOnly {
     if (quizQuestion.getCheckSpell() != null && quizQuestion.getCheckSpell()) {
       return getNote().matchAnswer(answer.getSpellingAnswer());
     }
-    return Objects.equals(answer.getChoiceIndex(), quizQuestion.getCorrectAnswerIndex());
+    return Objects.equals(answer.getChoiceIndex(), getCorrectAnswerIndex());
   }
 
   public ImageWithMask getImageWithMask() {
@@ -48,15 +66,8 @@ public class QuizQuestionAndAnswer extends EntityIdentifiedByIdOnly {
     quizQuestionAIQuestionAndAnswer
         .getQuizQuestion()
         .setMultipleChoicesQuestion(MCQWithAnswer.getMultipleChoicesQuestion());
-    quizQuestionAIQuestionAndAnswer
-        .getQuizQuestion()
-        .setCorrectAnswerIndex(MCQWithAnswer.getCorrectChoiceIndex());
+    quizQuestionAIQuestionAndAnswer.setCorrectAnswerIndex(MCQWithAnswer.getCorrectChoiceIndex());
     return quizQuestionAIQuestionAndAnswer;
-  }
-
-  @JsonIgnore
-  public void setCorrectAnswerIndex(int i) {
-    getQuizQuestion().setCorrectAnswerIndex(i);
   }
 
   public void setMultipleChoicesQuestion(MultipleChoicesQuestion mcq) {
@@ -69,28 +80,8 @@ public class QuizQuestionAndAnswer extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  public void setApproved(boolean approved) {
-    getQuizQuestion().setApproved(approved);
-  }
-
-  @JsonIgnore
-  public void setNote(Note value) {
-    this.note = value;
-  }
-
-  @JsonIgnore
-  public Integer getCorrectAnswerIndex() {
-    return getQuizQuestion().getCorrectAnswerIndex();
-  }
-
-  @JsonIgnore
   public void setCheckSpell(boolean b) {
     getQuizQuestion().setCheckSpell(b);
-  }
-
-  @JsonIgnore
-  public boolean isApproved() {
-    return getQuizQuestion().isApproved();
   }
 
   public QuizQuestionInNotebook toQuizQuestionInNotebook() {
