@@ -15,55 +15,43 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script setup lang="ts">
+import { computed, onMounted, ref } from "vue";
 import useLoadingApi from "@/managedApi/useLoadingApi";
 import { QuizQuestion } from "@/generated/backend";
+import { useRouter } from "vue-router";
 import QuizQuestionComp from "../components/review/QuizQuestion.vue";
 
-export default defineComponent({
-  setup() {
-    return { ...useLoadingApi() };
-  },
-  props: {
-    notebookId: { type: Number, required: true },
-  },
-  computed: {
-    topicConstructor() {
-      return this.$route.query?.topic;
-    },
-  },
-  components: {
-    QuizQuestionComp,
-  },
-  data() {
-    return {
-      quizQuestions: [] as QuizQuestion[],
-      currentQuestion: 0,
-      errors: "",
-      correctAnswers: 0,
-    };
-  },
-  created() {
-    this.generateAssessmentQuestions();
-  },
-  methods: {
-    questionAnswered(answerResult) {
-      this.currentQuestion += 1;
-      if (answerResult.correct) {
-        this.correctAnswers += 1;
-      }
-    },
-    generateAssessmentQuestions() {
-      this.managedApi.restAssessmentController
-        .generateAssessmentQuestions(this.notebookId)
-        .then((response) => {
-          this.quizQuestions = response;
-        })
-        .catch((res) => {
-          this.errors = res.body.message;
-        });
-    },
-  },
+const { managedApi } = useLoadingApi();
+const router = useRouter();
+const props = defineProps({
+  notebookId: { type: Number, required: true },
+});
+const topicConstructor = computed(() => {
+  return router.currentRoute.value.query?.topic;
+});
+const quizQuestions = ref<QuizQuestion[]>([]);
+const currentQuestion = ref(0);
+const errors = ref("");
+const correctAnswers = ref(0);
+const questionAnswered = (answerResult) => {
+  currentQuestion.value += 1;
+  if (answerResult.correct) {
+    correctAnswers.value += 1;
+  }
+};
+const generateAssessmentQuestions = () => {
+  managedApi.restAssessmentController
+    .generateAssessmentQuestions(props.notebookId)
+    .then((response) => {
+      quizQuestions.value = response;
+    })
+    .catch((res) => {
+      errors.value = res.body.message;
+    });
+};
+
+onMounted(() => {
+  generateAssessmentQuestions();
 });
 </script>
