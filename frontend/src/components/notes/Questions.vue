@@ -60,6 +60,8 @@
 import { defineComponent, PropType } from "vue";
 import { Note, QuizQuestionAndAnswer } from "@/generated/backend";
 import useLoadingApi from "@/managedApi/useLoadingApi";
+import NoteAddQuestion from "./NoteAddQuestion.vue";
+import PopButton from "../commons/Popups/PopButton.vue";
 
 export default defineComponent({
   setup() {
@@ -75,6 +77,10 @@ export default defineComponent({
     return {
       questions: [] as QuizQuestionAndAnswer[],
     };
+  },
+  components: {
+    NoteAddQuestion,
+    PopButton,
   },
   methods: {
     fetchQuestions() {

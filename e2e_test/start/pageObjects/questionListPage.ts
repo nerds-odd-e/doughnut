@@ -15,6 +15,10 @@ export const questionListPage = () => {
       this.fillQuestion(row)
       cy.findByRole("button", { name: "Submit" }).click()
     },
+    generateQuestionByAI() {
+      cy.findByRole("button", { name: "Add Question" }).click()
+      cy.findByRole("button", { name: "Generate by AI" }).click()
+    },
     refineQuestion(row: Record<string, string>) {
       this.fillQuestion(row)
       cy.findByRole("button", { name: "Refine" }).click()
