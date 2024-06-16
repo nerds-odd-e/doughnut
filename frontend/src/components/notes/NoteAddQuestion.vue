@@ -22,25 +22,26 @@
     /><br />
 
     <button
-      @click="addOption"
-      :disabled="multipleChoicesQuestion.choices.length >= maxOptions"
+      @click="addChoice"
+      :disabled="
+        multipleChoicesQuestion.choices.length >= maximumNumberOfChoices
+      "
     >
       +
     </button>
     <button
-      @click="removeOption"
-      :disabled="multipleChoicesQuestion.choices.length <= minOptions"
+      @click="removeChoice"
+      :disabled="
+        multipleChoicesQuestion.choices.length <= minimumNumberOfChoices
+      "
     >
       -
     </button>
-    <button @click="refineQuestion" :disabled="!isValidRefine">Refine</button>
-    <button @click="submitQuestion" :disabled="!isValidQuestion">Submit</button>
-    <button
-      @click="generateQuestionByAI"
-      :disabled="isUserDidInputQuestion || isUserDidInputChoices"
-    >
+    <button @click="refineQuestion" :disabled="!dirty">Refine</button>
+    <button @click="generateQuestionByAI" :disabled="dirty">
       Generate by AI
     </button>
+    <button @click="submitQuestion" :disabled="!isValidQuestion">Submit</button>
   </div>
 </template>
 
@@ -49,7 +50,6 @@ import { PropType, computed, ref } from "vue";
 import useLoadingApi from "@/managedApi/useLoadingApi";
 import { Note, QuizQuestionAndAnswer } from "@/generated/backend";
 import isMCQWithAnswerValid from "@/models/isMCQWithAnswerValid";
-import isRefineMCQWithAnswerValid from "@/models/isRefineMCQWithAnswerValid";
 import TextArea from "../form/TextArea.vue";
 
 const { managedApi } = useLoadingApi();
@@ -69,43 +69,38 @@ const quizQuestionAndAnswer = ref<QuizQuestionAndAnswer>({
     },
   },
 } as QuizQuestionAndAnswer);
-const minOptions = 2; // Minimum number of options
-const maxOptions = 10; // Maximum number of options
+
+const minimumNumberOfChoices = 2;
+const maximumNumberOfChoices = 10;
 
 const emit = defineEmits(["close-dialog"]);
 
 const isValidQuestion = computed(() =>
   isMCQWithAnswerValid(quizQuestionAndAnswer.value),
 );
-const isValidRefine = computed(() =>
-  isRefineMCQWithAnswerValid(quizQuestionAndAnswer.value),
-);
 const multipleChoicesQuestion = computed(
   () => quizQuestionAndAnswer.value.quizQuestion.multipleChoicesQuestion,
 );
-const isUserDidInputChoices = computed(() => {
+const dirty = computed(() => {
   for (let i = 0; i < multipleChoicesQuestion.value.choices.length; i += 1) {
     if (multipleChoicesQuestion.value.choices[i]) {
       return true;
     }
   }
-  return false;
-});
-const isUserDidInputQuestion = computed(() => {
   return (
-    multipleChoicesQuestion.value.stem &&
+    multipleChoicesQuestion.value.stem !== undefined &&
     multipleChoicesQuestion.value.stem.trim().length > 0
   );
 });
 
-const addOption = () => {
-  if (multipleChoicesQuestion.value.choices.length < maxOptions) {
+const addChoice = () => {
+  if (multipleChoicesQuestion.value.choices.length < maximumNumberOfChoices) {
     multipleChoicesQuestion.value.choices.push("");
   }
 };
 
-const removeOption = () => {
-  if (multipleChoicesQuestion.value.choices.length > minOptions) {
+const removeChoice = () => {
+  if (multipleChoicesQuestion.value.choices.length > minimumNumberOfChoices) {
     multipleChoicesQuestion.value.choices.pop();
   }
 };
@@ -120,11 +115,11 @@ const submitQuestion = async () => {
 };
 const refineQuestion = async () => {
   const quizQuestion = quizQuestionAndAnswer.value;
-  const response = await managedApi.restQuizQuestionController.refineQuestion(
-    props.note.id,
-    quizQuestion,
-  );
-  quizQuestionAndAnswer.value = response;
+  quizQuestionAndAnswer.value =
+    await managedApi.restQuizQuestionController.refineQuestion(
+      props.note.id,
+      quizQuestion,
+    );
 };
 const generateQuestionByAI = async () => {
   quizQuestionAndAnswer.value =
