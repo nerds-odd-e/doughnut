@@ -39,6 +39,11 @@ Feature: New questions assessment
     When I start the assessment on the "Countries" notebook in the bazaar
     Then I should see error message Not enough questions
 
+  Scenario: Cannot start assessment with 0 questions
+    Given I set the number of question for the "Countries" note is "0"
+    When I start the assessment on the "Countries" notebook in the bazaar
+    Then I should see error message The assessment is not available
+
   Scenario: Must login to generate assessment
     Given I haven't login
     When I start the assessment on the "Countries" notebook in the bazaar
