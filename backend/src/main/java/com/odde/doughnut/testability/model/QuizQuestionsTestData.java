@@ -28,7 +28,7 @@ public class QuizQuestionsTestData {
       QuizQuestionAndAnswer question = new QuizQuestionAndAnswer();
       question.setNote(note);
       question.setCorrectAnswerIndex(0);
-      question.setMultipleChoicesQuestion(mcq);
+      question.getQuizQuestion().setMultipleChoicesQuestion(mcq);
       question.setApproved(approved);
       return question;
     }

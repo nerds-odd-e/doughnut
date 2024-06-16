@@ -1,10 +1,8 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.doughnut.controllers.dto.QuizQuestionInNotebook;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
-import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.sql.Timestamp;
@@ -60,20 +58,6 @@ public class QuizQuestionAndAnswer extends EntityIdentifiedByIdOnly {
         .setMultipleChoicesQuestion(MCQWithAnswer.getMultipleChoicesQuestion());
     quizQuestionAIQuestionAndAnswer.setCorrectAnswerIndex(MCQWithAnswer.getCorrectChoiceIndex());
     return quizQuestionAIQuestionAndAnswer;
-  }
-
-  public void setMultipleChoicesQuestion(MultipleChoicesQuestion mcq) {
-    getQuizQuestion().setMultipleChoicesQuestion(mcq);
-  }
-
-  @NotNull
-  public MultipleChoicesQuestion getMultipleChoicesQuestion() {
-    return getQuizQuestion().getMultipleChoicesQuestion();
-  }
-
-  @JsonIgnore
-  public void setCheckSpell(boolean b) {
-    getQuizQuestion().setCheckSpell(b);
   }
 
   public QuizQuestionInNotebook toQuizQuestionInNotebook() {

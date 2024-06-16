@@ -18,7 +18,7 @@ class QuizQuestionAndAnswerBuilder extends Builder<QuizQuestionAndAnswer> {
   do(): QuizQuestionAndAnswer {
     const quizQuestion = this.quizQuestionBuilder.do();
     return {
-      ...quizQuestion,
+      id: quizQuestion.id,
       quizQuestion,
     };
   }

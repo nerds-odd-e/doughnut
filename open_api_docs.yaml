@@ -2531,7 +2531,6 @@ components:
     QuizQuestionAndAnswer:
       required:
       - id
-      - multipleChoicesQuestion
       - quizQuestion
       type: object
       properties:
@@ -2545,8 +2544,6 @@ components:
           format: int32
         approved:
           type: boolean
-        multipleChoicesQuestion:
-          $ref: "#/components/schemas/MultipleChoicesQuestion"
     NoteTestData:
       type: object
       properties:

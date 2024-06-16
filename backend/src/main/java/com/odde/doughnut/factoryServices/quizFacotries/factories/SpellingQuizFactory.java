@@ -39,10 +39,10 @@ public class SpellingQuizFactory extends QuizQuestionFactory {
     QuizQuestionAndAnswer quizQuestionAndAnswerSpelling = new QuizQuestionAndAnswer();
     quizQuestionAndAnswerSpelling.setNote(answerNote);
     quizQuestionAndAnswerSpelling.setApproved(true);
-    quizQuestionAndAnswerSpelling.setCheckSpell(true);
+    quizQuestionAndAnswerSpelling.getQuizQuestion().setCheckSpell(true);
     MultipleChoicesQuestion mcq = new MultipleChoicesQuestion();
     mcq.setStem(getStem());
-    quizQuestionAndAnswerSpelling.setMultipleChoicesQuestion(mcq);
+    quizQuestionAndAnswerSpelling.getQuizQuestion().setMultipleChoicesQuestion(mcq);
     return quizQuestionAndAnswerSpelling;
   }
 }
