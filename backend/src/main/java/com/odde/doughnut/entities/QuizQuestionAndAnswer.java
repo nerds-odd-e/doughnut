@@ -16,14 +16,14 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 @Table(name = "quiz_question")
 @JsonPropertyOrder({"id", "multipleChoicesQuestion", "headNote", "imageWithMask"})
-public class QuizQuestion extends EntityIdentifiedByIdOnly {
+public class QuizQuestionAndAnswer extends EntityIdentifiedByIdOnly {
 
   @ManyToOne(cascade = CascadeType.DETACH)
   @JoinColumn(name = "note_id", referencedColumnName = "id")
   @JsonIgnore
   private Note note;
 
-  @Embedded @JsonIgnore private QuizQuestion1 quizQuestion1 = new QuizQuestion1();
+  @Embedded @NotNull private QuizQuestion1 quizQuestion1 = new QuizQuestion1();
 
   @JsonIgnore
   public MCQWithAnswer getMcqWithAnswer() {
@@ -42,16 +42,16 @@ public class QuizQuestion extends EntityIdentifiedByIdOnly {
     return quizQuestion1.getImageWithMask();
   }
 
-  public static QuizQuestion fromMCQWithAnswer(MCQWithAnswer MCQWithAnswer, Note note) {
-    QuizQuestion quizQuestionAIQuestion = new QuizQuestion();
-    quizQuestionAIQuestion.setNote(note);
-    quizQuestionAIQuestion
+  public static QuizQuestionAndAnswer fromMCQWithAnswer(MCQWithAnswer MCQWithAnswer, Note note) {
+    QuizQuestionAndAnswer quizQuestionAIQuestionAndAnswer = new QuizQuestionAndAnswer();
+    quizQuestionAIQuestionAndAnswer.setNote(note);
+    quizQuestionAIQuestionAndAnswer
         .getQuizQuestion1()
         .setMultipleChoicesQuestion(MCQWithAnswer.getMultipleChoicesQuestion());
-    quizQuestionAIQuestion
+    quizQuestionAIQuestionAndAnswer
         .getQuizQuestion1()
         .setCorrectAnswerIndex(MCQWithAnswer.getCorrectChoiceIndex());
-    return quizQuestionAIQuestion;
+    return quizQuestionAIQuestionAndAnswer;
   }
 
   @JsonIgnore

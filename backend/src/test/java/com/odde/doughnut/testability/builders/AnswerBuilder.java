@@ -38,8 +38,8 @@ public class AnswerBuilder extends EntityBuilder<Answer> {
     return this;
   }
 
-  public AnswerBuilder forQuestion(QuizQuestion quizQuestion) {
-    entity.setQuestion(quizQuestion);
+  public AnswerBuilder forQuestion(QuizQuestionAndAnswer quizQuestionAndAnswer) {
+    entity.setQuestion(quizQuestionAndAnswer);
     return this;
   }
 

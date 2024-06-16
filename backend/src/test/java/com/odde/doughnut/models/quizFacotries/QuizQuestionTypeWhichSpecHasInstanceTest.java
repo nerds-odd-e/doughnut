@@ -82,12 +82,12 @@ class WhichSpecHasInstanceQuizFactoryTest {
 
         @Test
         void shouldIncludeRightAnswers() {
-          QuizQuestion quizQuestion = buildQuestion();
+          QuizQuestionAndAnswer quizQuestionAndAnswer = buildQuestion();
           assertThat(
-              quizQuestion.getMultipleChoicesQuestion().getStem(),
+              quizQuestionAndAnswer.getMultipleChoicesQuestion().getStem(),
               containsString(
                   "<p>Which one is a specialization of <mark>element</mark> <em>and</em> is an instance of <mark>non-official name</mark>:"));
-          List<String> strings = quizQuestion.getMultipleChoicesQuestion().getChoices();
+          List<String> strings = quizQuestionAndAnswer.getMultipleChoicesQuestion().getChoices();
           assertThat("metal", in(strings));
           assertThat(source.getTopicConstructor(), in(strings));
         }
@@ -120,8 +120,8 @@ class WhichSpecHasInstanceQuizFactoryTest {
 
           @Test
           void options() {
-            QuizQuestion quizQuestion = buildQuestion();
-            List<String> strings = quizQuestion.getMultipleChoicesQuestion().getChoices();
+            QuizQuestionAndAnswer quizQuestionAndAnswer = buildQuestion();
+            List<String> strings = quizQuestionAndAnswer.getMultipleChoicesQuestion().getChoices();
             assertThat("something else", in(strings));
           }
         }
@@ -129,7 +129,7 @@ class WhichSpecHasInstanceQuizFactoryTest {
     }
   }
 
-  private QuizQuestion buildQuestion() {
+  private QuizQuestionAndAnswer buildQuestion() {
     return makeMe.buildAQuestionForLinkingNote(
         LinkQuestionType.WHICH_SPEC_HAS_INSTANCE, subjectNote, user);
   }

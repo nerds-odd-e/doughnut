@@ -54,19 +54,22 @@ class RestQuizQuestionController {
   public QuizQuestionInNotebook generateQuestion(
       @RequestParam(value = "note") @Schema(type = "integer") Note note) {
     currentUser.assertLoggedIn();
-    QuizQuestion quizQuestion = quizQuestionService.generateQuestionForNote(note);
-    if (quizQuestion == null) {
+    QuizQuestionAndAnswer quizQuestionAndAnswer = quizQuestionService.generateQuestionForNote(note);
+    if (quizQuestionAndAnswer == null) {
       return null;
     }
-    return quizQuestion.toQuizQuestionInNotebook();
+    return quizQuestionAndAnswer.toQuizQuestionInNotebook();
   }
 
   @PostMapping("/{quizQuestion}/regenerate")
   @Transactional
   public QuizQuestion1 regenerate(
-      @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion) {
+      @PathVariable("quizQuestion") @Schema(type = "integer")
+          QuizQuestionAndAnswer quizQuestionAndAnswer) {
     currentUser.assertLoggedIn();
-    return quizQuestionService.generateQuestionForNote(quizQuestion.getNote()).getQuizQuestion1();
+    return quizQuestionService
+        .generateQuestionForNote(quizQuestionAndAnswer.getNote())
+        .getQuizQuestion1();
   }
 
   @PostMapping("/generate-question-without-save")
@@ -79,19 +82,21 @@ class RestQuizQuestionController {
   @PostMapping("/{quizQuestion}/contest")
   @Transactional
   public QuizQuestionContestResult contest(
-      @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion) {
+      @PathVariable("quizQuestion") @Schema(type = "integer")
+          QuizQuestionAndAnswer quizQuestionAndAnswer) {
     currentUser.assertLoggedIn();
-    return aiQuestionGenerator.getQuizQuestionContestResult(quizQuestion);
+    return aiQuestionGenerator.getQuizQuestionContestResult(quizQuestionAndAnswer);
   }
 
   @PostMapping("/{quizQuestion}/answer")
   @Transactional
   public AnsweredQuestion answerQuiz(
-      @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion,
+      @PathVariable("quizQuestion") @Schema(type = "integer")
+          QuizQuestionAndAnswer quizQuestionAndAnswer,
       @Valid @RequestBody AnswerDTO answerDTO) {
     currentUser.assertLoggedIn();
     Answer answer = new Answer();
-    answer.setQuestion(quizQuestion);
+    answer.setQuestion(quizQuestionAndAnswer);
     answer.setFromDTO(answerDTO);
     AnswerModel answerModel = modelFactoryService.toAnswerModel(answer);
     answerModel.makeAnswerToQuestion(
@@ -102,13 +107,14 @@ class RestQuizQuestionController {
   @PostMapping("/{quizQuestion}/suggest-fine-tuning")
   @Transactional
   public SuggestedQuestionForFineTuning suggestQuestionForFineTuning(
-      @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion,
+      @PathVariable("quizQuestion") @Schema(type = "integer")
+          QuizQuestionAndAnswer quizQuestionAndAnswer,
       @Valid @RequestBody QuestionSuggestionCreationParams suggestion) {
     SuggestedQuestionForFineTuning sqft = new SuggestedQuestionForFineTuning();
     var suggestedQuestionForFineTuningService =
         modelFactoryService.toSuggestedQuestionForFineTuningService(sqft);
     return suggestedQuestionForFineTuningService.suggestQuestionForFineTuning(
-        quizQuestion,
+        quizQuestionAndAnswer,
         suggestion,
         currentUser.getEntity(),
         testabilitySettings.getCurrentUTCTimestamp());
@@ -119,7 +125,9 @@ class RestQuizQuestionController {
       @PathVariable("note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
-    return note.getQuizQuestions().stream().map(QuizQuestion::getMcqWithAnswer).toList();
+    return note.getQuizQuestionAndAnswers().stream()
+        .map(QuizQuestionAndAnswer::getMcqWithAnswer)
+        .toList();
   }
 
   @PostMapping("/{note}/note-questions")
@@ -144,10 +152,11 @@ class RestQuizQuestionController {
 
   @PostMapping("/{quizQuestion}/toggle-approval")
   @Transactional
-  public QuizQuestion toggleApproval(
-      @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion)
+  public QuizQuestionAndAnswer toggleApproval(
+      @PathVariable("quizQuestion") @Schema(type = "integer")
+          QuizQuestionAndAnswer quizQuestionAndAnswer)
       throws UnexpectedNoAccessRightException {
-    currentUser.assertAuthorization(quizQuestion.getNote());
-    return quizQuestionService.toggleApproval(quizQuestion);
+    currentUser.assertAuthorization(quizQuestionAndAnswer.getNote());
+    return quizQuestionService.toggleApproval(quizQuestionAndAnswer);
   }
 }

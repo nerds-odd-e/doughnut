@@ -39,7 +39,7 @@ import { defineComponent, PropType } from "vue";
 import type { StorageAccessor } from "@/store/createNoteStorage";
 import {
   AnsweredQuestion,
-  QuizQuestion,
+  QuizQuestion1,
   QuizQuestionInNotebook,
 } from "@/generated/backend";
 import useLoadingApi from "@/managedApi/useLoadingApi";
@@ -74,7 +74,7 @@ export default defineComponent({
       currentQuestion: this.quizQuestionInNotebook.quizQuestion,
       answeredQuestion: undefined as AnsweredQuestion | undefined,
       prevQuizQuestions: [] as {
-        quizeQuestion: QuizQuestion;
+        quizeQuestion: QuizQuestion1;
         badQuestionReason: string | undefined;
       }[],
       chatInput: "",

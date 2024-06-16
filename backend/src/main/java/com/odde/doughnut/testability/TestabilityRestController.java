@@ -165,12 +165,13 @@ class TestabilityRestController {
 
   @PostMapping("/inject_quiz_questions")
   @Transactional
-  public List<QuizQuestion> injectQuizQuestion(
+  public List<QuizQuestionAndAnswer> injectQuizQuestion(
       @RequestBody QuizQuestionsTestData quizQuestionsTestData) {
-    List<QuizQuestion> quizQuestions =
+    List<QuizQuestionAndAnswer> quizQuestionAndAnswers =
         quizQuestionsTestData.buildQuizQuestions(this.modelFactoryService);
-    quizQuestions.forEach(question -> modelFactoryService.quizQuestionRepository.save(question));
-    return quizQuestions;
+    quizQuestionAndAnswers.forEach(
+        question -> modelFactoryService.quizQuestionRepository.save(question));
+    return quizQuestionAndAnswers;
   }
 
   private Ownership getOwnership(NotesTestData notesTestData, User user) {

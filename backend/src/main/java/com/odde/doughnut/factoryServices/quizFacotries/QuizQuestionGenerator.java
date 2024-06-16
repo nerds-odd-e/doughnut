@@ -13,16 +13,17 @@ import org.springframework.web.server.ResponseStatusException;
 public record QuizQuestionGenerator(
     User user, Note note, Randomizer randomizer, ModelFactoryService modelFactoryService) {
 
-  private Optional<QuizQuestion> getQuizQuestionEntity(QuizQuestionFactory quizQuestionFactory) {
+  private Optional<QuizQuestionAndAnswer> getQuizQuestionEntity(
+      QuizQuestionFactory quizQuestionFactory) {
     try {
-      QuizQuestion quizQuestion = quizQuestionFactory.buildValidQuizQuestion();
-      return Optional.of(quizQuestion);
+      QuizQuestionAndAnswer quizQuestionAndAnswer = quizQuestionFactory.buildValidQuizQuestion();
+      return Optional.of(quizQuestionAndAnswer);
     } catch (QuizQuestionNotPossibleException e) {
       return Optional.empty();
     }
   }
 
-  private QuizQuestion generateAQuestionOfFirstPossibleType(
+  private QuizQuestionAndAnswer generateAQuestionOfFirstPossibleType(
       List<QuizQuestionFactory> quizQuestionFactoryStream) {
     return quizQuestionFactoryStream.stream()
         .map(this::getQuizQuestionEntity)
@@ -31,7 +32,8 @@ public record QuizQuestionGenerator(
         .orElse(null);
   }
 
-  public QuizQuestion generateAQuestionOfRandomType(AiQuestionGenerator questionGenerator) {
+  public QuizQuestionAndAnswer generateAQuestionOfRandomType(
+      AiQuestionGenerator questionGenerator) {
     List<QuizQuestionFactory> shuffled;
     if (note instanceof HierarchicalNote && user.getAiQuestionTypeOnlyForReview()) {
       shuffled = List.of(new AiQuestionFactory(note, questionGenerator));
@@ -41,7 +43,7 @@ public record QuizQuestionGenerator(
               note.getQuizQuestionFactories(
                   new QuizQuestionServant(user, randomizer, modelFactoryService)));
     }
-    QuizQuestion result = generateAQuestionOfFirstPossibleType(shuffled);
+    QuizQuestionAndAnswer result = generateAQuestionOfFirstPossibleType(shuffled);
     if (result == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated");
     }

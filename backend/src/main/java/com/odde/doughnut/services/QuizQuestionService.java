@@ -1,7 +1,7 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestion;
+import com.odde.doughnut.entities.QuizQuestionAndAnswer;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
@@ -18,21 +18,22 @@ public class QuizQuestionService {
         new AiQuestionGenerator(openAiApi, new GlobalSettingsService(modelFactoryService));
   }
 
-  QuizQuestion selectQuizQuestionForANote(Note note) {
-    return note.getQuizQuestions().stream().findFirst().orElse(null);
+  QuizQuestionAndAnswer selectQuizQuestionForANote(Note note) {
+    return note.getQuizQuestionAndAnswers().stream().findFirst().orElse(null);
   }
 
-  public QuizQuestion addQuestion(Note note, MCQWithAnswer mcqWithAnswer) {
-    QuizQuestion quizQuestion = QuizQuestion.fromMCQWithAnswer(mcqWithAnswer, note);
-    modelFactoryService.save(quizQuestion);
-    return quizQuestion;
+  public QuizQuestionAndAnswer addQuestion(Note note, MCQWithAnswer mcqWithAnswer) {
+    QuizQuestionAndAnswer quizQuestionAndAnswer =
+        QuizQuestionAndAnswer.fromMCQWithAnswer(mcqWithAnswer, note);
+    modelFactoryService.save(quizQuestionAndAnswer);
+    return quizQuestionAndAnswer;
   }
 
   public MCQWithAnswer refineQuestion(Note note, MCQWithAnswer mcqWithAnswer) {
     return aiQuestionGenerator.getAiGeneratedRefineQuestion(note, mcqWithAnswer);
   }
 
-  public QuizQuestion toggleApproval(QuizQuestion question) {
+  public QuizQuestionAndAnswer toggleApproval(QuizQuestionAndAnswer question) {
     question.setApproved(!question.isApproved());
     modelFactoryService.save(question);
     return question;
@@ -42,14 +43,15 @@ public class QuizQuestionService {
     return aiQuestionGenerator.getAiGeneratedQuestion(note);
   }
 
-  public QuizQuestion generateQuestionForNote(Note note) {
+  public QuizQuestionAndAnswer generateQuestionForNote(Note note) {
     MCQWithAnswer MCQWithAnswer = generateMcqWithAnswer(note);
     if (MCQWithAnswer == null) {
       return null;
     }
-    QuizQuestion quizQuestion = QuizQuestion.fromMCQWithAnswer(MCQWithAnswer, note);
+    QuizQuestionAndAnswer quizQuestionAndAnswer =
+        QuizQuestionAndAnswer.fromMCQWithAnswer(MCQWithAnswer, note);
     // make sure the id is the same as the quiz question id
-    QuizQuestion saved = modelFactoryService.save(quizQuestion);
+    QuizQuestionAndAnswer saved = modelFactoryService.save(quizQuestionAndAnswer);
     saved.getQuizQuestion1().setId(saved.getId());
     return saved;
   }

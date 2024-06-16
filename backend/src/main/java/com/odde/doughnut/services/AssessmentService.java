@@ -3,8 +3,8 @@ package com.odde.doughnut.services;
 import static com.odde.doughnut.controllers.dto.ApiError.ErrorType.ASSESSMENT_SERVICE_ERROR;
 
 import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.QuizQuestion1;
+import com.odde.doughnut.entities.QuizQuestionAndAnswer;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.theokanning.openai.client.OpenAiApi;
@@ -20,11 +20,11 @@ public class AssessmentService {
 
   public List<QuizQuestion1> generateAssessment(Notebook notebook) {
 
-    List<QuizQuestion> questions =
+    List<QuizQuestionAndAnswer> questions =
         notebook.getNotes().stream()
             .map(quizQuestionService::selectQuizQuestionForANote)
             .filter(Objects::nonNull)
-            .filter(QuizQuestion::isApproved)
+            .filter(QuizQuestionAndAnswer::isApproved)
             .toList();
 
     Integer numberOfQuestion = notebook.getNotebookSettings().getNumberOfQuestionsInAssessment();
@@ -40,6 +40,9 @@ public class AssessmentService {
           "Not enough questions", ASSESSMENT_SERVICE_ERROR, "Not enough questions");
     }
 
-    return questions.stream().limit(numberOfQuestion).map(QuizQuestion::getQuizQuestion1).toList();
+    return questions.stream()
+        .limit(numberOfQuestion)
+        .map(QuizQuestionAndAnswer::getQuizQuestion1)
+        .toList();
   }
 }

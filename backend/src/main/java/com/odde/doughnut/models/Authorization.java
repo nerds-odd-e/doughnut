@@ -39,7 +39,8 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
       case Notebook notebook -> assertReadAuthorizationNotebook(notebook);
       case Subscription subscription -> assertReadAuthorization(subscription);
       case Answer answer -> assertReadAuthorizationAnswer(answer);
-      case QuizQuestion quizQuestion -> assertReadAuthorizationQuizQuestion(quizQuestion);
+      case QuizQuestionAndAnswer quizQuestionAndAnswer ->
+          assertReadAuthorizationQuizQuestion(quizQuestionAndAnswer);
       case ReviewPoint reviewPoint -> assertReadAuthorizationReviewPoint(reviewPoint);
       case User user -> assertAuthorizationUser(user);
       case Audio audio -> assertAuthorizationUser(audio.getUser());
@@ -59,7 +60,7 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
     assertReadAuthorizationQuizQuestion(object.getQuestion());
   }
 
-  private void assertReadAuthorizationQuizQuestion(QuizQuestion question)
+  private void assertReadAuthorizationQuizQuestion(QuizQuestionAndAnswer question)
       throws UnexpectedNoAccessRightException {
     assertReadAuthorization(question.getNote());
   }

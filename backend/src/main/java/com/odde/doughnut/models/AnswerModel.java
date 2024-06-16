@@ -25,11 +25,11 @@ public class AnswerModel {
     answerResult.correct = answer.isCorrect();
     answerResult.correctChoiceIndex = getQuestion().getCorrectAnswerIndex();
     answerResult.choiceIndex = answer.getChoiceIndex();
-    answerResult.quizQuestion = getQuestion();
+    answerResult.quizQuestionAndAnswer = getQuestion();
     return answerResult;
   }
 
-  private QuizQuestion getQuestion() {
+  private QuizQuestionAndAnswer getQuestion() {
     return answer.getQuestion();
   }
 

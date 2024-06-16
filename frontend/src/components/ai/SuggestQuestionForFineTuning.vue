@@ -42,7 +42,7 @@
 import { ref } from "vue";
 import {
   QuestionSuggestionCreationParams,
-  QuizQuestion,
+  QuizQuestion1,
 } from "@/generated/backend";
 import useLoadingApi from "@/managedApi/useLoadingApi";
 
@@ -53,7 +53,7 @@ const params = ref<QuestionSuggestionCreationParams>({
 const { managedApi } = useLoadingApi();
 
 const props = defineProps<{
-  quizQuestion: QuizQuestion;
+  quizQuestion: QuizQuestion1;
 }>();
 
 const emit = defineEmits(["closeDialog"]);

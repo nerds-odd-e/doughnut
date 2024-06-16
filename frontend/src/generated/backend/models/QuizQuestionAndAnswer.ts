@@ -4,9 +4,11 @@
 /* eslint-disable */
 import type { ImageWithMask } from './ImageWithMask';
 import type { MultipleChoicesQuestion } from './MultipleChoicesQuestion';
-export type QuizQuestion = {
+import type { QuizQuestion1 } from './QuizQuestion1';
+export type QuizQuestionAndAnswer = {
     id: number;
     multipleChoicesQuestion: MultipleChoicesQuestion;
     imageWithMask?: ImageWithMask;
+    quizQuestion1: QuizQuestion1;
 };
 

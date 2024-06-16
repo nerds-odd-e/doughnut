@@ -1,7 +1,7 @@
 package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestion;
+import com.odde.doughnut.entities.QuizQuestionAndAnswer;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 
@@ -11,10 +11,10 @@ public class ImageTitleSelectionQuizFactory extends ClozeTitleSelectionQuizFacto
   }
 
   @Override
-  public QuizQuestion buildValidQuizQuestion() throws QuizQuestionNotPossibleException {
-    QuizQuestion quizQuestion = super.buildValidQuizQuestion();
-    quizQuestion.getQuizQuestion1().setImageWithMask(note.getImageWithMask());
-    return quizQuestion;
+  public QuizQuestionAndAnswer buildValidQuizQuestion() throws QuizQuestionNotPossibleException {
+    QuizQuestionAndAnswer quizQuestionAndAnswer = super.buildValidQuizQuestion();
+    quizQuestionAndAnswer.getQuizQuestion1().setImageWithMask(note.getImageWithMask());
+    return quizQuestionAndAnswer;
   }
 
   @Override

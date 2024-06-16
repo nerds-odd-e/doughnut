@@ -10,7 +10,7 @@ describe("AnswerResult", () => {
     correct: false,
     choiceIndex: 1,
     answerDisplay: "answerDisplay",
-    quizQuestion: makeMe.aQuizQuestion.please(),
+    quizQuestionAndAnswer: makeMe.aQuizQuestionAndAnswer.please(),
   };
   const wrapper = helper
     .component(AnswerResult)

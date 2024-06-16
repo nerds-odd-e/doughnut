@@ -1,13 +1,13 @@
 import { flushPromises } from "@vue/test-utils";
 import { beforeEach, describe, it } from "vitest";
 import SuggestQuestionForFineTuning from "@/components/ai/SuggestQuestionForFineTuning.vue";
-import { QuizQuestion } from "@/generated/backend";
+import { QuizQuestion1 } from "@/generated/backend";
 import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";
 
 describe("QuizQuestion", () => {
   describe("suggest question for fine tuning AI", () => {
-    const quizQuestion: QuizQuestion = makeMe.aQuizQuestion.please();
+    const quizQuestion: QuizQuestion1 = makeMe.aQuizQuestion.please();
 
     let wrapper;
 

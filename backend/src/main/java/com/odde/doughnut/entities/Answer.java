@@ -29,7 +29,7 @@ public class Answer extends EntityIdentifiedByIdOnly {
   @Getter
   @Setter
   @JsonIgnore
-  QuizQuestion question;
+  QuizQuestionAndAnswer question;
 
   @Column(name = "created_at")
   @Getter

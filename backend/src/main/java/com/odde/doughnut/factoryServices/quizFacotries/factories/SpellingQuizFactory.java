@@ -1,7 +1,7 @@
 package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestion;
+import com.odde.doughnut.entities.QuizQuestionAndAnswer;
 import com.odde.doughnut.entities.ReviewSetting;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
@@ -16,7 +16,7 @@ public class SpellingQuizFactory extends QuizQuestionFactory {
   }
 
   @Override
-  public QuizQuestion buildValidQuizQuestion() throws QuizQuestionNotPossibleException {
+  public QuizQuestionAndAnswer buildValidQuizQuestion() throws QuizQuestionNotPossibleException {
     if (!needSpellingQuiz()) {
       throw new QuizQuestionNotPossibleException();
     }
@@ -35,14 +35,14 @@ public class SpellingQuizFactory extends QuizQuestionFactory {
     return answerNote.getClozeDescription().clozeDetails();
   }
 
-  public QuizQuestion buildSpellingQuestion() {
-    QuizQuestion quizQuestionSpelling = new QuizQuestion();
-    quizQuestionSpelling.setNote(answerNote);
-    quizQuestionSpelling.setApproved(true);
-    quizQuestionSpelling.setCheckSpell(true);
+  public QuizQuestionAndAnswer buildSpellingQuestion() {
+    QuizQuestionAndAnswer quizQuestionAndAnswerSpelling = new QuizQuestionAndAnswer();
+    quizQuestionAndAnswerSpelling.setNote(answerNote);
+    quizQuestionAndAnswerSpelling.setApproved(true);
+    quizQuestionAndAnswerSpelling.setCheckSpell(true);
     MultipleChoicesQuestion mcq = new MultipleChoicesQuestion();
     mcq.setStem(getStem());
-    quizQuestionSpelling.setMultipleChoicesQuestion(mcq);
-    return quizQuestionSpelling;
+    quizQuestionAndAnswerSpelling.setMultipleChoicesQuestion(mcq);
+    return quizQuestionAndAnswerSpelling;
   }
 }

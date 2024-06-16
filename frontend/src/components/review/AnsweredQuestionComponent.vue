@@ -15,10 +15,10 @@
       <NoteInfoReviewPoint v-model="reviewPoint" />
     </div>
   </div>
-  <QuizQuestion
-    v-if="answeredQuestion.quizQuestion"
+  <QuizQuestionComponent
+    v-if="answeredQuestion.quizQuestionAndAnswer"
     v-bind="{
-      quizQuestion: answeredQuestion.quizQuestion,
+      quizQuestion: answeredQuestion.quizQuestionAndAnswer.quizQuestion1,
       correctChoiceIndex: answeredQuestion.correctChoiceIndex,
       answerChoiceIndex: answeredQuestion.choiceIndex,
     }"
@@ -30,7 +30,7 @@
 import { PropType, computed, ref } from "vue";
 import { AnsweredQuestion } from "@/generated/backend";
 import AnswerResult from "./AnswerResult.vue";
-import QuizQuestion from "./QuizQuestion.vue";
+import QuizQuestionComponent from "./QuizQuestion.vue";
 import { StorageAccessor } from "../../store/createNoteStorage";
 import NoteTopicComponent from "../notes/core/NoteTopicComponent.vue";
 import NoteWithBreadcrumb from "./NoteWithBreadcrumb.vue";

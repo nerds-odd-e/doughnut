@@ -40,15 +40,15 @@ class ClozeLinkTargetQuizFactoryTest {
   class WhenThereAreMoreThanOneOptions {
     @Test
     void shouldIncludeRightAnswers() {
-      QuizQuestion quizQuestion = (buildQuestion());
+      QuizQuestionAndAnswer quizQuestionAndAnswer = (buildQuestion());
       assertThat(
-          quizQuestion.getMultipleChoicesQuestion().getStem(),
+          quizQuestionAndAnswer.getMultipleChoicesQuestion().getStem(),
           equalTo(
               "<mark><mark title='Hidden text that is matching the answer'>[...]</mark> is not built in a day</mark> is a specialization of:"));
     }
   }
 
-  private QuizQuestion buildQuestion() {
+  private QuizQuestionAndAnswer buildQuestion() {
     return makeMe.buildAQuestionForLinkingNote(
         LinkQuestionType.CLOZE_LINK_TARGET, subjectNote, user);
   }
