@@ -2578,11 +2578,33 @@ components:
           $ref: "#/components/schemas/NoteTopic"
         parentNoteTopic:
           $ref: "#/components/schemas/NoteTopic"
-    QuizQuestion:
+    Notebook:
       required:
       - headNote
       - id
+      - notebookSettings
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        headNote:
+          $ref: "#/components/schemas/Note"
+        notebookSettings:
+          $ref: "#/components/schemas/NotebookSettings"
+    NotebookSettings:
+      type: object
+      properties:
+        skipReviewEntirely:
+          type: boolean
+        numberOfQuestionsInAssessment:
+          type: integer
+          format: int32
+    QuizQuestion:
+      required:
+      - id
       - multipleChoicesQuestion
+      - notebook
       type: object
       properties:
         id:
@@ -2590,10 +2612,10 @@ components:
           format: int32
         multipleChoicesQuestion:
           $ref: "#/components/schemas/MultipleChoicesQuestion"
-        headNote:
-          $ref: "#/components/schemas/Note"
         imageWithMask:
           $ref: "#/components/schemas/ImageWithMask"
+        notebook:
+          $ref: "#/components/schemas/Notebook"
     NoteTestData:
       type: object
       properties:
@@ -2638,28 +2660,6 @@ components:
       type: object
       properties:
         dailyTargetOfNewNotes:
-          type: integer
-          format: int32
-    Notebook:
-      required:
-      - headNote
-      - id
-      - notebookSettings
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        headNote:
-          $ref: "#/components/schemas/Note"
-        notebookSettings:
-          $ref: "#/components/schemas/NotebookSettings"
-    NotebookSettings:
-      type: object
-      properties:
-        skipReviewEntirely:
-          type: boolean
-        numberOfQuestionsInAssessment:
           type: integer
           format: int32
     Subscription:

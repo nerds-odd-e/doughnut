@@ -1,12 +1,12 @@
 import { QuizQuestion } from "@/generated/backend";
 import Builder from "./Builder";
-import NoteBuilder from "./NoteBuilder";
 import generateId from "./generateId";
+import NotebookBuilder from "./NotebookBuilder";
 
 class QuizQuestionBuilder extends Builder<QuizQuestion> {
   quizQuestion: QuizQuestion = {
     id: generateId(),
-    headNote: new NoteBuilder().do(),
+    notebook: new NotebookBuilder().do(),
     multipleChoicesQuestion: {
       stem: "answer",
       choices: [],

@@ -1,5 +1,5 @@
 <template>
-  <BasicBreadcrumb :ancestors="[quizQuestion.headNote.noteTopic]" />
+  <BasicBreadcrumb :ancestors="[quizQuestion.notebook.headNote.noteTopic]" />
   <div class="quiz-instruction" :key="quizQuestion.id">
     <ShowImage
       v-if="quizQuestion.imageWithMask"

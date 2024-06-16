@@ -42,8 +42,8 @@ public class QuizQuestion extends EntityIdentifiedByIdOnly {
   }
 
   @NotNull
-  public Note getHeadNote() {
-    return quizQuestion1.getHeadNote();
+  public Notebook getNotebook() {
+    return getNote().getNotebook();
   }
 
   public static QuizQuestion fromMCQWithAnswer(MCQWithAnswer MCQWithAnswer, Note note) {
@@ -80,8 +80,6 @@ public class QuizQuestion extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public void setNote(Note value) {
     this.note = value;
-    // the following is to keep the readonly field in embedded object in sync
-    this.getQuizQuestion1().setNotebook(value.getNotebook());
   }
 
   @JsonIgnore

@@ -4,11 +4,11 @@
 /* eslint-disable */
 import type { ImageWithMask } from './ImageWithMask';
 import type { MultipleChoicesQuestion } from './MultipleChoicesQuestion';
-import type { Note } from './Note';
+import type { Notebook } from './Notebook';
 export type QuizQuestion = {
     id: number;
     multipleChoicesQuestion: MultipleChoicesQuestion;
-    headNote: Note;
     imageWithMask?: ImageWithMask;
+    notebook: Notebook;
 };
 

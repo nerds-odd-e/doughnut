@@ -10,7 +10,6 @@ import jakarta.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.hibernate.annotations.JoinFormula;
 
 @Embeddable
 @Data
@@ -20,11 +19,6 @@ public class QuizQuestion1 {
   @Column(name = "id", updatable = false, insertable = false)
   @JsonIgnore
   private Integer id;
-
-  @ManyToOne
-  @JoinFormula("(SELECT n.notebook_id FROM Note n WHERE n.id = note_id)")
-  @JsonIgnore
-  private Notebook notebook;
 
   @Column(name = "raw_json_question")
   @Convert(converter = MCQToJsonConverter.class)
@@ -56,10 +50,5 @@ public class QuizQuestion1 {
     mcqWithAnswer.setApproved(approved);
     mcqWithAnswer.setId(id);
     return mcqWithAnswer;
-  }
-
-  @NotNull
-  public Note getHeadNote() {
-    return getNotebook().getHeadNote();
   }
 }
