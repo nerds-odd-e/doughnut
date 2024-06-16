@@ -18,7 +18,7 @@
           storageAccessor,
         }"
         @answered="onAnswered($event)"
-        :key="currentQuizQuestion.id"
+        :key="currentQuizQuestion.quizQuestion.id"
       />
     </template>
   </div>
