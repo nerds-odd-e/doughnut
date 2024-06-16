@@ -18,6 +18,7 @@ Feature: Quiz Question Management
       | What does a cow say?                 | moo            |
       | What do you call a cow with not leg? | Ground beef    |
 
+  @usingMockedOpenAiService
   Scenario: Can generate the question by AI
     Given OpenAI now generates this question:
       | Question Stem                            | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
@@ -28,6 +29,7 @@ Feature: Quiz Question Management
       | Why do cows have hooves instead of feet? | they lactose | they moo | they have | 0                    |
 
 
+  @usingMockedOpenAiService
   Scenario: Can refine the question by AI
     Given OpenAI now refines the question to become:
       | Question Stem                   | Correct Choice           | Incorrect Choice 1 | Incorrect Choice 2 |
