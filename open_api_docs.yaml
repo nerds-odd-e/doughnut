@@ -710,7 +710,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/QuizQuestion"
+                $ref: "#/components/schemas/QuizQuestion1"
   /api/quiz-questions/{quizQuestion}/contest:
     post:
       tags:
@@ -2761,6 +2761,19 @@ components:
           format: date-time
         positiveFeedback:
           type: boolean
+    QuizQuestion1:
+      required:
+      - id
+      - multipleChoicesQuestion
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        multipleChoicesQuestion:
+          $ref: "#/components/schemas/MultipleChoicesQuestion"
+        imageWithMask:
+          $ref: "#/components/schemas/ImageWithMask"
     QuizQuestionContestResult:
       type: object
       properties:
@@ -2796,19 +2809,6 @@ components:
           $ref: "#/components/schemas/ReviewPoint"
         quizQuestion:
           $ref: "#/components/schemas/QuizQuestion"
-    QuizQuestion1:
-      required:
-      - id
-      - multipleChoicesQuestion
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        multipleChoicesQuestion:
-          $ref: "#/components/schemas/MultipleChoicesQuestion"
-        imageWithMask:
-          $ref: "#/components/schemas/ImageWithMask"
     QuizQuestionInNotebook:
       required:
       - notebook

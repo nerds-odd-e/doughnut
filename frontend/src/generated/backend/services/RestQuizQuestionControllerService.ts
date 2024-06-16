@@ -7,6 +7,7 @@ import type { AnsweredQuestion } from '../models/AnsweredQuestion';
 import type { MCQWithAnswer } from '../models/MCQWithAnswer';
 import type { QuestionSuggestionCreationParams } from '../models/QuestionSuggestionCreationParams';
 import type { QuizQuestion } from '../models/QuizQuestion';
+import type { QuizQuestion1 } from '../models/QuizQuestion1';
 import type { QuizQuestionContestResult } from '../models/QuizQuestionContestResult';
 import type { QuizQuestionInNotebook } from '../models/QuizQuestionInNotebook';
 import type { SuggestedQuestionForFineTuning } from '../models/SuggestedQuestionForFineTuning';
@@ -58,12 +59,12 @@ export class RestQuizQuestionControllerService {
     }
     /**
      * @param quizQuestion
-     * @returns QuizQuestion OK
+     * @returns QuizQuestion1 OK
      * @throws ApiError
      */
     public regenerate(
         quizQuestion: number,
-    ): CancelablePromise<QuizQuestion> {
+    ): CancelablePromise<QuizQuestion1> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/quiz-questions/{quizQuestion}/regenerate',

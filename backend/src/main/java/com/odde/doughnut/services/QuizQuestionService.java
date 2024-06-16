@@ -48,6 +48,9 @@ public class QuizQuestionService {
       return null;
     }
     QuizQuestion quizQuestion = QuizQuestion.fromMCQWithAnswer(MCQWithAnswer, note);
-    return modelFactoryService.save(quizQuestion);
+    // make sure the id is the same as the quiz question id
+    QuizQuestion saved = modelFactoryService.save(quizQuestion);
+    saved.getQuizQuestion1().setId(saved.getId());
+    return saved;
   }
 }
