@@ -81,7 +81,8 @@ Cypress.Commands.add("clearFocusedText", () => {
 })
 
 Cypress.Commands.add("replaceFocusedTextAndEnter", (text) => {
-  cy.clearFocusedText().type(text).blur()
+  cy.clearFocusedText().type(text).type("{shift}{enter}")
+  cy.pageIsNotLoading()
 })
 
 Cypress.Commands.add("inPlaceEdit", (noteAttributes) => {

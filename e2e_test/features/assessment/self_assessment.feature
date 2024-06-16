@@ -23,7 +23,7 @@ Feature: New questions assessment
 
 
   Scenario: Start an assessment with 5 approved questions
-    And I set the number of question for the "Countries" note is "5"
+    Given I set the number of question for the "Countries" note is "5"
     When I start the assessment on the "Countries" notebook in the bazaar
     Then I answer the question "Where in the world is Singapore?" with "Asia"
     And I answer the question "Most famous food of Vietnam?" with "Pho"
