@@ -2538,12 +2538,15 @@ components:
         id:
           type: integer
           format: int32
-        multipleChoicesQuestion:
-          $ref: "#/components/schemas/MultipleChoicesQuestion"
-        imageWithMask:
-          $ref: "#/components/schemas/ImageWithMask"
         quizQuestion:
           $ref: "#/components/schemas/QuizQuestion"
+        correctAnswerIndex:
+          type: integer
+          format: int32
+        approved:
+          type: boolean
+        multipleChoicesQuestion:
+          $ref: "#/components/schemas/MultipleChoicesQuestion"
     NoteTestData:
       type: object
       properties:

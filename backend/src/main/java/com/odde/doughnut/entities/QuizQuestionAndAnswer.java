@@ -16,9 +16,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Table(name = "quiz_question")
-@JsonPropertyOrder({"id", "multipleChoicesQuestion", "headNote", "imageWithMask"})
 public class QuizQuestionAndAnswer extends EntityIdentifiedByIdOnly {
-
   @ManyToOne(cascade = CascadeType.DETACH)
   @JoinColumn(name = "note_id", referencedColumnName = "id")
   @JsonIgnore
@@ -31,11 +29,9 @@ public class QuizQuestionAndAnswer extends EntityIdentifiedByIdOnly {
   private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
   @Column(name = "correct_answer_index")
-  @JsonIgnore
   private Integer correctAnswerIndex;
 
   @Column(name = "is_approved")
-  @JsonIgnore
   private boolean approved;
 
   @JsonIgnore
@@ -54,10 +50,6 @@ public class QuizQuestionAndAnswer extends EntityIdentifiedByIdOnly {
       return getNote().matchAnswer(answer.getSpellingAnswer());
     }
     return Objects.equals(answer.getChoiceIndex(), getCorrectAnswerIndex());
-  }
-
-  public ImageWithMask getImageWithMask() {
-    return quizQuestion.getImageWithMask();
   }
 
   public static QuizQuestionAndAnswer fromMCQWithAnswer(MCQWithAnswer MCQWithAnswer, Note note) {
