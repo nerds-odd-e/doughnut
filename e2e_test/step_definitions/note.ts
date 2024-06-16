@@ -405,7 +405,7 @@ Given(
   },
 )
 
-When("I generate question by AI {string}", (noteName: string) => {
+When("I generate question by AI for note {string}", (noteName: string) => {
   start.jumpToNotePage(noteName).goToAddQuestion()
   cy.findByRole("button", { name: "Generate by AI" }).click()
 })

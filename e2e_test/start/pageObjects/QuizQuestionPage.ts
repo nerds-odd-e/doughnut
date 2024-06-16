@@ -29,15 +29,10 @@ const assumeQuestionPage = (stem?: string) => {
 
       return SuggestQuestionForFineTuningPage()
     },
-    expectQuestionGeneratedByAI(expectedQuestions: Record<string, string>) {
-      cy.findByLabelText("Stem").should("have.value", expectedQuestions["Question"]!)
-      cy.findByLabelText("Choice 0").should("have.value", expectedQuestions["Choice 0"]!)
-      cy.findByLabelText("Choice 1").should("have.value", expectedQuestions["Choice 1"]!)
-      cy.findByLabelText("Choice 2").should("have.value", expectedQuestions["Choice 2"]!)
-      cy.findByLabelText("Correct Choice Index").should(
-        "have.value",
-        expectedQuestions["Correct Choice"]!,
-      )
+    expectQuestionForm(expectedQuestions: Record<string, string>) {
+      ;["Stem", "Choice 0", "Choice 1", "Choice 2", "Correct Choice Index"].forEach((key) => {
+        cy.findByLabelText(key).should("have.value", expectedQuestions[key]!)
+      })
     },
   }
 }

@@ -17,3 +17,13 @@ Feature: Quiz Question Management
       | Question                             | Correct Choice |
       | What does a cow say?                 | moo            |
       | What do you call a cow with not leg? | Ground beef    |
+
+  Scenario: Can generate the question by AI
+    Given OpenAI now generates this question:
+      | Question Stem                            | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
+      | Why do cows have hooves instead of feet? | they lactose   | they moo           | they have          |
+    When I generate question by AI for note "The cow joke"
+    Then The generated question for the note by AI will show:
+      | Stem                                     | Choice 0     | Choice 1 | Choice 2  | Correct Choice Index |
+      | Why do cows have hooves instead of feet? | they lactose | they moo | they have | 0                    |
+
