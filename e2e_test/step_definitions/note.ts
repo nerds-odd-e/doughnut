@@ -416,3 +416,10 @@ Given(
 When("I generate question by AI for note {string}", (noteName: string) => {
   start.jumpToNotePage(noteName).openQuestionList().addQuestionPage().generateQuestionByAI()
 })
+
+Then("the question in the form becomes:", (data: DataTable) => {
+  const expectedQuestions = data.hashes()[0]!
+  ;["Stem", "Choice 0", "Choice 1", "Choice 2", "Correct Choice Index"].forEach((key) => {
+    cy.findByLabelText(key).should("have.value", expectedQuestions[key]!)
+  })
+})

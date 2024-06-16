@@ -29,11 +29,6 @@ const assumeQuestionPage = (stem?: string) => {
 
       return SuggestQuestionForFineTuningPage()
     },
-    expectQuestionForm(expectedQuestions: Record<string, string>) {
-      ;["Stem", "Choice 0", "Choice 1", "Choice 2", "Correct Choice Index"].forEach((key) => {
-        cy.findByLabelText(key).should("have.value", expectedQuestions[key]!)
-      })
-    },
   }
 }
 

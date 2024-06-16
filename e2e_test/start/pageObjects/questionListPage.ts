@@ -1,4 +1,4 @@
-import { addQuestionPage } from "./addQuestionPage";
+import { addQuestionPage } from "./addQuestionPage"
 
 export const questionListPage = () => {
   return {

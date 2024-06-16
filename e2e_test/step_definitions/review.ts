@@ -239,7 +239,3 @@ Then("I suggest the displayed question {string} as a bad example", (questionStem
     .suggestingThisQuestionForFineTuning()
     .suggestingNegativeFeedbackFineTuningExclusion()
 })
-
-Then("the question in the form becomes:", (data: DataTable) => {
-  start.assumeQuestionPage().expectQuestionForm(data.hashes()[0]!)
-})
