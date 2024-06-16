@@ -42,13 +42,11 @@ public class QuizQuestion1 {
   @JsonIgnore
   private Boolean checkSpell;
 
-  @Column(name = "has_image")
-  @JsonIgnore
-  private Boolean hasImage;
-
   @Column(name = "is_approved")
   @JsonIgnore
   private boolean approved;
+
+  @Embedded @JsonIgnore ImageWithMask imageWithMask;
 
   @JsonIgnore
   public MCQWithAnswer getMcqWithAnswer() {
@@ -66,11 +64,6 @@ public class QuizQuestion1 {
       return getNote().matchAnswer(answer.getSpellingAnswer());
     }
     return Objects.equals(answer.getChoiceIndex(), getCorrectAnswerIndex());
-  }
-
-  public ImageWithMask getImageWithMask() {
-    if (hasImage != null && hasImage) return getNote().getImageWithMask();
-    return null;
   }
 
   @NotNull
