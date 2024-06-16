@@ -182,19 +182,12 @@ export const assumeNotePage = (noteTopic?: string) => {
         incorrectChoice2,
       )
     },
-    changeApprovalStatus(question: string, approval: string) {
+    toggleApproval(question: string) {
       this.openQuestionList()
-      if (approval == "approve") {
-        cy.findByText(question).parent("tr").find('input[type="checkbox"]').check()
-      } else {
-        cy.findByText(question).parent("tr").find('input[type="checkbox"]').uncheck()
-      }
+      cy.findByText(question).parent("tr").find('input[type="checkbox"]').click()
     },
     expectQuestionsInList(expectedQuestions: Record<string, string>[]) {
       this.openQuestionList().expectQuestion(expectedQuestions)
-    },
-    expectApprovedStatusQuestion(noteTopic: string, question: string, approval: string) {
-      this.openQuestionList().expectApprovedStatusQuestion(question, approval)
     },
     aiSuggestDetailsForNote: () => {
       cy.on("uncaught:exception", () => {

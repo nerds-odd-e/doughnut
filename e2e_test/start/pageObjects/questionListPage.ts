@@ -18,13 +18,6 @@ export const questionListPage = () => {
         })
       })
     },
-    expectApprovedStatusQuestion(question: string, approval: string) {
-      if (approval == "approve") {
-        cy.findByText(question).parent("tr").find('input[type="checkbox"]').should("be.checked")
-      } else {
-        cy.findByText(question).parent("tr").find('input[type="checkbox"]').should("not.be.checked")
-      }
-    },
     fillQuestion(
       question: string,
       correctChoice: string,

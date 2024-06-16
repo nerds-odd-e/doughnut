@@ -413,17 +413,10 @@ When(
   },
 )
 
-When(
-  "I see the {string} question of the {string} note has {string}",
-  (question: string, noteTopic: string, approval: string) => {
-    start.jumpToNotePage(noteTopic).expectApprovedStatusQuestion(noteTopic, question, approval)
-  },
-)
-
 Given(
-  "I change approval status of the question {string} of the topic {string} to {string}:",
-  (quizQuestion: string, noteTopic: string, approval: string) => {
-    start.jumpToNotePage(noteTopic).changeApprovalStatus(quizQuestion, approval)
+  "I toggle the approval of the question {string} of the topic {string}",
+  (quizQuestion: string, noteTopic: string) => {
+    start.jumpToNotePage(noteTopic).toggleApproval(quizQuestion)
   },
 )
 

@@ -33,8 +33,8 @@ Feature: New questions assessment
     And I should see the score "Yours score: 2 / 5" at the end of assessment
 
   Scenario: Fail to start assessment not enough approve questions
-    Given I change approval status of the question "What is the capital city of China?" of the topic "China" to "unapproved":
-    And I change approval status of the question "Most famous food of Vietnam?" of the topic "Vietnam" to "unapproved":
+    Given I toggle the approval of the question "What is the capital city of China?" of the topic "China"
+    And I toggle the approval of the question "Most famous food of Vietnam?" of the topic "Vietnam"
     And I set the number of question for the "Countries" note is "4"
     When I start the assessment on the "Countries" notebook in the bazaar
     Then I should see error message Not enough questions
