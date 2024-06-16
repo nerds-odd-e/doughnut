@@ -2110,7 +2110,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/QuizQuestion"
+                $ref: "#/components/schemas/QuizQuestionInNotebook"
   /api/notes/{note}/note-info:
     get:
       tags:
@@ -3156,6 +3156,22 @@ components:
         toInitialReviewCount:
           type: integer
           format: int32
+    QuizQuestionInNotebook:
+      required:
+      - id
+      - multipleChoicesQuestion
+      - notebook
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        multipleChoicesQuestion:
+          $ref: "#/components/schemas/MultipleChoicesQuestion"
+        imageWithMask:
+          $ref: "#/components/schemas/ImageWithMask"
+        notebook:
+          $ref: "#/components/schemas/Notebook"
     NoteInfo:
       required:
       - createdAt

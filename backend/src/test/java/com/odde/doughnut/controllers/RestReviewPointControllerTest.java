@@ -5,9 +5,9 @@ import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.odde.doughnut.controllers.dto.QuizQuestionInNotebook;
 import com.odde.doughnut.controllers.dto.SelfEvaluation;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -139,7 +139,7 @@ class RestReviewPointControllerTest {
       // question cannot be generated.
       makeMe.aNote().under(note).please();
       ReviewPoint rp = makeMe.aReviewPointFor(note).by(userModel).please();
-      QuizQuestion quizQuestion = controller.generateRandomQuestion(rp);
+      QuizQuestionInNotebook quizQuestion = controller.generateRandomQuestion(rp);
       assertThat(quizQuestion.getId(), notNullValue());
     }
   }

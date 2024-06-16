@@ -2,6 +2,7 @@ package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.odde.doughnut.controllers.dto.QuizQuestionInNotebook;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
 import jakarta.persistence.*;
@@ -95,5 +96,14 @@ public class QuizQuestion extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public boolean isApproved() {
     return getQuizQuestion1().isApproved();
+  }
+
+  public QuizQuestionInNotebook toQuizQuestionInNotebook() {
+    QuizQuestionInNotebook quizQuestionInNotebook = new QuizQuestionInNotebook();
+    quizQuestionInNotebook.setNotebook(getNotebook());
+    quizQuestionInNotebook.setMultipleChoicesQuestion(getMultipleChoicesQuestion());
+    quizQuestionInNotebook.setId(getId());
+    quizQuestionInNotebook.setImageWithMask(getImageWithMask());
+    return quizQuestionInNotebook;
   }
 }
