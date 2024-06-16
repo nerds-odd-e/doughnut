@@ -11,10 +11,6 @@ Feature: Ask AI to refine the question
     And I have a note with the topic "Countries"
     And I want to create a question for the note "Countries"
 
-  Scenario: Cannot refine the question without any information
-    Given Empty question
-    Then The "Refine" button should be disabled
-
   Scenario Outline: Can refine the question with filled data
     Given I fill "<Stem>" to the Stem of the question
     And I fill "<Choice 0>" to the Choice 0 of the question

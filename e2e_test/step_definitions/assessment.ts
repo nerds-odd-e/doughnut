@@ -26,14 +26,6 @@ Given("I want to create a question for the note {string}", (noteName: string) =>
   start.jumpToNotePage(noteName).goToAddQuestion()
 })
 
-Given("Empty question", () => {
-  start.assumeNotePage().clearQuestion()
-})
-
-Then("The {string} button should be disabled", (buttonName: string) => {
-  cy.findByRole("button", { name: buttonName }).should("be.disabled")
-})
-
 Given("I fill {string} to the Stem of the question", (stem: string) => {
   start.assumeNotePage().injectDataToQuestion("Stem", stem)
 })

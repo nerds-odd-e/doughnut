@@ -57,21 +57,6 @@ Given(
   },
 )
 
-When(
-  "I fill {string} and {string} and {string} and {string} the following question for the note {string}:",
-  (
-    question: string,
-    correctChoice: string,
-    incorrectChoice1: string,
-    incorrectChoice2: string,
-    noteTopic: string,
-  ) => {
-    start
-      .jumpToNotePage(noteTopic)
-      .fillQuestion(question, correctChoice, incorrectChoice1, incorrectChoice2, noteTopic)
-  },
-)
-
 When("I create a notebook with topic {string}", (notebookTopic: string) => {
   start.routerToNotebooksPage().creatingNotebook(notebookTopic)
 })

@@ -169,19 +169,6 @@ export const assumeNotePage = (noteTopic?: string) => {
     addQuestion(row: Record<string, string>) {
       this.openQuestionList().addQuestion(row)
     },
-    fillQuestion(
-      question: string,
-      correctChoice: string,
-      incorrectChoice1: string,
-      incorrectChoice2: string,
-    ) {
-      this.openQuestionList().fillQuestion(
-        question,
-        correctChoice,
-        incorrectChoice1,
-        incorrectChoice2,
-      )
-    },
     toggleApproval(question: string) {
       this.openQuestionList()
       cy.findByText(question).parent("tr").find('input[type="checkbox"]').click()
@@ -259,11 +246,6 @@ export const assumeNotePage = (noteTopic?: string) => {
     },
     verifyRefineQuestionField(field: string) {
       cy.findByLabelText(field).invoke("val").should("not.eq", "")
-    },
-    clearQuestion() {
-      cy.findByLabelText("Stem").clear()
-      cy.findByLabelText("Choice 0").clear()
-      cy.findByLabelText("Choice 1").clear()
     },
   }
 }
