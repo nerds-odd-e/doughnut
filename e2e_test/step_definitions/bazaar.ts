@@ -3,7 +3,7 @@
 /// <reference types="../support" />
 // @ts-check
 
-import { Given, Then, When } from "@badeball/cypress-cucumber-preprocessor"
+import { Then, When } from "@badeball/cypress-cucumber-preprocessor"
 import start from "../start"
 
 Then("I should see {string} shared in the Bazaar", (notebooks: string) => {
