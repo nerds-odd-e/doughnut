@@ -10,6 +10,5 @@ export type QuizQuestion = {
     multipleChoicesQuestion: MultipleChoicesQuestion;
     headNote: Note;
     imageWithMask?: ImageWithMask;
-    createdAt?: string;
 };
 

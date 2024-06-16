@@ -2,13 +2,10 @@ package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.odde.doughnut.entities.converters.MCQToJsonConverter;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import java.sql.Timestamp;
-import java.util.Objects;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -24,63 +21,76 @@ public class QuizQuestion extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   private Note note;
 
-  @Column(name = "raw_json_question")
-  @Convert(converter = MCQToJsonConverter.class)
-  @NotNull
-  private MultipleChoicesQuestion multipleChoicesQuestion;
-
-  @Column(name = "created_at")
-  private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
-
-  @Column(name = "correct_answer_index")
-  @JsonIgnore
-  private Integer correctAnswerIndex;
-
-  @Column(name = "check_spell")
-  @JsonIgnore
-  private Boolean checkSpell;
-
-  @Column(name = "has_image")
-  @JsonIgnore
-  private Boolean hasImage;
-
-  @Column(name = "is_approved")
-  @JsonIgnore
-  private boolean approved;
+  @Embedded @JsonIgnore private QuizQuestion1 quizQuestion1 = new QuizQuestion1();
 
   @JsonIgnore
   public MCQWithAnswer getMcqWithAnswer() {
-    MCQWithAnswer mcqWithAnswer = new MCQWithAnswer();
-    mcqWithAnswer.setMultipleChoicesQuestion(getMultipleChoicesQuestion());
-    mcqWithAnswer.setCorrectChoiceIndex(correctAnswerIndex == null ? -1 : correctAnswerIndex);
-    mcqWithAnswer.setApproved(approved);
-    mcqWithAnswer.setId(id);
-    return mcqWithAnswer;
+    return quizQuestion1.getMcqWithAnswer();
   }
 
   @JsonIgnore
   public boolean checkAnswer(Answer answer) {
-    if (checkSpell != null && checkSpell) {
-      return getNote().matchAnswer(answer.getSpellingAnswer());
-    }
-    return Objects.equals(answer.getChoiceIndex(), getCorrectAnswerIndex());
+    return quizQuestion1.checkAnswer(answer);
   }
 
   public ImageWithMask getImageWithMask() {
-    if (hasImage != null && hasImage) return getNote().getImageWithMask();
-    return null;
+    return quizQuestion1.getImageWithMask();
   }
 
   @NotNull
   public Note getHeadNote() {
-    return getNote().getNotebook().getHeadNote();
+    return quizQuestion1.getHeadNote();
   }
 
   public static QuizQuestion fromMCQWithAnswer(MCQWithAnswer MCQWithAnswer, Note note) {
     QuizQuestion quizQuestionAIQuestion = new QuizQuestion();
     quizQuestionAIQuestion.setNote(note);
-    quizQuestionAIQuestion.setMultipleChoicesQuestion(MCQWithAnswer.getMultipleChoicesQuestion());
-    quizQuestionAIQuestion.setCorrectAnswerIndex(MCQWithAnswer.getCorrectChoiceIndex());
+    quizQuestionAIQuestion
+        .getQuizQuestion1()
+        .setMultipleChoicesQuestion(MCQWithAnswer.getMultipleChoicesQuestion());
+    quizQuestionAIQuestion
+        .getQuizQuestion1()
+        .setCorrectAnswerIndex(MCQWithAnswer.getCorrectChoiceIndex());
     return quizQuestionAIQuestion;
+  }
+
+  @JsonIgnore
+  public void setCorrectAnswerIndex(int i) {
+    getQuizQuestion1().setCorrectAnswerIndex(i);
+  }
+
+  public void setMultipleChoicesQuestion(MultipleChoicesQuestion mcq) {
+    getQuizQuestion1().setMultipleChoicesQuestion(mcq);
+  }
+
+  @NotNull
+  public MultipleChoicesQuestion getMultipleChoicesQuestion() {
+    return getQuizQuestion1().getMultipleChoicesQuestion();
+  }
+
+  @JsonIgnore
+  public void setApproved(boolean approved) {
+    getQuizQuestion1().setApproved(approved);
+  }
+
+  @JsonIgnore
+  public void setNote(Note value) {
+    this.note = value;
+    this.getQuizQuestion1().setNote(value);
+  }
+
+  @JsonIgnore
+  public Integer getCorrectAnswerIndex() {
+    return getQuizQuestion1().getCorrectAnswerIndex();
+  }
+
+  @JsonIgnore
+  public void setCheckSpell(boolean b) {
+    getQuizQuestion1().setCheckSpell(b);
+  }
+
+  @JsonIgnore
+  public boolean isApproved() {
+    return getQuizQuestion1().isApproved();
   }
 }

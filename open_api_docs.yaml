@@ -2594,9 +2594,6 @@ components:
           $ref: "#/components/schemas/Note"
         imageWithMask:
           $ref: "#/components/schemas/ImageWithMask"
-        createdAt:
-          type: string
-          format: date-time
     NoteTestData:
       type: object
       properties:
