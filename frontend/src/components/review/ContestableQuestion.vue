@@ -17,7 +17,7 @@
     />
     <QuizQuestionC
       v-else
-      :quiz-question="currentQuestion"
+      :quiz-question="currentQuestion.quizQuestion"
       @answered="onAnswered($event)"
     >
       <a
@@ -95,20 +95,21 @@ export default defineComponent({
       this.currentQuestionLegitMessage = "";
       const contestResult =
         await this.managedApi.restQuizQuestionController.contest(
-          this.currentQuestion.id,
+          this.currentQuestion.quizQuestion.id,
         );
 
       if (!contestResult.rejected) {
         this.regenerating = true;
         this.prevQuizQuestions.push({
-          quizeQuestion: this.currentQuestion,
+          quizeQuestion: this.currentQuestion.quizQuestion,
           badQuestionReason: contestResult.reason,
         });
         this.currentQuestion = {
-          ...this.currentQuestion,
-          ...(await this.managedApi.restQuizQuestionController.regenerate(
-            this.currentQuestion.id,
-          )),
+          notebook: this.currentQuestion.notebook,
+          quizQuestion:
+            await this.managedApi.restQuizQuestionController.regenerate(
+              this.currentQuestion.quizQuestion.id,
+            ),
         };
       } else {
         this.currentQuestionLegitMessage = contestResult.reason;

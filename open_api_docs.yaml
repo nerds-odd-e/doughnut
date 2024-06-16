@@ -2796,11 +2796,10 @@ components:
           $ref: "#/components/schemas/ReviewPoint"
         quizQuestion:
           $ref: "#/components/schemas/QuizQuestion"
-    QuizQuestionInNotebook:
+    QuizQuestion1:
       required:
       - id
       - multipleChoicesQuestion
-      - notebook
       type: object
       properties:
         id:
@@ -2810,8 +2809,16 @@ components:
           $ref: "#/components/schemas/MultipleChoicesQuestion"
         imageWithMask:
           $ref: "#/components/schemas/ImageWithMask"
+    QuizQuestionInNotebook:
+      required:
+      - notebook
+      - quizQuestion
+      type: object
+      properties:
         notebook:
           $ref: "#/components/schemas/Notebook"
+        quizQuestion:
+          $ref: "#/components/schemas/QuizQuestion1"
     NoteCreationDTO:
       required:
       - topicConstructor

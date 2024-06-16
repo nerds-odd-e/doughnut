@@ -96,9 +96,9 @@ public class QuizQuestion extends EntityIdentifiedByIdOnly {
   public QuizQuestionInNotebook toQuizQuestionInNotebook() {
     QuizQuestionInNotebook quizQuestionInNotebook = new QuizQuestionInNotebook();
     quizQuestionInNotebook.setNotebook(getNote().getNotebook());
-    quizQuestionInNotebook.setMultipleChoicesQuestion(getMultipleChoicesQuestion());
-    quizQuestionInNotebook.setId(getId());
-    quizQuestionInNotebook.setImageWithMask(getImageWithMask());
+    // make sure the id is the same as the quiz question id
+    getQuizQuestion1().setId(getId());
+    quizQuestionInNotebook.setQuizQuestion(getQuizQuestion1());
     return quizQuestionInNotebook;
   }
 }

@@ -2,13 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { ImageWithMask } from './ImageWithMask';
-import type { MultipleChoicesQuestion } from './MultipleChoicesQuestion';
 import type { Notebook } from './Notebook';
+import type { QuizQuestion1 } from './QuizQuestion1';
 export type QuizQuestionInNotebook = {
-    id: number;
-    multipleChoicesQuestion: MultipleChoicesQuestion;
-    imageWithMask?: ImageWithMask;
     notebook: Notebook;
+    quizQuestion: QuizQuestion1;
 };
 

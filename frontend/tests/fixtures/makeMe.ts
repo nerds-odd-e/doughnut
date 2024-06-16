@@ -9,6 +9,7 @@ import NoteBuilder from "./NoteBuilder";
 import UserBuilder from "./UserBuilder";
 import WikidataEntityBuilder from "./WikidataEntityBuilder";
 import WikidataSearchEntityBuilder from "./WikidataSearchEntityBuilder";
+import QuizQuestionInNotebookBuilder from "./QuizQuestionInNotebookBuilder";
 import QuizQuestionBuilder from "./QuizQuestionBuilder";
 import SuggestedQuestionForFineTuningBuilder from "./SuggestedQuestionForFineTuningBuilder";
 import ApiErrorBuilder from "./ApiErrorBuilder";
@@ -40,6 +41,10 @@ class MakeMe {
 
   static get aQuizQuestion(): QuizQuestionBuilder {
     return new QuizQuestionBuilder();
+  }
+
+  static get aQuizQuestionInNotebook(): QuizQuestionInNotebookBuilder {
+    return new QuizQuestionInNotebookBuilder();
   }
 
   static get aCircleNote(): CircleNoteBuilder {

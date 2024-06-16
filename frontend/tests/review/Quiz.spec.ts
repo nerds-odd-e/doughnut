@@ -5,7 +5,7 @@ import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 
 describe("repeat page", () => {
-  const quizQuestion = makeMe.aQuizQuestion.please();
+  const quizQuestion = makeMe.aQuizQuestionInNotebook.please();
   const mockedRandomQuestionCall = vi.fn().mockResolvedValue(quizQuestion);
 
   beforeEach(() => {

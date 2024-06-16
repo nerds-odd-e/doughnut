@@ -268,7 +268,7 @@ class RestQuizQuestionControllerTests {
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(jsonQuestion, "");
       QuizQuestionInNotebook quizQuestion = controller.generateQuestion(note);
 
-      Assertions.assertThat(quizQuestion.getMultipleChoicesQuestion().getStem())
+      Assertions.assertThat(quizQuestion.getQuizQuestion().getMultipleChoicesQuestion().getStem())
           .contains("What is the first color in the rainbow?");
     }
 

@@ -17,7 +17,7 @@ import lombok.EqualsAndHashCode;
 @JsonPropertyOrder({"id", "multipleChoicesQuestion", "headNote", "imageWithMask"})
 public class QuizQuestion1 {
   @Column(name = "id", updatable = false, insertable = false)
-  @JsonIgnore
+  @NotNull
   private Integer id;
 
   @Column(name = "raw_json_question")
@@ -26,6 +26,7 @@ public class QuizQuestion1 {
   private MultipleChoicesQuestion multipleChoicesQuestion;
 
   @Column(name = "created_at")
+  @JsonIgnore
   private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
   @Column(name = "correct_answer_index")
@@ -40,7 +41,7 @@ public class QuizQuestion1 {
   @JsonIgnore
   private boolean approved;
 
-  @Embedded @JsonIgnore ImageWithMask imageWithMask;
+  @Embedded ImageWithMask imageWithMask;
 
   @JsonIgnore
   public MCQWithAnswer getMcqWithAnswer() {
