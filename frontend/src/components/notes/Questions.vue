@@ -56,55 +56,40 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, PropType } from "vue";
+<script setup lang="ts">
+import { PropType, onMounted, ref } from "vue";
 import { Note, QuizQuestionAndAnswer } from "@/generated/backend";
 import useLoadingApi from "@/managedApi/useLoadingApi";
 import NoteAddQuestion from "./NoteAddQuestion.vue";
 import PopButton from "../commons/Popups/PopButton.vue";
 
-export default defineComponent({
-  setup() {
-    return useLoadingApi();
+const { managedApi } = useLoadingApi();
+const props = defineProps({
+  note: {
+    type: Object as PropType<Note>,
+    required: true,
   },
-  props: {
-    note: {
-      type: Object as PropType<Note>,
-      required: true,
-    },
-  },
-  data() {
-    return {
-      questions: [] as QuizQuestionAndAnswer[],
-    };
-  },
-  components: {
-    NoteAddQuestion,
-    PopButton,
-  },
-  methods: {
-    fetchQuestions() {
-      this.managedApi.restQuizQuestionController
-        .getAllQuestionByNote(this.note.id)
-        .then((questions) => {
-          this.questions = questions;
-        });
-    },
-    questionAdded(newQuestion: QuizQuestionAndAnswer) {
-      if (newQuestion == null) {
-        return;
-      }
-      this.questions.push(newQuestion);
-    },
-    async toggleApproval(questionId?: number) {
-      if (questionId) {
-        this.managedApi.restQuizQuestionController.toggleApproval(questionId);
-      }
-    },
-  },
-  mounted() {
-    this.fetchQuestions();
-  },
+});
+const questions = ref<QuizQuestionAndAnswer[]>([]);
+const fetchQuestions = async () => {
+  questions.value =
+    await managedApi.restQuizQuestionController.getAllQuestionByNote(
+      props.note.id,
+    );
+};
+const questionAdded = (newQuestion: QuizQuestionAndAnswer) => {
+  if (newQuestion == null) {
+    return;
+  }
+  questions.value.push(newQuestion);
+};
+const toggleApproval = async (questionId?: number) => {
+  if (questionId) {
+    await managedApi.restQuizQuestionController.toggleApproval(questionId);
+  }
+};
+onMounted(() => {
+  fetchQuestions();
 });
 </script>
 
