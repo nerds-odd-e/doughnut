@@ -15,7 +15,7 @@ For more background info you can read::
 - [Scholarship & Learning](https://www.lesswrong.com/tag/scholarship-and-learning)
 - [Knowledge Acquisition & Documentation Structuring](https://en.m.wikipedia.org/wiki/Knowledge_Acquisition_and_Documentation_Structuring)
 
-## [Product Backlog](https://docs.google.com/spreadsheets/d/1_GofvpnV1tjy2F_aaoOiYTZUOO-8t_qf3twIKMQyGV4/edit?ts=600e6711&pli=1#gid=0)
+## [Product Backlog](https://doughnut.odd-e.com/reviews/repeat/n24336)
 
 [Story Map](https://miro.com/app/board/o9J_lTB77Mc=/)
 
