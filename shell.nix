@@ -14,56 +14,27 @@ in mkShell {
     corepack_22
     zsh
     jdk22
-    libiconv
     git
     git-secret
-    delta
     gitleaks
-    binutils-unwrapped
-    hostname
-    inetutils
-    openssh
-    pkg-config
-    rsync
-    autojump
-    fasd
-    fzf
-    gnupg
     jq
-    less
-    lesspipe
-    lsof
-    lzma
-    btop
-    ps
-    vgrep
-    unixtools.whereis
     libmysqlclient
-    libpcap
-    patchelf
-    cacert
     mysql80
     mysql-client
     mysql_jdbc
-    uutils-coreutils
     google-cloud-sdk
     yamllint
-    nix-direnv
     nixfmt-classic
-  ] ++ lib.optionals stdenv.isDarwin [
-    darwin.apple_sdk.libs.utmp
-    apple_sdk.CoreFoundation
-    apple_sdk.CoreServices
-    sequelpro
-  ] ++ lib.optionals (!stdenv.isDarwin) [
-    sequeler
-    ungoogled-chromium
-    psmisc
-    x11vnc
-    xclip
-    xvfb-run
-    pinentry
-  ];
+  ] ++ lib.optionals stdenv.isDarwin [ sequelpro ]
+    ++ lib.optionals (!stdenv.isDarwin) [
+      sequeler
+      ungoogled-chromium
+      psmisc
+      x11vnc
+      xclip
+      xvfb-run
+      pinentry
+    ];
   shellHook = ''
     #!/usr/bin/env bash
 
