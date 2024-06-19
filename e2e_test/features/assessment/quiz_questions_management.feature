@@ -23,7 +23,7 @@ Feature: Quiz Question Management
       | noteTopic    | question                             | answer | oneWrongChoice |
       | The cow joke | What does a cow say?                 | moo    | woo            |
       | The cow joke | What do you call a cow with not leg? | Ground beef | Cowboy   |
-    When I delete the question "What does a cow say?" for the note "The cow joke"
+    When I delete the question "What does a cow say?" of the note "The cow joke"
     Then I should see the questions in the question list of the note "The cow joke":
       | Question                             | Correct Choice |
       | What do you call a cow with not leg? | Ground beef    |
