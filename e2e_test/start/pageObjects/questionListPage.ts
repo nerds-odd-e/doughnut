@@ -11,5 +11,8 @@ export const questionListPage = () => {
         })
       })
     },
+    deleteQuestion(question: string) {
+      
+    }
   }
 }
