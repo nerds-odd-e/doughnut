@@ -14,25 +14,26 @@
 			"e2e_test/config/common.ts",
 			"e2e_test/fixtures/*.js",
 			"e2e_test/fixtures/*.json",
-                        "frontend/*.cjs",
-                        "frontend/biome.json",
-                        "frontend/package.json",
-                        "frontend/tsconfig.json",
-                        "frontend/auto-imports.d.ts",
-                        "frontend/components.d.ts",
-                        "frontend/vite.config.ts",
+			"e2e_test/support/index.d.ts",
+      "frontend/*.cjs",
+      "frontend/biome.json",
+      "frontend/package.json",
+      "frontend/tsconfig.json",
+      "frontend/auto-imports.d.ts",
+      "frontend/components.d.ts",
+      "frontend/vite.config.ts",
 			"frontend/src/@types/doughnut/index.d.ts",
-                        "frontend/src/generated/backend/DoughnutApi.ts",
-                        "frontend/tests/*.js",
-                        "frontend/tests/shims-vue.d.ts",
-                        "infra/"
-                ]
+      "frontend/src/generated/backend/DoughnutApi.ts",
+      "frontend/tests/*.js",
+      "frontend/tests/shims-vue.d.ts",
+      "infra/"
+    ]
 	},
 	"vcs": {
-	      "enabled": true,
-	      "clientKind": "git",
-	      "useIgnoreFile": true,
-	      "defaultBranch": "main"
+	  "enabled": true,
+	  "clientKind": "git",
+	  "useIgnoreFile": true,
+	  "defaultBranch": "main"
 	},
 	"linter": {
 		"enabled": true,
