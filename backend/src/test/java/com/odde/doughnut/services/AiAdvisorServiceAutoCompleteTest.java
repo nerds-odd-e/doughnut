@@ -6,7 +6,6 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.*;
@@ -17,10 +16,10 @@ import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.services.ai.ClarifyingQuestion;
 import com.odde.doughnut.services.ai.NoteDetailsCompletion;
 import com.odde.doughnut.testability.MakeMe;
-import com.odde.doughnut.testability.OpenAIAssistantMock;
+import com.odde.doughnut.testability.OpenAIAssistantMocker;
+import com.odde.doughnut.testability.OpenAIAssistantThreadMocker;
 import com.theokanning.openai.OpenAiError;
 import com.theokanning.openai.OpenAiHttpException;
-import com.theokanning.openai.assistants.message.Message;
 import com.theokanning.openai.assistants.run.SubmitToolOutputRequestItem;
 import com.theokanning.openai.assistants.run.SubmitToolOutputsRequest;
 import com.theokanning.openai.client.OpenAiApi;
@@ -40,16 +39,16 @@ class AiAdvisorServiceAutoCompleteTest {
   private AiAdvisorService aiAdvisorService;
   @Mock private OpenAiApi openAiApi;
   MakeMe makeMe = MakeMe.makeMeWithoutFactoryService();
-  OpenAIAssistantMock openAIAssistantMock;
+  OpenAIAssistantMocker openAIAssistantMocker;
+  OpenAIAssistantThreadMocker openAIAssistantThreadMocker;
 
   @BeforeEach
   void Setup() {
     MockitoAnnotations.openMocks(this);
     aiAdvisorService = new AiAdvisorService(openAiApi);
-    openAIAssistantMock = new OpenAIAssistantMock(openAiApi);
-    openAIAssistantMock.mockThreadCreation(null);
-    when(openAiApi.createMessage(ArgumentMatchers.any(), ArgumentMatchers.any()))
-        .thenReturn(Single.just(new Message()));
+    openAIAssistantMocker = new OpenAIAssistantMocker(openAiApi);
+    openAIAssistantThreadMocker =
+        openAIAssistantMocker.mockThreadCreation(null).mockCreateMessage();
   }
 
   @Nested
@@ -57,14 +56,16 @@ class AiAdvisorServiceAutoCompleteTest {
 
     @Test
     void aiUnderstandHowToCompete() {
-      openAIAssistantMock.mockThreadRunCompletionToolCalled(
+      openAIAssistantThreadMocker.mockCreateRunInProcess("my-run-id");
+      openAIAssistantMocker.mockThreadRunCompletionToolCalled(
           new NoteDetailsCompletion(" must come down"), "my-run-id");
       assertEquals(" must come down", getAiCompletionAndResult("what goes up"));
     }
 
     @Test
     void aiTryToChatWithoutCallingAnyTool() {
-      openAIAssistantMock.mockThreadRunCompletedAndListMessage("Interesting idea.", "my-run-id");
+      openAIAssistantThreadMocker.mockCreateRunInProcess("my-run-id");
+      openAIAssistantMocker.mockThreadRunCompletedAndListMessage("Interesting idea.", "my-run-id");
       assertEquals("Interesting idea.", getAiCompletionResponse("what goes up").getLastMessage());
     }
 
@@ -126,18 +127,18 @@ class AiAdvisorServiceAutoCompleteTest {
     Note note;
     AiCompletionAnswerClarifyingQuestionParams params =
         new AiCompletionAnswerClarifyingQuestionParams();
-    OpenAIAssistantMock openAIAssistantMock;
+    OpenAIAssistantMocker openAIAssistantMocker;
 
     @BeforeEach
     void setup() {
       params.setThreadId("any-thread-id");
       note = makeMe.aNote().inMemoryPlease();
-      openAIAssistantMock = new OpenAIAssistantMock(openAiApi);
+      openAIAssistantMocker = new OpenAIAssistantMocker(openAiApi);
     }
 
     @Test
     void askCompletionAndUseQuestionResponse() {
-      openAIAssistantMock.mockSubmitOutputAndRequiredMoreAction(
+      openAIAssistantMocker.mockSubmitOutputAndRequiredMoreAction(
           new ClarifyingQuestion(
               "Are you referring to American football or association football (soccer) ?"),
           "my-run-id");
@@ -159,7 +160,7 @@ class AiAdvisorServiceAutoCompleteTest {
 
       @Test
       void mustSubmitTheAnswer() {
-        openAIAssistantMock.mockSubmitOutputAndCompletion(
+        openAIAssistantMocker.mockSubmitOutputAndCompletion(
             new NoteDetailsCompletion("blue planet"), "my-run-id");
         params.setToolCallId("tool-call-id");
         aiAdvisorService.answerAiCompletionClarifyingQuestion(params);
@@ -174,7 +175,7 @@ class AiAdvisorServiceAutoCompleteTest {
 
       @Test
       void askCompletionAndUseStopResponseWithQuestionAnswer() {
-        openAIAssistantMock.mockSubmitOutputAndCompletion(
+        openAIAssistantMocker.mockSubmitOutputAndCompletion(
             new NoteDetailsCompletion(" is common in China, if you are referring to green tea."),
             "my-run-id");
         AiAssistantResponse aiAssistantResponse =

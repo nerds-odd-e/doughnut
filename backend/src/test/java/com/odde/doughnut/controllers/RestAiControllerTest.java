@@ -15,11 +15,10 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.NoteDetailsCompletion;
 import com.odde.doughnut.testability.MakeMe;
-import com.odde.doughnut.testability.OpenAIAssistantMock;
+import com.odde.doughnut.testability.OpenAIAssistantMocker;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.OpenAiResponse;
 import com.theokanning.openai.assistants.assistant.Assistant;
-import com.theokanning.openai.assistants.message.Message;
 import com.theokanning.openai.assistants.message.MessageRequest;
 import com.theokanning.openai.assistants.run.RunCreateRequest;
 import com.theokanning.openai.client.OpenAiApi;
@@ -70,14 +69,14 @@ class RestAiControllerTest {
     AiCompletionParams params = new AiCompletionParams();
     ArgumentCaptor<ChatCompletionRequest> captor =
         ArgumentCaptor.forClass(ChatCompletionRequest.class);
-    OpenAIAssistantMock openAIAssistantMock;
+    OpenAIAssistantMocker openAIAssistantMocker;
 
     @BeforeEach
     void setup() {
       Note cosmos = makeMe.aNote("cosmos").please();
       Note solar = makeMe.aNote("solar system").under(cosmos).please();
       note = makeMe.aNote("Earth").under(solar).please();
-      openAIAssistantMock = new OpenAIAssistantMock(openAiApi);
+      openAIAssistantMocker = new OpenAIAssistantMocker(openAiApi);
     }
 
     @Test
@@ -97,10 +96,11 @@ class RestAiControllerTest {
     class StartACompletionThread {
       @BeforeEach
       void setup() {
-        openAIAssistantMock.mockThreadCreation("this-thread");
-        when(openAiApi.createMessage(eq("this-thread"), ArgumentMatchers.any()))
-            .thenReturn(Single.just(new Message()));
-        openAIAssistantMock.mockThreadRunCompletionToolCalled(
+        openAIAssistantMocker
+            .mockThreadCreation("this-thread")
+            .mockCreateMessage()
+            .mockCreateRunInProcess("my-run-id");
+        openAIAssistantMocker.mockThreadRunCompletionToolCalled(
             new NoteDetailsCompletion("blue planet"), "my-run-id");
       }
 
@@ -145,7 +145,7 @@ class RestAiControllerTest {
       @BeforeEach
       void setup() {
         params.setThreadId("any-thread-id");
-        openAIAssistantMock.mockSubmitOutputAndCompletion(
+        openAIAssistantMocker.mockSubmitOutputAndCompletion(
             new NoteDetailsCompletion("blue planet"), "my-run-id");
       }
 

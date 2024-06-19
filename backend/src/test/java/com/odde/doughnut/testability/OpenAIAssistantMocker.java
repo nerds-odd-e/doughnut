@@ -20,7 +20,7 @@ import java.util.Map;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
-public record OpenAIAssistantMock(OpenAiApi openAiApi) {
+public record OpenAIAssistantMocker(OpenAiApi openAiApi) {
   public OpenAIAssistantThreadMocker mockThreadCreation(String threadId) {
     Thread item = new Thread();
     item.setId(threadId);
@@ -29,7 +29,10 @@ public record OpenAIAssistantMock(OpenAiApi openAiApi) {
   }
 
   public void mockThreadRunCompletionToolCalled(Object result, String runId) {
-    mockCreateRunInProcess(runId);
+    retrieveRunRequestAction(result, runId);
+  }
+
+  private void retrieveRunRequestAction(Object result, String runId) {
     Run retrievedRun = getRunThatCallCompletionTool(runId, result);
     Mockito.doReturn(Single.just(retrievedRun))
         .when(openAiApi)
@@ -37,8 +40,13 @@ public record OpenAIAssistantMock(OpenAiApi openAiApi) {
   }
 
   public void mockThreadRunCompletedAndListMessage(String msg, String runId) {
-    mockCreateRunInProcess(runId);
-    Run retrievedRun = getRunThatCompleted(runId);
+    retrieveRunCompletedAndListMessage(msg, runId);
+  }
+
+  private void retrieveRunCompletedAndListMessage(String msg, String runId) {
+    Run retrievedRun = new Run();
+    retrievedRun.setId(runId);
+    retrievedRun.setStatus("completed");
     Mockito.doReturn(Single.just(retrievedRun))
         .when(openAiApi)
         .retrieveRun(ArgumentMatchers.any(), ArgumentMatchers.any());
@@ -68,22 +76,6 @@ public record OpenAIAssistantMock(OpenAiApi openAiApi) {
   private static Run getRunThatCallCompletionTool(String runId, Object result) {
     JsonNode arguments = new ObjectMapper().valueToTree(result);
     return getRunThatRequiresAction(arguments, runId, COMPLETE_NOTE_DETAILS);
-  }
-
-  private void mockCreateRunInProcess(String runId) {
-    Run run = new Run();
-    run.setId(runId);
-    run.setStatus("processing");
-    Mockito.doReturn(Single.just(run))
-        .when(openAiApi)
-        .createRun(ArgumentMatchers.any(), ArgumentMatchers.any());
-  }
-
-  private static Run getRunThatCompleted(String runId) {
-    Run retrievedRun = new Run();
-    retrievedRun.setId(runId);
-    retrievedRun.setStatus("completed");
-    return retrievedRun;
   }
 
   private static Run getRunThatRequiresAction(
