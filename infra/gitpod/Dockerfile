@@ -1,4 +1,4 @@
-# syntax=docker.io/docker/dockerfile:1.8.0
+# syntax=docker.io/docker/dockerfile:1.8.1
 FROM gitpod/workspace-full-vnc
 # ---------------------------------------------------
 # -------------------- USER root --------------------
