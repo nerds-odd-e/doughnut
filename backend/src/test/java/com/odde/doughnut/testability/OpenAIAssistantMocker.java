@@ -7,16 +7,11 @@ import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.theokanning.openai.OpenAiResponse;
-import com.theokanning.openai.assistants.message.Message;
-import com.theokanning.openai.assistants.message.MessageContent;
-import com.theokanning.openai.assistants.message.content.Text;
 import com.theokanning.openai.assistants.run.*;
 import com.theokanning.openai.assistants.thread.Thread;
 import com.theokanning.openai.client.OpenAiApi;
 import io.reactivex.Single;
 import java.util.List;
-import java.util.Map;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
@@ -37,28 +32,6 @@ public record OpenAIAssistantMocker(OpenAiApi openAiApi) {
     Mockito.doReturn(Single.just(retrievedRun))
         .when(openAiApi)
         .retrieveRun(ArgumentMatchers.any(), ArgumentMatchers.any());
-  }
-
-  public void mockThreadRunCompletedAndListMessage(String msg, String runId) {
-    retrieveRunCompletedAndListMessage(msg, runId);
-  }
-
-  private void retrieveRunCompletedAndListMessage(String msg, String runId) {
-    Run retrievedRun = new Run();
-    retrievedRun.setId(runId);
-    retrievedRun.setStatus("completed");
-    Mockito.doReturn(Single.just(retrievedRun))
-        .when(openAiApi)
-        .retrieveRun(ArgumentMatchers.any(), ArgumentMatchers.any());
-    Text txt = new Text(msg, List.of());
-    MessageContent cnt = new MessageContent();
-    cnt.setText(txt);
-    List<MessageContent> contentList = List.of(cnt);
-    OpenAiResponse<Message> msgs = new OpenAiResponse<>();
-    msgs.setData(List.of(Message.builder().content(contentList).build()));
-    Mockito.doReturn(Single.just(msgs))
-        .when(openAiApi)
-        .listMessages(retrievedRun.getThreadId(), Map.of());
   }
 
   public void mockSubmitOutputAndCompletion(Object result, String runId) {

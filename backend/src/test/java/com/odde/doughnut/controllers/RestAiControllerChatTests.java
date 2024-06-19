@@ -51,8 +51,9 @@ public class RestAiControllerChatTests {
     openAIAssistantMocker
         .mockThreadCreation(null)
         .mockCreateMessage()
-        .mockCreateRunInProcess("my-run-id");
-    openAIAssistantMocker.mockThreadRunCompletedAndListMessage("I'm Chatbot", "my-run-id");
+        .mockCreateRunInProcess("my-run-id")
+        .mockRetrieveRunAndGetCompleted("my-run-id")
+        .mockListMessages("I'm Chatbot");
   }
 
   @Test
