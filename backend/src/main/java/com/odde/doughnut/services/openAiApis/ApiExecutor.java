@@ -33,7 +33,9 @@ public record ApiExecutor() {
 
   public static <T> T blockGet(Single<T> apply) {
     try {
-      return execute(apply);
+      T executed = execute(apply);
+      //      System.out.println("executed = " + executed);
+      return executed;
     } catch (OpenAiHttpException e) {
       if (HttpStatus.UNAUTHORIZED.value() == e.statusCode) {
         throw new OpenAiUnauthorizedException(e.getMessage());

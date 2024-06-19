@@ -169,7 +169,7 @@ class RestAiControllerTest {
   }
 
   @Nested
-  class AskEngagingStory {
+  class GenerateImage {
     Note aNote;
 
     @BeforeEach

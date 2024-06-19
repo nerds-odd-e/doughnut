@@ -15,6 +15,7 @@ import com.theokanning.openai.assistants.run.*;
 import com.theokanning.openai.client.OpenAiApi;
 import io.reactivex.Single;
 import java.util.List;
+import java.util.Map;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
@@ -42,7 +43,7 @@ public record OpenAIAssistantMock(OpenAiApi openAiApi) {
     msgs.setData(List.of(Message.builder().content(contentList).build()));
     Mockito.doReturn(Single.just(msgs))
         .when(openAiApi)
-        .listMessages(retrievedRun.getThreadId(), null);
+        .listMessages(retrievedRun.getThreadId(), Map.of());
   }
 
   public void mockSubmitOutputAndCompletion(Object result, String runId) {

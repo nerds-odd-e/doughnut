@@ -1,8 +1,8 @@
 package com.odde.doughnut.controllers;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.controllers.dto.ChatRequest;
 import com.odde.doughnut.controllers.dto.ChatResponse;
@@ -10,18 +10,17 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.OpenAIAssistantMock;
 import com.odde.doughnut.testability.TestabilitySettings;
+import com.theokanning.openai.assistants.message.Message;
+import com.theokanning.openai.assistants.thread.Thread;
 import com.theokanning.openai.client.OpenAiApi;
-import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatCompletionResult;
-import com.theokanning.openai.completion.chat.ChatMessage;
 import io.reactivex.Single;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -40,6 +39,7 @@ public class RestAiControllerChatTests {
   Note note;
   Single<ChatCompletionResult> completionResultSingle;
   TestabilitySettings testabilitySettings = new TestabilitySettings();
+  OpenAIAssistantMock openAIAssistantMock;
 
   @BeforeEach
   void setUp() {
@@ -50,13 +50,18 @@ public class RestAiControllerChatTests {
     note = makeMe.aNote().creatorAndOwner(currentUser).please();
     completionResultSingle =
         Single.just(makeMe.openAiCompletionResult().choice("I'm ChatGPT").please());
+
+    openAIAssistantMock = new OpenAIAssistantMock(openAiApi);
+    when(openAiApi.createThread(ArgumentMatchers.any())).thenReturn(Single.just(new Thread()));
+    when(openAiApi.createMessage(ArgumentMatchers.any(), ArgumentMatchers.any()))
+        .thenReturn(Single.just(new Message()));
+    openAIAssistantMock.mockThreadRunCompletedAndListMessage("I'm Chatbot", "my-run-id");
   }
 
   @Test
   void chatWithAIAndGetResponse() throws UnexpectedNoAccessRightException {
-    Mockito.when(openAiApi.createChatCompletion(Mockito.any())).thenReturn(completionResultSingle);
     ChatResponse res = controller.chat(note, new ChatRequest("What's your name?"));
-    assertEquals("I'm ChatGPT", res.getAssistantMessage());
+    assertEquals("I'm Chatbot", res.getAssistantMessage());
   }
 
   @Test
@@ -70,33 +75,5 @@ public class RestAiControllerChatTests {
                     makeMe.aUser().toModelPlease(),
                     testabilitySettings)
                 .chat(note, new ChatRequest("What's your name?")));
-  }
-
-  @Nested
-  class ChatRequestTests {
-    ArgumentCaptor<ChatCompletionRequest> argumentCaptor =
-        ArgumentCaptor.forClass(ChatCompletionRequest.class);
-
-    @BeforeEach
-    void setUp() throws UnexpectedNoAccessRightException {
-      Mockito.when(openAiApi.createChatCompletion(Mockito.any()))
-          .thenReturn(completionResultSingle);
-      controller.chat(note, new ChatRequest("What's your name?"));
-      Mockito.verify(openAiApi).createChatCompletion(argumentCaptor.capture());
-    }
-
-    @Test
-    void chatRequestShouldContainTheNoteDetails() {
-      ChatMessage systemMessage = argumentCaptor.getValue().getMessages().get(1);
-      assertThat(systemMessage.getRole()).isEqualTo("system");
-      assertThat(systemMessage.getTextContent()).contains(note.getTopicConstructor());
-    }
-
-    @Test
-    void chatRequestShouldContainTheUserQuestion() {
-      ChatMessage userMessage = argumentCaptor.getValue().getMessages().get(2);
-      assertThat(userMessage.getRole()).isEqualTo("user");
-      assertThat(userMessage.getTextContent()).isEqualTo("What's your name?");
-    }
   }
 }

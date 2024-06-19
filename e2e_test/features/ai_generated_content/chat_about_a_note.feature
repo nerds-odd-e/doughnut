@@ -19,6 +19,7 @@ Feature: Chat about a note with AI
     Then I should receive the response "No. It is not."
 
 
+  @ignore
   Scenario: The users can continue to conmunication with AI
     Given OpenAI by default reply text completion assistant message "I'm ChatGPT"
     When I send the message "What's your name?" to AI

@@ -83,6 +83,7 @@ const openAiService = () => {
           await serviceMocker.stubPoster(`/threads`, {
             id: threadId,
           })
+          // for creating a message
           await serviceMocker.stubPoster(`/threads/${threadId}/messages`, {
             id: "msg-abc123",
           })
@@ -99,7 +100,40 @@ const openAiService = () => {
           )
         },
 
-        async stubRetrieveRuns(hashes: Record<string, string>[]) {
+        async stubRetrieveRunsThatReplyWithMessage(msg: string) {
+          const responses = [
+            {
+              id: "run-abc123",
+              status: "completed",
+            },
+          ]
+          await serviceMocker.stubGetterWithMutipleResponses(
+            `/threads/${threadId}/runs/run-abc123`,
+            {},
+            responses,
+          )
+          return await serviceMocker.stubGetter(
+            `/threads/${threadId}/messages`,
+            {},
+            {
+              object: "list",
+              data: [
+                {
+                  object: "thread.message",
+                  content: [
+                    {
+                      type: "text",
+                      text: {
+                        value: msg,
+                      },
+                    },
+                  ],
+                },
+              ],
+            },
+          )
+        },
+        async stubRetrieveRunsThatRequireAction(hashes: Record<string, string>[]) {
           const createRequiresActionRun = (functionName: string, argumentsObj: unknown) => {
             return {
               id: "run-abc123",
@@ -120,6 +154,7 @@ const openAiService = () => {
               },
             }
           }
+
           const responses = hashes.map((hash) => {
             switch (hash["response"]) {
               case "ask clarification question":

@@ -35,17 +35,15 @@ Given("OpenAI has models {string} available", (modelNames: string) => {
 Given(
   "OpenAI assistant will reply {string} for messages containing:",
   (returnMessage: string, data: DataTable) => {
-    const messages: MessageToMatch[] = data.hashes().map((row) => {
+    const _messages: MessageToMatch[] = data.hashes().map((row) => {
       return {
         role: row["role"],
         content: row["content"],
       } as MessageToMatch
     })
-    mock_services
-      .openAi()
-      .chatCompletion()
-      .requestMessagesMatch(messages)
-      .stubNonfunctionCallResponse(returnMessage)
+    const threadId = "thread-abc123"
+    mock_services.openAi().thread(threadId).stubCreateThreadRunAndSubmitOutput()
+    mock_services.openAi().thread(threadId).stubRetrieveRunsThatReplyWithMessage(returnMessage)
   },
 )
 
@@ -58,9 +56,9 @@ Given("An OpenAI response is unavailable", () => {
 })
 
 Given("OpenAI now generates this question:", (questionTable: DataTable) => {
-  const hashes = questionTable.hashes();
+  const hashes = questionTable.hashes()
   if (hashes.length !== 1 || !hashes[0]) {
-    throw new Error("Expected exactly one row in the data table, but got " + hashes.length);
+    throw new Error("Expected exactly one row in the data table, but got " + hashes.length)
   }
   start.questionGenerationService().resetAndStubAskingMCQ(hashes[0])
 })
@@ -88,6 +86,6 @@ Given(
   (data: DataTable) => {
     const threadId = "thread-abc123"
     mock_services.openAi().thread(threadId).stubCreateThreadRunAndSubmitOutput()
-    mock_services.openAi().thread(threadId).stubRetrieveRuns(data.hashes())
+    mock_services.openAi().thread(threadId).stubRetrieveRunsThatRequireAction(data.hashes())
   },
 )

@@ -29,6 +29,7 @@ import com.theokanning.openai.model.Model;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -173,7 +174,7 @@ public class OpenAiApiHandler {
   }
 
   public Message getThreadLastMessage(String threadId) {
-    return blockGet(openAiApi.listMessages(threadId, null)).getData().getLast();
+    return blockGet(openAiApi.listMessages(threadId, Map.of())).getData().getFirst();
   }
 
   public SrtDto getTranscription(RequestBody requestBody) throws IOException {
