@@ -58,7 +58,11 @@ Given("An OpenAI response is unavailable", () => {
 })
 
 Given("OpenAI now generates this question:", (questionTable: DataTable) => {
-  start.questionGenerationService().resetAndStubAskingMCQ(questionTable.hashes()[0])
+  const hashes = questionTable.hashes();
+  if (hashes.length !== 1 || !hashes[0]) {
+    throw new Error("Expected exactly one row in the data table, but got " + hashes.length);
+  }
+  start.questionGenerationService().resetAndStubAskingMCQ(hashes[0])
 })
 
 Given("OpenAI evaluates the question as legitamate", () => {
