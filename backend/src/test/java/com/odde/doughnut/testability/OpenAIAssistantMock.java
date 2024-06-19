@@ -12,6 +12,7 @@ import com.theokanning.openai.assistants.message.Message;
 import com.theokanning.openai.assistants.message.MessageContent;
 import com.theokanning.openai.assistants.message.content.Text;
 import com.theokanning.openai.assistants.run.*;
+import com.theokanning.openai.assistants.thread.Thread;
 import com.theokanning.openai.client.OpenAiApi;
 import io.reactivex.Single;
 import java.util.List;
@@ -20,6 +21,12 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
 public record OpenAIAssistantMock(OpenAiApi openAiApi) {
+  public OpenAIAssistantThreadMocker mockThreadCreation(String threadId) {
+    Thread item = new Thread();
+    item.setId(threadId);
+    when(openAiApi.createThread(ArgumentMatchers.any())).thenReturn(Single.just(item));
+    return new OpenAIAssistantThreadMocker(openAiApi, threadId);
+  }
 
   public void mockThreadRunCompletionToolCalled(Object result, String runId) {
     mockCreateRunInProcess(runId);

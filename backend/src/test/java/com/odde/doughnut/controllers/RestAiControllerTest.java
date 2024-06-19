@@ -22,7 +22,6 @@ import com.theokanning.openai.assistants.assistant.Assistant;
 import com.theokanning.openai.assistants.message.Message;
 import com.theokanning.openai.assistants.message.MessageRequest;
 import com.theokanning.openai.assistants.run.RunCreateRequest;
-import com.theokanning.openai.assistants.thread.Thread;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.image.Image;
@@ -98,9 +97,7 @@ class RestAiControllerTest {
     class StartACompletionThread {
       @BeforeEach
       void setup() {
-        Thread thread = new Thread();
-        thread.setId("this-thread");
-        when(openAiApi.createThread(ArgumentMatchers.any())).thenReturn(Single.just(thread));
+        openAIAssistantMock.mockThreadCreation("this-thread");
         when(openAiApi.createMessage(eq("this-thread"), ArgumentMatchers.any()))
             .thenReturn(Single.just(new Message()));
         openAIAssistantMock.mockThreadRunCompletionToolCalled(

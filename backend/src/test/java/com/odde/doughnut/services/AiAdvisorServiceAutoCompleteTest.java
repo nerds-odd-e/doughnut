@@ -23,7 +23,6 @@ import com.theokanning.openai.OpenAiHttpException;
 import com.theokanning.openai.assistants.message.Message;
 import com.theokanning.openai.assistants.run.SubmitToolOutputRequestItem;
 import com.theokanning.openai.assistants.run.SubmitToolOutputsRequest;
-import com.theokanning.openai.assistants.thread.Thread;
 import com.theokanning.openai.client.OpenAiApi;
 import io.reactivex.Single;
 import java.net.SocketTimeoutException;
@@ -46,9 +45,9 @@ class AiAdvisorServiceAutoCompleteTest {
   @BeforeEach
   void Setup() {
     MockitoAnnotations.openMocks(this);
-    openAIAssistantMock = new OpenAIAssistantMock(openAiApi);
     aiAdvisorService = new AiAdvisorService(openAiApi);
-    when(openAiApi.createThread(ArgumentMatchers.any())).thenReturn(Single.just(new Thread()));
+    openAIAssistantMock = new OpenAIAssistantMock(openAiApi);
+    openAIAssistantMock.mockThreadCreation(null);
     when(openAiApi.createMessage(ArgumentMatchers.any(), ArgumentMatchers.any()))
         .thenReturn(Single.just(new Message()));
   }

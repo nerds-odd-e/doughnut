@@ -11,9 +11,9 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIAssistantMock;
+import com.odde.doughnut.testability.OpenAIAssistantThreadMocker;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.assistants.message.Message;
-import com.theokanning.openai.assistants.thread.Thread;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionResult;
 import io.reactivex.Single;
@@ -40,6 +40,7 @@ public class RestAiControllerChatTests {
   Single<ChatCompletionResult> completionResultSingle;
   TestabilitySettings testabilitySettings = new TestabilitySettings();
   OpenAIAssistantMock openAIAssistantMock;
+  OpenAIAssistantThreadMocker openAIAssistantThreadMocker;
 
   @BeforeEach
   void setUp() {
@@ -52,7 +53,7 @@ public class RestAiControllerChatTests {
         Single.just(makeMe.openAiCompletionResult().choice("I'm ChatGPT").please());
 
     openAIAssistantMock = new OpenAIAssistantMock(openAiApi);
-    when(openAiApi.createThread(ArgumentMatchers.any())).thenReturn(Single.just(new Thread()));
+    openAIAssistantThreadMocker = openAIAssistantMock.mockThreadCreation(null);
     when(openAiApi.createMessage(ArgumentMatchers.any(), ArgumentMatchers.any()))
         .thenReturn(Single.just(new Message()));
     openAIAssistantMock.mockThreadRunCompletedAndListMessage("I'm Chatbot", "my-run-id");
