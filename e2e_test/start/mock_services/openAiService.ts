@@ -86,9 +86,6 @@ const openAiService = () => {
           await serviceMocker.stubPoster(`/threads/${threadId}/messages`, {
             id: "msg-abc123",
           })
-          await serviceMocker.stubPoster(`/threads/${threadId}/messages`, {
-            id: "msg-abc123",
-          })
           await serviceMocker.stubPoster(`/threads/${threadId}/runs`, {
             id: "run-abc123",
             status: "queued",
