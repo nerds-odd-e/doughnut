@@ -4,6 +4,8 @@ export const questionListPage = () => {
   return {
     addQuestionPage,
     expectQuestion(expectedQuestions: Record<string, string>[]) {
+      cy.get('.question-table tbody tr').should('have.length', expectedQuestions.length);
+
       expectedQuestions.forEach((row) => {
         cy.findByText(row["Question"]!)
         cy.findByText(row["Correct Choice"]!).then(($el) => {
@@ -12,7 +14,7 @@ export const questionListPage = () => {
       })
     },
     deleteQuestion(question: string) {
-      
+
     }
   }
 }
