@@ -3,8 +3,11 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.*;
+import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
+import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.assistants.assistant.Assistant;
+import com.theokanning.openai.assistants.assistant.AssistantRequest;
 import com.theokanning.openai.client.OpenAiApi;
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -40,10 +43,6 @@ public class AiAdvisorService {
         .answerAiCompletionClarifyingQuestion(answerClarifyingQuestionParams);
   }
 
-  public Assistant createNoteAssistant(String modelName) {
-    return getContentCompletionService().createNoteAssistant(modelName);
-  }
-
   public String chatWithAi(Note note, String userMessage, String assistantId) {
     return getContentCompletionService()
         .initiateAThread(note, assistantId, userMessage)
@@ -69,10 +68,6 @@ public class AiAdvisorService {
       List<OpenAIChatGPTFineTuningExample> examples, String question) throws IOException {
     String fileId = openAiApiHandler.uploadFineTuningExamples(examples, question);
     return openAiApiHandler.triggerFineTuning(fileId).getFineTunedModel();
-  }
-
-  private ContentCompletionService getContentCompletionService() {
-    return new ContentCompletionService(openAiApiHandler);
   }
 
   public SrtDto getTranscription(String filename, byte[] bytes) throws IOException {
@@ -104,8 +99,8 @@ public class AiAdvisorService {
 
   private String createCompletionAssistant(
       Timestamp currentUTCTimestamp, GlobalSettingsService globalSettingsService) {
-    Assistant noteCompletionAssistant =
-        createNoteAssistant(globalSettingsService.globalSettingOthers().getValue());
+    String modelName = globalSettingsService.globalSettingOthers().getValue();
+    Assistant noteCompletionAssistant = createNoteAssistant(modelName);
     String id = noteCompletionAssistant.getId();
     globalSettingsService.noteCompletionAssistantId().setKeyValue(currentUTCTimestamp, id);
     return id;
@@ -113,10 +108,29 @@ public class AiAdvisorService {
 
   private String createChatAssistant(
       Timestamp currentUTCTimestamp, GlobalSettingsService globalSettingsService) {
-    Assistant chatAssistant =
-        createNoteAssistant(globalSettingsService.globalSettingOthers().getValue());
+    String modelName = globalSettingsService.globalSettingOthers().getValue();
+    Assistant chatAssistant = createNoteAssistant(modelName);
     String id = chatAssistant.getId();
     globalSettingsService.chatAssistantId().setKeyValue(currentUTCTimestamp, id);
     return id;
+  }
+
+  public Assistant createNoteAssistant(String modelName) {
+    AssistantRequest assistantRequest =
+        AssistantRequest.builder()
+            .model(modelName)
+            .name("Note details completion")
+            .instructions(OpenAIChatRequestBuilder.systemInstruction)
+            .tools(ContentCompletionService.getTools().map(AiTool::getTool).toList())
+            .build();
+    return openAiApiHandler.createAssistant(assistantRequest);
+  }
+
+  private ContentCompletionService getContentCompletionService() {
+    return new ContentCompletionService(openAiApiHandler);
+  }
+
+  private ChatService getChatService() {
+    return new ChatService(openAiApiHandler);
   }
 }

@@ -5,11 +5,8 @@ import static com.odde.doughnut.services.ai.tools.AiToolFactory.COMPLETE_NOTE_DE
 
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
-import com.theokanning.openai.assistants.assistant.Assistant;
-import com.theokanning.openai.assistants.assistant.AssistantRequest;
 import com.theokanning.openai.assistants.message.MessageRequest;
 import com.theokanning.openai.assistants.run.RequiredAction;
 import com.theokanning.openai.assistants.run.Run;
@@ -86,18 +83,7 @@ public record ContentCompletionService(OpenAiApiHandler openAiApiHandler) {
     return completionResponse;
   }
 
-  public Assistant createNoteAssistant(String modelName) {
-    AssistantRequest assistantRequest =
-        AssistantRequest.builder()
-            .model(modelName)
-            .name("Note details completion")
-            .instructions(OpenAIChatRequestBuilder.systemInstruction)
-            .tools(getTools().map(AiTool::getTool).toList())
-            .build();
-    return openAiApiHandler.createAssistant(assistantRequest);
-  }
-
-  private static Stream<AiTool> getTools() {
+  public static Stream<AiTool> getTools() {
     return Stream.of(
         AiTool.build(
             COMPLETE_NOTE_DETAILS,
