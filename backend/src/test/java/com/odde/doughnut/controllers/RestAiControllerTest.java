@@ -100,7 +100,7 @@ class RestAiControllerTest {
             .mockThreadCreation("this-thread")
             .mockCreateMessage()
             .mockCreateRunInProcess("my-run-id");
-        openAIAssistantMocker.mockThreadRunCompletionToolCalled(
+        openAIAssistantMocker.mockThreadRunRequireActionAndCompletionToolCalled(
             new NoteDetailsCompletion("blue planet"), "my-run-id");
       }
 

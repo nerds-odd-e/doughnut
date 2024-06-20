@@ -23,11 +23,7 @@ public record OpenAIAssistantMocker(OpenAiApi openAiApi) {
     return new OpenAIAssistantThreadMocker(openAiApi, threadId);
   }
 
-  public void mockThreadRunCompletionToolCalled(Object result, String runId) {
-    retrieveRunRequestAction(result, runId);
-  }
-
-  private void retrieveRunRequestAction(Object result, String runId) {
+  public void mockThreadRunRequireActionAndCompletionToolCalled(Object result, String runId) {
     Run retrievedRun = getRunThatCallCompletionTool(runId, result);
     Mockito.doReturn(Single.just(retrievedRun))
         .when(openAiApi)
