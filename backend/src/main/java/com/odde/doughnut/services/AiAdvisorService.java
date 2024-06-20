@@ -116,7 +116,7 @@ public class AiAdvisorService {
     Assistant chatAssistant =
         createNoteAssistant(globalSettingsService.globalSettingOthers().getValue());
     String id = chatAssistant.getId();
-    globalSettingsService.noteCompletionAssistantId().setKeyValue(currentUTCTimestamp, id);
+    globalSettingsService.chatAssistantId().setKeyValue(currentUTCTimestamp, id);
     return id;
   }
 }
