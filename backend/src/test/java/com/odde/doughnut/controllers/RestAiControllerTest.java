@@ -255,7 +255,7 @@ class RestAiControllerTest {
       }
 
       @Test
-      void callingTheApi() throws UnexpectedNoAccessRightException {
+      void createCompletionAssistant() throws UnexpectedNoAccessRightException {
         Map<String, String> result = controller.recreateAllAssistants();
         assertThat(result.get("note details completion")).isEqualTo("1234");
       }
@@ -266,6 +266,12 @@ class RestAiControllerTest {
         GlobalSettingsService globalSettingsService =
             new GlobalSettingsService(makeMe.modelFactoryService);
         assertThat(globalSettingsService.noteCompletionAssistantId().getValue()).isEqualTo("1234");
+      }
+
+      @Test
+      void createChatAssistant() throws UnexpectedNoAccessRightException {
+        Map<String, String> result = controller.recreateAllAssistants();
+        assertThat(result.get("chat")).isEqualTo("1234");
       }
     }
   }

@@ -8,11 +8,10 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.testability.TestabilitySettings;
-import com.theokanning.openai.assistants.assistant.Assistant;
 import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
-import java.util.HashMap;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -90,20 +89,9 @@ public class RestAiController {
   @Transactional
   public Map<String, String> recreateAllAssistants() throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
-    Map<String, String> result = new HashMap<>();
-    Assistant noteCompletionAssistant =
-        aiAdvisorService.createNoteAssistant(getDefaultOpenAiChatModel());
-    String id = noteCompletionAssistant.getId();
-    getGlobalSettingsService()
-        .noteCompletionAssistantId()
-        .setKeyValue(testabilitySettings.getCurrentUTCTimestamp(), id);
-
-    result.put("note details completion", id);
-    return result;
-  }
-
-  private String getDefaultOpenAiChatModel() {
-    return getGlobalSettingsService().globalSettingOthers().getValue();
+    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
+    return aiAdvisorService.createAllDefaultAssistants(
+        currentUTCTimestamp, getGlobalSettingsService());
   }
 
   private GlobalSettingsService getGlobalSettingsService() {

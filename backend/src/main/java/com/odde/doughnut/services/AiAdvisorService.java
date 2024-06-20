@@ -7,8 +7,11 @@ import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.assistants.assistant.Assistant;
 import com.theokanning.openai.client.OpenAiApi;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -86,5 +89,34 @@ public class AiAdvisorService {
 
     RequestBody requestBody = builder.build();
     return openAiApiHandler.getTranscription(requestBody);
+  }
+
+  public Map<String, String> createAllDefaultAssistants(
+      Timestamp currentUTCTimestamp, GlobalSettingsService globalSettingsService) {
+    Map<String, String> result = new HashMap<>();
+    result.put(
+        "note details completion",
+        createCompletionAssistant(currentUTCTimestamp, globalSettingsService));
+    result.put("chat", createChatAssistant(currentUTCTimestamp, globalSettingsService));
+
+    return result;
+  }
+
+  private String createCompletionAssistant(
+      Timestamp currentUTCTimestamp, GlobalSettingsService globalSettingsService) {
+    Assistant noteCompletionAssistant =
+        createNoteAssistant(globalSettingsService.globalSettingOthers().getValue());
+    String id = noteCompletionAssistant.getId();
+    globalSettingsService.noteCompletionAssistantId().setKeyValue(currentUTCTimestamp, id);
+    return id;
+  }
+
+  private String createChatAssistant(
+      Timestamp currentUTCTimestamp, GlobalSettingsService globalSettingsService) {
+    Assistant chatAssistant =
+        createNoteAssistant(globalSettingsService.globalSettingOthers().getValue());
+    String id = chatAssistant.getId();
+    globalSettingsService.noteCompletionAssistantId().setKeyValue(currentUTCTimestamp, id);
+    return id;
   }
 }
