@@ -14,6 +14,28 @@ const openAiAssistantCreatedRunMocker = (
 
       return this
     },
+    async stubListMessages(msg: string) {
+      return await serviceMocker.stubGetter(
+        `/threads/${threadId}/messages`,
+        {},
+        {
+          object: "list",
+          data: [
+            {
+              object: "thread.message",
+              content: [
+                {
+                  type: "text",
+                  text: {
+                    value: msg,
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      )
+    },
   }
 }
 

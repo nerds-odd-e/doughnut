@@ -32,24 +32,6 @@ Given("OpenAI has models {string} available", (modelNames: string) => {
   })
 })
 
-Given(
-  "OpenAI assistant will reply {string} for messages containing:",
-  (returnMessage: string, data: DataTable) => {
-    const _messages: MessageToMatch[] = data.hashes().map((row) => {
-      return {
-        role: row["role"],
-        content: row["content"],
-      } as MessageToMatch
-    })
-    const threadId = "thread-abc123"
-    mock_services
-      .openAi()
-      .stubCreateThread(threadId)
-      .then((thread) => thread.stubCreateMessageAndCreateRun())
-    mock_services.openAi().thread(threadId).stubRetrieveRunsThatReplyWithMessage(returnMessage)
-  },
-)
-
 Given("OpenAI always return image of a moon", () => {
   mock_services.openAi().stubCreateImage()
 })
@@ -98,6 +80,29 @@ Given(
             run
               .stubRetrieveRunsThatRequireAction(data.hashes())
               .then((run) => run.stubSubmitToolOutputs()),
+          ),
+      )
+  },
+)
+
+Given(
+  "OpenAI assistant will reply {string} for messages containing:",
+  (returnMessage: string, data: DataTable) => {
+    const _messages: MessageToMatch[] = data.hashes().map((row) => {
+      return {
+        role: row["role"],
+        content: row["content"],
+      } as MessageToMatch
+    })
+    const threadId = "thread-abc123"
+    mock_services
+      .openAi()
+      .stubCreateThread(threadId)
+      .then((thread) =>
+        thread
+          .stubCreateMessageAndCreateRun()
+          .then((run) =>
+            run.stubRetrieveRunsThatCompleted().then((run) => run.stubListMessages(returnMessage)),
           ),
       )
   },

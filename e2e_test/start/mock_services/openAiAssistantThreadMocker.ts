@@ -15,6 +15,21 @@ const openAiAssistantThreadMocker = (serviceMocker: ServiceMocker, threadId: str
       return this
     },
 
+    async stubRetrieveRunsThatCompleted() {
+      const responses = [
+        {
+          id: "run-abc123",
+          status: "completed",
+        },
+      ]
+      await serviceMocker.stubGetterWithMutipleResponses(
+        `/threads/${threadId}/runs/run-abc123`,
+        {},
+        responses,
+      )
+      return openAiAssistantCreatedRunMocker(serviceMocker, threadId, "run-abc123")
+    },
+
     async stubRetrieveRunsThatRequireAction(hashes: Record<string, string>[]) {
       const createRequiresActionRun = (functionName: string, argumentsObj: unknown) => {
         return {

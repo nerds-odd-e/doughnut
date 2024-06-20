@@ -84,43 +84,6 @@ const openAiService = () => {
       })
       return openAiAssistantThreadMocker(serviceMocker, threadId)
     },
-    thread(threadId: string) {
-      return {
-        async stubRetrieveRunsThatReplyWithMessage(msg: string) {
-          const responses = [
-            {
-              id: "run-abc123",
-              status: "completed",
-            },
-          ]
-          await serviceMocker.stubGetterWithMutipleResponses(
-            `/threads/${threadId}/runs/run-abc123`,
-            {},
-            responses,
-          )
-          return await serviceMocker.stubGetter(
-            `/threads/${threadId}/messages`,
-            {},
-            {
-              object: "list",
-              data: [
-                {
-                  object: "thread.message",
-                  content: [
-                    {
-                      type: "text",
-                      text: {
-                        value: msg,
-                      },
-                    },
-                  ],
-                },
-              ],
-            },
-          )
-        },
-      }
-    },
 
     async stubFineTuningStatus(successful: boolean) {
       return await serviceMocker.stubPoster(`/fine_tuning/jobs`, {
