@@ -1,11 +1,11 @@
 export type TextMessageToMatch = {
   role?: "user" | "assistant" | "system"
-  content: string | RegExp
+  content: string
 }
 
 export type ToolCallToMatch = {
   role: "tool" | "function"
-  content?: string | RegExp
+  content?: string
   name: string
 }
 
