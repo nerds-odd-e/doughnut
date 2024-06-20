@@ -68,8 +68,7 @@ public class RestAiController {
       throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(note);
     String userMessage = request.getUserMessage();
-    String assistantMessage =
-        this.aiAdvisorService.chatWithAi(note, userMessage, getDefaultOpenAiChatModel());
+    String assistantMessage = this.aiAdvisorService.chatWithAi(note, userMessage, getAssistantId());
     return new ChatResponse(assistantMessage);
   }
 
