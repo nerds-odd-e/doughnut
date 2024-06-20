@@ -1,13 +1,13 @@
 package com.odde.doughnut.services;
 
+import static com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder.askClarificationQuestion;
+import static com.odde.doughnut.services.ai.tools.AiToolFactory.COMPLETE_NOTE_DETAILS;
+
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.*;
-import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
-import com.theokanning.openai.assistants.assistant.Assistant;
-import com.theokanning.openai.assistants.assistant.AssistantRequest;
 import com.theokanning.openai.client.OpenAiApi;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -41,9 +41,7 @@ public class AiAdvisorService {
   }
 
   public String chatWithAi(Note note, String userMessage, String assistantId) {
-    return getContentCompletionService()
-        .initiateAThread(note, assistantId, userMessage)
-        .getLastMessage();
+    return getChatService().initiateAThread(note, assistantId, userMessage).getLastMessage();
   }
 
   public List<String> getAvailableGptModels() {
@@ -84,30 +82,40 @@ public class AiAdvisorService {
   }
 
   public String createCompletionAssistant(String modelName) {
-    Assistant noteCompletionAssistant =
-        createAssistant(modelName, "Note details completion", ContentCompletionService.getTools());
-    return noteCompletionAssistant.getId();
+    return getContentCompletionService()
+        .createAssistant(modelName, "Note details completion")
+        .getId();
   }
 
   public String createChatAssistant(String modelName) {
-    Assistant chatAssistant =
-        createAssistant(modelName, "Chat assistant", ContentCompletionService.getChatTools());
-    return chatAssistant.getId();
+    return getChatService().createAssistant(modelName, "Chat assistant").getId();
   }
 
-  private Assistant createAssistant(
-      String modelName, String noteDetailsCompletion, List<AiTool> tools) {
-    AssistantRequest assistantRequest =
-        AssistantRequest.builder()
-            .model(modelName)
-            .name(noteDetailsCompletion)
-            .instructions(OpenAIChatRequestBuilder.systemInstruction)
-            .tools(tools.stream().map(AiTool::getTool).toList())
-            .build();
-    return openAiApiHandler.createAssistant(assistantRequest);
+  private AssistantService getContentCompletionService() {
+    return new AssistantService(
+        openAiApiHandler,
+        List.of(
+            AiTool.build(
+                COMPLETE_NOTE_DETAILS,
+                "Text completion for the details of the note of focus",
+                NoteDetailsCompletion.class,
+                (noteDetailsCompletion) -> {
+                  AiCompletionRequiredAction result = new AiCompletionRequiredAction();
+                  result.setContentToAppend(noteDetailsCompletion.completion);
+                  return result;
+                }),
+            AiTool.build(
+                askClarificationQuestion,
+                "Ask question to get more context",
+                ClarifyingQuestion.class,
+                (clarifyingQuestion) -> {
+                  AiCompletionRequiredAction result = new AiCompletionRequiredAction();
+                  result.setClarifyingQuestion(clarifyingQuestion);
+                  return result;
+                })));
   }
 
-  private ContentCompletionService getContentCompletionService() {
-    return new ContentCompletionService(openAiApiHandler);
+  private AssistantService getChatService() {
+    return new AssistantService(openAiApiHandler, List.of());
   }
 }

@@ -1,12 +1,12 @@
 package com.odde.doughnut.services.ai;
 
-import static com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder.askClarificationQuestion;
-import static com.odde.doughnut.services.ai.tools.AiToolFactory.COMPLETE_NOTE_DETAILS;
-
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
+import com.theokanning.openai.assistants.assistant.Assistant;
+import com.theokanning.openai.assistants.assistant.AssistantRequest;
 import com.theokanning.openai.assistants.message.MessageRequest;
 import com.theokanning.openai.assistants.run.RequiredAction;
 import com.theokanning.openai.assistants.run.Run;
@@ -15,7 +15,18 @@ import com.theokanning.openai.assistants.thread.Thread;
 import com.theokanning.openai.assistants.thread.ThreadRequest;
 import java.util.List;
 
-public record ContentCompletionService(OpenAiApiHandler openAiApiHandler) {
+public record AssistantService(OpenAiApiHandler openAiApiHandler, List<AiTool> tools) {
+  public Assistant createAssistant(String modelName, String name) {
+    AssistantRequest assistantRequest =
+        AssistantRequest.builder()
+            .model(modelName)
+            .name(name)
+            .instructions(OpenAIChatRequestBuilder.systemInstruction)
+            .tools(tools.stream().map(AiTool::getTool).toList())
+            .build();
+    return openAiApiHandler.createAssistant(assistantRequest);
+  }
+
   public AiAssistantResponse initiateAThread(Note note, String assistantId, String prompt) {
     String threadId = createThread(note, prompt);
     Run run = openAiApiHandler.createRun(threadId, assistantId);
@@ -59,7 +70,7 @@ public record ContentCompletionService(OpenAiApiHandler openAiApiHandler) {
       ToolCall toolCall = requiredAction.getSubmitToolOutputs().getToolCalls().getFirst();
 
       AiCompletionRequiredAction actionRequired =
-          getTools()
+          tools.stream()
               .flatMap(t -> t.tryConsume(toolCall))
               .findFirst()
               .orElseThrow(
@@ -81,31 +92,5 @@ public record ContentCompletionService(OpenAiApiHandler openAiApiHandler) {
       completionResponse.setLastMessage(message);
     }
     return completionResponse;
-  }
-
-  public static List<AiTool> getTools() {
-    return List.of(
-        AiTool.build(
-            COMPLETE_NOTE_DETAILS,
-            "Text completion for the details of the note of focus",
-            NoteDetailsCompletion.class,
-            (noteDetailsCompletion) -> {
-              AiCompletionRequiredAction result = new AiCompletionRequiredAction();
-              result.setContentToAppend(noteDetailsCompletion.completion);
-              return result;
-            }),
-        AiTool.build(
-            askClarificationQuestion,
-            "Ask question to get more context",
-            ClarifyingQuestion.class,
-            (clarifyingQuestion) -> {
-              AiCompletionRequiredAction result = new AiCompletionRequiredAction();
-              result.setClarifyingQuestion(clarifyingQuestion);
-              return result;
-            }));
-  }
-
-  public static List<AiTool> getChatTools() {
-    return List.of();
   }
 }
