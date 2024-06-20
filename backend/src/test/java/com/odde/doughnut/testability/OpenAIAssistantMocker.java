@@ -3,7 +3,6 @@ package com.odde.doughnut.testability;
 import static com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder.askClarificationQuestion;
 import static com.odde.doughnut.services.ai.tools.AiToolFactory.COMPLETE_NOTE_DETAILS;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,36 +18,29 @@ public record OpenAIAssistantMocker(OpenAiApi openAiApi) {
   public OpenAIAssistantThreadMocker mockThreadCreation(String threadId) {
     Thread item = new Thread();
     item.setId(threadId);
-    when(openAiApi.createThread(ArgumentMatchers.any())).thenReturn(Single.just(item));
+    Mockito.doReturn(Single.just(item)).when(openAiApi).createThread(any());
     return new OpenAIAssistantThreadMocker(openAiApi, threadId);
   }
 
   public void mockThreadRunRequireActionAndCompletionToolCalled(Object result, String runId) {
-    Run retrievedRun = getRunThatCallCompletionTool(runId, result);
+    Run retrievedRun = getRunThatRequiresAction(result, runId, COMPLETE_NOTE_DETAILS);
     Mockito.doReturn(Single.just(retrievedRun))
         .when(openAiApi)
         .retrieveRun(ArgumentMatchers.any(), ArgumentMatchers.any());
   }
 
   public void mockSubmitOutputAndCompletion(Object result, String runId) {
-    Run run = getRunThatCallCompletionTool(runId, result);
-    when(openAiApi.submitToolOutputs(any(), any(), any())).thenReturn(Single.just(run));
+    Run run = getRunThatRequiresAction(result, runId, COMPLETE_NOTE_DETAILS);
+    Mockito.doReturn(Single.just(run)).when(openAiApi).submitToolOutputs(any(), any(), any());
   }
 
   public void mockSubmitOutputAndRequiredMoreAction(Object result, String runId) {
-    Run run =
-        getRunThatRequiresAction(
-            new ObjectMapper().valueToTree(result), runId, askClarificationQuestion);
-    when(openAiApi.submitToolOutputs(any(), any(), any())).thenReturn(Single.just(run));
+    Run run = getRunThatRequiresAction(result, runId, askClarificationQuestion);
+    Mockito.doReturn(Single.just(run)).when(openAiApi).submitToolOutputs(any(), any(), any());
   }
 
-  private static Run getRunThatCallCompletionTool(String runId, Object result) {
+  private static Run getRunThatRequiresAction(Object result, String runId, String function_name) {
     JsonNode arguments = new ObjectMapper().valueToTree(result);
-    return getRunThatRequiresAction(arguments, runId, COMPLETE_NOTE_DETAILS);
-  }
-
-  private static Run getRunThatRequiresAction(
-      JsonNode arguments, String runId, String function_name) {
     Run retrievedRun = new Run();
     retrievedRun.setId(runId);
     retrievedRun.setStatus("requires_action");

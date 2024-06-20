@@ -8,9 +8,7 @@ import com.odde.doughnut.controllers.dto.ChatResponse;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.testability.MakeMe;
-import com.odde.doughnut.testability.OpenAIAssistantMocker;
-import com.odde.doughnut.testability.TestabilitySettings;
+import com.odde.doughnut.testability.*;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionResult;
 import io.reactivex.Single;
@@ -48,11 +46,14 @@ public class RestAiControllerChatTests {
         Single.just(makeMe.openAiCompletionResult().choice("I'm ChatGPT").please());
 
     openAIAssistantMocker = new OpenAIAssistantMocker(openAiApi);
-    openAIAssistantMocker
-        .mockThreadCreation(null)
-        .mockCreateMessage()
-        .mockCreateRunInProcess("my-run-id")
-        .mockRetrieveRunAndGetCompleted("my-run-id")
+    OpenAIAssistantThreadMocker openAIAssistantThreadMocker =
+        openAIAssistantMocker
+            .mockThreadCreation(null)
+            .mockCreateMessage()
+            .mockCreateRunInProcess("my-run-id");
+    openAIAssistantThreadMocker
+        .aRunThatCompleted("my-run-id")
+        .mockRetrieveRun()
         .mockListMessages("I'm Chatbot");
   }
 

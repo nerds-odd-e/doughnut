@@ -28,14 +28,11 @@ public record OpenAIAssistantThreadMocker(OpenAiApi openAiApi, String threadId) 
     return this;
   }
 
-  public OpenAIAssistantRunMocker mockRetrieveRunAndGetCompleted(String runId) {
+  public OpenAIAssistantRunCompletedMocker aRunThatCompleted(String runId) {
     Run run = new Run();
     run.setId(runId);
     run.setStatus("completed");
     run.setThreadId(threadId);
-    Mockito.doReturn(Single.just(run))
-        .when(openAiApi)
-        .retrieveRun(ArgumentMatchers.any(), ArgumentMatchers.any());
-    return new OpenAIAssistantRunMocker(openAiApi, threadId, runId);
+    return new OpenAIAssistantRunCompletedMocker(openAiApi, threadId, run);
   }
 }

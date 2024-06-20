@@ -64,9 +64,11 @@ class AiAdvisorServiceAutoCompleteTest {
 
     @Test
     void aiTryToChatWithoutCallingAnyTool() {
-      openAIAssistantThreadMocker
-          .mockCreateRunInProcess("my-run-id")
-          .mockRetrieveRunAndGetCompleted("my-run-id")
+      OpenAIAssistantThreadMocker openAIAssistantThreadMocker1 =
+          openAIAssistantThreadMocker.mockCreateRunInProcess("my-run-id");
+      openAIAssistantThreadMocker1
+          .aRunThatCompleted("my-run-id")
+          .mockRetrieveRun()
           .mockListMessages("Interesting idea.");
       assertEquals("Interesting idea.", getAiCompletionResponse("what goes up").getLastMessage());
     }
