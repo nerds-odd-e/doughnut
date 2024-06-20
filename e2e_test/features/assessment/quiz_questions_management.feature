@@ -13,9 +13,6 @@ Feature: Quiz Question Management
     When I add the following question for the note "The cow joke":
       | Stem                                 | Choice 0    | Choice 1 | Choice 2 | Correct Choice Index |
       | What do you call a cow with not leg? | Ground beef | Cowboy   | Oxford   | 0                    |
-    And I add the following question for the note "The cow joke":
-      | Stem                                 | Choice 0    | Choice 1 | Choice 2 | Correct Choice Index |
-      | This Test should fail, but it doesnt.| A           | B        | C        | 0                    |
     Then I should see the questions in the question list of the note "The cow joke":
       | Question                             | Correct Choice |
       | What does a cow say?                 | moo            |
