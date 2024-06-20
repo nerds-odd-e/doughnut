@@ -1,6 +1,7 @@
 package com.odde.doughnut.testability;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 
 import com.theokanning.openai.OpenAiResponse;
 import com.theokanning.openai.assistants.message.Message;
@@ -25,7 +26,13 @@ public record OpenAIAssistantRunCompletedMocker(OpenAiApi openAiApi, String thre
   }
 
   public OpenAIAssistantRunCompletedMocker mockRetrieveRun() {
-    Mockito.doReturn(Single.just(run)).when(openAiApi).retrieveRun(any(), any());
+    Mockito.doReturn(Single.just(run)).when(openAiApi).retrieveRun(eq(threadId), any());
     return this;
+  }
+
+  public void mockSubmitOutput() {
+    Mockito.doReturn(Single.just(run))
+        .when(openAiApi)
+        .submitToolOutputs(eq(threadId), any(), any());
   }
 }

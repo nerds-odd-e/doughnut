@@ -1,5 +1,7 @@
 package com.odde.doughnut.services;
 
+import static com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder.askClarificationQuestion;
+import static com.odde.doughnut.services.ai.tools.AiToolFactory.COMPLETE_NOTE_DETAILS;
 import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -56,18 +58,19 @@ class AiAdvisorServiceAutoCompleteTest {
 
     @Test
     void aiUnderstandHowToCompete() {
-      openAIAssistantThreadMocker.mockCreateRunInProcess("my-run-id");
-      openAIAssistantMocker.mockThreadRunRequireActionAndCompletionToolCalled(
-          new NoteDetailsCompletion(" must come down"), "my-run-id");
+      openAIAssistantThreadMocker
+          .mockCreateRunInProcess("my-run-id")
+          .aRunThatRequireAction(
+              new NoteDetailsCompletion(" must come down"), COMPLETE_NOTE_DETAILS)
+          .mockRetrieveRun();
       assertEquals(" must come down", getAiCompletionAndResult("what goes up"));
     }
 
     @Test
     void aiTryToChatWithoutCallingAnyTool() {
-      OpenAIAssistantThreadMocker openAIAssistantThreadMocker1 =
-          openAIAssistantThreadMocker.mockCreateRunInProcess("my-run-id");
-      openAIAssistantThreadMocker1
-          .aRunThatCompleted("my-run-id")
+      openAIAssistantThreadMocker
+          .mockCreateRunInProcess("my-run-id")
+          .aRunThatCompleted()
           .mockRetrieveRun()
           .mockListMessages("Interesting idea.");
       assertEquals("Interesting idea.", getAiCompletionResponse("what goes up").getLastMessage());
@@ -142,10 +145,13 @@ class AiAdvisorServiceAutoCompleteTest {
 
     @Test
     void askCompletionAndUseQuestionResponse() {
-      openAIAssistantMocker.mockSubmitOutputAndRequiredMoreAction(
-          new ClarifyingQuestion(
-              "Are you referring to American football or association football (soccer) ?"),
-          "my-run-id");
+      openAIAssistantMocker
+          .aCreatedRun("any-thread-id", "my-run-id")
+          .aRunThatRequireAction(
+              new ClarifyingQuestion(
+                  "Are you referring to American football or association football (soccer) ?"),
+              askClarificationQuestion)
+          .mockSubmitOutput();
       AiAssistantResponse aiAssistantResponse =
           aiAdvisorService.answerAiCompletionClarifyingQuestion(params);
       assertEquals("mocked-tool-call-id", aiAssistantResponse.getRequiredAction().toolCallId);
@@ -164,8 +170,11 @@ class AiAdvisorServiceAutoCompleteTest {
 
       @Test
       void mustSubmitTheAnswer() {
-        openAIAssistantMocker.mockSubmitOutputAndCompletion(
-            new NoteDetailsCompletion("blue planet"), "my-run-id");
+        Object result = new NoteDetailsCompletion("blue planet");
+        openAIAssistantMocker
+            .aCreatedRun("any-thread-id", "my-run-id")
+            .aRunThatRequireAction(result, COMPLETE_NOTE_DETAILS)
+            .mockSubmitOutput();
         params.setToolCallId("tool-call-id");
         aiAdvisorService.answerAiCompletionClarifyingQuestion(params);
         ArgumentCaptor<SubmitToolOutputsRequest> captor =
@@ -179,9 +188,12 @@ class AiAdvisorServiceAutoCompleteTest {
 
       @Test
       void askCompletionAndUseStopResponseWithQuestionAnswer() {
-        openAIAssistantMocker.mockSubmitOutputAndCompletion(
-            new NoteDetailsCompletion(" is common in China, if you are referring to green tea."),
-            "my-run-id");
+        Object result =
+            new NoteDetailsCompletion(" is common in China, if you are referring to green tea.");
+        openAIAssistantMocker
+            .aCreatedRun("any-thread-id", "my-run-id")
+            .aRunThatRequireAction(result, COMPLETE_NOTE_DETAILS)
+            .mockSubmitOutput();
         AiAssistantResponse aiAssistantResponse =
             aiAdvisorService.answerAiCompletionClarifyingQuestion(params);
         assertEquals(

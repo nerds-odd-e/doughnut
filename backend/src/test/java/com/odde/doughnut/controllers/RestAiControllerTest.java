@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import static com.odde.doughnut.services.ai.tools.AiToolFactory.COMPLETE_NOTE_DETAILS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -99,9 +100,9 @@ class RestAiControllerTest {
         openAIAssistantMocker
             .mockThreadCreation("this-thread")
             .mockCreateMessage()
-            .mockCreateRunInProcess("my-run-id");
-        openAIAssistantMocker.mockThreadRunRequireActionAndCompletionToolCalled(
-            new NoteDetailsCompletion("blue planet"), "my-run-id");
+            .mockCreateRunInProcess("my-run-id")
+            .aRunThatRequireAction(new NoteDetailsCompletion("blue planet"), COMPLETE_NOTE_DETAILS)
+            .mockRetrieveRun();
       }
 
       @Test
@@ -145,8 +146,11 @@ class RestAiControllerTest {
       @BeforeEach
       void setup() {
         params.setThreadId("any-thread-id");
-        openAIAssistantMocker.mockSubmitOutputAndCompletion(
-            new NoteDetailsCompletion("blue planet"), "my-run-id");
+        Object result = new NoteDetailsCompletion("blue planet");
+        openAIAssistantMocker
+            .aCreatedRun("any-thread-id", "my-run-id")
+            .aRunThatRequireAction(result, COMPLETE_NOTE_DETAILS)
+            .mockSubmitOutput();
       }
 
       @Test

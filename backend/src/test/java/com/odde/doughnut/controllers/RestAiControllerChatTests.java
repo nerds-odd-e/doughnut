@@ -46,13 +46,11 @@ public class RestAiControllerChatTests {
         Single.just(makeMe.openAiCompletionResult().choice("I'm ChatGPT").please());
 
     openAIAssistantMocker = new OpenAIAssistantMocker(openAiApi);
-    OpenAIAssistantThreadMocker openAIAssistantThreadMocker =
-        openAIAssistantMocker
-            .mockThreadCreation(null)
-            .mockCreateMessage()
-            .mockCreateRunInProcess("my-run-id");
-    openAIAssistantThreadMocker
-        .aRunThatCompleted("my-run-id")
+    openAIAssistantMocker
+        .mockThreadCreation(null)
+        .mockCreateMessage()
+        .mockCreateRunInProcess("my-run-id")
+        .aRunThatCompleted()
         .mockRetrieveRun()
         .mockListMessages("I'm Chatbot");
   }
