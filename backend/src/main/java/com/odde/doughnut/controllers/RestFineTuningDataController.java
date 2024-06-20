@@ -7,6 +7,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.odde.doughnut.services.FineTuningService;
+import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
 import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.IOException;
@@ -71,10 +72,12 @@ class RestFineTuningDataController {
   @Transactional
   public void uploadAndTriggerFineTuning() throws UnexpectedNoAccessRightException, IOException {
     currentUser.assertAdminAuthorization();
-    aiAdvisorService.uploadAndTriggerFineTuning(
-        fineTuningService.getQuestionGenerationTrainingExamples(), "Question");
-    aiAdvisorService.uploadAndTriggerFineTuning(
-        fineTuningService.getQuestionEvaluationTrainingExamples(), "Evaluation");
+    List<OpenAIChatGPTFineTuningExample> examples1 =
+        fineTuningService.getQuestionGenerationTrainingExamples();
+    aiAdvisorService.getOtherAiServices().uploadAndTriggerFineTuning(examples1, "Question");
+    List<OpenAIChatGPTFineTuningExample> examples =
+        fineTuningService.getQuestionEvaluationTrainingExamples();
+    aiAdvisorService.getOtherAiServices().uploadAndTriggerFineTuning(examples, "Evaluation");
   }
 
   @GetMapping("/all-suggested-questions-for-fine-tuning")

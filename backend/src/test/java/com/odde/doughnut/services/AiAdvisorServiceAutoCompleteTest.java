@@ -125,7 +125,9 @@ class AiAdvisorServiceAutoCompleteTest {
       Note note = makeMe.aNote().inMemoryPlease();
       AiCompletionParams aiCompletionParams = new AiCompletionParams();
       aiCompletionParams.setDetailsToComplete(incompleteContent);
-      return aiAdvisorService.initiateAiCompletion(aiCompletionParams, note, "asst_example_id");
+      return aiAdvisorService
+          .getContentCompletionService()
+          .initiateAThread(note, "asst_example_id", aiCompletionParams.getCompletionPrompt());
     }
   }
 
@@ -153,7 +155,9 @@ class AiAdvisorServiceAutoCompleteTest {
               askClarificationQuestion)
           .mockSubmitOutput();
       AiAssistantResponse aiAssistantResponse =
-          aiAdvisorService.answerAiCompletionClarifyingQuestion(params);
+          aiAdvisorService
+              .getContentCompletionService()
+              .answerAiCompletionClarifyingQuestion(params);
       assertEquals("mocked-tool-call-id", aiAssistantResponse.getRequiredAction().toolCallId);
       assertEquals(
           "Are you referring to American football or association football (soccer) ?",
@@ -176,7 +180,7 @@ class AiAdvisorServiceAutoCompleteTest {
             .aRunThatRequireAction(result, COMPLETE_NOTE_DETAILS)
             .mockSubmitOutput();
         params.setToolCallId("tool-call-id");
-        aiAdvisorService.answerAiCompletionClarifyingQuestion(params);
+        aiAdvisorService.getContentCompletionService().answerAiCompletionClarifyingQuestion(params);
         ArgumentCaptor<SubmitToolOutputsRequest> captor =
             ArgumentCaptor.forClass(SubmitToolOutputsRequest.class);
         verify(openAiApi)
@@ -195,7 +199,9 @@ class AiAdvisorServiceAutoCompleteTest {
             .aRunThatRequireAction(result, COMPLETE_NOTE_DETAILS)
             .mockSubmitOutput();
         AiAssistantResponse aiAssistantResponse =
-            aiAdvisorService.answerAiCompletionClarifyingQuestion(params);
+            aiAdvisorService
+                .getContentCompletionService()
+                .answerAiCompletionClarifyingQuestion(params);
         assertEquals(
             " is common in China, if you are referring to green tea.",
             aiAssistantResponse.getRequiredAction().getContentToAppend());

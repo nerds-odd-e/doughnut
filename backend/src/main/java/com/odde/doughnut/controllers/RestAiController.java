@@ -50,7 +50,9 @@ public class RestAiController {
       @RequestBody AiCompletionParams aiCompletionParams) {
     currentUser.assertLoggedIn();
     String assistantId = getGlobalSettingsService().noteCompletionAssistantId().getValue();
-    return aiAdvisorService.initiateAiCompletion(aiCompletionParams, note, assistantId);
+    return aiAdvisorService
+        .getContentCompletionService()
+        .initiateAThread(note, assistantId, aiCompletionParams.getCompletionPrompt());
   }
 
   @PostMapping("/answer-clarifying-question")
@@ -58,7 +60,9 @@ public class RestAiController {
   public AiAssistantResponse answerCompletionClarifyingQuestion(
       @RequestBody AiCompletionAnswerClarifyingQuestionParams answerClarifyingQuestionParams) {
     currentUser.assertLoggedIn();
-    return aiAdvisorService.answerAiCompletionClarifyingQuestion(answerClarifyingQuestionParams);
+    return aiAdvisorService
+        .getContentCompletionService()
+        .answerAiCompletionClarifyingQuestion(answerClarifyingQuestionParams);
   }
 
   @PostMapping("/chat/{note}")
@@ -70,7 +74,11 @@ public class RestAiController {
     currentUser.assertReadAuthorization(note);
     String userMessage = request.getUserMessage();
     String assistantId = getGlobalSettingsService().chatAssistantId().getValue();
-    String assistantMessage = this.aiAdvisorService.chatWithAi(note, userMessage, assistantId);
+    String assistantMessage =
+        this.aiAdvisorService
+            .getChatService()
+            .initiateAThread(note, assistantId, userMessage)
+            .getLastMessage();
     return new ChatResponse(assistantMessage);
   }
 
@@ -78,12 +86,12 @@ public class RestAiController {
   @Transactional
   public AiGeneratedImage generateImage(@RequestBody String prompt) {
     currentUser.assertLoggedIn();
-    return new AiGeneratedImage(aiAdvisorService.getImage(prompt));
+    return new AiGeneratedImage(aiAdvisorService.getOtherAiServices().getTimage(prompt));
   }
 
   @GetMapping("/available-gpt-models")
   public List<String> getAvailableGptModels() {
-    return aiAdvisorService.getAvailableGptModels();
+    return aiAdvisorService.getOtherAiServices().getAvailableGptModels();
   }
 
   @PostMapping("/recreate-all-assistants")
@@ -94,12 +102,17 @@ public class RestAiController {
     GlobalSettingsService globalSettingsService = getGlobalSettingsService();
     Map<String, String> result = new HashMap<>();
     String modelName = globalSettingsService.globalSettingOthers().getValue();
-    String completionAssistant = aiAdvisorService.createCompletionAssistant(modelName);
+    String completionAssistant =
+        aiAdvisorService
+            .getContentCompletionService()
+            .createAssistant(modelName, "Note details completion")
+            .getId();
     result.put("note details completion", completionAssistant);
     globalSettingsService
         .noteCompletionAssistantId()
         .setKeyValue(currentUTCTimestamp, completionAssistant);
-    String chatAssistant = aiAdvisorService.createChatAssistant(modelName);
+    String chatAssistant =
+        aiAdvisorService.getChatService().createAssistant(modelName, "Chat assistant").getId();
     result.put("chat", chatAssistant);
     globalSettingsService.chatAssistantId().setKeyValue(currentUTCTimestamp, chatAssistant);
     return result;

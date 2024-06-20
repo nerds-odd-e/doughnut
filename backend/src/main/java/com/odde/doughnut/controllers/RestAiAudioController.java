@@ -30,7 +30,9 @@ class RestAiAudioController {
   public SrtDto convertNoteAudioToSRT(
       @PathVariable(name = "note") @Schema(type = "integer") Note note) throws IOException {
     Audio audio = note.getNoteAccessory().getAudioAttachment();
-    return aiAdvisorService.getTranscription(audio.getName(), audio.getBlob().getData());
+    return aiAdvisorService
+        .getOtherAiServices()
+        .getTranscription(audio.getName(), audio.getBlob().getData());
   }
 
   @PostMapping(
@@ -39,6 +41,7 @@ class RestAiAudioController {
   @Transactional
   public SrtDto convertSrt(@Valid @ModelAttribute AudioUploadDTO audioFile) throws IOException {
     String filename = audioFile.getUploadAudioFile().getOriginalFilename();
-    return aiAdvisorService.getTranscription(filename, audioFile.getUploadAudioFile().getBytes());
+    byte[] bytes = audioFile.getUploadAudioFile().getBytes();
+    return aiAdvisorService.getOtherAiServices().getTranscription(filename, bytes);
   }
 }

@@ -35,7 +35,7 @@ class AiAdvisorServiceTest {
       image.setB64Json("https://image.com");
       result.setData(List.of(image));
       Mockito.when(openAiApi.createImage(Mockito.any())).thenReturn(Single.just(result));
-      assertEquals("https://image.com", aiAdvisorService.getImage("prompt"));
+      assertEquals("https://image.com", aiAdvisorService.getOtherAiServices().getTimage("prompt"));
     }
   }
 }

@@ -53,7 +53,10 @@ class AiAdvisorServiceTriggerFineTuningTest {
       var result =
           assertThrows(
               OpenAIServiceErrorException.class,
-              () -> aiAdvisorService.uploadAndTriggerFineTuning(makeExamples(0), "test"));
+              () -> {
+                List<OpenAIChatGPTFineTuningExample> examples = makeExamples(0);
+                aiAdvisorService.getOtherAiServices().uploadAndTriggerFineTuning(examples, "test");
+              });
       assertEquals(result.getMessage(), "Positive feedback cannot be less than 10.");
     }
 
@@ -64,7 +67,10 @@ class AiAdvisorServiceTriggerFineTuningTest {
       var result =
           assertThrows(
               OpenAIServiceErrorException.class,
-              () -> aiAdvisorService.uploadAndTriggerFineTuning(makeExamples(10), "test"));
+              () -> {
+                List<OpenAIChatGPTFineTuningExample> examples = makeExamples(10);
+                aiAdvisorService.getOtherAiServices().uploadAndTriggerFineTuning(examples, "test");
+              });
       assertEquals(result.getMessage(), "Upload failed.");
     }
 
@@ -90,7 +96,8 @@ class AiAdvisorServiceTriggerFineTuningTest {
 
       @Test
       void shouldPassPositiveExamplesForQuestionGeneration() throws IOException {
-        aiAdvisorService.uploadAndTriggerFineTuning(makeExamples(10), "test");
+        List<OpenAIChatGPTFineTuningExample> examples = makeExamples(10);
+        aiAdvisorService.getOtherAiServices().uploadAndTriggerFineTuning(examples, "test");
         List<String> lines = fileContents.get(0).lines().toList();
         assertThat(lines, hasSize(10));
         assertThat(lines.get(0), containsString("{\"messages\":["));
