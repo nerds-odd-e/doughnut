@@ -1,6 +1,7 @@
 import ServiceMocker from "../../support/ServiceMocker"
 import testability from "../testability"
 import createOpenAiChatCompletionMock from "./createOpenAiChatCompletionMock"
+import openAiAssistantThreadMocker from "./openAiAssistantThreadMocker"
 
 const openAiService = () => {
   const serviceMocker = new ServiceMocker("openAi", 5001)
@@ -77,25 +78,11 @@ const openAiService = () => {
       )
     },
 
-    async stubCreateThreadRunAndSubmitOutput(threadId: string) {
+    async stubCreateThread(threadId: string) {
       await serviceMocker.stubPoster(`/threads`, {
         id: threadId,
       })
-      // for creating a message
-      await serviceMocker.stubPoster(`/threads/${threadId}/messages`, {
-        id: "msg-abc123",
-      })
-      await serviceMocker.stubPoster(`/threads/${threadId}/runs`, {
-        id: "run-abc123",
-        status: "queued",
-      })
-      return await serviceMocker.stubPoster(
-        `/threads/${threadId}/runs/run-abc123/submit_tool_outputs`,
-        {
-          id: "run-abc123",
-          status: "queued",
-        },
-      )
+      return await openAiAssistantThreadMocker(serviceMocker, threadId).stubCreateMessageAndCreateRunAndSubmit()
     },
     thread(threadId: string) {
       return {
@@ -210,3 +197,4 @@ const openAiService = () => {
 }
 
 export default openAiService
+
