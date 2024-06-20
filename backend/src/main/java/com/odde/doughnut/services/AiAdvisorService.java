@@ -10,11 +10,8 @@ import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.client.OpenAiApi;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
+import org.jetbrains.annotations.NotNull;
 
 public class AiAdvisorService {
 
@@ -25,7 +22,7 @@ public class AiAdvisorService {
   }
 
   public String getImage(String prompt) {
-    return openAiApiHandler.getOpenAiImage(prompt);
+    return getOtherAiServices().getTimage(prompt);
   }
 
   public AiAssistantResponse initiateAiCompletion(
@@ -45,40 +42,20 @@ public class AiAdvisorService {
   }
 
   public List<String> getAvailableGptModels() {
-    List<String> modelVersionOptions = new ArrayList<>();
+    return getOtherAiServices().getAvailableGptModels();
+  }
 
-    openAiApiHandler
-        .getModels()
-        .forEach(
-            (e) -> {
-              if (e.id.startsWith("ft:") || e.id.startsWith("gpt")) {
-                modelVersionOptions.add(e.id);
-              }
-            });
-
-    return modelVersionOptions;
+  private @NotNull OtherAiServices getOtherAiServices() {
+    return new OtherAiServices(openAiApiHandler);
   }
 
   public String uploadAndTriggerFineTuning(
       List<OpenAIChatGPTFineTuningExample> examples, String question) throws IOException {
-    String fileId = openAiApiHandler.uploadFineTuningExamples(examples, question);
-    return openAiApiHandler.triggerFineTuning(fileId).getFineTunedModel();
+    return getOtherAiServices().uploadAndTriggerFineTuning(examples, question);
   }
 
   public SrtDto getTranscription(String filename, byte[] bytes) throws IOException {
-    RequestBody requestFile = RequestBody.create(bytes, MediaType.parse("multipart/form-data"));
-
-    MultipartBody.Part body = MultipartBody.Part.createFormData("file", filename, requestFile);
-
-    MultipartBody.Builder builder =
-        new MultipartBody.Builder()
-            .setType(MultipartBody.FORM)
-            .addPart(body)
-            .addFormDataPart("model", "whisper-1")
-            .addFormDataPart("response_format", "srt");
-
-    RequestBody requestBody = builder.build();
-    return openAiApiHandler.getTranscription(requestBody);
+    return getOtherAiServices().getTranscription(filename, bytes);
   }
 
   public String createCompletionAssistant(String modelName) {
