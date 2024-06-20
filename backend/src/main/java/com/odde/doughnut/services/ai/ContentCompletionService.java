@@ -13,7 +13,7 @@ import com.theokanning.openai.assistants.run.Run;
 import com.theokanning.openai.assistants.run.ToolCall;
 import com.theokanning.openai.assistants.thread.Thread;
 import com.theokanning.openai.assistants.thread.ThreadRequest;
-import java.util.stream.Stream;
+import java.util.List;
 
 public record ContentCompletionService(OpenAiApiHandler openAiApiHandler) {
   public AiAssistantResponse initiateAThread(Note note, String assistantId, String prompt) {
@@ -83,8 +83,8 @@ public record ContentCompletionService(OpenAiApiHandler openAiApiHandler) {
     return completionResponse;
   }
 
-  public static Stream<AiTool> getTools() {
-    return Stream.of(
+  public static List<AiTool> getTools() {
+    return List.of(
         AiTool.build(
             COMPLETE_NOTE_DETAILS,
             "Text completion for the details of the note of focus",
@@ -103,5 +103,9 @@ public record ContentCompletionService(OpenAiApiHandler openAiApiHandler) {
               result.setClarifyingQuestion(clarifyingQuestion);
               return result;
             }));
+  }
+
+  public static List<AiTool> getChatTools() {
+    return List.of();
   }
 }

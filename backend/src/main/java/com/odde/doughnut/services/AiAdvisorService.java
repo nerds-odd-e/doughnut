@@ -12,7 +12,6 @@ import com.theokanning.openai.client.OpenAiApi;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -91,27 +90,24 @@ public class AiAdvisorService {
   }
 
   public String createChatAssistant(String modelName) {
-    Assistant chatAssistant = createAssistant(modelName, "Chat assistant", ChatService.getTools());
+    Assistant chatAssistant =
+        createAssistant(modelName, "Chat assistant", ContentCompletionService.getChatTools());
     return chatAssistant.getId();
   }
 
   private Assistant createAssistant(
-      String modelName, String noteDetailsCompletion, Stream<AiTool> tools) {
+      String modelName, String noteDetailsCompletion, List<AiTool> tools) {
     AssistantRequest assistantRequest =
         AssistantRequest.builder()
             .model(modelName)
             .name(noteDetailsCompletion)
             .instructions(OpenAIChatRequestBuilder.systemInstruction)
-            .tools(tools.map(AiTool::getTool).toList())
+            .tools(tools.stream().map(AiTool::getTool).toList())
             .build();
     return openAiApiHandler.createAssistant(assistantRequest);
   }
 
   private ContentCompletionService getContentCompletionService() {
     return new ContentCompletionService(openAiApiHandler);
-  }
-
-  private ChatService getChatService() {
-    return new ChatService(openAiApiHandler);
   }
 }
