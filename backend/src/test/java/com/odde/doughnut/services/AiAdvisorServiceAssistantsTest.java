@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
 
-class AiAdvisorServiceCompletionAssistantTest {
+class AiAdvisorServiceAssistantsTest {
 
   private AiAdvisorService aiAdvisorService;
   @Mock private OpenAiApi openAiApi;
@@ -30,14 +30,14 @@ class AiAdvisorServiceCompletionAssistantTest {
   }
 
   @Nested
-  class CreateNoteCompletionAssistant {
+  class CreateAssistants {
     AssistantRequest assistantRequest;
 
     @BeforeEach
     void captureTheRequest() {
       when(openAiApi.createAssistant(ArgumentMatchers.any()))
           .thenReturn(Single.just(new Assistant()));
-      aiAdvisorService.createNoteAssistant("gpt");
+      aiAdvisorService.createCompletionAssistant("gpt4o");
       ArgumentCaptor<AssistantRequest> captor = ArgumentCaptor.forClass(AssistantRequest.class);
       verify(openAiApi).createAssistant(captor.capture());
       assistantRequest = captor.getValue();

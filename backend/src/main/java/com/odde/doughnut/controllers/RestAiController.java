@@ -12,6 +12,7 @@ import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import java.sql.Timestamp;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -90,8 +91,18 @@ public class RestAiController {
   public Map<String, String> recreateAllAssistants() throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    return aiAdvisorService.createAllDefaultAssistants(
-        currentUTCTimestamp, getGlobalSettingsService());
+    GlobalSettingsService globalSettingsService = getGlobalSettingsService();
+    Map<String, String> result = new HashMap<>();
+    String modelName = globalSettingsService.globalSettingOthers().getValue();
+    String completionAssistant = aiAdvisorService.createCompletionAssistant(modelName);
+    result.put("note details completion", completionAssistant);
+    globalSettingsService
+        .noteCompletionAssistantId()
+        .setKeyValue(currentUTCTimestamp, completionAssistant);
+    String chatAssistant = aiAdvisorService.createChatAssistant(modelName);
+    result.put("chat", chatAssistant);
+    globalSettingsService.chatAssistantId().setKeyValue(currentUTCTimestamp, chatAssistant);
+    return result;
   }
 
   private GlobalSettingsService getGlobalSettingsService() {

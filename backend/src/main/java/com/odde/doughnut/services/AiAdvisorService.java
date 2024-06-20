@@ -10,11 +10,9 @@ import com.theokanning.openai.assistants.assistant.Assistant;
 import com.theokanning.openai.assistants.assistant.AssistantRequest;
 import com.theokanning.openai.client.OpenAiApi;
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Stream;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -86,42 +84,25 @@ public class AiAdvisorService {
     return openAiApiHandler.getTranscription(requestBody);
   }
 
-  public Map<String, String> createAllDefaultAssistants(
-      Timestamp currentUTCTimestamp, GlobalSettingsService globalSettingsService) {
-    Map<String, String> result = new HashMap<>();
-    result.put(
-        "note details completion",
-        createCompletionAssistant(currentUTCTimestamp, globalSettingsService));
-    result.put("chat", createChatAssistant(currentUTCTimestamp, globalSettingsService));
-
-    return result;
+  public String createCompletionAssistant(String modelName) {
+    Assistant noteCompletionAssistant =
+        createAssistant(modelName, "Note details completion", ContentCompletionService.getTools());
+    return noteCompletionAssistant.getId();
   }
 
-  private String createCompletionAssistant(
-      Timestamp currentUTCTimestamp, GlobalSettingsService globalSettingsService) {
-    String modelName = globalSettingsService.globalSettingOthers().getValue();
-    Assistant noteCompletionAssistant = createNoteAssistant(modelName);
-    String id = noteCompletionAssistant.getId();
-    globalSettingsService.noteCompletionAssistantId().setKeyValue(currentUTCTimestamp, id);
-    return id;
+  public String createChatAssistant(String modelName) {
+    Assistant chatAssistant = createAssistant(modelName, "Chat assistant", ChatService.getTools());
+    return chatAssistant.getId();
   }
 
-  private String createChatAssistant(
-      Timestamp currentUTCTimestamp, GlobalSettingsService globalSettingsService) {
-    String modelName = globalSettingsService.globalSettingOthers().getValue();
-    Assistant chatAssistant = createNoteAssistant(modelName);
-    String id = chatAssistant.getId();
-    globalSettingsService.chatAssistantId().setKeyValue(currentUTCTimestamp, id);
-    return id;
-  }
-
-  public Assistant createNoteAssistant(String modelName) {
+  private Assistant createAssistant(
+      String modelName, String noteDetailsCompletion, Stream<AiTool> tools) {
     AssistantRequest assistantRequest =
         AssistantRequest.builder()
             .model(modelName)
-            .name("Note details completion")
+            .name(noteDetailsCompletion)
             .instructions(OpenAIChatRequestBuilder.systemInstruction)
-            .tools(ContentCompletionService.getTools().map(AiTool::getTool).toList())
+            .tools(tools.map(AiTool::getTool).toList())
             .build();
     return openAiApiHandler.createAssistant(assistantRequest);
   }
