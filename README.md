@@ -209,13 +209,24 @@ directory:
 1 directory, 6 files
 ```
 
-### 7. [Style Guide & Code linting/formating](./docs/linting_formating.md)
+### 7. [Manual testing locally](./docs/manual_testing_locally.md)
 
-### 8. [Production environment](./docs/prod_env.md)
+When you have the backend and frontend running, you can manually test the application.
 
-### 9. [Doughnut source code secrets management](./docs/secrets_management.md)
+Visit http://localhost:5173/ to see the frontend web-app. The backend API is available at http://localhost:9081, and you will see the built frontend web-app there as well, but it wil not auto-reload on changes. So stay with the 5173 port.
 
-### 10. Architecture and Design documentation
+Local test accounts:
+* User: 'old_learner', Password: 'password'
+* User: 'another_old_learner', Password: 'password'
+* User: 'admin', Password: 'password'
+
+### 8. [Style Guide & Code linting/formating](./docs/linting_formating.md)
+
+### 9. [Production environment](./docs/prod_env.md)
+
+### 10. [Doughnut source code secrets management](./docs/secrets_management.md)
+
+### 11. Architecture and Design documentation
 
 [Miro board](https://miro.com/app/board/uXjVNNaWVeA=/?share_link_id=753160038592)
 
