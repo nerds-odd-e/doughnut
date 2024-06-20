@@ -113,7 +113,7 @@ public class RestAiController {
         .setKeyValue(currentUTCTimestamp, completionAssistant);
     String chatAssistant =
         aiAdvisorService.getChatService().createAssistant(modelName, "Chat assistant").getId();
-    result.put("chat", chatAssistant);
+    result.put("chat assistant", chatAssistant);
     globalSettingsService.chatAssistantId().setKeyValue(currentUTCTimestamp, chatAssistant);
     return result;
   }

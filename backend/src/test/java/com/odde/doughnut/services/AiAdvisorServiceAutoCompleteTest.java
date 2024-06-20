@@ -15,6 +15,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.exceptions.OpenAITimeoutException;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
+import com.odde.doughnut.services.ai.AssistantService;
 import com.odde.doughnut.services.ai.ClarifyingQuestion;
 import com.odde.doughnut.services.ai.NoteDetailsCompletion;
 import com.odde.doughnut.testability.MakeMe;
@@ -38,7 +39,7 @@ import retrofit2.Response;
 
 class AiAdvisorServiceAutoCompleteTest {
 
-  private AiAdvisorService aiAdvisorService;
+  private AssistantService completionService;
   @Mock private OpenAiApi openAiApi;
   MakeMe makeMe = MakeMe.makeMeWithoutFactoryService();
   OpenAIAssistantMocker openAIAssistantMocker;
@@ -47,7 +48,7 @@ class AiAdvisorServiceAutoCompleteTest {
   @BeforeEach
   void Setup() {
     MockitoAnnotations.openMocks(this);
-    aiAdvisorService = new AiAdvisorService(openAiApi);
+    completionService = new AiAdvisorService(openAiApi).getContentCompletionService();
     openAIAssistantMocker = new OpenAIAssistantMocker(openAiApi);
     openAIAssistantThreadMocker =
         openAIAssistantMocker.mockThreadCreation(null).mockCreateMessage();
@@ -125,9 +126,8 @@ class AiAdvisorServiceAutoCompleteTest {
       Note note = makeMe.aNote().inMemoryPlease();
       AiCompletionParams aiCompletionParams = new AiCompletionParams();
       aiCompletionParams.setDetailsToComplete(incompleteContent);
-      return aiAdvisorService
-          .getContentCompletionService()
-          .initiateAThread(note, "asst_example_id", aiCompletionParams.getCompletionPrompt());
+      return completionService.initiateAThread(
+          note, "asst_example_id", aiCompletionParams.getCompletionPrompt());
     }
   }
 
@@ -155,9 +155,7 @@ class AiAdvisorServiceAutoCompleteTest {
               askClarificationQuestion)
           .mockSubmitOutput();
       AiAssistantResponse aiAssistantResponse =
-          aiAdvisorService
-              .getContentCompletionService()
-              .answerAiCompletionClarifyingQuestion(params);
+          completionService.answerAiCompletionClarifyingQuestion(params);
       assertEquals("mocked-tool-call-id", aiAssistantResponse.getRequiredAction().toolCallId);
       assertEquals(
           "Are you referring to American football or association football (soccer) ?",
@@ -180,7 +178,7 @@ class AiAdvisorServiceAutoCompleteTest {
             .aRunThatRequireAction(result, COMPLETE_NOTE_DETAILS)
             .mockSubmitOutput();
         params.setToolCallId("tool-call-id");
-        aiAdvisorService.getContentCompletionService().answerAiCompletionClarifyingQuestion(params);
+        completionService.answerAiCompletionClarifyingQuestion(params);
         ArgumentCaptor<SubmitToolOutputsRequest> captor =
             ArgumentCaptor.forClass(SubmitToolOutputsRequest.class);
         verify(openAiApi)
@@ -199,9 +197,7 @@ class AiAdvisorServiceAutoCompleteTest {
             .aRunThatRequireAction(result, COMPLETE_NOTE_DETAILS)
             .mockSubmitOutput();
         AiAssistantResponse aiAssistantResponse =
-            aiAdvisorService
-                .getContentCompletionService()
-                .answerAiCompletionClarifyingQuestion(params);
+            completionService.answerAiCompletionClarifyingQuestion(params);
         assertEquals(
             " is common in China, if you are referring to green tea.",
             aiAssistantResponse.getRequiredAction().getContentToAppend());

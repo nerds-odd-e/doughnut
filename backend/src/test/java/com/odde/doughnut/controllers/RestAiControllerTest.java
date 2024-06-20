@@ -266,7 +266,7 @@ class RestAiControllerTest {
       @Test
       void createChatAssistant() throws UnexpectedNoAccessRightException {
         Map<String, String> result = controller.recreateAllAssistants();
-        assertThat(result.get("chat")).isEqualTo("1234");
+        assertThat(result.get("chat assistant")).isEqualTo("1234");
         GlobalSettingsService globalSettingsService =
             new GlobalSettingsService(makeMe.modelFactoryService);
         assertThat(globalSettingsService.chatAssistantId().getValue()).isEqualTo("1234");
