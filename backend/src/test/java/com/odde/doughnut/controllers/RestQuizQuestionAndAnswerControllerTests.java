@@ -294,7 +294,7 @@ class RestQuizQuestionAndAnswerControllerTests {
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(jsonQuestion, "");
       GlobalSettingsService globalSettingsService = new GlobalSettingsService(modelFactoryService);
       globalSettingsService
-          .getGlobalSettingQuestionGeneration()
+          .globalSettingQuestionGeneration()
           .setKeyValue(makeMe.aTimestamp().please(), "gpt-new");
       controller.generateQuestion(note);
       ArgumentCaptor<ChatCompletionRequest> captor =
@@ -414,7 +414,7 @@ class RestQuizQuestionAndAnswerControllerTests {
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(questionEvaluation, "");
       GlobalSettingsService globalSettingsService = new GlobalSettingsService(modelFactoryService);
       globalSettingsService
-          .getGlobalSettingEvaluation()
+          .globalSettingEvaluation()
           .setKeyValue(makeMe.aTimestamp().please(), "gpt-new");
       controller.contest(quizQuestion.getQuizQuestion());
       ArgumentCaptor<ChatCompletionRequest> argumentCaptor =

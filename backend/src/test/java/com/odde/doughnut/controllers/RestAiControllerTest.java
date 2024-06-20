@@ -108,7 +108,7 @@ class RestAiControllerTest {
       @Test
       void useTheCorrectAssistant() {
         new GlobalSettingsService(makeMe.modelFactoryService)
-            .getNoteCompletionAssistantId()
+            .noteCompletionAssistantId()
             .setKeyValue(makeMe.aTimestamp().please(), "my-assistant-id");
         controller.getCompletion(note, params);
         ArgumentCaptor<RunCreateRequest> runRequest =
@@ -265,8 +265,7 @@ class RestAiControllerTest {
         controller.recreateAllAssistants();
         GlobalSettingsService globalSettingsService =
             new GlobalSettingsService(makeMe.modelFactoryService);
-        assertThat(globalSettingsService.getNoteCompletionAssistantId().getValue())
-            .isEqualTo("1234");
+        assertThat(globalSettingsService.noteCompletionAssistantId().getValue()).isEqualTo("1234");
       }
     }
   }

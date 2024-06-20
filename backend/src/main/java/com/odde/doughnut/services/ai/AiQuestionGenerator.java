@@ -18,12 +18,12 @@ public record AiQuestionGenerator(
   }
 
   public MCQWithAnswer getAiGeneratedQuestion(Note note) {
-    return forNote(note, globalSettingsService.getGlobalSettingQuestionGeneration().getValue())
+    return forNote(note, globalSettingsService.globalSettingQuestionGeneration().getValue())
         .getAiGeneratedQuestion();
   }
 
   public MCQWithAnswer getAiGeneratedRefineQuestion(Note note, MCQWithAnswer mcqWithAnswer) {
-    return forNote(note, globalSettingsService.getGlobalSettingQuestionGeneration().getValue())
+    return forNote(note, globalSettingsService.globalSettingQuestionGeneration().getValue())
         .refineQuestion(mcqWithAnswer)
         .orElse(null);
   }
@@ -32,7 +32,7 @@ public record AiQuestionGenerator(
       QuizQuestionAndAnswer quizQuestionAndAnswer) {
     return forNote(
             quizQuestionAndAnswer.getNote(),
-            globalSettingsService.getGlobalSettingEvaluation().getValue())
+            globalSettingsService.globalSettingEvaluation().getValue())
         .evaluateQuestion(quizQuestionAndAnswer.getMcqWithAnswer())
         .map(e -> e.getQuizQuestionContestResult(quizQuestionAndAnswer.getCorrectAnswerIndex()))
         .orElse(null);

@@ -56,13 +56,13 @@ class RestGlobalSettingsControllerTest {
     @Test
     void ShouldUseDbSettingsIfExists() {
       globalSettingsService
-          .getGlobalSettingEvaluation()
+          .globalSettingEvaluation()
           .setKeyValue(currentTime, "any-evaluation-model-version");
       globalSettingsService
-          .getGlobalSettingQuestionGeneration()
+          .globalSettingQuestionGeneration()
           .setKeyValue(currentTime, "any-question-generation-model-version");
       globalSettingsService
-          .getGlobalSettingOthers()
+          .globalSettingOthers()
           .setKeyValue(currentTime, "any-other-model-version");
       GlobalAiModelSettings currentModelVersions = controller.getCurrentModelVersions();
       assertEquals(
@@ -91,7 +91,7 @@ class RestGlobalSettingsControllerTest {
     void setValues() throws UnexpectedNoAccessRightException {
       controller.setCurrentModelVersions(settings);
       GlobalSettingsService.GlobalSettingsKeyValue globalSettingQuestionQuestion =
-          globalSettingsService.getGlobalSettingQuestionGeneration();
+          globalSettingsService.globalSettingQuestionGeneration();
       assertEquals("gpt-3.5", globalSettingQuestionQuestion.getValue());
       assertEquals(currentTime, globalSettingQuestionQuestion.getCreatedAt());
     }

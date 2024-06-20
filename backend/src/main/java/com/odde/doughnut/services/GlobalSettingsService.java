@@ -14,22 +14,27 @@ public class GlobalSettingsService {
     this.modelFactoryService = modelFactoryService;
   }
 
-  public GlobalSettingsKeyValue getGlobalSettingQuestionGeneration() {
+  public GlobalSettingsKeyValue globalSettingQuestionGeneration() {
     return new GlobalSettingsKeyValue(
         "question_generation_model", DEFAULT_CHAT_MODEL, modelFactoryService);
   }
 
-  public GlobalSettingsKeyValue getGlobalSettingEvaluation() {
+  public GlobalSettingsKeyValue globalSettingEvaluation() {
     return new GlobalSettingsKeyValue("evaluation_model", DEFAULT_CHAT_MODEL, modelFactoryService);
   }
 
-  public GlobalSettingsKeyValue getGlobalSettingOthers() {
+  public GlobalSettingsKeyValue globalSettingOthers() {
     return new GlobalSettingsKeyValue("others_model", DEFAULT_CHAT_MODEL, modelFactoryService);
   }
 
-  public GlobalSettingsKeyValue getNoteCompletionAssistantId() {
+  public GlobalSettingsKeyValue noteCompletionAssistantId() {
     return new GlobalSettingsKeyValue(
         "note_completion_assistant", "asst_37nHzDavC0gLbxydvprHwoca", modelFactoryService);
+  }
+
+  public GlobalSettingsKeyValue chatAssistantId() {
+    return new GlobalSettingsKeyValue(
+        "chat_assistant", "asst_37nHzDavC0gLbxydvprHwoca", modelFactoryService);
   }
 
   public record GlobalSettingsKeyValue(
@@ -64,17 +69,17 @@ public class GlobalSettingsService {
 
   public GlobalAiModelSettings getCurrentModelVersions() {
     return new GlobalAiModelSettings(
-        getGlobalSettingQuestionGeneration().getValue(),
-        getGlobalSettingEvaluation().getValue(),
-        getGlobalSettingOthers().getValue());
+        globalSettingQuestionGeneration().getValue(),
+        globalSettingEvaluation().getValue(),
+        globalSettingOthers().getValue());
   }
 
   public GlobalAiModelSettings setCurrentModelVersions(
       GlobalAiModelSettings models, Timestamp currentUTCTimestamp) {
-    getGlobalSettingQuestionGeneration()
+    globalSettingQuestionGeneration()
         .setKeyValue(currentUTCTimestamp, models.getQuestionGenerationModel());
-    getGlobalSettingEvaluation().setKeyValue(currentUTCTimestamp, models.getEvaluationModel());
-    getGlobalSettingOthers().setKeyValue(currentUTCTimestamp, models.getOthersModel());
+    globalSettingEvaluation().setKeyValue(currentUTCTimestamp, models.getEvaluationModel());
+    globalSettingOthers().setKeyValue(currentUTCTimestamp, models.getOthersModel());
     return models;
   }
 }

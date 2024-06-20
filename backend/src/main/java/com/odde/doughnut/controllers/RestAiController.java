@@ -49,7 +49,8 @@ public class RestAiController {
       @PathVariable(name = "note") @Schema(type = "integer") Note note,
       @RequestBody AiCompletionParams aiCompletionParams) {
     currentUser.assertLoggedIn();
-    return aiAdvisorService.initiateAiCompletion(aiCompletionParams, note, getAssistantId());
+    String assistantId = getGlobalSettingsService().noteCompletionAssistantId().getValue();
+    return aiAdvisorService.initiateAiCompletion(aiCompletionParams, note, assistantId);
   }
 
   @PostMapping("/answer-clarifying-question")
@@ -68,7 +69,8 @@ public class RestAiController {
       throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(note);
     String userMessage = request.getUserMessage();
-    String assistantMessage = this.aiAdvisorService.chatWithAi(note, userMessage, getAssistantId());
+    String assistantId = getGlobalSettingsService().chatAssistantId().getValue();
+    String assistantMessage = this.aiAdvisorService.chatWithAi(note, userMessage, assistantId);
     return new ChatResponse(assistantMessage);
   }
 
@@ -93,7 +95,7 @@ public class RestAiController {
         aiAdvisorService.createNoteAssistant(getDefaultOpenAiChatModel());
     String id = noteCompletionAssistant.getId();
     getGlobalSettingsService()
-        .getNoteCompletionAssistantId()
+        .noteCompletionAssistantId()
         .setKeyValue(testabilitySettings.getCurrentUTCTimestamp(), id);
 
     result.put("note details completion", id);
@@ -101,11 +103,7 @@ public class RestAiController {
   }
 
   private String getDefaultOpenAiChatModel() {
-    return getGlobalSettingsService().getGlobalSettingOthers().getValue();
-  }
-
-  private String getAssistantId() {
-    return getGlobalSettingsService().getNoteCompletionAssistantId().getValue();
+    return getGlobalSettingsService().globalSettingOthers().getValue();
   }
 
   private GlobalSettingsService getGlobalSettingsService() {
