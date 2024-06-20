@@ -14,7 +14,11 @@ export const questionListPage = () => {
       })
     },
     deleteQuestion(question: string) {
+      cy.contains('tr', question).within(() => {
+      cy.get('input[type="checkbox"]').click();
+        });
 
+      cy.get('a[title="Delete"]').click();
     }
   }
 }
