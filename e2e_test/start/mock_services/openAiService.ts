@@ -82,7 +82,7 @@ const openAiService = () => {
       await serviceMocker.stubPoster(`/threads`, {
         id: threadId,
       })
-      return await openAiAssistantThreadMocker(serviceMocker, threadId).stubCreateMessageAndCreateRunAndSubmit()
+      return openAiAssistantThreadMocker(serviceMocker, threadId)
     },
     thread(threadId: string) {
       return {
@@ -197,4 +197,3 @@ const openAiService = () => {
 }
 
 export default openAiService
-

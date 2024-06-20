@@ -1,4 +1,5 @@
 import ServiceMocker from "../../support/ServiceMocker"
+import openAiAssistantCreatedRunMocker from "./openAiAssistantCreatedRunMocker"
 
 const openAiAssistantThreadMocker = (serviceMocker: ServiceMocker, threadId: string) => {
   return {
@@ -11,13 +12,7 @@ const openAiAssistantThreadMocker = (serviceMocker: ServiceMocker, threadId: str
         id: "run-abc123",
         status: "queued",
       })
-      return await serviceMocker.stubPoster(
-        `/threads/${threadId}/runs/run-abc123/submit_tool_outputs`,
-        {
-          id: "run-abc123",
-          status: "queued",
-        },
-      )
+      return openAiAssistantCreatedRunMocker(serviceMocker, threadId, "run-abc123")
     },
   }
 }

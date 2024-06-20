@@ -42,7 +42,10 @@ Given(
       } as MessageToMatch
     })
     const threadId = "thread-abc123"
-    mock_services.openAi().stubCreateThread(threadId)
+    mock_services
+      .openAi()
+      .stubCreateThread(threadId)
+      .then((thread) => thread.stubCreateMessageAndCreateRunAndSubmit())
     mock_services.openAi().thread(threadId).stubRetrieveRunsThatReplyWithMessage(returnMessage)
   },
 )
@@ -85,7 +88,12 @@ Given(
   "the OpenAI assistant will create a thread and request for the following actions:",
   (data: DataTable) => {
     const threadId = "thread-abc123"
-    mock_services.openAi().stubCreateThread(threadId)
+    mock_services
+      .openAi()
+      .stubCreateThread(threadId)
+      .then((thread) =>
+        thread.stubCreateMessageAndCreateRunAndSubmit().then((run) => run.stubSubmitToolOutputs()),
+      )
     mock_services.openAi().thread(threadId).stubRetrieveRunsThatRequireAction(data.hashes())
   },
 )
