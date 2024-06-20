@@ -45,7 +45,7 @@ Given(
     mock_services
       .openAi()
       .stubCreateThread(threadId)
-      .then((thread) => thread.stubCreateMessageAndCreateRunAndSubmit())
+      .then((thread) => thread.stubCreateMessageAndCreateRun())
     mock_services.openAi().thread(threadId).stubRetrieveRunsThatReplyWithMessage(returnMessage)
   },
 )
@@ -92,8 +92,13 @@ Given(
       .openAi()
       .stubCreateThread(threadId)
       .then((thread) =>
-        thread.stubCreateMessageAndCreateRunAndSubmit().then((run) => run.stubSubmitToolOutputs()),
+        thread
+          .stubCreateMessageAndCreateRun()
+          .then((run) =>
+            run
+              .stubRetrieveRunsThatRequireAction(data.hashes())
+              .then((run) => run.stubSubmitToolOutputs()),
+          ),
       )
-    mock_services.openAi().thread(threadId).stubRetrieveRunsThatRequireAction(data.hashes())
   },
 )

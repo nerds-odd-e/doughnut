@@ -7,13 +7,12 @@ const openAiAssistantCreatedRunMocker = (
 ) => {
   return {
     async stubSubmitToolOutputs() {
-      return await serviceMocker.stubPoster(
-        `/threads/${threadId}/runs/run-abc123/submit_tool_outputs`,
-        {
-          id: runId,
-          status: "queued",
-        },
-      )
+      await serviceMocker.stubPoster(`/threads/${threadId}/runs/${runId}/submit_tool_outputs`, {
+        id: runId,
+        status: "queued",
+      })
+
+      return this
     },
   }
 }
