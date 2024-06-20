@@ -1,13 +1,19 @@
 import ServiceMocker from "../../support/ServiceMocker"
+import { MessageToMatch } from "./MessageToMatch"
 import openAiAssistantCreatedRunMocker from "./openAiAssistantCreatedRunMocker"
 
 const openAiAssistantThreadMocker = (serviceMocker: ServiceMocker, threadId: string) => {
   return {
-    async stubCreateMessageAndCreateRun() {
+    async stubCreateMessageAndCreateRun(message: MessageToMatch) {
       // for creating a message
-      await serviceMocker.stubPoster(`/threads/${threadId}/messages`, {
-        id: "msg-abc123",
-      })
+      await serviceMocker.mockPostMatchsAndNotMatches(
+        `/threads/${threadId}/messages`,
+        message,
+        undefined,
+        {
+          id: "msg-abc123",
+        },
+      )
       await serviceMocker.stubPoster(`/threads/${threadId}/runs`, {
         id: "run-abc123",
         status: "queued",

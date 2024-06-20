@@ -36,16 +36,21 @@ const openAiChatCompletionStubber = (
     message: ChatMessageInResponse,
     finishReason: "length" | "stop" | "function_call",
   ): Promise<void> => {
-    return serviceMocker.mockMatchsAndNotMatches(`/chat/completions`, bodyToMatch, bodyNotToMatch, {
-      object: "chat.completion",
-      choices: [
-        {
-          message,
-          index: 0,
-          finish_reason: finishReason,
-        },
-      ],
-    })
+    return serviceMocker.mockPostMatchsAndNotMatches(
+      `/chat/completions`,
+      bodyToMatch,
+      bodyNotToMatch,
+      {
+        object: "chat.completion",
+        choices: [
+          {
+            message,
+            index: 0,
+            finish_reason: finishReason,
+          },
+        ],
+      },
+    )
   }
 
   const stubSingleToolCall = (functionName: string, argumentsString: string) => {

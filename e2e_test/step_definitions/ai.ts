@@ -75,7 +75,7 @@ Given(
       .stubCreateThread(threadId)
       .then((thread) =>
         thread
-          .stubCreateMessageAndCreateRun()
+          .stubCreateMessageAndCreateRun({ role: "user", content: "Please complete" })
           .then((run) =>
             run
               .stubRetrieveRunsThatRequireAction(data.hashes())
@@ -88,19 +88,17 @@ Given(
 Given(
   "OpenAI assistant will reply {string} for messages containing:",
   (returnMessage: string, data: DataTable) => {
-    const _messages: MessageToMatch[] = data.hashes().map((row) => {
-      return {
-        role: row["role"],
-        content: row["content"],
-      } as MessageToMatch
-    })
+    const userMessage: MessageToMatch = {
+      role: "user",
+      content: data.hashes().map((row) => row["content"])[0],
+    } as MessageToMatch
     const threadId = "thread-abc123"
     mock_services
       .openAi()
       .stubCreateThread(threadId)
       .then((thread) =>
         thread
-          .stubCreateMessageAndCreateRun()
+          .stubCreateMessageAndCreateRun(userMessage)
           .then((run) =>
             run.stubRetrieveRunsThatCompleted().then((run) => run.stubListMessages(returnMessage)),
           ),

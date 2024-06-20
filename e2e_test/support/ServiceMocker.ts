@@ -61,7 +61,7 @@ class ServiceMocker {
     return this.mockWithPredicates([new DefaultPredicate(path, HttpMethod.POST)], [response])
   }
 
-  public mockMatchsAndNotMatches(
+  public mockPostMatchsAndNotMatches(
     path: string,
     bodyToMatch: unknown,
     bodyNotToMatch: unknown,
