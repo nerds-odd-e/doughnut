@@ -1,20 +1,26 @@
 {
-	"$schema": "https://biomejs.dev/schemas/1.8.1/schema.json",
-	"organizeImports": { "enabled": true },
-	"files": {
-		"ignoreUnknown": true,
-		"ignore": [
-			"biome.json",
-			"package.json",
-			"tsconfig.json",
-			"backend/",
-			"doughnut_mobile/",
-			"e2e_test/.eslintrc.cjs",
-			"e2e_test/config/ci.ts",
-			"e2e_test/config/common.ts",
-			"e2e_test/fixtures/*.js",
-			"e2e_test/fixtures/*.json",
-			"e2e_test/support/index.d.ts",
+  "$schema": "https://biomejs.dev/schemas/1.8.1/schema.json",
+  "organizeImports": { "enabled": true },
+  "files": {
+    "ignoreUnknown": true,
+    "ignore": [
+      "**/.direnv",
+      "**/.git",
+      "**/.github",
+      "**/.gradle",
+      "**/.idea",
+      "**/.vscode",
+      "**/node_modules",
+      "biome.json",
+      "package.json",
+      "tsconfig.json",
+      "backend/",
+      "doughnut_mobile/",
+      "infra/",
+      "e2e_test/.eslintrc.cjs",
+      "e2e_test/fixtures/*.js",
+      "e2e_test/fixtures/*.json",
+      "e2e_test/support/index.d.ts",
       "frontend/*.cjs",
       "frontend/biome.json",
       "frontend/package.json",
@@ -22,92 +28,99 @@
       "frontend/auto-imports.d.ts",
       "frontend/components.d.ts",
       "frontend/vite.config.ts",
-			"frontend/src/@types/doughnut/index.d.ts",
+      "frontend/src/@types/doughnut/index.d.ts",
       "frontend/src/generated/backend/DoughnutApi.ts",
       "frontend/tests/*.js",
-      "frontend/tests/shims-vue.d.ts",
-      "infra/"
+      "frontend/tests/shims-vue.d.ts"
     ]
-	},
-	"vcs": {
-	  "enabled": true,
-	  "clientKind": "git",
-	  "useIgnoreFile": true,
-	  "defaultBranch": "main"
-	},
-	"linter": {
-		"enabled": true,
-		"rules": {
-			"recommended": false,
-			"complexity": {
-				"noBannedTypes": "error",
-				"noUselessTypeConstraint": "error"
-			},
-			"correctness": {
-				"noInvalidUseBeforeDeclaration": "warn",
-				"noPrecisionLoss": "error",
-				"noUnusedImports": "error",
-				"noUnusedVariables": "off",
-				"useArrayLiterals": "off"
-			},
-			"style": {
-				"noInferrableTypes": "warn",
-				"noNamespace": "error",
-				"useAsConstAssertion": "error",
-				"useBlockStatements": "off"
-			},
-			"suspicious": {
-				"noExplicitAny": "warn",
-				"noExtraNonNullAssertion": "error",
-				"noMisleadingInstantiator": "error",
-				"noUnsafeDeclarationMerging": "error"
-			}
-		},
-		"ignore": [
-			"**/tsconfig.json",
-			"**/.eslintrc.cjs",
-			"config/ci.ts",
-			"config/common.ts",
-			"**/components.d.ts",
-			"**/node_modules",
-			"**/.git",
-			"**/.github",
-			"**/*.md"
-		]
-	},
-	"overrides": [
-		{
-			"include": ["*.ts", "*.tsx", "*.mts", "*.cts"],
-			"linter": {
-				"rules": {
-					"correctness": {
-						"noConstAssign": "off",
-						"noGlobalObjectCalls": "off",
-						"noInvalidConstructorSuper": "off",
-						"noInvalidNewBuiltin": "off",
-						"noNewSymbol": "off",
-						"noSetterReturn": "off",
-						"noUndeclaredVariables": "off",
-						"noUnreachable": "off",
-						"noUnreachableSuper": "off"
-					},
-					"style": {
-						"noArguments": "error",
-						"noVar": "error",
-						"useConst": "error"
-					},
-					"suspicious": {
-						"noDuplicateClassMembers": "off",
-						"noDuplicateObjectKeys": "off",
-						"noDuplicateParameters": "off",
-						"noFunctionAssign": "off",
-						"noImportAssign": "off",
-						"noRedeclare": "off",
-						"noUnsafeNegation": "off",
-						"useGetterReturn": "off"
-					}
-				}
-			}
-		}
-	]
+  },
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true,
+    "defaultBranch": "main"
+  },
+  "formatter": {
+    "indentStyle": "space"
+  },
+  "javascript": {
+    "formatter": {
+      "semicolons": "asNeeded"
+    }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": false,
+      "complexity": {
+        "noBannedTypes": "error",
+        "noUselessTypeConstraint": "error"
+      },
+      "correctness": {
+        "noInvalidUseBeforeDeclaration": "warn",
+        "noPrecisionLoss": "error",
+        "noUnusedImports": "error",
+        "noUnusedVariables": "off",
+        "useArrayLiterals": "off"
+      },
+      "style": {
+        "noInferrableTypes": "warn",
+        "noNamespace": "error",
+        "useAsConstAssertion": "error",
+        "useBlockStatements": "off"
+      },
+      "suspicious": {
+        "noExplicitAny": "warn",
+        "noExtraNonNullAssertion": "error",
+        "noMisleadingInstantiator": "error",
+        "noUnsafeDeclarationMerging": "error"
+      }
+    },
+    "ignore": [
+      "**/tsconfig.json",
+      "**/.eslintrc.cjs",
+      "config/ci.ts",
+      "config/common.ts",
+      "**/components.d.ts",
+      "**/node_modules",
+      "**/.git",
+      "**/.github",
+      "**/*.md"
+    ]
+  },
+  "overrides": [
+    {
+      "include": ["*.ts", "*.tsx", "*.mts", "*.cts"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noConstAssign": "off",
+            "noGlobalObjectCalls": "off",
+            "noInvalidConstructorSuper": "off",
+            "noInvalidNewBuiltin": "off",
+            "noNewSymbol": "off",
+            "noSetterReturn": "off",
+            "noUndeclaredVariables": "off",
+            "noUnreachable": "off",
+            "noUnreachableSuper": "off"
+          },
+          "style": {
+            "noArguments": "error",
+            "noVar": "error",
+            "useConst": "error"
+          },
+          "suspicious": {
+            "noDuplicateClassMembers": "off",
+            "noDuplicateObjectKeys": "off",
+            "noDuplicateParameters": "off",
+            "noFunctionAssign": "off",
+            "noImportAssign": "off",
+            "noRedeclare": "off",
+            "noUnsafeNegation": "off",
+            "useGetterReturn": "off"
+          }
+        }
+      }
+    }
+  ]
 }

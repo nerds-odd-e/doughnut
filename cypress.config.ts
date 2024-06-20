@@ -1,15 +1,15 @@
-import { defineConfig } from 'cypress'
-import commonConfig from './e2e_test/config/common'
+import { defineConfig } from "cypress"
+import commonConfig from "./e2e_test/config/common"
 
 export default defineConfig({
-   ...commonConfig,
+  ...commonConfig,
   env: {
-    TAGS: 'not @ignore and not @requiresDeveloperSecret',
+    TAGS: "not @ignore and not @requiresDeveloperSecret",
   },
   viewportWidth: 1000,
   viewportHeight: 660,
   e2e: {
     ...commonConfig.e2e,
-    baseUrl: 'http://localhost:5173',
+    baseUrl: "http://localhost:5173",
   },
 })
