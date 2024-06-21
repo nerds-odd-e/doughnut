@@ -97,9 +97,10 @@ public class RestAiController {
     AssistantService completionService = getContentCompletionService();
     result.put(
         completionService.assistantName(),
-        completionService.create(modelName, currentUTCTimestamp));
+        completionService.createAssistant(modelName, currentUTCTimestamp));
     AssistantService chatService = getChatService();
-    result.put(chatService.assistantName(), chatService.create(modelName, currentUTCTimestamp));
+    result.put(
+        chatService.assistantName(), chatService.createAssistant(modelName, currentUTCTimestamp));
     return result;
   }
 

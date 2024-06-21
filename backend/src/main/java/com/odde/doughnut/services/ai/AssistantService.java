@@ -22,7 +22,7 @@ public record AssistantService(
     String assistantName,
     List<AiTool> tools) {
 
-  public String create(String modelName, Timestamp currentUTCTimestamp) {
+  public String createAssistant(String modelName, Timestamp currentUTCTimestamp) {
     AssistantRequest assistantRequest =
         AssistantRequest.builder()
             .model(modelName)
