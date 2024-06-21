@@ -66,11 +66,7 @@ const openAiAssistantCreatedRunMocker = (
         {},
         responses,
       )
-      return openAiAssistantCreatedRunMocker(
-        serviceMocker,
-        threadId,
-        runId,
-      )
+      return openAiAssistantCreatedRunMocker(serviceMocker, threadId, runId)
     },
 
     async stubSubmitToolOutputs() {

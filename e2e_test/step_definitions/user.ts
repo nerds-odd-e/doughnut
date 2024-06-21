@@ -32,7 +32,7 @@ Given("I'm on the login page", () => {
   // The login page is different when the frontend is built into the backend.
   // Use the nonproduction login page when testing with standalone frontend server
   const baseUrl = Cypress.config("baseUrl")
-  if(baseUrl && baseUrl.indexOf("5173") > -1) {
+  if (baseUrl && baseUrl.indexOf("5173") > -1) {
     cy.visit("/users/identify")
     return
   }
