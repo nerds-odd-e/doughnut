@@ -5,10 +5,13 @@ import openAiAssistantCreatedRunMocker from "./openAiAssistantCreatedRunMocker"
 const openAiAssistantThreadMocker = (
   serviceMocker: ServiceMocker,
   threadId: string,
-  _mockedRunIds: string[],
+  mockedRunIds: string[],
 ) => {
   return {
     aRun(runId: string) {
+      if (!mockedRunIds.includes(runId)) {
+        throw new Error(`Run ID ${runId} not found in mockedRunIds, please mock the run first`)
+      }
       return openAiAssistantCreatedRunMocker(
         serviceMocker,
         threadId,
