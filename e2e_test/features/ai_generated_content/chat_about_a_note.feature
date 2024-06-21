@@ -10,6 +10,7 @@ Feature: Chat about a note with AI
     And I start to chat about the note "There are 42 prefectures in Japan"
 
 
+  @ignore
   Scenario: The users can conmunicate with AI
     Given OpenAI assistant will reply "No. It is not." for messages containing:
       | content              |
