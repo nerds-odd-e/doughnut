@@ -40,8 +40,8 @@
 <script setup lang="ts">
 import { PropType, ref, watch } from "vue"
 import { NoteRealm } from "@/generated/backend"
-import { StorageAccessor } from "../../store/createNoteStorage"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
+import { StorageAccessor } from "../../store/createNoteStorage"
 import NoteTopicWithLink from "./NoteTopicWithLink.vue"
 
 const props = defineProps({

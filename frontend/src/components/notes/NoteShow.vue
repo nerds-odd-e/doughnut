@@ -21,8 +21,8 @@
 
 <script setup lang="ts">
 import { PropType } from "vue"
-import { StorageAccessor } from "../../store/createNoteStorage"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
+import { StorageAccessor } from "../../store/createNoteStorage"
 import NoteRealmLoader from "./NoteRealmLoader.vue"
 
 defineProps({

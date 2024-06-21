@@ -65,6 +65,7 @@ import NoteAccessoryAsync from "./accessory/NoteAccessoryAsync.vue"
 import NoteCoreToolbar from "./core/NoteCoreToolbar.vue"
 import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue"
 import LinkOfNote from "../links/LinkOfNote.vue"
+import { reverseLabel } from "../../models/linkTypeOptions"
 
 defineProps({
   noteRealm: { type: Object as PropType<NoteRealm>, required: true },
