@@ -86,11 +86,11 @@ Given(
 )
 
 Given(
-  "OpenAI assistant will reply {string} for messages containing:",
-  (returnMessage: string, data: DataTable) => {
+  "OpenAI assistant will reply {string} for user message {string}",
+  (returnMessage: string, message: string) => {
     const userMessage: MessageToMatch = {
       role: "user",
-      content: data.hashes().map((row) => row["content"])[0],
+      content: message,
     } as MessageToMatch
     const threadId = "thread-abc123"
     mock_services
@@ -100,7 +100,11 @@ Given(
         thread
           .stubCreateMessageAndCreateRun(userMessage)
           .then((run) =>
-            run.stubRetrieveRunsThatCompleted().then((run) => run.stubListMessages(returnMessage)),
+            run
+              .stubRetrieveRunsThatCompleted()
+              .then((run) =>
+                run.stubListMessages([{ role: "assistant", content: returnMessage }, userMessage]),
+              ),
           ),
       )
   },

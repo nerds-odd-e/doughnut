@@ -16,7 +16,7 @@ export function assumeChatAboutNotePage() {
     },
     expectMessages(messages: Record<"role" | "message", string>[]) {
       messages.forEach(({ role, message }) => {
-        cy.findByText(message).parents(".chat-message").should("have.class", role)
+        cy.findByText(message).parents(".chat-answer-container").should("have.class", role)
       })
     },
   }

@@ -1,4 +1,5 @@
 import ServiceMocker from "../../support/ServiceMocker"
+import { MessageToMatch } from "./MessageToMatch"
 
 const openAiAssistantCreatedRunMocker = (
   serviceMocker: ServiceMocker,
@@ -14,25 +15,24 @@ const openAiAssistantCreatedRunMocker = (
 
       return this
     },
-    async stubListMessages(msg: string) {
+    async stubListMessages(msgs: MessageToMatch[]) {
       return await serviceMocker.stubGetter(
         `/threads/${threadId}/messages`,
         {},
         {
           object: "list",
-          data: [
-            {
-              object: "thread.message",
-              content: [
-                {
-                  type: "text",
-                  text: {
-                    value: msg,
-                  },
+          data: msgs.map((msg) => ({
+            object: "thread.message",
+            role: msg.role,
+            content: [
+              {
+                type: "text",
+                text: {
+                  value: msg.content,
                 },
-              ],
-            },
-          ],
+              },
+            ],
+          })),
         },
       )
     },

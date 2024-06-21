@@ -7,6 +7,7 @@
   <div
     class="chat-answer-container"
     v-for="(message, index) in assistantMessage"
+    :class="message.role"
     :key="index"
   >
     <img src="/user-icon.svg" class="chat-answer-icon" />
