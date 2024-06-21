@@ -5,15 +5,19 @@
     @need-scroll="scrollToBottom"
   />
   <div
-    class="chat-answer-container"
-    v-for="(message, index) in assistantMessage"
+    class="chat-answer-container row"
+    v-for="(message, index) in messages"
     :class="message.role"
     :key="index"
   >
-    <div class="chat-answer-text">
+    <div v-if="message.role==='assistant'" class="assistant-icon col-auto">
+      <SvgRobot />
+    </div>
+    <div class="chat-answer-text col">
       <p>{{ message.content?.[0]?.text?.value }}</p>
     </div>
   </div>
+
   <div ref="bottomOfTheChat" style="height: 140px; display: block"></div>
 
   <div class="chat-controls">
@@ -52,6 +56,7 @@ import type { StorageAccessor } from "@/store/createNoteStorage"
 import { PropType, defineComponent } from "vue"
 import scrollToElement from "../commons/scrollToElement"
 import ContestableQuestion from "../review/ContestableQuestion.vue"
+import SvgRobot from "../svgs/SvgRobot.vue"
 
 export default defineComponent({
   setup() {
@@ -71,7 +76,7 @@ export default defineComponent({
     return {
       quizQuestionInNotebook: undefined as QuizQuestionInNotebook | undefined,
       chatInput: "",
-      assistantMessage: [] as Message[],
+      messages: [] as Message[],
     }
   },
   computed: {
@@ -79,7 +84,7 @@ export default defineComponent({
       return this.chatInput === ""
     },
     threadId() {
-      return this.assistantMessage?.[this.assistantMessage.length - 1]?.thread_id
+      return this.messages?.[this.messages.length - 1]?.thread_id
     },
   },
   methods: {
@@ -97,11 +102,11 @@ export default defineComponent({
       this.scrollToBottom()
     },
     async generateChatAnswer() {
-      this.assistantMessage.push({
+      this.messages.push({
         role: "user",
         content: [{ text: { value: this.chatInput } }],
       })
-      this.assistantMessage = [...this.assistantMessage, ...(
+      this.messages = [...this.messages, ...(
         await this.managedApi.restAiController.chat(this.selectedNote.id, {
           userMessage: this.chatInput,
           threadId: this.threadId,
@@ -146,46 +151,5 @@ input.auto-extendable-input {
 
 .float-btn {
   float: right;
-}
-
-.chat-answer-container {
-  display: flex;
-  margin: 2% 0;
-}
-
-.chat-answer-text {
-  position: relative;
-  display: inline-block;
-  margin-left: 15px;
-  padding: 7px 10px;
-  width: 100%;
-  border: solid 3px #555;
-  box-sizing: border-box;
-}
-
-.chat-answer-text:before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: -24px;
-  margin-top: -12px;
-  border: 12px solid transparent;
-  border-right: 12px solid #fff;
-  z-index: 2;
-}
-
-.chat-answer-text:after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: -30px;
-  margin-top: -14px;
-  border: 14px solid transparent;
-  border-right: 14px solid #555;
-}
-
-.chat-answer-text p {
-  margin: 0;
-  word-break: break-word;
 }
 </style>

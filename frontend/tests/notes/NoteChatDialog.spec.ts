@@ -99,8 +99,9 @@ describe("NoteChatDialog TestMe", () => {
 })
 
 describe("NoteChatDialog Conversation", () => {
-  it("When the chat button is clicked, the anwser from AI will be displayed", async () => {
-    const expected = "I'm ChatGPT"
+  const expected = "I'm ChatGPT"
+
+  beforeEach(() => {
     const response: AiAssistantResponse = {
       messages: [
         {
@@ -118,19 +119,38 @@ describe("NoteChatDialog Conversation", () => {
     helper.managedApi.restAiController.chat = vi
       .fn()
       .mockResolvedValue(response)
+  })
 
-    const wrapper = await createWrapper()
-
+  const askAndReplied = async () => {
+   const wrapper = await createWrapper()
     await wrapper.find("#chat-input").setValue("What's your name?")
     await wrapper.find("#chat-button").trigger("submit")
     await flushPromises()
+    return wrapper
+  }
 
-    wrapper.find(".chat-answer-container").isVisible()
-    const actual = wrapper.find(".chat-answer-container.assistant").text()
-    expect(actual).toBe(expected)
+  it("called the api", async () => {
+   await askAndReplied()
     expect(helper.managedApi.restAiController.chat).toHaveBeenCalledWith(
       note.id,
       expect.anything(),
     )
+  })
+
+  it("shows the user's message as well", async () => {
+   const wrapper = await askAndReplied()
+    const actual = wrapper.find(".chat-answer-container.user").text()
+    expect(actual).toBe("What's your name?")
+  })
+
+  it("When the chat button is clicked, the anwser from AI will be displayed", async () => {
+   const wrapper = await askAndReplied()
+    const actual = wrapper.find(".chat-answer-container.assistant").text()
+    expect(actual).toBe(expected)
+  })
+
+  it("has one assistant icon", async () => {
+   const wrapper = await askAndReplied()
+    expect(wrapper.findAll(".assistant-icon")).toHaveLength(1)
   })
 })
