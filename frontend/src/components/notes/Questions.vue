@@ -16,6 +16,7 @@
       role="button"
       class="btn btn-secondary btn-sm"
       title="Delete Question"
+      @click="deleteQuestion"
     >
       Delete Question
     </button>
@@ -92,6 +93,7 @@ const questionAdded = (newQuestion: QuizQuestionAndAnswer) => {
   }
   questions.value.push(newQuestion)
 }
+const deleteQuestion = () => {};
 const toggleApproval = async (questionId?: number) => {
   if (questionId) {
     await managedApi.restQuizQuestionController.toggleApproval(questionId)
