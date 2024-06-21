@@ -77,9 +77,6 @@ const openAiChatCompletionStubber = (
     requestDoesNotMessageMatch(message: MessageToMatch) {
       return openAiChatCompletionStubber(serviceMocker, bodyToMatch, { messages: [message] })
     },
-    stubNonfunctionCallResponse(reply: string, finishReason: "length" | "stop" = "stop") {
-      return stubChatCompletion({ role: "assistant", content: reply }, finishReason)
-    },
     stubNoteDetailsCompletion(argumentsString: string) {
       return stubSingleToolCall("note_details_completion", argumentsString)
     },

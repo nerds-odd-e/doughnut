@@ -15,17 +15,6 @@ Then("I should be prompted with an error message saying {string}", (errorMessage
   cy.expectFieldErrorMessage("Prompt", errorMessage)
 })
 
-Given("OpenAI by default reply text completion assistant message {string}", (details: string) => {
-  cy.then(async () => {
-    await mock_services.openAi().restartImposter()
-    mock_services
-      .openAi()
-      .chatCompletion()
-      .requestMessagesMatch([])
-      .stubNonfunctionCallResponse(details, "stop")
-  })
-})
-
 Given("OpenAI has models {string} available", (modelNames: string) => {
   cy.then(async () => {
     mock_services.openAi().stubGetModels(modelNames)

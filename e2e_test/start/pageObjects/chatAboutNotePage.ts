@@ -11,9 +11,6 @@ export function assumeChatAboutNotePage() {
       cy.get("#chat-input").clear().type(msg)
       cy.get("#chat-button").click()
     },
-    expectResponse(msg: string) {
-      cy.findByText(msg)
-    },
     expectMessages(messages: Record<"role" | "message", string>[]) {
       messages.forEach(({ role, message }) => {
         cy.findByText(message).parents(".chat-answer-container").should("have.class", role)
