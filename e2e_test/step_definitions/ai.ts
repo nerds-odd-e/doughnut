@@ -74,12 +74,11 @@ Given(
   },
 )
 
-Given(
-  "OpenAI assistant will reply {string} for user message {string}",
-  (returnMessage: string, message: string) => {
+Given("OpenAI assistant will reply below for user messages:", (data: DataTable) => {
+  data.hashes().forEach((row) => {
     const userMessage: MessageToMatch = {
       role: "user",
-      content: message,
+      content: row["user message"],
     } as MessageToMatch
     const threadId = "thread-abc123"
     mock_services
@@ -92,9 +91,12 @@ Given(
             run
               .stubRetrieveRunsThatCompleted()
               .then((run) =>
-                run.stubListMessages([{ role: "assistant", content: returnMessage }, userMessage]),
+                run.stubListMessages([
+                  userMessage,
+                  { role: "assistant", content: row["assistant reply"]! },
+                ]),
               ),
           ),
       )
-  },
-)
+  })
+})
