@@ -12,10 +12,9 @@ ENV USER gitpod
 WORKDIR /home/gitpod
 
 # activate nix
-RUN . /home/gitpod/.nix-profile/etc/profile.d/nix.sh
-
+RUN . /home/gitpod/.nix-profile/etc/profile.d/nix.sh \
 # install direnv
-RUN nix-env -iA nixpkgs.direnv && nix-env -iA nixpkgs.nix-direnv
+    && nix-env -iA nixpkgs.direnv && nix-env -iA nixpkgs.nix-direnv
 
 # fasd
 RUN echo 'eval "$(fasd --init auto)"' >> ~/.bashrc
