@@ -30,15 +30,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { ReviewSetting } from "@/generated/backend";
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import CheckInput from "../form/CheckInput.vue";
-import RadioButtons from "../form/RadioButtons.vue";
+import { ReviewSetting } from "@/generated/backend"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import { PropType, defineComponent } from "vue"
+import CheckInput from "../form/CheckInput.vue"
+import RadioButtons from "../form/RadioButtons.vue"
 
 export default defineComponent({
   setup() {
-    return useLoadingApi();
+    return useLoadingApi()
   },
   props: {
     noteId: { type: Number, required: true },
@@ -53,23 +53,23 @@ export default defineComponent({
     return {
       formData: (this.reviewSetting ? this.reviewSetting : {}) as ReviewSetting,
       errors: {} as Partial<ReviewSetting>,
-    };
+    }
   },
   methods: {
     updateModelValue(newValue: ReviewSetting) {
       this.formData = {
         ...this.formData,
         ...newValue,
-      };
+      }
       this.managedApi.restNoteController
         .updateReviewSetting(this.noteId, this.formData)
         .then(() => {
           if (newValue.level !== undefined) {
-            this.$emit("levelChanged", newValue.level);
+            this.$emit("levelChanged", newValue.level)
           }
         })
-        .catch((error) => (this.errors = error));
+        .catch((error) => (this.errors = error))
     },
   },
-});
+})
 </script>

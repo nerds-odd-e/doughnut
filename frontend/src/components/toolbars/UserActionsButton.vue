@@ -32,16 +32,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { User } from "@/generated/backend";
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import PopButton from "@/components/commons/Popups/PopButton.vue";
-import SvgMissingAvatar from "@/components/svgs/SvgMissingAvatar.vue";
-import UserProfileDialog from "./UserProfileDialog.vue";
+import PopButton from "@/components/commons/Popups/PopButton.vue"
+import SvgMissingAvatar from "@/components/svgs/SvgMissingAvatar.vue"
+import { User } from "@/generated/backend"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import { PropType, defineComponent } from "vue"
+import UserProfileDialog from "./UserProfileDialog.vue"
 
 export default defineComponent({
   setup() {
-    return useLoadingApi();
+    return useLoadingApi()
   },
   props: {
     user: { type: Object as PropType<User>, required: true },
@@ -54,9 +54,9 @@ export default defineComponent({
   },
   methods: {
     async logout() {
-      await this.managedApi.logout();
-      window.location.href = "/bazaar";
+      await this.managedApi.logout()
+      window.location.href = "/bazaar"
     },
   },
-});
+})
 </script>

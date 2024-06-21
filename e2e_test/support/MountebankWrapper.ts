@@ -1,4 +1,4 @@
-import { Stub, Mountebank, Imposter } from "@anev/ts-mountebank"
+import { Imposter, Mountebank, Stub } from "@anev/ts-mountebank"
 /// <reference types="cypress" />
 
 import request from "superagent"
@@ -31,11 +31,15 @@ class MountebankWrapper {
       .send(JSON.stringify(imposter))
 
     if (response.statusCode != 201)
-      throw new Error(`Problem creating imposter: ${JSON.stringify(response?.error)}`)
+      throw new Error(
+        `Problem creating imposter: ${JSON.stringify(response?.error)}`,
+      )
   }
 
   deleteStub(stubId: number) {
-    return request.delete(`${this.mountebank.mountebankUrl}/imposters/${this.port}/stubs/${stubId}`)
+    return request.delete(
+      `${this.mountebank.mountebankUrl}/imposters/${this.port}/stubs/${stubId}`,
+    )
   }
 
   public async addStubsToImposter(stubs: Stub[]): Promise<void> {
@@ -44,7 +48,9 @@ class MountebankWrapper {
       .send(JSON.stringify({ stubs }))
 
     if (response.statusCode != 200)
-      throw new Error(`Problem adding stubs to imposter: ${JSON.stringify(response?.error)}`)
+      throw new Error(
+        `Problem adding stubs to imposter: ${JSON.stringify(response?.error)}`,
+      )
   }
 }
 

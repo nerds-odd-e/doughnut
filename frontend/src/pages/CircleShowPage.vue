@@ -42,20 +42,20 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { CircleForUserView } from "@/generated/backend";
-import SvgMissingAvatar from "@/components/svgs/SvgMissingAvatar.vue";
-import NotebookCardsWithButtons from "@/components/notebook/NotebookCardsWithButtons.vue";
-import NotebookNewButton from "@/components/notebook/NotebookNewButton.vue";
-import NotebookButtons from "@/components/notebook/NotebookButtons.vue";
-import BazaarNotebookButtons from "@/components/bazaar/BazaarNotebookButtons.vue";
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import { StorageAccessor } from "@/store/createNoteStorage";
-import ContainerPage from "./commons/ContainerPage.vue";
+import BazaarNotebookButtons from "@/components/bazaar/BazaarNotebookButtons.vue"
+import NotebookButtons from "@/components/notebook/NotebookButtons.vue"
+import NotebookCardsWithButtons from "@/components/notebook/NotebookCardsWithButtons.vue"
+import NotebookNewButton from "@/components/notebook/NotebookNewButton.vue"
+import SvgMissingAvatar from "@/components/svgs/SvgMissingAvatar.vue"
+import { CircleForUserView } from "@/generated/backend"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import { StorageAccessor } from "@/store/createNoteStorage"
+import { PropType, defineComponent } from "vue"
+import ContainerPage from "./commons/ContainerPage.vue"
 
 export default defineComponent({
   setup() {
-    return useLoadingApi();
+    return useLoadingApi()
   },
   components: {
     SvgMissingAvatar,
@@ -77,17 +77,17 @@ export default defineComponent({
     return {
       circle: null as CircleForUserView | null,
       timer: null as NodeJS.Timeout | null,
-    };
+    }
   },
 
   methods: {
     async fetchData() {
       this.timer = setTimeout(() => {
-        this.fetchData();
-      }, 5000);
+        this.fetchData()
+      }, 5000)
       this.circle = await this.managedApi.restCircleController.showCircle(
         this.circleId,
-      );
+      )
     },
   },
 
@@ -96,19 +96,19 @@ export default defineComponent({
       return `${window.location.origin}/circles/join/${
         /* eslint-disable  @typescript-eslint/no-non-null-assertion */
         this.circle!.invitationCode
-      }`;
+      }`
     },
   },
 
   mounted() {
-    this.fetchData();
+    this.fetchData()
   },
   beforeUnmount() {
     if (this.timer) {
-      clearTimeout(this.timer);
+      clearTimeout(this.timer)
     }
   },
-});
+})
 </script>
 
 <style lang="sass" scoped>

@@ -7,24 +7,23 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, computed } from "vue";
-import { NoteTopic } from "@/generated/backend";
-import BasicBreadcrumb from "../commons/BasicBreadcrumb.vue";
+import { NoteTopic } from "@/generated/backend"
+import { PropType, computed } from "vue"
 
 const props = defineProps({
   noteTopic: {
     type: Object as PropType<NoteTopic>,
     required: true,
   },
-});
+})
 
 const ancestors = computed(() => {
-  const result: NoteTopic[] = [];
-  let currentColor = props.noteTopic;
+  const result: NoteTopic[] = []
+  let currentColor = props.noteTopic
   while (currentColor.parentNoteTopic) {
-    result.unshift(currentColor.parentNoteTopic);
-    currentColor = currentColor.parentNoteTopic;
+    result.unshift(currentColor.parentNoteTopic)
+    currentColor = currentColor.parentNoteTopic
   }
-  return result;
-});
+  return result
+})
 </script>

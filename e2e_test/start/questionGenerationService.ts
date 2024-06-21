@@ -24,12 +24,17 @@ export const questionGenerationService = () => ({
         .stubQuestionGeneration(reply)
     })
   },
-  stubEvaluationQuestion: (record: Record<string, boolean | string | number[]>) => {
+  stubEvaluationQuestion: (
+    record: Record<string, boolean | string | number[]>,
+  ) => {
     cy.then(async () => {
       await mock_services
         .openAi()
         .chatCompletion()
-        .requestMessageMatches({ role: "user", content: ".*critically check.*" })
+        .requestMessageMatches({
+          role: "user",
+          content: ".*critically check.*",
+        })
         .stubQuestionEvaluation(JSON.stringify(record))
     })
   },

@@ -23,10 +23,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent } from "vue"
 
-import TextInput from "./TextInput.vue";
-import SvgEditText from "../svgs/SvgEditText.vue";
+import SvgEditText from "../svgs/SvgEditText.vue"
+import TextInput from "./TextInput.vue"
 
 export default defineComponent({
   name: "EditableLine",
@@ -46,22 +46,22 @@ export default defineComponent({
   data() {
     return {
       isEditing: false,
-    };
+    }
   },
   methods: {
     startEditing() {
-      if (this.isEditing) return;
-      this.isEditing = true;
+      if (this.isEditing) return
+      this.isEditing = true
     },
     onEnterKey(event) {
-      event.target.blur();
+      event.target.blur()
     },
     onBlurTextField() {
-      this.isEditing = false;
-      this.$emit("blur");
+      this.isEditing = false
+      this.$emit("blur")
     },
   },
-});
+})
 </script>
 
 <style lang="sass" scoped>

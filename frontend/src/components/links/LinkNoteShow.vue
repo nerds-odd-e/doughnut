@@ -6,9 +6,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { NoteTopic } from "@/generated/backend";
-import Breadcrumb from "../toolbars/Breadcrumb.vue";
+import { NoteTopic } from "@/generated/backend"
+import { PropType, defineComponent } from "vue"
+import Breadcrumb from "../toolbars/Breadcrumb.vue"
 
 export default defineComponent({
   name: "LinkNoteShow",
@@ -16,5 +16,5 @@ export default defineComponent({
     noteTopic: { type: Object as PropType<NoteTopic>, required: true },
   },
   components: { Breadcrumb },
-});
+})
 </script>

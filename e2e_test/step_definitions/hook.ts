@@ -3,7 +3,7 @@
 /// <reference types="../support" />
 // @ts-check
 
-import { Before, After } from "@badeball/cypress-cucumber-preprocessor"
+import { After, Before } from "@badeball/cypress-cucumber-preprocessor"
 import start, { mock_services } from "../start"
 
 Before(() => {

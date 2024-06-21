@@ -27,23 +27,22 @@
 </template>
 
 <script setup lang="ts">
-import usePopups from "@/components/commons/Popups/usePopups";
-import ResumeButton from "./ResumeButton.vue";
+import usePopups from "@/components/commons/Popups/usePopups"
 
 defineProps({
   paused: { type: Boolean, required: true },
   finished: { type: Number, required: true },
   toRepeatCount: { type: Number, required: true },
   title: String,
-});
+})
 
-defineEmits(["resume"]);
+defineEmits(["resume"])
 
 const goHome = async () => {
   if (await usePopups().popups.confirm("Confirm to leave the reviewing?")) {
-    window.location.href = "/";
+    window.location.href = "/"
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>

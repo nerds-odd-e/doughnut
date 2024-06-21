@@ -1,13 +1,13 @@
-import { NoteRealm, ReviewPoint, Note } from "@/generated/backend";
-import Builder from "./Builder";
-import generateId from "./generateId";
-import NoteBuilder from "./NoteBuilder";
+import { Note, NoteRealm, ReviewPoint } from "@/generated/backend"
+import Builder from "./Builder"
+import NoteBuilder from "./NoteBuilder"
+import generateId from "./generateId"
 
 class ReviewPointBuilder extends Builder<ReviewPoint> {
-  data: ReviewPoint;
+  data: ReviewPoint
 
   constructor() {
-    super();
+    super()
     this.data = {
       id: generateId(),
       lastReviewedAt: "",
@@ -17,22 +17,22 @@ class ReviewPointBuilder extends Builder<ReviewPoint> {
       forgettingCurveIndex: 0,
       removedFromReview: false,
       note: new NoteBuilder().do(),
-    };
+    }
   }
 
   ofNote(note: NoteRealm): ReviewPointBuilder {
-    this.data.note = note.note;
-    return this;
+    this.data.note = note.note
+    return this
   }
 
   ofLink(link: Note): ReviewPointBuilder {
-    this.data.note = link;
-    return this;
+    this.data.note = link
+    return this
   }
 
   do(): ReviewPoint {
-    return this.data;
+    return this.data
   }
 }
 
-export default ReviewPointBuilder;
+export default ReviewPointBuilder

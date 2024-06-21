@@ -1,32 +1,32 @@
-import { VueWrapper, flushPromises } from "@vue/test-utils";
-import WikidataAssociationDialog from "@/components/notes/WikidataAssociationDialog.vue";
-import { Note } from "@/generated/backend";
-import makeMe from "../fixtures/makeMe";
-import helper from "../helpers";
+import WikidataAssociationDialog from "@/components/notes/WikidataAssociationDialog.vue"
+import { Note } from "@/generated/backend"
+import { VueWrapper, flushPromises } from "@vue/test-utils"
+import makeMe from "../fixtures/makeMe"
+import helper from "../helpers"
 
 describe("Save wikidata id", () => {
-  const wikidataId = "Q123";
+  const wikidataId = "Q123"
   async function putWikidataIdAndSubmit(note: Note) {
     const wrapper = helper
       .component(WikidataAssociationDialog)
       .withStorageProps({
         note,
       })
-      .mount();
-    wrapper.find("#wikidataID-wikidataID").setValue(wikidataId);
-    await wrapper.find('input[value="Save"]').trigger("submit");
-    await flushPromises();
-    return wrapper;
+      .mount()
+    wrapper.find("#wikidataID-wikidataID").setValue(wikidataId)
+    await wrapper.find('input[value="Save"]').trigger("submit")
+    await flushPromises()
+    return wrapper
   }
 
   async function cancelOperation(wrapper: VueWrapper) {
-    await wrapper.find('input[type="cancel"]').trigger("click");
-    await flushPromises();
+    await wrapper.find('input[type="cancel"]').trigger("click")
+    await flushPromises()
   }
 
   async function confirmDifference(wrapper: VueWrapper) {
-    await wrapper.find('input[value="Confirm"]').trigger("submit");
-    await flushPromises();
+    await wrapper.find('input[value="Confirm"]').trigger("submit")
+    await flushPromises()
   }
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
@@ -43,26 +43,26 @@ describe("Save wikidata id", () => {
   `(
     "associate $noteTitle with $wikidataTitle and choose to $userAction",
     async ({ noteTitle, wikidataTitle, userAction, shouldSave }) => {
-      const note = makeMe.aNote.topicConstructor(noteTitle).please();
+      const note = makeMe.aNote.topicConstructor(noteTitle).please()
       const wikidata = makeMe.aWikidataEntity
         .wikidataTitle(wikidataTitle)
-        .please();
+        .please()
 
       helper.managedApi.restWikidataController.fetchWikidataEntityDataById = vi
         .fn()
-        .mockResolvedValue(wikidata);
+        .mockResolvedValue(wikidata)
       helper.managedApi.restNoteController.updateWikidataId = vi
         .fn()
-        .mockResolvedValue({});
+        .mockResolvedValue({})
 
-      const wrapper = await putWikidataIdAndSubmit(note);
-      await userAction(wrapper);
+      const wrapper = await putWikidataIdAndSubmit(note)
+      await userAction(wrapper)
       expect(
         helper.managedApi.restWikidataController.fetchWikidataEntityDataById,
-      ).toBeCalledWith(wikidataId);
+      ).toBeCalledWith(wikidataId)
       expect(
         helper.managedApi.restNoteController.updateWikidataId,
-      ).toBeCalledTimes(shouldSave ? 1 : 0);
+      ).toBeCalledTimes(shouldSave ? 1 : 0)
     },
-  );
-});
+  )
+})

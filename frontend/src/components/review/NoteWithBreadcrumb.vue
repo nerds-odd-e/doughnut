@@ -11,11 +11,9 @@
 </template>
 
 <script setup lang="ts">
-import { PropType } from "vue";
-import { Note } from "@/generated/backend";
-import { StorageAccessor } from "@/store/createNoteStorage";
-import NoteShow from "../notes/NoteShow.vue";
-import Breadcrumb from "../toolbars/Breadcrumb.vue";
+import { Note } from "@/generated/backend"
+import { StorageAccessor } from "@/store/createNoteStorage"
+import { PropType } from "vue"
 
 defineProps({
   note: {
@@ -26,5 +24,5 @@ defineProps({
     type: Object as PropType<StorageAccessor>,
     required: true,
   },
-});
+})
 </script>

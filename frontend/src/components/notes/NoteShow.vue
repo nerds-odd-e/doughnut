@@ -20,10 +20,8 @@
 </template>
 
 <script setup lang="ts">
-import { PropType } from "vue";
-import ContentLoader from "@/components/commons/ContentLoader.vue";
-import NoteRealmLoader from "./NoteRealmLoader.vue";
-import { StorageAccessor } from "../../store/createNoteStorage";
+import { PropType } from "vue"
+import { StorageAccessor } from "../../store/createNoteStorage"
 
 defineProps({
   noteId: { type: Number, required: true },
@@ -33,5 +31,5 @@ defineProps({
     type: Object as PropType<StorageAccessor>,
     required: true,
   },
-});
+})
 </script>

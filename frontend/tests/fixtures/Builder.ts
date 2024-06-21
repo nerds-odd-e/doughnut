@@ -1,21 +1,21 @@
 abstract class Builder<T> {
   // eslint-disable-next-line no-use-before-define
   parent<P extends Builder<S>, S>(parentBuilder: P) {
-    const that = this as Omit<typeof this, "please">;
+    const that = this as Omit<typeof this, "please">
     const those = that as typeof that & {
-      please: () => S;
-      and: P;
-    };
-    those.and = parentBuilder;
-    those.please = () => parentBuilder.please();
-    return those;
+      please: () => S
+      and: P
+    }
+    those.and = parentBuilder
+    those.please = () => parentBuilder.please()
+    return those
   }
 
   please(): T {
-    return this.do();
+    return this.do()
   }
 
-  abstract do(): T;
+  abstract do(): T
 }
 
-export default Builder;
+export default Builder

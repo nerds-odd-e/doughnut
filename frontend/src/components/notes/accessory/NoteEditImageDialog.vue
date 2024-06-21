@@ -10,14 +10,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import { NoteAccessoriesDTO, NoteAccessory } from "@/generated/backend";
-import ImageFormBody from "./ImageFormBody.vue";
+import { NoteAccessoriesDTO, NoteAccessory } from "@/generated/backend"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import { defineComponent } from "vue"
+import ImageFormBody from "./ImageFormBody.vue"
 
 export default defineComponent({
   setup() {
-    return useLoadingApi();
+    return useLoadingApi()
   },
   components: {
     ImageFormBody,
@@ -31,7 +31,7 @@ export default defineComponent({
       noteAccessory: undefined as NoteAccessory | undefined,
       formData: {} as NoteAccessoriesDTO,
       noteFormErrors: {},
-    };
+    }
   },
 
   methods: {
@@ -39,20 +39,20 @@ export default defineComponent({
       this.noteAccessory =
         (await this.managedApi.restNoteController.showNoteAccessory(
           this.noteId,
-        )) || {};
-      this.formData = { ...this.noteAccessory };
+        )) || {}
+      this.formData = { ...this.noteAccessory }
     },
     processForm() {
       this.managedApi.restNoteController
         .updateNoteAccessories(this.noteId, this.formData)
         .then((na) => this.$emit("closeDialog", na))
         .catch((error) => {
-          this.noteFormErrors = error;
-        });
+          this.noteFormErrors = error
+        })
     },
   },
   mounted() {
-    this.fetchData();
+    this.fetchData()
   },
-});
+})
 </script>

@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import InputWithType from "./InputWithType.vue";
+import InputWithType from "./InputWithType.vue"
 
 export default {
   props: {
@@ -36,5 +36,5 @@ export default {
     InputWithType,
   },
   emits: ["update:modelValue", "blur"],
-};
+}
 </script>

@@ -20,15 +20,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { User } from "@/generated/backend";
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import TextInput from "@/components/form/TextInput.vue";
-import ContainerPage from "./commons/ContainerPage.vue";
+import TextInput from "@/components/form/TextInput.vue"
+import { User } from "@/generated/backend"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import { defineComponent } from "vue"
+import ContainerPage from "./commons/ContainerPage.vue"
 
 export default defineComponent({
   setup() {
-    return useLoadingApi();
+    return useLoadingApi()
   },
   emits: ["updateUser"],
   components: { ContainerPage, TextInput },
@@ -40,20 +40,20 @@ export default defineComponent({
       errors: {
         name: undefined as undefined | string,
       },
-    };
+    }
   },
   methods: {
     async processForm() {
       try {
         const user = await this.managedApi.restUserController.createUser(
           this.formData,
-        );
-        this.$emit("updateUser", user);
+        )
+        this.$emit("updateUser", user)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
-        this.errors = err;
+        this.errors = err
       }
     },
   },
-});
+})
 </script>

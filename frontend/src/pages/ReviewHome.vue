@@ -5,29 +5,30 @@
 </template>
 
 <script>
-import timezoneParam from "@/managedApi/window/timezoneParam";
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import ReviewWelcome from "@/components/review/ReviewWelcome.vue";
-import ContainerPage from "./commons/ContainerPage.vue";
+import ReviewWelcome from "@/components/review/ReviewWelcome.vue"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import timezoneParam from "@/managedApi/window/timezoneParam"
+import ContainerPage from "./commons/ContainerPage.vue"
 
 export default {
   setup() {
-    return useLoadingApi();
+    return useLoadingApi()
   },
   data() {
     return {
       reviewing: null,
-    };
+    }
   },
   components: { ReviewWelcome, ContainerPage },
   methods: {
     async fetchData() {
-      this.reviewing =
-        await this.managedApi.restReviewsController.overview(timezoneParam());
+      this.reviewing = await this.managedApi.restReviewsController.overview(
+        timezoneParam(),
+      )
     },
   },
   mounted() {
-    this.fetchData();
+    this.fetchData()
   },
-};
+}
 </script>

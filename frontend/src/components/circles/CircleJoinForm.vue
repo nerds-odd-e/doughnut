@@ -13,12 +13,12 @@
 </template>
 
 <script>
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import TextInput from "@/components/form/TextInput.vue";
+import TextInput from "@/components/form/TextInput.vue"
+import useLoadingApi from "@/managedApi/useLoadingApi"
 
 export default {
   setup() {
-    return useLoadingApi();
+    return useLoadingApi()
   },
   components: { TextInput },
   props: { invitationCode: Number },
@@ -28,7 +28,7 @@ export default {
       circle: null,
       formData: { invitationCode: this.invitationCode },
       errors: {},
-    };
+    }
   },
 
   methods: {
@@ -39,10 +39,10 @@ export default {
           this.$router.push({
             name: "circleShow",
             params: { circleId: res.id },
-          });
+          })
         })
-        .catch((err) => (this.errors = err));
+        .catch((err) => (this.errors = err))
     },
   },
-};
+}
 </script>

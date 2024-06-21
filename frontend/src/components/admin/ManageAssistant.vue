@@ -11,13 +11,13 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
-import useLoadingApi from "@/managedApi/useLoadingApi";
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import { ref } from "vue"
 
-const { managedApi } = useLoadingApi();
-const assistants = ref<Record<string, string> | undefined>(undefined);
+const { managedApi } = useLoadingApi()
+const assistants = ref<Record<string, string> | undefined>(undefined)
 
 const recreateAllAssistants = async () => {
-  assistants.value = await managedApi.restAiController.recreateAllAssistants();
-};
+  assistants.value = await managedApi.restAiController.recreateAllAssistants()
+}
 </script>

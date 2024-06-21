@@ -10,5 +10,5 @@
 </template>
 
 <script setup>
-const props = defineProps({ x: String });
+const props = defineProps({ x: String })
 </script>

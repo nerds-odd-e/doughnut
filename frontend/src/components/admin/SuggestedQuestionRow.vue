@@ -27,14 +27,14 @@
 </template>
 
 <script lang="ts">
-import { PropType } from "vue";
-import { SuggestedQuestionForFineTuning } from "@/generated/backend";
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import usePopups from "@/components/commons/Popups/usePopups";
+import usePopups from "@/components/commons/Popups/usePopups"
+import { SuggestedQuestionForFineTuning } from "@/generated/backend"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import { PropType } from "vue"
 
 export default {
   setup() {
-    return { ...useLoadingApi(), ...usePopups() };
+    return { ...useLoadingApi(), ...usePopups() }
   },
   props: {
     suggestedQuestion: {
@@ -60,7 +60,7 @@ export default {
       The question I got from the system was:
       ${JSON.stringify(this.suggestedQuestion.preservedQuestion)}
 
-      `;
+      `
     },
   },
   methods: {
@@ -68,11 +68,11 @@ export default {
       const duplicated =
         await this.managedApi.restFineTuningDataController.duplicate(
           suggested.id,
-        );
-      this.$emit("duplicated", duplicated);
+        )
+      this.$emit("duplicated", duplicated)
     },
     chatStarter() {
-      this.popups.alert(this.chatStarterMessage);
+      this.popups.alert(this.chatStarterMessage)
     },
     async deleteSuggestedQuestion(suggested: SuggestedQuestionForFineTuning) {
       if (
@@ -80,9 +80,9 @@ export default {
           `Are you sure to delete this suggestion (${suggested.preservedQuestion.multipleChoicesQuestion.stem})?`,
         )
       ) {
-        await this.managedApi.restFineTuningDataController.delete(suggested.id);
+        await this.managedApi.restFineTuningDataController.delete(suggested.id)
       }
     },
   },
-};
+}
 </script>

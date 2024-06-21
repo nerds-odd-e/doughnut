@@ -45,7 +45,9 @@ export const bazaarOrCircle = () => {
     },
     subscribe(notebook: string, dailyLearningCount: string) {
       this.findNotebookCardButton(notebook, addToMyLearning).click()
-      cy.get("#subscription-dailyTargetOfNewNotes").clear().type(dailyLearningCount)
+      cy.get("#subscription-dailyTargetOfNewNotes")
+        .clear()
+        .type(dailyLearningCount)
       cy.findByRole("button", { name: "Submit" }).click()
     },
   }

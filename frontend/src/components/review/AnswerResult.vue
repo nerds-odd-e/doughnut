@@ -10,8 +10,8 @@
 </template>
 
 <script lang="ts">
-import { AnsweredQuestion } from "@/generated/backend";
-import { defineComponent, PropType } from "vue";
+import { AnsweredQuestion } from "@/generated/backend"
+import { PropType, defineComponent } from "vue"
 
 export default defineComponent({
   props: {
@@ -20,5 +20,5 @@ export default defineComponent({
       required: true,
     },
   },
-});
+})
 </script>

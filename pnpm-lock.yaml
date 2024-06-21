@@ -25,8 +25,11 @@ importers:
         specifier: ^2.2.1
         version: 2.2.1(esbuild@0.21.5)
       '@biomejs/biome':
-        specifier: 1.8.1
-        version: 1.8.1
+        specifier: 1.8.2
+        version: 1.8.2
+      '@stylistic/eslint-plugin':
+        specifier: ^2.2.2
+        version: 2.2.2(eslint@8.57.0)(typescript@5.4.5)
       '@testing-library/cypress':
         specifier: 10.0.2
         version: 10.0.2(cypress@13.12.0)
@@ -158,8 +161,11 @@ importers:
         version: 4.3.3(vue@3.4.27(typescript@5.4.5))
     devDependencies:
       '@biomejs/biome':
-        specifier: 1.8.1
-        version: 1.8.1
+        specifier: 1.8.2
+        version: 1.8.2
+      '@stylistic/eslint-plugin':
+        specifier: ^2.2.2
+        version: 2.2.2(eslint@8.57.0)(typescript@5.4.5)
       '@testing-library/user-event':
         specifier: ^14.5.2
         version: 14.5.2(@testing-library/dom@10.1.0)
@@ -497,55 +503,55 @@ packages:
     peerDependencies:
       esbuild: '>=0.17.0'
 
-  '@biomejs/biome@1.8.1':
-    resolution: {integrity: sha512-fQXGfvq6DIXem12dGQCM2tNF+vsNHH1qs3C7WeOu75Pd0trduoTmoO7G4ntLJ2qDs5wuw981H+cxQhi1uHnAtA==}
+  '@biomejs/biome@1.8.2':
+    resolution: {integrity: sha512-XafCzLgs0xbH0bCjYKxQ63ig2V86fZQMq1jiy5pyLToWk9aHxA8GAUxyBtklPHtPYZPGEPOYglQHj4jyfUp+Iw==}
     engines: {node: '>=14.21.3'}
     hasBin: true
 
-  '@biomejs/cli-darwin-arm64@1.8.1':
-    resolution: {integrity: sha512-XLiB7Uu6GALIOBWzQ2aMD0ru4Ly5/qSeQF7kk3AabzJ/kwsEWSe33iVySBP/SS2qv25cgqNiLksjGcw2bHT3mw==}
+  '@biomejs/cli-darwin-arm64@1.8.2':
+    resolution: {integrity: sha512-l9msLsTcSIAPqMsPIhodQmb50sEfaXPLQ0YW4cdj6INmd8iaOh/V9NceQb2366vACTJgcWDQ2RzlvURek1T68g==}
     engines: {node: '>=14.21.3'}
     cpu: [arm64]
     os: [darwin]
 
-  '@biomejs/cli-darwin-x64@1.8.1':
-    resolution: {integrity: sha512-uMTSxVLMfqkBVqyc25hSn83jBbp+wtWjzM/pHFlKXt3htJuw7FErVGW0nmQ9Sxa9vJ7GcqoltLMl28VQRIMYzg==}
+  '@biomejs/cli-darwin-x64@1.8.2':
+    resolution: {integrity: sha512-Fc4y/FuIxRSiB3TJ+y27vFDE/HJt4QgBuymktsIKEcBZvnKfsRjxvzVDunccRn4xbKgepnp+fn6BoS+ZIg/I3Q==}
     engines: {node: '>=14.21.3'}
     cpu: [x64]
     os: [darwin]
 
-  '@biomejs/cli-linux-arm64-musl@1.8.1':
-    resolution: {integrity: sha512-UQ8Wc01J0wQL+5AYOc7qkJn20B4PZmQL1KrmDZh7ot0DvD6aX4+8mmfd/dG5b6Zjo/44QvCKcvkFGCMRYuhWZA==}
+  '@biomejs/cli-linux-arm64-musl@1.8.2':
+    resolution: {integrity: sha512-WpT41QJJvkZa1eZq0WmD513zkC6AYaMI39HJKmKeiUeX2NZirG+bxv1YRDhqkns1NbBqo3+qrJqBkPmOW+xAVA==}
     engines: {node: '>=14.21.3'}
     cpu: [arm64]
     os: [linux]
 
-  '@biomejs/cli-linux-arm64@1.8.1':
-    resolution: {integrity: sha512-3SzZRuC/9Oi2P2IBNPsEj0KXxSXUEYRR2kfRF/Ve8QAfGgrt4qnwuWd6QQKKN5R+oYH691qjm+cXBKEcrP1v/Q==}
+  '@biomejs/cli-linux-arm64@1.8.2':
+    resolution: {integrity: sha512-Q99qwP0qibkZxm2kfnt37OxeIlliDYf5ogi3zX9ij2DULzc+KtPA9Uj0wCljcJofOBsBYaHc7597Q+Bf/251ww==}
     engines: {node: '>=14.21.3'}
     cpu: [arm64]
     os: [linux]
 
-  '@biomejs/cli-linux-x64-musl@1.8.1':
-    resolution: {integrity: sha512-fYbP/kNu/rtZ4kKzWVocIdqZOtBSUEg9qUhZaao3dy3CRzafR6u6KDtBeSCnt47O+iLnks1eOR1TUxzr5+QuqA==}
+  '@biomejs/cli-linux-x64-musl@1.8.2':
+    resolution: {integrity: sha512-rk1Wj4d3LIlAlIAS1m2jlyfOjkNbuY1lfwKvWIAeZC51yDMzwhRD7cReE5PE+jqLDtq60PX38hDPeKd7nA1S6A==}
     engines: {node: '>=14.21.3'}
     cpu: [x64]
     os: [linux]
 
-  '@biomejs/cli-linux-x64@1.8.1':
-    resolution: {integrity: sha512-AeBycVdNrTzsyYKEOtR2R0Ph0hCD0sCshcp2aOnfGP0hCZbtFg09D0SdKLbyzKntisY41HxKVrydYiaApp+2uw==}
+  '@biomejs/cli-linux-x64@1.8.2':
+    resolution: {integrity: sha512-bjhhUVFchFid2gOjrvBe4fg8BShcpyFQTHuB/QQnfGxs1ddrGP30yq3fHfc6S6MoCcz9Tjd3Zzq1EfWfyy5iHA==}
     engines: {node: '>=14.21.3'}
     cpu: [x64]
     os: [linux]
 
-  '@biomejs/cli-win32-arm64@1.8.1':
-    resolution: {integrity: sha512-6tEd1H/iFKpgpE3OIB7oNgW5XkjiVMzMRPL8zYoZ036YfuJ5nMYm9eB9H/y81+8Z76vL48fiYzMPotJwukGPqQ==}
+  '@biomejs/cli-win32-arm64@1.8.2':
+    resolution: {integrity: sha512-EUbqmCmNWT5xhnxHrCAEBzJB1AnLqxTYoRjlxiCMzGvsy5jQzhCanJ8CT9kNsApW3pfPWBWkoTa7qrwWmwnEGA==}
     engines: {node: '>=14.21.3'}
     cpu: [arm64]
     os: [win32]
 
-  '@biomejs/cli-win32-x64@1.8.1':
-    resolution: {integrity: sha512-g2H31jJzYmS4jkvl6TiyEjEX+Nv79a5km/xn+5DARTp5MBFzC9gwceusSSB2AkJKqZzY131AiACAWjKrVt5Ijw==}
+  '@biomejs/cli-win32-x64@1.8.2':
+    resolution: {integrity: sha512-n9H5oRUCk1uNezMgyJh9+hZdtfD8PXLLeq8DUzTycIhl0I1BulIoZ/uxWgRVDFDwAR1JHu1AykISCRFNGnc4iA==}
     engines: {node: '>=14.21.3'}
     cpu: [x64]
     os: [win32]
@@ -1129,6 +1135,35 @@ packages:
     resolution: {integrity: sha512-LtoMMhxAlorcGhmFYI+LhPgbPZCkgP6ra1YL604EeF6U98pLlQ3iWIGMdWSC+vWmPBWBNgmDBAhnAobLROJmwg==}
     engines: {node: '>=18'}
 
+  '@stylistic/eslint-plugin-js@2.2.2':
+    resolution: {integrity: sha512-Vj2Q1YHVvJw+ThtOvmk5Yx7wZanVrIBRUTT89horLDb4xdP9GA1um9XOYQC6j67VeUC2gjZQnz5/RVJMzaOhtw==}
+    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+    peerDependencies:
+      eslint: '>=8.40.0'
+
+  '@stylistic/eslint-plugin-jsx@2.2.2':
+    resolution: {integrity: sha512-xfIMdLivoMV1wV+5Tl0PtkLN/oUwjIt7LuIu48vhrZfJ2jCXwjlTGPGSoM7dnLZYD65XjtrHHIFAvPuvvvjlaw==}
+    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+    peerDependencies:
+      eslint: '>=8.40.0'
+
+  '@stylistic/eslint-plugin-plus@2.2.2':
+    resolution: {integrity: sha512-oeqPs01yAH4ad4bSchGtx8Jf5XTbxRx++A0joNYiOoq3EBTAUHE/ZB7dVv3BhNuCKiwojOQduLkUCXI5UMHoSw==}
+    peerDependencies:
+      eslint: '*'
+
+  '@stylistic/eslint-plugin-ts@2.2.2':
+    resolution: {integrity: sha512-n6cYMSWTDDcrQLLxEKIrL/ihQ1lyyq6+gGp0g5VdstBElmImSRsQkCq+g3jRoDJIUo7tGO9lwQtGnuJ7oGB4kg==}
+    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+    peerDependencies:
+      eslint: '>=8.40.0'
+
+  '@stylistic/eslint-plugin@2.2.2':
+    resolution: {integrity: sha512-GNRtyhhPsc9I9FNTaU2L0V/4LdSPAciQNEdYo6NBRdAz7sdiaxgEJKLNSXeXSQAuO9JBWWjZBs/57+WvrU0Iug==}
+    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+    peerDependencies:
+      eslint: '>=8.40.0'
+
   '@szmarczak/http-timer@4.0.6':
     resolution: {integrity: sha512-4BAffykYOgO+5nzBWYwE3W90sBgLJoUPRWWcL8wlyiM8IB8ipJz3UMJ9KXQd1RKQXpKp8Tutn80HZtWsu2u76w==}
     engines: {node: '>=10'}
@@ -1589,6 +1624,11 @@ packages:
 
   acorn@8.11.3:
     resolution: {integrity: sha512-Y9rRfJG5jcKOE0CLisYbojUjIrIEE7AGMzA/Sm4BslANhbS+cDMpgBdcPT91oJ7OuJ9hYJBx59RjbhxVnrF8Xg==}
+    engines: {node: '>=0.4.0'}
+    hasBin: true
+
+  acorn@8.12.0:
+    resolution: {integrity: sha512-RTvkC4w+KNXrM39/lWCUaG0IbRkWdCv7W/IOW9oU6SawyxulvkQy5HQPVTKxEjczcUvapcrw3cFx/60VN/NRNw==}
     engines: {node: '>=0.4.0'}
     hasBin: true
 
@@ -2573,10 +2613,18 @@ packages:
     resolution: {integrity: sha512-wpc+LXeiyiisxPlEkUzU6svyS1frIO3Mgxj1fdy7Pm8Ygzguax2N3Fa/D/ag1WqbOprdI+uY6wMUl8/a2G+iag==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
 
+  eslint-visitor-keys@4.0.0:
+    resolution: {integrity: sha512-OtIRv/2GyiF6o/d8K7MYKKbXrOUBIK6SfkIRM4Z0dY3w+LiQ0vy3F57m0Z71bjbyeiWFiHJ8brqnmE6H6/jEuw==}
+    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
   eslint@8.57.0:
     resolution: {integrity: sha512-dZ6+mexnaTIbSBZWgou51U6OmzIhYM2VcNdtiTtI7qPNZm35Akpr0f6vtw3w1Kmn5PYo+tZVfh13WrhpS6oLqQ==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     hasBin: true
+
+  espree@10.1.0:
+    resolution: {integrity: sha512-M1M6CpiE6ffoigIOWYO9UDP8TMUw9kqb21tf+08IgDYjCsOvCuDt4jQcZmoYxx+w7zlKw9/N0KXfto+I8/FrXA==}
+    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
   espree@9.6.1:
     resolution: {integrity: sha512-oruZaFkjorTpF32kDSI5/75ViwGeZginGGy2NoOSg3Q9bnwlnmDm4HLnkl0RE3n+njDXR037aY1+x58Z/zFdwQ==}
@@ -3962,6 +4010,10 @@ packages:
   picomatch@2.3.1:
     resolution: {integrity: sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==}
     engines: {node: '>=8.6'}
+
+  picomatch@4.0.2:
+    resolution: {integrity: sha512-M7BAV6Rlcy5u+m6oPhAPFgJTzAioX/6B0DxyvDlo9l8+T3nLKbrczg2WLUyzd45L8RqfUMyGPzekbMvX2Ldkwg==}
+    engines: {node: '>=12'}
 
   pidtree@0.6.0:
     resolution: {integrity: sha512-eG2dWTVw5bzqGRztnHExczNxt5VGsE6OwTeCG3fdUf9KBsZzO3R5OIIIzWR+iZA0NtZ+RDVdaoE2dK1cn6jH4g==}
@@ -5659,39 +5711,39 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@biomejs/biome@1.8.1':
+  '@biomejs/biome@1.8.2':
     optionalDependencies:
-      '@biomejs/cli-darwin-arm64': 1.8.1
-      '@biomejs/cli-darwin-x64': 1.8.1
-      '@biomejs/cli-linux-arm64': 1.8.1
-      '@biomejs/cli-linux-arm64-musl': 1.8.1
-      '@biomejs/cli-linux-x64': 1.8.1
-      '@biomejs/cli-linux-x64-musl': 1.8.1
-      '@biomejs/cli-win32-arm64': 1.8.1
-      '@biomejs/cli-win32-x64': 1.8.1
+      '@biomejs/cli-darwin-arm64': 1.8.2
+      '@biomejs/cli-darwin-x64': 1.8.2
+      '@biomejs/cli-linux-arm64': 1.8.2
+      '@biomejs/cli-linux-arm64-musl': 1.8.2
+      '@biomejs/cli-linux-x64': 1.8.2
+      '@biomejs/cli-linux-x64-musl': 1.8.2
+      '@biomejs/cli-win32-arm64': 1.8.2
+      '@biomejs/cli-win32-x64': 1.8.2
 
-  '@biomejs/cli-darwin-arm64@1.8.1':
+  '@biomejs/cli-darwin-arm64@1.8.2':
     optional: true
 
-  '@biomejs/cli-darwin-x64@1.8.1':
+  '@biomejs/cli-darwin-x64@1.8.2':
     optional: true
 
-  '@biomejs/cli-linux-arm64-musl@1.8.1':
+  '@biomejs/cli-linux-arm64-musl@1.8.2':
     optional: true
 
-  '@biomejs/cli-linux-arm64@1.8.1':
+  '@biomejs/cli-linux-arm64@1.8.2':
     optional: true
 
-  '@biomejs/cli-linux-x64-musl@1.8.1':
+  '@biomejs/cli-linux-x64-musl@1.8.2':
     optional: true
 
-  '@biomejs/cli-linux-x64@1.8.1':
+  '@biomejs/cli-linux-x64@1.8.2':
     optional: true
 
-  '@biomejs/cli-win32-arm64@1.8.1':
+  '@biomejs/cli-win32-arm64@1.8.2':
     optional: true
 
-  '@biomejs/cli-win32-x64@1.8.1':
+  '@biomejs/cli-win32-x64@1.8.2':
     optional: true
 
   '@colors/colors@1.5.0': {}
@@ -6180,6 +6232,53 @@ snapshots:
   '@sindresorhus/is@6.3.1': {}
 
   '@sindresorhus/merge-streams@2.3.0': {}
+
+  '@stylistic/eslint-plugin-js@2.2.2(eslint@8.57.0)':
+    dependencies:
+      '@types/eslint': 8.56.10
+      acorn: 8.11.3
+      eslint: 8.57.0
+      eslint-visitor-keys: 4.0.0
+      espree: 10.1.0
+
+  '@stylistic/eslint-plugin-jsx@2.2.2(eslint@8.57.0)':
+    dependencies:
+      '@stylistic/eslint-plugin-js': 2.2.2(eslint@8.57.0)
+      '@types/eslint': 8.56.10
+      eslint: 8.57.0
+      estraverse: 5.3.0
+      picomatch: 4.0.2
+
+  '@stylistic/eslint-plugin-plus@2.2.2(eslint@8.57.0)(typescript@5.4.5)':
+    dependencies:
+      '@types/eslint': 8.56.10
+      '@typescript-eslint/utils': 7.13.1(eslint@8.57.0)(typescript@5.4.5)
+      eslint: 8.57.0
+    transitivePeerDependencies:
+      - supports-color
+      - typescript
+
+  '@stylistic/eslint-plugin-ts@2.2.2(eslint@8.57.0)(typescript@5.4.5)':
+    dependencies:
+      '@stylistic/eslint-plugin-js': 2.2.2(eslint@8.57.0)
+      '@types/eslint': 8.56.10
+      '@typescript-eslint/utils': 7.13.1(eslint@8.57.0)(typescript@5.4.5)
+      eslint: 8.57.0
+    transitivePeerDependencies:
+      - supports-color
+      - typescript
+
+  '@stylistic/eslint-plugin@2.2.2(eslint@8.57.0)(typescript@5.4.5)':
+    dependencies:
+      '@stylistic/eslint-plugin-js': 2.2.2(eslint@8.57.0)
+      '@stylistic/eslint-plugin-jsx': 2.2.2(eslint@8.57.0)
+      '@stylistic/eslint-plugin-plus': 2.2.2(eslint@8.57.0)(typescript@5.4.5)
+      '@stylistic/eslint-plugin-ts': 2.2.2(eslint@8.57.0)(typescript@5.4.5)
+      '@types/eslint': 8.56.10
+      eslint: 8.57.0
+    transitivePeerDependencies:
+      - supports-color
+      - typescript
 
   '@szmarczak/http-timer@4.0.6':
     dependencies:
@@ -6798,17 +6897,23 @@ snapshots:
       acorn: 8.11.3
       acorn-walk: 8.3.2
 
-  acorn-import-assertions@1.9.0(acorn@8.11.3):
+  acorn-import-assertions@1.9.0(acorn@8.12.0):
     dependencies:
-      acorn: 8.11.3
+      acorn: 8.12.0
 
   acorn-jsx@5.3.2(acorn@8.11.3):
     dependencies:
       acorn: 8.11.3
 
+  acorn-jsx@5.3.2(acorn@8.12.0):
+    dependencies:
+      acorn: 8.12.0
+
   acorn-walk@8.3.2: {}
 
   acorn@8.11.3: {}
+
+  acorn@8.12.0: {}
 
   agent-base@6.0.2:
     dependencies:
@@ -7867,6 +7972,8 @@ snapshots:
 
   eslint-visitor-keys@3.4.3: {}
 
+  eslint-visitor-keys@4.0.0: {}
+
   eslint@8.57.0:
     dependencies:
       '@eslint-community/eslint-utils': 4.4.0(eslint@8.57.0)
@@ -7909,6 +8016,12 @@ snapshots:
       text-table: 0.2.0
     transitivePeerDependencies:
       - supports-color
+
+  espree@10.1.0:
+    dependencies:
+      acorn: 8.12.0
+      acorn-jsx: 5.3.2(acorn@8.12.0)
+      eslint-visitor-keys: 4.0.0
 
   espree@9.6.1:
     dependencies:
@@ -9388,6 +9501,8 @@ snapshots:
 
   picomatch@2.3.1: {}
 
+  picomatch@4.0.2: {}
+
   pidtree@0.6.0: {}
 
   pify@2.3.0: {}
@@ -10106,7 +10221,7 @@ snapshots:
   terser@5.31.1:
     dependencies:
       '@jridgewell/source-map': 0.3.6
-      acorn: 8.11.3
+      acorn: 8.12.0
       commander: 2.20.3
       source-map-support: 0.5.21
 
@@ -10641,8 +10756,8 @@ snapshots:
       '@webassemblyjs/ast': 1.12.1
       '@webassemblyjs/wasm-edit': 1.12.1
       '@webassemblyjs/wasm-parser': 1.12.1
-      acorn: 8.11.3
-      acorn-import-assertions: 1.9.0(acorn@8.11.3)
+      acorn: 8.12.0
+      acorn-import-assertions: 1.9.0(acorn@8.12.0)
       browserslist: 4.23.1
       chrome-trace-event: 1.0.4
       enhanced-resolve: 5.17.0

@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import InputWithType from "./InputWithType.vue";
+import InputWithType from "./InputWithType.vue"
 
 export default {
   props: {
@@ -32,8 +32,8 @@ export default {
   components: { InputWithType },
   methods: {
     update(data) {
-      this.$emit("update:modelValue", data);
+      this.$emit("update:modelValue", data)
     },
   },
-};
+}
 </script>

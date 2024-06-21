@@ -1,61 +1,57 @@
 <script setup lang="ts">
-import { computed, onMounted, provide, Ref, ref } from "vue";
-import { useRoute } from "vue-router";
-import Popups from "./components/commons/Popups/Popups.vue";
-import TestMenu from "./components/commons/TestMenu.vue";
-import UserNewRegisterPage from "./pages/UserNewRegisterPage.vue";
-import createNoteStorage from "./store/createNoteStorage";
-import ManagedApi, { ApiStatus } from "./managedApi/ManagedApi";
-import GlobalBar from "./components/toolbars/GlobalBar.vue";
-import { User } from "./generated/backend";
-import getEnvironment from "./managedApi/window/getEnvironment";
+import { Ref, computed, onMounted, provide, ref } from "vue"
+import { useRoute } from "vue-router"
+import { User } from "./generated/backend"
+import ManagedApi, { ApiStatus } from "./managedApi/ManagedApi"
+import getEnvironment from "./managedApi/window/getEnvironment"
+import createNoteStorage from "./store/createNoteStorage"
 
 const apiStatus: Ref<ApiStatus> = ref({
   errors: [],
   states: [],
-});
-const managedApi = new ManagedApi(apiStatus.value);
-const storageAccessor = ref(createNoteStorage(managedApi));
-provide("managedApi", managedApi);
-const $route = useRoute();
+})
+const managedApi = new ManagedApi(apiStatus.value)
+const storageAccessor = ref(createNoteStorage(managedApi))
+provide("managedApi", managedApi)
+const $route = useRoute()
 
-const externalIdentifier = ref<string | undefined>();
-const user = ref<User | undefined>();
-const featureToggle = ref(false);
-const environment = ref("production");
-const userLoaded = ref(false);
+const externalIdentifier = ref<string | undefined>()
+const user = ref<User | undefined>()
+const featureToggle = ref(false)
+const environment = ref("production")
+const userLoaded = ref(false)
 
 const newUser = computed(() => {
-  return !user.value && !!externalIdentifier.value;
-});
+  return !user.value && !!externalIdentifier.value
+})
 
 const routeViewProps = computed(() => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const props = {} as any;
+  const props = {} as any
   if ($route.meta.useNoteStorageAccessor) {
-    props.storageAccessor = storageAccessor.value;
+    props.storageAccessor = storageAccessor.value
   }
   if ($route.meta.userProp) {
-    props.user = user.value;
+    props.user = user.value
   }
-  return props;
-});
+  return props
+})
 
 const clearErrorMessage = (_id: number) => {
-  apiStatus.value.errors = [];
-};
+  apiStatus.value.errors = []
+}
 
 onMounted(async () => {
-  environment.value = getEnvironment();
+  environment.value = getEnvironment()
   featureToggle.value =
     environment.value === "testing" &&
-    (await managedApi.testabilityRestController.getFeatureToggle());
+    (await managedApi.testabilityRestController.getFeatureToggle())
   const userInfo =
-    await managedApi.restCurrentUserInfoController.currentUserInfo();
-  user.value = userInfo.user;
-  externalIdentifier.value = userInfo.externalIdentifier;
-  userLoaded.value = true;
-});
+    await managedApi.restCurrentUserInfoController.currentUserInfo()
+  user.value = userInfo.user
+  externalIdentifier.value = userInfo.externalIdentifier
+  userLoaded.value = true
+})
 </script>
 
 <template>

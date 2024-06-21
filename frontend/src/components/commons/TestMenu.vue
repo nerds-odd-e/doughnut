@@ -25,16 +25,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { User } from "@/generated/backend";
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import PopButton from "./Popups/PopButton.vue";
-import CheckInput from "../form/CheckInput.vue";
-import TextInput from "../form/TextInput.vue";
+import { User } from "@/generated/backend"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import { PropType, defineComponent } from "vue"
+import CheckInput from "../form/CheckInput.vue"
+import TextInput from "../form/TextInput.vue"
+import PopButton from "./Popups/PopButton.vue"
 
 export default defineComponent({
   setup() {
-    return useLoadingApi();
+    return useLoadingApi()
   },
   props: {
     featureToggle: Boolean,
@@ -49,22 +49,22 @@ export default defineComponent({
   data() {
     return {
       randomSelector: "",
-    };
+    }
   },
   methods: {
     updateRandomSelector() {
       this.managedApi.testabilityRestController.randomizer({
         choose: this.randomSelector,
-      });
+      })
     },
     updateFeatureToggle(value) {
       this.managedApi.testabilityRestController.enableFeatureToggle({
         enabled: value,
-      });
-      this.$emit("featureToggle", value);
+      })
+      this.$emit("featureToggle", value)
     },
   },
-});
+})
 </script>
 
 <style lang="scss" scoped>

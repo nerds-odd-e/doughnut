@@ -1,5 +1,5 @@
-import { questionGenerationService } from "./questionGenerationService"
 import basicActions from "./basicActions"
+import { questionGenerationService } from "./questionGenerationService"
 import testability from "./testability"
 
 export const higherOrderActions = {

@@ -4,19 +4,27 @@
 // @ts-check
 
 import { Then, When } from "@badeball/cypress-cucumber-preprocessor"
-import { commonSenseSplit } from "../support/string_util"
-import start from "../start"
 import NotePath from "support/NotePath"
+import start from "../start"
+import { commonSenseSplit } from "../support/string_util"
 
 When("I start searching", () => {
   cy.startSearching()
 })
 
-When("I am creating a linking note under note {string}", (noteTopic: string) => {
-  start.jumpToNotePage(noteTopic).startSearchingAndLinkNote()
-})
+When(
+  "I am creating a linking note under note {string}",
+  (noteTopic: string) => {
+    start.jumpToNotePage(noteTopic).startSearchingAndLinkNote()
+  },
+)
 
-function makingLink(cy, fromNoteTopic: string, linkType: string, toNoteTopic: string) {
+function makingLink(
+  cy,
+  fromNoteTopic: string,
+  linkType: string,
+  toNoteTopic: string,
+) {
   start.jumpToNotePage(fromNoteTopic).startSearchingAndLinkNote()
   cy.searchNote(toNoteTopic, ["All My Notebooks And Subscriptions"])
   cy.clickButtonOnCardBody(toNoteTopic, "Select")
@@ -49,13 +57,20 @@ When(
 )
 
 When("I should see the parent note as {string}", (noteTopic: string) => {
-  cy.findByText(noteTopic, { selector: "strong .topic-text" }).should("be.visible")
+  cy.findByText(noteTopic, { selector: "strong .topic-text" }).should(
+    "be.visible",
+  )
 })
 
-When("I should see {string} as the possible duplicate", (noteTopicsAsString: string) => {
-  cy.tick(500)
-  cy.expectExactLinkTargets(commonSenseSplit(noteTopicsAsString, ",").map((i: string) => i.trim()))
-})
+When(
+  "I should see {string} as the possible duplicate",
+  (noteTopicsAsString: string) => {
+    cy.tick(500)
+    cy.expectExactLinkTargets(
+      commonSenseSplit(noteTopicsAsString, ",").map((i: string) => i.trim()),
+    )
+  },
+)
 
 When(
   "I should see {string} as targets only when searching {string}",
@@ -98,7 +113,9 @@ Then(
 Then(
   "I should see {string} has link {string} {string}",
   (noteTopic: string, linkType: string, targetNoteTopics: string) => {
-    start.jumpToNotePage(noteTopic).expectLinkingChildren(linkType, targetNoteTopics)
+    start
+      .jumpToNotePage(noteTopic)
+      .expectLinkingChildren(linkType, targetNoteTopics)
   },
 )
 
@@ -112,10 +129,13 @@ Then(
   },
 )
 
-Then("I should see {string} has no link to {string}", (noteTopic: string, targetTitle: string) => {
-  start.jumpToNotePage(noteTopic)
-  cy.findByText(targetTitle, { selector: "main *" }).should("not.exist")
-})
+Then(
+  "I should see {string} has no link to {string}",
+  (noteTopic: string, targetTitle: string) => {
+    start.jumpToNotePage(noteTopic)
+    cy.findByText(targetTitle, { selector: "main *" }).should("not.exist")
+  },
+)
 
 Then(
   "I change the link from {string} to {string} to {string}",
@@ -141,7 +161,13 @@ Then("I should be able to delete the link", () => {
   cy.findByRole("button", { name: "Delete" }).click()
 })
 
-Then("I delete the link from {string} to {string}", (noteTopic: string, targetTitle: string) => {
-  start.jumpToNotePage(noteTopic).navigateToLinkingChild(targetTitle).deleteNote()
-  start.assumeNotePage(noteTopic) // remain on the same note page
-})
+Then(
+  "I delete the link from {string} to {string}",
+  (noteTopic: string, targetTitle: string) => {
+    start
+      .jumpToNotePage(noteTopic)
+      .navigateToLinkingChild(targetTitle)
+      .deleteNote()
+    start.assumeNotePage(noteTopic) // remain on the same note page
+  },
+)

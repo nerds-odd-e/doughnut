@@ -34,7 +34,6 @@ module.exports = {
     "plugin:import/typescript",
     "plugin:import/recommended",
     "plugin:prettier/recommended",
-    "prettier",
   ],
   ignorePatterns: [
     ".git",
@@ -44,10 +43,12 @@ module.exports = {
     "*.md",
     "index.html",
     "components.d.ts",
+    "index.d.ts",
+    "shims-vue.d.ts",
     "tsconfig.json",
     ".eslintrc.cjs",
     "vite.config.ts",
-    "tests/setupVitest.js"
+    "tests/setupVitest.js",
   ],
   settings: {
     "import/extensions": [".ts", ".tsx"],
@@ -61,7 +62,14 @@ module.exports = {
       },
     },
   },
-  plugins: ["vue", "testing-library", "@typescript-eslint", "vitest"],
+  plugins: [
+    "vue",
+    "testing-library",
+    "@typescript-eslint",
+    "vitest",
+    "prettier",
+    "@stylistic",
+  ],
   rules: {
     "no-unused-vars": ["error", { varsIgnorePattern: ".*", args: "none" }],
     "no-param-reassign": ["error", { props: false }],
@@ -78,6 +86,8 @@ module.exports = {
     "testing-library/no-debugging-utils": "warn",
     "testing-library/no-dom-import": "off",
     "vue/multi-word-component-names": 0,
+    "prettier/prettier": "off",
+    "@stylistic/semi": ["error", "never"],
   },
   overrides: [
     {

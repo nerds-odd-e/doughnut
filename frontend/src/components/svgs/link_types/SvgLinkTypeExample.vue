@@ -44,9 +44,5 @@
 </template>
 
 <script setup>
-import Tag from "./Tag.vue";
-import Object1 from "./Object1.vue";
-import Lnk from "./Lnk.vue";
-
-const props = defineProps({ ifInverse: { type: Number, default: 1 } });
+const props = defineProps({ ifInverse: { type: Number, default: 1 } })
 </script>

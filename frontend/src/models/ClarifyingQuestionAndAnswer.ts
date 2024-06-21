@@ -1,6 +1,6 @@
-import { ClarifyingQuestion } from "@/generated/backend";
+import { ClarifyingQuestion } from "@/generated/backend"
 
 export default interface ClarifyingQuestionAndAnswer {
-  questionFromAI: ClarifyingQuestion;
-  answerFromUser: string;
+  questionFromAI: ClarifyingQuestion
+  answerFromUser: string
 }

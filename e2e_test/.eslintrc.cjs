@@ -5,6 +5,7 @@ module.exports = {
     "cypress",
     "chai-friendly",
     "prettier",
+    "@stylistic",
     "unused-imports",
     "testing-library"
   ],
@@ -19,7 +20,6 @@ module.exports = {
     "plugin:@typescript-eslint/recommended", // Uses the recommended rules from the @typescript-eslint/eslint-plugin
     "plugin:cypress/recommended",
     "plugin:prettier/recommended",
-    "prettier",
   ],
   parserOptions: {
     ecmaVersion: 2022, // Allows for the parsing of modern ECMAScript features
@@ -42,18 +42,8 @@ module.exports = {
     "cypress/no-pause": "error",
     "cypress/assertion-before-screenshot": "warn",
     "cypress/unsafe-to-chain-command": "off",
-    "prettier/prettier": [
-      "warn",
-      {
-        printWidth: 100,
-        tabWidth: 2,
-        singleQuote: false,
-        trailingComma: "all",
-        bracketSpacing: true,
-        semi: false,
-        useTabs: false,
-      },
-    ],
+    "prettier/prettier": "off",
+    '@stylistic/semi': ["error", "never"],
     "@typescript-eslint/no-var-requires": "off",
     "@typescript-eslint/indent": "off",
     "@typescript-eslint/no-use-before-define": "warn",

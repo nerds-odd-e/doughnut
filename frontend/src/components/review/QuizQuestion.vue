@@ -60,20 +60,20 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { AnswerDTO, QuizQuestion } from "@/generated/backend";
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import ShowImage from "../notes/accessory/ShowImage.vue";
-import TextInput from "../form/TextInput.vue";
-import usePopups from "../commons/Popups/usePopups";
-import QuizQuestionChoices from "./QuizQuestionChoices.vue";
-import SuggestQuestionForFineTuning from "../ai/SuggestQuestionForFineTuning.vue";
-import SvgRaiseHand from "../svgs/SvgRaiseHand.vue";
+import { AnswerDTO, QuizQuestion } from "@/generated/backend"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import { PropType, defineComponent } from "vue"
+import SuggestQuestionForFineTuning from "../ai/SuggestQuestionForFineTuning.vue"
+import usePopups from "../commons/Popups/usePopups"
+import TextInput from "../form/TextInput.vue"
+import ShowImage from "../notes/accessory/ShowImage.vue"
+import SvgRaiseHand from "../svgs/SvgRaiseHand.vue"
+import QuizQuestionChoices from "./QuizQuestionChoices.vue"
 
 export default defineComponent({
   inheritAttrs: false,
   setup() {
-    return { ...useLoadingApi(), ...usePopups() };
+    return { ...useLoadingApi(), ...usePopups() }
   },
   props: {
     quizQuestion: {
@@ -95,7 +95,7 @@ export default defineComponent({
   data() {
     return {
       answer: "" as string,
-    };
+    }
   },
   methods: {
     async submitAnswer(answerData: AnswerDTO) {
@@ -104,16 +104,16 @@ export default defineComponent({
           await this.managedApi.restQuizQuestionController.answerQuiz(
             this.quizQuestion.id,
             answerData,
-          );
-        this.$emit("answered", answerResult);
+          )
+        this.$emit("answered", answerResult)
       } catch (_e) {
         await this.popups.alert(
           "This review point doesn't exist any more or is being skipped now. Moving on to the next review point...",
-        );
+        )
       }
     },
   },
-});
+})
 </script>
 
 <style lang="scss" scoped>

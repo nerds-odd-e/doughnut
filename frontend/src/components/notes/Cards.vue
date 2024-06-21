@@ -13,12 +13,11 @@
 </template>
 
 <script setup lang="ts">
-import { PropType } from "vue";
-import { NoteTopic } from "@/generated/backend";
-import Card from "./Card.vue";
+import { NoteTopic } from "@/generated/backend"
+import { PropType } from "vue"
 
 defineProps({
   noteTopics: { type: Array as PropType<NoteTopic[]>, required: true },
   columns: { type: Number, default: 4 },
-});
+})
 </script>

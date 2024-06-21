@@ -28,10 +28,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { ClarifyingQuestion } from "@/generated/backend";
-import ClarifyingQuestionAndAnswer from "@/models/ClarifyingQuestionAndAnswer";
-import TextInput from "../form/TextInput.vue";
+import { ClarifyingQuestion } from "@/generated/backend"
+import ClarifyingQuestionAndAnswer from "@/models/ClarifyingQuestionAndAnswer"
+import { PropType, defineComponent } from "vue"
+import TextInput from "../form/TextInput.vue"
 
 export default defineComponent({
   props: {
@@ -49,17 +49,17 @@ export default defineComponent({
   data() {
     return {
       answerToAI: "",
-    };
+    }
   },
   methods: {
     handleFormSubmit() {
       this.$emit("submit", <ClarifyingQuestionAndAnswer>{
         questionFromAI: this.clarifyingQuestion,
         answerFromUser: this.answerToAI,
-      });
+      })
     },
   },
-});
+})
 </script>
 
 <style lang="scss" scoped></style>

@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { startCase, camelCase } from "lodash";
+import { camelCase, startCase } from "lodash"
 
 export default {
   props: {
@@ -31,13 +31,13 @@ export default {
   },
   computed: {
     titlized() {
-      return this.title ? this.title : startCase(camelCase(this.field));
+      return this.title ? this.title : startCase(camelCase(this.field))
     },
     controlId() {
-      return `${this.scopeName}-${this.field}`;
+      return `${this.scopeName}-${this.field}`
     },
   },
-};
+}
 </script>
 
 <style lang="sass" scoped>

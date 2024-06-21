@@ -13,8 +13,5 @@
 </template>
 
 <script setup>
-import ObjectLeft from "./ObjectLeft.vue";
-import Lnk from "./Lnk.vue";
-
-const props = defineProps({ ifInverse: { type: Number, default: 1 } });
+const props = defineProps({ ifInverse: { type: Number, default: 1 } })
 </script>

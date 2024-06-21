@@ -26,13 +26,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { startCase, camelCase } from "lodash";
-import { NoteCreationDTO, NoteTopic } from "@/generated/backend";
-import PopButton from "../commons/Popups/PopButton.vue";
-import SvgLinkTypeIcon from "../svgs/SvgLinkTypeIcon.vue";
-import LinkTypeSelect from "./LinkTypeSelect.vue";
-import InputWithType from "../form/InputWithType.vue";
+import { NoteCreationDTO, NoteTopic } from "@/generated/backend"
+import { camelCase, startCase } from "lodash"
+import { PropType, defineComponent } from "vue"
+import PopButton from "../commons/Popups/PopButton.vue"
+import InputWithType from "../form/InputWithType.vue"
+import SvgLinkTypeIcon from "../svgs/SvgLinkTypeIcon.vue"
+import LinkTypeSelect from "./LinkTypeSelect.vue"
 
 export default defineComponent({
   props: {
@@ -50,11 +50,11 @@ export default defineComponent({
   emits: ["update:modelValue"],
   computed: {
     titlized() {
-      return startCase(camelCase(this.field));
+      return startCase(camelCase(this.field))
     },
     label() {
-      return this.modelValue ? this.modelValue : "default";
+      return this.modelValue ? this.modelValue : "default"
     },
   },
-});
+})
 </script>

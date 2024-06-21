@@ -17,14 +17,14 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
-import { bgcolors } from "../../../colors";
+import { computed } from "vue"
+import { bgcolors } from "../../../colors"
 
 const props = defineProps({
   linkRole: String,
   x: Number,
   y: Number,
   oheight: Number,
-});
-const fill = computed(() => bgcolors(props.linkRole));
+})
+const fill = computed(() => bgcolors(props.linkRole))
 </script>

@@ -48,34 +48,31 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, ref, watch } from "vue";
-import { ReviewPoint } from "@/generated/backend";
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import SvgNoReview from "../svgs/SvgNoReview.vue";
-import usePopups from "../commons/Popups/usePopups";
-import SvgSad from "../svgs/SvgSad.vue";
-import SvgHappy from "../svgs/SvgHappy.vue";
+import { ReviewPoint } from "@/generated/backend"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import { PropType, ref, watch } from "vue"
+import usePopups from "../commons/Popups/usePopups"
 
 const props = defineProps({
   modelValue: {
     type: Object as PropType<ReviewPoint>,
     required: true,
   },
-});
+})
 
-const emit = defineEmits(["update:modelValue"]);
+const emit = defineEmits(["update:modelValue"])
 
-const localReviewPoint = ref<ReviewPoint>(props.modelValue);
-const { managedApi } = useLoadingApi();
-const { popups } = usePopups();
+const localReviewPoint = ref<ReviewPoint>(props.modelValue)
+const { managedApi } = useLoadingApi()
+const { popups } = usePopups()
 
 watch(
   () => props.modelValue,
   (newVal) => {
-    localReviewPoint.value = newVal;
+    localReviewPoint.value = newVal
   },
   { immediate: true },
-);
+)
 
 const selfEvaluate = async (adjustment: number) => {
   const reviewPoint = await managedApi.restReviewPointController.selfEvaluate(
@@ -83,10 +80,10 @@ const selfEvaluate = async (adjustment: number) => {
     {
       adjustment,
     },
-  );
-  localReviewPoint.value = reviewPoint;
-  emit("update:modelValue", reviewPoint);
-};
+  )
+  localReviewPoint.value = reviewPoint
+  emit("update:modelValue", reviewPoint)
+}
 
 const removeFromReview = async () => {
   if (
@@ -94,13 +91,13 @@ const removeFromReview = async () => {
       `Confirm to hide this from reviewing in the future?`,
     ))
   ) {
-    return;
+    return
   }
   const reviewPoint =
     await managedApi.restReviewPointController.removeFromRepeating(
       localReviewPoint.value.id,
-    );
-  localReviewPoint.value = reviewPoint;
-  emit("update:modelValue", reviewPoint);
-};
+    )
+  localReviewPoint.value = reviewPoint
+  emit("update:modelValue", reviewPoint)
+}
 </script>

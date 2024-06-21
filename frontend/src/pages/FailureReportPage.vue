@@ -22,12 +22,12 @@
 </template>
 
 <script>
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import ContainerPage from "./commons/ContainerPage.vue";
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import ContainerPage from "./commons/ContainerPage.vue"
 
 export default {
   setup() {
-    return useLoadingApi();
+    return useLoadingApi()
   },
   props: { failureReportId: [String, Number] },
   components: { ContainerPage },
@@ -35,20 +35,20 @@ export default {
     return {
       failureReport: null,
       githubIssueUrl: null,
-    };
+    }
   },
   methods: {
     fetchData() {
       this.managedApi.restFailureReportController
         .show2(this.failureReportId)
         .then((res) => {
-          this.failureReport = res.failureReport;
-          this.githubIssueUrl = res.githubIssueUrl;
-        });
+          this.failureReport = res.failureReport
+          this.githubIssueUrl = res.githubIssueUrl
+        })
     },
   },
   mounted() {
-    this.fetchData();
+    this.fetchData()
   },
-};
+}
 </script>

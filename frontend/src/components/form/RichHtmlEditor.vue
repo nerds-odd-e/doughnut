@@ -12,10 +12,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { QuillEditor } from "@vueup/vue-quill";
+import { QuillEditor } from "@vueup/vue-quill"
+import { defineComponent } from "vue"
 
-import "quill/dist/quill.snow.css";
+import "quill/dist/quill.snow.css"
 
 export default defineComponent({
   props: {
@@ -50,25 +50,25 @@ export default defineComponent({
       },
       localValue: this.modelValue,
       hadFocus: false as boolean,
-    };
+    }
   },
   watch: {
     modelValue() {
-      this.localValue = this.modelValue;
+      this.localValue = this.modelValue
     },
   },
   methods: {
     onUpdateContent() {
       if (this.localValue === this.modelValue) {
-        return;
+        return
       }
-      this.$emit("update:modelValue", this.localValue);
+      this.$emit("update:modelValue", this.localValue)
     },
     onBlurTextField() {
-      this.$emit("blur");
+      this.$emit("blur")
     },
   },
-});
+})
 </script>
 
 <style lang="sass">

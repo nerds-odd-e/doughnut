@@ -47,18 +47,18 @@
 </template>
 
 <script lang="ts">
-import { PropType, defineComponent } from "vue";
-import { Circle, User } from "@/generated/backend";
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import ContentLoader from "@/components/commons/ContentLoader.vue";
-import PopButton from "@/components/commons/Popups/PopButton.vue";
-import CircleNewDialog from "@/components/circles/CircleNewDialog.vue";
-import BrandBar from "./BrandBar.vue";
-import ReviewButton from "./ReviewButton.vue";
+import CircleNewDialog from "@/components/circles/CircleNewDialog.vue"
+import ContentLoader from "@/components/commons/ContentLoader.vue"
+import PopButton from "@/components/commons/Popups/PopButton.vue"
+import { Circle, User } from "@/generated/backend"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import { PropType, defineComponent } from "vue"
+import BrandBar from "./BrandBar.vue"
+import ReviewButton from "./ReviewButton.vue"
 
 export default defineComponent({
   setup() {
-    return useLoadingApi();
+    return useLoadingApi()
   },
   props: {
     user: { type: Object as PropType<User> },
@@ -66,18 +66,18 @@ export default defineComponent({
   data() {
     return {
       circles: undefined as Circle[] | undefined,
-    };
+    }
   },
   emits: ["updateUser"],
   methods: {
     fetchData() {
       this.managedApi.restCircleController.index().then((res) => {
-        this.circles = res;
-      });
+        this.circles = res
+      })
     },
   },
   mounted() {
-    this.fetchData();
+    this.fetchData()
   },
   components: {
     PopButton,
@@ -86,7 +86,7 @@ export default defineComponent({
     BrandBar,
     ReviewButton,
   },
-});
+})
 </script>
 
 <style lang="scss" scoped>

@@ -1,6 +1,6 @@
-import { QuizQuestion } from "@/generated/backend";
-import Builder from "./Builder";
-import generateId from "./generateId";
+import { QuizQuestion } from "@/generated/backend"
+import Builder from "./Builder"
+import generateId from "./generateId"
 
 class QuizQuestionBuilder extends Builder<QuizQuestion> {
   quizQuestion: QuizQuestion = {
@@ -9,21 +9,21 @@ class QuizQuestionBuilder extends Builder<QuizQuestion> {
       stem: "answer",
       choices: [],
     },
-  };
+  }
 
   withQuestionStem(stem: string) {
-    this.quizQuestion.multipleChoicesQuestion.stem = stem;
-    return this;
+    this.quizQuestion.multipleChoicesQuestion.stem = stem
+    return this
   }
 
   withChoices(choices: string[]) {
-    this.quizQuestion.multipleChoicesQuestion.choices = [...choices];
-    return this;
+    this.quizQuestion.multipleChoicesQuestion.choices = [...choices]
+    return this
   }
 
   do(): QuizQuestion {
-    return this.quizQuestion;
+    return this.quizQuestion
   }
 }
 
-export default QuizQuestionBuilder;
+export default QuizQuestionBuilder

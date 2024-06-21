@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent } from "vue"
 
 export default defineComponent({
   props: {
@@ -17,21 +17,21 @@ export default defineComponent({
   },
   computed: {
     bgColor() {
-      const colorOld = [150, 150, 150];
-      const newColor = [208, 237, 23];
+      const colorOld = [150, 150, 150]
+      const newColor = [208, 237, 23]
       const ageInMillisecond = Math.max(
         0,
         /* eslint-disable  @typescript-eslint/no-non-null-assertion */
         Date.now() - new Date(this.updatedAt!).getTime(),
-      );
-      const max = 15; // equals to 225 hours
-      const index = Math.min(max, Math.sqrt(ageInMillisecond / 1000 / 60 / 60));
+      )
+      const max = 15 // equals to 225 hours
+      const index = Math.min(max, Math.sqrt(ageInMillisecond / 1000 / 60 / 60))
       return `rgb(${colorOld
         .map((oc, i) =>
           Math.round((oc * index + newColor[i]! * (max - index)) / max),
         )
-        .join(",")})`;
+        .join(",")})`
     },
   },
-});
+})
 </script>

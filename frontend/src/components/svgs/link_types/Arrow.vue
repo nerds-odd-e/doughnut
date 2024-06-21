@@ -10,5 +10,5 @@
 </template>
 
 <script setup>
-const props = defineProps({ x: String, flip: Boolean });
+const props = defineProps({ x: String, flip: Boolean })
 </script>

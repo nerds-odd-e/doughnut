@@ -2,9 +2,9 @@
 /// <reference types="../support" />
 // @ts-check
 
-import { Given, When, Then } from "@badeball/cypress-cucumber-preprocessor"
-import start from "../start"
+import { Given, Then, When } from "@badeball/cypress-cucumber-preprocessor"
 import { DataTable } from "@cucumber/cucumber"
+import start from "../start"
 
 Then("I do these initial reviews in sequence:", (data: DataTable) => {
   cy.initialReviewInSequence(data.hashes())
@@ -71,16 +71,22 @@ Then("I initial review {string}", (noteTopic) => {
   cy.initialReviewNotes(noteTopic)
 })
 
-Then("I added and learned one note {string} on day {int}", (noteTopic: string, day: number) => {
-  start.testability().injectNotes([{ topicConstructor: noteTopic }])
-  start.testability().backendTimeTravelTo(day, 8)
-  cy.initialReviewNotes(noteTopic)
-})
+Then(
+  "I added and learned one note {string} on day {int}",
+  (noteTopic: string, day: number) => {
+    start.testability().injectNotes([{ topicConstructor: noteTopic }])
+    start.testability().backendTimeTravelTo(day, 8)
+    cy.initialReviewNotes(noteTopic)
+  },
+)
 
-Then("I learned one note {string} on day {int}", (noteTopic: string, day: number) => {
-  start.testability().backendTimeTravelTo(day, 8)
-  cy.initialReviewNotes(noteTopic)
-})
+Then(
+  "I learned one note {string} on day {int}",
+  (noteTopic: string, day: number) => {
+    start.testability().backendTimeTravelTo(day, 8)
+    cy.initialReviewNotes(noteTopic)
+  },
+)
 
 Then("I am repeat-reviewing my old note on day {int}", (day: number) => {
   start.testability().backendTimeTravelTo(day, 8)
@@ -92,14 +98,17 @@ Then("I am learning new note on day {int}", (day: number) => {
   cy.routerToInitialReview()
 })
 
-Then("I set the level of {string} to be {int}", (noteTopic: string, level: number) => {
-  start.assumeNotePage(noteTopic)
-  cy.formField("Level").then(($control) => {
-    cy.wrap($control).within(() => {
-      cy.findByRole("button", { name: "" + level }).click()
+Then(
+  "I set the level of {string} to be {int}",
+  (noteTopic: string, level: number) => {
+    start.assumeNotePage(noteTopic)
+    cy.formField("Level").then(($control) => {
+      cy.wrap($control).within(() => {
+        cy.findByRole("button", { name: "" + level }).click()
+      })
     })
-  })
-})
+  },
+)
 
 Then("I have selected the choice {string}", (choice: string) => {
   cy.formField(choice).check()
@@ -156,9 +165,9 @@ Then("I should see that my answer {string} is incorrect", (answer) => {
 })
 
 Then("I should see the repetition is finished: {string}", (yesNo) => {
-  cy.findByText("You have finished all repetitions for this half a day!").should(
-    yesNo === "yes" ? "exist" : "not.exist",
-  )
+  cy.findByText(
+    "You have finished all repetitions for this half a day!",
+  ).should(yesNo === "yes" ? "exist" : "not.exist")
 })
 
 Then("The randomizer always choose the last", () => {
@@ -170,7 +179,10 @@ Then("I should see that my answer is correct", () => {
 })
 
 Then("I should see that my last answer is correct", () => {
-  start.assumeAnsweredQuestionPage().goToLastResult().expectLastAnswerToBeCorrect()
+  start
+    .assumeAnsweredQuestionPage()
+    .goToLastResult()
+    .expectLastAnswerToBeCorrect()
 })
 
 Then(
@@ -202,40 +214,61 @@ Then("the choice {string} should be incorrect", (choice: string) => {
 When(
   "I've got the following question for a note with topic {string}:",
   (noteTopic: string, question: DataTable) => {
-    start.stubOpenAIQuestionGenerationAndSeeTheQuestion(noteTopic, question.hashes()[0])
+    start.stubOpenAIQuestionGenerationAndSeeTheQuestion(
+      noteTopic,
+      question.hashes()[0],
+    )
   },
 )
 
-When("I have the true false question {string} rated as a good example", (questionStem: string) => {
-  start.testability().injectSuggestedQuestion(questionStem, true)
-})
+When(
+  "I have the true false question {string} rated as a good example",
+  (questionStem: string) => {
+    start.testability().injectSuggestedQuestion(questionStem, true)
+  },
+)
 
-When("I have the true false question {string} rated as a bad example", (questionStem: string) => {
-  start.testability().injectSuggestedQuestion(questionStem, false)
-})
+When(
+  "I have the true false question {string} rated as a bad example",
+  (questionStem: string) => {
+    start.testability().injectSuggestedQuestion(questionStem, false)
+  },
+)
 
 Then("I should be asked {string}", (expectedQuestionStem: string) => {
   start.assumeQuestionPage(expectedQuestionStem)
 })
 
-Then("I should see the question {string} is disabled", (questionStem: string) => {
-  start.assumeQuestionPage(questionStem).isDisabled()
-})
+Then(
+  "I should see the question {string} is disabled",
+  (questionStem: string) => {
+    start.assumeQuestionPage(questionStem).isDisabled()
+  },
+)
 
-Then("I should see the question {string} is enabled", (questionStem: string) => {
-  start.assumeQuestionPage(questionStem).isNotDisabled()
-})
+Then(
+  "I should see the question {string} is enabled",
+  (questionStem: string) => {
+    start.assumeQuestionPage(questionStem).isNotDisabled()
+  },
+)
 
-Then("I suggest the displayed question {string} as a good example", (questionStem: string) => {
-  start
-    .assumeQuestionPage(questionStem)
-    .suggestingThisQuestionForFineTuning()
-    .suggestingPositiveFeedbackForFineTuning()
-})
+Then(
+  "I suggest the displayed question {string} as a good example",
+  (questionStem: string) => {
+    start
+      .assumeQuestionPage(questionStem)
+      .suggestingThisQuestionForFineTuning()
+      .suggestingPositiveFeedbackForFineTuning()
+  },
+)
 
-Then("I suggest the displayed question {string} as a bad example", (questionStem: string) => {
-  start
-    .assumeQuestionPage(questionStem)
-    .suggestingThisQuestionForFineTuning()
-    .suggestingNegativeFeedbackFineTuningExclusion()
-})
+Then(
+  "I suggest the displayed question {string} as a bad example",
+  (questionStem: string) => {
+    start
+      .assumeQuestionPage(questionStem)
+      .suggestingThisQuestionForFineTuning()
+      .suggestingNegativeFeedbackFineTuningExclusion()
+  },
+)

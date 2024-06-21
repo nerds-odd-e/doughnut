@@ -54,27 +54,27 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import _ from "lodash";
 import {
   QuestionSuggestionParams,
   SuggestedQuestionForFineTuning,
-} from "@/generated/backend";
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import TextInput from "../form/TextInput.vue";
-import TextArea from "../form/TextArea.vue";
-import CheckInput from "../form/CheckInput.vue";
+} from "@/generated/backend"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import _ from "lodash"
+import { PropType, defineComponent } from "vue"
+import CheckInput from "../form/CheckInput.vue"
+import TextArea from "../form/TextArea.vue"
+import TextInput from "../form/TextInput.vue"
 
 const validateRealCorrectAnswers = (answers: string) => {
-  if (answers.length === 0) return true;
-  const numbers = answers.split(",");
-  return numbers.every((number) => Number.isInteger(Number(number)));
-};
+  if (answers.length === 0) return true
+  const numbers = answers.split(",")
+  return numbers.every((number) => Number.isInteger(Number(number)))
+}
 
 export default defineComponent({
   inheritAttrs: false,
   setup() {
-    return { ...useLoadingApi() };
+    return { ...useLoadingApi() }
   },
   props: {
     modelValue: {
@@ -94,49 +94,49 @@ export default defineComponent({
         },
         realCorrectAnswers: "",
       },
-    };
+    }
   },
   methods: {
     async suggestQuestionForFineTuning() {
-      const validated = this.validateSuggestedQuestion(this.suggestionParams);
-      if (!validated) return;
+      const validated = this.validateSuggestedQuestion(this.suggestionParams)
+      if (!validated) return
       const updated =
         await this.managedApi.restFineTuningDataController.updateSuggestedQuestionForFineTuning(
           this.modelValue.id,
           validated,
-        );
-      this.$emit("update:modelValue", updated);
+        )
+      this.$emit("update:modelValue", updated)
     },
     validateSuggestedQuestion(
       params: QuestionSuggestionParams,
     ): QuestionSuggestionParams | undefined {
-      const validated = _.cloneDeep(params);
+      const validated = _.cloneDeep(params)
       validated.preservedQuestion.multipleChoicesQuestion.choices =
         validated.preservedQuestion.multipleChoicesQuestion.choices
           .map((choice) => choice?.trim())
-          .filter((choice) => choice?.length > 0);
+          .filter((choice) => choice?.length > 0)
       if (
         validated.preservedQuestion.multipleChoicesQuestion.choices.length < 2
       ) {
         this.errors.preservedQuestion.choices[1] =
-          "At least 2 choices are required";
-        return undefined;
+          "At least 2 choices are required"
+        return undefined
       }
       if (
         validated.preservedQuestion.multipleChoicesQuestion.choices.length <=
         validated.preservedQuestion.correctChoiceIndex
       ) {
         this.errors.preservedQuestion.correctChoiceIndex =
-          "Correct choice index is out of range";
-        return undefined;
+          "Correct choice index is out of range"
+        return undefined
       }
       if (!validateRealCorrectAnswers(validated.realCorrectAnswers)) {
-        this.errors.realCorrectAnswers = "must be a number list";
-        return undefined;
+        this.errors.realCorrectAnswers = "must be a number list"
+        return undefined
       }
-      return validated;
+      return validated
     },
   },
   components: { TextInput, TextArea, CheckInput },
-});
+})
 </script>

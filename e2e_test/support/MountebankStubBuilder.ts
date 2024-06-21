@@ -1,21 +1,26 @@
 import {
+  FlexiPredicate,
+  HttpMethod,
+  Operator,
   Predicate,
   Response,
   Stub,
-  HttpMethod,
-  FlexiPredicate,
-  Operator,
 } from "@anev/ts-mountebank"
 /// <reference types="cypress" />
 
 // @ts-check
 
 class MountebankStubBuilder {
-  public stubWithPredicates(predicates: Predicate[], responses: unknown[]): Stub {
+  public stubWithPredicates(
+    predicates: Predicate[],
+    responses: unknown[],
+  ): Stub {
     const stub = new Stub()
     predicates.forEach((predicate) => stub.withPredicate(predicate))
     responses.forEach((response) =>
-      stub.withResponse(new Response().withStatusCode(200).withJSONBody(response)),
+      stub.withResponse(
+        new Response().withStatusCode(200).withJSONBody(response),
+      ),
     )
     return stub
   }
@@ -33,7 +38,9 @@ class MountebankStubBuilder {
           .withPath(pathMatcher)
           .withMethod(method),
       )
-      .withResponse(new Response().withStatusCode(status).withJSONBody(response))
+      .withResponse(
+        new Response().withStatusCode(status).withJSONBody(response),
+      )
   }
 }
 

@@ -21,8 +21,8 @@
 </template>
 
 <script lang="ts">
-import { PropType, defineComponent } from "vue";
-import SvgClose from "../svgs/SvgClose.vue";
+import { PropType, defineComponent } from "vue"
+import SvgClose from "../svgs/SvgClose.vue"
 
 export default defineComponent({
   props: {
@@ -32,18 +32,18 @@ export default defineComponent({
   components: { SvgClose },
   computed: {
     sidebarStyle() {
-      if (this.sidebar === "left") return "modal-sidebar modal-left";
-      if (this.sidebar === "right") return "modal-sidebar modal-right";
-      return "modal-container";
+      if (this.sidebar === "left") return "modal-sidebar modal-left"
+      if (this.sidebar === "right") return "modal-sidebar modal-right"
+      return "modal-container"
     },
   },
   watch: {
     // When the route changes, close the modal.
     $route() {
-      this.$emit("close_request");
+      this.$emit("close_request")
     },
   },
-});
+})
 </script>
 
 <style scoped lang="scss">

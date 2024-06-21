@@ -1,13 +1,13 @@
-import { ApiError } from "@/generated/backend";
-import { ApiRequestOptions } from "@/generated/backend/core/ApiRequestOptions";
-import { ApiResult } from "@/generated/backend/core/ApiResult";
-import Builder from "./Builder";
+import { ApiError } from "@/generated/backend"
+import { ApiRequestOptions } from "@/generated/backend/core/ApiRequestOptions"
+import { ApiResult } from "@/generated/backend/core/ApiResult"
+import Builder from "./Builder"
 
 class ApiErrorBuilder extends Builder<ApiError> {
   request: ApiRequestOptions = {
     url: "",
     method: "GET",
-  };
+  }
 
   response: ApiResult = {
     url: "",
@@ -15,44 +15,44 @@ class ApiErrorBuilder extends Builder<ApiError> {
     status: 404,
     statusText: "not found",
     body: "not found",
-  };
+  }
 
-  message: string = "not found";
+  message = "not found"
 
-  errors: Record<string, unknown> = {};
+  errors: Record<string, unknown> = {}
 
   of401() {
     this.response = {
       ...this.response,
       status: 401,
-    };
-    return this;
+    }
+    return this
   }
 
   ofBindingError(errors: Record<string, unknown>) {
-    this.errors = errors;
+    this.errors = errors
     this.response = {
       ...this.response,
       status: 400,
-    };
-    this.message = "bad request";
-    return this;
+    }
+    this.message = "bad request"
+    return this
   }
 
   error404(): ApiErrorBuilder {
     this.response = {
       ...this.response,
       status: 404,
-    };
-    return this;
+    }
+    return this
   }
 
   do() {
     return {
       ...new ApiError(this.request, this.response, this.message),
       ...this.errors,
-    };
+    }
   }
 }
 
-export default ApiErrorBuilder;
+export default ApiErrorBuilder

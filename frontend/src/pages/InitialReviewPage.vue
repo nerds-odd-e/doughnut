@@ -21,18 +21,15 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, ref, onMounted, computed } from "vue";
-import { useRouter } from "vue-router";
-import { Note } from "@/generated/backend";
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import timezoneParam from "@/managedApi/window/timezoneParam";
-import ProgressBar from "@/components/commons/ProgressBar.vue";
-import InitialReview from "@/components/review/InitialReview.vue";
-import { StorageAccessor } from "@/store/createNoteStorage";
-import ContainerPage from "./commons/ContainerPage.vue";
+import { Note } from "@/generated/backend"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import timezoneParam from "@/managedApi/window/timezoneParam"
+import { StorageAccessor } from "@/store/createNoteStorage"
+import { PropType, computed, onMounted, ref } from "vue"
+import { useRouter } from "vue-router"
 
-const router = useRouter();
-const { managedApi } = useLoadingApi();
+const router = useRouter()
+const { managedApi } = useLoadingApi()
 
 defineProps({
   minimized: Boolean,
@@ -40,43 +37,43 @@ defineProps({
     type: Object as PropType<StorageAccessor>,
     required: true,
   },
-});
-defineEmits(["update-reviewing"]);
+})
+defineEmits(["update-reviewing"])
 
-const finished = ref(0);
-const notes = ref([] as Note[]);
+const finished = ref(0)
+const notes = ref([] as Note[])
 
-const note = computed(() => notes.value[0]);
-const remainingInitialReviewCountForToday = computed(() => notes.value.length);
+const note = computed(() => notes.value[0])
+const remainingInitialReviewCountForToday = computed(() => notes.value.length)
 const resume = () => {
-  router.push({ name: "initial" });
-};
+  router.push({ name: "initial" })
+}
 const initialReviewDone = () => {
-  finished.value += 1;
-  notes.value.shift();
+  finished.value += 1
+  notes.value.shift()
   if (notes.value.length === 0) {
-    router.push({ name: "reviews" });
-    return;
+    router.push({ name: "reviews" })
+    return
   }
-};
+}
 
 const loadInitialReview = () => {
   managedApi.restReviewsController
     .initialReview(timezoneParam())
     .then((resp) => {
       if (resp.length === 0) {
-        router.push({ name: "reviews" });
-        return;
+        router.push({ name: "reviews" })
+        return
       }
-      notes.value = resp;
-    });
-};
+      notes.value = resp
+    })
+}
 
 onMounted(() => {
-  loadInitialReview();
-});
+  loadInitialReview()
+})
 
 const onReloadNeeded = () => {
-  loadInitialReview();
-};
+  loadInitialReview()
+}
 </script>

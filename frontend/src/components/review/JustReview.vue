@@ -13,15 +13,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import { StorageAccessor } from "@/store/createNoteStorage";
-import ReviewPointAsync from "./ReviewPointAsync.vue";
-import SelfEvaluateButtons from "./SelfEvaluateButtons.vue";
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import { StorageAccessor } from "@/store/createNoteStorage"
+import { PropType, defineComponent } from "vue"
+import ReviewPointAsync from "./ReviewPointAsync.vue"
+import SelfEvaluateButtons from "./SelfEvaluateButtons.vue"
 
 export default defineComponent({
   setup() {
-    return { ...useLoadingApi() };
+    return { ...useLoadingApi() }
   },
   props: {
     reviewPointId: Number,
@@ -38,14 +38,14 @@ export default defineComponent({
   methods: {
     async justReivew(successful: boolean) {
       if (this.reviewPointId === undefined) {
-        return;
+        return
       }
       await this.managedApi.restReviewPointController.markAsRepeated(
         this.reviewPointId,
         successful,
-      );
-      this.$emit("reviewed");
+      )
+      this.$emit("reviewed")
     },
   },
-});
+})
 </script>

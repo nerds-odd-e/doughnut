@@ -1,25 +1,25 @@
-import { describe, it, vi, beforeEach } from "vitest";
-import { flushPromises } from "@vue/test-utils";
-import Quiz from "@/components/review/Quiz.vue";
-import helper from "../helpers";
-import makeMe from "../fixtures/makeMe";
+import Quiz from "@/components/review/Quiz.vue"
+import { flushPromises } from "@vue/test-utils"
+import { beforeEach, describe, it, vi } from "vitest"
+import makeMe from "../fixtures/makeMe"
+import helper from "../helpers"
 
 describe("repeat page", () => {
-  const quizQuestion = makeMe.aQuizQuestionInNotebook.please();
-  const mockedRandomQuestionCall = vi.fn().mockResolvedValue(quizQuestion);
+  const quizQuestion = makeMe.aQuizQuestionInNotebook.please()
+  const mockedRandomQuestionCall = vi.fn().mockResolvedValue(quizQuestion)
 
   beforeEach(() => {
-    vi.resetAllMocks();
-    vi.useFakeTimers();
+    vi.resetAllMocks()
+    vi.useFakeTimers()
     helper.managedApi.restNoteController.show1 = vi
       .fn()
-      .mockResolvedValue(makeMe.aNote.please());
+      .mockResolvedValue(makeMe.aNote.please())
     helper.managedApi.restReviewPointController.show = vi
       .fn()
-      .mockResolvedValue(makeMe.aReviewPoint.please());
+      .mockResolvedValue(makeMe.aReviewPoint.please())
     helper.managedApi.silent.restReviewPointController.generateRandomQuestion =
-      mockedRandomQuestionCall;
-  });
+      mockedRandomQuestionCall
+  })
 
   const mountPage = async (reviewPoints: number[], eagerFetchCount: number) => {
     const wrapper = helper
@@ -29,29 +29,29 @@ describe("repeat page", () => {
         currentIndex: 0,
         eagerFetchCount,
       })
-      .mount();
-    await flushPromises();
-    return wrapper;
-  };
+      .mount()
+    await flushPromises()
+    return wrapper
+  }
 
   describe('repeat page with "just review" quiz', () => {
     it("fetch the first 1 question when mount", async () => {
-      await mountPage([1, 2, 3], 1);
-      expect(mockedRandomQuestionCall).toHaveBeenCalledWith(1);
-    });
+      await mountPage([1, 2, 3], 1)
+      expect(mockedRandomQuestionCall).toHaveBeenCalledWith(1)
+    })
 
     it("fetch the first 3 question when mount", async () => {
-      await mountPage([111, 222, 333, 444], 3);
-      expect(mockedRandomQuestionCall).nthCalledWith(1, 111);
-      expect(mockedRandomQuestionCall).nthCalledWith(2, 222);
-      expect(mockedRandomQuestionCall).nthCalledWith(3, 333);
-    });
+      await mountPage([111, 222, 333, 444], 3)
+      expect(mockedRandomQuestionCall).nthCalledWith(1, 111)
+      expect(mockedRandomQuestionCall).nthCalledWith(2, 222)
+      expect(mockedRandomQuestionCall).nthCalledWith(3, 333)
+    })
 
     it("does not fetch question 2 again after prefetched", async () => {
-      const wrapper = await mountPage([1, 2, 3, 4], 2);
-      expect(mockedRandomQuestionCall).toBeCalledTimes(2);
-      await wrapper.setProps({ currentIndex: 1 });
-      expect(mockedRandomQuestionCall).toHaveBeenCalledWith(3);
-    });
-  });
-});
+      const wrapper = await mountPage([1, 2, 3, 4], 2)
+      expect(mockedRandomQuestionCall).toBeCalledTimes(2)
+      await wrapper.setProps({ currentIndex: 1 })
+      expect(mockedRandomQuestionCall).toHaveBeenCalledWith(3)
+    })
+  })
+})

@@ -1,4 +1,4 @@
 export default () => {
-  const { timeZone } = Intl.DateTimeFormat().resolvedOptions();
-  return timeZone;
-};
+  const { timeZone } = Intl.DateTimeFormat().resolvedOptions()
+  return timeZone
+}

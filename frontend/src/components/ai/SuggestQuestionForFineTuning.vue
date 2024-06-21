@@ -39,33 +39,33 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from "vue";
 import {
   QuestionSuggestionCreationParams,
   QuizQuestion,
-} from "@/generated/backend";
-import useLoadingApi from "@/managedApi/useLoadingApi";
+} from "@/generated/backend"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import { ref } from "vue"
 
 const params = ref<QuestionSuggestionCreationParams>({
   isPositiveFeedback: false,
   comment: "",
-});
-const { managedApi } = useLoadingApi();
+})
+const { managedApi } = useLoadingApi()
 
 const props = defineProps<{
-  quizQuestion: QuizQuestion;
-}>();
+  quizQuestion: QuizQuestion
+}>()
 
-const emit = defineEmits(["closeDialog"]);
+const emit = defineEmits(["closeDialog"])
 
-const { quizQuestion } = props;
+const { quizQuestion } = props
 
 async function suggestQuestionForFineTuning() {
   await managedApi.restQuizQuestionController.suggestQuestionForFineTuning(
     quizQuestion.id,
     params.value,
-  );
-  emit("closeDialog");
+  )
+  emit("closeDialog")
 }
 </script>
 <style scoped>

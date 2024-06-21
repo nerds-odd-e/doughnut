@@ -38,19 +38,19 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import _ from "lodash";
-import { AnsweredQuestion } from "@/generated/backend";
-import getEnvironment from "@/managedApi/window/getEnvironment";
-import timezoneParam from "@/managedApi/window/timezoneParam";
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import Quiz from "@/components/review/Quiz.vue";
-import RepeatProgressBar from "@/components/review/RepeatProgressBar.vue";
-import { StorageAccessor } from "@/store/createNoteStorage";
+import Quiz from "@/components/review/Quiz.vue"
+import RepeatProgressBar from "@/components/review/RepeatProgressBar.vue"
+import { AnsweredQuestion } from "@/generated/backend"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import getEnvironment from "@/managedApi/window/getEnvironment"
+import timezoneParam from "@/managedApi/window/timezoneParam"
+import { StorageAccessor } from "@/store/createNoteStorage"
+import _ from "lodash"
+import { PropType, defineComponent } from "vue"
 
 export default defineComponent({
   setup() {
-    return useLoadingApi();
+    return useLoadingApi()
   },
   name: "RepeatPage",
   props: {
@@ -71,29 +71,29 @@ export default defineComponent({
       currentIndex: 0,
       previousResults: [] as (AnsweredQuestion | undefined)[],
       previousResultCursor: undefined as number | undefined,
-    };
+    }
   },
   computed: {
     currentResult() {
-      if (this.previousResultCursor === undefined) return undefined;
-      return this.previousResults[this.previousResultCursor];
+      if (this.previousResultCursor === undefined) return undefined
+      return this.previousResults[this.previousResultCursor]
     },
     finished() {
-      return this.previousResults.length;
+      return this.previousResults.length
     },
     toRepeatCount() {
-      return (this.toRepeat?.length ?? 0) - this.currentIndex;
+      return (this.toRepeat?.length ?? 0) - this.currentIndex
     },
   },
   methods: {
     viewLastResult(cursor: number | undefined) {
-      this.previousResultCursor = cursor;
+      this.previousResultCursor = cursor
       if (this.currentResult) {
-        const { answerId } = this.currentResult;
-        this.$router.push({ name: "repeat-answer", params: { answerId } });
-        return;
+        const { answerId } = this.currentResult
+        this.$router.push({ name: "repeat-answer", params: { answerId } })
+        return
       }
-      this.$router.push({ name: "repeat" });
+      this.$router.push({ name: "repeat" })
     },
 
     async loadMore(dueInDays?: number) {
@@ -102,27 +102,27 @@ export default defineComponent({
           timezoneParam(),
           dueInDays,
         )
-      ).toRepeat;
-      this.currentIndex = 0;
+      ).toRepeat
+      this.currentIndex = 0
       if (this.toRepeat?.length === 0) {
-        return;
+        return
       }
       if (getEnvironment() !== "testing") {
-        this.toRepeat = _.shuffle(this.toRepeat);
+        this.toRepeat = _.shuffle(this.toRepeat)
       }
     },
 
     onAnswered(answerResult?: AnsweredQuestion) {
-      this.currentIndex += 1;
-      this.previousResults.push(answerResult);
-      if (!answerResult) return;
+      this.currentIndex += 1
+      this.previousResults.push(answerResult)
+      if (!answerResult) return
       if (!answerResult.correct) {
-        this.viewLastResult(this.previousResults.length - 1);
+        this.viewLastResult(this.previousResults.length - 1)
       }
     },
   },
   async mounted() {
-    this.loadMore(0);
+    this.loadMore(0)
   },
-});
+})
 </script>

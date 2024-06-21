@@ -8,14 +8,14 @@
 </template>
 
 <script lang="ts">
-import { PropType, defineComponent } from "vue";
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import { NoteAccessory } from "@/generated/backend";
-import NoteAccessoryDisplay from "./NoteAccessoryDisplay.vue";
+import { NoteAccessory } from "@/generated/backend"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import { PropType, defineComponent } from "vue"
+import NoteAccessoryDisplay from "./NoteAccessoryDisplay.vue"
 
 export default defineComponent({
   setup() {
-    return useLoadingApi();
+    return useLoadingApi()
   },
   props: {
     noteId: { type: Number, required: true },
@@ -30,21 +30,21 @@ export default defineComponent({
   data() {
     return {
       noteAccessory: undefined as NoteAccessory | undefined,
-    };
+    }
   },
   watch: {
     updatedNoteAccessory() {
-      this.noteAccessory = this.updatedNoteAccessory;
+      this.noteAccessory = this.updatedNoteAccessory
     },
   },
   methods: {
     async fetchData() {
       this.noteAccessory =
-        await this.managedApi.restNoteController.showNoteAccessory(this.noteId);
+        await this.managedApi.restNoteController.showNoteAccessory(this.noteId)
     },
   },
   mounted() {
-    this.fetchData();
+    this.fetchData()
   },
-});
+})
 </script>

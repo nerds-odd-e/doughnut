@@ -21,20 +21,19 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from "vue";
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import { BazaarNotebook } from "@/generated/backend";
-import NoteTopicWithLink from "../notes/NoteTopicWithLink.vue";
-import usePopups from "../commons/Popups/usePopups";
+import { BazaarNotebook } from "@/generated/backend"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import { onMounted, ref } from "vue"
+import usePopups from "../commons/Popups/usePopups"
 
-const { managedApi } = useLoadingApi();
-const { popups } = usePopups();
+const { managedApi } = useLoadingApi()
+const { popups } = usePopups()
 
-const notebooks = ref<BazaarNotebook[] | undefined>(undefined);
+const notebooks = ref<BazaarNotebook[] | undefined>(undefined)
 
 const fetchData = async () => {
-  notebooks.value = await managedApi.restBazaarController.bazaar();
-};
+  notebooks.value = await managedApi.restBazaarController.bazaar()
+}
 
 const removeFromBazaar = async (bazaarNotebook: BazaarNotebook) => {
   if (
@@ -44,11 +43,11 @@ const removeFromBazaar = async (bazaarNotebook: BazaarNotebook) => {
   ) {
     notebooks.value = await managedApi.restBazaarController.removeFromBazaar(
       bazaarNotebook.id!,
-    );
+    )
   }
-};
+}
 
 onMounted(() => {
-  fetchData();
-});
+  fetchData()
+})
 </script>

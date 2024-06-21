@@ -13,10 +13,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import NoteNewDialog from "../NoteNewDialog.vue";
-import PopButton from "../../commons/Popups/PopButton.vue";
-import { StorageAccessor } from "../../../store/createNoteStorage";
+import { PropType, defineComponent } from "vue"
+import { StorageAccessor } from "../../../store/createNoteStorage"
+import PopButton from "../../commons/Popups/PopButton.vue"
+import NoteNewDialog from "../NoteNewDialog.vue"
 
 export default defineComponent({
   props: {
@@ -28,5 +28,5 @@ export default defineComponent({
     },
   },
   components: { PopButton, NoteNewDialog },
-});
+})
 </script>

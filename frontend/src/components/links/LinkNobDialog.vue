@@ -31,16 +31,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { LinkCreation, NoteTopic } from "@/generated/backend";
-import LinkTypeSelect from "./LinkTypeSelect.vue";
-import NoteTopicWithLink from "../notes/NoteTopicWithLink.vue";
-import usePopups from "../commons/Popups/usePopups";
-import { StorageAccessor } from "../../store/createNoteStorage";
+import { LinkCreation, NoteTopic } from "@/generated/backend"
+import { PropType, defineComponent } from "vue"
+import { StorageAccessor } from "../../store/createNoteStorage"
+import usePopups from "../commons/Popups/usePopups"
+import NoteTopicWithLink from "../notes/NoteTopicWithLink.vue"
+import LinkTypeSelect from "./LinkTypeSelect.vue"
 
 export default defineComponent({
   setup() {
-    return { ...usePopups() };
+    return { ...usePopups() }
   },
   props: {
     noteTopic: {
@@ -66,7 +66,7 @@ export default defineComponent({
         fromTargetPerspective: this.inverseIcon,
       } as LinkCreation,
       linkFormErrors: { linkType: undefined as string | undefined },
-    };
+    }
   },
 
   methods: {
@@ -76,11 +76,11 @@ export default defineComponent({
         .updateLink(this.noteTopic.id, this.formData)
         .then(() => this.$emit("closeDialog"))
         .catch((error) => {
-          this.linkFormErrors = error;
-        });
+          this.linkFormErrors = error
+        })
     },
   },
-});
+})
 </script>
 
 <style scoped>

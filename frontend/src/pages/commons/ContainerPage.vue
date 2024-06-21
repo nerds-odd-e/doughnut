@@ -12,10 +12,8 @@
 </template>
 
 <script setup>
-import ContentLoader from "@/components/commons/ContentLoader.vue";
-
 const props = defineProps({
   title: String,
   contentExists: Boolean,
-});
+})
 </script>

@@ -46,19 +46,18 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, computed, ref } from "vue";
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import { Note, QuizQuestionAndAnswer } from "@/generated/backend";
-import isMCQWithAnswerValid from "@/models/isMCQWithAnswerValid";
-import TextArea from "../form/TextArea.vue";
+import { Note, QuizQuestionAndAnswer } from "@/generated/backend"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import isMCQWithAnswerValid from "@/models/isMCQWithAnswerValid"
+import { PropType, computed, ref } from "vue"
 
-const { managedApi } = useLoadingApi();
+const { managedApi } = useLoadingApi()
 const props = defineProps({
   note: {
     type: Object as PropType<Note>,
     required: true,
   },
-});
+})
 
 const quizQuestionAndAnswer = ref<QuizQuestionAndAnswer>({
   correctAnswerIndex: 0,
@@ -68,63 +67,63 @@ const quizQuestionAndAnswer = ref<QuizQuestionAndAnswer>({
       choices: ["", ""],
     },
   },
-} as QuizQuestionAndAnswer);
+} as QuizQuestionAndAnswer)
 
-const minimumNumberOfChoices = 2;
-const maximumNumberOfChoices = 10;
+const minimumNumberOfChoices = 2
+const maximumNumberOfChoices = 10
 
-const emit = defineEmits(["close-dialog"]);
+const emit = defineEmits(["close-dialog"])
 
 const isValidQuestion = computed(() =>
   isMCQWithAnswerValid(quizQuestionAndAnswer.value),
-);
+)
 const multipleChoicesQuestion = computed(
   () => quizQuestionAndAnswer.value.quizQuestion.multipleChoicesQuestion,
-);
+)
 const dirty = computed(() => {
   for (let i = 0; i < multipleChoicesQuestion.value.choices.length; i += 1) {
     if (multipleChoicesQuestion.value.choices[i]) {
-      return true;
+      return true
     }
   }
   return (
     multipleChoicesQuestion.value.stem !== undefined &&
     multipleChoicesQuestion.value.stem.trim().length > 0
-  );
-});
+  )
+})
 
 const addChoice = () => {
   if (multipleChoicesQuestion.value.choices.length < maximumNumberOfChoices) {
-    multipleChoicesQuestion.value.choices.push("");
+    multipleChoicesQuestion.value.choices.push("")
   }
-};
+}
 
 const removeChoice = () => {
   if (multipleChoicesQuestion.value.choices.length > minimumNumberOfChoices) {
-    multipleChoicesQuestion.value.choices.pop();
+    multipleChoicesQuestion.value.choices.pop()
   }
-};
+}
 const submitQuestion = async () => {
-  const quizQuestion = quizQuestionAndAnswer.value;
+  const quizQuestion = quizQuestionAndAnswer.value
   const response =
     await managedApi.restQuizQuestionController.addQuestionManually(
       props.note.id,
       quizQuestion,
-    );
-  emit("close-dialog", response);
-};
+    )
+  emit("close-dialog", response)
+}
 const refineQuestion = async () => {
-  const quizQuestion = quizQuestionAndAnswer.value;
+  const quizQuestion = quizQuestionAndAnswer.value
   quizQuestionAndAnswer.value =
     await managedApi.restQuizQuestionController.refineQuestion(
       props.note.id,
       quizQuestion,
-    );
-};
+    )
+}
 const generateQuestionByAI = async () => {
   quizQuestionAndAnswer.value =
     await managedApi.restQuizQuestionController.generateAiQuestionWithoutSave(
       props.note.id,
-    );
-};
+    )
+}
 </script>

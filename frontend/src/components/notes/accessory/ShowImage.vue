@@ -33,21 +33,21 @@ const props = defineProps({
   noteImage: String,
   imageMask: String,
   opacity: Number,
-});
+})
 
 const createGroups = (arr, perGroup) => {
-  const numGroups = Math.ceil(arr.length / perGroup);
+  const numGroups = Math.ceil(arr.length / perGroup)
   return new Array(numGroups)
     .fill("")
-    .map((_, i) => arr.slice(i * perGroup, (i + 1) * perGroup));
-};
+    .map((_, i) => arr.slice(i * perGroup, (i + 1) * perGroup))
+}
 
 const getMasks = () => {
   return createGroups(props.imageMask.split(/\s+/), 4).map((arr, index) => {
-    const [x, y, width, height] = arr;
-    return { index, x, y, width, height };
-  });
-};
+    const [x, y, width, height] = arr
+    return { index, x, y, width, height }
+  })
+}
 </script>
 
 <style lang="sass" scoped>

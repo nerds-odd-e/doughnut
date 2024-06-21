@@ -27,13 +27,9 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, computed, ref } from "vue";
-import { AnsweredQuestion } from "@/generated/backend";
-import AnswerResult from "./AnswerResult.vue";
-import QuizQuestionComponent from "./QuizQuestion.vue";
-import { StorageAccessor } from "../../store/createNoteStorage";
-import NoteTopicComponent from "../notes/core/NoteTopicComponent.vue";
-import NoteWithBreadcrumb from "./NoteWithBreadcrumb.vue";
+import { AnsweredQuestion } from "@/generated/backend"
+import { PropType, computed, ref } from "vue"
+import { StorageAccessor } from "../../store/createNoteStorage"
 
 const props = defineProps({
   answeredQuestion: {
@@ -44,10 +40,10 @@ const props = defineProps({
     type: Object as PropType<StorageAccessor>,
     required: true,
   },
-});
+})
 
-const toggleReviewPoint = ref(false);
-const reviewPoint = computed(() => props.answeredQuestion?.reviewPoint);
+const toggleReviewPoint = ref(false)
+const reviewPoint = computed(() => props.answeredQuestion?.reviewPoint)
 </script>
 
 <style lang="sass" scoped>

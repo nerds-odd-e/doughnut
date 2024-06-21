@@ -18,10 +18,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import RichMarkdownEditor from "../../form/RichMarkdownEditor.vue";
-import { type StorageAccessor } from "../../../store/createNoteStorage";
-import TextContentWrapper from "./TextContentWrapper.vue";
+import { PropType, defineComponent } from "vue"
+import { type StorageAccessor } from "../../../store/createNoteStorage"
+import RichMarkdownEditor from "../../form/RichMarkdownEditor.vue"
+import TextContentWrapper from "./TextContentWrapper.vue"
 
 export default defineComponent({
   props: {
@@ -37,5 +37,5 @@ export default defineComponent({
     RichMarkdownEditor,
     TextContentWrapper,
   },
-});
+})
 </script>

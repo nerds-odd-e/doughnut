@@ -48,7 +48,5 @@
 </template>
 
 <script setup>
-import Object1 from "./Object1.vue";
-
-const props = defineProps({ ifInverse: { type: Number, default: 1 } });
+const props = defineProps({ ifInverse: { type: Number, default: 1 } })
 </script>

@@ -18,22 +18,22 @@
 </template>
 
 <script>
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import CheckInput from "@/components/form/CheckInput.vue";
-import TextInput from "../form/TextInput.vue";
+import CheckInput from "@/components/form/CheckInput.vue"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import TextInput from "../form/TextInput.vue"
 
 export default {
   setup() {
-    return useLoadingApi();
+    return useLoadingApi()
   },
   props: { notebook: Object },
   components: { CheckInput, TextInput },
   data() {
-    const { skipReviewEntirely, numberOfQuestionsInAssessment } = this.notebook;
+    const { skipReviewEntirely, numberOfQuestionsInAssessment } = this.notebook
     return {
       formData: { skipReviewEntirely, numberOfQuestionsInAssessment },
       errors: {},
-    };
+    }
   },
 
   methods: {
@@ -41,10 +41,10 @@ export default {
       this.managedApi.restNotebookController
         .update1(this.notebook.id, this.formData)
         .then(() => {
-          this.$router.push({ name: "notebooks" });
+          this.$router.push({ name: "notebooks" })
         })
-        .catch((err) => (this.errors = err));
+        .catch((err) => (this.errors = err))
     },
   },
-};
+}
 </script>

@@ -1,8 +1,8 @@
-import { mount } from "@vue/test-utils";
-import Modal from "@/components/commons/Modal.vue";
+import Modal from "@/components/commons/Modal.vue"
+import { mount } from "@vue/test-utils"
 
 describe("Modal", () => {
-  const Comp = Modal;
+  const Comp = Modal
   const TestComponent = {
     template: `
       <Modal @close_request="$emit('close_request')">
@@ -16,7 +16,7 @@ describe("Modal", () => {
     `,
     components: { Modal: Comp },
     emits: ["close_request"],
-  };
+  }
 
   const mountWithoutTeleport = () =>
     mount(TestComponent, {
@@ -25,18 +25,18 @@ describe("Modal", () => {
           Teleport: true, // Stub the Teleport component
         },
       },
-    });
+    })
 
   it("click on note when doing review", async () => {
-    const wrapper = mountWithoutTeleport();
-    expect(wrapper.find(".close-button").exists()).toBe(true);
-    await wrapper.find(".close-button").trigger("click");
-    expect(wrapper.emitted().close_request).toHaveLength(1);
-  });
+    const wrapper = mountWithoutTeleport()
+    expect(wrapper.find(".close-button").exists()).toBe(true)
+    await wrapper.find(".close-button").trigger("click")
+    expect(wrapper.emitted().close_request).toHaveLength(1)
+  })
 
   it("click on note when doing review", async () => {
-    const wrapper = mountWithoutTeleport();
-    await wrapper.find(".modal-wrapper").trigger("mousedown");
-    expect(wrapper.emitted().close_request).toHaveLength(1);
-  });
-});
+    const wrapper = mountWithoutTeleport()
+    await wrapper.find(".modal-wrapper").trigger("mousedown")
+    expect(wrapper.emitted().close_request).toHaveLength(1)
+  })
+})

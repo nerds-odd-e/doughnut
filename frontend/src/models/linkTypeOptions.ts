@@ -1,8 +1,8 @@
-import { NoteTopic } from "@/generated/backend";
+import { NoteTopic } from "@/generated/backend"
 
 interface LinkTypeOption {
-  label: NoteTopic.linkType;
-  reversedLabel: string;
+  label: NoteTopic.linkType
+  reversedLabel: string
 }
 
 const linkTypeOptions = [
@@ -66,12 +66,12 @@ const linkTypeOptions = [
     reversedLabel: "confused with",
     label: "confused with",
   },
-] as LinkTypeOption[];
+] as LinkTypeOption[]
 
 const reverseLabel = (lbl) => {
-  const linkType = linkTypeOptions.find(({ label }) => lbl === label);
-  if (linkType) return linkType.reversedLabel;
-  return "*unknown link type*";
-};
+  const linkType = linkTypeOptions.find(({ label }) => lbl === label)
+  if (linkType) return linkType.reversedLabel
+  return "*unknown link type*"
+}
 
-export { linkTypeOptions, reverseLabel };
+export { linkTypeOptions, reverseLabel }

@@ -9,10 +9,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, readonly } from "vue";
-import "quill/dist/quill.snow.css";
-import RichHtmlEditor from "./RichHtmlEditor.vue";
-import markdownizer from "./markdownizer";
+import { defineComponent } from "vue"
+import "quill/dist/quill.snow.css"
+import RichHtmlEditor from "./RichHtmlEditor.vue"
+import markdownizer from "./markdownizer"
 
 export default defineComponent({
   props: {
@@ -30,14 +30,14 @@ export default defineComponent({
   },
   computed: {
     htmlValue() {
-      return markdownizer.markdownToHtml(this.modelValue);
+      return markdownizer.markdownToHtml(this.modelValue)
     },
   },
   methods: {
     htmlValueUpdated(htmlValue) {
-      const markdownValue = markdownizer.htmlToMarkdown(htmlValue);
-      this.$emit("update:modelValue", markdownValue);
+      const markdownValue = markdownizer.htmlToMarkdown(htmlValue)
+      this.$emit("update:modelValue", markdownValue)
     },
   },
-});
+})
 </script>

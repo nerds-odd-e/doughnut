@@ -1,14 +1,14 @@
-import { CircleForUserView, Notebook } from "@/generated/backend";
-import Builder from "./Builder";
-import generateId from "./generateId";
-import NotebooksBuilder from "./BazaarNotebooksBuilder";
+import { CircleForUserView, Notebook } from "@/generated/backend"
+import NotebooksBuilder from "./BazaarNotebooksBuilder"
+import Builder from "./Builder"
+import generateId from "./generateId"
 
 class CircleNoteBuilder extends Builder<CircleForUserView> {
-  notebooksBuilder: NotebooksBuilder = new NotebooksBuilder();
+  notebooksBuilder: NotebooksBuilder = new NotebooksBuilder()
 
   notebooks(notebook: Notebook) {
-    this.notebooksBuilder.notebooks(notebook);
-    return this;
+    this.notebooksBuilder.notebooks(notebook)
+    return this
   }
 
   do(): CircleForUserView {
@@ -22,8 +22,8 @@ class CircleNoteBuilder extends Builder<CircleForUserView> {
           .map((bazaarNotebook) => bazaarNotebook.notebook),
       },
       members: [],
-    };
+    }
   }
 }
 
-export default CircleNoteBuilder;
+export default CircleNoteBuilder

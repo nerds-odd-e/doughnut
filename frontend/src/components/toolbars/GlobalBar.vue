@@ -39,13 +39,10 @@
 </template>
 
 <script setup lang="ts">
-import { PropType } from "vue";
-import { User } from "@/generated/backend";
-import { type ApiStatus } from "@/managedApi/ManagedApi";
-import { StorageAccessor } from "@/store/createNoteStorage";
-import PopButton from "@/components/commons/Popups/PopButton.vue";
-import SvgSidebar from "@/components/svgs/SvgSidebar.vue";
-import GlobalSidebar from "./GlobalSidebar.vue";
+import { User } from "@/generated/backend"
+import { type ApiStatus } from "@/managedApi/ManagedApi"
+import { StorageAccessor } from "@/store/createNoteStorage"
+import { PropType } from "vue"
 
 defineProps({
   storageAccessor: {
@@ -54,8 +51,8 @@ defineProps({
   },
   apiStatus: { type: Object as PropType<ApiStatus>, required: true },
   user: { type: Object as PropType<User> },
-});
-defineEmits(["updateUser", "clearErrorMessage"]);
+})
+defineEmits(["updateUser", "clearErrorMessage"])
 </script>
 
 <style scoped lang="scss">

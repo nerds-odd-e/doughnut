@@ -2,12 +2,20 @@
 /// <reference types="../support" />
 // @ts-check
 
-import { DataTable, Given, Then, When } from "@badeball/cypress-cucumber-preprocessor"
+import {
+  DataTable,
+  Given,
+  Then,
+  When,
+} from "@badeball/cypress-cucumber-preprocessor"
 import start, { mock_services } from "../start"
 
-When("I associate the note {string} with wikidata id {string}", (topic: string, wikiID: string) => {
-  start.jumpToNotePage(topic).wikidataOptions().associate(wikiID)
-})
+When(
+  "I associate the note {string} with wikidata id {string}",
+  (topic: string, wikiID: string) => {
+    start.jumpToNotePage(topic).wikidataOptions().associate(wikiID)
+  },
+)
 
 When(
   "I change the note {string} to associate with wikidata id {string}",
@@ -16,34 +24,46 @@ When(
   },
 )
 
-When("I need to confirm the association with different label {string}", (wikidataTitle: string) => {
-  cy.findAllByText(wikidataTitle).should("exist")
-  cy.findByRole("button", { name: "Confirm" }).click()
-  start.assumeNotePage().wikidataOptions().hasAssociation()
-})
+When(
+  "I need to confirm the association with different label {string}",
+  (wikidataTitle: string) => {
+    cy.findAllByText(wikidataTitle).should("exist")
+    cy.findByRole("button", { name: "Confirm" }).click()
+    start.assumeNotePage().wikidataOptions().hasAssociation()
+  },
+)
 
-Then("I don't need to confirm the association with different label {string}", () => {
-  start.assumeNotePage().wikidataOptions().hasAssociation()
-})
+Then(
+  "I don't need to confirm the association with different label {string}",
+  () => {
+    start.assumeNotePage().wikidataOptions().hasAssociation()
+  },
+)
 
 Given(
   "Wikidata.org has an entity {string} with label {string} and link to wikipedia {string}",
   (wikidataId: string, wikidataTitle: string, wikipediaLink: string) => {
-    mock_services.wikidata().stubWikidataEntityQuery(wikidataId, wikidataTitle, wikipediaLink)
+    mock_services
+      .wikidata()
+      .stubWikidataEntityQuery(wikidataId, wikidataTitle, wikipediaLink)
   },
 )
 
 Given(
   "Wikidata.org has an entity {string} with label {string}",
   (wikidataId: string, wikidataTitle: string) => {
-    mock_services.wikidata().stubWikidataEntityQuery(wikidataId, wikidataTitle, undefined)
+    mock_services
+      .wikidata()
+      .stubWikidataEntityQuery(wikidataId, wikidataTitle, undefined)
   },
 )
 
 Given(
   "Wikidata.org entity {string} is a person from {string} and birthday is {string}",
   (wikidataId: string, countryId: string, birthday: string) => {
-    mock_services.wikidata().stubWikidataEntityPerson(wikidataId, countryId, birthday)
+    mock_services
+      .wikidata()
+      .stubWikidataEntityPerson(wikidataId, countryId, birthday)
   },
 )
 
@@ -58,9 +78,12 @@ Given("The wikidata service is not available", () => {
   // The service should be mocked, but no stubbing is done
 })
 
-Then("I should see an error {string} on {string}", (message: string, field: string) => {
-  cy.expectFieldErrorMessage(field, message)
-})
+Then(
+  "I should see an error {string} on {string}",
+  (message: string, field: string) => {
+    cy.expectFieldErrorMessage(field, message)
+  },
+)
 
 Then(
   "the Wiki association of note {string} should link to {string}",
@@ -85,13 +108,19 @@ When("I search with topic {string} on Wikidata", (topic: string) => {
   cy.findByRole("button", { name: "Wikidata Id" }).click()
 })
 
-When("I select wikidataID {string} from the Wikidata search result", (wikidataID: string) => {
-  cy.get('select[name="wikidataSearchResult"]').select(wikidataID)
-})
+When(
+  "I select wikidataID {string} from the Wikidata search result",
+  (wikidataID: string) => {
+    cy.get('select[name="wikidataSearchResult"]').select(wikidataID)
+  },
+)
 
-Then("I should see that the {string} becomes {string}", (field: string, value: string) => {
-  cy.formField(field).fieldShouldHaveValue(value)
-})
+Then(
+  "I should see that the {string} becomes {string}",
+  (field: string, value: string) => {
+    cy.formField(field).fieldShouldHaveValue(value)
+  },
+)
 
 Then(
   "a map pointing to lat: {string}, lon: {string} is added to the note",

@@ -7,32 +7,32 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { NoteInfo } from "@/generated/backend";
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import NoteInfoComponent from "./NoteInfoComponent.vue";
+import { NoteInfo } from "@/generated/backend"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import { defineComponent } from "vue"
+import NoteInfoComponent from "./NoteInfoComponent.vue"
 
 export default defineComponent({
   setup() {
-    return useLoadingApi();
+    return useLoadingApi()
   },
   props: { noteId: { type: Number, required: true } },
   emits: ["levelChanged"],
   components: { NoteInfoComponent },
   data() {
-    return { noteInfo: undefined as undefined | NoteInfo };
+    return { noteInfo: undefined as undefined | NoteInfo }
   },
   methods: {
     fetchData() {
       this.managedApi.restNoteController
         .getNoteInfo(this.noteId)
         .then((articles) => {
-          this.noteInfo = articles;
-        });
+          this.noteInfo = articles
+        })
     },
   },
   mounted() {
-    this.fetchData();
+    this.fetchData()
   },
-});
+})
 </script>

@@ -16,15 +16,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { AudioUploadDTO } from "@/generated/backend";
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import NoteUploadAudioForm from "./NoteUploadAudioForm.vue";
-import TextArea from "../../form/TextArea.vue";
+import { AudioUploadDTO } from "@/generated/backend"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import { defineComponent } from "vue"
+import TextArea from "../../form/TextArea.vue"
+import NoteUploadAudioForm from "./NoteUploadAudioForm.vue"
 
 export default defineComponent({
   setup() {
-    return { ...useLoadingApi() };
+    return { ...useLoadingApi() }
   },
   components: {
     NoteUploadAudioForm,
@@ -39,7 +39,7 @@ export default defineComponent({
       formData: {} as AudioUploadDTO,
       noteFormErrors: {},
       convertedSrt: "",
-    };
+    }
   },
 
   methods: {
@@ -48,24 +48,24 @@ export default defineComponent({
         const na = await this.managedApi.restNoteController.uploadAudio(
           this.noteId,
           this.formData,
-        );
-        this.$emit("closeDialog", na);
+        )
+        this.$emit("closeDialog", na)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
-        this.noteFormErrors = error;
+        this.noteFormErrors = error
       }
     },
     async convertToSRT() {
       try {
         const response = await this.managedApi.restAiAudioController.convertSrt(
           this.formData,
-        );
-        this.convertedSrt = response.srt;
+        )
+        this.convertedSrt = response.srt
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
-        this.noteFormErrors = error;
+        this.noteFormErrors = error
       }
     },
   },
-});
+})
 </script>

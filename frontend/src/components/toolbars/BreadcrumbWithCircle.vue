@@ -29,9 +29,8 @@
 </template>
 
 <script setup lang="ts">
-import { PropType } from "vue";
-import { NoteTopic, Circle } from "@/generated/backend";
-import Breadcrumb from "./Breadcrumb.vue";
+import { Circle, NoteTopic } from "@/generated/backend"
+import { PropType } from "vue"
 
 defineProps({
   noteTopic: {
@@ -46,5 +45,5 @@ defineProps({
     type: Boolean,
     required: false,
   },
-});
+})
 </script>

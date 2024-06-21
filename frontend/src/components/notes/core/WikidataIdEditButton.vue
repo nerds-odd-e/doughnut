@@ -14,12 +14,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { StorageAccessor } from "@/store/createNoteStorage";
-import { Note } from "@/generated/backend";
-import SvgWikidata from "../../svgs/SvgWikidata.vue";
-import WikidataAssociationDialog from "../WikidataAssociationDialog.vue";
-import PopButton from "../../commons/Popups/PopButton.vue";
+import { Note } from "@/generated/backend"
+import { StorageAccessor } from "@/store/createNoteStorage"
+import { PropType, defineComponent } from "vue"
+import PopButton from "../../commons/Popups/PopButton.vue"
+import SvgWikidata from "../../svgs/SvgWikidata.vue"
+import WikidataAssociationDialog from "../WikidataAssociationDialog.vue"
 
 export default defineComponent({
   props: {
@@ -38,5 +38,5 @@ export default defineComponent({
     WikidataAssociationDialog,
     PopButton,
   },
-});
+})
 </script>

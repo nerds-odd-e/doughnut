@@ -16,16 +16,16 @@
 </template>
 
 <script>
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import SvgUnsubscribe from "../svgs/SvgUnsubscribe.vue";
-import usePopups from "../commons/Popups/usePopups";
-import PopButton from "../commons/Popups/PopButton.vue";
-import SvgEdit from "../svgs/SvgEdit.vue";
-import SubscriptionEditDialog from "./SubscriptionEditDialog.vue";
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import PopButton from "../commons/Popups/PopButton.vue"
+import usePopups from "../commons/Popups/usePopups"
+import SvgEdit from "../svgs/SvgEdit.vue"
+import SvgUnsubscribe from "../svgs/SvgUnsubscribe.vue"
+import SubscriptionEditDialog from "./SubscriptionEditDialog.vue"
 
 export default {
   setup() {
-    return { ...useLoadingApi(), ...usePopups() };
+    return { ...useLoadingApi(), ...usePopups() }
   },
   props: { subscription: Object },
   emits: ["updated"],
@@ -38,10 +38,10 @@ export default {
         this.managedApi.restSubscriptionController
           .delete(this.subscription.id)
           .then(() => {
-            this.$emit("updated");
-          });
+            this.$emit("updated")
+          })
       }
     },
   },
-};
+}
 </script>

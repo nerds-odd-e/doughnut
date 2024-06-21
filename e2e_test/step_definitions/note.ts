@@ -4,10 +4,10 @@
 
 import {
   DataTable,
-  defineParameterType,
   Given,
   Then,
   When,
+  defineParameterType,
 } from "@badeball/cypress-cucumber-preprocessor"
 import NotePath from "../support/NotePath"
 import "../support/string_util"
@@ -40,19 +40,24 @@ Given(
   },
 )
 
-Given("there are notes from Note {int} to Note {int}", (from: number, to: number) => {
-  const notes = Array(to - from + 1)
-    .fill(0)
-    .map((_, i) => {
-      return { topicConstructor: `Note ${i + from}` }
-    })
-  start.testability().injectNotes(notes)
-})
+Given(
+  "there are notes from Note {int} to Note {int}",
+  (from: number, to: number) => {
+    const notes = Array(to - from + 1)
+      .fill(0)
+      .map((_, i) => {
+        return { topicConstructor: `Note ${i + from}` }
+      })
+    start.testability().injectNotes(notes)
+  },
+)
 
 Given(
   "I add the following question for the note {string}:",
   (noteTopic: string, data: DataTable) => {
-    expect(data.hashes().length, "please add one question at a time.").to.equal(1)
+    expect(data.hashes().length, "please add one question at a time.").to.equal(
+      1,
+    )
     start.jumpToNotePage(noteTopic).addQuestion(data.hashes()[0]!)
   },
 )
@@ -60,7 +65,9 @@ Given(
 Given(
   "I refine the following question for the note {string}:",
   (noteTopic: string, data: DataTable) => {
-    expect(data.hashes().length, "please add one question at a time.").to.equal(1)
+    expect(data.hashes().length, "please add one question at a time.").to.equal(
+      1,
+    )
     start.jumpToNotePage(noteTopic).refineQuestion(data.hashes()[0]!)
   },
 )
@@ -73,17 +80,23 @@ When("I create a notebook with empty topic", () => {
   start.routerToNotebooksPage().creatingNotebook("")
 })
 
-When("I update note {string} to become:", (noteTopic: string, data: DataTable) => {
-  start.jumpToNotePage(noteTopic)
-  cy.inPlaceEdit(data.hashes()[0])
-})
+When(
+  "I update note {string} to become:",
+  (noteTopic: string, data: DataTable) => {
+    start.jumpToNotePage(noteTopic)
+    cy.inPlaceEdit(data.hashes()[0])
+  },
+)
 
-When("I update note accessories of {string} to become:", (noteTopic: string, data: DataTable) => {
-  start
-    .jumpToNotePage(noteTopic)
-    .updateNoteImage(data.hashes()[0]!)
-    .updateNoteUrl(data.hashes()[0]!)
-})
+When(
+  "I update note accessories of {string} to become:",
+  (noteTopic: string, data: DataTable) => {
+    start
+      .jumpToNotePage(noteTopic)
+      .updateNoteImage(data.hashes()[0]!)
+      .updateNoteUrl(data.hashes()[0]!)
+  },
+)
 
 When(
   "I upload an audio-file {string} to the note {string}",
@@ -121,11 +134,14 @@ When(
   },
 )
 
-When("I can change the topic {string} to {string}", (noteTopic: string, newNoteTopic: string) => {
-  start.assumeNotePage(noteTopic)
-  cy.inPlaceEdit({ topic: newNoteTopic })
-  start.assumeNotePage(newNoteTopic)
-})
+When(
+  "I can change the topic {string} to {string}",
+  (noteTopic: string, newNoteTopic: string) => {
+    start.assumeNotePage(noteTopic)
+    cy.inPlaceEdit({ topic: newNoteTopic })
+    start.assumeNotePage(newNoteTopic)
+  },
+)
 
 Given(
   "I update note topic {string} to become {string}",
@@ -143,16 +159,25 @@ Given(
   },
 )
 
-When("I update note {string} with details {string}", (noteTopic: string, newDetails: string) => {
-  start.jumpToNotePage(noteTopic)
-  cy.inPlaceEdit({ Details: newDetails })
-  start.assumeNotePage().findNoteDetails(newDetails)
-})
+When(
+  "I update note {string} with details {string}",
+  (noteTopic: string, newDetails: string) => {
+    start.jumpToNotePage(noteTopic)
+    cy.inPlaceEdit({ Details: newDetails })
+    start.assumeNotePage().findNoteDetails(newDetails)
+  },
+)
 
-When("I create a note belonging to {string}:", (noteTopic: string, data: DataTable) => {
-  expect(data.hashes().length).to.equal(1)
-  start.jumpToNotePage(noteTopic).addingChildNote().createNoteWithAttributes(data.hashes()[0]!)
-})
+When(
+  "I create a note belonging to {string}:",
+  (noteTopic: string, data: DataTable) => {
+    expect(data.hashes().length).to.equal(1)
+    start
+      .jumpToNotePage(noteTopic)
+      .addingChildNote()
+      .createNoteWithAttributes(data.hashes()[0]!)
+  },
+)
 
 When("I am creating a note under {notepath}", (notePath: NotePath) => {
   start.routerToNotebooksPage().navigateToPath(notePath).addingChildNote()
@@ -175,18 +200,27 @@ Then(
   },
 )
 
-Then("I should see {notepath} with these children", (notePath: NotePath, data: DataTable) => {
-  start.routerToNotebooksPage().navigateToPath(notePath).expectChildren(data.hashes())
-})
+Then(
+  "I should see {notepath} with these children",
+  (notePath: NotePath, data: DataTable) => {
+    start
+      .routerToNotebooksPage()
+      .navigateToPath(notePath)
+      .expectChildren(data.hashes())
+  },
+)
 
 When("I delete notebook {string}", (noteTopic: string) => {
   start.jumpToNotePage(noteTopic).deleteNote()
 })
 
-When("I delete note {string} at {int}:00", (noteTopic: string, hour: number) => {
-  start.testability().backendTimeTravelTo(0, hour)
-  start.jumpToNotePage(noteTopic).deleteNote()
-})
+When(
+  "I delete note {string} at {int}:00",
+  (noteTopic: string, hour: number) => {
+    start.testability().backendTimeTravelTo(0, hour)
+    start.jumpToNotePage(noteTopic).deleteNote()
+  },
+)
 
 When("I delete note {string}", (noteTopic: string) => {
   start.jumpToNotePage(noteTopic).deleteNote()
@@ -197,16 +231,22 @@ When("I should see that the note creation is not successful", () => {
   cy.dismissLastErrorMessage()
 })
 
-Then("I should see the note {string} is marked as deleted", (noteTopic: string) => {
-  start.jumpToNotePage(noteTopic)
-  cy.findByText("This note has been deleted")
-})
+Then(
+  "I should see the note {string} is marked as deleted",
+  (noteTopic: string) => {
+    start.jumpToNotePage(noteTopic)
+    cy.findByText("This note has been deleted")
+  },
+)
 
-Then("I should not see note {string} at the top level of all my notes", (noteTopic: string) => {
-  cy.pageIsNotLoading()
-  cy.findByText("Notebooks")
-  cy.get("main").within(() => cy.findCardTitle(noteTopic).should("not.exist"))
-})
+Then(
+  "I should not see note {string} at the top level of all my notes",
+  (noteTopic: string) => {
+    cy.pageIsNotLoading()
+    cy.findByText("Notebooks")
+    cy.get("main").within(() => cy.findCardTitle(noteTopic).should("not.exist"))
+  },
+)
 
 When("I navigate to {notepath} note", (notePath: NotePath) => {
   start.routerToNotebooksPage().navigateToPath(notePath)
@@ -246,21 +286,27 @@ When(
 )
 
 // This step definition is for demo purpose
-Then("*for demo* I should see there are {int} descendants", (numberOfDescendants: number) => {
-  cy.findByText("" + numberOfDescendants, {
-    selector: ".descendant-counter",
-  })
-})
+Then(
+  "*for demo* I should see there are {int} descendants",
+  (numberOfDescendants: number) => {
+    cy.findByText("" + numberOfDescendants, {
+      selector: ".descendant-counter",
+    })
+  },
+)
 
-When("I should be asked to log in again when I click the link {string}", (noteTopic: string) => {
-  cy.on("uncaught:exception", () => {
-    return false
-  })
-  cy.get("main").within(() => {
-    cy.findCardTitle(noteTopic).click()
-  })
-  cy.get("#username").should("exist")
-})
+When(
+  "I should be asked to log in again when I click the link {string}",
+  (noteTopic: string) => {
+    cy.on("uncaught:exception", () => {
+      return false
+    })
+    cy.get("main").within(() => {
+      cy.findCardTitle(noteTopic).click()
+    })
+    cy.get("#username").should("exist")
+  },
+)
 
 Then(
   "I should see {string} is {string} than {string}",
@@ -276,7 +322,9 @@ Then(
       .invoke("css", "color")
       .then((val) => {
         const leftColorIndex = parseInt(leftColor.match(/\d+/)[0])
-        const rightColorIndex = parseInt(JSON.stringify(val).match(/\d+/)?.[0] ?? "")
+        const rightColorIndex = parseInt(
+          JSON.stringify(val).match(/\d+/)?.[0] ?? "",
+        )
         if (aging === "newer") {
           expect(leftColorIndex).to.greaterThan(rightColorIndex)
         } else {
@@ -294,9 +342,12 @@ When("I undo {string} again", (undoType: string) => {
   cy.undoLast(undoType)
 })
 
-Then("the deleted notebook with topic {string} should be restored", (topic: string) => {
-  start.assumeNotePage(topic)
-})
+Then(
+  "the deleted notebook with topic {string} should be restored",
+  (topic: string) => {
+    start.assumeNotePage(topic)
+  },
+)
 
 Then("there should be no more undo to do", () => {
   cy.get('.btn[title="undo"]').should("not.exist")
@@ -306,9 +357,12 @@ Then("I type {string} in the topic", (content: string) => {
   cy.focused().clear().type(content)
 })
 
-Then("the note details on the current page should be {string}", (detailsText: string) => {
-  start.assumeNotePage().findNoteDetails(detailsText)
-})
+Then(
+  "the note details on the current page should be {string}",
+  (detailsText: string) => {
+    start.assumeNotePage().findNoteDetails(detailsText)
+  },
+)
 
 When("I generate an image for {string}", (noteTopic: string) => {
   start.jumpToNotePage(noteTopic).aiGenerateImage()
@@ -318,17 +372,23 @@ Then("I should find an art created by the ai", () => {
   cy.get("img.ai-art").should("be.visible")
 })
 
-Given("I request to complete the details for the note {string}", (noteTopic: string) => {
-  start.jumpToNotePage(noteTopic).aiSuggestDetailsForNote()
-})
+Given(
+  "I request to complete the details for the note {string}",
+  (noteTopic: string) => {
+    start.jumpToNotePage(noteTopic).aiSuggestDetailsForNote()
+  },
+)
 
-Then("I should see a notification of OpenAI service unavailability in the controller bar", () => {
-  cy.get(".last-error-message")
-    .should((elem) => {
-      expect(elem.text()).to.equal("The OpenAI request was not Authorized.")
-    })
-    .click()
-})
+Then(
+  "I should see a notification of OpenAI service unavailability in the controller bar",
+  () => {
+    cy.get(".last-error-message")
+      .should((elem) => {
+        expect(elem.text()).to.equal("The OpenAI request was not Authorized.")
+      })
+      .click()
+  },
+)
 
 When("I start to chat about the note {string}", (noteTopic: string) => {
   start.jumpToNotePage(noteTopic).chatAboutNote()
@@ -341,9 +401,12 @@ When(
   },
 )
 
-When('I respond with "cancel" to the clarifying question {string}', (question: string) => {
-  start.assumeClarifyingQuestionDialog(question).close()
-})
+When(
+  'I respond with "cancel" to the clarifying question {string}',
+  (question: string) => {
+    start.assumeClarifyingQuestionDialog(question).close()
+  },
+)
 
 When("I should see a follow-up question {string}", (question: string) => {
   start.assumeClarifyingQuestionDialog(question)
@@ -354,7 +417,9 @@ When(
   "the initial clarifying question with the response {string} should be visible",
   (oldAnswer: string) => {
     cy.get("@lastClarifyingQuestion").then((question) => {
-      start.assumeClarifyingQuestionDialog(question as unknown as string).oldAnswer(oldAnswer)
+      start
+        .assumeClarifyingQuestionDialog(question as unknown as string)
+        .oldAnswer(oldAnswer)
     })
   },
 )
@@ -380,9 +445,12 @@ When("I expand the children of note {string}", (noteTopic: string) => {
   start.assumeNotePage(noteTopic).expandChildren()
 })
 
-When("I expand the children of note {string} in the sidebar", (noteTopic: string) => {
-  start.sidebar().expand(noteTopic)
-})
+When(
+  "I expand the children of note {string} in the sidebar",
+  (noteTopic: string) => {
+    start.sidebar().expand(noteTopic)
+  },
+)
 
 When(
   "I should see the note {string} with {int} children collapsed",
@@ -414,12 +482,18 @@ Given(
 )
 
 When("I generate question by AI for note {string}", (noteName: string) => {
-  start.jumpToNotePage(noteName).openQuestionList().addQuestionPage().generateQuestionByAI()
+  start
+    .jumpToNotePage(noteName)
+    .openQuestionList()
+    .addQuestionPage()
+    .generateQuestionByAI()
 })
 
 Then("the question in the form becomes:", (data: DataTable) => {
   const expectedQuestions = data.hashes()[0]!
-  ;["Stem", "Choice 0", "Choice 1", "Choice 2", "Correct Choice Index"].forEach((key) => {
-    cy.findByLabelText(key).should("have.value", expectedQuestions[key]!)
-  })
+  ;["Stem", "Choice 0", "Choice 1", "Choice 2", "Correct Choice Index"].forEach(
+    (key) => {
+      cy.findByLabelText(key).should("have.value", expectedQuestions[key]!)
+    },
+  )
 })

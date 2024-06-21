@@ -1,33 +1,33 @@
-import ManagedApi from "@/managedApi/ManagedApi";
-import NoteEditingHistory, { HistoryRecord } from "./NoteEditingHistory";
-import NoteStorage, { StorageImplementation } from "./NoteStorage";
-import StoredApiCollection, { StoredApi } from "./StoredApiCollection";
+import ManagedApi from "@/managedApi/ManagedApi"
+import NoteEditingHistory, { HistoryRecord } from "./NoteEditingHistory"
+import NoteStorage, { StorageImplementation } from "./NoteStorage"
+import StoredApiCollection, { StoredApi } from "./StoredApiCollection"
 
 interface StorageAccessor extends NoteStorage {
-  storedApi(): StoredApi;
-  peekUndo(): null | HistoryRecord;
+  storedApi(): StoredApi
+  peekUndo(): null | HistoryRecord
 }
 
 class AccessorImplementation
   extends StorageImplementation
   implements StorageAccessor
 {
-  noteEditingHistory: NoteEditingHistory;
+  noteEditingHistory: NoteEditingHistory
 
-  managedApi: ManagedApi;
+  managedApi: ManagedApi
 
   constructor(managedApi: ManagedApi, noteEditingHistory?: NoteEditingHistory) {
-    super();
-    this.managedApi = managedApi;
+    super()
+    this.managedApi = managedApi
     if (noteEditingHistory) {
-      this.noteEditingHistory = noteEditingHistory;
+      this.noteEditingHistory = noteEditingHistory
     } else {
-      this.noteEditingHistory = new NoteEditingHistory();
+      this.noteEditingHistory = new NoteEditingHistory()
     }
   }
 
   peekUndo(): HistoryRecord | null {
-    return this.noteEditingHistory.peekUndo() as HistoryRecord;
+    return this.noteEditingHistory.peekUndo() as HistoryRecord
   }
 
   storedApi(): StoredApi {
@@ -35,7 +35,7 @@ class AccessorImplementation
       this.managedApi,
       this.noteEditingHistory,
       this,
-    );
+    )
   }
 }
 
@@ -43,9 +43,9 @@ function createNoteStorage(
   managedApi: ManagedApi,
   noteEditingHistory?: NoteEditingHistory,
 ): StorageAccessor {
-  return new AccessorImplementation(managedApi, noteEditingHistory);
+  return new AccessorImplementation(managedApi, noteEditingHistory)
 }
 
-export default createNoteStorage;
-export type { StorageAccessor };
-export { NoteEditingHistory };
+export default createNoteStorage
+export type { StorageAccessor }
+export { NoteEditingHistory }

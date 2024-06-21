@@ -5,16 +5,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import SvgRemove from "../../svgs/SvgRemove.vue";
-import usePopups from "../../commons/Popups/usePopups";
-import { StorageAccessor } from "../../../store/createNoteStorage";
+import { PropType, defineComponent } from "vue"
+import { StorageAccessor } from "../../../store/createNoteStorage"
+import usePopups from "../../commons/Popups/usePopups"
+import SvgRemove from "../../svgs/SvgRemove.vue"
 
 export default defineComponent({
   setup() {
     return {
       ...usePopups(),
-    };
+    }
   },
   props: {
     noteId: { type: Number, required: true },
@@ -31,9 +31,9 @@ export default defineComponent({
       if (await this.popups.confirm(`Confirm to delete this note?`)) {
         await this.storageAccessor
           .storedApi()
-          .deleteNote(this.$router, this.noteId);
+          .deleteNote(this.$router, this.noteId)
       }
     },
   },
-});
+})
 </script>

@@ -13,11 +13,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { NoteTopic } from "@/generated/backend";
-import RadioButtons from "../form/RadioButtons.vue";
-import SvgLinkTypeIcon from "../svgs/SvgLinkTypeIcon.vue";
-import { linkTypeOptions } from "../../models/linkTypeOptions";
+import { NoteTopic } from "@/generated/backend"
+import { PropType, defineComponent } from "vue"
+import { linkTypeOptions } from "../../models/linkTypeOptions"
+import RadioButtons from "../form/RadioButtons.vue"
+import SvgLinkTypeIcon from "../svgs/SvgLinkTypeIcon.vue"
 
 export default defineComponent({
   name: "LinkTypeSelect",
@@ -39,14 +39,14 @@ export default defineComponent({
       return this.optionsRaw.map(({ label }) => ({
         value: label,
         label,
-      }));
+      }))
     },
     optionsRaw() {
       if (this.allowEmpty) {
-        return linkTypeOptions;
+        return linkTypeOptions
       }
-      return linkTypeOptions.filter(({ label }) => label !== "no link");
+      return linkTypeOptions.filter(({ label }) => label !== "no link")
     },
   },
-});
+})
 </script>

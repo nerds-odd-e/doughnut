@@ -14,8 +14,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import RadioButtons from "../form/RadioButtons.vue";
+import { defineComponent } from "vue"
+import RadioButtons from "../form/RadioButtons.vue"
 
 export default defineComponent({
   components: {
@@ -29,19 +29,19 @@ export default defineComponent({
   data() {
     return {
       replaceOrAppendTopic: "",
-    };
+    }
   },
   methods: {
     updateModelValue() {
       if (this.replaceOrAppendTopic === "Replace") {
-        this.$emit("suggestedTopicSelected", this.suggestedTopic);
+        this.$emit("suggestedTopicSelected", this.suggestedTopic)
       }
 
       if (this.replaceOrAppendTopic === "Append") {
-        const newTopic = `${this.originalTopic} / ${this.suggestedTopic}`;
-        this.$emit("suggestedTopicSelected", newTopic);
+        const newTopic = `${this.originalTopic} / ${this.suggestedTopic}`
+        this.$emit("suggestedTopicSelected", newTopic)
       }
     },
   },
-});
+})
 </script>

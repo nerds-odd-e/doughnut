@@ -7,16 +7,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { ReviewPoint } from "@/generated/backend";
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import { StorageAccessor } from "@/store/createNoteStorage";
-import ContentLoader from "@/components/commons/ContentLoader.vue";
-import NoteWithBreadcrumb from "./NoteWithBreadcrumb.vue";
+import ContentLoader from "@/components/commons/ContentLoader.vue"
+import { ReviewPoint } from "@/generated/backend"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import { StorageAccessor } from "@/store/createNoteStorage"
+import { PropType, defineComponent } from "vue"
+import NoteWithBreadcrumb from "./NoteWithBreadcrumb.vue"
 
 export default defineComponent({
   setup() {
-    return useLoadingApi();
+    return useLoadingApi()
   },
   props: {
     reviewPointId: { type: Number, required: true },
@@ -32,22 +32,22 @@ export default defineComponent({
   data() {
     return {
       reviewPoint: undefined as ReviewPoint | undefined,
-    };
+    }
   },
   methods: {
     async fetchData() {
       this.reviewPoint = await this.managedApi.restReviewPointController.show(
         this.reviewPointId,
-      );
+      )
     },
   },
   watch: {
     reviewPointId() {
-      this.fetchData();
+      this.fetchData()
     },
   },
   mounted() {
-    this.fetchData();
+    this.fetchData()
   },
-});
+})
 </script>

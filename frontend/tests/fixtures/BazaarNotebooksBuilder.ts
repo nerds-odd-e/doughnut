@@ -1,9 +1,9 @@
-import { BazaarNotebook, Notebook } from "@/generated/backend";
-import Builder from "./Builder";
-import generateId from "./generateId";
+import { BazaarNotebook, Notebook } from "@/generated/backend"
+import Builder from "./Builder"
+import generateId from "./generateId"
 
 class NotebooksBuilder extends Builder<BazaarNotebook[]> {
-  data: BazaarNotebook[] = [];
+  data: BazaarNotebook[] = []
 
   notebooks(notebook: Notebook) {
     this.data = [
@@ -12,13 +12,13 @@ class NotebooksBuilder extends Builder<BazaarNotebook[]> {
         id: generateId(),
         notebook,
       },
-    ];
-    return this;
+    ]
+    return this
   }
 
   do(): BazaarNotebook[] {
-    return this.data;
+    return this.data
   }
 }
 
-export default NotebooksBuilder;
+export default NotebooksBuilder

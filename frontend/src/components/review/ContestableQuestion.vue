@@ -35,21 +35,21 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import type { StorageAccessor } from "@/store/createNoteStorage";
 import {
   AnsweredQuestion,
   QuizQuestion,
   QuizQuestionInNotebook,
-} from "@/generated/backend";
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import QuizQuestionC from "./QuizQuestion.vue";
-import AnsweredQuestionComponent from "./AnsweredQuestionComponent.vue";
-import BasicBreadcrumb from "../commons/BasicBreadcrumb.vue";
+} from "@/generated/backend"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import type { StorageAccessor } from "@/store/createNoteStorage"
+import { PropType, defineComponent } from "vue"
+import BasicBreadcrumb from "../commons/BasicBreadcrumb.vue"
+import AnsweredQuestionComponent from "./AnsweredQuestionComponent.vue"
+import QuizQuestionC from "./QuizQuestion.vue"
 
 export default defineComponent({
   setup() {
-    return useLoadingApi();
+    return useLoadingApi()
   },
   props: {
     quizQuestionInNotebook: {
@@ -74,52 +74,52 @@ export default defineComponent({
       currentQuestion: this.quizQuestionInNotebook.quizQuestion,
       answeredQuestion: undefined as AnsweredQuestion | undefined,
       prevQuizQuestions: [] as {
-        quizeQuestion: QuizQuestion;
-        badQuestionReason: string | undefined;
+        quizeQuestion: QuizQuestion
+        badQuestionReason: string | undefined
       }[],
       chatInput: "",
       assistantMessage: "",
       answered: false,
-    };
+    }
   },
   computed: {
     isButtonDisabled() {
-      return this.chatInput === "";
+      return this.chatInput === ""
     },
   },
   methods: {
     scrollToBottom() {
-      this.$emit("need-scroll");
+      this.$emit("need-scroll")
     },
     async contest() {
-      this.currentQuestionLegitMessage = "";
+      this.currentQuestionLegitMessage = ""
       const contestResult =
         await this.managedApi.restQuizQuestionController.contest(
           this.currentQuestion.id,
-        );
+        )
 
       if (!contestResult.rejected) {
-        this.regenerating = true;
+        this.regenerating = true
         this.prevQuizQuestions.push({
           quizeQuestion: this.currentQuestion,
           badQuestionReason: contestResult.reason,
-        });
+        })
         this.currentQuestion =
           await this.managedApi.restQuizQuestionController.regenerate(
             this.currentQuestion.id,
-          );
+          )
       } else {
-        this.currentQuestionLegitMessage = contestResult.reason;
+        this.currentQuestionLegitMessage = contestResult.reason
       }
-      this.regenerating = false;
-      this.scrollToBottom();
+      this.regenerating = false
+      this.scrollToBottom()
     },
     onAnswered(answeredQuestion: AnsweredQuestion) {
-      this.answeredQuestion = answeredQuestion;
-      this.$emit("answered", answeredQuestion);
+      this.answeredQuestion = answeredQuestion
+      this.$emit("answered", answeredQuestion)
     },
   },
-});
+})
 </script>
 
 <style lang="scss" scoped>

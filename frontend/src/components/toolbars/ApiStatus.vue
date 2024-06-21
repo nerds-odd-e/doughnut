@@ -9,10 +9,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { ApiStatus } from "@/managedApi/ManagedApi";
-import LoadingThinBar from "@/components/commons/LoadingThinBar.vue";
-import LastErrorMessage from "@/components/commons/LastErrorMessage.vue";
+import LastErrorMessage from "@/components/commons/LastErrorMessage.vue"
+import LoadingThinBar from "@/components/commons/LoadingThinBar.vue"
+import { ApiStatus } from "@/managedApi/ManagedApi"
+import { PropType, defineComponent } from "vue"
 
 export default defineComponent({
   props: {
@@ -23,5 +23,5 @@ export default defineComponent({
     LoadingThinBar,
     LastErrorMessage,
   },
-});
+})
 </script>

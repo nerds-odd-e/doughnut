@@ -23,9 +23,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { Audio, NoteAccessory } from "@/generated/backend";
-import ShowImage from "./ShowImage.vue";
+import { Audio, NoteAccessory } from "@/generated/backend"
+import { PropType, defineComponent } from "vue"
+import ShowImage from "./ShowImage.vue"
 
 export default defineComponent({
   props: {
@@ -36,12 +36,12 @@ export default defineComponent({
   },
   methods: {
     async downloadAudioFile(audioAttachment: Audio) {
-      const audioUrl = `/attachments/audio/${audioAttachment.id}`;
-      const link = document.createElement("a");
-      link.href = audioUrl;
-      link.download = audioAttachment.name!;
-      link.click();
+      const audioUrl = `/attachments/audio/${audioAttachment.id}`
+      const link = document.createElement("a")
+      link.href = audioUrl
+      link.download = audioAttachment.name!
+      link.click()
     },
   },
-});
+})
 </script>

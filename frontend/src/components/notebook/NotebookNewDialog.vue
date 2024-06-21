@@ -9,14 +9,14 @@
 </template>
 
 <script lang="ts">
-import { PropType } from "vue";
-import { Circle, NoteCreationDTO } from "@/generated/backend";
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import NoteFormTopicOnly from "@/components/notes/NoteFormTopicOnly.vue";
+import NoteFormTopicOnly from "@/components/notes/NoteFormTopicOnly.vue"
+import { Circle, NoteCreationDTO } from "@/generated/backend"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import { PropType } from "vue"
 
 export default {
   setup() {
-    return useLoadingApi();
+    return useLoadingApi()
   },
   props: { circle: { type: Object as PropType<Circle> } },
   components: {
@@ -26,7 +26,7 @@ export default {
     return {
       noteFormData: { topicConstructor: "" } as NoteCreationDTO,
       errors: { topicConstructor: undefined as undefined | string },
-    };
+    }
   },
   methods: {
     createNotebook() {
@@ -34,11 +34,11 @@ export default {
         return this.managedApi.restCircleController.createNotebookInCircle(
           this.circle.id,
           this.noteFormData,
-        );
+        )
       }
       return this.managedApi.restNotebookController.createNotebook(
         this.noteFormData,
-      );
+      )
     },
     processForm() {
       this.createNotebook()
@@ -48,8 +48,8 @@ export default {
             params: { noteId: res.noteId },
           }),
         )
-        .catch((err) => (this.errors = err));
+        .catch((err) => (this.errors = err))
     },
   },
-};
+}
 </script>

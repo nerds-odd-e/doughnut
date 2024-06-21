@@ -10,15 +10,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import type { StorageAccessor } from "@/store/createNoteStorage";
-import { Note } from "@/generated/backend";
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import TextInput from "../form/TextInput.vue";
+import { Note } from "@/generated/backend"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import type { StorageAccessor } from "@/store/createNoteStorage"
+import { PropType, defineComponent } from "vue"
+import TextInput from "../form/TextInput.vue"
 
 export default defineComponent({
   setup() {
-    return useLoadingApi();
+    return useLoadingApi()
   },
   props: {
     note: { type: Object as PropType<Note>, required: true },
@@ -35,14 +35,14 @@ export default defineComponent({
       prompt: this.note.noteTopic.topicConstructor,
       b64Json: undefined as string | undefined,
       promptError: undefined as string | undefined,
-    };
+    }
   },
   computed: {
     imageSrc() {
       if (!this.b64Json) {
-        return undefined;
+        return undefined
       }
-      return `data:image/png;base64,${this.b64Json}`;
+      return `data:image/png;base64,${this.b64Json}`
     },
   },
   methods: {
@@ -50,16 +50,16 @@ export default defineComponent({
       try {
         this.b64Json = (
           await this.managedApi.restAiController.generateImage(this.prompt)
-        ).b64encoded;
+        ).b64encoded
       } catch (_) {
-        this.promptError = "There is a problem";
+        this.promptError = "There is a problem"
       }
     },
   },
   mounted() {
-    this.askForImage();
+    this.askForImage()
   },
-});
+})
 </script>
 
 <style lang="scss" scoped>

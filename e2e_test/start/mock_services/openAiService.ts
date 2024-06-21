@@ -64,7 +64,11 @@ const openAiService = () => {
       }
     },
 
-    async stubCreateAssistant(newId: string, _nameOfAssistant: string, modelName: string) {
+    async stubCreateAssistant(
+      newId: string,
+      _nameOfAssistant: string,
+      modelName: string,
+    ) {
       return await serviceMocker.mockPostMatchsAndNotMatches(
         `/assistants`,
         {

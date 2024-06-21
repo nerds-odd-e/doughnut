@@ -38,19 +38,19 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import Modal from "../Modal.vue";
-import usePopups, { PopupInfo } from "./usePopups";
+import { defineComponent } from "vue"
+import Modal from "../Modal.vue"
+import usePopups, { PopupInfo } from "./usePopups"
 
 export default defineComponent({
   setup() {
-    return usePopups();
+    return usePopups()
   },
   emits: ["done"],
   components: { Modal },
   methods: {
     resolve(result: unknown) {
-      this.popups.done(result);
+      this.popups.done(result)
     },
   },
   data() {
@@ -60,19 +60,19 @@ export default defineComponent({
       },
     } as {
       popupData: {
-        popupInfo: PopupInfo[];
-      };
-    };
+        popupInfo: PopupInfo[]
+      }
+    }
   },
   computed: {
     popupInfos() {
-      return this.popupData.popupInfo;
+      return this.popupData.popupInfo
     },
   },
   mounted() {
-    this.popups.register(this.popupData);
+    this.popups.register(this.popupData)
   },
-});
+})
 </script>
 
 <style lang="scss" scoped>

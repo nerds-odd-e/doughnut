@@ -39,9 +39,8 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { PropType, ref } from "vue";
-import { GlobalAiModelSettings } from "@/generated/backend";
-import Select from "../form/Select.vue";
+import { GlobalAiModelSettings } from "@/generated/backend"
+import { PropType, ref } from "vue"
 
 const props = defineProps({
   modelList: {
@@ -52,9 +51,9 @@ const props = defineProps({
     type: Object as PropType<GlobalAiModelSettings>,
     required: true,
   },
-});
+})
 
-const emit = defineEmits(["save"]);
+const emit = defineEmits(["save"])
 
-const localSelectedModels = ref(props.selectedModels);
+const localSelectedModels = ref(props.selectedModels)
 </script>

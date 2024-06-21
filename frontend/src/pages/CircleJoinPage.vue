@@ -5,14 +5,14 @@
 </template>
 
 <script lang="js">
-import CircleJoinForm from "@/components/circles/CircleJoinForm.vue";
-import loginOrRegisterAndHaltThisThread from "@/managedApi/window/loginOrRegisterAndHaltThisThread";
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import ContainerPage from "./commons/ContainerPage.vue";
+import CircleJoinForm from "@/components/circles/CircleJoinForm.vue"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import loginOrRegisterAndHaltThisThread from "@/managedApi/window/loginOrRegisterAndHaltThisThread"
+import ContainerPage from "./commons/ContainerPage.vue"
 
 export default {
   setup() {
-    return useLoadingApi();
+    return useLoadingApi()
   },
   components: { CircleJoinForm, ContainerPage },
   props: {
@@ -25,13 +25,13 @@ export default {
   beforeRouteEnter(_to, _from, next) {
     next(async (vm) => {
       const x =
-        await vm.managedApi.restCurrentUserInfoController.currentUserInfo();
+        await vm.managedApi.restCurrentUserInfoController.currentUserInfo()
       if (!x?.user) {
-        loginOrRegisterAndHaltThisThread();
-        next(false);
+        loginOrRegisterAndHaltThisThread()
+        next(false)
       }
-      next();
-    });
+      next()
+    })
   },
-};
+}
 </script>

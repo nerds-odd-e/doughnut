@@ -21,13 +21,12 @@
 </template>
 
 <script setup lang="ts">
-import { PropType } from "vue";
-import { NoteTopic } from "@/generated/backend";
-import NoteTopicWithLink from "./NoteTopicWithLink.vue";
+import { NoteTopic } from "@/generated/backend"
+import { PropType } from "vue"
 
 defineProps({
   noteTopic: { type: Object as PropType<NoteTopic>, required: true },
-});
+})
 </script>
 
 <style scoped>

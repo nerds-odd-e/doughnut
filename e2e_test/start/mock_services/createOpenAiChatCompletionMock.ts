@@ -53,7 +53,10 @@ const openAiChatCompletionStubber = (
     )
   }
 
-  const stubSingleToolCall = (functionName: string, argumentsString: string) => {
+  const stubSingleToolCall = (
+    functionName: string,
+    argumentsString: string,
+  ) => {
     return stubChatCompletion(
       {
         role: "assistant",
@@ -75,13 +78,18 @@ const openAiChatCompletionStubber = (
 
   return {
     requestDoesNotMessageMatch(message: MessageToMatch) {
-      return openAiChatCompletionStubber(serviceMocker, bodyToMatch, { messages: [message] })
+      return openAiChatCompletionStubber(serviceMocker, bodyToMatch, {
+        messages: [message],
+      })
     },
     stubNoteDetailsCompletion(argumentsString: string) {
       return stubSingleToolCall("note_details_completion", argumentsString)
     },
     stubQuestionGeneration(argumentsString: string) {
-      return stubSingleToolCall("ask_single_answer_multiple_choice_question", argumentsString)
+      return stubSingleToolCall(
+        "ask_single_answer_multiple_choice_question",
+        argumentsString,
+      )
     },
     stubQuestionEvaluation(argumentsString: string) {
       return stubSingleToolCall("evaluate_question", argumentsString)

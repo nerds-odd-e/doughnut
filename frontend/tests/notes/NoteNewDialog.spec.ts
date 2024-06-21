@@ -1,133 +1,133 @@
-import { flushPromises, VueWrapper } from "@vue/test-utils";
-import { ComponentPublicInstance } from "vue";
-import NoteNewDialog from "@/components/notes/NoteNewDialog.vue";
-import helper from "../helpers";
-import makeMe from "../fixtures/makeMe";
+import NoteNewDialog from "@/components/notes/NoteNewDialog.vue"
+import { VueWrapper, flushPromises } from "@vue/test-utils"
+import { ComponentPublicInstance } from "vue"
+import makeMe from "../fixtures/makeMe"
+import helper from "../helpers"
 
-const mockedSearch = vitest.fn();
-const mockedSearchWithin = vitest.fn();
-const mockedCreateNote = vitest.fn();
+const mockedSearch = vitest.fn()
+const mockedSearchWithin = vitest.fn()
+const mockedCreateNote = vitest.fn()
 
 describe("adding new note", () => {
   beforeEach(() => {
-    vi.useFakeTimers();
-    vi.resetAllMocks();
-    helper.managedApi.restNoteController.searchForLinkTarget = mockedSearch;
+    vi.useFakeTimers()
+    vi.resetAllMocks()
+    helper.managedApi.restNoteController.searchForLinkTarget = mockedSearch
     helper.managedApi.restNoteController.searchForLinkTargetWithin =
-      mockedSearchWithin;
+      mockedSearchWithin
     helper.managedApi.restNoteController.createNote =
-      mockedCreateNote.mockResolvedValue({});
-  });
+      mockedCreateNote.mockResolvedValue({})
+  })
 
   afterEach(() => {
-    vi.runOnlyPendingTimers();
-    vi.useRealTimers();
-  });
+    vi.runOnlyPendingTimers()
+    vi.useRealTimers()
+  })
 
-  const note = makeMe.aNote.topicConstructor("mythical").please();
+  const note = makeMe.aNote.topicConstructor("mythical").please()
 
   it("search for duplicate", async () => {
-    mockedSearchWithin.mockResolvedValue([note.noteTopic]);
+    mockedSearchWithin.mockResolvedValue([note.noteTopic])
     const wrapper = helper
       .component(NoteNewDialog)
       .withStorageProps({ parentId: 123 })
-      .mount();
-    await wrapper.find("input#note-topic").setValue("myth");
+      .mount()
+    await wrapper.find("input#note-topic").setValue("myth")
 
-    vi.runOnlyPendingTimers();
-    await flushPromises();
+    vi.runOnlyPendingTimers()
+    await flushPromises()
 
-    expect(wrapper.text()).toContain("mythical");
+    expect(wrapper.text()).toContain("mythical")
     expect(mockedSearchWithin).toHaveBeenCalledWith(
       123,
       expect.objectContaining({ searchKey: "myth" }),
-    );
-  });
+    )
+  })
 
   describe("submit form", () => {
-    let wrapper: VueWrapper<ComponentPublicInstance>;
+    let wrapper: VueWrapper<ComponentPublicInstance>
 
     beforeEach(async () => {
       wrapper = helper
         .component(NoteNewDialog)
         .withStorageProps({ parentId: 123 })
-        .mount({ attachTo: document.body });
-      await wrapper.find("input#note-topic").setValue("note title");
-      vi.clearAllTimers();
-    });
+        .mount({ attachTo: document.body })
+      await wrapper.find("input#note-topic").setValue("note title")
+      vi.clearAllTimers()
+    })
 
     it("call the api", async () => {
-      await wrapper.find("form").trigger("submit");
-      expect(mockedCreateNote).toHaveBeenCalledWith(123, expect.anything());
-    });
+      await wrapper.find("form").trigger("submit")
+      expect(mockedCreateNote).toHaveBeenCalledWith(123, expect.anything())
+    })
 
     it("call the api once only", async () => {
-      await wrapper.find("form").trigger("submit");
-      await wrapper.find("form").trigger("submit");
-      expect(mockedCreateNote).toHaveBeenCalledTimes(1);
-    });
-  });
+      await wrapper.find("form").trigger("submit")
+      await wrapper.find("form").trigger("submit")
+      expect(mockedCreateNote).toHaveBeenCalledTimes(1)
+    })
+  })
 
   describe("search wikidata entry", () => {
-    let wrapper: VueWrapper<ComponentPublicInstance>;
-    const mockedWikidataSearch = vitest.fn();
+    let wrapper: VueWrapper<ComponentPublicInstance>
+    const mockedWikidataSearch = vitest.fn()
 
     beforeEach(() => {
-      mockedSearchWithin.mockResolvedValue([]);
+      mockedSearchWithin.mockResolvedValue([])
       helper.managedApi.restWikidataController.searchWikidata =
-        mockedWikidataSearch;
+        mockedWikidataSearch
       wrapper = helper
         .component(NoteNewDialog)
         .withStorageProps({ parentId: 123 })
-        .mount({ attachTo: document.body });
-    });
+        .mount({ attachTo: document.body })
+    })
 
     const titleInput = () => {
-      return wrapper.find("input#note-topic");
-    };
+      return wrapper.find("input#note-topic")
+    }
 
     const searchWikidata = async (key: string) => {
-      await titleInput().setValue(key);
-      await wrapper.find("button[title='Wikidata Id']").trigger("click");
+      await titleInput().setValue(key)
+      await wrapper.find("button[title='Wikidata Id']").trigger("click")
 
-      await flushPromises();
+      await flushPromises()
 
-      return wrapper.find('select[name="wikidataSearchResult"]');
-    };
+      return wrapper.find('select[name="wikidataSearchResult"]')
+    }
 
     const searchAndSelectFirstResult = async (key: string) => {
-      const select = await searchWikidata(key);
-      select.findAll("option").at(1)?.setValue();
-    };
+      const select = await searchWikidata(key)
+      select.findAll("option").at(1)?.setValue()
+    }
 
     const replaceTitle = async () => {
-      await wrapper.find("[id='topicRadio-Replace']").setValue();
-    };
+      await wrapper.find("[id='topicRadio-Replace']").setValue()
+    }
     const appendTitle = async () => {
-      await wrapper.find("[id='topicRadio-Append']").setValue();
-    };
+      await wrapper.find("[id='topicRadio-Append']").setValue()
+    }
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    const doNothing = () => {};
+    const doNothing = () => {}
 
     describe("the select for wikidata id", () => {
-      let select;
+      let select
       beforeEach(async () => {
-        const searchResult = makeMe.aWikidataSearchEntity.label("dog").please();
-        mockedWikidataSearch.mockResolvedValue([searchResult]);
-        select = await searchWikidata("dog");
-      });
+        const searchResult = makeMe.aWikidataSearchEntity.label("dog").please()
+        mockedWikidataSearch.mockResolvedValue([searchResult])
+        select = await searchWikidata("dog")
+      })
 
       it("focus on the select", async () => {
-        expect(select.element).toHaveFocus();
-        expect(mockedWikidataSearch).toHaveBeenCalledWith("dog");
-      });
+        expect(select.element).toHaveFocus()
+        expect(mockedWikidataSearch).toHaveBeenCalledWith("dog")
+      })
 
       it("remove the select when lose focus", async () => {
-        select.element.blur();
-        await flushPromises();
-        expect(wrapper.vm.$el).not.toContainElement(select.element);
-      });
-    });
+        select.element.blur()
+        await flushPromises()
+        expect(wrapper.vm.$el).not.toContainElement(select.element)
+      })
+    })
 
     it.each`
       searchTitle | wikidataTitle | action          | expectedTitle
@@ -140,19 +140,19 @@ describe("adding new note", () => {
       async ({ searchTitle, wikidataTitle, action, expectedTitle }) => {
         const searchResult = makeMe.aWikidataSearchEntity
           .label(wikidataTitle)
-          .please();
+          .please()
 
-        mockedWikidataSearch.mockResolvedValue([searchResult]);
-        await searchAndSelectFirstResult(searchTitle);
+        mockedWikidataSearch.mockResolvedValue([searchResult])
+        await searchAndSelectFirstResult(searchTitle)
 
-        action();
-        await flushPromises();
+        action()
+        await flushPromises()
 
-        expect(mockedWikidataSearch).toHaveBeenCalledWith(searchTitle);
+        expect(mockedWikidataSearch).toHaveBeenCalledWith(searchTitle)
         expect((<HTMLInputElement>titleInput().element).value).toBe(
           expectedTitle,
-        );
+        )
       },
-    );
-  });
-});
+    )
+  })
+})

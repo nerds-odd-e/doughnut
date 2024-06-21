@@ -1,9 +1,9 @@
 /// <reference types="Cypress" />
 // @ts-check
 import { QuestionSuggestionParams } from "../../frontend/src/generated/backend/models/QuestionSuggestionParams"
-import { QuizQuestionTestData } from "./../../frontend/src/generated/backend/models/QuizQuestionTestData"
-import { NoteTestData } from "./../../frontend/src/generated/backend/models/NoteTestData"
 import ServiceMocker from "../support/ServiceMocker"
+import { NoteTestData } from "./../../frontend/src/generated/backend/models/NoteTestData"
+import { QuizQuestionTestData } from "./../../frontend/src/generated/backend/models/QuizQuestionTestData"
 
 const hourOfDay = (days: number, hours: number) => {
   return new Date(1976, 5, 1 + days, hours)
@@ -48,10 +48,16 @@ const testability = () => {
     },
 
     featureToggle(enabled: boolean) {
-      postToTestabilityApiSuccessfully(cy, "feature_toggle", { body: { enabled } })
+      postToTestabilityApiSuccessfully(cy, "feature_toggle", {
+        body: { enabled },
+      })
     },
 
-    injectNotes(noteTestData: NoteTestData[], externalIdentifier = "", circleName = null) {
+    injectNotes(
+      noteTestData: NoteTestData[],
+      externalIdentifier = "",
+      circleName = null,
+    ) {
       postToTestabilityApi(cy, "inject_notes", {
         body: {
           externalIdentifier,
@@ -70,7 +76,9 @@ const testability = () => {
           quizQuestionTestData,
         },
       }).then((response) => {
-        expect(Object.keys(response.body).length).to.equal(quizQuestionTestData.length)
+        expect(Object.keys(response.body).length).to.equal(
+          quizQuestionTestData.length,
+        )
       })
     },
 
@@ -116,13 +124,15 @@ const testability = () => {
     },
 
     getInjectedNoteIdByTitle(noteTopic: string) {
-      return cy.get(`@${injectedNoteIdMapAliasName}`).then((injectedNoteIdMap) => {
-        expect(
-          injectedNoteIdMap,
-          `"${noteTopic}" is not in the injected note. Did you created during the test?`,
-        ).haveOwnPropertyDescriptor(noteTopic)
-        return injectedNoteIdMap[noteTopic]
-      })
+      return cy
+        .get(`@${injectedNoteIdMapAliasName}`)
+        .then((injectedNoteIdMap) => {
+          expect(
+            injectedNoteIdMap,
+            `"${noteTopic}" is not in the injected note. Did you created during the test?`,
+          ).haveOwnPropertyDescriptor(noteTopic)
+          return injectedNoteIdMap[noteTopic]
+        })
     },
 
     timeTravelTo(day: number, hour: number) {
@@ -145,7 +155,9 @@ const testability = () => {
     },
 
     randomizerAlwaysChooseLast() {
-      postToTestabilityApiSuccessfully(cy, "randomizer", { body: { choose: "last" } })
+      postToTestabilityApiSuccessfully(cy, "randomizer", {
+        body: { choose: "last" },
+      })
     },
 
     triggerException() {
@@ -153,15 +165,21 @@ const testability = () => {
     },
 
     shareToBazaar(noteTopic: string) {
-      postToTestabilityApiSuccessfully(cy, "share_to_bazaar", { body: { noteTopic } })
+      postToTestabilityApiSuccessfully(cy, "share_to_bazaar", {
+        body: { noteTopic },
+      })
     },
 
     injectCircle(circleInfo: Record<string, string>) {
-      postToTestabilityApiSuccessfully(cy, "inject_circle", { body: circleInfo })
+      postToTestabilityApiSuccessfully(cy, "inject_circle", {
+        body: circleInfo,
+      })
     },
 
     updateCurrentUserSettingsWith(hash: Record<string, string>) {
-      postToTestabilityApiSuccessfully(cy, "update_current_user", { body: hash })
+      postToTestabilityApiSuccessfully(cy, "update_current_user", {
+        body: hash,
+      })
     },
 
     setServiceUrl(serviceName: string, serviceUrl: string) {
@@ -188,15 +206,19 @@ const testability = () => {
       ])
     },
     mockService(serviceMocker: ServiceMocker) {
-      this.setServiceUrl(serviceMocker.serviceName, serviceMocker.serviceUrl).as(
-        serviceMocker.savedServiceUrlName,
-      )
+      this.setServiceUrl(
+        serviceMocker.serviceName,
+        serviceMocker.serviceUrl,
+      ).as(serviceMocker.savedServiceUrlName)
       serviceMocker.install()
     },
 
     restoreMockedService(serviceMocker: ServiceMocker) {
       cy.get(`@${serviceMocker.savedServiceUrlName}`).then((saved) =>
-        this.setServiceUrl(serviceMocker.serviceName, saved as unknown as string),
+        this.setServiceUrl(
+          serviceMocker.serviceName,
+          saved as unknown as string,
+        ),
       )
     },
   }

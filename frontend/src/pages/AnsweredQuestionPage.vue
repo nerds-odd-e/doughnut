@@ -9,16 +9,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { AnsweredQuestion } from "@/generated/backend";
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import AnsweredQuestionComponent from "@/components/review/AnsweredQuestionComponent.vue";
-import { StorageAccessor } from "@/store/createNoteStorage";
-import ContentLoader from "@/components/commons/ContentLoader.vue";
+import ContentLoader from "@/components/commons/ContentLoader.vue"
+import AnsweredQuestionComponent from "@/components/review/AnsweredQuestionComponent.vue"
+import { AnsweredQuestion } from "@/generated/backend"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import { StorageAccessor } from "@/store/createNoteStorage"
+import { PropType, defineComponent } from "vue"
 
 export default defineComponent({
   setup() {
-    return useLoadingApi();
+    return useLoadingApi()
   },
   props: {
     answerId: { type: Number, required: true },
@@ -34,26 +34,26 @@ export default defineComponent({
   data() {
     return {
       answeredQuestion: undefined as AnsweredQuestion | undefined,
-    };
+    }
   },
   computed: {
     reviewPoint() {
-      return this.answeredQuestion?.reviewPoint;
+      return this.answeredQuestion?.reviewPoint
     },
   },
   methods: {
     async fetchData() {
       this.answeredQuestion =
-        await this.managedApi.restReviewsController.showAnswer(this.answerId);
+        await this.managedApi.restReviewsController.showAnswer(this.answerId)
     },
   },
   watch: {
     answerId() {
-      this.fetchData();
+      this.fetchData()
     },
   },
   mounted() {
-    this.fetchData();
+    this.fetchData()
   },
-});
+})
 </script>

@@ -1,11 +1,11 @@
-import { SuggestedQuestionForFineTuning } from "@/generated/backend";
-import Builder from "./Builder";
+import { SuggestedQuestionForFineTuning } from "@/generated/backend"
+import Builder from "./Builder"
 
 class SuggestQuestionForFineTuningBuilder extends Builder<SuggestedQuestionForFineTuning> {
-  data: SuggestedQuestionForFineTuning;
+  data: SuggestedQuestionForFineTuning
 
   constructor() {
-    super();
+    super()
     this.data = {
       id: 1357,
       preservedQuestion: {
@@ -19,17 +19,17 @@ class SuggestQuestionForFineTuningBuilder extends Builder<SuggestedQuestionForFi
       comment: "",
       positiveFeedback: false,
       realCorrectAnswers: "0",
-    };
+    }
   }
 
   positive() {
-    this.data.positiveFeedback = true;
-    return this;
+    this.data.positiveFeedback = true
+    return this
   }
 
   do() {
-    return this.data;
+    return this.data
   }
 }
 
-export default SuggestQuestionForFineTuningBuilder;
+export default SuggestQuestionForFineTuningBuilder

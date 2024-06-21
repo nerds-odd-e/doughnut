@@ -19,8 +19,8 @@
 </template>
 
 <script lang="ts">
-import { PropType, defineComponent } from "vue";
-import Modal from "../Modal.vue";
+import { PropType, defineComponent } from "vue"
+import Modal from "../Modal.vue"
 
 export default defineComponent({
   props: {
@@ -30,13 +30,13 @@ export default defineComponent({
     ariaLabel: String,
   },
   data() {
-    return { show: false };
+    return { show: false }
   },
   components: { Modal },
   methods: {
     closeDialog() {
-      this.show = false;
+      this.show = false
     },
   },
-});
+})
 </script>

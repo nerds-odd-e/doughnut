@@ -1,12 +1,12 @@
-import { User } from "@/generated/backend/models/User";
-import Builder from "./Builder";
-import generateId from "./generateId";
+import { User } from "@/generated/backend/models/User"
+import Builder from "./Builder"
+import generateId from "./generateId"
 
 class UserBuilder extends Builder<User> {
-  data: User;
+  data: User
 
   constructor() {
-    super();
+    super()
     this.data = {
       id: generateId(),
       name: "a name",
@@ -16,17 +16,17 @@ class UserBuilder extends Builder<User> {
       spaceIntervals: "",
       aiQuestionTypeOnlyForReview: false,
       admin: false,
-    };
+    }
   }
 
   admin(isAdmin: boolean) {
-    this.data.admin = isAdmin;
-    return this;
+    this.data.admin = isAdmin
+    return this
   }
 
   do(): User {
-    return this.data;
+    return this.data
   }
 }
 
-export default UserBuilder;
+export default UserBuilder

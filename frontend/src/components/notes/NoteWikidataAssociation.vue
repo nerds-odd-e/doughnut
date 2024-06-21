@@ -11,14 +11,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import nonBlockingPopup from "@/managedApi/window/nonBlockingPopup";
-import SvgAssociation from "@/components/svgs/SvgAssociation.vue";
+import SvgAssociation from "@/components/svgs/SvgAssociation.vue"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import nonBlockingPopup from "@/managedApi/window/nonBlockingPopup"
+import { defineComponent } from "vue"
 
 export default defineComponent({
   setup() {
-    return useLoadingApi();
+    return useLoadingApi()
   },
   props: {
     wikidataId: { type: String, required: true },
@@ -28,22 +28,22 @@ export default defineComponent({
   },
   methods: {
     onClickWikidata() {
-      nonBlockingPopup(this.wikiUrl());
+      nonBlockingPopup(this.wikiUrl())
     },
     async wikiUrl() {
-      const wikipediaEnglishUrl = await this.getWikidataItem();
+      const wikipediaEnglishUrl = await this.getWikidataItem()
       if (wikipediaEnglishUrl !== "") {
-        return wikipediaEnglishUrl;
+        return wikipediaEnglishUrl
       }
-      return `https://www.wikidata.org/wiki/${this.wikidataId}`;
+      return `https://www.wikidata.org/wiki/${this.wikidataId}`
     },
     async getWikidataItem() {
       return (
         await this.managedApi.restWikidataController.fetchWikidataEntityDataById(
           this.wikidataId,
         )
-      ).WikipediaEnglishUrl;
+      ).WikipediaEnglishUrl
     },
   },
-});
+})
 </script>

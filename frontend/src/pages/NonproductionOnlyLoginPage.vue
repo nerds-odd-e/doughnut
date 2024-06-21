@@ -38,32 +38,32 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import useLoadingApi from "@/managedApi/useLoadingApi";
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import { defineComponent } from "vue"
 
 export default defineComponent({
   setup() {
-    return useLoadingApi();
+    return useLoadingApi()
   },
   data() {
     return {
       username: "",
       password: "",
       errorMessage: undefined,
-    };
+    }
   },
   computed: {
     redirectAfterLogin(): string | undefined {
-      if (!this.$route.query) return undefined;
-      if (!this.$route.query.from) return undefined;
+      if (!this.$route.query) return undefined
+      if (!this.$route.query.from) return undefined
 
-      return this.$route.query.from as string;
+      return this.$route.query.from as string
     },
   },
   methods: {
     handleSubmit() {
       // Encode username and password in Base64
-      const token = btoa(`${this.username}:${this.password}`);
+      const token = btoa(`${this.username}:${this.password}`)
 
       fetch("/api/healthcheck", {
         method: "GET",
@@ -74,15 +74,15 @@ export default defineComponent({
       })
         .then(() => {
           if (this.redirectAfterLogin) {
-            window.location.href = this.redirectAfterLogin;
+            window.location.href = this.redirectAfterLogin
           } else {
-            this.$router.push("/");
+            this.$router.push("/")
           }
         })
         .catch((err) => {
-          this.errorMessage = err;
-        });
+          this.errorMessage = err
+        })
     },
   },
-});
+})
 </script>

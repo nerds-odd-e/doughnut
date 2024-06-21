@@ -13,14 +13,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { Notebook, SubscriptionDTO } from "@/generated/backend";
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import TextInput from "@/components/form/TextInput.vue";
+import TextInput from "@/components/form/TextInput.vue"
+import { Notebook, SubscriptionDTO } from "@/generated/backend"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import { PropType, defineComponent } from "vue"
 
 export default defineComponent({
   setup() {
-    return { ...useLoadingApi() };
+    return { ...useLoadingApi() }
   },
   props: {
     notebook: { type: Object as PropType<Notebook>, required: true },
@@ -32,7 +32,7 @@ export default defineComponent({
     return {
       formData: { dailyTargetOfNewNotes: 5 } as SubscriptionDTO,
       errors: {},
-    };
+    }
   },
 
   methods: {
@@ -40,11 +40,11 @@ export default defineComponent({
       this.managedApi.restSubscriptionController
         .createSubscription(this.notebook.id, this.formData)
         .then(() => {
-          this.$emit("closeDialog");
-          this.$router.push({ name: "notebooks" });
+          this.$emit("closeDialog")
+          this.$router.push({ name: "notebooks" })
         })
-        .catch((res) => (this.errors = res));
+        .catch((res) => (this.errors = res))
     },
   },
-});
+})
 </script>

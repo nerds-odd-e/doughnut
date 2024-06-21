@@ -11,9 +11,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import SvgUndo from "../svgs/SvgUndo.vue";
-import { StorageAccessor } from "../../store/createNoteStorage";
+import { PropType, defineComponent } from "vue"
+import { StorageAccessor } from "../../store/createNoteStorage"
+import SvgUndo from "../svgs/SvgUndo.vue"
 
 export default defineComponent({
   components: {
@@ -28,19 +28,19 @@ export default defineComponent({
   },
   computed: {
     history() {
-      return this.storageAccessor.peekUndo();
+      return this.storageAccessor.peekUndo()
     },
     undoTitle() {
       if (this.history) {
-        return `undo ${this.history.type}`;
+        return `undo ${this.history.type}`
       }
-      return "undo";
+      return "undo"
     },
   },
   methods: {
     undoDelete() {
-      this.storageAccessor.storedApi().undo(this.$router);
+      this.storageAccessor.storedApi().undo(this.$router)
     },
   },
-});
+})
 </script>

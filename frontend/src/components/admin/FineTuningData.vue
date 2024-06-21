@@ -12,14 +12,14 @@
 </template>
 
 <script lang="ts">
-import { ContentLoader } from "vue-content-loader";
-import { ApiError, SuggestedQuestionForFineTuning } from "@/generated/backend";
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import SuggestedQuestionList from "./SuggestedQuestionList.vue";
+import { ApiError, SuggestedQuestionForFineTuning } from "@/generated/backend"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import { ContentLoader } from "vue-content-loader"
+import SuggestedQuestionList from "./SuggestedQuestionList.vue"
 
 export default {
   setup() {
-    return useLoadingApi();
+    return useLoadingApi()
   },
   data() {
     return {
@@ -29,28 +29,28 @@ export default {
       fineTuningDataResultMsg: "",
       showAlert: false,
       fileId: "",
-    };
+    }
   },
   methods: {
     async duplicated(duplicated: SuggestedQuestionForFineTuning) {
-      this.suggestedQuestions = [...this.suggestedQuestions!, duplicated];
+      this.suggestedQuestions = [...this.suggestedQuestions!, duplicated]
     },
     async triggerFineTuning() {
       try {
-        await this.managedApi.restFineTuningDataController.uploadAndTriggerFineTuning();
-        this.fineTuningDataResultMsg = "Training initiated.";
+        await this.managedApi.restFineTuningDataController.uploadAndTriggerFineTuning()
+        this.fineTuningDataResultMsg = "Training initiated."
       } catch (error) {
-        const errorInstance = error as ApiError;
-        this.fineTuningDataResultMsg = errorInstance.body.message;
+        const errorInstance = error as ApiError
+        this.fineTuningDataResultMsg = errorInstance.body.message
       }
-      this.showAlert = true;
+      this.showAlert = true
     },
   },
 
   components: { ContentLoader, SuggestedQuestionList },
   async mounted() {
     this.suggestedQuestions =
-      await this.managedApi.restFineTuningDataController.getAllSuggestedQuestions();
+      await this.managedApi.restFineTuningDataController.getAllSuggestedQuestions()
   },
-};
+}
 </script>

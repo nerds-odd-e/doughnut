@@ -32,10 +32,10 @@
 </template>
 
 <script lang="ts">
-import { PropType } from "vue";
-import { SuggestedQuestionForFineTuning } from "@/generated/backend";
-import SuggestedQuestionRow from "./SuggestedQuestionRow.vue";
-import Modal from "../commons/Modal.vue";
+import { SuggestedQuestionForFineTuning } from "@/generated/backend"
+import { PropType } from "vue"
+import Modal from "../commons/Modal.vue"
+import SuggestedQuestionRow from "./SuggestedQuestionRow.vue"
 
 export default {
   props: {
@@ -48,7 +48,7 @@ export default {
   watch: {
     suggestedQuestions: {
       handler() {
-        this.localSuggestedQuestions = this.suggestedQuestions;
+        this.localSuggestedQuestions = this.suggestedQuestions
       },
       deep: true,
     },
@@ -57,9 +57,9 @@ export default {
     return {
       localSuggestedQuestions: this.suggestedQuestions,
       editingIndex: undefined as undefined | number,
-    };
+    }
   },
 
   components: { Modal, SuggestedQuestionRow },
-};
+}
 </script>

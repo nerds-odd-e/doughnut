@@ -21,9 +21,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import TextInput from "../form/TextInput.vue";
-import SearchResults from "./SearchResults.vue";
+import { defineComponent } from "vue"
+import TextInput from "../form/TextInput.vue"
+import SearchResults from "./SearchResults.vue"
 
 export default defineComponent({
   props: { noteId: Number },
@@ -32,7 +32,7 @@ export default defineComponent({
   data() {
     return {
       inputSearchKey: "",
-    };
+    }
   },
-});
+})
 </script>

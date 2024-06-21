@@ -63,8 +63,8 @@
 </style>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { AnswerDTO } from "@/generated/backend";
+import { AnswerDTO } from "@/generated/backend"
+import { defineComponent } from "vue"
 
 export default defineComponent({
   props: {
@@ -79,18 +79,18 @@ export default defineComponent({
   data() {
     return {
       answer: "" as string,
-    };
+    }
   },
   methods: {
     isSelectedOption(optionIndex: number) {
-      return this.answerChoiceIndex === optionIndex;
+      return this.answerChoiceIndex === optionIndex
     },
     isOptionCorrect(index: number) {
-      return index === this.correctChoiceIndex;
+      return index === this.correctChoiceIndex
     },
     async submitAnswer(answerData: AnswerDTO) {
-      this.$emit("answer", answerData);
+      this.$emit("answer", answerData)
     },
   },
-});
+})
 </script>

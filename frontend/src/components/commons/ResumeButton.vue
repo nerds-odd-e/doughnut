@@ -35,31 +35,31 @@
 </template>
 
 <script setup lang="ts">
-import { toRefs, computed } from "vue";
+import { computed, toRefs } from "vue"
 
-const svgSize = 50;
-const viewBox = `0 0 ${svgSize} ${svgSize}`;
-const circleCenter = svgSize / 2;
-const circleRadius = 20;
-const strokeWidth = 4;
-const circleCircumference = 2 * Math.PI * circleRadius;
+const svgSize = 50
+const viewBox = `0 0 ${svgSize} ${svgSize}`
+const circleCenter = svgSize / 2
+const circleRadius = 20
+const strokeWidth = 4
+const circleCircumference = 2 * Math.PI * circleRadius
 
 const props = defineProps({
   finished: { type: Number, required: true },
   toRepeatCount: { type: Number, required: true },
-});
+})
 
-const reactiveProps = toRefs(props);
+const reactiveProps = toRefs(props)
 
-defineEmits(["resume"]);
+defineEmits(["resume"])
 
 const calculateStrokeDashArray = computed(() => {
   const progress =
     circleCircumference *
     (reactiveProps.finished.value /
-      (reactiveProps.finished.value + reactiveProps.toRepeatCount.value));
-  return Math.max(progress, 5);
-});
+      (reactiveProps.finished.value + reactiveProps.toRepeatCount.value))
+  return Math.max(progress, 5)
+})
 </script>
 
 <style lang="scss" scoped>

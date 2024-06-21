@@ -1,6 +1,8 @@
-import testability from "../testability"
 import ServiceMocker from "../../support/ServiceMocker"
-import WikidataEntitiesBuilder, { Claim } from "../../support/json/WikidataEntitiesBuilder"
+import WikidataEntitiesBuilder, {
+  Claim,
+} from "../../support/json/WikidataEntitiesBuilder"
+import testability from "../testability"
 
 const stubWikidataApi = (
   serviceMocker: ServiceMocker,
@@ -11,7 +13,11 @@ const stubWikidataApi = (
   return serviceMocker.stubGetter(`/w/api.php`, { action, ...query }, data)
 }
 
-const stubWikidataEntity = (serviceMocker: ServiceMocker, wikidataId: string, claims: Claim[]) => {
+const stubWikidataEntity = (
+  serviceMocker: ServiceMocker,
+  wikidataId: string,
+  claims: Claim[],
+) => {
   stubWikidataApi(
     serviceMocker,
     "wbgetentities",
@@ -30,8 +36,14 @@ const wikidataService = () => {
       testability().restoreMockedService(serviceMocker)
     },
 
-    stubWikidataEntityQuery(wikidataId: string, wikidataTitle: string, wikipediaLink: string) {
-      const wikipedia = wikipediaLink ? { enwiki: { site: "enwiki", url: wikipediaLink } } : {}
+    stubWikidataEntityQuery(
+      wikidataId: string,
+      wikidataTitle: string,
+      wikipediaLink: string,
+    ) {
+      const wikipedia = wikipediaLink
+        ? { enwiki: { site: "enwiki", url: wikipediaLink } }
+        : {}
       serviceMocker.stubByUrl(`/wiki/Special:EntityData/${wikidataId}.json`, {
         entities: {
           [wikidataId]: {
@@ -47,13 +59,25 @@ const wikidataService = () => {
       })
     },
 
-    stubWikidataEntityLocation(wikidataId: string, latitude: number, longitude: number) {
+    stubWikidataEntityLocation(
+      wikidataId: string,
+      latitude: number,
+      longitude: number,
+    ) {
       stubWikidataEntity(serviceMocker, wikidataId, [
-        { claimId: "P625", type: "globecoordinate", value: { latitude, longitude } },
+        {
+          claimId: "P625",
+          type: "globecoordinate",
+          value: { latitude, longitude },
+        },
       ])
     },
 
-    stubWikidataEntityPerson(wikidataId: string, countryId: string, birthday: string) {
+    stubWikidataEntityPerson(
+      wikidataId: string,
+      countryId: string,
+      birthday: string,
+    ) {
       stubWikidataEntity(serviceMocker, wikidataId, [
         { claimId: "P31", type: "wikibase-entityid", value: { id: "Q5" } },
         { claimId: "P569", type: "time", value: { time: birthday } },
@@ -61,7 +85,10 @@ const wikidataService = () => {
       ])
     },
 
-    stubWikidataEntityBook(wikidataId: string, authorWikidataIds: Array<string>) {
+    stubWikidataEntityBook(
+      wikidataId: string,
+      authorWikidataIds: Array<string>,
+    ) {
       stubWikidataEntity(
         serviceMocker,
         wikidataId,

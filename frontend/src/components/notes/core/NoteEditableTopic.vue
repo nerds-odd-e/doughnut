@@ -22,12 +22,9 @@
 </template>
 
 <script setup lang="ts">
-import { PropType } from "vue";
-import { NoteTopic } from "@/generated/backend";
-import EditableText from "../../form/EditableText.vue";
-import { type StorageAccessor } from "../../../store/createNoteStorage";
-import TextContentWrapper from "./TextContentWrapper.vue";
-import NoteTopicComponent from "./NoteTopicComponent.vue";
+import { NoteTopic } from "@/generated/backend"
+import { PropType } from "vue"
+import { type StorageAccessor } from "../../../store/createNoteStorage"
 
 defineProps({
   noteTopic: { type: Object as PropType<NoteTopic>, required: true },
@@ -36,5 +33,5 @@ defineProps({
     type: Object as PropType<StorageAccessor>,
     required: true,
   },
-});
+})
 </script>

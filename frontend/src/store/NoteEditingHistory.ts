@@ -1,19 +1,19 @@
 export interface HistoryRecord {
-  type: "edit topic" | "edit details" | "delete note";
-  noteId: Doughnut.ID;
-  textContent?: string;
+  type: "edit topic" | "edit details" | "delete note"
+  noteId: Doughnut.ID
+  textContent?: string
 }
 
 export default class NoteEditingHistory {
-  noteUndoHistories: HistoryRecord[];
+  noteUndoHistories: HistoryRecord[]
 
   constructor() {
-    this.noteUndoHistories = [];
+    this.noteUndoHistories = []
   }
 
   peekUndo() {
-    if (this.noteUndoHistories.length === 0) return null;
-    return this.noteUndoHistories[this.noteUndoHistories.length - 1];
+    if (this.noteUndoHistories.length === 0) return null
+    return this.noteUndoHistories[this.noteUndoHistories.length - 1]
   }
 
   addEditingToUndoHistory(
@@ -25,17 +25,17 @@ export default class NoteEditingHistory {
       type: field,
       noteId,
       textContent,
-    });
+    })
   }
 
   popUndoHistory() {
     if (this.noteUndoHistories.length === 0) {
-      return;
+      return
     }
-    this.noteUndoHistories.pop();
+    this.noteUndoHistories.pop()
   }
 
   deleteNote(noteId: Doughnut.ID) {
-    this.noteUndoHistories.push({ type: "delete note", noteId });
+    this.noteUndoHistories.push({ type: "delete note", noteId })
   }
 }

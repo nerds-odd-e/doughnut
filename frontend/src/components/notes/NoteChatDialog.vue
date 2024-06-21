@@ -47,16 +47,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { Message, Note, QuizQuestionInNotebook } from "@/generated/backend";
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import type { StorageAccessor } from "@/store/createNoteStorage";
-import ContestableQuestion from "../review/ContestableQuestion.vue";
-import scrollToElement from "../commons/scrollToElement";
+import { Message, Note, QuizQuestionInNotebook } from "@/generated/backend"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import type { StorageAccessor } from "@/store/createNoteStorage"
+import { PropType, defineComponent } from "vue"
+import scrollToElement from "../commons/scrollToElement"
+import ContestableQuestion from "../review/ContestableQuestion.vue"
 
 export default defineComponent({
   setup() {
-    return useLoadingApi();
+    return useLoadingApi()
   },
   props: {
     selectedNote: { type: Object as PropType<Note>, required: true },
@@ -73,36 +73,36 @@ export default defineComponent({
       quizQuestionInNotebook: undefined as QuizQuestionInNotebook | undefined,
       chatInput: "",
       assistantMessage: undefined as Message[] | undefined,
-    };
+    }
   },
   computed: {
     isButtonDisabled() {
-      return this.chatInput === "";
+      return this.chatInput === ""
     },
   },
   methods: {
     scrollToBottom() {
-      const elm = this.$refs.bottomOfTheChat as HTMLElement;
+      const elm = this.$refs.bottomOfTheChat as HTMLElement
       if (elm) {
-        scrollToElement(elm);
+        scrollToElement(elm)
       }
     },
     async generateQuestion() {
       this.quizQuestionInNotebook =
         await this.managedApi.restQuizQuestionController.generateQuestion(
           this.selectedNote.id,
-        );
-      this.scrollToBottom();
+        )
+      this.scrollToBottom()
     },
     async generateChatAnswer() {
       this.assistantMessage = (
         await this.managedApi.restAiController.chat(this.selectedNote.id, {
           userMessage: this.chatInput,
         })
-      ).messages;
+      ).messages
     },
   },
-});
+})
 </script>
 
 <style lang="scss" scoped>

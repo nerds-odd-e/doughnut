@@ -1,27 +1,27 @@
-import { Note, NoteTopic } from "@/generated/backend";
-import Builder from "./Builder";
-import NoteBuilder from "./NoteBuilder";
+import { Note, NoteTopic } from "@/generated/backend"
+import Builder from "./Builder"
+import NoteBuilder from "./NoteBuilder"
 
 class LinkBuilder extends Builder<Note> {
-  sourceNoteBuilder = new NoteBuilder();
+  sourceNoteBuilder = new NoteBuilder()
 
-  targetNoteBuilder = new NoteBuilder();
+  targetNoteBuilder = new NoteBuilder()
 
-  internalType = NoteTopic.linkType.RELATED_TO;
+  internalType = NoteTopic.linkType.RELATED_TO
 
   from(note: Note): LinkBuilder {
-    this.sourceNoteBuilder.data = note;
-    return this;
+    this.sourceNoteBuilder.data = note
+    return this
   }
 
   to(note: Note): LinkBuilder {
-    this.targetNoteBuilder.data = note;
-    return this;
+    this.targetNoteBuilder.data = note
+    return this
   }
 
   type(t: NoteTopic.linkType): LinkBuilder {
-    this.internalType = t;
-    return this;
+    this.internalType = t
+    return this
   }
 
   do(): Note {
@@ -29,8 +29,8 @@ class LinkBuilder extends Builder<Note> {
       .linkType(this.internalType)
       .underNote(this.sourceNoteBuilder.do())
       .target(this.targetNoteBuilder.do())
-      .do();
+      .do()
   }
 }
 
-export default LinkBuilder;
+export default LinkBuilder

@@ -2,7 +2,7 @@
 /// <reference types="../support" />
 // @ts-check
 
-import { Given, Then, DataTable } from "@badeball/cypress-cucumber-preprocessor"
+import { DataTable, Given, Then } from "@badeball/cypress-cucumber-preprocessor"
 import "../support/string_util"
 import start, { mock_services } from "../start"
 import { MessageToMatch } from "../start/mock_services/MessageToMatch"
@@ -11,9 +11,12 @@ Given("the OpenAI service is unavailable due to invalid system token", () => {
   mock_services.openAi().alwaysResponseAsUnauthorized()
 })
 
-Then("I should be prompted with an error message saying {string}", (errorMessage: string) => {
-  cy.expectFieldErrorMessage("Prompt", errorMessage)
-})
+Then(
+  "I should be prompted with an error message saying {string}",
+  (errorMessage: string) => {
+    cy.expectFieldErrorMessage("Prompt", errorMessage)
+  },
+)
 
 Given("OpenAI has models {string} available", (modelNames: string) => {
   cy.then(async () => {
@@ -32,7 +35,9 @@ Given("An OpenAI response is unavailable", () => {
 Given("OpenAI now generates this question:", (questionTable: DataTable) => {
   const hashes = questionTable.hashes()
   if (hashes.length !== 1 || !hashes[0]) {
-    throw new Error("Expected exactly one row in the data table, but got " + hashes.length)
+    throw new Error(
+      "Expected exactly one row in the data table, but got " + hashes.length,
+    )
   }
   start.questionGenerationService().resetAndStubAskingMCQ(hashes[0])
 })
@@ -64,7 +69,10 @@ Given(
       .stubCreateThread(threadId)
       .then((thread) =>
         thread
-          .stubCreateMessageAndCreateRun({ role: "user", content: "Please complete" })
+          .stubCreateMessageAndCreateRun({
+            role: "user",
+            content: "Please complete",
+          })
           .then((run) =>
             run
               .stubRetrieveRunsThatRequireAction(data.hashes())
@@ -74,29 +82,32 @@ Given(
   },
 )
 
-Given("OpenAI assistant will reply below for user messages:", (data: DataTable) => {
-  data.hashes().forEach((row) => {
-    const userMessage: MessageToMatch = {
-      role: "user",
-      content: row["user message"],
-    } as MessageToMatch
-    const threadId = "thread-abc123"
-    mock_services
-      .openAi()
-      .stubCreateThread(threadId)
-      .then((thread) =>
-        thread
-          .stubCreateMessageAndCreateRun(userMessage)
-          .then((run) =>
-            run
-              .stubRetrieveRunsThatCompleted()
-              .then((run) =>
-                run.stubListMessages([
-                  userMessage,
-                  { role: "assistant", content: row["assistant reply"]! },
-                ]),
-              ),
-          ),
-      )
-  })
-})
+Given(
+  "OpenAI assistant will reply below for user messages:",
+  (data: DataTable) => {
+    data.hashes().forEach((row) => {
+      const userMessage: MessageToMatch = {
+        role: "user",
+        content: row["user message"],
+      } as MessageToMatch
+      const threadId = "thread-abc123"
+      mock_services
+        .openAi()
+        .stubCreateThread(threadId)
+        .then((thread) =>
+          thread
+            .stubCreateMessageAndCreateRun(userMessage)
+            .then((run) =>
+              run
+                .stubRetrieveRunsThatCompleted()
+                .then((run) =>
+                  run.stubListMessages([
+                    userMessage,
+                    { role: "assistant", content: row["assistant reply"]! },
+                  ]),
+                ),
+            ),
+        )
+    })
+  },
+)

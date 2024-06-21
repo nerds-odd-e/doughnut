@@ -56,16 +56,9 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, ref } from "vue";
-import { NoteRealm, NoteAccessory } from "@/generated/backend";
-import NoteTextContent from "./core/NoteTextContent.vue";
-import ChildrenNotes from "./ChildrenNotes.vue";
-import { StorageAccessor } from "../../store/createNoteStorage";
-import NoteAccessoryAsync from "./accessory/NoteAccessoryAsync.vue";
-import NoteCoreToolbar from "./core/NoteCoreToolbar.vue";
-import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue";
-import LinkOfNote from "../links/LinkOfNote.vue";
-import { reverseLabel } from "../../models/linkTypeOptions";
+import { NoteAccessory, NoteRealm } from "@/generated/backend"
+import { PropType, ref } from "vue"
+import { StorageAccessor } from "../../store/createNoteStorage"
 
 defineProps({
   noteRealm: { type: Object as PropType<NoteRealm>, required: true },
@@ -76,13 +69,13 @@ defineProps({
     type: Object as PropType<StorageAccessor>,
     required: true,
   },
-});
+})
 
-const updatedNoteAccessory = ref<NoteAccessory | undefined>(undefined);
+const updatedNoteAccessory = ref<NoteAccessory | undefined>(undefined)
 
 const toLocalDateString = (date: string) => {
-  return new Date(date).toLocaleDateString();
-};
+  return new Date(date).toLocaleDateString()
+}
 </script>
 
 <style scoped>

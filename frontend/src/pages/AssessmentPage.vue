@@ -16,42 +16,41 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import { QuizQuestion } from "@/generated/backend";
-import { useRouter } from "vue-router";
-import QuizQuestionComp from "../components/review/QuizQuestion.vue";
+import { QuizQuestion } from "@/generated/backend"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import { computed, onMounted, ref } from "vue"
+import { useRouter } from "vue-router"
 
-const { managedApi } = useLoadingApi();
-const router = useRouter();
+const { managedApi } = useLoadingApi()
+const router = useRouter()
 const props = defineProps({
   notebookId: { type: Number, required: true },
-});
+})
 const topicConstructor = computed(() => {
-  return router.currentRoute.value.query?.topic;
-});
-const quizQuestions = ref<QuizQuestion[]>([]);
-const currentQuestion = ref(0);
-const errors = ref("");
-const correctAnswers = ref(0);
+  return router.currentRoute.value.query?.topic
+})
+const quizQuestions = ref<QuizQuestion[]>([])
+const currentQuestion = ref(0)
+const errors = ref("")
+const correctAnswers = ref(0)
 const questionAnswered = (answerResult) => {
-  currentQuestion.value += 1;
+  currentQuestion.value += 1
   if (answerResult.correct) {
-    correctAnswers.value += 1;
+    correctAnswers.value += 1
   }
-};
+}
 const generateAssessmentQuestions = () => {
   managedApi.restAssessmentController
     .generateAssessmentQuestions(props.notebookId)
     .then((response) => {
-      quizQuestions.value = response;
+      quizQuestions.value = response
     })
     .catch((res) => {
-      errors.value = res.body.message;
-    });
-};
+      errors.value = res.body.message
+    })
+}
 
 onMounted(() => {
-  generateAssessmentQuestions();
-});
+  generateAssessmentQuestions()
+})
 </script>

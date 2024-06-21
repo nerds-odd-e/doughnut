@@ -22,9 +22,12 @@ Then("I move the note {string} up among its siblings", (noteToMove: string) => {
   start.jumpToNotePage(noteToMove).moveUpAmongSiblings()
 })
 
-Then("I move the note {string} down among its siblings", (noteToMove: string) => {
-  start.jumpToNotePage(noteToMove).moveDownAmongSiblings()
-})
+Then(
+  "I move the note {string} down among its siblings",
+  (noteToMove: string) => {
+    start.jumpToNotePage(noteToMove).moveDownAmongSiblings()
+  },
+)
 
 Then(
   "I should see the note {string} before the note {string} in the sidebar",

@@ -69,7 +69,9 @@ Cypress.Commands.add("findUserSettingsButton", (userName: string) => {
 
 Cypress.Commands.add("expectBreadcrumb", (items: string) => {
   cy.get(".breadcrumb").within(() =>
-    commonSenseSplit(items, ", ").forEach((noteTopic: string) => cy.findByText(noteTopic)),
+    commonSenseSplit(items, ", ").forEach((noteTopic: string) =>
+      cy.findByText(noteTopic),
+    ),
   )
 })
 
@@ -129,18 +131,21 @@ Cypress.Commands.add("clickRadioByLabel", (labelText) => {
   cy.findByText(labelText, { selector: "label" }).click({ force: true })
 })
 
-Cypress.Commands.add("expectNoteCards", (expectedCards: Record<string, string>[]) => {
-  cy.get(".card-title").should("have.length", expectedCards.length)
-  expectedCards.forEach((elem) => {
-    for (const propName in elem) {
-      if (propName === "note-topic") {
-        cy.findCardTitle(elem[propName]!)
-      } else {
-        cy.findByText(elem[propName]!)
+Cypress.Commands.add(
+  "expectNoteCards",
+  (expectedCards: Record<string, string>[]) => {
+    cy.get(".card-title").should("have.length", expectedCards.length)
+    expectedCards.forEach((elem) => {
+      for (const propName in elem) {
+        if (propName === "note-topic") {
+          cy.findCardTitle(elem[propName]!)
+        } else {
+          cy.findByText(elem[propName]!)
+        }
       }
-    }
-  })
-})
+    })
+  },
+)
 
 Cypress.Commands.add("routerPush", (fallback, name, params) => {
   cy.get("@firstVisited").then((firstVisited) => {
@@ -193,7 +198,9 @@ Cypress.Commands.add(
   "initialReviewOneNoteIfThereIs",
   ({ review_type, topic, additional_info, skip }) => {
     if (review_type == "initial done") {
-      cy.findByText("You have achieved your daily new notes goal.").should("be.visible")
+      cy.findByText("You have achieved your daily new notes goal.").should(
+        "be.visible",
+      )
     } else {
       cy.findByText(topic, { selector: "main *" })
       switch (review_type) {
@@ -206,7 +213,10 @@ Cypress.Commands.add(
 
         case "image note": {
           if (additional_info) {
-            const [expectedDetails, expectedImage] = commonSenseSplit(additional_info, "; ")
+            const [expectedDetails, expectedImage] = commonSenseSplit(
+              additional_info,
+              "; ",
+            )
             cy.get(".note-details").should("contain", expectedDetails)
             cy.get("#note-image")
               .find("img")
@@ -218,7 +228,10 @@ Cypress.Commands.add(
 
         case "link": {
           if (additional_info) {
-            const [linkType, targetNote] = commonSenseSplit(additional_info, "; ")
+            const [linkType, targetNote] = commonSenseSplit(
+              additional_info,
+              "; ",
+            )
             cy.findByText(topic)
             cy.findByText(targetNote)
             cy.get(".link-type").contains(linkType)
@@ -294,7 +307,9 @@ Cypress.Commands.add("initialReviewNotes", (noteTopics: string) => {
 Cypress.Commands.add("repeatReviewNotes", (noteTopics: string) => {
   commonSenseSplit(noteTopics, ",").forEach((topic) => {
     if (topic == "end") {
-      cy.findByText("You have finished all repetitions for this half a day!").should("be.visible")
+      cy.findByText(
+        "You have finished all repetitions for this half a day!",
+      ).should("be.visible")
     } else {
       cy.findByText(topic, { selector: "h2 *" })
       cy.yesIRemember()
@@ -313,12 +328,17 @@ Cypress.Commands.add("repeatMore", () => {
   cy.findByRole("button", { name: "Load more from next 3 days" }).click()
 })
 
-Cypress.Commands.add("shouldSeeQuizWithOptions", (questionParts: string[], options: string) => {
-  questionParts.forEach((part) => {
-    cy.get(".quiz-instruction").contains(part)
-  })
-  commonSenseSplit(options, ",").forEach((option: string) => cy.findByText(option))
-})
+Cypress.Commands.add(
+  "shouldSeeQuizWithOptions",
+  (questionParts: string[], options: string) => {
+    questionParts.forEach((part) => {
+      cy.get(".quiz-instruction").contains(part)
+    })
+    commonSenseSplit(options, ",").forEach((option: string) =>
+      cy.findByText(option),
+    )
+  },
+)
 
 Cypress.Commands.add("formField", (label) => {
   return cy.findByLabelText(label)
@@ -356,9 +376,12 @@ Cypress.Commands.add("noteByTitle", (noteTopic: string) => {
     .then(($attr) => /n(\d+)/g.exec($attr)[1])
 })
 
-Cypress.Commands.add("expectFieldErrorMessage", (field: string, message: string) => {
-  cy.formField(field).siblings(".error-msg").findByText(message)
-})
+Cypress.Commands.add(
+  "expectFieldErrorMessage",
+  (field: string, message: string) => {
+    cy.formField(field).siblings(".error-msg").findByText(message)
+  },
+)
 
 Cypress.Commands.add("expectAMapTo", (latitude: string, longitude: string) => {
   cy.findByText(`Location: ${latitude}'N, ${longitude}'E`)

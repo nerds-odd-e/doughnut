@@ -22,24 +22,24 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import { StorageAccessor } from "@/store/createNoteStorage";
 import {
   AiAssistantResponse,
   ClarifyingQuestion,
   Note,
-} from "@/generated/backend";
-import ClarifyingQuestionAndAnswer from "@/models/ClarifyingQuestionAndAnswer";
-import SvgRobot from "../../svgs/SvgRobot.vue";
-import AIClarifyingQuestionDialog from "../AIClarifyingQuestionDialog.vue";
-import Modal from "../../commons/Modal.vue";
+} from "@/generated/backend"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import ClarifyingQuestionAndAnswer from "@/models/ClarifyingQuestionAndAnswer"
+import { StorageAccessor } from "@/store/createNoteStorage"
+import { PropType, defineComponent } from "vue"
+import Modal from "../../commons/Modal.vue"
+import SvgRobot from "../../svgs/SvgRobot.vue"
+import AIClarifyingQuestionDialog from "../AIClarifyingQuestionDialog.vue"
 
 export default defineComponent({
   setup() {
     return {
       ...useLoadingApi(),
-    };
+    }
   },
   props: {
     storageAccessor: {
@@ -62,7 +62,7 @@ export default defineComponent({
       threadRespons: undefined as undefined | AiAssistantResponse,
       clarifyingQuestion: undefined as undefined | ClarifyingQuestion,
       clarifyingHistory: [] as ClarifyingQuestionAndAnswer[],
-    };
+    }
   },
   methods: {
     async initialAutoCompleteDetails() {
@@ -71,32 +71,32 @@ export default defineComponent({
         {
           detailsToComplete: this.note.details,
         },
-      );
+      )
 
-      return this.autoCompleteDetails(response);
+      return this.autoCompleteDetails(response)
     },
     async autoCompleteDetails(response: AiAssistantResponse) {
-      if (this.isUnmounted) return;
+      if (this.isUnmounted) return
 
       if (response.requiredAction?.clarifyingQuestion) {
-        this.threadRespons = response;
-        this.clarifyingQuestion = response.requiredAction.clarifyingQuestion;
-        return;
+        this.threadRespons = response
+        this.clarifyingQuestion = response.requiredAction.clarifyingQuestion
+        return
       }
 
-      this.clarifyingQuestion = undefined;
+      this.clarifyingQuestion = undefined
       this.storageAccessor
         .storedApi()
         .updateTextField(
           this.note.id,
           "edit details",
           this.note.details + response.requiredAction!.contentToAppend!,
-        );
+        )
     },
     async clarifyingQuestionAnswered(
       clarifyingQuestionAndAnswer: ClarifyingQuestionAndAnswer,
     ) {
-      this.clarifyingHistory.push(clarifyingQuestionAndAnswer);
+      this.clarifyingHistory.push(clarifyingQuestionAndAnswer)
       const response =
         await this.managedApi.restAiController.answerCompletionClarifyingQuestion(
           {
@@ -106,12 +106,12 @@ export default defineComponent({
             runId: this.threadRespons!.runId,
             toolCallId: this.threadRespons!.requiredAction!.toolCallId,
           },
-        );
-      await this.autoCompleteDetails(response);
+        )
+      await this.autoCompleteDetails(response)
     },
   },
   unmounted() {
-    this.isUnmounted = true;
+    this.isUnmounted = true
   },
-});
+})
 </script>

@@ -25,29 +25,27 @@
 </template>
 
 <script setup lang="ts">
-import { NoteTopic } from "@/generated/backend";
-import { PropType, computed, ref } from "vue";
-import SvgLinkTypeIcon from "@/components/svgs/SvgLinkTypeIcon.vue";
-import NoteTopicWithLink from "../NoteTopicWithLink.vue";
+import { NoteTopic } from "@/generated/backend"
+import { PropType, computed, ref } from "vue"
 
 const props = defineProps({
   noteTopic: { type: Object as PropType<NoteTopic>, required: true },
-});
+})
 
-const reactiveProps = ref(props);
+const reactiveProps = ref(props)
 
 const linkType = computed(() =>
   reactiveProps.value.noteTopic.topicConstructor.substring(1),
-);
+)
 const topic = computed(() =>
   reactiveProps.value.noteTopic.topicConstructor?.replace(
     "%P",
     `[${reactiveProps.value.noteTopic.parentNoteTopic?.topicConstructor}]`,
   ),
-);
+)
 const iconizedTarget = computed(
   () => !!reactiveProps.value.noteTopic.shortDetails,
-);
+)
 </script>
 
 <style scoped>

@@ -19,5 +19,5 @@
 export default {
   name: "InitialReviewButtons",
   emits: ["doInitialReview"],
-};
+}
 </script>

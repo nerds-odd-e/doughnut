@@ -17,14 +17,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { Notebook } from "@/generated/backend";
-import Card from "../notes/Card.vue";
+import { Notebook } from "@/generated/backend"
+import { PropType, defineComponent } from "vue"
+import Card from "../notes/Card.vue"
 
 export default defineComponent({
   props: {
     notebooks: Array as PropType<Array<Notebook>>,
   },
   components: { Card },
-});
+})
 </script>

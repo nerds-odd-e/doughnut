@@ -38,11 +38,9 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, ref, watch } from "vue";
-import { NoteRealm } from "@/generated/backend";
-import ScrollTo from "@/components/commons/ScrollTo.vue";
-import { StorageAccessor } from "../../store/createNoteStorage";
-import NoteTopicWithLink from "./NoteTopicWithLink.vue";
+import { NoteRealm } from "@/generated/backend"
+import { PropType, ref, watch } from "vue"
+import { StorageAccessor } from "../../store/createNoteStorage"
 
 const props = defineProps({
   noteId: { type: Number, required: true },
@@ -51,28 +49,28 @@ const props = defineProps({
     type: Object as PropType<StorageAccessor>,
     required: true,
   },
-});
+})
 
 const noteRealm = props.storageAccessor
   .storedApi()
-  .getNoteRealmRefAndLoadWhenNeeded(props.noteId);
+  .getNoteRealmRefAndLoadWhenNeeded(props.noteId)
 
-const expandedIds = ref([props.activeNoteRealm.note.id]);
+const expandedIds = ref([props.activeNoteRealm.note.id])
 
 const toggleChildren = (noteId: number) => {
-  const index = expandedIds.value.indexOf(noteId);
+  const index = expandedIds.value.indexOf(noteId)
   if (index === -1) {
-    expandedIds.value.push(noteId);
+    expandedIds.value.push(noteId)
   } else {
-    expandedIds.value.splice(index, 1);
+    expandedIds.value.splice(index, 1)
   }
-};
+}
 
 const childrenCount = (noteId: number) => {
-  const noteRef = props.storageAccessor.refOfNoteRealm(noteId);
-  if (!noteRef.value) return undefined;
-  return noteRef.value.children?.length ?? 0;
-};
+  const noteRef = props.storageAccessor.refOfNoteRealm(noteId)
+  if (!noteRef.value) return undefined
+  return noteRef.value.children?.length ?? 0
+}
 
 watch(
   () => props.activeNoteRealm.note.noteTopic.parentNoteTopic,
@@ -80,16 +78,16 @@ watch(
     const uniqueIds = new Set([
       ...expandedIds.value,
       props.activeNoteRealm.note.id,
-    ]);
-    let cursor = parentNoteTopic;
+    ])
+    let cursor = parentNoteTopic
     while (cursor) {
-      uniqueIds.add(cursor.id);
-      cursor = cursor.parentNoteTopic;
+      uniqueIds.add(cursor.id)
+      cursor = cursor.parentNoteTopic
     }
-    expandedIds.value = Array.from(uniqueIds);
+    expandedIds.value = Array.from(uniqueIds)
   },
   { immediate: true },
-);
+)
 </script>
 
 <style lang="scss" scoped>

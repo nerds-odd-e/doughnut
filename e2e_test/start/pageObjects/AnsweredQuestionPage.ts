@@ -19,7 +19,9 @@ const assumeAnsweredQuestionPage = () => {
           }
         },
         removeReviewPointFromReview() {
-          cy.findByRole("button", { name: "remove this note from review" }).click()
+          cy.findByRole("button", {
+            name: "remove this note from review",
+          }).click()
           cy.findByRole("button", { name: "OK" }).click()
           cy.findByText("This review point has been removed from reviewing.")
         },

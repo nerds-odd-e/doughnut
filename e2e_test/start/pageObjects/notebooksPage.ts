@@ -1,7 +1,7 @@
-import { assumeNotePage } from "./notePage"
 import NotePath from "../../support/NotePath"
-import noteCreationForm from "./noteForms/noteCreationForm"
 import { notebookList } from "./NotebookList"
+import noteCreationForm from "./noteForms/noteCreationForm"
+import { assumeNotePage } from "./notePage"
 
 export const routerToNotebooksPage = () => {
   cy.pageIsNotLoading()
@@ -34,7 +34,9 @@ export const routerToNotebooksPage = () => {
     },
     updateAssessmentSettings(notebook: string, numberOfQuestion: number) {
       this.findNotebookCardButton(notebook, "Edit notebook settings").click()
-      cy.formField("Number Of Questions In Assessment").assignFieldValue(`${numberOfQuestion}`)
+      cy.formField("Number Of Questions In Assessment").assignFieldValue(
+        `${numberOfQuestion}`,
+      )
       cy.findByRole("button", { name: "Update" }).click()
     },
     unsubscribe(notebook: string) {

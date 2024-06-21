@@ -26,16 +26,25 @@ export function adminFineTuningPage() {
     expectExampleQuestions(questions: Record<string, string>[]) {
       this.expectFineTuningExamplesCount(questions.length)
       questions.forEach((expectation) => {
-        cy.findByText(expectation["Question Stem"], { selector: "td" }).dblclick()
+        cy.findByText(expectation["Question Stem"], {
+          selector: "td",
+        }).dblclick()
         if (expectation["Choices"]) {
-          expectation["Choices"].split(", ").forEach((choice: string, index: number) => {
-            cy.findByLabelText(`Choice ${index}`).invoke("val").should("eq", choice)
-          })
+          expectation["Choices"]
+            .split(", ")
+            .forEach((choice: string, index: number) => {
+              cy.findByLabelText(`Choice ${index}`)
+                .invoke("val")
+                .should("eq", choice)
+            })
         }
       })
     },
     duplicateNegativeQuestion(questionStem: string) {
-      cy.findByText(questionStem).parent().findByRole("button", { name: "Duplicate" }).click()
+      cy.findByText(questionStem)
+        .parent()
+        .findByRole("button", { name: "Duplicate" })
+        .click()
     },
 
     expectString(numOfOccurrence: number, expectedString: string) {

@@ -12,14 +12,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { Circle } from "@/generated/backend";
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import TextInput from "../form/TextInput.vue";
+import { Circle } from "@/generated/backend"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import { defineComponent } from "vue"
+import TextInput from "../form/TextInput.vue"
 
 export default defineComponent({
   setup() {
-    return { ...useLoadingApi() };
+    return { ...useLoadingApi() }
   },
   emits: ["closeDialog"],
   components: { TextInput },
@@ -27,7 +27,7 @@ export default defineComponent({
     return {
       formData: {} as Circle,
       errors: {},
-    };
+    }
   },
 
   methods: {
@@ -35,14 +35,14 @@ export default defineComponent({
       this.managedApi.restCircleController
         .createCircle(this.formData)
         .then((res) => {
-          this.$emit("closeDialog");
+          this.$emit("closeDialog")
           this.$router.push({
             name: "circleShow",
             params: { circleId: res.id },
-          });
+          })
         })
-        .catch((err) => (this.errors = err));
+        .catch((err) => (this.errors = err))
     },
   },
-});
+})
 </script>

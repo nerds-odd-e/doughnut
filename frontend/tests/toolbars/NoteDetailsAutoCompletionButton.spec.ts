@@ -1,92 +1,92 @@
-import { flushPromises } from "@vue/test-utils";
-import AIClarifyingQuestionDialog from "@/components/notes/AIClarifyingQuestionDialog.vue";
+import AIClarifyingQuestionDialog from "@/components/notes/AIClarifyingQuestionDialog.vue"
+import NoteDetailsAutoCompletionButton from "@/components/notes/core/NoteDetailsAutoCompletionButton.vue"
 import {
-  AiCompletionParams,
   AiAssistantResponse,
+  AiCompletionParams,
   CancelablePromise,
   Note,
-} from "@/generated/backend";
-import NoteDetailsAutoCompletionButton from "@/components/notes/core/NoteDetailsAutoCompletionButton.vue";
-import helper from "../helpers";
-import makeMe from "../fixtures/makeMe";
+} from "@/generated/backend"
+import { flushPromises } from "@vue/test-utils"
+import makeMe from "../fixtures/makeMe"
+import helper from "../helpers"
 
 describe("NoteDetailsAutoCompletionButton", () => {
-  const note = makeMe.aNote.please();
+  const note = makeMe.aNote.please()
   const mockedGetCompletion = vitest.fn<
     [number, AiCompletionParams],
     CancelablePromise<AiAssistantResponse>
-  >();
+  >()
   const mockedAnswerClarifyingQuestion = vitest.fn().mockResolvedValue({
     requiredAction: {
       contentToAppend: "auto completed content",
     },
-  });
-  const mockedUpldateDetails = vitest.fn();
+  })
+  const mockedUpldateDetails = vitest.fn()
 
   beforeEach(() => {
-    helper.managedApi.restAiController.getCompletion = mockedGetCompletion;
+    helper.managedApi.restAiController.getCompletion = mockedGetCompletion
     helper.managedApi.restAiController.answerCompletionClarifyingQuestion =
-      mockedAnswerClarifyingQuestion;
+      mockedAnswerClarifyingQuestion
     helper.managedApi.restTextContentController.updateNoteDetails =
-      mockedUpldateDetails;
-  });
+      mockedUpldateDetails
+  })
 
   const triggerAutoCompletionWithoutFlushPromises = async (n: Note) => {
     const wrapper = helper
       .component(NoteDetailsAutoCompletionButton)
       .withStorageProps({ note: n })
-      .mount();
-    await wrapper.find(".btn").trigger("click");
-    return wrapper;
-  };
+      .mount()
+    await wrapper.find(".btn").trigger("click")
+    return wrapper
+  }
 
   const triggerAutoCompletion = async (n: Note) => {
-    const wrapper = triggerAutoCompletionWithoutFlushPromises(n);
-    await flushPromises();
-    return wrapper;
-  };
+    const wrapper = triggerAutoCompletionWithoutFlushPromises(n)
+    await flushPromises()
+    return wrapper
+  }
 
   it("ask api to generate details when details is empty", async () => {
-    const noteWithNoDetails = makeMe.aNote.details("").please();
+    const noteWithNoDetails = makeMe.aNote.details("").please()
     mockedGetCompletion.mockResolvedValue({
       requiredAction: { contentToAppend: "auto completed content" },
-    });
-    await triggerAutoCompletion(noteWithNoDetails);
+    })
+    await triggerAutoCompletion(noteWithNoDetails)
     expect(mockedGetCompletion).toHaveBeenCalledWith(
       noteWithNoDetails.id,
       expect.objectContaining({ detailsToComplete: "" }),
-    );
+    )
     expect(mockedUpldateDetails).toHaveBeenCalledWith(
       noteWithNoDetails.id,
       expect.anything(),
-    );
-  });
+    )
+  })
 
   it("ask api be called once when clicking the auto-complete button", async () => {
     mockedGetCompletion.mockResolvedValue({
       requiredAction: { contentToAppend: "auto completed content" },
-    });
-    await triggerAutoCompletion(note);
+    })
+    await triggerAutoCompletion(note)
     expect(mockedGetCompletion).toHaveBeenCalledWith(
       note.id,
       expect.objectContaining({
         detailsToComplete: "<p>Desc</p>",
       }),
-    );
-    expect(mockedUpldateDetails).toHaveBeenCalled();
-  });
+    )
+    expect(mockedUpldateDetails).toHaveBeenCalled()
+  })
 
   it("get more completed content and update", async () => {
     mockedGetCompletion.mockResolvedValue({
       requiredAction: {
         contentToAppend: "auto completed content",
       },
-    });
+    })
 
-    await triggerAutoCompletion(note);
+    await triggerAutoCompletion(note)
 
-    expect(mockedUpldateDetails).toHaveBeenCalled();
-  });
+    expect(mockedUpldateDetails).toHaveBeenCalled()
+  })
 
   it("ask for clarifying question", async () => {
     mockedGetCompletion.mockResolvedValue({
@@ -98,17 +98,17 @@ describe("NoteDetailsAutoCompletionButton", () => {
           question: "what do you mean?",
         },
       },
-    });
-    const wrapper = await triggerAutoCompletion(note);
-    const dialog = wrapper.getComponent(AIClarifyingQuestionDialog);
-    await dialog.find("input#note-answerToAI").setValue("I mean this");
-    await dialog.find("input[type='submit']").trigger("click");
+    })
+    const wrapper = await triggerAutoCompletion(note)
+    const dialog = wrapper.getComponent(AIClarifyingQuestionDialog)
+    await dialog.find("input#note-answerToAI").setValue("I mean this")
+    await dialog.find("input[type='submit']").trigger("click")
     expect(mockedAnswerClarifyingQuestion).toHaveBeenCalledWith(
       expect.objectContaining({
         toolCallId: "tool-call-id",
       }),
-    );
-  });
+    )
+  })
 
   it("stop updating if the component is unmounted", async () => {
     mockedGetCompletion.mockReturnValue(
@@ -117,12 +117,12 @@ describe("NoteDetailsAutoCompletionButton", () => {
           contentToAppend: "auto completed content",
         },
       })),
-    );
+    )
 
-    const wrapper = await triggerAutoCompletionWithoutFlushPromises(note);
-    wrapper.unmount();
-    await flushPromises();
+    const wrapper = await triggerAutoCompletionWithoutFlushPromises(note)
+    wrapper.unmount()
+    await flushPromises()
     // no future api call expected.
     // Because the component is unmounted.
-  });
-});
+  })
+})

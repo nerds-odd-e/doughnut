@@ -5,9 +5,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { ApiError } from "@/managedApi/ManagedApi";
-import ToolbarCover from "./ToolbarOver.vue";
+import { ApiError } from "@/managedApi/ManagedApi"
+import { PropType, defineComponent } from "vue"
+import ToolbarCover from "./ToolbarOver.vue"
 
 export default defineComponent({
   props: {
@@ -17,5 +17,5 @@ export default defineComponent({
     ToolbarCover,
   },
   emits: ["close"],
-});
+})
 </script>

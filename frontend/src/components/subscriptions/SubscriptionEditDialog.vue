@@ -12,21 +12,21 @@
 </template>
 
 <script>
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import TextInput from "../form/TextInput.vue";
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import TextInput from "../form/TextInput.vue"
 
 export default {
   setup() {
-    return useLoadingApi();
+    return useLoadingApi()
   },
   props: { subscription: Object },
   components: { TextInput },
   data() {
-    const { dailyTargetOfNewNotes } = this.subscription;
+    const { dailyTargetOfNewNotes } = this.subscription
     return {
       formData: { dailyTargetOfNewNotes },
       errors: {},
-    };
+    }
   },
 
   methods: {
@@ -34,10 +34,10 @@ export default {
       this.managedApi.restSubscriptionController
         .update(this.subscription.id, this.formData)
         .then(() => {
-          this.$router.push({ name: "notebooks" });
+          this.$router.push({ name: "notebooks" })
         })
-        .catch((err) => (this.errors = err));
+        .catch((err) => (this.errors = err))
     },
   },
-};
+}
 </script>

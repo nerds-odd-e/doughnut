@@ -17,8 +17,8 @@
 </template>
 
 <script lang="ts">
-import gsap from "gsap";
-import { defineComponent } from "vue";
+import gsap from "gsap"
+import { defineComponent } from "vue"
 
 export default defineComponent({
   emits: ["self-evaluated-memory-state"],
@@ -26,7 +26,7 @@ export default defineComponent({
     return {
       loadingWidth: "100%",
       ready: false,
-    };
+    }
   },
   methods: {
     readyIn(sec: number) {
@@ -47,18 +47,18 @@ export default defineComponent({
       // But Cypress doesn't have a clear way of mocking window.Date.
       // `cy.clock()` with no arguments works, but it break other things as mentioned above.
       setTimeout(() => {
-        this.ready = true;
-      }, sec * 1000);
+        this.ready = true
+      }, sec * 1000)
       gsap.to(this, {
         duration: sec,
         loadingWidth: "0%",
-      });
+      })
     },
   },
   mounted() {
-    this.readyIn(10);
+    this.readyIn(10)
   },
-});
+})
 </script>
 
 <style lang="scss" scoped>

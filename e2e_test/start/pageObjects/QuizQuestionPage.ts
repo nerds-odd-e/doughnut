@@ -17,7 +17,10 @@ const assumeQuestionPage = (stem?: string) => {
 
     expectChoiceToBe(choice: string, correctness: "correct" | "incorrect") {
       getChoice(choice).click()
-      getChoice(choice).parent().invoke("attr", "class").should("contain", `is-${correctness}`)
+      getChoice(choice)
+        .parent()
+        .invoke("attr", "class")
+        .should("contain", `is-${correctness}`)
     },
 
     suggestingThisQuestionForFineTuning() {

@@ -39,16 +39,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { User } from "@/generated/backend";
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import ContainerPage from "@/pages/commons/ContainerPage.vue";
-import CheckInput from "@/components/form/CheckInput.vue";
-import TextInput from "@/components/form/TextInput.vue";
+import CheckInput from "@/components/form/CheckInput.vue"
+import TextInput from "@/components/form/TextInput.vue"
+import { User } from "@/generated/backend"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import ContainerPage from "@/pages/commons/ContainerPage.vue"
+import { defineComponent } from "vue"
 
 export default defineComponent({
   setup() {
-    return { ...useLoadingApi() };
+    return { ...useLoadingApi() }
   },
   components: { ContainerPage, TextInput, CheckInput },
   emits: ["user-updated"],
@@ -56,25 +56,25 @@ export default defineComponent({
     return {
       formData: undefined as undefined | User,
       errors: {} as Record<string, string>,
-    };
+    }
   },
   methods: {
     async fetchData() {
-      this.formData = await this.managedApi.restUserController.getUserProfile();
+      this.formData = await this.managedApi.restUserController.getUserProfile()
     },
     async processForm() {
-      if (!this.formData) return;
+      if (!this.formData) return
       const updated = await this.managedApi.restUserController
         .updateUser(this.formData.id, this.formData)
         .catch((err) => {
-          this.errors = err;
-        });
-      this.$emit("user-updated", updated);
+          this.errors = err
+        })
+      this.$emit("user-updated", updated)
     },
   },
 
   mounted() {
-    this.fetchData();
+    this.fetchData()
   },
-});
+})
 </script>

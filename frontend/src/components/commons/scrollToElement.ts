@@ -1,5 +1,5 @@
 const scrollToElement = (elm: HTMLElement) => {
-  elm.scrollIntoView({ behavior: "smooth" as const });
-};
+  elm.scrollIntoView({ behavior: "smooth" as const })
+}
 
-export default scrollToElement;
+export default scrollToElement

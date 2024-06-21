@@ -40,11 +40,11 @@
 </template>
 
 <script lang="ts">
-import { PropType, defineComponent } from "vue";
-import { NoteAccessoriesDTO } from "@/generated/backend";
-import TextInput from "../../form/TextInput.vue";
-import CheckInput from "../../form/CheckInput.vue";
-import FileInput from "../../form/FileInput.vue";
+import { NoteAccessoriesDTO } from "@/generated/backend"
+import { PropType, defineComponent } from "vue"
+import CheckInput from "../../form/CheckInput.vue"
+import FileInput from "../../form/FileInput.vue"
+import TextInput from "../../form/TextInput.vue"
 
 export default defineComponent({
   props: {
@@ -55,11 +55,11 @@ export default defineComponent({
     errors: {
       type: Object,
       default() {
-        return {};
+        return {}
       },
     },
   },
   emits: ["update:modelValue"],
   components: { TextInput, CheckInput, FileInput },
-});
+})
 </script>

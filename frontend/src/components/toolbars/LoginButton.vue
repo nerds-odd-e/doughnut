@@ -10,16 +10,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import loginOrRegisterAndHaltThisThread from "@/managedApi/window/loginOrRegisterAndHaltThisThread";
-import SvgLogin from "@/components/svgs/SvgLogin.vue";
+import SvgLogin from "@/components/svgs/SvgLogin.vue"
+import loginOrRegisterAndHaltThisThread from "@/managedApi/window/loginOrRegisterAndHaltThisThread"
+import { defineComponent } from "vue"
 
 export default defineComponent({
   methods: {
     login() {
-      loginOrRegisterAndHaltThisThread();
+      loginOrRegisterAndHaltThisThread()
     },
   },
   components: { SvgLogin },
-});
+})
 </script>

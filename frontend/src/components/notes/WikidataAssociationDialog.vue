@@ -39,60 +39,58 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, ref } from "vue";
-import { Note, WikidataAssociationCreation } from "@/generated/backend";
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import { StorageAccessor } from "@/store/createNoteStorage";
-import TextInput from "../form/TextInput.vue";
-import NoteTopicComponent from "./core/NoteTopicComponent.vue";
+import { Note, WikidataAssociationCreation } from "@/generated/backend"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import { StorageAccessor } from "@/store/createNoteStorage"
+import { PropType, ref } from "vue"
 
-const { managedApi } = useLoadingApi();
+const { managedApi } = useLoadingApi()
 const props = defineProps({
   note: { type: Object as PropType<Note>, required: true },
   storageAccessor: {
     type: Object as PropType<StorageAccessor>,
     required: true,
   },
-});
+})
 
-const emit = defineEmits(["closeDialog"]);
+const emit = defineEmits(["closeDialog"])
 
 const associationData = ref<WikidataAssociationCreation>({
   wikidataId: props.note.wikidataId!,
-});
-const conflictWikidataTitle = ref<string | undefined>(undefined);
-const wikidataIdError = ref<string | undefined>(undefined);
+})
+const conflictWikidataTitle = ref<string | undefined>(undefined)
+const wikidataIdError = ref<string | undefined>(undefined)
 
 const save = async () => {
   try {
     await props.storageAccessor
       .storedApi()
-      .updateWikidataId(props.note.id, associationData.value);
-    emit("closeDialog");
+      .updateWikidataId(props.note.id, associationData.value)
+    emit("closeDialog")
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {
-    wikidataIdError.value = e.wikidataId;
+    wikidataIdError.value = e.wikidataId
   }
-};
+}
 
 const validateAndSave = async () => {
   try {
     const res =
       await managedApi.restWikidataController.fetchWikidataEntityDataById(
         associationData.value.wikidataId,
-      );
+      )
     if (
       res.WikidataTitleInEnglish !== "" &&
       res.WikidataTitleInEnglish.toUpperCase() !==
         props.note.noteTopic.topicConstructor.toUpperCase()
     ) {
-      conflictWikidataTitle.value = res.WikidataTitleInEnglish;
-      return;
+      conflictWikidataTitle.value = res.WikidataTitleInEnglish
+      return
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {
-    wikidataIdError.value = e.body.message;
+    wikidataIdError.value = e.body.message
   }
-  await save();
-};
+  await save()
+}
 </script>

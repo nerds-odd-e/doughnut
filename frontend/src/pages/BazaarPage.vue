@@ -16,15 +16,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { BazaarNotebook, User } from "@/generated/backend";
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import NotebookBazaarViewCards from "@/components/bazaar/NotebookBazaarViewCards.vue";
-import ContainerPage from "./commons/ContainerPage.vue";
+import NotebookBazaarViewCards from "@/components/bazaar/NotebookBazaarViewCards.vue"
+import { BazaarNotebook, User } from "@/generated/backend"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import { PropType, defineComponent } from "vue"
+import ContainerPage from "./commons/ContainerPage.vue"
 
 export default defineComponent({
   setup() {
-    return useLoadingApi();
+    return useLoadingApi()
   },
   components: { ContainerPage, NotebookBazaarViewCards },
   props: {
@@ -36,18 +36,18 @@ export default defineComponent({
   data() {
     return {
       bazaarNotebooks: null as BazaarNotebook[] | null,
-    };
+    }
   },
 
   methods: {
     fetchData() {
       this.managedApi.restBazaarController.bazaar().then((res) => {
-        this.bazaarNotebooks = res;
-      });
+        this.bazaarNotebooks = res
+      })
     },
   },
   mounted() {
-    this.fetchData();
+    this.fetchData()
   },
-});
+})
 </script>

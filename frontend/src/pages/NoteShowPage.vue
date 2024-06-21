@@ -53,12 +53,9 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, ref } from "vue";
-import { User } from "@/generated/backend";
-import ScrollTo from "@/components/commons/ScrollTo.vue";
-import NoteShow from "../components/notes/NoteShow.vue";
-import BreadcrumbWithCircle from "../components/toolbars/BreadcrumbWithCircle.vue";
-import { StorageAccessor } from "../store/createNoteStorage";
+import { User } from "@/generated/backend"
+import { PropType, ref } from "vue"
+import { StorageAccessor } from "../store/createNoteStorage"
 
 defineProps({
   noteId: { type: Number, required: true },
@@ -67,13 +64,13 @@ defineProps({
     required: true,
   },
   user: { type: Object as PropType<User> },
-});
+})
 
-const sidebarCollapsedForSmallScreen = ref(true);
+const sidebarCollapsedForSmallScreen = ref(true)
 
 const toggleSideBar = () => {
-  sidebarCollapsedForSmallScreen.value = !sidebarCollapsedForSmallScreen.value;
-};
+  sidebarCollapsedForSmallScreen.value = !sidebarCollapsedForSmallScreen.value
+}
 </script>
 
 <style scoped lang="scss">

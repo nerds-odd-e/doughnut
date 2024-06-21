@@ -18,8 +18,8 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
-import { bgcolors } from "../../../colors";
+import { computed } from "vue"
+import { bgcolors } from "../../../colors"
 
 const props = defineProps({
   stripes: Boolean,
@@ -28,7 +28,7 @@ const props = defineProps({
   y: Number,
   abstract: Boolean,
   size: Number,
-});
-const fill = computed(() => bgcolors(props.linkRole));
-const strokeDashArray = computed(() => (props.abstract ? "20, 12" : null));
+})
+const fill = computed(() => bgcolors(props.linkRole))
+const strokeDashArray = computed(() => (props.abstract ? "20, 12" : null))
 </script>

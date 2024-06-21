@@ -12,12 +12,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { Note } from "@/generated/backend";
-import LinkNob from "./LinkNob.vue";
-import { colors } from "../../colors";
-import { StorageAccessor } from "../../store/createNoteStorage";
-import NoteTopicComponent from "../notes/core/NoteTopicComponent.vue";
+import { Note } from "@/generated/backend"
+import { PropType, defineComponent } from "vue"
+import { colors } from "../../colors"
+import { StorageAccessor } from "../../store/createNoteStorage"
+import NoteTopicComponent from "../notes/core/NoteTopicComponent.vue"
+import LinkNob from "./LinkNob.vue"
 
 export default defineComponent({
   props: {
@@ -33,16 +33,16 @@ export default defineComponent({
     noteTopic() {
       return this.reverse
         ? this.note.noteTopic.parentNoteTopic!
-        : this.note.noteTopic.targetNoteTopic!;
+        : this.note.noteTopic.targetNoteTopic!
     },
     fontColor() {
-      return this.reverse ? colors.target : colors.source;
+      return this.reverse ? colors.target : colors.source
     },
     colors() {
-      return colors;
+      return colors
     },
   },
-});
+})
 </script>
 
 <style scoped>

@@ -15,17 +15,17 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { Notebook, Subscription } from "@/generated/backend";
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import NotebookViewCards from "@/components/notebook/NotebookViewCards.vue";
-import NotebookNewButton from "@/components/notebook/NotebookNewButton.vue";
-import NotebookSubscriptionCards from "@/components/subscriptions/NotebookSubscriptionCards.vue";
-import ContainerPage from "./commons/ContainerPage.vue";
+import NotebookNewButton from "@/components/notebook/NotebookNewButton.vue"
+import NotebookViewCards from "@/components/notebook/NotebookViewCards.vue"
+import NotebookSubscriptionCards from "@/components/subscriptions/NotebookSubscriptionCards.vue"
+import { Notebook, Subscription } from "@/generated/backend"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import { defineComponent } from "vue"
+import ContainerPage from "./commons/ContainerPage.vue"
 
 export default defineComponent({
   setup() {
-    return useLoadingApi();
+    return useLoadingApi()
   },
   components: {
     ContainerPage,
@@ -37,18 +37,18 @@ export default defineComponent({
     return {
       subscriptions: undefined as Subscription[] | undefined,
       notebooks: undefined as Notebook[] | undefined,
-    };
+    }
   },
   methods: {
     fetchData() {
       this.managedApi.restNotebookController.myNotebooks().then((res) => {
-        this.notebooks = res.notebooks;
-        this.subscriptions = res.subscriptions;
-      });
+        this.notebooks = res.notebooks
+        this.subscriptions = res.subscriptions
+      })
     },
   },
   mounted() {
-    this.fetchData();
+    this.fetchData()
   },
-});
+})
 </script>

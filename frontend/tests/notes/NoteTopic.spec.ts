@@ -1,9 +1,9 @@
-import { VueWrapper } from "@vue/test-utils";
-import { ComponentPublicInstance } from "vue";
-import { Note } from "@/generated/backend";
-import NoteTopicComponent from "@/components/notes/core/NoteTopicComponent.vue";
-import makeMe from "../fixtures/makeMe";
-import helper from "../helpers";
+import NoteTopicComponent from "@/components/notes/core/NoteTopicComponent.vue"
+import { Note } from "@/generated/backend"
+import { VueWrapper } from "@vue/test-utils"
+import { ComponentPublicInstance } from "vue"
+import makeMe from "../fixtures/makeMe"
+import helper from "../helpers"
 
 describe("note topic", () => {
   const mountComponent = (n: Note): VueWrapper<ComponentPublicInstance> => {
@@ -12,36 +12,36 @@ describe("note topic", () => {
       .withProps({
         noteTopic: n.noteTopic,
       })
-      .mount();
-  };
+      .mount()
+  }
 
   beforeEach(() => {
-    vi.resetAllMocks();
-  });
+    vi.resetAllMocks()
+  })
 
   describe("linking note", () => {
-    const note = makeMe.aNote.topicConstructor("Dummy Title").please();
-    const target = makeMe.aNote.underNote(note).please();
-    const linkingNote = makeMe.aLink.to(target).please();
+    const note = makeMe.aNote.topicConstructor("Dummy Title").please()
+    const target = makeMe.aNote.underNote(note).please()
+    const linkingNote = makeMe.aLink.to(target).please()
 
     it("should have link to target", async () => {
-      const wrapper = mountComponent(linkingNote);
-      const link = wrapper.find("a.router-link");
-      expect(link.exists()).toBe(true);
+      const wrapper = mountComponent(linkingNote)
+      const link = wrapper.find("a.router-link")
+      expect(link.exists()).toBe(true)
       expect(JSON.parse(link.attributes("to")!)).toMatchObject({
         name: "noteShow",
         params: { noteId: target.id },
-      });
-      expect(link.text()).toBe(target.noteTopic.topicConstructor);
-    });
+      })
+      expect(link.text()).toBe(target.noteTopic.topicConstructor)
+    })
 
     it("if linking note has details the link is an icon", async () => {
-      linkingNote.noteTopic.shortDetails = "exist";
-      const wrapper = mountComponent(linkingNote);
-      const link = wrapper.find("a.router-link");
-      expect(link.exists()).toBe(true);
-      expect(link.text()).toBe("🔗");
-      expect(wrapper.text()).toContain(target.noteTopic.topicConstructor);
-    });
-  });
-});
+      linkingNote.noteTopic.shortDetails = "exist"
+      const wrapper = mountComponent(linkingNote)
+      const link = wrapper.find("a.router-link")
+      expect(link.exists()).toBe(true)
+      expect(link.text()).toBe("🔗")
+      expect(wrapper.text()).toContain(target.noteTopic.topicConstructor)
+    })
+  })
+})

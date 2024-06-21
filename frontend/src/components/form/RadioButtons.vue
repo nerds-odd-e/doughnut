@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import InputWithType from "./InputWithType.vue";
+import InputWithType from "./InputWithType.vue"
 
 export default {
   props: {
@@ -39,10 +39,10 @@ export default {
   components: { InputWithType },
   methods: {
     selectionChanged(event) {
-      this.$emit("update:modelValue", event.target.value);
+      this.$emit("update:modelValue", event.target.value)
     },
   },
-};
+}
 </script>
 
 <style scoped>

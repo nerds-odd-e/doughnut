@@ -2,7 +2,10 @@ import ServiceMocker from "../../support/ServiceMocker"
 import { MessageToMatch } from "./MessageToMatch"
 import openAiAssistantCreatedRunMocker from "./openAiAssistantCreatedRunMocker"
 
-const openAiAssistantThreadMocker = (serviceMocker: ServiceMocker, threadId: string) => {
+const openAiAssistantThreadMocker = (
+  serviceMocker: ServiceMocker,
+  threadId: string,
+) => {
   return {
     async stubCreateMessageAndCreateRun(message: MessageToMatch) {
       // for creating a message
@@ -33,11 +36,18 @@ const openAiAssistantThreadMocker = (serviceMocker: ServiceMocker, threadId: str
         {},
         responses,
       )
-      return openAiAssistantCreatedRunMocker(serviceMocker, threadId, "run-abc123")
+      return openAiAssistantCreatedRunMocker(
+        serviceMocker,
+        threadId,
+        "run-abc123",
+      )
     },
 
     async stubRetrieveRunsThatRequireAction(hashes: Record<string, string>[]) {
-      const createRequiresActionRun = (functionName: string, argumentsObj: unknown) => {
+      const createRequiresActionRun = (
+        functionName: string,
+        argumentsObj: unknown,
+      ) => {
         return {
           id: "run-abc123",
           status: "requires_action",
@@ -78,7 +88,11 @@ const openAiAssistantThreadMocker = (serviceMocker: ServiceMocker, threadId: str
         {},
         responses,
       )
-      return openAiAssistantCreatedRunMocker(serviceMocker, threadId, "run-abc123")
+      return openAiAssistantCreatedRunMocker(
+        serviceMocker,
+        threadId,
+        "run-abc123",
+      )
     },
   }
 }

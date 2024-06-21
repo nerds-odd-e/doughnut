@@ -1,14 +1,14 @@
-import { flushPromises } from "@vue/test-utils";
-import { screen } from "@testing-library/vue";
-import NoteShow from "@/components/notes/NoteShow.vue";
-import { NoteRealm } from "@/generated/backend";
-import helper from "../helpers";
-import makeMe from "../fixtures/makeMe";
+import NoteShow from "@/components/notes/NoteShow.vue"
+import { NoteRealm } from "@/generated/backend"
+import { screen } from "@testing-library/vue"
+import { flushPromises } from "@vue/test-utils"
+import makeMe from "../fixtures/makeMe"
+import helper from "../helpers"
 
 describe("new/updated pink banner", () => {
   beforeAll(() => {
-    Date.now = vi.fn(() => new Date(Date.UTC(2017, 1, 14)).valueOf());
-  });
+    Date.now = vi.fn(() => new Date(Date.UTC(2017, 1, 14)).valueOf())
+  })
 
   it.each([
     [new Date(Date.UTC(2017, 1, 15)), "rgb(208,237,23)"],
@@ -18,10 +18,10 @@ describe("new/updated pink banner", () => {
   ])(
     "should show fresher color if recently updated",
     async (updatedAt, expectedColor) => {
-      const note = makeMe.aNoteRealm.updatedAt(updatedAt).please();
+      const note = makeMe.aNoteRealm.updatedAt(updatedAt).please()
       helper.managedApi.restNoteController.show1 = vitest
         .fn()
-        .mockResolvedValue(note);
+        .mockResolvedValue(note)
 
       const wrapper = helper
         .component(NoteShow)
@@ -30,39 +30,39 @@ describe("new/updated pink banner", () => {
           expandChildren: true,
           readonly: false,
         })
-        .mount();
-      await flushPromises();
+        .mount()
+      await flushPromises()
       expect(wrapper.find(".note-recent-update-indicator").element).toHaveStyle(
         `color: ${expectedColor};`,
-      );
+      )
     },
-  );
-});
+  )
+})
 
 describe("note wth children", () => {
-  const note = makeMe.aNoteRealm.please();
+  const note = makeMe.aNoteRealm.please()
 
   const render = (n: NoteRealm) => {
     helper.managedApi.restNoteController.show1 = vitest
       .fn()
-      .mockResolvedValue(n);
+      .mockResolvedValue(n)
     helper
       .component(NoteShow)
       .withStorageProps({
         noteId: n.id,
         expandChildren: true,
       })
-      .render();
-  };
+      .render()
+  }
 
   it("should call the api", async () => {
-    render(note);
-    expect(helper.managedApi.restNoteController.show1).toBeCalledWith(note.id);
-  });
+    render(note)
+    expect(helper.managedApi.restNoteController.show1).toBeCalledWith(note.id)
+  })
 
   it("should not render children control if no child", async () => {
-    render(note);
-    await flushPromises();
-    expect(screen.queryAllByTitle("collapse children")).toHaveLength(0);
-  });
-});
+    render(note)
+    await flushPromises()
+    expect(screen.queryAllByTitle("collapse children")).toHaveLength(0)
+  })
+})

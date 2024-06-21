@@ -10,8 +10,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import TextInput from "../form/TextInput.vue";
+import { defineComponent } from "vue"
+import TextInput from "../form/TextInput.vue"
 
 export default defineComponent({
   props: {
@@ -20,5 +20,5 @@ export default defineComponent({
   },
   emits: ["update:modelValue"],
   components: { TextInput },
-});
+})
 </script>

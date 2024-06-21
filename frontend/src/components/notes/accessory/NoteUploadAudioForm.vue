@@ -12,9 +12,9 @@
 </template>
 
 <script lang="ts">
-import { PropType, defineComponent } from "vue";
-import { AudioUploadDTO } from "@/generated/backend";
-import FileInput from "../../form/FileInput.vue";
+import { AudioUploadDTO } from "@/generated/backend"
+import { PropType, defineComponent } from "vue"
+import FileInput from "../../form/FileInput.vue"
 
 export default defineComponent({
   props: {
@@ -25,16 +25,16 @@ export default defineComponent({
     errors: {
       type: Object,
       default() {
-        return {};
+        return {}
       },
     },
   },
   data() {
     return {
       formData: { ...this.modelValue },
-    };
+    }
   },
   emits: ["update:modelValue"],
   components: { FileInput },
-});
+})
 </script>

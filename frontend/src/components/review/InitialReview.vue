@@ -16,20 +16,20 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { Note } from "@/generated/backend";
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import { StorageAccessor } from "@/store/createNoteStorage";
-import ContainerPage from "@/pages/commons/ContainerPage.vue";
-import NoteInfoBar from "../notes/NoteInfoBar.vue";
-import InitialReviewButtons from "./InitialReviewButtons.vue";
-import usePopups from "../commons/Popups/usePopups";
-import NoteWithBreadcrumb from "./NoteWithBreadcrumb.vue";
+import { Note } from "@/generated/backend"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import ContainerPage from "@/pages/commons/ContainerPage.vue"
+import { StorageAccessor } from "@/store/createNoteStorage"
+import { PropType, defineComponent } from "vue"
+import usePopups from "../commons/Popups/usePopups"
+import NoteInfoBar from "../notes/NoteInfoBar.vue"
+import InitialReviewButtons from "./InitialReviewButtons.vue"
+import NoteWithBreadcrumb from "./NoteWithBreadcrumb.vue"
 
 export default defineComponent({
   name: "InitialReview",
   setup() {
-    return { ...useLoadingApi(), ...usePopups() };
+    return { ...useLoadingApi(), ...usePopups() }
   },
   props: {
     note: {
@@ -50,7 +50,7 @@ export default defineComponent({
   },
   computed: {
     buttonKey() {
-      return this.note.id;
+      return this.note.id
     },
   },
 
@@ -62,7 +62,7 @@ export default defineComponent({
             "Confirm to hide this note from reviewing in the future?",
           ))
         )
-          return;
+          return
       }
       this.managedApi.restReviewsController
         .create({
@@ -71,14 +71,14 @@ export default defineComponent({
         })
         .then((data) => {
           if (skipReview) {
-            this.$emit("reloadNeeded", data);
+            this.$emit("reloadNeeded", data)
           } else {
-            this.$emit("initialReviewDone", data);
+            this.$emit("initialReviewDone", data)
           }
-        });
+        })
     },
   },
-});
+})
 </script>
 
 <style>

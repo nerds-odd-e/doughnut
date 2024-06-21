@@ -4,7 +4,7 @@
 
 import start from "../start"
 
-import { When, Then, DataTable } from "@badeball/cypress-cucumber-preprocessor"
+import { DataTable, Then, When } from "@badeball/cypress-cucumber-preprocessor"
 
 When("I send the message {string} to AI", (question: string) => {
   start.assumeChatAboutNotePage().sendMessage(question)

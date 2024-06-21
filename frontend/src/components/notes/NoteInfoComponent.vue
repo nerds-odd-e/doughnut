@@ -14,10 +14,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { NoteInfo, ReviewPoint } from "@/generated/backend";
-import ReviewSettingForm from "../review/ReviewSettingForm.vue";
-import NoteInfoReviewPoint from "./NoteInfoReviewPoint.vue";
+import { NoteInfo, ReviewPoint } from "@/generated/backend"
+import { PropType, defineComponent } from "vue"
+import ReviewSettingForm from "../review/ReviewSettingForm.vue"
+import NoteInfoReviewPoint from "./NoteInfoReviewPoint.vue"
 
 export default defineComponent({
   props: {
@@ -27,20 +27,20 @@ export default defineComponent({
   data() {
     return {
       reviewPoint: this.noteInfo.reviewPoint,
-    };
+    }
   },
   computed: {
     reviewSetting() {
-      return this.noteInfo.reviewSetting;
+      return this.noteInfo.reviewSetting
     },
   },
   components: { ReviewSettingForm, NoteInfoReviewPoint },
   methods: {
     onSelfEvaluated(reviewPoint: ReviewPoint) {
-      this.reviewPoint = reviewPoint;
+      this.reviewPoint = reviewPoint
     },
   },
-});
+})
 </script>
 
 <style lang="scss" scoped>

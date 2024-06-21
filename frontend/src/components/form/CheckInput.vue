@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import InputWithType from "./InputWithType.vue";
+import InputWithType from "./InputWithType.vue"
 
 export default {
   props: {
@@ -25,5 +25,5 @@ export default {
   },
   emits: ["update:modelValue"],
   components: { InputWithType },
-};
+}
 </script>

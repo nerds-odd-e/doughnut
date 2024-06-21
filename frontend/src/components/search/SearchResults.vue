@@ -24,18 +24,18 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { debounce } from "mini-debounce";
-import { NoteTopic, SearchTerm } from "@/generated/backend";
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import CheckInput from "../form/CheckInput.vue";
-import Cards from "../notes/Cards.vue";
+import { NoteTopic, SearchTerm } from "@/generated/backend"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import { debounce } from "mini-debounce"
+import { defineComponent } from "vue"
+import CheckInput from "../form/CheckInput.vue"
+import Cards from "../notes/Cards.vue"
 
-const debounced = debounce((callback) => callback(), 500);
+const debounced = debounce((callback) => callback(), 500)
 
 export default defineComponent({
   setup() {
-    return useLoadingApi();
+    return useLoadingApi()
   },
   name: "SearchNote",
   props: { noteId: Number, inputSearchKey: { type: String, required: true } },
@@ -56,12 +56,12 @@ export default defineComponent({
         global: {},
         local: {},
       } as {
-        global: Record<string, NoteTopic[]>;
-        local: Record<string, NoteTopic[]>;
+        global: Record<string, NoteTopic[]>
+        local: Record<string, NoteTopic[]>
       },
       recentResult: undefined as NoteTopic[] | undefined,
       timeoutId: null as unknown as ReturnType<typeof setTimeout>,
-    };
+    }
   },
   watch: {
     searchTerm: {
@@ -70,38 +70,38 @@ export default defineComponent({
           this.searchTerm.allMyCircles &&
           !this.oldSearchTerm.allMyNotebooksAndSubscriptions
         ) {
-          this.searchTerm.allMyNotebooksAndSubscriptions = true;
+          this.searchTerm.allMyNotebooksAndSubscriptions = true
         } else if (
           !this.searchTerm.allMyNotebooksAndSubscriptions &&
           this.oldSearchTerm.allMyCircles
         ) {
-          this.searchTerm.allMyCircles = false;
+          this.searchTerm.allMyCircles = false
         }
         if (this.searchTerm.searchKey.trim() !== "") {
-          this.search();
+          this.search()
         }
-        this.oldSearchTerm = { ...this.searchTerm };
+        this.oldSearchTerm = { ...this.searchTerm }
       },
       deep: true,
     },
     inputSearchKey() {
-      this.searchTerm.searchKey = this.inputSearchKey;
+      this.searchTerm.searchKey = this.inputSearchKey
     },
   },
   computed: {
     trimmedSearchKey() {
-      return this.searchTerm.searchKey.trim();
+      return this.searchTerm.searchKey.trim()
     },
     cachedSearches() {
       return this.searchTerm.allMyNotebooksAndSubscriptions
         ? this.cache.global
-        : this.cache.local;
+        : this.cache.local
     },
     cachedResult() {
-      return this.cachedSearches[this.trimmedSearchKey];
+      return this.cachedSearches[this.trimmedSearchKey]
     },
     searchResult() {
-      return this.cachedResult ? this.cachedResult : this.recentResult;
+      return this.cachedResult ? this.cachedResult : this.recentResult
     },
   },
   methods: {
@@ -113,9 +113,9 @@ export default defineComponent({
         return this.managedApi.restNoteController.searchForLinkTargetWithin(
           noteId,
           searchTerm,
-        );
+        )
       }
-      return this.managedApi.restNoteController.searchForLinkTarget(searchTerm);
+      return this.managedApi.restNoteController.searchForLinkTarget(searchTerm)
     },
 
     search() {
@@ -125,27 +125,27 @@ export default defineComponent({
           "trimmedSearchKey",
         )
       ) {
-        return;
+        return
       }
 
       this.timeoutId = debounced(async () => {
-        const originalTrimmedKey = this.trimmedSearchKey;
-        const result = await this.relativeSearch(this.noteId, this.searchTerm);
-        this.recentResult = result;
-        this.cachedSearches[originalTrimmedKey] = result;
-      });
+        const originalTrimmedKey = this.trimmedSearchKey
+        const result = await this.relativeSearch(this.noteId, this.searchTerm)
+        this.recentResult = result
+        this.cachedSearches[originalTrimmedKey] = result
+      })
     },
   },
   mounted() {
     if (!this.noteId) {
-      this.searchTerm.allMyNotebooksAndSubscriptions = true;
+      this.searchTerm.allMyNotebooksAndSubscriptions = true
     }
-    this.searchTerm.searchKey = this.inputSearchKey;
+    this.searchTerm.searchKey = this.inputSearchKey
   },
   beforeUnmount() {
-    clearTimeout(this.timeoutId);
+    clearTimeout(this.timeoutId)
   },
-});
+})
 </script>
 
 <style scoped>

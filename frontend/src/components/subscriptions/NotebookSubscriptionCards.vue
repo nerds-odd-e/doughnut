@@ -10,13 +10,13 @@
 </template>
 
 <script>
-import NotebookCardsWithButtons from "../notebook/NotebookCardsWithButtons.vue";
-import SubscriptionNoteButtons from "./SubscriptionNoteButtons.vue";
+import NotebookCardsWithButtons from "../notebook/NotebookCardsWithButtons.vue"
+import SubscriptionNoteButtons from "./SubscriptionNoteButtons.vue"
 
 export default {
   name: "NotebookSubscriptionCards",
   props: { subscriptions: Array },
   emits: ["updated"],
   components: { NotebookCardsWithButtons, SubscriptionNoteButtons },
-};
+}
 </script>

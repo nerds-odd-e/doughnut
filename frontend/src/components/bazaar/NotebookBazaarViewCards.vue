@@ -7,10 +7,8 @@
 </template>
 
 <script setup lang="ts">
-import { PropType } from "vue";
-import { BazaarNotebook } from "@/generated/backend";
-import NotebookCardsWithButtons from "../notebook/NotebookCardsWithButtons.vue";
-import BazaarNotebookButtons from "./BazaarNotebookButtons.vue";
+import { BazaarNotebook } from "@/generated/backend"
+import { PropType } from "vue"
 
 const props = defineProps({
   bazaarNotebooks: {
@@ -18,9 +16,9 @@ const props = defineProps({
     required: true,
   },
   loggedIn: Boolean,
-});
+})
 
 const notebooks = props.bazaarNotebooks.map(
   (bazaarNotebook) => bazaarNotebook.notebook,
-);
+)
 </script>

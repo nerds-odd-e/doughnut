@@ -9,9 +9,8 @@
 </template>
 
 <script setup lang="ts">
-import { PropType } from "vue";
-import { NoteTopic } from "@/generated/backend";
-import SvgLinkTypeIcon from "../svgs/SvgLinkTypeIcon.vue";
+import { NoteTopic } from "@/generated/backend"
+import { PropType } from "vue"
 
 defineProps({
   noteTopic: {
@@ -19,5 +18,5 @@ defineProps({
     required: true,
   },
   inverseIcon: Boolean,
-});
+})
 </script>

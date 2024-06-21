@@ -7,10 +7,10 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
-import { bgcolors } from "../../../colors";
+import { computed } from "vue"
+import { bgcolors } from "../../../colors"
 
-const props = defineProps({ linkRole: String, x: Number, y: Number });
-const fill = computed(() => bgcolors(props.linkRole));
-const strokeDashArray = computed(() => (props.abstract ? "20, 12" : null));
+const props = defineProps({ linkRole: String, x: Number, y: Number })
+const fill = computed(() => bgcolors(props.linkRole))
+const strokeDashArray = computed(() => (props.abstract ? "20, 12" : null))
 </script>

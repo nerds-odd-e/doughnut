@@ -3,13 +3,13 @@ import {
   DefaultPredicate,
   FlexiPredicate,
   HttpMethod,
-  Predicate,
   Operator,
+  Predicate,
   Stub,
 } from "@anev/ts-mountebank"
+import MountebankStubBuilder from "./MountebankStubBuilder"
 import MountebankWrapper from "./MountebankWrapper"
 import { NotPredicate } from "./NotPredicate"
-import MountebankStubBuilder from "./MountebankStubBuilder"
 
 class ServiceMocker {
   private readonly mountebank: MountebankWrapper
@@ -45,20 +45,37 @@ class ServiceMocker {
 
   public stubGetter(path: string, queryData: unknown, response: unknown) {
     return this.mockWithPredicates(
-      [new FlexiPredicate().withPath(path).withMethod(HttpMethod.GET).withQuery(queryData)],
+      [
+        new FlexiPredicate()
+          .withPath(path)
+          .withMethod(HttpMethod.GET)
+          .withQuery(queryData),
+      ],
       [response],
     )
   }
 
-  public stubGetterWithMutipleResponses(path: string, queryData: unknown, responses: unknown[]) {
+  public stubGetterWithMutipleResponses(
+    path: string,
+    queryData: unknown,
+    responses: unknown[],
+  ) {
     return this.mockWithPredicates(
-      [new FlexiPredicate().withPath(path).withMethod(HttpMethod.GET).withQuery(queryData)],
+      [
+        new FlexiPredicate()
+          .withPath(path)
+          .withMethod(HttpMethod.GET)
+          .withQuery(queryData),
+      ],
       responses,
     )
   }
 
   public stubPoster(path: string, response: unknown) {
-    return this.mockWithPredicates([new DefaultPredicate(path, HttpMethod.POST)], [response])
+    return this.mockWithPredicates(
+      [new DefaultPredicate(path, HttpMethod.POST)],
+      [response],
+    )
   }
 
   public mockPostMatchsAndNotMatches(
@@ -89,7 +106,10 @@ class ServiceMocker {
     return this.addStubToMountebank(stub)
   }
 
-  public stubGetterWithError500Response(pathMatcher: string, response: unknown) {
+  public stubGetterWithError500Response(
+    pathMatcher: string,
+    response: unknown,
+  ) {
     const stub = this.mountebankStubBuilder.stubWithErrorResponse(
       pathMatcher,
       HttpMethod.GET,
@@ -99,7 +119,10 @@ class ServiceMocker {
     return this.addStubToMountebank(stub)
   }
 
-  public stubPosterWithError500Response(pathMatcher: string, response: unknown) {
+  public stubPosterWithError500Response(
+    pathMatcher: string,
+    response: unknown,
+  ) {
     const stub = this.mountebankStubBuilder.stubWithErrorResponse(
       pathMatcher,
       HttpMethod.POST,
@@ -109,8 +132,14 @@ class ServiceMocker {
     return this.addStubToMountebank(stub)
   }
 
-  private mockWithPredicates(predicates: Predicate[], responses: unknown[]): Promise<void> {
-    const stub = this.mountebankStubBuilder.stubWithPredicates(predicates, responses)
+  private mockWithPredicates(
+    predicates: Predicate[],
+    responses: unknown[],
+  ): Promise<void> {
+    const stub = this.mountebankStubBuilder.stubWithPredicates(
+      predicates,
+      responses,
+    )
     return this.addStubToMountebank(stub)
   }
 

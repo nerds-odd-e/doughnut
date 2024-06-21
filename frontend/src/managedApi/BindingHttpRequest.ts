@@ -1,23 +1,23 @@
-import { ApiError, CancelablePromise } from "@/generated/backend";
-import { ApiRequestOptions } from "@/generated/backend/core/ApiRequestOptions";
-import { FetchHttpRequest } from "@/generated/backend/core/FetchHttpRequest";
-import loginOrRegisterAndHaltThisThread from "./window/loginOrRegisterAndHaltThisThread";
-import ApiStatusHandler, { ApiStatus } from "./ApiStatusHandler";
-import assignBadRequestProperties from "./window/assignBadRequestProperties";
+import { ApiError, CancelablePromise } from "@/generated/backend"
+import { ApiRequestOptions } from "@/generated/backend/core/ApiRequestOptions"
+import { FetchHttpRequest } from "@/generated/backend/core/FetchHttpRequest"
+import ApiStatusHandler, { ApiStatus } from "./ApiStatusHandler"
+import assignBadRequestProperties from "./window/assignBadRequestProperties"
+import loginOrRegisterAndHaltThisThread from "./window/loginOrRegisterAndHaltThisThread"
 
 export default function BindingHttpRequest(
   apiStatus: ApiStatus,
   silent?: boolean,
 ) {
-  const apiStatusHandler = new ApiStatusHandler(apiStatus, silent);
+  const apiStatusHandler = new ApiStatusHandler(apiStatus, silent)
   return class BindingHttpRequestWithStatus extends FetchHttpRequest {
     public override request<T>(
       options: ApiRequestOptions,
     ): CancelablePromise<T> {
       return new CancelablePromise<T>((resolve, reject, onCancel) => {
-        const originalPromise = super.request<T>(options);
+        const originalPromise = super.request<T>(options)
 
-        onCancel(() => originalPromise.cancel());
+        onCancel(() => originalPromise.cancel())
 
         this.around(originalPromise)
           .then(resolve)
@@ -31,35 +31,35 @@ export default function BindingHttpRequest(
                     "You are logged out. Do you want to log in (and lose the current changes)?",
                   )
                 ) {
-                  loginOrRegisterAndHaltThisThread();
-                  return;
+                  loginOrRegisterAndHaltThisThread()
+                  return
                 }
               }
 
-              const msg = error.body ? error.body.message : error.message;
-              apiStatusHandler.addError(msg);
+              const msg = error.body ? error.body.message : error.message
+              apiStatusHandler.addError(msg)
 
               if (error.status === 400) {
                 const jsonResponse =
                   typeof error.body === "string"
                     ? JSON.parse(error.body)
-                    : error.body;
-                assignBadRequestProperties(error, jsonResponse);
+                    : error.body
+                assignBadRequestProperties(error, jsonResponse)
               }
             }
-            reject(error);
-          });
-      });
+            reject(error)
+          })
+      })
     }
 
     // eslint-disable-next-line class-methods-use-this
     private async around<T>(promise: Promise<T>): Promise<T> {
-      apiStatusHandler.assignLoading(true);
+      apiStatusHandler.assignLoading(true)
       try {
-        return await promise;
+        return await promise
       } finally {
-        apiStatusHandler.assignLoading(false);
+        apiStatusHandler.assignLoading(false)
       }
     }
-  };
+  }
 }

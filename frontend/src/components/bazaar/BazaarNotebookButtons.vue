@@ -21,18 +21,18 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
+import { PropType, defineComponent } from "vue"
 
-import { Notebook } from "@/generated/backend";
-import PopButton from "../commons/Popups/PopButton.vue";
-import SubscribeDialog from "./SubscribeDialog.vue";
-import SvgAdd from "../svgs/SvgAdd.vue";
-import SvgAssessment from "../svgs/SvgAssessment.vue";
-import usePopups from "../commons/Popups/usePopups";
+import { Notebook } from "@/generated/backend"
+import PopButton from "../commons/Popups/PopButton.vue"
+import usePopups from "../commons/Popups/usePopups"
+import SvgAdd from "../svgs/SvgAdd.vue"
+import SvgAssessment from "../svgs/SvgAssessment.vue"
+import SubscribeDialog from "./SubscribeDialog.vue"
 
 export default defineComponent({
   setup() {
-    return usePopups();
+    return usePopups()
   },
   props: {
     notebook: { type: Object as PropType<Notebook>, required: true },
@@ -47,8 +47,8 @@ export default defineComponent({
   methods: {
     openAssessmentPage() {
       if (!this.loggedIn) {
-        this.popups.alert("Please login first");
-        return;
+        this.popups.alert("Please login first")
+        return
       }
       this.$router.push({
         name: "assessment",
@@ -58,8 +58,8 @@ export default defineComponent({
         params: {
           notebookId: this.notebook.id,
         },
-      });
+      })
     },
   },
-});
+})
 </script>

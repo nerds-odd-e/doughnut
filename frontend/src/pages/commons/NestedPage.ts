@@ -1,9 +1,9 @@
-import { defineComponent, h, PropType } from "vue";
-import { RouterView } from "vue-router";
-import { User } from "@/generated/backend";
-import usePopups from "../../components/commons/Popups/usePopups";
-import routerScopeGuard from "../../routes/relative_routes";
-import { StorageAccessor } from "../../store/createNoteStorage";
+import { User } from "@/generated/backend"
+import { PropType, defineComponent, h } from "vue"
+import { RouterView } from "vue-router"
+import usePopups from "../../components/commons/Popups/usePopups"
+import routerScopeGuard from "../../routes/relative_routes"
+import { StorageAccessor } from "../../store/createNoteStorage"
 
 function NestedPage(
   WrappedComponent: ReturnType<typeof defineComponent>,
@@ -12,7 +12,7 @@ function NestedPage(
   return defineComponent({
     name: "NestedPage",
     setup() {
-      return usePopups();
+      return usePopups()
     },
     props: {
       storageAccessor: {
@@ -27,28 +27,28 @@ function NestedPage(
     computed: {
       isNested() {
         if (this.$route) {
-          const routeParts = this.$route?.name?.toString().split("-");
-          return routeParts && routeParts.length > 1;
+          const routeParts = this.$route?.name?.toString().split("-")
+          return routeParts && routeParts.length > 1
         }
-        return true;
+        return true
       },
     },
     beforeRouteEnter(to, _from, next) {
-      routerScopeGuard(scopeName)(to, next);
+      routerScopeGuard(scopeName)(to, next)
     },
     beforeRouteUpdate(to, _from, next) {
-      routerScopeGuard(scopeName)(to, next);
+      routerScopeGuard(scopeName)(to, next)
     },
     beforeRouteLeave(to, _from, next) {
-      routerScopeGuard(scopeName)(to, next);
+      routerScopeGuard(scopeName)(to, next)
     },
     render() {
       return h("div", { class: "content" }, [
         h(WrappedComponent, { ...this.$props, minimized: this.isNested }),
         h(RouterView, { ...this.$props }),
-      ]);
+      ])
     },
-  });
+  })
 }
 
-export default NestedPage;
+export default NestedPage

@@ -38,14 +38,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { NoteCreationDTO, WikidataSearchEntity } from "@/generated/backend";
-import NoteFormTopicOnly from "./NoteFormTopicOnly.vue";
-import SearchResults from "../search/SearchResults.vue";
-import LinkTypeSelectCompact from "../links/LinkTypeSelectCompact.vue";
-import WikidataSearchByLabel from "./WikidataSearchByLabel.vue";
-import { StorageAccessor } from "../../store/createNoteStorage";
-import SuggestTopic from "./SuggestTopic.vue";
+import { NoteCreationDTO, WikidataSearchEntity } from "@/generated/backend"
+import { PropType, defineComponent } from "vue"
+import { StorageAccessor } from "../../store/createNoteStorage"
+import LinkTypeSelectCompact from "../links/LinkTypeSelectCompact.vue"
+import SearchResults from "../search/SearchResults.vue"
+import NoteFormTopicOnly from "./NoteFormTopicOnly.vue"
+import SuggestTopic from "./SuggestTopic.vue"
+import WikidataSearchByLabel from "./WikidataSearchByLabel.vue"
 
 export default defineComponent({
   components: {
@@ -77,46 +77,46 @@ export default defineComponent({
       },
       suggestedTopic: "",
       processing: false,
-    };
+    }
   },
   methods: {
     processForm() {
-      if (this.processing) return;
-      this.processing = true;
-      this.noteFormErrors.wikidataId = undefined;
-      this.noteFormErrors.topicConstructor = undefined;
+      if (this.processing) return
+      this.processing = true
+      this.noteFormErrors.wikidataId = undefined
+      this.noteFormErrors.topicConstructor = undefined
       this.storageAccessor
         .storedApi()
         .createNote(this.$router, this.parentId, this.creationData)
         .then(() => {
-          this.$emit("closeDialog");
+          this.$emit("closeDialog")
         })
         .catch((res) => {
-          this.noteFormErrors = res;
+          this.noteFormErrors = res
         })
         .finally(() => {
-          this.processing = false;
-        });
+          this.processing = false
+        })
     },
     onSelectWikidataEntry(selectedSuggestion: WikidataSearchEntity) {
-      const currentLabel = this.creationData.topicConstructor.toUpperCase();
-      const newLabel = selectedSuggestion.label.toUpperCase();
+      const currentLabel = this.creationData.topicConstructor.toUpperCase()
+      const newLabel = selectedSuggestion.label.toUpperCase()
 
       if (currentLabel === newLabel) {
-        this.creationData.topicConstructor = selectedSuggestion.label;
-        this.suggestedTopic = "";
+        this.creationData.topicConstructor = selectedSuggestion.label
+        this.suggestedTopic = ""
       } else {
-        this.suggestedTopic = selectedSuggestion.label;
+        this.suggestedTopic = selectedSuggestion.label
       }
 
-      this.creationData.wikidataId = selectedSuggestion.id;
+      this.creationData.wikidataId = selectedSuggestion.id
     },
     takeSuggestedTopic(topic: string) {
-      this.creationData.topicConstructor = topic;
-      this.suggestedTopic = "";
+      this.creationData.topicConstructor = topic
+      this.suggestedTopic = ""
     },
   },
-});
+})
 </script>
 
 <style lang="sass">

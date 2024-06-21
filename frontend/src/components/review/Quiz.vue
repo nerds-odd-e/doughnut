@@ -25,18 +25,18 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import _ from "lodash";
-import { AnsweredQuestion, QuizQuestionInNotebook } from "@/generated/backend";
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import { StorageAccessor } from "@/store/createNoteStorage";
-import ContentLoader from "@/components/commons/ContentLoader.vue";
-import JustReview from "./JustReview.vue";
-import ContestableQuestion from "./ContestableQuestion.vue";
+import ContentLoader from "@/components/commons/ContentLoader.vue"
+import { AnsweredQuestion, QuizQuestionInNotebook } from "@/generated/backend"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import { StorageAccessor } from "@/store/createNoteStorage"
+import _ from "lodash"
+import { PropType, defineComponent } from "vue"
+import ContestableQuestion from "./ContestableQuestion.vue"
+import JustReview from "./JustReview.vue"
 
 export default defineComponent({
   setup() {
-    return useLoadingApi();
+    return useLoadingApi()
   },
   props: {
     minimized: Boolean,
@@ -68,82 +68,82 @@ export default defineComponent({
       quizQuestionCache: [] as (QuizQuestionInNotebook | undefined)[],
       eagerFetchUntil: 0,
       fetching: false,
-    };
+    }
   },
   computed: {
     currentReviewPointId() {
-      return this.reviewPointIdAt(this.currentIndex);
+      return this.reviewPointIdAt(this.currentIndex)
     },
     currentQuestionFetched() {
-      return this.quizQuestionCache.length > this.currentIndex;
+      return this.quizQuestionCache.length > this.currentIndex
     },
     currentQuizQuestion() {
-      return this.quizQuestionCache[this.currentIndex];
+      return this.quizQuestionCache[this.currentIndex]
     },
   },
   watch: {
     minimized() {
-      this.selectPosition();
+      this.selectPosition()
     },
     QuizQuestions() {
-      this.quizQuestionCache = [];
-      this.eagerFetchUntil = 0;
-      this.fetchQuestion();
+      this.quizQuestionCache = []
+      this.eagerFetchUntil = 0
+      this.fetchQuestion()
     },
     currentIndex() {
-      this.fetchQuestion();
+      this.fetchQuestion()
     },
     currentQuizQuestion() {
-      this.selectPosition();
+      this.selectPosition()
     },
   },
   methods: {
     reviewPointIdAt(index: number): number | undefined {
       if (this.reviewPoints && index < this.reviewPoints.length) {
-        return this.reviewPoints[index] as number;
+        return this.reviewPoints[index] as number
       }
-      return undefined;
+      return undefined
     },
 
     selectPosition() {
-      if (this.minimized) return;
+      if (this.minimized) return
     },
 
     async fetchQuestion() {
       this.eagerFetchUntil = _.max([
         this.eagerFetchUntil,
         this.currentIndex + this.eagerFetchCount,
-      ]) as number;
+      ]) as number
       if (!this.fetching) {
-        this.fetching = true;
-        await this.fetchNextQuestion();
-        this.fetching = false;
+        this.fetching = true
+        await this.fetchNextQuestion()
+        this.fetching = false
       }
     },
 
     async fetchNextQuestion() {
-      const index = this.quizQuestionCache.length;
-      if (this.eagerFetchUntil <= index) return;
-      const reviewPointId = this.reviewPointIdAt(index);
-      if (reviewPointId === undefined) return;
+      const index = this.quizQuestionCache.length
+      if (this.eagerFetchUntil <= index) return
+      const reviewPointId = this.reviewPointIdAt(index)
+      if (reviewPointId === undefined) return
       try {
         const question =
           await this.managedApi.silent.restReviewPointController.generateRandomQuestion(
             reviewPointId,
-          );
-        this.quizQuestionCache.push(question);
+          )
+        this.quizQuestionCache.push(question)
       } catch (e) {
-        this.quizQuestionCache.push(undefined);
+        this.quizQuestionCache.push(undefined)
       }
-      await this.fetchNextQuestion();
+      await this.fetchNextQuestion()
     },
 
     onAnswered(answerResult: AnsweredQuestion) {
-      this.$emit("answered", answerResult);
+      this.$emit("answered", answerResult)
     },
   },
   async mounted() {
-    this.fetchQuestion();
+    this.fetchQuestion()
   },
-});
+})
 </script>

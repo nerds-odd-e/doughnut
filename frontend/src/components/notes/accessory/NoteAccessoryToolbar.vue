@@ -39,15 +39,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { NoteAccessory } from "@/generated/backend";
-import NoteEditUploadAudioDialog from "./NoteEditUploadAudioDialog.vue";
-import PopButton from "../../commons/Popups/PopButton.vue";
-import SvgResume from "../../svgs/SvgResume.vue";
-import SvgImage from "../../svgs/SvgImage.vue";
-import SvgUrlIndicator from "../../svgs/SvgUrlIndicator.vue";
-import NoteEditImageDialog from "./NoteEditImageDialog.vue";
-import NoteEditUrlDialog from "./NoteEditUrlDialog.vue";
+import { NoteAccessory } from "@/generated/backend"
+import { defineComponent } from "vue"
+import PopButton from "../../commons/Popups/PopButton.vue"
+import SvgImage from "../../svgs/SvgImage.vue"
+import SvgResume from "../../svgs/SvgResume.vue"
+import SvgUrlIndicator from "../../svgs/SvgUrlIndicator.vue"
+import NoteEditImageDialog from "./NoteEditImageDialog.vue"
+import NoteEditUploadAudioDialog from "./NoteEditUploadAudioDialog.vue"
+import NoteEditUrlDialog from "./NoteEditUrlDialog.vue"
 
 export default defineComponent({
   props: {
@@ -69,10 +69,10 @@ export default defineComponent({
   methods: {
     handleCloseDialog(closer, na: NoteAccessory) {
       if (na) {
-        this.$emit("note-accessory-updated", na);
+        this.$emit("note-accessory-updated", na)
       }
-      closer();
+      closer()
     },
   },
-});
+})
 </script>

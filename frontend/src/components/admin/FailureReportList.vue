@@ -23,37 +23,37 @@
 </template>
 
 <script>
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import ContainerPage from "@/pages/commons/ContainerPage.vue";
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import ContainerPage from "@/pages/commons/ContainerPage.vue"
 
 export default {
   setup() {
-    return useLoadingApi();
+    return useLoadingApi()
   },
   components: { ContainerPage },
   data() {
     return {
       failureReports: null,
       errorMessage: null,
-    };
+    }
   },
   methods: {
     fetchData() {
       this.managedApi.restFailureReportController
         .failureReports()
         .then((res) => {
-          this.failureReports = res;
+          this.failureReports = res
         })
         .catch((err) => {
           if (err.status === 401) {
-            throw err;
+            throw err
           }
-          this.errorMessage = "It seems you cannot access this page.";
-        });
+          this.errorMessage = "It seems you cannot access this page."
+        })
     },
   },
   mounted() {
-    this.fetchData();
+    this.fetchData()
   },
-};
+}
 </script>

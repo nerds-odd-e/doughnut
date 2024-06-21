@@ -1,32 +1,32 @@
-import { screen } from "@testing-library/vue";
-import "intersection-observer";
-import Sidebar from "@/components/notes/Sidebar.vue";
-import { NoteRealm } from "@/generated/backend";
-import { flushPromises } from "@vue/test-utils";
-import helper from "../helpers";
-import makeMe from "../fixtures/makeMe";
+import { screen } from "@testing-library/vue"
+import "intersection-observer"
+import Sidebar from "@/components/notes/Sidebar.vue"
+import { NoteRealm } from "@/generated/backend"
+import { flushPromises } from "@vue/test-utils"
+import makeMe from "../fixtures/makeMe"
+import helper from "../helpers"
 
 function isBefore(node1: Node, node2: Node) {
   return !!(
     // eslint-disable-next-line no-bitwise
     (node1.compareDocumentPosition(node2) & Node.DOCUMENT_POSITION_FOLLOWING)
-  );
+  )
 }
 
 describe("Sidebar", () => {
-  const topNoteRealm = makeMe.aNoteRealm.topicConstructor("top").please();
+  const topNoteRealm = makeMe.aNoteRealm.topicConstructor("top").please()
   const firstGeneration = makeMe.aNoteRealm
     .topicConstructor("first gen")
     .under(topNoteRealm)
-    .please();
+    .please()
   const firstGenerationSibling = makeMe.aNoteRealm
     .topicConstructor("first gen sibling")
     .under(topNoteRealm)
-    .please();
+    .please()
   const secondGeneration = makeMe.aNoteRealm
     .topicConstructor("2nd gen")
     .under(firstGeneration)
-    .please();
+    .please()
 
   const render = (n: NoteRealm) => {
     return helper
@@ -34,21 +34,21 @@ describe("Sidebar", () => {
       .withStorageProps({
         noteRealm: n,
       })
-      .render();
-  };
+      .render()
+  }
 
-  let isIntersecting = false;
-  let observerDisconnected = false;
+  let isIntersecting = false
+  let observerDisconnected = false
 
   beforeEach(() => {
-    isIntersecting = false;
-    observerDisconnected = false;
+    isIntersecting = false
+    observerDisconnected = false
     // Mock the IntersectionObserver
     /* eslint-disable */
-    let observeCallback: IntersectionObserverCallback;
+    let observeCallback: IntersectionObserverCallback
     const MockIntersectionObserver = class {
       constructor(callback: IntersectionObserverCallback) {
-        observeCallback = callback;
+        observeCallback = callback
       }
 
       observe() {
@@ -56,111 +56,114 @@ describe("Sidebar", () => {
         observeCallback(
           [{ isIntersecting }] as IntersectionObserverEntry[],
           {} as IntersectionObserver,
-        );
+        )
       }
 
       disconnect() {
-        observerDisconnected = true;
+        observerDisconnected = true
       }
 
       unobserve() {}
-    };
+    }
 
-    global.IntersectionObserver = MockIntersectionObserver as any;
+    global.IntersectionObserver = MockIntersectionObserver as any
     /* eslint-enable */
-  });
+  })
 
   beforeEach(() => {
-    window.HTMLElement.prototype.scrollIntoView = vitest.fn();
-  });
+    window.HTMLElement.prototype.scrollIntoView = vitest.fn()
+  })
 
   it("should call the api once if top note", async () => {
     helper.managedApi.restNoteController.show1 = vitest
       .fn()
-      .mockResolvedValueOnce(topNoteRealm);
-    render(topNoteRealm);
-    expect(helper.managedApi.restNoteController.show1).toBeCalled();
-    await screen.findByText(firstGeneration.note.noteTopic.topicConstructor);
-  });
+      .mockResolvedValueOnce(topNoteRealm)
+    render(topNoteRealm)
+    expect(helper.managedApi.restNoteController.show1).toBeCalled()
+    await screen.findByText(firstGeneration.note.noteTopic.topicConstructor)
+  })
 
   describe("first generation", () => {
     beforeEach(() => {
       helper.managedApi.restNoteController.show1 = vitest
         .fn()
         .mockResolvedValueOnce(topNoteRealm)
-        .mockResolvedValueOnce(firstGeneration);
-    });
+        .mockResolvedValueOnce(firstGeneration)
+    })
 
     it("should call the api if not top note", async () => {
-      render(firstGeneration);
-      await flushPromises();
+      render(firstGeneration)
+      await flushPromises()
       expect(helper.managedApi.restNoteController.show1).toBeCalledWith(
         topNoteRealm.id,
-      );
+      )
       expect(helper.managedApi.restNoteController.show1).toBeCalledWith(
         firstGeneration.id,
-      );
-    });
+      )
+    })
 
     it("should scroll to active note", async () => {
-      render(firstGeneration);
-      await flushPromises();
-      expect(window.HTMLElement.prototype.scrollIntoView).toBeCalled();
-      expect(observerDisconnected).toBe(true);
+      render(firstGeneration)
+      await flushPromises()
+      expect(window.HTMLElement.prototype.scrollIntoView).toBeCalled()
+      expect(observerDisconnected).toBe(true)
       expect(
         /* eslint-disable */
-        (await screen.findByText(firstGeneration.note.noteTopic.topicConstructor)).parentNode
-          ?.parentNode?.parentNode,
+        (
+          await screen.findByText(
+            firstGeneration.note.noteTopic.topicConstructor,
+          )
+        ).parentNode?.parentNode?.parentNode,
         /* eslint-enable */
-      ).toHaveClass("active-item");
-    });
+      ).toHaveClass("active-item")
+    })
 
     it("should not scroll if already visible", async () => {
-      isIntersecting = true;
-      render(firstGeneration);
-      await flushPromises();
-      expect(window.HTMLElement.prototype.scrollIntoView).not.toBeCalled();
-      expect(observerDisconnected).toBe(true);
-    });
+      isIntersecting = true
+      render(firstGeneration)
+      await flushPromises()
+      expect(window.HTMLElement.prototype.scrollIntoView).not.toBeCalled()
+      expect(observerDisconnected).toBe(true)
+    })
 
     it("should have siblings", async () => {
-      render(firstGeneration);
+      render(firstGeneration)
       await screen.findByText(
         firstGenerationSibling.note.noteTopic.topicConstructor,
-      );
-    });
+      )
+    })
 
     it("should have child note of active first gen", async () => {
-      render(firstGeneration);
+      render(firstGeneration)
       const secondGen = await screen.findByText(
         secondGeneration.note.noteTopic.topicConstructor,
-      );
+      )
       const sibling = await screen.findByText(
         firstGenerationSibling.note.noteTopic.topicConstructor,
-      );
-      expect(isBefore(secondGen, sibling)).toBe(true);
-    });
-  });
+      )
+      expect(isBefore(secondGen, sibling)).toBe(true)
+    })
+  })
 
   it("should start from notebook top", async () => {
     helper.managedApi.restNoteController.show1 = vitest
       .fn()
       .mockResolvedValueOnce(topNoteRealm)
       .mockResolvedValueOnce(firstGeneration)
-      .mockResolvedValueOnce(secondGeneration);
-    render(secondGeneration);
-    await screen.findByText(firstGeneration.note.noteTopic.topicConstructor);
-    await screen.findByText(secondGeneration.note.noteTopic.topicConstructor);
-  });
+      .mockResolvedValueOnce(secondGeneration)
+    render(secondGeneration)
+    await screen.findByText(firstGeneration.note.noteTopic.topicConstructor)
+    await screen.findByText(secondGeneration.note.noteTopic.topicConstructor)
+  })
 
   it("should disable the menu and keep the content when loading", async () => {
     helper.managedApi.restNoteController.show1 = vitest
       .fn()
-      .mockResolvedValueOnce(topNoteRealm);
-    const { rerender } = render(topNoteRealm);
-    await flushPromises();
-    await rerender({ noteRealm: undefined });
-    await flushPromises();
-    await screen.findByText(firstGeneration.note.noteTopic.topicConstructor);
-  });
-});
+      .mockResolvedValueOnce(topNoteRealm)
+    const { rerender } = render(topNoteRealm)
+    await flushPromises()
+    await rerender({ noteRealm: undefined })
+    await flushPromises()
+    await screen.findByText(firstGeneration.note.noteTopic.topicConstructor)
+  })
+})

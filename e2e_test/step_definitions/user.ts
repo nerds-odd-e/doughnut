@@ -59,7 +59,9 @@ Then("My name {string} is in the user action menu", (name: string) => {
 })
 
 Then("my daily new notes to review is set to {int}", (number: string) => {
-  start.testability().updateCurrentUserSettingsWith({ daily_new_notes_count: number })
+  start
+    .testability()
+    .updateCurrentUserSettingsWith({ daily_new_notes_count: number })
 })
 
 Then("my space setting is {string}", (number: string) => {
@@ -96,12 +98,15 @@ Then("The {string} page is displayed", (pageName) => {
   }
 })
 
-Then("I login as {string} I should see {string}", (username: string, expectation: string) => {
-  cy.get("#username").type(username)
-  cy.get("#password").type("password")
-  cy.get("form.form-signin").submit()
-  start.assumeNotePage(expectation)
-})
+Then(
+  "I login as {string} I should see {string}",
+  (username: string, expectation: string) => {
+    cy.get("#username").type(username)
+    cy.get("#password").type("password")
+    cy.get("form.form-signin").submit()
+    start.assumeNotePage(expectation)
+  },
+)
 
 Then("I edit user profile", () => {
   cy.visit("/")

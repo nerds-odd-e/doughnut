@@ -19,8 +19,7 @@
 </template>
 
 <script lang="ts" setup>
-import { PropType, ref, watch } from "vue";
-import InputWithType from "./InputWithType.vue";
+import { PropType, ref, watch } from "vue"
 
 const props = defineProps({
   modelValue: String,
@@ -28,13 +27,13 @@ const props = defineProps({
   field: String,
   options: Array as PropType<string[]>,
   errors: Object,
-});
+})
 
-const emit = defineEmits(["update:modelValue"]);
+const emit = defineEmits(["update:modelValue"])
 
-const localValue = ref(props.modelValue);
+const localValue = ref(props.modelValue)
 
 watch(localValue, (newValue) => {
-  emit("update:modelValue", newValue);
-});
+  emit("update:modelValue", newValue)
+})
 </script>

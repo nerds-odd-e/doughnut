@@ -41,15 +41,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { WikidataSearchEntity } from "@/generated/backend";
-import useLoadingApi from "@/managedApi/useLoadingApi";
-import TextInput from "../form/TextInput.vue";
-import SvgSearchWikidata from "../svgs/SvgSearchWikidata.vue";
+import { WikidataSearchEntity } from "@/generated/backend"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import { defineComponent } from "vue"
+import TextInput from "../form/TextInput.vue"
+import SvgSearchWikidata from "../svgs/SvgSearchWikidata.vue"
 
 export default defineComponent({
   setup() {
-    return useLoadingApi();
+    return useLoadingApi()
   },
   props: {
     searchKey: { type: String, required: true },
@@ -65,33 +65,33 @@ export default defineComponent({
     return {
       wikiSearchSuggestions: [] as WikidataSearchEntity[],
       selectedOption: "",
-    };
+    }
   },
   methods: {
     async onSelectSearchResult() {
       const selectedSuggestion = this.wikiSearchSuggestions.find((obj) => {
-        return obj.id === this.selectedOption;
-      });
-      this.wikiSearchSuggestions = [];
-      if (!selectedSuggestion) return;
-      this.$emit("selected", selectedSuggestion);
-      this.selectedOption = "";
+        return obj.id === this.selectedOption
+      })
+      this.wikiSearchSuggestions = []
+      if (!selectedSuggestion) return
+      this.$emit("selected", selectedSuggestion)
+      this.selectedOption = ""
     },
     removeSearchSuggestions() {
-      this.wikiSearchSuggestions = [];
+      this.wikiSearchSuggestions = []
     },
     async fetchSearchResult() {
       this.wikiSearchSuggestions =
         await this.managedApi.restWikidataController.searchWikidata(
           this.searchKey,
-        );
+        )
       this.$nextTick(() => {
-        const select = this.$refs.select as HTMLSelectElement | undefined;
-        select?.focus();
-      });
+        const select = this.$refs.select as HTMLSelectElement | undefined
+        select?.focus()
+      })
     },
   },
-});
+})
 </script>
 
 <style lang="scss" scoped>

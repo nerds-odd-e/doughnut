@@ -13,13 +13,22 @@ class WikidataEntitiesBuilder {
   }
 
   wclaims(claims: Claim[]): WikidataEntitiesBuilder {
-    this.claims = claims.reduce<Record<string, Array<unknown>>>((claimsIter, claimIter) => {
-      return { ...claimsIter, ...this.toClaim(claimIter, claimsIter[claimIter.claimId]) }
-    }, this.claims)
+    this.claims = claims.reduce<Record<string, Array<unknown>>>(
+      (claimsIter, claimIter) => {
+        return {
+          ...claimsIter,
+          ...this.toClaim(claimIter, claimsIter[claimIter.claimId]),
+        }
+      },
+      this.claims,
+    )
     return this
   }
 
-  private toClaim(claimIter: Claim, data: Array<unknown>): Record<string, Array<unknown>> {
+  private toClaim(
+    claimIter: Claim,
+    data: Array<unknown>,
+  ): Record<string, Array<unknown>> {
     return {
       [claimIter.claimId]: [
         ...(data || []),

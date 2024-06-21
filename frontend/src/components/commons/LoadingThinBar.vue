@@ -5,13 +5,13 @@
 </template>
 
 <script>
-import { ContentLoader } from "vue-content-loader";
-import ToolbarCover from "./ToolbarOver.vue";
+import { ContentLoader } from "vue-content-loader"
+import ToolbarCover from "./ToolbarOver.vue"
 
 export default {
   components: {
     ContentLoader,
     ToolbarCover,
   },
-};
+}
 </script>
