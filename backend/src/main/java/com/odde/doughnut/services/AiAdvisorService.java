@@ -26,6 +26,7 @@ public class AiAdvisorService {
     return new AssistantService(
         openAiApiHandler,
         settingAccessor,
+        "Note details completion",
         List.of(
             AiTool.build(
                 COMPLETE_NOTE_DETAILS,
@@ -49,6 +50,6 @@ public class AiAdvisorService {
 
   public AssistantService getChatService(
       GlobalSettingsService.GlobalSettingsKeyValue settingAccessor) {
-    return new AssistantService(openAiApiHandler, settingAccessor, List.of());
+    return new AssistantService(openAiApiHandler, settingAccessor, "chat assistant", List.of());
   }
 }

@@ -71,13 +71,7 @@ public class RestAiController {
       throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(note);
     String userMessage = request.getUserMessage();
-    GlobalSettingsService.GlobalSettingsKeyValue settingAccessor =
-        getGlobalSettingsService().chatAssistantId();
-    String assistantMessage =
-        this.aiAdvisorService
-            .getChatService(settingAccessor)
-            .initiateAThread(note, userMessage)
-            .getLastMessage();
+    String assistantMessage = getChatService().initiateAThread(note, userMessage).getLastMessage();
     return new ChatResponse(assistantMessage);
   }
 
@@ -98,18 +92,14 @@ public class RestAiController {
   public Map<String, String> recreateAllAssistants() throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    GlobalSettingsService globalSettingsService = getGlobalSettingsService();
     Map<String, String> result = new HashMap<>();
-    String modelName = globalSettingsService.globalSettingOthers().getValue();
-    String completionAssistant =
-        getContentCompletionService().createAssistant(modelName, "Note details completion").getId();
-    result.put("note details completion", completionAssistant);
-    globalSettingsService
-        .noteCompletionAssistantId()
-        .setKeyValue(currentUTCTimestamp, completionAssistant);
-    String chatAssistant = getChatService().createAssistant(modelName, "Chat assistant").getId();
-    result.put("chat assistant", chatAssistant);
-    globalSettingsService.chatAssistantId().setKeyValue(currentUTCTimestamp, chatAssistant);
+    String modelName = getGlobalSettingsService().globalSettingOthers().getValue();
+    AssistantService completionService = getContentCompletionService();
+    result.put(
+        completionService.assistantName(),
+        completionService.create(modelName, currentUTCTimestamp));
+    AssistantService chatService = getChatService();
+    result.put(chatService.assistantName(), chatService.create(modelName, currentUTCTimestamp));
     return result;
   }
 
