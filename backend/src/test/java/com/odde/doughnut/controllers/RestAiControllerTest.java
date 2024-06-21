@@ -21,7 +21,6 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.OpenAiResponse;
 import com.theokanning.openai.assistants.assistant.Assistant;
 import com.theokanning.openai.assistants.message.MessageRequest;
-import com.theokanning.openai.assistants.run.CreateThreadAndRunRequest;
 import com.theokanning.openai.assistants.run.RunCreateRequest;
 import com.theokanning.openai.assistants.thread.ThreadRequest;
 import com.theokanning.openai.client.OpenAiApi;
@@ -132,7 +131,7 @@ class RestAiControllerTest {
         controller.getCompletion(note, params);
         verify(openAiApi, times(1)).createThread(captor.capture());
         assertThat(captor.getAllValues().get(0).getMessages().getFirst().getContent().toString())
-          .contains("cosmos › solar system");
+            .contains("cosmos › solar system");
       }
 
       @Test
@@ -145,7 +144,6 @@ class RestAiControllerTest {
         assertThat(captor.getAllValues().get(0).getContent().toString())
             .contains("Don't make assumptions");
       }
-
     }
 
     @Nested

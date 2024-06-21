@@ -174,7 +174,7 @@ public class OpenAiApiHandler {
   }
 
   public List<Message> getThreadLastMessage(String threadId) {
-    return blockGet(openAiApi.listMessages(threadId, Map.of())).getData();
+    return blockGet(openAiApi.listMessages(threadId, Map.of("order", "asc"))).getData();
   }
 
   public SrtDto getTranscription(RequestBody requestBody) throws IOException {
