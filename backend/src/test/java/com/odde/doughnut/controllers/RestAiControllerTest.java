@@ -257,7 +257,7 @@ class RestAiControllerTest {
       @Test
       void createCompletionAssistant() throws UnexpectedNoAccessRightException {
         Map<String, String> result = controller.recreateAllAssistants();
-        assertThat(result.get("note details completion")).isEqualTo("1234");
+        assertThat(result.get("Note details completion")).isEqualTo("1234");
         GlobalSettingsService globalSettingsService =
             new GlobalSettingsService(makeMe.modelFactoryService);
         assertThat(globalSettingsService.noteCompletionAssistantId().getValue()).isEqualTo("1234");

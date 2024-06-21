@@ -7,13 +7,13 @@ Feature: Manage AI models
 
   Background:
     Given I am logged in as an admin
-    And OpenAI creates an assistant of ID "new_assistant" for name "note details completion" with model "gpt-future"
+    And OpenAI creates an assistant of ID "new_assistant" for name "Note details completion" with model "gpt-future"
     And OpenAI creates an assistant of ID "new_chat_assistant" for name "chat assistant" with model "gpt-future"
     And OpenAI has models "gpt-future, gpt-3.5" available
 
   Scenario: Admin choose a default model and use it for creating assistants
     When I choose model "gpt-future" for "Others"
-    Then I recreate all the assitants and the new assistant ID should be "new_assistant" for "note details completion"
+    Then I recreate all the assitants and the new assistant ID should be "new_assistant" for "Note details completion"
 
 
 
