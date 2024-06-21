@@ -7,21 +7,21 @@ const openAiAssistantCreatedRunMocker = (
   runId: string,
 ) => {
   return {
-    async stubRetrieveRunsThatCompleted() {
+    stubRetrieveRunsThatCompleted() {
       const responses = [
         {
           id: runId,
           status: "completed",
         },
       ]
-      await serviceMocker.stubGetterWithMutipleResponses(
+      serviceMocker.stubGetterWithMutipleResponses(
         `/threads/${threadId}/runs/${runId}`,
         {},
         responses,
       )
       return this
     },
-    async stubRetrieveRunsThatRequireAction(hashes: Record<string, string>[]) {
+    stubRetrieveRunsThatRequireAction(hashes: Record<string, string>[]) {
       const createRequiresActionRun = (
         functionName: string,
         argumentsObj: unknown,
@@ -61,12 +61,12 @@ const openAiAssistantCreatedRunMocker = (
         }
       })
 
-      await serviceMocker.stubGetterWithMutipleResponses(
+      serviceMocker.stubGetterWithMutipleResponses(
         `/threads/${threadId}/runs/${runId}`,
         {},
         responses,
       )
-      return openAiAssistantCreatedRunMocker(serviceMocker, threadId, runId)
+      return this
     },
 
     async stubSubmitToolOutputs() {
