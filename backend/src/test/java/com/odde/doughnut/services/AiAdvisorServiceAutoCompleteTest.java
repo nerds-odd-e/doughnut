@@ -137,7 +137,8 @@ class AiAdvisorServiceAutoCompleteTest {
       Note note = makeMe.aNote().inMemoryPlease();
       AiCompletionParams aiCompletionParams = new AiCompletionParams();
       aiCompletionParams.setDetailsToComplete(incompleteContent);
-      return completionService.initiateAThread(note, aiCompletionParams.getCompletionPrompt());
+      return completionService.createThreadAndRunWithFirstMessage(
+          note, aiCompletionParams.getCompletionPrompt());
     }
   }
 

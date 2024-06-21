@@ -51,7 +51,7 @@ public class RestAiController {
       @RequestBody AiCompletionParams aiCompletionParams) {
     currentUser.assertLoggedIn();
     return getContentCompletionService()
-        .initiateAThread(note, aiCompletionParams.getCompletionPrompt());
+        .createThreadAndRunWithFirstMessage(note, aiCompletionParams.getCompletionPrompt());
   }
 
   @PostMapping("/answer-clarifying-question")
@@ -71,7 +71,7 @@ public class RestAiController {
       throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(note);
     String userMessage = request.getUserMessage();
-    return getChatService().initiateAThread(note, userMessage);
+    return getChatService().createThreadAndRunWithFirstMessage(note, userMessage);
   }
 
   @PostMapping("/generate-image")

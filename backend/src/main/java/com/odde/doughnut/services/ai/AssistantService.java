@@ -11,7 +11,6 @@ import com.theokanning.openai.assistants.message.MessageRequest;
 import com.theokanning.openai.assistants.run.RequiredAction;
 import com.theokanning.openai.assistants.run.Run;
 import com.theokanning.openai.assistants.run.ToolCall;
-import com.theokanning.openai.assistants.thread.Thread;
 import com.theokanning.openai.assistants.thread.ThreadRequest;
 import java.sql.Timestamp;
 import java.util.List;
@@ -35,10 +34,21 @@ public record AssistantService(
     return chatAssistant;
   }
 
-  public AiAssistantResponse initiateAThread(Note note, String prompt) {
-    String threadId = createThread(note, prompt);
-    Run run = openAiApiHandler.createRun(threadId, settingAccessor.getValue());
+  public AiAssistantResponse createThreadAndRunWithFirstMessage(Note note, String prompt) {
+    String threadId = createThread(note);
+    return createMessageRunAndGetResponse(prompt, threadId);
+  }
+
+  private AiAssistantResponse createMessageRunAndGetResponse(String prompt, String threadId) {
+    Run run = createMessageAndRun(prompt, threadId);
     return getThreadResponse(threadId, run);
+  }
+
+  private Run createMessageAndRun(String prompt, String threadId) {
+    MessageRequest messageRequest = MessageRequest.builder().role("user").content(prompt).build();
+
+    openAiApiHandler.createMessage(threadId, messageRequest);
+    return openAiApiHandler.createRun(threadId, settingAccessor.getValue());
   }
 
   public AiAssistantResponse answerAiCompletionClarifyingQuestion(
@@ -50,7 +60,7 @@ public record AssistantService(
     return getThreadResponse(threadId, retrievedRun);
   }
 
-  private String createThread(Note note, String completionPrompt) {
+  private String createThread(Note note) {
     ThreadRequest threadRequest =
         ThreadRequest.builder()
             .messages(
@@ -60,12 +70,7 @@ public record AssistantService(
                         .content(note.getNoteDescription())
                         .build()))
             .build();
-    Thread thread = openAiApiHandler.createThread(threadRequest);
-    MessageRequest messageRequest =
-        MessageRequest.builder().role("user").content(completionPrompt).build();
-
-    openAiApiHandler.createMessage(thread.getId(), messageRequest);
-    return thread.getId();
+    return openAiApiHandler.createThread(threadRequest).getId();
   }
 
   private AiAssistantResponse getThreadResponse(String threadId, Run currentRun) {
