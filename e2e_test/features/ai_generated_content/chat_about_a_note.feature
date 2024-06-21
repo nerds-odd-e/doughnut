@@ -12,18 +12,18 @@ Feature: Chat about a note with AI
 
   Scenario: The users can continue to conmunication with AI
     Given OpenAI assistant will reply below for user messages:
-      | user message          | list after message id | assistant reply              | message id   |
-      | Is Naba one of them?  |                       | No. It is not.               | message_id_1 |
-      | Is this note correct? | message_id_1          | No, there are 47 prefectures | message_id_2 |
+      | user message          | assistant reply              | run id |
+      | Is Naba one of them?  | No. It is not.               | run1   |
+      | Is this note correct? | No, there are 47 prefectures | run2   |
     When I send the message "Is Naba one of them?" to AI
     Then I should receive the following chat messages:
       | role      | message              |
       | user      | Is Naba one of them? |
       | assistant | No. It is not.       |
-    # When I send the message "Is this note correct?" to AI
-    # Then I should receive the following chat messages:
-    #   | role      | message                      |
-    #   | user      | Is Naba one of them?         |
-    #   | assistant | No. It is not.               |
-    #   | user      | Is this note correct?        |
-    #   | assistant | No, there are 47 prefectures |
+# When I send the message "Is this note correct?" to AI
+# Then I should receive the following chat messages:
+#   | role      | message                      |
+#   | user      | Is Naba one of them?         |
+#   | assistant | No. It is not.               |
+#   | user      | Is this note correct?        |
+#   | assistant | No, there are 47 prefectures |

@@ -34,7 +34,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import {
   AnsweredQuestion,
   QuizQuestion,
@@ -42,16 +42,13 @@ import {
 } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
-import { PropType, defineComponent } from "vue"
+import { PropType, ref } from "vue"
 import BasicBreadcrumb from "../commons/BasicBreadcrumb.vue"
 import AnsweredQuestionComponent from "./AnsweredQuestionComponent.vue"
 import QuizQuestionC from "./QuizQuestion.vue"
 
-export default defineComponent({
-  setup() {
-    return useLoadingApi()
-  },
-  props: {
+  const { managedApi } = useLoadingApi()
+  const props = defineProps({
     quizQuestionInNotebook: {
       type: Object as PropType<QuizQuestionInNotebook>,
       required: true,
@@ -60,66 +57,52 @@ export default defineComponent({
       type: Object as PropType<StorageAccessor>,
       required: true,
     },
-  },
-  emits: ["need-scroll", "answered"],
-  components: {
-    QuizQuestionC,
-    BasicBreadcrumb,
-    AnsweredQuestionComponent,
-  },
-  data() {
-    return {
-      regenerating: false,
-      currentQuestionLegitMessage: undefined as string | undefined,
-      currentQuestion: this.quizQuestionInNotebook.quizQuestion,
-      answeredQuestion: undefined as AnsweredQuestion | undefined,
-      prevQuizQuestions: [] as {
-        quizeQuestion: QuizQuestion
-        badQuestionReason: string | undefined
-      }[],
-      chatInput: "",
-      assistantMessage: "",
-      answered: false,
-    }
-  },
-  computed: {
-    isButtonDisabled() {
-      return this.chatInput === ""
-    },
-  },
-  methods: {
-    scrollToBottom() {
-      this.$emit("need-scroll")
-    },
-    async contest() {
-      this.currentQuestionLegitMessage = ""
-      const contestResult =
-        await this.managedApi.restQuizQuestionController.contest(
-          this.currentQuestion.id,
-        )
+  })
+  const emit = defineEmits(["need-scroll", "answered"])
+  const regenerating = ref(false)
+  const currentQuestionLegitMessage = ref<string | undefined>(undefined)
+  const currentQuestion = ref(props.quizQuestionInNotebook.quizQuestion)
+  const answeredQuestion = ref<AnsweredQuestion | undefined>(undefined)
+  const prevQuizQuestions = ref<
+    {
+      quizeQuestion: QuizQuestion
+      badQuestionReason: string | undefined
+    }[]
+  >([])
 
-      if (!contestResult.rejected) {
-        this.regenerating = true
-        this.prevQuizQuestions.push({
-          quizeQuestion: this.currentQuestion,
-          badQuestionReason: contestResult.reason,
-        })
-        this.currentQuestion =
-          await this.managedApi.restQuizQuestionController.regenerate(
-            this.currentQuestion.id,
-          )
-      } else {
-        this.currentQuestionLegitMessage = contestResult.reason
-      }
-      this.regenerating = false
-      this.scrollToBottom()
-    },
-    onAnswered(answeredQuestion: AnsweredQuestion) {
-      this.answeredQuestion = answeredQuestion
-      this.$emit("answered", answeredQuestion)
-    },
-  },
-})
+  const scrollToBottom = () => {
+    emit("need-scroll")
+  }
+
+
+const contest = async () => {
+  currentQuestionLegitMessage.value = ""
+  const contestResult = await managedApi.restQuizQuestionController.contest(
+    currentQuestion.value.id,
+  )
+
+  if (!contestResult.rejected) {
+    regenerating.value = true
+    prevQuizQuestions.value.push({
+      quizeQuestion: currentQuestion.value,
+      badQuestionReason: contestResult.reason,
+    })
+    currentQuestion.value =
+      await managedApi.restQuizQuestionController.regenerate(
+        currentQuestion.value.id,
+      )
+  } else {
+    currentQuestionLegitMessage.value = contestResult.reason
+  }
+  regenerating.value = false
+  scrollToBottom()
+}
+
+const onAnswered = (answer: AnsweredQuestion) => {
+  answeredQuestion.value = answer
+  emit("answered", answeredQuestion)
+}
+
 </script>
 
 <style lang="scss" scoped>
