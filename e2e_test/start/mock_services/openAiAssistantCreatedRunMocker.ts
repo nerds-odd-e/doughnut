@@ -83,7 +83,9 @@ const openAiAssistantCreatedRunMocker = (
     async stubListMessages(msgs: MessageToMatch[]) {
       return await serviceMocker.stubGetter(
         `/threads/${threadId}/messages`,
-        {},
+        {
+          run_id: runId,
+        },
         {
           object: "list",
           data: msgs.map((msg) => ({

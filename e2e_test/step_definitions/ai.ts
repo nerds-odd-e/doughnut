@@ -105,15 +105,12 @@ Given(
         .openAi()
         .aThread(threadId)
         .stubCreateMessage(userMessage, row["run id"]!)
-        .then((run) =>
-          run
-            .stubRetrieveRunsThatCompleted()
-            .then((run) =>
-              run.stubListMessages([
+        .then((run) => {
+          run.stubRetrieveRunsThatCompleted()
+          run.stubListMessages([
                 userMessage,
                 { role: "assistant", content: row["assistant reply"]! },
-              ]),
-            ),
-        )
+              ])
+        })
     })
 })
