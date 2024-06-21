@@ -1,5 +1,6 @@
 @usingMockedOpenAiService
 Feature: Note details completion
+  As a user, I want to complete the details of a note using OpenAI so that I can save time and effort in writing the details.
 
   Background:
     Given I am logged in as an existing user

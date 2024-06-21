@@ -64,23 +64,22 @@ Given(
   "the OpenAI assistant will create a thread and request for the following actions:",
   (data: DataTable) => {
     const threadId = "thread-abc123"
-    mock_services.openAi().aThread("thread-abc123").stubMultipleCreateRuns(["run-run-id"])
     mock_services
       .openAi()
       .stubCreateThread(threadId)
-      .then((thread) =>
+      .then((thread) => {
+        thread.stubMultipleCreateRuns(["run-run-id"])
         thread
           .stubCreateMessage({
             role: "user",
             content: "Please complete",
           },
-          "run-run-id",
         )
-          .then((run) =>
-            run
+        thread.aRun("run-run-id")
               .stubRetrieveRunsThatRequireAction(data.hashes())
-              .then((run) => run.stubSubmitToolOutputs()),
-          ),
+              .then((run) => run.stubSubmitToolOutputs())
+        }
+
       )
   },
 )
@@ -89,28 +88,20 @@ Given(
   "OpenAI assistant will reply below for user messages:",
   (data: DataTable) => {
     const threadId = "thread-abc123"
-    mock_services
-      .openAi()
-      .stubCreateThread(threadId)
-      mock_services
-        .openAi()
-        .aThread(threadId)
-        .stubMultipleCreateRuns(data.hashes().map((row) => row["run id"]!))
-    data.hashes().forEach((row) => {
-      const userMessage: MessageToMatch = {
-        role: "user",
-        content: row["user message"],
-      } as MessageToMatch
-      mock_services
-        .openAi()
-        .aThread(threadId)
-        .stubCreateMessage(userMessage, row["run id"]!)
-        .then((run) => {
-          run.stubRetrieveRunsThatCompleted()
-          run.stubListMessages([
-                userMessage,
-                { role: "assistant", content: row["assistant reply"]! },
-              ])
-        })
+    mock_services .openAi().stubCreateThread(threadId).then((thread) => {
+      thread.stubMultipleCreateRuns(data.hashes().map((row) => row["run id"]!))
+      data.hashes().forEach((row) => {
+        const userMessage: MessageToMatch = {
+          role: "user",
+          content: row["user message"],
+        } as MessageToMatch
+          thread.stubCreateMessage(userMessage)
+        const run = thread.aRun(row["run id"]!)
+        run.stubRetrieveRunsThatCompleted()
+        run.stubListMessages([
+              userMessage,
+              { role: "assistant", content: row["assistant reply"]! },
+            ])
+      })
     })
 })
