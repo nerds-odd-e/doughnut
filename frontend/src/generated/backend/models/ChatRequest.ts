@@ -4,5 +4,7 @@
 /* eslint-disable */
 export type ChatRequest = {
     userMessage?: string;
+    threadId?: string;
+    lastMessageId?: string;
 };
 

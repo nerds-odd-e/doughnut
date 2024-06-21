@@ -7,4 +7,6 @@ import lombok.*;
 @Data
 public class ChatRequest {
   public String userMessage;
+  public String threadId;
+  public String lastMessageId;
 }

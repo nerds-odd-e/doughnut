@@ -63,7 +63,8 @@ public class RestAiControllerChatTests {
 
   @Test
   void chatWithAIAndGetResponse() throws UnexpectedNoAccessRightException {
-    AiAssistantResponse res = controller.chat(note, new ChatRequest("What's your name?"));
+    AiAssistantResponse res =
+        controller.chat(note, new ChatRequest("What's your name?", null, null));
     assertEquals(
         "I'm Chatbot", res.getMessages().getFirst().getContent().getFirst().getText().getValue());
   }
@@ -75,7 +76,7 @@ public class RestAiControllerChatTests {
     globalSettingsService
         .chatAssistantId()
         .setKeyValue(makeMe.aTimestamp().please(), "chat-assistant");
-    controller.chat(note, new ChatRequest("What's your name?"));
+    controller.chat(note, new ChatRequest("What's your name?", null, null));
     ArgumentCaptor<RunCreateRequest> captor = ArgumentCaptor.forClass(RunCreateRequest.class);
     verify(openAiApi).createRun(any(), captor.capture());
     assertThat(captor.getValue().getAssistantId()).isEqualTo("chat-assistant");
@@ -91,6 +92,6 @@ public class RestAiControllerChatTests {
                     makeMe.modelFactoryService,
                     makeMe.aUser().toModelPlease(),
                     testabilitySettings)
-                .chat(note, new ChatRequest("What's your name?")));
+                .chat(note, new ChatRequest("What's your name?", null, null)));
   }
 }
