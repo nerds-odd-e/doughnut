@@ -70,8 +70,11 @@ public class RestAiController {
       @RequestBody ChatRequest request)
       throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(note);
-    String userMessage = request.getUserMessage();
-    return getChatService().createThreadAndRunWithFirstMessage(note, userMessage);
+    if (request.getThreadId() == null) {
+      return getChatService().createThreadAndRunWithFirstMessage(note, request.getUserMessage());
+    }
+    return getChatService()
+        .createMessageRunAndGetResponse(request.getUserMessage(), request.getThreadId());
   }
 
   @PostMapping("/generate-image")

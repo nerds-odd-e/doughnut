@@ -18,4 +18,8 @@ public record OpenAIAssistantMocker(OpenAiApi openAiApi) {
   public OpenAIAssistantCreatedRunMocker aCreatedRun(String threadId, String runId) {
     return new OpenAIAssistantCreatedRunMocker(openAiApi, threadId, runId);
   }
+
+  public OpenAIAssistantThreadMocker aThread(String threadId) {
+    return new OpenAIAssistantThreadMocker(openAiApi, threadId);
+  }
 }

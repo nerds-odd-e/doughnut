@@ -13,11 +13,11 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.testability.*;
+import com.theokanning.openai.assistants.message.MessageRequest;
 import com.theokanning.openai.assistants.run.RunCreateRequest;
 import com.theokanning.openai.client.OpenAiApi;
-import com.theokanning.openai.completion.chat.ChatCompletionResult;
-import io.reactivex.Single;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -37,7 +37,6 @@ public class RestAiControllerChatTests {
   RestAiController controller;
   UserModel currentUser;
   Note note;
-  Single<ChatCompletionResult> completionResultSingle;
   TestabilitySettings testabilitySettings = new TestabilitySettings();
   OpenAIAssistantMocker openAIAssistantMocker;
 
@@ -48,38 +47,65 @@ public class RestAiControllerChatTests {
         new RestAiController(
             openAiApi, makeMe.modelFactoryService, currentUser, testabilitySettings);
     note = makeMe.aNote().creatorAndOwner(currentUser).please();
-    completionResultSingle =
-        Single.just(makeMe.openAiCompletionResult().choice("I'm ChatGPT").please());
-
     openAIAssistantMocker = new OpenAIAssistantMocker(openAiApi);
-    openAIAssistantMocker
-        .mockThreadCreation("my-thread")
-        .mockCreateMessage()
-        .mockCreateRunInProcess("my-run-id")
-        .aRunThatCompleted()
-        .mockRetrieveRun()
-        .mockListMessages("I'm Chatbot");
   }
 
-  @Test
-  void chatWithAIAndGetResponse() throws UnexpectedNoAccessRightException {
-    AiAssistantResponse res =
-        controller.chat(note, new ChatRequest("What's your name?", null, null));
-    assertEquals(
-        "I'm Chatbot", res.getMessages().getFirst().getContent().getFirst().getText().getValue());
+  @Nested
+  class NewChat {
+    @BeforeEach
+    void setUp() {
+      openAIAssistantMocker
+          .mockThreadCreation("my-thread")
+          .mockCreateMessage()
+          .mockCreateRunInProcess("my-run-id")
+          .aRunThatCompleted()
+          .mockRetrieveRun()
+          .mockListMessages("I'm Chatbot");
+    }
+
+    @Test
+    void chatWithAIAndGetResponse() throws UnexpectedNoAccessRightException {
+      AiAssistantResponse res =
+          controller.chat(note, new ChatRequest("What's your name?", null, null));
+      assertEquals(
+          "I'm Chatbot", res.getMessages().getFirst().getContent().getFirst().getText().getValue());
+    }
+
+    @Test
+    void chatWithUseTheChatAssistant() throws UnexpectedNoAccessRightException {
+      GlobalSettingsService globalSettingsService =
+          new GlobalSettingsService(makeMe.modelFactoryService);
+      globalSettingsService
+          .chatAssistantId()
+          .setKeyValue(makeMe.aTimestamp().please(), "chat-assistant");
+      controller.chat(note, new ChatRequest("What's your name?", null, null));
+      ArgumentCaptor<RunCreateRequest> captor = ArgumentCaptor.forClass(RunCreateRequest.class);
+      verify(openAiApi).createRun(any(), captor.capture());
+      assertThat(captor.getValue().getAssistantId()).isEqualTo("chat-assistant");
+    }
   }
 
-  @Test
-  void chatWithUseTheChatAssistant() throws UnexpectedNoAccessRightException {
-    GlobalSettingsService globalSettingsService =
-        new GlobalSettingsService(makeMe.modelFactoryService);
-    globalSettingsService
-        .chatAssistantId()
-        .setKeyValue(makeMe.aTimestamp().please(), "chat-assistant");
-    controller.chat(note, new ChatRequest("What's your name?", null, null));
-    ArgumentCaptor<RunCreateRequest> captor = ArgumentCaptor.forClass(RunCreateRequest.class);
-    verify(openAiApi).createRun(any(), captor.capture());
-    assertThat(captor.getValue().getAssistantId()).isEqualTo("chat-assistant");
+  @Nested
+  class ContinueChat {
+    @BeforeEach
+    void setUp() {
+      openAIAssistantMocker
+          .aThread("existing-thread-id")
+          .mockCreateMessage()
+          .mockCreateRunInProcess("my-run-id")
+          .aRunThatCompleted()
+          .mockRetrieveRun()
+          .mockListMessages("I'm Chatbot");
+    }
+
+    @Test
+    void continueChat() throws UnexpectedNoAccessRightException {
+      controller.chat(
+          note, new ChatRequest("What's your name?", "existing-thread-id", "last-msg-id"));
+      ArgumentCaptor<MessageRequest> captor = ArgumentCaptor.forClass(MessageRequest.class);
+      verify(openAiApi).createMessage(any(), captor.capture());
+      assertThat(captor.getValue().getContent().toString()).isEqualTo("What's your name?");
+    }
   }
 
   @Test

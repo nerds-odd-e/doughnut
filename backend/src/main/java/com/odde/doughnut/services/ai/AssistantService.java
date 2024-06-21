@@ -39,7 +39,7 @@ public record AssistantService(
     return createMessageRunAndGetResponse(prompt, threadId);
   }
 
-  private AiAssistantResponse createMessageRunAndGetResponse(String prompt, String threadId) {
+  public AiAssistantResponse createMessageRunAndGetResponse(String prompt, String threadId) {
     Run run = createMessageAndRun(prompt, threadId);
     return getThreadResponse(threadId, run);
   }
