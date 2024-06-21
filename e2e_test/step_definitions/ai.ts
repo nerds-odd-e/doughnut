@@ -97,7 +97,6 @@ Given(
         .aRun(row["run id"]!)
         .stubRetrieveRunsThatCompleted()
         .stubListMessages([
-          userMessage,
           { role: "assistant", content: row["assistant reply"]! },
         ]);
     });

@@ -98,6 +98,10 @@ export default defineComponent({
       this.scrollToBottom()
     },
     async generateChatAnswer() {
+      this.assistantMessage.push({
+        role: "user",
+        content: [{ text: { value: this.chatInput } }],
+      })
       this.assistantMessage = [...this.assistantMessage, ...(
         await this.managedApi.restAiController.chat(this.selectedNote.id, {
           userMessage: this.chatInput,
