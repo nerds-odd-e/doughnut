@@ -4,10 +4,14 @@
     v-bind="{ quizQuestionInNotebook, storageAccessor }"
     @need-scroll="scrollToBottom"
   />
-  <div v-show="answered" class="chat-answer-container">
+  <div
+    class="chat-answer-container"
+    v-for="(message, index) in assistantMessage"
+    :key="index"
+  >
     <img src="/user-icon.svg" class="chat-answer-icon" />
     <div class="chat-answer-text">
-      <p id="chat-answer">{{ assistantMessage }}</p>
+      <p id="chat-answer">{{ message.content?.[0]?.text?.value }}</p>
     </div>
   </div>
   <div ref="bottomOfTheChat" style="height: 140px; display: block"></div>
@@ -43,7 +47,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { Note, QuizQuestionInNotebook } from "@/generated/backend";
+import { Message, Note, QuizQuestionInNotebook } from "@/generated/backend";
 import useLoadingApi from "@/managedApi/useLoadingApi";
 import type { StorageAccessor } from "@/store/createNoteStorage";
 import ContestableQuestion from "../review/ContestableQuestion.vue";
@@ -67,8 +71,7 @@ export default defineComponent({
     return {
       quizQuestionInNotebook: undefined as QuizQuestionInNotebook | undefined,
       chatInput: "",
-      assistantMessage: "" as string | undefined,
-      answered: false,
+      assistantMessage: undefined as Message[] | undefined,
     };
   },
   computed: {
@@ -95,8 +98,7 @@ export default defineComponent({
         await this.managedApi.restAiController.chat(this.selectedNote.id, {
           userMessage: this.chatInput,
         })
-      ).assistantMessage;
-      this.answered = true;
+      ).messages;
     },
   },
 });

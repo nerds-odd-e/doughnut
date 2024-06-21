@@ -65,14 +65,13 @@ public class RestAiController {
 
   @PostMapping("/chat/{note}")
   @Transactional
-  public ChatResponse chat(
+  public AiAssistantResponse chat(
       @PathVariable(value = "note") @Schema(type = "integer") Note note,
       @RequestBody ChatRequest request)
       throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(note);
     String userMessage = request.getUserMessage();
-    String assistantMessage = getChatService().initiateAThread(note, userMessage).getLastMessage();
-    return new ChatResponse(assistantMessage);
+    return getChatService().initiateAThread(note, userMessage);
   }
 
   @PostMapping("/generate-image")

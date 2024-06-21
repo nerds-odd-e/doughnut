@@ -7,7 +7,6 @@ import type { AiCompletionAnswerClarifyingQuestionParams } from '../models/AiCom
 import type { AiCompletionParams } from '../models/AiCompletionParams';
 import type { AiGeneratedImage } from '../models/AiGeneratedImage';
 import type { ChatRequest } from '../models/ChatRequest';
-import type { ChatResponse } from '../models/ChatResponse';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestAiControllerService {
@@ -69,13 +68,13 @@ export class RestAiControllerService {
     /**
      * @param note
      * @param requestBody
-     * @returns ChatResponse OK
+     * @returns AiAssistantResponse OK
      * @throws ApiError
      */
     public chat(
         note: number,
         requestBody: ChatRequest,
-    ): CancelablePromise<ChatResponse> {
+    ): CancelablePromise<AiAssistantResponse> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/ai/chat/{note}',

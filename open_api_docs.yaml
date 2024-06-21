@@ -1566,7 +1566,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/ChatResponse"
+                $ref: "#/components/schemas/AiAssistantResponse"
   /api/ai/answer-clarifying-question:
     post:
       tags:
@@ -2990,8 +2990,10 @@ components:
           type: string
         requiredAction:
           $ref: "#/components/schemas/AiCompletionRequiredAction"
-        lastMessage:
-          type: string
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/Message"
     AiCompletionRequiredAction:
       type: object
       properties:
@@ -3001,6 +3003,38 @@ components:
           $ref: "#/components/schemas/ClarifyingQuestion"
         contentToAppend:
           type: string
+    Annotation:
+      type: object
+      properties:
+        index:
+          type: integer
+          format: int32
+        type:
+          type: string
+        text:
+          type: string
+        file_path:
+          $ref: "#/components/schemas/FilePath"
+        file_citation:
+          $ref: "#/components/schemas/FileCitation"
+        start_index:
+          type: integer
+          format: int32
+        end_index:
+          type: integer
+          format: int32
+    Attachment:
+      type: object
+      properties:
+        tools:
+          type: array
+          items:
+            oneOf:
+            - $ref: "#/components/schemas/CodeInterpreterTool"
+            - $ref: "#/components/schemas/FileSearchTool"
+            - $ref: "#/components/schemas/FunctionTool"
+        file_id:
+          type: string
     ClarifyingQuestion:
       required:
       - question
@@ -3008,6 +3042,111 @@ components:
       properties:
         question:
           type: string
+    CodeInterpreterTool:
+      type: object
+      allOf:
+      - $ref: "#/components/schemas/Tool"
+    FileCitation:
+      type: object
+      properties:
+        quote:
+          type: string
+        file_id:
+          type: string
+    FilePath:
+      type: object
+      properties:
+        file_id:
+          type: string
+    FileSearchTool:
+      type: object
+      allOf:
+      - $ref: "#/components/schemas/Tool"
+    FunctionTool:
+      type: object
+      allOf:
+      - $ref: "#/components/schemas/Tool"
+      - type: object
+        properties:
+          function:
+            type: object
+    ImageFile:
+      type: object
+      properties:
+        detail:
+          type: string
+        file_id:
+          type: string
+    IncompleteDetails:
+      type: object
+      properties:
+        reason:
+          type: string
+    Message:
+      type: object
+      properties:
+        id:
+          type: string
+        object:
+          type: string
+        status:
+          type: string
+        role:
+          type: string
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/MessageContent"
+        attachments:
+          type: array
+          items:
+            $ref: "#/components/schemas/Attachment"
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+        created_at:
+          type: integer
+          format: int32
+        thread_id:
+          type: string
+        incomplete_details:
+          $ref: "#/components/schemas/IncompleteDetails"
+        completed_at:
+          type: integer
+          format: int32
+        incomplete_at:
+          type: integer
+          format: int32
+        assistant_id:
+          type: string
+        run_id:
+          type: string
+    MessageContent:
+      type: object
+      properties:
+        type:
+          type: string
+        text:
+          $ref: "#/components/schemas/Text"
+        image_file:
+          $ref: "#/components/schemas/ImageFile"
+    Text:
+      type: object
+      properties:
+        value:
+          type: string
+        annotations:
+          type: array
+          items:
+            $ref: "#/components/schemas/Annotation"
+    Tool:
+      type: object
+      properties:
+        type:
+          type: string
+      discriminator:
+        propertyName: type
     AiGeneratedImage:
       type: object
       properties:
@@ -3017,11 +3156,6 @@ components:
       type: object
       properties:
         userMessage:
-          type: string
-    ChatResponse:
-      type: object
-      properties:
-        assistantMessage:
           type: string
     AiCompletionAnswerClarifyingQuestionParams:
       type: object

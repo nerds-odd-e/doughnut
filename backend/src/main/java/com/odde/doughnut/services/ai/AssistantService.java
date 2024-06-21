@@ -90,14 +90,7 @@ public record AssistantService(
 
       completionResponse.setRequiredAction(actionRequired);
     } else {
-      String message =
-          openAiApiHandler
-              .getThreadLastMessage(threadId)
-              .getContent()
-              .getFirst()
-              .getText()
-              .getValue();
-      completionResponse.setLastMessage(message);
+      completionResponse.setMessages(openAiApiHandler.getThreadLastMessage(threadId));
     }
     return completionResponse;
   }

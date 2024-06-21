@@ -77,7 +77,15 @@ class AiAdvisorServiceAutoCompleteTest {
           .aRunThatCompleted()
           .mockRetrieveRun()
           .mockListMessages("Interesting idea.");
-      assertEquals("Interesting idea.", getAiCompletionResponse("what goes up").getLastMessage());
+      assertEquals(
+          "Interesting idea.",
+          getAiCompletionResponse("what goes up")
+              .getMessages()
+              .getFirst()
+              .getContent()
+              .getFirst()
+              .getText()
+              .getValue());
     }
 
     @Test

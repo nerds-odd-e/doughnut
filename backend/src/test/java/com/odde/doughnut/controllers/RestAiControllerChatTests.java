@@ -6,8 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 
+import com.odde.doughnut.controllers.dto.AiAssistantResponse;
 import com.odde.doughnut.controllers.dto.ChatRequest;
-import com.odde.doughnut.controllers.dto.ChatResponse;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
@@ -63,8 +63,9 @@ public class RestAiControllerChatTests {
 
   @Test
   void chatWithAIAndGetResponse() throws UnexpectedNoAccessRightException {
-    ChatResponse res = controller.chat(note, new ChatRequest("What's your name?"));
-    assertEquals("I'm Chatbot", res.getAssistantMessage());
+    AiAssistantResponse res = controller.chat(note, new ChatRequest("What's your name?"));
+    assertEquals(
+        "I'm Chatbot", res.getMessages().getFirst().getContent().getFirst().getText().getValue());
   }
 
   @Test

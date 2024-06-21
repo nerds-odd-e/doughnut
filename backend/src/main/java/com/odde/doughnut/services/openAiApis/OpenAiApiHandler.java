@@ -173,8 +173,8 @@ public class OpenAiApiHandler {
             submitToolOutputsRequest));
   }
 
-  public Message getThreadLastMessage(String threadId) {
-    return blockGet(openAiApi.listMessages(threadId, Map.of())).getData().getFirst();
+  public List<Message> getThreadLastMessage(String threadId) {
+    return blockGet(openAiApi.listMessages(threadId, Map.of())).getData();
   }
 
   public SrtDto getTranscription(RequestBody requestBody) throws IOException {

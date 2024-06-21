@@ -2,7 +2,6 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type ChatResponse = {
-    assistantMessage?: string;
-};
+import type { Tool } from './Tool';
+export type CodeInterpreterTool = Tool;
 
