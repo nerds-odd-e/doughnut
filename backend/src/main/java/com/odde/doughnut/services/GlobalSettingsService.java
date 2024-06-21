@@ -37,8 +37,18 @@ public class GlobalSettingsService {
         "chat_assistant", "asst_37nHzDavC0gLbxydvprHwoca", modelFactoryService);
   }
 
-  public record GlobalSettingsKeyValue(
-      String keyName, String defaultValue, ModelFactoryService modelFactoryService) {
+  public static class GlobalSettingsKeyValue {
+    private final String keyName;
+    private final String defaultValue;
+    private final ModelFactoryService modelFactoryService;
+
+    public GlobalSettingsKeyValue(
+        String keyName, String defaultValue, ModelFactoryService modelFactoryService) {
+      this.keyName = keyName;
+      this.defaultValue = defaultValue;
+      this.modelFactoryService = modelFactoryService;
+    }
+
     public String getValue() {
       return getGlobalSettings().getValue();
     }
@@ -64,6 +74,14 @@ public class GlobalSettingsService {
         return globalSettings;
       }
       return currentQuestionGenerationModelVersion;
+    }
+
+    public String keyName() {
+      return keyName;
+    }
+
+    public ModelFactoryService modelFactoryService() {
+      return modelFactoryService;
     }
   }
 

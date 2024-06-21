@@ -71,10 +71,11 @@ public class RestAiController {
       throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(note);
     String userMessage = request.getUserMessage();
-    String assistantId = getGlobalSettingsService().chatAssistantId().getValue();
+    GlobalSettingsService.GlobalSettingsKeyValue settingAccessor =
+        getGlobalSettingsService().chatAssistantId();
     String assistantMessage =
         this.aiAdvisorService
-            .getChatService(assistantId)
+            .getChatService(settingAccessor)
             .initiateAThread(note, userMessage)
             .getLastMessage();
     return new ChatResponse(assistantMessage);
@@ -118,10 +119,10 @@ public class RestAiController {
 
   private AssistantService getContentCompletionService() {
     return aiAdvisorService.getContentCompletionService(
-        getGlobalSettingsService().noteCompletionAssistantId().getValue());
+        getGlobalSettingsService().noteCompletionAssistantId());
   }
 
   private AssistantService getChatService() {
-    return aiAdvisorService.getChatService(getGlobalSettingsService().chatAssistantId().getValue());
+    return aiAdvisorService.getChatService(getGlobalSettingsService().chatAssistantId());
   }
 }

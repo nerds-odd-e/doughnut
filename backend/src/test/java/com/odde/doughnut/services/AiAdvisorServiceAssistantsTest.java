@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
+import com.odde.doughnut.testability.model.MemorySettingAccessor;
 import com.theokanning.openai.assistants.assistant.Assistant;
 import com.theokanning.openai.assistants.assistant.AssistantRequest;
 import com.theokanning.openai.assistants.assistant.Tool;
@@ -37,8 +38,10 @@ class AiAdvisorServiceAssistantsTest {
     void captureTheRequest() {
       when(openAiApi.createAssistant(ArgumentMatchers.any()))
           .thenReturn(Single.just(new Assistant()));
+      GlobalSettingsService.GlobalSettingsKeyValue settingAccessor =
+          new MemorySettingAccessor("example-id");
       aiAdvisorService
-          .getContentCompletionService("asst_example_id")
+          .getContentCompletionService(settingAccessor)
           .createAssistant("gpt4o", "Note details completion")
           .getId();
       ArgumentCaptor<AssistantRequest> captor = ArgumentCaptor.forClass(AssistantRequest.class);
