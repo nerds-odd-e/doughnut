@@ -48,7 +48,8 @@ class AiAdvisorServiceAutoCompleteTest {
   @BeforeEach
   void Setup() {
     MockitoAnnotations.openMocks(this);
-    completionService = new AiAdvisorService(openAiApi).getContentCompletionService();
+    completionService =
+        new AiAdvisorService(openAiApi).getContentCompletionService("asst_example_id");
     openAIAssistantMocker = new OpenAIAssistantMocker(openAiApi);
     openAIAssistantThreadMocker =
         openAIAssistantMocker.mockThreadCreation(null).mockCreateMessage();
@@ -126,8 +127,7 @@ class AiAdvisorServiceAutoCompleteTest {
       Note note = makeMe.aNote().inMemoryPlease();
       AiCompletionParams aiCompletionParams = new AiCompletionParams();
       aiCompletionParams.setDetailsToComplete(incompleteContent);
-      return completionService.initiateAThread(
-          note, "asst_example_id", aiCompletionParams.getCompletionPrompt());
+      return completionService.initiateAThread(note, aiCompletionParams.getCompletionPrompt());
     }
   }
 

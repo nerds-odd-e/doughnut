@@ -7,6 +7,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.odde.doughnut.services.GlobalSettingsService;
+import com.odde.doughnut.services.ai.AssistantService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -49,10 +50,8 @@ public class RestAiController {
       @PathVariable(name = "note") @Schema(type = "integer") Note note,
       @RequestBody AiCompletionParams aiCompletionParams) {
     currentUser.assertLoggedIn();
-    String assistantId = getGlobalSettingsService().noteCompletionAssistantId().getValue();
-    return aiAdvisorService
-        .getContentCompletionService()
-        .initiateAThread(note, assistantId, aiCompletionParams.getCompletionPrompt());
+    return getContentCompletionService()
+        .initiateAThread(note, aiCompletionParams.getCompletionPrompt());
   }
 
   @PostMapping("/answer-clarifying-question")
@@ -60,8 +59,7 @@ public class RestAiController {
   public AiAssistantResponse answerCompletionClarifyingQuestion(
       @RequestBody AiCompletionAnswerClarifyingQuestionParams answerClarifyingQuestionParams) {
     currentUser.assertLoggedIn();
-    return aiAdvisorService
-        .getContentCompletionService()
+    return getContentCompletionService()
         .answerAiCompletionClarifyingQuestion(answerClarifyingQuestionParams);
   }
 
@@ -76,8 +74,8 @@ public class RestAiController {
     String assistantId = getGlobalSettingsService().chatAssistantId().getValue();
     String assistantMessage =
         this.aiAdvisorService
-            .getChatService()
-            .initiateAThread(note, assistantId, userMessage)
+            .getChatService(assistantId)
+            .initiateAThread(note, userMessage)
             .getLastMessage();
     return new ChatResponse(assistantMessage);
   }
@@ -103,16 +101,12 @@ public class RestAiController {
     Map<String, String> result = new HashMap<>();
     String modelName = globalSettingsService.globalSettingOthers().getValue();
     String completionAssistant =
-        aiAdvisorService
-            .getContentCompletionService()
-            .createAssistant(modelName, "Note details completion")
-            .getId();
+        getContentCompletionService().createAssistant(modelName, "Note details completion").getId();
     result.put("note details completion", completionAssistant);
     globalSettingsService
         .noteCompletionAssistantId()
         .setKeyValue(currentUTCTimestamp, completionAssistant);
-    String chatAssistant =
-        aiAdvisorService.getChatService().createAssistant(modelName, "Chat assistant").getId();
+    String chatAssistant = getChatService().createAssistant(modelName, "Chat assistant").getId();
     result.put("chat assistant", chatAssistant);
     globalSettingsService.chatAssistantId().setKeyValue(currentUTCTimestamp, chatAssistant);
     return result;
@@ -120,5 +114,14 @@ public class RestAiController {
 
   private GlobalSettingsService getGlobalSettingsService() {
     return new GlobalSettingsService(modelFactoryService);
+  }
+
+  private AssistantService getContentCompletionService() {
+    return aiAdvisorService.getContentCompletionService(
+        getGlobalSettingsService().noteCompletionAssistantId().getValue());
+  }
+
+  private AssistantService getChatService() {
+    return aiAdvisorService.getChatService(getGlobalSettingsService().chatAssistantId().getValue());
   }
 }

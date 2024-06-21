@@ -15,7 +15,8 @@ import com.theokanning.openai.assistants.thread.Thread;
 import com.theokanning.openai.assistants.thread.ThreadRequest;
 import java.util.List;
 
-public record AssistantService(OpenAiApiHandler openAiApiHandler, List<AiTool> tools) {
+public record AssistantService(
+    OpenAiApiHandler openAiApiHandler, String assistantId, List<AiTool> tools) {
   public Assistant createAssistant(String modelName, String name) {
     AssistantRequest assistantRequest =
         AssistantRequest.builder()
@@ -27,7 +28,7 @@ public record AssistantService(OpenAiApiHandler openAiApiHandler, List<AiTool> t
     return openAiApiHandler.createAssistant(assistantRequest);
   }
 
-  public AiAssistantResponse initiateAThread(Note note, String assistantId, String prompt) {
+  public AiAssistantResponse initiateAThread(Note note, String prompt) {
     String threadId = createThread(note, prompt);
     Run run = openAiApiHandler.createRun(threadId, assistantId);
     return getThreadResponse(threadId, run);

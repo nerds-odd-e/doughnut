@@ -22,9 +22,10 @@ public class AiAdvisorService {
     return new OtherAiServices(openAiApiHandler);
   }
 
-  public AssistantService getContentCompletionService() {
+  public AssistantService getContentCompletionService(String assistantId) {
     return new AssistantService(
         openAiApiHandler,
+        assistantId,
         List.of(
             AiTool.build(
                 COMPLETE_NOTE_DETAILS,
@@ -46,7 +47,7 @@ public class AiAdvisorService {
                 })));
   }
 
-  public AssistantService getChatService() {
-    return new AssistantService(openAiApiHandler, List.of());
+  public AssistantService getChatService(String assistantId) {
+    return new AssistantService(openAiApiHandler, assistantId, List.of());
   }
 }
