@@ -7,10 +7,15 @@ const openAiAssistantThreadMocker = (
   threadId: string,
 ) => {
   return {
-    async stubCreateMessageAndCreateRun(
-      message: MessageToMatch,
-      runId: string,
-    ) {
+    async stubMultipleCreateRuns(runIds: string[]) {
+      await serviceMocker.stubPosterWithMultipleResponses(`/threads/${threadId}/runs`,
+        runIds.map((runId) => ({
+        id: runId,
+        status: "queued",
+      })))
+      return this
+    },
+    async stubCreateMessage(message: MessageToMatch, runId: string) {
       // for creating a message
       await serviceMocker.mockPostMatchsAndNotMatches(
         `/threads/${threadId}/messages`,
@@ -20,13 +25,14 @@ const openAiAssistantThreadMocker = (
           id: "msg-abc123",
         },
       )
-      await serviceMocker.stubPoster(`/threads/${threadId}/runs`, {
-        id: runId,
-        status: "queued",
-      })
-      return openAiAssistantCreatedRunMocker(serviceMocker, threadId, runId)
+      return openAiAssistantCreatedRunMocker(
+        serviceMocker,
+        threadId,
+        runId,
+      )
     },
-  }
+
+ }
 }
 
 export default openAiAssistantThreadMocker
