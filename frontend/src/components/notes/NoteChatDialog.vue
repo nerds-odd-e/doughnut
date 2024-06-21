@@ -12,30 +12,32 @@
   </div>
   <div ref="bottomOfTheChat" style="height: 140px; display: block"></div>
 
-  <div class="container">
-    <button
-      v-if="!quizQuestionInNotebook"
-      class="btn btn-secondary"
-      @click="generateQuestion"
-    >
-      Test me
-    </button>
-    <form class="chat-input-container" @submit.prevent="generateChatAnswer">
-      <input id="chat-input" class="chat-input-text" v-model="chatInput" />
-      <input
-        :disabled="isButtonDisabled"
-        type="submit"
-        value="Chat"
-        id="chat-button"
-        class="btn float-btn btn-secondary"
-      />
-    </form>
-    <p class="text-center">
-      <i
-        >Ask question to AI about this note. Each question ignores the chat
-        history, unlike ChatGPT.</i
+  <div class="chat-controls">
+    <div class="container">
+      <button
+        v-if="!quizQuestionInNotebook"
+        class="btn btn-secondary"
+        @click="generateQuestion"
       >
-    </p>
+        Test me
+      </button>
+      <form class="chat-input-container" @submit.prevent="generateChatAnswer">
+        <input id="chat-input" class="chat-input-text" v-model="chatInput" />
+        <input
+          :disabled="isButtonDisabled"
+          type="submit"
+          value="Chat"
+          id="chat-button"
+          class="btn float-btn btn-secondary"
+        />
+      </form>
+      <p class="text-center">
+        <i
+          >Ask question to AI about this note. Each question ignores the chat
+          history, unlike ChatGPT.</i
+        >
+      </p>
+    </div>
   </div>
 </template>
 
@@ -105,6 +107,14 @@ span {
   display: block;
   overflow: hidden;
   padding-right: 5px;
+}
+
+.chat-controls {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background-color: white;
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .chat-input-container {

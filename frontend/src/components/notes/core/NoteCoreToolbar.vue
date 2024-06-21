@@ -11,7 +11,7 @@
       <WikidataButton v-bind="{ note, storageAccessor }" />
       <NoteDetailsAutoCompletionButton v-bind="{ note, storageAccessor }" />
 
-      <PopButton title="Chat with AI">
+      <PopButton title="Chat with AI" sidebar="right">
         <template #button_face>
           <SvgChat />
         </template>
