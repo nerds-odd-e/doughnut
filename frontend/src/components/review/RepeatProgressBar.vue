@@ -49,6 +49,10 @@
 <script setup lang="ts">
 import { computed } from "vue"
 import { useRouter } from "vue-router"
+import ProgressBar from "../commons/ProgressBar.vue"
+import SvgPause from "../svgs/SvgPause.vue"
+import SvgBackward from "../svgs/SvgBackward.vue"
+import SvgResume from "../svgs/SvgResume.vue"
 
 defineProps({
   finished: { type: Number, required: true },

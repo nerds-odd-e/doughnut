@@ -25,8 +25,10 @@
 </template>
 
 <script setup lang="ts">
-import { NoteTopic } from "@/generated/backend"
 import { PropType, computed, ref } from "vue"
+import { NoteTopic } from "@/generated/backend"
+import SvgLinkTypeIcon from "@/components/svgs/SvgLinkTypeIcon.vue"
+import NoteTopicWithLink from "../NoteTopicWithLink.vue"
 
 const props = defineProps({
   noteTopic: { type: Object as PropType<NoteTopic>, required: true },

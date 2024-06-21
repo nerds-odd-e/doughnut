@@ -17,9 +17,13 @@
 </template>
 
 <script setup lang="ts">
-import { NoteTopic } from "@/generated/backend"
 import { PropType, ref } from "vue"
+import { NoteTopic } from "@/generated/backend"
 import { type StorageAccessor } from "../../../store/createNoteStorage"
+import NoteTopicComponent from "./NoteTopicComponent.vue"
+import Modal from "../../commons/Modal.vue"
+import LinkNobDialog from "../../links/LinkNobDialog.vue"
+import Breadcrumb from "../../toolbars/Breadcrumb.vue"
 
 defineProps({
   noteTopic: { type: Object as PropType<NoteTopic>, required: true },

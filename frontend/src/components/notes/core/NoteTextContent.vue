@@ -21,9 +21,12 @@
 </template>
 
 <script setup lang="ts">
-import { Note } from "@/generated/backend"
 import { PropType } from "vue"
+import { Note } from "@/generated/backend"
 import { StorageAccessor } from "../../../store/createNoteStorage"
+import NoteEditableTopic from "./NoteEditableTopic.vue"
+import NoteLinkTopic from "./NoteLinkTopic.vue"
+import NoteEditableDetails from "./NoteEditableDetails.vue"
 
 defineProps({
   note: { type: Object as PropType<Note>, required: true },
