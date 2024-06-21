@@ -10,7 +10,6 @@
     :class="message.role"
     :key="index"
   >
-    <img src="/user-icon.svg" class="chat-answer-icon" />
     <div class="chat-answer-text">
       <p>{{ message.content?.[0]?.text?.value }}</p>
     </div>
@@ -152,11 +151,6 @@ input.auto-extendable-input {
 .chat-answer-container {
   display: flex;
   margin: 2% 0;
-}
-
-.chat-answer-icon {
-  width: 6%;
-  height: 6%;
 }
 
 .chat-answer-text {
