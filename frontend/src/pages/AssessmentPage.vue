@@ -20,6 +20,7 @@ import { QuizQuestion } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { computed, onMounted, ref } from "vue"
 import { useRouter } from "vue-router"
+import QuizQuestionComp from "@/components/review/QuizQuestion.vue"
 
 const { managedApi } = useLoadingApi()
 const router = useRouter()
