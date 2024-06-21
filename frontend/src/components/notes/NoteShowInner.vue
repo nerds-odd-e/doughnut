@@ -58,6 +58,7 @@
 <script setup lang="ts">
 import { NoteAccessory, NoteRealm } from "@/generated/backend"
 import { PropType, ref } from "vue"
+import { reverseLabel } from "@/models/linkTypeOptions"
 import { StorageAccessor } from "../../store/createNoteStorage"
 
 defineProps({

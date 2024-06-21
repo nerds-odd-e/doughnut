@@ -3159,8 +3159,6 @@ components:
           type: string
         threadId:
           type: string
-        lastMessageId:
-          type: string
     AiCompletionAnswerClarifyingQuestionParams:
       type: object
       properties:

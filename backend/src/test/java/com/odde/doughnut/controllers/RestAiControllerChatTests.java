@@ -65,8 +65,7 @@ public class RestAiControllerChatTests {
 
     @Test
     void chatWithAIAndGetResponse() throws UnexpectedNoAccessRightException {
-      AiAssistantResponse res =
-          controller.chat(note, new ChatRequest("What's your name?", null, null));
+      AiAssistantResponse res = controller.chat(note, new ChatRequest("What's your name?", null));
       assertEquals(
           "I'm Chatbot", res.getMessages().getFirst().getContent().getFirst().getText().getValue());
     }
@@ -78,7 +77,7 @@ public class RestAiControllerChatTests {
       globalSettingsService
           .chatAssistantId()
           .setKeyValue(makeMe.aTimestamp().please(), "chat-assistant");
-      controller.chat(note, new ChatRequest("What's your name?", null, null));
+      controller.chat(note, new ChatRequest("What's your name?", null));
       ArgumentCaptor<RunCreateRequest> captor = ArgumentCaptor.forClass(RunCreateRequest.class);
       verify(openAiApi).createRun(any(), captor.capture());
       assertThat(captor.getValue().getAssistantId()).isEqualTo("chat-assistant");
@@ -100,8 +99,7 @@ public class RestAiControllerChatTests {
 
     @Test
     void continueChat() throws UnexpectedNoAccessRightException {
-      controller.chat(
-          note, new ChatRequest("What's your name?", "existing-thread-id", "last-msg-id"));
+      controller.chat(note, new ChatRequest("What's your name?", "existing-thread-id"));
       ArgumentCaptor<MessageRequest> captor = ArgumentCaptor.forClass(MessageRequest.class);
       verify(openAiApi).createMessage(any(), captor.capture());
       assertThat(captor.getValue().getContent().toString()).isEqualTo("What's your name?");
@@ -118,6 +116,6 @@ public class RestAiControllerChatTests {
                     makeMe.modelFactoryService,
                     makeMe.aUser().toModelPlease(),
                     testabilitySettings)
-                .chat(note, new ChatRequest("What's your name?", null, null)));
+                .chat(note, new ChatRequest("What's your name?", null)));
   }
 }
