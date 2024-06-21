@@ -11,8 +11,8 @@
 </template>
 
 <script lang="ts" setup>
-import useLoadingApi from "@/managedApi/useLoadingApi"
 import { ref } from "vue"
+import useLoadingApi from "@/managedApi/useLoadingApi"
 
 const { managedApi } = useLoadingApi()
 const assistants = ref<Record<string, string> | undefined>(undefined)

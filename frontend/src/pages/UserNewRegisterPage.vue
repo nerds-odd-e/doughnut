@@ -20,10 +20,10 @@
 </template>
 
 <script lang="ts">
-import TextInput from "@/components/form/TextInput.vue"
+import { defineComponent } from "vue"
 import { User } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { defineComponent } from "vue"
+import TextInput from "@/components/form/TextInput.vue"
 import ContainerPage from "./commons/ContainerPage.vue"
 
 export default defineComponent({

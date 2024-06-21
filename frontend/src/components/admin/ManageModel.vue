@@ -7,9 +7,11 @@
   <ContentLoader v-else />
 </template>
 <script lang="ts" setup>
+import { onMounted, ref } from "vue"
 import { GlobalAiModelSettings } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { onMounted, ref } from "vue"
+import ContentLoader from "@/components/commons/ContentLoader.vue"
+import ManageModelInner from "./ManageModelInner.vue"
 
 const { managedApi } = useLoadingApi()
 const modelList = ref<string[] | undefined>(undefined)

@@ -1,7 +1,7 @@
-import AnsweredQuestionPage from "@/pages/AnsweredQuestionPage.vue"
 import { flushPromises } from "@vue/test-utils"
-import makeMe from "../fixtures/makeMe"
+import AnsweredQuestionPage from "@/pages/AnsweredQuestionPage.vue"
 import helper from "../helpers"
+import makeMe from "../fixtures/makeMe"
 
 describe("repetition page", () => {
   describe("repetition page for a link", () => {

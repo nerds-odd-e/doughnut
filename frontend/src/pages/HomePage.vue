@@ -70,10 +70,10 @@
 </template>
 
 <script lang="ts">
+import { PropType, defineComponent } from "vue"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import GlobalSidebar from "@/components/toolbars/GlobalSidebar.vue"
 import { User } from "@/generated/backend"
-import { PropType, defineComponent } from "vue"
 
 export default defineComponent({
   props: {

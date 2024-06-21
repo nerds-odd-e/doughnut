@@ -60,6 +60,12 @@
 
 <script setup lang="ts">
 import { ref } from "vue"
+import FineTuningData from "../components/admin/FineTuningData.vue"
+import FailureReportList from "../components/admin/FailureReportList.vue"
+import ManageModel from "../components/admin/ManageModel.vue"
+import ManageAssistant from "../components/admin/ManageAssistant.vue"
+import ManageBazaar from "../components/admin/ManageBazaar.vue"
+import ContainerPage from "./commons/ContainerPage.vue"
 
 const activePage = ref(
   "fineTuningData" as

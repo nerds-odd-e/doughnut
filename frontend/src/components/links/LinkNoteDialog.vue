@@ -21,8 +21,11 @@
 </template>
 
 <script setup lang="ts">
-import { Note, NoteTopic } from "@/generated/backend"
 import { PropType, ref } from "vue"
+import { Note, NoteTopic } from "@/generated/backend"
+import LinkNoteFinalize from "./LinkNoteFinalize.vue"
+import NoteTopicComponent from "../notes/core/NoteTopicComponent.vue"
+import SearchNote from "../search/SearchNote.vue"
 import { StorageAccessor } from "../../store/createNoteStorage"
 
 defineProps({

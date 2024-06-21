@@ -38,15 +38,15 @@
 </template>
 
 <script lang="ts">
-import Quiz from "@/components/review/Quiz.vue"
-import RepeatProgressBar from "@/components/review/RepeatProgressBar.vue"
+import { PropType, defineComponent } from "vue"
+import _ from "lodash"
 import { AnsweredQuestion } from "@/generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
 import getEnvironment from "@/managedApi/window/getEnvironment"
 import timezoneParam from "@/managedApi/window/timezoneParam"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import Quiz from "@/components/review/Quiz.vue"
+import RepeatProgressBar from "@/components/review/RepeatProgressBar.vue"
 import { StorageAccessor } from "@/store/createNoteStorage"
-import _ from "lodash"
-import { PropType, defineComponent } from "vue"
 
 export default defineComponent({
   setup() {

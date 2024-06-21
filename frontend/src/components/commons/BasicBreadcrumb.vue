@@ -18,8 +18,9 @@
 </template>
 
 <script setup lang="ts">
-import { NoteTopic } from "@/generated/backend"
 import { PropType } from "vue"
+import { NoteTopic } from "@/generated/backend"
+import NoteTopicWithLink from "../notes/NoteTopicWithLink.vue"
 
 defineProps({ ancestors: Array as PropType<NoteTopic[]> })
 </script>

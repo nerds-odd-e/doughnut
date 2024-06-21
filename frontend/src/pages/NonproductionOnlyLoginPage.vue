@@ -38,8 +38,8 @@
 </template>
 
 <script lang="ts">
-import useLoadingApi from "@/managedApi/useLoadingApi"
 import { defineComponent } from "vue"
+import useLoadingApi from "@/managedApi/useLoadingApi"
 
 export default defineComponent({
   setup() {

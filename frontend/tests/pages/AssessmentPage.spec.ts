@@ -1,8 +1,8 @@
-import AssessmentPage from "@/pages/AssessmentPage.vue"
 import { screen } from "@testing-library/vue"
 import { describe, it } from "vitest"
-import makeMe from "../fixtures/makeMe"
+import AssessmentPage from "@/pages/AssessmentPage.vue"
 import helper from "../helpers"
+import makeMe from "../fixtures/makeMe"
 
 vitest.mock("vue-router", () => ({
   useRouter: () => ({

@@ -53,8 +53,11 @@
 </template>
 
 <script setup lang="ts">
-import { User } from "@/generated/backend"
 import { PropType, ref } from "vue"
+import { User } from "@/generated/backend"
+import ScrollTo from "@/components/commons/ScrollTo.vue"
+import NoteShow from "../components/notes/NoteShow.vue"
+import BreadcrumbWithCircle from "../components/toolbars/BreadcrumbWithCircle.vue"
 import { StorageAccessor } from "../store/createNoteStorage"
 
 defineProps({

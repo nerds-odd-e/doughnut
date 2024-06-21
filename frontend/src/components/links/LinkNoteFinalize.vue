@@ -43,10 +43,15 @@
 </template>
 
 <script setup lang="ts">
-import { LinkCreation, Note, NoteTopic } from "@/generated/backend"
 import { PropType, ref } from "vue"
-import { StorageAccessor } from "../../store/createNoteStorage"
+import { LinkCreation, Note, NoteTopic } from "@/generated/backend"
+import LinkTypeSelect from "./LinkTypeSelect.vue"
+import NoteTopicComponent from "../notes/core/NoteTopicComponent.vue"
+import CheckInput from "../form/CheckInput.vue"
+import RadioButtons from "../form/RadioButtons.vue"
+import SvgGoBack from "../svgs/SvgGoBack.vue"
 import usePopups from "../commons/Popups/usePopups"
+import { StorageAccessor } from "../../store/createNoteStorage"
 
 const { popups } = usePopups()
 const props = defineProps({

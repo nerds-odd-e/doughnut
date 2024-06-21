@@ -9,8 +9,9 @@
 </template>
 
 <script setup lang="ts">
-import { NoteTopic } from "@/generated/backend"
 import { PropType } from "vue"
+import { NoteTopic } from "@/generated/backend"
+import SvgLinkTypeIcon from "../svgs/SvgLinkTypeIcon.vue"
 
 defineProps({
   noteTopic: {

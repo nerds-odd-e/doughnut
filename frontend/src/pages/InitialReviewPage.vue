@@ -21,9 +21,13 @@
 </template>
 
 <script setup lang="ts">
+import { PropType, computed, onMounted, ref } from "vue"
+import { useRouter } from "vue-router"
 import { Note } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import timezoneParam from "@/managedApi/window/timezoneParam"
+import ProgressBar from "@/components/commons/ProgressBar.vue"
+import InitialReview from "@/components/review/InitialReview.vue"
 import { StorageAccessor } from "@/store/createNoteStorage"
 import { PropType, computed, onMounted, ref } from "vue"
 import { useRouter } from "vue-router"

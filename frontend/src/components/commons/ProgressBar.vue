@@ -28,6 +28,7 @@
 
 <script setup lang="ts">
 import usePopups from "@/components/commons/Popups/usePopups"
+import ResumeButton from "./ResumeButton.vue"
 
 defineProps({
   paused: { type: Boolean, required: true },

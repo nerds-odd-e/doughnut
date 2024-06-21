@@ -15,12 +15,12 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from "vue"
+import { Notebook, Subscription } from "@/generated/backend"
+import useLoadingApi from "@/managedApi/useLoadingApi"
 import NotebookNewButton from "@/components/notebook/NotebookNewButton.vue"
 import NotebookViewCards from "@/components/notebook/NotebookViewCards.vue"
 import NotebookSubscriptionCards from "@/components/subscriptions/NotebookSubscriptionCards.vue"
-import { Notebook, Subscription } from "@/generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
-import { defineComponent } from "vue"
 import ContainerPage from "./commons/ContainerPage.vue"
 
 export default defineComponent({

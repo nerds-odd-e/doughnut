@@ -16,9 +16,9 @@
 </template>
 
 <script setup lang="ts">
-import { QuizQuestion } from "@/generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
 import { computed, onMounted, ref } from "vue"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import { QuizQuestion } from "@/generated/backend"
 import { useRouter } from "vue-router"
 import QuizQuestionComp from "@/components/review/QuizQuestion.vue"
 

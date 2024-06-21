@@ -7,8 +7,10 @@
 </template>
 
 <script setup lang="ts">
-import { BazaarNotebook } from "@/generated/backend"
 import { PropType } from "vue"
+import { BazaarNotebook } from "@/generated/backend"
+import NotebookCardsWithButtons from "../notebook/NotebookCardsWithButtons.vue"
+import BazaarNotebookButtons from "./BazaarNotebookButtons.vue"
 
 const props = defineProps({
   bazaarNotebooks: {

@@ -54,13 +54,13 @@
 </template>
 
 <script lang="ts">
+import { PropType, defineComponent } from "vue"
+import _ from "lodash"
 import {
   QuestionSuggestionParams,
   SuggestedQuestionForFineTuning,
 } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import _ from "lodash"
-import { PropType, defineComponent } from "vue"
 import CheckInput from "../form/CheckInput.vue"
 import TextArea from "../form/TextArea.vue"
 import TextInput from "../form/TextInput.vue"

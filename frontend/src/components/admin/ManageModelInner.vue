@@ -39,8 +39,9 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { GlobalAiModelSettings } from "@/generated/backend"
 import { PropType, ref } from "vue"
+import { GlobalAiModelSettings } from "@/generated/backend"
+import Select from "../form/Select.vue"
 
 const props = defineProps({
   modelList: {

@@ -16,10 +16,10 @@
 </template>
 
 <script lang="ts">
-import NotebookBazaarViewCards from "@/components/bazaar/NotebookBazaarViewCards.vue"
+import { PropType, defineComponent } from "vue"
 import { BazaarNotebook, User } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { PropType, defineComponent } from "vue"
+import NotebookBazaarViewCards from "@/components/bazaar/NotebookBazaarViewCards.vue"
 import ContainerPage from "./commons/ContainerPage.vue"
 
 export default defineComponent({

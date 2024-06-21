@@ -1,6 +1,6 @@
-import { User } from "@/generated/backend"
 import { PropType, defineComponent, h } from "vue"
 import { RouterView } from "vue-router"
+import { User } from "@/generated/backend"
 import usePopups from "../../components/commons/Popups/usePopups"
 import routerScopeGuard from "../../routes/relative_routes"
 import { StorageAccessor } from "../../store/createNoteStorage"

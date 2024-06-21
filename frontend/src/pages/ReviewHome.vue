@@ -5,9 +5,9 @@
 </template>
 
 <script>
-import ReviewWelcome from "@/components/review/ReviewWelcome.vue"
-import useLoadingApi from "@/managedApi/useLoadingApi"
 import timezoneParam from "@/managedApi/window/timezoneParam"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import ReviewWelcome from "@/components/review/ReviewWelcome.vue"
 import ContainerPage from "./commons/ContainerPage.vue"
 
 export default {

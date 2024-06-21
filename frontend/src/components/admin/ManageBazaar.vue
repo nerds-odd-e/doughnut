@@ -21,9 +21,10 @@
 </template>
 
 <script lang="ts" setup>
-import { BazaarNotebook } from "@/generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
 import { onMounted, ref } from "vue"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import { BazaarNotebook } from "@/generated/backend"
+import NoteTopicWithLink from "../notes/NoteTopicWithLink.vue"
 import usePopups from "../commons/Popups/usePopups"
 
 const { managedApi } = useLoadingApi()
