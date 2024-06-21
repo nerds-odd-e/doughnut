@@ -72,9 +72,13 @@ class ServiceMocker {
   }
 
   public stubPoster(path: string, response: unknown) {
+    return this.stubPosterWithMultipleResponses(path, [response])
+  }
+
+  public stubPosterWithMultipleResponses(path: string, responses: unknown[]) {
     return this.mockWithPredicates(
       [new DefaultPredicate(path, HttpMethod.POST)],
-      [response],
+      responses,
     )
   }
 
