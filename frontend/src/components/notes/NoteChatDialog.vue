@@ -72,7 +72,7 @@ export default defineComponent({
     return {
       quizQuestionInNotebook: undefined as QuizQuestionInNotebook | undefined,
       chatInput: "",
-      assistantMessage: undefined as Message[] | undefined,
+      assistantMessage: [] as Message[],
     }
   },
   computed: {
@@ -98,12 +98,12 @@ export default defineComponent({
       this.scrollToBottom()
     },
     async generateChatAnswer() {
-      this.assistantMessage = (
+      this.assistantMessage = [...this.assistantMessage, ...(
         await this.managedApi.restAiController.chat(this.selectedNote.id, {
           userMessage: this.chatInput,
           threadId: this.threadId,
         })
-      ).messages
+      ).messages!]
     },
   },
 })
