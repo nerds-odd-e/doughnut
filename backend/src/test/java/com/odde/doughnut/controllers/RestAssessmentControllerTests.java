@@ -3,6 +3,7 @@ package com.odde.doughnut.controllers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.odde.doughnut.controllers.dto.QuestionAnswerPair;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -109,6 +110,27 @@ public class RestAssessmentControllerTests {
           .please();
 
       assertThrows(ApiException.class, () -> controller.generateAssessmentQuestions(notebook));
+    }
+  }
+
+  @Nested
+  class completeAssessmentTest {
+    private Notebook notebook;
+    private Note topNote;
+
+    @BeforeEach
+    void setup() {
+      topNote = makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser).please();
+      notebook = topNote.getNotebook();
+    }
+
+    @Test
+    void submitAssessmentResult() throws UnexpectedNoAccessRightException {
+      makeMe.theNote(topNote).withNChildrenThat(5, NoteBuilder::hasAnApprovedQuestion).please();
+      notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(5);
+      List<QuestionAnswerPair> questionsAnswerPairs = new ArrayList<>();
+
+      controller.submitAssessmentResult(notebook, questionsAnswerPairs);
     }
   }
 }
