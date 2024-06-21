@@ -101,7 +101,7 @@ public record AssistantService(
 
       completionResponse.setRequiredAction(actionRequired);
     } else {
-      completionResponse.setMessages(openAiApiHandler.getThreadLastMessage(threadId));
+      completionResponse.setMessages(openAiApiHandler.getThreadLastMessage(threadId, run.getId()));
     }
     return completionResponse;
   }

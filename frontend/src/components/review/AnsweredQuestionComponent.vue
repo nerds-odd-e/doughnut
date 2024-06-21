@@ -30,6 +30,7 @@
 import { AnsweredQuestion } from "@/generated/backend"
 import { PropType, computed, ref } from "vue"
 import { StorageAccessor } from "../../store/createNoteStorage"
+import QuizQuestionComponent from "./QuizQuestion.vue"
 
 const props = defineProps({
   answeredQuestion: {

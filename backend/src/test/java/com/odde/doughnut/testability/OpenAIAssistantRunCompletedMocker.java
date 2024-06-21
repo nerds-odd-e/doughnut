@@ -24,7 +24,7 @@ public record OpenAIAssistantRunCompletedMocker(OpenAiApi openAiApi, String thre
     msgs.setData(List.of(Message.builder().content(contentList).build()));
     Mockito.doReturn(Single.just(msgs))
         .when(openAiApi)
-        .listMessages(threadId, Map.of("order", "asc"));
+        .listMessages(threadId, Map.of("order", "asc", "run_id", run.getId()));
   }
 
   public OpenAIAssistantRunCompletedMocker mockRetrieveRun() {

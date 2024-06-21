@@ -27,6 +27,7 @@ import timezoneParam from "@/managedApi/window/timezoneParam"
 import { StorageAccessor } from "@/store/createNoteStorage"
 import { PropType, computed, onMounted, ref } from "vue"
 import { useRouter } from "vue-router"
+import ContainerPage from "./commons/ContainerPage.vue"
 
 const router = useRouter()
 const { managedApi } = useLoadingApi()
