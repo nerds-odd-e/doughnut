@@ -96,7 +96,7 @@ const questionAdded = (newQuestion: QuizQuestionAndAnswer) => {
 const deleteQuestion = () => {
   const questionsToDelete = questions.value.filter((q) => q.approved)
   questionsToDelete.forEach(async (q) => {
-    await managedApi.restQuizQuestionController.deleteQuestion(props.note.id, q.id)
+    await managedApi.restQuizQuestionController.deleteQuestion(q.id)
   })
 }
 const toggleApproval = async (questionId?: number) => {
