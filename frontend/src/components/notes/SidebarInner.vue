@@ -38,9 +38,11 @@
 </template>
 
 <script setup lang="ts">
-import { NoteRealm } from "@/generated/backend"
 import { PropType, ref, watch } from "vue"
+import { NoteRealm } from "@/generated/backend"
 import { StorageAccessor } from "../../store/createNoteStorage"
+import ScrollTo from "@/components/commons/ScrollTo.vue"
+import NoteTopicWithLink from "./NoteTopicWithLink.vue"
 
 const props = defineProps({
   noteId: { type: Number, required: true },

@@ -89,9 +89,26 @@
 </template>
 
 <script setup lang="ts">
-import { Note } from "@/generated/backend"
-import { StorageAccessor } from "@/store/createNoteStorage"
 import { PropType } from "vue"
+import { StorageAccessor } from "@/store/createNoteStorage"
+import { Note } from "@/generated/backend"
+import NoteNewButton from "./NoteNewButton.vue"
+import SvgAddChild from "../../svgs/SvgAddChild.vue"
+import WikidataButton from "./WikidataButton.vue"
+import SvgSearchForLink from "../../svgs/SvgSearchForLink.vue"
+import LinkNoteDialog from "../../links/LinkNoteDialog.vue"
+import SvgCog from "../../svgs/SvgCog.vue"
+import SvgChat from "../../svgs/SvgChat.vue"
+import SvgUp from "../../svgs/SvgUp.vue"
+import SvgDown from "../../svgs/SvgDown.vue"
+import NoteDeleteButton from "./NoteDeleteButton.vue"
+import PopButton from "../../commons/Popups/PopButton.vue"
+import AIGenerateImageDialog from "../AIGenerateImageDialog.vue"
+import NoteDetailsAutoCompletionButton from "./NoteDetailsAutoCompletionButton.vue"
+import NoteChatDialog from "../NoteChatDialog.vue"
+import Questions from "../Questions.vue"
+import NoteInfoBar from "../NoteInfoBar.vue"
+
 
 const props = defineProps({
   storageAccessor: {

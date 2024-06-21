@@ -12,9 +12,10 @@
 </template>
 
 <script setup lang="ts">
-import { NoteRealm } from "@/generated/backend"
 import { PropType, Ref, computed, ref, toRefs, watch } from "vue"
+import { NoteRealm } from "@/generated/backend"
 import { StorageAccessor } from "../../store/createNoteStorage"
+import SidebarInner from "./SidebarInner.vue"
 
 const props = defineProps({
   noteRealm: { type: Object as PropType<NoteRealm> },

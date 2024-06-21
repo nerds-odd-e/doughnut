@@ -57,9 +57,11 @@
 </template>
 
 <script setup lang="ts">
+import { PropType, onMounted, ref } from "vue"
 import { Note, QuizQuestionAndAnswer } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { PropType, onMounted, ref } from "vue"
+import NoteAddQuestion from "./NoteAddQuestion.vue"
+import PopButton from "../commons/Popups/PopButton.vue"
 
 const { managedApi } = useLoadingApi()
 const props = defineProps({

@@ -22,6 +22,8 @@
 <script setup lang="ts">
 import { PropType } from "vue"
 import { StorageAccessor } from "../../store/createNoteStorage"
+import ContentLoader from "@/components/commons/ContentLoader.vue"
+import NoteRealmLoader from "./NoteRealmLoader.vue"
 
 defineProps({
   noteId: { type: Number, required: true },

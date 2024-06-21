@@ -61,10 +61,10 @@ import { NoteAccessory, NoteRealm } from "@/generated/backend"
 import NoteTextContent from "./core/NoteTextContent.vue"
 import ChildrenNotes from "./ChildrenNotes.vue"
 import { StorageAccessor } from "../../store/createNoteStorage"
+import NoteAccessoryAsync from "./accessory/NoteAccessoryAsync.vue"
 import NoteCoreToolbar from "./core/NoteCoreToolbar.vue"
 import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue"
 import LinkOfNote from "../links/LinkOfNote.vue"
-import { reverseLabel } from "../../models/linkTypeOptions"
 
 defineProps({
   noteRealm: { type: Object as PropType<NoteRealm>, required: true },

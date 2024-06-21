@@ -13,8 +13,9 @@
 </template>
 
 <script setup lang="ts">
-import { NoteTopic } from "@/generated/backend"
 import { PropType } from "vue"
+import { NoteTopic } from "@/generated/backend"
+import Card from "./Card.vue"
 
 defineProps({
   noteTopics: { type: Array as PropType<NoteTopic[]>, required: true },

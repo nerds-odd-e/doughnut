@@ -8,8 +8,10 @@
 </template>
 
 <script setup lang="ts">
-import { Notebook } from "@/generated/backend"
 import { PropType } from "vue"
+import { Notebook } from "@/generated/backend"
+import NotebookCardsWithButtons from "./NotebookCardsWithButtons.vue"
+import NotebookButtons from "./NotebookButtons.vue"
 
 defineProps({
   notebooks: {

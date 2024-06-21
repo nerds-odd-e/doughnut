@@ -48,10 +48,13 @@
 </template>
 
 <script setup lang="ts">
+import { PropType, ref, watch } from "vue"
 import { ReviewPoint } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { PropType, ref, watch } from "vue"
 import usePopups from "../commons/Popups/usePopups"
+import SvgNoReview from "../svgs/SvgNoReview.vue"
+import SvgSad from "../svgs/SvgSad.vue"
+import SvgHappy from "../svgs/SvgHappy.vue"
 
 const props = defineProps({
   modelValue: {

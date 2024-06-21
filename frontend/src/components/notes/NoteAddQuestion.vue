@@ -46,10 +46,11 @@
 </template>
 
 <script setup lang="ts">
-import { Note, QuizQuestionAndAnswer } from "@/generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
-import isMCQWithAnswerValid from "@/models/isMCQWithAnswerValid"
 import { PropType, computed, ref } from "vue"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import { Note, QuizQuestionAndAnswer } from "@/generated/backend"
+import isMCQWithAnswerValid from "@/models/isMCQWithAnswerValid"
+import TextArea from "../form/TextArea.vue"
 
 const { managedApi } = useLoadingApi()
 const props = defineProps({
