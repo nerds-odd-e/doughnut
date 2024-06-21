@@ -51,11 +51,14 @@ public record AssistantService(
   }
 
   private String createThread(Note note, String completionPrompt) {
-    ThreadRequest threadRequest = ThreadRequest.builder().build();
+    ThreadRequest threadRequest = ThreadRequest.builder().messages(
+      List.of(MessageRequest.builder().role("assistant").content(note.getNoteDescription()).build())
+    ).build();
     Thread thread = openAiApiHandler.createThread(threadRequest);
     MessageRequest messageRequest =
         MessageRequest.builder()
-            .content(note.getNoteDescription() + "------------\n" + completionPrompt)
+          .role("user")
+            .content(completionPrompt)
             .build();
 
     openAiApiHandler.createMessage(thread.getId(), messageRequest);

@@ -21,7 +21,9 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.OpenAiResponse;
 import com.theokanning.openai.assistants.assistant.Assistant;
 import com.theokanning.openai.assistants.message.MessageRequest;
+import com.theokanning.openai.assistants.run.CreateThreadAndRunRequest;
 import com.theokanning.openai.assistants.run.RunCreateRequest;
+import com.theokanning.openai.assistants.thread.ThreadRequest;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.image.Image;
@@ -125,17 +127,25 @@ class RestAiControllerTest {
       }
 
       @Test
+      void mustPutNoteInformInMessageWhenCreatethThread() {
+        ArgumentCaptor<ThreadRequest> captor = ArgumentCaptor.forClass(ThreadRequest.class);
+        controller.getCompletion(note, params);
+        verify(openAiApi, times(1)).createThread(captor.capture());
+        assertThat(captor.getAllValues().get(0).getMessages().getFirst().getContent().toString())
+          .contains("cosmos › solar system");
+      }
+
+      @Test
       void mustCreateMessageToRequestCompletion() {
         ArgumentCaptor<MessageRequest> captor = ArgumentCaptor.forClass(MessageRequest.class);
         controller.getCompletion(note, params);
         verify(openAiApi, times(1)).createMessage(any(), captor.capture());
         assertThat(captor.getAllValues().get(0).getContent().toString())
-            .contains("cosmos › solar system");
-        assertThat(captor.getAllValues().get(0).getContent().toString())
             .contains(" \"details_to_complete\" : \"\"");
         assertThat(captor.getAllValues().get(0).getContent().toString())
             .contains("Don't make assumptions");
       }
+
     }
 
     @Nested
