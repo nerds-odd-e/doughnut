@@ -104,6 +104,7 @@ describe("NoteChatDialog Conversation", () => {
     const response: AiAssistantResponse = {
       messages: [
         {
+          role: "assistant",
           content: [
             {
               text: {
@@ -125,7 +126,7 @@ describe("NoteChatDialog Conversation", () => {
     await flushPromises()
 
     wrapper.find(".chat-answer-container").isVisible()
-    const actual = wrapper.find("#chat-answer").text()
+    const actual = wrapper.find(".chat-answer-container.assistant").text()
     expect(actual).toBe(expected)
     expect(helper.managedApi.restAiController.chat).toHaveBeenCalledWith(
       note.id,

@@ -12,7 +12,7 @@
   >
     <img src="/user-icon.svg" class="chat-answer-icon" />
     <div class="chat-answer-text">
-      <p id="chat-answer">{{ message.content?.[0]?.text?.value }}</p>
+      <p>{{ message.content?.[0]?.text?.value }}</p>
     </div>
   </div>
   <div ref="bottomOfTheChat" style="height: 140px; display: block"></div>
