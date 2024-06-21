@@ -12,10 +12,14 @@ Feature: Chat about a note with AI
 
   Scenario: The users can conmunicate with AI
     Given OpenAI assistant will reply "No. It is not." for messages containing:
-      | content                           |
-      | Is Naba one of them?              |
+      | content              |
+      | Is Naba one of them? |
     When I send the message "Is Naba one of them?" to AI
-    Then I should receive the response "No. It is not."
+    Then I should receive the following chat messages:
+      | role      | message                           |
+      | assistant | There are 42 prefectures in Japan |
+      | user      | Is Naba one of them?              |
+      | assistant | No. It is not.                    |
 
 
   @ignore

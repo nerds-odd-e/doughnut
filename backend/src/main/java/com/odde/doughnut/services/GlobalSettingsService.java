@@ -29,12 +29,12 @@ public class GlobalSettingsService {
 
   public GlobalSettingsKeyValue noteCompletionAssistantId() {
     return new GlobalSettingsKeyValue(
-        "note_completion_assistant", "asst_37nHzDavC0gLbxydvprHwoca", modelFactoryService);
+        "note_completion_assistant", "asst_mGLNAgjtMR60NUheP2QtXJ2D", modelFactoryService);
   }
 
   public GlobalSettingsKeyValue chatAssistantId() {
     return new GlobalSettingsKeyValue(
-        "chat_assistant", "asst_37nHzDavC0gLbxydvprHwoca", modelFactoryService);
+        "chat_assistant", "asst_d1anqhMl5PNXGYKKERnMpUo8", modelFactoryService);
   }
 
   public static class GlobalSettingsKeyValue implements SettingAccessor {

@@ -14,5 +14,6 @@ export function assumeChatAboutNotePage() {
     expectResponse(msg: string) {
       cy.findByText(msg)
     },
+    expectMessages(_messages: { assistantMessage: string }[]) {},
   }
 }
