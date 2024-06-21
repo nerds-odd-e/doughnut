@@ -82,15 +82,17 @@ const openAiService = () => {
       )
     },
 
-    aThread(threadId: string) {
-      return openAiAssistantThreadMocker(serviceMocker, threadId)
-    },
-
-    async stubCreateThread(threadId: string) {
-      await serviceMocker.stubPoster(`/threads`, {
+    stubCreateThreadAndRuns(threadId: string, runIds: string[]) {
+      serviceMocker.stubPoster(`/threads`, {
         id: threadId,
       })
-      return this.aThread(threadId)
+      serviceMocker.stubPosterWithMultipleResponses(`/threads/${threadId}/runs`,
+        runIds.map((runId) => ({
+        id: runId,
+        status: "queued",
+      })))
+
+      return openAiAssistantThreadMocker(serviceMocker, threadId, runIds)
     },
 
     async stubFineTuningStatus(successful: boolean) {
