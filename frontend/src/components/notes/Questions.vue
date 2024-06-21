@@ -11,6 +11,15 @@
         />
       </template>
     </PopButton>
+
+    <button
+      role="button"
+      class="btn btn-secondary btn-sm"
+      title="Delete Question"
+    >
+      Delete Question
+    </button>
+
     <table class="question-table mt-2">
       <thead>
         <tr>

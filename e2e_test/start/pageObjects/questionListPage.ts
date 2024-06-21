@@ -18,7 +18,7 @@ export const questionListPage = () => {
       cy.get('input[type="checkbox"]').click();
         });
 
-      cy.get('a[title="Delete"]').click();
+      cy.get('button[title="Delete Question"]').click();
     }
   }
 }
