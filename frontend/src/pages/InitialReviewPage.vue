@@ -29,8 +29,6 @@ import timezoneParam from "@/managedApi/window/timezoneParam"
 import ProgressBar from "@/components/commons/ProgressBar.vue"
 import InitialReview from "@/components/review/InitialReview.vue"
 import { StorageAccessor } from "@/store/createNoteStorage"
-import { PropType, computed, onMounted, ref } from "vue"
-import { useRouter } from "vue-router"
 import ContainerPage from "./commons/ContainerPage.vue"
 
 const router = useRouter()
