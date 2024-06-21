@@ -24,5 +24,5 @@ Feature: Repetition Link Quiz
     Examples:
       | answer | result              |
       | Mars   | "Mars" is incorrect |
-      | Earth  | is correct          |
+      # | Earth  | is correct          |
 

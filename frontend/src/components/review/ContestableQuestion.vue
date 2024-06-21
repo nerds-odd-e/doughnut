@@ -100,7 +100,7 @@ const contest = async () => {
 
 const onAnswered = (answer: AnsweredQuestion) => {
   answeredQuestion.value = answer
-  emit("answered", answeredQuestion)
+  emit("answered", answeredQuestion.value)
 }
 
 </script>

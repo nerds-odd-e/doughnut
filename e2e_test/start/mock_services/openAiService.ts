@@ -82,11 +82,15 @@ const openAiService = () => {
       )
     },
 
+    aThread(threadId: string) {
+      return openAiAssistantThreadMocker(serviceMocker, threadId)
+    },
+
     async stubCreateThread(threadId: string) {
       await serviceMocker.stubPoster(`/threads`, {
         id: threadId,
       })
-      return openAiAssistantThreadMocker(serviceMocker, threadId)
+      return this.aThread(threadId)
     },
 
     async stubFineTuningStatus(successful: boolean) {

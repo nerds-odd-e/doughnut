@@ -72,7 +72,9 @@ Given(
           .stubCreateMessageAndCreateRun({
             role: "user",
             content: "Please complete",
-          })
+          },
+          "run-run-id",
+        )
           .then((run) =>
             run
               .stubRetrieveRunsThatRequireAction(data.hashes())
@@ -85,29 +87,28 @@ Given(
 Given(
   "OpenAI assistant will reply below for user messages:",
   (data: DataTable) => {
+    const threadId = "thread-abc123"
+    mock_services
+      .openAi()
+      .stubCreateThread(threadId)
     data.hashes().forEach((row) => {
       const userMessage: MessageToMatch = {
         role: "user",
         content: row["user message"],
       } as MessageToMatch
-      const threadId = "thread-abc123"
       mock_services
         .openAi()
-        .stubCreateThread(threadId)
-        .then((thread) =>
-          thread
-            .stubCreateMessageAndCreateRun(userMessage)
+        .aThread(threadId)
+        .stubCreateMessageAndCreateRun(userMessage, row["run id"]!)
+        .then((run) =>
+          run
+            .stubRetrieveRunsThatCompleted()
             .then((run) =>
-              run
-                .stubRetrieveRunsThatCompleted()
-                .then((run) =>
-                  run.stubListMessages([
-                    userMessage,
-                    { role: "assistant", content: row["assistant reply"]! },
-                  ]),
-                ),
+              run.stubListMessages([
+                userMessage,
+                { role: "assistant", content: row["assistant reply"]! },
+              ]),
             ),
         )
     })
-  },
-)
+})
