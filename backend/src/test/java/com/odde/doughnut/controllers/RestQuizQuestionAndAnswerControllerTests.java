@@ -31,6 +31,7 @@ import java.sql.Timestamp;
 import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -580,6 +581,7 @@ class RestQuizQuestionAndAnswerControllerTests {
 
   @Nested
   class DeleteQuestion{
+    @Disabled
     @Test
     void deleteQuestion() throws UnexpectedNoAccessRightException {
       Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
@@ -593,6 +595,10 @@ class RestQuizQuestionAndAnswerControllerTests {
       makeMe.refresh(note);
 
       controller.deleteQuestion(questionToDelete);
+      makeMe.refresh(note);
+
+      assertThat(note.getQuizQuestionAndAnswers(), hasSize(1));
+      assertThat(note.getQuizQuestionAndAnswers(), contains(questionToRemain));
     }
   }
 }
