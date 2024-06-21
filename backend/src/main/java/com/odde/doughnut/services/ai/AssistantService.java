@@ -2,7 +2,6 @@ package com.odde.doughnut.services.ai;
 
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
@@ -18,7 +17,7 @@ import java.util.List;
 
 public record AssistantService(
     OpenAiApiHandler openAiApiHandler,
-    GlobalSettingsService.GlobalSettingsKeyValue settingAccessor,
+    com.odde.doughnut.services.SettingAccessor settingAccessor,
     List<AiTool> tools) {
   public Assistant createAssistant(String modelName, String name) {
     AssistantRequest assistantRequest =

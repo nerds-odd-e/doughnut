@@ -1,13 +1,12 @@
 package com.odde.doughnut.testability.model;
 
-import com.odde.doughnut.services.GlobalSettingsService.GlobalSettingsKeyValue;
+import com.odde.doughnut.services.SettingAccessor;
 import java.sql.Timestamp;
 
-public class MemorySettingAccessor extends GlobalSettingsKeyValue {
+public class MemorySettingAccessor implements SettingAccessor {
   private String value;
 
   public MemorySettingAccessor(String initialValue) {
-    super(null, null, null);
     this.value = initialValue;
   }
 

@@ -49,8 +49,7 @@ class AiAdvisorServiceAutoCompleteTest {
   @BeforeEach
   void Setup() {
     MockitoAnnotations.openMocks(this);
-    GlobalSettingsService.GlobalSettingsKeyValue settingAccessor =
-        new MemorySettingAccessor("example-id");
+    SettingAccessor settingAccessor = new MemorySettingAccessor("example-id");
     completionService =
         new AiAdvisorService(openAiApi).getContentCompletionService(settingAccessor);
     openAIAssistantMocker = new OpenAIAssistantMocker(openAiApi);

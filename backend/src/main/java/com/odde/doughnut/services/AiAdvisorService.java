@@ -22,8 +22,7 @@ public class AiAdvisorService {
     return new OtherAiServices(openAiApiHandler);
   }
 
-  public AssistantService getContentCompletionService(
-      GlobalSettingsService.GlobalSettingsKeyValue settingAccessor) {
+  public AssistantService getContentCompletionService(SettingAccessor settingAccessor) {
     return new AssistantService(
         openAiApiHandler,
         settingAccessor,

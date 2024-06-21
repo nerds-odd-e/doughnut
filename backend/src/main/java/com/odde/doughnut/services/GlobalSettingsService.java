@@ -37,7 +37,7 @@ public class GlobalSettingsService {
         "chat_assistant", "asst_37nHzDavC0gLbxydvprHwoca", modelFactoryService);
   }
 
-  public static class GlobalSettingsKeyValue {
+  public static class GlobalSettingsKeyValue implements SettingAccessor {
     private final String keyName;
     private final String defaultValue;
     private final ModelFactoryService modelFactoryService;
@@ -49,10 +49,12 @@ public class GlobalSettingsService {
       this.modelFactoryService = modelFactoryService;
     }
 
+    @Override
     public String getValue() {
       return getGlobalSettings().getValue();
     }
 
+    @Override
     public void setKeyValue(Timestamp currentUTCTimestamp, String value) {
       GlobalSettings settings = getGlobalSettings();
       settings.setValue(value);

@@ -38,8 +38,7 @@ class AiAdvisorServiceAssistantsTest {
     void captureTheRequest() {
       when(openAiApi.createAssistant(ArgumentMatchers.any()))
           .thenReturn(Single.just(new Assistant()));
-      GlobalSettingsService.GlobalSettingsKeyValue settingAccessor =
-          new MemorySettingAccessor("example-id");
+      SettingAccessor settingAccessor = new MemorySettingAccessor("example-id");
       aiAdvisorService
           .getContentCompletionService(settingAccessor)
           .createAssistant("gpt4o", "Note details completion")
