@@ -28,7 +28,7 @@ Given("my session is logged out", () => {
 })
 
 Given("I'm on the login page", () => {
-  cy.visit("/login")
+  cy.visit("/users/identify")
 })
 
 When("I identify myself as a new user", () => {

@@ -79,6 +79,9 @@ export default defineComponent({
     isButtonDisabled() {
       return this.chatInput === ""
     },
+    threadId() {
+      return this.assistantMessage?.[this.assistantMessage.length - 1]?.thread_id
+    },
   },
   methods: {
     scrollToBottom() {
@@ -98,6 +101,7 @@ export default defineComponent({
       this.assistantMessage = (
         await this.managedApi.restAiController.chat(this.selectedNote.id, {
           userMessage: this.chatInput,
+          threadId: this.threadId,
         })
       ).messages
     },

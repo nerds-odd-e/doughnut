@@ -5,6 +5,7 @@ import { User } from "./generated/backend"
 import ManagedApi, { ApiStatus } from "./managedApi/ManagedApi"
 import getEnvironment from "./managedApi/window/getEnvironment"
 import createNoteStorage from "./store/createNoteStorage"
+import UserNewRegisterPage from "./pages/UserNewRegisterPage.vue"
 
 const apiStatus: Ref<ApiStatus> = ref({
   errors: [],

@@ -76,7 +76,7 @@ export default defineComponent({
           if (this.redirectAfterLogin) {
             window.location.href = this.redirectAfterLogin
           } else {
-            this.$router.push("/")
+            window.location.href = "/"
           }
         })
         .catch((err) => {
