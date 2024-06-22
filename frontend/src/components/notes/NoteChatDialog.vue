@@ -1,4 +1,5 @@
 <template>
+  <div class="mt-4"/>
   <ContestableQuestion
     v-if="quizQuestionInNotebook"
     v-bind="{ quizQuestionInNotebook, storageAccessor }"
@@ -13,8 +14,11 @@
     <div v-if="message.role==='assistant'" class="assistant-icon col-auto">
       <SvgRobot />
     </div>
-    <div class="chat-answer-text col">
-      <p>{{ message.content?.[0]?.text?.value }}</p>
+    <div class="col">
+      <div v-if="message.role==='assistant'" v-html="markdowntToHtml(message.content?.[0]?.text?.value)"/>
+      <div v-else class="chat-message-content">
+        {{ message.content?.[0]?.text?.value }}
+      </div>
     </div>
   </div>
 
@@ -54,6 +58,7 @@ import { Message, Note, QuizQuestionInNotebook } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import { PropType, defineComponent } from "vue"
+import markdownizer from "@/components/form/markdownizer"
 import scrollToElement from "../commons/scrollToElement"
 import ContestableQuestion from "../review/ContestableQuestion.vue"
 import SvgRobot from "../svgs/SvgRobot.vue"
@@ -88,6 +93,9 @@ export default defineComponent({
     },
   },
   methods: {
+    markdowntToHtml(content?: string) {
+      return markdownizer.markdownToHtml(content)
+    },
     scrollToBottom() {
       const elm = this.$refs.bottomOfTheChat as HTMLElement
       if (elm) {
@@ -150,6 +158,15 @@ input.auto-extendable-input {
 }
 
 .float-btn {
+  float: right;
+}
+
+.user .chat-message-content {
+  background-color: #f0f0f0;
+  border-radius: 10px;
+  padding: 10px;
+  margin: 5px;
+  max-width: 70%;
   float: right;
 }
 </style>

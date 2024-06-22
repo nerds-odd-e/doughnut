@@ -99,8 +99,6 @@ describe("NoteChatDialog TestMe", () => {
 })
 
 describe("NoteChatDialog Conversation", () => {
-  const expected = "I'm ChatGPT"
-
   beforeEach(() => {
     const response: AiAssistantResponse = {
       messages: [
@@ -109,7 +107,7 @@ describe("NoteChatDialog Conversation", () => {
           content: [
             {
               text: {
-                value: expected,
+                value: "## I'm ChatGPT"
               },
             },
           ],
@@ -146,7 +144,7 @@ describe("NoteChatDialog Conversation", () => {
   it("When the chat button is clicked, the anwser from AI will be displayed", async () => {
    const wrapper = await askAndReplied()
     const actual = wrapper.find(".chat-answer-container.assistant").text()
-    expect(actual).toBe(expected)
+    expect(actual).toBe("I'm ChatGPT")
   })
 
   it("has one assistant icon", async () => {
