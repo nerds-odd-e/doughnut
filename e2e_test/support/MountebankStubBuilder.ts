@@ -14,13 +14,23 @@ class MountebankStubBuilder {
   public stubWithPredicates(
     predicates: Predicate[],
     responses: unknown[],
+    headers?: Record<string, string>,
   ): Stub {
     const stub = new Stub()
     predicates.forEach((predicate) => stub.withPredicate(predicate))
-    responses.forEach((response) =>
-      stub.withResponse(
-        new Response().withStatusCode(200).withJSONBody(response),
-      ),
+    responses.forEach((response) => {
+      const resp = new Response().withStatusCode(200)
+
+      if (typeof response === "string") resp.withBody(response)
+      else resp.withJSONBody(response)
+
+      if (headers !== undefined) {
+        Object.entries(headers).forEach(([key, value]) => {
+          resp.withHeader(key, value)
+        })
+      }
+      return stub.withResponse(resp)
+    },
     )
     return stub
   }

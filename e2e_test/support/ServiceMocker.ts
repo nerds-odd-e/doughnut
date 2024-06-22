@@ -51,14 +51,14 @@ class ServiceMocker {
           .withMethod(HttpMethod.GET)
           .withQuery(queryData),
       ],
-      [response],
+      [response]
     )
   }
 
   public stubGetterWithMutipleResponses(
     path: string,
     queryData: unknown,
-    responses: unknown[],
+    responses: unknown[]
   ) {
     return this.mockWithPredicates(
       [
@@ -67,7 +67,7 @@ class ServiceMocker {
           .withMethod(HttpMethod.GET)
           .withQuery(queryData),
       ],
-      responses,
+      responses
     )
   }
 
@@ -75,10 +75,15 @@ class ServiceMocker {
     return this.stubPosterWithMultipleResponses(path, [response])
   }
 
-  public stubPosterWithMultipleResponses(path: string, responses: unknown[]) {
+  public stubPosterWithMultipleResponses(
+    path: string,
+    responses: unknown[],
+    headers?: Record<string, string>
+  ) {
     return this.mockWithPredicates(
       [new DefaultPredicate(path, HttpMethod.POST)],
       responses,
+      headers
     )
   }
 
@@ -86,7 +91,7 @@ class ServiceMocker {
     path: string,
     bodyToMatch: unknown,
     bodyNotToMatch: unknown,
-    response: unknown,
+    response: unknown
   ): Promise<void> {
     const nots = bodyNotToMatch
       ? [new NotPredicate(new FlexiPredicate().withBody(bodyNotToMatch))]
@@ -105,33 +110,33 @@ class ServiceMocker {
       pathMatcher,
       HttpMethod.POST,
       401,
-      response,
+      response
     )
     return this.addStubToMountebank(stub)
   }
 
   public stubGetterWithError500Response(
     pathMatcher: string,
-    response: unknown,
+    response: unknown
   ) {
     const stub = this.mountebankStubBuilder.stubWithErrorResponse(
       pathMatcher,
       HttpMethod.GET,
       500,
-      response,
+      response
     )
     return this.addStubToMountebank(stub)
   }
 
   public stubPosterWithError500Response(
     pathMatcher: string,
-    response: unknown,
+    response: unknown
   ) {
     const stub = this.mountebankStubBuilder.stubWithErrorResponse(
       pathMatcher,
       HttpMethod.POST,
       500,
-      response,
+      response
     )
     return this.addStubToMountebank(stub)
   }
@@ -139,10 +144,12 @@ class ServiceMocker {
   private mockWithPredicates(
     predicates: Predicate[],
     responses: unknown[],
+    headers?: Record<string, string>
   ): Promise<void> {
     const stub = this.mountebankStubBuilder.stubWithPredicates(
       predicates,
       responses,
+      headers
     )
     return this.addStubToMountebank(stub)
   }

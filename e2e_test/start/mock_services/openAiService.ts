@@ -82,16 +82,26 @@ const openAiService = () => {
       )
     },
 
-    stubCreateThreadAndRuns(threadId: string, runIds: string[]) {
+    stubCreateThread(threadId: string) {
       serviceMocker.stubPoster(`/threads`, {
         id: threadId,
       })
+      return this
+    },
+
+    stubCreateRuns(threadId: string, runIds: string[]) {
       serviceMocker.stubPosterWithMultipleResponses(`/threads/${threadId}/runs`,
         runIds.map((runId) => ({
         id: runId,
         status: "queued",
       })))
+      return openAiAssistantThreadMocker(serviceMocker, threadId, runIds)
+    },
 
+    stubCreateRunStreams(threadId: string, runIds: string[]) {
+      serviceMocker.stubPosterWithMultipleResponses(`/threads/${threadId}/runs`,
+        runIds.map((runId) => `event: thread.run.step.completed\ndata: {"run_id": "${runId}", "status": "completed"}\n\n`),
+    { "Content-Type": "text/event-stream" })
       return openAiAssistantThreadMocker(serviceMocker, threadId, runIds)
     },
 

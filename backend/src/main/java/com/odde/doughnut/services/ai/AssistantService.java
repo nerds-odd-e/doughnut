@@ -57,28 +57,28 @@ public record AssistantService(
   public AiAssistantResponse createMessageRunAndGetResponseStream(String prompt, String threadId) {
     MessageRequest messageRequest = MessageRequest.builder().role("user").content(prompt).build();
     openAiApiHandler.createMessage(threadId, messageRequest);
-    TestSubscriber<AssistantSSE> subscriber1 = new TestSubscriber<>();
+    TestSubscriber<AssistantSSE> subscriber = new TestSubscriber<>();
     openAiApiHandler
         .createRunStream(threadId, settingAccessor.getValue())
-        .blockingSubscribe(subscriber1);
+        .blockingSubscribe(subscriber);
+    //            System.out.println(subscriber.getEvents());
+    Optional<AssistantSSE> runStepCompletion =
+        subscriber.values().stream()
+            .filter(item -> item.getEvent().equals(StreamEvent.THREAD_RUN_STEP_COMPLETED))
+            .findFirst();
+    RunStep runStep = null;
     try {
-      //      System.out.println(subscriber1.getEvents());
-      Optional<AssistantSSE> runStepCompletion =
-          subscriber1.values().stream()
-              .filter(item -> item.getEvent().equals(StreamEvent.THREAD_RUN_STEP_COMPLETED))
-              .findFirst();
-      RunStep runStep =
-          new ObjectMapper().readValue(runStepCompletion.get().getData(), RunStep.class);
-
-      AiAssistantResponse completionResponse = new AiAssistantResponse();
-      completionResponse.setThreadId(threadId);
-      completionResponse.setRunId(runStep.getRunId());
-      completionResponse.setMessages(
-          openAiApiHandler.getThreadLastMessage(threadId, runStep.getRunId()));
-      return completionResponse;
+      runStep = new ObjectMapper().readValue(runStepCompletion.get().getData(), RunStep.class);
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }
+
+    AiAssistantResponse completionResponse = new AiAssistantResponse();
+    completionResponse.setThreadId(threadId);
+    completionResponse.setRunId(runStep.getRunId());
+    completionResponse.setMessages(
+        openAiApiHandler.getThreadLastMessage(threadId, runStep.getRunId()));
+    return completionResponse;
   }
 
   public AiAssistantResponse answerAiCompletionClarifyingQuestion(
