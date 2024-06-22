@@ -53,76 +53,56 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { Message, Note, QuizQuestionInNotebook } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
-import { PropType, defineComponent } from "vue"
+import { PropType, computed, ref } from "vue"
 import markdownizer from "@/components/form/markdownizer"
 import scrollToElement from "../commons/scrollToElement"
 import ContestableQuestion from "../review/ContestableQuestion.vue"
 import SvgRobot from "../svgs/SvgRobot.vue"
 
-export default defineComponent({
-  setup() {
-    return useLoadingApi()
-  },
-  props: {
-    selectedNote: { type: Object as PropType<Note>, required: true },
-    storageAccessor: {
-      type: Object as PropType<StorageAccessor>,
-      required: true,
-    },
-  },
-  components: {
-    ContestableQuestion,
-  },
-  data() {
-    return {
-      quizQuestionInNotebook: undefined as QuizQuestionInNotebook | undefined,
-      chatInput: "",
-      messages: [] as Message[],
-    }
-  },
-  computed: {
-    isButtonDisabled() {
-      return this.chatInput === ""
-    },
-    threadId() {
-      return this.messages?.[this.messages.length - 1]?.thread_id
-    },
-  },
-  methods: {
-    markdowntToHtml(content?: string) {
-      return markdownizer.markdownToHtml(content)
-    },
-    scrollToBottom() {
-      const elm = this.$refs.bottomOfTheChat as HTMLElement
-      if (elm) {
-        scrollToElement(elm)
-      }
-    },
-    async generateQuestion() {
-      this.quizQuestionInNotebook =
-        await this.managedApi.restQuizQuestionController.generateQuestion(
-          this.selectedNote.id,
-        )
-      this.scrollToBottom()
-    },
-    async generateChatAnswer() {
-      this.messages.push({
-        role: "user",
-        content: [{ text: { value: this.chatInput } }],
-      })
-      this.messages = [...this.messages, ...(
-        await this.managedApi.restAiController.chat(this.selectedNote.id, {
-          userMessage: this.chatInput,
-          threadId: this.threadId,
-        })
-      ).messages!]
-    },
+const { managedApi } = useLoadingApi()
+const props = defineProps({
+  selectedNote: { type: Object as PropType<Note>, required: true },
+  storageAccessor: {
+    type: Object as PropType<StorageAccessor>,
+    required: true,
   },
 })
+const quizQuestionInNotebook = ref<QuizQuestionInNotebook | undefined>(undefined)
+const chatInput = ref("")
+const messages = ref<Message[]>([])
+const bottomOfTheChat = ref<HTMLElement | null>(null)
+
+const isButtonDisabled = computed(() => chatInput.value === "")
+const threadId = computed(() => messages.value?.[messages.value.length - 1]?.thread_id)
+
+const markdowntToHtml = (content?: string) => markdownizer.markdownToHtml(content)
+const scrollToBottom = () => {
+  if (bottomOfTheChat.value) {
+    scrollToElement(bottomOfTheChat.value)
+  }
+}
+
+const generateQuestion = async () => {
+  quizQuestionInNotebook.value = await managedApi.restQuizQuestionController.generateQuestion(
+    props.selectedNote.id,
+  )
+  scrollToBottom()
+}
+
+const generateChatAnswer = async () => {
+  messages.value.push({
+    role: "user",
+    content: [{ text: { value: chatInput.value } }],
+  })
+  messages.value = [...messages.value, ...(await managedApi.restAiController.chat(props.selectedNote.id, {
+    userMessage: chatInput.value,
+    threadId: threadId.value,
+  })).messages!]
+}
 </script>
 
 <style lang="scss" scoped>
