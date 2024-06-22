@@ -16,8 +16,8 @@
     </div>
     <div class="col">
       <div v-if="message.role==='assistant'" v-html="markdowntToHtml(message.content?.[0]?.text?.value)"/>
-      <div v-else class="chat-message-content">
-        {{ message.content?.[0]?.text?.value }}
+      <div v-else class="d-flex justify-content-end">
+        <div class="user-message" v-text="message.content?.[0]?.text?.value" />
       </div>
     </div>
   </div>
@@ -155,12 +155,13 @@ input.auto-extendable-input {
   float: right;
 }
 
-.user .chat-message-content {
+.user-message {
   background-color: #f0f0f0;
   border-radius: 10px;
-  padding: 10px;
-  margin: 5px;
   max-width: 70%;
-  float: right;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  text-align: left;
+  padding: 12px 16px;
 }
 </style>
