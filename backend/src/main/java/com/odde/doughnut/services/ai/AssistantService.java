@@ -77,35 +77,38 @@ public record AssistantService(
   }
 
   private AiAssistantResponse getThreadResponse(String threadId, Run currentRun) {
-    Run run = openAiApiHandler.retrieveUntilCompletedOrRequiresAction(threadId, currentRun);
-
+    String id = currentRun.getId();
     AiAssistantResponse completionResponse = new AiAssistantResponse();
     completionResponse.setThreadId(threadId);
-    completionResponse.setRunId(currentRun.getId());
+    completionResponse.setRunId(id);
 
+    Run run = openAiApiHandler.retrieveUntilCompletedOrRequiresAction(threadId, currentRun);
     if (run.getStatus().equals("requires_action")) {
-      RequiredAction requiredAction = run.getRequiredAction();
-      int size = requiredAction.getSubmitToolOutputs().getToolCalls().size();
-      if (size != 1) {
-        throw new RuntimeException("Unexpected number of tool calls: " + size);
-      }
-      ToolCall toolCall = requiredAction.getSubmitToolOutputs().getToolCalls().getFirst();
-
-      AiCompletionRequiredAction actionRequired =
-          tools.stream()
-              .flatMap(t -> t.tryConsume(toolCall))
-              .findFirst()
-              .orElseThrow(
-                  () ->
-                      new RuntimeException(
-                          "Unknown function name: " + toolCall.getFunction().getName()));
-
-      actionRequired.setToolCallId(toolCall.getId());
-
-      completionResponse.setRequiredAction(actionRequired);
+      completionResponse.setRequiredAction(getAiCompletionRequiredAction(run.getRequiredAction()));
     } else {
-      completionResponse.setMessages(openAiApiHandler.getThreadLastMessage(threadId, run.getId()));
+      completionResponse.setMessages(openAiApiHandler.getThreadLastMessage(threadId, id));
     }
+
     return completionResponse;
+  }
+
+  private AiCompletionRequiredAction getAiCompletionRequiredAction(RequiredAction requiredAction) {
+    int size = requiredAction.getSubmitToolOutputs().getToolCalls().size();
+    if (size != 1) {
+      throw new RuntimeException("Unexpected number of tool calls: " + size);
+    }
+    ToolCall toolCall = requiredAction.getSubmitToolOutputs().getToolCalls().getFirst();
+
+    AiCompletionRequiredAction actionRequired =
+        tools.stream()
+            .flatMap(t -> t.tryConsume(toolCall))
+            .findFirst()
+            .orElseThrow(
+                () ->
+                    new RuntimeException(
+                        "Unknown function name: " + toolCall.getFunction().getName()));
+
+    actionRequired.setToolCallId(toolCall.getId());
+    return actionRequired;
   }
 }
