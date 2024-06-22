@@ -18,16 +18,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue"
+import { nextTick, ref, watch } from "vue"
 import InputWithType from "./InputWithType.vue"
 
-defineProps({
+const props = defineProps({
   modelValue: String,
   scopeName: String,
   field: String,
   placeholder: { type: String, default: null },
   autofocus: { type: Boolean, default: false },
   rows: { type: Number, default: 8 },
+  autoExtendUntil: { type: Number, default: null },
   errors: Object,
 })
 
@@ -42,5 +43,15 @@ const focus = () => {
 
 defineExpose({
   focus
+})
+
+watch(() => props.modelValue, async () => {
+  await nextTick()
+  if (input.value && props.autoExtendUntil) {
+    const lineHeight = parseInt(window.getComputedStyle(input.value).lineHeight, 10)
+    const {scrollHeight} = input.value
+    const newRows = Math.floor(scrollHeight / lineHeight)
+    input.value.rows = newRows > props.autoExtendUntil ? props.autoExtendUntil : newRows
+  }
 })
 </script>

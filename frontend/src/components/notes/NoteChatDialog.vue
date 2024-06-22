@@ -39,7 +39,8 @@
           class="flex-grow-1"
           label="false"
           id="chat-input"
-          :rows="2"
+          :rows="1"
+          :auto-extend-until="5"
           v-model="chatInput"
         />
         <input
