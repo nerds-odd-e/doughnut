@@ -57,4 +57,17 @@ describe("TextArea.vue", () => {
     expect(textarea.element.rows).toBeLessThanOrEqual(5)
     expect(textarea.element.rows).toBeGreaterThan(1) // Assuming initial rows is 1 and it should expand
   })
+
+  it('emits "enterPressed" when Enter is pressed and enterSubmit is true', async () => {
+    const wrapper = mount(TextArea, {
+      props: {
+        enterSubmit: true,
+      },
+    })
+
+    const textarea = wrapper.find("textarea")
+    await textarea.trigger('keydown', { key: 'Enter' })
+
+    expect(wrapper.emitted()).toHaveProperty('enterPressed')
+  })
 })

@@ -37,11 +37,12 @@
         <TextArea
           ref="chatInputTextArea"
           class="flex-grow-1"
-          label="false"
           id="chat-input"
           :rows="1"
           :auto-extend-until="5"
+          :enter-submit="true"
           v-model="chatInput"
+          @enter-pressed="generateChatAnswer"
         />
         <input
           :disabled="isButtonDisabled"

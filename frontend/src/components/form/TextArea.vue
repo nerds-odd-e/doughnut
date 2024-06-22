@@ -13,6 +13,7 @@
       :rows="rows"
       @blur="emit('blur', $event)"
       ref="input"
+      @keydown="handleKeydown"
     />
   </InputWithType>
 </template>
@@ -27,12 +28,13 @@ const props = defineProps({
   field: String,
   placeholder: { type: String, default: null },
   autofocus: { type: Boolean, default: false },
+  enterSubmit: { type: Boolean, default: false },
   rows: { type: Number, default: 8 },
   autoExtendUntil: { type: Number, default: null },
   errors: Object,
 })
 
-const emit = defineEmits(["update:modelValue", "blur"])
+const emit = defineEmits(["update:modelValue", "blur", "enterPressed"])
 
 const input = ref<HTMLTextAreaElement | null>(null)
 
@@ -44,6 +46,13 @@ const focus = () => {
 defineExpose({
   focus
 })
+
+const handleKeydown = (event: KeyboardEvent) => {
+  if (props.enterSubmit && event.key === 'Enter' && !event.shiftKey) {
+    event.preventDefault() // Prevent newline insertion
+    emit('enterPressed')
+  }
+}
 
 watch(() => props.modelValue, async () => {
   await nextTick()
