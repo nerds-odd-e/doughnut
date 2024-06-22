@@ -1,19 +1,26 @@
 package com.odde.doughnut.services.ai;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.SettingAccessor;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
+import com.theokanning.openai.assistants.StreamEvent;
 import com.theokanning.openai.assistants.assistant.AssistantRequest;
 import com.theokanning.openai.assistants.message.MessageRequest;
 import com.theokanning.openai.assistants.run.RequiredAction;
 import com.theokanning.openai.assistants.run.Run;
 import com.theokanning.openai.assistants.run.ToolCall;
+import com.theokanning.openai.assistants.run_step.RunStep;
 import com.theokanning.openai.assistants.thread.ThreadRequest;
+import com.theokanning.openai.service.assistant_stream.AssistantSSE;
+import io.reactivex.subscribers.TestSubscriber;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 
 public record AssistantService(
     OpenAiApiHandler openAiApiHandler,
@@ -42,16 +49,36 @@ public record AssistantService(
     return getThreadResponse(threadId, run);
   }
 
-  public AiAssistantResponse createThreadAndRunWithFirstMessageForChat(Note note, String prompt) {
+  public AiAssistantResponse createThreadAndRunWithFirstMessageStream(Note note, String prompt) {
     String threadId = createThread(note);
-    return createMessageRunAndGetResponseForChat(prompt, threadId);
+    return createMessageRunAndGetResponseStream(prompt, threadId);
   }
 
-  public AiAssistantResponse createMessageRunAndGetResponseForChat(String prompt, String threadId) {
+  public AiAssistantResponse createMessageRunAndGetResponseStream(String prompt, String threadId) {
     MessageRequest messageRequest = MessageRequest.builder().role("user").content(prompt).build();
     openAiApiHandler.createMessage(threadId, messageRequest);
-    Run run = openAiApiHandler.createRun(threadId, settingAccessor.getValue());
-    return getThreadResponse(threadId, run);
+    TestSubscriber<AssistantSSE> subscriber1 = new TestSubscriber<>();
+    openAiApiHandler
+        .createRunStream(threadId, settingAccessor.getValue())
+        .blockingSubscribe(subscriber1);
+    try {
+      //      System.out.println(subscriber1.getEvents());
+      Optional<AssistantSSE> runStepCompletion =
+          subscriber1.values().stream()
+              .filter(item -> item.getEvent().equals(StreamEvent.THREAD_RUN_STEP_COMPLETED))
+              .findFirst();
+      RunStep runStep =
+          new ObjectMapper().readValue(runStepCompletion.get().getData(), RunStep.class);
+
+      AiAssistantResponse completionResponse = new AiAssistantResponse();
+      completionResponse.setThreadId(threadId);
+      completionResponse.setRunId(runStep.getRunId());
+      completionResponse.setMessages(
+          openAiApiHandler.getThreadLastMessage(threadId, runStep.getRunId()));
+      return completionResponse;
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   public AiAssistantResponse answerAiCompletionClarifyingQuestion(

@@ -72,10 +72,10 @@ public class RestAiController {
     currentUser.assertReadAuthorization(note);
     if (request.getThreadId() == null) {
       return getChatService()
-          .createThreadAndRunWithFirstMessageForChat(note, request.getUserMessage());
+          .createThreadAndRunWithFirstMessageStream(note, request.getUserMessage());
     }
     return getChatService()
-        .createMessageRunAndGetResponseForChat(request.getUserMessage(), request.getThreadId());
+        .createMessageRunAndGetResponseStream(request.getUserMessage(), request.getThreadId());
   }
 
   @PostMapping("/generate-image")

@@ -26,6 +26,10 @@ import com.theokanning.openai.fine_tuning.Hyperparameters;
 import com.theokanning.openai.image.CreateImageRequest;
 import com.theokanning.openai.image.ImageResult;
 import com.theokanning.openai.model.Model;
+import com.theokanning.openai.service.assistant_stream.AssistantResponseBodyCallback;
+import com.theokanning.openai.service.assistant_stream.AssistantSSE;
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.Flowable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +37,9 @@ import java.util.Map;
 import java.util.Optional;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import org.springframework.http.HttpStatus;
+import retrofit2.Call;
 
 public class OpenAiApiHandler {
   private final OpenAiApi openAiApi;
@@ -125,6 +131,18 @@ public class OpenAiApiHandler {
   public Run createRun(String threadId, String assistantId) {
     RunCreateRequest runCreateRequest = RunCreateRequest.builder().assistantId(assistantId).build();
     return blockGet(openAiApi.createRun(threadId, runCreateRequest));
+  }
+
+  public static Flowable<AssistantSSE> assistantStream(Call<ResponseBody> apiCall) {
+    return Flowable.create(
+        emitter -> apiCall.enqueue(new AssistantResponseBodyCallback(emitter)),
+        BackpressureStrategy.BUFFER);
+  }
+
+  public Flowable<AssistantSSE> createRunStream(String threadId, String assistantId) {
+    RunCreateRequest runCreateRequest =
+        RunCreateRequest.builder().assistantId(assistantId).stream(true).build();
+    return assistantStream(openAiApi.createRunStream(threadId, runCreateRequest));
   }
 
   public Run retrieveUntilCompletedOrRequiresAction(String threadId, Run currentRun) {

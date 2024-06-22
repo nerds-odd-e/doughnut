@@ -57,9 +57,7 @@ public class RestAiControllerChatTests {
       openAIAssistantMocker
           .mockThreadCreation("my-thread")
           .mockCreateMessage()
-          .mockCreateRunInProcess("my-run-id")
-          .aRunThatCompleted()
-          .mockRetrieveRun()
+          .mockCreateRunStream("my-run-id")
           .mockListMessages("I'm Chatbot");
     }
 
@@ -79,7 +77,7 @@ public class RestAiControllerChatTests {
           .setKeyValue(makeMe.aTimestamp().please(), "chat-assistant");
       controller.chat(note, new ChatRequest("What's your name?", null));
       ArgumentCaptor<RunCreateRequest> captor = ArgumentCaptor.forClass(RunCreateRequest.class);
-      verify(openAiApi).createRun(any(), captor.capture());
+      verify(openAiApi).createRunStream(any(), captor.capture());
       assertThat(captor.getValue().getAssistantId()).isEqualTo("chat-assistant");
     }
   }
@@ -91,9 +89,7 @@ public class RestAiControllerChatTests {
       openAIAssistantMocker
           .aThread("existing-thread-id")
           .mockCreateMessage()
-          .mockCreateRunInProcess("my-run-id")
-          .aRunThatCompleted()
-          .mockRetrieveRun()
+          .mockCreateRunStream("my-run-id")
           .mockListMessages("I'm Chatbot");
     }
 
