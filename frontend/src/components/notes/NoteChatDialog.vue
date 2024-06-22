@@ -80,9 +80,9 @@ const chatInput = ref("")
 const messages = ref<Message[]>([])
 const bottomOfTheChat = ref<HTMLElement | null>(null)
 const chatInputTextArea = ref(null)
+const threadId = ref<string | undefined>(undefined)
 
 const isButtonDisabled = computed(() => chatInput.value === "")
-const threadId = computed(() => messages.value?.[messages.value.length - 1]?.thread_id)
 
 const markdowntToHtml = (content?: string) => markdownizer.markdownToHtml(content)
 const scrollToBottom = () => {
@@ -117,6 +117,7 @@ const generateChatAnswer = async () => {
   chatInput.value = ""
   focusChatInput()
   messages.value = [...messages.value, ...(await managedApi.restAiController.chat(props.selectedNote.id, request)).messages!]
+  threadId.value = messages.value[messages.value.length - 1]?.thread_id
 }
 
 onMounted(() => {

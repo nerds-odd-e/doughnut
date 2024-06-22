@@ -104,6 +104,7 @@ describe("NoteChatDialog Conversation", () => {
       messages: [
         {
           role: "assistant",
+          thread_id: "test-thread-id",
           content: [
             {
               text: {
@@ -142,13 +143,27 @@ describe("NoteChatDialog Conversation", () => {
   })
 
   it("When the chat button is clicked, the anwser from AI will be displayed", async () => {
-   const wrapper = await askAndReplied()
+    const wrapper = await askAndReplied()
     const actual = wrapper.find(".chat-answer-container.assistant").text()
     expect(actual).toBe("I'm ChatGPT")
   })
 
   it("has one assistant icon", async () => {
-   const wrapper = await askAndReplied()
+    const wrapper = await askAndReplied()
     expect(wrapper.findAll(".assistant-icon")).toHaveLength(1)
   })
+
+  it("called the api again but with the threadId", async () => {
+    const wrapper = await askAndReplied()
+    await wrapper.find("textarea").setValue("What's your name?")
+    await wrapper.find("#chat-button").trigger("submit")
+    await flushPromises()
+    expect(helper.managedApi.restAiController.chat).toHaveBeenCalledWith(
+      note.id,
+      expect.objectContaining({
+        threadId: "test-thread-id",
+      }),
+    )
+  })
+
 })
