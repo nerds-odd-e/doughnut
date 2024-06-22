@@ -121,7 +121,7 @@ describe("NoteChatDialog Conversation", () => {
 
   const askAndReplied = async () => {
    const wrapper = await createWrapper()
-    await wrapper.find("#chat-input").setValue("What's your name?")
+    await wrapper.find("textarea").setValue("What's your name?")
     await wrapper.find("#chat-button").trigger("submit")
     await flushPromises()
     return wrapper

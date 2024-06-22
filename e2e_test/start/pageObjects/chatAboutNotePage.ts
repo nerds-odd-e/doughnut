@@ -8,7 +8,7 @@ export function assumeChatAboutNotePage() {
       return assumeQuestionPage()
     },
     sendMessage(msg: string) {
-      cy.get("#chat-input").clear().type(msg)
+      cy.focused().type(msg)
       cy.get("#chat-button").click()
     },
     expectMessages(messages: Record<"role" | "message", string>[]) {
