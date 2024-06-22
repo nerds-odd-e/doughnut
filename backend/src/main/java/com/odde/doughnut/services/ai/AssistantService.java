@@ -36,19 +36,22 @@ public record AssistantService(
 
   public AiAssistantResponse createThreadAndRunWithFirstMessage(Note note, String prompt) {
     String threadId = createThread(note);
-    return createMessageRunAndGetResponse(prompt, threadId);
-  }
-
-  public AiAssistantResponse createMessageRunAndGetResponse(String prompt, String threadId) {
-    Run run = createMessageAndRun(prompt, threadId);
+    MessageRequest messageRequest = MessageRequest.builder().role("user").content(prompt).build();
+    openAiApiHandler.createMessage(threadId, messageRequest);
+    Run run = openAiApiHandler.createRun(threadId, settingAccessor.getValue());
     return getThreadResponse(threadId, run);
   }
 
-  private Run createMessageAndRun(String prompt, String threadId) {
-    MessageRequest messageRequest = MessageRequest.builder().role("user").content(prompt).build();
+  public AiAssistantResponse createThreadAndRunWithFirstMessageForChat(Note note, String prompt) {
+    String threadId = createThread(note);
+    return createMessageRunAndGetResponseForChat(prompt, threadId);
+  }
 
+  public AiAssistantResponse createMessageRunAndGetResponseForChat(String prompt, String threadId) {
+    MessageRequest messageRequest = MessageRequest.builder().role("user").content(prompt).build();
     openAiApiHandler.createMessage(threadId, messageRequest);
-    return openAiApiHandler.createRun(threadId, settingAccessor.getValue());
+    Run run = openAiApiHandler.createRun(threadId, settingAccessor.getValue());
+    return getThreadResponse(threadId, run);
   }
 
   public AiAssistantResponse answerAiCompletionClarifyingQuestion(
