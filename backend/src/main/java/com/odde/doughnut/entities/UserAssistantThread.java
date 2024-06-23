@@ -5,20 +5,20 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Entity
-@Table(name = "user_assistant_threads")
+@Table(name = "user_assistant_thread")
 @Data
 public class UserAssistantThread extends EntityIdentifiedByIdOnly {
   @OneToOne
   @NotNull
   @JoinColumn(name = "user_id")
-  private User creatorEntity;
+  private User user;
 
   @OneToOne
   @NotNull
   @JoinColumn(name = "note_id")
   private Note note;
 
-  @Column(name = "assistant_id")
+  @Column(name = "thread_id")
   @NotNull
-  private String assistantId;
+  private String threadId;
 }

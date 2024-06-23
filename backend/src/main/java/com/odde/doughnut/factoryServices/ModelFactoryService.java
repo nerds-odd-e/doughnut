@@ -19,9 +19,10 @@ public class ModelFactoryService {
   @Autowired public BazaarNotebookRepository bazaarNotebookRepository;
   @Autowired public ReviewPointRepository reviewPointRepository;
   @Autowired public CircleRepository circleRepository;
-  @Autowired public EntityManager entityManager;
+  @Autowired public UserAssistantThreadRepository userAssistantThreadRepository;
   @Autowired public FailureReportRepository failureReportRepository;
   @Autowired public GlobalSettingRepository globalSettingRepository;
+  @Autowired public EntityManager entityManager;
 
   @Autowired
   public QuestionSuggestionForFineTuningRepository questionSuggestionForFineTuningRepository;

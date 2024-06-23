@@ -45,11 +45,6 @@ public record AssistantService(
     return getThreadResponse(threadId, run);
   }
 
-  public SseEmitter createThreadAndRunWithFirstMessageStream2(Note note, String prompt) {
-    String threadId = createThread(note);
-    return createMessageRunAndGetResponseStream2(prompt, threadId);
-  }
-
   public SseEmitter createMessageRunAndGetResponseStream2(String prompt, String threadId) {
     MessageRequest messageRequest = MessageRequest.builder().role("user").content(prompt).build();
     openAiApiHandler.createMessage(threadId, messageRequest);
@@ -80,7 +75,7 @@ public record AssistantService(
     return getThreadResponse(threadId, retrievedRun);
   }
 
-  private String createThread(Note note) {
+  public String createThread(Note note) {
     ThreadRequest threadRequest =
         ThreadRequest.builder()
             .messages(

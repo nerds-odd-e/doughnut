@@ -86,6 +86,14 @@ public class RestAiControllerChatTests {
     }
 
     @Test
+    void itWillPersistTheThreadId() throws UnexpectedNoAccessRightException {
+      long oldCount = makeMe.modelFactoryService.userAssistantThreadRepository.count();
+      controller.chat(note, new ChatRequest("What's your name?", null));
+      long newCount = makeMe.modelFactoryService.userAssistantThreadRepository.count();
+      assertThat(newCount).isEqualTo(oldCount + 1);
+    }
+
+    @Test
     void chatWithUseTheChatAssistant() throws UnexpectedNoAccessRightException {
       GlobalSettingsService globalSettingsService =
           new GlobalSettingsService(makeMe.modelFactoryService);
