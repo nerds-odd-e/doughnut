@@ -19,6 +19,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -78,6 +79,12 @@ public class RestAiController {
     }
     return getChatService()
         .createMessageRunAndGetResponseStream2(request.getUserMessage(), request.getThreadId());
+  }
+
+  @GetMapping("/dummy")
+  public DummyForGeneratingTypes dummyEntryToGenerateDataTypesThatAreRequiredInEventStream()
+      throws HttpMediaTypeNotAcceptableException {
+    throw new HttpMediaTypeNotAcceptableException("dummy");
   }
 
   @PostMapping("/generate-image")

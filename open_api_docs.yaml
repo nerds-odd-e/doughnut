@@ -2347,6 +2347,24 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/QuizQuestion"
+  /api/ai/dummy:
+    get:
+      tags:
+      - rest-ai-controller
+      operationId: dummyEntryToGenerateDataTypesThatAreRequiredInEventStream
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/DummyForGeneratingTypes"
   /api/ai/available-gpt-models:
     get:
       tags:
@@ -3409,3 +3427,47 @@ components:
       properties:
         name:
           type: string
+    Delta:
+      type: object
+      properties:
+        role:
+          type: string
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/DeltaContent"
+    DeltaContent:
+      type: object
+      properties:
+        index:
+          type: integer
+          format: int32
+        type:
+          type: string
+        text:
+          $ref: "#/components/schemas/Text"
+        image_file:
+          $ref: "#/components/schemas/ImageFile"
+        image_url:
+          $ref: "#/components/schemas/ImageUrl"
+    DummyForGeneratingTypes:
+      type: object
+      properties:
+        messageDelta:
+          $ref: "#/components/schemas/MessageDelta"
+    ImageUrl:
+      type: object
+      properties:
+        url:
+          type: string
+        detail:
+          type: string
+    MessageDelta:
+      type: object
+      properties:
+        id:
+          type: string
+        object:
+          type: string
+        delta:
+          $ref: "#/components/schemas/Delta"

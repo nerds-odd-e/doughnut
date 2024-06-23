@@ -7,6 +7,7 @@ import type { AiCompletionAnswerClarifyingQuestionParams } from '../models/AiCom
 import type { AiCompletionParams } from '../models/AiCompletionParams';
 import type { AiGeneratedImage } from '../models/AiGeneratedImage';
 import type { ChatRequest } from '../models/ChatRequest';
+import type { DummyForGeneratingTypes } from '../models/DummyForGeneratingTypes';
 import type { SseEmitter } from '../models/SseEmitter';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -102,6 +103,19 @@ export class RestAiControllerService {
             url: '/api/ai/answer-clarifying-question',
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @returns DummyForGeneratingTypes OK
+     * @throws ApiError
+     */
+    public dummyEntryToGenerateDataTypesThatAreRequiredInEventStream(): CancelablePromise<DummyForGeneratingTypes> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/ai/dummy',
             errors: {
                 500: `Internal Server Error`,
             },
