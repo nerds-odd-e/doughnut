@@ -1,6 +1,6 @@
 import scrollToElement from "@/components/commons/scrollToElement"
 import NoteChatDialog from "@/components/notes/NoteChatDialog.vue"
-import { AiAssistantResponse } from "@/generated/backend"
+import { Message } from "@/generated/backend"
 import { VueWrapper, flushPromises } from "@vue/test-utils"
 import { beforeEach, expect } from "vitest"
 import makeMe from "../fixtures/makeMe"
@@ -98,39 +98,35 @@ describe("NoteChatDialog TestMe", () => {
   })
 })
 
-describe.skip("NoteChatDialog Conversation", () => {
-  beforeEach(() => {
-    const response: AiAssistantResponse = {
-      messages: [
-        {
-          role: "assistant",
-          thread_id: "test-thread-id",
-          content: [
-            {
-              text: {
-                value: "## I'm ChatGPT"
-              },
+describe("NoteChatDialog Conversation", () => {
+  const completedMessage: Message = {
+        role: "assistant",
+        thread_id: "test-thread-id",
+        content: [
+          {
+            text: {
+              value: "## I'm ChatGPT"
             },
-          ],
-        },
-      ],
-    }
-    helper.managedApi.restAiController.chat = vi
+          },
+        ],
+      }
+  beforeEach(() => {
+    helper.managedApi.eventSource.restAiController.chat = vi
       .fn()
-      .mockResolvedValue(response)
   })
 
   const askAndReplied = async () => {
    const wrapper = await createWrapper()
     await wrapper.find("textarea").setValue("What's your name?")
     await wrapper.find("#chat-button").trigger("submit")
+    helper.managedApi.eventSource.eventSourceRequest.onMessage("thread.message.completed", JSON.stringify(completedMessage))
     await flushPromises()
     return wrapper
   }
 
   it("called the api", async () => {
    await askAndReplied()
-    expect(helper.managedApi.restAiController.chat).toHaveBeenCalledWith(
+    expect(helper.managedApi.eventSource.restAiController.chat).toHaveBeenCalledWith(
       note.id,
       expect.anything(),
     )
@@ -158,7 +154,7 @@ describe.skip("NoteChatDialog Conversation", () => {
     await wrapper.find("textarea").setValue("What's your name?")
     await wrapper.find("#chat-button").trigger("submit")
     await flushPromises()
-    expect(helper.managedApi.restAiController.chat).toHaveBeenCalledWith(
+    expect(helper.managedApi.eventSource.restAiController.chat).toHaveBeenCalledWith(
       note.id,
       expect.objectContaining({
         threadId: "test-thread-id",

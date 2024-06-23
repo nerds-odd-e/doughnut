@@ -105,8 +105,9 @@ const focusChatInput = () => {
   }
 }
 
-const  chat = async (id: Doughnut.ID, request: ChatRequest) => {
-  await managedApi.eventSource(
+const chat = async (id: Doughnut.ID, request: ChatRequest) => {
+  await managedApi.eventSource
+  .onMessage(
     (event, data) => {
       if (event === "thread.message.completed") {
         const response = JSON.parse(data) as Message
@@ -114,12 +115,12 @@ const  chat = async (id: Doughnut.ID, request: ChatRequest) => {
         messages.value = [...messages.value, response]
         scrollToBottom()
       }
-    },
+    })
+    .onError(
     (error) => {
       // eslint-disable-next-line no-console
       console.error(error)
-    },
-  )
+    })
   .restAiController.chat(id, request)
 }
 

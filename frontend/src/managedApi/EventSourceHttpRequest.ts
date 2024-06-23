@@ -31,24 +31,25 @@ const getUrl = (config: OpenAPIConfig, options: ApiRequestOptions): string => {
   return url
 }
 
-export default function EventSourceHttpRequest(
-  onMessage: (event: string, data: string) => void, onError?: (error: unknown) => void
-) {
-  return class EventSourceHttpRequestImpl extends BaseHttpRequest {
-    public override request<T>(
-      options: ApiRequestOptions
-    ): CancelablePromise<T> {
-      return new CancelablePromise(async (resolve, reject, onCancel) => {
-        try {
-          const url = getUrl(this.config, options)
-          if (!onCancel.isCancelled) {
-            createEventSourceWithBody(url, options.body, onMessage, onError)
-            resolve(undefined as unknown as T)
-          }
-        } catch (error) {
-          reject(error)
+export default class EventSourceHttpRequestImpl extends BaseHttpRequest {
+  // eslint-disable-next-line class-methods-use-this
+  onMessage: (event: string, data: string) => void = () => undefined
+
+  onError?: (error: unknown) => void = undefined
+
+  public override request<T>(
+    options: ApiRequestOptions
+  ): CancelablePromise<T> {
+    return new CancelablePromise(async (resolve, reject, onCancel) => {
+      try {
+        const url = getUrl(this.config, options)
+        if (!onCancel.isCancelled) {
+          createEventSourceWithBody(url, options.body, this.onMessage, this.onError)
+          resolve(undefined as unknown as T)
         }
-      })
-    }
+      } catch (error) {
+        reject(error)
+      }
+    })
   }
 }
