@@ -147,6 +147,13 @@ const generateChatAnswer = async () => {
 
 onMounted(() => {
   focusChatInput()
+  managedApi.restAiController.tryRestoreChat(props.selectedNote.id).then((response) => {
+    messages.value = response
+    if (response.length > 0){
+      threadId.value = response[response.length - 1]?.thread_id
+    }
+    scrollToBottom()
+  })
 })
 </script>
 

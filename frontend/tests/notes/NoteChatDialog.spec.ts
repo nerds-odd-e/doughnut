@@ -103,6 +103,9 @@ describe("NoteChatDialog Conversation", () => {
   beforeEach(() => {
     helper.managedApi.eventSource.restAiController.chat = vi
       .fn()
+    helper.managedApi.restAiController.tryRestoreChat = vi
+      .fn()
+      .mockResolvedValue([])
   })
 
   const askAndReplied = async () => {
@@ -171,4 +174,20 @@ describe("NoteChatDialog Conversation", () => {
     )
   })
 
+  it("will try to restore the previous chat", async () => {
+    const oldMessage: Message = {
+          role: "assistant",
+          thread_id: "test-thread-id",
+          content: [{
+            text: {
+              value: "preiouvs message"
+            },
+          }],
+        }
+    helper.managedApi.restAiController.tryRestoreChat = vi
+      .fn()
+      .mockResolvedValue([oldMessage])
+    const wrapper = await askAndReplied()
+    expect(wrapper.findAll(".assistant-icon")).toHaveLength(2)
+  })
 })
