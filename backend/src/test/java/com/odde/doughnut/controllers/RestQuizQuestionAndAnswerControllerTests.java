@@ -581,7 +581,6 @@ class RestQuizQuestionAndAnswerControllerTests {
 
   @Nested
   class DeleteQuestion{
-    @Disabled
     @Test
     void deleteQuestion() throws UnexpectedNoAccessRightException {
       Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
@@ -597,8 +596,8 @@ class RestQuizQuestionAndAnswerControllerTests {
       controller.deleteQuestion(questionToDelete);
       makeMe.refresh(note);
 
-      //assertThat(note.getQuizQuestionAndAnswers(), hasSize(1));
-      //assertThat(note.getQuizQuestionAndAnswers(), contains(questionToRemain));
+      assertThat(note.getQuizQuestionAndAnswers(), hasSize(1));
+      assertThat(note.getQuizQuestionAndAnswers(), contains(questionToRemain));
     }
   }
 }

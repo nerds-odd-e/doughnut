@@ -141,6 +141,6 @@ public class ModelFactoryService {
   }
 
   public void delete(QuizQuestionAndAnswer quizQuestionAndAnswer) {
-
+    entityManager.remove(quizQuestionAndAnswer);
   }
 }
