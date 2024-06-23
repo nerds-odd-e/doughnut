@@ -79,6 +79,7 @@ export type { ReviewStatus } from './models/ReviewStatus';
 export type { SearchTerm } from './models/SearchTerm';
 export type { SelfEvaluation } from './models/SelfEvaluation';
 export type { SrtDto } from './models/SrtDto';
+export type { SseEmitter } from './models/SseEmitter';
 export type { Subscription } from './models/Subscription';
 export type { SubscriptionDTO } from './models/SubscriptionDTO';
 export type { SuggestedQuestionForFineTuning } from './models/SuggestedQuestionForFineTuning';

@@ -59,6 +59,7 @@
 <script setup lang="ts">
 import { Message, Note, QuizQuestionInNotebook } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
+import createEventSourceWithBody from "@/managedApi/createEventSourceWithBody"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import { PropType, computed, ref, onMounted } from "vue"
 import markdownizer from "@/components/form/markdownizer"
@@ -105,6 +106,25 @@ const focusChatInput = () => {
   }
 }
 
+const  chat = async (id: Doughnut.ID, request: unknown) => {
+  await createEventSourceWithBody(
+    `/api/ai/chat1/${id}`,
+    request,
+    (event, data) => {
+      if (event === "thread.message.completed") {
+        const response = JSON.parse(data) as Message
+        threadId.value = response.thread_id
+        messages.value = [...messages.value, response]
+        scrollToBottom()
+      }
+    },
+    (error) => {
+      // eslint-disable-next-line no-console
+      console.error(error)
+    },
+)
+}
+
 const generateChatAnswer = async () => {
   messages.value.push({
     role: "user",
@@ -116,7 +136,8 @@ const generateChatAnswer = async () => {
   }
   chatInput.value = ""
   focusChatInput()
-  messages.value = [...messages.value, ...(await managedApi.restAiController.chat(props.selectedNote.id, request)).messages!]
+  // messages.value = [...messages.value, ...(chat(props.selectedNote.id, request)).messages!]
+  chat(props.selectedNote.id, request)
   threadId.value = messages.value[messages.value.length - 1]?.thread_id
 }
 

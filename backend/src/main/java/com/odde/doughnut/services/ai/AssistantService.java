@@ -23,11 +23,13 @@ import com.theokanning.openai.assistants.run.ToolCall;
 import com.theokanning.openai.assistants.run_step.RunStep;
 import com.theokanning.openai.assistants.thread.ThreadRequest;
 import com.theokanning.openai.service.assistant_stream.AssistantSSE;
+import io.reactivex.Flowable;
 import io.reactivex.subscribers.TestSubscriber;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 public record AssistantService(
     OpenAiApiHandler openAiApiHandler,
@@ -59,6 +61,33 @@ public record AssistantService(
   public AiAssistantResponse createThreadAndRunWithFirstMessageStream(Note note, String prompt) {
     String threadId = createThread(note);
     return createMessageRunAndGetResponseStream(prompt, threadId);
+  }
+
+  public SseEmitter createThreadAndRunWithFirstMessageStream2(Note note, String prompt) {
+    String threadId = createThread(note);
+    return createMessageRunAndGetResponseStream2(prompt, threadId);
+  }
+
+  public SseEmitter createMessageRunAndGetResponseStream2(String prompt, String threadId) {
+    MessageRequest messageRequest = MessageRequest.builder().role("user").content(prompt).build();
+    openAiApiHandler.createMessage(threadId, messageRequest);
+    Flowable<AssistantSSE> runStream =
+        openAiApiHandler.createRunStream(threadId, settingAccessor.getValue());
+    SseEmitter emitter = new SseEmitter();
+    runStream.subscribe(
+        sse -> {
+          System.out.println(sse);
+          try {
+            SseEmitter.SseEventBuilder builder =
+                SseEmitter.event().name(sse.getEvent().eventName).data(sse.getData());
+            emitter.send(builder);
+          } catch (Exception e) {
+            emitter.completeWithError(e);
+          }
+        },
+        emitter::completeWithError,
+        emitter::complete);
+    return emitter;
   }
 
   public AiAssistantResponse createMessageRunAndGetResponseStream(String prompt, String threadId) {

@@ -17,9 +17,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @RestController
 @SessionScope
@@ -76,6 +78,21 @@ public class RestAiController {
     }
     return getChatService()
         .createMessageRunAndGetResponseStream(request.getUserMessage(), request.getThreadId());
+  }
+
+  @PostMapping(path = "/chat1/{note}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+  @Transactional
+  public SseEmitter chat1(
+      @PathVariable(value = "note") @Schema(type = "integer") Note note,
+      @RequestBody ChatRequest request)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertReadAuthorization(note);
+    if (request.getThreadId() == null) {
+      return getChatService()
+          .createThreadAndRunWithFirstMessageStream2(note, request.getUserMessage());
+    }
+    return getChatService()
+        .createMessageRunAndGetResponseStream2(request.getUserMessage(), request.getThreadId());
   }
 
   @PostMapping("/generate-image")

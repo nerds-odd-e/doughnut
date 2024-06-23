@@ -7,6 +7,7 @@ import type { AiCompletionAnswerClarifyingQuestionParams } from '../models/AiCom
 import type { AiCompletionParams } from '../models/AiCompletionParams';
 import type { AiGeneratedImage } from '../models/AiGeneratedImage';
 import type { ChatRequest } from '../models/ChatRequest';
+import type { SseEmitter } from '../models/SseEmitter';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestAiControllerService {
@@ -58,6 +59,29 @@ export class RestAiControllerService {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/ai/generate-image',
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param note
+     * @param requestBody
+     * @returns SseEmitter OK
+     * @throws ApiError
+     */
+    public chat1(
+        note: number,
+        requestBody: ChatRequest,
+    ): CancelablePromise<SseEmitter> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/ai/chat1/{note}',
+            path: {
+                'note': note,
+            },
             body: requestBody,
             mediaType: 'application/json',
             errors: {

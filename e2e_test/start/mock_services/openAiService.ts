@@ -109,6 +109,9 @@ const openAiService = () => {
 `event: thread.message.delta
 data: {"delta": {"content": [{"index": 0, "type": "text", "text": {"value": "${fullMessage}"}}]}}
 
+event: thread.message.completed
+data: {"thread_id": "${threadId}", "run_id": "${runId}", "role": "assistant", "content": [{"index": 0, "type": "text", "text": {"value": "${fullMessage}"}}]}
+
 event: thread.run.step.completed
 data: {"run_id": "${runId}", "status": "completed"}
 
