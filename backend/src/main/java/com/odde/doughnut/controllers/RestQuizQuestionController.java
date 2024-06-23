@@ -160,6 +160,8 @@ class RestQuizQuestionController {
   public QuizQuestionAndAnswer deleteQuestion(
     @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestionAndAnswer quizQuestionAndAnswer)
     throws UnexpectedNoAccessRightException {
-    return null;
+    currentUser.assertAuthorization(quizQuestionAndAnswer.getNote());
+    quizQuestionService.deleteQuestion(quizQuestionAndAnswer);
+    return quizQuestionAndAnswer;
   }
 }
