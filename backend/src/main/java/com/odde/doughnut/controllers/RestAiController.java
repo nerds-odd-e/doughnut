@@ -10,6 +10,7 @@ import com.odde.doughnut.services.AiAdvisorService;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.AssistantService;
 import com.odde.doughnut.testability.TestabilitySettings;
+import com.theokanning.openai.assistants.message.Message;
 import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
@@ -67,7 +68,22 @@ public class RestAiController {
         .answerAiCompletionClarifyingQuestion(answerClarifyingQuestionParams);
   }
 
-  @PostMapping(path = "/chat/{note}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+  @GetMapping("/chat/{note}")
+  public List<Message> tryRestoreChat(
+      @PathVariable(value = "note") @Schema(type = "integer") Note note)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertReadAuthorization(note);
+    AssistantService assistantService = getChatService();
+    UserAssistantThread byUserAndNote =
+        modelFactoryService.userAssistantThreadRepository.findByUserAndNote(
+            currentUser.getEntity(), note);
+    if (byUserAndNote == null) {
+      return List.of();
+    }
+    return assistantService.loadPreviousMessages(byUserAndNote.getThreadId());
+  }
+
+  @GetMapping(path = "/chat/{note}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
   @Transactional
   public SseEmitter chat(
       @PathVariable(value = "note") @Schema(type = "integer") Note note,
@@ -78,20 +94,12 @@ public class RestAiController {
     SseEmitter emitter = new SseEmitter();
     String threadId = request.getThreadId();
     if (threadId == null) {
-      UserAssistantThread byUserAndNote =
-          modelFactoryService.userAssistantThreadRepository.findByUserAndNote(
-              currentUser.getEntity(), note);
-      if (byUserAndNote != null) {
-        threadId = byUserAndNote.getThreadId();
-        assistantService.loadPreviousMessages(threadId, emitter);
-      } else {
-        threadId = assistantService.createThread(note);
-        UserAssistantThread userAssistantThread = new UserAssistantThread();
-        userAssistantThread.setThreadId(threadId);
-        userAssistantThread.setNote(note);
-        userAssistantThread.setUser(currentUser.getEntity());
-        modelFactoryService.entityManager.persist(userAssistantThread);
-      }
+      threadId = assistantService.createThread(note);
+      UserAssistantThread userAssistantThread = new UserAssistantThread();
+      userAssistantThread.setThreadId(threadId);
+      userAssistantThread.setNote(note);
+      userAssistantThread.setUser(currentUser.getEntity());
+      modelFactoryService.entityManager.persist(userAssistantThread);
     }
     assistantService.createMessageRunAndGetResponseStream(
         request.getUserMessage(), threadId, emitter);

@@ -15,7 +15,6 @@ import com.theokanning.openai.assistants.run.ToolCall;
 import com.theokanning.openai.assistants.thread.ThreadRequest;
 import com.theokanning.openai.service.assistant_stream.AssistantSSE;
 import io.reactivex.Flowable;
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.List;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -126,14 +125,7 @@ public record AssistantService(
     return actionRequired;
   }
 
-  public void loadPreviousMessages(String threadId, SseEmitter emitter) {
-    List<Message> threadMessages = openAiApiHandler.getThreadMessages(threadId, null);
-    SseEmitter.SseEventBuilder builder =
-        SseEmitter.event().name("doughnut.messages").data(threadMessages);
-    try {
-      emitter.send(builder);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+  public List<Message> loadPreviousMessages(String threadId) {
+    return openAiApiHandler.getThreadMessages(threadId, null);
   }
 }

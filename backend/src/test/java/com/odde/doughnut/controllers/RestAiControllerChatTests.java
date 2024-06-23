@@ -13,6 +13,7 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.testability.*;
+import com.theokanning.openai.assistants.message.Message;
 import com.theokanning.openai.assistants.message.MessageRequest;
 import com.theokanning.openai.assistants.run.RunCreateRequest;
 import com.theokanning.openai.client.OpenAiApi;
@@ -111,34 +112,6 @@ public class RestAiControllerChatTests {
   }
 
   @Nested
-  class ResumeChat {
-    @BeforeEach
-    void setUp() {
-      openAIAssistantMocker
-          .aThread("my-existing-thread")
-          .mockListMessages("previous message")
-          .mockCreateMessage()
-          .andARunStream("my-run-id")
-          .withMessageDeltas("I'm", " Chatbot")
-          .mockTheRunStream();
-      makeMe.aUserAssistantThread("my-existing-thread").by(currentUser).forNote(note).please();
-    }
-
-    @Test
-    void itWillLoadTheExistingThread() throws UnexpectedNoAccessRightException {
-      controller.chat(note, new ChatRequest("What's your name?", null));
-      verify(openAiApi, times(0)).createThread(any());
-    }
-
-    @Test
-    void itMustGetTheMessageBackFirst() throws UnexpectedNoAccessRightException {
-      controller.chat(note, new ChatRequest("What's your name?", null));
-      verify(openAiApi, times(1))
-          .listMessages(eq("my-existing-thread"), eq(Map.of("order", "asc")));
-    }
-  }
-
-  @Nested
   class ContinueChat {
     @BeforeEach
     void setUp() {
@@ -170,5 +143,33 @@ public class RestAiControllerChatTests {
                     makeMe.aUser().toModelPlease(),
                     testabilitySettings)
                 .chat(note, new ChatRequest("What's your name?", null)));
+  }
+
+  @Nested
+  class RestoreChat {
+    @BeforeEach
+    void setUp() {
+      openAIAssistantMocker
+          .aThread("my-existing-thread")
+          .mockListMessages("previous message")
+          .mockCreateMessage()
+          .andARunStream("my-run-id")
+          .withMessageDeltas("I'm", " Chatbot")
+          .mockTheRunStream();
+      makeMe.aUserAssistantThread("my-existing-thread").by(currentUser).forNote(note).please();
+    }
+
+    @Test
+    void itWillLoadTheExistingThread() throws UnexpectedNoAccessRightException {
+      List<Message> messages = controller.tryRestoreChat(note);
+      assertThat(messages.size()).isEqualTo(1);
+    }
+
+    @Test
+    void itMustGetTheMessageBackFirst() throws UnexpectedNoAccessRightException {
+      controller.tryRestoreChat(note);
+      verify(openAiApi, times(1))
+          .listMessages(eq("my-existing-thread"), eq(Map.of("order", "asc")));
+    }
   }
 }

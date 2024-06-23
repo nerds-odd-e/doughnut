@@ -8,7 +8,7 @@ import type { AiCompletionParams } from '../models/AiCompletionParams';
 import type { AiGeneratedImage } from '../models/AiGeneratedImage';
 import type { ChatRequest } from '../models/ChatRequest';
 import type { DummyForGeneratingTypes } from '../models/DummyForGeneratingTypes';
-import type { SseEmitter } from '../models/SseEmitter';
+import type { Message } from '../models/Message';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestAiControllerService {
@@ -68,29 +68,6 @@ export class RestAiControllerService {
         });
     }
     /**
-     * @param note
-     * @param requestBody
-     * @returns SseEmitter OK
-     * @throws ApiError
-     */
-    public chat(
-        note: number,
-        requestBody: ChatRequest,
-    ): CancelablePromise<SseEmitter> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/api/ai/chat/{note}',
-            path: {
-                'note': note,
-            },
-            body: requestBody,
-            mediaType: 'application/json',
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
      * @param requestBody
      * @returns AiAssistantResponse OK
      * @throws ApiError
@@ -116,6 +93,30 @@ export class RestAiControllerService {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/ai/dummy',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param note
+     * @param request
+     * @returns Message OK
+     * @throws ApiError
+     */
+    public tryRestoreChat1(
+        note: number,
+        request: ChatRequest,
+    ): CancelablePromise<Array<Message>> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/ai/chat/{note}',
+            path: {
+                'note': note,
+            },
+            query: {
+                'request': request,
+            },
             errors: {
                 500: `Internal Server Error`,
             },
