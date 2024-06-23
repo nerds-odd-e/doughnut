@@ -63,6 +63,6 @@ public class QuizQuestionService {
   }
 
   public void deleteQuestion(QuizQuestionAndAnswer quizQuestionAndAnswer) {
-
+    modelFactoryService.delete(quizQuestionAndAnswer);
   }
 }

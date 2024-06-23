@@ -139,4 +139,8 @@ public class ModelFactoryService {
 
     return note;
   }
+
+  public void delete(QuizQuestionAndAnswer quizQuestionAndAnswer) {
+
+  }
 }
