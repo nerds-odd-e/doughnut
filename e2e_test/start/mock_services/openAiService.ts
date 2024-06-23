@@ -3,6 +3,11 @@ import testability from "../testability"
 import createOpenAiChatCompletionMock from "./createOpenAiChatCompletionMock"
 import openAiAssistantThreadMocker from "./openAiAssistantThreadMocker"
 
+type RunStreamData = {
+  runId: string
+  fullMessage: string
+}
+
 const openAiService = () => {
   const serviceMocker = new ServiceMocker("openAi", 5001)
   return {
@@ -98,11 +103,18 @@ const openAiService = () => {
       return openAiAssistantThreadMocker(serviceMocker, threadId, runIds)
     },
 
-    stubCreateRunStreams(threadId: string, runIds: string[]) {
+    stubCreateRunStreams(threadId: string, runStreamData: RunStreamData[]) {
       serviceMocker.stubPosterWithMultipleResponses(`/threads/${threadId}/runs`,
-        runIds.map((runId) => `event: thread.run.step.completed\ndata: {"run_id": "${runId}", "status": "completed"}\n\n`),
+        runStreamData.map(({runId, fullMessage}) =>
+`event: thread.message.delta
+data: {"delta": {"content": [{"index": 0, "type": "text", "text": {"value": "${fullMessage}"}}]}}
+
+event: thread.run.step.completed
+data: {"run_id": "${runId}", "status": "completed"}
+
+`),
     { "Content-Type": "text/event-stream" })
-      return openAiAssistantThreadMocker(serviceMocker, threadId, runIds)
+      return openAiAssistantThreadMocker(serviceMocker, threadId, [])
     },
 
     async stubFineTuningStatus(successful: boolean) {

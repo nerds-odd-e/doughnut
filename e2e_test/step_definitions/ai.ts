@@ -86,20 +86,17 @@ Given(
   (data: DataTable) => {
     const thread = mock_services.openAi().stubCreateThread(
       "thread-abc123",
-    ).stubCreateRunStreams("thread-abc123", data.hashes().map((row) => row["run id"]!))
+    ).stubCreateRunStreams("thread-abc123", data.hashes().map((row) => ({
+      runId: row["run id"]!,
+      fullMessage: row["assistant reply"]!,
+  })))
 
     data.hashes().forEach((row) => {
       const userMessage: MessageToMatch = {
         role: "user",
         content: row["user message"]!,
       }
-      thread
-        .stubCreateMessage(userMessage)
-        .aRun(row["run id"]!)
-        .stubRetrieveRunsThatCompleted()
-        .stubListMessages([
-          { role: "assistant", content: row["assistant reply"]! },
-        ])
+      thread.stubCreateMessage(userMessage)
     })
   }
 )

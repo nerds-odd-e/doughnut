@@ -57,15 +57,17 @@ public class RestAiControllerChatTests {
       openAIAssistantMocker
           .mockThreadCreation("my-thread")
           .mockCreateMessage()
-          .mockCreateRunStream("my-run-id")
-          .mockListMessages("I'm Chatbot");
+          .andARunStream("my-run-id")
+          .withMessageDeltas("I", " am", " a", " Chatbot")
+          .mockTheRunStream();
     }
 
     @Test
     void chatWithAIAndGetResponse() throws UnexpectedNoAccessRightException {
       AiAssistantResponse res = controller.chat(note, new ChatRequest("What's your name?", null));
       assertEquals(
-          "I'm Chatbot", res.getMessages().getFirst().getContent().getFirst().getText().getValue());
+          "I am a Chatbot",
+          res.getMessages().getFirst().getContent().getFirst().getText().getValue());
     }
 
     @Test
@@ -89,8 +91,9 @@ public class RestAiControllerChatTests {
       openAIAssistantMocker
           .aThread("existing-thread-id")
           .mockCreateMessage()
-          .mockCreateRunStream("my-run-id")
-          .mockListMessages("I'm Chatbot");
+          .andARunStream("my-run-id")
+          .withMessageDeltas("I'm", " Chatbot")
+          .mockTheRunStream();
     }
 
     @Test

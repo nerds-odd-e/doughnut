@@ -10,7 +10,13 @@ import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.assistants.StreamEvent;
 import com.theokanning.openai.assistants.assistant.AssistantRequest;
+import com.theokanning.openai.assistants.message.Message;
+import com.theokanning.openai.assistants.message.MessageContent;
 import com.theokanning.openai.assistants.message.MessageRequest;
+import com.theokanning.openai.assistants.message.content.Delta;
+import com.theokanning.openai.assistants.message.content.DeltaContent;
+import com.theokanning.openai.assistants.message.content.MessageDelta;
+import com.theokanning.openai.assistants.message.content.Text;
 import com.theokanning.openai.assistants.run.RequiredAction;
 import com.theokanning.openai.assistants.run.Run;
 import com.theokanning.openai.assistants.run.ToolCall;
@@ -21,6 +27,7 @@ import io.reactivex.subscribers.TestSubscriber;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public record AssistantService(
     OpenAiApiHandler openAiApiHandler,
@@ -61,7 +68,7 @@ public record AssistantService(
     openAiApiHandler
         .createRunStream(threadId, settingAccessor.getValue())
         .blockingSubscribe(subscriber);
-    //            System.out.println(subscriber.getEvents());
+    //    System.out.println(subscriber.getEvents());
     Optional<AssistantSSE> runStepCompletion =
         subscriber.values().stream()
             .filter(item -> item.getEvent().equals(StreamEvent.THREAD_RUN_STEP_COMPLETED))
@@ -73,11 +80,33 @@ public record AssistantService(
       throw new RuntimeException(e);
     }
 
+    String reply =
+        subscriber.values().stream()
+            .filter(item -> item.getEvent().equals(StreamEvent.THREAD_MESSAGE_DELTA))
+            .map(
+                item -> {
+                  try {
+                    return new ObjectMapper().readValue(item.getData(), MessageDelta.class);
+                  } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                  }
+                })
+            .map(MessageDelta::getDelta)
+            .map(Delta::getContent)
+            .map(List::getFirst)
+            .map(DeltaContent::getText)
+            .map(Text::getValue)
+            .collect(Collectors.joining());
+
+    MessageContent cnt = new MessageContent();
+    cnt.setText(new Text(reply, List.of()));
+    Message message =
+        Message.builder().threadId(threadId).role("assistant").content(List.of(cnt)).build();
+
     AiAssistantResponse completionResponse = new AiAssistantResponse();
     completionResponse.setThreadId(threadId);
     completionResponse.setRunId(runStep.getRunId());
-    completionResponse.setMessages(
-        openAiApiHandler.getThreadLastMessage(threadId, runStep.getRunId()));
+    completionResponse.setMessages(List.of(message));
     return completionResponse;
   }
 
