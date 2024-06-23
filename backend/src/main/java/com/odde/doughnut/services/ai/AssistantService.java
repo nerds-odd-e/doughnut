@@ -7,6 +7,7 @@ import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.assistants.assistant.AssistantRequest;
+import com.theokanning.openai.assistants.message.Message;
 import com.theokanning.openai.assistants.message.MessageRequest;
 import com.theokanning.openai.assistants.run.RequiredAction;
 import com.theokanning.openai.assistants.run.Run;
@@ -14,6 +15,7 @@ import com.theokanning.openai.assistants.run.ToolCall;
 import com.theokanning.openai.assistants.thread.ThreadRequest;
 import com.theokanning.openai.service.assistant_stream.AssistantSSE;
 import io.reactivex.Flowable;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.List;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -45,12 +47,12 @@ public record AssistantService(
     return getThreadResponse(threadId, run);
   }
 
-  public SseEmitter createMessageRunAndGetResponseStream2(String prompt, String threadId) {
+  public SseEmitter createMessageRunAndGetResponseStream(
+      String prompt, String threadId, SseEmitter emitter) {
     MessageRequest messageRequest = MessageRequest.builder().role("user").content(prompt).build();
     openAiApiHandler.createMessage(threadId, messageRequest);
     Flowable<AssistantSSE> runStream =
         openAiApiHandler.createRunStream(threadId, settingAccessor.getValue());
-    SseEmitter emitter = new SseEmitter();
     runStream.subscribe(
         sse -> {
           try {
@@ -98,7 +100,7 @@ public record AssistantService(
     if (run.getStatus().equals("requires_action")) {
       completionResponse.setRequiredAction(getAiCompletionRequiredAction(run.getRequiredAction()));
     } else {
-      completionResponse.setMessages(openAiApiHandler.getThreadLastMessage(threadId, id));
+      completionResponse.setMessages(openAiApiHandler.getThreadMessages(threadId, id));
     }
 
     return completionResponse;
@@ -122,5 +124,16 @@ public record AssistantService(
 
     actionRequired.setToolCallId(toolCall.getId());
     return actionRequired;
+  }
+
+  public void loadPreviousMessages(String threadId, SseEmitter emitter) {
+    List<Message> threadMessages = openAiApiHandler.getThreadMessages(threadId, null);
+    SseEmitter.SseEventBuilder builder =
+        SseEmitter.event().name("doughnut.messages").data(threadMessages);
+    try {
+      emitter.send(builder);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 }

@@ -31,10 +31,7 @@ import com.theokanning.openai.service.assistant_stream.AssistantSSE;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -191,9 +188,13 @@ public class OpenAiApiHandler {
             submitToolOutputsRequest));
   }
 
-  public List<Message> getThreadLastMessage(String threadId, String runId) {
-    return blockGet(openAiApi.listMessages(threadId, Map.of("order", "asc", "run_id", runId)))
-        .getData();
+  public List<Message> getThreadMessages(String threadId, String runId) {
+    Map<String, Object> options = new HashMap<>();
+    options.put("order", "asc");
+    if (runId != null) {
+      options.put("run_id", runId);
+    }
+    return blockGet(openAiApi.listMessages(threadId, options)).getData();
   }
 
   public SrtDto getTranscription(RequestBody requestBody) throws IOException {

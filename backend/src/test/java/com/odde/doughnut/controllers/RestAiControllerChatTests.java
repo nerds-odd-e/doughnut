@@ -3,6 +3,7 @@ package com.odde.doughnut.controllers;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -17,6 +18,7 @@ import com.theokanning.openai.assistants.run.RunCreateRequest;
 import com.theokanning.openai.client.OpenAiApi;
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -114,17 +116,25 @@ public class RestAiControllerChatTests {
     void setUp() {
       openAIAssistantMocker
           .aThread("my-existing-thread")
+          .mockListMessages("previous message")
           .mockCreateMessage()
           .andARunStream("my-run-id")
           .withMessageDeltas("I'm", " Chatbot")
           .mockTheRunStream();
+      makeMe.aUserAssistantThread("my-existing-thread").by(currentUser).forNote(note).please();
     }
 
     @Test
     void itWillLoadTheExistingThread() throws UnexpectedNoAccessRightException {
-      makeMe.aUserAssistantThread("my-existing-thread").by(currentUser).forNote(note).please();
       controller.chat(note, new ChatRequest("What's your name?", null));
       verify(openAiApi, times(0)).createThread(any());
+    }
+
+    @Test
+    void itMustGetTheMessageBackFirst() throws UnexpectedNoAccessRightException {
+      controller.chat(note, new ChatRequest("What's your name?", null));
+      verify(openAiApi, times(1))
+          .listMessages(eq("my-existing-thread"), eq(Map.of("order", "asc")));
     }
   }
 

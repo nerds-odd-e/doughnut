@@ -75,6 +75,7 @@ public class RestAiController {
       throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(note);
     AssistantService assistantService = getChatService();
+    SseEmitter emitter = new SseEmitter();
     String threadId = request.getThreadId();
     if (threadId == null) {
       UserAssistantThread byUserAndNote =
@@ -82,6 +83,7 @@ public class RestAiController {
               currentUser.getEntity(), note);
       if (byUserAndNote != null) {
         threadId = byUserAndNote.getThreadId();
+        assistantService.loadPreviousMessages(threadId, emitter);
       } else {
         threadId = assistantService.createThread(note);
         UserAssistantThread userAssistantThread = new UserAssistantThread();
@@ -91,8 +93,9 @@ public class RestAiController {
         modelFactoryService.entityManager.persist(userAssistantThread);
       }
     }
-    return assistantService.createMessageRunAndGetResponseStream2(
-        request.getUserMessage(), threadId);
+    assistantService.createMessageRunAndGetResponseStream(
+        request.getUserMessage(), threadId, emitter);
+    return emitter;
   }
 
   @GetMapping("/dummy")

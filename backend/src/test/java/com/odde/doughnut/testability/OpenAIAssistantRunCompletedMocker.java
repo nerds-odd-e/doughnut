@@ -10,6 +10,7 @@ import com.theokanning.openai.assistants.message.content.Text;
 import com.theokanning.openai.assistants.run.Run;
 import com.theokanning.openai.client.OpenAiApi;
 import io.reactivex.Single;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.mockito.Mockito;
@@ -22,9 +23,12 @@ public record OpenAIAssistantRunCompletedMocker(OpenAiApi openAiApi, String thre
     List<MessageContent> contentList = List.of(cnt);
     OpenAiResponse<Message> msgs = new OpenAiResponse<>();
     msgs.setData(List.of(Message.builder().content(contentList).build()));
-    Mockito.doReturn(Single.just(msgs))
-        .when(openAiApi)
-        .listMessages(threadId, Map.of("order", "asc", "run_id", run.getId()));
+    Map<String, Object> options = new HashMap<>();
+    options.put("order", "asc");
+    if (run != null) {
+      options.put("run_id", run.getId());
+    }
+    Mockito.doReturn(Single.just(msgs)).when(openAiApi).listMessages(threadId, options);
   }
 
   public OpenAIAssistantRunCompletedMocker mockRetrieveRun() {
