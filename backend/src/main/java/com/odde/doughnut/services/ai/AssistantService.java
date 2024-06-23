@@ -1,34 +1,21 @@
 package com.odde.doughnut.services.ai;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.SettingAccessor;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
-import com.theokanning.openai.assistants.StreamEvent;
 import com.theokanning.openai.assistants.assistant.AssistantRequest;
-import com.theokanning.openai.assistants.message.Message;
-import com.theokanning.openai.assistants.message.MessageContent;
 import com.theokanning.openai.assistants.message.MessageRequest;
-import com.theokanning.openai.assistants.message.content.Delta;
-import com.theokanning.openai.assistants.message.content.DeltaContent;
-import com.theokanning.openai.assistants.message.content.MessageDelta;
-import com.theokanning.openai.assistants.message.content.Text;
 import com.theokanning.openai.assistants.run.RequiredAction;
 import com.theokanning.openai.assistants.run.Run;
 import com.theokanning.openai.assistants.run.ToolCall;
-import com.theokanning.openai.assistants.run_step.RunStep;
 import com.theokanning.openai.assistants.thread.ThreadRequest;
 import com.theokanning.openai.service.assistant_stream.AssistantSSE;
 import io.reactivex.Flowable;
-import io.reactivex.subscribers.TestSubscriber;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 public record AssistantService(
@@ -58,11 +45,6 @@ public record AssistantService(
     return getThreadResponse(threadId, run);
   }
 
-  public AiAssistantResponse createThreadAndRunWithFirstMessageStream(Note note, String prompt) {
-    String threadId = createThread(note);
-    return createMessageRunAndGetResponseStream(prompt, threadId);
-  }
-
   public SseEmitter createThreadAndRunWithFirstMessageStream2(Note note, String prompt) {
     String threadId = createThread(note);
     return createMessageRunAndGetResponseStream2(prompt, threadId);
@@ -76,7 +58,6 @@ public record AssistantService(
     SseEmitter emitter = new SseEmitter();
     runStream.subscribe(
         sse -> {
-          System.out.println(sse);
           try {
             SseEmitter.SseEventBuilder builder =
                 SseEmitter.event().name(sse.getEvent().eventName).data(sse.getData());
@@ -88,55 +69,6 @@ public record AssistantService(
         emitter::completeWithError,
         emitter::complete);
     return emitter;
-  }
-
-  public AiAssistantResponse createMessageRunAndGetResponseStream(String prompt, String threadId) {
-    MessageRequest messageRequest = MessageRequest.builder().role("user").content(prompt).build();
-    openAiApiHandler.createMessage(threadId, messageRequest);
-    TestSubscriber<AssistantSSE> subscriber = new TestSubscriber<>();
-    openAiApiHandler
-        .createRunStream(threadId, settingAccessor.getValue())
-        .blockingSubscribe(subscriber);
-    //    System.out.println(subscriber.getEvents());
-    Optional<AssistantSSE> runStepCompletion =
-        subscriber.values().stream()
-            .filter(item -> item.getEvent().equals(StreamEvent.THREAD_RUN_STEP_COMPLETED))
-            .findFirst();
-    RunStep runStep = null;
-    try {
-      runStep = new ObjectMapper().readValue(runStepCompletion.get().getData(), RunStep.class);
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
-    }
-
-    String reply =
-        subscriber.values().stream()
-            .filter(item -> item.getEvent().equals(StreamEvent.THREAD_MESSAGE_DELTA))
-            .map(
-                item -> {
-                  try {
-                    return new ObjectMapper().readValue(item.getData(), MessageDelta.class);
-                  } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
-                  }
-                })
-            .map(MessageDelta::getDelta)
-            .map(Delta::getContent)
-            .map(List::getFirst)
-            .map(DeltaContent::getText)
-            .map(Text::getValue)
-            .collect(Collectors.joining());
-
-    MessageContent cnt = new MessageContent();
-    cnt.setText(new Text(reply, List.of()));
-    Message message =
-        Message.builder().threadId(threadId).role("assistant").content(List.of(cnt)).build();
-
-    AiAssistantResponse completionResponse = new AiAssistantResponse();
-    completionResponse.setThreadId(threadId);
-    completionResponse.setRunId(runStep.getRunId());
-    completionResponse.setMessages(List.of(message));
-    return completionResponse;
   }
 
   public AiAssistantResponse answerAiCompletionClarifyingQuestion(

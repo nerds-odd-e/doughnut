@@ -65,24 +65,9 @@ public class RestAiController {
         .answerAiCompletionClarifyingQuestion(answerClarifyingQuestionParams);
   }
 
-  @PostMapping("/chat/{note}")
+  @PostMapping(path = "/chat/{note}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
   @Transactional
-  public AiAssistantResponse chat(
-      @PathVariable(value = "note") @Schema(type = "integer") Note note,
-      @RequestBody ChatRequest request)
-      throws UnexpectedNoAccessRightException {
-    currentUser.assertReadAuthorization(note);
-    if (request.getThreadId() == null) {
-      return getChatService()
-          .createThreadAndRunWithFirstMessageStream(note, request.getUserMessage());
-    }
-    return getChatService()
-        .createMessageRunAndGetResponseStream(request.getUserMessage(), request.getThreadId());
-  }
-
-  @PostMapping(path = "/chat1/{note}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-  @Transactional
-  public SseEmitter chat1(
+  public SseEmitter chat(
       @PathVariable(value = "note") @Schema(type = "integer") Note note,
       @RequestBody ChatRequest request)
       throws UnexpectedNoAccessRightException {

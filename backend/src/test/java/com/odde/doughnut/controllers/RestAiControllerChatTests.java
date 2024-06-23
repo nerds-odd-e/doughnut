@@ -1,12 +1,10 @@
 package com.odde.doughnut.controllers;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 
-import com.odde.doughnut.controllers.dto.AiAssistantResponse;
 import com.odde.doughnut.controllers.dto.ChatRequest;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -16,6 +14,9 @@ import com.odde.doughnut.testability.*;
 import com.theokanning.openai.assistants.message.MessageRequest;
 import com.theokanning.openai.assistants.run.RunCreateRequest;
 import com.theokanning.openai.client.OpenAiApi;
+import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -25,6 +26,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -62,12 +65,24 @@ public class RestAiControllerChatTests {
           .mockTheRunStream();
     }
 
+    private List<ResponseBodyEmitter.DataWithMediaType>
+        peekIntoEmitterWithExtremelyInappropriateIntimacy(SseEmitter sseEmitter) {
+      try {
+        Field field = ResponseBodyEmitter.class.getDeclaredField("earlySendAttempts");
+        field.setAccessible(true);
+        return ((Set<ResponseBodyEmitter.DataWithMediaType>) field.get(sseEmitter))
+            .stream().toList();
+      } catch (NoSuchFieldException | IllegalAccessException e) {
+        throw new RuntimeException(e);
+      }
+    }
+
     @Test
     void chatWithAIAndGetResponse() throws UnexpectedNoAccessRightException {
-      AiAssistantResponse res = controller.chat(note, new ChatRequest("What's your name?", null));
-      assertEquals(
-          "I am a Chatbot",
-          res.getMessages().getFirst().getContent().getFirst().getText().getValue());
+      SseEmitter res = controller.chat(note, new ChatRequest("What's your name?", null));
+      List<ResponseBodyEmitter.DataWithMediaType> events =
+          peekIntoEmitterWithExtremelyInappropriateIntimacy(res);
+      assertThat(events.size()).isEqualTo(15);
     }
 
     @Test

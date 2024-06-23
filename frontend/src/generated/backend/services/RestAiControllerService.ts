@@ -72,33 +72,10 @@ export class RestAiControllerService {
      * @returns SseEmitter OK
      * @throws ApiError
      */
-    public chat1(
-        note: number,
-        requestBody: ChatRequest,
-    ): CancelablePromise<SseEmitter> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/api/ai/chat1/{note}',
-            path: {
-                'note': note,
-            },
-            body: requestBody,
-            mediaType: 'application/json',
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * @param note
-     * @param requestBody
-     * @returns AiAssistantResponse OK
-     * @throws ApiError
-     */
     public chat(
         note: number,
         requestBody: ChatRequest,
-    ): CancelablePromise<AiAssistantResponse> {
+    ): CancelablePromise<SseEmitter> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/ai/chat/{note}',

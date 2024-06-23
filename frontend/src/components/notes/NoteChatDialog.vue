@@ -108,7 +108,7 @@ const focusChatInput = () => {
 
 const  chat = async (id: Doughnut.ID, request: unknown) => {
   await createEventSourceWithBody(
-    `/api/ai/chat1/${id}`,
+    `/api/ai/chat/${id}`,
     request,
     (event, data) => {
       if (event === "thread.message.completed") {
