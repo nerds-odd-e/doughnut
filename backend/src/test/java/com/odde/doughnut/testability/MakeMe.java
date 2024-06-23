@@ -133,4 +133,8 @@ public class MakeMe extends MakeMeWithoutDB {
   public AudioBuilder anAudio() {
     return new AudioBuilder(new Audio(), this);
   }
+
+  public UserAssistantThreadBuilder aUserAssistantThread(String threadId) {
+    return new UserAssistantThreadBuilder(this, threadId);
+  }
 }

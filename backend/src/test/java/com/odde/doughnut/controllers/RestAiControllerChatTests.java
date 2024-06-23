@@ -3,6 +3,7 @@ package com.odde.doughnut.controllers;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.odde.doughnut.controllers.dto.ChatRequest;
@@ -104,6 +105,26 @@ public class RestAiControllerChatTests {
       ArgumentCaptor<RunCreateRequest> captor = ArgumentCaptor.forClass(RunCreateRequest.class);
       verify(openAiApi).createRunStream(any(), captor.capture());
       assertThat(captor.getValue().getAssistantId()).isEqualTo("chat-assistant");
+    }
+  }
+
+  @Nested
+  class ResumeChat {
+    @BeforeEach
+    void setUp() {
+      openAIAssistantMocker
+          .aThread("my-existing-thread")
+          .mockCreateMessage()
+          .andARunStream("my-run-id")
+          .withMessageDeltas("I'm", " Chatbot")
+          .mockTheRunStream();
+    }
+
+    @Test
+    void itWillLoadTheExistingThread() throws UnexpectedNoAccessRightException {
+      makeMe.aUserAssistantThread("my-existing-thread").by(currentUser).forNote(note).please();
+      controller.chat(note, new ChatRequest("What's your name?", null));
+      verify(openAiApi, times(0)).createThread(any());
     }
   }
 

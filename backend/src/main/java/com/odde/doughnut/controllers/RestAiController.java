@@ -77,12 +77,19 @@ public class RestAiController {
     AssistantService assistantService = getChatService();
     String threadId = request.getThreadId();
     if (threadId == null) {
-      threadId = assistantService.createThread(note);
-      UserAssistantThread userAssistantThread = new UserAssistantThread();
-      userAssistantThread.setThreadId(threadId);
-      userAssistantThread.setNote(note);
-      userAssistantThread.setUser(currentUser.getEntity());
-      modelFactoryService.entityManager.persist(userAssistantThread);
+      UserAssistantThread byUserAndNote =
+          modelFactoryService.userAssistantThreadRepository.findByUserAndNote(
+              currentUser.getEntity(), note);
+      if (byUserAndNote != null) {
+        threadId = byUserAndNote.getThreadId();
+      } else {
+        threadId = assistantService.createThread(note);
+        UserAssistantThread userAssistantThread = new UserAssistantThread();
+        userAssistantThread.setThreadId(threadId);
+        userAssistantThread.setNote(note);
+        userAssistantThread.setUser(currentUser.getEntity());
+        modelFactoryService.entityManager.persist(userAssistantThread);
+      }
     }
     return assistantService.createMessageRunAndGetResponseStream2(
         request.getUserMessage(), threadId);
