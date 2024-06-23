@@ -57,7 +57,7 @@
 </template>
 
 <script setup lang="ts">
-import { Message, Note, QuizQuestionInNotebook, ChatRequest } from "@/generated/backend"
+import { Message, Note, QuizQuestionInNotebook, ChatRequest, MessageDelta } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import { PropType, computed, ref, onMounted } from "vue"
@@ -109,11 +109,18 @@ const chat = async (id: Doughnut.ID, request: ChatRequest) => {
   await managedApi.eventSource
   .onMessage(
     (event, data) => {
-      if (event === "thread.message.completed") {
+      if (event === "thread.message.created") {
         const response = JSON.parse(data) as Message
-        threadId.value = response.thread_id
+        response.content = [{ text: { value: "" } }]
         messages.value = [...messages.value, response]
-        scrollToBottom()
+        threadId.value = response.thread_id
+      }
+      if (event === "thread.message.delta") {
+        const response = JSON.parse(data) as MessageDelta
+        const message = messages.value[messages.value.length - 1]!
+        const currentValue = message.content?.[0]?.text?.value
+        const delta = response.delta?.content?.[0]?.text?.value
+        message.content = [{ text: { value: currentValue! + delta } }]
       }
     })
     .onError(

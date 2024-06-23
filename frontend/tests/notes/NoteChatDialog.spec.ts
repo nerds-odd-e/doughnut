@@ -1,6 +1,6 @@
 import scrollToElement from "@/components/commons/scrollToElement"
 import NoteChatDialog from "@/components/notes/NoteChatDialog.vue"
-import { Message } from "@/generated/backend"
+import { Message, MessageDelta } from "@/generated/backend"
 import { VueWrapper, flushPromises } from "@vue/test-utils"
 import { beforeEach, expect } from "vitest"
 import makeMe from "../fixtures/makeMe"
@@ -99,9 +99,20 @@ describe("NoteChatDialog TestMe", () => {
 })
 
 describe("NoteChatDialog Conversation", () => {
-  const completedMessage: Message = {
-        role: "assistant",
-        thread_id: "test-thread-id",
+
+  beforeEach(() => {
+    helper.managedApi.eventSource.restAiController.chat = vi
+      .fn()
+  })
+
+  const askAndReplied = async () => {
+    const newMessage: Message = {
+          role: "assistant",
+          thread_id: "test-thread-id",
+          content: [],
+        }
+  const messageDelta: MessageDelta = {
+    delta: {
         content: [
           {
             text: {
@@ -110,16 +121,14 @@ describe("NoteChatDialog Conversation", () => {
           },
         ],
       }
-  beforeEach(() => {
-    helper.managedApi.eventSource.restAiController.chat = vi
-      .fn()
-  })
+    }
 
-  const askAndReplied = async () => {
+
    const wrapper = await createWrapper()
     await wrapper.find("textarea").setValue("What's your name?")
     await wrapper.find("#chat-button").trigger("submit")
-    helper.managedApi.eventSource.eventSourceRequest.onMessage("thread.message.completed", JSON.stringify(completedMessage))
+    helper.managedApi.eventSource.eventSourceRequest.onMessage("thread.message.created", JSON.stringify(newMessage))
+    helper.managedApi.eventSource.eventSourceRequest.onMessage("thread.message.delta", JSON.stringify(messageDelta))
     await flushPromises()
     return wrapper
   }

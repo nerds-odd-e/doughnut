@@ -106,11 +106,11 @@ const openAiService = () => {
     stubCreateRunStreams(threadId: string, runStreamData: RunStreamData[]) {
       serviceMocker.stubPosterWithMultipleResponses(`/threads/${threadId}/runs`,
         runStreamData.map(({runId, fullMessage}) =>
-`event: thread.message.delta
-data: {"delta": {"content": [{"index": 0, "type": "text", "text": {"value": "${fullMessage}"}}]}}
+`event: thread.message.created
+data: {"thread_id": "${threadId}", "run_id": "${runId}", "role": "assistant", "content": []}
 
-event: thread.message.completed
-data: {"thread_id": "${threadId}", "run_id": "${runId}", "role": "assistant", "content": [{"index": 0, "type": "text", "text": {"value": "${fullMessage}"}}]}
+event: thread.message.delta
+data: {"delta": {"content": [{"index": 0, "type": "text", "text": {"value": "${fullMessage}"}}]}}
 
 event: thread.run.step.completed
 data: {"run_id": "${runId}", "status": "completed"}
