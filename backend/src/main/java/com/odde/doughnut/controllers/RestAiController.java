@@ -83,7 +83,7 @@ public class RestAiController {
     return assistantService.loadPreviousMessages(byUserAndNote.getThreadId());
   }
 
-  @GetMapping(path = "/chat/{note}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+  @PostMapping(path = "/chat/{note}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
   @Transactional
   public SseEmitter chat(
       @PathVariable(value = "note") @Schema(type = "integer") Note note,
