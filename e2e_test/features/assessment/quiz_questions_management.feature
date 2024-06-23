@@ -18,7 +18,6 @@ Feature: Quiz Question Management
       | What does a cow say?                 | moo            |
       | What do you call a cow with not leg? | Ground beef    |
 
-
   Scenario: Manually delete a question from the note successfully
     Given there are questions for the note:
       | noteTopic    | question                             | answer | oneWrongChoice |
