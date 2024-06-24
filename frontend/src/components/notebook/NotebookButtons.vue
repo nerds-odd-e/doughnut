@@ -11,7 +11,7 @@
       <template #button_face>
         <SvgRobot />
       </template>
-      <NotebookEditDialog v-bind="{ notebook }" />
+      <NotebookAssistantManagementDialog v-bind="{ notebook }" />
     </PopButton>
     <button
       class="btn btn-sm"
@@ -32,6 +32,7 @@ import { Notebook, User } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { PropType, defineComponent } from "vue"
 import NotebookEditDialog from "./NotebookEditDialog.vue"
+import NotebookAssistantManagementDialog from "./NotebookAssistantManagementDialog.vue"
 import SvgRobot from "../svgs/SvgRobot.vue"
 
 export default defineComponent({
@@ -46,6 +47,7 @@ export default defineComponent({
     SvgBazaarShare,
     PopButton,
     NotebookEditDialog,
+    NotebookAssistantManagementDialog,
     SvgEditNotebook,
     SvgRobot,
   },

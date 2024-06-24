@@ -33,7 +33,11 @@ export const notebookList = () => {
     },
     notebookAssistant(notebook: string) {
       this.findNotebookCardButton(notebook, "Notebook Assistant").click()
-      return {}
+      return {
+        create() {
+          cy.findByRole("button", { name: "Create Assistant For Notebook"}).click()
+        },
+      }
     },
   }
 }
