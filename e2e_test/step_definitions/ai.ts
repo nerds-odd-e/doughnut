@@ -100,3 +100,11 @@ Given(
     })
   }
 )
+
+Given(
+  "I create an assistant for my notebook {string} assuming the assistant id {string}",
+  (notebook: string, _assistantId: string) => {
+    start.routerToNotebooksPage().notebookAssistant(notebook)
+  })
+
+

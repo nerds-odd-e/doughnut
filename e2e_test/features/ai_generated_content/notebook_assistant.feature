@@ -6,7 +6,7 @@ Feature: Notebook assistant
 
 
   Background:
-    Given I am logged in as an admin user
+    Given I am logged in as an admin
     And there are some notes for the current user:
       | topicConstructor | details    | parentTopic |
       | Vertical farming |            |             |

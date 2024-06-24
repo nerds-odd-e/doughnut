@@ -24,6 +24,7 @@ const noteAndLinkRoutes = [
     path: "notebooks",
     name: "notebooks",
     component: NotebooksPage,
+    meta: { userProp: true },
   },
   {
     path: `n:noteId`,

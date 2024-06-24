@@ -31,6 +31,10 @@ export const notebookList = () => {
         },
       }
     },
+    notebookAssistant(notebook: string) {
+      this.findNotebookCardButton(notebook, "Notebook Assistant").click()
+      return {}
+    },
   }
 }
 
