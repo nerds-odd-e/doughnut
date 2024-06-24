@@ -2,7 +2,6 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "module": "ESNext",
-    "jsx": "preserve",
     "resolveJsonModule": true,
     "baseUrl": ".",
     "lib": [
@@ -20,7 +19,12 @@
       "@/*": [
         "src/*"
       ]
-    }
+    },
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "jsx": "preserve"
   },
   "compileOnSave": true,
   "typeAcquisition": {
@@ -38,5 +42,6 @@
     "src/**/*.tsx",
     "src/**/*.vue",
     "tests/**/*.ts"
-  ]
+  ],
+  "references": [{ "path": "./tsconfig.node.json" }]
 }
