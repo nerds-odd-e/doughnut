@@ -4,7 +4,7 @@
       <NotebookNewButton>Add New Notebook</NotebookNewButton>
     </p>
     <main>
-      <NotebookViewCards v-if="notebooks" :notebooks="notebooks" />
+      <NotebookViewCards v-if="notebooks" :notebooks="notebooks"  :user="user"/>
     </main>
     <h2>Subscribed Notes</h2>
     <NotebookSubscriptionCards
@@ -15,8 +15,8 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue"
-import { Notebook, Subscription } from "@/generated/backend"
+import { onMounted, ref, PropType } from "vue"
+import { Notebook, Subscription, User } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import NotebookNewButton from "@/components/notebook/NotebookNewButton.vue"
 import NotebookViewCards from "@/components/notebook/NotebookViewCards.vue"
@@ -24,6 +24,10 @@ import NotebookSubscriptionCards from "@/components/subscriptions/NotebookSubscr
 import ContainerPage from "./commons/ContainerPage.vue"
 
 const { managedApi } = useLoadingApi()
+
+defineProps({
+  user: { type: Object as PropType<User> },
+})
 
 const subscriptions = ref<Subscription[] | undefined>(undefined)
 const notebooks = ref<Notebook[] | undefined>(undefined)

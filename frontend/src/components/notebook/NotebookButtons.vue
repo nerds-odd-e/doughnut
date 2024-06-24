@@ -7,6 +7,12 @@
       </template>
       <NotebookEditDialog v-bind="{ notebook }" />
     </PopButton>
+    <PopButton title="Notebook Assistant" v-if="user?.admin">
+      <template #button_face>
+        <SvgRobot />
+      </template>
+      <NotebookEditDialog v-bind="{ notebook }" />
+    </PopButton>
     <button
       class="btn btn-sm"
       title="Share notebook to bazaar"
@@ -22,10 +28,11 @@ import PopButton from "@/components/commons/Popups/PopButton.vue"
 import usePopups from "@/components/commons/Popups/usePopups"
 import SvgBazaarShare from "@/components/svgs/SvgBazaarShare.vue"
 import SvgEditNotebook from "@/components/svgs/SvgEditNotebook.vue"
-import { Notebook } from "@/generated/backend"
+import { Notebook, User } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { PropType, defineComponent } from "vue"
 import NotebookEditDialog from "./NotebookEditDialog.vue"
+import SvgRobot from "../svgs/SvgRobot.vue"
 
 export default defineComponent({
   setup() {
@@ -33,12 +40,14 @@ export default defineComponent({
   },
   props: {
     notebook: { type: Object as PropType<Notebook>, required: true },
+    user: { type: Object as PropType<User>, required: false },
   },
   components: {
     SvgBazaarShare,
     PopButton,
     NotebookEditDialog,
     SvgEditNotebook,
+    SvgRobot,
   },
   methods: {
     async shareNotebook() {
