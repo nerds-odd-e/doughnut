@@ -19,8 +19,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -40,10 +38,11 @@ class RestQuizQuestionController {
   private final QuizQuestionAndAnswerRepository quizQuestionAndAnswerRepository;
 
   public RestQuizQuestionController(
-    @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
-    ModelFactoryService modelFactoryService,
-    UserModel currentUser,
-    TestabilitySettings testabilitySettings, QuizQuestionAndAnswerRepository quizQuestionAndAnswerRepository) {
+      @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
+      ModelFactoryService modelFactoryService,
+      UserModel currentUser,
+      TestabilitySettings testabilitySettings,
+      QuizQuestionAndAnswerRepository quizQuestionAndAnswerRepository) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
@@ -163,8 +162,10 @@ class RestQuizQuestionController {
   @DeleteMapping("{questionId}")
   @Transactional
   public void deleteQuestion(
-    @PathVariable("questionId") @Schema(type = "integer") Integer questionId)
-    throws UnexpectedNoAccessRightException {
-    quizQuestionAndAnswerRepository.findById(questionId).ifPresent(quizQuestionService::deleteQuestion);
+      @PathVariable("questionId") @Schema(type = "integer") Integer questionId)
+      throws UnexpectedNoAccessRightException {
+    quizQuestionAndAnswerRepository
+        .findById(questionId)
+        .ifPresent(quizQuestionService::deleteQuestion);
   }
 }

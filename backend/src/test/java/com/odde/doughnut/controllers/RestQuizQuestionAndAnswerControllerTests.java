@@ -32,7 +32,6 @@ import java.sql.Timestamp;
 import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -64,12 +63,20 @@ class RestQuizQuestionAndAnswerControllerTests {
     currentUser = makeMe.aUser().toModelPlease();
     controller =
         new RestQuizQuestionController(
-            openAiApi, modelFactoryService, currentUser, testabilitySettings, quizQuestionAndAnswerRepository);
+            openAiApi,
+            modelFactoryService,
+            currentUser,
+            testabilitySettings,
+            quizQuestionAndAnswerRepository);
   }
 
   RestQuizQuestionController nullUserController() {
     return new RestQuizQuestionController(
-        openAiApi, modelFactoryService, makeMe.aNullUserModelPlease(), testabilitySettings, quizQuestionAndAnswerRepository);
+        openAiApi,
+        modelFactoryService,
+        makeMe.aNullUserModelPlease(),
+        testabilitySettings,
+        quizQuestionAndAnswerRepository);
   }
 
   @Nested
@@ -318,7 +325,7 @@ class RestQuizQuestionAndAnswerControllerTests {
                     makeMe.modelFactoryService,
                     makeMe.aNullUserModelPlease(),
                     testabilitySettings,
-                  quizQuestionAndAnswerRepository);
+                    quizQuestionAndAnswerRepository);
             restAiController.generateAIQuestionWithoutSave(note);
           });
     }
@@ -586,7 +593,7 @@ class RestQuizQuestionAndAnswerControllerTests {
   }
 
   @Nested
-  class DeleteQuestion{
+  class DeleteQuestion {
     @Test
     void deleteQuestion() throws UnexpectedNoAccessRightException {
       Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
