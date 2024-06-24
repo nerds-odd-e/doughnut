@@ -850,23 +850,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/QuizQuestionAndAnswer"
-  /api/quiz-questions/{questionId}:
-    delete:
-      tags:
-        - rest-quiz-question-controller
-      operationId: deleteQuestion
-      parameters:
-        - name: questionId
-          in: path
-          required: true
-          schema:
-            type: integer
-            description: ID of the question to delete
-      responses:
-        "500":
-          description: Internal Server Error
-        "200":
-          description: OK
   /api/quiz-questions/generate-question:
     post:
       tags:
@@ -2451,6 +2434,26 @@ paths:
                 type: array
                 items:
                   type: string
+  /api/quiz-questions/{questionId}:
+    delete:
+      tags:
+      - rest-quiz-question-controller
+      operationId: deleteQuestion
+      parameters:
+      - name: questionId
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
 components:
   schemas:
     Circle:

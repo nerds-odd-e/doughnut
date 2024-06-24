@@ -220,20 +220,23 @@ export class RestQuizQuestionControllerService {
             },
         });
     }
-  /**
-   * @param questionId
-   * @throws ApiError
-   */
-  public deleteQuestion(questionId: number): CancelablePromise<void> {
-    return this.httpRequest.request({
-      method: 'DELETE',
-      url: '/api/quiz-questions/{questionId}',
-      path: {
-        'questionId': questionId,
-      },
-      errors: {
-        500: `Internal Server Error`,
-      },
-    });
-  }
+    /**
+     * @param questionId
+     * @returns any OK
+     * @throws ApiError
+     */
+    public deleteQuestion(
+        questionId: number,
+    ): CancelablePromise<any> {
+        return this.httpRequest.request({
+            method: 'DELETE',
+            url: '/api/quiz-questions/{questionId}',
+            path: {
+                'questionId': questionId,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
 }
