@@ -850,19 +850,13 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/QuizQuestionAndAnswer"
-  /api/quiz-questions/{note}/note-questions/{question}:
+  /api/quiz-questions/{questionId}:
     delete:
       tags:
         - rest-quiz-question-controller
       operationId: deleteQuestion
       parameters:
-        - name: note
-          in: path
-          required: true
-          schema:
-            type: integer
-            description: ID of the note
-        - name: question
+        - name: questionId
           in: path
           required: true
           schema:
