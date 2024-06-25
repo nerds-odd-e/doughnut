@@ -2,12 +2,10 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.UserAssistantThread;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorWithStorageService;
-import com.odde.doughnut.services.ai.AssistantService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.assistants.message.Message;
 import com.theokanning.openai.client.OpenAiApi;
@@ -75,16 +73,7 @@ public class RestAiController {
       @PathVariable(value = "note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(note);
-    AssistantService assistantService = aiAdvisorWithStorageService.getChatService();
-    UserAssistantThread byUserAndNote =
-        aiAdvisorWithStorageService
-            .modelFactoryService()
-            .userAssistantThreadRepository
-            .findByUserAndNote(currentUser.getEntity(), note);
-    if (byUserAndNote == null) {
-      return List.of();
-    }
-    return assistantService.loadPreviousMessages(byUserAndNote.getThreadId());
+    return aiAdvisorWithStorageService.getMessageList(note, currentUser.getEntity());
   }
 
   @PostMapping(path = "/chat/{note}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
@@ -94,19 +83,9 @@ public class RestAiController {
       @RequestBody ChatRequest request)
       throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(note);
-    AssistantService assistantService = aiAdvisorWithStorageService.getChatService();
-    SseEmitter emitter = new SseEmitter();
-    String threadId = request.getThreadId();
-    if (threadId == null) {
-      threadId = assistantService.createThread(note);
-      UserAssistantThread userAssistantThread = new UserAssistantThread();
-      userAssistantThread.setThreadId(threadId);
-      userAssistantThread.setNote(note);
-      userAssistantThread.setUser(currentUser.getEntity());
-      aiAdvisorWithStorageService.modelFactoryService().entityManager.persist(userAssistantThread);
-    }
     Flowable<AssistantSSE> runStream =
-        assistantService.createMessageRunAndGetResponseStream(request.getUserMessage(), threadId);
+        aiAdvisorWithStorageService.getChatMessages(note, request, currentUser.getEntity());
+    SseEmitter emitter = new SseEmitter();
     runStream.subscribe(
         sse -> {
           try {
