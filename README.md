@@ -143,7 +143,7 @@ For MS Windows WSL2 users:
 
 ### 5. Database migrations
 
-You can find the database migrations in `backend/src/main/resources/db.migration/`.
+You can find the database migrations in `backend/src/main/resources/db/migration/`.
 The migrations are run automatically when the backend app starts up.
 It will also run the migrations for test when you run `pnpm backend:test`.
 To trigger the test DB migration manually, run `backend/gradlew migrateTestDB`.
