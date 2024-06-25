@@ -17,7 +17,6 @@ import com.theokanning.openai.service.assistant_stream.AssistantSSE;
 import io.reactivex.Flowable;
 import java.sql.Timestamp;
 import java.util.List;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 public record AssistantService(
     OpenAiApiHandler openAiApiHandler,
@@ -46,25 +45,11 @@ public record AssistantService(
     return getThreadResponse(threadId, run);
   }
 
-  public SseEmitter createMessageRunAndGetResponseStream(
-      String prompt, String threadId, SseEmitter emitter) {
+  public Flowable<AssistantSSE> createMessageRunAndGetResponseStream(
+      String prompt, String threadId) {
     MessageRequest messageRequest = MessageRequest.builder().role("user").content(prompt).build();
     openAiApiHandler.createMessage(threadId, messageRequest);
-    Flowable<AssistantSSE> runStream =
-        openAiApiHandler.createRunStream(threadId, settingAccessor.getValue());
-    runStream.subscribe(
-        sse -> {
-          try {
-            SseEmitter.SseEventBuilder builder =
-                SseEmitter.event().name(sse.getEvent().eventName).data(sse.getData());
-            emitter.send(builder);
-          } catch (Exception e) {
-            emitter.completeWithError(e);
-          }
-        },
-        emitter::completeWithError,
-        emitter::complete);
-    return emitter;
+    return openAiApiHandler.createRunStream(threadId, settingAccessor.getValue());
   }
 
   public AiAssistantResponse answerAiCompletionClarifyingQuestion(

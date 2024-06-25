@@ -7,15 +7,15 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorWithStorageService;
-import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.AssistantService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.assistants.message.Message;
 import com.theokanning.openai.client.OpenAiApi;
+import com.theokanning.openai.service.assistant_stream.AssistantSSE;
+import io.reactivex.Flowable;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import java.sql.Timestamp;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -55,7 +55,8 @@ public class RestAiController {
       @PathVariable(name = "note") @Schema(type = "integer") Note note,
       @RequestBody AiCompletionParams aiCompletionParams) {
     currentUser.assertLoggedIn();
-    return getContentCompletionService()
+    return aiAdvisorWithStorageService
+        .getContentCompletionService()
         .createThreadAndRunWithFirstMessage(note, aiCompletionParams.getCompletionPrompt());
   }
 
@@ -64,7 +65,8 @@ public class RestAiController {
   public AiAssistantResponse answerCompletionClarifyingQuestion(
       @RequestBody AiCompletionAnswerClarifyingQuestionParams answerClarifyingQuestionParams) {
     currentUser.assertLoggedIn();
-    return getContentCompletionService()
+    return aiAdvisorWithStorageService
+        .getContentCompletionService()
         .answerAiCompletionClarifyingQuestion(answerClarifyingQuestionParams);
   }
 
@@ -73,7 +75,7 @@ public class RestAiController {
       @PathVariable(value = "note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(note);
-    AssistantService assistantService = getChatService();
+    AssistantService assistantService = aiAdvisorWithStorageService.getChatService();
     UserAssistantThread byUserAndNote =
         aiAdvisorWithStorageService
             .modelFactoryService()
@@ -92,7 +94,7 @@ public class RestAiController {
       @RequestBody ChatRequest request)
       throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(note);
-    AssistantService assistantService = getChatService();
+    AssistantService assistantService = aiAdvisorWithStorageService.getChatService();
     SseEmitter emitter = new SseEmitter();
     String threadId = request.getThreadId();
     if (threadId == null) {
@@ -103,8 +105,18 @@ public class RestAiController {
       userAssistantThread.setUser(currentUser.getEntity());
       aiAdvisorWithStorageService.modelFactoryService().entityManager.persist(userAssistantThread);
     }
-    assistantService.createMessageRunAndGetResponseStream(
-        request.getUserMessage(), threadId, emitter);
+    Flowable<AssistantSSE> runStream =
+        assistantService.createMessageRunAndGetResponseStream(request.getUserMessage(), threadId);
+    runStream.subscribe(
+        sse -> {
+          try {
+            SseEmitter.SseEventBuilder builder =
+                SseEmitter.event().name(sse.getEvent().eventName).data(sse.getData());
+            emitter.send(builder);
+          } catch (Exception e) {
+            emitter.completeWithError(e);
+          }
+        });
     return emitter;
   }
 
@@ -135,31 +147,6 @@ public class RestAiController {
   public Map<String, String> recreateAllAssistants() throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    Map<String, String> result = new HashMap<>();
-    String modelName = getGlobalSettingsService().globalSettingOthers().getValue();
-    AssistantService completionService = getContentCompletionService();
-    result.put(
-        completionService.assistantName(),
-        completionService.createAssistant(modelName, currentUTCTimestamp));
-    AssistantService chatService = getChatService();
-    result.put(
-        chatService.assistantName(), chatService.createAssistant(modelName, currentUTCTimestamp));
-    return result;
-  }
-
-  private GlobalSettingsService getGlobalSettingsService() {
-    return new GlobalSettingsService(aiAdvisorWithStorageService.modelFactoryService());
-  }
-
-  private AssistantService getContentCompletionService() {
-    return aiAdvisorWithStorageService
-        .aiAdvisorService()
-        .getContentCompletionService(getGlobalSettingsService().noteCompletionAssistantId());
-  }
-
-  private AssistantService getChatService() {
-    return aiAdvisorWithStorageService
-        .aiAdvisorService()
-        .getChatService(getGlobalSettingsService().chatAssistantId());
+    return aiAdvisorWithStorageService.recreateAllAssistants(currentUTCTimestamp);
   }
 }
