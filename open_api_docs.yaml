@@ -1493,6 +1493,26 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/AiAssistantResponse"
+  /api/ai/recreate-notebook-assistant/{notebook}:
+    post:
+      tags:
+      - rest-ai-controller
+      operationId: recreateNotebookAssistant
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
   /api/ai/recreate-all-assistants:
     post:
       tags:

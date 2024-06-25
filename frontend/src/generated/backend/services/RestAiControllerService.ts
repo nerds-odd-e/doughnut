@@ -38,6 +38,25 @@ export class RestAiControllerService {
         });
     }
     /**
+     * @param notebook
+     * @returns any OK
+     * @throws ApiError
+     */
+    public recreateNotebookAssistant(
+        notebook: number,
+    ): CancelablePromise<any> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/ai/recreate-notebook-assistant/{notebook}',
+            path: {
+                'notebook': notebook,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
      * @returns string OK
      * @throws ApiError
      */

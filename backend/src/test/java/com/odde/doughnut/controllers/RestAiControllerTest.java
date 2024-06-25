@@ -11,7 +11,6 @@ import com.odde.doughnut.controllers.dto.AiAssistantResponse;
 import com.odde.doughnut.controllers.dto.AiCompletionAnswerClarifyingQuestionParams;
 import com.odde.doughnut.controllers.dto.AiCompletionParams;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.NoteDetailsCompletion;
@@ -19,7 +18,6 @@ import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIAssistantMocker;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.OpenAiResponse;
-import com.theokanning.openai.assistants.assistant.Assistant;
 import com.theokanning.openai.assistants.message.MessageRequest;
 import com.theokanning.openai.assistants.run.RunCreateRequest;
 import com.theokanning.openai.assistants.thread.ThreadRequest;
@@ -31,12 +29,10 @@ import com.theokanning.openai.model.Model;
 import io.reactivex.Single;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -218,6 +214,14 @@ class RestAiControllerTest {
       final String aiImage = controller.generateImage("create an image").b64encoded();
       assertEquals("this is supposed to be a base64 image", aiImage);
     }
+
+    private Single<ImageResult> buildImageResult(String s) {
+      ImageResult result = new ImageResult();
+      Image image = new Image();
+      image.setB64Json(s);
+      result.setData(List.of(image));
+      return Single.just(result);
+    }
   }
 
   @Nested
@@ -238,55 +242,5 @@ class RestAiControllerTest {
       when(openAiApi.listModels()).thenReturn(Single.just(fakeResponse));
       assertThat(controller.getAvailableGptModels()).contains("gpt-4");
     }
-  }
-
-  @Nested
-  class recreateAllAssistants {
-    @Test
-    void authentication() {
-      assertThrows(
-          UnexpectedNoAccessRightException.class, () -> controller.recreateAllAssistants());
-    }
-
-    @Nested
-    class asAdmin {
-      @BeforeEach
-      void setup() {
-        currentUser = makeMe.anAdmin().toModelPlease();
-        controller =
-            new RestAiController(
-                openAiApi, makeMe.modelFactoryService, currentUser, testabilitySettings);
-        Assistant assistantToReturn = new Assistant();
-        assistantToReturn.setId("1234");
-        when(openAiApi.createAssistant(ArgumentMatchers.any()))
-            .thenReturn(Single.just(assistantToReturn));
-      }
-
-      @Test
-      void createCompletionAssistant() throws UnexpectedNoAccessRightException {
-        Map<String, String> result = controller.recreateAllAssistants();
-        assertThat(result.get("Note details completion")).isEqualTo("1234");
-        GlobalSettingsService globalSettingsService =
-            new GlobalSettingsService(makeMe.modelFactoryService);
-        assertThat(globalSettingsService.noteCompletionAssistantId().getValue()).isEqualTo("1234");
-      }
-
-      @Test
-      void createChatAssistant() throws UnexpectedNoAccessRightException {
-        Map<String, String> result = controller.recreateAllAssistants();
-        assertThat(result.get("chat assistant")).isEqualTo("1234");
-        GlobalSettingsService globalSettingsService =
-            new GlobalSettingsService(makeMe.modelFactoryService);
-        assertThat(globalSettingsService.chatAssistantId().getValue()).isEqualTo("1234");
-      }
-    }
-  }
-
-  private Single<ImageResult> buildImageResult(String s) {
-    ImageResult result = new ImageResult();
-    Image image = new Image();
-    image.setB64Json(s);
-    result.setData(List.of(image));
-    return Single.just(result);
   }
 }
