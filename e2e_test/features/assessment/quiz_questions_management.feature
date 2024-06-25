@@ -18,6 +18,20 @@ Feature: Quiz Question Management
       | What does a cow say?                 | moo            |
       | What do you call a cow with not leg? | Ground beef    |
 
+  Scenario: Delete a question from the note successfully
+    Given I add the following question for the note "The cow joke":
+      | Stem                   | Choice 0            | Choice 1              | Choice 2              | Correct Choice Index |
+      | What does the fox say? | Ring-ding-ding-ding | Wa-pa-pa-pa-pa-pa-pow | Hatee-hatee-hatee-ho! | 1                    |
+    Then I should see the questions in the question list of the note "The cow joke":
+      | Question                             | Correct Choice |
+      | What does a cow say?                 | moo            |
+      | What does the fox say?               | Wa-pa-pa-pa-pa-pa-pow |
+    When I delete the question "What does the fox say?" from the note "The cow joke"
+    And I confirm the deletion
+    Then I should see the questions in the question list of the note "The cow joke":
+      | Question                             | Correct Choice |
+      | What does a cow say?                 | moo            |
+
   @usingMockedOpenAiService
   Scenario: Can generate the question by AI
     Given OpenAI now generates this question:
