@@ -31,7 +31,6 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @RequestMapping("/api/ai")
 public class RestAiController {
 
-  private final ModelFactoryService modelFactoryService;
   private final UserModel currentUser;
 
   @Resource(name = "testabilitySettings")
@@ -46,7 +45,6 @@ public class RestAiController {
       TestabilitySettings testabilitySettings) {
     this.aiAdvisorWithStorageService =
         new AiAdvisorWithStorageService(openAiApi, modelFactoryService);
-    this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
   }
@@ -77,8 +75,10 @@ public class RestAiController {
     currentUser.assertReadAuthorization(note);
     AssistantService assistantService = getChatService();
     UserAssistantThread byUserAndNote =
-        modelFactoryService.userAssistantThreadRepository.findByUserAndNote(
-            currentUser.getEntity(), note);
+        aiAdvisorWithStorageService
+            .modelFactoryService()
+            .userAssistantThreadRepository
+            .findByUserAndNote(currentUser.getEntity(), note);
     if (byUserAndNote == null) {
       return List.of();
     }
@@ -101,7 +101,7 @@ public class RestAiController {
       userAssistantThread.setThreadId(threadId);
       userAssistantThread.setNote(note);
       userAssistantThread.setUser(currentUser.getEntity());
-      modelFactoryService.entityManager.persist(userAssistantThread);
+      aiAdvisorWithStorageService.modelFactoryService().entityManager.persist(userAssistantThread);
     }
     assistantService.createMessageRunAndGetResponseStream(
         request.getUserMessage(), threadId, emitter);
@@ -148,7 +148,7 @@ public class RestAiController {
   }
 
   private GlobalSettingsService getGlobalSettingsService() {
-    return new GlobalSettingsService(modelFactoryService);
+    return new GlobalSettingsService(aiAdvisorWithStorageService.modelFactoryService());
   }
 
   private AssistantService getContentCompletionService() {
