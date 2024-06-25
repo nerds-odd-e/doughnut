@@ -2,15 +2,20 @@ import { defineConfig } from "@farmfe/core";
 import { fileURLToPath, URL } from "url";
 import vue from "@vitejs/plugin-vue";
 import vueJsx from "@vitejs/plugin-vue-jsx";
-import checker from 'vite-plugin-checker';
 import AutoImport from 'unplugin-auto-import/vite';
 import Components from 'unplugin-vue-components/vite';
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
+import { VueRouterAutoImports } from 'unplugin-vue-router';
+import VueRouter from 'unplugin-vue-router/vite';
 import viteCompression from 'vite-plugin-compression';
-import tsconfigPaths from 'vite-tsconfig-paths'
+
+import farmJsPluginSass from '@farmfe/js-plugin-sass';
 
 export default defineConfig({
+  plugins: [
+    farmJsPluginSass(),
+  ],
   vitePlugins: [
-    tsconfigPaths(),
     vue({
       template: {
         compilerOptions: {
@@ -18,16 +23,19 @@ export default defineConfig({
         },
       },
     }),
+    VueRouter(),
     vueJsx(),
     AutoImport({
+      resolvers: [ElementPlusResolver({ importStyle: 'sass' })],
       imports: [
-        'vue',
-        'vue-router',
-        'vitest'
+	'vue',
+        VueRouterAutoImports
       ],
       dts: true, // generate TypeScript declaration
     }),
-    Components(),
+    Components({
+      resolvers: [ElementPlusResolver({ importStyle: 'sass' })]
+    }),
     viteCompression()
   ],
   server: {
