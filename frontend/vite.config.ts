@@ -7,6 +7,9 @@ import checker from 'vite-plugin-checker';
 import VueDevTools from 'vite-plugin-vue-devtools'
 import AutoImport from 'unplugin-auto-import/vite';
 import Components from 'unplugin-vue-components/vite';
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
+import { VueRouterAutoImports } from 'unplugin-vue-router';
+import VueRouter from 'unplugin-vue-router/vite';
 import viteCompression from 'vite-plugin-compression';
 import tsconfigPaths from 'vite-tsconfig-paths'
 
@@ -47,16 +50,20 @@ export default defineConfig({
         },
       },
     }),
+    VueRouter(),
     vueJsx(),
     AutoImport({
+      resolvers: [ElementPlusResolver({ importStyle: 'sass' })],
       imports: [
         'vue',
-        'vue-router',
-        'vitest'
+        'vitest',
+	VueRouterAutoImports
       ],
       dts: true, // generate TypeScript declaration
     }),
-    Components(),
+    Components({
+      resolvers: [ElementPlusResolver({ importStyle: 'sass' })]
+    }),
     viteCompression()
   ],
   server: {
