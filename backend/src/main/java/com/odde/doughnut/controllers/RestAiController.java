@@ -6,7 +6,7 @@ import com.odde.doughnut.entities.UserAssistantThread;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.AiAdvisorService;
+import com.odde.doughnut.services.AiAdvisorWithStorageService;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.AssistantService;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -31,19 +31,21 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @RequestMapping("/api/ai")
 public class RestAiController {
 
-  private final AiAdvisorService aiAdvisorService;
   private final ModelFactoryService modelFactoryService;
   private final UserModel currentUser;
 
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
+  private final AiAdvisorWithStorageService aiAdvisorWithStorageService;
+
   public RestAiController(
       @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
       TestabilitySettings testabilitySettings) {
-    this.aiAdvisorService = new AiAdvisorService(openAiApi);
+    this.aiAdvisorWithStorageService =
+        new AiAdvisorWithStorageService(openAiApi, modelFactoryService);
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
@@ -116,12 +118,16 @@ public class RestAiController {
   @Transactional
   public AiGeneratedImage generateImage(@RequestBody String prompt) {
     currentUser.assertLoggedIn();
-    return new AiGeneratedImage(aiAdvisorService.getOtherAiServices().getTimage(prompt));
+    return new AiGeneratedImage(
+        aiAdvisorWithStorageService.aiAdvisorService().getOtherAiServices().getTimage(prompt));
   }
 
   @GetMapping("/available-gpt-models")
   public List<String> getAvailableGptModels() {
-    return aiAdvisorService.getOtherAiServices().getAvailableGptModels();
+    return aiAdvisorWithStorageService
+        .aiAdvisorService()
+        .getOtherAiServices()
+        .getAvailableGptModels();
   }
 
   @PostMapping("/recreate-all-assistants")
@@ -146,11 +152,14 @@ public class RestAiController {
   }
 
   private AssistantService getContentCompletionService() {
-    return aiAdvisorService.getContentCompletionService(
-        getGlobalSettingsService().noteCompletionAssistantId());
+    return aiAdvisorWithStorageService
+        .aiAdvisorService()
+        .getContentCompletionService(getGlobalSettingsService().noteCompletionAssistantId());
   }
 
   private AssistantService getChatService() {
-    return aiAdvisorService.getChatService(getGlobalSettingsService().chatAssistantId());
+    return aiAdvisorWithStorageService
+        .aiAdvisorService()
+        .getChatService(getGlobalSettingsService().chatAssistantId());
   }
 }
