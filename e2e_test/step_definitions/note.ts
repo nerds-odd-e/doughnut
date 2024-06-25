@@ -62,6 +62,19 @@ Given(
   },
 )
 
+When(
+  "I delete the question {string} from the note {string}",
+  (question: string, noteTopic: string) => {
+    start.jumpToNotePage(noteTopic).deleteQuestion(question)
+  },
+)
+
+//     And I confirm the deletion for "What does the fox say?"
+
+Given("I confirm the deletion for {string}", (question: string) => {
+  start.assumeNotePage().confirmDelete(question)
+})
+
 Given(
   "I refine the following question for the note {string}:",
   (noteTopic: string, data: DataTable) => {
