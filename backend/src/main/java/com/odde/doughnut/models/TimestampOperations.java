@@ -34,10 +34,9 @@ public abstract class TimestampOperations {
     return zonedDateTime.plusDays(1).withHour(0);
   }
 
-  private static ZonedDateTime getZonedDateTime(Timestamp timestamp, ZoneId timeZone) {
+  public static ZonedDateTime getZonedDateTime(Timestamp timestamp, ZoneId timeZone) {
     ZonedDateTime systemLocalDateTime = timestamp.toLocalDateTime().atZone(ZoneId.systemDefault());
-    ZonedDateTime userLocalDateTime = systemLocalDateTime.withZoneSameInstant(timeZone);
-    return userLocalDateTime;
+    return systemLocalDateTime.withZoneSameInstant(timeZone);
   }
 
   public static long getDiffInHours(Timestamp currentUTCTimestamp, Timestamp nextReviewAt) {

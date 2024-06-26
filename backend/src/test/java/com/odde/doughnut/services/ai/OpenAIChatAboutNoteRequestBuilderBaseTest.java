@@ -26,6 +26,16 @@ class OpenAIChatAboutNoteRequestBuilderBaseTest {
     String content = getNoteOfFocusDescription(note);
     assertThat(content, containsString(DETAILS));
     assertThat(content, containsString(note.getDetails()));
+    assertThat(content, containsString("createdAt"));
+  }
+
+  @Test
+  void messageShouldContainTarget() {
+    Note to = makeMe.aNote().inMemoryPlease();
+    Note from = makeMe.aNote().inMemoryPlease();
+    Note note = makeMe.aLink().between(from, to).inMemoryPlease();
+    String content = getNoteOfFocusDescription(note);
+    assertThat(content, containsString("target"));
   }
 
   private static String getNoteOfFocusDescription(Note note) {

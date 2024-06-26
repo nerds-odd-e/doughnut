@@ -14,10 +14,12 @@ import com.odde.doughnut.controllers.dto.NoteTopic;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import com.odde.doughnut.models.NoteViewer;
+import com.odde.doughnut.models.TimestampOperations;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.sql.Timestamp;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -30,6 +32,7 @@ import lombok.Setter;
 @JsonPropertyOrder({"topic", "noteTopic", "details", "parentId", "linkType", "updatedAt"})
 public abstract class Note extends EntityIdentifiedByIdOnly {
   public static final int MAX_TITLE_LENGTH = 150;
+  private static final String PATH_DELIMITER = " › ";
 
   @OneToOne
   @JoinColumn(name = "creator_id")
@@ -260,7 +263,7 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
   public String getContextPathString() {
     return getAncestors().stream()
         .map(Note::getTopicConstructor)
-        .collect(Collectors.joining(" › "));
+        .collect(Collectors.joining(PATH_DELIMITER));
   }
 
   @JsonIgnore
@@ -324,6 +327,8 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
     public String contextPath;
     public String topic;
     public String details;
+    public String createdAt;
+    public String target;
   }
 
   @JsonIgnore
@@ -341,6 +346,12 @@ The note of current focus (in JSON format):
     noteBrief.contextPath = getContextPathString();
     noteBrief.topic = getTopicConstructor();
     noteBrief.details = getDetails();
+    noteBrief.createdAt =
+        TimestampOperations.getZonedDateTime(getCreatedAt(), ZoneId.systemDefault()).toString();
+    if (targetNote != null) {
+      noteBrief.target =
+          targetNote.getContextPathString() + PATH_DELIMITER + targetNote.getTopicConstructor();
+    }
     return noteBrief;
   }
 
