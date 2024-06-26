@@ -54,6 +54,7 @@ class RestAiControllerForAssistantTest {
     void setup() {
       Assistant assistantToReturn = new Assistant();
       assistantToReturn.setId("1234");
+      assistantToReturn.setName("Assistant created");
       when(openAiApi.createAssistant(ArgumentMatchers.any()))
           .thenReturn(Single.just(assistantToReturn));
     }
@@ -75,7 +76,7 @@ class RestAiControllerForAssistantTest {
       @Test
       void createCompletionAssistant() throws UnexpectedNoAccessRightException {
         Map<String, String> result = controller.recreateAllAssistants();
-        assertThat(result.get("Note details completion")).isEqualTo("1234");
+        assertThat(result.get("Assistant created")).isEqualTo("1234");
         GlobalSettingsService globalSettingsService =
             new GlobalSettingsService(makeMe.modelFactoryService);
         assertThat(globalSettingsService.noteCompletionAssistantId().getValue()).isEqualTo("1234");
@@ -84,7 +85,7 @@ class RestAiControllerForAssistantTest {
       @Test
       void createChatAssistant() throws UnexpectedNoAccessRightException {
         Map<String, String> result = controller.recreateAllAssistants();
-        assertThat(result.get("chat assistant")).isEqualTo("1234");
+        assertThat(result.get("Assistant created")).isEqualTo("1234");
         GlobalSettingsService globalSettingsService =
             new GlobalSettingsService(makeMe.modelFactoryService);
         assertThat(globalSettingsService.chatAssistantId().getValue()).isEqualTo("1234");

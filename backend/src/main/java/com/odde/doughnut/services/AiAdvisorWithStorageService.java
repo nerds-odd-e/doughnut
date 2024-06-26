@@ -4,6 +4,7 @@ import com.odde.doughnut.controllers.dto.ChatRequest;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.ai.AssistantService;
+import com.theokanning.openai.assistants.assistant.Assistant;
 import com.theokanning.openai.assistants.message.Message;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.service.assistant_stream.AssistantSSE;
@@ -20,7 +21,11 @@ public record AiAdvisorWithStorageService(
   }
 
   private AssistantService getDefaultChatService() {
-    return aiAdvisorService.getChatService(getGlobalSettingsService().chatAssistantId());
+    return aiAdvisorService.getChatService(getDefaultChatAssistantSettingAccessor().getValue());
+  }
+
+  private GlobalSettingsService.GlobalSettingsKeyValue getDefaultChatAssistantSettingAccessor() {
+    return getGlobalSettingsService().chatAssistantId();
   }
 
   private AssistantService getChatService(Note note) {
@@ -33,25 +38,36 @@ public record AiAdvisorWithStorageService(
 
   public AssistantService getContentCompletionService() {
     return aiAdvisorService.getContentCompletionService(
-        getGlobalSettingsService().noteCompletionAssistantId());
+        getCompletionAssistantSettingAccessor().getValue());
+  }
+
+  private GlobalSettingsService.GlobalSettingsKeyValue getCompletionAssistantSettingAccessor() {
+    return getGlobalSettingsService().noteCompletionAssistantId();
   }
 
   public Map<String, String> recreateAllAssistants(Timestamp currentUTCTimestamp) {
     Map<String, String> result = new HashMap<>();
     String modelName = getGlobalSettingsService().globalSettingOthers().getValue();
-    AssistantService completionService = getContentCompletionService();
-    result.put(
-        completionService.assistantName(),
-        createAssistant(currentUTCTimestamp, completionService, modelName));
-    AssistantService chatService = getDefaultChatService();
-    result.put(
-        chatService.assistantName(), chatService.createAssistant(modelName, currentUTCTimestamp));
+    Assistant completionAssistant = createCompletionAssistant(currentUTCTimestamp, modelName);
+    result.put(completionAssistant.getName(), completionAssistant.getId());
+    Assistant chatAssistant = createChatAssistant(currentUTCTimestamp, modelName);
+    result.put(chatAssistant.getName(), chatAssistant.getId());
     return result;
   }
 
-  private String createAssistant(
-      Timestamp currentUTCTimestamp, AssistantService completionService, String modelName) {
-    return completionService.createAssistant(modelName, currentUTCTimestamp);
+  public Assistant createCompletionAssistant(Timestamp currentUTCTimestamp, String modelName) {
+    AssistantService service = getContentCompletionService();
+    Assistant assistant = service.createAssistant(modelName, "Note details completion");
+    getCompletionAssistantSettingAccessor().setKeyValue(currentUTCTimestamp, assistant.getId());
+    return assistant;
+  }
+
+  public Assistant createChatAssistant(Timestamp currentUTCTimestamp, String modelName) {
+    AssistantService service = getDefaultChatService();
+    Assistant chatAssistant = service.createAssistant(modelName, "chat assistant");
+    getDefaultChatAssistantSettingAccessor()
+        .setKeyValue(currentUTCTimestamp, chatAssistant.getId());
+    return chatAssistant;
   }
 
   public Flowable<AssistantSSE> getChatMessages(Note note, ChatRequest request, User user) {

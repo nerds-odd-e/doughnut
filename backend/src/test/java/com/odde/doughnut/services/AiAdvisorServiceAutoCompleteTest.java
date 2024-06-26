@@ -21,7 +21,6 @@ import com.odde.doughnut.services.ai.NoteDetailsCompletion;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIAssistantMocker;
 import com.odde.doughnut.testability.OpenAIAssistantThreadMocker;
-import com.odde.doughnut.testability.model.MemorySettingAccessor;
 import com.theokanning.openai.OpenAiError;
 import com.theokanning.openai.OpenAiHttpException;
 import com.theokanning.openai.assistants.run.SubmitToolOutputRequestItem;
@@ -49,9 +48,7 @@ class AiAdvisorServiceAutoCompleteTest {
   @BeforeEach
   void Setup() {
     MockitoAnnotations.openMocks(this);
-    SettingAccessor settingAccessor = new MemorySettingAccessor("example-id");
-    completionService =
-        new AiAdvisorService(openAiApi).getContentCompletionService(settingAccessor);
+    completionService = new AiAdvisorService(openAiApi).getContentCompletionService("example-id");
     openAIAssistantMocker = new OpenAIAssistantMocker(openAiApi);
     openAIAssistantThreadMocker =
         openAIAssistantMocker.mockThreadCreation(null).mockCreateMessage();

@@ -2,10 +2,10 @@ package com.odde.doughnut.services.ai;
 
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.services.SettingAccessor;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
+import com.theokanning.openai.assistants.assistant.Assistant;
 import com.theokanning.openai.assistants.assistant.AssistantRequest;
 import com.theokanning.openai.assistants.message.Message;
 import com.theokanning.openai.assistants.message.MessageRequest;
@@ -15,22 +15,12 @@ import com.theokanning.openai.assistants.run.ToolCall;
 import com.theokanning.openai.assistants.thread.ThreadRequest;
 import com.theokanning.openai.service.assistant_stream.AssistantSSE;
 import io.reactivex.Flowable;
-import java.sql.Timestamp;
 import java.util.List;
 
 public record AssistantService(
-    OpenAiApiHandler openAiApiHandler,
-    SettingAccessor settingAccessor,
-    String assistantName,
-    List<AiTool> tools) {
+    OpenAiApiHandler openAiApiHandler, String assistantId, List<AiTool> tools) {
 
-  public String createAssistant(String modelName, Timestamp currentUTCTimestamp) {
-    String chatAssistant = createAssistant1(modelName);
-    settingAccessor.setKeyValue(currentUTCTimestamp, chatAssistant);
-    return chatAssistant;
-  }
-
-  private String createAssistant1(String modelName) {
+  public Assistant createAssistant(String modelName, String assistantName) {
     AssistantRequest assistantRequest =
         AssistantRequest.builder()
             .model(modelName)
@@ -38,14 +28,14 @@ public record AssistantService(
             .instructions(OpenAIChatRequestBuilder.systemInstruction)
             .tools(tools.stream().map(AiTool::getTool).toList())
             .build();
-    return openAiApiHandler.createAssistant(assistantRequest).getId();
+    return openAiApiHandler.createAssistant(assistantRequest);
   }
 
   public AiAssistantResponse createThreadAndRunWithFirstMessage(Note note, String prompt) {
     String threadId = createThread(note);
     MessageRequest messageRequest = MessageRequest.builder().role("user").content(prompt).build();
     openAiApiHandler.createMessage(threadId, messageRequest);
-    Run run = openAiApiHandler.createRun(threadId, settingAccessor.getValue());
+    Run run = openAiApiHandler.createRun(threadId, assistantId);
     return getThreadResponse(threadId, run);
   }
 
@@ -53,7 +43,7 @@ public record AssistantService(
       String prompt, String threadId) {
     MessageRequest messageRequest = MessageRequest.builder().role("user").content(prompt).build();
     openAiApiHandler.createMessage(threadId, messageRequest);
-    return openAiApiHandler.createRunStream(threadId, settingAccessor.getValue());
+    return openAiApiHandler.createRunStream(threadId, assistantId);
   }
 
   public AiAssistantResponse answerAiCompletionClarifyingQuestion(

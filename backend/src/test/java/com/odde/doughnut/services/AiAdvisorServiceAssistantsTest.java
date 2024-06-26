@@ -47,9 +47,7 @@ class AiAdvisorServiceAssistantsTest {
       Assistant item = new Assistant();
       item.setId("1234");
       when(openAiApi.createAssistant(ArgumentMatchers.any())).thenReturn(Single.just(item));
-      aiAdvisorService
-          .getContentCompletionService()
-          .createAssistant("gpt4o", makeMe.aTimestamp().please());
+      aiAdvisorService.createCompletionAssistant(makeMe.aTimestamp().please(), "gpt4o");
       ArgumentCaptor<AssistantRequest> captor = ArgumentCaptor.forClass(AssistantRequest.class);
       verify(openAiApi).createAssistant(captor.capture());
       assistantRequest = captor.getValue();
