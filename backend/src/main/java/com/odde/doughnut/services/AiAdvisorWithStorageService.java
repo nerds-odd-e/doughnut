@@ -29,6 +29,11 @@ public record AiAdvisorWithStorageService(
   }
 
   private AssistantService getChatService(Note note) {
+    NotebookAssistant assistant =
+        modelFactoryService.notebookAssistantRepository.findByNotebook(note.getNotebook());
+    if (assistant != null) {
+      return aiAdvisorService.getChatService(assistant.getAssistantId());
+    }
     return getDefaultChatService();
   }
 
