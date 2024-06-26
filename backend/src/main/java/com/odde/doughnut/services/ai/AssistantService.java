@@ -25,6 +25,12 @@ public record AssistantService(
     List<AiTool> tools) {
 
   public String createAssistant(String modelName, Timestamp currentUTCTimestamp) {
+    String chatAssistant = createAssistant1(modelName);
+    settingAccessor.setKeyValue(currentUTCTimestamp, chatAssistant);
+    return chatAssistant;
+  }
+
+  private String createAssistant1(String modelName) {
     AssistantRequest assistantRequest =
         AssistantRequest.builder()
             .model(modelName)
@@ -32,9 +38,7 @@ public record AssistantService(
             .instructions(OpenAIChatRequestBuilder.systemInstruction)
             .tools(tools.stream().map(AiTool::getTool).toList())
             .build();
-    String chatAssistant = openAiApiHandler.createAssistant(assistantRequest).getId();
-    settingAccessor.setKeyValue(currentUTCTimestamp, chatAssistant);
-    return chatAssistant;
+    return openAiApiHandler.createAssistant(assistantRequest).getId();
   }
 
   public AiAssistantResponse createThreadAndRunWithFirstMessage(Note note, String prompt) {

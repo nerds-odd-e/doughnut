@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 
 import com.odde.doughnut.controllers.dto.ChatRequest;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.NotebookAssistant;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GlobalSettingsService;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -108,6 +110,22 @@ public class RestAiControllerChatTests {
       ArgumentCaptor<RunCreateRequest> captor = ArgumentCaptor.forClass(RunCreateRequest.class);
       verify(openAiApi).createRunStream(any(), captor.capture());
       assertThat(captor.getValue().getAssistantId()).isEqualTo("chat-assistant");
+    }
+
+    @Disabled
+    @Test
+    void chatWithUseTheNotebookChatAssistantIfExisting() throws UnexpectedNoAccessRightException {
+      NotebookAssistant notebookAssistant = new NotebookAssistant();
+      notebookAssistant.setAssistantId("notebook-assistant");
+      notebookAssistant.setNotebook(note.getNotebook());
+      notebookAssistant.setCreator(currentUser.getEntity());
+      notebookAssistant.setCreatedAt(makeMe.aTimestamp().please());
+      makeMe.modelFactoryService.save(notebookAssistant);
+
+      controller.chat(note, new ChatRequest("What's your name?", null));
+      ArgumentCaptor<RunCreateRequest> captor = ArgumentCaptor.forClass(RunCreateRequest.class);
+      verify(openAiApi).createRunStream(any(), captor.capture());
+      assertThat(captor.getValue().getAssistantId()).isEqualTo("notebook-assistant");
     }
   }
 

@@ -19,8 +19,12 @@ public record AiAdvisorWithStorageService(
     this(new AiAdvisorService(openAiApi), modelFactoryService);
   }
 
-  private AssistantService getChatService() {
+  private AssistantService getDefaultChatService() {
     return aiAdvisorService.getChatService(getGlobalSettingsService().chatAssistantId());
+  }
+
+  private AssistantService getChatService(Note note) {
+    return getDefaultChatService();
   }
 
   private GlobalSettingsService getGlobalSettingsService() {
@@ -38,15 +42,20 @@ public record AiAdvisorWithStorageService(
     AssistantService completionService = getContentCompletionService();
     result.put(
         completionService.assistantName(),
-        completionService.createAssistant(modelName, currentUTCTimestamp));
-    AssistantService chatService = getChatService();
+        createAssistant(currentUTCTimestamp, completionService, modelName));
+    AssistantService chatService = getDefaultChatService();
     result.put(
         chatService.assistantName(), chatService.createAssistant(modelName, currentUTCTimestamp));
     return result;
   }
 
+  private String createAssistant(
+      Timestamp currentUTCTimestamp, AssistantService completionService, String modelName) {
+    return completionService.createAssistant(modelName, currentUTCTimestamp);
+  }
+
   public Flowable<AssistantSSE> getChatMessages(Note note, ChatRequest request, User user) {
-    AssistantService assistantService = getChatService();
+    AssistantService assistantService = getChatService(note);
     String threadId = request.getThreadId();
     if (threadId == null) {
       threadId = assistantService.createThread(note);
@@ -66,7 +75,7 @@ public record AiAdvisorWithStorageService(
     if (byUserAndNote == null) {
       return List.of();
     }
-    return getChatService().loadPreviousMessages(byUserAndNote.getThreadId());
+    return getChatService(note).loadPreviousMessages(byUserAndNote.getThreadId());
   }
 
   public NotebookAssistant recreateNotebookAssistant(

@@ -5,8 +5,8 @@ import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
-import com.odde.doughnut.testability.model.MemorySettingAccessor;
 import com.theokanning.openai.assistants.assistant.Assistant;
 import com.theokanning.openai.assistants.assistant.AssistantRequest;
 import com.theokanning.openai.assistants.assistant.Tool;
@@ -16,10 +16,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
+@SpringBootTest
+@ActiveProfiles("test")
+@Transactional
 class AiAdvisorServiceAssistantsTest {
 
-  private AiAdvisorService aiAdvisorService;
+  private AiAdvisorWithStorageService aiAdvisorService;
+  @Autowired MakeMe makeMe;
   @Mock private OpenAiApi openAiApi;
   OpenAIChatCompletionMock openAIChatCompletionMock;
 
@@ -27,7 +35,7 @@ class AiAdvisorServiceAssistantsTest {
   void Setup() {
     MockitoAnnotations.openMocks(this);
     openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
-    aiAdvisorService = new AiAdvisorService(openAiApi);
+    aiAdvisorService = new AiAdvisorWithStorageService(openAiApi, makeMe.modelFactoryService);
   }
 
   @Nested
@@ -36,10 +44,12 @@ class AiAdvisorServiceAssistantsTest {
 
     @BeforeEach
     void captureTheRequest() {
-      when(openAiApi.createAssistant(ArgumentMatchers.any()))
-          .thenReturn(Single.just(new Assistant()));
-      SettingAccessor settingAccessor = new MemorySettingAccessor("example-id");
-      aiAdvisorService.getContentCompletionService(settingAccessor).createAssistant("gpt4o", null);
+      Assistant item = new Assistant();
+      item.setId("1234");
+      when(openAiApi.createAssistant(ArgumentMatchers.any())).thenReturn(Single.just(item));
+      aiAdvisorService
+          .getContentCompletionService()
+          .createAssistant("gpt4o", makeMe.aTimestamp().please());
       ArgumentCaptor<AssistantRequest> captor = ArgumentCaptor.forClass(AssistantRequest.class);
       verify(openAiApi).createAssistant(captor.capture());
       assistantRequest = captor.getValue();

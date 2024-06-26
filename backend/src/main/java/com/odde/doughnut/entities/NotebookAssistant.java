@@ -19,7 +19,7 @@ public class NotebookAssistant extends EntityIdentifiedByIdOnly {
   @JoinColumn(name = "notebook_id")
   private Notebook notebook;
 
-  @Column(name = "assistant_id")
+  @Column(name = "assistant")
   @NotNull
   private String assistantId;
 
