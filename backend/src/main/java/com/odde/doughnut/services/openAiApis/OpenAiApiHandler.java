@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.odde.doughnut.controllers.dto.AiCompletionAnswerClarifyingQuestionParams;
 import com.odde.doughnut.controllers.dto.SrtDto;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
-import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
 import com.theokanning.openai.assistants.assistant.Assistant;
 import com.theokanning.openai.assistants.assistant.AssistantRequest;
 import com.theokanning.openai.assistants.message.Message;
@@ -30,9 +29,13 @@ import com.theokanning.openai.service.assistant_stream.AssistantResponseBodyCall
 import com.theokanning.openai.service.assistant_stream.AssistantSSE;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.util.*;
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import org.springframework.http.HttpStatus;
@@ -79,19 +82,25 @@ public class OpenAiApiHandler {
     return blockGet(openAiApi.listModels()).data;
   }
 
-  public String uploadFineTuningExamples(
-      List<OpenAIChatGPTFineTuningExample> examples, String subFileName) throws IOException {
-    FineTuningFileWrapper uploader = new FineTuningFileWrapper(examples, subFileName);
-    return uploader.withFileToBeUploaded(
-        (file) -> {
-          RequestBody purpose = RequestBody.create("fine-tune", MediaType.parse("text/plain"));
-          try {
-            return blockGet(openAiApi.uploadFile(purpose, file)).getId();
-          } catch (Exception e) {
-            throw new OpenAIServiceErrorException(
-                "Upload failed.", HttpStatus.INTERNAL_SERVER_ERROR);
-          }
-        });
+  public String uploadTextFile(String subFileName, String content, String purpose)
+      throws IOException {
+    File tempFile = File.createTempFile(subFileName, ".jsonl");
+    try {
+      Files.write(tempFile.toPath(), content.getBytes(), StandardOpenOption.WRITE);
+
+      RequestBody fileRequestBody =
+          RequestBody.create(tempFile, MediaType.parse("application/octet-stream"));
+      MultipartBody.Part filePart =
+          MultipartBody.Part.createFormData("file", tempFile.getName(), fileRequestBody);
+      RequestBody purposeBody = RequestBody.create(purpose, MediaType.parse("text/plain"));
+      try {
+        return blockGet(openAiApi.uploadFile(purposeBody, filePart)).getId();
+      } catch (Exception e) {
+        throw new OpenAIServiceErrorException("Upload failed.", HttpStatus.INTERNAL_SERVER_ERROR);
+      }
+    } finally {
+      tempFile.delete();
+    }
   }
 
   public FineTuningJob triggerFineTuning(String fileId) {

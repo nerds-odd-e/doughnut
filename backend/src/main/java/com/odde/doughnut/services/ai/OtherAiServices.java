@@ -1,6 +1,7 @@
 package com.odde.doughnut.services.ai;
 
 import com.odde.doughnut.controllers.dto.SrtDto;
+import com.odde.doughnut.services.openAiApis.FineTuningExamples;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -31,7 +32,10 @@ public record OtherAiServices(OpenAiApiHandler openAiApiHandler) {
 
   public String uploadAndTriggerFineTuning(
       List<OpenAIChatGPTFineTuningExample> examples, String question) throws IOException {
-    String fileId = openAiApiHandler.uploadFineTuningExamples(examples, question);
+    FineTuningExamples fineTuningExamples = new FineTuningExamples(examples);
+
+    String fileId =
+        openAiApiHandler.uploadTextFile(question, fineTuningExamples.toJsonL(), "fine-tune");
     return openAiApiHandler.triggerFineTuning(fileId).getFineTunedModel();
   }
 
