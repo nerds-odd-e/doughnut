@@ -160,8 +160,10 @@ class RestAiControllerForAssistantTest {
 
     @Test
     void uploadAllNotes() throws UnexpectedNoAccessRightException, IOException {
+      Note child = makeMe.aNote().under(notebook.getHeadNote()).please();
       controller.recreateNotebookAssistant(notebook);
       assertThat(uploadedFileContent).contains(notebook.getHeadNote().getTopicConstructor());
+      assertThat(uploadedFileContent).contains(child.getTopicConstructor());
     }
 
     private static String getBuffer(MultipartBody.Part part) {

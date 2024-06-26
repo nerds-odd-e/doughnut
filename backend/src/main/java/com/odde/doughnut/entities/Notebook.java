@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
@@ -69,6 +70,12 @@ public class Notebook extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public String getNotebookDump() {
-    return defaultObjectMapper().valueToTree(headNote.getNoteBrief()).toPrettyString();
+    List<Note.NoteBrief> noteBriefs =
+        notes.stream()
+            .sorted(Comparator.comparing(Note::getParentId).thenComparing(Note::getSiblingOrder))
+            .map(Note::getNoteBrief)
+            .toList();
+    ;
+    return defaultObjectMapper().valueToTree(noteBriefs).toPrettyString();
   }
 }

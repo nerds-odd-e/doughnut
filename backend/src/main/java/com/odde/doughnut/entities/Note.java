@@ -237,10 +237,10 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
     return getSiblings().stream().filter(nc -> nc.getSiblingOrder() > siblingOrder).findFirst();
   }
 
-  public Optional<Integer> getParentId() {
+  public Integer getParentId() {
     Note parent = getParent();
-    if (parent == null) return Optional.empty();
-    return Optional.ofNullable(parent.id);
+    if (parent == null) return null;
+    return parent.id;
   }
 
   @JsonIgnore
