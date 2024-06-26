@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
+import com.odde.doughnut.entities.NotebookAssistant;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GlobalSettingsService;
@@ -114,7 +115,10 @@ class RestAiControllerForAssistantTest {
 
       @Test
       void createNotebookAssistant() throws UnexpectedNoAccessRightException {
-        controller.recreateNotebookAssistant(notebook);
+        NotebookAssistant notebookAssistant = controller.recreateNotebookAssistant(notebook);
+        assertThat(notebookAssistant.getCreatedAt()).isNotNull();
+        assertThat(notebookAssistant.getCreator()).isEqualTo(currentUser.getEntity());
+        assertThat(notebookAssistant.getId()).isNotNull();
       }
     }
   }

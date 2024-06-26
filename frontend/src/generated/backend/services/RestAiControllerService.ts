@@ -9,6 +9,7 @@ import type { AiGeneratedImage } from '../models/AiGeneratedImage';
 import type { ChatRequest } from '../models/ChatRequest';
 import type { DummyForGeneratingTypes } from '../models/DummyForGeneratingTypes';
 import type { Message } from '../models/Message';
+import type { NotebookAssistant } from '../models/NotebookAssistant';
 import type { SseEmitter } from '../models/SseEmitter';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -39,12 +40,12 @@ export class RestAiControllerService {
     }
     /**
      * @param notebook
-     * @returns any OK
+     * @returns NotebookAssistant OK
      * @throws ApiError
      */
     public recreateNotebookAssistant(
         notebook: number,
-    ): CancelablePromise<any> {
+    ): CancelablePromise<NotebookAssistant> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/ai/recreate-notebook-assistant/{notebook}',

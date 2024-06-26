@@ -3,6 +3,7 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
+import com.odde.doughnut.entities.NotebookAssistant;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
@@ -132,9 +133,12 @@ public class RestAiController {
 
   @PostMapping("/recreate-notebook-assistant/{notebook}")
   @Transactional
-  public void recreateNotebookAssistant(
+  public NotebookAssistant recreateNotebookAssistant(
       @PathVariable(value = "notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
+    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
+    return aiAdvisorWithStorageService.recreateNotebookAssistant(
+        currentUTCTimestamp, currentUser.getEntity(), notebook);
   }
 }

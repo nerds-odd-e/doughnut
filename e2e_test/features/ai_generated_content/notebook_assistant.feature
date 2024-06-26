@@ -13,7 +13,6 @@ Feature: Notebook assistant
       | Acquaponics      |         | Vertical farming |
 
 
-  @ignore
   Scenario: The users will use the notebook assistant if exist
     Given I create an assistant for my notebook "Vertical farming" assuming the assistant id "assistant-id-1"
     And OpenAI assistant "assistant-id-1" will reply below for user messages:

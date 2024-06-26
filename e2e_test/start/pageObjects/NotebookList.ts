@@ -36,6 +36,7 @@ export const notebookList = () => {
       return {
         create() {
           cy.findByRole("button", { name: "Create Assistant For Notebook"}).click()
+          cy.pageIsNotLoading()
         },
       }
     },

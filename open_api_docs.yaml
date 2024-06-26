@@ -1513,6 +1513,10 @@ paths:
                 type: string
         "200":
           description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/NotebookAssistant"
   /api/ai/recreate-all-assistants:
     post:
       tags:
@@ -3210,6 +3214,27 @@ components:
           type: string
       discriminator:
         propertyName: type
+    NotebookAssistant:
+      required:
+      - assistantId
+      - createdAt
+      - creator
+      - id
+      - notebook
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        creator:
+          $ref: "#/components/schemas/User"
+        notebook:
+          $ref: "#/components/schemas/Notebook"
+        assistantId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
     AiGeneratedImage:
       type: object
       properties:

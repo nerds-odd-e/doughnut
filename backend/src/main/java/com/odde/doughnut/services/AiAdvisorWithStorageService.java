@@ -1,9 +1,7 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.ChatRequest;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.UserAssistantThread;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.ai.AssistantService;
 import com.theokanning.openai.assistants.message.Message;
@@ -69,5 +67,16 @@ public record AiAdvisorWithStorageService(
       return List.of();
     }
     return getChatService().loadPreviousMessages(byUserAndNote.getThreadId());
+  }
+
+  public NotebookAssistant recreateNotebookAssistant(
+      Timestamp currentUTCTimestamp, User creator, Notebook notebook) {
+    NotebookAssistant notebookAssistant = new NotebookAssistant();
+    notebookAssistant.setNotebook(notebook);
+    notebookAssistant.setCreator(creator);
+    notebookAssistant.setCreatedAt(currentUTCTimestamp);
+    notebookAssistant.setAssistantId("assistant-id-1");
+    this.modelFactoryService.save(notebookAssistant);
+    return notebookAssistant;
   }
 }

@@ -56,6 +56,7 @@ export type { Note } from './models/Note';
 export type { NoteAccessoriesDTO } from './models/NoteAccessoriesDTO';
 export type { NoteAccessory } from './models/NoteAccessory';
 export type { Notebook } from './models/Notebook';
+export type { NotebookAssistant } from './models/NotebookAssistant';
 export type { NotebookSettings } from './models/NotebookSettings';
 export type { NotebooksViewedByUser } from './models/NotebooksViewedByUser';
 export { NoteCreationDTO } from './models/NoteCreationDTO';
