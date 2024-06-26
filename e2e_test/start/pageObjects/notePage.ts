@@ -61,11 +61,6 @@ export const assumeNotePage = (noteTopic?: string) => {
       return assumeNotePage(noteTopic)
     },
 
-    deleteQuestion(question: string) {
-      cy.wait(2000)
-      throw new Error("deleteQuestion - Method not implemented.")
-    },
-
     collapseChildren: () => {
       cy.get("main").within(() => {
         cy.findByRole("button", { name: "collapse children" }).click()
@@ -273,9 +268,5 @@ export const assumeNotePage = (noteTopic?: string) => {
         },
       }
     },
-    confirmDelete(question?: string) {
-      cy.wait(2000)
-      throw new Error("confirmDelete - Method not implemented.")
-    }
   }
 }

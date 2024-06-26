@@ -27,7 +27,6 @@ Feature: Quiz Question Management
       | What does a cow say?                 | moo            |
       | What does the fox say?               | Wa-pa-pa-pa-pa-pa-pow |
     When I delete the question "What does the fox say?" from the note "The cow joke"
-    And I confirm the deletion for "What does the fox say?"
     Then I should see the questions in the question list of the note "The cow joke":
       | Question                             | Correct Choice |
       | What does a cow say?                 | moo            |
