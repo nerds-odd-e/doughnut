@@ -1,5 +1,7 @@
 package com.odde.doughnut.entities;
 
+import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.*;
@@ -63,5 +65,10 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   // database
   public void addNoteInMemoryToSupportUnitTestOnly(Note note) {
     this.notes.add(note);
+  }
+
+  @JsonIgnore
+  public String getNotebookDump() {
+    return defaultObjectMapper().valueToTree(headNote.getNoteBrief()).toPrettyString();
   }
 }

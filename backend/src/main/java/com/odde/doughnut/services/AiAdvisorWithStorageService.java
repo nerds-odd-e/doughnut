@@ -104,11 +104,12 @@ public record AiAdvisorWithStorageService(
       Timestamp currentUTCTimestamp, User creator, Notebook notebook) throws IOException {
     AssistantService service = getDefaultChatService();
     String modelName = getGlobalSettingsService().globalSettingOthers().getValue();
+    String fileContent = notebook.getNotebookDump();
     Assistant chatAssistant =
         service.createAssistantWithFile(
             modelName,
             "Assistant for notebook %s".formatted(notebook.getHeadNote().getTopicConstructor()),
-            "text content");
+            fileContent);
     NotebookAssistant notebookAssistant = new NotebookAssistant();
     notebookAssistant.setNotebook(notebook);
     notebookAssistant.setCreator(creator);

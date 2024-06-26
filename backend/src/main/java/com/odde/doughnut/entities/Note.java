@@ -328,15 +328,20 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public String getNoteDescription() {
-    Note.NoteBrief noteBrief = new Note.NoteBrief();
-    noteBrief.contextPath = getContextPathString();
-    noteBrief.topic = getTopicConstructor();
-    noteBrief.details = getDetails();
+    String prettyString = defaultObjectMapper().valueToTree(getNoteBrief()).toPrettyString();
     return """
 The note of current focus (in JSON format):
 %s
-"""
-        .formatted(defaultObjectMapper().valueToTree(noteBrief).toPrettyString());
+""".formatted(prettyString);
+  }
+
+  @JsonIgnore
+  public NoteBrief getNoteBrief() {
+    NoteBrief noteBrief = new NoteBrief();
+    noteBrief.contextPath = getContextPathString();
+    noteBrief.topic = getTopicConstructor();
+    noteBrief.details = getDetails();
+    return noteBrief;
   }
 
   protected void initialize(

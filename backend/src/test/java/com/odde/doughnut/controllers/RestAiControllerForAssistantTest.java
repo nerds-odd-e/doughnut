@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.Map;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import okio.Buffer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -104,6 +105,7 @@ class RestAiControllerForAssistantTest {
   @Nested
   class createNotebookAssistant {
     Notebook notebook;
+    String uploadedFileContent = "";
 
     @BeforeEach
     public void setup() {
@@ -114,7 +116,11 @@ class RestAiControllerForAssistantTest {
       when(openAiApi.createAssistant(ArgumentMatchers.any()))
           .thenReturn(Single.just(assistantToReturn));
       when(openAiApi.uploadFile(any(RequestBody.class), any(MultipartBody.Part.class)))
-          .thenReturn(Single.just(new File()));
+          .then(
+              (invocation) -> {
+                uploadedFileContent = getBuffer(invocation.getArgument(1));
+                return Single.just(new File());
+              });
     }
 
     @Test
@@ -155,8 +161,18 @@ class RestAiControllerForAssistantTest {
     @Test
     void uploadAllNotes() throws UnexpectedNoAccessRightException, IOException {
       controller.recreateNotebookAssistant(notebook);
-      ArgumentCaptor<MultipartBody.Part> captor = ArgumentCaptor.forClass(MultipartBody.Part.class);
-      verify(openAiApi, times(1)).uploadFile(any(), captor.capture());
+      assertThat(uploadedFileContent).contains(notebook.getHeadNote().getTopicConstructor());
+    }
+
+    private static String getBuffer(MultipartBody.Part part) {
+      RequestBody requestBody = part.body();
+      Buffer buffer = new Buffer();
+      try {
+        requestBody.writeTo(buffer);
+        return buffer.readUtf8();
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
     }
   }
 }
