@@ -166,7 +166,7 @@ class RestQuizQuestionController {
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(question.getNote());
     quizQuestionAndAnswerRepository
-      .findById(question.getId())
-      .ifPresent(quizQuestionService::deleteQuestion);
+        .findById(question.getId())
+        .ifPresent(quizQuestionService::deleteQuestion);
   }
 }
