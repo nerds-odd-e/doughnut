@@ -81,7 +81,7 @@ Given(
 )
 
 Given(
-  "OpenAI responds with {string} when uploading fine-tuning data",
+  "OpenAI responds with {string} when uploading file",
   (result) => {
     mock_services.openAi().stubOpenAiUploadResponse(result === "success")
   },

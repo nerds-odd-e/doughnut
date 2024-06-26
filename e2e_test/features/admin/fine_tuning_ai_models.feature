@@ -12,7 +12,7 @@ Feature: Refine OpenAI's AI Model using user feedback
 
   Scenario Outline: Trigger fine tuning with feedbacks for Question model and Evaluation model
     Given I have 10 positive feedbacks and 2 negative feedbacks
-    And OpenAI responds with "<upload_result>" when uploading fine-tuning data
+    And OpenAI responds with "<upload_result>" when uploading file
     And OpenAI responds with "<training_result>" when triggering fine-tuning
     When I attempt to trigger fine-tuning
     Then I should see the message "<message>"

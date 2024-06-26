@@ -15,6 +15,7 @@ import com.theokanning.openai.service.assistant_stream.AssistantSSE;
 import io.reactivex.Flowable;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
@@ -135,7 +136,7 @@ public class RestAiController {
   @Transactional
   public NotebookAssistant recreateNotebookAssistant(
       @PathVariable(value = "notebook") @Schema(type = "integer") Notebook notebook)
-      throws UnexpectedNoAccessRightException {
+      throws UnexpectedNoAccessRightException, IOException {
     currentUser.assertAdminAuthorization();
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     return aiAdvisorWithStorageService.recreateNotebookAssistant(

@@ -15,8 +15,12 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.assistants.assistant.Assistant;
 import com.theokanning.openai.assistants.assistant.AssistantRequest;
 import com.theokanning.openai.client.OpenAiApi;
+import com.theokanning.openai.file.File;
 import io.reactivex.Single;
+import java.io.IOException;
 import java.util.Map;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -109,6 +113,8 @@ class RestAiControllerForAssistantTest {
       assistantToReturn.setName("Assistant created");
       when(openAiApi.createAssistant(ArgumentMatchers.any()))
           .thenReturn(Single.just(assistantToReturn));
+      when(openAiApi.uploadFile(any(RequestBody.class), any(MultipartBody.Part.class)))
+          .thenReturn(Single.just(new File()));
     }
 
     @Test
@@ -125,7 +131,7 @@ class RestAiControllerForAssistantTest {
     }
 
     @Test
-    void createNotebookAssistant() throws UnexpectedNoAccessRightException {
+    void createNotebookAssistant() throws UnexpectedNoAccessRightException, IOException {
       NotebookAssistant notebookAssistant = controller.recreateNotebookAssistant(notebook);
       assertThat(notebookAssistant.getCreatedAt()).isNotNull();
       assertThat(notebookAssistant.getCreator()).isEqualTo(currentUser.getEntity());
@@ -133,17 +139,24 @@ class RestAiControllerForAssistantTest {
     }
 
     @Test
-    void useTheCreatedAssistantId() throws UnexpectedNoAccessRightException {
+    void useTheCreatedAssistantId() throws UnexpectedNoAccessRightException, IOException {
       NotebookAssistant notebookAssistant = controller.recreateNotebookAssistant(notebook);
       assertThat(notebookAssistant.getAssistantId()).isEqualTo("created-assistant-id");
     }
 
     @Test
-    void passTheRightParameters() throws UnexpectedNoAccessRightException {
+    void passTheRightParameters() throws UnexpectedNoAccessRightException, IOException {
       controller.recreateNotebookAssistant(notebook);
       ArgumentCaptor<AssistantRequest> captor = ArgumentCaptor.forClass(AssistantRequest.class);
       verify(openAiApi).createAssistant(captor.capture());
       assertThat(captor.getValue().getName()).startsWith("Assistant for notebook ");
+    }
+
+    @Test
+    void uploadAllNotes() throws UnexpectedNoAccessRightException, IOException {
+      controller.recreateNotebookAssistant(notebook);
+      ArgumentCaptor<MultipartBody.Part> captor = ArgumentCaptor.forClass(MultipartBody.Part.class);
+      verify(openAiApi, times(1)).uploadFile(any(), captor.capture());
     }
   }
 }

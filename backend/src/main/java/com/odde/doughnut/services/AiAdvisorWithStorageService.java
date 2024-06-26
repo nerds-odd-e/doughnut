@@ -9,6 +9,7 @@ import com.theokanning.openai.assistants.message.Message;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.service.assistant_stream.AssistantSSE;
 import io.reactivex.Flowable;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
@@ -100,13 +101,14 @@ public record AiAdvisorWithStorageService(
   }
 
   public NotebookAssistant recreateNotebookAssistant(
-      Timestamp currentUTCTimestamp, User creator, Notebook notebook) {
+      Timestamp currentUTCTimestamp, User creator, Notebook notebook) throws IOException {
     AssistantService service = getDefaultChatService();
     String modelName = getGlobalSettingsService().globalSettingOthers().getValue();
     Assistant chatAssistant =
-        service.createAssistant(
+        service.createAssistantWithFile(
             modelName,
-            "Assistant for notebook %s".formatted(notebook.getHeadNote().getTopicConstructor()));
+            "Assistant for notebook %s".formatted(notebook.getHeadNote().getTopicConstructor()),
+            "text content");
     NotebookAssistant notebookAssistant = new NotebookAssistant();
     notebookAssistant.setNotebook(notebook);
     notebookAssistant.setCreator(creator);

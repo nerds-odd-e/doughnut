@@ -15,6 +15,7 @@ import com.theokanning.openai.assistants.run.ToolCall;
 import com.theokanning.openai.assistants.thread.ThreadRequest;
 import com.theokanning.openai.service.assistant_stream.AssistantSSE;
 import io.reactivex.Flowable;
+import java.io.IOException;
 import java.util.List;
 
 public record AssistantService(
@@ -29,6 +30,12 @@ public record AssistantService(
             .tools(tools.stream().map(AiTool::getTool).toList())
             .build();
     return openAiApiHandler.createAssistant(assistantRequest);
+  }
+
+  public Assistant createAssistantWithFile(
+      String modelName, String assistantName, String textContent) throws IOException {
+    openAiApiHandler.uploadTextFile(assistantName, textContent, "assistant");
+    return createAssistant(modelName, assistantName);
   }
 
   public AiAssistantResponse createThreadAndRunWithFirstMessage(Note note, String prompt) {
