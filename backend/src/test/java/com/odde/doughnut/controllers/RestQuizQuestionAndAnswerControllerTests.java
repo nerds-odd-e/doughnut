@@ -597,19 +597,15 @@ class RestQuizQuestionAndAnswerControllerTests {
     @Test
     void deleteQuestion() throws UnexpectedNoAccessRightException {
       Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
-
       QuizQuestionAndAnswer questionToRemain = makeMe.aQuestion().please();
       controller.addQuestionManually(note, questionToRemain);
-      makeMe.refresh(note);
-
       QuizQuestionAndAnswer questionToDelete = makeMe.aQuestion().please();
       controller.addQuestionManually(note, questionToDelete);
       makeMe.refresh(note);
-
       when(quizQuestionAndAnswerRepository.findById(questionToDelete.getId()))
           .thenReturn(java.util.Optional.of(questionToDelete));
 
-      controller.deleteQuestion(questionToDelete.getId());
+      controller.deleteQuestion(questionToDelete);
       makeMe.refresh(note);
 
       assertThat(note.getQuizQuestionAndAnswers(), hasSize(1));

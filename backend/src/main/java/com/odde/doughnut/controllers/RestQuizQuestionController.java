@@ -162,10 +162,11 @@ class RestQuizQuestionController {
   @DeleteMapping("{questionId}")
   @Transactional
   public void deleteQuestion(
-      @PathVariable("questionId") @Schema(type = "integer") Integer questionId)
+      @PathVariable("questionId") @Schema(type = "integer") QuizQuestionAndAnswer question)
       throws UnexpectedNoAccessRightException {
+    currentUser.assertAuthorization(question.getNote());
     quizQuestionAndAnswerRepository
-        .findById(questionId)
-        .ifPresent(quizQuestionService::deleteQuestion);
+      .findById(question.getId())
+      .ifPresent(quizQuestionService::deleteQuestion);
   }
 }
