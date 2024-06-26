@@ -101,11 +101,17 @@ public record AiAdvisorWithStorageService(
 
   public NotebookAssistant recreateNotebookAssistant(
       Timestamp currentUTCTimestamp, User creator, Notebook notebook) {
+    AssistantService service = getDefaultChatService();
+    String modelName = getGlobalSettingsService().globalSettingOthers().getValue();
+    Assistant chatAssistant =
+        service.createAssistant(
+            modelName,
+            "Assistant for notebook %s".formatted(notebook.getHeadNote().getTopicConstructor()));
     NotebookAssistant notebookAssistant = new NotebookAssistant();
     notebookAssistant.setNotebook(notebook);
     notebookAssistant.setCreator(creator);
     notebookAssistant.setCreatedAt(currentUTCTimestamp);
-    notebookAssistant.setAssistantId("assistant-id-1");
+    notebookAssistant.setAssistantId(chatAssistant.getId());
     this.modelFactoryService.save(notebookAssistant);
     return notebookAssistant;
   }

@@ -13,12 +13,14 @@ import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.assistants.assistant.Assistant;
+import com.theokanning.openai.assistants.assistant.AssistantRequest;
 import com.theokanning.openai.client.OpenAiApi;
 import io.reactivex.Single;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +55,7 @@ class RestAiControllerForAssistantTest {
     @BeforeEach
     void setup() {
       Assistant assistantToReturn = new Assistant();
-      assistantToReturn.setId("1234");
+      assistantToReturn.setId("created-assistant-id");
       assistantToReturn.setName("Assistant created");
       when(openAiApi.createAssistant(ArgumentMatchers.any()))
           .thenReturn(Single.just(assistantToReturn));
@@ -76,51 +78,72 @@ class RestAiControllerForAssistantTest {
       @Test
       void createCompletionAssistant() throws UnexpectedNoAccessRightException {
         Map<String, String> result = controller.recreateAllAssistants();
-        assertThat(result.get("Assistant created")).isEqualTo("1234");
+        assertThat(result.get("Assistant created")).isEqualTo("created-assistant-id");
         GlobalSettingsService globalSettingsService =
             new GlobalSettingsService(makeMe.modelFactoryService);
-        assertThat(globalSettingsService.noteCompletionAssistantId().getValue()).isEqualTo("1234");
+        assertThat(globalSettingsService.noteCompletionAssistantId().getValue())
+            .isEqualTo("created-assistant-id");
       }
 
       @Test
       void createChatAssistant() throws UnexpectedNoAccessRightException {
         Map<String, String> result = controller.recreateAllAssistants();
-        assertThat(result.get("Assistant created")).isEqualTo("1234");
+        assertThat(result.get("Assistant created")).isEqualTo("created-assistant-id");
         GlobalSettingsService globalSettingsService =
             new GlobalSettingsService(makeMe.modelFactoryService);
-        assertThat(globalSettingsService.chatAssistantId().getValue()).isEqualTo("1234");
+        assertThat(globalSettingsService.chatAssistantId().getValue())
+            .isEqualTo("created-assistant-id");
       }
     }
+  }
 
-    @Nested
-    class createNotebookAssistant {
-      Notebook notebook;
+  @Nested
+  class createNotebookAssistant {
+    Notebook notebook;
 
-      @BeforeEach
-      public void setup() {
-        notebook = note.getNotebook();
-      }
+    @BeforeEach
+    public void setup() {
+      notebook = note.getNotebook();
+      Assistant assistantToReturn = new Assistant();
+      assistantToReturn.setId("created-assistant-id");
+      assistantToReturn.setName("Assistant created");
+      when(openAiApi.createAssistant(ArgumentMatchers.any()))
+          .thenReturn(Single.just(assistantToReturn));
+    }
 
-      @Test
-      void authentication() {
-        controller =
-            new RestAiController(
-                openAiApi,
-                makeMe.modelFactoryService,
-                makeMe.aUser().toModelPlease(),
-                testabilitySettings);
-        assertThrows(
-            UnexpectedNoAccessRightException.class,
-            () -> controller.recreateNotebookAssistant(notebook));
-      }
+    @Test
+    void authentication() {
+      controller =
+          new RestAiController(
+              openAiApi,
+              makeMe.modelFactoryService,
+              makeMe.aUser().toModelPlease(),
+              testabilitySettings);
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.recreateNotebookAssistant(notebook));
+    }
 
-      @Test
-      void createNotebookAssistant() throws UnexpectedNoAccessRightException {
-        NotebookAssistant notebookAssistant = controller.recreateNotebookAssistant(notebook);
-        assertThat(notebookAssistant.getCreatedAt()).isNotNull();
-        assertThat(notebookAssistant.getCreator()).isEqualTo(currentUser.getEntity());
-        assertThat(notebookAssistant.getId()).isNotNull();
-      }
+    @Test
+    void createNotebookAssistant() throws UnexpectedNoAccessRightException {
+      NotebookAssistant notebookAssistant = controller.recreateNotebookAssistant(notebook);
+      assertThat(notebookAssistant.getCreatedAt()).isNotNull();
+      assertThat(notebookAssistant.getCreator()).isEqualTo(currentUser.getEntity());
+      assertThat(notebookAssistant.getId()).isNotNull();
+    }
+
+    @Test
+    void useTheCreatedAssistantId() throws UnexpectedNoAccessRightException {
+      NotebookAssistant notebookAssistant = controller.recreateNotebookAssistant(notebook);
+      assertThat(notebookAssistant.getAssistantId()).isEqualTo("created-assistant-id");
+    }
+
+    @Test
+    void passTheRightParameters() throws UnexpectedNoAccessRightException {
+      controller.recreateNotebookAssistant(notebook);
+      ArgumentCaptor<AssistantRequest> captor = ArgumentCaptor.forClass(AssistantRequest.class);
+      verify(openAiApi).createAssistant(captor.capture());
+      assertThat(captor.getValue().getName()).startsWith("Assistant for notebook ");
     }
   }
 }
