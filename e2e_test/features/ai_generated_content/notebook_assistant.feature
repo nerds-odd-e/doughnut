@@ -8,12 +8,18 @@ Feature: Notebook assistant
   Background:
     Given I am logged in as an admin
     And there are some notes for the current user:
-      | topicConstructor | details    | parentTopic |
-      | Vertical farming |            |             |
-      | Acqua            |            | Vertical farming  |
+      | topicConstructor | details | parentTopic      |
+      | Vertical farming |         |                  |
+      | Acquaponics      |         | Vertical farming |
 
 
   Scenario: The users will use the notebook assistant if exist
     Given I create an assistant for my notebook "Vertical farming" assuming the assistant id "assistant-id-1"
-    Then it should use assistant id "assistant-id-1"
-    When I start to chat about the note "Acqua"
+    And OpenAI assistant "assistant-id-1" will reply below for user messages:
+      | user message          | assistant reply                   | run id |
+      | Tell me more about it | It is a kind of vertical farming. | run1   |
+    When I start to chat about the note "Acquaponics"
+    And I send the message "Tell me more about it" to AI
+    Then I should receive the following chat messages:
+      | role      | message                           |
+      | assistant | It is a kind of vertical farming. |

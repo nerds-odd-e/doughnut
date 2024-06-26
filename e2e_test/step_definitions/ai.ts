@@ -9,7 +9,6 @@ import {
 } from "@badeball/cypress-cucumber-preprocessor"
 import "../support/string_util"
 import start, { mock_services } from "../start"
-import { MessageToMatch } from "../start/mock_services/MessageToMatch"
 
 Given("the OpenAI service is unavailable due to invalid system token", () => {
   mock_services.openAi().alwaysResponseAsUnauthorized()
@@ -84,20 +83,13 @@ Given(
 Given(
   "OpenAI assistant will reply below for user messages:",
   (data: DataTable) => {
-    const thread = mock_services.openAi().stubCreateThread(
-      "thread-abc123",
-    ).stubCreateRunStreams("thread-abc123", data.hashes().map((row) => ({
-      runId: row["run id"]!,
-      fullMessage: row["assistant reply"]!,
-  })))
+    mock_services.openAi().stubAIChat(data.hashes())
+})
 
-    data.hashes().forEach((row) => {
-      const userMessage: MessageToMatch = {
-        role: "user",
-        content: row["user message"]!,
-      }
-      thread.stubCreateMessage(userMessage)
-    })
+Given(
+  "OpenAI assistant {string} will reply below for user messages:",
+  (assistantId: string, data: DataTable) => {
+    mock_services.openAi().stubAIChat(data.hashes(), assistantId)
   }
 )
 
@@ -106,10 +98,3 @@ Given(
   (notebook: string, _assistantId: string) => {
     start.routerToNotebooksPage().notebookAssistant(notebook).create()
   })
-
-Given(
-  "it should use assistant id {string}",
-  (_assistantId: string) => {
-  })
-
-

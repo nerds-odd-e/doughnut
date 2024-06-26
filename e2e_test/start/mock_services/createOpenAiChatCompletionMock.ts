@@ -40,7 +40,7 @@ const openAiChatCompletionStubber = (
       `/chat/completions`,
       bodyToMatch,
       bodyNotToMatch,
-      {
+      [{
         object: "chat.completion",
         choices: [
           {
@@ -49,7 +49,7 @@ const openAiChatCompletionStubber = (
             finish_reason: finishReason,
           },
         ],
-      },
+      }],
     )
   }
 

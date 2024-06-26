@@ -25,9 +25,9 @@ const openAiAssistantThreadMocker = (
         `/threads/${threadId}/messages`,
         message,
         undefined,
-        {
+        [{
           id: "msg-abc123",
-        },
+        }],
       )
       return this
     },

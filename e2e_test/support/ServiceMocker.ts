@@ -91,7 +91,8 @@ class ServiceMocker {
     path: string,
     bodyToMatch: unknown,
     bodyNotToMatch: unknown,
-    response: unknown
+    responses: unknown[],
+    headers?: Record<string, string>
   ): Promise<void> {
     const nots = bodyNotToMatch
       ? [new NotPredicate(new FlexiPredicate().withBody(bodyNotToMatch))]
@@ -102,7 +103,7 @@ class ServiceMocker {
       .withPath(path)
       .withMethod(HttpMethod.POST)
       .withBody(bodyToMatch)
-    return this.mockWithPredicates([predicate, ...nots], [response])
+    return this.mockWithPredicates([predicate, ...nots], responses, headers)
   }
 
   public stubPosterUnauthorized(pathMatcher: string, response: unknown) {

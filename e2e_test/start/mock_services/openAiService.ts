@@ -1,5 +1,6 @@
 import ServiceMocker from "../../support/ServiceMocker"
 import testability from "../testability"
+import { MessageToMatch } from "./MessageToMatch"
 import createOpenAiChatCompletionMock from "./createOpenAiChatCompletionMock"
 import openAiAssistantThreadMocker from "./openAiAssistantThreadMocker"
 
@@ -81,10 +82,27 @@ const openAiService = () => {
           model: modelName,
         },
         undefined,
-        {
+        [{
           id: newId,
-        },
+        }],
       )
+    },
+
+    stubAIChat(messages: Record<string, string>[], assistantId?: string) {
+    const thread = this.stubCreateThread(
+      "thread-abc123",
+    ).stubCreateRunStreams("thread-abc123", assistantId, messages.map((row) => ({
+      runId: row["run id"]!,
+      fullMessage: row["assistant reply"]!,
+  })))
+    messages.forEach((row) => {
+      const userMessage: MessageToMatch = {
+        role: "user",
+        content: row["user message"]!,
+      }
+      thread.stubCreateMessage(userMessage)
+    })
+
     },
 
     stubCreateThread(threadId: string) {
@@ -103,8 +121,10 @@ const openAiService = () => {
       return openAiAssistantThreadMocker(serviceMocker, threadId, runIds)
     },
 
-    stubCreateRunStreams(threadId: string, runStreamData: RunStreamData[]) {
-      serviceMocker.stubPosterWithMultipleResponses(`/threads/${threadId}/runs`,
+    stubCreateRunStreams(threadId: string, _assistantId: string | undefined, runStreamData: RunStreamData[]) {
+      serviceMocker.mockPostMatchsAndNotMatches(`/threads/${threadId}/runs`,
+        {},
+        undefined,
         runStreamData.map(({runId, fullMessage}) =>
 `event: thread.message.created
 data: {"thread_id": "${threadId}", "run_id": "${runId}", "role": "assistant", "content": []}
