@@ -12,6 +12,14 @@ import type { QuizQuestionInNotebook } from '../models/QuizQuestionInNotebook';
 import type { SuggestedQuestionForFineTuning } from '../models/SuggestedQuestionForFineTuning';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
+
+function useStandardErrorMapping() {
+    return {
+        500: `Internal Server Error`,
+        404: 'Resource Not Found',
+    };
+}
+
 export class RestQuizQuestionControllerService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
@@ -28,9 +36,7 @@ export class RestQuizQuestionControllerService {
             path: {
                 'quizQuestion': quizQuestion,
             },
-            errors: {
-                500: `Internal Server Error`,
-            },
+            errors: useStandardErrorMapping(),
         });
     }
     /**
@@ -51,9 +57,7 @@ export class RestQuizQuestionControllerService {
             },
             body: requestBody,
             mediaType: 'application/json',
-            errors: {
-                500: `Internal Server Error`,
-            },
+            errors: useStandardErrorMapping(),
         });
     }
     /**
@@ -70,9 +74,7 @@ export class RestQuizQuestionControllerService {
             path: {
                 'quizQuestion': quizQuestion,
             },
-            errors: {
-                500: `Internal Server Error`,
-            },
+            errors: useStandardErrorMapping(),
         });
     }
     /**
@@ -89,9 +91,7 @@ export class RestQuizQuestionControllerService {
             path: {
                 'quizQuestion': quizQuestion,
             },
-            errors: {
-                500: `Internal Server Error`,
-            },
+            errors: useStandardErrorMapping(),
         });
     }
     /**
@@ -112,9 +112,7 @@ export class RestQuizQuestionControllerService {
             },
             body: requestBody,
             mediaType: 'application/json',
-            errors: {
-                500: `Internal Server Error`,
-            },
+            errors: useStandardErrorMapping(),
         });
     }
     /**
@@ -154,9 +152,7 @@ export class RestQuizQuestionControllerService {
             path: {
                 'note': note,
             },
-            errors: {
-                500: `Internal Server Error`,
-            },
+            errors: useStandardErrorMapping(),
         });
     }
     /**
@@ -177,9 +173,7 @@ export class RestQuizQuestionControllerService {
             },
             body: requestBody,
             mediaType: 'application/json',
-            errors: {
-                500: `Internal Server Error`,
-            },
+            errors: useStandardErrorMapping(),
         });
     }
     /**
@@ -196,9 +190,7 @@ export class RestQuizQuestionControllerService {
             query: {
                 'note': note,
             },
-            errors: {
-                500: `Internal Server Error`,
-            },
+            errors: useStandardErrorMapping(),
         });
     }
     /**
@@ -215,9 +207,16 @@ export class RestQuizQuestionControllerService {
             query: {
                 'note': note,
             },
-            errors: {
-                500: `Internal Server Error`,
-            },
+            errors: useStandardErrorMapping(),
         });
     }
+
+  async deleteQuestion(param: { questionId: number; noteId: any }) {
+    return this.httpRequest.request({
+      method: 'DELETE',
+      url: '/api/quiz-questions/{noteId}/note-questions/{questionId}',
+      errors: useStandardErrorMapping(),
+      path: { noteId: param.noteId, questionId: param.questionId },
+    })
+  }
 }

@@ -15,6 +15,7 @@
       <thead>
         <tr>
           <th>Approved</th>
+          <th>Actions</th>
           <th>Question Text</th>
           <th>A</th>
           <th>B</th>
@@ -34,6 +35,27 @@
               v-model="question.approved"
               @change="toggleApproval(question.id)"
             />
+          </td>
+          <td>
+            <PopButton
+              title="Delete"
+            >
+              <template #default="{ closer }">
+                <h4>Are you sure you want to delete "{{question.quizQuestion.multipleChoicesQuestion.stem}}"?</h4>
+                <button
+                  class="btn btn-danger"
+                  @click="
+                    closer();
+                    deleteQuestion(question.id)
+                  "
+                >
+                  Delete
+                </button>
+                <button class="btn btn-secondary" @click="closer">
+                  Cancel
+                </button>
+              </template>
+            </PopButton>
           </td>
           <td>{{ question.quizQuestion.multipleChoicesQuestion.stem }}</td>
           <template
@@ -70,6 +92,9 @@ const props = defineProps({
     required: true,
   },
 })
+
+
+
 const questions = ref<QuizQuestionAndAnswer[]>([])
 const fetchQuestions = async () => {
   questions.value =
@@ -77,6 +102,16 @@ const fetchQuestions = async () => {
       props.note.id,
     )
 }
+
+async function deleteQuestion(id: number) {
+  await managedApi.restQuizQuestionController.deleteQuestion({
+    noteId: props.note.id,
+    questionId: id,
+  })
+  // TODO: check notification mechanism
+  await fetchQuestions()
+}
+
 const questionAdded = (newQuestion: QuizQuestionAndAnswer) => {
   if (newQuestion == null) {
     return
