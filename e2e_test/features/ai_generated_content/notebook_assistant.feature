@@ -15,7 +15,7 @@ Feature: Notebook assistant
 
   Scenario: The users will use the notebook assistant if exist
     Given OpenAI creates an assistant of ID "assistant-id-1" for name "Assistant for notebook Vertical farming" with model "gpt-3.5-turbo"
-    And OpenAI responds with "success" when uploading file
+    And OpenAI accepts the vector file upload requests
     And I create an assistant for my notebook "Vertical farming"
     And OpenAI assistant "assistant-id-1" will reply below for user messages:
       | user message          | assistant reply                   | run id |

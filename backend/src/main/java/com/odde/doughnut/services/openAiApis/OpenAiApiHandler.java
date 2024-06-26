@@ -9,6 +9,7 @@ import com.odde.doughnut.controllers.dto.SrtDto;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.theokanning.openai.assistants.assistant.Assistant;
 import com.theokanning.openai.assistants.assistant.AssistantRequest;
+import com.theokanning.openai.assistants.assistant.VectorStoreFileRequest;
 import com.theokanning.openai.assistants.message.Message;
 import com.theokanning.openai.assistants.message.MessageRequest;
 import com.theokanning.openai.assistants.run.Run;
@@ -17,6 +18,7 @@ import com.theokanning.openai.assistants.run.SubmitToolOutputRequestItem;
 import com.theokanning.openai.assistants.run.SubmitToolOutputsRequest;
 import com.theokanning.openai.assistants.thread.Thread;
 import com.theokanning.openai.assistants.thread.ThreadRequest;
+import com.theokanning.openai.assistants.vector_store.VectorStoreRequest;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.*;
 import com.theokanning.openai.fine_tuning.FineTuningJob;
@@ -82,12 +84,11 @@ public class OpenAiApiHandler {
     return blockGet(openAiApi.listModels()).data;
   }
 
-  public String uploadTextFile(String subFileName, String content, String purpose)
+  public String uploadTextFile(String subFileName, String content, String purpose, String suffix)
       throws IOException {
-    File tempFile = File.createTempFile(subFileName, ".jsonl");
+    File tempFile = File.createTempFile(subFileName, suffix);
     try {
       Files.write(tempFile.toPath(), content.getBytes(), StandardOpenOption.WRITE);
-
       RequestBody fileRequestBody =
           RequestBody.create(tempFile, MediaType.parse("application/octet-stream"));
       MultipartBody.Part filePart =
@@ -212,5 +213,12 @@ public class OpenAiApiHandler {
     SrtDto srtDto = new SrtDto();
     srtDto.setSrt(string);
     return srtDto;
+  }
+
+  public String createVectorFile(String assistantName, String fileId) {
+    VectorStoreRequest store = VectorStoreRequest.builder().name(assistantName).build();
+    String storeId = blockGet(openAiApi.createVectorStore(store)).getId();
+    VectorStoreFileRequest request = VectorStoreFileRequest.builder().fileId(fileId).build();
+    return blockGet(openAiApi.createVectorStoreFile(storeId, request)).getId();
   }
 }

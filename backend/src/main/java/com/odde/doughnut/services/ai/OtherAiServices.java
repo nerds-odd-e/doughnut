@@ -35,7 +35,8 @@ public record OtherAiServices(OpenAiApiHandler openAiApiHandler) {
     FineTuningExamples fineTuningExamples = new FineTuningExamples(examples);
 
     String fileId =
-        openAiApiHandler.uploadTextFile(question, fineTuningExamples.toJsonL(), "fine-tune");
+        openAiApiHandler.uploadTextFile(
+            question, fineTuningExamples.toJsonL(), "fine-tune", ".jsonl");
     return openAiApiHandler.triggerFineTuning(fileId).getFineTunedModel();
   }
 

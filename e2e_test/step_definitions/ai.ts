@@ -98,3 +98,12 @@ Given(
   (notebook: string) => {
     start.routerToNotebooksPage().notebookAssistant(notebook).create()
   })
+
+Given(
+  "OpenAI accepts the vector file upload requests",
+  () => {
+    mock_services.openAi().stubOpenAiUploadResponse(true)
+    mock_services.openAi().stubOpenAiVectorFileUpload()
+  },
+)
+

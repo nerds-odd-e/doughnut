@@ -14,6 +14,8 @@ import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.assistants.assistant.Assistant;
 import com.theokanning.openai.assistants.assistant.AssistantRequest;
+import com.theokanning.openai.assistants.vector_store.VectorStore;
+import com.theokanning.openai.assistants.vector_store_file.VectorStoreFile;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.file.File;
 import io.reactivex.Single;
@@ -115,11 +117,21 @@ class RestAiControllerForAssistantTest {
       assistantToReturn.setName("Assistant created");
       when(openAiApi.createAssistant(ArgumentMatchers.any()))
           .thenReturn(Single.just(assistantToReturn));
+      VectorStore vectorStore = new VectorStore();
+      vectorStore.setId("new-vector-store-id");
+      when(openAiApi.createVectorStore(ArgumentMatchers.any()))
+          .thenReturn(Single.just(vectorStore));
+      VectorStoreFile vectorStoreFile = new VectorStoreFile();
+      vectorStoreFile.setId("new-vector-store-file-id");
+      when(openAiApi.createVectorStoreFile(eq("new-vector-store-id"), ArgumentMatchers.any()))
+          .thenReturn(Single.just(vectorStoreFile));
       when(openAiApi.uploadFile(any(RequestBody.class), any(MultipartBody.Part.class)))
           .then(
               (invocation) -> {
                 uploadedFileContent = getBuffer(invocation.getArgument(1));
-                return Single.just(new File());
+                File item = new File();
+                item.setId("new-file-id");
+                return Single.just(item);
               });
     }
 
@@ -156,6 +168,7 @@ class RestAiControllerForAssistantTest {
       ArgumentCaptor<AssistantRequest> captor = ArgumentCaptor.forClass(AssistantRequest.class);
       verify(openAiApi).createAssistant(captor.capture());
       assertThat(captor.getValue().getName()).startsWith("Assistant for notebook ");
+      assertThat(captor.getValue().getTools().getFirst().getType()).startsWith("file_search");
     }
 
     @Test

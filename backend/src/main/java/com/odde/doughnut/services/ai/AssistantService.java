@@ -5,8 +5,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
-import com.theokanning.openai.assistants.assistant.Assistant;
-import com.theokanning.openai.assistants.assistant.AssistantRequest;
+import com.theokanning.openai.assistants.assistant.*;
 import com.theokanning.openai.assistants.message.Message;
 import com.theokanning.openai.assistants.message.MessageRequest;
 import com.theokanning.openai.assistants.run.RequiredAction;
@@ -21,21 +20,33 @@ import java.util.List;
 public record AssistantService(
     OpenAiApiHandler openAiApiHandler, String assistantId, List<AiTool> tools) {
 
-  public Assistant createAssistant(String modelName, String assistantName) {
+  public Assistant createAssistant(String modelName, String assistantName, String fileId) {
+    List<Tool> toolList = new java.util.ArrayList<>(tools.stream().map(AiTool::getTool).toList());
+    ToolResources tooResources = new ToolResources();
+    if (fileId != null) {
+      toolList.add(new FileSearchTool());
+      FileSearchResources fileSearchResources = new FileSearchResources();
+      fileSearchResources.setVectorStoreIds(List.of(fileId));
+      tooResources.setFileSearch(fileSearchResources);
+    }
     AssistantRequest assistantRequest =
         AssistantRequest.builder()
             .model(modelName)
             .name(assistantName)
             .instructions(OpenAIChatRequestBuilder.systemInstruction)
-            .tools(tools.stream().map(AiTool::getTool).toList())
+            .tools(toolList)
+            .toolResources(tooResources)
             .build();
     return openAiApiHandler.createAssistant(assistantRequest);
   }
 
   public Assistant createAssistantWithFile(
       String modelName, String assistantName, String textContent) throws IOException {
-    openAiApiHandler.uploadTextFile(assistantName, textContent, "assistant");
-    return createAssistant(modelName, assistantName);
+    String fileId =
+        openAiApiHandler.uploadTextFile(assistantName + ".json", textContent, "assistant", ".json");
+
+    String vectorFile = openAiApiHandler.createVectorFile(assistantName, fileId);
+    return createAssistant(modelName, assistantName, vectorFile);
   }
 
   public AiAssistantResponse createThreadAndRunWithFirstMessage(Note note, String prompt) {

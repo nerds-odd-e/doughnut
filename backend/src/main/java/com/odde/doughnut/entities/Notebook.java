@@ -72,7 +72,9 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   public String getNotebookDump() {
     List<Note.NoteBrief> noteBriefs =
         notes.stream()
-            .sorted(Comparator.comparing(Note::getParentId).thenComparing(Note::getSiblingOrder))
+            .sorted(
+                Comparator.comparing(Note::getParentId, Comparator.nullsFirst(Integer::compare))
+                    .thenComparing(Note::getSiblingOrder, Comparator.nullsFirst(Long::compare)))
             .map(Note::getNoteBrief)
             .toList();
     ;

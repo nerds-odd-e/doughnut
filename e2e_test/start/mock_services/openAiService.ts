@@ -70,6 +70,16 @@ const openAiService = () => {
       }
     },
 
+    stubOpenAiVectorFileUpload() {
+      const vectorStoreId = "vector-store-abc123"
+      serviceMocker.stubPoster(`/vector_stores`, {
+        id: vectorStoreId,
+      })
+      serviceMocker.stubPoster(`/vector_stores/${vectorStoreId}/files`, {
+        id: "vector-file-1",
+      })
+    },
+
     async stubCreateAssistant(
       newId: string,
       nameOfAssistant: string,
