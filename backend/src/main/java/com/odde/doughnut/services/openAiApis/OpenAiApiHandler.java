@@ -219,6 +219,7 @@ public class OpenAiApiHandler {
     VectorStoreRequest store = VectorStoreRequest.builder().name(assistantName).build();
     String storeId = blockGet(openAiApi.createVectorStore(store)).getId();
     VectorStoreFileRequest request = VectorStoreFileRequest.builder().fileId(fileId).build();
-    return blockGet(openAiApi.createVectorStoreFile(storeId, request)).getId();
+    blockGet(openAiApi.createVectorStoreFile(storeId, request)).getId();
+    return storeId;
   }
 }

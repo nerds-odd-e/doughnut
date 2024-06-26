@@ -20,13 +20,13 @@ import java.util.List;
 public record AssistantService(
     OpenAiApiHandler openAiApiHandler, String assistantId, List<AiTool> tools) {
 
-  public Assistant createAssistant(String modelName, String assistantName, String fileId) {
+  public Assistant createAssistant(String modelName, String assistantName, String vectorStoreId) {
     List<Tool> toolList = new java.util.ArrayList<>(tools.stream().map(AiTool::getTool).toList());
     ToolResources tooResources = new ToolResources();
-    if (fileId != null) {
+    if (vectorStoreId != null) {
       toolList.add(new FileSearchTool());
       FileSearchResources fileSearchResources = new FileSearchResources();
-      fileSearchResources.setVectorStoreIds(List.of(fileId));
+      fileSearchResources.setVectorStoreIds(List.of(vectorStoreId));
       tooResources.setFileSearch(fileSearchResources);
     }
     AssistantRequest assistantRequest =
@@ -43,10 +43,11 @@ public record AssistantService(
   public Assistant createAssistantWithFile(
       String modelName, String assistantName, String textContent) throws IOException {
     String fileId =
-        openAiApiHandler.uploadTextFile(assistantName + ".json", textContent, "assistant", ".json");
+        openAiApiHandler.uploadTextFile(
+            assistantName + ".json", textContent, "assistants", ".json");
 
-    String vectorFile = openAiApiHandler.createVectorFile(assistantName, fileId);
-    return createAssistant(modelName, assistantName, vectorFile);
+    String vectorStoreId = openAiApiHandler.createVectorFile(assistantName, fileId);
+    return createAssistant(modelName, assistantName, vectorStoreId);
   }
 
   public AiAssistantResponse createThreadAndRunWithFirstMessage(Note note, String prompt) {
