@@ -121,9 +121,13 @@ const openAiService = () => {
       return openAiAssistantThreadMocker(serviceMocker, threadId, runIds)
     },
 
-    stubCreateRunStreams(threadId: string, _assistantId: string | undefined, runStreamData: RunStreamData[]) {
+    stubCreateRunStreams(threadId: string, assistantId: string | undefined, runStreamData: RunStreamData[]) {
+      const bodyToMatch = {}
+      if (assistantId) {
+        bodyToMatch["assistant_id"] = assistantId
+      }
       serviceMocker.mockPostMatchsAndNotMatches(`/threads/${threadId}/runs`,
-        {},
+        bodyToMatch,
         undefined,
         runStreamData.map(({runId, fullMessage}) =>
 `event: thread.message.created
