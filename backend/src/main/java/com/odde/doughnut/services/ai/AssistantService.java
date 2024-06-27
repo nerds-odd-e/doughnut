@@ -20,24 +20,13 @@ import java.util.List;
 public record AssistantService(
     OpenAiApiHandler openAiApiHandler, String assistantId, List<AiTool> tools) {
 
-  public Assistant createAssistant(
-      String modelName, String assistantName, String vectorStoreId, String additionalInstruction) {
-    List<Tool> toolList = new java.util.ArrayList<>(tools.stream().map(AiTool::getTool).toList());
-    ToolResources tooResources = new ToolResources();
-    if (vectorStoreId != null) {
-      toolList.add(new FileSearchTool());
-      FileSearchResources fileSearchResources = new FileSearchResources();
-      fileSearchResources.setVectorStoreIds(List.of(vectorStoreId));
-      tooResources.setFileSearch(fileSearchResources);
-    }
+  public Assistant createDefaultAssistant(String modelName, String assistantName) {
     AssistantRequest assistantRequest =
         AssistantRequest.builder()
             .model(modelName)
             .name(assistantName)
-            .instructions(
-                OpenAIChatRequestBuilder.systemInstruction + "\n\n" + additionalInstruction)
-            .tools(toolList)
-            .toolResources(tooResources)
+            .instructions(OpenAIChatRequestBuilder.systemInstruction)
+            .tools(tools.stream().map(AiTool::getTool).toList())
             .build();
     return openAiApiHandler.createAssistant(assistantRequest);
   }
@@ -45,12 +34,31 @@ public record AssistantService(
   public Assistant createAssistantWithFile(
       String modelName, String assistantName, String textContent, String additionalInstruction)
       throws IOException {
+    ToolResources tooResources = uploadToolResources(assistantName, textContent);
+    List<Tool> toolList = new java.util.ArrayList<>(tools.stream().map(AiTool::getTool).toList());
+    toolList.add(new FileSearchTool());
+    AssistantRequest assistantRequest =
+        AssistantRequest.builder()
+            .model(modelName)
+            .name(assistantName)
+            .toolResources(tooResources)
+            .instructions(
+                OpenAIChatRequestBuilder.systemInstruction + "\n\n" + additionalInstruction)
+            .tools(toolList)
+            .build();
+    return openAiApiHandler.createAssistant(assistantRequest);
+  }
+
+  private ToolResources uploadToolResources(String assistantName, String textContent)
+      throws IOException {
     String fileId =
         openAiApiHandler.uploadTextFile(
             assistantName + ".json", textContent, "assistants", ".json");
 
     String vectorStoreId = openAiApiHandler.createVectorFile(assistantName, fileId);
-    return createAssistant(modelName, assistantName, vectorStoreId, additionalInstruction);
+    FileSearchResources fileSearchResources = new FileSearchResources();
+    fileSearchResources.setVectorStoreIds(List.of(vectorStoreId));
+    return new ToolResources(null, fileSearchResources);
   }
 
   public AiAssistantResponse createThreadAndRunWithFirstMessage(Note note, String prompt) {

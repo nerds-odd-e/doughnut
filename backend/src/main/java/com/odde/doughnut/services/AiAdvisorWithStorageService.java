@@ -63,15 +63,14 @@ public record AiAdvisorWithStorageService(
 
   public Assistant createCompletionAssistant(Timestamp currentUTCTimestamp, String modelName) {
     AssistantService service = getContentCompletionService();
-    Assistant assistant =
-        service.createAssistant(modelName, "Note details completion", null, modelName);
+    Assistant assistant = service.createDefaultAssistant(modelName, "Note details completion");
     getCompletionAssistantSettingAccessor().setKeyValue(currentUTCTimestamp, assistant.getId());
     return assistant;
   }
 
   public Assistant createChatAssistant(Timestamp currentUTCTimestamp, String modelName) {
     AssistantService service = getDefaultChatService();
-    Assistant chatAssistant = service.createAssistant(modelName, "chat assistant", null, modelName);
+    Assistant chatAssistant = service.createDefaultAssistant(modelName, "chat assistant");
     getDefaultChatAssistantSettingAccessor()
         .setKeyValue(currentUTCTimestamp, chatAssistant.getId());
     return chatAssistant;
