@@ -135,11 +135,15 @@ public class RestAiController {
   @PostMapping("/recreate-notebook-assistant/{notebook}")
   @Transactional
   public NotebookAssistant recreateNotebookAssistant(
-      @PathVariable(value = "notebook") @Schema(type = "integer") Notebook notebook)
+      @PathVariable(value = "notebook") @Schema(type = "integer") Notebook notebook,
+      NotebookAssistantCreationParams notebookAssistantCreationParams)
       throws UnexpectedNoAccessRightException, IOException {
     currentUser.assertAdminAuthorization();
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     return aiAdvisorWithStorageService.recreateNotebookAssistant(
-        currentUTCTimestamp, currentUser.getEntity(), notebook);
+        currentUTCTimestamp,
+        currentUser.getEntity(),
+        notebook,
+        notebookAssistantCreationParams.getInstruction());
   }
 }

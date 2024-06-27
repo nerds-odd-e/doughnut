@@ -1504,6 +1504,11 @@ paths:
         required: true
         schema:
           type: integer
+      - name: notebookAssistantCreationParams
+        in: query
+        required: true
+        schema:
+          $ref: "#/components/schemas/NotebookAssistantCreationParams"
       responses:
         "500":
           description: Internal Server Error
@@ -3214,6 +3219,11 @@ components:
           type: string
       discriminator:
         propertyName: type
+    NotebookAssistantCreationParams:
+      type: object
+      properties:
+        instruction:
+          type: string
     NotebookAssistant:
       required:
       - assistantId

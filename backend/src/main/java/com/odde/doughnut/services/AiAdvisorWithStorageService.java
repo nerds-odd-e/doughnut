@@ -63,14 +63,15 @@ public record AiAdvisorWithStorageService(
 
   public Assistant createCompletionAssistant(Timestamp currentUTCTimestamp, String modelName) {
     AssistantService service = getContentCompletionService();
-    Assistant assistant = service.createAssistant(modelName, "Note details completion", null);
+    Assistant assistant =
+        service.createAssistant(modelName, "Note details completion", null, modelName);
     getCompletionAssistantSettingAccessor().setKeyValue(currentUTCTimestamp, assistant.getId());
     return assistant;
   }
 
   public Assistant createChatAssistant(Timestamp currentUTCTimestamp, String modelName) {
     AssistantService service = getDefaultChatService();
-    Assistant chatAssistant = service.createAssistant(modelName, "chat assistant", null);
+    Assistant chatAssistant = service.createAssistant(modelName, "chat assistant", null, modelName);
     getDefaultChatAssistantSettingAccessor()
         .setKeyValue(currentUTCTimestamp, chatAssistant.getId());
     return chatAssistant;
@@ -101,7 +102,8 @@ public record AiAdvisorWithStorageService(
   }
 
   public NotebookAssistant recreateNotebookAssistant(
-      Timestamp currentUTCTimestamp, User creator, Notebook notebook) throws IOException {
+      Timestamp currentUTCTimestamp, User creator, Notebook notebook, String additionalInstruction)
+      throws IOException {
     AssistantService service = getDefaultChatService();
     String modelName = getGlobalSettingsService().globalSettingOthers().getValue();
     String fileContent = notebook.getNotebookDump();
@@ -109,7 +111,8 @@ public record AiAdvisorWithStorageService(
         service.createAssistantWithFile(
             modelName,
             "Assistant for notebook %s".formatted(notebook.getHeadNote().getTopicConstructor()),
-            fileContent);
+            fileContent,
+            additionalInstruction);
     NotebookAssistant notebookAssistant = new NotebookAssistant();
     notebookAssistant.setNotebook(notebook);
     notebookAssistant.setCreator(creator);

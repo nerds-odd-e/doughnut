@@ -16,7 +16,9 @@ const props = defineProps({
 const emit = defineEmits(["close"])
 
 const createAssistantForNotebook = async () => {
-  await managedApi.restAiController.recreateNotebookAssistant(props.notebook.id)
+  await managedApi.restAiController.recreateNotebookAssistant(props.notebook.id, {
+    instruction: "",
+  })
   emit("close")
 }
 </script>

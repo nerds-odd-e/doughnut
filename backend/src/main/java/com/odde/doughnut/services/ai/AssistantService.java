@@ -20,7 +20,8 @@ import java.util.List;
 public record AssistantService(
     OpenAiApiHandler openAiApiHandler, String assistantId, List<AiTool> tools) {
 
-  public Assistant createAssistant(String modelName, String assistantName, String vectorStoreId) {
+  public Assistant createAssistant(
+      String modelName, String assistantName, String vectorStoreId, String additionalInstruction) {
     List<Tool> toolList = new java.util.ArrayList<>(tools.stream().map(AiTool::getTool).toList());
     ToolResources tooResources = new ToolResources();
     if (vectorStoreId != null) {
@@ -33,7 +34,8 @@ public record AssistantService(
         AssistantRequest.builder()
             .model(modelName)
             .name(assistantName)
-            .instructions(OpenAIChatRequestBuilder.systemInstruction)
+            .instructions(
+                OpenAIChatRequestBuilder.systemInstruction + "\n\n" + additionalInstruction)
             .tools(toolList)
             .toolResources(tooResources)
             .build();
@@ -41,13 +43,14 @@ public record AssistantService(
   }
 
   public Assistant createAssistantWithFile(
-      String modelName, String assistantName, String textContent) throws IOException {
+      String modelName, String assistantName, String textContent, String additionalInstruction)
+      throws IOException {
     String fileId =
         openAiApiHandler.uploadTextFile(
             assistantName + ".json", textContent, "assistants", ".json");
 
     String vectorStoreId = openAiApiHandler.createVectorFile(assistantName, fileId);
-    return createAssistant(modelName, assistantName, vectorStoreId);
+    return createAssistant(modelName, assistantName, vectorStoreId, additionalInstruction);
   }
 
   public AiAssistantResponse createThreadAndRunWithFirstMessage(Note note, String prompt) {

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
+import com.odde.doughnut.controllers.dto.NotebookAssistantCreationParams;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.NotebookAssistant;
@@ -108,6 +109,8 @@ class RestAiControllerForAssistantTest {
   class createNotebookAssistant {
     Notebook notebook;
     String uploadedFileContent = "";
+    NotebookAssistantCreationParams notebookAssistantCreationParams =
+        new NotebookAssistantCreationParams();
 
     @BeforeEach
     public void setup() {
@@ -145,12 +148,13 @@ class RestAiControllerForAssistantTest {
               testabilitySettings);
       assertThrows(
           UnexpectedNoAccessRightException.class,
-          () -> controller.recreateNotebookAssistant(notebook));
+          () -> controller.recreateNotebookAssistant(notebook, notebookAssistantCreationParams));
     }
 
     @Test
     void createNotebookAssistant() throws UnexpectedNoAccessRightException, IOException {
-      NotebookAssistant notebookAssistant = controller.recreateNotebookAssistant(notebook);
+      NotebookAssistant notebookAssistant =
+          controller.recreateNotebookAssistant(notebook, notebookAssistantCreationParams);
       assertThat(notebookAssistant.getCreatedAt()).isNotNull();
       assertThat(notebookAssistant.getCreator()).isEqualTo(currentUser.getEntity());
       assertThat(notebookAssistant.getId()).isNotNull();
@@ -158,13 +162,14 @@ class RestAiControllerForAssistantTest {
 
     @Test
     void useTheCreatedAssistantId() throws UnexpectedNoAccessRightException, IOException {
-      NotebookAssistant notebookAssistant = controller.recreateNotebookAssistant(notebook);
+      NotebookAssistant notebookAssistant =
+          controller.recreateNotebookAssistant(notebook, notebookAssistantCreationParams);
       assertThat(notebookAssistant.getAssistantId()).isEqualTo("created-assistant-id");
     }
 
     @Test
     void passTheRightParameters() throws UnexpectedNoAccessRightException, IOException {
-      controller.recreateNotebookAssistant(notebook);
+      controller.recreateNotebookAssistant(notebook, notebookAssistantCreationParams);
       ArgumentCaptor<AssistantRequest> captor = ArgumentCaptor.forClass(AssistantRequest.class);
       verify(openAiApi).createAssistant(captor.capture());
       assertThat(captor.getValue().getName()).startsWith("Assistant for notebook ");
@@ -175,9 +180,18 @@ class RestAiControllerForAssistantTest {
     }
 
     @Test
+    void useTheCustomInstruction() throws UnexpectedNoAccessRightException, IOException {
+      notebookAssistantCreationParams.setInstruction("custom instruction");
+      controller.recreateNotebookAssistant(notebook, notebookAssistantCreationParams);
+      ArgumentCaptor<AssistantRequest> captor = ArgumentCaptor.forClass(AssistantRequest.class);
+      verify(openAiApi).createAssistant(captor.capture());
+      assertThat(captor.getValue().getInstructions()).contains("custom instruction");
+    }
+
+    @Test
     void uploadAllNotes() throws UnexpectedNoAccessRightException, IOException {
       Note child = makeMe.aNote().under(notebook.getHeadNote()).please();
-      controller.recreateNotebookAssistant(notebook);
+      controller.recreateNotebookAssistant(notebook, notebookAssistantCreationParams);
       assertThat(uploadedFileContent).contains(notebook.getHeadNote().getTopicConstructor());
       assertThat(uploadedFileContent).contains(child.getTopicConstructor());
     }
