@@ -8,6 +8,7 @@ import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
 import { VueRouterAutoImports } from 'unplugin-vue-router';
 import VueRouter from 'unplugin-vue-router/vite';
 import viteCompression from 'vite-plugin-compression';
+import tsconfigPaths from 'vite-tsconfig-paths'
 
 import farmJsPluginSass from '@farmfe/js-plugin-sass';
 
@@ -16,6 +17,7 @@ export default defineConfig({
     farmJsPluginSass(),
   ],
   vitePlugins: [
+    tsconfigPaths(),
     vue({
       template: {
         compilerOptions: {
