@@ -44,6 +44,8 @@
                 <h4>Are you sure you want to delete "{{question.quizQuestion.multipleChoicesQuestion.stem}}"?</h4>
                 <button
                   class="btn btn-danger"
+                  role="button"
+                  data-test="confirm-delete-button"
                   @click="
                     closer();
                     deleteQuestion(question.id)
@@ -93,8 +95,6 @@ const props = defineProps({
   },
 })
 
-
-
 const questions = ref<QuizQuestionAndAnswer[]>([])
 const fetchQuestions = async () => {
   questions.value =
@@ -108,7 +108,7 @@ async function deleteQuestion(id: number) {
     noteId: props.note.id,
     questionId: id,
   })
-  // TODO: check notification mechanism
+
   await fetchQuestions()
 }
 

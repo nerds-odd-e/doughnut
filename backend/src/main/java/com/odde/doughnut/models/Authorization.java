@@ -21,6 +21,8 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
       assertAuthorizationSubscription((Subscription) object);
     } else if (object instanceof User) {
       assertAuthorizationUser((User) object);
+    } else if (object instanceof QuizQuestionAndAnswer) {
+      assertAuthorizationNote(((QuizQuestionAndAnswer) object).getNote());
     } else {
       throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unknown object type");
     }

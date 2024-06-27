@@ -30,6 +30,10 @@ public class QuizQuestionService {
     return questionAndAnswer;
   }
 
+  public void deleteQuestion(QuizQuestionAndAnswer quizQuestion) {
+    modelFactoryService.remove(quizQuestion);
+  }
+
   public QuizQuestionAndAnswer refineQuestion(Note note, QuizQuestionAndAnswer questionAndAnswer) {
     MCQWithAnswer aiGeneratedRefineQuestion =
         aiQuestionGenerator.getAiGeneratedRefineQuestion(
