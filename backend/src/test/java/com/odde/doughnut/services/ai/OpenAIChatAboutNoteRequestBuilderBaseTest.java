@@ -24,6 +24,7 @@ class OpenAIChatAboutNoteRequestBuilderBaseTest {
   void messageShouldContainDetails() {
     Note note = makeMe.aNote().details("description").inMemoryPlease();
     String content = getNoteOfFocusDescription(note);
+    assertThat(content, containsString("uri"));
     assertThat(content, containsString(DETAILS));
     assertThat(content, containsString(note.getDetails()));
     assertThat(content, containsString("createdAt"));

@@ -324,6 +324,7 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
   }
 
   public static class NoteBrief {
+    public String uri;
     public String contextPath;
     public String topic;
     public String details;
@@ -343,6 +344,7 @@ The note of current focus (in JSON format):
   @JsonIgnore
   public NoteBrief getNoteBrief() {
     NoteBrief noteBrief = new NoteBrief();
+    noteBrief.uri = "https://doughnut.odde.com/n" + getId();
     noteBrief.contextPath = getContextPathString();
     noteBrief.topic = getTopicConstructor();
     noteBrief.details = getDetails();
