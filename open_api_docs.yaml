@@ -1504,11 +1504,12 @@ paths:
         required: true
         schema:
           type: integer
-      - name: notebookAssistantCreationParams
-        in: query
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NotebookAssistantCreationParams"
         required: true
-        schema:
-          $ref: "#/components/schemas/NotebookAssistantCreationParams"
       responses:
         "500":
           description: Internal Server Error

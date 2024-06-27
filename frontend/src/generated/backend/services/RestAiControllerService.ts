@@ -41,13 +41,13 @@ export class RestAiControllerService {
     }
     /**
      * @param notebook
-     * @param notebookAssistantCreationParams
+     * @param requestBody
      * @returns NotebookAssistant OK
      * @throws ApiError
      */
     public recreateNotebookAssistant(
         notebook: number,
-        notebookAssistantCreationParams: NotebookAssistantCreationParams,
+        requestBody: NotebookAssistantCreationParams,
     ): CancelablePromise<NotebookAssistant> {
         return this.httpRequest.request({
             method: 'POST',
@@ -55,9 +55,8 @@ export class RestAiControllerService {
             path: {
                 'notebook': notebook,
             },
-            query: {
-                'notebookAssistantCreationParams': notebookAssistantCreationParams,
-            },
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
                 500: `Internal Server Error`,
             },

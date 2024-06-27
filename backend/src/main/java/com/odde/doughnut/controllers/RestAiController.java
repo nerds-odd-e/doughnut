@@ -140,7 +140,7 @@ public class RestAiController {
   @Transactional
   public NotebookAssistant recreateNotebookAssistant(
       @PathVariable(value = "notebook") @Schema(type = "integer") Notebook notebook,
-      NotebookAssistantCreationParams notebookAssistantCreationParams)
+      @RequestBody NotebookAssistantCreationParams notebookAssistantCreationParams)
       throws UnexpectedNoAccessRightException, IOException {
     currentUser.assertAdminAuthorization();
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();

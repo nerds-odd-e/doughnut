@@ -143,6 +143,15 @@ Given(
   },
 )
 
+Given(
+  "OpenAI creates an assistant of ID {string} for name {string} with additional instruction {string}",
+  (newId: string, nameOfAssistant: string, additionalInstruction: string) => {
+    mock_services
+      .openAi()
+      .stubCreateAssistant(newId, nameOfAssistant, "gpt-3.5-turbo", additionalInstruction)
+  },
+)
+
 When(
   "I recreate all the assitants and the new assistant ID should be {string} for {string}",
   (newId: string, nameOfAssistant: string) => {

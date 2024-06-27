@@ -8,6 +8,11 @@ import pathspec
 # Initialize OpenAI client
 client = OpenAI(api_key=os.getenv("OPENAI_API_TOKEN"))
 
+def split_into_chunks(lst, chunk_size):
+    """Yield successive chunk_size chunks from lst."""
+    for i in range(0, len(lst), chunk_size):
+        yield lst[i:i + chunk_size]
+
 def upload_file(filepath, purpose='assistants'):
     with open(filepath, 'rb') as file:
         response = client.files.create(file=file, purpose=purpose)
@@ -45,7 +50,7 @@ def find_source_files(root_dir, gitignore_path):
 
             # Check file size, skip if larger than 500KB
             file_size = os.path.getsize(file_path)
-            if file_size > 500 * 1024:  # 500KB
+            if file_size > 300 * 1024:  # 500KB
                 print(f'File too large, skipping: {file_path}')
                 continue
 
@@ -63,27 +68,32 @@ def main(assistant_id, project_dir, gitignore):
           filepath: filepath,
           'content': open(filepath, 'r').read(),
         }]
-        # print(f'success file: {filepath}')
+        print(f'success file: {filepath}')
       except Exception as e:
         print(f'Binary file: {filepath}')
 
-    # Create a temporary file and write the json of files to it
-    with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix="_all_source_code.json") as temp_file:
-        json.dump(files, temp_file)
-        temp_file_path = temp_file.name
+    print(f'Found {len(files)} source files')
 
-    print(f'Temporary file created at: {temp_file_path}')
+    for chunk in split_into_chunks(files, 1000):
+      # Create a temporary file and write the json of files to it
+      with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix="_all_source_code.json") as temp_file:
+          json.dump(chunk, temp_file)
+          temp_file_path = temp_file.name
 
-    file_id = upload_file(temp_file_path)
+      print(f'Temporary file created at: {temp_file_path}')
 
-    print('Attaching files to the assistant...')
-    updated_assistant = attach_files_to_assistant(assistant_id, file_id)
-    print('Files successfully attached to the assistant:', updated_assistant.id)
+      file_id = upload_file(temp_file_path)
+
+      print('Attaching files to the assistant...')
+      updated_assistant = attach_files_to_assistant(assistant_id, file_id)
+      print('Files successfully attached to the assistant:', updated_assistant.id)
 
 # Set your assistant ID and project directory
-assistant_id = 'asst_4wvS7l1MYpjtjV72Ip9l37cs'
-project_dir = '../'
-gitignore = '../.gitignore'
+# assistant_id = 'asst_4wvS7l1MYpjtjV72Ip9l37cs'
+assistant_id = 'asst_H4YJwXqLyOh6yNXim2L0lMHy'
+
+project_dir = '../../less_site'
+gitignore = '../../less_site/.gitignore'
 
 if __name__ == "__main__":
     main(assistant_id, project_dir, gitignore)
