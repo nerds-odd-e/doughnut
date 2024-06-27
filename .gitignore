@@ -93,7 +93,9 @@ backend/src/main/resources/static/odd-e.ico
 backend/src/main/resources/static/index.html
 backend/src/main/resources/static/partial.html
 backend/src/main/resources/static/assets/
-backend/out/**
+backend/src/main/resources/static/*.css
+backend/src/main/resources/static/*.js
+backend/src/main/resources/static/*.map
 
 # Symbolication related
 frontend/app.*.symbols
