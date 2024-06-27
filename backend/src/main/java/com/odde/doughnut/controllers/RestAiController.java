@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
@@ -95,6 +96,9 @@ public class RestAiController {
             SseEmitter.SseEventBuilder builder =
                 SseEmitter.event().name(sse.getEvent().eventName).data(sse.getData());
             emitter.send(builder);
+            if (Objects.equals(sse.getEvent().eventName, "done")) {
+              emitter.complete();
+            }
           } catch (Exception e) {
             emitter.completeWithError(e);
           }

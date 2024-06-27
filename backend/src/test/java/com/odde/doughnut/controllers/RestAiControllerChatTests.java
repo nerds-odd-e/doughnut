@@ -85,9 +85,10 @@ public class RestAiControllerChatTests {
     @Test
     void chatWithAIAndGetResponse() throws UnexpectedNoAccessRightException {
       SseEmitter res = controller.chat(note, new ChatRequest("What's your name?", null));
+      assertThat(res.getTimeout()).isNull();
       List<ResponseBodyEmitter.DataWithMediaType> events =
           peekIntoEmitterWithExtremelyInappropriateIntimacy(res);
-      assertThat(events.size()).isEqualTo(15);
+      assertThat(events.size()).isEqualTo(18);
     }
 
     @Test

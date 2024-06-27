@@ -50,7 +50,9 @@ public final class OpenAIAssistantRunStreamMocker {
         Stream.concat(
                 messageDeltas.stream()
                     .map(delta -> toSSEString(StreamEvent.THREAD_MESSAGE_DELTA.eventName, delta)),
-                Stream.of(toSSEString(StreamEvent.THREAD_RUN_STEP_COMPLETED.eventName, runStep)))
+                Stream.of(
+                    toSSEString(StreamEvent.THREAD_RUN_STEP_COMPLETED.eventName, runStep),
+                    toSSEString("done", "DONE")))
             .collect(Collectors.joining());
     ResponseBody responseBody =
         ResponseBody.create(assistantSSEString, MediaType.parse("text/event-stream"));
