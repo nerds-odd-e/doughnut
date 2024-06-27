@@ -4,11 +4,7 @@
     "module": "ESNext",
     "resolveJsonModule": true,
     "baseUrl": ".",
-    "lib": [
-      "es2022",
-      "dom",
-      "dom.iterable"
-    ],
+    "lib": ["es2022", "dom", "dom.iterable"],
     "types": [
       "vite/client",
       "vitest/globals",
@@ -16,11 +12,8 @@
       "node"
     ],
     "paths": {
-      "@/*": [
-        "src/*"
-      ]
+      "@/*": ["src/*"]
     },
-    /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "noEmit": true,

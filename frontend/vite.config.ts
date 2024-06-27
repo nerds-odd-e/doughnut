@@ -56,8 +56,9 @@ export default defineConfig({
       resolvers: [ElementPlusResolver({ importStyle: 'sass' })],
       imports: [
         'vue',
+        'vue-router',
         'vitest',
-	VueRouterAutoImports
+        VueRouterAutoImports
       ],
       dts: true, // generate TypeScript declaration
     }),
@@ -76,7 +77,7 @@ export default defineConfig({
   },
   base: "/",
   build: {
-    outDir: "../backend/src/main/resources/static",
+    outDir: "../backend/src/main/resources/static/",
     chunkSizeWarningLimit: 1000,
     sourcemap: true,
     rollupOptions: {

@@ -48,6 +48,7 @@ module.exports = {
     "tsconfig.json",
     ".eslintrc.cjs",
     "vite.config.ts",
+    "farm.config.ts",
     "tests/setupVitest.js",
   ],
   settings: {
