@@ -181,7 +181,7 @@ class RestAiControllerForAssistantTest {
 
     @Test
     void useTheCustomInstruction() throws UnexpectedNoAccessRightException, IOException {
-      notebookAssistantCreationParams.setInstruction("custom instruction");
+      notebookAssistantCreationParams.setAdditionalInstruction("custom instruction");
       controller.recreateNotebookAssistant(notebook, notebookAssistantCreationParams);
       ArgumentCaptor<AssistantRequest> captor = ArgumentCaptor.forClass(AssistantRequest.class);
       verify(openAiApi).createAssistant(captor.capture());

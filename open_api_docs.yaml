@@ -3222,7 +3222,7 @@ components:
     NotebookAssistantCreationParams:
       type: object
       properties:
-        instruction:
+        additionalInstruction:
           type: string
     NotebookAssistant:
       required:

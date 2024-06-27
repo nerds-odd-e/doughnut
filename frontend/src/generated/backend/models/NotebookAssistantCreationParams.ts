@@ -3,6 +3,6 @@
 /* tslint:disable */
 /* eslint-disable */
 export type NotebookAssistantCreationParams = {
-    instruction?: string;
+    additionalInstruction?: string;
 };
 

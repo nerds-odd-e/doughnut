@@ -144,6 +144,6 @@ public class RestAiController {
         currentUTCTimestamp,
         currentUser.getEntity(),
         notebook,
-        notebookAssistantCreationParams.getInstruction());
+        notebookAssistantCreationParams.getAdditionalInstruction());
   }
 }

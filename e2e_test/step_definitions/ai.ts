@@ -94,9 +94,9 @@ Given(
 )
 
 Given(
-  "I create an assistant for my notebook {string}",
-  (notebook: string) => {
-    start.routerToNotebooksPage().notebookAssistant(notebook).create()
+  "I create an assistant for my notebook {string} with additional instruction {string}",
+  (notebook: string, instruction: string) => {
+    start.routerToNotebooksPage().notebookAssistant(notebook).create(instruction)
   })
 
 Given(
