@@ -46,7 +46,7 @@ const noteAndLinkRoutes = [
     name: "circleShow",
     component: CircleShowPage,
     props: true,
-    meta: { useNoteStorageAccessor: true },
+    meta: { useNoteStorageAccessor: true, userProp: true },
   },
 ]
 

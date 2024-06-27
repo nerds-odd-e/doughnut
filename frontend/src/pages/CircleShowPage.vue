@@ -12,7 +12,7 @@
       <main>
         <NotebookCardsWithButtons :notebooks="circle.notebooks.notebooks">
           <template #default="{ notebook }">
-            <NotebookButtons v-bind="{ notebook }" class="card-header-btn">
+            <NotebookButtons v-bind="{ notebook, user }" class="card-header-btn">
               <template #additional-buttons>
                 <BazaarNotebookButtons :notebook="notebook" :logged-in="true" />
               </template>
@@ -47,7 +47,7 @@ import NotebookButtons from "@/components/notebook/NotebookButtons.vue"
 import NotebookCardsWithButtons from "@/components/notebook/NotebookCardsWithButtons.vue"
 import NotebookNewButton from "@/components/notebook/NotebookNewButton.vue"
 import SvgMissingAvatar from "@/components/svgs/SvgMissingAvatar.vue"
-import { CircleForUserView } from "@/generated/backend"
+import { CircleForUserView, User } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { StorageAccessor } from "@/store/createNoteStorage"
 import { PropType, defineComponent } from "vue"
@@ -67,6 +67,7 @@ export default defineComponent({
   },
   props: {
     circleId: { type: Number, required: true },
+    user: { type: Object as PropType<User> },
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
       required: true,
