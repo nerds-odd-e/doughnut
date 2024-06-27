@@ -48,7 +48,7 @@ defineExpose({
 })
 
 const handleKeydown = (event: KeyboardEvent) => {
-  if (props.enterSubmit && event.key === 'Enter' && !event.shiftKey) {
+  if (props.enterSubmit && event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
     event.preventDefault() // Prevent newline insertion
     emit('enterPressed')
   }

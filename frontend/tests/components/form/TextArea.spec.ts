@@ -70,4 +70,18 @@ describe("TextArea.vue", () => {
 
     expect(wrapper.emitted()).toHaveProperty('enterPressed')
   })
+
+  it('does not emit "enterPressed" when Enter is pressed during IME composition', async () => {
+    const wrapper = mount(TextArea, {
+      props: {
+        enterSubmit: true,
+      },
+    })
+
+    const textarea = wrapper.find("textarea")
+    // Simulate the IME composition state by setting isComposing to true
+    await textarea.trigger('keydown', { key: 'Enter', isComposing: true })
+
+    expect(wrapper.emitted()).not.toHaveProperty('enterPressed')
+  })
 })
