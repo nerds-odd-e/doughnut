@@ -1,0 +1,4 @@
+doughnut.odd-e.com {
+    reverse_proxy localhost:80
+    reverse_proxy localhost:443
+}
