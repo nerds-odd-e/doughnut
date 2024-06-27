@@ -196,6 +196,19 @@ class RestAiControllerForAssistantTest {
       assertThat(uploadedFileContent).contains(child.getTopicConstructor());
     }
 
+    @Test
+    void shouldNotCreateNewRecordIfExist() throws UnexpectedNoAccessRightException, IOException {
+      NotebookAssistant notebookAssistant = new NotebookAssistant();
+      notebookAssistant.setAssistantId("previous-assistant-id");
+      notebookAssistant.setCreatedAt(makeMe.aTimestamp().please());
+      notebookAssistant.setCreator(currentUser.getEntity());
+      notebookAssistant.setNotebook(notebook);
+      makeMe.modelFactoryService.save(notebookAssistant);
+      controller.recreateNotebookAssistant(notebook, notebookAssistantCreationParams);
+      makeMe.refresh(notebookAssistant);
+      assertThat(notebookAssistant.getAssistantId()).isEqualTo("created-assistant-id");
+    }
+
     private static String getBuffer(MultipartBody.Part part) {
       RequestBody requestBody = part.body();
       Buffer buffer = new Buffer();

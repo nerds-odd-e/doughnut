@@ -112,8 +112,17 @@ public record AiAdvisorWithStorageService(
             "Assistant for notebook %s".formatted(notebook.getHeadNote().getTopicConstructor()),
             fileContent,
             additionalInstruction);
-    NotebookAssistant notebookAssistant = new NotebookAssistant();
-    notebookAssistant.setNotebook(notebook);
+    return updateNotebookAssistant(currentUTCTimestamp, creator, notebook, chatAssistant);
+  }
+
+  private NotebookAssistant updateNotebookAssistant(
+      Timestamp currentUTCTimestamp, User creator, Notebook notebook, Assistant chatAssistant) {
+    NotebookAssistant notebookAssistant =
+        this.modelFactoryService.notebookAssistantRepository.findByNotebook(notebook);
+    if (notebookAssistant == null) {
+      notebookAssistant = new NotebookAssistant();
+      notebookAssistant.setNotebook(notebook);
+    }
     notebookAssistant.setCreator(creator);
     notebookAssistant.setCreatedAt(currentUTCTimestamp);
     notebookAssistant.setAssistantId(chatAssistant.getId());
