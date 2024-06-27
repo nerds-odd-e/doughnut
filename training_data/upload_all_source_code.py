@@ -15,18 +15,23 @@ def upload_file(filepath, purpose='assistants'):
     return response.id
 
 def attach_files_to_assistant(assistant_id, file_ids):
-    # Add files to the assistant
-    assistant = client.beta.assistants.update(
+    # This method can only be done through creating a new assistant with file_ids
+    assistant = client.beta.assistants.retrieve(assistant_id=assistant_id)
+    updated_assistant = client.beta.assistants.update(
         assistant_id=assistant_id,
-        file_ids=file_ids
+        tool_resources={
+          "code_interpreter": {
+            "file_ids": assistant.tool_resources.code_interpreter.file_ids + file_ids
+          }
+        }
     )
-    return assistant
+    return updated_assistant
 
 def find_source_files(root_dir):
     source_files = []
     for root, _, files in os.walk(root_dir):
         for file in files:
-            if file.endswith(('.java', '.ts', '.vue')):
+            if file.endswith(('.java', '.ts', '.vue', '.py', '.md', '.txt', '.sql')):
                 source_files.append(os.path.join(root, file))
     return source_files
 
@@ -44,9 +49,10 @@ def main(assistant_id, project_dir):
     updated_assistant = attach_files_to_assistant(assistant_id, file_ids)
     print('Files successfully attached to the assistant:', updated_assistant.id)
 
+
 # Set your assistant ID and project directory
-assistant_id = 'your_assistant_id_here'
-project_dir = 'path_to_your_project_directory'
+assistant_id = 'asst_4wvS7l1MYpjtjV72Ip9l37cs'
+project_dir = '.'
 
 if __name__ == "__main__":
     main(assistant_id, project_dir)
