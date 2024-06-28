@@ -60,6 +60,7 @@ export type { NotebookAssistant } from './models/NotebookAssistant';
 export type { NotebookAssistantCreationParams } from './models/NotebookAssistantCreationParams';
 export type { NotebookSettings } from './models/NotebookSettings';
 export type { NotebooksViewedByUser } from './models/NotebooksViewedByUser';
+export type { NoteBrief } from './models/NoteBrief';
 export { NoteCreationDTO } from './models/NoteCreationDTO';
 export type { NoteCreationRresult } from './models/NoteCreationRresult';
 export type { NoteInfo } from './models/NoteInfo';

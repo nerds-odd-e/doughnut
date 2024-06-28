@@ -16,6 +16,7 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -83,5 +84,13 @@ class RestNotebookController {
     BazaarModel bazaar = modelFactoryService.toBazaarModel();
     bazaar.shareNotebook(notebook);
     return notebook;
+  }
+
+  @GetMapping("/{notebook}/dump")
+  public List<Note.NoteBrief> downloadNotebookDump(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertAuthorization(notebook);
+    return notebook.getNoteBriefs();
   }
 }

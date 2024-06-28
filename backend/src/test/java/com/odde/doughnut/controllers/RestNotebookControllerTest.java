@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -91,6 +92,35 @@ class RestNotebookControllerTest {
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.update(note.getNotebook(), new NotebookSettings()));
+    }
+  }
+
+  @Nested
+  class DownloadNotebookDump {
+    private Notebook notebook;
+
+    @BeforeEach
+    void setup() {
+      notebook = makeMe.aNote().creatorAndOwner(userModel).please().getNotebook();
+      makeMe.refresh(notebook);
+    }
+
+    @Test
+    void whenNotAuthorized() {
+      User anotherUser = makeMe.aUser().please();
+      controller =
+          new RestNotebookController(
+              modelFactoryService,
+              modelFactoryService.toUserModel(anotherUser),
+              testabilitySettings);
+      assertThrows(
+          UnexpectedNoAccessRightException.class, () -> controller.downloadNotebookDump(notebook));
+    }
+
+    @Test
+    void whenAuthorized() throws UnexpectedNoAccessRightException {
+      List<Note.NoteBrief> noteBriefs = controller.downloadNotebookDump(notebook);
+      assertThat(noteBriefs, hasSize(1));
     }
   }
 }

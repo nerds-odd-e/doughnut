@@ -2232,6 +2232,32 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NotebooksViewedByUser"
+  /api/notebooks/{notebook}/dump:
+    get:
+      tags:
+      - rest-notebook-controller
+      operationId: downloadNotebookDump
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NoteBrief"
   /api/healthcheck:
     get:
       tags:
@@ -3445,6 +3471,21 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Subscription"
+    NoteBrief:
+      type: object
+      properties:
+        uri:
+          type: string
+        contextPath:
+          type: string
+        topic:
+          type: string
+        details:
+          type: string
+        createdAt:
+          type: string
+        target:
+          type: string
     FailureReport:
       required:
       - createDatetime

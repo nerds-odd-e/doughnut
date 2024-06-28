@@ -70,6 +70,12 @@ public class Notebook extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public String getNotebookDump() {
+    List<Note.NoteBrief> noteBriefs = getNoteBriefs();
+    return defaultObjectMapper().valueToTree(noteBriefs).toPrettyString();
+  }
+
+  @JsonIgnore
+  public List<Note.NoteBrief> getNoteBriefs() {
     List<Note.NoteBrief> noteBriefs =
         notes.stream()
             .sorted(
@@ -78,6 +84,6 @@ public class Notebook extends EntityIdentifiedByIdOnly {
             .map(Note::getNoteBrief)
             .toList();
     ;
-    return defaultObjectMapper().valueToTree(noteBriefs).toPrettyString();
+    return noteBriefs;
   }
 }

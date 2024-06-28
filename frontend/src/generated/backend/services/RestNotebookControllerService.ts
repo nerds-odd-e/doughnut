@@ -5,6 +5,7 @@
 import type { Notebook } from '../models/Notebook';
 import type { NotebookSettings } from '../models/NotebookSettings';
 import type { NotebooksViewedByUser } from '../models/NotebooksViewedByUser';
+import type { NoteBrief } from '../models/NoteBrief';
 import type { NoteCreationDTO } from '../models/NoteCreationDTO';
 import type { RedirectToNoteResponse } from '../models/RedirectToNoteResponse';
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -79,6 +80,25 @@ export class RestNotebookControllerService {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/notebooks',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param notebook
+     * @returns NoteBrief OK
+     * @throws ApiError
+     */
+    public downloadNotebookDump(
+        notebook: number,
+    ): CancelablePromise<Array<NoteBrief>> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/notebooks/{notebook}/dump',
+            path: {
+                'notebook': notebook,
+            },
             errors: {
                 500: `Internal Server Error`,
             },
