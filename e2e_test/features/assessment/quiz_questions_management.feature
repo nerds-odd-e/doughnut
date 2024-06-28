@@ -15,7 +15,7 @@ Feature: Quiz Question Management
       | What do you call a cow with not leg? | Ground beef | Cowboy   | Oxford   | 0                    |
     Then I should see the questions in the question list of the note "The cow joke":
       | Question                             | Correct Choice |
-      | What does a cow say?                 | moo            |
+      | What does a cow say too many times moo?                 | she is hungry           |
       | What do you call a cow with not leg? | Ground beef    |
 
   @usingMockedOpenAiService
