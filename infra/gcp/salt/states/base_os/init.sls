@@ -7,29 +7,36 @@
     - source: salt://base_os/templates/doughnut_env.sh
     - mode: 755
 
-/etc/apt/sources.list.d/mysql.list:
-  file.managed:
-    - source: salt://base_os/templates/mysql.list
-    - require_in:
-        - pkg: doughnut-app-deps
-
-mysql-deb-apt-repo:
+mysql-repo:
   pkgrepo.managed:
     - humanname: MySQL
-    - name: deb http://repo.mysql.com/apt/debian/ Bookworm mysql-8.0
-    - dist: bookworm
+    - name: deb [signed-by=/usr/share/keyrings/mysql-archive-keyring.gpg] http://repo.mysql.com/apt/debian bookworm mysql-8.0
     - file: /etc/apt/sources.list.d/mysql.list
-    - keyid: A8D3785C
-    - keyserver: keyserver.ubuntu.com
+    - key_url: https://repo.mysql.com/RPM-GPG-KEY-mysql-2023
+    - aptkey: False
+    - gpgcheck: 1
     - require_in:
-        - file: /etc/apt/sources.list.d/mysql.list
+      - pkg: doughnut-app-deps
+
+mysql-repo-key:
+  file.managed:
+    - name: /usr/share/keyrings/mysql-archive-keyring.gpg
+    - source: https://repo.mysql.com/RPM-GPG-KEY-mysql-2023
+    - skip_verify: True
+    - mode: 644
+    - user: root
+    - group: root
+    - require_in:
+      - pkgrepo: mysql-repo
 
 /etc/caddy/Caddyfile:
   file.managed:
     - source: salt://base_os/templates/Caddyfile
+    - user: root
+    - group: root
     - mode: 644
     - require_in:
-        - service: caddy-service
+      - service: caddy-service
 
 caddy-repo:
   pkgrepo.managed:
@@ -53,12 +60,9 @@ caddy-repo-key:
       - pkgrepo: caddy-repo
 
 caddy-service:
-  service.running:
+  service.enabled:
     - name: caddy
-    - enable: True
     - reload: True
-    - watch:
-        - file: /etc/caddy/Caddyfile
 
 doughnut-app-deps:
   pkg.installed:
@@ -82,10 +86,10 @@ doughnut-app-deps:
         - libmysqlclient21
         - mysql-community-client
     - require_in:
-        - cmd: os-dist-upgrade
-        - cmd: doughnut-jre
-        - file: /etc/profile.d/doughnut_env.sh
-        - service: caddy-service
+      - cmd: os-dist-upgrade
+      - cmd: doughnut-jre
+      - file: /etc/profile.d/doughnut_env.sh
+      - service: caddy-service
         
 zulu{{ pillar['doughnut_app']['jre_version'] }}-linux_amd64.deb:
   file.managed:
@@ -93,13 +97,14 @@ zulu{{ pillar['doughnut_app']['jre_version'] }}-linux_amd64.deb:
     - source: https://cdn.azul.com/zulu/bin/zulu{{ pillar['doughnut_app']['jre_version'] }}-linux_amd64.deb
     - skip_verify: True
     - require_in:
-        - cmd: install-jre
+      - cmd: install-jre
+      - service: caddy-service
 
 install-jre:
   cmd.run:
     - name: apt-get install -y /tmp/zulu{{ pillar['doughnut_app']['jre_version'] }}-linux_amd64.deb
     - require_in:
-        - cmd: doughnut-jre
+      - cmd: doughnut-jre
 
 doughnut-jre:
   cmd.run:
