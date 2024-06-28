@@ -48,6 +48,32 @@ def find_source_files(root_dir, gitignore_path):
             if ignore_patterns.match_file(relative_path):
                 continue  # Skip ignored files
 
+            if relative_path.find('.git') != -1:
+                continue
+
+            # if relative_path.find('spec/dummy') != -1:
+            #     continue
+
+            # if relative_path.find('static_content/') == -1:
+            #     continue
+
+            # if relative_path.find('zh-CN') != -1:
+            #     continue
+
+            # if relative_path.find('.jp.') != -1:
+            #     continue
+
+            if relative_path.find('.svg') != -1:
+                continue
+
+            if relative_path.find('.pdf') != -1:
+                continue
+
+            with open(file_path, 'rb') as file:
+              chunk = file.read(1024)
+              if b'\0' in chunk:
+                  continue
+
             # Check file size, skip if larger than 500KB
             file_size = os.path.getsize(file_path)
             if file_size > 300 * 1024:  # 500KB
@@ -70,11 +96,12 @@ def main(assistant_id, project_dir, gitignore):
         }]
         print(f'success file: {filepath}')
       except Exception as e:
-        print(f'Binary file: {filepath}')
+        # print(f'Binary file: {filepath}')
+        pass
 
     print(f'Found {len(files)} source files')
 
-    for chunk in split_into_chunks(files, 1000):
+    for chunk in split_into_chunks(files, 10000):
       # Create a temporary file and write the json of files to it
       with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix="_all_source_code.json") as temp_file:
           json.dump(chunk, temp_file)
@@ -84,9 +111,9 @@ def main(assistant_id, project_dir, gitignore):
 
       file_id = upload_file(temp_file_path)
 
-      print('Attaching files to the assistant...')
-      updated_assistant = attach_files_to_assistant(assistant_id, file_id)
-      print('Files successfully attached to the assistant:', updated_assistant.id)
+      # print('Attaching files to the assistant...')
+      # updated_assistant = attach_files_to_assistant(assistant_id, file_id)
+      # print('Files successfully attached to the assistant:', updated_assistant.id)
 
 # Set your assistant ID and project directory
 # assistant_id = 'asst_4wvS7l1MYpjtjV72Ip9l37cs'
