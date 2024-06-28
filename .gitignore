@@ -46,6 +46,7 @@ hs_err_pid*
 **/bin/
 **/build/
 !backend/src/main/resources/db/migration/*.sql
+backend/out
 
 # Jetbrains
 *.iml
