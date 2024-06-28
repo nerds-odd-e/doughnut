@@ -9,6 +9,7 @@
 import { Notebook } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { PropType, ref } from "vue"
+import { saveAs } from 'file-saver'
 import TextInput from "../form/TextInput.vue"
 
 const { managedApi } = useLoadingApi()
@@ -30,14 +31,6 @@ const createAssistantForNotebook = async () => {
 const downloadNotebookDump = async () => {
   const notes = await managedApi.restNotebookController.downloadNotebookDump(props.notebook.id)
   const blob = new Blob([JSON.stringify(notes, null, 2)], { type: 'application/json' })
-
-  const url = window.URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = 'notebook-dump.json'
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
-  window.URL.revokeObjectURL(url)
+  saveAs(blob, 'notebook-dump.json')
 }
 </script>

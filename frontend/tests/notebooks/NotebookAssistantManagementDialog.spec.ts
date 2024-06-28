@@ -1,7 +1,10 @@
 import { flushPromises } from '@vue/test-utils'
+import { saveAs } from 'file-saver'
 import NotebookAssistantManagementDialog from '@/components/notebook/NotebookAssistantManagementDialog.vue'
 import makeMe from 'tests/fixtures/makeMe'
 import helper from "../helpers"
+
+vitest.mock('file-saver', () => ({ saveAs: vitest.fn() }))
 
 describe('NotebookAssistantManagementDialog.vue', () => {
   let wrapper
@@ -18,7 +21,7 @@ describe('NotebookAssistantManagementDialog.vue', () => {
       mockedDump
     wrapper = helper
     .component(NotebookAssistantManagementDialog)
-    .withStorageProps({
+    .withProps({
       notebook,
     })
     .mount()
@@ -47,8 +50,11 @@ describe('NotebookAssistantManagementDialog.vue', () => {
     // Wait for any pending promises to resolve
     await flushPromises()
 
-    // Check if the URL.createObjectURL was called with the correct Blob
-    expect(global.URL.createObjectURL).toHaveBeenCalledWith(expect.any(Blob))
+        // Check if the file-saver was called with the correct options
+    expect(saveAs).toHaveBeenCalledWith(
+      new Blob([JSON.stringify(noteBriefs, null, 2)], { type: 'application/json' }),
+      'notebook-dump.json'
+    )
   })
 
 })

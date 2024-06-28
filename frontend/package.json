@@ -22,6 +22,7 @@
     "@types/turndown": "^5.0.4",
     "@vueup/vue-quill": "1.2.0",
     "bootstrap": "5.3.3",
+    "file-saver": "^2.0.5",
     "gsap": "^3.12.5",
     "intersection-observer": "^0.12.2",
     "lodash": "^4.17.21",
