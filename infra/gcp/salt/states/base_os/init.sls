@@ -31,19 +31,26 @@ mysql-deb-apt-repo:
     - require_in:
         - service: caddy-service
 
-caddy-repo-gpg-key:
-  cmd.run:
-    - name: curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
-    - unless: test -f /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+caddy-repo:
+  pkgrepo.managed:
+    - name: deb [signed-by=/usr/share/keyrings/caddy-stable-archive-keyring.gpg] https://dl.cloudsmith.io/public/caddy/stable/deb/debian any-version main
+    - file: /etc/apt/sources.list.d/caddy-stable.list
+    - key_url: https://dl.cloudsmith.io/public/caddy/stable/gpg.key
+    - aptkey: False
+    - gpgcheck: 1
     - require_in:
-        - cmd: caddy-apt-source
+      - pkg: doughnut-app-deps
 
-caddy-apt-source:
-  cmd.run:
-    - name: curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list
-    - unless: test -f /etc/apt/sources.list.d/caddy-stable.list
+caddy-repo-key:
+  file.managed:
+    - name: /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+    - source: https://dl.cloudsmith.io/public/caddy/stable/gpg.key
+    - skip_verify: True
+    - mode: 644
+    - user: root
+    - group: root
     - require_in:
-        - pkg: doughnut-app-deps
+      - pkgrepo: caddy-repo
 
 caddy-service:
   service.running:
