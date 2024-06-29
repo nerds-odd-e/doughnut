@@ -59,7 +59,7 @@
       "correctness": {
         "noInvalidUseBeforeDeclaration": "warn",
         "noPrecisionLoss": "error",
-        "noUnusedImports": "error",
+        "noUnusedImports": "warn",
         "noUnusedVariables": "off",
         "useArrayLiterals": "off"
       },
