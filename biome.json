@@ -1,6 +1,8 @@
 {
   "$schema": "https://biomejs.dev/schemas/1.8.1/schema.json",
-  "organizeImports": { "enabled": true },
+  "organizeImports": {
+    "enabled": true
+  },
   "files": {
     "ignoreUnknown": true,
     "ignore": [
@@ -11,6 +13,7 @@
       "**/.idea",
       "**/.vscode",
       "**/node_modules",
+      "**/dist",
       "biome.json",
       "package.json",
       "tsconfig.json",
@@ -18,20 +21,19 @@
       "doughnut_mobile/",
       "infra/",
       "e2e_test/.eslintrc.cjs",
-      "e2e_test/fixtures/*.js",
-      "e2e_test/fixtures/*.json",
+      "e2e_test/fixtures/*.{js,json}",
       "e2e_test/support/index.d.ts",
       "frontend/*.cjs",
-      "frontend/biome.json",
-      "frontend/package.json",
-      "frontend/tsconfig.json",
-      "frontend/auto-imports.d.ts",
-      "frontend/components.d.ts",
-      "frontend/vite.config.ts",
+      "frontend/{biome,package,tsconfig}.json",
+      "frontend/{auto-imports,components}.d.ts",
+      "frontend/{vite,farm}.config.ts",
       "frontend/src/@types/doughnut/index.d.ts",
-      "frontend/src/generated/backend/DoughnutApi.ts",
+      "frontend/src/generated/backend/**/*.ts",
       "frontend/tests/*.js",
-      "frontend/tests/shims-vue.d.ts"
+      "frontend/tests/shims-vue.d.ts",
+      "frontend/tests/setupVitest.js",
+      "**/*.md",
+      "**/index.html"
     ]
   },
   "vcs": {
@@ -41,83 +43,141 @@
     "defaultBranch": "main"
   },
   "formatter": {
-    "indentStyle": "space"
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100
   },
   "javascript": {
     "formatter": {
-      "semicolons": "asNeeded"
+      "quoteStyle": "single",
+      "semicolons": "asNeeded",
+      "trailingCommas": "es5"
     }
   },
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": false,
+      "recommended": true,
       "complexity": {
         "noBannedTypes": "error",
-        "noUselessTypeConstraint": "error"
+        "noUselessTypeConstraint": "error",
+        "useSimplifiedLogicExpression": "warn",
+        "noExtraBooleanCast": "error",
+        "noUselessConstructor": "error",
+        "noUselessRename": "error",
+        "noUselessTernary": "error",
+        "noVoid": "error",
+        "noWith": "error",
+        "useLiteralKeys": "error",
+        "useRegexLiterals": "error"
       },
       "correctness": {
         "noInvalidUseBeforeDeclaration": "warn",
         "noPrecisionLoss": "error",
         "noUnusedImports": "warn",
-        "noUnusedVariables": "off",
-        "useArrayLiterals": "off"
+        "noUnusedVariables": "warn",
+        "useArrayLiterals": "warn",
+        "noConstAssign": "error",
+        "noConstantCondition": "error",
+        "noConstructorReturn": "error",
+        "noGlobalObjectCalls": "error",
+        "noInvalidConstructorSuper": "error",
+        "noNewSymbol": "error",
+        "noSetterReturn": "error",
+        "noUndeclaredVariables": "error",
+        "noUnreachable": "error",
+        "noUnreachableSuper": "error",
+        "useIsNan": "error",
+        "useValidForDirection": "error",
+        "useYield": "error"
       },
       "style": {
         "noInferrableTypes": "warn",
         "noNamespace": "error",
         "useAsConstAssertion": "error",
-        "useBlockStatements": "off"
+        "useBlockStatements": "warn",
+        "useSingleVarDeclarator": "warn",
+        "noArguments": "error",
+        "noCommaOperator": "error",
+        "noVar": "error",
+        "useConst": "error",
+        "useDefaultParameterLast": "error",
+        "useShorthandAssign": "error",
+        "useTemplate": "error"
       },
       "suspicious": {
         "noExplicitAny": "warn",
         "noExtraNonNullAssertion": "error",
         "noMisleadingInstantiator": "error",
-        "noUnsafeDeclarationMerging": "error"
+        "noUnsafeDeclarationMerging": "error",
+        "noAsyncPromiseExecutor": "error",
+        "noDoubleEquals": "error",
+        "noPrototypeBuiltins": "error",
+        "noShadowRestrictedNames": "error",
+        "useDefaultSwitchClauseLast": "error",
+        "useValidTypeof": "error"
+      },
+      "security": {
+        "noGlobalEval": "error"
       }
     },
     "ignore": [
-      "**/tsconfig.json",
+      "**/tsconfig*.json",
       "**/.eslintrc.cjs",
-      "config/ci.ts",
-      "config/common.ts",
+      "e2e_test/config/{ci,common}.ts",
       "**/components.d.ts",
       "**/node_modules",
       "**/.git",
       "**/.github",
-      "**/*.md"
+      "**/*.md",
+      "**/index.html",
+      "frontend/{farm,vite}.config.ts",
+      "frontend/tests/setupVitest.js"
     ]
   },
   "overrides": [
     {
-      "include": ["*.ts", "*.tsx", "*.mts", "*.cts"],
+      "include": ["*.json", "*.config.*", ".*.js"],
+      "linter": {
+        "rules": {}
+      }
+    },
+    {
+      "include": ["**/*.vue"],
       "linter": {
         "rules": {
           "correctness": {
-            "noConstAssign": "off",
-            "noGlobalObjectCalls": "off",
-            "noInvalidConstructorSuper": "off",
-            "noInvalidNewBuiltin": "off",
-            "noNewSymbol": "off",
-            "noSetterReturn": "off",
             "noUndeclaredVariables": "off",
-            "noUnreachable": "off",
-            "noUnreachableSuper": "off"
-          },
-          "style": {
-            "noArguments": "error",
-            "noVar": "error",
-            "useConst": "error"
+            "noUnusedVariables": "off"
+          }
+        }
+      }
+    },
+    {
+      "include": ["**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noInvalidUseBeforeDeclaration": "off",
+            "noUndeclaredVariables": "off",
+            "noUnusedVariables": "warn"
           },
           "suspicious": {
-            "noDuplicateClassMembers": "off",
-            "noDuplicateObjectKeys": "off",
-            "noDuplicateParameters": "off",
-            "noFunctionAssign": "off",
-            "noImportAssign": "off",
-            "noRedeclare": "off",
-            "noUnsafeNegation": "off",
-            "useGetterReturn": "off"
+            "noExplicitAny": "warn"
+          }
+        }
+      }
+    },
+    {
+      "include": ["shims-tsx.d.ts"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noUnusedVariables": "off"
+          },
+          "suspicious": {
+            "noExplicitAny": "off"
           }
         }
       }

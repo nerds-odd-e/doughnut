@@ -1,14 +1,14 @@
-import { defineConfig } from "@farmfe/core";
-import { fileURLToPath, URL } from "url";
-import vue from "@vitejs/plugin-vue";
-import vueJsx from "@vitejs/plugin-vue-jsx";
-import AutoImport from "unplugin-auto-import/vite";
-import Components from "unplugin-vue-components/vite";
-import { ElementPlusResolver } from "unplugin-vue-components/resolvers";
-import { VueRouterAutoImports } from "unplugin-vue-router";
-import VueRouter from "unplugin-vue-router/vite";
-import tsconfigPaths from "vite-tsconfig-paths";
-import farmJsPluginSass from "@farmfe/js-plugin-sass";
+import { URL, fileURLToPath } from 'node:url'
+import { defineConfig } from '@farmfe/core'
+import farmJsPluginSass from '@farmfe/js-plugin-sass'
+import vue from '@vitejs/plugin-vue'
+import vueJsx from '@vitejs/plugin-vue-jsx'
+import AutoImport from 'unplugin-auto-import/vite'
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
+import Components from 'unplugin-vue-components/vite'
+import { VueRouterAutoImports } from 'unplugin-vue-router'
+import VueRouter from 'unplugin-vue-router/vite'
+import tsconfigPaths from 'vite-tsconfig-paths'
 
 export default defineConfig({
   plugins: [farmJsPluginSass()],
@@ -24,44 +24,44 @@ export default defineConfig({
     VueRouter(),
     vueJsx(),
     AutoImport({
-      resolvers: [ElementPlusResolver({ importStyle: "sass" })],
-      imports: ["vue", "vue-router", VueRouterAutoImports],
+      resolvers: [ElementPlusResolver({ importStyle: 'sass' })],
+      imports: ['vue', 'vue-router', VueRouterAutoImports],
       dts: true, // generate TypeScript declaration
     }),
     Components({
-      resolvers: [ElementPlusResolver({ importStyle: "sass" })],
+      resolvers: [ElementPlusResolver({ importStyle: 'sass' })],
     }),
   ],
   server: {
     port: 5173,
     proxy: {
-      "/api": {
-        target: "http://localhost:9081",
+      '/api': {
+        target: 'http://localhost:9081',
         changeOrigin: true,
       },
-      "/attachments": {
-        target: "http://localhost:9081",
+      '/attachments': {
+        target: 'http://localhost:9081',
         changeOrigin: true,
       },
-      "/logout": {
-        target: "http://localhost:9081",
+      '/logout': {
+        target: 'http://localhost:9081',
         changeOrigin: true,
       },
-      "/testability": {
-        target: "http://localhost:9081",
+      '/testability': {
+        target: 'http://localhost:9081',
         changeOrigin: true,
       },
     },
   },
   compilation: {
     output: {
-      path: "../backend/src/main/resources/static/",
-      publicPath: "/",
-      targetEnv: "browser-esnext",
+      path: '../backend/src/main/resources/static/',
+      publicPath: '/',
+      targetEnv: 'browser-esnext',
     },
     sourcemap: true,
     input: {
-      index: fileURLToPath(new URL("index.html", import.meta.url)),
+      index: fileURLToPath(new URL('index.html', import.meta.url)),
     },
   },
-});
+})
