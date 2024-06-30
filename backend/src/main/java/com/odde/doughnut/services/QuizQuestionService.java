@@ -7,16 +7,19 @@ import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.theokanning.openai.client.OpenAiApi;
 import jakarta.validation.Valid;
+import org.jetbrains.annotations.NotNull;
 
 public class QuizQuestionService {
+  private final OpenAiApi openAiApi;
   private final ModelFactoryService modelFactoryService;
 
-  private final AiQuestionGenerator aiQuestionGenerator;
-
   public QuizQuestionService(OpenAiApi openAiApi, ModelFactoryService modelFactoryService) {
+    this.openAiApi = openAiApi;
     this.modelFactoryService = modelFactoryService;
-    this.aiQuestionGenerator =
-        new AiQuestionGenerator(openAiApi, new GlobalSettingsService(modelFactoryService));
+  }
+
+  private AiQuestionGenerator getAiQuestionGenerator() {
+    return new AiQuestionGenerator(openAiApi, new GlobalSettingsService(modelFactoryService));
   }
 
   QuizQuestionAndAnswer selectQuizQuestionForANote(Note note) {
@@ -32,7 +35,7 @@ public class QuizQuestionService {
 
   public QuizQuestionAndAnswer refineQuestion(Note note, QuizQuestionAndAnswer questionAndAnswer) {
     MCQWithAnswer aiGeneratedRefineQuestion =
-        aiQuestionGenerator.getAiGeneratedRefineQuestion(
+        getAiQuestionGenerator().getAiGeneratedRefineQuestion(
             note, questionAndAnswer.getMcqWithAnswer());
     if (aiGeneratedRefineQuestion == null) {
       return null;
@@ -47,7 +50,7 @@ public class QuizQuestionService {
   }
 
   public QuizQuestionAndAnswer generateMcqWithAnswer(Note note) {
-    MCQWithAnswer MCQWithAnswer = aiQuestionGenerator.getAiGeneratedQuestion(note);
+    MCQWithAnswer MCQWithAnswer = getAiQuestionGenerator().getAiGeneratedQuestion(note);
     if (MCQWithAnswer == null) {
       return null;
     }

@@ -50,4 +50,8 @@ public class AiAdvisorService {
   public AssistantService getChatService(String assistantId) {
     return new AssistantService(openAiApiHandler, assistantId, List.of());
   }
+
+  public AiQuestionGenerator getQuestionGenerationService(String generationModel, String evaluationModel) {
+    return new AiQuestionGenerator(openAiApiHandler.openAiApi, generationModel, evaluationModel);
+  }
 }
