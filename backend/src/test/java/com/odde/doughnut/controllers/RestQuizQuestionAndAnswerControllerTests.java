@@ -520,6 +520,18 @@ class RestQuizQuestionAndAnswerControllerTests {
       makeMe.refresh(note);
       assertThat(note.getQuizQuestionAndAnswers(), hasSize(0));
     }
+
+    @Test
+    void questionShouldBelongToNoteBeforeDeletion() {
+      Note note1 = makeMe.aNote().creatorAndOwner(currentUser).please();
+      Note note2 = makeMe.aNote().creatorAndOwner(currentUser).please();
+      QuizQuestionAndAnswer questionOfNote2 =
+          makeMe.aQuestion().approvedSpellingQuestionOf(note2).please();
+
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.deleteQuestion(note1, questionOfNote2));
+    }
   }
 
   @Nested

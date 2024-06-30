@@ -163,7 +163,7 @@ class RestQuizQuestionController {
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
     currentUser.assertAuthorization(quizQuestion);
-    if (quizQuestion.getNote() != note) {
+    if (!quizQuestion.belongsTo(note)) {
       throw new UnexpectedNoAccessRightException();
     }
     quizQuestionService.deleteQuestion(quizQuestion);

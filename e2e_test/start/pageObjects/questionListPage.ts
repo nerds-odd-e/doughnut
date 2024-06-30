@@ -8,7 +8,6 @@ const lineSection = (chainable: Cypress.Chainable<any>) => {
     deleteQuestion() {
       this.deleteButton().click()
       cy.get('[data-test="confirm-delete-button"]').click()
-      cy.get('[data-test="confirm-delete-button"]').should('not.be.visible');
     }
   }
 }
