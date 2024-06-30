@@ -9,11 +9,7 @@ import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.client.OpenAiApi;
 
 public record AiQuestionGenerator(
-    OpenAiApi openAiApi, String generationModel, String evaluationModel) {
-  public AiQuestionGenerator(OpenAiApi openAiApi, GlobalSettingsService globalSettingsService) {
-    this(openAiApi, globalSettingsService.globalSettingQuestionGeneration().getValue(),
-        globalSettingsService.globalSettingEvaluation().getValue());
-  }
+    OpenAiApi openAiApi, GlobalSettingsService globalSettingsService) {
   private AiQuestionGeneratorForNote forNote(Note note, String modelName1) {
     OpenAIChatRequestBuilder chatAboutNoteRequestBuilder =
         OpenAIChatRequestBuilder.chatAboutNoteRequestBuilder(modelName1, note);
@@ -22,12 +18,12 @@ public record AiQuestionGenerator(
   }
 
   public MCQWithAnswer getAiGeneratedQuestion(Note note) {
-    return forNote(note, generationModel)
+    return forNote(note, globalSettingsService.globalSettingQuestionGeneration().getValue())
         .getAiGeneratedQuestion();
   }
 
   public MCQWithAnswer getAiGeneratedRefineQuestion(Note note, MCQWithAnswer mcqWithAnswer) {
-    return forNote(note, generationModel)
+    return forNote(note, globalSettingsService.globalSettingQuestionGeneration().getValue())
         .refineQuestion(mcqWithAnswer)
         .orElse(null);
   }
@@ -36,7 +32,7 @@ public record AiQuestionGenerator(
       QuizQuestionAndAnswer quizQuestionAndAnswer) {
     return forNote(
             quizQuestionAndAnswer.getNote(),
-            evaluationModel)
+            globalSettingsService.globalSettingEvaluation().getValue())
         .evaluateQuestion(quizQuestionAndAnswer.getMcqWithAnswer())
         .map(e -> e.getQuizQuestionContestResult(quizQuestionAndAnswer.getCorrectAnswerIndex()))
         .orElse(null);

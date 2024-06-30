@@ -9,8 +9,9 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.AnswerModel;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.AiAdvisorWithStorageService;
+import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.QuizQuestionService;
+import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -32,7 +33,7 @@ class RestQuizQuestionController {
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
-  private final AiAdvisorWithStorageService aiAdvisorWithStorageService;
+  private final AiQuestionGenerator aiQuestionGenerator;
 
   public RestQuizQuestionController(
       @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
@@ -42,8 +43,8 @@ class RestQuizQuestionController {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
-    this.aiAdvisorWithStorageService =
-        new AiAdvisorWithStorageService(openAiApi,modelFactoryService);
+    this.aiQuestionGenerator =
+        new AiQuestionGenerator(openAiApi, new GlobalSettingsService(modelFactoryService));
     this.quizQuestionService = new QuizQuestionService(openAiApi, modelFactoryService);
   }
 
@@ -81,7 +82,7 @@ class RestQuizQuestionController {
   public QuizQuestionContestResult contest(
       @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion) {
     currentUser.assertLoggedIn();
-    return aiAdvisorWithStorageService.getQuestionGenerationService().getQuizQuestionContestResult(
+    return aiQuestionGenerator.getQuizQuestionContestResult(
         quizQuestion.getQuizQuestionAndAnswer());
   }
 

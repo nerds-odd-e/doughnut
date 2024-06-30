@@ -44,7 +44,7 @@ import org.springframework.http.HttpStatus;
 import retrofit2.Call;
 
 public class OpenAiApiHandler {
-  public final OpenAiApi openAiApi;
+  private final OpenAiApi openAiApi;
 
   public OpenAiApiHandler(OpenAiApi openAiApi) {
     this.openAiApi = openAiApi;

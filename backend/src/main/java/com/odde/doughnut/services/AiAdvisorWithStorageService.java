@@ -3,7 +3,6 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.controllers.dto.ChatRequest;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.AssistantService;
 import com.theokanning.openai.assistants.assistant.Assistant;
 import com.theokanning.openai.assistants.message.Message;
@@ -129,10 +128,5 @@ public record AiAdvisorWithStorageService(
     notebookAssistant.setAssistantId(chatAssistant.getId());
     this.modelFactoryService.save(notebookAssistant);
     return notebookAssistant;
-  }
-
-  public AiQuestionGenerator getQuestionGenerationService() {
-    return aiAdvisorService.getQuestionGenerationService(getGlobalSettingsService().globalSettingQuestionGeneration().getValue(),
-        getGlobalSettingsService().globalSettingEvaluation().getValue());
   }
 }
