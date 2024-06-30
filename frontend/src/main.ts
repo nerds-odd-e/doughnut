@@ -7,7 +7,7 @@ import "bootstrap"
 import DoughnutAppVue from "./DoughnutApp.vue"
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory('/'),
   routes,
 })
 
