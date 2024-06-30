@@ -51,7 +51,8 @@ public class AiAdvisorService {
     return new AssistantService(openAiApiHandler, assistantId, List.of());
   }
 
-  public AiQuestionGenerator getQuestionGenerationService(String generationModel, String evaluationModel) {
+  public AiQuestionGenerator getQuestionGenerationService(
+      String generationModel, String evaluationModel) {
     return new AiQuestionGenerator(openAiApiHandler.openAiApi, generationModel, evaluationModel);
   }
 }

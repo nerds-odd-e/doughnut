@@ -43,7 +43,7 @@ class RestQuizQuestionController {
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
     this.aiAdvisorWithStorageService =
-        new AiAdvisorWithStorageService(openAiApi,modelFactoryService);
+        new AiAdvisorWithStorageService(openAiApi, modelFactoryService);
     this.quizQuestionService = new QuizQuestionService(openAiApi, modelFactoryService);
   }
 
@@ -81,8 +81,9 @@ class RestQuizQuestionController {
   public QuizQuestionContestResult contest(
       @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion) {
     currentUser.assertLoggedIn();
-    return aiAdvisorWithStorageService.getQuestionGenerationService().getQuizQuestionContestResult(
-        quizQuestion.getQuizQuestionAndAnswer());
+    return aiAdvisorWithStorageService
+        .getQuestionGenerationService()
+        .getQuizQuestionContestResult(quizQuestion.getQuizQuestionAndAnswer());
   }
 
   @PostMapping("/{quizQuestion}/answer")

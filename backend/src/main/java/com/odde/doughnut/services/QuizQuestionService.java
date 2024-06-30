@@ -7,7 +7,6 @@ import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.theokanning.openai.client.OpenAiApi;
 import jakarta.validation.Valid;
-import org.jetbrains.annotations.NotNull;
 
 public class QuizQuestionService {
   private final OpenAiApi openAiApi;
@@ -35,8 +34,8 @@ public class QuizQuestionService {
 
   public QuizQuestionAndAnswer refineQuestion(Note note, QuizQuestionAndAnswer questionAndAnswer) {
     MCQWithAnswer aiGeneratedRefineQuestion =
-        getAiQuestionGenerator().getAiGeneratedRefineQuestion(
-            note, questionAndAnswer.getMcqWithAnswer());
+        getAiQuestionGenerator()
+            .getAiGeneratedRefineQuestion(note, questionAndAnswer.getMcqWithAnswer());
     if (aiGeneratedRefineQuestion == null) {
       return null;
     }
