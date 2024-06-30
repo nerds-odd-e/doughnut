@@ -132,8 +132,7 @@ public record AiAdvisorWithStorageService(
   }
 
   public AiQuestionGenerator getQuestionGenerationService() {
-    return aiAdvisorService.getQuestionGenerationService(
-        getGlobalSettingsService().globalSettingQuestionGeneration().getValue(),
+    return aiAdvisorService.getQuestionGenerationService(getGlobalSettingsService().globalSettingQuestionGeneration().getValue(),
         getGlobalSettingsService().globalSettingEvaluation().getValue());
   }
 }
