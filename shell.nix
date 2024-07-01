@@ -25,6 +25,7 @@ in mkShell {
     google-cloud-sdk
     yamllint
     nixfmt-classic
+    hclfmt
   ] ++ lib.optionals stdenv.isDarwin [ sequelpro ]
     ++ lib.optionals (!stdenv.isDarwin) [
       sequeler
@@ -34,14 +35,13 @@ in mkShell {
       xclip
       xvfb-run
       pinentry
-    ];
+  ];
   shellHook = ''
     #!/usr/bin/env bash
 
     # Deactivate nvm if exists
     command -v nvm >/dev/null 2>&1 && { nvm deactivate; }
 
-    export NIXPKGS_ALLOW_UNFREE=1
     export PS1="(nix)$PS1"
     export GPG_TTY=$(tty)
     export JAVA_HOME="$(readlink -e $(type -p javac) | sed  -e 's/\/bin\/javac//g')"
@@ -58,22 +58,23 @@ in mkShell {
     export MYSQL_PID_FILE=$MYSQL_HOME/mysql.pid
     export MYSQL_TCP_PORT=3309
     export MYSQLX_TCP_PORT=33090
-    export PATH=$JAVA_HOME/bin::$NODE_PATH/bin:$PNPM_HOME/bin:$MYSQL_BASEDIR/bin:$PATH
     export LANG="en_US.UTF-8"
+    export SOURCE_REPO_NAME="''${PWD##*/}"
+    export PATH=$JAVA_HOME/bin::$NODE_PATH/bin:$PNPM_HOME/bin:$MYSQL_BASEDIR/bin:$PATH
 
     echo "###################################################################################################################"
     echo "                                                                                "
-    echo "##   !! DOUGHNUT NIX DEVELOPMENT ENVIRONMENT ;) !!    "
-    echo "##   NIX VERSION: `nix --version`                     "
-    echo "##   JAVA_HOME: $JAVA_HOME                            "
-    echo "##   NODE_PATH: $NODE_PATH                            "
-    echo "##   PNPM_HOME: $PNPM_HOME                            "
-    echo "##   MYSQL_BASEDIR: $MYSQL_BASEDIR                    "
-    echo "##   MYSQL_HOME: $MYSQL_HOME                          "
-    echo "##   MYSQL_DATADIR: $MYSQL_DATADIR                    "
-    echo "##   JAVA VERSION: `javac --version`                  "
-    echo "##   NODE VERSION: `node --version`                   "
-    echo "##   PNPM VERSION: `pnpm --version`                   "
+    echo "##   !! $SOURCE_REPO_NAME NIX DEVELOPMENT ENVIRONMENT !!"
+    echo "##   NIX VERSION: `nix --version`                       "
+    echo "##   JAVA_HOME: $JAVA_HOME                              "
+    echo "##   NODE_PATH: $NODE_PATH                              "
+    echo "##   PNPM_HOME: $PNPM_HOME                              "
+    echo "##   MYSQL_BASEDIR: $MYSQL_BASEDIR                      "
+    echo "##   MYSQL_HOME: $MYSQL_HOME                            "
+    echo "##   MYSQL_DATADIR: $MYSQL_DATADIR                      "
+    echo "##   JAVA VERSION: `javac --version`                    "
+    echo "##   NODE VERSION: `node --version`                     "
+    echo "##   PNPM VERSION: `pnpm --version`                     "
     echo "                                                                                "
     echo "###################################################################################################################"
 
