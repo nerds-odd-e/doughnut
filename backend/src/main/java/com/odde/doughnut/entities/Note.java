@@ -344,7 +344,7 @@ The note of current focus (in JSON format):
   @JsonIgnore
   public NoteBrief getNoteBrief() {
     NoteBrief noteBrief = new NoteBrief();
-    noteBrief.uri = "https://doughnut.odde.com/n" + getId();
+    noteBrief.uri = "https://doughnut.odd-e.com/n" + getId();
     noteBrief.contextPath = getContextPathString();
     noteBrief.topic = getTopicConstructor();
     noteBrief.details = getDetails();
