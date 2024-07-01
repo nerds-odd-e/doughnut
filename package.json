@@ -78,7 +78,7 @@
     "prettier": "^3.3.2",
     "superagent": "^9.0.2",
     "syncpack": "^12.3.2",
-    "typescript": "5.4.5",
+    "typescript": "5.5.2",
     "wait-on": "^7.2.0"
   },
   "dependencies": {
