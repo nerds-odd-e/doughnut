@@ -7,9 +7,9 @@ and `doughnut/frontend/package.json`.
 
 ### 1. VSCode IDE extension for Vue3 Typescript
 
-##### 1.1. Install Volar VSCode Typescript extension for Vue3
+##### 1.1. Install [Vue - Official VSCode Typescript extension for Vue3](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
 
-[Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) replaces Vetur, the previous
+[Vue - Official](https://marketplace.visualstudio.com/items?itemName=Vue.volar) replaces Vetur, the previous
 official VSCode extension for Vue 2.
 
 If you have Vetur currently installed, make sure to disable it in Vue 3 projects.
