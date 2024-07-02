@@ -36,6 +36,13 @@ Then("I should see error message The assessment is not available", () => {
   cy.findByText("The assessment is not available").should("be.visible")
 })
 
+Then("I should see a link to the {string} notebook",
+  (notebookName: string) => {
+    cy.get('.card').get('.topic-text').get('span').should("have.value", notebookName)
+    start.assumeNotePage().navigateToReference(notebookName)
+  }
+)
+
 Given(
   "OpenAI now refines the question to become:",
   (questionTable: DataTable) => {
