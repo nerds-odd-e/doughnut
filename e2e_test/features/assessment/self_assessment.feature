@@ -52,7 +52,11 @@ Feature: New questions assessment
     And I answer the question "What is the capital city of Korea?" with "Busan"
     And I answer the question "What is the capital city of China?" with "Shanghai"
     And I should see the score "Yours score: 0 / 5" at the end of assessment
-    And I should see a link to the "Countries" notebook
+    And I should see a link to the "Singapore" notebook
+    And I should see a link to the "Vietnam" notebook
+    And I should see a link to the "Japan" notebook
+    And I should see a link to the "Korea" notebook
+    And I should see a link to the "China" notebook
 
   @ignore
   Scenario: Questions vary from attempt to attempt
