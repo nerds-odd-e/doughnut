@@ -42,6 +42,16 @@ Feature: New questions assessment
     And I answer the question "What is the capital city of China?" with "Beijing"
     And I should see the score "Yours score: 5 / 5" at the end of assessment
 
+  Scenario: Perform an assessment with all wrong answers
+    Given I set the number of questions per assessment of the notebook "Countries" to 5
+    When I start the assessment on the "Countries" notebook in the bazaar
+    Then I answer the question "Where in the world is Singapore?" with "euro"
+    And I answer the question "Most famous food of Vietnam?" with "bread"
+    And I answer the question "What is the capital city of Japan?" with "Kyoto"
+    And I answer the question "What is the capital city of Korea?" with "Busan"
+    And I answer the question "What is the capital city of China?" with "Shanghai"
+    And I should see the score "Yours score: 0 / 5" at the end of assessment
+
   Scenario: Fail to start assessment not enough approve questions
     Given I toggle the approval of the question "What is the capital city of China?" of the topic "China"
     And I toggle the approval of the question "Most famous food of Vietnam?" of the topic "Vietnam"
