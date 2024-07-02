@@ -44,5 +44,14 @@ describe("assessment page", () => {
         .render()
       await screen.findByText(quizQuestion.multipleChoicesQuestion.stem!)
     })
+
+    it("does not display score immediately after rendering", async () => {
+      const {html} = helper
+        .component(AssessmentPage)
+        .withProps({notebookId: notebook.id})
+        .render()
+
+      expect(html()).not.toContain('score:')
+    })
   })
 })
