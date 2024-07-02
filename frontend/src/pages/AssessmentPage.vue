@@ -9,7 +9,7 @@
       :quiz-question="quizQuestions[currentQuestion]!"
       @answered="questionAnswered"
     />
-    <div v-else>
+    <div v-else-if="assessmentCompleted">
       <p>Yours score: {{ correctAnswers }} / {{ quizQuestions.length }}</p>
     </div>
   </div>
@@ -34,15 +34,19 @@ const quizQuestions = ref<QuizQuestion[]>([])
 const currentQuestion = ref(0)
 const errors = ref("")
 const correctAnswers = ref(0)
+const assessmentCompleted = ref(false)
 const questionAnswered = (answerResult) => {
   currentQuestion.value += 1
   if (answerResult.correct) {
     correctAnswers.value += 1
   }
+  if (currentQuestion.value >= quizQuestions.value.length) {
+    assessmentCompleted.value = true
+  }
 }
 const generateAssessmentQuestions = () => {
   managedApi.restAssessmentController
-    .generateAssessmentQuestions(props.notebookId)
+    .generateAssessmentQuestions(<number>props.notebookId)
     .then((response) => {
       quizQuestions.value = response
     })
