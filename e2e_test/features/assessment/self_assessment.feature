@@ -32,7 +32,7 @@ Feature: New questions assessment
     And I answer the question "What is the capital city of China?" with "Shanghai"
     And I should see the score "Yours score: 2 / 5" at the end of assessment
 
-  Scenario: Perform an assesment with all correct answers
+  Scenario: Perform an assessment with all correct answers
     Given I set the number of questions per assessment of the notebook "Countries" to 5
     When I start the assessment on the "Countries" notebook in the bazaar
     Then I answer the question "Where in the world is Singapore?" with "Asia"
