@@ -22,7 +22,7 @@ Feature: New questions assessment
       | China     | What is the capital city of China? | Beijing | Shanghai       | true     |
 
 
-  Scenario: Start an assessment with 5 approved questions
+  Scenario: Complete an assessment with 5 approved questions
     Given I set the number of questions per assessment of the notebook "Countries" to 5
     When I start the assessment on the "Countries" notebook in the bazaar
     Then I answer the question "Where in the world is Singapore?" with "Asia"
@@ -53,6 +53,14 @@ Feature: New questions assessment
     And I answer the question "What is the capital city of China?" with "Shanghai"
     And I should see the score "Yours score: 0 / 5" at the end of assessment
     And I should see a link to the "Countries" notebook
+
+  @ignore
+  Scenario: Questions vary from attempt to attempt
+    Given I set the number of questions per assessment of the notebook "Countries" to 3
+    When I start the assessment on the "Countries" notebook in the bazaar
+    Then I am presented with 3 questions
+    When I start the assessment on the "Countries" notebook in the bazaar
+    Then I am presented with 3 different questions
 
   Scenario: Fail to start assessment not enough approve questions
     Given I toggle the approval of the question "What is the capital city of China?" of the topic "China"
