@@ -21,6 +21,17 @@ Then(
   },
 )
 
+
+Then(
+  "I am presented with {int} questions",
+  (numberOfQuestion: number) => {
+    start.assumeAssessmentPage().expectAQuestion().answerAny()
+    start.assumeAssessmentPage().expectAQuestion().answerAny()
+    start.assumeAssessmentPage().expectAQuestion().answerAny()
+    // see summary page
+},
+)
+
 Then(
   "I should see the score {string} at the end of assessment",
   (expectedScore: string) => {

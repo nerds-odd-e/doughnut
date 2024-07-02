@@ -12,8 +12,15 @@ export const assumeAssessmentPage = (notebook?: string) => {
         },
       }
     },
+    expectAQuestion() {
+      return {
+        answerAny() {
+          cy.get(".choices button").first().click()
+        },
+      }
+    },
     expectEndOfAssessment(expectedScore: string) {
       cy.findByText(expectedScore)
-    },
+    }
   }
 }
