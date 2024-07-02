@@ -22,8 +22,8 @@ Then(
 )
 
 When(
-  "I start the assessment on the {string} notebook in the bazaar {int} times in a row",
-  (notebook: string, attempts: number) => {
+  "{int} subsequent attempts of assessment on the {string} notebook should not have the same questions each time",
+  (attempts: number, notebook: string) => {
     const questions: string[] = []
     for (let i = 0; i < attempts; i++) {
       start.navigateToBazaar().selfAssessmentOnNotebook(notebook)
@@ -33,14 +33,7 @@ When(
         question.answerFirst()
       })
     }
-    cy.wrap(questions).as("questions")
-  },
-)
-
-Then(
-  "at least 1 of the 10 assessments should have a different question",
-  () => {
-    cy.get("@questions").within(questions => {
+    cy.then(() => {
       const uniqueQuestions = new Set(questions)
       expect(uniqueQuestions.size).to.be.greaterThan(1)
     })
