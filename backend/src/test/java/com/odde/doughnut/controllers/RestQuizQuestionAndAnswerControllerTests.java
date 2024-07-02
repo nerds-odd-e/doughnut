@@ -13,6 +13,7 @@ import com.odde.doughnut.controllers.dto.QuestionSuggestionCreationParams;
 import com.odde.doughnut.controllers.dto.QuizQuestionContestResult;
 import com.odde.doughnut.controllers.dto.QuizQuestionInNotebook;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.repositories.QuizQuestionAndAnswerRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
@@ -47,6 +48,7 @@ import org.springframework.web.server.ResponseStatusException;
 @Transactional
 class RestQuizQuestionAndAnswerControllerTests {
   @Mock OpenAiApi openAiApi;
+  @Mock QuizQuestionAndAnswerRepository quizQuestionAndAnswerRepository;
   @Autowired ModelFactoryService modelFactoryService;
   @Autowired MakeMe makeMe;
   private UserModel currentUser;
@@ -61,12 +63,20 @@ class RestQuizQuestionAndAnswerControllerTests {
     currentUser = makeMe.aUser().toModelPlease();
     controller =
         new RestQuizQuestionController(
-            openAiApi, modelFactoryService, currentUser, testabilitySettings);
+            openAiApi,
+            modelFactoryService,
+            currentUser,
+            testabilitySettings,
+            quizQuestionAndAnswerRepository);
   }
 
   RestQuizQuestionController nullUserController() {
     return new RestQuizQuestionController(
-        openAiApi, modelFactoryService, makeMe.aNullUserModelPlease(), testabilitySettings);
+        openAiApi,
+        modelFactoryService,
+        makeMe.aNullUserModelPlease(),
+        testabilitySettings,
+        quizQuestionAndAnswerRepository);
   }
 
   @Nested
@@ -267,7 +277,8 @@ class RestQuizQuestionAndAnswerControllerTests {
                     openAiApi,
                     makeMe.modelFactoryService,
                     makeMe.aNullUserModelPlease(),
-                    testabilitySettings);
+                    testabilitySettings,
+                    quizQuestionAndAnswerRepository);
             restAiController.generateQuestion(note);
           });
     }
@@ -313,7 +324,8 @@ class RestQuizQuestionAndAnswerControllerTests {
                     openAiApi,
                     makeMe.modelFactoryService,
                     makeMe.aNullUserModelPlease(),
-                    testabilitySettings);
+                    testabilitySettings,
+                    quizQuestionAndAnswerRepository);
             restAiController.generateAIQuestionWithoutSave(note);
           });
     }
@@ -352,7 +364,8 @@ class RestQuizQuestionAndAnswerControllerTests {
                     openAiApi,
                     makeMe.modelFactoryService,
                     makeMe.aNullUserModelPlease(),
-                    testabilitySettings);
+                    testabilitySettings,
+                    quizQuestionAndAnswerRepository);
             restAiController.regenerate(quizQuestionAndAnswer.getQuizQuestion());
           });
     }
@@ -397,7 +410,8 @@ class RestQuizQuestionAndAnswerControllerTests {
                     openAiApi,
                     makeMe.modelFactoryService,
                     makeMe.aNullUserModelPlease(),
-                    testabilitySettings);
+                    testabilitySettings,
+                    quizQuestionAndAnswerRepository);
             restAiController.contest(quizQuestion.getQuizQuestion());
           });
     }
@@ -575,6 +589,27 @@ class RestQuizQuestionAndAnswerControllerTests {
       quizQuestionAndAnswer.setApproved(true);
       QuizQuestionAndAnswer approvedQuestion = controller.toggleApproval(quizQuestionAndAnswer);
       assertFalse(approvedQuestion.isApproved());
+    }
+  }
+
+  @Nested
+  class DeleteQuestion {
+    @Test
+    void deleteQuestion() throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
+      QuizQuestionAndAnswer questionToRemain = makeMe.aQuestion().please();
+      controller.addQuestionManually(note, questionToRemain);
+      QuizQuestionAndAnswer questionToDelete = makeMe.aQuestion().please();
+      controller.addQuestionManually(note, questionToDelete);
+      makeMe.refresh(note);
+      when(quizQuestionAndAnswerRepository.findById(questionToDelete.getId()))
+          .thenReturn(java.util.Optional.of(questionToDelete));
+
+      controller.deleteQuestion(questionToDelete);
+      makeMe.refresh(note);
+
+      assertThat(note.getQuizQuestionAndAnswers(), hasSize(1));
+      assertThat(note.getQuizQuestionAndAnswers(), contains(questionToRemain));
     }
   }
 }

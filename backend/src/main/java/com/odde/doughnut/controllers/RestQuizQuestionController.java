@@ -5,6 +5,7 @@ import com.odde.doughnut.controllers.dto.QuestionSuggestionCreationParams;
 import com.odde.doughnut.controllers.dto.QuizQuestionContestResult;
 import com.odde.doughnut.controllers.dto.QuizQuestionInNotebook;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.repositories.QuizQuestionAndAnswerRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.AnswerModel;
@@ -34,18 +35,21 @@ class RestQuizQuestionController {
   private final TestabilitySettings testabilitySettings;
 
   private final AiQuestionGenerator aiQuestionGenerator;
+  private final QuizQuestionAndAnswerRepository quizQuestionAndAnswerRepository;
 
   public RestQuizQuestionController(
       @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
-      TestabilitySettings testabilitySettings) {
+      TestabilitySettings testabilitySettings,
+      QuizQuestionAndAnswerRepository quizQuestionAndAnswerRepository) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
     this.aiQuestionGenerator =
         new AiQuestionGenerator(openAiApi, new GlobalSettingsService(modelFactoryService));
     this.quizQuestionService = new QuizQuestionService(openAiApi, modelFactoryService);
+    this.quizQuestionAndAnswerRepository = quizQuestionAndAnswerRepository;
   }
 
   @PostMapping("/generate-question")
@@ -153,5 +157,16 @@ class RestQuizQuestionController {
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(quizQuestionAndAnswer.getNote());
     return quizQuestionService.toggleApproval(quizQuestionAndAnswer);
+  }
+
+  @DeleteMapping("{questionId}")
+  @Transactional
+  public void deleteQuestion(
+      @PathVariable("questionId") @Schema(type = "integer") QuizQuestionAndAnswer question)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertAuthorization(question.getNote());
+    quizQuestionAndAnswerRepository
+        .findById(question.getId())
+        .ifPresent(quizQuestionService::deleteQuestion);
   }
 }

@@ -11,6 +11,16 @@
         />
       </template>
     </PopButton>
+
+    <button
+      role="button"
+      class="btn btn-secondary btn-sm"
+      title="Delete Question"
+      @click="deleteQuestion"
+    >
+      Delete Question
+    </button>
+
     <table class="question-table mt-2">
       <thead>
         <tr>
@@ -82,6 +92,12 @@ const questionAdded = (newQuestion: QuizQuestionAndAnswer) => {
     return
   }
   questions.value.push(newQuestion)
+}
+const deleteQuestion = () => {
+  const questionsToDelete = questions.value.filter((q) => q.approved)
+  questionsToDelete.forEach(async (q) => {
+    await managedApi.restQuizQuestionController.deleteQuestion(q.id)
+  })
 }
 const toggleApproval = async (questionId?: number) => {
   if (questionId) {
