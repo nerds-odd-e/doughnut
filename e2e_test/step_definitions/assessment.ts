@@ -24,12 +24,12 @@ Then(
 
 Then(
   "I am presented with {int} questions",
-  (numberOfQuestion: number) => {
-    start.assumeAssessmentPage().expectAQuestion().answerAny()
-    start.assumeAssessmentPage().expectAQuestion().answerAny()
-    start.assumeAssessmentPage().expectAQuestion().answerAny()
-    // see summary page
-},
+  (numberOfQuestions: number) => {
+    for (let i = 0; i < numberOfQuestions; i++) {
+      start.assumeAssessmentPage().expectAQuestion().answerFirst()
+    }
+    start.assumeAssessmentPage().expectEndOfAssessment("/ " + numberOfQuestions)
+  },
 )
 
 Then(

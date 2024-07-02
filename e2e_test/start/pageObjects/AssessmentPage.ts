@@ -14,13 +14,13 @@ export const assumeAssessmentPage = (notebook?: string) => {
     },
     expectAQuestion() {
       return {
-        answerAny() {
+        answerFirst() {
           cy.get(".choices button").first().click()
         },
       }
     },
     expectEndOfAssessment(expectedScore: string) {
-      cy.findByText(expectedScore)
+      cy.contains(expectedScore)
     }
   }
 }
