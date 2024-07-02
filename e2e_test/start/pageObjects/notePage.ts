@@ -23,11 +23,11 @@ function filterAttributes(
 }
 
 export const assumeNotePage = (noteTopic?: string) => {
-  const findNoteTopic = (topic) =>
+  const assertNoteWithTopicExists = (topic) =>
     cy.findByText(topic, { selector: "[role=topic] *" })
 
   if (noteTopic) {
-    findNoteTopic(noteTopic)
+    assertNoteWithTopicExists(noteTopic)
   }
 
   const privateToolbarButton = (btnTextOrTitle: string) => {
@@ -60,6 +60,7 @@ export const assumeNotePage = (noteTopic?: string) => {
       })
       return assumeNotePage(noteTopic)
     },
+
     collapseChildren: () => {
       cy.get("main").within(() => {
         cy.findByRole("button", { name: "collapse children" }).click()

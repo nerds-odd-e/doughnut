@@ -499,6 +499,42 @@ class RestQuizQuestionAndAnswerControllerTests {
   }
 
   @Nested
+  class DeleteQuestion {
+    @Test
+    void authorization() {
+      Note note = makeMe.aNote().please();
+      QuizQuestionAndAnswer mcqWithAnswer = makeMe.aQuestion().please();
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.deleteQuestion(note, mcqWithAnswer));
+    }
+
+    @Test
+    void persistent() throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
+      QuizQuestionAndAnswer mcqWithAnswer = makeMe.aQuestion().please();
+      controller.addQuestionManually(note, mcqWithAnswer);
+      makeMe.refresh(note);
+      assertThat(note.getQuizQuestionAndAnswers(), hasSize(1));
+      controller.deleteQuestion(note, mcqWithAnswer);
+      makeMe.refresh(note);
+      assertThat(note.getQuizQuestionAndAnswers(), hasSize(0));
+    }
+
+    @Test
+    void questionShouldBelongToNoteBeforeDeletion() {
+      Note note1 = makeMe.aNote().creatorAndOwner(currentUser).please();
+      Note note2 = makeMe.aNote().creatorAndOwner(currentUser).please();
+      QuizQuestionAndAnswer questionOfNote2 =
+          makeMe.aQuestion().approvedSpellingQuestionOf(note2).please();
+
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.deleteQuestion(note1, questionOfNote2));
+    }
+  }
+
+  @Nested
   class RefineQuestion {
     @Test
     void authorization() {

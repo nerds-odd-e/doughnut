@@ -62,6 +62,13 @@ Given(
   },
 )
 
+When(
+  "I delete the question {string} from the note {string}",
+  (question: string, noteTopic: string) => {
+    start.jumpToNotePage(noteTopic).openQuestionList().questionLine(question).deleteQuestion()
+  },
+)
+
 Given(
   "I refine the following question for the note {string}:",
   (noteTopic: string, data: DataTable) => {

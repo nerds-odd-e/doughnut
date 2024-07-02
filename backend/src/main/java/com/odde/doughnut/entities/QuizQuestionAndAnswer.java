@@ -51,6 +51,11 @@ public class QuizQuestionAndAnswer extends EntityIdentifiedByIdOnly {
     return Objects.equals(answer.getChoiceIndex(), getCorrectAnswerIndex());
   }
 
+  @JsonIgnore
+  public boolean belongsTo(Note otherNote) {
+    return this.note.equals(otherNote);
+  }
+
   public static QuizQuestionAndAnswer fromMCQWithAnswer(MCQWithAnswer MCQWithAnswer, Note note) {
     QuizQuestionAndAnswer quizQuestionAIQuestionAndAnswer = new QuizQuestionAndAnswer();
     quizQuestionAIQuestionAndAnswer.setNote(note);
