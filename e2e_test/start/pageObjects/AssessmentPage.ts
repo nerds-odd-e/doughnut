@@ -14,6 +14,9 @@ export const assumeAssessmentPage = (notebook?: string) => {
     },
     expectAQuestion() {
       return {
+        getStem() {
+            return cy.get(".quiz-instruction div").first().invoke("text")
+        },
         answerFirst() {
           cy.get(".choices button").first().click()
         },

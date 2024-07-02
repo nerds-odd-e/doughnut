@@ -21,14 +21,29 @@ Then(
   },
 )
 
+When(
+  "I start the assessment on the {string} notebook in the bazaar {int} times in a row",
+  (notebook: string, attempts: number) => {
+    const questions: string[] = []
+    for (let i = 0; i < attempts; i++) {
+      start.navigateToBazaar().selfAssessmentOnNotebook(notebook)
+      const question = start.assumeAssessmentPage().expectAQuestion()
+      question.getStem().then((stem) => {
+        questions.push(stem)
+        question.answerFirst()
+      })
+    }
+    cy.wrap(questions).as("questions")
+  },
+)
 
 Then(
-  "I am presented with {int} questions",
-  (numberOfQuestions: number) => {
-    for (let i = 0; i < numberOfQuestions; i++) {
-      start.assumeAssessmentPage().expectAQuestion().answerFirst()
-    }
-    start.assumeAssessmentPage().expectEndOfAssessment("/ " + numberOfQuestions)
+  "at least 1 of the 10 assessments should have a different question",
+  () => {
+    cy.get("@questions").within(questions => {
+      const uniqueQuestions = new Set(questions)
+      expect(uniqueQuestions.size).to.be.greaterThan(1)
+    })
   },
 )
 

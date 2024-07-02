@@ -60,11 +60,9 @@ Feature: New questions assessment
 
   @ignore
   Scenario: Questions vary from attempt to attempt
-    Given I set the number of questions per assessment of the notebook "Countries" to 3
-    When I start the assessment on the "Countries" notebook in the bazaar
-    Then I am presented with 3 questions
-    When I start the assessment on the "Countries" notebook in the bazaar
-    Then I am presented with 3 different questions
+    Given I set the number of questions per assessment of the notebook "Countries" to 1
+    When I start the assessment on the "Countries" notebook in the bazaar 10 times in a row
+    Then at least 1 of the 10 assessments should have a different question
 
   Scenario: Fail to start assessment not enough approve questions
     Given I toggle the approval of the question "What is the capital city of China?" of the topic "China"
