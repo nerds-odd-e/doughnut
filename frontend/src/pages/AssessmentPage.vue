@@ -34,16 +34,14 @@ const quizQuestions = ref<QuizQuestion[]>([])
 const currentQuestion = ref(0)
 const errors = ref("")
 const correctAnswers = ref(0)
-const assessmentCompleted = ref(false)
+const assessmentCompleted = computed(() => currentQuestion.value >= quizQuestions.value.length && quizQuestions.value.length > 0)
 const questionAnswered = (answerResult) => {
   currentQuestion.value += 1
   if (answerResult.correct) {
     correctAnswers.value += 1
   }
-  if (currentQuestion.value >= quizQuestions.value.length) {
-    assessmentCompleted.value = true
-  }
 }
+
 const generateAssessmentQuestions = () => {
   managedApi.restAssessmentController
     .generateAssessmentQuestions(<number>props.notebookId)
