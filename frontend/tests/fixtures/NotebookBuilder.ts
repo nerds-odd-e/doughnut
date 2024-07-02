@@ -24,6 +24,11 @@ class NotebookBuilder extends Builder<Notebook> {
     return this
   }
 
+  numberOfQuestionsInAssessment(numberofQuestions: number) {
+    this.data.notebookSettings.numberOfQuestionsInAssessment = numberofQuestions
+    return this
+  }
+
   do(): Notebook {
     this.data.headNote = this.notebuilder.do()
     return this.data
