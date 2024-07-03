@@ -29,13 +29,12 @@ export default {
   props: { notebook: Object },
   components: { CheckInput, TextInput },
   data() {
-    const { skipReviewEntirely, numberOfQuestionsInAssessment } = this.notebook
+    const { skipReviewEntirely, numberOfQuestionsInAssessment } = this.notebook.notebookSettings
     return {
       formData: { skipReviewEntirely, numberOfQuestionsInAssessment },
       errors: {},
     }
   },
-
   methods: {
     processForm() {
       this.managedApi.restNotebookController
