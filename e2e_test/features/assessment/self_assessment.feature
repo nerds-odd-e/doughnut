@@ -26,12 +26,14 @@ Feature: New questions assessment
   Scenario: Complete an assessment with 5 approved questions
     Given I set the number of questions per assessment of the notebook "Countries" to 5
     When I start the assessment on the "Countries" notebook in the bazaar
-    Then I answer the question "Where in the world is Singapore?" with "Asia"
-    And I answer the question "Most famous food of Vietnam?" with "Pho"
-    And I answer the question "What is the capital city of Japan?" with "Kyoto"
-    And I answer the question "What is the capital city of Korea?" with "Busan"
-    And I answer the question "What is the capital city of China?" with "Shanghai"
-    And I should see the score "Yours score: 2 / 5" at the end of assessment
+    And I answer with the 5 following answers:
+      | question                           | answer  |
+      | Where in the world is Singapore?   | Asia    |
+      | Most famous food of Vietnam?       | Pho     |
+      | What is the capital city of Korea? | Busan   |
+      | What is the capital city of Japan? | Kyoto   |
+      | What is the capital city of China? | Shanghai |
+    Then I should see the score "Yours score: 2 / 5" at the end of assessment
 
   Scenario: Perform an assessment with all correct answers with table view
     Given I set the number of questions per assessment of the notebook "Countries" to 5
@@ -41,9 +43,9 @@ Feature: New questions assessment
       | Where in the world is Singapore?   | Asia    |
       | Most famous food of Vietnam?       | Pho     |
       | What is the capital city of Japan? | Tokyo   |
-      | What is the capital city of Korea? | Seoul   |
       | What is the capital city of China? | Beijing |
-    And I should see the score "Yours score: 5 / 5" at the end of assessment
+      | What is the capital city of Korea? | Seoul   |
+    Then I should see the score "Yours score: 5 / 5" at the end of assessment
 
   Scenario: Perform an assessment with all wrong answers
     Given I set the number of questions per assessment of the notebook "Countries" to 1
@@ -51,8 +53,8 @@ Feature: New questions assessment
     And I answer with the 1 following answers:
       | question                           | answer   |
       | Where in the world is Singapore?   | euro     |
-      | Most famous food of Vietnam?       | bread    |
       | What is the capital city of Japan? | Kyoto    |
+      | Most famous food of Vietnam?       | bread    |
       | What is the capital city of Korea? | Busan    |
       | What is the capital city of China? | Shanghai |
     Then I should see the score "Yours score: 0 / 1" at the end of assessment
