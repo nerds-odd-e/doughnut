@@ -47,69 +47,70 @@ import timezoneParam from "@/managedApi/window/timezoneParam"
 import { useRouter } from "vue-router"
 import { StorageAccessor } from "@/store/createNoteStorage"
 import _ from "lodash"
-import { PropType, computed, onMounted, ref,  } from "vue"
+import { PropType, computed, onMounted, ref } from "vue"
 
 const $router = useRouter()
-const { managedApi }    = useLoadingApi()
-  defineProps({
-    minimized: Boolean,
-    eagerFetchCount: Number,
-    storageAccessor: {
-      type: Object as PropType<StorageAccessor>,
-      required: true,
-    },
-  })
+const { managedApi } = useLoadingApi()
+defineProps({
+  minimized: Boolean,
+  eagerFetchCount: Number,
+  storageAccessor: {
+    type: Object as PropType<StorageAccessor>,
+    required: true,
+  },
+})
 
-  const toRepeat = ref<number[] | undefined>(undefined)
-  const currentIndex = ref(0)
-  const previousResults = ref<(AnsweredQuestion | undefined)[]>([])
-  const previousResultCursor = ref<number | undefined>(undefined)
+const toRepeat = ref<number[] | undefined>(undefined)
+const currentIndex = ref(0)
+const previousResults = ref<(AnsweredQuestion | undefined)[]>([])
+const previousResultCursor = ref<number | undefined>(undefined)
 
-  const currentResult = computed(() => {
-    if (previousResultCursor.value === undefined) return undefined
-    return previousResults.value[previousResultCursor.value]
-  })
+const currentResult = computed(() => {
+  if (previousResultCursor.value === undefined) return undefined
+  return previousResults.value[previousResultCursor.value]
+})
 
-  const finished = computed(() => previousResults.value.length)
-  const toRepeatCount = computed(() => (toRepeat.value?.length ?? 0) - currentIndex.value)
+const finished = computed(() => previousResults.value.length)
+const toRepeatCount = computed(
+  () => (toRepeat.value?.length ?? 0) - currentIndex.value,
+)
 
-  const viewLastResult = (cursor: number | undefined) => {
-    previousResultCursor.value = cursor
-    if (currentResult.value) {
-      const { answerId } = currentResult.value
-      $router.push({ name: "repeat-answer", params: { answerId } })
-      return
-    }
-    $router.push({ name: "repeat" })
+const viewLastResult = (cursor: number | undefined) => {
+  previousResultCursor.value = cursor
+  if (currentResult.value) {
+    const { answerId } = currentResult.value
+    $router.push({ name: "repeat-answer", params: { answerId } })
+    return
   }
+  $router.push({ name: "repeat" })
+}
 
-  const loadMore = async (dueInDays?: number) => {
-    toRepeat.value = (
-      await managedApi.restReviewsController.repeatReview(
-        timezoneParam(),
-        dueInDays,
-      )
-    ).toRepeat
-    currentIndex.value = 0
-    if (toRepeat.value?.length === 0) {
-      return
-    }
-    if (getEnvironment() !== "testing") {
-      toRepeat.value = _.shuffle(toRepeat.value)
-    }
+const loadMore = async (dueInDays?: number) => {
+  toRepeat.value = (
+    await managedApi.restReviewsController.repeatReview(
+      timezoneParam(),
+      dueInDays,
+    )
+  ).toRepeat
+  currentIndex.value = 0
+  if (toRepeat.value?.length === 0) {
+    return
   }
-
-  const onAnswered = (answerResult: AnsweredQuestion) => {
-    currentIndex.value += 1
-    previousResults.value.push(answerResult)
-    if (!answerResult) return
-    if (!answerResult.correct) {
-      viewLastResult(previousResults.value.length - 1)
-    }
+  if (getEnvironment() !== "testing") {
+    toRepeat.value = _.shuffle(toRepeat.value)
   }
+}
 
-  onMounted(() => {
-    loadMore(0)})
+const onAnswered = (answerResult: AnsweredQuestion) => {
+  currentIndex.value += 1
+  previousResults.value.push(answerResult)
+  if (!answerResult) return
+  if (!answerResult.correct) {
+    viewLastResult(previousResults.value.length - 1)
+  }
+}
 
-
+onMounted(() => {
+  loadMore(0)
+})
 </script>

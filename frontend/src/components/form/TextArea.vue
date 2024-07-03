@@ -5,7 +5,9 @@
       :id="`${scopeName}-${field}`"
       :name="field"
       :value="modelValue"
-      @input="emit('update:modelValue', ($event.target as HTMLTextAreaElement).value)"
+      @input="
+        emit('update:modelValue', ($event.target as HTMLTextAreaElement).value)
+      "
       :placeholder="placeholder"
       :autofocus="autofocus"
       autocomplete="off"
@@ -39,28 +41,40 @@ const emit = defineEmits(["update:modelValue", "blur", "enterPressed"])
 const input = ref<HTMLTextAreaElement | null>(null)
 
 const focus = () => {
-  if(input.value === null) return
+  if (input.value === null) return
   input.value.focus()
 }
 
 defineExpose({
-  focus
+  focus,
 })
 
 const handleKeydown = (event: KeyboardEvent) => {
-  if (props.enterSubmit && event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
+  if (
+    props.enterSubmit &&
+    event.key === "Enter" &&
+    !event.shiftKey &&
+    !event.isComposing
+  ) {
     event.preventDefault() // Prevent newline insertion
-    emit('enterPressed')
+    emit("enterPressed")
   }
 }
 
-watch(() => props.modelValue, async () => {
-  await nextTick()
-  if (input.value && props.autoExtendUntil) {
-    const lineHeight = parseInt(window.getComputedStyle(input.value).lineHeight, 10)
-    const {scrollHeight} = input.value
-    const newRows = Math.floor(scrollHeight / lineHeight)
-    input.value.rows = newRows > props.autoExtendUntil ? props.autoExtendUntil : newRows
-  }
-})
+watch(
+  () => props.modelValue,
+  async () => {
+    await nextTick()
+    if (input.value && props.autoExtendUntil) {
+      const lineHeight = parseInt(
+        window.getComputedStyle(input.value).lineHeight,
+        10,
+      )
+      const { scrollHeight } = input.value
+      const newRows = Math.floor(scrollHeight / lineHeight)
+      input.value.rows =
+        newRows > props.autoExtendUntil ? props.autoExtendUntil : newRows
+    }
+  },
+)
 </script>

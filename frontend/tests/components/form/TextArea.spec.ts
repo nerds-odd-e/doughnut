@@ -66,9 +66,9 @@ describe("TextArea.vue", () => {
     })
 
     const textarea = wrapper.find("textarea")
-    await textarea.trigger('keydown', { key: 'Enter' })
+    await textarea.trigger("keydown", { key: "Enter" })
 
-    expect(wrapper.emitted()).toHaveProperty('enterPressed')
+    expect(wrapper.emitted()).toHaveProperty("enterPressed")
   })
 
   it('does not emit "enterPressed" when Enter is pressed during IME composition', async () => {
@@ -80,8 +80,8 @@ describe("TextArea.vue", () => {
 
     const textarea = wrapper.find("textarea")
     // Simulate the IME composition state by setting isComposing to true
-    await textarea.trigger('keydown', { key: 'Enter', isComposing: true })
+    await textarea.trigger("keydown", { key: "Enter", isComposing: true })
 
-    expect(wrapper.emitted()).not.toHaveProperty('enterPressed')
+    expect(wrapper.emitted()).not.toHaveProperty("enterPressed")
   })
 })

@@ -99,10 +99,8 @@ describe("NoteChatDialog TestMe", () => {
 })
 
 describe("NoteChatDialog Conversation", () => {
-
   beforeEach(() => {
-    helper.managedApi.eventSource.restAiController.chat = vi
-      .fn()
+    helper.managedApi.eventSource.restAiController.chat = vi.fn()
     helper.managedApi.restAiController.tryRestoreChat = vi
       .fn()
       .mockResolvedValue([])
@@ -110,42 +108,46 @@ describe("NoteChatDialog Conversation", () => {
 
   const askAndReplied = async () => {
     const newMessage: Message = {
-          role: "assistant",
-          thread_id: "test-thread-id",
-          content: [],
-        }
-  const messageDelta: MessageDelta = {
-    delta: {
+      role: "assistant",
+      thread_id: "test-thread-id",
+      content: [],
+    }
+    const messageDelta: MessageDelta = {
+      delta: {
         content: [
           {
             text: {
-              value: "## I'm ChatGPT"
+              value: "## I'm ChatGPT",
             },
           },
         ],
-      }
+      },
     }
 
-
-   const wrapper = await createWrapper()
+    const wrapper = await createWrapper()
     await wrapper.find("textarea").setValue("What's your name?")
     await wrapper.find("#chat-button").trigger("submit")
-    helper.managedApi.eventSource.eventSourceRequest.onMessage("thread.message.created", JSON.stringify(newMessage))
-    helper.managedApi.eventSource.eventSourceRequest.onMessage("thread.message.delta", JSON.stringify(messageDelta))
+    helper.managedApi.eventSource.eventSourceRequest.onMessage(
+      "thread.message.created",
+      JSON.stringify(newMessage),
+    )
+    helper.managedApi.eventSource.eventSourceRequest.onMessage(
+      "thread.message.delta",
+      JSON.stringify(messageDelta),
+    )
     await flushPromises()
     return wrapper
   }
 
   it("called the api", async () => {
-   await askAndReplied()
-    expect(helper.managedApi.eventSource.restAiController.chat).toHaveBeenCalledWith(
-      note.id,
-      expect.anything(),
-    )
+    await askAndReplied()
+    expect(
+      helper.managedApi.eventSource.restAiController.chat,
+    ).toHaveBeenCalledWith(note.id, expect.anything())
   })
 
   it("shows the user's message as well", async () => {
-   const wrapper = await askAndReplied()
+    const wrapper = await askAndReplied()
     const actual = wrapper.find(".chat-answer-container.user").text()
     expect(actual).toBe("What's your name?")
   })
@@ -166,7 +168,9 @@ describe("NoteChatDialog Conversation", () => {
     await wrapper.find("textarea").setValue("What's your name?")
     await wrapper.find("#chat-button").trigger("submit")
     await flushPromises()
-    expect(helper.managedApi.eventSource.restAiController.chat).toHaveBeenCalledWith(
+    expect(
+      helper.managedApi.eventSource.restAiController.chat,
+    ).toHaveBeenCalledWith(
       note.id,
       expect.objectContaining({
         threadId: "test-thread-id",
@@ -176,14 +180,16 @@ describe("NoteChatDialog Conversation", () => {
 
   it("will try to restore the previous chat", async () => {
     const oldMessage: Message = {
-          role: "assistant",
-          thread_id: "test-thread-id",
-          content: [{
-            text: {
-              value: "preiouvs message"
-            },
-          }],
-        }
+      role: "assistant",
+      thread_id: "test-thread-id",
+      content: [
+        {
+          text: {
+            value: "preiouvs message",
+          },
+        },
+      ],
+    }
     helper.managedApi.restAiController.tryRestoreChat = vi
       .fn()
       .mockResolvedValue([oldMessage])

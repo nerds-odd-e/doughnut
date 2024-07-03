@@ -14,6 +14,7 @@
     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
       <PopButton btn-class="dropdown-item" title="user settings">
         <template #button_face> Settings for {{ user.name }}</template>
+        <!-- prettier-ignore -->
         <template #default="{ closer }">
           <UserProfileDialog
             v-bind="{ user }"

@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-4"/>
+  <div class="mt-4" />
   <ContestableQuestion
     v-if="quizQuestionInNotebook"
     v-bind="{ quizQuestionInNotebook, storageAccessor }"
@@ -11,11 +11,14 @@
     :class="message.role"
     :key="index"
   >
-    <div v-if="message.role==='assistant'" class="assistant-icon col-auto">
+    <div v-if="message.role === 'assistant'" class="assistant-icon col-auto">
       <SvgRobot />
     </div>
     <div class="col">
-      <div v-if="message.role==='assistant'" v-html="markdowntToHtml(message.content?.[0]?.text?.value)"/>
+      <div
+        v-if="message.role === 'assistant'"
+        v-html="markdowntToHtml(message.content?.[0]?.text?.value)"
+      />
       <div v-else class="d-flex justify-content-end">
         <div class="user-message" v-text="message.content?.[0]?.text?.value" />
       </div>
@@ -57,7 +60,13 @@
 </template>
 
 <script setup lang="ts">
-import { Message, Note, QuizQuestionInNotebook, ChatRequest, MessageDelta } from "@/generated/backend"
+import {
+  Message,
+  Note,
+  QuizQuestionInNotebook,
+  ChatRequest,
+  MessageDelta,
+} from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import { PropType, computed, ref, onMounted } from "vue"
@@ -75,7 +84,9 @@ const props = defineProps({
     required: true,
   },
 })
-const quizQuestionInNotebook = ref<QuizQuestionInNotebook | undefined>(undefined)
+const quizQuestionInNotebook = ref<QuizQuestionInNotebook | undefined>(
+  undefined,
+)
 const chatInput = ref("")
 const messages = ref<Message[]>([])
 const bottomOfTheChat = ref<HTMLElement | null>(null)
@@ -84,7 +95,8 @@ const threadId = ref<string | undefined>(undefined)
 
 const isButtonDisabled = computed(() => chatInput.value === "")
 
-const markdowntToHtml = (content?: string) => markdownizer.markdownToHtml(content)
+const markdowntToHtml = (content?: string) =>
+  markdownizer.markdownToHtml(content)
 const scrollToBottom = () => {
   if (bottomOfTheChat.value) {
     scrollToElement(bottomOfTheChat.value)
@@ -92,23 +104,23 @@ const scrollToBottom = () => {
 }
 
 const generateQuestion = async () => {
-  quizQuestionInNotebook.value = await managedApi.restQuizQuestionController.generateQuestion(
-    props.selectedNote.id,
-  )
+  quizQuestionInNotebook.value =
+    await managedApi.restQuizQuestionController.generateQuestion(
+      props.selectedNote.id,
+    )
   scrollToBottom()
 }
 
 const focusChatInput = () => {
   if (chatInputTextArea.value) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (chatInputTextArea.value as any).focus()
+    ;(chatInputTextArea.value as any).focus()
   }
 }
 
 const chat = async (id: Doughnut.ID, request: ChatRequest) => {
   await managedApi.eventSource
-  .onMessage(
-    (event, data) => {
+    .onMessage((event, data) => {
       if (event === "thread.message.created") {
         const response = JSON.parse(data) as Message
         response.content = [{ text: { value: "" } }]
@@ -123,12 +135,11 @@ const chat = async (id: Doughnut.ID, request: ChatRequest) => {
         message.content = [{ text: { value: currentValue! + delta } }]
       }
     })
-    .onError(
-    (error) => {
+    .onError((error) => {
       // eslint-disable-next-line no-console
       console.error(error)
     })
-  .restAiController.chat(id, request)
+    .restAiController.chat(id, request)
 }
 
 const generateChatAnswer = async () => {
@@ -147,13 +158,15 @@ const generateChatAnswer = async () => {
 
 onMounted(() => {
   focusChatInput()
-  managedApi.restAiController.tryRestoreChat(props.selectedNote.id).then((response) => {
-    messages.value = response
-    if (response.length > 0){
-      threadId.value = response[response.length - 1]?.thread_id
-    }
-    scrollToBottom()
-  })
+  managedApi.restAiController
+    .tryRestoreChat(props.selectedNote.id)
+    .then((response) => {
+      messages.value = response
+      if (response.length > 0) {
+        threadId.value = response[response.length - 1]?.thread_id
+      }
+      scrollToBottom()
+    })
 })
 </script>
 

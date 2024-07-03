@@ -109,7 +109,6 @@ import NoteChatDialog from "../NoteChatDialog.vue"
 import Questions from "../Questions.vue"
 import NoteInfoBar from "../NoteInfoBar.vue"
 
-
 const props = defineProps({
   storageAccessor: {
     type: Object as PropType<StorageAccessor>,

@@ -29,7 +29,8 @@ export default {
   props: { notebook: Object },
   components: { CheckInput, TextInput },
   data() {
-    const { skipReviewEntirely, numberOfQuestionsInAssessment } = this.notebook.notebookSettings
+    const { skipReviewEntirely, numberOfQuestionsInAssessment } =
+      this.notebook.notebookSettings
     return {
       formData: { skipReviewEntirely, numberOfQuestionsInAssessment },
       errors: {},

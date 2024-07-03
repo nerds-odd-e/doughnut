@@ -46,12 +46,12 @@ describe("assessment page", () => {
     })
 
     it("does not display score immediately after rendering", async () => {
-      const {html} = helper
+      const { html } = helper
         .component(AssessmentPage)
-        .withProps({notebookId: notebook.id})
+        .withProps({ notebookId: notebook.id })
         .render()
 
-      expect(html()).not.toContain('score:')
+      expect(html()).not.toContain("score:")
     })
   })
 })

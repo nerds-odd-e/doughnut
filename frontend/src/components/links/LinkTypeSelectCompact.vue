@@ -5,6 +5,7 @@
         <SvgLinkTypeIcon :link-type="modelValue" :inverse-icon="inverseIcon" />
         {{ label }}
       </template>
+      <!-- prettier-ignore -->
       <template #default="{ closer }">
         <LinkTypeSelect
           v-bind="{

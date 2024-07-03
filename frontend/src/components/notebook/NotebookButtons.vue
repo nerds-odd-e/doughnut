@@ -12,7 +12,10 @@
         <SvgRobot />
       </template>
       <template #default="{ closer }">
-        <NotebookAssistantManagementDialog v-bind="{ notebook }" @close="closer($event)" />
+        <NotebookAssistantManagementDialog
+          v-bind="{ notebook }"
+          @close="closer($event)"
+        />
       </template>
     </PopButton>
     <button

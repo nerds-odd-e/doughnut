@@ -37,14 +37,17 @@ export default class EventSourceHttpRequestImpl extends BaseHttpRequest {
 
   onError?: (error: unknown) => void = undefined
 
-  public override request<T>(
-    options: ApiRequestOptions
-  ): CancelablePromise<T> {
+  public override request<T>(options: ApiRequestOptions): CancelablePromise<T> {
     return new CancelablePromise(async (resolve, reject, onCancel) => {
       try {
         const url = getUrl(this.config, options)
         if (!onCancel.isCancelled) {
-          createEventSourceWithBody(url, options.body, this.onMessage, this.onError)
+          createEventSourceWithBody(
+            url,
+            options.body,
+            this.onMessage,
+            this.onError,
+          )
           resolve(undefined as unknown as T)
         }
       } catch (error) {

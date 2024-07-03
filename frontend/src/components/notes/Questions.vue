@@ -1,6 +1,7 @@
 <template>
   <div>
     <PopButton btn-class="btn btn-primary" title="Add Question">
+      <!-- prettier-ignore -->
       <template #default="{ closer }">
         <NoteAddQuestion
           v-bind="{ note }"

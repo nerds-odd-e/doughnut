@@ -1,5 +1,9 @@
 // eslint-disable-next-line max-classes-per-file
-import { BaseHttpRequest, DoughnutApi, OpenAPIConfig } from "@/generated/backend"
+import {
+  BaseHttpRequest,
+  DoughnutApi,
+  OpenAPIConfig,
+} from "@/generated/backend"
 import ApiStatusHandler, { ApiError, ApiStatus } from "./ApiStatusHandler"
 import BindingHttpRequest from "./BindingHttpRequest"
 import EventSourceHttpRequest from "./EventSourceHttpRequest"
@@ -13,8 +17,15 @@ class ManagedApi extends DoughnutApi {
 
   eventSourceApi: EventSourceApi | undefined = undefined
 
-  constructor(apiStatus: ApiStatus, silent?: boolean, httpRequestConstructor?: new (config: OpenAPIConfig) => BaseHttpRequest) {
-    super({ BASE: "" }, httpRequestConstructor ?? BindingHttpRequest(apiStatus, silent))
+  constructor(
+    apiStatus: ApiStatus,
+    silent?: boolean,
+    httpRequestConstructor?: new (config: OpenAPIConfig) => BaseHttpRequest,
+  ) {
+    super(
+      { BASE: "" },
+      httpRequestConstructor ?? BindingHttpRequest(apiStatus, silent),
+    )
     this.apiStatus = apiStatus
     this.apiStatusHandler = new ApiStatusHandler(apiStatus, silent)
   }

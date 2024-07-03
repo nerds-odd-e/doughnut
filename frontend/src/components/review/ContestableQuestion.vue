@@ -47,33 +47,32 @@ import BasicBreadcrumb from "../commons/BasicBreadcrumb.vue"
 import AnsweredQuestionComponent from "./AnsweredQuestionComponent.vue"
 import QuizQuestionC from "./QuizQuestion.vue"
 
-  const { managedApi } = useLoadingApi()
-  const props = defineProps({
-    quizQuestionInNotebook: {
-      type: Object as PropType<QuizQuestionInNotebook>,
-      required: true,
-    },
-    storageAccessor: {
-      type: Object as PropType<StorageAccessor>,
-      required: true,
-    },
-  })
-  const emit = defineEmits(["need-scroll", "answered"])
-  const regenerating = ref(false)
-  const currentQuestionLegitMessage = ref<string | undefined>(undefined)
-  const currentQuestion = ref(props.quizQuestionInNotebook.quizQuestion)
-  const answeredQuestion = ref<AnsweredQuestion | undefined>(undefined)
-  const prevQuizQuestions = ref<
-    {
-      quizeQuestion: QuizQuestion
-      badQuestionReason: string | undefined
-    }[]
-  >([])
+const { managedApi } = useLoadingApi()
+const props = defineProps({
+  quizQuestionInNotebook: {
+    type: Object as PropType<QuizQuestionInNotebook>,
+    required: true,
+  },
+  storageAccessor: {
+    type: Object as PropType<StorageAccessor>,
+    required: true,
+  },
+})
+const emit = defineEmits(["need-scroll", "answered"])
+const regenerating = ref(false)
+const currentQuestionLegitMessage = ref<string | undefined>(undefined)
+const currentQuestion = ref(props.quizQuestionInNotebook.quizQuestion)
+const answeredQuestion = ref<AnsweredQuestion | undefined>(undefined)
+const prevQuizQuestions = ref<
+  {
+    quizeQuestion: QuizQuestion
+    badQuestionReason: string | undefined
+  }[]
+>([])
 
-  const scrollToBottom = () => {
-    emit("need-scroll")
-  }
-
+const scrollToBottom = () => {
+  emit("need-scroll")
+}
 
 const contest = async () => {
   currentQuestionLegitMessage.value = ""
@@ -102,7 +101,6 @@ const onAnswered = (answer: AnsweredQuestion) => {
   answeredQuestion.value = answer
   emit("answered", answeredQuestion.value)
 }
-
 </script>
 
 <style lang="scss" scoped>

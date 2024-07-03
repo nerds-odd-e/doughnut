@@ -22,6 +22,7 @@ module.exports = {
     'plugin:vue/vue3-strongly-recommended',
     'plugin:import/recommended',
     'plugin:import/typescript',
+    'plugin:prettier/recommended',
     'prettier',
   ],
   ignorePatterns: [
@@ -58,6 +59,7 @@ module.exports = {
     'vue',
     '@typescript-eslint',
     'import',
+    'prettier',
   ],
   rules: {
     'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'warn',
@@ -74,6 +76,12 @@ module.exports = {
     'vue/no-template-shadow': 'off',
     'vue/require-default-prop': 'off',
     'vue/no-template-shadow': 'off',
+    'prettier/prettier': ['error', {
+      semi: false,
+      bracketSpacing: true,
+      printWidth: 80,
+      arrowParens: 'always',
+    }],
   },
   overrides: [
     {
