@@ -58,7 +58,7 @@ export default defineConfig({
   },
   compilation: {
     input: {
-      index: fileURLToPath(new URL('index.html', import.meta.url)),
+      index: fileURLToPath(new URL('/index.html', import.meta.url)),
     },
     output: {
       path: '../backend/src/main/resources/static/',
