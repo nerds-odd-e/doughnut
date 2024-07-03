@@ -1,4 +1,3 @@
-import start from "../index";
 
 export const assumeAssessmentPage = (notebook?: string) => {
   if (notebook) {
