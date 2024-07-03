@@ -15,6 +15,7 @@
   </div>
 
   <div v-if="notesOfWrongAnswers.length > 0 && assessmentCompleted">
+    <h1>CONTENT BELOW IS IN PROGRESS</h1>
     <h5>Improve your knowledge by studying these notes</h5>
     <Cards :note-topics="notesOfWrongAnswers">
     </Cards>
