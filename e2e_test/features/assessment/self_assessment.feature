@@ -18,8 +18,10 @@ Feature: New questions assessment
       | Singapore | Where in the world is Singapore?   | Asia    | euro           | true     |
       | Vietnam   | Most famous food of Vietnam?       | Pho     | bread          | true     |
       | Japan     | What is the capital city of Japan? | Tokyo   | Kyoto          | true     |
+      | Japan     | What is the oldest city of Japan?  | Fukuoka | Sapporo         | true     |
       | Korea     | What is the capital city of Korea? | Seoul   | Busan          | true     |
       | China     | What is the capital city of China? | Beijing | Shanghai       | true     |
+      | China     | What is the largest city of China? | Shanghai| Beijing        | true     |
 
 
   Scenario: Complete an assessment with 5 approved questions
@@ -42,7 +44,7 @@ Feature: New questions assessment
     And I answer the question "What is the capital city of China?" with "Beijing"
     And I should see the score "Yours score: 5 / 5" at the end of assessment
 
-    @focus
+
   Scenario: Perform an assessment with all wrong answers
     Given I set the number of questions per assessment of the notebook "Countries" to 1
     When I start the assessment on the "Countries" notebook in the bazaar
