@@ -13,5 +13,5 @@
 </template>
 
 <script setup>
-const props = defineProps({ ifInverse: { type: Number, default: 1 } })
+defineProps({ ifInverse: { type: Number, default: 1 } })
 </script>

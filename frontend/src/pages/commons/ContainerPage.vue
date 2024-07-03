@@ -14,7 +14,7 @@
 <script setup>
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 
-const props = defineProps({
+defineProps({
   title: String,
   contentExists: Boolean,
 })
