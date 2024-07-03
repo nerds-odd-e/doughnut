@@ -14,14 +14,14 @@ Feature: New questions assessment
       | China            | Countries   |
     And notebook "Countries" is shared to the Bazaar
     And there are questions for the note:
-    | noteTopic | question                                          | answer  | oneWrongChoice | approved |
-    | Singapore | Where in the world is Singapore?                  | Asia    | euro           | true     |
-    | Vietnam   | Most famous food of Vietnam?                      | Pho     | bread          | true     |
-    | Japan     | What is the capital city of Japan?                | Tokyo   | Kyoto          | true     |
-    | Japan     | What is the largest city in on the Kyushu island? | Fukuoka | Nagasaki       | true     |
-    | Korea     | What is the capital city of Korea?                | Seoul   | Busan          | true     |
-    | China     | What is the capital city of China?                | Beijing | Shanghai       | true     |
-    | China     | What is the largest city of China?                | Shanghai| Beijing        | true     |
+      | noteTopic | question                                          | answer   | oneWrongChoice | approved |
+      | Singapore | Where in the world is Singapore?                  | Asia     | euro           | true     |
+      | Vietnam   | Most famous food of Vietnam?                      | Pho      | bread          | true     |
+      | Japan     | What is the capital city of Japan?                | Tokyo    | Kyoto          | true     |
+      | Japan     | What is the largest city in on the Kyushu island? | Fukuoka  | Nagasaki       | true     |
+      | Korea     | What is the capital city of Korea?                | Seoul    | Busan          | true     |
+      | China     | What is the capital city of China?                | Beijing  | Shanghai       | true     |
+      | China     | What is the largest city of China?                | Shanghai | Beijing        | true     |
 
 
   Scenario: Complete an assessment with 5 approved questions
@@ -49,9 +49,9 @@ Feature: New questions assessment
     Given I set the number of questions per assessment of the notebook "Countries" to 1
     When I start the assessment on the "Countries" notebook in the bazaar
     And I answer with the following answers:
-    | question                         | answer |
-    |Most famous food of Vietnam?      | bread  |
-    |Where in the world is Singapore?  | euro   |
+      | question                         | answer |
+      | Most famous food of Vietnam?     | bread  |
+      | Where in the world is Singapore? | euro   |
 
     Then I should see the score "Yours score: 0 / 1" at the end of assessment
     And I should see a link to the "Singapore" notebook
