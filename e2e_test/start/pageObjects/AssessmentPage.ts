@@ -16,14 +16,14 @@ export const assumeAssessmentPage = (notebook?: string) => {
     aQuestion() {
       return {
         getStem() {
-            return cy.get(".quiz-instruction div").first().invoke("text")
+            return cy.get(".quiz-instruction div", {}).first().invoke("text")
         },
         answerFirst() {
           cy.get(".choices button").first().click()
         },
-        answerFromTable(hashes: Record<string, string>[]) {
-          this.getStem().then((stem) => {
-            const row = hashes.find(row => row.question === stem)
+        answerFromTable(answersTable: Record<string, string>[]) {
+          return this.getStem().then((stem) => {
+            const row = answersTable.find(row => row.question === stem)
             return cy.findByText(row.answer).click()
           })
         }
@@ -32,6 +32,21 @@ export const assumeAssessmentPage = (notebook?: string) => {
     expectEndOfAssessment(expectedScore: string) {
       cy.contains(expectedScore)
     },
+    answerQuestionsFromTable(expectedNumberOfQuestions: number, hashes: Record<string, string>[]) {
+      const takeNextQuestion = () => {
+        return cy.get('body').then($body => {
+          if ($body.find('.quiz-instruction').length > 0) {
+            return performOneQuestion();
+          } else {
+            return cy.log('Element not found');
+          }
+        });
+      }
+
+      const performOneQuestion = () => this.aQuestion().answerFromTable(hashes).then(takeNextQuestion)
+
+      return performOneQuestion()
+    }
   }
 }
 

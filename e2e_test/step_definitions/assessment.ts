@@ -23,9 +23,7 @@ Then(
 
 When('I answer with the {int} following answers:',
   function (expectedNumberOfQuestions: number, table: DataTable) {
-    for (let i = 0; i < expectedNumberOfQuestions; i++) {
-      start.assumeAssessmentPage().aQuestion().answerFromTable(table.hashes())
-    }
+    start.assumeAssessmentPage().answerQuestionsFromTable(expectedNumberOfQuestions, table.hashes())
 })
 
 When(
