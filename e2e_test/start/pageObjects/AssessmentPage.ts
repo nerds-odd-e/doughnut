@@ -12,7 +12,7 @@ export const assumeAssessmentPage = (notebook?: string) => {
         },
       }
     },
-    expectAQuestion() {
+    aQuestion() {
       return {
         getStem() {
             return cy.get(".quiz-instruction div").first().invoke("text")

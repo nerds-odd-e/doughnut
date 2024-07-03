@@ -24,7 +24,7 @@ Then(
 When('I answer with the {int} following answers:',
   function (expectedNumberOfQuestions: number, table: DataTable) {
     for (let i = 0; i < expectedNumberOfQuestions; i++) {
-      start.assumeAssessmentPage().expectAQuestion().getStem().then(stem => {
+      start.assumeAssessmentPage().aQuestion().getStem().then(stem => {
         const row = table.hashes().find(row => row.question === stem)
         start.assumeAssessmentPage().expectQuestion(stem).answer(row.answer)
       })
@@ -37,7 +37,7 @@ When(
     const questions: string[] = []
     for (let i = 0; i < attempts; i++) {
       start.navigateToBazaar().selfAssessmentOnNotebook(notebook)
-      const question = start.assumeAssessmentPage().expectAQuestion()
+      const question = start.assumeAssessmentPage().aQuestion()
       question.getStem().then((stem) => {
         questions.push(stem)
         question.answerFirst()
