@@ -64,10 +64,12 @@ Then("I should see error message The assessment is not available", () => {
 })
 
 Then("I should see a link to the {string} notebook",
-  (notebookName: string) => {
-   cy
+  (noteName: string) => {
+    start.assumeAssessmentResultPage().expectCardFor(noteName)
+    cy
       .findByRole("heading", { name: `Improve your knowledge by studying these notes` })
-      .get('.card-body').should("contain", notebookName)
+      .get('.card-body').click()
+    start.assumeNotePage(noteName)
   }
 )
 

@@ -24,6 +24,16 @@ export const assumeAssessmentPage = (notebook?: string) => {
     },
     expectEndOfAssessment(expectedScore: string) {
       cy.contains(expectedScore)
-    }
+    },
+  }
+}
+
+export const assumeAssessmentResultPage = () => {
+  cy.findByRole("heading", { name: "Improve your knowledge by studying these notes" })
+
+  return {
+     expectCardFor(noteName: string) {
+       cy.get('.card-body').should("contain", noteName)
+     }
   }
 }
