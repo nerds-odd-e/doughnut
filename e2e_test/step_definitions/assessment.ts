@@ -21,6 +21,11 @@ Then(
   },
 )
 
+When('I answer with the following answers:',
+  function (table: DataTable) {
+    start.assumeAssessmentPage().expectQuestion(table.hashes()[0]!.question).answer(table.hashes()[0]!.answer)
+});
+
 When(
   "{int} subsequent attempts of assessment on the {string} notebook should not have the same questions each time",
   (attempts: number, notebook: string) => {
