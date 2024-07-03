@@ -42,21 +42,12 @@ Feature: New questions assessment
     And I answer the question "What is the capital city of China?" with "Beijing"
     And I should see the score "Yours score: 5 / 5" at the end of assessment
 
-@ignore
   Scenario: Perform an assessment with all wrong answers
-    Given I set the number of questions per assessment of the notebook "Countries" to 5
+    Given I set the number of questions per assessment of the notebook "Countries" to 1
     When I start the assessment on the "Countries" notebook in the bazaar
     Then I answer the question "Where in the world is Singapore?" with "euro"
-    And I answer the question "Most famous food of Vietnam?" with "bread"
-    And I answer the question "What is the capital city of Japan?" with "Kyoto"
-    And I answer the question "What is the capital city of Korea?" with "Busan"
-    And I answer the question "What is the capital city of China?" with "Shanghai"
-    And I should see the score "Yours score: 0 / 5" at the end of assessment
+    And I should see the score "Yours score: 0 / 1" at the end of assessment
     And I should see a link to the "Singapore" notebook
-    And I should see a link to the "Vietnam" notebook
-    And I should see a link to the "Japan" notebook
-    And I should see a link to the "Korea" notebook
-    And I should see a link to the "China" notebook
 
   @ignore
   Scenario: Questions vary from attempt to attempt

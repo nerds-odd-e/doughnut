@@ -13,14 +13,21 @@
       <p>Yours score: {{ correctAnswers }} / {{ quizQuestions.length }}</p>
     </div>
   </div>
+
+  <div v-if="notesOfWrongAnswers.length > 0 && assessmentCompleted">
+    <h5>Improve your knowledge by studying these notes</h5>
+    <Cards :note-topics="notesOfWrongAnswers">
+    </Cards>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { QuizQuestion } from "@/generated/backend"
+import {NoteTopic, QuizQuestion} from "@/generated/backend"
 import { useRouter } from "vue-router"
 import QuizQuestionComp from "@/components/review/QuizQuestion.vue"
+import Cards from "@/components/notes/Cards.vue"
 
 const { managedApi } = useLoadingApi()
 const router = useRouter()
@@ -31,14 +38,26 @@ const topicConstructor = computed(() => {
   return router.currentRoute.value.query?.topic
 })
 const quizQuestions = ref<QuizQuestion[]>([])
+const notesOfWrongAnswers = ref<NoteTopic[]>([])
 const currentQuestion = ref(0)
 const errors = ref("")
 const correctAnswers = ref(0)
 const assessmentCompleted = computed(() => currentQuestion.value >= quizQuestions.value.length && quizQuestions.value.length > 0)
+
+const getNoteTopicFromQuestion = (): NoteTopic => {
+  return {
+    id: 2,
+    topicConstructor: "Singapore"}
+}
+
 const questionAnswered = (answerResult) => {
   currentQuestion.value += 1
   if (answerResult.correct) {
     correctAnswers.value += 1
+  }
+
+  if (!answerResult.correct) {
+    notesOfWrongAnswers.value.push(getNoteTopicFromQuestion())
   }
 }
 

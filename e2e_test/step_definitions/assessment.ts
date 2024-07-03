@@ -57,8 +57,9 @@ Then("I should see error message The assessment is not available", () => {
 
 Then("I should see a link to the {string} notebook",
   (notebookName: string) => {
-    cy.get('.card').get('.topic-text').get('span').should("have.value", notebookName)
-    start.assumeNotePage().navigateToReference(notebookName)
+   cy
+      .findByRole("heading", { name: `Improve your knowledge by studying these notes` })
+      .get('.card-body').should("contain", notebookName)
   }
 )
 
