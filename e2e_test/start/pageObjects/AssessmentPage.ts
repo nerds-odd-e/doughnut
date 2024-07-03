@@ -24,7 +24,7 @@ export const assumeAssessmentPage = (notebook?: string) => {
         answerFromTable(answersTable: Record<string, string>[]) {
           return this.getStem().then((stem) => {
             const row = answersTable.find(row => row.question === stem)
-            return cy.findByText(row.answer).click()
+            cy.findByText(row.answer).click()
           })
         }
       }
@@ -36,16 +36,14 @@ export const assumeAssessmentPage = (notebook?: string) => {
       const tryContinueAssessment = () => {
         return cy.get('body').then($body => {
           if ($body.find('.quiz-instruction').length > 0) {
-            return passNextQuestion();
+            return this.aQuestion().answerFromTable(answersTable).then(tryContinueAssessment)
           } else {
-            return cy.log('Element not found');
+            return cy.log('Element not found')
           }
-        });
+        })
       }
 
-      const passNextQuestion = () => this.aQuestion().answerFromTable(answersTable).then(tryContinueAssessment)
-
-      return passNextQuestion()
+      return this.aQuestion().answerFromTable(answersTable).then(tryContinueAssessment)
     }
   }
 }
