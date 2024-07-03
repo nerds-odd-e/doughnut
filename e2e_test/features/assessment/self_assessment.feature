@@ -60,8 +60,7 @@ Feature: New questions assessment
     Then I should see the score "Yours score: 0 / 2" at the end of assessment
     And I should see a link to the "Singapore" notebook
 
-  @ignore
-  Scenario: Questions vary from attempt to attempt
+  Scenario: Notes order vary from attempt to attempt
     Given I set the number of questions per assessment of the notebook "Countries" to 1
     Then 10 subsequent attempts of assessment on the "Countries" notebook should be random meaning it should not have the same questions each time
 

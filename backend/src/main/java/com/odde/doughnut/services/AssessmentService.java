@@ -2,12 +2,14 @@ package com.odde.doughnut.services;
 
 import static com.odde.doughnut.controllers.dto.ApiError.ErrorType.ASSESSMENT_SERVICE_ERROR;
 
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.QuizQuestionAndAnswer;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.theokanning.openai.client.OpenAiApi;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -20,8 +22,11 @@ public class AssessmentService {
 
   public List<QuizQuestion> generateAssessment(Notebook notebook) {
 
+    List<Note> notes = new java.util.ArrayList<Note>(notebook.getNotes());
+    Collections.shuffle(notes);
+
     List<QuizQuestionAndAnswer> questions =
-        notebook.getNotes().stream()
+        notes.stream()
             .map(quizQuestionService::selectQuizQuestionForANote)
             .filter(Objects::nonNull)
             .filter(QuizQuestionAndAnswer::isApproved)

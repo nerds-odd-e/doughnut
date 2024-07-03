@@ -32,7 +32,7 @@ When('I answer with the {int} following answers:',
 })
 
 When(
-  "{int} subsequent attempts of assessment on the {string} notebook should not have the same questions each time",
+  "{int} subsequent attempts of assessment on the {string} notebook should be random meaning it should not have the same questions each time",
   (attempts: number, notebook: string) => {
     const questions: string[] = []
     for (let i = 0; i < attempts; i++) {
