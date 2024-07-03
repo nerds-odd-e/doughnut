@@ -21,9 +21,9 @@ Then(
   },
 )
 
-When('I answer with the {int} following answers:',
-  function (expectedNumberOfQuestions: number, table: DataTable) {
-    start.assumeAssessmentPage().answerQuestionsFromTable(expectedNumberOfQuestions, table.hashes())
+When('I answer with the following answers:',
+  function (table: DataTable) {
+    start.assumeAssessmentPage().answerQuestionsFromTable(table.hashes())
 })
 
 When(

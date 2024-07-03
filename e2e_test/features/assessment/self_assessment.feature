@@ -26,7 +26,7 @@ Feature: New questions assessment
   Scenario: Complete an assessment with 5 approved questions
     Given I set the number of questions per assessment of the notebook "Countries" to 5
     When I start the assessment on the "Countries" notebook in the bazaar
-    And I answer with the 5 following answers:
+    And I answer with the following answers:
       | question                           | answer  |
       | Where in the world is Singapore?   | Asia    |
       | Most famous food of Vietnam?       | Pho     |
@@ -38,7 +38,7 @@ Feature: New questions assessment
   Scenario: Perform an assessment with all correct answers with table view
     Given I set the number of questions per assessment of the notebook "Countries" to 5
     When I start the assessment on the "Countries" notebook in the bazaar
-    And I answer with the 5 following answers:
+    And I answer with the following answers:
       | question                           | answer  |
       | Where in the world is Singapore?   | Asia    |
       | Most famous food of Vietnam?       | Pho     |
@@ -50,7 +50,7 @@ Feature: New questions assessment
   Scenario: Perform an assessment with all wrong answers
     Given I set the number of questions per assessment of the notebook "Countries" to 2
     When I start the assessment on the "Countries" notebook in the bazaar
-    And I answer with the 2 following answers:
+    And I answer with the following answers:
       | question                           | answer   |
       | Where in the world is Singapore?   | euro     |
       | What is the capital city of Japan? | Kyoto    |

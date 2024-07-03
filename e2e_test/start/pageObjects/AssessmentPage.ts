@@ -32,20 +32,20 @@ export const assumeAssessmentPage = (notebook?: string) => {
     expectEndOfAssessment(expectedScore: string) {
       cy.contains(expectedScore)
     },
-    answerQuestionsFromTable(expectedNumberOfQuestions: number, hashes: Record<string, string>[]) {
-      const takeNextQuestion = () => {
+    answerQuestionsFromTable(answersTable: Record<string, string>[]) {
+      const tryContinueAssessment = () => {
         return cy.get('body').then($body => {
           if ($body.find('.quiz-instruction').length > 0) {
-            return performOneQuestion();
+            return passNextQuestion();
           } else {
             return cy.log('Element not found');
           }
         });
       }
 
-      const performOneQuestion = () => this.aQuestion().answerFromTable(hashes).then(takeNextQuestion)
+      const passNextQuestion = () => this.aQuestion().answerFromTable(answersTable).then(tryContinueAssessment)
 
-      return performOneQuestion()
+      return passNextQuestion()
     }
   }
 }
