@@ -24,10 +24,7 @@ Then(
 When('I answer with the {int} following answers:',
   function (expectedNumberOfQuestions: number, table: DataTable) {
     for (let i = 0; i < expectedNumberOfQuestions; i++) {
-      start.assumeAssessmentPage().aQuestion().getStem().then(stem => {
-        const row = table.hashes().find(row => row.question === stem)
-        start.assumeAssessmentPage().expectQuestion(stem).answer(row.answer)
-      })
+      start.assumeAssessmentPage().aQuestion().answerFromTable(table.hashes())
     }
 })
 

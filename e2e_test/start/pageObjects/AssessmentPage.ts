@@ -1,3 +1,5 @@
+import start from "../index";
+
 export const assumeAssessmentPage = (notebook?: string) => {
   if (notebook) {
     cy.findByRole("heading", { name: `Assessment For ${notebook}` })
@@ -20,6 +22,12 @@ export const assumeAssessmentPage = (notebook?: string) => {
         answerFirst() {
           cy.get(".choices button").first().click()
         },
+        answerFromTable(hashes: Record<string, string>[]) {
+          this.getStem().then((stem) => {
+            const row = hashes.find(row => row.question === stem)
+            return cy.findByText(row.answer).click()
+          })
+        }
       }
     },
     expectEndOfAssessment(expectedScore: string) {
