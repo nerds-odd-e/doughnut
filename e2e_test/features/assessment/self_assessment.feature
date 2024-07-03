@@ -23,7 +23,6 @@ Feature: New questions assessment
       | China     | What is the capital city of China?                | Beijing  | Shanghai       | true     |
       | China     | What is the largest city of China?                | Shanghai | Beijing        | true     |
 
-
   Scenario: Complete an assessment with 5 approved questions
     Given I set the number of questions per assessment of the notebook "Countries" to 5
     When I start the assessment on the "Countries" notebook in the bazaar
