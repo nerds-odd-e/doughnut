@@ -1,6 +1,6 @@
 <template>
   <h3>Edit notebook settings</h3>
-  <form @submit.prevent.once="processForm">
+  <form @submit="processForm">
     <CheckInput
       scope-name="notebook"
       field="skipReviewEntirely"
