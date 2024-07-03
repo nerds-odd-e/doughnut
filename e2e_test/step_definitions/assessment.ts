@@ -23,7 +23,10 @@ Then(
 
 When('I answer with the following answers:',
   function (table: DataTable) {
-    start.assumeAssessmentPage().expectQuestion(table.hashes()[0]!.question).answer(table.hashes()[0]!.answer)
+    start.assumeAssessmentPage().expectAQuestion().getStem().then(stem => {
+      const row = table.hashes().find(row => row.question === stem)
+      start.assumeAssessmentPage().expectQuestion(stem).answer(row.answer)
+    })
 })
 
 When(
