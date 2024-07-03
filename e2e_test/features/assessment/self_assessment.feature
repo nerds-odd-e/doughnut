@@ -42,7 +42,6 @@ Feature: New questions assessment
     And I answer the question "What is the capital city of China?" with "Beijing"
     And I should see the score "Yours score: 5 / 5" at the end of assessment
 
-  @focus
   Scenario: Perform an assessment with all wrong answers
     Given I set the number of questions per assessment of the notebook "Countries" to 1
     When I start the assessment on the "Countries" notebook in the bazaar
@@ -55,7 +54,7 @@ Feature: New questions assessment
   @ignore
   Scenario: Questions vary from attempt to attempt
     Given I set the number of questions per assessment of the notebook "Countries" to 1
-    Then 10 subsequent attempts of assessment on the "Countries" notebook should not have the same questions each time
+    Then 10 subsequent attempts of assessment on the "Countries" notebook should be random meaning it should not have the same questions each time
 
   Scenario: Fail to start assessment not enough approve questions
     Given I toggle the approval of the question "What is the capital city of China?" of the topic "China"
