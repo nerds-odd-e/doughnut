@@ -14,14 +14,14 @@ Feature: New questions assessment
       | China            | Countries   |
     And notebook "Countries" is shared to the Bazaar
     And there are questions for the note:
-      | noteTopic | question                           | answer  | oneWrongChoice | approved |
-      | Singapore | Where in the world is Singapore?   | Asia    | euro           | true     |
-      | Vietnam   | Most famous food of Vietnam?       | Pho     | bread          | true     |
-      | Japan     | What is the capital city of Japan? | Tokyo   | Kyoto          | true     |
-      | Japan     | What is the oldest city of Japan?  | Fukuoka | Sapporo         | true     |
-      | Korea     | What is the capital city of Korea? | Seoul   | Busan          | true     |
-      | China     | What is the capital city of China? | Beijing | Shanghai       | true     |
-      | China     | What is the largest city of China? | Shanghai| Beijing        | true     |
+    | noteTopic | question                                          | answer  | oneWrongChoice | approved |
+    | Singapore | Where in the world is Singapore?                  | Asia    | euro           | true     |
+    | Vietnam   | Most famous food of Vietnam?                      | Pho     | bread          | true     |
+    | Japan     | What is the capital city of Japan?                | Tokyo   | Kyoto          | true     |
+    | Japan     | What is the largest city in on the Kyushu island? | Fukuoka | Nagasaki       | true     |
+    | Korea     | What is the capital city of Korea?                | Seoul   | Busan          | true     |
+    | China     | What is the capital city of China?                | Beijing | Shanghai       | true     |
+    | China     | What is the largest city of China?                | Shanghai| Beijing        | true     |
 
 
   Scenario: Complete an assessment with 5 approved questions
