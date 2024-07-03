@@ -111,7 +111,7 @@ module.exports = {
         'vitest/expect-expect': 'off',
         'vitest/no-disabled-tests': 'warn',
         'vitest/no-focused-tests': 'error',
-        'vitest/no-identical-title': 'warn',
+        'vitest/no-identical-title': 'error',
       },
     },
   ],

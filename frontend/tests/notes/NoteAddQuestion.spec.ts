@@ -1,5 +1,5 @@
 import NoteAddQuestion from "@/components/notes/NoteAddQuestion.vue"
-import userEvent from "@testing-library/user-event"
+import { userEvent } from "@testing-library/user-event"
 import { screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import makeMe from "../fixtures/makeMe"
