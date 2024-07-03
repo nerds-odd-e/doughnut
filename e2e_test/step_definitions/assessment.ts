@@ -21,9 +21,9 @@ Then(
   },
 )
 
-When('I answer with the following answers:',
-  function (table: DataTable) {
-    for (let i = 0; i < table.hashes().length; i++) {
+When('I answer with the {int} following answers:',
+  function (expectedNumberOfQuestions: number, table: DataTable) {
+    for (let i = 0; i < expectedNumberOfQuestions; i++) {
       start.assumeAssessmentPage().expectAQuestion().getStem().then(stem => {
         const row = table.hashes().find(row => row.question === stem)
         start.assumeAssessmentPage().expectQuestion(stem).answer(row.answer)
