@@ -37,7 +37,7 @@
     "cy:run-on-sut": "wait-on tcp:9081 && pnpm cy:run",
     "sut": "backend/gradlew -p backend bootRunE2E --build-cache",
     "open": "pnpm --frozen-lockfile --silent recursive install && pnpm format:all && pnpm frontend:build && run-p -clnr sut cy:open",
-    "test": "pnpm --frozen-lockfile --silent recursive install && pnpm format:all && pnpm frontend:build && run-p -clnr sut start:mb cy:run-on-sut",
+    "test": "pnpm --frozen-lockfile --silent recursive install && pnpm frontend:build && run-p -clnr sut start:mb cy:run-on-sut",
     "test:open": "pnpm --frozen-lockfile --silent recursive install && pnpm format:all && pnpm run-p -clnr sut start:mb frontend:sut cy:open",
     "verify": "pnpm format:all && pnpm test",
     "sound": "github_action_sound https://github.com/nerds-odd-e/doughnut/actions",
