@@ -53,28 +53,28 @@ const assessmentCompleted = computed(
     quizQuestions.value.length > 0
 )
 
-const getNoteTopicFromQuestion = (): NoteTopic => {
-  return {
-    id: 2,
-    topicConstructor: "Singapore",
-  }
-}
+const questionAnswered = async (answerResult) => {
+  questionsAnswerCollection.value.push({
+    questionId: quizQuestions.value[currentQuestion.value]!.id,
+    answerId: answerResult.answerId,
+  })
 
-const questionAnswered = (answerResult) => {
-  currentQuestion.value += 1
   if (answerResult.correct) {
     correctAnswers.value += 1
   }
-
-  if (!answerResult.correct) {
-    notesOfWrongAnswers.value.push(getNoteTopicFromQuestion())
-  }
-
+  currentQuestion.value += 1
   if (assessmentCompleted.value) {
-    managedApi.restAssessmentController.submitAssessmentResult(
-      <number>props.notebookId,
-      questionsAnswerCollection.value
-    )
+    const assessmentResult =
+      await managedApi.restAssessmentController.submitAssessmentResult(
+        <number>props.notebookId,
+        questionsAnswerCollection.value
+      )
+    for (let noteIdAndTitle of assessmentResult.noteIdAndTitles!) {
+      notesOfWrongAnswers.value.push({
+        id: noteIdAndTitle.id ?? 0,
+        topicConstructor: noteIdAndTitle.title ?? "",
+      })
+    }
   }
 }
 
