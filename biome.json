@@ -1,10 +1,12 @@
 {
   "$schema": "https://biomejs.dev/schemas/1.8.3/schema.json",
-  "organizeImports": {
-    "enabled": false
+  "vcs": {
+    "clientKind": "git",
+    "enabled": true,
+    "useIgnoreFile": true,
+    "defaultBranch": "main"
   },
   "files": {
-    "ignoreUnknown": true,
     "ignore": [
       "**/.direnv",
       "**/.git",
@@ -24,8 +26,8 @@
       "e2e_test/fixtures/*.{js,json}",
       "e2e_test/support/index.d.ts",
       "frontend/*.cjs",
-      "frontend/{biome,package,tsconfig}.json",
-      "frontend/{auto-imports,components}.d.ts",
+      "frontend/{biome,package,tsconfig, tsconfig.node}.json",
+      "frontend/{auto-imports,components,typed-router}.d.ts",
       "frontend/{vite,farm}.config.ts",
       "frontend/src/@types/doughnut/index.d.ts",
       "frontend/src/generated/backend/**/*.ts",
@@ -34,150 +36,168 @@
       "frontend/tests/setupVitest.js",
       "**/*.md",
       "**/index.html"
-    ]
-  },
-  "vcs": {
-    "enabled": true,
-    "clientKind": "git",
-    "useIgnoreFile": true,
-    "defaultBranch": "main"
+    ],
+    "ignoreUnknown": true
   },
   "formatter": {
     "enabled": true,
     "indentStyle": "space",
     "indentWidth": 2,
-    "lineWidth": 100
+    "lineWidth": 80
   },
-  "javascript": {
-    "formatter": {
-      "quoteStyle": "single",
-      "semicolons": "asNeeded",
-      "trailingCommas": "es5"
-    }
-  },
+  "organizeImports": { "enabled": false },
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true,
+      "recommended": false,
       "complexity": {
         "noBannedTypes": "error",
-        "noUselessTypeConstraint": "error",
-        "useSimplifiedLogicExpression": "warn",
         "noExtraBooleanCast": "error",
+        "noMultipleSpacesInRegularExpressionLiterals": "error",
+        "noUselessCatch": "error",
         "noUselessConstructor": "error",
         "noUselessRename": "error",
         "noUselessTernary": "error",
+        "noUselessThisAlias": "error",
+        "noUselessTypeConstraint": "error",
         "noVoid": "error",
         "noWith": "error",
+        "useArrowFunction": "off",
         "useLiteralKeys": "error",
-        "useRegexLiterals": "error"
+        "useRegexLiterals": "error",
+        "useSimplifiedLogicExpression": "warn"
       },
       "correctness": {
-        "noInvalidUseBeforeDeclaration": "warn",
-        "noPrecisionLoss": "error",
-        "noUnusedImports": "warn",
-        "noUnusedVariables": "warn",
-        "useArrayLiterals": "warn",
         "noConstAssign": "error",
         "noConstantCondition": "error",
         "noConstructorReturn": "error",
+        "noEmptyCharacterClassInRegex": "error",
+        "noEmptyPattern": "error",
         "noGlobalObjectCalls": "error",
+        "noInnerDeclarations": "error",
         "noInvalidConstructorSuper": "error",
+        "noInvalidUseBeforeDeclaration": "warn",
         "noNewSymbol": "error",
+        "noNonoctalDecimalEscape": "error",
+        "noPrecisionLoss": "error",
+        "noSelfAssign": "error",
         "noSetterReturn": "error",
+        "noSwitchDeclarations": "error",
         "noUndeclaredVariables": "error",
         "noUnreachable": "error",
         "noUnreachableSuper": "error",
+        "noUnsafeFinally": "error",
+        "noUnsafeOptionalChaining": "error",
+        "noUnusedImports": "error",
+        "noUnusedLabels": "error",
+        "noUnusedVariables": "error",
+        "useArrayLiterals": "off",
         "useIsNan": "error",
         "useValidForDirection": "error",
         "useYield": "error"
       },
+      "security": { "noGlobalEval": "error" },
       "style": {
-        "noInferrableTypes": "warn",
-        "noNamespace": "error",
-        "useAsConstAssertion": "error",
-        "useBlockStatements": "warn",
-        "useSingleVarDeclarator": "warn",
         "noArguments": "error",
         "noCommaOperator": "error",
+        "noInferrableTypes": "warn",
+        "noNamespace": "error",
         "noVar": "error",
+        "useAsConstAssertion": "error",
+        "useBlockStatements": "off",
         "useConst": "error",
         "useDefaultParameterLast": "error",
         "useShorthandAssign": "error",
+        "useSingleVarDeclarator": "warn",
         "useTemplate": "error"
       },
       "suspicious": {
+        "noAssignInExpressions": "error",
+        "noAsyncPromiseExecutor": "error",
+        "noCatchAssign": "error",
+        "noClassAssign": "error",
+        "noCompareNegZero": "error",
+        "noControlCharactersInRegex": "error",
+        "noDebugger": "error",
+        "noDoubleEquals": "error",
+        "noDuplicateCase": "error",
+        "noDuplicateClassMembers": "error",
+        "noDuplicateObjectKeys": "error",
+        "noDuplicateParameters": "error",
+        "noEmptyBlockStatements": "error",
         "noExplicitAny": "warn",
         "noExtraNonNullAssertion": "error",
+        "noFallthroughSwitchClause": "error",
+        "noFunctionAssign": "error",
+        "noGlobalAssign": "error",
+        "noImportAssign": "error",
+        "noMisleadingCharacterClass": "error",
         "noMisleadingInstantiator": "error",
-        "noUnsafeDeclarationMerging": "error",
-        "noAsyncPromiseExecutor": "error",
-        "noDoubleEquals": "error",
         "noPrototypeBuiltins": "error",
+        "noRedeclare": "error",
         "noShadowRestrictedNames": "error",
+        "noUnsafeDeclarationMerging": "error",
+        "noUnsafeNegation": "error",
         "useDefaultSwitchClauseLast": "error",
+        "useGetterReturn": "error",
         "useValidTypeof": "error"
-      },
-      "security": {
-        "noGlobalEval": "error"
       }
     },
     "ignore": [
       "**/tsconfig*.json",
       "**/.eslintrc.cjs",
       "e2e_test/config/{ci,common}.ts",
-      "**/components.d.ts",
+      "**/{auto-imports,components,typed-router}.d.ts",
       "**/node_modules",
       "**/.git",
       "**/.github",
       "**/*.md",
       "**/index.html",
       "frontend/{farm,vite}.config.ts",
-      "frontend/tests/setupVitest.js"
+      "frontend/tests/setupVitest.js",
+      "**/tsconfig.json",
+      "**/tsconfignode.json",
+      "config/ci.ts",
+      "config/common.ts"
     ]
+  },
+  "javascript": {
+    "formatter": {
+      "trailingCommas": "es5",
+      "semicolons": "asNeeded",
+      "quoteStyle": "single"
+    }
   },
   "overrides": [
     {
-      "include": ["*.json", "*.config.*", ".*.js"],
-      "linter": {
-        "rules": {}
-      }
-    },
-    {
-      "include": ["**/*.vue"],
+      "include": ["*.ts", "*.tsx", "*.mts", "*.cts"],
       "linter": {
         "rules": {
           "correctness": {
+            "noConstAssign": "off",
+            "noGlobalObjectCalls": "off",
+            "noInvalidConstructorSuper": "off",
+            "noInvalidNewBuiltin": "off",
+            "noNewSymbol": "off",
+            "noSetterReturn": "off",
             "noUndeclaredVariables": "off",
-            "noUnusedVariables": "off"
-          }
-        }
-      }
-    },
-    {
-      "include": ["**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts"],
-      "linter": {
-        "rules": {
-          "correctness": {
-            "noInvalidUseBeforeDeclaration": "off",
-            "noUndeclaredVariables": "off",
-            "noUnusedVariables": "warn"
+            "noUnreachable": "off",
+            "noUnreachableSuper": "off"
+          },
+          "style": {
+            "noArguments": "error",
+            "noVar": "error",
+            "useConst": "error"
           },
           "suspicious": {
-            "noExplicitAny": "warn"
-          }
-        }
-      }
-    },
-    {
-      "include": ["shims-tsx.d.ts"],
-      "linter": {
-        "rules": {
-          "correctness": {
-            "noUnusedVariables": "off"
-          },
-          "suspicious": {
-            "noExplicitAny": "off"
+            "noDuplicateClassMembers": "off",
+            "noDuplicateObjectKeys": "off",
+            "noDuplicateParameters": "off",
+            "noFunctionAssign": "off",
+            "noImportAssign": "off",
+            "noRedeclare": "off",
+            "noUnsafeNegation": "off",
+            "useGetterReturn": "off"
           }
         }
       }
