@@ -19,7 +19,14 @@ const assumeQuestionSection = () => {
       })
     },
     answer(answer: string) {
-      return cy.findByText(answer).click()
+      return cy
+        .findByText(answer)
+        .click()
+        .then(() => cy.wait(100))
+      // This wait is an anti-pattern and should be fixed.
+      // There is an issue now when the user clicks an answer,
+      // the test move on before the next question appears on the screen.
+      // We should have something else in the questions page like a status bar so we can use  cy.get() and .should() instead.
     },
   }
 }
