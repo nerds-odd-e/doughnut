@@ -9,7 +9,7 @@ const assumeQuestionSection = () => {
         .first()
         .invoke("text")
     },
-    answerFirst() {
+    answerFirstOption() {
       return this.getQuestionSection().get("button").first().click()
     },
     answerFromTable(answersTable: Record<string, string>[]) {

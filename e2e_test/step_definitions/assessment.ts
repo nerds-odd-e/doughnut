@@ -27,7 +27,7 @@ When(
       const question = start.assumeAssessmentPage().assumeQuestionSection()
       question.getStemText().then((stem) => {
         questions.push(stem)
-        question.answerFirst()
+        question.answerFirstOption()
       })
     }
     cy.then(() => {
