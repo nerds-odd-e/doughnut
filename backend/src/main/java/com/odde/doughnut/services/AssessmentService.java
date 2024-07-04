@@ -10,22 +10,21 @@ import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.QuizQuestionAndAnswer;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.models.randomizers.RealRandomizer;
 import com.theokanning.openai.client.OpenAiApi;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
 public class AssessmentService {
   private final QuizQuestionService quizQuestionService;
+  private final RealRandomizer realRandomizer = new RealRandomizer();
 
   public AssessmentService(OpenAiApi openAiApi, ModelFactoryService modelFactoryService) {
     this.quizQuestionService = new QuizQuestionService(openAiApi, modelFactoryService);
   }
 
   public List<QuizQuestion> generateAssessment(Notebook notebook) {
-
-    List<Note> notes = new java.util.ArrayList<Note>(notebook.getNotes());
-    Collections.shuffle(notes);
+    List<Note> notes = realRandomizer.shuffle(notebook.getNotes());
 
     List<QuizQuestionAndAnswer> questions =
         notes.stream()
