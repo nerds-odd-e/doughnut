@@ -46,7 +46,7 @@ export default class EventSourceHttpRequestImpl extends BaseHttpRequest {
             url,
             options.body,
             this.onMessage,
-            this.onError,
+            this.onError
           )
           resolve(undefined as unknown as T)
         }

@@ -74,6 +74,6 @@ const activePage = ref(
     | "manageModel"
     | "manageAssistant"
     | "manageBazaar"
-    | undefined,
+    | undefined
 )
 </script>

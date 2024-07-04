@@ -85,7 +85,7 @@ const props = defineProps({
   },
 })
 const quizQuestionInNotebook = ref<QuizQuestionInNotebook | undefined>(
-  undefined,
+  undefined
 )
 const chatInput = ref("")
 const messages = ref<Message[]>([])
@@ -106,7 +106,7 @@ const scrollToBottom = () => {
 const generateQuestion = async () => {
   quizQuestionInNotebook.value =
     await managedApi.restQuizQuestionController.generateQuestion(
-      props.selectedNote.id,
+      props.selectedNote.id
     )
   scrollToBottom()
 }

@@ -37,16 +37,16 @@ const props = defineProps({
 const reactiveProps = ref(props)
 
 const linkType = computed(() =>
-  reactiveProps.value.noteTopic.topicConstructor.substring(1),
+  reactiveProps.value.noteTopic.topicConstructor.substring(1)
 )
 const topic = computed(() =>
   reactiveProps.value.noteTopic.topicConstructor?.replace(
     "%P",
-    `[${reactiveProps.value.noteTopic.parentNoteTopic?.topicConstructor}]`,
-  ),
+    `[${reactiveProps.value.noteTopic.parentNoteTopic?.topicConstructor}]`
+  )
 )
 const iconizedTarget = computed(
-  () => !!reactiveProps.value.noteTopic.shortDetails,
+  () => !!reactiveProps.value.noteTopic.shortDetails
 )
 </script>
 

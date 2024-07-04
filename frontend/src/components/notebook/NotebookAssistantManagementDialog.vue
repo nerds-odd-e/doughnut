@@ -28,14 +28,14 @@ const createAssistantForNotebook = async () => {
     props.notebook.id,
     {
       additionalInstruction: additionalInstruction.value,
-    },
+    }
   )
   emit("close")
 }
 
 const downloadNotebookDump = async () => {
   const notes = await managedApi.restNotebookController.downloadNotebookDump(
-    props.notebook.id,
+    props.notebook.id
   )
   const blob = new Blob([JSON.stringify(notes, null, 2)], {
     type: "application/json",

@@ -37,7 +37,7 @@ export default defineComponent({
   methods: {
     async fetchData() {
       this.reviewPoint = await this.managedApi.restReviewPointController.show(
-        this.reviewPointId,
+        this.reviewPointId
       )
     },
   },

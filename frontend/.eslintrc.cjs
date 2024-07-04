@@ -78,6 +78,7 @@ module.exports = {
     'vue/no-template-shadow': 'off',
     'prettier/prettier': ['error', {
       semi: false,
+      trailingComma: 'es5',
       bracketSpacing: true,
       printWidth: 80,
       arrowParens: 'always',

@@ -32,7 +32,7 @@ describe("answering a clarifying question for note details geeration", () => {
 
   it("renders the questions correctly", () => {
     expect(wrapper.text()).toContain(
-      "Do you mean American Football or European Football?",
+      "Do you mean American Football or European Football?"
     )
   })
 

@@ -21,7 +21,7 @@ describe("global bar", () => {
     noteEditingHistory = new NoteEditingHistory()
     histories = createNoteStorage(
       new ManagedApi({ states: [], errors: [] }),
-      noteEditingHistory,
+      noteEditingHistory
     )
   })
 

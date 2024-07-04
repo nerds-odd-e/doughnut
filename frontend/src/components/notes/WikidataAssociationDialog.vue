@@ -79,7 +79,7 @@ const validateAndSave = async () => {
   try {
     const res =
       await managedApi.restWikidataController.fetchWikidataEntityDataById(
-        associationData.value.wikidataId,
+        associationData.value.wikidataId
       )
     if (
       res.WikidataTitleInEnglish !== "" &&

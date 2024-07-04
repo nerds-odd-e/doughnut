@@ -54,11 +54,11 @@ describe("NoteDetailsAutoCompletionButton", () => {
     await triggerAutoCompletion(noteWithNoDetails)
     expect(mockedGetCompletion).toHaveBeenCalledWith(
       noteWithNoDetails.id,
-      expect.objectContaining({ detailsToComplete: "" }),
+      expect.objectContaining({ detailsToComplete: "" })
     )
     expect(mockedUpldateDetails).toHaveBeenCalledWith(
       noteWithNoDetails.id,
-      expect.anything(),
+      expect.anything()
     )
   })
 
@@ -71,7 +71,7 @@ describe("NoteDetailsAutoCompletionButton", () => {
       note.id,
       expect.objectContaining({
         detailsToComplete: "<p>Desc</p>",
-      }),
+      })
     )
     expect(mockedUpldateDetails).toHaveBeenCalled()
   })
@@ -106,7 +106,7 @@ describe("NoteDetailsAutoCompletionButton", () => {
     expect(mockedAnswerClarifyingQuestion).toHaveBeenCalledWith(
       expect.objectContaining({
         toolCallId: "tool-call-id",
-      }),
+      })
     )
   })
 
@@ -116,7 +116,7 @@ describe("NoteDetailsAutoCompletionButton", () => {
         requiredAction: {
           contentToAppend: "auto completed content",
         },
-      })),
+      }))
     )
 
     const wrapper = await triggerAutoCompletionWithoutFlushPromises(note)

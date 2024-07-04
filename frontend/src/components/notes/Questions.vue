@@ -75,7 +75,7 @@ const questions = ref<QuizQuestionAndAnswer[]>([])
 const fetchQuestions = async () => {
   questions.value =
     await managedApi.restQuizQuestionController.getAllQuestionByNote(
-      props.note.id,
+      props.note.id
     )
 }
 const questionAdded = (newQuestion: QuizQuestionAndAnswer) => {

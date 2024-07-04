@@ -7,12 +7,12 @@ import loginOrRegisterAndHaltThisThread from "./window/loginOrRegisterAndHaltThi
 
 export default function BindingHttpRequest(
   apiStatus: ApiStatus,
-  silent?: boolean,
+  silent?: boolean
 ) {
   const apiStatusHandler = new ApiStatusHandler(apiStatus, silent)
   return class BindingHttpRequestWithStatus extends FetchHttpRequest {
     public override request<T>(
-      options: ApiRequestOptions,
+      options: ApiRequestOptions
     ): CancelablePromise<T> {
       return new CancelablePromise<T>((resolve, reject, onCancel) => {
         const originalPromise = super.request<T>(options)
@@ -28,7 +28,7 @@ export default function BindingHttpRequest(
                   error.request.method === "GET" ||
                   // eslint-disable-next-line no-alert
                   window.confirm(
-                    "You are logged out. Do you want to log in (and lose the current changes)?",
+                    "You are logged out. Do you want to log in (and lose the current changes)?"
                   )
                 ) {
                   loginOrRegisterAndHaltThisThread()

@@ -31,7 +31,7 @@ onMounted(() => {
 const save = async (settings: GlobalAiModelSettings) => {
   selectedModels.value =
     await managedApi.restGlobalSettingsController.setCurrentModelVersions(
-      settings,
+      settings
     )
 }
 </script>

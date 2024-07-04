@@ -72,7 +72,7 @@ const currentResult = computed(() => {
 
 const finished = computed(() => previousResults.value.length)
 const toRepeatCount = computed(
-  () => (toRepeat.value?.length ?? 0) - currentIndex.value,
+  () => (toRepeat.value?.length ?? 0) - currentIndex.value
 )
 
 const viewLastResult = (cursor: number | undefined) => {
@@ -89,7 +89,7 @@ const loadMore = async (dueInDays?: number) => {
   toRepeat.value = (
     await managedApi.restReviewsController.repeatReview(
       timezoneParam(),
-      dueInDays,
+      dueInDays
     )
   ).toRepeat
   currentIndex.value = 0

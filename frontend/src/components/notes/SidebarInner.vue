@@ -88,7 +88,7 @@ watch(
     }
     expandedIds.value = Array.from(uniqueIds)
   },
-  { immediate: true },
+  { immediate: true }
 )
 </script>
 

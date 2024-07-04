@@ -103,12 +103,12 @@ export default defineComponent({
       const updated =
         await this.managedApi.restFineTuningDataController.updateSuggestedQuestionForFineTuning(
           this.modelValue.id,
-          validated,
+          validated
         )
       this.$emit("update:modelValue", updated)
     },
     validateSuggestedQuestion(
-      params: QuestionSuggestionParams,
+      params: QuestionSuggestionParams
     ): QuestionSuggestionParams | undefined {
       const validated = _.cloneDeep(params)
       validated.preservedQuestion.multipleChoicesQuestion.choices =

@@ -19,7 +19,7 @@ export default class NoteEditingHistory {
   addEditingToUndoHistory(
     noteId: Doughnut.ID,
     field: "edit topic" | "edit details",
-    textContent?: string,
+    textContent?: string
   ) {
     this.noteUndoHistories.push({
       type: field,

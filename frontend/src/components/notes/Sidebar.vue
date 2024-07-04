@@ -36,7 +36,7 @@ watch(
       lastDefinedNoteRealm.value = newNoteRealm
     }
   },
-  { immediate: true },
+  { immediate: true }
 )
 
 const headNoteId = computed(() => {

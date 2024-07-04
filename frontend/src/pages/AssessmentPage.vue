@@ -45,7 +45,7 @@ const correctAnswers = ref(0)
 const assessmentCompleted = computed(
   () =>
     currentQuestion.value >= quizQuestions.value.length &&
-    quizQuestions.value.length > 0,
+    quizQuestions.value.length > 0
 )
 
 const getNoteTopicFromQuestion = (): NoteTopic => {

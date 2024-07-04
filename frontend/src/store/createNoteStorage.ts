@@ -34,14 +34,14 @@ class AccessorImplementation
     return new StoredApiCollection(
       this.managedApi,
       this.noteEditingHistory,
-      this,
+      this
     )
   }
 }
 
 function createNoteStorage(
   managedApi: ManagedApi,
-  noteEditingHistory?: NoteEditingHistory,
+  noteEditingHistory?: NoteEditingHistory
 ): StorageAccessor {
   return new AccessorImplementation(managedApi, noteEditingHistory)
 }

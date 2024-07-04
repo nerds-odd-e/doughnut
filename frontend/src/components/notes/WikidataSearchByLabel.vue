@@ -83,7 +83,7 @@ export default defineComponent({
     async fetchSearchResult() {
       this.wikiSearchSuggestions =
         await this.managedApi.restWikidataController.searchWikidata(
-          this.searchKey,
+          this.searchKey
         )
       this.$nextTick(() => {
         const select = this.$refs.select as HTMLSelectElement | undefined

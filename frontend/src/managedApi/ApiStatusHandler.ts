@@ -32,7 +32,7 @@ export default class ApiStatusHandler {
     this.apiStatus.errors.push({ message, id })
     setTimeout(() => {
       this.apiStatus.errors = this.apiStatus.errors.filter(
-        (error) => error.id !== id,
+        (error) => error.id !== id
       )
     }, 2000)
   }

@@ -53,7 +53,7 @@ describe("NotebookAssistantManagementDialog.vue", () => {
       new Blob([JSON.stringify(noteBriefs, null, 2)], {
         type: "application/json",
       }),
-      "notebook-dump.json",
+      "notebook-dump.json"
     )
   })
 })

@@ -67,7 +67,7 @@ export default {
     async duplicateQuestion(suggested: SuggestedQuestionForFineTuning) {
       const duplicated =
         await this.managedApi.restFineTuningDataController.duplicate(
-          suggested.id,
+          suggested.id
         )
       this.$emit("duplicated", duplicated)
     },
@@ -77,7 +77,7 @@ export default {
     async deleteSuggestedQuestion(suggested: SuggestedQuestionForFineTuning) {
       if (
         await this.popups.confirm(
-          `Are you sure to delete this suggestion (${suggested.preservedQuestion.multipleChoicesQuestion.stem})?`,
+          `Are you sure to delete this suggestion (${suggested.preservedQuestion.multipleChoicesQuestion.stem})?`
         )
       ) {
         await this.managedApi.restFineTuningDataController.delete(suggested.id)

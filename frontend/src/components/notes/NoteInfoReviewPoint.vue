@@ -74,7 +74,7 @@ watch(
   (newVal) => {
     localReviewPoint.value = newVal
   },
-  { immediate: true },
+  { immediate: true }
 )
 
 const selfEvaluate = async (adjustment: number) => {
@@ -82,7 +82,7 @@ const selfEvaluate = async (adjustment: number) => {
     localReviewPoint.value.id,
     {
       adjustment,
-    },
+    }
   )
   localReviewPoint.value = reviewPoint
   emit("update:modelValue", reviewPoint)
@@ -91,14 +91,14 @@ const selfEvaluate = async (adjustment: number) => {
 const removeFromReview = async () => {
   if (
     !(await popups.confirm(
-      `Confirm to hide this from reviewing in the future?`,
+      `Confirm to hide this from reviewing in the future?`
     ))
   ) {
     return
   }
   const reviewPoint =
     await managedApi.restReviewPointController.removeFromRepeating(
-      localReviewPoint.value.id,
+      localReviewPoint.value.id
     )
   localReviewPoint.value = reviewPoint
   emit("update:modelValue", reviewPoint)

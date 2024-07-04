@@ -38,7 +38,7 @@ describe("Edit Suggested Question", () => {
         matchByText(wrapper, /Chat/, "button")!.trigger("click")
         const alertMsg = usePopups().popups.peek()[0]!.message
         expect(alertMsg).toContain(
-          suggestedQuestion.preservedQuestion.multipleChoicesQuestion.stem,
+          suggestedQuestion.preservedQuestion.multipleChoicesQuestion.stem
         )
         expect(alertMsg).toContain(suggestedQuestion.preservedNoteContent)
       })
@@ -53,7 +53,7 @@ describe("Edit Suggested Question", () => {
         usePopups().popups.done(true)
         await flushPromises()
         expect(
-          helper.managedApi.restFineTuningDataController.delete,
+          helper.managedApi.restFineTuningDataController.delete
         ).toHaveBeenCalledWith(suggestedQuestion.id)
       })
     })

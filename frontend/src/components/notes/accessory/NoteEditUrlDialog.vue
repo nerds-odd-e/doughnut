@@ -38,7 +38,7 @@ export default defineComponent({
     async fetchData() {
       this.noteAccessory =
         (await this.managedApi.restNoteController.showNoteAccessory(
-          this.noteId,
+          this.noteId
         )) || {}
       this.formData = { ...this.noteAccessory }
     },

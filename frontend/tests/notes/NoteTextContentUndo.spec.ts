@@ -8,7 +8,7 @@ import helper from "../helpers"
 describe("undo editing", () => {
   it("should call addEditingToUndoHistory on submitChange", async () => {
     const histories = createNoteStorage(
-      new ManagedApi({ errors: [], states: [] }),
+      new ManagedApi({ errors: [], states: [] })
     )
 
     const noteRealm = makeMe.aNoteRealm.topicConstructor("Dummy Title").please()

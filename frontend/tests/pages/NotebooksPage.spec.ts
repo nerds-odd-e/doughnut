@@ -21,7 +21,7 @@ describe("Notebooks Page", () => {
       })
     helper.component(NotebooksPage).withProps({}).render()
     expect(
-      helper.managedApi.restNotebookController.myNotebooks,
+      helper.managedApi.restNotebookController.myNotebooks
     ).toBeCalledTimes(1)
   })
 })

@@ -33,9 +33,9 @@ describe("new/updated pink banner", () => {
         .mount()
       await flushPromises()
       expect(wrapper.find(".note-recent-update-indicator").element).toHaveStyle(
-        `color: ${expectedColor};`,
+        `color: ${expectedColor};`
       )
-    },
+    }
   )
 })
 

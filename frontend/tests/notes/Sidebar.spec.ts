@@ -95,10 +95,10 @@ describe("Sidebar", () => {
       render(firstGeneration)
       await flushPromises()
       expect(helper.managedApi.restNoteController.show1).toBeCalledWith(
-        topNoteRealm.id,
+        topNoteRealm.id
       )
       expect(helper.managedApi.restNoteController.show1).toBeCalledWith(
-        firstGeneration.id,
+        firstGeneration.id
       )
     })
 
@@ -129,17 +129,17 @@ describe("Sidebar", () => {
     it("should have siblings", async () => {
       render(firstGeneration)
       await screen.findByText(
-        firstGenerationSibling.note.noteTopic.topicConstructor,
+        firstGenerationSibling.note.noteTopic.topicConstructor
       )
     })
 
     it("should have child note of active first gen", async () => {
       render(firstGeneration)
       const secondGen = await screen.findByText(
-        secondGeneration.note.noteTopic.topicConstructor,
+        secondGeneration.note.noteTopic.topicConstructor
       )
       const sibling = await screen.findByText(
-        firstGenerationSibling.note.noteTopic.topicConstructor,
+        firstGenerationSibling.note.noteTopic.topicConstructor
       )
       expect(isBefore(secondGen, sibling)).toBe(true)
     })

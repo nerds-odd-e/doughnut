@@ -76,10 +76,10 @@ const maximumNumberOfChoices = 10
 const emit = defineEmits(["close-dialog"])
 
 const isValidQuestion = computed(() =>
-  isMCQWithAnswerValid(quizQuestionAndAnswer.value),
+  isMCQWithAnswerValid(quizQuestionAndAnswer.value)
 )
 const multipleChoicesQuestion = computed(
-  () => quizQuestionAndAnswer.value.quizQuestion.multipleChoicesQuestion,
+  () => quizQuestionAndAnswer.value.quizQuestion.multipleChoicesQuestion
 )
 const dirty = computed(() => {
   for (let i = 0; i < multipleChoicesQuestion.value.choices.length; i += 1) {
@@ -109,7 +109,7 @@ const submitQuestion = async () => {
   const response =
     await managedApi.restQuizQuestionController.addQuestionManually(
       props.note.id,
-      quizQuestion,
+      quizQuestion
     )
   emit("close-dialog", response)
 }
@@ -118,13 +118,13 @@ const refineQuestion = async () => {
   quizQuestionAndAnswer.value =
     await managedApi.restQuizQuestionController.refineQuestion(
       props.note.id,
-      quizQuestion,
+      quizQuestion
     )
 }
 const generateQuestionByAI = async () => {
   quizQuestionAndAnswer.value =
     await managedApi.restQuizQuestionController.generateAiQuestionWithoutSave(
-      props.note.id,
+      props.note.id
     )
 }
 </script>

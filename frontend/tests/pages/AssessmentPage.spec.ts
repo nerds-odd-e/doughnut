@@ -33,7 +33,7 @@ describe("assessment page", () => {
         .withProps({ notebookId: notebook.id })
         .render()
       expect(
-        helper.managedApi.restAssessmentController.generateAssessmentQuestions,
+        helper.managedApi.restAssessmentController.generateAssessmentQuestions
       ).toBeCalledTimes(1)
     })
 

@@ -12,11 +12,11 @@ import NoteStorage from "./NoteStorage"
 
 export interface StoredApi {
   getNoteRealmRefAndReloadPosition(
-    noteId: Doughnut.ID,
+    noteId: Doughnut.ID
   ): Ref<NoteRealm | undefined>
 
   getNoteRealmRefAndLoadWhenNeeded(
-    noteId: Doughnut.ID,
+    noteId: Doughnut.ID
   ): Ref<NoteRealm | undefined>
 
   getNoteRealmRef(noteId: Doughnut.ID): Ref<NoteRealm | undefined>
@@ -24,13 +24,13 @@ export interface StoredApi {
   createNote(
     router: Router,
     parentId: Doughnut.ID,
-    data: NoteCreationDTO,
+    data: NoteCreationDTO
   ): Promise<NoteRealm>
 
   createLink(
     sourceId: Doughnut.ID,
     targetId: Doughnut.ID,
-    data: LinkCreation,
+    data: LinkCreation
   ): Promise<void>
 
   updateLink(linkId: Doughnut.ID, data: LinkCreation): Promise<void>
@@ -42,19 +42,19 @@ export interface StoredApi {
   updateTextField(
     noteId: Doughnut.ID,
     field: "edit topic" | "edit details",
-    value: string,
+    value: string
   ): Promise<void>
 
   updateWikidataId(
     noteId: Doughnut.ID,
-    data: WikidataAssociationCreation,
+    data: WikidataAssociationCreation
   ): Promise<NoteRealm>
 
   undo(router: Router): Promise<NoteRealm>
 
   deleteNote(
     router: Router,
-    noteId: Doughnut.ID,
+    noteId: Doughnut.ID
   ): Promise<NoteRealm | undefined>
 }
 export default class StoredApiCollection implements StoredApi {
@@ -67,7 +67,7 @@ export default class StoredApiCollection implements StoredApi {
   constructor(
     managedApi: ManagedApi,
     undoHistory: NoteEditingHistory,
-    storage: NoteStorage,
+    storage: NoteStorage
   ) {
     this.managedApi = managedApi
     this.noteEditingHistory = undoHistory
@@ -88,22 +88,22 @@ export default class StoredApiCollection implements StoredApi {
   private async updateTextContentWithoutUndo(
     noteId: Doughnut.ID,
     field: "edit topic" | "edit details",
-    content: string,
+    content: string
   ) {
     return this.storage.refreshNoteRealm(
-      await this.callUpdateApi(noteId, field, content),
+      await this.callUpdateApi(noteId, field, content)
     )
   }
 
   private async callUpdateApi(
     noteId: Doughnut.ID,
     field: "edit topic" | "edit details",
-    content: string,
+    content: string
   ) {
     if (field === "edit topic") {
       return this.managedApi.restTextContentController.updateNoteTopicConstructor(
         noteId,
-        { topicConstructor: content },
+        { topicConstructor: content }
       )
     }
     return this.managedApi.restTextContentController.updateNoteDetails(noteId, {
@@ -113,10 +113,10 @@ export default class StoredApiCollection implements StoredApi {
 
   async updateWikidataId(
     noteId: Doughnut.ID,
-    data: WikidataAssociationCreation,
+    data: WikidataAssociationCreation
   ): Promise<NoteRealm> {
     return this.storage.refreshNoteRealm(
-      await this.managedApi.restNoteController.updateWikidataId(noteId, data),
+      await this.managedApi.restNoteController.updateWikidataId(noteId, data)
     )
   }
 
@@ -144,11 +144,11 @@ export default class StoredApiCollection implements StoredApi {
   async createNote(
     router: Router,
     parentId: Doughnut.ID,
-    data: NoteCreationDTO,
+    data: NoteCreationDTO
   ) {
     const nrwp = await this.managedApi.restNoteController.createNote(
       parentId,
-      data,
+      data
     )
     const focus = this.storage.refreshNoteRealm(nrwp.created)
     this.storage.refreshNoteRealm(nrwp.parent)
@@ -159,20 +159,20 @@ export default class StoredApiCollection implements StoredApi {
   async createLink(
     sourceId: Doughnut.ID,
     targetId: Doughnut.ID,
-    data: LinkCreation,
+    data: LinkCreation
   ) {
     this.refreshNoteRealms(
       await this.managedApi.restLinkController.linkNoteFinalize(
         sourceId,
         targetId,
-        data,
-      ),
+        data
+      )
     )
   }
 
   async updateLink(linkId: Doughnut.ID, data: LinkCreation) {
     this.refreshNoteRealms(
-      await this.managedApi.restLinkController.updateLink(linkId, data),
+      await this.managedApi.restLinkController.updateLink(linkId, data)
     )
   }
 
@@ -199,8 +199,8 @@ export default class StoredApiCollection implements StoredApi {
       await this.managedApi.restNoteController.moveAfter(
         noteId,
         currentIndex === 1 ? parentId : siblings[currentIndex - 2]!.id,
-        currentIndex === 1 ? "asFirstChild" : "after",
-      ),
+        currentIndex === 1 ? "asFirstChild" : "after"
+      )
     )
   }
 
@@ -212,15 +212,15 @@ export default class StoredApiCollection implements StoredApi {
       await this.managedApi.restNoteController.moveAfter(
         noteId,
         siblings[currentIndex + 1]!.id,
-        "after",
-      ),
+        "after"
+      )
     )
   }
 
   async updateTextField(
     noteId: Doughnut.ID,
     field: "edit topic" | "edit details",
-    value: string,
+    value: string
   ) {
     const currentNote = this.storage.refOfNoteRealm(noteId).value?.note
     if (currentNote) {
@@ -247,7 +247,7 @@ export default class StoredApiCollection implements StoredApi {
       return this.updateTextContentWithoutUndo(
         undone.noteId,
         undone.type,
-        undone.textContent!,
+        undone.textContent!
       )
     }
     return this.managedApi.restNoteController.undoDeleteNote(undone.noteId)

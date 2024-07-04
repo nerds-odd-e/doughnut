@@ -90,7 +90,7 @@ export default defineComponent({
         this.fetchData()
       }, 5000)
       this.circle = await this.managedApi.restCircleController.showCircle(
-        this.circleId,
+        this.circleId
       )
     },
   },

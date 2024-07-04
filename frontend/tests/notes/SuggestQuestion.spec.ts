@@ -26,7 +26,7 @@ describe("QuizQuestion", () => {
       await flushPromises()
       expect(
         helper.managedApi.restQuizQuestionController
-          .suggestQuestionForFineTuning,
+          .suggestQuestionForFineTuning
       ).toBeCalledWith(quizQuestion.id, {
         comment: "",
         isPositiveFeedback: false,

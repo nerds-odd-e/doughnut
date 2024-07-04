@@ -6,7 +6,7 @@ export default (zonename: string, beforeEach, afterEach) => {
     vitest
       .spyOn(Intl.DateTimeFormat.prototype, "resolvedOptions")
       .mockImplementation(function mockResolvedOptions(
-        this: Intl.DateTimeFormat,
+        this: Intl.DateTimeFormat
       ) {
         const options = resolvedOptionsOriginal.call(this)
         options.timeZone = zonename

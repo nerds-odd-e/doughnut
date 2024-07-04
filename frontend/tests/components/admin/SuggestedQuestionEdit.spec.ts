@@ -24,7 +24,7 @@ describe("Edit Suggested Question", () => {
       await flushPromises()
       expect(
         helper.managedApi.restFineTuningDataController
-          .updateSuggestedQuestionForFineTuning,
+          .updateSuggestedQuestionForFineTuning
       ).toHaveBeenCalledWith(1357, expect.anything())
     })
 
@@ -35,7 +35,7 @@ describe("Edit Suggested Question", () => {
       wrapper.get("button.btn-success").trigger("click")
       await flushPromises()
       expect(wrapper.get(".error-msg").text()).toContain(
-        "At least 2 choices are required",
+        "At least 2 choices are required"
       )
     })
 
@@ -44,7 +44,7 @@ describe("Edit Suggested Question", () => {
       wrapper.get("button.btn-success").trigger("click")
       await flushPromises()
       expect(wrapper.get(".error-msg").text()).toContain(
-        "Correct choice index is out of range",
+        "Correct choice index is out of range"
       )
     })
 
@@ -53,7 +53,7 @@ describe("Edit Suggested Question", () => {
       wrapper.get("button.btn-success").trigger("click")
       await flushPromises()
       expect(wrapper.get(".error-msg").text()).toContain(
-        "must be a number list",
+        "must be a number list"
       )
     })
   })

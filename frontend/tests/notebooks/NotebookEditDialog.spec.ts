@@ -10,7 +10,7 @@ describe("NoteBookEditDialog.vue", () => {
       .withProps({ notebook })
       .mount()
     const input = wrapper.find(
-      "input[id='notebook-numberOfQuestionsInAssessment']",
+      "input[id='notebook-numberOfQuestionsInAssessment']"
     )
     expect((input.element as HTMLInputElement).value).toBe("4")
   })

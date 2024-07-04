@@ -70,7 +70,7 @@ export default defineComponent({
         this.note.id,
         {
           detailsToComplete: this.note.details,
-        },
+        }
       )
 
       return this.autoCompleteDetails(response)
@@ -90,11 +90,11 @@ export default defineComponent({
         .updateTextField(
           this.note.id,
           "edit details",
-          this.note.details + response.requiredAction!.contentToAppend!,
+          this.note.details + response.requiredAction!.contentToAppend!
         )
     },
     async clarifyingQuestionAnswered(
-      clarifyingQuestionAndAnswer: ClarifyingQuestionAndAnswer,
+      clarifyingQuestionAndAnswer: ClarifyingQuestionAndAnswer
     ) {
       this.clarifyingHistory.push(clarifyingQuestionAndAnswer)
       const response =
@@ -105,7 +105,7 @@ export default defineComponent({
             threadId: this.threadRespons!.threadId,
             runId: this.threadRespons!.runId,
             toolCallId: this.threadRespons!.requiredAction!.toolCallId,
-          },
+          }
         )
       await this.autoCompleteDetails(response)
     },

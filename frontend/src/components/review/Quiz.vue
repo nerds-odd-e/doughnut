@@ -129,7 +129,7 @@ export default defineComponent({
       try {
         const question =
           await this.managedApi.silent.restReviewPointController.generateRandomQuestion(
-            reviewPointId,
+            reviewPointId
           )
         this.quizQuestionCache.push(question)
       } catch (e) {

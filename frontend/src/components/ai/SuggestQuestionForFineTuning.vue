@@ -63,7 +63,7 @@ const { quizQuestion } = props
 async function suggestQuestionForFineTuning() {
   await managedApi.restQuizQuestionController.suggestQuestionForFineTuning(
     quizQuestion.id,
-    params.value,
+    params.value
   )
   emit("closeDialog")
 }

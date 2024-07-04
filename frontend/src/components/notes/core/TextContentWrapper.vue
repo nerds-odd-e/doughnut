@@ -19,7 +19,7 @@ export default defineComponent({
       noteId: number,
       newValue: string,
       version: number,
-      errorHander: (errs: unknown) => void,
+      errorHander: (errs: unknown) => void
     ) => {
       await props.storageAccessor
         .storedApi()

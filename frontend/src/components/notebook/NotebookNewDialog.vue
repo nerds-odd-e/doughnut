@@ -33,11 +33,11 @@ export default {
       if (this.circle) {
         return this.managedApi.restCircleController.createNotebookInCircle(
           this.circle.id,
-          this.noteFormData,
+          this.noteFormData
         )
       }
       return this.managedApi.restNotebookController.createNotebook(
-        this.noteFormData,
+        this.noteFormData
       )
     },
     processForm() {
@@ -46,7 +46,7 @@ export default {
           this.$router.push({
             name: "noteShow",
             params: { noteId: res.noteId },
-          }),
+          })
         )
         .catch((err) => (this.errors = err))
     },

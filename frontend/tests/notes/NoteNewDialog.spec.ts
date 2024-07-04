@@ -40,7 +40,7 @@ describe("adding new note", () => {
     expect(wrapper.text()).toContain("mythical")
     expect(mockedSearchWithin).toHaveBeenCalledWith(
       123,
-      expect.objectContaining({ searchKey: "myth" }),
+      expect.objectContaining({ searchKey: "myth" })
     )
   })
 
@@ -150,9 +150,9 @@ describe("adding new note", () => {
 
         expect(mockedWikidataSearch).toHaveBeenCalledWith(searchTitle)
         expect((<HTMLInputElement>titleInput().element).value).toBe(
-          expectedTitle,
+          expectedTitle
         )
-      },
+      }
     )
   })
 })

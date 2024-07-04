@@ -68,13 +68,13 @@ watch(
     if (input.value && props.autoExtendUntil) {
       const lineHeight = parseInt(
         window.getComputedStyle(input.value).lineHeight,
-        10,
+        10
       )
       const { scrollHeight } = input.value
       const newRows = Math.floor(scrollHeight / lineHeight)
       input.value.rows =
         newRows > props.autoExtendUntil ? props.autoExtendUntil : newRows
     }
-  },
+  }
 )
 </script>

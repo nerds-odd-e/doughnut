@@ -21,7 +21,7 @@ describe("circle show page", () => {
       .withStorageProps({ circleId: circleNote.id })
       .render()
     expect(helper.managedApi.restCircleController.showCircle).toBeCalledWith(
-      circleNote.id,
+      circleNote.id
     )
   })
 })

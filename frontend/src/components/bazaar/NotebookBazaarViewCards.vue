@@ -21,6 +21,6 @@ const props = defineProps({
 })
 
 const notebooks = props.bazaarNotebooks.map(
-  (bazaarNotebook) => bazaarNotebook.notebook,
+  (bazaarNotebook) => bazaarNotebook.notebook
 )
 </script>

@@ -42,7 +42,7 @@ export default defineComponent({
       }
       await this.managedApi.restReviewPointController.markAsRepeated(
         this.reviewPointId,
-        successful,
+        successful
       )
       this.$emit("reviewed")
     },

@@ -40,7 +40,7 @@ export default defineComponent({
     async getWikidataItem() {
       return (
         await this.managedApi.restWikidataController.fetchWikidataEntityDataById(
-          this.wikidataId,
+          this.wikidataId
         )
       ).WikipediaEnglishUrl
     },

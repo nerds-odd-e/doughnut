@@ -107,12 +107,12 @@ export default defineComponent({
   methods: {
     async relativeSearch(
       noteId: undefined | Doughnut.ID,
-      searchTerm: SearchTerm,
+      searchTerm: SearchTerm
     ) {
       if (noteId) {
         return this.managedApi.restNoteController.searchForLinkTargetWithin(
           noteId,
-          searchTerm,
+          searchTerm
         )
       }
       return this.managedApi.restNoteController.searchForLinkTarget(searchTerm)
@@ -122,7 +122,7 @@ export default defineComponent({
       if (
         Object.prototype.hasOwnProperty.call(
           this.cachedSearches,
-          "trimmedSearchKey",
+          "trimmedSearchKey"
         )
       ) {
         return

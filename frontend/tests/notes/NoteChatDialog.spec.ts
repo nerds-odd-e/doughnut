@@ -76,10 +76,10 @@ describe("NoteChatDialog TestMe", () => {
       wrapper.find("a#try-again").trigger("click")
       await flushPromises()
       expect(mockedContest).toHaveBeenCalledWith(
-        quizQuestionInNotebook.quizQuestion.id,
+        quizQuestionInNotebook.quizQuestion.id
       )
       expect(mockedRegenerate).toHaveBeenCalledWith(
-        quizQuestionInNotebook.quizQuestion.id,
+        quizQuestionInNotebook.quizQuestion.id
       )
     })
 
@@ -129,11 +129,11 @@ describe("NoteChatDialog Conversation", () => {
     await wrapper.find("#chat-button").trigger("submit")
     helper.managedApi.eventSource.eventSourceRequest.onMessage(
       "thread.message.created",
-      JSON.stringify(newMessage),
+      JSON.stringify(newMessage)
     )
     helper.managedApi.eventSource.eventSourceRequest.onMessage(
       "thread.message.delta",
-      JSON.stringify(messageDelta),
+      JSON.stringify(messageDelta)
     )
     await flushPromises()
     return wrapper
@@ -142,7 +142,7 @@ describe("NoteChatDialog Conversation", () => {
   it("called the api", async () => {
     await askAndReplied()
     expect(
-      helper.managedApi.eventSource.restAiController.chat,
+      helper.managedApi.eventSource.restAiController.chat
     ).toHaveBeenCalledWith(note.id, expect.anything())
   })
 
@@ -169,12 +169,12 @@ describe("NoteChatDialog Conversation", () => {
     await wrapper.find("#chat-button").trigger("submit")
     await flushPromises()
     expect(
-      helper.managedApi.eventSource.restAiController.chat,
+      helper.managedApi.eventSource.restAiController.chat
     ).toHaveBeenCalledWith(
       note.id,
       expect.objectContaining({
         threadId: "test-thread-id",
-      }),
+      })
     )
   })
 

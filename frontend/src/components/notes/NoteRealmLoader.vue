@@ -19,7 +19,7 @@ const reactiveProps = toRefs(props)
 const noteRealmRef = computed(() =>
   reactiveProps.storageAccessor.value
     .storedApi()
-    .getNoteRealmRefAndReloadPosition(reactiveProps.noteId.value),
+    .getNoteRealmRefAndReloadPosition(reactiveProps.noteId.value)
 )
 
 const noteRealm = computed(() => noteRealmRef.value?.value)

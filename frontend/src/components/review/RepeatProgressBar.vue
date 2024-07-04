@@ -16,7 +16,7 @@
                   'viewLastResult',
                   !previousResultCursor
                     ? finished - 1
-                    : previousResultCursor - 1,
+                    : previousResultCursor - 1
                 )
               "
             >

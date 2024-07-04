@@ -47,7 +47,7 @@ export default defineComponent({
       try {
         const na = await this.managedApi.restNoteController.uploadAudio(
           this.noteId,
-          this.formData,
+          this.formData
         )
         this.$emit("closeDialog", na)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -58,7 +58,7 @@ export default defineComponent({
     async convertToSRT() {
       try {
         const response = await this.managedApi.restAiAudioController.convertSrt(
-          this.formData,
+          this.formData
         )
         this.convertedSrt = response.srt
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

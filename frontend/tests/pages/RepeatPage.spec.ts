@@ -79,7 +79,7 @@ describe("repeat page", () => {
       mockedRepeatCall.mockResolvedValue(
         makeMe.aDueReviewPointsList
           .toRepeat([firstReviewPointId, secondReviewPointId, 3])
-          .please(),
+          .please()
       )
     })
 
@@ -107,7 +107,7 @@ describe("repeat page", () => {
       await wrapper.find("button.btn-primary").trigger("click")
       expect(mockedMarkAsRepeatedCall).toHaveBeenCalledWith(
         firstReviewPointId,
-        true,
+        true
       )
       await flushPromises()
       expect(teleportTarget.textContent).toContain("1/3")

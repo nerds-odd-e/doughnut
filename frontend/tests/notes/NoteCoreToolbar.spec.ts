@@ -22,6 +22,6 @@ it("displays menu items when dropdown is open", async () => {
   // Check if menu items exist
   expect(wrapper.find(".dropdown-menu").exists()).toBe(true)
   expect(wrapper.find(".dropdown-menu").text()).toContain(
-    "Questions for the note",
+    "Questions for the note"
   )
 })

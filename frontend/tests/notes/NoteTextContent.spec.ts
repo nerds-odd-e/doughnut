@@ -12,7 +12,7 @@ describe("in place edit on title", () => {
   const note = makeMe.aNote.topicConstructor("Dummy Title").please()
   const mountComponent = (
     n: Note,
-    readonly = false,
+    readonly = false
   ): VueWrapper<ComponentPublicInstance> => {
     return helper
       .component(NoteTextContent)
@@ -97,14 +97,14 @@ describe("in place edit on title", () => {
 
   const editTitle = async (
     wrapper: VueWrapper<ComponentPublicInstance>,
-    newValue: string,
+    newValue: string
   ) => {
     await wrapper.find('[role="topic"]').trigger("click")
     await wrapper.find('[role="topic"] input').setValue(newValue)
   }
 
   const editTitleThenBlur = async (
-    wrapper: VueWrapper<ComponentPublicInstance>,
+    wrapper: VueWrapper<ComponentPublicInstance>
   ) => {
     await editTitle(wrapper, "updated")
     await wrapper.find('[role="topic"] input').trigger("blur")
@@ -127,7 +127,7 @@ describe("in place edit on title", () => {
       note: { ...note, topicConstructor: "different value" },
     })
     expect(
-      wrapper.find<HTMLInputElement>('[role="topic"] input').element.value,
+      wrapper.find<HTMLInputElement>('[role="topic"] input').element.value
     ).toBe("updated")
 
     expect(mockedUpdateTopicCall).not.toBeCalled()
@@ -143,7 +143,7 @@ describe("in place edit on title", () => {
     })
     await wrapper.find('[role="topic"]').trigger("click")
     expect(
-      wrapper.find<HTMLInputElement>('[role="topic"] input').element.value,
+      wrapper.find<HTMLInputElement>('[role="topic"] input').element.value
     ).toBe("different value")
   })
 
@@ -156,7 +156,7 @@ describe("in place edit on title", () => {
           .ofBindingError({
             topic: "size must be between 1 and 100",
           })
-          .please(),
+          .please()
       )
       await editTitleThenBlur(wrapper)
       await flushPromises()
@@ -164,7 +164,7 @@ describe("in place edit on title", () => {
 
     it("should display error when saving failed", async () => {
       expect(wrapper.find(".error-msg").text()).toBe(
-        "size must be between 1 and 100",
+        "size must be between 1 and 100"
       )
     })
 
@@ -200,12 +200,12 @@ describe("in place edit on title", () => {
     it("should display error when no authorization to save", async () => {
       const wrapper = mountComponent(note)
       mockedUpdateTopicCall.mockRejectedValueOnce(
-        makeMe.anApiError.of401().please(),
+        makeMe.anApiError.of401().please()
       )
       await editTitleThenBlur(wrapper)
       await flushPromises()
       expect(wrapper.find(".error-msg").text()).toBe(
-        "You are not authorized to edit this note. Perhaps you are not logged in?",
+        "You are not authorized to edit this note. Perhaps you are not logged in?"
       )
     })
   })
@@ -216,7 +216,7 @@ describe("in place edit on title", () => {
     it("should dispay target", async () => {
       const wrapper = mountComponent(linkingNote)
       expect(wrapper.text()).toContain(
-        linkingNote.noteTopic.targetNoteTopic?.topicConstructor,
+        linkingNote.noteTopic.targetNoteTopic?.topicConstructor
       )
     })
 

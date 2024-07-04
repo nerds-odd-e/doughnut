@@ -58,11 +58,11 @@ describe("Save wikidata id", () => {
       const wrapper = await putWikidataIdAndSubmit(note)
       await userAction(wrapper)
       expect(
-        helper.managedApi.restWikidataController.fetchWikidataEntityDataById,
+        helper.managedApi.restWikidataController.fetchWikidataEntityDataById
       ).toBeCalledWith(wikidataId)
       expect(
-        helper.managedApi.restNoteController.updateWikidataId,
+        helper.managedApi.restNoteController.updateWikidataId
       ).toBeCalledTimes(shouldSave ? 1 : 0)
-    },
+    }
   )
 })

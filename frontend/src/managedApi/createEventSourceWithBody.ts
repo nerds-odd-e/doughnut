@@ -2,7 +2,7 @@ async function createEventSourceWithBody(
   url: string,
   body: unknown,
   onMessage: (event: string, data: string) => void,
-  onError?: (error: unknown) => void,
+  onError?: (error: unknown) => void
 ) {
   try {
     const response = await fetch(url, {

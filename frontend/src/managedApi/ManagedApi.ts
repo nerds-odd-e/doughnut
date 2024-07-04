@@ -20,11 +20,11 @@ class ManagedApi extends DoughnutApi {
   constructor(
     apiStatus: ApiStatus,
     silent?: boolean,
-    httpRequestConstructor?: new (config: OpenAPIConfig) => BaseHttpRequest,
+    httpRequestConstructor?: new (config: OpenAPIConfig) => BaseHttpRequest
   ) {
     super(
       { BASE: "" },
-      httpRequestConstructor ?? BindingHttpRequest(apiStatus, silent),
+      httpRequestConstructor ?? BindingHttpRequest(apiStatus, silent)
     )
     this.apiStatus = apiStatus
     this.apiStatusHandler = new ApiStatusHandler(apiStatus, silent)
