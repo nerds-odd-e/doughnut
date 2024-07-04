@@ -3125,11 +3125,11 @@ components:
         totalCount:
           type: integer
           format: int32
-        noteIdTitles:
+        noteIdAndTitles:
           type: array
           items:
-            $ref: "#/components/schemas/NoteIdTitle"
-    NoteIdTitle:
+            $ref: "#/components/schemas/NoteIdAndTitle"
+    NoteIdAndTitle:
       type: object
       properties:
         id:

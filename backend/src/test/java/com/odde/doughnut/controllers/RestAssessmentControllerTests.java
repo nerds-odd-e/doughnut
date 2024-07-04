@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.dto.AssessmentResult;
+import com.odde.doughnut.controllers.dto.NoteIdAndTitle;
 import com.odde.doughnut.controllers.dto.QuestionAnswerPair;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.ApiException;
@@ -118,21 +119,36 @@ public class RestAssessmentControllerTests {
   class completeAssessmentTest {
     private Notebook notebook;
     private Note topNote;
+    private List<QuestionAnswerPair> questionsAnswerPairs;
 
     @BeforeEach
     void setup() {
       topNote = makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser).please();
       notebook = topNote.getNotebook();
+
+      makeMe.theNote(topNote).withNChildrenThat(5, NoteBuilder::hasAnApprovedQuestion).please();
+      notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(5);
+      questionsAnswerPairs = new ArrayList<>();
     }
 
     @Test
-    void submitAssessmentResult() throws UnexpectedNoAccessRightException {
-      makeMe.theNote(topNote).withNChildrenThat(5, NoteBuilder::hasAnApprovedQuestion).please();
-      notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(5);
-      List<QuestionAnswerPair> questionsAnswerPairs = new ArrayList<>();
-
+    void submitAssessmentResultCheckScore() throws UnexpectedNoAccessRightException {
       AssessmentResult assessmentResult =
           controller.submitAssessmentResult(notebook, questionsAnswerPairs);
+
+      assertEquals(1, assessmentResult.getTotalCount());
+      assertEquals(0, assessmentResult.getCorrectCount());
+    }
+
+    @Test
+    void submitAssessmentResultCheckNoteIdAndTitle() throws UnexpectedNoAccessRightException {
+      AssessmentResult assessmentResult =
+          controller.submitAssessmentResult(notebook, questionsAnswerPairs);
+
+      assertEquals(1, assessmentResult.getNoteIdAndTitles().length);
+      NoteIdAndTitle noteIdAndTitle = assessmentResult.getNoteIdAndTitles()[0];
+      assertEquals(2, noteIdAndTitle.getId());
+      assertEquals("Singapore", noteIdAndTitle.getTitle());
     }
   }
 }

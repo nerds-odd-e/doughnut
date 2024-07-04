@@ -64,7 +64,7 @@ export type { NotebooksViewedByUser } from './models/NotebooksViewedByUser';
 export type { NoteBrief } from './models/NoteBrief';
 export { NoteCreationDTO } from './models/NoteCreationDTO';
 export type { NoteCreationRresult } from './models/NoteCreationRresult';
-export type { NoteIdTitle } from './models/NoteIdTitle';
+export type { NoteIdAndTitle } from './models/NoteIdAndTitle';
 export type { NoteInfo } from './models/NoteInfo';
 export type { NoteRealm } from './models/NoteRealm';
 export type { NotesTestData } from './models/NotesTestData';

@@ -2,10 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { NoteIdTitle } from './NoteIdTitle';
+import type { NoteIdAndTitle } from './NoteIdAndTitle';
 export type AssessmentResult = {
     correctCount?: number;
     totalCount?: number;
-    noteIdTitles?: Array<NoteIdTitle>;
+    noteIdAndTitles?: Array<NoteIdAndTitle>;
 };
 
