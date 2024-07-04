@@ -21,14 +21,10 @@ public class QuizQuestionService {
   }
 
   QuizQuestionAndAnswer selectRandomQuestionForANote(Note note) {
-    List<QuizQuestionAndAnswer> allQuestions = note.getQuizQuestionAndAnswers().stream().toList();
+    List<QuizQuestionAndAnswer> allQuestions = note.getQuizQuestionAndAnswers();
     return allQuestions.isEmpty()
         ? null
         : allQuestions.get(new Random().nextInt(allQuestions.size()));
-  }
-
-  QuizQuestionAndAnswer selectQuizQuestionForANote(Note note) {
-    return note.getQuizQuestionAndAnswers().stream().findFirst().orElse(null);
   }
 
   public QuizQuestionAndAnswer addQuestion(
