@@ -220,4 +220,11 @@ public class NoteBuilder extends EntityBuilder<Note> {
     this.quizQuestionBuilders.add(quizQuestionBuilder);
     return this;
   }
+
+  public NoteBuilder hasApprovedQuestions(int numQuestions) {
+    for (int i = 0; i < numQuestions; i++) {
+      this.hasAnApprovedQuestion();
+    }
+    return this;
+  }
 }

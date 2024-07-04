@@ -1,8 +1,5 @@
 package com.odde.doughnut.controllers;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import com.odde.doughnut.controllers.dto.AssessmentResult;
 import com.odde.doughnut.controllers.dto.NoteIdAndTitle;
 import com.odde.doughnut.controllers.dto.QuestionAnswerPair;
@@ -14,6 +11,8 @@ import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.builders.NoteBuilder;
 import com.theokanning.openai.client.OpenAiApi;
 import java.util.*;
+import java.util.function.Consumer;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -23,6 +22,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -37,6 +38,52 @@ public class RestAssessmentControllerTests {
   void setup() {
     currentUser = makeMe.aUser().toModelPlease();
     controller = new RestAssessmentController(openAiApi, makeMe.modelFactoryService, currentUser);
+  }
+
+  @Nested
+  class assessmentQuestionOrderTest {
+    private Notebook notebook;
+    private Note topNote;
+
+    @BeforeEach
+    void setup() {
+      topNote = makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser).please();
+      notebook = topNote.getNotebook();
+    }
+
+    @Test
+    void shouldPickRandomNotesForAssessment() throws UnexpectedNoAccessRightException {
+        makeMe.theNote(topNote).withNChildrenThat(10, NoteBuilder::hasAnApprovedQuestion).please();
+        notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(1);
+
+        Set<Integer> questionIds = new HashSet<>();
+        for (int i = 0; i < 3; i++) {
+            List<QuizQuestion> assessment = controller.generateAssessmentQuestions(notebook);
+          Integer questionId = assessment.get(0).getId();
+          questionIds.add(questionId);
+        }
+
+        assertTrue(questionIds.size() > 1, "Expected questions from different notes.");
+    }
+
+    @Test
+    void shouldPickRandomQuestionsFromTheSameNote() throws UnexpectedNoAccessRightException {
+      int numberOfQuestions = 3;
+
+      Consumer<NoteBuilder> multipleApprovedQuestionsForNote = noteBuilder -> noteBuilder.hasApprovedQuestions(numberOfQuestions);
+
+        makeMe.theNote(topNote).withNChildrenThat(1, multipleApprovedQuestionsForNote).please();
+        notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(1);
+
+        Set<Integer> questionIds = new HashSet<>();
+        for (int i = 0; i < 10; i++) {
+            List<QuizQuestion> assessment = controller.generateAssessmentQuestions(notebook);
+          Integer questionId = assessment.get(0).getId();
+          questionIds.add(questionId);
+        }
+
+        assertEquals(numberOfQuestions, questionIds.size(), "Expected questions from the same note.");
+    }
   }
 
   @Nested
