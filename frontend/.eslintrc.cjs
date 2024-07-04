@@ -1,13 +1,10 @@
-/* eslint-env node */
-require('@rushstack/eslint-patch/modern-module-resolution')
-
 const path = require('path')
 module.exports = {
   root: true,
   parser: 'vue-eslint-parser',
   parserOptions: {
     parser: '@typescript-eslint/parser',
-    ecmaVersion: 'latest',
+    ecmaVersion: 2024,
     sourceType: 'module',
     extraFileExtensions: ['.vue'],
   },

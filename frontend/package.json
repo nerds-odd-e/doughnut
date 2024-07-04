@@ -39,7 +39,6 @@
     "@farmfe/cli": "^1.0.2",
     "@farmfe/core": "^1.2.6",
     "@farmfe/js-plugin-sass": "^2.8.1",
-    "@rushstack/eslint-patch": "^1.10.3",
     "@testing-library/user-event": "^14.5.2",
     "@testing-library/vue": "^8.1.0",
     "@types/lodash": "^4.17.6",
