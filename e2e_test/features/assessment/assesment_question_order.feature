@@ -1,4 +1,4 @@
-@ignore
+
 Feature: Questions order in assessment is random
   As a user taking an assessment
   I want to have random questions in the assessment

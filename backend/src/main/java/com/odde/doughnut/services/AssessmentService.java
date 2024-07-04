@@ -29,7 +29,7 @@ public class AssessmentService {
 
     List<QuizQuestionAndAnswer> questions =
         notes.stream()
-            .map(quizQuestionService::selectQuizQuestionForANote)
+            .map(quizQuestionService::selectRandomQuestionForANote)
             .filter(Objects::nonNull)
             .filter(QuizQuestionAndAnswer::isApproved)
             .toList();

@@ -7,6 +7,7 @@ import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.theokanning.openai.client.OpenAiApi;
 import jakarta.validation.Valid;
+import java.util.*;
 
 public class QuizQuestionService {
   private final ModelFactoryService modelFactoryService;
@@ -17,6 +18,13 @@ public class QuizQuestionService {
     this.modelFactoryService = modelFactoryService;
     this.aiQuestionGenerator =
         new AiQuestionGenerator(openAiApi, new GlobalSettingsService(modelFactoryService));
+  }
+
+  QuizQuestionAndAnswer selectRandomQuestionForANote(Note note) {
+    List<QuizQuestionAndAnswer> allQuestions = note.getQuizQuestionAndAnswers().stream().toList();
+    return allQuestions.isEmpty()
+        ? null
+        : allQuestions.get(new Random().nextInt(allQuestions.size()));
   }
 
   QuizQuestionAndAnswer selectQuizQuestionForANote(Note note) {
