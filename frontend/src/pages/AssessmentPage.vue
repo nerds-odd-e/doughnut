@@ -24,7 +24,11 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { NoteTopic, QuizQuestion } from "@/generated/backend"
+import {
+  NoteTopic,
+  QuestionAnswerPair,
+  QuizQuestion,
+} from "@/generated/backend"
 import { useRouter } from "vue-router"
 import QuizQuestionComp from "@/components/review/QuizQuestion.vue"
 import Cards from "@/components/notes/Cards.vue"
@@ -40,6 +44,7 @@ const topicConstructor = computed(() => {
 const quizQuestions = ref<QuizQuestion[]>([])
 const notesOfWrongAnswers = ref<NoteTopic[]>([])
 const currentQuestion = ref(0)
+const questionsAnswerCollection = ref<QuestionAnswerPair[]>([])
 const errors = ref("")
 const correctAnswers = ref(0)
 const assessmentCompleted = computed(
@@ -63,6 +68,13 @@ const questionAnswered = (answerResult) => {
 
   if (!answerResult.correct) {
     notesOfWrongAnswers.value.push(getNoteTopicFromQuestion())
+  }
+
+  if (assessmentCompleted.value) {
+    managedApi.restAssessmentController.submitAssessmentResult(
+      <number>props.notebookId,
+      questionsAnswerCollection.value
+    )
   }
 }
 
