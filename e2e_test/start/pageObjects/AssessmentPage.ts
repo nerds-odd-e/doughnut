@@ -19,9 +19,7 @@ const assumeQuestionSection = () => {
       })
     },
     answer(answer: string) {
-      return cy
-        .findByText(answer)
-        .click()
+      return cy.findByText(answer).click()
     },
   }
 }
