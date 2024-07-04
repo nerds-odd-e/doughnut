@@ -27,6 +27,7 @@ public class ApplicationController {
         "/bazaar/**",
         "/circles/**",
         "/notebooks/**",
+        "/assessment-history/**",
         "/n**",
         "/reviews/**",
         "/answers/**",

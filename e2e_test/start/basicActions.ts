@@ -5,6 +5,7 @@ import { assumeAdminDashboardPage } from "./pageObjects/adminPages/adminDashboar
 import { navigateToBazaar } from "./pageObjects/bazaarPage"
 import { assumeChatAboutNotePage } from "./pageObjects/chatAboutNotePage"
 import { navigateToCircle } from "./pageObjects/circlePage"
+import { navigateToAssessmentHistory } from "./pageObjects/AssessmentHistoryPage"
 import { assumeClarifyingQuestionDialog } from "./pageObjects/clarifyingQuestionDialog"
 import { assumeNotePage } from "./pageObjects/notePage"
 import { routerToNotebooksPage } from "./pageObjects/notebooksPage"
@@ -13,6 +14,7 @@ import testability from "./testability"
 
 export default {
   navigateToBazaar,
+  navigateToAssessmentHistory,
   sidebar,
   assumeNotePage,
   assumeAssessmentPage,
