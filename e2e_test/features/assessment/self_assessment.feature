@@ -18,10 +18,9 @@ Feature: New questions assessment
       | Singapore | Where in the world is Singapore?   | Asia    | euro           | true     |
       | Vietnam   | Most famous food of Vietnam?       | Pho     | bread          | true     |
       | Japan     | What is the capital city of Japan? | Tokyo   | Kyoto          | true     |
- #     | Japan     | What is the largest city in on the Kyushu island? | Fukuoka  | Nagasaki       | true     |
       | Korea     | What is the capital city of Korea? | Seoul   | Busan          | true     |
       | China     | What is the capital city of China? | Beijing | Shanghai       | true     |
- #     | China     | What is the largest city of China?                | Shanghai | Beijing        | true     |
+
 
   Scenario: Complete an assessment with 5 approved questions
     Given I set the number of questions per assessment of the notebook "Countries" to 5
