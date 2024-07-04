@@ -1,6 +1,11 @@
 {
   "$schema": "https://biomejs.dev/schemas/1.8.3/schema.json",
-  "organizeImports": { "enabled": false },
+  "vcs": {
+    "clientKind": "git",
+    "enabled": true,
+    "useIgnoreFile": true,
+    "defaultBranch": "main"
+  },
   "files": {
     "ignore": [
       "**/node_modules",
@@ -10,6 +15,7 @@
       "vite.config.ts",
       "auto-imports.d.ts",
       "components.d.ts",
+      "typed-router.d.ts",
       "src/@types/doughnut/index.d.ts",
       "src/generated/backend/**/*.ts",
       "tests/*.js",
@@ -17,20 +23,8 @@
     ],
     "ignoreUnknown": true
   },
-  "vcs": {
-    "enabled": true,
-    "clientKind": "git",
-    "useIgnoreFile": true,
-    "defaultBranch": "main"
-  },
-  "formatter": {
-    "indentStyle": "space"
-  },
-  "javascript": {
-    "formatter": {
-      "semicolons": "asNeeded"
-    }
-  },
+  "formatter": { "indentStyle": "space" },
+  "organizeImports": { "enabled": false },
   "linter": {
     "enabled": true,
     "rules": {
@@ -214,119 +208,41 @@
       "**/.eslintrc.cjs",
       "**/vite.config.ts",
       "**/farm.config.ts",
-      "tests/setupVitest.js"
+      "tests/setupVitest.js",
+      "**/index.d.ts",
+      "**/shims-vue.d.ts",
+      "**/tsconfig.node.json",
+      "**/vitest.config.ts",
+      "**/setupVitest.js",
+      "**/typed-router.d.ts"
     ]
   },
+  "javascript": {
+    "formatter": {
+      "semicolons": "asNeeded",
+      "trailingCommas": "es5"
+    }
+  },
   "overrides": [
-    { "include": ["*.json"], "linter": { "rules": {} } },
-    { "include": ["*.config.*", ".*.js"], "linter": { "rules": {} } },
     {
-      "include": ["**/*.vue"],
+      "include": ["*.vue"],
       "linter": {
         "rules": { "correctness": { "noUndeclaredVariables": "off" } }
       }
     },
     {
-      "include": ["**/*.ts"],
+      "include": ["*.ts", "*.tsx"],
       "linter": {
-        "rules": {
-          "correctness": {
-            "noInvalidUseBeforeDeclaration": "off",
-            "noUndeclaredVariables": "off"
-          }
-        }
+        "rules": { "correctness": { "noUndeclaredVariables": "off" } }
       }
     },
+    { "include": ["*.config.js", "*.config.ts"], "linter": { "rules": {} } },
     {
-      "include": ["**/*.vue"],
-      "linter": { "rules": { "correctness": { "noUnusedVariables": "off" } } }
-    },
-    {
-      "include": ["shims-tsx.d.ts"],
-      "linter": {
-        "rules": {
-          "correctness": { "noUnusedVariables": "off" },
-          "suspicious": { "noExplicitAny": "off" }
-        }
-      }
-    },
-    { "include": ["*.js", "*.cjs"], "linter": { "rules": {} } },
-    {
-      "include": ["*.ts", "*.cts", "*.mts", "*.tsx", "*.vue"],
-      "linter": {
-        "rules": {
-          "correctness": {
-            "noUndeclaredVariables": "off",
-            "noUnusedVariables": "warn"
-          }
-        }
-      }
-    },
-    {
-      "include": ["*.ts", "*.tsx", "*.mts", "*.cts"],
-      "linter": {
-        "rules": {
-          "correctness": {
-            "noConstAssign": "off",
-            "noGlobalObjectCalls": "off",
-            "noInvalidConstructorSuper": "off",
-            "noInvalidNewBuiltin": "off",
-            "noNewSymbol": "off",
-            "noSetterReturn": "off",
-            "noUndeclaredVariables": "off",
-            "noUnreachable": "off",
-            "noUnreachableSuper": "off"
-          },
-          "style": {
-            "noArguments": "error",
-            "noVar": "error",
-            "useConst": "error"
-          },
-          "suspicious": {
-            "noDuplicateClassMembers": "off",
-            "noDuplicateObjectKeys": "off",
-            "noDuplicateParameters": "off",
-            "noFunctionAssign": "off",
-            "noImportAssign": "off",
-            "noRedeclare": "off",
-            "noUnsafeNegation": "off",
-            "useGetterReturn": "off"
-          }
-        }
-      }
-    },
-    {
-      "include": ["*.ts", "*.tsx", "*.mts", "*.cts"],
-      "linter": {
-        "rules": {
-          "correctness": {
-            "noConstAssign": "off",
-            "noGlobalObjectCalls": "off",
-            "noInvalidConstructorSuper": "off",
-            "noInvalidNewBuiltin": "off",
-            "noNewSymbol": "off",
-            "noSetterReturn": "off",
-            "noUndeclaredVariables": "off",
-            "noUnreachable": "off",
-            "noUnreachableSuper": "off"
-          },
-          "style": {
-            "noArguments": "error",
-            "noVar": "error",
-            "useConst": "error"
-          },
-          "suspicious": {
-            "noDuplicateClassMembers": "off",
-            "noDuplicateObjectKeys": "off",
-            "noDuplicateParameters": "off",
-            "noFunctionAssign": "off",
-            "noImportAssign": "off",
-            "noRedeclare": "off",
-            "noUnsafeNegation": "off",
-            "useGetterReturn": "off"
-          }
-        }
-      }
+      "include": [
+        "**/__tests__/**/*.[jt]s?(x)",
+        "**/?(*.)+(spec|test).[jt]s?(x)"
+      ],
+      "linter": { "rules": {} }
     },
     {
       "include": ["*.ts", "*.tsx", "*.mts", "*.cts"],

@@ -29,6 +29,7 @@ module.exports = {
     'index.html',
     'components.d.ts',
     'index.d.ts',
+    'typed-router.d.ts',
     'shims-vue.d.ts',
     'tsconfig.json',
     'tsconfig.node.json',
