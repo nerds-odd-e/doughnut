@@ -25,7 +25,7 @@ export const questionGenerationService = () => ({
     })
   },
   stubEvaluationQuestion: (
-    record: Record<string, boolean | string | number[]>,
+    record: Record<string, boolean | string | number[]>
   ) => {
     cy.then(async () => {
       await mock_services

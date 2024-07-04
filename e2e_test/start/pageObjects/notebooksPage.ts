@@ -12,7 +12,7 @@ export const routerToNotebooksPage = () => {
     navigateToPath(notePath: NotePath) {
       return notePath.path.reduce(
         (page, noteTopic) => page.navigateToChild(noteTopic),
-        assumeNotePage(),
+        assumeNotePage()
       )
     },
     creatingNotebook(notebookTopic: string) {
@@ -35,7 +35,7 @@ export const routerToNotebooksPage = () => {
     updateAssessmentSettings(notebook: string, numberOfQuestion: number) {
       this.findNotebookCardButton(notebook, "Edit notebook settings").click()
       cy.formField("Number Of Questions In Assessment").assignFieldValue(
-        `${numberOfQuestion}`,
+        `${numberOfQuestion}`
       )
       cy.findByRole("button", { name: "Update" }).click()
     },

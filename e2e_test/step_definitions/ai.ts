@@ -2,11 +2,7 @@
 /// <reference types="../support" />
 // @ts-check
 
-import {
-  DataTable,
-  Given,
-  Then,
-} from "@badeball/cypress-cucumber-preprocessor"
+import { DataTable, Given, Then } from "@badeball/cypress-cucumber-preprocessor"
 import "../support/string_util"
 import start, { mock_services } from "../start"
 
@@ -84,7 +80,8 @@ Given(
   "OpenAI assistant will reply below for user messages:",
   (data: DataTable) => {
     mock_services.openAi().stubAIChat(data.hashes())
-})
+  }
+)
 
 Given(
   "OpenAI assistant {string} will reply below for user messages:",
@@ -96,14 +93,14 @@ Given(
 Given(
   "I create an assistant for my notebook {string} with additional instruction {string}",
   (notebook: string, instruction: string) => {
-    start.routerToNotebooksPage().notebookAssistant(notebook).create(instruction)
-  })
-
-Given(
-  "OpenAI accepts the vector file upload requests",
-  () => {
-    mock_services.openAi().stubOpenAiUploadResponse(true)
-    mock_services.openAi().stubOpenAiVectorFileUpload()
-  },
+    start
+      .routerToNotebooksPage()
+      .notebookAssistant(notebook)
+      .create(instruction)
+  }
 )
 
+Given("OpenAI accepts the vector file upload requests", () => {
+  mock_services.openAi().stubOpenAiUploadResponse(true)
+  mock_services.openAi().stubOpenAiVectorFileUpload()
+})

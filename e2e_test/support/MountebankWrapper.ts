@@ -32,13 +32,13 @@ class MountebankWrapper {
 
     if (response.statusCode != 201)
       throw new Error(
-        `Problem creating imposter: ${JSON.stringify(response?.error)}`,
+        `Problem creating imposter: ${JSON.stringify(response?.error)}`
       )
   }
 
   deleteStub(stubId: number) {
     return request.delete(
-      `${this.mountebank.mountebankUrl}/imposters/${this.port}/stubs/${stubId}`,
+      `${this.mountebank.mountebankUrl}/imposters/${this.port}/stubs/${stubId}`
     )
   }
 
@@ -49,7 +49,7 @@ class MountebankWrapper {
 
     if (response.statusCode != 200)
       throw new Error(
-        `Problem adding stubs to imposter: ${JSON.stringify(response?.error)}`,
+        `Problem adding stubs to imposter: ${JSON.stringify(response?.error)}`
       )
   }
 }

@@ -114,7 +114,7 @@ Then(
     cy.get("#password").type("password")
     cy.get("form.form-signin").submit()
     start.assumeNotePage(expectation)
-  },
+  }
 )
 
 Then("I edit user profile", () => {

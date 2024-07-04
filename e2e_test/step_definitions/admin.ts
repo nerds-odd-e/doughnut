@@ -16,7 +16,7 @@ Given(
       .loginAsAdminAndGoToAdminDashboard()
       .goToFineTuningData()
       .expectFineTuningExamplesCount(0)
-  },
+  }
 )
 
 Given(
@@ -27,9 +27,9 @@ Given(
       .goToFineTuningData()
       .updateQuestionSuggestionAndChoice(
         originalQuestionStem,
-        newQuestion.hashes()[0],
+        newQuestion.hashes()[0]
       )
-  },
+  }
 )
 
 Given("an admin duplicates the question {string}", (questionStem: string) => {
@@ -46,7 +46,7 @@ Given(
       .loginAsAdminAndGoToAdminDashboard()
       .goToFineTuningData()
       .expectExampleQuestions(question.hashes())
-  },
+  }
 )
 
 Given(
@@ -56,7 +56,7 @@ Given(
       .loginAsAdminAndGoToAdminDashboard()
       .goToFineTuningData()
       .expectFineTuningExamplesCount(numberOfRecords)
-  },
+  }
 )
 
 Given(
@@ -66,7 +66,7 @@ Given(
       .assumeAdminDashboardPage()
       .goToFineTuningData()
       .expectString(numOfOccurrence, expectedString)
-  },
+  }
 )
 
 Given("I am logged in as an admin", (_tabName: string) => {
@@ -77,15 +77,12 @@ Given(
   "I navigate to the {string} section in the admin dashboard",
   (tabName: string) => {
     start.goToAdminDashboard().goToTabInAdminDashboard(tabName)
-  },
+  }
 )
 
-Given(
-  "OpenAI responds with {string} when uploading file",
-  (result) => {
-    mock_services.openAi().stubOpenAiUploadResponse(result === "success")
-  },
-)
+Given("OpenAI responds with {string} when uploading file", (result) => {
+  mock_services.openAi().stubOpenAiUploadResponse(result === "success")
+})
 
 Given("OpenAI responds with {string} when triggering fine-tuning", (result) => {
   mock_services.openAi().stubFineTuningStatus(result === "success")
@@ -127,7 +124,7 @@ Given(
     }))
 
     start.testability().injectSuggestedQuestions(positives.concat(negatives))
-  },
+  }
 )
 
 Then("I choose model {string} for {string}", (model: string, task: string) => {
@@ -140,7 +137,7 @@ Given(
     mock_services
       .openAi()
       .stubCreateAssistant(newId, nameOfAssistant, modelName)
-  },
+  }
 )
 
 Given(
@@ -148,8 +145,13 @@ Given(
   (newId: string, nameOfAssistant: string, additionalInstruction: string) => {
     mock_services
       .openAi()
-      .stubCreateAssistant(newId, nameOfAssistant, "gpt-3.5-turbo", additionalInstruction)
-  },
+      .stubCreateAssistant(
+        newId,
+        nameOfAssistant,
+        "gpt-3.5-turbo",
+        additionalInstruction
+      )
+  }
 )
 
 When(
@@ -160,7 +162,7 @@ When(
       .goToAssistantManagement()
       .recreate()
       .expectNewAssistant(newId, nameOfAssistant)
-  },
+  }
 )
 
 When("I remove the notebook {string} from the bazaar", (notebook: string) => {

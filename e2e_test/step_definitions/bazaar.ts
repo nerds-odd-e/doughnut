@@ -26,14 +26,14 @@ When(
   "I subscribe to notebook {string} in the bazaar, with target of learning {int} notes per day",
   (notebookTitle: string, count: string) => {
     start.navigateToBazaar().subscribe(notebookTitle, count)
-  },
+  }
 )
 
 Then(
   "I can not see add the notebook {string} to my learning in the bazaar",
   (noteTopic: string) => {
     start.navigateToBazaar().expectNoAddToMyLearningButton(noteTopic)
-  },
+  }
 )
 
 Then("I should see I've subscribed to {string}", (noteTopic: string) => {

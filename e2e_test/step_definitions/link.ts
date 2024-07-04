@@ -16,14 +16,14 @@ When(
   "I am creating a linking note under note {string}",
   (noteTopic: string) => {
     start.jumpToNotePage(noteTopic).startSearchingAndLinkNote()
-  },
+  }
 )
 
 function makingLink(
   cy,
   fromNoteTopic: string,
   linkType: string,
-  toNoteTopic: string,
+  toNoteTopic: string
 ) {
   start.jumpToNotePage(fromNoteTopic).startSearchingAndLinkNote()
   cy.searchNote(toNoteTopic, ["All My Notebooks And Subscriptions"])
@@ -36,7 +36,7 @@ When(
   (fromNoteTopic: string, linkType: string, toNoteTopic: string) => {
     makingLink(cy, fromNoteTopic, linkType, toNoteTopic)
     cy.findByRole("button", { name: "Create Link" }).click()
-  },
+  }
 )
 
 When(
@@ -46,19 +46,19 @@ When(
     cy.formField("Also Move To Under Target Note").check()
     cy.findByRole("button", { name: "Create Link" }).click()
     cy.findByRole("button", { name: "OK" }).click()
-  },
+  }
 )
 
 When(
   "there is {string} link between note {string} and {string}",
   (linkType: string, fromNoteTopic: string, toNoteTopic: string) => {
     start.testability().injectLink(linkType, fromNoteTopic, toNoteTopic)
-  },
+  }
 )
 
 When("I should see the parent note as {string}", (noteTopic: string) => {
   cy.findByText(noteTopic, { selector: "strong .topic-text" }).should(
-    "be.visible",
+    "be.visible"
   )
 })
 
@@ -67,9 +67,9 @@ When(
   (noteTopicsAsString: string) => {
     cy.tick(500)
     cy.expectExactLinkTargets(
-      commonSenseSplit(noteTopicsAsString, ",").map((i: string) => i.trim()),
+      commonSenseSplit(noteTopicsAsString, ",").map((i: string) => i.trim())
     )
-  },
+  }
 )
 
 When(
@@ -77,9 +77,9 @@ When(
   (noteTopicsAsString: string, searchKey: string) => {
     cy.searchNote(searchKey, [])
     cy.expectExactLinkTargets(
-      commonSenseSplit(noteTopicsAsString, ",").map((i: string) => i.trim()),
+      commonSenseSplit(noteTopicsAsString, ",").map((i: string) => i.trim())
     )
-  },
+  }
 )
 
 When(
@@ -87,9 +87,9 @@ When(
   (noteTopicsAsString: string, searchKey: string) => {
     cy.searchNote(searchKey, ["All My Notebooks And Subscriptions"])
     cy.expectExactLinkTargets(
-      commonSenseSplit(noteTopicsAsString, ",").map((i: string) => i.trim()),
+      commonSenseSplit(noteTopicsAsString, ",").map((i: string) => i.trim())
     )
-  },
+  }
 )
 
 When(
@@ -97,7 +97,7 @@ When(
   (searchKey: string) => {
     cy.searchNote(searchKey, ["All My Notebooks And Subscriptions"])
     cy.findByText("No matching notes found.").should("be.visible")
-  },
+  }
 )
 
 Then(
@@ -107,7 +107,7 @@ Then(
       selector: ".card .topic-text",
     })
     cy.findAllByText(linkType)
-  },
+  }
 )
 
 Then(
@@ -116,7 +116,7 @@ Then(
     start
       .jumpToNotePage(noteTopic)
       .expectLinkingChildren(linkType, targetNoteTopics)
-  },
+  }
 )
 
 Then(
@@ -126,7 +126,7 @@ Then(
       .routerToNotebooksPage()
       .navigateToPath(notePath)
       .expectLinkingChildren(linkType, targetNoteTopics)
-  },
+  }
 )
 
 Then(
@@ -134,7 +134,7 @@ Then(
   (noteTopic: string, targetTitle: string) => {
     start.jumpToNotePage(noteTopic)
     cy.findByText(targetTitle, { selector: "main *" }).should("not.exist")
-  },
+  }
 )
 
 Then(
@@ -144,7 +144,7 @@ Then(
       .jumpToNotePage(noteTopic)
       .navigateToLinkingChild(targetTitle)
       .changeLinkType(linkType, targetTitle)
-  },
+  }
 )
 
 Then(
@@ -154,7 +154,7 @@ Then(
       .jumpToNotePage(noteTopic)
       .navigateToReference(referenceTitle)
       .changeLinkType(linkType, noteTopic)
-  },
+  }
 )
 
 Then("I should be able to delete the link", () => {
@@ -169,5 +169,5 @@ Then(
       .navigateToLinkingChild(targetTitle)
       .deleteNote()
     start.assumeNotePage(noteTopic) // remain on the same note page
-  },
+  }
 )

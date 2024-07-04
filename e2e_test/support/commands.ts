@@ -70,8 +70,8 @@ Cypress.Commands.add("findUserSettingsButton", (userName: string) => {
 Cypress.Commands.add("expectBreadcrumb", (items: string) => {
   cy.get(".breadcrumb").within(() =>
     commonSenseSplit(items, ", ").forEach((noteTopic: string) =>
-      cy.findByText(noteTopic),
-    ),
+      cy.findByText(noteTopic)
+    )
   )
 })
 
@@ -101,7 +101,7 @@ Cypress.Commands.add(
   { prevSubject: true },
   ($input: JQuery<HTMLElement>, value: string) => {
     cy.wrap($input).should("have.value", value)
-  },
+  }
 )
 
 Cypress.Commands.add(
@@ -124,7 +124,7 @@ Cypress.Commands.add(
     } else {
       cy.wrap($input).clear().type(value)
     }
-  },
+  }
 )
 
 Cypress.Commands.add("clickRadioByLabel", (labelText) => {
@@ -144,7 +144,7 @@ Cypress.Commands.add(
         }
       }
     })
-  },
+  }
 )
 
 Cypress.Commands.add("routerPush", (fallback, name, params) => {
@@ -199,7 +199,7 @@ Cypress.Commands.add(
   ({ review_type, topic, additional_info, skip }) => {
     if (review_type == "initial done") {
       cy.findByText("You have achieved your daily new notes goal.").should(
-        "be.visible",
+        "be.visible"
       )
     } else {
       cy.findByText(topic, { selector: "main *" })
@@ -215,7 +215,7 @@ Cypress.Commands.add(
           if (additional_info) {
             const [expectedDetails, expectedImage] = commonSenseSplit(
               additional_info,
-              "; ",
+              "; "
             )
             cy.get(".note-details").should("contain", expectedDetails)
             cy.get("#note-image")
@@ -230,7 +230,7 @@ Cypress.Commands.add(
           if (additional_info) {
             const [linkType, targetNote] = commonSenseSplit(
               additional_info,
-              "; ",
+              "; "
             )
             cy.findByText(topic)
             cy.findByText(targetNote)
@@ -249,11 +249,11 @@ Cypress.Commands.add(
         cy.findByText("Keep for repetition").click()
       }
     }
-  },
+  }
 )
 
 Cypress.Commands.add("findCardTitle", (topic) =>
-  cy.findByText(topic, { selector: ".card-title .topic-text" }),
+  cy.findByText(topic, { selector: ".card-title .topic-text" })
 )
 
 Cypress.Commands.add("yesIRemember", () => {
@@ -300,7 +300,7 @@ Cypress.Commands.add("initialReviewNotes", (noteTopics: string) => {
         review_type: topic === "end" ? "initial done" : "single note",
         topic,
       }
-    }),
+    })
   )
 })
 
@@ -308,7 +308,7 @@ Cypress.Commands.add("repeatReviewNotes", (noteTopics: string) => {
   commonSenseSplit(noteTopics, ",").forEach((topic) => {
     if (topic == "end") {
       cy.findByText(
-        "You have finished all repetitions for this half a day!",
+        "You have finished all repetitions for this half a day!"
       ).should("be.visible")
     } else {
       cy.findByText(topic, { selector: "h2 *" })
@@ -335,9 +335,9 @@ Cypress.Commands.add(
       cy.get(".quiz-instruction").contains(part)
     })
     commonSenseSplit(options, ",").forEach((option: string) =>
-      cy.findByText(option),
+      cy.findByText(option)
     )
-  },
+  }
 )
 
 Cypress.Commands.add("formField", (label) => {
@@ -380,7 +380,7 @@ Cypress.Commands.add(
   "expectFieldErrorMessage",
   (field: string, message: string) => {
     cy.formField(field).siblings(".error-msg").findByText(message)
-  },
+  }
 )
 
 Cypress.Commands.add("expectAMapTo", (latitude: string, longitude: string) => {

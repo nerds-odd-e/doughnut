@@ -38,7 +38,7 @@
     "sut": "backend/gradlew -p backend bootRunE2E --build-cache",
     "open": "pnpm --frozen-lockfile --silent recursive install && pnpm format:all && pnpm frontend:build && run-p -clnr sut cy:open",
     "test": "pnpm --frozen-lockfile --silent recursive install && pnpm frontend:build && run-p -clnr sut start:mb cy:run-on-sut",
-    "test:open": "pnpm --frozen-lockfile --silent recursive install && pnpm format:all && pnpm run-p -clnr sut start:mb frontend:sut cy:open",
+    "test:open": "pnpm --frozen-lockfile --silent recursive install && pnpm run-p -clnr sut start:mb frontend:sut cy:open",
     "verify": "pnpm format:all && pnpm test",
     "sound": "github_action_sound https://github.com/nerds-odd-e/doughnut/actions",
     "lint:all": "pnpm --frozen-lockfile --silent recursive install && pnpm backend:lint && pnpm frontend:lint && pnpm cy:lint",
@@ -52,7 +52,6 @@
     "@badeball/cypress-cucumber-preprocessor": "^20.1.0",
     "@bahmutov/cypress-esbuild-preprocessor": "^2.2.1",
     "@biomejs/biome": "1.8.3",
-    "@stylistic/eslint-plugin": "^2.3.0",
     "@testing-library/cypress": "10.0.2",
     "@types/cypress-cucumber-preprocessor": "^4.0.5",
     "@types/node": "^20.14.9",
@@ -73,7 +72,7 @@
     "got": "^14.4.1",
     "jsdom": "^24.1.0",
     "mountebank": "^2.9.1",
-    "npm-run-all2": "^6.2.0",
+    "npm-run-all2": "^6.2.2",
     "openapi-typescript-codegen": "^0.29.0",
     "prettier": "^3.3.2",
     "superagent": "^9.0.2",
@@ -82,7 +81,8 @@
     "wait-on": "^7.2.0"
   },
   "dependencies": {
-    "@cucumber/cucumber": "^10.8.0"
+    "@cucumber/cucumber": "^10.8.0",
+    "@rushstack/eslint-patch": "^1.10.3"
   },
   "pnpm": {
     "overrides": {

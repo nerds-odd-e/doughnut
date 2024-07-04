@@ -13,7 +13,7 @@ class NotePath {
     const m = value.match(NotePath.regex)
     if (!m) {
       throw new Error(
-        "the note path should be something like `My Notes/path/to/note`",
+        "the note path should be something like `My Notes/path/to/note`"
       )
     }
     this.root = m[1]

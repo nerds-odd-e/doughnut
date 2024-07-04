@@ -6,7 +6,7 @@ import { questionListPage } from "./questionListPage"
 
 function filterAttributes(
   attributes: Record<string, string>,
-  keysToKeep: string[],
+  keysToKeep: string[]
 ) {
   return Object.keys(attributes)
     .filter((key) => keysToKeep.includes(key))
@@ -18,7 +18,7 @@ function filterAttributes(
         }
         return obj
       },
-      {} as Record<string, string>,
+      {} as Record<string, string>
     )
 }
 
@@ -103,7 +103,7 @@ export const assumeNotePage = (noteTopic?: string) => {
     },
     expectLinkingChildren: function (
       linkType: string,
-      targetNoteTopics: string,
+      targetNoteTopics: string
     ) {
       cy.get("main").within(() => {
         commonSenseSplit(targetNoteTopics, ",").forEach((target) => {
@@ -148,7 +148,7 @@ export const assumeNotePage = (noteTopic?: string) => {
       cy.findByRole("button", { name: `Download ${fileName}` }).click()
       cy.task("fileShouldExistSoon", downloadsFolder + "/" + fileName).should(
         "equal",
-        true,
+        true
       )
     },
     updateNoteImage(attributes: Record<string, string>) {
@@ -159,7 +159,7 @@ export const assumeNotePage = (noteTopic?: string) => {
             "Upload Image",
             "Image Url",
             "Use Parent Image",
-          ]),
+          ])
         )
       return this
     },

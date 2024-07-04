@@ -37,7 +37,7 @@ Given(
   "there are some notes for existing user {string}",
   (externalIdentifier: string | undefined, data: DataTable) => {
     start.testability().injectNotes(data.hashes(), externalIdentifier)
-  },
+  }
 )
 
 Given(
@@ -49,27 +49,27 @@ Given(
         return { topicConstructor: `Note ${i + from}` }
       })
     start.testability().injectNotes(notes)
-  },
+  }
 )
 
 Given(
   "I add the following question for the note {string}:",
   (noteTopic: string, data: DataTable) => {
     expect(data.hashes().length, "please add one question at a time.").to.equal(
-      1,
+      1
     )
     start.jumpToNotePage(noteTopic).addQuestion(data.hashes()[0]!)
-  },
+  }
 )
 
 Given(
   "I refine the following question for the note {string}:",
   (noteTopic: string, data: DataTable) => {
     expect(data.hashes().length, "please add one question at a time.").to.equal(
-      1,
+      1
     )
     start.jumpToNotePage(noteTopic).refineQuestion(data.hashes()[0]!)
-  },
+  }
 )
 
 When("I create a notebook with topic {string}", (notebookTopic: string) => {
@@ -85,7 +85,7 @@ When(
   (noteTopic: string, data: DataTable) => {
     start.jumpToNotePage(noteTopic)
     cy.inPlaceEdit(data.hashes()[0])
-  },
+  }
 )
 
 When(
@@ -95,7 +95,7 @@ When(
       .jumpToNotePage(noteTopic)
       .updateNoteImage(data.hashes()[0]!)
       .updateNoteUrl(data.hashes()[0]!)
-  },
+  }
 )
 
 When(
@@ -106,7 +106,7 @@ When(
     cy.get("#note-uploadAudioFile").attachFile(fileName)
     cy.findAllByText("Save").click()
     cy.pageIsNotLoading()
-  },
+  }
 )
 
 Then(
@@ -114,7 +114,7 @@ Then(
   (fileName: string, noteTopic: string) => {
     start.jumpToNotePage(noteTopic)
     start.assumeNotePage().downloadAudioFile(fileName)
-  },
+  }
 )
 
 When("I convert the audio-file to SRT without saving", () => {
@@ -131,7 +131,7 @@ When(
     start.jumpToNotePage(noteTopic)
     cy.get("#note-image").should("exist")
     cy.findByLabelText("Url:").should("have.attr", "href", expectedUrl)
-  },
+  }
 )
 
 When(
@@ -140,7 +140,7 @@ When(
     start.assumeNotePage(noteTopic)
     cy.inPlaceEdit({ topic: newNoteTopic })
     start.assumeNotePage(newNoteTopic)
-  },
+  }
 )
 
 Given(
@@ -148,7 +148,7 @@ Given(
   (noteTopic: string, newNoteTopic: string) => {
     start.jumpToNotePage(noteTopic)
     cy.inPlaceEdit({ topic: newNoteTopic })
-  },
+  }
 )
 
 Given(
@@ -156,7 +156,7 @@ Given(
   (noteTopic: string, noteDetails: string, newNoteDetails: string) => {
     cy.findByText(noteDetails).click({ force: true })
     cy.replaceFocusedTextAndEnter(newNoteDetails)
-  },
+  }
 )
 
 When(
@@ -165,7 +165,7 @@ When(
     start.jumpToNotePage(noteTopic)
     cy.inPlaceEdit({ Details: newDetails })
     start.assumeNotePage().findNoteDetails(newDetails)
-  },
+  }
 )
 
 When(
@@ -176,7 +176,7 @@ When(
       .jumpToNotePage(noteTopic)
       .addingChildNote()
       .createNoteWithAttributes(data.hashes()[0]!)
-  },
+  }
 )
 
 When("I am creating a note under {notepath}", (notePath: NotePath) => {
@@ -197,7 +197,7 @@ Then(
   (data: DataTable) => {
     start.routerToNotebooksPage()
     cy.expectNoteCards(data.hashes())
-  },
+  }
 )
 
 Then(
@@ -207,7 +207,7 @@ Then(
       .routerToNotebooksPage()
       .navigateToPath(notePath)
       .expectChildren(data.hashes())
-  },
+  }
 )
 
 When("I delete notebook {string}", (noteTopic: string) => {
@@ -219,7 +219,7 @@ When(
   (noteTopic: string, hour: number) => {
     start.testability().backendTimeTravelTo(0, hour)
     start.jumpToNotePage(noteTopic).deleteNote()
-  },
+  }
 )
 
 When("I delete note {string}", (noteTopic: string) => {
@@ -236,7 +236,7 @@ Then(
   (noteTopic: string) => {
     start.jumpToNotePage(noteTopic)
     cy.findByText("This note has been deleted")
-  },
+  }
 )
 
 Then(
@@ -245,7 +245,7 @@ Then(
     cy.pageIsNotLoading()
     cy.findByText("Notebooks")
     cy.get("main").within(() => cy.findCardTitle(noteTopic).should("not.exist"))
-  },
+  }
 )
 
 When("I navigate to {notepath} note", (notePath: NotePath) => {
@@ -282,7 +282,7 @@ When(
       const texts = Array.from($els, (el) => el.innerText)
       expect(texts).to.match(matcher)
     })
-  },
+  }
 )
 
 // This step definition is for demo purpose
@@ -292,7 +292,7 @@ Then(
     cy.findByText("" + numberOfDescendants, {
       selector: ".descendant-counter",
     })
-  },
+  }
 )
 
 When(
@@ -305,7 +305,7 @@ When(
       cy.findCardTitle(noteTopic).click()
     })
     cy.get("#username").should("exist")
-  },
+  }
 )
 
 Then(
@@ -323,7 +323,7 @@ Then(
       .then((val) => {
         const leftColorIndex = parseInt(leftColor.match(/\d+/)[0])
         const rightColorIndex = parseInt(
-          JSON.stringify(val).match(/\d+/)?.[0] ?? "",
+          JSON.stringify(val).match(/\d+/)?.[0] ?? ""
         )
         if (aging === "newer") {
           expect(leftColorIndex).to.greaterThan(rightColorIndex)
@@ -331,7 +331,7 @@ Then(
           expect(leftColorIndex).to.equal(rightColorIndex)
         }
       })
-  },
+  }
 )
 
 When("I undo {string}", (undoType: string) => {
@@ -346,7 +346,7 @@ Then(
   "the deleted notebook with topic {string} should be restored",
   (topic: string) => {
     start.assumeNotePage(topic)
-  },
+  }
 )
 
 Then("there should be no more undo to do", () => {
@@ -361,7 +361,7 @@ Then(
   "the note details on the current page should be {string}",
   (detailsText: string) => {
     start.assumeNotePage().findNoteDetails(detailsText)
-  },
+  }
 )
 
 When("I generate an image for {string}", (noteTopic: string) => {
@@ -376,7 +376,7 @@ Given(
   "I request to complete the details for the note {string}",
   (noteTopic: string) => {
     start.jumpToNotePage(noteTopic).aiSuggestDetailsForNote()
-  },
+  }
 )
 
 Then(
@@ -387,7 +387,7 @@ Then(
         expect(elem.text()).to.equal("The OpenAI request was not Authorized.")
       })
       .click()
-  },
+  }
 )
 
 When("I start to chat about the note {string}", (noteTopic: string) => {
@@ -398,14 +398,14 @@ When(
   "I answer {string} to the clarifying question {string}",
   (answer: string, question: string) => {
     start.assumeClarifyingQuestionDialog(question).answer(answer)
-  },
+  }
 )
 
 When(
   'I respond with "cancel" to the clarifying question {string}',
   (question: string) => {
     start.assumeClarifyingQuestionDialog(question).close()
-  },
+  }
 )
 
 When("I should see a follow-up question {string}", (question: string) => {
@@ -421,7 +421,7 @@ When(
         .assumeClarifyingQuestionDialog(question as unknown as string)
         .oldAnswer(oldAnswer)
     })
-  },
+  }
 )
 
 Then("I should see a child note {string}", (childTopic: string) => {
@@ -434,7 +434,7 @@ When(
     start.jumpToNotePage(noteTopic)
     start.assumeNotePage().editAudioButton().click()
     cy.get("#note-uploadAudioFile").attachFile(fileName)
-  },
+  }
 )
 
 When("I collapse the children of note {string}", (noteTopic: string) => {
@@ -449,14 +449,14 @@ When(
   "I expand the children of note {string} in the sidebar",
   (noteTopic: string) => {
     start.sidebar().expand(noteTopic)
-  },
+  }
 )
 
 When(
   "I should see the note {string} with {int} children collapsed",
   (noteTopic: string, childrenCount: number) => {
     start.assumeNotePage(noteTopic).collapsedChildrenWithCount(childrenCount)
-  },
+  }
 )
 
 Then("I should see the children notes:", (data: DataTable) => {
@@ -471,14 +471,14 @@ When(
   "I should see the questions in the question list of the note {string}:",
   (noteTopic: string, data: DataTable) => {
     start.jumpToNotePage(noteTopic).expectQuestionsInList(data.hashes())
-  },
+  }
 )
 
 Given(
   "I toggle the approval of the question {string} of the topic {string}",
   (quizQuestion: string, noteTopic: string) => {
     start.jumpToNotePage(noteTopic).toggleApproval(quizQuestion)
-  },
+  }
 )
 
 When("I generate question by AI for note {string}", (noteName: string) => {
@@ -494,6 +494,6 @@ Then("the question in the form becomes:", (data: DataTable) => {
   ;["Stem", "Choice 0", "Choice 1", "Choice 2", "Correct Choice Index"].forEach(
     (key) => {
       cy.findByLabelText(key).should("have.value", expectedQuestions[key]!)
-    },
+    }
   )
 })

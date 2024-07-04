@@ -32,7 +32,7 @@ Then(
     start.testability().backendTimeTravelTo(day, 8)
     cy.goAndRepeatReviewNotes(repeatNotes)
     cy.initialReviewNotes(initialNotes)
-  },
+  }
 )
 
 Given("I go to the reviews page", () => {
@@ -60,7 +60,7 @@ Then(
       selector: ".number-of-initial-reviews",
     })
     cy.findByText(numberOfRepeats, { selector: ".number-of-repeats" })
-  },
+  }
 )
 
 Then("it should move to review page", () => {
@@ -77,7 +77,7 @@ Then(
     start.testability().injectNotes([{ topicConstructor: noteTopic }])
     start.testability().backendTimeTravelTo(day, 8)
     cy.initialReviewNotes(noteTopic)
-  },
+  }
 )
 
 Then(
@@ -85,7 +85,7 @@ Then(
   (noteTopic: string, day: number) => {
     start.testability().backendTimeTravelTo(day, 8)
     cy.initialReviewNotes(noteTopic)
-  },
+  }
 )
 
 Then("I am repeat-reviewing my old note on day {int}", (day: number) => {
@@ -107,7 +107,7 @@ Then(
         cy.findByRole("button", { name: "" + level }).click()
       })
     })
-  },
+  }
 )
 
 Then("I have selected the choice {string}", (choice: string) => {
@@ -123,14 +123,14 @@ Then(
   "I should be asked cloze deletion question {string} with options {string}",
   (question: string, options: string) => {
     cy.shouldSeeQuizWithOptions([question], options)
-  },
+  }
 )
 
 Then(
   "I should be asked image question {string} with options {string}",
   (imageInQuestion: string, options: string) => {
     cy.shouldSeeQuizWithOptions([], options)
-  },
+  }
 )
 
 Then(
@@ -138,14 +138,14 @@ Then(
   (question: string, notebook: string) => {
     cy.expectBreadcrumb(notebook)
     cy.findByText(question).should("be.visible")
-  },
+  }
 )
 
 Then(
   "I should be asked link question {string} {string} with options {string}",
   (noteTopic: string, linkType: string, options: string) => {
     cy.shouldSeeQuizWithOptions([noteTopic, linkType], options)
-  },
+  }
 )
 
 Then("I type my answer {string}", (answer: string) => {
@@ -166,7 +166,7 @@ Then("I should see that my answer {string} is incorrect", (answer) => {
 
 Then("I should see the repetition is finished: {string}", (yesNo) => {
   cy.findByText(
-    "You have finished all repetitions for this half a day!",
+    "You have finished all repetitions for this half a day!"
   ).should(yesNo === "yes" ? "exist" : "not.exist")
 })
 
@@ -192,7 +192,7 @@ Then(
       .assumeAnsweredQuestionPage()
       .showReviewPoint(noteTopic)
       .expectReviewPointInfo(data.hashes()[0])
-  },
+  }
 )
 
 Then("choose to remove the last review point from reviews", () => {
@@ -216,23 +216,23 @@ When(
   (noteTopic: string, question: DataTable) => {
     start.stubOpenAIQuestionGenerationAndSeeTheQuestion(
       noteTopic,
-      question.hashes()[0],
+      question.hashes()[0]
     )
-  },
+  }
 )
 
 When(
   "I have the true false question {string} rated as a good example",
   (questionStem: string) => {
     start.testability().injectSuggestedQuestion(questionStem, true)
-  },
+  }
 )
 
 When(
   "I have the true false question {string} rated as a bad example",
   (questionStem: string) => {
     start.testability().injectSuggestedQuestion(questionStem, false)
-  },
+  }
 )
 
 Then("I should be asked {string}", (expectedQuestionStem: string) => {
@@ -243,14 +243,14 @@ Then(
   "I should see the question {string} is disabled",
   (questionStem: string) => {
     start.assumeQuestionPage(questionStem).isDisabled()
-  },
+  }
 )
 
 Then(
   "I should see the question {string} is enabled",
   (questionStem: string) => {
     start.assumeQuestionPage(questionStem).isNotDisabled()
-  },
+  }
 )
 
 Then(
@@ -260,7 +260,7 @@ Then(
       .assumeQuestionPage(questionStem)
       .suggestingThisQuestionForFineTuning()
       .suggestingPositiveFeedbackForFineTuning()
-  },
+  }
 )
 
 Then(
@@ -270,5 +270,5 @@ Then(
       .assumeQuestionPage(questionStem)
       .suggestingThisQuestionForFineTuning()
       .suggestingNegativeFeedbackFineTuningExclusion()
-  },
+  }
 )

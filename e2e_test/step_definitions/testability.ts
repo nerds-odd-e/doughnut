@@ -17,7 +17,7 @@ Then(
       .loginAsAdminAndGoToAdminDashboard()
       .goToFailureReportList()
       .shouldContain(content)
-  },
+  }
 )
 
 Then(
@@ -26,9 +26,9 @@ Then(
     cy.visit("/")
     cy.contains("Welcome")
     cy.contains(expectedContent).should(
-      shouldExistOrNot === "should exist" ? "exist" : "not.exist",
+      shouldExistOrNot === "should exist" ? "exist" : "not.exist"
     )
-  },
+  }
 )
 
 Then("I go to the testability page to turn on the feature toggle", () => {

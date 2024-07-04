@@ -1,6 +1,6 @@
 export const SuggestQuestionForFineTuningPage = () => {
   cy.contains(
-    "will make this note and question visible to admin. Are you sure?",
+    "will make this note and question visible to admin. Are you sure?"
   )
   return {
     confirm() {

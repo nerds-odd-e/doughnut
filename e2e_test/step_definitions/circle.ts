@@ -19,12 +19,12 @@ When(
       .then((text) => {
         cy.wrap(text).as("savedInvitationCode")
       })
-  },
+  }
 )
 
 When("I visit the invitation link", () => {
   cy.get("@savedInvitationCode").then((invitationCode) =>
-    cy.visit(invitationCode),
+    cy.visit(invitationCode)
   )
 })
 
@@ -36,7 +36,7 @@ When(
   "I should see the circle {string} and it has two members in it",
   (circleName: string) => {
     start.navigateToCircle(circleName).haveMembers(2)
-  },
+  }
 )
 
 Given(
@@ -45,14 +45,14 @@ Given(
     start
       .testability()
       .injectCircle({ circleName: circleName, members: members })
-  },
+  }
 )
 
 When(
   "I create a notebook {string} in circle {string}",
   (noteTopic: string, circleName: string) => {
     start.navigateToCircle(circleName).creatingNotebook(noteTopic)
-  },
+  }
 )
 
 When(
@@ -60,7 +60,7 @@ When(
   (noteTopic: string, circleName: string) => {
     start.navigateToCircle(circleName)
     cy.findCardTitle(noteTopic)
-  },
+  }
 )
 
 When(
@@ -71,14 +71,14 @@ When(
       .navigateToChild(parentNoteTopic)
       .addingChildNote()
       .createNote(noteTopic)
-  },
+  }
 )
 
 When(
   "I subscribe to notebook {string} in the circle {string}, with target of learning {int} notes per day",
   (notebookTitle: string, circleName: string, count: string) => {
     start.navigateToCircle(circleName).subscribe(notebookTitle, count)
-  },
+  }
 )
 
 When("I am on {string} circle page", (circleName: string) => {
@@ -93,7 +93,7 @@ When(
   "someone of my circle deletes the {string} notebook",
   (noteTopic: string) => {
     cy.noteByTitle(noteTopic).deleteNoteViaAPI()
-  },
+  }
 )
 
 Then(
@@ -101,7 +101,7 @@ Then(
   (noteTopic: string, seconds: number) => {
     cy.tick(seconds * 1000)
     cy.findCardTitle(noteTopic)
-  },
+  }
 )
 
 Then(
@@ -109,5 +109,5 @@ Then(
   (noteTopic: string, seconds: number) => {
     cy.tick(seconds * 1000)
     cy.findCardTitle(noteTopic).should("not.exist")
-  },
+  }
 )

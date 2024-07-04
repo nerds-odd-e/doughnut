@@ -10,7 +10,10 @@ declare namespace Cypress {
     clickRadioByLabel(labelText: any): Chainable<any>
     deleteNoteViaAPI(): Chainable<Subject>
     dialogDisappeared(): Chainable<any>
-    expectBreadcrumb(item: string, addChildButton: boolean = true): Chainable<any>
+    expectBreadcrumb(
+      item: string,
+      addChildButton: boolean = true
+    ): Chainable<any>
     expectExactLinkTargets(targets: any): Chainable<any>
     expectFieldErrorMessage(field: string, message: string): Chainable<any>
     expectNoteCards(expectedCards: any): Chainable<any>

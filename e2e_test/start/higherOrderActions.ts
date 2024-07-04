@@ -14,7 +14,7 @@ export const higherOrderActions = {
 
   stubOpenAIQuestionGenerationAndSeeTheQuestion: (
     noteTopic: string,
-    question: Record<string, string>,
+    question: Record<string, string>
   ) => {
     testability().injectNotes([{ topicConstructor: noteTopic }])
     questionGenerationService().resetAndStubAskingMCQ(question)

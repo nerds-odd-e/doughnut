@@ -30,32 +30,34 @@ type ChatMessageInResponse = TextBasedMessage | ToolCalls
 const openAiChatCompletionStubber = (
   serviceMocker: ServiceMocker,
   bodyToMatch: BodyToMatch,
-  bodyNotToMatch?: BodyToMatch,
+  bodyNotToMatch?: BodyToMatch
 ) => {
   const stubChatCompletion = (
     message: ChatMessageInResponse,
-    finishReason: "length" | "stop" | "function_call",
+    finishReason: "length" | "stop" | "function_call"
   ): Promise<void> => {
     return serviceMocker.mockPostMatchsAndNotMatches(
       `/chat/completions`,
       bodyToMatch,
       bodyNotToMatch,
-      [{
-        object: "chat.completion",
-        choices: [
-          {
-            message,
-            index: 0,
-            finish_reason: finishReason,
-          },
-        ],
-      }],
+      [
+        {
+          object: "chat.completion",
+          choices: [
+            {
+              message,
+              index: 0,
+              finish_reason: finishReason,
+            },
+          ],
+        },
+      ]
     )
   }
 
   const stubSingleToolCall = (
     functionName: string,
-    argumentsString: string,
+    argumentsString: string
   ) => {
     return stubChatCompletion(
       {
@@ -72,7 +74,7 @@ const openAiChatCompletionStubber = (
           },
         ],
       },
-      "function_call",
+      "function_call"
     )
   }
 
@@ -88,7 +90,7 @@ const openAiChatCompletionStubber = (
     stubQuestionGeneration(argumentsString: string) {
       return stubSingleToolCall(
         "ask_single_answer_multiple_choice_question",
-        argumentsString,
+        argumentsString
       )
     },
     stubQuestionEvaluation(argumentsString: string) {

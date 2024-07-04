@@ -4,7 +4,7 @@ const noteCreationForm = {
   createNote: (
     topic: string,
     linkTypeToParent?: string,
-    wikidataId?: string,
+    wikidataId?: string
   ) => {
     submittableForm.submitWith({
       Topic: topic,

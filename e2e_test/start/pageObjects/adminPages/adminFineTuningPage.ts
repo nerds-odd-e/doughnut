@@ -13,7 +13,7 @@ export function adminFineTuningPage() {
 
     updateQuestionSuggestionAndChoice(
       originalQuestionStem: string,
-      newQuestion: Record<string, string>,
+      newQuestion: Record<string, string>
     ) {
       cy.findByText(originalQuestionStem).parent().dblclick()
       cy.formField("Stem").clear().type(newQuestion["Question Stem"])

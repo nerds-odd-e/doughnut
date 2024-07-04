@@ -8,7 +8,7 @@ const stubWikidataApi = (
   serviceMocker: ServiceMocker,
   action: string,
   query: Record<string, string>,
-  data: unknown,
+  data: unknown
 ) => {
   return serviceMocker.stubGetter(`/w/api.php`, { action, ...query }, data)
 }
@@ -16,13 +16,13 @@ const stubWikidataApi = (
 const stubWikidataEntity = (
   serviceMocker: ServiceMocker,
   wikidataId: string,
-  claims: Claim[],
+  claims: Claim[]
 ) => {
   stubWikidataApi(
     serviceMocker,
     "wbgetentities",
     { ids: wikidataId },
-    new WikidataEntitiesBuilder(wikidataId).wclaims(claims).build(),
+    new WikidataEntitiesBuilder(wikidataId).wclaims(claims).build()
   )
 }
 
@@ -39,7 +39,7 @@ const wikidataService = () => {
     stubWikidataEntityQuery(
       wikidataId: string,
       wikidataTitle: string,
-      wikipediaLink: string,
+      wikipediaLink: string
     ) {
       const wikipedia = wikipediaLink
         ? { enwiki: { site: "enwiki", url: wikipediaLink } }
@@ -62,7 +62,7 @@ const wikidataService = () => {
     stubWikidataEntityLocation(
       wikidataId: string,
       latitude: number,
-      longitude: number,
+      longitude: number
     ) {
       stubWikidataEntity(serviceMocker, wikidataId, [
         {
@@ -76,7 +76,7 @@ const wikidataService = () => {
     stubWikidataEntityPerson(
       wikidataId: string,
       countryId: string,
-      birthday: string,
+      birthday: string
     ) {
       stubWikidataEntity(serviceMocker, wikidataId, [
         { claimId: "P31", type: "wikibase-entityid", value: { id: "Q5" } },
@@ -87,7 +87,7 @@ const wikidataService = () => {
 
     stubWikidataEntityBook(
       wikidataId: string,
-      authorWikidataIds: Array<string>,
+      authorWikidataIds: Array<string>
     ) {
       stubWikidataEntity(
         serviceMocker,
@@ -96,7 +96,7 @@ const wikidataService = () => {
           claimId: "P50",
           type: "wikibase-entityid",
           value: { id },
-        })),
+        }))
       )
     },
 
@@ -114,7 +114,7 @@ const wikidataService = () => {
                 'genre of popular music that originated as"rock and roll"in 1950s United States',
             },
           ],
-        },
+        }
       )
     },
   }

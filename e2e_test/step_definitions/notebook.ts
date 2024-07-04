@@ -17,14 +17,14 @@ Then(
     cy.findByText(noteTopic).click()
     cy.pageIsNotLoading()
     start.assumeNotePage().editNoteImage().shouldNotExist()
-  },
+  }
 )
 
 Then(
   "I should be able to edit the subscription to notebook {string}",
   (noteTopic: string) => {
     start.routerToNotebooksPage().updateSubscription(noteTopic)
-  },
+  }
 )
 
 When("I change notebook {string} to skip review", (noteTopic: string) => {
@@ -41,5 +41,5 @@ Given(
     start
       .routerToNotebooksPage()
       .updateAssessmentSettings(notebook, numberOfQuestion)
-  },
+  }
 )

@@ -14,7 +14,7 @@ class MountebankStubBuilder {
   public stubWithPredicates(
     predicates: Predicate[],
     responses: unknown[],
-    headers?: Record<string, string>,
+    headers?: Record<string, string>
   ): Stub {
     const stub = new Stub()
     predicates.forEach((predicate) => stub.withPredicate(predicate))
@@ -30,8 +30,7 @@ class MountebankStubBuilder {
         })
       }
       return stub.withResponse(resp)
-    },
-    )
+    })
     return stub
   }
 
@@ -39,17 +38,17 @@ class MountebankStubBuilder {
     pathMatcher: string,
     method: HttpMethod,
     status: number,
-    response: unknown,
+    response: unknown
   ) {
     return new Stub()
       .withPredicate(
         new FlexiPredicate()
           .withOperator(Operator.matches)
           .withPath(pathMatcher)
-          .withMethod(method),
+          .withMethod(method)
       )
       .withResponse(
-        new Response().withStatusCode(status).withJSONBody(response),
+        new Response().withStatusCode(status).withJSONBody(response)
       )
   }
 }

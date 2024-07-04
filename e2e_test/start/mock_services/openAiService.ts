@@ -84,7 +84,7 @@ const openAiService = () => {
       newId: string,
       nameOfAssistant: string,
       modelName?: string,
-      additionalInstruction?: string,
+      additionalInstruction?: string
     ) {
       return await serviceMocker.mockPostMatchsAndNotMatches(
         `/assistants`,
@@ -94,28 +94,33 @@ const openAiService = () => {
           instructions: additionalInstruction,
         },
         undefined,
-        [{
-          id: newId,
-          name: nameOfAssistant,
-        }],
+        [
+          {
+            id: newId,
+            name: nameOfAssistant,
+          },
+        ]
       )
     },
 
     stubAIChat(messages: Record<string, string>[], assistantId?: string) {
-    const thread = this.stubCreateThread(
-      "thread-abc123",
-    ).stubCreateRunStreams("thread-abc123", assistantId, messages.map((row) => ({
-      runId: row["run id"]!,
-      fullMessage: row["assistant reply"]!,
-  })))
-    messages.forEach((row) => {
-      const userMessage: MessageToMatch = {
-        role: "user",
-        content: row["user message"]!,
-      }
-      thread.stubCreateMessage(userMessage)
-    })
-
+      const thread = this.stubCreateThread(
+        "thread-abc123"
+      ).stubCreateRunStreams(
+        "thread-abc123",
+        assistantId,
+        messages.map((row) => ({
+          runId: row["run id"]!,
+          fullMessage: row["assistant reply"]!,
+        }))
+      )
+      messages.forEach((row) => {
+        const userMessage: MessageToMatch = {
+          role: "user",
+          content: row["user message"]!,
+        }
+        thread.stubCreateMessage(userMessage)
+      })
     },
 
     stubCreateThread(threadId: string) {
@@ -126,24 +131,32 @@ const openAiService = () => {
     },
 
     stubCreateRuns(threadId: string, runIds: string[]) {
-      serviceMocker.stubPosterWithMultipleResponses(`/threads/${threadId}/runs`,
+      serviceMocker.stubPosterWithMultipleResponses(
+        `/threads/${threadId}/runs`,
         runIds.map((runId) => ({
-        id: runId,
-        status: "queued",
-      })))
+          id: runId,
+          status: "queued",
+        }))
+      )
       return openAiAssistantThreadMocker(serviceMocker, threadId, runIds)
     },
 
-    stubCreateRunStreams(threadId: string, assistantId: string | undefined, runStreamData: RunStreamData[]) {
+    stubCreateRunStreams(
+      threadId: string,
+      assistantId: string | undefined,
+      runStreamData: RunStreamData[]
+    ) {
       const bodyToMatch = {}
       if (assistantId) {
         bodyToMatch["assistant_id"] = assistantId
       }
-      serviceMocker.mockPostMatchsAndNotMatches(`/threads/${threadId}/runs`,
+      serviceMocker.mockPostMatchsAndNotMatches(
+        `/threads/${threadId}/runs`,
         bodyToMatch,
         undefined,
-        runStreamData.map(({runId, fullMessage}) =>
-`event: thread.message.created
+        runStreamData.map(
+          ({ runId, fullMessage }) =>
+            `event: thread.message.created
 data: {"thread_id": "${threadId}", "run_id": "${runId}", "role": "assistant", "content": []}
 
 event: thread.message.delta
@@ -152,8 +165,10 @@ data: {"delta": {"content": [{"index": 0, "type": "text", "text": {"value": "${f
 event: thread.run.step.completed
 data: {"run_id": "${runId}", "status": "completed"}
 
-`),
-    { "Content-Type": "text/event-stream" })
+`
+        ),
+        { "Content-Type": "text/event-stream" }
+      )
       return openAiAssistantThreadMocker(serviceMocker, threadId, [])
     },
 

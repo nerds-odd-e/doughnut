@@ -5,18 +5,16 @@ import openAiAssistantCreatedRunMocker from "./openAiAssistantCreatedRunMocker"
 const openAiAssistantThreadMocker = (
   serviceMocker: ServiceMocker,
   threadId: string,
-  mockedRunIds: string[],
+  mockedRunIds: string[]
 ) => {
   return {
     aRun(runId: string) {
       if (!mockedRunIds.includes(runId)) {
-        throw new Error(`Run ID ${runId} not found in mockedRunIds, please mock the run first`)
+        throw new Error(
+          `Run ID ${runId} not found in mockedRunIds, please mock the run first`
+        )
       }
-      return openAiAssistantCreatedRunMocker(
-        serviceMocker,
-        threadId,
-        runId,
-      )
+      return openAiAssistantCreatedRunMocker(serviceMocker, threadId, runId)
     },
 
     stubCreateMessage(message: MessageToMatch) {
@@ -25,9 +23,11 @@ const openAiAssistantThreadMocker = (
         `/threads/${threadId}/messages`,
         message,
         undefined,
-        [{
-          id: "msg-abc123",
-        }],
+        [
+          {
+            id: "msg-abc123",
+          },
+        ]
       )
       return this
     },

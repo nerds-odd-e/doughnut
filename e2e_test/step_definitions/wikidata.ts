@@ -14,14 +14,14 @@ When(
   "I associate the note {string} with wikidata id {string}",
   (topic: string, wikiID: string) => {
     start.jumpToNotePage(topic).wikidataOptions().associate(wikiID)
-  },
+  }
 )
 
 When(
   "I change the note {string} to associate with wikidata id {string}",
   (topic: string, wikiID: string) => {
     start.jumpToNotePage(topic).wikidataOptions().reassociationWith(wikiID)
-  },
+  }
 )
 
 When(
@@ -30,14 +30,14 @@ When(
     cy.findAllByText(wikidataTitle).should("exist")
     cy.findByRole("button", { name: "Confirm" }).click()
     start.assumeNotePage().wikidataOptions().hasAssociation()
-  },
+  }
 )
 
 Then(
   "I don't need to confirm the association with different label {string}",
   () => {
     start.assumeNotePage().wikidataOptions().hasAssociation()
-  },
+  }
 )
 
 Given(
@@ -46,7 +46,7 @@ Given(
     mock_services
       .wikidata()
       .stubWikidataEntityQuery(wikidataId, wikidataTitle, wikipediaLink)
-  },
+  }
 )
 
 Given(
@@ -55,7 +55,7 @@ Given(
     mock_services
       .wikidata()
       .stubWikidataEntityQuery(wikidataId, wikidataTitle, undefined)
-  },
+  }
 )
 
 Given(
@@ -64,14 +64,14 @@ Given(
     mock_services
       .wikidata()
       .stubWikidataEntityPerson(wikidataId, countryId, birthday)
-  },
+  }
 )
 
 Given(
   "Wikidata.org entity {string} is a location at {float}, {float}",
   (wikidataId: string, lat: number, lng: number) => {
     mock_services.wikidata().stubWikidataEntityLocation(wikidataId, lat, lng)
-  },
+  }
 )
 
 Given("The wikidata service is not available", () => {
@@ -82,7 +82,7 @@ Then(
   "I should see an error {string} on {string}",
   (message: string, field: string) => {
     cy.expectFieldErrorMessage(field, message)
-  },
+  }
 )
 
 Then(
@@ -93,14 +93,14 @@ Then(
       .wikidataOptions()
       .hasAssociation()
       .expectALinkThatOpensANewWindowWithURL(associationUrl)
-  },
+  }
 )
 
 Given(
   "Wikidata search result always has {string} with ID {string}",
   (wikidataLabel: string, wikidataId: string) => {
     mock_services.wikidata().stubWikidataSearchResult(wikidataLabel, wikidataId)
-  },
+  }
 )
 
 When("I search with topic {string} on Wikidata", (topic: string) => {
@@ -112,21 +112,21 @@ When(
   "I select wikidataID {string} from the Wikidata search result",
   (wikidataID: string) => {
     cy.get('select[name="wikidataSearchResult"]').select(wikidataID)
-  },
+  }
 )
 
 Then(
   "I should see that the {string} becomes {string}",
   (field: string, value: string) => {
     cy.formField(field).fieldShouldHaveValue(value)
-  },
+  }
 )
 
 Then(
   "a map pointing to lat: {string}, lon: {string} is added to the note",
   (latitude: string, longitude: string) => {
     cy.expectAMapTo(latitude, longitude)
-  },
+  }
 )
 
 Given(
@@ -134,7 +134,7 @@ Given(
   (wikidataId: string, data: DataTable) => {
     mock_services.wikidata().stubWikidataEntityBook(
       wikidataId,
-      data.hashes().map((hash) => hash["Wikidata Id"]),
+      data.hashes().map((hash) => hash["Wikidata Id"])
     )
-  },
+  }
 )

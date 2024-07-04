@@ -4,7 +4,7 @@ import { MessageToMatch } from "./MessageToMatch"
 const openAiAssistantCreatedRunMocker = (
   serviceMocker: ServiceMocker,
   threadId: string,
-  runId: string,
+  runId: string
 ) => {
   return {
     stubRetrieveRunsThatCompleted() {
@@ -17,14 +17,14 @@ const openAiAssistantCreatedRunMocker = (
       serviceMocker.stubGetterWithMutipleResponses(
         `/threads/${threadId}/runs/${runId}`,
         {},
-        responses,
+        responses
       )
       return this
     },
     stubRetrieveRunsThatRequireAction(hashes: Record<string, string>[]) {
       const createRequiresActionRun = (
         functionName: string,
-        argumentsObj: unknown,
+        argumentsObj: unknown
       ) => {
         return {
           id: runId,
@@ -64,7 +64,7 @@ const openAiAssistantCreatedRunMocker = (
       serviceMocker.stubGetterWithMutipleResponses(
         `/threads/${threadId}/runs/${runId}`,
         {},
-        responses,
+        responses
       )
       return this
     },
@@ -75,7 +75,7 @@ const openAiAssistantCreatedRunMocker = (
         {
           id: runId,
           status: "queued",
-        },
+        }
       )
 
       return this
@@ -100,7 +100,7 @@ const openAiAssistantCreatedRunMocker = (
               },
             ],
           })),
-        },
+        }
       )
     },
   }

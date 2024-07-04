@@ -12,7 +12,7 @@ const hourOfDay = (days: number, hours: number) => {
 const postToTestabilityApi = (
   cy: Cypress.cy & CyEventEmitter,
   path: string,
-  options: { body?: Record<string, unknown>; failOnStatusCode?: boolean },
+  options: { body?: Record<string, unknown>; failOnStatusCode?: boolean }
 ) => {
   return cy.request({
     method: "POST",
@@ -24,7 +24,7 @@ const postToTestabilityApi = (
 const postToTestabilityApiSuccessfully = (
   cy: Cypress.cy & CyEventEmitter,
   path: string,
-  options: { body?: Record<string, unknown>; failOnStatusCode?: boolean },
+  options: { body?: Record<string, unknown>; failOnStatusCode?: boolean }
 ) => {
   postToTestabilityApi(cy, path, options).its("status").should("equal", 200)
 }
@@ -56,7 +56,7 @@ const testability = () => {
     injectNotes(
       noteTestData: NoteTestData[],
       externalIdentifier = "",
-      circleName = null,
+      circleName = null
     ) {
       postToTestabilityApi(cy, "inject_notes", {
         body: {
@@ -77,7 +77,7 @@ const testability = () => {
         },
       }).then((response) => {
         expect(Object.keys(response.body).length).to.equal(
-          quizQuestionTestData.length,
+          quizQuestionTestData.length
         )
       })
     },
@@ -129,7 +129,7 @@ const testability = () => {
         .then((injectedNoteIdMap) => {
           expect(
             injectedNoteIdMap,
-            `"${noteTopic}" is not in the injected note. Did you created during the test?`,
+            `"${noteTopic}" is not in the injected note. Did you created during the test?`
           ).haveOwnPropertyDescriptor(noteTopic)
           return injectedNoteIdMap[noteTopic]
         })
@@ -208,7 +208,7 @@ const testability = () => {
     mockService(serviceMocker: ServiceMocker) {
       this.setServiceUrl(
         serviceMocker.serviceName,
-        serviceMocker.serviceUrl,
+        serviceMocker.serviceUrl
       ).as(serviceMocker.savedServiceUrlName)
       serviceMocker.install()
     },
@@ -217,8 +217,8 @@ const testability = () => {
       cy.get(`@${serviceMocker.savedServiceUrlName}`).then((saved) =>
         this.setServiceUrl(
           serviceMocker.serviceName,
-          saved as unknown as string,
-        ),
+          saved as unknown as string
+        )
       )
     },
   }
