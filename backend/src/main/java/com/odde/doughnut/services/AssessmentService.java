@@ -10,8 +10,6 @@ import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.randomizers.RealRandomizer;
 import com.theokanning.openai.client.OpenAiApi;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Objects;

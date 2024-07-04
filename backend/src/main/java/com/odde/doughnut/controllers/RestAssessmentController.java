@@ -48,6 +48,7 @@ class RestAssessmentController {
     currentUser.assertLoggedIn();
     currentUser.assertReadAuthorization(notebook);
 
-    return assessmentService.submitAssessmentResult(currentUser.getEntity(), notebook, questionsAnswerPairs);
+    return assessmentService.submitAssessmentResult(
+        currentUser.getEntity(), notebook, questionsAnswerPairs);
   }
 }
