@@ -46,7 +46,8 @@ Feature: New questions assessment
       | What is the capital city of Korea? | Seoul   |
     Then I should see the score "Yours score: 5 / 5" at the end of assessment
 
-  Scenario: Perform an assessment with all wrong answers
+  @featureToggle
+  Scenario: Performing an assessment with all wrong answers shows links to notes that had wrong ansers
     Given I set the number of questions per assessment of the notebook "Countries" to 2
     When I start the assessment on the "Countries" notebook in the bazaar
     And I answer with the following answers:
