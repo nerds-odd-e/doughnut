@@ -14,9 +14,6 @@ importers:
       '@cucumber/cucumber':
         specifier: ^10.8.0
         version: 10.8.0
-      '@rushstack/eslint-patch':
-        specifier: ^1.10.3
-        version: 1.10.3
     devDependencies:
       '@anev/ts-mountebank':
         specifier: 1.8.0
@@ -1358,9 +1355,6 @@ packages:
     resolution: {integrity: sha512-UOo5FdvOL0+eIVTgS4tIdbW+TtnBLWg1YBCcU2KWM7nuNwRz9bksDX1bekJJCpu25N1DVWaCwnT39dVQxzqS8g==}
     cpu: [x64]
     os: [win32]
-
-  '@rushstack/eslint-patch@1.10.3':
-    resolution: {integrity: sha512-qC/xYId4NMebE6w/V33Fh9gWxLgURiNYgVNObbJl2LZv0GUUItCcCqC5axQSwRaAgaxl2mELq1rMzlswaQ0Zxg==}
 
   '@sec-ant/readable-stream@0.4.1':
     resolution: {integrity: sha512-831qok9r2t8AlxLko40y2ebgSDhenenCatLVeW/uBtnHPyhHOvG0C7TvfgecV+wHzIm5KUICgzmVpWS+IMEAeg==}
@@ -7046,8 +7040,6 @@ snapshots:
 
   '@rollup/rollup-win32-x64-msvc@4.18.0':
     optional: true
-
-  '@rushstack/eslint-patch@1.10.3': {}
 
   '@sec-ant/readable-stream@0.4.1': {}
 

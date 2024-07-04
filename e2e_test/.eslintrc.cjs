@@ -1,6 +1,3 @@
-/* eslint-env node */
-require('@rushstack/eslint-patch/modern-module-resolution')
-
 module.exports = {
   parser: '@typescript-eslint/parser',
   plugins: [
@@ -26,7 +23,7 @@ module.exports = {
     'prettier',
   ],
   parserOptions: {
-    ecmaVersion: 'latest',
+    ecmaVersion: 2024,
     sourceType: 'module', // Allows for the use of imports
     project: 'tsconfig.json',
     tsconfigRootDir: __dirname
