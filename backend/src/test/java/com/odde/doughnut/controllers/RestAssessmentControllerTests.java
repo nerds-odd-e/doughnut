@@ -3,6 +3,7 @@ package com.odde.doughnut.controllers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.odde.doughnut.controllers.dto.AssessmentResult;
 import com.odde.doughnut.controllers.dto.QuestionAnswerPair;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.ApiException;
@@ -130,7 +131,8 @@ public class RestAssessmentControllerTests {
       notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(5);
       List<QuestionAnswerPair> questionsAnswerPairs = new ArrayList<>();
 
-      controller.submitAssessmentResult(notebook, questionsAnswerPairs);
+      AssessmentResult assessmentResult =
+          controller.submitAssessmentResult(notebook, questionsAnswerPairs);
     }
   }
 }

@@ -1491,6 +1491,10 @@ paths:
                 type: string
         "200":
           description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AssessmentResult"
   /api/ai/{note}/completion:
     post:
       tags:
@@ -3112,6 +3116,27 @@ components:
         answerId:
           type: integer
           format: int32
+    AssessmentResult:
+      type: object
+      properties:
+        correctCount:
+          type: integer
+          format: int32
+        totalCount:
+          type: integer
+          format: int32
+        noteIdTitles:
+          type: array
+          items:
+            $ref: "#/components/schemas/NoteIdTitle"
+    NoteIdTitle:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        title:
+          type: string
     AiCompletionParams:
       type: object
       properties:

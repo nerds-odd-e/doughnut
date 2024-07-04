@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.controllers.dto.AssessmentResult;
 import com.odde.doughnut.controllers.dto.QuestionAnswerPair;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.QuizQuestion;
@@ -38,11 +39,13 @@ class RestAssessmentController {
   }
 
   @PostMapping("{notebook}")
-  public void submitAssessmentResult(
+  public AssessmentResult submitAssessmentResult(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
       @RequestBody List<QuestionAnswerPair> questionsAnswerPairs)
       throws UnexpectedNoAccessRightException {
     currentUser.assertLoggedIn();
     currentUser.assertReadAuthorization(notebook);
+
+    return assessmentService.submitAssessmentResult(notebook, questionsAnswerPairs);
   }
 }

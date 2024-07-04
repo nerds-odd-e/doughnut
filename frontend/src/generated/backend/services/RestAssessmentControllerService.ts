@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { AssessmentResult } from '../models/AssessmentResult';
 import type { QuestionAnswerPair } from '../models/QuestionAnswerPair';
 import type { QuizQuestion } from '../models/QuizQuestion';
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -11,13 +12,13 @@ export class RestAssessmentControllerService {
     /**
      * @param notebook
      * @param requestBody
-     * @returns any OK
+     * @returns AssessmentResult OK
      * @throws ApiError
      */
     public submitAssessmentResult(
         notebook: number,
         requestBody: Array<QuestionAnswerPair>,
-    ): CancelablePromise<any> {
+    ): CancelablePromise<AssessmentResult> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/assessment/{notebook}',

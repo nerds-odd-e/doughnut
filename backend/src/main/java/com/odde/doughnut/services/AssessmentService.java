@@ -2,6 +2,8 @@ package com.odde.doughnut.services;
 
 import static com.odde.doughnut.controllers.dto.ApiError.ErrorType.ASSESSMENT_SERVICE_ERROR;
 
+import com.odde.doughnut.controllers.dto.AssessmentResult;
+import com.odde.doughnut.controllers.dto.QuestionAnswerPair;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.QuizQuestion;
@@ -49,5 +51,10 @@ public class AssessmentService {
         .limit(numberOfQuestion)
         .map(QuizQuestionAndAnswer::getQuizQuestion)
         .toList();
+  }
+
+  public AssessmentResult submitAssessmentResult(
+      Notebook notebook, List<QuestionAnswerPair> questionsAnswerPairs) {
+    return null;
   }
 }
