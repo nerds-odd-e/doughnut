@@ -1,5 +1,9 @@
 <template>
-  <div class="quiz-instruction" data-test="question-section" :key="quizQuestion.id">
+  <div
+    class="quiz-instruction"
+    data-test="question-section"
+    :key="quizQuestion.id"
+  >
     <ShowImage
       v-if="quizQuestion.imageWithMask"
       v-bind="quizQuestion.imageWithMask"

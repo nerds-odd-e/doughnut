@@ -1,3 +1,27 @@
+const assumeQuestionSection = () => {
+  return {
+    getQuestionSection() {
+      return cy.get('[data-test="question-section"]')
+    },
+    getStemText() {
+      return this.getQuestionSection().get('[data-test="stem"]').first().invoke("text")
+    },
+    answerFirst() {
+      return this.getQuestionSection().get('button').first().click()
+    },
+    answerFromTable(answersTable: Record<string, string>[]) {
+      return this.getStemText().then((stem) => {
+        const row = answersTable.find(row => row.question === stem)
+        return this.answer(row.answer)
+      })
+    },
+    answer(answer: string) {
+      return cy.findByText(answer).click()
+    },
+  }
+
+}
+
 
 export const assumeAssessmentPage = (notebook?: string) => {
   if (notebook) {
@@ -7,32 +31,9 @@ export const assumeAssessmentPage = (notebook?: string) => {
   return {
     expectQuestion(stem: string) {
       cy.findByText(stem)
-      return {
-        answer(answer: string) {
-          cy.findByText(answer).click()
-        },
-      }
+      return assumeQuestionSection()
     },
-    aQuestion() {
-      return {
-        getQuestionSection() {
-          // TODO: check if this pattern is used
-          return cy.get('[data-test="question-section"]')
-        },
-        getStemText() {
-            return this.getQuestionSection().get('[data-test="stem"]').first().invoke("text")
-        },
-        answerFirst() {
-          return this.getQuestionSection().get('button').first().click()
-        },
-        answerFromTable(answersTable: Record<string, string>[]) {
-          return this.getStemText().then((stem) => {
-            const row = answersTable.find(row => row.question === stem)
-            cy.findByText(row.answer).click()
-          })
-        }
-      }
-    },
+    assumeQuestionSection,
     expectEndOfAssessment(expectedScore: string) {
       cy.contains(expectedScore)
     },
@@ -40,14 +41,14 @@ export const assumeAssessmentPage = (notebook?: string) => {
       const tryContinueAssessment = () => {
         return cy.get('body').then($body => {
           if ($body.find('.quiz-instruction').length > 0) {
-            return this.aQuestion().answerFromTable(answersTable).then(tryContinueAssessment)
+            return this.assumeQuestionSection().answerFromTable(answersTable).then(tryContinueAssessment)
           } else {
-            return cy.log('Element not found')
+            return cy.log('No more questions to answer.')
           }
         })
       }
 
-      return this.aQuestion().answerFromTable(answersTable).then(tryContinueAssessment)
+      return this.assumeQuestionSection().answerFromTable(answersTable).then(tryContinueAssessment)
     }
   }
 }
