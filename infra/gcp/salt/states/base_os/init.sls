@@ -6,6 +6,7 @@
   file.managed:
     - source: salt://base_os/templates/doughnut_env.sh
     - mode: 755
+    - template: jinja
 
 mysql-repo:
   pkgrepo.managed:
@@ -60,9 +61,12 @@ caddy-repo-key:
       - pkgrepo: caddy-repo
 
 caddy-service:
-  service.enabled:
+  service.running:
     - name: caddy
+    - enable: True
     - reload: True
+    - watch:
+        - file: /etc/caddy/Caddyfile
 
 doughnut-app-deps:
   pkg.installed:
@@ -90,7 +94,7 @@ doughnut-app-deps:
       - cmd: doughnut-jre
       - file: /etc/profile.d/doughnut_env.sh
       - service: caddy-service
-        
+
 zulu{{ pillar['doughnut_app']['jre_version'] }}-linux_amd64.deb:
   file.managed:
     - name: /tmp/zulu{{ pillar['doughnut_app']['jre_version'] }}-linux_amd64.deb

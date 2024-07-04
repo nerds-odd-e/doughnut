@@ -1,6 +1,4 @@
 doughnut.odd-e.com {
-    tls {
-        email nerds@odd-e.com
-    }
+    tls nerds@odd-e.com
     reverse_proxy localhost:8081
 }
