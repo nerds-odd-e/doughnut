@@ -15,14 +15,18 @@ export const assumeAssessmentPage = (notebook?: string) => {
     },
     aQuestion() {
       return {
-        getStem() {
-            return cy.get(".quiz-instruction div", {}).first().invoke("text")
+        getQuestionSection() {
+          // TODO: check if this pattern is used
+          return cy.get('[data-test="question-section"]')
+        },
+        getStemText() {
+            return this.getQuestionSection().get('[data-test="stem"]').first().invoke("text")
         },
         answerFirst() {
-          cy.get(".choices button").first().click()
+          return this.getQuestionSection().get('button').first().click()
         },
         answerFromTable(answersTable: Record<string, string>[]) {
-          return this.getStem().then((stem) => {
+          return this.getStemText().then((stem) => {
             const row = answersTable.find(row => row.question === stem)
             cy.findByText(row.answer).click()
           })

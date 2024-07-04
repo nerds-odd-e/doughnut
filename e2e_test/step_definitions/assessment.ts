@@ -33,7 +33,7 @@ When(
     for (let i = 0; i < attempts; i++) {
       start.navigateToBazaar().selfAssessmentOnNotebook(notebook)
       const question = start.assumeAssessmentPage().aQuestion()
-      question.getStem().then((stem) => {
+      question.getStemText().then((stem) => {
         questions.push(stem)
         question.answerFirst()
       })

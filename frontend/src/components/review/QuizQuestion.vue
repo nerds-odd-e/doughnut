@@ -1,5 +1,5 @@
 <template>
-  <div class="quiz-instruction" :key="quizQuestion.id">
+  <div class="quiz-instruction" data-test="question-section" :key="quizQuestion.id">
     <ShowImage
       v-if="quizQuestion.imageWithMask"
       v-bind="quizQuestion.imageWithMask"
@@ -7,6 +7,7 @@
     />
     <div
       style="white-space: pre-wrap"
+      data-test="stem"
       v-if="quizQuestion.multipleChoicesQuestion.stem"
       v-html="quizQuestion.multipleChoicesQuestion.stem"
     ></div>
