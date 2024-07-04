@@ -5,22 +5,24 @@ import static com.odde.doughnut.controllers.dto.ApiError.ErrorType.ASSESSMENT_SE
 import com.odde.doughnut.controllers.dto.AssessmentResult;
 import com.odde.doughnut.controllers.dto.NoteIdAndTitle;
 import com.odde.doughnut.controllers.dto.QuestionAnswerPair;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.entities.QuizQuestion;
-import com.odde.doughnut.entities.QuizQuestionAndAnswer;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.randomizers.RealRandomizer;
 import com.theokanning.openai.client.OpenAiApi;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Objects;
 
 public class AssessmentService {
+  private final ModelFactoryService modelFactoryService;
   private final QuizQuestionService quizQuestionService;
   private final RealRandomizer realRandomizer = new RealRandomizer();
 
   public AssessmentService(OpenAiApi openAiApi, ModelFactoryService modelFactoryService) {
+    this.modelFactoryService = modelFactoryService;
     this.quizQuestionService = new QuizQuestionService(openAiApi, modelFactoryService);
   }
 
@@ -54,7 +56,16 @@ public class AssessmentService {
   }
 
   public AssessmentResult submitAssessmentResult(
-      Notebook notebook, List<QuestionAnswerPair> questionsAnswerPairs) {
+      User user, Notebook notebook, List<QuestionAnswerPair> questionsAnswerPairs) {
+
+    AssessmentAttempt attempt = new AssessmentAttempt();
+    attempt.setUser(user);
+    attempt.setNotebook(notebook);
+    attempt.setAnswersCorrect(0);
+    attempt.setAnswersTotal(1);
+    attempt.setSubmittedAt(new Timestamp(System.currentTimeMillis()));
+    modelFactoryService.save(attempt);
+
     AssessmentResult assessmentResult = new AssessmentResult();
     assessmentResult.setTotalCount(1);
     assessmentResult.setCorrectCount(0);

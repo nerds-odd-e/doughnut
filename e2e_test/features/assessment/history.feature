@@ -12,13 +12,17 @@ Feature: Assessment History
   @ignore
   Scenario: "View assessment history"
     Given I am logged in as an existing user
-    When I have done the following assessments:
+    And there are some notes for the current user:
+      | topicConstructor | parentTopic |
+      | Countries        |             |
+    And notebook "Countries" is shared to the Bazaar
+    And there are questions for the note:
+      | noteTopic | question                           | answer  | oneWrongChoice | approved |
+      | Countries | Where in the world is Singapore?   | Asia    | Who knows?     | true     |
+    And I set the number of questions per assessment of the notebook "Countries" to 1
+
+    When I submit the assessment on the "Countries" notebook in the bazaar
+    And I go to the assessment history page
+    Then I see the following assessments:
       | notebookTopic | score | totalQuestions |
-      | Countries     | 2     | 5              |
-      | Countries     | 5     | 5              |
-      | Countries     | 0     | 2              |
-    Then I should see the following assessments:
-      | notebookTopic | score | totalQuestions |
-      | Countries     | 2     | 5              |
-      | Countries     | 5     | 5              |
-      | Countries     | 0     | 2              |
+      | Countries     | 0     | 1              |

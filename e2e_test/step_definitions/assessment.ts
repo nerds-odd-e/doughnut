@@ -19,6 +19,15 @@ When("I answer with the following answers:", function (table: DataTable) {
 })
 
 When(
+  "I submit the assessment on the {string} notebook in the bazaar",
+  (notebook: string) => {
+    start.navigateToBazaar().selfAssessmentOnNotebook(notebook)
+    start.assumeAssessmentPage().assumeQuestionSection().answerFirst()
+    start.assumeAssessmentPage().expectEndOfAssessment("Yours score: 1 / 1")
+  }
+)
+
+When(
   "{int} subsequent attempts of assessment on the {string} notebook should be random meaning it should not have the same questions each time",
   (attempts: number, notebook: string) => {
     const questions: string[] = []
