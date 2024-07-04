@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.controllers.dto.QuestionAnswerPair;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -11,7 +12,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
-import com.odde.doughnut.controllers.dto.QuestionAnswerPair;
 
 @RestController
 @RequestMapping("/api/assessment")
@@ -38,10 +38,10 @@ class RestAssessmentController {
   }
 
   @PostMapping("{notebook}")
-  public void submitAssessmentResult (
-    @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
-    @RequestBody List<QuestionAnswerPair> questionsAnswerPairs)
-    throws UnexpectedNoAccessRightException {
+  public void submitAssessmentResult(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
+      @RequestBody List<QuestionAnswerPair> questionsAnswerPairs)
+      throws UnexpectedNoAccessRightException {
     currentUser.assertLoggedIn();
     currentUser.assertReadAuthorization(notebook);
   }
