@@ -30,7 +30,7 @@ export const assumeAssessmentPage = (notebook?: string) => {
 
   return {
     expectQuestion(stem: string) {
-      cy.findByText(stem)
+      cy.findByText(stem);
       return assumeQuestionSection()
     },
     assumeQuestionSection,

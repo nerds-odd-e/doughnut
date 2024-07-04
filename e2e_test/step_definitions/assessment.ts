@@ -14,13 +14,6 @@ When(
   },
 )
 
-Then(
-  "I answer the question {string} with {string}",
-  function (stem: string, answer: string) {
-    start.assumeAssessmentPage().expectQuestion(stem).answer(answer)
-  },
-)
-
 When('I answer with the following answers:',
   function (table: DataTable) {
     start.assumeAssessmentPage().answerQuestionsFromTable(table.hashes())
