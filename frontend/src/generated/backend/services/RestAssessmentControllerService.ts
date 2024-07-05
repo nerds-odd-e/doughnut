@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { AssessmentAttempt } from '../models/AssessmentAttempt';
 import type { AssessmentResult } from '../models/AssessmentResult';
 import type { QuestionAnswerPair } from '../models/QuestionAnswerPair';
 import type { QuizQuestion } from '../models/QuizQuestion';
@@ -46,6 +47,19 @@ export class RestAssessmentControllerService {
             path: {
                 'notebook': notebook,
             },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @returns AssessmentAttempt OK
+     * @throws ApiError
+     */
+    public getAssessmentHistory(): CancelablePromise<Array<AssessmentAttempt>> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/assessment/history',
             errors: {
                 500: `Internal Server Error`,
             },
