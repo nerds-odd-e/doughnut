@@ -54,14 +54,6 @@ class RestAssessmentController {
 
   @GetMapping("/history")
   public List<AssessmentAttempt> getAssessmentHistory() {
-    var result = new ArrayList<AssessmentAttempt>();
-
-    var attempt = new AssessmentAttempt();
-    attempt.setAnswersCorrect(0);
-    attempt.setAnswersTotal(1);
-
-    result.add(attempt);
-
-    return result;
+    return assessmentService.getAssessmentHistory(currentUser.getEntity());
   }
 }

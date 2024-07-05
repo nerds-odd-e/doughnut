@@ -11,6 +11,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.randomizers.RealRandomizer;
 import com.theokanning.openai.client.OpenAiApi;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -72,5 +73,17 @@ public class AssessmentService {
     noteIdAndTitle.setTitle("Singapore");
     assessmentResult.setNoteIdAndTitles(new NoteIdAndTitle[] {noteIdAndTitle});
     return assessmentResult;
+  }
+
+  public List<AssessmentAttempt> getAssessmentHistory(User user) {
+    var result = new ArrayList<AssessmentAttempt>();
+
+    var attempt = new AssessmentAttempt();
+    attempt.setAnswersCorrect(0);
+    attempt.setAnswersTotal(1);
+
+    result.add(attempt);
+
+    return result;
   }
 }
