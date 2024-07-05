@@ -26,7 +26,7 @@
     "gsap": "^3.12.5",
     "intersection-observer": "^0.12.2",
     "lodash": "^4.17.21",
-    "marked": "^13.0.1",
+    "marked": "^13.0.2",
     "mini-debounce": "^1.0.8",
     "quill": "2.0.2",
     "turndown": "^7.2.0",
@@ -82,6 +82,6 @@
     "vitest": "1.6.0",
     "vitest-dom": "^0.1.1",
     "vitest-fetch-mock": "^0.2.2",
-    "vue-tsc": "2.0.24"
+    "vue-tsc": "2.0.26"
   }
 }
