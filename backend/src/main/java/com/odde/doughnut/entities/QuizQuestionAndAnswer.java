@@ -71,4 +71,10 @@ public class QuizQuestionAndAnswer extends EntityIdentifiedByIdOnly {
     quizQuestionInNotebook.setQuizQuestion(getQuizQuestion());
     return quizQuestionInNotebook;
   }
+
+  @Override
+  public String toString() {
+    // Fixing StackoverflowError when calling toString on QuizQuestionAndAnswer or QuizQuestion
+    return "QuizQuestionAndAnswer{" + "id=" + id + '}';
+  }
 }
