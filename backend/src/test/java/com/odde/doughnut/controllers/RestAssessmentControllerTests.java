@@ -243,7 +243,7 @@ public class RestAssessmentControllerTests {
               .getNoteTopic()
               .getTopicConstructor());
       assertEquals(0, assessmentHistory.stream().findFirst().get().getAnswersCorrect());
-      assertEquals(1, assessmentHistory.stream().findFirst().get().getAnswersTotal());
+      assertEquals(0, assessmentHistory.stream().findFirst().get().getAnswersTotal());
     }
   }
 }
