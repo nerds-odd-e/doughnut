@@ -168,6 +168,7 @@ public class RestAssessmentControllerTests {
     private Notebook notebook;
     private Note topNote;
     private List<QuestionAnswerPair> questionsAnswerPairs;
+    AssessmentResult expectedAssessmentResult = new AssessmentResult();
 
     @BeforeEach
     void setup() {
@@ -185,10 +186,14 @@ public class RestAssessmentControllerTests {
         quizQuestionAndAnswer.setCorrectAnswerIndex(1);
         questionAnswerPair.setAnswerId(0);
         questionsAnswerPairs.add(questionAnswerPair);
+
+        NoteIdAndTitle noteIdAndTitle = new NoteIdAndTitle();
+        noteIdAndTitle.setId(note.getId());
+        noteIdAndTitle.setTitle(note.getNoteTopic().getTopicConstructor());
+        expectedAssessmentResult.setNoteIdAndTitles(new NoteIdAndTitle[] {noteIdAndTitle});
       }
     }
 
-    @Disabled
     @Test
     void submitAssessmentResultCheckScore() throws UnexpectedNoAccessRightException {
       AssessmentResult assessmentResult =
@@ -205,9 +210,12 @@ public class RestAssessmentControllerTests {
           controller.submitAssessmentResult(notebook, questionsAnswerPairs);
 
       assertEquals(questionsAnswerPairs.size(), assessmentResult.getNoteIdAndTitles().length);
-      NoteIdAndTitle noteIdAndTitle = assessmentResult.getNoteIdAndTitles()[0];
-      assertEquals(2, noteIdAndTitle.getId());
-      assertEquals("Singapore", noteIdAndTitle.getTitle());
+      for( int i = 0; i < questionsAnswerPairs.size(); i++){
+        NoteIdAndTitle expectedNoteIdAndTitle = expectedAssessmentResult.getNoteIdAndTitles()[i];
+        NoteIdAndTitle providedNoteIdAndTitle = assessmentResult.getNoteIdAndTitles()[i];
+        assertEquals(expectedNoteIdAndTitle.getId(), providedNoteIdAndTitle.getId());
+        assertEquals(expectedNoteIdAndTitle.getTitle(), providedNoteIdAndTitle.getTitle());
+      }
     }
   }
 

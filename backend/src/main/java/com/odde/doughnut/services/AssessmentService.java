@@ -61,12 +61,12 @@ public class AssessmentService {
     attempt.setUser(user);
     attempt.setNotebook(notebook);
     attempt.setAnswersCorrect(0);
-    attempt.setAnswersTotal(1);
+    attempt.setAnswersTotal(questionsAnswerPairs.size());
     attempt.setSubmittedAt(new Timestamp(System.currentTimeMillis()));
     modelFactoryService.save(attempt);
 
     AssessmentResult assessmentResult = new AssessmentResult();
-    assessmentResult.setTotalCount(1);
+    assessmentResult.setTotalCount(questionsAnswerPairs.size());
     assessmentResult.setCorrectCount(0);
     NoteIdAndTitle noteIdAndTitle = new NoteIdAndTitle();
     noteIdAndTitle.setId(2);
