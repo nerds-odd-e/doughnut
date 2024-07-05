@@ -210,4 +210,14 @@ public class RestAssessmentControllerTests {
       assertEquals("Singapore", noteIdAndTitle.getTitle());
     }
   }
+
+  @Nested
+  class assessmentHistoryTest {
+
+    @Test
+    void emptyAssessmentHistory() {
+      List<AssessmentAttempt> assessmentHistory = controller.getAssessmentHistory();
+      assertEquals(0, assessmentHistory.size());
+    }
+  }
 }
