@@ -11,7 +11,6 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AssessmentService;
 import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
-
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -57,6 +56,5 @@ class RestAssessmentController {
 
   public List<AssessmentAttempt> getAssessmentHistory() {
     return new ArrayList<>();
-//    return null;
   }
 }
