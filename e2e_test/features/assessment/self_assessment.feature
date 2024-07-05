@@ -23,33 +23,25 @@ Feature: New questions assessment
       | China     | What is the capital city of China?             | Beijing  | Shanghai       | true     |
       | China     | What is the largest city of China?             | Shanghai | Beijing        | true     |
 
-  Scenario: Complete an assessment with 5 approved questions
-    Given I set the number of questions per assessment of the notebook "Countries" to 5
+  Scenario Outline: Perform an assessment with variable outcomes counts correct scores
+    Given I set the number of questions per assessment of the notebook "Countries" to <QuestionsPerAssessment>
     When I start the assessment on the "Countries" notebook in the bazaar
     And I answer with the following answers:
-      | question                                       | answer   |
-      | Where in the world is Singapore?               | Asia     |
-      | Most famous food of Vietnam?                   | Pho      |
-      | What is the capital city of Korea?             | Busan    |
-      | What is the capital city of Japan?             | Kyoto    |
-      | What is the capital city of China?             | Shanghai |
-      | What is the largest city in the Kyushu island? | Nagasaki |
-      | What is the largest city of China?             | Beijing  |
-    Then I should see the score "Your score: 2 / 5" at the end of assessment
+      | question                                       | answer                   |
+      | Where in the world is Singapore?               | <SingaporeAnswer>        |
+      | Most famous food of Vietnam?                   | <VietnamAnswer>          |
+      | What is the capital city of Japan?             | <JapanAnswer>            |
+      | What is the capital city of Korea?             | <KoreaAnswer>            |
+      | What is the capital city of China?             | <ChinaAnswer>            |
+      | What is the largest city in the Kyushu island? | <KyushuAnswer>           |
+      | What is the largest city of China?             | <LargestChinaCityAnswer> |
+    Then I should see the score "Your score: <ExpectedScore> / <QuestionsPerAssessment>" at the end of assessment
 
-  Scenario: Perform an assessment with all correct answers
-    Given I set the number of questions per assessment of the notebook "Countries" to 5
-    When I start the assessment on the "Countries" notebook in the bazaar
-    And I answer with the following answers:
-      | question                                       | answer   |
-      | Where in the world is Singapore?               | Asia     |
-      | Most famous food of Vietnam?                   | Pho      |
-      | What is the capital city of Japan?             | Tokyo    |
-      | What is the capital city of China?             | Beijing  |
-      | What is the capital city of Korea?             | Seoul    |
-      | What is the largest city in the Kyushu island? | Fukuoka  |
-      | What is the largest city of China?             | Shanghai |
-    Then I should see the score "Your score: 5 / 5" at the end of assessment
+    Examples:
+      | QuestionsPerAssessment | SingaporeAnswer | VietnamAnswer | JapanAnswer | KoreaAnswer | ChinaAnswer | KyushuAnswer | LargestChinaCityAnswer | ExpectedScore |
+      | 5                      | Asia            | Pho           | Tokyo       | Seoul       | Beijing     | Fukuoka      | Shanghai               | 5             |
+      | 5                      | euro            | bread         | Kyoto       | Busan       | Shanghai    | Nagasaki     | Beijing                | 0             |
+      | 5                      | Asia            | Pho           | Kyoto       | Busan       | Shanghai    | Nagasaki     | Beijing                | 2             |
 
   Scenario: Perform an assessment with all wrong answers
     Given I set the number of questions per assessment of the notebook "Countries" to 2
