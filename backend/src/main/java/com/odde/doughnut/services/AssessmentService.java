@@ -76,6 +76,7 @@ public class AssessmentService {
   }
 
   public List<AssessmentAttempt> getAssessmentHistory(User user) {
-    return (List<AssessmentAttempt>) modelFactoryService.assessmentAttemptRepository.findAll(); // TODO: filter for user
+    return (List<AssessmentAttempt>)
+        modelFactoryService.assessmentAttemptRepository.findAll(); // TODO: filter for user
   }
 }
