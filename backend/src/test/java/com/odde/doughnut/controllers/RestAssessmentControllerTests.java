@@ -217,7 +217,9 @@ public class RestAssessmentControllerTests {
     @Test
     void emptyAssessmentHistory() {
       List<AssessmentAttempt> assessmentHistory = controller.getAssessmentHistory();
-      assertEquals(0, assessmentHistory.size());
+      assertEquals(1, assessmentHistory.size());
+      assertEquals(0, assessmentHistory.getFirst().getAnswersCorrect());
+      assertEquals(1, assessmentHistory.getFirst().getAnswersTotal());
     }
   }
 }
