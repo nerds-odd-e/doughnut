@@ -209,7 +209,7 @@ public class RestAssessmentControllerTests {
       AssessmentResult assessmentResult =
           controller.submitAssessmentResult(notebook, questionsAnswerPairs);
 
-      assertEquals(questionsAnswerPairs.size(), assessmentResult.getNoteIdAndTitles().length);
+      assertEquals(questionsAnswerPairs.size(), assessmentResult.getNoteIdAndTitles().length, "Expected number of notes do not match the provided number of questions.");
       for( int i = 0; i < questionsAnswerPairs.size(); i++){
         NoteIdAndTitle expectedNoteIdAndTitle = expectedAssessmentResult.getNoteIdAndTitles()[i];
         NoteIdAndTitle providedNoteIdAndTitle = assessmentResult.getNoteIdAndTitles()[i];
