@@ -58,14 +58,12 @@ Feature: New questions assessment
     Then I should see the score "Your score: 0 / 2" at the end of assessment
     And I should see a link to the "Singapore" notebook
 
-  Scenario: Notes order vary from attempt to attempt
+  Scenario: Perform multiple assesments on the same notebook and questions vary from attempt to attempt
     Given I set the number of questions per assessment of the notebook "Countries" to 1
     Then 10 subsequent attempts of assessment on the "Countries" notebook should be random meaning it should not have the same questions each time
 
-  Scenario: Fail to start assessment not enough approve questions
-    Given I toggle the approval of the question "What is the capital city of China?" of the topic "China"
-    And I toggle the approval of the question "Most famous food of Vietnam?" of the topic "Vietnam"
-    And I set the number of questions per assessment of the notebook "Countries" to 8
+  Scenario: Fail to start assessment where there is not enough approved questions in the notebook
+    And I set the number of questions per assessment of the notebook "Countries" to 10
     When I start the assessment on the "Countries" notebook in the bazaar
     Then I should see error message Not enough questions
 
