@@ -57,6 +57,7 @@ public class AssessmentService {
   public AssessmentResult submitAssessmentResult(
       User user, Notebook notebook, List<QuestionAnswerPair> questionsAnswerPairs) {
 
+    // TODO: add indices on assessment_attempt table!
     AssessmentAttempt attempt = new AssessmentAttempt();
     attempt.setUser(user);
     attempt.setNotebook(notebook);
