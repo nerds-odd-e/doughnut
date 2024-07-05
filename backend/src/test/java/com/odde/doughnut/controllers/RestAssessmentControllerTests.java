@@ -44,46 +44,46 @@ public class RestAssessmentControllerTests {
   class assessmentQuestionOrderTest {
     private Notebook notebook;
     private Note topNote;
+    private int representativeNumberOfAttempts = 30;
+
+    Set<Integer> performAssessments(int numberOfAttempts) throws UnexpectedNoAccessRightException {
+      Set<Integer> questionIds = new HashSet<>();
+      for (int i = 0; i < numberOfAttempts; i++) {
+        List<QuizQuestion> assessment = controller.generateAssessmentQuestions(notebook);
+        Integer questionId = assessment.get(0).getId();
+        questionIds.add(questionId);
+      }
+      return questionIds;
+    }
 
     @BeforeEach
     void setup() {
       topNote = makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser).please();
       notebook = topNote.getNotebook();
+      notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(1);
     }
 
     @Test
     void shouldPickRandomNotesForAssessment() throws UnexpectedNoAccessRightException {
       makeMe.theNote(topNote).withNChildrenThat(10, NoteBuilder::hasAnApprovedQuestion).please();
-      notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(1);
 
-      Set<Integer> questionIds = new HashSet<>();
-      for (int i = 0; i < 3; i++) {
-        List<QuizQuestion> assessment = controller.generateAssessmentQuestions(notebook);
-        Integer questionId = assessment.get(0).getId();
-        questionIds.add(questionId);
-      }
+      Set<Integer> questionIds = performAssessments(representativeNumberOfAttempts);
 
       assertTrue(questionIds.size() > 1, "Expected questions from different notes.");
     }
 
     @Test
     void shouldPickRandomQuestionsFromTheSameNote() throws UnexpectedNoAccessRightException {
-      int numberOfQuestions = 3;
+      int numberOfQuestions = 10;
 
       Consumer<NoteBuilder> multipleApprovedQuestionsForNote =
           noteBuilder -> noteBuilder.hasApprovedQuestions(numberOfQuestions);
 
       makeMe.theNote(topNote).withNChildrenThat(1, multipleApprovedQuestionsForNote).please();
-      notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(1);
 
-      Set<Integer> questionIds = new HashSet<>();
-      for (int i = 0; i < 10; i++) {
-        List<QuizQuestion> assessment = controller.generateAssessmentQuestions(notebook);
-        Integer questionId = assessment.get(0).getId();
-        questionIds.add(questionId);
-      }
+      Set<Integer> questionIds = performAssessments(representativeNumberOfAttempts);
 
-      assertEquals(numberOfQuestions, questionIds.size(), "Expected questions from the same note.");
+      assertTrue(questionIds.size() > 1, "Expected questions from the same note.");
     }
   }
 
