@@ -3,6 +3,7 @@ import { onMounted, ref } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { AssessmentAttempt } from "@/generated/backend"
 
+const loaded = ref(false)
 const assessmentHistory = ref<AssessmentAttempt[]>([])
 
 const loadAssessmentHistory = () => {
@@ -10,6 +11,7 @@ const loadAssessmentHistory = () => {
     .managedApi.restAssessmentController.getAssessmentHistory()
     .then((response) => {
       assessmentHistory.value = response
+      loaded.value = true
     })
 }
 
@@ -20,9 +22,11 @@ onMounted(() => {
 
 <template>
   <div class="container">
-    <p>No assessment has been done yet</p>
     <h1>Assessment History</h1>
-    <table>
+    <p v-if="loaded && assessmentHistory.length === 0">
+      No assessment has been done yet
+    </p>
+    <table v-else-if="loaded && assessmentHistory.length > 0">
       <thead>
         <tr>
           <th>Notebook</th>
@@ -41,4 +45,8 @@ onMounted(() => {
   </div>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+table {
+  width: 100%;
+}
+</style>
