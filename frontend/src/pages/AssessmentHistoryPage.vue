@@ -36,7 +36,7 @@ onMounted(() => {
       </thead>
       <tbody>
         <tr v-for="attempt in assessmentHistory" :key="attempt.id">
-          <td>{{ attempt.notebook?.headNote.noteTopic }}</td>
+          <td>{{ attempt.notebook?.headNote.noteTopic.topicConstructor }}</td>
           <td>{{ attempt.answersCorrect }}</td>
           <td>{{ attempt.answersTotal }}</td>
         </tr>

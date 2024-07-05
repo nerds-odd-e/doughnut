@@ -52,6 +52,7 @@ class RestAssessmentController {
   }
 
   @GetMapping("/history")
+  @Transactional
   public List<AssessmentAttempt> getAssessmentHistory() {
     return assessmentService.getAssessmentHistory(currentUser.getEntity());
   }

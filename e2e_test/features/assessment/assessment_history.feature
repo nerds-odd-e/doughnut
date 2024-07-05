@@ -3,7 +3,6 @@ Feature: Assessment History
   so that I can track my progress
   and review/share my results with others
 
-  @ignore
   Scenario: "Empty history when no assessment has been done"
     Given I am logged in as an existing user
     When I go to the assessment history page
@@ -24,5 +23,5 @@ Feature: Assessment History
     And I go to the assessment history page
     Then I see the following assessments:
       | notebook topic | score | total questions |
-      | Countries      | 0     | 1               |
+      | Countries     | 0     | 1               |
 

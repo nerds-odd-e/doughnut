@@ -221,13 +221,26 @@ public class RestAssessmentControllerTests {
 
   @Nested
   class assessmentHistoryTest {
-
     @Test
-    void emptyAssessmentHistory() {
+    void shouldReturnAssessmentHistory() throws UnexpectedNoAccessRightException {
+      var topNote = makeMe.aHeadNote("Countries").creatorAndOwner(currentUser).please();
+      var notebook = topNote.getNotebook();
+
+      controller.submitAssessmentResult(notebook, new ArrayList<>());
+
       List<AssessmentAttempt> assessmentHistory = controller.getAssessmentHistory();
       assertEquals(1, assessmentHistory.size());
-      assertEquals(0, assessmentHistory.getFirst().getAnswersCorrect());
-      assertEquals(1, assessmentHistory.getFirst().getAnswersTotal());
+      assertEquals(
+          "Countries",
+          assessmentHistory.stream()
+              .findFirst()
+              .get()
+              .getNotebook()
+              .getHeadNote()
+              .getNoteTopic()
+              .getTopicConstructor());
+      assertEquals(0, assessmentHistory.stream().findFirst().get().getAnswersCorrect());
+      assertEquals(1, assessmentHistory.stream().findFirst().get().getAnswersTotal());
     }
   }
 }
