@@ -2460,6 +2460,26 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/QuizQuestion"
+  /api/assessment/history:
+    get:
+      tags:
+      - rest-assessment-controller
+      operationId: getAssessmentHistory
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AssessmentAttempt"
   /api/ai/dummy:
     get:
       tags:
@@ -3611,6 +3631,25 @@ components:
       properties:
         name:
           type: string
+    AssessmentAttempt:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        notebook:
+          $ref: "#/components/schemas/Notebook"
+        submittedAt:
+          type: string
+          format: date-time
+        answersTotal:
+          type: integer
+          format: int32
+        answersCorrect:
+          type: integer
+          format: int32
     Delta:
       type: object
       properties:

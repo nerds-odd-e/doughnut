@@ -54,6 +54,7 @@ class RestAssessmentController {
         currentUser.getEntity(), notebook, questionsAnswerPairs);
   }
 
+  @GetMapping("/history")
   public List<AssessmentAttempt> getAssessmentHistory() {
     return new ArrayList<>();
   }
