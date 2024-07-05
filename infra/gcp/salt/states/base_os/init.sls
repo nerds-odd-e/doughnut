@@ -5,8 +5,8 @@
 /etc/profile.d/doughnut_env.sh:
   file.managed:
     - source: salt://base_os/templates/doughnut_env.sh
-    - mode: 755
     - template: jinja
+    - mode: 755
 
 mysql-repo:
   pkgrepo.managed:
