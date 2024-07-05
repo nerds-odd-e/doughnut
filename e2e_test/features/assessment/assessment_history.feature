@@ -3,13 +3,11 @@ Feature: Assessment History
   so that I can track my progress
   and review/share my results with others
 
-  @ignore
   Scenario: "Empty history when no assessment has been done"
     Given I am logged in as an existing user
     When I go to the assessment history page
     Then I should see an empty assessment list
 
-  @ignore
   Scenario: "View assessment history"
     Given I am logged in as an existing user
     And there are some notes for the current user:
@@ -24,5 +22,6 @@ Feature: Assessment History
     When I submit the assessment on the "Countries" notebook in the bazaar
     And I go to the assessment history page
     Then I see the following assessments:
-      | notebookTopic | score | totalQuestions |
-      | Countries     | 0     | 1              |
+      | notebook topic | score | total questions |
+      | Countries      | 0     | 1               |
+

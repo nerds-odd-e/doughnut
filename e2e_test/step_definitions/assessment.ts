@@ -22,7 +22,7 @@ When(
   "I submit the assessment on the {string} notebook in the bazaar",
   (notebook: string) => {
     start.navigateToBazaar().selfAssessmentOnNotebook(notebook)
-    start.assumeAssessmentPage().assumeQuestionSection().answerFirst()
+    start.assumeAssessmentPage().assumeQuestionSection().answerFirstOption()
     start.assumeAssessmentPage().expectEndOfAssessment("Yours score: 1 / 1")
   }
 )
