@@ -10,7 +10,7 @@
       @answered="questionAnswered"
     />
     <div v-else-if="assessmentCompleted">
-      <p>Yours score: {{ correctAnswers }} / {{ quizQuestions.length }}</p>
+      <p>Your score: {{ correctAnswers }} / {{ quizQuestions.length }}</p>
     </div>
   </div>
 

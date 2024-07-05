@@ -23,7 +23,7 @@ When(
   (notebook: string) => {
     start.navigateToBazaar().selfAssessmentOnNotebook(notebook)
     start.assumeAssessmentPage().assumeQuestionSection().answerFirstOption()
-    start.assumeAssessmentPage().expectEndOfAssessment("Yours score: 1 / 1")
+    start.assumeAssessmentPage().expectEndOfAssessment("Your score: 1 / 1")
   }
 )
 
