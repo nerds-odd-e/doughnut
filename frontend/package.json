@@ -10,9 +10,9 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "postinstall": "syncpack fix-mismatches",
-    "dev": "vite --host",
-    "build": "vue-tsc --noEmit && vite build --emptyOutDir",
-    "serve": "vite preview",
+    "dev": "farm",
+    "build": "vue-tsc --noEmit && farm build",
+    "serve": "farm preview",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint src tests"
@@ -37,7 +37,7 @@
   "devDependencies": {
     "@biomejs/biome": "1.8.3",
     "@farmfe/cli": "^1.0.2",
-    "@farmfe/core": "^1.2.6",
+    "@farmfe/core": "^1.2.8",
     "@farmfe/js-plugin-sass": "^2.8.1",
     "@testing-library/user-event": "^14.5.2",
     "@testing-library/vue": "^8.1.0",

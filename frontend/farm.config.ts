@@ -34,9 +34,6 @@ export default defineConfig({
   ],
   server: {
     port: 5173,
-    hmr: {
-      port: 9080,
-    },
     proxy: {
       '/api': {
         target: 'http://localhost:9081',

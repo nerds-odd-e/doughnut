@@ -164,11 +164,11 @@ importers:
         specifier: ^1.0.2
         version: 1.0.2
       '@farmfe/core':
-        specifier: ^1.2.6
-        version: 1.2.6(bufferutil@4.0.8)(utf-8-validate@6.0.4)
+        specifier: ^1.2.8
+        version: 1.2.8(bufferutil@4.0.8)(utf-8-validate@6.0.4)
       '@farmfe/js-plugin-sass':
         specifier: ^2.8.1
-        version: 2.8.1(@farmfe/core@1.2.6(bufferutil@4.0.8)(utf-8-validate@6.0.4))(sass-embedded@1.77.5)(sass@1.77.6)
+        version: 2.8.1(@farmfe/core@1.2.8(bufferutil@4.0.8)(utf-8-validate@6.0.4))(sass-embedded@1.77.5)(sass@1.77.6)
       '@testing-library/user-event':
         specifier: ^14.5.2
         version: 14.5.2(@testing-library/dom@10.3.0)
@@ -1088,62 +1088,62 @@ packages:
     engines: {node: '>= 16'}
     hasBin: true
 
-  '@farmfe/core-darwin-arm64@1.2.6':
-    resolution: {integrity: sha512-+U+VdLKo3i2M3ANeHaSt1wZoe3Z0gT8YvxIcEZvk3OrZVe7LqSCbORkvXhMwyFblDKxzrhv75Em5/L+5CF8o/g==}
+  '@farmfe/core-darwin-arm64@1.2.8':
+    resolution: {integrity: sha512-L6b5HHZmHW7df2mbCzdTS/Jw5qn3LFtfUUbmnIbHKEJtujSR6QF2gpNiiYbJRX3/0zh+SUSrOYjSsiPo6j3u9A==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [darwin]
 
-  '@farmfe/core-darwin-x64@1.2.6':
-    resolution: {integrity: sha512-EjMQHIlKvoQJ1EYqbuZosE+C7l6ol5ZFZlTCxzNUSlGevGtj20Zqi41idVeXcsn/goxwi1kxpaIxt+nPetmgtQ==}
+  '@farmfe/core-darwin-x64@1.2.8':
+    resolution: {integrity: sha512-yXHoZWozTAaRYcLp6unbwv0JSf1rMimUAkzc8YPXR4xCGBzbJe7h5dCXTcbqqx9BVh7cYJppy5U9Ht1k6L2s8w==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [darwin]
 
-  '@farmfe/core-linux-arm64-gnu@1.2.6':
-    resolution: {integrity: sha512-tqYMXBxshi858jkKH/5vz9pVsh6b9f0zX9ZTcmWS4a8qED//rG45p9eXwgpVVdr+SVKqPoQauhf1Imgu1HgIsg==}
+  '@farmfe/core-linux-arm64-gnu@1.2.8':
+    resolution: {integrity: sha512-2v5zRwSAyrW3PyvOGjE26ALl8nolGx5Jl2FYt8v6x567MYEp2MpC2lhYLwJnsdcoOdp0wDsvRO52jxfxhyP/cw==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
 
-  '@farmfe/core-linux-arm64-musl@1.2.6':
-    resolution: {integrity: sha512-a6OtdzA5V45eado8Lh6iCzFIkgqvdEAvRZoWkYCB29FzLb8TDKjEA3/R1q5cOe+CTUPPvAF6DgEZApsNJQkC2Q==}
+  '@farmfe/core-linux-arm64-musl@1.2.8':
+    resolution: {integrity: sha512-Y4DqR4l/I/VjAhwYxH6Vt/84FgESfEz/USSkVwHuOdgkj+cx6tzp0qUTZbXArPlAkksnO2NzfWM4tjKbGSCKUw==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
 
-  '@farmfe/core-linux-x64-gnu@1.2.6':
-    resolution: {integrity: sha512-jniNdzCUYlbPHp1xR5XDodEcJw5feB3hZPXXOe44zmW0Nc3AEbU5/U4q2uY1BkL/KymzlpFJJOyvGt+78SWoOQ==}
+  '@farmfe/core-linux-x64-gnu@1.2.8':
+    resolution: {integrity: sha512-GYiyN+CVBIhK4ukXY33NlfgBbBgE3plhuxu+O7womygpBjA+xqAjevF3kG5Gmf052fFcFEW9R0YRpR92qbLStw==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
 
-  '@farmfe/core-linux-x64-musl@1.2.6':
-    resolution: {integrity: sha512-G/7SpuKjoNx2sDWQEqMyWhyZqBMNETbwgxUTs8IxsqOCM2l9eoi6/5JUAzlkpguf/Qyy/ehCNNnVoLsqXfXcKg==}
+  '@farmfe/core-linux-x64-musl@1.2.8':
+    resolution: {integrity: sha512-+ncq7JLmM/zSeTQkZhBQO15c/2Svv/75t20G3bqD9bHcUWYwb5sUDs1Nxt69aJqp1zY29Q8VT9DREAYkOSJdew==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
 
-  '@farmfe/core-win32-arm64-msvc@1.2.6':
-    resolution: {integrity: sha512-QFehFoJoIoqL6qRypShIEqdQjx/TJfdnNAp+07z7yX1dbaOAharqgY3OZEDxmXoTbcMyM06OpEqwU71PEN+XpQ==}
+  '@farmfe/core-win32-arm64-msvc@1.2.8':
+    resolution: {integrity: sha512-5qLKljphERE0dJLehL9s4UeIBSCYfBzdzuCZ249fgZoJQ62p0/VcnHUf6uT0ayQCX1hU6LD43S2Mha2s5ZVyHA==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [win32]
 
-  '@farmfe/core-win32-ia32-msvc@1.2.6':
-    resolution: {integrity: sha512-A0I/5D8WU3Pbdv+j5+r6m/W6eWgl8XlENrvXfWUexnC3cP1TkdQ5LI9Yy+VI9kk1vL5GV5TbnCErRn9rkZMI+Q==}
+  '@farmfe/core-win32-ia32-msvc@1.2.8':
+    resolution: {integrity: sha512-uLcyLbWXX/IeV7a7kIZRHB+3RTRZXp3LiNg17pfI80RycBDvEh4qL8kC/qRSV8f58afMYoxQD6ZkgRMW5TFZ6g==}
     engines: {node: '>= 10'}
     cpu: [ia32]
     os: [win32]
 
-  '@farmfe/core-win32-x64-msvc@1.2.6':
-    resolution: {integrity: sha512-SKc3CJjQnRFgisdQKSxAIx9bE4pBHj1o3+C6FGwQdMUzb13a1jCf+++Jf2E++7tjNvI0qarGWyTDUL8JibUNpg==}
+  '@farmfe/core-win32-x64-msvc@1.2.8':
+    resolution: {integrity: sha512-tMfXJ8ekFr5cid1PQuBTzwJDph3j825M2nu/UhANbGVGPQPQ1ZCumeTvbotaia12K1ZzWG+BoMdKccWtwbHE4g==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [win32]
 
-  '@farmfe/core@1.2.6':
-    resolution: {integrity: sha512-jMtuO82MMYGRtLcPlUCn25yzLtvr31D7MnYm4LaZcsLd+Kr8ube4zDN/b1lKzAPpwcsDUXGUCuwcS0iuicLhfg==}
+  '@farmfe/core@1.2.8':
+    resolution: {integrity: sha512-vHb6BKmCPE+iAwwdTcEYI25WAoFhKiUs/DUohS5b9lyzKn9XdMWkAFy0Z1DoTwIpkxa/30/Gw7FciRtje8eB4A==}
     engines: {node: '>=16.15.1'}
 
   '@farmfe/js-plugin-sass@2.8.1':
@@ -1462,6 +1462,9 @@ packages:
 
   '@types/http-cache-semantics@4.0.4':
     resolution: {integrity: sha512-1m0bIFVc7eJWyve9S0RnuRgcQqF/Xd5QsUZAZeQFr1Q3/p9JWoQQEqmVy+DPTNpGXwhgIetAoYF8JSc33q29QA==}
+
+  '@types/http-proxy@1.17.14':
+    resolution: {integrity: sha512-SSrD0c1OQzlFX7pGu1eXxSEjemej64aaNPRhhVYUGqXh0BtldAAx37MG8btcumvpgKyZp1F5Gn3JkktdxiFv6w==}
 
   '@types/istanbul-lib-coverage@2.0.6':
     resolution: {integrity: sha512-2QF/t/auWm0lsy8XtKVPG19v3sSOQlJe/YHZgfjb/KBBHOGSV+J2q/S671rcq9uTBrLAXmZpqJiaQbMT+zNU1w==}
@@ -3355,10 +3358,6 @@ packages:
   http-cache-semantics@4.1.1:
     resolution: {integrity: sha512-er295DKPVsV82j5kw1Gjt+ADA/XYHsajl82cGNQG2eyoPkvgUhX+nDIyelzhIWbbsXP39EHcI6l5tYs2FYqYXQ==}
 
-  http-errors@1.4.0:
-    resolution: {integrity: sha512-oLjPqve1tuOl5aRhv8GK5eHpqP1C9fb+Ol+XTLjKfLltE44zdDbEdjPSbU7Ch5rSNsVFqZn97SrMmZLdu1/YMw==}
-    engines: {node: '>= 0.6'}
-
   http-errors@1.6.3:
     resolution: {integrity: sha512-lks+lVC8dgGyh97jxvxeYTWQFvh4uw4yC12gVl63Cg30sjPX4wuGcdkICVXDAESr6OJGjqGA8Iz5mkeN6zlD7A==}
     engines: {node: '>= 0.6'}
@@ -3382,6 +3381,10 @@ packages:
   http-proxy-agent@7.0.2:
     resolution: {integrity: sha512-T1gkAiYYDWYx3V5Bmyu7HcfcvL7mUrTWiM6yOfa3PIphViJ/gFPbvidQ+veqSOHci/PxBcDabeUNCzpOODJZig==}
     engines: {node: '>= 14'}
+
+  http-proxy-middleware@3.0.0:
+    resolution: {integrity: sha512-36AV1fIaI2cWRzHo+rbcxhe3M3jUDCNzc4D5zRl57sEWRAxdXYtw7FSQKYY6PDKssiAKjLYypbssHk+xs/kMXw==}
+    engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
 
   http-proxy@1.18.1:
     resolution: {integrity: sha512-7mz/721AbnJwIVbnaSv1Cz3Am0ZLT/UBwkC92VlxhXv/k/BBQfM2fXElQNC27BVGr0uwUpplYPQM9LnaBMR5NQ==}
@@ -3470,9 +3473,6 @@ packages:
   inflight@1.0.6:
     resolution: {integrity: sha512-k92I/b08q4wvFscXCLvqfsHCrjrF7yiXsQuIVvVE7N82W3+aqpzuUdBbfhWcy/FZR3/4IgflMgKLOsvPDrGCJA==}
     deprecated: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
-
-  inherits@2.0.1:
-    resolution: {integrity: sha512-8nWq2nLTAwd02jTqJExUYFSD/fKq6VH9Y/oG2accc/kdI0V98Bag8d5a4gi3XHz73rDWa2PvTtvcWYquKqSENA==}
 
   inherits@2.0.3:
     resolution: {integrity: sha512-x00IRNXNy63jwGkJmzPigoySHbaqpNuzKbBOmzK+g2OdZpQ9w+sxCN+VSB3ja7IAge2OP2qpfxTjeNcyjmW1uw==}
@@ -3609,6 +3609,10 @@ packages:
     resolution: {integrity: sha512-YWnfyRwxL/+SsrWYfOpUtz5b3YD+nyfkHvjbcanzk8zgyO4ASD67uVMRt8k5bM4lLMDnXfriRhOpemw+NfT1eA==}
     engines: {node: '>=8'}
 
+  is-plain-obj@3.0.0:
+    resolution: {integrity: sha512-gwsOE28k+23GP1B6vFl1oVh/WOzmawBrKwo5Ev6wMKzPkaXaCDIQKzLnvsA42DRlbVTWorkgTKIviAKCWkfUwA==}
+    engines: {node: '>=10'}
+
   is-plain-object@5.0.0:
     resolution: {integrity: sha512-VRSzKkbMm5jMDoKLbltAkFQ5Qr7VDiTFGXxYFXXowVj387GeGNOCsOH6Msy00SGZ3Fp84b1Naa1psqgcCIEP5Q==}
     engines: {node: '>=0.10.0'}
@@ -3682,9 +3686,6 @@ packages:
   is-wsl@3.1.0:
     resolution: {integrity: sha512-UcVfVfaK4Sc4m7X3dUSoHoozQGBEFeDC+zVo06t98xe8CzHSZZBekNXH+tu0NalHolcJ/QAGqS46Hef7QXBIMw==}
     engines: {node: '>=16'}
-
-  isarray@0.0.1:
-    resolution: {integrity: sha512-D2S+3GLxWH+uhrNEcoh/fnmYeP8E8/zHl644d/jdA0g2uyXvy3sb0qxotE+ne0LtccHknQzWwZEzhak7oJ0COQ==}
 
   isarray@2.0.5:
     resolution: {integrity: sha512-xHjhDr3cNBK0BzdUJSPXZntQUx/mwMS5Rw4A7lPJ90XGAO6ISP/ePDNuo0vhqOZU+UD5JoodwCAAoZQd3FeAKw==}
@@ -3819,17 +3820,15 @@ packages:
     resolution: {integrity: sha512-UgMIN7ZoEP2DuoSQmD6CYvFSLt0NReGlc2qSY4bO4Oq0L56OiD9pDG41Kj/zFmVY/A3Wvmn4BqKcfq5H30LGIg==}
     engines: {node: '>= 12'}
 
+  koa-connect@2.1.0:
+    resolution: {integrity: sha512-O9pcFafHk0oQsBevlbTBlB9co+2RUQJ4zCzu3qJPmGlGoeEZkne+7gWDkecqDPSbCtED6LmhlQladxs6NjOnMQ==}
+
   koa-convert@2.0.0:
     resolution: {integrity: sha512-asOvN6bFlSnxewce2e/DK3p4tltyfC4VM7ZwuTuepI7dEQVcvpyFuBcEARu1+Hxg8DIwytce2n7jrZtRlPrARA==}
     engines: {node: '>= 10'}
 
   koa-is-json@1.0.0:
     resolution: {integrity: sha512-+97CtHAlWDx0ndt0J8y3P12EWLwTLMXIfMnYDev3wOTwH/RpBGMlfn4bDXlMEg1u73K6XRE9BbUp+5ZAYoRYWw==}
-
-  koa-proxies@0.12.4:
-    resolution: {integrity: sha512-xxrEtN0e7s7/gNRoOMUltCbuIaCWqTQUTZNWQqet/8MoxSW0hG422lx2Al9FfYO3nCeA+b5c5/YmILRzavivDA==}
-    peerDependencies:
-      koa: '>=2'
 
   koa-send@5.0.1:
     resolution: {integrity: sha512-tmcyQ/wXXuxpDxyNXv5yNNkdAMdFRqwtegBXUaowiQzUKqJehttS0x2j0eOZDQAyloAth5w6wwBImnFzkUz3pQ==}
@@ -4401,9 +4400,6 @@ packages:
     resolution: {integrity: sha512-haREypq7xkM7ErfgIyA0z+Bj4AGKlMSdlQE2jvJo6huWD1EdkKYV+G/T4nq0YEF2vgTT8kqMFKo1uHn950r4SQ==}
     engines: {node: '>=12'}
 
-  path-match@1.2.4:
-    resolution: {integrity: sha512-UWlehEdqu36jmh4h5CWJ7tARp1OEVKGHKm6+dg9qMq5RKUTV5WJrGgaZ3dN2m7WFAXDbjlHzvJvL/IUpy84Ktw==}
-
   path-parse@1.0.7:
     resolution: {integrity: sha512-LDJzPVEEEPR+y48z93A0Ed0yXb8pAByGWo/k5YYdYgpY2/2EsOsksJrq7lOHxryrVOn1ejG6oAp8ahvOIQD8sw==}
 
@@ -4413,9 +4409,6 @@ packages:
 
   path-to-regexp@0.1.7:
     resolution: {integrity: sha512-5DFkuoqlv1uYQKxy8omFBeJPQcdoE07Kv2sferDCrAq1ohOU+MSDswDIbnx3YAM60qIOnYa53wBhXW0EbMonrQ==}
-
-  path-to-regexp@1.8.0:
-    resolution: {integrity: sha512-n43JRhlUKUAlibEJhPeir1ncUID16QnEjNpwzNdO3Lm4ywrBpBZ5oLD0I6br9evr1Y9JTqwRtAh7JLoOzAQdVA==}
 
   path-type@4.0.0:
     resolution: {integrity: sha512-gDKb8aZMDeD/tZWs9P6+q0J9Mwkdl6xMV8TjnGP3qJVJ06bdMgkbBlLU8IdfOsIsFz2BW1rNVT3XuNEl8zPAvw==}
@@ -6017,9 +6010,9 @@ packages:
   yup@1.2.0:
     resolution: {integrity: sha512-PPqYKSAXjpRCgLgLKVGPA33v5c/WgEx3wi6NFjIiegz90zSwyMpvTFp/uGcVnnbx6to28pgnzp/q8ih3QRjLMQ==}
 
-  zod-validation-error@1.5.0:
-    resolution: {integrity: sha512-/7eFkAI4qV0tcxMBB/3+d2c1P6jzzZYdYSlBuAklzMuCrJu5bzJfHS0yVAS87dRHVlhftd6RFJDIvv03JgkSbw==}
-    engines: {node: '>=16.0.0'}
+  zod-validation-error@3.3.0:
+    resolution: {integrity: sha512-Syib9oumw1NTqEv4LT0e6U83Td9aVRk9iTXPUQr1otyV1PuXQKOvOwhMNqZIq5hluzHP2pMgnOmHEo7kPdI2mw==}
+    engines: {node: '>=18.0.0'}
     peerDependencies:
       zod: ^3.18.0
 
@@ -6767,34 +6760,34 @@ snapshots:
       inquirer: 9.3.4
       walkdir: 0.4.1
 
-  '@farmfe/core-darwin-arm64@1.2.6':
+  '@farmfe/core-darwin-arm64@1.2.8':
     optional: true
 
-  '@farmfe/core-darwin-x64@1.2.6':
+  '@farmfe/core-darwin-x64@1.2.8':
     optional: true
 
-  '@farmfe/core-linux-arm64-gnu@1.2.6':
+  '@farmfe/core-linux-arm64-gnu@1.2.8':
     optional: true
 
-  '@farmfe/core-linux-arm64-musl@1.2.6':
+  '@farmfe/core-linux-arm64-musl@1.2.8':
     optional: true
 
-  '@farmfe/core-linux-x64-gnu@1.2.6':
+  '@farmfe/core-linux-x64-gnu@1.2.8':
     optional: true
 
-  '@farmfe/core-linux-x64-musl@1.2.6':
+  '@farmfe/core-linux-x64-musl@1.2.8':
     optional: true
 
-  '@farmfe/core-win32-arm64-msvc@1.2.6':
+  '@farmfe/core-win32-arm64-msvc@1.2.8':
     optional: true
 
-  '@farmfe/core-win32-ia32-msvc@1.2.6':
+  '@farmfe/core-win32-ia32-msvc@1.2.8':
     optional: true
 
-  '@farmfe/core-win32-x64-msvc@1.2.6':
+  '@farmfe/core-win32-x64-msvc@1.2.8':
     optional: true
 
-  '@farmfe/core@1.2.6(bufferutil@4.0.8)(utf-8-validate@6.0.4)':
+  '@farmfe/core@1.2.8(bufferutil@4.0.8)(utf-8-validate@6.0.4)':
     dependencies:
       '@farmfe/runtime': 0.11.2
       '@farmfe/runtime-plugin-hmr': 3.5.2
@@ -6810,10 +6803,11 @@ snapshots:
       farm-browserslist-generator: 1.0.0
       fast-glob: 3.3.2
       fs-extra: 11.2.0
+      http-proxy-middleware: 3.0.0
       is-plain-object: 5.0.0
       koa: 2.15.3
       koa-compress: 5.1.1
-      koa-proxies: 0.12.4(koa@2.15.3)
+      koa-connect: 2.1.0
       koa-static: 5.0.0
       lodash.debounce: 4.0.8
       loglevel: 1.9.1
@@ -6822,26 +6816,25 @@ snapshots:
       slashes: 3.0.12
       ws: 8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4)
       zod: 3.23.8
-      zod-validation-error: 1.5.0(zod@3.23.8)
+      zod-validation-error: 3.3.0(zod@3.23.8)
     optionalDependencies:
-      '@farmfe/core-darwin-arm64': 1.2.6
-      '@farmfe/core-darwin-x64': 1.2.6
-      '@farmfe/core-linux-arm64-gnu': 1.2.6
-      '@farmfe/core-linux-arm64-musl': 1.2.6
-      '@farmfe/core-linux-x64-gnu': 1.2.6
-      '@farmfe/core-linux-x64-musl': 1.2.6
-      '@farmfe/core-win32-arm64-msvc': 1.2.6
-      '@farmfe/core-win32-ia32-msvc': 1.2.6
-      '@farmfe/core-win32-x64-msvc': 1.2.6
+      '@farmfe/core-darwin-arm64': 1.2.8
+      '@farmfe/core-darwin-x64': 1.2.8
+      '@farmfe/core-linux-arm64-gnu': 1.2.8
+      '@farmfe/core-linux-arm64-musl': 1.2.8
+      '@farmfe/core-linux-x64-gnu': 1.2.8
+      '@farmfe/core-linux-x64-musl': 1.2.8
+      '@farmfe/core-win32-arm64-msvc': 1.2.8
+      '@farmfe/core-win32-ia32-msvc': 1.2.8
+      '@farmfe/core-win32-x64-msvc': 1.2.8
     transitivePeerDependencies:
       - bufferutil
-      - debug
       - supports-color
       - utf-8-validate
 
-  '@farmfe/js-plugin-sass@2.8.1(@farmfe/core@1.2.6(bufferutil@4.0.8)(utf-8-validate@6.0.4))(sass-embedded@1.77.5)(sass@1.77.6)':
+  '@farmfe/js-plugin-sass@2.8.1(@farmfe/core@1.2.8(bufferutil@4.0.8)(utf-8-validate@6.0.4))(sass-embedded@1.77.5)(sass@1.77.6)':
     dependencies:
-      '@farmfe/core': 1.2.6(bufferutil@4.0.8)(utf-8-validate@6.0.4)
+      '@farmfe/core': 1.2.8(bufferutil@4.0.8)(utf-8-validate@6.0.4)
       sass: 1.77.6
       sass-embedded: 1.77.5
 
@@ -7133,6 +7126,10 @@ snapshots:
   '@types/estree@1.0.5': {}
 
   '@types/http-cache-semantics@4.0.4': {}
+
+  '@types/http-proxy@1.17.14':
+    dependencies:
+      '@types/node': 20.14.9
 
   '@types/istanbul-lib-coverage@2.0.6': {}
 
@@ -7804,7 +7801,7 @@ snapshots:
 
   axios@1.7.2:
     dependencies:
-      follow-redirects: 1.15.6
+      follow-redirects: 1.15.6(debug@4.3.5)
       form-data: 4.0.0
       proxy-from-env: 1.1.0
     transitivePeerDependencies:
@@ -9082,7 +9079,9 @@ snapshots:
 
   fn.name@1.1.0: {}
 
-  follow-redirects@1.15.6: {}
+  follow-redirects@1.15.6(debug@4.3.5):
+    optionalDependencies:
+      debug: 4.3.5(supports-color@8.1.1)
 
   for-each@0.3.3:
     dependencies:
@@ -9404,11 +9403,6 @@ snapshots:
 
   http-cache-semantics@4.1.1: {}
 
-  http-errors@1.4.0:
-    dependencies:
-      inherits: 2.0.1
-      statuses: 1.5.0
-
   http-errors@1.6.3:
     dependencies:
       depd: 1.1.2
@@ -9454,10 +9448,21 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  http-proxy@1.18.1:
+  http-proxy-middleware@3.0.0:
+    dependencies:
+      '@types/http-proxy': 1.17.14
+      debug: 4.3.5(supports-color@8.1.1)
+      http-proxy: 1.18.1(debug@4.3.5)
+      is-glob: 4.0.3
+      is-plain-obj: 3.0.0
+      micromatch: 4.0.7
+    transitivePeerDependencies:
+      - supports-color
+
+  http-proxy@1.18.1(debug@4.3.5):
     dependencies:
       eventemitter3: 4.0.7
-      follow-redirects: 1.15.6
+      follow-redirects: 1.15.6(debug@4.3.5)
       requires-port: 1.0.0
     transitivePeerDependencies:
       - debug
@@ -9540,8 +9545,6 @@ snapshots:
     dependencies:
       once: 1.4.0
       wrappy: 1.0.2
-
-  inherits@2.0.1: {}
 
   inherits@2.0.3: {}
 
@@ -9660,6 +9663,8 @@ snapshots:
 
   is-plain-obj@2.1.0: {}
 
+  is-plain-obj@3.0.0: {}
+
   is-plain-object@5.0.0: {}
 
   is-potential-custom-element-name@1.0.1: {}
@@ -9713,8 +9718,6 @@ snapshots:
   is-wsl@3.1.0:
     dependencies:
       is-inside-container: 1.0.0
-
-  isarray@0.0.1: {}
 
   isarray@2.0.5: {}
 
@@ -9888,21 +9891,14 @@ snapshots:
       http-errors: 1.8.1
       koa-is-json: 1.0.0
 
+  koa-connect@2.1.0: {}
+
   koa-convert@2.0.0:
     dependencies:
       co: 4.6.0
       koa-compose: 4.1.0
 
   koa-is-json@1.0.0: {}
-
-  koa-proxies@0.12.4(koa@2.15.3):
-    dependencies:
-      http-proxy: 1.18.1
-      koa: 2.15.3
-      path-match: 1.2.4
-      uuid: 8.3.2
-    transitivePeerDependencies:
-      - debug
 
   koa-send@5.0.1:
     dependencies:
@@ -10512,11 +10508,6 @@ snapshots:
 
   path-key@4.0.0: {}
 
-  path-match@1.2.4:
-    dependencies:
-      http-errors: 1.4.0
-      path-to-regexp: 1.8.0
-
   path-parse@1.0.7: {}
 
   path-scurry@1.11.1:
@@ -10525,10 +10516,6 @@ snapshots:
       minipass: 7.1.2
 
   path-to-regexp@0.1.7: {}
-
-  path-to-regexp@1.8.0:
-    dependencies:
-      isarray: 0.0.1
 
   path-type@4.0.0: {}
 
@@ -12141,7 +12128,7 @@ snapshots:
       toposort: 2.0.2
       type-fest: 2.19.0
 
-  zod-validation-error@1.5.0(zod@3.23.8):
+  zod-validation-error@3.3.0(zod@3.23.8):
     dependencies:
       zod: 3.23.8
 
