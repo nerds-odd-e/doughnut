@@ -3,11 +3,11 @@ Feature: Repetition Image Quiz
 
   Background:
     Given I am logged in as an existing user
+    And I have a notebook with the head note "Space" which skips review
     And there are some notes:
-      | Topic            | Skip Review| Parent Topic| Image Url                          | Image Mask           |
-      | Space            | true       |             |                                    |                       |
-      | Earth            |            | Space       | https://picsum.photos/id/237/20/30 | 20 40 70 30 40 80 5 8 |
-      | Moon             |            | Space       | https://picsum.photos/id/238/20/30 | 30 40 20 30           |
+      | Topic | Parent Topic | Image Url                          | Image Mask            |
+      | Earth | Space        | https://picsum.photos/id/237/20/30 | 20 40 70 30 40 80 5 8 |
+      | Moon  | Space        | https://picsum.photos/id/238/20/30 | 30 40 20 30           |
 
   Scenario: Image question
     Given I learned one note "Earth" on day 1

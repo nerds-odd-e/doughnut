@@ -3,11 +3,12 @@ Feature: Review Pages
 
   Background:
     Given I am logged in as an existing user
+    And I have a notebook with the head note "English" which skips review
     And there are some notes:
-      | Topic    | Details         | Image Url   |
-      | Sedition | Incite violence |             |
-      | Sedation | Put to sleep    |             |
-      | Sedative | Sleep medicine  | a_slide.jpg |
+      | Topic    | Details         | Image Url   | Parent Topic |
+      | Sedition | Incite violence |             | English      |
+      | Sedation | Put to sleep    |             | English      |
+      | Sedative | Sleep medicine  | a_slide.jpg | English      |
     And there is "similar to" link between note "Sedition" and "Sedation"
 
   Scenario: Different review pages for different notes
