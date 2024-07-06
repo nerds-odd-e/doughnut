@@ -302,8 +302,8 @@ Cypress.Commands.add("initialReviewNotes", (noteTopics: string) => {
   cy.initialReviewInSequence(
     commonSenseSplit(noteTopics, ", ").map((topic: string) => {
       return {
-        review_type: topic === "end" ? "initial done" : "single note",
-        topic,
+        "Review Type": topic === "end" ? "initial done" : "single note",
+        Topic: topic,
       }
     })
   )
