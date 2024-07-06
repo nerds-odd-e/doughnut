@@ -3,10 +3,10 @@ Feature: link edit and remove
   Background:
     Given I am logged in as an existing user
     And I have a notebook with head note "Space" and notes:
-      | Topic            | Skip Review| Parent Topic|
-      | Moon             | true       | Space       |
-      | Earth            | true       | Space       |
-      | Mars             | true       | Space       |
+      | Topic | Parent Topic |
+      | Moon  | Space        |
+      | Earth | Space        |
+      | Mars  | Space        |
     And there is "a part of" link between note "Moon" and "Earth"
 
   Scenario: change link type

@@ -8,7 +8,6 @@ Feature: Repetition Image Quiz
       | Space            | true       |             |                                    |                       |
       | Earth            |            | Space       | https://picsum.photos/id/237/20/30 | 20 40 70 30 40 80 5 8 |
       | Moon             |            | Space       | https://picsum.photos/id/238/20/30 | 30 40 20 30           |
-      | Mars             | true       | Space       |                                    |                       |
 
   Scenario: Image question
     Given I learned one note "Earth" on day 1
