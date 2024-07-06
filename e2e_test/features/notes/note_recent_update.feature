@@ -5,20 +5,20 @@ Feature: see recent note update
   Background:
     Given I am logged in as an existing user
     And I let the server to time travel to 100 hours ago
-    And I have a notebook with head note "Notebook" and notes:
-      | Topic            | Parent Topic| Details |
-      | Note1            | NoteBook    |         |
-      | Note2            | NoteBook    |         |
-      | Note1.1          | Note1       | note1.1 |
-      | Note1.2          | Note1       | note1.2 |
-      | Note3            | NoteBook    |         |
+    And I have a notebook with head note "World" and notes:
+      | Topic   | Parent Topic | Details           |
+      | Germany | World        |                   |
+      | Japan   | World        |                   |
+      | Berlin  | Germany      | Berlin has a wall |
+      | Munich  | Germany      | Munich has beer   |
+      | Italy   | World        |                   |
     And I let the server to time travel to 24 hours ago
 
   Scenario Outline: I should see the color of a newer note is fresher
-    And I update note "Note1.1" with details "<new details>"
-    Then I should see "Note1.1" is "<aging>" than "Note2"
+    And I update note "Berlin" with details "<new details>"
+    Then I should see "Berlin" is "<aging>" than "Japan"
 
     Examples:
-      | new details     | aging     |
-      | updated note1.1 | newer     |
-      | note1.1         | not newer |
+      | new details       | aging     |
+      | Berlin had a wall | newer     |
+      | Berlin has a wall | not newer |

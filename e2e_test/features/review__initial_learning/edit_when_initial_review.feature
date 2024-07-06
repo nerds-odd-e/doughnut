@@ -2,10 +2,8 @@ Feature: Editing when initial review
 
   Background:
     Given I am logged in as an existing user
-    And there are some notes:
-      | Topic            |
-      | hard             |
-      | easy             |
+    And I have a notebook with the head note "hard"
+    And I have a notebook with the head note "easy"
 
   Scenario: Update note
     When I am learning new note on day 1
