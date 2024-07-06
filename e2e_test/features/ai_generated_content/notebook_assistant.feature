@@ -7,10 +7,9 @@ Feature: Notebook assistant
 
   Background:
     Given I am logged in as an admin
-    And there are some notes for the current user:
-      | Topic            | Details | Parent Topic     |
-      | Vertical farming |         |                  |
-      | Acquaponics      |         | Vertical farming |
+    And a notebook with head note "Vertical farming" exists with the following sub notes:
+      | Topic       | Parent Topic     |
+      | Acquaponics | Vertical farming |
 
 
   Scenario: The users will use the notebook assistant if exist
