@@ -4,7 +4,7 @@ Feature: Self assessment
 
   Background:
     Given I am logged in as an existing user
-    And a notebook with head note "Countries" exists with the following sub notes:
+    And current user has a notebook with head note "Countries" and notes::
       | Topic     | Parent Topic |
       | Singapore | Countries    |
       | Vietnam   | Countries    |

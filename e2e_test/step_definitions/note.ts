@@ -22,7 +22,7 @@ defineParameterType({
 })
 
 Given(
-  "a notebook with head note {string} exists with the following sub notes:",
+  "current user has a notebook with head note {string} and notes::",
   (notebookTopic: string, data: DataTable) => {
     const notes = data.hashes()
     notes.unshift({ Topic: notebookTopic })
