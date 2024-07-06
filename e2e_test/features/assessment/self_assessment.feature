@@ -61,15 +61,15 @@ Feature: Self assessment
     Given I set the number of questions per assessment of the notebook "Countries" to 1
     Then 10 subsequent attempts of assessment on the "Countries" notebook should be random meaning it should not have the same questions each time
 
-  Scenario: Fail to start assessment where there is not enough approved questions in the notebook
-    And I set the number of questions per assessment of the notebook "Countries" to 10
+  Scenario Outline: Cannot start assessment with 0 questions or not enough approved questions
+    Given I set the number of questions per assessment of the notebook "Countries" to <Questions Per Assessment>
     When I start the assessment on the "Countries" notebook in the bazaar
-    Then I should see error message Not enough questions
+    Then I should see error message <Message>
 
-  Scenario: Cannot start assessment with 0 questions
-    Given I set the number of questions per assessment of the notebook "Countries" to 0
-    When I start the assessment on the "Countries" notebook in the bazaar
-    Then I should see error message The assessment is not available
+    Examples:
+      | Questions Per Assessment | Message                         |
+      | 0                        | The assessment is not available |
+      | 10                       | Not enough questions            |
 
   Scenario: Must login to generate assessment
     Given I haven't login
