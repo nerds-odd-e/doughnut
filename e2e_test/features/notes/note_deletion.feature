@@ -4,7 +4,6 @@ Feature: Note deletion
     Given I am logged in as an existing user
     And I have a notebook with head note "LeSS in Action" and notes:
       | Topic            | Parent Topic   |
-      | LeSS in Action   |                |
       | team             | LeSS in Action |
       | tech             | LeSS in Action |
       | TDD              | tech           |
