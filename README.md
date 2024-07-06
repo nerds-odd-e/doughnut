@@ -231,7 +231,7 @@ Local test accounts:
 ### 12. Teardown and cleanup
 
 - pnpm: To clean up packages installed by pnpm, you can run pnpm store prune to remove unused packages from the store. To remove all packages for a specific project, navigate to the project directory and run pnpm recursive uninstall to uninstall all dependencies in the project and its subdirectories.
-- - direnv: To stop direnv from automatically loading the environment, you can simply delete the .envrc/ file in the project directory or run direnv deny in the project directory. To uninstall direnv, use the package manager you installed it with (e.g., brew uninstall direnv for macOS).
+- direnv: To stop direnv from automatically loading the environment, you can simply delete the .envrc/ file in the project directory or run direnv deny in the project directory. To uninstall direnv, use the package manager you installed it with (e.g., brew uninstall direnv for macOS).
 - Nix: If you want to remove the Nix package manager and all packages installed through it, you can run sudo rm -rf /nix to delete the Nix store. To uninstall Nix completely, follow the [official Nix documentation for uninstallation](https://nix.dev/manual/nix/2.22/installation/uninstall) instructions.
 
 
