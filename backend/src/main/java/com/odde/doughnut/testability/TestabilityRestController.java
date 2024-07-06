@@ -76,17 +76,25 @@ class TestabilityRestController {
     @JsonProperty("Topic")
     public String topic;
 
-    @Setter private String details;
+    @JsonProperty("Details")
+    @Setter
+    private String details;
 
     @JsonProperty("Parent Topic")
     @Setter
     private String parentTopic;
 
-    @Setter private Boolean skipReview;
-    @Setter private String url;
-    @Setter private String imageUrl;
-    @Setter private String imageMask;
-    @Setter private String wikidataId;
+    @JsonProperty("Skip Review")
+    @Setter
+    private Boolean skipReview;
+
+    @JsonProperty("Image Url")
+    @Setter
+    private String imageUrl;
+
+    @JsonProperty("Image Mask")
+    @Setter
+    private String imageMask;
 
     private Note buildNote(User user, Timestamp currentUTCTimestamp) {
       Note note =
@@ -99,11 +107,9 @@ class TestabilityRestController {
       if (skipReview != null) {
         note.getReviewSetting().setSkipReview(skipReview);
       }
-      content.setUrl(url);
       content.setImageMask(imageMask);
       content.setImageUrl(imageUrl);
 
-      note.setWikidataId(wikidataId);
       note.setUpdatedAt(currentUTCTimestamp);
       return note;
     }

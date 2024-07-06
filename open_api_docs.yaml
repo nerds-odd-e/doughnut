@@ -2693,27 +2693,17 @@ components:
     NoteTestData:
       type: object
       properties:
-        details:
-          type: string
-          writeOnly: true
-        skipReview:
-          type: boolean
-          writeOnly: true
-        url:
-          type: string
-          writeOnly: true
-        imageUrl:
-          type: string
-          writeOnly: true
-        imageMask:
-          type: string
-          writeOnly: true
-        wikidataId:
-          type: string
-          writeOnly: true
         Topic:
           type: string
+        Details:
+          type: string
         Parent Topic:
+          type: string
+        Skip Review:
+          type: boolean
+        Image Url:
+          type: string
+        Image Mask:
           type: string
     NotesTestData:
       type: object

@@ -5,7 +5,7 @@ Feature: Nested Note Create with wikidata
   Background:
     Given I am logged in as an existing user
     And there are some notes for the current user:
-      | Topic            | Parent Topic| details             |
+      | Topic            | Parent Topic| Details             |
       | Animals          |             | An awesome training |
 
   @usingMockedWikidataService @mockBrowserTime

@@ -5,7 +5,7 @@ Feature: Note Edit
   Background:
     Given I am logged in as an existing user
     And there are some notes for the current user:
-      | Topic            | details             |
+      | Topic            | Details             |
       | LeSS in Action   | An awesome training |
 
   Scenario: Edit a note
@@ -14,7 +14,7 @@ Feature: Note Edit
       | Odd-e CSD | Our best training |
     Then I should see "Odd-e CSD" in the page
     And I should see these notes belonging to the user at the top level of all my notes
-      | Topic     | details           |
+      | Topic     | Details           |
       | Odd-e CSD | Our best training |
 
   Scenario: Edit a note topic and edit details

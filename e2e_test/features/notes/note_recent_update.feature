@@ -6,7 +6,7 @@ Feature: see recent note update
     Given I am logged in as an existing user
     And I let the server to time travel to 100 hours ago
     And there are some notes for the current user:
-      | Topic            | Parent Topic| details |
+      | Topic            | Parent Topic| Details |
       | NoteBook         |             |         |
       | Note1            | NoteBook    |         |
       | Note2            | NoteBook    |         |

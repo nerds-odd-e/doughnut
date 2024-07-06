@@ -4,7 +4,7 @@ Feature: Repetition Quiz
   Background:
     Given I am logged in as an existing user
     And there are some notes for the current user:
-      | Topic            | details                        | skipReview | Parent Topic|
+      | Topic            | Details                        | Skip Review| Parent Topic|
       | English          |                                | true       |             |
       | sedition         | Sedition means incite violence | false      | English     |
       | sedation         | Put to sleep is sedation       | false      | English     |

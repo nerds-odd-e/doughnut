@@ -3,7 +3,7 @@ Feature: link edit and remove
   Background:
     Given I am logged in as an existing user
     And there are some notes for the current user:
-      | Topic            | skipReview | Parent Topic|
+      | Topic            | Skip Review| Parent Topic|
       | Space            | true       |             |
       | Moon             | true       | Space       |
       | Earth            | true       | Space       |
