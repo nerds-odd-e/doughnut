@@ -2,7 +2,7 @@ Feature: Note creation for a book
 
   Background:
     Given I am logged in as an existing user
-    And I have a note with the topic "My Favourite Books"
+    And I have a notebook with the head note "My Favourite Books"
 
   @usingMockedWikidataService
   Scenario: Create a new book note with multiple authors as children notes

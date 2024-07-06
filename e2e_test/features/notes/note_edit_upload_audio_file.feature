@@ -3,7 +3,7 @@ Feature: Note Upload Audio File
 
     Background:
         Given I am logged in as an existing user
-        And I have a note with the topic "podcast"
+        And I have a notebook with the head note "podcast"
 
 
     Scenario: Upload audio into a note

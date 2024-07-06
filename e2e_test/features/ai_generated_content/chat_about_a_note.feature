@@ -6,7 +6,7 @@ Feature: Chat about a note with AI
 
   Background:
     Given I am logged in as an existing user
-    And I have a note with the topic "There are 42 prefectures in Japan"
+    And I have a notebook with the head note "There are 42 prefectures in Japan"
 
 
   Scenario: The users can chat with AI about the current note

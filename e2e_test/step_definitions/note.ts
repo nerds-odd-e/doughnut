@@ -34,11 +34,7 @@ Given("there are some notes for the current user:", (data: DataTable) => {
   start.testability().injectNotes(data.hashes())
 })
 
-Given("there are questions for the note:", (data: DataTable) => {
-  start.testability().injectQuizQuestions(data.hashes())
-})
-
-Given("I have a note with the topic {string}", (noteTopic: string) => {
+Given("I have a notebook with the head note {string}", (noteTopic: string) => {
   start.testability().injectNotes([{ Topic: noteTopic }])
 })
 
@@ -60,6 +56,10 @@ Given(
     start.testability().injectNotes(notes)
   }
 )
+
+Given("there are questions for the note:", (data: DataTable) => {
+  start.testability().injectQuizQuestions(data.hashes())
+})
 
 Given(
   "I add the following question for the note {string}:",

@@ -3,7 +3,7 @@ Feature: Generate image
 
   Background:
     Given I am logged in as an existing user
-    And I have a note with the topic "Animals"
+    And I have a notebook with the head note "Animals"
 
   @usingMockedOpenAiService
   Scenario: get an image for a note based on its topic
