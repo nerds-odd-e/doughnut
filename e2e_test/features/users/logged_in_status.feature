@@ -9,10 +9,9 @@ Feature: Logged in status
     Then I should be on the welcome page and asked to login
 
   Scenario: User logout because of session timeout
-    Given there are some notes:
-      | Topic            | Parent Topic|
-      | Shape            |             |
-      | Triangle         | Shape       |
+    Given I have a notebook with head note "Shape" and notes:
+      | Topic    | Parent Topic |
+      | Triangle | Shape        |
     And I navigate to "My Notes/Shape" note
     When my session is logged out
     Then I should be asked to log in again when I click the link "Triangle"

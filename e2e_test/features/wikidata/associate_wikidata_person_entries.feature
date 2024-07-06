@@ -10,9 +10,8 @@ Feature: Note creation should have details if wikidata is a person
     And Wikidata.org has an entity "Q4604" with label "Confucius"
     And Wikidata.org entity "Q706446" is a person from "Q22502" and birthday is "+1980-03-31T00:00:00Z"
     And Wikidata.org entity "Q4604" is a person from "Q736936" and birthday is "-0552-10-09T00:00:00Z"
-    And there are some notes:
+    And I have a notebook with head note "People" and notes:
       | Topic  | Parent Topic | Wikidata Id |
-      | People |              |             |
       | Taiwan | People       | Q22502      |
 
   @usingMockedWikidataService
