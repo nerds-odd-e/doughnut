@@ -4,7 +4,7 @@ Feature: Note details completion
 
   Background:
     Given I am logged in as an existing user
-    And current user has a notebook with head note "Taiwan" and notes:
+    And I have a notebook with head note "Taiwan" and notes:
       | Topic            | Details    | Parent Topic|
       | Taipei           | It is a    | Taiwan      |
       | Weather          | It rains a | Taipei      |

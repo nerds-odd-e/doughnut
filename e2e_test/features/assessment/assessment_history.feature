@@ -10,9 +10,7 @@ Feature: Assessment History
 
   Scenario: "View assessment history"
     Given I am logged in as an existing user
-    And there are some notes for the current user:
-      | Topic            | Parent Topic|
-      | Countries        |             |
+    And I have a notebook with the head note "Countries"
     And notebook "Countries" is shared to the Bazaar
     And there are questions for the note:
       | noteTopic | question                           | answer  | oneWrongChoice | approved |
