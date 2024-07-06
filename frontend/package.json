@@ -10,9 +10,9 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "postinstall": "syncpack fix-mismatches",
-    "dev": "farm",
-    "build": "vue-tsc --noEmit && farm build",
-    "serve": "farm preview",
+    "dev": "vite --host",
+    "build": "vue-tsc --noEmit && vite build --emptyOutDir",
+    "serve": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint src tests"

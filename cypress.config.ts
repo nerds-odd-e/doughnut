@@ -6,8 +6,8 @@ export default defineConfig({
   env: {
     TAGS: 'not @ignore and not @requiresDeveloperSecret',
   },
-  viewportWidth: 1000,
-  viewportHeight: 660,
+  viewportWidth: 1200,
+  viewportHeight: 800,
   e2e: {
     ...commonConfig.e2e,
     baseUrl: 'http://localhost:5173',
