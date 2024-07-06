@@ -4,25 +4,25 @@ Feature: Review Pages
   Background:
     Given I am logged in as an existing user
     And there are some notes for the current user:
-      | Topic            | Details         | Image Url |
-      | Sedition         | Incite violence |             |
-      | Sedation         | Put to sleep    |             |
-      | Sedative         | Sleep medicine  | a_slide.jpg |
+      | Topic    | Details         | Image Url   |
+      | Sedition | Incite violence |             |
+      | Sedation | Put to sleep    |             |
+      | Sedative | Sleep medicine  | a_slide.jpg |
     And there is "similar to" link between note "Sedition" and "Sedation"
 
   Scenario: Different review pages for different notes
     * I do these initial reviews in sequence:
-      | review_type  | Topic    | additional_info             |
+      | Review Type  | Topic    | Additional Info             |
       | single note  | Sedition | Incite violence             |
       | single note  | Sedation | Put to sleep                |
-      | image note | Sedative | Sleep medicine; a_slide.jpg |
+      | image note   | Sedative | Sleep medicine; a_slide.jpg |
       | link         | Sedition | similar to; Sedation        |
       | initial done |          |                             |
 
   Scenario: Index page
     Given It's day 1, 8 hour
     And I do these initial reviews in sequence:
-      | review_type | Topic    |
+      | Review Type | Topic    |
       | single note | Sedition |
     When It's day 2, 9 hour
     And I go to the reviews page

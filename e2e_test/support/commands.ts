@@ -196,25 +196,30 @@ Cypress.Commands.add("expectExactLinkTargets", (targets) => {
 
 Cypress.Commands.add(
   "initialReviewOneNoteIfThereIs",
-  ({ review_type, topic, additional_info, skip }) => {
-    if (review_type == "initial done") {
+  ({
+    "Review Type": reviewType,
+    Topic: topic,
+    "Additional Info": additionalInfo,
+    Skip: skip,
+  }) => {
+    if (reviewType == "initial done") {
       cy.findByText("You have achieved your daily new notes goal.").should(
         "be.visible"
       )
     } else {
       cy.findByText(topic, { selector: "main *" })
-      switch (review_type) {
+      switch (reviewType) {
         case "single note": {
-          if (additional_info) {
-            cy.get(".note-details").should("contain", additional_info)
+          if (additionalInfo) {
+            cy.get(".note-details").should("contain", additionalInfo)
           }
           break
         }
 
         case "image note": {
-          if (additional_info) {
+          if (additionalInfo) {
             const [expectedDetails, expectedImage] = commonSenseSplit(
-              additional_info,
+              additionalInfo,
               "; "
             )
             cy.get(".note-details").should("contain", expectedDetails)
@@ -227,9 +232,9 @@ Cypress.Commands.add(
         }
 
         case "link": {
-          if (additional_info) {
+          if (additionalInfo) {
             const [linkType, targetNote] = commonSenseSplit(
-              additional_info,
+              additionalInfo,
               "; "
             )
             cy.findByText(topic)
@@ -240,7 +245,7 @@ Cypress.Commands.add(
         }
 
         default:
-          expect(review_type).equal("a known review page type")
+          expect(reviewType).equal("a known review page type")
       }
       if (skip === "yes") {
         cy.findByText("Skip repetition").click()
