@@ -7,7 +7,7 @@ Feature: Notebook assistant
 
   Background:
     Given I am logged in as an admin
-    And current user has a notebook with head note "Vertical farming" and notes::
+    And current user has a notebook with head note "Vertical farming" and notes:
       | Topic       | Parent Topic     |
       | Acquaponics | Vertical farming |
 
