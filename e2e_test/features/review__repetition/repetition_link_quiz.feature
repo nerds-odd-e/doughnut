@@ -4,7 +4,7 @@ Feature: Repetition Link Quiz
   Background:
     Given I am logged in as an existing user
     And there are some notes for the current user:
-      | Topic            | skipReview | parentTopic |
+      | Topic            | skipReview | Parent Topic|
       | Space            | true       |             |
       | Moon             | true       | Space       |
       | Earth            | true       | Space       |

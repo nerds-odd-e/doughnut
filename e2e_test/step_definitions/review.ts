@@ -74,7 +74,7 @@ Then("I initial review {string}", (noteTopic) => {
 Then(
   "I added and learned one note {string} on day {int}",
   (noteTopic: string, day: number) => {
-    start.testability().injectNotes([{ topicConstructor: noteTopic }])
+    start.testability().injectNotes([{ Topic: noteTopic }])
     start.testability().backendTimeTravelTo(day, 8)
     cy.initialReviewNotes(noteTopic)
   }

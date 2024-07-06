@@ -85,9 +85,12 @@ When("I am on {string} circle page", (circleName: string) => {
   start.navigateToCircle(circleName)
 })
 
-When("There is a notebook {string} in circle {string}", (topic, circleName) => {
-  start.testability().injectNotes([{ topicConstructor: topic }], "", circleName)
-})
+When(
+  "There is a notebook {string} in circle {string}",
+  (topic: string, circleName: string) => {
+    start.testability().injectNotes([{ Topic: topic }], "", circleName)
+  }
+)
 
 When(
   "someone of my circle deletes the {string} notebook",

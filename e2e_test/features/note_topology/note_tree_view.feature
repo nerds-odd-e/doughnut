@@ -4,7 +4,7 @@ Feature: Note tree view
   Background:
     Given I am logged in as an existing user
     And there are some notes for the current user:
-      | Topic            | parentTopic    |
+      | Topic            | Parent Topic   |
       | LeSS in Action   |                |
       | TDD              | LeSS in Action |
       | ATDD             | LeSS in Action |

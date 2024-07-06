@@ -3,7 +3,7 @@ Feature: Note deletion
   Background:
     Given I am logged in as an existing user
     And there are some notes for the current user:
-      | Topic            | parentTopic    |
+      | Topic            | Parent Topic   |
       | LeSS in Action   |                |
       | team             | LeSS in Action |
       | tech             | LeSS in Action |

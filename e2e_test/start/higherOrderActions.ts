@@ -16,7 +16,7 @@ export const higherOrderActions = {
     noteTopic: string,
     question: Record<string, string>
   ) => {
-    testability().injectNotes([{ topicConstructor: noteTopic }])
+    testability().injectNotes([{ Topic: noteTopic }])
     questionGenerationService().resetAndStubAskingMCQ(question)
     return basicActions.jumpToNotePage(noteTopic).chatAboutNote().testMe()
   },

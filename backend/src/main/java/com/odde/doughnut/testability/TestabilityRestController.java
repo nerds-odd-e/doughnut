@@ -1,5 +1,6 @@
 package com.odde.doughnut.testability;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.odde.doughnut.controllers.dto.QuestionSuggestionParams;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.NoteRepository;
@@ -72,9 +73,15 @@ class TestabilityRestController {
   }
 
   static class NoteTestData {
-    public String Topic;
+    @JsonProperty("Topic")
+    public String topic;
+
     @Setter private String details;
-    @Setter private String parentTopic;
+
+    @JsonProperty("Parent Topic")
+    @Setter
+    private String parentTopic;
+
     @Setter private Boolean skipReview;
     @Setter private String url;
     @Setter private String imageUrl;
@@ -83,10 +90,10 @@ class TestabilityRestController {
 
     private Note buildNote(User user, Timestamp currentUTCTimestamp) {
       Note note =
-          new NoteConstructionService(user, currentUTCTimestamp, null).createNote(null, Topic);
+          new NoteConstructionService(user, currentUTCTimestamp, null).createNote(null, topic);
       NoteAccessory content = note.getOrInitializeNoteAccessory();
 
-      note.setTopicConstructor(Topic);
+      note.setTopicConstructor(topic);
       note.setDetails(details);
       note.setUpdatedAt(currentUTCTimestamp);
       if (skipReview != null) {
@@ -120,7 +127,7 @@ class TestabilityRestController {
         ModelFactoryService modelFactoryService) {
       noteTestData.forEach(
           injection -> {
-            Note note = titleNoteMap.get(injection.Topic);
+            Note note = titleNoteMap.get(injection.topic);
 
             if (Strings.isBlank(injection.parentTopic)) {
               note.buildNotebookForHeadNote(ownership, user);
@@ -142,7 +149,7 @@ class TestabilityRestController {
 
     private void saveByOriginalOrder(
         Map<String, Note> titleNoteMap, ModelFactoryService modelFactoryService) {
-      noteTestData.forEach((inject -> modelFactoryService.save(titleNoteMap.get(inject.Topic))));
+      noteTestData.forEach((inject -> modelFactoryService.save(titleNoteMap.get(inject.topic))));
     }
   }
 

@@ -3,7 +3,7 @@ Feature: Notebook deletion
   Background:
     Given I am logged in as an existing user
     And there are some notes for the current user:
-      | Topic            | parentTopic    | details             |
+      | Topic            | Parent Topic   | details             |
       | LeSS in Action   |                | An awesome training |
       | team             | LeSS in Action |                     |
       | tech             | LeSS in Action |                     |

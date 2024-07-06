@@ -2693,12 +2693,7 @@ components:
     NoteTestData:
       type: object
       properties:
-        Topic:
-          type: string
         details:
-          type: string
-          writeOnly: true
-        parentTopic:
           type: string
           writeOnly: true
         skipReview:
@@ -2716,6 +2711,10 @@ components:
         wikidataId:
           type: string
           writeOnly: true
+        Topic:
+          type: string
+        Parent Topic:
+          type: string
     NotesTestData:
       type: object
       properties:

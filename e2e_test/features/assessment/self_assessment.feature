@@ -5,13 +5,13 @@ Feature: Self assessment
   Background:
     Given I am logged in as an existing user
     And there are some notes for the current user:
-      | Topic            | parentTopic |
-      | Countries        |             |
-      | Singapore        | Countries   |
-      | Vietnam          | Countries   |
-      | Japan            | Countries   |
-      | Korea            | Countries   |
-      | China            | Countries   |
+      | Topic     | Parent Topic |
+      | Countries |              |
+      | Singapore | Countries    |
+      | Vietnam   | Countries    |
+      | Japan     | Countries    |
+      | Korea     | Countries    |
+      | China     | Countries    |
     And notebook "Countries" is shared to the Bazaar
     And there are questions for the note:
       | noteTopic | question                                       | answer   | oneWrongChoice | approved |

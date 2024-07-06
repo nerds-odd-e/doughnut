@@ -30,7 +30,7 @@ Given("there are questions for the note:", (data: DataTable) => {
 })
 
 Given("I have a note with the topic {string}", (noteTopic: string) => {
-  start.testability().injectNotes([{ topicConstructor: noteTopic }])
+  start.testability().injectNotes([{ Topic: noteTopic }])
 })
 
 Given(
@@ -46,7 +46,7 @@ Given(
     const notes = Array(to - from + 1)
       .fill(0)
       .map((_, i) => {
-        return { topicConstructor: `Note ${i + from}` }
+        return { Topic: `Note ${i + from}` }
       })
     start.testability().injectNotes(notes)
   }

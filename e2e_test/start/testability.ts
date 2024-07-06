@@ -56,7 +56,7 @@ const testability = () => {
     injectNotes(
       noteTestData: NoteTestData[],
       externalIdentifier = "",
-      circleName = null
+      circleName: string | null = null
     ) {
       postToTestabilityApi(cy, "inject_notes", {
         body: {
