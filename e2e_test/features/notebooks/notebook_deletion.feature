@@ -2,11 +2,10 @@ Feature: Notebook deletion
 
   Background:
     Given I am logged in as an existing user
-    And there are some notes for the current user:
-      | Topic            | Parent Topic   | Details             |
-      | LeSS in Action   |                | An awesome training |
-      | team             | LeSS in Action |                     |
-      | tech             | LeSS in Action |                     |
+    And I have a notebook with head note "LeSS in Action" and notes:
+      | Topic | Parent Topic   |
+      | team  | LeSS in Action |
+      | tech  | LeSS in Action |
 
   Scenario: Delete a notebook and undo
     Given I initial review "LeSS in Action"

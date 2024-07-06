@@ -4,9 +4,7 @@ Feature: Note Edit
 
   Background:
     Given I am logged in as an existing user
-    And there are some notes for the current user:
-      | Topic            | Details             |
-      | LeSS in Action   | An awesome training |
+    And I have a notebook with the head note "LeSS in Action" and details "An awesome training"
 
   Scenario: Edit a note
     And I update note "LeSS in Action" to become:

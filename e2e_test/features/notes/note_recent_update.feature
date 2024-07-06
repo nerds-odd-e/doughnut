@@ -5,9 +5,8 @@ Feature: see recent note update
   Background:
     Given I am logged in as an existing user
     And I let the server to time travel to 100 hours ago
-    And there are some notes for the current user:
+    And I have a notebook with head note "Notebook" and notes:
       | Topic            | Parent Topic| Details |
-      | NoteBook         |             |         |
       | Note1            | NoteBook    |         |
       | Note2            | NoteBook    |         |
       | Note1.1          | Note1       | note1.1 |

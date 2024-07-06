@@ -4,9 +4,8 @@ Feature: Note parent reference
 
   Background:
     Given I am logged in as an existing user
-    And there are some notes for the current user:
+    And I have a notebook with head note "LeSS in Action" and notes:
       | Topic                    | Parent Topic   |
-      | LeSS in Action           |                |
       | Usually, %P is in-person | LeSS in Action |
 
   Scenario: the note should be rendered with parent reference

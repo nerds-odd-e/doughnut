@@ -4,11 +4,10 @@ Feature: Nested Note creation
 
   Background:
     Given I am logged in as an existing user
-    And there are some notes for the current user:
-      | Topic            | Parent Topic   | Details             |
-      | LeSS in Action   |                | An awesome training |
-      | team             | LeSS in Action |                     |
-      | tech             | LeSS in Action |                     |
+    And I have a notebook with head note "LeSS in Action" and notes:
+      | Topic | Parent Topic   |
+      | team  | LeSS in Action |
+      | tech  | LeSS in Action |
 
   Scenario: Create a new note belonging to another note
     When I create a note belonging to "LeSS in Action":

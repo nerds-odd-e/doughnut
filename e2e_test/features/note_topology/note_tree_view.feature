@@ -3,9 +3,8 @@ Feature: Note tree view
 
   Background:
     Given I am logged in as an existing user
-    And there are some notes for the current user:
+    And I have a notebook with head note "LeSS in Action" and notes:
       | Topic            | Parent Topic   |
-      | LeSS in Action   |                |
       | TDD              | LeSS in Action |
       | ATDD             | LeSS in Action |
       | CI               | LeSS in Action |

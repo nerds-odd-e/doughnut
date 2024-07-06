@@ -2,9 +2,8 @@ Feature: link edit and remove
 
   Background:
     Given I am logged in as an existing user
-    And there are some notes for the current user:
+    And I have a notebook with head note "Space" and notes:
       | Topic            | Skip Review| Parent Topic|
-      | Space            | true       |             |
       | Moon             | true       | Space       |
       | Earth            | true       | Space       |
       | Mars             | true       | Space       |
