@@ -45,6 +45,7 @@ const testability = () => {
   return {
     cleanDBAndResetTestabilitySettings() {
       cleanAndReset(cy, 5)
+      cy.wrap({}).as(injectedNoteIdMapAliasName)
     },
 
     featureToggle(enabled: boolean) {
@@ -66,7 +67,10 @@ const testability = () => {
         },
       }).then((response) => {
         expect(Object.keys(response.body).length).to.equal(noteTestData.length)
-        cy.wrap(response.body).as(injectedNoteIdMapAliasName)
+        cy.get(`@${injectedNoteIdMapAliasName}`).then((existingMap) => {
+          const mergedMap = { ...existingMap, ...response.body }
+          cy.wrap(mergedMap).as(injectedNoteIdMapAliasName)
+        })
       })
     },
 

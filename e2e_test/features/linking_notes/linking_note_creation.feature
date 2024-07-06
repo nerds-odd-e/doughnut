@@ -5,11 +5,9 @@ Feature: link note
 
   Background:
     Given I am logged in as an existing user
-    And there are some notes for the current user:
-      | Topic            | Details         |
-      | Sedition         | Incite violence |
-      | Sedation         | Put to sleep    |
-      | Sedative         | Sleep medicine  |
+    And I have a notebook with the head note "Sedition" and details "Incite violence"
+    And I have a notebook with the head note "Sedation" and details "Put to sleep"
+    And I have a notebook with the head note "Sedative" and details "Sleep medicine"
 
   @mockBrowserTime
   Scenario: View all linkable notes for a note when no link exists

@@ -39,6 +39,13 @@ Given("I have a notebook with the head note {string}", (noteTopic: string) => {
 })
 
 Given(
+  "I have a notebook with the head note {string} and details {string}",
+  (noteTopic: string, details: string) => {
+    start.testability().injectNotes([{ Topic: noteTopic, Details: details }])
+  }
+)
+
+Given(
   "there are some notes for existing user {string}",
   (externalIdentifier: string | undefined, data: DataTable) => {
     start.testability().injectNotes(data.hashes(), externalIdentifier)
