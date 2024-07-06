@@ -3,7 +3,7 @@ Feature: Repetition Quiz
 
   Background:
     Given I am logged in as an existing user
-    And there are some notes for the current user:
+    And there are some notes:
       | Topic            | Details                        | Skip Review| Parent Topic|
       | English          |                                | true       |             |
       | sedition         | Sedition means incite violence | false      | English     |

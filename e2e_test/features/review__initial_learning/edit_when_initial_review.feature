@@ -2,7 +2,7 @@ Feature: Editing when initial review
 
   Background:
     Given I am logged in as an existing user
-    And there are some notes for the current user:
+    And there are some notes:
       | Topic            |
       | hard             |
       | easy             |

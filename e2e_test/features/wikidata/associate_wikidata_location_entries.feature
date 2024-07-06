@@ -18,7 +18,7 @@ Feature: Note creation/edit for a location
 
   @usingMockedWikidataService
   Scenario: Existing Note wikidata edited by user
-    When there are some notes for the current user:
+    When there are some notes:
       | Topic            | Details     | Parent Topic|
       | Singapore        | The red dot | places      |
     And I associate the note "Singapore" with wikidata id "Q334"

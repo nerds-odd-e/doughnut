@@ -30,7 +30,7 @@ Given(
   }
 )
 
-Given("there are some notes for the current user:", (data: DataTable) => {
+Given("there are some notes:", (data: DataTable) => {
   start.testability().injectNotes(data.hashes())
 })
 

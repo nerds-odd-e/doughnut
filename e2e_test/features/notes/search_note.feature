@@ -5,12 +5,12 @@ Feature: search note
 
   Background:
     Given I am logged in as an existing user
-    And there are some notes for the current user:
-      | Topic            | Details        | Parent Topic|
-      | Sedation         | Put to sleep   |             |
-      | Sedative         | Sleep medicine |             |
-      | Physical         |                | Sedation    |
-      | Magical          |                | Sedation    |
+    And I have a notebook with the head note "Sedation" and details "Put to sleep"
+    And I have a notebook with the head note "Sedative" and details "Sleep medicine"
+    And there are some notes:
+      | Topic    | Parent Topic |
+      | Physical | Sedation     |
+      | Magical  | Sedation     |
 
   @mockBrowserTime
   Scenario Outline: Search at the top level
