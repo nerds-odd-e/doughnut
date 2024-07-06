@@ -31,6 +31,11 @@ Given(
 )
 
 Given("there are some notes:", (data: DataTable) => {
+  data.hashes().forEach((note) => {
+    if (!note["Parent Topic"]) {
+      throw new Error("Parent Topic is required for all notes")
+    }
+  })
   start.testability().injectNotes(data.hashes())
 })
 
