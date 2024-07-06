@@ -10,7 +10,7 @@ Feature: Logged in status
 
   Scenario: User logout because of session timeout
     Given there are some notes for the current user:
-      | topicConstructor | parentTopic |
+      | Topic            | parentTopic |
       | Shape            |             |
       | Triangle         | Shape       |
     And I navigate to "My Notes/Shape" note

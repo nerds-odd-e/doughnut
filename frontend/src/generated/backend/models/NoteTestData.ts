@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type NoteTestData = {
-    topicConstructor?: string;
+    Topic?: string;
     details?: string;
     parentTopic?: string;
     skipReview?: boolean;

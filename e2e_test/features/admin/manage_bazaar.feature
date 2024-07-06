@@ -5,7 +5,7 @@ Feature: Manage Bazaar
 
   Background:
     Given there are some notes for existing user "another_old_learner"
-      | topicConstructor |
+      | Topic            |
       | Romance          |
       | Classics         |
     And notebook "Romance" is shared to the Bazaar

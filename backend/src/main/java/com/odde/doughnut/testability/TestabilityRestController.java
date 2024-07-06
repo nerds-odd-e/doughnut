@@ -72,7 +72,7 @@ class TestabilityRestController {
   }
 
   static class NoteTestData {
-    public String topicConstructor;
+    public String Topic;
     @Setter private String details;
     @Setter private String parentTopic;
     @Setter private Boolean skipReview;
@@ -83,11 +83,10 @@ class TestabilityRestController {
 
     private Note buildNote(User user, Timestamp currentUTCTimestamp) {
       Note note =
-          new NoteConstructionService(user, currentUTCTimestamp, null)
-              .createNote(null, topicConstructor);
+          new NoteConstructionService(user, currentUTCTimestamp, null).createNote(null, Topic);
       NoteAccessory content = note.getOrInitializeNoteAccessory();
 
-      note.setTopicConstructor(topicConstructor);
+      note.setTopicConstructor(Topic);
       note.setDetails(details);
       note.setUpdatedAt(currentUTCTimestamp);
       if (skipReview != null) {
@@ -121,7 +120,7 @@ class TestabilityRestController {
         ModelFactoryService modelFactoryService) {
       noteTestData.forEach(
           injection -> {
-            Note note = titleNoteMap.get(injection.topicConstructor);
+            Note note = titleNoteMap.get(injection.Topic);
 
             if (Strings.isBlank(injection.parentTopic)) {
               note.buildNotebookForHeadNote(ownership, user);
@@ -143,8 +142,7 @@ class TestabilityRestController {
 
     private void saveByOriginalOrder(
         Map<String, Note> titleNoteMap, ModelFactoryService modelFactoryService) {
-      noteTestData.forEach(
-          (inject -> modelFactoryService.save(titleNoteMap.get(inject.topicConstructor))));
+      noteTestData.forEach((inject -> modelFactoryService.save(titleNoteMap.get(inject.Topic))));
     }
   }
 

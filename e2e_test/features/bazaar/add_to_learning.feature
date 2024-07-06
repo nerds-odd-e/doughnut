@@ -4,7 +4,7 @@ Feature: Bazaar subscription
 
   Background:
     Given there are some notes for existing user "another_old_learner"
-      | topicConstructor | parentTopic | skipReview |
+      | Topic            | parentTopic | skipReview |
       | Shape            |             | true       |
       | Square           | Shape       |            |
       | Triangle         | Shape       |            |

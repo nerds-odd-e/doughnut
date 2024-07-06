@@ -1,11 +1,11 @@
-Feature: New questions assessment
+Feature: Self assessment
   As a trainer, I want to create a notebook with knowledge and questions
   and share it in the Bazaar, so that people can use it to assess their own skill level and knowledge on the topic
 
   Background:
     Given I am logged in as an existing user
     And there are some notes for the current user:
-      | topicConstructor | parentTopic |
+      | Topic            | parentTopic |
       | Countries        |             |
       | Singapore        | Countries   |
       | Vietnam          | Countries   |

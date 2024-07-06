@@ -6,7 +6,7 @@ Feature: link note
   Background:
     Given I am logged in as an existing user
     And there are some notes for the current user:
-      | topicConstructor | details         |
+      | Topic            | details         |
       | Sedition         | Incite violence |
       | Sedation         | Put to sleep    |
       | Sedative         | Sleep medicine  |

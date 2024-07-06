@@ -4,7 +4,7 @@ Feature: Repetition Link Quiz
   Background:
     Given I am logged in as an existing user
     And there are some notes for the current user:
-      | topicConstructor | skipReview | parentTopic |
+      | Topic            | skipReview | parentTopic |
       | Space            | true       |             |
       | Moon             | true       | Space       |
       | Earth            | true       | Space       |
@@ -14,7 +14,7 @@ Feature: Repetition Link Quiz
   Scenario Outline: "Belongs to" question
     Given It's day 1, 8 hour
     And I do these initial reviews in sequence:
-      | review_type | topic |
+      | review_type | Topic |
       | single note | Moon  |
     When I am repeat-reviewing my old note on day 2
     Then I should be asked link question "Moon" "a specialization of" with options "Earth, Mars"

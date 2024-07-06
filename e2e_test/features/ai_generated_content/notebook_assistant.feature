@@ -8,7 +8,7 @@ Feature: Notebook assistant
   Background:
     Given I am logged in as an admin
     And there are some notes for the current user:
-      | topicConstructor | details | parentTopic      |
+      | Topic            | details | parentTopic      |
       | Vertical farming |         |                  |
       | Acquaponics      |         | Vertical farming |
 

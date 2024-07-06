@@ -2693,7 +2693,7 @@ components:
     NoteTestData:
       type: object
       properties:
-        topicConstructor:
+        Topic:
           type: string
         details:
           type: string
