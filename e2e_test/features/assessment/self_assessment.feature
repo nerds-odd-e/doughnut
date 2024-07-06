@@ -59,7 +59,7 @@ Feature: Self assessment
 
   Scenario: Perform multiple assesments on the same notebook and questions vary from attempt to attempt
     Given I set the number of questions per assessment of the notebook "Countries" to 1
-    Then 10 subsequent attempts of assessment on the "Countries" notebook should be random meaning it should not have the same questions each time
+    Then 5 subsequent attempts of assessment on the "Countries" notebook should use more than 1 different questions
 
   Scenario Outline: Cannot start assessment with 0 questions or not enough approved questions
     Given I set the number of questions per assessment of the notebook "Countries" to <Questions Per Assessment>

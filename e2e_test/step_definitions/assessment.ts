@@ -28,8 +28,8 @@ When(
 )
 
 When(
-  "{int} subsequent attempts of assessment on the {string} notebook should be random meaning it should not have the same questions each time",
-  (attempts: number, notebook: string) => {
+  "{int} subsequent attempts of assessment on the {string} notebook should use more than {int} different questions",
+  (attempts: number, notebook: string, minUniqueQuestionsThreshold: number) => {
     const questions: string[] = []
     for (let i = 0; i < attempts; i++) {
       start.navigateToBazaar().selfAssessmentOnNotebook(notebook)
@@ -41,7 +41,9 @@ When(
     }
     cy.then(() => {
       const uniqueQuestions = new Set(questions)
-      expect(uniqueQuestions.size).to.be.greaterThan(1)
+      expect(uniqueQuestions.size).to.be.greaterThan(
+        minUniqueQuestionsThreshold
+      )
     })
   }
 )
