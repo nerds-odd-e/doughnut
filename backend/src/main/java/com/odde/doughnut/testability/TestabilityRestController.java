@@ -96,6 +96,10 @@ class TestabilityRestController {
     @Setter
     private String imageMask;
 
+    @JsonProperty("Wikidata Id")
+    @Setter
+    private String wikidataId;
+
     private Note buildNote(User user, Timestamp currentUTCTimestamp) {
       Note note =
           new NoteConstructionService(user, currentUTCTimestamp, null).createNote(null, topic);
@@ -110,6 +114,7 @@ class TestabilityRestController {
       content.setImageMask(imageMask);
       content.setImageUrl(imageUrl);
 
+      note.setWikidataId(wikidataId);
       note.setUpdatedAt(currentUTCTimestamp);
       return note;
     }

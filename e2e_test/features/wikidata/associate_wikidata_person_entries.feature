@@ -11,21 +11,21 @@ Feature: Note creation should have details if wikidata is a person
     And Wikidata.org entity "Q706446" is a person from "Q22502" and birthday is "+1980-03-31T00:00:00Z"
     And Wikidata.org entity "Q4604" is a person from "Q736936" and birthday is "-0552-10-09T00:00:00Z"
     And there are some notes for the current user:
-      | Topic            | Parent Topic| wikidataId |
-      | People           |             |            |
-      | Taiwan           | People      | Q22502     |
+      | Topic  | Parent Topic | Wikidata Id |
+      | People |              |             |
+      | Taiwan | People       | Q22502      |
 
   @usingMockedWikidataService
   Scenario Outline: Create a note for a person with wikidata should auto fill the details
     When I create a note belonging to "People":
-      | Topic         | Wikidata Id  |
-      | <person name> | <wikidataId> |
+      | Topic         | Wikidata Id   |
+      | <person name> | <Wikidata Id> |
     Then the note details on the current page should be "<expected details>"
 
     Examples:
-      | person name     | wikidataId | expected details         |
-      | Wang Chien-ming | Q706446    | Taiwan, 31 March 1980    |
-      | Confucius       | Q4604      | Lu, 09 October 0552 B.C. |
+      | person name     | Wikidata Id | expected details         |
+      | Wang Chien-ming | Q706446     | Taiwan, 31 March 1980    |
+      | Confucius       | Q4604       | Lu, 09 October 0552 B.C. |
 
 
   @usingMockedWikidataService

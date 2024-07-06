@@ -2705,6 +2705,8 @@ components:
           type: string
         Image Mask:
           type: string
+        Wikidata Id:
+          type: string
     NotesTestData:
       type: object
       properties:

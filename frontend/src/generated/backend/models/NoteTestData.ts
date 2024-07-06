@@ -9,5 +9,6 @@ export type NoteTestData = {
     'Skip Review'?: boolean;
     'Image Url'?: string;
     'Image Mask'?: string;
+    'Wikidata Id'?: string;
 };
 
