@@ -4,9 +4,8 @@ Feature: Self assessment
 
   Background:
     Given I am logged in as an existing user
-    And there are some notes for the current user:
+    And a notebook with head note "Countries" exists with the following sub notes:
       | Topic     | Parent Topic |
-      | Countries |              |
       | Singapore | Countries    |
       | Vietnam   | Countries    |
       | Japan     | Countries    |

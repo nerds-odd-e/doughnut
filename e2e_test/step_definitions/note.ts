@@ -21,6 +21,15 @@ defineParameterType({
   },
 })
 
+Given(
+  "a notebook with head note {string} exists with the following sub notes:",
+  (notebookTopic: string, data: DataTable) => {
+    const notes = data.hashes()
+    notes.unshift({ Topic: notebookTopic })
+    start.testability().injectNotes(notes)
+  }
+)
+
 Given("there are some notes for the current user:", (data: DataTable) => {
   start.testability().injectNotes(data.hashes())
 })
