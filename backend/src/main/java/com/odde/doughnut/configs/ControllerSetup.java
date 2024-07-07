@@ -30,17 +30,10 @@ public class ControllerSetup {
     this.testabilitySettings = testabilitySettings;
   }
 
-  //  @InitBinder
-  //  public void initBinder(WebDataBinder binder) {
-  //    // trimming all strings coming from any user form
-  //    StringTrimmerEditor stringTrimmerEditor = new StringTrimmerEditor(false);
-  //    binder.registerCustomEditor(String.class, stringTrimmerEditor);
-  //  }
-
   @SneakyThrows
   @ExceptionHandler(Exception.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-  public String handleSystemException(HttpServletRequest req, Exception exception) {
+  public void handleSystemException(HttpServletRequest req, Exception exception) {
     FailureReportFactory failureReportFactory =
         new FailureReportFactory(
             req,
