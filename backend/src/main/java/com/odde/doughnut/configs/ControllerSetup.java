@@ -33,7 +33,7 @@ public class ControllerSetup {
   @SneakyThrows
   @ExceptionHandler(Exception.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-  public void handleSystemException(HttpServletRequest req, Exception exception) {
+  public String handleSystemException(HttpServletRequest req, Exception exception) {
     FailureReportFactory failureReportFactory =
         new FailureReportFactory(
             req,
