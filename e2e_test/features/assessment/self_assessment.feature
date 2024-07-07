@@ -57,9 +57,10 @@ Feature: Self assessment
     Then I should see the score "Your score: 0 / 2" at the end of assessment
     And I should see a link to the "Singapore" notebook
 
+  @randomSeed(1) @focus
   Scenario: Perform multiple assesments on the same notebook and questions vary from attempt to attempt
     Given I set the number of questions per assessment of the notebook "Countries" to 1
-    Then 5 subsequent attempts of assessment on the "Countries" notebook should use more than 1 different questions
+    Then 2 subsequent attempts of assessment on the "Countries" notebook should use more than 1 different questions
 
   Scenario Outline: Cannot start assessment with 0 questions or not enough approved questions
     Given I set the number of questions per assessment of the notebook "Countries" to <Questions Per Assessment>

@@ -2,6 +2,7 @@ package com.odde.doughnut.testability;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.odde.doughnut.controllers.dto.QuestionSuggestionParams;
+import com.odde.doughnut.controllers.dto.Randomization;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
@@ -49,7 +50,7 @@ class TestabilityRestController {
     createUser("non_admin", "Non Admin");
     testabilitySettings.setUseRealGithub(false);
     testabilitySettings.enableFeatureToggle(false);
-    testabilitySettings.setAlwaysChoose("first");
+    testabilitySettings.setAlwaysChoose(Randomization.RandomStrategy.first);
     return "OK";
   }
 
@@ -342,10 +343,6 @@ class TestabilityRestController {
   public Map<String, String> replaceServiceUrl(
       @RequestBody Map<String, String> setWikidataService) {
     return testabilitySettings.replaceServiceUrls(setWikidataService);
-  }
-
-  static class Randomization {
-    public String choose;
   }
 
   @PostMapping(value = "/randomizer")

@@ -1,5 +1,6 @@
 package com.odde.doughnut.models.randomizers;
 
+import com.odde.doughnut.controllers.dto.Randomization;
 import com.odde.doughnut.models.Randomizer;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,11 +9,11 @@ import java.util.Optional;
 import lombok.Setter;
 
 public class NonRandomizer implements Randomizer {
-  @Setter public String alwaysChoose = "first";
+  @Setter public Randomization.RandomStrategy alwaysChoose = Randomization.RandomStrategy.first;
 
   @Override
   public <T> List<T> shuffle(List<T> list) {
-    if (alwaysChoose.equals("last")) {
+    if (alwaysChoose.equals(Randomization.RandomStrategy.last)) {
       List<T> newList = new ArrayList<>(list);
       Collections.reverse(newList);
       return newList;
@@ -25,7 +26,7 @@ public class NonRandomizer implements Randomizer {
     if (list.isEmpty()) {
       return Optional.empty();
     }
-    if (alwaysChoose.equals("last")) {
+    if (alwaysChoose.equals(Randomization.RandomStrategy.last)) {
       return Optional.of(list.get(list.size() - 1));
     }
     return Optional.of(list.get(0));

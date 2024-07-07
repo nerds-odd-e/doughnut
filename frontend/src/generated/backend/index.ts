@@ -83,7 +83,7 @@ export type { QuizQuestionContestResult } from './models/QuizQuestionContestResu
 export type { QuizQuestionInNotebook } from './models/QuizQuestionInNotebook';
 export type { QuizQuestionsTestData } from './models/QuizQuestionsTestData';
 export type { QuizQuestionTestData } from './models/QuizQuestionTestData';
-export type { Randomization } from './models/Randomization';
+export { Randomization } from './models/Randomization';
 export type { RedirectToNoteResponse } from './models/RedirectToNoteResponse';
 export type { ReviewPoint } from './models/ReviewPoint';
 export type { ReviewSetting } from './models/ReviewSetting';

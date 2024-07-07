@@ -3,6 +3,14 @@
 /* tslint:disable */
 /* eslint-disable */
 export type Randomization = {
-    choose?: string;
+    choose?: Randomization.choose;
+    seed?: number;
 };
+export namespace Randomization {
+    export enum choose {
+        FIRST = 'first',
+        LAST = 'last',
+        SEED = 'seed',
+    }
+}
 

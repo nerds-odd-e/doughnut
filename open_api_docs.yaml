@@ -2581,6 +2581,13 @@ components:
       properties:
         choose:
           type: string
+          enum:
+          - first
+          - last
+          - seed
+        seed:
+          type: integer
+          format: int32
     MCQWithAnswer:
       required:
       - correctChoiceIndex

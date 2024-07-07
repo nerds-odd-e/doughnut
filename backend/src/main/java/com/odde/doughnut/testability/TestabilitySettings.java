@@ -1,5 +1,6 @@
 package com.odde.doughnut.testability;
 
+import com.odde.doughnut.controllers.dto.Randomization;
 import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.models.randomizers.RealRandomizer;
@@ -51,7 +52,7 @@ public class TestabilitySettings {
     return nonRandomizer;
   }
 
-  public void setAlwaysChoose(String option) {
+  public void setAlwaysChoose(Randomization.RandomStrategy option) {
     if (nonRandomizer == null) {
       nonRandomizer = new NonRandomizer();
     }

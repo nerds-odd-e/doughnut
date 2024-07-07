@@ -8,6 +8,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.odde.doughnut.controllers.dto.Randomization;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionGenerator;
 import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.models.UserModel;
@@ -94,7 +95,7 @@ class QuizQuestionAndAnswerTest {
 
       @Test
       void ascendingRandomizer() {
-        randomizer.alwaysChoose = "last";
+        randomizer.alwaysChoose = Randomization.RandomStrategy.last;
         QuizQuestionAndAnswer quizQuestionAndAnswer = generateQuizQuestion(note1);
         List<String> options =
             quizQuestionAndAnswer.getQuizQuestion().getMultipleChoicesQuestion().getChoices();
