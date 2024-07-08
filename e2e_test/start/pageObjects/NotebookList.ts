@@ -3,6 +3,7 @@ import { commonSenseSplit } from "support/string_util"
 const addToMyLearning = "Add to my learning"
 
 export const notebookList = () => {
+  cy.pageIsNotLoading()
   return {
     expectNotebooks: (notebooks: string) => {
       cy.pageIsNotLoading()
