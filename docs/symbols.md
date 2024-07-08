@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Sawasdee ka! Welcome to my dad's training workshop. To make sure you adult people can communicate and my dad can return home safely, I will teach you how to pronounce the basic programming symbols. Let's get started!
+Sawasdee ka! Welcome to my dad's training workshop. To make sure you adult people can communicate and my dad can return home safely, we will teach you how to pronounce the basic programming symbols. Let's get started!
 
 ## Pronunciation of Symbols
 
