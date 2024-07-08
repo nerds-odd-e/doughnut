@@ -170,10 +170,6 @@ Then("I should see the repetition is finished: {string}", (yesNo) => {
   ).should(yesNo === "yes" ? "exist" : "not.exist")
 })
 
-Then("The randomizer always choose the last", () => {
-  start.testability().randomizerAlwaysChooseLast()
-})
-
 Then("I should see that my answer is correct", () => {
   start.assumeAnsweredQuestionPage().expectLastAnswerToBeCorrect()
 })
