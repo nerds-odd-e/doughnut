@@ -41,7 +41,7 @@ Sawadika! Welcome to my dad's training workshop. To make sure you adult people c
 
 12. **Ampersand (`&`)**
     - This is an ampersand.
-    - For "a & b" you can say "a and b". If your driver doesn't understand, you may clarify by "a ampersand b."
+    - For "a & b" you can say "a and b". If my dad looks confused, you may clarify by "a ampersand b."
     - The bottom line is, don't get angry. Just communicate clearly.
 
 13. **Double Ampersand (`&&`)**
@@ -71,6 +71,14 @@ Sawadika! Welcome to my dad's training workshop. To make sure you adult people c
 22. **Arrow (`->`)**
 
 23. **Triple Equals / Strict Equals (===)**
+
+24. **Single Quote (`'`)**
+
+25. **Double Quote (`"`)**
+
+26. **Backtick (`` ` ``)**
+
+27. **At Sign, Hash, Dollar, Percentage (`@`, `#`, `$`, `%`)**
 
 ## Conclusion
 
