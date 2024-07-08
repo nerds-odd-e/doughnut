@@ -1,3 +1,4 @@
+import { Randomization } from "./../../frontend/src/generated/backend/models/Randomization"
 /// <reference types="Cypress" />
 // @ts-check
 import { QuestionSuggestionParams } from "../../frontend/src/generated/backend/models/QuestionSuggestionParams"
@@ -158,9 +159,9 @@ const testability = () => {
       })
     },
 
-    randomizerAlwaysChooseLast() {
+    randomizerUseSeed() {
       postToTestabilityApiSuccessfully(cy, "randomizer", {
-        body: { choose: "last" },
+        body: <Randomization>{ choose: "seed", seed: 1 },
       })
     },
 

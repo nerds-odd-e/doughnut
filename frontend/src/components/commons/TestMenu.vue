@@ -13,7 +13,14 @@
           scope-name="testability"
           v-model="randomSelector"
           field="randomSelector"
-          hint="can be 'first' or 'last'"
+          hint="can be 'seed', 'first' or 'last'"
+          @blur="updateRandomSelector"
+        />
+        <TextInput
+          scope-name="testability"
+          v-model="seed"
+          field="seed"
+          hint="Only works when randomSelector is 'seed'"
           @blur="updateRandomSelector"
         />
       </PopButton>
@@ -25,7 +32,7 @@
 </template>
 
 <script lang="ts">
-import { User } from "@/generated/backend"
+import { Randomization, User } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { PropType, defineComponent } from "vue"
 import CheckInput from "../form/CheckInput.vue"
@@ -48,13 +55,15 @@ export default defineComponent({
   },
   data() {
     return {
-      randomSelector: "",
+      randomSelector: "seed" as Randomization.choose,
+      seed: 0,
     }
   },
   methods: {
     updateRandomSelector() {
       this.managedApi.testabilityRestController.randomizer({
         choose: this.randomSelector,
+        seed: this.seed,
       })
     },
     updateFeatureToggle(value) {

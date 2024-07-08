@@ -42,6 +42,10 @@ Before({ tags: "@featureToggle" }, () => {
   start.testability().featureToggle(true)
 })
 
+Before({ tags: "@randomSeed_1" }, () => {
+  start.testability().randomizerUseSeed(1)
+})
+
 Before({ tags: "@usingMockedWikidataService" }, () => {
   mock_services.wikidata().mock()
 })
