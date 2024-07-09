@@ -135,6 +135,11 @@ class RestQuizQuestionController {
     return quizQuestionService.addQuestion(note, questionAndAnswer);
   }
 
+  @DeleteMapping("/{note}/questions/{question}")
+  public QuizQuestionAndAnswer deleteQuestion(@PathVariable Integer note, @PathVariable Integer question) {
+    return quizQuestionService.deleteQuestion(note, question);
+  }
+
   @PostMapping("/{note}/refine-question")
   @Transactional
   public QuizQuestionAndAnswer refineQuestion(
