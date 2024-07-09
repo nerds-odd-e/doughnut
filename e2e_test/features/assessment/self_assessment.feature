@@ -57,10 +57,15 @@ Feature: Self assessment
     Then I should see the score "Your score: 0 / 2" at the end of assessment
     And I should see a link to the "Singapore" notebook
 
-  @randomSeed
+  @randomizerWithFixedSeed
   Scenario: Perform multiple assesments on the same notebook and questions vary from attempt to attempt
     Given I set the number of questions per assessment of the notebook "Countries" to 1
-    Then 2 subsequent attempts of assessment on the "Countries" notebook should use more than 1 different questions
+    Then 2 subsequent attempts of assessment on the "Countries" notebook should use 1 questions
+
+  @randomizerAlwaysInAscendOrder
+  Scenario: Should always use the same questions when randomizer is set to always in ascending order
+    Given I set the number of questions per assessment of the notebook "Countries" to 1
+    Then 2 subsequent attempts of assessment on the "Countries" notebook should use 1 questions
 
   Scenario Outline: Cannot start assessment with 0 questions or not enough approved questions
     Given I set the number of questions per assessment of the notebook "Countries" to <Questions Per Assessment>

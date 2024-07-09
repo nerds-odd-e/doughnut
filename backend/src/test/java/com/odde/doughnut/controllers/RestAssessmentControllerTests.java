@@ -10,6 +10,7 @@ import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.NoteBuilder;
 import com.theokanning.openai.client.OpenAiApi;
 import java.util.*;
@@ -33,11 +34,14 @@ public class RestAssessmentControllerTests {
   @Autowired MakeMe makeMe;
   private UserModel currentUser;
   private RestAssessmentController controller;
+  private TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   @BeforeEach
   void setup() {
     currentUser = makeMe.aUser().toModelPlease();
-    controller = new RestAssessmentController(openAiApi, makeMe.modelFactoryService, currentUser);
+    controller =
+        new RestAssessmentController(
+            openAiApi, makeMe.modelFactoryService, testabilitySettings, currentUser);
   }
 
   @Nested
@@ -102,7 +106,10 @@ public class RestAssessmentControllerTests {
     void whenNotLogin() {
       controller =
           new RestAssessmentController(
-              openAiApi, makeMe.modelFactoryService, makeMe.aNullUserModelPlease());
+              openAiApi,
+              makeMe.modelFactoryService,
+              testabilitySettings,
+              makeMe.aNullUserModelPlease());
       assertThrows(
           ResponseStatusException.class, () -> controller.generateAssessmentQuestions(notebook));
     }

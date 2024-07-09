@@ -28,7 +28,7 @@ When(
 )
 
 When(
-  "{int} subsequent attempts of assessment on the {string} notebook should use more than {int} different questions",
+  "{int} subsequent attempts of assessment on the {string} notebook should use {int} questions",
   (attempts: number, notebook: string, minUniqueQuestionsThreshold: number) => {
     const questions: string[] = []
     for (let i = 0; i < attempts; i++) {
@@ -41,9 +41,7 @@ When(
     }
     cy.then(() => {
       const uniqueQuestions = new Set(questions)
-      expect(uniqueQuestions.size).to.be.greaterThan(
-        minUniqueQuestionsThreshold
-      )
+      expect(uniqueQuestions.size).to.equal(minUniqueQuestionsThreshold)
     })
   }
 )

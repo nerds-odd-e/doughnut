@@ -159,9 +159,9 @@ const testability = () => {
       })
     },
 
-    randomizerUseSeed() {
+    randomizerSettings(strategy: "first" | "last" | "seed", seed: number) {
       postToTestabilityApiSuccessfully(cy, "randomizer", {
-        body: <Randomization>{ choose: "seed", seed: 1 },
+        body: <Randomization>{ choose: strategy, seed },
       })
     },
 

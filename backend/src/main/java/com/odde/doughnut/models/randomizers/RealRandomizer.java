@@ -4,10 +4,12 @@ import com.odde.doughnut.models.Randomizer;
 import java.util.*;
 
 public class RealRandomizer implements Randomizer {
+  Random rand = new Random();
+
   @Override
   public <T> List<T> shuffle(List<T> list) {
     List<T> newList = new ArrayList<>(list);
-    Collections.shuffle(newList);
+    Collections.shuffle(newList, rand);
     return newList;
   }
 
@@ -16,7 +18,6 @@ public class RealRandomizer implements Randomizer {
     if (list.isEmpty()) {
       return Optional.empty();
     }
-    Random rand = new Random();
     return Optional.of(list.get(rand.nextInt(list.size())));
   }
 }

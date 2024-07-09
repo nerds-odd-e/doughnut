@@ -42,8 +42,12 @@ Before({ tags: "@featureToggle" }, () => {
   start.testability().featureToggle(true)
 })
 
-Before({ tags: "@randomSeed_1" }, () => {
-  start.testability().randomizerUseSeed(1)
+Before({ tags: "@randomizerAlwaysInAscendOrder" }, () => {
+  start.testability().randomizerSettings("first", 0)
+})
+
+Before({ tags: "@randomizerWithFixedSeed" }, () => {
+  start.testability().randomizerSettings("seed", 1)
 })
 
 Before({ tags: "@usingMockedWikidataService" }, () => {

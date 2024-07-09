@@ -8,7 +8,7 @@ import com.odde.doughnut.controllers.dto.QuestionAnswerPair;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.randomizers.RealRandomizer;
+import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
 import java.sql.Timestamp;
 import java.util.List;
@@ -17,15 +17,19 @@ import java.util.Objects;
 public class AssessmentService {
   private final ModelFactoryService modelFactoryService;
   private final QuizQuestionService quizQuestionService;
-  private final RealRandomizer realRandomizer = new RealRandomizer();
+  private final TestabilitySettings testabilitySettings;
 
-  public AssessmentService(OpenAiApi openAiApi, ModelFactoryService modelFactoryService) {
+  public AssessmentService(
+      OpenAiApi openAiApi,
+      ModelFactoryService modelFactoryService,
+      TestabilitySettings testabilitySettings) {
     this.modelFactoryService = modelFactoryService;
+    this.testabilitySettings = testabilitySettings;
     this.quizQuestionService = new QuizQuestionService(openAiApi, modelFactoryService);
   }
 
   public List<QuizQuestion> generateAssessment(Notebook notebook) {
-    List<Note> notes = realRandomizer.shuffle(notebook.getNotes());
+    List<Note> notes = testabilitySettings.getRandomizer().shuffle(notebook.getNotes());
 
     List<QuizQuestionAndAnswer> questions =
         notes.stream()
