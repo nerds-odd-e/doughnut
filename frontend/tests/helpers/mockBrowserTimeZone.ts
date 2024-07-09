@@ -17,6 +17,7 @@ export default (zonename: string, beforeEach, afterEach) => {
         this: Intl.ResolvedDateTimeFormatOptions
       ) => Intl.ResolvedDateTimeFormatOptions)
   })
+
   afterEach(() => {
     vitest.restoreAllMocks()
   })
