@@ -181,7 +181,7 @@ Given(
 
 Given(
   "I update note {string} details from {string} to become {string}",
-  (noteTopic: string, noteDetails: string, newNoteDetails: string) => {
+  (_noteTopic: string, noteDetails: string, newNoteDetails: string) => {
     cy.findByText(noteDetails).click({ force: true })
     cy.replaceFocusedTextAndEnter(newNoteDetails)
   }
@@ -304,7 +304,7 @@ When(
   "I should see {string} is before {string} in {string}",
   (noteTopic1: string, noteTopic2: string, parentNoteTopic: string) => {
     start.jumpToNotePage(parentNoteTopic)
-    const matcher = new RegExp(noteTopic1 + ".*" + noteTopic2, "g")
+    const matcher = new RegExp(`${noteTopic1}.*${noteTopic2}`, "g")
 
     cy.get(".card-title").then(($els) => {
       const texts = Array.from($els, (el) => el.innerText)
@@ -317,7 +317,7 @@ When(
 Then(
   "*for demo* I should see there are {int} descendants",
   (numberOfDescendants: number) => {
-    cy.findByText("" + numberOfDescendants, {
+    cy.findByText(`${numberOfDescendants}`, {
       selector: ".descendant-counter",
     })
   }

@@ -15,7 +15,7 @@ const assumeQuestionSection = () => {
     answerFromTable(answersTable: Record<string, string>[]) {
       return this.getStemText().then((stem) => {
         const row = answersTable.find((row) => row.question === stem)
-        return this.answer(row.answer)
+        return this.answer(row!.answer ?? "")
       })
     },
     answer(answer: string) {

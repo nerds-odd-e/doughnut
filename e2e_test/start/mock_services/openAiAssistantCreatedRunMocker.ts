@@ -47,17 +47,17 @@ const openAiAssistantCreatedRunMocker = (
       }
 
       const responses = hashes.map((hash) => {
-        switch (hash["response"]) {
+        switch (hash.response) {
           case "ask clarification question":
             return createRequiresActionRun("ask_clarification_question", {
-              question: hash["arguments"],
+              question: hash.arguments,
             })
           case "complete note details":
             return createRequiresActionRun("complete_note_details", {
-              completion: hash["arguments"]?.match(/"(.*)"/)?.[1],
+              completion: hash.arguments?.match(/"(.*)"/)?.[1],
             })
           default:
-            throw new Error(`Unknown response: ${hash["response"]}`)
+            throw new Error(`Unknown response: ${hash.response}`)
         }
       })
 

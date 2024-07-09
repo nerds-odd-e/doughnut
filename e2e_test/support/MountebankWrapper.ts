@@ -20,7 +20,7 @@ class MountebankWrapper {
     try {
       // just try to delete in case an imposter is there
       await this.mountebank.deleteImposter(this.port)
-    } catch (error) {} // eslint-disable-line
+    } catch (_error) {} // eslint-disable-line
   }
 
   public async createImposter(): Promise<void> {
@@ -30,7 +30,7 @@ class MountebankWrapper {
       .post(`${this.mountebank.mountebankUrl}/imposters`)
       .send(JSON.stringify(imposter))
 
-    if (response.statusCode != 201)
+    if (response.statusCode !== 201)
       throw new Error(
         `Problem creating imposter: ${JSON.stringify(response?.error)}`
       )
@@ -47,7 +47,7 @@ class MountebankWrapper {
       .put(`${this.mountebank.mountebankUrl}/imposters/${this.port}/stubs`)
       .send(JSON.stringify({ stubs }))
 
-    if (response.statusCode != 200)
+    if (response.statusCode !== 200)
       throw new Error(
         `Problem adding stubs to imposter: ${JSON.stringify(response?.error)}`
       )

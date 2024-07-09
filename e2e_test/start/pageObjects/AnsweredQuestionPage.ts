@@ -15,7 +15,9 @@ const assumeAnsweredQuestionPage = () => {
       return {
         expectReviewPointInfo(attrs: { [key: string]: string }) {
           for (const k in attrs) {
-            cy.contains(k).findByText(attrs[k]).should("be.visible")
+            cy.contains(k)
+              .findByText(attrs[k] ?? "")
+              .should("be.visible")
           }
         },
         removeReviewPointFromReview() {

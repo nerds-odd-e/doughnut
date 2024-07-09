@@ -35,7 +35,7 @@ Given("OpenAI now generates this question:", (questionTable: DataTable) => {
   const hashes = questionTable.hashes()
   if (hashes.length !== 1 || !hashes[0]) {
     throw new Error(
-      "Expected exactly one row in the data table, but got " + hashes.length
+      `Expected exactly one row in the data table, but got ${hashes.length}`
     )
   }
   start.questionGenerationService().resetAndStubAskingMCQ(hashes[0])

@@ -15,8 +15,8 @@ const noteCreationForm = {
   createNoteWithAttributes(attributes: Record<string, string>) {
     const {
       Topic,
-      ["Link Type To Parent"]: linkTypeToParent,
-      ["Wikidata Id"]: wikidataId,
+      "Link Type To Parent": linkTypeToParent,
+      "Wikidata Id": wikidataId,
       ...remainingAttrs
     } = attributes
     expect(Object.keys(remainingAttrs)).to.have.lengthOf(0)

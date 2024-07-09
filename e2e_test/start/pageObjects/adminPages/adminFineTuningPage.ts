@@ -16,21 +16,26 @@ export function adminFineTuningPage() {
       newQuestion: Record<string, string>
     ) {
       cy.findByText(originalQuestionStem).parent().dblclick()
-      cy.formField("Stem").clear().type(newQuestion["Question Stem"])
-      cy.get("li input").first().clear().type(newQuestion["Choice A"])
+      cy.formField("Stem")
+        .clear()
+        .type(newQuestion["Question Stem"] ?? "")
+      cy.get("li input")
+        .first()
+        .clear()
+        .type(newQuestion["Choice A"] ?? "")
       cy.findByRole("button", { name: "Save" }).click()
       cy.pageIsNotLoading()
-      cy.findByText(newQuestion["Question Stem"])
+      cy.findByText(newQuestion["Question Stem"] ?? "")
     },
 
     expectExampleQuestions(questions: Record<string, string>[]) {
       this.expectFineTuningExamplesCount(questions.length)
       questions.forEach((expectation) => {
-        cy.findByText(expectation["Question Stem"], {
+        cy.findByText(expectation["Question Stem"] ?? "", {
           selector: "td",
         }).dblclick()
-        if (expectation["Choices"]) {
-          expectation["Choices"]
+        if (expectation.Choices ?? "") {
+          ;(expectation.Choices ?? "")
             .split(", ")
             .forEach((choice: string, index: number) => {
               cy.findByLabelText(`Choice ${index}`)

@@ -64,7 +64,7 @@ Then(
 )
 
 Then("it should move to review page", () => {
-  cy.url().should("eq", Cypress.config().baseUrl + "/reviews")
+  cy.url().should("eq", `${Cypress.config().baseUrl}/reviews`)
 })
 
 Then("I initial review {string}", (noteTopic) => {
@@ -104,7 +104,7 @@ Then(
     start.assumeNotePage(noteTopic)
     cy.formField("Level").then(($control) => {
       cy.wrap($control).within(() => {
-        cy.findByRole("button", { name: "" + level }).click()
+        cy.findByRole("button", { name: `${level}` }).click()
       })
     })
   }
@@ -128,7 +128,7 @@ Then(
 
 Then(
   "I should be asked image question {string} with options {string}",
-  (imageInQuestion: string, options: string) => {
+  (_imageInQuestion: string, options: string) => {
     cy.shouldSeeQuizWithOptions([], options)
   }
 )
