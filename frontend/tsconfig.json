@@ -35,5 +35,11 @@
     "src/**/*.vue",
     "tests/**/*.ts"
   ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "public",
+    "/tests//*",
+  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

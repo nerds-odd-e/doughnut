@@ -12,10 +12,13 @@ import helper from "../helpers"
 
 describe("NoteDetailsAutoCompletionButton", () => {
   const note = makeMe.aNote.please()
-  const mockedGetCompletion = vitest.fn<
-    [number, AiCompletionParams],
-    CancelablePromise<AiAssistantResponse>
-  >()
+  const mockedGetCompletion =
+    vitest.fn<
+      (
+        id: number,
+        params: AiCompletionParams
+      ) => CancelablePromise<AiAssistantResponse>
+    >()
   const mockedAnswerClarifyingQuestion = vitest.fn().mockResolvedValue({
     requiredAction: {
       contentToAppend: "auto completed content",

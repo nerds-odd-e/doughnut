@@ -5,13 +5,17 @@ export default (zonename: string, beforeEach, afterEach) => {
 
     vitest
       .spyOn(Intl.DateTimeFormat.prototype, "resolvedOptions")
-      .mockImplementation(function mockResolvedOptions(
-        this: Intl.DateTimeFormat
-      ) {
-        const options = resolvedOptionsOriginal.call(this)
-        options.timeZone = zonename
-        return options
-      })
+      .mockImplementation(function (this: unknown) {
+        const options = resolvedOptionsOriginal.call(
+          this as Intl.DateTimeFormat
+        )
+        return {
+          ...options,
+          timeZone: zonename,
+        }
+      } as (
+        this: Intl.ResolvedDateTimeFormatOptions
+      ) => Intl.ResolvedDateTimeFormatOptions)
   })
   afterEach(() => {
     vitest.restoreAllMocks()
