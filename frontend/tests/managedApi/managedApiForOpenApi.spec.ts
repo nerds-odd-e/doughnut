@@ -36,7 +36,7 @@ describe("managdApi", () => {
     const callApiAndIgnoreError = async () => {
       try {
         await managedApi.restUserController.getUserProfile()
-      } catch (e) {
+      } catch (_e) {
         // ignore
       }
     }
