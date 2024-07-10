@@ -9,6 +9,10 @@ type RunStreamData = {
   fullMessage: string
 }
 
+interface BodyMatch {
+  assistant_id?: string
+}
+
 const openAiService = () => {
   const serviceMocker = new ServiceMocker('openAi', 5001)
   return {
@@ -146,9 +150,9 @@ const openAiService = () => {
       assistantId: string | undefined,
       runStreamData: RunStreamData[]
     ) {
-      const bodyToMatch = {}
+      const bodyToMatch: BodyMatch = {}
       if (assistantId) {
-        bodyToMatch['assistant_id'] = assistantId
+        bodyToMatch.assistant_id = assistantId
       }
       serviceMocker.mockPostMatchsAndNotMatches(
         `/threads/${threadId}/runs`,
