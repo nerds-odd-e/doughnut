@@ -167,7 +167,7 @@
   },
   "overrides": [
     {
-      "include": ["e2e_test/*.{js,ts}"],
+      "include": ["e2e_test/*.js", "e2e_test/*.ts", "e2e_test/*.tsx", "e2e_test/*.mts", "e2e_test/*.cts"],
       "linter": {
         "rules": {
           "correctness": {
