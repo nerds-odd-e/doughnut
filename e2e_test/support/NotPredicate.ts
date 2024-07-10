@@ -1,13 +1,21 @@
 import { Predicate } from '@anev/ts-mountebank'
 
-export class NotPredicate implements Predicate {
-  Predicate: Predicate
+interface PredicateJSON {
+  not: unknown
+}
 
-  constructor(predicate: Predicate) {
+interface PredicateWithToJSON extends Predicate {
+  toJSON(): PredicateJSON
+}
+
+export class NotPredicate implements PredicateWithToJSON {
+  Predicate: PredicateWithToJSON
+
+  constructor(predicate: PredicateWithToJSON) {
     this.Predicate = predicate
   }
 
-  toJSON() {
+  toJSON(): PredicateJSON {
     return {
       not: this.Predicate.toJSON(),
     }
