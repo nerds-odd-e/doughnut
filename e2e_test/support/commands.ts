@@ -147,27 +147,52 @@ Cypress.Commands.add(
   }
 )
 
-Cypress.Commands.add("routerPush", (fallback, name, params) => {
-  cy.get("@firstVisited").then((firstVisited) => {
-    cy.window().then(async (win) => {
-      if (!!win.router && firstVisited === "yes") {
-        const failed = await win.router.push({
-          name,
-          params,
-          query: { time: Date.now() }, // make sure the route re-render
-        })
-        if (!failed) {
-          cy.dialogDisappeared()
-          return
+interface RouterPushOptions {
+  name: string
+  params: Record<string, string | number>
+  query: Record<string, string | number>
+}
+
+interface RouteParams {
+  [key: string]: string | number
+}
+
+type CustomWindow = Omit<Cypress.AUTWindow, "Infinity" | "NaN"> & {
+  Infinity: number
+  NaN: number
+  router?: {
+    push: (options: RouterPushOptions) => Promise<unknown>
+  }
+}
+
+Cypress.Commands.add(
+  "routerPush",
+  (fallback: string, name: string, params: RouteParams) => {
+    cy.get("@firstVisited").then((firstVisited) => {
+      // Extract the value from the Cypress subject
+      const isFirstVisited =
+        (firstVisited as unknown as { valueOf(): string }).valueOf() === "yes"
+      cy.window().then(async (win: CustomWindow) => {
+        if (win.router && isFirstVisited) {
+          try {
+            await win.router.push({
+              name,
+              params,
+              query: { time: Date.now() }, // make sure the route re-render
+            })
+            cy.dialogDisappeared()
+            return
+          } catch (error) {
+            cy.log("router push failed")
+            cy.log(error as string)
+          }
         }
-        cy.log("router push failed")
-        cy.log(failed)
-      }
-      cy.wrap("yes").as("firstVisited")
-      cy.visit(fallback)
+        cy.wrap("yes").as("firstVisited")
+        cy.visit(fallback)
+      })
     })
-  })
-})
+  }
+)
 
 Cypress.Commands.add("clickButtonOnCardBody", (noteTopic, buttonTitle) => {
   cy.findCardTitle(noteTopic).then(($card) => {
@@ -237,9 +262,17 @@ Cypress.Commands.add(
               additionalInfo,
               "; "
             )
-            cy.findByText(topic)
-            cy.findByText(targetNote)
-            cy.get(".link-type").contains(linkType)
+            if (typeof topic === "string") {
+              cy.findByText(topic)
+            }
+
+            if (typeof targetNote === "string") {
+              cy.findByText(targetNote)
+            }
+
+            if (typeof linkType === "string") {
+              cy.get(".link-type").contains(linkType)
+            }
           }
           break
         }
