@@ -1,3 +1,5 @@
+/// <reference types="cypress" />
+// @ts-check
 import {
   FlexiPredicate,
   HttpMethod,
@@ -6,9 +8,6 @@ import {
   Response,
   Stub,
 } from '@anev/ts-mountebank'
-/// <reference types="cypress" />
-
-// @ts-check
 
 class MountebankStubBuilder {
   public stubWithPredicates(

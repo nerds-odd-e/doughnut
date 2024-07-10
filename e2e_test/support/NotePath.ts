@@ -1,6 +1,5 @@
 /// <reference types="cypress" />
 // @ts-check
-
 import { commonSenseSplit } from './string_util'
 
 class NotePath {

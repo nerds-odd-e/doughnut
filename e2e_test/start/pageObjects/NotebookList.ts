@@ -1,4 +1,4 @@
-import { commonSenseSplit } from 'support/string_util'
+import { commonSenseSplit } from '../../support/string_util'
 
 const addToMyLearning = 'Add to my learning'
 

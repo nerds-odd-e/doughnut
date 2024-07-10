@@ -1,6 +1,6 @@
-import { Randomization } from './../../frontend/src/generated/backend/models/Randomization'
 /// <reference types="Cypress" />
 // @ts-check
+import { Randomization } from './../../frontend/src/generated/backend/models/Randomization'
 import { QuestionSuggestionParams } from '../../frontend/src/generated/backend/models/QuestionSuggestionParams'
 import ServiceMocker from '../support/ServiceMocker'
 import { NoteTestData } from './../../frontend/src/generated/backend/models/NoteTestData'

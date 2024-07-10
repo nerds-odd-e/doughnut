@@ -1,9 +1,7 @@
-import { Imposter, Mountebank, Stub } from '@anev/ts-mountebank'
 /// <reference types="cypress" />
-
-import request from 'superagent'
-
 // @ts-check
+import { Imposter, Mountebank, Stub } from '@anev/ts-mountebank'
+import request from 'superagent'
 
 class MountebankWrapper {
   mountebank = new Mountebank()

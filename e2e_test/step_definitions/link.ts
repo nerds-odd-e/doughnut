@@ -4,7 +4,7 @@
 // @ts-check
 
 import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
-import NotePath from 'support/NotePath'
+import NotePath from '../support/NotePath'
 import start from '../start'
 import { commonSenseSplit } from '../support/string_util'
 

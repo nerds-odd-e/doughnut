@@ -1,4 +1,4 @@
-import { commonSenseSplit } from 'support/string_util'
+import { commonSenseSplit } from '../../support/string_util'
 import submittableForm from '../submittableForm'
 import { assumeChatAboutNotePage } from './chatAboutNotePage'
 import noteCreationForm from './noteForms/noteCreationForm'
