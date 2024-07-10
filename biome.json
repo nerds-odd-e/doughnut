@@ -14,25 +14,21 @@
       "**/.gradle",
       "**/.idea",
       "**/.vscode",
-      "**/node_modules",
       "**/dist",
-      "**/.eslintrc.cjs",
+      "**/gradle",
+      "**/node_modules",
       "**/*.md",
+      "**/.eslintrc.cjs",
       "**/index.html",
-      "**/biome.json",
-      "**/package.json",
-      "**/tsconfig.json",
-      "backend/",
-      "doughnut_mobile/",
-      "infra/",
-      "e2e_test/fixtures/*.{js,json}",
-      "e2e_test/support/index.d.ts",
-      "frontend/{vite,farm}.config.ts",
-      "frontend/**/*.cjs",
-      "frontend/**/*.d.ts",
-      "frontend/**/*.json",
-      "frontend/src/**/*.{js,ts,vue}",
-      "frontend/tests/**/*.{js,ts}"
+      "backend",
+      "docs",
+      "doughnut_mobile",
+      "frontend",
+      "infra",
+      "mysql",
+      "secrets_public_keys",
+      "training_data",
+      "e2e_test/support/index.d.ts"
     ],
     "ignoreUnknown": true
   },
@@ -139,35 +135,33 @@
         "useGetterReturn": "error",
         "useValidTypeof": "error"
       }
-    },
-    "ignore": [
-      "**/.git",
-      "**/.github",
-      "**/node_modules",
-      "**/dist",
-      "**/.eslintrc.cjs",
-      "**/{tsconfig,tsconfig.node}.json",
-      "**/{ci,common}.ts",
-      "**/*.md",
-      "**/index.html",
-      "frontend/{farm,vite}.config.ts",
-      "frontend/src/**/*.{js,ts,vue}",
-      "frontend/tests/**/.{js,ts}",
-      "frontend/**/{auto-imports,components,typed-router}.d.ts",
-      "frontend/tsconfig.json",
-      "frontend/tsconfig.node.json"
-    ]
+    }
   },
   "javascript": {
     "formatter": {
       "trailingCommas": "es5",
       "semicolons": "asNeeded",
       "quoteStyle": "single"
-    }
+    },
+    "globals": [
+      "cy",
+      "Cypress",
+      "expect",
+      "assert",
+      "it",
+      "describe",
+      "context",
+      "before",
+      "beforeEach",
+      "after",
+      "afterEach",
+      "CyEventEmitter",
+      "JQuery"
+    ]
   },
   "overrides": [
     {
-      "include": ["e2e_test/*.js", "e2e_test/*.ts", "e2e_test/*.tsx", "e2e_test/*.mts", "e2e_test/*.cts"],
+      "include": ["**/e2e_test/**/*.{js,ts,jsx,tsx}"],
       "linter": {
         "rules": {
           "correctness": {

@@ -6,7 +6,7 @@
     "resolveJsonModule": true,
     "baseUrl": "../e2e_test",
     "lib": ["dom", "dom.iterable", "ESNext"],
-    "types": ["cypress"],
+    "types": ["cypress", "jquery"],
     "typeRoots": [
       "types",
       "node_modules",
