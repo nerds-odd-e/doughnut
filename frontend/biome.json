@@ -224,8 +224,7 @@
   "javascript": {
     "formatter": {
       "trailingCommas": "es5",
-      "semicolons": "asNeeded",
-      "quoteStyle": "single"
+      "semicolons": "asNeeded"
     }
   },
   "overrides": [
