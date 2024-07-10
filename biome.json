@@ -16,29 +16,23 @@
       "**/.vscode",
       "**/node_modules",
       "**/dist",
-      "biome.json",
-      "package.json",
-      "tsconfig.json",
+      "**/.eslintrc.cjs",
+      "**/*.md",
+      "**/index.html",
+      "**/biome.json",
+      "**/package.json",
+      "**/tsconfig.json",
       "backend/",
       "doughnut_mobile/",
       "infra/",
-      "e2e_test/.eslintrc.cjs",
       "e2e_test/fixtures/*.{js,json}",
       "e2e_test/support/index.d.ts",
-      "frontend/*.cjs",
-      "frontend/{biome,package,tsconfig, tsconfig.node}.json",
-      "frontend/{auto-imports,components,typed-router}.d.ts",
       "frontend/{vite,farm}.config.ts",
-      "frontend/src/*.js",
-      "frontend/src/*.ts",
-      "frontend/src/@types/doughnut/index.d.ts",
-      "frontend/src/generated/backend/**/*.ts",
-      "frontend/tests/*.js",
-      "frontend/tests/*.ts",
-      "frontend/tests/shims-vue.d.ts",
-      "frontend/tests/setupVitest.js",
-      "**/*.md",
-      "**/index.html"
+      "frontend/**/*.cjs",
+      "frontend/**/*.d.ts",
+      "frontend/**/*.json",
+      "frontend/src/**/*.{js,ts,vue}",
+      "frontend/tests/**/*.{js,ts}"
     ],
     "ignoreUnknown": true
   },
@@ -147,24 +141,21 @@
       }
     },
     "ignore": [
-      "**/tsconfig*.json",
-      "**/.eslintrc.cjs",
-      "e2e_test/config/{ci,common}.ts",
-      "**/{auto-imports,components,typed-router}.d.ts",
-      "**/node_modules",
       "**/.git",
       "**/.github",
+      "**/node_modules",
+      "**/dist",
+      "**/.eslintrc.cjs",
+      "**/{tsconfig,tsconfig.node}.json",
+      "**/{ci,common}.ts",
       "**/*.md",
       "**/index.html",
       "frontend/{farm,vite}.config.ts",
-      "frontend/src/*.js",
-      "frontend/src/*.ts",
-      "frontend/tests/*.js",
-      "frontend/tests/*.ts",
-      "**/tsconfig.json",
-      "**/tsconfignode.json",
-      "config/ci.ts",
-      "config/common.ts"
+      "frontend/src/**/*.{js,ts,vue}",
+      "frontend/tests/**/.{js,ts}",
+      "frontend/**/{auto-imports,components,typed-router}.d.ts",
+      "frontend/tsconfig.json",
+      "frontend/tsconfig.node.json"
     ]
   },
   "javascript": {
@@ -176,7 +167,7 @@
   },
   "overrides": [
     {
-      "include": ["*.ts", "*.tsx", "*.mts", "*.cts"],
+      "include": ["e2e_test/*.{js,ts}"],
       "linter": {
         "rules": {
           "correctness": {
