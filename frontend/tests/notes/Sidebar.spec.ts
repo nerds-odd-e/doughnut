@@ -55,7 +55,7 @@ describe("Sidebar", () => {
         // Call the callback with a mock entry
         observeCallback(
           [{ isIntersecting }] as IntersectionObserverEntry[],
-          {} as IntersectionObserver,
+          {} as IntersectionObserver
         )
       }
 
@@ -111,9 +111,9 @@ describe("Sidebar", () => {
         /* eslint-disable */
         (
           await screen.findByText(
-            firstGeneration.note.noteTopic.topicConstructor,
+            firstGeneration.note.noteTopic.topicConstructor
           )
-        ).parentNode?.parentNode?.parentNode,
+        ).parentNode?.parentNode?.parentNode
         /* eslint-enable */
       ).toHaveClass("active-item")
     })

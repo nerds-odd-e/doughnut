@@ -10,5 +10,5 @@
 </template>
 
 <script setup>
-  defineProps({ x: String, flip: Boolean })
+defineProps({ x: String, flip: Boolean })
 </script>

@@ -10,5 +10,5 @@
 </template>
 
 <script setup>
-  defineProps({ x: String })
+defineProps({ x: String })
 </script>

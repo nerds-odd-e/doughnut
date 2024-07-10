@@ -69,7 +69,7 @@ const questionAnswered = async (answerResult) => {
         <number>props.notebookId,
         questionsAnswerCollection.value
       )
-    for (let noteIdAndTitle of assessmentResult.noteIdAndTitles!) {
+    for (const noteIdAndTitle of assessmentResult.noteIdAndTitles!) {
       notesOfWrongAnswers.value.push({
         id: noteIdAndTitle.id ?? 0,
         topicConstructor: noteIdAndTitle.title ?? "",
