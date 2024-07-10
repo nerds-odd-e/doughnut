@@ -17,7 +17,7 @@ class WikidataEntitiesBuilder {
       (claimsIter, claimIter) => {
         return {
           ...claimsIter,
-          ...this.toClaim(claimIter, claimsIter[claimIter.claimId]),
+          ...this.toClaim(claimIter, claimsIter[claimIter.claimId] ?? []),
         }
       },
       this.claims
@@ -31,7 +31,7 @@ class WikidataEntitiesBuilder {
   ): Record<string, Array<unknown>> {
     return {
       [claimIter.claimId]: [
-        ...(data || []),
+        ...(data ?? []),
         {
           mainsnak: {
             snaktype: 'value',
@@ -60,4 +60,4 @@ class WikidataEntitiesBuilder {
 }
 
 export default WikidataEntitiesBuilder
-export { Claim }
+export type { Claim }
