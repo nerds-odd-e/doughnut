@@ -1,8 +1,8 @@
-import basicActions from "./basicActions"
-import { higherOrderActions } from "./higherOrderActions"
-import mock_services from "./mock_services/index"
-import { questionGenerationService } from "./questionGenerationService"
-import testability from "./testability"
+import basicActions from './basicActions'
+import { higherOrderActions } from './higherOrderActions'
+import mock_services from './mock_services/index'
+import { questionGenerationService } from './questionGenerationService'
+import testability from './testability'
 
 const start = {
   ...basicActions,

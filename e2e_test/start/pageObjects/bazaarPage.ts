@@ -1,7 +1,7 @@
-import { bazaarOrCircle } from "./NotebookList"
+import { bazaarOrCircle } from './NotebookList'
 
 export const navigateToBazaar = () => {
-  cy.visit("/bazaar")
+  cy.visit('/bazaar')
 
   return bazaarOrCircle()
 }

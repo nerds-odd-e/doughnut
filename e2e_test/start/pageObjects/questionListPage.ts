@@ -1,4 +1,4 @@
-import { addQuestionPage } from "./addQuestionPage"
+import { addQuestionPage } from './addQuestionPage'
 
 export const questionListPage = () => {
   return {
@@ -6,8 +6,8 @@ export const questionListPage = () => {
     expectQuestion(expectedQuestions: Record<string, string>[]) {
       expectedQuestions.forEach((row) => {
         cy.findByText(row.Question!)
-        cy.findByText(row["Correct Choice"]!).then(($el) => {
-          cy.wrap($el).should("have.class", "correct-choice")
+        cy.findByText(row['Correct Choice']!).then(($el) => {
+          cy.wrap($el).should('have.class', 'correct-choice')
         })
       })
     },

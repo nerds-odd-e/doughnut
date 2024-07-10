@@ -77,6 +77,7 @@ module.exports = {
       bracketSpacing: true,
       printWidth: 80,
       arrowParens: 'always',
+      singleQuote: true,
     }],
   },
 }

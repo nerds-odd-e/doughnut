@@ -24,21 +24,21 @@
 
 /// <reference types="cypress" />
 // @ts-check
-import "@testing-library/cypress/add-commands"
-import "cypress-file-upload"
-import start from "../start"
-import { commonSenseSplit } from "./string_util"
+import '@testing-library/cypress/add-commands'
+import 'cypress-file-upload'
+import start from '../start'
+import { commonSenseSplit } from './string_util'
 
-Cypress.Commands.add("pageIsNotLoading", () => {
-  cy.get(".loading-bar").should("not.exist")
+Cypress.Commands.add('pageIsNotLoading', () => {
+  cy.get('.loading-bar').should('not.exist')
 })
 
-Cypress.Commands.add("loginAs", (username) => {
-  const password = "password"
+Cypress.Commands.add('loginAs', (username) => {
+  const password = 'password'
   const token = btoa(`${username}:${password}`)
   cy.request({
-    method: "GET",
-    url: "/api/healthcheck",
+    method: 'GET',
+    url: '/api/healthcheck',
     headers: {
       Authorization: `Basic ${token}`,
     },
@@ -47,46 +47,46 @@ Cypress.Commands.add("loginAs", (username) => {
   })
 })
 
-Cypress.Commands.add("logout", () => {
+Cypress.Commands.add('logout', () => {
   cy.pageIsNotLoading()
   cy.request({
-    method: "POST",
-    url: "/logout",
+    method: 'POST',
+    url: '/logout',
   }).then((response) => {
     expect(response.status).to.equal(204)
   })
 })
 
-Cypress.Commands.add("dialogDisappeared", () => {
-  cy.get(".modal-body").should("not.exist")
+Cypress.Commands.add('dialogDisappeared', () => {
+  cy.get('.modal-body').should('not.exist')
 })
 
-Cypress.Commands.add("findUserSettingsButton", (userName: string) => {
+Cypress.Commands.add('findUserSettingsButton', (userName: string) => {
   cy.openSidebar()
-  cy.findByRole("button", { name: "User actions" }).click()
-  cy.findByRole("button", { name: `Settings for ${userName}` })
+  cy.findByRole('button', { name: 'User actions' }).click()
+  cy.findByRole('button', { name: `Settings for ${userName}` })
 })
 
-Cypress.Commands.add("expectBreadcrumb", (items: string) => {
-  cy.get(".breadcrumb").within(() =>
-    commonSenseSplit(items, ", ").forEach((noteTopic: string) =>
+Cypress.Commands.add('expectBreadcrumb', (items: string) => {
+  cy.get('.breadcrumb').within(() =>
+    commonSenseSplit(items, ', ').forEach((noteTopic: string) =>
       cy.findByText(noteTopic)
     )
   )
 })
 
-Cypress.Commands.add("clearFocusedText", () => {
+Cypress.Commands.add('clearFocusedText', () => {
   // cy.clear for now is an alias of cy.type('{selectall}{backspace}')
   // it doesn't clear the text sometimes.
   // Invoking it twice seems to solve the problem.
   cy.focused().clear().clear()
 })
 
-Cypress.Commands.add("replaceFocusedTextAndEnter", (text) => {
-  cy.clearFocusedText().type(text).type("{shift}{enter}")
+Cypress.Commands.add('replaceFocusedTextAndEnter', (text) => {
+  cy.clearFocusedText().type(text).type('{shift}{enter}')
 })
 
-Cypress.Commands.add("inPlaceEdit", (noteAttributes) => {
+Cypress.Commands.add('inPlaceEdit', (noteAttributes) => {
   for (const propName in noteAttributes) {
     const value = noteAttributes[propName]
     if (value) {
@@ -97,28 +97,28 @@ Cypress.Commands.add("inPlaceEdit", (noteAttributes) => {
 })
 
 Cypress.Commands.add(
-  "fieldShouldHaveValue",
+  'fieldShouldHaveValue',
   { prevSubject: true },
   ($input: JQuery<HTMLElement>, value: string) => {
-    cy.wrap($input).should("have.value", value)
+    cy.wrap($input).should('have.value', value)
   }
 )
 
 Cypress.Commands.add(
-  "assignFieldValue",
+  'assignFieldValue',
   { prevSubject: true },
   ($input: JQuery<HTMLElement>, value: string) => {
-    if ($input.attr("type") === "file") {
+    if ($input.attr('type') === 'file') {
       cy.fixture(value).then((img) => {
         cy.wrap($input).attachFile({
           fileContent: Cypress.Blob.base64StringToBlob(img),
           fileName: value,
-          mimeType: "image/png",
+          mimeType: 'image/png',
         })
       })
-    } else if ($input.attr("role") === "radiogroup") {
+    } else if ($input.attr('role') === 'radiogroup') {
       cy.clickRadioByLabel(value)
-    } else if ($input.attr("role") === "button") {
+    } else if ($input.attr('role') === 'button') {
       cy.wrap($input).click()
       cy.clickRadioByLabel(value)
     } else {
@@ -127,17 +127,17 @@ Cypress.Commands.add(
   }
 )
 
-Cypress.Commands.add("clickRadioByLabel", (labelText) => {
-  cy.findByText(labelText, { selector: "label" }).click({ force: true })
+Cypress.Commands.add('clickRadioByLabel', (labelText) => {
+  cy.findByText(labelText, { selector: 'label' }).click({ force: true })
 })
 
 Cypress.Commands.add(
-  "expectNoteCards",
+  'expectNoteCards',
   (expectedCards: Record<string, string>[]) => {
-    cy.get(".card-title").should("have.length", expectedCards.length)
+    cy.get('.card-title').should('have.length', expectedCards.length)
     expectedCards.forEach((elem) => {
       for (const propName in elem) {
-        if (propName === "note-topic") {
+        if (propName === 'note-topic') {
           cy.findCardTitle(elem[propName]!)
         } else {
           cy.findByText(elem[propName]!)
@@ -157,7 +157,7 @@ interface RouteParams {
   [key: string]: string | number
 }
 
-type CustomWindow = Omit<Cypress.AUTWindow, "Infinity" | "NaN"> & {
+type CustomWindow = Omit<Cypress.AUTWindow, 'Infinity' | 'NaN'> & {
   Infinity: number
   NaN: number
   router?: {
@@ -166,12 +166,12 @@ type CustomWindow = Omit<Cypress.AUTWindow, "Infinity" | "NaN"> & {
 }
 
 Cypress.Commands.add(
-  "routerPush",
+  'routerPush',
   (fallback: string, name: string, params: RouteParams) => {
-    cy.get("@firstVisited").then((firstVisited) => {
+    cy.get('@firstVisited').then((firstVisited) => {
       // Extract the value from the Cypress subject
       const isFirstVisited =
-        (firstVisited as unknown as { valueOf(): string }).valueOf() === "yes"
+        (firstVisited as unknown as { valueOf(): string }).valueOf() === 'yes'
       cy.window().then(async (win: CustomWindow) => {
         if (win.router && isFirstVisited) {
           try {
@@ -183,18 +183,18 @@ Cypress.Commands.add(
             cy.dialogDisappeared()
             return
           } catch (error) {
-            cy.log("router push failed")
+            cy.log('router push failed')
             cy.log(error as string)
           }
         }
-        cy.wrap("yes").as("firstVisited")
+        cy.wrap('yes').as('firstVisited')
         cy.visit(fallback)
       })
     })
   }
 )
 
-Cypress.Commands.add("clickButtonOnCardBody", (noteTopic, buttonTitle) => {
+Cypress.Commands.add('clickButtonOnCardBody', (noteTopic, buttonTitle) => {
   cy.findCardTitle(noteTopic).then(($card) => {
     cy.wrap($card)
       .parent()
@@ -209,208 +209,208 @@ Cypress.Commands.add("clickButtonOnCardBody", (noteTopic, buttonTitle) => {
   })
 })
 
-Cypress.Commands.add("startSearching", () => {
-  start.assumeNotePage().toolbarButton("search note").click()
+Cypress.Commands.add('startSearching', () => {
+  start.assumeNotePage().toolbarButton('search note').click()
 })
 
-Cypress.Commands.add("expectExactLinkTargets", (targets) => {
-  cy.get(".search-result a.card-title")
-    .then((elms) => Cypress._.map(elms, "innerText"))
-    .should("deep.equal", targets)
+Cypress.Commands.add('expectExactLinkTargets', (targets) => {
+  cy.get('.search-result a.card-title')
+    .then((elms) => Cypress._.map(elms, 'innerText'))
+    .should('deep.equal', targets)
 })
 
 Cypress.Commands.add(
-  "initialReviewOneNoteIfThereIs",
+  'initialReviewOneNoteIfThereIs',
   ({
-    "Review Type": reviewType,
+    'Review Type': reviewType,
     Topic: topic,
-    "Additional Info": additionalInfo,
+    'Additional Info': additionalInfo,
     Skip: skip,
   }) => {
-    if (reviewType === "initial done") {
-      cy.findByText("You have achieved your daily new notes goal.").should(
-        "be.visible"
+    if (reviewType === 'initial done') {
+      cy.findByText('You have achieved your daily new notes goal.').should(
+        'be.visible'
       )
     } else {
-      cy.findByText(topic, { selector: "main *" })
+      cy.findByText(topic, { selector: 'main *' })
       switch (reviewType) {
-        case "single note": {
+        case 'single note': {
           if (additionalInfo) {
-            cy.get(".note-details").should("contain", additionalInfo)
+            cy.get('.note-details').should('contain', additionalInfo)
           }
           break
         }
 
-        case "image note": {
+        case 'image note': {
           if (additionalInfo) {
             const [expectedDetails, expectedImage] = commonSenseSplit(
               additionalInfo,
-              "; "
+              '; '
             )
-            cy.get(".note-details").should("contain", expectedDetails)
-            cy.get("#note-image")
-              .find("img")
-              .should("have.attr", "src")
-              .should("include", expectedImage)
+            cy.get('.note-details').should('contain', expectedDetails)
+            cy.get('#note-image')
+              .find('img')
+              .should('have.attr', 'src')
+              .should('include', expectedImage)
           }
           break
         }
 
-        case "link": {
+        case 'link': {
           if (additionalInfo) {
             const [linkType, targetNote] = commonSenseSplit(
               additionalInfo,
-              "; "
+              '; '
             )
-            if (typeof topic === "string") {
+            if (typeof topic === 'string') {
               cy.findByText(topic)
             }
 
-            if (typeof targetNote === "string") {
+            if (typeof targetNote === 'string') {
               cy.findByText(targetNote)
             }
 
-            if (typeof linkType === "string") {
-              cy.get(".link-type").contains(linkType)
+            if (typeof linkType === 'string') {
+              cy.get('.link-type').contains(linkType)
             }
           }
           break
         }
 
         default:
-          expect(reviewType).equal("a known review page type")
+          expect(reviewType).equal('a known review page type')
       }
-      if (skip === "yes") {
-        cy.findByText("Skip repetition").click()
-        cy.findByRole("button", { name: "OK" }).click()
+      if (skip === 'yes') {
+        cy.findByText('Skip repetition').click()
+        cy.findByRole('button', { name: 'OK' }).click()
       } else {
-        cy.findByText("Keep for repetition").click()
+        cy.findByText('Keep for repetition').click()
       }
     }
   }
 )
 
-Cypress.Commands.add("findCardTitle", (topic) =>
-  cy.findByText(topic, { selector: ".card-title .topic-text" })
+Cypress.Commands.add('findCardTitle', (topic) =>
+  cy.findByText(topic, { selector: '.card-title .topic-text' })
 )
 
-Cypress.Commands.add("yesIRemember", () => {
-  cy.findByRole("button", { name: "Yes, I remember" })
+Cypress.Commands.add('yesIRemember', () => {
+  cy.findByRole('button', { name: 'Yes, I remember' })
   cy.tick(11 * 1000).then(() => {
-    cy.findByRole("button", { name: "Yes, I remember" }).click({})
+    cy.findByRole('button', { name: 'Yes, I remember' }).click({})
   })
 })
 
-Cypress.Commands.add("openSidebar", () => {
+Cypress.Commands.add('openSidebar', () => {
   start.routerToNotebooksPage()
   cy.pageIsNotLoading()
-  cy.findByRole("button", { name: "open sidebar" }).click({ force: true })
+  cy.findByRole('button', { name: 'open sidebar' }).click({ force: true })
 })
 
-Cypress.Commands.add("routerToInitialReview", () => {
-  cy.routerPush("/reviews/initial", "initial", {})
+Cypress.Commands.add('routerToInitialReview', () => {
+  cy.routerPush('/reviews/initial', 'initial', {})
 })
 
-Cypress.Commands.add("routerToRoot", () => {
-  cy.routerPush("/", "root", {})
+Cypress.Commands.add('routerToRoot', () => {
+  cy.routerPush('/', 'root', {})
 })
 
-Cypress.Commands.add("routerToReviews", () => {
+Cypress.Commands.add('routerToReviews', () => {
   cy.routerToRoot()
-  cy.routerPush("/reviews", "reviews", {})
+  cy.routerPush('/reviews', 'reviews', {})
 })
 
-Cypress.Commands.add("routerToRepeatReview", () => {
-  cy.routerPush("/reviews/repeat", "repeat", {})
+Cypress.Commands.add('routerToRepeatReview', () => {
+  cy.routerPush('/reviews/repeat', 'repeat', {})
 })
 
-Cypress.Commands.add("initialReviewInSequence", (reviews) => {
+Cypress.Commands.add('initialReviewInSequence', (reviews) => {
   cy.routerToInitialReview()
   reviews.forEach((initialReview: string) => {
     cy.initialReviewOneNoteIfThereIs(initialReview)
   })
 })
 
-Cypress.Commands.add("initialReviewNotes", (noteTopics: string) => {
+Cypress.Commands.add('initialReviewNotes', (noteTopics: string) => {
   cy.initialReviewInSequence(
-    commonSenseSplit(noteTopics, ", ").map((topic: string) => {
+    commonSenseSplit(noteTopics, ', ').map((topic: string) => {
       return {
-        "Review Type": topic === "end" ? "initial done" : "single note",
+        'Review Type': topic === 'end' ? 'initial done' : 'single note',
         Topic: topic,
       }
     })
   )
 })
 
-Cypress.Commands.add("repeatReviewNotes", (noteTopics: string) => {
-  commonSenseSplit(noteTopics, ",").forEach((topic) => {
-    if (topic === "end") {
+Cypress.Commands.add('repeatReviewNotes', (noteTopics: string) => {
+  commonSenseSplit(noteTopics, ',').forEach((topic) => {
+    if (topic === 'end') {
       cy.findByText(
-        "You have finished all repetitions for this half a day!"
-      ).should("be.visible")
+        'You have finished all repetitions for this half a day!'
+      ).should('be.visible')
     } else {
-      cy.findByText(topic, { selector: "h2 *" })
+      cy.findByText(topic, { selector: 'h2 *' })
       cy.yesIRemember()
     }
   })
 })
 
-Cypress.Commands.add("goAndRepeatReviewNotes", (noteTopics: string) => {
-  if (noteTopics.trim() === "") return
+Cypress.Commands.add('goAndRepeatReviewNotes', (noteTopics: string) => {
+  if (noteTopics.trim() === '') return
   cy.routerToRepeatReview()
   cy.repeatReviewNotes(noteTopics)
 })
 
-Cypress.Commands.add("repeatMore", () => {
+Cypress.Commands.add('repeatMore', () => {
   cy.routerToRepeatReview()
-  cy.findByRole("button", { name: "Load more from next 3 days" }).click()
+  cy.findByRole('button', { name: 'Load more from next 3 days' }).click()
 })
 
 Cypress.Commands.add(
-  "shouldSeeQuizWithOptions",
+  'shouldSeeQuizWithOptions',
   (questionParts: string[], options: string) => {
     questionParts.forEach((part) => {
-      cy.get(".quiz-instruction").contains(part)
+      cy.get('.quiz-instruction').contains(part)
     })
-    commonSenseSplit(options, ",").forEach((option: string) =>
+    commonSenseSplit(options, ',').forEach((option: string) =>
       cy.findByText(option)
     )
   }
 )
 
-Cypress.Commands.add("formField", (label) => {
+Cypress.Commands.add('formField', (label) => {
   return cy.findByLabelText(label)
 })
 
-Cypress.Commands.add("searchNote", (searchKey: string, options: string[]) => {
+Cypress.Commands.add('searchNote', (searchKey: string, options: string[]) => {
   options?.forEach((option: string) => cy.formField(option).check())
-  cy.findByPlaceholderText("Search").clear().type(searchKey)
+  cy.findByPlaceholderText('Search').clear().type(searchKey)
   cy.tick(500)
 })
 
-Cypress.Commands.add("failure", () => {
-  throw new Error("Deliberate CYPRESS test Failure!!!")
+Cypress.Commands.add('failure', () => {
+  throw new Error('Deliberate CYPRESS test Failure!!!')
 })
 
-Cypress.Commands.add("undoLast", (undoType: string) => {
+Cypress.Commands.add('undoLast', (undoType: string) => {
   cy.findByTitle(`undo ${undoType}`).click()
   cy.pageIsNotLoading()
 })
 
-Cypress.Commands.add("deleteNoteViaAPI", { prevSubject: true }, (subject) => {
+Cypress.Commands.add('deleteNoteViaAPI', { prevSubject: true }, (subject) => {
   cy.request({
-    method: "POST",
+    method: 'POST',
     url: `/api/notes/${subject}/delete`,
   }).then((response) => {
     expect(response.status).to.equal(200)
   })
 })
 
-Cypress.Commands.add("noteByTitle", (noteTopic: string) => {
+Cypress.Commands.add('noteByTitle', (noteTopic: string) => {
   return cy
     .findCardTitle(noteTopic)
     .parent()
-    .invoke("attr", "href")
+    .invoke('attr', 'href')
     .then(($attr) => {
       const match = /n(\d+)/g.exec($attr as string)?.[1]
       if (match) {
@@ -421,16 +421,16 @@ Cypress.Commands.add("noteByTitle", (noteTopic: string) => {
 })
 
 Cypress.Commands.add(
-  "expectFieldErrorMessage",
+  'expectFieldErrorMessage',
   (field: string, message: string) => {
-    cy.formField(field).siblings(".error-msg").findByText(message)
+    cy.formField(field).siblings('.error-msg').findByText(message)
   }
 )
 
-Cypress.Commands.add("expectAMapTo", (latitude: string, longitude: string) => {
+Cypress.Commands.add('expectAMapTo', (latitude: string, longitude: string) => {
   cy.findByText(`Location: ${latitude}'N, ${longitude}'E`)
 })
 
-Cypress.Commands.add("dismissLastErrorMessage", () => {
-  cy.get(".last-error-message").click({ force: true })
+Cypress.Commands.add('dismissLastErrorMessage', () => {
+  cy.get('.last-error-message').click({ force: true })
 })

@@ -1,14 +1,14 @@
-import { assumeNotePage } from "./notePage"
+import { assumeNotePage } from './notePage'
 
 const assumeAnsweredQuestionPage = () => {
   return {
     expectLastAnswerToBeCorrect() {
       // checking the css name isn't the best solution
       // but the text changes
-      cy.get(".alert-success").should("exist")
+      cy.get('.alert-success').should('exist')
     },
     showReviewPoint(noteTopic?: string) {
-      cy.findByText("Review Point:").click()
+      cy.findByText('Review Point:').click()
       if (noteTopic) {
         assumeNotePage(noteTopic)
       }
@@ -16,21 +16,21 @@ const assumeAnsweredQuestionPage = () => {
         expectReviewPointInfo(attrs: { [key: string]: string }) {
           for (const k in attrs) {
             cy.contains(k)
-              .findByText(attrs[k] ?? "")
-              .should("be.visible")
+              .findByText(attrs[k] ?? '')
+              .should('be.visible')
           }
         },
         removeReviewPointFromReview() {
-          cy.findByRole("button", {
-            name: "remove this note from review",
+          cy.findByRole('button', {
+            name: 'remove this note from review',
           }).click()
-          cy.findByRole("button", { name: "OK" }).click()
-          cy.findByText("This review point has been removed from reviewing.")
+          cy.findByRole('button', { name: 'OK' }).click()
+          cy.findByText('This review point has been removed from reviewing.')
         },
       }
     },
     goToLastResult: () => {
-      cy.findByRole("button", { name: "view last result" }).click()
+      cy.findByRole('button', { name: 'view last result' }).click()
       return assumeAnsweredQuestionPage()
     },
   }

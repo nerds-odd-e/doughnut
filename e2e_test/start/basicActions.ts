@@ -1,19 +1,19 @@
-import { assumeAnsweredQuestionPage } from "./pageObjects/AnsweredQuestionPage"
+import { assumeAnsweredQuestionPage } from './pageObjects/AnsweredQuestionPage'
 import {
   assumeAssessmentPage,
   assumeAssessmentResultPage,
-} from "./pageObjects/AssessmentPage"
-import { assumeQuestionPage } from "./pageObjects/QuizQuestionPage"
-import { assumeAdminDashboardPage } from "./pageObjects/adminPages/adminDashboardPage"
-import { navigateToBazaar } from "./pageObjects/bazaarPage"
-import { assumeChatAboutNotePage } from "./pageObjects/chatAboutNotePage"
-import { navigateToCircle } from "./pageObjects/circlePage"
-import { navigateToAssessmentHistory } from "./pageObjects/AssessmentHistoryPage"
-import { assumeClarifyingQuestionDialog } from "./pageObjects/clarifyingQuestionDialog"
-import { assumeNotePage } from "./pageObjects/notePage"
-import { routerToNotebooksPage } from "./pageObjects/notebooksPage"
-import { sidebar } from "./pageObjects/sidebar"
-import testability from "./testability"
+} from './pageObjects/AssessmentPage'
+import { assumeQuestionPage } from './pageObjects/QuizQuestionPage'
+import { assumeAdminDashboardPage } from './pageObjects/adminPages/adminDashboardPage'
+import { navigateToBazaar } from './pageObjects/bazaarPage'
+import { assumeChatAboutNotePage } from './pageObjects/chatAboutNotePage'
+import { navigateToCircle } from './pageObjects/circlePage'
+import { navigateToAssessmentHistory } from './pageObjects/AssessmentHistoryPage'
+import { assumeClarifyingQuestionDialog } from './pageObjects/clarifyingQuestionDialog'
+import { assumeNotePage } from './pageObjects/notePage'
+import { routerToNotebooksPage } from './pageObjects/notebooksPage'
+import { sidebar } from './pageObjects/sidebar'
+import testability from './testability'
 
 export default {
   navigateToBazaar,
@@ -37,7 +37,7 @@ export default {
       .then((noteId) => {
         const url = `/n${noteId}`
         if (forceLoadPage) cy.visit(url)
-        else cy.routerPush(url, "noteShow", { noteId: noteId })
+        else cy.routerPush(url, 'noteShow', { noteId: noteId })
       })
 
     return assumeNotePage(noteTopic)
@@ -45,13 +45,13 @@ export default {
 
   loginAsAdmin: () => {
     cy.logout()
-    cy.loginAs("admin")
+    cy.loginAs('admin')
   },
 
   goToAdminDashboard: () => {
     cy.reload()
     cy.openSidebar()
-    cy.findByText("Admin Dashboard").click()
+    cy.findByText('Admin Dashboard').click()
     return assumeAdminDashboardPage()
   },
 

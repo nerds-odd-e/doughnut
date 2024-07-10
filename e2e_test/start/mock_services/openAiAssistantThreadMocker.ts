@@ -1,6 +1,6 @@
-import ServiceMocker from "../../support/ServiceMocker"
-import { MessageToMatch } from "./MessageToMatch"
-import openAiAssistantCreatedRunMocker from "./openAiAssistantCreatedRunMocker"
+import ServiceMocker from '../../support/ServiceMocker'
+import { MessageToMatch } from './MessageToMatch'
+import openAiAssistantCreatedRunMocker from './openAiAssistantCreatedRunMocker'
 
 const openAiAssistantThreadMocker = (
   serviceMocker: ServiceMocker,
@@ -25,7 +25,7 @@ const openAiAssistantThreadMocker = (
         undefined,
         [
           {
-            id: "msg-abc123",
+            id: 'msg-abc123',
           },
         ]
       )

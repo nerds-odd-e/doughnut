@@ -7,15 +7,15 @@ const assumeQuestionSection = () => {
       return this.getQuestionSection()
         .get('[data-test="stem"]')
         .first()
-        .invoke("text")
+        .invoke('text')
     },
     answerFirstOption() {
-      return this.getQuestionSection().get("button").first().click()
+      return this.getQuestionSection().get('button').first().click()
     },
     answerFromTable(answersTable: Record<string, string>[]) {
       return this.getStemText().then((stem) => {
         const row = answersTable.find((row) => row.question === stem)
-        return this.answer(row!.answer ?? "")
+        return this.answer(row!.answer ?? '')
       })
     },
     answer(answer: string) {
@@ -31,7 +31,7 @@ const assumeQuestionSection = () => {
 
 export const assumeAssessmentPage = (notebook?: string) => {
   if (notebook) {
-    cy.findByRole("heading", { name: `Assessment For ${notebook}` })
+    cy.findByRole('heading', { name: `Assessment For ${notebook}` })
   }
 
   return {
@@ -45,13 +45,13 @@ export const assumeAssessmentPage = (notebook?: string) => {
     },
     answerQuestionsFromTable(answersTable: Record<string, string>[]) {
       const tryContinueAssessment = () => {
-        return cy.get("body").then(($body) => {
-          if ($body.find(".quiz-instruction").length > 0) {
+        return cy.get('body').then(($body) => {
+          if ($body.find('.quiz-instruction').length > 0) {
             return this.assumeQuestionSection()
               .answerFromTable(answersTable)
               .then(tryContinueAssessment)
           } else {
-            return cy.log("No more questions to answer.")
+            return cy.log('No more questions to answer.')
           }
         })
       }
@@ -64,13 +64,13 @@ export const assumeAssessmentPage = (notebook?: string) => {
 }
 
 export const assumeAssessmentResultPage = () => {
-  cy.findByRole("heading", {
-    name: "Improve your knowledge by studying these notes",
+  cy.findByRole('heading', {
+    name: 'Improve your knowledge by studying these notes',
   })
 
   return {
     expectCardFor(noteName: string) {
-      cy.get(".card-body").should("contain", noteName)
+      cy.get('.card-body').should('contain', noteName)
     },
   }
 }

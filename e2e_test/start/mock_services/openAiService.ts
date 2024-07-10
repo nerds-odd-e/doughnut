@@ -1,8 +1,8 @@
-import ServiceMocker from "../../support/ServiceMocker"
-import testability from "../testability"
-import { MessageToMatch } from "./MessageToMatch"
-import createOpenAiChatCompletionMock from "./createOpenAiChatCompletionMock"
-import openAiAssistantThreadMocker from "./openAiAssistantThreadMocker"
+import ServiceMocker from '../../support/ServiceMocker'
+import testability from '../testability'
+import { MessageToMatch } from './MessageToMatch'
+import createOpenAiChatCompletionMock from './createOpenAiChatCompletionMock'
+import openAiAssistantThreadMocker from './openAiAssistantThreadMocker'
 
 type RunStreamData = {
   runId: string
@@ -10,7 +10,7 @@ type RunStreamData = {
 }
 
 const openAiService = () => {
-  const serviceMocker = new ServiceMocker("openAi", 5001)
+  const serviceMocker = new ServiceMocker('openAi', 5001)
   return {
     mock() {
       testability().mockService(serviceMocker)
@@ -32,9 +32,9 @@ const openAiService = () => {
         created: 1589478378,
         data: [
           {
-            url: "https://moon",
+            url: 'https://moon',
             b64_json:
-              "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
+              'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=',
           },
         ],
       })
@@ -47,10 +47,10 @@ const openAiService = () => {
     async alwaysResponseAsUnauthorized() {
       await serviceMocker.install()
       await serviceMocker.stubPosterUnauthorized(`/*`, {
-        status: "BAD_REQUEST",
-        message: "nah nah nah, you need a valid token",
+        status: 'BAD_REQUEST',
+        message: 'nah nah nah, you need a valid token',
         error: {
-          "OpenAi Error": "BAD_REQUEST",
+          'OpenAi Error': 'BAD_REQUEST',
         },
       })
     },
@@ -58,25 +58,25 @@ const openAiService = () => {
     stubOpenAiUploadResponse(shouldSuccess: boolean) {
       if (shouldSuccess) {
         return serviceMocker.stubPoster(`/files`, {
-          id: "file-abc123",
-          object: "file",
+          id: 'file-abc123',
+          object: 'file',
           bytes: 175,
           created_at: 1613677385,
-          filename: "Question-%s.jsonl",
-          purpose: "fine-tune",
+          filename: 'Question-%s.jsonl',
+          purpose: 'fine-tune',
         })
       } else {
-        return serviceMocker.stubPosterWithError500Response("/v1/files", {})
+        return serviceMocker.stubPosterWithError500Response('/v1/files', {})
       }
     },
 
     stubOpenAiVectorFileUpload() {
-      const vectorStoreId = "vector-store-abc123"
+      const vectorStoreId = 'vector-store-abc123'
       serviceMocker.stubPoster(`/vector_stores`, {
         id: vectorStoreId,
       })
       serviceMocker.stubPoster(`/vector_stores/${vectorStoreId}/files`, {
-        id: "vector-file-1",
+        id: 'vector-file-1',
       })
     },
 
@@ -105,19 +105,19 @@ const openAiService = () => {
 
     stubAIChat(messages: Record<string, string>[], assistantId?: string) {
       const thread = this.stubCreateThread(
-        "thread-abc123"
+        'thread-abc123'
       ).stubCreateRunStreams(
-        "thread-abc123",
+        'thread-abc123',
         assistantId,
         messages.map((row) => ({
-          runId: row["run id"]!,
-          fullMessage: row["assistant reply"]!,
+          runId: row['run id']!,
+          fullMessage: row['assistant reply']!,
         }))
       )
       messages.forEach((row) => {
         const userMessage: MessageToMatch = {
-          role: "user",
-          content: row["user message"]!,
+          role: 'user',
+          content: row['user message']!,
         }
         thread.stubCreateMessage(userMessage)
       })
@@ -135,7 +135,7 @@ const openAiService = () => {
         `/threads/${threadId}/runs`,
         runIds.map((runId) => ({
           id: runId,
-          status: "queued",
+          status: 'queued',
         }))
       )
       return openAiAssistantThreadMocker(serviceMocker, threadId, runIds)
@@ -148,7 +148,7 @@ const openAiService = () => {
     ) {
       const bodyToMatch = {}
       if (assistantId) {
-        bodyToMatch["assistant_id"] = assistantId
+        bodyToMatch['assistant_id'] = assistantId
       }
       serviceMocker.mockPostMatchsAndNotMatches(
         `/threads/${threadId}/runs`,
@@ -167,35 +167,35 @@ data: {"run_id": "${runId}", "status": "completed"}
 
 `
         ),
-        { "Content-Type": "text/event-stream" }
+        { 'Content-Type': 'text/event-stream' }
       )
       return openAiAssistantThreadMocker(serviceMocker, threadId, [])
     },
 
     async stubFineTuningStatus(successful: boolean) {
       return await serviceMocker.stubPoster(`/fine_tuning/jobs`, {
-        object: "fine_tuning.job",
-        id: "ftjob-abc123",
-        model: "gpt-3.5-turbo-0613",
+        object: 'fine_tuning.job',
+        id: 'ftjob-abc123',
+        model: 'gpt-3.5-turbo-0613',
         created_at: 1614807352,
         fine_tuned_model: null,
-        organization_id: "org-123",
+        organization_id: 'org-123',
         result_files: [],
-        status: successful ? "queued" : "failed",
+        status: successful ? 'queued' : 'failed',
         validation_file: null,
-        training_file: "file-abc123",
+        training_file: 'file-abc123',
       })
     },
 
     async stubGetModels(modelNames: string) {
       return await serviceMocker.stubGetter(`/models`, undefined, {
-        object: "list",
-        data: modelNames.split(",").map((modelName) => {
+        object: 'list',
+        data: modelNames.split(',').map((modelName) => {
           return {
             id: modelName.trim(),
-            object: "model",
+            object: 'model',
             created: 1614807352,
-            owned_by: "openai",
+            owned_by: 'openai',
           }
         }),
       })

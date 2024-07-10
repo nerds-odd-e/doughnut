@@ -1,10 +1,10 @@
 export type TextMessageToMatch = {
-  role?: "user" | "assistant" | "system"
+  role?: 'user' | 'assistant' | 'system'
   content: string
 }
 
 export type ToolCallToMatch = {
-  role: "tool" | "function"
+  role: 'tool' | 'function'
   content?: string
   name: string
 }

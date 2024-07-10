@@ -5,7 +5,7 @@ import {
   Predicate,
   Response,
   Stub,
-} from "@anev/ts-mountebank"
+} from '@anev/ts-mountebank'
 /// <reference types="cypress" />
 
 // @ts-check
@@ -21,7 +21,7 @@ class MountebankStubBuilder {
     responses.forEach((response) => {
       const resp = new Response().withStatusCode(200)
 
-      if (typeof response === "string") resp.withBody(response)
+      if (typeof response === 'string') resp.withBody(response)
       else resp.withJSONBody(response)
 
       if (headers !== undefined) {

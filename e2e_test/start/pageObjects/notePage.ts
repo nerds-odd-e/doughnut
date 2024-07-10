@@ -1,8 +1,8 @@
-import { commonSenseSplit } from "support/string_util"
-import submittableForm from "../submittableForm"
-import { assumeChatAboutNotePage } from "./chatAboutNotePage"
-import noteCreationForm from "./noteForms/noteCreationForm"
-import { questionListPage } from "./questionListPage"
+import { commonSenseSplit } from 'support/string_util'
+import submittableForm from '../submittableForm'
+import { assumeChatAboutNotePage } from './chatAboutNotePage'
+import noteCreationForm from './noteForms/noteCreationForm'
+import { questionListPage } from './questionListPage'
 
 function filterAttributes(
   attributes: Record<string, string>,
@@ -24,14 +24,14 @@ function filterAttributes(
 
 export const assumeNotePage = (noteTopic?: string) => {
   const findNoteTopic = (topic) =>
-    cy.findByText(topic, { selector: "[role=topic] *" })
+    cy.findByText(topic, { selector: '[role=topic] *' })
 
   if (noteTopic) {
     findNoteTopic(noteTopic)
   }
 
   const privateToolbarButton = (btnTextOrTitle: string) => {
-    const getButton = () => cy.findByRole("button", { name: btnTextOrTitle })
+    const getButton = () => cy.findByRole('button', { name: btnTextOrTitle })
     return {
       click: () => {
         getButton().click()
@@ -39,37 +39,37 @@ export const assumeNotePage = (noteTopic?: string) => {
       },
       clickIfNotOpen: () => {
         getButton().then(($btn) => {
-          if ($btn.attr("aria-expanded") === "false") {
+          if ($btn.attr('aria-expanded') === 'false') {
             cy.wrap($btn).click()
           }
         })
       },
-      shouldNotExist: () => getButton().should("not.exist"),
+      shouldNotExist: () => getButton().should('not.exist'),
     }
   }
 
   const clickNotePageMoreOptionsButton = (btnTextOrTitle: string) => {
-    privateToolbarButton("more options").click()
+    privateToolbarButton('more options').click()
     privateToolbarButton(btnTextOrTitle).click()
   }
 
   return {
     navigateToChild: (noteTopic: string) => {
-      cy.get("main").within(() => {
+      cy.get('main').within(() => {
         cy.findCardTitle(noteTopic).click()
       })
       return assumeNotePage(noteTopic)
     },
     collapseChildren: () => {
-      cy.get("main").within(() => {
-        cy.findByRole("button", { name: "collapse children" }).click()
+      cy.get('main').within(() => {
+        cy.findByRole('button', { name: 'collapse children' }).click()
       })
     },
     expandChildren: () => {
-      cy.findByRole("button", { name: "expand children" }).click()
+      cy.findByRole('button', { name: 'expand children' }).click()
     },
     expectChildren: (children: Record<string, string>[]) => {
-      cy.get("main").within(() => {
+      cy.get('main').within(() => {
         cy.expectNoteCards(children)
       })
     },
@@ -77,18 +77,18 @@ export const assumeNotePage = (noteTopic?: string) => {
     linkNoteTo: (target: string) => {
       const findLink = () =>
         cy
-          .findByText(target, { selector: "main .topic-text" })
+          .findByText(target, { selector: 'main .topic-text' })
           .parent()
           .parent()
           .parent()
       return {
         linkType: (linkType: string) => {
           findLink().findAllByText(linkType, {
-            selector: ".link-type",
+            selector: '.link-type',
           })
         },
         goto: () => {
-          findLink().get(".link-type").click()
+          findLink().get('.link-type').click()
         },
       }
     },
@@ -105,49 +105,49 @@ export const assumeNotePage = (noteTopic?: string) => {
       linkType: string,
       targetNoteTopics: string
     ) {
-      cy.get("main").within(() => {
-        commonSenseSplit(targetNoteTopics, ",").forEach((target) => {
+      cy.get('main').within(() => {
+        commonSenseSplit(targetNoteTopics, ',').forEach((target) => {
           this.expectLinkingTopic(linkType, target)
         })
       })
     },
     changeLinkType: function (linkType: string, target: string) {
-      cy.findByRole("topic").click()
+      cy.findByRole('topic').click()
       cy.clickRadioByLabel(linkType)
       cy.pageIsNotLoading()
       this.expectLinkingTopic(linkType, target)
     },
 
     navigateToReference: (referenceTopic: string) => {
-      cy.get("main").within(() => {
+      cy.get('main').within(() => {
         cy.findByText(referenceTopic, {
-          selector: ".link-link .topic-text",
+          selector: '.link-link .topic-text',
         }).click()
       })
       return assumeNotePage()
     },
     collapsedChildrenWithCount: (count: number) => {
-      cy.findByText(count, { selector: "[role=collapsed-children-count]" })
+      cy.findByText(count, { selector: '[role=collapsed-children-count]' })
     },
     findNoteDetails: (expected: string) => {
       expected
-        .split("\\n")
-        .forEach((line) => cy.get("[role=details]").should("contain", line))
+        .split('\\n')
+        .forEach((line) => cy.get('[role=details]').should('contain', line))
     },
     toolbarButton: (btnTextOrTitle: string) => {
       return privateToolbarButton(btnTextOrTitle)
     },
     editNoteImage() {
-      return this.toolbarButton("edit note image")
+      return this.toolbarButton('edit note image')
     },
     editAudioButton() {
-      return this.toolbarButton("Upload audio")
+      return this.toolbarButton('Upload audio')
     },
     downloadAudioFile(fileName: string) {
-      const downloadsFolder = Cypress.config("downloadsFolder")
-      cy.findByRole("button", { name: `Download ${fileName}` }).click()
-      cy.task("fileShouldExistSoon", `${downloadsFolder}/${fileName}`).should(
-        "equal",
+      const downloadsFolder = Cypress.config('downloadsFolder')
+      cy.findByRole('button', { name: `Download ${fileName}` }).click()
+      cy.task('fileShouldExistSoon', `${downloadsFolder}/${fileName}`).should(
+        'equal',
         true
       )
     },
@@ -156,38 +156,38 @@ export const assumeNotePage = (noteTopic?: string) => {
         .click()
         .submitWith(
           filterAttributes(attributes, [
-            "Upload Image",
-            "Image Url",
-            "Use Parent Image",
+            'Upload Image',
+            'Image Url',
+            'Use Parent Image',
           ])
         )
       return this
     },
     updateNoteUrl(attributes: Record<string, string>) {
-      this.toolbarButton("edit note url")
+      this.toolbarButton('edit note url')
         .click()
-        .submitWith(filterAttributes(attributes, ["Url"]))
+        .submitWith(filterAttributes(attributes, ['Url']))
       return this
     },
 
     startSearchingAndLinkNote() {
-      this.toolbarButton("search and link note").click()
+      this.toolbarButton('search and link note').click()
     },
     addingChildNote() {
       cy.pageIsNotLoading()
-      this.toolbarButton("Add Child Note").click()
+      this.toolbarButton('Add Child Note').click()
       return noteCreationForm
     },
     aiGenerateImage() {
-      clickNotePageMoreOptionsButton("Generate Image with DALL-E")
+      clickNotePageMoreOptionsButton('Generate Image with DALL-E')
     },
     deleteNote() {
-      clickNotePageMoreOptionsButton("Delete note")
-      cy.findByRole("button", { name: "OK" }).click()
+      clickNotePageMoreOptionsButton('Delete note')
+      cy.findByRole('button', { name: 'OK' }).click()
       cy.pageIsNotLoading()
     },
     openQuestionList() {
-      clickNotePageMoreOptionsButton("Questions for the note")
+      clickNotePageMoreOptionsButton('Questions for the note')
       return questionListPage()
     },
     addQuestion(row: Record<string, string>) {
@@ -199,7 +199,7 @@ export const assumeNotePage = (noteTopic?: string) => {
     toggleApproval(question: string) {
       this.openQuestionList()
       cy.findByText(question)
-        .parent("tr")
+        .parent('tr')
         .find('input[type="checkbox"]')
         .click()
     },
@@ -207,41 +207,41 @@ export const assumeNotePage = (noteTopic?: string) => {
       this.openQuestionList().expectQuestion(expectedQuestions)
     },
     aiSuggestDetailsForNote: () => {
-      cy.on("uncaught:exception", () => {
+      cy.on('uncaught:exception', () => {
         return false
       })
-      cy.findByRole("button", { name: "auto-complete details" }).click()
+      cy.findByRole('button', { name: 'auto-complete details' }).click()
     },
     chatAboutNote() {
-      this.toolbarButton("Chat with AI").click()
+      this.toolbarButton('Chat with AI').click()
       return assumeChatAboutNotePage()
     },
     moveUpAmongSiblings() {
       cy.pageIsNotLoading()
-      this.toolbarButton("Move up").click()
+      this.toolbarButton('Move up').click()
     },
     moveDownAmongSiblings() {
       cy.pageIsNotLoading()
-      this.toolbarButton("Move down").click()
+      this.toolbarButton('Move down').click()
     },
     wikidataOptions() {
       const openWikidataOptions = () =>
-        privateToolbarButton("wikidata options").clickIfNotOpen()
+        privateToolbarButton('wikidata options').clickIfNotOpen()
 
       return {
         associate(wikiID: string) {
-          privateToolbarButton("associate wikidata").click()
+          privateToolbarButton('associate wikidata').click()
           cy.replaceFocusedTextAndEnter(wikiID)
         },
         reassociationWith(wikiID: string) {
           openWikidataOptions()
-          privateToolbarButton("Edit Wikidata Id").click()
+          privateToolbarButton('Edit Wikidata Id').click()
           cy.replaceFocusedTextAndEnter(wikiID)
         },
         hasAssociation() {
           openWikidataOptions()
           const elm = () => {
-            return cy.findByRole("button", { name: "Go to Wikidata" })
+            return cy.findByRole('button', { name: 'Go to Wikidata' })
           }
           elm()
 
@@ -252,9 +252,9 @@ export const assumeNotePage = (noteTopic?: string) => {
                   location: { href: undefined },
                   focus: cy.stub(),
                 }
-                cy.stub(win, "open").as("open").returns(popupWindowStub)
+                cy.stub(win, 'open').as('open').returns(popupWindowStub)
                 elm().click()
-                cy.get("@open").should("have.been.calledWith", "")
+                cy.get('@open').should('have.been.calledWith', '')
                 // using a callback so that cypress can wait until the stubbed value is assigned
                 cy.wrap(() => popupWindowStub.location.href)
                   .should((cb) => expect(cb()).equal(url))

@@ -1,8 +1,8 @@
-import ServiceMocker from "../../support/ServiceMocker"
+import ServiceMocker from '../../support/ServiceMocker'
 import WikidataEntitiesBuilder, {
   Claim,
-} from "../../support/json/WikidataEntitiesBuilder"
-import testability from "../testability"
+} from '../../support/json/WikidataEntitiesBuilder'
+import testability from '../testability'
 
 const stubWikidataApi = (
   serviceMocker: ServiceMocker,
@@ -20,14 +20,14 @@ const stubWikidataEntity = (
 ) => {
   stubWikidataApi(
     serviceMocker,
-    "wbgetentities",
+    'wbgetentities',
     { ids: wikidataId },
     new WikidataEntitiesBuilder(wikidataId).wclaims(claims).build()
   )
 }
 
 const wikidataService = () => {
-  const serviceMocker = new ServiceMocker("wikidata", 5002)
+  const serviceMocker = new ServiceMocker('wikidata', 5002)
   return {
     mock() {
       testability().mockService(serviceMocker)
@@ -42,14 +42,14 @@ const wikidataService = () => {
       wikipediaLink: string | undefined
     ) {
       const wikipedia = wikipediaLink
-        ? { enwiki: { site: "enwiki", url: wikipediaLink } }
+        ? { enwiki: { site: 'enwiki', url: wikipediaLink } }
         : {}
       serviceMocker.stubByUrl(`/wiki/Special:EntityData/${wikidataId}.json`, {
         entities: {
           [wikidataId]: {
             labels: {
               en: {
-                language: "en",
+                language: 'en',
                 value: wikidataTitle,
               },
             },
@@ -66,8 +66,8 @@ const wikidataService = () => {
     ) {
       stubWikidataEntity(serviceMocker, wikidataId, [
         {
-          claimId: "P625",
-          type: "globecoordinate",
+          claimId: 'P625',
+          type: 'globecoordinate',
           value: { latitude, longitude },
         },
       ])
@@ -79,9 +79,9 @@ const wikidataService = () => {
       birthday: string
     ) {
       stubWikidataEntity(serviceMocker, wikidataId, [
-        { claimId: "P31", type: "wikibase-entityid", value: { id: "Q5" } },
-        { claimId: "P569", type: "time", value: { time: birthday } },
-        { claimId: "P27", type: "wikibase-entityid", value: { id: countryId } },
+        { claimId: 'P31', type: 'wikibase-entityid', value: { id: 'Q5' } },
+        { claimId: 'P569', type: 'time', value: { time: birthday } },
+        { claimId: 'P27', type: 'wikibase-entityid', value: { id: countryId } },
       ])
     },
 
@@ -93,8 +93,8 @@ const wikidataService = () => {
         serviceMocker,
         wikidataId,
         authorWikidataIds.map((id) => ({
-          claimId: "P50",
-          type: "wikibase-entityid",
+          claimId: 'P50',
+          type: 'wikibase-entityid',
           value: { id },
         }))
       )
@@ -103,7 +103,7 @@ const wikidataService = () => {
     stubWikidataSearchResult(wikidataLabel: string, wikidataId: string) {
       stubWikidataApi(
         serviceMocker,
-        "wbsearchentities",
+        'wbsearchentities',
         {},
         {
           search: [

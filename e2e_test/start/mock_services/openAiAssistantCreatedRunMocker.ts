@@ -1,5 +1,5 @@
-import ServiceMocker from "../../support/ServiceMocker"
-import { MessageToMatch } from "./MessageToMatch"
+import ServiceMocker from '../../support/ServiceMocker'
+import { MessageToMatch } from './MessageToMatch'
 
 const openAiAssistantCreatedRunMocker = (
   serviceMocker: ServiceMocker,
@@ -11,7 +11,7 @@ const openAiAssistantCreatedRunMocker = (
       const responses = [
         {
           id: runId,
-          status: "completed",
+          status: 'completed',
         },
       ]
       serviceMocker.stubGetterWithMutipleResponses(
@@ -28,13 +28,13 @@ const openAiAssistantCreatedRunMocker = (
       ) => {
         return {
           id: runId,
-          status: "requires_action",
+          status: 'requires_action',
           required_action: {
-            type: "submit_tool_outputs",
+            type: 'submit_tool_outputs',
             submit_tool_outputs: {
               tool_calls: [
                 {
-                  type: "function",
+                  type: 'function',
                   function: {
                     name: functionName,
                     arguments: JSON.stringify(argumentsObj),
@@ -48,12 +48,12 @@ const openAiAssistantCreatedRunMocker = (
 
       const responses = hashes.map((hash) => {
         switch (hash.response) {
-          case "ask clarification question":
-            return createRequiresActionRun("ask_clarification_question", {
+          case 'ask clarification question':
+            return createRequiresActionRun('ask_clarification_question', {
               question: hash.arguments,
             })
-          case "complete note details":
-            return createRequiresActionRun("complete_note_details", {
+          case 'complete note details':
+            return createRequiresActionRun('complete_note_details', {
               completion: hash.arguments?.match(/"(.*)"/)?.[1],
             })
           default:
@@ -74,7 +74,7 @@ const openAiAssistantCreatedRunMocker = (
         `/threads/${threadId}/runs/${runId}/submit_tool_outputs`,
         {
           id: runId,
-          status: "queued",
+          status: 'queued',
         }
       )
 
@@ -87,13 +87,13 @@ const openAiAssistantCreatedRunMocker = (
           run_id: runId,
         },
         {
-          object: "list",
+          object: 'list',
           data: msgs.map((msg) => ({
-            object: "thread.message",
+            object: 'thread.message',
             role: msg.role,
             content: [
               {
-                type: "text",
+                type: 'text',
                 text: {
                   value: msg.content,
                 },

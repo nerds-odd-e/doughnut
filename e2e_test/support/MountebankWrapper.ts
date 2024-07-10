@@ -1,7 +1,7 @@
-import { Imposter, Mountebank, Stub } from "@anev/ts-mountebank"
+import { Imposter, Mountebank, Stub } from '@anev/ts-mountebank'
 /// <reference types="cypress" />
 
-import request from "superagent"
+import request from 'superagent'
 
 // @ts-check
 

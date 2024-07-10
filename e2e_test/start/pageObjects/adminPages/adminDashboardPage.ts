@@ -1,59 +1,59 @@
-import { adminFineTuningPage } from "./adminFineTuningPage"
+import { adminFineTuningPage } from './adminFineTuningPage'
 
 export function assumeAdminDashboardPage() {
   return {
     goToFailureReportList() {
-      this.goToTabInAdminDashboard("Failure Reports")
-      cy.findByText("Failure report list")
+      this.goToTabInAdminDashboard('Failure Reports')
+      cy.findByText('Failure report list')
       return {
         shouldContain(content: string) {
-          cy.get("body").should("contain", content)
+          cy.get('body').should('contain', content)
         },
       }
     },
 
     goToTabInAdminDashboard(tabName: string) {
-      cy.findByRole("button", { name: tabName }).click()
+      cy.findByRole('button', { name: tabName }).click()
     },
 
     goToFineTuningData() {
-      this.goToTabInAdminDashboard("Fine Tuning Data")
+      this.goToTabInAdminDashboard('Fine Tuning Data')
       return adminFineTuningPage()
     },
 
     goToModelManagement() {
-      this.goToTabInAdminDashboard("Manage Models")
+      this.goToTabInAdminDashboard('Manage Models')
       return {
         chooseModel(model: string, task: string) {
           cy.findByLabelText(task).select(model)
-          cy.findByRole("button", { name: "Save" }).click()
+          cy.findByRole('button', { name: 'Save' }).click()
         },
       }
     },
 
     goToBazaarManagement() {
-      this.goToTabInAdminDashboard("Manage Bazaar")
+      this.goToTabInAdminDashboard('Manage Bazaar')
       return {
         removeFromBazaar(notebook: string) {
           cy.findByText(notebook)
-            .parentsUntil("tr")
+            .parentsUntil('tr')
             .parent()
-            .findByRole("button", { name: "Remove" })
+            .findByRole('button', { name: 'Remove' })
             .click()
-          cy.findByRole("button", { name: "OK" }).click()
+          cy.findByRole('button', { name: 'OK' }).click()
           cy.pageIsNotLoading()
         },
       }
     },
 
     goToAssistantManagement() {
-      this.goToTabInAdminDashboard("Manage Assistant")
+      this.goToTabInAdminDashboard('Manage Assistant')
       return {
         recreate() {
-          cy.findByRole("button", { name: "Recreate All Assistants" }).click()
+          cy.findByRole('button', { name: 'Recreate All Assistants' }).click()
           return {
             expectNewAssistant(newId: string, nameOfAssistant: string) {
-              cy.findByLabelText(nameOfAssistant).should("have.value", newId)
+              cy.findByLabelText(nameOfAssistant).should('have.value', newId)
             },
           }
         },

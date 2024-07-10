@@ -1,9 +1,9 @@
-import ServiceMocker from "../../support/ServiceMocker"
-import { MessageToMatch } from "./MessageToMatch"
+import ServiceMocker from '../../support/ServiceMocker'
+import { MessageToMatch } from './MessageToMatch'
 
 type ToolCall = {
   id: string
-  type: "function"
+  type: 'function'
   function: {
     name: string
     arguments: string
@@ -11,12 +11,12 @@ type ToolCall = {
 }
 
 type ToolCalls = {
-  role: "assistant"
+  role: 'assistant'
   tool_calls: ToolCall[]
 }
 
 type TextBasedMessage = {
-  role: "user" | "assistant" | "system"
+  role: 'user' | 'assistant' | 'system'
   content: string
 }
 
@@ -34,7 +34,7 @@ const openAiChatCompletionStubber = (
 ) => {
   const stubChatCompletion = (
     message: ChatMessageInResponse,
-    finishReason: "length" | "stop" | "function_call"
+    finishReason: 'length' | 'stop' | 'function_call'
   ): Promise<void> => {
     return serviceMocker.mockPostMatchsAndNotMatches(
       `/chat/completions`,
@@ -42,7 +42,7 @@ const openAiChatCompletionStubber = (
       bodyNotToMatch,
       [
         {
-          object: "chat.completion",
+          object: 'chat.completion',
           choices: [
             {
               message,
@@ -61,11 +61,11 @@ const openAiChatCompletionStubber = (
   ) => {
     return stubChatCompletion(
       {
-        role: "assistant",
+        role: 'assistant',
         tool_calls: [
           {
-            id: "tool-abc123",
-            type: "function",
+            id: 'tool-abc123',
+            type: 'function',
 
             function: {
               name: functionName,
@@ -74,7 +74,7 @@ const openAiChatCompletionStubber = (
           },
         ],
       },
-      "function_call"
+      'function_call'
     )
   }
 
@@ -85,16 +85,16 @@ const openAiChatCompletionStubber = (
       })
     },
     stubNoteDetailsCompletion(argumentsString: string) {
-      return stubSingleToolCall("note_details_completion", argumentsString)
+      return stubSingleToolCall('note_details_completion', argumentsString)
     },
     stubQuestionGeneration(argumentsString: string) {
       return stubSingleToolCall(
-        "ask_single_answer_multiple_choice_question",
+        'ask_single_answer_multiple_choice_question',
         argumentsString
       )
     },
     stubQuestionEvaluation(argumentsString: string) {
-      return stubSingleToolCall("evaluate_question", argumentsString)
+      return stubSingleToolCall('evaluate_question', argumentsString)
     },
   }
 }

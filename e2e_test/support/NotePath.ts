@@ -1,7 +1,7 @@
 /// <reference types="cypress" />
 // @ts-check
 
-import { commonSenseSplit } from "./string_util"
+import { commonSenseSplit } from './string_util'
 
 class NotePath {
   static regex = /"(My Notes|Bazaar|Circle)\/([^"]*)"/
@@ -13,11 +13,11 @@ class NotePath {
     const m = value.match(NotePath.regex)
     if (!m) {
       throw new Error(
-        "the note path should be something like `My Notes/path/to/note`"
+        'the note path should be something like `My Notes/path/to/note`'
       )
     }
     this.root = m[1]
-    this.path = commonSenseSplit(m[2] ?? "", "/")
+    this.path = commonSenseSplit(m[2] ?? '', '/')
   }
 }
 

@@ -1,12 +1,12 @@
-import NotePath from "../../support/NotePath"
-import { notebookList } from "./NotebookList"
-import noteCreationForm from "./noteForms/noteCreationForm"
-import { assumeNotePage } from "./notePage"
+import NotePath from '../../support/NotePath'
+import { notebookList } from './NotebookList'
+import noteCreationForm from './noteForms/noteCreationForm'
+import { assumeNotePage } from './notePage'
 
 export const routerToNotebooksPage = () => {
   cy.pageIsNotLoading()
-  cy.routerPush("/notebooks", "notebooks", {})
-  cy.findByText("Notebooks")
+  cy.routerPush('/notebooks', 'notebooks', {})
+  cy.findByText('Notebooks')
   return {
     ...notebookList(),
     navigateToPath(notePath: NotePath) {
@@ -16,32 +16,32 @@ export const routerToNotebooksPage = () => {
       )
     },
     creatingNotebook(notebookTopic: string) {
-      cy.findByText("Add New Notebook").click()
+      cy.findByText('Add New Notebook').click()
       return noteCreationForm.createNote(notebookTopic, undefined)
     },
     shareNotebookToBazaar(notebook: string) {
-      this.findNotebookCardButton(notebook, "Share notebook to bazaar").click()
-      cy.findByRole("button", { name: "OK" }).click()
+      this.findNotebookCardButton(notebook, 'Share notebook to bazaar').click()
+      cy.findByRole('button', { name: 'OK' }).click()
     },
     updateSubscription(notebook: string) {
-      this.findNotebookCardButton(notebook, "Edit subscription").click()
-      cy.findByRole("button", { name: "Update" }).click()
+      this.findNotebookCardButton(notebook, 'Edit subscription').click()
+      cy.findByRole('button', { name: 'Update' }).click()
     },
     skipReview(notebook: string) {
-      this.findNotebookCardButton(notebook, "Edit notebook settings").click()
-      cy.formField("Skip Review Entirely").check()
-      cy.findByRole("button", { name: "Update" }).click()
+      this.findNotebookCardButton(notebook, 'Edit notebook settings').click()
+      cy.formField('Skip Review Entirely').check()
+      cy.findByRole('button', { name: 'Update' }).click()
     },
     updateAssessmentSettings(notebook: string, numberOfQuestion: number) {
-      this.findNotebookCardButton(notebook, "Edit notebook settings").click()
-      cy.formField("Number Of Questions In Assessment").assignFieldValue(
+      this.findNotebookCardButton(notebook, 'Edit notebook settings').click()
+      cy.formField('Number Of Questions In Assessment').assignFieldValue(
         `${numberOfQuestion}`
       )
-      cy.findByRole("button", { name: "Update" }).click()
+      cy.findByRole('button', { name: 'Update' }).click()
     },
     unsubscribe(notebook: string) {
-      this.findNotebookCardButton(notebook, "Unsubscribe").click()
-      cy.findByRole("button", { name: "OK" }).click()
+      this.findNotebookCardButton(notebook, 'Unsubscribe').click()
+      cy.findByRole('button', { name: 'OK' }).click()
     },
   }
 }

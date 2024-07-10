@@ -1,30 +1,30 @@
 export const addQuestionPage = () => {
-  cy.findByRole("button", { name: "Add Question" }).click()
+  cy.findByRole('button', { name: 'Add Question' }).click()
   return {
     fillQuestion(row: Record<string, string>) {
-      cy.findByRole("button", { name: "+" }).click()
+      cy.findByRole('button', { name: '+' }).click()
       ;[
-        "Stem",
-        "Choice 0",
-        "Choice 1",
-        "Choice 2",
-        "Correct Choice Index",
+        'Stem',
+        'Choice 0',
+        'Choice 1',
+        'Choice 2',
+        'Correct Choice Index',
       ].forEach((key: string) => {
-        if (row[key] !== undefined && row[key] !== "") {
+        if (row[key] !== undefined && row[key] !== '') {
           cy.findByLabelText(key).clear().type(row[key]!)
         }
       })
     },
     addQuestion(row: Record<string, string>) {
       this.fillQuestion(row)
-      cy.findByRole("button", { name: "Submit" }).click()
+      cy.findByRole('button', { name: 'Submit' }).click()
     },
     generateQuestionByAI() {
-      cy.findByRole("button", { name: "Generate by AI" }).click()
+      cy.findByRole('button', { name: 'Generate by AI' }).click()
     },
     refineQuestion(row: Record<string, string>) {
       this.fillQuestion(row)
-      cy.findByRole("button", { name: "Refine" }).click()
+      cy.findByRole('button', { name: 'Refine' }).click()
     },
   }
 }

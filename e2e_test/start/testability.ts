@@ -1,10 +1,10 @@
-import { Randomization } from "./../../frontend/src/generated/backend/models/Randomization"
+import { Randomization } from './../../frontend/src/generated/backend/models/Randomization'
 /// <reference types="Cypress" />
 // @ts-check
-import { QuestionSuggestionParams } from "../../frontend/src/generated/backend/models/QuestionSuggestionParams"
-import ServiceMocker from "../support/ServiceMocker"
-import { NoteTestData } from "./../../frontend/src/generated/backend/models/NoteTestData"
-import { QuizQuestionTestData } from "./../../frontend/src/generated/backend/models/QuizQuestionTestData"
+import { QuestionSuggestionParams } from '../../frontend/src/generated/backend/models/QuestionSuggestionParams'
+import ServiceMocker from '../support/ServiceMocker'
+import { NoteTestData } from './../../frontend/src/generated/backend/models/NoteTestData'
+import { QuizQuestionTestData } from './../../frontend/src/generated/backend/models/QuizQuestionTestData'
 
 const hourOfDay = (days: number, hours: number) => {
   return new Date(1976, 5, 1 + days, hours)
@@ -16,7 +16,7 @@ const postToTestabilityApi = (
   options: { body?: Record<string, unknown>; failOnStatusCode?: boolean }
 ) => {
   return cy.request({
-    method: "POST",
+    method: 'POST',
     url: `/api/testability/${path}`,
     ...options,
   })
@@ -27,11 +27,11 @@ const postToTestabilityApiSuccessfully = (
   path: string,
   options: { body?: Record<string, unknown>; failOnStatusCode?: boolean }
 ) => {
-  postToTestabilityApi(cy, path, options).its("status").should("equal", 200)
+  postToTestabilityApi(cy, path, options).its('status').should('equal', 200)
 }
 
 const cleanAndReset = (cy: Cypress.cy & CyEventEmitter, countdown: number) => {
-  postToTestabilityApi(cy, "clean_db_and_reset_testability_settings", {
+  postToTestabilityApi(cy, 'clean_db_and_reset_testability_settings', {
     failOnStatusCode: countdown === 1,
   }).then((response) => {
     if (countdown > 0 && response.status !== 200) {
@@ -40,7 +40,7 @@ const cleanAndReset = (cy: Cypress.cy & CyEventEmitter, countdown: number) => {
   })
 }
 
-const injectedNoteIdMapAliasName = "injectedNoteIdMap"
+const injectedNoteIdMapAliasName = 'injectedNoteIdMap'
 
 const testability = () => {
   return {
@@ -50,17 +50,17 @@ const testability = () => {
     },
 
     featureToggle(enabled: boolean) {
-      postToTestabilityApiSuccessfully(cy, "feature_toggle", {
+      postToTestabilityApiSuccessfully(cy, 'feature_toggle', {
         body: { enabled },
       })
     },
 
     injectNotes(
       noteTestData: NoteTestData[],
-      externalIdentifier = "",
+      externalIdentifier = '',
       circleName: string | null = null
     ) {
-      postToTestabilityApi(cy, "inject_notes", {
+      postToTestabilityApi(cy, 'inject_notes', {
         body: {
           externalIdentifier,
           circleName,
@@ -76,7 +76,7 @@ const testability = () => {
     },
 
     injectQuizQuestions(quizQuestionTestData: QuizQuestionTestData[]) {
-      postToTestabilityApi(cy, "inject_quiz_questions", {
+      postToTestabilityApi(cy, 'inject_quiz_questions', {
         body: {
           quizQuestionTestData,
         },
@@ -93,7 +93,7 @@ const testability = () => {
         expect(injectedNoteIdMap).haveOwnPropertyDescriptor(toNoteTopic)
         const fromNoteId = injectedNoteIdMap[fromNoteTopic]
         const toNoteId = injectedNoteIdMap[toNoteTopic]
-        postToTestabilityApiSuccessfully(cy, "link_notes", {
+        postToTestabilityApiSuccessfully(cy, 'link_notes', {
           body: {
             type,
             source_id: fromNoteId,
@@ -104,7 +104,7 @@ const testability = () => {
     },
 
     injectSuggestedQuestions(examples: Array<QuestionSuggestionParams>) {
-      postToTestabilityApiSuccessfully(cy, "inject_suggested_questions", {
+      postToTestabilityApiSuccessfully(cy, 'inject_suggested_questions', {
         body: {
           examples,
         },
@@ -115,12 +115,12 @@ const testability = () => {
       this.injectSuggestedQuestions([
         {
           positiveFeedback,
-          preservedNoteContent: "note content",
-          realCorrectAnswers: "",
+          preservedNoteContent: 'note content',
+          realCorrectAnswers: '',
           preservedQuestion: {
             multipleChoicesQuestion: {
               stem: questionStem,
-              choices: ["choice 1", "choice 2"],
+              choices: ['choice 1', 'choice 2'],
             },
             correctChoiceIndex: 0,
           },
@@ -148,41 +148,41 @@ const testability = () => {
     },
 
     backendTimeTravelTo(day: number, hour: number) {
-      postToTestabilityApiSuccessfully(cy, "time_travel", {
+      postToTestabilityApiSuccessfully(cy, 'time_travel', {
         body: { travel_to: JSON.stringify(hourOfDay(day, hour)) },
       })
     },
 
     backendTimeTravelRelativeToNow(hours: number) {
-      postToTestabilityApiSuccessfully(cy, "time_travel_relative_to_now", {
+      postToTestabilityApiSuccessfully(cy, 'time_travel_relative_to_now', {
         body: { hours: JSON.stringify(hours) },
       })
     },
 
-    randomizerSettings(strategy: "first" | "last" | "seed", seed: number) {
-      postToTestabilityApiSuccessfully(cy, "randomizer", {
+    randomizerSettings(strategy: 'first' | 'last' | 'seed', seed: number) {
+      postToTestabilityApiSuccessfully(cy, 'randomizer', {
         body: <Randomization>{ choose: strategy, seed },
       })
     },
 
     triggerException() {
-      postToTestabilityApi(cy, "trigger_exception", { failOnStatusCode: false })
+      postToTestabilityApi(cy, 'trigger_exception', { failOnStatusCode: false })
     },
 
     shareToBazaar(noteTopic: string) {
-      postToTestabilityApiSuccessfully(cy, "share_to_bazaar", {
+      postToTestabilityApiSuccessfully(cy, 'share_to_bazaar', {
         body: { noteTopic },
       })
     },
 
     injectCircle(circleInfo: Record<string, string>) {
-      postToTestabilityApiSuccessfully(cy, "inject_circle", {
+      postToTestabilityApiSuccessfully(cy, 'inject_circle', {
         body: circleInfo,
       })
     },
 
     updateCurrentUserSettingsWith(hash: Record<string, string>) {
-      postToTestabilityApiSuccessfully(cy, "update_current_user", {
+      postToTestabilityApiSuccessfully(cy, 'update_current_user', {
         body: hash,
       })
     },
@@ -192,7 +192,7 @@ const testability = () => {
         body: { [serviceName]: serviceUrl },
       }).then((response) => {
         expect(response.body).to.haveOwnProperty(serviceName)
-        expect(response.body[serviceName]).to.include("http")
+        expect(response.body[serviceName]).to.include('http')
         cy.wrap(response.body[serviceName])
       })
     },
@@ -203,11 +203,11 @@ const testability = () => {
       // the event, eg. click, will not work.
       //
       cy.clock(hourOfDay(0, 0), [
-        "setTimeout",
-        "setInterval",
-        "clearInterval",
-        "clearTimeout",
-        "Date",
+        'setTimeout',
+        'setInterval',
+        'clearInterval',
+        'clearTimeout',
+        'Date',
       ])
     },
     mockService(serviceMocker: ServiceMocker) {

@@ -1,16 +1,16 @@
-import { MCQWithAnswer } from "../../frontend/src/generated/backend/models/MCQWithAnswer"
-import mock_services from "./mock_services"
+import { MCQWithAnswer } from '../../frontend/src/generated/backend/models/MCQWithAnswer'
+import mock_services from './mock_services'
 
 export const questionGenerationService = () => ({
   resetAndStubAskingMCQ: (record: Record<string, string>) => {
     const mcqWithAnswer: MCQWithAnswer = {
       correctChoiceIndex: 0,
       multipleChoicesQuestion: {
-        stem: record["Question Stem"],
+        stem: record['Question Stem'],
         choices: [
-          record["Correct Choice"]!,
-          record["Incorrect Choice 1"]!,
-          record["Incorrect Choice 2"]!,
+          record['Correct Choice']!,
+          record['Incorrect Choice 1']!,
+          record['Incorrect Choice 2']!,
         ],
       },
     }
@@ -20,7 +20,7 @@ export const questionGenerationService = () => ({
       await mock_services
         .openAi()
         .chatCompletion()
-        .requestMessageMatches({ role: "user", content: "Memory Assistant" })
+        .requestMessageMatches({ role: 'user', content: 'Memory Assistant' })
         .stubQuestionGeneration(reply)
     })
   },
@@ -32,8 +32,8 @@ export const questionGenerationService = () => ({
         .openAi()
         .chatCompletion()
         .requestMessageMatches({
-          role: "user",
-          content: ".*critically check.*",
+          role: 'user',
+          content: '.*critically check.*',
         })
         .stubQuestionEvaluation(JSON.stringify(record))
     })

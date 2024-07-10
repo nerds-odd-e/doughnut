@@ -6,10 +6,10 @@ import {
   Operator,
   Predicate,
   Stub,
-} from "@anev/ts-mountebank"
-import MountebankStubBuilder from "./MountebankStubBuilder"
-import MountebankWrapper from "./MountebankWrapper"
-import { NotPredicate } from "./NotPredicate"
+} from '@anev/ts-mountebank'
+import MountebankStubBuilder from './MountebankStubBuilder'
+import MountebankWrapper from './MountebankWrapper'
+import { NotPredicate } from './NotPredicate'
 
 class ServiceMocker {
   private readonly mountebank: MountebankWrapper

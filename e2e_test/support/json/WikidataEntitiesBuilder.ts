@@ -34,7 +34,7 @@ class WikidataEntitiesBuilder {
         ...(data || []),
         {
           mainsnak: {
-            snaktype: "value",
+            snaktype: 'value',
             property: claimIter.claimId,
             datavalue: {
               value: claimIter.value,
@@ -50,7 +50,7 @@ class WikidataEntitiesBuilder {
     return {
       entities: {
         [this.wikidataId]: {
-          type: "item",
+          type: 'item',
           id: this.wikidataId,
           claims: this.claims,
         },
