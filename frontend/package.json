@@ -79,7 +79,7 @@
     "vite-plugin-eslint": "^1.8.1",
     "vite-plugin-vue-devtools": "^7.3.5",
     "vite-tsconfig-paths": "^4.3.2",
-    "vitest": "2.0.1",
+    "vitest": "2.0.2",
     "vitest-dom": "^0.1.1",
     "vitest-fetch-mock": "^0.2.2",
     "vue-tsc": "2.0.26"
