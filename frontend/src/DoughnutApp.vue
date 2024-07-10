@@ -1,11 +1,15 @@
 <script setup lang="ts">
 import { Ref, computed, onMounted, provide, ref } from "vue"
 import { useRoute } from "vue-router"
+// biome-ignore lint/correctness/noUnusedImports: <explanation>
 import Popups from "./components/commons/Popups/Popups.vue"
+// biome-ignore lint/correctness/noUnusedImports: <explanation>
 import TestMenu from "./components/commons/TestMenu.vue"
+// biome-ignore lint/correctness/noUnusedImports: <explanation>
 import UserNewRegisterPage from "./pages/UserNewRegisterPage.vue"
 import createNoteStorage from "./store/createNoteStorage"
 import ManagedApi, { ApiStatus } from "./managedApi/ManagedApi"
+// biome-ignore lint/correctness/noUnusedImports: <explanation>
 import GlobalBar from "./components/toolbars/GlobalBar.vue"
 import { User } from "./generated/backend"
 import getEnvironment from "./managedApi/window/getEnvironment"
@@ -30,10 +34,12 @@ const featureToggle = ref(false)
 const environment = ref("production")
 const userLoaded = ref(false)
 
+// biome-ignore lint/correctness/noUnusedVariables: <explanation>
 const newUser = computed(() => {
   return !user.value && !!externalIdentifier.value
 })
 
+// biome-ignore lint/correctness/noUnusedVariables: <explanation>
 const routeViewProps = computed(() => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const props: RouteViewProps = {}
@@ -46,6 +52,7 @@ const routeViewProps = computed(() => {
   return props
 })
 
+// biome-ignore lint/correctness/noUnusedVariables: <explanation>
 const clearErrorMessage = (_id: number) => {
   apiStatus.value.errors = []
 }

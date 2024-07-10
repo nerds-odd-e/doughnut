@@ -43,7 +43,9 @@ import { PropType, ref } from "vue"
 import { Note, WikidataAssociationCreation } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { StorageAccessor } from "@/store/createNoteStorage"
+// biome-ignore lint/correctness/noUnusedImports: <explanation>
 import TextInput from "../form/TextInput.vue"
+// biome-ignore lint/correctness/noUnusedImports: <explanation>
 import NoteTopicComponent from "./core/NoteTopicComponent.vue"
 
 const { managedApi } = useLoadingApi()
@@ -75,6 +77,7 @@ const save = async () => {
   }
 }
 
+// biome-ignore lint/correctness/noUnusedVariables: <explanation>
 const validateAndSave = async () => {
   try {
     const res =

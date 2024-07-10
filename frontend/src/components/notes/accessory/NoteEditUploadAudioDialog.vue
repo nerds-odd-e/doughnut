@@ -50,13 +50,10 @@ export default defineComponent({
           this.formData
         )
         this.$emit("closeDialog", na)
+        // biome-ignore lint/suspicious/noExplicitAny: <explanation>
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (error: unknown) {
-        if (error instanceof Error) {
-          this.noteFormErrors = error.message
-        } else {
-          this.noteFormErrors = String(error)
-        }
+      } catch (error: any) {
+        this.noteFormErrors = error
       }
     },
     async convertToSRT() {
@@ -65,13 +62,10 @@ export default defineComponent({
           this.formData
         )
         this.convertedSrt = response.srt
+        // biome-ignore lint/suspicious/noExplicitAny: <explanation>
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (error: unknown) {
-        if (error instanceof Error) {
-          this.noteFormErrors = { message: error.message }
-        } else {
-          this.noteFormErrors = { message: "An unknown error occurred" }
-        }
+      } catch (error: any) {
+        this.noteFormErrors = error
       }
     },
   },
