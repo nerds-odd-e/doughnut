@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import { Ref, computed, onMounted, provide, ref } from "vue"
 import { useRoute } from "vue-router"
-import Popups from "./components/commons/Popups/Popups.vue"
 import TestMenu from "./components/commons/TestMenu.vue"
 import UserNewRegisterPage from "./pages/UserNewRegisterPage.vue"
 import createNoteStorage from "./store/createNoteStorage"
 import ManagedApi, { ApiStatus } from "./managedApi/ManagedApi"
-import GlobalBar from "./components/toolbars/GlobalBar.vue"
 import { User } from "./generated/backend"
 import getEnvironment from "./managedApi/window/getEnvironment"
+
+interface RouteViewProps {
+  storageAccessor?: typeof storageAccessor.value
+  [key: string]: unknown
+}
 
 const apiStatus: Ref<ApiStatus> = ref({
   errors: [],
@@ -31,7 +34,7 @@ const newUser = computed(() => {
 
 const routeViewProps = computed(() => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const props = {} as any
+  const props: RouteViewProps = {}
   if ($route.meta.useNoteStorageAccessor) {
     props.storageAccessor = storageAccessor.value
   }
