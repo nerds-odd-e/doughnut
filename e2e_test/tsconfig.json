@@ -2,9 +2,12 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "resolveJsonModule": true,
     "baseUrl": "../e2e_test",
     "lib": ["dom", "dom.iterable", "ESNext"],
+    "types": ["cypress", "node"],
     "typeRoots": [
       "types",
       "node_modules",
@@ -13,11 +16,12 @@
       "node_modules/@badeball/cypress-cucumber-preprocessor"
     ],
     "paths": {
+      "*": ["node_modules/*"],
       "@badeball/cypress-cucumber-preprocessor": [
         "node_modules/@badeball/cypress-cucumber-preprocessor"
       ],
       "@badeball/cypress-cucumber-preprocessor/esbuild": [
-        "node_modules/@badeball/cypress-cucumber-preprocessor/dist/subpath-entrypoints/esbuild.d.ts"
+        "node_modules/@badeball/cypress-cucumber-preprocessor/dist/subpath-entrypoints/esbuild"
       ]
     }
   },

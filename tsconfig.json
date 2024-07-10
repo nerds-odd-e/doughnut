@@ -23,5 +23,6 @@
     "backend/bin/main/static/**/*.js",
     "backend/build/**/*.js",
     "backend/src/main/resources/static/**/*.js",
+    "frontend/tests/setupVitest.js"
   ]
 }
