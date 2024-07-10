@@ -30,7 +30,9 @@ describe("Save wikidata id", () => {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
-  function doNothing(_: VueWrapper) {}
+  function doNothing(_: VueWrapper) {
+    // noop
+  }
 
   it.each`
     noteTitle   | wikidataTitle | userAction           | shouldSave

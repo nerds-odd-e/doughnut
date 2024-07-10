@@ -63,7 +63,9 @@ describe("Sidebar", () => {
         observerDisconnected = true
       }
 
-      unobserve() {}
+      unobserve() {
+        // noop
+      }
     }
 
     global.IntersectionObserver = MockIntersectionObserver as any

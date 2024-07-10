@@ -107,7 +107,9 @@ describe("adding new note", () => {
       await wrapper.find("[id='topicRadio-Append']").setValue()
     }
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    const doNothing = () => {}
+    const doNothing = () => {
+      // noop
+    }
 
     describe("the select for wikidata id", () => {
       let select

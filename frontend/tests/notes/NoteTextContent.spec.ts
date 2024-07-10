@@ -48,7 +48,9 @@ describe("in place edit on title", () => {
     const mockUnmounted = vitest
       .spyOn(TextContentWrapper, "unmounted")
       // eslint-disable-next-line @typescript-eslint/no-empty-function
-      .mockImplementation(() => {})
+      .mockImplementation(() => {
+        // noop
+      })
     const wrapper = mountComponent(note)
     await wrapper.find('[role="topic"]').trigger("click")
     await wrapper.find('[role="topic"] input').setValue("updated")
