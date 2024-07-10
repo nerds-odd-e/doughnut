@@ -4,6 +4,7 @@
 // @ts-check
 
 import { Given, Then, When } from "@badeball/cypress-cucumber-preprocessor"
+import { DataTable } from "@cucumber/cucumber"
 import start from "../start"
 
 Given("I am logged in as {string}", (externalIdentifier: string) => {
@@ -50,10 +51,10 @@ When("I should be asked to create my profile", () => {
   cy.get("body").should("contain", "Please create your profile")
 })
 
-When("I save my profile with:", (data) => {
+When("I save my profile with:", (data: DataTable) => {
   data.hashes().forEach((elem) => {
     for (const propName in elem) {
-      cy.formField(propName).assignFieldValue(elem[propName])
+      cy.formField(propName).assignFieldValue(elem[propName] ?? "")
     }
   })
   cy.get('input[value="Submit"]').click()

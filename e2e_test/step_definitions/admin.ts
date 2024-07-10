@@ -27,7 +27,7 @@ Given(
       .goToFineTuningData()
       .updateQuestionSuggestionAndChoice(
         originalQuestionStem,
-        newQuestion.hashes()[0]
+        newQuestion.hashes()[0] as Record<string, string>
       )
   }
 )
@@ -107,8 +107,10 @@ Given(
       preservedNoteContent: "note content",
       realCorrectAnswers: "",
       preservedQuestion: {
-        stem: `good question #${index}`,
-        choices: ["choice 1", "choice 2"],
+        multipleChoicesQuestion: {
+          stem: `good question #${index}`,
+          choices: ["choice 1", "choice 2"],
+        },
         correctChoiceIndex: 0,
       },
     }))
@@ -117,8 +119,10 @@ Given(
       preservedNoteContent: "note content",
       realCorrectAnswers: "",
       preservedQuestion: {
-        stem: `bad question #${index}`,
-        choices: ["choice 1", "choice 2"],
+        multipleChoicesQuestion: {
+          stem: `bad question #${index}`,
+          choices: ["choice 1", "choice 2"],
+        },
         correctChoiceIndex: 0,
       },
     }))

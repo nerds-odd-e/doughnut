@@ -202,7 +202,7 @@ Cypress.Commands.add(
     "Additional Info": additionalInfo,
     Skip: skip,
   }) => {
-    if (reviewType == "initial done") {
+    if (reviewType === "initial done") {
       cy.findByText("You have achieved your daily new notes goal.").should(
         "be.visible"
       )
@@ -311,7 +311,7 @@ Cypress.Commands.add("initialReviewNotes", (noteTopics: string) => {
 
 Cypress.Commands.add("repeatReviewNotes", (noteTopics: string) => {
   commonSenseSplit(noteTopics, ",").forEach((topic) => {
-    if (topic == "end") {
+    if (topic === "end") {
       cy.findByText(
         "You have finished all repetitions for this half a day!"
       ).should("be.visible")
@@ -378,7 +378,13 @@ Cypress.Commands.add("noteByTitle", (noteTopic: string) => {
     .findCardTitle(noteTopic)
     .parent()
     .invoke("attr", "href")
-    .then(($attr) => /n(\d+)/g.exec($attr)[1])
+    .then(($attr) => {
+      const match = /n(\d+)/g.exec($attr as string)?.[1]
+      if (match) {
+        return match
+      }
+      throw new Error(`Could not find note ID in href: ${$attr}`)
+    })
 })
 
 Cypress.Commands.add(

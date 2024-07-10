@@ -134,7 +134,7 @@ Given(
   (wikidataId: string, data: DataTable) => {
     mock_services.wikidata().stubWikidataEntityBook(
       wikidataId,
-      data.hashes().map((hash) => hash["Wikidata Id"])
+      data.hashes().map((hash) => hash["Wikidata Id"] ?? "")
     )
   }
 )

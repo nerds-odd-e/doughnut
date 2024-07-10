@@ -344,7 +344,9 @@ Then(
     start.jumpToNotePage(left)
     cy.get(".note-recent-update-indicator")
       .invoke("css", "color")
-      .then((val) => (leftColor = val))
+      .then((val) => {
+        leftColor = val
+      })
     start.jumpToNotePage(right)
     cy.get(".note-recent-update-indicator")
       .invoke("css", "color")

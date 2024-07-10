@@ -10,7 +10,7 @@ export const navigateToCircle = (circleName: string) => {
   return {
     creatingNotebook(notebookTopic: string) {
       cy.findByText("Add New Notebook In This Circle").click()
-      return noteCreationForm.createNote(notebookTopic, undefined, undefined)
+      return noteCreationForm.createNote(notebookTopic, undefined)
     },
     haveMembers(count: number) {
       cy.get("body").find(".circle-member").should("have.length", count)

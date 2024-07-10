@@ -39,7 +39,7 @@ const wikidataService = () => {
     stubWikidataEntityQuery(
       wikidataId: string,
       wikidataTitle: string,
-      wikipediaLink: string
+      wikipediaLink: string | undefined
     ) {
       const wikipedia = wikipediaLink
         ? { enwiki: { site: "enwiki", url: wikipediaLink } }

@@ -17,7 +17,7 @@ export const routerToNotebooksPage = () => {
     },
     creatingNotebook(notebookTopic: string) {
       cy.findByText("Add New Notebook").click()
-      return noteCreationForm.createNote(notebookTopic, undefined, undefined)
+      return noteCreationForm.createNote(notebookTopic, undefined)
     },
     shareNotebookToBazaar(notebook: string) {
       this.findNotebookCardButton(notebook, "Share notebook to bazaar").click()

@@ -187,7 +187,7 @@ Then(
     start
       .assumeAnsweredQuestionPage()
       .showReviewPoint(noteTopic)
-      .expectReviewPointInfo(data.hashes()[0])
+      .expectReviewPointInfo(data.hashes()[0] ?? {})
   }
 )
 
@@ -212,7 +212,7 @@ When(
   (noteTopic: string, question: DataTable) => {
     start.stubOpenAIQuestionGenerationAndSeeTheQuestion(
       noteTopic,
-      question.hashes()[0]
+      question.hashes()[0] ?? {}
     )
   }
 )

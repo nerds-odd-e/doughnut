@@ -17,7 +17,7 @@ class NotePath {
       )
     }
     this.root = m[1]
-    this.path = commonSenseSplit(m[2], "/")
+    this.path = commonSenseSplit(m[2] ?? "", "/")
   }
 }
 

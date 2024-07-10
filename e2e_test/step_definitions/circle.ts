@@ -23,9 +23,12 @@ When(
 )
 
 When("I visit the invitation link", () => {
-  cy.get("@savedInvitationCode").then((invitationCode) =>
-    cy.visit(invitationCode)
-  )
+  cy.get("@savedInvitationCode").then((invitationCode) => {
+    // Extract the string value from the JQuery object
+    const url = invitationCode.toString()
+    // Visit the URL
+    cy.visit(url)
+  })
 })
 
 When("I join the circle", () => {
