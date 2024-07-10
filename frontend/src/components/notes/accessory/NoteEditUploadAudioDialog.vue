@@ -50,7 +50,6 @@ export default defineComponent({
           this.formData
         )
         this.$emit("closeDialog", na)
-        // biome-ignore lint/suspicious/noExplicitAny: <explanation>
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         this.noteFormErrors = error
@@ -62,7 +61,6 @@ export default defineComponent({
           this.formData
         )
         this.convertedSrt = response.srt
-        // biome-ignore lint/suspicious/noExplicitAny: <explanation>
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         this.noteFormErrors = error
