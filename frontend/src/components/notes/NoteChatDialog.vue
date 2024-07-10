@@ -72,9 +72,6 @@ import type { StorageAccessor } from "@/store/createNoteStorage"
 import { PropType, computed, ref, onMounted } from "vue"
 import markdownizer from "@/components/form/markdownizer"
 import scrollToElement from "../commons/scrollToElement"
-import ContestableQuestion from "../review/ContestableQuestion.vue"
-import SvgRobot from "../svgs/SvgRobot.vue"
-import TextArea from "../form/TextArea.vue"
 
 const { managedApi } = useLoadingApi()
 const props = defineProps({

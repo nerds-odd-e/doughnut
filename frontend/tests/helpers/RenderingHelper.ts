@@ -6,6 +6,10 @@ import { ComponentPublicInstance, DefineComponent } from "vue"
 import { RouteLocationRaw } from "vue-router"
 import createNoteStorage from "../../src/store/createNoteStorage"
 
+interface NoteStorageProps {
+  storageAccessor?: ReturnType<typeof createNoteStorage>
+  [key: string]: unknown
+}
 class RenderingHelper {
   private comp
 
@@ -23,7 +27,9 @@ class RenderingHelper {
     this.global = {
       directives: {
         // eslint-disable-next-line @typescript-eslint/no-empty-function
-        focus() {},
+        focus() {
+          // noop
+        },
       },
       provide: {
         managedApi: this.managedApi,
@@ -39,7 +45,7 @@ class RenderingHelper {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  withStorageProps(props: any) {
+  withStorageProps(props: Partial<NoteStorageProps>) {
     return this.withProps({
       storageAccessor: createNoteStorage(this.managedApi),
       ...props,
@@ -47,7 +53,7 @@ class RenderingHelper {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  withProps(props: any) {
+  withProps(props: NoteStorageProps) {
     this.props = props
     return this
   }

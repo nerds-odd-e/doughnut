@@ -208,15 +208,14 @@
       "**/node_modules",
       "**/*.md",
       "**/index.html",
-      "**/components.d.ts",
       "**/tsconfig.json",
+      "**/tsconfig.node.json",
       "**/.eslintrc.cjs",
       "**/vite.config.ts",
       "**/farm.config.ts",
-      "tests/setupVitest.js",
+      "**/components.d.ts",
       "**/index.d.ts",
       "**/shims-vue.d.ts",
-      "**/tsconfig.node.json",
       "**/vitest.config.ts",
       "**/setupVitest.js",
       "**/typed-router.d.ts"
@@ -224,15 +223,21 @@
   },
   "javascript": {
     "formatter": {
+      "trailingCommas": "es5",
       "semicolons": "asNeeded",
-      "trailingCommas": "es5"
+      "quoteStyle": "single"
     }
   },
   "overrides": [
     {
       "include": ["*.vue"],
       "linter": {
-        "rules": { "correctness": { "noUndeclaredVariables": "off" } }
+        "rules": {
+          "correctness": {
+            "noUndeclaredVariables": "off",
+            "noUnusedVariables": "off"
+          }
+        }
       }
     },
     {
