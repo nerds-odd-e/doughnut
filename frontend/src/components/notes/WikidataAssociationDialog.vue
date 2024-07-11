@@ -79,7 +79,6 @@ const save = async () => {
       .storedApi()
       .updateWikidataId(props.note.id, associationData.value)
     emit("closeDialog")
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: unknown) {
     if (typeof e === "object" && e !== null && "wikidataId" in e) {
       wikidataIdError.value = (e as WikidataIdError).wikidataId
@@ -103,7 +102,6 @@ const validateAndSave = async () => {
       conflictWikidataTitle.value = res.WikidataTitleInEnglish
       return
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: unknown) {
     if (
       e instanceof Error &&
