@@ -55,13 +55,8 @@ export default defineComponent({
           this.formData
         )
         this.$emit("closeDialog", na)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: unknown) {
-        if (typeof error === "object" && error !== null && "message" in error) {
-          this.noteFormErrors = (error as ApiError).message
-        } else {
-          this.noteFormErrors = String(error)
-        }
+        this.noteFormErrors = error as ApiError
       }
     },
     async convertToSRT() {
@@ -70,13 +65,8 @@ export default defineComponent({
           this.formData
         )
         this.convertedSrt = response.srt
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: unknown) {
-        if (typeof error === "object" && error !== null && "message" in error) {
-          this.noteFormErrors = (error as ApiError).message
-        } else {
-          this.noteFormErrors = String(error)
-        }
+        this.noteFormErrors = error as ApiError
       }
     },
   },
