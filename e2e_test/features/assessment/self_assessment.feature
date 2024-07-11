@@ -60,7 +60,7 @@ Feature: Self assessment
   @randomizerWithFixedSeed
   Scenario: Perform multiple assesments on the same notebook and questions vary from attempt to attempt
     Given I set the number of questions per assessment of the notebook "Countries" to 1
-    Then 2 subsequent attempts of assessment on the "Countries" notebook should use 1 questions
+    Then 2 subsequent attempts of assessment on the "Countries" notebook should use 2 questions
 
   @randomizerAlwaysInAscendOrder
   Scenario: Should always use the same questions when randomizer is set to always in ascending order

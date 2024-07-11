@@ -6,6 +6,12 @@ import java.util.*;
 public class RealRandomizer implements Randomizer {
   Random rand = new Random();
 
+  public RealRandomizer() {}
+
+  public RealRandomizer(Integer seed) {
+    rand = new Random(seed);
+  }
+
   @Override
   public <T> List<T> shuffle(List<T> list) {
     List<T> newList = new ArrayList<>(list);

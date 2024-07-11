@@ -18,7 +18,7 @@ import org.springframework.web.context.annotation.ApplicationScope;
 @ApplicationScope
 public class TestabilitySettings {
   private Timestamp timestamp = null;
-  private NonRandomizer nonRandomizer = null;
+  private Randomizer randomizer = null;
   @Getter @Setter Boolean useRealGithub = true;
   @Autowired GithubService githubService;
   @Getter private boolean featureToggleEnabled = false;
@@ -33,8 +33,8 @@ public class TestabilitySettings {
 
   public void timeTravelTo(Timestamp timestamp) {
     this.timestamp = timestamp;
-    if (nonRandomizer == null) {
-      nonRandomizer = new NonRandomizer();
+    if (randomizer == null) {
+      randomizer = new NonRandomizer();
     }
   }
 
@@ -46,17 +46,20 @@ public class TestabilitySettings {
   }
 
   public Randomizer getRandomizer() {
-    if (nonRandomizer == null) {
+    if (randomizer == null) {
       return new RealRandomizer();
     }
-    return nonRandomizer;
+    return randomizer;
   }
 
-  public void setAlwaysChoose(Randomization.RandomStrategy option) {
-    if (nonRandomizer == null) {
-      nonRandomizer = new NonRandomizer();
+  public void setRandomization(Randomization option) {
+    if (option.choose == Randomization.RandomStrategy.seed) {
+      randomizer = new RealRandomizer(option.seed);
+      return;
     }
-    nonRandomizer.setAlwaysChoose(option);
+    NonRandomizer nonRandomizer = new NonRandomizer();
+    nonRandomizer.setAlwaysChoose(option.choose);
+    randomizer = nonRandomizer;
   }
 
   public GithubService getGithubService() {

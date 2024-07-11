@@ -50,7 +50,7 @@ class TestabilityRestController {
     createUser("non_admin", "Non Admin");
     testabilitySettings.setUseRealGithub(false);
     testabilitySettings.enableFeatureToggle(false);
-    testabilitySettings.setAlwaysChoose(Randomization.RandomStrategy.first);
+    testabilitySettings.setRandomization(new Randomization(Randomization.RandomStrategy.first, 0));
     return "OK";
   }
 
@@ -347,7 +347,7 @@ class TestabilityRestController {
 
   @PostMapping(value = "/randomizer")
   public List<Object> randomizer(@RequestBody Randomization randomization) {
-    testabilitySettings.setAlwaysChoose(randomization.choose);
+    testabilitySettings.setRandomization(randomization);
     return Collections.emptyList();
   }
 }
