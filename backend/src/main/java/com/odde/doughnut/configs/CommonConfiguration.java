@@ -28,6 +28,7 @@ public class CommonConfiguration {
       "/bazaar/**",
       "/circles/**",
       "/notebooks/**",
+      "/assessment/**",
       "/assessment-history/**",
       "/n**",
       "/reviews/**",
