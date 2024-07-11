@@ -22,6 +22,11 @@ import { defineComponent } from "vue"
 import TextArea from "../../form/TextArea.vue"
 import NoteUploadAudioForm from "./NoteUploadAudioForm.vue"
 
+interface ApiError {
+  message: string
+  code?: number
+}
+
 export default defineComponent({
   setup() {
     return { ...useLoadingApi() }
@@ -51,8 +56,12 @@ export default defineComponent({
         )
         this.$emit("closeDialog", na)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (error: any) {
-        this.noteFormErrors = error
+      } catch (error: unknown) {
+        if (typeof error === "object" && error !== null && "message" in error) {
+          this.noteFormErrors = (error as ApiError).message
+        } else {
+          this.noteFormErrors = String(error)
+        }
       }
     },
     async convertToSRT() {
@@ -62,8 +71,12 @@ export default defineComponent({
         )
         this.convertedSrt = response.srt
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (error: any) {
-        this.noteFormErrors = error
+      } catch (error: unknown) {
+        if (typeof error === "object" && error !== null && "message" in error) {
+          this.noteFormErrors = (error as ApiError).message
+        } else {
+          this.noteFormErrors = String(error)
+        }
       }
     },
   },
