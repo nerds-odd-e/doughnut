@@ -49,7 +49,6 @@ export default defineComponent({
           this.formData
         )
         this.$emit("updateUser", user)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: unknown) {
         if (err instanceof Error) {
           this.errors = { name: err.message }
