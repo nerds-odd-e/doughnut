@@ -47,7 +47,6 @@ describe("in place edit on title", () => {
 
     const mockUnmounted = vitest
       .spyOn(TextContentWrapper, "unmounted")
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
       .mockImplementation(() => {
         // noop
       })
@@ -81,9 +80,12 @@ describe("in place edit on title", () => {
     try {
       getPlaceholder(wrapper)
       expect(true, "there should not be placehodler for readonly").toBe(false)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (e: any) {
-      expect(e.message).toContain("Unable to get")
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        expect(e.message).toContain("Unable to get")
+      } else {
+        throw new Error("Unexpected error type")
+      }
     }
   })
 
