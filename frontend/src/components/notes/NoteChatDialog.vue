@@ -87,7 +87,7 @@ const quizQuestionInNotebook = ref<QuizQuestionInNotebook | undefined>(
 const chatInput = ref("")
 const messages = ref<Message[]>([])
 const bottomOfTheChat = ref<HTMLElement | null>(null)
-const chatInputTextArea = ref(null)
+const chatInputTextArea = ref<HTMLTextAreaElement | null>(null)
 const threadId = ref<string | undefined>(undefined)
 
 const isButtonDisabled = computed(() => chatInput.value === "")
@@ -110,8 +110,9 @@ const generateQuestion = async () => {
 
 const focusChatInput = () => {
   if (chatInputTextArea.value) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ;(chatInputTextArea.value as any).focus()
+    if (chatInputTextArea.value) {
+      chatInputTextArea.value.focus()
+    }
   }
 }
 

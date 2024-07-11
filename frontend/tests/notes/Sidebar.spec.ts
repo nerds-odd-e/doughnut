@@ -68,6 +68,7 @@ describe("Sidebar", () => {
       }
     }
 
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
     global.IntersectionObserver = MockIntersectionObserver as any
     /* eslint-enable */
   })

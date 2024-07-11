@@ -17,9 +17,8 @@ const getUrl = (config: OpenAPIConfig, options: ApiRequestOptions): string => {
   const path = options.url
     .replace("{api-version}", config.VERSION)
     .replace(/{(.*?)}/g, (substring: string, group: string) => {
-      // eslint-disable-next-line no-prototype-builtins
-      if (options.path?.hasOwnProperty(group)) {
-        return encoder(String(options.path[group]))
+      if (Object.hasOwn(options.path ?? {}, group)) {
+        return encoder(String(options.path?.[group]))
       }
       return substring
     })
