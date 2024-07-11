@@ -46,6 +46,16 @@ import { StorageAccessor } from "@/store/createNoteStorage"
 import TextInput from "../form/TextInput.vue"
 import NoteTopicComponent from "./core/NoteTopicComponent.vue"
 
+interface WikidataError {
+  body: {
+    message: string
+  }
+}
+
+interface WikidataIdError {
+  wikidataId: string
+}
+
 const { managedApi } = useLoadingApi()
 const props = defineProps({
   note: { type: Object as PropType<Note>, required: true },
@@ -70,8 +80,12 @@ const save = async () => {
       .updateWikidataId(props.note.id, associationData.value)
     emit("closeDialog")
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (e: any) {
-    wikidataIdError.value = e.wikidataId
+  } catch (e: unknown) {
+    if (typeof e === "object" && e !== null && "wikidataId" in e) {
+      wikidataIdError.value = (e as WikidataIdError).wikidataId
+    } else {
+      wikidataIdError.value = "An unknown error occurred"
+    }
   }
 }
 
@@ -90,8 +104,18 @@ const validateAndSave = async () => {
       return
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (e: any) {
-    wikidataIdError.value = e.body.message
+  } catch (e: unknown) {
+    if (
+      e instanceof Error &&
+      "body" in e &&
+      typeof e.body === "object" &&
+      e.body &&
+      "message" in e.body
+    ) {
+      wikidataIdError.value = (e as WikidataError).body.message
+    } else {
+      wikidataIdError.value = "An unknown error occurred"
+    }
   }
   await save()
 }
