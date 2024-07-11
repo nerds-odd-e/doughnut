@@ -37,8 +37,8 @@ export default defineConfig({
     tsconfigPaths(),
     checker({
       vueTsc: true,
-      eslint: {
-        lintCommand: 'eslint "./src/**/*.{vue,ts,tsx}" "./tests/**/*.ts"',
+      biome: {
+        command: 'check .',
       },
     }),
     vue({

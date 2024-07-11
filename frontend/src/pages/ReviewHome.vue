@@ -22,8 +22,9 @@ export default {
   components: { ReviewWelcome, ContainerPage },
   methods: {
     async fetchData() {
-      this.reviewing =
-        await this.managedApi.restReviewsController.overview(timezoneParam())
+      this.reviewing = await this.managedApi.restReviewsController.overview(
+        timezoneParam()
+      )
     },
   },
   mounted() {

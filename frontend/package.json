@@ -15,7 +15,8 @@
     "serve": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "lint": "eslint src tests"
+    "lint": "biome check .",
+    "format": "biome check --write ."
   },
   "dependencies": {
     "@popperjs/core": "^2.11.8",
