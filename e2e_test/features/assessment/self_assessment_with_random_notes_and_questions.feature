@@ -1,0 +1,24 @@
+Feature: Self assessment with random notes and questions
+  As a trainer, I want the assessment to be more dynamic by using random notes and questions
+
+  Background:
+    Given I am logged in as an existing user
+    And I have a notebook with head note "Countries" and notes:
+      | Topic     | Parent Topic |
+      | Singapore | Countries    |
+      | Vietnam   | Countries    |
+    And notebook "Countries" is shared to the Bazaar
+    And there are questions for the note:
+      | noteTopic | question                         | answer | oneWrongChoice | approved |
+      | Singapore | Where in the world is Singapore? | Asia   | euro           | true     |
+      | Vietnam   | Most famous food of Vietnam?     | Pho    | bread          | true     |
+
+  @randomizerWithFixedSeed
+  Scenario: Perform multiple assesments on the same notebook and questions vary from attempt to attempt
+    Given I set the number of questions per assessment of the notebook "Countries" to 1
+    Then 2 subsequent attempts of assessment on the "Countries" notebook should use 2 questions
+
+  @randomizerAlwaysInAscendOrder
+  Scenario: Should always use the same questions when randomizer is set to always in ascending order
+    Given I set the number of questions per assessment of the notebook "Countries" to 1
+    Then 2 subsequent attempts of assessment on the "Countries" notebook should use 1 questions
