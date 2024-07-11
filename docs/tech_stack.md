@@ -13,6 +13,7 @@
 - [cypress-cucumber-preprocessor](https://github.com/TheBrainFamily/cypress-cucumber-preprocessor#cypress-configuration)
 - [Cypress Testing Library](https://testing-library.com/docs/cypress-testing-library/intro/)
 - [pnpm](https://pnpm.io/)
+- [biome](https://biomejs.dev/)
 - [Vue3](https://v3.vuejs.org/guide/introduction.html)
 - [Vite](https://vitejs.dev)
 - [vue-router 4](https://router.vuejs.org/)

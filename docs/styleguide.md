@@ -1,10 +1,19 @@
 # Style Guide
 
-- For typescript code, turn on autofix on save in VSCode IDE:
-  - Install these following VSCode extensions/plugins:
-    1. [Vue.volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
-    2. [esbenp.prettier-vscode](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
-    3. [dbaeumer.vscode-eslint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
+- VSCode IDE:
+  - Install these following VSCode extension:
+    1. [Biome LSP VS Code Extension](https://marketplace.visualstudio.com/items?itemName=biomejs.biome)
+
+- IntelliJ Ultimate IDE:
+  - Install the following IntelliJ Ultimate plugin:
+    1. [Biome plugin for Jetbrains IDEs](https://plugins.jetbrains.com/plugin/22761-biome)
+
+- Zed IDE:
+  - Install the following Zed extension:
+    1. Open the Command Palette (View or Ctrl/⌘+⇧+P)
+    2. Select zed: extensions
+    3. Search Biome
+    4. Select Install
 
 ```json
 "editor.codeActionsOnSave": {

@@ -51,8 +51,6 @@ ports:
 vscode:
   extensions:
     - vue.volar
-    - esbenp.prettier-vscode
-    - dbaeumer.vscode-eslint
     - HansUXdev.bootstrap5-snippets
     - Shelex.vscode-cy-helper
     - mtxr.sqltools

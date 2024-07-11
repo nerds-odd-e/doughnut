@@ -16,7 +16,9 @@ Once you have VSCode installed, follow these steps to open the project:
 2. Click on `File` in the menu bar, then select `Open...`.
 3. Navigate to the directory where you have cloned this project, select it, and click `Open`.
 
-Since this is a monorepo project managed by PNPM, each sub-project (like `frontend` and `e2e`) has its own `package.json` file. VSCode might not automatically detect the correct `package.json` for each sub-project. To help VSCode understand the structure of the project, you can create a multi-root workspace:
+Since this is a monorepo project managed by PNPM, each sub-project (like `frontend` and `e2e`) has its own `package.json` file.
+VSCode might not automatically detect the correct `package.json` for each sub-project.
+To help VSCode understand the structure of the project, you can create a multi-root workspace:
 
 1. Open the Command Palette with `Ctrl+Shift+P` (or `Cmd+Shift+P` on macOS).
 2. Type "Add Folder to Workspace" and select the command.
