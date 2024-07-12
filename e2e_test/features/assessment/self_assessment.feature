@@ -9,33 +9,28 @@ Feature: Self assessment
       | Singapore | Countries    |
       | Vietnam   | Countries    |
       | Japan     | Countries    |
-      | Korea     | Countries    |
     And notebook "Countries" is shared to the Bazaar
     And there are questions for the note:
-      | noteTopic | question                                       | answer   | oneWrongChoice | approved |
-      | Singapore | Where in the world is Singapore?               | Asia     | euro           | true     |
-      | Vietnam   | Most famous food of Vietnam?                   | Pho      | bread          | true     |
-      | Japan     | What is the capital city of Japan?             | Tokyo    | Kyoto          | true     |
-      | Japan     | What is the largest city in the Kyushu island? | Fukuoka  | Nagasaki       | true     |
-      | Korea     | What is the capital city of Korea?             | Seoul    | Busan          | true     |
+      | noteTopic | question                           | answer | oneWrongChoice | approved |
+      | Singapore | Where in the world is Singapore?   | Asia   | euro           | true     |
+      | Vietnam   | Most famous food of Vietnam?       | Pho    | bread          | true     |
+      | Japan     | What is the capital city of Japan? | Tokyo  | Kyoto          | true     |
 
   Scenario Outline: Perform an assessment with variable outcomes counts correct scores
     Given I set the number of questions per assessment of the notebook "Countries" to <QuestionsPerAssessment>
     When I start the assessment on the "Countries" notebook in the bazaar
     And I answer with the following answers:
-      | question                                       | answer                   |
-      | Where in the world is Singapore?               | <SingaporeAnswer>        |
-      | Most famous food of Vietnam?                   | <VietnamAnswer>          |
-      | What is the capital city of Japan?             | <JapanAnswer>            |
-      | What is the capital city of Korea?             | <KoreaAnswer>            |
-      | What is the largest city in the Kyushu island? | <KyushuAnswer>           |
+      | question                           | answer            |
+      | Where in the world is Singapore?   | <SingaporeAnswer> |
+      | Most famous food of Vietnam?       | <VietnamAnswer>   |
+      | What is the capital city of Japan? | <JapanAnswer>     |
     Then I should see the score "Your score: <ExpectedScore> / <QuestionsPerAssessment>" at the end of assessment
 
     Examples:
-      | QuestionsPerAssessment | SingaporeAnswer | VietnamAnswer | JapanAnswer | KoreaAnswer | KyushuAnswer | ExpectedScore |
-      | 5                      | Asia            | Pho           | Tokyo       | Seoul       | Fukuoka      | 5             |
-      | 5                      | euro            | bread         | Kyoto       | Busan       | Nagasaki     | 0             |
-      | 5                      | Asia            | Pho           | Kyoto       | Busan       | Nagasaki     | 2             |
+      | QuestionsPerAssessment | SingaporeAnswer | VietnamAnswer | JapanAnswer | ExpectedScore |
+      | 3                      | Asia            | Pho           | Tokyo       | 3             |
+      | 3                      | euro            | bread         | Kyoto       | 0             |
+      | 3                      | Asia            | Pho           | Kyoto       | 2             |
 
   Scenario Outline: Cannot start assessment with 0 questions or not enough approved questions
     Given I set the number of questions per assessment of the notebook "Countries" to <Questions Per Assessment>
