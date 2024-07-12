@@ -1,8 +1,5 @@
 import { assumeAnsweredQuestionPage } from './pageObjects/AnsweredQuestionPage'
-import {
-  assumeAssessmentPage,
-  assumeAssessmentResultPage,
-} from './pageObjects/AssessmentPage'
+import { assumeAssessmentPage } from './pageObjects/AssessmentPage'
 import { assumeQuestionPage } from './pageObjects/QuizQuestionPage'
 import { assumeAdminDashboardPage } from './pageObjects/adminPages/adminDashboardPage'
 import { navigateToBazaar } from './pageObjects/bazaarPage'
@@ -21,7 +18,6 @@ export default {
   sidebar,
   assumeNotePage,
   assumeAssessmentPage,
-  assumeAssessmentResultPage,
   assumeAnsweredQuestionPage,
   assumeChatAboutNotePage,
   assumeQuestionPage,
