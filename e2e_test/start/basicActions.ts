@@ -10,12 +10,14 @@ import { assumeClarifyingQuestionDialog } from './pageObjects/clarifyingQuestion
 import { assumeNotePage } from './pageObjects/notePage'
 import { routerToNotebooksPage } from './pageObjects/notebooksPage'
 import { noteSidebar } from './pageObjects/noteSidebar'
+import { systemSidebar } from './pageObjects/systemSidebar'
 import testability from './testability'
 
 export default {
   navigateToBazaar,
   navigateToAssessmentHistory,
   noteSidebar,
+  systemSidebar,
   assumeNotePage,
   assumeAssessmentPage,
   assumeAnsweredQuestionPage,
@@ -46,7 +48,7 @@ export default {
 
   goToAdminDashboard: () => {
     cy.reload()
-    cy.openSidebar()
+    systemSidebar()
     cy.findByText('Admin Dashboard').click()
     return assumeAdminDashboardPage()
   },

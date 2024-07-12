@@ -62,7 +62,7 @@ Cypress.Commands.add('dialogDisappeared', () => {
 })
 
 Cypress.Commands.add('findUserSettingsButton', (userName: string) => {
-  cy.openSidebar()
+  start.systemSidebar()
   cy.findByRole('button', { name: 'User actions' }).click()
   cy.findByRole('button', { name: `Settings for ${userName}` })
 })
@@ -299,12 +299,6 @@ Cypress.Commands.add('yesIRemember', () => {
   cy.tick(11 * 1000).then(() => {
     cy.findByRole('button', { name: 'Yes, I remember' }).click({})
   })
-})
-
-Cypress.Commands.add('openSidebar', () => {
-  start.routerToNotebooksPage()
-  cy.pageIsNotLoading()
-  cy.findByRole('button', { name: 'open sidebar' }).click({ force: true })
 })
 
 Cypress.Commands.add('routerToInitialReview', () => {

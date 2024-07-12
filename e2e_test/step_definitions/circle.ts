@@ -9,7 +9,7 @@ import start from '../start'
 When(
   'I create a new circle {string} and copy the invitation code',
   (circleName: string) => {
-    cy.openSidebar()
+    start.systemSidebar()
     cy.findByRole('button', { name: 'Create a new circle' }).click()
     cy.formField('Name').type(circleName)
     cy.get('input[value="Submit"]').click()

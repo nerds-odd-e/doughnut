@@ -120,7 +120,7 @@ Then(
 
 Then('I edit user profile', () => {
   cy.visit('/')
-  cy.openSidebar()
+  start.systemSidebar()
   cy.findUserSettingsButton('Old Learner').click()
 })
 
@@ -131,7 +131,7 @@ Then('I change my name to {string}', (name: string) => {
 
 Then('I logout via the UI', () => {
   cy.visit('/')
-  cy.openSidebar()
+  start.systemSidebar()
   cy.findByRole('button', { name: 'User actions' }).click()
   cy.findByRole('button', { name: 'Logout' }).click()
 })

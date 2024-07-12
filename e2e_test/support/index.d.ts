@@ -36,7 +36,6 @@ declare namespace Cypress {
     loginAs(username: string): Chainable<any>
     logout(username?: string): Chainable<any>
     noteByTitle(noteTopic: string): Chainable<any>
-    openSidebar(): Chainable<any>
     pageIsNotLoading(): Chainable<any>
     clearFocusedText(): Chainable<any>
     replaceFocusedTextAndEnter(test: any): Chainable<any>

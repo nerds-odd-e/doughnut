@@ -1,10 +1,9 @@
 import { bazaarOrCircle } from './NotebookList'
 import noteCreationForm from './noteForms/noteCreationForm'
+import start from '../../start'
 
 export const navigateToCircle = (circleName: string) => {
-  cy.routerToRoot()
-  cy.pageIsNotLoading()
-  cy.openSidebar()
+  start.systemSidebar()
   cy.findByText(circleName, { selector: '.modal-body a' }).click()
 
   return {
