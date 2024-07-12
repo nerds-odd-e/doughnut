@@ -45,7 +45,6 @@ export default {
   },
 
   goToAdminDashboard: () => {
-    cy.reload()
     cy.openSidebar()
     cy.findByText('Admin Dashboard').click()
     return assumeAdminDashboardPage()
