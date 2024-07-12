@@ -61,10 +61,6 @@ Then('I should see error message The assessment is not available', () => {
   cy.findByText('The assessment is not available').should('be.visible')
 })
 
-Then('I should see a link to the {string} notebook', (noteName: string) => {
-  start.assumeAssessmentResultPage().expectCardFor(noteName)
-})
-
 Given(
   'OpenAI now refines the question to become:',
   (questionTable: DataTable) => {

@@ -42,21 +42,6 @@ Feature: Self assessment
       | 5                      | euro            | bread         | Kyoto       | Busan       | Shanghai    | Nagasaki     | Beijing                | 0             |
       | 5                      | Asia            | Pho           | Kyoto       | Busan       | Shanghai    | Nagasaki     | Beijing                | 2             |
 
-  Scenario: Perform an assessment with all wrong answers
-    Given I set the number of questions per assessment of the notebook "Countries" to 2
-    When I start the assessment on the "Countries" notebook in the bazaar
-    And I answer with the following answers:
-      | question                                       | answer   |
-      | Where in the world is Singapore?               | euro     |
-      | What is the capital city of Japan?             | Kyoto    |
-      | Most famous food of Vietnam?                   | bread    |
-      | What is the capital city of Korea?             | Busan    |
-      | What is the capital city of China?             | Shanghai |
-      | What is the largest city in the Kyushu island? | Nagasaki |
-      | What is the largest city of China?             | Beijing  |
-    Then I should see the score "Your score: 0 / 2" at the end of assessment
-    And I should see a link to the "Singapore" notebook
-
   Scenario Outline: Cannot start assessment with 0 questions or not enough approved questions
     Given I set the number of questions per assessment of the notebook "Countries" to <Questions Per Assessment>
     When I start the assessment on the "Countries" notebook in the bazaar

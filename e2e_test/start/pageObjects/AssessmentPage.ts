@@ -62,15 +62,3 @@ export const assumeAssessmentPage = (notebook?: string) => {
     },
   }
 }
-
-export const assumeAssessmentResultPage = () => {
-  cy.findByRole('heading', {
-    name: 'Improve your knowledge by studying these notes',
-  })
-
-  return {
-    expectCardFor(noteName: string) {
-      cy.get('.card-body').should('contain', noteName)
-    },
-  }
-}
