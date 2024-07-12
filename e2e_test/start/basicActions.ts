@@ -9,13 +9,13 @@ import { navigateToAssessmentHistory } from './pageObjects/AssessmentHistoryPage
 import { assumeClarifyingQuestionDialog } from './pageObjects/clarifyingQuestionDialog'
 import { assumeNotePage } from './pageObjects/notePage'
 import { routerToNotebooksPage } from './pageObjects/notebooksPage'
-import { sidebar } from './pageObjects/sidebar'
+import { noteSidebar } from './pageObjects/noteSidebar'
 import testability from './testability'
 
 export default {
   navigateToBazaar,
   navigateToAssessmentHistory,
-  sidebar,
+  noteSidebar,
   assumeNotePage,
   assumeAssessmentPage,
   assumeAnsweredQuestionPage,
