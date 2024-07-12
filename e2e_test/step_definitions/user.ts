@@ -65,7 +65,7 @@ Then('I should see {string} in the page', (content) => {
 })
 
 Then('My name {string} is in the user action menu', (name: string) => {
-  cy.findUserSettingsButton(name)
+  start.systemSidebar().userOptions().userSettings(name)
 })
 
 Then('my daily new notes to review is set to {int}', (number: string) => {
@@ -118,22 +118,17 @@ Then(
   }
 )
 
-Then('I edit user profile', () => {
-  cy.visit('/')
-  start.systemSidebar()
-  cy.findUserSettingsButton('Old Learner').click()
-})
-
-Then('I change my name to {string}', (name: string) => {
-  cy.formField('Name').assignFieldValue(name)
-  cy.findByText('Submit').click()
+Then('I edit user profile to change my name to {string}', (name: string) => {
+  start
+    .systemSidebar()
+    .userOptions()
+    .userSettings('Old Learner')
+    .changeName(name)
 })
 
 Then('I logout via the UI', () => {
   cy.visit('/')
-  start.systemSidebar()
-  cy.findByRole('button', { name: 'User actions' }).click()
-  cy.findByRole('button', { name: 'Logout' }).click()
+  start.systemSidebar().userOptions().logout()
 })
 
 Then('I should be on the welcome page and asked to login', () => {
@@ -142,8 +137,9 @@ Then('I should be on the welcome page and asked to login', () => {
 })
 
 Then('I opt to do only AI generated questions', () => {
-  cy.visit('/')
-  cy.findUserSettingsButton('Old Learner').click()
-  cy.formField('Ai Question Type Only For Review').check()
-  cy.findByText('Submit').click()
+  start
+    .systemSidebar()
+    .userOptions()
+    .userSettings('Old Learner')
+    .aiQuestionOnlyForReview()
 })

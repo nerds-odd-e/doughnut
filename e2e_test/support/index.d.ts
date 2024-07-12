@@ -19,7 +19,6 @@ declare namespace Cypress {
     expectNoteCards(expectedCards: any): Chainable<any>
     findCardTitle(topic: string): Chainable<any>
     expectAMapTo(latitude: string, longitude: string): Chainable<any>
-    findUserSettingsButton(userName: string): Chainable<any>
     failure(): Chainable<any>
     formField(label: string): Chainable<any>
     assignFieldValue(value: string): Chainable<any>
