@@ -2637,21 +2637,16 @@ components:
     QuizQuestionTestData:
       type: object
       properties:
-        noteTopic:
+        Note Topic:
           type: string
-          writeOnly: true
-        question:
+        Question:
           type: string
-          writeOnly: true
-        answer:
+        Answer:
           type: string
-          writeOnly: true
-        oneWrongChoice:
+        One Wrong Choice:
           type: string
-          writeOnly: true
-        approved:
+        Approved:
           type: boolean
-          writeOnly: true
     QuizQuestionsTestData:
       type: object
       properties:
