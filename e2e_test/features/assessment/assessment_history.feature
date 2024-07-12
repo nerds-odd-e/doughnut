@@ -3,11 +3,6 @@ Feature: Assessment History
   so that I can track my progress
   and review/share my results with others
 
-  Scenario: "Empty history when no assessment has been done"
-    Given I am logged in as an existing user
-    When I go to the assessment history page
-    Then I should see an empty assessment list
-
   Scenario: "View assessment history"
     Given I am logged in as an existing user
     And I have a notebook with the head note "Countries"

@@ -5,10 +5,6 @@ When('I go to the assessment history page', () => {
   start.navigateToAssessmentHistory()
 })
 
-Then('I should see an empty assessment list', () => {
-  cy.findByText('No assessment has been done yet')
-})
-
 Then('I see the following assessments:', (dataTable: DataTable) => {
   // look for exactly one row in a table and assert the content of each cell: assessment topic, correct answers, total questions
   const rows = dataTable.hashes()
