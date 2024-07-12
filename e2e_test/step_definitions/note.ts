@@ -478,7 +478,7 @@ When('I expand the children of note {string}', (noteTopic: string) => {
 When(
   'I expand the children of note {string} in the sidebar',
   (noteTopic: string) => {
-    start.sidebar().expand(noteTopic)
+    start.noteSidebar().expand(noteTopic)
   }
 )
 

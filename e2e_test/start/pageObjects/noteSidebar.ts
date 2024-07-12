@@ -1,4 +1,4 @@
-export const sidebar = () => {
+export const noteSidebar = () => {
   cy.get('aside').should('exist')
 
   return {
