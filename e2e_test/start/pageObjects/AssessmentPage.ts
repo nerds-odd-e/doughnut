@@ -14,8 +14,8 @@ const assumeQuestionSection = () => {
     },
     answerFromTable(answersTable: Record<string, string>[]) {
       return this.getStemText().then((stem) => {
-        const row = answersTable.find((row) => row.question === stem)
-        return this.answer(row!.answer ?? '')
+        const row = answersTable.find((row) => row.Question === stem)
+        return this.answer(row!.Answer ?? '')
       })
     },
     answer(answer: string) {

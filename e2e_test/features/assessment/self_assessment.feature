@@ -19,7 +19,7 @@ Feature: Self assessment
   Scenario Outline: Perform an assessment with variable outcomes counts correct scores
     Given I set the number of questions per assessment of the notebook "Countries" to <QuestionsPerAssessment>
     When I do the assessment on the "Countries" notebook in the bazaar with the following answers:
-      | question                           | answer            |
+      | Question                           | Answer            |
       | Where in the world is Singapore?   | <SingaporeAnswer> |
       | Most famous food of Vietnam?       | <VietnamAnswer>   |
       | What is the capital city of Japan? | <JapanAnswer>     |
