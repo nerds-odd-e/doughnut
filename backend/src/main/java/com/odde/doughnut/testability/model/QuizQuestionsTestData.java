@@ -18,12 +18,16 @@ public class QuizQuestionsTestData {
   static class QuizQuestionTestData {
     @JsonProperty("Note Topic")
     private String noteTopic;
+
     @JsonProperty("Question")
     private String question;
+
     @JsonProperty("Answer")
     private String answer;
+
     @JsonProperty("One Wrong Choice")
     private String oneWrongChoice;
+
     @JsonProperty("Approved")
     private boolean approved;
 
