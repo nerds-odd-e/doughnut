@@ -14,15 +14,24 @@ When(
   }
 )
 
-When('I answer with the following answers:', function (table: DataTable) {
-  start.assumeAssessmentPage().answerQuestionsFromTable(table.hashes())
-})
+When(
+  'I do the assessment on the {string} notebook in the bazaar with the following answers:',
+  function (notebook: string, table: DataTable) {
+    start
+      .navigateToBazaar()
+      .selfAssessmentOnNotebook(notebook)
+      .answerQuestionsFromTable(table.hashes())
+  }
+)
 
 When(
   'I submit the assessment on the {string} notebook in the bazaar',
   (notebook: string) => {
-    start.navigateToBazaar().selfAssessmentOnNotebook(notebook)
-    start.assumeAssessmentPage().assumeQuestionSection().answerFirstOption()
+    start
+      .navigateToBazaar()
+      .selfAssessmentOnNotebook(notebook)
+      .assumeQuestionSection()
+      .answerFirstOption()
     start.assumeAssessmentPage().expectEndOfAssessment('Your score: 1 / 1')
   }
 )
