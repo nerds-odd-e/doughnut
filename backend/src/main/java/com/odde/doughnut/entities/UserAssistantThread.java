@@ -3,10 +3,12 @@ package com.odde.doughnut.entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Entity
 @Table(name = "user_assistant_thread")
 @Data
+@EqualsAndHashCode(callSuper = false)
 public class UserAssistantThread extends EntityIdentifiedByIdOnly {
   @OneToOne
   @NotNull

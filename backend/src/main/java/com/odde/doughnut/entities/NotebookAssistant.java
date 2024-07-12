@@ -4,10 +4,12 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Entity
 @Table(name = "notebook_assistant")
 @Data
+@EqualsAndHashCode(callSuper = false)
 public class NotebookAssistant extends EntityIdentifiedByIdOnly {
   @OneToOne
   @NotNull
