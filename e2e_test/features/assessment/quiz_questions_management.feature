@@ -48,7 +48,7 @@ Feature: Quiz Question Management
     And I add the following question for the note "The cow joke":
       | Stem                                 | Choice 0       | Choice 1       | Choice 2          | Correct Choice Index |
       | Why cows moo from their mouths?      | they don't boo | they tried poo | they ain't voodoo | 1                    |
-    When I delete the following "What do you call a cow with not leg?" question for the note "The cow joke"
+    When I delete the question with title "What do you call a cow with not leg?" for the note "The cow joke"
     Then I should see the questions in the question list of the note "The cow joke":
       | Question                             | Correct Choice |
       | What does a cow say?                 | moo            |
