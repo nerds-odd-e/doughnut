@@ -82,7 +82,7 @@
     "vite-tsconfig-paths": "^4.3.2",
     "vitest": "2.0.2",
     "vitest-dom": "^0.1.1",
-    "vitest-fetch-mock": "^0.2.2",
+    "vitest-fetch-mock": "^0.3.0",
     "vue-tsc": "2.0.26"
   }
 }
