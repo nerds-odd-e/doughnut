@@ -1,5 +1,6 @@
 package com.odde.doughnut.testability.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionAndAnswer;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -15,10 +16,15 @@ public class QuizQuestionsTestData {
 
   @Setter
   static class QuizQuestionTestData {
+    @JsonProperty("Note Topic")
     private String noteTopic;
+    @JsonProperty("Question")
     private String question;
+    @JsonProperty("Answer")
     private String answer;
+    @JsonProperty("One Wrong Choice")
     private String oneWrongChoice;
+    @JsonProperty("Approved")
     private boolean approved;
 
     public QuizQuestionAndAnswer buildQuizQuestion(Note note) {

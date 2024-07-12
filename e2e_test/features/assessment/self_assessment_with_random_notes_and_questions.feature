@@ -9,9 +9,9 @@ Feature: Self assessment with random notes and questions
       | Vietnam   | Countries    |
     And notebook "Countries" is shared to the Bazaar
     And there are questions for the note:
-      | noteTopic | question                         | answer | oneWrongChoice | approved |
-      | Singapore | Where in the world is Singapore? | Asia   | euro           | true     |
-      | Vietnam   | Most famous food of Vietnam?     | Pho    | bread          | true     |
+      | Note Topic | Question                         | Answer | One Wrong Choice | Approved |
+      | Singapore  | Where in the world is Singapore? | Asia   | euro             | true     |
+      | Vietnam    | Most famous food of Vietnam?     | Pho    | bread            | true     |
 
   @randomizerWithFixedSeed
   Scenario: Perform multiple assesments on the same notebook and questions vary from attempt to attempt

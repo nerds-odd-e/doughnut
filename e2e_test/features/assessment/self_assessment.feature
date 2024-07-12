@@ -11,10 +11,10 @@ Feature: Self assessment
       | Japan     | Countries    |
     And notebook "Countries" is shared to the Bazaar
     And there are questions for the note:
-      | noteTopic | question                           | answer | oneWrongChoice | approved |
-      | Singapore | Where in the world is Singapore?   | Asia   | euro           | true     |
-      | Vietnam   | Most famous food of Vietnam?       | Pho    | bread          | true     |
-      | Japan     | What is the capital city of Japan? | Tokyo  | Kyoto          | true     |
+      | Note Topic | Question                           | Answer | One Wrong Choice | Approved |
+      | Singapore  | Where in the world is Singapore?   | Asia   | europe           | true     |
+      | Vietnam    | Most famous food of Vietnam?       | Pho    | bread            | true     |
+      | Japan      | What is the capital city of Japan? | Tokyo  | kyoto            | true     |
 
   Scenario Outline: Perform an assessment with variable outcomes counts correct scores
     Given I set the number of questions per assessment of the notebook "Countries" to <QuestionsPerAssessment>
@@ -29,8 +29,8 @@ Feature: Self assessment
     Examples:
       | QuestionsPerAssessment | SingaporeAnswer | VietnamAnswer | JapanAnswer | ExpectedScore |
       | 3                      | Asia            | Pho           | Tokyo       | 3             |
-      | 3                      | euro            | bread         | Kyoto       | 0             |
-      | 3                      | Asia            | Pho           | Kyoto       | 2             |
+      | 3                      | europe          | bread         | kyoto       | 0             |
+      | 3                      | Asia            | Pho           | kyoto       | 2             |
 
   Scenario Outline: Cannot start assessment with 0 questions or not enough approved questions
     Given I set the number of questions per assessment of the notebook "Countries" to <Questions Per Assessment>
