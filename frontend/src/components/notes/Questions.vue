@@ -38,18 +38,30 @@
             />
           </td>
           <td>
-            <PopButton btn-class="btn btn-secondary" title="Edit">
-              <!-- prettier-ignore -->
-              <template #default="{ closer }">
-                <NoteAddQuestion
-                  v-bind="{ action: action.Edit, note, question }"
-                  @close-dialog="
-                    closer($event);
-                    questionEdited($event);
-                  "
-                />
-              </template>
-            </PopButton>
+            <div class="d-flex flex-row">
+              <div class="p-2">
+                <PopButton btn-class="btn btn-secondary" title="Edit">
+                  <!-- prettier-ignore -->
+                  <template #default="{ closer }">
+                    <NoteAddQuestion
+                      v-bind="{ action: action.Edit, note, question }"
+                      @close-dialog="
+                        closer($event);
+                        questionEdited($event);
+                      "
+                    />
+                  </template>
+                </PopButton>
+              </div>
+              <div class="p-2">
+                <button
+                  class="btn btn-sm btn-danger"
+                  @click="deleteQuestion(question)"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
           </td>
           <td>{{ question.quizQuestion.multipleChoicesQuestion.stem }}</td>
           <template
@@ -112,6 +124,12 @@ const questionEdited = (question: QuizQuestionAndAnswer) => {
     result.quizQuestion.multipleChoicesQuestion.choices =
       question.quizQuestion.multipleChoicesQuestion.choices
   }
+}
+const deleteQuestion = async (question: QuizQuestionAndAnswer) => {
+  const response = await managedApi.restQuizQuestionController.deleteQuestion(
+    question.id
+  )
+  questions.value = questions.value.filter((e) => e.id !== response.id)
 }
 const toggleApproval = async (questionId?: number) => {
   if (questionId) {
