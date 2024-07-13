@@ -21,6 +21,7 @@
           <th>B</th>
           <th>C</th>
           <th>D</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -40,15 +41,20 @@
           <template
             v-if="question.quizQuestion.multipleChoicesQuestion.choices"
           >
-            <td
-              v-for="(choice, index) in question.quizQuestion
-                .multipleChoicesQuestion.choices"
-              :class="{
-                'correct-choice': index === question.correctAnswerIndex,
-              }"
-              :key="index"
-            >
-              {{ choice }}
+            <td :class="{'correct-choice': 0 === question.correctAnswerIndex}">
+              {{ question.quizQuestion.multipleChoicesQuestion.choices[0] }}
+            </td>
+            <td :class="{'correct-choice': 1 === question.correctAnswerIndex}">
+              {{ question.quizQuestion.multipleChoicesQuestion.choices[1] }}
+            </td>
+            <td :class="{'correct-choice': 2 === question.correctAnswerIndex}">
+              {{ question.quizQuestion.multipleChoicesQuestion.choices[2] }}
+            </td>
+            <td :class="{'correct-choice': 3 === question.correctAnswerIndex}">
+              {{ question.quizQuestion.multipleChoicesQuestion.choices[3] }}
+            </td>
+            <td class="d-flex justify-content-center">
+              <button class="btn btn-danger" @click="questDeleted(question)">x</button>
             </td>
           </template>
         </tr>
@@ -88,6 +94,11 @@ const toggleApproval = async (questionId?: number) => {
   if (questionId) {
     await managedApi.restQuizQuestionController.toggleApproval(questionId)
   }
+}
+
+const questDeleted = async (question: QuizQuestionAndAnswer) => {
+  await managedApi.restQuizQuestionController.deleteQuestionManually(question.id)
+  await fetchQuestions()
 }
 onMounted(() => {
   fetchQuestions()
