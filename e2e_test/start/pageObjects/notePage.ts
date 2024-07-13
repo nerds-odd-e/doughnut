@@ -206,8 +206,8 @@ export const assumeNotePage = (noteTopic?: string) => {
     expectQuestionsInList(expectedQuestions: Record<string, string>[]) {
       this.openQuestionList().expectQuestion(expectedQuestions)
     },
-    expectNoQuestion(question: string) {
-      this.openQuestionList().expectNoQuestion(question)
+    expectThereIsOnlyOneQuestionLeft() {
+      this.openQuestionList().expectThereShouldBeOneQuestionLeft()
     },
     deleteQuestion(question: string) {
       this.openQuestionList()

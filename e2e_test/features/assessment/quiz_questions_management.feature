@@ -23,7 +23,10 @@ Feature: Quiz Question Management
       | Stem                                 | Choice 0                | Choice 1                  | Choice 2 | Correct Choice Index |
       | What am I doing here?                | Learning from an expert | Being forced to be here   | N/A      | 0                    |
     When I delete the question "What am I doing here?" in the note "The cow joke"
-    Then I should not see the question "What am I doing here?" in the question list of the note "The cow joke"
+    Then I should see the questions in the question list of the note "The cow joke":
+      | Question                             | Correct Choice |
+      | What does a cow say?                 | moo            |
+    And there should be only one question left in the note "The cow joke"
 
   @usingMockedOpenAiService
   Scenario: Can generate the question by AI

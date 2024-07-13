@@ -70,9 +70,9 @@ When(
 )
 
 Then(
-  "I should not see the question {string} in the question list of the note {string}",
-  (questionTitle: string, noteTopic: string) => {
-    start.jumpToNotePage(noteTopic).expectNoQuestion(questionTitle)
+  "there should be only one question left in the note {string}",
+  (noteTopic: string) => {
+    start.jumpToNotePage(noteTopic).expectThereIsOnlyOneQuestionLeft()
   },
 )
 

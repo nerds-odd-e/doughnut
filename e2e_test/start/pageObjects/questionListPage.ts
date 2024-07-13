@@ -11,8 +11,8 @@ export const questionListPage = () => {
         })
       })
     },
-    expectNoQuestion(question: string) {
-      cy.findByText(question).should("not.exist")
-    }
+    expectThereShouldBeOneQuestionLeft() {
+      cy.get("input[id^=checkbox-]").should("have.length", 1)
+    },
   }
 }
