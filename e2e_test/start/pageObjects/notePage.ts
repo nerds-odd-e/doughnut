@@ -191,13 +191,13 @@ export const assumeNotePage = (noteTopic?: string) => {
       return questionListPage()
     },
     addQuestion(row: Record<string, string>) {
-      this.openQuestionList().addQuestionPage().addQuestion(row)
+      this.openQuestionList().addQuestionPage().submitQuestion(row)
     },
     editQuestion(questionNo: number, row: Record<string, string>) {
-      this.openQuestionList().editQuestionPage(questionNo).editQuestion(row)
+      this.openQuestionList().editQuestionPage(questionNo).submitQuestion(row)
     },
     deleteQuestion(questionNo: number) {
-      this.openQuestionList().deleteQuestion(questionNo);
+      this.openQuestionList().deleteQuestion(questionNo)
     },
     refineQuestion(row: Record<string, string>) {
       this.openQuestionList().addQuestionPage().refineQuestion(row)
