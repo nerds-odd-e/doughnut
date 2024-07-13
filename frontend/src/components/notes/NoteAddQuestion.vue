@@ -51,6 +51,7 @@ import useLoadingApi from "@/managedApi/useLoadingApi"
 import { Note, QuizQuestionAndAnswer } from "@/generated/backend"
 import isMCQWithAnswerValid from "@/models/isMCQWithAnswerValid"
 import TextArea from "../form/TextArea.vue"
+import TextInput from "@/components/form/TextInput.vue";
 
 const { managedApi } = useLoadingApi()
 const props = defineProps({
@@ -58,9 +59,13 @@ const props = defineProps({
     type: Object as PropType<Note>,
     required: true,
   },
+  question: {
+    type: Object as PropType<QuizQuestionAndAnswer>,
+    required: false
+  },
 })
 
-const quizQuestionAndAnswer = ref<QuizQuestionAndAnswer>({
+const quizQuestionAndAnswer = ref<QuizQuestionAndAnswer>(props.question ?? {
   correctAnswerIndex: 0,
   quizQuestion: {
     multipleChoicesQuestion: {
