@@ -14,44 +14,63 @@
     </PopButton>
     <table class="question-table mt-2">
       <thead>
-        <tr>
-          <th>Approved</th>
-          <th>Question Text</th>
-          <th>A</th>
-          <th>B</th>
-          <th>C</th>
-          <th>D</th>
-        </tr>
+      <tr>
+        <th>Action</th>
+        <th>Approved</th>
+        <th>Question Text</th>
+        <th>A</th>
+        <th>B</th>
+        <th>C</th>
+        <th>D</th>
+      </tr>
       </thead>
       <tbody>
-        <tr
-          v-for="(question, outerIndex) in questions"
-          :key="question.quizQuestion.multipleChoicesQuestion.stem"
-        >
-          <td>
-            <input
-              :id="'checkbox-' + outerIndex"
-              type="checkbox"
-              v-model="question.approved"
-              @change="toggleApproval(question.id)"
-            />
-          </td>
-          <td>{{ question.quizQuestion.multipleChoicesQuestion.stem }}</td>
-          <template
-            v-if="question.quizQuestion.multipleChoicesQuestion.choices"
+      <tr
+        v-for="(question, outerIndex) in questions"
+        :key="question.quizQuestion.multipleChoicesQuestion.stem"
+      >
+        <td>
+          <PopButton
+            :id="'btn-edit-question-' + outerIndex"
+            btn-class="btn btn-secondary"
+            title="Edit"
           >
-            <td
-              v-for="(choice, index) in question.quizQuestion
+            <!-- prettier-ignore -->
+            <template #default="{ closer }">
+              <NoteAddQuestion
+                v-bind="{ note, question }"
+                @close-dialog="
+                  closer($event);
+                  "
+              />
+            </template>
+          </PopButton>
+        </td>
+        <td>
+          <input
+            :id="'checkbox-' + outerIndex"
+            type="checkbox"
+            v-model="question.approved"
+            @change="toggleApproval(question.id)"
+          />
+        </td>
+
+        <td>{{ question.quizQuestion.multipleChoicesQuestion.stem }}</td>
+        <template
+          v-if="question.quizQuestion.multipleChoicesQuestion.choices"
+        >
+          <td
+            v-for="(choice, index) in question.quizQuestion
                 .multipleChoicesQuestion.choices"
-              :class="{
+            :class="{
                 'correct-choice': index === question.correctAnswerIndex,
               }"
-              :key="index"
-            >
-              {{ choice }}
-            </td>
-          </template>
-        </tr>
+            :key="index"
+          >
+            {{ choice }}
+          </td>
+        </template>
+      </tr>
       </tbody>
     </table>
   </div>
@@ -62,6 +81,7 @@ import { PropType, onMounted, ref } from "vue"
 import { Note, QuizQuestionAndAnswer } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import NoteAddQuestion from "./NoteAddQuestion.vue"
+
 import PopButton from "../commons/Popups/PopButton.vue"
 
 const { managedApi } = useLoadingApi()
@@ -71,6 +91,7 @@ const props = defineProps({
     required: true,
   },
 })
+
 const questions = ref<QuizQuestionAndAnswer[]>([])
 const fetchQuestions = async () => {
   questions.value =
@@ -89,6 +110,7 @@ const toggleApproval = async (questionId?: number) => {
     await managedApi.restQuizQuestionController.toggleApproval(questionId)
   }
 }
+
 onMounted(() => {
   fetchQuestions()
 })
