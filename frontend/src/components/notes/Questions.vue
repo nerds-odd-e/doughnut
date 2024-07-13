@@ -54,7 +54,7 @@
               {{ question.quizQuestion.multipleChoicesQuestion.choices[3] }}
             </td>
             <td class="d-flex justify-content-center">
-              <button class="btn btn-danger" @click="questionDeleted(question)">x</button>
+              <button class="btn btn-danger" @click="questionDeleted(question)">Delete</button>
             </td>
           </template>
         </tr>
