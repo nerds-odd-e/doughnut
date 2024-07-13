@@ -183,7 +183,7 @@ export class RestQuizQuestionControllerService {
         });
     }
     /**
-     * @param note
+     * @param quizQuestion
      * @param requestBody
      * @returns QuizQuestionAndAnswer OK
      * @throws ApiError
