@@ -78,3 +78,11 @@ Given(
       .resetAndStubAskingMCQ(questionTable.hashes()[0]!)
   }
 )
+
+Then(
+  'I must see the following assessments in my assessment history:',
+  (dataTable: DataTable) => {
+    const rows = dataTable.hashes()
+    start.navigateToAssessmentHistory().expectAssessmentHistory(rows)
+  }
+)
