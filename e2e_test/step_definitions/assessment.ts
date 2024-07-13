@@ -15,7 +15,7 @@ When(
 )
 
 When(
-  'I do the assessment on the {string} notebook in the bazaar with the following answers:',
+  'I do the assessment on {string} notebook in the bazaar with the following answers:',
   function (notebook: string, table: DataTable) {
     start
       .navigateToBazaar()
