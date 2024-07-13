@@ -28,7 +28,6 @@ public class ApplicationController {
         "/circles/**",
         "/notebooks/**",
         "/assessment/**",
-        "/assessment-history/**",
         "/n**",
         "/reviews/**",
         "/answers/**",

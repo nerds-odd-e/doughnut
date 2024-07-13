@@ -14,7 +14,6 @@ import AnsweredQuestionPage from "@/pages/AnsweredQuestionPage.vue"
 import AdminDashboardPage from "@/pages/AdminDashboardPage.vue"
 import NonproductionOnlyLoginPage from "@/pages/NonproductionOnlyLoginPage.vue"
 import NestedPage from "../pages/commons/NestedPage"
-import AssessmentHistoryPage from "@/pages/AssessmentHistoryPage.vue"
 
 const NestedInitialReviewPage = NestedPage(InitialReviewPage, "initial")
 
@@ -81,11 +80,6 @@ const routes = [
     name: "assessment",
     component: AssessmentPage,
     props: true,
-  },
-  {
-    path: "/assessment-history",
-    name: "assessmentHistory",
-    component: AssessmentHistoryPage,
   },
   { path: "/reviews", name: "reviews", component: ReviewHome },
   {
