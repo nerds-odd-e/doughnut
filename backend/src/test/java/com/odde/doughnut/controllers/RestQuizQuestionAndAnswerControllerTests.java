@@ -38,6 +38,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -599,9 +600,11 @@ class RestQuizQuestionAndAnswerControllerTests {
 
     @Test
     void deleteApproval() throws UnexpectedNoAccessRightException {
-      QuizQuestionAndAnswer quizQuestionAndAnswer =
-          makeMe.aQuestion().approvedSpellingQuestionOf(subjectNote).please();
-      controller.deleteQuestion(quizQuestionAndAnswer);
+      QuizQuestionAndAnswer quizQuestionAndAnswer = makeMe.aQuestion().approvedSpellingQuestionOf(subjectNote).please();
+
+      var response = controller.deleteQuestion(quizQuestionAndAnswer);
+
+      assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }
   }
 }

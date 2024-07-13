@@ -2536,8 +2536,8 @@ paths:
             '*/*':
               schema:
                 type: string
-        "204":
-          description: No Content
+        "200":
+          description: OK
 components:
   schemas:
     Circle:
