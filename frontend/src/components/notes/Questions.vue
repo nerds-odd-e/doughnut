@@ -29,9 +29,9 @@
           v-for="(question, outerIndex) in questions"
           :key="question.quizQuestion.multipleChoicesQuestion.stem"
         >
-        <td>
-          <button @click="deleteQuestion(question.id)">Delete</button>
-        </td>
+          <td>
+            <button @click="deleteQuestion(question.id)">Delete</button>
+          </td>
           <td>
             <input
               :id="'checkbox-' + outerIndex"
@@ -96,7 +96,7 @@ const toggleApproval = async (questionId?: number) => {
 const deleteQuestion = async (questionId?: number) => {
   if (questionId) {
     await managedApi.restQuizQuestionController.deleteQuestion(questionId)
-    fetchQuestions();
+    fetchQuestions()
   }
 }
 onMounted(() => {
