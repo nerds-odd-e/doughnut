@@ -41,7 +41,8 @@
     <button @click="generateQuestionByAI" :disabled="dirty">
       Generate by AI
     </button>
-    <button @click="submitQuestion" :disabled="!isValidQuestion">Submit</button>
+    <button v-if="action == 'add'" @click="submitQuestion" :disabled="!isValidQuestion">Submit</button>
+    <button v-if="action == 'edit'" @click="updateQuestion" :disabled="!isValidQuestion">Update</button>
   </div>
 </template>
 
@@ -51,7 +52,7 @@ import useLoadingApi from "@/managedApi/useLoadingApi"
 import { Note, QuizQuestionAndAnswer } from "@/generated/backend"
 import isMCQWithAnswerValid from "@/models/isMCQWithAnswerValid"
 import TextArea from "../form/TextArea.vue"
-import TextInput from "@/components/form/TextInput.vue";
+import TextInput from "@/components/form/TextInput.vue"
 
 const { managedApi } = useLoadingApi()
 const props = defineProps({
@@ -61,20 +62,22 @@ const props = defineProps({
   },
   question: {
     type: Object as PropType<QuizQuestionAndAnswer>,
-    required: false
+    required: false,
   },
 })
-
-const quizQuestionAndAnswer = ref<QuizQuestionAndAnswer>(props.question ?? {
-  correctAnswerIndex: 0,
-  quizQuestion: {
-    multipleChoicesQuestion: {
-      stem: "",
-      choices: ["", ""],
+const action: string = props.question ? "edit" : "add";
+const quizQuestionAndAnswer = ref<QuizQuestionAndAnswer>(
+  props.question ??
+  ({
+    correctAnswerIndex: 0,
+    quizQuestion: {
+      multipleChoicesQuestion: {
+        stem: "",
+        choices: ["", ""],
+      },
     },
-  },
-} as QuizQuestionAndAnswer)
-
+  } as QuizQuestionAndAnswer)
+)
 const minimumNumberOfChoices = 2
 const maximumNumberOfChoices = 10
 
@@ -118,6 +121,7 @@ const submitQuestion = async () => {
     )
   emit("close-dialog", response)
 }
+const updateQuestion = async () => {}
 const refineQuestion = async () => {
   const quizQuestion = quizQuestionAndAnswer.value
   quizQuestionAndAnswer.value =

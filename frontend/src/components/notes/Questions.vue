@@ -78,7 +78,7 @@
 
 <script setup lang="ts">
 import { PropType, onMounted, ref } from "vue"
-import {Note, QuizQuestionAndAnswer} from "@/generated/backend"
+import { Note, QuizQuestionAndAnswer } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import NoteAddQuestion from "./NoteAddQuestion.vue"
 
@@ -89,7 +89,7 @@ const props = defineProps({
   note: {
     type: Object as PropType<Note>,
     required: true,
-  }
+  },
 })
 
 const questions = ref<QuizQuestionAndAnswer[]>([])
