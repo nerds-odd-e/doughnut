@@ -12,7 +12,7 @@ Feature: Quiz Question Management
   Scenario: Manually add a question to the note successfully
     When I add the following question for the note "The cow joke":
       | Stem                                 | Choice 0    | Choice 1 | Choice 2 | Correct Choice Index |
-      | What do you call a cow with not leg? | Ground beef | Cowboy   | Oxford   | 0                    |
+      | What do you call a cow with not leg? | Ground beef | Cowboy   | Oxford   |                    0 |
     Then I should see the questions in the question list of the note "The cow joke":
       | Question                             | Correct Choice |
       | What does a cow say?                 | moo            |
@@ -26,8 +26,7 @@ Feature: Quiz Question Management
     When I generate question by AI for note "The cow joke"
     Then the question in the form becomes:
       | Stem                                     | Choice 0     | Choice 1 | Choice 2  | Correct Choice Index |
-      | Why do cows have hooves instead of feet? | they lactose | they moo | they have | 0                    |
-
+      | Why do cows have hooves instead of feet? | they lactose | they moo | they have |                    0 |
 
   @usingMockedOpenAiService
   Scenario: Can refine the question by AI
@@ -36,7 +35,20 @@ Feature: Quiz Question Management
       | Why did the cow cross the road? | To get to the udder side | To see the chicken | To find grass      |
     When I refine the following question for the note "The cow joke":
       | Stem                                 | Choice 1 | Correct Choice Index |
-      | What do you call a cow with no legs? | Cowboy   | 0                    |
+      | What do you call a cow with no legs? | Cowboy   |                    0 |
     Then the question in the form becomes:
       | Stem                            | Choice 0                 | Choice 1           | Choice 2      | Correct Choice Index |
-      | Why did the cow cross the road? | To get to the udder side | To see the chicken | To find grass | 0                    |
+      | Why did the cow cross the road? | To get to the udder side | To see the chicken | To find grass |                    0 |
+
+  Scenario: Delete quiz question
+    When I add the following question for the note "The cow joke":
+      | Stem                           | Choice 0 | Choice 1 | Choice 2 | Correct Choice Index |
+      | The moon revolve around earth. | Yes      | No       | Not Sure |                    0 |
+    Then I should see the questions in the question list of the note "The cow joke":
+      | Question                       | Correct Choice |
+      | What does a cow say?           | moo            |
+      | The moon revolve around earth. | Yes            |
+    When I delete the question "The moon revolve around earth." for the note "The cow joke"
+    Then I should see the questions in the question list of the note "The cow joke":
+      | Question             | Correct Choice |
+      | What does a cow say? | moo            |

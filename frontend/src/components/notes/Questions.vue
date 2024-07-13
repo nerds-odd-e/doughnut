@@ -30,7 +30,12 @@
           :key="question.quizQuestion.multipleChoicesQuestion.stem"
         >
           <td>
-            <button @click="deleteQuestion(question.id)">Delete</button>
+            <button
+              :id="'delete-quiz-' + outerIndex"
+              @click="deleteQuestion(question.id)"
+            >
+              Delete
+            </button>
           </td>
           <td>
             <input
