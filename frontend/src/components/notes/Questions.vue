@@ -36,7 +36,7 @@
               @change="toggleApproval(question.id)"
             />
           </td>
-          <button @click="deleteQuestion(question.id)">Delete</button>
+          <button :id="'btn-delete-question-' + outerIndex" @click="deleteQuestion(question.id)">Delete</button>
           <td>{{ question.quizQuestion.multipleChoicesQuestion.stem }}</td>
           <template
             v-if="question.quizQuestion.multipleChoicesQuestion.choices"

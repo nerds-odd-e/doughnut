@@ -18,6 +18,13 @@ Feature: Quiz Question Management
       | What does a cow say?                 | moo            |
       | What do you call a cow with not leg? | Ground beef    |
 
+  Scenario: Delete a question in the question list in a note successfully
+    Given I add the following question for the note "The cow joke":
+      | Stem                                 | Choice 0                | Choice 1                  | Choice 2 | Correct Choice Index |
+      | What am I doing here?                | Learning from an expert | Being forced to be here   | N/A      | 0                    |
+    When I delete the question "What am I doing here?" in the note "The cow joke"
+    Then I should not see the question "What am I doing here?" in the question list of the note "The cow joke"
+
   @usingMockedOpenAiService
   Scenario: Can generate the question by AI
     Given OpenAI now generates this question:

@@ -206,6 +206,16 @@ export const assumeNotePage = (noteTopic?: string) => {
     expectQuestionsInList(expectedQuestions: Record<string, string>[]) {
       this.openQuestionList().expectQuestion(expectedQuestions)
     },
+    expectNoQuestion(question: string) {
+      this.openQuestionList().expectNoQuestion(question)
+    },
+    deleteQuestion(question: string) {
+      this.openQuestionList()
+      cy.findByText(question)
+        .parent('tr')
+        .find('button[id^="btn-delete-question-"]')
+        .click()
+    },
     aiSuggestDetailsForNote: () => {
       cy.on("uncaught:exception", () => {
         return false

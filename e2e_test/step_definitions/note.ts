@@ -62,6 +62,20 @@ Given(
   },
 )
 
+When(
+  "I delete the question {string} in the note {string}",
+  (questionTitle: string, noteTopic: string) => {
+    start.jumpToNotePage(noteTopic).deleteQuestion(questionTitle)
+  }
+)
+
+Then(
+  "I should not see the question {string} in the question list of the note {string}",
+  (questionTitle: string, noteTopic: string) => {
+    start.jumpToNotePage(noteTopic).expectNoQuestion(questionTitle)
+  },
+)
+
 Given(
   "I refine the following question for the note {string}:",
   (noteTopic: string, data: DataTable) => {

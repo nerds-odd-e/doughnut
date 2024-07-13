@@ -11,5 +11,8 @@ export const questionListPage = () => {
         })
       })
     },
+    expectNoQuestion(question: string) {
+      cy.findByText(question).should("not.exist")
+    }
   }
 }
