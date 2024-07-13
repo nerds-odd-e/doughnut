@@ -2536,8 +2536,8 @@ paths:
             '*/*':
               schema:
                 type: string
-        "200":
-          description: OK
+        "204":
+          description: Delete success
 components:
   schemas:
     Circle:

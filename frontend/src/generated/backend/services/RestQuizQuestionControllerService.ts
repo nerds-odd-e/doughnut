@@ -222,12 +222,12 @@ export class RestQuizQuestionControllerService {
     }
     /**
      * @param quizQuestion
-     * @returns any OK
+     * @returns void
      * @throws ApiError
      */
     public deleteQuestion(
         quizQuestion: number,
-    ): CancelablePromise<any> {
+    ): CancelablePromise<void> {
         return this.httpRequest.request({
             method: 'DELETE',
             url: '/api/quiz-questions/{quizQuestion}',

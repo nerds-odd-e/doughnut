@@ -15,6 +15,8 @@ import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -156,6 +158,9 @@ class RestQuizQuestionController {
     return quizQuestionService.toggleApproval(quizQuestionAndAnswer);
   }
 
+  @ApiResponses(value = {
+    @ApiResponse(responseCode = "204", description = "Delete success")
+  })
   @DeleteMapping("/{quizQuestion}")
   @Transactional
   public ResponseEntity<Void> deleteQuestion(
