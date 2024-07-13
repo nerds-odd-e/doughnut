@@ -16,6 +16,7 @@
       <thead>
         <tr>
           <th>Approved</th>
+          <th>Action</th>
           <th>Question Text</th>
           <th>A</th>
           <th>B</th>
@@ -35,6 +36,11 @@
               v-model="question.approved"
               @change="toggleApproval(question.id)"
             />
+          </td>
+          <td>
+            <button 
+              :id="'delete-question-btn-' + outerIndex"
+              @click="deleteQuestion(question.id)">delete</button>
           </td>
           <td>{{ question.quizQuestion.multipleChoicesQuestion.stem }}</td>
           <template
@@ -87,6 +93,17 @@ const questionAdded = (newQuestion: QuizQuestionAndAnswer) => {
 const toggleApproval = async (questionId?: number) => {
   if (questionId) {
     await managedApi.restQuizQuestionController.toggleApproval(questionId)
+  }
+}
+const deleteQuestion = async (questionId?: number) => {
+  if (questionId) {
+    managedApi.restQuizQuestionController
+      .deleteQuestion(questionId)
+      .then(() => {
+        questions.value = questions.value.filter(
+          (q: QuizQuestionAndAnswer) => q.id !== questionId
+        )
+      })
   }
 }
 onMounted(() => {
