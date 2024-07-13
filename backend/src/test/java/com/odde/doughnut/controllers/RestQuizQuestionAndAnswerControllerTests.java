@@ -597,4 +597,25 @@ class RestQuizQuestionAndAnswerControllerTests {
       assertThat(note.getQuizQuestionAndAnswers(), hasSize(0));
     }
   }
+
+  @Nested
+  class EditQuestion {
+    Note subjectNote;
+
+    @BeforeEach
+    void setUp() {
+      subjectNote = makeMe.aNote().creatorAndOwner(currentUser).please();
+    }
+
+    @Test
+    void editQuestion() throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
+      QuizQuestionAndAnswer mcqWithAnswer = makeMe.aQuestion().please();
+      controller.addQuestionManually(note, mcqWithAnswer);
+      makeMe.refresh(note);
+
+      QuizQuestionAndAnswer edit = controller.editQuestion(mcqWithAnswer, mcqWithAnswer);
+      assertThat(note.getQuizQuestionAndAnswers(), hasSize(1));
+    }
+  }
 }

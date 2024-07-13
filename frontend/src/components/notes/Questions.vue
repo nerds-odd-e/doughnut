@@ -31,11 +31,25 @@
         >
           <td>
             <button
+              class="btn bg-danger"
               :id="'delete-quiz-' + outerIndex"
               @click="deleteQuestion(question.id)"
             >
               Delete
             </button>
+
+            <PopButton btn-class="btn btn-secondary" title="Edit Question">
+              <!-- prettier-ignore -->
+              <template #default="{ closer }">
+                <NoteEditQuestion
+                  v-bind="{ quizQuestion: question }"
+                  @close-dialog="
+                    closer($event);
+                    fetchQuestions()
+                  "
+                />
+              </template>
+            </PopButton>
           </td>
           <td>
             <input

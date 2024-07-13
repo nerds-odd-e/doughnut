@@ -77,6 +77,29 @@ export class RestQuizQuestionControllerService {
     }
     /**
      * @param quizQuestion
+     * @param requestBody
+     * @returns QuizQuestionAndAnswer OK
+     * @throws ApiError
+     */
+    public editQuestion(
+        quizQuestion: number,
+        requestBody: QuizQuestionAndAnswer,
+    ): CancelablePromise<QuizQuestionAndAnswer> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/quiz-questions/{quizQuestion}/edit',
+            path: {
+                'quizQuestion': quizQuestion,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param quizQuestion
      * @returns number OK
      * @throws ApiError
      */
