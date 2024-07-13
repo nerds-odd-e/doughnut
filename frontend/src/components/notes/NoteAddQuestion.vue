@@ -46,17 +46,27 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, computed, ref } from "vue"
+import { PropType, computed, onMounted, ref } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { Note, QuizQuestionAndAnswer } from "@/generated/backend"
 import isMCQWithAnswerValid from "@/models/isMCQWithAnswerValid"
 import TextArea from "../form/TextArea.vue"
+import { ActionQuestionForNote } from "./enum/action.enum"
 
 const { managedApi } = useLoadingApi()
 const props = defineProps({
+  action: {
+    type: String as PropType<ActionQuestionForNote>,
+    require: false,
+    default: ActionQuestionForNote.Add,
+  },
   note: {
     type: Object as PropType<Note>,
     required: true,
+  },
+  question: {
+    type: Object as PropType<QuizQuestionAndAnswer>,
+    required: false,
   },
 })
 
@@ -105,6 +115,16 @@ const removeChoice = () => {
   }
 }
 const submitQuestion = async () => {
+  if (props.action === ActionQuestionForNote.Edit) {
+    const quizQuestion = { ...props.question, ...quizQuestionAndAnswer.value }
+    const response =
+      await managedApi.restQuizQuestionController.updateQuestionManually(
+        props.question!.id,
+        quizQuestion
+      )
+    emit("close-dialog", response)
+    return
+  }
   const quizQuestion = quizQuestionAndAnswer.value
   const response =
     await managedApi.restQuizQuestionController.addQuestionManually(
@@ -127,4 +147,19 @@ const generateQuestionByAI = async () => {
       props.note.id
     )
 }
+
+onMounted(() => {
+  if (props.question) {
+    quizQuestionAndAnswer.value.correctAnswerIndex =
+      props.question.correctAnswerIndex
+    quizQuestionAndAnswer.value.quizQuestion.checkSpell =
+      props.question.quizQuestion.checkSpell
+    quizQuestionAndAnswer.value.quizQuestion.imageWithMask =
+      props.question.quizQuestion.imageWithMask
+    quizQuestionAndAnswer.value.quizQuestion.multipleChoicesQuestion.stem =
+      props.question.quizQuestion.multipleChoicesQuestion.stem
+    quizQuestionAndAnswer.value.quizQuestion.multipleChoicesQuestion.choices =
+      props.question.quizQuestion.multipleChoicesQuestion.choices
+  }
+})
 </script>
