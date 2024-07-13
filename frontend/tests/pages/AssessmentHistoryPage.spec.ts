@@ -1,6 +1,6 @@
 import { screen } from "@testing-library/vue"
 import { beforeEach, describe, expect, it, vi, vitest } from "vitest"
-import AssessmentHistoryPage from "@/pages/AssessmentHistoryPage.vue"
+import AssessmentHistoryDialog from "@/components/user/AssessmentHistoryDialog.vue"
 import helper from "../helpers"
 
 vitest.mock("vue-router", () => ({
@@ -22,14 +22,14 @@ describe("assessment history", () => {
   })
 
   it("calls API ONCE on mount", async () => {
-    helper.component(AssessmentHistoryPage).render()
+    helper.component(AssessmentHistoryDialog).render()
     expect(
       helper.managedApi.restAssessmentController.getAssessmentHistory
     ).toBeCalledTimes(1)
   })
 
   it("indicate the list is empty", async () => {
-    helper.component(AssessmentHistoryPage).render()
+    helper.component(AssessmentHistoryDialog).render()
     await screen.findByText("No assessment has been done yet")
   })
 })
