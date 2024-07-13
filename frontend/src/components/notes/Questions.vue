@@ -41,17 +41,13 @@
           <template
             v-if="question.quizQuestion.multipleChoicesQuestion.choices"
           >
-            <td :class="{'correct-choice': 0 === question.correctAnswerIndex}">
-              {{ question.quizQuestion.multipleChoicesQuestion.choices[0] }}
-            </td>
-            <td :class="{'correct-choice': 1 === question.correctAnswerIndex}">
-              {{ question.quizQuestion.multipleChoicesQuestion.choices[1] }}
-            </td>
-            <td :class="{'correct-choice': 2 === question.correctAnswerIndex}">
-              {{ question.quizQuestion.multipleChoicesQuestion.choices[2] }}
-            </td>
-            <td :class="{'correct-choice': 3 === question.correctAnswerIndex}">
-              {{ question.quizQuestion.multipleChoicesQuestion.choices[3] }}
+            <td
+              v-for="(_, i) in 4"
+              :class="{
+                'correct-choice': i === question.correctAnswerIndex,
+              }"
+            >
+              {{ question.quizQuestion.multipleChoicesQuestion.choices[i] }}
             </td>
             <td class="d-flex justify-content-center">
               <button class="btn btn-danger" @click="questionDeleted(question)">Delete</button>
