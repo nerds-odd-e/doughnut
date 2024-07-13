@@ -54,7 +54,7 @@
               {{ question.quizQuestion.multipleChoicesQuestion.choices[3] }}
             </td>
             <td class="d-flex justify-content-center">
-              <button class="btn btn-danger" @click="questDeleted(question)">x</button>
+              <button class="btn btn-danger" @click="questionDeleted(question)">x</button>
             </td>
           </template>
         </tr>
@@ -96,8 +96,8 @@ const toggleApproval = async (questionId?: number) => {
   }
 }
 
-const questDeleted = async (question: QuizQuestionAndAnswer) => {
-  await managedApi.restQuizQuestionController.deleteQuestionManually(question.id)
+const questionDeleted = async (question: QuizQuestionAndAnswer) => {
+  await managedApi.restQuizQuestionController.deleteQuestion(question.id)
   await fetchQuestions()
 }
 onMounted(() => {
