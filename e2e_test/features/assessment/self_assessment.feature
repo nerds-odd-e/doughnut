@@ -17,19 +17,19 @@ Feature: Self assessment
       | Japan      | What is the capital city of Japan? | Tokyo  | kyoto            | true     |
 
   Scenario Outline: Perform an assessment with variable outcomes counts correct scores
-    Given I set the number of questions per assessment of the notebook "Countries" to <QuestionsPerAssessment>
-    When I do the assessment on "Countries" notebook in the bazaar with the following answers:
+    Given I set the number of questions per assessment of the notebook "Countries" to 3
+    When I do the assessment on "Countries" in the bazaar with the following answers:
       | Question                           | Answer            |
       | Where in the world is Singapore?   | <SingaporeAnswer> |
       | Most famous food of Vietnam?       | <VietnamAnswer>   |
       | What is the capital city of Japan? | <JapanAnswer>     |
-    Then I should see the score "Your score: <ExpectedScore> / <QuestionsPerAssessment>" at the end of assessment
+    Then I should see the score "Your score: <ExpectedScore> / 3" at the end of assessment
 
     Examples:
-      | QuestionsPerAssessment | SingaporeAnswer | VietnamAnswer | JapanAnswer | ExpectedScore |
-      | 3                      | Asia            | Pho           | Tokyo       | 3             |
-      | 3                      | europe          | bread         | kyoto       | 0             |
-      | 3                      | Asia            | Pho           | kyoto       | 2             |
+      | SingaporeAnswer | VietnamAnswer | JapanAnswer | ExpectedScore |
+      | Asia            | Pho           | Tokyo       | 3             |
+      | europe          | bread         | kyoto       | 0             |
+      | Asia            | Pho           | kyoto       | 2             |
 
   Scenario Outline: Cannot start assessment with 0 questions or not enough approved questions
     Given I set the number of questions per assessment of the notebook "Countries" to <Questions Per Assessment>

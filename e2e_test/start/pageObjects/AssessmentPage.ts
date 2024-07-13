@@ -39,21 +39,9 @@ export const assumeAssessmentPage = (notebook?: string) => {
       cy.contains(expectedScore)
     },
     answerQuestionsFromTable(answersTable: Record<string, string>[]) {
-      const tryContinueAssessment = () => {
-        return cy.get('body').then(($body) => {
-          if ($body.find('.quiz-instruction').length > 0) {
-            return this.assumeQuestionSection()
-              .answerFromTable(answersTable)
-              .then(tryContinueAssessment)
-          } else {
-            return cy.log('No more questions to answer.')
-          }
-        })
+      for (let i = 0; i < answersTable.length; i++) {
+        this.assumeQuestionSection().answerFromTable(answersTable)
       }
-
-      return this.assumeQuestionSection()
-        .answerFromTable(answersTable)
-        .then(tryContinueAssessment)
     },
   }
 }
