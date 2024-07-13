@@ -46,20 +46,14 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, computed, onMounted, ref } from "vue"
+import { PropType, computed, ref, toRaw } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { Note, QuizQuestionAndAnswer } from "@/generated/backend"
 import isMCQWithAnswerValid from "@/models/isMCQWithAnswerValid"
 import TextArea from "../form/TextArea.vue"
-import { ActionQuestionForNote } from "./enum/action.enum"
 
 const { managedApi } = useLoadingApi()
 const props = defineProps({
-  action: {
-    type: String as PropType<ActionQuestionForNote>,
-    require: false,
-    default: ActionQuestionForNote.Add,
-  },
   note: {
     type: Object as PropType<Note>,
     required: true,
@@ -67,18 +61,26 @@ const props = defineProps({
   question: {
     type: Object as PropType<QuizQuestionAndAnswer>,
     required: false,
+    default: null,
   },
 })
 
-const quizQuestionAndAnswer = ref<QuizQuestionAndAnswer>({
-  correctAnswerIndex: 0,
-  quizQuestion: {
-    multipleChoicesQuestion: {
-      stem: "",
-      choices: ["", ""],
-    },
-  },
-} as QuizQuestionAndAnswer)
+const isExistingQuestion = () => {
+  return Boolean(props.question)
+}
+const quizQuestionAndAnswer = ref<QuizQuestionAndAnswer>(
+  isExistingQuestion()
+    ? (structuredClone(toRaw(props.question)) as QuizQuestionAndAnswer)
+    : ({
+        correctAnswerIndex: 0,
+        quizQuestion: {
+          multipleChoicesQuestion: {
+            stem: "",
+            choices: ["", ""],
+          },
+        },
+      } as QuizQuestionAndAnswer)
+)
 
 const minimumNumberOfChoices = 2
 const maximumNumberOfChoices = 10
@@ -114,15 +116,17 @@ const removeChoice = () => {
     multipleChoicesQuestion.value.choices.pop()
   }
 }
+const updateQuestion = async () => {
+  const response =
+    await managedApi.restQuizQuestionController.updateQuestionManually(
+      props.question!.id,
+      quizQuestionAndAnswer.value
+    )
+  emit("close-dialog", response)
+}
 const submitQuestion = async () => {
-  if (props.action === ActionQuestionForNote.Edit) {
-    const quizQuestion = { ...props.question, ...quizQuestionAndAnswer.value }
-    const response =
-      await managedApi.restQuizQuestionController.updateQuestionManually(
-        props.question!.id,
-        quizQuestion
-      )
-    emit("close-dialog", response)
+  if (isExistingQuestion()) {
+    updateQuestion()
     return
   }
   const quizQuestion = quizQuestionAndAnswer.value
@@ -147,19 +151,4 @@ const generateQuestionByAI = async () => {
       props.note.id
     )
 }
-
-onMounted(() => {
-  if (props.question) {
-    quizQuestionAndAnswer.value.correctAnswerIndex =
-      props.question.correctAnswerIndex
-    quizQuestionAndAnswer.value.quizQuestion.checkSpell =
-      props.question.quizQuestion.checkSpell
-    quizQuestionAndAnswer.value.quizQuestion.imageWithMask =
-      props.question.quizQuestion.imageWithMask
-    quizQuestionAndAnswer.value.quizQuestion.multipleChoicesQuestion.stem =
-      props.question.quizQuestion.multipleChoicesQuestion.stem
-    quizQuestionAndAnswer.value.quizQuestion.multipleChoicesQuestion.choices =
-      props.question.quizQuestion.multipleChoicesQuestion.choices
-  }
-})
 </script>

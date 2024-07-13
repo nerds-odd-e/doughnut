@@ -44,7 +44,7 @@
                   <!-- prettier-ignore -->
                   <template #default="{ closer }">
                     <NoteAddQuestion
-                      v-bind="{ action: action.Edit, note, question }"
+                      v-bind="{ note, question }"
                       @close-dialog="
                         closer($event);
                         questionEdited($event);
@@ -90,7 +90,6 @@ import { Note, QuizQuestionAndAnswer } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import NoteAddQuestion from "./NoteAddQuestion.vue"
 import PopButton from "../commons/Popups/PopButton.vue"
-import { ActionQuestionForNote } from "./enum/action.enum"
 
 const { managedApi } = useLoadingApi()
 const props = defineProps({
@@ -99,7 +98,6 @@ const props = defineProps({
     required: true,
   },
 })
-const action = ActionQuestionForNote
 const questions = ref<QuizQuestionAndAnswer[]>([])
 const fetchQuestions = async () => {
   questions.value =
@@ -114,15 +112,9 @@ const questionAdded = (newQuestion: QuizQuestionAndAnswer) => {
   questions.value.push(newQuestion)
 }
 const questionEdited = (question: QuizQuestionAndAnswer) => {
-  const result = questions.value.find((e) => e.id === question.id)
-  if (result) {
-    result.correctAnswerIndex = question.correctAnswerIndex
-    result.quizQuestion.checkSpell = question.quizQuestion.checkSpell
-    result.quizQuestion.imageWithMask = question.quizQuestion.imageWithMask
-    result.quizQuestion.multipleChoicesQuestion.stem =
-      question.quizQuestion.multipleChoicesQuestion.stem
-    result.quizQuestion.multipleChoicesQuestion.choices =
-      question.quizQuestion.multipleChoicesQuestion.choices
+  const indexResult = questions.value.findIndex((e) => e.id === question.id)
+  if (indexResult > -1) {
+    questions.value[indexResult] = { ...question }
   }
 }
 const deleteQuestion = async (question: QuizQuestionAndAnswer) => {
