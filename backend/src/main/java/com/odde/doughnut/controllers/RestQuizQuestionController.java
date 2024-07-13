@@ -125,6 +125,15 @@ class RestQuizQuestionController {
     return note.getQuizQuestionAndAnswers().stream().toList();
   }
 
+  @DeleteMapping("/{questionId}/delete-question")
+  @Transactional
+  public Boolean deleteQuestion(
+    @PathVariable("questionId") @Schema(type = "integer") QuizQuestionAndAnswer questionAndAnswer)
+    throws UnexpectedNoAccessRightException {
+    currentUser.assertAuthorization(questionAndAnswer.getNote());
+    QuizQuestionAndAnswer removeQuestionAndAnswer= quizQuestionService.removeQuestion(questionAndAnswer);
+    return removeQuestionAndAnswer.equals(questionAndAnswer);
+  }
   @PostMapping("/{note}/note-questions")
   @Transactional
   public QuizQuestionAndAnswer addQuestionManually(

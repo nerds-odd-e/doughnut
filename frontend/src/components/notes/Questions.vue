@@ -21,6 +21,7 @@
           <th>B</th>
           <th>C</th>
           <th>D</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -51,6 +52,10 @@
               {{ choice }}
             </td>
           </template>
+          <td>
+            <!-- <button @click="editQuestion(question)">Edit</button> -->
+            <button @click="deleteQuestion(question.id)">Delete</button>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -89,6 +94,19 @@ const toggleApproval = async (questionId?: number) => {
     await managedApi.restQuizQuestionController.toggleApproval(questionId)
   }
 }
+// const editQuestion = (question: QuizQuestionAndAnswer) => {
+//  console.log("Edit question:", question)
+// }
+const deleteQuestion = async (questionId?: number) => {
+  if (questionId) {
+    let response =
+      await managedApi.restQuizQuestionController.deleteQuestion(questionId)
+    if (response) {
+      questions.value = questions.value.filter((q) => q.id !== questionId)
+    }
+  }
+}
+
 onMounted(() => {
   fetchQuestions()
 })
