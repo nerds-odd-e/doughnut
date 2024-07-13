@@ -33,15 +33,6 @@ public class QuizQuestionService {
     modelFactoryService.save(questionAndAnswer);
     return questionAndAnswer;
   }
-  public QuizQuestionAndAnswer updateQuestion(
-    Note note, @Valid QuizQuestionAndAnswer questionAndAnswer) {
-    questionAndAnswer.setNote(note);
-    questionAndAnswer.setQuizQuestion(questionAndAnswer.getQuizQuestion());
-    questionAndAnswer.setCorrectAnswerIndex(questionAndAnswer.getCorrectAnswerIndex());
-    modelFactoryService.save(questionAndAnswer);
-    return questionAndAnswer;
-  }
-
   public QuizQuestionAndAnswer refineQuestion(Note note, QuizQuestionAndAnswer questionAndAnswer) {
     MCQWithAnswer aiGeneratedRefineQuestion =
       aiQuestionGenerator.getAiGeneratedRefineQuestion(

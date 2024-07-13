@@ -182,13 +182,6 @@ export class RestQuizQuestionControllerService {
             },
         });
     }
-
-  /**
-   * @param note
-   * @param requestBody
-   * @returns QuizQuestionAndAnswer OK
-   * @throws ApiError
-   */
   public updateQuestionManually(
     note: number,
     requestBody: QuizQuestionAndAnswer,

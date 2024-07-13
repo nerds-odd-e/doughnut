@@ -142,7 +142,7 @@ class RestQuizQuestionController {
     @Valid @RequestBody QuizQuestionAndAnswer questionAndAnswer)
     throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
-    return quizQuestionService.updateQuestion(note, questionAndAnswer);
+    return quizQuestionService.addQuestion(note, questionAndAnswer);
   }
 
   @PostMapping("/{note}/refine-question")
