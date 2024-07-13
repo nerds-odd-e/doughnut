@@ -154,4 +154,15 @@ class RestQuizQuestionController {
     currentUser.assertAuthorization(quizQuestionAndAnswer.getNote());
     return quizQuestionService.toggleApproval(quizQuestionAndAnswer);
   }
+
+  @PatchMapping("/{quizQuestion}/question")
+  @Transactional
+  public QuizQuestionAndAnswer updateQuestionManually(
+      @PathVariable("quizQuestion") @Schema(type = "integer")
+          QuizQuestionAndAnswer quizQuestionAndAnswer,
+      @Valid @RequestBody QuizQuestionAndAnswer question)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertAuthorization(quizQuestionAndAnswer.getNote());
+    return quizQuestionService.addQuestion(quizQuestionAndAnswer.getNote(), question);
+  }
 }

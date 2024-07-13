@@ -577,4 +577,40 @@ class RestQuizQuestionAndAnswerControllerTests {
       assertFalse(approvedQuestion.isApproved());
     }
   }
+
+  @Nested
+  class UpdateQuestionManually {
+    Note subjectNote;
+
+    @BeforeEach
+    void setUp() {
+      subjectNote = makeMe.aNote().creatorAndOwner(currentUser).please();
+    }
+
+    @Test
+    void authorization() {
+      Note note = makeMe.aNote().creatorAndOwner(makeMe.aUser().please()).please();
+
+      QuizQuestionAndAnswer quizQuestionAndAnswer =
+          makeMe.aQuestion().approvedSpellingQuestionOf(note).please();
+
+      QuizQuestionAndAnswer mcqWithAnswer = makeMe.aQuestion().please();
+
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.updateQuestionManually(quizQuestionAndAnswer, mcqWithAnswer));
+    }
+
+    @Test
+    void updateQuestion() throws UnexpectedNoAccessRightException {
+      QuizQuestionAndAnswer quizQuestionAndAnswer =
+          makeMe.aQuestion().approvedSpellingQuestionOf(subjectNote).please();
+      QuizQuestionAndAnswer mcqWithAnswer = makeMe.aQuestion().please();
+
+      QuizQuestionAndAnswer question =
+          controller.updateQuestionManually(quizQuestionAndAnswer, mcqWithAnswer);
+
+      assertEquals(mcqWithAnswer, question);
+    }
+  }
 }
