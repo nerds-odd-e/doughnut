@@ -30,8 +30,9 @@ public class QuizQuestionService {
     return questionAndAnswer;
   }
 
-  public QuizQuestionAndAnswer deleteQuestion(Integer noteId, Integer questionId) {
-    return null;
+  public QuizQuestionAndAnswer deleteQuestion(QuizQuestionAndAnswer questionAndAnswer) {
+    modelFactoryService.remove(questionAndAnswer);
+    return questionAndAnswer;
   }
 
   public QuizQuestionAndAnswer refineQuestion(Note note, QuizQuestionAndAnswer questionAndAnswer) {
