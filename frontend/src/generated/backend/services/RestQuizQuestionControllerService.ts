@@ -182,26 +182,6 @@ export class RestQuizQuestionControllerService {
             },
         });
     }
-  /**
-   * @param quizQuestion
-   * @returns QuizQuestionAndAnswer OK
-   * @throws ApiError
-   */
-  public deleteQuestionManually(
-    quizQuestion: number
-  ): CancelablePromise<QuizQuestionAndAnswer> {
-    return this.httpRequest.request({
-      method: 'DELETE',
-      url: '/api/quiz-questions/{quizQuestion}',
-      path: {
-        'quizQuestion': quizQuestion,
-      },
-      mediaType: 'application/json',
-      errors: {
-        500: `Internal Server Error`,
-      },
-    });
-  }
     /**
      * @param note
      * @returns QuizQuestionInNotebook OK
@@ -234,6 +214,25 @@ export class RestQuizQuestionControllerService {
             url: '/api/quiz-questions/generate-question-without-save',
             query: {
                 'note': note,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param quizQuestion
+     * @returns any OK
+     * @throws ApiError
+     */
+    public deleteQuestion(
+        quizQuestion: number,
+    ): CancelablePromise<any> {
+        return this.httpRequest.request({
+            method: 'DELETE',
+            url: '/api/quiz-questions/{quizQuestion}',
+            path: {
+                'quizQuestion': quizQuestion,
             },
             errors: {
                 500: `Internal Server Error`,

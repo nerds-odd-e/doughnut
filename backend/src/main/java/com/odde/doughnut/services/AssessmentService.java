@@ -13,8 +13,11 @@ import com.theokanning.openai.client.OpenAiApi;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Objects;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class AssessmentService {
+  private static final Logger log = LogManager.getLogger(AssessmentService.class);
   private final ModelFactoryService modelFactoryService;
   private final QuizQuestionService quizQuestionService;
   private final TestabilitySettings testabilitySettings;

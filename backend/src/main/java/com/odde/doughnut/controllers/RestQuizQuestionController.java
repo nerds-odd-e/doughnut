@@ -19,6 +19,7 @@ import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -153,5 +154,16 @@ class RestQuizQuestionController {
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(quizQuestionAndAnswer.getNote());
     return quizQuestionService.toggleApproval(quizQuestionAndAnswer);
+  }
+
+  @DeleteMapping("/{quizQuestion}")
+  @Transactional
+  public ResponseEntity<Void> deleteQuestion(
+      @PathVariable("quizQuestion") @Schema(type = "integer")
+          QuizQuestionAndAnswer quizQuestionAndAnswer)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertAuthorization(quizQuestionAndAnswer.getNote());
+    quizQuestionService.deleteQuestion(quizQuestionAndAnswer);
+    return ResponseEntity.noContent().build();
   }
 }
