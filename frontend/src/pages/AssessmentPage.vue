@@ -13,25 +13,14 @@
       <p>Your score: {{ correctAnswers }} / {{ quizQuestions.length }}</p>
     </div>
   </div>
-
-  <div v-if="notesOfWrongAnswers.length > 0 && assessmentCompleted">
-    <h1>CONTENT BELOW IS IN PROGRESS</h1>
-    <h5>Improve your knowledge by studying these notes</h5>
-    <Cards :note-topics="notesOfWrongAnswers"> </Cards>
-  </div>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import {
-  NoteTopic,
-  QuestionAnswerPair,
-  QuizQuestion,
-} from "@/generated/backend"
+import { QuestionAnswerPair, QuizQuestion } from "@/generated/backend"
 import { useRouter } from "vue-router"
 import QuizQuestionComp from "@/components/review/QuizQuestion.vue"
-import Cards from "@/components/notes/Cards.vue"
 
 const { managedApi } = useLoadingApi()
 const router = useRouter()
@@ -42,7 +31,6 @@ const topicConstructor = computed(() => {
   return router.currentRoute.value.query?.topic
 })
 const quizQuestions = ref<QuizQuestion[]>([])
-const notesOfWrongAnswers = ref<NoteTopic[]>([])
 const currentQuestion = ref(0)
 const questionsAnswerCollection = ref<QuestionAnswerPair[]>([])
 const errors = ref("")
@@ -64,23 +52,16 @@ const questionAnswered = async (answerResult) => {
   }
   currentQuestion.value += 1
   if (assessmentCompleted.value) {
-    const assessmentResult =
-      await managedApi.restAssessmentController.submitAssessmentResult(
-        <number>props.notebookId,
-        questionsAnswerCollection.value
-      )
-    for (const noteIdAndTitle of assessmentResult.noteIdAndTitles!) {
-      notesOfWrongAnswers.value.push({
-        id: noteIdAndTitle.id ?? 0,
-        topicConstructor: noteIdAndTitle.title ?? "",
-      })
-    }
+    await managedApi.restAssessmentController.submitAssessmentResult(
+      props.notebookId,
+      questionsAnswerCollection.value
+    )
   }
 }
 
 const generateAssessmentQuestions = () => {
   managedApi.restAssessmentController
-    .generateAssessmentQuestions(<number>props.notebookId)
+    .generateAssessmentQuestions(props.notebookId)
     .then((response) => {
       quizQuestions.value = response
     })
