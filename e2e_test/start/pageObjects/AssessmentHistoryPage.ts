@@ -1,6 +1,8 @@
+import { systemSidebar } from './systemSidebar'
+
 export const navigateToAssessmentHistory = () => {
-  cy.visit('/assessment-history')
-  cy.findByText('Assessment History')
+  systemSidebar().userOptions()
+  cy.findByText('Assessment History').click()
   return {
     expectAssessmentHistory: (rows: Record<string, string>[]) => {
       cy.get('table tbody tr').should('have.length', rows.length)
