@@ -38,7 +38,11 @@
               Delete
             </button>
 
-            <PopButton btn-class="btn btn-secondary" title="Edit Question">
+            <PopButton
+              :id="'edit-quiz-' + outerIndex"
+              btn-class="btn btn-secondary"
+              title="Edit Question"
+            >
               <!-- prettier-ignore -->
               <template #default="{ closer }">
                 <NoteEditQuestion

@@ -274,5 +274,8 @@ export const assumeNotePage = (noteTopic?: string) => {
         .find('button[id^="delete-quiz-"]')
         .click()
     },
+    editQuestion(question: string, row: Record<string, string>) {
+      this.openQuestionList().editQuestionPage(question).editRow(row)
+    },
   }
 }

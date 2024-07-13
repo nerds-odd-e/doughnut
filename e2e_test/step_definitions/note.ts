@@ -534,3 +534,10 @@ When(
     start.jumpToNotePage(noteName).deleteQuestion(question)
   }
 )
+
+When(
+  'I edit the question {string} for the note {string}:',
+  (question: string, noteName: string, data: DataTable) => {
+    start.jumpToNotePage(noteName).editQuestion(question, data.hashes()[0]!)
+  }
+)

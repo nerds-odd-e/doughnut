@@ -52,3 +52,14 @@ Feature: Quiz Question Management
     Then I should see the questions in the question list of the note "The cow joke":
       | Question             | Correct Choice |
       | What does a cow say? | moo            |
+
+  Scenario: Edit quiz question
+    When I add the following question for the note "The cow joke":
+      | Stem                           | Choice 0 | Choice 1 | Choice 2 | Correct Choice Index |
+      | The moon revolve around earth. | Yes      | No       | Not Sure |                    0 |
+    When I edit the question "The moon revolve around earth." for the note "The cow joke":
+      | Correct Choice Index |
+      |                    1 |
+    Then I should see the questions in the question list of the note "The cow joke":
+      | Question                       | Correct Choice |
+      | The moon revolve around earth. | No             |
