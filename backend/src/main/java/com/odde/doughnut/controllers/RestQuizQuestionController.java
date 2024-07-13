@@ -154,4 +154,15 @@ class RestQuizQuestionController {
     currentUser.assertAuthorization(quizQuestionAndAnswer.getNote());
     return quizQuestionService.toggleApproval(quizQuestionAndAnswer);
   }
+
+  @PostMapping("/{quizQuestion}/delete")
+  @Transactional
+  public List<Integer> deleteQuestion(
+      @PathVariable("quizQuestion") @Schema(type = "integer")
+          QuizQuestionAndAnswer quizQuestionAndAnswer)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertAuthorization(quizQuestionAndAnswer.getNote());
+    modelFactoryService.remove(quizQuestionAndAnswer);
+    return List.of(1);
+  }
 }

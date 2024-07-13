@@ -15,6 +15,7 @@
     <table class="question-table mt-2">
       <thead>
         <tr>
+          <th>Actions</th>
           <th>Approved</th>
           <th>Question Text</th>
           <th>A</th>
@@ -28,6 +29,9 @@
           v-for="(question, outerIndex) in questions"
           :key="question.quizQuestion.multipleChoicesQuestion.stem"
         >
+        <td>
+          <button @click="deleteQuestion(question.id)">Delete</button>
+        </td>
           <td>
             <input
               :id="'checkbox-' + outerIndex"
@@ -87,6 +91,12 @@ const questionAdded = (newQuestion: QuizQuestionAndAnswer) => {
 const toggleApproval = async (questionId?: number) => {
   if (questionId) {
     await managedApi.restQuizQuestionController.toggleApproval(questionId)
+  }
+}
+const deleteQuestion = async (questionId?: number) => {
+  if (questionId) {
+    await managedApi.restQuizQuestionController.deleteQuestion(questionId)
+    fetchQuestions();
   }
 }
 onMounted(() => {

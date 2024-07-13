@@ -711,6 +711,33 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/QuizQuestion"
+  /api/quiz-questions/{quizQuestion}/delete:
+    post:
+      tags:
+      - rest-quiz-question-controller
+      operationId: deleteQuestion
+      parameters:
+      - name: quizQuestion
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: integer
+                  format: int32
   /api/quiz-questions/{quizQuestion}/contest:
     post:
       tags:
