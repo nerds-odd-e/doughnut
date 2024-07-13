@@ -3,7 +3,6 @@ package com.odde.doughnut.controllers;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.dto.AssessmentResult;
-import com.odde.doughnut.controllers.dto.NoteIdAndTitle;
 import com.odde.doughnut.controllers.dto.QuestionAnswerPair;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.ApiException;
@@ -16,7 +15,6 @@ import com.theokanning.openai.client.OpenAiApi;
 import java.util.*;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -193,11 +191,6 @@ public class RestAssessmentControllerTests {
         quizQuestionAndAnswer.setCorrectAnswerIndex(1);
         questionAnswerPair.setAnswerId(0);
         questionsAnswerPairs.add(questionAnswerPair);
-
-        NoteIdAndTitle noteIdAndTitle = new NoteIdAndTitle();
-        noteIdAndTitle.setId(note.getId());
-        noteIdAndTitle.setTitle(note.getNoteTopic().getTopicConstructor());
-        expectedAssessmentResult.setNoteIdAndTitles(new NoteIdAndTitle[] {noteIdAndTitle});
       }
     }
 
@@ -208,24 +201,6 @@ public class RestAssessmentControllerTests {
 
       assertEquals(questionsAnswerPairs.size(), assessmentResult.getTotalCount());
       assertEquals(0, assessmentResult.getCorrectCount());
-    }
-
-    @Disabled
-    @Test
-    void submitAssessmentResultCheckNoteIdAndTitles() throws UnexpectedNoAccessRightException {
-      AssessmentResult assessmentResult =
-          controller.submitAssessmentResult(notebook, questionsAnswerPairs);
-
-      assertEquals(
-          questionsAnswerPairs.size(),
-          assessmentResult.getNoteIdAndTitles().length,
-          "Expected number of notes do not match the provided number of questions.");
-      for (int i = 0; i < questionsAnswerPairs.size(); i++) {
-        NoteIdAndTitle expectedNoteIdAndTitle = expectedAssessmentResult.getNoteIdAndTitles()[i];
-        NoteIdAndTitle providedNoteIdAndTitle = assessmentResult.getNoteIdAndTitles()[i];
-        assertEquals(expectedNoteIdAndTitle.getId(), providedNoteIdAndTitle.getId());
-        assertEquals(expectedNoteIdAndTitle.getTitle(), providedNoteIdAndTitle.getTitle());
-      }
     }
   }
 

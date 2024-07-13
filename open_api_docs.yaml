@@ -3138,18 +3138,6 @@ components:
         totalCount:
           type: integer
           format: int32
-        noteIdAndTitles:
-          type: array
-          items:
-            $ref: "#/components/schemas/NoteIdAndTitle"
-    NoteIdAndTitle:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        title:
-          type: string
     AiCompletionParams:
       type: object
       properties:

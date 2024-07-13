@@ -8,5 +8,4 @@ import lombok.Setter;
 public class AssessmentResult {
   public int correctCount;
   public int totalCount;
-  public NoteIdAndTitle[] noteIdAndTitles;
 }

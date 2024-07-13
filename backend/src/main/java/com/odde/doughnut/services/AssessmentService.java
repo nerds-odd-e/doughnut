@@ -3,7 +3,6 @@ package com.odde.doughnut.services;
 import static com.odde.doughnut.controllers.dto.ApiError.ErrorType.ASSESSMENT_SERVICE_ERROR;
 
 import com.odde.doughnut.controllers.dto.AssessmentResult;
-import com.odde.doughnut.controllers.dto.NoteIdAndTitle;
 import com.odde.doughnut.controllers.dto.QuestionAnswerPair;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.ApiException;
@@ -72,10 +71,6 @@ public class AssessmentService {
     AssessmentResult assessmentResult = new AssessmentResult();
     assessmentResult.setTotalCount(questionsAnswerPairs.size());
     assessmentResult.setCorrectCount(0);
-    NoteIdAndTitle noteIdAndTitle = new NoteIdAndTitle();
-    noteIdAndTitle.setId(2);
-    noteIdAndTitle.setTitle("Singapore");
-    assessmentResult.setNoteIdAndTitles(new NoteIdAndTitle[] {noteIdAndTitle});
     return assessmentResult;
   }
 
