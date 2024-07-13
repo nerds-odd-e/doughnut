@@ -2466,17 +2466,12 @@ paths:
                 type: array
                 items:
                   type: string
-  /api/quiz-questions/{note}/questions/{question}:
+  /api/quiz-questions/{question}:
     delete:
       tags:
       - rest-quiz-question-controller
       operationId: deleteQuestion
       parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
       - name: question
         in: path
         required: true

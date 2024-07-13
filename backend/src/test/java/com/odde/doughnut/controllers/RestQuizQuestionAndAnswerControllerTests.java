@@ -508,10 +508,18 @@ class RestQuizQuestionAndAnswerControllerTests {
     }
 
     @Test
+    void authorization() {
+      QuizQuestionAndAnswer questionAndAnswer = makeMe.aQuestion().please();
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.deleteQuestion(questionAndAnswer));
+    }
+
+    @Test
     void delete() throws UnexpectedNoAccessRightException {
       QuizQuestionAndAnswer questionAndAnswer =
           makeMe.aQuestion().approvedSpellingQuestionOf(subjectNote).please();
-      controller.deleteQuestion(subjectNote, questionAndAnswer);
+      controller.deleteQuestion(questionAndAnswer);
       assertThat(subjectNote.getQuizQuestionAndAnswers(), hasSize(0));
     }
   }

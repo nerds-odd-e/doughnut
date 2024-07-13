@@ -87,7 +87,7 @@ const questionAdded = (newQuestion: QuizQuestionAndAnswer) => {
 }
 
 const deleteQuestion = async (questionId: number) => {
-  await managedApi.restQuizQuestionController.deleteQuestion(props.note.id, questionId)
+  await managedApi.restQuizQuestionController.deleteQuestion(questionId)
   questions.value = questions.value.filter((q) => q.id !== questionId)
 }
 

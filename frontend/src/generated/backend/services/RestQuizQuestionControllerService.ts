@@ -190,14 +190,12 @@ export class RestQuizQuestionControllerService {
      * @throws ApiError
      */
     public deleteQuestion(
-        noteId: number,
         questionId: number,
     ): CancelablePromise<void> {
         return this.httpRequest.request({
             method: 'DELETE',
-            url: '/api/quiz-questions/{noteId}/questions/{questionId}',
+            url: '/api/quiz-questions/{questionId}',
             path: {
-                'noteId': noteId,
                 'questionId': questionId,
             },
             errors: {
