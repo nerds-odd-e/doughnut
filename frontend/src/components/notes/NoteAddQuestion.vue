@@ -121,7 +121,16 @@ const submitQuestion = async () => {
     )
   emit("close-dialog", response)
 }
-const updateQuestion = async () => {}
+
+const updateQuestion = async () => {
+  const quizQuestion = quizQuestionAndAnswer.value
+  const response =
+    await managedApi.restQuizQuestionController.updateQuestionManually(
+      props.note.id,
+      quizQuestion
+    )
+  emit("close-dialog", response)
+}
 const refineQuestion = async () => {
   const quizQuestion = quizQuestionAndAnswer.value
   quizQuestionAndAnswer.value =
