@@ -20,12 +20,12 @@ Feature: Quiz Question Management
 
   Scenario: Delete a question in the question list in a note successfully
     Given I add the following question for the note "The cow joke":
-      | Stem                                 | Choice 0                | Choice 1                  | Choice 2 | Correct Choice Index |
-      | What am I doing here?                | Learning from an expert | Being forced to be here   | N/A      | 0                    |
+      | Stem                  | Choice 0                | Choice 1                | Choice 2 | Correct Choice Index |
+      | What am I doing here? | Learning from an expert | Being forced to be here | N/A      | 0                    |
     When I delete the question "What am I doing here?" in the note "The cow joke"
     Then I should see the questions in the question list of the note "The cow joke":
-      | Question                             | Correct Choice |
-      | What does a cow say?                 | moo            |
+      | Question             | Correct Choice |
+      | What does a cow say? | moo            |
     And there should be only one question left in the note "The cow joke"
 
   @usingMockedOpenAiService
