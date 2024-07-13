@@ -17,27 +17,35 @@ public class QuizQuestionService {
   public QuizQuestionService(OpenAiApi openAiApi, ModelFactoryService modelFactoryService) {
     this.modelFactoryService = modelFactoryService;
     this.aiQuestionGenerator =
-        new AiQuestionGenerator(openAiApi, new GlobalSettingsService(modelFactoryService));
+      new AiQuestionGenerator(openAiApi, new GlobalSettingsService(modelFactoryService));
   }
 
   QuizQuestionAndAnswer selectRandomQuestionForANote(Note note) {
     List<QuizQuestionAndAnswer> allQuestions = note.getQuizQuestionAndAnswers();
     return allQuestions.isEmpty()
-        ? null
-        : allQuestions.get(new Random().nextInt(allQuestions.size()));
+      ? null
+      : allQuestions.get(new Random().nextInt(allQuestions.size()));
   }
 
   public QuizQuestionAndAnswer addQuestion(
-      Note note, @Valid QuizQuestionAndAnswer questionAndAnswer) {
+    Note note, @Valid QuizQuestionAndAnswer questionAndAnswer) {
     questionAndAnswer.setNote(note);
+    modelFactoryService.save(questionAndAnswer);
+    return questionAndAnswer;
+  }
+  public QuizQuestionAndAnswer updateQuestion(
+    Note note, @Valid QuizQuestionAndAnswer questionAndAnswer) {
+    questionAndAnswer.setNote(note);
+    questionAndAnswer.setQuizQuestion(questionAndAnswer.getQuizQuestion());
+    questionAndAnswer.setCorrectAnswerIndex(questionAndAnswer.getCorrectAnswerIndex());
     modelFactoryService.save(questionAndAnswer);
     return questionAndAnswer;
   }
 
   public QuizQuestionAndAnswer refineQuestion(Note note, QuizQuestionAndAnswer questionAndAnswer) {
     MCQWithAnswer aiGeneratedRefineQuestion =
-        aiQuestionGenerator.getAiGeneratedRefineQuestion(
-            note, questionAndAnswer.getMcqWithAnswer());
+      aiQuestionGenerator.getAiGeneratedRefineQuestion(
+        note, questionAndAnswer.getMcqWithAnswer());
     if (aiGeneratedRefineQuestion == null) {
       return null;
     }

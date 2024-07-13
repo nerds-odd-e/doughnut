@@ -36,22 +36,22 @@ class RestQuizQuestionController {
   private final AiQuestionGenerator aiQuestionGenerator;
 
   public RestQuizQuestionController(
-      @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
-      ModelFactoryService modelFactoryService,
-      UserModel currentUser,
-      TestabilitySettings testabilitySettings) {
+    @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
+    ModelFactoryService modelFactoryService,
+    UserModel currentUser,
+    TestabilitySettings testabilitySettings) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
     this.aiQuestionGenerator =
-        new AiQuestionGenerator(openAiApi, new GlobalSettingsService(modelFactoryService));
+      new AiQuestionGenerator(openAiApi, new GlobalSettingsService(modelFactoryService));
     this.quizQuestionService = new QuizQuestionService(openAiApi, modelFactoryService);
   }
 
   @PostMapping("/generate-question")
   @Transactional
   public QuizQuestionInNotebook generateQuestion(
-      @RequestParam(value = "note") @Schema(type = "integer") Note note) {
+    @RequestParam(value = "note") @Schema(type = "integer") Note note) {
     currentUser.assertLoggedIn();
     QuizQuestionAndAnswer quizQuestionAndAnswer = quizQuestionService.generateQuestionForNote(note);
     if (quizQuestionAndAnswer == null) {
@@ -63,16 +63,16 @@ class RestQuizQuestionController {
   @PostMapping("/{quizQuestion}/regenerate")
   @Transactional
   public QuizQuestion regenerate(
-      @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion) {
+    @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion) {
     currentUser.assertLoggedIn();
     return quizQuestionService
-        .generateQuestionForNote(quizQuestion.getQuizQuestionAndAnswer().getNote())
-        .getQuizQuestion();
+      .generateQuestionForNote(quizQuestion.getQuizQuestionAndAnswer().getNote())
+      .getQuizQuestion();
   }
 
   @PostMapping("/generate-question-without-save")
   public QuizQuestionAndAnswer generateAIQuestionWithoutSave(
-      @RequestParam(value = "note") @Schema(type = "integer") Note note) {
+    @RequestParam(value = "note") @Schema(type = "integer") Note note) {
     currentUser.assertLoggedIn();
     return quizQuestionService.generateMcqWithAnswer(note);
   }
@@ -80,47 +80,47 @@ class RestQuizQuestionController {
   @PostMapping("/{quizQuestion}/contest")
   @Transactional
   public QuizQuestionContestResult contest(
-      @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion) {
+    @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion) {
     currentUser.assertLoggedIn();
     return aiQuestionGenerator.getQuizQuestionContestResult(
-        quizQuestion.getQuizQuestionAndAnswer());
+      quizQuestion.getQuizQuestionAndAnswer());
   }
 
   @PostMapping("/{quizQuestion}/answer")
   @Transactional
   public AnsweredQuestion answerQuiz(
-      @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion,
-      @Valid @RequestBody AnswerDTO answerDTO) {
+    @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion,
+    @Valid @RequestBody AnswerDTO answerDTO) {
     currentUser.assertLoggedIn();
     Answer answer = new Answer();
     answer.setQuestion(quizQuestion.getQuizQuestionAndAnswer());
     answer.setFromDTO(answerDTO);
     AnswerModel answerModel = modelFactoryService.toAnswerModel(answer);
     answerModel.makeAnswerToQuestion(
-        testabilitySettings.getCurrentUTCTimestamp(), currentUser.getEntity());
+      testabilitySettings.getCurrentUTCTimestamp(), currentUser.getEntity());
     return answerModel.getAnswerViewedByUser(currentUser.getEntity());
   }
 
   @PostMapping("/{quizQuestion}/suggest-fine-tuning")
   @Transactional
   public SuggestedQuestionForFineTuning suggestQuestionForFineTuning(
-      @PathVariable("quizQuestion") @Schema(type = "integer")
-          QuizQuestionAndAnswer quizQuestionAndAnswer,
-      @Valid @RequestBody QuestionSuggestionCreationParams suggestion) {
+    @PathVariable("quizQuestion") @Schema(type = "integer")
+    QuizQuestionAndAnswer quizQuestionAndAnswer,
+    @Valid @RequestBody QuestionSuggestionCreationParams suggestion) {
     SuggestedQuestionForFineTuning sqft = new SuggestedQuestionForFineTuning();
     var suggestedQuestionForFineTuningService =
-        modelFactoryService.toSuggestedQuestionForFineTuningService(sqft);
+      modelFactoryService.toSuggestedQuestionForFineTuningService(sqft);
     return suggestedQuestionForFineTuningService.suggestQuestionForFineTuning(
-        quizQuestionAndAnswer,
-        suggestion,
-        currentUser.getEntity(),
-        testabilitySettings.getCurrentUTCTimestamp());
+      quizQuestionAndAnswer,
+      suggestion,
+      currentUser.getEntity(),
+      testabilitySettings.getCurrentUTCTimestamp());
   }
 
   @GetMapping("/{note}/note-questions")
   public List<QuizQuestionAndAnswer> getAllQuestionByNote(
-      @PathVariable("note") @Schema(type = "integer") Note note)
-      throws UnexpectedNoAccessRightException {
+    @PathVariable("note") @Schema(type = "integer") Note note)
+    throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
     return note.getQuizQuestionAndAnswers().stream().toList();
   }
@@ -128,19 +128,29 @@ class RestQuizQuestionController {
   @PostMapping("/{note}/note-questions")
   @Transactional
   public QuizQuestionAndAnswer addQuestionManually(
-      @PathVariable("note") @Schema(type = "integer") Note note,
-      @Valid @RequestBody QuizQuestionAndAnswer questionAndAnswer)
-      throws UnexpectedNoAccessRightException {
+    @PathVariable("note") @Schema(type = "integer") Note note,
+    @Valid @RequestBody QuizQuestionAndAnswer questionAndAnswer)
+    throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
     return quizQuestionService.addQuestion(note, questionAndAnswer);
+  }
+
+  @PatchMapping("/{note}/note-questions")
+  @Transactional
+  public QuizQuestionAndAnswer updateQuestionManually(
+    @PathVariable("note") @Schema(type = "integer") Note note,
+    @Valid @RequestBody QuizQuestionAndAnswer questionAndAnswer)
+    throws UnexpectedNoAccessRightException {
+    currentUser.assertAuthorization(note);
+    return quizQuestionService.updateQuestion(note, questionAndAnswer);
   }
 
   @PostMapping("/{note}/refine-question")
   @Transactional
   public QuizQuestionAndAnswer refineQuestion(
-      @PathVariable("note") @Schema(type = "integer") Note note,
-      @RequestBody QuizQuestionAndAnswer questionAndAnswer)
-      throws UnexpectedNoAccessRightException {
+    @PathVariable("note") @Schema(type = "integer") Note note,
+    @RequestBody QuizQuestionAndAnswer questionAndAnswer)
+    throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
     return quizQuestionService.refineQuestion(note, questionAndAnswer);
   }
@@ -148,9 +158,9 @@ class RestQuizQuestionController {
   @PostMapping("/{quizQuestion}/toggle-approval")
   @Transactional
   public QuizQuestionAndAnswer toggleApproval(
-      @PathVariable("quizQuestion") @Schema(type = "integer")
-          QuizQuestionAndAnswer quizQuestionAndAnswer)
-      throws UnexpectedNoAccessRightException {
+    @PathVariable("quizQuestion") @Schema(type = "integer")
+    QuizQuestionAndAnswer quizQuestionAndAnswer)
+    throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(quizQuestionAndAnswer.getNote());
     return quizQuestionService.toggleApproval(quizQuestionAndAnswer);
   }
