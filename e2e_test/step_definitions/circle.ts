@@ -116,3 +116,11 @@ Then(
     cy.findCardTitle(noteTopic).should('not.exist')
   }
 )
+
+Then(
+  'I move the notebook {string} to circle {string}',
+  (_notebook: string, _toCircle: string) => {
+    // eslint-disable-next-line chai-friendly/no-unused-expressions
+    start
+  }
+)
