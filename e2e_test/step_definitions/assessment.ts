@@ -25,18 +25,6 @@ When(
 )
 
 When(
-  'I submit the assessment on the {string} notebook in the bazaar',
-  (notebook: string) => {
-    start
-      .navigateToBazaar()
-      .selfAssessmentOnNotebook(notebook)
-      .assumeQuestionSection()
-      .answerFirstOption()
-    start.assumeAssessmentPage().expectEndOfAssessment('Your score: 1 / 1')
-  }
-)
-
-When(
   '{int} subsequent attempts of assessment on the {string} notebook should use {int} questions',
   (attempts: number, notebook: string, minUniqueQuestionsThreshold: number) => {
     const questions: string[] = []
@@ -76,16 +64,5 @@ Given(
     start
       .questionGenerationService()
       .resetAndStubAskingMCQ(questionTable.hashes()[0]!)
-  }
-)
-
-Then(
-  'I must see the following assessments in my assessment history:',
-  (dataTable: DataTable) => {
-    start
-      .systemSidebar()
-      .userOptions()
-      .assessmentHistory()
-      .expectAssessmentHistory(dataTable.hashes())
   }
 )

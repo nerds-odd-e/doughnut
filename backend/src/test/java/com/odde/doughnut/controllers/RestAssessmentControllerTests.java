@@ -173,7 +173,6 @@ public class RestAssessmentControllerTests {
     private Notebook notebook;
     private Note topNote;
     private List<QuestionAnswerPair> questionsAnswerPairs;
-    AssessmentResult expectedAssessmentResult = new AssessmentResult();
 
     @BeforeEach
     void setup() {
