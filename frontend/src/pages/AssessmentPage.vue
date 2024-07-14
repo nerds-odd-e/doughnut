@@ -51,12 +51,6 @@ const questionAnswered = async (answerResult) => {
     correctAnswers.value += 1
   }
   currentQuestion.value += 1
-  if (assessmentCompleted.value) {
-    await managedApi.restAssessmentController.submitAssessmentResult(
-      props.notebookId,
-      questionsAnswerCollection.value
-    )
-  }
 }
 
 const generateAssessmentQuestions = () => {
