@@ -118,9 +118,8 @@ Then(
 )
 
 Then(
-  'I move the notebook {string} to circle {string}',
-  (_notebook: string, _toCircle: string) => {
-    // eslint-disable-next-line chai-friendly/no-unused-expressions
-    start
+  'I move the notebook {string} from {string} to {string}',
+  (notebook: string, fromCircle: string, toCircle: string) => {
+    start.navigateToCircle(fromCircle).moveNotebook(notebook).toCircle(toCircle)
   }
 )

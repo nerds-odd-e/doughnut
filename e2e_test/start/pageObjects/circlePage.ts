@@ -14,6 +14,14 @@ export const navigateToCircle = (circleName: string) => {
     haveMembers(count: number) {
       cy.get('body').find('.circle-member').should('have.length', count)
     },
+    moveNotebook(notebookTitle: string) {
+      this.findNotebookCardButton(notebookTitle, 'Move to ...').click()
+      return {
+        toCircle(circleName: string) {
+          cy.findByText(circleName).click()
+        },
+      }
+    },
     ...bazaarOrCircle(),
   }
 }
