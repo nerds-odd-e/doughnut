@@ -18,7 +18,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { QuestionAnswerPair, QuizQuestion } from "@/generated/backend"
+import { QuizQuestion } from "@/generated/backend"
 import { useRouter } from "vue-router"
 import QuizQuestionComp from "@/components/review/QuizQuestion.vue"
 
@@ -32,7 +32,6 @@ const topicConstructor = computed(() => {
 })
 const quizQuestions = ref<QuizQuestion[]>([])
 const currentQuestion = ref(0)
-const questionsAnswerCollection = ref<QuestionAnswerPair[]>([])
 const errors = ref("")
 const correctAnswers = ref(0)
 const assessmentCompleted = computed(
@@ -42,11 +41,6 @@ const assessmentCompleted = computed(
 )
 
 const questionAnswered = async (answerResult) => {
-  questionsAnswerCollection.value.push({
-    questionId: quizQuestions.value[currentQuestion.value]!.id,
-    answerId: answerResult.answerId,
-  })
-
   if (answerResult.correct) {
     correctAnswers.value += 1
   }
