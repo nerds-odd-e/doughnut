@@ -16,12 +16,12 @@
       <thead>
         <tr>
           <th>Approved</th>
+          <th>Actions</th>
           <th>Question Text</th>
           <th>A</th>
           <th>B</th>
           <th>C</th>
           <th>D</th>
-          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -36,6 +36,10 @@
               v-model="question.approved"
               @change="toggleApproval(question.id)"
             />
+          </td>
+          <td>
+            <!-- <button @click="editQuestion(question)">Edit</button> -->
+            <button @click="deleteQuestion(question.id)">Delete</button>
           </td>
           <td>{{ question.quizQuestion.multipleChoicesQuestion.stem }}</td>
           <template
@@ -52,10 +56,6 @@
               {{ choice }}
             </td>
           </template>
-          <td>
-            <!-- <button @click="editQuestion(question)">Edit</button> -->
-            <button @click="deleteQuestion(question.id)">Delete</button>
-          </td>
         </tr>
       </tbody>
     </table>
