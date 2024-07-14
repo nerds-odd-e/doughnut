@@ -33,6 +33,13 @@ public class QuizQuestionService {
     modelFactoryService.save(questionAndAnswer);
     return questionAndAnswer;
   }
+
+  public QuizQuestionAndAnswer deleteQuestion(
+    Note note, @Valid QuizQuestionAndAnswer questionAndAnswer) {
+    questionAndAnswer.setNote(note);
+    modelFactoryService.remove(questionAndAnswer);
+    return questionAndAnswer;
+  }
   public QuizQuestionAndAnswer refineQuestion(Note note, QuizQuestionAndAnswer questionAndAnswer) {
     MCQWithAnswer aiGeneratedRefineQuestion =
       aiQuestionGenerator.getAiGeneratedRefineQuestion(
@@ -48,7 +55,10 @@ public class QuizQuestionService {
     modelFactoryService.save(question);
     return question;
   }
-
+  public QuizQuestionAndAnswer toggleRemove(QuizQuestionAndAnswer questionAndAnswer) {
+    modelFactoryService.remove(questionAndAnswer);
+    return questionAndAnswer;
+  }
   public QuizQuestionAndAnswer generateMcqWithAnswer(Note note) {
     MCQWithAnswer MCQWithAnswer = aiQuestionGenerator.getAiGeneratedQuestion(note);
     if (MCQWithAnswer == null) {

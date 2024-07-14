@@ -45,6 +45,14 @@
               />
             </template>
           </PopButton>
+            <button
+                    :id="'button-' + outerIndex"
+                    type="button"
+                    class="btn btn-sm btn-danger"
+                    @click="toggleRemove(question.id)"
+            >
+                Delete
+            </button>
         </td>
         <td>
           <input
@@ -109,6 +117,14 @@ const toggleApproval = async (questionId?: number) => {
   if (questionId) {
     await managedApi.restQuizQuestionController.toggleApproval(questionId)
   }
+}
+const toggleRemove = async (questionId?: number) => {
+  if (questionId) {
+      const response = await managedApi.restQuizQuestionController.toggleRemove(
+          questionId
+      )
+      questions.value = questions.value.filter((e) => e.id !== response.id)
+    }
 }
 
 onMounted(() => {
