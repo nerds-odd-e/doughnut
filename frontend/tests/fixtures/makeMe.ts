@@ -1,5 +1,6 @@
 import ApiErrorBuilder from "./ApiErrorBuilder"
 import BazaarNotebooksBuilder from "./BazaarNotebooksBuilder"
+import CircleBuilder from "./CircleBuilder"
 import CircleNoteBuilder from "./CircleNoteBuilder"
 import DueReviewPointsBuilder from "./DueReviewPointsBuilder"
 import LinkBuilder from "./LinkBuilder"
@@ -54,6 +55,10 @@ class MakeMe {
 
   static get aCircleNote(): CircleNoteBuilder {
     return new CircleNoteBuilder()
+  }
+
+  static get aCircle(): CircleBuilder {
+    return new CircleBuilder()
   }
 
   static get aNotebook(): NotebookBuilder {

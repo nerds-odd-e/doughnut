@@ -7,7 +7,10 @@
       </template>
       <NotebookEditDialog v-bind="{ notebook }" />
     </PopButton>
-    <PopButton title="Move to ..." v-if="user?.externalIdentifier === notebook.creatorId">
+    <PopButton
+      title="Move to ..."
+      v-if="user?.externalIdentifier === notebook.creatorId"
+    >
       <template #button_face>
         <SvgMoveToCircle />
       </template>

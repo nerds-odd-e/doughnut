@@ -11,11 +11,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue"
-import { Circle } from "@/generated/backend"
+import { ref, onMounted, PropType } from "vue"
+import { Circle, Notebook } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 
 const { managedApi } = useLoadingApi()
+
+defineProps({
+  notebook: {
+    type: Object as PropType<Notebook>,
+    required: true,
+  },
+})
 
 const circles = ref<Circle[]>([])
 
