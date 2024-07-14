@@ -19,11 +19,15 @@ Feature: Quiz Question Management
       | What do you call a cow with not leg? | Ground beef    |
 
   Scenario: Manually edit quiz question in note
-    Given I am on the quiz questions management page
-    When I select the question to edit
-    And I update the question details
-    And I save the changes
-    Then the question should be updated successfully
+    When I add the following question for the note "The cow joke":
+      | Stem                           | Choice 0 | Choice 1 | Choice 2 | Correct Choice Index |
+      | What color are a cow's spots?  | black    | green    | red      | 1                    |
+    When I edit question "What color are a cow's spots?" for the note "The cow joke":
+      | Stem                           | Choice 0 | Choice 1 | Choice 2 | Correct Choice Index |
+      | What color are a cow's ferry?  | red      | black    | blue     | 0                    |
+    Then I should see the questions in the question list of the note "The cow joke":
+      | Question                             | Correct Choice |
+      | What color are a cow's ferry?        | red            |
 
   @usingMockedOpenAiService
   Scenario: Can generate the question by AI
