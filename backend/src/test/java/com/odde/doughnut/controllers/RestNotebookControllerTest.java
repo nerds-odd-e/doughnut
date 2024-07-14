@@ -6,10 +6,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.entities.NotebookSettings;
-import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
@@ -121,6 +118,19 @@ class RestNotebookControllerTest {
     void whenAuthorized() throws UnexpectedNoAccessRightException {
       List<Note.NoteBrief> noteBriefs = controller.downloadNotebookDump(notebook);
       assertThat(noteBriefs, hasSize(1));
+    }
+  }
+
+  @Nested
+  class MoveToCircle {
+    @Test
+    void shouldNotBeAbleToMoveNotebookThatIsCreatedByAnotherUser() {
+      User anotherUser = makeMe.aUser().please();
+      Circle circle1 = makeMe.aCircle().hasMember(anotherUser).hasMember(userModel).please();
+      Note note = makeMe.aNote().creator(anotherUser).inCircle(circle1).please();
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.moveToCircle(note.getNotebook(), makeMe.aCircle().please()));
     }
   }
 }

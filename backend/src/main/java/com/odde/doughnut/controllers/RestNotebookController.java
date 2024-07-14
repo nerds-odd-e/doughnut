@@ -89,7 +89,9 @@ class RestNotebookController {
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
       @PathVariable("circle") @Schema(type = "integer") Circle circle)
       throws UnexpectedNoAccessRightException {
-    currentUser.assertAuthorization(notebook);
+    if (notebook.getCreatorEntity().getId() != currentUser.getEntity().getId()) {
+      throw new UnexpectedNoAccessRightException();
+    }
     notebook.setOwnership(circle.getOwnership());
     modelFactoryService.save(notebook);
     return notebook;
