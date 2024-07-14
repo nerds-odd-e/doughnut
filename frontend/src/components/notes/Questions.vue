@@ -38,7 +38,6 @@
             />
           </td>
           <td>
-            <!-- <button @click="editQuestion(question)">Edit</button> -->
             <button @click="deleteQuestion(question.id)">Delete</button>
           </td>
           <td>{{ question.quizQuestion.multipleChoicesQuestion.stem }}</td>
@@ -94,9 +93,6 @@ const toggleApproval = async (questionId?: number) => {
     await managedApi.restQuizQuestionController.toggleApproval(questionId)
   }
 }
-// const editQuestion = (question: QuizQuestionAndAnswer) => {
-//  console.log("Edit question:", question)
-// }
 const deleteQuestion = async (questionId?: number) => {
   if (questionId) {
     let response =
