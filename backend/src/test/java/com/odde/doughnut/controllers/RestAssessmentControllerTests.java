@@ -11,7 +11,6 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.NoteBuilder;
 import com.theokanning.openai.client.OpenAiApi;
 import java.util.*;
-import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -74,15 +73,11 @@ public class RestAssessmentControllerTests {
 
     @Test
     void shouldPickRandomQuestionsFromTheSameNote() throws UnexpectedNoAccessRightException {
-      int numberOfQuestions = 10;
-
-      Consumer<NoteBuilder> multipleApprovedQuestionsForNote =
-          noteBuilder -> noteBuilder.hasApprovedQuestions(numberOfQuestions);
-
-      makeMe.theNote(topNote).withNChildrenThat(1, multipleApprovedQuestionsForNote).please();
-
+      makeMe
+          .theNote(topNote)
+          .withNChildrenThat(1, noteBuilder -> noteBuilder.hasApprovedQuestions(10))
+          .please();
       Set<Integer> questionIds = performAssessments(representativeNumberOfAttempts);
-
       assertTrue(questionIds.size() > 1, "Expected questions from the same note.");
     }
   }
