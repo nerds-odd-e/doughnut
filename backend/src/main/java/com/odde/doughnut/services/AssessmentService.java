@@ -2,14 +2,11 @@ package com.odde.doughnut.services;
 
 import static com.odde.doughnut.controllers.dto.ApiError.ErrorType.ASSESSMENT_SERVICE_ERROR;
 
-import com.odde.doughnut.controllers.dto.AssessmentResult;
-import com.odde.doughnut.controllers.dto.QuestionAnswerPair;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.Objects;
 
@@ -54,28 +51,5 @@ public class AssessmentService {
         .limit(numberOfQuestion)
         .map(QuizQuestionAndAnswer::getQuizQuestion)
         .toList();
-  }
-
-  public AssessmentResult submitAssessmentResult(
-      User user, Notebook notebook, List<QuestionAnswerPair> questionsAnswerPairs) {
-
-    // TODO: add indices on assessment_attempt table!
-    AssessmentAttempt attempt = new AssessmentAttempt();
-    attempt.setUser(user);
-    attempt.setNotebook(notebook);
-    attempt.setAnswersCorrect(0);
-    attempt.setAnswersTotal(questionsAnswerPairs.size());
-    attempt.setSubmittedAt(new Timestamp(System.currentTimeMillis()));
-    modelFactoryService.save(attempt);
-
-    AssessmentResult assessmentResult = new AssessmentResult();
-    assessmentResult.setTotalCount(questionsAnswerPairs.size());
-    assessmentResult.setCorrectCount(0);
-    return assessmentResult;
-  }
-
-  public List<AssessmentAttempt> getAssessmentHistory(User user) {
-    return (List<AssessmentAttempt>)
-        modelFactoryService.assessmentAttemptRepository.findAll(); // TODO: filter for user
   }
 }

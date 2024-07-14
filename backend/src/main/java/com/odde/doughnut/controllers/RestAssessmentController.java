@@ -1,7 +1,5 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.dto.AssessmentResult;
-import com.odde.doughnut.controllers.dto.QuestionAnswerPair;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -13,7 +11,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -44,24 +41,5 @@ class RestAssessmentController {
     currentUser.assertReadAuthorization(notebook);
 
     return assessmentService.generateAssessment(notebook);
-  }
-
-  @PostMapping("{notebook}")
-  @Transactional
-  public AssessmentResult submitAssessmentResult(
-      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
-      @RequestBody List<QuestionAnswerPair> questionsAnswerPairs)
-      throws UnexpectedNoAccessRightException {
-    currentUser.assertLoggedIn();
-    currentUser.assertReadAuthorization(notebook);
-
-    return assessmentService.submitAssessmentResult(
-        currentUser.getEntity(), notebook, questionsAnswerPairs);
-  }
-
-  @GetMapping("/history")
-  @Transactional
-  public List<AssessmentAttempt> getAssessmentHistory() {
-    return assessmentService.getAssessmentHistory(currentUser.getEntity());
   }
 }

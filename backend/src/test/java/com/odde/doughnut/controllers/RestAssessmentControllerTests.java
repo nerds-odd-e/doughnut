@@ -2,8 +2,6 @@ package com.odde.doughnut.controllers;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.odde.doughnut.controllers.dto.AssessmentResult;
-import com.odde.doughnut.controllers.dto.QuestionAnswerPair;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -165,66 +163,6 @@ public class RestAssessmentControllerTests {
           .please();
 
       assertThrows(ApiException.class, () -> controller.generateAssessmentQuestions(notebook));
-    }
-  }
-
-  @Nested
-  class completeAssessmentTest {
-    private Notebook notebook;
-    private Note topNote;
-    private List<QuestionAnswerPair> questionsAnswerPairs;
-
-    @BeforeEach
-    void setup() {
-      topNote = makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser).please();
-      notebook = topNote.getNotebook();
-
-      makeMe.theNote(topNote).withNChildrenThat(2, NoteBuilder::hasAnApprovedQuestion).please();
-      notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(2);
-      questionsAnswerPairs = new ArrayList<>();
-
-      for (Note note : notebook.getNotes()) {
-        QuizQuestionAndAnswer quizQuestionAndAnswer = note.getQuizQuestionAndAnswers().getFirst();
-        QuestionAnswerPair questionAnswerPair = new QuestionAnswerPair();
-        questionAnswerPair.setQuestionId(quizQuestionAndAnswer.getId());
-        quizQuestionAndAnswer.setCorrectAnswerIndex(1);
-        questionAnswerPair.setAnswerId(0);
-        questionsAnswerPairs.add(questionAnswerPair);
-      }
-    }
-
-    @Test
-    void submitAssessmentResultCheckScore() throws UnexpectedNoAccessRightException {
-      AssessmentResult assessmentResult =
-          controller.submitAssessmentResult(notebook, questionsAnswerPairs);
-
-      assertEquals(questionsAnswerPairs.size(), assessmentResult.getTotalCount());
-      assertEquals(0, assessmentResult.getCorrectCount());
-    }
-  }
-
-  @Nested
-  class assessmentHistoryTest {
-    @Test
-    void shouldReturnAssessmentHistory() throws UnexpectedNoAccessRightException {
-      var topNote = makeMe.aHeadNote("Countries").creatorAndOwner(currentUser).please();
-      var notebook = topNote.getNotebook();
-
-      controller.submitAssessmentResult(notebook, new ArrayList<>());
-
-      List<AssessmentAttempt> assessmentHistory = controller.getAssessmentHistory();
-      assertEquals(1, assessmentHistory.size());
-      assertEquals(
-          "Countries",
-          assessmentHistory.stream()
-              .findFirst()
-              .get()
-              .getNotebook()
-              .getHeadNote()
-              .getNoteTopic()
-              .getTopicConstructor());
-      assertEquals(0, assessmentHistory.stream().findFirst().get().getAnswersCorrect());
-      assertEquals(0, assessmentHistory.stream().findFirst().get().getAnswersTotal());
     }
   }
 }
