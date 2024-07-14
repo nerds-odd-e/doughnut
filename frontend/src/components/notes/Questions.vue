@@ -120,8 +120,8 @@ const toggleApproval = async (questionId?: number) => {
 }
 const toggleRemove = async (questionId?: number) => {
   if (questionId) {
-    await managedApi.restQuizQuestionController.toggleRemove(questionId);
-    questions.value = questions.value.filter(q => q.id !== questionId);
+    const response = await managedApi.restQuizQuestionController.toggleRemove(questionId);
+    questions.value = questions.value.filter(q => q.id !== response.id);
   }
 };
 
