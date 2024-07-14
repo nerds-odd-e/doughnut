@@ -134,6 +134,7 @@ class RestQuizQuestionController {
     QuizQuestionAndAnswer removeQuestionAndAnswer= quizQuestionService.removeQuestion(questionAndAnswer);
     return removeQuestionAndAnswer.equals(questionAndAnswer);
   }
+
   @PostMapping("/{note}/note-questions")
   @Transactional
   public QuizQuestionAndAnswer addQuestionManually(
