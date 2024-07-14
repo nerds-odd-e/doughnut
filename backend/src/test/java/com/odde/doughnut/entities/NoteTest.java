@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class NoteTest {
 
   @Autowired MakeMe makeMe;
-  User user;
 
   @Test
   void timeOrder() {

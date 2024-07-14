@@ -19,6 +19,7 @@ public class User extends EntityIdentifiedByIdOnly {
   @Column(name = "external_identifier")
   @Getter
   @Setter
+  @NotNull
   private String externalIdentifier;
 
   @OneToMany(mappedBy = "user")

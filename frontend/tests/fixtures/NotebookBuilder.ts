@@ -24,6 +24,11 @@ class NotebookBuilder extends Builder<Notebook> {
     return this
   }
 
+  creator(creatorId: string) {
+    this.data.creatorId = creatorId
+    return this
+  }
+
   numberOfQuestionsInAssessment(numberofQuestions: number) {
     this.data.notebookSettings.numberOfQuestionsInAssessment = numberofQuestions
     return this

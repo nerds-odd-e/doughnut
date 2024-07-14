@@ -17,7 +17,7 @@ describe("global bar", () => {
     helper.managedApi.restCircleController.index = vitest
       .fn()
       .mockResolvedValue([])
-    user = makeMe.aUser().please()
+    user = makeMe.aUser.please()
     noteEditingHistory = new NoteEditingHistory()
     histories = createNoteStorage(
       new ManagedApi({ states: [], errors: [] }),

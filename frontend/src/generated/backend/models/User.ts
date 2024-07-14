@@ -6,7 +6,7 @@ import type { Ownership } from './Ownership';
 export type User = {
     id: number;
     name: string;
-    externalIdentifier?: string;
+    externalIdentifier: string;
     ownership?: Ownership;
     dailyNewNotesCount?: number;
     spaceIntervals?: string;

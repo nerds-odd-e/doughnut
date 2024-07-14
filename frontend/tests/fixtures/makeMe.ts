@@ -16,7 +16,7 @@ import WikidataEntityBuilder from "./WikidataEntityBuilder"
 import WikidataSearchEntityBuilder from "./WikidataSearchEntityBuilder"
 
 class MakeMe {
-  static aUser() {
+  static get aUser() {
     return new UserBuilder()
   }
 

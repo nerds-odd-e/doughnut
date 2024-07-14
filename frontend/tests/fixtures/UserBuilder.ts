@@ -10,7 +10,7 @@ class UserBuilder extends Builder<User> {
     this.data = {
       id: generateId(),
       name: "a name",
-      externalIdentifier: "an external identifier",
+      externalIdentifier: `user ${generateId()}`,
       ownership: { id: 0 },
       dailyNewNotesCount: 5,
       spaceIntervals: "",

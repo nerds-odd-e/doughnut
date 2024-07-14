@@ -3,9 +3,13 @@ import { describe, it } from "vitest"
 import makeMe from "../fixtures/makeMe"
 import helper from "../helpers"
 import { screen } from "@testing-library/vue"
+import { flushPromises } from "@vue/test-utils"
 
 describe("circle show page", () => {
-  const notebook = makeMe.aNotebook.please()
+  const currentUser = makeMe.aUser.please()
+  const notebook = makeMe.aNotebook
+    .creator(currentUser.externalIdentifier)
+    .please()
   const circleNote = makeMe.aCircleNote.notebooks(notebook).please()
 
   beforeEach(() => {
@@ -27,13 +31,25 @@ describe("circle show page", () => {
     )
   })
 
-  // eslint-disable-next-line vitest/no-disabled-tests
-  it.skip("shows the move notebook button", async () => {
+  const moveButtonTitle = "Move to ..."
+  it("shows the move notebook button", async () => {
     helper
       .component(CircleShowPage)
-      .withStorageProps({ circleId: circleNote.id })
+      .withStorageProps({ circleId: circleNote.id, user: currentUser })
       .render()
-    screen.getByRole("button", { name: "Move to ..." })
+    await flushPromises()
+    screen.getByRole("button", { name: moveButtonTitle })
   })
 
+  it("must not show the move button if not the creator", async () => {
+    helper
+      .component(CircleShowPage)
+      .withStorageProps({
+        circleId: circleNote.id,
+        user: makeMe.aUser.please(),
+      })
+      .render()
+    await flushPromises()
+    expect(screen.queryByRole("button", { name: moveButtonTitle })).toBeNull()
+  })
 })
