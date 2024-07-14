@@ -8,5 +8,6 @@ export type Notebook = {
     id: number;
     headNote: Note;
     notebookSettings: NotebookSettings;
+    creatorId?: string;
 };
 

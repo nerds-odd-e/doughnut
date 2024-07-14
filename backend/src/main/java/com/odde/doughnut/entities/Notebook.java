@@ -86,4 +86,8 @@ public class Notebook extends EntityIdentifiedByIdOnly {
     ;
     return noteBriefs;
   }
+
+  public String getCreatorId() {
+    return creatorEntity.getExternalIdentifier();
+  }
 }

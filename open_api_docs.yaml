@@ -2756,6 +2756,8 @@ components:
           $ref: "#/components/schemas/Note"
         notebookSettings:
           $ref: "#/components/schemas/NotebookSettings"
+        creatorId:
+          type: string
     NotebookSettings:
       type: object
       properties:
