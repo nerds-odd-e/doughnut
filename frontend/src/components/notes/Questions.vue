@@ -120,12 +120,10 @@ const toggleApproval = async (questionId?: number) => {
 }
 const toggleRemove = async (questionId?: number) => {
   if (questionId) {
-      const response = await managedApi.restQuizQuestionController.toggleRemove(
-          questionId
-      )
-      questions.value = questions.value.filter((e) => e.id !== response.id)
-    }
-}
+    await managedApi.restQuizQuestionController.toggleRemove(questionId);
+    questions.value = questions.value.filter(q => q.id !== questionId);
+  }
+};
 
 onMounted(() => {
   fetchQuestions()
