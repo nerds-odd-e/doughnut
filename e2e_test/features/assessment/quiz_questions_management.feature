@@ -18,6 +18,13 @@ Feature: Quiz Question Management
       | What does a cow say?                 | moo            |
       | What do you call a cow with not leg? | Ground beef    |
 
+  Scenario: Manually edit quiz question in note
+    Given I am on the quiz questions management page
+    When I select the question to edit
+    And I update the question details
+    And I save the changes
+    Then the question should be updated successfully
+
   @usingMockedOpenAiService
   Scenario: Can generate the question by AI
     Given OpenAI now generates this question:
@@ -27,7 +34,6 @@ Feature: Quiz Question Management
     Then the question in the form becomes:
       | Stem                                     | Choice 0     | Choice 1 | Choice 2  | Correct Choice Index |
       | Why do cows have hooves instead of feet? | they lactose | they moo | they have | 0                    |
-
 
   @usingMockedOpenAiService
   Scenario: Can refine the question by AI

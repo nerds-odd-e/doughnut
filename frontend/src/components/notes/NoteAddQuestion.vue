@@ -41,7 +41,8 @@
     <button @click="generateQuestionByAI" :disabled="dirty">
       Generate by AI
     </button>
-    <button @click="submitQuestion" :disabled="!isValidQuestion">Submit</button>
+    <button v-if="action == 'add'" @click="submitQuestion" :disabled="!isValidQuestion">Submit</button>
+    <button v-if="action == 'edit'" @click="updateQuestion" :disabled="!isValidQuestion">Update</button>
   </div>
 </template>
 
@@ -51,6 +52,7 @@ import useLoadingApi from "@/managedApi/useLoadingApi"
 import { Note, QuizQuestionAndAnswer } from "@/generated/backend"
 import isMCQWithAnswerValid from "@/models/isMCQWithAnswerValid"
 import TextArea from "../form/TextArea.vue"
+import TextInput from "@/components/form/TextInput.vue"
 
 const { managedApi } = useLoadingApi()
 const props = defineProps({
@@ -58,18 +60,24 @@ const props = defineProps({
     type: Object as PropType<Note>,
     required: true,
   },
-})
-
-const quizQuestionAndAnswer = ref<QuizQuestionAndAnswer>({
-  correctAnswerIndex: 0,
-  quizQuestion: {
-    multipleChoicesQuestion: {
-      stem: "",
-      choices: ["", ""],
-    },
+  question: {
+    type: Object as PropType<QuizQuestionAndAnswer>,
+    required: false,
   },
-} as QuizQuestionAndAnswer)
-
+})
+const action: string = props.question ? "edit" : "add";
+const quizQuestionAndAnswer = ref<QuizQuestionAndAnswer>(
+  props.question ??
+  ({
+    correctAnswerIndex: 0,
+    quizQuestion: {
+      multipleChoicesQuestion: {
+        stem: "",
+        choices: ["", ""],
+      },
+    },
+  } as QuizQuestionAndAnswer)
+)
 const minimumNumberOfChoices = 2
 const maximumNumberOfChoices = 10
 
@@ -108,6 +116,16 @@ const submitQuestion = async () => {
   const quizQuestion = quizQuestionAndAnswer.value
   const response =
     await managedApi.restQuizQuestionController.addQuestionManually(
+      props.note.id,
+      quizQuestion
+    )
+  emit("close-dialog", response)
+}
+
+const updateQuestion = async () => {
+  const quizQuestion = quizQuestionAndAnswer.value
+  const response =
+    await managedApi.restQuizQuestionController.updateQuestionManually(
       props.note.id,
       quizQuestion
     )
