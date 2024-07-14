@@ -27,10 +27,6 @@
           />
         </template>
       </PopButton>
-      <PopButton btn-class="dropdown-item" title="user settings">
-        <template #button_face>Assessment History</template>
-        <AssessmentHistoryDialog />
-      </PopButton>
       <a href="#" class="dropdown-item" role="button" @click="logout">Logout</a>
     </div>
   </div>
@@ -43,7 +39,6 @@ import { User } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { PropType, defineComponent } from "vue"
 import UserProfileDialog from "./UserProfileDialog.vue"
-import AssessmentHistoryDialog from "../user/AssessmentHistoryDialog.vue"
 
 export default defineComponent({
   setup() {
@@ -56,7 +51,6 @@ export default defineComponent({
   components: {
     PopButton,
     UserProfileDialog,
-    AssessmentHistoryDialog,
     SvgMissingAvatar,
   },
   methods: {
