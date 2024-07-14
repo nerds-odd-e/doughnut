@@ -7,6 +7,12 @@
       </template>
       <NotebookEditDialog v-bind="{ notebook }" />
     </PopButton>
+    <PopButton title="Move to ...">
+      <template #button_face>
+        <SvgMoveToCircle />
+      </template>
+      <NotebookEditDialog v-bind="{ notebook }" />
+    </PopButton>
     <PopButton title="Notebook Assistant" v-if="user?.admin">
       <template #button_face>
         <SvgRobot />
@@ -33,6 +39,7 @@ import PopButton from "@/components/commons/Popups/PopButton.vue"
 import usePopups from "@/components/commons/Popups/usePopups"
 import SvgBazaarShare from "@/components/svgs/SvgBazaarShare.vue"
 import SvgEditNotebook from "@/components/svgs/SvgEditNotebook.vue"
+import SvgMoveToCircle from "@/components/svgs/SvgMoveToCircle.vue"
 import { Notebook, User } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { PropType, defineComponent } from "vue"
@@ -54,6 +61,7 @@ export default defineComponent({
     NotebookEditDialog,
     NotebookAssistantManagementDialog,
     SvgEditNotebook,
+    SvgMoveToCircle,
     SvgRobot,
   },
   methods: {
