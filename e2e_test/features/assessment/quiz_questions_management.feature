@@ -40,3 +40,16 @@ Feature: Quiz Question Management
     Then the question in the form becomes:
       | Stem                            | Choice 0                 | Choice 1           | Choice 2      | Correct Choice Index |
       | Why did the cow cross the road? | To get to the udder side | To see the chicken | To find grass | 0                    |
+
+  Scenario: Manually delete a question to the note successfully
+    When I add the following question for the note "The cow joke":
+      | Stem                           | Choice 0 | Choice 1 | Choice 2 | Correct Choice Index |
+      | The moon revolve around earth. | Yes      | No       | Not Sure |                    0 |
+    Then I should see the questions in the question list of the note "The cow joke":
+      | Question                       | Correct Choice |
+      | What does a cow say?           | moo            |
+      | The moon revolve around earth. | Yes            |
+    When I delete the question "What does a cow say?" for the note "The cow joke"
+    Then I should see the questions in the question list of the note "The cow joke":
+      | Question                        | Correct Choice |
+      | The moon revolve around earth.  | Yes            |
