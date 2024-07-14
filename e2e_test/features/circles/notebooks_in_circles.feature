@@ -25,7 +25,6 @@ Feature: Notes in circles
     When someone of my circle deletes the "Shared info" notebook
     Then I should not see "Shared info" in the circle page within 5 seconds
 
-  @ignore
   Scenario: move notebook to another circle
     Given There is a circle "Odd-e Thai Team" with "old_learner" members
     And  There is a notebook "Family gathering guidelines" in circle "Odd-e SG Team"

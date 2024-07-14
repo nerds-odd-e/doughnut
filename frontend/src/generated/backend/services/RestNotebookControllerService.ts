@@ -73,6 +73,28 @@ export class RestNotebookControllerService {
         });
     }
     /**
+     * @param notebook
+     * @param circle
+     * @returns Notebook OK
+     * @throws ApiError
+     */
+    public moveToCircle(
+        notebook: number,
+        circle: number,
+    ): CancelablePromise<Notebook> {
+        return this.httpRequest.request({
+            method: 'PATCH',
+            url: '/api/notebooks/{notebook}/move-to-circle/{circle}',
+            path: {
+                'notebook': notebook,
+                'circle': circle,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
      * @returns NotebooksViewedByUser OK
      * @throws ApiError
      */

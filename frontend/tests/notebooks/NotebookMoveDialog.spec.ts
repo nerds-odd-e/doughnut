@@ -20,10 +20,7 @@ describe("circle show page", () => {
   })
 
   it("fetch API to be called ONCE on mount", async () => {
-    helper
-      .component(NotebookMoveDialog)
-      .withProps({ notebook, fromCircle: circle1 })
-      .render()
+    helper.component(NotebookMoveDialog).withProps({ notebook }).render()
     expect(helper.managedApi.restCircleController.index).toBeCalled()
   })
 

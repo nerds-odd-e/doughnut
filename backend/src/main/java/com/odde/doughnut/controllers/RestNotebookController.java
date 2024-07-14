@@ -3,10 +3,7 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NotebooksViewedByUser;
 import com.odde.doughnut.controllers.dto.RedirectToNoteResponse;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.entities.NotebookSettings;
-import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.BazaarModel;
@@ -83,6 +80,18 @@ class RestNotebookController {
     currentUser.assertAuthorization(notebook);
     BazaarModel bazaar = modelFactoryService.toBazaarModel();
     bazaar.shareNotebook(notebook);
+    return notebook;
+  }
+
+  @PatchMapping(value = "/{notebook}/move-to-circle/{circle}")
+  @Transactional
+  public Notebook moveToCircle(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
+      @PathVariable("circle") @Schema(type = "integer") Circle circle)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertAuthorization(notebook);
+    notebook.setOwnership(circle.getOwnership());
+    modelFactoryService.save(notebook);
     return notebook;
   }
 

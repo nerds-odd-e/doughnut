@@ -19,6 +19,7 @@ export const navigateToCircle = (circleName: string) => {
       return {
         toCircle(circleName: string) {
           cy.findByText(circleName).click()
+          cy.findByText('OK').click()
         },
       }
     },
