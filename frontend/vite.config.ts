@@ -12,6 +12,7 @@ import checker from 'vite-plugin-checker'
 import viteCompression from 'vite-plugin-compression'
 import VueDevTools from 'vite-plugin-vue-devtools'
 import tsconfigPaths from 'vite-tsconfig-paths'
+import biomePlugin from 'vite-plugin-biome'
 
 export default defineConfig({
   test: {
@@ -35,11 +36,12 @@ export default defineConfig({
   plugins: [
     VueDevTools(),
     tsconfigPaths(),
+    biomePlugin({
+      mode: 'check',
+      files: '.', 
+    }),
     checker({
       vueTsc: true,
-      biome: {
-        command: 'check .',
-      },
     }),
     vue({
       template: {
