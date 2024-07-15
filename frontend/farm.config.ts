@@ -11,7 +11,9 @@ import VueRouter from 'unplugin-vue-router/vite'
 import tsconfigPaths from 'vite-tsconfig-paths'
 
 export default defineConfig({
-  plugins: [farmJsPluginSass()],
+  plugins: [
+    farmJsPluginSass(),
+  ],
   vitePlugins: [
     tsconfigPaths(),
     vue({
@@ -59,7 +61,7 @@ export default defineConfig({
   },
   compilation: {
     input: {
-      index: fileURLToPath(new URL('/index.html', import.meta.url)),
+      index: fileURLToPath(new URL('./index.html', import.meta.url)),
     },
     output: {
       path: '../backend/src/main/resources/static/',
