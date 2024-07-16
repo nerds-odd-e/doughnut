@@ -31,12 +31,14 @@ import useLoadingApi from "@/managedApi/useLoadingApi"
 import { QuizQuestion } from "@/generated/backend"
 import { useRouter } from "vue-router"
 import QuizQuestionComp from "@/components/review/QuizQuestion.vue"
+import usePopups from "@/components/commons/Popups/usePopups.ts"
 
 const { managedApi } = useLoadingApi()
 const router = useRouter()
 const props = defineProps({
   notebookId: { type: Number, required: true },
 })
+const { popups } = usePopups()
 const topicConstructor = computed(() => {
   return router.currentRoute.value.query?.topic
 })
@@ -72,6 +74,15 @@ const generateAssessmentQuestions = () => {
       quizQuestions.value = response
     })
     .catch((res) => {
+      if (res.status === 403) {
+        popups
+          .alert(
+            "You have reached the assessment limit for today. Please try again tomorrow"
+          )
+          .then(() => {
+            router.back()
+          })
+      }
       errors.value = res.body.message
     })
 }
