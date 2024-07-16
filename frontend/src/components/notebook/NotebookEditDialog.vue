@@ -1,23 +1,24 @@
 <template>
   <h3>Edit notebook settings</h3>
-  <form @submit="processForm">
-    <CheckInput
-      scope-name="notebook"
-      field="skipReviewEntirely"
-      v-model="formData.skipReviewEntirely"
-      :errors="errors.skipReviewEntirely"
-    />
-    <TextInput
-      scope-name="notebook"
-      field="numberOfQuestionsInAssessment"
-      v-model="formData.numberOfQuestionsInAssessment"
-      :errors="errors.numberOfQuestionsInAssessment"
-    />
+  <form  @submit="processForm">
+    <div class="form-container">
+      <CheckInput
+        scope-name="notebook"
+        field="skipReviewEntirely"
+        v-model="formData.skipReviewEntirely"
+        :errors="errors.skipReviewEntirely"
+      />
+      <TextInput
+        scope-name="notebook"
+        field="numberOfQuestionsInAssessment"
+        v-model="formData.numberOfQuestionsInAssessment"
+        :errors="errors.numberOfQuestionsInAssessment"
+      />
     <div>
-        <label for="untilCertExpire">Until Cert Expire (in days)</label>
-        <input type="number" id="untilCertExpire" v-model.number="formData.untilCertExpire" class="form-control" />
-      </div>
-    <input type="submit" value="Update" class="btn btn-primary" />
+      <label for="untilCertExpire">Until Cert Expire (in days)</label>
+      <input type="number" id="untilCertExpire" v-model.number="formData.untilCertExpire" class="form-control" />
+    </div>
+    <input class="btn btn-primary btn-layout" type="submit" value="Update"  /></div>
   </form>
 </template>
 
@@ -65,4 +66,17 @@ input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  row-gap: 12px;
+
+}
+
+.btn-layout {
+  width: 100px;
+  align-self: center;
+}
+
 </style>
