@@ -39,6 +39,13 @@ export const routerToNotebooksPage = () => {
       )
       cy.findByRole('button', { name: 'Update' }).click()
     },
+    updateAssessmentSettingsCertificatePeriod(notebook: string, untilCerExpire: number) {
+      this.findNotebookCardButton(notebook, 'Edit notebook settings').click()
+      cy.formField('Until Cert Expire (in days)').assignFieldValue(
+        `${untilCerExpire}`
+      )
+      cy.findByRole('button', { name: 'Update' }).click()
+    },
     unsubscribe(notebook: string) {
       this.findNotebookCardButton(notebook, 'Unsubscribe').click()
       cy.findByRole('button', { name: 'OK' }).click()
