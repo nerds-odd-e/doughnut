@@ -16,7 +16,6 @@
           :href="viewCertificateUrl"
           target="_blank"
           class="btn btn-primary"
-          v-bind="{ verifiedBy: 'Korn' }"
           >View</a
         >
       </div>
