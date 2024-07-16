@@ -44,4 +44,9 @@ class NotebookTest {
     assertThat(notebook.getCreatorId())
         .isEqualTo(notebook.getCreatorEntity().getExternalIdentifier());
   }
+
+  @Test
+  void verifiedBy() {
+    assertThat(notebook.getVerifiedBy()).isEqualTo("Terry");
+  }
 }

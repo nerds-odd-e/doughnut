@@ -60,6 +60,13 @@ class RestNotebookController {
     return new RedirectToNoteResponse(note.getId());
   }
 
+  @GetMapping(value = "/{notebook}")
+  public Notebook get(@PathVariable @Schema(type = "integer") Notebook notebook)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertLoggedIn();
+    return notebook;
+  }
+
   @PostMapping(value = "/{notebook}")
   @Transactional
   public Notebook update(
@@ -70,12 +77,6 @@ class RestNotebookController {
     notebook.getNotebookSettings().update(notebookSettings);
     modelFactoryService.save(notebook);
     return notebook;
-  }
-
-  @GetMapping(value = "/{notebook}/verified-by")
-  public String getVerifiedBy() throws UnexpectedNoAccessRightException {
-    currentUser.assertLoggedIn();
-    return "Terry";
   }
 
   @PostMapping(value = "/{notebook}/share")
