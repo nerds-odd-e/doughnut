@@ -45,3 +45,28 @@ Feature: Self assessment
     Given I haven't login
     When I start the assessment on the "Countries" notebook in the bazaar
     Then I should see message that says "Please login first"
+
+  @ignore
+  Scenario: Perform an assessment more than limit per day
+    Given I have not start assessment "Countries" notebook before
+    When I do the assessment on "Countries" in the bazaar with the following answers:
+      | Question                           | Answer            |
+      | Where in the world is Singapore?   | <SingaporeAnswer> |
+      | Most famous food of Vietnam?       | <VietnamAnswer>   |
+      | What is the capital city of Japan? | <JapanAnswer>     |
+    And I do the assessment on "Countries" in the bazaar with the following answers:
+      | Question                           | Answer            |
+      | Where in the world is Singapore?   | <SingaporeAnswer> |
+      | Most famous food of Vietnam?       | <VietnamAnswer>   |
+      | What is the capital city of Japan? | <JapanAnswer>     |
+    And I do the assessment on "Countries" in the bazaar with the following answers:
+      | Question                           | Answer            |
+      | Where in the world is Singapore?   | <SingaporeAnswer> |
+      | Most famous food of Vietnam?       | <VietnamAnswer>   |
+      | What is the capital city of Japan? | <JapanAnswer>     |
+    And I do the assessment on "Countries" in the bazaar with the following answers:
+      | Question                           | Answer            |
+      | Where in the world is Singapore?   | <SingaporeAnswer> |
+      | Most famous food of Vietnam?       | <VietnamAnswer>   |
+      | What is the capital city of Japan? | <JapanAnswer>     |
+    Then I should see message that says "You hit the limit to do this assessment today. Please try again tomorrow."
