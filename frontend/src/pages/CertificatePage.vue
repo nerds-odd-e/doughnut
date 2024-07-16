@@ -2,7 +2,7 @@
   <div v-if="notebook" class="certificate-frame">
     <div class="certificate-container">
       <span>This to certificate that</span>
-      <span class="reciever-name">{{ notebook.certifiedBy }}</span>
+      <span class="reciever-name">{{ reciever }}</span>
       <p class="certificate-detail">
         <span>by completing the qualifications, </span
         ><span>is granted the Certified Vue Expert</span>
@@ -13,20 +13,31 @@
         <span>, and expiring on</span>
         <span class="date">2015-07-31</span>
       </div>
+      <div class="signature-section">
+        <div class="signature">
+          <span>{{ notebook.certifiedBy }}</span>
+          <span>Content Creator</span>
+        </div>
+        <div class="signature">
+          <span>Terry</span>
+          <span>Odd-e</span>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import useLoadingApi from '@/managedApi/useLoadingApi'
-import { Notebook } from '@/generated/backend'
+import { ref, onMounted } from "vue"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import { Notebook } from "@/generated/backend"
 
 const props = defineProps({
   notebookId: { type: Number, required: true },
 })
 const { managedApi } = useLoadingApi()
 const notebook = ref<Notebook | undefined>(undefined)
+const reciever = ref("Tony Stark")
 
 const fetchData = async () => {
   notebook.value = await managedApi.restNotebookController.get(props.notebookId)
@@ -68,5 +79,17 @@ onMounted(() => {
 .date {
   color: lightskyblue;
   text-decoration: underline;
+}
+.signature-section {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  padding: 16px;
+}
+.signature {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 </style>
