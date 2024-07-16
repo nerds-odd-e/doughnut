@@ -13,6 +13,10 @@
       v-model="formData.numberOfQuestionsInAssessment"
       :errors="errors.numberOfQuestionsInAssessment"
     />
+    <div>
+        <label for="untilCertExpire">Until Cert Expire (in days)</label>
+        <input type="number" id="untilCertExpire" v-model.number="formData.untilCertExpire" class="form-control" />
+      </div>
     <input type="submit" value="Update" class="btn btn-primary" />
   </form>
 </template>
@@ -29,10 +33,17 @@ export default {
   props: { notebook: Object },
   components: { CheckInput, TextInput },
   data() {
-    const { skipReviewEntirely, numberOfQuestionsInAssessment } =
-      this.notebook.notebookSettings
+    const {
+      skipReviewEntirely,
+      numberOfQuestionsInAssessment,
+      untilCertExpire,
+    } = this.notebook.notebookSettings
     return {
-      formData: { skipReviewEntirely, numberOfQuestionsInAssessment },
+      formData: {
+        skipReviewEntirely,
+        numberOfQuestionsInAssessment,
+        untilCertExpire,
+      },
       errors: {},
     }
   },
