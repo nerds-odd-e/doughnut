@@ -23,6 +23,7 @@ public class ModelFactoryService {
   @Autowired public FailureReportRepository failureReportRepository;
   @Autowired public NotebookAssistantRepository notebookAssistantRepository;
   @Autowired public GlobalSettingRepository globalSettingRepository;
+  @Autowired public AssessmentAttemptHistoryRepository assessmentAttemptHistoryRepository;
   @Autowired public EntityManager entityManager;
 
   @Autowired
