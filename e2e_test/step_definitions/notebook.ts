@@ -43,3 +43,12 @@ Given(
       .updateAssessmentSettings(notebook, numberOfQuestion)
   }
 )
+
+Given(
+  'I set the number of Certificate Expiration Period of the notebook {string} to {int}',
+  (notebook: string, untilCerExpire: number) => {
+    start
+      .routerToNotebooksPage()
+      .updateAssessmentSettingsCertificatePeriod(notebook, untilCerExpire)
+  }
+)
