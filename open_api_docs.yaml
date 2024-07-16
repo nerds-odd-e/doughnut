@@ -2814,6 +2814,9 @@ components:
         numberOfQuestionsInAssessment:
           type: integer
           format: int32
+        untilCertExpire:
+          type: integer
+          format: int32
     Subscription:
       required:
       - id
