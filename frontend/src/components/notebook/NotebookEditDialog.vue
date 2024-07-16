@@ -16,9 +16,9 @@
       />
     <div>
       <label for="untilCertExpire">Until Cert Expire (in days)</label>
-      <input type="number" id="untilCertExpire" v-model.number="formData.untilCertExpire" class="form-control" />
+      <input type="number" id="untilCertExpire" v-model.number="formData.untilCertExpire" class="form-control" min="0" oninput="validity.valid||(value='');" />
     </div>
-    <input class="btn btn-primary btn-layout" type="submit" value="Update"  /></div>
+    <input class="btn btn-primary btn-layout" type="submit" value="Update" /></div>
   </form>
 </template>
 
