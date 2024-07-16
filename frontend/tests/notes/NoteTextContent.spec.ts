@@ -44,9 +44,8 @@ describe("in place edit on title", () => {
     // because the components always get unmounted after each test
     // we simulate the before unmount siutation by replacing the unmounted method
     // with an empty function.
-
     const mockUnmounted = vitest
-      .spyOn(TextContentWrapper, "unmounted")
+      .spyOn(TextContentWrapper, "unmounted" as keyof typeof TextContentWrapper)
       .mockImplementation(() => {
         // noop
       })
