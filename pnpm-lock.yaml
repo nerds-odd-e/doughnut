@@ -167,11 +167,11 @@ importers:
         specifier: ^1.0.2
         version: 1.0.2
       '@farmfe/core':
-        specifier: ^1.3.0
-        version: 1.3.0(bufferutil@4.0.8)(utf-8-validate@6.0.4)
+        specifier: ^1.3.1
+        version: 1.3.1(bufferutil@4.0.8)(utf-8-validate@6.0.4)
       '@farmfe/js-plugin-sass':
         specifier: ^2.9.0
-        version: 2.9.0(@farmfe/core@1.3.0(bufferutil@4.0.8)(utf-8-validate@6.0.4))(sass-embedded@1.77.5)(sass@1.77.6)
+        version: 2.9.0(@farmfe/core@1.3.1(bufferutil@4.0.8)(utf-8-validate@6.0.4))(sass-embedded@1.77.5)(sass@1.77.6)
       '@testing-library/user-event':
         specifier: ^14.5.2
         version: 14.5.2(@testing-library/dom@10.3.1)
@@ -210,7 +210,7 @@ importers:
         version: 3.37.1
       css-loader:
         specifier: ^7.1.2
-        version: 7.1.2(webpack@5.92.1)
+        version: 7.1.2(webpack@5.92.1(esbuild@0.23.0))
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
@@ -252,10 +252,10 @@ importers:
         version: 1.77.6
       sass-loader:
         specifier: 14.2.1
-        version: 14.2.1(sass-embedded@1.77.5)(sass@1.77.6)(webpack@5.92.1)
+        version: 14.2.1(sass-embedded@1.77.5)(sass@1.77.6)(webpack@5.92.1(esbuild@0.23.0))
       style-loader:
         specifier: ^4.0.0
-        version: 4.0.0(webpack@5.92.1)
+        version: 4.0.0(webpack@5.92.1(esbuild@0.23.0))
       typescript:
         specifier: 5.5.3
         version: 5.5.3
@@ -1085,62 +1085,62 @@ packages:
     engines: {node: '>= 16'}
     hasBin: true
 
-  '@farmfe/core-darwin-arm64@1.3.0':
-    resolution: {integrity: sha512-L2TQYUpH2rBonfxVDBqdLudCOLSDtOIU0yMbww0SsjdJb9JtgDCg5gUbYXV235xe+mC2v7v6byUHomqhqpJM0w==}
+  '@farmfe/core-darwin-arm64@1.3.1':
+    resolution: {integrity: sha512-gtBVDCgsnPTf1x0XedNvdqj98VXlGDDjlu6JeyiDs0xQk+iEuJDxY4nqEzllVi587vCektMtLBBsaQOiGm4q2w==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [darwin]
 
-  '@farmfe/core-darwin-x64@1.3.0':
-    resolution: {integrity: sha512-XQ7yQ0nddlhQwBN2iky6St77UepEzlxNLmelo6AZcIUgOHTv6mzmCVNXt9giceK7acTc7q9OXmU3JaRR27FjeA==}
+  '@farmfe/core-darwin-x64@1.3.1':
+    resolution: {integrity: sha512-c90ZAvTX1nJPiWFG2IcVIv99SzNiQ9Qv4j1Sm1rTYJC6WLhqjLLyRKOK7SORBWbHh4QT13T12tQgwKe+a7ClgQ==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [darwin]
 
-  '@farmfe/core-linux-arm64-gnu@1.3.0':
-    resolution: {integrity: sha512-oRyBk6TkMDhedNK+043P2+JsvYD+/4EBBHRstzaTJolIYT/n7NbW6gOor+zksTZBK6uXM6033CCFAOYE9r3Dgw==}
+  '@farmfe/core-linux-arm64-gnu@1.3.1':
+    resolution: {integrity: sha512-V6w4VEeczDIBDph6m+X/2XLZj6WvhhFsNtC4qVBV6yDr8IgnFNnRwwu+De3NcNla3oecQBJ3S1wZUlFZKthYnw==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
 
-  '@farmfe/core-linux-arm64-musl@1.3.0':
-    resolution: {integrity: sha512-NtDl1K8X9xahsJ1d0IFn9vju6wV3yLiAuow1dFJQvuAQ17AvTZZqT66GAdoMXMInAe9HdVdQWXVwmR/vpEqmlA==}
+  '@farmfe/core-linux-arm64-musl@1.3.1':
+    resolution: {integrity: sha512-hZFeave06v7D6qFz0PD1me04KQqPoMR+ufZEhK6XaLv8uqFqP218n1rFzdqL+AZ67WhUAksoP5WewrWYMQT4Mg==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
 
-  '@farmfe/core-linux-x64-gnu@1.3.0':
-    resolution: {integrity: sha512-F2ElUwTlWdAQe7waEhGzJVHNlAf3vI6BfK/70n1S0/rNietGih6RpQ5X45Q0Dl8TQIq9lqt7Fzi6a/JXYFjstQ==}
+  '@farmfe/core-linux-x64-gnu@1.3.1':
+    resolution: {integrity: sha512-aHQknyoF/CmqUlKLR1xYEHZ6NHxm7GOxRa9GrLKQnlqAO5/mW+s07jjXSbVC+R/TXQfcCI4FPdOPGjuT+WiUgA==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
 
-  '@farmfe/core-linux-x64-musl@1.3.0':
-    resolution: {integrity: sha512-dRrJ6aJvv/MZL3C2CI5JL6WUf0lP4zaP7keQ8v9EF4RvWs4WTx8wn9m1uSNX5YpePwvdtJcz6nTS3sF6kErPOw==}
+  '@farmfe/core-linux-x64-musl@1.3.1':
+    resolution: {integrity: sha512-ozIrViJ9JsifJMOqEexaLUzAHmIEky+CMDtvFxklnrQD3fX8N/8Dip76JqeT0WtM2Jihfnh3ydm/zmip6JvMEw==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
 
-  '@farmfe/core-win32-arm64-msvc@1.3.0':
-    resolution: {integrity: sha512-DTCQkvLHw3tUStuufWsO55oywJSw0qc07bUOkL/rfZf4OoJ2599BaM4uLgTWWzRbly3UTIqGHccgiCrRT+Sw6Q==}
+  '@farmfe/core-win32-arm64-msvc@1.3.1':
+    resolution: {integrity: sha512-QJFwkY4344eFvn2Pem9xW0nDFtscqYiOv3V9rtBPsDe34NKqPdktnwuWC4L1ssPye7RUUjN0VI3y/Iwu761hXg==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [win32]
 
-  '@farmfe/core-win32-ia32-msvc@1.3.0':
-    resolution: {integrity: sha512-aaV9rmv5bGmVNV6T+cn7kUOFpbXiTxk1aHURadCwLXBgOie8srqDr5xbFgt4E6chEunEZ6knlTM8mQUNSVFEWQ==}
+  '@farmfe/core-win32-ia32-msvc@1.3.1':
+    resolution: {integrity: sha512-R/6zeYB9TfwVI3CDmy1qkpST4vQZLZFyLBTw939wAlOlKwl7o4pl7x173yLTffBMnAxvJDnwJ3WeJWuLsCP/nQ==}
     engines: {node: '>= 10'}
     cpu: [ia32]
     os: [win32]
 
-  '@farmfe/core-win32-x64-msvc@1.3.0':
-    resolution: {integrity: sha512-YnVF0AGi48qZILjxJox6N0sMt8/wkql6SsucUfU+YSjLQw5fov7Qwtv2F3biVhSqjsFx4nRs1axhstEq0xhOFg==}
+  '@farmfe/core-win32-x64-msvc@1.3.1':
+    resolution: {integrity: sha512-ZoDnmjAub+eGs0JxlGaWWv8x9gR8TKHiR/ueKg4l47XLAMVHqEH0aYsoNQ6wQvNItzdi9zTzuidjjqpNrVc+eg==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [win32]
 
-  '@farmfe/core@1.3.0':
-    resolution: {integrity: sha512-ELVc8z0cKkTLFNlK+BUJwtfmAB7Ym9VPtVkymqzslDnSCBi9UjBFYhNMIyx4WI2wC8aSsmAYjmlvsHlaAM+dEA==}
+  '@farmfe/core@1.3.1':
+    resolution: {integrity: sha512-jbFVNuBPH0orEfsC89nzC1dFSPb5K0uIYeODnUmEJMhrfwrBAe5CpPnT45zOq48wbKgyt5C0S9iar1ZU4IKcrg==}
     engines: {node: '>=16.15.1'}
 
   '@farmfe/js-plugin-sass@2.9.0':
@@ -1629,6 +1629,9 @@ packages:
 
   '@vitest/pretty-format@2.0.2':
     resolution: {integrity: sha512-SBCyOXfGVvddRd9r2PwoVR0fonQjh9BMIcBMlSzbcNwFfGr6ZhOhvBzurjvi2F4ryut2HcqiFhNeDVGwru8tLg==}
+
+  '@vitest/pretty-format@2.0.3':
+    resolution: {integrity: sha512-URM4GLsB2xD37nnTyvf6kfObFafxmycCL8un3OC9gaCs5cti2u+5rJdIflZ2fUJUen4NbvF6jCufwViAFLvz1g==}
 
   '@vitest/runner@2.0.2':
     resolution: {integrity: sha512-OCh437Vi8Wdbif1e0OvQcbfM3sW4s2lpmOjAE7qfLrpzJX2M7J1IQlNvEcb/fu6kaIB9n9n35wS0G2Q3en5kHg==}
@@ -6031,7 +6034,7 @@ snapshots:
       '@babel/traverse': 7.24.7
       '@babel/types': 7.24.7
       convert-source-map: 2.0.0
-      debug: 4.3.5
+      debug: 4.3.5(supports-color@8.1.1)
       gensync: 1.0.0-beta.2
       json5: 2.2.3
       semver: 6.3.1
@@ -6238,7 +6241,7 @@ snapshots:
       '@babel/helper-split-export-declaration': 7.24.7
       '@babel/parser': 7.24.7
       '@babel/types': 7.24.7
-      debug: 4.3.5
+      debug: 4.3.5(supports-color@8.1.1)
       globals: 11.12.0
     transitivePeerDependencies:
       - supports-color
@@ -6710,7 +6713,7 @@ snapshots:
   '@eslint/eslintrc@2.1.4':
     dependencies:
       ajv: 6.12.6
-      debug: 4.3.5
+      debug: 4.3.5(supports-color@8.1.1)
       espree: 9.6.1
       globals: 13.24.0
       ignore: 5.3.1
@@ -6730,34 +6733,34 @@ snapshots:
       inquirer: 9.3.5
       walkdir: 0.4.1
 
-  '@farmfe/core-darwin-arm64@1.3.0':
+  '@farmfe/core-darwin-arm64@1.3.1':
     optional: true
 
-  '@farmfe/core-darwin-x64@1.3.0':
+  '@farmfe/core-darwin-x64@1.3.1':
     optional: true
 
-  '@farmfe/core-linux-arm64-gnu@1.3.0':
+  '@farmfe/core-linux-arm64-gnu@1.3.1':
     optional: true
 
-  '@farmfe/core-linux-arm64-musl@1.3.0':
+  '@farmfe/core-linux-arm64-musl@1.3.1':
     optional: true
 
-  '@farmfe/core-linux-x64-gnu@1.3.0':
+  '@farmfe/core-linux-x64-gnu@1.3.1':
     optional: true
 
-  '@farmfe/core-linux-x64-musl@1.3.0':
+  '@farmfe/core-linux-x64-musl@1.3.1':
     optional: true
 
-  '@farmfe/core-win32-arm64-msvc@1.3.0':
+  '@farmfe/core-win32-arm64-msvc@1.3.1':
     optional: true
 
-  '@farmfe/core-win32-ia32-msvc@1.3.0':
+  '@farmfe/core-win32-ia32-msvc@1.3.1':
     optional: true
 
-  '@farmfe/core-win32-x64-msvc@1.3.0':
+  '@farmfe/core-win32-x64-msvc@1.3.1':
     optional: true
 
-  '@farmfe/core@1.3.0(bufferutil@4.0.8)(utf-8-validate@6.0.4)':
+  '@farmfe/core@1.3.1(bufferutil@4.0.8)(utf-8-validate@6.0.4)':
     dependencies:
       '@farmfe/runtime': 0.12.0
       '@farmfe/runtime-plugin-hmr': 3.5.3
@@ -6788,23 +6791,23 @@ snapshots:
       zod: 3.23.8
       zod-validation-error: 3.3.0(zod@3.23.8)
     optionalDependencies:
-      '@farmfe/core-darwin-arm64': 1.3.0
-      '@farmfe/core-darwin-x64': 1.3.0
-      '@farmfe/core-linux-arm64-gnu': 1.3.0
-      '@farmfe/core-linux-arm64-musl': 1.3.0
-      '@farmfe/core-linux-x64-gnu': 1.3.0
-      '@farmfe/core-linux-x64-musl': 1.3.0
-      '@farmfe/core-win32-arm64-msvc': 1.3.0
-      '@farmfe/core-win32-ia32-msvc': 1.3.0
-      '@farmfe/core-win32-x64-msvc': 1.3.0
+      '@farmfe/core-darwin-arm64': 1.3.1
+      '@farmfe/core-darwin-x64': 1.3.1
+      '@farmfe/core-linux-arm64-gnu': 1.3.1
+      '@farmfe/core-linux-arm64-musl': 1.3.1
+      '@farmfe/core-linux-x64-gnu': 1.3.1
+      '@farmfe/core-linux-x64-musl': 1.3.1
+      '@farmfe/core-win32-arm64-msvc': 1.3.1
+      '@farmfe/core-win32-ia32-msvc': 1.3.1
+      '@farmfe/core-win32-x64-msvc': 1.3.1
     transitivePeerDependencies:
       - bufferutil
       - supports-color
       - utf-8-validate
 
-  '@farmfe/js-plugin-sass@2.9.0(@farmfe/core@1.3.0(bufferutil@4.0.8)(utf-8-validate@6.0.4))(sass-embedded@1.77.5)(sass@1.77.6)':
+  '@farmfe/js-plugin-sass@2.9.0(@farmfe/core@1.3.1(bufferutil@4.0.8)(utf-8-validate@6.0.4))(sass-embedded@1.77.5)(sass@1.77.6)':
     dependencies:
-      '@farmfe/core': 1.3.0(bufferutil@4.0.8)(utf-8-validate@6.0.4)
+      '@farmfe/core': 1.3.1(bufferutil@4.0.8)(utf-8-validate@6.0.4)
       sass: 1.77.6
       sass-embedded: 1.77.5
 
@@ -6831,7 +6834,7 @@ snapshots:
   '@humanwhocodes/config-array@0.11.14':
     dependencies:
       '@humanwhocodes/object-schema': 2.0.3
-      debug: 4.3.5
+      debug: 4.3.5(supports-color@8.1.1)
       minimatch: 3.1.2
     transitivePeerDependencies:
       - supports-color
@@ -7183,7 +7186,7 @@ snapshots:
       '@typescript-eslint/types': 7.16.0
       '@typescript-eslint/typescript-estree': 7.16.0(typescript@5.5.3)
       '@typescript-eslint/visitor-keys': 7.16.0
-      debug: 4.3.5
+      debug: 4.3.5(supports-color@8.1.1)
       eslint: 8.57.0
     optionalDependencies:
       typescript: 5.5.3
@@ -7204,7 +7207,7 @@ snapshots:
     dependencies:
       '@typescript-eslint/typescript-estree': 7.16.0(typescript@5.5.3)
       '@typescript-eslint/utils': 7.16.0(eslint@8.57.0)(typescript@5.5.3)
-      debug: 4.3.5
+      debug: 4.3.5(supports-color@8.1.1)
       eslint: 8.57.0
       ts-api-utils: 1.3.0(typescript@5.5.3)
     optionalDependencies:
@@ -7220,7 +7223,7 @@ snapshots:
     dependencies:
       '@typescript-eslint/types': 5.62.0
       '@typescript-eslint/visitor-keys': 5.62.0
-      debug: 4.3.5
+      debug: 4.3.5(supports-color@8.1.1)
       globby: 11.1.0
       is-glob: 4.0.3
       semver: 7.6.2
@@ -7234,7 +7237,7 @@ snapshots:
     dependencies:
       '@typescript-eslint/types': 7.16.0
       '@typescript-eslint/visitor-keys': 7.16.0
-      debug: 4.3.5
+      debug: 4.3.5(supports-color@8.1.1)
       globby: 11.1.0
       is-glob: 4.0.3
       minimatch: 9.0.5
@@ -7306,6 +7309,10 @@ snapshots:
       tinyrainbow: 1.2.0
 
   '@vitest/pretty-format@2.0.2':
+    dependencies:
+      tinyrainbow: 1.2.0
+
+  '@vitest/pretty-format@2.0.3':
     dependencies:
       tinyrainbow: 1.2.0
 
@@ -7630,7 +7637,7 @@ snapshots:
 
   agent-base@7.1.1:
     dependencies:
-      debug: 4.3.5
+      debug: 4.3.5(supports-color@8.1.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -8155,7 +8162,7 @@ snapshots:
       shebang-command: 2.0.0
       which: 2.0.2
 
-  css-loader@7.1.2(webpack@5.92.1):
+  css-loader@7.1.2(webpack@5.92.1(esbuild@0.23.0)):
     dependencies:
       icss-utils: 5.1.0(postcss@8.4.39)
       postcss: 8.4.39
@@ -8166,7 +8173,7 @@ snapshots:
       postcss-value-parser: 4.2.0
       semver: 7.6.2
     optionalDependencies:
-      webpack: 5.92.1
+      webpack: 5.92.1(esbuild@0.23.0)
 
   css.escape@1.5.1: {}
 
@@ -8260,19 +8267,11 @@ snapshots:
     dependencies:
       ms: 2.0.0
 
-  debug@3.2.7:
-    dependencies:
-      ms: 2.1.3
-
   debug@3.2.7(supports-color@8.1.1):
     dependencies:
       ms: 2.1.3
     optionalDependencies:
       supports-color: 8.1.1
-
-  debug@4.3.5:
-    dependencies:
-      ms: 2.1.2
 
   debug@4.3.5(supports-color@8.1.1):
     dependencies:
@@ -8624,7 +8623,7 @@ snapshots:
 
   eslint-import-resolver-node@0.3.9:
     dependencies:
-      debug: 3.2.7
+      debug: 3.2.7(supports-color@8.1.1)
       is-core-module: 2.14.0
       resolve: 1.22.8
     transitivePeerDependencies:
@@ -8632,7 +8631,7 @@ snapshots:
 
   eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.16.0(eslint@8.57.0)(typescript@5.5.3))(eslint-plugin-i@2.29.1)(eslint@8.57.0):
     dependencies:
-      debug: 4.3.5
+      debug: 4.3.5(supports-color@8.1.1)
       enhanced-resolve: 5.17.0
       eslint: 8.57.0
       eslint-module-utils: 2.8.1(@typescript-eslint/parser@7.16.0(eslint@8.57.0)(typescript@5.5.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.16.0(eslint@8.57.0)(typescript@5.5.3))(eslint-plugin-i@2.29.1)(eslint@8.57.0))(eslint@8.57.0)
@@ -8649,7 +8648,7 @@ snapshots:
 
   eslint-module-utils@2.8.1(@typescript-eslint/parser@7.16.0(eslint@8.57.0)(typescript@5.5.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.16.0(eslint@8.57.0)(typescript@5.5.3))(eslint-plugin-i@2.29.1)(eslint@8.57.0))(eslint@8.57.0):
     dependencies:
-      debug: 3.2.7
+      debug: 3.2.7(supports-color@8.1.1)
     optionalDependencies:
       '@typescript-eslint/parser': 7.16.0(eslint@8.57.0)(typescript@5.5.3)
       eslint: 8.57.0
@@ -8669,7 +8668,7 @@ snapshots:
 
   eslint-plugin-i@2.29.1(@typescript-eslint/parser@7.16.0(eslint@8.57.0)(typescript@5.5.3))(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0):
     dependencies:
-      debug: 4.3.5
+      debug: 4.3.5(supports-color@8.1.1)
       doctrine: 3.0.0
       eslint: 8.57.0
       eslint-import-resolver-node: 0.3.9
@@ -8761,7 +8760,7 @@ snapshots:
       ajv: 6.12.6
       chalk: 4.1.2
       cross-spawn: 7.0.3
-      debug: 4.3.5
+      debug: 4.3.5(supports-color@8.1.1)
       doctrine: 3.0.0
       escape-string-regexp: 4.0.0
       eslint-scope: 7.2.2
@@ -9042,7 +9041,7 @@ snapshots:
 
   follow-redirects@1.15.6(debug@4.3.5):
     optionalDependencies:
-      debug: 4.3.5
+      debug: 4.3.5(supports-color@8.1.1)
 
   for-each@0.3.3:
     dependencies:
@@ -9403,14 +9402,14 @@ snapshots:
   http-proxy-agent@7.0.2:
     dependencies:
       agent-base: 7.1.1
-      debug: 4.3.5
+      debug: 4.3.5(supports-color@8.1.1)
     transitivePeerDependencies:
       - supports-color
 
   http-proxy-middleware@3.0.0:
     dependencies:
       '@types/http-proxy': 1.17.14
-      debug: 4.3.5
+      debug: 4.3.5(supports-color@8.1.1)
       http-proxy: 1.18.1(debug@4.3.5)
       is-glob: 4.0.3
       is-plain-obj: 3.0.0
@@ -9459,7 +9458,7 @@ snapshots:
   https-proxy-agent@7.0.5:
     dependencies:
       agent-base: 7.1.1
-      debug: 4.3.5
+      debug: 4.3.5(supports-color@8.1.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -9861,7 +9860,7 @@ snapshots:
 
   koa-send@5.0.1:
     dependencies:
-      debug: 4.3.5
+      debug: 4.3.5(supports-color@8.1.1)
       http-errors: 1.8.1
       resolve-path: 1.4.0
     transitivePeerDependencies:
@@ -9869,7 +9868,7 @@ snapshots:
 
   koa-static@5.0.0:
     dependencies:
-      debug: 3.2.7
+      debug: 3.2.7(supports-color@8.1.1)
       koa-send: 5.0.1
     transitivePeerDependencies:
       - supports-color
@@ -9881,7 +9880,7 @@ snapshots:
       content-disposition: 0.5.4
       content-type: 1.0.5
       cookies: 0.9.1
-      debug: 4.3.5
+      debug: 4.3.5(supports-color@8.1.1)
       delegates: 1.0.0
       depd: 2.0.0
       destroy: 1.2.0
@@ -10923,13 +10922,13 @@ snapshots:
       sass-embedded-win32-ia32: 1.77.5
       sass-embedded-win32-x64: 1.77.5
 
-  sass-loader@14.2.1(sass-embedded@1.77.5)(sass@1.77.6)(webpack@5.92.1):
+  sass-loader@14.2.1(sass-embedded@1.77.5)(sass@1.77.6)(webpack@5.92.1(esbuild@0.23.0)):
     dependencies:
       neo-async: 2.6.2
     optionalDependencies:
       sass: 1.77.6
       sass-embedded: 1.77.5
-      webpack: 5.92.1
+      webpack: 5.92.1(esbuild@0.23.0)
 
   sass@1.77.6:
     dependencies:
@@ -11188,9 +11187,9 @@ snapshots:
     dependencies:
       js-tokens: 9.0.0
 
-  style-loader@4.0.0(webpack@5.92.1):
+  style-loader@4.0.0(webpack@5.92.1(esbuild@0.23.0)):
     dependencies:
-      webpack: 5.92.1
+      webpack: 5.92.1(esbuild@0.23.0)
 
   superagent@8.1.2:
     dependencies:
@@ -11276,14 +11275,16 @@ snapshots:
     dependencies:
       bintrees: 1.0.2
 
-  terser-webpack-plugin@5.3.10(webpack@5.92.1):
+  terser-webpack-plugin@5.3.10(esbuild@0.23.0)(webpack@5.92.1(esbuild@0.23.0)):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.25
       jest-worker: 27.5.1
       schema-utils: 3.3.0
       serialize-javascript: 6.0.2
       terser: 5.31.2
-      webpack: 5.92.1
+      webpack: 5.92.1(esbuild@0.23.0)
+    optionalDependencies:
+      esbuild: 0.23.0
 
   terser@5.31.2:
     dependencies:
@@ -11476,7 +11477,7 @@ snapshots:
       '@antfu/utils': 0.7.10
       '@rollup/pluginutils': 5.1.0(rollup@4.18.1)
       chokidar: 3.6.0
-      debug: 4.3.5
+      debug: 4.3.5(supports-color@8.1.1)
       fast-glob: 3.3.2
       local-pkg: 0.5.0
       magic-string: 0.30.10
@@ -11586,7 +11587,7 @@ snapshots:
   vite-node@2.0.2(@types/node@20.14.10)(sass@1.77.6)(terser@5.31.2):
     dependencies:
       cac: 6.7.14
-      debug: 4.3.5
+      debug: 4.3.5(supports-color@8.1.1)
       pathe: 1.1.2
       tinyrainbow: 1.2.0
       vite: 5.3.3(@types/node@20.14.10)(sass@1.77.6)(terser@5.31.2)
@@ -11627,7 +11628,7 @@ snapshots:
   vite-plugin-compression@0.5.1(vite@5.3.3(@types/node@20.14.10)(sass@1.77.6)(terser@5.31.2)):
     dependencies:
       chalk: 4.1.2
-      debug: 4.3.5
+      debug: 4.3.5(supports-color@8.1.1)
       fs-extra: 10.1.0
       vite: 5.3.3(@types/node@20.14.10)(sass@1.77.6)(terser@5.31.2)
     transitivePeerDependencies:
@@ -11645,7 +11646,7 @@ snapshots:
     dependencies:
       '@antfu/utils': 0.7.10
       '@rollup/pluginutils': 5.1.0(rollup@4.18.1)
-      debug: 4.3.5
+      debug: 4.3.5(supports-color@8.1.1)
       error-stack-parser-es: 0.1.4
       fs-extra: 11.2.0
       open: 10.1.0
@@ -11690,7 +11691,7 @@ snapshots:
 
   vite-tsconfig-paths@4.3.2(typescript@5.5.3)(vite@5.3.3(@types/node@20.14.10)(sass@1.77.6)(terser@5.31.2)):
     dependencies:
-      debug: 4.3.5
+      debug: 4.3.5(supports-color@8.1.1)
       globrex: 0.1.2
       tsconfck: 3.1.1(typescript@5.5.3)
     optionalDependencies:
@@ -11731,13 +11732,13 @@ snapshots:
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@vitest/expect': 2.0.2
-      '@vitest/pretty-format': 2.0.2
+      '@vitest/pretty-format': 2.0.3
       '@vitest/runner': 2.0.2
       '@vitest/snapshot': 2.0.2
       '@vitest/spy': 2.0.2
       '@vitest/utils': 2.0.2
       chai: 5.1.1
-      debug: 4.3.5
+      debug: 4.3.5(supports-color@8.1.1)
       execa: 8.0.1
       magic-string: 0.30.10
       pathe: 1.1.2
@@ -11791,7 +11792,7 @@ snapshots:
 
   vue-eslint-parser@9.4.3(eslint@8.57.0):
     dependencies:
-      debug: 4.3.5
+      debug: 4.3.5(supports-color@8.1.1)
       eslint: 8.57.0
       eslint-scope: 7.2.2
       eslint-visitor-keys: 3.4.3
@@ -11866,7 +11867,7 @@ snapshots:
 
   webpack-virtual-modules@0.6.2: {}
 
-  webpack@5.92.1:
+  webpack@5.92.1(esbuild@0.23.0):
     dependencies:
       '@types/eslint-scope': 3.7.7
       '@types/estree': 1.0.5
@@ -11889,7 +11890,7 @@ snapshots:
       neo-async: 2.6.2
       schema-utils: 3.3.0
       tapable: 2.2.1
-      terser-webpack-plugin: 5.3.10(webpack@5.92.1)
+      terser-webpack-plugin: 5.3.10(esbuild@0.23.0)(webpack@5.92.1(esbuild@0.23.0))
       watchpack: 2.4.1
       webpack-sources: 3.2.3
     transitivePeerDependencies:
