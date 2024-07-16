@@ -90,8 +90,4 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   public String getCreatorId() {
     return creatorEntity.getExternalIdentifier();
   }
-
-  public String getVerifiedBy() {
-    return "Terry";
-  }
 }

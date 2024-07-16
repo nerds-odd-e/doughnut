@@ -9,6 +9,5 @@ export type Notebook = {
     headNote: Note;
     notebookSettings: NotebookSettings;
     creatorId?: string;
-    verifiedBy?: string;
 };
 
