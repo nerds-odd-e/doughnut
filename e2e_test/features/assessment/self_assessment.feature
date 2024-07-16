@@ -47,17 +47,26 @@ Feature: Self assessment
     Then I should see message that says "Please login first"
 
   @ignore
-  Scenario Outline: Perform an assessment more than the limit per day
+  Scenario: Perform an assessment more than the limit per day
     Given I set the number of questions per assessment of the notebook "Countries" to 3
     When I do the assessment on "Countries" in the bazaar with the following answers:
       | Question                           | Answer            |
-      | Where in the world is Singapore?   | <SingaporeAnswer> |
-      | Most famous food of Vietnam?       | <VietnamAnswer>   |
-      | What is the capital city of Japan? | <JapanAnswer>     |
+      | Where in the world is Singapore?   | Asia |
+      | Most famous food of Vietnam?       | Pho   |
+      | What is the capital city of Japan? | Tokyo    |
+    And I do the assessment on "Countries" in the bazaar with the following answers:
+      | Question                           | Answer            |
+      | Where in the world is Singapore?   | Asia |
+      | Most famous food of Vietnam?       | Pho   |
+      | What is the capital city of Japan? | Tokyo    |
+    And I do the assessment on "Countries" in the bazaar with the following answers:
+      | Question                           | Answer            |
+      | Where in the world is Singapore?   | Asia |
+      | Most famous food of Vietnam?       | Pho   |
+      | What is the capital city of Japan? | Tokyo    |
+    And I do the assessment on "Countries" in the bazaar with the following answers:
+      | Question                           | Answer            |
+      | Where in the world is Singapore?   | Asia |
+      | Most famous food of Vietnam?       | Pho   |
+      | What is the capital city of Japan? | Tokyo    |
     Then I should see message that says "You have reached the assessment limit for today. Please try again tomorrow"
-    Examples:
-      | SingaporeAnswer | VietnamAnswer | JapanAnswer |
-      | Asia            | Pho           | Tokyo       |
-      | Asia            | Pho           | Tokyo       |
-      | Asia            | Pho           | Tokyo       |
-      | Asia            | Pho           | Tokyo       |
