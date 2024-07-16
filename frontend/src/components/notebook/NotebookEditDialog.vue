@@ -16,7 +16,7 @@
       />
     <div>
       <label for="untilCertExpire">Until Cert Expire (in days)</label>
-      <input type="number" id="untilCertExpire" v-model.number="formData.untilCertExpire" class="form-control" min="0" oninput="validity.valid||(value='');" />
+      <input type="number" id="untilCertExpire" v-model.number="formData.untilCertExpire" class="form-control" @input="sanitizeInput" min="0" oninput="validity.valid||(value='');" />
     </div>
     <input class="btn btn-primary btn-layout" type="submit" value="Update" /></div>
   </form>
@@ -56,6 +56,11 @@ export default {
           this.$router.push({ name: "notebooks" })
         })
         .catch((err) => (this.errors = err))
+    },
+    sanitizeInput(event) {
+      const value = event.target.value
+      event.target.value = value === "0" ? "0" : value.replace(/^0+/, "")
+      this.formData.untilCertExpire = event.target.value
     },
   },
 }
