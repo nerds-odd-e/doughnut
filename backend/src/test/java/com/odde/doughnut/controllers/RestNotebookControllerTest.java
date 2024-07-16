@@ -133,4 +133,13 @@ class RestNotebookControllerTest {
           () -> controller.moveToCircle(note.getNotebook(), makeMe.aCircle().please()));
     }
   }
+
+  @Nested
+  class GetVerifiedBy {
+    @Test
+    void shouldGetVerifiedBy() throws UnexpectedNoAccessRightException {
+      String name = controller.getVerifiedBy();
+      assertEquals(name, "Terry");
+    }
+  }
 }

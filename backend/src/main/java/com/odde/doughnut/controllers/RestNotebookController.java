@@ -72,6 +72,12 @@ class RestNotebookController {
     return notebook;
   }
 
+  @GetMapping(value = "/{notebook}/verified-by")
+  public String getVerifiedBy() throws UnexpectedNoAccessRightException {
+    currentUser.assertLoggedIn();
+    return "Terry";
+  }
+
   @PostMapping(value = "/{notebook}/share")
   @Transactional
   public Notebook shareNotebook(

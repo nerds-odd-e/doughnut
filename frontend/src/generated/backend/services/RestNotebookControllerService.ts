@@ -108,6 +108,19 @@ export class RestNotebookControllerService {
         });
     }
     /**
+     * @returns string OK
+     * @throws ApiError
+     */
+    public getVerifiedBy(): CancelablePromise<string> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/notebooks/{notebook}/verified-by',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
      * @param notebook
      * @returns NoteBrief OK
      * @throws ApiError
