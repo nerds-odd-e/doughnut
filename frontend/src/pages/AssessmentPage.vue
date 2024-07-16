@@ -11,14 +11,18 @@
     />
     <div v-else-if="assessmentCompleted">
       <p>Your score: {{ correctAnswers }} / {{ quizQuestions.length }}</p>
-      <a
-        :href="viewCertificateUrl"
-        target="_blank"
-        class="btn btn-primary"
-        v-bind="{ verifiedBy: 'Korn' }"
-        >View</a
-      >
+      <div v-if="assessmentPassed">
+        <a 
+          :href="viewCertificateUrl"
+          target="_blank"
+          class="btn btn-primary"
+          v-bind="{ verifiedBy: 'Korn' }"
+          >View</a
+        >
+      </div>
     </div>
+    
+    
   </div>
 </template>
 
@@ -46,6 +50,14 @@ const assessmentCompleted = computed(
     currentQuestion.value >= quizQuestions.value.length &&
     quizQuestions.value.length > 0
 )
+
+const passCriteriaPercentage = 80
+
+const assessmentPassed = computed(() => {
+  const correctAnswersPercentage =
+    (correctAnswers.value * 100) / quizQuestions.value.length
+  return correctAnswersPercentage >= passCriteriaPercentage
+})
 
 const questionAnswered = async (answerResult) => {
   if (answerResult.correct) {
