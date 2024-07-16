@@ -48,7 +48,7 @@ Feature: Self assessment
 
   @ignore
   Scenario Outline: Perform an assessment more than the limit per day
-    Given I have not started the assessment of the "Countries" notebook before
+    Given I set the number of questions per assessment of the notebook "Countries" to 3
     When I do the assessment on "Countries" in the bazaar with the following answers:
       | Question                           | Answer            |
       | Where in the world is Singapore?   | <SingaporeAnswer> |
@@ -57,7 +57,7 @@ Feature: Self assessment
     Then I should see message that says "You have reached the assessment limit for today. Please try again tomorrow"
     Examples:
       | SingaporeAnswer | VietnamAnswer | JapanAnswer |
-      | Answer1         | Answer2       | Answer3     |
-      | Answer1         | Answer2       | Answer3     |
-      | Answer1         | Answer2       | Answer3     |
-      | Answer1         | Answer2       | Answer3     |
+      | Asia            | Pho           | Tokyo       |
+      | Asia            | Pho           | Tokyo       |
+      | Asia            | Pho           | Tokyo       |
+      | Asia            | Pho           | Tokyo       |
