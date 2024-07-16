@@ -44,11 +44,20 @@ Given(
   }
 )
 
-Given(
+When(
   'I set the number of Certificate Expiration Period of the notebook {string} to {int}',
   (notebook: string, untilCerExpire: number) => {
     start
       .routerToNotebooksPage()
       .updateAssessmentSettingsCertificatePeriod(notebook, untilCerExpire)
+  }
+)
+
+Then(
+  'I should see the expiration period of the notebook {string} to {int}',
+  (notebook: string, untilCertExpire: number) => {
+    start
+      .routerToNotebooksPage()
+      .expectPeriodCertification(notebook, untilCertExpire)
   }
 )
