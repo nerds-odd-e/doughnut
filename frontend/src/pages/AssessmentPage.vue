@@ -11,6 +11,13 @@
     />
     <div v-else-if="assessmentCompleted">
       <p>Your score: {{ correctAnswers }} / {{ quizQuestions.length }}</p>
+      <a
+        :href="viewCertificateUrl"
+        target="_blank"
+        class="btn btn-primary"
+        v-bind="{ verifiedBy: 'Korn' }"
+        >View</a
+      >
     </div>
   </div>
 </template>
@@ -57,6 +64,8 @@ const generateAssessmentQuestions = () => {
       errors.value = res.body.message
     })
 }
+
+const viewCertificateUrl = `./${props.notebookId}/certificate`
 
 onMounted(() => {
   generateAssessmentQuestions()

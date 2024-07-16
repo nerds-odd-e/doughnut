@@ -4,6 +4,7 @@ import BazaarPage from "@/pages/BazaarPage.vue"
 import NotebooksPage from "@/pages/NotebooksPage.vue"
 import NoteShowPage from "@/pages/NoteShowPage.vue"
 import AssessmentPage from "@/pages/AssessmentPage.vue"
+import CertificatePage from "@/pages/CertificatePage.vue"
 import ReviewHome from "@/pages/ReviewHome.vue"
 import RepeatPage from "@/pages/RepeatPage.vue"
 import InitialReviewPage from "@/pages/InitialReviewPage.vue"
@@ -106,6 +107,12 @@ const routes = [
     path: "/users/identify",
     name: "nonproductionOnlyLogin",
     component: NonproductionOnlyLoginPage,
+  },
+  {
+    path: "/assessment/notebook/:notebookId/certificate",
+    name: "certificate",
+    component: CertificatePage,
+    props: true,
   },
 ] as RouteRecordRaw[]
 
