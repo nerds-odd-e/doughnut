@@ -136,10 +136,18 @@ class RestNotebookControllerTest {
 
   @Nested
   class GetVerifiedBy {
+    Notebook notebook;
+
+    @BeforeEach
+    void setup() {
+      notebook = makeMe.aNote().creatorAndOwner(userModel).please().getNotebook();
+      makeMe.refresh(notebook);
+    }
+
     @Test
     void shouldGetVerifiedBy() throws UnexpectedNoAccessRightException {
-      String name = controller.getVerifiedBy();
-      assertEquals(name, "Terry");
+      Notebook nb = controller.get(notebook);
+      assertEquals(nb.getVerifiedBy(), "Terry");
     }
   }
 }

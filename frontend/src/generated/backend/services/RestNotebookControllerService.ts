@@ -14,6 +14,25 @@ export class RestNotebookControllerService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
      * @param notebook
+     * @returns Notebook OK
+     * @throws ApiError
+     */
+    public get(
+        notebook: number,
+    ): CancelablePromise<Notebook> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/notebooks/{notebook}',
+            path: {
+                'notebook': notebook,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param notebook
      * @param requestBody
      * @returns Notebook OK
      * @throws ApiError
@@ -102,19 +121,6 @@ export class RestNotebookControllerService {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/notebooks',
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * @returns string OK
-     * @throws ApiError
-     */
-    public getVerifiedBy(): CancelablePromise<string> {
-        return this.httpRequest.request({
-            method: 'GET',
-            url: '/api/notebooks/{notebook}/verified-by',
             errors: {
                 500: `Internal Server Error`,
             },

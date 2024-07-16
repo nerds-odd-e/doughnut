@@ -1132,6 +1132,29 @@ paths:
               schema:
                 $ref: "#/components/schemas/SrtDto"
   /api/notebooks/{notebook}:
+    get:
+      tags:
+      - rest-notebook-controller
+      operationId: get
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Notebook"
     post:
       tags:
       - rest-notebook-controller
@@ -2261,24 +2284,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NotebooksViewedByUser"
-  /api/notebooks/{notebook}/verified-by:
-    get:
-      tags:
-      - rest-notebook-controller
-      operationId: getVerifiedBy
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: string
   /api/notebooks/{notebook}/dump:
     get:
       tags:
@@ -2805,6 +2810,8 @@ components:
         notebookSettings:
           $ref: "#/components/schemas/NotebookSettings"
         creatorId:
+          type: string
+        verifiedBy:
           type: string
     NotebookSettings:
       type: object
