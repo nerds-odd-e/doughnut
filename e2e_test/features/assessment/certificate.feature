@@ -34,3 +34,14 @@ Feature: Get Certificate by an assessment.
       | Who was the first emperor of China?     | Qin-Shi           |
     
     Then I should see view a certificate button 
+  
+   Scenario: Hide a certificate when fail the assessment.
+    When I do the assessment on "Countries" in the bazaar with the following answers:
+      | Question                                | Answer            |
+      | Where in the world is Singapore?        | Asia              |
+      | Most famous food of Vietnam?            | Pho               |
+      | What is the capital city of Japan?      | kyoto             |
+      | What is the capital city of Thailand?   | DAS               |
+      | Who was the first emperor of China?     | eiei              |
+    
+    Then I should not see view a certificate button
