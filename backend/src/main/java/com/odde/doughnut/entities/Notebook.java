@@ -15,7 +15,7 @@ import org.springframework.lang.NonNull;
 
 @Entity
 @Table(name = "notebook")
-@JsonPropertyOrder({"id", "headNote", "verifiedBy"})
+@JsonPropertyOrder({"id", "headNote", "certifiedBy"})
 public class Notebook extends EntityIdentifiedByIdOnly {
   @OneToOne
   @JoinColumn(name = "creator_id")
@@ -91,7 +91,7 @@ public class Notebook extends EntityIdentifiedByIdOnly {
     return creatorEntity.getExternalIdentifier();
   }
 
-  public String getVerifiedBy() {
+  public String getCertifiedBy() {
     return "Terry";
   }
 }

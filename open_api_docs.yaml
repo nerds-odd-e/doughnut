@@ -2807,7 +2807,7 @@ components:
           format: int32
         headNote:
           $ref: "#/components/schemas/Note"
-        verifiedBy:
+        certifiedBy:
           type: string
         notebookSettings:
           $ref: "#/components/schemas/NotebookSettings"

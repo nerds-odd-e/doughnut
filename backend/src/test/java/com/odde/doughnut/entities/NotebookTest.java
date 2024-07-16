@@ -46,7 +46,7 @@ class NotebookTest {
   }
 
   @Test
-  void verifiedBy() {
-    assertThat(notebook.getVerifiedBy()).isEqualTo("Terry");
+  void certifiedBy() {
+    assertThat(notebook.getCertifiedBy()).isEqualTo("Terry");
   }
 }

@@ -135,7 +135,7 @@ class RestNotebookControllerTest {
   }
 
   @Nested
-  class GetVerifiedBy {
+  class GetCertifiedBy {
     Notebook notebook;
 
     @BeforeEach
@@ -145,9 +145,9 @@ class RestNotebookControllerTest {
     }
 
     @Test
-    void shouldGetVerifiedBy() throws UnexpectedNoAccessRightException {
+    void shouldGetCertifiedBy() throws UnexpectedNoAccessRightException {
       Notebook nb = controller.get(notebook);
-      assertEquals(nb.getVerifiedBy(), "Terry");
+      assertEquals(nb.getCertifiedBy(), "Terry");
     }
   }
 }
