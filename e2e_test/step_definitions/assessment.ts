@@ -72,5 +72,5 @@ Then('I should see view a certificate button', () => {
 })
 
 Then('I should not see view a certificate button', () => {
-  cy.findByText('View').should('not.exist');
+  cy.findByText('View').should('not.exist')
 })
