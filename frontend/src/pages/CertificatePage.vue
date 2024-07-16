@@ -15,9 +15,6 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps({
-  notebookId: { type: Number, required: true },
-})
 </script>
 
 <style lang="scss" scoped>
