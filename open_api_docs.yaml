@@ -2807,10 +2807,10 @@ components:
           format: int32
         headNote:
           $ref: "#/components/schemas/Note"
-        notebookSettings:
-          $ref: "#/components/schemas/NotebookSettings"
         verifiedBy:
           type: string
+        notebookSettings:
+          $ref: "#/components/schemas/NotebookSettings"
         creatorId:
           type: string
     NotebookSettings:
