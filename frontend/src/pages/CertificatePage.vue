@@ -1,9 +1,12 @@
 <template>
-  <div class="certificate-frame">
+  <div v-if="notebook" class="certificate-frame">
     <div class="certificate-container">
       <span>This to certificate that</span>
-      <span class="reciever-name">Korn</span>
-      <p class="certificate-detail"><span>by completing the qualifications, </span><span>is granted the Certified Vue Expert</span></p>
+      <span class="reciever-name">{{ notebook.certifiedBy }}</span>
+      <p class="certificate-detail">
+        <span>by completing the qualifications, </span
+        ><span>is granted the Certified Vue Expert</span>
+      </p>
       <div class="date-container">
         <span>on</span>
         <span class="date">2015-07-31</span>
@@ -15,6 +18,22 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import useLoadingApi from '@/managedApi/useLoadingApi'
+import { Notebook } from '@/generated/backend'
+
+const props = defineProps({
+  notebookId: { type: Number, required: true },
+})
+const { managedApi } = useLoadingApi()
+const notebook = ref<Notebook | undefined>(undefined)
+
+const fetchData = async () => {
+  notebook.value = await managedApi.restNotebookController.get(props.notebookId)
+}
+onMounted(() => {
+  fetchData()
+})
 </script>
 
 <style lang="scss" scoped>
@@ -37,7 +56,7 @@
   flex-direction: column;
   text-align: center;
 }
-.reciever-name{
+.reciever-name {
   font-size: 32px;
   font-weight: 700;
   color: lightskyblue;
