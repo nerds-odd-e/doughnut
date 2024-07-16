@@ -2807,11 +2807,11 @@ components:
           format: int32
         headNote:
           $ref: "#/components/schemas/Note"
+        certifiedBy:
+          type: string
         notebookSettings:
           $ref: "#/components/schemas/NotebookSettings"
         creatorId:
-          type: string
-        certifiedBy:
           type: string
     NotebookSettings:
       type: object
