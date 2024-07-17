@@ -20,7 +20,7 @@ importers:
         version: 1.8.0
       '@badeball/cypress-cucumber-preprocessor':
         specifier: ^20.1.0
-        version: 20.1.0(cypress@13.13.0)(typescript@5.5.3)
+        version: 20.1.0(cypress@13.13.1)(typescript@5.5.3)
       '@bahmutov/cypress-esbuild-preprocessor':
         specifier: ^2.2.1
         version: 2.2.1(esbuild@0.23.0)
@@ -29,7 +29,7 @@ importers:
         version: 1.8.3
       '@testing-library/cypress':
         specifier: 10.0.2
-        version: 10.0.2(cypress@13.13.0)
+        version: 10.0.2(cypress@13.13.1)
       '@types/cypress-cucumber-preprocessor':
         specifier: ^4.0.5
         version: 4.0.5
@@ -49,11 +49,11 @@ importers:
         specifier: ^7.16.1
         version: 7.16.1(eslint@8.57.0)(typescript@5.5.3)
       cypress:
-        specifier: 13.13.0
-        version: 13.13.0
+        specifier: 13.13.1
+        version: 13.13.1
       cypress-file-upload:
         specifier: ^5.0.8
-        version: 5.0.8(cypress@13.13.0)
+        version: 5.0.8(cypress@13.13.1)
       esbuild:
         specifier: ^0.23.0
         version: 0.23.0
@@ -263,8 +263,8 @@ importers:
         specifier: ^0.18.0
         version: 0.18.0(rollup@4.18.1)
       unplugin-vue-components:
-        specifier: 0.27.2
-        version: 0.27.2(@babel/parser@7.24.7)(rollup@4.18.1)(vue@3.4.31(typescript@5.5.3))
+        specifier: 0.27.3
+        version: 0.27.3(@babel/parser@7.24.7)(rollup@4.18.1)(vue@3.4.31(typescript@5.5.3))
       unplugin-vue-router:
         specifier: ^0.10.0
         version: 0.10.0(rollup@4.18.1)(vue-router@4.4.0(vue@3.4.31(typescript@5.5.3)))(vue@3.4.31(typescript@5.5.3))
@@ -2459,8 +2459,8 @@ packages:
     peerDependencies:
       cypress: '>3.0.0'
 
-  cypress@13.13.0:
-    resolution: {integrity: sha512-ou/MQUDq4tcDJI2FsPaod2FZpex4kpIK43JJlcBgWrX8WX7R/05ZxGTuxedOuZBfxjZxja+fbijZGyxiLP6CFA==}
+  cypress@13.13.1:
+    resolution: {integrity: sha512-8F9UjL5MDUdgC/S5hr8CGLHbS5gGht5UOV184qc2pFny43fnkoaKxlzH/U6//zmGu/xRTaKimNfjknLT8+UDFg==}
     engines: {node: ^16.0.0 || ^18.0.0 || >=20.0.0}
     hasBin: true
 
@@ -5498,8 +5498,8 @@ packages:
       '@vueuse/core':
         optional: true
 
-  unplugin-vue-components@0.27.2:
-    resolution: {integrity: sha512-YifnsmslMRNt+JRQiCG4ZX1+xUQuubUZm76K7Qtg8dmchZJkHIDxZSyfZb5/jqrLWMTm/TUjGJ3ZDlzO6SFnSQ==}
+  unplugin-vue-components@0.27.3:
+    resolution: {integrity: sha512-5wg7lbdg5ZcrAQNzyYK+6gcg/DG8K6rO+f5YeuvqGHs/PhpapBvpA4O/0ex/pFthE5WgRk43iWuRZEMLVsdz4Q==}
     engines: {node: '>=14'}
     peerDependencies:
       '@babel/parser': ^7.15.8
@@ -6287,7 +6287,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@badeball/cypress-cucumber-preprocessor@20.1.0(cypress@13.13.0)(typescript@5.5.3)':
+  '@badeball/cypress-cucumber-preprocessor@20.1.0(cypress@13.13.1)(typescript@5.5.3)':
     dependencies:
       '@badeball/cypress-configuration': 6.1.1
       '@cucumber/ci-environment': 10.0.1
@@ -6304,7 +6304,7 @@ snapshots:
       cli-table: 0.3.11
       common-ancestor-path: 1.0.1
       cosmiconfig: 9.0.0(typescript@5.5.3)
-      cypress: 13.13.0
+      cypress: 13.13.1
       debug: 4.3.5(supports-color@8.1.1)
       error-stack-parser: 2.1.4
       esbuild: 0.21.5
@@ -7037,11 +7037,11 @@ snapshots:
 
   '@teppeis/multimaps@3.0.0': {}
 
-  '@testing-library/cypress@10.0.2(cypress@13.13.0)':
+  '@testing-library/cypress@10.0.2(cypress@13.13.1)':
     dependencies:
       '@babel/runtime': 7.24.7
       '@testing-library/dom': 10.3.1
-      cypress: 13.13.0
+      cypress: 13.13.1
 
   '@testing-library/dom@10.3.1':
     dependencies:
@@ -7165,7 +7165,7 @@ snapshots:
   '@types/testing-library__cypress@5.0.13':
     dependencies:
       '@testing-library/dom': 7.31.2
-      cypress: 13.13.0
+      cypress: 13.13.1
 
   '@types/triple-beam@1.3.5': {}
 
@@ -8253,11 +8253,11 @@ snapshots:
 
   csv-parse@5.4.0: {}
 
-  cypress-file-upload@5.0.8(cypress@13.13.0):
+  cypress-file-upload@5.0.8(cypress@13.13.1):
     dependencies:
-      cypress: 13.13.0
+      cypress: 13.13.1
 
-  cypress@13.13.0:
+  cypress@13.13.1:
     dependencies:
       '@cypress/request': 3.0.1
       '@cypress/xvfb': 1.2.4(supports-color@8.1.1)
@@ -11530,7 +11530,7 @@ snapshots:
     transitivePeerDependencies:
       - rollup
 
-  unplugin-vue-components@0.27.2(@babel/parser@7.24.7)(rollup@4.18.1)(vue@3.4.31(typescript@5.5.3)):
+  unplugin-vue-components@0.27.3(@babel/parser@7.24.7)(rollup@4.18.1)(vue@3.4.31(typescript@5.5.3)):
     dependencies:
       '@antfu/utils': 0.7.10
       '@rollup/pluginutils': 5.1.0(rollup@4.18.1)
