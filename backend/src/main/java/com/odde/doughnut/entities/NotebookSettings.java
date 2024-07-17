@@ -17,6 +17,9 @@ public class NotebookSettings {
   @Column(name = "until_cert_expire")
   Integer untilCertExpire = 0;
 
+  @Column(name = "certified_by")
+  String certifiedBy = "";
+
   @JsonIgnore
   public void update(NotebookSettings value) {
     setSkipReviewEntirely(value.getSkipReviewEntirely());

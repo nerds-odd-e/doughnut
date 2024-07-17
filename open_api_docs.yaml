@@ -2824,6 +2824,8 @@ components:
         untilCertExpire:
           type: integer
           format: int32
+        certifiedBy:
+          type: string
     Subscription:
       required:
       - id
