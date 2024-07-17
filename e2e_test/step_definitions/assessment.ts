@@ -66,11 +66,3 @@ Given(
       .resetAndStubAskingMCQ(questionTable.hashes()[0]!)
   }
 )
-
-Then('I should see view a certificate button', () => {
-  cy.findByText('View').should('be.visible')
-})
-
-Then('I should not see view a certificate button', () => {
-  cy.findByText('View').should('not.exist')
-})
