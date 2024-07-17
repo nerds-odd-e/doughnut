@@ -48,25 +48,11 @@ Feature: Self assessment
 
   @ignore
   Scenario: Perform an assessment more than the limit per day
-    Given I set the number of questions per assessment of the notebook "Countries" to 3
-    When I do the assessment on "Countries" in the bazaar with the following answers:
+    Given There is a notebook "Countries"
+    And The notebook owner set the number of questions in assessment of the notebook "Countries" to 1
+    And The notebook owner set the number of maximum attempt per day of the notebook "Countries" to 3
+    And I have done the assessment of the notebook "Countries" 3 times
       | Question                           | Answer            |
       | Where in the world is Singapore?   | Asia |
-      | Most famous food of Vietnam?       | Pho   |
-      | What is the capital city of Japan? | Tokyo    |
-    And I do the assessment on "Countries" in the bazaar with the following answers:
-      | Question                           | Answer            |
-      | Where in the world is Singapore?   | Asia |
-      | Most famous food of Vietnam?       | Pho   |
-      | What is the capital city of Japan? | Tokyo    |
-    And I do the assessment on "Countries" in the bazaar with the following answers:
-      | Question                           | Answer            |
-      | Where in the world is Singapore?   | Asia |
-      | Most famous food of Vietnam?       | Pho   |
-      | What is the capital city of Japan? | Tokyo    |
-    And I do the assessment on "Countries" in the bazaar with the following answers:
-      | Question                           | Answer            |
-      | Where in the world is Singapore?   | Asia |
-      | Most famous food of Vietnam?       | Pho   |
-      | What is the capital city of Japan? | Tokyo    |
-    Then I should see message that says "You have reached the assessment limit for today. Please try again tomorrow"
+    When I try to do assessment of the notebook "Countries" again
+    Then I should not be able to do anymore assessment of the notebook "Countries" today

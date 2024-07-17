@@ -61,3 +61,25 @@ Then(
       .expectPeriodCertification(notebook, untilCertExpire)
   }
 )
+
+Given('There is a notebook {string}', (notebook: string) => {
+  start.navigateToBazaar().expectNotebooks(notebook)
+})
+
+When('The notebook owner set the number of questions in assessment of the notebook {string} to {int}', (notebook: string, numberOfQuestion: int) => {
+  start
+        .routerToNotebooksPage()
+        .updateAssessmentSettings(notebook, numberOfQuestion)
+})
+
+When('The notebook owner set the number of maximum attempt per day of the notebook {string} to {int}', (notebook: string, maxAttempts: int) => {
+  // do nothing, since it is currently hardcoded in backend
+})
+
+When('I have done the assessment of the notebook {string} {int} times', (notebook: string, numberOfAttempts: int, table: DataTable) => {
+      start
+        .navigateToBazaar()
+        .selfAssessmentOnNotebook(notebook)
+
+        .answerQuestionsFromTable(table.hashes())
+})
