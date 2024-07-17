@@ -34,6 +34,11 @@ class NotebookBuilder extends Builder<Notebook> {
     return this
   }
 
+  certifiedBy(name: string) {
+    this.data.notebookSettings.certifiedBy = name
+    return this
+  }
+
   do(): Notebook {
     this.data.headNote = this.notebuilder.do()
     return this.data

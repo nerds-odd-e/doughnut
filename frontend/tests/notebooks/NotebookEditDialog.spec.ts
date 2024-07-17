@@ -14,4 +14,14 @@ describe("NoteBookEditDialog.vue", () => {
     )
     expect((input.element as HTMLInputElement).value).toBe("4")
   })
+
+  it("shows the name of the one who can certifies if set", () => {
+    const notebook = makeMe.aNotebook.certifiedBy("Some Name").please()
+    const wrapper = helper
+      .component(NotebookEditDialog)
+      .withProps({ notebook })
+      .mount()
+    const input = wrapper.find("input[id='notebook-certifiedBy']")
+    expect((input.element as HTMLInputElement).value).toBe("Some Name")
+  })
 })

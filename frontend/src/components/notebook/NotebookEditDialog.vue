@@ -25,10 +25,16 @@
         oninput="validity.valid||(value='');"
       />
     </div>
+    <TextInput
+      scope-name="notebook"
+      field="certifiedBy"
+      v-model="formData.certifiedBy"
+      :errors="errors.certifiedBy"
+    />
     <button class="btn btn-primary btn-layout" @click="processForm">
       Update
     </button>
-  </div>
+    </div>
 </template>
 
 <script>
@@ -47,12 +53,14 @@ export default {
       skipReviewEntirely,
       numberOfQuestionsInAssessment,
       untilCertExpire,
+      certifiedBy,
     } = this.notebook.notebookSettings
     return {
       formData: {
         skipReviewEntirely,
         numberOfQuestionsInAssessment,
         untilCertExpire,
+        certifiedBy,
       },
       errors: {},
     }
