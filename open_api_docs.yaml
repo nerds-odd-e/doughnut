@@ -1486,6 +1486,38 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BazaarNotebook"
+  /api/assessment/{notebook}:
+    post:
+      tags:
+      - rest-assessment-controller
+      operationId: submitAssessmentResult
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/QuestionAnswerPair"
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AssessmentResult"
   /api/ai/{note}/completion:
     post:
       tags:
@@ -3156,6 +3188,24 @@ components:
           format: int32
         notebook:
           $ref: "#/components/schemas/Notebook"
+    QuestionAnswerPair:
+      type: object
+      properties:
+        questionId:
+          type: integer
+          format: int32
+        answerId:
+          type: integer
+          format: int32
+    AssessmentResult:
+      type: object
+      properties:
+        correctCount:
+          type: integer
+          format: int32
+        totalCount:
+          type: integer
+          format: int32
     AiCompletionParams:
       type: object
       properties:

@@ -2,6 +2,8 @@ package com.odde.doughnut.controllers;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.odde.doughnut.controllers.dto.AssessmentResult;
+import com.odde.doughnut.controllers.dto.QuestionAnswerPair;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -29,7 +31,7 @@ public class RestAssessmentControllerTests {
   @Autowired MakeMe makeMe;
   private UserModel currentUser;
   private RestAssessmentController controller;
-  private TestabilitySettings testabilitySettings = new TestabilitySettings();
+  private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   @BeforeEach
   void setup() {
@@ -158,6 +160,41 @@ public class RestAssessmentControllerTests {
           .please();
 
       assertThrows(ApiException.class, () -> controller.generateAssessmentQuestions(notebook));
+    }
+  }
+  @Nested
+  class completeAssessmentTest {
+    private Notebook notebook;
+    private Note topNote;
+    private List<QuestionAnswerPair> questionsAnswerPairs;
+    AssessmentResult expectedAssessmentResult = new AssessmentResult();
+
+    @BeforeEach
+    void setup() {
+      topNote = makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser).please();
+      notebook = topNote.getNotebook();
+
+      makeMe.theNote(topNote).withNChildrenThat(2, NoteBuilder::hasAnApprovedQuestion).please();
+      notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(2);
+      questionsAnswerPairs = new ArrayList<>();
+
+      for (Note note : notebook.getNotes()) {
+        QuizQuestionAndAnswer quizQuestionAndAnswer = note.getQuizQuestionAndAnswers().getFirst();
+        QuestionAnswerPair questionAnswerPair = new QuestionAnswerPair();
+        questionAnswerPair.setQuestionId(quizQuestionAndAnswer.getId());
+        quizQuestionAndAnswer.setCorrectAnswerIndex(1);
+        questionAnswerPair.setAnswerId(0);
+        questionsAnswerPairs.add(questionAnswerPair);
+      }
+    }
+
+    @Test
+    void submitAssessmentResultCheckScore() throws ApiException {
+      AssessmentResult assessmentResult =
+        controller.submitAssessmentResult(notebook, questionsAnswerPairs);
+
+      assertEquals(questionsAnswerPairs.size(), assessmentResult.getTotalCount());
+      assertEquals(0, assessmentResult.getCorrectCount());
     }
   }
 }

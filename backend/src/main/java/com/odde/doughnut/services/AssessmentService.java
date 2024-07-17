@@ -2,11 +2,14 @@ package com.odde.doughnut.services;
 
 import static com.odde.doughnut.controllers.dto.ApiError.ErrorType.ASSESSMENT_SERVICE_ERROR;
 
+import com.odde.doughnut.controllers.dto.AssessmentResult;
+import com.odde.doughnut.controllers.dto.QuestionAnswerPair;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Objects;
 
@@ -51,5 +54,22 @@ public class AssessmentService {
         .limit(numberOfQuestion)
         .map(QuizQuestionAndAnswer::getQuizQuestion)
         .toList();
+  }
+
+  public AssessmentResult submitAssessmentResult(
+      User user, Notebook notebook, List<QuestionAnswerPair> questionsAnswerPairs) {
+
+    AssessmentAttemptHistory assessmentAttemptHistory = new AssessmentAttemptHistory();
+    assessmentAttemptHistory.setUser(user);
+    assessmentAttemptHistory.setNotebook(notebook);
+    assessmentAttemptHistory.setAnswersCorrect(0);
+    assessmentAttemptHistory.setAnswersTotal(questionsAnswerPairs.size());
+    assessmentAttemptHistory.setSubmittedAt(new Timestamp(System.currentTimeMillis()));
+    modelFactoryService.save(assessmentAttemptHistory);
+
+    AssessmentResult assessmentResult = new AssessmentResult();
+    assessmentResult.setTotalCount(questionsAnswerPairs.size());
+    assessmentResult.setCorrectCount(0);
+    return assessmentResult;
   }
 }
