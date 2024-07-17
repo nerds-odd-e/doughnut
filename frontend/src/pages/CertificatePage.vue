@@ -1,8 +1,8 @@
 <template>
-  <div v-if="notebook" class="certificate-frame">
+  <div v-if="notebook && user" class="certificate-frame">
     <div class="certificate-container">
       <span>This to certificate that</span>
-      <span class="reciever-name">{{ reciever }}</span>
+      <span class="reciever-name">{{ user.name }}</span>
       <p class="certificate-detail">
         <span>by completing the qualifications, </span
         ><span>is granted the Certified Vue Expert</span>
@@ -30,17 +30,18 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { Notebook } from "@/generated/backend"
+import { Notebook, User } from "@/generated/backend"
 
 const props = defineProps({
   notebookId: { type: Number, required: true },
 })
 const { managedApi } = useLoadingApi()
 const notebook = ref<Notebook | undefined>(undefined)
-const reciever = ref("Tony Stark")
+const user = ref<User | undefined>(undefined)
 
 const fetchData = async () => {
   notebook.value = await managedApi.restNotebookController.get(props.notebookId)
+  user.value = await managedApi.restUserController.getUserProfile()
 }
 onMounted(() => {
   fetchData()
