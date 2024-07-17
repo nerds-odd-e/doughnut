@@ -18,6 +18,12 @@ const assumeQuestionSection = () => {
         return this.answer(row!.Answer ?? '')
       })
     },
+    answerWrongFromTable(answersTable: Record<string, string>[]) {
+      return this.getStemText().then((stem) => {
+        const row = answersTable.find((row) => row.Question === stem)
+        return this.answer(row!['One Wrong Choice'] ?? '')
+      })
+    },
     answer(answer: string) {
       return cy.findByText(answer).click()
     },
@@ -43,24 +49,51 @@ export const assumeAssessmentPage = (notebook?: string) => {
         this.assumeQuestionSection().answerFromTable(answersTable)
       }
     },
-    answerQuestionsByScore(_: number) {
+    answerQuestionsByScore(score: number) {
+      const expectCorrectAssessmentCount = score / 20
       const answersTable: Record<string, string>[] = [
-        { Question: 'Where in the world is Singapore?', Answer: 'Asia' },
-        { Question: 'Most famous food of Vietnam?', Answer: 'Pho' },
-        { Question: 'What is the capital city of Japan?', Answer: 'Tokyo' },
+        {
+          Question: 'Where in the world is Singapore?',
+          Answer: 'Asia',
+          'One Wrong Choice': 'europe',
+        },
+        {
+          Question: 'Most famous food of Vietnam?',
+          Answer: 'Pho',
+          'One Wrong Choice': 'bread',
+        },
+        {
+          Question: 'What is the capital city of Japan?',
+          Answer: 'Tokyo',
+          'One Wrong Choice': 'kyoto',
+        },
         {
           Question: 'What is the capital city of Thailand?',
           Answer: 'Bangkok',
+          'One Wrong Choice': 'DAS',
         },
-        { Question: 'Who was the first emperor of China?', Answer: 'Qin-Shi' },
+        {
+          Question: 'Who was the first emperor of China?',
+          Answer: 'Qin-Shi',
+          'One Wrong Choice': 'eiei',
+        },
       ]
+      let correctAnswer = 0
       for (let i = 0; i < 5; i++) {
-        this.assumeQuestionSection().answerFromTable(answersTable)
+        if (correctAnswer <= expectCorrectAssessmentCount) {
+          this.assumeQuestionSection().answerFromTable(answersTable)
+          correctAnswer += 1
+        } else {
+          this.assumeQuestionSection().answerWrongFromTable(answersTable)
+        }
       }
     },
     getCertificate() {
       cy.findByRole('button', { name: 'Get Certificate' }).click()
       cy.contains('This to certificate that')
+    },
+    expectNotPassAssessment() {
+      cy.findByRole('button', { name: 'Get Certificate' }).should('be.disabled')
     },
   }
 }

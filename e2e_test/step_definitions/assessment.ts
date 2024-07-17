@@ -80,7 +80,10 @@ When(
 Then(
   'I should {string} my certificate of {string}',
   (receiveOrNot: string, notebook: string) => {
-    if (receiveOrNot === 'receive')
+    if (receiveOrNot === 'receive') {
       start.assumeAssessmentPage(notebook).getCertificate()
+    } else {
+      start.assumeAssessmentPage(notebook).expectNotPassAssessment()
+    }
   }
 )

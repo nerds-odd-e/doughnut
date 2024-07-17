@@ -12,14 +12,17 @@
       />
       <div v-else-if="assessmentCompleted">
         <p>Your score: {{ correctAnswers }} / {{ quizQuestions.length }}</p>
-        <div v-if="assessmentPassed">
-          <router-link
-            :to="{ name: 'certificate', params: { notebookId: props.notebookId } }"
-            class="text-decoration-none"
-          >
-            <button class="btn btn-primary">Get Certificate</button>
-          </router-link>
-        </div>
+        <router-link
+          :to="{
+            name: 'certificate',
+            params: { notebookId: props.notebookId },
+          }"
+          class="text-decoration-none"
+        >
+          <button :disabled="!assessmentPassed" class="btn btn-primary">
+            Get Certificate
+          </button>
+        </router-link>
       </div>
     </div>
   </div>

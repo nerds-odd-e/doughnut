@@ -30,5 +30,5 @@ Feature: Get Certificate by an assessment.
     Examples:
     | score | receive or not |
     | 100   | receive        |
-    # | 80    | receive        |
-    # | 20    | not receive    |
+    | 80    | receive        |
+    | 20    | not receive    |
