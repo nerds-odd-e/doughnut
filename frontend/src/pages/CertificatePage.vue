@@ -5,7 +5,10 @@
       <span class="reciever-name">{{ user.name }}</span>
       <p class="certificate-detail">
         <span>by completing the qualifications, </span
-        ><span>is granted the Certified Vue Expert</span>
+        ><span
+          >is granted the Certified
+          {{ notebook.headNote.noteTopic.topicConstructor }}</span
+        >
       </p>
       <div class="date-container">
         <span>on</span>

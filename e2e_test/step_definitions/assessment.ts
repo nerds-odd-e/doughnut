@@ -81,7 +81,7 @@ Then(
   'I should {string} my certificate of {string} certified by {string}',
   (receiveOrNot: string, notebook: string, certifiedBy: string) => {
     if (receiveOrNot === 'receive') {
-      start.assumeAssessmentPage(notebook).getCertificate(certifiedBy)
+      start.assumeAssessmentPage(notebook).getCertificate(notebook, certifiedBy)
     } else {
       start.assumeAssessmentPage(notebook).expectNotPassAssessment()
     }
