@@ -3,6 +3,7 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.controllers.dto.AssessmentResult;
 import com.odde.doughnut.controllers.dto.QuestionAnswerPair;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.exceptions.AssessmentAttemptLimitException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
@@ -13,8 +14,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/assessment")
@@ -42,6 +45,11 @@ class RestAssessmentController {
       throws UnexpectedNoAccessRightException {
     currentUser.assertLoggedIn();
     currentUser.assertReadAuthorization(notebook);
+    try {
+      currentUser.assertAssessmentAttempt(notebook);
+    } catch (AssessmentAttemptLimitException e) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
+    }
 
     return assessmentService.generateAssessment(notebook);
   }

@@ -1,20 +1,26 @@
 package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.exceptions.AssessmentAttemptLimitException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;
-import java.time.ZoneId;
+import java.time.*;
 import java.util.List;
 import java.util.stream.Stream;
 import lombok.Getter;
+import org.springframework.beans.factory.annotation.Value;
 
 public class UserModel implements ReviewScope {
 
   @Getter protected final User entity;
   protected final ModelFactoryService modelFactoryService;
+
+  @Value("${constraints.assessment-attempts}")
+  private Integer assessmentAttemptsLimit;
 
   public UserModel(User user, ModelFactoryService modelFactoryService) {
     this.entity = user;
@@ -96,5 +102,24 @@ public class UserModel implements ReviewScope {
 
   public void assertLoggedIn() {
     getAuthorization().assertLoggedIn();
+  }
+
+  public void assertAssessmentAttempt(Notebook notebook) throws AssessmentAttemptLimitException {
+    var zoneId = ZoneId.of("UTC");
+    var now = LocalDate.now(zoneId);
+    var begin = now.atStartOfDay(zoneId);
+    var end = now.atTime(LocalTime.MAX).atZone(zoneId);
+
+    int count =
+        modelFactoryService.assessmentAttemptHistoryRepository
+            .countAssessmentAttemptHistoriesByNotebookAndUserAndSubmittedAtBetween(
+                notebook,
+                entity,
+                Timestamp.valueOf(begin.toLocalDateTime()),
+                Timestamp.valueOf(end.toLocalDateTime()));
+    int limit = assessmentAttemptsLimit == null ? 3 : assessmentAttemptsLimit;
+    if (count >= limit) {
+      throw new AssessmentAttemptLimitException("");
+    }
   }
 }

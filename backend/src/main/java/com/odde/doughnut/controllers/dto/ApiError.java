@@ -17,7 +17,8 @@ public class ApiError {
     OPENAI_TIMEOUT,
     OPENAI_SERVICE_ERROR,
     WIKIDATA_SERVICE_ERROR,
-    ASSESSMENT_SERVICE_ERROR
+    ASSESSMENT_SERVICE_ERROR,
+    ATTEMPT_LIMIT_ERROR
   };
 
   public ApiError(String message, ErrorType type) {

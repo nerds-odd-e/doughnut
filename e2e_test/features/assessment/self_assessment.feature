@@ -46,7 +46,6 @@ Feature: Self assessment
     When I start the assessment on the "Countries" notebook in the bazaar
     Then I should see message that says "Please login first"
 
-  @ignore
   Scenario: Perform an assessment more than the limit per day
     Given There is a notebook "Countries"
     And The notebook owner set the number of questions in assessment of the notebook "Countries" to 1

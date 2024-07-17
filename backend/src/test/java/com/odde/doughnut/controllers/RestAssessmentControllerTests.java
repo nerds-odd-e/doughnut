@@ -12,6 +12,8 @@ import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.NoteBuilder;
 import com.theokanning.openai.client.OpenAiApi;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -160,6 +162,50 @@ public class RestAssessmentControllerTests {
           .please();
 
       assertThrows(ApiException.class, () -> controller.generateAssessmentQuestions(notebook));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenThereExcessAssessmentLimit() {
+      makeMe.theNote(topNote).withNChildrenThat(5, NoteBuilder::hasAnApprovedQuestion).please();
+      notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(5);
+
+      var now = LocalDateTime.now();
+      for (int i = 0; i < 3; i++) {
+        var assessmentAttempt = new AssessmentAttemptHistory();
+        assessmentAttempt.setUser(currentUser.getEntity());
+        assessmentAttempt.setNotebook(notebook);
+        assessmentAttempt.setSubmittedAt(Timestamp.valueOf(now));
+        makeMe.aAssessmentAttemptHistory(assessmentAttempt).please();
+      }
+
+      assertThrows(
+          ResponseStatusException.class, () -> controller.generateAssessmentQuestions(notebook));
+    }
+
+    @Test
+    void shouldReturnQuestionsWhenAssessmentDoesNotExcessAssessmentLimitWithinOneDay()
+        throws UnexpectedNoAccessRightException {
+      makeMe.theNote(topNote).withNChildrenThat(5, NoteBuilder::hasAnApprovedQuestion).please();
+      notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(5);
+
+      var now = LocalDateTime.now();
+      for (int i = 0; i < 2; i++) {
+        var assessmentAttempt = new AssessmentAttemptHistory();
+        assessmentAttempt.setUser(currentUser.getEntity());
+        assessmentAttempt.setNotebook(notebook);
+        assessmentAttempt.setSubmittedAt(Timestamp.valueOf(now));
+        makeMe.aAssessmentAttemptHistory(assessmentAttempt).please();
+      }
+
+      var yesterday = LocalDateTime.now().minusDays(1);
+      var yesterdayAttempt = new AssessmentAttemptHistory();
+      yesterdayAttempt.setUser(currentUser.getEntity());
+      yesterdayAttempt.setNotebook(notebook);
+      yesterdayAttempt.setSubmittedAt(Timestamp.valueOf(yesterday));
+      makeMe.aAssessmentAttemptHistory(yesterdayAttempt).please();
+
+      List<QuizQuestion> assessment = controller.generateAssessmentQuestions(notebook);
+      assertEquals(5, assessment.size());
     }
   }
 

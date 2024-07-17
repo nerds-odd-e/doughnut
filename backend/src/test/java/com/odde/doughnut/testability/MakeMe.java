@@ -54,6 +54,11 @@ public class MakeMe extends MakeMeWithoutDB {
     return new BazaarNotebookBuilder(this, notebook);
   }
 
+  public AssessmentAttemptHistoryBuilder aAssessmentAttemptHistory(
+      AssessmentAttemptHistory assessmentAttemptHistory) {
+    return new AssessmentAttemptHistoryBuilder(this, assessmentAttemptHistory);
+  }
+
   public <T> T refresh(T object) {
     modelFactoryService.entityManager.flush();
     modelFactoryService.entityManager.refresh(object);

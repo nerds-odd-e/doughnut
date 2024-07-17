@@ -92,7 +92,7 @@ const generateAssessmentQuestions = () => {
       if (res.status === 403) {
         popups
           .alert(
-            "You have reached the assessment limit for today. Please try again tomorrow"
+            "You have reached the assessment limit for today. Please try again tomorrow."
           )
           .then(() => {
             router.back()
