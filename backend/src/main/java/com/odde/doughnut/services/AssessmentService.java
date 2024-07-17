@@ -62,7 +62,7 @@ public class AssessmentService {
     AssessmentAttemptHistory assessmentAttemptHistory = new AssessmentAttemptHistory();
     assessmentAttemptHistory.setUser(user);
     assessmentAttemptHistory.setNotebook(notebook);
-    assessmentAttemptHistory.setAnswersCorrect(0);
+    assessmentAttemptHistory.setAnswersCorrect(0); // edit
     assessmentAttemptHistory.setAnswersTotal(questionsAnswerPairs.size());
     assessmentAttemptHistory.setSubmittedAt(new Timestamp(System.currentTimeMillis()));
     modelFactoryService.save(assessmentAttemptHistory);

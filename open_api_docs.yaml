@@ -3197,6 +3197,8 @@ components:
         answerId:
           type: integer
           format: int32
+        correctAnswers:
+          type: boolean
     AssessmentResult:
       type: object
       properties:

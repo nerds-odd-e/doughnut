@@ -5,5 +5,6 @@
 export type QuestionAnswerPair = {
     questionId?: number;
     answerId?: number;
+    correctAnswers?: boolean;
 };
 

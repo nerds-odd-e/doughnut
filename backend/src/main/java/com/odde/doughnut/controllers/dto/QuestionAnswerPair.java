@@ -8,4 +8,5 @@ import lombok.Setter;
 public class QuestionAnswerPair {
   @Setter private Integer questionId;
   @Setter private Integer answerId;
+  @Setter private boolean correctAnswers;
 }
