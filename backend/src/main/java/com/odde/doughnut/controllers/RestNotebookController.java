@@ -13,6 +13,7 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -110,5 +111,14 @@ class RestNotebookController {
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(notebook);
     return notebook.getNoteBriefs();
+  }
+
+  @GetMapping("{notebook}/all-questions")
+  public List<QuizQuestionAndAnswer> getAllQuestions(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertAuthorization(notebook);
+    List<QuizQuestionAndAnswer> questions = new ArrayList<>();
+    return questions;
   }
 }

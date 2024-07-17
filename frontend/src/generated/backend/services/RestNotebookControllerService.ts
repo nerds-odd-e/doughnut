@@ -7,6 +7,7 @@ import type { NotebookSettings } from '../models/NotebookSettings';
 import type { NotebooksViewedByUser } from '../models/NotebooksViewedByUser';
 import type { NoteBrief } from '../models/NoteBrief';
 import type { NoteCreationDTO } from '../models/NoteCreationDTO';
+import type { QuizQuestionAndAnswer } from '../models/QuizQuestionAndAnswer';
 import type { RedirectToNoteResponse } from '../models/RedirectToNoteResponse';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -137,6 +138,25 @@ export class RestNotebookControllerService {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/notebooks/{notebook}/dump',
+            path: {
+                'notebook': notebook,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param notebook
+     * @returns QuizQuestionAndAnswer OK
+     * @throws ApiError
+     */
+    public getAllQuestions(
+        notebook: number,
+    ): CancelablePromise<Array<QuizQuestionAndAnswer>> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/notebooks/{notebook}/all-questions',
             path: {
                 'notebook': notebook,
             },
