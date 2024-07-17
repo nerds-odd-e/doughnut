@@ -1,6 +1,9 @@
 <template>
   <div class="container px-4 pb-4">
-    <table class="table table-auto border-collapse">
+    <table
+      class="table table-auto border-collapse"
+      title="view all note questions"
+    >
       <thead>
         <tr>
           <th>Approved</th>
