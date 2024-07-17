@@ -226,10 +226,11 @@ public class RestAssessmentControllerTests {
 
       for (Note note : notebook.getNotes()) {
         QuizQuestionAndAnswer quizQuestionAndAnswer = note.getQuizQuestionAndAnswers().get(0);
+        quizQuestionAndAnswer.setCorrectAnswerIndex(1);
         QuestionAnswerPair questionAnswerPair = new QuestionAnswerPair();
         questionAnswerPair.setQuestionId(quizQuestionAndAnswer.getId());
-        quizQuestionAndAnswer.setCorrectAnswerIndex(1);
         questionAnswerPair.setAnswerId(0);
+        questionAnswerPair.setCorrectAnswers(false);
         questionsAnswerPairs.add(questionAnswerPair);
       }
     }

@@ -59,17 +59,19 @@ public class AssessmentService {
   public AssessmentResult submitAssessmentResult(
       User user, Notebook notebook, List<QuestionAnswerPair> questionsAnswerPairs) {
 
+    var totalCorrectAnswer = 0;
+
     AssessmentAttemptHistory assessmentAttemptHistory = new AssessmentAttemptHistory();
     assessmentAttemptHistory.setUser(user);
     assessmentAttemptHistory.setNotebook(notebook);
-    assessmentAttemptHistory.setAnswersCorrect(0); // edit
+    assessmentAttemptHistory.setAnswersCorrect(totalCorrectAnswer);
     assessmentAttemptHistory.setAnswersTotal(questionsAnswerPairs.size());
     assessmentAttemptHistory.setSubmittedAt(new Timestamp(System.currentTimeMillis()));
     modelFactoryService.save(assessmentAttemptHistory);
 
     AssessmentResult assessmentResult = new AssessmentResult();
     assessmentResult.setTotalCount(questionsAnswerPairs.size());
-    assessmentResult.setCorrectCount(0);
+    assessmentResult.setCorrectCount(totalCorrectAnswer);
     return assessmentResult;
   }
 }
