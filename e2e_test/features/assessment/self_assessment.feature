@@ -16,37 +16,37 @@ Feature: Self assessment
       | Vietnam    | Most famous food of Vietnam?       | Pho    | bread            | true     |
       | Japan      | What is the capital city of Japan? | Tokyo  | kyoto            | true     |
 
-#  Scenario Outline: Perform an assessment with variable outcomes counts correct scores
-#    Given I set the number of questions per assessment of the notebook "Countries" to 3
-#    When I do the assessment on "Countries" in the bazaar with the following answers:
-#      | Question                           | Answer            |
-#      | Where in the world is Singapore?   | <SingaporeAnswer> |
-#      | Most famous food of Vietnam?       | <VietnamAnswer>   |
-#      | What is the capital city of Japan? | <JapanAnswer>     |
-#    Then I should see the score "Your score: <ExpectedScore> / 3" at the end of assessment
-#
-#    Examples:
-#      | SingaporeAnswer | VietnamAnswer | JapanAnswer | ExpectedScore |
-#      | Asia            | Pho           | Tokyo       | 3             |
-#      | europe          | bread         | kyoto       | 0             |
-#      | Asia            | Pho           | kyoto       | 2             |
-#
-#  Scenario Outline: Cannot start assessment with 0 questions or not enough approved questions
-#    Given I set the number of questions per assessment of the notebook "Countries" to <Questions Per Assessment>
-#    When I start the assessment on the "Countries" notebook in the bazaar
-#    Then I should see error message <Message>
-#
-#    Examples:
-#      | Questions Per Assessment | Message                         |
-#      | 0                        | The assessment is not available |
-#      | 10                       | Not enough questions            |
-#
-#  Scenario: Must login to generate assessment
-#    Given I haven't login
-#    When I start the assessment on the "Countries" notebook in the bazaar
-#    Then I should see message that says "Please login first"
-#
-#  @ignore
+  Scenario Outline: Perform an assessment with variable outcomes counts correct scores
+    Given I set the number of questions per assessment of the notebook "Countries" to 3
+    When I do the assessment on "Countries" in the bazaar with the following answers:
+      | Question                           | Answer            |
+      | Where in the world is Singapore?   | <SingaporeAnswer> |
+      | Most famous food of Vietnam?       | <VietnamAnswer>   |
+      | What is the capital city of Japan? | <JapanAnswer>     |
+    Then I should see the score "Your score: <ExpectedScore> / 3" at the end of assessment
+
+    Examples:
+      | SingaporeAnswer | VietnamAnswer | JapanAnswer | ExpectedScore |
+      | Asia            | Pho           | Tokyo       | 3             |
+      | europe          | bread         | kyoto       | 0             |
+      | Asia            | Pho           | kyoto       | 2             |
+
+  Scenario Outline: Cannot start assessment with 0 questions or not enough approved questions
+    Given I set the number of questions per assessment of the notebook "Countries" to <Questions Per Assessment>
+    When I start the assessment on the "Countries" notebook in the bazaar
+    Then I should see error message <Message>
+
+    Examples:
+      | Questions Per Assessment | Message                         |
+      | 0                        | The assessment is not available |
+      | 10                       | Not enough questions            |
+
+  Scenario: Must login to generate assessment
+    Given I haven't login
+    When I start the assessment on the "Countries" notebook in the bazaar
+    Then I should see message that says "Please login first"
+
+  @ignore
   Scenario: Perform an assessment more than the limit per day
     Given There is a notebook "Countries"
     And The notebook owner set the number of questions in assessment of the notebook "Countries" to 1
