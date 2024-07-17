@@ -1,6 +1,11 @@
 <template>
   <div class="btn-group btn-group-sm">
     <slot name="additional-buttons" />
+    <PopButton title="View all questions">
+      <template #button_face>
+        <SvgQuestion />
+      </template>
+    </PopButton>
     <PopButton title="Edit notebook settings">
       <template #button_face>
         <SvgEditNotebook />
@@ -50,6 +55,7 @@ import NotebookEditDialog from "./NotebookEditDialog.vue"
 import NotebookMoveDialog from "./NotebookMoveDialog.vue"
 import NotebookAssistantManagementDialog from "./NotebookAssistantManagementDialog.vue"
 import SvgRobot from "../svgs/SvgRobot.vue"
+import SvgQuestion from "../svgs/SvgQuestion.vue"
 
 export default defineComponent({
   setup() {
@@ -68,6 +74,7 @@ export default defineComponent({
     SvgEditNotebook,
     SvgMoveToCircle,
     SvgRobot,
+    SvgQuestion,
   },
   methods: {
     async shareNotebook() {
