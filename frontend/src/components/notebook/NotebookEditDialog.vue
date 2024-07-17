@@ -1,25 +1,34 @@
 <template>
   <h3>Edit notebook settings</h3>
-  <form  @submit="processForm">
-    <div class="form-container">
-      <CheckInput
-        scope-name="notebook"
-        field="skipReviewEntirely"
-        v-model="formData.skipReviewEntirely"
-        :errors="errors.skipReviewEntirely"
-      />
-      <TextInput
-        scope-name="notebook"
-        field="numberOfQuestionsInAssessment"
-        v-model="formData.numberOfQuestionsInAssessment"
-        :errors="errors.numberOfQuestionsInAssessment"
-      />
+  <div class="form-container">
+    <CheckInput
+      scope-name="notebook"
+      field="skipReviewEntirely"
+      v-model="formData.skipReviewEntirely"
+      :errors="errors.skipReviewEntirely"
+    />
+    <TextInput
+      scope-name="notebook"
+      field="numberOfQuestionsInAssessment"
+      v-model="formData.numberOfQuestionsInAssessment"
+      :errors="errors.numberOfQuestionsInAssessment"
+    />
     <div>
       <label for="untilCertExpire">Until Cert Expire (in days)</label>
-      <input type="number" id="untilCertExpire" v-model.number="formData.untilCertExpire" class="form-control" @input="sanitizeInput" min="0" oninput="validity.valid||(value='');" />
+      <input
+        type="number"
+        id="untilCertExpire"
+        v-model.number="formData.untilCertExpire"
+        class="form-control"
+        @input="sanitizeInput"
+        min="0"
+        oninput="validity.valid||(value='');"
+      />
     </div>
-    <input class="btn btn-primary btn-layout" type="submit" value="Update" /></div>
-  </form>
+    <button class="btn btn-primary btn-layout" @click="processForm">
+      Update
+    </button>
+  </div>
 </template>
 
 <script>
@@ -53,7 +62,7 @@ export default {
       this.managedApi.restNotebookController
         .update1(this.notebook.id, this.formData)
         .then(() => {
-          this.$router.push({ name: "notebooks" })
+          this.$router.go()
         })
         .catch((err) => (this.errors = err))
     },
@@ -76,12 +85,10 @@ input::-webkit-inner-spin-button {
   display: flex;
   flex-direction: column;
   row-gap: 12px;
-
 }
 
 .btn-layout {
   width: 100px;
   align-self: center;
 }
-
 </style>
