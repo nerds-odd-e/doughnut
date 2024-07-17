@@ -60,5 +60,10 @@ export const routerToNotebooksPage = () => {
         untilCertExpire
       )
     },
+    updateCertifiedBy(notebook: string, certifiedBy: string) {
+      this.findNotebookCardButton(notebook, 'Edit notebook settings').click()
+      cy.formField('Certified By').assignFieldValue(`${certifiedBy}`)
+      cy.findByRole('button', { name: 'Update' }).click()
+    },
   }
 }

@@ -88,10 +88,11 @@ export const assumeAssessmentPage = (notebook?: string) => {
         }
       }
     },
-    getCertificate() {
+    getCertificate(certifiedBy: string) {
       cy.findByRole('button', { name: 'Get Certificate' }).click()
       cy.contains('This to certificate that')
       cy.contains('Old Learner')
+      cy.findByText(certifiedBy)
     },
     expectNotPassAssessment() {
       cy.findByRole('button', { name: 'Get Certificate' }).should('be.disabled')

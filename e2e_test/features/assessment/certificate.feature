@@ -12,6 +12,7 @@ Feature: Get Certificate by an assessment.
     | Thailand     | Countries    |
     | China        | Countries    |
 
+    And notebook owner set the assessment in the notebook "Countries" to be certified by "<certified by>"
     And notebook "Countries" is shared to the Bazaar
     And there are questions for the note:
       | Note Topic    | Question                              | Answer          | One Wrong Choice       | Approved |
@@ -25,10 +26,10 @@ Feature: Get Certificate by an assessment.
     # And The notebook has 80 percent score criteria to pass the assessment
 
     When I get <score> percent score when do the assessment on "Countries"
-    Then I should "<receive or not>" my certificate of "Countries"
+    Then I should "<receive or not>" my certificate of "Countries" certified by "<certified by>"
 
     Examples:
-    | score | receive or not |
-    | 100   | receive        |
-    | 80    | receive        |
-    | 20    | not receive    |
+    | score | receive or not | certified by |
+    | 100   | receive        | Korn         |
+    | 80    | receive        | Jens         |
+    | 20    | not receive    | Mindo        |
