@@ -5,6 +5,9 @@
       <template #button_face>
         <SvgQuestion />
       </template>
+      <div class="noteBookListQuestion">
+        <NotebookListQuizQuestion></NotebookListQuizQuestion>
+      </div>
     </PopButton>
     <PopButton title="Edit notebook settings">
       <template #button_face>
@@ -56,6 +59,7 @@ import NotebookMoveDialog from "./NotebookMoveDialog.vue"
 import NotebookAssistantManagementDialog from "./NotebookAssistantManagementDialog.vue"
 import SvgRobot from "../svgs/SvgRobot.vue"
 import SvgQuestion from "../svgs/SvgQuestion.vue"
+import NotebookListQuizQuestion from "./NotebookListQuizQuestion.vue"
 
 export default defineComponent({
   setup() {
@@ -75,6 +79,7 @@ export default defineComponent({
     SvgMoveToCircle,
     SvgRobot,
     SvgQuestion,
+    NotebookListQuizQuestion,
   },
   methods: {
     async shareNotebook() {
@@ -87,3 +92,8 @@ export default defineComponent({
   },
 })
 </script>
+<style>
+.noteBookListQuestion {
+  max-height: 400px;
+}
+</style>
