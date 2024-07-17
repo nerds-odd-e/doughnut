@@ -168,7 +168,6 @@ public class RestAssessmentControllerTests {
     private Notebook notebook;
     private Note topNote;
     private List<QuestionAnswerPair> questionsAnswerPairs;
-    AssessmentResult expectedAssessmentResult = new AssessmentResult();
 
     @BeforeEach
     void setup() {
@@ -180,7 +179,7 @@ public class RestAssessmentControllerTests {
       questionsAnswerPairs = new ArrayList<>();
 
       for (Note note : notebook.getNotes()) {
-        QuizQuestionAndAnswer quizQuestionAndAnswer = note.getQuizQuestionAndAnswers().getFirst();
+        QuizQuestionAndAnswer quizQuestionAndAnswer = note.getQuizQuestionAndAnswers().get(0);
         QuestionAnswerPair questionAnswerPair = new QuestionAnswerPair();
         questionAnswerPair.setQuestionId(quizQuestionAndAnswer.getId());
         quizQuestionAndAnswer.setCorrectAnswerIndex(1);
@@ -190,7 +189,7 @@ public class RestAssessmentControllerTests {
     }
 
     @Test
-    void submitAssessmentResultCheckScore() throws ApiException {
+    void submitAssessmentResultCheckScore() throws UnexpectedNoAccessRightException {
       AssessmentResult assessmentResult =
           controller.submitAssessmentResult(notebook, questionsAnswerPairs);
 
