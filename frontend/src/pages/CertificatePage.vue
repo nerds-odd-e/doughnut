@@ -15,7 +15,7 @@
       </div>
       <div class="signature-section">
         <div class="signature">
-          <span>{{ notebook.certifiedBy }}</span>
+          <span>{{ notebook.notebookSettings.certifiedBy }}</span>
           <span>Content Creator</span>
         </div>
         <div class="signature">
