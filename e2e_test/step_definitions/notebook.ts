@@ -3,7 +3,12 @@
 /// <reference types="../support" />
 // @ts-check
 
-import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
+import {
+  Given,
+  Then,
+  When,
+  DataTable,
+} from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 
 Given('I choose to share my notebook {string}', (noteTopic: string) => {
@@ -66,20 +71,41 @@ Given('There is a notebook {string}', (notebook: string) => {
   start.navigateToBazaar().expectNotebooks(notebook)
 })
 
-When('The notebook owner set the number of questions in assessment of the notebook {string} to {int}', (notebook: string, numberOfQuestion: int) => {
-  start
-        .routerToNotebooksPage()
-        .updateAssessmentSettings(notebook, numberOfQuestion)
-})
+When(
+  'The notebook owner set the number of questions in assessment of the notebook {string} to {int}',
+  (notebook: string, numberOfQuestion: number) => {
+    start
+      .routerToNotebooksPage()
+      .updateAssessmentSettings(notebook, numberOfQuestion)
+  }
+)
 
-When('The notebook owner set the number of maximum attempt per day of the notebook {string} to {int}', (notebook: string, maxAttempts: int) => {
-  // do nothing, since it is currently hardcoded in backend
-})
+When(
+  'The notebook owner set the number of maximum attempt per day of the notebook {string} to {int}',
+  (_notebook: string, _maxAttempts: number) => {
+    // do nothing, since it is currently hardcoded in backend
+  }
+)
 
-When('I have done the assessment of the notebook {string} {int} times', (notebook: string, numberOfAttempts: int, table: DataTable) => {
+When(
+  'I have done the assessment of the notebook {string} {int} times',
+  (notebook: string, numberOfAttempts: number) => {
+    const table: DataTable = new DataTable([
+      ['Question', 'Answer'],
+      ['Where in the world is Singapore?', 'Asia'],
+    ])
+    for (let count = 0; count < numberOfAttempts; count++) {
       start
         .navigateToBazaar()
         .selfAssessmentOnNotebook(notebook)
-
         .answerQuestionsFromTable(table.hashes())
-})
+    }
+  }
+)
+
+When(
+  'I try to do assessment of the notebook {string} again',
+  (notebook: string) => {
+    start.navigateToBazaar().selfAssessmentOnNotebook(notebook)
+  }
+)
