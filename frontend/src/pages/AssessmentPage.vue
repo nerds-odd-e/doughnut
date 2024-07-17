@@ -12,7 +12,7 @@
     <div v-else-if="assessmentCompleted">
       <p>Your score: {{ correctAnswers }} / {{ quizQuestions.length }}</p>
       <div v-if="assessmentPassed">
-        <a 
+        <a
           :href="viewCertificateUrl"
           target="_blank"
           class="btn btn-primary"
@@ -20,15 +20,15 @@
         >
       </div>
     </div>
-    
-    
+
+
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { QuizQuestion } from "@/generated/backend"
+import { QuizQuestion, QuestionAnswerPair } from "@/generated/backend"
 import { useRouter } from "vue-router"
 import QuizQuestionComp from "@/components/review/QuizQuestion.vue"
 import usePopups from "@/components/commons/Popups/usePopups.ts"
@@ -46,6 +46,7 @@ const quizQuestions = ref<QuizQuestion[]>([])
 const currentQuestion = ref(0)
 const errors = ref("")
 const correctAnswers = ref(0)
+const questionsAnswerCollection = ref<QuestionAnswerPair[]>([])
 const assessmentCompleted = computed(
   () =>
     currentQuestion.value >= quizQuestions.value.length &&
@@ -61,10 +62,20 @@ const assessmentPassed = computed(() => {
 })
 
 const questionAnswered = async (answerResult) => {
+  questionsAnswerCollection.value.push({
+    questionId: quizQuestions.value[currentQuestion.value]!.id,
+    answerId: answerResult.answerId,
+  })
   if (answerResult.correct) {
     correctAnswers.value += 1
   }
   currentQuestion.value += 1
+  if (assessmentCompleted.value) {
+    await managedApi.restAssessmentController.submitAssessmentResult(
+      props.notebookId,
+      questionsAnswerCollection.value
+    )
+  }
 }
 
 const generateAssessmentQuestions = () => {
