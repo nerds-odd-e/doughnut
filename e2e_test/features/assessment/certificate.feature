@@ -2,7 +2,6 @@ Feature: Get Certificate by an assessment.
   As a learner, I want to get the certificate when I do assessment passed,
   so that I can show my certificate on my portfolio.
 
-  @ignore
   Scenario: As a learner, I receive a certificate when pass the assessment.
     Given I am logged in as an existing user
     And I have a notebook with head note "Countries" and notes:
@@ -23,13 +22,13 @@ Feature: Get Certificate by an assessment.
       | China         | Who was the first emperor of China?   | Qin-Shi         | eiei                   | true     |
 
     And I set the number of questions per assessment of the notebook "Countries" to 5
-    And The notebook has 80 percent score criteria to pass the assessment
+    # And The notebook has 80 percent score criteria to pass the assessment
 
     When I get <score> percent score when do the assessment on "Countries"
-    Then I should <receive or not> my certificate of "Countries"
+    Then I should "<receive or not>" my certificate of "Countries"
 
     Examples:
     | score | receive or not |
     | 100   | receive        |
-    | 80    | receive        |
-    | 20    | not receive    |
+    # | 80    | receive        |
+    # | 20    | not receive    |

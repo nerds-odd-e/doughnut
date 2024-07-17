@@ -1,27 +1,27 @@
 <template>
-  <h3>Assessment For {{ topicConstructor }}</h3>
   <div>
-    <div v-if="errors != ''">
-      {{ errors }}
-    </div>
-    <QuizQuestionComp
-      v-else-if="currentQuestion < quizQuestions.length"
-      :quiz-question="quizQuestions[currentQuestion]!"
-      @answered="questionAnswered"
-    />
-    <div v-else-if="assessmentCompleted">
-      <p>Your score: {{ correctAnswers }} / {{ quizQuestions.length }}</p>
-      <div v-if="assessmentPassed">
-        <a
-          :href="viewCertificateUrl"
-          target="_blank"
-          class="btn btn-primary"
-          >View</a
-        >
+    <h3>Assessment For {{ topicConstructor }}</h3>
+    <div>
+      <div v-if="errors != ''">
+        {{ errors }}
+      </div>
+      <QuizQuestionComp
+        v-else-if="currentQuestion < quizQuestions.length"
+        :quiz-question="quizQuestions[currentQuestion]!"
+        @answered="questionAnswered"
+      />
+      <div v-else-if="assessmentCompleted">
+        <p>Your score: {{ correctAnswers }} / {{ quizQuestions.length }}</p>
+        <div v-if="assessmentPassed">
+          <router-link
+            :to="{ name: 'certificate', params: { notebookId: props.notebookId } }"
+            class="text-decoration-none"
+          >
+            <button class="btn btn-primary">Get Certificate</button>
+          </router-link>
+        </div>
       </div>
     </div>
-
-
   </div>
 </template>
 
@@ -97,8 +97,6 @@ const generateAssessmentQuestions = () => {
       errors.value = res.body.message
     })
 }
-
-const viewCertificateUrl = `./${props.notebookId}/certificate`
 
 onMounted(() => {
   generateAssessmentQuestions()

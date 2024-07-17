@@ -76,3 +76,11 @@ When(
       .answerQuestionsByScore(score)
   }
 )
+
+Then(
+  'I should {string} my certificate of {string}',
+  (receiveOrNot: string, notebook: string) => {
+    if (receiveOrNot === 'receive')
+      start.assumeAssessmentPage(notebook).getCertificate()
+  }
+)

@@ -58,5 +58,9 @@ export const assumeAssessmentPage = (notebook?: string) => {
         this.assumeQuestionSection().answerFromTable(answersTable)
       }
     },
+    getCertificate() {
+      cy.findByRole('button', { name: 'Get Certificate' }).click()
+      cy.contains('This to certificate that')
+    },
   }
 }
