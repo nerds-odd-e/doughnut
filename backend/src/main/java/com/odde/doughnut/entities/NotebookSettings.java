@@ -25,5 +25,6 @@ public class NotebookSettings {
     setSkipReviewEntirely(value.getSkipReviewEntirely());
     setNumberOfQuestionsInAssessment(value.getNumberOfQuestionsInAssessment());
     setUntilCertExpire(value.getUntilCertExpire());
+    setCertifiedBy(value.getCertifiedBy());
   }
 }

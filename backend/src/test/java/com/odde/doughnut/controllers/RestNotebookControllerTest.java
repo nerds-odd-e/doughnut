@@ -136,23 +136,6 @@ class RestNotebookControllerTest {
   }
 
   @Nested
-  class GetCertifiedBy {
-    Notebook notebook;
-
-    @BeforeEach
-    void setup() {
-      notebook = makeMe.aNote().creatorAndOwner(userModel).please().getNotebook();
-      makeMe.refresh(notebook);
-    }
-
-    @Test
-    void shouldGetCertifiedBy() throws UnexpectedNoAccessRightException {
-      Notebook nb = controller.get(notebook);
-      assertEquals(nb.getCertifiedBy(), "Terry");
-    }
-  }
-
-  @Nested
   class GetNotebookQuestions {
     Notebook notebook;
 
