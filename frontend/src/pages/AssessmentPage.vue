@@ -65,6 +65,7 @@ const questionAnswered = async (answerResult) => {
   questionsAnswerCollection.value.push({
     questionId: quizQuestions.value[currentQuestion.value]!.id,
     answerId: answerResult.answerId,
+    correctAnswers: answerResult.correct
   })
   if (answerResult.correct) {
     correctAnswers.value += 1
