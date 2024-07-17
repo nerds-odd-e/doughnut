@@ -43,5 +43,20 @@ export const assumeAssessmentPage = (notebook?: string) => {
         this.assumeQuestionSection().answerFromTable(answersTable)
       }
     },
+    answerQuestionsByScore(_: number) {
+      const answersTable: Record<string, string>[] = [
+        { Question: 'Where in the world is Singapore?', Answer: 'Asia' },
+        { Question: 'Most famous food of Vietnam?', Answer: 'Pho' },
+        { Question: 'What is the capital city of Japan?', Answer: 'Tokyo' },
+        {
+          Question: 'What is the capital city of Thailand?',
+          Answer: 'Bangkok',
+        },
+        { Question: 'Who was the first emperor of China?', Answer: 'Qin-Shi' },
+      ]
+      for (let i = 0; i < 5; i++) {
+        this.assumeQuestionSection().answerFromTable(answersTable)
+      }
+    },
   }
 }

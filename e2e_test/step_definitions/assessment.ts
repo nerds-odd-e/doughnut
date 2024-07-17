@@ -66,3 +66,13 @@ Given(
       .resetAndStubAskingMCQ(questionTable.hashes()[0]!)
   }
 )
+
+When(
+  'I get {int} percent score when do the assessment on {string}',
+  (score: number, notebook: string) => {
+    start
+      .navigateToBazaar()
+      .selfAssessmentOnNotebook(notebook)
+      .answerQuestionsByScore(score)
+  }
+)
