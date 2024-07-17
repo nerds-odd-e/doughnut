@@ -162,6 +162,7 @@ public class RestAssessmentControllerTests {
       assertThrows(ApiException.class, () -> controller.generateAssessmentQuestions(notebook));
     }
   }
+
   @Nested
   class completeAssessmentTest {
     private Notebook notebook;
@@ -191,7 +192,7 @@ public class RestAssessmentControllerTests {
     @Test
     void submitAssessmentResultCheckScore() throws ApiException {
       AssessmentResult assessmentResult =
-        controller.submitAssessmentResult(notebook, questionsAnswerPairs);
+          controller.submitAssessmentResult(notebook, questionsAnswerPairs);
 
       assertEquals(questionsAnswerPairs.size(), assessmentResult.getTotalCount());
       assertEquals(0, assessmentResult.getCorrectCount());
