@@ -109,3 +109,12 @@ When(
     start.navigateToBazaar().selfAssessmentOnNotebook(notebook)
   }
 )
+
+Then(
+  'I should not be able to do anymore assessment of the notebook {string} today',
+  (_notebook: string) => {
+    cy.findByText(
+      'You have reached the assessment limit for today. Please try again tomorrow.'
+    )
+  }
+)
