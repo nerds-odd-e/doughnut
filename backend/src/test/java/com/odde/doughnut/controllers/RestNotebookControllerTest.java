@@ -12,6 +12,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -148,6 +149,24 @@ class RestNotebookControllerTest {
     void shouldGetCertifiedBy() throws UnexpectedNoAccessRightException {
       Notebook nb = controller.get(notebook);
       assertEquals(nb.getCertifiedBy(), "Terry");
+    }
+  }
+
+  @Nested
+  class GetNotebookQuestions {
+    Notebook notebook;
+
+    @BeforeEach
+    void setup() {
+      userModel = makeMe.aUser().toModelPlease();
+      notebook = makeMe.aNote().creatorAndOwner(userModel).please().getNotebook();
+      makeMe.refresh(notebook);
+    }
+
+    @Test
+    void shouldGetEmptyListOfQuestion() throws UnexpectedNoAccessRightException {
+      controller = new RestNotebookController(modelFactoryService, userModel, testabilitySettings);
+      assertEquals(new ArrayList<>(), controller.getAllQuestions(notebook));
     }
   }
 }
