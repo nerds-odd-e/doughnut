@@ -82,6 +82,17 @@ class RestNotebookControllerTest {
   }
 
   @Nested
+  class getNotebook {
+    @Test
+    void shouldNotBeAbleToGetNotebookThatBelongsToOtherUser() {
+      User anotherUser = makeMe.aUser().please();
+      Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
+      assertThrows(
+          UnexpectedNoAccessRightException.class, () -> controller.get(note.getNotebook()));
+    }
+  }
+
+  @Nested
   class updateNotebook {
     @Test
     void shouldNotBeAbleToUpdateNotebookThatBelongsToOtherUser() {
