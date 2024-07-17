@@ -7,7 +7,6 @@ import type { NotebookSettings } from './NotebookSettings';
 export type Notebook = {
     id: number;
     headNote: Note;
-    certifiedBy?: string;
     notebookSettings: NotebookSettings;
     creatorId?: string;
 };
