@@ -76,7 +76,7 @@ class RestNotebookController {
   @GetMapping(value = "/{notebook}")
   public Notebook get(@PathVariable @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
-    currentUser.assertAuthorization(notebook);
+    currentUser.assertLoggedIn();
     return notebook;
   }
 
