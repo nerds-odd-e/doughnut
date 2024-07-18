@@ -113,8 +113,7 @@ class RestNotebookController {
   }
 
   @GetMapping("{notebook}/notes")
-  public List<Note> getAllQuestions(
-      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
+  public List<Note> getNotes(@PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(notebook);
     return notebook.getNotes();

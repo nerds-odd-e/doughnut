@@ -83,7 +83,7 @@ const noteAndQuestions = computed<NoteAndQuestion[]>(() => {
 })
 
 const getNoteQuestions = (notebookId: number) => {
-  return restApi.managedApi.restNotebookController.getAllQuestions(notebookId)
+  return restApi.managedApi.restNotebookController.getNotes(notebookId)
 }
 
 const toggleApproval = async (questionId?: number) => {

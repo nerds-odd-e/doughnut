@@ -2320,7 +2320,7 @@ paths:
     get:
       tags:
       - rest-notebook-controller
-      operationId: getAllQuestions
+      operationId: getNotes
       parameters:
       - name: notebook
         in: path

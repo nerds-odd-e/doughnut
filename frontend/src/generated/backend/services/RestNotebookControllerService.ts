@@ -132,7 +132,7 @@ export class RestNotebookControllerService {
      * @returns Note OK
      * @throws ApiError
      */
-    public getAllQuestions(
+    public getNotes(
         notebook: number,
     ): CancelablePromise<Array<Note>> {
         return this.httpRequest.request({

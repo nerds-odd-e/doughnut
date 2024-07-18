@@ -150,7 +150,7 @@ class RestNotebookControllerTest {
     @Test
     void shouldGetEmptyListOfNotes() throws UnexpectedNoAccessRightException {
       controller = new RestNotebookController(modelFactoryService, userModel, testabilitySettings);
-      List<Note> result = controller.getAllQuestions(notebook);
+      List<Note> result = controller.getNotes(notebook);
       assertThat(result.get(0).getQuizQuestionAndAnswers(), hasSize(0));
     }
 
@@ -159,7 +159,7 @@ class RestNotebookControllerTest {
       controller = new RestNotebookController(modelFactoryService, userModel, testabilitySettings);
       QuizQuestionBuilder quizQuestionBuilder = makeMe.aQuestion();
       quizQuestionBuilder.approvedSpellingQuestionOf(notebook.getNotes().get(0)).please();
-      List<Note> result = controller.getAllQuestions(notebook);
+      List<Note> result = controller.getNotes(notebook);
       assertThat(result.get(0).getQuizQuestionAndAnswers(), hasSize(1));
     }
   }
