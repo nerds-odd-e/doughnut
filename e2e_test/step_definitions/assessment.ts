@@ -123,3 +123,20 @@ Given(
     start.testability().shareToBazaar(notebook)
   }
 )
+
+When(
+  'I pass the assessment for the {string} notebook today',
+  (notebook: string) => {
+    start
+      .navigateToBazaar()
+      .selfAssessmentOnNotebook(notebook)
+      .answerQuestionsByScore(80)
+  }
+)
+
+Then(
+  'I should receive my {string} certificate with the issue date today and expiring in {int} days later',
+  (notebook: string, expiredDays: number) => {
+    start.assumeAssessmentPage(notebook).getExpiredDate(expiredDays)
+  }
+)

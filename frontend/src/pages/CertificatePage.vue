@@ -14,7 +14,7 @@
         <span>on</span>
         <span class="date">{{ issueDate }}</span>
         <span>, and expiring on</span>
-        <span class="date">{{ expiredDate }}</span>
+        <span data-cy="expired-date" class="date">{{ expiredDate }}</span>
       </div>
       <div class="signature-section">
         <div class="signature">

@@ -1,3 +1,5 @@
+import { addDays, formatDateToISO } from "../../support/dateUtils"
+
 const assumeQuestionSection = () => {
   return {
     getQuestionSection() {
@@ -79,6 +81,15 @@ export const assumeAssessmentPage = (notebook?: string) => {
       cy.contains('Old Learner')
       cy.findByText(certifiedBy)
       cy.contains(notebook)
+    },
+    getExpiredDate(expiredDays: number) {
+      cy.findByRole('button', { name: 'Get Certificate' }).click()
+
+      const now = new Date()
+      const expDate = addDays(now, expiredDays)
+      const expiredDate = formatDateToISO(expDate)
+
+      cy.get('[data-cy="expired-date"]').contains(expiredDate)
     },
     expectNotPassAssessment() {
       cy.findByRole('button', { name: 'Get Certificate' }).should('be.disabled')
