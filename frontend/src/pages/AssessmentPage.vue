@@ -24,7 +24,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { QuizQuestion, QuestionAnswerPair } from "@/generated/backend"
+import { QuizQuestion, AnswerSubmission } from "@/generated/backend"
 import { useRouter } from "vue-router"
 import QuizQuestionComp from "@/components/review/QuizQuestion.vue"
 import usePopups from "@/components/commons/Popups/usePopups.ts"
@@ -42,7 +42,7 @@ const quizQuestions = ref<QuizQuestion[]>([])
 const currentQuestion = ref(0)
 const errors = ref("")
 const correctAnswers = ref(0)
-const questionsAnswerCollection = ref<QuestionAnswerPair[]>([])
+const questionsAnswerCollection = ref<AnswerSubmission[]>([])
 const assessmentCompleted = computed(
   () =>
     currentQuestion.value >= quizQuestions.value.length &&
