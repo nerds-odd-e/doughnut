@@ -19,6 +19,7 @@
               :id="'checkbox-' + idx"
               type="checkbox"
               v-model="noteQuestion.quizQuestion.approved"
+              @change="toggleApproval(noteQuestion.quizQuestion.id)"
             />
           </td>
           <td>
@@ -67,7 +68,7 @@ interface NoteAndQuestion {
 
 const props = defineProps<Props>()
 
-const noteAndQuestions = computed(() => {
+const noteAndQuestions = computed<NoteAndQuestion[]>(() => {
   return notes.value.reduce((acc: NoteAndQuestion[], item: Note) => {
     const questionsWithName: NoteAndQuestion[] =
       item.quizQuestionAndAnswers!.map((question) => {
@@ -83,6 +84,14 @@ const noteAndQuestions = computed(() => {
 
 const getNoteQuestions = (notebookId: number) => {
   return restApi.managedApi.restNotebookController.getAllQuestions(notebookId)
+}
+
+const toggleApproval = async (questionId?: number) => {
+  if (questionId) {
+    await restApi.managedApi.restQuizQuestionController.toggleApproval(
+      questionId
+    )
+  }
 }
 
 onMounted(async () => {
