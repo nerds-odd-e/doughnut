@@ -196,6 +196,13 @@ export const assumeNotePage = (noteTopic?: string) => {
     refineQuestion(row: Record<string, string>) {
       this.openQuestionList().addQuestionPage().refineQuestion(row)
     },
+    deleteQuestion(question: string) {
+      this.openQuestionList()
+      cy.findByText(question)
+        .parent('tr')
+        .findByRole('button', { name: 'Delete' })
+        .click()
+    },
     toggleApproval(question: string) {
       this.openQuestionList()
       cy.findByText(question)

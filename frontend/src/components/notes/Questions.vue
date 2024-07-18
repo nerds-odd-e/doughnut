@@ -21,6 +21,7 @@
           <th>B</th>
           <th>C</th>
           <th>D</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -41,14 +42,15 @@
             v-if="question.quizQuestion.multipleChoicesQuestion.choices"
           >
             <td
-              v-for="(choice, index) in question.quizQuestion
-                .multipleChoicesQuestion.choices"
+              v-for="(_, i) in 4"
               :class="{
-                'correct-choice': index === question.correctAnswerIndex,
+                'correct-choice': i === question.correctAnswerIndex,
               }"
-              :key="index"
             >
-              {{ choice }}
+              {{ question.quizQuestion.multipleChoicesQuestion.choices[i] }}
+            </td>
+            <td class="d-flex justify-content-center">
+              <button class="btn btn-danger" @click="questionDeleted(question)">Delete</button>
             </td>
           </template>
         </tr>
@@ -88,6 +90,11 @@ const toggleApproval = async (questionId?: number) => {
   if (questionId) {
     await managedApi.restQuizQuestionController.toggleApproval(questionId)
   }
+}
+
+const questionDeleted = async (question: QuizQuestionAndAnswer) => {
+  await managedApi.restQuizQuestionController.deleteQuestion(question.id)
+  await fetchQuestions()
 }
 onMounted(() => {
   fetchQuestions()

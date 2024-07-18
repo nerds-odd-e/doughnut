@@ -527,3 +527,7 @@ Then('the question in the form becomes:', (data: DataTable) => {
     }
   )
 })
+
+When("I delete question stem {string} for the note {string}", (stem: string, noteTopic: string) => {
+  start.jumpToNotePage(noteTopic).deleteQuestion(stem)
+})
