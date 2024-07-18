@@ -55,8 +55,8 @@ public class MakeMe extends MakeMeWithoutDB {
   }
 
   public AssessmentAttemptHistoryBuilder aAssessmentAttemptHistory(
-      AssessmentAttemptHistory assessmentAttemptHistory) {
-    return new AssessmentAttemptHistoryBuilder(this, assessmentAttemptHistory);
+      AssessmentAttempt assessmentAttempt) {
+    return new AssessmentAttemptHistoryBuilder(this, assessmentAttempt);
   }
 
   public <T> T refresh(T object) {

@@ -171,7 +171,7 @@ public class RestAssessmentControllerTests {
 
       var now = LocalDateTime.now();
       for (int i = 0; i < 3; i++) {
-        var assessmentAttempt = new AssessmentAttemptHistory();
+        var assessmentAttempt = new AssessmentAttempt();
         assessmentAttempt.setUser(currentUser.getEntity());
         assessmentAttempt.setNotebook(notebook);
         assessmentAttempt.setSubmittedAt(Timestamp.valueOf(now));
@@ -190,7 +190,7 @@ public class RestAssessmentControllerTests {
 
       var now = LocalDateTime.now();
       for (int i = 0; i < 2; i++) {
-        var assessmentAttempt = new AssessmentAttemptHistory();
+        var assessmentAttempt = new AssessmentAttempt();
         assessmentAttempt.setUser(currentUser.getEntity());
         assessmentAttempt.setNotebook(notebook);
         assessmentAttempt.setSubmittedAt(Timestamp.valueOf(now));
@@ -198,7 +198,7 @@ public class RestAssessmentControllerTests {
       }
 
       var yesterday = LocalDateTime.now().minusDays(1);
-      var yesterdayAttempt = new AssessmentAttemptHistory();
+      var yesterdayAttempt = new AssessmentAttempt();
       yesterdayAttempt.setUser(currentUser.getEntity());
       yesterdayAttempt.setNotebook(notebook);
       yesterdayAttempt.setSubmittedAt(Timestamp.valueOf(yesterday));

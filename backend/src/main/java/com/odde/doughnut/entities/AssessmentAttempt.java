@@ -7,10 +7,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "assessment_attempt_history")
+@Table(name = "assessment_attempt")
 @Getter
 @Setter
-public class AssessmentAttemptHistory extends EntityIdentifiedByIdOnly {
+public class AssessmentAttempt extends EntityIdentifiedByIdOnly {
   @ManyToOne
   @JoinColumn(name = "user_id")
   @JsonIgnore
