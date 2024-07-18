@@ -218,22 +218,21 @@ public class RestAssessmentControllerTests {
     @BeforeEach
     void setup() {
       topNote = makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser).please();
+      makeMe.theNote(topNote).withNChildrenThat(3, NoteBuilder::hasAnApprovedQuestion).please();
+      notebook = topNote.getNotebook();
+      notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(3);
+      questionsAnswerPairs = new ArrayList<>();
     }
 
     @Test
     void shouldReturnAllAnswersCorrect() throws UnexpectedNoAccessRightException {
-      makeMe.theNote(topNote).withNChildrenThat(3, NoteBuilder::hasAnApprovedQuestion).please();
-      notebook = topNote.getNotebook();
-
-      notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(3);
-      notebook.getNotes().get(0).getQuizQuestionAndAnswers().get(0).setCorrectAnswerIndex(1);
-
-      questionsAnswerPairs = new ArrayList<>();
       for (Note note : notebook.getNotes()) {
         QuizQuestionAndAnswer quizQuestionAndAnswer = note.getQuizQuestionAndAnswers().get(0);
         quizQuestionAndAnswer.setCorrectAnswerIndex(1);
+
         AnswerSubmission answerSubmission = new AnswerSubmission();
         answerSubmission.setQuestionId(quizQuestionAndAnswer.getId());
+
         answerSubmission.setAnswerId(0);
         answerSubmission.setCorrectAnswers(true);
         questionsAnswerPairs.add(answerSubmission);
@@ -248,11 +247,6 @@ public class RestAssessmentControllerTests {
 
     @Test
     void shouldReturnSomeAnswersCorrect() throws UnexpectedNoAccessRightException {
-      makeMe.theNote(topNote).withNChildrenThat(3, NoteBuilder::hasAnApprovedQuestion).please();
-      notebook = topNote.getNotebook();
-      notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(3);
-
-      questionsAnswerPairs = new ArrayList<>();
       for (Note note : notebook.getNotes()) {
         QuizQuestionAndAnswer quizQuestionAndAnswer = note.getQuizQuestionAndAnswers().get(0);
         quizQuestionAndAnswer.setCorrectAnswerIndex(1);
@@ -276,6 +270,15 @@ public class RestAssessmentControllerTests {
 
       assertEquals(3, assessmentResult.getTotalCount());
       assertEquals(2, assessmentResult.getCorrectCount());
+    }
+
+    @Test
+    void shouldNotBeAbleToAccessNotebookWhenUserHasNoPermission() {
+      User anotherUser = makeMe.aUser().please();
+      notebook.setOwnership(anotherUser.getOwnership());
+      assertThrows(
+        UnexpectedNoAccessRightException.class,
+        () -> controller.submitAssessmentResult(notebook, questionsAnswerPairs));
     }
   }
 }
