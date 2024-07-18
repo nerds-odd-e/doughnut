@@ -58,15 +58,16 @@ public class AssessmentService {
 
   public AssessmentResult submitAssessmentResult(
       User user, Notebook notebook, List<QuestionAnswerPair> questionsAnswerPairs) {
-
-    var totalCorrectAnswer = 0;
-
     AssessmentAttemptHistory assessmentAttemptHistory = new AssessmentAttemptHistory();
     assessmentAttemptHistory.setUser(user);
     assessmentAttemptHistory.setNotebook(notebook);
-    assessmentAttemptHistory.setAnswersCorrect(totalCorrectAnswer);
     assessmentAttemptHistory.setAnswersTotal(questionsAnswerPairs.size());
     assessmentAttemptHistory.setSubmittedAt(new Timestamp(System.currentTimeMillis()));
+
+    int totalCorrectAnswer =
+        (int) questionsAnswerPairs.stream().filter(QuestionAnswerPair::isCorrectAnswers).count();
+    assessmentAttemptHistory.setAnswersCorrect(totalCorrectAnswer);
+
     modelFactoryService.save(assessmentAttemptHistory);
 
     AssessmentResult assessmentResult = new AssessmentResult();

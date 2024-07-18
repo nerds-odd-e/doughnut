@@ -218,9 +218,8 @@ public class RestAssessmentControllerTests {
     @BeforeEach
     void setup() {
       topNote = makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser).please();
-      notebook = topNote.getNotebook();
-
       makeMe.theNote(topNote).withNChildrenThat(2, NoteBuilder::hasAnApprovedQuestion).please();
+      notebook = topNote.getNotebook();
       notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(2);
       questionsAnswerPairs = new ArrayList<>();
 
@@ -236,7 +235,7 @@ public class RestAssessmentControllerTests {
     }
 
     @Test
-    void submitAssessmentResultCheckScore() throws UnexpectedNoAccessRightException {
+    void shouldReturnSubmittedAssessmentResult() throws UnexpectedNoAccessRightException {
       AssessmentResult assessmentResult =
           controller.submitAssessmentResult(notebook, questionsAnswerPairs);
 
