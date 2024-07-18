@@ -25,11 +25,11 @@ Feature: Get Certificate by an assessment.
     Given I have received the "Countries" certification, expiring on <expiration date>
     And today is "2024-12-10"
     When I complete the renewal assessment with a result of <pass or fail>
-    Then I should receive my certification with a <new expiration date>
+    Then I should receive my certification of the "Countires" with a <new expiration date>
 
     Examples:
       | expiration date | pass or fail | new expiration date |
-      | 2024-12-20       | pass           |          2025-12-10 |
-      | 2024-12-20       | fail             |          2024-12-20 |
-      | 2024-06-01       | pass           |          2025-12-10 |
-      | 2024-06-01       | fail             |          2024-06-01 |
+      | 2024-12-20       | pass        |          2025-12-10 |
+      | 2024-12-20       | fail        |          2024-12-20 |
+      | 2024-06-01       | pass        |          2025-12-10 |
+      | 2024-06-01       | fail        |          2024-06-01 |

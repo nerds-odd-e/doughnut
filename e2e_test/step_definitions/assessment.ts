@@ -140,3 +140,12 @@ Then(
     start.assumeAssessmentPage(notebook).getExpiredDate(expiredDays)
   }
 )
+
+Then(
+  'I should receive my certification of the {string} with a {string}',
+  (notebook: string, newExpirationDate: string) => {
+    start
+      .assumeAssessmentPage(notebook)
+      .getCertificate(notebook, undefined, newExpirationDate)
+  }
+)
