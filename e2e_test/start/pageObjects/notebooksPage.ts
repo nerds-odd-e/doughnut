@@ -65,5 +65,8 @@ export const routerToNotebooksPage = () => {
       cy.formField('Certified By').assignFieldValue(`${certifiedBy}`)
       cy.findByRole('button', { name: 'Update' }).click()
     },
+    expectEmptyQuestion(notebook: string) {
+      this.findNotebookCardButton(notebook,'View all questions').click()
+    }
   }
 }

@@ -2,11 +2,14 @@ Feature: Notebook quiz questions
 
     Background:
         Given I am logged in as an existing user
-        And I have a notebook with head note "Scrum" and notes:
+        When I have a notebook with head note "Scrum" and notes:
             | Topic              | Parent Topic              |
             | Scrum roles        | Scrum                     |
             | Scrum master       | Scrum roles               |
             | Scrum events       | Scrum                     |
+
+    Scenario: View question when there is no question on each note
+        Then I should see empty question list on notebook "Scrum"
 
     @ignore
     Scenario: View question that add at primary level notebook
