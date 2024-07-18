@@ -13,17 +13,9 @@
       />
       <div v-else-if="assessmentCompleted">
         <p>Your score: {{ correctAnswers }} / {{ quizQuestions.length }}</p>
-        <router-link
-          :to="{
-            name: 'certificate',
-            params: { notebookId: props.notebookId },
-          }"
-          class="text-decoration-none"
-        >
-          <button :disabled="!assessmentPassed" class="btn btn-primary">
-            Get Certificate
-          </button>
-        </router-link>
+        <button :disabled="!assessmentPassed" class="btn btn-primary" @click="routeToCertificatePage()">
+          Get Certificate
+        </button>
       </div>
     </div>
   </div>
@@ -101,6 +93,13 @@ const generateAssessmentQuestions = () => {
       }
       errors.value = res.body.message
     })
+}
+
+const routeToCertificatePage = () => {
+  router.push({
+    name: "certificate",
+    params: { notebookId: props.notebookId },
+  })
 }
 
 onMounted(() => {

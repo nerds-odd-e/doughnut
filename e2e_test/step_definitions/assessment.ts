@@ -78,13 +78,16 @@ When(
 )
 
 Then(
-  'I should {string} my certificate of {string} certified by {string}',
-  (receiveOrNot: string, notebook: string, certifiedBy: string) => {
-    if (receiveOrNot === 'receive') {
-      start.assumeAssessmentPage(notebook).getCertificate(notebook, certifiedBy)
-    } else {
-      start.assumeAssessmentPage(notebook).expectNotPassAssessment()
-    }
+  'I should receive my certificate of {string} certified by {string}',
+  (notebook: string, certifiedBy: string) => {
+    start.assumeAssessmentPage(notebook).getCertificate(notebook, certifiedBy)
+  }
+)
+
+Then(
+  'I should not receive my certificate of {string} certified by {string}',
+  (notebook: string, _certifiedBy: string) => {
+    start.assumeAssessmentPage(notebook).expectNotPassAssessment()
   }
 )
 
