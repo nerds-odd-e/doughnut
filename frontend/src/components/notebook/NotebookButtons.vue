@@ -1,13 +1,13 @@
 <template>
   <div class="btn-group btn-group-sm">
     <slot name="additional-buttons" />
-    <PopButton btn-class="btn" title="View all questions" v-bind="{ notebook }">
+    <PopButton btn-class="btn" title="View all questions">
       <template #button_face>
         <SvgQuestion />
       </template>
       <div class="noteBookListQuestion">
         <NotebookListQuizQuestion
-          :notebook-id="notebook.id"
+          v-bind="{ notebookId: notebook.id }"
         ></NotebookListQuizQuestion>
       </div>
     </PopButton>
