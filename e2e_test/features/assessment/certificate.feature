@@ -10,5 +10,12 @@ Feature: Get Certificate by an assessment.
 
     Examples:
       | score | receive or not | certified by |
-      |   100 | receive        | Korn         |
-      |    50 | not receive    | Mindo        |
+      | 100   | receive        | Korn         |
+      | 50    | not receive    | Mindo        |
+
+  @ignore
+  Scenario: As a learner, I receive Certification with correct expiration date
+    Given I am logged in as an existing user
+    And   The note owner sets the certificate expiration period for the "Countries" notebook to 100 days
+    When  I pass the assessment for the "Countries" notebook today
+    Then  I should receive my "Countries" certificate with the issue date today and expiring in 100 days later
