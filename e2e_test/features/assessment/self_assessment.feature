@@ -15,17 +15,6 @@ Feature: Self assessment
       | Singapore  | Where in the world is Singapore?   | Asia   | europe           | true     |
       | Vietnam    | Most famous food of Vietnam?       | Pho    | bread            | true     |
       | Japan      | What is the capital city of Japan? | Tokyo  | kyoto            | true     |
-    And I have a notebook with head note "Foods" and notes:
-      | Topic     | Parent Topic |
-      | Malaysia  | Foods        |
-      | England   | Foods        |
-      | USA       | Foods        |
-    And notebook "Foods" is shared to the Bazaar
-    And there are questions for the note:
-      | Note Topic | Question                           | Answer         | One Wrong Choice | Approved |
-      | Malaysia   | Which food is from Malaysia?       | Nasi lemak     | Pad thai         | true     |
-      | England    | Which food is from England?        | Fish and chips | Pad thai         | true     |
-      | USA        | Which food is from USA?            | Burger king    | Pad thai         | true     |
 
   Scenario Outline: Perform an assessment with variable outcomes counts correct scores
     Given I set the number of questions per assessment of the notebook "Countries" to 3
@@ -58,21 +47,8 @@ Feature: Self assessment
     Then I should see message that says "Please login first"
 
   Scenario: Perform an assessment more than the limit per day
-    Given There is a notebook "Countries"
-    And The notebook owner set the number of questions in assessment of the notebook "Countries" to 1
-    And The notebook owner set the number of maximum attempt per day of the notebook "Countries" to 3
+    Given There is a notebook "Countries" and number of questions in assessment is set to 1 
     And I have done the assessment of the notebook "Countries" 3 times
     When I try to do assessment of the notebook "Countries" again
     Then I should not be able to do anymore assessment of the notebook "Countries" today
 
-  @ignore
-  Scenario: Perform another assessment after one reached limit per day
-    Given There is a notebook "Countries"
-    And The notebook owner set the number of questions in assessment of the notebook "Countries" to 1
-    And The notebook owner set the number of maximum attempt per day of the notebook "Countries" to 3
-    And There is a notebook "Foods"
-    And The notebook owner set the number of questions in assessment of the notebook "Foods" to 1
-    And The notebook owner set the number of maximum attempt per day of the notebook "Foods" to 3
-    And I have done the assessment of the notebook "Countries" 3 times
-    When I start the assessment on the "Foods" notebook in the bazaar
-    Then I should be able to do the assessment of the notebook "Foods"

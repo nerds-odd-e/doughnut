@@ -67,23 +67,13 @@ Then(
   }
 )
 
-Given('There is a notebook {string}', (notebook: string) => {
-  start.navigateToBazaar().expectNotebook(notebook)
-})
-
-When(
-  'The notebook owner set the number of questions in assessment of the notebook {string} to {int}',
+Given(
+  'There is a notebook {string} and number of questions in assessment is set to {int}',
   (notebook: string, numberOfQuestion: number) => {
+    start.navigateToBazaar().expectNotebook(notebook)
     start
       .routerToNotebooksPage()
       .updateAssessmentSettings(notebook, numberOfQuestion)
-  }
-)
-
-When(
-  'The notebook owner set the number of maximum attempt per day of the notebook {string} to {int}',
-  (_notebook: string, _maxAttempts: number) => {
-    // do nothing, since it is currently hardcoded in backend
   }
 )
 
