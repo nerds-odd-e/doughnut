@@ -66,7 +66,7 @@ export const routerToNotebooksPage = () => {
       cy.findByRole('button', { name: 'Update' }).click()
     },
     expectEmptyQuestion(notebook: string) {
-      this.findNotebookCardButton(notebook,'View all questions').click()
-    }
+      this.findNotebookCardButton(notebook, 'View all questions').click()
+    },
   }
 }
