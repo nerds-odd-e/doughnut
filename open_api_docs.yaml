@@ -2316,6 +2316,32 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NotebooksViewedByUser"
+  /api/notebooks/{notebook}/notes:
+    get:
+      tags:
+      - rest-notebook-controller
+      operationId: getAllQuestions
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Note"
   /api/notebooks/{notebook}/dump:
     get:
       tags:
@@ -2342,32 +2368,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/NoteBrief"
-  /api/notebooks/{notebook}/all-questions:
-    get:
-      tags:
-      - rest-notebook-controller
-      operationId: getAllQuestions
-      parameters:
-      - name: notebook
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/QuizQuestionAndAnswer"
   /api/healthcheck:
     get:
       tags:
@@ -2818,6 +2818,10 @@ components:
           readOnly: true
         wikidataId:
           type: string
+        quizQuestionAndAnswers:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuizQuestionAndAnswer"
     NoteTopic:
       required:
       - id

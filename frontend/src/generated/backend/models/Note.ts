@@ -3,6 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { NoteTopic } from './NoteTopic';
+import type { QuizQuestionAndAnswer } from './QuizQuestionAndAnswer';
 export type Note = {
     noteTopic: NoteTopic;
     details?: string;
@@ -12,5 +13,6 @@ export type Note = {
     createdAt: string;
     readonly deletedAt?: string;
     wikidataId?: string;
+    quizQuestionAndAnswers?: Array<QuizQuestionAndAnswer>;
 };
 

@@ -12,7 +12,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
-import java.util.ArrayList;
+import com.odde.doughnut.testability.builders.QuizQuestionBuilder;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -138,6 +138,7 @@ class RestNotebookControllerTest {
   @Nested
   class GetNotebookQuestions {
     Notebook notebook;
+    QuizQuestionAndAnswer quizQuestionAndAnswer;
 
     @BeforeEach
     void setup() {
@@ -147,9 +148,19 @@ class RestNotebookControllerTest {
     }
 
     @Test
-    void shouldGetEmptyListOfQuestion() throws UnexpectedNoAccessRightException {
+    void shouldGetEmptyListOfNotes() throws UnexpectedNoAccessRightException {
       controller = new RestNotebookController(modelFactoryService, userModel, testabilitySettings);
-      assertEquals(new ArrayList<>(), controller.getAllQuestions(notebook));
+      List<Note> result = controller.getAllQuestions(notebook);
+      assertThat(result.get(0).getQuizQuestionAndAnswers(), hasSize(0));
+    }
+
+    @Test
+    void shouldGetListOfNotesWithQuestions() throws UnexpectedNoAccessRightException {
+      controller = new RestNotebookController(modelFactoryService, userModel, testabilitySettings);
+      QuizQuestionBuilder quizQuestionBuilder = makeMe.aQuestion();
+      quizQuestionBuilder.approvedSpellingQuestionOf(notebook.getNotes().get(0)).please();
+      List<Note> result = controller.getAllQuestions(notebook);
+      assertThat(result.get(0).getQuizQuestionAndAnswers(), hasSize(1));
     }
   }
 }

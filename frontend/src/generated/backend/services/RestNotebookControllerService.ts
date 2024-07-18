@@ -2,12 +2,12 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { Note } from '../models/Note';
 import type { Notebook } from '../models/Notebook';
 import type { NotebookSettings } from '../models/NotebookSettings';
 import type { NotebooksViewedByUser } from '../models/NotebooksViewedByUser';
 import type { NoteBrief } from '../models/NoteBrief';
 import type { NoteCreationDTO } from '../models/NoteCreationDTO';
-import type { QuizQuestionAndAnswer } from '../models/QuizQuestionAndAnswer';
 import type { RedirectToNoteResponse } from '../models/RedirectToNoteResponse';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -129,15 +129,15 @@ export class RestNotebookControllerService {
     }
     /**
      * @param notebook
-     * @returns NoteBrief OK
+     * @returns Note OK
      * @throws ApiError
      */
-    public downloadNotebookDump(
+    public getAllQuestions(
         notebook: number,
-    ): CancelablePromise<Array<NoteBrief>> {
+    ): CancelablePromise<Array<Note>> {
         return this.httpRequest.request({
             method: 'GET',
-            url: '/api/notebooks/{notebook}/dump',
+            url: '/api/notebooks/{notebook}/notes',
             path: {
                 'notebook': notebook,
             },
@@ -148,15 +148,15 @@ export class RestNotebookControllerService {
     }
     /**
      * @param notebook
-     * @returns QuizQuestionAndAnswer OK
+     * @returns NoteBrief OK
      * @throws ApiError
      */
-    public getAllQuestions(
+    public downloadNotebookDump(
         notebook: number,
-    ): CancelablePromise<Array<QuizQuestionAndAnswer>> {
+    ): CancelablePromise<Array<NoteBrief>> {
         return this.httpRequest.request({
             method: 'GET',
-            url: '/api/notebooks/{notebook}/all-questions',
+            url: '/api/notebooks/{notebook}/dump',
             path: {
                 'notebook': notebook,
             },

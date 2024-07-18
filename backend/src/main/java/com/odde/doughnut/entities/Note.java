@@ -125,7 +125,6 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
 
   @OneToMany(mappedBy = "note")
   @Getter
-  @JsonIgnore
   private List<QuizQuestionAndAnswer> quizQuestionAndAnswers = new ArrayList<>();
 
   @Embedded @JsonIgnore @Getter private ReviewSetting reviewSetting = new ReviewSetting();
@@ -336,9 +335,10 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
   public String getNoteDescription() {
     String prettyString = defaultObjectMapper().valueToTree(getNoteBrief()).toPrettyString();
     return """
-The note of current focus (in JSON format):
-%s
-""".formatted(prettyString);
+        The note of current focus (in JSON format):
+        %s
+        """
+        .formatted(prettyString);
   }
 
   @JsonIgnore
