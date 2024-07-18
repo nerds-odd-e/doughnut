@@ -50,7 +50,7 @@ Given(
 )
 
 When(
-  'I set the number of Certificate Expiration Period of the notebook {string} to {int}',
+  'The note owner sets the certificate expiration period for the {string} notebook to {int} days',
   (notebook: string, untilCerExpire: number) => {
     start
       .routerToNotebooksPage()

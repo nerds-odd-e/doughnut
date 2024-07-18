@@ -13,9 +13,12 @@ Feature: Get Certificate by an assessment.
       | 100   | receive        | Korn         |
       | 50    | not receive    | Mindo        |
 
-  @ignore
+@ignore
   Scenario: As a learner, I receive Certification with correct expiration date
     Given I am logged in as an existing user
+    And I have shared assessment with 2 questions in nootbook "Countries" with certified by "<certified by>"
     And   The note owner sets the certificate expiration period for the "Countries" notebook to 100 days
     When  I pass the assessment for the "Countries" notebook today
     Then  I should receive my "Countries" certificate with the issue date today and expiring in 100 days later
+
+
