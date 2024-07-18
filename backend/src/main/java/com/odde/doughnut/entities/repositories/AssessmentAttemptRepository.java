@@ -6,7 +6,7 @@ import com.odde.doughnut.entities.User;
 import java.sql.Timestamp;
 import org.springframework.data.repository.CrudRepository;
 
-public interface AssessmentAttemptHistoryRepository
+public interface AssessmentAttemptRepository
     extends CrudRepository<AssessmentAttempt, Integer> {
 
   int countAssessmentAttemptHistoriesByNotebookAndUserAndSubmittedAtBetween(

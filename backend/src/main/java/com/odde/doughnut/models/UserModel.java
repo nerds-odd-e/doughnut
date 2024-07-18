@@ -111,7 +111,7 @@ public class UserModel implements ReviewScope {
     var end = now.atTime(LocalTime.MAX).atZone(zoneId);
 
     int count =
-        modelFactoryService.assessmentAttemptHistoryRepository
+        modelFactoryService.assessmentAttemptRepository
             .countAssessmentAttemptHistoriesByNotebookAndUserAndSubmittedAtBetween(
                 notebook,
                 entity,
