@@ -2,8 +2,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { AnswerSubmission } from '../models/AnswerSubmission';
 import type { AssessmentResult } from '../models/AssessmentResult';
-import type { QuestionAnswerPair } from '../models/QuestionAnswerPair';
 import type { QuizQuestion } from '../models/QuizQuestion';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -17,7 +17,7 @@ export class RestAssessmentControllerService {
      */
     public submitAssessmentResult(
         notebook: number,
-        requestBody: Array<QuestionAnswerPair>,
+        requestBody: Array<AnswerSubmission>,
     ): CancelablePromise<AssessmentResult> {
         return this.httpRequest.request({
             method: 'POST',

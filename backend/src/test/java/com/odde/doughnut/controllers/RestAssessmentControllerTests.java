@@ -2,8 +2,8 @@ package com.odde.doughnut.controllers;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.odde.doughnut.controllers.dto.AnswerSubmission;
 import com.odde.doughnut.controllers.dto.AssessmentResult;
-import com.odde.doughnut.controllers.dto.QuestionAnswerPair;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -213,7 +213,7 @@ public class RestAssessmentControllerTests {
   class completeAssessmentTest {
     private Notebook notebook;
     private Note topNote;
-    private List<QuestionAnswerPair> questionsAnswerPairs;
+    private List<AnswerSubmission> questionsAnswerPairs;
 
     @BeforeEach
     void setup() {
@@ -232,11 +232,11 @@ public class RestAssessmentControllerTests {
       for (Note note : notebook.getNotes()) {
         QuizQuestionAndAnswer quizQuestionAndAnswer = note.getQuizQuestionAndAnswers().get(0);
         quizQuestionAndAnswer.setCorrectAnswerIndex(1);
-        QuestionAnswerPair questionAnswerPair = new QuestionAnswerPair();
-        questionAnswerPair.setQuestionId(quizQuestionAndAnswer.getId());
-        questionAnswerPair.setAnswerId(0);
-        questionAnswerPair.setCorrectAnswers(true);
-        questionsAnswerPairs.add(questionAnswerPair);
+        AnswerSubmission answerSubmission = new AnswerSubmission();
+        answerSubmission.setQuestionId(quizQuestionAndAnswer.getId());
+        answerSubmission.setAnswerId(0);
+        answerSubmission.setCorrectAnswers(true);
+        questionsAnswerPairs.add(answerSubmission);
       }
 
       AssessmentResult assessmentResult =
@@ -257,18 +257,18 @@ public class RestAssessmentControllerTests {
         QuizQuestionAndAnswer quizQuestionAndAnswer = note.getQuizQuestionAndAnswers().get(0);
         quizQuestionAndAnswer.setCorrectAnswerIndex(1);
 
-        QuestionAnswerPair questionAnswerPair = new QuestionAnswerPair();
-        questionAnswerPair.setQuestionId(quizQuestionAndAnswer.getId());
+        AnswerSubmission answerSubmission = new AnswerSubmission();
+        answerSubmission.setQuestionId(quizQuestionAndAnswer.getId());
 
         if (notebook.getNotes().indexOf(note) == 0) {
-          questionAnswerPair.setAnswerId(0);
-          questionAnswerPair.setCorrectAnswers(false);
+          answerSubmission.setAnswerId(0);
+          answerSubmission.setCorrectAnswers(false);
         } else {
-          questionAnswerPair.setAnswerId(1);
-          questionAnswerPair.setCorrectAnswers(true);
+          answerSubmission.setAnswerId(1);
+          answerSubmission.setCorrectAnswers(true);
         }
 
-        questionsAnswerPairs.add(questionAnswerPair);
+        questionsAnswerPairs.add(answerSubmission);
       }
 
       AssessmentResult assessmentResult =

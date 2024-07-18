@@ -2,8 +2,8 @@ package com.odde.doughnut.services;
 
 import static com.odde.doughnut.controllers.dto.ApiError.ErrorType.ASSESSMENT_SERVICE_ERROR;
 
+import com.odde.doughnut.controllers.dto.AnswerSubmission;
 import com.odde.doughnut.controllers.dto.AssessmentResult;
-import com.odde.doughnut.controllers.dto.QuestionAnswerPair;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -57,7 +57,7 @@ public class AssessmentService {
   }
 
   public AssessmentResult submitAssessmentResult(
-      User user, Notebook notebook, List<QuestionAnswerPair> questionsAnswerPairs) {
+      User user, Notebook notebook, List<AnswerSubmission> questionsAnswerPairs) {
     AssessmentAttempt assessmentAttempt = new AssessmentAttempt();
     assessmentAttempt.setUser(user);
     assessmentAttempt.setNotebook(notebook);
@@ -65,7 +65,7 @@ public class AssessmentService {
     assessmentAttempt.setSubmittedAt(new Timestamp(System.currentTimeMillis()));
 
     int totalCorrectAnswer =
-        (int) questionsAnswerPairs.stream().filter(QuestionAnswerPair::isCorrectAnswers).count();
+        (int) questionsAnswerPairs.stream().filter(AnswerSubmission::isCorrectAnswers).count();
     assessmentAttempt.setAnswersCorrect(totalCorrectAnswer);
 
     modelFactoryService.save(assessmentAttempt);

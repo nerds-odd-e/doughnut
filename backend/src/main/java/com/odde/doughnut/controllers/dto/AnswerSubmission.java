@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class QuestionAnswerPair {
+public class AnswerSubmission {
   @Setter private Integer questionId;
   @Setter private Integer answerId;
   @Setter private boolean correctAnswers;

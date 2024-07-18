@@ -1503,7 +1503,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: "#/components/schemas/QuestionAnswerPair"
+                $ref: "#/components/schemas/AnswerSubmission"
         required: true
       responses:
         "500":
@@ -3190,7 +3190,7 @@ components:
           format: int32
         notebook:
           $ref: "#/components/schemas/Notebook"
-    QuestionAnswerPair:
+    AnswerSubmission:
       type: object
       properties:
         questionId:
