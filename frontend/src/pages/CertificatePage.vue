@@ -14,7 +14,7 @@
         <span>on</span>
         <span class="date">{{ issueDate }}</span>
         <span>, and expiring on</span>
-        <span class="date">2015-07-31</span>
+        <span class="date">{{ expiredDate }}</span>
       </div>
       <div class="signature-section">
         <div class="signature">
@@ -41,17 +41,31 @@ const props = defineProps({
 const { managedApi } = useLoadingApi()
 const notebook = ref<Notebook | undefined>(undefined)
 const user = ref<User | undefined>(undefined)
-const d = new Date()
-const theMonth = `0${d.getMonth() + 1}`.substr(-2)
-const theDate = `0${d.getDate()}`.substr(-2)
-const issueDate = `${d.getFullYear()}-${theMonth}-${theDate}`
+const issueDate = ref("")
+const expiredDate = ref("")
+
+function addDays(date: Date, days: number = 0): Date {
+  const result = new Date(date)
+  result.setDate(result.getDate() + days)
+  return result
+}
 
 const fetchData = async () => {
   notebook.value = await managedApi.restNotebookController.get(props.notebookId)
   user.value = await managedApi.restUserController.getUserProfile()
 }
+const prepare = async () => {
+  const now = new Date()
+  const theMonth = `0${now.getMonth() + 1}`.substr(-2)
+  const theDate = `0${now.getDate()}`.substr(-2)
+  issueDate.value = `${now.getFullYear()}-${theMonth}-${theDate}`
+  const expDate = addDays(now, notebook.value?.notebookSettings.untilCertExpire)
+  const theExpiredMonth = `0${expDate.getMonth() + 1}`.substr(-2)
+  const theExpiredDate = `0${expDate.getDate()}`.substr(-2)
+  expiredDate.value = `${expDate.getFullYear()}-${theExpiredMonth}-${theExpiredDate}`
+}
 onMounted(() => {
-  fetchData()
+  fetchData().then(() => prepare())
 })
 </script>
 
