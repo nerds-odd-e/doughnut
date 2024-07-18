@@ -1,7 +1,7 @@
 <template>
   <div class="btn-group btn-group-sm">
     <slot name="additional-buttons" />
-    <PopButton title="View all questions" v-bind="{ notebook }">
+    <PopButton btn-class="btn" title="View all questions" v-bind="{ notebook }">
       <template #button_face>
         <SvgQuestion />
       </template>
