@@ -4,9 +4,9 @@ import com.odde.doughnut.entities.AssessmentAttempt;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 
-public class AssessmentAttemptHistoryBuilder extends EntityBuilder<AssessmentAttempt> {
+public class AssessmentAttemptBuilder extends EntityBuilder<AssessmentAttempt> {
 
-  public AssessmentAttemptHistoryBuilder(MakeMe makeMe, AssessmentAttempt assessmentAttempt) {
+  public AssessmentAttemptBuilder(MakeMe makeMe, AssessmentAttempt assessmentAttempt) {
     super(makeMe, assessmentAttempt);
   }
 
