@@ -127,7 +127,6 @@ declare module 'vue' {
     SearchResults: typeof import('./src/components/search/SearchResults.vue')['default']
     Select: typeof import('./src/components/form/Select.vue')['default']
     SelfEvaluateButtons: typeof import('./src/components/review/SelfEvaluateButtons.vue')['default']
-    SettingCertifiedByDialog: typeof import('./src/components/notes/SettingCertifiedByDialog.vue')['default']
     ShowImage: typeof import('./src/components/notes/accessory/ShowImage.vue')['default']
     Sidebar: typeof import('./src/components/notes/Sidebar.vue')['default']
     SidebarInner: typeof import('./src/components/notes/SidebarInner.vue')['default']
