@@ -218,32 +218,29 @@ public class RestAssessmentControllerTests {
     @BeforeEach
     void setup() {
       topNote = makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser).please();
-    }
-
-    @Test
-    void shouldReturnAllAnswersCorrect() throws UnexpectedNoAccessRightException {
-      makeMe.theNote(topNote).withNChildrenThat(3, NoteBuilder::hasAnApprovedQuestion).please();
+      makeMe.theNote(topNote).withNChildrenThat(2, NoteBuilder::hasAnApprovedQuestion).please();
       notebook = topNote.getNotebook();
-
-      notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(3);
-      notebook.getNotes().get(0).getQuizQuestionAndAnswers().get(0).setCorrectAnswerIndex(1);
-
+      notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(2);
       questionsAnswerPairs = new ArrayList<>();
+
       for (Note note : notebook.getNotes()) {
         QuizQuestionAndAnswer quizQuestionAndAnswer = note.getQuizQuestionAndAnswers().get(0);
         quizQuestionAndAnswer.setCorrectAnswerIndex(1);
         QuestionAnswerPair questionAnswerPair = new QuestionAnswerPair();
         questionAnswerPair.setQuestionId(quizQuestionAndAnswer.getId());
         questionAnswerPair.setAnswerId(0);
-        questionAnswerPair.setCorrectAnswers(true);
+        questionAnswerPair.setCorrectAnswers(false);
         questionsAnswerPairs.add(questionAnswerPair);
       }
+    }
 
+    @Test
+    void shouldReturnSubmittedAssessmentResult() throws UnexpectedNoAccessRightException {
       AssessmentResult assessmentResult =
           controller.submitAssessmentResult(notebook, questionsAnswerPairs);
 
       assertEquals(questionsAnswerPairs.size(), assessmentResult.getTotalCount());
-      assertEquals(3, assessmentResult.getCorrectCount());
+      assertEquals(0, assessmentResult.getCorrectCount());
     }
   }
 }
