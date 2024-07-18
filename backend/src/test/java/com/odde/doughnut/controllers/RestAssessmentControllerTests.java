@@ -277,8 +277,8 @@ public class RestAssessmentControllerTests {
       User anotherUser = makeMe.aUser().please();
       notebook.setOwnership(anotherUser.getOwnership());
       assertThrows(
-        UnexpectedNoAccessRightException.class,
-        () -> controller.submitAssessmentResult(notebook, questionsAnswerPairs));
+          UnexpectedNoAccessRightException.class,
+          () -> controller.submitAssessmentResult(notebook, questionsAnswerPairs));
     }
   }
 }
