@@ -12,7 +12,7 @@
       </p>
       <div class="date-container">
         <span>on</span>
-        <span class="date">2015-07-31</span>
+        <span class="date">{{ issueDate }}</span>
         <span>, and expiring on</span>
         <span class="date">2015-07-31</span>
       </div>
@@ -41,6 +41,10 @@ const props = defineProps({
 const { managedApi } = useLoadingApi()
 const notebook = ref<Notebook | undefined>(undefined)
 const user = ref<User | undefined>(undefined)
+const d = new Date()
+const theMonth = `0${d.getMonth() + 1}`.substr(-2)
+const theDate = `0${d.getDate()}`.substr(-2)
+const issueDate = `${d.getFullYear()}-${theMonth}-${theDate}`
 
 const fetchData = async () => {
   notebook.value = await managedApi.restNotebookController.get(props.notebookId)
