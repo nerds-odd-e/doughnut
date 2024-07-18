@@ -1,6 +1,7 @@
 <template>
   <div>
-    <h3>Assessment For {{ topicConstructor }}</h3>
+    <h3>Assessment For {{ topicConstructor }} </h3>
+    <h5>If you achieve a score of more than 80%, then you will receive the certificate</h5>
     <div>
       <div v-if="errors != ''">
         {{ errors }}
