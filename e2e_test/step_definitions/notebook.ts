@@ -118,10 +118,3 @@ Then(
     )
   }
 )
-
-Given(
-  'notebook owner set the assessment in the notebook {string} to be certified by {string}',
-  (notebook: string, certifiedBy: string) => {
-    start.routerToNotebooksPage().updateCertifiedBy(notebook, certifiedBy)
-  }
-)

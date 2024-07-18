@@ -87,3 +87,17 @@ Then(
     }
   }
 )
+
+// And I have a notebook with head note "Countries" and notes:
+//     | Topic        | Parent Topic |
+//     | Singapore    | Countries    |
+//     | Vietnam      | Countries    |
+
+//     And notebook owner set the assessment in the notebook "Countries" to be certified by "<certified by>"
+//     And notebook "Countries" is shared to the Bazaar
+//     And there are questions for the note:
+//       | Note Topic    | Question                              | Answer          | One Wrong Choice       | Approved |
+//       | Singapore     | Where in the world is Singapore?      | Asia            | europe                 | true     |
+//       | Vietnam       | Most famous food of Vietnam?          | Pho             | bread                  | true     |
+
+//     And I set the number of questions per assessment of the notebook "Countries" to 2
