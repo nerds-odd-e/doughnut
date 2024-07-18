@@ -175,7 +175,7 @@ public class RestAssessmentControllerTests {
         assessmentAttempt.setUser(currentUser.getEntity());
         assessmentAttempt.setNotebook(notebook);
         assessmentAttempt.setSubmittedAt(Timestamp.valueOf(now));
-        makeMe.aAssessmentAttemptHistory(assessmentAttempt).please();
+        makeMe.aAssessmentAttempt(assessmentAttempt).please();
       }
 
       assertThrows(
@@ -194,7 +194,7 @@ public class RestAssessmentControllerTests {
         assessmentAttempt.setUser(currentUser.getEntity());
         assessmentAttempt.setNotebook(notebook);
         assessmentAttempt.setSubmittedAt(Timestamp.valueOf(now));
-        makeMe.aAssessmentAttemptHistory(assessmentAttempt).please();
+        makeMe.aAssessmentAttempt(assessmentAttempt).please();
       }
 
       var yesterday = LocalDateTime.now().minusDays(1);
@@ -202,7 +202,7 @@ public class RestAssessmentControllerTests {
       yesterdayAttempt.setUser(currentUser.getEntity());
       yesterdayAttempt.setNotebook(notebook);
       yesterdayAttempt.setSubmittedAt(Timestamp.valueOf(yesterday));
-      makeMe.aAssessmentAttemptHistory(yesterdayAttempt).please();
+      makeMe.aAssessmentAttempt(yesterdayAttempt).please();
 
       List<QuizQuestion> assessment = controller.generateAssessmentQuestions(notebook);
       assertEquals(5, assessment.size());

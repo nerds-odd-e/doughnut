@@ -54,8 +54,7 @@ public class MakeMe extends MakeMeWithoutDB {
     return new BazaarNotebookBuilder(this, notebook);
   }
 
-  public AssessmentAttemptBuilder aAssessmentAttemptHistory(
-      AssessmentAttempt assessmentAttempt) {
+  public AssessmentAttemptBuilder aAssessmentAttempt(AssessmentAttempt assessmentAttempt) {
     return new AssessmentAttemptBuilder(this, assessmentAttempt);
   }
 
