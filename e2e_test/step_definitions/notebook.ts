@@ -68,7 +68,7 @@ Then(
 )
 
 Given('There is a notebook {string}', (notebook: string) => {
-  start.navigateToBazaar().expectNotebooks(notebook)
+  start.navigateToBazaar().expectNotebook(notebook)
 })
 
 When(

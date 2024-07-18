@@ -13,6 +13,15 @@ export const notebookList = () => {
         expect(cardTitles).to.deep.eq(commonSenseSplit(notebooks, ','))
       })
     },
+    expectNotebook: (notebook: string) => {
+      cy.pageIsNotLoading()
+      cy.get('h5 .topic-text').then(($els) => {
+        const cardTitles = Array.from($els, (el) => el.innerText).filter(
+          (title) => title === notebook
+        )
+        expect(cardTitles.length).to.be.gte(1)
+      })
+    },
     findNotebookCardButton: (notebook: string, name: string) => {
       const finder = () =>
         cy
