@@ -50,7 +50,6 @@ export const assumeAssessmentPage = (notebook?: string) => {
       }
     },
     answerQuestionsByScore(score: number) {
-      const expectCorrectAssessmentCount = score / 20
       const answersTable: Record<string, string>[] = [
         {
           Question: 'Where in the world is Singapore?',
@@ -62,29 +61,15 @@ export const assumeAssessmentPage = (notebook?: string) => {
           Answer: 'Pho',
           'One Wrong Choice': 'bread',
         },
-        {
-          Question: 'What is the capital city of Japan?',
-          Answer: 'Tokyo',
-          'One Wrong Choice': 'kyoto',
-        },
-        {
-          Question: 'What is the capital city of Thailand?',
-          Answer: 'Bangkok',
-          'One Wrong Choice': 'DAS',
-        },
-        {
-          Question: 'Who was the first emperor of China?',
-          Answer: 'Qin-Shi',
-          'One Wrong Choice': 'eiei',
-        },
       ]
+      const expectCorrectAssessmentCount = score / (100 / answersTable.length)
       let correctAnswer = 0
-      for (let i = 0; i < 5; i++) {
-        if (correctAnswer <= expectCorrectAssessmentCount) {
+      for (let i = 0; i < answersTable.length; i++) {
+        if (correctAnswer >= expectCorrectAssessmentCount) {
+          this.assumeQuestionSection().answerWrongFromTable(answersTable)
+        } else {
           this.assumeQuestionSection().answerFromTable(answersTable)
           correctAnswer += 1
-        } else {
-          this.assumeQuestionSection().answerWrongFromTable(answersTable)
         }
       }
     },

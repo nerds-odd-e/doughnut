@@ -88,16 +88,35 @@ Then(
   }
 )
 
-// And I have a notebook with head note "Countries" and notes:
-//     | Topic        | Parent Topic |
-//     | Singapore    | Countries    |
-//     | Vietnam      | Countries    |
-
-//     And notebook owner set the assessment in the notebook "Countries" to be certified by "<certified by>"
-//     And notebook "Countries" is shared to the Bazaar
-//     And there are questions for the note:
-//       | Note Topic    | Question                              | Answer          | One Wrong Choice       | Approved |
-//       | Singapore     | Where in the world is Singapore?      | Asia            | europe                 | true     |
-//       | Vietnam       | Most famous food of Vietnam?          | Pho             | bread                  | true     |
-
-//     And I set the number of questions per assessment of the notebook "Countries" to 2
+Given(
+  'I have shared assessment with {int} questions in nootbook {string} with certified by {string}',
+  (numberOfQuestion: number, notebook: string, certifiedBy: string) => {
+    const notes: Record<string, string>[] = [
+      { Topic: notebook },
+      { Topic: 'Singapore', 'Parent Topic': 'Countries' },
+      { Topic: 'Vietnam', 'Parent Topic': 'Countries' },
+    ]
+    start.testability().injectNotes(notes)
+    const quizQuestion: Record<string, string>[] = [
+      {
+        'Note Topic': 'Singapore',
+        Question: 'Where in the world is Singapore?',
+        Answer: 'Asia',
+        'One Wrong Choice': 'europe',
+        Approved: 'true',
+      },
+      {
+        'Note Topic': 'Vietnam',
+        Question: 'Most famous food of Vietnam?',
+        Answer: 'Pho',
+        'One Wrong Choice': 'bread',
+        Approved: 'true',
+      },
+    ]
+    start.testability().injectQuizQuestions(quizQuestion)
+    start
+      .routerToNotebooksPage()
+      .updateAssessmentSettings(notebook, numberOfQuestion, certifiedBy)
+    start.testability().shareToBazaar(notebook)
+  }
+)

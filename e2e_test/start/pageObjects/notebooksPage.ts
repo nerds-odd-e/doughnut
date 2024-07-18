@@ -32,11 +32,17 @@ export const routerToNotebooksPage = () => {
       cy.formField('Skip Review Entirely').check()
       cy.findByRole('button', { name: 'Update' }).click()
     },
-    updateAssessmentSettings(notebook: string, numberOfQuestion: number) {
+    updateAssessmentSettings(
+      notebook: string,
+      numberOfQuestion: number,
+      certifiedBy?: string
+    ) {
       this.findNotebookCardButton(notebook, 'Edit notebook settings').click()
       cy.formField('Number Of Questions In Assessment').assignFieldValue(
         `${numberOfQuestion}`
       )
+      if (certifiedBy)
+        cy.formField('Certified By').assignFieldValue(`${certifiedBy}`)
       cy.findByRole('button', { name: 'Update' }).click()
     },
     updateAssessmentSettingsCertificatePeriod(
@@ -59,11 +65,6 @@ export const routerToNotebooksPage = () => {
         'have.value',
         untilCertExpire
       )
-    },
-    updateCertifiedBy(notebook: string, certifiedBy: string) {
-      this.findNotebookCardButton(notebook, 'Edit notebook settings').click()
-      cy.formField('Certified By').assignFieldValue(`${certifiedBy}`)
-      cy.findByRole('button', { name: 'Update' }).click()
     },
     expectEmptyQuestion(notebook: string) {
       this.findNotebookCardButton(notebook, 'View all questions').click()
