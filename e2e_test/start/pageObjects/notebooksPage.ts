@@ -66,8 +66,5 @@ export const routerToNotebooksPage = () => {
         untilCertExpire
       )
     },
-    expectEmptyQuestion(notebook: string) {
-      this.findNotebookCardButton(notebook, 'View all questions').click()
-    },
   }
 }

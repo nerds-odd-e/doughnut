@@ -108,10 +108,3 @@ Then(
     )
   }
 )
-
-Then(
-  'I should see empty question list on notebook {string}',
-  (noteTopic: string) => {
-    start.routerToNotebooksPage().expectEmptyQuestion(noteTopic)
-  }
-)

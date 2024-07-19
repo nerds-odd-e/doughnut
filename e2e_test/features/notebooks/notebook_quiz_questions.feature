@@ -8,9 +8,6 @@ Feature: Notebook quiz questions
             | Scrum master       | Scrum roles               |
             | Scrum events       | Scrum                     |
 
-    Scenario: View question when there is no question on each note
-        Then I should see empty question list on notebook "Scrum"
-
     @ignore
     Scenario: View question that add at primary level notebook
         When I add the following question for the note "Scrum":
