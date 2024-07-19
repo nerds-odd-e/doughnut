@@ -149,7 +149,7 @@ Then(
                 .eq(index)
                 .find('input[type="checkbox"]')
                 .should('be.checked')
-              }
+            }
           })
       })
   }
