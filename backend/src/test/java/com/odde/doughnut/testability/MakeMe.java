@@ -9,6 +9,8 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.services.LinkQuestionType;
 import com.odde.doughnut.testability.builders.*;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -54,7 +56,13 @@ public class MakeMe extends MakeMeWithoutDB {
     return new BazaarNotebookBuilder(this, notebook);
   }
 
-  public AssessmentAttemptBuilder aAssessmentAttempt(AssessmentAttempt assessmentAttempt) {
+  public AssessmentAttemptBuilder aAssessmentAttempt(
+      User currentUser, Notebook notebook, LocalDateTime date) {
+    AssessmentAttempt assessmentAttempt = new AssessmentAttempt();
+
+    assessmentAttempt.setUser(currentUser);
+    assessmentAttempt.setNotebook(notebook);
+    assessmentAttempt.setSubmittedAt(Timestamp.valueOf(date));
     return new AssessmentAttemptBuilder(this, assessmentAttempt);
   }
 

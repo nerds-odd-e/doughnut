@@ -12,7 +12,6 @@ import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.NoteBuilder;
 import com.theokanning.openai.client.OpenAiApi;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -171,11 +170,7 @@ public class RestAssessmentControllerTests {
 
       var now = LocalDateTime.now();
       for (int i = 0; i < 3; i++) {
-        var assessmentAttempt = new AssessmentAttempt();
-        assessmentAttempt.setUser(currentUser.getEntity());
-        assessmentAttempt.setNotebook(notebook);
-        assessmentAttempt.setSubmittedAt(Timestamp.valueOf(now));
-        makeMe.aAssessmentAttempt(assessmentAttempt).please();
+        makeMe.aAssessmentAttempt(currentUser.getEntity(), notebook, now).please();
       }
 
       assertThrows(
@@ -190,19 +185,11 @@ public class RestAssessmentControllerTests {
 
       var now = LocalDateTime.now();
       for (int i = 0; i < 2; i++) {
-        var assessmentAttempt = new AssessmentAttempt();
-        assessmentAttempt.setUser(currentUser.getEntity());
-        assessmentAttempt.setNotebook(notebook);
-        assessmentAttempt.setSubmittedAt(Timestamp.valueOf(now));
-        makeMe.aAssessmentAttempt(assessmentAttempt).please();
+        makeMe.aAssessmentAttempt(currentUser.getEntity(), notebook, now).please();
       }
 
       var yesterday = LocalDateTime.now().minusDays(1);
-      var yesterdayAttempt = new AssessmentAttempt();
-      yesterdayAttempt.setUser(currentUser.getEntity());
-      yesterdayAttempt.setNotebook(notebook);
-      yesterdayAttempt.setSubmittedAt(Timestamp.valueOf(yesterday));
-      makeMe.aAssessmentAttempt(yesterdayAttempt).please();
+      makeMe.aAssessmentAttempt(currentUser.getEntity(), notebook, yesterday).please();
 
       List<QuizQuestion> assessment = controller.generateAssessmentQuestions(notebook);
       assertEquals(5, assessment.size());
