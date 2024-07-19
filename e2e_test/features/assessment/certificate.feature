@@ -26,17 +26,3 @@ Feature: Get Certificate by an assessment.
       | today      | expired days | expiration date |
       | 2024-07-15 | 100          | 2024-10-23      |
       | 2024-01-01 | 80           | 2024-03-21      |
-
-  @ignore
-  Scenario: As a learner, I want to renew Certification.
-    Given I have received the "Countries" certification, expiring on <expiration date>
-    And today is "2024-12-10"
-    When I complete the renewal assessment with a result of <pass or fail>
-    Then I should receive my certification of the "Countires" with a <new expiration date>
-
-    Examples:
-      | expiration date | pass or fail | new expiration date |
-      | 2024-12-20      | pass         | 2025-12-10          |
-      | 2024-12-20      | fail         | 2024-12-20          |
-      | 2024-06-01      | pass         | 2025-12-10          |
-      | 2024-06-01      | fail         | 2024-06-01          |
