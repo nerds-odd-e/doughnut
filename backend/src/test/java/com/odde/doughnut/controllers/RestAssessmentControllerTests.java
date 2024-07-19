@@ -226,6 +226,10 @@ public class RestAssessmentControllerTests {
 
     @Test
     void shouldReturnAllAnswersCorrect() throws UnexpectedNoAccessRightException {
+      makeMe.theNote(topNote).withNChildrenThat(3, NoteBuilder::hasAnApprovedQuestion).please();
+      notebook = topNote.getNotebook();
+      notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(3);
+
       for (Note note : notebook.getNotes()) {
         QuizQuestionAndAnswer quizQuestionAndAnswer = note.getQuizQuestionAndAnswers().get(0);
         quizQuestionAndAnswer.setCorrectAnswerIndex(1);
@@ -247,6 +251,10 @@ public class RestAssessmentControllerTests {
 
     @Test
     void shouldReturnSomeAnswersCorrect() throws UnexpectedNoAccessRightException {
+      makeMe.theNote(topNote).withNChildrenThat(3, NoteBuilder::hasAnApprovedQuestion).please();
+      notebook = topNote.getNotebook();
+      notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(3);
+
       for (Note note : notebook.getNotes()) {
         QuizQuestionAndAnswer quizQuestionAndAnswer = note.getQuizQuestionAndAnswers().get(0);
         quizQuestionAndAnswer.setCorrectAnswerIndex(1);
