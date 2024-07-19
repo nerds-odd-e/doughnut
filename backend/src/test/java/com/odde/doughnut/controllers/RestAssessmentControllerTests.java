@@ -213,12 +213,12 @@ public class RestAssessmentControllerTests {
   class completeAssessmentTest {
     private Notebook notebook;
     private Note topNote;
-    private List<AnswerSubmission> questionsAnswerPairs;
+    private List<AnswerSubmission> answerSubmissions;
 
     @BeforeEach
     void setup() {
       topNote = makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser).please();
-      questionsAnswerPairs = new ArrayList<>();
+      answerSubmissions = new ArrayList<>();
     }
 
     @Test
@@ -236,13 +236,13 @@ public class RestAssessmentControllerTests {
 
         answerSubmission.setAnswerId(0);
         answerSubmission.setCorrectAnswers(true);
-        questionsAnswerPairs.add(answerSubmission);
+        answerSubmissions.add(answerSubmission);
       }
 
       AssessmentResult assessmentResult =
-          controller.submitAssessmentResult(notebook, questionsAnswerPairs);
+          controller.submitAssessmentResult(notebook, answerSubmissions);
 
-      assertEquals(questionsAnswerPairs.size(), assessmentResult.getTotalCount());
+      assertEquals(answerSubmissions.size(), assessmentResult.getTotalCount());
       assertEquals(3, assessmentResult.getCorrectCount());
     }
 
@@ -260,7 +260,7 @@ public class RestAssessmentControllerTests {
       answerSubmission.setQuestionId(quizQuestionAndAnswer.getId());
       answerSubmission.setAnswerId(0);
       answerSubmission.setCorrectAnswers(true);
-      questionsAnswerPairs.add(answerSubmission);
+      answerSubmissions.add(answerSubmission);
 
       quizQuestionAndAnswer = notebook.getNotes().get(1).getQuizQuestionAndAnswers().get(0);
       quizQuestionAndAnswer.setCorrectAnswerIndex(0);
@@ -269,10 +269,10 @@ public class RestAssessmentControllerTests {
       answerSubmission.setQuestionId(quizQuestionAndAnswer.getId());
       answerSubmission.setAnswerId(0);
       answerSubmission.setCorrectAnswers(false);
-      questionsAnswerPairs.add(answerSubmission);
+      answerSubmissions.add(answerSubmission);
 
       AssessmentResult assessmentResult =
-          controller.submitAssessmentResult(notebook, questionsAnswerPairs);
+          controller.submitAssessmentResult(notebook, answerSubmissions);
 
       assertEquals(2, assessmentResult.getTotalCount());
       assertEquals(1, assessmentResult.getCorrectCount());
@@ -286,7 +286,7 @@ public class RestAssessmentControllerTests {
       notebook.setOwnership(anotherUser.getOwnership());
       assertThrows(
           UnexpectedNoAccessRightException.class,
-          () -> controller.submitAssessmentResult(notebook, questionsAnswerPairs));
+          () -> controller.submitAssessmentResult(notebook, answerSubmissions));
     }
   }
 }
