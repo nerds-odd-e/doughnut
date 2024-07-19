@@ -21,7 +21,7 @@ describe("assessment page", () => {
     document.body.appendChild(teleportTarget)
   })
 
-  describe("assessment with one quesiton", () => {
+  describe("assessment with one question", () => {
     const notebook = makeMe.aNotebook.please()
     const quizQuestion = makeMe.aQuizQuestion.please()
     beforeEach(() => {
