@@ -19,7 +19,7 @@ Feature: Get Certificate by an assessment.
     Given I have shared assessment with 2 questions in nootbook "Countries" with certified by "Korn"
     And The note owner sets the certificate expiration period for the "Countries" notebook to <expired days> days
     And today is "<today>"
-    When I pass the assessment for the "Countries" notebook
+    When I pass the assessment for the "Countries" notebook with score 80
     Then I should receive my "Countries" certificate with the issue date today and expiring on "<expiration date>"
 
     Examples:

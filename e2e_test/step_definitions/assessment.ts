@@ -124,12 +124,15 @@ Given(
   }
 )
 
-When('I pass the assessment for the {string} notebook', (notebook: string) => {
-  start
-    .navigateToBazaar()
-    .selfAssessmentOnNotebook(notebook)
-    .answerQuestionsByScore(80)
-})
+When(
+  'I pass the assessment for the {string} notebook with score {int}',
+  (notebook: string, score: number) => {
+    start
+      .navigateToBazaar()
+      .selfAssessmentOnNotebook(notebook)
+      .answerQuestionsByScore(score)
+  }
+)
 
 Then(
   'I should receive my {string} certificate with the issue date today and expiring on {string}',
