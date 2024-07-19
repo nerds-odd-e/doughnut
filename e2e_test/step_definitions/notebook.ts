@@ -108,3 +108,49 @@ Then(
     )
   }
 )
+
+Then(
+  'I should be able to approve question {string} on notebook {string}',
+  (question: string, notebook: string) => {
+    start
+      .routerToNotebooksPage()
+      .findNotebookCardButton(notebook, 'View all questions')
+      .click()
+    cy.get('table[title="view all note questions"]')
+      .find('tbody')
+      .find('tr')
+      .each(($row, index) => {
+        cy.wrap($row)
+          .find('td')
+          .eq(2)
+          .then(($cell) => {
+            if ($cell.text().includes(question)) {
+              cy.get('table[title="view all note questions"]')
+                .find('tbody')
+                .find('tr')
+                .eq(index)
+                .find('input[type="checkbox"]')
+                .click()
+            }
+          })
+      })
+    cy.get('table[title="view all note questions"]')
+      .find('tbody')
+      .find('tr')
+      .each(($row, index) => {
+        cy.wrap($row)
+          .find('td')
+          .eq(2)
+          .then(($cell) => {
+            if ($cell.text().includes(question)) {
+              cy.get('table[title="view all note questions"]')
+                .find('tbody')
+                .find('tr')
+                .eq(index)
+                .find('input[type="checkbox"]')
+                .should('be.checked')
+              }
+          })
+      })
+  }
+)
