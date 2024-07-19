@@ -44,28 +44,41 @@ const user = ref<User | undefined>(undefined)
 const issueDate = ref("")
 const expiredDate = ref("")
 
-function addDays(date: Date, days: number = 0): Date {
-  const result = new Date(date)
-  result.setDate(result.getDate() + days)
-  return result
-}
-
 const fetchData = async () => {
   notebook.value = await managedApi.restNotebookController.get(props.notebookId)
   user.value = await managedApi.restUserController.getUserProfile()
 }
-const prepare = async () => {
-  const now = new Date()
-  const theMonth = `0${now.getMonth() + 1}`.substr(-2)
-  const theDate = `0${now.getDate()}`.substr(-2)
-  issueDate.value = `${now.getFullYear()}-${theMonth}-${theDate}`
-  const expDate = addDays(now, notebook.value?.notebookSettings.untilCertExpire)
-  const theExpiredMonth = `0${expDate.getMonth() + 1}`.substr(-2)
-  const theExpiredDate = `0${expDate.getDate()}`.substr(-2)
-  expiredDate.value = `${expDate.getFullYear()}-${theExpiredMonth}-${theExpiredDate}`
+
+const addDays = (date: Date, days: number = 0): Date => {
+  const result = new Date(date)
+  result.setDate(result.getDate() + days)
+
+  return result
 }
+
+const padZero = (num: number): string => {
+  return num.toString().padStart(2, "0")
+}
+
+const formatDate = (date: Date): string => {
+  const theYear = date.getFullYear()
+  const theMonth = padZero(date.getMonth() + 1)
+  const theDate = padZero(date.getDate())
+
+  return `${theYear}-${theMonth}-${theDate}`
+}
+
 onMounted(() => {
-  fetchData().then(() => prepare())
+  fetchData().then(() => {
+    const now = new Date()
+    issueDate.value = formatDate(now)
+
+    const expiringInDays = addDays(
+      now,
+      notebook.value?.notebookSettings.untilCertExpire
+    )
+    expiredDate.value = formatDate(expiringInDays)
+  })
 })
 </script>
 
