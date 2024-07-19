@@ -9,3 +9,7 @@ import start from '../start'
 Given('I let the server to time travel to {int} hours ago', (hours: number) => {
   start.testability().backendTimeTravelRelativeToNow(-hours)
 })
+
+Given('today is {string}', (date: string) => {
+  start.testability().setTodayTo(new Date(date))
+})

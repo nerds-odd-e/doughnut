@@ -140,6 +140,10 @@ const testability = () => {
         })
     },
 
+    setTodayTo(date: Date) {
+      cy.clock(date.getTime())
+    },
+
     timeTravelTo(day: number, hour: number) {
       this.backendTimeTravelTo(day, hour)
       cy.window().then((window) => {
