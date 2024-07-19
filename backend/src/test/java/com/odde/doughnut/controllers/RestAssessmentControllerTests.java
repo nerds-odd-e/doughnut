@@ -218,9 +218,6 @@ public class RestAssessmentControllerTests {
     @BeforeEach
     void setup() {
       topNote = makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser).please();
-      makeMe.theNote(topNote).withNChildrenThat(3, NoteBuilder::hasAnApprovedQuestion).please();
-      notebook = topNote.getNotebook();
-      notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(3);
       questionsAnswerPairs = new ArrayList<>();
     }
 
@@ -251,37 +248,40 @@ public class RestAssessmentControllerTests {
 
     @Test
     void shouldReturnSomeAnswersCorrect() throws UnexpectedNoAccessRightException {
-      makeMe.theNote(topNote).withNChildrenThat(3, NoteBuilder::hasAnApprovedQuestion).please();
+      makeMe.theNote(topNote).withNChildrenThat(2, NoteBuilder::hasAnApprovedQuestion).please();
       notebook = topNote.getNotebook();
       notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(3);
 
-      for (Note note : notebook.getNotes()) {
-        QuizQuestionAndAnswer quizQuestionAndAnswer = note.getQuizQuestionAndAnswers().get(0);
-        quizQuestionAndAnswer.setCorrectAnswerIndex(1);
+      QuizQuestionAndAnswer quizQuestionAndAnswer = notebook.getNotes().get(0).getQuizQuestionAndAnswers().get(0);
+      quizQuestionAndAnswer.setCorrectAnswerIndex(0);
 
-        AnswerSubmission answerSubmission = new AnswerSubmission();
-        answerSubmission.setQuestionId(quizQuestionAndAnswer.getId());
+      AnswerSubmission answerSubmission = new AnswerSubmission();
+      answerSubmission.setQuestionId(quizQuestionAndAnswer.getId());
+      answerSubmission.setAnswerId(0);
+      answerSubmission.setCorrectAnswers(true);
+      questionsAnswerPairs.add(answerSubmission);
 
-        if (notebook.getNotes().indexOf(note) == 0) {
-          answerSubmission.setAnswerId(0);
-          answerSubmission.setCorrectAnswers(false);
-        } else {
-          answerSubmission.setAnswerId(1);
-          answerSubmission.setCorrectAnswers(true);
-        }
+        quizQuestionAndAnswer = notebook.getNotes().get(1).getQuizQuestionAndAnswers().get(0);
+      quizQuestionAndAnswer.setCorrectAnswerIndex(0);
 
-        questionsAnswerPairs.add(answerSubmission);
-      }
+        answerSubmission = new AnswerSubmission();
+      answerSubmission.setQuestionId(quizQuestionAndAnswer.getId());
+      answerSubmission.setAnswerId(0);
+      answerSubmission.setCorrectAnswers(false);
+      questionsAnswerPairs.add(answerSubmission);
+
 
       AssessmentResult assessmentResult =
           controller.submitAssessmentResult(notebook, questionsAnswerPairs);
 
-      assertEquals(3, assessmentResult.getTotalCount());
-      assertEquals(2, assessmentResult.getCorrectCount());
+      assertEquals(2, assessmentResult.getTotalCount());
+      assertEquals(1, assessmentResult.getCorrectCount());
     }
 
     @Test
     void shouldNotBeAbleToAccessNotebookWhenUserHasNoPermission() {
+      makeMe.theNote(topNote).withNChildrenThat(2, NoteBuilder::hasAnApprovedQuestion).please();
+      notebook = topNote.getNotebook();
       User anotherUser = makeMe.aUser().please();
       notebook.setOwnership(anotherUser.getOwnership());
       assertThrows(
