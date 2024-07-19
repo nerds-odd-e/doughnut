@@ -252,7 +252,8 @@ public class RestAssessmentControllerTests {
       notebook = topNote.getNotebook();
       notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(3);
 
-      QuizQuestionAndAnswer quizQuestionAndAnswer = notebook.getNotes().get(0).getQuizQuestionAndAnswers().get(0);
+      QuizQuestionAndAnswer quizQuestionAndAnswer =
+          notebook.getNotes().get(0).getQuizQuestionAndAnswers().get(0);
       quizQuestionAndAnswer.setCorrectAnswerIndex(0);
 
       AnswerSubmission answerSubmission = new AnswerSubmission();
@@ -261,15 +262,14 @@ public class RestAssessmentControllerTests {
       answerSubmission.setCorrectAnswers(true);
       questionsAnswerPairs.add(answerSubmission);
 
-        quizQuestionAndAnswer = notebook.getNotes().get(1).getQuizQuestionAndAnswers().get(0);
+      quizQuestionAndAnswer = notebook.getNotes().get(1).getQuizQuestionAndAnswers().get(0);
       quizQuestionAndAnswer.setCorrectAnswerIndex(0);
 
-        answerSubmission = new AnswerSubmission();
+      answerSubmission = new AnswerSubmission();
       answerSubmission.setQuestionId(quizQuestionAndAnswer.getId());
       answerSubmission.setAnswerId(0);
       answerSubmission.setCorrectAnswers(false);
       questionsAnswerPairs.add(answerSubmission);
-
 
       AssessmentResult assessmentResult =
           controller.submitAssessmentResult(notebook, questionsAnswerPairs);
