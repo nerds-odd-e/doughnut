@@ -61,15 +61,14 @@ export default defineConfig({
   },
   compilation: {
     input: {
-      index: fileURLToPath(new URL('./index.html', import.meta.url)),
+      index: './index.html',
     },
     output: {
       path: '../backend/src/main/resources/static/',
       publicPath: '/',
-      targetEnv: 'browser-esnext',
+      targetEnv: 'browser',
     },
     sourcemap: true,
     minify: true,
-    presetEnv: true,
-  },
+  }
 })
