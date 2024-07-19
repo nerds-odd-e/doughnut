@@ -4,6 +4,7 @@ import AssessmentPage from "@/pages/AssessmentPage.vue"
 import helper from "../helpers"
 import makeMe from "../fixtures/makeMe"
 import { flushPromises } from "@vue/test-utils"
+import { AnsweredQuestion } from "@/generated/backend"
 
 vitest.mock("vue-router", () => ({
   useRouter: () => ({
@@ -64,9 +65,21 @@ describe("assessment page", () => {
     const quizQuestion2 = makeMe.aQuizQuestion
       .withChoices(["answer3", "answer4"])
       .please()
+    const answerResult1: AnsweredQuestion = {
+      answerId: 1,
+      correct: true,
+    }
+    const answerResult2: AnsweredQuestion = {
+      answerId: 2,
+      correct: true,
+    }
     beforeEach(() => {
       helper.managedApi.restAssessmentController.generateAssessmentQuestions =
         vi.fn().mockResolvedValue([quizQuestion1, quizQuestion2])
+      helper.managedApi.restQuizQuestionController.answerQuiz = vi
+        .fn()
+        .mockResolvedValueOnce(answerResult1)
+        .mockResolvedValueOnce(answerResult2)
       helper.managedApi.restAssessmentController.submitAssessmentResult = vi
         .fn()
         .mockResolvedValue({})
@@ -83,9 +96,21 @@ describe("assessment page", () => {
       ;(await wrapper.findByRole("button", { name: "answer3" })).click()
       await flushPromises()
 
+      const expectedAnswers = [
+        {
+          answerId: answerResult1.answerId,
+          correctAnswers: true,
+          questionId: quizQuestion1.id,
+        },
+        {
+          answerId: answerResult2.answerId,
+          correctAnswers: true,
+          questionId: quizQuestion2.id,
+        },
+      ]
       expect(
         helper.managedApi.restAssessmentController.submitAssessmentResult
-      ).toBeCalledTimes(1)
+      ).toBeCalledWith(notebook.id, expectedAnswers)
     })
   })
 })
