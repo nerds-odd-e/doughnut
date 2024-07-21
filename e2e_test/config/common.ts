@@ -1,7 +1,6 @@
 import { existsSync, rmdir } from 'node:fs'
 import { addCucumberPreprocessorPlugin } from '@badeball/cypress-cucumber-preprocessor'
 import { createEsbuildPlugin } from '@badeball/cypress-cucumber-preprocessor/esbuild'
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import createBundler from '@bahmutov/cypress-esbuild-preprocessor'
 
 const commonConfig = {

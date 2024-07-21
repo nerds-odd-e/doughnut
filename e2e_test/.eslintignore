@@ -1,7 +1,0 @@
-.git
-.github
-node_modules
-tsconfig.json
-components.d.ts
-config/*.ts
-*.md

@@ -57,25 +57,14 @@
     "@types/jquery": "^3.5.30",
     "@types/node": "^20.14.11",
     "@types/testing-library__cypress": "^5.0.13",
-    "@typescript-eslint/eslint-plugin": "^7.16.1",
-    "@typescript-eslint/parser": "^7.16.1",
     "cypress": "13.13.1",
     "cypress-file-upload": "^5.0.8",
-    "esbuild": "^0.23.0",
-    "eslint": "^8.57.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-chai-friendly": "^1.0.0",
-    "eslint-plugin-cypress": "^3.3.0",
-    "eslint-plugin-prettier": "^5.2.1",
-    "eslint-plugin-testing-library": "^6.2.2",
-    "eslint-plugin-unused-imports": "^3.2.0",
     "github_action_sound": "^1.0.5",
     "got": "^14.4.1",
     "jsdom": "^24.1.0",
     "mountebank": "^2.9.1",
     "npm-run-all2": "^6.2.2",
     "openapi-typescript-codegen": "^0.29.0",
-    "prettier": "^3.3.3",
     "superagent": "^9.0.2",
     "syncpack": "^12.3.3",
     "typescript": "5.5.3",
@@ -83,6 +72,9 @@
   },
   "dependencies": {
     "@cucumber/cucumber": "^10.8.0"
+  },
+  "resolutions": {
+    "esbuild": "^0.23.0"
   },
   "pnpm": {
     "overrides": {

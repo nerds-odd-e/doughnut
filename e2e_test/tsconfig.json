@@ -9,18 +9,17 @@
     "types": ["cypress", "jquery"],
     "typeRoots": [
       "types",
-      "node_modules",
-      "node_modules/@types",
-      "node_modules/@testing-library",
-      "node_modules/@badeball/cypress-cucumber-preprocessor"
+      "../node_modules/@types",
+      "../node_modules/@testing-library",
+      "../node_modules/@badeball/cypress-cucumber-preprocessor"
     ],
     "paths": {
-      "*": ["node_modules/*"],
+      "*": ["../node_modules/*"],
       "@badeball/cypress-cucumber-preprocessor": [
-        "node_modules/@badeball/cypress-cucumber-preprocessor"
+        "../node_modules/@badeball/cypress-cucumber-preprocessor"
       ],
       "@badeball/cypress-cucumber-preprocessor/esbuild": [
-        "node_modules/@badeball/cypress-cucumber-preprocessor/dist/subpath-entrypoints/esbuild"
+        "../node_modules/@badeball/cypress-cucumber-preprocessor/dist/subpath-entrypoints/esbuild"
       ]
     }
   },
