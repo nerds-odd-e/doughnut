@@ -71,7 +71,7 @@
     "typescript": "5.5.3",
     "unplugin-auto-import": "^0.18.0",
     "unplugin-vue-components": "0.27.3",
-    "unplugin-vue-router": "^0.10.0",
+    "unplugin-vue-router": "^0.10.1",
     "vite": "5.3.4",
     "vite-plugin-checker": "0.7.2",
     "vite-plugin-compression": "^0.5.1",
@@ -81,6 +81,6 @@
     "vitest": "2.0.4",
     "vitest-dom": "^0.1.1",
     "vitest-fetch-mock": "^0.3.0",
-    "vue-tsc": "2.0.26"
+    "vue-tsc": "2.0.28"
   }
 }
