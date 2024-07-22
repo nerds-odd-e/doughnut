@@ -119,8 +119,8 @@ in mkShell {
       rm -rf "$PWD/frontend/node_modules"
     fi
 
-    corepack prepare pnpm@9.5.0 --activate
-    corepack use pnpm@9.5.0
+    corepack prepare pnpm@9.6.0 --activate
+    corepack use pnpm@9.6.0
     pnpm --frozen-lockfile recursive install
     # start biome daemon-server
     pnpm biome start
