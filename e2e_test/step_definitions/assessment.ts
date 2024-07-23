@@ -92,24 +92,26 @@ Then(
 )
 
 Given(
-  'there is an assessment on nootbook {string} with {int} questions certified by {string}',
+  'there is an assessment on notebook {string} with {int} questions certified by {string}',
   (notebook: string, numberOfQuestion: number, certifiedBy: string) => {
     const notes: Record<string, string>[] = [
       { Topic: notebook },
-      { Topic: 'Singapore', 'Parent Topic': 'Countries' },
-      { Topic: 'Vietnam', 'Parent Topic': 'Countries' },
+      ...new Array(numberOfQuestion).fill(0).map((_, index) => ({
+        Topic: `Note about ${index}`,
+        'Parent Topic': notebook,
+      })),
     ]
     start.testability().injectNotes(notes)
     const quizQuestion: Record<string, string>[] = [
       {
-        'Note Topic': 'Singapore',
+        'Note Topic': 'Note about 0',
         Question: 'Where in the world is Singapore?',
         Answer: 'Asia',
         'One Wrong Choice': 'europe',
         Approved: 'true',
       },
       {
-        'Note Topic': 'Vietnam',
+        'Note Topic': 'Note about 1',
         Question: 'Most famous food of Vietnam?',
         Answer: 'Pho',
         'One Wrong Choice': 'bread',
