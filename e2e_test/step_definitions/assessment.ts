@@ -78,14 +78,14 @@ When(
 )
 
 Then(
-  'I should receive my certificate of {string} certified by {string}',
+  'I should receive a certificate of {string} certified by {string}',
   (notebook: string, certifiedBy: string) => {
     start.assumeAssessmentPage(notebook).getCertificate(notebook, certifiedBy)
   }
 )
 
 Then(
-  'I should not receive my certificate of {string} certified by {string}',
+  'I should not receive a certificate of {string} certified by {string}',
   (notebook: string, _certifiedBy: string) => {
     start.assumeAssessmentPage(notebook).expectNotPassAssessment()
   }
@@ -125,7 +125,7 @@ Given(
 )
 
 When(
-  'I pass the assessment for the {string} notebook with score {int}',
+  'I finish the assessment for the notebook {string} with score {int}',
   (notebook: string, score: number) => {
     start
       .navigateToBazaar()

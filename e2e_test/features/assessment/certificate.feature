@@ -8,19 +8,19 @@ Feature: Get certificate by an assessment
     Given I am logged in as an existing user
     And there is an assessment on nootbook "Countries" with 2 questions certified by "Korn"
 
-  Scenario: As a learner, I receive a certificate when pass the assessment.
-    When I get <score> percent score when do the assessment on "Countries"
-    Then I should <receive or not> my certificate of "Countries" certified by "Korn"
+  Scenario: I should receive a certificate when pass the assessment
+    When I get <Score> percent score when do the assessment on "Countries"
+    Then I should <Receive or not> a certificate of "Countries" certified by "Korn"
 
     Examples:
-      | score | receive or not | certified by |
-      | 100   | receive        | Korn         |
-      | 50    | not receive    | Mindo        |
+      | Score | Receive or not |
+      | 100   | receive        |
+      | 50    | not receive    |
 
   Scenario: As a learner, I receive Certification with correct expiration date
-    Given The note owner sets the certificate expiration period for the "Countries" notebook to <expired days> days
+    Given the certificate expiration period for the notebook "Countries" is <expired days> days
     And today is "<today>"
-    When I pass the assessment for the "Countries" notebook with score 80
+    When I finish the assessment for the notebook "Countries" with score 80
     Then I should receive my "Countries" certificate with the issue date today and expiring on "<expiration date>"
 
     Examples:
