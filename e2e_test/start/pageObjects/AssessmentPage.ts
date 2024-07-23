@@ -53,13 +53,13 @@ export const assumeAssessmentPage = (notebook?: string) => {
       const answersTable: Record<string, string>[] = [
         {
           Question: 'Where in the world is Singapore?',
-          Answer: 'Yes',
-          'One Wrong Choice': 'No',
+          Answer: 'Asia',
+          'One Wrong Choice': 'europe',
         },
         {
           Question: 'Most famous food of Vietnam?',
-          Answer: 'Yes',
-          'One Wrong Choice': 'No',
+          Answer: 'Pho',
+          'One Wrong Choice': 'bread',
         },
       ]
       const expectCorrectAssessmentCount = score / (100 / answersTable.length)
