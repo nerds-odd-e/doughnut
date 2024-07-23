@@ -74,7 +74,16 @@ const testability = () => {
         })
       })
     },
-
+    injectNumberNotes(notebook: string, numberOfNotes: number) {
+      const notes: Record<string, string>[] = [
+        { Topic: notebook },
+        ...new Array(numberOfNotes).fill(0).map((_, index) => ({
+          Topic: `Note about ${index}`,
+          'Parent Topic': notebook,
+        })),
+      ]
+      return this.injectNotes(notes)
+    },
     injectQuizQuestions(quizQuestionTestData: QuizQuestionTestData[]) {
       postToTestabilityApi(cy, 'inject_quiz_questions', {
         body: {
@@ -85,6 +94,18 @@ const testability = () => {
           quizQuestionTestData.length
         )
       })
+    },
+    injectYesNoQuestionsForNumberNotes(numberOfNotes: number) {
+      const quizQuestion: Record<string, string>[] = new Array(numberOfNotes)
+        .fill(0)
+        .map((_, index) => ({
+          'Note Topic': `Note about ${index}`,
+          Question: `Is ${index} * ${index} = ${index * index}?`,
+          Answer: 'Yes',
+          'One Wrong Choice': 'No',
+          Approved: 'true',
+        }))
+      return this.injectQuizQuestions(quizQuestion)
     },
 
     injectLink(type: string, fromNoteTopic: string, toNoteTopic: string) {
