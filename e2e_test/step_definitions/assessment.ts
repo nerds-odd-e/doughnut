@@ -92,8 +92,8 @@ Then(
 )
 
 Given(
-  'I have shared assessment with {int} questions in nootbook {string} with certified by {string}',
-  (numberOfQuestion: number, notebook: string, certifiedBy: string) => {
+  'there is an assessment on nootbook {string} with {int} questions certified by {string}',
+  (notebook: string, numberOfQuestion: number, certifiedBy: string) => {
     const notes: Record<string, string>[] = [
       { Topic: notebook },
       { Topic: 'Singapore', 'Parent Topic': 'Countries' },
