@@ -60,7 +60,7 @@
     "cypress": "13.13.1",
     "cypress-file-upload": "^5.0.8",
     "github_action_sound": "^1.0.5",
-    "got": "^14.4.1",
+    "got": "^14.4.2",
     "jsdom": "^24.1.1",
     "mountebank": "^2.9.1",
     "npm-run-all2": "^6.2.2",
