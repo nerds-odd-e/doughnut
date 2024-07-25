@@ -30,14 +30,14 @@
     "mini-debounce": "^1.0.8",
     "quill": "2.0.2",
     "turndown": "^7.2.0",
-    "vue": "3.4.33",
+    "vue": "3.4.34",
     "vue-content-loader": "2.0.1",
     "vue-router": "4.4.0"
   },
   "devDependencies": {
     "@biomejs/biome": "1.8.3",
     "@farmfe/cli": "^1.0.3",
-    "@farmfe/core": "^1.3.10",
+    "@farmfe/core": "^1.3.11",
     "@farmfe/js-plugin-sass": "^2.9.0",
     "@testing-library/user-event": "^14.5.2",
     "@testing-library/vue": "^8.1.0",
@@ -81,6 +81,6 @@
     "vitest": "2.0.4",
     "vitest-dom": "^0.1.1",
     "vitest-fetch-mock": "^0.3.0",
-    "vue-tsc": "2.0.28"
+    "vue-tsc": "2.0.29"
   }
 }
