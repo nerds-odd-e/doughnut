@@ -72,7 +72,7 @@
     "unplugin-auto-import": "^0.18.2",
     "unplugin-vue-components": "0.27.3",
     "unplugin-vue-router": "^0.10.1",
-    "vite": "5.3.4",
+    "vite": "5.3.5",
     "vite-plugin-checker": "0.7.2",
     "vite-plugin-compression": "^0.5.1",
     "vite-plugin-eslint": "^1.8.1",
