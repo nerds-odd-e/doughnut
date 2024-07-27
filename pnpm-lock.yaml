@@ -219,8 +219,8 @@ importers:
         specifier: ^1.77.6
         version: 1.77.6
       sass-loader:
-        specifier: 14.2.1
-        version: 14.2.1(sass-embedded@1.77.5)(sass@1.77.6)(webpack@5.92.1(esbuild@0.23.0))
+        specifier: 16.0.0
+        version: 16.0.0(sass-embedded@1.77.5)(sass@1.77.6)(webpack@5.92.1(esbuild@0.23.0))
       style-loader:
         specifier: ^4.0.0
         version: 4.0.0(webpack@5.92.1(esbuild@0.23.0))
@@ -4839,8 +4839,8 @@ packages:
     resolution: {integrity: sha512-JQI8aprHDRSNK5exXsbusswTENQPJxW1QWUcLdwuyESoJClT1zo8e+4cmaV5OAU4abcRC6Av4/RmLocPdjcR3A==}
     engines: {node: '>=16.0.0'}
 
-  sass-loader@14.2.1:
-    resolution: {integrity: sha512-G0VcnMYU18a4N7VoNDegg2OuMjYtxnqzQWARVWCIVSZwJeiL9kg8QMsuIZOplsJgTzZLF6jGxI3AClj8I9nRdQ==}
+  sass-loader@16.0.0:
+    resolution: {integrity: sha512-n13Z+3rU9A177dk4888czcVFiC8CL9dii4qpXWUg3YIIgZEvi9TCFKjOQcbK0kJM7DJu9VucrZFddvNfYCPwtw==}
     engines: {node: '>= 18.12.0'}
     peerDependencies:
       '@rspack/core': 0.x || 1.x
@@ -11133,7 +11133,7 @@ snapshots:
       sass-embedded-win32-ia32: 1.77.5
       sass-embedded-win32-x64: 1.77.5
 
-  sass-loader@14.2.1(sass-embedded@1.77.5)(sass@1.77.6)(webpack@5.92.1(esbuild@0.23.0)):
+  sass-loader@16.0.0(sass-embedded@1.77.5)(sass@1.77.6)(webpack@5.92.1(esbuild@0.23.0)):
     dependencies:
       neo-async: 2.6.2
     optionalDependencies:
