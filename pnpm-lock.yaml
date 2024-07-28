@@ -20,11 +20,11 @@ importers:
         specifier: 1.8.0
         version: 1.8.0
       '@badeball/cypress-cucumber-preprocessor':
-        specifier: ^20.1.0
-        version: 20.1.0(cypress@13.13.1)(typescript@5.5.4)
+        specifier: ^20.1.1
+        version: 20.1.1(cypress@13.13.1)(typescript@5.5.4)
       '@bahmutov/cypress-esbuild-preprocessor':
-        specifier: ^2.2.1
-        version: 2.2.1(esbuild@0.23.0)
+        specifier: ^2.2.2
+        version: 2.2.2(esbuild@0.23.0)
       '@biomejs/biome':
         specifier: 1.8.3
         version: 1.8.3
@@ -466,8 +466,8 @@ packages:
   '@badeball/cypress-configuration@6.1.1':
     resolution: {integrity: sha512-0IcJFMiCRo33Ofrvxxojt5QRJWyxApymHuuy981FeXnOGz4UsWKgr/hRupeXkw2cKXvah+j+880kXliygxPOSQ==}
 
-  '@badeball/cypress-cucumber-preprocessor@20.1.0':
-    resolution: {integrity: sha512-K4zm9BAFYxggxld6CXn4B+q3nJLJSQYWArqPQzHSZKZCTLJ0a2qGS4dGrcUqfe8yFbNQ4u9S9OcJzYho5xajRA==}
+  '@badeball/cypress-cucumber-preprocessor@20.1.1':
+    resolution: {integrity: sha512-oskUD3DukTK1OuP+SEo0qsM8aJsHJOxINvWuNh7VF2dSx19wLSGikjbtuiahgbypL1ZvR2/x0kJY6EHCcbrZ1A==}
     engines: {node: '>=18.0.0'}
     hasBin: true
     peerDependencies:
@@ -477,8 +477,8 @@ packages:
       '@cypress/browserify-preprocessor':
         optional: true
 
-  '@bahmutov/cypress-esbuild-preprocessor@2.2.1':
-    resolution: {integrity: sha512-mXbo78bly2VrEro/YeRMM0Q6JHcBSEtbNfuT2nYL2GsTsb2O5fUC6L+kVK/tbenzcXvtpxshHzZ9xFXE41ewWA==}
+  '@bahmutov/cypress-esbuild-preprocessor@2.2.2':
+    resolution: {integrity: sha512-WE1l3gNqMlSd4P0g565u0AgUJvtQo9OtP6pWt46rK/Dxv0NsL56PIsgZGQoWPEjsOslyyCpq4LLip+RL9bqnDA==}
     peerDependencies:
       esbuild: ^0.23.0
 
@@ -2309,6 +2309,15 @@ packages:
 
   debug@4.3.5:
     resolution: {integrity: sha512-pt0bNEmneDIvdL1Xsd9oDQ/wrQRkXDT4AUWlNZNPKvW5x/jyO9VFXkJUP07vQ2upmw5PlaITaPKc31jK13V+jg==}
+    engines: {node: '>=6.0'}
+    peerDependencies:
+      supports-color: '*'
+    peerDependenciesMeta:
+      supports-color:
+        optional: true
+
+  debug@4.3.6:
+    resolution: {integrity: sha512-O/09Bd4Z1fBrU4VzkhFqVgpPzaGbw6Sm9FEkBT1A/YBXQFGuuSxa1dN2nxgxS34JmKXqYx8CZAwEVoJFImUXIg==}
     engines: {node: '>=6.0'}
     peerDependencies:
       supports-color: '*'
@@ -6248,7 +6257,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@badeball/cypress-cucumber-preprocessor@20.1.0(cypress@13.13.1)(typescript@5.5.4)':
+  '@badeball/cypress-cucumber-preprocessor@20.1.1(cypress@13.13.1)(typescript@5.5.4)':
     dependencies:
       '@badeball/cypress-configuration': 6.1.1
       '@cucumber/ci-environment': 10.0.1
@@ -6280,9 +6289,9 @@ snapshots:
       - supports-color
       - typescript
 
-  '@bahmutov/cypress-esbuild-preprocessor@2.2.1(esbuild@0.23.0)':
+  '@bahmutov/cypress-esbuild-preprocessor@2.2.2(esbuild@0.23.0)':
     dependencies:
-      debug: 4.3.5(supports-color@8.1.1)
+      debug: 4.3.6
       esbuild: 0.23.0
     transitivePeerDependencies:
       - supports-color
@@ -8421,6 +8430,10 @@ snapshots:
       ms: 2.1.2
     optionalDependencies:
       supports-color: 8.1.1
+
+  debug@4.3.6:
+    dependencies:
+      ms: 2.1.2
 
   decamelize@4.0.0: {}
 
