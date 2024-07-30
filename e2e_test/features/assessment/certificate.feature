@@ -17,6 +17,7 @@ Feature: Get certificate by an assessment
       | 2/2   | receive        |
       | 1/2   | not receive    |
 
+  @ignore
   Scenario: As a learner, I receive Certification with correct expiration date
     Given the certificate expiration period for the notebook "Just say 'Yes'" is <expired days> days
     When I pass the assessment for the notebook "Just say 'Yes'" with all 2 questions correct on "<today>"

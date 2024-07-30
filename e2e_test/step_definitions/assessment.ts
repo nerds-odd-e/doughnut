@@ -106,7 +106,7 @@ Given(
 When(
   'I pass the assessment for the notebook {string} with all {int} questions correct on {string}',
   (notebook: string, questionCount: number, date: number) => {
-    start.testability().setTodayTo(new Date(date))
+    start.testability().backendTimeTravelToDate(new Date(date))
     start
       .navigateToBazaar()
       .selfAssessmentOnNotebook(notebook)
