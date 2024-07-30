@@ -104,19 +104,22 @@ Given(
 )
 
 When(
-  'I finish the assessment for the notebook {string} with score {int}\\/{int}',
-  (notebook: string, correctAnswers: number, allQuestions: number) => {
+  'I pass the assessment for the notebook {string} with all {int} questions correct on {string}',
+  (notebook: string, questionCount: number, date: number) => {
+    start.testability().setTodayTo(new Date(date))
     start
       .navigateToBazaar()
       .selfAssessmentOnNotebook(notebook)
-      .answerYesNoQuestionsByScore(correctAnswers, allQuestions)
+      .answerYesNoQuestionsByScore(questionCount, questionCount)
   }
 )
 
 Then(
-  'I should receive my {string} certificate with the issue date today and expiring on {string}',
-  (notebook: string, expiredDate: string) => {
-    start.assumeAssessmentPage(notebook).getExpiredDate(expiredDate)
+  'I should receive my {string} certificate with the issue date {string} and expiring on {string}',
+  (notebook: string, certificateDate: string, expiredDate: string) => {
+    start
+      .assumeAssessmentPage(notebook)
+      .getExpiredDate(certificateDate, expiredDate)
   }
 )
 

@@ -63,8 +63,9 @@ export const assumeAssessmentPage = (notebook?: string) => {
       cy.contains(notebook)
       if (expirationDate) cy.findByText(expirationDate)
     },
-    getExpiredDate(expiredDate: string) {
+    getExpiredDate(certficateDate: string, expiredDate: string) {
       cy.findByRole('button', { name: 'Get Certificate' }).click()
+      cy.findByText(certficateDate)
       cy.findByText(expiredDate)
     },
     expectNotPassAssessment() {

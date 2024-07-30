@@ -19,9 +19,8 @@ Feature: Get certificate by an assessment
 
   Scenario: As a learner, I receive Certification with correct expiration date
     Given the certificate expiration period for the notebook "Just say 'Yes'" is <expired days> days
-    And today is "<today>"
-    When I finish the assessment for the notebook "Just say 'Yes'" with score 2/2
-    Then I should receive my "Just say 'Yes'" certificate with the issue date today and expiring on "<expiration date>"
+    When I pass the assessment for the notebook "Just say 'Yes'" with all 2 questions correct on "<today>"
+    Then I should receive my "Just say 'Yes'" certificate with the issue date "<today>" and expiring on "<expiration date>"
 
     Examples:
       | today      | expired days | expiration date |
