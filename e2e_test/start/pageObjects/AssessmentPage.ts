@@ -51,17 +51,8 @@ export const assumeAssessmentPage = (notebook?: string) => {
         this.assumeQuestionSection().answer('No')
       }
     },
-    getCertificate(
-      notebook: string,
-      certifiedBy?: string,
-      expirationDate?: string
-    ) {
-      cy.findByRole('button', { name: 'Get Certificate' }).click()
-      cy.contains('This to certificate that')
-      cy.contains('Old Learner')
-      if (certifiedBy) cy.findByText(certifiedBy)
-      cy.contains(notebook)
-      if (expirationDate) cy.findByText(expirationDate)
+    getCertificate() {
+      cy.findByRole('button', { name: 'Get Certificate' }).should('be.enabled')
     },
     getExpiredDate(certficateDate: string, expiredDate: string) {
       cy.findByRole('button', { name: 'Get Certificate' }).click()

@@ -35,14 +35,11 @@ export const routerToNotebooksPage = () => {
     updateAssessmentSettings(
       notebook: string,
       numberOfQuestion: number,
-      certifiedBy?: string
     ) {
       this.findNotebookCardButton(notebook, 'Edit notebook settings').click()
       cy.formField('Number Of Questions In Assessment').assignFieldValue(
         `${numberOfQuestion}`
       )
-      if (certifiedBy)
-        cy.formField('Certified By').assignFieldValue(`${certifiedBy}`)
       cy.findByRole('button', { name: 'Update' }).click()
     },
     updateAssessmentSettingsCertificatePeriod(

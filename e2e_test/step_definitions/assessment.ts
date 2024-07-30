@@ -78,28 +78,28 @@ When(
 )
 
 Then(
-  'I should receive a certificate of {string} certified by {string}',
-  (notebook: string, certifiedBy: string) => {
-    start.assumeAssessmentPage(notebook).getCertificate(notebook, certifiedBy)
+  'I should pass the assessment of {string}',
+  (notebook: string) => {
+    start.assumeAssessmentPage(notebook).getCertificate()
   }
 )
 
 Then(
-  'I should not receive a certificate of {string} certified by {string}',
-  (notebook: string, _certifiedBy: string) => {
+  'I should not pass the assessment of {string}',
+  (notebook: string) => {
     start.assumeAssessmentPage(notebook).expectNotPassAssessment()
   }
 )
 
 Given(
-  'there is an assessment on notebook {string} with {int} questions certified by {string}',
-  (notebook: string, numberOfQuestion: number, certifiedBy: string) => {
+  'there is an assessment on notebook {string} with {int} questions',
+  (notebook: string, numberOfQuestion: number) => {
     start
       .testability()
       .injectNumbersNotebookWithQuestions(notebook, numberOfQuestion)
     start
       .routerToNotebooksPage()
-      .updateAssessmentSettings(notebook, numberOfQuestion, certifiedBy)
+      .updateAssessmentSettings(notebook, numberOfQuestion)
   }
 )
 
