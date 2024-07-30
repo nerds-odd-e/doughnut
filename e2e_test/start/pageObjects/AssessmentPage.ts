@@ -18,12 +18,6 @@ const assumeQuestionSection = () => {
         return this.answer(row!.Answer ?? '')
       })
     },
-    answerWrongFromTable(answersTable: Record<string, string>[]) {
-      return this.getStemText().then((stem) => {
-        const row = answersTable.find((row) => row.Question === stem)
-        return this.answer(row!['One Wrong Choice'] ?? '')
-      })
-    },
     answer(answer: string) {
       return cy.findByText(answer).click()
     },
@@ -66,9 +60,9 @@ export const assumeAssessmentPage = (notebook?: string) => {
       let correctAnswer = 0
       for (let i = 0; i < answersTable.length; i++) {
         if (correctAnswer >= expectCorrectAssessmentCount) {
-          this.assumeQuestionSection().answerWrongFromTable(answersTable)
+          this.assumeQuestionSection().answer('No')
         } else {
-          this.assumeQuestionSection().answerFromTable(answersTable)
+          this.assumeQuestionSection().answer('Yes')
           correctAnswer += 1
         }
       }

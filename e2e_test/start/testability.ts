@@ -107,7 +107,14 @@ const testability = () => {
         }))
       return this.injectQuizQuestions(quizQuestion)
     },
-
+    injectNumbersNotebookWithQuestions(
+      notebook: string,
+      numberOfQuestion: number
+    ) {
+      this.injectNumberNotes(notebook, numberOfQuestion)
+      this.injectYesNoQuestionsForNumberNotes(numberOfQuestion)
+      this.shareToBazaar(notebook)
+    },
     injectLink(type: string, fromNoteTopic: string, toNoteTopic: string) {
       cy.get(`@${injectedNoteIdMapAliasName}`).then((injectedNoteIdMap) => {
         expect(injectedNoteIdMap).haveOwnPropertyDescriptor(fromNoteTopic)

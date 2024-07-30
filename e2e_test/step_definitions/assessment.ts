@@ -94,12 +94,12 @@ Then(
 Given(
   'there is an assessment on notebook {string} with {int} questions certified by {string}',
   (notebook: string, numberOfQuestion: number, certifiedBy: string) => {
-    start.testability().injectNumberNotes(notebook, numberOfQuestion)
-    start.testability().injectYesNoQuestionsForNumberNotes(numberOfQuestion)
+    start
+      .testability()
+      .injectNumbersNotebookWithQuestions(notebook, numberOfQuestion)
     start
       .routerToNotebooksPage()
       .updateAssessmentSettings(notebook, numberOfQuestion, certifiedBy)
-    start.testability().shareToBazaar(notebook)
   }
 )
 
