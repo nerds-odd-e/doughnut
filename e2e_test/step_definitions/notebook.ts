@@ -49,15 +49,6 @@ Given(
   }
 )
 
-When(
-  'the certificate expiration period for the notebook {string} is {int} days',
-  (notebook: string, untilCerExpire: number) => {
-    start
-      .routerToNotebooksPage()
-      .updateAssessmentSettingsCertificatePeriod(notebook, untilCerExpire)
-  }
-)
-
 Then(
   'I should see the expiration period of the notebook {string} to {int}',
   (notebook: string, untilCertExpire: number) => {

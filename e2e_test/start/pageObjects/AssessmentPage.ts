@@ -51,13 +51,8 @@ export const assumeAssessmentPage = (notebook?: string) => {
         this.assumeQuestionSection().answer('No')
       }
     },
-    getCertificate() {
+    passAssessment() {
       cy.findByRole('button', { name: 'Get Certificate' }).should('be.enabled')
-    },
-    getExpiredDate(certficateDate: string, expiredDate: string) {
-      cy.findByRole('button', { name: 'Get Certificate' }).click()
-      cy.findByText(certficateDate)
-      cy.findByText(expiredDate)
     },
     expectNotPassAssessment() {
       cy.findByRole('button', { name: 'Get Certificate' }).should('be.disabled')

@@ -77,19 +77,13 @@ When(
   }
 )
 
-Then(
-  'I should pass the assessment of {string}',
-  (notebook: string) => {
-    start.assumeAssessmentPage(notebook).getCertificate()
-  }
-)
+Then('I should pass the assessment of {string}', (notebook: string) => {
+  start.assumeAssessmentPage(notebook).passAssessment()
+})
 
-Then(
-  'I should not pass the assessment of {string}',
-  (notebook: string) => {
-    start.assumeAssessmentPage(notebook).expectNotPassAssessment()
-  }
-)
+Then('I should not pass the assessment of {string}', (notebook: string) => {
+  start.assumeAssessmentPage(notebook).expectNotPassAssessment()
+})
 
 Given(
   'there is an assessment on notebook {string} with {int} questions',
@@ -100,34 +94,5 @@ Given(
     start
       .routerToNotebooksPage()
       .updateAssessmentSettings(notebook, numberOfQuestion)
-  }
-)
-
-When(
-  'I pass the assessment for the notebook {string} with all {int} questions correct on {string}',
-  (notebook: string, questionCount: number, date: number) => {
-    start.testability().backendTimeTravelToDate(new Date(date))
-    start
-      .navigateToBazaar()
-      .selfAssessmentOnNotebook(notebook)
-      .answerYesNoQuestionsByScore(questionCount, questionCount)
-  }
-)
-
-Then(
-  'I should receive my {string} certificate with the issue date {string} and expiring on {string}',
-  (notebook: string, certificateDate: string, expiredDate: string) => {
-    start
-      .assumeAssessmentPage(notebook)
-      .getExpiredDate(certificateDate, expiredDate)
-  }
-)
-
-Then(
-  'I should receive my certification of the {string} with a {string}',
-  (notebook: string, newExpirationDate: string) => {
-    start
-      .assumeAssessmentPage(notebook)
-      .getCertificate(notebook, undefined, newExpirationDate)
   }
 )
