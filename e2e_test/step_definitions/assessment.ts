@@ -68,12 +68,12 @@ Given(
 )
 
 When(
-  'I get {int} percent score when do the assessment on {string}',
-  (score: number, notebook: string) => {
+  'I get score {int}\\/{int} when do the assessment on {string}',
+  (correctAnswers: number, allQuestions: number, notebook: string) => {
     start
       .navigateToBazaar()
       .selfAssessmentOnNotebook(notebook)
-      .answerQuestionsByScore(score)
+      .answerYesNoQuestionsByScore(correctAnswers, allQuestions)
   }
 )
 
@@ -104,12 +104,12 @@ Given(
 )
 
 When(
-  'I finish the assessment for the notebook {string} with score {int}',
-  (notebook: string, score: number) => {
+  'I finish the assessment for the notebook {string} with score {int}\\/{int}',
+  (notebook: string, correctAnswers: number, allQuestions: number) => {
     start
       .navigateToBazaar()
       .selfAssessmentOnNotebook(notebook)
-      .answerQuestionsByScore(score)
+      .answerYesNoQuestionsByScore(correctAnswers, allQuestions)
   }
 )
 

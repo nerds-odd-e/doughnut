@@ -43,28 +43,12 @@ export const assumeAssessmentPage = (notebook?: string) => {
         this.assumeQuestionSection().answerFromTable(answersTable)
       }
     },
-    answerQuestionsByScore(score: number) {
-      const answersTable: Record<string, string>[] = [
-        {
-          Question: 'Where in the world is Singapore?',
-          Answer: 'Yes',
-          'One Wrong Choice': 'No',
-        },
-        {
-          Question: 'Most famous food of Vietnam?',
-          Answer: 'Yes',
-          'One Wrong Choice': 'No',
-        },
-      ]
-      const expectCorrectAssessmentCount = score / (100 / answersTable.length)
-      let correctAnswer = 0
-      for (let i = 0; i < answersTable.length; i++) {
-        if (correctAnswer >= expectCorrectAssessmentCount) {
-          this.assumeQuestionSection().answer('No')
-        } else {
-          this.assumeQuestionSection().answer('Yes')
-          correctAnswer += 1
-        }
+    answerYesNoQuestionsByScore(correctAnswers: number, allQuestions: number) {
+      for (let i = 0; i < correctAnswers; i++) {
+        this.assumeQuestionSection().answer('Yes')
+      }
+      for (let i = correctAnswers; i < allQuestions; i++) {
+        this.assumeQuestionSection().answer('No')
       }
     },
     getCertificate(
