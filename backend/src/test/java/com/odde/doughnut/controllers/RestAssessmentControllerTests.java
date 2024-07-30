@@ -12,6 +12,7 @@ import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.NoteBuilder;
 import com.theokanning.openai.client.OpenAiApi;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -231,6 +232,34 @@ public class RestAssessmentControllerTests {
 
       assertEquals(answerSubmissions.size(), assessmentResult.getTotalCount());
       assertEquals(3, assessmentResult.getCorrectCount());
+    }
+
+    @Test
+    void shouldCreateNewAssessmentAttempt() throws UnexpectedNoAccessRightException {
+      makeMe.theNote(topNote).withNChildrenThat(3, NoteBuilder::hasAnApprovedQuestion).please();
+      notebook = topNote.getNotebook();
+      notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(3);
+
+      for (Note note : notebook.getNotes()) {
+        QuizQuestionAndAnswer quizQuestionAndAnswer = note.getQuizQuestionAndAnswers().get(0);
+        quizQuestionAndAnswer.setCorrectAnswerIndex(1);
+
+        AnswerSubmission answerSubmission = new AnswerSubmission();
+        answerSubmission.setQuestionId(quizQuestionAndAnswer.getId());
+
+        answerSubmission.setAnswerId(0);
+        answerSubmission.setCorrectAnswers(true);
+        answerSubmissions.add(answerSubmission);
+      }
+
+      Timestamp timestamp = makeMe.aTimestamp().please();
+      testabilitySettings.timeTravelTo(timestamp);
+      controller.submitAssessmentResult(notebook, answerSubmissions);
+      AssessmentAttempt assessmentAttempt =
+          makeMe.modelFactoryService.assessmentAttemptRepository.findAll().iterator().next();
+
+      assertEquals(3, assessmentAttempt.getAnswersCorrect());
+      assertEquals(timestamp, assessmentAttempt.getSubmittedAt());
     }
 
     @Test
