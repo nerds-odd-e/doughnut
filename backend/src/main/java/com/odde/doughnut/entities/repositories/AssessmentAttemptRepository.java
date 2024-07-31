@@ -8,6 +8,6 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface AssessmentAttemptRepository extends CrudRepository<AssessmentAttempt, Integer> {
 
-  int countAssessmentAttemptHistoriesByNotebookAndUserAndSubmittedAtBetween(
+  int countByNotebookAndUserAndSubmittedAtBetween(
       Notebook notebook, User user, Timestamp beginSubmittedAt, Timestamp endSubmittedAt);
 }

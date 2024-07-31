@@ -108,12 +108,11 @@ public class UserModel implements ReviewScope {
       throws AssessmentAttemptLimitException {
 
     int count =
-        modelFactoryService.assessmentAttemptRepository
-            .countAssessmentAttemptHistoriesByNotebookAndUserAndSubmittedAtBetween(
-                notebook,
-                entity,
-                TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, -24),
-                currentUTCTimestamp);
+        modelFactoryService.assessmentAttemptRepository.countByNotebookAndUserAndSubmittedAtBetween(
+            notebook,
+            entity,
+            TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, -24),
+            currentUTCTimestamp);
     int limit = assessmentAttemptsLimit == null ? 3 : assessmentAttemptsLimit;
     if (count >= limit) {
       throw new AssessmentAttemptLimitException("");
