@@ -13,12 +13,6 @@
       v-model="formData.numberOfQuestionsInAssessment"
       :errors="errors.numberOfQuestionsInAssessment"
     />
-    <TextInput
-      scope-name="notebook"
-      field="certifiedBy"
-      v-model="formData.certifiedBy"
-      :errors="errors.certifiedBy"
-    />
     <button class="btn btn-primary btn-layout" @click="processForm">
       Update
     </button>
@@ -37,13 +31,12 @@ export default {
   props: { notebook: Object },
   components: { CheckInput, TextInput },
   data() {
-    const { skipReviewEntirely, numberOfQuestionsInAssessment, certifiedBy } =
+    const { skipReviewEntirely, numberOfQuestionsInAssessment } =
       this.notebook.notebookSettings
     return {
       formData: {
         skipReviewEntirely,
         numberOfQuestionsInAssessment,
-        certifiedBy,
       },
       errors: {},
     }
@@ -56,10 +49,6 @@ export default {
           this.$router.go()
         })
         .catch((err) => (this.errors = err))
-    },
-    sanitizeInput(event) {
-      const value = event.target.value
-      event.target.value = value === "0" ? "0" : value.replace(/^0+/, "")
     },
   },
 }
