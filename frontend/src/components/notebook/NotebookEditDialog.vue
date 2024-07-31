@@ -53,21 +53,3 @@ export default {
   },
 }
 </script>
-<style>
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-.form-container {
-  display: flex;
-  flex-direction: column;
-  row-gap: 12px;
-}
-
-.btn-layout {
-  width: 100px;
-  align-self: center;
-}
-</style>
