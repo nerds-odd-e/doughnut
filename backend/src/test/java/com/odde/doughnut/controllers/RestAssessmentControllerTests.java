@@ -7,13 +7,13 @@ import com.odde.doughnut.controllers.dto.AssessmentResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.NoteBuilder;
 import com.theokanning.openai.client.OpenAiApi;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -169,7 +169,7 @@ public class RestAssessmentControllerTests {
       makeMe.theNote(topNote).withNChildrenThat(5, NoteBuilder::hasAnApprovedQuestion).please();
       notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(5);
 
-      var now = LocalDateTime.now();
+      var now = testabilitySettings.getCurrentUTCTimestamp();
       for (int i = 0; i < 3; i++) {
         makeMe.aAssessmentAttempt(currentUser.getEntity(), notebook, now).please();
       }
@@ -184,12 +184,12 @@ public class RestAssessmentControllerTests {
       makeMe.theNote(topNote).withNChildrenThat(5, NoteBuilder::hasAnApprovedQuestion).please();
       notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(5);
 
-      var now = LocalDateTime.now();
+      var now = testabilitySettings.getCurrentUTCTimestamp();
       for (int i = 0; i < 2; i++) {
         makeMe.aAssessmentAttempt(currentUser.getEntity(), notebook, now).please();
       }
 
-      var yesterday = LocalDateTime.now().minusDays(1);
+      var yesterday = TimestampOperations.addHoursToTimestamp(now, -24);
       makeMe.aAssessmentAttempt(currentUser.getEntity(), notebook, yesterday).please();
 
       List<QuizQuestion> assessment = controller.generateAssessmentQuestions(notebook);
