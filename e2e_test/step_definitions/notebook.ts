@@ -89,7 +89,7 @@ Then(
   (notebook: string) => {
     start
       .testability()
-      .backendTimeTravelRelativeToNow(24)
+      .backendTimeTravelRelativeToNow(25)
       .then(() => {
         start
           .navigateToBazaar()

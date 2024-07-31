@@ -2818,10 +2818,6 @@ components:
           readOnly: true
         wikidataId:
           type: string
-        quizQuestionAndAnswers:
-          type: array
-          items:
-            $ref: "#/components/schemas/QuizQuestionAndAnswer"
     NoteTopic:
       required:
       - id
