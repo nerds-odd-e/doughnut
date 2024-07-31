@@ -65,12 +65,12 @@ When(
       ['Question', 'Answer'],
       ['Where in the world is Singapore?', 'Asia'],
     ])
-    for (let count = 0; count < numberOfAttempts; count++) {
+    Cypress._.times(numberOfAttempts, () => {
       start
         .navigateToBazaar()
         .selfAssessmentOnNotebook(notebook)
         .answerQuestionsFromTable(table.hashes())
-    }
+    })
   }
 )
 
