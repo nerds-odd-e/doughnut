@@ -41,9 +41,10 @@ export const assumeAssessmentPage = (notebook?: string) => {
       cy.contains(expectedScore)
     },
     answerQuestionsFromTable(answersTable: Record<string, string>[]) {
-      for (let i = 0; i < answersTable.length; i++) {
+      Cypress._.times(answersTable.length, () => {
         this.assumeQuestionSection().answerFromTable(answersTable)
-      }
+      })
+      cy.pageIsNotLoading()
     },
     answerYesNoQuestionsByScore(correctAnswers: number, allQuestions: number) {
       for (let i = 0; i < correctAnswers; i++) {
