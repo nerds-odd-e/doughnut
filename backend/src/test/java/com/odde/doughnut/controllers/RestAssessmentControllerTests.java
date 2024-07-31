@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.dto.AnswerSubmission;
 import com.odde.doughnut.controllers.dto.AssessmentResult;
+import com.odde.doughnut.controllers.dto.Randomization;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -37,6 +38,7 @@ public class RestAssessmentControllerTests {
 
   @BeforeEach
   void setup() {
+    testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
     currentUser = makeMe.aUser().toModelPlease();
     controller =
         new RestAssessmentController(
@@ -61,6 +63,7 @@ public class RestAssessmentControllerTests {
 
     @BeforeEach
     void setup() {
+      testabilitySettings.setRandomization(new Randomization(Randomization.RandomStrategy.seed, 1));
       topNote = makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser).please();
       notebook = topNote.getNotebook();
       notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(1);
@@ -189,7 +192,7 @@ public class RestAssessmentControllerTests {
         makeMe.aAssessmentAttempt(currentUser.getEntity(), notebook, now).please();
       }
 
-      var yesterday = TimestampOperations.addHoursToTimestamp(now, -24);
+      var yesterday = TimestampOperations.addHoursToTimestamp(now, -25);
       makeMe.aAssessmentAttempt(currentUser.getEntity(), notebook, yesterday).please();
 
       List<QuizQuestion> assessment = controller.generateAssessmentQuestions(notebook);

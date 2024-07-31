@@ -1,7 +1,7 @@
 <template>
   <div>
     <h3>Assessment For {{ topicConstructor }} </h3>
-    <h5>If you achieve a score of more than {{ passCriteriaPercentage }}%, then you will receive the certificate</h5>
+    <h5>Passing criteria: {{ passCriteriaPercentage }}%</h5>
     <div>
       <div v-if="errors != ''">
         {{ errors }}
@@ -13,9 +13,12 @@
       />
       <div v-else-if="assessmentCompleted">
         <p>Your score: {{ correctAnswers }} / {{ quizQuestions.length }}</p>
-        <button :disabled="!assessmentPassed" class="btn btn-primary" @click="routeToCertificatePage()">
-          Get Certificate
-        </button>
+        <div class="alert alert-success" v-if="assessmentPassed">
+          You have passed the assessment.
+        </div>
+        <div class="alert alert-danger" v-else>
+          You have not passed the assessment.
+        </div>
       </div>
     </div>
   </div>
@@ -93,13 +96,6 @@ const generateAssessmentQuestions = () => {
       }
       errors.value = res.body.message
     })
-}
-
-const routeToCertificatePage = () => {
-  router.push({
-    name: "certificate",
-    params: { notebookId: props.notebookId },
-  })
 }
 
 onMounted(() => {

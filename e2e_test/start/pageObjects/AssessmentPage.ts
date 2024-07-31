@@ -54,10 +54,10 @@ export const assumeAssessmentPage = (notebook?: string) => {
       }
     },
     passAssessment() {
-      cy.findByRole('button', { name: 'Get Certificate' }).should('be.enabled')
+      cy.findByText('You have passed the assessment.').should('be.visible')
     },
     expectNotPassAssessment() {
-      cy.findByRole('button', { name: 'Get Certificate' }).should('be.disabled')
+      cy.findByText('You have not passed the assessment.').should('be.visible')
     },
     expectReachedLimit() {
       cy.findByText(
