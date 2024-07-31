@@ -13,18 +13,6 @@
       v-model="formData.numberOfQuestionsInAssessment"
       :errors="errors.numberOfQuestionsInAssessment"
     />
-    <div>
-      <label for="untilCertExpire">Until Cert Expire (in days)</label>
-      <input
-        type="number"
-        id="untilCertExpire"
-        v-model.number="formData.untilCertExpire"
-        class="form-control"
-        @input="sanitizeInput"
-        min="0"
-        oninput="validity.valid||(value='');"
-      />
-    </div>
     <TextInput
       scope-name="notebook"
       field="certifiedBy"
@@ -52,14 +40,12 @@ export default {
     const {
       skipReviewEntirely,
       numberOfQuestionsInAssessment,
-      untilCertExpire,
       certifiedBy,
     } = this.notebook.notebookSettings
     return {
       formData: {
         skipReviewEntirely,
         numberOfQuestionsInAssessment,
-        untilCertExpire,
         certifiedBy,
       },
       errors: {},
@@ -77,7 +63,6 @@ export default {
     sanitizeInput(event) {
       const value = event.target.value
       event.target.value = value === "0" ? "0" : value.replace(/^0+/, "")
-      this.formData.untilCertExpire = event.target.value
     },
   },
 }

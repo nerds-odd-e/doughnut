@@ -49,15 +49,6 @@ Given(
   }
 )
 
-Then(
-  'I should see the expiration period of the notebook {string} to {int}',
-  (notebook: string, untilCertExpire: number) => {
-    start
-      .routerToNotebooksPage()
-      .expectPeriodCertification(notebook, untilCertExpire)
-  }
-)
-
 Given(
   'There is a notebook {string} and number of questions in assessment is set to {int}',
   (notebook: string, numberOfQuestion: number) => {
