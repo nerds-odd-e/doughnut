@@ -104,19 +104,16 @@ public class UserModel implements ReviewScope {
     getAuthorization().assertLoggedIn();
   }
 
-  public void assertAssessmentAttempt(Notebook notebook) throws AssessmentAttemptLimitException {
-    var zoneId = ZoneId.of("UTC");
-    var now = LocalDate.now(zoneId);
-    var begin = now.atStartOfDay(zoneId);
-    var end = now.atTime(LocalTime.MAX).atZone(zoneId);
+  public void assertAssessmentAttempt(Notebook notebook, Timestamp currentUTCTimestamp)
+      throws AssessmentAttemptLimitException {
 
     int count =
         modelFactoryService.assessmentAttemptRepository
             .countAssessmentAttemptHistoriesByNotebookAndUserAndSubmittedAtBetween(
                 notebook,
                 entity,
-                Timestamp.valueOf(begin.toLocalDateTime()),
-                Timestamp.valueOf(end.toLocalDateTime()));
+                TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, -24),
+                currentUTCTimestamp);
     int limit = assessmentAttemptsLimit == null ? 3 : assessmentAttemptsLimit;
     if (count >= limit) {
       throw new AssessmentAttemptLimitException("");

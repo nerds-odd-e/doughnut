@@ -27,7 +27,9 @@ const postToTestabilityApiSuccessfully = (
   path: string,
   options: { body?: Record<string, unknown>; failOnStatusCode?: boolean }
 ) => {
-  postToTestabilityApi(cy, path, options).its('status').should('equal', 200)
+  return postToTestabilityApi(cy, path, options)
+    .its('status')
+    .should('equal', 200)
 }
 
 const cleanAndReset = (cy: Cypress.cy & CyEventEmitter, countdown: number) => {
@@ -188,9 +190,13 @@ const testability = () => {
     },
 
     backendTimeTravelRelativeToNow(hours: number) {
-      postToTestabilityApiSuccessfully(cy, 'time_travel_relative_to_now', {
-        body: { hours: JSON.stringify(hours) },
-      })
+      return postToTestabilityApiSuccessfully(
+        cy,
+        'time_travel_relative_to_now',
+        {
+          body: { hours: JSON.stringify(hours) },
+        }
+      )
     },
 
     randomizerSettings(strategy: 'first' | 'last' | 'seed', seed: number) {

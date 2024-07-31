@@ -48,6 +48,7 @@ class TestabilityRestController {
     createUser("another_old_learner", "Another Old Learner");
     createUser("admin", "admin");
     createUser("non_admin", "Non Admin");
+    testabilitySettings.timeTravelTo(null);
     testabilitySettings.setUseRealGithub(false);
     testabilitySettings.enableFeatureToggle(false);
     testabilitySettings.setRandomization(new Randomization(Randomization.RandomStrategy.first, 0));

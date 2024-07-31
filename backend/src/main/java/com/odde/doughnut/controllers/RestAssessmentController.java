@@ -46,7 +46,7 @@ class RestAssessmentController {
     currentUser.assertLoggedIn();
     currentUser.assertReadAuthorization(notebook);
     try {
-      currentUser.assertAssessmentAttempt(notebook);
+      currentUser.assertAssessmentAttempt(notebook, testabilitySettings.getCurrentUTCTimestamp());
     } catch (AssessmentAttemptLimitException e) {
       throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
     }

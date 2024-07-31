@@ -86,6 +86,21 @@ Then(
 )
 
 Then(
+  'I should be able to do assessment of the notebook {string} again the next day',
+  (notebook: string) => {
+    start
+      .testability()
+      .backendTimeTravelRelativeToNow(24)
+      .then(() => {
+        start
+          .navigateToBazaar()
+          .selfAssessmentOnNotebook(notebook)
+          .expectQuestion('Where in the world is Singapore?')
+      })
+  }
+)
+
+Then(
   'I should be able to approve question {string} on notebook {string}',
   (question: string, notebook: string) => {
     start
