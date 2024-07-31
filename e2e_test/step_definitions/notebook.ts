@@ -50,9 +50,8 @@ Given(
 )
 
 Given(
-  'There is a notebook {string} and number of questions in assessment is set to {int}',
+  'the number of questions in assessment for notebook {string} is {int}',
   (notebook: string, numberOfQuestion: number) => {
-    start.navigateToBazaar().expectNotebook(notebook)
     start
       .routerToNotebooksPage()
       .updateAssessmentSettings(notebook, numberOfQuestion)
