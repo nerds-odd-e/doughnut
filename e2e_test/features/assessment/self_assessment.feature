@@ -46,9 +46,8 @@ Feature: Self assessment
     When I start the assessment on the "Countries" notebook in the bazaar
     Then I should see message that says "Please login first"
 
-  Scenario: Perform an assessment more than the limit per day
-    Given There is a notebook "Countries" and number of questions in assessment is set to 1 
-    And I have done the assessment of the notebook "Countries" 3 times
-    When I try to do assessment of the notebook "Countries" again
-    Then I should not be able to do anymore assessment of the notebook "Countries" today
+  Scenario: One user cannot perform an assessment more than 3 times per day
+    Given There is a notebook "Countries" and number of questions in assessment is set to 1
+    When I have done the assessment of the notebook "Countries" 3 times
+    Then I should not be able to do assessment of the notebook "Countries" any more today
 

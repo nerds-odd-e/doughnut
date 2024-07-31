@@ -75,19 +75,13 @@ When(
   }
 )
 
-When(
-  'I try to do assessment of the notebook {string} again',
-  (notebook: string) => {
-    start.navigateToBazaar().selfAssessmentOnNotebook(notebook)
-  }
-)
-
 Then(
-  'I should not be able to do anymore assessment of the notebook {string} today',
-  (_notebook: string) => {
-    cy.findByText(
-      'You have reached the assessment limit for today. Please try again tomorrow.'
-    )
+  'I should not be able to do assessment of the notebook {string} any more today',
+  (notebook: string) => {
+    start
+      .navigateToBazaar()
+      .selfAssessmentOnNotebook(notebook)
+      .expectReachedLimit()
   }
 )
 

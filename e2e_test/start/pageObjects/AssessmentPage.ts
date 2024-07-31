@@ -1,3 +1,5 @@
+import { assumeBazaarPage } from './bazaarPage'
+
 const assumeQuestionSection = () => {
   return {
     getQuestionSection() {
@@ -56,6 +58,13 @@ export const assumeAssessmentPage = (notebook?: string) => {
     },
     expectNotPassAssessment() {
       cy.findByRole('button', { name: 'Get Certificate' }).should('be.disabled')
+    },
+    expectReachedLimit() {
+      cy.findByText(
+        'You have reached the assessment limit for today. Please try again tomorrow.'
+      )
+      cy.findByRole('button', { name: 'OK' }).click()
+      assumeBazaarPage()
     },
   }
 }
