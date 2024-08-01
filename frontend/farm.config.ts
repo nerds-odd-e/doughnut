@@ -1,5 +1,6 @@
 import { URL, fileURLToPath } from 'node:url'
 import { defineConfig } from '@farmfe/core'
+import farmPluginSass from '@farmfe/plugin-sass'
 import farmJsPluginSass from '@farmfe/js-plugin-sass'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
@@ -12,6 +13,7 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 
 export default defineConfig({
   plugins: [
+    farmPluginSass(),
     farmJsPluginSass(),
   ],
   vitePlugins: [

@@ -37,8 +37,9 @@
   "devDependencies": {
     "@biomejs/biome": "1.8.3",
     "@farmfe/cli": "^1.0.3",
-    "@farmfe/core": "^1.3.11",
+    "@farmfe/core": "^1.3.12",
     "@farmfe/js-plugin-sass": "^2.9.0",
+    "@farmfe/plugin-sass": "^1.1.0",
     "@testing-library/user-event": "^14.5.2",
     "@testing-library/vue": "^8.1.0",
     "@types/lodash": "^4.17.7",
