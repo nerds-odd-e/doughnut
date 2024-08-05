@@ -30,44 +30,6 @@ mysql-repo-key:
     - require_in:
       - pkgrepo: mysql-repo
 
-/etc/caddy/Caddyfile:
-  file.managed:
-    - source: salt://base_os/templates/Caddyfile
-    - user: root
-    - group: root
-    - mode: 644
-    - require_in:
-      - service: caddy-service
-
-caddy-repo:
-  pkgrepo.managed:
-    - name: deb [signed-by=/usr/share/keyrings/caddy-stable-archive-keyring.gpg] https://dl.cloudsmith.io/public/caddy/stable/deb/debian any-version main
-    - file: /etc/apt/sources.list.d/caddy-stable.list
-    - key_url: https://dl.cloudsmith.io/public/caddy/stable/gpg.key
-    - aptkey: False
-    - gpgcheck: 1
-    - require_in:
-      - pkg: doughnut-app-deps
-
-caddy-repo-key:
-  file.managed:
-    - name: /usr/share/keyrings/caddy-stable-archive-keyring.gpg
-    - source: https://dl.cloudsmith.io/public/caddy/stable/gpg.key
-    - skip_verify: True
-    - mode: 644
-    - user: root
-    - group: root
-    - require_in:
-      - pkgrepo: caddy-repo
-
-caddy-service:
-  service.running:
-    - name: caddy
-    - enable: True
-    - reload: True
-    - watch:
-        - file: /etc/caddy/Caddyfile
-
 doughnut-app-deps:
   pkg.installed:
     - normalize: True
@@ -79,7 +41,6 @@ doughnut-app-deps:
     - pkgs:
         - apt-transport-https
         - ca-certificates
-        - caddy
         - debian-keyring
         - debian-archive-keyring
         - openssl
@@ -93,7 +54,6 @@ doughnut-app-deps:
       - cmd: os-dist-upgrade
       - cmd: doughnut-jre
       - file: /etc/profile.d/doughnut_env.sh
-      - service: caddy-service
 
 zulu{{ pillar['doughnut_app']['jre_version'] }}-linux_amd64.deb:
   file.managed:
@@ -102,7 +62,6 @@ zulu{{ pillar['doughnut_app']['jre_version'] }}-linux_amd64.deb:
     - skip_verify: True
     - require_in:
       - cmd: install-jre
-      - service: caddy-service
 
 install-jre:
   cmd.run:

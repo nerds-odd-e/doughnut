@@ -1,4 +1,0 @@
-doughnut.odd-e.com {
-    tls nerds@odd-e.com
-    reverse_proxy localhost:8081
-}
