@@ -2601,10 +2601,6 @@ paths:
                 type: string
         "200":
           description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/QuizQuestionAndAnswer"
 components:
   schemas:
     Circle:
