@@ -510,9 +510,10 @@ class RestQuizQuestionAndAnswerControllerTests {
 
     @Test
     void persistent() throws UnexpectedNoAccessRightException {
-      QuizQuestionAndAnswer questionAndAnswer = makeMe.aQuestion().please();
-      Note note = questionAndAnswer.getNote();
-      controller.deleteQuestion(note, questionAndAnswer);
+      Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
+      QuizQuestionAndAnswer mcqWithAnswer = makeMe.aQuestion().please();
+      mcqWithAnswer.setNote(note);
+      controller.deleteQuestion(note, mcqWithAnswer);
       makeMe.refresh(note);
       assertThat(note.getQuizQuestionAndAnswers(), hasSize(0));
     }
