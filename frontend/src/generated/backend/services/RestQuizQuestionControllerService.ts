@@ -4,6 +4,7 @@
 /* eslint-disable */
 import type { AnswerDTO } from '../models/AnswerDTO';
 import type { AnsweredQuestion } from '../models/AnsweredQuestion';
+import type { QuestionAndAnswerUpdateDTO } from '../models/QuestionAndAnswerUpdateDTO';
 import type { QuestionSuggestionCreationParams } from '../models/QuestionSuggestionCreationParams';
 import type { QuizQuestion } from '../models/QuizQuestion';
 import type { QuizQuestionAndAnswer } from '../models/QuizQuestionAndAnswer';
@@ -215,6 +216,54 @@ export class RestQuizQuestionControllerService {
             query: {
                 'note': note,
             },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param note
+     * @param quizQuestion
+     * @returns any OK
+     * @throws ApiError
+     */
+    public deleteQuestion(
+        note: number,
+        quizQuestion: number,
+    ): CancelablePromise<any> {
+        return this.httpRequest.request({
+            method: 'DELETE',
+            url: '/api/quiz-questions/{note}/note-questions/{quizQuestion}',
+            path: {
+                'note': note,
+                'quizQuestion': quizQuestion,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param note
+     * @param quizQuestion
+     * @param requestBody
+     * @returns QuizQuestionAndAnswer OK
+     * @throws ApiError
+     */
+    public editQuestion(
+        note: number,
+        quizQuestion: number,
+        requestBody: QuestionAndAnswerUpdateDTO,
+    ): CancelablePromise<QuizQuestionAndAnswer> {
+        return this.httpRequest.request({
+            method: 'PATCH',
+            url: '/api/quiz-questions/{note}/note-questions/{quizQuestion}',
+            path: {
+                'note': note,
+                'quizQuestion': quizQuestion,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
                 500: `Internal Server Error`,
             },

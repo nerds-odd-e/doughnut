@@ -15,7 +15,8 @@
     <table class="question-table mt-2">
       <thead>
         <tr>
-          <th>Approved</th>
+          <th>Edit</th>
+          <th>Approveded</th>
           <th>Question Text</th>
           <th>A</th>
           <th>B</th>
@@ -28,6 +29,20 @@
           v-for="(question, outerIndex) in questions"
           :key="question.quizQuestion.multipleChoicesQuestion.stem"
         >
+          <td>
+            <PopButton btn-class="btn btn-primary" title="Edit Question">
+              <!-- prettier-ignore -->
+              <template #default="{ closer }">
+                <NoteEditQuestion
+                  v-bind="{ note, question }"
+                  @close-dialog="
+                    closer($event);
+                    questionEdited($event);
+                  "
+                />
+              </template>
+            </PopButton>
+          </td>
           <td>
             <input
               :id="'checkbox-' + outerIndex"
@@ -62,6 +77,7 @@ import { PropType, onMounted, ref } from "vue"
 import { Note, QuizQuestionAndAnswer } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import NoteAddQuestion from "./NoteAddQuestion.vue"
+import NoteEditQuestion from "./NoteEditQuestion.vue"
 import PopButton from "../commons/Popups/PopButton.vue"
 
 const { managedApi } = useLoadingApi()
@@ -83,6 +99,14 @@ const questionAdded = (newQuestion: QuizQuestionAndAnswer) => {
     return
   }
   questions.value.push(newQuestion)
+}
+const questionEdited = (editedQuestion: QuizQuestionAndAnswer) => {
+  if (editedQuestion == null) {
+    return
+  }
+  questions.value = questions.value.map((question) =>
+    question.id === editedQuestion.id ? editedQuestion : question
+  )
 }
 const toggleApproval = async (questionId?: number) => {
   if (questionId) {
