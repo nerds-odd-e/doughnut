@@ -1864,7 +1864,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/QuizQuestionAndAnswer"
+              $ref: "#/components/schemas/QuestionAndAnswerUpdateDTO"
         required: true
       responses:
         "500":
@@ -3524,6 +3524,14 @@ components:
       properties:
         details:
           type: string
+    QuestionAndAnswerUpdateDTO:
+      type: object
+      properties:
+        quizQuestion:
+          $ref: "#/components/schemas/QuizQuestion"
+        correctAnswerIndex:
+          type: integer
+          format: int32
     NoteAccessoriesDTO:
       type: object
       properties:

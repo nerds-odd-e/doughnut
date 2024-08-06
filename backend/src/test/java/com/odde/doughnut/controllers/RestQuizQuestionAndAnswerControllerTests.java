@@ -9,6 +9,7 @@ import static org.mockito.Mockito.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
+import com.odde.doughnut.controllers.dto.QuestionAndAnswerUpdateDTO;
 import com.odde.doughnut.controllers.dto.QuestionSuggestionCreationParams;
 import com.odde.doughnut.controllers.dto.QuizQuestionContestResult;
 import com.odde.doughnut.controllers.dto.QuizQuestionInNotebook;
@@ -528,7 +529,9 @@ class RestQuizQuestionAndAnswerControllerTests {
           UnexpectedNoAccessRightException.class,
           () ->
               controller.editQuestion(
-                  questionAndAnswer.getNote(), questionAndAnswer, questionAndAnswer));
+                  questionAndAnswer.getNote(),
+                  questionAndAnswer,
+                  new QuestionAndAnswerUpdateDTO()));
     }
 
     @Test
@@ -537,8 +540,8 @@ class RestQuizQuestionAndAnswerControllerTests {
       QuizQuestionAndAnswer mcqWithAnswer = makeMe.aQuestion().please();
       mcqWithAnswer.setNote(note);
       mcqWithAnswer.setCorrectAnswerIndex(0);
-      // edit question title to be "new cool title"
-      QuizQuestionAndAnswer questionAndAnswer = makeMe.aQuestion().please();
+
+      QuestionAndAnswerUpdateDTO questionAndAnswer = new QuestionAndAnswerUpdateDTO();
       questionAndAnswer.setCorrectAnswerIndex(1);
       controller.editQuestion(note, mcqWithAnswer, questionAndAnswer);
       makeMe.refresh(mcqWithAnswer);

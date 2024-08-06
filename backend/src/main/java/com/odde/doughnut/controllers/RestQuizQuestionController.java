@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.AnswerDTO;
+import com.odde.doughnut.controllers.dto.QuestionAndAnswerUpdateDTO;
 import com.odde.doughnut.controllers.dto.QuestionSuggestionCreationParams;
 import com.odde.doughnut.controllers.dto.QuizQuestionContestResult;
 import com.odde.doughnut.controllers.dto.QuizQuestionInNotebook;
@@ -152,11 +153,11 @@ class RestQuizQuestionController {
   public QuizQuestionAndAnswer editQuestion(
       @PathVariable(name = "note") @Schema(type = "integer") Note note,
       @PathVariable(name = "quizQuestion") @Schema(type = "integer")
-          QuizQuestionAndAnswer quizQuestionAndAnswer,
-      @RequestBody QuizQuestionAndAnswer questionAndAnswer)
+          QuizQuestionAndAnswer originalQuizQuestionAndAnswer,
+      @Valid @RequestBody QuestionAndAnswerUpdateDTO updateDTO)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
-    return questionAndAnswer;
+    return quizQuestionService.updateQuestion(originalQuizQuestionAndAnswer, updateDTO);
   }
 
   @PostMapping("/{note}/refine-question")
