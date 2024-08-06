@@ -147,6 +147,18 @@ class RestQuizQuestionController {
     return;
   }
 
+  @PatchMapping("/{note}/note-questions/{quizQuestion}")
+  @Transactional
+  public QuizQuestionAndAnswer editQuestion(
+      @PathVariable(name = "note") @Schema(type = "integer") Note note,
+      @PathVariable(name = "quizQuestion") @Schema(type = "integer")
+          QuizQuestionAndAnswer quizQuestionAndAnswer,
+      @RequestBody QuizQuestionAndAnswer questionAndAnswer)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertAuthorization(note);
+    return questionAndAnswer;
+  }
+
   @PostMapping("/{note}/refine-question")
   @Transactional
   public QuizQuestionAndAnswer refineQuestion(
