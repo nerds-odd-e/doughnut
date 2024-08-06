@@ -241,30 +241,6 @@ class RestQuizQuestionAndAnswerControllerTests {
   }
 
   @Nested
-  class DeleteQuestion {
-    MCQWithAnswer jsonQuestion;
-    Note note;
-  
-    @BeforeEach
-    void setUp() {
-      note = makeMe.aNote().please();
-      jsonQuestion =
-          makeMe
-              .aMCQWithAnswer()
-              .stem("What is the first color in the rainbow?")
-              .choices("red", "black", "green")
-              .correctChoiceIndex(0)
-              .please();
-    }
-    @Test
-    void deleteQuestion() {
-      openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(jsonQuestion, "");
-      QuizQuestionInNotebook quizQuestion = controller.generateQuestion(note);
-      controller.deleteQuestion(quizQuestion.getQuizQuestion());
-      assertThat(modelFactoryService.noteRepository.findById(note.getId()).get().getQuizQuestionAndAnswers().size(), equalTo(0));
-    }
-  }
-  @Nested
   class GenerateQuestion {
     MCQWithAnswer jsonQuestion;
     Note note;
@@ -519,6 +495,26 @@ class RestQuizQuestionAndAnswerControllerTests {
       controller.addQuestionManually(note, mcqWithAnswer);
       makeMe.refresh(note);
       assertThat(note.getQuizQuestionAndAnswers(), hasSize(1));
+    }
+  }
+
+  @Nested
+  class deleteQuestionFromNote {
+    @Test
+    void authorization() {
+      QuizQuestionAndAnswer questionAndAnswer = makeMe.aQuestion().please();
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.deleteQuestion(questionAndAnswer.getNote(), questionAndAnswer));
+    }
+
+    @Test
+    void persistent() throws UnexpectedNoAccessRightException {
+      QuizQuestionAndAnswer questionAndAnswer = makeMe.aQuestion().please();
+      Note note = questionAndAnswer.getNote();
+      controller.deleteQuestion(note, questionAndAnswer);
+      makeMe.refresh(note);
+      assertThat(note.getQuizQuestionAndAnswers(), hasSize(0));
     }
   }
 
