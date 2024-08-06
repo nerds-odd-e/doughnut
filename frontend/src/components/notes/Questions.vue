@@ -15,6 +15,7 @@
     <table class="question-table mt-2">
       <thead>
         <tr>
+          <th>Delete</th>
           <th>Edit</th>
           <th>Approveded</th>
           <th>Question Text</th>
@@ -30,6 +31,12 @@
           :key="question.quizQuestion.multipleChoicesQuestion.stem"
         >
           <td>
+            <button btn-class="btn btn-warning" title="Delete Question" @click="deleteQuestion(question)">
+              <!-- prettier-ignore -->
+              Delete Question
+            </button>
+          </td>
+          <td>
             <PopButton btn-class="btn btn-primary" title="Edit Question">
               <!-- prettier-ignore -->
               <template #default="{ closer }">
@@ -43,6 +50,7 @@
               </template>
             </PopButton>
           </td>
+          
           <td>
             <input
               :id="'checkbox-' + outerIndex"
@@ -93,6 +101,16 @@ const fetchQuestions = async () => {
     await managedApi.restQuizQuestionController.getAllQuestionByNote(
       props.note.id
     )
+}
+const deleteQuestion = async (question: QuizQuestionAndAnswer) => {
+  if (question == null) {
+    return
+  }
+  await managedApi.restQuizQuestionController.deleteQuestion(
+    props.note.id,
+    question.id
+  )
+  questions.value = questions.value.filter((q) => q.id !== question.id)
 }
 const questionAdded = (newQuestion: QuizQuestionAndAnswer) => {
   if (newQuestion == null) {
