@@ -241,6 +241,30 @@ class RestQuizQuestionAndAnswerControllerTests {
   }
 
   @Nested
+  class DeleteQuestion {
+    MCQWithAnswer jsonQuestion;
+    Note note;
+  
+    @BeforeEach
+    void setUp() {
+      note = makeMe.aNote().please();
+      jsonQuestion =
+          makeMe
+              .aMCQWithAnswer()
+              .stem("What is the first color in the rainbow?")
+              .choices("red", "black", "green")
+              .correctChoiceIndex(0)
+              .please();
+    }
+    @Test
+    void deleteQuestion() {
+      openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(jsonQuestion, "");
+      QuizQuestionInNotebook quizQuestion = controller.generateQuestion(note);
+      controller.deleteQuestion(quizQuestion.getQuizQuestion());
+      assertThat(modelFactoryService.noteRepository.findById(note.getId()).get().getQuizQuestionAndAnswers().size(), equalTo(0));
+    }
+  }
+  @Nested
   class GenerateQuestion {
     MCQWithAnswer jsonQuestion;
     Note note;
