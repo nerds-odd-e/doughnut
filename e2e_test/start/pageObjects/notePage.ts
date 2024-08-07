@@ -196,8 +196,8 @@ export const assumeNotePage = (noteTopic?: string) => {
     editQuestion(row: Record<string, string>, optionValue: string) {
       this.openQuestionList().crudQuestionPage().editQuestion(row, optionValue)
     },
-    deleteQuestion() {
-      this.openQuestionList().crudQuestionPage().deleteQuestion()
+    deleteFirstQuestion() {
+      this.openQuestionList().crudQuestionPage().deleteFirstQuestion()
     },
     refineQuestion(row: Record<string, string>) {
       this.openQuestionList().crudQuestionPage().refineQuestion(row)

@@ -1,7 +1,6 @@
 export const crudQuestionPage = () => {
   return {
     fillQuestion(row: Record<string, string>) {
-      cy.findByRole('button', { name: 'Add Question' }).click()
       cy.findByRole('button', { name: '+' }).click()
       ;[
         'Stem',
@@ -22,20 +21,20 @@ export const crudQuestionPage = () => {
       }
       cy.findByRole('button', { name: 'Submit' }).click()
     },
-    deleteQuestion() {
-      cy.findByRole('button', { name: 'Delete Question' }).click()
+    deleteFirstQuestion() {
+      cy.findAllByTitle('Delete Question').first().click()
     },
     addQuestion(row: Record<string, string>) {
-      cy.findByRole('button', { name: 'Add Question' }).click()
+      cy.findByRole('button', { name: 'Add Question' }).click({ force: true })
       this.fillQuestion(row)
       cy.findByRole('button', { name: 'Submit' }).click()
     },
     generateQuestionByAI() {
-      cy.findByRole('button', { name: 'Add Question' }).click()
+      cy.findByRole('button', { name: 'Add Question' }).click({ force: true })
       cy.findByRole('button', { name: 'Generate by AI' }).click()
     },
     refineQuestion(row: Record<string, string>) {
-      cy.findByRole('button', { name: 'Add Question' }).click()
+      cy.findByRole('button', { name: 'Add Question' }).click({ force: true })
       this.fillQuestion(row)
       cy.findByRole('button', { name: 'Refine' }).click()
     },

@@ -90,17 +90,17 @@ Given(
   }
 )
 
-Given(
-  'I edit the first questions first option to {string} in the question list of the note {string}',
+When(
+  'I edit the first questions first option to {string} in the question list of the note {string}:',
   (optionValue: string, noteTopic: string, data: DataTable) => {
     start.jumpToNotePage(noteTopic).editQuestion(data.hashes()[0]!, optionValue)
   }
 )
 
-Given(
-  'I delete the first question in the question list of the note {string}',
+When(
+  'I delete the first question in the question list of the note {string}:',
   (noteTopic: string) => {
-    start.jumpToNotePage(noteTopic).deleteQuestion()
+    start.jumpToNotePage(noteTopic).deleteFirstQuestion()
   }
 )
 
@@ -529,7 +529,7 @@ When('I generate question by AI for note {string}', (noteName: string) => {
   start
     .jumpToNotePage(noteName)
     .openQuestionList()
-    .addQuestionPage()
+    .crudQuestionPage()
     .generateQuestionByAI()
 })
 
