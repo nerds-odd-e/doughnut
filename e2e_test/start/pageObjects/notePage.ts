@@ -267,5 +267,15 @@ export const assumeNotePage = (noteTopic?: string) => {
         },
       }
     },
+    deleteQuestion(question: string) {
+      this.openQuestionList()
+      cy.findByText(question)
+        .parent('tr')
+        .find('button[id^="delete-quiz-"]')
+        .click()
+    },
+    editQuestion(question: string, row: Record<string, string>) {
+      this.openQuestionList().editQuestionPage(question).editRow(row)
+    },
   }
 }

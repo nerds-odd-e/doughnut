@@ -15,6 +15,7 @@
     <table class="question-table mt-2">
       <thead>
         <tr>
+          <th>Actions</th>
           <th>Approved</th>
           <th>Question Text</th>
           <th>A</th>
@@ -28,6 +29,32 @@
           v-for="(question, outerIndex) in questions"
           :key="question.quizQuestion.multipleChoicesQuestion.stem"
         >
+          <td>
+            <button
+              class="btn bg-danger"
+              :id="'delete-quiz-' + outerIndex"
+              @click="deleteQuestion(question.id)"
+            >
+              Delete
+            </button>
+
+            <PopButton
+              :id="'edit-quiz-' + outerIndex"
+              btn-class="btn btn-secondary"
+              title="Edit Question"
+            >
+              <!-- prettier-ignore -->
+              <template #default="{ closer }">
+                <NoteEditQuestion
+                  v-bind="{ quizQuestion: question }"
+                  @close-dialog="
+                    closer($event);
+                    fetchQuestions()
+                  "
+                />
+              </template>
+            </PopButton>
+          </td>
           <td>
             <input
               :id="'checkbox-' + outerIndex"
@@ -87,6 +114,12 @@ const questionAdded = (newQuestion: QuizQuestionAndAnswer) => {
 const toggleApproval = async (questionId?: number) => {
   if (questionId) {
     await managedApi.restQuizQuestionController.toggleApproval(questionId)
+  }
+}
+const deleteQuestion = async (questionId?: number) => {
+  if (questionId) {
+    await managedApi.restQuizQuestionController.deleteQuestion(questionId)
+    fetchQuestions()
   }
 }
 onMounted(() => {
