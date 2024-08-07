@@ -16,6 +16,7 @@
       <thead>
         <tr>
           <th>Approved</th>
+          <th>Actions</th>
           <th>Question Text</th>
           <th>A</th>
           <th>B</th>
@@ -35,6 +36,9 @@
               v-model="question.approved"
               @change="toggleApproval(question.id)"
             />
+          </td>
+          <td>
+            <button @click="deleteQuestion(question.id)">Delete</button>
           </td>
           <td>{{ question.quizQuestion.multipleChoicesQuestion.stem }}</td>
           <template
@@ -89,6 +93,16 @@ const toggleApproval = async (questionId?: number) => {
     await managedApi.restQuizQuestionController.toggleApproval(questionId)
   }
 }
+const deleteQuestion = async (questionId?: number) => {
+  if (questionId) {
+    let response =
+      await managedApi.restQuizQuestionController.deleteQuestion(questionId)
+    if (response) {
+      questions.value = questions.value.filter((q) => q.id !== questionId)
+    }
+  }
+}
+
 onMounted(() => {
   fetchQuestions()
 })
