@@ -91,6 +91,20 @@ Given(
 )
 
 Given(
+  'I edit the first questions first option to {string} in the question list of the note {string}',
+  (optionValue: string, noteTopic: string, data: DataTable) => {
+    start.jumpToNotePage(noteTopic).editQuestion(data.hashes()[0]!, optionValue)
+  }
+)
+
+Given(
+  'I delete the first question in the question list of the note {string}',
+  (noteTopic: string) => {
+    start.jumpToNotePage(noteTopic).deleteQuestion()
+  }
+)
+
+Given(
   'I refine the following question for the note {string}:',
   (noteTopic: string, data: DataTable) => {
     expect(data.hashes().length, 'please add one question at a time.').to.equal(

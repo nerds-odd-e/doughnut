@@ -17,6 +17,23 @@ Feature: Quiz Question Management
       | Question                             | Correct Choice |
       | What does a cow say?                 | moo            |
       | What do you call a cow with not leg? | Ground beef    |
+  
+  Scenario: Edit a question in the note successfully
+    Given I add the following question for the note "The cow joke":
+      | Stem                                 | Choice 0    | Choice 1 | Choice 2 | Correct Choice Index |
+      | What do you call a cow with not leg? | Ground beef | Cowboy   | Oxford   | 0                    |
+    When I edit the first questions first option to "MuuMuu" in the question list of the note "The cow joke":
+    Then I should see the questions in the question list of the note "The cow joke":
+      | Question                             | Correct Choice |
+      | What do you call a cow with not leg? | MuuMuu         |
+  
+  Scenario: Delete a question in the note successfully
+    Given I add the following question for the note "The cow joke":
+      | Stem                                 | Choice 0    | Choice 1 | Choice 2 | Correct Choice Index |
+      | What do you call a cow with not leg? | Ground beef | Cowboy   | Oxford   | 0                    |
+    When I delete the first question in the question list of the note "The cow joke":
+    Then I should see the questions in the question list of the note "The cow joke":
+      | Question | Correct Choice |
 
   @usingMockedOpenAiService
   Scenario: Can generate the question by AI

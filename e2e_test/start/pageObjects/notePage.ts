@@ -191,10 +191,16 @@ export const assumeNotePage = (noteTopic?: string) => {
       return questionListPage()
     },
     addQuestion(row: Record<string, string>) {
-      this.openQuestionList().addQuestionPage().addQuestion(row)
+      this.openQuestionList().crudQuestionPage().addQuestion(row)
+    },
+    editQuestion(row: Record<string, string>, optionValue: string) {
+      this.openQuestionList().crudQuestionPage().editQuestion(row, optionValue)
+    },
+    deleteQuestion() {
+      this.openQuestionList().crudQuestionPage().deleteQuestion()
     },
     refineQuestion(row: Record<string, string>) {
-      this.openQuestionList().addQuestionPage().refineQuestion(row)
+      this.openQuestionList().crudQuestionPage().refineQuestion(row)
     },
     toggleApproval(question: string) {
       this.openQuestionList()
