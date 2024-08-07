@@ -20,13 +20,11 @@ Feature: Quiz Question Management
       | Why do cows have hooves instead of feet? | Because they lactose! |
       | What do you call a cow with not leg?     | Ground beef           |
 
-  Scenario: Manually remove a question to the note successfully
-    When I remove the following question for the note "The cow joke":
-      | Index |
-      | 1     |
+  Scenario: Manually remove a question from the note successfully
+    When I remove the question "Why do cows have hooves instead of feet?" from the note "The cow joke"
     Then I should see the questions in the question list of the note "The cow joke":
-      | Question             |
-      | What does a cow say? |
+      | Question             | Correct Choice        |
+      | What does a cow say? | moo                   |
 
   @usingMockedOpenAiService
   Scenario: Can generate the question by AI

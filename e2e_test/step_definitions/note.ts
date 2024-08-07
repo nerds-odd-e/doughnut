@@ -90,13 +90,10 @@ Given(
   }
 )
 
-Given(
-  'I remove the following question for the note {string}:',
-  (noteTopic: string, data: DataTable) => {
-    expect(data.hashes().length, 'please remove one question at a time.').to.equal(
-      1
-    )
-    return "pending";
+When(
+  "I remove the question {string} from the note {string}",
+  (question: string, noteTopic: string) => {
+    start.jumpToNotePage(noteTopic).removeQuestion(question)
   }
 )
 
