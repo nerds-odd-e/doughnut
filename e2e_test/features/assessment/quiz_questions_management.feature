@@ -18,6 +18,22 @@ Feature: Quiz Question Management
       | What does a cow say?                 | moo            |
       | What do you call a cow with not leg? | Ground beef    |
 
+  Scenario: Manually edit a question to the note successfully
+    When I add the following question for the note "The cow joke":
+      | Stem                                 | Choice 0    | Choice 1 | Choice 2 | Correct Choice Index |
+      | What do you call a cow with not leg? | Ground beef | Cowboy   | Oxford   | 0                    |
+    When I edit the question "What do you call a cow with no leg?" for the note "The cow joke":
+      | Stem                                 | Choice 0    | Choice 1 | Choice 2 | Correct Choice Index |
+      | What do you call a cow with no leg?  | Ground beef | Cowboy   | Oxford   | 1                    |
+    Then I should see the questions in the question list of the note "The cow joke":
+      | Question                             | Correct Choice |
+      | What does a cow say?                 | moo            |
+      | What do you call a cow with not leg? | Cowboy         |
+
+  Scenario: Manually delete a question to the note successfully
+    When I delete the question "What does a cow say?" for the note "The cow joke"
+    Then I should see no questions in the question list of the note "The cow joke"
+
   @usingMockedOpenAiService
   Scenario: Can generate the question by AI
     Given OpenAI now generates this question:
