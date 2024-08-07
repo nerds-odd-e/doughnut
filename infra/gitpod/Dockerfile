@@ -1,5 +1,8 @@
 # syntax=docker.io/docker/dockerfile:1.9.0
-FROM gitpod/workspace-full-vnc
+
+ARG TARGET_PLATFORM=linux/amd64
+
+FROM --platform=$TARGET_PLATFORM gitpod/workspace-full-vnc
 # ---------------------------------------------------
 # -------------------- USER root --------------------
 # ---------------------------------------------------
@@ -64,9 +67,9 @@ RUN mkdir -m 0755 /nix && chown gitpod /nix \
 
 # Setup gitpod workspace user, zsh and zimfw
 
-CMD /bin/bash -l
+CMD ["/bin/bash", "-l"]
 USER gitpod
-ENV USER gitpod
+ENV USER=gitpod
 WORKDIR /home/gitpod
 
 # Install Nix
