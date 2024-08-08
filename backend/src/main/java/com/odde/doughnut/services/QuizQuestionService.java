@@ -1,5 +1,6 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.controllers.dto.QuestionAndAnswerUpdateDTO;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionAndAnswer;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -32,6 +33,22 @@ public class QuizQuestionService {
     questionAndAnswer.setNote(note);
     modelFactoryService.save(questionAndAnswer);
     return questionAndAnswer;
+  }
+
+  public void deleteQuestion(QuizQuestionAndAnswer questionAndAnswer) {
+    modelFactoryService.remove(questionAndAnswer);
+    return;
+  }
+
+  public QuizQuestionAndAnswer updateQuestion(
+      QuizQuestionAndAnswer questionAndAnswer, QuestionAndAnswerUpdateDTO update) {
+    if (update.getCorrectAnswerIndex() != null) {
+      questionAndAnswer.setCorrectAnswerIndex(update.getCorrectAnswerIndex());
+    }
+    if (update.getQuizQuestion() != null) {
+      questionAndAnswer.setQuizQuestion(update.getQuizQuestion());
+    }
+    return modelFactoryService.save(questionAndAnswer);
   }
 
   public QuizQuestionAndAnswer refineQuestion(Note note, QuizQuestionAndAnswer questionAndAnswer) {

@@ -1820,6 +1820,65 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ReviewPoint"
+  /api/quiz-questions/{note}/note-questions/{quizQuestion}:
+    delete:
+      tags:
+      - rest-quiz-question-controller
+      operationId: deleteQuestion
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: quizQuestion
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+    patch:
+      tags:
+      - rest-quiz-question-controller
+      operationId: editQuestion
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: quizQuestion
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuestionAndAnswerUpdateDTO"
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/QuizQuestionAndAnswer"
   /api/notes/{note}:
     get:
       tags:
@@ -3465,6 +3524,14 @@ components:
       properties:
         details:
           type: string
+    QuestionAndAnswerUpdateDTO:
+      type: object
+      properties:
+        quizQuestion:
+          $ref: "#/components/schemas/QuizQuestion"
+        correctAnswerIndex:
+          type: integer
+          format: int32
     NoteAccessoriesDTO:
       type: object
       properties:

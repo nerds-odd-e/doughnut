@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.AnswerDTO;
+import com.odde.doughnut.controllers.dto.QuestionAndAnswerUpdateDTO;
 import com.odde.doughnut.controllers.dto.QuestionSuggestionCreationParams;
 import com.odde.doughnut.controllers.dto.QuizQuestionContestResult;
 import com.odde.doughnut.controllers.dto.QuizQuestionInNotebook;
@@ -133,6 +134,30 @@ class RestQuizQuestionController {
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
     return quizQuestionService.addQuestion(note, questionAndAnswer);
+  }
+
+  @DeleteMapping("/{note}/note-questions/{quizQuestion}")
+  @Transactional
+  public void deleteQuestion(
+      @PathVariable("note") @Schema(type = "integer") Note note,
+      @PathVariable("quizQuestion") @Schema(type = "integer")
+          QuizQuestionAndAnswer quizQuestionAndAnswer)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertAuthorization(note);
+    quizQuestionService.deleteQuestion(quizQuestionAndAnswer);
+    return;
+  }
+
+  @PatchMapping("/{note}/note-questions/{quizQuestion}")
+  @Transactional
+  public QuizQuestionAndAnswer editQuestion(
+      @PathVariable(name = "note") @Schema(type = "integer") Note note,
+      @PathVariable(name = "quizQuestion") @Schema(type = "integer")
+          QuizQuestionAndAnswer originalQuizQuestionAndAnswer,
+      @Valid @RequestBody QuestionAndAnswerUpdateDTO updateDTO)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertAuthorization(note);
+    return quizQuestionService.updateQuestion(originalQuizQuestionAndAnswer, updateDTO);
   }
 
   @PostMapping("/{note}/refine-question")

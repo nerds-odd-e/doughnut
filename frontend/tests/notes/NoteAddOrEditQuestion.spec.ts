@@ -1,24 +1,27 @@
-import NoteAddQuestion from "@/components/notes/NoteAddQuestion.vue"
+import NoteAddOrEditQuestion from "@/components/notes/NoteAddOrEditQuestion.vue"
 import { userEvent } from "@testing-library/user-event"
 import { screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import makeMe from "../fixtures/makeMe"
 import helper from "../helpers"
+import { QuizQuestionAndAnswer } from "@/generated/backend"
 
 const note = makeMe.aNoteRealm.please()
-const createWrapper = async () => {
+const createWrapper = async (question?: QuizQuestionAndAnswer) => {
   helper
-    .component(NoteAddQuestion)
+    .component(NoteAddOrEditQuestion)
     .withProps({
       note: note.note,
+      question,
     })
     .render()
   await flushPromises()
 }
 
-describe("NoteAddQuestion", () => {
+describe("NoteAddOrEditQuestion", () => {
   interface Case {
     question: Record<string, string>
+    questionProp?: QuizQuestionAndAnswer
     expectedRefineButton: boolean
     expectedGenerateButton: boolean
   }
@@ -38,9 +41,26 @@ describe("NoteAddQuestion", () => {
       expectedRefineButton: true,
       expectedGenerateButton: false,
     },
+    {
+      question: {},
+      questionProp: {
+        id: 1234,
+        quizQuestion: {
+          id: 1234,
+          multipleChoicesQuestion: {
+            stem: "it's a me, a test",
+            choices: ["mario", "luigi", "yoshi"],
+          },
+          correctAnswerIndex: 2,
+          approved: true,
+        },
+      },
+      expectedRefineButton: true,
+      expectedGenerateButton: false,
+    },
   ].forEach(async (testCase: Case) => {
     it("only allow generation when no changes", async () => {
-      await createWrapper()
+      await createWrapper(testCase.questionProp)
       // eslint-disable-next-line no-restricted-syntax
       for (const key of Object.keys(testCase.question)) {
         // eslint-disable-next-line no-await-in-loop

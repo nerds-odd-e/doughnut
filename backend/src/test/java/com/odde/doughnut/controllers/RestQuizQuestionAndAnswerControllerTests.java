@@ -9,6 +9,7 @@ import static org.mockito.Mockito.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
+import com.odde.doughnut.controllers.dto.QuestionAndAnswerUpdateDTO;
 import com.odde.doughnut.controllers.dto.QuestionSuggestionCreationParams;
 import com.odde.doughnut.controllers.dto.QuizQuestionContestResult;
 import com.odde.doughnut.controllers.dto.QuizQuestionInNotebook;
@@ -495,6 +496,56 @@ class RestQuizQuestionAndAnswerControllerTests {
       controller.addQuestionManually(note, mcqWithAnswer);
       makeMe.refresh(note);
       assertThat(note.getQuizQuestionAndAnswers(), hasSize(1));
+    }
+  }
+
+  @Nested
+  class deleteQuestionFromNote {
+    @Test
+    void authorization() {
+      QuizQuestionAndAnswer questionAndAnswer = makeMe.aQuestion().please();
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.deleteQuestion(questionAndAnswer.getNote(), questionAndAnswer));
+    }
+
+    @Test
+    void persistent() throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
+      QuizQuestionAndAnswer mcqWithAnswer = makeMe.aQuestion().please();
+      mcqWithAnswer.setNote(note);
+      controller.deleteQuestion(note, mcqWithAnswer);
+      makeMe.refresh(note);
+      assertThat(note.getQuizQuestionAndAnswers(), hasSize(0));
+    }
+  }
+
+  @Nested
+  class editQuestionInNote {
+    @Test
+    void authorization() {
+      QuizQuestionAndAnswer questionAndAnswer = makeMe.aQuestion().please();
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () ->
+              controller.editQuestion(
+                  questionAndAnswer.getNote(),
+                  questionAndAnswer,
+                  new QuestionAndAnswerUpdateDTO()));
+    }
+
+    @Test
+    void persistent() throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
+      QuizQuestionAndAnswer mcqWithAnswer = makeMe.aQuestion().please();
+      mcqWithAnswer.setNote(note);
+      mcqWithAnswer.setCorrectAnswerIndex(0);
+
+      QuestionAndAnswerUpdateDTO questionAndAnswer = new QuestionAndAnswerUpdateDTO();
+      questionAndAnswer.setCorrectAnswerIndex(1);
+      controller.editQuestion(note, mcqWithAnswer, questionAndAnswer);
+      makeMe.refresh(mcqWithAnswer);
+      assertThat(mcqWithAnswer.getCorrectAnswerIndex(), equalTo(1));
     }
   }
 

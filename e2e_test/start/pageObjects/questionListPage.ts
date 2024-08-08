@@ -1,8 +1,8 @@
-import { addQuestionPage } from './addQuestionPage'
+import { crudQuestionPage } from './crudQuestionPage'
 
 export const questionListPage = () => {
   return {
-    addQuestionPage,
+    crudQuestionPage,
     expectQuestion(expectedQuestions: Record<string, string>[]) {
       expectedQuestions.forEach((row) => {
         cy.findByText(row.Question!)
