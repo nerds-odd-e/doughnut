@@ -183,6 +183,49 @@ export class RestQuizQuestionControllerService {
         });
     }
     /**
+     * @param quizQuestion
+     * @param requestBody
+     * @returns QuizQuestionAndAnswer OK
+     * @throws ApiError
+     */
+    public updateQuestionManually(
+      quizQuestionAndAnswer: number,
+      requestBody: QuizQuestionAndAnswer,
+    ): CancelablePromise<QuizQuestionAndAnswer> {
+        return this.httpRequest.request({
+            method: 'PATCH',
+            url: '/api/quiz-questions/{quizQuestion}/question',
+            path: {
+                'quizQuestion': quizQuestionAndAnswer,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param quizQuestion
+     * @param requestBody
+     * @returns QuizQuestionAndAnswer OK
+     * @throws ApiError
+     */
+    public deleteQuestion(
+      quizQuestionAndAnswer: number,
+    ): CancelablePromise<QuizQuestionAndAnswer> {
+        return this.httpRequest.request({
+            method: 'DELETE',
+            url: '/api/quiz-questions/{quizQuestion}/question',
+            path: {
+                'quizQuestion': quizQuestionAndAnswer,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
      * @param note
      * @returns QuizQuestionInNotebook OK
      * @throws ApiError

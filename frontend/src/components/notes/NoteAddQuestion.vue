@@ -46,7 +46,7 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, computed, ref } from "vue"
+import { PropType, computed, ref, toRaw } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { Note, QuizQuestionAndAnswer } from "@/generated/backend"
 import isMCQWithAnswerValid from "@/models/isMCQWithAnswerValid"
@@ -58,17 +58,29 @@ const props = defineProps({
     type: Object as PropType<Note>,
     required: true,
   },
+  question: {
+    type: Object as PropType<QuizQuestionAndAnswer>,
+    required: false,
+    default: null,
+  },
 })
 
-const quizQuestionAndAnswer = ref<QuizQuestionAndAnswer>({
-  correctAnswerIndex: 0,
-  quizQuestion: {
-    multipleChoicesQuestion: {
-      stem: "",
-      choices: ["", ""],
-    },
-  },
-} as QuizQuestionAndAnswer)
+const isExistingQuestion = () => {
+  return Boolean(props.question)
+}
+const quizQuestionAndAnswer = ref<QuizQuestionAndAnswer>(
+  isExistingQuestion()
+    ? (structuredClone(toRaw(props.question)) as QuizQuestionAndAnswer)
+    : ({
+        correctAnswerIndex: 0,
+        quizQuestion: {
+          multipleChoicesQuestion: {
+            stem: "",
+            choices: ["", ""],
+          },
+        },
+      } as QuizQuestionAndAnswer)
+)
 
 const minimumNumberOfChoices = 2
 const maximumNumberOfChoices = 10
@@ -104,7 +116,19 @@ const removeChoice = () => {
     multipleChoicesQuestion.value.choices.pop()
   }
 }
+const updateQuestion = async () => {
+  const response =
+    await managedApi.restQuizQuestionController.updateQuestionManually(
+      props.question!.id,
+      quizQuestionAndAnswer.value
+    )
+  emit("close-dialog", response)
+}
 const submitQuestion = async () => {
+  if (isExistingQuestion()) {
+    updateQuestion()
+    return
+  }
   const quizQuestion = quizQuestionAndAnswer.value
   const response =
     await managedApi.restQuizQuestionController.addQuestionManually(
