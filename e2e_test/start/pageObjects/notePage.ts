@@ -203,6 +203,13 @@ export const assumeNotePage = (noteTopic?: string) => {
         .find('input[type="checkbox"]')
         .click()
     },
+    deleteQuestion(question: string) {
+      this.openQuestionList()
+      cy.findByText(question)
+        .parent('tr')
+        .find('button[id^="delete-question-"]')
+        .click()
+    },
     expectQuestionsInList(expectedQuestions: Record<string, string>[]) {
       this.openQuestionList().expectQuestion(expectedQuestions)
     },

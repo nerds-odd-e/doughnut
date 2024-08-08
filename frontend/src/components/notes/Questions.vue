@@ -21,6 +21,7 @@
           <th>B</th>
           <th>C</th>
           <th>D</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -51,6 +52,13 @@
               {{ choice }}
             </td>
           </template>
+          <td v-for="index in 4 - question.quizQuestion.multipleChoicesQuestion.choices.length" :key="index"></td>
+          <td><button
+            :id="'delete-question-' + outerIndex"
+             class="btn btn-sm btn-danger"
+             @click="deleteQuestion(question.id)">
+             Delete
+            </button></td>
         </tr>
       </tbody>
     </table>
@@ -87,6 +95,16 @@ const questionAdded = (newQuestion: QuizQuestionAndAnswer) => {
 const toggleApproval = async (questionId?: number) => {
   if (questionId) {
     await managedApi.restQuizQuestionController.toggleApproval(questionId)
+  }
+}
+const deleteQuestion = async (questionId?: number) => {
+  if (questionId) {
+    await managedApi.restQuizQuestionController.deleteQuestion(questionId)
+    questions.value = questions.value.filter(
+      (question: QuizQuestionAndAnswer): boolean => {
+        return question.id === questionId
+      }
+    )
   }
 }
 onMounted(() => {

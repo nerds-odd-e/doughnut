@@ -50,6 +50,11 @@ public class QuizQuestionService {
     return question;
   }
 
+  public QuizQuestionAndAnswer deleteQuestion(QuizQuestionAndAnswer question) {
+    modelFactoryService.remove(question);
+    return question;
+  }
+
   public QuizQuestionAndAnswer generateMcqWithAnswer(Note note) {
     MCQWithAnswer MCQWithAnswer = aiQuestionGenerator.getAiGeneratedQuestion(note);
     if (MCQWithAnswer == null) {
