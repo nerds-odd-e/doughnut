@@ -135,6 +135,15 @@ class RestQuizQuestionController {
     return quizQuestionService.addQuestion(note, questionAndAnswer);
   }
 
+  @DeleteMapping("/{question}")
+  @Transactional
+  public QuizQuestionAndAnswer deleteQuestion(
+      @PathVariable("question") @Schema(type = "integer") QuizQuestionAndAnswer questionAndAnswer)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertAuthorization(questionAndAnswer.getNote());
+    return quizQuestionService.deleteQuestion(questionAndAnswer);
+  }
+
   @PostMapping("/{note}/refine-question")
   @Transactional
   public QuizQuestionAndAnswer refineQuestion(

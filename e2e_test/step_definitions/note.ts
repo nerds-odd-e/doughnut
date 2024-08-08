@@ -90,6 +90,20 @@ Given(
   }
 )
 
+When(
+  "I delete the question {string} in the note {string}",
+  (questionTitle: string, noteTopic: string) => {
+    start.jumpToNotePage(noteTopic).deleteQuestion(questionTitle)
+  }
+)
+
+Then(
+  "there should be only one question left in the note {string}",
+  (noteTopic: string) => {
+    start.jumpToNotePage(noteTopic).expectThereIsOnlyOneQuestionLeft()
+  },
+)
+
 Given(
   'I refine the following question for the note {string}:',
   (noteTopic: string, data: DataTable) => {

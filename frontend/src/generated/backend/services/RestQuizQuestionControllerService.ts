@@ -183,6 +183,27 @@ export class RestQuizQuestionControllerService {
         });
     }
     /**
+     * Deletes a question from a note
+     * @param noteId The ID of the note
+     * @param questionId The ID of the question
+     * @returns void
+     * @throws ApiError
+     */
+    public deleteQuestion(
+        questionId: number,
+    ): CancelablePromise<void> {
+        return this.httpRequest.request({
+            method: 'DELETE',
+            url: '/api/quiz-questions/{questionId}',
+            path: {
+                'questionId': questionId,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
      * @param note
      * @returns QuizQuestionInNotebook OK
      * @throws ApiError

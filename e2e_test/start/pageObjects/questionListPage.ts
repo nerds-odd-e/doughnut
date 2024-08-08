@@ -11,5 +11,8 @@ export const questionListPage = () => {
         })
       })
     },
+    expectThereShouldBeOneQuestionLeft() {
+      cy.get("input[id^=checkbox-]").should("have.length", 1)
+    },
   }
 }
