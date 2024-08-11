@@ -20,8 +20,8 @@ importers:
         specifier: 1.8.0
         version: 1.8.0
       '@badeball/cypress-cucumber-preprocessor':
-        specifier: ^20.1.1
-        version: 20.1.1(cypress@13.13.2)(typescript@5.5.4)
+        specifier: ^20.1.2
+        version: 20.1.2(cypress@13.13.2)(typescript@5.5.4)
       '@bahmutov/cypress-esbuild-preprocessor':
         specifier: ^2.2.2
         version: 2.2.2(esbuild@0.23.0)
@@ -424,8 +424,8 @@ packages:
   '@badeball/cypress-configuration@6.1.1':
     resolution: {integrity: sha512-0IcJFMiCRo33Ofrvxxojt5QRJWyxApymHuuy981FeXnOGz4UsWKgr/hRupeXkw2cKXvah+j+880kXliygxPOSQ==}
 
-  '@badeball/cypress-cucumber-preprocessor@20.1.1':
-    resolution: {integrity: sha512-oskUD3DukTK1OuP+SEo0qsM8aJsHJOxINvWuNh7VF2dSx19wLSGikjbtuiahgbypL1ZvR2/x0kJY6EHCcbrZ1A==}
+  '@badeball/cypress-cucumber-preprocessor@20.1.2':
+    resolution: {integrity: sha512-p3l9XQoY8ouhkSq+Rs+ZdRjnfL4opB+BcZKC9kFK4r68+Qyj7uAq0M5JX+xWzxDOPDx+hhyNDV/EgIL7c8IHIA==}
     engines: {node: '>=18.0.0'}
     hasBin: true
     peerDependencies:
@@ -590,8 +590,8 @@ packages:
     peerDependencies:
       '@cucumber/messages': '>=18'
 
-  '@cucumber/html-formatter@21.4.0':
-    resolution: {integrity: sha512-Vg8FpBFWUl6tXWdh+4Hk4Pf8r7KJhkNxMRULCLtjrIgM3cjap/jbc0hxiX6ta7a54CpUPAmmUOURTxuqsm64lQ==}
+  '@cucumber/html-formatter@21.6.0':
+    resolution: {integrity: sha512-Qw1tdObBJrgXgXwVjKVjB3hFhFPI8WhIFb+ULy8g5lDl5AdnKDiyDXAMvAWRX+pphnRMMNdkPCt6ZXEfWvUuAA==}
     peerDependencies:
       '@cucumber/messages': '>=18'
 
@@ -2932,6 +2932,11 @@ packages:
     resolution: {integrity: sha512-7Bv8RF0k6xjo7d4A/PxYLbUCfb6c+Vpd2/mB2yRDlew7Jb5hEXiCD9ibfO7wpk8i4sevK6DFny9h7EYbM3/sHg==}
     hasBin: true
 
+  glob@11.0.0:
+    resolution: {integrity: sha512-9UiX/Bl6J2yaBbxKoEBRm4Cipxgok8kQYcOPEhScPwebu2I0HoQOuYdIO6S3hLuWoZgpDpwQZMzTFxgpkyT76g==}
+    engines: {node: 20 || >=22}
+    hasBin: true
+
   glob@7.2.3:
     resolution: {integrity: sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==}
     deprecated: Glob versions prior to v9 are no longer supported
@@ -3439,6 +3444,10 @@ packages:
     resolution: {integrity: sha512-qH3nOSj8q/8+Eg8LUPOq3C+6HWkpUioIjDsq1+D4zY91oZvpPttw8GwtF1nReRYKXl+1AORyFqtm2f5Q1SB6/Q==}
     engines: {node: 14 >=14.21 || 16 >=16.20 || >=18}
 
+  jackspeak@4.0.1:
+    resolution: {integrity: sha512-cub8rahkh0Q/bw1+GxP7aeSe29hHHn2V4m29nnDlvCdlgU+3UGxkZp7Z53jLUdpX3jdTO0nJZUDl3xvbWc2Xog==}
+    engines: {node: 20 || >=22}
+
   jake@10.9.2:
     resolution: {integrity: sha512-2P4SQ0HrLQ+fw6llpLnOaGAvN2Zu6778SJMrCUwns4fOoG9ayrTiZk3VV8sCPkVZF8ab0zksVpS8FDY5pRCNBA==}
     engines: {node: '>=10'}
@@ -3715,6 +3724,10 @@ packages:
   lru-cache@10.4.2:
     resolution: {integrity: sha512-voV4dDrdVZVNz84n39LFKDaRzfwhdzJ7akpyXfTMxCgRUp07U3lcJUXRlhTKP17rgt09sUzLi5iCitpEAr+6ug==}
     engines: {node: 14 || 16 || 18 || 20 || >=22}
+
+  lru-cache@11.0.0:
+    resolution: {integrity: sha512-Qv32eSV1RSCfhY3fpPE2GNZ8jgM9X7rdAfemLWqTUxwiyIC4jJ6Sy0fZ8H+oLWevO6i4/bizg7c8d8i6bxrzbA==}
+    engines: {node: 20 || >=22}
 
   lru-cache@4.1.5:
     resolution: {integrity: sha512-sWZlbEP2OsHNkXrMl5GYk/jKk70MBng6UU4YI/qGDYbgf6YbP4EvmqISbXCoJiRKs+1bSpFHVgQxvJ17F2li5g==}
@@ -4214,6 +4227,10 @@ packages:
   path-scurry@1.11.1:
     resolution: {integrity: sha512-Xa4Nw17FS9ApQFJ9umLiJS4orGjm7ZzwUrwamcGQuHSzDyth9boKDaycYdDcZDuqYATXw4HFXgaqWTctW/v1HA==}
     engines: {node: '>=16 || 14 >=14.18'}
+
+  path-scurry@2.0.0:
+    resolution: {integrity: sha512-ypGJsmGtdXUOeM5u93TyeIEfEhM6s+ljAhrk5vAvSx8uyY/02OvrZnA0YNGUrPXfpJMgI1ODd3nwz8Npx4O4cg==}
+    engines: {node: 20 || >=22}
 
   path-to-regexp@0.1.7:
     resolution: {integrity: sha512-5DFkuoqlv1uYQKxy8omFBeJPQcdoE07Kv2sferDCrAq1ohOU+MSDswDIbnx3YAM60qIOnYa53wBhXW0EbMonrQ==}
@@ -6206,14 +6223,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@badeball/cypress-cucumber-preprocessor@20.1.1(cypress@13.13.2)(typescript@5.5.4)':
+  '@badeball/cypress-cucumber-preprocessor@20.1.2(cypress@13.13.2)(typescript@5.5.4)':
     dependencies:
       '@badeball/cypress-configuration': 6.1.1
       '@cucumber/ci-environment': 10.0.1
       '@cucumber/cucumber': 10.8.0
       '@cucumber/cucumber-expressions': 17.1.0
       '@cucumber/gherkin': 28.0.0
-      '@cucumber/html-formatter': 21.4.0(@cucumber/messages@25.0.1)
+      '@cucumber/html-formatter': 21.6.0(@cucumber/messages@25.0.1)
       '@cucumber/message-streams': 4.0.1(@cucumber/messages@25.0.1)
       '@cucumber/messages': 25.0.1
       '@cucumber/pretty-formatter': 1.0.1(@cucumber/cucumber@10.8.0)(@cucumber/messages@25.0.1)
@@ -6227,7 +6244,7 @@ snapshots:
       debug: 4.3.6(supports-color@8.1.1)
       error-stack-parser: 2.1.4
       esbuild: 0.23.0
-      glob: 10.4.5
+      glob: 11.0.0
       is-path-inside: 3.0.3
       mocha: 10.7.0
       seedrandom: 3.0.5
@@ -6516,7 +6533,7 @@ snapshots:
     dependencies:
       '@cucumber/messages': 24.1.0
 
-  '@cucumber/html-formatter@21.4.0(@cucumber/messages@25.0.1)':
+  '@cucumber/html-formatter@21.6.0(@cucumber/messages@25.0.1)':
     dependencies:
       '@cucumber/messages': 25.0.1
 
@@ -9137,6 +9154,15 @@ snapshots:
       package-json-from-dist: 1.0.0
       path-scurry: 1.11.1
 
+  glob@11.0.0:
+    dependencies:
+      foreground-child: 3.2.1
+      jackspeak: 4.0.1
+      minimatch: 10.0.1
+      minipass: 7.1.2
+      package-json-from-dist: 1.0.0
+      path-scurry: 2.0.0
+
   glob@7.2.3:
     dependencies:
       fs.realpath: 1.0.0
@@ -9655,6 +9681,12 @@ snapshots:
     optionalDependencies:
       '@pkgjs/parseargs': 0.11.0
 
+  jackspeak@4.0.1:
+    dependencies:
+      '@isaacs/cliui': 8.0.2
+    optionalDependencies:
+      '@pkgjs/parseargs': 0.11.0
+
   jake@10.9.2:
     dependencies:
       async: 3.2.5
@@ -10008,6 +10040,8 @@ snapshots:
   lowercase-keys@3.0.0: {}
 
   lru-cache@10.4.2: {}
+
+  lru-cache@11.0.0: {}
 
   lru-cache@4.1.5:
     dependencies:
@@ -10535,6 +10569,11 @@ snapshots:
   path-scurry@1.11.1:
     dependencies:
       lru-cache: 10.4.2
+      minipass: 7.1.2
+
+  path-scurry@2.0.0:
+    dependencies:
+      lru-cache: 11.0.0
       minipass: 7.1.2
 
   path-to-regexp@0.1.7: {}
