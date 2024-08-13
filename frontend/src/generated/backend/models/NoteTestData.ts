@@ -10,7 +10,5 @@ export type NoteTestData = {
     'Image Url'?: string;
     'Image Mask'?: string;
     'Wikidata Id'?: string;
-    'Number of Questions'?: number;
-    'Validity Period'?: number;
 };
 

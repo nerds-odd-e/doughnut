@@ -2794,12 +2794,6 @@ components:
           type: string
         Wikidata Id:
           type: string
-        Number of Questions:
-          type: integer
-          format: int32
-        Validity Period:
-          type: integer
-          format: int32
     NotesTestData:
       type: object
       properties:

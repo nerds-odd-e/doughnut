@@ -101,7 +101,7 @@ Then(
 
 Given(
   'I have a notebook with head note {string} and settings:',
-  (notebookTopic: string, data: DataTable) => {
+  (_notebookTopic: string, data: DataTable) => {
     const settings = data.hashes()
     start.testability().injectNotebookSettings(settings)
   }
@@ -110,9 +110,8 @@ Given(
 When(
   'I update validity period in notebook with {string} to {int}',
   (topic: string, validityPeriod: number) => {
-      start
-        .routerToNotebooksPage()
-        .updateAssessmentSettings(topic, 0, validityPeriod)
-    console.log(topic)
+    start
+      .routerToNotebooksPage()
+      .updateAssessmentSettings(topic, 0, validityPeriod)
   }
 )
