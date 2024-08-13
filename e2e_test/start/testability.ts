@@ -76,6 +76,25 @@ const testability = () => {
         })
       })
     },
+    injectNotebookSettings(
+      noteTestData: NoteTestData[],
+      externalIdentifier = '',
+      circleName: string | null = null
+    ) {
+      postToTestabilityApi(cy, 'inject_notebook_settings', {
+        body: {
+          externalIdentifier,
+          circleName,
+          noteTestData,
+        },
+      }).then((response) => {
+        expect(Object.keys(response.body).length).to.equal(noteTestData.length)
+        cy.get(`@${injectedNoteIdMapAliasName}`).then((existingMap) => {
+          const mergedMap = { ...existingMap, ...response.body }
+          cy.wrap(mergedMap).as(injectedNoteIdMapAliasName)
+        })
+      })
+    },
     injectNumberNotes(notebook: string, numberOfNotes: number) {
       const notes: Record<string, string>[] = [
         { Topic: notebook },

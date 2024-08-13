@@ -73,6 +73,34 @@ class TestabilityRestController {
     user.setName(name);
     modelFactoryService.save(user);
   }
+//
+//  static class NotebookSettingTestData {
+//
+//    @JsonProperty("Topic")
+//    public String topic;
+//
+//    @JsonProperty("Number of Questions")
+//    @Setter
+//    private int numberOfQuestions;
+//
+//    @JsonProperty("Validity Period")
+//    @Setter
+//    private int validityPeriod;
+//
+//    private Note buildNote(User user, Timestamp currentUTCTimestamp) {
+//      Note note =
+//        new NoteConstructionService(user, currentUTCTimestamp, null).createNote(null, topic);
+//
+//      note.setTopicConstructor(topic);
+//      if (null == note.getNotebook()) {
+//        note.buildNotebookForHeadNote(user.getOwnership(), user);
+//      }
+//      note.getNotebook().getNotebookSettings().setUntilCertExpire(validityPeriod);
+//      note.getNotebook().getNotebookSettings().setNumberOfQuestionsInAssessment(numberOfQuestions);
+//      note.setUpdatedAt(currentUTCTimestamp);
+//      return note;
+//    }
+//  }
 
   static class NoteTestData {
     @JsonProperty("Topic")
@@ -104,7 +132,7 @@ class TestabilityRestController {
 
     private Note buildNote(User user, Timestamp currentUTCTimestamp) {
       Note note =
-          new NoteConstructionService(user, currentUTCTimestamp, null).createNote(null, topic);
+        new NoteConstructionService(user, currentUTCTimestamp, null).createNote(null, topic);
       NoteAccessory content = note.getOrInitializeNoteAccessory();
 
       note.setTopicConstructor(topic);
@@ -166,11 +194,32 @@ class TestabilityRestController {
     }
   }
 
+
+  @PostMapping("/inject_notebook_settings")
+  @Transactional
+  public Map<String, NotebookSettings> injectNotebookSettings(@RequestBody NotesTestData notesTestData) {
+    final User user =
+      getUserModelByExternalIdentifierOrCurrentUser(notesTestData.externalIdentifier);
+    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
+
+    Map<String, Note> noteMap = notesTestData.buildIndividualNotes(user, currentUTCTimestamp);
+    for (String key : noteMap.keySet()) {
+      noteMap.get(key).buildNotebookForHeadNote(user.getOwnership(), user);
+    }
+    notesTestData.saveByOriginalOrder(noteMap, this.modelFactoryService);
+
+    Map<String, NotebookSettings> map = new HashMap<>();
+    noteMap.values().stream().filter(note -> map.put(note.getTopicConstructor(), note.getNotebook().getNotebookSettings()) != null).forEach(note -> {
+      throw new IllegalStateException("Duplicate key");
+    });
+    return map;
+  }
+
   @PostMapping("/inject_notes")
   @Transactional
   public Map<String, Integer> injectNotes(@RequestBody NotesTestData notesTestData) {
     final User user =
-        getUserModelByExternalIdentifierOrCurrentUser(notesTestData.externalIdentifier);
+      getUserModelByExternalIdentifierOrCurrentUser(notesTestData.externalIdentifier);
     Ownership ownership = getOwnership(notesTestData, user);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
 
@@ -178,15 +227,15 @@ class TestabilityRestController {
     notesTestData.buildNoteTree(user, ownership, titleNoteMap, this.modelFactoryService);
     notesTestData.saveByOriginalOrder(titleNoteMap, this.modelFactoryService);
     return titleNoteMap.values().stream()
-        .collect(Collectors.toMap(note -> note.getTopicConstructor(), Note::getId));
+      .collect(Collectors.toMap(note -> note.getTopicConstructor(), Note::getId));
   }
 
   @PostMapping("/inject_quiz_questions")
   @Transactional
   public List<QuizQuestionAndAnswer> injectQuizQuestion(
-      @RequestBody QuizQuestionsTestData quizQuestionsTestData) {
+    @RequestBody QuizQuestionsTestData quizQuestionsTestData) {
     List<QuizQuestionAndAnswer> quizQuestionAndAnswers =
-        quizQuestionsTestData.buildQuizQuestions(this.modelFactoryService);
+      quizQuestionsTestData.buildQuizQuestions(this.modelFactoryService);
     quizQuestionAndAnswers.forEach(question -> modelFactoryService.save(question));
     return quizQuestionAndAnswers;
   }
@@ -203,11 +252,11 @@ class TestabilityRestController {
   @Transactional
   public String linkNotes(@RequestBody HashMap<String, String> linkInfo) {
     Note sourceNote =
-        modelFactoryService.entityManager.find(
-            Note.class, Integer.valueOf(linkInfo.get("source_id")));
+      modelFactoryService.entityManager.find(
+        Note.class, Integer.valueOf(linkInfo.get("source_id")));
     Note targetNote =
-        modelFactoryService.entityManager.find(
-            Note.class, Integer.valueOf(linkInfo.get("target_id")));
+      modelFactoryService.entityManager.find(
+        Note.class, Integer.valueOf(linkInfo.get("target_id")));
     LinkType type = LinkType.fromLabel(linkInfo.get("type"));
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     User creator = sourceNote.getCreator();
@@ -239,7 +288,7 @@ class TestabilityRestController {
   public String updateCurrentUser(@RequestBody HashMap<String, String> userInfo) {
     if (userInfo.containsKey("daily_new_notes_count")) {
       currentUser.setAndSaveDailyNewNotesCount(
-          Integer.valueOf(userInfo.get("daily_new_notes_count")));
+        Integer.valueOf(userInfo.get("daily_new_notes_count")));
     }
     if (userInfo.containsKey("space_intervals")) {
       currentUser.setAndSaveSpaceIntervals(userInfo.get("space_intervals"));
@@ -254,27 +303,28 @@ class TestabilityRestController {
     entity.setName(circleInfo.get("circleName"));
     CircleModel circleModel = modelFactoryService.toCircleModel(entity);
     Arrays.stream(circleInfo.get("members").split(","))
-        .map(String::trim)
-        .forEach(
-            s -> {
-              circleModel.joinAndSave(getUserModelByExternalIdentifier(s));
-            });
+      .map(String::trim)
+      .forEach(
+        s -> {
+          circleModel.joinAndSave(getUserModelByExternalIdentifier(s));
+        });
     return "OK";
   }
 
   static class SuggestedQuestionsData {
-    @Setter private List<QuestionSuggestionParams> examples;
+    @Setter
+    private List<QuestionSuggestionParams> examples;
   }
 
   @PostMapping("/inject_suggested_questions")
   @Transactional
   public String injectSuggestedQuestion(@RequestBody SuggestedQuestionsData testData) {
     testData.examples.forEach(
-        example -> {
-          SuggestedQuestionForFineTuning suggestion = new SuggestedQuestionForFineTuning();
-          suggestion.setUser(currentUser.getEntity());
-          modelFactoryService.toSuggestedQuestionForFineTuningService(suggestion).update(example);
-        });
+      example -> {
+        SuggestedQuestionForFineTuning suggestion = new SuggestedQuestionForFineTuning();
+        suggestion.setUser(currentUser.getEntity());
+        modelFactoryService.toSuggestedQuestionForFineTuningService(suggestion).update(example);
+      });
     return "OK";
   }
 
@@ -282,7 +332,7 @@ class TestabilityRestController {
     User user = userRepository.findByExternalIdentifier(externalIdentifier);
     if (user == null) {
       throw new RuntimeException(
-          "User with external identifier `" + externalIdentifier + "` does not exist");
+        "User with external identifier `" + externalIdentifier + "` does not exist");
     }
     return user;
   }
@@ -332,17 +382,17 @@ class TestabilityRestController {
 
   @PostMapping(value = "/time_travel_relative_to_now")
   public List<Object> timeTravelRelativeToNow(
-      @RequestBody TimeTravelRelativeToNow timeTravelRelativeToNow) {
+    @RequestBody TimeTravelRelativeToNow timeTravelRelativeToNow) {
     Timestamp timestamp =
-        TimestampOperations.addHoursToTimestamp(
-            new Timestamp(System.currentTimeMillis()), timeTravelRelativeToNow.hours);
+      TimestampOperations.addHoursToTimestamp(
+        new Timestamp(System.currentTimeMillis()), timeTravelRelativeToNow.hours);
     testabilitySettings.timeTravelTo(timestamp);
     return Collections.emptyList();
   }
 
   @PostMapping(value = "/replace_service_url")
   public Map<String, String> replaceServiceUrl(
-      @RequestBody Map<String, String> setWikidataService) {
+    @RequestBody Map<String, String> setWikidataService) {
     return testabilitySettings.replaceServiceUrls(setWikidataService);
   }
 
