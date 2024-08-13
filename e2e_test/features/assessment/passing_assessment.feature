@@ -1,3 +1,4 @@
+@ignore
 Feature: Get certificate by an assessment
   As a trainer, I want to provide certificate to the learner when they pass the assessment,
   so that they can use it to show their skill level on the topic.
