@@ -9,12 +9,26 @@
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr>
       </tbody>
     </table>
   </div>
 </template>
+
+<style scoped>
+.assessment-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.assessment-table th,
+.assessment-table td {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+.assessment-table th {
+  background-color: #f2f2f2;
+}
+
+</style>

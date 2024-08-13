@@ -103,4 +103,5 @@ When('I try to view my assessment history', () => {
 
 Then('I should see my assessment history with empty records', () => {
   start.assumeViewAssessmentHistoryPage().expectToFindTitle()
+  start.assumeViewAssessmentHistoryPage().expectTableWithNoRow()
 })
