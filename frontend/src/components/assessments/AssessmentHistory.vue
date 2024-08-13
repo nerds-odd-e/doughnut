@@ -20,11 +20,9 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, onMounted, ref } from "vue"
-import { Note, QuizQuestionAndAnswer } from "@/generated/backend"
+import { ref } from "vue"
+import { QuizQuestionAndAnswer } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import NoteAddQuestion from "./NoteAddQuestion.vue"
-import PopButton from "../commons/Popups/PopButton.vue"
 
 const { managedApi } = useLoadingApi()
 const questions = ref<QuizQuestionAndAnswer[]>([])
@@ -39,8 +37,6 @@ const toggleApproval = async (questionId?: number) => {
     await managedApi.restQuizQuestionController.toggleApproval(questionId)
   }
 }
-onMounted(() => {
-})
 </script>
 
 <style scoped>

@@ -28,6 +28,6 @@ export default defineComponent({
       type: Object as PropType<User>,
       required: false,
     },
-  }
+  },
 })
 </script>

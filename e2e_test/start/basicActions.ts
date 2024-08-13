@@ -10,7 +10,10 @@ import { assumeNotePage } from './pageObjects/notePage'
 import { routerToNotebooksPage } from './pageObjects/notebooksPage'
 import { noteSidebar } from './pageObjects/noteSidebar'
 import { systemSidebar } from './pageObjects/systemSidebar'
-import { navigateToAssessmentHistory, assumeViewAssessmentHistoryPage } from './pageObjects/assessmentHistoryPage'
+import {
+  navigateToAssessmentHistory,
+  assumeViewAssessmentHistoryPage,
+} from './pageObjects/assessmentHistoryPage'
 import { assessmentSidebar } from './pageObjects/assessmentSideBar'
 import testability from './testability'
 
