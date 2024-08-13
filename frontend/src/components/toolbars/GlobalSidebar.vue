@@ -21,6 +21,9 @@
       <router-link :to="{ name: 'notebooks' }"> My Notebooks </router-link>
     </li>
     <li class="list-group-item">
+      <router-link :to="{ name: 'assessmentHistory' }"> My Assessments </router-link>
+    </li>
+    <li class="list-group-item">
       <router-link :to="{ name: 'bazaar' }"> Bazaar </router-link>
     </li>
     <ContentLoader v-if="!circles" />

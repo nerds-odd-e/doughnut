@@ -3,6 +3,7 @@ import HomePage from "@/pages/HomePage.vue"
 import BazaarPage from "@/pages/BazaarPage.vue"
 import NotebooksPage from "@/pages/NotebooksPage.vue"
 import NoteShowPage from "@/pages/NoteShowPage.vue"
+import AssessmentHistoryPage from "@/pages/AssessmentHistoryPage.vue"
 import AssessmentPage from "@/pages/AssessmentPage.vue"
 import ReviewHome from "@/pages/ReviewHome.vue"
 import RepeatPage from "@/pages/RepeatPage.vue"
@@ -60,6 +61,12 @@ const routes = [
     path: "/bazaar",
     name: "bazaar",
     component: BazaarPage,
+    meta: { userProp: true },
+  },
+  {
+    path: "/assessmentHistory",
+    name: "assessmentHistory",
+    component: AssessmentHistoryPage,
     meta: { userProp: true },
   },
   {
