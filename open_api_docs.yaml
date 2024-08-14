@@ -3737,12 +3737,8 @@ components:
         submittedAt:
           type: string
           format: date-time
-        answersCorrect:
-          type: integer
-          format: int32
-        answersTotal:
-          type: integer
-          format: int32
+        result:
+          type: string
     Delta:
       type: object
       properties:

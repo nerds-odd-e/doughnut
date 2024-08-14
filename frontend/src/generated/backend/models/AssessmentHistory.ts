@@ -5,7 +5,6 @@
 export type AssessmentHistory = {
     notebookTitle?: string;
     submittedAt?: string;
-    answersCorrect?: number;
-    answersTotal?: number;
+    result?: string;
 };
 

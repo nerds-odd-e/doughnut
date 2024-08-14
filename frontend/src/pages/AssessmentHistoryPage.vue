@@ -20,7 +20,7 @@
         >
           <td>{{assessmentHistory.notebookTitle}}</td>
           <td>{{assessmentHistory.submittedAt}}</td>
-          <td>{{assessmentHistory.answersCorrect}}</td>
+          <td>{{assessmentHistory.result}}</td>
         </tr>
       </tbody>
     </table>

@@ -75,7 +75,7 @@ class RestAssessmentController {
   public List<AssessmentHistory> getAssessmentHistory() {
     List<AssessmentHistory> assessmentHistories = new ArrayList<>();
     assessmentHistories.add(
-        new AssessmentHistory("Notebook A", testabilitySettings.getCurrentUTCTimestamp(), 2, 2));
+        new AssessmentHistory("Notebook A", testabilitySettings.getCurrentUTCTimestamp(), "Pass"));
     return assessmentHistories;
   }
 }

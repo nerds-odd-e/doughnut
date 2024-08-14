@@ -14,6 +14,5 @@ public class AssessmentHistory {
 
   public String notebookTitle;
   public Timestamp submittedAt;
-  public int answersCorrect;
-  public int answersTotal;
+  public String result;
 }
