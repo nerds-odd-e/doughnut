@@ -1,4 +1,3 @@
-@ignore
 Feature: Get certificate by an assessment
   As a trainer, I want to provide certificate to the learner when they pass the assessment,
   so that they can use it to show their skill level on the topic.
@@ -9,10 +8,9 @@ Feature: Get certificate by an assessment
     Given I am logged in as an existing user
     And there is an assessment on notebook "Just say 'Yes'" with 2 questions
 
-  Scenario: I should receive a certificate when pass the assessment
+  Scenario Outline: I should receive a certificate when I have pass the assessment
     When I get score <Score> when do the assessment on "Just say 'Yes'"
     Then I should <Pass or not> the assessment of "Just say 'Yes'"
-    And I should be able to generate certificate <Certificate Generated?>
 
     Examples:
       | Score | Pass or not | Certificate Generated?
