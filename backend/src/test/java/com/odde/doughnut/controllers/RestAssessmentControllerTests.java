@@ -3,6 +3,7 @@ package com.odde.doughnut.controllers;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.dto.AnswerSubmission;
+import com.odde.doughnut.controllers.dto.AssessmentHistory;
 import com.odde.doughnut.controllers.dto.AssessmentResult;
 import com.odde.doughnut.controllers.dto.Randomization;
 import com.odde.doughnut.entities.*;
@@ -306,6 +307,15 @@ public class RestAssessmentControllerTests {
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.submitAssessmentResult(notebook, answerSubmissions));
+    }
+  }
+
+  @Nested
+  class showAssessmentHistoryTest {
+    @Test
+    void shouldReturnOneAssessmentHistory() throws UnexpectedNoAccessRightException {
+      List<AssessmentHistory> assessmentHistories = controller.getAssessmentHistory();
+      assertEquals(1, assessmentHistories.size());
     }
   }
 }
