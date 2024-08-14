@@ -6,6 +6,12 @@ export const assumeViewAssessmentHistoryPage = () => {
     expectTableWithNumberOfRow(n: number) {
       cy.get('.assessment-table tbody tr').should('have.length', n)
     },
+    expectEnabledCertificateButton() {
+      cy.contains('button', 'Get Certificate').should('be.enabled')
+    },
+    expectDisabledCertificateButton() {
+      cy.contains('button', 'Get Certificate').should('be.disabled')
+    },
   }
 }
 

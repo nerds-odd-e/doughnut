@@ -110,3 +110,27 @@ Then('I should see one record of the assessment', () => {
   start.assumeViewAssessmentHistoryPage().expectToFindTitle()
   start.assumeViewAssessmentHistoryPage().expectTableWithNumberOfRow(1)
 })
+
+Given(
+  'I have completed the assessment on notebook {string} with {int} questions',
+  (notebook: string, numberOfQuestion: number) => {
+    start
+      .testability()
+      .injectNumbersNotebookWithQuestions(notebook, numberOfQuestion)
+    start
+      .routerToNotebooksPage()
+      .updateAssessmentSettings(notebook, { numberOfQuestion })
+  }
+)
+When(
+  'I view my assessment history of topic {string} and scored {int}\\/{int} on the assessment',
+  () => {
+    start.navigateToAssessmentHistory()
+  }
+)
+Then('I should be able to get my assessment certificate', () => {
+  start.assumeViewAssessmentHistoryPage().expectEnabledCertificateButton()
+})
+Then('I should not be able to see the get certificate button', () => {
+  start.assumeViewAssessmentHistoryPage().expectDisabledCertificateButton()
+})
