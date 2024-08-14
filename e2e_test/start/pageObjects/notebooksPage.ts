@@ -35,9 +35,9 @@ export const routerToNotebooksPage = () => {
     updateAssessmentSettings(
       notebook: string,
       settings: {
-        numberOfQuestion?: number,
-        untilCertExpire?: number,
-      },
+        numberOfQuestion?: number
+        untilCertExpire?: number
+      }
     ) {
       this.findNotebookCardButton(notebook, 'Edit notebook settings').click()
       if (settings.numberOfQuestion) {
@@ -47,7 +47,9 @@ export const routerToNotebooksPage = () => {
       }
 
       if (settings.untilCertExpire) {
-        cy.formField('Until Cert Expire').assignFieldValue(`${settings.untilCertExpire}`)
+        cy.formField('Until Cert Expire').assignFieldValue(
+          `${settings.untilCertExpire}`
+        )
       }
       cy.findByRole('button', { name: 'Update' }).click()
     },
@@ -57,7 +59,7 @@ export const routerToNotebooksPage = () => {
     },
     checkCertificateExpiry(notebook: string, expectedExpiry: number) {
       this.findNotebookCardButton(notebook, 'Edit notebook settings').click()
-      cy.formField('Until Cert Expire').should("have.value", expectedExpiry)
+      cy.formField('Until Cert Expire').should('have.value', expectedExpiry)
     },
   }
 }
