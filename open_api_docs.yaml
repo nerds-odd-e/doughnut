@@ -368,7 +368,7 @@ paths:
               schema:
                 type: object
                 additionalProperties:
-                  $ref: "#/components/schemas/NotebookSettings"
+                  $ref: "#/components/schemas/Note"
   /api/testability/inject_circle:
     post:
       tags:
@@ -2794,6 +2794,9 @@ components:
           type: string
         Wikidata Id:
           type: string
+        Validity Period:
+          type: integer
+          format: int32
     NotesTestData:
       type: object
       properties:
@@ -2808,25 +2811,6 @@ components:
         circleName:
           type: string
           writeOnly: true
-    NotebookSettings:
-      type: object
-      properties:
-        skipReviewEntirely:
-          type: boolean
-        numberOfQuestionsInAssessment:
-          type: integer
-          format: int32
-        untilCertExpire:
-          type: integer
-          format: int32
-        certifiedBy:
-          type: string
-    SubscriptionDTO:
-      type: object
-      properties:
-        dailyTargetOfNewNotes:
-          type: integer
-          format: int32
     Note:
       required:
       - createdAt
@@ -2892,6 +2876,12 @@ components:
           $ref: "#/components/schemas/NoteTopic"
         parentNoteTopic:
           $ref: "#/components/schemas/NoteTopic"
+    SubscriptionDTO:
+      type: object
+      properties:
+        dailyTargetOfNewNotes:
+          type: integer
+          format: int32
     Notebook:
       required:
       - headNote
@@ -2907,6 +2897,19 @@ components:
         notebookSettings:
           $ref: "#/components/schemas/NotebookSettings"
         creatorId:
+          type: string
+    NotebookSettings:
+      type: object
+      properties:
+        skipReviewEntirely:
+          type: boolean
+        numberOfQuestionsInAssessment:
+          type: integer
+          format: int32
+        untilCertExpire:
+          type: integer
+          format: int32
+        certifiedBy:
           type: string
     Subscription:
       required:

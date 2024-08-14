@@ -1,4 +1,3 @@
-@ignore
 Feature: Update Notebook Settings
 
   Background:
@@ -8,5 +7,5 @@ Feature: Update Notebook Settings
       |LeSS in Action | 10                  | 0               |
 
   Scenario: Update validity period in notebook settings
-    When I update validity period in notebook with "LeSS in Action" to 1
-    Then I should be able to view the Validity Period of notebook with "LeSS in Action": 1 in notebook settings
+    When I update validity period in notebook: "LeSS in Action" with number of questions: 5 and until cert expire: 2 year
+    Then I should be able to view the Validity Period of notebook with "LeSS in Action": 2 year in notebook settings

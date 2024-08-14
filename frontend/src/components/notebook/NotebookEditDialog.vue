@@ -13,6 +13,12 @@
       v-model="formData.numberOfQuestionsInAssessment"
       :errors="errors.numberOfQuestionsInAssessment"
     />
+    <TextInput
+      scope-name="notebook"
+      field="untilCertExpire"
+      v-model="formData.untilCertExpire"
+      :errors="errors.untilCertExpire"
+    />
     <button class="btn btn-primary btn-layout" @click="processForm">
       Update
     </button>
@@ -31,12 +37,16 @@ export default {
   props: { notebook: Object },
   components: { CheckInput, TextInput },
   data() {
-    const { skipReviewEntirely, numberOfQuestionsInAssessment } =
-      this.notebook.notebookSettings
+    const {
+      skipReviewEntirely,
+      numberOfQuestionsInAssessment,
+      untilCertExpire,
+    } = this.notebook.notebookSettings
     return {
       formData: {
         skipReviewEntirely,
         numberOfQuestionsInAssessment,
+        untilCertExpire,
       },
       errors: {},
     }

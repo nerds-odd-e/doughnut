@@ -102,6 +102,10 @@ class TestabilityRestController {
     @Setter
     private String wikidataId;
 
+    @JsonProperty("Validity Period")
+    @Setter
+    private int validityPeriod;
+
     private Note buildNote(User user, Timestamp currentUTCTimestamp) {
       Note note =
           new NoteConstructionService(user, currentUTCTimestamp, null).createNote(null, topic);
@@ -118,6 +122,12 @@ class TestabilityRestController {
 
       note.setWikidataId(wikidataId);
       note.setUpdatedAt(currentUTCTimestamp);
+      return buildNotebook(user, currentUTCTimestamp, note);
+    }
+
+    private Note buildNotebook(User user, Timestamp currentUTCTimestamp, Note note) {
+      note.buildNotebookForHeadNote(user.getOwnership(), user);
+      note.getNotebook().getNotebookSettings().setUntilCertExpire(validityPeriod);
       return note;
     }
   }
@@ -168,28 +178,16 @@ class TestabilityRestController {
 
   @PostMapping("/inject_notebook_settings")
   @Transactional
-  public Map<String, NotebookSettings> injectNotebookSettings(
-      @RequestBody NotesTestData notesTestData) {
+  public Map<String, Note> injectNotebookSettings(@RequestBody NotesTestData notesTestData) {
     final User user =
         getUserModelByExternalIdentifierOrCurrentUser(notesTestData.externalIdentifier);
+    Ownership ownership = getOwnership(notesTestData, user);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
 
-    Map<String, Note> noteMap = notesTestData.buildIndividualNotes(user, currentUTCTimestamp);
-    for (String key : noteMap.keySet()) {
-      noteMap.get(key).buildNotebookForHeadNote(user.getOwnership(), user);
-    }
-    notesTestData.saveByOriginalOrder(noteMap, this.modelFactoryService);
+    Map<String, Note> map = notesTestData.buildIndividualNotes(user, currentUTCTimestamp);
+    notesTestData.buildNoteTree(user, ownership, map, this.modelFactoryService);
+    notesTestData.saveByOriginalOrder(map, this.modelFactoryService);
 
-    Map<String, NotebookSettings> map = new HashMap<>();
-    noteMap.values().stream()
-        .filter(
-            note ->
-                map.put(note.getTopicConstructor(), note.getNotebook().getNotebookSettings())
-                    != null)
-        .forEach(
-            note -> {
-              throw new IllegalStateException("Duplicate key");
-            });
     return map;
   }
 

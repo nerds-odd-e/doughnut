@@ -93,7 +93,7 @@ Given(
       .injectNumbersNotebookWithQuestions(notebook, numberOfQuestion)
     start
       .routerToNotebooksPage()
-      .updateAssessmentSettings(notebook, numberOfQuestion)
+      .updateAssessmentSettings(notebook, { numberOfQuestion })
   }
 )
 

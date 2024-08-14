@@ -45,7 +45,7 @@ Given(
   (notebook: string, numberOfQuestion: number) => {
     start
       .routerToNotebooksPage()
-      .updateAssessmentSettings(notebook, numberOfQuestion)
+      .updateAssessmentSettings(notebook, { numberOfQuestion })
   }
 )
 
@@ -54,7 +54,7 @@ Given(
   (notebook: string, numberOfQuestion: number) => {
     start
       .routerToNotebooksPage()
-      .updateAssessmentSettings(notebook, numberOfQuestion)
+      .updateAssessmentSettings(notebook, { numberOfQuestion })
   }
 )
 
@@ -106,12 +106,19 @@ Given(
     start.testability().injectNotebookSettings(settings)
   }
 )
-
 When(
-  'I update validity period in notebook with {string} to {int}',
-  (topic: string, validityPeriod: number) => {
+  'I update validity period in notebook: {string} with number of questions: {int} and until cert expire: {int} year',
+  (topic: string, numberOfQuestions: number, untilCertExpire: number) => {
     start
       .routerToNotebooksPage()
-      .updateAssessmentSettings(topic, 0, validityPeriod)
+      .updateAssessmentSettings(topic, { numberOfQuestions, untilCertExpire })
+  }
+)
+Then(
+  'I should be able to view the Validity Period of notebook with {string}: {int} year in notebook settings',
+  (notebook: string, untilCertExpire: number) => {
+    start
+      .routerToNotebooksPage()
+      .checkCertificateExpiry(notebook, untilCertExpire)
   }
 )
