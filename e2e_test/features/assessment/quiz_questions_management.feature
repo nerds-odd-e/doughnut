@@ -6,17 +6,26 @@ Feature: Quiz Question Management
     Given I am logged in as an existing user
     And I have a notebook with the head note "The cow joke"
     And there are questions for the note:
-      | Note Topic   | Question             | Answer | One Wrong Choice |
-      | The cow joke | What does a cow say? | moo    | woo              |
+      | Note Topic   | Question                              | Answer    | One Wrong Choice |
+      | The cow joke | What does a cow say?                  | moo       | woo              |
+      | The cow joke | What kind of shows do cows like best? | moosicals | comedies         |
+
 
   Scenario: Manually add a question to the note successfully
     When I add the following question for the note "The cow joke":
       | Stem                                 | Choice 0    | Choice 1 | Choice 2 | Correct Choice Index |
       | What do you call a cow with not leg? | Ground beef | Cowboy   | Oxford   | 0                    |
     Then I should see the questions in the question list of the note "The cow joke":
-      | Question                             | Correct Choice |
-      | What does a cow say?                 | moo            |
-      | What do you call a cow with not leg? | Ground beef    |
+      | Question                              | Correct Choice |
+      | What does a cow say?                  | moo            |
+      | What kind of shows do cows like best? | moosicals      |
+      | What do you call a cow with not leg?  | Ground beef    |
+
+  Scenario: Manually delete a single question from the note successfully
+    When I delete the question "What does a cow say?" from the note "The cow joke":
+    Then I should see the questions in the question list of the note "The cow joke":
+      | Question                              | Correct Choice |
+      | What kind of shows do cows like best? | moosicals      |
 
   @usingMockedOpenAiService
   Scenario: Can generate the question by AI
