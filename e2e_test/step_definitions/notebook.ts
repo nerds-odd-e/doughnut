@@ -59,7 +59,7 @@ Given(
 )
 
 When(
-  'I have done the assessment of the notebook {string} {int} times',
+  'I have passed the assessment of the notebook {string} {int} times',
   (notebook: string, numberOfAttempts: number) => {
     const table: DataTable = new DataTable([
       ['Question', 'Answer'],
@@ -70,6 +70,7 @@ When(
         .navigateToBazaar()
         .selfAssessmentOnNotebook(notebook)
         .answerQuestionsFromTable(table.hashes())
+        .passAssessment()
     })
   }
 )
