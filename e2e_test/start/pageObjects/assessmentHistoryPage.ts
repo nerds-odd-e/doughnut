@@ -3,8 +3,8 @@ export const assumeViewAssessmentHistoryPage = () => {
     expectToFindTitle() {
       cy.findByText('Welcome To Assessment History').should('be.visible')
     },
-    expectTableWithNoRow() {
-      cy.get('.assessment-table tbody tr').should('have.length', 0)
+    expectTableWithNumberOfRow(n: number) {
+      cy.get('.assessment-table tbody tr').should('have.length', n)
     },
   }
 }

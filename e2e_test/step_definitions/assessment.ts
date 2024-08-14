@@ -97,11 +97,16 @@ Given(
   }
 )
 
-When('I try to view my assessment history', () => {
+When('I view my assessment history', () => {
   start.navigateToAssessmentHistory()
 })
 
 Then('I should see my assessment history with empty records', () => {
   start.assumeViewAssessmentHistoryPage().expectToFindTitle()
-  start.assumeViewAssessmentHistoryPage().expectTableWithNoRow()
+  start.assumeViewAssessmentHistoryPage().expectTableWithNumberOfRow(0)
+})
+
+Then('I should see one record of the assessment', () => {
+  start.assumeViewAssessmentHistoryPage().expectToFindTitle()
+  start.assumeViewAssessmentHistoryPage().expectTableWithNumberOfRow(1)
 })

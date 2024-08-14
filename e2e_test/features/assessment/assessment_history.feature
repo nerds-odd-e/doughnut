@@ -4,14 +4,17 @@ Feature: View my assessment history
 
   Background:
     Given I am logged in as an existing user
-    
+    And there is an assessment on notebook "Just say 'Yes'" with 2 questions
+
+ @focus
   Scenario: Have not taken any assessment
-    When I try to view my assessment history
+    When I view my assessment history
     Then I should see my assessment history with empty records
 
   Scenario: Have take one assessment of a notebook
-    When I try to view my assessment history
-    Then I should see one record of the assessment
+    When I get score 2/2 when do the assessment on "Just say 'Yes'"
+    Then I view my assessment history
+    And I should see one record of the assessment
 
   Scenario Outline: Have attempted assessment of a notebook
     When I view my assessment history
