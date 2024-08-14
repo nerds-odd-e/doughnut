@@ -19,6 +19,7 @@ export type { Annotation } from './models/Annotation';
 export type { AnswerDTO } from './models/AnswerDTO';
 export type { AnsweredQuestion } from './models/AnsweredQuestion';
 export type { AnswerSubmission } from './models/AnswerSubmission';
+export type { AssessmentHistory } from './models/AssessmentHistory';
 export type { AssessmentResult } from './models/AssessmentResult';
 export type { Attachment } from './models/Attachment';
 export type { Audio } from './models/Audio';

@@ -2538,6 +2538,26 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BazaarNotebook"
+  /api/assessment:
+    get:
+      tags:
+      - rest-assessment-controller
+      operationId: getAssessmentHistory
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AssessmentHistory"
   /api/assessment/questions/{notebook}:
     get:
       tags:
@@ -3709,6 +3729,20 @@ components:
       properties:
         name:
           type: string
+    AssessmentHistory:
+      type: object
+      properties:
+        notebookTitle:
+          type: string
+        submittedAt:
+          type: string
+          format: date-time
+        answersCorrect:
+          type: integer
+          format: int32
+        answersTotal:
+          type: integer
+          format: int32
     Delta:
       type: object
       properties:

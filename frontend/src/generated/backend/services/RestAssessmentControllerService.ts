@@ -3,6 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { AnswerSubmission } from '../models/AnswerSubmission';
+import type { AssessmentHistory } from '../models/AssessmentHistory';
 import type { AssessmentResult } from '../models/AssessmentResult';
 import type { QuizQuestion } from '../models/QuizQuestion';
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -27,6 +28,19 @@ export class RestAssessmentControllerService {
             },
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @returns AssessmentHistory OK
+     * @throws ApiError
+     */
+    public getAssessmentHistory(): CancelablePromise<Array<AssessmentHistory>> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/assessment',
             errors: {
                 500: `Internal Server Error`,
             },
