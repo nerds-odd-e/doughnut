@@ -45,7 +45,6 @@ export const assumeAssessmentPage = (notebook?: string) => {
         this.assumeQuestionSection().answerFromTable(answersTable)
       })
       cy.pageIsNotLoading()
-      return this
     },
     answerYesNoQuestionsByScore(correctAnswers: number, allQuestions: number) {
       for (let i = 0; i < correctAnswers; i++) {
