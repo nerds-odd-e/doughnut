@@ -12,6 +12,7 @@
           <th>Notebook</th>
           <th>Attempt At</th>
           <th>Result</th>
+          <th>Action</th>
         </tr>
       </thead>
       <tbody>
@@ -21,6 +22,11 @@
           <td>{{assessmentHistory.notebookTitle}}</td>
           <td>{{assessmentHistory.submittedAt}}</td>
           <td>{{assessmentHistory.result}}</td>
+          <td>
+            <button :disabled="assessmentHistory.result === 'Fail'">
+              Get Certificate
+            </button>
+          </td>
         </tr>
       </tbody>
     </table>

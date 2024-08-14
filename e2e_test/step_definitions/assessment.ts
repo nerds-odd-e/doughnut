@@ -128,9 +128,12 @@ When(
     start.navigateToAssessmentHistory()
   }
 )
-Then('I should be able to get my assessment certificate', () => {
-  start.assumeViewAssessmentHistoryPage().expectEnabledCertificateButton()
-})
-Then('I should not be able to see the get certificate button', () => {
+Then(
+  "I should be able to click the 'Get Certificate' button to get my assessment certificate",
+  () => {
+    start.assumeViewAssessmentHistoryPage().expectEnabledCertificateButton()
+  }
+)
+Then("I should not be able to click on the 'Get Certificate' button", () => {
   start.assumeViewAssessmentHistoryPage().expectDisabledCertificateButton()
 })
