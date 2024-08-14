@@ -4,7 +4,7 @@ export const assumeViewAssessmentHistoryPage = () => {
       cy.findByText('Welcome To Assessment History').should('be.visible')
     },
     expectTableWithNoRow() {
-      cy.get('.assessment-table tbody tr').should('not.exist')
+      cy.get('.assessment-table tbody tr').should('have.length', 0)
     },
   }
 }
