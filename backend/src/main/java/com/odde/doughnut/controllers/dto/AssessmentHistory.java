@@ -1,13 +1,15 @@
 package com.odde.doughnut.controllers.dto;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class AssessmentHistory {
 
   public String notebookTitle;
