@@ -3,11 +3,11 @@
     <PopButton btn-class="btn btn-primary" title="Add Question">
       <!-- prettier-ignore -->
       <template #default="{ closer }">
-        <NoteAddQuestion
+        <NoteAddOrEditQuestion
           v-bind="{ note }"
           @close-dialog="
-            closer($event);
-            questionAdded($event);
+            closer();
+            questionAddedOrEdited($event);
           "
         />
       </template>
@@ -15,6 +15,7 @@
     <table class="question-table mt-2">
       <thead>
         <tr>
+          <th>Actions</th>
           <th>Approved</th>
           <th>Question Text</th>
           <th>A</th>
@@ -28,6 +29,23 @@
           v-for="(question, outerIndex) in questions"
           :key="question.quizQuestion.multipleChoicesQuestion.stem"
         >
+          <td>
+            <button class="btn btn-danger" title="Delete Question" @click=deleteQuestion(question.id)>
+              Delete
+            </button>
+            <PopButton btn-class="btn btn-primary" title="Edit">
+              <!-- prettier-ignore -->
+              <template #default="{ closer }">
+                <NoteAddOrEditQuestion
+                  v-bind="{ note, question }"
+                  @close-dialog="
+                    closer();
+                    questionAddedOrEdited($event);
+                  "
+                />
+              </template>
+            </PopButton>
+          </td>
           <td>
             <input
               :id="'checkbox-' + outerIndex"
@@ -61,7 +79,7 @@
 import { PropType, onMounted, ref } from "vue"
 import { Note, QuizQuestionAndAnswer } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import NoteAddQuestion from "./NoteAddQuestion.vue"
+import NoteAddOrEditQuestion from "./NoteAddOrEditQuestion.vue"
 import PopButton from "../commons/Popups/PopButton.vue"
 
 const { managedApi } = useLoadingApi()
@@ -78,12 +96,27 @@ const fetchQuestions = async () => {
       props.note.id
     )
 }
-const questionAdded = (newQuestion: QuizQuestionAndAnswer) => {
+const questionAddedOrEdited = (newQuestion: QuizQuestionAndAnswer) => {
   if (newQuestion == null) {
     return
   }
-  questions.value.push(newQuestion)
+
+  const index = questions.value.findIndex((q) => {
+    return q.id === newQuestion.id
+  })
+  if (index === -1) {
+    questions.value.push(newQuestion)
+  } else {
+    questions.value.splice(index, 1, newQuestion)
+  }
 }
+
+const deleteQuestion = async (questionId?: number) => {
+  if (questionId) {
+    console.log("Delete not implemented yet!")
+  }
+}
+
 const toggleApproval = async (questionId?: number) => {
   if (questionId) {
     await managedApi.restQuizQuestionController.toggleApproval(questionId)

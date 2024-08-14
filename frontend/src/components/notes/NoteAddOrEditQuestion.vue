@@ -58,17 +58,36 @@ const props = defineProps({
     type: Object as PropType<Note>,
     required: true,
   },
+  question: {
+    type: Object as PropType<QuizQuestionAndAnswer>,
+    required: false,
+  },
 })
 
-const quizQuestionAndAnswer = ref<QuizQuestionAndAnswer>({
-  correctAnswerIndex: 0,
-  quizQuestion: {
-    multipleChoicesQuestion: {
-      stem: "",
-      choices: ["", ""],
-    },
-  },
-} as QuizQuestionAndAnswer)
+const quizQuestionAndAnswer = ref<QuizQuestionAndAnswer>(
+  props.question
+    ? {
+        ...props.question,
+        quizQuestion: {
+          ...props.question.quizQuestion,
+          multipleChoicesQuestion: {
+            ...props.question.quizQuestion.multipleChoicesQuestion,
+            choices: [
+              ...props.question.quizQuestion.multipleChoicesQuestion.choices,
+            ],
+          },
+        },
+      }
+    : ({
+        correctAnswerIndex: 0,
+        quizQuestion: {
+          multipleChoicesQuestion: {
+            stem: "",
+            choices: ["", ""],
+          },
+        },
+      } as QuizQuestionAndAnswer)
+)
 
 const minimumNumberOfChoices = 2
 const maximumNumberOfChoices = 10
