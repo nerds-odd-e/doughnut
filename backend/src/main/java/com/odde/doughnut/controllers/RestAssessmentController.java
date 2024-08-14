@@ -13,7 +13,6 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -73,9 +72,7 @@ class RestAssessmentController {
 
   @GetMapping
   public List<AssessmentHistory> getAssessmentHistory() {
-    List<AssessmentHistory> assessmentHistories = new ArrayList<>();
-    assessmentHistories.add(
-        new AssessmentHistory("Notebook A", testabilitySettings.getCurrentUTCTimestamp(), "Pass"));
-    return assessmentHistories;
+    currentUser.assertLoggedIn();
+    return assessmentService.getAssessmentHistory(currentUser.getEntity());
   }
 }

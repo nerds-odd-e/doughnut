@@ -3,6 +3,7 @@ package com.odde.doughnut.services;
 import static com.odde.doughnut.controllers.dto.ApiError.ErrorType.ASSESSMENT_SERVICE_ERROR;
 
 import com.odde.doughnut.controllers.dto.AnswerSubmission;
+import com.odde.doughnut.controllers.dto.AssessmentHistory;
 import com.odde.doughnut.controllers.dto.AssessmentResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.ApiException;
@@ -10,6 +11,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -77,5 +79,23 @@ public class AssessmentService {
     assessmentResult.setTotalCount(answerSubmission.size());
     assessmentResult.setCorrectCount(totalCorrectAnswer);
     return assessmentResult;
+  }
+
+  public List<AssessmentHistory> getAssessmentHistory(User user) {
+    List<AssessmentHistory> assessmentHistories = new ArrayList<>();
+    modelFactoryService
+        .assessmentAttemptRepository
+        .findAll()
+        .forEach(
+            aa -> {
+              AssessmentHistory ah =
+                  new AssessmentHistory(
+                      aa.getNotebook().getHeadNote().getNoteTitle().toString(),
+                      aa.getSubmittedAt(),
+                      "Pass");
+              assessmentHistories.add(ah);
+            });
+
+    return assessmentHistories;
   }
 }

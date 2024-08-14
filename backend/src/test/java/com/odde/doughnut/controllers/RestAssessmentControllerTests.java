@@ -312,8 +312,30 @@ public class RestAssessmentControllerTests {
 
   @Nested
   class showAssessmentHistoryTest {
+    private Notebook notebook;
+    private Note topNote;
+
+    @BeforeEach
+    void setup() {
+      topNote = makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser).please();
+    }
+
+    @Test
+    void shouldReturnEmptyIfNoAssemsentTaken() throws UnexpectedNoAccessRightException {
+      List<AssessmentHistory> assessmentHistories = controller.getAssessmentHistory();
+      assertEquals(0, assessmentHistories.size());
+    }
+
     @Test
     void shouldReturnOneAssessmentHistory() throws UnexpectedNoAccessRightException {
+      makeMe.theNote(topNote).withNChildrenThat(2, NoteBuilder::hasAnApprovedQuestion).please();
+      notebook = topNote.getNotebook();
+      AssessmentAttempt assessmentAttempt =
+          makeMe
+              .aAssessmentAttempt(
+                  currentUser.getEntity(), notebook, testabilitySettings.getCurrentUTCTimestamp())
+              .please();
+      makeMe.modelFactoryService.save(assessmentAttempt);
       List<AssessmentHistory> assessmentHistories = controller.getAssessmentHistory();
       assertEquals(1, assessmentHistories.size());
     }
