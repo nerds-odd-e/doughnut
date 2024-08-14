@@ -6,7 +6,6 @@ Feature: View my assessment history
     Given I am logged in as an existing user
     And there is an assessment on notebook "Just say 'Yes'" with 2 questions
 
- @focus
   Scenario: Have not taken any assessment
     When I view my assessment history
     Then I should see my assessment history with empty records
