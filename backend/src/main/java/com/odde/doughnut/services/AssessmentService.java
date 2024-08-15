@@ -110,6 +110,14 @@ public class AssessmentService {
     Optional<Certificate> optionalCertificate =
         modelFactoryService.certificateRepository.findFirstByNotebookAndUserOrderByExpiryDateDesc(
             notebook, currentUser.getEntity());
-    return optionalCertificate.orElse(null);
+    return optionalCertificate.orElse(generateCertificate(notebook, currentUser));
+  }
+
+  private Certificate generateCertificate(Notebook notebook, UserModel currentUser) {
+    Certificate certificate = new Certificate();
+    certificate.setNotebook(notebook);
+    certificate.setUser(currentUser.getEntity());
+
+    return modelFactoryService.save(certificate);
   }
 }
