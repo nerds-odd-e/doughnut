@@ -2584,6 +2584,30 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/QuizQuestion"
+  /api/assessment/certificate/{notebook}:
+    get:
+      tags:
+      - rest-assessment-controller
+      operationId: getCertificate
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Certificate"
   /api/ai/dummy:
     get:
       tags:
@@ -3739,6 +3763,19 @@ components:
           format: date-time
         result:
           type: string
+    Certificate:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        notebook:
+          $ref: "#/components/schemas/Notebook"
+        expiryDate:
+          type: string
+          format: date-time
     Delta:
       type: object
       properties:

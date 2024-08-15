@@ -8,12 +8,14 @@ import com.odde.doughnut.controllers.dto.AssessmentResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public class AssessmentService {
   private final ModelFactoryService modelFactoryService;
@@ -99,5 +101,12 @@ public class AssessmentService {
               assessmentHistories.add(ah);
             });
     return assessmentHistories;
+  }
+
+  public Certificate getCertificate(Notebook notebook, UserModel currentUser) {
+    Optional<Certificate> optionalCertificate =
+        modelFactoryService.certificateRepository.findFirstByNotebookAndUserOrderByExpiryDateDesc(
+            notebook, currentUser.getEntity());
+    return optionalCertificate.orElse(null);
   }
 }

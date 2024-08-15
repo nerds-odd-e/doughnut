@@ -16,7 +16,10 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.NoteBuilder;
 import com.theokanning.openai.client.OpenAiApi;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -356,6 +359,38 @@ public class RestAssessmentControllerTests {
           .please();
       List<AssessmentHistory> assessmentHistories = controller.getAssessmentHistory();
       assertEquals("Fail", assessmentHistories.getFirst().getResult());
+    }
+  }
+
+  @Nested
+  class showCertificateTests {
+    private Notebook notebook;
+    private Note topNote;
+
+    @BeforeEach
+    void setup() {
+      topNote = makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser).please();
+      makeMe.theNote(topNote).withNChildrenThat(2, NoteBuilder::hasAnApprovedQuestion).please();
+      notebook = topNote.getNotebook();
+    }
+
+    @Test
+    void shouldNotReturnCertificate() throws UnexpectedNoAccessRightException {
+      Certificate certificate = controller.getCertificate(notebook);
+      assertNull(certificate);
+    }
+
+    @Test
+    void shouldReturnCertificate() throws UnexpectedNoAccessRightException {
+      AssessmentAttempt assessmentAttempt =
+          makeMe
+              .aAssessmentAttempt(
+                  currentUser.getEntity(), notebook, testabilitySettings.getCurrentUTCTimestamp())
+              .please();
+
+      Certificate expectedCertificate = makeMe.aCertificate(assessmentAttempt).please();
+      Certificate certificate = controller.getCertificate(notebook);
+      assertEquals(expectedCertificate, certificate);
     }
   }
 }

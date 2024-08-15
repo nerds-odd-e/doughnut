@@ -75,4 +75,13 @@ class RestAssessmentController {
     currentUser.assertLoggedIn();
     return assessmentService.getAssessmentHistory(currentUser.getEntity());
   }
+
+  @GetMapping("/certificate/{notebook}")
+  public Certificate getCertificate(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertLoggedIn();
+    currentUser.assertReadAuthorization(notebook);
+    return assessmentService.getCertificate(notebook, currentUser);
+  }
 }
