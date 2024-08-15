@@ -88,9 +88,10 @@ public class AssessmentService {
         .findAll()
         .forEach(
             aa -> {
+              // Logic to determine pass or fail
               AssessmentHistory ah =
                   new AssessmentHistory(
-                      aa.getNotebook().getHeadNote().getNoteTitle().toString(),
+                      aa.getNotebook().getHeadNote().getTopicConstructor(),
                       aa.getSubmittedAt(),
                       "Pass");
               assessmentHistories.add(ah);

@@ -318,26 +318,34 @@ public class RestAssessmentControllerTests {
     @BeforeEach
     void setup() {
       topNote = makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser).please();
+      makeMe.theNote(topNote).withNChildrenThat(2, NoteBuilder::hasAnApprovedQuestion).please();
+      notebook = topNote.getNotebook();
     }
 
     @Test
-    void shouldReturnEmptyIfNoAssemsentTaken() throws UnexpectedNoAccessRightException {
+    void shouldReturnEmptyIfNoAssemsentTaken() {
       List<AssessmentHistory> assessmentHistories = controller.getAssessmentHistory();
       assertEquals(0, assessmentHistories.size());
     }
 
     @Test
-    void shouldReturnOneAssessmentHistory() throws UnexpectedNoAccessRightException {
-      makeMe.theNote(topNote).withNChildrenThat(2, NoteBuilder::hasAnApprovedQuestion).please();
-      notebook = topNote.getNotebook();
-      AssessmentAttempt assessmentAttempt =
-          makeMe
-              .aAssessmentAttempt(
-                  currentUser.getEntity(), notebook, testabilitySettings.getCurrentUTCTimestamp())
-              .please();
-      makeMe.modelFactoryService.save(assessmentAttempt);
+    void shouldReturnOneAssessmentHistory() {
+      makeMe
+          .aAssessmentAttempt(
+              currentUser.getEntity(), notebook, testabilitySettings.getCurrentUTCTimestamp())
+          .please();
       List<AssessmentHistory> assessmentHistories = controller.getAssessmentHistory();
       assertEquals(1, assessmentHistories.size());
+    }
+
+    @Test
+    void shouldReturnOnePassAssessmentHistory() {
+      makeMe
+          .aAssessmentAttempt(
+              currentUser.getEntity(), notebook, testabilitySettings.getCurrentUTCTimestamp(), 2, 2)
+          .please();
+      List<AssessmentHistory> assessmentHistories = controller.getAssessmentHistory();
+      assertEquals("Pass", assessmentHistories.getFirst().getResult());
     }
   }
 }

@@ -65,6 +65,22 @@ public class MakeMe extends MakeMeWithoutDB {
     return new AssessmentAttemptBuilder(this, assessmentAttempt);
   }
 
+  public AssessmentAttemptBuilder aAssessmentAttempt(
+      User currentUser,
+      Notebook notebook,
+      Timestamp submittedAt,
+      int answersTotal,
+      int answersCorrect) {
+    AssessmentAttempt assessmentAttempt = new AssessmentAttempt();
+
+    assessmentAttempt.setUser(currentUser);
+    assessmentAttempt.setNotebook(notebook);
+    assessmentAttempt.setSubmittedAt(submittedAt);
+    assessmentAttempt.setAnswersTotal(answersTotal);
+    assessmentAttempt.setAnswersCorrect(answersCorrect);
+    return new AssessmentAttemptBuilder(this, assessmentAttempt);
+  }
+
   public <T> T refresh(T object) {
     modelFactoryService.entityManager.flush();
     modelFactoryService.entityManager.refresh(object);
