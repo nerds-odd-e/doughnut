@@ -11,6 +11,8 @@
     pkgs.corepack_22
     pkgs.nodejs_22
     pkgs.jdk22
+    pkgs.bat
+    pkgs.lsd
   ];
 
   # Sets environment variables in the workspace
