@@ -22,7 +22,7 @@
         >
           <td>{{assessmentHistory.id}}</td>
           <td>{{assessmentHistory.notebookTitle}}</td>
-          <td>{{assessmentHistory.submittedAt}}</td>
+          <td>{{toLocalDateString(assessmentHistory.submittedAt)}}</td>
           <td>{{assessmentHistory.result}}</td>
           <td>
             <button 
@@ -55,6 +55,10 @@ defineProps({
 })
 
 const assessmentHistories = ref<AssessmentHistory[]>([])
+
+const toLocalDateString = (date: string) => {
+  return new Date(date).toLocaleString()
+}
 
 onMounted(async () => {
   assessmentHistories.value =

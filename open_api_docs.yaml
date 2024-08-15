@@ -3767,6 +3767,11 @@ components:
         name:
           type: string
     AssessmentHistory:
+      required:
+      - id
+      - notebookTitle
+      - result
+      - submittedAt
       type: object
       properties:
         id:
