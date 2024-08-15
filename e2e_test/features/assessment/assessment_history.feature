@@ -1,4 +1,3 @@
-@ignore
 Feature: View my assessment history
   As a learner, I want to be able to view my past assessment
 
