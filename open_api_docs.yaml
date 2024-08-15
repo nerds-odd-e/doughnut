@@ -2576,6 +2576,26 @@ paths:
                 type: array
                 items:
                   type: string
+  /api/quiz-questions/{quizQuestion}:
+    delete:
+      tags:
+      - rest-quiz-question-controller
+      operationId: removeQuestionManually
+      parameters:
+      - name: quizQuestion
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
 components:
   schemas:
     Circle:
