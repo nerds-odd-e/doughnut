@@ -332,7 +332,7 @@ public class RestAssessmentControllerTests {
     void shouldReturnOneAssessmentHistory() {
       makeMe
           .aAssessmentAttempt(
-              currentUser.getEntity(), notebook, testabilitySettings.getCurrentUTCTimestamp())
+              currentUser.getEntity(), notebook, testabilitySettings.getCurrentUTCTimestamp(), 2, 2)
           .please();
       List<AssessmentHistory> assessmentHistories = controller.getAssessmentHistory();
       assertEquals(1, assessmentHistories.size());
