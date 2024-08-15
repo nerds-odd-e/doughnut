@@ -90,7 +90,7 @@ public class AssessmentService {
         .findAll()
         .forEach(
             aa -> {
-              if (aa.getUser() == user) {
+              if (Objects.equals(aa.getUser().getId(), user.getId())) {
                 String result =
                     (aa.getAnswersTotal() / aa.getAnswersCorrect()) * 100 >= 80 ? "Pass" : "Fail";
                 AssessmentHistory ah =
