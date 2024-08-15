@@ -92,7 +92,9 @@ public class AssessmentService {
             aa -> {
               if (Objects.equals(aa.getUser().getId(), user.getId())) {
                 String result =
-                    (aa.getAnswersCorrect() / aa.getAnswersTotal()) * 100 >= 80 ? "Pass" : "Fail";
+                    ((double) aa.getAnswersCorrect() / aa.getAnswersTotal()) >= 0.8
+                        ? "Pass"
+                        : "Fail";
                 AssessmentHistory ah =
                     new AssessmentHistory(
                         aa.getNotebook().getHeadNote().getTopicConstructor(),

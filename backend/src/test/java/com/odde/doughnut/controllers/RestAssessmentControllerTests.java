@@ -345,7 +345,7 @@ public class RestAssessmentControllerTests {
     void shouldReturnOnePassAssessmentHistory() {
       makeMe
           .aAssessmentAttempt(
-              currentUser.getEntity(), notebook, testabilitySettings.getCurrentUTCTimestamp(), 2, 2)
+              currentUser.getEntity(), notebook, testabilitySettings.getCurrentUTCTimestamp(), 5, 4)
           .please();
       List<AssessmentHistory> assessmentHistories = controller.getAssessmentHistory();
       assertEquals("Pass", assessmentHistories.getFirst().getResult());
@@ -355,7 +355,7 @@ public class RestAssessmentControllerTests {
     void shouldReturnOneFailAssessmentHistory() {
       makeMe
           .aAssessmentAttempt(
-              currentUser.getEntity(), notebook, testabilitySettings.getCurrentUTCTimestamp(), 2, 1)
+              currentUser.getEntity(), notebook, testabilitySettings.getCurrentUTCTimestamp(), 5, 2)
           .please();
       List<AssessmentHistory> assessmentHistories = controller.getAssessmentHistory();
       assertEquals("Fail", assessmentHistories.getFirst().getResult());
@@ -366,7 +366,7 @@ public class RestAssessmentControllerTests {
       User anotherUser = makeMe.aUser().please();
       makeMe
           .aAssessmentAttempt(
-              anotherUser, notebook, testabilitySettings.getCurrentUTCTimestamp(), 1, 2)
+              anotherUser, notebook, testabilitySettings.getCurrentUTCTimestamp(), 5, 5)
           .please();
       List<AssessmentHistory> assessmentHistories = controller.getAssessmentHistory();
       assertEquals(0, assessmentHistories.size());
