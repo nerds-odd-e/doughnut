@@ -9,6 +9,7 @@
     <table class="assessment-table mt-2">
       <thead>
         <tr>
+          <th>ID</th>
           <th>Notebook</th>
           <th>Attempt At</th>
           <th>Result</th>
@@ -19,11 +20,15 @@
         <tr
           v-for="(assessmentHistory) in assessmentHistories"
         >
+          <td>{{assessmentHistory.id}}</td>
           <td>{{assessmentHistory.notebookTitle}}</td>
           <td>{{assessmentHistory.submittedAt}}</td>
           <td>{{assessmentHistory.result}}</td>
           <td>
-            <button :disabled="assessmentHistory.result === 'Fail'">
+            <button 
+              :disabled="assessmentHistory.result === 'Fail'"
+              @click="getCertificate(assessmentHistory.id)"
+            >
               Get Certificate
             </button>
           </td>
@@ -55,7 +60,22 @@ onMounted(async () => {
   assessmentHistories.value =
     await managedApi.restAssessmentController.getAssessmentHistory()
 })
+
+const getCertificate = async (assessmentHistoryId?: number) => {
+  if (assessmentHistoryId == null) {
+    return
+  }
+
+  console.log(">>> id: ", assessmentHistoryId)
+
+  const certificate =
+    await managedApi.restAssessmentController.getCertificate(
+      assessmentHistoryId
+    )
+  console.log(certificate)
+}
 </script>
+
 <style scoped>
 .assessment-table {
   border-collapse: collapse;

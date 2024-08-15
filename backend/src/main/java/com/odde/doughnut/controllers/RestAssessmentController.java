@@ -76,7 +76,8 @@ class RestAssessmentController {
     return assessmentService.getAssessmentHistory(currentUser.getEntity());
   }
 
-  @GetMapping("/certificate/{notebook}")
+  @PostMapping("/certificate/{assessmentAttempt}")
+  @Transactional
   public Certificate getCertificate(
       @PathVariable("assessmentAttempt") @Schema(type = "integer")
           AssessmentAttempt assessmentAttempt)

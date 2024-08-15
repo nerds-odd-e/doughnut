@@ -35,6 +35,25 @@ export class RestAssessmentControllerService {
         });
     }
     /**
+     * @param assessmentAttempt
+     * @returns Certificate OK
+     * @throws ApiError
+     */
+    public getCertificate(
+        assessmentAttempt: number,
+    ): CancelablePromise<Certificate> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/assessment/certificate/{assessmentAttempt}',
+            path: {
+                'assessmentAttempt': assessmentAttempt,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
      * @returns AssessmentHistory OK
      * @throws ApiError
      */
@@ -61,19 +80,6 @@ export class RestAssessmentControllerService {
             path: {
                 'notebook': notebook,
             },
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * @returns Certificate OK
-     * @throws ApiError
-     */
-    public getCertificate(): CancelablePromise<Certificate> {
-        return this.httpRequest.request({
-            method: 'GET',
-            url: '/api/assessment/certificate/{notebook}',
             errors: {
                 500: `Internal Server Error`,
             },
