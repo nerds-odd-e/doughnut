@@ -4,7 +4,7 @@ import { screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import makeMe from "../fixtures/makeMe"
 import helper from "../helpers"
-import {QuizQuestionAndAnswer} from "@/generated/backend";
+import { QuizQuestionAndAnswer } from "@/generated/backend"
 
 const note = makeMe.aNoteRealm.please()
 const createWrapper = async (questionInput?: QuizQuestionAndAnswer) => {

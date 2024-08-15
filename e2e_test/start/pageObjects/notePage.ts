@@ -199,10 +199,7 @@ export const assumeNotePage = (noteTopic?: string) => {
     },
     deleteQuestion(question) {
       this.openQuestionList()
-      cy.findByText(question)
-        .parent('tr')
-        .contains('Delete')
-        .click()
+      cy.findByText(question).parent('tr').contains('Delete').click()
     },
     refineQuestion(row: Record<string, string>) {
       this.openQuestionList().addEditQuestionPage().refineQuestion(row)
