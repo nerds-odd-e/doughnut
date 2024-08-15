@@ -355,7 +355,7 @@ public class RestAssessmentControllerTests {
     void shouldReturnOneFailAssessmentHistory() {
       makeMe
           .aAssessmentAttempt(
-              currentUser.getEntity(), notebook, testabilitySettings.getCurrentUTCTimestamp(), 1, 2)
+              currentUser.getEntity(), notebook, testabilitySettings.getCurrentUTCTimestamp(), 2, 1)
           .please();
       List<AssessmentHistory> assessmentHistories = controller.getAssessmentHistory();
       assertEquals("Fail", assessmentHistories.getFirst().getResult());
