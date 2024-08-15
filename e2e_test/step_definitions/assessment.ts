@@ -138,7 +138,11 @@ Given(
 )
 When(
   'I view my assessment history of topic {string} and scored {int}\\/{int} on the assessment',
-  () => {
+  (notebook: string, correctAnswers: number, allQuestions: number) => {
+    start.navigateToBazaar()
+    .selfAssessmentOnNotebook(notebook)
+    .answerYesNoQuestionsByScore(correctAnswers, allQuestions)
+
     start.navigateToAssessmentHistory()
   }
 )

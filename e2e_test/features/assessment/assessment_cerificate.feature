@@ -1,4 +1,3 @@
-@ignore
 Feature: As a learner, I want to be able to get my certificate on assessments which I have passed
 
   Background:
