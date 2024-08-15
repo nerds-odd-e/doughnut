@@ -360,6 +360,17 @@ public class RestAssessmentControllerTests {
       List<AssessmentHistory> assessmentHistories = controller.getAssessmentHistory();
       assertEquals("Fail", assessmentHistories.getFirst().getResult());
     }
+
+    @Test
+    void shouldReturnNoAssessmentHistoryForOtherUser() {
+      User anotherUser = makeMe.aUser().please();
+      makeMe
+          .aAssessmentAttempt(
+              anotherUser, notebook, testabilitySettings.getCurrentUTCTimestamp(), 1, 2)
+          .please();
+      List<AssessmentHistory> assessmentHistories = controller.getAssessmentHistory();
+      assertEquals(0, assessmentHistories.size());
+    }
   }
 
   @Nested
