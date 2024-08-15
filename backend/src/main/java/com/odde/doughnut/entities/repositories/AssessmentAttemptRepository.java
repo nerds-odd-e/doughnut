@@ -5,7 +5,6 @@ import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import java.sql.Timestamp;
 import java.util.List;
-
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.repository.CrudRepository;
 
