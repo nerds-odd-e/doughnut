@@ -2589,12 +2589,7 @@ paths:
       tags:
       - rest-assessment-controller
       operationId: getCertificate
-      parameters:
-      - name: notebook
-        in: path
-        required: true
-        schema:
-          type: integer
+      parameters: []
       responses:
         "500":
           description: Internal Server Error
@@ -3756,6 +3751,9 @@ components:
     AssessmentHistory:
       type: object
       properties:
+        id:
+          type: integer
+          format: int32
         notebookTitle:
           type: string
         submittedAt:

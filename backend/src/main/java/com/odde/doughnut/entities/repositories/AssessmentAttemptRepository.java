@@ -10,4 +10,7 @@ public interface AssessmentAttemptRepository extends CrudRepository<AssessmentAt
 
   int countByNotebookAndUserAndSubmittedAtBetween(
       Notebook notebook, User user, Timestamp beginSubmittedAt, Timestamp endSubmittedAt);
+
+  AssessmentAttempt findFirstByNotebookAndUserAndSubmittedAt(
+      Notebook notebook, User user, Timestamp submittedAt);
 }

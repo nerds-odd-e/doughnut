@@ -386,12 +386,6 @@ public class RestAssessmentControllerTests {
     }
 
     @Test
-    void shouldNotReturnCertificate() throws UnexpectedNoAccessRightException {
-      Certificate certificate = controller.getCertificate(notebook);
-      assertNull(certificate);
-    }
-
-    @Test
     void shouldReturnCertificate() throws UnexpectedNoAccessRightException {
       AssessmentAttempt assessmentAttempt =
           makeMe
@@ -400,7 +394,7 @@ public class RestAssessmentControllerTests {
               .please();
 
       Certificate expectedCertificate = makeMe.aCertificate(assessmentAttempt).please();
-      Certificate certificate = controller.getCertificate(notebook);
+      Certificate certificate = controller.getCertificate(assessmentAttempt);
       assertEquals(expectedCertificate, certificate);
     }
   }

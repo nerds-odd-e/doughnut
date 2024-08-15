@@ -8,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AssessmentHistory {
-
+  public int id;
   public String notebookTitle;
   public Timestamp submittedAt;
   public String result;

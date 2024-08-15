@@ -3,6 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type AssessmentHistory = {
+    id?: number;
     notebookTitle?: string;
     submittedAt?: string;
     result?: string;
