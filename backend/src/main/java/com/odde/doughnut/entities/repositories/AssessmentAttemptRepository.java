@@ -4,6 +4,9 @@ import com.odde.doughnut.entities.AssessmentAttempt;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import java.sql.Timestamp;
+import java.util.List;
+
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.repository.CrudRepository;
 
 public interface AssessmentAttemptRepository extends CrudRepository<AssessmentAttempt, Integer> {
@@ -13,4 +16,8 @@ public interface AssessmentAttemptRepository extends CrudRepository<AssessmentAt
 
   AssessmentAttempt findFirstByNotebookAndUserAndSubmittedAt(
       Notebook notebook, User user, Timestamp submittedAt);
+
+  @Override
+  @NotNull
+  List<AssessmentAttempt> findAll();
 }

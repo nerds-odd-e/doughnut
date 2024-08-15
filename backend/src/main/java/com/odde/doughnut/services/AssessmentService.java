@@ -12,6 +12,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
+
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,9 +25,9 @@ public class AssessmentService {
   private final TestabilitySettings testabilitySettings;
 
   public AssessmentService(
-      OpenAiApi openAiApi,
-      ModelFactoryService modelFactoryService,
-      TestabilitySettings testabilitySettings) {
+    OpenAiApi openAiApi,
+    ModelFactoryService modelFactoryService,
+    TestabilitySettings testabilitySettings) {
     this.modelFactoryService = modelFactoryService;
     this.testabilitySettings = testabilitySettings;
     this.quizQuestionService = new QuizQuestionService(openAiApi, modelFactoryService);
@@ -36,36 +37,36 @@ public class AssessmentService {
     List<Note> notes = testabilitySettings.getRandomizer().shuffle(notebook.getNotes());
 
     List<QuizQuestionAndAnswer> questions =
-        notes.stream()
-            .map(quizQuestionService::selectRandomQuestionForANote)
-            .filter(Objects::nonNull)
-            .filter(QuizQuestionAndAnswer::isApproved)
-            .toList();
+      notes.stream()
+        .map(quizQuestionService::selectRandomQuestionForANote)
+        .filter(Objects::nonNull)
+        .filter(QuizQuestionAndAnswer::isApproved)
+        .toList();
 
     Integer numberOfQuestion = notebook.getNotebookSettings().getNumberOfQuestionsInAssessment();
     if (numberOfQuestion == null || numberOfQuestion == 0) {
       throw new ApiException(
-          "The assessment is not available",
-          ASSESSMENT_SERVICE_ERROR,
-          "The assessment is not available");
+        "The assessment is not available",
+        ASSESSMENT_SERVICE_ERROR,
+        "The assessment is not available");
     }
 
     if (questions.size() < numberOfQuestion) {
       throw new ApiException(
-          "Not enough questions", ASSESSMENT_SERVICE_ERROR, "Not enough questions");
+        "Not enough questions", ASSESSMENT_SERVICE_ERROR, "Not enough questions");
     }
 
     return questions.stream()
-        .limit(numberOfQuestion)
-        .map(QuizQuestionAndAnswer::getQuizQuestion)
-        .toList();
+      .limit(numberOfQuestion)
+      .map(QuizQuestionAndAnswer::getQuizQuestion)
+      .toList();
   }
 
   public AssessmentResult submitAssessmentResult(
-      User user,
-      Notebook notebook,
-      List<AnswerSubmission> answerSubmission,
-      Timestamp currentUTCTimestamp) {
+    User user,
+    Notebook notebook,
+    List<AnswerSubmission> answerSubmission,
+    Timestamp currentUTCTimestamp) {
     AssessmentAttempt assessmentAttempt = new AssessmentAttempt();
     assessmentAttempt.setUser(user);
     assessmentAttempt.setNotebook(notebook);
@@ -73,7 +74,7 @@ public class AssessmentService {
     assessmentAttempt.setSubmittedAt(currentUTCTimestamp);
 
     int totalCorrectAnswer =
-        (int) answerSubmission.stream().filter(AnswerSubmission::isCorrectAnswers).count();
+      (int) answerSubmission.stream().filter(AnswerSubmission::isCorrectAnswers).count();
     assessmentAttempt.setAnswersCorrect(totalCorrectAnswer);
 
     modelFactoryService.save(assessmentAttempt);
@@ -87,41 +88,43 @@ public class AssessmentService {
   public List<AssessmentHistory> getAssessmentHistory(User user) {
     List<AssessmentHistory> assessmentHistories = new ArrayList<>();
     modelFactoryService
-        .assessmentAttemptRepository
-        .findAll()
-        .forEach(
-            aa -> {
-              if (Objects.equals(aa.getUser().getId(), user.getId())) {
-                String result =
-                    ((double) aa.getAnswersCorrect() / aa.getAnswersTotal()) >= 0.8
-                        ? "Pass"
-                        : "Fail";
-                AssessmentHistory ah =
-                    new AssessmentHistory(
-                        aa.getId(),
-                        aa.getNotebook().getHeadNote().getTopicConstructor(),
-                        aa.getSubmittedAt(),
-                        result);
-                assessmentHistories.add(ah);
-              }
-            });
+      .assessmentAttemptRepository
+      .findAll()
+      .stream()
+      .filter(aa -> Objects.equals(aa.getUser().getId(), user.getId()))
+      .forEach(
+        aa -> {
+          String result =
+            ((double) aa.getAnswersCorrect() / aa.getAnswersTotal()) >= 0.8
+              ? "Pass"
+              : "Fail";
+          AssessmentHistory ah =
+            new AssessmentHistory(
+              aa.getId(),
+              aa.getNotebook().getHeadNote().getTopicConstructor(),
+              aa.getSubmittedAt(),
+              result);
+          assessmentHistories.add(ah);
+        });
+
+
     return assessmentHistories;
   }
 
   public Certificate getCertificate(AssessmentAttempt assessmentAttempt, UserModel currentUser) {
     Optional<Certificate> optionalCertificate =
-        modelFactoryService.certificateRepository.findFirstByNotebookAndUserOrderByExpiryDateDesc(
-            assessmentAttempt.getNotebook(), currentUser.getEntity());
+      modelFactoryService.certificateRepository.findFirstByNotebookAndUserOrderByExpiryDateDesc(
+        assessmentAttempt.getNotebook(), currentUser.getEntity());
     return optionalCertificate.orElse(generateCertificate(assessmentAttempt, currentUser));
   }
 
   private Certificate generateCertificate(
-      AssessmentAttempt assessmentAttempt, UserModel currentUser) {
+    AssessmentAttempt assessmentAttempt, UserModel currentUser) {
     Certificate certificate = new Certificate();
     certificate.setNotebook(assessmentAttempt.getNotebook());
     certificate.setUser(currentUser.getEntity());
     certificate.setExpiryDate(
-        TimestampUtil.addYearsToTimestamp(assessmentAttempt.getSubmittedAt()));
+      TimestampUtil.addYearsToTimestamp(assessmentAttempt.getSubmittedAt()));
     return modelFactoryService.save(certificate);
   }
 }
