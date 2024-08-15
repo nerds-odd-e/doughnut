@@ -2,6 +2,7 @@ export const assumeViewAssessmentHistoryPage = () => {
   return {
     expectToFindTitle() {
       cy.findByText('Welcome To Assessment History').should('be.visible')
+      return this
     },
     expectTableWithNumberOfRow(n: number) {
       cy.get('.assessment-table tbody tr').should('have.length', n)
@@ -11,6 +12,13 @@ export const assumeViewAssessmentHistoryPage = () => {
     },
     expectDisabledCertificateButton() {
       cy.contains('button', 'Get Certificate').should('be.disabled')
+    },
+    checkAttemptResult(notebook: string, result: string) {
+      cy.get('.assessment-table tbody')
+        .findByText(notebook)
+        .next()
+        .next()
+        .contains(result)
     },
   }
 }

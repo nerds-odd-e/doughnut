@@ -102,14 +102,28 @@ When('I view my assessment history', () => {
 })
 
 Then('I should see my assessment history with empty records', () => {
-  start.assumeViewAssessmentHistoryPage().expectToFindTitle()
-  start.assumeViewAssessmentHistoryPage().expectTableWithNumberOfRow(0)
+  start
+    .assumeViewAssessmentHistoryPage()
+    .expectToFindTitle()
+    .expectTableWithNumberOfRow(0)
 })
 
 Then('I should see one record of the assessment', () => {
-  start.assumeViewAssessmentHistoryPage().expectToFindTitle()
-  start.assumeViewAssessmentHistoryPage().expectTableWithNumberOfRow(1)
+  start
+    .assumeViewAssessmentHistoryPage()
+    .expectToFindTitle()
+    .expectTableWithNumberOfRow(1)
 })
+
+Then(
+  'I should see {string} result as {string}',
+  (notebook: string, result: string) => {
+    start
+      .assumeViewAssessmentHistoryPage()
+      .expectToFindTitle()
+      .checkAttemptResult(notebook, result)
+  }
+)
 
 Given(
   'I have completed the assessment on notebook {string} with {int} questions',
