@@ -70,6 +70,7 @@ public class RestAiControllerChatTests {
           .mockTheRunStream();
     }
 
+    @SuppressWarnings("unchecked")
     private List<ResponseBodyEmitter.DataWithMediaType>
         peekIntoEmitterWithExtremelyInappropriateIntimacy(SseEmitter sseEmitter) {
       try {

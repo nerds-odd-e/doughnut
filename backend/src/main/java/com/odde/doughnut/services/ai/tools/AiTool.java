@@ -24,15 +24,24 @@ public record AiTool(
       Class<T> parameterClass,
       Function<T, AiCompletionRequiredAction> executor) {
     return new AiTool(
-        name, description, parameterClass, (arguments) -> executor.apply((T) arguments));
+        name,
+        description,
+        parameterClass,
+        (arguments) -> {
+          @SuppressWarnings("unchecked")
+          T castArguments = (T) arguments;
+          return executor.apply(castArguments);
+        });
   }
 
   public Tool getTool() {
+    @SuppressWarnings("unchecked")
+    Class<Object> castParameterClass = (Class<Object>) parameterClass;
     return new FunctionTool(
         FunctionDefinition.builder()
             .name(name)
             .description(description)
-            .parametersDefinitionByClass((Class<Object>) parameterClass)
+            .parametersDefinitionByClass(castParameterClass)
             .build());
   }
 
