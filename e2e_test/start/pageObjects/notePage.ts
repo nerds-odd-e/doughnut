@@ -191,10 +191,21 @@ export const assumeNotePage = (noteTopic?: string) => {
       return questionListPage()
     },
     addQuestion(row: Record<string, string>) {
-      this.openQuestionList().addQuestionPage().addQuestion(row)
+      this.openQuestionList().addEditQuestionPage().addQuestion(row)
+    },
+
+    editQuestion(question: string, row: Record<string, string>) {
+      this.openQuestionList().addEditQuestionPage().editQuestion(question, row)
+    },
+    deleteQuestion(question) {
+      this.openQuestionList()
+      cy.findByText(question)
+        .parent('tr')
+        .contains('Delete')
+        .click()
     },
     refineQuestion(row: Record<string, string>) {
-      this.openQuestionList().addQuestionPage().refineQuestion(row)
+      this.openQuestionList().addEditQuestionPage().refineQuestion(row)
     },
     toggleApproval(question: string) {
       this.openQuestionList()
@@ -205,6 +216,11 @@ export const assumeNotePage = (noteTopic?: string) => {
     },
     expectQuestionsInList(expectedQuestions: Record<string, string>[]) {
       this.openQuestionList().expectQuestion(expectedQuestions)
+    },
+    expectQuestionNotInList(question: string) {
+      this.openQuestionList()
+      cy.pageIsNotLoading()
+      cy.findByText(question).should('not.exist')
     },
     aiSuggestDetailsForNote: () => {
       cy.on('uncaught:exception', () => {

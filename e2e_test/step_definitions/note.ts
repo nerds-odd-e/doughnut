@@ -504,6 +504,27 @@ When(
   }
 )
 
+When (
+  'I edit the question {string} for the note {string}:',
+  (quizQuestion: string, noteTopic: string, data: DataTable) => {
+    start.jumpToNotePage(noteTopic).editQuestion(quizQuestion, data.hashes()[0]!)
+  }
+)
+
+When (
+  'I delete the question {string} for the note {string}',
+  (quizQuestion: string, noteTopic: string) => {
+    start.jumpToNotePage(noteTopic).deleteQuestion(quizQuestion)
+  }
+)
+
+Then (
+  'I should see no question named {string} in the question list of the note {string}',
+  (quizQuestion: string, noteTopic: string) => {
+    start.jumpToNotePage(noteTopic).expectQuestionNotInList(quizQuestion)
+  }
+)
+
 Given(
   'I toggle the approval of the question {string} of the topic {string}',
   (quizQuestion: string, noteTopic: string) => {
@@ -515,7 +536,7 @@ When('I generate question by AI for note {string}', (noteName: string) => {
   start
     .jumpToNotePage(noteName)
     .openQuestionList()
-    .addQuestionPage()
+    .addEditQuestionPage()
     .generateQuestionByAI()
 })
 
