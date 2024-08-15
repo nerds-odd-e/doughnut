@@ -347,5 +347,15 @@ public class RestAssessmentControllerTests {
       List<AssessmentHistory> assessmentHistories = controller.getAssessmentHistory();
       assertEquals("Pass", assessmentHistories.getFirst().getResult());
     }
+
+    @Test
+    void shouldReturnOneFailAssessmentHistory() {
+      makeMe
+          .aAssessmentAttempt(
+              currentUser.getEntity(), notebook, testabilitySettings.getCurrentUTCTimestamp(), 1, 2)
+          .please();
+      List<AssessmentHistory> assessmentHistories = controller.getAssessmentHistory();
+      assertEquals("Fail", assessmentHistories.getFirst().getResult());
+    }
   }
 }

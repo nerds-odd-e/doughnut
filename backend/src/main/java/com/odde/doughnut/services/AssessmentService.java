@@ -89,14 +89,15 @@ public class AssessmentService {
         .forEach(
             aa -> {
               // Logic to determine pass or fail
+              String result =
+                  (aa.getAnswersTotal() / aa.getAnswersCorrect()) * 100 >= 80 ? "Pass" : "Fail";
               AssessmentHistory ah =
                   new AssessmentHistory(
                       aa.getNotebook().getHeadNote().getTopicConstructor(),
                       aa.getSubmittedAt(),
-                      "Pass");
+                      result);
               assessmentHistories.add(ah);
             });
-
     return assessmentHistories;
   }
 }
