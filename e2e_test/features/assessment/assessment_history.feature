@@ -12,17 +12,17 @@ Feature: View my assessment history
 
   Scenario: Have take one assessment of a notebook
     When I get score 2/2 when do the assessment on "Just say 'Yes'"
-    Then I view my assessment history
-    And I should see one record of the assessment
+    And I view my assessment history
+    Then I should see one record of the assessment
 
   Scenario Outline: Have attempted assessment of a notebook
     When I view my assessment history
     Then I should see <Notebook> result as <Result>
 
     Examples:
-      | Notebook    | Attempt At           | Result |
-      | Notebook A  | 01-Apr-2024 12:00PM  | Pass   |
-      | Notebook B  | 02-Apr-2024 10:00PM  | Fail   |
+      | Notebook    | Score | Attempt At          | Result |
+      | Notebook A  | 2/2   | 01-Apr-2024 12:00PM | Pass   |
+      | Notebook B  | 1/2   | 01-Apr-2024 12:00PM | Fail   |
 
 
 
