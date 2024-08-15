@@ -18,6 +18,11 @@ Feature: Quiz Question Management
       | What does a cow say?                 | moo            |
       | What do you call a cow with not leg? | Ground beef    |
 
+  Scenario: Manually remove a question from the note successfully
+    When I remove a question with the stem "What does a cow say?" from the note "The cow joke"
+    Then I should see the questions in the question list of the note "The cow joke":
+      | Question                             | Correct Choice |
+
   @usingMockedOpenAiService
   Scenario: Can generate the question by AI
     Given OpenAI now generates this question:

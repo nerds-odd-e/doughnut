@@ -90,6 +90,16 @@ Given(
   }
 )
 
+When(
+  'I remove a question with the stem {string} from the note {string}',
+  (questionStem: string, noteTopic: string) => {
+    start
+      .jumpToNotePage(noteTopic)
+      .openQuestionList()
+      .removeQuestion(questionStem)
+  }
+)
+
 Given(
   'I refine the following question for the note {string}:',
   (noteTopic: string, data: DataTable) => {
