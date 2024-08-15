@@ -25,7 +25,7 @@
           <td>{{toLocalDateString(assessmentHistory.submittedAt)}}</td>
           <td>{{assessmentHistory.result}}</td>
           <td>
-            <button 
+            <button
               :disabled="assessmentHistory.result === 'Fail'"
               @click="getCertificate(assessmentHistory.id)"
             >
@@ -36,12 +36,22 @@
       </tbody>
     </table>
   </div>
+  <Modal
+    v-if="certificate != null"
+    @close_request="certificate = null"
+  >
+    <template #body>
+      <h2>Congratulations on your Certificate</h2>
+      <div>Notebook: {{ certificate.notebook?.headNote.noteTopic.topicConstructor }}</div>
+      <div>Expiry: {{ certificate.expiryDate }}</div>
+    </template>
+  </Modal>
   </ContainerPage>
 </template>
 
 <script setup lang="ts">
 import { PropType, onMounted, ref } from "vue"
-import { AssessmentHistory, User } from "@/generated/backend"
+import { AssessmentHistory, Certificate, User } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import ContainerPage from "./commons/ContainerPage.vue"
 
@@ -55,6 +65,7 @@ defineProps({
 })
 
 const assessmentHistories = ref<AssessmentHistory[]>([])
+const certificate = ref<Certificate | null>(null)
 
 const toLocalDateString = (date: string) => {
   return new Date(date).toLocaleString()
@@ -70,13 +81,10 @@ const getCertificate = async (assessmentHistoryId?: number) => {
     return
   }
 
-  console.log(">>> id: ", assessmentHistoryId)
-
-  const certificate =
+  certificate.value =
     await managedApi.restAssessmentController.getCertificate(
       assessmentHistoryId
     )
-  console.log(certificate)
 }
 </script>
 

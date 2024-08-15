@@ -13,6 +13,12 @@ export const assumeViewAssessmentHistoryPage = () => {
     expectDisabledCertificateButton() {
       cy.contains('button', 'Get Certificate').should('be.disabled')
     },
+    expectCertificateModal() {
+      cy.contains('Congratulations on your Certificate').should('be.visible')
+    },
+    clickGetCertificate() {
+      cy.findByText('Get Certificate').click()
+    },
     checkAttemptResult(notebook: string, result: string) {
       cy.get('.assessment-table tbody')
         .findByText(notebook)

@@ -156,3 +156,15 @@ Then(
 Then("I should not be able to click on the 'Get Certificate' button", () => {
   start.assumeViewAssessmentHistoryPage().expectDisabledCertificateButton()
 })
+When(
+  "I click on the 'Get Certificate' button",
+  () => {
+    start.assumeViewAssessmentHistoryPage().clickGetCertificate()
+  }
+)
+Then(
+  "I should be able to see my certificate",
+  () => {
+    start.assumeViewAssessmentHistoryPage().expectCertificateModal()
+  }
+)
