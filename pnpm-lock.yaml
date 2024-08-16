@@ -68,8 +68,8 @@ importers:
         specifier: ^0.29.0
         version: 0.29.0
       superagent:
-        specifier: ^10.0.1
-        version: 10.0.1
+        specifier: ^10.0.2
+        version: 10.0.2
       syncpack:
         specifier: ^12.4.0
         version: 12.4.0(typescript@5.5.4)
@@ -4247,8 +4247,8 @@ packages:
     peerDependencies:
       webpack: ^5.27.0
 
-  superagent@10.0.1:
-    resolution: {integrity: sha512-kG7dZ4Z6s6VbCVxd0PJpkYND0X+SW+iIAuboIQyHE7eFSNVprFVTpG1uID3UsVS7Jw47tdPvSiCSGzgXDhFcGQ==}
+  superagent@10.0.2:
+    resolution: {integrity: sha512-rvcN5ciYmVRaZLyM/9thpmNSDGscx1FXNwT5LJjsl+2nhdE4ppd53L2c9iSQSM6FA1poBVwlw+0h2Ofxwr3DoQ==}
     engines: {node: '>=14.18.0'}
 
   superagent@8.1.2:
@@ -9405,7 +9405,7 @@ snapshots:
     dependencies:
       webpack: 5.92.1(esbuild@0.23.0)
 
-  superagent@10.0.1:
+  superagent@10.0.2:
     dependencies:
       component-emitter: 1.3.1
       cookiejar: 2.1.4

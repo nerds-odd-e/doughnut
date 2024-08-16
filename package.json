@@ -65,7 +65,7 @@
     "mountebank": "^2.9.1",
     "npm-run-all2": "^6.2.2",
     "openapi-typescript-codegen": "^0.29.0",
-    "superagent": "^10.0.1",
+    "superagent": "^10.0.2",
     "syncpack": "^12.4.0",
     "typescript": "5.5.4",
     "wait-on": "^7.2.0"
