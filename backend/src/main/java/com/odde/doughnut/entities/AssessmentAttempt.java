@@ -1,6 +1,7 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.odde.doughnut.controllers.dto.AssessmentHistory;
 import jakarta.persistence.*;
 import java.sql.Timestamp;
 import lombok.Getter;
@@ -28,4 +29,10 @@ public class AssessmentAttempt extends EntityIdentifiedByIdOnly {
 
   @Column(name = "answers_correct")
   private int answersCorrect;
+
+  public AssessmentHistory getAssessmentHistory() {
+    String result = ((double) getAnswersCorrect() / getAnswersTotal()) >= 0.8 ? "Pass" : "Fail";
+    return new AssessmentHistory(
+        getId(), getNotebook().getHeadNote().getTopicConstructor(), getSubmittedAt(), result);
+  }
 }

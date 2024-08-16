@@ -13,7 +13,6 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -85,23 +84,10 @@ public class AssessmentService {
   }
 
   public List<AssessmentHistory> getAssessmentHistory(User user) {
-    List<AssessmentHistory> assessmentHistories = new ArrayList<>();
-    modelFactoryService.assessmentAttemptRepository.findAll().stream()
+    return modelFactoryService.assessmentAttemptRepository.findAll().stream()
         .filter(aa -> Objects.equals(aa.getUser().getId(), user.getId()))
-        .forEach(
-            aa -> {
-              String result =
-                  ((double) aa.getAnswersCorrect() / aa.getAnswersTotal()) >= 0.8 ? "Pass" : "Fail";
-              AssessmentHistory ah =
-                  new AssessmentHistory(
-                      aa.getId(),
-                      aa.getNotebook().getHeadNote().getTopicConstructor(),
-                      aa.getSubmittedAt(),
-                      result);
-              assessmentHistories.add(ah);
-            });
-
-    return assessmentHistories;
+        .map(AssessmentAttempt::getAssessmentHistory)
+        .toList();
   }
 
   public Certificate getCertificate(AssessmentAttempt assessmentAttempt, UserModel currentUser) {
