@@ -103,9 +103,7 @@ public class AssessmentService {
     certificate.setNotebook(assessmentAttempt.getNotebook());
     certificate.setUser(currentUser.getEntity());
     certificate.setExpiryDate(
-        TimestampOperations.addYearsToTimestamp(
-            assessmentAttempt.getSubmittedAt(),
-            certificate.getNotebook().getNotebookSettings().getUntilCertExpire()));
+        TimestampOperations.addYearsToTimestamp(assessmentAttempt.getSubmittedAt(), 1));
     return modelFactoryService.save(certificate);
   }
 }
