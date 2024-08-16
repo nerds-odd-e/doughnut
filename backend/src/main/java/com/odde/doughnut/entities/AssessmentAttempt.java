@@ -31,8 +31,10 @@ public class AssessmentAttempt extends EntityIdentifiedByIdOnly {
   private int answersCorrect;
 
   public AssessmentHistory getAssessmentHistory() {
-    String result = ((double) getAnswersCorrect() / getAnswersTotal()) >= 0.8 ? "Pass" : "Fail";
     return new AssessmentHistory(
-        getId(), getNotebook().getHeadNote().getTopicConstructor(), getSubmittedAt(), result);
+        getId(),
+        getNotebook().getHeadNote().getTopicConstructor(),
+        getSubmittedAt(),
+        ((double) getAnswersCorrect() / getAnswersTotal()) >= 0.8);
   }
 }

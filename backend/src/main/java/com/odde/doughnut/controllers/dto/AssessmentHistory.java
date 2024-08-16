@@ -12,5 +12,5 @@ public class AssessmentHistory {
   @NotNull public int id;
   @NotNull public String notebookTitle;
   @NotNull public Timestamp submittedAt;
-  @NotNull public String result;
+  @NotNull public boolean isPass;
 }

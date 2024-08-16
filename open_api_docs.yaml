@@ -3769,8 +3769,8 @@ components:
     AssessmentHistory:
       required:
       - id
+      - isPass
       - notebookTitle
-      - result
       - submittedAt
       type: object
       properties:
@@ -3782,8 +3782,10 @@ components:
         submittedAt:
           type: string
           format: date-time
-        result:
-          type: string
+        isPass:
+          type: boolean
+        pass:
+          type: boolean
     Delta:
       type: object
       properties:

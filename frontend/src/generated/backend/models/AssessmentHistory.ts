@@ -6,6 +6,7 @@ export type AssessmentHistory = {
     id: number;
     notebookTitle: string;
     submittedAt: string;
-    result: string;
+    isPass: boolean;
+    pass?: boolean;
 };
 

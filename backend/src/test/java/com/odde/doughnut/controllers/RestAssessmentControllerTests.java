@@ -349,7 +349,7 @@ public class RestAssessmentControllerTests {
               currentUser.getEntity(), notebook, testabilitySettings.getCurrentUTCTimestamp(), 5, 4)
           .please();
       List<AssessmentHistory> assessmentHistories = controller.getAssessmentHistory();
-      assertEquals("Pass", assessmentHistories.getFirst().getResult());
+      assertTrue(assessmentHistories.getFirst().isPass());
     }
 
     @Test
@@ -359,7 +359,7 @@ public class RestAssessmentControllerTests {
               currentUser.getEntity(), notebook, testabilitySettings.getCurrentUTCTimestamp(), 5, 2)
           .please();
       List<AssessmentHistory> assessmentHistories = controller.getAssessmentHistory();
-      assertEquals("Fail", assessmentHistories.getFirst().getResult());
+      assertFalse(assessmentHistories.getFirst().isPass());
     }
 
     @Test

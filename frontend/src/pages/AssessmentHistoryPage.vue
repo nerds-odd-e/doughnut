@@ -23,10 +23,10 @@
           <td>{{assessmentHistory.id}}</td>
           <td>{{assessmentHistory.notebookTitle}}</td>
           <td>{{toLocalDateString(assessmentHistory.submittedAt)}}</td>
-          <td>{{assessmentHistory.result}}</td>
+          <td>{{assessmentHistory.isPass ? "Pass" : "Fail"}}</td>
           <td>
             <button
-              :disabled="assessmentHistory.result === 'Fail'"
+              :disabled="!assessmentHistory.isPass"
               @click="getCertificate(assessmentHistory.id)"
             >
               Get Certificate
