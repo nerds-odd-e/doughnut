@@ -99,11 +99,15 @@ public class AssessmentService {
 
   public Certificate generateCertificate(
       AssessmentAttempt assessmentAttempt, UserModel currentUser) {
+    int yearsToAdd =
+        assessmentAttempt.getNotebook().getNotebookSettings().getUntilCertExpire() != null
+            ? assessmentAttempt.getNotebook().getNotebookSettings().getUntilCertExpire()
+            : 1;
     Certificate certificate = new Certificate();
     certificate.setNotebook(assessmentAttempt.getNotebook());
     certificate.setUser(currentUser.getEntity());
     certificate.setExpiryDate(
-        TimestampOperations.addYearsToTimestamp(assessmentAttempt.getSubmittedAt(), 1));
+        TimestampOperations.addYearsToTimestamp(assessmentAttempt.getSubmittedAt(), yearsToAdd));
     return modelFactoryService.save(certificate);
   }
 }
