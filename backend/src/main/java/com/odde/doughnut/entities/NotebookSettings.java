@@ -15,7 +15,7 @@ public class NotebookSettings {
   Integer numberOfQuestionsInAssessment;
 
   @Column(name = "until_cert_expire")
-  Integer untilCertExpire = 0;
+  Integer untilCertExpire = 1;
 
   @Column(name = "certified_by")
   String certifiedBy = "";
