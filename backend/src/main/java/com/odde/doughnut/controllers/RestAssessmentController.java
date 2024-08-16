@@ -84,6 +84,8 @@ class RestAssessmentController {
       throws UnexpectedNoAccessRightException {
     currentUser.assertLoggedIn();
     currentUser.assertReadAuthorization(assessmentAttempt.getNotebook());
-    return assessmentService.getCertificate(assessmentAttempt, currentUser);
+    return assessmentService
+        .getCertificate(assessmentAttempt, currentUser)
+        .orElse(assessmentService.generateCertificate(assessmentAttempt, currentUser));
   }
 }

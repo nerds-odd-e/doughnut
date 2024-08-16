@@ -16,6 +16,7 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.NoteBuilder;
 import com.theokanning.openai.client.OpenAiApi;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -390,12 +391,15 @@ public class RestAssessmentControllerTests {
       AssessmentAttempt assessmentAttempt =
           makeMe
               .aAssessmentAttempt(
-                  currentUser.getEntity(), notebook, testabilitySettings.getCurrentUTCTimestamp())
+                  currentUser.getEntity(),
+                  notebook,
+                  Timestamp.valueOf(LocalDateTime.of(2024, 6, 1, 0, 0, 0)))
               .please();
-
+      Timestamp expectedTs = Timestamp.valueOf(LocalDateTime.of(2025, 6, 1, 0, 0, 0));
       Certificate expectedCertificate = makeMe.aCertificate(assessmentAttempt).please();
       Certificate certificate = controller.getCertificate(assessmentAttempt);
       assertEquals(expectedCertificate, certificate);
+      assertEquals(expectedTs, certificate.getExpiryDate());
     }
   }
 }

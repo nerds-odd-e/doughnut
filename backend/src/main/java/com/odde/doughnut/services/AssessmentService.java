@@ -2,13 +2,13 @@ package com.odde.doughnut.services;
 
 import static com.odde.doughnut.controllers.dto.ApiError.ErrorType.ASSESSMENT_SERVICE_ERROR;
 
-import com.odde.doughnut.algorithms.TimestampUtil;
 import com.odde.doughnut.controllers.dto.AnswerSubmission;
 import com.odde.doughnut.controllers.dto.AssessmentHistory;
 import com.odde.doughnut.controllers.dto.AssessmentResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
@@ -90,20 +90,20 @@ public class AssessmentService {
         .toList();
   }
 
-  public Certificate getCertificate(AssessmentAttempt assessmentAttempt, UserModel currentUser) {
-    Optional<Certificate> optionalCertificate =
-        modelFactoryService.certificateRepository.findFirstByNotebookAndUserOrderByExpiryDateDesc(
+  public Optional<Certificate> getCertificate(
+      AssessmentAttempt assessmentAttempt, UserModel currentUser) {
+    return modelFactoryService.certificateRepository
+        .findFirstByNotebookAndUserOrderByExpiryDateDesc(
             assessmentAttempt.getNotebook(), currentUser.getEntity());
-    return optionalCertificate.orElse(generateCertificate(assessmentAttempt, currentUser));
   }
 
-  private Certificate generateCertificate(
+  public Certificate generateCertificate(
       AssessmentAttempt assessmentAttempt, UserModel currentUser) {
     Certificate certificate = new Certificate();
     certificate.setNotebook(assessmentAttempt.getNotebook());
     certificate.setUser(currentUser.getEntity());
     certificate.setExpiryDate(
-        TimestampUtil.addYearsToTimestamp(assessmentAttempt.getSubmittedAt()));
+        TimestampOperations.addYearsToTimestamp(assessmentAttempt.getSubmittedAt(), 1));
     return modelFactoryService.save(certificate);
   }
 }

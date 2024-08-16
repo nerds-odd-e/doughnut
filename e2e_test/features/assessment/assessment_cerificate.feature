@@ -7,8 +7,7 @@ Feature: As a learner, I want to be able to get my certificate on assessments wh
   Scenario: I have passed the assessment
     When I view my assessment history of topic "LeSS in Action" and scored 2/2 on the assessment
     Then I should be able to click the 'Get Certificate' button to get my assessment certificate
-    When I click on the 'Get Certificate' button
-    Then I should be able to see my certificate
+    And I should be able to see my certificate
 
   Scenario: I have not passed the assessment
     When I view my assessment history of topic "LeSS in Action" and scored 1/2 on the assessment

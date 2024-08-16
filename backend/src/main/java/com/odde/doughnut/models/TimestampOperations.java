@@ -14,6 +14,11 @@ public abstract class TimestampOperations {
     return Timestamp.from(zonedDateTime.plusHours(hoursToAdd).toInstant());
   }
 
+  public static Timestamp addYearsToTimestamp(Timestamp timestamp, int yearsToAdd) {
+    ZonedDateTime zonedDateTime = timestamp.toInstant().atZone(ZoneId.of("UTC"));
+    return Timestamp.from(zonedDateTime.plusYears(yearsToAdd).toInstant());
+  }
+
   public static int getDayId(Timestamp timestamp, ZoneId timeZone) {
     ZonedDateTime userLocalDateTime = TimestampOperations.getZonedDateTime(timestamp, timeZone);
     return userLocalDateTime.getYear() * 366 + userLocalDateTime.getDayOfYear();
