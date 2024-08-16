@@ -86,6 +86,6 @@ class RestAssessmentController {
     currentUser.assertReadAuthorization(assessmentAttempt.getNotebook());
     return assessmentService
         .getCertificate(assessmentAttempt, currentUser)
-        .orElse(assessmentService.generateCertificate(assessmentAttempt, currentUser));
+        .orElseGet(() -> assessmentService.generateCertificate(assessmentAttempt, currentUser));
   }
 }
