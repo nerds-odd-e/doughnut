@@ -41,7 +41,7 @@
     <button @click="generateQuestionByAI" :disabled="dirty">
       Generate by AI
     </button>
-    <button @click="submitQuestion" :disabled="!isValidQuestion">Submit</button>
+    <button @click="submitQuestion" :disabled="!isValidQuestion">{{props.question ? "Save" : "Submit"}}</button>
   </div>
 </template>
 
@@ -58,17 +58,24 @@ const props = defineProps({
     type: Object as PropType<Note>,
     required: true,
   },
+  question: {
+    type: Object as PropType<QuizQuestionAndAnswer>,
+    required: false,
+  },
 })
 
-const quizQuestionAndAnswer = ref<QuizQuestionAndAnswer>({
-  correctAnswerIndex: 0,
-  quizQuestion: {
-    multipleChoicesQuestion: {
-      stem: "",
-      choices: ["", ""],
-    },
-  },
-} as QuizQuestionAndAnswer)
+const quizQuestionAndAnswer = ref<QuizQuestionAndAnswer>(
+  props.question ??
+    ({
+      correctAnswerIndex: 0,
+      quizQuestion: {
+        multipleChoicesQuestion: {
+          stem: "",
+          choices: ["", ""],
+        },
+      },
+    } as QuizQuestionAndAnswer)
+)
 
 const minimumNumberOfChoices = 2
 const maximumNumberOfChoices = 10

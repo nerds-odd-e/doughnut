@@ -6,15 +6,6 @@ import makeMe from "../fixtures/makeMe"
 import helper from "../helpers"
 
 const note = makeMe.aNoteRealm.please()
-const createWrapper = async () => {
-  helper
-    .component(NoteAddQuestion)
-    .withProps({
-      note: note.note,
-    })
-    .render()
-  await flushPromises()
-}
 
 describe("NoteAddQuestion", () => {
   interface Case {
@@ -40,7 +31,13 @@ describe("NoteAddQuestion", () => {
     },
   ].forEach(async (testCase: Case) => {
     it("only allow generation when no changes", async () => {
-      await createWrapper()
+      helper
+        .component(NoteAddQuestion)
+        .withProps({
+          note: note.note,
+        })
+        .render()
+      await flushPromises()
       // eslint-disable-next-line no-restricted-syntax
       for (const key of Object.keys(testCase.question)) {
         // eslint-disable-next-line no-await-in-loop
@@ -58,5 +55,24 @@ describe("NoteAddQuestion", () => {
       expect(refineButton.disabled).toBe(!testCase.expectedRefineButton)
       expect(generateButton.disabled).toBe(!testCase.expectedGenerateButton)
     })
+  })
+
+  it("turns into edit dialog when question is provided", async () => {
+    const wrapper = helper
+      .component(NoteAddQuestion)
+      .withProps({
+        note: note.note,
+        question: makeMe.aQuizQuestionAndAnswer
+          .withQuestionStem('Which of the following is the letter "A"?')
+          .withChoices(["A", "B"])
+          .please(),
+      })
+      .render()
+    await flushPromises()
+    expect(
+      wrapper.getByDisplayValue('Which of the following is the letter "A"?')
+    ).toHaveAttribute("name", "stem")
+    expect(wrapper.getByDisplayValue("A")).toHaveAttribute("name", "choice 0")
+    expect(wrapper.getByDisplayValue("B")).toHaveAttribute("name", "choice 1")
   })
 })

@@ -57,7 +57,23 @@
               :key="n"
             />
             <td>
-              <button @click="removeQuestion(question.id)">Remove</button>
+              <PopButton btn-class="btn btn-primary" title="Edit">
+                <!-- prettier-ignore -->
+                <template #default="{ closer }">
+                  <NoteAddQuestion
+                    v-bind="{ note, question }"
+                    @close-dialog="
+                      closer($event);
+                      fetchQuestions();
+                    "
+                  />
+                </template>
+              </PopButton>
+              <button
+                :class="`btn btn-sm btn-danger`"
+                @click="removeQuestion(question.id)">
+                Remove
+              </button>
             </td>
           </template>
         </tr>
