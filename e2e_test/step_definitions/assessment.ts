@@ -97,22 +97,10 @@ Given(
   }
 )
 
-When('I view my assessment history', () => {
-  start.navigateToAssessmentHistory()
-})
-
 Then('I should see my assessment history with empty records', () => {
   start
-    .assumeViewAssessmentHistoryPage()
-    .expectToFindTitle()
+    .navigateToAssessmentHistory()
     .expectTableWithNumberOfRow(0)
-})
-
-Then('I should see one record of the assessment', () => {
-  start
-    .assumeViewAssessmentHistoryPage()
-    .expectToFindTitle()
-    .expectTableWithNumberOfRow(1)
 })
 
 Then(
@@ -120,7 +108,7 @@ Then(
   (notebook: string, result: string) => {
     start
       .navigateToAssessmentHistory()
-      .expectToFindTitle()
+      .expectTableWithNumberOfRow(1)
       .checkAttemptResult(notebook, result)
   }
 )
