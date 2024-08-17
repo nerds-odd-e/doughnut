@@ -9,49 +9,28 @@
     <table class="assessment-table mt-2">
       <thead>
         <tr>
-          <th>ID</th>
           <th>Notebook</th>
           <th>Attempt At</th>
           <th>Result</th>
-          <th>Action</th>
         </tr>
       </thead>
       <tbody>
         <tr
           v-for="(assessmentHistory) in assessmentHistories"
         >
-          <td>{{assessmentHistory.id}}</td>
           <td>{{assessmentHistory.notebookTitle}}</td>
           <td>{{toLocalDateString(assessmentHistory.submittedAt)}}</td>
           <td>{{assessmentHistory.isPass ? "Pass" : "Fail"}}</td>
-          <td>
-            <button
-              :disabled="!assessmentHistory.isPass"
-              @click="getCertificate(assessmentHistory.id)"
-            >
-              Get Certificate
-            </button>
-          </td>
         </tr>
       </tbody>
     </table>
   </div>
-  <Modal
-    v-if="certificate != null"
-    @close_request="certificate = null"
-  >
-    <template #body>
-      <h2>Congratulations on your Certificate</h2>
-      <div>Notebook: {{ certificate.notebook?.headNote.noteTopic.topicConstructor }}</div>
-      <div>Expiry: {{ certificate.expiryDate }}</div>
-    </template>
-  </Modal>
   </ContainerPage>
 </template>
 
 <script setup lang="ts">
 import { PropType, onMounted, ref } from "vue"
-import { AssessmentHistory, Certificate, User } from "@/generated/backend"
+import { AssessmentHistory, User } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import ContainerPage from "./commons/ContainerPage.vue"
 
@@ -65,7 +44,6 @@ defineProps({
 })
 
 const assessmentHistories = ref<AssessmentHistory[]>([])
-const certificate = ref<Certificate | null>(null)
 
 const toLocalDateString = (date: string) => {
   return new Date(date).toLocaleString()
@@ -75,17 +53,6 @@ onMounted(async () => {
   assessmentHistories.value =
     await managedApi.restAssessmentController.getAssessmentHistory()
 })
-
-const getCertificate = async (assessmentHistoryId?: number) => {
-  if (assessmentHistoryId == null) {
-    return
-  }
-
-  certificate.value =
-    await managedApi.restAssessmentController.getCertificate(
-      assessmentHistoryId
-    )
-}
 </script>
 
 <style scoped>
