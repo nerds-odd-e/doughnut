@@ -98,27 +98,3 @@ Then(
       })
   }
 )
-
-Given(
-  'I have a notebook with head note {string} and settings:',
-  (_notebookTopic: string, data: DataTable) => {
-    const settings = data.hashes()
-    start.testability().injectNotebookSettings(settings)
-  }
-)
-When(
-  'I update validity period in notebook: {string} with number of questions: {int} and until cert expire: {int} year',
-  (topic: string, numberOfQuestions: number, untilCertExpire: number) => {
-    start
-      .routerToNotebooksPage()
-      .updateAssessmentSettings(topic, { numberOfQuestions, untilCertExpire })
-  }
-)
-Then(
-  'I should be able to view the Validity Period of notebook with {string}: {int} year in notebook settings',
-  (notebook: string, untilCertExpire: number) => {
-    start
-      .routerToNotebooksPage()
-      .checkCertificateExpiry(notebook, untilCertExpire)
-  }
-)
