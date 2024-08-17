@@ -98,9 +98,7 @@ Given(
 )
 
 Then('I should see my assessment history with empty records', () => {
-  start
-    .navigateToAssessmentHistory()
-    .expectTableWithNumberOfRow(0)
+  start.navigateToAssessmentHistory().expectTableWithNumberOfRow(0)
 })
 
 Then(
