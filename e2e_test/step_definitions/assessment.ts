@@ -104,7 +104,7 @@ Then('I should see my assessment history with empty records', () => {
 })
 
 Then(
-  'I should see {string} result as {string} in the assessment history',
+  'I should see {string} result as {string} in my assessment history',
   (notebook: string, result: string) => {
     start
       .navigateToAssessmentHistory()

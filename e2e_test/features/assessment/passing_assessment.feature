@@ -13,6 +13,6 @@ Feature: Get certificate by an assessment
     Then I should <Pass or not> the assessment of "Just say 'Yes'"
 
     Examples:
-      | Score | Pass or not | Certificate Generated?
-      | 2/2   | pass        | Yes
-      | 1/2   | not pass    | No
+      | Score | Pass or not |
+      | 2/2   | pass        |
+      | 1/2   | not pass    |
