@@ -73,7 +73,7 @@ When(
     start
       .navigateToBazaar()
       .selfAssessmentOnNotebook(notebook)
-      .answerYesNoQuestionsByScore(correctAnswers, allQuestions)
+      .answerYesNoQuestionsToScore(correctAnswers, allQuestions)
   }
 )
 
@@ -124,39 +124,3 @@ Then(
       .checkAttemptResult(notebook, result)
   }
 )
-
-Given(
-  'I have completed the assessment on notebook {string} with {int} questions',
-  (notebook: string, numberOfQuestion: number) => {
-    start
-      .testability()
-      .injectNumbersNotebookWithQuestions(notebook, numberOfQuestion)
-    start
-      .routerToNotebooksPage()
-      .updateAssessmentSettings(notebook, { numberOfQuestion })
-  }
-)
-When(
-  'I view my assessment history of topic {string} and scored {int}\\/{int} on the assessment',
-  (notebook: string, correctAnswers: number, allQuestions: number) => {
-    start
-      .navigateToBazaar()
-      .selfAssessmentOnNotebook(notebook)
-      .answerYesNoQuestionsByScore(correctAnswers, allQuestions)
-
-    start.navigateToAssessmentHistory()
-  }
-)
-Then(
-  "I should be able to click the 'Get Certificate' button to get my assessment certificate",
-  () => {
-    start.assumeViewAssessmentHistoryPage().expectEnabledCertificateButton()
-  }
-)
-Then("I should not be able to click on the 'Get Certificate' button", () => {
-  start.assumeViewAssessmentHistoryPage().expectDisabledCertificateButton()
-})
-Then('I should be able to see my certificate', () => {
-  start.assumeViewAssessmentHistoryPage().clickGetCertificate()
-  start.assumeViewAssessmentHistoryPage().expectCertificateModal()
-})
