@@ -116,10 +116,10 @@ Then('I should see one record of the assessment', () => {
 })
 
 Then(
-  'I should see {string} result as {string}',
+  'I should see {string} result as {string} in the assessment history',
   (notebook: string, result: string) => {
     start
-      .assumeViewAssessmentHistoryPage()
+      .navigateToAssessmentHistory()
       .expectToFindTitle()
       .checkAttemptResult(notebook, result)
   }

@@ -13,16 +13,15 @@ Feature: View my assessment history
     When I get score 2/2 when do the assessment on "Just say 'Yes'"
     And I view my assessment history
     Then I should see one record of the assessment
-  
+
   Scenario Outline: Have attempted assessment of a notebook
-    When I get score <Score> when do the assessment on "<Notebook>"
-    And I view my assessment history
-    Then I should see "<Notebook>" result as "<Result>"
+    When I get score <Score> when do the assessment on "Just say 'Yes'"
+    Then I should see "Just say 'Yes'" result as "<Result>" in my assessment history
 
     Examples:
-      | Notebook        | Score | Attempt At          | Result |
-      | Just say 'Yes'  | 2/2   | 01-Apr-2024 12:00PM | Pass   |
-      | Just say 'Yes'  | 1/2   | 02-Apr-2024 12:00PM | Fail   |
+      | Score | Result |
+      | 2/2   | Pass   |
+      | 1/2   | Fail   |
 
 
 

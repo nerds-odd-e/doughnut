@@ -19,4 +19,5 @@ export const assumeViewAssessmentHistoryPage = () => {
 
 export const navigateToAssessmentHistory = () => {
   cy.visit('/assessmentHistory')
+  return assumeViewAssessmentHistoryPage()
 }
