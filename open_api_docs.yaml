@@ -2581,7 +2581,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/AssessmentHistory"
+                  $ref: "#/components/schemas/AssessmentAttempt"
   /api/assessment/questions/{notebook}:
     get:
       tags:
@@ -3766,26 +3766,30 @@ components:
       properties:
         name:
           type: string
-    AssessmentHistory:
+    AssessmentAttempt:
       required:
       - id
-      - isPass
-      - notebookTitle
       - submittedAt
       type: object
       properties:
         id:
           type: integer
           format: int32
-        notebookTitle:
-          type: string
         submittedAt:
           type: string
           format: date-time
+        answersTotal:
+          type: integer
+          format: int32
+        answersCorrect:
+          type: integer
+          format: int32
+        assessmentHistory:
+          $ref: "#/components/schemas/AssessmentAttempt"
         isPass:
           type: boolean
-        pass:
-          type: boolean
+        notebookTitle:
+          type: string
     Delta:
       type: object
       properties:

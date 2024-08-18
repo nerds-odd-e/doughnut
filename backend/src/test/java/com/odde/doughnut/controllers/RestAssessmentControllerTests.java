@@ -3,7 +3,6 @@ package com.odde.doughnut.controllers;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.dto.AnswerSubmission;
-import com.odde.doughnut.controllers.dto.AssessmentHistory;
 import com.odde.doughnut.controllers.dto.AssessmentResult;
 import com.odde.doughnut.controllers.dto.Randomization;
 import com.odde.doughnut.entities.*;
@@ -328,7 +327,7 @@ public class RestAssessmentControllerTests {
 
     @Test
     void shouldReturnEmptyIfNoAssemsentTaken() {
-      List<AssessmentHistory> assessmentHistories = controller.getAssessmentHistory();
+      List<AssessmentAttempt> assessmentHistories = controller.getAssessmentHistory();
       assertEquals(0, assessmentHistories.size());
     }
 
@@ -338,7 +337,7 @@ public class RestAssessmentControllerTests {
           .aAssessmentAttempt(
               currentUser.getEntity(), notebook, testabilitySettings.getCurrentUTCTimestamp(), 2, 2)
           .please();
-      List<AssessmentHistory> assessmentHistories = controller.getAssessmentHistory();
+      List<AssessmentAttempt> assessmentHistories = controller.getAssessmentHistory();
       assertEquals(1, assessmentHistories.size());
     }
 
@@ -348,8 +347,8 @@ public class RestAssessmentControllerTests {
           .aAssessmentAttempt(
               currentUser.getEntity(), notebook, testabilitySettings.getCurrentUTCTimestamp(), 5, 4)
           .please();
-      List<AssessmentHistory> assessmentHistories = controller.getAssessmentHistory();
-      assertTrue(assessmentHistories.getFirst().isPass());
+      List<AssessmentAttempt> assessmentHistories = controller.getAssessmentHistory();
+      assertTrue(assessmentHistories.getFirst().getIsPass());
     }
 
     @Test
@@ -358,8 +357,8 @@ public class RestAssessmentControllerTests {
           .aAssessmentAttempt(
               currentUser.getEntity(), notebook, testabilitySettings.getCurrentUTCTimestamp(), 5, 2)
           .please();
-      List<AssessmentHistory> assessmentHistories = controller.getAssessmentHistory();
-      assertFalse(assessmentHistories.getFirst().isPass());
+      List<AssessmentAttempt> assessmentHistories = controller.getAssessmentHistory();
+      assertFalse(assessmentHistories.getFirst().getIsPass());
     }
 
     @Test
@@ -369,7 +368,7 @@ public class RestAssessmentControllerTests {
           .aAssessmentAttempt(
               anotherUser, notebook, testabilitySettings.getCurrentUTCTimestamp(), 5, 5)
           .please();
-      List<AssessmentHistory> assessmentHistories = controller.getAssessmentHistory();
+      List<AssessmentAttempt> assessmentHistories = controller.getAssessmentHistory();
       assertEquals(0, assessmentHistories.size());
     }
   }

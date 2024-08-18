@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { AnswerSubmission } from '../models/AnswerSubmission';
-import type { AssessmentHistory } from '../models/AssessmentHistory';
+import type { AssessmentAttempt } from '../models/AssessmentAttempt';
 import type { AssessmentResult } from '../models/AssessmentResult';
 import type { Certificate } from '../models/Certificate';
 import type { QuizQuestion } from '../models/QuizQuestion';
@@ -54,10 +54,10 @@ export class RestAssessmentControllerService {
         });
     }
     /**
-     * @returns AssessmentHistory OK
+     * @returns AssessmentAttempt OK
      * @throws ApiError
      */
-    public getAssessmentHistory(): CancelablePromise<Array<AssessmentHistory>> {
+    public getAssessmentHistory(): CancelablePromise<Array<AssessmentAttempt>> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/assessment',

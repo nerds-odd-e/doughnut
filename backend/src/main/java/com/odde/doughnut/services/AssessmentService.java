@@ -3,7 +3,6 @@ package com.odde.doughnut.services;
 import static com.odde.doughnut.controllers.dto.ApiError.ErrorType.ASSESSMENT_SERVICE_ERROR;
 
 import com.odde.doughnut.controllers.dto.AnswerSubmission;
-import com.odde.doughnut.controllers.dto.AssessmentHistory;
 import com.odde.doughnut.controllers.dto.AssessmentResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.ApiException;
@@ -83,7 +82,7 @@ public class AssessmentService {
     return assessmentResult;
   }
 
-  public List<AssessmentHistory> getAssessmentHistory(User user) {
+  public List<AssessmentAttempt> getAssessmentHistory(User user) {
     return modelFactoryService.assessmentAttemptRepository.findAll().stream()
         .filter(aa -> Objects.equals(aa.getUser().getId(), user.getId()))
         .map(AssessmentAttempt::getAssessmentHistory)

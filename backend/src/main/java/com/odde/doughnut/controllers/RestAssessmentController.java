@@ -1,7 +1,6 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.AnswerSubmission;
-import com.odde.doughnut.controllers.dto.AssessmentHistory;
 import com.odde.doughnut.controllers.dto.AssessmentResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.AssessmentAttemptLimitException;
@@ -71,7 +70,7 @@ class RestAssessmentController {
   }
 
   @GetMapping
-  public List<AssessmentHistory> getAssessmentHistory() {
+  public List<AssessmentAttempt> getAssessmentHistory() {
     currentUser.assertLoggedIn();
     return assessmentService.getAssessmentHistory(currentUser.getEntity());
   }

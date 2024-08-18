@@ -30,7 +30,7 @@
 
 <script setup lang="ts">
 import { PropType, onMounted, ref } from "vue"
-import { AssessmentHistory, User } from "@/generated/backend"
+import { AssessmentAttempt, User } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import ContainerPage from "./commons/ContainerPage.vue"
 
@@ -43,7 +43,7 @@ defineProps({
   },
 })
 
-const assessmentHistories = ref<AssessmentHistory[]>([])
+const assessmentHistories = ref<AssessmentAttempt[]>([])
 
 const toLocalDateString = (date: string) => {
   return new Date(date).toLocaleString()
