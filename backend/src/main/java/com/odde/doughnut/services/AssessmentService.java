@@ -80,8 +80,7 @@ public class AssessmentService {
   }
 
   public List<AssessmentAttempt> getAssessmentHistory(User user) {
-    return modelFactoryService.assessmentAttemptRepository.findAll().stream()
-        .filter(aa -> Objects.equals(aa.getUser().getId(), user.getId()))
+    return modelFactoryService.assessmentAttemptRepository.findAllByUser(user).stream()
         .map(AssessmentAttempt::getAssessmentHistory)
         .toList();
   }

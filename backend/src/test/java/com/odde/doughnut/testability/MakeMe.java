@@ -164,8 +164,4 @@ public class MakeMe extends MakeMeWithoutDB {
   public UserAssistantThreadBuilder aUserAssistantThread(String threadId) {
     return new UserAssistantThreadBuilder(this, threadId);
   }
-
-  public CertificateBuilder aCertificate(AssessmentAttempt assessmentAttempt) {
-    return new CertificateBuilder(this, assessmentAttempt);
-  }
 }

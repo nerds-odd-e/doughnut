@@ -3738,9 +3738,13 @@ components:
         id:
           type: integer
           format: int32
+        notebookTitle:
+          type: string
         submittedAt:
           type: string
           format: date-time
+        isPass:
+          type: boolean
         answersTotal:
           type: integer
           format: int32
@@ -3749,10 +3753,6 @@ components:
           format: int32
         assessmentHistory:
           $ref: "#/components/schemas/AssessmentAttempt"
-        notebookTitle:
-          type: string
-        isPass:
-          type: boolean
     Delta:
       type: object
       properties:

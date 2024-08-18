@@ -1,6 +1,7 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.sql.Timestamp;
@@ -11,6 +12,7 @@ import lombok.Setter;
 @Table(name = "assessment_attempt")
 @Getter
 @Setter
+@JsonPropertyOrder({"id", "notebookTitle", "submittedAt", "isPass"})
 public class AssessmentAttempt extends EntityIdentifiedByIdOnly {
   @ManyToOne
   @JoinColumn(name = "user_id")

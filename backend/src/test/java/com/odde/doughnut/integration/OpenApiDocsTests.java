@@ -1,6 +1,6 @@
 package com.odde.doughnut.integration;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import java.nio.file.Files;
@@ -42,12 +42,11 @@ class OpenApiDocsTests {
     Files.writeString(tempFile, currentApiDocs);
     String trueCopy = new String(Files.readAllBytes(Paths.get(trueCopyPath)));
 
-    assertThat(currentApiDocs)
-        .as(
-            "The current OpenAPI documentation does not match the approved 'true copy'. "
-                + "Please review the changes in '%s'. If the changes are intended, "
-                    .formatted(tempFile)
-                + "copy it over '%s' and rerun the test.".formatted(trueCopyPath))
-        .isEqualTo(trueCopy);
+    assertEquals(
+        trueCopy,
+        currentApiDocs,
+        "The current OpenAPI documentation does not match the approved 'true copy'. "
+            + "Please review the changes in '%s'. If the changes are intended, ".formatted(tempFile)
+            + "copy it over '%s' and rerun the test.".formatted(trueCopyPath));
   }
 }

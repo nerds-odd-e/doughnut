@@ -4,11 +4,11 @@
 /* eslint-disable */
 export type AssessmentAttempt = {
     id: number;
+    notebookTitle?: string;
     submittedAt: string;
+    isPass?: boolean;
     answersTotal?: number;
     answersCorrect?: number;
     assessmentHistory?: AssessmentAttempt;
-    notebookTitle?: string;
-    isPass?: boolean;
 };
 
