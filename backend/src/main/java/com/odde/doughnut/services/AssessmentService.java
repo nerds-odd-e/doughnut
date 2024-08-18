@@ -7,14 +7,11 @@ import com.odde.doughnut.controllers.dto.AssessmentResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.TimestampOperations;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 public class AssessmentService {
   private final ModelFactoryService modelFactoryService;
@@ -87,23 +84,5 @@ public class AssessmentService {
         .filter(aa -> Objects.equals(aa.getUser().getId(), user.getId()))
         .map(AssessmentAttempt::getAssessmentHistory)
         .toList();
-  }
-
-  public Optional<Certificate> getCertificate(
-      AssessmentAttempt assessmentAttempt, UserModel currentUser) {
-    return modelFactoryService.certificateRepository
-        .findFirstByNotebookAndUserOrderByExpiryDateDesc(
-            assessmentAttempt.getNotebook(), currentUser.getEntity());
-  }
-
-  public Certificate generateCertificate(
-      AssessmentAttempt assessmentAttempt, UserModel currentUser) {
-    int yearsToAdd = 1;
-    Certificate certificate = new Certificate();
-    certificate.setNotebook(assessmentAttempt.getNotebook());
-    certificate.setUser(currentUser.getEntity());
-    certificate.setExpiryDate(
-        TimestampOperations.addYearsToTimestamp(assessmentAttempt.getSubmittedAt(), yearsToAdd));
-    return modelFactoryService.save(certificate);
   }
 }

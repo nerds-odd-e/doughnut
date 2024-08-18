@@ -5,7 +5,6 @@
 import type { AnswerSubmission } from '../models/AnswerSubmission';
 import type { AssessmentAttempt } from '../models/AssessmentAttempt';
 import type { AssessmentResult } from '../models/AssessmentResult';
-import type { Certificate } from '../models/Certificate';
 import type { QuizQuestion } from '../models/QuizQuestion';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -29,25 +28,6 @@ export class RestAssessmentControllerService {
             },
             body: requestBody,
             mediaType: 'application/json',
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * @param assessmentAttempt
-     * @returns Certificate OK
-     * @throws ApiError
-     */
-    public getCertificate(
-        assessmentAttempt: number,
-    ): CancelablePromise<Certificate> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/api/assessment/certificate/{assessmentAttempt}',
-            path: {
-                'assessmentAttempt': assessmentAttempt,
-            },
             errors: {
                 500: `Internal Server Error`,
             },

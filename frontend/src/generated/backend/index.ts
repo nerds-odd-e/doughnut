@@ -25,7 +25,6 @@ export type { Attachment } from './models/Attachment';
 export type { Audio } from './models/Audio';
 export type { AudioUploadDTO } from './models/AudioUploadDTO';
 export type { BazaarNotebook } from './models/BazaarNotebook';
-export type { Certificate } from './models/Certificate';
 export type { ChatRequest } from './models/ChatRequest';
 export type { Circle } from './models/Circle';
 export type { CircleForUserView } from './models/CircleForUserView';

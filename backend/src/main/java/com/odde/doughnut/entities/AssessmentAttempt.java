@@ -2,9 +2,8 @@ package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import java.sql.Timestamp;
-
 import jakarta.validation.constraints.NotNull;
+import java.sql.Timestamp;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -8,7 +8,7 @@ export type AssessmentAttempt = {
     answersTotal?: number;
     answersCorrect?: number;
     assessmentHistory?: AssessmentAttempt;
-    isPass?: boolean;
     notebookTitle?: string;
+    isPass?: boolean;
 };
 
