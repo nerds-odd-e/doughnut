@@ -3,7 +3,6 @@
   <main v-else>
     <NoteWithBreadcrumb v-bind="{ note: reviewPoint.note, storageAccessor }" />
   </main>
-  />
 </template>
 
 <script lang="ts">

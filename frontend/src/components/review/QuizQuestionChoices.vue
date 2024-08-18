@@ -1,5 +1,5 @@
 <template>
-  <ol class="choices" v-if="choices && choices.length > 0" type="A">
+  <ol class="choices" v-if="choices && choices.length > 0">
     <li class="choice" v-for="(choice, index) in choices" :key="index">
       <button
         :class="{
