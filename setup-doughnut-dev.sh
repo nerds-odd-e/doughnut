@@ -8,9 +8,9 @@ export os_type=Unsupported
 
 get_os_type() {
   case "${unameOut}" in
-  Linux*) os_type=Linux ;;
-  Darwin*) os_type=Mac ;;
-  *) os_type="UNKNOWN:${unameOut}" ;;
+    Linux*) os_type=Linux ;;
+    Darwin*) os_type=Mac ;;
+    *) os_type="UNKNOWN:${unameOut}" ;;
   esac
 }
 
@@ -27,7 +27,7 @@ configure_nix_flakes() {
   fi
 
   if ! grep -Fxq "experimental-features = nix-command flakes" "${HOME}/.config/nix/nix.conf"; then
-    cat <<-EOF >"${HOME}/.config/nix/nix.conf"
+    cat <<-EOF > "${HOME}/.config/nix/nix.conf"
     experimental-features = nix-command flakes
 EOF
   fi
@@ -36,7 +36,7 @@ EOF
 allow_nix_unfree() {
   mkdir -p "${HOME}/.config/nixpkgs"
   touch "${HOME}/.config/nixpkgs/config.nix"
-  cat <<-EOF >"${HOME}/.config/nixpkgs/config.nix"
+  cat <<-EOF > "${HOME}/.config/nixpkgs/config.nix"
   { allowUnfree = true; }
 EOF
 }
