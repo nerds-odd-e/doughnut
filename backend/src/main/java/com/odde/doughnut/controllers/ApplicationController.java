@@ -38,7 +38,7 @@ public class ApplicationController {
       },
       method = RequestMethod.GET)
   public String home() {
-    return "vuejsed";
+    return "../static/index";
   }
 
   @GetMapping("/users/identify")
