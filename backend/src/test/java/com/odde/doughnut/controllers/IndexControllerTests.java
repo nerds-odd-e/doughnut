@@ -11,6 +11,6 @@ class IndexControllerTests {
   @Test
   void visitWithNoUserSession() {
     controller = new ApplicationController();
-    assertEquals("vuejsed", controller.home());
+    assertEquals("forward:/index.html", controller.home());
   }
 }
