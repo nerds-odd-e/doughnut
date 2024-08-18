@@ -38,6 +38,7 @@ dependencies {
   compileOnly 'org.flywaydb:flyway-core'
   implementation 'org.springframework.session:spring-session-core'
   implementation 'org.springframework.boot:spring-boot-starter-validation'
+  implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
   implementation 'org.springframework.boot:spring-boot-starter-security'
   implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
   implementation 'org.springdoc:springdoc-openapi-starter-webmvc-api:2.3.0'

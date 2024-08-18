@@ -38,7 +38,7 @@ public class ApplicationController {
       },
       method = RequestMethod.GET)
   public String home() {
-    return "forward:/index.html";
+    return "../static/index";
   }
 
   @GetMapping("/users/identify")
