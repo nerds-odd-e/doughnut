@@ -11,6 +11,6 @@ class IndexControllerTests {
   @Test
   void visitWithNoUserSession() {
     controller = new ApplicationController();
-    assertEquals("forward:/index.html", controller.home());
+    assertEquals("../static/index", controller.home());
   }
 }
