@@ -94,3 +94,10 @@ export default defineComponent({
   },
 })
 </script>
+
+<style scoped>
+.choices {
+    list-style-type: none;
+    padding-left: 0
+}
+</style>
