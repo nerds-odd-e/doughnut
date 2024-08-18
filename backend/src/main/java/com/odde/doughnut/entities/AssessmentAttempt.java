@@ -41,8 +41,4 @@ public class AssessmentAttempt extends EntityIdentifiedByIdOnly {
   public Boolean getIsPass() {
     return ((double) getAnswersCorrect() / getAnswersTotal()) >= 0.8;
   }
-
-  public AssessmentAttempt getAssessmentHistory() {
-    return this;
-  }
 }

@@ -9,6 +9,5 @@ export type AssessmentAttempt = {
     isPass?: boolean;
     answersTotal?: number;
     answersCorrect?: number;
-    assessmentHistory?: AssessmentAttempt;
 };
 

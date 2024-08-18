@@ -343,32 +343,6 @@ paths:
                 additionalProperties:
                   type: integer
                   format: int32
-  /api/testability/inject_notebook_settings:
-    post:
-      tags:
-      - testability-rest-controller
-      operationId: injectNotebookSettings
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/NotesTestData"
-        required: true
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: object
-                additionalProperties:
-                  $ref: "#/components/schemas/Note"
   /api/testability/inject_circle:
     post:
       tags:
@@ -2814,9 +2788,6 @@ components:
           type: string
         Wikidata Id:
           type: string
-        Validity Period:
-          type: integer
-          format: int32
     NotesTestData:
       type: object
       properties:
@@ -2831,6 +2802,12 @@ components:
         circleName:
           type: string
           writeOnly: true
+    SubscriptionDTO:
+      type: object
+      properties:
+        dailyTargetOfNewNotes:
+          type: integer
+          format: int32
     Note:
       required:
       - createdAt
@@ -2896,12 +2873,6 @@ components:
           $ref: "#/components/schemas/NoteTopic"
         parentNoteTopic:
           $ref: "#/components/schemas/NoteTopic"
-    SubscriptionDTO:
-      type: object
-      properties:
-        dailyTargetOfNewNotes:
-          type: integer
-          format: int32
     Notebook:
       required:
       - headNote
@@ -2924,9 +2895,6 @@ components:
         skipReviewEntirely:
           type: boolean
         numberOfQuestionsInAssessment:
-          type: integer
-          format: int32
-        untilCertExpire:
           type: integer
           format: int32
         certifiedBy:
@@ -3751,8 +3719,6 @@ components:
         answersCorrect:
           type: integer
           format: int32
-        assessmentHistory:
-          $ref: "#/components/schemas/AssessmentAttempt"
     Delta:
       type: object
       properties:

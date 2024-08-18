@@ -5,7 +5,6 @@
 export type NotebookSettings = {
     skipReviewEntirely?: boolean;
     numberOfQuestionsInAssessment?: number;
-    untilCertExpire?: number;
     certifiedBy?: string;
 };
 

@@ -80,8 +80,6 @@ public class AssessmentService {
   }
 
   public List<AssessmentAttempt> getAssessmentHistory(User user) {
-    return modelFactoryService.assessmentAttemptRepository.findAllByUser(user).stream()
-        .map(AssessmentAttempt::getAssessmentHistory)
-        .toList();
+    return modelFactoryService.assessmentAttemptRepository.findAllByUser(user);
   }
 }

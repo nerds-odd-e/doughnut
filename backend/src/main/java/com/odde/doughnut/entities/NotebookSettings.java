@@ -14,9 +14,6 @@ public class NotebookSettings {
   @Column(name = "number_of_questions_in_assessment")
   Integer numberOfQuestionsInAssessment;
 
-  @Column(name = "until_cert_expire")
-  Integer untilCertExpire = 1;
-
   @Column(name = "certified_by")
   String certifiedBy = "";
 
@@ -24,7 +21,6 @@ public class NotebookSettings {
   public void update(NotebookSettings value) {
     setSkipReviewEntirely(value.getSkipReviewEntirely());
     setNumberOfQuestionsInAssessment(value.getNumberOfQuestionsInAssessment());
-    setUntilCertExpire(value.getUntilCertExpire());
     setCertifiedBy(value.getCertifiedBy());
   }
 }

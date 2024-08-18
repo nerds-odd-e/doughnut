@@ -2,7 +2,6 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { Note } from '../models/Note';
 import type { NotesTestData } from '../models/NotesTestData';
 import type { QuizQuestionAndAnswer } from '../models/QuizQuestionAndAnswer';
 import type { QuizQuestionsTestData } from '../models/QuizQuestionsTestData';
@@ -213,24 +212,6 @@ export class TestabilityRestControllerService {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/testability/inject_notes',
-            body: requestBody,
-            mediaType: 'application/json',
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * @param requestBody
-     * @returns Note OK
-     * @throws ApiError
-     */
-    public injectNotebookSettings(
-        requestBody: NotesTestData,
-    ): CancelablePromise<Record<string, Note>> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/api/testability/inject_notebook_settings',
             body: requestBody,
             mediaType: 'application/json',
             errors: {

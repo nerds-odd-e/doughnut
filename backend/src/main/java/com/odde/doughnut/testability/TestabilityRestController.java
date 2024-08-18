@@ -102,10 +102,6 @@ class TestabilityRestController {
     @Setter
     private String wikidataId;
 
-    @JsonProperty("Validity Period")
-    @Setter
-    private int validityPeriod;
-
     private Note buildNote(User user, Timestamp currentUTCTimestamp) {
       Note note =
           new NoteConstructionService(user, currentUTCTimestamp, null).createNote(null, topic);
@@ -122,12 +118,6 @@ class TestabilityRestController {
 
       note.setWikidataId(wikidataId);
       note.setUpdatedAt(currentUTCTimestamp);
-      return buildNotebook(user, currentUTCTimestamp, note);
-    }
-
-    private Note buildNotebook(User user, Timestamp currentUTCTimestamp, Note note) {
-      note.buildNotebookForHeadNote(user.getOwnership(), user);
-      note.getNotebook().getNotebookSettings().setUntilCertExpire(validityPeriod);
       return note;
     }
   }
@@ -174,21 +164,6 @@ class TestabilityRestController {
         Map<String, Note> titleNoteMap, ModelFactoryService modelFactoryService) {
       noteTestData.forEach((inject -> modelFactoryService.save(titleNoteMap.get(inject.topic))));
     }
-  }
-
-  @PostMapping("/inject_notebook_settings")
-  @Transactional
-  public Map<String, Note> injectNotebookSettings(@RequestBody NotesTestData notesTestData) {
-    final User user =
-        getUserModelByExternalIdentifierOrCurrentUser(notesTestData.externalIdentifier);
-    Ownership ownership = getOwnership(notesTestData, user);
-    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-
-    Map<String, Note> map = notesTestData.buildIndividualNotes(user, currentUTCTimestamp);
-    notesTestData.buildNoteTree(user, ownership, map, this.modelFactoryService);
-    notesTestData.saveByOriginalOrder(map, this.modelFactoryService);
-
-    return map;
   }
 
   @PostMapping("/inject_notes")
