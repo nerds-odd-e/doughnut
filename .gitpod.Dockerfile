@@ -16,14 +16,8 @@ ENV PATH="${PATH}:/nix/var/nix/profiles/default/bin"
 RUN export PATH="${PATH}:/nix/var/nix/profiles/default/bin"
 # upgrade to lix
 RUN . /home/gitpod/.nix-profile/etc/profile.d/nix.sh \
-    && sudo --preserve-env=PATH nix run \
-     --experimental-features "nix-command flakes" \
-     --extra-substituters https://cache.lix.systems --extra-trusted-public-keys "cache.lix.systems:aBnZUw8zA7H35Cz2RyKFVs3H4PlGTLawyY5KRbvJR8o=" \
-     'git+https://git.lix.systems/lix-project/lix?ref=refs/tags/2.91.0' -- \
-     upgrade-nix \
-     --extra-substituters https://cache.lix.systems --extra-trusted-public-keys "cache.lix.systems:aBnZUw8zA7H35Cz2RyKFVs3H4PlGTLawyY5KRbvJR8o=" \
 # install direnv
-    && nix-env -iA nixpkgs.direnv && nix-env -iA nixpkgs.nix-direnv
+    && nix-env -iA nixpkgs.direnv && nix-env -iA nixpkgs.nix-direnv && nix-env -iA nixpkgs.lix
 
 # fasd
 RUN echo 'eval "$(fasd --init auto)"' >> ~/.bashrc
