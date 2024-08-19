@@ -72,9 +72,13 @@ USER gitpod
 ENV USER=gitpod
 WORKDIR /home/gitpod
 
-# Install Nix
-RUN touch .bash_profile \
-    && curl https://nixos.org/releases/nix/nix-2.24.2/install | sh
+# Convert Nix to Lix
+RUN for i in $(seq 1 32); do \
+      sudo userdel nixbld$i || true; \
+    done && \
+    sudo groupdel nixbld || true
+RUN curl -L https://nixos.org/nix/install | sh -s -- --no-daemon
+ENV PATH="${PATH}:/nix/var/nix/profiles/default/bin"
 
 RUN echo '. /home/gitpod/.nix-profile/etc/profile.d/nix.sh' >> /home/gitpod/.bashrc
 RUN mkdir -p /home/gitpod/.config/nixpkgs && echo '{ allowUnfree = true; }' >> /home/gitpod/.config/nixpkgs/config.nix
