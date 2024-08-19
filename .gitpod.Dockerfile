@@ -14,9 +14,9 @@ WORKDIR /home/gitpod
 # activate nix
 ENV PATH="${PATH}:/nix/var/nix/profiles/default/bin"
 RUN export PATH="${PATH}:/nix/var/nix/profiles/default/bin"
-RUN . /home/gitpod/.nix-profile/etc/profile.d/nix.sh
+RUN . /home/gitpod/.nix-profile/etc/profile.d/nix.sh \
 # upgrade to lix
-RUN nix run \
+    && nix run \
     --experimental-features "nix-command flakes" \
     --extra-substituters https://cache.lix.systems --extra-trusted-public-keys "cache.lix.systems:aBnZUw8zA7H35Cz2RyKFVs3H4PlGTLawyY5KRbvJR8o=" \
     'git+https://git.lix.systems/lix-project/lix?ref=refs/tags/2.91.0' -- \
