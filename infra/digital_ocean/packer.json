@@ -36,7 +36,7 @@
         "ufw allow from 0.0.0.0/0 to any port 22",
         "ufw allow from 0.0.0.0/0 to any port 3389",
         "ufw enable",
-        "curl -L https://nixos.org/nix/install | sh -s -- --daemon",
+        "curl -sSf -L https://install.lix.systems/lix | sh -s -- install",
         "curl -sfL https://direnv.net/install.sh | bash",
         "sudo -u lia echo 'eval '$(direnv hook bash)' >> /home/lia/.bashrc",
         "sudo -u lia echo 'eval '$(direnv hook zsh)' >> /home/lia/.zshrc",
