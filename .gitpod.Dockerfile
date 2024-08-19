@@ -14,10 +14,9 @@ WORKDIR /home/gitpod
 # activate nix
 ENV PATH="${PATH}:/nix/var/nix/profiles/default/bin"
 RUN export PATH="${PATH}:/nix/var/nix/profiles/default/bin"
-# upgrade to lix
 RUN . /home/gitpod/.nix-profile/etc/profile.d/nix.sh \
 # install direnv
-    && nix-env -iA nixpkgs.direnv && nix-env -iA nixpkgs.nix-direnv && nix-env -iA nixpkgs.lix
+    && nix-env -iA nixpkgs.direnv && nix-env -iA nixpkgs.nix-direnv
 
 # fasd
 RUN echo 'eval "$(fasd --init auto)"' >> ~/.bashrc
