@@ -49,7 +49,7 @@
     "jsdom": "^24.1.1",
     "optionator": "^0.9.4",
     "sass": "^1.77.6",
-    "sass-loader": "16.0.0",
+    "sass-loader": "16.0.1",
     "style-loader": "^4.0.0",
     "typescript": "5.5.4",
     "unplugin-auto-import": "^0.18.2",
