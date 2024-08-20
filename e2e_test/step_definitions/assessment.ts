@@ -115,6 +115,16 @@ When('I get a certificate of {string}', (notebook: string) => {
   start.assumeAssessmentPage(notebook).viewCertificate()
 })
 
+
 Then('I do not get a certificate of {string}', (notebook: string) => {
   start.assumeAssessmentPage(notebook).expectNoCertificate()
+})
+
+When ('Now is {string}', (dateString: string) => {
+  let date: Date = new Date(dateString)
+  start.testability().backendTimeTravelToDate(date)
+})
+
+When( 'I should see the original start date {string} on my renewed certificate for {string}', ( dateString: string, notebook: string ) => {
+  start.assumeAssessmentPage(notebook).viewCertificateWithDate(dateString)
 })

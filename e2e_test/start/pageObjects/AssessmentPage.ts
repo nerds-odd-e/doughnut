@@ -65,8 +65,13 @@ export const assumeAssessmentPage = (notebook?: string) => {
       cy.findByText(`is granted the Certified`).should('be.visible')
       cy.findByText(`${notebook}`).should('be.visible')
     },
+
     expectNoCertificate() {
       cy.findByText('View Certificate').should('not.exist')
+    },
+    viewCertificateWithDate(date: string) {
+      this.viewCertificate()
+      cy.findByText(date).should('be.visible')
     },
     expectReachedLimit() {
       cy.findByText(

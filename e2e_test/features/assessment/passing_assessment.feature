@@ -17,10 +17,19 @@ Feature: Get certificate by an assessment
       | 2/2   | pass        |
       | 1/2   | not pass    |
 
-  Scenario Outline: I should receive a certificate when I have passed the assessment
+  Scenario: I should receive a certificate when I have passed the assessment
     When I get score 2/2 when do the assessment on "Just say 'Yes'"
     Then I get a certificate of "Just say 'Yes'"
 
-  Scenario Outline: I should not receive a certificate when I fail the assessment
+
+  Scenario: I should not receive a certificate when I fail the assessment
     When I get score 1/2 when do the assessment on "Just say 'Yes'"
     Then I do not get a certificate of "Just say 'Yes'"
+
+  @ignore
+  Scenario: I should see the original start date on my renewed certificate
+    Given Now is "2021-08-09"
+    And I get score 2/2 when do the assessment on "Just say 'Yes'"
+    When Now is "2024-08-09"
+    And I get score 2/2 when do the assessment on "Just say 'Yes'"
+    Then I should see the original start date "2021-08-09" on my renewed certificate for "Just say 'Yes'"
