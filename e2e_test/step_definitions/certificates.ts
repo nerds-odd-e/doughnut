@@ -14,3 +14,27 @@ Then(
       .assertNoteHasSettingWithValue(noteTopic, 'Certificate Expiry', '1y')
   }
 )
+
+When(
+  'There is a {string} notebook with assesment that has certification',
+  (notebook: string) => {
+    start.testability().injectNumbersNotebookWithQuestions(notebook, 2)
+    start
+      .routerToNotebooksPage()
+      .updateAssessmentSettings(notebook, { numberOfQuestion: 2 })
+  }
+)
+
+When('I Complete an assessment in {string}', (notebook: string) => {
+  start
+    .navigateToBazaar()
+    .selfAssessmentOnNotebook(notebook)
+    .answerYesNoQuestionsToScore(3, 3)
+})
+
+Then(
+  'I should see that the certificate of {string} assesment expires in 1 year from now',
+  (notebook: string) => {
+    start.assumeAssessmentPage(notebook).expectCerticateHasExprityDate()
+  }
+)
