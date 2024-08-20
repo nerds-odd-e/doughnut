@@ -67,6 +67,7 @@ export const routerToNotebooksPage = () => {
       }
 
       cy.findByRole('button', { name: 'Update' }).click()
+      cy.pageIsNotLoading()
     },
     unsubscribe(notebook: string) {
       this.findNotebookCardButton(notebook, 'Unsubscribe').click()
