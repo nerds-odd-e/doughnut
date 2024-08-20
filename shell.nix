@@ -34,7 +34,6 @@ in mkShell {
       x11vnc
       xclip
       xvfb-run
-      pinentry
   ];
   shellHook = ''
     #!/usr/bin/env bash
@@ -95,11 +94,6 @@ in mkShell {
     GRANT ALL PRIVILEGES ON doughnut_e2e_test.*    TO 'doughnut'@'127.0.0.1';
     FLUSH PRIVILEGES;
     EOF
-
-    export NIX_SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-      export NIX_SSL_CERT_FILE=/etc/ssl/cert.pem
-    fi
 
     export MYSQLD_PID=$(ps -ax | grep -v " grep " | grep mysqld | awk '{ print $1 }')
     if [[ -z "$MYSQLD_PID" ]]; then
