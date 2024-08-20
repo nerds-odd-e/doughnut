@@ -180,3 +180,7 @@ When('I request for approval for notebooks:', (_notebooks: DataTable) => {
 When('I open certification approval page', () => {
   start.goToAdminDashboard().goToCertificationRequestPage()
 })
+
+Then('I should see empty approval list', () => {
+  start.goToAdminDashboard().goToCertificationRequestPage().listIsEmpty()
+})

@@ -9,7 +9,6 @@ Feature: Notebook approval
     When I apply for an approval for notebook "Sedation"
     Then I should see the status "Pending" of the approval for notebook "Sedation"
   
-  @skip
   Scenario: Empty approval list is shown
     Given that I have the following notebooks:
       | TDD           | 

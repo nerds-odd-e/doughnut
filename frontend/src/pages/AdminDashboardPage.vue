@@ -50,12 +50,23 @@
         Manage Bazaar</a
       >
     </li>
+    <li class="nav-item">
+      <a
+        :class="`nav-link ${activePage === 'certificateRequests' ? 'active' : ''}`"
+        role="button"
+        href="#"
+        @click="activePage = 'certificateRequests'"
+      >
+       Certification Requests</a
+      >
+    </li>
   </ul>
   <FineTuningData v-if="activePage === 'fineTuningData'" />
   <FailureReportList v-if="activePage === 'failureReport'" />
   <ManageModel v-if="activePage === 'manageModel'" />
   <ManageAssistant v-if="activePage === 'manageAssistant'" />
   <ManageBazaar v-if="activePage === 'manageBazaar'" />
+  <CertificateRequests v-if="activePage === 'certificateRequests'" />
 </template>
 
 <script setup lang="ts">
@@ -66,6 +77,7 @@ import ManageModel from "../components/admin/ManageModel.vue"
 import ManageAssistant from "../components/admin/ManageAssistant.vue"
 import ManageBazaar from "../components/admin/ManageBazaar.vue"
 import ContainerPage from "./commons/ContainerPage.vue"
+import CertificateRequests from "../components/admin/CertificateRequests.vue"
 
 const activePage = ref(
   "fineTuningData" as
@@ -74,6 +86,7 @@ const activePage = ref(
     | "manageModel"
     | "manageAssistant"
     | "manageBazaar"
+    | "certificateRequests"
     | undefined
 )
 </script>
