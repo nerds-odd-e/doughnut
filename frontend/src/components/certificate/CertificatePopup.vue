@@ -2,13 +2,12 @@
   <div v-if="notebook && user" class="certificate-frame">
     <div class="certificate-container">
       <span>This to certificate that</span>
-      <span class="reciever-name">{{ user.name }}</span>
+      <span class="receiver-name">{{ user.name }}</span>
       <p class="certificate-detail">
-        <span>by completing the qualifications, </span
-        ><span
-      >is granted the Certified
-          {{ notebook.headNote.noteTopic.topicConstructor }}</span
-      >
+        <span>by completing the qualifications, </span>
+        <span>is granted the Certified
+          <span class="certificate-name"> {{ notebook.headNote.noteTopic.topicConstructor }}</span>
+        </span>
       </p>
       <div class="date-container">
         <span>on</span>
@@ -18,11 +17,11 @@
       </div>
       <div class="signature-section">
         <div class="signature">
-          <span>{{ notebook.creatorId }}</span>
+          <span class="signature-name">{{ notebook.creatorId }}</span>
           <span>Content Creator</span>
         </div>
         <div class="signature">
-          <span>Terry</span>
+          <span class="signature-name">Terry</span>
           <span>Odd-e</span>
         </div>
       </div>
@@ -77,24 +76,26 @@ onMounted(() => {
 <style lang="scss" scoped>
 .certificate-frame {
   border: solid 16px lightskyblue;
-  margin: 32px 64px;
+  margin: 16px 16px;
 }
 .certificate-container {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 80vh;
-  row-gap: 32px;
+  row-gap: 16px;
   border: solid 2px lightskyblue;
-  margin: 8px;
+  margin: 16px;
 }
 .certificate-detail {
   display: flex;
   flex-direction: column;
   text-align: center;
 }
-.reciever-name {
+.certificate-name {
+  font-weight: 700;
+}
+.receiver-name {
   font-size: 32px;
   font-weight: 700;
   color: lightskyblue;
@@ -118,5 +119,8 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+.signature-name {
+  font-style: italic;
 }
 </style>
