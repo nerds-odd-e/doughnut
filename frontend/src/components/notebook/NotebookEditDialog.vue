@@ -19,7 +19,6 @@
       hint="Format (1y 1m 1d)"
       v-model="formData.certificateExpiry"
       :errors="errors.certificateExpiry"
-      disabled
     />
     <button class="btn btn-primary btn-layout" @click="processForm">
       Update
