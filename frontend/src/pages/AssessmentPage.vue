@@ -16,6 +16,13 @@
         <div class="alert alert-success" v-if="assessmentPassed">
           You have passed the assessment.
         </div>
+        <PopButton
+          btn-class="btn btn-light"
+          title="View Certificate"
+          v-if="assessmentPassed"
+        >
+          <div> <h1>This is a fancy cert</h1> </div>
+        </PopButton>
         <div class="alert alert-danger" v-else>
           You have not passed the assessment.
         </div>
