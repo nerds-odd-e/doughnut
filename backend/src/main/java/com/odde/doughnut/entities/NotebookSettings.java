@@ -32,7 +32,7 @@ public class NotebookSettings {
   @Schema(implementation = String.class, defaultValue = "1y", example = "1y 6m")
   @JsonSerialize(using = PeriodSerializer.class)
   @JsonDeserialize(using = PeriodDeserializer.class)
-  Period certificateExpiry;
+  Period certificateExpiry = Period.ofYears(1);
 
   @JsonIgnore
   public void update(NotebookSettings value) {
