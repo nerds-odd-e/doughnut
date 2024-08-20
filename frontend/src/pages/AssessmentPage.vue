@@ -21,7 +21,7 @@
           title="View Certificate"
           v-if="assessmentPassed"
         >
-          <div> <h1>This is a fancy cert</h1> </div>
+          <CertificatePopup :notebook-id="props.notebookId"></CertificatePopup>
         </PopButton>
         <div class="alert alert-danger" v-else>
           You have not passed the assessment.

@@ -20,6 +20,7 @@ declare module 'vue' {
     BreadcrumbWithCircle: typeof import('./src/components/toolbars/BreadcrumbWithCircle.vue')['default']
     Card: typeof import('./src/components/notes/Card.vue')['default']
     Cards: typeof import('./src/components/notes/Cards.vue')['default']
+    CertificatePopup: typeof import('./src/components/certificate/CertificatePopup.vue')['default']
     CheckInput: typeof import('./src/components/form/CheckInput.vue')['default']
     ChildrenNotes: typeof import('./src/components/notes/ChildrenNotes.vue')['default']
     CircleJoinForm: typeof import('./src/components/circles/CircleJoinForm.vue')['default']
