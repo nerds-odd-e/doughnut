@@ -2897,6 +2897,10 @@ components:
         numberOfQuestionsInAssessment:
           type: integer
           format: int32
+        certificateExpiry:
+          type: string
+          example: 1y 6m
+          default: 1y
     Subscription:
       required:
       - id
