@@ -527,3 +527,10 @@ Then('the question in the form becomes:', (data: DataTable) => {
     }
   )
 })
+
+Then(
+  'I should be able to request certification approval for the notebook {string}',
+  (_noteTopic: string) => {
+    return 'pending'
+  }
+)

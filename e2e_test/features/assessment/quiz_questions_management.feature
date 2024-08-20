@@ -18,6 +18,19 @@ Feature: Quiz Question Management
       | What does a cow say?                 | moo            |
       | What do you call a cow with not leg? | Ground beef    |
 
+  @ignore
+  Scenario: Reset approval on new question
+    Given I am logged in as "admin"
+    And I have a notebook with the head note "The cow joke"
+    And there are questions for the note:
+      | Note Topic   | Question             | Answer | One Wrong Choice |
+      | The cow joke | What does a cow say? | moo    | woo              |
+    And the notebook "The cow joke" is approved
+    When I add the following question for the note "The cow joke":
+      | Stem                                 | Choice 0    | Choice 1 | Correct Choice Index |
+      | Why do cows have hooves instead of feet? | Because they lactose! | Woof! | 0         |
+    Then I should be able to request certification approval for the notebook "The cow joke"
+
   @usingMockedOpenAiService
   Scenario: Can generate the question by AI
     Given OpenAI now generates this question:
