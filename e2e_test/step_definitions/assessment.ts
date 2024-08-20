@@ -111,9 +111,6 @@ Then(
   }
 )
 
-When(
-  'I get a certificate of {string}',
-  (notebook: string) => {
-    start.assumeAssessmentPage(notebook).viewCertificate()
-  }
-)
+When('I get a certificate of {string}', (notebook: string) => {
+  start.assumeAssessmentPage(notebook).viewCertificate()
+})
