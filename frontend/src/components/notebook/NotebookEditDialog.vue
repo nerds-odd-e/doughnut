@@ -16,6 +16,7 @@
     <TextInput
       scope-name="notebook"
       field="certificateExpiry"
+      hint="Format (1 y 1 m 1 d)"
       v-model="formData.certificateExpiry"
       :errors="errors.certificateExpiry"
       disabled
