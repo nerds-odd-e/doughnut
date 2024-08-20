@@ -129,3 +129,10 @@ When(
     start.assumeAssessmentPage(notebook).viewCertificateWithDate(dateString)
   }
 )
+
+Then(
+  'I can view certificate of {string} in my assessment history',
+  (notebook: string) => {
+    start.navigateToAssessmentHistory().viewCertificate(notebook)
+  }
+)

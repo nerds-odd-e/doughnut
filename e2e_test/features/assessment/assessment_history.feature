@@ -17,5 +17,10 @@ Feature: View my assessment history
       | 2/2   | Pass   |
       | 1/2   | Fail   |
 
+  @ignore
+  Scenario: I can view certificate for passed assessment
+    When I get score 2/2 when do the assessment on "Just say 'Yes'"
+    Then I can view certificate of "Just say 'Yes'" in my assessment history
+
 
 
