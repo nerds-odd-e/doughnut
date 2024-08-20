@@ -42,7 +42,7 @@ export default {
     const {
       skipReviewEntirely,
       numberOfQuestionsInAssessment,
-      certificateExpiry = "1 y",
+      certificateExpiry = "1y",
     } = this.notebook.notebookSettings
     return {
       formData: {

@@ -11,6 +11,6 @@ Then(
   (noteTopic: string) => {
     start
       .routerToNotebooksPage()
-      .assertNoteHasSettingWithValue(noteTopic, 'Certificate Expiry', '1 y')
+      .assertNoteHasSettingWithValue(noteTopic, 'Certificate Expiry', '1y')
   }
 )
