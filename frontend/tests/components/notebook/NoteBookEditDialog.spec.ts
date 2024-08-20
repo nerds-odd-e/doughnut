@@ -1,5 +1,4 @@
 import { Notebook } from "@/generated/backend"
-import { flushPromises } from "@vue/test-utils"
 import NotebookEditDialog from "@/components/notebook/NotebookEditDialog.vue"
 import makeMe from "../../fixtures/makeMe"
 import helper from "../../helpers"
