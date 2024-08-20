@@ -59,5 +59,20 @@ export function assumeAdminDashboardPage() {
         },
       }
     },
+    goToCertificationRequestPage() {
+      this.goToTabInAdminDashboard('Certification Requests')
+      return {
+        approve(notebook: string) {
+          cy.findByText(notebook)
+            .parentsUntil('tr')
+            .parent()
+            .findByRole('button', { name: 'Approve' })
+            .click()
+        },
+        listIsEmpty() {
+          cy.findByText('No certification request found.')
+        },
+      }
+    },
   }
 }
