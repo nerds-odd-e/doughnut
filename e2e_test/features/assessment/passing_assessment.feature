@@ -20,3 +20,8 @@ Feature: Get certificate by an assessment
   Scenario Outline: I should receive a certificate when I have passed the assessment
     When I get score 2/2 when do the assessment on "Just say 'Yes'"
     Then I get a certificate of "Just say 'Yes'"
+
+  @ignore
+  Scenario Outline: I should not receive a certificate when I fail the assessment
+    When I get score 1/2 when do the assessment on "Just say 'Yes'"
+    Then I do not get a certificate
