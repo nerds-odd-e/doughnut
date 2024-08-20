@@ -36,6 +36,19 @@ When('I change notebook {string} to skip review', (noteTopic: string) => {
   start.routerToNotebooksPage().skipReview(noteTopic)
 })
 
+When('I apply for an approval for notebook {string}', (noteTopic: string) => {
+  start.routerToNotebooksPage().applyForNotebookApproval(noteTopic)
+})
+
+Then(
+  'I should see the status {string} of the approval for notebook {string}',
+  (status: string, noteTopic: string) => {
+    start
+      .routerToNotebooksPage()
+      .expectNotebookApprovalStatus(noteTopic, status)
+  }
+)
+
 Then('I unsubscribe from notebook {string}', (noteTopic: string) => {
   start.routerToNotebooksPage().unsubscribe(noteTopic)
 })
