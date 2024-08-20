@@ -1,5 +1,6 @@
 import { commonSenseSplit } from '../../support/string_util'
 import { assumeAssessmentPage } from './AssessmentPage'
+import { expectCertificationIcon } from './bazaarPage'
 
 const addToMyLearning = 'Add to my learning'
 
@@ -65,5 +66,11 @@ export const bazaarOrCircle = () => {
         .type(dailyLearningCount)
       cy.findByRole('button', { name: 'Submit' }).click()
     },
+    expectCertificationIcon(notebook: string) {
+      cy.findByText(notebook)
+        .parents('.card')
+        .find('.btn')
+        .should('exist')
+    }
   }
 }

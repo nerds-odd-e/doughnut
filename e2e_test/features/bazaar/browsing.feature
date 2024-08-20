@@ -25,3 +25,6 @@ Feature: Bazaar browsing
     Then there shouldn't be any note edit button
     And I should see it has link to "Square"
 
+  Scenario: Seeing approved notebooks
+    When I haven't login
+    Then I should see a certification icon on the "Shape" notebook card
