@@ -8,7 +8,7 @@ Feature: Get certificate by an assessment
     Given I am logged in as an existing user
     And there is an assessment on notebook "Just say 'Yes'" with 2 questions
 
-  Scenario Outline: I should receive a certificate when I have pass the assessment
+  Scenario Outline: I should pass the assessment when I get score more than 80%
     When I get score <Score> when do the assessment on "Just say 'Yes'"
     Then I should <Pass or not> the assessment of "Just say 'Yes'"
 
@@ -16,3 +16,7 @@ Feature: Get certificate by an assessment
       | Score | Pass or not |
       | 2/2   | pass        |
       | 1/2   | not pass    |
+
+  Scenario Outline: I should receive a certificate when I have passed the assessment
+    When I get score 2/2 when do the assessment on "Just say 'Yes'"
+    Then I get a certificate of "Just say 'Yes'"

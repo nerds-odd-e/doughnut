@@ -110,3 +110,10 @@ Then(
       .checkAttemptResult(notebook, result)
   }
 )
+
+When(
+  'I get a certificate of {string}',
+  (notebook: string) => {
+    start.assumeAssessmentPage(notebook).viewCertificate()
+  }
+)

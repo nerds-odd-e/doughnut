@@ -60,6 +60,10 @@ export const assumeAssessmentPage = (notebook?: string) => {
     expectNotPassAssessment() {
       cy.findByText('You have not passed the assessment.').should('be.visible')
     },
+    viewCertificate() {
+      cy.findByText('View Certificate').click()
+      cy.findByText('This is a fancy cert').should('be.visible')
+    },
     expectReachedLimit() {
       cy.findByText(
         'You have reached the assessment limit for today. Please try again tomorrow.'
