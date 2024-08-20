@@ -7,4 +7,4 @@ Feature: Notebook approval
 
   Scenario: Apply for an approval for a notebook
     When I apply for an approval for notebook "Sedation"
-    Then I should see the status "pending" of the approval for notebook "Sedation"
+    Then I should see the status "Pending" of the approval for notebook "Sedation"

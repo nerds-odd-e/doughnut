@@ -55,6 +55,16 @@ export class RestNotebookControllerService {
             },
         });
     }
+
+    /**
+     * @param notebook
+     * @param requestBody
+     * @returns Boolean OK
+     */
+    public requestApproval(): string  {
+        return "Pending approval";
+    }
+
     /**
      * @param notebook
      * @returns Notebook OK

@@ -20,8 +20,11 @@
       v-model="formData.certificateExpiry"
       :errors="errors.certificateExpiry"
     />
-    <button class="btn btn-primary btn-layout" @click="processForm">
+    <button class="btn btn-primary btn-layout mt-2" @click="processForm">
       Update
+    </button>
+    <button id="request-approval-btn" class="btn btn-primary btn-layout mt-2 float-end" @click="requestNotebookApproval">
+      Apply approval
     </button>
     </div>
 </template>
@@ -60,6 +63,13 @@ export default {
           this.$router.go()
         })
         .catch((err) => (this.errors = err))
+    },
+    requestNotebookApproval() {
+      const response = this.managedApi.restNotebookController.requestApproval()
+      const button = document.getElementById("request-approval-btn")
+      button.disabled = true
+      button.classList.replace("btn-primary", "btn-disabled")
+      button.textContent = response
     },
   },
 }
