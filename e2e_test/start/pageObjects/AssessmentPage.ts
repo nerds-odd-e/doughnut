@@ -62,7 +62,8 @@ export const assumeAssessmentPage = (notebook?: string) => {
     },
     viewCertificate() {
       cy.findByText('View Certificate').click()
-      cy.findByText(`is granted the Certified ${notebook}`).should('be.visible')
+      cy.findByText(`is granted the Certified`).should('be.visible')
+      cy.findByText(`${notebook}`).should('be.visible')
     },
     expectReachedLimit() {
       cy.findByText(
