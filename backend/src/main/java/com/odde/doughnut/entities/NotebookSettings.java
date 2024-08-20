@@ -17,6 +17,8 @@ import jakarta.persistence.Embeddable;
 import java.io.IOException;
 import java.time.Period;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 @Data
 @Embeddable
@@ -32,6 +34,8 @@ public class NotebookSettings {
   @Schema(implementation = String.class, defaultValue = "1y", example = "1y 6m")
   @JsonSerialize(using = PeriodSerializer.class)
   @JsonDeserialize(using = PeriodDeserializer.class)
+  @Getter
+  @Setter
   Period certificateExpiry = Period.ofYears(1);
 
   @JsonIgnore

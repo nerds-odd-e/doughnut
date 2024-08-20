@@ -13,6 +13,7 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.QuizQuestionBuilder;
+import java.time.Period;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -90,6 +91,17 @@ class RestNotebookControllerTest {
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.update(note.getNotebook(), new NotebookSettings()));
+    }
+
+    @Test
+    void shouldBeAbleToEditCertificateExpiry() throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().creatorAndOwner(userModel).please();
+      var notebookSettings = new NotebookSettings();
+      notebookSettings.setCertificateExpiry(Period.parse("P2Y3M"));
+      controller.update(note.getNotebook(), notebookSettings);
+      assertThat(
+          note.getNotebook().getNotebookSettings().getCertificateExpiry(),
+          equalTo(Period.parse("P2Y3M")));
     }
   }
 
