@@ -23,8 +23,8 @@
     <button class="btn btn-primary btn-layout mt-2" @click="processForm">
       Update
     </button>
-    <button id="request-approval-btn" class="btn btn-primary btn-layout mt-2 float-end" @click="requestNotebookApproval">
-      Apply approval
+    <button hidden="true" id="request-approval-btn" class="btn btn-primary btn-layout mt-2 float-end" @click="requestNotebookApproval">
+      Request approval
     </button>
     </div>
 </template>
@@ -65,11 +65,16 @@ export default {
         .catch((err) => (this.errors = err))
     },
     requestNotebookApproval() {
-      const response = this.managedApi.restNotebookController.requestApproval()
+      this.managedApi.restNotebookController
+        .requestNotebookApproval(this.notebook.id)
+        .then(() => {
+          this.disableButton()
+        })
+    },
+    disableButton() {
       const button = document.getElementById("request-approval-btn")
       button.disabled = true
       button.classList.replace("btn-primary", "btn-disabled")
-      button.textContent = response
     },
   },
 }

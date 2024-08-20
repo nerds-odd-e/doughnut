@@ -90,6 +90,15 @@ class RestNotebookController {
     return notebook;
   }
 
+  @PostMapping(value = "/{notebook}/request-approval")
+  @Transactional
+  public Notebook requestNotebookApproval(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertAuthorization(notebook);
+    return notebook;
+  }
+
   @PatchMapping(value = "/{notebook}/move-to-circle/{circle}")
   @Transactional
   public Notebook moveToCircle(

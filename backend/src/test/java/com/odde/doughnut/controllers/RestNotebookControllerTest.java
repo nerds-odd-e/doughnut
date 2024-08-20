@@ -106,6 +106,18 @@ class RestNotebookControllerTest {
   }
 
   @Nested
+  class requestNotebookApproval {
+    @Test
+    void shouldNotBeAbleToRequestApprovalForNotebookThatBelongsToOtherUser() {
+      User anotherUser = makeMe.aUser().please();
+      Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.requestNotebookApproval(note.getNotebook()));
+    }
+  }
+
+  @Nested
   class DownloadNotebookDump {
     private Notebook notebook;
 
