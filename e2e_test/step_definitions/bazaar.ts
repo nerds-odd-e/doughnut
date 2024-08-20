@@ -32,9 +32,7 @@ When(
 Then(
   'I should see a certification icon on the {string} notebook card',
   (notebook: string) => {
-    start
-      .navigateToBazaar()
-      .expectCertificationIcon(notebook)
+    start.navigateToBazaar().expectCertificationIcon(notebook)
   }
 )
 
