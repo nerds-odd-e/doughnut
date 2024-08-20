@@ -172,3 +172,11 @@ When(
 When('I remove the notebook {string} from the bazaar', (notebook: string) => {
   start.goToAdminDashboard().goToBazaarManagement().removeFromBazaar(notebook)
 })
+
+Given('there are no pending approvals', () => {
+  return 'pending'
+})
+
+When('I request for approval for notebooks:', (_notebooks: DataTable) => {
+  return 'pending'
+})
