@@ -247,4 +247,4 @@ Local test accounts:
   - [doughnut gitter.im](https://gitter.im/Odd-e-doughnut/community)
 - FOSS style; Fork and submit GitHub PR.
   - Please keep the PR small and on only one topic
-  - The code need to come with tests
+  - The code need to come with tests.
