@@ -14,6 +14,7 @@
       autocomplete="off"
       autocapitalize="off"
       @blur="$emit('blur', $event)"
+      :disabled="disabled"
     />
   </InputWithType>
 </template>
@@ -31,6 +32,7 @@ export default {
     placeholder: { type: String, default: null },
     autofocus: { type: Boolean, default: false },
     errors: String,
+    disabled: { type: Boolean, default: false },
   },
   components: {
     InputWithType,
