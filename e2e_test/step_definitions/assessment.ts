@@ -114,3 +114,7 @@ Then(
 When('I get a certificate of {string}', (notebook: string) => {
   start.assumeAssessmentPage(notebook).viewCertificate()
 })
+
+Then('I do not get a certificate of {string}', (notebook: string) => {
+  start.assumeAssessmentPage(notebook).expectNoCertificate()
+})
