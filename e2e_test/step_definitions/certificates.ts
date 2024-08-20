@@ -1,12 +1,16 @@
 import { When, Then } from '@badeball/cypress-cucumber-preprocessor'
 import '../support/string_util'
+import start from '../start'
 
-When('I have a notebook with the name "Certified thing"', () => {
-  return true
+When('I have a notebook with the name {string}', (noteTopic: string) => {
+  start.routerToNotebooksPage().creatingNotebook(noteTopic)
 })
-When('I open the notebooks settings', () => {
-  return true
-})
-Then('I should see the default expiration timespan which is 1 year', () => {
-  return true
-})
+
+Then(
+  'I should see the default expiration of {string} note to be 1 year',
+  (noteTopic: string) => {
+    start
+      .routerToNotebooksPage()
+      .assertNoteHasSettingWithValue(noteTopic, 'Certificate Expiry', '1 y')
+  }
+)

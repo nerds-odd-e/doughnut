@@ -15,6 +15,17 @@ export const routerToNotebooksPage = () => {
         assumeNotePage()
       )
     },
+    assertNoteHasSettingWithValue(
+      notebookTopic: string,
+      setting: string,
+      value: string
+    ) {
+      this.findNotebookCardButton(
+        notebookTopic,
+        'Edit notebook settings'
+      ).click()
+      cy.formField(setting).fieldShouldHaveValue(value)
+    },
     creatingNotebook(notebookTopic: string) {
       cy.findByText('Add New Notebook').click()
       return noteCreationForm.createNote(notebookTopic, undefined)
@@ -32,6 +43,7 @@ export const routerToNotebooksPage = () => {
       cy.formField('Skip Review Entirely').check()
       cy.findByRole('button', { name: 'Update' }).click()
     },
+
     updateAssessmentSettings(
       notebook: string,
       settings: {
