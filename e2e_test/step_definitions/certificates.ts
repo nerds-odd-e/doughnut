@@ -1,6 +1,7 @@
 import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
 import '../support/string_util'
 import start from '../start'
+import { DataTable } from '@cucumber/cucumber'
 
 When('I have a notebook with the name {string}', (noteTopic: string) => {
   start.routerToNotebooksPage().creatingNotebook(noteTopic)
@@ -60,9 +61,18 @@ Then(
   }
 )
 
-Then(
-  'from the certificate list I should see that the certificate of {string} assesment expires on {string}',
-  () => {
-    return true
+Then('list should contain certificates', (datatable: DataTable) => {
+  for (let i = 0; i < datatable.rows().length; i++) {
+    const row = datatable.rows()[i]
+    if (row) {
+      const notebook = row[0]
+      const expires = row[1]
+      if (notebook && expires) {
+        start
+          .navigateToAssessmentHistory()
+          .viewMultipleCertificates(notebook, i)
+        cy.findByTestId('expired-date').contains(expires)
+      }
+    }
   }
-)
+})
