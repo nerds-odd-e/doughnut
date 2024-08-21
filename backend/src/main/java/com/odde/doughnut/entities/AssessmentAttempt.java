@@ -28,6 +28,10 @@ public class AssessmentAttempt extends EntityIdentifiedByIdOnly {
   @NotNull
   private Timestamp submittedAt;
 
+  @Column(name = "certificate_expires_at")
+  @NotNull
+  private Timestamp certificateExpiresAt;
+
   @Column(name = "answers_total")
   private int answersTotal;
 
@@ -36,13 +40,6 @@ public class AssessmentAttempt extends EntityIdentifiedByIdOnly {
 
   public Integer getNotebookId() {
     return getNotebook().getId();
-  }
-
-  public Timestamp getCertificateExpiresAt() {
-    return Timestamp.valueOf(
-        this.submittedAt
-            .toLocalDateTime()
-            .plus(getNotebook().getNotebookSettings().getCertificateExpiry()));
   }
 
   public String getNotebookTitle() {

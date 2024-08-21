@@ -7,9 +7,9 @@ export type AssessmentAttempt = {
     notebookTitle?: string;
     submittedAt: string;
     isPass?: boolean;
+    certificateExpiresAt: string;
     answersTotal?: number;
     answersCorrect?: number;
     notebookId?: number;
-    certificateExpiresAt?: string;
 };
 

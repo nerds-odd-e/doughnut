@@ -66,6 +66,11 @@ public class AssessmentService {
     assessmentAttempt.setNotebook(notebook);
     assessmentAttempt.setAnswersTotal(answerSubmission.size());
     assessmentAttempt.setSubmittedAt(currentUTCTimestamp);
+    assessmentAttempt.setCertificateExpiresAt(
+        Timestamp.valueOf(
+            currentUTCTimestamp
+                .toLocalDateTime()
+                .plus(notebook.getNotebookSettings().getCertificateExpiry())));
 
     int totalCorrectAnswer =
         (int) answerSubmission.stream().filter(AnswerSubmission::isCorrectAnswers).count();
