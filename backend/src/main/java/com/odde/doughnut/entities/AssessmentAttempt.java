@@ -34,6 +34,17 @@ public class AssessmentAttempt extends EntityIdentifiedByIdOnly {
   @Column(name = "answers_correct")
   private int answersCorrect;
 
+  public Integer getNotebookId() {
+    return getNotebook().getId();
+  }
+
+  public Timestamp getCertificateExpiresAt() {
+    return Timestamp.valueOf(
+        this.submittedAt
+            .toLocalDateTime()
+            .plus(getNotebook().getNotebookSettings().getCertificateExpiry()));
+  }
+
   public String getNotebookTitle() {
     return getNotebook().getHeadNote().getTopicConstructor();
   }

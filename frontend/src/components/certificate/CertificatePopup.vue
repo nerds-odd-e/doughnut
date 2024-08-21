@@ -30,26 +30,55 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue"
+import { ref, onMounted, computed } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { Notebook, User } from "@/generated/backend"
+import { AssessmentAttempt, Notebook, User } from "@/generated/backend"
 const props = defineProps({
   notebookId: { type: Number, required: true },
 })
 const { managedApi } = useLoadingApi()
 const notebook = ref<Notebook | undefined>(undefined)
+const assesmentResult = ref<AssessmentAttempt | undefined>(undefined)
 const user = ref<User | undefined>(undefined)
-const issueDate = ref("")
-const expiredDate = ref("")
+const issueDate = computed(() =>
+  formatDate(
+    new Date(
+      assesmentResult.value ? assesmentResult.value.submittedAt : Date.now()
+    )
+  )
+)
+const expiredDate = computed(() =>
+  formatDate(
+    new Date(
+      assesmentResult.value && assesmentResult.value.certificateExpiresAt
+        ? assesmentResult.value.certificateExpiresAt
+        : Date.now()
+    )
+  )
+)
 const fetchData = async () => {
   notebook.value = await managedApi.restNotebookController.get(props.notebookId)
+  const allAssesments =
+    await managedApi.restAssessmentController.getAssessmentHistory()
+  assesmentResult.value = allAssesments
+    .filter((a) => a.notebookId === props.notebookId && a.isPass)
+    .sort(
+      (a, b) =>
+        new Date(b.submittedAt).valueOf() - new Date(a.submittedAt).valueOf()
+    )[0]
   user.value = await managedApi.restUserController.getUserProfile()
 }
+const padZero = (num: number): string => {
+  return num.toString().padStart(2, "0")
+}
+const formatDate = (date: Date): string => {
+  const theYear = date.getFullYear()
+  const theMonth = padZero(date.getMonth() + 1)
+  const theDate = padZero(date.getDate())
+  return `${theYear}-${theMonth}-${theDate}`
+}
 onMounted(() => {
-  fetchData().then(() => {
-    issueDate.value = "2024-01-01"
-    expiredDate.value = "2026-01-01"
-  })
+  fetchData()
 })
 </script>
 

@@ -3745,6 +3745,12 @@ components:
         answersCorrect:
           type: integer
           format: int32
+        notebookId:
+          type: integer
+          format: int32
+        certificateExpiresAt:
+          type: string
+          format: date-time
     Delta:
       type: object
       properties:
