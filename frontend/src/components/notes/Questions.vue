@@ -42,7 +42,7 @@
               <!-- prettier-ignore -->
               <template #default="{ closer }">
                 <NoteEditQuestion
-                  v-bind="{ note }"
+                  v-bind="{ question }"
                   @close-dialog="
                     closer($event);
                     questionAdded($event);
