@@ -23,9 +23,13 @@
     <button class="btn btn-primary btn-layout mt-2" @click="processForm">
       Update
     </button>
-    <button id="request-approval-btn" :class="approvalButtonClasses" :disabled="isApprovalButtonDisabled" @click="requestNotebookApproval">
-      {{ approvalButtonText }}
-    </button>
+    </div>
+    <hr/>
+    <div>
+      <h4>Request to obtain certificate from assessment</h4>
+      <button id="request-approval-btn" :class="approvalButtonClasses" :disabled="isApprovalButtonDisabled" @click="requestNotebookApproval">
+        {{ approvalButtonText }}
+      </button>
     </div>
 </template>
 
@@ -59,13 +63,13 @@ export default {
     approvalButtonText() {
       switch (this.notebook.approvalStatus) {
         case "NOT_APPROVED":
-          return "Request Approval"
+          return "Send Request"
         case "APPROVED":
           return "Certificate Request Approved"
         case "PENDING":
           return "Approval Pending"
         default:
-          return "Request Approval"
+          return "Send Request"
       }
     },
     approvalButtonClasses() {
@@ -77,7 +81,7 @@ export default {
           this.notebook.approvalStatus === "PENDING",
         "btn-layout": true,
         "mt-2": true,
-        "float-end": true,
+        display: "block",
       }
     },
     isApprovalButtonDisabled() {
