@@ -12,6 +12,7 @@
           <th>Notebook</th>
           <th>Attempt At</th>
           <th>Result</th>
+          <th>Certificate</th>
         </tr>
       </thead>
       <tbody>
@@ -21,6 +22,15 @@
           <td>{{assessmentHistory.notebookTitle}}</td>
           <td>{{toLocalDateString(assessmentHistory.submittedAt)}}</td>
           <td>{{assessmentHistory.isPass ? "Pass" : "Fail"}}</td>
+          <td>
+            <PopButton
+              btn-class="btn btn-light"
+              title="View Certificate"
+              v-if="assessmentHistory.isPass"
+            >
+              <CertificatePopup :notebook-id="1"></CertificatePopup>
+            </PopButton>
+          </td>
         </tr>
       </tbody>
     </table>
