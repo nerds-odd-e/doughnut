@@ -34,7 +34,7 @@ export const assumeViewAssessmentHistoryPage = () => {
         .findByText('View Certificate')
         .should('not.exist')
     },
-    viewMultipleCertificates(index: number) {
+    viewCertificateAt(index: number) {
       cy.get('.assessment-table tbody')
         .findAllByText('View Certificate')
         .each(($button, $index) => {
