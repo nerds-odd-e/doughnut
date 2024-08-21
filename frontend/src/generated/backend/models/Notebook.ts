@@ -8,6 +8,14 @@ export type Notebook = {
     id: number;
     headNote: Note;
     notebookSettings: NotebookSettings;
+    approvalStatus?: Notebook.approvalStatus;
     creatorId?: string;
 };
+export namespace Notebook {
+    export enum approvalStatus {
+        NOT_APPROVED = 'NOT_APPROVED',
+        PENDING = 'PENDING',
+        APPROVED = 'APPROVED',
+    }
+}
 

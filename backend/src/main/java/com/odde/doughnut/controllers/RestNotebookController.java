@@ -96,6 +96,7 @@ class RestNotebookController {
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(notebook);
+    notebook.setApprovalStatus(ApprovalStatus.PENDING);
     return notebook;
   }
 

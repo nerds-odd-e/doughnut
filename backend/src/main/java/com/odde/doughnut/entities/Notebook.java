@@ -56,6 +56,12 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   private List<Subscription> subscriptions;
 
+  @Column(name = "approval_status")
+  @Getter
+  @Setter
+  @Enumerated(EnumType.STRING)
+  private ApprovalStatus approvalStatus = ApprovalStatus.NOT_APPROVED;
+
   @JsonIgnore
   public List<Note> getNotes() {
     return Note.filterDeletedUnmodifiableNoteList(notes);

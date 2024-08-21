@@ -115,6 +115,14 @@ class RestNotebookControllerTest {
           UnexpectedNoAccessRightException.class,
           () -> controller.requestNotebookApproval(note.getNotebook()));
     }
+
+    @Test
+    void approvalStatusShouldBePendingAfterRequestingApproval()
+        throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().creatorAndOwner(userModel).please();
+      controller.requestNotebookApproval(note.getNotebook());
+      assertThat(note.getNotebook().getApprovalStatus(), equalTo(ApprovalStatus.PENDING));
+    }
   }
 
   @Nested

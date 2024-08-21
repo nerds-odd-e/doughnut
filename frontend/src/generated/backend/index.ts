@@ -58,7 +58,7 @@ export type { MultipleChoicesQuestion } from './models/MultipleChoicesQuestion';
 export type { Note } from './models/Note';
 export type { NoteAccessoriesDTO } from './models/NoteAccessoriesDTO';
 export type { NoteAccessory } from './models/NoteAccessory';
-export type { Notebook } from './models/Notebook';
+export { Notebook } from './models/Notebook';
 export type { NotebookAssistant } from './models/NotebookAssistant';
 export type { NotebookAssistantCreationParams } from './models/NotebookAssistantCreationParams';
 export type { NotebookSettings } from './models/NotebookSettings';

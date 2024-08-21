@@ -2911,6 +2911,12 @@ components:
           $ref: "#/components/schemas/Note"
         notebookSettings:
           $ref: "#/components/schemas/NotebookSettings"
+        approvalStatus:
+          type: string
+          enum:
+          - NOT_APPROVED
+          - PENDING
+          - APPROVED
         creatorId:
           type: string
     NotebookSettings:
