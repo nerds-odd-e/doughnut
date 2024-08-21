@@ -9,7 +9,7 @@ export type AssessmentAttempt = {
     isPass?: boolean;
     answersTotal?: number;
     answersCorrect?: number;
-    certificateExpiresAt?: string;
     notebookId?: number;
+    certificateExpiresAt?: string;
 };
 
