@@ -112,7 +112,10 @@ Then(
 )
 
 When('I should get a certificate of {string}', (notebook: string) => {
-  start.assumeAssessmentPage(notebook).viewCertificate()
+  start
+    .assumeAssessmentPage(notebook)
+    .expectCertificate()
+    .expectValidCertificate()
 })
 
 Then('I should not get a certificate of {string}', (notebook: string) => {
@@ -126,7 +129,10 @@ When('Now is {string}', (dateString: string) => {
 When(
   'I should see the original start date {string} on my renewed certificate for {string}',
   (dateString: string, notebook: string) => {
-    start.assumeAssessmentPage(notebook).viewCertificateWithDate(dateString)
+    start
+      .assumeAssessmentPage(notebook)
+      .expectCertificate()
+      .expectDate(dateString)
   }
 )
 

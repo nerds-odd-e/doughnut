@@ -1,4 +1,5 @@
 import { assumeBazaarPage } from './bazaarPage'
+import { CertificatePage } from './CertificatePage'
 
 const assumeQuestionSection = () => {
   return {
@@ -62,21 +63,12 @@ export const assumeAssessmentPage = (notebook?: string) => {
     expectNotPassAssessment() {
       cy.findByText('You have not passed the assessment.').should('be.visible')
     },
-    viewCertificate() {
+    expectCertificate() {
       cy.findByText('View Certificate').click()
-      cy.findByText(`is granted the Certified`).should('be.visible')
-      cy.findByText(`${notebook}`).should('be.visible')
+      return CertificatePage(notebook)
     },
     expectNoCertificate() {
       cy.findByText('View Certificate').should('not.exist')
-    },
-    viewCertificateWithDate(date: string) {
-      this.viewCertificate()
-      cy.findByText(date).should('be.visible')
-    },
-    expectCerticateHasExprityDate(expires: string) {
-      cy.findByText('View Certificate').click()
-      cy.findByTestId('expired-date').contains(expires)
     },
     expectReachedLimit() {
       cy.findByText(
