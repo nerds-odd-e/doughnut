@@ -29,7 +29,7 @@ When('I Complete an assessment in {string}', (notebook: string) => {
   start
     .navigateToBazaar()
     .selfAssessmentOnNotebook(notebook)
-    .answerYesNoQuestionsToScore(3, 3)
+    .answerYesNoQuestionsToScore(2, 2)
 })
 
 Then(

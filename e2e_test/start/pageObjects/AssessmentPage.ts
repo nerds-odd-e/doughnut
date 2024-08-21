@@ -49,9 +49,11 @@ export const assumeAssessmentPage = (notebook?: string) => {
     answerYesNoQuestionsToScore(correctAnswers: number, allQuestions: number) {
       for (let i = 0; i < correctAnswers; i++) {
         this.assumeQuestionSection().answer('Yes')
+        cy.pageIsNotLoading()
       }
       for (let i = correctAnswers; i < allQuestions; i++) {
         this.assumeQuestionSection().answer('No')
+        cy.pageIsNotLoading()
       }
     },
     passAssessment() {

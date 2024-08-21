@@ -1,5 +1,3 @@
-@wip
-@skip
 Feature: Notebook certificate default expiration
 
   Background:
