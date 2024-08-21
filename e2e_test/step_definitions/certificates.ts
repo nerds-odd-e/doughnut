@@ -25,13 +25,23 @@ When(
   }
 )
 
-Given('Expiration of "Certified thing" is set to "2y"', () => {
-  return true
-})
+Given(
+  'Expiration of {string} is set to {string}',
+  (notebook: string, period: string) => {
+    start
+      .routerToNotebooksPage()
+      .updateAssessmentSettings(notebook, { certificateExpiry: period })
+  }
+)
 
-Given('I should see the expiration of "Certified thing" is set to "2y"', () => {
-  return true
-})
+Given(
+  'I should see the expiration setting of {string} is set to {string}',
+  (notebook: string, period: string) => {
+    start
+      .routerToNotebooksPage()
+      .assertNoteHasSettingWithValue(notebook, 'Certificate Expiry', period)
+  }
+)
 
 When('I Complete an assessment in {string}', (notebook: string) => {
   start

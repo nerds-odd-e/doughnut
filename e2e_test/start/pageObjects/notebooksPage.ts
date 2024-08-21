@@ -57,12 +57,18 @@ export const routerToNotebooksPage = () => {
       notebook: string,
       settings: {
         numberOfQuestion?: number
+        certificateExpiry?: string
       }
     ) {
       this.findNotebookCardButton(notebook, 'Edit notebook settings').click()
       if (settings.numberOfQuestion) {
         cy.formField('Number Of Questions In Assessment').assignFieldValue(
           `${settings.numberOfQuestion}`
+        )
+      }
+      if (settings.certificateExpiry) {
+        cy.formField('Certificate Expiry').assignFieldValue(
+          `${settings.certificateExpiry}`
         )
       }
 
