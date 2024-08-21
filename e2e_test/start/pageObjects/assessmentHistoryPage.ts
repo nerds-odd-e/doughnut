@@ -1,3 +1,5 @@
+import { CertificatePopup } from './CertificatePopup'
+
 export const assumeViewAssessmentHistoryPage = () => {
   cy.findByText('Welcome To Assessment History').should('be.visible')
 
@@ -13,7 +15,7 @@ export const assumeViewAssessmentHistoryPage = () => {
         .next()
         .contains(result)
     },
-    viewCertificate(notebook: string) {
+    expectCertificate(notebook: string) {
       cy.get('.assessment-table tbody')
         .findByText(notebook)
         .next()
@@ -21,6 +23,7 @@ export const assumeViewAssessmentHistoryPage = () => {
         .next()
         .findByText('View Certificate')
         .click()
+      return CertificatePopup()
     },
     expectNoCertificate(notebook: string) {
       cy.get('.assessment-table tbody')

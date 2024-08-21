@@ -115,7 +115,7 @@ When('I should get a certificate of {string}', (notebook: string) => {
   start
     .assumeAssessmentPage(notebook)
     .expectCertificate()
-    .expectValidCertificate()
+    .expectCertificateFor(notebook)
 })
 
 Then('I should not get a certificate of {string}', (notebook: string) => {
@@ -139,7 +139,10 @@ When(
 Then(
   'I can view certificate of {string} in my assessment history',
   (notebook: string) => {
-    start.navigateToAssessmentHistory().viewCertificate(notebook)
+    start
+      .navigateToAssessmentHistory()
+      .expectCertificate(notebook)
+      .expectCertificateFor(notebook)
   }
 )
 

@@ -1,5 +1,5 @@
 import { assumeBazaarPage } from './bazaarPage'
-import { CertificatePage } from './CertificatePage'
+import { CertificatePopup } from './CertificatePopup'
 
 const assumeQuestionSection = () => {
   return {
@@ -65,7 +65,7 @@ export const assumeAssessmentPage = (notebook?: string) => {
     },
     expectCertificate() {
       cy.findByText('View Certificate').click()
-      return CertificatePage(notebook)
+      return CertificatePopup()
     },
     expectNoCertificate() {
       cy.findByText('View Certificate').should('not.exist')
