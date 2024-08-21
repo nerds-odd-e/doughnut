@@ -57,7 +57,6 @@ export default {
   },
   computed: {
     approvalButtonText() {
-      console.log(this.notebook.approvalStatus)
       switch (this.notebook.approvalStatus) {
         case "NOT_APPROVED":
           return "Request Approval"
