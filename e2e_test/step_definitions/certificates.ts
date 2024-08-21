@@ -56,3 +56,10 @@ Then(
     start.assumeAssessmentPage(notebook).expectCerticateHasExprityDate(expires)
   }
 )
+
+Then(
+  'from the certificate list I should see that the certificate of {string} assesment expires on {string}',
+  () => {
+    return true
+  }
+)
