@@ -136,3 +136,10 @@ Then(
     start.navigateToAssessmentHistory().viewCertificate(notebook)
   }
 )
+
+Then(
+  'I can not view certificate of {string} in my assessment history',
+  (notebook: string) => {
+    start.navigateToAssessmentHistory().expectNoCertificate(notebook)
+  }
+)

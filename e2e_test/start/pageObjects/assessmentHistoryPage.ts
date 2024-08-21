@@ -22,6 +22,15 @@ export const assumeViewAssessmentHistoryPage = () => {
         .findByText('View Certificate')
         .click()
     },
+    expectNoCertificate(notebook: string) {
+      cy.get('.assessment-table tbody')
+        .findByText(notebook)
+        .next()
+        .next()
+        .next()
+        .findByText('View Certificate')
+        .should('not.exist')
+    },
   }
 }
 
