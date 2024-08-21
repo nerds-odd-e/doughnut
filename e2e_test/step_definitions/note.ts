@@ -104,7 +104,7 @@ When('I create a notebook with topic {string}', (notebookTopic: string) => {
   start.routerToNotebooksPage().creatingNotebook(notebookTopic)
 })
 
-Given('that I have the following notebooks:', (data: DataTable) => {
+Given('I have the following notebooks:', (data: DataTable) => {
   for (const row of data.raw()) {
     start.routerToNotebooksPage().creatingNotebook(row[0]!)
   }

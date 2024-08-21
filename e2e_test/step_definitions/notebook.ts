@@ -36,9 +36,21 @@ When('I change notebook {string} to skip review', (noteTopic: string) => {
   start.routerToNotebooksPage().skipReview(noteTopic)
 })
 
-When('I apply for an approval for notebook {string}', (noteTopic: string) => {
-  start.routerToNotebooksPage().applyForNotebookApproval(noteTopic)
+When('I request for an approval for notebooks:', (notebooks: DataTable) => {
+  notebooks.raw().forEach((notebookRaw: string[]) => {
+    const notebookName = notebookRaw[0]!
+    start.routerToNotebooksPage().requestForNotebookApproval(notebookName)
+  })
 })
+
+When(
+  'I cannot request approval again for notebook {string}',
+  (noteTopic: string) => {
+    start
+      .routerToNotebooksPage()
+      .expectNotebookApprovalCannotBeRequested(noteTopic)
+  }
+)
 
 Then(
   'I should see the status {string} of the approval for notebook {string}',

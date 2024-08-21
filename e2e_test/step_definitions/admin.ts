@@ -173,10 +173,6 @@ When('I remove the notebook {string} from the bazaar', (notebook: string) => {
   start.goToAdminDashboard().goToBazaarManagement().removeFromBazaar(notebook)
 })
 
-When('I request for approval for notebooks:', (_notebooks: DataTable) => {
-  return 'pending'
-})
-
 When('I open certification approval page', () => {
   start.goToAdminDashboard().goToCertificationRequestPage()
 })

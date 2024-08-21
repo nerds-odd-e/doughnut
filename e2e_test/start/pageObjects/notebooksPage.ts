@@ -43,9 +43,13 @@ export const routerToNotebooksPage = () => {
       cy.formField('Skip Review Entirely').check()
       cy.findByRole('button', { name: 'Update' }).click()
     },
-    applyForNotebookApproval(notebook: string) {
+    requestForNotebookApproval(notebook: string) {
       this.findNotebookCardButton(notebook, 'Edit notebook settings').click()
       cy.findByRole('button', { name: 'Request Approval' }).click()
+    },
+    expectNotebookApprovalCannotBeRequested(notebook: string) {
+      this.findNotebookCardButton(notebook, 'Edit notebook settings').click()
+      cy.findByRole('button', { name: 'Request Approval' }).should('not.exist')
     },
     expectNotebookApprovalStatus(notebook: string, status: string) {
       this.findNotebookCardButton(notebook, 'Edit notebook settings').click()
