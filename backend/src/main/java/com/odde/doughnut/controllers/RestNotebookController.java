@@ -97,6 +97,7 @@ class RestNotebookController {
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(notebook);
     notebook.setApprovalStatus(ApprovalStatus.PENDING);
+    modelFactoryService.save(notebook);
     return notebook;
   }
 

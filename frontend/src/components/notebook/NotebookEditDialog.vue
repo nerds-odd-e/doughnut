@@ -23,8 +23,8 @@
     <button class="btn btn-primary btn-layout mt-2" @click="processForm">
       Update
     </button>
-    <button hidden="true" id="request-approval-btn" class="btn btn-primary btn-layout mt-2 float-end" @click="requestNotebookApproval">
-      Request approval
+    <button id="request-approval-btn" :class="approvalButtonClasses" :disabled="isApprovalButtonDisabled" @click="requestNotebookApproval">
+      {{ approvalButtonText }}
     </button>
     </div>
 </template>
@@ -55,6 +55,39 @@ export default {
       errors: {},
     }
   },
+  computed: {
+    approvalButtonText() {
+      console.log(this.notebook.approvalStatus)
+      switch (this.notebook.approvalStatus) {
+        case "NOT_APPROVED":
+          return "Request Approval"
+        case "APPROVED":
+          return "Certificate Request Approved"
+        case "PENDING":
+          return "Approval Pending"
+        default:
+          return "Request Approval"
+      }
+    },
+    approvalButtonClasses() {
+      return {
+        btn: true,
+        "btn-primary": this.notebook.approvalStatus === "NOT_APPROVED",
+        "btn-disabled":
+          this.notebook.approvalStatus === "APPROVED" ||
+          this.notebook.approvalStatus === "PENDING",
+        "btn-layout": true,
+        "mt-2": true,
+        "float-end": true,
+      }
+    },
+    isApprovalButtonDisabled() {
+      return (
+        this.notebook.approvalStatus === "APPROVED" ||
+        this.notebook.approvalStatus === "PENDING"
+      )
+    },
+  },
   methods: {
     processForm() {
       this.managedApi.restNotebookController
@@ -67,14 +100,9 @@ export default {
     requestNotebookApproval() {
       this.managedApi.restNotebookController
         .requestNotebookApproval(this.notebook.id)
-        .then(() => {
-          this.disableButton()
+        .then((response) => {
+          this.notebook.approvalStatus = response.approvalStatus
         })
-    },
-    disableButton() {
-      const button = document.getElementById("request-approval-btn")
-      button.disabled = true
-      button.classList.replace("btn-primary", "btn-disabled")
     },
   },
 }
