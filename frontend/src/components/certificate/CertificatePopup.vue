@@ -45,30 +45,10 @@ const fetchData = async () => {
   notebook.value = await managedApi.restNotebookController.get(props.notebookId)
   user.value = await managedApi.restUserController.getUserProfile()
 }
-const addDays = (date: Date, days: number = 0): Date => {
-  const result = new Date(date)
-  result.setDate(result.getDate() + days)
-  return result
-}
-const padZero = (num: number): string => {
-  return num.toString().padStart(2, "0")
-}
-const formatDate = (date: Date): string => {
-  const theYear = date.getFullYear()
-  const theMonth = padZero(date.getMonth() + 1)
-  const theDate = padZero(date.getDate())
-  return `${theYear}-${theMonth}-${theDate}`
-}
 onMounted(() => {
   fetchData().then(() => {
-    const now = new Date()
-    issueDate.value = formatDate(now)
-    const expiringInDays = addDays(
-      now,
-      365
-      //notebook.value?.notebookSettings.untilCertExpire
-    )
-    expiredDate.value = formatDate(expiringInDays)
+    issueDate.value = "2024-01-01"
+    expiredDate.value = "2026-01-01"
   })
 })
 </script>
