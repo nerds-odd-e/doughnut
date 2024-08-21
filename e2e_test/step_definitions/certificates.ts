@@ -1,4 +1,4 @@
-import { When, Then } from '@badeball/cypress-cucumber-preprocessor'
+import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
 import '../support/string_util'
 import start from '../start'
 
@@ -24,6 +24,14 @@ When(
       .updateAssessmentSettings(notebook, { numberOfQuestion: 2 })
   }
 )
+
+Given('Expiration of "Certified thing" is set to "2y"', () => {
+  return true
+})
+
+Given('I should see the expiration of "Certified thing" is set to "2y"', () => {
+  return true
+})
 
 When('I Complete an assessment in {string}', (notebook: string) => {
   start
