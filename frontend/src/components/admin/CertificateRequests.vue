@@ -16,7 +16,7 @@
         </td>
       </tr>
     </tbody>
-    <h2 v-else></h2>
+    <h2 v-else>No certification request found.</h2>
   </table>
 </template>
 
