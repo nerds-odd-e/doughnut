@@ -16,6 +16,7 @@
       <thead>
         <tr>
           <th>Approved</th>
+          <th>Actions</th>
           <th>Question Text</th>
           <th>A</th>
           <th>B</th>
@@ -35,6 +36,20 @@
               v-model="question.approved"
               @change="toggleApproval(question.id)"
             />
+          </td>
+          <td>
+            <PopButton btn-class="btn btn-primary" title="Edit Question">
+              <!-- prettier-ignore -->
+              <template #default="{ closer }">
+                <NoteEditQuestion
+                  v-bind="{ note }"
+                  @close-dialog="
+                    closer($event);
+                    questionAdded($event);
+                  "
+                />
+              </template>
+            </PopButton>
           </td>
           <td>{{ question.quizQuestion.multipleChoicesQuestion.stem }}</td>
           <template
