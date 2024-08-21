@@ -74,13 +74,10 @@ export const assumeAssessmentPage = (notebook?: string) => {
       this.viewCertificate()
       cy.findByText(date).should('be.visible')
     },
-    expectCerticateHasExprityDate() {
-      const nextYear: Date = new Date()
-      nextYear.setFullYear(nextYear.getFullYear() + 1)
-
+    expectCerticateHasExprityDate(expires : string) {
       cy.findByText('View Certificate').click()
       cy.findByTestId('expired-date').contains(
-        nextYear.toISOString().split('T')[0]!
+        expires
       )
     },
     expectReachedLimit() {

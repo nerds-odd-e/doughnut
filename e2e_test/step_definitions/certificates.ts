@@ -33,8 +33,8 @@ When('I Complete an assessment in {string}', (notebook: string) => {
 })
 
 Then(
-  'I should see that the certificate of {string} assesment expires in 1 year from now',
-  (notebook: string) => {
-    start.assumeAssessmentPage(notebook).expectCerticateHasExprityDate()
+  'I should see that the certificate of {string} assesment expires on {string}',
+  (notebook: string, expires : string) => {
+    start.assumeAssessmentPage(notebook).expectCerticateHasExprityDate(expires)
   }
 )
