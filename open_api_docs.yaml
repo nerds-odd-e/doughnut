@@ -1484,6 +1484,30 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Circle"
+  /api/certificate:
+    post:
+      tags:
+      - rest-certificate-controller
+      operationId: saveCertificate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SaveCertificateDetails"
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Certificate"
   /api/bazaar/{bazaarNotebook}/remove:
     post:
       tags:
@@ -3224,6 +3248,25 @@ components:
           maxLength: 20
           minLength: 10
           type: string
+    SaveCertificateDetails:
+      type: object
+      properties:
+        notebook:
+          type: integer
+          format: int32
+    Certificate:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+        notebook:
+          $ref: "#/components/schemas/Notebook"
+        startDate:
+          type: string
+          format: date-time
+        expiryDate:
+          type: string
+          format: date-time
     BazaarNotebook:
       required:
       - id

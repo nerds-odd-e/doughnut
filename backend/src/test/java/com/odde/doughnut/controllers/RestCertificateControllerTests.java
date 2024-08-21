@@ -2,7 +2,9 @@ package com.odde.doughnut.controllers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.odde.doughnut.controllers.dto.SaveCertificateDetails;
 import com.odde.doughnut.entities.Certificate;
+import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,10 +32,27 @@ public class RestCertificateControllerTests {
   // Create a nested test class for the getCertificate method
   @Nested
   class SaveCertificate {
+
+    private Notebook notebook;
+    private SaveCertificateDetails saveCertificate;
+
+    @BeforeEach
+    void setup() {
+      notebook = makeMe.aNote("Just say 'Yes'").creatorAndOwner(currentUser).please().getNotebook();
+      saveCertificate = new SaveCertificateDetails();
+      saveCertificate.setNotebook(notebook);
+    }
+
     @Test
     void ShouldReturnCertificateForCurrentUser() {
-      Certificate cert = controller.saveCertificate();
-      assertEquals(cert.getUser(), currentUser.getEntity());
+      Certificate cert = controller.saveCertificate(saveCertificate);
+      assertEquals(currentUser.getEntity(), cert.getUser());
+    }
+
+    @Test
+    void ShouldReturnCertificateForNotebook() {
+      Certificate cert = controller.saveCertificate(saveCertificate);
+      assertEquals(notebook, cert.getNotebook());
     }
   }
 }
