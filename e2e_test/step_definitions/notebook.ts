@@ -52,12 +52,30 @@ When(
   }
 )
 
+When(
+  'the approval for the notebook {string} is {string}',
+  (noteTopic: string, status: string) => {
+    start
+      .routerToNotebooksPage()
+      .expectNotebookApprovalStatus(noteTopic, status)
+  }
+)
+
 Then(
   'I should see the status {string} of the approval for notebook {string}',
   (status: string, noteTopic: string) => {
     start
       .routerToNotebooksPage()
       .expectNotebookApprovalStatus(noteTopic, status)
+  }
+)
+
+Then(
+  'I can request approval for the notebook {string}',
+  (noteTopic: string) => {
+    start
+      .routerToNotebooksPage()
+      .expectNotebookApprovalCanBeRequested(noteTopic)
   }
 )
 

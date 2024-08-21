@@ -51,6 +51,10 @@ export const routerToNotebooksPage = () => {
       this.findNotebookCardButton(notebook, 'Edit notebook settings').click()
       cy.findByRole('button', { name: 'Send Request' }).should('not.exist')
     },
+    expectNotebookApprovalCanBeRequested(notebook: string) {
+      this.findNotebookCardButton(notebook, 'Edit notebook settings').click()
+      cy.findByRole('button', { name: 'Send request' }).should('exist')
+    },
     expectNotebookApprovalStatus(notebook: string, status: string) {
       this.findNotebookCardButton(notebook, 'Edit notebook settings').click()
       cy.findByText('Approval {status}'.replace('{status}', status)).should(
