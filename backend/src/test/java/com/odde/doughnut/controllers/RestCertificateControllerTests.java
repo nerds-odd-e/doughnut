@@ -79,5 +79,16 @@ public class RestCertificateControllerTests {
           TimestampOperations.addHoursToTimestamp(new Timestamp(currentTime.getTime()), 8760);
       assertEquals(expiryDate, cert.getExpiryDate());
     }
+
+    void SaveTwiceGetOriginalStartDate() {
+      Timestamp currentTimeAtStart = currentTime;
+      Certificate cert = controller.saveCertificate(notebook);
+      assertEquals(currentTimeAtStart, cert.getStartDate());
+      Timestamp newStartDate =
+          TimestampOperations.addHoursToTimestamp(new Timestamp(currentTime.getTime()), 8760);
+      testabilitySettings.timeTravelTo(newStartDate);
+      Certificate certLater = controller.saveCertificate(notebook);
+      assertEquals(currentTimeAtStart, certLater.getStartDate());
+    }
   }
 }
