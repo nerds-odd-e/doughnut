@@ -1,12 +1,12 @@
 <template>
-  <div v-if="notebook && user" class="certificate-frame">
+  <div v-if="certificate" class="certificate-frame">
     <div class="certificate-container">
       <span>This to certificate that</span>
-      <span class="receiver-name">{{ user.name }}</span>
+      <span class="receiver-name">{{ certificate.user?.name }}</span>
       <p class="certificate-detail">
         <span>by completing the qualifications, </span>
         <span>is granted the Certified
-          <span class="certificate-name"> {{ notebook.headNote.noteTopic.topicConstructor }}</span>
+          <span class="certificate-name"> {{ certificate.notebook?.headNote.noteTopic.topicConstructor  }}</span>
         </span>
       </p>
       <div class="date-container">
@@ -17,7 +17,7 @@
       </div>
       <div class="signature-section">
         <div class="signature">
-          <span class="signature-name">{{ notebook.creatorId }}</span>
+          <span class="signature-name">{{ certificate.notebook?.creatorId }}</span>
           <span>Content Creator</span>
         </div>
         <div class="signature">
@@ -32,7 +32,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, PropType } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { AssessmentAttempt, Notebook, User } from "@/generated/backend"
+import { AssessmentAttempt, Certificate } from "@/generated/backend"
 const props = defineProps({
   notebookId: { type: Number, required: true },
   assessmentAttempt: {
@@ -41,8 +41,8 @@ const props = defineProps({
   },
 })
 const { managedApi } = useLoadingApi()
-const notebook = ref<Notebook | undefined>(undefined)
-const user = ref<User | undefined>(undefined)
+const certificate = ref<Certificate | undefined>(undefined)
+
 const issueDate = computed(() =>
   formatDate(
     new Date(
@@ -60,8 +60,9 @@ const expiredDate = computed(() =>
   )
 )
 const fetchData = async () => {
-  notebook.value = await managedApi.restNotebookController.get(props.notebookId)
-  user.value = await managedApi.restUserController.getUserProfile()
+  certificate.value = await managedApi.restCertificateController.getCertificate(
+    props.notebookId ? props.notebookId : 0
+  )
 }
 const padZero = (num: number): string => {
   return num.toString().padStart(2, "0")
