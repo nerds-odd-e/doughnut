@@ -1,5 +1,6 @@
-@wip
-@skip
+
+  @wip 
+  @skip
 Feature: Notebook questions
 
   Background:
@@ -10,15 +11,20 @@ Feature: Notebook questions
       | mgmt  | LeSS in Action |
       | team  | mgmt           |
 
+  Scenario: I have a notebook with no questions
+    Then I should see that there are no questions for the following topics:
+      | Topic |
+      | mgmt  |
+
   Scenario: View all questions in a notebook
     When I add questions to the following notes in the notebook "LeSS in Action"
-        | Topic | Question                | Answer                |
-        | team  | Who is the team?        | The team is ...       |
-        | tech  | What is the technology? | The technology is ... |
+      | Topic | Question                | Answer                |
+      | team  | Who is the team?        | The team is ...       |
+      | tech  | What is the technology? | The technology is ... |
     Then I should see the following questions for the topics:
-        | Topic | Question                | Answer                |
-        | team  | Who is the team?        | The team is ...       |
-        | tech  | What is the technology? | The technology is ... |
+      | Topic | Question                | Answer                |
+      | team  | Who is the team?        | The team is ...       |
+      | tech  | What is the technology? | The technology is ... |
     And I should see that there are no questions for the following topics:
-        | Topic |
-        | mgmt  |
+      | Topic |
+      | mgmt  |
