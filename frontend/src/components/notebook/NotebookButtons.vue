@@ -16,6 +16,15 @@
       </template>
       <NotebookMoveDialog v-bind="{ notebook }" />
     </PopButton>
+    <PopButton
+      title="Notebook Questions"
+      v-if="user?.externalIdentifier === notebook.creatorId"
+    >
+      <template #button_face>
+        <SvgRaiseHand />
+      </template>
+      <div>Questions</div>
+    </PopButton>
     <PopButton title="Notebook Assistant" v-if="user?.admin">
       <template #button_face>
         <SvgRobot />
@@ -43,6 +52,7 @@ import usePopups from "@/components/commons/Popups/usePopups"
 import SvgBazaarShare from "@/components/svgs/SvgBazaarShare.vue"
 import SvgEditNotebook from "@/components/svgs/SvgEditNotebook.vue"
 import SvgMoveToCircle from "@/components/svgs/SvgMoveToCircle.vue"
+import SvgRaiseHand from "@/components/svgs/SvgRaiseHand.vue"
 import { Notebook, User } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { PropType, defineComponent } from "vue"

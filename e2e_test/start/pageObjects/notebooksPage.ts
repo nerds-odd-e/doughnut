@@ -89,7 +89,7 @@ export const routerToNotebooksPage = () => {
       cy.findByRole('button', { name: 'OK' }).click()
     },
     openNotebookQuestions(notebook: string) {
-      this.findNotebookCardButton(notebook, 'Questions').click()
+      this.findNotebookCardButton(notebook, 'Notebook Questions').click()
       return notebookQuestionsList()
     },
   }
