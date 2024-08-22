@@ -544,15 +544,13 @@ When(
   'I add questions to the following notes in the notebook {string}',
   (_notebook: string, data: DataTable) => {
     data.rows().forEach((row) => {
-      start
-        .jumpToNotePage(row[0] as string)
-        .addQuestion({
-          Stem: row[1] as string,
-          'Choice 0': 'yes',
-          'Choice 1': 'no',
-          'Choice 2': 'maybe',
-          'Correct Choice Index': '0',
-        })
+      start.jumpToNotePage(row[0] as string).addQuestion({
+        Stem: row[1] as string,
+        'Choice 0': 'yes',
+        'Choice 1': 'no',
+        'Choice 2': 'maybe',
+        'Correct Choice Index': '0',
+      })
     })
   }
 )
