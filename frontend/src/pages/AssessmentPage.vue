@@ -11,7 +11,7 @@
         :quiz-question="quizQuestions[currentQuestion]!"
         @answered="questionAnswered"
       />
-      <div v-else-if="assessmentResult?.attempt?.isPass">
+      <div v-else-if="assessmentResult">
         <p>Your score: {{ correctAnswers }} / {{ quizQuestions.length }}</p>
         <div class="alert alert-success" v-if="assessmentResult?.attempt?.isPass">
           You have passed the assessment.
