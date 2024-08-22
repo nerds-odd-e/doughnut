@@ -58,4 +58,26 @@ public class RestCertificateControllerTests {
       assertEquals(expiryDate, cert.getExpiryDate());
     }
   }
+
+  @Nested
+  class GetCertificate {
+    private Notebook notebook;
+
+    @BeforeEach
+    void setup() {
+      notebook = makeMe.aNote("Just say 'Yes'").creatorAndOwner(currentUser).please().getNotebook();
+    }
+
+    @Test
+    void ShouldReturnCompleteCertificateData() {
+      Certificate cert = controller.getCertificate(notebook);
+      assertEquals(currentUser.getEntity(), cert.getUser());
+      assertEquals(notebook, cert.getNotebook());
+      assertEquals(currentTime, cert.getStartDate());
+      // Set expiry date to 1 year from current time
+      Timestamp expiryDate =
+          TimestampOperations.addHoursToTimestamp(new Timestamp(currentTime.getTime()), 8760);
+      assertEquals(expiryDate, cert.getExpiryDate());
+    }
+  }
 }

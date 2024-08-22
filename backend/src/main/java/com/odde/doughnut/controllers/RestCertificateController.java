@@ -36,4 +36,17 @@ public class RestCertificateController {
     certificate.setExpiryDate(TimestampOperations.addHoursToTimestamp(now, 8760));
     return certificate;
   }
+
+  @GetMapping("/{notebook}")
+  public Certificate getCertificate(@PathVariable @Schema(type = "integer") Notebook notebook) {
+    Certificate certificate = new Certificate();
+    certificate.setUser(this.currentUser.getEntity());
+    certificate.setNotebook(notebook);
+    // Set start date to current time
+    Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
+    certificate.setStartDate(now);
+    // Hard code expiry date to 1 year from current time
+    certificate.setExpiryDate(TimestampOperations.addHoursToTimestamp(now, 8760));
+    return certificate;
+  }
 }
