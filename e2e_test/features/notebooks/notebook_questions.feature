@@ -1,6 +1,4 @@
 
-@wip 
-@skip
 Feature: Notebook questions
 
   Background:
@@ -8,13 +6,13 @@ Feature: Notebook questions
     And I have a notebook with head note "LeSS in Action" and notes:
       | Topic | Parent Topic   |
       | tech  | LeSS in Action |
-      | mgmt  | LeSS in Action |
-      | team  | mgmt           |
+      | management  | LeSS in Action |
+      | team  | management           |
 
   Scenario: I have a notebook with no questions
     Then I should see that there are no questions for "LeSS in Action" for the following topics:
       | Topic |
-      | mgmt  |
+      | management  |
   @wip 
   @skip
   Scenario: View all questions in a notebook
@@ -28,4 +26,4 @@ Feature: Notebook questions
       | tech  | What is the technology? | The technology is ... |
     And I should see that there are no questions for the following topics:
       | Topic |
-      | mgmt  |
+      | management  |
