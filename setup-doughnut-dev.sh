@@ -46,8 +46,8 @@ install_nixpkg_manager() {
   if ! command -v nix >/dev/null 2>&1; then
     download_nixpkg_manager_install_script
     touch .bash_profile
-    if [ "${os_type}" == "Mac" || "${os_type}" == "Linux" ]; then
-      ./install-nix -s -- install
+    if [ "${os_type}" == "Mac" ] || [ "${os_type}" == "Linux" ]; then
+      ./install-nix install
     else
       echo "Unsupported OS Platform for Nix development enviroment. Exiting!!!"
       exit 1
