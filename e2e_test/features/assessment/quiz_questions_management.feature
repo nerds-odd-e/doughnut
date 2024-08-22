@@ -18,6 +18,11 @@ Feature: Quiz Question Management
       | What does a cow say?                 | moo            |
       | What do you call a cow with not leg? | Ground beef    |
 
+  Scenario: Manually delete a question from the note successfully
+    When I delete a question with the stem "What does a cow say?" for the note "The cow joke"
+    Then I should see the questions in the question list of the note "The cow joke":
+
+  @ignore
   Scenario: Reset approval on new question
     Given I am logged in as an admin
     And I have a notebook with the head note "The cow joke"

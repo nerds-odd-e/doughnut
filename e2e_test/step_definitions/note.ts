@@ -96,6 +96,16 @@ Given(
   }
 )
 
+When(
+  'I delete a question with the stem {string} for the note {string}',
+  (questionStem: string, noteTopic: string) => {
+    start
+      .jumpToNotePage(noteTopic)
+      .openQuestionList()
+      .deleteQuestion(questionStem)
+  }
+)
+
 Given(
   'I refine the following question for the note {string}:',
   (noteTopic: string, data: DataTable) => {
