@@ -27,8 +27,6 @@
       <tbody>
         <tr
           v-for="(question, outerIndex) in questions">
-<!--          :key="question.quizQuestion.multipleChoicesQuestion.stem"-->
-<!--        >-->
           <td>
             <input
               :id="'checkbox-' + outerIndex"
@@ -71,7 +69,7 @@
     </table>
     <div v-else class="no-questions">
       <b >No questions</b>
-    </div> 
+    </div>
   </div>
 </template>
 

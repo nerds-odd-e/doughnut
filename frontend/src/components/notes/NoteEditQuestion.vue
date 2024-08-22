@@ -43,7 +43,6 @@
 <script setup lang="ts">
 import { computed, PropType, ref } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-// import isMCQWithAnswerValid from "@/models/isMCQWithAnswerValid"
 import { QuizQuestionAndAnswer } from "@/generated/backend"
 
 const { managedApi } = useLoadingApi()
@@ -63,9 +62,6 @@ const maximumNumberOfChoices = 10
 
 const emit = defineEmits(["close-dialog"])
 
-// const isValidQuestion = computed(() =>
-//   isMCQWithAnswerValid(formData.value)
-// )
 const multipleChoicesQuestion = computed(
   () => formData.value.quizQuestion.multipleChoicesQuestion
 )
