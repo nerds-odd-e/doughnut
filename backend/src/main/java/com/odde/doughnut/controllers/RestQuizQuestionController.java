@@ -125,6 +125,14 @@ class RestQuizQuestionController {
     return note.getQuizQuestionAndAnswers().stream().toList();
   }
 
+  @GetMapping("/{note}/note-questions")
+  public List<QuizQuestionAndAnswer> getAllQuestionByNote(
+      @PathVariable("note") @Schema(type = "integer") Note note)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertAuthorization(note);
+    return note.getQuizQuestionAndAnswers().stream().toList();
+  }
+
   @PostMapping("/{note}/note-questions")
   @Transactional
   public QuizQuestionAndAnswer addQuestionManually(

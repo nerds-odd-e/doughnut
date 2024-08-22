@@ -13,17 +13,18 @@ Feature: Notebook questions
     Then I should see that there are no questions for "LeSS in Action" for the following topics:
       | Topic |
       | management  |
-  @wip 
-  @skip
+
+@wip
+@skip
   Scenario: View all questions in a notebook
     When I add questions to the following notes in the notebook "LeSS in Action"
-      | Topic | Question                | Answer                |
-      | team  | Who is the team?        | The team is ...       |
-      | tech  | What is the technology? | The technology is ... |
+      | Topic | Question                |
+      | team  | Who is the team?        |
+      | tech  | What is the technology? |
     Then I should see the following questions for the topics:
-      | Topic | Question                | Answer                |
-      | team  | Who is the team?        | The team is ...       |
-      | tech  | What is the technology? | The technology is ... |
+      | Topic | Question                |
+      | team  | Who is the team?        |
+      | tech  | What is the technology? |
     And I should see that there are no questions for the following topics:
       | Topic |
       | management  |
