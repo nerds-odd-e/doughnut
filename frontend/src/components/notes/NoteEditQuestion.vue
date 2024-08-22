@@ -3,13 +3,13 @@
     <TextArea
       :rows="2"
       field="stem"
-      v-model="formData.stem"
+      v-model="formData.quizQuestion.multipleChoicesQuestion.stem"
     /><br />
-  <div v-for="(_, index) in formData.choices" :key="index">
+  <div v-for="(_, index) in formData.quizQuestion.multipleChoicesQuestion.choices" :key="index">
     <TextArea
       :field="'choice ' + index"
       :rows="1"
-      v-model="formData.choices[index]"
+      v-model="formData.quizQuestion.multipleChoicesQuestion.choices[index]"
     />
     <br />
   </div>
@@ -23,7 +23,7 @@
   <button
     @click="addChoice"
     :disabled="
-        formData.choices.length >= maximumNumberOfChoices
+        formData.quizQuestion.multipleChoicesQuestion.choices.length >= maximumNumberOfChoices
       "
   >
     +
@@ -31,47 +31,60 @@
   <button
     @click="removeChoice"
     :disabled="
-        formData.choices.length <= minimumNumberOfChoices
+        formData.quizQuestion.multipleChoicesQuestion.choices.length <= minimumNumberOfChoices
       "
   >
     -
   </button>
-  <button @click="refineQuestion" :disabled="!dirty">Refine</button>
-  <button @click="generateQuestionByAI" :disabled="dirty">
-    Generate by AI
-  </button>
-  <button @click="submitQuestion" :disabled="!isValidQuestion">Submit</button>
+  <button @click="submitQuestion" >Submit</button>
   </div>
 </template>
 
-<script>
-import useLoadingApi from "@/managedApi/useLoadingApi.ts";
-import CheckInput from "@/components/form/CheckInput.vue";
-import TextInput from "@/components/form/TextInput.vue";
-import TextArea from "@/components/form/TextArea.vue";
+<script setup lang="ts">
+import { computed, PropType, ref } from "vue"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+// import isMCQWithAnswerValid from "@/models/isMCQWithAnswerValid"
+import { QuizQuestionAndAnswer } from "@/generated/backend"
 
-export default {
-  setup() {
-    return useLoadingApi()
+const { managedApi } = useLoadingApi()
+const props = defineProps({
+  question: {
+    type: Object as PropType<QuizQuestionAndAnswer>,
+    required: true,
   },
-  props: { question: Object },
-  components: {TextArea, CheckInput, TextInput },
-  data() {
-    const {
-      correctAnswerIndex,
-    } = this.question;
-    const {
-      stem,
-      choices,
-    } = this.question.quizQuestion.multipleChoicesQuestion;
-    return {
-      formData: {
-        correctAnswerIndex,
-        stem,
-        choices,
-      },
-      errors: {},
-    }
-  },
+})
+
+const formData = ref<QuizQuestionAndAnswer>(
+  props.question as QuizQuestionAndAnswer
+)
+
+const minimumNumberOfChoices = 2
+const maximumNumberOfChoices = 10
+
+const emit = defineEmits(["close-dialog"])
+
+// const isValidQuestion = computed(() =>
+//   isMCQWithAnswerValid(formData.value)
+// )
+const multipleChoicesQuestion = computed(
+  () => formData.value.quizQuestion.multipleChoicesQuestion
+)
+const addChoice = () => {
+  if (multipleChoicesQuestion.value.choices.length < maximumNumberOfChoices) {
+    multipleChoicesQuestion.value.choices.push("")
+  }
+}
+
+const removeChoice = () => {
+  if (multipleChoicesQuestion.value.choices.length > minimumNumberOfChoices) {
+    multipleChoicesQuestion.value.choices.pop()
+  }
+}
+const submitQuestion = async () => {
+  const response = await managedApi.restQuizQuestionController.editQuestion(
+    props.question.id,
+    formData.value
+  )
+  emit("close-dialog", response)
 }
 </script>

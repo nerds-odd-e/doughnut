@@ -26,9 +26,9 @@
       </thead>
       <tbody>
         <tr
-          v-for="(question, outerIndex) in questions"
-          :key="question.quizQuestion.multipleChoicesQuestion.stem"
-        >
+          v-for="(question, outerIndex) in questions">
+<!--          :key="question.quizQuestion.multipleChoicesQuestion.stem"-->
+<!--        >-->
           <td>
             <input
               :id="'checkbox-' + outerIndex"
@@ -39,8 +39,8 @@
           </td>
           <td>
             <PopButton btn-class="btn btn-primary" title="Edit Question">
-              <!-- prettier-ignore -->
               <template #default="{ closer }">
+              <!-- prettier-ignore -->
                 <NoteEditQuestion
                   v-bind="{ question }"
                   @close-dialog="

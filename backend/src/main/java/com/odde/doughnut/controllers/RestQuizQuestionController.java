@@ -19,7 +19,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,8 +30,7 @@ class RestQuizQuestionController {
   private final ModelFactoryService modelFactoryService;
   private final QuizQuestionService quizQuestionService;
 
-  @Autowired
-  private QuizQuestionAndAnswerRepository quizQuestionAndAnswerRepository;
+  @Autowired private QuizQuestionAndAnswerRepository quizQuestionAndAnswerRepository;
 
   private final UserModel currentUser;
 
@@ -144,7 +142,8 @@ class RestQuizQuestionController {
   @PutMapping("/{quizQuestion}/edit")
   @Transactional
   public QuizQuestionAndAnswer editQuestion(
-      @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestionAndAnswer quizQuestionAndAnswer,
+      @PathVariable("quizQuestion") @Schema(type = "integer")
+          QuizQuestionAndAnswer quizQuestionAndAnswer,
       @Valid @RequestBody QuizQuestionAndAnswer questionAndAnswer)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(quizQuestionAndAnswer.getNote());

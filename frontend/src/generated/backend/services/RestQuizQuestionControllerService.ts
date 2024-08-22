@@ -182,6 +182,30 @@ export class RestQuizQuestionControllerService {
             },
         });
     }
+  /**
+   * @param question
+   * @param requestBody
+   * @returns QuizQuestionAndAnswer OK
+   * @throws ApiError
+   */
+  public editQuestion(
+    question: number,
+    requestBody: QuizQuestionAndAnswer,
+  ): CancelablePromise<QuizQuestionAndAnswer> {
+    return this.httpRequest.request({
+      method: 'PUT',
+      url: '/api/quiz-questions/{question}/edit',
+      path: {
+        'question': question,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        500: `Internal Server Error`,
+      },
+    });
+  }
+
     /**
      * @param note
      * @returns QuizQuestionInNotebook OK
