@@ -147,6 +147,7 @@ declare module 'vue' {
     SvgAssociation: typeof import('./src/components/svgs/SvgAssociation.vue')['default']
     SvgBackward: typeof import('./src/components/svgs/SvgBackward.vue')['default']
     SvgBazaarShare: typeof import('./src/components/svgs/SvgBazaarShare.vue')['default']
+    SvgCertifiedAssessment: typeof import('./src/components/svgs/SvgCertifiedAssessment.vue')['default']
     SvgChat: typeof import('./src/components/svgs/SvgChat.vue')['default']
     SvgClipboard: typeof import('./src/components/svgs/SvgClipboard.vue')['default']
     SvgClose: typeof import('./src/components/svgs/SvgClose.vue')['default']

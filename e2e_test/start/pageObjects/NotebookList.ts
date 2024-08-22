@@ -66,7 +66,10 @@ export const bazaarOrCircle = () => {
       cy.findByRole('button', { name: 'Submit' }).click()
     },
     expectCertificationIcon(notebook: string) {
-      cy.findByText(notebook).parents('.card').find('.btn').should('exist')
+      cy.findByText(notebook)
+        .parents('.card')
+        .find('.certification-icon')
+        .should('exist')
     },
   }
 }

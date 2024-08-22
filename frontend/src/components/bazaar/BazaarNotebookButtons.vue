@@ -18,6 +18,9 @@
       <SvgAssessment />
     </button>
   </div>
+  <div class="p-1">
+    <SvgCertifiedAssessment v-if="certifiedNotebook"/>
+  </div>
 </template>
 
 <script lang="ts">
@@ -29,6 +32,7 @@ import usePopups from "../commons/Popups/usePopups"
 import SvgAdd from "../svgs/SvgAdd.vue"
 import SvgAssessment from "../svgs/SvgAssessment.vue"
 import SubscribeDialog from "./SubscribeDialog.vue"
+import SvgCertifiedAssessment from "../svgs/SvgCertifiedAssessment.vue"
 
 export default defineComponent({
   setup() {
@@ -43,6 +47,12 @@ export default defineComponent({
     SvgAdd,
     SvgAssessment,
     SubscribeDialog,
+    SvgCertifiedAssessment,
+  },
+  computed: {
+    certifiedNotebook() {
+      return this.notebook.approvalStatus === "APPROVED"
+    },
   },
   methods: {
     openAssessmentPage() {
