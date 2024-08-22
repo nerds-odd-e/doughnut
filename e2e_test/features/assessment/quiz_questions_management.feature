@@ -18,7 +18,6 @@ Feature: Quiz Question Management
       | What does a cow say?                 | moo            |
       | What do you call a cow with not leg? | Ground beef    |
 
-  @skip
   Scenario: Reset approval on new question
     Given I am logged in as an admin
     And I have a notebook with the head note "The cow joke"

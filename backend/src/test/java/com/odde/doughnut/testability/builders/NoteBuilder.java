@@ -227,4 +227,9 @@ public class NoteBuilder extends EntityBuilder<Note> {
     }
     return this;
   }
+
+  public NoteBuilder withApprovalStatus(ApprovalStatus status) {
+    entity.getNotebook().setApprovalStatus(status);
+    return this;
+  }
 }
