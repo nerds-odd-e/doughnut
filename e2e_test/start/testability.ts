@@ -95,7 +95,10 @@ const testability = () => {
         )
       })
     },
-    injectYesNoQuestionsForNumberNotes(notebook: string, numberOfNotes: number) {
+    injectYesNoQuestionsForNumberNotes(
+      notebook: string,
+      numberOfNotes: number
+    ) {
       const quizQuestion: Record<string, string>[] = new Array(numberOfNotes)
         .fill(0)
         .map((_, index) => ({
@@ -107,7 +110,8 @@ const testability = () => {
         }))
       return this.injectQuizQuestions({
         notebookTitle: notebook,
-        quizQuestionTestData: quizQuestion})
+        quizQuestionTestData: quizQuestion,
+      })
     },
     injectNumbersNotebookWithQuestions(
       notebook: string,

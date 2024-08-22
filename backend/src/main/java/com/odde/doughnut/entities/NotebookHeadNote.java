@@ -15,9 +15,7 @@ public class NotebookHeadNote {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
 
-  @Getter
-  private Integer notebook_id;
+  @Getter private Integer notebook_id;
 
-  @Getter
-  private Integer head_note_id;
+  @Getter private Integer head_note_id;
 }

@@ -18,10 +18,14 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
   @Query(value = selectFromNote + " where n.topicConstructor = :key")
   Note findFirstByTopicConstructor(@Param("key") String key);
 
-  @Query(value = selectFromNote + " WHERE n.notebook.id = (" +
-    "SELECT nhn.notebook_id FROM NotebookHeadNote nhn WHERE nhn.head_note_id = (SELECT rn.id FROM Note rn WHERE rn.topicConstructor = :title)" +
-    ") AND n.topicConstructor = :key")
-  Note findFirstInNotebookByTopicConstructor(@Param("title") String notebookTitle, @Param("key") String key);
+  @Query(
+      value =
+          selectFromNote
+              + " WHERE n.notebook.id = ("
+              + "SELECT nhn.notebook_id FROM NotebookHeadNote nhn WHERE nhn.head_note_id = (SELECT rn.id FROM Note rn WHERE rn.topicConstructor = :title)"
+              + ") AND n.topicConstructor = :key")
+  Note findFirstInNotebookByTopicConstructor(
+      @Param("title") String notebookTitle, @Param("key") String key);
 
   @Query(
       value = selectFromNote + searchForTopicLike + "  AND n.notebook.ownership.user.id = :userId ")

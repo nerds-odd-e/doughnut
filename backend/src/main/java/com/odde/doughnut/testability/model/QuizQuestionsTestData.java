@@ -12,7 +12,7 @@ import lombok.Setter;
 
 @Data
 public class QuizQuestionsTestData {
-  private String notebookTitle; 
+  private String notebookTitle;
   private List<QuizQuestionTestData> quizQuestionTestData;
 
   @Setter
@@ -50,7 +50,8 @@ public class QuizQuestionsTestData {
         .map(
             question ->
                 question.buildQuizQuestion(
-                    factoryService.noteRepository.findFirstInNotebookByTopicConstructor(notebookTitle, question.noteTopic)))
+                    factoryService.noteRepository.findFirstInNotebookByTopicConstructor(
+                        notebookTitle, question.noteTopic)))
         .collect(Collectors.toList());
   }
 }
