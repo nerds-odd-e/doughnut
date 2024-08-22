@@ -18,10 +18,11 @@ Feature: Notebook approval
       | TDD           |
     Then I cannot request approval again for notebook "TDD"
   
-  Scenario: Empty approval list is shown
+  Scenario: Notebook with no approval request does not show on the approval request list
       Given I am logged in as an admin
-      When I open certification approval page
-      Then I should see empty approval list
+      And I have a notebook with the head note "WrumWrum"
+      # When I open certification approval page
+      Then I should not see any pending approval requests
 
   Scenario: Approval list shows pending requests for notebooks
     When I request for an approval for notebooks:

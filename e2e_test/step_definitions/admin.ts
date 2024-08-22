@@ -177,7 +177,7 @@ When('I open certification approval page', () => {
   start.goToAdminDashboard().goToCertificationRequestPage()
 })
 
-Then('I should see empty approval list', () => {
+Then('I should not see any pending approval requests', () => {
   start.goToAdminDashboard().goToCertificationRequestPage().listIsEmpty()
 })
 
