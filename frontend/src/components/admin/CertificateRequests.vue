@@ -4,7 +4,7 @@
     <tr>
       <th>Notebook</th>
       <th>Username</th>
-      <th hidden>Status</th>
+      <th>Status</th>
     </tr>
     </thead>
     <tbody>
@@ -17,7 +17,6 @@
       </td>
       <td>
         <button
-          hidden
           class="btn btn-dange"
           @click="approveNoteBook(notebook)"
         >
@@ -48,7 +47,7 @@ const fetchData = async () => {
 }
 
 const approveNoteBook = async (notebook: Notebook) => {
-  notebook
+  await managedApi.restNotebookController.approveNoteBook(notebook.id)
 }
 onMounted(() => {
   fetchData()

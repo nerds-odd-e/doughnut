@@ -72,6 +72,9 @@ export function assumeAdminDashboardPage() {
         listIsEmpty() {
           cy.findByText('No certification request found.')
         },
+        listDoesNotContain(notebook: string) {
+          cy.findByText(notebook).should('not.exist')
+        },
       }
     },
   }

@@ -180,3 +180,17 @@ When('I open certification approval page', () => {
 Then('I should see empty approval list', () => {
   start.goToAdminDashboard().goToCertificationRequestPage().listIsEmpty()
 })
+
+When('I approve notebook {string}', (notebook: string) => {
+  start.goToAdminDashboard().goToCertificationRequestPage().approve(notebook)
+})
+
+Then(
+  'I should not see notebook {string} waiting for approval',
+  (notebook: string) => {
+    start
+      .goToAdminDashboard()
+      .goToCertificationRequestPage()
+      .listDoesNotContain(notebook)
+  }
+)
