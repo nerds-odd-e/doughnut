@@ -2416,6 +2416,26 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/NoteBrief"
+  /api/notebooks/getAllPendingRequestNoteBooks:
+    get:
+      tags:
+      - rest-notebook-controller
+      operationId: getAllPendingRequestNotebooks
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Notebook"
   /api/healthcheck:
     get:
       tags:

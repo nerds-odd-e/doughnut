@@ -195,4 +195,30 @@ class RestNotebookControllerTest {
       assertThat(result.get(0).getQuizQuestionAndAnswers(), hasSize(1));
     }
   }
+
+  @Nested
+  class getAllPendingRequestNotebooks {
+
+    private Notebook notebook;
+
+    @BeforeEach
+    void setup() {
+      UserModel userModel = makeMe.anAdmin().toModelPlease();
+      notebook = makeMe.aNote().creatorAndOwner(userModel).please().getNotebook();
+      makeMe.refresh(notebook);
+    }
+
+    @Test
+    void shouldGetAllPendingRequestNotebooks() {
+      notebook.setApprovalStatus(ApprovalStatus.PENDING);
+      List<Notebook> result = controller.getAllPendingRequestNotebooks();
+      assertThat(result, hasSize(1));
+    }
+
+    @Test
+    void shouldNotGetAllPendingRequestNotebooks() {
+      List<Notebook> result = controller.getAllPendingRequestNotebooks();
+      assertThat(result, hasSize(0));
+    }
+  }
 }

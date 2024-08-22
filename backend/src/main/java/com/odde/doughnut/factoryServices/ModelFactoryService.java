@@ -25,6 +25,7 @@ public class ModelFactoryService {
   @Autowired public GlobalSettingRepository globalSettingRepository;
   @Autowired public AssessmentAttemptRepository assessmentAttemptRepository;
   @Autowired public EntityManager entityManager;
+  @Autowired public NotebookRepository notebookRepository;
 
   @Autowired
   public QuestionSuggestionForFineTuningRepository questionSuggestionForFineTuningRepository;

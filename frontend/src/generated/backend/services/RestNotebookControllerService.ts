@@ -184,4 +184,17 @@ export class RestNotebookControllerService {
             },
         });
     }
+    /**
+     * @returns Notebook OK
+     * @throws ApiError
+     */
+    public getAllPendingRequestNotebooks(): CancelablePromise<Array<Notebook>> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/notebooks/getAllPendingRequestNoteBooks',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
 }

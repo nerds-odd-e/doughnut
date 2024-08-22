@@ -14,6 +14,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -128,5 +130,17 @@ class RestNotebookController {
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(notebook);
     return notebook.getNotes();
+  }
+
+  @GetMapping("/getAllPendingRequestNoteBooks")
+  public List<Notebook> getAllPendingRequestNotebooks() {
+    // Fetch all pending request notebooks as an Iterable
+    var notebooksIterable = modelFactoryService.notebookRepository.findAll();
+    return StreamSupport.stream(notebooksIterable.spliterator(), false)
+        .filter(
+            notebook ->
+                notebook.getApprovalStatus() == ApprovalStatus.PENDING
+                    && notebook.getHeadNote().getDeletedAt() == null)
+        .collect(Collectors.toList());
   }
 }
