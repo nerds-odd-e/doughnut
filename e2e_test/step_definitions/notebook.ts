@@ -190,3 +190,10 @@ Then(
     })
   }
 )
+
+Given('following notebooks have pending approval:', (notebooks: DataTable) => {
+  notebooks.raw().forEach((notebookRaw: string[]) => {
+    const notebookName = notebookRaw[0]!
+    start.routerToNotebooksPage().requestForNotebookApproval(notebookName)
+  })
+})

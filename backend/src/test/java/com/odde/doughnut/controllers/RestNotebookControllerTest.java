@@ -209,14 +209,14 @@ class RestNotebookControllerTest {
     }
 
     @Test
-    void shouldGetAllPendingRequestNotebooks() {
+    void shouldReturnPendingRequestNotebooks() {
       notebook.setApprovalStatus(ApprovalStatus.PENDING);
       List<Notebook> result = controller.getAllPendingRequestNotebooks();
       assertThat(result, hasSize(1));
     }
 
     @Test
-    void shouldNotGetApprovedNotebooks() {
+    void shouldNotReturnApprovedNotebooks() {
       notebook.setApprovalStatus(ApprovalStatus.APPROVED);
       List<Notebook> result = controller.getAllPendingRequestNotebooks();
       assertThat(result, hasSize(0));
