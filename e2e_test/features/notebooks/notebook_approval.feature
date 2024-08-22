@@ -23,16 +23,16 @@ Feature: Notebook approval
       When I open certification approval page
       Then I should see empty approval list
 
-  @skip
   Scenario: Approval list shows pending requests for notebooks
-      When I request for an approval for notebooks:
-      | TDD           | 
-      | GIT           |
-      And I open certification approval page
-      Then I should see following notebooks waiting for approval:
-      | Notebook name | Username            | Approve |
-      | TDD           | old_learner         | Approve |
-      | GIT           | another_old_learner | Approve |
+    When I request for an approval for notebooks:
+    | TDD           |
+    | GIT           |
+    When I am logged in as an admin
+    And I open certification approval page
+    Then I should see following notebooks waiting for approval:
+    | Notebook name | Username            | Approve |
+    | TDD           | old_learner         | Approve |
+    | GIT           | another_old_learner | Approve |
 
   @skip
   Scenario: Approved notebook is removed from approval list
