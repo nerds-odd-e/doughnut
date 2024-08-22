@@ -143,4 +143,14 @@ class RestNotebookController {
                     && notebook.getHeadNote().getDeletedAt() == null)
         .collect(Collectors.toList());
   }
+
+  @PostMapping(value = "/{notebook}/approve")
+  @Transactional
+  public Notebook approveNoteBook(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
+      throws UnexpectedNoAccessRightException {
+    notebook.setApprovalStatus(ApprovalStatus.APPROVED);
+    modelFactoryService.save(notebook);
+    return notebook;
+  }
 }

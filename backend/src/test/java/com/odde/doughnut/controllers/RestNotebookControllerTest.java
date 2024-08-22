@@ -216,9 +216,16 @@ class RestNotebookControllerTest {
     }
 
     @Test
-    void shouldNotGetAllPendingRequestNotebooks() {
+    void shouldNotGetApprovedNotebooks() {
+      notebook.setApprovalStatus(ApprovalStatus.APPROVED);
       List<Notebook> result = controller.getAllPendingRequestNotebooks();
       assertThat(result, hasSize(0));
+    }
+
+    @Test
+    void shouldApproveNoteBook() throws UnexpectedNoAccessRightException {
+      Notebook result = controller.approveNoteBook(notebook);
+      assertThat(result.getApprovalStatus(), equalTo(ApprovalStatus.APPROVED));
     }
   }
 }

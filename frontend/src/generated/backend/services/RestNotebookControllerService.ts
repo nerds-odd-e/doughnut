@@ -94,6 +94,25 @@ export class RestNotebookControllerService {
         });
     }
     /**
+     * @param notebook
+     * @returns Notebook OK
+     * @throws ApiError
+     */
+    public approveNoteBook(
+        notebook: number,
+    ): CancelablePromise<Notebook> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/notebooks/{notebook}/approve',
+            path: {
+                'notebook': notebook,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
      * @param requestBody
      * @returns RedirectToNoteResponse OK
      * @throws ApiError
