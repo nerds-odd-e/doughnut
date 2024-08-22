@@ -28,7 +28,7 @@
               title="View Certificate"
               v-if="assessmentHistory.isPass"
             >
-              <CertificatePopup :notebook-id="assessmentHistory.notebookId"></CertificatePopup>
+              <CertificatePopup  :assessment-attempt="assessmentHistory" :notebook-id="assessmentHistory.notebookId"></CertificatePopup>
             </PopButton>
           </td>
         </tr>

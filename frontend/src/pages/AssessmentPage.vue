@@ -11,17 +11,17 @@
         :quiz-question="quizQuestions[currentQuestion]!"
         @answered="questionAnswered"
       />
-      <div v-else-if="assessmentCompleted">
+      <div v-else-if="assessmentResult?.attempt?.isPass">
         <p>Your score: {{ correctAnswers }} / {{ quizQuestions.length }}</p>
-        <div class="alert alert-success" v-if="assessmentPassed">
+        <div class="alert alert-success" v-if="assessmentResult?.attempt?.isPass">
           You have passed the assessment.
         </div>
         <PopButton
           btn-class="btn btn-light"
           title="View Certificate"
-          v-if="assessmentPassed"
+          v-if="assessmentResult?.attempt?.isPass"
         >
-          <CertificatePopup :notebook-id="props.notebookId"></CertificatePopup>
+          <CertificatePopup :assessment-attempt="assessmentResult.attempt" :notebook-id="props.notebookId"></CertificatePopup>
         </PopButton>
         <div class="alert alert-danger" v-else>
           You have not passed the assessment.
@@ -34,7 +34,11 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { QuizQuestion, AnswerSubmission } from "@/generated/backend"
+import {
+  QuizQuestion,
+  AnswerSubmission,
+  AssessmentResult,
+} from "@/generated/backend"
 import { useRouter } from "vue-router"
 import QuizQuestionComp from "@/components/review/QuizQuestion.vue"
 import usePopups from "@/components/commons/Popups/usePopups.ts"
@@ -52,20 +56,10 @@ const quizQuestions = ref<QuizQuestion[]>([])
 const currentQuestion = ref(0)
 const errors = ref("")
 const correctAnswers = ref(0)
+const assessmentResult = ref<AssessmentResult | undefined>(undefined)
 const questionsAnswerCollection = ref<AnswerSubmission[]>([])
-const assessmentCompleted = computed(
-  () =>
-    currentQuestion.value >= quizQuestions.value.length &&
-    quizQuestions.value.length > 0
-)
 
 const passCriteriaPercentage = 80
-
-const assessmentPassed = computed(() => {
-  const correctAnswersPercentage =
-    (correctAnswers.value * 100) / quizQuestions.value.length
-  return correctAnswersPercentage >= passCriteriaPercentage
-})
 
 const questionAnswered = async (answerResult) => {
   questionsAnswerCollection.value.push({
@@ -77,11 +71,15 @@ const questionAnswered = async (answerResult) => {
     correctAnswers.value += 1
   }
   currentQuestion.value += 1
-  if (assessmentCompleted.value) {
-    await managedApi.restAssessmentController.submitAssessmentResult(
-      props.notebookId,
-      questionsAnswerCollection.value
-    )
+  if (
+    currentQuestion.value >= quizQuestions.value.length &&
+    quizQuestions.value.length > 0
+  ) {
+    assessmentResult.value =
+      await managedApi.restAssessmentController.submitAssessmentResult(
+        props.notebookId,
+        questionsAnswerCollection.value
+      )
   }
 }
 

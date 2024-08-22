@@ -30,42 +30,37 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue"
+import { ref, onMounted, computed, PropType } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { AssessmentAttempt, Notebook, User } from "@/generated/backend"
 const props = defineProps({
   notebookId: { type: Number, required: true },
+  assessmentAttempt: {
+    type: Object as PropType<AssessmentAttempt>,
+    required: true,
+  },
 })
 const { managedApi } = useLoadingApi()
 const notebook = ref<Notebook | undefined>(undefined)
-const assesmentResult = ref<AssessmentAttempt | undefined>(undefined)
 const user = ref<User | undefined>(undefined)
 const issueDate = computed(() =>
   formatDate(
     new Date(
-      assesmentResult.value ? assesmentResult.value.submittedAt : Date.now()
+      props.assessmentAttempt ? props.assessmentAttempt.submittedAt : Date.now()
     )
   )
 )
 const expiredDate = computed(() =>
   formatDate(
     new Date(
-      assesmentResult.value && assesmentResult.value.certificateExpiresAt
-        ? assesmentResult.value.certificateExpiresAt
+      props.assessmentAttempt && props.assessmentAttempt.certificateExpiresAt
+        ? props.assessmentAttempt.certificateExpiresAt
         : Date.now()
     )
   )
 )
 const fetchData = async () => {
   notebook.value = await managedApi.restNotebookController.get(props.notebookId)
-  const allAssesments =
-    await managedApi.restAssessmentController.getAssessmentHistory()
-  assesmentResult.value = allAssesments
-    .filter((a) => a.notebookId === props.notebookId && a.isPass)
-    .sort(
-      (a, b) =>
-        new Date(b.submittedAt).valueOf() - new Date(a.submittedAt).valueOf()
-    )[0]
   user.value = await managedApi.restUserController.getUserProfile()
 }
 const padZero = (num: number): string => {

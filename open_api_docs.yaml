@@ -3289,6 +3289,35 @@ components:
           format: int32
         correctAnswers:
           type: boolean
+    AssessmentAttempt:
+      required:
+      - certificateExpiresAt
+      - id
+      - submittedAt
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        notebookTitle:
+          type: string
+        submittedAt:
+          type: string
+          format: date-time
+        isPass:
+          type: boolean
+        certificateExpiresAt:
+          type: string
+          format: date-time
+        answersTotal:
+          type: integer
+          format: int32
+        answersCorrect:
+          type: integer
+          format: int32
+        notebookId:
+          type: integer
+          format: int32
     AssessmentResult:
       type: object
       properties:
@@ -3298,6 +3327,8 @@ components:
         totalCount:
           type: integer
           format: int32
+        attempt:
+          $ref: "#/components/schemas/AssessmentAttempt"
     AiCompletionParams:
       type: object
       properties:
@@ -3772,35 +3803,6 @@ components:
       properties:
         name:
           type: string
-    AssessmentAttempt:
-      required:
-      - certificateExpiresAt
-      - id
-      - submittedAt
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        notebookTitle:
-          type: string
-        submittedAt:
-          type: string
-          format: date-time
-        isPass:
-          type: boolean
-        certificateExpiresAt:
-          type: string
-          format: date-time
-        answersTotal:
-          type: integer
-          format: int32
-        answersCorrect:
-          type: integer
-          format: int32
-        notebookId:
-          type: integer
-          format: int32
     Delta:
       type: object
       properties:

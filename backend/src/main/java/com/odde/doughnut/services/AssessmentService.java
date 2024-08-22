@@ -79,6 +79,7 @@ public class AssessmentService {
     modelFactoryService.save(assessmentAttempt);
 
     AssessmentResult assessmentResult = new AssessmentResult();
+    assessmentResult.attempt = assessmentAttempt;
     assessmentResult.setTotalCount(answerSubmission.size());
     assessmentResult.setCorrectCount(totalCorrectAnswer);
     return assessmentResult;

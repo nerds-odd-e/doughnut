@@ -68,7 +68,11 @@ Then('list should contain certificates', (datatable: DataTable) => {
       const notebook = row[0]
       const expires = row[1]
       if (notebook && expires) {
+<<<<<<< HEAD
         start.navigateToAssessmentHistory().viewCertificateAt(i)
+=======
+        start.navigateToAssessmentHistory().viewMultipleCertificates(i)
+>>>>>>> 854546e9a (feat: use assessment result for data in certificate view)
         cy.findByTestId('expired-date').contains(expires)
       }
     }
