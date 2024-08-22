@@ -29,9 +29,7 @@ import org.springframework.web.bind.annotation.*;
 class RestQuizQuestionController {
   private final ModelFactoryService modelFactoryService;
   private final QuizQuestionService quizQuestionService;
-
-  @Autowired private QuizQuestionAndAnswerRepository quizQuestionAndAnswerRepository;
-
+  
   private final UserModel currentUser;
 
   @Resource(name = "testabilitySettings")
