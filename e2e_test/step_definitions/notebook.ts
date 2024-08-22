@@ -141,18 +141,7 @@ Then(
       })
   }
 )
-Then(
-  'I should see that there are no questions for {string} for the following topics:',
-  (notebook: string, topics: DataTable) => {
-    topics.rows().forEach((topic: string[]) => {
-      const topicName = topic[0]!
-      start
-        .routerToNotebooksPage()
-        .openNotebookQuestions(notebook)
-        .expectNoQuestionsForTopic(topicName)
-    })
-  }
-)
+
 
 Then(
   'I should see following notebooks waiting for approval:',
@@ -180,19 +169,28 @@ When(
   }
 )
 Then(
-  "I should see the following questions for the topics in the notebook {string}:",
+  'I should see that there are no questions for {string} for the following topics:',
   (notebook: string, topics: DataTable) => {
+    const notebookQuestionsPage = start
+    .routerToNotebooksPage()
+    .openNotebookQuestions(notebook)
     topics.rows().forEach((topic: string[]) => {
       const topicName = topic[0]!
-      const question = topic[1]!
-      start
-        .routerToNotebooksPage()
-        .openNotebookQuestions(notebook)
-        .expectOnlyQuestionsForTopic(topicName, question)
+      notebookQuestionsPage
+        .expectNoQuestionsForTopic(topicName)
     })
   }
 )
-// Then I should see the following questions for the topics in the notebook "LeSS in Action":
-// | Topic | Question                |
-// | team  | Who is the team?        |
-// | tech  | What is the technology? |
+Then(
+  "I should see the following questions for the topics in the notebook {string}:",
+  (notebook: string, topics: DataTable) => {
+    const notebookQuestionsPage = start
+      .routerToNotebooksPage()
+      .openNotebookQuestions(notebook)
+    topics.rows().forEach((topic: string[]) => {
+      const topicName = topic[0]!
+      const question = topic[1]!
+      notebookQuestionsPage.expectOnlyQuestionsForTopic(topicName, question)
+    })
+  }
+)
