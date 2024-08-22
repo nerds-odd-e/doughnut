@@ -18,8 +18,8 @@
       <SvgAssessment />
     </button>
   </div>
-  <div class="p-1">
-    <SvgCertifiedAssessment v-if="certifiedNotebook"/>
+  <div v-if="certifiedNotebook" class="p-1 certification-icon" >
+    <SvgCertifiedAssessment/>
   </div>
 </template>
 
