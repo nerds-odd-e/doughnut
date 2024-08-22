@@ -4,7 +4,6 @@
     <tr>
       <th>Notebook</th>
       <th>Username</th>
-      <th>Status</th>
     </tr>
     </thead>
     <tbody>
@@ -17,8 +16,9 @@
       </td>
       <td>
         <button
-          class="btn btn-dange"
-          @click="approveNoteBook(notebook)"
+          class="btn btn-primary"
+          style="background-color: green; border-color: green;"
+          @click="approveNoteBook(notebook.id)"
         >
         Approve
         </button>
@@ -41,15 +41,16 @@ const { managedApi } = useLoadingApi()
 
 const notebooks = ref<Notebook[] | undefined>(undefined)
 
-const fetchData = async () => {
+const fetchNotebooks = async () => {
   notebooks.value =
     await managedApi.restNotebookController.getAllPendingRequestNotebooks()
 }
 
-const approveNoteBook = async (notebook: Notebook) => {
-  await managedApi.restNotebookController.approveNoteBook(notebook.id)
+const approveNoteBook = async (notebookId: number) => {
+  await managedApi.restNotebookController.approveNoteBook(notebookId)
+  fetchNotebooks()
 }
 onMounted(() => {
-  fetchData()
+  fetchNotebooks()
 })
 </script>
