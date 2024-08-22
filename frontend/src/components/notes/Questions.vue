@@ -12,7 +12,7 @@
         />
       </template>
     </PopButton>
-    <table class="question-table mt-2">
+    <table class="question-table mt-2" v-if="questions.length">
       <thead>
         <tr>
           <th>Approved</th>
@@ -69,6 +69,9 @@
         </tr>
       </tbody>
     </table>
+    <div v-else class="no-questions">
+      <b >No questions</b>
+    </div> 
   </div>
 </template>
 
@@ -128,5 +131,10 @@ onMounted(() => {
 
 .correct-choice {
   background-color: #4caf50;
+}
+.no-questions {
+  margin-top: 10px;
+  width: 100%;
+  text-align: center;
 }
 </style>

@@ -1,6 +1,8 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.entities.ApprovalStatus;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.QuizQuestionAndAnswer;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
@@ -30,6 +32,12 @@ public class QuizQuestionService {
   public QuizQuestionAndAnswer addQuestion(
       Note note, @Valid QuizQuestionAndAnswer questionAndAnswer) {
     questionAndAnswer.setNote(note);
+
+    // Approval status should be reset whenever note questions are changed
+    Notebook parentNotebook = note.getNotebook();
+    parentNotebook.setApprovalStatus(ApprovalStatus.NOT_APPROVED);
+    modelFactoryService.save(parentNotebook);
+
     modelFactoryService.save(questionAndAnswer);
     return questionAndAnswer;
   }

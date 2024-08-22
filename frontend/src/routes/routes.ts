@@ -86,7 +86,9 @@ const routes = [
     path: "/assessment/notebook/:notebookId",
     name: "assessment",
     component: AssessmentPage,
-    props: true,
+    props: (route: RouteLocation) => ({
+      notebookId: Number(route.params.notebookId),
+    }),
   },
   { path: "/reviews", name: "reviews", component: ReviewHome },
   {

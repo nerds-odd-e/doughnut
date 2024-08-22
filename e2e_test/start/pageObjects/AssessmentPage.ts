@@ -1,4 +1,5 @@
 import { assumeBazaarPage } from './bazaarPage'
+import { CertificatePopup } from './CertificatePopup'
 
 const assumeQuestionSection = () => {
   return {
@@ -21,7 +22,7 @@ const assumeQuestionSection = () => {
       })
     },
     answer(answer: string) {
-      return cy.findByText(answer).click()
+      return cy.findByText(answer).click().pageIsNotLoading()
     },
   }
 }
@@ -49,9 +50,11 @@ export const assumeAssessmentPage = (notebook?: string) => {
     answerYesNoQuestionsToScore(correctAnswers: number, allQuestions: number) {
       for (let i = 0; i < correctAnswers; i++) {
         this.assumeQuestionSection().answer('Yes')
+        cy.pageIsNotLoading()
       }
       for (let i = correctAnswers; i < allQuestions; i++) {
         this.assumeQuestionSection().answer('No')
+        cy.pageIsNotLoading()
       }
     },
     passAssessment() {
@@ -60,26 +63,12 @@ export const assumeAssessmentPage = (notebook?: string) => {
     expectNotPassAssessment() {
       cy.findByText('You have not passed the assessment.').should('be.visible')
     },
-    viewCertificate() {
+    expectCertificate() {
       cy.findByText('View Certificate').click()
-      cy.findByText(`is granted the Certified`).should('be.visible')
-      cy.findByText(`${notebook}`).should('be.visible')
+      return CertificatePopup()
     },
     expectNoCertificate() {
       cy.findByText('View Certificate').should('not.exist')
-    },
-    viewCertificateWithDate(date: string) {
-      this.viewCertificate()
-      cy.findByText(date).should('be.visible')
-    },
-    expectCerticateHasExprityDate() {
-      const nextYear: Date = new Date()
-      nextYear.setFullYear(nextYear.getFullYear() + 1)
-
-      cy.findByText('View Certificate').click()
-      cy.findByTestId('expired-date').contains(
-        nextYear.toISOString().split('T')[0]!
-      )
     },
     expectReachedLimit() {
       cy.findByText(

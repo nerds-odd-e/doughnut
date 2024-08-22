@@ -76,9 +76,15 @@ Given(
   }
 )
 
-Given('there are questions for the note:', (data: DataTable) => {
-  start.testability().injectQuizQuestions(data.hashes())
-})
+Given(
+  'there are questions in the notebook {string} for the note:',
+  (notebook: string, data: DataTable) => {
+    start.testability().injectQuizQuestions({
+      notebookTitle: notebook,
+      quizQuestionTestData: data.hashes(),
+    })
+  }
+)
 
 Given(
   'I add the following question for the note {string}:',
@@ -115,7 +121,7 @@ When('I create a notebook with topic {string}', (notebookTopic: string) => {
   start.routerToNotebooksPage().creatingNotebook(notebookTopic)
 })
 
-Given('that I have the following notebooks:', (data: DataTable) => {
+Given('I have the following notebooks:', (data: DataTable) => {
   for (const row of data.raw()) {
     start.routerToNotebooksPage().creatingNotebook(row[0]!)
   }
@@ -544,10 +550,3 @@ Then('the question in the form becomes:', (data: DataTable) => {
     }
   )
 })
-
-Then(
-  'I should be able to request certification approval for the notebook {string}',
-  (_noteTopic: string) => {
-    return 'pending'
-  }
-)

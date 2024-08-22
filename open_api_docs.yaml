@@ -1208,6 +1208,54 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Notebook"
+  /api/notebooks/{notebook}/request-approval:
+    post:
+      tags:
+      - rest-notebook-controller
+      operationId: requestNotebookApproval
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Notebook"
+  /api/notebooks/{notebook}/approve:
+    post:
+      tags:
+      - rest-notebook-controller
+      operationId: approveNoteBook
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Notebook"
   /api/notebooks/create:
     post:
       tags:
@@ -1460,6 +1508,53 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Circle"
+  /api/certificate/{notebook}:
+    get:
+      tags:
+      - rest-certificate-controller
+      operationId: getCertificate
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Certificate"
+    post:
+      tags:
+      - rest-certificate-controller
+      operationId: saveCertificate
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Certificate"
   /api/bazaar/{bazaarNotebook}/remove:
     post:
       tags:
@@ -2368,6 +2463,26 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/NoteBrief"
+  /api/notebooks/getAllPendingRequestNoteBooks:
+    get:
+      tags:
+      - rest-notebook-controller
+      operationId: getAllPendingRequestNotebooks
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Notebook"
   /api/healthcheck:
     get:
       tags:
@@ -2729,6 +2844,8 @@ components:
     QuizQuestionsTestData:
       type: object
       properties:
+        notebookTitle:
+          type: string
         quizQuestionTestData:
           type: array
           items:
@@ -2887,6 +3004,12 @@ components:
           $ref: "#/components/schemas/Note"
         notebookSettings:
           $ref: "#/components/schemas/NotebookSettings"
+        approvalStatus:
+          type: string
+          enum:
+          - NOT_APPROVED
+          - PENDING
+          - APPROVED
         creatorId:
           type: string
     NotebookSettings:
@@ -3194,6 +3317,19 @@ components:
           maxLength: 20
           minLength: 10
           type: string
+    Certificate:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+        notebook:
+          $ref: "#/components/schemas/Notebook"
+        startDate:
+          type: string
+          format: date-time
+        expiryDate:
+          type: string
+          format: date-time
     BazaarNotebook:
       required:
       - id
@@ -3216,6 +3352,35 @@ components:
           format: int32
         correctAnswers:
           type: boolean
+    AssessmentAttempt:
+      required:
+      - certificateExpiresAt
+      - id
+      - submittedAt
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        notebookTitle:
+          type: string
+        submittedAt:
+          type: string
+          format: date-time
+        isPass:
+          type: boolean
+        certificateExpiresAt:
+          type: string
+          format: date-time
+        answersTotal:
+          type: integer
+          format: int32
+        answersCorrect:
+          type: integer
+          format: int32
+        notebookId:
+          type: integer
+          format: int32
     AssessmentResult:
       type: object
       properties:
@@ -3225,6 +3390,8 @@ components:
         totalCount:
           type: integer
           format: int32
+        attempt:
+          $ref: "#/components/schemas/AssessmentAttempt"
     AiCompletionParams:
       type: object
       properties:
@@ -3699,28 +3866,6 @@ components:
       properties:
         name:
           type: string
-    AssessmentAttempt:
-      required:
-      - id
-      - submittedAt
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        notebookTitle:
-          type: string
-        submittedAt:
-          type: string
-          format: date-time
-        isPass:
-          type: boolean
-        answersTotal:
-          type: integer
-          format: int32
-        answersCorrect:
-          type: integer
-          format: int32
     Delta:
       type: object
       properties:

@@ -62,6 +62,11 @@ public class MakeMe extends MakeMeWithoutDB {
     assessmentAttempt.setUser(currentUser);
     assessmentAttempt.setNotebook(notebook);
     assessmentAttempt.setSubmittedAt(submittedAt);
+    assessmentAttempt.setCertificateExpiresAt(
+        Timestamp.valueOf(
+            submittedAt
+                .toLocalDateTime()
+                .plus(notebook.getNotebookSettings().getCertificateExpiry())));
     return new AssessmentAttemptBuilder(this, assessmentAttempt);
   }
 
@@ -76,6 +81,11 @@ public class MakeMe extends MakeMeWithoutDB {
     assessmentAttempt.setUser(currentUser);
     assessmentAttempt.setNotebook(notebook);
     assessmentAttempt.setSubmittedAt(submittedAt);
+    assessmentAttempt.setCertificateExpiresAt(
+        Timestamp.valueOf(
+            submittedAt
+                .toLocalDateTime()
+                .plus(notebook.getNotebookSettings().getCertificateExpiry())));
     assessmentAttempt.setAnswersTotal(answersTotal);
     assessmentAttempt.setAnswersCorrect(answersCorrect);
     return new AssessmentAttemptBuilder(this, assessmentAttempt);

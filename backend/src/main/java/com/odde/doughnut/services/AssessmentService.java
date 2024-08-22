@@ -66,6 +66,11 @@ public class AssessmentService {
     assessmentAttempt.setNotebook(notebook);
     assessmentAttempt.setAnswersTotal(answerSubmission.size());
     assessmentAttempt.setSubmittedAt(currentUTCTimestamp);
+    assessmentAttempt.setCertificateExpiresAt(
+        Timestamp.valueOf(
+            currentUTCTimestamp
+                .toLocalDateTime()
+                .plus(notebook.getNotebookSettings().getCertificateExpiry())));
 
     int totalCorrectAnswer =
         (int) answerSubmission.stream().filter(AnswerSubmission::isCorrectAnswers).count();
@@ -74,6 +79,7 @@ public class AssessmentService {
     modelFactoryService.save(assessmentAttempt);
 
     AssessmentResult assessmentResult = new AssessmentResult();
+    assessmentResult.attempt = assessmentAttempt;
     assessmentResult.setTotalCount(answerSubmission.size());
     assessmentResult.setCorrectCount(totalCorrectAnswer);
     return assessmentResult;

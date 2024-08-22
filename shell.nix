@@ -34,7 +34,6 @@ in mkShell {
       x11vnc
       xclip
       xvfb-run
-      pinentry
   ];
   shellHook = ''
     #!/usr/bin/env bash
@@ -47,6 +46,8 @@ in mkShell {
     export JAVA_HOME="$(readlink -e $(type -p javac) | sed  -e 's/\/bin\/javac//g')"
     export PNPM_HOME="$(readlink -e $(type -p pnpm) | sed -e 's/\/bin\/pnpm//g')"
     export NODE_PATH="$(readlink -e $(type -p node) | sed  -e 's/\/bin\/node//g')"
+    export PYTHON_PATH="$(readlink -e $(type -p python) | sed  -e 's/\/bin\/python//g')"
+    export POETRY_PATH="$(readlink -e $(type -p poetry) | sed  -e 's/\/bin\/poetry//g')"
     export PUB_CACHE="''${PUB_CACHE:-$PWD/.pub-cache}"
     export OPENAI_API_TOKEN="''${AI_TOKEN}"
 
@@ -69,12 +70,16 @@ in mkShell {
     echo "##   JAVA_HOME: $JAVA_HOME                              "
     echo "##   NODE_PATH: $NODE_PATH                              "
     echo "##   PNPM_HOME: $PNPM_HOME                              "
+    echo "##   PYTHON_PATH: $PYTHON_PATH                          "
+    echo "##   POETRY_PATH: $POETRY_PATH                          "
     echo "##   MYSQL_BASEDIR: $MYSQL_BASEDIR                      "
     echo "##   MYSQL_HOME: $MYSQL_HOME                            "
     echo "##   MYSQL_DATADIR: $MYSQL_DATADIR                      "
     echo "##   JAVA VERSION: `javac --version`                    "
     echo "##   NODE VERSION: `node --version`                     "
     echo "##   PNPM VERSION: `pnpm --version`                     "
+    echo "##   PYTHON VERSION: `python --version`                 "
+    echo "##   POETRY VERSION: `poetry --version`                 "
     echo "                                                                                "
     echo "###################################################################################################################"
 
@@ -95,11 +100,6 @@ in mkShell {
     GRANT ALL PRIVILEGES ON doughnut_e2e_test.*    TO 'doughnut'@'127.0.0.1';
     FLUSH PRIVILEGES;
     EOF
-
-    export NIX_SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-      export NIX_SSL_CERT_FILE=/etc/ssl/cert.pem
-    fi
 
     export MYSQLD_PID=$(ps -ax | grep -v " grep " | grep mysqld | awk '{ print $1 }')
     if [[ -z "$MYSQLD_PID" ]]; then

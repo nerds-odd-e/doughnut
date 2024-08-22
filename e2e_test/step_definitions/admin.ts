@@ -173,14 +173,36 @@ When('I remove the notebook {string} from the bazaar', (notebook: string) => {
   start.goToAdminDashboard().goToBazaarManagement().removeFromBazaar(notebook)
 })
 
-When('I request for approval for notebooks:', (_notebooks: DataTable) => {
-  return 'pending'
-})
-
 When('I open certification approval page', () => {
   start.goToAdminDashboard().goToCertificationRequestPage()
 })
 
-Then('I should see empty approval list', () => {
+Then('I should not see any pending approval requests', () => {
   start.goToAdminDashboard().goToCertificationRequestPage().listIsEmpty()
 })
+
+When('I approve notebook {string}', (notebook: string) => {
+  start.goToAdminDashboard().goToCertificationRequestPage().approve(notebook)
+})
+
+Then(
+  'I should not see notebook {string} waiting for approval',
+  (notebook: string) => {
+    start
+      .goToAdminDashboard()
+      .goToCertificationRequestPage()
+      .listDoesNotContain(notebook)
+  }
+)
+
+Then(
+  'I should see following notebooks waiting for approval:',
+  (notebooks: DataTable) => {
+    notebooks.raw().forEach((notebookRaw: string[]) => {
+      start
+        .goToAdminDashboard()
+        .goToCertificationRequestPage()
+        .listContains(notebookRaw[0]!)
+    })
+  }
+)

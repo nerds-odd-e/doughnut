@@ -1,14 +1,28 @@
-@wip
-@skip
-Feature: Notebook certificate expiration
+Feature: Certification expiration
 
   Background:
-    Given I am logged in as an existing user
-    And There exists a notebook with the name "Certified thing"
-    And The notebook has an assessment with certification
+    Given Now is "2024-01-01"
+    And I am logged in as an existing user
+    And There is a "Certified thing" notebook with assesment that has certification
 
-  Scenario: See the expiration +2 years from now for a certificate
-    Given I open the notebooks settings
-    And I change the expiration timespan to 2 years
-    When I Complete an assessment
-    Then I should see that the certificate expires in 2 years from now
+  Scenario: Default certificate expiration is one year
+    When I Complete an assessment in "Certified thing"
+    Then I should see that the certificate of "Certified thing" assesment expires on "2025-01-01"
+
+  Scenario: See modifed expiration date
+    Given Expiration of "Certified thing" is set to "2y"
+    * I should see the expiration setting of "Certified thing" is set to "2y"
+    When I Complete an assessment in "Certified thing"
+    Then I should see that the certificate of "Certified thing" assesment expires on "2026-01-01"
+
+  Scenario: Existing certificate expiry is changed
+    Given Expiration of "Certified thing" is set to "2y"
+    And I Complete an assessment in "Certified thing"
+    When Expiration of "Certified thing" is set to "3y"
+    And I Complete an assessment in "Certified thing"
+    Then list should contain certificates
+      |Notebook         |Expiry Date  |
+      |Certified thing  |2026-01-01   |
+      |Certified thing  |2027-01-01   |
+
+

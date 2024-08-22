@@ -5,7 +5,7 @@ Feature: Quiz Question Management
   Background:
     Given I am logged in as an existing user
     And I have a notebook with the head note "The cow joke"
-    And there are questions for the note:
+    And there are questions in the notebook "The cow joke" for the note:
       | Note Topic   | Question             | Answer | One Wrong Choice |
       | The cow joke | What does a cow say? | moo    | woo              |
 
@@ -28,16 +28,14 @@ Feature: Quiz Question Management
 
   @ignore
   Scenario: Reset approval on new question
-    Given I am logged in as "admin"
+    Given I am logged in as an admin
     And I have a notebook with the head note "The cow joke"
-    And there are questions for the note:
-      | Note Topic   | Question             | Answer | One Wrong Choice |
-      | The cow joke | What does a cow say? | moo    | woo              |
-    And the notebook "The cow joke" is approved
+    And I request for an approval for notebooks:
+      | The cow joke |
     When I add the following question for the note "The cow joke":
-      | Stem                                 | Choice 0    | Choice 1 | Correct Choice Index |
-      | Why do cows have hooves instead of feet? | Because they lactose! | Woof! | 0         |
-    Then I should be able to request certification approval for the notebook "The cow joke"
+      | Stem                                     | Choice 0              | Choice 1 | Choice 2 | Correct Choice Index |
+      | Why do cows have hooves instead of feet? | Because they lactose! | Woof!    | What?    | 0                    |
+    Then I can request approval for the notebook "The cow joke"
 
   @usingMockedOpenAiService
   Scenario: Can generate the question by AI
@@ -48,7 +46,6 @@ Feature: Quiz Question Management
     Then the question in the form becomes:
       | Stem                                     | Choice 0     | Choice 1 | Choice 2  | Correct Choice Index |
       | Why do cows have hooves instead of feet? | they lactose | they moo | they have | 0                    |
-
 
   @usingMockedOpenAiService
   Scenario: Can refine the question by AI

@@ -106,6 +106,26 @@ class RestNotebookControllerTest {
   }
 
   @Nested
+  class requestNotebookApproval {
+    @Test
+    void shouldNotBeAbleToRequestApprovalForNotebookThatBelongsToOtherUser() {
+      User anotherUser = makeMe.aUser().please();
+      Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.requestNotebookApproval(note.getNotebook()));
+    }
+
+    @Test
+    void approvalStatusShouldBePendingAfterRequestingApproval()
+        throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().creatorAndOwner(userModel).please();
+      controller.requestNotebookApproval(note.getNotebook());
+      assertThat(note.getNotebook().getApprovalStatus(), equalTo(ApprovalStatus.PENDING));
+    }
+  }
+
+  @Nested
   class DownloadNotebookDump {
     private Notebook notebook;
 
@@ -173,6 +193,39 @@ class RestNotebookControllerTest {
       quizQuestionBuilder.approvedSpellingQuestionOf(notebook.getNotes().get(0)).please();
       List<Note> result = controller.getNotes(notebook);
       assertThat(result.get(0).getQuizQuestionAndAnswers(), hasSize(1));
+    }
+  }
+
+  @Nested
+  class getAllPendingRequestNotebooks {
+
+    private Notebook notebook;
+
+    @BeforeEach
+    void setup() {
+      UserModel userModel = makeMe.anAdmin().toModelPlease();
+      notebook = makeMe.aNote().creatorAndOwner(userModel).please().getNotebook();
+      makeMe.refresh(notebook);
+    }
+
+    @Test
+    void shouldReturnPendingRequestNotebooks() {
+      notebook.setApprovalStatus(ApprovalStatus.PENDING);
+      List<Notebook> result = controller.getAllPendingRequestNotebooks();
+      assertThat(result, hasSize(1));
+    }
+
+    @Test
+    void shouldNotReturnApprovedNotebooks() {
+      notebook.setApprovalStatus(ApprovalStatus.APPROVED);
+      List<Notebook> result = controller.getAllPendingRequestNotebooks();
+      assertThat(result, hasSize(0));
+    }
+
+    @Test
+    void shouldApproveNoteBook() throws UnexpectedNoAccessRightException {
+      Notebook result = controller.approveNoteBook(notebook);
+      assertThat(result.getApprovalStatus(), equalTo(ApprovalStatus.APPROVED));
     }
   }
 }

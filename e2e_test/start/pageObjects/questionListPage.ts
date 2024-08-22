@@ -3,7 +3,10 @@ import { editQuestionPage } from './editQuestionPage'
 
 export const questionListPage = () => {
   return {
-    addQuestionPage,
+    addQuestionPage: () => {
+      cy.findByRole('button', { name: 'Add Question' }).click()
+      return addQuestionPage()
+    },
     editQuestionPage,
     expectQuestion(expectedQuestions: Record<string, string>[]) {
       expectedQuestions.forEach((row) => {

@@ -111,11 +111,14 @@ Then(
   }
 )
 
-When('I get a certificate of {string}', (notebook: string) => {
-  start.assumeAssessmentPage(notebook).viewCertificate()
+When('I should get a certificate of {string}', (notebook: string) => {
+  start
+    .assumeAssessmentPage(notebook)
+    .expectCertificate()
+    .expectCertificateFor(notebook)
 })
 
-Then('I do not get a certificate of {string}', (notebook: string) => {
+Then('I should not get a certificate of {string}', (notebook: string) => {
   start.assumeAssessmentPage(notebook).expectNoCertificate()
 })
 
@@ -126,13 +129,26 @@ When('Now is {string}', (dateString: string) => {
 When(
   'I should see the original start date {string} on my renewed certificate for {string}',
   (dateString: string, notebook: string) => {
-    start.assumeAssessmentPage(notebook).viewCertificateWithDate(dateString)
+    start
+      .assumeAssessmentPage(notebook)
+      .expectCertificate()
+      .expectDate(dateString)
   }
 )
 
 Then(
   'I can view certificate of {string} in my assessment history',
   (notebook: string) => {
-    start.navigateToAssessmentHistory().viewCertificate(notebook)
+    start
+      .navigateToAssessmentHistory()
+      .expectCertificate(notebook)
+      .expectCertificateFor(notebook)
+  }
+)
+
+Then(
+  'I can not view certificate of {string} in my assessment history',
+  (notebook: string) => {
+    start.navigateToAssessmentHistory().expectNoCertificate(notebook)
   }
 )

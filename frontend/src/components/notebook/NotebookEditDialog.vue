@@ -23,9 +23,13 @@
     <button class="btn btn-primary btn-layout mt-2" @click="processForm">
       Update
     </button>
-    <button id="request-approval-btn" class="btn btn-primary btn-layout mt-2 float-end" @click="requestNotebookApproval">
-      Apply approval
-    </button>
+    </div>
+    <hr/>
+    <div>
+      <h4>Request to obtain certificate from assessment</h4>
+      <button id="request-approval-btn" :class="approvalButtonClasses" :disabled="isApprovalButtonDisabled" @click="requestNotebookApproval">
+        {{ approvalButtonText }}
+      </button>
     </div>
 </template>
 
@@ -55,6 +59,38 @@ export default {
       errors: {},
     }
   },
+  computed: {
+    approvalButtonText() {
+      switch (this.notebook.approvalStatus) {
+        case "NOT_APPROVED":
+          return "Send Request"
+        case "APPROVED":
+          return "Certificate Request Approved"
+        case "PENDING":
+          return "Approval Pending"
+        default:
+          return "Send Request"
+      }
+    },
+    approvalButtonClasses() {
+      return {
+        btn: true,
+        "btn-primary": this.notebook.approvalStatus === "NOT_APPROVED",
+        "btn-disabled":
+          this.notebook.approvalStatus === "APPROVED" ||
+          this.notebook.approvalStatus === "PENDING",
+        "btn-layout": true,
+        "mt-2": true,
+        display: "block",
+      }
+    },
+    isApprovalButtonDisabled() {
+      return (
+        this.notebook.approvalStatus === "APPROVED" ||
+        this.notebook.approvalStatus === "PENDING"
+      )
+    },
+  },
   methods: {
     processForm() {
       this.managedApi.restNotebookController
@@ -65,11 +101,11 @@ export default {
         .catch((err) => (this.errors = err))
     },
     requestNotebookApproval() {
-      const response = this.managedApi.restNotebookController.requestApproval()
-      const button = document.getElementById("request-approval-btn")
-      button.disabled = true
-      button.classList.replace("btn-primary", "btn-disabled")
-      button.textContent = response
+      this.managedApi.restNotebookController
+        .requestNotebookApproval(this.notebook.id)
+        .then((response) => {
+          this.notebook.approvalStatus = response.approvalStatus
+        })
     },
   },
 }

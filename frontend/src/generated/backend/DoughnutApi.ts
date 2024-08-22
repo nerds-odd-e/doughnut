@@ -9,6 +9,7 @@ import { RestAiAudioControllerService } from './services/RestAiAudioControllerSe
 import { RestAiControllerService } from './services/RestAiControllerService';
 import { RestAssessmentControllerService } from './services/RestAssessmentControllerService';
 import { RestBazaarControllerService } from './services/RestBazaarControllerService';
+import { RestCertificateControllerService } from './services/RestCertificateControllerService';
 import { RestCircleControllerService } from './services/RestCircleControllerService';
 import { RestCurrentUserInfoControllerService } from './services/RestCurrentUserInfoControllerService';
 import { RestFailureReportControllerService } from './services/RestFailureReportControllerService';
@@ -32,6 +33,7 @@ export class DoughnutApi {
     public readonly restAiController: RestAiControllerService;
     public readonly restAssessmentController: RestAssessmentControllerService;
     public readonly restBazaarController: RestBazaarControllerService;
+    public readonly restCertificateController: RestCertificateControllerService;
     public readonly restCircleController: RestCircleControllerService;
     public readonly restCurrentUserInfoController: RestCurrentUserInfoControllerService;
     public readonly restFailureReportController: RestFailureReportControllerService;
@@ -66,6 +68,7 @@ export class DoughnutApi {
         this.restAiController = new RestAiControllerService(this.request);
         this.restAssessmentController = new RestAssessmentControllerService(this.request);
         this.restBazaarController = new RestBazaarControllerService(this.request);
+        this.restCertificateController = new RestCertificateControllerService(this.request);
         this.restCircleController = new RestCircleControllerService(this.request);
         this.restCurrentUserInfoController = new RestCurrentUserInfoControllerService(this.request);
         this.restFailureReportController = new RestFailureReportControllerService(this.request);

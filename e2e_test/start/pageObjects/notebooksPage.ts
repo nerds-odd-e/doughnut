@@ -2,6 +2,7 @@ import NotePath from '../../support/NotePath'
 import { notebookList } from './NotebookList'
 import noteCreationForm from './noteForms/noteCreationForm'
 import { assumeNotePage } from './notePage'
+import notebookQuestionsList from './notebookQuestionsList'
 
 export const routerToNotebooksPage = () => {
   cy.pageIsNotLoading()
@@ -43,13 +44,21 @@ export const routerToNotebooksPage = () => {
       cy.formField('Skip Review Entirely').check()
       cy.findByRole('button', { name: 'Update' }).click()
     },
-    applyForNotebookApproval(notebook: string) {
+    requestForNotebookApproval(notebook: string) {
       this.findNotebookCardButton(notebook, 'Edit notebook settings').click()
-      cy.findByRole('button', { name: 'Apply approval' }).click()
+      cy.findByRole('button', { name: 'Send Request' }).click()
+    },
+    expectNotebookApprovalCannotBeRequested(notebook: string) {
+      this.findNotebookCardButton(notebook, 'Edit notebook settings').click()
+      cy.findByRole('button', { name: 'Send Request' }).should('not.exist')
+    },
+    expectNotebookApprovalCanBeRequested(notebook: string) {
+      this.findNotebookCardButton(notebook, 'Edit notebook settings').click()
+      cy.findByRole('button', { name: 'Send Request' }).should('exist')
     },
     expectNotebookApprovalStatus(notebook: string, status: string) {
       this.findNotebookCardButton(notebook, 'Edit notebook settings').click()
-      cy.findByText('{status} approval'.replace('{status}', status)).should(
+      cy.findByText('Approval {status}'.replace('{status}', status)).should(
         'exist'
       )
     },
@@ -57,12 +66,18 @@ export const routerToNotebooksPage = () => {
       notebook: string,
       settings: {
         numberOfQuestion?: number
+        certificateExpiry?: string
       }
     ) {
       this.findNotebookCardButton(notebook, 'Edit notebook settings').click()
       if (settings.numberOfQuestion) {
         cy.formField('Number Of Questions In Assessment').assignFieldValue(
           `${settings.numberOfQuestion}`
+        )
+      }
+      if (settings.certificateExpiry) {
+        cy.formField('Certificate Expiry').assignFieldValue(
+          `${settings.certificateExpiry}`
         )
       }
 
@@ -72,6 +87,10 @@ export const routerToNotebooksPage = () => {
     unsubscribe(notebook: string) {
       this.findNotebookCardButton(notebook, 'Unsubscribe').click()
       cy.findByRole('button', { name: 'OK' }).click()
+    },
+    openNotebookQuestions(notebook: string) {
+      this.findNotebookCardButton(notebook, 'Notebook Questions').click()
+      return notebookQuestionsList()
     },
   }
 }

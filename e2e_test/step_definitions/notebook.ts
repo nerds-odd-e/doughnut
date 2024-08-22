@@ -36,9 +36,30 @@ When('I change notebook {string} to skip review', (noteTopic: string) => {
   start.routerToNotebooksPage().skipReview(noteTopic)
 })
 
-When('I apply for an approval for notebook {string}', (noteTopic: string) => {
-  start.routerToNotebooksPage().applyForNotebookApproval(noteTopic)
+When('I request for an approval for notebooks:', (notebooks: DataTable) => {
+  notebooks.raw().forEach((notebookRaw: string[]) => {
+    const notebookName = notebookRaw[0]!
+    start.routerToNotebooksPage().requestForNotebookApproval(notebookName)
+  })
 })
+
+When(
+  'I cannot request approval again for notebook {string}',
+  (noteTopic: string) => {
+    start
+      .routerToNotebooksPage()
+      .expectNotebookApprovalCannotBeRequested(noteTopic)
+  }
+)
+
+When(
+  'the approval for the notebook {string} is {string}',
+  (noteTopic: string, status: string) => {
+    start
+      .routerToNotebooksPage()
+      .expectNotebookApprovalStatus(noteTopic, status)
+  }
+)
 
 Then(
   'I should see the status {string} of the approval for notebook {string}',
@@ -46,6 +67,15 @@ Then(
     start
       .routerToNotebooksPage()
       .expectNotebookApprovalStatus(noteTopic, status)
+  }
+)
+
+Then(
+  'I can request approval for the notebook {string}',
+  (noteTopic: string) => {
+    start
+      .routerToNotebooksPage()
+      .expectNotebookApprovalCanBeRequested(noteTopic)
   }
 )
 
@@ -109,5 +139,64 @@ Then(
           .selfAssessmentOnNotebook(notebook)
           .expectQuestion('Where in the world is Singapore?')
       })
+  }
+)
+
+When(
+  'I add questions to the following notes in the notebook {string}',
+  (_notebook: string, data: DataTable) => {
+    data.rows().forEach((row) => {
+      start.jumpToNotePage(row[0] as string).addQuestion({
+        Stem: row[1] as string,
+        'Choice 0': 'yes',
+        'Choice 1': 'no',
+        'Choice 2': 'maybe',
+        'Correct Choice Index': '0',
+      })
+    })
+  }
+)
+Then(
+  'I should see that there are no questions for {string} for the following topics:',
+  (notebook: string, topics: DataTable) => {
+    const notebookQuestionsPage = start
+      .routerToNotebooksPage()
+      .openNotebookQuestions(notebook)
+    topics.rows().forEach((topic: string[]) => {
+      const topicName = topic[0]!
+      notebookQuestionsPage.expectNoQuestionsForTopic(topicName)
+    })
+  }
+)
+Then(
+  'I should see the following questions for the topics in the notebook {string}:',
+  (notebook: string, topics: DataTable) => {
+    const notebookQuestionsPage = start
+      .routerToNotebooksPage()
+      .openNotebookQuestions(notebook)
+    topics.rows().forEach((topic: string[]) => {
+      const topicName = topic[0]!
+      const question = topic[1]!
+      notebookQuestionsPage.expectOnlyQuestionsForTopic(topicName, question)
+    })
+  }
+)
+
+Given('following notebooks have pending approval:', (notebooks: DataTable) => {
+  notebooks.raw().forEach((notebookRaw: string[]) => {
+    const notebookName = notebookRaw[0]!
+    start.routerToNotebooksPage().requestForNotebookApproval(notebookName)
+  })
+})
+
+When(
+  'I add the following question for the note {string} of notebook {string}:',
+  (note: string, notebook: string, data: DataTable) => {
+    const notebookQuestionsPage = start
+      .routerToNotebooksPage()
+      .openNotebookQuestions(notebook)
+    data.hashes().forEach((row: Record<string, string>) => {
+      notebookQuestionsPage.addQuestionPage(note).addQuestion(row)
+    })
   }
 )

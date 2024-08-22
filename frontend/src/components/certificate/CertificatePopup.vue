@@ -1,12 +1,12 @@
 <template>
-  <div v-if="notebook && user" class="certificate-frame">
+  <div v-if="certificate" class="certificate-frame">
     <div class="certificate-container">
       <span>This to certificate that</span>
-      <span class="receiver-name">{{ user.name }}</span>
+      <span class="receiver-name">{{ certificate.user?.name }}</span>
       <p class="certificate-detail">
         <span>by completing the qualifications, </span>
         <span>is granted the Certified
-          <span class="certificate-name"> {{ notebook.headNote.noteTopic.topicConstructor }}</span>
+          <span class="certificate-name"> {{ certificate.notebook?.headNote.noteTopic.topicConstructor  }}</span>
         </span>
       </p>
       <div class="date-container">
@@ -17,7 +17,7 @@
       </div>
       <div class="signature-section">
         <div class="signature">
-          <span class="signature-name">{{ notebook.creatorId }}</span>
+          <span class="signature-name">{{ certificate.notebook?.creatorId }}</span>
           <span>Content Creator</span>
         </div>
         <div class="signature">
@@ -30,25 +30,39 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue"
+import { ref, onMounted, computed, PropType } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { Notebook, User } from "@/generated/backend"
+import { AssessmentAttempt, Certificate } from "@/generated/backend"
 const props = defineProps({
   notebookId: { type: Number, required: true },
+  assessmentAttempt: {
+    type: Object as PropType<AssessmentAttempt>,
+    required: true,
+  },
 })
 const { managedApi } = useLoadingApi()
-const notebook = ref<Notebook | undefined>(undefined)
-const user = ref<User | undefined>(undefined)
-const issueDate = ref("")
-const expiredDate = ref("")
+const certificate = ref<Certificate | undefined>(undefined)
+
+const issueDate = computed(() =>
+  formatDate(
+    new Date(
+      props.assessmentAttempt ? props.assessmentAttempt.submittedAt : Date.now()
+    )
+  )
+)
+const expiredDate = computed(() =>
+  formatDate(
+    new Date(
+      props.assessmentAttempt && props.assessmentAttempt.certificateExpiresAt
+        ? props.assessmentAttempt.certificateExpiresAt
+        : Date.now()
+    )
+  )
+)
 const fetchData = async () => {
-  notebook.value = await managedApi.restNotebookController.get(props.notebookId)
-  user.value = await managedApi.restUserController.getUserProfile()
-}
-const addDays = (date: Date, days: number = 0): Date => {
-  const result = new Date(date)
-  result.setDate(result.getDate() + days)
-  return result
+  certificate.value = await managedApi.restCertificateController.getCertificate(
+    props.notebookId ? props.notebookId : 0
+  )
 }
 const padZero = (num: number): string => {
   return num.toString().padStart(2, "0")
@@ -60,16 +74,7 @@ const formatDate = (date: Date): string => {
   return `${theYear}-${theMonth}-${theDate}`
 }
 onMounted(() => {
-  fetchData().then(() => {
-    const now = new Date()
-    issueDate.value = formatDate(now)
-    const expiringInDays = addDays(
-      now,
-      365
-      //notebook.value?.notebookSettings.untilCertExpire
-    )
-    expiredDate.value = formatDate(expiringInDays)
-  })
+  fetchData()
 })
 </script>
 

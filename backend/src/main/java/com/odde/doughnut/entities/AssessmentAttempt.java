@@ -28,11 +28,19 @@ public class AssessmentAttempt extends EntityIdentifiedByIdOnly {
   @NotNull
   private Timestamp submittedAt;
 
+  @Column(name = "certificate_expires_at")
+  @NotNull
+  private Timestamp certificateExpiresAt;
+
   @Column(name = "answers_total")
   private int answersTotal;
 
   @Column(name = "answers_correct")
   private int answersCorrect;
+
+  public Integer getNotebookId() {
+    return getNotebook().getId();
+  }
 
   public String getNotebookTitle() {
     return getNotebook().getHeadNote().getTopicConstructor();
