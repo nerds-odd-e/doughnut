@@ -1,7 +1,7 @@
 <template>
   <div class="notebook-questions-list">
     <div v-for="note in notes">
-      <h2>{{note.noteTopic.topicConstructor}}</h2>
+      <h3>{{note.noteTopic.topicConstructor}}</h3>
       <Questions :note="note" />
     </div>
   </div>
@@ -28,3 +28,10 @@ onMounted(() => {
   fetchData()
 })
 </script>
+<style scoped>
+.notebook-questions-list > div:not(:last-child) {
+    border-bottom: 1px solid grey;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+</style>
