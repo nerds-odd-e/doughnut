@@ -57,8 +57,6 @@ export default {
   props: { question: Object },
   components: {TextArea, CheckInput, TextInput },
   data() {
-    console.log(this.question);
-    console.log(this.question.stem);
     const {
       correctAnswerIndex,
     } = this.question;
