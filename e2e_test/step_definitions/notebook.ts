@@ -142,15 +142,6 @@ Then(
   }
 )
 
-Then(
-  'I should see following notebooks waiting for approval:',
-  (datatable: DataTable) => {
-    for (let i = 0; i < datatable.rows().length; i++) {
-      // const row = datatable.rows()[i]
-      // const notebook = row[0]
-    }
-  }
-)
 When(
   'I add questions to the following notes in the notebook {string}',
   (_notebook: string, data: DataTable) => {

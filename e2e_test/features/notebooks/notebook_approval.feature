@@ -31,9 +31,8 @@ Feature: Notebook approval
     When I am logged in as an admin
     And I open certification approval page
     Then I should see following notebooks waiting for approval:
-    | Notebook name | Username            | Approve |
-    | TDD           | old_learner         | Approve |
-    | GIT           | another_old_learner | Approve |
+    | TDD           |
+    | GIT           |
 
   Scenario: Approved notebook is removed from approval list
       Given following notebooks have pending approval:

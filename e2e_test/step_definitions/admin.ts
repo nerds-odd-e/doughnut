@@ -194,3 +194,15 @@ Then(
       .listDoesNotContain(notebook)
   }
 )
+
+Then(
+  'I should see following notebooks waiting for approval:',
+  (notebooks: DataTable) => {
+    notebooks.raw().forEach((notebookRaw: string[]) => {
+      start
+        .goToAdminDashboard()
+        .goToCertificationRequestPage()
+        .listContains(notebookRaw[0]!)
+    })
+  }
+)
