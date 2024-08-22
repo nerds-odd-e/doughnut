@@ -12,5 +12,5 @@ export default () => ({
       .parent()
       .findByText(question)
       .should('exist')
-  }
+  },
 })

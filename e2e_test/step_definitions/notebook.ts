@@ -142,7 +142,6 @@ Then(
   }
 )
 
-
 Then(
   'I should see following notebooks waiting for approval:',
   (datatable: DataTable) => {
@@ -156,15 +155,13 @@ When(
   'I add questions to the following notes in the notebook {string}',
   (_notebook: string, data: DataTable) => {
     data.rows().forEach((row) => {
-      start
-        .jumpToNotePage(row[0] as string)
-        .addQuestion({
-          Stem: row[1] as string,
-          'Choice 0': 'yes',
-          'Choice 1': 'no',
-          'Choice 2': 'maybe',
-          'Correct Choice Index': '0',
-        })
+      start.jumpToNotePage(row[0] as string).addQuestion({
+        Stem: row[1] as string,
+        'Choice 0': 'yes',
+        'Choice 1': 'no',
+        'Choice 2': 'maybe',
+        'Correct Choice Index': '0',
+      })
     })
   }
 )
@@ -172,17 +169,16 @@ Then(
   'I should see that there are no questions for {string} for the following topics:',
   (notebook: string, topics: DataTable) => {
     const notebookQuestionsPage = start
-    .routerToNotebooksPage()
-    .openNotebookQuestions(notebook)
+      .routerToNotebooksPage()
+      .openNotebookQuestions(notebook)
     topics.rows().forEach((topic: string[]) => {
       const topicName = topic[0]!
-      notebookQuestionsPage
-        .expectNoQuestionsForTopic(topicName)
+      notebookQuestionsPage.expectNoQuestionsForTopic(topicName)
     })
   }
 )
 Then(
-  "I should see the following questions for the topics in the notebook {string}:",
+  'I should see the following questions for the topics in the notebook {string}:',
   (notebook: string, topics: DataTable) => {
     const notebookQuestionsPage = start
       .routerToNotebooksPage()
