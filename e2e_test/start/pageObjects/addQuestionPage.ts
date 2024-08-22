@@ -1,5 +1,4 @@
 export const addQuestionPage = () => {
-  cy.findByRole('button', { name: 'Add Question' }).click()
   return {
     fillQuestion(row: Record<string, string>) {
       cy.findByRole('button', { name: '+' }).click()

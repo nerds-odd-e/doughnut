@@ -26,3 +26,15 @@ Feature: Notebook questions
     And I should see that there are no questions for "LeSS in Action" for the following topics:
       | Topic |
       | management  |
+
+  Scenario: Add question to child note
+    When I add the following question for the note "team" of notebook "LeSS in Action":
+      | Stem             | Choice 0 | Choice 1 | Choice 2 | Correct Choice Index |
+      | Who is the team? | Us       | Them     | No one   | 0                    |
+    Then I should see the following questions for the topics in the notebook "LeSS in Action":
+      | Topic | Question         |
+      | team  | Who is the team? |
+    And I should see that there are no questions for "LeSS in Action" for the following topics:
+      | Topic      |
+      | tech       |
+      | management |

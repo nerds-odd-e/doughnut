@@ -2,7 +2,10 @@ import { addQuestionPage } from './addQuestionPage'
 
 export const questionListPage = () => {
   return {
-    addQuestionPage,
+    addQuestionPage: () => {
+      cy.findByRole('button', { name: 'Add Question' }).click()
+      return addQuestionPage()
+    },
     expectQuestion(expectedQuestions: Record<string, string>[]) {
       expectedQuestions.forEach((row) => {
         cy.findByText(row.Question!)
