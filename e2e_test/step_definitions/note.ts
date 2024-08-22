@@ -539,29 +539,3 @@ Then('the question in the form becomes:', (data: DataTable) => {
     }
   )
 })
-
-When(
-  'I add questions to the following notes in the notebook {string}',
-  (_notebook: string, data: DataTable) => {
-    data.rows().forEach((row) => {
-      start.jumpToNotePage(row[0] as string).addQuestion({
-        Stem: row[1] as string,
-        'Choice 0': 'yes',
-        'Choice 1': 'no',
-        'Choice 2': 'maybe',
-        'Correct Choice Index': '0',
-      })
-    })
-  }
-)
-// When I add questions to the following notes in the notebook "LeSS in Action"
-// | Topic | Question                | Answer                |
-// | team  | Who is the team?        | The team is ...       |
-// | tech  | What is the technology? | The technology is ... |
-// Then I should see the following questions for the topics:
-// | Topic | Question                | Answer                |
-// | team  | Who is the team?        | The team is ...       |
-// | tech  | What is the technology? | The technology is ... |
-// And I should see that there are no questions for the following topics:
-// | Topic |
-// | management  |

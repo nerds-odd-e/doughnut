@@ -163,3 +163,36 @@ Then(
     }
   }
 )
+When(
+  'I add questions to the following notes in the notebook {string}',
+  (_notebook: string, data: DataTable) => {
+    data.rows().forEach((row) => {
+      start
+        .jumpToNotePage(row[0] as string)
+        .addQuestion({
+          Stem: row[1] as string,
+          'Choice 0': 'yes',
+          'Choice 1': 'no',
+          'Choice 2': 'maybe',
+          'Correct Choice Index': '0',
+        })
+    })
+  }
+)
+Then(
+  "I should see the following questions for the topics in the notebook {string}:",
+  (notebook: string, topics: DataTable) => {
+    topics.rows().forEach((topic: string[]) => {
+      const topicName = topic[0]!
+      const question = topic[1]!
+      start
+        .routerToNotebooksPage()
+        .openNotebookQuestions(notebook)
+        .expectOnlyQuestionsForTopic(topicName, question)
+    })
+  }
+)
+// Then I should see the following questions for the topics in the notebook "LeSS in Action":
+// | Topic | Question                |
+// | team  | Who is the team?        |
+// | tech  | What is the technology? |
