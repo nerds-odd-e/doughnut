@@ -21,7 +21,7 @@
           title="View Certificate"
           v-if="assessmentResult?.attempt?.isPass"
         >
-          <CertificatePopup :assessment-attempt="assessmentResult.attempt" :notebook-id="props.notebookId"></CertificatePopup>
+          <CertificatePopup :assessment-attempt="assessmentResult.attempt" :notebook-id="certificate?.notebook?.id"></CertificatePopup>
         </PopButton>
         <div class="alert alert-danger" v-else>
           You have not passed the assessment.
@@ -38,6 +38,7 @@ import {
   QuizQuestion,
   AnswerSubmission,
   AssessmentResult,
+  Certificate,
 } from "@/generated/backend"
 import { useRouter } from "vue-router"
 import QuizQuestionComp from "@/components/review/QuizQuestion.vue"
@@ -58,6 +59,7 @@ const errors = ref("")
 const correctAnswers = ref(0)
 const assessmentResult = ref<AssessmentResult | undefined>(undefined)
 const questionsAnswerCollection = ref<AnswerSubmission[]>([])
+const certificate = ref<Certificate>()
 
 const passCriteriaPercentage = 80
 
@@ -79,6 +81,10 @@ const questionAnswered = async (answerResult) => {
       await managedApi.restAssessmentController.submitAssessmentResult(
         props.notebookId,
         questionsAnswerCollection.value
+      )
+    certificate.value =
+      await managedApi.restCertificateController.saveCertificate(
+        props.notebookId
       )
   }
 }

@@ -88,7 +88,6 @@ export type { RedirectToNoteResponse } from './models/RedirectToNoteResponse';
 export type { ReviewPoint } from './models/ReviewPoint';
 export type { ReviewSetting } from './models/ReviewSetting';
 export type { ReviewStatus } from './models/ReviewStatus';
-export type { SaveCertificateDetails } from './models/SaveCertificateDetails';
 export type { SearchTerm } from './models/SearchTerm';
 export type { SelfEvaluation } from './models/SelfEvaluation';
 export type { SrtDto } from './models/SrtDto';

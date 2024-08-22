@@ -3,24 +3,24 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { Certificate } from '../models/Certificate';
-import type { SaveCertificateDetails } from '../models/SaveCertificateDetails';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestCertificateControllerService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
-     * @param requestBody
+     * @param notebook
      * @returns Certificate OK
      * @throws ApiError
      */
     public saveCertificate(
-        requestBody: SaveCertificateDetails,
+        notebook: number,
     ): CancelablePromise<Certificate> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/certificate',
-            body: requestBody,
-            mediaType: 'application/json',
+            url: '/api/certificate/{notebook}',
+            path: {
+                'notebook': notebook,
+            },
             errors: {
                 500: `Internal Server Error`,
             },

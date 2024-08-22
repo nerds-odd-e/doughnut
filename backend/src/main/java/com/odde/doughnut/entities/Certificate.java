@@ -1,6 +1,6 @@
 package com.odde.doughnut.entities;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,7 +12,7 @@ public class Certificate {
 
   private Notebook notebook;
 
-  private Date startDate;
+  private Timestamp startDate;
 
-  private Date expiryDate;
+  private Timestamp expiryDate;
 }

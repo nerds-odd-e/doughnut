@@ -1484,17 +1484,17 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Circle"
-  /api/certificate:
+  /api/certificate/{notebook}:
     post:
       tags:
       - rest-certificate-controller
       operationId: saveCertificate
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/SaveCertificateDetails"
+      parameters:
+      - name: notebook
+        in: path
         required: true
+        schema:
+          type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -3270,12 +3270,6 @@ components:
           maxLength: 20
           minLength: 10
           type: string
-    SaveCertificateDetails:
-      type: object
-      properties:
-        notebook:
-          type: integer
-          format: int32
     Certificate:
       type: object
       properties:
