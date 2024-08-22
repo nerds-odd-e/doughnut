@@ -76,9 +76,17 @@ Given(
   }
 )
 
-Given('there are questions for the note:', (data: DataTable) => {
-  start.testability().injectQuizQuestions(data.hashes())
-})
+Given(
+  'there are questions in the notebook {string} for the note:',
+  (notebook: string, data: DataTable) => {
+    start
+      .testability()
+      .injectQuizQuestions({
+        notebookTitle: notebook,
+        quizQuestionTestData: data.hashes(),
+      })
+  }
+)
 
 Given(
   'I add the following question for the note {string}:',
