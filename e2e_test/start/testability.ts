@@ -4,7 +4,7 @@ import { Randomization } from './../../frontend/src/generated/backend/models/Ran
 import { QuestionSuggestionParams } from '../../frontend/src/generated/backend/models/QuestionSuggestionParams'
 import ServiceMocker from '../support/ServiceMocker'
 import { NoteTestData } from './../../frontend/src/generated/backend/models/NoteTestData'
-import { QuizQuestionTestData } from './../../frontend/src/generated/backend/models/QuizQuestionTestData'
+import { QuizQuestionsTestData } from './../../frontend/src/generated/backend/models/QuizQuestionsTestData'
 
 const hourOfDay = (days: number, hours: number) => {
   return new Date(1976, 5, 1 + days, hours)
@@ -86,18 +86,16 @@ const testability = () => {
       ]
       return this.injectNotes(notes)
     },
-    injectQuizQuestions(quizQuestionTestData: QuizQuestionTestData[]) {
+    injectQuizQuestions(quizQuestionsTestData: QuizQuestionsTestData) {
       postToTestabilityApi(cy, 'inject_quiz_questions', {
-        body: {
-          quizQuestionTestData,
-        },
+        body: quizQuestionsTestData,
       }).then((response) => {
         expect(Object.keys(response.body).length).to.equal(
-          quizQuestionTestData.length
+          quizQuestionsTestData.quizQuestionTestData?.length
         )
       })
     },
-    injectYesNoQuestionsForNumberNotes(numberOfNotes: number) {
+    injectYesNoQuestionsForNumberNotes(notebook: string, numberOfNotes: number) {
       const quizQuestion: Record<string, string>[] = new Array(numberOfNotes)
         .fill(0)
         .map((_, index) => ({
@@ -107,14 +105,16 @@ const testability = () => {
           'One Wrong Choice': 'No',
           Approved: 'true',
         }))
-      return this.injectQuizQuestions(quizQuestion)
+      return this.injectQuizQuestions({
+        notebookTitle: notebook,
+        quizQuestionTestData: quizQuestion})
     },
     injectNumbersNotebookWithQuestions(
       notebook: string,
       numberOfQuestion: number
     ) {
       this.injectNumberNotes(notebook, numberOfQuestion)
-      this.injectYesNoQuestionsForNumberNotes(numberOfQuestion)
+      this.injectYesNoQuestionsForNumberNotes(notebook, numberOfQuestion)
       this.shareToBazaar(notebook)
     },
     injectLink(type: string, fromNoteTopic: string, toNoteTopic: string) {

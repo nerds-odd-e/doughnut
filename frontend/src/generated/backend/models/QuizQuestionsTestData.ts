@@ -4,6 +4,7 @@
 /* eslint-disable */
 import type { QuizQuestionTestData } from './QuizQuestionTestData';
 export type QuizQuestionsTestData = {
+    notebookTitle?: string;
     quizQuestionTestData?: Array<QuizQuestionTestData>;
 };
 

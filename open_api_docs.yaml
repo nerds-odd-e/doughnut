@@ -2797,6 +2797,8 @@ components:
     QuizQuestionsTestData:
       type: object
       properties:
+        notebookTitle:
+          type: string
         quizQuestionTestData:
           type: array
           items:
