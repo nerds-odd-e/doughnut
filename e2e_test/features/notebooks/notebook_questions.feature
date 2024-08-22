@@ -13,8 +13,7 @@ Feature: Notebook questions
     Then I should see that there are no questions for "LeSS in Action" for the following topics:
       | Topic |
       | management  |
-@skip
-@wip
+
   Scenario: View all questions in a notebook
     When I add questions to the following notes in the notebook "LeSS in Action"
       | Topic | Question                |
