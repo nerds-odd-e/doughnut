@@ -12,7 +12,7 @@
         />
       </template>
     </PopButton>
-    <table class="question-table mt-2">
+    <table class="question-table mt-2" v-if="questions.length">
       <thead>
         <tr>
           <th>Approved</th>
@@ -54,6 +54,7 @@
         </tr>
       </tbody>
     </table>
+    <b v-else>No questions</b>
   </div>
 </template>
 

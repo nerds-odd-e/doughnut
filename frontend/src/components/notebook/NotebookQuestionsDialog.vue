@@ -2,16 +2,14 @@
   <div class="notebook-questions-list">
     <div v-for="note in notes">
       <h2>{{note.noteTopic.topicConstructor}}</h2>
-      <h3 v-if="!questionsByNote[note.id]?.length">No questions</h3>
-      <ul>
-        <li v-for="question in questionsByNote[note.id]">{{ question.quizQuestion.multipleChoicesQuestion.stem }}</li>
-      </ul>
+      <Questions :note="note" />
     </div>
   </div>
 </template>
 <script setup lang="ts">
 import { onMounted, PropType, ref } from "vue"
-import { Note, Notebook, QuizQuestionAndAnswer } from "@/generated/backend"
+import { Note, Notebook } from "@/generated/backend"
+import Questions from "../notes/Questions.vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 const props = defineProps({
   notebook: {
@@ -21,15 +19,10 @@ const props = defineProps({
 })
 const managedApi = useLoadingApi().managedApi
 const notes = ref<Note[] | undefined>(undefined)
-const questionsByNote = ref<Record<number, QuizQuestionAndAnswer[]>>({})
 const fetchData = async () => {
   notes.value = await managedApi.restNotebookController.getNotes(
     props.notebook.id
   )
-  notes.value.forEach(async (note) => {
-    questionsByNote.value[note.id] =
-      await managedApi.restQuizQuestionController.getAllQuestionByNote(note.id)
-  })
 }
 onMounted(() => {
   fetchData()
