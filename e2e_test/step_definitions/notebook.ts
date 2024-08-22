@@ -141,3 +141,15 @@ Then(
       })
   }
 )
+Then(
+  'I should see that there are no questions for {string} for the following topics:',
+  (notebook: string, topics: DataTable) => {
+    topics.raw().forEach((topic: string[]) => {
+      const topicName = topic[0]!
+      start
+        .routerToNotebooksPage()
+        .openNotebookQuestions(notebook)
+        .expectNoQuestionsForTopic(topicName)
+    })
+  }
+)

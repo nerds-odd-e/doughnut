@@ -1,6 +1,6 @@
 
-  @wip 
-  @skip
+@wip 
+@skip
 Feature: Notebook questions
 
   Background:
@@ -12,10 +12,11 @@ Feature: Notebook questions
       | team  | mgmt           |
 
   Scenario: I have a notebook with no questions
-    Then I should see that there are no questions for the following topics:
+    Then I should see that there are no questions for "LeSS in Action" for the following topics:
       | Topic |
       | mgmt  |
-
+  @wip 
+  @skip
   Scenario: View all questions in a notebook
     When I add questions to the following notes in the notebook "LeSS in Action"
       | Topic | Question                | Answer                |

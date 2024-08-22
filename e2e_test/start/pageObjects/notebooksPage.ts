@@ -2,6 +2,7 @@ import NotePath from '../../support/NotePath'
 import { notebookList } from './NotebookList'
 import noteCreationForm from './noteForms/noteCreationForm'
 import { assumeNotePage } from './notePage'
+import notebookQuestionsList from './notebookQuestionsList'
 
 export const routerToNotebooksPage = () => {
   cy.pageIsNotLoading()
@@ -86,6 +87,10 @@ export const routerToNotebooksPage = () => {
     unsubscribe(notebook: string) {
       this.findNotebookCardButton(notebook, 'Unsubscribe').click()
       cy.findByRole('button', { name: 'OK' }).click()
+    },
+    openNotebookQuestions(notebook: string) {
+      this.findNotebookCardButton(notebook, 'Questions').click()
+      return notebookQuestionsList()
     },
   }
 }
