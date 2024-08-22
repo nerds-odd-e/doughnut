@@ -36,7 +36,9 @@ import { onMounted, ref } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { Notebook } from "@/generated/backend"
 import NoteTopicWithLink from "@/components/notes/NoteTopicWithLink.vue"
+import usePopups from "../commons/Popups/usePopups"
 
+const { popups } = usePopups()
 const { managedApi } = useLoadingApi()
 
 const notebooks = ref<Notebook[] | undefined>(undefined)
@@ -47,8 +49,10 @@ const fetchNotebooks = async () => {
 }
 
 const approveNoteBook = async (notebookId: number) => {
-  await managedApi.restNotebookController.approveNoteBook(notebookId)
-  fetchNotebooks()
+  if (await popups.confirm(`Are you sure you want to approve this notebook?`)) {
+    await managedApi.restNotebookController.approveNoteBook(notebookId)
+    fetchNotebooks()
+  }
 }
 onMounted(() => {
   fetchNotebooks()

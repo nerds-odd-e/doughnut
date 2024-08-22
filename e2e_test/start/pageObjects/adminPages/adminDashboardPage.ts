@@ -68,6 +68,7 @@ export function assumeAdminDashboardPage() {
             .parent()
             .findByRole('button', { name: 'Approve' })
             .click()
+          cy.findByRole('button', { name: 'OK' }).click()
         },
         listIsEmpty() {
           cy.findByText('No certification request found.')

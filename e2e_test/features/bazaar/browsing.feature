@@ -32,7 +32,6 @@ Feature: Bazaar browsing
     And I request for an approval for notebooks:
       | Grape           |
     Then I should see following notebooks waiting for approval:
-    | Notebook name | Username            | Approve |
-    | Grape         | admin               | Approve |
+    | Grape         |
     And I approve notebook "Grape"
     Then I should see a certification icon on the "Grape" notebook card
