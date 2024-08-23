@@ -91,12 +91,10 @@ const questionAnswered = async (answerResult) => {
         props.notebookId,
         questionsAnswerCollection.value
       )
-    if (generatesCertificate.value) {
-      certificate.value =
-        await managedApi.restCertificateController.saveCertificate(
-          props.notebookId
-        )
-    }
+    certificate.value =
+      await managedApi.restCertificateController.saveCertificate(
+        props.notebookId
+      )
   }
 }
 
