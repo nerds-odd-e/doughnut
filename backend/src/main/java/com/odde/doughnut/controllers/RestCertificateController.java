@@ -3,7 +3,6 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.entities.Certificate;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -37,7 +36,9 @@ public class RestCertificateController {
   @Transactional
   public Certificate saveCertificate(@PathVariable @Schema(type = "integer") Notebook notebook) {
     Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
-    Timestamp expiryDate = TimestampOperations.addHoursToTimestamp(now, oneYearInHours);
+    Timestamp expiryDate =
+        Timestamp.valueOf(
+            now.toLocalDateTime().plus(notebook.getNotebookSettings().getCertificateExpiry()));
 
     Certificate old_cert =
         modelFactoryService.certificateRepository.findFirstByUserAndNotebook(
