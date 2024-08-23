@@ -63,17 +63,23 @@ public class RestCertificateControllerTests {
   @Nested
   class GetCertificate {
     private Notebook notebook;
-    private Certificate cert;
+    private Certificate expectedCertificate;
 
     @BeforeEach
     void setup() {
       notebook = makeMe.aNote("Just say 'Yes'").creatorAndOwner(currentUser).please().getNotebook();
-      cert = controller.saveCertificate(notebook);
+      expectedCertificate = makeMe.aCertificate(notebook, currentUser, currentTime).please();
     }
 
     @Test
-    void ShouldReturnCompleteCertificateData() {
-      Certificate cert = controller.getCertificate(notebook);
+    void ReturnsACertificate() {
+      Certificate c =
+          new Certificate() {
+            {
+              id = expectedCertificate.getId();
+            }
+          };
+      Certificate cert = controller.getCertificate(notebook, expectedCertificate);
       assertEquals(currentUser.getEntity(), cert.getUser());
       assertEquals(notebook, cert.getNotebook());
       assertEquals(currentTime, cert.getStartDate());
