@@ -15,14 +15,12 @@ Feature: Certification expiration
     When I Complete an assessment in "Certified thing"
     Then I should see that the certificate of "Certified thing" assesment expires on "2026-01-01"
 
-  Scenario: Existing certificate expiry is changed
+  Scenario: Existing certificate expiry is not changed
     Given Expiration of "Certified thing" is set to "2y"
     And I Complete an assessment in "Certified thing"
     When Expiration of "Certified thing" is set to "3y"
-    And I Complete an assessment in "Certified thing"
     Then list should contain certificates
       |Notebook         |Expiry Date  |
       |Certified thing  |2026-01-01   |
-      |Certified thing  |2027-01-01   |
 
 

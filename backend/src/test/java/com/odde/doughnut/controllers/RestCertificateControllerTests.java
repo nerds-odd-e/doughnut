@@ -79,7 +79,7 @@ public class RestCertificateControllerTests {
               id = expectedCertificate.getId();
             }
           };
-      Certificate cert = controller.getCertificate(notebook, expectedCertificate);
+      Certificate cert = controller.getCertificate(notebook);
       assertEquals(currentUser.getEntity(), cert.getUser());
       assertEquals(notebook, cert.getNotebook());
       assertEquals(currentTime, cert.getStartDate());
@@ -98,7 +98,7 @@ public class RestCertificateControllerTests {
       testabilitySettings.timeTravelTo(newStartDate);
       Certificate certLater = controller.saveCertificate(notebook);
       assertEquals(currentTimeAtStart, certLater.getStartDate());
-      assertEquals(cert.getId(), certLater.getId());
+      assertEquals(expectedCertificate.getId(), certLater.getId());
     }
   }
 }

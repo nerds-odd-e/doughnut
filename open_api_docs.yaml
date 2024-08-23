@@ -3363,7 +3363,6 @@ components:
           type: boolean
     AssessmentAttempt:
       required:
-      - certificateExpiresAt
       - id
       - submittedAt
       type: object
@@ -3378,9 +3377,6 @@ components:
           format: date-time
         isPass:
           type: boolean
-        certificateExpiresAt:
-          type: string
-          format: date-time
         answersTotal:
           type: integer
           format: int32

@@ -8,6 +8,8 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import java.sql.Timestamp;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,8 +39,10 @@ public class RestCertificateController {
   public Certificate saveCertificate(@PathVariable @Schema(type = "integer") Notebook notebook) {
     Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
     Timestamp expiryDate =
-        Timestamp.valueOf(
-            now.toLocalDateTime().plus(notebook.getNotebookSettings().getCertificateExpiry()));
+        Timestamp.from(
+            ZonedDateTime.ofInstant(now.toInstant(), ZoneOffset.UTC.normalized())
+                .plus(notebook.getNotebookSettings().getCertificateExpiry())
+                .toInstant());
 
     Certificate old_cert =
         modelFactoryService.certificateRepository.findFirstByUserAndNotebook(

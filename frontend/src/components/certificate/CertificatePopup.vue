@@ -43,8 +43,32 @@ const props = defineProps({
 const { managedApi } = useLoadingApi()
 const certificate = ref<Certificate | undefined>(undefined)
 
-const issueDate = computed(() => certificate.value?.startDate.split("T")[0])
-const expiredDate = computed(() => certificate.value?.expiryDate.split("T")[0])
+const issueDate = computed(() =>
+  formatDate(
+    new Date(
+      certificate.value?.startDate ? certificate.value?.startDate : Date.now()
+    )
+  )
+)
+
+const expiredDate = computed(() =>
+  formatDate(
+    new Date(
+      certificate.value?.expiryDate ? certificate.value?.expiryDate : Date.now()
+    )
+  )
+)
+
+const padZero = (num: number): string => {
+  return num.toString().padStart(2, "0")
+}
+const formatDate = (date: Date): string => {
+  const theYear = date.getFullYear()
+  const theMonth = padZero(date.getMonth() + 1)
+  const theDate = padZero(date.getDate())
+  return `${theYear}-${theMonth}-${theDate}`
+}
+
 const fetchData = async () => {
   certificate.value = await managedApi.restCertificateController.getCertificate(
     props.notebookId
