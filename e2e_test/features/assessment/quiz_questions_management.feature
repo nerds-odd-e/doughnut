@@ -28,6 +28,20 @@ Feature: Quiz Question Management
       | Why do cows have hooves instead of feet? | Because they lactose! | Woof!    | What?    | 0                    |
     Then I can request approval for the notebook "The cow joke"
 
+  Scenario: Can delete question
+    Given I am logged in as an admin
+    And I have a notebook with the head note "The cow joke"
+    And I add the following question for the note "The cow joke":
+      | Stem                                     | Choice 0              | Choice 1 | Choice 2 | Correct Choice Index |
+      | Why do cows have hooves instead of feet? | Because they lactose! | Woof!    | What?    | 0                    |
+    And I add the following question for the note "The cow joke":
+      | Stem                                 | Choice 0    | Choice 1 | Choice 2 | Correct Choice Index |
+      | What do you call a cow with not leg? | Ground beef | Cowboy   | Oxford   | 0                    |
+    When I click on the delete button for question "Why do cows have hooves instead of feet?" for note "The cow joke"
+    Then I should see the questions in the question list of the note "The cow joke":
+      | Question                             | Correct Choice |
+      | What do you call a cow with not leg? | Ground beef    |
+
   @usingMockedOpenAiService
   Scenario: Can generate the question by AI
     Given OpenAI now generates this question:

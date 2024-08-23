@@ -96,6 +96,13 @@ Given(
   }
 )
 
+When(
+  'I click on the delete button for question {string} for note {string}',
+  (question: string, noteTopic: string) => {
+    start.jumpToNotePage(noteTopic).deleteQuestion(question)
+  }
+)
+
 Given(
   'I refine the following question for the note {string}:',
   (noteTopic: string, data: DataTable) => {

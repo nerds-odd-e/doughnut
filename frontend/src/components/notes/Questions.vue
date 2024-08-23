@@ -15,6 +15,7 @@
     <table class="question-table mt-2" v-if="questions.length">
       <thead>
         <tr>
+          <th>edit</th>
           <th>Approved</th>
           <th>Question Text</th>
           <th>A</th>
@@ -28,6 +29,9 @@
           v-for="(question, outerIndex) in questions"
           :key="question.quizQuestion.multipleChoicesQuestion.stem"
         >
+          <td>
+            <button @click="removeQuestion(question.id)">delete</button>
+          </td>
           <td>
             <input
               :id="'checkbox-' + outerIndex"
@@ -56,42 +60,58 @@
     </table>
     <div v-else class="no-questions">
       <b >No questions</b>
-    </div> 
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { PropType, onMounted, ref } from "vue"
+import { onMounted, PropType, ref } from "vue"
 import { Note, QuizQuestionAndAnswer } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import NoteAddQuestion from "./NoteAddQuestion.vue"
 import PopButton from "../commons/Popups/PopButton.vue"
 
 const { managedApi } = useLoadingApi()
+
 const props = defineProps({
   note: {
     type: Object as PropType<Note>,
     required: true,
   },
 })
+
 const questions = ref<QuizQuestionAndAnswer[]>([])
+
 const fetchQuestions = async () => {
   questions.value =
     await managedApi.restQuizQuestionController.getAllQuestionByNote(
       props.note.id
     )
 }
+
 const questionAdded = (newQuestion: QuizQuestionAndAnswer) => {
   if (newQuestion == null) {
     return
   }
   questions.value.push(newQuestion)
 }
+
 const toggleApproval = async (questionId?: number) => {
   if (questionId) {
     await managedApi.restQuizQuestionController.toggleApproval(questionId)
   }
 }
+
+const removeQuestion = (questionId: number) => {
+  managedApi.restQuizQuestionController
+    .removeQuestion(props.note.id, questionId)
+    .then(() => {
+      questions.value = questions.value.filter((question) => {
+        return question.id !== questionId
+      })
+    })
+}
+
 onMounted(() => {
   fetchQuestions()
 })
