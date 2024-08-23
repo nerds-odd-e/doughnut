@@ -205,18 +205,20 @@ class RestNotebookControllerTest {
     void setup() {
       UserModel userModel = makeMe.anAdmin().toModelPlease();
       notebook = makeMe.aNote().creatorAndOwner(userModel).please().getNotebook();
+      controller = new RestNotebookController(modelFactoryService, userModel, testabilitySettings);
+
       makeMe.refresh(notebook);
     }
 
     @Test
-    void shouldReturnPendingRequestNotebooks() {
+    void shouldReturnPendingRequestNotebooks() throws UnexpectedNoAccessRightException {
       notebook.setApprovalStatus(ApprovalStatus.PENDING);
       List<Notebook> result = controller.getAllPendingRequestNotebooks();
       assertThat(result, hasSize(1));
     }
 
     @Test
-    void shouldNotReturnApprovedNotebooks() {
+    void shouldNotReturnApprovedNotebooks() throws UnexpectedNoAccessRightException {
       notebook.setApprovalStatus(ApprovalStatus.APPROVED);
       List<Notebook> result = controller.getAllPendingRequestNotebooks();
       assertThat(result, hasSize(0));

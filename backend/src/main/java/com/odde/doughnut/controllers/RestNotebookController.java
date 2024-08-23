@@ -133,7 +133,10 @@ class RestNotebookController {
   }
 
   @GetMapping("/getAllPendingRequestNoteBooks")
-  public List<Notebook> getAllPendingRequestNotebooks() {
+  public List<Notebook> getAllPendingRequestNotebooks() throws UnexpectedNoAccessRightException {
+
+    currentUser.assertAdminAuthorization();
+
     // Fetch all pending request notebooks as an Iterable
     var notebooksIterable = modelFactoryService.notebookRepository.findAll();
     return StreamSupport.stream(notebooksIterable.spliterator(), false)
@@ -149,6 +152,7 @@ class RestNotebookController {
   public Notebook approveNoteBook(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
+    currentUser.assertAdminAuthorization();
     notebook.setApprovalStatus(ApprovalStatus.APPROVED);
     modelFactoryService.save(notebook);
     return notebook;
