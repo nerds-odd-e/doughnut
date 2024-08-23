@@ -23,3 +23,14 @@ Feature: View my assessment history
   Scenario: Get certificate for another assessment
     When I get score 2/2 when do the assessment on "Also say 'Yes'"
     Then I can view certificate of "Also say 'Yes'" for "Old Learner" from "Old Learner" in my assessment history
+
+  @skip
+  Scenario: Get certificate list
+    Given I have following assesments done:
+    | Just say 'Yes'  |
+    | Just say 'Yes'  |
+    | Also say 'Yes'  |
+
+    When I filter my certificates
+    And notebook names "Just say 'Yes'"
+    Then I only see my list of certificates for "Just say 'Yes'"
