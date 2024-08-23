@@ -12,16 +12,19 @@ Given('I am logged in as {string}', (externalIdentifier: string) => {
   if (externalIdentifier === 'none') {
     return
   }
+  cy.pageIsNotLoading()
   cy.loginAs(externalIdentifier)
 })
 
 Given('I am logged in as an existing user', () => {
   cy.logout()
+  cy.pageIsNotLoading()
   cy.loginAs('old_learner')
 })
 
 Given('I am logged in as another existing user', () => {
   cy.logout()
+  cy.pageIsNotLoading()
   cy.loginAs('another_old_learner')
 })
 
