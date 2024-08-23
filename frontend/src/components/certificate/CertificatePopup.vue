@@ -43,36 +43,14 @@ const props = defineProps({
 const { managedApi } = useLoadingApi()
 const certificate = ref<Certificate | undefined>(undefined)
 
-const issueDate = computed(() =>
-  formatDate(
-    new Date(
-      props.assessmentAttempt ? props.assessmentAttempt.submittedAt : Date.now()
-    )
-  )
-)
-const expiredDate = computed(() =>
-  formatDate(
-    new Date(
-      props.assessmentAttempt && props.assessmentAttempt.certificateExpiresAt
-        ? props.assessmentAttempt.certificateExpiresAt
-        : Date.now()
-    )
-  )
-)
+const issueDate = computed(() => certificate.value?.startDate.split("T")[0])
+const expiredDate = computed(() => certificate.value?.expiryDate.split("T")[0])
 const fetchData = async () => {
   certificate.value = await managedApi.restCertificateController.getCertificate(
-    props.notebookId ? props.notebookId : 0
+    props.notebookId
   )
 }
-const padZero = (num: number): string => {
-  return num.toString().padStart(2, "0")
-}
-const formatDate = (date: Date): string => {
-  const theYear = date.getFullYear()
-  const theMonth = padZero(date.getMonth() + 1)
-  const theDate = padZero(date.getDate())
-  return `${theYear}-${theMonth}-${theDate}`
-}
+
 onMounted(() => {
   fetchData()
 })
