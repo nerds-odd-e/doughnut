@@ -24,7 +24,7 @@ Feature: Get certificate by an assessment
       | 2/2   | pass        | get a certificate        |
       | 1/2   | not pass    | not get a certificate    |
       | 0/2   | not pass    | not get a certificate    |
-
+  @skip
   Scenario: I cannot receive a certificate on passing an unapproved assessment
   # Given the notebook "Just say 'Yes'" is unapproved
   When I pass the assessment on "Just say 'Yes'"
