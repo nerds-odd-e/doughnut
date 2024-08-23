@@ -32,7 +32,8 @@ public class RestCertificateControllerTests {
     currentTime = makeMe.aTimestamp().please();
     testabilitySettings.timeTravelTo(currentTime);
     currentUser = makeMe.aUser().toModelPlease();
-    controller = new RestCertificateController(currentUser, this.testabilitySettings);
+    controller =
+        new RestCertificateController(currentUser, testabilitySettings, makeMe.modelFactoryService);
   }
 
   // Create a nested test class for the getCertificate method
@@ -66,6 +67,7 @@ public class RestCertificateControllerTests {
     @BeforeEach
     void setup() {
       notebook = makeMe.aNote("Just say 'Yes'").creatorAndOwner(currentUser).please().getNotebook();
+      controller.saveCertificate(notebook);
     }
 
     @Test
@@ -80,10 +82,9 @@ public class RestCertificateControllerTests {
       assertEquals(expiryDate, cert.getExpiryDate());
     }
 
+    @Test
     void SaveTwiceGetOriginalStartDate() {
       Timestamp currentTimeAtStart = currentTime;
-      Certificate cert = controller.saveCertificate(notebook);
-      assertEquals(currentTimeAtStart, cert.getStartDate());
       Timestamp newStartDate =
           TimestampOperations.addHoursToTimestamp(new Timestamp(currentTime.getTime()), 8760);
       testabilitySettings.timeTravelTo(newStartDate);

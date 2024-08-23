@@ -2,12 +2,14 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.Certificate;
 import com.odde.doughnut.entities.Notebook;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import java.sql.Timestamp;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,21 +21,36 @@ public class RestCertificateController {
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
-  public RestCertificateController(UserModel currentUser, TestabilitySettings testabilitySettings) {
+  private final ModelFactoryService modelFactoryService;
+
+  public RestCertificateController(
+      UserModel currentUser,
+      TestabilitySettings testabilitySettings,
+      ModelFactoryService modelFactoryService) {
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
+    this.modelFactoryService = modelFactoryService;
   }
 
   @PostMapping("/{notebook}")
+  @Transactional
   public Certificate saveCertificate(@PathVariable @Schema(type = "integer") Notebook notebook) {
     Certificate certificate = new Certificate();
     certificate.setUser(this.currentUser.getEntity());
     certificate.setNotebook(notebook);
     // Set start date to current time
     Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
-    certificate.setStartDate(now);
     // Hard code expiry date to 1 year from current time
     certificate.setExpiryDate(TimestampOperations.addHoursToTimestamp(now, 8760));
+    Certificate old_cert =
+        modelFactoryService.certificateRepository.findByUserAndNotebook(
+            currentUser.getEntity(), notebook);
+    if (old_cert != null) {
+      certificate.setStartDate(old_cert.getStartDate());
+    } else {
+      certificate.setStartDate(now);
+    }
+    modelFactoryService.save(certificate);
     return certificate;
   }
 

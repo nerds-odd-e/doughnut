@@ -5,9 +5,10 @@
 import type { Notebook } from './Notebook';
 import type { User } from './User';
 export type Certificate = {
+    id: number;
     user?: User;
     notebook?: Notebook;
-    startDate?: string;
-    expiryDate?: string;
+    startDate: string;
+    expiryDate: string;
 };
 

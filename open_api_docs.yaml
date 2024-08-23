@@ -3318,8 +3318,15 @@ components:
           minLength: 10
           type: string
     Certificate:
+      required:
+      - expiryDate
+      - id
+      - startDate
       type: object
       properties:
+        id:
+          type: integer
+          format: int32
         user:
           $ref: "#/components/schemas/User"
         notebook:
