@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/certificate")
 public class RestCertificateController {
 
+  public static final int oneYearInHours = 8760;
   private final UserModel currentUser;
 
   @Resource(name = "testabilitySettings")
@@ -35,35 +36,30 @@ public class RestCertificateController {
   @PostMapping("/{notebook}")
   @Transactional
   public Certificate saveCertificate(@PathVariable @Schema(type = "integer") Notebook notebook) {
+    Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
+    Timestamp expiryDate = TimestampOperations.addHoursToTimestamp(now, oneYearInHours);
+
+    Certificate old_cert =
+        modelFactoryService.certificateRepository.findFirstByUserAndNotebook(
+            currentUser.getEntity(), notebook);
+    if (old_cert != null) {
+      old_cert.setExpiryDate(expiryDate);
+      modelFactoryService.save(old_cert);
+      return old_cert;
+    }
+
     Certificate certificate = new Certificate();
     certificate.setUser(this.currentUser.getEntity());
     certificate.setNotebook(notebook);
-    // Set start date to current time
-    Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
-    // Hard code expiry date to 1 year from current time
-    certificate.setExpiryDate(TimestampOperations.addHoursToTimestamp(now, 8760));
-    Certificate old_cert =
-        modelFactoryService.certificateRepository.findByUserAndNotebook(
-            currentUser.getEntity(), notebook);
-    if (old_cert != null) {
-      certificate.setStartDate(old_cert.getStartDate());
-    } else {
-      certificate.setStartDate(now);
-    }
+    certificate.setExpiryDate(expiryDate);
+    certificate.setStartDate(now);
     modelFactoryService.save(certificate);
     return certificate;
   }
 
   @GetMapping("/{notebook}")
   public Certificate getCertificate(@PathVariable @Schema(type = "integer") Notebook notebook) {
-    Certificate certificate = new Certificate();
-    certificate.setUser(this.currentUser.getEntity());
-    certificate.setNotebook(notebook);
-    // Set start date to current time
-    Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
-    certificate.setStartDate(now);
-    // Hard code expiry date to 1 year from current time
-    certificate.setExpiryDate(TimestampOperations.addHoursToTimestamp(now, 8760));
-    return certificate;
+    return modelFactoryService.certificateRepository.findFirstByUserAndNotebook(
+        currentUser.getEntity(), notebook);
   }
 }

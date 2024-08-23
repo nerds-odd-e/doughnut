@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import static com.odde.doughnut.controllers.RestCertificateController.oneYearInHours;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.odde.doughnut.entities.Certificate;
@@ -36,7 +37,6 @@ public class RestCertificateControllerTests {
         new RestCertificateController(currentUser, testabilitySettings, makeMe.modelFactoryService);
   }
 
-  // Create a nested test class for the getCertificate method
   @Nested
   class SaveCertificate {
 
@@ -53,9 +53,9 @@ public class RestCertificateControllerTests {
       assertEquals(currentUser.getEntity(), cert.getUser());
       assertEquals(notebook, cert.getNotebook());
       assertEquals(currentTime, cert.getStartDate());
-      // Set expiry date to 1 year from current time
       Timestamp expiryDate =
-          TimestampOperations.addHoursToTimestamp(new Timestamp(currentTime.getTime()), 8760);
+          TimestampOperations.addHoursToTimestamp(
+              new Timestamp(currentTime.getTime()), oneYearInHours);
       assertEquals(expiryDate, cert.getExpiryDate());
     }
   }
@@ -63,11 +63,12 @@ public class RestCertificateControllerTests {
   @Nested
   class GetCertificate {
     private Notebook notebook;
+    private Certificate cert;
 
     @BeforeEach
     void setup() {
       notebook = makeMe.aNote("Just say 'Yes'").creatorAndOwner(currentUser).please().getNotebook();
-      controller.saveCertificate(notebook);
+      cert = controller.saveCertificate(notebook);
     }
 
     @Test
@@ -76,9 +77,9 @@ public class RestCertificateControllerTests {
       assertEquals(currentUser.getEntity(), cert.getUser());
       assertEquals(notebook, cert.getNotebook());
       assertEquals(currentTime, cert.getStartDate());
-      // Set expiry date to 1 year from current time
       Timestamp expiryDate =
-          TimestampOperations.addHoursToTimestamp(new Timestamp(currentTime.getTime()), 8760);
+          TimestampOperations.addHoursToTimestamp(
+              new Timestamp(currentTime.getTime()), oneYearInHours);
       assertEquals(expiryDate, cert.getExpiryDate());
     }
 
@@ -86,10 +87,12 @@ public class RestCertificateControllerTests {
     void SaveTwiceGetOriginalStartDate() {
       Timestamp currentTimeAtStart = currentTime;
       Timestamp newStartDate =
-          TimestampOperations.addHoursToTimestamp(new Timestamp(currentTime.getTime()), 8760);
+          TimestampOperations.addHoursToTimestamp(
+              new Timestamp(currentTime.getTime()), oneYearInHours);
       testabilitySettings.timeTravelTo(newStartDate);
       Certificate certLater = controller.saveCertificate(notebook);
       assertEquals(currentTimeAtStart, certLater.getStartDate());
+      assertEquals(cert.getId(), certLater.getId());
     }
   }
 }
