@@ -32,7 +32,7 @@ describe("assessment page", () => {
     it("calls API ONCE on mount", async () => {
       helper
         .component(AssessmentPage)
-        .withProps({ notebookId: notebook.id })
+        .withProps({ notebookId: notebook.id, approvalStatus: "NOT_APPROVED" })
         .render()
       expect(
         helper.managedApi.restAssessmentController.generateAssessmentQuestions
@@ -42,7 +42,7 @@ describe("assessment page", () => {
     it("renders the questions", async () => {
       helper
         .component(AssessmentPage)
-        .withProps({ notebookId: notebook.id })
+        .withProps({ notebookId: notebook.id, approvalStatus: "NOT_APPROVED" })
         .render()
       await screen.findByText(quizQuestion.multipleChoicesQuestion.stem!)
     })
@@ -50,7 +50,7 @@ describe("assessment page", () => {
     it("does not display score immediately after rendering", async () => {
       const { html } = helper
         .component(AssessmentPage)
-        .withProps({ notebookId: notebook.id })
+        .withProps({ notebookId: notebook.id, approvalStatus: "NOT_APPROVED" })
         .render()
 
       expect(html()).not.toContain("score:")
@@ -88,7 +88,7 @@ describe("assessment page", () => {
     it("should submit assessment result when answer all questions", async () => {
       const wrapper = helper
         .component(AssessmentPage)
-        .withProps({ notebookId: notebook.id })
+        .withProps({ notebookId: notebook.id, approvalStatus: "NOT_APPROVED" })
         .render()
       await flushPromises()
       ;(await wrapper.findByRole("button", { name: "answer1" })).click()
