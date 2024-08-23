@@ -9,9 +9,10 @@ Feature: Get certificate by an assessment
     And there is an assessment on notebook "Just say 'Yes'" with 2 questions
 
   Scenario Outline: I should pass the assessment when I get score more than 80%
+    Given I am logged in as "another_old_learner"
     When I get score <Score> when do the assessment on "Just say 'Yes'"
     Then I should <Pass or not> the assessment of "Just say 'Yes'"
-    And I should <Get a certificate or not> of "Just say 'Yes'" for "Old Learner" from "Old Learner"
+    And I should <Get a certificate or not> of "Just say 'Yes'" for "Another Old Learner" from "Old Learner"
 
     Examples:
       | Score | Pass or not | Get a certificate or not |

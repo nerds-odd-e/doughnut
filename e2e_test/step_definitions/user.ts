@@ -8,6 +8,7 @@ import { DataTable } from '@cucumber/cucumber'
 import start from '../start'
 
 Given('I am logged in as {string}', (externalIdentifier: string) => {
+  cy.logout()
   if (externalIdentifier === 'none') {
     return
   }
@@ -15,6 +16,7 @@ Given('I am logged in as {string}', (externalIdentifier: string) => {
 })
 
 Given('I am logged in as an existing user', () => {
+  cy.logout()
   cy.loginAs('old_learner')
 })
 
