@@ -17,6 +17,8 @@
           You have passed the assessment.
         </div>
         <PopButton
+          :disabled="certificateButtonDisabled"
+          disabledTitle="This notebook does not award a certificate."
           btn-class="btn btn-light"
           title="View Certificate"
           v-if="assessmentResult?.attempt?.isPass"
@@ -48,11 +50,18 @@ const { managedApi } = useLoadingApi()
 const router = useRouter()
 const props = defineProps({
   notebookId: { type: Number, required: true },
+  approvalStatus: { type: String, required: true },
 })
+
 const { popups } = usePopups()
 const topicConstructor = computed(() => {
   return router.currentRoute.value.query?.topic
 })
+
+const certificateButtonDisabled = computed(() => {
+  return props.approvalStatus !== "APPROVED"
+})
+
 const quizQuestions = ref<QuizQuestion[]>([])
 const currentQuestion = ref(0)
 const errors = ref("")

@@ -70,6 +70,12 @@ export const assumeAssessmentPage = (notebook?: string) => {
     expectNoCertificate() {
       cy.findByText('View Certificate').should('not.exist')
     },
+    expectCertificateCannotBeObtained() {
+      cy.findByRole('button', { name: 'View Certificate' }).should(
+        'have.class',
+        'disabled'
+      )
+    },
     expectReachedLimit() {
       cy.findByText(
         'You have reached the assessment limit for today. Please try again tomorrow.'

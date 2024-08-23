@@ -77,6 +77,15 @@ When(
   }
 )
 
+When('I pass the assessment on {string}', (notebook: string) => {
+  start.navigateToBazaar().selfAssessmentOnNotebook(notebook)
+  start.assumeAssessmentPage(notebook).answerYesNoQuestionsToScore(2, 2)
+})
+
+Then('I cannot download a certificate after passing an assessment', () => {
+  start.assumeAssessmentPage().expectCertificateCannotBeObtained()
+})
+
 Then('I should pass the assessment of {string}', (notebook: string) => {
   start.assumeAssessmentPage(notebook).passAssessment()
 })

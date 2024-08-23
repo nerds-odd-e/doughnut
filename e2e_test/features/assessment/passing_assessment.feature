@@ -9,6 +9,12 @@ Feature: Get certificate by an assessment
     And there is an assessment on notebook "Just say 'Yes'" with 2 questions
 
   Scenario Outline: I should pass the assessment when I get score more than 80%
+    Given I request for an approval for notebooks:
+      | Just say 'Yes'  |
+    And I am logged in as an admin
+    And I approve notebook "Just say 'Yes'"
+    And I logout via the UI
+    And I am logged in as "old_learner"
     When I get score <Score> when do the assessment on "Just say 'Yes'"
     Then I should <Pass or not> the assessment of "Just say 'Yes'"
     And I should <Get a certificate or not> of "Just say 'Yes'" for "Old Learner" from "Old Learner"
@@ -18,6 +24,11 @@ Feature: Get certificate by an assessment
       | 2/2   | pass        | get a certificate        |
       | 1/2   | not pass    | not get a certificate    |
       | 0/2   | not pass    | not get a certificate    |
+
+  Scenario: I cannot receive a certificate on passing an unapproved assessment
+  # Given the notebook "Just say 'Yes'" is unapproved
+  When I pass the assessment on "Just say 'Yes'"
+  Then I cannot download a certificate after passing an assessment
 
   @ignore
   Scenario: I should see the original start date on my renewed certificate
