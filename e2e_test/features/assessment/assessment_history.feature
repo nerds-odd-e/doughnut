@@ -10,10 +10,9 @@ Feature: View my assessment history
     Then I should see my assessment history with empty records
 
   Scenario Outline: Have attempted assessment of a notebook
-    Given I am logged in as "another_old_learner"
     When I get score <Score> when do the assessment on "Just say 'Yes'"
     Then I should see "Just say 'Yes'" result as "<Result>" in my assessment history
-    And  I <Can view certificate or not> of "Just say 'Yes'" for "Another Old Learner" from "Old Learner" in my assessment history
+    And  I <Can view certificate or not> of "Just say 'Yes'" for "Old Learner" from "Old Learner" in my assessment history
 
     Examples:
       | Score | Result | Can view certificate or not |
