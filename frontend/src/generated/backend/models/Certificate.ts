@@ -10,5 +10,6 @@ export type Certificate = {
     notebook?: Notebook;
     startDate: string;
     expiryDate: string;
+    creatorName?: string;
 };
 

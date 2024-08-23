@@ -27,4 +27,8 @@ public class Certificate extends EntityIdentifiedByIdOnly {
   @Column(name = "expiry_date")
   @NotNull
   private Timestamp expiryDate;
+
+  public String getCreatorName() {
+    return notebook.getCreatorEntity().getName();
+  }
 }

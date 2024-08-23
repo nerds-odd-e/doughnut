@@ -111,16 +111,23 @@ Then(
   }
 )
 
-When('I should get a certificate of {string}', (notebook: string) => {
-  start
-    .assumeAssessmentPage(notebook)
-    .expectCertificate()
-    .expectCertificateFor(notebook)
-})
+When(
+  'I should get a certificate of {string} for {string} from {string}',
+  (notebook: string, user: string, creator: string) => {
+    const cert = start.assumeAssessmentPage(notebook).expectCertificate()
 
-Then('I should not get a certificate of {string}', (notebook: string) => {
-  start.assumeAssessmentPage(notebook).expectNoCertificate()
-})
+    cert.expectCertificateFor(notebook)
+    cert.expectCertificateUser(user)
+    cert.expectCertificateCreator(creator)
+  }
+)
+
+Then(
+  'I should not get a certificate of {string} for {string} from {string}',
+  (notebook: string) => {
+    start.assumeAssessmentPage(notebook).expectNoCertificate()
+  }
+)
 
 When('Now is {string}', (dateString: string) => {
   start.testability().backendTimeTravelToDate(new Date(dateString))

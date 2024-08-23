@@ -5,13 +5,13 @@ Feature: Get certificate by an assessment
   As a learner, I want to obtain a certificate when I pass the assessment.
 
   Background:
-    Given I am logged in as an existing user
+    Given I am logged in as "old_learner"
     And there is an assessment on notebook "Just say 'Yes'" with 2 questions
 
   Scenario Outline: I should pass the assessment when I get score more than 80%
     When I get score <Score> when do the assessment on "Just say 'Yes'"
     Then I should <Pass or not> the assessment of "Just say 'Yes'"
-    And I should <Get a certificate or not> of "Just say 'Yes'"
+    And I should <Get a certificate or not> of "Just say 'Yes'" for "Old Learner" from "Old Learner"
 
     Examples:
       | Score | Pass or not | Get a certificate or not |

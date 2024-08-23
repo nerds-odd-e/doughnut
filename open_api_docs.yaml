@@ -3337,6 +3337,8 @@ components:
         expiryDate:
           type: string
           format: date-time
+        creatorName:
+          type: string
     BazaarNotebook:
       required:
       - id

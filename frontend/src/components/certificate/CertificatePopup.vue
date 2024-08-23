@@ -17,11 +17,11 @@
       </div>
       <div class="signature-section">
         <div class="signature">
-          <span class="signature-name">{{ certificate.notebook?.creatorId }}</span>
+          <span class="signature-creator-name">{{ certificate.creatorName }}</span>
           <span>Content Creator</span>
         </div>
         <div class="signature">
-          <span class="signature-name">Terry</span>
+          <span class="signature-issuer-name">Terry</span>
           <span>Odd-e</span>
         </div>
       </div>
@@ -125,7 +125,10 @@ onMounted(() => {
   flex-direction: column;
   align-items: center;
 }
-.signature-name {
+.signature-creator-name {
+  font-style: italic;
+}
+.signature-issuer-name {
   font-style: italic;
 }
 </style>
