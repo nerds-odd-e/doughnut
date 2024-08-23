@@ -25,7 +25,6 @@
           <th>Attempt At</th>
           <th>Result</th>
           <th>Certificate</th>
-          <th>Expirary date</th>
         </tr>
       </thead>
       <tbody>
@@ -44,7 +43,6 @@
               <CertificatePopup  :assessment-attempt="assessmentHistory" :notebook-id="assessmentHistory.notebookId"></CertificatePopup>
             </PopButton>
           </td>
-          <td>{{toLocalDateString(assessmentHistory.certificateExpiresAt)}}</td>
         </tr>
       </tbody>
     </table>
