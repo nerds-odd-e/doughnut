@@ -114,11 +114,12 @@ Then(
 When(
   'I should get a certificate of {string} for {string} from {string}',
   (notebook: string, user: string, creator: string) => {
-    const cert = start.assumeAssessmentPage(notebook).expectCertificate()
-
-    cert.expectCertificateFor(notebook)
-    cert.expectCertificateUser(user)
-    cert.expectCertificateCreator(creator)
+    start
+      .assumeAssessmentPage(notebook)
+      .expectCertificate()
+      .expectCertificateFor(notebook)
+      .expectCertificateUser(user)
+      .expectCertificateCreator(creator)
   }
 )
 
@@ -144,17 +145,19 @@ When(
 )
 
 Then(
-  'I can view certificate of {string} in my assessment history',
-  (notebook: string) => {
+  'I can view certificate of {string} for {string} from {string} in my assessment history',
+  (notebook: string, user: string, creator: string) => {
     start
       .navigateToAssessmentHistory()
       .expectCertificate(notebook)
       .expectCertificateFor(notebook)
+      .expectCertificateUser(user)
+      .expectCertificateCreator(creator)
   }
 )
 
 Then(
-  'I can not view certificate of {string} in my assessment history',
+  'I can not view certificate of {string} for {string} from {string} in my assessment history',
   (notebook: string) => {
     start.navigateToAssessmentHistory().expectNoCertificate(notebook)
   }
