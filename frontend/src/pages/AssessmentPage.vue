@@ -17,6 +17,7 @@
           You have passed the assessment.
         </div>
         <PopButton
+          :disabled="!generatesCertificate"
           disabledTitle="This notebook does not award a certificate."
           btn-class="btn btn-light"
           title="View Certificate"
@@ -57,9 +58,9 @@ const topicConstructor = computed(() => {
   return router.currentRoute.value.query?.topic
 })
 
-/*const generatesCertificate = computed(() => {
+const generatesCertificate = computed(() => {
   return props.approvalStatus === "APPROVED"
-})*/
+})
 
 const quizQuestions = ref<QuizQuestion[]>([])
 const currentQuestion = ref(0)
@@ -90,10 +91,12 @@ const questionAnswered = async (answerResult) => {
         props.notebookId,
         questionsAnswerCollection.value
       )
-    certificate.value =
-      await managedApi.restCertificateController.saveCertificate(
-        props.notebookId
-      )
+    if (generatesCertificate.value) {
+      certificate.value =
+        await managedApi.restCertificateController.saveCertificate(
+          props.notebookId
+        )
+    }
   }
 }
 
