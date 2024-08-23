@@ -28,6 +28,10 @@ public class AssessmentAttempt extends EntityIdentifiedByIdOnly {
   @NotNull
   private Timestamp submittedAt;
 
+  @Column(name = "certificate_expires_at")
+  @NotNull
+  private Timestamp certificateExpiresAt;
+
   @Column(name = "answers_total")
   private int answersTotal;
 
