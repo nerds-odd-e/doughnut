@@ -11,15 +11,10 @@
       placeholder="Filter by notebook title"
       class="form-control mb-2"
     />
-    <input
-      type="checkbox"
-      v-model="filterByCertificate"
-      class="form-check-input"
+    <input type="checkbox" v-model="filterByCertificate" class="form-check-input"
       id="filterByCertificate"
-    />
-    <label class="form-check-label" for="filterByCertificate"
-      >Filter by Certificate</label
-    >
+     />
+    <label class="form-check-label" for="filterByCertificate">Filter by Certificate</label>
     <div>
       <table class="assessment-table mt-2">
         <thead>
