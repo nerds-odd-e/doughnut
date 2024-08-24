@@ -16,16 +16,6 @@ Then(
   }
 )
 
-When(
-  'There is a {string} notebook with assesment that has certification',
-  (notebook: string) => {
-    start.testability().injectNumbersNotebookWithQuestions(notebook, 2)
-    start
-      .routerToNotebooksPage()
-      .updateAssessmentSettings(notebook, { numberOfQuestion: 2 })
-  }
-)
-
 Given(
   'Expiration of {string} is set to {string}',
   (notebook: string, period: string) => {
