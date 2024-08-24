@@ -47,6 +47,7 @@ class TestabilityRestController {
     createUser("old_learner", "Old Learner");
     createUser("another_old_learner", "Another Old Learner");
     createUser("admin", "admin");
+    createUser("non_admin", "Non Admin");
     createUser("a_trainer", "A Trainer");
     testabilitySettings.timeTravelTo(null);
     testabilitySettings.setUseRealGithub(false);

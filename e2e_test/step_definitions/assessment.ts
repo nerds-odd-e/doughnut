@@ -100,9 +100,6 @@ Given(
     start
       .testability()
       .injectNumbersNotebookWithQuestions(notebook, numberOfQuestion)
-    start
-      .routerToNotebooksPage()
-      .updateAssessmentSettings(notebook, { numberOfQuestion })
   }
 )
 
@@ -112,9 +109,6 @@ Given(
     start
       .testability()
       .injectNumbersNotebookWithQuestions(notebook, numberOfQuestion, creatorId)
-    start
-      .routerToNotebooksPage()
-      .updateAssessmentSettings(notebook, { numberOfQuestion })
   }
 )
 
