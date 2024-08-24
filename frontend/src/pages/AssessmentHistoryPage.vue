@@ -5,48 +5,47 @@
       title: 'Welcome To Assessment History',
     }"
   >
-  <input
-  type="text"
-  v-model="filterText"
-  placeholder="Filter by notebook title"
-  class="form-control mb-2"
-/>
-<input
-  type="checkbox"
-  v-model="filterByCertificate"
-  class="form-check-input"
-/>
-<label class="form-check-label">Filter by Certificate</label>
-  <div>
-    <table class="assessment-table mt-2">
-      <thead>
-        <tr>
-          <th>Notebook</th>
-          <th>Attempt At</th>
-          <th>Result</th>
-          <th>Certificate</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          v-for="(assessmentHistory) in filteredAssessmentHistories"
-        >
-          <td>{{assessmentHistory.notebookTitle}}</td>
-          <td>{{toLocalDateString(assessmentHistory.submittedAt)}}</td>
-          <td>{{assessmentHistory.isPass ? "Pass" : "Fail"}}</td>
-          <td>
-            <PopButton
-              btn-class="btn btn-light"
-              title="View Certificate"
-              v-if="assessmentHistory.isPass"
-            >
-              <CertificatePopup  :assessment-attempt="assessmentHistory" :notebook-id="assessmentHistory.notebookId"></CertificatePopup>
-            </PopButton>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+    <input
+      type="text"
+      v-model="filterText"
+      placeholder="Filter by notebook title"
+      class="form-control mb-2"
+    />
+    <input type="checkbox" v-model="filterByCertificate" class="form-check-input"
+      id="filterByCertificate"
+     />
+    <label class="form-check-label" for="filterByCertificate">Filter by Certificate</label>
+    <div>
+      <table class="assessment-table mt-2">
+        <thead>
+          <tr>
+            <th>Notebook</th>
+            <th>Attempt At</th>
+            <th>Result</th>
+            <th>Certificate</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="assessmentHistory in filteredAssessmentHistories">
+            <td>{{ assessmentHistory.notebookTitle }}</td>
+            <td>{{ toLocalDateString(assessmentHistory.submittedAt) }}</td>
+            <td>{{ assessmentHistory.isPass ? "Pass" : "Fail" }}</td>
+            <td>
+              <PopButton
+                btn-class="btn btn-light"
+                title="View Certificate"
+                v-if="assessmentHistory.isPass"
+              >
+                <CertificatePopup
+                  :assessment-attempt="assessmentHistory"
+                  :notebook-id="assessmentHistory.notebookId"
+                ></CertificatePopup>
+              </PopButton>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </ContainerPage>
 </template>
 
@@ -106,5 +105,4 @@ onMounted(async () => {
 .assessment-table th {
   background-color: #f2f2f2;
 }
-
 </style>
