@@ -518,6 +518,50 @@ class RestQuizQuestionAndAnswerControllerTests {
   }
 
   @Nested
+  class removeAQuestionFromNote {
+    @Test
+    void authorization() {
+      Note note = makeMe.aNote().please();
+      QuizQuestionAndAnswer mcqWithAnswer = makeMe.aQuestion().please();
+      mcqWithAnswer.setNote(note);
+      assertThrows(
+        UnexpectedNoAccessRightException.class,
+        () -> controller.removeQuestion(note, mcqWithAnswer));
+    }
+
+    @Test
+    void persistent() throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
+      QuizQuestionAndAnswer mcqWithAnswer = makeMe.aQuestion().please();
+      controller.addQuestionManually(note, mcqWithAnswer);
+      makeMe.refresh(note);
+      assertThat(note.getQuizQuestionAndAnswers(), hasSize(1));
+      controller.removeQuestion(note, mcqWithAnswer);
+      makeMe.refresh(note);
+      assertThat(note.getQuizQuestionAndAnswers(), empty());
+    }
+
+    @Test
+    void resetNotebookApprovalOnRemove() throws UnexpectedNoAccessRightException {
+      Note note =
+        makeMe
+          .aNote()
+          .creatorAndOwner(currentUser)
+          .asHeadNoteOfANotebook(currentUser.getEntity().getOwnership())
+          .withApprovalStatus(ApprovalStatus.PENDING)
+          .please();
+      QuizQuestionAndAnswer mcqWithAnswer = makeMe.aQuestion().please();
+      Notebook parentNotebook = note.getNotebook();
+      makeMe.refresh(parentNotebook);
+      assertEquals(ApprovalStatus.PENDING, parentNotebook.getApprovalStatus());
+
+      controller.removeQuestion(note, mcqWithAnswer);
+      makeMe.refresh(note);
+      assertEquals(ApprovalStatus.NOT_APPROVED, note.getNotebook().getApprovalStatus());
+    }
+  }
+
+  @Nested
   class RefineQuestion {
     @Test
     void authorization() {
