@@ -3,45 +3,36 @@ import { CertificatePopup } from './CertificatePopup'
 export const assumeViewAssessmentHistoryPage = () => {
   cy.findByText('Welcome To Assessment History').should('be.visible')
 
+  const findNotebookCell = (notebook: string, column: number) => {
+    return cy
+      .get('.assessment-table tbody')
+      .contains('td', notebook)
+      .siblings('td')
+      .eq(column)
+  }
+
   return {
     expectTableWithNumberOfRow(n: number) {
       cy.get('.assessment-table tbody tr').should('have.length', n)
       return this
     },
     checkAttemptResult(notebook: string, result: string) {
-      cy.get('.assessment-table tbody')
-        .findByText(notebook)
-        .next()
-        .next()
-        .contains(result)
+      findNotebookCell(notebook, 1).contains(result)
     },
     expectCertificate(notebook: string) {
-      cy.get('.assessment-table tbody')
-        .findByText(notebook)
-        .next()
-        .next()
-        .next()
-        .findByText('View Certificate')
-        .click()
+      findNotebookCell(notebook, 2).contains('View Certificate').click()
       return CertificatePopup()
     },
     expectNoCertificate(notebook: string) {
-      cy.get('.assessment-table tbody')
-        .findByText(notebook)
-        .next()
-        .next()
-        .next()
-        .findByText('View Certificate')
+      findNotebookCell(notebook, 2)
+        .contains('View Certificate')
         .should('not.exist')
     },
     viewCertificateAt(index: number) {
       cy.get('.assessment-table tbody')
         .findAllByText('View Certificate')
-        .each(($button, $index) => {
-          if ($index === index) {
-            cy.wrap($button).click()
-          }
-        })
+        .eq(index)
+        .click()
     },
   }
 }
