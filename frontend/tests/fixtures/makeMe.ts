@@ -15,6 +15,7 @@ import SuggestedQuestionForFineTuningBuilder from "./SuggestedQuestionForFineTun
 import UserBuilder from "./UserBuilder"
 import WikidataEntityBuilder from "./WikidataEntityBuilder"
 import WikidataSearchEntityBuilder from "./WikidataSearchEntityBuilder"
+import AssessmentAttemptBuilder from "./AssessmentAttemptBuilder"
 
 class MakeMe {
   static get aUser() {
@@ -71,6 +72,10 @@ class MakeMe {
 
   static get aWikidataEntity(): WikidataEntityBuilder {
     return new WikidataEntityBuilder()
+  }
+
+  static get anAssessmentAttempt(): AssessmentAttemptBuilder {
+    return new AssessmentAttemptBuilder()
   }
 
   static get aWikidataSearchEntity(): WikidataSearchEntityBuilder {

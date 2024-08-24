@@ -3,15 +3,21 @@ import AssessmentHistoryPage from "@/pages/AssessmentHistoryPage.vue"
 import helper from "../helpers"
 import makeMe from "../fixtures/makeMe"
 import { nextTick } from "vue"
+import { AssessmentAttempt } from "@/generated/backend"
 
 describe("assessment history page", () => {
   const user = makeMe.aUser.please()
+  const assessmentForArt: AssessmentAttempt =
+    makeMe.anAssessmentAttempt.please()
+  const assessmentForTech: AssessmentAttempt = makeMe.anAssessmentAttempt
+    .passed()
+    .please()
   let wrapper
 
   beforeEach(() => {
     helper.managedApi.restAssessmentController.getAssessmentHistory = vi
       .fn()
-      .mockResolvedValue([])
+      .mockResolvedValue([assessmentForArt, assessmentForTech])
     wrapper = helper
       .component(AssessmentHistoryPage)
       .withProps({ user })
@@ -24,12 +30,17 @@ describe("assessment history page", () => {
     ).toBeCalledTimes(1)
   })
 
+  it("should have two items in the list", async () => {
+    expect(wrapper.findAll("tr")).toHaveLength(3)
+  })
+
   it("filters by text", async () => {
     const filterInput = wrapper.find(
       'input[placeholder="Filter by notebook title"]'
     )
-    await filterInput.setValue("test text")
+    await filterInput.setValue(assessmentForArt.notebookTitle)
     await nextTick()
+    expect(wrapper.findAll("tr")).toHaveLength(2)
   })
 
   it("filters by certificate", async () => {
@@ -38,5 +49,6 @@ describe("assessment history page", () => {
     )
     await certificateDropdown.setValue("certificate-id")
     await nextTick()
+    expect(wrapper.findAll("tr")).toHaveLength(2)
   })
 })
