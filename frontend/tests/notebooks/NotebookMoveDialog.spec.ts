@@ -11,9 +11,6 @@ describe("circle show page", () => {
   const circle2 = makeMe.aCircle.please()
 
   beforeEach(() => {
-    const teleportTarget = document.createElement("div")
-    teleportTarget.id = "head-status"
-    document.body.appendChild(teleportTarget)
     helper.managedApi.restCircleController.index = vi
       .fn()
       .mockResolvedValue([circle1, circle2])
@@ -28,6 +25,5 @@ describe("circle show page", () => {
     helper.component(NotebookMoveDialog).withProps({ notebook }).render()
     await flushPromises()
     await screen.findByText(circle2.name)
-    // expect(screen.queryByText(circle1.name)).toBeNull()
   })
 })

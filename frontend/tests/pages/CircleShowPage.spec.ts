@@ -13,9 +13,6 @@ describe("circle show page", () => {
   const circleNote = makeMe.aCircleNote.notebooks(notebook).please()
 
   beforeEach(() => {
-    const teleportTarget = document.createElement("div")
-    teleportTarget.id = "head-status"
-    document.body.appendChild(teleportTarget)
     helper.managedApi.restCircleController.showCircle = vi
       .fn()
       .mockResolvedValue(circleNote)

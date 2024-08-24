@@ -15,12 +15,6 @@ vitest.mock("vue-router", () => ({
 }))
 
 describe("assessment page", () => {
-  beforeEach(() => {
-    const teleportTarget = document.createElement("div")
-    teleportTarget.id = "head-status"
-    document.body.appendChild(teleportTarget)
-  })
-
   describe("assessment with one question", () => {
     const notebook = makeMe.aNotebook.please()
     const quizQuestion = makeMe.aQuizQuestion.please()
