@@ -76,7 +76,11 @@ const testability = () => {
         })
       })
     },
-    injectNumberNotes(notebook: string, numberOfNotes: number) {
+    injectNumberNotes(
+      notebook: string,
+      numberOfNotes: number,
+      creatorId?: string
+    ) {
       const notes: Record<string, string>[] = [
         { Topic: notebook },
         ...new Array(numberOfNotes).fill(0).map((_, index) => ({
@@ -84,7 +88,7 @@ const testability = () => {
           'Parent Topic': notebook,
         })),
       ]
-      return this.injectNotes(notes)
+      return this.injectNotes(notes, creatorId)
     },
     injectQuizQuestions(quizQuestionsTestData: QuizQuestionsTestData) {
       postToTestabilityApi(cy, 'inject_quiz_questions', {
@@ -115,9 +119,10 @@ const testability = () => {
     },
     injectNumbersNotebookWithQuestions(
       notebook: string,
-      numberOfQuestion: number
+      numberOfQuestion: number,
+      creatorId?: string
     ) {
-      this.injectNumberNotes(notebook, numberOfQuestion)
+      this.injectNumberNotes(notebook, numberOfQuestion, creatorId)
       this.injectYesNoQuestionsForNumberNotes(notebook, numberOfQuestion)
       this.shareToBazaar(notebook)
     },

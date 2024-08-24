@@ -51,7 +51,7 @@ public class NonProductConfiguration {
     createUser(manager, "another_old_learner", passwordEncoder.encode("password"));
     createUser(manager, "manual", passwordEncoder.encode("password"));
     createUser(manager, "admin", passwordEncoder.encode("password"));
-    createUser(manager, "non_admin", passwordEncoder.encode("password"));
+    createUser(manager, "a_trainer", passwordEncoder.encode("password"));
     return manager;
   }
 

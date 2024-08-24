@@ -3,8 +3,7 @@ Feature: Certification expiration
   Background:
     Given Now is "2024-01-01"
     And I am logged in as an existing user
-    And there is an assessment on notebook "Certified thing" with 2 questions
-
+    And there is an assessment on notebook "Certified thing" with 2 questions by "old_learner"
 
   Scenario: Default certificate expiration is one year
     Given I request for an approval for notebooks:

@@ -106,6 +106,18 @@ Given(
   }
 )
 
+Given(
+  'there is an assessment on notebook {string} with {int} questions by {string}',
+  (notebook: string, numberOfQuestion: number, creatorId: string) => {
+    start
+      .testability()
+      .injectNumbersNotebookWithQuestions(notebook, numberOfQuestion, creatorId)
+    start
+      .routerToNotebooksPage()
+      .updateAssessmentSettings(notebook, { numberOfQuestion })
+  }
+)
+
 Then('I should see my assessment history with empty records', () => {
   start.navigateToAssessmentHistory().expectTableWithNumberOfRow(0)
 })

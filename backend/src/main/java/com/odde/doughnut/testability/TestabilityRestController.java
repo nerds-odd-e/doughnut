@@ -47,7 +47,7 @@ class TestabilityRestController {
     createUser("old_learner", "Old Learner");
     createUser("another_old_learner", "Another Old Learner");
     createUser("admin", "admin");
-    createUser("non_admin", "Non Admin");
+    createUser("a_trainer", "A Trainer");
     testabilitySettings.timeTravelTo(null);
     testabilitySettings.setUseRealGithub(false);
     testabilitySettings.enableFeatureToggle(false);
@@ -188,7 +188,15 @@ class TestabilityRestController {
     List<QuizQuestionAndAnswer> quizQuestionAndAnswers =
         quizQuestionsTestData.buildQuizQuestions(this.modelFactoryService);
     quizQuestionAndAnswers.forEach(question -> modelFactoryService.save(question));
+    setNumberOfQuestionsPerAssessmentOfNotebook(quizQuestionAndAnswers);
     return quizQuestionAndAnswers;
+  }
+
+  private void setNumberOfQuestionsPerAssessmentOfNotebook(
+      List<QuizQuestionAndAnswer> quizQuestionAndAnswers) {
+    Notebook notebook = quizQuestionAndAnswers.getFirst().getNote().getNotebook();
+    notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(quizQuestionAndAnswers.size());
+    modelFactoryService.save(notebook);
   }
 
   private Ownership getOwnership(NotesTestData notesTestData, User user) {
