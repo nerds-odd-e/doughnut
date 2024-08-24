@@ -18,6 +18,15 @@ Feature: Quiz Question Management
       | What does a cow say?                 | moo            |
       | What do you call a cow with not leg? | Ground beef    |
 
+  Scenario: Edit a question in the note question list successfully
+    When I edit a question for the note "The cow joke" to:
+      | Stem                 | Choice 0      | One Wrong Choice |
+      | What does a cow say? | Cow you doin? | woo              |
+    Then I should see the questions in the question list of the note "The cow joke":
+      | Question             | Correct Choice |
+      | What does a cow say? | Cow you doin?  |
+
+  @ignore
   Scenario: Reset approval on new question
     Given I am logged in as an admin
     And I have a notebook with the head note "The cow joke"

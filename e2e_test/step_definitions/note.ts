@@ -96,6 +96,17 @@ Given(
   }
 )
 
+When(
+  'I edit a question for the note {string} to:',
+  (noteTopic: string, data: DataTable) => {
+    expect(
+      data.hashes().length,
+      'please edit one question at a time.'
+    ).to.equal(1)
+    start.jumpToNotePage(noteTopic).editQuestion(data.hashes()[0]!)
+  }
+)
+
 Given(
   'I refine the following question for the note {string}:',
   (noteTopic: string, data: DataTable) => {

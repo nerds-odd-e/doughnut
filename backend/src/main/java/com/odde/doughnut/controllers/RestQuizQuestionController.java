@@ -5,6 +5,7 @@ import com.odde.doughnut.controllers.dto.QuestionSuggestionCreationParams;
 import com.odde.doughnut.controllers.dto.QuizQuestionContestResult;
 import com.odde.doughnut.controllers.dto.QuizQuestionInNotebook;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.repositories.QuizQuestionAndAnswerRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.AnswerModel;
@@ -18,6 +19,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +29,7 @@ import org.springframework.web.bind.annotation.*;
 class RestQuizQuestionController {
   private final ModelFactoryService modelFactoryService;
   private final QuizQuestionService quizQuestionService;
-
+  
   private final UserModel currentUser;
 
   @Resource(name = "testabilitySettings")
@@ -133,6 +135,21 @@ class RestQuizQuestionController {
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
     return quizQuestionService.addQuestion(note, questionAndAnswer);
+  }
+
+  @PutMapping("/{quizQuestion}/edit")
+  @Transactional
+  public QuizQuestionAndAnswer editQuestion(
+      @PathVariable("quizQuestion") @Schema(type = "integer")
+          QuizQuestionAndAnswer quizQuestionAndAnswer,
+      @Valid @RequestBody QuizQuestionAndAnswer questionAndAnswer)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertAuthorization(quizQuestionAndAnswer.getNote());
+
+    quizQuestionAndAnswer.setQuizQuestion(questionAndAnswer.getQuizQuestion());
+    quizQuestionAndAnswer.setCorrectAnswerIndex(questionAndAnswer.getCorrectAnswerIndex());
+
+    return modelFactoryService.save(quizQuestionAndAnswer);
   }
 
   @PostMapping("/{note}/refine-question")

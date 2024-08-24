@@ -79,6 +79,7 @@ declare module 'vue' {
     NoteEditableDetails: typeof import('./src/components/notes/core/NoteEditableDetails.vue')['default']
     NoteEditableTopic: typeof import('./src/components/notes/core/NoteEditableTopic.vue')['default']
     NoteEditImageDialog: typeof import('./src/components/notes/accessory/NoteEditImageDialog.vue')['default']
+    NoteEditQuestion: typeof import('./src/components/notes/NoteEditQuestion.vue')['default']
     NoteEditUploadAudioDialog: typeof import('./src/components/notes/accessory/NoteEditUploadAudioDialog.vue')['default']
     NoteEditUrlDialog: typeof import('./src/components/notes/accessory/NoteEditUrlDialog.vue')['default']
     NoteFormTopicOnly: typeof import('./src/components/notes/NoteFormTopicOnly.vue')['default']

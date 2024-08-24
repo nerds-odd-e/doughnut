@@ -16,6 +16,7 @@
       <thead>
         <tr>
           <th>Approved</th>
+          <th>Actions</th>
           <th>Question Text</th>
           <th>A</th>
           <th>B</th>
@@ -25,9 +26,7 @@
       </thead>
       <tbody>
         <tr
-          v-for="(question, outerIndex) in questions"
-          :key="question.quizQuestion.multipleChoicesQuestion.stem"
-        >
+          v-for="(question, outerIndex) in questions">
           <td>
             <input
               :id="'checkbox-' + outerIndex"
@@ -35,6 +34,20 @@
               v-model="question.approved"
               @change="toggleApproval(question.id)"
             />
+          </td>
+          <td>
+            <PopButton btn-class="btn btn-primary" title="Edit Question">
+              <template #default="{ closer }">
+              <!-- prettier-ignore -->
+                <NoteEditQuestion
+                  v-bind="{ question }"
+                  @close-dialog="
+                    closer($event);
+                    questionAdded($event);
+                  "
+                />
+              </template>
+            </PopButton>
           </td>
           <td>{{ question.quizQuestion.multipleChoicesQuestion.stem }}</td>
           <template
@@ -56,7 +69,7 @@
     </table>
     <div v-else class="no-questions">
       <b >No questions</b>
-    </div> 
+    </div>
   </div>
 </template>
 
