@@ -4,7 +4,7 @@
     @resume="$emit('resume')"
     v-bind="{ finished, toRepeatCount }"
   />
-  <teleport v-else-if="title" to="#head-status">
+  <TeleportToHeadStatus v-else-if="title">
     <div class="flex-shrink-0">
       <slot name="buttons" />
     </div>
@@ -23,11 +23,12 @@
         </span>
       </span>
     </div>
-  </teleport>
+  </TeleportToHeadStatus>
 </template>
 
 <script setup lang="ts">
 import usePopups from "@/components/commons/Popups/usePopups"
+import TeleportToHeadStatus from "@/pages/commons/TeleportToHeadStatus.vue"
 import ResumeButton from "./ResumeButton.vue"
 
 defineProps({

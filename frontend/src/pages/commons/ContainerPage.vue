@@ -1,7 +1,7 @@
 <template>
-  <teleport v-if="teleportTargetExists && title" :to="teleportTargetName">
+  <TeleportToHeadStatus v-if="title">
     <h2>{{ title }}</h2>
-  </teleport>
+  </TeleportToHeadStatus>
 
   <div class="container mt-3">
     <ContentLoader v-if="!contentExists" />
@@ -13,9 +13,7 @@
 
 <script setup lang="ts">
 import ContentLoader from "@/components/commons/ContentLoader.vue"
-
-const teleportTargetName = "#head-status"
-const teleportTargetExists = !!document.querySelector(teleportTargetName)
+import TeleportToHeadStatus from "@/pages/commons/TeleportToHeadStatus.vue"
 
 defineProps({
   title: String,

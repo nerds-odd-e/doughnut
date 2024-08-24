@@ -1,5 +1,5 @@
 <template>
-  <teleport to="#head-status">
+  <TeleportToHeadStatus>
     <div class="btn-group">
       <button
         role="button"
@@ -23,7 +23,7 @@
         />
       </template>
     </NoteRealmLoader>
-  </teleport>
+  </TeleportToHeadStatus>
   <div class="d-flex flex-grow-1 overflow-auto h-full">
     <aside
       class="d-md-block flex-shrink-0 overflow-auto me-3"
@@ -57,6 +57,7 @@ import { PropType, ref } from "vue"
 import { User } from "@/generated/backend"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
 import NoteShow from "../components/notes/NoteShow.vue"
+import TeleportToHeadStatus from "@/pages/commons/TeleportToHeadStatus.vue"
 import BreadcrumbWithCircle from "../components/toolbars/BreadcrumbWithCircle.vue"
 import { StorageAccessor } from "../store/createNoteStorage"
 
