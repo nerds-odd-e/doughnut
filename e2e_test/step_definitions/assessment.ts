@@ -154,19 +154,17 @@ When(
 )
 
 Then(
-  'I can view certificate of {string} for {string} from {string} in my assessment history',
-  (notebook: string, user: string, creator: string) => {
+  'I can view certificate of {string} in my assessment history',
+  (notebook: string) => {
     start
       .navigateToAssessmentHistory()
       .expectCertificate(notebook)
       .expectCertificateFor(notebook)
-      .expectCertificateUser(user)
-      .expectCertificateCreator(creator)
   }
 )
 
 Then(
-  'I can not view certificate of {string} for {string} from {string} in my assessment history',
+  'I can not view certificate of {string} in my assessment history',
   (notebook: string) => {
     start.navigateToAssessmentHistory().expectNoCertificate(notebook)
   }
