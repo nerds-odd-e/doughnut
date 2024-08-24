@@ -70,7 +70,7 @@ export const routerToNotebooksPage = () => {
       }
     ) {
       this.findNotebookCardButton(notebook, 'Edit notebook settings').click()
-      if (settings.numberOfQuestion) {
+      if (settings.numberOfQuestion !== undefined) {
         cy.formField('Number Of Questions In Assessment').assignFieldValue(
           `${settings.numberOfQuestion}`
         )

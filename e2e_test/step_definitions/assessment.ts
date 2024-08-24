@@ -104,11 +104,11 @@ Given(
 )
 
 Given(
-  'there is an assessment on notebook {string} with {int} questions by {string}',
-  (notebook: string, numberOfQuestion: number, creatorId: string) => {
+  'there is a notebook {string} by {string} with approved certifiable assessment',
+  (notebook: string, creatorId: string) => {
     start
       .testability()
-      .injectNumbersNotebookWithQuestions(notebook, numberOfQuestion, creatorId)
+      .injectNumbersNotebookWithQuestions(notebook, 2, creatorId)
   }
 )
 
