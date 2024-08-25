@@ -1,4 +1,4 @@
-Feature: View my assessment history
+Feature: View my assessment and certificate history
   As a learner, I want to be able to view my past assessments
 
   Background:
@@ -7,12 +7,12 @@ Feature: View my assessment history
     And there is an assessment on notebook "Also say 'Yes'" with 2 questions
 
   Scenario: Have not taken any assessment
-    Then I should see my assessment history with empty records
+    Then I should see my assessment and certificate history with empty records
 
   Scenario Outline: Have attempted assessment of a notebook
     When I get score <Score> when do the assessment on "Just say 'Yes'"
-    Then I should see "Just say 'Yes'" result as "<Result>" in my assessment history
-    And  I <Can view certificate or not> of "Just say 'Yes'" in my assessment history
+    Then I should see "Just say 'Yes'" result as "<Result>" in my assessment and certificate history
+    And  I <Can view certificate or not> of "Just say 'Yes'" in my assessment and certificate history
 
     Examples:
       | Notebook title | Score | Result | Can view certificate or not |

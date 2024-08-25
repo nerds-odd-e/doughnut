@@ -37,7 +37,7 @@ export class RestAssessmentControllerService {
      * @returns AssessmentAttempt OK
      * @throws ApiError
      */
-    public getAssessmentHistory(): CancelablePromise<Array<AssessmentAttempt>> {
+    public getMyAssessments(): CancelablePromise<Array<AssessmentAttempt>> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/assessment',

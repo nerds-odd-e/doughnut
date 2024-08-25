@@ -11,9 +11,9 @@ import { routerToNotebooksPage } from './pageObjects/notebooksPage'
 import { noteSidebar } from './pageObjects/noteSidebar'
 import { systemSidebar } from './pageObjects/systemSidebar'
 import {
-  navigateToAssessmentHistory,
-  assumeViewAssessmentHistoryPage,
-} from './pageObjects/assessmentHistoryPage'
+  navigateToAssessmentAndCertificatePage,
+  assumeAssessmentAndCertificateHistoryPage,
+} from './pageObjects/assessmentAndCertificateHistoryPage'
 import testability from './testability'
 
 export default {
@@ -29,8 +29,8 @@ export default {
   assumeClarifyingQuestionDialog,
   routerToNotebooksPage,
   navigateToCircle,
-  navigateToAssessmentHistory,
-  assumeViewAssessmentHistoryPage,
+  navigateToAssessmentAndCertificatePage,
+  assumeAssessmentAndCertificateHistoryPage,
   // jumptoNotePage is faster than navigateToPage
   //    it uses the note id memorized when creating them with testability api
   jumpToNotePage: (noteTopic: string, forceLoadPage = false) => {

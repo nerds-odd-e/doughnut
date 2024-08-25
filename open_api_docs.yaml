@@ -2631,7 +2631,7 @@ paths:
     get:
       tags:
       - rest-assessment-controller
-      operationId: getAssessmentHistory
+      operationId: getMyAssessments
       responses:
         "500":
           description: Internal Server Error

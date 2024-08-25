@@ -3,7 +3,7 @@ import HomePage from "@/pages/HomePage.vue"
 import BazaarPage from "@/pages/BazaarPage.vue"
 import NotebooksPage from "@/pages/NotebooksPage.vue"
 import NoteShowPage from "@/pages/NoteShowPage.vue"
-import AssessmentHistoryPage from "@/pages/AssessmentHistoryPage.vue"
+import AssessmentAndCertificateHistoryPage from "@/pages/AssessmentAndCertificateHistoryPage.vue"
 import AssessmentPage from "@/pages/AssessmentPage.vue"
 import ReviewHome from "@/pages/ReviewHome.vue"
 import RepeatPage from "@/pages/RepeatPage.vue"
@@ -64,9 +64,9 @@ const routes = [
     meta: { userProp: true },
   },
   {
-    path: "/assessmentHistory",
-    name: "assessmentHistory",
-    component: AssessmentHistoryPage,
+    path: "/assessmentAndCertificateHistory",
+    name: "assessmentAndCertificateHistory",
+    component: AssessmentAndCertificateHistoryPage,
     meta: { userProp: true },
   },
   {

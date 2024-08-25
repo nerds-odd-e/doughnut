@@ -2,7 +2,7 @@
   <ContainerPage
     v-bind="{
       contentExists: true,
-      title: 'Welcome To Assessment History',
+      title: 'My Assessment and Certificate History',
     }"
   >
     <input
@@ -26,19 +26,19 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="assessmentHistory in filteredAssessmentHistories">
-            <td>{{ assessmentHistory.notebookTitle }}</td>
-            <td>{{ toLocalDateString(assessmentHistory.submittedAt) }}</td>
-            <td>{{ assessmentHistory.isPass ? "Pass" : "Fail" }}</td>
+          <tr v-for="assessmentAndCertificateHistory in filteredAssessmentHistories">
+            <td>{{ assessmentAndCertificateHistory.notebookTitle }}</td>
+            <td>{{ toLocalDateString(assessmentAndCertificateHistory.submittedAt) }}</td>
+            <td>{{ assessmentAndCertificateHistory.isPass ? "Pass" : "Fail" }}</td>
             <td>
               <PopButton
                 btn-class="btn btn-light"
                 title="View Certificate"
-                v-if="assessmentHistory.isPass"
+                v-if="assessmentAndCertificateHistory.isPass"
               >
                 <CertificatePopup
-                  :assessment-attempt="assessmentHistory"
-                  :notebook-id="assessmentHistory.notebookId"
+                  :assessment-attempt="assessmentAndCertificateHistory"
+                  :notebook-id="assessmentAndCertificateHistory.notebookId"
                 ></CertificatePopup>
               </PopButton>
             </td>
@@ -73,19 +73,19 @@ const toLocalDateString = (date: string) => {
 }
 
 const filteredAssessmentHistories = computed(() => {
-  return assessmentHistories.value.filter((assessmentHistory) => {
-    const matchesTitle = assessmentHistory.notebookTitle
+  return assessmentHistories.value.filter((assessmentAndCertificateHistory) => {
+    const matchesTitle = assessmentAndCertificateHistory.notebookTitle
       ?.toLowerCase()
       .includes(filterText.value.toLowerCase())
     const matchesCertificate =
-      !filterByCertificate.value || assessmentHistory.isPass
+      !filterByCertificate.value || assessmentAndCertificateHistory.isPass
     return matchesTitle && matchesCertificate
   })
 })
 
 onMounted(async () => {
   assessmentHistories.value =
-    await managedApi.restAssessmentController.getAssessmentHistory()
+    await managedApi.restAssessmentController.getMyAssessments()
 })
 </script>
 

@@ -1,6 +1,6 @@
 import { CertificatePopup } from './CertificatePopup'
 
-export const assumeViewAssessmentHistoryPage = () => {
+export const assumeAssessmentAndCertificateHistoryPage = () => {
   cy.findByText('Welcome To Assessment History').should('be.visible')
 
   const findNotebookCell = (notebook: string, column: number) => {
@@ -38,7 +38,7 @@ export const assumeViewAssessmentHistoryPage = () => {
   }
 }
 
-export const navigateToAssessmentHistory = () => {
-  cy.visit('/assessmentHistory')
-  return assumeViewAssessmentHistoryPage()
+export const navigateToAssessmentAndCertificatePage = () => {
+  cy.visit('/assessmentAndCertificateHistory')
+  return assumeAssessmentAndCertificateHistoryPage()
 }

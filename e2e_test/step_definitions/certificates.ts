@@ -43,7 +43,7 @@ Then('I should have the following certificates:', (datatable: DataTable) => {
     const [notebook, expires] = row
     if (notebook && expires) {
       start
-        .navigateToAssessmentHistory()
+        .navigateToAssessmentAndCertificatePage()
         .viewCertificateAt(i)
         .expectExpiryDate(expires)
     }

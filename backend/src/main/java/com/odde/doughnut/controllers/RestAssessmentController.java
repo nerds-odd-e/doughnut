@@ -70,8 +70,8 @@ class RestAssessmentController {
   }
 
   @GetMapping
-  public List<AssessmentAttempt> getAssessmentHistory() {
+  public List<AssessmentAttempt> getMyAssessments() {
     currentUser.assertLoggedIn();
-    return assessmentService.getAssessmentHistory(currentUser.getEntity());
+    return assessmentService.getMyAssessments(currentUser.getEntity());
   }
 }

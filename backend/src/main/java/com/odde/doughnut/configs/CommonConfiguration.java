@@ -35,7 +35,7 @@ public class CommonConfiguration {
       "/links/**",
       "/failure-report-list/**",
       "/admin-dashboard/**",
-      "/assessmentHistory"
+      "/assessmentAndCertificateHistory"
     };
 
     String[] allRoutes =

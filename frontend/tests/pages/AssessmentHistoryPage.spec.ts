@@ -1,11 +1,11 @@
 import { describe, it } from "vitest"
-import AssessmentHistoryPage from "@/pages/AssessmentHistoryPage.vue"
+import AssessmentAndCertificateHistoryPage from "@/pages/AssessmentAndCertificateHistoryPage.vue"
 import helper from "../helpers"
 import makeMe from "../fixtures/makeMe"
 import { nextTick } from "vue"
 import { AssessmentAttempt } from "@/generated/backend"
 
-describe("assessment history page", () => {
+describe("assessment and certificate history page", () => {
   const user = makeMe.aUser.please()
   const assessmentForArt: AssessmentAttempt =
     makeMe.anAssessmentAttempt.please()
@@ -15,18 +15,18 @@ describe("assessment history page", () => {
   let wrapper
 
   beforeEach(() => {
-    helper.managedApi.restAssessmentController.getAssessmentHistory = vi
+    helper.managedApi.restAssessmentController.getMyAssessments = vi
       .fn()
       .mockResolvedValue([assessmentForArt, assessmentForTech])
     wrapper = helper
-      .component(AssessmentHistoryPage)
+      .component(AssessmentAndCertificateHistoryPage)
       .withProps({ user })
       .mount()
   })
 
   it("calls API ONCE on mount", async () => {
     expect(
-      helper.managedApi.restAssessmentController.getAssessmentHistory
+      helper.managedApi.restAssessmentController.getMyAssessments
     ).toBeCalledTimes(1)
   })
 

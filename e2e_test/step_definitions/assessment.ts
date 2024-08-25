@@ -112,15 +112,18 @@ Given(
   }
 )
 
-Then('I should see my assessment history with empty records', () => {
-  start.navigateToAssessmentHistory().expectTableWithNumberOfRow(0)
-})
+Then(
+  'I should see my assessment and certificate history with empty records',
+  () => {
+    start.navigateToAssessmentAndCertificatePage().expectTableWithNumberOfRow(0)
+  }
+)
 
 Then(
-  'I should see {string} result as {string} in my assessment history',
+  'I should see {string} result as {string} in my assessment and certificate history',
   (notebook: string, result: string) => {
     start
-      .navigateToAssessmentHistory()
+      .navigateToAssessmentAndCertificatePage()
       .expectTableWithNumberOfRow(1)
       .checkAttemptResult(notebook, result)
   }
@@ -160,18 +163,18 @@ When(
 )
 
 Then(
-  'I can view certificate of {string} in my assessment history',
+  'I can view certificate of {string} in my assessment and certificate history',
   (notebook: string) => {
     start
-      .navigateToAssessmentHistory()
+      .navigateToAssessmentAndCertificatePage()
       .expectCertificate(notebook)
       .expectCertificateFor(notebook)
   }
 )
 
 Then(
-  'I can not view certificate of {string} in my assessment history',
+  'I can not view certificate of {string} in my assessment and certificate history',
   (notebook: string) => {
-    start.navigateToAssessmentHistory().expectNoCertificate(notebook)
+    start.navigateToAssessmentAndCertificatePage().expectNoCertificate(notebook)
   }
 )

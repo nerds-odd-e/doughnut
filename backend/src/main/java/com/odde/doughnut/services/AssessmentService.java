@@ -80,7 +80,7 @@ public class AssessmentService {
     return assessmentResult;
   }
 
-  public List<AssessmentAttempt> getAssessmentHistory(User user) {
+  public List<AssessmentAttempt> getMyAssessments(User user) {
     return modelFactoryService.assessmentAttemptRepository.findAllByUser(user);
   }
 }

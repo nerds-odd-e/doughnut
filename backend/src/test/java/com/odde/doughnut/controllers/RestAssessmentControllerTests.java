@@ -326,7 +326,7 @@ public class RestAssessmentControllerTests {
 
     @Test
     void shouldReturnEmptyIfNoAssemsentTaken() {
-      List<AssessmentAttempt> assessmentHistories = controller.getAssessmentHistory();
+      List<AssessmentAttempt> assessmentHistories = controller.getMyAssessments();
       assertEquals(0, assessmentHistories.size());
     }
 
@@ -336,7 +336,7 @@ public class RestAssessmentControllerTests {
           .aAssessmentAttempt(
               currentUser.getEntity(), notebook, testabilitySettings.getCurrentUTCTimestamp(), 2, 2)
           .please();
-      List<AssessmentAttempt> assessmentHistories = controller.getAssessmentHistory();
+      List<AssessmentAttempt> assessmentHistories = controller.getMyAssessments();
       assertEquals(1, assessmentHistories.size());
     }
 
@@ -346,7 +346,7 @@ public class RestAssessmentControllerTests {
           .aAssessmentAttempt(
               currentUser.getEntity(), notebook, testabilitySettings.getCurrentUTCTimestamp(), 5, 4)
           .please();
-      List<AssessmentAttempt> assessmentHistories = controller.getAssessmentHistory();
+      List<AssessmentAttempt> assessmentHistories = controller.getMyAssessments();
       assertTrue(assessmentHistories.getFirst().getIsPass());
     }
 
@@ -356,7 +356,7 @@ public class RestAssessmentControllerTests {
           .aAssessmentAttempt(
               currentUser.getEntity(), notebook, testabilitySettings.getCurrentUTCTimestamp(), 5, 2)
           .please();
-      List<AssessmentAttempt> assessmentHistories = controller.getAssessmentHistory();
+      List<AssessmentAttempt> assessmentHistories = controller.getMyAssessments();
       assertFalse(assessmentHistories.getFirst().getIsPass());
     }
 
@@ -367,7 +367,7 @@ public class RestAssessmentControllerTests {
           .aAssessmentAttempt(
               anotherUser, notebook, testabilitySettings.getCurrentUTCTimestamp(), 5, 5)
           .please();
-      List<AssessmentAttempt> assessmentHistories = controller.getAssessmentHistory();
+      List<AssessmentAttempt> assessmentHistories = controller.getMyAssessments();
       assertEquals(0, assessmentHistories.size());
     }
   }
