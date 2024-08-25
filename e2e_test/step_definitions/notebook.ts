@@ -33,13 +33,16 @@ Then(
 )
 
 When('I change notebook {string} to skip review', (noteTopic: string) => {
-  start.routerToNotebooksPage().skipReview(noteTopic)
+  start.routerToNotebooksPage().editNotebookSettings(noteTopic).skipReview()
 })
 
 When('I request for an approval for notebooks:', (notebooks: DataTable) => {
   notebooks.raw().forEach((notebookRaw: string[]) => {
     const notebookName = notebookRaw[0]!
-    start.routerToNotebooksPage().requestForNotebookApproval(notebookName)
+    start
+      .routerToNotebooksPage()
+      .editNotebookSettings(notebookName)
+      .requestForNotebookApproval()
   })
 })
 
@@ -48,7 +51,8 @@ When(
   (noteTopic: string, status: string) => {
     start
       .routerToNotebooksPage()
-      .expectNotebookApprovalStatus(noteTopic, status)
+      .editNotebookSettings(noteTopic)
+      .expectNotebookApprovalStatus(status)
   }
 )
 
@@ -57,7 +61,8 @@ Then(
   (status: string, noteTopic: string) => {
     start
       .routerToNotebooksPage()
-      .expectNotebookApprovalStatus(noteTopic, status)
+      .editNotebookSettings(noteTopic)
+      .expectNotebookApprovalStatus(status)
   }
 )
 
@@ -66,7 +71,8 @@ Then(
   (noteTopic: string) => {
     start
       .routerToNotebooksPage()
-      .expectNotebookApprovalCanBeRequested(noteTopic)
+      .editNotebookSettings(noteTopic)
+      .expectNotebookApprovalCanBeRequested()
   }
 )
 
@@ -79,7 +85,8 @@ Given(
   (notebook: string, numberOfQuestion: number) => {
     start
       .routerToNotebooksPage()
-      .updateAssessmentSettings(notebook, { numberOfQuestion })
+      .editNotebookSettings(notebook)
+      .updateAssessmentSettings({ numberOfQuestion })
   }
 )
 
@@ -88,7 +95,8 @@ Given(
   (notebook: string, numberOfQuestion: number) => {
     start
       .routerToNotebooksPage()
-      .updateAssessmentSettings(notebook, { numberOfQuestion })
+      .editNotebookSettings(notebook)
+      .updateAssessmentSettings({ numberOfQuestion })
   }
 )
 
@@ -176,7 +184,10 @@ Then(
 Given('following notebooks have pending approval:', (notebooks: DataTable) => {
   notebooks.raw().forEach((notebookRaw: string[]) => {
     const notebookName = notebookRaw[0]!
-    start.routerToNotebooksPage().requestForNotebookApproval(notebookName)
+    start
+      .routerToNotebooksPage()
+      .editNotebookSettings(notebookName)
+      .requestForNotebookApproval()
   })
 })
 

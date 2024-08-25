@@ -12,7 +12,8 @@ Then(
   (noteTopic: string) => {
     start
       .routerToNotebooksPage()
-      .assertNoteHasSettingWithValue(noteTopic, 'Certificate Expiry', '1y')
+      .editNotebookSettings(noteTopic)
+      .assertNoteHasSettingWithValue('Certificate Expiry', '1y')
   }
 )
 
@@ -21,10 +22,12 @@ Given(
   (notebook: string, period: string) => {
     start
       .routerToNotebooksPage()
-      .updateAssessmentSettings(notebook, { certificateExpiry: period })
+      .editNotebookSettings(notebook)
+      .updateAssessmentSettings({ certificateExpiry: period })
     start
       .routerToNotebooksPage()
-      .assertNoteHasSettingWithValue(notebook, 'Certificate Expiry', period)
+      .editNotebookSettings(notebook)
+      .assertNoteHasSettingWithValue('Certificate Expiry', period)
   }
 )
 

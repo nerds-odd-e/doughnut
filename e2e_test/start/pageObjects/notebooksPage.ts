@@ -4,6 +4,54 @@ import noteCreationForm from './noteForms/noteCreationForm'
 import { assumeNotePage } from './notePage'
 import notebookQuestionsList from './notebookQuestionsList'
 
+const notebookSettingsPopup = () => {
+  const clickButton = (name: string) =>
+    cy.findByRole('button', { name }).click()
+  const assertButtonExists = (name: string) =>
+    cy.findByRole('button', { name }).should('exist')
+  const assertButtonNotExists = (name: string) =>
+    cy.findByRole('button', { name }).should('not.exist')
+
+  return {
+    assertNoteHasSettingWithValue(setting: string, value: string) {
+      cy.formField(setting).fieldShouldHaveValue(value)
+    },
+
+    skipReview() {
+      cy.formField('Skip Review Entirely').check()
+      clickButton('Update')
+    },
+    requestForNotebookApproval() {
+      clickButton('Send Request')
+    },
+    expectNotebookApprovalCanBeRequested() {
+      assertButtonExists('Send Request')
+    },
+    expectNotebookApprovalStatus(status: string) {
+      assertButtonNotExists('Send Request')
+      cy.findByText(`Approval ${status}`).should('exist')
+    },
+    updateAssessmentSettings(settings: {
+      numberOfQuestion?: number
+      certificateExpiry?: string
+    }) {
+      if (settings.numberOfQuestion !== undefined) {
+        cy.formField('Number Of Questions In Assessment').assignFieldValue(
+          `${settings.numberOfQuestion}`
+        )
+      }
+      if (settings.certificateExpiry) {
+        cy.formField('Certificate Expiry').assignFieldValue(
+          `${settings.certificateExpiry}`
+        )
+      }
+
+      clickButton('Update')
+      cy.pageIsNotLoading()
+    },
+  }
+}
+
 export const routerToNotebooksPage = () => {
   cy.pageIsNotLoading()
   cy.routerPush('/notebooks', 'notebooks', {})
@@ -16,17 +64,7 @@ export const routerToNotebooksPage = () => {
         assumeNotePage()
       )
     },
-    assertNoteHasSettingWithValue(
-      notebookTopic: string,
-      setting: string,
-      value: string
-    ) {
-      this.findNotebookCardButton(
-        notebookTopic,
-        'Edit notebook settings'
-      ).click()
-      cy.formField(setting).fieldShouldHaveValue(value)
-    },
+
     creatingNotebook(notebookTopic: string) {
       cy.findByText('Add New Notebook').click()
       return noteCreationForm.createNote(notebookTopic, undefined)
@@ -39,48 +77,6 @@ export const routerToNotebooksPage = () => {
       this.findNotebookCardButton(notebook, 'Edit subscription').click()
       cy.findByRole('button', { name: 'Update' }).click()
     },
-    skipReview(notebook: string) {
-      this.findNotebookCardButton(notebook, 'Edit notebook settings').click()
-      cy.formField('Skip Review Entirely').check()
-      cy.findByRole('button', { name: 'Update' }).click()
-    },
-    requestForNotebookApproval(notebook: string) {
-      this.findNotebookCardButton(notebook, 'Edit notebook settings').click()
-      cy.findByRole('button', { name: 'Send Request' }).click()
-    },
-    expectNotebookApprovalCanBeRequested(notebook: string) {
-      this.findNotebookCardButton(notebook, 'Edit notebook settings').click()
-      cy.findByRole('button', { name: 'Send Request' }).should('exist')
-    },
-    expectNotebookApprovalStatus(notebook: string, status: string) {
-      this.findNotebookCardButton(notebook, 'Edit notebook settings').click()
-      cy.findByRole('button', { name: 'Send Request' }).should('not.exist')
-      cy.findByText('Approval {status}'.replace('{status}', status)).should(
-        'exist'
-      )
-    },
-    updateAssessmentSettings(
-      notebook: string,
-      settings: {
-        numberOfQuestion?: number
-        certificateExpiry?: string
-      }
-    ) {
-      this.findNotebookCardButton(notebook, 'Edit notebook settings').click()
-      if (settings.numberOfQuestion !== undefined) {
-        cy.formField('Number Of Questions In Assessment').assignFieldValue(
-          `${settings.numberOfQuestion}`
-        )
-      }
-      if (settings.certificateExpiry) {
-        cy.formField('Certificate Expiry').assignFieldValue(
-          `${settings.certificateExpiry}`
-        )
-      }
-
-      cy.findByRole('button', { name: 'Update' }).click()
-      cy.pageIsNotLoading()
-    },
     unsubscribe(notebook: string) {
       this.findNotebookCardButton(notebook, 'Unsubscribe').click()
       cy.findByRole('button', { name: 'OK' }).click()
@@ -89,5 +85,10 @@ export const routerToNotebooksPage = () => {
       this.findNotebookCardButton(notebook, 'Notebook Questions').click()
       return notebookQuestionsList()
     },
+    editNotebookSettings(notebook: string) {
+      this.findNotebookCardButton(notebook, 'Edit notebook settings').click()
+      return notebookSettingsPopup()
+    },
+    ...notebookSettingsPopup(),
   }
 }
