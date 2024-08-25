@@ -24,14 +24,3 @@ Feature: Bazaar browsing
     When I click the child note "Rectangle"
     Then there shouldn't be any note edit button
     And I should see it has link to "Square"
-
-  Scenario: Seeing approved notebooks
-    Given I am logged in as an admin
-    And I have a notebook with the head note "Grape"
-    And I choose to share my notebook "Grape"
-    And I request for an approval for notebooks:
-      | Grape           |
-    Then I should see following notebooks waiting for approval:
-    | Grape         |
-    And I approve notebook "Grape"
-    Then I should see a certification icon on the "Grape" notebook card

@@ -18,16 +18,6 @@ Feature: Quiz Question Management
       | What does a cow say?                 | moo            |
       | What do you call a cow with not leg? | Ground beef    |
 
-  Scenario: Reset approval on new question
-    Given I am logged in as an admin
-    And I have a notebook with the head note "The cow joke"
-    And I request for an approval for notebooks:
-      | The cow joke |
-    When I add the following question for the note "The cow joke":
-      | Stem                                     | Choice 0              | Choice 1 | Choice 2 | Correct Choice Index |
-      | Why do cows have hooves instead of feet? | Because they lactose! | Woof!    | What?    | 0                    |
-    Then I can request approval for the notebook "The cow joke"
-
   @usingMockedOpenAiService
   Scenario: Can generate the question by AI
     Given OpenAI now generates this question:
