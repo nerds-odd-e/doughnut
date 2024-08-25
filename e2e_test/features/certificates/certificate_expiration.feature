@@ -2,8 +2,8 @@ Feature: Certification expiration
 
   Background:
     Given Now is "2024-01-01"
-    And I am logged in as an existing user
-    And there is a notebook "Certified thing" by "old_learner" with approved certifiable assessment
+    And I am logged in as "a_trainer"
+    And there is a notebook "Certified thing" by "a_trainer" with approved certifiable assessment
 
   Scenario: Default certificate expiration is one year
     When I Complete an assessment in "Certified thing"

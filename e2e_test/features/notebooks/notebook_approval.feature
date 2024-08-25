@@ -7,6 +7,10 @@ Feature: Notebook approval
       | GIT           |
       | COW           |
 
+  Scenario: I cannot receive a certificate on passing an unapproved assessment
+    Given there is an assessment on notebook "Just say 'Yes'" with 2 questions
+    When I pass the assessment on "Just say 'Yes'"
+    Then I cannot download a certificate after passing an assessment
 
   Scenario: Apply for an approval for a notebook
     When I request for an approval for notebooks:
@@ -17,7 +21,7 @@ Feature: Notebook approval
     When I request for an approval for notebooks:
       | TDD           |
     Then I cannot request approval again for notebook "TDD"
-  
+
   Scenario: Notebook with no approval request does not show on the approval request list
       Given I am logged in as an admin
       And I have a notebook with the head note "WrumWrum"
