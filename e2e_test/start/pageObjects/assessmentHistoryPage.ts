@@ -33,6 +33,7 @@ export const assumeViewAssessmentHistoryPage = () => {
         .findAllByText('View Certificate')
         .eq(index)
         .click()
+      return CertificatePopup()
     },
   }
 }

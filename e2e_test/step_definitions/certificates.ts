@@ -38,26 +38,14 @@ When(
   }
 )
 
-Then(
-  'I should see that the certificate of {string} assesment expires on {string}',
-  (notebook: string, expires: string) => {
-    start
-      .assumeAssessmentPage(notebook)
-      .expectCertificate()
-      .expectExpiryDate(expires)
-  }
-)
-
-Then('list should contain certificates', (datatable: DataTable) => {
-  for (let i = 0; i < datatable.rows().length; i++) {
-    const row = datatable.rows()[i]
-    if (row) {
-      const notebook = row[0]
-      const expires = row[1]
-      if (notebook && expires) {
-        start.navigateToAssessmentHistory().viewCertificateAt(i)
-        cy.findByTestId('expired-date').contains(expires)
-      }
+Then('I should have the following certificates:', (datatable: DataTable) => {
+  datatable.rows().forEach((row, i) => {
+    const [notebook, expires] = row
+    if (notebook && expires) {
+      start
+        .navigateToAssessmentHistory()
+        .viewCertificateAt(i)
+        .expectExpiryDate(expires)
     }
-  }
+  })
 })
