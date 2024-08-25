@@ -533,3 +533,10 @@ Then('the question in the form becomes:', (data: DataTable) => {
     }
   )
 })
+
+When('I remove the question {string} from the note {string}:', (question: string, noteTopic: string) => {
+    start.jumpToNotePage(noteTopic)
+    .openQuestionList()
+    .removeQuestion(question)
+  }
+)
