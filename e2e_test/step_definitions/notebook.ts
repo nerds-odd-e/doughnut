@@ -44,15 +44,6 @@ When('I request for an approval for notebooks:', (notebooks: DataTable) => {
 })
 
 When(
-  'I cannot request approval again for notebook {string}',
-  (noteTopic: string) => {
-    start
-      .routerToNotebooksPage()
-      .expectNotebookApprovalCannotBeRequested(noteTopic)
-  }
-)
-
-When(
   'the approval for the notebook {string} is {string}',
   (noteTopic: string, status: string) => {
     start

@@ -26,11 +26,6 @@ Feature: Notebook approval to become certified
       | TDD |
     Then I should see the status "Pending" of the approval for notebook "TDD"
 
-  Scenario: Approval cannot be requested again after requesting it
-    When I request for an approval for notebooks:
-      | TDD |
-    Then I cannot request approval again for notebook "TDD"
-
   Scenario: Notebook with no approval request does not show on the approval request list
     Given I am logged in as an admin
     And I have a notebook with the head note "WrumWrum"
