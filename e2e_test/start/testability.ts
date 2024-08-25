@@ -115,7 +115,7 @@ const testability = () => {
         }))
       return this.injectQuizQuestions({
         notebookTitle: notebook,
-        notebookCertifiable,
+        notebookCertifiable: notebookCertifiable ?? false,
         quizQuestionTestData: quizQuestion,
       })
     },
