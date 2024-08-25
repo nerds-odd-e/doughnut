@@ -90,7 +90,9 @@ const testability = () => {
       ]
       return this.injectNotes(notes, creatorId)
     },
-    injectQuizQuestions(quizQuestionsTestData: QuizQuestionsTestData) {
+    injectQuizQuestionsToNotebook(
+      quizQuestionsTestData: QuizQuestionsTestData
+    ) {
       postToTestabilityApi(cy, 'inject_quiz_questions', {
         body: quizQuestionsTestData,
       }).then((response) => {
@@ -113,9 +115,9 @@ const testability = () => {
           'One Wrong Choice': 'No',
           Approved: 'true',
         }))
-      return this.injectQuizQuestions({
+      return this.injectQuizQuestionsToNotebook({
         notebookTitle: notebook,
-        notebookCertifiable: notebookCertifiable ?? false,
+        notebookCertifiable,
         quizQuestionTestData: quizQuestion,
       })
     },

@@ -195,10 +195,15 @@ class TestabilityRestController {
 
   private void updateNotebookSettings(
       List<QuizQuestionAndAnswer> quizQuestionAndAnswers, Boolean notebookCertifiable) {
+    if (quizQuestionAndAnswers.isEmpty()) {
+      return;
+    }
     Notebook notebook = quizQuestionAndAnswers.getFirst().getNote().getNotebook();
     notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(quizQuestionAndAnswers.size());
     notebook.setApprovalStatus(
-        notebookCertifiable ? ApprovalStatus.APPROVED : ApprovalStatus.NOT_APPROVED);
+        notebookCertifiable != null && notebookCertifiable
+            ? ApprovalStatus.APPROVED
+            : ApprovalStatus.NOT_APPROVED);
     modelFactoryService.save(notebook);
   }
 
