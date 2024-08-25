@@ -1,7 +1,7 @@
 import { CertificatePopup } from './CertificatePopup'
 
 export const assumeAssessmentAndCertificateHistoryPage = () => {
-  cy.findByText('Welcome To Assessment History').should('be.visible')
+  cy.findByText('My Assessment and Certificate History').should('be.visible')
 
   const findNotebookCell = (notebook: string, column: number) => {
     return cy
