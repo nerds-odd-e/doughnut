@@ -17,29 +17,26 @@ Then(
 )
 
 Given(
-  'Expiration of {string} is set to {string}',
+  'I set the certificate expiry of the notebook {string} to {string}',
   (notebook: string, period: string) => {
     start
       .routerToNotebooksPage()
       .updateAssessmentSettings(notebook, { certificateExpiry: period })
-  }
-)
-
-Given(
-  'I should see the expiration setting of {string} is set to {string}',
-  (notebook: string, period: string) => {
     start
       .routerToNotebooksPage()
       .assertNoteHasSettingWithValue(notebook, 'Certificate Expiry', period)
   }
 )
 
-When('I Complete an assessment in {string}', (notebook: string) => {
-  start
-    .navigateToBazaar()
-    .selfAssessmentOnNotebook(notebook)
-    .answerYesNoQuestionsToScore(2, 2)
-})
+When(
+  'I complete an assessment for the notebook {string}',
+  (notebook: string) => {
+    start
+      .navigateToBazaar()
+      .selfAssessmentOnNotebook(notebook)
+      .answerYesNoQuestionsToScore(2, 2)
+  }
+)
 
 Then(
   'I should see that the certificate of {string} assesment expires on {string}',

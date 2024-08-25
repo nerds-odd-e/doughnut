@@ -6,7 +6,7 @@ Feature: Get certificate by an assessment
 
   Background:
     Given I am logged in as "old_learner"
-    And there is a notebook "Just say 'Yes'" by "a_trainer" with approved certifiable assessment
+    And there is a certified notebook "Just say 'Yes'" by "a_trainer" with 2 questions and is shared to the Bazaar
 
   Scenario Outline: I should pass the assessment when I get score more than 80%
     When I get score <Score> when do the assessment on "Just say 'Yes'"
@@ -21,8 +21,8 @@ Feature: Get certificate by an assessment
 
   @ignore
   Scenario: I should see the original start date on my renewed certificate
-    Given Now is "2021-08-09"
+    Given the current date is "2021-08-09"
     And I get score 2/2 when do the assessment on "Just say 'Yes'"
-    When Now is "2024-08-09"
+    When the current date is "2024-08-09"
     And I get score 2/2 when do the assessment on "Just say 'Yes'"
     Then I should see the original start date "2021-08-09" on my renewed certificate for "Just say 'Yes'"

@@ -1,24 +1,21 @@
 Feature: Certification expiration
+  As a trainer, I want to set the expiration date of the certificate of the assessment,
+  so that the learner knows when the certificate expires.
 
   Background:
-    Given Now is "2024-01-01"
+    Given the current date is "2024-01-01"
     And I am logged in as "a_trainer"
-    And there is a notebook "Certified thing" by "a_trainer" with approved certifiable assessment
+    And there is a certified notebook "Certified thing" by "a_trainer" with 2 questions and is shared to the Bazaar
 
-  Scenario: Default certificate expiration is one year
-    When I Complete an assessment in "Certified thing"
-    Then I should see that the certificate of "Certified thing" assesment expires on "2025-01-01"
-
-  Scenario: See modifed expiration date
-    And Expiration of "Certified thing" is set to "2y"
-    * I should see the expiration setting of "Certified thing" is set to "2y"
-    When I Complete an assessment in "Certified thing"
+  Scenario: User gets certificate with expiration date
+    Given I set the certificate expiry of the notebook "Certified thing" to "2y"
+    When I complete an assessment for the notebook "Certified thing"
     Then I should see that the certificate of "Certified thing" assesment expires on "2026-01-01"
 
-  Scenario: Existing certificate expiry is not changed
-    And Expiration of "Certified thing" is set to "2y"
-    And I Complete an assessment in "Certified thing"
-    When Expiration of "Certified thing" is set to "3y"
+  Scenario: Updating the expiry should note change the existing certificates
+    Given I set the certificate expiry of the notebook "Certified thing" to "2y"
+    And I complete an assessment for the notebook "Certified thing"
+    When I set the certificate expiry of the notebook "Certified thing" to "3y"
     Then list should contain certificates
       |Notebook         |Expiry Date  |
       |Certified thing  |2026-01-01   |

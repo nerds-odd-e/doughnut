@@ -104,7 +104,7 @@ Given(
 )
 
 Given(
-  'there is a notebook {string} by {string} with approved certifiable assessment',
+  'there is a certified notebook {string} by {string} with 2 questions and is shared to the Bazaar',
   (notebook: string, creatorId: string) => {
     start
       .testability()
@@ -145,7 +145,7 @@ Then(
   }
 )
 
-When('Now is {string}', (dateString: string) => {
+When('the current date is {string}', (dateString: string) => {
   start.testability().backendTimeTravelToDate(new Date(dateString))
 })
 
