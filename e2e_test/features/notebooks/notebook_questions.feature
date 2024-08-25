@@ -1,5 +1,7 @@
 
 Feature: Notebook questions
+  As a trainer, I want to see all my questions in a notebook in one place,
+  so that I can review them before sharing the notebook with others.
 
   Background:
     Given I am logged in as an existing user
