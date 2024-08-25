@@ -178,16 +178,6 @@ When('I approve notebook {string} to become certified', (notebook: string) => {
 })
 
 Then(
-  'I should not see notebook {string} waiting for approval',
-  (notebook: string) => {
-    start
-      .goToAdminDashboard()
-      .goToCertificationRequestPage()
-      .listDoesNotContain(notebook)
-  }
-)
-
-Then(
   'I should see following notebooks waiting for approval only:',
   (notebooks: DataTable) => {
     start

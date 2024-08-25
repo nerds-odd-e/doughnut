@@ -65,11 +65,16 @@ export const bazaarOrCircle = () => {
         .type(dailyLearningCount)
       cy.findByRole('button', { name: 'Submit' }).click()
     },
-    expectCertificationIcon(notebook: string) {
-      cy.findByText(notebook)
+    expectCertificationIcon(notebook: string, exists: boolean) {
+      const icon = cy
+        .findByText(notebook)
         .parents('.card')
         .find('.certification-icon')
-        .should('exist')
+      if (exists) {
+        icon.should('exist')
+      } else {
+        icon.should('not.exist')
+      }
     },
   }
 }

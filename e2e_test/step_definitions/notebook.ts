@@ -64,7 +64,7 @@ Then(
 )
 
 Then(
-  'I can request approval for the notebook {string}',
+  'I can request approval for the notebook {string} again',
   (noteTopic: string) => {
     start
       .routerToNotebooksPage()

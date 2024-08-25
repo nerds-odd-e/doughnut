@@ -76,9 +76,6 @@ export function assumeAdminDashboardPage() {
             cy.findByText(notebook).should('exist')
           })
         },
-        listDoesNotContain(notebook: string) {
-          cy.findByText(notebook).should('not.exist')
-        },
       }
     },
   }
