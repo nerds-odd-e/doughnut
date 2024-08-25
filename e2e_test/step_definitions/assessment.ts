@@ -138,6 +138,13 @@ When(
   }
 )
 
+Then(
+  'I should not get a certificate of {string} for {string} from {string}',
+  (notebook: string) => {
+    start.assumeAssessmentPage(notebook).expectNoCertificate()
+  }
+)
+
 When('the current date is {string}', (dateString: string) => {
   start.testability().backendTimeTravelToDate(new Date(dateString))
 })
