@@ -2846,6 +2846,8 @@ components:
       properties:
         notebookTitle:
           type: string
+        notebookCertifiable:
+          type: boolean
         quizQuestionTestData:
           type: array
           items:

@@ -5,6 +5,7 @@
 import type { QuizQuestionTestData } from './QuizQuestionTestData';
 export type QuizQuestionsTestData = {
     notebookTitle?: string;
+    notebookCertifiable?: boolean;
     quizQuestionTestData?: Array<QuizQuestionTestData>;
 };
 

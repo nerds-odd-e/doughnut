@@ -189,14 +189,16 @@ class TestabilityRestController {
     List<QuizQuestionAndAnswer> quizQuestionAndAnswers =
         quizQuestionsTestData.buildQuizQuestions(this.modelFactoryService);
     quizQuestionAndAnswers.forEach(question -> modelFactoryService.save(question));
-    setNumberOfQuestionsPerAssessmentOfNotebook(quizQuestionAndAnswers);
+    updateNotebookSettings(quizQuestionAndAnswers, quizQuestionsTestData.getNotebookCertifiable());
     return quizQuestionAndAnswers;
   }
 
-  private void setNumberOfQuestionsPerAssessmentOfNotebook(
-      List<QuizQuestionAndAnswer> quizQuestionAndAnswers) {
+  private void updateNotebookSettings(
+      List<QuizQuestionAndAnswer> quizQuestionAndAnswers, Boolean notebookCertifiable) {
     Notebook notebook = quizQuestionAndAnswers.getFirst().getNote().getNotebook();
     notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(quizQuestionAndAnswers.size());
+    notebook.setApprovalStatus(
+        notebookCertifiable ? ApprovalStatus.APPROVED : ApprovalStatus.NOT_APPROVED);
     modelFactoryService.save(notebook);
   }
 

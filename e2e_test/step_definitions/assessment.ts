@@ -108,7 +108,7 @@ Given(
   (notebook: string, creatorId: string) => {
     start
       .testability()
-      .injectNumbersNotebookWithQuestions(notebook, 2, creatorId)
+      .injectNumbersNotebookWithQuestions(notebook, 2, creatorId, true)
   }
 )
 

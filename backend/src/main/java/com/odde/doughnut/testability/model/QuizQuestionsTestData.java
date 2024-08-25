@@ -13,6 +13,7 @@ import lombok.Setter;
 @Data
 public class QuizQuestionsTestData {
   private String notebookTitle;
+  private Boolean notebookCertifiable;
   private List<QuizQuestionTestData> quizQuestionTestData;
 
   @Setter
