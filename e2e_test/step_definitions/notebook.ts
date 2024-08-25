@@ -36,14 +36,11 @@ When('I change notebook {string} to skip review', (noteTopic: string) => {
   start.routerToNotebooksPage().editNotebookSettings(noteTopic).skipReview()
 })
 
-When('I request for an approval for notebooks:', (notebooks: DataTable) => {
-  notebooks.raw().forEach((notebookRaw: string[]) => {
-    const notebookName = notebookRaw[0]!
-    start
-      .routerToNotebooksPage()
-      .editNotebookSettings(notebookName)
-      .requestForNotebookApproval()
-  })
+When('I request for an approval for notebook {string}', (notebook: string) => {
+  start
+    .routerToNotebooksPage()
+    .editNotebookSettings(notebook)
+    .requestForNotebookApproval()
 })
 
 When(

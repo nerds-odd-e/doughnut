@@ -70,11 +70,11 @@ export function assumeAdminDashboardPage() {
             .click()
           cy.findByRole('button', { name: 'OK' }).click()
         },
-        listIsEmpty() {
-          cy.findByText('No certification request found.')
-        },
-        listContains(notebook: string) {
-          cy.findByText(notebook).should('exist')
+        listContainsExactly(notebooks: string[]) {
+          cy.get('tbody tr').should('have.length', notebooks.length)
+          notebooks.forEach((notebook) => {
+            cy.findByText(notebook).should('exist')
+          })
         },
         listDoesNotContain(notebook: string) {
           cy.findByText(notebook).should('not.exist')

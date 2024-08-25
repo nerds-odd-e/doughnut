@@ -64,7 +64,6 @@ export const routerToNotebooksPage = () => {
         assumeNotePage()
       )
     },
-
     creatingNotebook(notebookTopic: string) {
       cy.findByText('Add New Notebook').click()
       return noteCreationForm.createNote(notebookTopic, undefined)
