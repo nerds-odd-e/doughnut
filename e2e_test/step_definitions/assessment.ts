@@ -68,7 +68,7 @@ Given(
 )
 
 When(
-  'I get score {int}\\/{int} when do the assessment on {string}',
+  'I achieve a score of {int}\\/{int} in the assessment of the notebook {string}',
   (correctAnswers: number, allQuestions: number, notebook: string) => {
     start
       .navigateToBazaar()
@@ -80,6 +80,10 @@ When(
 When('I pass the assessment on {string}', (notebook: string) => {
   start.navigateToBazaar().selfAssessmentOnNotebook(notebook)
   start.assumeAssessmentPage(notebook).answerYesNoQuestionsToScore(2, 2)
+})
+
+Then('I can download a certificate after passing an assessment', () => {
+  start.assumeAssessmentPage().expectCertificate()
 })
 
 Then('I cannot download a certificate after passing an assessment', () => {
@@ -95,16 +99,16 @@ Then('I should not pass the assessment of {string}', (notebook: string) => {
 })
 
 Given(
-  'there is an assessment on notebook {string} with {int} questions',
-  (notebook: string, numberOfQuestion: number) => {
+  'there is a notebook {string} by {string} with {int} questions, shared to the Bazaar',
+  (notebook: string, creatorId: string, numberOfQuestion: number) => {
     start
       .testability()
-      .injectNumbersNotebookWithQuestions(notebook, numberOfQuestion)
+      .injectNumbersNotebookWithQuestions(notebook, numberOfQuestion, creatorId)
   }
 )
 
 Given(
-  'there is a certified notebook {string} by {string} with 2 questions and is shared to the Bazaar',
+  'there is a certified notebook {string} by {string} with 2 questions, shared to the Bazaar',
   (notebook: string, creatorId: string) => {
     start
       .testability()
@@ -113,15 +117,8 @@ Given(
 )
 
 Then(
-  'I should see my assessment and certificate history with empty records',
-  () => {
-    start.navigateToAssessmentAndCertificatePage().expectTableWithNumberOfRow(0)
-  }
-)
-
-Then(
-  'I should see {string} result as {string} in my assessment and certificate history',
-  (notebook: string, result: string) => {
+  'I should see the result {string} for the notebook {string} in my assessment and certificate history',
+  (result: string, notebook: string) => {
     start
       .navigateToAssessmentAndCertificatePage()
       .expectTableWithNumberOfRow(1)
@@ -141,13 +138,6 @@ When(
   }
 )
 
-Then(
-  'I should not get a certificate of {string} for {string} from {string}',
-  (notebook: string) => {
-    start.assumeAssessmentPage(notebook).expectNoCertificate()
-  }
-)
-
 When('the current date is {string}', (dateString: string) => {
   start.testability().backendTimeTravelToDate(new Date(dateString))
 })
@@ -163,7 +153,7 @@ When(
 )
 
 Then(
-  'I can view certificate of {string} in my assessment and certificate history',
+  'I can view the certificate for the notebook {string} in my assessment and certificate history',
   (notebook: string) => {
     start
       .navigateToAssessmentAndCertificatePage()
@@ -173,7 +163,7 @@ Then(
 )
 
 Then(
-  'I can not view certificate of {string} in my assessment and certificate history',
+  'I cannot view the certificate for the notebook {string} in my assessment and certificate history',
   (notebook: string) => {
     start.navigateToAssessmentAndCertificatePage().expectNoCertificate(notebook)
   }

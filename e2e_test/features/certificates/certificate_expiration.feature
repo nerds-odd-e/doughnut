@@ -5,7 +5,7 @@ Feature: Certification expiration
   Background:
     Given the current date is "2024-01-01"
     And I am logged in as "a_trainer"
-    And there is a certified notebook "Certified thing" by "a_trainer" with 2 questions and is shared to the Bazaar
+    And there is a certified notebook "Certified thing" by "a_trainer" with 2 questions, shared to the Bazaar
 
   Scenario: Certificate is issued with the specified expiration date
     Given I set the certificate expiry of the notebook "Certified thing" to "5y"

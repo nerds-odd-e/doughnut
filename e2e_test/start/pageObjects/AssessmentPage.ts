@@ -67,9 +67,6 @@ export const assumeAssessmentPage = (notebook?: string) => {
       cy.findByText('View Certificate').click()
       return CertificatePopup()
     },
-    expectNoCertificate() {
-      cy.findByText('View Certificate').should('not.exist')
-    },
     expectCertificateCannotBeObtained() {
       cy.findByRole('button', { name: 'View Certificate' }).should(
         'have.class',
