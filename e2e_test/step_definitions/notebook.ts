@@ -187,15 +187,3 @@ Given('following notebooks have pending approval:', (notebooks: DataTable) => {
       .requestForNotebookApproval()
   })
 })
-
-When(
-  'I add the following question for the note {string} of notebook {string}:',
-  (note: string, notebook: string, data: DataTable) => {
-    const notebookQuestionsPage = start
-      .routerToNotebooksPage()
-      .openNotebookQuestions(notebook)
-    data.hashes().forEach((row: Record<string, string>) => {
-      notebookQuestionsPage.addQuestionPage(note).addQuestion(row)
-    })
-  }
-)
