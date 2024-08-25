@@ -27,6 +27,30 @@ const assumeQuestionSection = () => {
   }
 }
 
+const endOfAssessment = () => {
+  const findCertificateButton = () =>
+    cy.findByRole('button', { name: 'View Certificate' })
+
+  return {
+    passAssessment() {
+      cy.findByText('You have passed the assessment.').should('be.visible')
+    },
+    expectNotPassAssessment() {
+      cy.findByText('You have not passed the assessment.').should('be.visible')
+    },
+    expectCertificate() {
+      findCertificateButton().click()
+      return CertificatePopup()
+    },
+    expectNoCertificate() {
+      findCertificateButton().should('not.exist')
+    },
+    expectCertificateCannotBeObtained() {
+      findCertificateButton().should('have.class', 'disabled')
+    },
+  }
+}
+
 export const assumeAssessmentPage = (notebook?: string) => {
   if (notebook) {
     cy.findByRole('heading', { name: `Assessment For ${notebook}` })
@@ -38,9 +62,6 @@ export const assumeAssessmentPage = (notebook?: string) => {
       return assumeQuestionSection()
     },
     assumeQuestionSection,
-    expectEndOfAssessment(expectedScore: string) {
-      cy.contains(expectedScore)
-    },
     answerQuestionsFromTable(answersTable: Record<string, string>[]) {
       Cypress._.times(answersTable.length, () => {
         this.assumeQuestionSection().answerFromTable(answersTable)
@@ -57,24 +78,11 @@ export const assumeAssessmentPage = (notebook?: string) => {
         cy.pageIsNotLoading()
       }
     },
-    passAssessment() {
-      cy.findByText('You have passed the assessment.').should('be.visible')
-    },
-    expectNotPassAssessment() {
-      cy.findByText('You have not passed the assessment.').should('be.visible')
-    },
-    expectCertificate() {
-      cy.findByText('View Certificate').click()
-      return CertificatePopup()
-    },
-    expectNoCertificate() {
-      cy.findByText('View Certificate').should('not.exist')
-    },
-    expectCertificateCannotBeObtained() {
-      cy.findByRole('button', { name: 'View Certificate' }).should(
-        'have.class',
-        'disabled'
-      )
+    expectEndOfAssessment(expectedScore?: string) {
+      if (expectedScore) {
+        cy.contains(expectedScore)
+      }
+      return endOfAssessment()
     },
     expectReachedLimit() {
       cy.findByText(

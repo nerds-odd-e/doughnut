@@ -83,19 +83,25 @@ When('I pass the assessment on {string}', (notebook: string) => {
 })
 
 Then('I can download a certificate after passing an assessment', () => {
-  start.assumeAssessmentPage().expectCertificate()
+  start.assumeAssessmentPage().expectEndOfAssessment().expectCertificate()
 })
 
 Then('I cannot download a certificate after passing an assessment', () => {
-  start.assumeAssessmentPage().expectCertificateCannotBeObtained()
+  start
+    .assumeAssessmentPage()
+    .expectEndOfAssessment()
+    .expectCertificateCannotBeObtained()
 })
 
 Then('I should pass the assessment of {string}', (notebook: string) => {
-  start.assumeAssessmentPage(notebook).passAssessment()
+  start.assumeAssessmentPage(notebook).expectEndOfAssessment().passAssessment()
 })
 
 Then('I should not pass the assessment of {string}', (notebook: string) => {
-  start.assumeAssessmentPage(notebook).expectNotPassAssessment()
+  start
+    .assumeAssessmentPage(notebook)
+    .expectEndOfAssessment()
+    .expectNotPassAssessment()
 })
 
 Given(
@@ -131,6 +137,7 @@ When(
   (notebook: string, user: string, creator: string) => {
     start
       .assumeAssessmentPage(notebook)
+      .expectEndOfAssessment()
       .expectCertificate()
       .expectCertificateFor(notebook)
       .expectCertificateUser(user)
@@ -141,7 +148,10 @@ When(
 Then(
   'I should not get a certificate of {string} for {string} from {string}',
   (notebook: string) => {
-    start.assumeAssessmentPage(notebook).expectNoCertificate()
+    start
+      .assumeAssessmentPage(notebook)
+      .expectEndOfAssessment()
+      .expectNoCertificate()
   }
 )
 
@@ -154,6 +164,7 @@ When(
   (dateString: string, notebook: string) => {
     start
       .assumeAssessmentPage(notebook)
+      .expectEndOfAssessment()
       .expectCertificate()
       .expectDate(dateString)
   }
