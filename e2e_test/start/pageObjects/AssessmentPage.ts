@@ -1,4 +1,3 @@
-import { assumeBazaarPage } from './bazaarPage'
 import { CertificatePopup } from './CertificatePopup'
 
 const assumeQuestionSection = () => {
@@ -57,10 +56,6 @@ export const assumeAssessmentPage = (notebook?: string) => {
   }
 
   return {
-    expectQuestion(stem: string) {
-      cy.findByText(stem)
-      return assumeQuestionSection()
-    },
     assumeQuestionSection,
     answerQuestionsFromTable(answersTable: Record<string, string>[]) {
       Cypress._.times(answersTable.length, () => {
@@ -83,13 +78,6 @@ export const assumeAssessmentPage = (notebook?: string) => {
         cy.contains(expectedScore)
       }
       return endOfAssessment()
-    },
-    expectReachedLimit() {
-      cy.findByText(
-        'You have reached the assessment limit for today. Please try again tomorrow.'
-      )
-      cy.findByRole('button', { name: 'OK' }).click()
-      assumeBazaarPage()
     },
   }
 }

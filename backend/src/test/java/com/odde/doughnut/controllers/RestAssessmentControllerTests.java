@@ -8,7 +8,6 @@ import com.odde.doughnut.controllers.dto.Randomization;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -168,38 +167,6 @@ public class RestAssessmentControllerTests {
           .please();
 
       assertThrows(ApiException.class, () -> controller.generateAssessmentQuestions(notebook));
-    }
-
-    @Test
-    void shouldThrowExceptionWhenThereExcessAssessmentLimit() {
-      makeMe.theNote(topNote).withNChildrenThat(5, NoteBuilder::hasAnApprovedQuestion).please();
-      notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(5);
-
-      var now = testabilitySettings.getCurrentUTCTimestamp();
-      for (int i = 0; i < 3; i++) {
-        makeMe.aAssessmentAttempt(currentUser.getEntity(), notebook, now).please();
-      }
-
-      assertThrows(
-          ResponseStatusException.class, () -> controller.generateAssessmentQuestions(notebook));
-    }
-
-    @Test
-    void shouldReturnQuestionsWhenAssessmentDoesNotExcessAssessmentLimitWithinOneDay()
-        throws UnexpectedNoAccessRightException {
-      makeMe.theNote(topNote).withNChildrenThat(5, NoteBuilder::hasAnApprovedQuestion).please();
-      notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(5);
-
-      var now = testabilitySettings.getCurrentUTCTimestamp();
-      for (int i = 0; i < 2; i++) {
-        makeMe.aAssessmentAttempt(currentUser.getEntity(), notebook, now).please();
-      }
-
-      var yesterday = TimestampOperations.addHoursToTimestamp(now, -25);
-      makeMe.aAssessmentAttempt(currentUser.getEntity(), notebook, yesterday).please();
-
-      List<QuizQuestion> assessment = controller.generateAssessmentQuestions(notebook);
-      assertEquals(5, assessment.size());
     }
   }
 

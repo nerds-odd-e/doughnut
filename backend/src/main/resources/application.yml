@@ -47,8 +47,6 @@ springdoc:
   api-docs:
     enabled: true
     path: /api-docs
-constraints:
-  assessment-attempts: 3
 ---
 spring:
   config:
@@ -99,8 +97,6 @@ springdoc:
   api-docs:
     enabled: true
     path: /api-docs
-constraints:
-  assessment-attempts: 3
 ---
 spring:
   config:
@@ -149,5 +145,3 @@ server:
 springdoc:
   api-docs:
     enabled: false
-constraints:
-  assessment-attempts: 3

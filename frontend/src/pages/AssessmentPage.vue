@@ -98,24 +98,11 @@ const questionAnswered = async (answerResult) => {
   }
 }
 
-const generateAssessmentQuestions = () => {
-  managedApi.restAssessmentController
-    .generateAssessmentQuestions(props.notebookId)
-    .then((response) => {
-      quizQuestions.value = response
-    })
-    .catch((res) => {
-      if (res.status === 403) {
-        popups
-          .alert(
-            "You have reached the assessment limit for today. Please try again tomorrow."
-          )
-          .then(() => {
-            router.back()
-          })
-      }
-      errors.value = res.body.message
-    })
+const generateAssessmentQuestions = async () => {
+  quizQuestions.value =
+    await managedApi.restAssessmentController.generateAssessmentQuestions(
+      props.notebookId
+    )
 }
 
 onMounted(() => {
