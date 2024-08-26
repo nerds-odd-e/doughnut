@@ -26,7 +26,7 @@
     "gsap": "^3.12.5",
     "intersection-observer": "^0.12.2",
     "lodash": "^4.17.21",
-    "marked": "^14.0.0",
+    "marked": "^14.1.0",
     "mini-debounce": "^1.0.8",
     "quill": "2.0.2",
     "turndown": "^7.2.0",
