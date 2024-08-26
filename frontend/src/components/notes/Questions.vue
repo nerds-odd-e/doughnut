@@ -36,7 +36,22 @@
               @change="toggleApproval(question.id)"
             />
           </td>
-          <td>{{ question.quizQuestion.multipleChoicesQuestion.stem }}</td>
+          <td>
+            {{ question.quizQuestion.multipleChoicesQuestion.stem }}
+            <PopButton btn-class="btn btn-primary" title="Edit Question">
+            <!-- prettier-ignore -->
+            <template #default="{ closer }">
+              <NoteEditQuestion
+                :note="note"
+                :question="question"
+                @close-dialog="
+                  closer($event);
+                  questionAdded($event);
+                "
+              />
+            </template>
+          </PopButton>
+          </td>
           <template
             v-if="question.quizQuestion.multipleChoicesQuestion.choices"
           >
