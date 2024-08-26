@@ -44,7 +44,6 @@ import {
 } from "@/generated/backend"
 import { useRouter } from "vue-router"
 import QuizQuestionComp from "@/components/review/QuizQuestion.vue"
-import usePopups from "@/components/commons/Popups/usePopups.ts"
 
 const { managedApi } = useLoadingApi()
 const router = useRouter()
@@ -53,7 +52,6 @@ const props = defineProps({
   approvalStatus: { type: String, required: true },
 })
 
-const { popups } = usePopups()
 const topicConstructor = computed(() => {
   return router.currentRoute.value.query?.topic
 })
