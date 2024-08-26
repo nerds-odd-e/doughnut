@@ -1,5 +1,6 @@
 import { routerToNotebooksPage } from './notebooksPage'
 import { assumeAdminDashboardPage } from './adminPages/adminDashboardPage'
+import { assumeAssessmentAndCertificateHistoryPage } from './assessmentAndCertificateHistoryPage'
 
 export const systemSidebar = () => {
   routerToNotebooksPage()
@@ -29,6 +30,12 @@ export const systemSidebar = () => {
         },
         logout() {
           cy.findByRole('button', { name: 'Logout' }).click()
+        },
+        myAssessmentAndCertificateHistory() {
+          cy.findByRole('button', {
+            name: 'My Assessments and Certificates',
+          }).click()
+          return assumeAssessmentAndCertificateHistoryPage()
         },
       }
     },

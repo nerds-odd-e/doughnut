@@ -37,8 +37,3 @@ export const assumeAssessmentAndCertificateHistoryPage = () => {
     },
   }
 }
-
-export const navigateToAssessmentAndCertificatePage = () => {
-  cy.visit('/assessmentAndCertificateHistory')
-  return assumeAssessmentAndCertificateHistoryPage()
-}
