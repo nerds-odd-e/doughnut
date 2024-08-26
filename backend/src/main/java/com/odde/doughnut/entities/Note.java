@@ -124,6 +124,7 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
   private Note parent;
 
   @OneToMany(mappedBy = "note")
+  @JoinColumn(name = "parent_id", referencedColumnName = "id")
   @Getter
   @JsonIgnore
   private List<QuizQuestionAndAnswer> quizQuestionAndAnswers = new ArrayList<>();
