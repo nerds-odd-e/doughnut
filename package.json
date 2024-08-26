@@ -66,7 +66,7 @@
     "npm-run-all2": "^6.2.2",
     "openapi-typescript-codegen": "^0.29.0",
     "superagent": "^10.0.2",
-    "syncpack": "^12.4.0",
+    "syncpack": "^13.0.0",
     "typescript": "5.5.4",
     "wait-on": "^8.0.0"
   },
