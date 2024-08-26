@@ -4,6 +4,7 @@ import com.odde.doughnut.entities.ApprovalStatus;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.QuizQuestionAndAnswer;
+import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
@@ -39,6 +40,19 @@ public class QuizQuestionService {
     modelFactoryService.save(parentNotebook);
 
     modelFactoryService.save(questionAndAnswer);
+    return questionAndAnswer;
+  }
+
+  public QuizQuestionAndAnswer updateQuestion(
+    Note note, @Valid QuizQuestionAndAnswer questionAndAnswer
+  ) {
+    Optional<Note> n = modelFactoryService.noteRepository.findById(note.getId());
+    if(n.isPresent()) {
+      n.get().getQuizQuestionAndAnswers().set(0, questionAndAnswer);
+   }
+    
+    //.update(questionAndAnswer);
+
     return questionAndAnswer;
   }
 
