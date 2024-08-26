@@ -45,7 +45,7 @@
     "@vitejs/plugin-vue-jsx": "^4.0.1",
     "@vue/test-utils": "2.4.6",
     "css-loader": "^7.1.2",
-    "jsdom": "^24.1.1",
+    "jsdom": "^25.0.0",
     "optionator": "^0.9.4",
     "sass": "^1.77.6",
     "sass-loader": "16.0.1",
