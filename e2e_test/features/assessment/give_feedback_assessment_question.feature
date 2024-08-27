@@ -3,18 +3,16 @@ Feature: Learner gives feedback on an assessment question
     As a learner, I want to give feedback on an assessment question
 
     Background:
-        Given I am logged in as an existing user
-        And I have a notebook with the head note "The cow joke"
-        And there are questions in the notebook "The cow joke" for the note:
-            | Note Topic   | Question             | Answer | One Wrong Choice |
-            | The cow joke | What does a cow say? | moo    | woo              |
+        Given I am logged in as "old_learner"
+        And there is a certified notebook "Just say 'Yes'" by "a_trainer" with 2 questions, shared to the Bazaar
 
     Scenario: Starts an assessment and answers wrongly, then gives feedback on the question
-        When I start an assessment on the note "The cow joke"
-        And I answer the question "What does a cow say?" wrongly
+        When I start an assessment on the note "Just say 'Yes'"
+        And I answer the question "Is 0 * 0 = 0?" wrongly
         Then I see an option to give feedback on the question
 
     Scenario: I have the option to give feedback
-        Given I answered the question "What does a cow say?" wrongly
-        When I submit my feedback
+        When I start an assessment on the note "Just say 'Yes'"
+        And I answer the question "Is 0 * 0 = 0?" wrongly
+        And I submit my feedback
         Then my feedback is saved and I see a confirmation message
