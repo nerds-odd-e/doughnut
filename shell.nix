@@ -114,13 +114,8 @@ in mkShell {
       [[ -d $HOME/.cache/Cypress ]] || pnpx cypress install --force
     fi
 
-    if [[ -d "$PWD/node_modules" && ! -d "$PWD/node_modules/@vue" ]]; then
-      rm -rf "$PWD/node_modules"
-      rm -rf "$PWD/frontend/node_modules"
-    fi
-
-    corepack prepare pnpm@9.8.0 --activate
-    corepack use pnpm@9.8.0
+    corepack prepare pnpm@9.9.0 --activate
+    corepack use pnpm@9.9.0
     pnpm --frozen-lockfile recursive install
     # start biome daemon-server
     pnpm biome start
