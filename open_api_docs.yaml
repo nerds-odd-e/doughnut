@@ -3397,8 +3397,12 @@ components:
         totalCount:
           type: integer
           format: int32
+        isCertified:
+          type: boolean
         attempt:
           $ref: "#/components/schemas/AssessmentAttempt"
+        certified:
+          type: boolean
     AiCompletionParams:
       type: object
       properties:

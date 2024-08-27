@@ -74,12 +74,7 @@ public class AssessmentService {
     assessmentAttempt.setAnswersCorrect(totalCorrectAnswer);
 
     modelFactoryService.save(assessmentAttempt);
-
-    AssessmentResult assessmentResult = new AssessmentResult();
-    assessmentResult.attempt = assessmentAttempt;
-    assessmentResult.setTotalCount(answerSubmission.size());
-    assessmentResult.setCorrectCount(totalCorrectAnswer);
-    return assessmentResult;
+    return assessmentAttempt.getAssessmentResult();
   }
 
   public List<AssessmentAttempt> getMyAssessments(User user) {

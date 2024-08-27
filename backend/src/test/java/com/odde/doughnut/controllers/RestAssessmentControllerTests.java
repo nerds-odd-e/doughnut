@@ -183,6 +183,18 @@ public class RestAssessmentControllerTests {
     }
 
     @Test
+    void shouldIncludeTheNotebookCertificateInTheResult() throws UnexpectedNoAccessRightException {
+      makeMe.theNote(topNote).withNChildrenThat(3, NoteBuilder::hasAnApprovedQuestion).please();
+      notebook = topNote.getNotebook();
+      notebook.setApprovalStatus(ApprovalStatus.APPROVED);
+
+      AssessmentResult assessmentResult =
+          controller.submitAssessmentResult(notebook, answerSubmissions);
+
+      assertTrue(assessmentResult.isCertified());
+    }
+
+    @Test
     void shouldReturnAllAnswersCorrect() throws UnexpectedNoAccessRightException {
       makeMe.theNote(topNote).withNChildrenThat(3, NoteBuilder::hasAnApprovedQuestion).please();
       notebook = topNote.getNotebook();

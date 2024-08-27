@@ -9,5 +9,6 @@ import lombok.Setter;
 public class AssessmentResult {
   public int correctCount;
   public int totalCount;
+  public boolean isCertified;
   public AssessmentAttempt attempt;
 }
