@@ -41,7 +41,7 @@ export const systemSidebar = () => {
           cy.findByRole('button', {
             name: 'Feedback overview',
           }).click()
-        }
+        },
       }
     },
   }
