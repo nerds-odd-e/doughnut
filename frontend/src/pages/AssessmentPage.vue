@@ -31,6 +31,9 @@
       </div>
     </div>
   </div>
+  <div :hidden="!answeredCurrentQuestion">
+    <button class="btn btn-danger" @click="advance">Continue</button>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -57,6 +60,7 @@ const topicConstructor = computed(() => {
 
 const quizQuestions = ref<QuizQuestion[]>([])
 const currentQuestion = ref(0)
+const answeredCurrentQuestion = ref(false)
 const errors = ref("")
 const correctAnswers = ref(0)
 const assessmentResult = ref<AssessmentResult | undefined>(undefined)
@@ -65,6 +69,10 @@ const certificate = ref<Certificate>()
 
 const passCriteriaPercentage = 80
 
+const advance = () => {
+  currentQuestion.value += 1;
+  answeredCurrentQuestion.value = false;
+}
 const questionAnswered = async (answerResult) => {
   questionsAnswerCollection.value.push({
     questionId: quizQuestions.value[currentQuestion.value]!.id,
@@ -73,8 +81,10 @@ const questionAnswered = async (answerResult) => {
   })
   if (answerResult.correct) {
     correctAnswers.value += 1
+    currentQuestion.value += 1
+  } else {
+    answeredCurrentQuestion.value = true;
   }
-  currentQuestion.value += 1
   if (
     currentQuestion.value >= quizQuestions.value.length &&
     quizQuestions.value.length > 0

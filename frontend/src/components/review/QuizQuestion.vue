@@ -110,6 +110,7 @@ export default defineComponent({
             this.quizQuestion.id,
             answerData
           )
+
         this.$emit("answered", answerResult)
       } catch (_e) {
         await this.popups.alert(
