@@ -1,10 +1,10 @@
-@ignore
 Feature: Response to a message
   As a notebook owner or examinee, I want to respond to a message.
 
   Background:
     Given I am logged in as an existing user
 
+  @focus
   Scenario: Provide response as a Notebook Owner
     Given I visit the feedback page as a "Notebook owner"
     When I have received feedback on a question
