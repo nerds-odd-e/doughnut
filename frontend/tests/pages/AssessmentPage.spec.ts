@@ -106,5 +106,32 @@ describe("assessment page", () => {
         helper.managedApi.restAssessmentController.submitAssessmentResult
       ).toBeCalledWith(notebook.id, expectedAnswers)
     })
+
+    it.only("shows a button when the answer is wrong", async () => {
+      const incorrectAnswer: AnsweredQuestion = {
+        answerId: 2,
+        correct: false,
+      }
+
+      helper.managedApi.restQuizQuestionController.answerQuiz = vi
+        .fn()
+        .mockResolvedValueOnce(answerResult1)
+        .mockResolvedValueOnce(incorrectAnswer)
+
+      const wrapper = helper
+        .component(AssessmentPage)
+        .withProps({ notebookId: notebook.id })
+        .render()
+      await flushPromises()
+      ;(await wrapper.findByRole("button", { name: "answer1" })).click()
+      await flushPromises()
+      ;(await wrapper.findByRole("button", { name: "answer3" })).click()
+      await flushPromises()
+
+      expect(
+        helper.managedApi.restAssessmentController.submitAssessmentResult
+      ).not.toBeCalled()
+      expect(wrapper.findByRole("button", { name: "Continue" })).toBeDefined()
+    })
   })
 })
