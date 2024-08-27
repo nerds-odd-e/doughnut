@@ -6,13 +6,13 @@ Feature: Response to a message
 
   @focus
   Scenario: Provide response as a Notebook Owner
-    Given I visit the feedback page as a "Notebook owner"
+    Given I visit the feedback page
     When I have received feedback on a question
     And I open that conversation
     Then I should be able to respond
 
   Scenario: Provide response as a Examinee
-    Given I visit the feedback page as a "Examinee"
+    Given I visit the feedback page
     When I have received feedback on a question
     And I open that conversation
     Then I should be able to respond

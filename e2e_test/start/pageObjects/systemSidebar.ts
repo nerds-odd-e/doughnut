@@ -37,6 +37,11 @@ export const systemSidebar = () => {
           }).click()
           return assumeAssessmentAndCertificateHistoryPage()
         },
+        myFeedbackOverview() {
+          cy.findByRole('button', {
+            name: 'Feedback overview',
+          }).click()
+        }
       }
     },
   }

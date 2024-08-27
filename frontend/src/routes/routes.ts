@@ -15,6 +15,7 @@ import AnsweredQuestionPage from "@/pages/AnsweredQuestionPage.vue"
 import AdminDashboardPage from "@/pages/AdminDashboardPage.vue"
 import NonproductionOnlyLoginPage from "@/pages/NonproductionOnlyLoginPage.vue"
 import NestedPage from "../pages/commons/NestedPage"
+import FeedbackOverviewPage from "../pages/FeedbackOverviewPage.vue"
 
 const NestedInitialReviewPage = NestedPage(InitialReviewPage, "initial")
 
@@ -34,7 +35,6 @@ const noteAndLinkRoutes = [
     props: (route: RouteLocation) => ({ noteId: Number(route.params.noteId) }),
     meta: { useNoteStorageAccessor: true, userProp: true },
   },
-
   {
     path: `answers/:answerId`,
     name: "answer",
@@ -81,6 +81,13 @@ const routes = [
     component: CircleJoinPage,
     props: true,
     meta: { userProp: true },
+  },
+  {
+    path: "/feedback",
+    name: "feedbackOverview",
+    component: FeedbackOverviewPage,
+    props: true,
+    meta: true,
   },
   {
     path: "/assessment/notebook/:notebookId",

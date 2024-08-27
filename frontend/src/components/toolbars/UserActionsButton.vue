@@ -27,6 +27,7 @@
           />
         </template>
       </PopButton>
+      <router-link role="button" class="dropdown-item" :to="{ name: 'feedbackOverview' }">Feedback overview</router-link>
       <router-link role="button" class="dropdown-item" :to="{ name: 'assessmentAndCertificateHistory' }"> My Assessments and Certificates </router-link>
       <a href="#" class="dropdown-item" role="button" @click="logout">Logout</a>
     </div>
