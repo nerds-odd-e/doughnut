@@ -38,6 +38,7 @@ public class RestCertificateController {
   @PostMapping("/{notebook}")
   @Transactional
   public Certificate claimCertificate(@PathVariable @Schema(type = "integer") Notebook notebook) {
+    currentUser.assertLoggedIn();
     return assessmentService.claimCertificateForPassedAssessment(notebook, currentUser.getEntity());
   }
 

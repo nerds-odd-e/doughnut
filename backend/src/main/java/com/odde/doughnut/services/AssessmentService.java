@@ -87,27 +87,43 @@ public class AssessmentService {
   }
 
   public Certificate claimCertificateForPassedAssessment(Notebook notebook, User user) {
-    Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
-    Timestamp expiryDate =
-        Timestamp.from(
-            ZonedDateTime.ofInstant(now.toInstant(), ZoneOffset.UTC.normalized())
-                .plus(notebook.getNotebookSettings().getCertificateExpiry())
-                .toInstant());
+    getLastAssessmentAttemptAndItMustBePassed(notebook, user);
 
     Certificate old_cert =
         modelFactoryService.certificateRepository.findFirstByUserAndNotebook(user, notebook);
     if (old_cert != null) {
-      old_cert.setExpiryDate(expiryDate);
-      modelFactoryService.save(old_cert);
-      return old_cert;
+      return updateExpiry(old_cert);
     }
 
     Certificate certificate = new Certificate();
     certificate.setUser(user);
     certificate.setNotebook(notebook);
-    certificate.setExpiryDate(expiryDate);
-    certificate.setStartDate(now);
-    modelFactoryService.save(certificate);
-    return certificate;
+    certificate.setStartDate(testabilitySettings.getCurrentUTCTimestamp());
+    return updateExpiry(certificate);
+  }
+
+  private Certificate updateExpiry(Certificate cert) {
+    Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
+    Timestamp expiryDate =
+        Timestamp.from(
+            ZonedDateTime.ofInstant(now.toInstant(), ZoneOffset.UTC.normalized())
+                .plus(cert.getNotebook().getNotebookSettings().getCertificateExpiry())
+                .toInstant());
+    cert.setExpiryDate(expiryDate);
+    modelFactoryService.save(cert);
+    return cert;
+  }
+
+  private void getLastAssessmentAttemptAndItMustBePassed(Notebook notebook, User user) {
+    getMyAssessments(user).stream()
+        .filter(assessmentAttempt -> assessmentAttempt.getNotebook().equals(notebook))
+        .reduce((_, second) -> second)
+        .filter(AssessmentAttempt::getIsPass)
+        .orElseThrow(
+            () ->
+                new ApiException(
+                    "You have not passed the assessment",
+                    ASSESSMENT_SERVICE_ERROR,
+                    "You have not passed the assessment"));
   }
 }
