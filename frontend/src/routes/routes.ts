@@ -88,7 +88,6 @@ const routes = [
     component: AssessmentPage,
     props: (route: RouteLocation) => ({
       notebookId: Number(route.params.notebookId),
-      approvalStatus: String(route.query.approvalStatus),
     }),
   },
   { path: "/reviews", name: "reviews", component: ReviewHome },

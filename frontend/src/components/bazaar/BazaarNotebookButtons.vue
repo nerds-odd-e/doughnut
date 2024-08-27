@@ -64,7 +64,6 @@ export default defineComponent({
         name: "assessment",
         query: {
           topic: this.notebook.headNote.noteTopic.topicConstructor,
-          approvalStatus: this.notebook.approvalStatus,
         },
         params: {
           notebookId: this.notebook.id,
