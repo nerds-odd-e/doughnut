@@ -12,4 +12,10 @@ public class AssessmentAttemptBuilder extends EntityBuilder<AssessmentAttempt> {
 
   @Override
   protected void beforeCreate(boolean needPersist) {}
+
+  public AssessmentAttemptBuilder score(int totalQuestions, int correctAnswers) {
+    this.entity.setAnswersTotal(totalQuestions);
+    this.entity.setAnswersCorrect(correctAnswers);
+    return this;
+  }
 }

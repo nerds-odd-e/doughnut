@@ -60,28 +60,14 @@ public class MakeMe extends MakeMeWithoutDB {
     return new CertificateBuilder(notebook, user, startDate, this);
   }
 
-  public AssessmentAttemptBuilder aAssessmentAttempt(
-      User currentUser, Notebook notebook, Timestamp submittedAt) {
-    AssessmentAttempt assessmentAttempt = new AssessmentAttempt();
-    assessmentAttempt.setUser(currentUser);
-    assessmentAttempt.setNotebook(notebook);
-    assessmentAttempt.setSubmittedAt(submittedAt);
-    return new AssessmentAttemptBuilder(this, assessmentAttempt);
-  }
-
-  public AssessmentAttemptBuilder aAssessmentAttempt(
-      User currentUser,
-      Notebook notebook,
-      Timestamp submittedAt,
-      int answersTotal,
-      int answersCorrect) {
+  public AssessmentAttemptBuilder anAssessmentAttempt(User currentUser, Notebook notebook) {
     AssessmentAttempt assessmentAttempt = new AssessmentAttempt();
 
     assessmentAttempt.setUser(currentUser);
     assessmentAttempt.setNotebook(notebook);
-    assessmentAttempt.setSubmittedAt(submittedAt);
-    assessmentAttempt.setAnswersTotal(answersTotal);
-    assessmentAttempt.setAnswersCorrect(answersCorrect);
+    assessmentAttempt.setSubmittedAt(aTimestamp().please());
+    assessmentAttempt.setAnswersTotal(2);
+    assessmentAttempt.setAnswersCorrect(2);
     return new AssessmentAttemptBuilder(this, assessmentAttempt);
   }
 

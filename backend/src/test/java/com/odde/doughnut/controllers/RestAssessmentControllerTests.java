@@ -299,30 +299,21 @@ public class RestAssessmentControllerTests {
 
     @Test
     void shouldReturnOneAssessmentHistory() {
-      makeMe
-          .aAssessmentAttempt(
-              currentUser.getEntity(), notebook, testabilitySettings.getCurrentUTCTimestamp(), 2, 2)
-          .please();
+      makeMe.anAssessmentAttempt(currentUser.getEntity(), notebook).please();
       List<AssessmentAttempt> assessmentHistories = controller.getMyAssessments();
       assertEquals(1, assessmentHistories.size());
     }
 
     @Test
     void shouldReturnOnePassAssessmentHistory() {
-      makeMe
-          .aAssessmentAttempt(
-              currentUser.getEntity(), notebook, testabilitySettings.getCurrentUTCTimestamp(), 5, 4)
-          .please();
+      makeMe.anAssessmentAttempt(currentUser.getEntity(), notebook).score(5, 4).please();
       List<AssessmentAttempt> assessmentHistories = controller.getMyAssessments();
       assertTrue(assessmentHistories.getFirst().getIsPass());
     }
 
     @Test
     void shouldReturnOneFailAssessmentHistory() {
-      makeMe
-          .aAssessmentAttempt(
-              currentUser.getEntity(), notebook, testabilitySettings.getCurrentUTCTimestamp(), 5, 2)
-          .please();
+      makeMe.anAssessmentAttempt(currentUser.getEntity(), notebook).score(5, 2).please();
       List<AssessmentAttempt> assessmentHistories = controller.getMyAssessments();
       assertFalse(assessmentHistories.getFirst().getIsPass());
     }
@@ -330,10 +321,7 @@ public class RestAssessmentControllerTests {
     @Test
     void shouldReturnNoAssessmentHistoryForOtherUser() {
       User anotherUser = makeMe.aUser().please();
-      makeMe
-          .aAssessmentAttempt(
-              anotherUser, notebook, testabilitySettings.getCurrentUTCTimestamp(), 5, 5)
-          .please();
+      makeMe.anAssessmentAttempt(anotherUser, notebook).score(5, 5).please();
       List<AssessmentAttempt> assessmentHistories = controller.getMyAssessments();
       assertEquals(0, assessmentHistories.size());
     }
