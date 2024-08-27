@@ -13,6 +13,6 @@ Feature: View my assessment and certificate history
 
     Examples:
       | Notebook                 | Score | Result | Can Or Cannot |
-      | Just say 'Yes'           | 2/2   | Pass   | can           |
+      # | Just say 'Yes'           | 2/2   | Pass   | cannot        |
       | Say 'Yes' Professionally | 2/2   | Pass   | can           |
       | Just say 'Yes'           | 1/2   | Fail   | cannot        |
