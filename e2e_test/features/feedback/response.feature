@@ -1,6 +1,6 @@
 @ignore
 Feature: Response to the feedback message
-  As a learner, I want to respond to feedback.
+  As a notebook owner, I want to respond to feedback.
 
   Background:
     Given I am logged in as an existing user
