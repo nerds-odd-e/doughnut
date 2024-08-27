@@ -7,6 +7,6 @@ Feature: Response to the feedback message
 
   Scenario: Provide response to feedback
     Given I visit the feedback overview page
-    When I have recieved feedback on a question
+    When I have received feedback on a question
     And I open a feedback chat
     Then I should be able to respond to the feedback
