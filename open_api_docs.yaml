@@ -1411,6 +1411,30 @@ paths:
                 type: string
         "200":
           description: OK
+  /api/feedback/sendFeedback:
+    post:
+      tags:
+      - rest-feedback-controller
+      operationId: sendFeedback
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FeedbackDTO"
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
   /api/circles:
     get:
       tags:
@@ -3310,6 +3334,11 @@ components:
           type: boolean
         asFirstChild:
           type: boolean
+    FeedbackDTO:
+      type: object
+      properties:
+        feedback:
+          type: string
     CircleJoiningByInvitation:
       required:
       - invitationCode

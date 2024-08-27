@@ -1,6 +1,5 @@
 package com.odde.doughnut.controllers;
 
-
 import com.odde.doughnut.controllers.dto.FeedbackDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,7 +15,4 @@ public class RestFeedbackController {
   public ResponseEntity<String> sendFeedback(@RequestBody FeedbackDTO feedbackDTO) {
     return ResponseEntity.ok("Feedback received successfully!");
   }
-
-
-
 }

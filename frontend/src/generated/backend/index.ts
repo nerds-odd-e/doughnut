@@ -39,6 +39,7 @@ export type { DueReviewPoints } from './models/DueReviewPoints';
 export type { DummyForGeneratingTypes } from './models/DummyForGeneratingTypes';
 export type { FailureReport } from './models/FailureReport';
 export type { FailureReportForView } from './models/FailureReportForView';
+export type { FeedbackDTO } from './models/FeedbackDTO';
 export type { FileCitation } from './models/FileCitation';
 export type { FilePath } from './models/FilePath';
 export type { FileSearchTool } from './models/FileSearchTool';
@@ -115,6 +116,7 @@ export { RestCertificateControllerService } from './services/RestCertificateCont
 export { RestCircleControllerService } from './services/RestCircleControllerService';
 export { RestCurrentUserInfoControllerService } from './services/RestCurrentUserInfoControllerService';
 export { RestFailureReportControllerService } from './services/RestFailureReportControllerService';
+export { RestFeedbackControllerService } from './services/RestFeedbackControllerService';
 export { RestFineTuningDataControllerService } from './services/RestFineTuningDataControllerService';
 export { RestGlobalSettingsControllerService } from './services/RestGlobalSettingsControllerService';
 export { RestHealthCheckControllerService } from './services/RestHealthCheckControllerService';

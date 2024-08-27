@@ -13,6 +13,7 @@ import { RestCertificateControllerService } from './services/RestCertificateCont
 import { RestCircleControllerService } from './services/RestCircleControllerService';
 import { RestCurrentUserInfoControllerService } from './services/RestCurrentUserInfoControllerService';
 import { RestFailureReportControllerService } from './services/RestFailureReportControllerService';
+import { RestFeedbackControllerService } from './services/RestFeedbackControllerService';
 import { RestFineTuningDataControllerService } from './services/RestFineTuningDataControllerService';
 import { RestGlobalSettingsControllerService } from './services/RestGlobalSettingsControllerService';
 import { RestHealthCheckControllerService } from './services/RestHealthCheckControllerService';
@@ -37,6 +38,7 @@ export class DoughnutApi {
     public readonly restCircleController: RestCircleControllerService;
     public readonly restCurrentUserInfoController: RestCurrentUserInfoControllerService;
     public readonly restFailureReportController: RestFailureReportControllerService;
+    public readonly restFeedbackController: RestFeedbackControllerService;
     public readonly restFineTuningDataController: RestFineTuningDataControllerService;
     public readonly restGlobalSettingsController: RestGlobalSettingsControllerService;
     public readonly restHealthCheckController: RestHealthCheckControllerService;
@@ -72,6 +74,7 @@ export class DoughnutApi {
         this.restCircleController = new RestCircleControllerService(this.request);
         this.restCurrentUserInfoController = new RestCurrentUserInfoControllerService(this.request);
         this.restFailureReportController = new RestFailureReportControllerService(this.request);
+        this.restFeedbackController = new RestFeedbackControllerService(this.request);
         this.restFineTuningDataController = new RestFineTuningDataControllerService(this.request);
         this.restGlobalSettingsController = new RestGlobalSettingsControllerService(this.request);
         this.restHealthCheckController = new RestHealthCheckControllerService(this.request);
