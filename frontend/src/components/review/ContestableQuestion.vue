@@ -1,7 +1,5 @@
 <template>
-  <BasicBreadcrumb
-    :ancestors="[quizQuestionInNotebook.notebook.headNote.noteTopic]"
-  />
+  <BasicBreadcrumb :ancestors="[quizQuestionInNotebook.notebook.headNote.noteTopic]" />
   <div v-for="(q, index) in prevQuizQuestions" :key="index">
     <h3>Previous Question Contested ...</h3>
     <p>{{ q.badQuestionReason }}</p>
@@ -10,24 +8,10 @@
   <p v-if="currentQuestionLegitMessage">{{ currentQuestionLegitMessage }}</p>
   <ContentLoader v-if="regenerating" />
   <div class="quiz-question" v-else>
-    <AnsweredQuestionComponent
-      v-if="answeredQuestion"
-      :answered-question="answeredQuestion"
-      :storage-accessor="storageAccessor"
-    />
-    <QuizQuestionC
-      v-else
-      :quiz-question="currentQuestion"
-      @answered="onAnswered($event)"
-    >
-      <a
-        role="button"
-        title="Doesn't make sense?"
-        id="try-again"
-        v-if="currentQuestion"
-        class="btn"
-        @click="contest"
-      >
+    <AnsweredQuestionComponent v-if="answeredQuestion" :answered-question="answeredQuestion"
+      :storage-accessor="storageAccessor" />
+    <QuizQuestionC v-else :quiz-question="currentQuestion" @answered="onAnswered($event)">
+      <a role="button" title="Doesn't make sense?" id="try-again" v-if="currentQuestion" class="btn" @click="contest">
         <SvgContest />
       </a>
     </QuizQuestionC>

@@ -31,6 +31,7 @@ declare module 'vue' {
     EditableText: typeof import('./src/components/form/EditableText.vue')['default']
     FailureReportList: typeof import('./src/components/admin/FailureReportList.vue')['default']
     Feather: typeof import('./src/components/svgs/link_types/Feather.vue')['default']
+    FeedbackForm: typeof import('./src/components/review/FeedbackForm.vue')['default']
     FileInput: typeof import('./src/components/form/FileInput.vue')['default']
     FineTuningData: typeof import('./src/components/admin/FineTuningData.vue')['default']
     GlobalBar: typeof import('./src/components/toolbars/GlobalBar.vue')['default']

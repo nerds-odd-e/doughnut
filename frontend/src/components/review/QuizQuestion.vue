@@ -1,64 +1,41 @@
 <template>
-  <div
-    class="quiz-instruction"
-    data-test="question-section"
-    :key="quizQuestion.id"
-  >
-    <ShowImage
-      v-if="quizQuestion.imageWithMask"
-      v-bind="quizQuestion.imageWithMask"
-      :opacity="1"
-    />
-    <div
-      style="white-space: pre-wrap"
-      data-test="stem"
-      v-if="quizQuestion.multipleChoicesQuestion.stem"
-      v-html="quizQuestion.multipleChoicesQuestion.stem"
-    ></div>
+  <div class="quiz-instruction" data-test="question-section" :key="quizQuestion.id">
+    <ShowImage v-if="quizQuestion.imageWithMask" v-bind="quizQuestion.imageWithMask" :opacity="1" />
+    <div style="white-space: pre-wrap" data-test="stem" v-if="quizQuestion.multipleChoicesQuestion.stem"
+      v-html="quizQuestion.multipleChoicesQuestion.stem"></div>
 
-    <div
-      v-if="
-        !quizQuestion.multipleChoicesQuestion.choices ||
-        quizQuestion.multipleChoicesQuestion.choices.length === 0
-      "
-    >
+    <div v-if="
+      !quizQuestion.multipleChoicesQuestion.choices ||
+      quizQuestion.multipleChoicesQuestion.choices.length === 0
+    ">
       <form @submit.prevent.once="submitAnswer({ spellingAnswer: answer })">
-        <TextInput
-          scope-name="review_point"
-          field="answer"
-          v-model="answer"
-          placeholder="put your answer here"
-          v-focus
-        />
-        <input
-          type="submit"
-          value="OK"
-          class="btn btn-primary btn-lg btn-block"
-        />
+        <TextInput scope-name="review_point" field="answer" v-model="answer" placeholder="put your answer here"
+          v-focus />
+        <input type="submit" value="OK" class="btn btn-primary btn-lg btn-block" />
       </form>
     </div>
-    <QuizQuestionChoices
-      v-if="quizQuestion.multipleChoicesQuestion.choices"
-      :choices="quizQuestion.multipleChoicesQuestion.choices"
-      :correct-choice-index="correctChoiceIndex"
-      :answer-choice-index="answerChoiceIndex"
-      :disabled="disabled"
-      @answer="submitAnswer($event)"
-    />
+    <QuizQuestionChoices v-if="quizQuestion.multipleChoicesQuestion.choices"
+      :choices="quizQuestion.multipleChoicesQuestion.choices" :correct-choice-index="correctChoiceIndex"
+      :answer-choice-index="answerChoiceIndex" :disabled="disabled" @answer="submitAnswer($event)" />
     <div class="mark-question">
-      <PopButton
-        title="send this question for fine tuning the question generation model"
-      >
+      <PopButton title="send this question for fine tuning the question generation model" v-if="showFinetuneButton">
         <template #button_face>
           <SvgRaiseHand />
         </template>
         <template #default="{ closer }">
-          <SuggestQuestionForFineTuning
-            :quiz-question="quizQuestion"
-            @close-dialog="closer()"
-          />
+          <SuggestQuestionForFineTuning :quiz-question="quizQuestion" @close-dialog="closer()" />
         </template>
       </PopButton>
+
+      <PopButton title="Send feedback" v-if="selectedWrongAnswer()">
+        <template #button_face>
+          <SvgRaiseHand />
+        </template>
+        <template #default="{ closer }">
+          <FeedbackForm :quiz-question="quizQuestion" @close-dialog="closer()" />
+        </template>
+      </PopButton>
+
       <slot />
     </div>
   </div>
@@ -68,12 +45,12 @@
 import { AnswerDTO, QuizQuestion } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { PropType, defineComponent } from "vue"
-import SuggestQuestionForFineTuning from "../ai/SuggestQuestionForFineTuning.vue"
 import usePopups from "../commons/Popups/usePopups"
 import TextInput from "../form/TextInput.vue"
 import ShowImage from "../notes/accessory/ShowImage.vue"
 import SvgRaiseHand from "../svgs/SvgRaiseHand.vue"
 import QuizQuestionChoices from "./QuizQuestionChoices.vue"
+import FeedbackForm from "./FeedbackForm.vue"
 
 export default defineComponent({
   inheritAttrs: false,
@@ -88,13 +65,17 @@ export default defineComponent({
     correctChoiceIndex: Number,
     answerChoiceIndex: Number,
     disabled: Boolean,
+    showFinetuneButton: {
+      type: Boolean,
+      default: true,
+    },
   },
   components: {
     ShowImage,
     TextInput,
     QuizQuestionChoices,
     SvgRaiseHand,
-    SuggestQuestionForFineTuning,
+    FeedbackForm,
   },
   emits: ["answered"],
   data() {
@@ -116,6 +97,10 @@ export default defineComponent({
           "This review point doesn't exist any more or is being skipped now. Moving on to the next review point..."
         )
       }
+    },
+    selectedWrongAnswer() {
+      // return this.answerChoiceIndex !== this.correctChoiceIndex
+      return false
     },
   },
 })

@@ -1,24 +1,13 @@
 <template>
   <div class="mt-4" />
-  <ContestableQuestion
-    v-if="quizQuestionInNotebook"
-    v-bind="{ quizQuestionInNotebook, storageAccessor }"
-    @need-scroll="scrollToBottom"
-  />
-  <div
-    class="chat-answer-container row"
-    v-for="(message, index) in messages"
-    :class="message.role"
-    :key="index"
-  >
+  <ContestableQuestion v-if="quizQuestionInNotebook" v-bind="{ quizQuestionInNotebook, storageAccessor }"
+    @need-scroll="scrollToBottom" />
+  <div class="chat-answer-container row" v-for="(message, index) in messages" :class="message.role" :key="index">
     <div v-if="message.role === 'assistant'" class="assistant-icon col-auto">
       <SvgRobot />
     </div>
     <div class="col">
-      <div
-        v-if="message.role === 'assistant'"
-        v-html="markdowntToHtml(message.content?.[0]?.text?.value)"
-      />
+      <div v-if="message.role === 'assistant'" v-html="markdowntToHtml(message.content?.[0]?.text?.value)" />
       <div v-else class="d-flex justify-content-end">
         <div class="user-message" v-text="message.content?.[0]?.text?.value" />
       </div>
@@ -29,31 +18,14 @@
 
   <div class="chat-controls">
     <div class="container">
-      <button
-        v-if="!quizQuestionInNotebook"
-        class="btn btn-secondary"
-        @click="generateQuestion"
-      >
+      <button v-if="!quizQuestionInNotebook" class="btn btn-secondary" @click="generateQuestion">
         Test me
       </button>
       <form class="chat-input-container" @submit.prevent="generateChatAnswer">
-        <TextArea
-          ref="chatInputTextArea"
-          class="flex-grow-1"
-          id="chat-input"
-          :rows="1"
-          :auto-extend-until="5"
-          :enter-submit="true"
-          v-model="chatInput"
-          @enter-pressed="generateChatAnswer"
-        />
-        <input
-          :disabled="isButtonDisabled"
-          type="submit"
-          value="Chat"
-          id="chat-button"
-          class="btn float-btn btn-secondary"
-        />
+        <TextArea ref="chatInputTextArea" class="flex-grow-1" id="chat-input" :rows="1" :auto-extend-until="5"
+          :enter-submit="true" v-model="chatInput" @enter-pressed="generateChatAnswer" />
+        <input :disabled="isButtonDisabled" type="submit" value="Chat" id="chat-button"
+          class="btn float-btn btn-secondary" />
       </form>
     </div>
   </div>
@@ -84,6 +56,7 @@ const props = defineProps({
 const quizQuestionInNotebook = ref<QuizQuestionInNotebook | undefined>(
   undefined
 )
+
 const chatInput = ref("")
 const messages = ref<Message[]>([])
 const bottomOfTheChat = ref<HTMLElement | null>(null)
