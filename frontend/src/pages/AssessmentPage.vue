@@ -70,8 +70,8 @@ const certificate = ref<Certificate>()
 const passCriteriaPercentage = 80
 
 const advance = () => {
-  currentQuestion.value += 1
-  answeredCurrentQuestion.value = false
+  currentQuestion.value += 1;
+  answeredCurrentQuestion.value = false;
 }
 const questionAnswered = async (answerResult) => {
   questionsAnswerCollection.value.push({
@@ -83,7 +83,7 @@ const questionAnswered = async (answerResult) => {
     correctAnswers.value += 1
     currentQuestion.value += 1
   } else {
-    answeredCurrentQuestion.value = true
+    answeredCurrentQuestion.value = true;
   }
   if (
     currentQuestion.value >= quizQuestions.value.length &&
