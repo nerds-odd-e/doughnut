@@ -97,10 +97,18 @@ const questionAnswered = async (answerResult) => {
 }
 
 const generateAssessmentQuestions = async () => {
-  quizQuestions.value =
-    await managedApi.restAssessmentController.generateAssessmentQuestions(
-      props.notebookId
-    )
+  try {
+    quizQuestions.value =
+      await managedApi.restAssessmentController.generateAssessmentQuestions(
+        props.notebookId
+      )
+  } catch (err) {
+    if (err instanceof Error) {
+      errors.value = err.message
+    } else {
+      errors.value = String(err)
+    }
+  }
 }
 
 onMounted(() => {
