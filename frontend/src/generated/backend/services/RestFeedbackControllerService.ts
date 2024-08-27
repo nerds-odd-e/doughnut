@@ -8,16 +8,21 @@ import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestFeedbackControllerService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
+     * @param question
      * @param requestBody
      * @returns string OK
      * @throws ApiError
      */
     public sendFeedback(
+        question: number,
         requestBody: FeedbackDTO,
     ): CancelablePromise<string> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/feedback/sendFeedback',
+            url: '/api/feedback/send/{question}',
+            path: {
+                'question': question,
+            },
             body: requestBody,
             mediaType: 'application/json',
             errors: {
