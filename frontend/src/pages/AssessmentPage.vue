@@ -84,10 +84,15 @@ const questionAnswered = async (answerResult) => {
         props.notebookId,
         questionsAnswerCollection.value
       )
-    certificate.value =
-      await managedApi.restCertificateController.claimCertificate(
-        props.notebookId
-      )
+    if (
+      assessmentResult.value.attempt?.isPass &&
+      assessmentResult.value.isCertified
+    ) {
+      certificate.value =
+        await managedApi.restCertificateController.claimCertificate(
+          props.notebookId
+        )
+    }
   }
 }
 
