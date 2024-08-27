@@ -10,6 +10,8 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
 import java.sql.Timestamp;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -82,5 +84,30 @@ public class AssessmentService {
 
   public List<AssessmentAttempt> getMyAssessments(User user) {
     return modelFactoryService.assessmentAttemptRepository.findAllByUser(user);
+  }
+
+  public Certificate claimCertificateForPassedAssessment(Notebook notebook, User user) {
+    Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
+    Timestamp expiryDate =
+        Timestamp.from(
+            ZonedDateTime.ofInstant(now.toInstant(), ZoneOffset.UTC.normalized())
+                .plus(notebook.getNotebookSettings().getCertificateExpiry())
+                .toInstant());
+
+    Certificate old_cert =
+        modelFactoryService.certificateRepository.findFirstByUserAndNotebook(user, notebook);
+    if (old_cert != null) {
+      old_cert.setExpiryDate(expiryDate);
+      modelFactoryService.save(old_cert);
+      return old_cert;
+    }
+
+    Certificate certificate = new Certificate();
+    certificate.setUser(user);
+    certificate.setNotebook(notebook);
+    certificate.setExpiryDate(expiryDate);
+    certificate.setStartDate(now);
+    modelFactoryService.save(certificate);
+    return certificate;
   }
 }

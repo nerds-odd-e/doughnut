@@ -49,7 +49,7 @@ public class RestCertificateControllerTests {
 
     @Test
     void ShouldReturnCompleteCertificateData() {
-      Certificate cert = controller.saveCertificate(notebook);
+      Certificate cert = controller.claimCertificate(notebook);
       assertEquals(currentUser.getEntity(), cert.getUser());
       assertEquals(notebook, cert.getNotebook());
       assertEquals(currentTime, cert.getStartDate());
@@ -96,7 +96,7 @@ public class RestCertificateControllerTests {
           TimestampOperations.addHoursToTimestamp(
               new Timestamp(currentTime.getTime()), oneYearInHours);
       testabilitySettings.timeTravelTo(newStartDate);
-      Certificate certLater = controller.saveCertificate(notebook);
+      Certificate certLater = controller.claimCertificate(notebook);
       assertEquals(currentTimeAtStart, certLater.getStartDate());
       assertEquals(expectedCertificate.getId(), certLater.getId());
     }

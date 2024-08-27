@@ -31,7 +31,7 @@ export class RestCertificateControllerService {
      * @returns Certificate OK
      * @throws ApiError
      */
-    public saveCertificate(
+    public claimCertificate(
         notebook: number,
     ): CancelablePromise<Certificate> {
         return this.httpRequest.request({

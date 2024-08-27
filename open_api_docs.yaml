@@ -1535,7 +1535,7 @@ paths:
     post:
       tags:
       - rest-certificate-controller
-      operationId: saveCertificate
+      operationId: claimCertificate
       parameters:
       - name: notebook
         in: path

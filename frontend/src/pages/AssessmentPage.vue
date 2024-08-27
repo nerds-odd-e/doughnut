@@ -90,7 +90,7 @@ const questionAnswered = async (answerResult) => {
         questionsAnswerCollection.value
       )
     certificate.value =
-      await managedApi.restCertificateController.saveCertificate(
+      await managedApi.restCertificateController.claimCertificate(
         props.notebookId
       )
   }

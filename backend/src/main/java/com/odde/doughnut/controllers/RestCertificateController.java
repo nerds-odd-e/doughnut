@@ -4,12 +4,10 @@ import com.odde.doughnut.entities.Certificate;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AssessmentService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
-import java.sql.Timestamp;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,6 +23,8 @@ public class RestCertificateController {
 
   private final ModelFactoryService modelFactoryService;
 
+  private final AssessmentService assessmentService;
+
   public RestCertificateController(
       UserModel currentUser,
       TestabilitySettings testabilitySettings,
@@ -32,34 +32,13 @@ public class RestCertificateController {
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
     this.modelFactoryService = modelFactoryService;
+    this.assessmentService = new AssessmentService(null, modelFactoryService, testabilitySettings);
   }
 
   @PostMapping("/{notebook}")
   @Transactional
-  public Certificate saveCertificate(@PathVariable @Schema(type = "integer") Notebook notebook) {
-    Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
-    Timestamp expiryDate =
-        Timestamp.from(
-            ZonedDateTime.ofInstant(now.toInstant(), ZoneOffset.UTC.normalized())
-                .plus(notebook.getNotebookSettings().getCertificateExpiry())
-                .toInstant());
-
-    Certificate old_cert =
-        modelFactoryService.certificateRepository.findFirstByUserAndNotebook(
-            currentUser.getEntity(), notebook);
-    if (old_cert != null) {
-      old_cert.setExpiryDate(expiryDate);
-      modelFactoryService.save(old_cert);
-      return old_cert;
-    }
-
-    Certificate certificate = new Certificate();
-    certificate.setUser(this.currentUser.getEntity());
-    certificate.setNotebook(notebook);
-    certificate.setExpiryDate(expiryDate);
-    certificate.setStartDate(now);
-    modelFactoryService.save(certificate);
-    return certificate;
+  public Certificate claimCertificate(@PathVariable @Schema(type = "integer") Notebook notebook) {
+    return assessmentService.claimCertificateForPassedAssessment(notebook, currentUser.getEntity());
   }
 
   @GetMapping("/{notebook}")
