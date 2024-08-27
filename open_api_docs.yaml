@@ -1411,11 +1411,17 @@ paths:
                 type: string
         "200":
           description: OK
-  /api/feedback/sendFeedback:
+  /api/feedback/send/{question}:
     post:
       tags:
       - rest-feedback-controller
       operationId: sendFeedback
+      parameters:
+      - name: question
+        in: path
+        required: true
+        schema:
+          type: integer
       requestBody:
         content:
           application/json:
@@ -3339,6 +3345,9 @@ components:
       properties:
         feedback:
           type: string
+        feedbackGiverId:
+          type: integer
+          format: int32
     CircleJoiningByInvitation:
       required:
       - invitationCode

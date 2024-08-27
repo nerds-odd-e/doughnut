@@ -8,4 +8,5 @@ import lombok.Setter;
 public class FeedbackDTO {
 
   String feedback;
+  int feedbackGiverId;
 }
