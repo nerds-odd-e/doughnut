@@ -22,4 +22,6 @@ public class Conversation extends EntityIdentifiedByIdOnly {
   @ManyToOne
   @JoinColumn(name = "conversation_initiator_id", referencedColumnName = "id")
   User conversationInitiator;
+
+  String message;
 }

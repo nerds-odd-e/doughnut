@@ -27,6 +27,7 @@ public class ModelFactoryService {
   @Autowired public EntityManager entityManager;
   @Autowired public NotebookRepository notebookRepository;
   @Autowired public CertificateRepository certificateRepository;
+  @Autowired public ConversationRepository conversationRepository;
 
   @Autowired
   public QuestionSuggestionForFineTuningRepository questionSuggestionForFineTuningRepository;

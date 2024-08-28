@@ -9,5 +9,6 @@ export type Conversation = {
     quizQuestionAndAnswer?: QuizQuestionAndAnswer;
     noteCreator?: User;
     conversationInitiator?: User;
+    message?: string;
 };
 

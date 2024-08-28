@@ -3886,6 +3886,8 @@ components:
           $ref: "#/components/schemas/User"
         conversationInitiator:
           $ref: "#/components/schemas/User"
+        message:
+          type: string
     FailureReport:
       required:
       - createDatetime

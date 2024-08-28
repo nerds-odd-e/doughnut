@@ -6,6 +6,7 @@ import com.odde.doughnut.controllers.dto.FeedbackDTO;
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionAndAnswer;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.ConversationService;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
@@ -27,9 +28,11 @@ class RestFeedbackControllerTest {
 
   RestFeedbackController controller;
 
+  @Autowired ModelFactoryService modelFactoryService;
+
   @BeforeEach
   void setup() {
-    controller = new RestFeedbackController(feedbackService);
+    controller = new RestFeedbackController(feedbackService, modelFactoryService);
   }
 
   @Test
@@ -52,15 +55,18 @@ class RestFeedbackControllerTest {
     assertEquals(0, conversations.size());
   }
 
-  //  @Test
-  //  void testGetFeedbackReturnsAllConversationsForCurrentUser() {
-  //    // Given 10 fake conversations in the database for the test user
-  //    Conversation conversation = makeMe.aConversation().please();
-  //
-  //    // When I call getFeedback, get all conversations for the current user
-  //    List<Conversation> conversations = controller.getFeedback();
-  //
-  //    // Then I should get all 10 conversations for the test user
-  //    assertEquals(10, conversations.size());
-  //  }
+  @Test
+  void testGetFeedbackReturnsAllConversationsForCurrentUser() {
+    Conversation conversation = new Conversation();
+    QuizQuestionAndAnswer quizQuestionAndAnswer = makeMe.aQuestion().please();
+    conversation.setConversationInitiator(makeMe.aUser().please());
+    conversation.setNoteCreator(quizQuestionAndAnswer.getNote().getCreator());
+    conversation.setMessage("This is a feedback");
+    conversation.setQuizQuestionAndAnswer(quizQuestionAndAnswer);
+    makeMe.modelFactoryService.save(conversation);
+
+    List<Conversation> conversations = controller.getFeedback();
+
+    assertEquals(1, conversations.size());
+  }
 }
