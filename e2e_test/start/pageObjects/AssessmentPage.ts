@@ -29,7 +29,7 @@ const assumeQuestionSection = () => {
     },
     answerWithoutContinuing(answer: string) {
       return cy.findByText(answer).click().pageIsNotLoading()
-    }
+    },
   }
 }
 
