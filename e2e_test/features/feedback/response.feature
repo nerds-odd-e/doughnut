@@ -20,7 +20,7 @@ Feature: Response to a message
     Given I visit the feedback page
     And Pete has given the feedback I don't understand this question on "Question 5"
     # And I'm the creator of question 5
-    # And I've opened Pete's Feedback
+    When I open feedback on "Question 5"
     # Then I should see the feedback message "I don't understand this question"
 
   @ignore

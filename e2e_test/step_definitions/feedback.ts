@@ -1,4 +1,4 @@
-import { Given, Then } from '@badeball/cypress-cucumber-preprocessor'
+import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 
 Given('I visit the feedback page', (userType: string) => {
@@ -18,6 +18,12 @@ Given(
     cy.findByText(question).should('be.visible')
   }
 )
+
+When('I open feedback on {string}', (question: string) => {
+  cy.findByText(question).parent().findByRole('button', {
+    name: 'View'
+  }).click()
+})
 
 Then(
   '{string} can see the feedback {string} on the question {string}',
