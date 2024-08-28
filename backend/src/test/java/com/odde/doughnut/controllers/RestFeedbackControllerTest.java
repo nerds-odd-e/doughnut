@@ -2,9 +2,7 @@ package com.odde.doughnut.controllers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.odde.doughnut.controllers.dto.FeedbackDTO;
 import com.odde.doughnut.entities.Conversation;
-import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionAndAnswer;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -16,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class RestFeedbackControllerTest {
 
-  @Autowired ConversationService feedbackService;
+  @Autowired ConversationService conversationService;
   @Autowired MakeMe makeMe;
   private UserModel currentUser;
   RestFeedbackController controller;
@@ -34,21 +33,21 @@ class RestFeedbackControllerTest {
   @BeforeEach
   void setup() {
     currentUser = makeMe.aUser().toModelPlease();
-    controller = new RestFeedbackController(currentUser, feedbackService, modelFactoryService);
+    controller = new RestFeedbackController(currentUser, conversationService, modelFactoryService);
   }
 
   @Test
   void testSendFeedbackReturnsOk() {
-    FeedbackDTO feedbackDTO = new FeedbackDTO();
-    feedbackDTO.setFeedback("This is a feedback");
+    String feedback = "This is a feedback";
+    QuizQuestionAndAnswer quizQuestionAndAnswer = makeMe.aQuestion().please();
 
-    Note note = makeMe.aNote().creatorAndOwner(makeMe.aUser().please()).please();
-    QuizQuestionAndAnswer quizQuestionAndAnswer = new QuizQuestionAndAnswer();
-    quizQuestionAndAnswer.setNote(note);
+    ResponseEntity<String> response = controller.sendFeedback(feedback, quizQuestionAndAnswer);
 
-    assertEquals(
-        "Feedback received successfully!",
-        controller.sendFeedback(feedbackDTO, quizQuestionAndAnswer).getBody());
+    List<Conversation> conversations =
+        (List<Conversation>) modelFactoryService.conversationRepository.findAll();
+    assertEquals("Feedback received successfully!", response.getBody());
+    assertEquals(1, conversations.size());
+    assertEquals(feedback, conversations.getFirst().getMessage());
   }
 
   @Test

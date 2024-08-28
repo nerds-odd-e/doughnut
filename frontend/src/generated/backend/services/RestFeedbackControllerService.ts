@@ -3,7 +3,6 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { Conversation } from '../models/Conversation';
-import type { FeedbackDTO } from '../models/FeedbackDTO';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestFeedbackControllerService {
@@ -16,7 +15,7 @@ export class RestFeedbackControllerService {
      */
     public sendFeedback(
         question: number,
-        requestBody: FeedbackDTO,
+        requestBody: string,
     ): CancelablePromise<string> {
         return this.httpRequest.request({
             method: 'POST',

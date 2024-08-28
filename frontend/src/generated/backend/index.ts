@@ -40,7 +40,6 @@ export type { DueReviewPoints } from './models/DueReviewPoints';
 export type { DummyForGeneratingTypes } from './models/DummyForGeneratingTypes';
 export type { FailureReport } from './models/FailureReport';
 export type { FailureReportForView } from './models/FailureReportForView';
-export type { FeedbackDTO } from './models/FeedbackDTO';
 export type { FileCitation } from './models/FileCitation';
 export type { FilePath } from './models/FilePath';
 export type { FileSearchTool } from './models/FileSearchTool';
