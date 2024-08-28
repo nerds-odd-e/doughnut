@@ -65,8 +65,9 @@ const passCriteriaPercentage = 80
 const advance = () => {
   currentQuestion.value += 1
   answeredCurrentQuestion.value = false
+  checkIfQuizComplete()
 }
-const questionAnswered = async (answerResult) => {
+const questionAnswered = (answerResult) => {
   questionsAnswerCollection.value.push({
     questionId: quizQuestions.value[currentQuestion.value]!.id,
     answerId: answerResult.answerId,
@@ -78,6 +79,10 @@ const questionAnswered = async (answerResult) => {
   } else {
     answeredCurrentQuestion.value = true
   }
+  checkIfQuizComplete()
+}
+
+const checkIfQuizComplete = async () => {
   if (
     currentQuestion.value >= quizQuestions.value.length &&
     quizQuestions.value.length > 0

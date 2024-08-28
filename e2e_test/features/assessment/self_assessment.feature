@@ -19,17 +19,17 @@ Feature: Self assessment
   Scenario Outline: Perform an assessment with variable outcomes counts correct scores
     Given I set the number of questions per assessment of the notebook "Countries" to 3
     When I do the assessment on "Countries" in the bazaar with the following answers:
-      | Question                           | Answer            |
-      | Where in the world is Singapore?   | <SingaporeAnswer> |
-      | Most famous food of Vietnam?       | <VietnamAnswer>   |
-      | What is the capital city of Japan? | <JapanAnswer>     |
+      | Question                           | Answer            | AnswerCorrect            |
+      | Where in the world is Singapore?   | <SingaporeAnswer> | <SingaporeAnswerCorrect> |
+      | Most famous food of Vietnam?       | <VietnamAnswer>   | <VietnamAnswerCorrect>   |
+      | What is the capital city of Japan? | <JapanAnswer>     | <JapanAnswerCorrect>     |
     Then I should see the score "Your score: <ExpectedScore> / 3" at the end of assessment
 
     Examples:
-      | SingaporeAnswer | VietnamAnswer | JapanAnswer | ExpectedScore |
-      | Asia            | Pho           | Tokyo       | 3             |
-      | europe          | bread         | kyoto       | 0             |
-      | Asia            | Pho           | kyoto       | 2             |
+      | SingaporeAnswer | SingaporeAnswerCorrect | VietnamAnswer | VietnamAnswerCorrect   | JapanAnswer | JapanAnswerCorrect     | ExpectedScore |
+      | Asia            | true                   | Pho           | true                   | Tokyo       | true                   | 3             |
+      | europe          | false                  | bread         | false                  | kyoto       | false                  | 0             |
+      | Asia            | true                   | Pho           | true                   | kyoto       | false                  | 2             |
 
   @ignore
   Scenario: Perform an assessment with the wrong answer to a question
