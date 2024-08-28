@@ -16,4 +16,5 @@ Then('{string} can see the feedback {string} on the question {string}', (user: s
   cy.loginAs(user)
   start.systemSidebar().userOptions().myFeedbackOverview()
   cy.findByText(feedback).should('be.visible')
+  cy.findByText(question).should('be.visible')
 })
