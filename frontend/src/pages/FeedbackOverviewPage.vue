@@ -11,6 +11,7 @@
       <tr>
         <th>Question</th>
         <th>Name</th>
+        <th></th>
       </tr>
       </thead>
       <tbody>
@@ -18,7 +19,7 @@
         <td>Question 5</td>
         <td>Frank Dorssers</td>
         <td>
-          <router-link :to="{ name: 'feedbackChat' }">View</router-link>
+          <router-link :to="{ name: 'feedbackConversation',  params: { conversationId: '123' } }">View</router-link>
         </td>
       </tr>
       </tbody>

@@ -20,7 +20,7 @@ Given(
 )
 
 When('I open feedback on {string}', (question: string) => {
-  cy.findByText(question).parent().findByRole('button', {
+  cy.findByText(question).parent().findByRole('link', {
     name: 'View'
   }).click()
 })
