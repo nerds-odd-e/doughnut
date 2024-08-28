@@ -12,9 +12,12 @@ Given('I visit the feedback page', (userType: string) => {
 
 // Then('I should be able to respond', () => {})
 
-Then('{string} can see the feedback {string} on the question {string}', (user: string, feedback:string, question:string) => {
-  cy.loginAs(user)
-  start.systemSidebar().userOptions().myFeedbackOverview()
-  cy.findByText(feedback).should('be.visible')
-  cy.findByText(question).should('be.visible')
-})
+Then(
+  '{string} can see the feedback {string} on the question {string}',
+  (user: string, feedback: string, question: string) => {
+    cy.loginAs(user)
+    start.systemSidebar().userOptions().myFeedbackOverview()
+    cy.findByText(feedback).should('be.visible')
+    cy.findByText(question).should('be.visible')
+  }
+)
