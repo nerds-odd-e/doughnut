@@ -12,6 +12,13 @@ Given('I visit the feedback page', (userType: string) => {
 
 // Then('I should be able to respond', () => {})
 
+Given(
+  "Pete has given the feedback I don't understand this question on {string}",
+  (question: string) => {
+    cy.findByText(question).should('be.visible')
+  }
+)
+
 Then(
   '{string} can see the feedback {string} on the question {string}',
   (user: string, feedback: string, question: string) => {
