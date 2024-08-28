@@ -27,6 +27,9 @@ const assumeQuestionSection = () => {
       }
       return cy.findByText(answer).click().pageIsNotLoading()
     },
+    answerWithoutContinuing(answer: string) {
+      return cy.findByText(answer).click().pageIsNotLoading()
+    }
   }
 }
 

@@ -15,6 +15,24 @@ When(
 )
 
 When(
+  'I start assessment {string} in the bazaar',
+  function (notebook: string) {
+    start
+      .navigateToBazaar()
+      .selfAssessmentOnNotebook(notebook)
+  }
+)
+
+When (
+  'I click on answer {string}', (answer: string) => {
+    start
+      .assumeAssessmentPage()
+      .assumeQuestionSection()
+      .answerWithoutContinuing(answer)
+  }
+)
+
+When(
   'I do the assessment on {string} in the bazaar with the following answers:',
   function (notebook: string, table: DataTable) {
     start
@@ -186,6 +204,10 @@ Then(
     start.navigateToAssessmentAndCertificatePage().expectNoCertificate(notebook)
   }
 )
+Then(
+  "it should immediately show {string} as the wrong answer after answering", (answer: string) => {
+    cy.contains(answer).should('have.class', 'incorrect');
+});
 
 Then('I answer the question wrongly', () => {
   cy.findByRole('button', { name: 'No' }).click()

@@ -6,6 +6,7 @@
           'is-correct': isOptionCorrect(index),
           'is-incorrect': !isOptionCorrect(index),
           'is-selected': isSelectedOption(index),
+          'incorrect': !selectedAnswer && selectedAnswer === index && !isOptionCorrect(index),
         }"
         @click.once="submitAnswer({ choiceIndex: index })"
         :disabled="disabled"
@@ -60,6 +61,9 @@
   font-weight: bold
   border-color: #000000
   border: 2
+
+.incorrect
+  border: solid 4px red !important
 </style>
 
 <script lang="ts">
@@ -74,11 +78,13 @@ export default defineComponent({
     correctChoiceIndex: Number,
     answerChoiceIndex: Number,
     disabled: Boolean,
+    showIncorrect: Boolean,
   },
   emits: ["answer"],
   data() {
     return {
       answer: "" as string,
+      selectedAnswer: -1 as number,
     }
   },
   methods: {
@@ -89,6 +95,12 @@ export default defineComponent({
       return index === this.correctChoiceIndex
     },
     async submitAnswer(answerData: AnswerDTO) {
+      if (
+        typeof answerData?.choiceIndex === "number" &&
+        answerData.choiceIndex >= 0
+      ) {
+        this.selectedAnswer = answerData.choiceIndex
+      }
       this.$emit("answer", answerData)
     },
   },

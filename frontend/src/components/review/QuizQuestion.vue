@@ -71,6 +71,7 @@ export default defineComponent({
   data() {
     return {
       answer: "" as string,
+      selectedAnswerIndex: null,
     }
   },
   methods: {
