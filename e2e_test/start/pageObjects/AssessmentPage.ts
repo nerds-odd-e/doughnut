@@ -20,10 +20,10 @@ const assumeQuestionSection = () => {
         return this.answer(row!.Answer ?? '', row.AnswerCorrect === 'true')
       })
     },
-    answer(answer: string, answerCorrect= true) {
-      if(!answerCorrect) {
+    answer(answer: string, answerCorrect = true) {
+      if (!answerCorrect) {
         cy.findByText(answer).click()
-        return  cy.findByText('Continue').click().pageIsNotLoading()
+        return cy.findByText('Continue').click().pageIsNotLoading()
       }
       return cy.findByText(answer).click().pageIsNotLoading()
     },
@@ -69,7 +69,7 @@ export const assumeAssessmentPage = (notebook?: string) => {
     },
     answerYesNoQuestionsToScore(correctAnswers: number, allQuestions: number) {
       for (let i = 0; i < correctAnswers; i++) {
-        this.assumeQuestionSection().answer('Yes',true)
+        this.assumeQuestionSection().answer('Yes', true)
         cy.pageIsNotLoading()
       }
       for (let i = correctAnswers; i < allQuestions; i++) {

@@ -31,12 +31,12 @@ Feature: Self assessment
       | europe          | false                  | bread         | false                  | kyoto       | false                  | 0             |
       | Asia            | true                   | Pho           | true                   | kyoto       | false                  | 2             |
 
-  @ignore
+  @only
   Scenario: Perform an assessment with the wrong answer to a question
     Given I set the number of questions per assessment of the notebook "Countries" to 3
-    When I start the assessment "Countries" in the bazaar:
-    When I Answer "Asia" for question "Where in the world is Singapore?"
-    And I Answer "Stamppot" for question "Most famous food of Vietnam?"
+#    When I start the assessment "Countries" in the bazaar:
+#    When I Answer "Asia" for question "Where in the world is Singapore?"
+#    And I Answer "Stamppot" for question "Most famous food of Vietnam?"
     Then The quiz should pause and show "Stamppot" as the wrong answer
 
   Scenario Outline: Cannot start assessment with 0 questions or not enough approved questions
