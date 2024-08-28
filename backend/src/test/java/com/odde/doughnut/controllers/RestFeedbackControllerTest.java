@@ -82,4 +82,23 @@ class RestFeedbackControllerTest {
     assertEquals(1, conversations.size());
     assertEquals("This is a feedback for the current user", conversations.getFirst().getMessage());
   }
+
+  @Test
+  void testGetFeedbackThreadsForUser() {
+    User conversationInitiator = makeMe.aUser().please();
+    User noteCreator = makeMe.aUser().please();
+    QuizQuestionAndAnswer question = makeMe.aQuestion().please();
+
+    Conversation conversation = new Conversation();
+    conversation.setMessage("I don't understand this question");
+    conversation.setConversationInitiator(conversationInitiator);
+    conversation.setNoteCreator(noteCreator);
+    conversation.setQuizQuestionAndAnswer(question);
+    makeMe.modelFactoryService.save(conversation);
+
+    List<Conversation> conversations = controller.getFeedbackThreadsForUser(conversationInitiator);
+
+    assertEquals(1, conversations.size());
+    assertEquals("I don't understand this question", conversations.getFirst().getMessage());
+  }
 }
