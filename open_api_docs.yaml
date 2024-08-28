@@ -2571,17 +2571,11 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Conversation"
-  /api/feedback/user/{id}:
+  /api/feedback/all:
     get:
       tags:
       - rest-feedback-controller
       operationId: getFeedbackThreadsForUser
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: integer
       responses:
         "500":
           description: Internal Server Error

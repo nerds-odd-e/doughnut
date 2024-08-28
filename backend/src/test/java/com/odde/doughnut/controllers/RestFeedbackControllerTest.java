@@ -85,20 +85,39 @@ class RestFeedbackControllerTest {
 
   @Test
   void testGetFeedbackThreadsForUser() {
-    User conversationInitiator = makeMe.aUser().please();
-    User noteCreator = makeMe.aUser().please();
-    QuizQuestionAndAnswer question = makeMe.aQuestion().please();
+    User notCurrentUser = makeMe.aUser().please();
 
-    Conversation conversation = new Conversation();
-    conversation.setMessage("I don't understand this question");
-    conversation.setConversationInitiator(conversationInitiator);
-    conversation.setNoteCreator(noteCreator);
-    conversation.setQuizQuestionAndAnswer(question);
-    makeMe.modelFactoryService.save(conversation);
+    QuizQuestionAndAnswer quizQuestionAndAnswer1 = makeMe.aQuestion().please();
+    quizQuestionAndAnswer1.getNote().setCreator(this.currentUser.getEntity());
+    Conversation conversation1 = new Conversation();
+    conversation1.setConversationInitiator(notCurrentUser);
+    conversation1.setNoteCreator(quizQuestionAndAnswer1.getNote().getCreator());
+    conversation1.setMessage("This is a feedback for the current user");
+    conversation1.setQuizQuestionAndAnswer(quizQuestionAndAnswer1);
+    makeMe.modelFactoryService.save(conversation1);
 
-    List<Conversation> conversations = controller.getFeedbackThreadsForUser(conversationInitiator);
+    QuizQuestionAndAnswer quizQuestionAndAnswer2 = makeMe.aQuestion().please();
+    quizQuestionAndAnswer2.getNote().setCreator(notCurrentUser);
+    Conversation conversation2 = new Conversation();
+    conversation2.setConversationInitiator(this.currentUser.getEntity());
+    conversation2.setNoteCreator(quizQuestionAndAnswer2.getNote().getCreator());
+    conversation2.setMessage("This is a feedback for the current user");
+    conversation2.setQuizQuestionAndAnswer(quizQuestionAndAnswer2);
+    makeMe.modelFactoryService.save(conversation2);
 
-    assertEquals(1, conversations.size());
-    assertEquals("I don't understand this question", conversations.getFirst().getMessage());
+    User notCurrentUser2 = makeMe.aUser().please();
+
+    QuizQuestionAndAnswer quizQuestionAndAnswer3 = makeMe.aQuestion().please();
+    quizQuestionAndAnswer3.getNote().setCreator(notCurrentUser);
+    Conversation conversation3 = new Conversation();
+    conversation3.setConversationInitiator(notCurrentUser2);
+    conversation3.setNoteCreator(quizQuestionAndAnswer3.getNote().getCreator());
+    conversation3.setMessage("This is a feedback for the current user");
+    conversation3.setQuizQuestionAndAnswer(quizQuestionAndAnswer3);
+    makeMe.modelFactoryService.save(conversation3);
+
+    List<Conversation> conversations = controller.getFeedbackThreadsForUser();
+
+    assertEquals(2, conversations.size());
   }
 }

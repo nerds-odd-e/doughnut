@@ -2,7 +2,6 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.QuizQuestionAndAnswer;
-import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ConversationService;
@@ -42,11 +41,10 @@ public class RestFeedbackController {
     return modelFactoryService.conversationRepository.findByNoteCreator(currentUser.getEntity());
   }
 
-  @GetMapping("/user/{id}")
-  public List<Conversation> getFeedbackThreadsForUser(
-      @PathVariable("id") @Schema(type = "integer") User user) {
-    var conversation = new Conversation();
-    conversation.setMessage("I don't understand this question");
-    return List.of(conversation);
+  @GetMapping("/all")
+  public List<Conversation> getFeedbackThreadsForUser() {
+    currentUser.assertLoggedIn();
+    return modelFactoryService.conversationRepository.findByNoteCreatorOrConversationInitiator(
+        currentUser.getEntity(), currentUser.getEntity());
   }
 }

@@ -44,19 +44,13 @@ export class RestFeedbackControllerService {
         });
     }
     /**
-     * @param id
      * @returns Conversation OK
      * @throws ApiError
      */
-    public getFeedbackThreadsForUser(
-        id: number,
-    ): CancelablePromise<Array<Conversation>> {
+    public getFeedbackThreadsForUser(): CancelablePromise<Array<Conversation>> {
         return this.httpRequest.request({
             method: 'GET',
-            url: '/api/feedback/user/{id}',
-            path: {
-                'id': id,
-            },
+            url: '/api/feedback/all',
             errors: {
                 500: `Internal Server Error`,
             },
