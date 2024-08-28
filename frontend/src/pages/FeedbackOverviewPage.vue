@@ -17,6 +17,9 @@
       <tr>
         <td>Question 5</td>
         <td>Frank Dorssers</td>
+        <td>
+          <router-link :to="{ name: 'feedbackChat' }">View</router-link>
+        </td>
       </tr>
       </tbody>
     </table>
