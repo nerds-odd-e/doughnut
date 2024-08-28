@@ -6,7 +6,9 @@ import com.odde.doughnut.controllers.dto.FeedbackDTO;
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestionAndAnswer;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ConversationService;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
@@ -23,16 +25,16 @@ import org.springframework.transaction.annotation.Transactional;
 class RestFeedbackControllerTest {
 
   @Autowired ConversationService feedbackService;
-
   @Autowired MakeMe makeMe;
-
+  private UserModel currentUser;
   RestFeedbackController controller;
 
   @Autowired ModelFactoryService modelFactoryService;
 
   @BeforeEach
   void setup() {
-    controller = new RestFeedbackController(feedbackService, modelFactoryService);
+    currentUser = makeMe.aUser().toModelPlease();
+    controller = new RestFeedbackController(currentUser, feedbackService, modelFactoryService);
   }
 
   @Test
@@ -57,16 +59,28 @@ class RestFeedbackControllerTest {
 
   @Test
   void testGetFeedbackReturnsAllConversationsForCurrentUser() {
-    Conversation conversation = new Conversation();
-    QuizQuestionAndAnswer quizQuestionAndAnswer = makeMe.aQuestion().please();
-    conversation.setConversationInitiator(makeMe.aUser().please());
-    conversation.setNoteCreator(quizQuestionAndAnswer.getNote().getCreator());
-    conversation.setMessage("This is a feedback");
-    conversation.setQuizQuestionAndAnswer(quizQuestionAndAnswer);
-    makeMe.modelFactoryService.save(conversation);
+    User feedbackGiverUser = makeMe.aUser().please();
+
+    QuizQuestionAndAnswer quizQuestionAndAnswer1 = makeMe.aQuestion().please();
+    quizQuestionAndAnswer1.getNote().setCreator(this.currentUser.getEntity());
+    Conversation conversation1 = new Conversation();
+    conversation1.setConversationInitiator(feedbackGiverUser);
+    conversation1.setNoteCreator(quizQuestionAndAnswer1.getNote().getCreator());
+    conversation1.setMessage("This is a feedback for the current user");
+    conversation1.setQuizQuestionAndAnswer(quizQuestionAndAnswer1);
+    makeMe.modelFactoryService.save(conversation1);
+
+    QuizQuestionAndAnswer quizQuestionAndAnswer2 = makeMe.aQuestion().please();
+    Conversation conversation2 = new Conversation();
+    conversation2.setConversationInitiator(feedbackGiverUser);
+    conversation2.setNoteCreator(quizQuestionAndAnswer2.getNote().getCreator());
+    conversation2.setMessage("This is a feedback for the other user");
+    conversation2.setQuizQuestionAndAnswer(quizQuestionAndAnswer2);
+    makeMe.modelFactoryService.save(conversation2);
 
     List<Conversation> conversations = controller.getFeedback();
 
     assertEquals(1, conversations.size());
+    assertEquals("This is a feedback for the current user", conversations.getFirst().getMessage());
   }
 }

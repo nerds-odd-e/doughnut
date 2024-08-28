@@ -4,6 +4,7 @@ import com.odde.doughnut.controllers.dto.FeedbackDTO;
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.QuizQuestionAndAnswer;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ConversationService;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
@@ -15,9 +16,13 @@ import org.springframework.web.bind.annotation.*;
 public class RestFeedbackController {
   private final ConversationService conversationService;
   private final ModelFactoryService modelFactoryService;
+  private final UserModel currentUser;
 
   public RestFeedbackController(
-      ConversationService conversationService, ModelFactoryService modelFactoryService) {
+      UserModel currentUser,
+      ConversationService conversationService,
+      ModelFactoryService modelFactoryService) {
+    this.currentUser = currentUser;
     this.conversationService = conversationService;
     this.modelFactoryService = modelFactoryService;
   }
@@ -33,6 +38,7 @@ public class RestFeedbackController {
 
   @GetMapping
   public List<Conversation> getFeedback() {
-    return (List<Conversation>) modelFactoryService.conversationRepository.findAll();
+    currentUser.assertLoggedIn();
+    return modelFactoryService.conversationRepository.findByNoteCreator(currentUser.getEntity());
   }
 }
