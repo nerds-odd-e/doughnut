@@ -1,4 +1,4 @@
-import {Given, Then} from '@badeball/cypress-cucumber-preprocessor'
+import { Given, Then } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 
 Given('I visit the feedback page', (userType: string) => {
