@@ -16,6 +16,7 @@
       <thead>
         <tr>
           <th>Approved</th>
+          <th>Actions</th>
           <th>Question Text</th>
           <th>A</th>
           <th>B</th>
@@ -35,6 +36,11 @@
               v-model="question.approved"
               @change="toggleApproval(question.id)"
             />
+          </td>
+          <td>
+            <button class="remove-button" @click="deleteQuestion(question.id)">
+              Remove
+            </button>
           </td>
           <td>{{ question.quizQuestion.multipleChoicesQuestion.stem }}</td>
           <template
@@ -56,7 +62,7 @@
     </table>
     <div v-else class="no-questions">
       <b >No questions</b>
-    </div> 
+    </div>
   </div>
 </template>
 
@@ -92,6 +98,17 @@ const toggleApproval = async (questionId?: number) => {
     await managedApi.restQuizQuestionController.toggleApproval(questionId)
   }
 }
+const deleteQuestion = async (questionId?: number) => {
+  if (questionId) {
+    await managedApi.restQuizQuestionController
+      .deleteQuestion(props.note.id, questionId)
+      .then(() => {
+        questions.value = questions.value.filter((question) => {
+          return question.id !== questionId
+        })
+      })
+  }
+}
 onMounted(() => {
   fetchQuestions()
 })
@@ -121,5 +138,12 @@ onMounted(() => {
   margin-top: 10px;
   width: 100%;
   text-align: center;
+}
+.remove-button {
+  color: white;
+  background-color: #ff3f3f;
+  border: none;
+  border-radius: 0.2rem;
+  padding: 0.25rem 0.5rem;
 }
 </style>

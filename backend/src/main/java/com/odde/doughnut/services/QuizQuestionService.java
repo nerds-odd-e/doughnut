@@ -42,6 +42,15 @@ public class QuizQuestionService {
     return questionAndAnswer;
   }
 
+  public void deleteQuestion(Note note, QuizQuestionAndAnswer questionAndAnswer) {
+    // Approval status should be reset whenever note questions are changed
+    Notebook parentNotebook = note.getNotebook();
+    parentNotebook.setApprovalStatus(ApprovalStatus.NOT_APPROVED);
+    modelFactoryService.save(parentNotebook);
+
+    modelFactoryService.remove(questionAndAnswer);
+  }
+
   public QuizQuestionAndAnswer refineQuestion(Note note, QuizQuestionAndAnswer questionAndAnswer) {
     MCQWithAnswer aiGeneratedRefineQuestion =
         aiQuestionGenerator.getAiGeneratedRefineQuestion(
