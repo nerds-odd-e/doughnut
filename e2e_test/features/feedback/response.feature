@@ -14,3 +14,16 @@ Feature: Response to a message
     Given I visit the feedback page
     # When I have no feedback
     Then I see the message "There is no feedback currently."
+
+  @ignore
+  Scenario: Receive feedback on a question that I've created:
+    Given Pete has given the feedback "I don't understand this question" on question 5
+    And I'm the creator of question 5
+    And I've opened Pete's Feedback
+    Then I should see the feedback message "I don't understand this question"
+
+  @ignore
+  Scenario: Don't see feedback on a question that I haven't created:
+    Given Pete has given the feedback "I don't understand this question" on question 5
+    And I'm not the creator of question 5
+    Then I don't see feedback from Pete
