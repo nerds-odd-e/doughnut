@@ -31,9 +31,11 @@
       <button class="btn btn-secondary">Send feedback</button>
       </template>
       <template #default="{ closer }">
-        <FeedbackForm @close-dialog="closer()" />
+        <FeedbackForm @close-dialog="closer()" @submit="handleFormSubmission" :question="quizQuestions[currentQuestion]"/>
       </template>
-    </PopButton>  </div>
+    </PopButton>
+    <div v-if="formSubmitted" class="alert alert-info">Feedback received successfully</div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -66,6 +68,7 @@ const correctAnswers = ref(0)
 const assessmentResult = ref<AssessmentResult | undefined>(undefined)
 const questionsAnswerCollection = ref<AnswerSubmission[]>([])
 const certificate = ref<Certificate>()
+const formSubmitted = ref(false)
 
 const passCriteriaPercentage = 80
 
@@ -86,6 +89,7 @@ const questionAnswered = (answerResult) => {
   } else {
     answeredCurrentQuestion.value = true
   }
+  formSubmitted.value = false
   checkIfQuizComplete()
 }
 
@@ -124,6 +128,9 @@ const generateAssessmentQuestions = async () => {
       errors.value = String(err)
     }
   }
+}
+const handleFormSubmission = () => {
+  formSubmitted.value = true
 }
 
 onMounted(() => {

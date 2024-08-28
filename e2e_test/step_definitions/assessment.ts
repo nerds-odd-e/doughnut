@@ -206,7 +206,6 @@ Then(
 
 Then('I answer the question wrongly', () => {
   cy.findByRole('button', { name: 'No' }).click()
-  // cy.findByText('Feedback submitted').should('be.visible')
 })
 
 Then('I submit my feedback: {string}', (feedback: string) => {
@@ -214,5 +213,5 @@ Then('I submit my feedback: {string}', (feedback: string) => {
   cy.findByText('Send feedback').click()
   cy.findByPlaceholderText('Give feedback about the question').type(feedback)
   cy.findByRole('button', { name: 'Submit' }).click()
-  // cy.findByText('Feedback submitted').should('be.visible')
+  cy.findByText('Feedback received successfully').should('be.visible')
 })
