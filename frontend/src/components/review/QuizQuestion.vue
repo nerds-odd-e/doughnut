@@ -26,16 +26,6 @@
           <SuggestQuestionForFineTuning :quiz-question="quizQuestion" @close-dialog="closer()" />
         </template>
       </PopButton>
-
-      <PopButton title="Send feedback" v-if="selectedWrongAnswer()">
-        <template #button_face>
-          <SvgRaiseHand />
-        </template>
-        <template #default="{ closer }">
-          <FeedbackForm :quiz-question="quizQuestion" @close-dialog="closer()" />
-        </template>
-      </PopButton>
-
       <slot />
     </div>
   </div>

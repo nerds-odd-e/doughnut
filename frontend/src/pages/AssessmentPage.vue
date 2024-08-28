@@ -26,7 +26,14 @@
   </div>
   <div :hidden="!answeredCurrentQuestion">
     <button class="btn btn-danger" @click="advance">Continue</button>
-  </div>
+    <PopButton title="Send feedback">
+      <template #button_face>
+      <button class="btn btn-secondary">Send feedback</button>
+      </template>
+      <template #default="{ closer }">
+        <FeedbackForm @close-dialog="closer()" />
+      </template>
+    </PopButton>  </div>
 </template>
 
 <script setup lang="ts">
