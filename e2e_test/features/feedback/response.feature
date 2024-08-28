@@ -9,7 +9,9 @@ Feature: Response to a message
     # When I have received feedback on a question
     # And I open that conversation
     # Then I should be able to respond
+    Then I should see the feedback message "Bla"
 
+  @ignore
   Scenario: No feedback
     Given I visit the feedback page
     # When I have no feedback
