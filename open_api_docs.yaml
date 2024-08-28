@@ -2551,6 +2551,26 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/SuggestedQuestionForFineTuning"
+  /api/feedback:
+    get:
+      tags:
+      - rest-feedback-controller
+      operationId: getFeedback
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Conversation"
   /api/failure-reports:
     get:
       tags:
@@ -3852,6 +3872,20 @@ components:
           type: string
         target:
           type: string
+    Conversation:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        quizQuestionAndAnswer:
+          $ref: "#/components/schemas/QuizQuestionAndAnswer"
+        noteCreator:
+          $ref: "#/components/schemas/User"
+        conversationInitiator:
+          $ref: "#/components/schemas/User"
     FailureReport:
       required:
       - createDatetime

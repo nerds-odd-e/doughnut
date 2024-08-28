@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { Conversation } from '../models/Conversation';
 import type { FeedbackDTO } from '../models/FeedbackDTO';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -25,6 +26,19 @@ export class RestFeedbackControllerService {
             },
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @returns Conversation OK
+     * @throws ApiError
+     */
+    public getFeedback(): CancelablePromise<Array<Conversation>> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/feedback',
             errors: {
                 500: `Internal Server Error`,
             },

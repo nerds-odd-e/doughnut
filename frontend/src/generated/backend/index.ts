@@ -32,6 +32,7 @@ export type { CircleForUserView } from './models/CircleForUserView';
 export type { CircleJoiningByInvitation } from './models/CircleJoiningByInvitation';
 export type { ClarifyingQuestion } from './models/ClarifyingQuestion';
 export type { CodeInterpreterTool } from './models/CodeInterpreterTool';
+export type { Conversation } from './models/Conversation';
 export type { CurrentUserInfo } from './models/CurrentUserInfo';
 export type { Delta } from './models/Delta';
 export type { DeltaContent } from './models/DeltaContent';
