@@ -6,7 +6,7 @@
       <div v-if="errors != ''">
         {{ errors }}
       </div>
-      <QuizQuestionComp v-else-if="currentQuestion < quizQuestions.length"
+      <QuizQuestion v-else-if="currentQuestion < quizQuestions.length"
         :quiz-question="quizQuestions[currentQuestion]!" @answered="questionAnswered" :show-finetune-button="false" />
       <div v-else-if="assessmentResult">
         <p>Your score: {{ correctAnswers }} / {{ quizQuestions.length }}</p>
@@ -42,13 +42,13 @@
 import { computed, onMounted, ref } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import {
-  QuizQuestion,
+  QuizQuestion as QuizQuestionType,
   AnswerSubmission,
   AssessmentResult,
   Certificate,
 } from "@/generated/backend"
 import { useRouter } from "vue-router"
-import QuizQuestionComp from "@/components/review/QuizQuestion.vue"
+import QuizQuestion from "@/components/review/QuizQuestion.vue"
 
 const { managedApi } = useLoadingApi()
 const router = useRouter()
@@ -60,7 +60,7 @@ const topicConstructor = computed(() => {
   return router.currentRoute.value.query?.topic
 })
 
-const quizQuestions = ref<QuizQuestion[]>([])
+const quizQuestions = ref<QuizQuestionType[]>([])
 const currentQuestion = ref(0)
 const answeredCurrentQuestion = ref(false)
 const errors = ref("")
