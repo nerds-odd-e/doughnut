@@ -90,10 +90,6 @@ export default defineComponent({
         )
       }
     },
-    selectedWrongAnswer() {
-      // return this.answerChoiceIndex !== this.correctChoiceIndex
-      return false
-    },
   },
 })
 </script>
