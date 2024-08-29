@@ -41,8 +41,6 @@ const conversations = ref<Conversation[] | undefined>(undefined)
 const fetchData = async () => {
   conversations.value =
     await managedApi.restFeedbackController.getFeedbackThreadsForUser()
-  // notebooks.value = res.notebooks
-  // subscriptions.value = res.subscriptions
 }
 onMounted(() => {
   fetchData()
