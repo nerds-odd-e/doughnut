@@ -35,7 +35,7 @@ Feature: Self assessment
     Given I set the number of questions per assessment of the notebook "Countries" to 3
     And I start assessment 'Countries' in the bazaar
     When I click on answer 'europe'
-#    Then it should immediately show "europe" as the wrong answer after answering
+    Then it should immediately show "europe" as the wrong answer after answering
 
   Scenario Outline: Cannot start assessment with 0 questions or not enough approved questions
     Given I set the number of questions per assessment of the notebook "Countries" to <Questions Per Assessment>

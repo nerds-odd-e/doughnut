@@ -4,7 +4,7 @@
       <button
         :class="{
           'is-correct': isOptionCorrect(index),
-          'is-incorrect': !isOptionCorrect(index),
+          'is-incorrect': incorrectAssessmentAnswerIndex === index,
           'is-selected': isSelectedOption(index),
         }"
         @click.once="submitAnswer({ choiceIndex: index })"
@@ -74,6 +74,7 @@ export default defineComponent({
     correctChoiceIndex: Number,
     answerChoiceIndex: Number,
     disabled: Boolean,
+    incorrectAssessmentAnswerIndex: Number,
   },
   emits: ["answer"],
   data() {

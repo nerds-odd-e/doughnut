@@ -16,7 +16,7 @@
     </div>
     <QuizQuestionChoices v-if="quizQuestion.multipleChoicesQuestion.choices"
       :choices="quizQuestion.multipleChoicesQuestion.choices" :correct-choice-index="correctChoiceIndex"
-      :answer-choice-index="answerChoiceIndex" :disabled="disabled" @answer="submitAnswer($event)" />
+      :answer-choice-index="answerChoiceIndex" :disabled="disabled" @answer="submitAnswer($event)" :incorrect-assessment-answer-index="checkIndex()" />
     <div class="mark-question">
       <PopButton title="send this question for fine tuning the question generation model" v-if="showFinetuneButton">
         <template #button_face>
@@ -71,6 +71,7 @@ export default defineComponent({
   data() {
     return {
       answer: "" as string,
+      assessmentAnsweredIndex: 1 as number,
     }
   },
   methods: {
@@ -82,12 +83,19 @@ export default defineComponent({
             answerData
           )
 
+        if (typeof answerData.choiceIndex === "number") {
+          this.assessmentAnsweredIndex = answerData.choiceIndex
+        }
+
         this.$emit("answered", answerResult)
       } catch (_e) {
         await this.popups.alert(
           "This review point doesn't exist any more or is being skipped now. Moving on to the next review point..."
         )
       }
+    },
+    checkIndex() {
+      return this.assessmentAnsweredIndex
     },
   },
 })
