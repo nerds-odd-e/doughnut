@@ -15,11 +15,11 @@
       </tr>
       </thead>
       <tbody>
-      <tr>
-        <td>Question 5</td>
-        <td>Frank Dorssers</td>
+      <tr v-for="conversation in conversations" :key="conversation.id">
+        <td>{{conversation.quizQuestionAndAnswer?.quizQuestion.multipleChoicesQuestion.stem}}</td>
+        <td>{{conversation.conversationInitiator?.name}}</td>
         <td>
-          <router-link :to="{ name: 'feedbackConversation',  params: { conversationId: '123' } }">View</router-link>
+          <router-link :to="{ name: 'feedbackConversation',  params: { conversationId: '123' } }">View chat</router-link>
         </td>
       </tr>
       </tbody>
@@ -28,7 +28,23 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted, ref } from "vue"
+const { managedApi } = useLoadingApi()
+import useLoadingApi from "@/managedApi/useLoadingApi"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
+import { Conversation } from "@/generated/backend"
+
+const conversations = ref<Conversation[] | undefined>(undefined)
+
+const fetchData = async () => {
+  conversations.value =
+    await managedApi.restFeedbackController.getFeedbackThreadsForUser()
+  // notebooks.value = res.notebooks
+  // subscriptions.value = res.subscriptions
+}
+onMounted(() => {
+  fetchData()
+})
 </script>
 
 <style scoped>
