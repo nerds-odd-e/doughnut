@@ -200,8 +200,8 @@ Then(
 Then(
   'it should immediately show {string} as the wrong answer after answering',
   (answer: string) => {
-    cy.contains(answer).should('have.class', 'is-incorrect')
-    cy.get('.is-incorrect').should('have.length', 1)
+    cy.contains(answer).should('have.class', 'current-choice')
+    cy.get('.current-choice').should('have.length', 1)
   }
 )
 

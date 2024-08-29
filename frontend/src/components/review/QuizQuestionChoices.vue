@@ -4,7 +4,7 @@
       <button
         :class="{
           'is-correct': isOptionCorrect(index),
-          'is-incorrect': incorrectAssessmentAnswerIndex === index,
+          'current-choice': assessmentCurrentChoiceIndex === index,
           'is-selected': isSelectedOption(index),
         }"
         @click.once="submitAnswer({ choiceIndex: index })"
@@ -56,6 +56,9 @@
 .is-correct
   background-color: #00ff00 !important
 
+.current-choice
+  border: solid 4px red !important
+
 .is-selected
   font-weight: bold
   border-color: #000000
@@ -74,7 +77,7 @@ export default defineComponent({
     correctChoiceIndex: Number,
     answerChoiceIndex: Number,
     disabled: Boolean,
-    incorrectAssessmentAnswerIndex: Number,
+    assessmentCurrentChoiceIndex: Number,
   },
   emits: ["answer"],
   data() {

@@ -16,7 +16,7 @@
     </div>
     <QuizQuestionChoices v-if="quizQuestion.multipleChoicesQuestion.choices"
       :choices="quizQuestion.multipleChoicesQuestion.choices" :correct-choice-index="correctChoiceIndex"
-      :answer-choice-index="answerChoiceIndex" :disabled="disabled" @answer="submitAnswer($event)" :incorrect-assessment-answer-index="checkIndex()" />
+      :answer-choice-index="answerChoiceIndex" :disabled="disabled" @answer="submitAnswer($event)" :assessment-current-choice-index="checkAssessmentAnsweredIndex()" />
     <div class="mark-question">
       <PopButton title="send this question for fine tuning the question generation model" v-if="showFinetuneButton">
         <template #button_face>
@@ -94,7 +94,7 @@ export default defineComponent({
         )
       }
     },
-    checkIndex() {
+    checkAssessmentAnsweredIndex() {
       return this.assessmentAnsweredIndex
     },
   },
