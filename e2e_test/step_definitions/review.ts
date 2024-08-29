@@ -165,7 +165,7 @@ Then('I should see that my answer {string} is incorrect', (answer) => {
 })
 
 Then('I should see my selected answer "sedation" highlighted', () => {
-  cy.findByText('sedation').parent().should('have.class', 'is-selected')
+  cy.findByText("sedation").parent().should('have.class', 'is-selected')
 })
 
 Then('I should see the repetition is finished: {string}', (yesNo) => {
