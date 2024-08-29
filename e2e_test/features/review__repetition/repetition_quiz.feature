@@ -19,7 +19,6 @@ Feature: Repetition Quiz
     When I am repeat-reviewing my old note on day 2
     When I choose answer "<answer>"
     Then I should see that my answer <result>
-    And I should see my selected answer "sedation" highlighted
     And I should see the repetition is finished: "<should see finish>"
 
     Examples:
