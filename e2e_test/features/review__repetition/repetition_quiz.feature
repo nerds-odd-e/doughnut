@@ -14,17 +14,19 @@ Feature: Repetition Quiz
     When I am repeat-reviewing my old note on day 2
     Then I should be asked cloze deletion question "[...] means incite violence" with options "sedition, sedation"
 
-  Scenario Outline: Answering cloze question
+  Scenario: Answering cloze question incorrectly
     Given I learned one note "sedition" on day 1
     When I am repeat-reviewing my old note on day 2
-    When I choose answer "<answer>"
-    Then I should see that my answer <result>
-    And I should see the repetition is finished: "<should see finish>"
+    When I choose answer "sedation"
+    Then I should see that my answer "sedation" is incorrect
+    And I should see the repetition is finished: "no"
 
-    Examples:
-      | answer   | result                  | should see finish |
-      | sedation | "sedation" is incorrect | no                |
-      | sedition | is correct              | yes               |
+  Scenario: Answering cloze question correctly
+    Given I learned one note "sedition" on day 1
+    When I am repeat-reviewing my old note on day 2
+    When I choose answer "sedition"
+    Then I should see that my answer is correct
+    And I should see the repetition is finished: "yes"
 
   Scenario Outline: Spelling quiz
     Given I am learning new note on day 1
