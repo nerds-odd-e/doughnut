@@ -37,6 +37,12 @@ public class AssessmentService {
             .map(quizQuestionService::selectRandomQuestionForANote)
             .filter(Objects::nonNull)
             .filter(QuizQuestionAndAnswer::isApproved)
+            .filter(
+                (quizQuestionAndAnswer) ->
+                    notebook.getLast_approval_time() == null
+                        || quizQuestionAndAnswer
+                            .getCreatedAt()
+                            .before(notebook.getLast_approval_time()))
             .toList();
 
     Integer numberOfQuestion = notebook.getNotebookSettings().getNumberOfQuestionsInAssessment();
