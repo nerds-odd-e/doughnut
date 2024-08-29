@@ -268,3 +268,9 @@ Then(
       .suggestingNegativeFeedbackFineTuningExclusion()
   }
 )
+Then(
+  'I should see that my selected answer {string} is highlighted',
+  function (answer: string) {
+    cy.findByText(answer).parent().should('have.class', 'is-selected')
+  }
+)
