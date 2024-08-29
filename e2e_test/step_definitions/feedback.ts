@@ -13,28 +13,28 @@ Given('I visit the feedback page', (userType: string) => {
 // Then('I should be able to respond', () => {})
 
 Given(
-  "Pete has given the feedback I don't understand this question on {string}",
-  (question: string) => {
-    cy.findByText(question).should('be.visible')
+  "Pete has given the feedback {string} on a question on notebook {string}",
+  (feedback:string, notebook: string) => {
+    //Start assessment
+    start.navigateToBazaar().selfAssessmentOnNotebook(notebook);
+    //Select wrong answer
+    cy.findByRole('button', { name: 'No' }).click()
+    //Submit feedback
+    cy.findByText('Send feedback').click()
+    cy.findByPlaceholderText('Give feedback about the question').type(feedback)
+    cy.findByRole('button', { name: 'Submit' }).click()
   }
 )
-
-When('I open feedback on {string}', (question: string) => {
-  cy.findByText(question)
-    .parent()
-    .findByRole('link', {
-      name: 'View',
-    })
-    .click()
-})
 
 Then(
   '{string} can see the feedback {string} on the question {string}',
   (user: string, feedback: string, question: string) => {
     cy.loginAs(user)
     start.systemSidebar().userOptions().myFeedbackOverview()
+    cy.findByRole("link", {
+      name: 'View chat'
+    }).click()
     cy.findByText(feedback).should('be.visible')
-    cy.findByText(question).should('be.visible')
   }
 )
 
