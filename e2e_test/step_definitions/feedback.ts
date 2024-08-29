@@ -38,6 +38,28 @@ Then(
   }
 )
 
+Then(
+  '{string} {string} see the conversation about question {string}',
+  (user: string, canOrCannotSee: string, feedback: string) => {
+    cy.loginAs(user)
+    start.systemSidebar().userOptions().myFeedbackOverview()
+    if (canOrCannotSee === 'can') {
+      cy.findByText(feedback).should('be.visible')
+    } else {
+      cy.findByText(feedback).should('not.exist')
+    }
+  }
+)
+
+Then(
+  "{string} can see {string}'s name in the conversation",
+  (loggedInUser: string, partnerUser: string) => {
+    cy.loginAs(loggedInUser)
+    start.systemSidebar().userOptions().myFeedbackOverview()
+    cy.findByText(partnerUser).should('be.visible')
+  }
+)
+
 Then('I see the message {string}', (message: string) => {
   cy.findByText(message).should('exist')
 })
