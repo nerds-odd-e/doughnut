@@ -11,6 +11,7 @@
       <tr>
         <th>Question</th>
         <th>Name</th>
+        <th>Feedback</th>
         <th></th>
       </tr>
       </thead>
@@ -18,6 +19,7 @@
       <tr v-for="conversation in conversations" :key="conversation.id">
         <td>{{conversation.quizQuestionAndAnswer?.quizQuestion.multipleChoicesQuestion.stem}}</td>
         <td>{{conversation.conversationInitiator?.name}}</td>
+        <td>{{conversation.message}}</td>
         <td>
           <router-link :to="{ name: 'feedbackConversation',  params: { conversationId: '123' } }">View chat</router-link>
         </td>

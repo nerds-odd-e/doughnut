@@ -27,13 +27,10 @@ Given(
 )
 
 Then(
-  '{string} can see the feedback {string} on the question {string}',
-  (user: string, feedback: string, _question: string) => {
+  '{string} can see the feedback {string}',
+  (user: string, feedback: string) => {
     cy.loginAs(user)
     start.systemSidebar().userOptions().myFeedbackOverview()
-    cy.findByRole('link', {
-      name: 'View chat',
-    }).click()
     cy.findByText(feedback).should('be.visible')
   }
 )
