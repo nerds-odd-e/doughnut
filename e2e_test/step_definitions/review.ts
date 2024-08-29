@@ -274,3 +274,12 @@ Then(
     cy.findByText(answer).parent().should('have.class', 'is-selected')
   }
 )
+Then(
+  'I should see the correct answer {string} highlighted',
+  function (correctAnswer: string) {
+    cy.findAllByRole('button', { name: correctAnswer }).should(
+      'have.class',
+      'is-correct'
+    )
+  }
+)
