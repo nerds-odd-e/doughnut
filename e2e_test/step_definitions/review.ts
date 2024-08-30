@@ -269,15 +269,10 @@ Then(
   }
 )
 Then(
-  'I should see that my selected answer {string} is highlighted',
-  function (answer: string) {
+  'My selected incorrect answer {string} and the correct answer {string} are highlighted',
+  function (answer: string, correctAnswer: string) {
     cy.findByText(answer).parent().should('have.class', 'is-selected')
-  }
-)
-Then(
-  'I should see the correct answer {string} highlighted',
-  function (correctAnswer: string) {
-    cy.findAllByRole('button', { name: correctAnswer }).should(
+    cy.findAllByRole('button', { name: correctAnswer}).should(
       'have.class',
       'is-correct'
     )

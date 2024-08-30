@@ -19,8 +19,7 @@ Feature: Repetition Quiz
     When I am repeat-reviewing my old note on day 2
     When I choose answer "sedation"
     Then I should see that my answer "sedation" is incorrect
-    And  I should see that my selected answer "sedation" is highlighted
-    And  I should see the correct answer "sedition" highlighted
+    And My selected incorrect answer "sedation" and the correct answer "sedition" are highlighted
     And I should see the repetition is finished: "no"
 
   Scenario: Answering cloze question correctly
