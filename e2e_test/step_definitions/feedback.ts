@@ -1,16 +1,10 @@
-import { Given, Then } from '@badeball/cypress-cucumber-preprocessor'
+import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 
 Given('I visit the feedback page', (userType: string) => {
   console.log(userType)
   start.systemSidebar().userOptions().myFeedbackOverview()
 })
-
-// When('I have received feedback on a question', () => {})
-
-// When('I open that conversation', () => {})
-
-// Then('I should be able to respond', () => {})
 
 Given(
   'Pete has given the feedback {string} on a question on notebook {string}',
@@ -25,6 +19,14 @@ Given(
     cy.findByRole('button', { name: 'Submit' }).click()
   }
 )
+
+When('I open that conversation', () => {
+  cy.findByText('There is no feedback currently.').should('not.exist')
+  cy.findByRole('link', {
+    name: 'View chat'
+  }).click()
+  cy.findByText('I don\'t understand this question').should('be.visible')
+})
 
 Then(
   '{string} can see the feedback {string}',

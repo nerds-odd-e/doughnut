@@ -5,15 +5,15 @@ Feature: Response to a message
     Given I am logged in as an existing user
 
   Scenario: Provide response as a Notebook Owner
-    Given I visit the feedback page
-    # When I have received feedback on a question
-    # And I open that conversation
+    Given I am logged in as "old_learner"
+    And there is a certified notebook "Just say 'Yes'" by "a_trainer" with 2 questions, shared to the Bazaar
+    And Pete has given the feedback "I don't understand this question" on a question on notebook "Just say 'Yes'"
+    And I visit the feedback page
+    When I open that conversation
     # Then I should be able to respond
 
-  @ignore
   Scenario: No feedback
     Given I visit the feedback page
-    # When I have no feedback
     Then I see the message "There is no feedback currently."
 
   @ignore
