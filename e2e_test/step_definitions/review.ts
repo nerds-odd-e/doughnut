@@ -271,10 +271,7 @@ Then(
 Then(
   'My selected incorrect answer {string} and the correct answer {string} are highlighted',
   function (answer: string, correctAnswer: string) {
-    cy.findByText(answer).parent().should('have.class', 'is-selected')
-    cy.findAllByRole('button', { name: correctAnswer}).should(
-      'have.class',
-      'is-correct'
-    )
+    start.assumeQuestionPage().isChoiceSelected(answer)
+    start.assumeQuestionPage().isChoiceMarkedCorrect(correctAnswer)
   }
 )

@@ -5,10 +5,18 @@ const assumeQuestionPage = (stem?: string) => {
     cy.findByText(stem)
   }
   const question = () => (stem ? cy.findByText(stem).parent() : cy)
-  const getChoice = (choice: string) => question().findByText(choice)
+  const getChoice = (choice: string) =>
+    question().findAllByRole('button', { name: choice })
   return {
     isDisabled() {
       question().find('ol button').should('be.disabled')
+    },
+
+    isChoiceSelected(answer: string) {
+      getChoice(answer).should('have.class', 'is-selected')
+    },
+    isChoiceMarkedCorrect(correctChoice: string) {
+      getChoice(correctChoice).should('have.class', 'is-correct')
     },
 
     isNotDisabled() {
@@ -18,7 +26,6 @@ const assumeQuestionPage = (stem?: string) => {
     expectChoiceToBe(choice: string, correctness: 'correct' | 'incorrect') {
       getChoice(choice).click()
       getChoice(choice)
-        .parent()
         .invoke('attr', 'class')
         .should('contain', `is-${correctness}`)
     },
