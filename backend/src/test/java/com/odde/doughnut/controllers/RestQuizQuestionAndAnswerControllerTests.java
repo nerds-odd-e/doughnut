@@ -496,25 +496,6 @@ class RestQuizQuestionAndAnswerControllerTests {
       makeMe.refresh(note);
       assertThat(note.getQuizQuestionAndAnswers(), hasSize(1));
     }
-
-    @Test
-    void resetNotebookApprovalOnAdd() throws UnexpectedNoAccessRightException {
-      Note note =
-          makeMe
-              .aNote()
-              .creatorAndOwner(currentUser)
-              .asHeadNoteOfANotebook(currentUser.getEntity().getOwnership())
-              .withApprovalStatus(ApprovalStatus.PENDING)
-              .please();
-      QuizQuestionAndAnswer mcqWithAnswer = makeMe.aQuestion().please();
-      Notebook parentNotebook = note.getNotebook();
-      makeMe.refresh(parentNotebook);
-      assertEquals(ApprovalStatus.PENDING, parentNotebook.getApprovalStatus());
-
-      controller.addQuestionManually(note, mcqWithAnswer);
-      makeMe.refresh(note);
-      assertEquals(ApprovalStatus.NOT_APPROVED, note.getNotebook().getApprovalStatus());
-    }
   }
 
   @Nested

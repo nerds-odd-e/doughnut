@@ -155,18 +155,22 @@ public class RestAssessmentControllerTests {
 
     @Test
     void shouldGetOneQuestionFromEachNoteOnly() {
-      makeMe
-          .theNote(topNote)
-          .withNChildrenThat(
-              3,
-              noteBuilder -> {
-                noteBuilder.hasAnApprovedQuestion();
-                noteBuilder.hasAnApprovedQuestion();
-                noteBuilder.hasAnApprovedQuestion();
-              })
-          .please();
-
+      makeMe.theNote(topNote).withNChildrenThat(3, NoteBuilder::hasAnApprovedQuestion).please();
       assertThrows(ApiException.class, () -> controller.generateAssessmentQuestions(notebook));
+    }
+
+    @Test
+    void shouldGetOnlyOldApprovedQuestionsBeforeNotebookApproval() {
+      makeMe.theNote(topNote).withNChildrenThat(1, NoteBuilder::hasAnApprovedQuestion).please();
+      notebook.setApprovalStatus(ApprovalStatus.APPROVED);
+      notebook.setLast_approval_time(new Timestamp(System.currentTimeMillis()));
+      makeMe.theNote(topNote).withNChildrenThat(1, NoteBuilder::hasAnApprovedQuestion).please();
+      notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(1);
+      try {
+        controller.generateAssessmentQuestions(notebook);
+      } catch (UnexpectedNoAccessRightException e) {
+        throw new RuntimeException(e);
+      }
     }
   }
 

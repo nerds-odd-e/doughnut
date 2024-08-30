@@ -62,6 +62,12 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @Enumerated(EnumType.STRING)
   private ApprovalStatus approvalStatus = ApprovalStatus.NOT_APPROVED;
 
+  @Column(name = "last_approval_time")
+  @Getter
+  @Setter
+  @JsonIgnore
+  private Timestamp last_approval_time;
+
   @JsonIgnore
   public List<Note> getNotes() {
     return Note.filterDeletedUnmodifiableNoteList(notes);
