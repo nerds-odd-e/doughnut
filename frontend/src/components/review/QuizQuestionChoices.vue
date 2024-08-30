@@ -5,7 +5,7 @@
         :class="{
           'is-correct': isOptionCorrect(index),
           'is-incorrect': !isOptionCorrect(index),
-          'current-choice': answeredCurrentQuestion && assessmentCurrentChoiceIndex === index,
+          'current-choice': isCurrentChoice(index),
           'is-selected': isSelectedOption(index),
         }"
         @click.once="submitAnswer({ choiceIndex: index })"
@@ -96,6 +96,12 @@ export default defineComponent({
     },
     async submitAnswer(answerData: AnswerDTO) {
       this.$emit("answer", answerData)
+    },
+    isCurrentChoice(index: number) {
+      return (
+        this.answeredCurrentQuestion &&
+        this.assessmentCurrentChoiceIndex === index
+      )
     },
   },
 })
