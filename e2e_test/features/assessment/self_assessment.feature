@@ -31,12 +31,6 @@ Feature: Self assessment
       | europe          | false                  | bread         | false                  | kyoto       | false                  | 0             |
       | Asia            | true                   | Pho           | true                   | kyoto       | false                  | 2             |
 
-  Scenario: Perform an assessment with variable outcomes counts correct scores
-    Given I set the number of questions per assessment of the notebook "Countries" to 3
-    And I start assessment 'Countries' in the bazaar
-    When I click on answer 'europe'
-    Then it should immediately show "europe" as the wrong answer after answering
-
   Scenario: Get immediate feedback on wrong answers while working on an assessment
     Given I answered an assessment question wrongly
     Then I should get immediate feedback by showing the wrong answer
