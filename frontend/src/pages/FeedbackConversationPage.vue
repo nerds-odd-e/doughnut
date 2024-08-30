@@ -5,22 +5,36 @@
       title: 'Feedback conversation',
     }"
   >
-    <h2>Empty conversation</h2>
-    <div class="mt-4" />
-  <!-- <ContestableQuestion /> -->
-    <div class="chat-answer-container row message">
-      <!-- <div v-if="message.role === 'assistant'" class="assistant-icon col-auto"> -->
-    </div>
-
-    <div class="col">
-      <!-- <div v-if="message.role === 'assistant'" v-html="markdowntToHtml(message.content?.[0]?.text?.value)" /> -->
-      <!-- <div v-else class="d-flex justify-content-end"> -->
-      <div class="d-flex justify-content-end">
-        <div class="user-message">
-          I think the question is wrong
+    <div class="chat-answer-container row mt-4 message-left">
+      <div class="col">
+        <div class="d-flex message-align">
+          <div class="flex-column message-wrapper">
+            <div class="message">
+              I think the question is wrong
+            </div>
+            <p>
+              Name
+            </p>
+          </div>
         </div>
       </div>
     </div>
+
+    <!-- Message for the other side -->
+    <!-- <div class="chat-answer-container row mt-4 message-right">
+      <div class="col">
+        <div class="d-flex message-align">
+          <div class="flex-column message-wrapper">
+            <div class="message">
+              Text message
+            </div>
+            <p>
+              Name
+            </p>
+          </div>
+        </div>
+      </div>
+    </div> -->
 
     <div ref="bottomOfTheChat" style="height: 140px; display: block"></div>
 
@@ -42,6 +56,7 @@ import ContainerPage from "@/pages/commons/ContainerPage.vue"
 <style>
 .chat-controls {
   position: fixed;
+  left: 0;
   bottom: 0;
   width: 100%;
   background-color: white;
@@ -60,10 +75,27 @@ input.auto-extendable-input {
   width: 100%;
 }
 
+.message-wrapper {
+  max-width: 50%;
+  min-width: 25%;
+
+}
+
+.message-right .message-align {
+  justify-content: flex-end;
+}
+
+.message-right p {
+  text-align: right;
+}
+
+.message-left .message-align {
+  justify-content: flex-start;
+}
+
 .message {
   background-color: #f0f0f0;
   border-radius: 10px;
-  max-width: 70%;
   word-wrap: break-word;
   white-space: pre-wrap;
   text-align: left;
