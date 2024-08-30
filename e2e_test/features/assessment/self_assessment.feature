@@ -37,7 +37,6 @@ Feature: Self assessment
     When I click on answer 'europe'
     Then it should immediately show "europe" as the wrong answer after answering
 
-  @focus
   Scenario: Get immediate feedback on wrong answers while working on an assessment
     Given I answered an assessment question wrongly
     Then I should get immediate feedback by showing the wrong answer
