@@ -4,6 +4,7 @@
       <button
         :class="{
           'is-correct': isOptionCorrect(index),
+          'is-incorrect': !isOptionCorrect(index),
           'current-choice': assessmentCurrentChoiceIndex === index,
           'is-selected': isSelectedOption(index),
         }"
