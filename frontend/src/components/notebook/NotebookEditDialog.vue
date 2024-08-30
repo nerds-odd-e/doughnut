@@ -76,11 +76,6 @@ export default {
       }
     },
     approvalButtonClasses() {
-      console.log(
-        this.notebook.last_approval_time,
-        this.notebook.updated_at,
-        this.notebook.approvalStatus
-      )
       return {
         btn: true,
         "btn-primary":
