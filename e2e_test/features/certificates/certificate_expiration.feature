@@ -28,17 +28,19 @@ Feature: Certification expiration
       | What do you call a cow with not leg? | Ground beef | Cowboy   | Oxford   | 0                    |
     Then I should see a certification icon on the "Certified thing" notebook card in the bazaar
 
-#  Scenario: a certified notebook should still assess on the old questions till the new ones are approved by the admin
-#    Given I add the following question for the note "Certified thing":
-#      | Stem                                 | Choice 0    | Choice 1 | Choice 2 | Correct Choice Index |
-#      | What do you call a cow with not leg? | Ground beef | Cowboy   | Oxford   | 0                    |
-#    When I start an assessment for the notebook "Certified thing"
-#    Then I should get assessed on the first two questions only
-#
-#  Scenario: a certified notebook should assess on all questions after the new ones are approved by the admin
-#    Given I add the following question for the note "Certified thing":
-#      | Stem                                 | Choice 0    | Choice 1 | Choice 2 | Correct Choice Index |
-#      | What do you call a cow with not leg? | Ground beef | Cowboy   | Oxford   | 0                    |
-#    And the admin approves the third question
-#    When I start an assessment for the notebook "Certified thing"
-#    Then I should get assessed on all three questions
+  @ignore
+  Scenario: a certified notebook should remain certified after adding a new question
+    Given I add the following question for the note "Certified thing":
+      | Stem                                 | Choice 0    | Choice 1 | Choice 2 | Correct Choice Index |
+      | What do you call a cow with not leg? | Ground beef | Cowboy   | Oxford   | 0                    |
+    When I start assessment "Certified thing" in the bazaar
+    Then I should get assessed on the first two questions only
+
+  @ignore
+  Scenario: a certified notebook should assess on all questions after the new ones are approved by the admin
+    Given I add the following question for the note "Certified thing":
+      | Stem                                 | Choice 0    | Choice 1 | Choice 2 | Correct Choice Index |
+      | What do you call a cow with not leg? | Ground beef | Cowboy   | Oxford   | 0                    |
+    And the admin approves the third question
+    When I start an assessment for the notebook "Certified thing"
+    Then I should get assessed on all three questions

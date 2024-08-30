@@ -1,12 +1,14 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.QuizQuestionAndAnswer;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.theokanning.openai.client.OpenAiApi;
 import jakarta.validation.Valid;
+import java.sql.Timestamp;
 import java.util.*;
 
 public class QuizQuestionService {
@@ -30,6 +32,10 @@ public class QuizQuestionService {
   public QuizQuestionAndAnswer addQuestion(
       Note note, @Valid QuizQuestionAndAnswer questionAndAnswer) {
     questionAndAnswer.setNote(note);
+
+    Notebook parentNotebook = note.getNotebook();
+    parentNotebook.setUpdated_at(new Timestamp(System.currentTimeMillis()));
+    modelFactoryService.save(parentNotebook);
 
     modelFactoryService.save(questionAndAnswer);
     return questionAndAnswer;

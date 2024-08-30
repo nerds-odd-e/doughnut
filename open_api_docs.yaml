@@ -3067,6 +3067,7 @@ components:
       - headNote
       - id
       - notebookSettings
+      - updated_at
       type: object
       properties:
         id:
@@ -3082,6 +3083,12 @@ components:
           - NOT_APPROVED
           - PENDING
           - APPROVED
+        last_approval_time:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
         creatorId:
           type: string
     NotebookSettings:

@@ -65,8 +65,13 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @Column(name = "last_approval_time")
   @Getter
   @Setter
-  @JsonIgnore
   private Timestamp last_approval_time;
+
+  @Column(name = "updated_at")
+  @Getter
+  @Setter
+  @NonNull
+  private Timestamp updated_at;
 
   @JsonIgnore
   public List<Note> getNotes() {

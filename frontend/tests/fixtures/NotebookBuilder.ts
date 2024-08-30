@@ -16,6 +16,7 @@ class NotebookBuilder extends Builder<Notebook> {
       notebookSettings: {
         skipReviewEntirely: false,
       },
+      updated_at: new Date().toISOString(),
     }
   }
 
