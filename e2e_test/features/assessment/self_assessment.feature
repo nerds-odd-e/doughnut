@@ -37,6 +37,11 @@ Feature: Self assessment
     When I click on answer 'europe'
     Then it should immediately show "europe" as the wrong answer after answering
 
+  @focus
+  Scenario: Get immediate feedback on wrong answers while working on an assessment
+    Given I answered an assessment question wrongly
+    Then I should get immediate feedback by showing the wrong answer
+
   Scenario Outline: Cannot start assessment with 0 questions or not enough approved questions
     Given I set the number of questions per assessment of the notebook "Countries" to <Questions Per Assessment>
     When I start the assessment on the "Countries" notebook in the bazaar
