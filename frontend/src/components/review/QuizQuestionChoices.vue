@@ -78,6 +78,7 @@ export default defineComponent({
     answerChoiceIndex: Number,
     disabled: Boolean,
     assessmentCurrentChoiceIndex: Number,
+    answeredCurrentQuestion: Boolean,
   },
   emits: ["answer"],
   data() {

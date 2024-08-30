@@ -6,7 +6,7 @@
       <div v-if="errors != ''">
         {{ errors }}
       </div>
-      <QuizQuestion v-else-if="currentQuestion < quizQuestions.length"
+      <QuizQuestion v-else-if="currentQuestion < quizQuestions.length" :answered-current-question="answeredCurrentQuestion"
         :quiz-question="quizQuestions[currentQuestion]!" @answered="questionAnswered" :show-finetune-button="false" />
       <div v-else-if="assessmentResult">
         <p>Your score: {{ correctAnswers }} / {{ quizQuestions.length }}</p>

@@ -59,6 +59,7 @@ export default defineComponent({
       type: Boolean,
       default: true,
     },
+    answeredCurrentQuestion: Boolean,
   },
   components: {
     ShowImage,
