@@ -5,8 +5,9 @@
       title: 'Feedback',
     }"
   >
-    <h2>There is no feedback currently.</h2>
-    <table class="feedback-table mt-2">
+    <h2 v-if="!conversations?.length">There is no feedback currently.</h2>
+
+    <table v-if="conversations?.length" class="feedback-table mt-2">
       <thead>
       <tr>
         <th>Question</th>
