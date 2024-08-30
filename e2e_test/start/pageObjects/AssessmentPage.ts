@@ -17,15 +17,19 @@ const assumeQuestionSection = () => {
     answerFromTable(answersTable: Record<string, string>[]) {
       return this.getStemText().then((stem) => {
         const row = answersTable.find((row) => row.Question === stem)
-        return this.answer(row!.Answer ?? '', row.AnswerCorrect === 'true')
+        if (row.AnswerCorrect === 'true') {
+          return this.answerCorrect(row!.Answer)
+        } else {
+          return this.answerIncorrect(row!.Answer)
+        }
       })
     },
-    answer(answer: string, answerCorrect = true) {
-      if (!answerCorrect) {
-        cy.findByText(answer).click()
-        return cy.findByText('Continue').click().pageIsNotLoading()
-      }
+    answerCorrect(answer: string) {
       return cy.findByText(answer).click().pageIsNotLoading()
+    },
+    answerIncorrect(answer: string) {
+      cy.findByText(answer).click()
+      return cy.findByText('Continue').click().pageIsNotLoading()
     },
     answerWithoutContinuing(answer: string) {
       return cy.findByText(answer).click().pageIsNotLoading()
@@ -72,11 +76,11 @@ export const assumeAssessmentPage = (notebook?: string) => {
     },
     answerYesNoQuestionsToScore(correctAnswers: number, allQuestions: number) {
       for (let i = 0; i < correctAnswers; i++) {
-        this.assumeQuestionSection().answer('Yes', true)
+        this.assumeQuestionSection().answerCorrect('Yes')
         cy.pageIsNotLoading()
       }
       for (let i = correctAnswers; i < allQuestions; i++) {
-        this.assumeQuestionSection().answer('No', false)
+        this.assumeQuestionSection().answerIncorrect('No')
         cy.pageIsNotLoading()
       }
     },
