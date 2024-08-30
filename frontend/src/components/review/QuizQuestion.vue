@@ -15,7 +15,7 @@
       </form>
     </div>
     <QuizQuestionChoices v-if="quizQuestion.multipleChoicesQuestion.choices"
-      :choices="quizQuestion.multipleChoicesQuestion.choices" :correct-choice-index="correctChoiceIndex"
+      :choices="quizQuestion.multipleChoicesQuestion.choices" :correct-choice-index="correctChoiceIndex" :answered-current-question="answeredCurrentQuestion"
       :answer-choice-index="answerChoiceIndex" :disabled="disabled" @answer="submitAnswer($event)" :assessment-current-choice-index="checkAssessmentAnsweredIndex()" />
     <div class="mark-question">
       <PopButton title="send this question for fine tuning the question generation model" v-if="showFinetuneButton">

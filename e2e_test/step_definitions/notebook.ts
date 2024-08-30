@@ -162,4 +162,6 @@ Given('I answered an assessment question wrongly', () => {
 Then('I should get immediate feedback by showing the wrong answer', () => {
   cy.contains('europe').should('have.class', 'current-choice')
   cy.get('.current-choice').should('have.length', 1)
+  cy.findByRole('button', { name: 'Continue' }).click()
+  cy.get('.current-choice').should('have.length', 0)
 })

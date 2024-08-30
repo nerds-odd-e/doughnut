@@ -5,7 +5,7 @@
         :class="{
           'is-correct': isOptionCorrect(index),
           'is-incorrect': !isOptionCorrect(index),
-          'current-choice': assessmentCurrentChoiceIndex === index,
+          'current-choice': answeredCurrentQuestion && assessmentCurrentChoiceIndex === index,
           'is-selected': isSelectedOption(index),
         }"
         @click.once="submitAnswer({ choiceIndex: index })"
