@@ -32,7 +32,7 @@ Feature: Self assessment
       | Asia            | true                   | Pho           | true                   | kyoto       | false                  | 2             |
 
   Scenario: Get immediate feedback on wrong answers while working on an assessment
-    Given I answered an assessment question wrongly
+    Given I answered an assessment question in the notebook "Countries" wrongly
     Then I should get immediate feedback by showing the wrong answer
 
   Scenario Outline: Cannot start assessment with 0 questions or not enough approved questions

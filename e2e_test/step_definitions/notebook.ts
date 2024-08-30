@@ -147,17 +147,20 @@ Given('following notebooks have pending approval:', (notebooks: DataTable) => {
   })
 })
 
-Given('I answered an assessment question wrongly', () => {
-  start
-    .routerToNotebooksPage()
-    .editNotebookSettings('Countries')
-    .updateAssessmentSettings({ numberOfQuestion: 3 })
-  start.navigateToBazaar().selfAssessmentOnNotebook('Countries')
-  start
-    .assumeAssessmentPage()
-    .assumeQuestionSection()
-    .answerWithoutContinuing('europe')
-})
+Given(
+  'I answered an assessment question in the notebook {string} wrongly',
+  (notebook: string) => {
+    start
+      .routerToNotebooksPage()
+      .editNotebookSettings(notebook)
+      .updateAssessmentSettings({ numberOfQuestion: 3 })
+    start.navigateToBazaar().selfAssessmentOnNotebook(notebook)
+    start
+      .assumeAssessmentPage()
+      .assumeQuestionSection()
+      .answerWithoutContinuing('europe')
+  }
+)
 
 Then('I should get immediate feedback by showing the wrong answer', () => {
   cy.contains('europe').should('have.class', 'current-choice')
