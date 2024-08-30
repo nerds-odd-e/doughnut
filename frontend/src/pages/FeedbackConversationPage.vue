@@ -10,7 +10,7 @@
         <div class="d-flex message-align">
           <div class="flex-column message-wrapper">
             <div class="message">
-              I think the question is wrong
+              I don't understand this question
             </div>
             <p>
               Name
