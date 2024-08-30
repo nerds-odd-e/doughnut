@@ -23,9 +23,9 @@ Given(
 When('I open that conversation', () => {
   cy.findByText('There is no feedback currently.').should('not.exist')
   cy.findByRole('link', {
-    name: 'View chat'
+    name: 'View chat',
   }).click()
-  cy.findByText('I don\'t understand this question').should('be.visible')
+  cy.findByText("I don't understand this question").should('be.visible')
 })
 
 Then(
