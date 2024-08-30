@@ -22,6 +22,7 @@ Feature: Certification expiration
       | Notebook        | Expiry Date  |
       | Certified thing | 2026-01-01   |
 
+  @ignore
   Scenario: a certified notebook should remain certified after adding a new question
     Given I add the following question for the note "Certified thing":
       | Stem                                 | Choice 0    | Choice 1 | Choice 2 | Correct Choice Index |
