@@ -148,17 +148,14 @@ Given('following notebooks have pending approval:', (notebooks: DataTable) => {
 })
 
 Given(
-  'I answered an assessment question in the notebook {string} wrongly',
-  (notebook: string) => {
-    start
-      .routerToNotebooksPage()
-      .editNotebookSettings(notebook)
-      .updateAssessmentSettings({ numberOfQuestion: 3 })
+  'in the notebook {string}, I wrongly answered the first assessment question with {string}',
+  (notebook: string, answer: string) => {
+    start.routerToNotebooksPage().editNotebookSettings(notebook)
     start.navigateToBazaar().selfAssessmentOnNotebook(notebook)
     start
       .assumeAssessmentPage()
       .assumeQuestionSection()
-      .answerWithoutContinuing('europe')
+      .answerWithoutContinuing(answer)
   }
 )
 
