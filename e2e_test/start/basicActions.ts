@@ -11,6 +11,7 @@ import { routerToNotebooksPage } from './pageObjects/notebooksPage'
 import { noteSidebar } from './pageObjects/noteSidebar'
 import { systemSidebar } from './pageObjects/systemSidebar'
 import testability from './testability'
+import { logins } from './logins'
 
 export default {
   navigateToBazaar,
@@ -25,6 +26,7 @@ export default {
   assumeClarifyingQuestionDialog,
   routerToNotebooksPage,
   navigateToCircle,
+  ...logins,
 
   // jumptoNotePage is faster than navigateToPage
   //    it uses the note id memorized when creating them with testability api
@@ -38,21 +40,6 @@ export default {
       })
 
     return assumeNotePage(noteTopic)
-  },
-
-  loginAsAdmin: () => {
-    cy.logout()
-    cy.loginAs('admin')
-  },
-
-  goToAdminDashboard: () => {
-    cy.reload()
-    return systemSidebar().adminDashboard()
-  },
-
-  loginAsAdminAndGoToAdminDashboard() {
-    this.loginAsAdmin()
-    return this.goToAdminDashboard()
   },
   navigateToAssessmentAndCertificatePage() {
     return systemSidebar().userOptions().myAssessmentAndCertificateHistory()

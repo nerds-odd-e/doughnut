@@ -51,7 +51,7 @@ Then(
 )
 
 Then(
-  "{string} can see name {string} in the conversation",
+  '{string} can see name {string} in the conversation',
   (loggedInUser: string, partnerUser: string) => {
     cy.loginAs(loggedInUser)
     start.systemSidebar().userOptions().myFeedbackOverview()
