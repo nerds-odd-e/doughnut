@@ -44,4 +44,8 @@ export default {
   navigateToAssessmentAndCertificatePage() {
     return systemSidebar().userOptions().myAssessmentAndCertificateHistory()
   },
+  loginAsAdminAndGoToAdminDashboard() {
+    this.loginAsAdmin()
+    return this.goToAdminDashboard()
+  },
 }

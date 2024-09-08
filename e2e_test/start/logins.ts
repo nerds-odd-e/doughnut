@@ -2,8 +2,19 @@ import start from './'
 import { systemSidebar } from './pageObjects/systemSidebar'
 
 export const logins = {
+  logout() {
+    cy.pageIsNotLoading()
+    cy.request({
+      method: 'POST',
+      url: '/logout',
+    }).then((response) => {
+      expect(response.status).to.equal(204)
+    })
+    cy.pageIsNotLoading()
+    return this
+  },
   loginAs(username: string) {
-    cy.logout()
+    this.logout()
 
     const password = 'password'
     const token = btoa(`${username}:${password}`)
@@ -26,12 +37,6 @@ export const logins = {
   },
 
   loginAsAdmin() {
-    cy.logout()
-    this.loginAs('admin')
-  },
-
-  loginAsAdminAndGoToAdminDashboard() {
-    this.loginAsAdmin()
-    return this.goToAdminDashboard()
+    this.logout().loginAs('admin')
   },
 }

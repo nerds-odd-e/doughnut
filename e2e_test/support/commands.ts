@@ -33,16 +33,6 @@ Cypress.Commands.add('pageIsNotLoading', () => {
   cy.get('.loading-bar').should('not.exist')
 })
 
-Cypress.Commands.add('logout', () => {
-  cy.pageIsNotLoading()
-  cy.request({
-    method: 'POST',
-    url: '/logout',
-  }).then((response) => {
-    expect(response.status).to.equal(204)
-  })
-})
-
 Cypress.Commands.add('dialogDisappeared', () => {
   cy.get('.modal-body').should('not.exist')
 })
