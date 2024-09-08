@@ -106,6 +106,7 @@ jobs:
             e2e_test/features/b*/**
           - |
             e2e_test/features/c*/**
+            e2e_test/features/f*/**
             e2e_test/features/l*/**
           - |
             e2e_test/features/n*/**
