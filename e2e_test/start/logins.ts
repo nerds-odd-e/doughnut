@@ -16,6 +16,10 @@ export const logins = {
   loginAs(username: string) {
     this.logout()
 
+    if (username === 'none') {
+      return
+    }
+
     const password = 'password'
     const token = btoa(`${username}:${password}`)
     cy.request({
@@ -29,6 +33,10 @@ export const logins = {
     })
 
     return start
+  },
+
+  reloginAs(username: string) {
+    return this.logout().loginAs(username)
   },
 
   goToAdminDashboard: () => {
