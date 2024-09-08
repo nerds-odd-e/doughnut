@@ -13,19 +13,19 @@ Given('I am logged in as {string}', (externalIdentifier: string) => {
     return
   }
   cy.pageIsNotLoading()
-  cy.loginAs(externalIdentifier)
+  start.loginAs(externalIdentifier)
 })
 
 Given('I am logged in as an existing user', () => {
   cy.logout()
   cy.pageIsNotLoading()
-  cy.loginAs('old_learner')
+  start.loginAs('old_learner')
 })
 
 Given('I am logged in as another existing user', () => {
   cy.logout()
   cy.pageIsNotLoading()
-  cy.loginAs('another_old_learner')
+  start.loginAs('another_old_learner')
 })
 
 Given('my session is logged out', () => {

@@ -31,8 +31,7 @@ When('I open that conversation', () => {
 Then(
   '{string} can see the feedback {string}',
   (user: string, feedback: string) => {
-    cy.loginAs(user)
-    start.systemSidebar().userOptions().myFeedbackOverview()
+    start.loginAs(user).systemSidebar().userOptions().myFeedbackOverview()
     cy.findByText(feedback).should('be.visible')
   }
 )
@@ -40,8 +39,7 @@ Then(
 Then(
   '{string} {string} see the conversation about question {string}',
   (user: string, canOrCannotSee: string, feedback: string) => {
-    cy.loginAs(user)
-    start.systemSidebar().userOptions().myFeedbackOverview()
+    start.loginAs(user).systemSidebar().userOptions().myFeedbackOverview()
     if (canOrCannotSee === 'can') {
       cy.findByText(feedback).should('be.visible')
     } else {
@@ -53,8 +51,11 @@ Then(
 Then(
   '{string} can see name {string} in the conversation',
   (loggedInUser: string, partnerUser: string) => {
-    cy.loginAs(loggedInUser)
-    start.systemSidebar().userOptions().myFeedbackOverview()
+    start
+      .loginAs(loggedInUser)
+      .systemSidebar()
+      .userOptions()
+      .myFeedbackOverview()
     cy.findByText(partnerUser).should('be.visible')
   }
 )
