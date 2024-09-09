@@ -12,7 +12,7 @@ import { noteSidebar } from './pageObjects/noteSidebar'
 import { systemSidebar } from './pageObjects/systemSidebar'
 import testability from './testability'
 import { logins } from './logins'
-import { navigateToFeedbackOverviewPage } from './pageObjects/feebackOveriewPage'
+import { navigateToMessageCenter } from './pageObjects/messageCenterPage'
 
 export default {
   navigateToBazaar,
@@ -27,7 +27,7 @@ export default {
   assumeClarifyingQuestionDialog,
   routerToNotebooksPage,
   navigateToCircle,
-  navigateToFeedbackOverviewPage,
+  navigateToMessageCenter,
   ...logins,
 
   // jumptoNotePage is faster than navigateToPage

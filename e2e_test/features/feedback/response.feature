@@ -18,10 +18,9 @@ Feature: Response to a message
   @ignore
   Scenario Outline: Only the creator of a question or the person giving the feedback can see the conversation
     And there is a certified notebook "Just say 'Yes'" by "a_trainer" with 2 questions, shared to the Bazaar
-
-    When I start the assessment on the "Just say 'Yes'" notebook in the bazaar
+    When I begin the assessment from the "Just say 'Yes'" notebook in the bazaar
     And I answer the question wrongly
-    And I submit my feedback: 'I think the question is wrong'
+    And I submit feedback saying 'I believe the question is incorrect'
 
     Then "<User>" "<CanOrCannotSeeConversation>" see the conversation about question "Question 5"
     Examples:

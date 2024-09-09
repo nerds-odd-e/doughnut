@@ -8,7 +8,7 @@ import '../support/string_util'
 import start from '../start'
 
 When(
-  'I start the assessment on the {string} notebook in the bazaar',
+  'I begin the assessment from the {string} notebook in the bazaar',
   (notebook: string) => {
     start.navigateToBazaar().selfAssessmentOnNotebook(notebook)
   }
@@ -209,7 +209,7 @@ Then('I answer the question wrongly', () => {
   cy.findByRole('button', { name: 'No' }).click()
 })
 
-Then('I submit my feedback: {string}', (feedback: string) => {
+Then('I submit feedback saying {string}', (feedback: string) => {
   cy.findByRole('button', { name: 'No' }).click()
   cy.findByText('Send feedback').click()
   cy.findByPlaceholderText('Give feedback about the question').type(feedback)

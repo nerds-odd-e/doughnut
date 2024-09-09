@@ -37,7 +37,7 @@ Feature: Self assessment
 
   Scenario Outline: Cannot start assessment with 0 questions or not enough approved questions
     Given I set the number of questions per assessment of the notebook "Countries" to <Questions Per Assessment>
-    When I start the assessment on the "Countries" notebook in the bazaar
+    When I begin the assessment from the "Countries" notebook in the bazaar
     Then I should see error message <Message>
 
     Examples:
@@ -47,5 +47,5 @@ Feature: Self assessment
 
   Scenario: Must login to generate assessment
     Given I haven't login
-    When I start the assessment on the "Countries" notebook in the bazaar
+    When I begin the assessment from the "Countries" notebook in the bazaar
     Then I should see message that says "Please login first"

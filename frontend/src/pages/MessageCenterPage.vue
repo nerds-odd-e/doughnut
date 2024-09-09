@@ -2,7 +2,7 @@
   <ContainerPage
     v-bind="{
       contentExists: true,
-      title: 'Feedback',
+      title: 'Message Center',
     }"
   >
     <h2 v-if="!conversations?.length">There is no feedback currently.</h2>

@@ -15,7 +15,7 @@ import AnsweredQuestionPage from "@/pages/AnsweredQuestionPage.vue"
 import AdminDashboardPage from "@/pages/AdminDashboardPage.vue"
 import NonproductionOnlyLoginPage from "@/pages/NonproductionOnlyLoginPage.vue"
 import NestedPage from "../pages/commons/NestedPage"
-import FeedbackOverviewPage from "../pages/FeedbackOverviewPage.vue"
+import MessageCenterPage from "../pages/MessageCenterPage.vue"
 import FeedbackConversationPage from "../pages/FeedbackConversationPage.vue"
 
 const NestedInitialReviewPage = NestedPage(InitialReviewPage, "initial")
@@ -85,8 +85,8 @@ const routes = [
   },
   {
     path: "/feedback",
-    name: "feedbackOverview",
-    component: FeedbackOverviewPage,
+    name: "messageCenter",
+    component: MessageCenterPage,
     props: true,
     meta: { userProp: true },
   },

@@ -3,7 +3,7 @@ import start from '../start'
 
 Given('I visit the feedback page', (userType: string) => {
   console.log(userType)
-  start.systemSidebar().userOptions().myFeedbackOverview()
+  start.systemSidebar().userOptions().myMessageCenter()
 })
 
 Given(
@@ -31,7 +31,7 @@ When('I open that conversation', () => {
 Then(
   '{string} can see the feedback {string}',
   (user: string, feedback: string) => {
-    start.reloginAndEnsureHomePage(user).navigateToFeedbackOverviewPage()
+    start.reloginAndEnsureHomePage(user).navigateToMessageCenter()
     cy.reload()
     cy.findByText(feedback).should('be.visible')
   }
@@ -40,7 +40,7 @@ Then(
 Then(
   '{string} {string} see the conversation about question {string}',
   (user: string, canOrCannotSee: string, feedback: string) => {
-    start.reloginAndEnsureHomePage(user).navigateToFeedbackOverviewPage()
+    start.reloginAndEnsureHomePage(user).navigateToMessageCenter()
     if (canOrCannotSee === 'can') {
       cy.findByText(feedback).should('be.visible')
     } else {
@@ -50,11 +50,9 @@ Then(
 )
 
 Then(
-  '{string} can see name {string} in the conversation',
+  '{string} can see name {string} in the message center',
   (loggedInUser: string, partnerUser: string) => {
-    start
-      .reloginAndEnsureHomePage(loggedInUser)
-      .navigateToFeedbackOverviewPage()
+    start.reloginAndEnsureHomePage(loggedInUser).navigateToMessageCenter()
     cy.findByText(partnerUser).should('be.visible')
   }
 )
