@@ -19,7 +19,7 @@
       <tbody>
       <tr v-for="conversation in conversations" :key="conversation.id">
         <td>{{conversation.quizQuestionAndAnswer?.quizQuestion.multipleChoicesQuestion.stem}}</td>
-        <td>{{conversation.conversationInitiator?.name}}</td>
+        <td>{{conversationPartner(conversation)}}</td>
         <td>{{conversation.message}}</td>
         <td>
           <router-link :to="{ name: 'feedbackConversation',  params: { conversationId: '123' } }">View chat</router-link>
@@ -31,11 +31,16 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue"
-const { managedApi } = useLoadingApi()
+import { onMounted, PropType, ref } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
-import { Conversation } from "@/generated/backend"
+import { Conversation, User } from "@/generated/backend"
+
+const { managedApi } = useLoadingApi()
+
+const props = defineProps({
+  user: { type: Object as PropType<User> },
+})
 
 const conversations = ref<Conversation[] | undefined>(undefined)
 
@@ -46,6 +51,13 @@ const fetchData = async () => {
 onMounted(() => {
   fetchData()
 })
+
+const conversationPartner = (conversation: Conversation) => {
+  if (conversation.conversationInitiator?.name !== props.user?.name) {
+    return conversation.conversationInitiator?.name
+  }
+  return conversation.noteCreator?.name
+}
 </script>
 
 <style scoped>

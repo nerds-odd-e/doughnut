@@ -88,7 +88,7 @@ const routes = [
     name: "feedbackOverview",
     component: FeedbackOverviewPage,
     props: true,
-    meta: true,
+    meta: { userProp: true },
   },
   {
     path: "/feedback/:conversationId",

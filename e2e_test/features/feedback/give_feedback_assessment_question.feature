@@ -11,4 +11,4 @@ Feature: Learner gives feedback on an assessment question
         And I submit my feedback: 'I think the question is wrong'
         Then "a_trainer" can see the feedback "\"I think the question is wrong\""
         And "a_trainer" can see name "Old Learner" in the conversation
-        # And "old_learner" can see name "A Trainer" in the conversation
+        And "old_learner" can see name "A Trainer" in the conversation
