@@ -38,6 +38,12 @@ export const logins = {
     return this.logout().loginAs(username)
   },
 
+  reloginAndEnsureHomePage(username: string) {
+    const result = this.reloginAs(username)
+    cy.visit('/')
+    return result
+  },
+
   goToAdminDashboard: () => {
     cy.reload()
     return systemSidebar().adminDashboard()
