@@ -4,9 +4,10 @@ import start from '../start'
 Then(
   '{string} can see the feedback {string}',
   (user: string, feedback: string) => {
-    start.reloginAndEnsureHomePage(user).navigateToMessageCenter()
-    cy.reload()
-    cy.findByText(feedback).should('be.visible')
+    start
+      .reloginAndEnsureHomePage(user)
+      .navigateToMessageCenter()
+      .expectMessage(feedback)
   }
 )
 

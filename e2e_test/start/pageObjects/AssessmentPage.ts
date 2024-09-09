@@ -33,10 +33,13 @@ const assumeQuestionSection = () => {
     answerFromTable(answersTable: Record<string, string>[]) {
       return this.getStemText().then((stem) => {
         const row = answersTable.find((row) => row.Question === stem)
+        if (!row) {
+          throw new Error(`No answer found for question: ${stem}`)
+        }
         if (row.AnswerCorrect === 'true') {
-          return this.answer(row!.Answer)
+          this.answer(row.Answer!)
         } else {
-          return this.answerIncorrectAndContinue(row!.Answer)
+          this.answerIncorrectAndContinue(row.Answer!)
         }
       })
     },
