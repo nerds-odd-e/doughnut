@@ -33,86 +33,84 @@
     </div>
 </template>
 
-<script lang="ts">
-import { PropType, defineComponent } from "vue"
+<script setup lang="ts">
+import { PropType, computed, ref } from "vue"
+import { useRouter } from "vue-router"
 import { Notebook } from "@/generated/backend"
 import CheckInput from "@/components/form/CheckInput.vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import TextInput from "../form/TextInput.vue"
 
-export default defineComponent({
-  setup() {
-    return useLoadingApi()
-  },
-  props: { notebook: { type: Object as PropType<Notebook>, required: true } },
-  components: { CheckInput, TextInput },
-  data() {
-    const {
-      skipReviewEntirely,
-      numberOfQuestionsInAssessment,
-      certificateExpiry = "1y",
-    } = this.notebook.notebookSettings
-    return {
-      formData: {
-        skipReviewEntirely,
-        numberOfQuestionsInAssessment,
-        certificateExpiry,
-      },
-      errors: {
-        skipReviewEntirely: undefined as string | undefined,
-        numberOfQuestionsInAssessment: undefined as string | undefined,
-        certificateExpiry: undefined as string | undefined,
-      },
-    }
-  },
-  computed: {
-    approvalButtonText() {
-      switch (this.notebook.approvalStatus) {
-        case "NOT_APPROVED":
-          return "Send Request"
-        case "APPROVED":
-          return "Certificate Request Approved"
-        case "PENDING":
-          return "Approval Pending"
-        default:
-          return "Send Request"
-      }
-    },
-    approvalButtonClasses() {
-      return {
-        btn: true,
-        "btn-primary": this.notebook.approvalStatus === "NOT_APPROVED",
-        "btn-disabled":
-          this.notebook.approvalStatus === "APPROVED" ||
-          this.notebook.approvalStatus === "PENDING",
-        "btn-layout": true,
-        "mt-2": true,
-        display: "block",
-      }
-    },
-    isApprovalButtonDisabled() {
-      return (
-        this.notebook.approvalStatus === "APPROVED" ||
-        this.notebook.approvalStatus === "PENDING"
-      )
-    },
-  },
-  methods: {
-    processForm() {
-      this.managedApi.restNotebookController
-        .update1(this.notebook.id, this.formData)
-        .then(() => {
-          this.$router.push({ name: "notebooks" })
-        })
-        .catch((err) => (this.errors = err))
-    },
-    requestNotebookApproval() {
-      this.managedApi.restNotebookController
-        .requestNotebookApproval(this.notebook.id)
-        .then((response) => {
-          this.notebook.approvalStatus = response.approvalStatus
-        })
-    },
-  },
+const { managedApi } = useLoadingApi()
+
+const router = useRouter()
+
+const props = defineProps({
+  notebook: { type: Object as PropType<Notebook>, required: true },
 })
+
+const {
+  skipReviewEntirely,
+  numberOfQuestionsInAssessment,
+  certificateExpiry = "1y",
+} = props.notebook.notebookSettings
+
+const formData = ref({
+  skipReviewEntirely,
+  numberOfQuestionsInAssessment,
+  certificateExpiry,
+})
+const errors = ref({
+  skipReviewEntirely: undefined as string | undefined,
+  numberOfQuestionsInAssessment: undefined as string | undefined,
+  certificateExpiry: undefined as string | undefined,
+})
+
+const approvalButtonText = computed(() => {
+  switch (props.notebook.approvalStatus) {
+    case "NOT_APPROVED":
+      return "Send Request"
+    case "APPROVED":
+      return "Certificate Request Approved"
+    case "PENDING":
+      return "Approval Pending"
+    default:
+      return "Send Request"
+  }
+})
+
+const approvalButtonClasses = computed(() => {
+  return {
+    btn: true,
+    "btn-primary": props.notebook.approvalStatus === "NOT_APPROVED",
+    "btn-disabled":
+      props.notebook.approvalStatus === "APPROVED" ||
+      props.notebook.approvalStatus === "PENDING",
+    "btn-layout": true,
+    "mt-2": true,
+    display: "block",
+  }
+})
+
+const isApprovalButtonDisabled = computed(() => {
+  return (
+    props.notebook.approvalStatus === "APPROVED" ||
+    props.notebook.approvalStatus === "PENDING"
+  )
+})
+const processForm = () => {
+  managedApi.restNotebookController
+    .update1(props.notebook.id, formData.value)
+    .then(() => {
+      router.go(0)
+    })
+    .catch((err) => (errors.value = err))
+}
+const requestNotebookApproval = () => {
+  managedApi.restNotebookController
+    .requestNotebookApproval(props.notebook.id)
+    .then(() => {
+      router.go(0)
+    })
+}
 </script>
