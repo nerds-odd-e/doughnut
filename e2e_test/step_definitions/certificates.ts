@@ -36,7 +36,7 @@ When(
   (notebook: string) => {
     start
       .navigateToBazaar()
-      .selfAssessmentOnNotebook(notebook)
+      .beginAssessmentOnNotebook(notebook)
       .answerYesNoQuestionsToScore(2, 2)
   }
 )

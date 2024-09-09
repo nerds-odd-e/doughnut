@@ -10,7 +10,7 @@ import start from '../start'
 When(
   'I begin the assessment from the {string} notebook in the bazaar',
   (notebook: string) => {
-    start.navigateToBazaar().selfAssessmentOnNotebook(notebook)
+    start.navigateToBazaar().beginAssessmentOnNotebook(notebook)
   }
 )
 
@@ -19,7 +19,7 @@ When(
   function (notebook: string, table: DataTable) {
     start
       .navigateToBazaar()
-      .selfAssessmentOnNotebook(notebook)
+      .beginAssessmentOnNotebook(notebook)
       .answerQuestionsFromTable(table.hashes())
   }
 )
@@ -29,7 +29,7 @@ When(
   (attempts: number, notebook: string, minUniqueQuestionsThreshold: number) => {
     const questions: string[] = []
     for (let i = 0; i < attempts; i++) {
-      start.navigateToBazaar().selfAssessmentOnNotebook(notebook)
+      start.navigateToBazaar().beginAssessmentOnNotebook(notebook)
       const question = start.assumeAssessmentPage().assumeQuestionSection()
       question.getStemText().then((stem) => {
         questions.push(stem)
@@ -72,13 +72,13 @@ When(
   (correctAnswers: number, allQuestions: number, notebook: string) => {
     start
       .navigateToBazaar()
-      .selfAssessmentOnNotebook(notebook)
+      .beginAssessmentOnNotebook(notebook)
       .answerYesNoQuestionsToScore(correctAnswers, allQuestions)
   }
 )
 
 When('I pass the assessment on {string}', (notebook: string) => {
-  start.navigateToBazaar().selfAssessmentOnNotebook(notebook)
+  start.navigateToBazaar().beginAssessmentOnNotebook(notebook)
   start.assumeAssessmentPage(notebook).answerYesNoQuestionsToScore(2, 2)
 })
 

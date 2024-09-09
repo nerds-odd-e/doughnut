@@ -32,7 +32,7 @@ Feature: Conducting assessment
       | Asia            | true                   | Pho           | true                   | kyoto       | false                  | 2             |
 
   Scenario: Get immediate feedback on wrong answers while working on an assessment
-    Given in the notebook "Countries", I wrongly answered the first assessment question with "europe"
+    Given in the assessment for notebook "Countries", I wrongly answered the first assessment question with "europe"
     Then I should get immediate feedback by showing the wrong answer
 
   Scenario Outline: Cannot start assessment with 0 questions or not enough approved questions

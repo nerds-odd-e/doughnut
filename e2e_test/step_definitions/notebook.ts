@@ -148,20 +148,19 @@ Given('following notebooks have pending approval:', (notebooks: DataTable) => {
 })
 
 Given(
-  'in the notebook {string}, I wrongly answered the first assessment question with {string}',
+  'in the assessment for notebook {string}, I wrongly answered the first assessment question with {string}',
   (notebook: string, answer: string) => {
-    start.routerToNotebooksPage().editNotebookSettings(notebook)
-    start.navigateToBazaar().selfAssessmentOnNotebook(notebook)
     start
-      .assumeAssessmentPage()
+      .navigateToBazaar()
+      .beginAssessmentOnNotebook(notebook)
       .assumeQuestionSection()
       .answerIncorrectly(answer)
   }
 )
 
 Then('I should get immediate feedback by showing the wrong answer', () => {
-  cy.contains('europe').should('have.class', 'current-choice')
-  cy.get('.current-choice').should('have.length', 1)
-  cy.findByRole('button', { name: 'Continue' }).click()
-  cy.get('.current-choice').should('have.length', 0)
+  start
+    .assumeAssessmentPage()
+    .assumeWrongAnswerPage()
+    .highlightCurrentChoice('europe')
 })

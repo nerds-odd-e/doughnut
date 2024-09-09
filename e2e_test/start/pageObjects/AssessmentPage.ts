@@ -1,9 +1,10 @@
 import { CertificatePopup } from './CertificatePopup'
 
-const assessmentWrongAnswerPage = () => {
+const assumeWrongAnswerPage = () => {
   return {
     continueAssessment() {
-      cy.findByText('Continue').click().pageIsNotLoading()
+      cy.findByRole('button', { name: 'Continue' }).click().pageIsNotLoading()
+      cy.get('.current-choice').should('have.length', 0)
     },
     sendFeedback(feedback: string) {
       cy.findByText('Send feedback').click()
@@ -12,6 +13,10 @@ const assessmentWrongAnswerPage = () => {
       )
       cy.findByRole('button', { name: 'Submit' }).click()
       cy.findByText('Feedback received successfully').should('be.visible')
+    },
+    highlightCurrentChoice(choice: string) {
+      cy.contains(choice).should('have.class', 'current-choice')
+      cy.get('.current-choice').should('have.length', 1)
     },
   }
 }
@@ -53,7 +58,7 @@ const assumeQuestionSection = () => {
     },
     answerIncorrectly(answer: string) {
       this.answer(answer)
-      return assessmentWrongAnswerPage()
+      return assumeWrongAnswerPage()
     },
   }
 }
@@ -89,6 +94,7 @@ export const assumeAssessmentPage = (notebook?: string) => {
 
   return {
     assumeQuestionSection,
+    assumeWrongAnswerPage,
     answerQuestionsFromTable(answersTable: Record<string, string>[]) {
       Cypress._.times(answersTable.length, () => {
         this.assumeQuestionSection().answerFromTable(answersTable)

@@ -51,7 +51,7 @@ export const notebookList = () => {
 export const bazaarOrCircle = () => {
   return {
     ...notebookList(),
-    selfAssessmentOnNotebook(notebook: string) {
+    beginAssessmentOnNotebook(notebook: string) {
       this.findNotebookCardButton(notebook, 'Start Assessment').click()
       return assumeAssessmentPage()
     },
