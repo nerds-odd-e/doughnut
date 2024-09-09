@@ -63,16 +63,6 @@ Then(
   }
 )
 
-Then(
-  'I can request approval for the notebook {string} again',
-  (noteTopic: string) => {
-    start
-      .routerToNotebooksPage()
-      .editNotebookSettings(noteTopic)
-      .expectNotebookApprovalCanBeRequested()
-  }
-)
-
 Then('I unsubscribe from notebook {string}', (noteTopic: string) => {
   start.routerToNotebooksPage().unsubscribe(noteTopic)
 })

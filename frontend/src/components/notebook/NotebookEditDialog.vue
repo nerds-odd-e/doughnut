@@ -33,16 +33,18 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { PropType, defineComponent } from "vue"
+import { Notebook } from "@/generated/backend"
 import CheckInput from "@/components/form/CheckInput.vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import TextInput from "../form/TextInput.vue"
 
-export default {
+export default defineComponent({
   setup() {
     return useLoadingApi()
   },
-  props: { notebook: Object },
+  props: { notebook: { type: Object as PropType<Notebook>, required: true } },
   components: { CheckInput, TextInput },
   data() {
     const {
@@ -56,7 +58,11 @@ export default {
         numberOfQuestionsInAssessment,
         certificateExpiry,
       },
-      errors: {},
+      errors: {
+        skipReviewEntirely: undefined as string | undefined,
+        numberOfQuestionsInAssessment: undefined as string | undefined,
+        certificateExpiry: undefined as string | undefined,
+      },
     }
   },
   computed: {
@@ -96,7 +102,7 @@ export default {
       this.managedApi.restNotebookController
         .update1(this.notebook.id, this.formData)
         .then(() => {
-          this.$router.go()
+          this.$router.push({ name: "notebooks" })
         })
         .catch((err) => (this.errors = err))
     },
@@ -108,5 +114,5 @@ export default {
         })
     },
   },
-}
+})
 </script>

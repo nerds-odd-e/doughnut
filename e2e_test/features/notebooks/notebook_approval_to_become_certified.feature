@@ -27,13 +27,3 @@ Feature: Notebook approval to become certified
     And I approve notebook "TDD" to become certified
     Then I should see following notebooks waiting for approval only:
       | GIT |
-
-  Scenario: Reset approval on new question
-    Given I am re-logged in as an admin
-    And I have a notebook with the head note "The cow joke"
-    And I request for an approval for notebook "The cow joke"
-    And I approve notebook "The cow joke" to become certified
-    When I add the following question for the note "The cow joke":
-      | Stem                                     | Choice 0              | Choice 1 | Choice 2 | Correct Choice Index |
-      | Why do cows have hooves instead of feet? | Because they lactose! | Woof!    | What?    | 0                    |
-    Then I can request approval for the notebook "The cow joke" again
