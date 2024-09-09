@@ -32,6 +32,7 @@ public class ApplicationController {
         "/reviews/**",
         "/answers/**",
         "/links/**",
+        "/feedback**",
         "/failure-report-list/**",
         "/admin-dashboard/**",
         "/assessmentAndCertificateHistory"

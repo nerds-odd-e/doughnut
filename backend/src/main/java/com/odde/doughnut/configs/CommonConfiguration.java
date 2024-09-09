@@ -33,6 +33,7 @@ public class CommonConfiguration {
       "/reviews/**",
       "/answers/**",
       "/links/**",
+      "/feedback**",
       "/failure-report-list/**",
       "/admin-dashboard/**",
       "/assessmentAndCertificateHistory"
