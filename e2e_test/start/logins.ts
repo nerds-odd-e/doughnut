@@ -14,9 +14,8 @@ export const logins = {
     return this
   },
   loginAs(username: string) {
-    this.logout()
-
     if (username === 'none') {
+      this.logout()
       return
     }
 
