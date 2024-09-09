@@ -23,14 +23,14 @@
     <button class="btn btn-primary btn-layout mt-2" @click="processForm">
       Update
     </button>
-  </div>
-  <hr/>
-  <div>
-    <h4>Request to obtain certificate from assessment</h4>
-    <button id="request-approval-btn" :class="approvalButtonClasses" :disabled="isApprovalButtonDisabled" @click="requestNotebookApproval">
-      {{ approvalButtonText }}
-    </button>
-  </div>
+    </div>
+    <hr/>
+    <div>
+      <h4>Request to obtain certificate from assessment</h4>
+      <button id="request-approval-btn" :class="approvalButtonClasses" :disabled="isApprovalButtonDisabled" @click="requestNotebookApproval">
+        {{ approvalButtonText }}
+      </button>
+    </div>
 </template>
 
 <script>
@@ -42,12 +42,12 @@ export default {
   setup() {
     return useLoadingApi()
   },
-  props: { notebook: { type: Object, required: true } },
+  props: { notebook: Object },
   components: { CheckInput, TextInput },
   data() {
     const {
-      skipReviewEntirely = false,
-      numberOfQuestionsInAssessment = 0,
+      skipReviewEntirely,
+      numberOfQuestionsInAssessment,
       certificateExpiry = "1y",
     } = this.notebook.notebookSettings
     return {
@@ -61,14 +61,11 @@ export default {
   },
   computed: {
     approvalButtonText() {
-      if (
-        this.notebook.last_approval_time &&
-        this.notebook.last_approval_time > this.notebook.updated_at
-      ) {
-        return "Certificate Request Approved"
-      }
-
       switch (this.notebook.approvalStatus) {
+        case "NOT_APPROVED":
+          return "Send Request"
+        case "APPROVED":
+          return "Certificate Request Approved"
         case "PENDING":
           return "Approval Pending"
         default:
@@ -78,12 +75,9 @@ export default {
     approvalButtonClasses() {
       return {
         btn: true,
-        "btn-primary":
-          this.notebook.approvalStatus === "NOT_APPROVED" ||
-          (this.notebook.last_approval_time < this.notebook.updated_at &&
-            this.notebook.approvalStatus !== "PENDING"),
+        "btn-primary": this.notebook.approvalStatus === "NOT_APPROVED",
         "btn-disabled":
-          this.notebook.last_approval_time > this.notebook.updated_at ||
+          this.notebook.approvalStatus === "APPROVED" ||
           this.notebook.approvalStatus === "PENDING",
         "btn-layout": true,
         "mt-2": true,
@@ -92,8 +86,7 @@ export default {
     },
     isApprovalButtonDisabled() {
       return (
-        (this.notebook.last_approval_time &&
-          this.notebook.last_approval_time >= this.notebook.updated_at) ||
+        this.notebook.approvalStatus === "APPROVED" ||
         this.notebook.approvalStatus === "PENDING"
       )
     },
@@ -109,7 +102,7 @@ export default {
     },
     requestNotebookApproval() {
       this.managedApi.restNotebookController
-        .requestNotebookApproval(this.notebook?.id)
+        .requestNotebookApproval(this.notebook.id)
         .then((response) => {
           this.notebook.approvalStatus = response.approvalStatus
         })
