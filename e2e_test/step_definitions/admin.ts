@@ -69,10 +69,6 @@ Given(
   }
 )
 
-Given('I am logged in as an admin', (_tabName: string) => {
-  start.loginAsAdmin()
-})
-
 Given(
   'I navigate to the {string} section in the admin dashboard',
   (tabName: string) => {

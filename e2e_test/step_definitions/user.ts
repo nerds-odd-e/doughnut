@@ -8,15 +8,23 @@ import { DataTable } from '@cucumber/cucumber'
 import start from '../start'
 
 Given('I am logged in as {string}', (externalIdentifier: string) => {
+  start.loginAs(externalIdentifier)
+})
+
+Given('I am re-logged in as {string}', (externalIdentifier: string) => {
   start.reloginAs(externalIdentifier)
 })
 
 Given('I am logged in as an existing user', () => {
-  start.reloginAs('old_learner')
+  start.loginAs('old_learner')
 })
 
-Given('I am logged in as another existing user', () => {
-  start.reloginAs('another_old_learner')
+Given('I am logged in as an admin', (_tabName: string) => {
+  start.loginAsAdmin()
+})
+
+Given('I am re-logged in as an admin', (_tabName: string) => {
+  start.reloginAsAdmin()
 })
 
 Given('my session is logged out', () => {

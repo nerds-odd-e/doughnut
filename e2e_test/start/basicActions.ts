@@ -45,7 +45,7 @@ export default {
     return systemSidebar().userOptions().myAssessmentAndCertificateHistory()
   },
   loginAsAdminAndGoToAdminDashboard() {
-    this.loginAsAdmin()
+    this.reloginAsAdmin()
     return this.goToAdminDashboard()
   },
 }

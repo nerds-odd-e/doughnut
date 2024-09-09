@@ -16,7 +16,7 @@ export const logins = {
   loginAs(username: string) {
     if (username === 'none') {
       this.logout()
-      return
+      return start
     }
 
     const password = 'password'
@@ -44,6 +44,9 @@ export const logins = {
   },
 
   loginAsAdmin() {
-    this.logout().loginAs('admin')
+    return this.loginAs('admin')
+  },
+  reloginAsAdmin() {
+    return this.logout().loginAsAdmin()
   },
 }

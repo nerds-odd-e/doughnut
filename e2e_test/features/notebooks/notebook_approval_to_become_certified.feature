@@ -17,19 +17,19 @@ Feature: Notebook approval to become certified
       | notebook           | no certification icon | cannot        |
 
   Scenario: Apply for an approval for a notebook
-    Given I am logged in as 'a_trainer'
+    Given I am re-logged in as 'a_trainer'
     And I have a notebook with the head note "TDD"
     And I have a notebook with the head note "GIT"
     Given I request for an approval for notebook "TDD"
     And I request for an approval for notebook "GIT"
     * I should see the status "Pending" of the approval for notebook "TDD"
-    When I am logged in as an admin
+    When I am re-logged in as an admin
     And I approve notebook "TDD" to become certified
     Then I should see following notebooks waiting for approval only:
       | GIT |
 
   Scenario: Reset approval on new question
-    Given I am logged in as an admin
+    Given I am re-logged in as an admin
     And I have a notebook with the head note "The cow joke"
     And I request for an approval for notebook "The cow joke"
     And I approve notebook "The cow joke" to become certified
