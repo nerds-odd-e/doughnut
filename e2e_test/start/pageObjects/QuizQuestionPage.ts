@@ -12,13 +12,6 @@ const assumeQuestionPage = (stem?: string) => {
       question().find('ol button').should('be.disabled')
     },
 
-    isChoiceSelected(answer: string) {
-      getChoice(answer).should('have.class', 'is-selected')
-    },
-    isChoiceMarkedCorrect(correctChoice: string) {
-      getChoice(correctChoice).should('have.class', 'is-correct')
-    },
-
     isNotDisabled() {
       question().find('ol button').should('not.be.disabled')
     },

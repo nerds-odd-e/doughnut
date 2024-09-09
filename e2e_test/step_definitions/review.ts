@@ -268,10 +268,3 @@ Then(
       .suggestingNegativeFeedbackFineTuningExclusion()
   }
 )
-Then(
-  'My selected incorrect answer {string} and the correct answer {string} are highlighted',
-  function (answer: string, correctAnswer: string) {
-    start.assumeQuestionPage().isChoiceSelected(answer)
-    start.assumeQuestionPage().isChoiceMarkedCorrect(correctAnswer)
-  }
-)

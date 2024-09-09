@@ -1,6 +1,6 @@
 import { systemSidebar } from './systemSidebar'
 
-const assumeMessageCenterPage = () => {
+export const assumeMessageCenterPage = () => {
   return {
     expectMessage(message: string, partner: string) {
       cy.findByText(message).should('be.visible')
@@ -11,6 +11,5 @@ const assumeMessageCenterPage = () => {
 }
 
 export const navigateToMessageCenter = () => {
-  systemSidebar().userOptions().myMessageCenter()
-  return assumeMessageCenterPage()
+  return systemSidebar().userOptions().myMessageCenter()
 }

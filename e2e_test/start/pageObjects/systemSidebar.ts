@@ -1,6 +1,7 @@
 import { routerToNotebooksPage } from './notebooksPage'
 import { assumeAdminDashboardPage } from './adminPages/adminDashboardPage'
 import { assumeAssessmentAndCertificateHistoryPage } from './assessmentAndCertificateHistoryPage'
+import { assumeMessageCenterPage } from './messageCenterPage'
 
 export const systemSidebar = () => {
   routerToNotebooksPage()
@@ -41,6 +42,8 @@ export const systemSidebar = () => {
           cy.findByRole('button', {
             name: 'Message center',
           }).click()
+
+          return assumeMessageCenterPage()
         },
       }
     },
