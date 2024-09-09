@@ -125,6 +125,7 @@ For MS Windows WSL2 users:
 | Start SUT (backend system under test) | `pnpm sut` (starts backend SUT ONLY)                                                                                                            |
 | Start Mock for external backend       | `pnpm start:mb` (starts mocked external backend ONLY)                                                                                           |
 | Start ONLY the Cypress IDE            | `pnpm cy:open` (starts Cypress IDE ONLY)                                                                                                        |
+| Run one feature headlessly            | `pnpm cy:run --spec **/name.feature` (expect services are already running, run the matched feature files only in headless mode)                 |
 | Run all e2e test                      | `pnpm verify` (compile frontend assets, start backend SUT, mountebank virtual service provider & cypress headless e2e testing)                  |
 | Run cypress with Backend & Frontend   | `pnpm test:open` (starts frontend SUT in HMR mode, backend SUT, mountebank virtual service provider & cypress IDE)                              |
 | Generate TypeScript Interfaces        | `pnpm generateTypeScript` (Generate TypeScript Interfaces from backend JSON classes. Should run manually every time backend service changes)    |
