@@ -14,10 +14,6 @@ When(
   }
 )
 
-When('I start assessment {string} in the bazaar', function (notebook: string) {
-  start.navigateToBazaar().selfAssessmentOnNotebook(notebook)
-})
-
 When('I click on answer {string}', (answer: string) => {
   start
     .assumeAssessmentPage()
