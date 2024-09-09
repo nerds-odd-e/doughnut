@@ -46,7 +46,8 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
+import { useRouter } from "vue-router"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import usePopups from "@/components/commons/Popups/usePopups"
 import SvgBazaarShare from "@/components/svgs/SvgBazaarShare.vue"
@@ -55,39 +56,26 @@ import SvgMoveToCircle from "@/components/svgs/SvgMoveToCircle.vue"
 import SvgRaiseHand from "@/components/svgs/SvgRaiseHand.vue"
 import { Notebook, User } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { PropType, defineComponent } from "vue"
+import { PropType } from "vue"
 import NotebookEditDialog from "./NotebookEditDialog.vue"
 import NotebookMoveDialog from "./NotebookMoveDialog.vue"
 import NotebookQuestionsDialog from "./NotebookQuestionsDialog.vue"
 import NotebookAssistantManagementDialog from "./NotebookAssistantManagementDialog.vue"
 import SvgRobot from "../svgs/SvgRobot.vue"
 
-export default defineComponent({
-  setup() {
-    return { ...useLoadingApi(), ...usePopups() }
-  },
-  props: {
-    notebook: { type: Object as PropType<Notebook>, required: true },
-    user: { type: Object as PropType<User>, required: false },
-  },
-  components: {
-    SvgBazaarShare,
-    PopButton,
-    NotebookEditDialog,
-    NotebookMoveDialog,
-    NotebookAssistantManagementDialog,
-    SvgEditNotebook,
-    SvgMoveToCircle,
-    SvgRobot,
-  },
-  methods: {
-    async shareNotebook() {
-      if (await this.popups.confirm(`Confirm to share?`)) {
-        this.managedApi.restNotebookController
-          .shareNotebook(this.notebook.id)
-          .then(() => this.$router.push({ name: "notebooks" }))
-      }
-    },
-  },
+const { managedApi } = useLoadingApi()
+const router = useRouter()
+const { popups } = usePopups()
+
+const props = defineProps({
+  notebook: { type: Object as PropType<Notebook>, required: true },
+  user: { type: Object as PropType<User>, required: false },
 })
+const shareNotebook = async () => {
+  if (await popups.confirm(`Confirm to share?`)) {
+    managedApi.restNotebookController
+      .shareNotebook(props.notebook.id)
+      .then(() => router.push({ name: "notebooks" }))
+  }
+}
 </script>
