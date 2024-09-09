@@ -10,9 +10,9 @@ import { assumeNotePage } from './pageObjects/notePage'
 import { routerToNotebooksPage } from './pageObjects/notebooksPage'
 import { noteSidebar } from './pageObjects/noteSidebar'
 import { systemSidebar } from './pageObjects/systemSidebar'
+import { navigateToMessageCenter } from './pageObjects/messageCenterPage'
 import testability from './testability'
 import { logins } from './logins'
-import { navigateToMessageCenter } from './pageObjects/messageCenterPage'
 
 export default {
   navigateToBazaar,
