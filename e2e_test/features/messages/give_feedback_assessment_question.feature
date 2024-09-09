@@ -8,9 +8,8 @@ Feature: Learner gives feedback on an assessment question
         And there is a certified notebook "Just say 'Yes'" by "a_trainer" with 2 questions, shared to the Bazaar
 
     Scenario: I have the option to give feedback
-        When I begin the assessment from the "Just say 'Yes'" notebook in the bazaar
-        And I answer the question wrongly
-        And I submit feedback saying 'I believe the question is incorrect'
+        Given I begin the assessment from the "Just say 'Yes'" notebook in the bazaar
+        When I answer the question wrongly and submit feedback saying 'I believe the question is incorrect'
         Then "a_trainer" can see the feedback "\"I believe the question is incorrect\""
         And "a_trainer" can see name "Old Learner" in the message center
         And "old_learner" can see name "A Trainer" in the message center

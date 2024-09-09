@@ -155,7 +155,7 @@ Given(
     start
       .assumeAssessmentPage()
       .assumeQuestionSection()
-      .answerWithoutContinuing(answer)
+      .answerIncorrectly(answer)
   }
 )
 

@@ -14,13 +14,6 @@ When(
   }
 )
 
-When('I click on answer {string}', (answer: string) => {
-  start
-    .assumeAssessmentPage()
-    .assumeQuestionSection()
-    .answerWithoutContinuing(answer)
-})
-
 When(
   'I do the assessment on {string} in the bazaar with the following answers:',
   function (notebook: string, table: DataTable) {
@@ -193,22 +186,14 @@ Then(
     start.navigateToAssessmentAndCertificatePage().expectNoCertificate(notebook)
   }
 )
+
 Then(
-  'it should immediately show {string} as the wrong answer after answering',
-  (answer: string) => {
-    cy.contains(answer).should('have.class', 'current-choice')
-    cy.get('.current-choice').should('have.length', 1)
+  'I answer the question wrongly and submit feedback saying {string}',
+  (feedback: string) => {
+    start
+      .assumeAssessmentPage()
+      .assumeQuestionSection()
+      .answerIncorrectly('No')
+      .sendFeedback(feedback)
   }
 )
-
-Then('I answer the question wrongly', () => {
-  cy.findByRole('button', { name: 'No' }).click()
-})
-
-Then('I submit feedback saying {string}', (feedback: string) => {
-  cy.findByRole('button', { name: 'No' }).click()
-  cy.findByText('Send feedback').click()
-  cy.findByPlaceholderText('Give feedback about the question').type(feedback)
-  cy.findByRole('button', { name: 'Submit' }).click()
-  cy.findByText('Feedback received successfully').should('be.visible')
-})

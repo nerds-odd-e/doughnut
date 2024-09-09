@@ -1,5 +1,21 @@
 import { CertificatePopup } from './CertificatePopup'
 
+const assessmentWrongAnswerPage = () => {
+  return {
+    continueAssessment() {
+      cy.findByText('Continue').click().pageIsNotLoading()
+    },
+    sendFeedback(feedback: string) {
+      cy.findByText('Send feedback').click()
+      cy.findByPlaceholderText('Give feedback about the question').type(
+        feedback
+      )
+      cy.findByRole('button', { name: 'Submit' }).click()
+      cy.findByText('Feedback received successfully').should('be.visible')
+    },
+  }
+}
+
 const assumeQuestionSection = () => {
   return {
     getQuestionSection() {
@@ -18,21 +34,23 @@ const assumeQuestionSection = () => {
       return this.getStemText().then((stem) => {
         const row = answersTable.find((row) => row.Question === stem)
         if (row.AnswerCorrect === 'true') {
-          return this.answerCorrect(row!.Answer)
+          return this.answer(row!.Answer)
         } else {
-          return this.answerIncorrect(row!.Answer)
+          return this.answerIncorrectAndContinue(row!.Answer)
         }
       })
     },
-    answerCorrect(answer: string) {
-      return cy.findByText(answer).click().pageIsNotLoading()
+    answer(answer: string) {
+      cy.findByText(answer).click().pageIsNotLoading()
+      return this
     },
-    answerIncorrect(answer: string) {
-      cy.findByText(answer).click()
-      return cy.findByText('Continue').click().pageIsNotLoading()
+    answerIncorrectAndContinue(answer: string) {
+      this.answerIncorrectly(answer).continueAssessment()
+      return this
     },
-    answerWithoutContinuing(answer: string) {
-      return cy.findByText(answer).click().pageIsNotLoading()
+    answerIncorrectly(answer: string) {
+      this.answer(answer)
+      return assessmentWrongAnswerPage()
     },
   }
 }
@@ -76,12 +94,10 @@ export const assumeAssessmentPage = (notebook?: string) => {
     },
     answerYesNoQuestionsToScore(correctAnswers: number, allQuestions: number) {
       for (let i = 0; i < correctAnswers; i++) {
-        this.assumeQuestionSection().answerCorrect('Yes')
-        cy.pageIsNotLoading()
+        this.assumeQuestionSection().answer('Yes')
       }
       for (let i = correctAnswers; i < allQuestions; i++) {
-        this.assumeQuestionSection().answerIncorrect('No')
-        cy.pageIsNotLoading()
+        this.assumeQuestionSection().answerIncorrectAndContinue('No')
       }
     },
     expectEndOfAssessment(expectedScore?: string) {
