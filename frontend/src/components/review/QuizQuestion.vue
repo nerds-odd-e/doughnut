@@ -40,20 +40,6 @@
       :assessment-current-choice-index="checkAssessmentAnsweredIndex()"
     />
     <div class="mark-question">
-      <PopButton
-        title="Send this question for fine tuning the question generation model"
-        v-if="showFinetuneButton"
-      >
-        <template #button_face>
-          <SvgRaiseHand />
-        </template>
-        <template #default="{ closer }">
-          <SuggestQuestionForFineTuning
-            :quiz-question="quizQuestion"
-            @close-dialog="closer()"
-          />
-        </template>
-      </PopButton>
       <slot />
     </div>
   </div>
@@ -66,8 +52,6 @@ import { PropType, defineComponent } from "vue"
 import usePopups from "../commons/Popups/usePopups"
 import TextInput from "../form/TextInput.vue"
 import ShowImage from "../notes/accessory/ShowImage.vue"
-import SvgRaiseHand from "../svgs/SvgRaiseHand.vue"
-import SuggestQuestionForFineTuning from "../ai/SuggestQuestionForFineTuning.vue"
 import QuizQuestionChoices from "./QuizQuestionChoices.vue"
 
 export default defineComponent({
@@ -83,18 +67,12 @@ export default defineComponent({
     correctChoiceIndex: Number,
     answerChoiceIndex: Number,
     disabled: Boolean,
-    showFinetuneButton: {
-      type: Boolean,
-      default: true,
-    },
     answeredCurrentQuestion: Boolean,
   },
   components: {
     ShowImage,
     TextInput,
     QuizQuestionChoices,
-    SvgRaiseHand,
-    SuggestQuestionForFineTuning,
   },
   emits: ["answered"],
   data() {

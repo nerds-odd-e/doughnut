@@ -11,7 +11,6 @@
         :answered-current-question="answeredCurrentQuestion"
         :quiz-question="quizQuestions[currentQuestion]!"
         @answered="questionAnswered"
-        :show-finetune-button="false"
       />
       <div v-else-if="assessmentResult">
         <p>Your score: {{ correctAnswers }} / {{ quizQuestions.length }}</p>
