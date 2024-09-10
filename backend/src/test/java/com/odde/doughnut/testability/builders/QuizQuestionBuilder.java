@@ -15,14 +15,23 @@ public class QuizQuestionBuilder extends EntityBuilder<QuizQuestionAndAnswer> {
   @Override
   protected void beforeCreate(boolean needPersist) {
     if (entity == null) {
-      approvedSpellingQuestionOf(makeMe.aNote().please(needPersist));
+      spellingQuestionOf(makeMe.aNote().please(needPersist));
     }
   }
 
-  public QuizQuestionBuilder approvedSpellingQuestionOf(Note note) {
+  public QuizQuestionBuilder spellingQuestionOf(Note note) {
     this.entity = new SpellingQuizFactory(note).buildSpellingQuestion();
+    this.entity.setApproved(false);
+    return this;
+  }
+
+  public QuizQuestionBuilder approved() {
     this.entity.setApproved(true);
     return this;
+  }
+
+  public QuizQuestionBuilder approvedSpellingQuestionOf(Note note) {
+    return spellingQuestionOf(note).approved();
   }
 
   public QuizQuestionBuilder ofAIGeneratedQuestion(MCQWithAnswer mcqWithAnswer, Note note) {

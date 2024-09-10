@@ -90,12 +90,12 @@ public class AssessmentServiceTests {
     void setup() {
       topNote = makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser).please();
       notebook = topNote.getNotebook();
+      notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(5);
     }
 
     @Test
     void shouldReturn5QuestionsWhenThereAreMoreThan5NotesWithQuestions() {
       makeMe.theNote(topNote).withNChildrenThat(5, NoteBuilder::hasAnApprovedQuestion).please();
-      notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(5);
       List<QuizQuestion> assessment = service.generateAssessment(notebook);
       assertEquals(5, assessment.size());
     }
@@ -107,8 +107,8 @@ public class AssessmentServiceTests {
     }
 
     @Test
-    void shouldGetOneQuestionFromEachNoteOnly() {
-      makeMe.theNote(topNote).withNChildrenThat(3, NoteBuilder::hasAnApprovedQuestion).please();
+    void shouldGetOneApprovedQuestionFromEachNoteOnly() {
+      makeMe.theNote(topNote).withNChildrenThat(5, NoteBuilder::hasAnUnapprovedQuestion).please();
       assertThrows(ApiException.class, () -> service.generateAssessment(notebook));
     }
 

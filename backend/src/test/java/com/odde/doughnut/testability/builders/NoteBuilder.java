@@ -221,6 +221,12 @@ public class NoteBuilder extends EntityBuilder<Note> {
     return this;
   }
 
+  public NoteBuilder hasAnUnapprovedQuestion() {
+    QuizQuestionBuilder quizQuestionBuilder = makeMe.aQuestion().spellingQuestionOf(entity);
+    this.quizQuestionBuilders.add(quizQuestionBuilder);
+    return this;
+  }
+
   public NoteBuilder hasApprovedQuestions(int numQuestions) {
     for (int i = 0; i < numQuestions; i++) {
       this.hasAnApprovedQuestion();

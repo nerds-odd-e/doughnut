@@ -31,8 +31,13 @@ public class AssessmentService {
     List<QuizQuestionAndAnswer> questions =
         notes.stream()
             .flatMap(
-                note -> randomizer.chooseOneRandomly(note.getQuizQuestionAndAnswers()).stream())
-            .filter(QuizQuestionAndAnswer::isApproved)
+                note ->
+                    randomizer
+                        .chooseOneRandomly(
+                            note.getQuizQuestionAndAnswers().stream()
+                                .filter(QuizQuestionAndAnswer::isApproved)
+                                .toList())
+                        .stream())
             .filter(
                 (quizQuestionAndAnswer) ->
                     notebook.getLast_approval_time() == null
