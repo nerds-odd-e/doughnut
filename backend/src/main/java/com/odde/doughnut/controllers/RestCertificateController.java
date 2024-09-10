@@ -26,11 +26,7 @@ public class RestCertificateController {
       ModelFactoryService modelFactoryService) {
     this.currentUser = currentUser;
     this.modelFactoryService = modelFactoryService;
-    this.assessmentService =
-        new AssessmentService(
-            modelFactoryService,
-            testabilitySettings.getRandomizer(),
-            testabilitySettings.getCurrentUTCTimestamp());
+    this.assessmentService = new AssessmentService(modelFactoryService, testabilitySettings);
   }
 
   @PostMapping("/{notebook}")

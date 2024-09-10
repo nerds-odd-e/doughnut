@@ -42,6 +42,8 @@ public class RestAssessmentControllerTests {
   void setup() {
     testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
     currentUser = makeMe.aUser().toModelPlease();
+    controller =
+        new RestAssessmentController(makeMe.modelFactoryService, testabilitySettings, currentUser);
   }
 
   @Nested
@@ -63,9 +65,6 @@ public class RestAssessmentControllerTests {
     @BeforeEach
     void setup() {
       testabilitySettings.setRandomization(new Randomization(Randomization.RandomStrategy.seed, 1));
-      controller =
-          new RestAssessmentController(
-              makeMe.modelFactoryService, testabilitySettings, currentUser);
       topNote = makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser).please();
       notebook = topNote.getNotebook();
       notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(1);
@@ -98,9 +97,6 @@ public class RestAssessmentControllerTests {
 
     @BeforeEach
     void setup() {
-      controller =
-          new RestAssessmentController(
-              makeMe.modelFactoryService, testabilitySettings, currentUser);
       topNote = makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser).please();
       notebook = topNote.getNotebook();
     }
@@ -182,9 +178,6 @@ public class RestAssessmentControllerTests {
 
     @BeforeEach
     void setup() {
-      controller =
-          new RestAssessmentController(
-              makeMe.modelFactoryService, testabilitySettings, currentUser);
       topNote = makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser).please();
       answerSubmissions = new ArrayList<>();
     }
@@ -305,9 +298,6 @@ public class RestAssessmentControllerTests {
 
     @BeforeEach
     void setup() {
-      controller =
-          new RestAssessmentController(
-              makeMe.modelFactoryService, testabilitySettings, currentUser);
       topNote = makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser).please();
       makeMe.theNote(topNote).withNChildrenThat(2, NoteBuilder::hasAnApprovedQuestion).please();
       notebook = topNote.getNotebook();

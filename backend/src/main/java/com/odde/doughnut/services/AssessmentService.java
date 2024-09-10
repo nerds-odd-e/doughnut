@@ -8,6 +8,7 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.Randomizer;
+import com.odde.doughnut.testability.TestabilitySettings;
 import java.sql.Timestamp;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -15,19 +16,16 @@ import java.util.List;
 
 public class AssessmentService {
   private final ModelFactoryService modelFactoryService;
-  private final Timestamp currentTimestamp;
-  private final Randomizer randomizer;
+  private final TestabilitySettings testabilitySettings;
 
   public AssessmentService(
-      ModelFactoryService modelFactoryService,
-      Randomizer randomizer,
-      Timestamp currentUTCTimestamp) {
+      ModelFactoryService modelFactoryService, TestabilitySettings testabilitySettings) {
     this.modelFactoryService = modelFactoryService;
-    this.currentTimestamp = currentUTCTimestamp;
-    this.randomizer = randomizer;
+    this.testabilitySettings = testabilitySettings;
   }
 
   public List<QuizQuestion> generateAssessment(Notebook notebook) {
+    Randomizer randomizer = this.testabilitySettings.getRandomizer();
     List<Note> notes = randomizer.shuffle(notebook.getNotes());
 
     List<QuizQuestionAndAnswer> questions =
@@ -97,14 +95,16 @@ public class AssessmentService {
     Certificate certificate = new Certificate();
     certificate.setUser(user);
     certificate.setNotebook(notebook);
-    certificate.setStartDate(currentTimestamp);
+    certificate.setStartDate(this.testabilitySettings.getCurrentUTCTimestamp());
     return updateExpiry(certificate);
   }
 
   private Certificate updateExpiry(Certificate cert) {
     Timestamp expiryDate =
         Timestamp.from(
-            ZonedDateTime.ofInstant(currentTimestamp.toInstant(), ZoneOffset.UTC.normalized())
+            ZonedDateTime.ofInstant(
+                    this.testabilitySettings.getCurrentUTCTimestamp().toInstant(),
+                    ZoneOffset.UTC.normalized())
                 .plus(cert.getNotebook().getNotebookSettings().getCertificateExpiry())
                 .toInstant());
     cert.setExpiryDate(expiryDate);

@@ -29,11 +29,7 @@ class RestAssessmentController {
       UserModel currentUser) {
     this.testabilitySettings = testabilitySettings;
     this.currentUser = currentUser;
-    this.assessmentService =
-        new AssessmentService(
-            modelFactoryService,
-            testabilitySettings.getRandomizer(),
-            testabilitySettings.getCurrentUTCTimestamp());
+    this.assessmentService = new AssessmentService(modelFactoryService, testabilitySettings);
   }
 
   @GetMapping("/questions/{notebook}")
