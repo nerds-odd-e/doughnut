@@ -8,11 +8,9 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AssessmentService;
 import com.odde.doughnut.testability.TestabilitySettings;
-import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,14 +24,16 @@ class RestAssessmentController {
   private final AssessmentService assessmentService;
 
   public RestAssessmentController(
-      @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
       ModelFactoryService modelFactoryService,
       TestabilitySettings testabilitySettings,
       UserModel currentUser) {
     this.testabilitySettings = testabilitySettings;
     this.currentUser = currentUser;
     this.assessmentService =
-        new AssessmentService(openAiApi, modelFactoryService, testabilitySettings);
+        new AssessmentService(
+            modelFactoryService,
+            testabilitySettings.getRandomizer(),
+            testabilitySettings.getCurrentUTCTimestamp());
   }
 
   @GetMapping("/questions/{notebook}")

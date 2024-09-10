@@ -1,6 +1,5 @@
 package com.odde.doughnut.controllers;
 
-import static com.odde.doughnut.controllers.RestCertificateController.oneYearInHours;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -25,6 +24,7 @@ import org.springframework.web.server.ResponseStatusException;
 @ActiveProfiles("test")
 @Transactional
 public class RestCertificateControllerTests {
+  public static final int oneYearInHours = 8760;
   @Autowired MakeMe makeMe;
   private UserModel currentUser;
   private RestCertificateController controller;

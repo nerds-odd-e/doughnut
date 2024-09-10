@@ -43,8 +43,7 @@ public class RestAssessmentControllerTests {
     testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
     currentUser = makeMe.aUser().toModelPlease();
     controller =
-        new RestAssessmentController(
-            openAiApi, makeMe.modelFactoryService, testabilitySettings, currentUser);
+        new RestAssessmentController(makeMe.modelFactoryService, testabilitySettings, currentUser);
   }
 
   @Nested
@@ -106,10 +105,7 @@ public class RestAssessmentControllerTests {
     void whenNotLogin() {
       controller =
           new RestAssessmentController(
-              openAiApi,
-              makeMe.modelFactoryService,
-              testabilitySettings,
-              makeMe.aNullUserModelPlease());
+              makeMe.modelFactoryService, testabilitySettings, makeMe.aNullUserModelPlease());
       assertThrows(
           ResponseStatusException.class, () -> controller.generateAssessmentQuestions(notebook));
     }

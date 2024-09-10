@@ -323,6 +323,14 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
     return noteTopic;
   }
 
+  @JsonIgnore
+  public QuizQuestionAndAnswer selectRandomQuestionForANote() {
+    List<QuizQuestionAndAnswer> allQuestions = getQuizQuestionAndAnswers();
+    return allQuestions.isEmpty()
+        ? null
+        : allQuestions.get(new Random().nextInt(allQuestions.size()));
+  }
+
   public static class NoteBrief {
     public String uri;
     public String contextPath;

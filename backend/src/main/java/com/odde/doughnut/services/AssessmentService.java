@@ -7,8 +7,7 @@ import com.odde.doughnut.controllers.dto.AssessmentResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.testability.TestabilitySettings;
-import com.theokanning.openai.client.OpenAiApi;
+import com.odde.doughnut.models.Randomizer;
 import java.sql.Timestamp;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -17,24 +16,24 @@ import java.util.Objects;
 
 public class AssessmentService {
   private final ModelFactoryService modelFactoryService;
-  private final QuizQuestionService quizQuestionService;
-  private final TestabilitySettings testabilitySettings;
+  private final Timestamp currentTimestamp;
+  private final Randomizer randomizer;
 
   public AssessmentService(
-      OpenAiApi openAiApi,
       ModelFactoryService modelFactoryService,
-      TestabilitySettings testabilitySettings) {
+      Randomizer randomizer,
+      Timestamp currentUTCTimestamp) {
     this.modelFactoryService = modelFactoryService;
-    this.testabilitySettings = testabilitySettings;
-    this.quizQuestionService = new QuizQuestionService(openAiApi, modelFactoryService);
+    this.currentTimestamp = currentUTCTimestamp;
+    this.randomizer = randomizer;
   }
 
   public List<QuizQuestion> generateAssessment(Notebook notebook) {
-    List<Note> notes = testabilitySettings.getRandomizer().shuffle(notebook.getNotes());
+    List<Note> notes = randomizer.shuffle(notebook.getNotes());
 
     List<QuizQuestionAndAnswer> questions =
         notes.stream()
-            .map(quizQuestionService::selectRandomQuestionForANote)
+            .map(Note::selectRandomQuestionForANote)
             .filter(Objects::nonNull)
             .filter(QuizQuestionAndAnswer::isApproved)
             .filter(
@@ -99,15 +98,14 @@ public class AssessmentService {
     Certificate certificate = new Certificate();
     certificate.setUser(user);
     certificate.setNotebook(notebook);
-    certificate.setStartDate(testabilitySettings.getCurrentUTCTimestamp());
+    certificate.setStartDate(currentTimestamp);
     return updateExpiry(certificate);
   }
 
   private Certificate updateExpiry(Certificate cert) {
-    Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
     Timestamp expiryDate =
         Timestamp.from(
-            ZonedDateTime.ofInstant(now.toInstant(), ZoneOffset.UTC.normalized())
+            ZonedDateTime.ofInstant(currentTimestamp.toInstant(), ZoneOffset.UTC.normalized())
                 .plus(cert.getNotebook().getNotebookSettings().getCertificateExpiry())
                 .toInstant());
     cert.setExpiryDate(expiryDate);

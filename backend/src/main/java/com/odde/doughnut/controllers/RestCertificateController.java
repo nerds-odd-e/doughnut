@@ -7,7 +7,6 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AssessmentService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.annotation.Resource;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,11 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/certificate")
 public class RestCertificateController {
 
-  public static final int oneYearInHours = 8760;
   private final UserModel currentUser;
-
-  @Resource(name = "testabilitySettings")
-  private final TestabilitySettings testabilitySettings;
 
   private final ModelFactoryService modelFactoryService;
 
@@ -30,9 +25,12 @@ public class RestCertificateController {
       TestabilitySettings testabilitySettings,
       ModelFactoryService modelFactoryService) {
     this.currentUser = currentUser;
-    this.testabilitySettings = testabilitySettings;
     this.modelFactoryService = modelFactoryService;
-    this.assessmentService = new AssessmentService(null, modelFactoryService, testabilitySettings);
+    this.assessmentService =
+        new AssessmentService(
+            modelFactoryService,
+            testabilitySettings.getRandomizer(),
+            testabilitySettings.getCurrentUTCTimestamp());
   }
 
   @PostMapping("/{notebook}")
