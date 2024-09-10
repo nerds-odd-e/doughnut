@@ -100,7 +100,12 @@ public class RestAssessmentControllerTests {
     void shouldIncludeTheNotebookCertificateInTheResult() throws UnexpectedNoAccessRightException {
       makeMe.theNote(topNote).withNChildrenThat(3, NoteBuilder::hasAnApprovedQuestion).please();
       notebook = topNote.getNotebook();
-      notebook.setApprovalStatus(ApprovalStatus.APPROVED);
+      makeMe
+          .modelFactoryService
+          .notebookService(notebook)
+          .requestNotebookApproval()
+          .approve(makeMe.aTimestamp().please());
+      makeMe.refresh(notebook);
 
       AssessmentResult assessmentResult =
           controller.submitAssessmentResult(notebook, answerSubmissions);

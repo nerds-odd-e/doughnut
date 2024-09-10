@@ -98,9 +98,7 @@ class RestNotebookController {
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(notebook);
-    NotebookCertificateApproval certificateApproval = new NotebookCertificateApproval();
-    certificateApproval.setNotebook(notebook);
-    modelFactoryService.save(certificateApproval);
+    modelFactoryService.notebookService(notebook).requestNotebookApproval();
     return notebook;
   }
 
@@ -154,9 +152,14 @@ class RestNotebookController {
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
-    notebook.setApprovalStatus(ApprovalStatus.APPROVED);
-    notebook.setLastApprovalTime(testabilitySettings.getCurrentUTCTimestamp());
-    modelFactoryService.save(notebook);
+    Iterable<NotebookCertificateApproval> all =
+        modelFactoryService.notebookCertificateApprovalRepository.findAll();
+    for (NotebookCertificateApproval approval : all) {
+      if (approval.getNotebook().getId().equals(notebook.getId())) {
+        approval.setLastApprovalTime(testabilitySettings.getCurrentUTCTimestamp());
+        modelFactoryService.save(notebook);
+      }
+    }
     return notebook;
   }
 }

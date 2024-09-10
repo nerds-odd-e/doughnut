@@ -70,13 +70,12 @@ public class Notebook extends EntityIdentifiedByIdOnly {
       return ApprovalStatus.APPROVED;
     }
     if (notebookCertificateApproval != null) {
+      if (notebookCertificateApproval.getLastApprovalTime() != null) {
+        return ApprovalStatus.APPROVED;
+      }
       return ApprovalStatus.PENDING;
     }
     return approvalStatus;
-  }
-
-  public void setApprovalStatus(ApprovalStatus approvalStatus) {
-    this.approvalStatus = approvalStatus;
   }
 
   @Column(name = "last_approval_time")

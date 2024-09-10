@@ -10,6 +10,7 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.NotebookCertificateApprovalService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.QuizQuestionBuilder;
@@ -201,29 +202,27 @@ class RestNotebookControllerTest {
   class getAllPendingRequestNotebooks {
 
     private Notebook notebook;
+    private NotebookCertificateApprovalService approval;
 
     @BeforeEach
     void setup() {
       UserModel userModel = makeMe.anAdmin().toModelPlease();
       notebook = makeMe.aNote().creatorAndOwner(userModel).please().getNotebook();
       controller = new RestNotebookController(modelFactoryService, userModel, testabilitySettings);
-
+      approval = makeMe.modelFactoryService.notebookService(notebook).requestNotebookApproval();
       makeMe.refresh(notebook);
     }
 
     @Test
     void shouldReturnPendingRequestNotebooks() throws UnexpectedNoAccessRightException {
-      NotebookCertificateApproval approval = new NotebookCertificateApproval();
-      approval.setNotebook(notebook);
-      modelFactoryService.save(approval);
-      makeMe.refresh(notebook);
       List<Notebook> result = controller.getAllPendingRequestNotebooks();
       assertThat(result, hasSize(1));
     }
 
     @Test
     void shouldNotReturnApprovedNotebooks() throws UnexpectedNoAccessRightException {
-      notebook.setApprovalStatus(ApprovalStatus.APPROVED);
+      approval.approve(makeMe.aTimestamp().please());
+      makeMe.refresh(notebook);
       List<Notebook> result = controller.getAllPendingRequestNotebooks();
       assertThat(result, hasSize(0));
     }

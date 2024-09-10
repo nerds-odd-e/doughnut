@@ -4,6 +4,7 @@ import com.odde.doughnut.controllers.dto.SearchTerm;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.*;
 import com.odde.doughnut.models.*;
+import com.odde.doughnut.services.NotebookService;
 import jakarta.persistence.EntityManager;
 import java.sql.Timestamp;
 import java.util.List;
@@ -28,6 +29,7 @@ public class ModelFactoryService {
   @Autowired public NotebookRepository notebookRepository;
   @Autowired public CertificateRepository certificateRepository;
   @Autowired public ConversationRepository conversationRepository;
+  @Autowired public NotebookCertificateApprovalRepository notebookCertificateApprovalRepository;
 
   @Autowired
   public QuestionSuggestionForFineTuningRepository questionSuggestionForFineTuningRepository;
@@ -142,5 +144,9 @@ public class ModelFactoryService {
                 targetNote.getReviewSetting().getLevel()));
 
     return note;
+  }
+
+  public NotebookService notebookService(Notebook notebook) {
+    return new NotebookService(notebook, this);
   }
 }

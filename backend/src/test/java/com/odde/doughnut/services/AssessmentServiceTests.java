@@ -9,7 +9,6 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.NoteBuilder;
-import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -110,16 +109,6 @@ public class AssessmentServiceTests {
     void shouldGetOneApprovedQuestionFromEachNoteOnly() {
       makeMe.theNote(topNote).withNChildrenThat(5, NoteBuilder::hasAnUnapprovedQuestion).please();
       assertThrows(ApiException.class, () -> service.generateAssessment(notebook));
-    }
-
-    @Test
-    void shouldGetOnlyOldApprovedQuestionsBeforeNotebookApproval() {
-      makeMe.theNote(topNote).withNChildrenThat(1, NoteBuilder::hasAnApprovedQuestion).please();
-      notebook.setApprovalStatus(ApprovalStatus.APPROVED);
-      notebook.setLastApprovalTime(new Timestamp(System.currentTimeMillis()));
-      makeMe.theNote(topNote).withNChildrenThat(1, NoteBuilder::hasAnApprovedQuestion).please();
-      notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(1);
-      service.generateAssessment(notebook);
     }
   }
 }

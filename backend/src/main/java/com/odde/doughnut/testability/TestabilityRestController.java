@@ -200,11 +200,13 @@ class TestabilityRestController {
     }
     Notebook notebook = quizQuestionAndAnswers.getFirst().getNote().getNotebook();
     notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(quizQuestionAndAnswers.size());
-    notebook.setApprovalStatus(
-        notebookCertifiable != null && notebookCertifiable
-            ? ApprovalStatus.APPROVED
-            : ApprovalStatus.NOT_APPROVED);
     modelFactoryService.save(notebook);
+    if (notebookCertifiable != null && notebookCertifiable) {
+      modelFactoryService
+          .notebookService(notebook)
+          .requestNotebookApproval()
+          .approve(testabilitySettings.getCurrentUTCTimestamp());
+    }
   }
 
   private Ownership getOwnership(NotesTestData notesTestData, User user) {
