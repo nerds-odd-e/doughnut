@@ -67,8 +67,8 @@ import usePopups from "../commons/Popups/usePopups"
 import TextInput from "../form/TextInput.vue"
 import ShowImage from "../notes/accessory/ShowImage.vue"
 import SvgRaiseHand from "../svgs/SvgRaiseHand.vue"
+import SuggestQuestionForFineTuning from "../ai/SuggestQuestionForFineTuning.vue"
 import QuizQuestionChoices from "./QuizQuestionChoices.vue"
-import FeedbackForm from "./FeedbackForm.vue"
 
 export default defineComponent({
   inheritAttrs: false,
@@ -94,7 +94,7 @@ export default defineComponent({
     TextInput,
     QuizQuestionChoices,
     SvgRaiseHand,
-    FeedbackForm,
+    SuggestQuestionForFineTuning,
   },
   emits: ["answered"],
   data() {
