@@ -121,6 +121,7 @@ class RestNotebookControllerTest {
         throws UnexpectedNoAccessRightException {
       Note note = makeMe.aNote().creatorAndOwner(userModel).please();
       controller.requestNotebookApproval(note.getNotebook());
+      makeMe.refresh(note.getNotebook());
       assertThat(note.getNotebook().getApprovalStatus(), equalTo(ApprovalStatus.PENDING));
     }
   }
@@ -212,7 +213,10 @@ class RestNotebookControllerTest {
 
     @Test
     void shouldReturnPendingRequestNotebooks() throws UnexpectedNoAccessRightException {
-      notebook.setApprovalStatus(ApprovalStatus.PENDING);
+      NotebookCertificateApproval approval = new NotebookCertificateApproval();
+      approval.setNotebook(notebook);
+      modelFactoryService.save(approval);
+      makeMe.refresh(notebook);
       List<Notebook> result = controller.getAllPendingRequestNotebooks();
       assertThat(result, hasSize(1));
     }

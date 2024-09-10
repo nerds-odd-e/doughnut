@@ -11,6 +11,7 @@ public class NotebookCertificateApproval extends EntityIdentifiedByIdOnly {
   @ManyToOne
   @JoinColumn(name = "notebook_id", referencedColumnName = "id")
   @Getter
+  @Setter
   private Notebook notebook;
 
   @Column(name = "last_approval_time")

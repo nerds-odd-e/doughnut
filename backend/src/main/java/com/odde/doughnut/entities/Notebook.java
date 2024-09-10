@@ -56,11 +56,28 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   private List<Subscription> subscriptions;
 
-  @Column(name = "approval_status")
-  @Getter
+  @OneToOne(mappedBy = "notebook")
+  @JsonIgnore
   @Setter
+  private NotebookCertificateApproval notebookCertificateApproval;
+
+  @Column(name = "approval_status")
   @Enumerated(EnumType.STRING)
   private ApprovalStatus approvalStatus = ApprovalStatus.NOT_APPROVED;
+
+  public ApprovalStatus getApprovalStatus() {
+    if (approvalStatus == ApprovalStatus.APPROVED) {
+      return ApprovalStatus.APPROVED;
+    }
+    if (notebookCertificateApproval != null) {
+      return ApprovalStatus.PENDING;
+    }
+    return approvalStatus;
+  }
+
+  public void setApprovalStatus(ApprovalStatus approvalStatus) {
+    this.approvalStatus = approvalStatus;
+  }
 
   @Column(name = "last_approval_time")
   @Getter
