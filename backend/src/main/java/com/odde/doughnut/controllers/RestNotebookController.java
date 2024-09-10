@@ -13,7 +13,6 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -155,7 +154,7 @@ class RestNotebookController {
       throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
     notebook.setApprovalStatus(ApprovalStatus.APPROVED);
-    notebook.setLast_approval_time(new Timestamp(System.currentTimeMillis()));
+    notebook.setLastApprovalTime(testabilitySettings.getCurrentUTCTimestamp());
     modelFactoryService.save(notebook);
     return notebook;
   }

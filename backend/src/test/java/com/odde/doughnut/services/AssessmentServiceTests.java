@@ -116,7 +116,7 @@ public class AssessmentServiceTests {
     void shouldGetOnlyOldApprovedQuestionsBeforeNotebookApproval() {
       makeMe.theNote(topNote).withNChildrenThat(1, NoteBuilder::hasAnApprovedQuestion).please();
       notebook.setApprovalStatus(ApprovalStatus.APPROVED);
-      notebook.setLast_approval_time(new Timestamp(System.currentTimeMillis()));
+      notebook.setLastApprovalTime(new Timestamp(System.currentTimeMillis()));
       makeMe.theNote(topNote).withNChildrenThat(1, NoteBuilder::hasAnApprovedQuestion).please();
       notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(1);
       service.generateAssessment(notebook);

@@ -65,7 +65,7 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @Column(name = "last_approval_time")
   @Getter
   @Setter
-  private Timestamp last_approval_time;
+  private Timestamp lastApprovalTime;
 
   @Column(name = "updated_at")
   @Getter

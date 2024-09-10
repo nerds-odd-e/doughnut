@@ -9,7 +9,7 @@ export type Notebook = {
     headNote: Note;
     notebookSettings: NotebookSettings;
     approvalStatus?: Notebook.approvalStatus;
-    last_approval_time?: string;
+    lastApprovalTime?: string;
     updated_at: string;
     creatorId?: string;
 };

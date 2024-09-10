@@ -3083,7 +3083,7 @@ components:
           - NOT_APPROVED
           - PENDING
           - APPROVED
-        last_approval_time:
+        lastApprovalTime:
           type: string
           format: date-time
         updated_at:
