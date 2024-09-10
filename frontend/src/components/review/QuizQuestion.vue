@@ -39,9 +39,6 @@
       @answer="submitAnswer($event)"
       :assessment-current-choice-index="checkAssessmentAnsweredIndex()"
     />
-    <div class="mark-question">
-      <slot />
-    </div>
   </div>
 </template>
 

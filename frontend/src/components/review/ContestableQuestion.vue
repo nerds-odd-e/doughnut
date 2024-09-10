@@ -15,11 +15,11 @@
       :answered-question="answeredQuestion"
       :storage-accessor="storageAccessor"
     />
+    <div v-else>
     <QuizQuestionC
-      v-else
       :quiz-question="currentQuestion"
       @answered="onAnswered($event)"
-    >
+    />
       <a
         role="button"
         title="Doesn't make sense?"
@@ -30,7 +30,7 @@
       >
         <SvgContest />
       </a>
-    </QuizQuestionC>
+    </div>
   </div>
 </template>
 
