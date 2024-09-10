@@ -21,7 +21,6 @@ vitest.mock("vue-router", () => ({
 useRouter().currentRoute.value.name = "repeat"
 
 let renderer: RenderingHelper
-const mockRouterPush = vi.fn()
 const mockedRepeatCall = vi.fn()
 
 let teleportTarget: HTMLDivElement
@@ -43,7 +42,6 @@ beforeEach(() => {
   helper.managedApi.restReviewsController.repeatReview = mockedRepeatCall
   renderer = helper
     .component(RepeatPage)
-    .withMockRouterPush(mockRouterPush)
     .withStorageProps({ eagerFetchCount: 1 })
 })
 

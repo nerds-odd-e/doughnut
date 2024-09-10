@@ -7,6 +7,7 @@ describe("NoteBookEditDialog.vue", () => {
     const notebook = makeMe.aNotebook.numberOfQuestionsInAssessment(4).please()
     const wrapper = helper
       .component(NotebookEditDialog)
+      .withRouter()
       .withProps({ notebook })
       .mount()
     const input = wrapper.find(

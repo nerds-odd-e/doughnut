@@ -3,7 +3,7 @@ import { render } from "@testing-library/vue"
 import { VueWrapper, mount } from "@vue/test-utils"
 import { merge } from "lodash"
 import { ComponentPublicInstance, DefineComponent } from "vue"
-import { RouteLocationRaw } from "vue-router"
+import { createRouter, createWebHistory, RouteLocationRaw } from "vue-router"
 import createNoteStorage from "../../src/store/createNoteStorage"
 
 interface NoteStorageProps {
@@ -25,6 +25,7 @@ class RenderingHelper {
     this.comp = comp
     this.managedApi = managedApi
     this.global = {
+      plugins: [],
       directives: {
         // eslint-disable-next-line @typescript-eslint/no-empty-function
         focus() {
@@ -58,13 +59,23 @@ class RenderingHelper {
     return this
   }
 
-  withMockRouterPush(push) {
-    this.withGlobalMock({ $router: { push } })
+  withRouter() {
+    const router = createRouter({
+      history: createWebHistory(),
+      routes: [
+        {
+          path: "/",
+          name: "Home",
+          component: {},
+        },
+      ],
+    })
+    this.withPlugin(router)
     return this
   }
 
-  withGlobalMock(mocks: Record<string, unknown>) {
-    this.global = merge(this.global, { mocks })
+  withPlugin(plugin: unknown) {
+    this.global.plugins = [...this.global.plugins, plugin]
     return this
   }
 

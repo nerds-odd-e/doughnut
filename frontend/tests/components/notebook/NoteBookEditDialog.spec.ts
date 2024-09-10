@@ -9,6 +9,7 @@ describe("NotebookEditDialog.spec", () => {
   }
   const wrapper = helper
     .component(NotebookEditDialog)
+    .withRouter()
     .withProps({ notebook })
     .mount()
 

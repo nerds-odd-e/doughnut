@@ -13,7 +13,7 @@ describe("Notebooks Page", () => {
         notebooks: [notebook],
         subscriptions: [],
       })
-    helper.component(NotebooksPage).withProps({}).render()
+    helper.component(NotebooksPage).withRouter().render()
     expect(
       helper.managedApi.restNotebookController.myNotebooks
     ).toBeCalledTimes(1)

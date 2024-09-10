@@ -21,6 +21,7 @@ describe("circle show page", () => {
   it("fetch API to be called ONCE on mount", async () => {
     helper
       .component(CircleShowPage)
+      .withRouter()
       .withStorageProps({ circleId: circleNote.id })
       .render()
     expect(helper.managedApi.restCircleController.showCircle).toBeCalledWith(
@@ -32,6 +33,7 @@ describe("circle show page", () => {
   it("shows the move notebook button", async () => {
     helper
       .component(CircleShowPage)
+      .withRouter()
       .withStorageProps({ circleId: circleNote.id, user: currentUser })
       .render()
     await flushPromises()
@@ -41,6 +43,7 @@ describe("circle show page", () => {
   it("must not show the move button if not the creator", async () => {
     helper
       .component(CircleShowPage)
+      .withRouter()
       .withStorageProps({
         circleId: circleNote.id,
         user: makeMe.aUser.please(),
