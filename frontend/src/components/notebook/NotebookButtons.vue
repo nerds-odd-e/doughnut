@@ -73,9 +73,8 @@ const props = defineProps({
 })
 const shareNotebook = async () => {
   if (await popups.confirm(`Confirm to share?`)) {
-    managedApi.restNotebookController
-      .shareNotebook(props.notebook.id)
-      .then(() => router.push({ name: "notebooks" }))
+    await managedApi.restNotebookController.shareNotebook(props.notebook.id)
+    router.push({ name: "notebooks" })
   }
 }
 </script>
