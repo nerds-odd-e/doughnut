@@ -18,7 +18,7 @@ export const questionListPage = () => {
     suggestingQuestionForFineTuning(stem: string) {
       cy.findByText(stem).click()
       cy.findByRole('button', {
-        name: 'send this question for fine tuning the question generation model',
+        name: 'Send this question for fine tuning the question generation model',
       }).click()
       return SuggestQuestionForFineTuningPage()
     },

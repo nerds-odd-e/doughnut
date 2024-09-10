@@ -36,7 +36,11 @@
               @change="toggleApproval(question.id)"
             />
           </td>
-          <td>{{ question.quizQuestion.multipleChoicesQuestion.stem }}</td>
+          <td>
+            <span @click="openedQuestion=question">
+              {{ question.quizQuestion.multipleChoicesQuestion.stem }}
+            </span>
+          </td>
           <template
             v-if="question.quizQuestion.multipleChoicesQuestion.choices"
           >
@@ -56,8 +60,18 @@
     </table>
     <div v-else class="no-questions">
       <b >No questions</b>
-    </div> 
+    </div>
   </div>
+  <Modal
+    v-if="openedQuestion !== undefined"
+    @close_request="openedQuestion = undefined"
+  >
+    <template #body>
+      <QuestionManagement
+        :questionAndAnswer="openedQuestion"
+      />
+    </template>
+  </Modal>
 </template>
 
 <script setup lang="ts">
@@ -65,6 +79,7 @@ import { PropType, onMounted, ref } from "vue"
 import { Note, QuizQuestionAndAnswer } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import NoteAddQuestion from "./NoteAddQuestion.vue"
+import QuestionManagement from "./QuestionManagement.vue"
 import PopButton from "../commons/Popups/PopButton.vue"
 
 const { managedApi } = useLoadingApi()
@@ -75,6 +90,8 @@ const props = defineProps({
   },
 })
 const questions = ref<QuizQuestionAndAnswer[]>([])
+const openedQuestion = ref<QuizQuestionAndAnswer | undefined>()
+
 const fetchQuestions = async () => {
   questions.value =
     await managedApi.restQuizQuestionController.getAllQuestionByNote(

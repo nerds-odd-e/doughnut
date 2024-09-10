@@ -1,6 +1,5 @@
 @usingMockedOpenAiService
 @startWithEmptyDownloadsFolder
-@ignore
 Feature: Improve OpenAI Question Generation using User Feedback
 
   As a learner,

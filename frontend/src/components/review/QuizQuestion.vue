@@ -41,7 +41,7 @@
     />
     <div class="mark-question">
       <PopButton
-        title="send this question for fine tuning the question generation model"
+        title="Send this question for fine tuning the question generation model"
         v-if="showFinetuneButton"
       >
         <template #button_face>
