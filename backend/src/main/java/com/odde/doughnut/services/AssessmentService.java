@@ -12,7 +12,6 @@ import java.sql.Timestamp;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Objects;
 
 public class AssessmentService {
   private final ModelFactoryService modelFactoryService;
@@ -33,8 +32,8 @@ public class AssessmentService {
 
     List<QuizQuestionAndAnswer> questions =
         notes.stream()
-            .map(Note::selectRandomQuestionForANote)
-            .filter(Objects::nonNull)
+            .flatMap(
+                note -> randomizer.chooseOneRandomly(note.getQuizQuestionAndAnswers()).stream())
             .filter(QuizQuestionAndAnswer::isApproved)
             .filter(
                 (quizQuestionAndAnswer) ->
