@@ -250,21 +250,23 @@ Then(
 )
 
 Then(
-  'I suggest the displayed question {string} as a good example',
-  (questionStem: string) => {
+  'I suggest the question {string} of the note {string} as a good example',
+  (questionStem: string, noteTopic: string) => {
     start
-      .assumeQuestionPage(questionStem)
-      .suggestingThisQuestionForFineTuning()
+      .jumpToNotePage(noteTopic)
+      .openQuestionList()
+      .suggestingQuestionForFineTuning(questionStem)
       .suggestingPositiveFeedbackForFineTuning()
   }
 )
 
 Then(
-  'I suggest the displayed question {string} as a bad example',
-  (questionStem: string) => {
+  'I suggest the question {string} of the note {string} as a bad example',
+  (questionStem: string, noteTopic: string) => {
     start
-      .assumeQuestionPage(questionStem)
-      .suggestingThisQuestionForFineTuning()
+      .jumpToNotePage(noteTopic)
+      .openQuestionList()
+      .suggestingQuestionForFineTuning(questionStem)
       .suggestingNegativeFeedbackFineTuningExclusion()
   }
 )

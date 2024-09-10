@@ -1,5 +1,3 @@
-import { SuggestQuestionForFineTuningPage } from './SuggestQuestionForFineTuningPage'
-
 const assumeQuestionPage = (stem?: string) => {
   if (stem) {
     cy.findByText(stem)
@@ -21,16 +19,6 @@ const assumeQuestionPage = (stem?: string) => {
       getChoice(choice)
         .invoke('attr', 'class')
         .should('contain', `is-${correctness}`)
-    },
-
-    suggestingThisQuestionForFineTuning() {
-      question()
-        .findByRole('button', {
-          name: 'send this question for fine tuning the question generation model',
-        })
-        .click()
-
-      return SuggestQuestionForFineTuningPage()
     },
   }
 }
