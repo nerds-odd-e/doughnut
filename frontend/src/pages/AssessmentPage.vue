@@ -1,26 +1,37 @@
 <template>
   <div>
-    <h3>Assessment For {{ topicConstructor }} </h3>
+    <h3>Assessment For {{ topicConstructor }}</h3>
     <h5>Passing criteria: {{ passCriteriaPercentage }}%</h5>
     <div>
       <div v-if="errors != ''">
         {{ errors }}
       </div>
-      <QuizQuestion v-else-if="currentQuestion < quizQuestions.length" :answered-current-question="answeredCurrentQuestion"
-        :quiz-question="quizQuestions[currentQuestion]!" @answered="questionAnswered" :show-finetune-button="false" />
+      <QuizQuestion
+        v-else-if="currentQuestion < quizQuestions.length"
+        :answered-current-question="answeredCurrentQuestion"
+        :quiz-question="quizQuestions[currentQuestion]!"
+        @answered="questionAnswered"
+        :show-finetune-button="false"
+      />
       <div v-else-if="assessmentResult">
         <p>Your score: {{ correctAnswers }} / {{ quizQuestions.length }}</p>
         <div class="alert alert-success" v-if="assessmentResult?.attempt?.isPass">
           You have passed the assessment.
         </div>
-        <PopButton :disabled="!assessmentResult.isCertified" disabledTitle="This notebook does not award a certificate."
-          btn-class="btn btn-light" title="View Certificate" v-if="assessmentResult.attempt?.isPass">
-          <CertificatePopup :assessment-attempt="assessmentResult.attempt" :notebook-id="certificate?.notebook?.id">
+        <PopButton
+          :disabled="!assessmentResult.isCertified"
+          disabledTitle="This notebook does not award a certificate."
+          btn-class="btn btn-light"
+          title="View Certificate"
+          v-if="assessmentResult.attempt?.isPass"
+        >
+          <CertificatePopup
+            :assessment-attempt="assessmentResult.attempt"
+            :notebook-id="certificate?.notebook?.id"
+          >
           </CertificatePopup>
         </PopButton>
-        <div class="alert alert-danger" v-else>
-          You have not passed the assessment.
-        </div>
+        <div class="alert alert-danger" v-else>You have not passed the assessment.</div>
       </div>
     </div>
   </div>
@@ -28,13 +39,21 @@
     <button class="btn btn-danger" @click="advance">Continue</button>
     <PopButton title="Send feedback">
       <template #button_face>
-      <button class="btn btn-secondary">Send feedback</button>
+        <button class="btn btn-secondary">Send feedback</button>
       </template>
       <template #default="{ closer }">
-        <FeedbackForm @close-dialog="closer()" @submit="handleFormSubmission" :question="quizQuestions[currentQuestion]"/>
+        <FeedbackForm
+          @submitted="
+            closer();
+            handleFormSubmission();
+          "
+          :question="quizQuestions[currentQuestion]"
+        />
       </template>
     </PopButton>
-    <div v-if="formSubmitted" class="alert alert-info">Feedback received successfully</div>
+    <div v-if="formSubmitted" class="alert alert-info">
+      Feedback received successfully
+    </div>
   </div>
 </template>
 

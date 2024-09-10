@@ -24,7 +24,6 @@
     </button>
   </div>
   <TextInput
-    id="feedback-comment"
     field="comment"
     v-model="params.comment"
     placeholder="Add a comment about the question"
