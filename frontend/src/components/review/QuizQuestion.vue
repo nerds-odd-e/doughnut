@@ -1,29 +1,57 @@
 <template>
   <div class="quiz-instruction" data-test="question-section" :key="quizQuestion.id">
-    <ShowImage v-if="quizQuestion.imageWithMask" v-bind="quizQuestion.imageWithMask" :opacity="1" />
-    <div style="white-space: pre-wrap" data-test="stem" v-if="quizQuestion.multipleChoicesQuestion.stem"
-      v-html="quizQuestion.multipleChoicesQuestion.stem"></div>
+    <ShowImage
+      v-if="quizQuestion.imageWithMask"
+      v-bind="quizQuestion.imageWithMask"
+      :opacity="1"
+    />
+    <div
+      style="white-space: pre-wrap"
+      data-test="stem"
+      v-if="quizQuestion.multipleChoicesQuestion.stem"
+      v-html="quizQuestion.multipleChoicesQuestion.stem"
+    ></div>
 
-    <div v-if="
-      !quizQuestion.multipleChoicesQuestion.choices ||
-      quizQuestion.multipleChoicesQuestion.choices.length === 0
-    ">
+    <div
+      v-if="
+        !quizQuestion.multipleChoicesQuestion.choices ||
+        quizQuestion.multipleChoicesQuestion.choices.length === 0
+      "
+    >
       <form @submit.prevent.once="submitAnswer({ spellingAnswer: answer })">
-        <TextInput scope-name="review_point" field="answer" v-model="answer" placeholder="put your answer here"
-          v-focus />
+        <TextInput
+          scope-name="review_point"
+          field="answer"
+          v-model="answer"
+          placeholder="put your answer here"
+          v-focus
+        />
         <input type="submit" value="OK" class="btn btn-primary btn-lg btn-block" />
       </form>
     </div>
-    <QuizQuestionChoices v-if="quizQuestion.multipleChoicesQuestion.choices"
-      :choices="quizQuestion.multipleChoicesQuestion.choices" :correct-choice-index="correctChoiceIndex" :answered-current-question="answeredCurrentQuestion"
-      :answer-choice-index="answerChoiceIndex" :disabled="disabled" @answer="submitAnswer($event)" :assessment-current-choice-index="checkAssessmentAnsweredIndex()" />
+    <QuizQuestionChoices
+      v-if="quizQuestion.multipleChoicesQuestion.choices"
+      :choices="quizQuestion.multipleChoicesQuestion.choices"
+      :correct-choice-index="correctChoiceIndex"
+      :answered-current-question="answeredCurrentQuestion"
+      :answer-choice-index="answerChoiceIndex"
+      :disabled="disabled"
+      @answer="submitAnswer($event)"
+      :assessment-current-choice-index="checkAssessmentAnsweredIndex()"
+    />
     <div class="mark-question">
-      <PopButton title="send this question for fine tuning the question generation model" v-if="showFinetuneButton">
+      <PopButton
+        title="send this question for fine tuning the question generation model"
+        v-if="showFinetuneButton"
+      >
         <template #button_face>
           <SvgRaiseHand />
         </template>
         <template #default="{ closer }">
-          <SuggestQuestionForFineTuning :quiz-question="quizQuestion" @close-dialog="closer()" />
+          <SuggestQuestionForFineTuning
+            :quiz-question="quizQuestion"
+            @close-dialog="closer()"
+          />
         </template>
       </PopButton>
       <slot />

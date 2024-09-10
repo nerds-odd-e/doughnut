@@ -109,7 +109,7 @@ export default defineComponent({
 
 <style scoped>
 .choices {
-    list-style-type: none;
-    padding-left: 0
+  list-style-type: none;
+  padding-left: 0;
 }
 </style>
