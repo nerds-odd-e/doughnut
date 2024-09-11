@@ -29,7 +29,7 @@ public class Answer extends EntityIdentifiedByIdOnly {
   @Getter
   @Setter
   @JsonIgnore
-  QuizQuestionAndAnswer question;
+  QuizQuestion quizQuestion;
 
   @Column(name = "created_at")
   @Getter
@@ -39,13 +39,13 @@ public class Answer extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public boolean isCorrect() {
-    return question.checkAnswer(this);
+    return quizQuestion.getQuizQuestionAndAnswer().checkAnswer(this);
   }
 
   @JsonIgnore
   public String getAnswerDisplay() {
-    if (question != null && choiceIndex != null) {
-      return question.getMultipleChoicesQuestion().getChoices().get(choiceIndex);
+    if (quizQuestion != null && choiceIndex != null) {
+      return quizQuestion.getMultipleChoicesQuestion().getChoices().get(choiceIndex);
     }
     return getSpellingAnswer();
   }

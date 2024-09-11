@@ -2960,10 +2960,10 @@ components:
         id:
           type: integer
           format: int32
-        imageWithMask:
-          $ref: "#/components/schemas/ImageWithMask"
         checkSpell:
           type: boolean
+        imageWithMask:
+          $ref: "#/components/schemas/ImageWithMask"
         multipleChoicesQuestion:
           $ref: "#/components/schemas/MultipleChoicesQuestion"
     QuizQuestionAndAnswer:
@@ -3104,15 +3104,15 @@ components:
           format: int32
         headNote:
           $ref: "#/components/schemas/Note"
+        certifiable:
+          type: boolean
         notebookSettings:
           $ref: "#/components/schemas/NotebookSettings"
+        creatorId:
+          type: string
         updated_at:
           type: string
           format: date-time
-        certifiable:
-          type: boolean
-        creatorId:
-          type: string
     NotebookSettings:
       type: object
       properties:

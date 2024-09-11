@@ -57,7 +57,7 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
 
   private void assertReadAuthorizationAnswer(Answer object)
       throws UnexpectedNoAccessRightException {
-    assertReadAuthorizationQuizQuestion(object.getQuestion());
+    assertReadAuthorizationQuizQuestion(object.getQuizQuestion().getQuizQuestionAndAnswer());
   }
 
   private void assertReadAuthorizationQuizQuestion(QuizQuestionAndAnswer question)

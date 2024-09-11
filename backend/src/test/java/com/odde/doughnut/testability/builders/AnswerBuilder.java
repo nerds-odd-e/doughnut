@@ -14,15 +14,17 @@ public class AnswerBuilder extends EntityBuilder<Answer> {
   @Override
   protected void beforeCreate(boolean needPersist) {
     if (needPersist) {
-      if (entity.getQuestion().getId() == null) {
-        makeMe.modelFactoryService.save(entity.getQuestion());
+      if (entity.getQuizQuestion().getId() == null) {
+        makeMe.modelFactoryService.save(entity.getQuizQuestion());
       }
     }
   }
 
   public AnswerBuilder withValidQuestion(QuizQuestionFactory quizQuestionFactory) {
     try {
-      entity.setQuestion(quizQuestionFactory.buildValidQuizQuestion());
+      QuizQuestionAndAnswer quizQuestionAndAnswer = quizQuestionFactory.buildValidQuizQuestion();
+      quizQuestionAndAnswer.getQuizQuestion().setQuizQuestionAndAnswer(quizQuestionAndAnswer);
+      entity.setQuizQuestion(quizQuestionAndAnswer.getQuizQuestion());
     } catch (QuizQuestionNotPossibleException e) {
       throw new RuntimeException(
           "Failed to generate a question of type "
@@ -34,12 +36,13 @@ public class AnswerBuilder extends EntityBuilder<Answer> {
 
   public AnswerBuilder ofSpellingQuestion(Note note) {
     QuizQuestionBuilder quizQuestionBuilder = makeMe.aQuestion();
-    entity.setQuestion(quizQuestionBuilder.approvedSpellingQuestionOf(note).inMemoryPlease());
+    entity.setQuizQuestion(
+        quizQuestionBuilder.approvedSpellingQuestionOf(note).inMemoryPlease().getQuizQuestion());
     return this;
   }
 
   public AnswerBuilder forQuestion(QuizQuestionAndAnswer quizQuestionAndAnswer) {
-    entity.setQuestion(quizQuestionAndAnswer);
+    entity.setQuizQuestion(quizQuestionAndAnswer.getQuizQuestion());
     return this;
   }
 

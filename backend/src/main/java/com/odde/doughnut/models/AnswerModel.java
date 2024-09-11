@@ -30,7 +30,7 @@ public class AnswerModel {
   }
 
   private QuizQuestionAndAnswer getQuestion() {
-    return answer.getQuestion();
+    return answer.getQuizQuestion().getQuizQuestionAndAnswer();
   }
 
   public void makeAnswerToQuestion(Timestamp currentUTCTimestamp, User user) {

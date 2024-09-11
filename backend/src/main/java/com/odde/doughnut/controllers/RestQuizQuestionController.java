@@ -93,7 +93,7 @@ class RestQuizQuestionController {
       @Valid @RequestBody AnswerDTO answerDTO) {
     currentUser.assertLoggedIn();
     Answer answer = new Answer();
-    answer.setQuestion(quizQuestion.getQuizQuestionAndAnswer());
+    answer.setQuizQuestion(quizQuestion);
     answer.setFromDTO(answerDTO);
     AnswerModel answerModel = modelFactoryService.toAnswerModel(answer);
     answerModel.makeAnswerToQuestion(
