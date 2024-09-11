@@ -158,4 +158,8 @@ public class MakeMe extends MakeMeWithoutDB {
   public UserAssistantThreadBuilder aUserAssistantThread(String threadId) {
     return new UserAssistantThreadBuilder(this, threadId);
   }
+
+  public ConversationBuilder aConversation() {
+    return new ConversationBuilder(this);
+  }
 }

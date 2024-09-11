@@ -24,7 +24,6 @@ import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.odde.doughnut.testability.TestabilitySettings;
-import com.odde.doughnut.testability.builders.PredefinedQuestionBuilder;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import java.sql.Timestamp;
@@ -45,7 +44,7 @@ import org.springframework.web.server.ResponseStatusException;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class RestPredefinedQuestionControllerTests {
+class RestQuizQuestionControllerTests {
   @Mock OpenAiApi openAiApi;
   @Autowired ModelFactoryService modelFactoryService;
   @Autowired MakeMe makeMe;
@@ -72,7 +71,7 @@ class RestPredefinedQuestionControllerTests {
   @Nested
   class answer {
     ReviewPoint reviewPoint;
-    PredefinedQuestion predefinedQuestion;
+    QuizQuestion quizQuestion;
     AnswerDTO answerDTO = new AnswerDTO();
 
     @BeforeEach
@@ -84,17 +83,14 @@ class RestPredefinedQuestionControllerTests {
               .by(currentUser)
               .forgettingCurveAndNextReviewAt(200)
               .please();
-      PredefinedQuestionBuilder predefinedQuestionBuilder = makeMe.aPredefinedQuestion();
-      predefinedQuestion =
-          predefinedQuestionBuilder.approvedSpellingQuestionOf(answerNote).please();
+      quizQuestion = makeMe.aQuizQuestion().approvedSpellingQuestionOf(answerNote).please();
       answerDTO.setSpellingAnswer(answerNote.getTopicConstructor());
     }
 
     @Test
     void shouldValidateTheAnswerAndUpdateReviewPoint() {
       Integer oldRepetitionCount = reviewPoint.getRepetitionCount();
-      AnsweredQuestion answerResult =
-          controller.answerQuiz(predefinedQuestion.getQuizQuestion(), answerDTO);
+      AnsweredQuestion answerResult = controller.answerQuiz(quizQuestion, answerDTO);
       assertTrue(answerResult.correct);
       assertThat(reviewPoint.getRepetitionCount(), greaterThan(oldRepetitionCount));
     }
@@ -103,7 +99,7 @@ class RestPredefinedQuestionControllerTests {
     void shouldNoteIncreaseIndexIfRepeatImmediately() {
       testabilitySettings.timeTravelTo(reviewPoint.getLastReviewedAt());
       Integer oldForgettingCurveIndex = reviewPoint.getForgettingCurveIndex();
-      controller.answerQuiz(predefinedQuestion.getQuizQuestion(), answerDTO);
+      controller.answerQuiz(quizQuestion, answerDTO);
       assertThat(reviewPoint.getForgettingCurveIndex(), equalTo(oldForgettingCurveIndex));
     }
 
@@ -111,7 +107,7 @@ class RestPredefinedQuestionControllerTests {
     void shouldIncreaseTheIndex() {
       testabilitySettings.timeTravelTo(reviewPoint.getNextReviewAt());
       Integer oldForgettingCurveIndex = reviewPoint.getForgettingCurveIndex();
-      controller.answerQuiz(predefinedQuestion.getQuizQuestion(), answerDTO);
+      controller.answerQuiz(quizQuestion, answerDTO);
       assertThat(reviewPoint.getForgettingCurveIndex(), greaterThan(oldForgettingCurveIndex));
       assertThat(
           reviewPoint.getLastReviewedAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
@@ -122,16 +118,15 @@ class RestPredefinedQuestionControllerTests {
       AnswerDTO answer = new AnswerDTO();
       assertThrows(
           ResponseStatusException.class,
-          () -> nullUserController().answerQuiz(predefinedQuestion.getQuizQuestion(), answer));
+          () -> nullUserController().answerQuiz(quizQuestion, answer));
     }
 
     @Nested
     class WrongAnswer {
       @BeforeEach
       void setup() {
-        PredefinedQuestionBuilder predefinedQuestionBuilder = makeMe.aPredefinedQuestion();
-        predefinedQuestion =
-            predefinedQuestionBuilder.approvedSpellingQuestionOf(reviewPoint.getNote()).please();
+        quizQuestion =
+            makeMe.aQuizQuestion().approvedSpellingQuestionOf(reviewPoint.getNote()).please();
         answerDTO.setSpellingAnswer("wrong");
       }
 
@@ -139,8 +134,7 @@ class RestPredefinedQuestionControllerTests {
       void shouldValidateTheWrongAnswer() {
         testabilitySettings.timeTravelTo(reviewPoint.getNextReviewAt());
         Integer oldRepetitionCount = reviewPoint.getRepetitionCount();
-        AnsweredQuestion answerResult =
-            controller.answerQuiz(predefinedQuestion.getQuizQuestion(), answerDTO);
+        AnsweredQuestion answerResult = controller.answerQuiz(quizQuestion, answerDTO);
         assertFalse(answerResult.correct);
         assertThat(reviewPoint.getRepetitionCount(), greaterThan(oldRepetitionCount));
       }
@@ -150,14 +144,14 @@ class RestPredefinedQuestionControllerTests {
         testabilitySettings.timeTravelTo(reviewPoint.getNextReviewAt());
         Timestamp lastReviewedAt = reviewPoint.getLastReviewedAt();
         Integer oldForgettingCurveIndex = reviewPoint.getForgettingCurveIndex();
-        controller.answerQuiz(predefinedQuestion.getQuizQuestion(), answerDTO);
+        controller.answerQuiz(quizQuestion, answerDTO);
         assertThat(reviewPoint.getForgettingCurveIndex(), lessThan(oldForgettingCurveIndex));
         assertThat(reviewPoint.getLastReviewedAt(), equalTo(lastReviewedAt));
       }
 
       @Test
       void shouldRepeatTheNextDay() {
-        controller.answerQuiz(predefinedQuestion.getQuizQuestion(), answerDTO);
+        controller.answerQuiz(quizQuestion, answerDTO);
         assertThat(
             reviewPoint.getNextReviewAt(),
             lessThan(
@@ -331,14 +325,14 @@ class RestPredefinedQuestionControllerTests {
 
   @Nested
   class RegenerateQuestion {
-    PredefinedQuestion predefinedQuestion;
+    QuizQuestion quizQuestion;
     Note note;
 
     @BeforeEach
     void setUp() {
       note = makeMe.aNote().please();
 
-      predefinedQuestion = makeMe.aPredefinedQuestion().approvedSpellingQuestionOf(note).please();
+      quizQuestion = makeMe.aQuizQuestion().approvedSpellingQuestionOf(note).please();
     }
 
     @Test
@@ -352,7 +346,7 @@ class RestPredefinedQuestionControllerTests {
                     makeMe.modelFactoryService,
                     makeMe.aNullUserModelPlease(),
                     testabilitySettings);
-            restAiController.regenerate(predefinedQuestion.getQuizQuestion());
+            restAiController.regenerate(quizQuestion);
           });
     }
 
@@ -362,7 +356,7 @@ class RestPredefinedQuestionControllerTests {
           makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
 
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(jsonQuestion, "");
-      QuizQuestion quizQuestion = controller.regenerate(this.predefinedQuestion.getQuizQuestion());
+      QuizQuestion quizQuestion = controller.regenerate(this.quizQuestion);
 
       Assertions.assertThat(quizQuestion.getMultipleChoicesQuestion().getStem())
           .contains("What is the first color in the rainbow?");
@@ -371,7 +365,7 @@ class RestPredefinedQuestionControllerTests {
 
   @Nested
   class Contest {
-    PredefinedQuestion quizQuestion;
+    QuizQuestion quizQuestion;
     QuestionEvaluation questionEvaluation = new QuestionEvaluation();
 
     @BeforeEach
@@ -383,7 +377,7 @@ class RestPredefinedQuestionControllerTests {
       MCQWithAnswer aiGeneratedQuestion = makeMe.aMCQWithAnswer().please();
       Note note = makeMe.aNote().please();
       quizQuestion =
-          makeMe.aPredefinedQuestion().ofAIGeneratedQuestion(aiGeneratedQuestion, note).please();
+          makeMe.aQuizQuestion().ofAIGeneratedQuestion(aiGeneratedQuestion, note).please();
     }
 
     @Test
@@ -397,14 +391,14 @@ class RestPredefinedQuestionControllerTests {
                     makeMe.modelFactoryService,
                     makeMe.aNullUserModelPlease(),
                     testabilitySettings);
-            restAiController.contest(quizQuestion.getQuizQuestion());
+            restAiController.contest(quizQuestion);
           });
     }
 
     @Test
     void rejected() {
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(questionEvaluation, "");
-      QuizQuestionContestResult contest = controller.contest(quizQuestion.getQuizQuestion());
+      QuizQuestionContestResult contest = controller.contest(quizQuestion);
       assertTrue(contest.rejected);
     }
 
@@ -415,7 +409,7 @@ class RestPredefinedQuestionControllerTests {
       globalSettingsService
           .globalSettingEvaluation()
           .setKeyValue(makeMe.aTimestamp().please(), "gpt-new");
-      controller.contest(quizQuestion.getQuizQuestion());
+      controller.contest(quizQuestion);
       ArgumentCaptor<ChatCompletionRequest> argumentCaptor =
           ArgumentCaptor.forClass(ChatCompletionRequest.class);
       verify(openAiApi, times(1)).createChatCompletion(argumentCaptor.capture());
@@ -426,7 +420,7 @@ class RestPredefinedQuestionControllerTests {
     void acceptTheContest() {
       questionEvaluation.feasibleQuestion = false;
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(questionEvaluation, "");
-      QuizQuestionContestResult contest = controller.contest(quizQuestion.getQuizQuestion());
+      QuizQuestionContestResult contest = controller.contest(quizQuestion);
       assertFalse(contest.rejected);
     }
   }
