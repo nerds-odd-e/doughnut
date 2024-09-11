@@ -3077,18 +3077,15 @@ components:
           $ref: "#/components/schemas/Note"
         notebookSettings:
           $ref: "#/components/schemas/NotebookSettings"
+        updated_at:
+          type: string
+          format: date-time
         approvalStatus:
           type: string
           enum:
           - NOT_APPROVED
           - PENDING
           - APPROVED
-        lastApprovalTime:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
         creatorId:
           type: string
     NotebookSettings:

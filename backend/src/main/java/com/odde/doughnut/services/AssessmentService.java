@@ -38,12 +38,6 @@ public class AssessmentService {
                                 .filter(QuizQuestionAndAnswer::isApproved)
                                 .toList())
                         .stream())
-            .filter(
-                (quizQuestionAndAnswer) ->
-                    notebook.getLastApprovalTime() == null
-                        || quizQuestionAndAnswer
-                            .getCreatedAt()
-                            .before(notebook.getLastApprovalTime()))
             .toList();
 
     Integer numberOfQuestion = notebook.getNotebookSettings().getNumberOfQuestionsInAssessment();

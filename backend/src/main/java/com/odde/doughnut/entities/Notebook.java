@@ -61,27 +61,15 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @Setter
   private NotebookCertificateApproval notebookCertificateApproval;
 
-  @Column(name = "approval_status")
-  @Enumerated(EnumType.STRING)
-  private ApprovalStatus approvalStatus = ApprovalStatus.NOT_APPROVED;
-
   public ApprovalStatus getApprovalStatus() {
-    if (approvalStatus == ApprovalStatus.APPROVED) {
-      return ApprovalStatus.APPROVED;
-    }
     if (notebookCertificateApproval != null) {
       if (notebookCertificateApproval.getLastApprovalTime() != null) {
         return ApprovalStatus.APPROVED;
       }
       return ApprovalStatus.PENDING;
     }
-    return approvalStatus;
+    return ApprovalStatus.NOT_APPROVED;
   }
-
-  @Column(name = "last_approval_time")
-  @Getter
-  @Setter
-  private Timestamp lastApprovalTime;
 
   @Column(name = "updated_at")
   @Getter

@@ -8,9 +8,8 @@ export type Notebook = {
     id: number;
     headNote: Note;
     notebookSettings: NotebookSettings;
-    approvalStatus?: Notebook.approvalStatus;
-    lastApprovalTime?: string;
     updated_at: string;
+    approvalStatus?: Notebook.approvalStatus;
     creatorId?: string;
 };
 export namespace Notebook {
