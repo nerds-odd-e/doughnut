@@ -57,6 +57,7 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   private List<Subscription> subscriptions;
 
   @OneToOne(mappedBy = "notebook")
+  @Getter
   @JsonIgnore
   private NotebookCertificateApproval notebookCertificateApproval;
 

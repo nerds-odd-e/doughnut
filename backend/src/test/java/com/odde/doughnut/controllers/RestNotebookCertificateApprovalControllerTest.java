@@ -1,8 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.entities.*;
@@ -40,6 +39,35 @@ class RestNotebookCertificateApprovalControllerTest {
   }
 
   @Nested
+  class getNotebookApproval {
+    @Test
+    void shouldNotBeAbleToGetApprovalForNotebookThatBelongsToOtherUser() {
+      User anotherUser = makeMe.aUser().please();
+      Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
+      assertThrows(
+        UnexpectedNoAccessRightException.class,
+        () -> controller.getApprovalForNotebook(note.getNotebook()));
+    }
+
+    @Test
+    void approvalStatusShouldBeNullIfNotExist()
+      throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().creatorAndOwner(userModel).please();
+      NotebookCertificateApproval approvalForNotebook = controller.getApprovalForNotebook(note.getNotebook());
+      assertThat(approvalForNotebook, nullValue());
+    }
+
+    @Test
+    void success()
+      throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().creatorAndOwner(userModel).please();
+      makeMe.modelFactoryService.notebookService(note.getNotebook()).requestNotebookApproval();
+      makeMe.refresh(note.getNotebook());
+      NotebookCertificateApproval approvalForNotebook = controller.getApprovalForNotebook(note.getNotebook());
+      assertThat(approvalForNotebook.getNotebook(), equalTo(note.getNotebook()));
+    }
+  }
+  @Nested
   class requestNotebookApproval {
     @Test
     void shouldNotBeAbleToRequestApprovalForNotebookThatBelongsToOtherUser() {
@@ -47,14 +75,14 @@ class RestNotebookCertificateApprovalControllerTest {
       Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
       assertThrows(
           UnexpectedNoAccessRightException.class,
-          () -> controller.requestNotebookApproval(note.getNotebook()));
+          () -> controller.requestApprovalForNotebook(note.getNotebook()));
     }
 
     @Test
     void approvalStatusShouldBePendingAfterRequestingApproval()
         throws UnexpectedNoAccessRightException {
       Note note = makeMe.aNote().creatorAndOwner(userModel).please();
-      controller.requestNotebookApproval(note.getNotebook());
+      controller.requestApprovalForNotebook(note.getNotebook());
       makeMe.refresh(note.getNotebook());
       assertThat(note.getNotebook().getApprovalStatus(), equalTo(ApprovalStatus.PENDING));
     }
@@ -78,7 +106,7 @@ class RestNotebookCertificateApprovalControllerTest {
 
     @Test
     void shouldReturnPendingRequestNotebooks() throws UnexpectedNoAccessRightException {
-      var result = controller.getAllPendingRequestNotebooks();
+      var result = controller.getAllPendingRequest();
       assertThat(result, hasSize(1));
     }
 
@@ -86,13 +114,13 @@ class RestNotebookCertificateApprovalControllerTest {
     void shouldNotReturnApprovedNotebooks() throws UnexpectedNoAccessRightException {
       approval.approve(makeMe.aTimestamp().please());
       makeMe.refresh(notebook);
-      var result = controller.getAllPendingRequestNotebooks();
+      var result = controller.getAllPendingRequest();
       assertThat(result, hasSize(0));
     }
 
     @Test
     void shouldApproveNoteBook() throws UnexpectedNoAccessRightException {
-      Notebook result = controller.approveNoteBook(notebook);
+      Notebook result = controller.approve(approval.getApproval()).getNotebook();
       assertThat(result.getApprovalStatus(), equalTo(ApprovalStatus.APPROVED));
     }
   }

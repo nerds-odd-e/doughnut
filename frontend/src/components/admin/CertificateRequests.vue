@@ -18,7 +18,7 @@
         <button
           class="btn btn-primary"
           style="background-color: green; border-color: green;"
-          @click="approveNoteBook(approval.notebook.id)"
+          @click="approveNoteBook(approval.id)"
         >
         Approve
         </button>
@@ -45,13 +45,13 @@ const approvals = ref<NotebookCertificateApproval[] | undefined>(undefined)
 
 const fetchNotebooks = async () => {
   approvals.value =
-    await managedApi.restNotebookCertificateApprovalController.getAllPendingRequestNotebooks()
+    await managedApi.restNotebookCertificateApprovalController.getAllPendingRequest()
 }
 
-const approveNoteBook = async (notebookId: number) => {
+const approveNoteBook = async (approvalId: number) => {
   if (await popups.confirm(`Are you sure you want to approve this notebook?`)) {
-    await managedApi.restNotebookCertificateApprovalController.approveNoteBook(
-      notebookId
+    await managedApi.restNotebookCertificateApprovalController.approve(
+      approvalId
     )
     fetchNotebooks()
   }

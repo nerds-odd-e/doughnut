@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/notebooks")
+@RequestMapping("/api/notebook_certificate_approvals")
 class RestNotebookCertificateApprovalController {
   private final ModelFactoryService modelFactoryService;
   private UserModel currentUser;
@@ -29,37 +29,37 @@ class RestNotebookCertificateApprovalController {
     this.testabilitySettings = testabilitySettings;
   }
 
-  @PostMapping(value = "/{notebook}/request-approval")
+  @GetMapping("/for-notebook/{notebook}")
+  public NotebookCertificateApproval getApprovalForNotebook(      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
+    throws UnexpectedNoAccessRightException {
+    currentUser.assertAuthorization(notebook);
+    return notebook.getNotebookCertificateApproval();
+  }
+
+  @PostMapping(value = "/request-approval/{notebook}")
   @Transactional
-  public Notebook requestNotebookApproval(
+  public NotebookCertificateApproval requestApprovalForNotebook(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(notebook);
-    modelFactoryService.notebookService(notebook).requestNotebookApproval();
-    return notebook;
+    return modelFactoryService.notebookService(notebook).requestNotebookApproval().getApproval();
   }
 
-  @GetMapping("/getAllPendingRequestNoteBooks")
-  public List<NotebookCertificateApproval> getAllPendingRequestNotebooks()
+  @GetMapping("/get-all-pending-request")
+  public List<NotebookCertificateApproval> getAllPendingRequest()
       throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
     return modelFactoryService.notebookCertificateApprovalRepository.findByLastApprovalTimeIsNull();
   }
 
-  @PostMapping(value = "/{notebook}/approve")
+  @PostMapping(value = "/{notebookCertificateApproval}/approve")
   @Transactional
-  public Notebook approveNoteBook(
-      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
+  public NotebookCertificateApproval approve(
+      @PathVariable("notebookCertificateApproval") @Schema(type = "integer")
+          NotebookCertificateApproval approval)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
-    Iterable<NotebookCertificateApproval> all =
-        modelFactoryService.notebookCertificateApprovalRepository.findAll();
-    for (NotebookCertificateApproval approval : all) {
-      if (approval.getNotebook().getId().equals(notebook.getId())) {
-        approval.setLastApprovalTime(testabilitySettings.getCurrentUTCTimestamp());
-        modelFactoryService.save(notebook);
-      }
-    }
-    return notebook;
+    approval.setLastApprovalTime(testabilitySettings.getCurrentUTCTimestamp());
+    return approval;
   }
 }

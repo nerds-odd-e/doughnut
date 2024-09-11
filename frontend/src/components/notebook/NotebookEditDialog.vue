@@ -108,7 +108,7 @@ const processForm = () => {
 }
 const requestNotebookApproval = () => {
   managedApi.restNotebookCertificateApprovalController
-    .requestNotebookApproval(props.notebook.id)
+    .requestApprovalForNotebook(props.notebook.id)
     .then(() => {
       router.go(0)
     })

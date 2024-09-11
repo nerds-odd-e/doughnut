@@ -2,25 +2,24 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { Notebook } from '../models/Notebook';
 import type { NotebookCertificateApproval } from '../models/NotebookCertificateApproval';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestNotebookCertificateApprovalControllerService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
-     * @param notebook
-     * @returns Notebook OK
+     * @param notebookCertificateApproval
+     * @returns NotebookCertificateApproval OK
      * @throws ApiError
      */
-    public requestNotebookApproval(
-        notebook: number,
-    ): CancelablePromise<Notebook> {
+    public approve(
+        notebookCertificateApproval: number,
+    ): CancelablePromise<NotebookCertificateApproval> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/notebooks/{notebook}/request-approval',
+            url: '/api/notebook_certificate_approvals/{notebookCertificateApproval}/approve',
             path: {
-                'notebook': notebook,
+                'notebookCertificateApproval': notebookCertificateApproval,
             },
             errors: {
                 500: `Internal Server Error`,
@@ -29,15 +28,15 @@ export class RestNotebookCertificateApprovalControllerService {
     }
     /**
      * @param notebook
-     * @returns Notebook OK
+     * @returns NotebookCertificateApproval OK
      * @throws ApiError
      */
-    public approveNoteBook(
+    public requestApprovalForNotebook(
         notebook: number,
-    ): CancelablePromise<Notebook> {
+    ): CancelablePromise<NotebookCertificateApproval> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/notebooks/{notebook}/approve',
+            url: '/api/notebook_certificate_approvals/request-approval/{notebook}',
             path: {
                 'notebook': notebook,
             },
@@ -50,10 +49,29 @@ export class RestNotebookCertificateApprovalControllerService {
      * @returns NotebookCertificateApproval OK
      * @throws ApiError
      */
-    public getAllPendingRequestNotebooks(): CancelablePromise<Array<NotebookCertificateApproval>> {
+    public getAllPendingRequest(): CancelablePromise<Array<NotebookCertificateApproval>> {
         return this.httpRequest.request({
             method: 'GET',
-            url: '/api/notebooks/getAllPendingRequestNoteBooks',
+            url: '/api/notebook_certificate_approvals/get-all-pending-request',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param notebook
+     * @returns NotebookCertificateApproval OK
+     * @throws ApiError
+     */
+    public getApprovalForNotebook(
+        notebook: number,
+    ): CancelablePromise<NotebookCertificateApproval> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/notebook_certificate_approvals/for-notebook/{notebook}',
+            path: {
+                'notebook': notebook,
+            },
             errors: {
                 500: `Internal Server Error`,
             },

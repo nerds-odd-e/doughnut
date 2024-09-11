@@ -20,4 +20,8 @@ public class NotebookCertificateApprovalService {
     modelFactoryService.save(certificateApproval);
     return certificateApproval;
   }
+
+  public NotebookCertificateApproval getApproval() {
+    return certificateApproval;
+  }
 }
