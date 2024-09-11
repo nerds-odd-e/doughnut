@@ -8,12 +8,8 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 public interface NoteRepository extends CrudRepository<Note, Integer> {
-
   String selectFromNote = "SELECT n FROM Note n";
   String searchForTopicLike = " WHERE n.topicConstructor LIKE :pattern AND n.deletedAt IS NULL ";
-
-  @Query(value = selectFromNote + " WHERE n.id IN (:ids)")
-  Stream<Note> findAllByIds(List<Integer> ids);
 
   @Query(value = selectFromNote + " where n.topicConstructor = :key")
   Note findFirstByTopicConstructor(@Param("key") String key);

@@ -3102,10 +3102,10 @@ components:
         updated_at:
           type: string
           format: date-time
-        creatorId:
-          type: string
         certifiable:
           type: boolean
+        creatorId:
+          type: string
     NotebookSettings:
       type: object
       properties:
@@ -3472,6 +3472,7 @@ components:
     AssessmentAttempt:
       required:
       - id
+      - notebookId
       - submittedAt
       type: object
       properties:

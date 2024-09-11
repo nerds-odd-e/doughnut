@@ -38,6 +38,7 @@ public class AssessmentAttempt extends EntityIdentifiedByIdOnly {
 
   @Transient private List<QuizQuestion> quizQuestions;
 
+  @NotNull
   public Integer getNotebookId() {
     return getNotebook().getId();
   }

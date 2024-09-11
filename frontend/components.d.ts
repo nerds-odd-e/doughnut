@@ -13,6 +13,8 @@ declare module 'vue' {
     AnswerResult: typeof import('./src/components/review/AnswerResult.vue')['default']
     ApiStatus: typeof import('./src/components/toolbars/ApiStatus.vue')['default']
     Arrow: typeof import('./src/components/svgs/link_types/Arrow.vue')['default']
+    Assessment: typeof import('./src/components/assessment/Assessment.vue')['default']
+    AssessmentPage: typeof import('./src/components/assessment/AssessmentPage.vue')['default']
     BasicBreadcrumb: typeof import('./src/components/commons/BasicBreadcrumb.vue')['default']
     BazaarNotebookButtons: typeof import('./src/components/bazaar/BazaarNotebookButtons.vue')['default']
     BrandBar: typeof import('./src/components/toolbars/BrandBar.vue')['default']

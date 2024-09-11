@@ -19,6 +19,7 @@ describe("assessment page", () => {
     const notebook = makeMe.aNotebook.please()
     const quizQuestion = makeMe.aQuizQuestion.please()
     const assessmentAttempt = makeMe.anAssessmentAttempt
+      .forNotebook(notebook)
       .withQuestions([quizQuestion])
       .please()
     beforeEach(() => {
@@ -71,6 +72,7 @@ describe("assessment page", () => {
       correct: true,
     }
     const assessmentAttempt = makeMe.anAssessmentAttempt
+      .forNotebook(notebook)
       .withQuestions([quizQuestion1, quizQuestion2])
       .please()
     beforeEach(() => {

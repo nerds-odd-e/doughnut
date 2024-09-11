@@ -48,4 +48,4 @@ Feature: Conducting assessment
   Scenario: Must login to generate assessment
     Given I haven't login
     When I begin the assessment from the "Countries" notebook in the bazaar
-    Then I should see message that says "Please login first"
+    Then I should see message that says "You need to be logged in to start an assessment."

@@ -9,7 +9,7 @@ export type Notebook = {
     headNote: Note;
     notebookSettings: NotebookSettings;
     updated_at: string;
-    creatorId?: string;
     certifiable?: boolean;
+    creatorId?: string;
 };
 

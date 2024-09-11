@@ -11,6 +11,6 @@ export type AssessmentAttempt = {
     answersTotal?: number;
     answersCorrect?: number;
     quizQuestions?: Array<QuizQuestion>;
-    notebookId?: number;
+    notebookId: number;
 };
 
