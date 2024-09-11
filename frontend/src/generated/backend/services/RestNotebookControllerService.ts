@@ -4,7 +4,6 @@
 /* eslint-disable */
 import type { Note } from '../models/Note';
 import type { Notebook } from '../models/Notebook';
-import type { NotebookCertificateApproval } from '../models/NotebookCertificateApproval';
 import type { NotebookSettings } from '../models/NotebookSettings';
 import type { NotebooksViewedByUser } from '../models/NotebooksViewedByUser';
 import type { NoteBrief } from '../models/NoteBrief';
@@ -67,44 +66,6 @@ export class RestNotebookControllerService {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/notebooks/{notebook}/share',
-            path: {
-                'notebook': notebook,
-            },
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * @param notebook
-     * @returns Notebook OK
-     * @throws ApiError
-     */
-    public requestNotebookApproval(
-        notebook: number,
-    ): CancelablePromise<Notebook> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/api/notebooks/{notebook}/request-approval',
-            path: {
-                'notebook': notebook,
-            },
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * @param notebook
-     * @returns Notebook OK
-     * @throws ApiError
-     */
-    public approveNoteBook(
-        notebook: number,
-    ): CancelablePromise<Notebook> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/api/notebooks/{notebook}/approve',
             path: {
                 'notebook': notebook,
             },
@@ -199,19 +160,6 @@ export class RestNotebookControllerService {
             path: {
                 'notebook': notebook,
             },
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * @returns NotebookCertificateApproval OK
-     * @throws ApiError
-     */
-    public getAllPendingRequestNotebooks(): CancelablePromise<Array<NotebookCertificateApproval>> {
-        return this.httpRequest.request({
-            method: 'GET',
-            url: '/api/notebooks/getAllPendingRequestNoteBooks',
             errors: {
                 500: `Internal Server Error`,
             },

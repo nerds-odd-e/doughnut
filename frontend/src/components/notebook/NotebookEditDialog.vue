@@ -107,7 +107,7 @@ const processForm = () => {
     .catch((err) => (errors.value = err))
 }
 const requestNotebookApproval = () => {
-  managedApi.restNotebookController
+  managedApi.restNotebookCertificateApprovalController
     .requestNotebookApproval(props.notebook.id)
     .then(() => {
       router.go(0)

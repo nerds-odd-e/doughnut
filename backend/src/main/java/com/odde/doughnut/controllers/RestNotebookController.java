@@ -90,16 +90,6 @@ class RestNotebookController {
     return notebook;
   }
 
-  @PostMapping(value = "/{notebook}/request-approval")
-  @Transactional
-  public Notebook requestNotebookApproval(
-      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
-      throws UnexpectedNoAccessRightException {
-    currentUser.assertAuthorization(notebook);
-    modelFactoryService.notebookService(notebook).requestNotebookApproval();
-    return notebook;
-  }
-
   @PatchMapping(value = "/{notebook}/move-to-circle/{circle}")
   @Transactional
   public Notebook moveToCircle(
@@ -127,29 +117,5 @@ class RestNotebookController {
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(notebook);
     return notebook.getNotes();
-  }
-
-  @GetMapping("/getAllPendingRequestNoteBooks")
-  public List<NotebookCertificateApproval> getAllPendingRequestNotebooks()
-      throws UnexpectedNoAccessRightException {
-    currentUser.assertAdminAuthorization();
-    return modelFactoryService.notebookCertificateApprovalRepository.findByLastApprovalTimeIsNull();
-  }
-
-  @PostMapping(value = "/{notebook}/approve")
-  @Transactional
-  public Notebook approveNoteBook(
-      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
-      throws UnexpectedNoAccessRightException {
-    currentUser.assertAdminAuthorization();
-    Iterable<NotebookCertificateApproval> all =
-        modelFactoryService.notebookCertificateApprovalRepository.findAll();
-    for (NotebookCertificateApproval approval : all) {
-      if (approval.getNotebook().getId().equals(notebook.getId())) {
-        approval.setLastApprovalTime(testabilitySettings.getCurrentUTCTimestamp());
-        modelFactoryService.save(notebook);
-      }
-    }
-    return notebook;
   }
 }

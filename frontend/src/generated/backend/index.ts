@@ -122,6 +122,7 @@ export { RestFineTuningDataControllerService } from './services/RestFineTuningDa
 export { RestGlobalSettingsControllerService } from './services/RestGlobalSettingsControllerService';
 export { RestHealthCheckControllerService } from './services/RestHealthCheckControllerService';
 export { RestLinkControllerService } from './services/RestLinkControllerService';
+export { RestNotebookCertificateApprovalControllerService } from './services/RestNotebookCertificateApprovalControllerService';
 export { RestNotebookControllerService } from './services/RestNotebookControllerService';
 export { RestNoteControllerService } from './services/RestNoteControllerService';
 export { RestQuizQuestionControllerService } from './services/RestQuizQuestionControllerService';

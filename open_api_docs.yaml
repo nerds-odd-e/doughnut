@@ -1211,7 +1211,7 @@ paths:
   /api/notebooks/{notebook}/request-approval:
     post:
       tags:
-      - rest-notebook-controller
+      - rest-notebook-certificate-approval-controller
       operationId: requestNotebookApproval
       parameters:
       - name: notebook
@@ -1235,7 +1235,7 @@ paths:
   /api/notebooks/{notebook}/approve:
     post:
       tags:
-      - rest-notebook-controller
+      - rest-notebook-certificate-approval-controller
       operationId: approveNoteBook
       parameters:
       - name: notebook
@@ -2496,7 +2496,7 @@ paths:
   /api/notebooks/getAllPendingRequestNoteBooks:
     get:
       tags:
-      - rest-notebook-controller
+      - rest-notebook-certificate-approval-controller
       operationId: getAllPendingRequestNotebooks
       responses:
         "500":

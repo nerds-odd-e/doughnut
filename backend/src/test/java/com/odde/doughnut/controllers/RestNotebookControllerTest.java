@@ -10,7 +10,6 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.NotebookCertificateApprovalService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.QuizQuestionBuilder;
@@ -107,27 +106,6 @@ class RestNotebookControllerTest {
   }
 
   @Nested
-  class requestNotebookApproval {
-    @Test
-    void shouldNotBeAbleToRequestApprovalForNotebookThatBelongsToOtherUser() {
-      User anotherUser = makeMe.aUser().please();
-      Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
-      assertThrows(
-          UnexpectedNoAccessRightException.class,
-          () -> controller.requestNotebookApproval(note.getNotebook()));
-    }
-
-    @Test
-    void approvalStatusShouldBePendingAfterRequestingApproval()
-        throws UnexpectedNoAccessRightException {
-      Note note = makeMe.aNote().creatorAndOwner(userModel).please();
-      controller.requestNotebookApproval(note.getNotebook());
-      makeMe.refresh(note.getNotebook());
-      assertThat(note.getNotebook().getApprovalStatus(), equalTo(ApprovalStatus.PENDING));
-    }
-  }
-
-  @Nested
   class DownloadNotebookDump {
     private Notebook notebook;
 
@@ -195,42 +173,6 @@ class RestNotebookControllerTest {
       quizQuestionBuilder.approvedSpellingQuestionOf(notebook.getNotes().get(0)).please();
       List<Note> result = controller.getNotes(notebook);
       assertThat(result.get(0).getQuizQuestionAndAnswers(), hasSize(1));
-    }
-  }
-
-  @Nested
-  class getAllPendingRequestNotebooks {
-
-    private Notebook notebook;
-    private NotebookCertificateApprovalService approval;
-
-    @BeforeEach
-    void setup() {
-      UserModel userModel = makeMe.anAdmin().toModelPlease();
-      notebook = makeMe.aNote().creatorAndOwner(userModel).please().getNotebook();
-      controller = new RestNotebookController(modelFactoryService, userModel, testabilitySettings);
-      approval = makeMe.modelFactoryService.notebookService(notebook).requestNotebookApproval();
-      makeMe.refresh(notebook);
-    }
-
-    @Test
-    void shouldReturnPendingRequestNotebooks() throws UnexpectedNoAccessRightException {
-      var result = controller.getAllPendingRequestNotebooks();
-      assertThat(result, hasSize(1));
-    }
-
-    @Test
-    void shouldNotReturnApprovedNotebooks() throws UnexpectedNoAccessRightException {
-      approval.approve(makeMe.aTimestamp().please());
-      makeMe.refresh(notebook);
-      var result = controller.getAllPendingRequestNotebooks();
-      assertThat(result, hasSize(0));
-    }
-
-    @Test
-    void shouldApproveNoteBook() throws UnexpectedNoAccessRightException {
-      Notebook result = controller.approveNoteBook(notebook);
-      assertThat(result.getApprovalStatus(), equalTo(ApprovalStatus.APPROVED));
     }
   }
 }

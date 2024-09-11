@@ -18,6 +18,7 @@ import { RestFineTuningDataControllerService } from './services/RestFineTuningDa
 import { RestGlobalSettingsControllerService } from './services/RestGlobalSettingsControllerService';
 import { RestHealthCheckControllerService } from './services/RestHealthCheckControllerService';
 import { RestLinkControllerService } from './services/RestLinkControllerService';
+import { RestNotebookCertificateApprovalControllerService } from './services/RestNotebookCertificateApprovalControllerService';
 import { RestNotebookControllerService } from './services/RestNotebookControllerService';
 import { RestNoteControllerService } from './services/RestNoteControllerService';
 import { RestQuizQuestionControllerService } from './services/RestQuizQuestionControllerService';
@@ -43,6 +44,7 @@ export class DoughnutApi {
     public readonly restGlobalSettingsController: RestGlobalSettingsControllerService;
     public readonly restHealthCheckController: RestHealthCheckControllerService;
     public readonly restLinkController: RestLinkControllerService;
+    public readonly restNotebookCertificateApprovalController: RestNotebookCertificateApprovalControllerService;
     public readonly restNotebookController: RestNotebookControllerService;
     public readonly restNoteController: RestNoteControllerService;
     public readonly restQuizQuestionController: RestQuizQuestionControllerService;
@@ -79,6 +81,7 @@ export class DoughnutApi {
         this.restGlobalSettingsController = new RestGlobalSettingsControllerService(this.request);
         this.restHealthCheckController = new RestHealthCheckControllerService(this.request);
         this.restLinkController = new RestLinkControllerService(this.request);
+        this.restNotebookCertificateApprovalController = new RestNotebookCertificateApprovalControllerService(this.request);
         this.restNotebookController = new RestNotebookControllerService(this.request);
         this.restNoteController = new RestNoteControllerService(this.request);
         this.restQuizQuestionController = new RestQuizQuestionControllerService(this.request);
