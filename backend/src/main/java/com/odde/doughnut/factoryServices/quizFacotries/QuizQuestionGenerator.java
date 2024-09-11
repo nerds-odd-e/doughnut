@@ -17,6 +17,7 @@ public record QuizQuestionGenerator(
       QuizQuestionFactory quizQuestionFactory) {
     try {
       QuizQuestionAndAnswer quizQuestionAndAnswer = quizQuestionFactory.buildValidQuizQuestion();
+      quizQuestionAndAnswer.getQuizQuestion().setQuizQuestionAndAnswer(quizQuestionAndAnswer);
       return Optional.of(quizQuestionAndAnswer);
     } catch (QuizQuestionNotPossibleException e) {
       return Optional.empty();

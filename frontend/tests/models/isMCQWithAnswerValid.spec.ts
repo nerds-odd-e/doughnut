@@ -6,6 +6,10 @@ describe("isMCQWithAnswerValid", () => {
     const validMCQWithAnswer: QuizQuestionAndAnswer = {
       id: 1,
       correctAnswerIndex: 0,
+      multipleChoicesQuestion: {
+        stem: "Valid question",
+        choices: ["Valid choice 1", "Valid choice 2"],
+      },
       quizQuestion: {
         id: 1,
         multipleChoicesQuestion: {
@@ -22,6 +26,10 @@ describe("isMCQWithAnswerValid", () => {
     const invalidMCQWithAnswer: QuizQuestionAndAnswer = {
       id: 1,
       correctAnswerIndex: -1,
+      multipleChoicesQuestion: {
+        stem: "",
+        choices: ["", ""],
+      },
       quizQuestion: {
         id: 1,
         multipleChoicesQuestion: {
@@ -37,6 +45,10 @@ describe("isMCQWithAnswerValid", () => {
     const mcqWithAnswer: QuizQuestionAndAnswer = {
       id: 1,
       correctAnswerIndex: 0,
+      multipleChoicesQuestion: {
+        stem: "Valid question",
+        choices: ["Valid choice 1", "", "Valid choice 3"],
+      },
       quizQuestion: {
         id: 1,
         multipleChoicesQuestion: {

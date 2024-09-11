@@ -2,7 +2,9 @@ package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.controllers.dto.QuizQuestionInNotebook;
+import com.odde.doughnut.entities.converters.MCQToJsonConverter;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
+import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.sql.Timestamp;
@@ -13,17 +15,26 @@ import lombok.EqualsAndHashCode;
 @Entity
 @Data
 @EqualsAndHashCode(callSuper = false)
-@Table(name = "quiz_question_and_answer")
+@Table(name = "question_and_answer")
 public class QuizQuestionAndAnswer extends EntityIdentifiedByIdOnly {
   @ManyToOne(cascade = CascadeType.DETACH)
   @JoinColumn(name = "note_id", referencedColumnName = "id")
   @JsonIgnore
   private Note note;
 
-  @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "quiz_question_id", referencedColumnName = "id")
+  @OneToOne(mappedBy = "quizQuestionAndAnswer", cascade = CascadeType.ALL)
   @NotNull
   private QuizQuestion quizQuestion = new QuizQuestion();
+
+  @Column(name = "raw_json_question")
+  @Convert(converter = MCQToJsonConverter.class)
+  @NotNull
+  private MultipleChoicesQuestion multipleChoicesQuestion;
+
+  @Column(name = "check_spell")
+  private Boolean checkSpell;
+
+  @Embedded ImageWithMask imageWithMask;
 
   @Column(name = "created_at")
   @JsonIgnore
@@ -38,7 +49,7 @@ public class QuizQuestionAndAnswer extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public MCQWithAnswer getMcqWithAnswer() {
     MCQWithAnswer mcqWithAnswer = new MCQWithAnswer();
-    mcqWithAnswer.setMultipleChoicesQuestion(quizQuestion.getMultipleChoicesQuestion());
+    mcqWithAnswer.setMultipleChoicesQuestion(getMultipleChoicesQuestion());
     mcqWithAnswer.setCorrectChoiceIndex(correctAnswerIndex == null ? -1 : correctAnswerIndex);
     return mcqWithAnswer;
   }
@@ -54,9 +65,8 @@ public class QuizQuestionAndAnswer extends EntityIdentifiedByIdOnly {
   public static QuizQuestionAndAnswer fromMCQWithAnswer(MCQWithAnswer MCQWithAnswer, Note note) {
     QuizQuestionAndAnswer quizQuestionAIQuestionAndAnswer = new QuizQuestionAndAnswer();
     quizQuestionAIQuestionAndAnswer.setNote(note);
-    quizQuestionAIQuestionAndAnswer
-        .getQuizQuestion()
-        .setMultipleChoicesQuestion(MCQWithAnswer.getMultipleChoicesQuestion());
+    quizQuestionAIQuestionAndAnswer.setMultipleChoicesQuestion(
+        MCQWithAnswer.getMultipleChoicesQuestion());
     quizQuestionAIQuestionAndAnswer.setCorrectAnswerIndex(MCQWithAnswer.getCorrectChoiceIndex());
     // for in memory consistency
     quizQuestionAIQuestionAndAnswer

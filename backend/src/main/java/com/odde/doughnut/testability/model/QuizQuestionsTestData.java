@@ -40,8 +40,9 @@ public class QuizQuestionsTestData {
       QuizQuestionAndAnswer question = new QuizQuestionAndAnswer();
       question.setNote(note);
       question.setCorrectAnswerIndex(0);
-      question.getQuizQuestion().setMultipleChoicesQuestion(mcq);
+      question.setMultipleChoicesQuestion(mcq);
       question.setApproved(approved);
+      question.getQuizQuestion().setQuizQuestionAndAnswer(question);
       return question;
     }
   }

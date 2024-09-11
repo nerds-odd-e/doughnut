@@ -323,8 +323,7 @@ class RestQuizQuestionAndAnswerControllerTests {
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(jsonQuestion, "");
       QuizQuestionAndAnswer quizQuestionDTO = controller.generateAIQuestionWithoutSave(note);
 
-      Assertions.assertThat(
-              quizQuestionDTO.getQuizQuestion().getMultipleChoicesQuestion().getStem())
+      Assertions.assertThat(quizQuestionDTO.getMultipleChoicesQuestion().getStem())
           .contains("What is the first color in the rainbow?");
       Assertions.assertThat(quizQuestionDTO.getCorrectAnswerIndex()).isEqualTo(0);
     }
@@ -518,12 +517,10 @@ class RestQuizQuestionAndAnswerControllerTests {
       QuizQuestionAndAnswer result = controller.refineQuestion(note, questionAndAnswer);
 
       assertEquals(0, result.getCorrectAnswerIndex());
-      assertEquals(
-          "a default question stem",
-          result.getQuizQuestion().getMultipleChoicesQuestion().getStem());
+      assertEquals("a default question stem", result.getMultipleChoicesQuestion().getStem());
       assertEquals(
           List.of("choice1", "choice2", "choice3"),
-          result.getQuizQuestion().getMultipleChoicesQuestion().getChoices());
+          result.getMultipleChoicesQuestion().getChoices());
     }
 
     @Test

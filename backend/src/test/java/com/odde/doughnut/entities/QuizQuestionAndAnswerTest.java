@@ -57,7 +57,7 @@ class QuizQuestionAndAnswerTest {
         makeMe.aNote().under(top).titleConstructor("abc").details("abc has 3 letters").please();
     QuizQuestionAndAnswer quizQuestionAndAnswer = generateQuizQuestion(note);
     assertThat(
-        quizQuestionAndAnswer.getQuizQuestion().getMultipleChoicesQuestion().getStem(),
+        quizQuestionAndAnswer.getMultipleChoicesQuestion().getStem(),
         containsString(
             "<mark title='Hidden text that is matching the answer'>[...]</mark> has 3 letters"));
   }
@@ -86,8 +86,7 @@ class QuizQuestionAndAnswerTest {
       @Test
       void descendingRandomizer() {
         QuizQuestionAndAnswer quizQuestionAndAnswer = generateQuizQuestion(note1);
-        List<String> options =
-            quizQuestionAndAnswer.getQuizQuestion().getMultipleChoicesQuestion().getChoices();
+        List<String> options = quizQuestionAndAnswer.getMultipleChoicesQuestion().getChoices();
         assertThat(
             options,
             containsInRelativeOrder(note2.getTopicConstructor(), note1.getTopicConstructor()));
@@ -97,8 +96,7 @@ class QuizQuestionAndAnswerTest {
       void ascendingRandomizer() {
         randomizer.alwaysChoose = Randomization.RandomStrategy.last;
         QuizQuestionAndAnswer quizQuestionAndAnswer = generateQuizQuestion(note1);
-        List<String> options =
-            quizQuestionAndAnswer.getQuizQuestion().getMultipleChoicesQuestion().getChoices();
+        List<String> options = quizQuestionAndAnswer.getMultipleChoicesQuestion().getChoices();
         assertThat(
             options,
             containsInRelativeOrder(note1.getTopicConstructor(), note2.getTopicConstructor()));
@@ -111,8 +109,7 @@ class QuizQuestionAndAnswerTest {
       makeMe.theNote(top).withNChildren(10).please();
       Note note = makeMe.aNote().under(top).please();
       QuizQuestionAndAnswer quizQuestionAndAnswer = generateQuizQuestion(note);
-      List<String> options =
-          quizQuestionAndAnswer.getQuizQuestion().getMultipleChoicesQuestion().getChoices();
+      List<String> options = quizQuestionAndAnswer.getMultipleChoicesQuestion().getChoices();
       assertThat(options.size(), equalTo(3));
       assertThat(options.contains(note.getTopicConstructor()), is(true));
     }
@@ -145,7 +142,7 @@ class QuizQuestionAndAnswerTest {
       assertThat(randomQuizQuestion, instanceOf(QuizQuestionAndAnswer.class));
       QuizQuestionAndAnswer qq = randomQuizQuestion;
       assertThat(
-          qq.getQuizQuestion().getMultipleChoicesQuestion().getStem(),
+          qq.getMultipleChoicesQuestion().getStem(),
           containsString(mcqWithAnswer.getMultipleChoicesQuestion().getStem()));
     }
 

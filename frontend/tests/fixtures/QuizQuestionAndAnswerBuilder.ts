@@ -19,6 +19,7 @@ class QuizQuestionAndAnswerBuilder extends Builder<QuizQuestionAndAnswer> {
     const quizQuestion = this.quizQuestionBuilder.do()
     return {
       id: quizQuestion.id,
+      multipleChoicesQuestion: quizQuestion.multipleChoicesQuestion,
       quizQuestion,
     }
   }

@@ -1,7 +1,7 @@
 import { QuizQuestionAndAnswer } from "@/generated/backend"
 
 function isMCQWithAnswerValid(mcqWithAnswer: QuizQuestionAndAnswer): boolean {
-  const { stem, choices } = mcqWithAnswer.quizQuestion.multipleChoicesQuestion
+  const { stem, choices } = mcqWithAnswer.multipleChoicesQuestion
   const { correctAnswerIndex } = mcqWithAnswer
 
   const isStemNotEmpty = !!stem?.trim()

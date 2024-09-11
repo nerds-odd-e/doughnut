@@ -2969,6 +2969,7 @@ components:
     QuizQuestionAndAnswer:
       required:
       - id
+      - multipleChoicesQuestion
       - quizQuestion
       type: object
       properties:
@@ -2977,6 +2978,12 @@ components:
           format: int32
         quizQuestion:
           $ref: "#/components/schemas/QuizQuestion"
+        multipleChoicesQuestion:
+          $ref: "#/components/schemas/MultipleChoicesQuestion"
+        checkSpell:
+          type: boolean
+        imageWithMask:
+          $ref: "#/components/schemas/ImageWithMask"
         correctAnswerIndex:
           type: integer
           format: int32

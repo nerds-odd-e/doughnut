@@ -1,7 +1,6 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.odde.doughnut.entities.converters.MCQToJsonConverter;
 import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -13,17 +12,30 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class QuizQuestion extends EntityIdentifiedByIdOnly {
-  @Column(name = "raw_json_question")
-  @Convert(converter = MCQToJsonConverter.class)
-  @NotNull
-  private MultipleChoicesQuestion multipleChoicesQuestion;
-
-  @Column(name = "check_spell")
-  private Boolean checkSpell;
-
-  @Embedded ImageWithMask imageWithMask;
-
-  @OneToOne(mappedBy = "quizQuestion")
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "question_and_answer_id", referencedColumnName = "id")
   @JsonIgnore
   private QuizQuestionAndAnswer quizQuestionAndAnswer;
+
+  @NotNull
+  public MultipleChoicesQuestion getMultipleChoicesQuestion() {
+    if (quizQuestionAndAnswer == null) {
+      return null;
+    }
+    return quizQuestionAndAnswer.getMultipleChoicesQuestion();
+  }
+
+  public Boolean getCheckSpell() {
+    if (quizQuestionAndAnswer == null) {
+      return null;
+    }
+    return quizQuestionAndAnswer.getCheckSpell();
+  }
+
+  public ImageWithMask getImageWithMask() {
+    if (quizQuestionAndAnswer == null) {
+      return null;
+    }
+    return quizQuestionAndAnswer.getImageWithMask();
+  }
 }
