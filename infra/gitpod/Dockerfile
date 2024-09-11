@@ -1,4 +1,4 @@
-# syntax=docker.io/docker/dockerfile:1.9.0
+# syntax=docker.io/docker/dockerfile:1.10.0
 
 ARG TARGET_PLATFORM=linux/amd64
 
@@ -10,7 +10,8 @@ FROM --platform=$TARGET_PLATFORM gitpod/workspace-full-vnc
 USER root
 
 # Install Cypress dependencies.
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y lsb-release ca-certificates curl apt-utils \
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y update \
+    && apt-get install -y lsb-release ca-certificates curl apt-utils \
     && curl -sSLo /tmp/debsuryorg-archive-keyring.deb https://packages.sury.org/debsuryorg-archive-keyring.deb \
     && dpkg -i /tmp/debsuryorg-archive-keyring.deb \
     && sh -c 'echo "deb [signed-by=/usr/share/keyrings/deb.sury.org-php.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list'
