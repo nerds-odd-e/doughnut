@@ -58,24 +58,23 @@ public class Notebook extends EntityIdentifiedByIdOnly {
 
   @OneToOne(mappedBy = "notebook")
   @JsonIgnore
-  @Setter
   private NotebookCertificateApproval notebookCertificateApproval;
-
-  public ApprovalStatus getApprovalStatus() {
-    if (notebookCertificateApproval != null) {
-      if (notebookCertificateApproval.getLastApprovalTime() != null) {
-        return ApprovalStatus.APPROVED;
-      }
-      return ApprovalStatus.PENDING;
-    }
-    return ApprovalStatus.NOT_APPROVED;
-  }
 
   @Column(name = "updated_at")
   @Getter
   @Setter
   @NonNull
   private Timestamp updated_at;
+
+  public ApprovalStatus getApprovalStatus() {
+    if (notebookCertificateApproval == null) {
+      return ApprovalStatus.NOT_APPROVED;
+    }
+    if (notebookCertificateApproval.getLastApprovalTime() == null) {
+      return ApprovalStatus.PENDING;
+    }
+    return ApprovalStatus.APPROVED;
+  }
 
   @JsonIgnore
   public List<Note> getNotes() {
