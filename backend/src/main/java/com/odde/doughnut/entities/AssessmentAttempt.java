@@ -6,6 +6,7 @@ import com.odde.doughnut.controllers.dto.AssessmentResult;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.sql.Timestamp;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -34,6 +35,8 @@ public class AssessmentAttempt extends EntityIdentifiedByIdOnly {
 
   @Column(name = "answers_correct")
   private int answersCorrect;
+
+  @Transient private List<QuizQuestion> quizQuestions;
 
   public Integer getNotebookId() {
     return getNotebook().getId();

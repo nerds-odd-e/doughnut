@@ -33,13 +33,18 @@ class RestAssessmentController {
   }
 
   @GetMapping("/questions/{notebook}")
-  public List<QuizQuestion> generateAssessmentQuestions(
+  public AssessmentAttempt generateAssessmentQuestions(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
     currentUser.assertLoggedIn();
     currentUser.assertReadAuthorization(notebook);
 
-    return assessmentService.generateAssessment(notebook);
+    List<QuizQuestion> quizQuestions = assessmentService.generateAssessment(notebook);
+    AssessmentAttempt assessmentAttempt = new AssessmentAttempt();
+    assessmentAttempt.setNotebook(notebook);
+    assessmentAttempt.setQuizQuestions(quizQuestions);
+
+    return assessmentAttempt;
   }
 
   @PostMapping("{notebook}")

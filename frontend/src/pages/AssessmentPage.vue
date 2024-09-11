@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h3>Assessment For {{ topicConstructor }}</h3>
+    <h3>Assessment For {{ assessmentAttempt?.notebookTitle }}</h3>
     <h5>Passing criteria: {{ passCriteriaPercentage }}%</h5>
     <div>
       <div v-if="errors != ''">
@@ -57,27 +57,23 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue"
+import { onMounted, ref } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import {
   QuizQuestion as QuizQuestionType,
   AnswerSubmission,
   AssessmentResult,
   Certificate,
+  AssessmentAttempt,
 } from "@/generated/backend"
-import { useRouter } from "vue-router"
 import QuizQuestion from "@/components/review/QuizQuestion.vue"
 
 const { managedApi } = useLoadingApi()
-const router = useRouter()
 const props = defineProps({
   notebookId: { type: Number, required: true },
 })
 
-const topicConstructor = computed(() => {
-  return router.currentRoute.value.query?.topic
-})
-
+const assessmentAttempt = ref<AssessmentAttempt | undefined>()
 const quizQuestions = ref<QuizQuestionType[]>([])
 const currentQuestion = ref(0)
 const answeredCurrentQuestion = ref(false)
@@ -135,10 +131,11 @@ const checkIfQuizComplete = async () => {
 
 const generateAssessmentQuestions = async () => {
   try {
-    quizQuestions.value =
+    assessmentAttempt.value =
       await managedApi.restAssessmentController.generateAssessmentQuestions(
         props.notebookId
       )
+    quizQuestions.value = assessmentAttempt.value.quizQuestions!
   } catch (err) {
     if (err instanceof Error) {
       errors.value = err.message

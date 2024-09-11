@@ -5,7 +5,6 @@
 import type { AnswerSubmission } from '../models/AnswerSubmission';
 import type { AssessmentAttempt } from '../models/AssessmentAttempt';
 import type { AssessmentResult } from '../models/AssessmentResult';
-import type { QuizQuestion } from '../models/QuizQuestion';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestAssessmentControllerService {
@@ -48,12 +47,12 @@ export class RestAssessmentControllerService {
     }
     /**
      * @param notebook
-     * @returns QuizQuestion OK
+     * @returns AssessmentAttempt OK
      * @throws ApiError
      */
     public generateAssessmentQuestions(
         notebook: number,
-    ): CancelablePromise<Array<QuizQuestion>> {
+    ): CancelablePromise<AssessmentAttempt> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/assessment/questions/{notebook}',

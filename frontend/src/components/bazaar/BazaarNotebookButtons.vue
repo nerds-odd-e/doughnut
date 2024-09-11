@@ -49,9 +49,6 @@ const openAssessmentPage = () => {
   }
   router.push({
     name: "assessment",
-    query: {
-      topic: props.notebook.headNote.noteTopic.topicConstructor,
-    },
     params: { notebookId: props.notebook.id },
   })
 }

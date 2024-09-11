@@ -2764,9 +2764,7 @@ paths:
           content:
             '*/*':
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/QuizQuestion"
+                $ref: "#/components/schemas/AssessmentAttempt"
   /api/ai/dummy:
     get:
       tags:
@@ -3104,10 +3102,10 @@ components:
         updated_at:
           type: string
           format: date-time
-        certifiable:
-          type: boolean
         creatorId:
           type: string
+        certifiable:
+          type: boolean
     NotebookSettings:
       type: object
       properties:
@@ -3493,6 +3491,10 @@ components:
         answersCorrect:
           type: integer
           format: int32
+        quizQuestions:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuizQuestion"
         notebookId:
           type: integer
           format: int32

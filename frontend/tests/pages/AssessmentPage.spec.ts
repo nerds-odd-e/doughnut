@@ -18,9 +18,12 @@ describe("assessment page", () => {
   describe("assessment with one question", () => {
     const notebook = makeMe.aNotebook.please()
     const quizQuestion = makeMe.aQuizQuestion.please()
+    const assessmentAttempt = makeMe.anAssessmentAttempt
+      .withQuestions([quizQuestion])
+      .please()
     beforeEach(() => {
       helper.managedApi.restAssessmentController.generateAssessmentQuestions =
-        vi.fn().mockResolvedValue([quizQuestion])
+        vi.fn().mockResolvedValue(assessmentAttempt)
     })
 
     it("calls API ONCE on mount", async () => {
@@ -67,9 +70,12 @@ describe("assessment page", () => {
       answerId: 2,
       correct: true,
     }
+    const assessmentAttempt = makeMe.anAssessmentAttempt
+      .withQuestions([quizQuestion1, quizQuestion2])
+      .please()
     beforeEach(() => {
       helper.managedApi.restAssessmentController.generateAssessmentQuestions =
-        vi.fn().mockResolvedValue([quizQuestion1, quizQuestion2])
+        vi.fn().mockResolvedValue(assessmentAttempt)
       helper.managedApi.restQuizQuestionController.answerQuiz = vi
         .fn()
         .mockResolvedValueOnce(answerResult1)

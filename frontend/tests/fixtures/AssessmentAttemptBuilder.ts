@@ -1,9 +1,14 @@
-import { AssessmentAttempt } from "@/generated/backend"
+import { AssessmentAttempt, QuizQuestion } from "@/generated/backend"
 import Builder from "./Builder"
 import generateId from "./generateId"
 
 class AssessmentAttemptBuilder extends Builder<AssessmentAttempt> {
   private data: Partial<AssessmentAttempt> = {}
+
+  withQuestions(questions: QuizQuestion[]) {
+    this.data.quizQuestions = questions
+    return this
+  }
   passed(): AssessmentAttemptBuilder {
     this.data.isPass = true
     return this
