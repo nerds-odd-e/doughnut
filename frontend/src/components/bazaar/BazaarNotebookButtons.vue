@@ -23,9 +23,9 @@
   </div>
 </template>
 
-<script lang="ts">
-import { PropType, defineComponent } from "vue"
-
+<script setup lang="ts">
+import { PropType } from "vue"
+import { useRouter } from "vue-router"
 import { Notebook } from "@/generated/backend"
 import PopButton from "../commons/Popups/PopButton.vue"
 import usePopups from "../commons/Popups/usePopups"
@@ -34,37 +34,25 @@ import SvgAssessment from "../svgs/SvgAssessment.vue"
 import SubscribeDialog from "./SubscribeDialog.vue"
 import SvgCertifiedAssessment from "../svgs/SvgCertifiedAssessment.vue"
 
-export default defineComponent({
-  setup() {
-    return usePopups()
-  },
-  props: {
-    notebook: { type: Object as PropType<Notebook>, required: true },
-    loggedIn: Boolean,
-  },
-  components: {
-    PopButton,
-    SvgAdd,
-    SvgAssessment,
-    SubscribeDialog,
-    SvgCertifiedAssessment,
-  },
-  methods: {
-    openAssessmentPage() {
-      if (!this.loggedIn) {
-        this.popups.alert("Please login first")
-        return
-      }
-      this.$router.push({
-        name: "assessment",
-        query: {
-          topic: this.notebook.headNote.noteTopic.topicConstructor,
-        },
-        params: {
-          notebookId: this.notebook.id,
-        },
-      })
-    },
-  },
+const props = defineProps({
+  notebook: { type: Object as PropType<Notebook>, required: true },
+  loggedIn: Boolean,
 })
+
+const { popups } = usePopups()
+const router = useRouter()
+
+const openAssessmentPage = () => {
+  if (!props.loggedIn) {
+    popups.alert("You need to be logged in to start an assessment.")
+    return
+  }
+  router.push({
+    name: "assessment",
+    query: {
+      topic: props.notebook.headNote.noteTopic.topicConstructor,
+    },
+    params: { notebookId: props.notebook.id },
+  })
+}
 </script>
