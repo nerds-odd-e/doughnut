@@ -4,6 +4,7 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.NotebookCertificateApprovalService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
@@ -30,8 +31,9 @@ class RestNotebookCertificateApprovalController {
   }
 
   @GetMapping("/for-notebook/{notebook}")
-  public NotebookCertificateApproval getApprovalForNotebook(      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
-    throws UnexpectedNoAccessRightException {
+  public NotebookCertificateApproval getApprovalForNotebook(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
+      throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(notebook);
     return notebook.getNotebookCertificateApproval();
   }
@@ -59,7 +61,8 @@ class RestNotebookCertificateApprovalController {
           NotebookCertificateApproval approval)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
-    approval.setLastApprovalTime(testabilitySettings.getCurrentUTCTimestamp());
+    new NotebookCertificateApprovalService(approval, modelFactoryService)
+        .approve(testabilitySettings.getCurrentUTCTimestamp());
     return approval;
   }
 }

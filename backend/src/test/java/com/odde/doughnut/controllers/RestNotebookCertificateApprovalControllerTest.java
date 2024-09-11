@@ -45,28 +45,29 @@ class RestNotebookCertificateApprovalControllerTest {
       User anotherUser = makeMe.aUser().please();
       Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
       assertThrows(
-        UnexpectedNoAccessRightException.class,
-        () -> controller.getApprovalForNotebook(note.getNotebook()));
+          UnexpectedNoAccessRightException.class,
+          () -> controller.getApprovalForNotebook(note.getNotebook()));
     }
 
     @Test
-    void approvalStatusShouldBeNullIfNotExist()
-      throws UnexpectedNoAccessRightException {
+    void approvalStatusShouldBeNullIfNotExist() throws UnexpectedNoAccessRightException {
       Note note = makeMe.aNote().creatorAndOwner(userModel).please();
-      NotebookCertificateApproval approvalForNotebook = controller.getApprovalForNotebook(note.getNotebook());
+      NotebookCertificateApproval approvalForNotebook =
+          controller.getApprovalForNotebook(note.getNotebook());
       assertThat(approvalForNotebook, nullValue());
     }
 
     @Test
-    void success()
-      throws UnexpectedNoAccessRightException {
+    void success() throws UnexpectedNoAccessRightException {
       Note note = makeMe.aNote().creatorAndOwner(userModel).please();
       makeMe.modelFactoryService.notebookService(note.getNotebook()).requestNotebookApproval();
       makeMe.refresh(note.getNotebook());
-      NotebookCertificateApproval approvalForNotebook = controller.getApprovalForNotebook(note.getNotebook());
+      NotebookCertificateApproval approvalForNotebook =
+          controller.getApprovalForNotebook(note.getNotebook());
       assertThat(approvalForNotebook.getNotebook(), equalTo(note.getNotebook()));
     }
   }
+
   @Nested
   class requestNotebookApproval {
     @Test
