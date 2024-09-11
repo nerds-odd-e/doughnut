@@ -2512,7 +2512,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Notebook"
+                  $ref: "#/components/schemas/NotebookCertificateApproval"
   /api/healthcheck:
     get:
       tags:
@@ -3888,6 +3888,20 @@ components:
           type: string
         target:
           type: string
+    NotebookCertificateApproval:
+      required:
+      - id
+      - notebook
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        notebook:
+          $ref: "#/components/schemas/Notebook"
+        lastApprovalTime:
+          type: string
+          format: date-time
     Conversation:
       required:
       - id

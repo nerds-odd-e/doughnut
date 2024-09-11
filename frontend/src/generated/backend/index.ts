@@ -63,6 +63,7 @@ export type { NoteAccessory } from './models/NoteAccessory';
 export { Notebook } from './models/Notebook';
 export type { NotebookAssistant } from './models/NotebookAssistant';
 export type { NotebookAssistantCreationParams } from './models/NotebookAssistantCreationParams';
+export type { NotebookCertificateApproval } from './models/NotebookCertificateApproval';
 export type { NotebookSettings } from './models/NotebookSettings';
 export type { NotebooksViewedByUser } from './models/NotebooksViewedByUser';
 export type { NoteBrief } from './models/NoteBrief';

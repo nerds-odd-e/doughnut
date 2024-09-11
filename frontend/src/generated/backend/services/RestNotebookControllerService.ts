@@ -4,6 +4,7 @@
 /* eslint-disable */
 import type { Note } from '../models/Note';
 import type { Notebook } from '../models/Notebook';
+import type { NotebookCertificateApproval } from '../models/NotebookCertificateApproval';
 import type { NotebookSettings } from '../models/NotebookSettings';
 import type { NotebooksViewedByUser } from '../models/NotebooksViewedByUser';
 import type { NoteBrief } from '../models/NoteBrief';
@@ -204,10 +205,10 @@ export class RestNotebookControllerService {
         });
     }
     /**
-     * @returns Notebook OK
+     * @returns NotebookCertificateApproval OK
      * @throws ApiError
      */
-    public getAllPendingRequestNotebooks(): CancelablePromise<Array<Notebook>> {
+    public getAllPendingRequestNotebooks(): CancelablePromise<Array<NotebookCertificateApproval>> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/notebooks/getAllPendingRequestNoteBooks',

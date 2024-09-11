@@ -14,7 +14,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -131,14 +130,10 @@ class RestNotebookController {
   }
 
   @GetMapping("/getAllPendingRequestNoteBooks")
-  public List<Notebook> getAllPendingRequestNotebooks() throws UnexpectedNoAccessRightException {
+  public List<NotebookCertificateApproval> getAllPendingRequestNotebooks()
+      throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
-    return modelFactoryService
-        .notebookCertificateApprovalRepository
-        .findByLastApprovalTimeIsNull()
-        .stream()
-        .map(NotebookCertificateApproval::getNotebook)
-        .collect(Collectors.toList());
+    return modelFactoryService.notebookCertificateApprovalRepository.findByLastApprovalTimeIsNull();
   }
 
   @PostMapping(value = "/{notebook}/approve")

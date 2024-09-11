@@ -215,7 +215,7 @@ class RestNotebookControllerTest {
 
     @Test
     void shouldReturnPendingRequestNotebooks() throws UnexpectedNoAccessRightException {
-      List<Notebook> result = controller.getAllPendingRequestNotebooks();
+      var result = controller.getAllPendingRequestNotebooks();
       assertThat(result, hasSize(1));
     }
 
@@ -223,7 +223,7 @@ class RestNotebookControllerTest {
     void shouldNotReturnApprovedNotebooks() throws UnexpectedNoAccessRightException {
       approval.approve(makeMe.aTimestamp().please());
       makeMe.refresh(notebook);
-      List<Notebook> result = controller.getAllPendingRequestNotebooks();
+      var result = controller.getAllPendingRequestNotebooks();
       assertThat(result, hasSize(0));
     }
 

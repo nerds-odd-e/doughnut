@@ -1,5 +1,5 @@
 <template>
-  <table class="table" v-if="notebooks?.length">
+  <table class="table" v-if="approvals?.length">
     <thead>
     <tr>
       <th>Notebook</th>
@@ -7,18 +7,18 @@
     </tr>
     </thead>
     <tbody>
-    <tr v-for="notebook in notebooks" :key="notebook.id">
+    <tr v-for="approval in approvals" :key="approval.id">
       <td>
-        <NoteTopicWithLink v-bind="{ noteTopic: notebook.headNote.noteTopic }" />
+        <NoteTopicWithLink v-bind="{ noteTopic: approval.notebook.headNote.noteTopic }" />
       </td>
       <td>
-        {{ notebook.creatorId }}
+        {{ approval.notebook.creatorId }}
       </td>
       <td>
         <button
           class="btn btn-primary"
           style="background-color: green; border-color: green;"
-          @click="approveNoteBook(notebook.id)"
+          @click="approveNoteBook(approval.notebook.id)"
         >
         Approve
         </button>
@@ -34,17 +34,17 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { Notebook } from "@/generated/backend"
+import { NotebookCertificateApproval } from "@/generated/backend"
 import NoteTopicWithLink from "@/components/notes/NoteTopicWithLink.vue"
 import usePopups from "../commons/Popups/usePopups"
 
 const { popups } = usePopups()
 const { managedApi } = useLoadingApi()
 
-const notebooks = ref<Notebook[] | undefined>(undefined)
+const approvals = ref<NotebookCertificateApproval[] | undefined>(undefined)
 
 const fetchNotebooks = async () => {
-  notebooks.value =
+  approvals.value =
     await managedApi.restNotebookController.getAllPendingRequestNotebooks()
 }
 
