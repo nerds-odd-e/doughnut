@@ -2960,12 +2960,12 @@ components:
         id:
           type: integer
           format: int32
-        multipleChoicesQuestion:
-          $ref: "#/components/schemas/MultipleChoicesQuestion"
-        checkSpell:
-          type: boolean
         imageWithMask:
           $ref: "#/components/schemas/ImageWithMask"
+        checkSpell:
+          type: boolean
+        multipleChoicesQuestion:
+          $ref: "#/components/schemas/MultipleChoicesQuestion"
     QuizQuestionAndAnswer:
       required:
       - id

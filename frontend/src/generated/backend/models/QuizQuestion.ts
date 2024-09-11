@@ -6,8 +6,8 @@ import type { ImageWithMask } from './ImageWithMask';
 import type { MultipleChoicesQuestion } from './MultipleChoicesQuestion';
 export type QuizQuestion = {
     id: number;
-    multipleChoicesQuestion: MultipleChoicesQuestion;
-    checkSpell?: boolean;
     imageWithMask?: ImageWithMask;
+    checkSpell?: boolean;
+    multipleChoicesQuestion: MultipleChoicesQuestion;
 };
 
