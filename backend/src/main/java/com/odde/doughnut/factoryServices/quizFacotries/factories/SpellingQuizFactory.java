@@ -1,7 +1,7 @@
 package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestionAndAnswer;
+import com.odde.doughnut.entities.QuestionAndAnswer;
 import com.odde.doughnut.entities.ReviewSetting;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
@@ -16,7 +16,7 @@ public class SpellingQuizFactory extends QuizQuestionFactory {
   }
 
   @Override
-  public QuizQuestionAndAnswer buildValidQuizQuestion() throws QuizQuestionNotPossibleException {
+  public QuestionAndAnswer buildValidQuizQuestion() throws QuizQuestionNotPossibleException {
     if (!needSpellingQuiz()) {
       throw new QuizQuestionNotPossibleException();
     }
@@ -35,18 +35,16 @@ public class SpellingQuizFactory extends QuizQuestionFactory {
     return answerNote.getClozeDescription().clozeDetails();
   }
 
-  public QuizQuestionAndAnswer buildSpellingQuestion() {
-    QuizQuestionAndAnswer quizQuestionAndAnswerSpelling = new QuizQuestionAndAnswer();
-    quizQuestionAndAnswerSpelling.setNote(answerNote);
-    quizQuestionAndAnswerSpelling.setApproved(true);
-    quizQuestionAndAnswerSpelling.setCheckSpell(true);
+  public QuestionAndAnswer buildSpellingQuestion() {
+    QuestionAndAnswer questionAndAnswerSpelling = new QuestionAndAnswer();
+    questionAndAnswerSpelling.setNote(answerNote);
+    questionAndAnswerSpelling.setApproved(true);
+    questionAndAnswerSpelling.setCheckSpell(true);
     MultipleChoicesQuestion mcq = new MultipleChoicesQuestion();
     mcq.setStem(getStem());
-    quizQuestionAndAnswerSpelling.setMultipleChoicesQuestion(mcq);
+    questionAndAnswerSpelling.setMultipleChoicesQuestion(mcq);
     // for in memory consistency
-    quizQuestionAndAnswerSpelling
-        .getQuizQuestion()
-        .setQuizQuestionAndAnswer(quizQuestionAndAnswerSpelling);
-    return quizQuestionAndAnswerSpelling;
+    questionAndAnswerSpelling.getQuizQuestion().setQuestionAndAnswer(questionAndAnswerSpelling);
+    return questionAndAnswerSpelling;
   }
 }

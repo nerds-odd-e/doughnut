@@ -16,13 +16,13 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Table(name = "question_and_answer")
-public class QuizQuestionAndAnswer extends EntityIdentifiedByIdOnly {
+public class QuestionAndAnswer extends EntityIdentifiedByIdOnly {
   @ManyToOne(cascade = CascadeType.DETACH)
   @JoinColumn(name = "note_id", referencedColumnName = "id")
   @JsonIgnore
   private Note note;
 
-  @OneToOne(mappedBy = "quizQuestionAndAnswer", cascade = CascadeType.ALL)
+  @OneToOne(mappedBy = "questionAndAnswer", cascade = CascadeType.ALL)
   @NotNull
   private QuizQuestion quizQuestion = new QuizQuestion();
 
@@ -62,8 +62,8 @@ public class QuizQuestionAndAnswer extends EntityIdentifiedByIdOnly {
     return Objects.equals(answer.getChoiceIndex(), getCorrectAnswerIndex());
   }
 
-  public static QuizQuestionAndAnswer fromMCQWithAnswer(MCQWithAnswer MCQWithAnswer, Note note) {
-    QuizQuestionAndAnswer quizQuestionAIQuestionAndAnswer = new QuizQuestionAndAnswer();
+  public static QuestionAndAnswer fromMCQWithAnswer(MCQWithAnswer MCQWithAnswer, Note note) {
+    QuestionAndAnswer quizQuestionAIQuestionAndAnswer = new QuestionAndAnswer();
     quizQuestionAIQuestionAndAnswer.setNote(note);
     quizQuestionAIQuestionAndAnswer.setMultipleChoicesQuestion(
         MCQWithAnswer.getMultipleChoicesQuestion());
@@ -71,7 +71,7 @@ public class QuizQuestionAndAnswer extends EntityIdentifiedByIdOnly {
     // for in memory consistency
     quizQuestionAIQuestionAndAnswer
         .getQuizQuestion()
-        .setQuizQuestionAndAnswer(quizQuestionAIQuestionAndAnswer);
+        .setQuestionAndAnswer(quizQuestionAIQuestionAndAnswer);
     return quizQuestionAIQuestionAndAnswer;
   }
 
@@ -84,7 +84,7 @@ public class QuizQuestionAndAnswer extends EntityIdentifiedByIdOnly {
 
   @Override
   public String toString() {
-    // Fixing StackoverflowError when calling toString on QuizQuestionAndAnswer or QuizQuestion
-    return "QuizQuestionAndAnswer{" + "id=" + id + '}';
+    // Fixing StackoverflowError when calling toString on QuestionAndAnswer or QuizQuestion
+    return "QuestionAndAnswer{" + "id=" + id + '}';
   }
 }

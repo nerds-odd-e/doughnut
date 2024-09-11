@@ -315,7 +315,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/QuizQuestionAndAnswer"
+                  $ref: "#/components/schemas/QuestionAndAnswer"
   /api/testability/inject_notes:
     post:
       tags:
@@ -656,7 +656,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/QuizQuestionAndAnswer"
+                $ref: "#/components/schemas/QuestionAndAnswer"
   /api/quiz-questions/{quizQuestion}/suggest-fine-tuning:
     post:
       tags:
@@ -780,7 +780,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/QuizQuestionAndAnswer"
+              $ref: "#/components/schemas/QuestionAndAnswer"
         required: true
       responses:
         "500":
@@ -794,7 +794,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/QuizQuestionAndAnswer"
+                $ref: "#/components/schemas/QuestionAndAnswer"
   /api/quiz-questions/{note}/note-questions:
     get:
       tags:
@@ -820,7 +820,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/QuizQuestionAndAnswer"
+                  $ref: "#/components/schemas/QuestionAndAnswer"
     post:
       tags:
       - rest-quiz-question-controller
@@ -835,7 +835,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/QuizQuestionAndAnswer"
+              $ref: "#/components/schemas/QuestionAndAnswer"
         required: true
       responses:
         "500":
@@ -849,7 +849,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/QuizQuestionAndAnswer"
+                $ref: "#/components/schemas/QuestionAndAnswer"
   /api/quiz-questions/generate-question:
     post:
       tags:
@@ -897,7 +897,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/QuizQuestionAndAnswer"
+                $ref: "#/components/schemas/QuestionAndAnswer"
   /api/notes/{parentNote}/create:
     post:
       tags:
@@ -2951,22 +2951,7 @@ components:
           type: string
         imageMask:
           type: string
-    QuizQuestion:
-      required:
-      - id
-      - multipleChoicesQuestion
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        checkSpell:
-          type: boolean
-        imageWithMask:
-          $ref: "#/components/schemas/ImageWithMask"
-        multipleChoicesQuestion:
-          $ref: "#/components/schemas/MultipleChoicesQuestion"
-    QuizQuestionAndAnswer:
+    QuestionAndAnswer:
       required:
       - id
       - multipleChoicesQuestion
@@ -2989,6 +2974,21 @@ components:
           format: int32
         approved:
           type: boolean
+    QuizQuestion:
+      required:
+      - id
+      - multipleChoicesQuestion
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        checkSpell:
+          type: boolean
+        imageWithMask:
+          $ref: "#/components/schemas/ImageWithMask"
+        multipleChoicesQuestion:
+          $ref: "#/components/schemas/MultipleChoicesQuestion"
     NoteTestData:
       type: object
       properties:
@@ -3260,8 +3260,8 @@ components:
           type: string
         reviewPoint:
           $ref: "#/components/schemas/ReviewPoint"
-        quizQuestionAndAnswer:
-          $ref: "#/components/schemas/QuizQuestionAndAnswer"
+        questionAndAnswer:
+          $ref: "#/components/schemas/QuestionAndAnswer"
     QuizQuestionInNotebook:
       required:
       - notebook
@@ -3940,8 +3940,8 @@ components:
         id:
           type: integer
           format: int32
-        quizQuestionAndAnswer:
-          $ref: "#/components/schemas/QuizQuestionAndAnswer"
+        questionAndAnswer:
+          $ref: "#/components/schemas/QuestionAndAnswer"
         noteCreator:
           $ref: "#/components/schemas/User"
         conversationInitiator:

@@ -16,9 +16,9 @@
     </div>
   </div>
   <QuizQuestionComponent
-    v-if="answeredQuestion.quizQuestionAndAnswer"
+    v-if="answeredQuestion.questionAndAnswer"
     v-bind="{
-      quizQuestion: answeredQuestion.quizQuestionAndAnswer.quizQuestion,
+      quizQuestion: answeredQuestion.questionAndAnswer.quizQuestion,
       correctChoiceIndex: answeredQuestion.correctChoiceIndex,
       answerChoiceIndex: answeredQuestion.choiceIndex,
     }"

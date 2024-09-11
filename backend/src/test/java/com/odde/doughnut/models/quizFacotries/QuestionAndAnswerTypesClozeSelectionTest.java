@@ -4,7 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestionAndAnswer;
+import com.odde.doughnut.entities.QuestionAndAnswer;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.ClozeTitleSelectionQuizFactory;
@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class QuizQuestionAndAnswerTypesClozeSelectionTest {
+class QuestionAndAnswerTypesClozeSelectionTest {
   @Autowired MakeMe makeMe;
 
   @Nested
@@ -41,22 +41,21 @@ class QuizQuestionAndAnswerTypesClozeSelectionTest {
     @Test
     void NotForNoteWithoutVisibleDescription() {
       makeMe.theNote(note1).details("<p>  <br>  <br/>  </p>  <br>").please();
-      QuizQuestionAndAnswer quizQuestionAndAnswer = buildClozeQuizQuestion();
-      assertThat(quizQuestionAndAnswer, nullValue());
+      QuestionAndAnswer questionAndAnswer = buildClozeQuizQuestion();
+      assertThat(questionAndAnswer, nullValue());
     }
 
     @Test
     void shouldIncludeRightAnswers() {
-      QuizQuestionAndAnswer quizQuestionAndAnswer = buildClozeQuizQuestion();
+      QuestionAndAnswer questionAndAnswer = buildClozeQuizQuestion();
       assertThat(
-          quizQuestionAndAnswer.getMultipleChoicesQuestion().getStem(),
-          containsString("descrption"));
-      List<String> options = quizQuestionAndAnswer.getMultipleChoicesQuestion().getChoices();
+          questionAndAnswer.getMultipleChoicesQuestion().getStem(), containsString("descrption"));
+      List<String> options = questionAndAnswer.getMultipleChoicesQuestion().getChoices();
       assertThat(note2.getTopicConstructor(), in(options));
       assertThat(note1.getTopicConstructor(), in(options));
     }
 
-    private QuizQuestionAndAnswer buildClozeQuizQuestion() {
+    private QuestionAndAnswer buildClozeQuizQuestion() {
       QuizQuestionServant servant =
           new QuizQuestionServant(null, new NonRandomizer(), makeMe.modelFactoryService);
       try {

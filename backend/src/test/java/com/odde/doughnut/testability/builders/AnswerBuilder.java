@@ -22,9 +22,9 @@ public class AnswerBuilder extends EntityBuilder<Answer> {
 
   public AnswerBuilder withValidQuestion(QuizQuestionFactory quizQuestionFactory) {
     try {
-      QuizQuestionAndAnswer quizQuestionAndAnswer = quizQuestionFactory.buildValidQuizQuestion();
-      quizQuestionAndAnswer.getQuizQuestion().setQuizQuestionAndAnswer(quizQuestionAndAnswer);
-      entity.setQuizQuestion(quizQuestionAndAnswer.getQuizQuestion());
+      QuestionAndAnswer questionAndAnswer = quizQuestionFactory.buildValidQuizQuestion();
+      questionAndAnswer.getQuizQuestion().setQuestionAndAnswer(questionAndAnswer);
+      entity.setQuizQuestion(questionAndAnswer.getQuizQuestion());
     } catch (QuizQuestionNotPossibleException e) {
       throw new RuntimeException(
           "Failed to generate a question of type "
@@ -41,8 +41,8 @@ public class AnswerBuilder extends EntityBuilder<Answer> {
     return this;
   }
 
-  public AnswerBuilder forQuestion(QuizQuestionAndAnswer quizQuestionAndAnswer) {
-    entity.setQuizQuestion(quizQuestionAndAnswer.getQuizQuestion());
+  public AnswerBuilder forQuestion(QuestionAndAnswer questionAndAnswer) {
+    entity.setQuizQuestion(questionAndAnswer.getQuizQuestion());
     return this;
   }
 

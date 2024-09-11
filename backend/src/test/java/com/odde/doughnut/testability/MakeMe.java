@@ -125,7 +125,7 @@ public class MakeMe extends MakeMeWithoutDB {
     return new QuizQuestionBuilder(this);
   }
 
-  public QuizQuestionAndAnswer buildAQuestionForLinkingNote(
+  public QuestionAndAnswer buildAQuestionForLinkingNote(
       LinkQuestionType linkQuestionType, LinkingNote linkingNote, User user) {
     QuizQuestionServant servant =
         new QuizQuestionServant(user, new NonRandomizer(), modelFactoryService);

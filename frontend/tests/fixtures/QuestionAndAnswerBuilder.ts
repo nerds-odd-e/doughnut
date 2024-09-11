@@ -1,8 +1,8 @@
-import { QuizQuestionAndAnswer } from "@/generated/backend"
+import { QuestionAndAnswer } from "@/generated/backend"
 import Builder from "./Builder"
 import QuizQuestionBuilder from "./QuizQuestionBuilder"
 
-class QuizQuestionAndAnswerBuilder extends Builder<QuizQuestionAndAnswer> {
+class QuestionAndAnswerBuilder extends Builder<QuestionAndAnswer> {
   quizQuestionBuilder = new QuizQuestionBuilder()
 
   withQuestionStem(stem: string) {
@@ -15,7 +15,7 @@ class QuizQuestionAndAnswerBuilder extends Builder<QuizQuestionAndAnswer> {
     return this
   }
 
-  do(): QuizQuestionAndAnswer {
+  do(): QuestionAndAnswer {
     const quizQuestion = this.quizQuestionBuilder.do()
     return {
       id: quizQuestion.id,
@@ -25,4 +25,4 @@ class QuizQuestionAndAnswerBuilder extends Builder<QuizQuestionAndAnswer> {
   }
 }
 
-export default QuizQuestionAndAnswerBuilder
+export default QuestionAndAnswerBuilder

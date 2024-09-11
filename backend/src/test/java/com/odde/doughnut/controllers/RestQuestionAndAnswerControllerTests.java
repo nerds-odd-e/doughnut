@@ -45,7 +45,7 @@ import org.springframework.web.server.ResponseStatusException;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class RestQuizQuestionAndAnswerControllerTests {
+class RestQuestionAndAnswerControllerTests {
   @Mock OpenAiApi openAiApi;
   @Autowired ModelFactoryService modelFactoryService;
   @Autowired MakeMe makeMe;
@@ -72,7 +72,7 @@ class RestQuizQuestionAndAnswerControllerTests {
   @Nested
   class answer {
     ReviewPoint reviewPoint;
-    QuizQuestionAndAnswer quizQuestionAndAnswer;
+    QuestionAndAnswer questionAndAnswer;
     AnswerDTO answerDTO = new AnswerDTO();
 
     @BeforeEach
@@ -85,7 +85,7 @@ class RestQuizQuestionAndAnswerControllerTests {
               .forgettingCurveAndNextReviewAt(200)
               .please();
       QuizQuestionBuilder quizQuestionBuilder = makeMe.aQuestion();
-      quizQuestionAndAnswer = quizQuestionBuilder.approvedSpellingQuestionOf(answerNote).please();
+      questionAndAnswer = quizQuestionBuilder.approvedSpellingQuestionOf(answerNote).please();
       answerDTO.setSpellingAnswer(answerNote.getTopicConstructor());
     }
 
@@ -93,7 +93,7 @@ class RestQuizQuestionAndAnswerControllerTests {
     void shouldValidateTheAnswerAndUpdateReviewPoint() {
       Integer oldRepetitionCount = reviewPoint.getRepetitionCount();
       AnsweredQuestion answerResult =
-          controller.answerQuiz(quizQuestionAndAnswer.getQuizQuestion(), answerDTO);
+          controller.answerQuiz(questionAndAnswer.getQuizQuestion(), answerDTO);
       assertTrue(answerResult.correct);
       assertThat(reviewPoint.getRepetitionCount(), greaterThan(oldRepetitionCount));
     }
@@ -102,7 +102,7 @@ class RestQuizQuestionAndAnswerControllerTests {
     void shouldNoteIncreaseIndexIfRepeatImmediately() {
       testabilitySettings.timeTravelTo(reviewPoint.getLastReviewedAt());
       Integer oldForgettingCurveIndex = reviewPoint.getForgettingCurveIndex();
-      controller.answerQuiz(quizQuestionAndAnswer.getQuizQuestion(), answerDTO);
+      controller.answerQuiz(questionAndAnswer.getQuizQuestion(), answerDTO);
       assertThat(reviewPoint.getForgettingCurveIndex(), equalTo(oldForgettingCurveIndex));
     }
 
@@ -110,7 +110,7 @@ class RestQuizQuestionAndAnswerControllerTests {
     void shouldIncreaseTheIndex() {
       testabilitySettings.timeTravelTo(reviewPoint.getNextReviewAt());
       Integer oldForgettingCurveIndex = reviewPoint.getForgettingCurveIndex();
-      controller.answerQuiz(quizQuestionAndAnswer.getQuizQuestion(), answerDTO);
+      controller.answerQuiz(questionAndAnswer.getQuizQuestion(), answerDTO);
       assertThat(reviewPoint.getForgettingCurveIndex(), greaterThan(oldForgettingCurveIndex));
       assertThat(
           reviewPoint.getLastReviewedAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
@@ -121,7 +121,7 @@ class RestQuizQuestionAndAnswerControllerTests {
       AnswerDTO answer = new AnswerDTO();
       assertThrows(
           ResponseStatusException.class,
-          () -> nullUserController().answerQuiz(quizQuestionAndAnswer.getQuizQuestion(), answer));
+          () -> nullUserController().answerQuiz(questionAndAnswer.getQuizQuestion(), answer));
     }
 
     @Nested
@@ -129,7 +129,7 @@ class RestQuizQuestionAndAnswerControllerTests {
       @BeforeEach
       void setup() {
         QuizQuestionBuilder quizQuestionBuilder = makeMe.aQuestion();
-        quizQuestionAndAnswer =
+        questionAndAnswer =
             quizQuestionBuilder.approvedSpellingQuestionOf(reviewPoint.getNote()).please();
         answerDTO.setSpellingAnswer("wrong");
       }
@@ -139,7 +139,7 @@ class RestQuizQuestionAndAnswerControllerTests {
         testabilitySettings.timeTravelTo(reviewPoint.getNextReviewAt());
         Integer oldRepetitionCount = reviewPoint.getRepetitionCount();
         AnsweredQuestion answerResult =
-            controller.answerQuiz(quizQuestionAndAnswer.getQuizQuestion(), answerDTO);
+            controller.answerQuiz(questionAndAnswer.getQuizQuestion(), answerDTO);
         assertFalse(answerResult.correct);
         assertThat(reviewPoint.getRepetitionCount(), greaterThan(oldRepetitionCount));
       }
@@ -149,14 +149,14 @@ class RestQuizQuestionAndAnswerControllerTests {
         testabilitySettings.timeTravelTo(reviewPoint.getNextReviewAt());
         Timestamp lastReviewedAt = reviewPoint.getLastReviewedAt();
         Integer oldForgettingCurveIndex = reviewPoint.getForgettingCurveIndex();
-        controller.answerQuiz(quizQuestionAndAnswer.getQuizQuestion(), answerDTO);
+        controller.answerQuiz(questionAndAnswer.getQuizQuestion(), answerDTO);
         assertThat(reviewPoint.getForgettingCurveIndex(), lessThan(oldForgettingCurveIndex));
         assertThat(reviewPoint.getLastReviewedAt(), equalTo(lastReviewedAt));
       }
 
       @Test
       void shouldRepeatTheNextDay() {
-        controller.answerQuiz(quizQuestionAndAnswer.getQuizQuestion(), answerDTO);
+        controller.answerQuiz(questionAndAnswer.getQuizQuestion(), answerDTO);
         assertThat(
             reviewPoint.getNextReviewAt(),
             lessThan(
@@ -168,7 +168,7 @@ class RestQuizQuestionAndAnswerControllerTests {
 
   @Nested
   class SuggestQuestionForFineTuning {
-    QuizQuestionAndAnswer quizQuestionAndAnswer;
+    QuestionAndAnswer questionAndAnswer;
     MCQWithAnswer mcqWithAnswer;
     Note note;
 
@@ -182,8 +182,7 @@ class RestQuizQuestionAndAnswerControllerTests {
     void setup() throws QuizQuestionNotPossibleException {
       note = makeMe.aNote().creatorAndOwner(currentUser).please();
       mcqWithAnswer = makeMe.aMCQWithAnswer().please();
-      quizQuestionAndAnswer =
-          makeMe.aQuestion().ofAIGeneratedQuestion(mcqWithAnswer, note).please();
+      questionAndAnswer = makeMe.aQuestion().ofAIGeneratedQuestion(mcqWithAnswer, note).please();
     }
 
     @Test
@@ -191,10 +190,10 @@ class RestQuizQuestionAndAnswerControllerTests {
 
       SuggestedQuestionForFineTuning suggestedQuestionForFineTuning =
           controller.suggestQuestionForFineTuning(
-              quizQuestionAndAnswer, suggestionWithPositiveFeedback);
+              questionAndAnswer, suggestionWithPositiveFeedback);
       assert suggestedQuestionForFineTuning != null;
       assertEquals(
-          quizQuestionAndAnswer.getMcqWithAnswer(),
+          questionAndAnswer.getMcqWithAnswer(),
           suggestedQuestionForFineTuning.getPreservedQuestion());
       assertEquals("this is a comment", suggestedQuestionForFineTuning.getComment());
       assertTrue(suggestedQuestionForFineTuning.isPositiveFeedback(), "Incorrect Feedback");
@@ -205,10 +204,10 @@ class RestQuizQuestionAndAnswerControllerTests {
     void suggestQuestionWithANegativeFeedback() {
       SuggestedQuestionForFineTuning suggestedQuestionForFineTuning =
           controller.suggestQuestionForFineTuning(
-              quizQuestionAndAnswer, suggestionWithNegativeFeedback);
+              questionAndAnswer, suggestionWithNegativeFeedback);
       assert suggestedQuestionForFineTuning != null;
       assertEquals(
-          quizQuestionAndAnswer.getMcqWithAnswer(),
+          questionAndAnswer.getMcqWithAnswer(),
           suggestedQuestionForFineTuning.getPreservedQuestion());
       assertEquals("this is a comment", suggestedQuestionForFineTuning.getComment());
       assertFalse(suggestedQuestionForFineTuning.isPositiveFeedback(), "Incorrect Feedback");
@@ -219,7 +218,7 @@ class RestQuizQuestionAndAnswerControllerTests {
     void suggestQuestionWithSnapshotQuestionStem() {
       var suggestedQuestionForFineTuning =
           controller.suggestQuestionForFineTuning(
-              quizQuestionAndAnswer, suggestionWithPositiveFeedback);
+              questionAndAnswer, suggestionWithPositiveFeedback);
       assert suggestedQuestionForFineTuning != null;
       assertThat(
           suggestedQuestionForFineTuning
@@ -232,8 +231,7 @@ class RestQuizQuestionAndAnswerControllerTests {
     @Test
     void createMarkedQuestionInDatabase() {
       long oldCount = modelFactoryService.questionSuggestionForFineTuningRepository.count();
-      controller.suggestQuestionForFineTuning(
-          quizQuestionAndAnswer, suggestionWithPositiveFeedback);
+      controller.suggestQuestionForFineTuning(questionAndAnswer, suggestionWithPositiveFeedback);
       assertThat(
           modelFactoryService.questionSuggestionForFineTuningRepository.count(),
           equalTo(oldCount + 1));
@@ -321,7 +319,7 @@ class RestQuizQuestionAndAnswerControllerTests {
     @Test
     void generateQuestionForAssessmentOfNote() {
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(jsonQuestion, "");
-      QuizQuestionAndAnswer quizQuestionDTO = controller.generateAIQuestionWithoutSave(note);
+      QuestionAndAnswer quizQuestionDTO = controller.generateAIQuestionWithoutSave(note);
 
       Assertions.assertThat(quizQuestionDTO.getMultipleChoicesQuestion().getStem())
           .contains("What is the first color in the rainbow?");
@@ -331,14 +329,14 @@ class RestQuizQuestionAndAnswerControllerTests {
 
   @Nested
   class RegenerateQuestion {
-    QuizQuestionAndAnswer quizQuestionAndAnswer;
+    QuestionAndAnswer questionAndAnswer;
     Note note;
 
     @BeforeEach
     void setUp() {
       note = makeMe.aNote().please();
 
-      quizQuestionAndAnswer = makeMe.aQuestion().approvedSpellingQuestionOf(note).please();
+      questionAndAnswer = makeMe.aQuestion().approvedSpellingQuestionOf(note).please();
     }
 
     @Test
@@ -352,7 +350,7 @@ class RestQuizQuestionAndAnswerControllerTests {
                     makeMe.modelFactoryService,
                     makeMe.aNullUserModelPlease(),
                     testabilitySettings);
-            restAiController.regenerate(quizQuestionAndAnswer.getQuizQuestion());
+            restAiController.regenerate(questionAndAnswer.getQuizQuestion());
           });
     }
 
@@ -362,8 +360,7 @@ class RestQuizQuestionAndAnswerControllerTests {
           makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
 
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(jsonQuestion, "");
-      QuizQuestion quizQuestion =
-          controller.regenerate(this.quizQuestionAndAnswer.getQuizQuestion());
+      QuizQuestion quizQuestion = controller.regenerate(this.questionAndAnswer.getQuizQuestion());
 
       Assertions.assertThat(quizQuestion.getMultipleChoicesQuestion().getStem())
           .contains("What is the first color in the rainbow?");
@@ -372,7 +369,7 @@ class RestQuizQuestionAndAnswerControllerTests {
 
   @Nested
   class Contest {
-    QuizQuestionAndAnswer quizQuestion;
+    QuestionAndAnswer quizQuestion;
     QuestionEvaluation questionEvaluation = new QuestionEvaluation();
 
     @BeforeEach
@@ -432,7 +429,7 @@ class RestQuizQuestionAndAnswerControllerTests {
   }
 
   @Nested
-  class GetListOfQuizQuestionAndAnswerForNotebook {
+  class GetListOfQuestionAndAnswerForNotebook {
     Note noteWithoutQuestions;
     Note noteWithQuestions;
 
@@ -455,15 +452,15 @@ class RestQuizQuestionAndAnswerControllerTests {
 
     @Test
     void getQuestionsOfANoteWhenThereIsNotQuestion() throws UnexpectedNoAccessRightException {
-      List<QuizQuestionAndAnswer> results = controller.getAllQuestionByNote(noteWithoutQuestions);
+      List<QuestionAndAnswer> results = controller.getAllQuestionByNote(noteWithoutQuestions);
       assertThat(results, hasSize(0));
     }
 
     @Test
     void getQuestionsOfANoteWhenThereIsOneQuestion() throws UnexpectedNoAccessRightException {
-      QuizQuestionAndAnswer questionOfNote =
+      QuestionAndAnswer questionOfNote =
           makeMe.aQuestion().approvedSpellingQuestionOf(noteWithoutQuestions).please();
-      List<QuizQuestionAndAnswer> results = controller.getAllQuestionByNote(noteWithoutQuestions);
+      List<QuestionAndAnswer> results = controller.getAllQuestionByNote(noteWithoutQuestions);
       assertThat(results, contains(questionOfNote));
     }
 
@@ -471,7 +468,7 @@ class RestQuizQuestionAndAnswerControllerTests {
     void getAllQuestionsOfANoteWhenThereIsMoreThanOneQuestion()
         throws UnexpectedNoAccessRightException {
       makeMe.aQuestion().approvedSpellingQuestionOf(noteWithQuestions).please();
-      List<QuizQuestionAndAnswer> results = controller.getAllQuestionByNote(noteWithQuestions);
+      List<QuestionAndAnswer> results = controller.getAllQuestionByNote(noteWithQuestions);
       assertThat(results, hasSize(2));
     }
   }
@@ -481,7 +478,7 @@ class RestQuizQuestionAndAnswerControllerTests {
     @Test
     void authorization() {
       Note note = makeMe.aNote().please();
-      QuizQuestionAndAnswer mcqWithAnswer = makeMe.aQuestion().please();
+      QuestionAndAnswer mcqWithAnswer = makeMe.aQuestion().please();
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.addQuestionManually(note, mcqWithAnswer));
@@ -490,10 +487,10 @@ class RestQuizQuestionAndAnswerControllerTests {
     @Test
     void persistent() throws UnexpectedNoAccessRightException {
       Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
-      QuizQuestionAndAnswer mcqWithAnswer = makeMe.aQuestion().please();
+      QuestionAndAnswer mcqWithAnswer = makeMe.aQuestion().please();
       controller.addQuestionManually(note, mcqWithAnswer);
       makeMe.refresh(note);
-      assertThat(note.getQuizQuestionAndAnswers(), hasSize(1));
+      assertThat(note.getQuestionAndAnswers(), hasSize(1));
     }
   }
 
@@ -502,7 +499,7 @@ class RestQuizQuestionAndAnswerControllerTests {
     @Test
     void authorization() {
       Note note = makeMe.aNote().please();
-      QuizQuestionAndAnswer mcqWithAnswer = makeMe.aQuestion().please();
+      QuestionAndAnswer mcqWithAnswer = makeMe.aQuestion().please();
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.addQuestionManually(note, mcqWithAnswer));
@@ -511,10 +508,10 @@ class RestQuizQuestionAndAnswerControllerTests {
     @Test
     void givenQuestion_thenReturnRefineQuestion() throws UnexpectedNoAccessRightException {
       Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
-      QuizQuestionAndAnswer questionAndAnswer = makeMe.aQuestion().please();
+      QuestionAndAnswer questionAndAnswer = makeMe.aQuestion().please();
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(mcqWithAnswer, "");
-      QuizQuestionAndAnswer result = controller.refineQuestion(note, questionAndAnswer);
+      QuestionAndAnswer result = controller.refineQuestion(note, questionAndAnswer);
 
       assertEquals(0, result.getCorrectAnswerIndex());
       assertEquals("a default question stem", result.getMultipleChoicesQuestion().getStem());
@@ -525,7 +522,7 @@ class RestQuizQuestionAndAnswerControllerTests {
 
     @Test
     void refineQuestionFailedWithGpt35WillNotTryAgain() throws JsonProcessingException {
-      QuizQuestionAndAnswer mcqWithAnswer = makeMe.aQuestion().please();
+      QuestionAndAnswer mcqWithAnswer = makeMe.aQuestion().please();
       Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCallJsonNode(
           new ObjectMapper()
@@ -549,28 +546,28 @@ class RestQuizQuestionAndAnswerControllerTests {
     @Test
     void mustNotBeAbleToApproveOtherPeoplesNoteQuestion() {
       Note note = makeMe.aNote().creatorAndOwner(makeMe.aUser().please()).please();
-      QuizQuestionAndAnswer quizQuestionAndAnswer =
+      QuestionAndAnswer questionAndAnswer =
           makeMe.aQuestion().approvedSpellingQuestionOf(note).please();
       assertThrows(
           UnexpectedNoAccessRightException.class,
-          () -> controller.toggleApproval(quizQuestionAndAnswer));
+          () -> controller.toggleApproval(questionAndAnswer));
     }
 
     @Test
     void approveQuestion() throws UnexpectedNoAccessRightException {
-      QuizQuestionAndAnswer quizQuestionAndAnswer =
+      QuestionAndAnswer questionAndAnswer =
           makeMe.aQuestion().approvedSpellingQuestionOf(subjectNote).please();
-      quizQuestionAndAnswer.setApproved(false);
-      QuizQuestionAndAnswer approvedQuestion = controller.toggleApproval(quizQuestionAndAnswer);
+      questionAndAnswer.setApproved(false);
+      QuestionAndAnswer approvedQuestion = controller.toggleApproval(questionAndAnswer);
       assertTrue(approvedQuestion.isApproved());
     }
 
     @Test
     void unApproveQuestion() throws UnexpectedNoAccessRightException {
-      QuizQuestionAndAnswer quizQuestionAndAnswer =
+      QuestionAndAnswer questionAndAnswer =
           makeMe.aQuestion().approvedSpellingQuestionOf(subjectNote).please();
-      quizQuestionAndAnswer.setApproved(true);
-      QuizQuestionAndAnswer approvedQuestion = controller.toggleApproval(quizQuestionAndAnswer);
+      questionAndAnswer.setApproved(true);
+      QuestionAndAnswer approvedQuestion = controller.toggleApproval(questionAndAnswer);
       assertFalse(approvedQuestion.isApproved());
     }
   }

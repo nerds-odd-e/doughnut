@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { NotesTestData } from '../models/NotesTestData';
-import type { QuizQuestionAndAnswer } from '../models/QuizQuestionAndAnswer';
+import type { QuestionAndAnswer } from '../models/QuestionAndAnswer';
 import type { QuizQuestionsTestData } from '../models/QuizQuestionsTestData';
 import type { Randomization } from '../models/Randomization';
 import type { SuggestedQuestionsData } from '../models/SuggestedQuestionsData';
@@ -185,12 +185,12 @@ export class TestabilityRestControllerService {
     }
     /**
      * @param requestBody
-     * @returns QuizQuestionAndAnswer OK
+     * @returns QuestionAndAnswer OK
      * @throws ApiError
      */
     public injectQuizQuestion(
         requestBody: QuizQuestionsTestData,
-    ): CancelablePromise<Array<QuizQuestionAndAnswer>> {
+    ): CancelablePromise<Array<QuestionAndAnswer>> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/testability/inject_quiz_questions',

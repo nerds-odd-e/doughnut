@@ -32,7 +32,7 @@ import org.springframework.web.server.ResponseStatusException;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class QuizQuestionAndAnswerTest {
+class QuestionAndAnswerTest {
   @Autowired MakeMe makeMe;
   UserModel userModel;
   NonRandomizer randomizer = new NonRandomizer();
@@ -55,9 +55,9 @@ class QuizQuestionAndAnswerTest {
     makeMe.aNote().under(top).please();
     Note note =
         makeMe.aNote().under(top).titleConstructor("abc").details("abc has 3 letters").please();
-    QuizQuestionAndAnswer quizQuestionAndAnswer = generateQuizQuestion(note);
+    QuestionAndAnswer questionAndAnswer = generateQuizQuestion(note);
     assertThat(
-        quizQuestionAndAnswer.getMultipleChoicesQuestion().getStem(),
+        questionAndAnswer.getMultipleChoicesQuestion().getStem(),
         containsString(
             "<mark title='Hidden text that is matching the answer'>[...]</mark> has 3 letters"));
   }
@@ -85,8 +85,8 @@ class QuizQuestionAndAnswerTest {
 
       @Test
       void descendingRandomizer() {
-        QuizQuestionAndAnswer quizQuestionAndAnswer = generateQuizQuestion(note1);
-        List<String> options = quizQuestionAndAnswer.getMultipleChoicesQuestion().getChoices();
+        QuestionAndAnswer questionAndAnswer = generateQuizQuestion(note1);
+        List<String> options = questionAndAnswer.getMultipleChoicesQuestion().getChoices();
         assertThat(
             options,
             containsInRelativeOrder(note2.getTopicConstructor(), note1.getTopicConstructor()));
@@ -95,8 +95,8 @@ class QuizQuestionAndAnswerTest {
       @Test
       void ascendingRandomizer() {
         randomizer.alwaysChoose = Randomization.RandomStrategy.last;
-        QuizQuestionAndAnswer quizQuestionAndAnswer = generateQuizQuestion(note1);
-        List<String> options = quizQuestionAndAnswer.getMultipleChoicesQuestion().getChoices();
+        QuestionAndAnswer questionAndAnswer = generateQuizQuestion(note1);
+        List<String> options = questionAndAnswer.getMultipleChoicesQuestion().getChoices();
         assertThat(
             options,
             containsInRelativeOrder(note1.getTopicConstructor(), note2.getTopicConstructor()));
@@ -108,8 +108,8 @@ class QuizQuestionAndAnswerTest {
       Note top = makeMe.aNote().please();
       makeMe.theNote(top).withNChildren(10).please();
       Note note = makeMe.aNote().under(top).please();
-      QuizQuestionAndAnswer quizQuestionAndAnswer = generateQuizQuestion(note);
-      List<String> options = quizQuestionAndAnswer.getMultipleChoicesQuestion().getChoices();
+      QuestionAndAnswer questionAndAnswer = generateQuizQuestion(note);
+      List<String> options = questionAndAnswer.getMultipleChoicesQuestion().getChoices();
       assertThat(options.size(), equalTo(3));
       assertThat(options.contains(note.getTopicConstructor()), is(true));
     }
@@ -137,10 +137,10 @@ class QuizQuestionAndAnswerTest {
       userModel.getEntity().setAiQuestionTypeOnlyForReview(true);
       AiQuestionGenerator questionGenerator = mock(AiQuestionGenerator.class);
       when(questionGenerator.getAiGeneratedQuestion(any())).thenReturn(mcqWithAnswer);
-      QuizQuestionAndAnswer randomQuizQuestion =
+      QuestionAndAnswer randomQuizQuestion =
           generateQuizQuestion(note, new RealRandomizer(), questionGenerator);
-      assertThat(randomQuizQuestion, instanceOf(QuizQuestionAndAnswer.class));
-      QuizQuestionAndAnswer qq = randomQuizQuestion;
+      assertThat(randomQuizQuestion, instanceOf(QuestionAndAnswer.class));
+      QuestionAndAnswer qq = randomQuizQuestion;
       assertThat(
           qq.getMultipleChoicesQuestion().getStem(),
           containsString(mcqWithAnswer.getMultipleChoicesQuestion().getStem()));
@@ -148,9 +148,8 @@ class QuizQuestionAndAnswerTest {
 
     @Test
     void shouldReturnTheSameType() {
-      QuizQuestionAndAnswer randomQuizQuestion =
-          generateQuizQuestion(note, new RealRandomizer(), null);
-      Set<Class<? extends QuizQuestionAndAnswer>> types = new HashSet<>();
+      QuestionAndAnswer randomQuizQuestion = generateQuizQuestion(note, new RealRandomizer(), null);
+      Set<Class<? extends QuestionAndAnswer>> types = new HashSet<>();
       for (int i = 0; i < 3; i++) {
         types.add(randomQuizQuestion.getClass());
       }
@@ -161,7 +160,7 @@ class QuizQuestionAndAnswerTest {
     void shouldChooseTypeRandomly() {
       int spellingCount = 0;
       for (int i = 0; i < 20; i++) {
-        QuizQuestionAndAnswer randomQuizQuestion =
+        QuestionAndAnswer randomQuizQuestion =
             generateQuizQuestion(note, new RealRandomizer(), null);
         if (randomQuizQuestion.getQuizQuestion().getCheckSpell() != null
             && randomQuizQuestion.getQuizQuestion().getCheckSpell()) {
@@ -173,7 +172,7 @@ class QuizQuestionAndAnswerTest {
     }
   }
 
-  private QuizQuestionAndAnswer generateQuizQuestion(
+  private QuestionAndAnswer generateQuizQuestion(
       Note note, Randomizer randomizer1, AiQuestionGenerator aiQuestionGenerator) {
     QuizQuestionGenerator quizQuestionGenerator =
         new QuizQuestionGenerator(
@@ -181,11 +180,11 @@ class QuizQuestionAndAnswerTest {
     return quizQuestionGenerator.generateAQuestionOfRandomType(aiQuestionGenerator);
   }
 
-  private QuizQuestionAndAnswer generateQuizQuestionEntity(Note note) {
+  private QuestionAndAnswer generateQuizQuestionEntity(Note note) {
     return generateQuizQuestion(note, randomizer, null);
   }
 
-  private QuizQuestionAndAnswer generateQuizQuestion(Note note) {
+  private QuestionAndAnswer generateQuizQuestion(Note note) {
     return generateQuizQuestionEntity(note);
   }
 }

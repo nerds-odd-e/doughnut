@@ -25,12 +25,12 @@ public class AnswerModel {
     answerResult.correct = answer.isCorrect();
     answerResult.correctChoiceIndex = getQuestion().getCorrectAnswerIndex();
     answerResult.choiceIndex = answer.getChoiceIndex();
-    answerResult.quizQuestionAndAnswer = getQuestion();
+    answerResult.questionAndAnswer = getQuestion();
     return answerResult;
   }
 
-  private QuizQuestionAndAnswer getQuestion() {
-    return answer.getQuizQuestion().getQuizQuestionAndAnswer();
+  private QuestionAndAnswer getQuestion() {
+    return answer.getQuizQuestion().getQuestionAndAnswer();
   }
 
   public void makeAnswerToQuestion(Timestamp currentUTCTimestamp, User user) {

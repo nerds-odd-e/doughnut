@@ -53,11 +53,11 @@ class RestQuizQuestionController {
   public QuizQuestionInNotebook generateQuestion(
       @RequestParam(value = "note") @Schema(type = "integer") Note note) {
     currentUser.assertLoggedIn();
-    QuizQuestionAndAnswer quizQuestionAndAnswer = quizQuestionService.generateQuestionForNote(note);
-    if (quizQuestionAndAnswer == null) {
+    QuestionAndAnswer questionAndAnswer = quizQuestionService.generateQuestionForNote(note);
+    if (questionAndAnswer == null) {
       return null;
     }
-    return quizQuestionAndAnswer.toQuizQuestionInNotebook();
+    return questionAndAnswer.toQuizQuestionInNotebook();
   }
 
   @PostMapping("/{quizQuestion}/regenerate")
@@ -66,12 +66,12 @@ class RestQuizQuestionController {
       @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion) {
     currentUser.assertLoggedIn();
     return quizQuestionService
-        .generateQuestionForNote(quizQuestion.getQuizQuestionAndAnswer().getNote())
+        .generateQuestionForNote(quizQuestion.getQuestionAndAnswer().getNote())
         .getQuizQuestion();
   }
 
   @PostMapping("/generate-question-without-save")
-  public QuizQuestionAndAnswer generateAIQuestionWithoutSave(
+  public QuestionAndAnswer generateAIQuestionWithoutSave(
       @RequestParam(value = "note") @Schema(type = "integer") Note note) {
     currentUser.assertLoggedIn();
     return quizQuestionService.generateMcqWithAnswer(note);
@@ -82,8 +82,7 @@ class RestQuizQuestionController {
   public QuizQuestionContestResult contest(
       @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion) {
     currentUser.assertLoggedIn();
-    return aiQuestionGenerator.getQuizQuestionContestResult(
-        quizQuestion.getQuizQuestionAndAnswer());
+    return aiQuestionGenerator.getQuizQuestionContestResult(quizQuestion.getQuestionAndAnswer());
   }
 
   @PostMapping("/{quizQuestion}/answer")
@@ -104,32 +103,31 @@ class RestQuizQuestionController {
   @PostMapping("/{quizQuestion}/suggest-fine-tuning")
   @Transactional
   public SuggestedQuestionForFineTuning suggestQuestionForFineTuning(
-      @PathVariable("quizQuestion") @Schema(type = "integer")
-          QuizQuestionAndAnswer quizQuestionAndAnswer,
+      @PathVariable("quizQuestion") @Schema(type = "integer") QuestionAndAnswer questionAndAnswer,
       @Valid @RequestBody QuestionSuggestionCreationParams suggestion) {
     SuggestedQuestionForFineTuning sqft = new SuggestedQuestionForFineTuning();
     var suggestedQuestionForFineTuningService =
         modelFactoryService.toSuggestedQuestionForFineTuningService(sqft);
     return suggestedQuestionForFineTuningService.suggestQuestionForFineTuning(
-        quizQuestionAndAnswer,
+        questionAndAnswer,
         suggestion,
         currentUser.getEntity(),
         testabilitySettings.getCurrentUTCTimestamp());
   }
 
   @GetMapping("/{note}/note-questions")
-  public List<QuizQuestionAndAnswer> getAllQuestionByNote(
+  public List<QuestionAndAnswer> getAllQuestionByNote(
       @PathVariable("note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
-    return note.getQuizQuestionAndAnswers().stream().toList();
+    return note.getQuestionAndAnswers().stream().toList();
   }
 
   @PostMapping("/{note}/note-questions")
   @Transactional
-  public QuizQuestionAndAnswer addQuestionManually(
+  public QuestionAndAnswer addQuestionManually(
       @PathVariable("note") @Schema(type = "integer") Note note,
-      @Valid @RequestBody QuizQuestionAndAnswer questionAndAnswer)
+      @Valid @RequestBody QuestionAndAnswer questionAndAnswer)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
     return quizQuestionService.addQuestion(note, questionAndAnswer);
@@ -137,9 +135,9 @@ class RestQuizQuestionController {
 
   @PostMapping("/{note}/refine-question")
   @Transactional
-  public QuizQuestionAndAnswer refineQuestion(
+  public QuestionAndAnswer refineQuestion(
       @PathVariable("note") @Schema(type = "integer") Note note,
-      @RequestBody QuizQuestionAndAnswer questionAndAnswer)
+      @RequestBody QuestionAndAnswer questionAndAnswer)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
     return quizQuestionService.refineQuestion(note, questionAndAnswer);
@@ -147,11 +145,10 @@ class RestQuizQuestionController {
 
   @PostMapping("/{quizQuestion}/toggle-approval")
   @Transactional
-  public QuizQuestionAndAnswer toggleApproval(
-      @PathVariable("quizQuestion") @Schema(type = "integer")
-          QuizQuestionAndAnswer quizQuestionAndAnswer)
+  public QuestionAndAnswer toggleApproval(
+      @PathVariable("quizQuestion") @Schema(type = "integer") QuestionAndAnswer questionAndAnswer)
       throws UnexpectedNoAccessRightException {
-    currentUser.assertAuthorization(quizQuestionAndAnswer.getNote());
-    return quizQuestionService.toggleApproval(quizQuestionAndAnswer);
+    currentUser.assertAuthorization(questionAndAnswer.getNote());
+    return quizQuestionService.toggleApproval(questionAndAnswer);
   }
 }

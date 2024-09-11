@@ -14,12 +14,12 @@
 
 <script setup lang="ts">
 import { PropType } from "vue"
-import { QuizQuestionAndAnswer } from "@/generated/backend"
+import { QuestionAndAnswer } from "@/generated/backend"
 import SuggestQuestionForFineTuning from "../ai/SuggestQuestionForFineTuning.vue"
 
 defineProps({
   questionAndAnswer: {
-    type: Object as PropType<QuizQuestionAndAnswer>,
+    type: Object as PropType<QuestionAndAnswer>,
     required: true,
   },
 })

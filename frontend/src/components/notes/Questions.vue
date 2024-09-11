@@ -76,7 +76,7 @@
 
 <script setup lang="ts">
 import { PropType, onMounted, ref } from "vue"
-import { Note, QuizQuestionAndAnswer } from "@/generated/backend"
+import { Note, QuestionAndAnswer } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import NoteAddQuestion from "./NoteAddQuestion.vue"
 import QuestionManagement from "./QuestionManagement.vue"
@@ -89,8 +89,8 @@ const props = defineProps({
     required: true,
   },
 })
-const questions = ref<QuizQuestionAndAnswer[]>([])
-const openedQuestion = ref<QuizQuestionAndAnswer | undefined>()
+const questions = ref<QuestionAndAnswer[]>([])
+const openedQuestion = ref<QuestionAndAnswer | undefined>()
 
 const fetchQuestions = async () => {
   questions.value =
@@ -98,7 +98,7 @@ const fetchQuestions = async () => {
       props.note.id
     )
 }
-const questionAdded = (newQuestion: QuizQuestionAndAnswer) => {
+const questionAdded = (newQuestion: QuestionAndAnswer) => {
   if (newQuestion == null) {
     return
   }

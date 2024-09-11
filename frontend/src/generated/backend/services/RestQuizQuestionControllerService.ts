@@ -4,9 +4,9 @@
 /* eslint-disable */
 import type { AnswerDTO } from '../models/AnswerDTO';
 import type { AnsweredQuestion } from '../models/AnsweredQuestion';
+import type { QuestionAndAnswer } from '../models/QuestionAndAnswer';
 import type { QuestionSuggestionCreationParams } from '../models/QuestionSuggestionCreationParams';
 import type { QuizQuestion } from '../models/QuizQuestion';
-import type { QuizQuestionAndAnswer } from '../models/QuizQuestionAndAnswer';
 import type { QuizQuestionContestResult } from '../models/QuizQuestionContestResult';
 import type { QuizQuestionInNotebook } from '../models/QuizQuestionInNotebook';
 import type { SuggestedQuestionForFineTuning } from '../models/SuggestedQuestionForFineTuning';
@@ -16,12 +16,12 @@ export class RestQuizQuestionControllerService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
      * @param quizQuestion
-     * @returns QuizQuestionAndAnswer OK
+     * @returns QuestionAndAnswer OK
      * @throws ApiError
      */
     public toggleApproval(
         quizQuestion: number,
-    ): CancelablePromise<QuizQuestionAndAnswer> {
+    ): CancelablePromise<QuestionAndAnswer> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/quiz-questions/{quizQuestion}/toggle-approval',
@@ -120,13 +120,13 @@ export class RestQuizQuestionControllerService {
     /**
      * @param note
      * @param requestBody
-     * @returns QuizQuestionAndAnswer OK
+     * @returns QuestionAndAnswer OK
      * @throws ApiError
      */
     public refineQuestion(
         note: number,
-        requestBody: QuizQuestionAndAnswer,
-    ): CancelablePromise<QuizQuestionAndAnswer> {
+        requestBody: QuestionAndAnswer,
+    ): CancelablePromise<QuestionAndAnswer> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/quiz-questions/{note}/refine-question',
@@ -142,12 +142,12 @@ export class RestQuizQuestionControllerService {
     }
     /**
      * @param note
-     * @returns QuizQuestionAndAnswer OK
+     * @returns QuestionAndAnswer OK
      * @throws ApiError
      */
     public getAllQuestionByNote(
         note: number,
-    ): CancelablePromise<Array<QuizQuestionAndAnswer>> {
+    ): CancelablePromise<Array<QuestionAndAnswer>> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/quiz-questions/{note}/note-questions',
@@ -162,13 +162,13 @@ export class RestQuizQuestionControllerService {
     /**
      * @param note
      * @param requestBody
-     * @returns QuizQuestionAndAnswer OK
+     * @returns QuestionAndAnswer OK
      * @throws ApiError
      */
     public addQuestionManually(
         note: number,
-        requestBody: QuizQuestionAndAnswer,
-    ): CancelablePromise<QuizQuestionAndAnswer> {
+        requestBody: QuestionAndAnswer,
+    ): CancelablePromise<QuestionAndAnswer> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/quiz-questions/{note}/note-questions',
@@ -203,12 +203,12 @@ export class RestQuizQuestionControllerService {
     }
     /**
      * @param note
-     * @returns QuizQuestionAndAnswer OK
+     * @returns QuestionAndAnswer OK
      * @throws ApiError
      */
     public generateAiQuestionWithoutSave(
         note: number,
-    ): CancelablePromise<QuizQuestionAndAnswer> {
+    ): CancelablePromise<QuestionAndAnswer> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/quiz-questions/generate-question-without-save',

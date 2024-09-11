@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class QuizQuestionAndAnswerGeneratorTest {
+class QuestionAndAnswerGeneratorTest {
   @Autowired MakeMe makeMe;
 
   Note note;

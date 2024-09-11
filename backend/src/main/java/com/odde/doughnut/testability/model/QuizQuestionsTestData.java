@@ -2,7 +2,7 @@ package com.odde.doughnut.testability.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestionAndAnswer;
+import com.odde.doughnut.entities.QuestionAndAnswer;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
 import java.util.List;
@@ -33,21 +33,21 @@ public class QuizQuestionsTestData {
     @JsonProperty("Approved")
     private boolean approved;
 
-    public QuizQuestionAndAnswer buildQuizQuestion(Note note) {
+    public QuestionAndAnswer buildQuizQuestion(Note note) {
       MultipleChoicesQuestion mcq = new MultipleChoicesQuestion();
       mcq.setStem(question);
       mcq.setChoices(List.of(answer, oneWrongChoice));
-      QuizQuestionAndAnswer question = new QuizQuestionAndAnswer();
+      QuestionAndAnswer question = new QuestionAndAnswer();
       question.setNote(note);
       question.setCorrectAnswerIndex(0);
       question.setMultipleChoicesQuestion(mcq);
       question.setApproved(approved);
-      question.getQuizQuestion().setQuizQuestionAndAnswer(question);
+      question.getQuizQuestion().setQuestionAndAnswer(question);
       return question;
     }
   }
 
-  public List<QuizQuestionAndAnswer> buildQuizQuestions(ModelFactoryService factoryService) {
+  public List<QuestionAndAnswer> buildQuizQuestions(ModelFactoryService factoryService) {
     return quizQuestionTestData.stream()
         .map(
             question ->

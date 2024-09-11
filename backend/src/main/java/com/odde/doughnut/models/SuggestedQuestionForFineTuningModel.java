@@ -2,7 +2,7 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.controllers.dto.QuestionSuggestionCreationParams;
 import com.odde.doughnut.controllers.dto.QuestionSuggestionParams;
-import com.odde.doughnut.entities.QuizQuestionAndAnswer;
+import com.odde.doughnut.entities.QuestionAndAnswer;
 import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -28,18 +28,18 @@ public class SuggestedQuestionForFineTuningModel {
   }
 
   public SuggestedQuestionForFineTuning suggestQuestionForFineTuning(
-      QuizQuestionAndAnswer quizQuestionAndAnswer,
+      QuestionAndAnswer questionAndAnswer,
       QuestionSuggestionCreationParams suggestionCreationParams,
       User user,
       Timestamp currentUTCTimestamp) {
     entity.setUser(user);
     entity.setCreatedAt(currentUTCTimestamp);
-    entity.preserveNoteContent(quizQuestionAndAnswer.getNote());
-    entity.preserveQuestion(quizQuestionAndAnswer.getMcqWithAnswer());
+    entity.preserveNoteContent(questionAndAnswer.getNote());
+    entity.preserveQuestion(questionAndAnswer.getMcqWithAnswer());
     entity.setComment(suggestionCreationParams.comment);
     entity.setPositiveFeedback(suggestionCreationParams.isPositiveFeedback);
     if (suggestionCreationParams.isPositiveFeedback) {
-      entity.setRealCorrectAnswers("%d".formatted(quizQuestionAndAnswer.getCorrectAnswerIndex()));
+      entity.setRealCorrectAnswers("%d".formatted(questionAndAnswer.getCorrectAnswerIndex()));
     }
     return modelFactoryService.save(entity);
   }

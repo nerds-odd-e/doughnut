@@ -5,7 +5,7 @@
 import type { ImageWithMask } from './ImageWithMask';
 import type { MultipleChoicesQuestion } from './MultipleChoicesQuestion';
 import type { QuizQuestion } from './QuizQuestion';
-export type QuizQuestionAndAnswer = {
+export type QuestionAndAnswer = {
     id: number;
     quizQuestion: QuizQuestion;
     multipleChoicesQuestion: MultipleChoicesQuestion;

@@ -40,7 +40,7 @@ class LinkSourceQuizFactoryTest {
   @Test
   void shouldReturnNullIfCannotFindEnoughOptions() {
     makeMe.aLink().between(anotherSource, target).please();
-    QuizQuestionAndAnswer actual = buildLinkSourceQuizQuestion();
+    QuestionAndAnswer actual = buildLinkSourceQuizQuestion();
     assertThat(actual, is(nullValue()));
   }
 
@@ -48,21 +48,21 @@ class LinkSourceQuizFactoryTest {
   class WhenThereAreMoreThanOneOptions {
     @Test
     void shouldIncludeRightAnswers() {
-      QuizQuestionAndAnswer quizQuestionAndAnswer = buildLinkSourceQuizQuestion();
+      QuestionAndAnswer questionAndAnswer = buildLinkSourceQuizQuestion();
       assertThat(
-          quizQuestionAndAnswer.getMultipleChoicesQuestion().getStem(),
+          questionAndAnswer.getMultipleChoicesQuestion().getStem(),
           containsString("Which one <em>is immediately a specialization of</em>:"));
       assertThat(
-          quizQuestionAndAnswer.getMultipleChoicesQuestion().getStem(),
+          questionAndAnswer.getMultipleChoicesQuestion().getStem(),
           containsString(target.getTopicConstructor()));
-      List<String> options = quizQuestionAndAnswer.getMultipleChoicesQuestion().getChoices();
+      List<String> options = questionAndAnswer.getMultipleChoicesQuestion().getChoices();
       assertThat(options, hasSize(2));
       assertThat(anotherSource.getTopicConstructor(), in(options));
       assertThat("tomato sauce", in(options));
     }
   }
 
-  private QuizQuestionAndAnswer buildLinkSourceQuizQuestion() {
+  private QuestionAndAnswer buildLinkSourceQuizQuestion() {
     return makeMe.buildAQuestionForLinkingNote(LinkQuestionType.LINK_SOURCE, subjectNote, user);
   }
 }

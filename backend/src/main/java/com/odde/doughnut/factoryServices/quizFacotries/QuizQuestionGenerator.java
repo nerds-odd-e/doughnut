@@ -13,18 +13,18 @@ import org.springframework.web.server.ResponseStatusException;
 public record QuizQuestionGenerator(
     User user, Note note, Randomizer randomizer, ModelFactoryService modelFactoryService) {
 
-  private Optional<QuizQuestionAndAnswer> getQuizQuestionEntity(
+  private Optional<QuestionAndAnswer> getQuizQuestionEntity(
       QuizQuestionFactory quizQuestionFactory) {
     try {
-      QuizQuestionAndAnswer quizQuestionAndAnswer = quizQuestionFactory.buildValidQuizQuestion();
-      quizQuestionAndAnswer.getQuizQuestion().setQuizQuestionAndAnswer(quizQuestionAndAnswer);
-      return Optional.of(quizQuestionAndAnswer);
+      QuestionAndAnswer questionAndAnswer = quizQuestionFactory.buildValidQuizQuestion();
+      questionAndAnswer.getQuizQuestion().setQuestionAndAnswer(questionAndAnswer);
+      return Optional.of(questionAndAnswer);
     } catch (QuizQuestionNotPossibleException e) {
       return Optional.empty();
     }
   }
 
-  private QuizQuestionAndAnswer generateAQuestionOfFirstPossibleType(
+  private QuestionAndAnswer generateAQuestionOfFirstPossibleType(
       List<QuizQuestionFactory> quizQuestionFactoryStream) {
     return quizQuestionFactoryStream.stream()
         .map(this::getQuizQuestionEntity)
@@ -33,8 +33,7 @@ public record QuizQuestionGenerator(
         .orElse(null);
   }
 
-  public QuizQuestionAndAnswer generateAQuestionOfRandomType(
-      AiQuestionGenerator questionGenerator) {
+  public QuestionAndAnswer generateAQuestionOfRandomType(AiQuestionGenerator questionGenerator) {
     List<QuizQuestionFactory> shuffled;
     if (note instanceof HierarchicalNote && user.getAiQuestionTypeOnlyForReview()) {
       shuffled = List.of(new AiQuestionFactory(note, questionGenerator));
@@ -44,7 +43,7 @@ public record QuizQuestionGenerator(
               note.getQuizQuestionFactories(
                   new QuizQuestionServant(user, randomizer, modelFactoryService)));
     }
-    QuizQuestionAndAnswer result = generateAQuestionOfFirstPossibleType(shuffled);
+    QuestionAndAnswer result = generateAQuestionOfFirstPossibleType(shuffled);
     if (result == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated");
     }

@@ -1,9 +1,9 @@
-import { QuizQuestionAndAnswer } from "@/generated/backend"
+import { QuestionAndAnswer } from "@/generated/backend"
 import isMCQWithAnswerValid from "@/models/isMCQWithAnswerValid"
 
 describe("isMCQWithAnswerValid", () => {
   it("should return true when the MCQWithAnswer is valid", () => {
-    const validMCQWithAnswer: QuizQuestionAndAnswer = {
+    const validMCQWithAnswer: QuestionAndAnswer = {
       id: 1,
       correctAnswerIndex: 0,
       multipleChoicesQuestion: {
@@ -23,7 +23,7 @@ describe("isMCQWithAnswerValid", () => {
   })
 
   it("should return false when the MCQWithAnswer is invalid", () => {
-    const invalidMCQWithAnswer: QuizQuestionAndAnswer = {
+    const invalidMCQWithAnswer: QuestionAndAnswer = {
       id: 1,
       correctAnswerIndex: -1,
       multipleChoicesQuestion: {
@@ -42,7 +42,7 @@ describe("isMCQWithAnswerValid", () => {
     expect(isMCQWithAnswerValid(invalidMCQWithAnswer)).toBe(false)
   })
   it("should return false when the second choice is empty", () => {
-    const mcqWithAnswer: QuizQuestionAndAnswer = {
+    const mcqWithAnswer: QuestionAndAnswer = {
       id: 1,
       correctAnswerIndex: 0,
       multipleChoicesQuestion: {
