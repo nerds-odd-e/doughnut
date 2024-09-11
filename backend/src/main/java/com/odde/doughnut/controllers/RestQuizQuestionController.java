@@ -65,9 +65,8 @@ class RestQuizQuestionController {
   public QuizQuestion regenerate(
       @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion) {
     currentUser.assertLoggedIn();
-    return quizQuestionService
-        .generateQuestionForNote(quizQuestion.getPredefinedQuestion().getNote())
-        .getQuizQuestion();
+    return quizQuestionService.generateQuizQuestionForNote(
+        quizQuestion.getPredefinedQuestion().getNote());
   }
 
   @PostMapping("/generate-question-without-save")

@@ -149,4 +149,10 @@ public class ModelFactoryService {
   public NotebookService notebookService(Notebook notebook) {
     return new NotebookService(notebook, this);
   }
+
+  public QuizQuestion createQuizQuestion(PredefinedQuestion question) {
+    QuizQuestion quizQuestion = new QuizQuestion();
+    quizQuestion.setPredefinedQuestion(question);
+    return save(quizQuestion);
+  }
 }
