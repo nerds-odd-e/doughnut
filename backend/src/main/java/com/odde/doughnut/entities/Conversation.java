@@ -15,7 +15,7 @@ public class Conversation extends EntityIdentifiedByIdOnly {
 
   @ManyToOne
   @JoinColumn(name = "quiz_question_and_answer_id", referencedColumnName = "id")
-  QuestionAndAnswer questionAndAnswer;
+  PredefinedQuestion predefinedQuestion;
 
   @ManyToOne
   @JoinColumn(name = "note_creator_id", referencedColumnName = "id")

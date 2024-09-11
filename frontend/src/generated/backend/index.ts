@@ -77,7 +77,7 @@ export { NoteTopic } from './models/NoteTopic';
 export type { NoteUpdateDetailsDTO } from './models/NoteUpdateDetailsDTO';
 export type { NoteUpdateTopicDTO } from './models/NoteUpdateTopicDTO';
 export type { Ownership } from './models/Ownership';
-export type { QuestionAndAnswer } from './models/QuestionAndAnswer';
+export type { PredefinedQuestion } from './models/PredefinedQuestion';
 export type { QuestionSuggestionCreationParams } from './models/QuestionSuggestionCreationParams';
 export type { QuestionSuggestionParams } from './models/QuestionSuggestionParams';
 export type { QuizQuestion } from './models/QuizQuestion';

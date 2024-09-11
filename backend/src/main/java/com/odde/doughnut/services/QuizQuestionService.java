@@ -2,7 +2,7 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.entities.QuestionAndAnswer;
+import com.odde.doughnut.entities.PredefinedQuestion;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
@@ -21,43 +21,43 @@ public class QuizQuestionService {
         new AiQuestionGenerator(openAiApi, new GlobalSettingsService(modelFactoryService));
   }
 
-  public QuestionAndAnswer addQuestion(Note note, @Valid QuestionAndAnswer questionAndAnswer) {
-    questionAndAnswer.setNote(note);
+  public PredefinedQuestion addQuestion(Note note, @Valid PredefinedQuestion predefinedQuestion) {
+    predefinedQuestion.setNote(note);
 
     Notebook parentNotebook = note.getNotebook();
     parentNotebook.setUpdated_at(new Timestamp(System.currentTimeMillis()));
     modelFactoryService.save(parentNotebook);
-    questionAndAnswer.getQuizQuestion().setQuestionAndAnswer(questionAndAnswer);
-    modelFactoryService.save(questionAndAnswer);
-    return questionAndAnswer;
+    predefinedQuestion.getQuizQuestion().setPredefinedQuestion(predefinedQuestion);
+    modelFactoryService.save(predefinedQuestion);
+    return predefinedQuestion;
   }
 
-  public QuestionAndAnswer refineQuestion(Note note, QuestionAndAnswer questionAndAnswer) {
+  public PredefinedQuestion refineQuestion(Note note, PredefinedQuestion predefinedQuestion) {
     MCQWithAnswer aiGeneratedRefineQuestion =
         aiQuestionGenerator.getAiGeneratedRefineQuestion(
-            note, questionAndAnswer.getMcqWithAnswer());
+            note, predefinedQuestion.getMcqWithAnswer());
     if (aiGeneratedRefineQuestion == null) {
       return null;
     }
-    return QuestionAndAnswer.fromMCQWithAnswer(aiGeneratedRefineQuestion, note);
+    return PredefinedQuestion.fromMCQWithAnswer(aiGeneratedRefineQuestion, note);
   }
 
-  public QuestionAndAnswer toggleApproval(QuestionAndAnswer question) {
+  public PredefinedQuestion toggleApproval(PredefinedQuestion question) {
     question.setApproved(!question.isApproved());
     modelFactoryService.save(question);
     return question;
   }
 
-  public QuestionAndAnswer generateMcqWithAnswer(Note note) {
+  public PredefinedQuestion generateMcqWithAnswer(Note note) {
     MCQWithAnswer MCQWithAnswer = aiQuestionGenerator.getAiGeneratedQuestion(note);
     if (MCQWithAnswer == null) {
       return null;
     }
-    return QuestionAndAnswer.fromMCQWithAnswer(MCQWithAnswer, note);
+    return PredefinedQuestion.fromMCQWithAnswer(MCQWithAnswer, note);
   }
 
-  public QuestionAndAnswer generateQuestionForNote(Note note) {
-    QuestionAndAnswer question = generateMcqWithAnswer(note);
+  public PredefinedQuestion generateQuestionForNote(Note note) {
+    PredefinedQuestion question = generateMcqWithAnswer(note);
     if (question == null) {
       return null;
     }

@@ -4,7 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuestionAndAnswer;
+import com.odde.doughnut.entities.PredefinedQuestion;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.ClozeTitleSelectionQuizFactory;
@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class QuestionAndAnswerTypesClozeSelectionTest {
+class PredefinedQuestionTypesClozeSelectionTest {
   @Autowired MakeMe makeMe;
 
   @Nested
@@ -41,21 +41,21 @@ class QuestionAndAnswerTypesClozeSelectionTest {
     @Test
     void NotForNoteWithoutVisibleDescription() {
       makeMe.theNote(note1).details("<p>  <br>  <br/>  </p>  <br>").please();
-      QuestionAndAnswer questionAndAnswer = buildClozeQuizQuestion();
-      assertThat(questionAndAnswer, nullValue());
+      PredefinedQuestion predefinedQuestion = buildClozeQuizQuestion();
+      assertThat(predefinedQuestion, nullValue());
     }
 
     @Test
     void shouldIncludeRightAnswers() {
-      QuestionAndAnswer questionAndAnswer = buildClozeQuizQuestion();
+      PredefinedQuestion predefinedQuestion = buildClozeQuizQuestion();
       assertThat(
-          questionAndAnswer.getMultipleChoicesQuestion().getStem(), containsString("descrption"));
-      List<String> options = questionAndAnswer.getMultipleChoicesQuestion().getChoices();
+          predefinedQuestion.getMultipleChoicesQuestion().getStem(), containsString("descrption"));
+      List<String> options = predefinedQuestion.getMultipleChoicesQuestion().getChoices();
       assertThat(note2.getTopicConstructor(), in(options));
       assertThat(note1.getTopicConstructor(), in(options));
     }
 
-    private QuestionAndAnswer buildClozeQuizQuestion() {
+    private PredefinedQuestion buildClozeQuizQuestion() {
       QuizQuestionServant servant =
           new QuizQuestionServant(null, new NonRandomizer(), makeMe.modelFactoryService);
       try {

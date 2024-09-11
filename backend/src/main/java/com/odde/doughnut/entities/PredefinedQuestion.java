@@ -16,13 +16,13 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Table(name = "question_and_answer")
-public class QuestionAndAnswer extends EntityIdentifiedByIdOnly {
+public class PredefinedQuestion extends EntityIdentifiedByIdOnly {
   @ManyToOne(cascade = CascadeType.DETACH)
   @JoinColumn(name = "note_id", referencedColumnName = "id")
   @JsonIgnore
   private Note note;
 
-  @OneToOne(mappedBy = "questionAndAnswer", cascade = CascadeType.ALL)
+  @OneToOne(mappedBy = "predefinedQuestion", cascade = CascadeType.ALL)
   @NotNull
   private QuizQuestion quizQuestion = new QuizQuestion();
 
@@ -62,17 +62,17 @@ public class QuestionAndAnswer extends EntityIdentifiedByIdOnly {
     return Objects.equals(answer.getChoiceIndex(), getCorrectAnswerIndex());
   }
 
-  public static QuestionAndAnswer fromMCQWithAnswer(MCQWithAnswer MCQWithAnswer, Note note) {
-    QuestionAndAnswer quizQuestionAIQuestionAndAnswer = new QuestionAndAnswer();
-    quizQuestionAIQuestionAndAnswer.setNote(note);
-    quizQuestionAIQuestionAndAnswer.setMultipleChoicesQuestion(
+  public static PredefinedQuestion fromMCQWithAnswer(MCQWithAnswer MCQWithAnswer, Note note) {
+    PredefinedQuestion quizQuestionAIPredefinedQuestion = new PredefinedQuestion();
+    quizQuestionAIPredefinedQuestion.setNote(note);
+    quizQuestionAIPredefinedQuestion.setMultipleChoicesQuestion(
         MCQWithAnswer.getMultipleChoicesQuestion());
-    quizQuestionAIQuestionAndAnswer.setCorrectAnswerIndex(MCQWithAnswer.getCorrectChoiceIndex());
+    quizQuestionAIPredefinedQuestion.setCorrectAnswerIndex(MCQWithAnswer.getCorrectChoiceIndex());
     // for in memory consistency
-    quizQuestionAIQuestionAndAnswer
+    quizQuestionAIPredefinedQuestion
         .getQuizQuestion()
-        .setQuestionAndAnswer(quizQuestionAIQuestionAndAnswer);
-    return quizQuestionAIQuestionAndAnswer;
+        .setPredefinedQuestion(quizQuestionAIPredefinedQuestion);
+    return quizQuestionAIPredefinedQuestion;
   }
 
   public QuizQuestionInNotebook toQuizQuestionInNotebook() {
@@ -84,7 +84,7 @@ public class QuestionAndAnswer extends EntityIdentifiedByIdOnly {
 
   @Override
   public String toString() {
-    // Fixing StackoverflowError when calling toString on QuestionAndAnswer or QuizQuestion
-    return "QuestionAndAnswer{" + "id=" + id + '}';
+    // Fixing StackoverflowError when calling toString on PredefinedQuestion or QuizQuestion
+    return "PredefinedQuestion{" + "id=" + id + '}';
   }
 }

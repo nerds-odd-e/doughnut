@@ -315,7 +315,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/QuestionAndAnswer"
+                  $ref: "#/components/schemas/PredefinedQuestion"
   /api/testability/inject_notes:
     post:
       tags:
@@ -656,7 +656,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/QuestionAndAnswer"
+                $ref: "#/components/schemas/PredefinedQuestion"
   /api/quiz-questions/{quizQuestion}/suggest-fine-tuning:
     post:
       tags:
@@ -780,7 +780,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/QuestionAndAnswer"
+              $ref: "#/components/schemas/PredefinedQuestion"
         required: true
       responses:
         "500":
@@ -794,7 +794,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/QuestionAndAnswer"
+                $ref: "#/components/schemas/PredefinedQuestion"
   /api/quiz-questions/{note}/note-questions:
     get:
       tags:
@@ -820,7 +820,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/QuestionAndAnswer"
+                  $ref: "#/components/schemas/PredefinedQuestion"
     post:
       tags:
       - rest-quiz-question-controller
@@ -835,7 +835,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/QuestionAndAnswer"
+              $ref: "#/components/schemas/PredefinedQuestion"
         required: true
       responses:
         "500":
@@ -849,7 +849,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/QuestionAndAnswer"
+                $ref: "#/components/schemas/PredefinedQuestion"
   /api/quiz-questions/generate-question:
     post:
       tags:
@@ -897,7 +897,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/QuestionAndAnswer"
+                $ref: "#/components/schemas/PredefinedQuestion"
   /api/notes/{parentNote}/create:
     post:
       tags:
@@ -2951,7 +2951,7 @@ components:
           type: string
         imageMask:
           type: string
-    QuestionAndAnswer:
+    PredefinedQuestion:
       required:
       - id
       - multipleChoicesQuestion
@@ -3260,8 +3260,8 @@ components:
           type: string
         reviewPoint:
           $ref: "#/components/schemas/ReviewPoint"
-        questionAndAnswer:
-          $ref: "#/components/schemas/QuestionAndAnswer"
+        predefinedQuestion:
+          $ref: "#/components/schemas/PredefinedQuestion"
     QuizQuestionInNotebook:
       required:
       - notebook
@@ -3940,8 +3940,8 @@ components:
         id:
           type: integer
           format: int32
-        questionAndAnswer:
-          $ref: "#/components/schemas/QuestionAndAnswer"
+        predefinedQuestion:
+          $ref: "#/components/schemas/PredefinedQuestion"
         noteCreator:
           $ref: "#/components/schemas/User"
         conversationInitiator:

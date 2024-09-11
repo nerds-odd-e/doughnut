@@ -18,7 +18,7 @@
     <TextInput
       rows="2"
       field="correctChoiceIndex"
-      v-model="questionAndAnswer.correctAnswerIndex"
+      v-model="predefinedQuestion.correctAnswerIndex"
     /><br />
 
     <button
@@ -48,7 +48,7 @@
 <script setup lang="ts">
 import { PropType, computed, ref } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { Note, QuestionAndAnswer } from "@/generated/backend"
+import { Note, PredefinedQuestion } from "@/generated/backend"
 import isMCQWithAnswerValid from "@/models/isMCQWithAnswerValid"
 import TextArea from "../form/TextArea.vue"
 
@@ -60,13 +60,13 @@ const props = defineProps({
   },
 })
 
-const questionAndAnswer = ref<QuestionAndAnswer>({
+const predefinedQuestion = ref<PredefinedQuestion>({
   correctAnswerIndex: 0,
   multipleChoicesQuestion: {
     stem: "",
     choices: ["", ""],
   },
-} as QuestionAndAnswer)
+} as PredefinedQuestion)
 
 const minimumNumberOfChoices = 2
 const maximumNumberOfChoices = 10
@@ -74,10 +74,10 @@ const maximumNumberOfChoices = 10
 const emit = defineEmits(["close-dialog"])
 
 const isValidQuestion = computed(() =>
-  isMCQWithAnswerValid(questionAndAnswer.value)
+  isMCQWithAnswerValid(predefinedQuestion.value)
 )
 const multipleChoicesQuestion = computed(
-  () => questionAndAnswer.value.multipleChoicesQuestion
+  () => predefinedQuestion.value.multipleChoicesQuestion
 )
 const dirty = computed(() => {
   for (let i = 0; i < multipleChoicesQuestion.value.choices.length; i += 1) {
@@ -103,7 +103,7 @@ const removeChoice = () => {
   }
 }
 const submitQuestion = async () => {
-  const quizQuestion = questionAndAnswer.value
+  const quizQuestion = predefinedQuestion.value
   const response =
     await managedApi.restQuizQuestionController.addQuestionManually(
       props.note.id,
@@ -112,15 +112,15 @@ const submitQuestion = async () => {
   emit("close-dialog", response)
 }
 const refineQuestion = async () => {
-  const quizQuestion = questionAndAnswer.value
-  questionAndAnswer.value =
+  const quizQuestion = predefinedQuestion.value
+  predefinedQuestion.value =
     await managedApi.restQuizQuestionController.refineQuestion(
       props.note.id,
       quizQuestion
     )
 }
 const generateQuestionByAI = async () => {
-  questionAndAnswer.value =
+  predefinedQuestion.value =
     await managedApi.restQuizQuestionController.generateAiQuestionWithoutSave(
       props.note.id
     )

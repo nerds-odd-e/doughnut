@@ -28,14 +28,14 @@ public class AssessmentService {
     Randomizer randomizer = this.testabilitySettings.getRandomizer();
     List<Note> notes = randomizer.shuffle(notebook.getNotes());
 
-    List<QuestionAndAnswer> questions =
+    List<PredefinedQuestion> questions =
         notes.stream()
             .flatMap(
                 note ->
                     randomizer
                         .chooseOneRandomly(
-                            note.getQuestionAndAnswers().stream()
-                                .filter(QuestionAndAnswer::isApproved)
+                            note.getPredefinedQuestions().stream()
+                                .filter(PredefinedQuestion::isApproved)
                                 .toList())
                         .stream())
             .toList();
@@ -55,7 +55,7 @@ public class AssessmentService {
 
     return questions.stream()
         .limit(numberOfQuestion)
-        .map(QuestionAndAnswer::getQuizQuestion)
+        .map(PredefinedQuestion::getQuizQuestion)
         .toList();
   }
 

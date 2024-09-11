@@ -66,9 +66,9 @@ class DescriptionLinkTargetQuizFactoryTest {
 
   @Test
   void shouldIncludeRightAnswers() {
-    QuestionAndAnswer questionAndAnswer = buildQuestion();
+    PredefinedQuestion predefinedQuestion = buildQuestion();
     assertThat(
-        questionAndAnswer.getMultipleChoicesQuestion().getStem(),
+        predefinedQuestion.getMultipleChoicesQuestion().getStem(),
         containsString(
             "<p>The following descriptions is a specialization of:</p><p><mark title='Hidden text that is matching the answer'>[...]</mark> is not built in a day</p>\n"));
   }
@@ -76,9 +76,9 @@ class DescriptionLinkTargetQuizFactoryTest {
   @Test
   void shouldIncludeMasks() {
     makeMe.theNote(source).titleConstructor("token").details("token /.").please();
-    QuestionAndAnswer questionAndAnswer = buildQuestion();
+    PredefinedQuestion predefinedQuestion = buildQuestion();
     assertThat(
-        questionAndAnswer.getMultipleChoicesQuestion().getStem(),
+        predefinedQuestion.getMultipleChoicesQuestion().getStem(),
         containsString("<mark title='Hidden text that is matching the answer'>[...]</mark> /."));
   }
 
@@ -96,7 +96,7 @@ class DescriptionLinkTargetQuizFactoryTest {
     }
   }
 
-  private QuestionAndAnswer buildQuestion() {
+  private PredefinedQuestion buildQuestion() {
     try {
       return getQuizQuestionFactory().buildValidQuizQuestion();
     } catch (QuizQuestionNotPossibleException e) {

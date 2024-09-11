@@ -120,11 +120,11 @@ public class RestAssessmentControllerTests {
       notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(3);
 
       for (Note note : notebook.getNotes()) {
-        QuestionAndAnswer questionAndAnswer = note.getQuestionAndAnswers().get(0);
-        questionAndAnswer.setCorrectAnswerIndex(1);
+        PredefinedQuestion predefinedQuestion = note.getPredefinedQuestions().get(0);
+        predefinedQuestion.setCorrectAnswerIndex(1);
 
         AnswerSubmission answerSubmission = new AnswerSubmission();
-        answerSubmission.setQuestionId(questionAndAnswer.getId());
+        answerSubmission.setQuestionId(predefinedQuestion.getId());
 
         answerSubmission.setAnswerId(0);
         answerSubmission.setCorrectAnswers(true);
@@ -145,11 +145,11 @@ public class RestAssessmentControllerTests {
       notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(3);
 
       for (Note note : notebook.getNotes()) {
-        QuestionAndAnswer questionAndAnswer = note.getQuestionAndAnswers().get(0);
-        questionAndAnswer.setCorrectAnswerIndex(1);
+        PredefinedQuestion predefinedQuestion = note.getPredefinedQuestions().get(0);
+        predefinedQuestion.setCorrectAnswerIndex(1);
 
         AnswerSubmission answerSubmission = new AnswerSubmission();
-        answerSubmission.setQuestionId(questionAndAnswer.getId());
+        answerSubmission.setQuestionId(predefinedQuestion.getId());
 
         answerSubmission.setAnswerId(0);
         answerSubmission.setCorrectAnswers(true);
@@ -172,21 +172,21 @@ public class RestAssessmentControllerTests {
       notebook = topNote.getNotebook();
       notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(3);
 
-      QuestionAndAnswer questionAndAnswer =
-          notebook.getNotes().get(0).getQuestionAndAnswers().get(0);
-      questionAndAnswer.setCorrectAnswerIndex(0);
+      PredefinedQuestion predefinedQuestion =
+          notebook.getNotes().get(0).getPredefinedQuestions().get(0);
+      predefinedQuestion.setCorrectAnswerIndex(0);
 
       AnswerSubmission answerSubmission = new AnswerSubmission();
-      answerSubmission.setQuestionId(questionAndAnswer.getId());
+      answerSubmission.setQuestionId(predefinedQuestion.getId());
       answerSubmission.setAnswerId(0);
       answerSubmission.setCorrectAnswers(true);
       answerSubmissions.add(answerSubmission);
 
-      questionAndAnswer = notebook.getNotes().get(1).getQuestionAndAnswers().get(0);
-      questionAndAnswer.setCorrectAnswerIndex(0);
+      predefinedQuestion = notebook.getNotes().get(1).getPredefinedQuestions().get(0);
+      predefinedQuestion.setCorrectAnswerIndex(0);
 
       answerSubmission = new AnswerSubmission();
-      answerSubmission.setQuestionId(questionAndAnswer.getId());
+      answerSubmission.setQuestionId(predefinedQuestion.getId());
       answerSubmission.setAnswerId(0);
       answerSubmission.setCorrectAnswers(false);
       answerSubmissions.add(answerSubmission);

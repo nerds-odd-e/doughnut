@@ -7,5 +7,5 @@ public class AnsweredQuestion {
   public Integer choiceIndex;
   public String answerDisplay;
   public ReviewPoint reviewPoint;
-  public QuestionAndAnswer questionAndAnswer;
+  public PredefinedQuestion predefinedQuestion;
 }

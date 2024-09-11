@@ -93,7 +93,7 @@ describe("repeat page", () => {
         answerId: 1,
         correct: false,
         answerDisplay: "my answer",
-        questionAndAnswer: makeMe.aQuizQuestionAndAnswer.please(),
+        predefinedQuestion: makeMe.aPredefinedQuestion.please(),
       }
       const mockedMarkAsRepeatedCall = vi.fn().mockResolvedValue(answerResult)
       helper.managedApi.restReviewPointController.markAsRepeated =

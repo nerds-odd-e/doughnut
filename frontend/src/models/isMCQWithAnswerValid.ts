@@ -1,6 +1,6 @@
-import { QuestionAndAnswer } from "@/generated/backend"
+import { PredefinedQuestion } from "@/generated/backend"
 
-function isMCQWithAnswerValid(mcqWithAnswer: QuestionAndAnswer): boolean {
+function isMCQWithAnswerValid(mcqWithAnswer: PredefinedQuestion): boolean {
   const { stem, choices } = mcqWithAnswer.multipleChoicesQuestion
   const { correctAnswerIndex } = mcqWithAnswer
 

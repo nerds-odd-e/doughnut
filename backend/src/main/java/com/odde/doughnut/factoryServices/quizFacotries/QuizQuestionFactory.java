@@ -1,9 +1,9 @@
 package com.odde.doughnut.factoryServices.quizFacotries;
 
-import com.odde.doughnut.entities.QuestionAndAnswer;
+import com.odde.doughnut.entities.PredefinedQuestion;
 
 public abstract class QuizQuestionFactory {
-  public QuestionAndAnswer buildValidQuizQuestion() throws QuizQuestionNotPossibleException {
+  public PredefinedQuestion buildValidQuizQuestion() throws QuizQuestionNotPossibleException {
     return null;
   }
 }

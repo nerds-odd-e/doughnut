@@ -1,7 +1,7 @@
 package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuestionAndAnswer;
+import com.odde.doughnut.entities.PredefinedQuestion;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
@@ -19,9 +19,9 @@ public abstract class QuestionOptionsFactory extends QuizQuestionFactory {
   }
 
   @Override
-  public QuestionAndAnswer buildValidQuizQuestion() throws QuizQuestionNotPossibleException {
-    QuestionAndAnswer questionAndAnswer = new QuestionAndAnswer();
-    questionAndAnswer.setNote(note);
+  public PredefinedQuestion buildValidQuizQuestion() throws QuizQuestionNotPossibleException {
+    PredefinedQuestion predefinedQuestion = new PredefinedQuestion();
+    predefinedQuestion.setNote(note);
     this.findCategoricalLink();
     this.validateBasicPossibility();
     Note answerNote = this.generateAnswer();
@@ -35,12 +35,12 @@ public abstract class QuestionOptionsFactory extends QuizQuestionFactory {
     List<Note> optionsEntities = new ArrayList<>(options);
     optionsEntities.add(answerNote);
     List<Note> shuffled = servant.randomizer.shuffle(optionsEntities);
-    questionAndAnswer.setCorrectAnswerIndex(shuffled.indexOf(answerNote));
+    predefinedQuestion.setCorrectAnswerIndex(shuffled.indexOf(answerNote));
     MultipleChoicesQuestion mcq = new MultipleChoicesQuestion();
     mcq.setStem(getStem());
     mcq.setChoices(shuffled.stream().map(this::noteToChoice).toList());
-    questionAndAnswer.setMultipleChoicesQuestion(mcq);
-    return questionAndAnswer;
+    predefinedQuestion.setMultipleChoicesQuestion(mcq);
+    return predefinedQuestion;
   }
 
   public void validateBasicPossibility() throws QuizQuestionNotPossibleException {}

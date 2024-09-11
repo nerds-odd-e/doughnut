@@ -100,15 +100,15 @@ class FromDifferentPartAsQuizFactoryTest {
 
         @Test
         void shouldIncludeRightAnswersAndFillingOptions() {
-          QuestionAndAnswer questionAndAnswer = buildQuestion();
+          PredefinedQuestion predefinedQuestion = buildQuestion();
           assertThat(
-              questionAndAnswer.getMultipleChoicesQuestion().getStem(),
+              predefinedQuestion.getMultipleChoicesQuestion().getStem(),
               containsString(
                   "<p>Which one <mark>is tagged by</mark> a <em>DIFFERENT</em> part of <mark>perspective</mark> than:"));
           assertThat(
-              questionAndAnswer.getMultipleChoicesQuestion().getStem(),
+              predefinedQuestion.getMultipleChoicesQuestion().getStem(),
               containsString(ugly.getTopicConstructor()));
-          List<String> strings = questionAndAnswer.getMultipleChoicesQuestion().getChoices();
+          List<String> strings = predefinedQuestion.getMultipleChoicesQuestion().getChoices();
           assertThat(tall.getTopicConstructor(), in(strings));
           assertThat(kind.getTopicConstructor(), in(strings));
           assertThat(pretty.getTopicConstructor(), in(strings));
@@ -138,7 +138,7 @@ class FromDifferentPartAsQuizFactoryTest {
 
           @Test
           void noRightAnswers() {
-            QuestionAndAnswer actual = buildQuestion();
+            PredefinedQuestion actual = buildQuestion();
             assertThat(actual, nullValue());
           }
 
@@ -202,7 +202,7 @@ class FromDifferentPartAsQuizFactoryTest {
     }
   }
 
-  private QuestionAndAnswer buildQuestion() {
+  private PredefinedQuestion buildQuestion() {
     try {
       return getQuizQuestionFactory().buildValidQuizQuestion();
     } catch (QuizQuestionNotPossibleException e) {

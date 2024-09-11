@@ -126,7 +126,7 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
   @OneToMany(mappedBy = "note")
   @Getter
   @JsonIgnore
-  private List<QuestionAndAnswer> questionAndAnswers = new ArrayList<>();
+  private List<PredefinedQuestion> predefinedQuestions = new ArrayList<>();
 
   @Embedded @JsonIgnore @Getter private ReviewSetting reviewSetting = new ReviewSetting();
 

@@ -5,7 +5,7 @@
     </template>
     <template #default="{ closer }">
       <SuggestQuestionForFineTuning
-        :quiz-question="questionAndAnswer.quizQuestion"
+        :quiz-question="predefinedQuestion.quizQuestion"
         @close-dialog="closer()"
       />
     </template>
@@ -14,12 +14,12 @@
 
 <script setup lang="ts">
 import { PropType } from "vue"
-import { QuestionAndAnswer } from "@/generated/backend"
+import { PredefinedQuestion } from "@/generated/backend"
 import SuggestQuestionForFineTuning from "../ai/SuggestQuestionForFineTuning.vue"
 
 defineProps({
-  questionAndAnswer: {
-    type: Object as PropType<QuestionAndAnswer>,
+  predefinedQuestion: {
+    type: Object as PropType<PredefinedQuestion>,
     required: true,
   },
 })

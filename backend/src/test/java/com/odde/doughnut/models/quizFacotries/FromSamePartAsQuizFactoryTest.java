@@ -90,15 +90,15 @@ class FromSamePartAsQuizFactoryTest {
 
         @Test
         void shouldIncludeRightAnswersAndFillingOptions() {
-          QuestionAndAnswer questionAndAnswer = buildQuestion();
+          PredefinedQuestion predefinedQuestion = buildQuestion();
           assertThat(
-              questionAndAnswer.getMultipleChoicesQuestion().getStem(),
+              predefinedQuestion.getMultipleChoicesQuestion().getStem(),
               containsString(
                   "<p>Which one <mark>is tagged by</mark> the same part of <mark>perspective</mark> as:"));
           assertThat(
-              questionAndAnswer.getMultipleChoicesQuestion().getStem(),
+              predefinedQuestion.getMultipleChoicesQuestion().getStem(),
               containsString(ugly.getTopicConstructor()));
-          List<String> strings = questionAndAnswer.getMultipleChoicesQuestion().getChoices();
+          List<String> strings = predefinedQuestion.getMultipleChoicesQuestion().getChoices();
           assertThat(pretty.getTopicConstructor(), in(strings));
           assertThat(tall.getTopicConstructor(), in(strings));
           assertThat(ugly.getTopicConstructor(), not(in(strings)));
@@ -107,7 +107,7 @@ class FromSamePartAsQuizFactoryTest {
     }
   }
 
-  private QuestionAndAnswer buildQuestion() {
+  private PredefinedQuestion buildQuestion() {
     return makeMe.buildAQuestionForLinkingNote(
         LinkQuestionType.FROM_SAME_PART_AS, uglySubjective, user);
   }

@@ -1,7 +1,7 @@
 package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuestionAndAnswer;
+import com.odde.doughnut.entities.PredefinedQuestion;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
@@ -17,11 +17,11 @@ public class AiQuestionFactory extends QuizQuestionFactory {
   }
 
   @Override
-  public QuestionAndAnswer buildValidQuizQuestion() throws QuizQuestionNotPossibleException {
+  public PredefinedQuestion buildValidQuizQuestion() throws QuizQuestionNotPossibleException {
     MCQWithAnswer MCQWithAnswer = aiQuestionGenerator.getAiGeneratedQuestion(note);
     if (MCQWithAnswer == null) {
       throw new QuizQuestionNotPossibleException();
     }
-    return QuestionAndAnswer.fromMCQWithAnswer(MCQWithAnswer, note);
+    return PredefinedQuestion.fromMCQWithAnswer(MCQWithAnswer, note);
   }
 }

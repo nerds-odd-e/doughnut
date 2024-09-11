@@ -150,7 +150,7 @@ class RestNotebookControllerTest {
   @Nested
   class GetNotebookQuestions {
     Notebook notebook;
-    QuestionAndAnswer questionAndAnswer;
+    PredefinedQuestion predefinedQuestion;
 
     @BeforeEach
     void setup() {
@@ -163,7 +163,7 @@ class RestNotebookControllerTest {
     void shouldGetEmptyListOfNotes() throws UnexpectedNoAccessRightException {
       controller = new RestNotebookController(modelFactoryService, userModel, testabilitySettings);
       List<Note> result = controller.getNotes(notebook);
-      assertThat(result.get(0).getQuestionAndAnswers(), hasSize(0));
+      assertThat(result.get(0).getPredefinedQuestions(), hasSize(0));
     }
 
     @Test
@@ -172,7 +172,7 @@ class RestNotebookControllerTest {
       QuizQuestionBuilder quizQuestionBuilder = makeMe.aQuestion();
       quizQuestionBuilder.approvedSpellingQuestionOf(notebook.getNotes().get(0)).please();
       List<Note> result = controller.getNotes(notebook);
-      assertThat(result.get(0).getQuestionAndAnswers(), hasSize(1));
+      assertThat(result.get(0).getPredefinedQuestions(), hasSize(1));
     }
   }
 }

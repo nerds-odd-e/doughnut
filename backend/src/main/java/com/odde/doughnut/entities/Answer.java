@@ -39,7 +39,7 @@ public class Answer extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public boolean isCorrect() {
-    return quizQuestion.getQuestionAndAnswer().checkAnswer(this);
+    return quizQuestion.getPredefinedQuestion().checkAnswer(this);
   }
 
   @JsonIgnore

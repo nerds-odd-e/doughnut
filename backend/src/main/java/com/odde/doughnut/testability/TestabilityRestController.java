@@ -184,22 +184,22 @@ class TestabilityRestController {
 
   @PostMapping("/inject_quiz_questions")
   @Transactional
-  public List<QuestionAndAnswer> injectQuizQuestion(
+  public List<PredefinedQuestion> injectQuizQuestion(
       @RequestBody QuizQuestionsTestData quizQuestionsTestData) {
-    List<QuestionAndAnswer> questionAndAnswers =
+    List<PredefinedQuestion> predefinedQuestions =
         quizQuestionsTestData.buildQuizQuestions(this.modelFactoryService);
-    questionAndAnswers.forEach(question -> modelFactoryService.save(question));
-    updateNotebookSettings(questionAndAnswers, quizQuestionsTestData.getNotebookCertifiable());
-    return questionAndAnswers;
+    predefinedQuestions.forEach(question -> modelFactoryService.save(question));
+    updateNotebookSettings(predefinedQuestions, quizQuestionsTestData.getNotebookCertifiable());
+    return predefinedQuestions;
   }
 
   private void updateNotebookSettings(
-      List<QuestionAndAnswer> questionAndAnswers, Boolean notebookCertifiable) {
-    if (questionAndAnswers.isEmpty()) {
+      List<PredefinedQuestion> predefinedQuestions, Boolean notebookCertifiable) {
+    if (predefinedQuestions.isEmpty()) {
       return;
     }
-    Notebook notebook = questionAndAnswers.getFirst().getNote().getNotebook();
-    notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(questionAndAnswers.size());
+    Notebook notebook = predefinedQuestions.getFirst().getNote().getNotebook();
+    notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(predefinedQuestions.size());
     modelFactoryService.save(notebook);
     if (notebookCertifiable != null && notebookCertifiable) {
       modelFactoryService

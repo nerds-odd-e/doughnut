@@ -1,7 +1,7 @@
 package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuestionAndAnswer;
+import com.odde.doughnut.entities.PredefinedQuestion;
 import com.odde.doughnut.entities.ReviewSetting;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
@@ -16,7 +16,7 @@ public class SpellingQuizFactory extends QuizQuestionFactory {
   }
 
   @Override
-  public QuestionAndAnswer buildValidQuizQuestion() throws QuizQuestionNotPossibleException {
+  public PredefinedQuestion buildValidQuizQuestion() throws QuizQuestionNotPossibleException {
     if (!needSpellingQuiz()) {
       throw new QuizQuestionNotPossibleException();
     }
@@ -35,16 +35,16 @@ public class SpellingQuizFactory extends QuizQuestionFactory {
     return answerNote.getClozeDescription().clozeDetails();
   }
 
-  public QuestionAndAnswer buildSpellingQuestion() {
-    QuestionAndAnswer questionAndAnswerSpelling = new QuestionAndAnswer();
-    questionAndAnswerSpelling.setNote(answerNote);
-    questionAndAnswerSpelling.setApproved(true);
-    questionAndAnswerSpelling.setCheckSpell(true);
+  public PredefinedQuestion buildSpellingQuestion() {
+    PredefinedQuestion predefinedQuestionSpelling = new PredefinedQuestion();
+    predefinedQuestionSpelling.setNote(answerNote);
+    predefinedQuestionSpelling.setApproved(true);
+    predefinedQuestionSpelling.setCheckSpell(true);
     MultipleChoicesQuestion mcq = new MultipleChoicesQuestion();
     mcq.setStem(getStem());
-    questionAndAnswerSpelling.setMultipleChoicesQuestion(mcq);
+    predefinedQuestionSpelling.setMultipleChoicesQuestion(mcq);
     // for in memory consistency
-    questionAndAnswerSpelling.getQuizQuestion().setQuestionAndAnswer(questionAndAnswerSpelling);
-    return questionAndAnswerSpelling;
+    predefinedQuestionSpelling.getQuizQuestion().setPredefinedQuestion(predefinedQuestionSpelling);
+    return predefinedQuestionSpelling;
   }
 }

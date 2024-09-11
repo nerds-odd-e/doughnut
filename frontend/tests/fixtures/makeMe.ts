@@ -7,7 +7,7 @@ import LinkBuilder from "./LinkBuilder"
 import NoteBuilder from "./NoteBuilder"
 import NoteRealmBuilder from "./NoteRealmBuilder"
 import NotebookBuilder from "./NotebookBuilder"
-import QuestionAndAnswerBuilder from "./QuestionAndAnswerBuilder"
+import PredefinedQuestionBuilder from "./PredefinedQuestionBuilder"
 import QuizQuestionBuilder from "./QuizQuestionBuilder"
 import QuizQuestionInNotebookBuilder from "./QuizQuestionInNotebookBuilder"
 import ReviewPointBuilder from "./ReviewPointBuilder"
@@ -50,8 +50,8 @@ class MakeMe {
     return new QuizQuestionInNotebookBuilder()
   }
 
-  static get aQuizQuestionAndAnswer(): QuestionAndAnswerBuilder {
-    return new QuestionAndAnswerBuilder()
+  static get aPredefinedQuestion(): PredefinedQuestionBuilder {
+    return new PredefinedQuestionBuilder()
   }
 
   static get aCircleNote(): CircleNoteBuilder {

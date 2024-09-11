@@ -17,27 +17,27 @@ public class QuizQuestion extends EntityIdentifiedByIdOnly {
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "question_and_answer_id", referencedColumnName = "id")
   @JsonIgnore
-  private QuestionAndAnswer questionAndAnswer;
+  private PredefinedQuestion predefinedQuestion;
 
   public Boolean getCheckSpell() {
-    if (questionAndAnswer == null) {
+    if (predefinedQuestion == null) {
       return null;
     }
-    return questionAndAnswer.getCheckSpell();
+    return predefinedQuestion.getCheckSpell();
   }
 
   public ImageWithMask getImageWithMask() {
-    if (questionAndAnswer == null) {
+    if (predefinedQuestion == null) {
       return null;
     }
-    return questionAndAnswer.getImageWithMask();
+    return predefinedQuestion.getImageWithMask();
   }
 
   @NotNull
   public MultipleChoicesQuestion getMultipleChoicesQuestion() {
-    if (questionAndAnswer == null) {
+    if (predefinedQuestion == null) {
       return null;
     }
-    return questionAndAnswer.getMultipleChoicesQuestion();
+    return predefinedQuestion.getMultipleChoicesQuestion();
   }
 }

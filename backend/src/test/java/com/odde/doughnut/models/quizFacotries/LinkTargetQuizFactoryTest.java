@@ -51,17 +51,17 @@ class LinkTargetQuizFactoryTest {
   class WhenThereAreMoreThanOneOptions {
     @Test
     void shouldIncludeRightAnswers() {
-      QuestionAndAnswer questionAndAnswer = buildLinkTargetQuizQuestion();
+      PredefinedQuestion predefinedQuestion = buildLinkTargetQuizQuestion();
       assertThat(
-          questionAndAnswer.getMultipleChoicesQuestion().getStem(),
+          predefinedQuestion.getMultipleChoicesQuestion().getStem(),
           equalTo("<mark>source</mark> is a specialization of:"));
-      List<String> options = questionAndAnswer.getMultipleChoicesQuestion().getChoices();
+      List<String> options = predefinedQuestion.getMultipleChoicesQuestion().getChoices();
       assertThat(anotherTarget.getTopicConstructor(), in(options));
       assertThat(target.getTopicConstructor(), in(options));
     }
   }
 
-  private QuestionAndAnswer buildLinkTargetQuizQuestion() {
+  private PredefinedQuestion buildLinkTargetQuizQuestion() {
     return makeMe.buildAQuestionForLinkingNote(LinkQuestionType.LINK_TARGET, subjectNote, user);
   }
 }

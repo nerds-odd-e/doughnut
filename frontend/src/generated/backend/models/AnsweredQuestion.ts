@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { QuestionAndAnswer } from './QuestionAndAnswer';
+import type { PredefinedQuestion } from './PredefinedQuestion';
 import type { ReviewPoint } from './ReviewPoint';
 export type AnsweredQuestion = {
     answerId?: number;
@@ -11,6 +11,6 @@ export type AnsweredQuestion = {
     choiceIndex?: number;
     answerDisplay?: string;
     reviewPoint?: ReviewPoint;
-    questionAndAnswer?: QuestionAndAnswer;
+    predefinedQuestion?: PredefinedQuestion;
 };
 

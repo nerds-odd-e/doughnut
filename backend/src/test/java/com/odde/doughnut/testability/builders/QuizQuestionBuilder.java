@@ -1,13 +1,13 @@
 package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuestionAndAnswer;
+import com.odde.doughnut.entities.PredefinedQuestion;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.SpellingQuizFactory;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 
-public class QuizQuestionBuilder extends EntityBuilder<QuestionAndAnswer> {
+public class QuizQuestionBuilder extends EntityBuilder<PredefinedQuestion> {
   public QuizQuestionBuilder(MakeMe makeMe) {
     super(makeMe, null);
   }
@@ -35,7 +35,7 @@ public class QuizQuestionBuilder extends EntityBuilder<QuestionAndAnswer> {
   }
 
   public QuizQuestionBuilder ofAIGeneratedQuestion(MCQWithAnswer mcqWithAnswer, Note note) {
-    this.entity = QuestionAndAnswer.fromMCQWithAnswer(mcqWithAnswer, note);
+    this.entity = PredefinedQuestion.fromMCQWithAnswer(mcqWithAnswer, note);
     return this;
   }
 }
