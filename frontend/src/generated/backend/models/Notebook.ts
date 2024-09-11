@@ -9,14 +9,7 @@ export type Notebook = {
     headNote: Note;
     notebookSettings: NotebookSettings;
     updated_at: string;
-    approvalStatus?: Notebook.approvalStatus;
+    certifiable?: boolean;
     creatorId?: string;
 };
-export namespace Notebook {
-    export enum approvalStatus {
-        NOT_APPROVED = 'NOT_APPROVED',
-        PENDING = 'PENDING',
-        APPROVED = 'APPROVED',
-    }
-}
 

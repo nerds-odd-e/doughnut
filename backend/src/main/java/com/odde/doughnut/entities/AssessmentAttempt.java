@@ -53,8 +53,7 @@ public class AssessmentAttempt extends EntityIdentifiedByIdOnly {
     assessmentResult.attempt = this;
     assessmentResult.setTotalCount(assessmentResult.getAttempt().getAnswersTotal());
     assessmentResult.setCorrectCount(getAnswersCorrect());
-    assessmentResult.isCertified =
-        getNotebook().getApprovalStatus().equals(ApprovalStatus.APPROVED);
+    assessmentResult.isCertified = getNotebook().isCertifiable();
     return assessmentResult;
   }
 }

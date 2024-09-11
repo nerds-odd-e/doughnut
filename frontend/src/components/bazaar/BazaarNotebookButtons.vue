@@ -18,7 +18,7 @@
       <SvgAssessment />
     </button>
   </div>
-  <div v-if="certifiedNotebook" class="p-1 certification-icon" >
+  <div v-if="notebook.certifiable" class="p-1 certification-icon" >
     <SvgCertifiedAssessment/>
   </div>
 </template>
@@ -48,11 +48,6 @@ export default defineComponent({
     SvgAssessment,
     SubscribeDialog,
     SvgCertifiedAssessment,
-  },
-  computed: {
-    certifiedNotebook() {
-      return this.notebook.approvalStatus === "APPROVED"
-    },
   },
   methods: {
     openAssessmentPage() {

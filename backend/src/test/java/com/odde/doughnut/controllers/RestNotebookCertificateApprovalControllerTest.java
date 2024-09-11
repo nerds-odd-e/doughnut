@@ -2,7 +2,7 @@ package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -85,7 +85,7 @@ class RestNotebookCertificateApprovalControllerTest {
       Note note = makeMe.aNote().creatorAndOwner(userModel).please();
       controller.requestApprovalForNotebook(note.getNotebook());
       makeMe.refresh(note.getNotebook());
-      assertThat(note.getNotebook().getApprovalStatus(), equalTo(ApprovalStatus.PENDING));
+      assertFalse(note.getNotebook().isCertifiable());
     }
   }
 
@@ -122,7 +122,7 @@ class RestNotebookCertificateApprovalControllerTest {
     @Test
     void shouldApproveNoteBook() throws UnexpectedNoAccessRightException {
       Notebook result = controller.approve(approval.getApproval()).getNotebook();
-      assertThat(result.getApprovalStatus(), equalTo(ApprovalStatus.APPROVED));
+      assertTrue(result.isCertifiable());
     }
   }
 }

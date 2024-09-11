@@ -67,14 +67,9 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @NonNull
   private Timestamp updated_at;
 
-  public ApprovalStatus getApprovalStatus() {
-    if (notebookCertificateApproval == null) {
-      return ApprovalStatus.NOT_APPROVED;
-    }
-    if (notebookCertificateApproval.getLastApprovalTime() == null) {
-      return ApprovalStatus.PENDING;
-    }
-    return ApprovalStatus.APPROVED;
+  public boolean isCertifiable() {
+    return notebookCertificateApproval != null
+        && notebookCertificateApproval.getLastApprovalTime() != null;
   }
 
   @JsonIgnore
