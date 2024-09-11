@@ -1,10 +1,13 @@
 <template>
-  <Assessment v-if="assessmentAttempt" :assessment-attempt="assessmentAttempt" />
+  <ContainerPage v-bind="{ contentExists: loaded, title: `Assessment For ${ assessmentAttempt?.notebookTitle }`}">
+    <Assessment v-if="assessmentAttempt" :assessment-attempt="assessmentAttempt" />
+  </ContainerPage>
   <div v-if="errors" class="alert alert-danger">{{ errors }}</div>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref } from "vue"
+import ContainerPage from "./commons/ContainerPage.vue"
 import Assessment from "@/components/assessment/Assessment.vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { AssessmentAttempt } from "@/generated/backend"
@@ -14,6 +17,7 @@ const props = defineProps({
   notebookId: { type: Number, required: true },
 })
 
+const loaded = ref(false)
 const assessmentAttempt = ref<AssessmentAttempt | undefined>()
 const errors = ref("")
 
@@ -30,6 +34,7 @@ const generateAssessmentQuestions = async () => {
       errors.value = String(err)
     }
   }
+  loaded.value = true
 }
 
 onMounted(() => {

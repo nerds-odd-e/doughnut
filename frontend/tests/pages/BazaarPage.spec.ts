@@ -10,7 +10,7 @@ describe("bazaar page", () => {
     helper.managedApi.restBazaarController.bazaar = vi
       .fn()
       .mockResolvedValue(bazaarNotebooks)
-    helper.component(BazaarPage).render()
+    helper.component(BazaarPage).withRouter().render()
     expect(helper.managedApi.restBazaarController.bazaar).toBeCalledTimes(1)
   })
 })
