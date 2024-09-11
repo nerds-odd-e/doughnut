@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.odde.doughnut.entities.AnsweredQuestion;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.PredefinedQuestion;
+import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.MakeMe;
@@ -45,7 +45,7 @@ class AIGeneratedQuizFactoryTest {
 
   @Test
   void shouldIncludeQuestionStem() {
-    PredefinedQuestion predefinedQuestion = buildQuestion();
+    QuizQuestion predefinedQuestion = buildQuestion();
     assertThat(
         predefinedQuestion.getMultipleChoicesQuestion().getStem(),
         containsString("How long did it take to build Rome?"));
@@ -78,10 +78,10 @@ class AIGeneratedQuizFactoryTest {
   }
 
   private QuizQuestionBuilder questionBuilder() {
-    return makeMe.aQuestion().ofAIGeneratedQuestion(mcqWithAnswer, note);
+    return makeMe.aQuizQuestion().ofAIGeneratedQuestion(mcqWithAnswer, note);
   }
 
-  private PredefinedQuestion buildQuestion() {
+  private QuizQuestion buildQuestion() {
     return questionBuilder().inMemoryPlease();
   }
 }

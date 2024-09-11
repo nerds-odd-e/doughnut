@@ -1,41 +1,34 @@
 package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.PredefinedQuestion;
-import com.odde.doughnut.factoryServices.quizFacotries.factories.SpellingQuizFactory;
+import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 
-public class QuizQuestionBuilder extends EntityBuilder<PredefinedQuestion> {
+public class QuizQuestionBuilder extends EntityBuilder<QuizQuestion> {
+  private PredefinedQuestionBuilder predefinedQuestionBuilder;
+
   public QuizQuestionBuilder(MakeMe makeMe) {
     super(makeMe, null);
+    predefinedQuestionBuilder = new PredefinedQuestionBuilder(makeMe);
   }
 
   @Override
   protected void beforeCreate(boolean needPersist) {
     if (entity == null) {
-      spellingQuestionOf(makeMe.aNote().please(needPersist));
+      entity = new QuizQuestion();
+      entity.setPredefinedQuestion(predefinedQuestionBuilder.please(needPersist));
     }
   }
 
   public QuizQuestionBuilder spellingQuestionOf(Note note) {
-    this.entity = new SpellingQuizFactory(note).buildSpellingQuestion();
-    this.entity.setApproved(false);
+    this.predefinedQuestionBuilder.spellingQuestionOf(note);
     return this;
-  }
-
-  public QuizQuestionBuilder approved() {
-    this.entity.setApproved(true);
-    return this;
-  }
-
-  public QuizQuestionBuilder approvedSpellingQuestionOf(Note note) {
-    return spellingQuestionOf(note).approved();
   }
 
   public QuizQuestionBuilder ofAIGeneratedQuestion(MCQWithAnswer mcqWithAnswer, Note note) {
-    this.entity = PredefinedQuestion.fromMCQWithAnswer(mcqWithAnswer, note);
+    this.predefinedQuestionBuilder.ofAIGeneratedQuestion(mcqWithAnswer, note);
     return this;
   }
 }

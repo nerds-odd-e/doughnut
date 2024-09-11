@@ -18,7 +18,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
   UserBuilder creatorBuilder = null;
   List<LinkBuilder> linkBuilders = new ArrayList<>();
   private String audioFilename = null;
-  private List<QuizQuestionBuilder> quizQuestionBuilders = new ArrayList<>();
+  private List<PredefinedQuestionBuilder> predefinedQuestionBuilders = new ArrayList<>();
   private List<NoteBuilder> childrenBuilders = new ArrayList<>();
 
   public NoteBuilder(Note note, MakeMe makeMe) {
@@ -112,10 +112,10 @@ public class NoteBuilder extends EntityBuilder<Note> {
   @Override
   protected void afterCreate(boolean needPersist) {
     linkBuilders.forEach(linkBuilder -> linkBuilder.please(needPersist));
-    quizQuestionBuilders.forEach(bu -> bu.please(needPersist));
+    predefinedQuestionBuilders.forEach(bu -> bu.please(needPersist));
     childrenBuilders.forEach(bu -> bu.please(needPersist));
     if (linkBuilders.isEmpty()
-        && quizQuestionBuilders.isEmpty()
+        && predefinedQuestionBuilders.isEmpty()
         && childrenBuilders.isEmpty()
         && !needPersist) return;
     makeMe.refresh(entity);
@@ -216,14 +216,16 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder hasAnApprovedQuestion() {
-    QuizQuestionBuilder quizQuestionBuilder = makeMe.aQuestion().approvedSpellingQuestionOf(entity);
-    this.quizQuestionBuilders.add(quizQuestionBuilder);
+    PredefinedQuestionBuilder predefinedQuestionBuilder =
+        makeMe.aPredefinedQuestion().approvedSpellingQuestionOf(entity);
+    this.predefinedQuestionBuilders.add(predefinedQuestionBuilder);
     return this;
   }
 
   public NoteBuilder hasAnUnapprovedQuestion() {
-    QuizQuestionBuilder quizQuestionBuilder = makeMe.aQuestion().spellingQuestionOf(entity);
-    this.quizQuestionBuilders.add(quizQuestionBuilder);
+    PredefinedQuestionBuilder predefinedQuestionBuilder =
+        makeMe.aPredefinedQuestion().spellingQuestionOf(entity);
+    this.predefinedQuestionBuilders.add(predefinedQuestionBuilder);
     return this;
   }
 

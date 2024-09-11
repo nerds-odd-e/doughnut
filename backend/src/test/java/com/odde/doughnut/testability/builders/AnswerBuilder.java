@@ -35,14 +35,17 @@ public class AnswerBuilder extends EntityBuilder<Answer> {
   }
 
   public AnswerBuilder ofSpellingQuestion(Note note) {
-    QuizQuestionBuilder quizQuestionBuilder = makeMe.aQuestion();
+    PredefinedQuestionBuilder predefinedQuestionBuilder = makeMe.aPredefinedQuestion();
     entity.setQuizQuestion(
-        quizQuestionBuilder.approvedSpellingQuestionOf(note).inMemoryPlease().getQuizQuestion());
+        predefinedQuestionBuilder
+            .approvedSpellingQuestionOf(note)
+            .inMemoryPlease()
+            .getQuizQuestion());
     return this;
   }
 
-  public AnswerBuilder forQuestion(PredefinedQuestion predefinedQuestion) {
-    entity.setQuizQuestion(predefinedQuestion.getQuizQuestion());
+  public AnswerBuilder forQuestion(QuizQuestion quizQuestion) {
+    entity.setQuizQuestion(quizQuestion);
     return this;
   }
 

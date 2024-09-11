@@ -121,7 +121,11 @@ public class MakeMe extends MakeMeWithoutDB {
     return modelFactoryService.toUserModel(null);
   }
 
-  public QuizQuestionBuilder aQuestion() {
+  public PredefinedQuestionBuilder aPredefinedQuestion() {
+    return new PredefinedQuestionBuilder(this);
+  }
+
+  public QuizQuestionBuilder aQuizQuestion() {
     return new QuizQuestionBuilder(this);
   }
 

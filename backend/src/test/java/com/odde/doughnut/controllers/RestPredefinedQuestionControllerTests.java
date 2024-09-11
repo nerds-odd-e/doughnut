@@ -24,7 +24,7 @@ import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.odde.doughnut.testability.TestabilitySettings;
-import com.odde.doughnut.testability.builders.QuizQuestionBuilder;
+import com.odde.doughnut.testability.builders.PredefinedQuestionBuilder;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import java.sql.Timestamp;
@@ -84,8 +84,9 @@ class RestPredefinedQuestionControllerTests {
               .by(currentUser)
               .forgettingCurveAndNextReviewAt(200)
               .please();
-      QuizQuestionBuilder quizQuestionBuilder = makeMe.aQuestion();
-      predefinedQuestion = quizQuestionBuilder.approvedSpellingQuestionOf(answerNote).please();
+      PredefinedQuestionBuilder predefinedQuestionBuilder = makeMe.aPredefinedQuestion();
+      predefinedQuestion =
+          predefinedQuestionBuilder.approvedSpellingQuestionOf(answerNote).please();
       answerDTO.setSpellingAnswer(answerNote.getTopicConstructor());
     }
 
@@ -128,9 +129,9 @@ class RestPredefinedQuestionControllerTests {
     class WrongAnswer {
       @BeforeEach
       void setup() {
-        QuizQuestionBuilder quizQuestionBuilder = makeMe.aQuestion();
+        PredefinedQuestionBuilder predefinedQuestionBuilder = makeMe.aPredefinedQuestion();
         predefinedQuestion =
-            quizQuestionBuilder.approvedSpellingQuestionOf(reviewPoint.getNote()).please();
+            predefinedQuestionBuilder.approvedSpellingQuestionOf(reviewPoint.getNote()).please();
         answerDTO.setSpellingAnswer("wrong");
       }
 
@@ -182,7 +183,8 @@ class RestPredefinedQuestionControllerTests {
     void setup() throws QuizQuestionNotPossibleException {
       note = makeMe.aNote().creatorAndOwner(currentUser).please();
       mcqWithAnswer = makeMe.aMCQWithAnswer().please();
-      predefinedQuestion = makeMe.aQuestion().ofAIGeneratedQuestion(mcqWithAnswer, note).please();
+      predefinedQuestion =
+          makeMe.aPredefinedQuestion().ofAIGeneratedQuestion(mcqWithAnswer, note).please();
     }
 
     @Test
@@ -336,7 +338,7 @@ class RestPredefinedQuestionControllerTests {
     void setUp() {
       note = makeMe.aNote().please();
 
-      predefinedQuestion = makeMe.aQuestion().approvedSpellingQuestionOf(note).please();
+      predefinedQuestion = makeMe.aPredefinedQuestion().approvedSpellingQuestionOf(note).please();
     }
 
     @Test
@@ -380,7 +382,8 @@ class RestPredefinedQuestionControllerTests {
 
       MCQWithAnswer aiGeneratedQuestion = makeMe.aMCQWithAnswer().please();
       Note note = makeMe.aNote().please();
-      quizQuestion = makeMe.aQuestion().ofAIGeneratedQuestion(aiGeneratedQuestion, note).please();
+      quizQuestion =
+          makeMe.aPredefinedQuestion().ofAIGeneratedQuestion(aiGeneratedQuestion, note).please();
     }
 
     @Test
@@ -459,7 +462,7 @@ class RestPredefinedQuestionControllerTests {
     @Test
     void getQuestionsOfANoteWhenThereIsOneQuestion() throws UnexpectedNoAccessRightException {
       PredefinedQuestion questionOfNote =
-          makeMe.aQuestion().approvedSpellingQuestionOf(noteWithoutQuestions).please();
+          makeMe.aPredefinedQuestion().approvedSpellingQuestionOf(noteWithoutQuestions).please();
       List<PredefinedQuestion> results = controller.getAllQuestionByNote(noteWithoutQuestions);
       assertThat(results, contains(questionOfNote));
     }
@@ -467,7 +470,7 @@ class RestPredefinedQuestionControllerTests {
     @Test
     void getAllQuestionsOfANoteWhenThereIsMoreThanOneQuestion()
         throws UnexpectedNoAccessRightException {
-      makeMe.aQuestion().approvedSpellingQuestionOf(noteWithQuestions).please();
+      makeMe.aPredefinedQuestion().approvedSpellingQuestionOf(noteWithQuestions).please();
       List<PredefinedQuestion> results = controller.getAllQuestionByNote(noteWithQuestions);
       assertThat(results, hasSize(2));
     }
@@ -478,7 +481,7 @@ class RestPredefinedQuestionControllerTests {
     @Test
     void authorization() {
       Note note = makeMe.aNote().please();
-      PredefinedQuestion mcqWithAnswer = makeMe.aQuestion().please();
+      PredefinedQuestion mcqWithAnswer = makeMe.aPredefinedQuestion().please();
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.addQuestionManually(note, mcqWithAnswer));
@@ -487,7 +490,7 @@ class RestPredefinedQuestionControllerTests {
     @Test
     void persistent() throws UnexpectedNoAccessRightException {
       Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
-      PredefinedQuestion mcqWithAnswer = makeMe.aQuestion().please();
+      PredefinedQuestion mcqWithAnswer = makeMe.aPredefinedQuestion().please();
       controller.addQuestionManually(note, mcqWithAnswer);
       makeMe.refresh(note);
       assertThat(note.getPredefinedQuestions(), hasSize(1));
@@ -499,7 +502,7 @@ class RestPredefinedQuestionControllerTests {
     @Test
     void authorization() {
       Note note = makeMe.aNote().please();
-      PredefinedQuestion mcqWithAnswer = makeMe.aQuestion().please();
+      PredefinedQuestion mcqWithAnswer = makeMe.aPredefinedQuestion().please();
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.addQuestionManually(note, mcqWithAnswer));
@@ -508,7 +511,7 @@ class RestPredefinedQuestionControllerTests {
     @Test
     void givenQuestion_thenReturnRefineQuestion() throws UnexpectedNoAccessRightException {
       Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
-      PredefinedQuestion predefinedQuestion = makeMe.aQuestion().please();
+      PredefinedQuestion predefinedQuestion = makeMe.aPredefinedQuestion().please();
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(mcqWithAnswer, "");
       PredefinedQuestion result = controller.refineQuestion(note, predefinedQuestion);
@@ -522,7 +525,7 @@ class RestPredefinedQuestionControllerTests {
 
     @Test
     void refineQuestionFailedWithGpt35WillNotTryAgain() throws JsonProcessingException {
-      PredefinedQuestion mcqWithAnswer = makeMe.aQuestion().please();
+      PredefinedQuestion mcqWithAnswer = makeMe.aPredefinedQuestion().please();
       Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCallJsonNode(
           new ObjectMapper()
@@ -547,7 +550,7 @@ class RestPredefinedQuestionControllerTests {
     void mustNotBeAbleToApproveOtherPeoplesNoteQuestion() {
       Note note = makeMe.aNote().creatorAndOwner(makeMe.aUser().please()).please();
       PredefinedQuestion predefinedQuestion =
-          makeMe.aQuestion().approvedSpellingQuestionOf(note).please();
+          makeMe.aPredefinedQuestion().approvedSpellingQuestionOf(note).please();
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.toggleApproval(predefinedQuestion));
@@ -556,7 +559,7 @@ class RestPredefinedQuestionControllerTests {
     @Test
     void approveQuestion() throws UnexpectedNoAccessRightException {
       PredefinedQuestion predefinedQuestion =
-          makeMe.aQuestion().approvedSpellingQuestionOf(subjectNote).please();
+          makeMe.aPredefinedQuestion().approvedSpellingQuestionOf(subjectNote).please();
       predefinedQuestion.setApproved(false);
       PredefinedQuestion approvedQuestion = controller.toggleApproval(predefinedQuestion);
       assertTrue(approvedQuestion.isApproved());
@@ -565,7 +568,7 @@ class RestPredefinedQuestionControllerTests {
     @Test
     void unApproveQuestion() throws UnexpectedNoAccessRightException {
       PredefinedQuestion predefinedQuestion =
-          makeMe.aQuestion().approvedSpellingQuestionOf(subjectNote).please();
+          makeMe.aPredefinedQuestion().approvedSpellingQuestionOf(subjectNote).please();
       predefinedQuestion.setApproved(true);
       PredefinedQuestion approvedQuestion = controller.toggleApproval(predefinedQuestion);
       assertFalse(approvedQuestion.isApproved());

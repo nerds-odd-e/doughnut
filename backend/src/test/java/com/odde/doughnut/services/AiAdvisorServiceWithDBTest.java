@@ -62,7 +62,8 @@ class AiAdvisorServiceWithDBTest {
               .correctChoiceIndex(0)
               .please();
       Note note = makeMe.aNote().please();
-      quizQuestion = makeMe.aQuestion().ofAIGeneratedQuestion(aiGeneratedQuestion, note).please();
+      quizQuestion =
+          makeMe.aPredefinedQuestion().ofAIGeneratedQuestion(aiGeneratedQuestion, note).please();
     }
 
     @Test

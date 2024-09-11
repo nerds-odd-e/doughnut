@@ -12,7 +12,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
-import com.odde.doughnut.testability.builders.QuizQuestionBuilder;
+import com.odde.doughnut.testability.builders.PredefinedQuestionBuilder;
 import java.time.Period;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -169,8 +169,8 @@ class RestNotebookControllerTest {
     @Test
     void shouldGetListOfNotesWithQuestions() throws UnexpectedNoAccessRightException {
       controller = new RestNotebookController(modelFactoryService, userModel, testabilitySettings);
-      QuizQuestionBuilder quizQuestionBuilder = makeMe.aQuestion();
-      quizQuestionBuilder.approvedSpellingQuestionOf(notebook.getNotes().get(0)).please();
+      PredefinedQuestionBuilder predefinedQuestionBuilder = makeMe.aPredefinedQuestion();
+      predefinedQuestionBuilder.approvedSpellingQuestionOf(notebook.getNotes().get(0)).please();
       List<Note> result = controller.getNotes(notebook);
       assertThat(result.get(0).getPredefinedQuestions(), hasSize(1));
     }
