@@ -2,17 +2,21 @@ package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 
 public class AnswerBuilder extends EntityBuilder<Answer> {
+  private QuizQuestionBuilder quizQuestionBuilder = null;
+
   public AnswerBuilder(MakeMe makeMe) {
     super(makeMe, new Answer());
   }
 
   @Override
   protected void beforeCreate(boolean needPersist) {
+    if (this.quizQuestionBuilder != null) {
+      entity.setQuizQuestion(quizQuestionBuilder.please(needPersist));
+    }
     if (needPersist) {
       if (entity.getQuizQuestion().getId() == null) {
         makeMe.modelFactoryService.save(entity.getQuizQuestion());
@@ -21,26 +25,13 @@ public class AnswerBuilder extends EntityBuilder<Answer> {
   }
 
   public AnswerBuilder withValidQuestion(QuizQuestionFactory quizQuestionFactory) {
-    try {
-      PredefinedQuestion predefinedQuestion = quizQuestionFactory.buildValidQuizQuestion();
-      predefinedQuestion.getQuizQuestion().setPredefinedQuestion(predefinedQuestion);
-      entity.setQuizQuestion(predefinedQuestion.getQuizQuestion());
-    } catch (QuizQuestionNotPossibleException e) {
-      throw new RuntimeException(
-          "Failed to generate a question of type "
-              + quizQuestionFactory.getClass().getSimpleName()
-              + ", perhaps no enough data.");
-    }
+    this.quizQuestionBuilder = makeMe.aQuizQuestion().useFactory(quizQuestionFactory);
     return this;
   }
 
   public AnswerBuilder ofSpellingQuestion(Note note) {
-    PredefinedQuestionBuilder predefinedQuestionBuilder = makeMe.aPredefinedQuestion();
-    entity.setQuizQuestion(
-        predefinedQuestionBuilder
-            .approvedSpellingQuestionOf(note)
-            .inMemoryPlease()
-            .getQuizQuestion());
+    QuizQuestionBuilder quizQuestionBuilder = makeMe.aQuizQuestion();
+    entity.setQuizQuestion(quizQuestionBuilder.approvedSpellingQuestionOf(note).inMemoryPlease());
     return this;
   }
 
