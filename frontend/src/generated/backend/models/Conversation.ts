@@ -2,11 +2,11 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { PredefinedQuestion } from './PredefinedQuestion';
+import type { QuizQuestion } from './QuizQuestion';
 import type { User } from './User';
 export type Conversation = {
     id: number;
-    predefinedQuestion?: PredefinedQuestion;
+    quizQuestion?: QuizQuestion;
     noteCreator?: User;
     conversationInitiator?: User;
     message?: string;

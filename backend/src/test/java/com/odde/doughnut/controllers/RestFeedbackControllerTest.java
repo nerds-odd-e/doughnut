@@ -41,7 +41,8 @@ class RestFeedbackControllerTest {
     String feedback = "This is a feedback";
     PredefinedQuestion predefinedQuestion = makeMe.aQuestion().please();
 
-    ResponseEntity<String> response = controller.sendFeedback(feedback, predefinedQuestion);
+    ResponseEntity<String> response =
+        controller.sendFeedback(feedback, predefinedQuestion.getQuizQuestion());
 
     List<Conversation> conversations =
         (List<Conversation>) modelFactoryService.conversationRepository.findAll();
@@ -66,7 +67,7 @@ class RestFeedbackControllerTest {
     conversation1.setConversationInitiator(feedbackGiverUser);
     conversation1.setNoteCreator(predefinedQuestion1.getNote().getCreator());
     conversation1.setMessage("This is a feedback for the current user");
-    conversation1.setPredefinedQuestion(predefinedQuestion1);
+    conversation1.setQuizQuestion(predefinedQuestion1.getQuizQuestion());
     makeMe.modelFactoryService.save(conversation1);
 
     PredefinedQuestion predefinedQuestion2 = makeMe.aQuestion().please();
@@ -74,7 +75,7 @@ class RestFeedbackControllerTest {
     conversation2.setConversationInitiator(feedbackGiverUser);
     conversation2.setNoteCreator(predefinedQuestion2.getNote().getCreator());
     conversation2.setMessage("This is a feedback for the other user");
-    conversation2.setPredefinedQuestion(predefinedQuestion2);
+    conversation2.setQuizQuestion(predefinedQuestion2.getQuizQuestion());
     makeMe.modelFactoryService.save(conversation2);
 
     List<Conversation> conversations = controller.getFeedback();
@@ -93,7 +94,7 @@ class RestFeedbackControllerTest {
     conversation1.setConversationInitiator(notCurrentUser);
     conversation1.setNoteCreator(predefinedQuestion1.getNote().getCreator());
     conversation1.setMessage("This is a feedback for the current user");
-    conversation1.setPredefinedQuestion(predefinedQuestion1);
+    conversation1.setQuizQuestion(predefinedQuestion1.getQuizQuestion());
     makeMe.modelFactoryService.save(conversation1);
 
     PredefinedQuestion predefinedQuestion2 = makeMe.aQuestion().please();
@@ -102,7 +103,7 @@ class RestFeedbackControllerTest {
     conversation2.setConversationInitiator(this.currentUser.getEntity());
     conversation2.setNoteCreator(predefinedQuestion2.getNote().getCreator());
     conversation2.setMessage("This is a feedback for the current user");
-    conversation2.setPredefinedQuestion(predefinedQuestion2);
+    conversation2.setQuizQuestion(predefinedQuestion2.getQuizQuestion());
     makeMe.modelFactoryService.save(conversation2);
 
     User notCurrentUser2 = makeMe.aUser().please();
@@ -113,7 +114,7 @@ class RestFeedbackControllerTest {
     conversation3.setConversationInitiator(notCurrentUser2);
     conversation3.setNoteCreator(predefinedQuestion3.getNote().getCreator());
     conversation3.setMessage("This is a feedback for the current user");
-    conversation3.setPredefinedQuestion(predefinedQuestion3);
+    conversation3.setQuizQuestion(predefinedQuestion3.getQuizQuestion());
     makeMe.modelFactoryService.save(conversation3);
 
     List<Conversation> conversations = controller.getFeedbackThreadsForUser();

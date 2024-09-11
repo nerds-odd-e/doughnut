@@ -3940,8 +3940,8 @@ components:
         id:
           type: integer
           format: int32
-        predefinedQuestion:
-          $ref: "#/components/schemas/PredefinedQuestion"
+        quizQuestion:
+          $ref: "#/components/schemas/QuizQuestion"
         noteCreator:
           $ref: "#/components/schemas/User"
         conversationInitiator:

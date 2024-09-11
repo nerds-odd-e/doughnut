@@ -1,7 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.Conversation;
-import com.odde.doughnut.entities.PredefinedQuestion;
+import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ConversationService;
@@ -29,8 +29,8 @@ public class RestFeedbackController {
   @PostMapping("/send/{question}")
   public ResponseEntity<String> sendFeedback(
       @RequestBody String feedback,
-      @PathVariable("question") @Schema(type = "integer") PredefinedQuestion predefinedQuestion) {
-    conversationService.startConversation(predefinedQuestion, currentUser.getEntity(), feedback);
+      @PathVariable("question") @Schema(type = "integer") QuizQuestion quizQuestion) {
+    conversationService.startConversation(quizQuestion, currentUser.getEntity(), feedback);
     return ResponseEntity.ok("Feedback received successfully!");
   }
 
