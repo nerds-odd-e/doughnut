@@ -67,7 +67,7 @@
     "openapi-typescript-codegen": "^0.29.0",
     "superagent": "^10.1.0",
     "syncpack": "^13.0.0",
-    "typescript": "5.5.4",
+    "typescript": "5.6.2",
     "wait-on": "^8.0.0"
   },
   "dependencies": {
