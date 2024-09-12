@@ -2,6 +2,7 @@ import { QuizQuestion } from "@/generated/backend"
 import Builder from "./Builder"
 import generateId from "./generateId"
 import PredefinedQuestionBuilder from "./PredefinedQuestionBuilder"
+import NotebookBuilder from "./NotebookBuilder"
 
 class QuizQuestionBuilder extends Builder<QuizQuestion> {
   predefinedQuestionBuilder = new PredefinedQuestionBuilder()
@@ -22,6 +23,7 @@ class QuizQuestionBuilder extends Builder<QuizQuestion> {
       id: generateId(),
       multipleChoicesQuestion: predefinedQuizQuestion.multipleChoicesQuestion,
       checkSpell: predefinedQuizQuestion.checkSpell,
+      notebook: new NotebookBuilder().do(),
     }
   }
 }

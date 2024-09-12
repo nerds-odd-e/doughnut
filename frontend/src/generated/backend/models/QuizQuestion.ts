@@ -4,10 +4,12 @@
 /* eslint-disable */
 import type { ImageWithMask } from './ImageWithMask';
 import type { MultipleChoicesQuestion } from './MultipleChoicesQuestion';
+import type { Notebook } from './Notebook';
 export type QuizQuestion = {
     id: number;
     checkSpell?: boolean;
     imageWithMask?: ImageWithMask;
     multipleChoicesQuestion: MultipleChoicesQuestion;
+    notebook?: Notebook;
 };
 

@@ -28,13 +28,13 @@ describe("NoteChatDialog TestMe", () => {
       mockedGenerateQuestion
   })
 
-  const quizQuestionInNotebook = makeMe.aQuizQuestionInNotebook
+  const quizQuestion = makeMe.aQuizQuestion
     .withQuestionStem("any question?")
     .withChoices(["option A", "option B", "option C"])
     .please()
 
   it("render the question returned", async () => {
-    mockedGenerateQuestion.mockResolvedValue(quizQuestionInNotebook)
+    mockedGenerateQuestion.mockResolvedValue(quizQuestion)
     const wrapper = await createWrapper()
     wrapper.find("button").trigger("click")
     await flushPromises()
@@ -45,7 +45,7 @@ describe("NoteChatDialog TestMe", () => {
   })
 
   it("scroll to bottom", async () => {
-    mockedGenerateQuestion.mockResolvedValue(quizQuestionInNotebook)
+    mockedGenerateQuestion.mockResolvedValue(quizQuestion)
     const wrapper = await createWrapper()
     wrapper.find("button").trigger("click")
     await flushPromises()
@@ -62,7 +62,7 @@ describe("NoteChatDialog TestMe", () => {
       .please()
 
     beforeEach(async () => {
-      mockedGenerateQuestion.mockResolvedValueOnce(quizQuestionInNotebook)
+      mockedGenerateQuestion.mockResolvedValueOnce(quizQuestion)
       helper.managedApi.restQuizQuestionController.contest =
         mockedContest.mockResolvedValue({})
       helper.managedApi.restQuizQuestionController.regenerate =
@@ -75,12 +75,8 @@ describe("NoteChatDialog TestMe", () => {
     it("calls the api", async () => {
       wrapper.find("a#try-again").trigger("click")
       await flushPromises()
-      expect(mockedContest).toHaveBeenCalledWith(
-        quizQuestionInNotebook.quizQuestion.id
-      )
-      expect(mockedRegenerate).toHaveBeenCalledWith(
-        quizQuestionInNotebook.quizQuestion.id
-      )
+      expect(mockedContest).toHaveBeenCalledWith(quizQuestion.id)
+      expect(mockedRegenerate).toHaveBeenCalledWith(quizQuestion.id)
     })
 
     it("regenerate question when asked", async () => {

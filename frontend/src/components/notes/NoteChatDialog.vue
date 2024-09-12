@@ -1,8 +1,8 @@
 <template>
   <div class="mt-4" />
   <ContestableQuestion
-    v-if="quizQuestionInNotebook"
-    v-bind="{ quizQuestionInNotebook, storageAccessor }"
+    v-if="quizQuestion"
+    v-bind="{ quizQuestion, storageAccessor }"
     @need-scroll="scrollToBottom"
   />
   <div
@@ -30,7 +30,7 @@
   <div class="chat-controls">
     <div class="container">
       <button
-        v-if="!quizQuestionInNotebook"
+        v-if="!quizQuestion"
         class="btn btn-secondary"
         @click="generateQuestion"
       >
@@ -63,9 +63,9 @@
 import {
   Message,
   Note,
-  QuizQuestionInNotebook,
   ChatRequest,
   MessageDelta,
+  QuizQuestion,
 } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
@@ -81,9 +81,7 @@ const props = defineProps({
     required: true,
   },
 })
-const quizQuestionInNotebook = ref<QuizQuestionInNotebook | undefined>(
-  undefined
-)
+const quizQuestion = ref<QuizQuestion | undefined>(undefined)
 const chatInput = ref("")
 const messages = ref<Message[]>([])
 const bottomOfTheChat = ref<HTMLElement | null>(null)
@@ -101,7 +99,7 @@ const scrollToBottom = () => {
 }
 
 const generateQuestion = async () => {
-  quizQuestionInNotebook.value =
+  quizQuestion.value =
     await managedApi.restQuizQuestionController.generateQuestion(
       props.selectedNote.id
     )

@@ -873,7 +873,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/QuizQuestionInNotebook"
+                $ref: "#/components/schemas/QuizQuestion"
   /api/quiz-questions/generate-question-without-save:
     post:
       tags:
@@ -2398,7 +2398,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/QuizQuestionInNotebook"
+                $ref: "#/components/schemas/QuizQuestion"
   /api/notes/{note}/note-info:
     get:
       tags:
@@ -3224,6 +3224,8 @@ components:
           $ref: "#/components/schemas/ImageWithMask"
         multipleChoicesQuestion:
           $ref: "#/components/schemas/MultipleChoicesQuestion"
+        notebook:
+          $ref: "#/components/schemas/Notebook"
     QuizQuestionContestResult:
       type: object
       properties:
@@ -3259,16 +3261,6 @@ components:
           $ref: "#/components/schemas/ReviewPoint"
         predefinedQuestion:
           $ref: "#/components/schemas/PredefinedQuestion"
-    QuizQuestionInNotebook:
-      required:
-      - notebook
-      - quizQuestion
-      type: object
-      properties:
-        notebook:
-          $ref: "#/components/schemas/Notebook"
-        quizQuestion:
-          $ref: "#/components/schemas/QuizQuestion"
     NoteCreationDTO:
       required:
       - topicConstructor

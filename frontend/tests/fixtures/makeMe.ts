@@ -9,7 +9,6 @@ import NoteRealmBuilder from "./NoteRealmBuilder"
 import NotebookBuilder from "./NotebookBuilder"
 import PredefinedQuestionBuilder from "./PredefinedQuestionBuilder"
 import QuizQuestionBuilder from "./QuizQuestionBuilder"
-import QuizQuestionInNotebookBuilder from "./QuizQuestionInNotebookBuilder"
 import ReviewPointBuilder from "./ReviewPointBuilder"
 import SuggestedQuestionForFineTuningBuilder from "./SuggestedQuestionForFineTuningBuilder"
 import UserBuilder from "./UserBuilder"
@@ -44,10 +43,6 @@ class MakeMe {
 
   static get aQuizQuestion(): QuizQuestionBuilder {
     return new QuizQuestionBuilder()
-  }
-
-  static get aQuizQuestionInNotebook(): QuizQuestionInNotebookBuilder {
-    return new QuizQuestionInNotebookBuilder()
   }
 
   static get aPredefinedQuestion(): PredefinedQuestionBuilder {

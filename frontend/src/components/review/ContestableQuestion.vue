@@ -1,6 +1,7 @@
 <template>
   <BasicBreadcrumb
-    :ancestors="[quizQuestionInNotebook.notebook.headNote.noteTopic]"
+    v-if="quizQuestion.notebook"
+    :ancestors="[quizQuestion.notebook.headNote.noteTopic]"
   />
   <div v-for="(q, index) in prevQuizQuestions" :key="index">
     <h3>Previous Question Contested ...</h3>
@@ -35,11 +36,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-  AnsweredQuestion,
-  QuizQuestion,
-  QuizQuestionInNotebook,
-} from "@/generated/backend"
+import { AnsweredQuestion, QuizQuestion } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import { PropType, ref } from "vue"
@@ -49,8 +46,8 @@ import QuizQuestionC from "./QuizQuestion.vue"
 
 const { managedApi } = useLoadingApi()
 const props = defineProps({
-  quizQuestionInNotebook: {
-    type: Object as PropType<QuizQuestionInNotebook>,
+  quizQuestion: {
+    type: Object as PropType<QuizQuestion>,
     required: true,
   },
   storageAccessor: {
@@ -61,7 +58,7 @@ const props = defineProps({
 const emit = defineEmits(["need-scroll", "answered"])
 const regenerating = ref(false)
 const currentQuestionLegitMessage = ref<string | undefined>(undefined)
-const currentQuestion = ref(props.quizQuestionInNotebook.quizQuestion)
+const currentQuestion = ref(props.quizQuestion)
 const answeredQuestion = ref<AnsweredQuestion | undefined>(undefined)
 const prevQuizQuestions = ref<
   {

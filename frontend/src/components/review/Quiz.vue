@@ -14,11 +14,11 @@
       <ContestableQuestion
         v-else
         v-bind="{
-          quizQuestionInNotebook: currentQuizQuestion,
+          quizQuestion: currentQuizQuestion,
           storageAccessor,
         }"
         @answered="onAnswered($event)"
-        :key="currentQuizQuestion.quizQuestion.id"
+        :key="currentQuizQuestion.id"
       />
     </template>
   </div>
@@ -26,7 +26,7 @@
 
 <script lang="ts">
 import ContentLoader from "@/components/commons/ContentLoader.vue"
-import { AnsweredQuestion, QuizQuestionInNotebook } from "@/generated/backend"
+import { AnsweredQuestion, QuizQuestion } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { StorageAccessor } from "@/store/createNoteStorage"
 import _ from "lodash"
@@ -65,7 +65,7 @@ export default defineComponent({
   },
   data() {
     return {
-      quizQuestionCache: [] as (QuizQuestionInNotebook | undefined)[],
+      quizQuestionCache: [] as (QuizQuestion | undefined)[],
       eagerFetchUntil: 0,
       fetching: false,
     }
