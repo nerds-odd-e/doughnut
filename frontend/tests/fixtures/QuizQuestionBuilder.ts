@@ -1,10 +1,10 @@
-import { QuizQuestion } from "@/generated/backend"
+import { ReviewQuestionInstance } from "@/generated/backend"
 import Builder from "./Builder"
 import generateId from "./generateId"
 import PredefinedQuestionBuilder from "./PredefinedQuestionBuilder"
 import NotebookBuilder from "./NotebookBuilder"
 
-class QuizQuestionBuilder extends Builder<QuizQuestion> {
+class QuizQuestionBuilder extends Builder<ReviewQuestionInstance> {
   predefinedQuestionBuilder = new PredefinedQuestionBuilder()
 
   withQuestionStem(stem: string) {
@@ -17,7 +17,7 @@ class QuizQuestionBuilder extends Builder<QuizQuestion> {
     return this
   }
 
-  do(): QuizQuestion {
+  do(): ReviewQuestionInstance {
     const predefinedQuizQuestion = this.predefinedQuestionBuilder.do()
     return {
       id: generateId(),

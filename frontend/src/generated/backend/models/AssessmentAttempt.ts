@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { QuizQuestion } from './QuizQuestion';
+import type { ReviewQuestionInstance } from './ReviewQuestionInstance';
 export type AssessmentAttempt = {
     id: number;
     notebookTitle?: string;
@@ -10,7 +10,7 @@ export type AssessmentAttempt = {
     isPass?: boolean;
     answersTotal?: number;
     answersCorrect?: number;
-    quizQuestions?: Array<QuizQuestion>;
+    reviewQuestionInstances?: Array<ReviewQuestionInstance>;
     notebookId: number;
 };
 

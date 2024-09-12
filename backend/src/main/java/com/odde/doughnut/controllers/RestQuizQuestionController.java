@@ -49,7 +49,7 @@ class RestQuizQuestionController {
 
   @PostMapping("/generate-question")
   @Transactional
-  public QuizQuestion generateQuestion(
+  public ReviewQuestionInstance generateQuestion(
       @RequestParam(value = "note") @Schema(type = "integer") Note note) {
     currentUser.assertLoggedIn();
     PredefinedQuestion question = quizQuestionService.generateQuestionForNote(note);
@@ -59,13 +59,15 @@ class RestQuizQuestionController {
     return modelFactoryService.createQuizQuestion(question);
   }
 
-  @PostMapping("/{quizQuestion}/regenerate")
+  @PostMapping("/{reviewQuestionInstance}/regenerate")
   @Transactional
-  public QuizQuestion regenerate(
-      @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion) {
+  public ReviewQuestionInstance regenerate(
+      @PathVariable("reviewQuestionInstance") @Schema(type = "integer")
+          ReviewQuestionInstance reviewQuestionInstance) {
     currentUser.assertLoggedIn();
     PredefinedQuestion question =
-        quizQuestionService.generateQuestionForNote(quizQuestion.getPredefinedQuestion().getNote());
+        quizQuestionService.generateQuestionForNote(
+            reviewQuestionInstance.getPredefinedQuestion().getNote());
     if (question == null) {
       return null;
     }
@@ -79,22 +81,25 @@ class RestQuizQuestionController {
     return quizQuestionService.generateMcqWithAnswer(note);
   }
 
-  @PostMapping("/{quizQuestion}/contest")
+  @PostMapping("/{reviewQuestionInstance}/contest")
   @Transactional
   public QuizQuestionContestResult contest(
-      @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion) {
+      @PathVariable("reviewQuestionInstance") @Schema(type = "integer")
+          ReviewQuestionInstance reviewQuestionInstance) {
     currentUser.assertLoggedIn();
-    return aiQuestionGenerator.getQuizQuestionContestResult(quizQuestion.getPredefinedQuestion());
+    return aiQuestionGenerator.getQuizQuestionContestResult(
+        reviewQuestionInstance.getPredefinedQuestion());
   }
 
-  @PostMapping("/{quizQuestion}/answer")
+  @PostMapping("/{reviewQuestionInstance}/answer")
   @Transactional
   public AnsweredQuestion answerQuiz(
-      @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion,
+      @PathVariable("reviewQuestionInstance") @Schema(type = "integer")
+          ReviewQuestionInstance reviewQuestionInstance,
       @Valid @RequestBody AnswerDTO answerDTO) {
     currentUser.assertLoggedIn();
     Answer answer = new Answer();
-    answer.setQuizQuestion(quizQuestion);
+    answer.setReviewQuestionInstance(reviewQuestionInstance);
     answer.setFromDTO(answerDTO);
     AnswerModel answerModel = modelFactoryService.toAnswerModel(answer);
     answerModel.makeAnswerToQuestion(
@@ -102,10 +107,11 @@ class RestQuizQuestionController {
     return answerModel.getAnswerViewedByUser(currentUser.getEntity());
   }
 
-  @PostMapping("/{quizQuestion}/suggest-fine-tuning")
+  @PostMapping("/{reviewQuestionInstance}/suggest-fine-tuning")
   @Transactional
   public SuggestedQuestionForFineTuning suggestQuestionForFineTuning(
-      @PathVariable("quizQuestion") @Schema(type = "integer") PredefinedQuestion predefinedQuestion,
+      @PathVariable("reviewQuestionInstance") @Schema(type = "integer")
+          PredefinedQuestion predefinedQuestion,
       @Valid @RequestBody QuestionSuggestionCreationParams suggestion) {
     SuggestedQuestionForFineTuning sqft = new SuggestedQuestionForFineTuning();
     var suggestedQuestionForFineTuningService =
@@ -145,10 +151,11 @@ class RestQuizQuestionController {
     return quizQuestionService.refineQuestion(note, predefinedQuestion);
   }
 
-  @PostMapping("/{quizQuestion}/toggle-approval")
+  @PostMapping("/{reviewQuestionInstance}/toggle-approval")
   @Transactional
   public PredefinedQuestion toggleApproval(
-      @PathVariable("quizQuestion") @Schema(type = "integer") PredefinedQuestion predefinedQuestion)
+      @PathVariable("reviewQuestionInstance") @Schema(type = "integer")
+          PredefinedQuestion predefinedQuestion)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(predefinedQuestion.getNote());
     return quizQuestionService.toggleApproval(predefinedQuestion);

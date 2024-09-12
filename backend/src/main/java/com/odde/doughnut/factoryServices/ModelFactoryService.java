@@ -150,9 +150,9 @@ public class ModelFactoryService {
     return new NotebookService(notebook, this);
   }
 
-  public QuizQuestion createQuizQuestion(PredefinedQuestion question) {
-    QuizQuestion quizQuestion = new QuizQuestion();
-    quizQuestion.setPredefinedQuestion(question);
-    return save(quizQuestion);
+  public ReviewQuestionInstance createQuizQuestion(PredefinedQuestion question) {
+    ReviewQuestionInstance reviewQuestionInstance = new ReviewQuestionInstance();
+    reviewQuestionInstance.setPredefinedQuestion(question);
+    return save(reviewQuestionInstance);
   }
 }

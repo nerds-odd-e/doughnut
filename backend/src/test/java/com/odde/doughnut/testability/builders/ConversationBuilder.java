@@ -17,9 +17,9 @@ public class ConversationBuilder extends EntityBuilder<Conversation> {
   @Override
   protected void beforeCreate(boolean needPersist) {
     if (this.quizQuestionBuilder != null) {
-      QuizQuestion quizQuestion = quizQuestionBuilder.please(needPersist);
-      entity.setQuizQuestion(quizQuestion);
-      entity.setNoteCreator(quizQuestion.getPredefinedQuestion().getNote().getCreator());
+      ReviewQuestionInstance reviewQuestionInstance = quizQuestionBuilder.please(needPersist);
+      entity.setReviewQuestionInstance(reviewQuestionInstance);
+      entity.setNoteCreator(reviewQuestionInstance.getPredefinedQuestion().getNote().getCreator());
     }
     if (noteCreator != null) {
       entity.setNoteCreator(noteCreator);

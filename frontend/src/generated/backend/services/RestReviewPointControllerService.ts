@@ -2,8 +2,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { QuizQuestion } from '../models/QuizQuestion';
 import type { ReviewPoint } from '../models/ReviewPoint';
+import type { ReviewQuestionInstance } from '../models/ReviewQuestionInstance';
 import type { SelfEvaluation } from '../models/SelfEvaluation';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -96,12 +96,12 @@ export class RestReviewPointControllerService {
     }
     /**
      * @param reviewPoint
-     * @returns QuizQuestion OK
+     * @returns ReviewQuestionInstance OK
      * @throws ApiError
      */
     public generateRandomQuestion(
         reviewPoint: number,
-    ): CancelablePromise<QuizQuestion> {
+    ): CancelablePromise<ReviewQuestionInstance> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/review-points/{reviewPoint}/random-question',

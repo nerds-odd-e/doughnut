@@ -1,13 +1,13 @@
 package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestion;
+import com.odde.doughnut.entities.ReviewQuestionInstance;
 import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 
-public class QuizQuestionBuilder extends EntityBuilder<QuizQuestion> {
+public class QuizQuestionBuilder extends EntityBuilder<ReviewQuestionInstance> {
   private PredefinedQuestionBuilder predefinedQuestionBuilder;
 
   public QuizQuestionBuilder(MakeMe makeMe) {
@@ -18,7 +18,7 @@ public class QuizQuestionBuilder extends EntityBuilder<QuizQuestion> {
   @Override
   protected void beforeCreate(boolean needPersist) {
     if (entity == null) {
-      entity = new QuizQuestion();
+      entity = new ReviewQuestionInstance();
       entity.setPredefinedQuestion(predefinedQuestionBuilder.please(needPersist));
     }
   }

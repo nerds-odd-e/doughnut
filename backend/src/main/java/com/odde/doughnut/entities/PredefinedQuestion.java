@@ -58,7 +58,6 @@ public class PredefinedQuestion extends EntityIdentifiedByIdOnly {
 
   @Override
   public String toString() {
-    // Fixing StackoverflowError when calling toString on PredefinedQuestion or QuizQuestion
     return "PredefinedQuestion{" + "id=" + id + '}';
   }
 }

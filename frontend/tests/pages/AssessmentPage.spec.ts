@@ -17,10 +17,10 @@ vitest.mock("vue-router", () => ({
 describe("assessment page", () => {
   describe("assessment with one question", () => {
     const notebook = makeMe.aNotebook.please()
-    const quizQuestion = makeMe.aQuizQuestion.please()
+    const reviewQuestionInstance = makeMe.aQuizQuestion.please()
     const assessmentAttempt = makeMe.anAssessmentAttempt
       .forNotebook(notebook)
-      .withQuestions([quizQuestion])
+      .withQuestions([reviewQuestionInstance])
       .please()
     beforeEach(() => {
       helper.managedApi.restAssessmentController.generateAssessmentQuestions =
@@ -43,7 +43,7 @@ describe("assessment page", () => {
         .withProps({ notebookId: notebook.id })
         .render()
       await screen.findByText(
-        quizQuestion.quizQuestion1.multipleChoicesQuestion.stem!
+        reviewQuestionInstance.quizQuestion1.multipleChoicesQuestion.stem!
       )
     })
 

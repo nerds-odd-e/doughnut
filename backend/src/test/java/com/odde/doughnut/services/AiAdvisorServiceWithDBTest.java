@@ -44,7 +44,7 @@ class AiAdvisorServiceWithDBTest {
   @Nested
   class ContestQuestion {
     private OpenAIChatCompletionMock openAIChatCompletionMock;
-    PredefinedQuestion quizQuestion;
+    PredefinedQuestion reviewQuestionInstance;
     QuestionEvaluation questionEvaluation = new QuestionEvaluation();
 
     @BeforeEach
@@ -62,7 +62,7 @@ class AiAdvisorServiceWithDBTest {
               .correctChoiceIndex(0)
               .please();
       Note note = makeMe.aNote().please();
-      quizQuestion =
+      reviewQuestionInstance =
           makeMe.aPredefinedQuestion().ofAIGeneratedQuestion(aiGeneratedQuestion, note).please();
     }
 
@@ -70,7 +70,7 @@ class AiAdvisorServiceWithDBTest {
     void rejected() {
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(questionEvaluation, "");
       QuizQuestionContestResult contest =
-          aiQuestionGenerator.getQuizQuestionContestResult(quizQuestion);
+          aiQuestionGenerator.getQuizQuestionContestResult(reviewQuestionInstance);
       assertTrue(contest.rejected);
       Assertions.assertThat(contest.reason)
           .isEqualTo("This seems to be a legitimate question. Please answer it.");
@@ -81,7 +81,7 @@ class AiAdvisorServiceWithDBTest {
       questionEvaluation.feasibleQuestion = false;
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(questionEvaluation, "");
       QuizQuestionContestResult contest =
-          aiQuestionGenerator.getQuizQuestionContestResult(quizQuestion);
+          aiQuestionGenerator.getQuizQuestionContestResult(reviewQuestionInstance);
       assertFalse(contest.rejected);
     }
 
@@ -91,7 +91,7 @@ class AiAdvisorServiceWithDBTest {
           new ObjectMapper().readTree(""), "");
       assertThrows(
           RuntimeException.class,
-          () -> aiQuestionGenerator.getQuizQuestionContestResult(quizQuestion));
+          () -> aiQuestionGenerator.getQuizQuestionContestResult(reviewQuestionInstance));
     }
   }
 }

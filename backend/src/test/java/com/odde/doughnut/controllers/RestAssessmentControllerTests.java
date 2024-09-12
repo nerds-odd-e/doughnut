@@ -78,8 +78,10 @@ public class RestAssessmentControllerTests {
       noteOwnedByOtherUser.getNotebook().getNotebookSettings().setNumberOfQuestionsInAssessment(5);
       BazaarNotebook bazaarNotebook =
           makeMe.aBazaarNotebook(noteOwnedByOtherUser.getNotebook()).please();
-      List<QuizQuestion> assessment =
-          controller.generateAssessmentQuestions(bazaarNotebook.getNotebook()).getQuizQuestions();
+      List<ReviewQuestionInstance> assessment =
+          controller
+              .generateAssessmentQuestions(bazaarNotebook.getNotebook())
+              .getReviewQuestionInstances();
       assertEquals(5, assessment.size());
     }
   }

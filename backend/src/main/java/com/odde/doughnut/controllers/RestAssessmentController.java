@@ -40,10 +40,11 @@ class RestAssessmentController {
     currentUser.assertLoggedIn();
     currentUser.assertReadAuthorization(notebook);
 
-    List<QuizQuestion> quizQuestions = assessmentService.generateAssessment(notebook);
+    List<ReviewQuestionInstance> reviewQuestionInstances =
+        assessmentService.generateAssessment(notebook);
     AssessmentAttempt assessmentAttempt = new AssessmentAttempt();
     assessmentAttempt.setNotebook(notebook);
-    assessmentAttempt.setQuizQuestions(quizQuestions);
+    assessmentAttempt.setReviewQuestionInstances(reviewQuestionInstances);
 
     return assessmentAttempt;
   }

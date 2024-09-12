@@ -45,7 +45,7 @@ public class AssessmentServiceTests {
     Set<Integer> performAssessments(int numberOfAttempts) {
       Set<Integer> questionIds = new HashSet<>();
       for (int i = 0; i < numberOfAttempts; i++) {
-        List<QuizQuestion> assessment = service.generateAssessment(notebook);
+        List<ReviewQuestionInstance> assessment = service.generateAssessment(notebook);
         Integer questionId = assessment.get(0).getId();
         questionIds.add(questionId);
       }
@@ -95,7 +95,7 @@ public class AssessmentServiceTests {
     @Test
     void shouldReturn5QuestionsWhenThereAreMoreThan5NotesWithQuestions() {
       makeMe.theNote(topNote).withNChildrenThat(5, NoteBuilder::hasAnApprovedQuestion).please();
-      List<QuizQuestion> assessment = service.generateAssessment(notebook);
+      List<ReviewQuestionInstance> assessment = service.generateAssessment(notebook);
       assertEquals(5, assessment.size());
     }
 

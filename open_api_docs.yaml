@@ -633,13 +633,13 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ReviewPoint"
-  /api/quiz-questions/{quizQuestion}/toggle-approval:
+  /api/quiz-questions/{reviewQuestionInstance}/toggle-approval:
     post:
       tags:
       - rest-quiz-question-controller
       operationId: toggleApproval
       parameters:
-      - name: quizQuestion
+      - name: reviewQuestionInstance
         in: path
         required: true
         schema:
@@ -657,13 +657,13 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PredefinedQuestion"
-  /api/quiz-questions/{quizQuestion}/suggest-fine-tuning:
+  /api/quiz-questions/{reviewQuestionInstance}/suggest-fine-tuning:
     post:
       tags:
       - rest-quiz-question-controller
       operationId: suggestQuestionForFineTuning
       parameters:
-      - name: quizQuestion
+      - name: reviewQuestionInstance
         in: path
         required: true
         schema:
@@ -687,13 +687,13 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/SuggestedQuestionForFineTuning"
-  /api/quiz-questions/{quizQuestion}/regenerate:
+  /api/quiz-questions/{reviewQuestionInstance}/regenerate:
     post:
       tags:
       - rest-quiz-question-controller
       operationId: regenerate
       parameters:
-      - name: quizQuestion
+      - name: reviewQuestionInstance
         in: path
         required: true
         schema:
@@ -710,14 +710,14 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/QuizQuestion"
-  /api/quiz-questions/{quizQuestion}/contest:
+                $ref: "#/components/schemas/ReviewQuestionInstance"
+  /api/quiz-questions/{reviewQuestionInstance}/contest:
     post:
       tags:
       - rest-quiz-question-controller
       operationId: contest
       parameters:
-      - name: quizQuestion
+      - name: reviewQuestionInstance
         in: path
         required: true
         schema:
@@ -735,13 +735,13 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/QuizQuestionContestResult"
-  /api/quiz-questions/{quizQuestion}/answer:
+  /api/quiz-questions/{reviewQuestionInstance}/answer:
     post:
       tags:
       - rest-quiz-question-controller
       operationId: answerQuiz
       parameters:
-      - name: quizQuestion
+      - name: reviewQuestionInstance
         in: path
         required: true
         schema:
@@ -873,7 +873,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/QuizQuestion"
+                $ref: "#/components/schemas/ReviewQuestionInstance"
   /api/quiz-questions/generate-question-without-save:
     post:
       tags:
@@ -2398,7 +2398,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/QuizQuestion"
+                $ref: "#/components/schemas/ReviewQuestionInstance"
   /api/notes/{note}/note-info:
     get:
       tags:
@@ -3216,7 +3216,7 @@ components:
           format: date-time
         positiveFeedback:
           type: boolean
-    QuizQuestion:
+    ReviewQuestionInstance:
       required:
       - id
       - quizQuestion1
@@ -3491,10 +3491,10 @@ components:
         answersCorrect:
           type: integer
           format: int32
-        quizQuestions:
+        reviewQuestionInstances:
           type: array
           items:
-            $ref: "#/components/schemas/QuizQuestion"
+            $ref: "#/components/schemas/ReviewQuestionInstance"
         notebookId:
           type: integer
           format: int32
@@ -3932,8 +3932,8 @@ components:
         id:
           type: integer
           format: int32
-        quizQuestion:
-          $ref: "#/components/schemas/QuizQuestion"
+        reviewQuestionInstance:
+          $ref: "#/components/schemas/ReviewQuestionInstance"
         noteCreator:
           $ref: "#/components/schemas/User"
         conversationInitiator:

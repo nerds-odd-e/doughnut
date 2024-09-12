@@ -512,8 +512,8 @@ When(
 
 Given(
   'I toggle the approval of the question {string} of the topic {string}',
-  (quizQuestion: string, noteTopic: string) => {
-    start.jumpToNotePage(noteTopic).toggleApproval(quizQuestion)
+  (reviewQuestionInstance: string, noteTopic: string) => {
+    start.jumpToNotePage(noteTopic).toggleApproval(reviewQuestionInstance)
   }
 )
 

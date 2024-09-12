@@ -6,26 +6,26 @@ import type { AnswerDTO } from '../models/AnswerDTO';
 import type { AnsweredQuestion } from '../models/AnsweredQuestion';
 import type { PredefinedQuestion } from '../models/PredefinedQuestion';
 import type { QuestionSuggestionCreationParams } from '../models/QuestionSuggestionCreationParams';
-import type { QuizQuestion } from '../models/QuizQuestion';
 import type { QuizQuestionContestResult } from '../models/QuizQuestionContestResult';
+import type { ReviewQuestionInstance } from '../models/ReviewQuestionInstance';
 import type { SuggestedQuestionForFineTuning } from '../models/SuggestedQuestionForFineTuning';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestQuizQuestionControllerService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
-     * @param quizQuestion
+     * @param reviewQuestionInstance
      * @returns PredefinedQuestion OK
      * @throws ApiError
      */
     public toggleApproval(
-        quizQuestion: number,
+        reviewQuestionInstance: number,
     ): CancelablePromise<PredefinedQuestion> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/quiz-questions/{quizQuestion}/toggle-approval',
+            url: '/api/quiz-questions/{reviewQuestionInstance}/toggle-approval',
             path: {
-                'quizQuestion': quizQuestion,
+                'reviewQuestionInstance': reviewQuestionInstance,
             },
             errors: {
                 500: `Internal Server Error`,
@@ -33,20 +33,20 @@ export class RestQuizQuestionControllerService {
         });
     }
     /**
-     * @param quizQuestion
+     * @param reviewQuestionInstance
      * @param requestBody
      * @returns SuggestedQuestionForFineTuning OK
      * @throws ApiError
      */
     public suggestQuestionForFineTuning(
-        quizQuestion: number,
+        reviewQuestionInstance: number,
         requestBody: QuestionSuggestionCreationParams,
     ): CancelablePromise<SuggestedQuestionForFineTuning> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/quiz-questions/{quizQuestion}/suggest-fine-tuning',
+            url: '/api/quiz-questions/{reviewQuestionInstance}/suggest-fine-tuning',
             path: {
-                'quizQuestion': quizQuestion,
+                'reviewQuestionInstance': reviewQuestionInstance,
             },
             body: requestBody,
             mediaType: 'application/json',
@@ -56,18 +56,18 @@ export class RestQuizQuestionControllerService {
         });
     }
     /**
-     * @param quizQuestion
-     * @returns QuizQuestion OK
+     * @param reviewQuestionInstance
+     * @returns ReviewQuestionInstance OK
      * @throws ApiError
      */
     public regenerate(
-        quizQuestion: number,
-    ): CancelablePromise<QuizQuestion> {
+        reviewQuestionInstance: number,
+    ): CancelablePromise<ReviewQuestionInstance> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/quiz-questions/{quizQuestion}/regenerate',
+            url: '/api/quiz-questions/{reviewQuestionInstance}/regenerate',
             path: {
-                'quizQuestion': quizQuestion,
+                'reviewQuestionInstance': reviewQuestionInstance,
             },
             errors: {
                 500: `Internal Server Error`,
@@ -75,18 +75,18 @@ export class RestQuizQuestionControllerService {
         });
     }
     /**
-     * @param quizQuestion
+     * @param reviewQuestionInstance
      * @returns QuizQuestionContestResult OK
      * @throws ApiError
      */
     public contest(
-        quizQuestion: number,
+        reviewQuestionInstance: number,
     ): CancelablePromise<QuizQuestionContestResult> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/quiz-questions/{quizQuestion}/contest',
+            url: '/api/quiz-questions/{reviewQuestionInstance}/contest',
             path: {
-                'quizQuestion': quizQuestion,
+                'reviewQuestionInstance': reviewQuestionInstance,
             },
             errors: {
                 500: `Internal Server Error`,
@@ -94,20 +94,20 @@ export class RestQuizQuestionControllerService {
         });
     }
     /**
-     * @param quizQuestion
+     * @param reviewQuestionInstance
      * @param requestBody
      * @returns AnsweredQuestion OK
      * @throws ApiError
      */
     public answerQuiz(
-        quizQuestion: number,
+        reviewQuestionInstance: number,
         requestBody: AnswerDTO,
     ): CancelablePromise<AnsweredQuestion> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/quiz-questions/{quizQuestion}/answer',
+            url: '/api/quiz-questions/{reviewQuestionInstance}/answer',
             path: {
-                'quizQuestion': quizQuestion,
+                'reviewQuestionInstance': reviewQuestionInstance,
             },
             body: requestBody,
             mediaType: 'application/json',
@@ -183,12 +183,12 @@ export class RestQuizQuestionControllerService {
     }
     /**
      * @param note
-     * @returns QuizQuestion OK
+     * @returns ReviewQuestionInstance OK
      * @throws ApiError
      */
     public generateQuestion(
         note: number,
-    ): CancelablePromise<QuizQuestion> {
+    ): CancelablePromise<ReviewQuestionInstance> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/quiz-questions/generate-question',

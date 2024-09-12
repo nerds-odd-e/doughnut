@@ -5,8 +5,10 @@ import makeMe from "../fixtures/makeMe"
 import helper from "../helpers"
 
 describe("repeat page", () => {
-  const quizQuestion = makeMe.aQuizQuestion.please()
-  const mockedRandomQuestionCall = vi.fn().mockResolvedValue(quizQuestion)
+  const reviewQuestionInstance = makeMe.aQuizQuestion.please()
+  const mockedRandomQuestionCall = vi
+    .fn()
+    .mockResolvedValue(reviewQuestionInstance)
 
   beforeEach(() => {
     vi.resetAllMocks()

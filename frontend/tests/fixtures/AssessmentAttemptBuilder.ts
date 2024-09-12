@@ -1,4 +1,8 @@
-import { AssessmentAttempt, Notebook, QuizQuestion } from "@/generated/backend"
+import {
+  AssessmentAttempt,
+  Notebook,
+  ReviewQuestionInstance,
+} from "@/generated/backend"
 import Builder from "./Builder"
 import generateId from "./generateId"
 
@@ -12,8 +16,8 @@ class AssessmentAttemptBuilder extends Builder<AssessmentAttempt> {
     return this
   }
 
-  withQuestions(questions: QuizQuestion[]) {
-    this.data.quizQuestions = questions
+  withQuestions(questions: ReviewQuestionInstance[]) {
+    this.data.reviewQuestionInstances = questions
     return this
   }
   passed(): AssessmentAttemptBuilder {

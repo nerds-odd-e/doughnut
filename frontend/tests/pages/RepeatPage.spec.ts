@@ -98,8 +98,8 @@ describe("repeat page", () => {
       const mockedMarkAsRepeatedCall = vi.fn().mockResolvedValue(answerResult)
       helper.managedApi.restReviewPointController.markAsRepeated =
         mockedMarkAsRepeatedCall
-      const quizQuestion = makeMe.aQuizQuestion.please()
-      mockedRandomQuestionCall.mockResolvedValueOnce(quizQuestion)
+      const reviewQuestionInstance = makeMe.aQuizQuestion.please()
+      mockedRandomQuestionCall.mockResolvedValueOnce(reviewQuestionInstance)
       vi.runOnlyPendingTimers()
       await flushPromises()
       await wrapper.find("button.btn-primary").trigger("click")

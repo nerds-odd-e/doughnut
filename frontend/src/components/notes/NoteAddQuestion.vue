@@ -105,20 +105,20 @@ const removeChoice = () => {
   }
 }
 const submitQuestion = async () => {
-  const quizQuestion = predefinedQuestion.value
+  const reviewQuestionInstance = predefinedQuestion.value
   const response =
     await managedApi.restQuizQuestionController.addQuestionManually(
       props.note.id,
-      quizQuestion
+      reviewQuestionInstance
     )
   emit("close-dialog", response)
 }
 const refineQuestion = async () => {
-  const quizQuestion = predefinedQuestion.value
+  const reviewQuestionInstance = predefinedQuestion.value
   predefinedQuestion.value =
     await managedApi.restQuizQuestionController.refineQuestion(
       props.note.id,
-      quizQuestion
+      reviewQuestionInstance
     )
 }
 const generateQuestionByAI = async () => {

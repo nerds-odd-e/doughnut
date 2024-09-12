@@ -1,24 +1,24 @@
 <template>
   <BasicBreadcrumb
-    v-if="quizQuestion.notebook"
-    :ancestors="[quizQuestion.notebook.headNote.noteTopic]"
+    v-if="reviewQuestionInstance.notebook"
+    :ancestors="[reviewQuestionInstance.notebook.headNote.noteTopic]"
   />
   <div v-for="(q, index) in prevQuizQuestions" :key="index">
     <h3>Previous Question Contested ...</h3>
     <p>{{ q.badQuestionReason }}</p>
-    <QuizQuestionC :quiz-question="q.quizeQuestion" :disabled="true" />
+    <QuizQuestion :review-question-instance="q.quizeQuestion" :disabled="true" />
   </div>
   <p v-if="currentQuestionLegitMessage">{{ currentQuestionLegitMessage }}</p>
   <ContentLoader v-if="regenerating" />
-  <div class="quiz-question" v-else>
+  <div class="review-question-instance" v-else>
     <AnsweredQuestionComponent
       v-if="answeredQuestion"
       :answered-question="answeredQuestion"
       :storage-accessor="storageAccessor"
     />
     <div v-else>
-    <QuizQuestionC
-      :quiz-question="currentQuestion"
+    <QuizQuestion
+      :review-question-instance="currentQuestion"
       @answered="onAnswered($event)"
     />
       <a
@@ -36,18 +36,18 @@
 </template>
 
 <script setup lang="ts">
-import { AnsweredQuestion, QuizQuestion } from "@/generated/backend"
+import { AnsweredQuestion, ReviewQuestionInstance } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import { PropType, ref } from "vue"
 import BasicBreadcrumb from "../commons/BasicBreadcrumb.vue"
 import AnsweredQuestionComponent from "./AnsweredQuestionComponent.vue"
-import QuizQuestionC from "./QuizQuestion.vue"
+import QuizQuestion from "./QuizQuestion.vue"
 
 const { managedApi } = useLoadingApi()
 const props = defineProps({
-  quizQuestion: {
-    type: Object as PropType<QuizQuestion>,
+  reviewQuestionInstance: {
+    type: Object as PropType<ReviewQuestionInstance>,
     required: true,
   },
   storageAccessor: {
@@ -58,11 +58,11 @@ const props = defineProps({
 const emit = defineEmits(["need-scroll", "answered"])
 const regenerating = ref(false)
 const currentQuestionLegitMessage = ref<string | undefined>(undefined)
-const currentQuestion = ref(props.quizQuestion)
+const currentQuestion = ref(props.reviewQuestionInstance)
 const answeredQuestion = ref<AnsweredQuestion | undefined>(undefined)
 const prevQuizQuestions = ref<
   {
-    quizeQuestion: QuizQuestion
+    quizeQuestion: ReviewQuestionInstance
     badQuestionReason: string | undefined
   }[]
 >([])
@@ -101,7 +101,7 @@ const onAnswered = (answer: AnsweredQuestion) => {
 </script>
 
 <style lang="scss" scoped>
-.quiz-question {
+.review-question-instance {
   overflow-y: auto;
 }
 </style>

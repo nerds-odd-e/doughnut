@@ -15,11 +15,11 @@ public class AnswerBuilder extends EntityBuilder<Answer> {
   @Override
   protected void beforeCreate(boolean needPersist) {
     if (this.quizQuestionBuilder != null) {
-      entity.setQuizQuestion(quizQuestionBuilder.please(needPersist));
+      entity.setReviewQuestionInstance(quizQuestionBuilder.please(needPersist));
     }
     if (needPersist) {
-      if (entity.getQuizQuestion().getId() == null) {
-        makeMe.modelFactoryService.save(entity.getQuizQuestion());
+      if (entity.getReviewQuestionInstance().getId() == null) {
+        makeMe.modelFactoryService.save(entity.getReviewQuestionInstance());
       }
     }
   }
@@ -34,8 +34,8 @@ public class AnswerBuilder extends EntityBuilder<Answer> {
     return this;
   }
 
-  public AnswerBuilder forQuestion(QuizQuestion quizQuestion) {
-    entity.setQuizQuestion(quizQuestion);
+  public AnswerBuilder forQuestion(ReviewQuestionInstance reviewQuestionInstance) {
+    entity.setReviewQuestionInstance(reviewQuestionInstance);
     return this;
   }
 

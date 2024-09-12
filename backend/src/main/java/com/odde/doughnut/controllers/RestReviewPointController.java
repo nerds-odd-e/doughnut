@@ -2,8 +2,8 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.SelfEvaluation;
 import com.odde.doughnut.entities.PredefinedQuestion;
-import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.ReviewQuestionInstance;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionGenerator;
@@ -55,7 +55,7 @@ class RestReviewPointController {
 
   @GetMapping("/{reviewPoint}/random-question")
   @Transactional
-  public QuizQuestion generateRandomQuestion(
+  public ReviewQuestionInstance generateRandomQuestion(
       @PathVariable("reviewPoint") @Schema(type = "integer") ReviewPoint reviewPoint) {
     currentUser.assertLoggedIn();
     Randomizer randomizer = testabilitySettings.getRandomizer();

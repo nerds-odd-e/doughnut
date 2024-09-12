@@ -30,7 +30,7 @@ public class AnswerModel {
   }
 
   private PredefinedQuestion getQuestion() {
-    return answer.getQuizQuestion().getPredefinedQuestion();
+    return answer.getReviewQuestionInstance().getPredefinedQuestion();
   }
 
   public void makeAnswerToQuestion(Timestamp currentUTCTimestamp, User user) {

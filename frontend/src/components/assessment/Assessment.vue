@@ -3,13 +3,13 @@
     <h5>Passing criteria: {{ passCriteriaPercentage }}%</h5>
     <div>
       <AssessmentQuestion
-        v-if="currentQuestion < quizQuestions.length"
+        v-if="currentQuestion < reviewQuestionInstances.length"
         :answered-current-question="answeredCurrentQuestion"
-        :quiz-question="quizQuestions[currentQuestion]!"
+        :review-question-instance="reviewQuestionInstances[currentQuestion]!"
         @answered="questionAnswered"
       />
       <div v-else-if="assessmentResult">
-        <p>Your score: {{ correctAnswers }} / {{ quizQuestions.length }}</p>
+        <p>Your score: {{ correctAnswers }} / {{ reviewQuestionInstances.length }}</p>
         <div class="alert alert-success" v-if="assessmentResult?.attempt?.isPass">
           You have passed the assessment.
         </div>
@@ -42,7 +42,7 @@
             closer();
             handleFormSubmission();
           "
-          :question="quizQuestions[currentQuestion]"
+          :question="reviewQuestionInstances[currentQuestion]"
         />
       </template>
     </PopButton>
@@ -78,7 +78,9 @@ const assessmentResult = ref<AssessmentResult | undefined>(undefined)
 const questionsAnswerCollection = ref<AnswerSubmission[]>([])
 const certificate = ref<Certificate>()
 const formSubmitted = ref(false)
-const quizQuestions = computed(() => props.assessmentAttempt.quizQuestions!)
+const reviewQuestionInstances = computed(
+  () => props.assessmentAttempt.reviewQuestionInstances!
+)
 
 const passCriteriaPercentage = 80
 
@@ -89,7 +91,7 @@ const advance = () => {
 }
 const questionAnswered = (answerResult) => {
   questionsAnswerCollection.value.push({
-    questionId: quizQuestions.value[currentQuestion.value]!.id,
+    questionId: reviewQuestionInstances.value[currentQuestion.value]!.id,
     answerId: answerResult.answerId,
     correctAnswers: answerResult.correct,
   })
@@ -105,8 +107,8 @@ const questionAnswered = (answerResult) => {
 
 const checkIfQuizComplete = async () => {
   if (
-    currentQuestion.value >= quizQuestions.value.length &&
-    quizQuestions.value.length > 0
+    currentQuestion.value >= reviewQuestionInstances.value.length &&
+    reviewQuestionInstances.value.length > 0
   ) {
     assessmentResult.value =
       await managedApi.restAssessmentController.submitAssessmentResult(

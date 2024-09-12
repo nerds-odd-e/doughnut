@@ -3,7 +3,7 @@ package com.odde.doughnut.controllers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.odde.doughnut.entities.Conversation;
-import com.odde.doughnut.entities.QuizQuestion;
+import com.odde.doughnut.entities.ReviewQuestionInstance;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ConversationService;
@@ -38,9 +38,9 @@ class RestFeedbackControllerTest {
   @Test
   void testSendFeedbackReturnsOk() {
     String feedback = "This is a feedback";
-    QuizQuestion quizQuestion = makeMe.aQuizQuestion().please();
+    ReviewQuestionInstance reviewQuestionInstance = makeMe.aQuizQuestion().please();
 
-    ResponseEntity<String> response = controller.sendFeedback(feedback, quizQuestion);
+    ResponseEntity<String> response = controller.sendFeedback(feedback, reviewQuestionInstance);
 
     List<Conversation> conversations =
         (List<Conversation>) modelFactoryService.conversationRepository.findAll();

@@ -106,7 +106,9 @@ const testability = () => {
       numberOfNotes: number,
       notebookCertifiable?: boolean
     ) {
-      const quizQuestion: Record<string, string>[] = new Array(numberOfNotes)
+      const reviewQuestionInstance: Record<string, string>[] = new Array(
+        numberOfNotes
+      )
         .fill(0)
         .map((_, index) => ({
           'Note Topic': `Note about ${index}`,
@@ -118,7 +120,7 @@ const testability = () => {
       return this.injectQuizQuestionsToNotebook({
         notebookTitle: notebook,
         notebookCertifiable,
-        quizQuestionTestData: quizQuestion,
+        quizQuestionTestData: reviewQuestionInstance,
       })
     },
     injectNumbersNotebookWithQuestions(

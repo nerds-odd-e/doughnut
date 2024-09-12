@@ -24,7 +24,7 @@ public class AssessmentService {
     this.testabilitySettings = testabilitySettings;
   }
 
-  public List<QuizQuestion> generateAssessment(Notebook notebook) {
+  public List<ReviewQuestionInstance> generateAssessment(Notebook notebook) {
     Randomizer randomizer = this.testabilitySettings.getRandomizer();
     List<Note> notes = randomizer.shuffle(notebook.getNotes());
 

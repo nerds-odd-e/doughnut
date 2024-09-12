@@ -14,7 +14,7 @@
       <ContestableQuestion
         v-else
         v-bind="{
-          quizQuestion: currentQuizQuestion,
+          reviewQuestionInstance: currentQuizQuestion,
           storageAccessor,
         }"
         @answered="onAnswered($event)"
@@ -26,7 +26,7 @@
 
 <script lang="ts">
 import ContentLoader from "@/components/commons/ContentLoader.vue"
-import { AnsweredQuestion, QuizQuestion } from "@/generated/backend"
+import { AnsweredQuestion, ReviewQuestionInstance } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { StorageAccessor } from "@/store/createNoteStorage"
 import _ from "lodash"
@@ -65,7 +65,7 @@ export default defineComponent({
   },
   data() {
     return {
-      quizQuestionCache: [] as (QuizQuestion | undefined)[],
+      quizQuestionCache: [] as (ReviewQuestionInstance | undefined)[],
       eagerFetchUntil: 0,
       fetching: false,
     }
