@@ -2,7 +2,7 @@
   <div>
     <h5>Passing criteria: {{ passCriteriaPercentage }}%</h5>
     <div>
-      <QuizQuestion
+      <AssessmentQuestion
         v-if="currentQuestion < quizQuestions.length"
         :answered-current-question="answeredCurrentQuestion"
         :quiz-question="quizQuestions[currentQuestion]!"
@@ -61,7 +61,7 @@ import {
   Certificate,
   AssessmentAttempt,
 } from "@/generated/backend"
-import QuizQuestion from "@/components/review/QuizQuestion.vue"
+import AssessmentQuestion from "./AssessmentQuestion.vue"
 
 const { managedApi } = useLoadingApi()
 const props = defineProps({

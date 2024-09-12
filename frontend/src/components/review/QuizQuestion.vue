@@ -17,6 +17,7 @@ import { PropType } from "vue"
 import { AnswerDTO, QuizQuestion } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import usePopups from "../commons/Popups/usePopups"
+import QuizQuestionDisplay from "../review/QuizQuestionDisplay.vue"
 
 const { managedApi } = useLoadingApi()
 const { popups } = usePopups()

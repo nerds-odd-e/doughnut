@@ -14,6 +14,7 @@ declare module 'vue' {
     ApiStatus: typeof import('./src/components/toolbars/ApiStatus.vue')['default']
     Arrow: typeof import('./src/components/svgs/link_types/Arrow.vue')['default']
     Assessment: typeof import('./src/components/assessment/Assessment.vue')['default']
+    AssessmentQuestion: typeof import('./src/components/assessment/AssessmentQuestion.vue')['default']
     BasicBreadcrumb: typeof import('./src/components/commons/BasicBreadcrumb.vue')['default']
     BazaarNotebookButtons: typeof import('./src/components/bazaar/BazaarNotebookButtons.vue')['default']
     BrandBar: typeof import('./src/components/toolbars/BrandBar.vue')['default']
