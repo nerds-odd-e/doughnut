@@ -81,7 +81,7 @@ Given(
   (notebook: string, data: DataTable) => {
     start.testability().injectQuizQuestionsToNotebook({
       notebookTitle: notebook,
-      quizQuestionTestData: data.hashes(),
+      predefinedQuestionTestData: data.hashes(),
     })
   }
 )
