@@ -33,7 +33,7 @@ public class ConversationBuilder extends EntityBuilder<Conversation> {
     }
   }
 
-  public ConversationBuilder forAQuizQuestion() {
+  public ConversationBuilder forAReviewQuestionInstance() {
     this.reviewQuestionInstanceBuilder = makeMe.aReviewQuestionInstance();
     return this;
   }

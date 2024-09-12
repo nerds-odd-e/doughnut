@@ -296,7 +296,7 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  public abstract List<PredefinedQuestionFactory> getQuizQuestionFactories(
+  public abstract List<PredefinedQuestionFactory> getPredefinedQuestionFactories(
       PredefinedQuestionServant servant);
 
   @JsonIgnore

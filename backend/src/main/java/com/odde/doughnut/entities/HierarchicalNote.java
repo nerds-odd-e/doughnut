@@ -23,7 +23,7 @@ public class HierarchicalNote extends Note {
   }
 
   @Override
-  public List<PredefinedQuestionFactory> getQuizQuestionFactories(
+  public List<PredefinedQuestionFactory> getPredefinedQuestionFactories(
       PredefinedQuestionServant servant) {
     return List.of(
         new SpellingPredefinedFactory(this),

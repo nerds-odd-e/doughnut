@@ -38,7 +38,7 @@ public record PredefinedQuestionGenerator(
     } else {
       shuffled =
           randomizer.shuffle(
-              note.getQuizQuestionFactories(
+              note.getPredefinedQuestionFactories(
                   new PredefinedQuestionServant(user, randomizer, modelFactoryService)));
     }
     PredefinedQuestion result = generateAQuestionOfFirstPossibleType(shuffled);

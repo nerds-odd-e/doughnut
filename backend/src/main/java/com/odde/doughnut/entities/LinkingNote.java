@@ -37,7 +37,7 @@ public class LinkingNote extends Note {
   }
 
   @Override
-  public List<PredefinedQuestionFactory> getQuizQuestionFactories(
+  public List<PredefinedQuestionFactory> getPredefinedQuestionFactories(
       PredefinedQuestionServant servant) {
     return Arrays.stream(getLinkType().getQuestionTypes())
         .map(t -> t.factoryForLinkingNote.apply(this, servant))

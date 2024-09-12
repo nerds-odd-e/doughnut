@@ -59,7 +59,7 @@ class RestFeedbackControllerTest {
   void testGetFeedbackReturnsAllConversationsForCurrentUser() {
     makeMe
         .aConversation()
-        .forAQuizQuestion()
+        .forAReviewQuestionInstance()
         .to(currentUser)
         .messagge("This is a feedback for the current user")
         .please();
@@ -70,9 +70,9 @@ class RestFeedbackControllerTest {
 
   @Test
   void testGetFeedbackThreadsForUser() {
-    makeMe.aConversation().forAQuizQuestion().to(currentUser).please();
-    makeMe.aConversation().forAQuizQuestion().from(currentUser).please();
-    makeMe.aConversation().forAQuizQuestion().please();
+    makeMe.aConversation().forAReviewQuestionInstance().to(currentUser).please();
+    makeMe.aConversation().forAReviewQuestionInstance().from(currentUser).please();
+    makeMe.aConversation().forAReviewQuestionInstance().please();
     List<Conversation> conversations = controller.getFeedbackThreadsForUser();
 
     assertEquals(2, conversations.size());

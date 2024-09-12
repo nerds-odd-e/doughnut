@@ -65,7 +65,7 @@ class PredefinedQuestionGeneratorTest {
   }
 
   private List<? extends Class<? extends PredefinedQuestionFactory>> getQuestionTypes(Note note) {
-    return note.getQuizQuestionFactories(null).stream()
+    return note.getPredefinedQuestionFactories(null).stream()
         .map(PredefinedQuestionFactory::getClass)
         .toList();
   }
