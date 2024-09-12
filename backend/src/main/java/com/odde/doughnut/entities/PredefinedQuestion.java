@@ -19,7 +19,7 @@ public class PredefinedQuestion extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   private Note note;
 
-  @Embedded @NotNull private QuizQuestion1 quizQuestion1 = new QuizQuestion1();
+  @Embedded @NotNull private BareQuestion bareQuestion = new BareQuestion();
 
   @Column(name = "created_at")
   @JsonIgnore
@@ -34,14 +34,14 @@ public class PredefinedQuestion extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public MCQWithAnswer getMcqWithAnswer() {
     MCQWithAnswer mcqWithAnswer = new MCQWithAnswer();
-    mcqWithAnswer.setMultipleChoicesQuestion(quizQuestion1.getMultipleChoicesQuestion());
+    mcqWithAnswer.setMultipleChoicesQuestion(bareQuestion.getMultipleChoicesQuestion());
     mcqWithAnswer.setCorrectChoiceIndex(correctAnswerIndex == null ? -1 : correctAnswerIndex);
     return mcqWithAnswer;
   }
 
   @JsonIgnore
   public boolean checkAnswer(Answer answer) {
-    if (Boolean.TRUE.equals(quizQuestion1.getCheckSpell())) {
+    if (Boolean.TRUE.equals(bareQuestion.getCheckSpell())) {
       return getNote().matchAnswer(answer.getSpellingAnswer());
     }
     return Objects.equals(answer.getChoiceIndex(), getCorrectAnswerIndex());
@@ -50,7 +50,7 @@ public class PredefinedQuestion extends EntityIdentifiedByIdOnly {
   public static PredefinedQuestion fromMCQWithAnswer(MCQWithAnswer MCQWithAnswer, Note note) {
     PredefinedQuestion predefinedQuestion = new PredefinedQuestion();
     predefinedQuestion.setNote(note);
-    predefinedQuestion.quizQuestion1.setMultipleChoicesQuestion(
+    predefinedQuestion.bareQuestion.setMultipleChoicesQuestion(
         MCQWithAnswer.getMultipleChoicesQuestion());
     predefinedQuestion.setCorrectAnswerIndex(MCQWithAnswer.getCorrectChoiceIndex());
     return predefinedQuestion;

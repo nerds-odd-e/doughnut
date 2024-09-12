@@ -102,14 +102,14 @@ class FromDifferentPartAsQuizFactoryTest {
         void shouldIncludeRightAnswersAndFillingOptions() {
           PredefinedQuestion predefinedQuestion = buildQuestion();
           assertThat(
-              predefinedQuestion.getQuizQuestion1().getMultipleChoicesQuestion().getStem(),
+              predefinedQuestion.getBareQuestion().getMultipleChoicesQuestion().getStem(),
               containsString(
                   "<p>Which one <mark>is tagged by</mark> a <em>DIFFERENT</em> part of <mark>perspective</mark> than:"));
           assertThat(
-              predefinedQuestion.getQuizQuestion1().getMultipleChoicesQuestion().getStem(),
+              predefinedQuestion.getBareQuestion().getMultipleChoicesQuestion().getStem(),
               containsString(ugly.getTopicConstructor()));
           List<String> strings =
-              predefinedQuestion.getQuizQuestion1().getMultipleChoicesQuestion().getChoices();
+              predefinedQuestion.getBareQuestion().getMultipleChoicesQuestion().getChoices();
           assertThat(tall.getTopicConstructor(), in(strings));
           assertThat(kind.getTopicConstructor(), in(strings));
           assertThat(pretty.getTopicConstructor(), in(strings));

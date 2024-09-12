@@ -2,10 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { QuizQuestion1 } from './QuizQuestion1';
+import type { BareQuestion } from './BareQuestion';
 export type PredefinedQuestion = {
     id: number;
-    quizQuestion1: QuizQuestion1;
+    bareQuestion: BareQuestion;
     correctAnswerIndex?: number;
     approved?: boolean;
 };

@@ -4,7 +4,7 @@
 /* eslint-disable */
 import type { ImageWithMask } from './ImageWithMask';
 import type { MultipleChoicesQuestion } from './MultipleChoicesQuestion';
-export type QuizQuestion1 = {
+export type BareQuestion = {
     checkSpell?: boolean;
     imageWithMask?: ImageWithMask;
     multipleChoicesQuestion: MultipleChoicesQuestion;

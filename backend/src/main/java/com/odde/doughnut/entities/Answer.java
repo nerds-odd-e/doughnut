@@ -46,7 +46,7 @@ public class Answer extends EntityIdentifiedByIdOnly {
   public String getAnswerDisplay() {
     if (reviewQuestionInstance != null && choiceIndex != null) {
       return reviewQuestionInstance
-          .getQuizQuestion1()
+          .getBareQuestion()
           .getMultipleChoicesQuestion()
           .getChoices()
           .get(choiceIndex);

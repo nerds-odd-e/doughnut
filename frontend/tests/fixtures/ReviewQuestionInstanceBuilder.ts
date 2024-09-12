@@ -21,7 +21,7 @@ class ReviewQuestionInstanceBuilder extends Builder<ReviewQuestionInstance> {
     const predefinedQuestion = this.predefinedQuestionBuilder.do()
     return {
       id: generateId(),
-      quizQuestion1: predefinedQuestion.quizQuestion1,
+      bareQuestion: predefinedQuestion.bareQuestion,
       notebook: new NotebookBuilder().do(),
     }
   }

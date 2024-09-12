@@ -62,7 +62,7 @@ const props = defineProps({
 
 const predefinedQuestion = ref<PredefinedQuestion>({
   correctAnswerIndex: 0,
-  quizQuestion1: {
+  bareQuestion: {
     multipleChoicesQuestion: {
       stem: "",
       choices: ["", ""],
@@ -79,7 +79,7 @@ const isValidQuestion = computed(() =>
   isMCQWithAnswerValid(predefinedQuestion.value)
 )
 const multipleChoicesQuestion = computed(
-  () => predefinedQuestion.value.quizQuestion1.multipleChoicesQuestion
+  () => predefinedQuestion.value.bareQuestion.multipleChoicesQuestion
 )
 const dirty = computed(() => {
   for (let i = 0; i < multipleChoicesQuestion.value.choices.length; i += 1) {

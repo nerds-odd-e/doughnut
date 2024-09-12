@@ -275,7 +275,7 @@ class RestReviewQuestionInstanceControllerTests {
       ReviewQuestionInstance reviewQuestionInstance = controller.generateQuestion(note);
 
       Assertions.assertThat(
-              reviewQuestionInstance.getQuizQuestion1().getMultipleChoicesQuestion().getStem())
+              reviewQuestionInstance.getBareQuestion().getMultipleChoicesQuestion().getStem())
           .contains("What is the first color in the rainbow?");
     }
 
@@ -322,7 +322,7 @@ class RestReviewQuestionInstanceControllerTests {
       PredefinedQuestion quizQuestionDTO = controller.generateAIQuestionWithoutSave(note);
 
       Assertions.assertThat(
-              quizQuestionDTO.getQuizQuestion1().getMultipleChoicesQuestion().getStem())
+              quizQuestionDTO.getBareQuestion().getMultipleChoicesQuestion().getStem())
           .contains("What is the first color in the rainbow?");
       Assertions.assertThat(quizQuestionDTO.getCorrectAnswerIndex()).isEqualTo(0);
     }
@@ -366,7 +366,7 @@ class RestReviewQuestionInstanceControllerTests {
           controller.regenerate(this.reviewQuestionInstance);
 
       Assertions.assertThat(
-              reviewQuestionInstance.getQuizQuestion1().getMultipleChoicesQuestion().getStem())
+              reviewQuestionInstance.getBareQuestion().getMultipleChoicesQuestion().getStem())
           .contains("What is the first color in the rainbow?");
     }
   }
@@ -524,10 +524,10 @@ class RestReviewQuestionInstanceControllerTests {
       assertEquals(0, result.getCorrectAnswerIndex());
       assertEquals(
           "a default question stem",
-          result.getQuizQuestion1().getMultipleChoicesQuestion().getStem());
+          result.getBareQuestion().getMultipleChoicesQuestion().getStem());
       assertEquals(
           List.of("choice1", "choice2", "choice3"),
-          result.getQuizQuestion1().getMultipleChoicesQuestion().getChoices());
+          result.getBareQuestion().getMultipleChoicesQuestion().getChoices());
     }
 
     @Test

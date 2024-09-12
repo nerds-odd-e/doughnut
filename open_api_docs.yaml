@@ -2975,30 +2975,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/PredefinedQuestionTestData"
-    ImageWithMask:
-      type: object
-      properties:
-        noteImage:
-          type: string
-        imageMask:
-          type: string
-    PredefinedQuestion:
-      required:
-      - id
-      - quizQuestion1
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        quizQuestion1:
-          $ref: "#/components/schemas/QuizQuestion1"
-        correctAnswerIndex:
-          type: integer
-          format: int32
-        approved:
-          type: boolean
-    QuizQuestion1:
+    BareQuestion:
       required:
       - multipleChoicesQuestion
       type: object
@@ -3009,6 +2986,29 @@ components:
           $ref: "#/components/schemas/ImageWithMask"
         multipleChoicesQuestion:
           $ref: "#/components/schemas/MultipleChoicesQuestion"
+    ImageWithMask:
+      type: object
+      properties:
+        noteImage:
+          type: string
+        imageMask:
+          type: string
+    PredefinedQuestion:
+      required:
+      - bareQuestion
+      - id
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        bareQuestion:
+          $ref: "#/components/schemas/BareQuestion"
+        correctAnswerIndex:
+          type: integer
+          format: int32
+        approved:
+          type: boolean
     SubscriptionDTO:
       type: object
       properties:
@@ -3183,17 +3183,17 @@ components:
           type: boolean
     ReviewQuestionInstance:
       required:
+      - bareQuestion
       - id
-      - quizQuestion1
       type: object
       properties:
         id:
           type: integer
           format: int32
+        bareQuestion:
+          $ref: "#/components/schemas/BareQuestion"
         notebook:
           $ref: "#/components/schemas/Notebook"
-        quizQuestion1:
-          $ref: "#/components/schemas/QuizQuestion1"
     ReviewQuestionContestResult:
       type: object
       properties:

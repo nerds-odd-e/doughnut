@@ -24,6 +24,7 @@ export type { AssessmentResult } from './models/AssessmentResult';
 export type { Attachment } from './models/Attachment';
 export type { Audio } from './models/Audio';
 export type { AudioUploadDTO } from './models/AudioUploadDTO';
+export type { BareQuestion } from './models/BareQuestion';
 export type { BazaarNotebook } from './models/BazaarNotebook';
 export type { Certificate } from './models/Certificate';
 export type { ChatRequest } from './models/ChatRequest';
@@ -82,7 +83,6 @@ export type { PredefinedQuestionsTestData } from './models/PredefinedQuestionsTe
 export type { PredefinedQuestionTestData } from './models/PredefinedQuestionTestData';
 export type { QuestionSuggestionCreationParams } from './models/QuestionSuggestionCreationParams';
 export type { QuestionSuggestionParams } from './models/QuestionSuggestionParams';
-export type { QuizQuestion1 } from './models/QuizQuestion1';
 export { Randomization } from './models/Randomization';
 export type { RedirectToNoteResponse } from './models/RedirectToNoteResponse';
 export type { ReviewPoint } from './models/ReviewPoint';

@@ -11,7 +11,7 @@ import lombok.EqualsAndHashCode;
 @Table(name = "review_question_instance")
 @Data
 @EqualsAndHashCode(callSuper = false)
-@JsonPropertyOrder({"id", "quiz_question1", "notebook"})
+@JsonPropertyOrder({"id", "bareQuestion", "notebook"})
 public class ReviewQuestionInstance extends EntityIdentifiedByIdOnly {
   @OneToOne
   @JoinColumn(name = "predefined_question_id", referencedColumnName = "id")
@@ -20,8 +20,8 @@ public class ReviewQuestionInstance extends EntityIdentifiedByIdOnly {
   private PredefinedQuestion predefinedQuestion;
 
   @NotNull
-  public QuizQuestion1 getQuizQuestion1() {
-    return predefinedQuestion.getQuizQuestion1();
+  public BareQuestion getBareQuestion() {
+    return predefinedQuestion.getBareQuestion();
   }
 
   public Notebook getNotebook() {

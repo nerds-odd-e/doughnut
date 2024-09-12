@@ -40,10 +40,10 @@ public class SpellingPredefinedFactory extends PredefinedQuestionFactory {
     PredefinedQuestion predefinedQuestionSpelling = new PredefinedQuestion();
     predefinedQuestionSpelling.setNote(answerNote);
     predefinedQuestionSpelling.setApproved(true);
-    predefinedQuestionSpelling.getQuizQuestion1().setCheckSpell(true);
+    predefinedQuestionSpelling.getBareQuestion().setCheckSpell(true);
     MultipleChoicesQuestion mcq = new MultipleChoicesQuestion();
     mcq.setStem(getStem());
-    predefinedQuestionSpelling.getQuizQuestion1().setMultipleChoicesQuestion(mcq);
+    predefinedQuestionSpelling.getBareQuestion().setMultipleChoicesQuestion(mcq);
     return predefinedQuestionSpelling;
   }
 }

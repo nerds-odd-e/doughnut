@@ -1,21 +1,21 @@
 <template>
   <div class="quiz-instruction" data-test="question-section">
     <ShowImage
-      v-if="quizQuestion1.imageWithMask"
-      v-bind="quizQuestion1.imageWithMask"
+      v-if="bareQuestion.imageWithMask"
+      v-bind="bareQuestion.imageWithMask"
       :opacity="1"
     />
     <div
       style="white-space: pre-wrap"
       data-test="stem"
-      v-if="quizQuestion1.multipleChoicesQuestion.stem"
-      v-html="quizQuestion1.multipleChoicesQuestion.stem"
+      v-if="bareQuestion.multipleChoicesQuestion.stem"
+      v-html="bareQuestion.multipleChoicesQuestion.stem"
     ></div>
 
     <div
       v-if="
-        !quizQuestion1.multipleChoicesQuestion.choices ||
-        quizQuestion1.multipleChoicesQuestion.choices.length === 0
+        !bareQuestion.multipleChoicesQuestion.choices ||
+        bareQuestion.multipleChoicesQuestion.choices.length === 0
       "
     >
       <form @submit.prevent.once="submitAnswer({ spellingAnswer: answer })">
@@ -30,8 +30,8 @@
       </form>
     </div>
     <QuestionChoices
-      v-if="quizQuestion1.multipleChoicesQuestion.choices"
-      :choices="quizQuestion1.multipleChoicesQuestion.choices"
+      v-if="bareQuestion.multipleChoicesQuestion.choices"
+      :choices="bareQuestion.multipleChoicesQuestion.choices"
       :correct-choice-index="correctChoiceIndex"
       :answered-current-question="answeredCurrentQuestion"
       :answer-choice-index="answerChoiceIndex"
@@ -44,14 +44,14 @@
 
 <script setup lang="ts">
 import { PropType, ref } from "vue"
-import { AnswerDTO, QuizQuestion1 } from "@/generated/backend"
+import { AnswerDTO, BareQuestion } from "@/generated/backend"
 import TextInput from "../form/TextInput.vue"
 import ShowImage from "../notes/accessory/ShowImage.vue"
 import QuestionChoices from "./QuestionChoices.vue"
 
 defineProps({
-  quizQuestion1: {
-    type: Object as PropType<QuizQuestion1>,
+  bareQuestion: {
+    type: Object as PropType<BareQuestion>,
     required: true,
   },
   correctChoiceIndex: Number,

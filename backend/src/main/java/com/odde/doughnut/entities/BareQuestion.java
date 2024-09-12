@@ -13,7 +13,7 @@ import lombok.Data;
 @Embeddable
 @Data
 @JsonPropertyOrder({"checkSpell", "imageWithMask", "multipleChoicesQuestion"})
-public class QuizQuestion1 {
+public class BareQuestion {
   @Column(name = "raw_json_question")
   @Convert(converter = MCQToJsonConverter.class)
   @NotNull

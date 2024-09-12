@@ -68,7 +68,7 @@ class DescriptionLinkTargetQuizFactoryTest {
   void shouldIncludeRightAnswers() {
     PredefinedQuestion predefinedQuestion = buildQuestion();
     assertThat(
-        predefinedQuestion.getQuizQuestion1().getMultipleChoicesQuestion().getStem(),
+        predefinedQuestion.getBareQuestion().getMultipleChoicesQuestion().getStem(),
         containsString(
             "<p>The following descriptions is a specialization of:</p><p><mark title='Hidden text that is matching the answer'>[...]</mark> is not built in a day</p>\n"));
   }
@@ -78,7 +78,7 @@ class DescriptionLinkTargetQuizFactoryTest {
     makeMe.theNote(source).titleConstructor("token").details("token /.").please();
     PredefinedQuestion predefinedQuestion = buildQuestion();
     assertThat(
-        predefinedQuestion.getQuizQuestion1().getMultipleChoicesQuestion().getStem(),
+        predefinedQuestion.getBareQuestion().getMultipleChoicesQuestion().getStem(),
         containsString("<mark title='Hidden text that is matching the answer'>[...]</mark> /."));
   }
 

@@ -40,7 +40,7 @@ public abstract class QuestionOptionsFactory extends PredefinedQuestionFactory {
     MultipleChoicesQuestion mcq = new MultipleChoicesQuestion();
     mcq.setStem(getStem());
     mcq.setChoices(shuffled.stream().map(this::noteToChoice).toList());
-    predefinedQuestion.getQuizQuestion1().setMultipleChoicesQuestion(mcq);
+    predefinedQuestion.getBareQuestion().setMultipleChoicesQuestion(mcq);
     return predefinedQuestion;
   }
 

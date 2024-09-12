@@ -57,7 +57,7 @@ class PredefinedQuestionTest {
         makeMe.aNote().under(top).titleConstructor("abc").details("abc has 3 letters").please();
     PredefinedQuestion predefinedQuestion = generateQuizQuestion(note);
     assertThat(
-        predefinedQuestion.getQuizQuestion1().getMultipleChoicesQuestion().getStem(),
+        predefinedQuestion.getBareQuestion().getMultipleChoicesQuestion().getStem(),
         containsString(
             "<mark title='Hidden text that is matching the answer'>[...]</mark> has 3 letters"));
   }
@@ -87,7 +87,7 @@ class PredefinedQuestionTest {
       void descendingRandomizer() {
         PredefinedQuestion predefinedQuestion = generateQuizQuestion(note1);
         List<String> options =
-            predefinedQuestion.getQuizQuestion1().getMultipleChoicesQuestion().getChoices();
+            predefinedQuestion.getBareQuestion().getMultipleChoicesQuestion().getChoices();
         assertThat(
             options,
             containsInRelativeOrder(note2.getTopicConstructor(), note1.getTopicConstructor()));
@@ -98,7 +98,7 @@ class PredefinedQuestionTest {
         randomizer.alwaysChoose = Randomization.RandomStrategy.last;
         PredefinedQuestion predefinedQuestion = generateQuizQuestion(note1);
         List<String> options =
-            predefinedQuestion.getQuizQuestion1().getMultipleChoicesQuestion().getChoices();
+            predefinedQuestion.getBareQuestion().getMultipleChoicesQuestion().getChoices();
         assertThat(
             options,
             containsInRelativeOrder(note1.getTopicConstructor(), note2.getTopicConstructor()));
@@ -112,7 +112,7 @@ class PredefinedQuestionTest {
       Note note = makeMe.aNote().under(top).please();
       PredefinedQuestion predefinedQuestion = generateQuizQuestion(note);
       List<String> options =
-          predefinedQuestion.getQuizQuestion1().getMultipleChoicesQuestion().getChoices();
+          predefinedQuestion.getBareQuestion().getMultipleChoicesQuestion().getChoices();
       assertThat(options.size(), equalTo(3));
       assertThat(options.contains(note.getTopicConstructor()), is(true));
     }
@@ -132,7 +132,7 @@ class PredefinedQuestionTest {
     @Test
     void typeShouldBeSpellingQuiz() {
       PredefinedQuestion question = generateQuizQuestionEntity(note);
-      assertTrue(question.getQuizQuestion1().getCheckSpell());
+      assertTrue(question.getBareQuestion().getCheckSpell());
     }
 
     @Test
@@ -146,7 +146,7 @@ class PredefinedQuestionTest {
       assertThat(randomQuizQuestion, instanceOf(PredefinedQuestion.class));
       PredefinedQuestion qq = randomQuizQuestion;
       assertThat(
-          qq.getQuizQuestion1().getMultipleChoicesQuestion().getStem(),
+          qq.getBareQuestion().getMultipleChoicesQuestion().getStem(),
           containsString(mcqWithAnswer.getMultipleChoicesQuestion().getStem()));
     }
 
@@ -167,8 +167,8 @@ class PredefinedQuestionTest {
       for (int i = 0; i < 20; i++) {
         PredefinedQuestion randomQuizQuestion =
             generateQuizQuestion(note, new RealRandomizer(), null);
-        if (randomQuizQuestion.getQuizQuestion1().getCheckSpell() != null) {
-          if (randomQuizQuestion.getQuizQuestion1().getCheckSpell()) {
+        if (randomQuizQuestion.getBareQuestion().getCheckSpell() != null) {
+          if (randomQuizQuestion.getBareQuestion().getCheckSpell()) {
             spellingCount++;
           }
         }

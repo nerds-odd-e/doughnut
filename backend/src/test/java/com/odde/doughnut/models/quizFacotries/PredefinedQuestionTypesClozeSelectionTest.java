@@ -49,10 +49,10 @@ class PredefinedQuestionTypesClozeSelectionTest {
     void shouldIncludeRightAnswers() {
       PredefinedQuestion predefinedQuestion = buildClozeQuizQuestion();
       assertThat(
-          predefinedQuestion.getQuizQuestion1().getMultipleChoicesQuestion().getStem(),
+          predefinedQuestion.getBareQuestion().getMultipleChoicesQuestion().getStem(),
           containsString("descrption"));
       List<String> options =
-          predefinedQuestion.getQuizQuestion1().getMultipleChoicesQuestion().getChoices();
+          predefinedQuestion.getBareQuestion().getMultipleChoicesQuestion().getChoices();
       assertThat(note2.getTopicConstructor(), in(options));
       assertThat(note1.getTopicConstructor(), in(options));
     }

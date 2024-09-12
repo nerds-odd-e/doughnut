@@ -40,7 +40,7 @@ public class PredefinedQuestionsTestData {
       PredefinedQuestion question = new PredefinedQuestion();
       question.setNote(note);
       question.setCorrectAnswerIndex(0);
-      question.getQuizQuestion1().setMultipleChoicesQuestion(mcq);
+      question.getBareQuestion().setMultipleChoicesQuestion(mcq);
       question.setApproved(approved);
       return question;
     }

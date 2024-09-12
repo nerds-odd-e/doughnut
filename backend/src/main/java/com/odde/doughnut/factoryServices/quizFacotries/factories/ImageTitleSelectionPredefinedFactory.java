@@ -14,7 +14,7 @@ public class ImageTitleSelectionPredefinedFactory extends ClozeTitleSelectionPre
   public PredefinedQuestion buildValidPredefinedQuestion()
       throws PredefinedQuestionNotPossibleException {
     PredefinedQuestion predefinedQuestion = super.buildValidPredefinedQuestion();
-    predefinedQuestion.getQuizQuestion1().setImageWithMask(note.getImageWithMask());
+    predefinedQuestion.getBareQuestion().setImageWithMask(note.getImageWithMask());
     return predefinedQuestion;
   }
 

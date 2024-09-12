@@ -2,11 +2,11 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { BareQuestion } from './BareQuestion';
 import type { Notebook } from './Notebook';
-import type { QuizQuestion1 } from './QuizQuestion1';
 export type ReviewQuestionInstance = {
     id: number;
+    bareQuestion: BareQuestion;
     notebook?: Notebook;
-    quizQuestion1: QuizQuestion1;
 };
 

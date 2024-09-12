@@ -18,7 +18,7 @@
       </thead>
       <tbody>
       <tr v-for="conversation in conversations" :key="conversation.id">
-        <td>{{conversation.reviewQuestionInstance?.quizQuestion1.multipleChoicesQuestion.stem}}</td>
+        <td>{{conversation.reviewQuestionInstance?.bareQuestion.multipleChoicesQuestion.stem}}</td>
         <td>{{conversationPartner(conversation)}}</td>
         <td>{{conversation.message}}</td>
         <td>

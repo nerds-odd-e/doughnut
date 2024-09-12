@@ -2,7 +2,7 @@ import { PredefinedQuestion } from "@/generated/backend"
 
 function isMCQWithAnswerValid(predefinedQuestion: PredefinedQuestion): boolean {
   const { stem, choices } =
-    predefinedQuestion.quizQuestion1.multipleChoicesQuestion
+    predefinedQuestion.bareQuestion.multipleChoicesQuestion
   const { correctAnswerIndex } = predefinedQuestion
 
   const isStemNotEmpty = !!stem?.trim()
