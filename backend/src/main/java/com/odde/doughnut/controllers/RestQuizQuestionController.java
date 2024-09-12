@@ -53,11 +53,11 @@ class RestQuizQuestionController {
   public QuizQuestionInNotebook generateQuestion(
       @RequestParam(value = "note") @Schema(type = "integer") Note note) {
     currentUser.assertLoggedIn();
-    QuizQuestion quizQuestion = quizQuestionService.generateQuizQuestionForNote(note);
-    if (quizQuestion == null) {
+    PredefinedQuestion question = quizQuestionService.generateQuestionForNote(note);
+    if (question == null) {
       return null;
     }
-    return quizQuestion.getQuizQuestionInNotebook();
+    return modelFactoryService.createQuizQuestion(question).getQuizQuestionInNotebook();
   }
 
   @PostMapping("/{quizQuestion}/regenerate")
@@ -65,8 +65,12 @@ class RestQuizQuestionController {
   public QuizQuestion regenerate(
       @PathVariable("quizQuestion") @Schema(type = "integer") QuizQuestion quizQuestion) {
     currentUser.assertLoggedIn();
-    return quizQuestionService.generateQuizQuestionForNote(
-        quizQuestion.getPredefinedQuestion().getNote());
+    PredefinedQuestion question =
+        quizQuestionService.generateQuestionForNote(quizQuestion.getPredefinedQuestion().getNote());
+    if (question == null) {
+      return null;
+    }
+    return modelFactoryService.createQuizQuestion(question);
   }
 
   @PostMapping("/generate-question-without-save")

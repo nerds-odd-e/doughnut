@@ -3,7 +3,6 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.PredefinedQuestion;
-import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
@@ -63,13 +62,5 @@ public class QuizQuestionService {
       return null;
     }
     return modelFactoryService.save(question);
-  }
-
-  public QuizQuestion generateQuizQuestionForNote(Note note) {
-    PredefinedQuestion question = generateQuestionForNote(note);
-    if (question == null) {
-      return null;
-    }
-    return modelFactoryService.createQuizQuestion(question);
   }
 }
