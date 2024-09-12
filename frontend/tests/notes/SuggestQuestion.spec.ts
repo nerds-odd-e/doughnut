@@ -1,20 +1,21 @@
 import SuggestQuestionForFineTuning from "@/components/ai/SuggestQuestionForFineTuning.vue"
-import { QuizQuestion } from "@/generated/backend"
+import { PredefinedQuestion } from "@/generated/backend"
 import { flushPromises } from "@vue/test-utils"
 import { beforeEach, describe, it } from "vitest"
 import makeMe from "../fixtures/makeMe"
 import helper from "../helpers"
 
-describe("QuizQuestion", () => {
+describe("SuggestQuestion", () => {
   describe("suggest question for fine tuning AI", () => {
-    const quizQuestion: QuizQuestion = makeMe.aQuizQuestion.please()
+    const predefinedQuestion: PredefinedQuestion =
+      makeMe.aPredefinedQuestion.please()
 
     let wrapper
 
     beforeEach(() => {
       wrapper = helper
         .component(SuggestQuestionForFineTuning)
-        .withProps({ quizQuestion })
+        .withProps({ predefinedQuestion })
         .mount()
     })
 
@@ -27,7 +28,7 @@ describe("QuizQuestion", () => {
       expect(
         helper.managedApi.restQuizQuestionController
           .suggestQuestionForFineTuning
-      ).toBeCalledWith(quizQuestion.id, {
+      ).toBeCalledWith(predefinedQuestion.id, {
         comment: "",
         isPositiveFeedback: false,
       })
