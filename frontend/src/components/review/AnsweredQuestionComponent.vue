@@ -15,10 +15,10 @@
       <NoteInfoReviewPoint v-model="reviewPoint" />
     </div>
   </div>
-  <QuizQuestionComponent
+  <QuizQuestionDisplay
     v-if="answeredQuestion.predefinedQuestion"
     v-bind="{
-      quizQuestion: answeredQuestion.predefinedQuestion,
+      quizQuestion: answeredQuestion.predefinedQuestion.quizQuestion1,
       correctChoiceIndex: answeredQuestion.correctChoiceIndex,
       answerChoiceIndex: answeredQuestion.choiceIndex,
     }"
@@ -30,7 +30,7 @@
 import { AnsweredQuestion } from "@/generated/backend"
 import { PropType, computed, ref } from "vue"
 import { StorageAccessor } from "../../store/createNoteStorage"
-import QuizQuestionComponent from "./QuizQuestion.vue"
+import QuizQuestionDisplay from "./QuizQuestionDisplay.vue"
 
 const props = defineProps({
   answeredQuestion: {

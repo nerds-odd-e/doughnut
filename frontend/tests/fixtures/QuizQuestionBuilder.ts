@@ -21,8 +21,7 @@ class QuizQuestionBuilder extends Builder<QuizQuestion> {
     const predefinedQuizQuestion = this.predefinedQuestionBuilder.do()
     return {
       id: generateId(),
-      multipleChoicesQuestion: predefinedQuizQuestion.multipleChoicesQuestion,
-      checkSpell: predefinedQuizQuestion.checkSpell,
+      ...predefinedQuizQuestion.quizQuestion1,
       notebook: new NotebookBuilder().do(),
     }
   }

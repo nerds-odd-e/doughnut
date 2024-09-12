@@ -81,6 +81,7 @@ export type { PredefinedQuestion } from './models/PredefinedQuestion';
 export type { QuestionSuggestionCreationParams } from './models/QuestionSuggestionCreationParams';
 export type { QuestionSuggestionParams } from './models/QuestionSuggestionParams';
 export type { QuizQuestion } from './models/QuizQuestion';
+export type { QuizQuestion1 } from './models/QuizQuestion1';
 export type { QuizQuestionContestResult } from './models/QuizQuestionContestResult';
 export type { QuizQuestionsTestData } from './models/QuizQuestionsTestData';
 export type { QuizQuestionTestData } from './models/QuizQuestionTestData';

@@ -2954,23 +2954,30 @@ components:
     PredefinedQuestion:
       required:
       - id
-      - multipleChoicesQuestion
+      - quizQuestion1
       type: object
       properties:
         id:
           type: integer
           format: int32
+        quizQuestion1:
+          $ref: "#/components/schemas/QuizQuestion1"
+        correctAnswerIndex:
+          type: integer
+          format: int32
+        approved:
+          type: boolean
+    QuizQuestion1:
+      required:
+      - multipleChoicesQuestion
+      type: object
+      properties:
         multipleChoicesQuestion:
           $ref: "#/components/schemas/MultipleChoicesQuestion"
         checkSpell:
           type: boolean
         imageWithMask:
           $ref: "#/components/schemas/ImageWithMask"
-        correctAnswerIndex:
-          type: integer
-          format: int32
-        approved:
-          type: boolean
     NoteTestData:
       type: object
       properties:

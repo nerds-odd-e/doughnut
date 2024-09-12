@@ -1,9 +1,7 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.odde.doughnut.entities.converters.MCQToJsonConverter;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
-import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.sql.Timestamp;
@@ -21,15 +19,7 @@ public class PredefinedQuestion extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   private Note note;
 
-  @Column(name = "raw_json_question")
-  @Convert(converter = MCQToJsonConverter.class)
-  @NotNull
-  private MultipleChoicesQuestion multipleChoicesQuestion;
-
-  @Column(name = "check_spell")
-  private Boolean checkSpell;
-
-  @Embedded ImageWithMask imageWithMask;
+  @Embedded @NotNull private QuizQuestion1 quizQuestion1 = new QuizQuestion1();
 
   @Column(name = "created_at")
   @JsonIgnore
@@ -44,14 +34,14 @@ public class PredefinedQuestion extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public MCQWithAnswer getMcqWithAnswer() {
     MCQWithAnswer mcqWithAnswer = new MCQWithAnswer();
-    mcqWithAnswer.setMultipleChoicesQuestion(getMultipleChoicesQuestion());
+    mcqWithAnswer.setMultipleChoicesQuestion(quizQuestion1.getMultipleChoicesQuestion());
     mcqWithAnswer.setCorrectChoiceIndex(correctAnswerIndex == null ? -1 : correctAnswerIndex);
     return mcqWithAnswer;
   }
 
   @JsonIgnore
   public boolean checkAnswer(Answer answer) {
-    if (getCheckSpell() != null && getCheckSpell()) {
+    if (Boolean.TRUE.equals(quizQuestion1.getCheckSpell())) {
       return getNote().matchAnswer(answer.getSpellingAnswer());
     }
     return Objects.equals(answer.getChoiceIndex(), getCorrectAnswerIndex());
@@ -60,7 +50,7 @@ public class PredefinedQuestion extends EntityIdentifiedByIdOnly {
   public static PredefinedQuestion fromMCQWithAnswer(MCQWithAnswer MCQWithAnswer, Note note) {
     PredefinedQuestion quizQuestionAIPredefinedQuestion = new PredefinedQuestion();
     quizQuestionAIPredefinedQuestion.setNote(note);
-    quizQuestionAIPredefinedQuestion.setMultipleChoicesQuestion(
+    quizQuestionAIPredefinedQuestion.quizQuestion1.setMultipleChoicesQuestion(
         MCQWithAnswer.getMultipleChoicesQuestion());
     quizQuestionAIPredefinedQuestion.setCorrectAnswerIndex(MCQWithAnswer.getCorrectChoiceIndex());
     return quizQuestionAIPredefinedQuestion;

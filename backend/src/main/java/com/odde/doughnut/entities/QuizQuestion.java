@@ -21,16 +21,16 @@ public class QuizQuestion extends EntityIdentifiedByIdOnly {
   private PredefinedQuestion predefinedQuestion;
 
   public Boolean getCheckSpell() {
-    return predefinedQuestion.getCheckSpell();
+    return predefinedQuestion.getQuizQuestion1().getCheckSpell();
   }
 
   public ImageWithMask getImageWithMask() {
-    return predefinedQuestion.getImageWithMask();
+    return predefinedQuestion.getQuizQuestion1().getImageWithMask();
   }
 
   @NotNull
   public MultipleChoicesQuestion getMultipleChoicesQuestion() {
-    return predefinedQuestion.getMultipleChoicesQuestion();
+    return predefinedQuestion.getQuizQuestion1().getMultipleChoicesQuestion();
   }
 
   public Notebook getNotebook() {

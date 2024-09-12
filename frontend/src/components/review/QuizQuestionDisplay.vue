@@ -1,5 +1,5 @@
 <template>
-  <div class="quiz-instruction" data-test="question-section" :key="quizQuestion.id">
+  <div class="quiz-instruction" data-test="question-section">
     <ShowImage
       v-if="quizQuestion.imageWithMask"
       v-bind="quizQuestion.imageWithMask"
@@ -44,14 +44,14 @@
 
 <script setup lang="ts">
 import { PropType, ref } from "vue"
-import { AnswerDTO, QuizQuestion } from "@/generated/backend"
+import { AnswerDTO, QuizQuestion1 } from "@/generated/backend"
 import TextInput from "../form/TextInput.vue"
 import ShowImage from "../notes/accessory/ShowImage.vue"
 import QuizQuestionChoices from "./QuizQuestionChoices.vue"
 
 defineProps({
   quizQuestion: {
-    type: Object as PropType<QuizQuestion>,
+    type: Object as PropType<QuizQuestion1>,
     required: true,
   },
   correctChoiceIndex: Number,

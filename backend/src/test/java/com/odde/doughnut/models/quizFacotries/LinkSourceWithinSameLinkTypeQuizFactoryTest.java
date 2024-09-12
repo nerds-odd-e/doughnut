@@ -50,12 +50,13 @@ class LinkSourceWithinSameLinkTypeQuizFactoryTest {
     void shouldIncludeRightAnswers() {
       PredefinedQuestion predefinedQuestion = buildLinkTargetQuizQuestion();
       assertThat(
-          predefinedQuestion.getMultipleChoicesQuestion().getStem(),
+          predefinedQuestion.getQuizQuestion1().getMultipleChoicesQuestion().getStem(),
           containsString("Which one <em>is immediately a specialization of</em>:"));
       assertThat(
-          predefinedQuestion.getMultipleChoicesQuestion().getStem(),
+          predefinedQuestion.getQuizQuestion1().getMultipleChoicesQuestion().getStem(),
           containsString(target.getTopicConstructor()));
-      List<String> options = predefinedQuestion.getMultipleChoicesQuestion().getChoices();
+      List<String> options =
+          predefinedQuestion.getQuizQuestion1().getMultipleChoicesQuestion().getChoices();
       assertThat(anotherSource.getTopicConstructor(), in(options));
       assertThat(
           "tomato <mark title='Hidden text that is matching the answer'>[...]</mark>", in(options));
@@ -65,7 +66,8 @@ class LinkSourceWithinSameLinkTypeQuizFactoryTest {
     void shouldIncludeOneLinkFromEachFillingOptions() {
       makeMe.aLink().between(anotherSource, top).please();
       PredefinedQuestion predefinedQuestion = buildLinkTargetQuizQuestion();
-      List<String> options = predefinedQuestion.getMultipleChoicesQuestion().getChoices();
+      List<String> options =
+          predefinedQuestion.getQuizQuestion1().getMultipleChoicesQuestion().getChoices();
       assertThat(options, hasSize(2));
     }
   }
