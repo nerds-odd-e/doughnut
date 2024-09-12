@@ -6,7 +6,7 @@ import type { AnswerDTO } from '../models/AnswerDTO';
 import type { AnsweredQuestion } from '../models/AnsweredQuestion';
 import type { PredefinedQuestion } from '../models/PredefinedQuestion';
 import type { QuestionSuggestionCreationParams } from '../models/QuestionSuggestionCreationParams';
-import type { QuizQuestionContestResult } from '../models/QuizQuestionContestResult';
+import type { ReviewQuestionContestResult } from '../models/ReviewQuestionContestResult';
 import type { ReviewQuestionInstance } from '../models/ReviewQuestionInstance';
 import type { SuggestedQuestionForFineTuning } from '../models/SuggestedQuestionForFineTuning';
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -76,12 +76,12 @@ export class RestQuizQuestionControllerService {
     }
     /**
      * @param reviewQuestionInstance
-     * @returns QuizQuestionContestResult OK
+     * @returns ReviewQuestionContestResult OK
      * @throws ApiError
      */
     public contest(
         reviewQuestionInstance: number,
-    ): CancelablePromise<QuizQuestionContestResult> {
+    ): CancelablePromise<ReviewQuestionContestResult> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/quiz-questions/{reviewQuestionInstance}/contest',

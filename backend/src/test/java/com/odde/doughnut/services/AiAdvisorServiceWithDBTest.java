@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.odde.doughnut.controllers.dto.QuizQuestionContestResult;
+import com.odde.doughnut.controllers.dto.ReviewQuestionContestResult;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.PredefinedQuestion;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
@@ -69,8 +69,8 @@ class AiAdvisorServiceWithDBTest {
     @Test
     void rejected() {
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(questionEvaluation, "");
-      QuizQuestionContestResult contest =
-          aiQuestionGenerator.getQuizQuestionContestResult(reviewQuestionInstance);
+      ReviewQuestionContestResult contest =
+          aiQuestionGenerator.getReviewQuestionContestResult(reviewQuestionInstance);
       assertTrue(contest.rejected);
       Assertions.assertThat(contest.reason)
           .isEqualTo("This seems to be a legitimate question. Please answer it.");
@@ -80,8 +80,8 @@ class AiAdvisorServiceWithDBTest {
     void acceptTheContest() {
       questionEvaluation.feasibleQuestion = false;
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(questionEvaluation, "");
-      QuizQuestionContestResult contest =
-          aiQuestionGenerator.getQuizQuestionContestResult(reviewQuestionInstance);
+      ReviewQuestionContestResult contest =
+          aiQuestionGenerator.getReviewQuestionContestResult(reviewQuestionInstance);
       assertFalse(contest.rejected);
     }
 
@@ -91,7 +91,7 @@ class AiAdvisorServiceWithDBTest {
           new ObjectMapper().readTree(""), "");
       assertThrows(
           RuntimeException.class,
-          () -> aiQuestionGenerator.getQuizQuestionContestResult(reviewQuestionInstance));
+          () -> aiQuestionGenerator.getReviewQuestionContestResult(reviewQuestionInstance));
     }
   }
 }

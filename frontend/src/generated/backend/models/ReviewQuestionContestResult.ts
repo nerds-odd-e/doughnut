@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type QuizQuestionContestResult = {
+export type ReviewQuestionContestResult = {
     reason?: string;
     rejected?: boolean;
 };

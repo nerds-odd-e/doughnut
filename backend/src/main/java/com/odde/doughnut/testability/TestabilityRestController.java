@@ -187,7 +187,7 @@ class TestabilityRestController {
   public List<PredefinedQuestion> injectPredefinedQuestion(
       @RequestBody PredefinedQuestionsTestData predefinedQuestionsTestData) {
     List<PredefinedQuestion> predefinedQuestions =
-        predefinedQuestionsTestData.buildQuizQuestions(this.modelFactoryService);
+        predefinedQuestionsTestData.buildPredefinedQuestions(this.modelFactoryService);
     predefinedQuestions.forEach(question -> modelFactoryService.save(question));
     updateNotebookSettings(
         predefinedQuestions, predefinedQuestionsTestData.getNotebookCertifiable());

@@ -10,7 +10,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.QuestionSuggestionCreationParams;
-import com.odde.doughnut.controllers.dto.QuizQuestionContestResult;
+import com.odde.doughnut.controllers.dto.ReviewQuestionContestResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -402,7 +402,7 @@ class RestReviewQuestionInstanceControllerTests {
     @Test
     void rejected() {
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(questionEvaluation, "");
-      QuizQuestionContestResult contest = controller.contest(reviewQuestionInstance);
+      ReviewQuestionContestResult contest = controller.contest(reviewQuestionInstance);
       assertTrue(contest.rejected);
     }
 
@@ -424,7 +424,7 @@ class RestReviewQuestionInstanceControllerTests {
     void acceptTheContest() {
       questionEvaluation.feasibleQuestion = false;
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(questionEvaluation, "");
-      QuizQuestionContestResult contest = controller.contest(reviewQuestionInstance);
+      ReviewQuestionContestResult contest = controller.contest(reviewQuestionInstance);
       assertFalse(contest.rejected);
     }
   }

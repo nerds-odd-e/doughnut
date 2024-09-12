@@ -2,7 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.QuestionSuggestionCreationParams;
-import com.odde.doughnut.controllers.dto.QuizQuestionContestResult;
+import com.odde.doughnut.controllers.dto.ReviewQuestionContestResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -83,11 +83,11 @@ class RestQuizQuestionController {
 
   @PostMapping("/{reviewQuestionInstance}/contest")
   @Transactional
-  public QuizQuestionContestResult contest(
+  public ReviewQuestionContestResult contest(
       @PathVariable("reviewQuestionInstance") @Schema(type = "integer")
           ReviewQuestionInstance reviewQuestionInstance) {
     currentUser.assertLoggedIn();
-    return aiQuestionGenerator.getQuizQuestionContestResult(
+    return aiQuestionGenerator.getReviewQuestionContestResult(
         reviewQuestionInstance.getPredefinedQuestion());
   }
 

@@ -14,10 +14,10 @@ import lombok.Setter;
 public class PredefinedQuestionsTestData {
   private String notebookTitle;
   private Boolean notebookCertifiable;
-  private List<QuizQuestionTestData> quizQuestionTestData;
+  private List<PredefinedQuestionQuestionTestData> predefinedQuestionQuestionTestData;
 
   @Setter
-  static class QuizQuestionTestData {
+  static class PredefinedQuestionQuestionTestData {
     @JsonProperty("Note Topic")
     private String noteTopic;
 
@@ -33,7 +33,7 @@ public class PredefinedQuestionsTestData {
     @JsonProperty("Approved")
     private boolean approved;
 
-    public PredefinedQuestion buildQuizQuestion(Note note) {
+    public PredefinedQuestion buildPredefinedQuestion(Note note) {
       MultipleChoicesQuestion mcq = new MultipleChoicesQuestion();
       mcq.setStem(question);
       mcq.setChoices(List.of(answer, oneWrongChoice));
@@ -46,11 +46,11 @@ public class PredefinedQuestionsTestData {
     }
   }
 
-  public List<PredefinedQuestion> buildQuizQuestions(ModelFactoryService factoryService) {
-    return quizQuestionTestData.stream()
+  public List<PredefinedQuestion> buildPredefinedQuestions(ModelFactoryService factoryService) {
+    return predefinedQuestionQuestionTestData.stream()
         .map(
             question ->
-                question.buildQuizQuestion(
+                question.buildPredefinedQuestion(
                     factoryService.noteRepository.findFirstInNotebookByTopicConstructor(
                         notebookTitle, question.noteTopic)))
         .collect(Collectors.toList());

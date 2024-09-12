@@ -1,6 +1,6 @@
 package com.odde.doughnut.services.ai;
 
-import com.odde.doughnut.controllers.dto.QuizQuestionContestResult;
+import com.odde.doughnut.controllers.dto.ReviewQuestionContestResult;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.PredefinedQuestion;
 import com.odde.doughnut.services.GlobalSettingsService;
@@ -28,13 +28,13 @@ public record AiQuestionGenerator(
         .orElse(null);
   }
 
-  public QuizQuestionContestResult getQuizQuestionContestResult(
+  public ReviewQuestionContestResult getReviewQuestionContestResult(
       PredefinedQuestion predefinedQuestion) {
     return forNote(
             predefinedQuestion.getNote(),
             globalSettingsService.globalSettingEvaluation().getValue())
         .evaluateQuestion(predefinedQuestion.getMcqWithAnswer())
-        .map(e -> e.getQuizQuestionContestResult(predefinedQuestion.getCorrectAnswerIndex()))
+        .map(e -> e.getReviewQuestionContestResult(predefinedQuestion.getCorrectAnswerIndex()))
         .orElse(null);
   }
 }

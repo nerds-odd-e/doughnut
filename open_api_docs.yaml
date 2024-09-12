@@ -734,7 +734,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/QuizQuestionContestResult"
+                $ref: "#/components/schemas/ReviewQuestionContestResult"
   /api/quiz-questions/{reviewQuestionInstance}/answer:
     post:
       tags:
@@ -2951,18 +2951,7 @@ components:
         circleName:
           type: string
           writeOnly: true
-    PredefinedQuestionsTestData:
-      type: object
-      properties:
-        notebookTitle:
-          type: string
-        notebookCertifiable:
-          type: boolean
-        quizQuestionTestData:
-          type: array
-          items:
-            $ref: "#/components/schemas/QuizQuestionTestData"
-    QuizQuestionTestData:
+    PredefinedQuestionQuestionTestData:
       type: object
       properties:
         Note Topic:
@@ -2975,6 +2964,17 @@ components:
           type: string
         Approved:
           type: boolean
+    PredefinedQuestionsTestData:
+      type: object
+      properties:
+        notebookTitle:
+          type: string
+        notebookCertifiable:
+          type: boolean
+        predefinedQuestionQuestionTestData:
+          type: array
+          items:
+            $ref: "#/components/schemas/PredefinedQuestionQuestionTestData"
     ImageWithMask:
       type: object
       properties:
@@ -3229,7 +3229,7 @@ components:
           $ref: "#/components/schemas/Notebook"
         quizQuestion1:
           $ref: "#/components/schemas/QuizQuestion1"
-    QuizQuestionContestResult:
+    ReviewQuestionContestResult:
       type: object
       properties:
         reason:
