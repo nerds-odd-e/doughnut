@@ -14,7 +14,7 @@ import lombok.Setter;
 public class Conversation extends EntityIdentifiedByIdOnly {
 
   @ManyToOne
-  @JoinColumn(name = "quiz_question_id", referencedColumnName = "id")
+  @JoinColumn(name = "review_question_instance_id", referencedColumnName = "id")
   ReviewQuestionInstance reviewQuestionInstance;
 
   @ManyToOne

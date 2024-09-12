@@ -25,7 +25,7 @@ public class Answer extends EntityIdentifiedByIdOnly {
   Integer choiceIndex;
 
   @ManyToOne
-  @JoinColumn(name = "quiz_question_id", referencedColumnName = "id")
+  @JoinColumn(name = "review_question_instance_id", referencedColumnName = "id")
   @Getter
   @Setter
   @JsonIgnore
