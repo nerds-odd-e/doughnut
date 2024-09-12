@@ -1,45 +1,15 @@
 <template>
-  <div class="quiz-instruction" data-test="question-section" :key="quizQuestion.id">
-    <ShowImage
-      v-if="quizQuestion.imageWithMask"
-      v-bind="quizQuestion.imageWithMask"
-      :opacity="1"
-    />
-    <div
-      style="white-space: pre-wrap"
-      data-test="stem"
-      v-if="quizQuestion.multipleChoicesQuestion.stem"
-      v-html="quizQuestion.multipleChoicesQuestion.stem"
-    ></div>
-
-    <div
-      v-if="
-        !quizQuestion.multipleChoicesQuestion.choices ||
-        quizQuestion.multipleChoicesQuestion.choices.length === 0
-      "
-    >
-      <form @submit.prevent.once="submitAnswer({ spellingAnswer: answer })">
-        <TextInput
-          scope-name="review_point"
-          field="answer"
-          v-model="answer"
-          placeholder="put your answer here"
-          v-focus
-        />
-        <input type="submit" value="OK" class="btn btn-primary btn-lg btn-block" />
-      </form>
-    </div>
-    <QuizQuestionChoices
-      v-if="quizQuestion.multipleChoicesQuestion.choices"
-      :choices="quizQuestion.multipleChoicesQuestion.choices"
-      :correct-choice-index="correctChoiceIndex"
-      :answered-current-question="answeredCurrentQuestion"
-      :answer-choice-index="answerChoiceIndex"
-      :disabled="disabled"
-      @answer="submitAnswer($event)"
-      :assessment-current-choice-index="checkAssessmentAnsweredIndex()"
-    />
-  </div>
+  <QuizQuestionDisplay
+    v-bind="{
+      quizQuestion,
+      correctChoiceIndex,
+      answerChoiceIndex,
+      disabled,
+      answeredCurrentQuestion,
+    }"
+    @answer="submitAnswer($event)"
+    :key="quizQuestion.id"
+   />
 </template>
 
 <script lang="ts">
@@ -72,12 +42,6 @@ export default defineComponent({
     QuizQuestionChoices,
   },
   emits: ["answered"],
-  data() {
-    return {
-      answer: "" as string,
-      assessmentAnsweredIndex: 1 as number,
-    }
-  },
   methods: {
     async submitAnswer(answerData: AnswerDTO) {
       try {
@@ -87,10 +51,6 @@ export default defineComponent({
             answerData
           )
 
-        if (typeof answerData.choiceIndex === "number") {
-          this.assessmentAnsweredIndex = answerData.choiceIndex
-        }
-
         this.$emit("answered", answerResult)
       } catch (_e) {
         await this.popups.alert(
@@ -98,23 +58,6 @@ export default defineComponent({
         )
       }
     },
-    checkAssessmentAnsweredIndex() {
-      return this.assessmentAnsweredIndex
-    },
   },
 })
 </script>
-
-<style lang="scss" scoped>
-.quiz-instruction {
-  position: relative;
-  margin-top: 20px;
-}
-
-.mark-question {
-  button {
-    border: none;
-    background: none;
-  }
-}
-</style>
