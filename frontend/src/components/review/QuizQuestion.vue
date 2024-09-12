@@ -12,52 +12,40 @@
    />
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
+import { PropType } from "vue"
 import { AnswerDTO, QuizQuestion } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { PropType, defineComponent } from "vue"
 import usePopups from "../commons/Popups/usePopups"
-import TextInput from "../form/TextInput.vue"
-import ShowImage from "../notes/accessory/ShowImage.vue"
-import QuizQuestionChoices from "./QuizQuestionChoices.vue"
 
-export default defineComponent({
-  inheritAttrs: false,
-  setup() {
-    return { ...useLoadingApi(), ...usePopups() }
-  },
-  props: {
-    quizQuestion: {
-      type: Object as PropType<QuizQuestion>,
-      required: true,
-    },
-    correctChoiceIndex: Number,
-    answerChoiceIndex: Number,
-    disabled: Boolean,
-    answeredCurrentQuestion: Boolean,
-  },
-  components: {
-    ShowImage,
-    TextInput,
-    QuizQuestionChoices,
-  },
-  emits: ["answered"],
-  methods: {
-    async submitAnswer(answerData: AnswerDTO) {
-      try {
-        const answerResult =
-          await this.managedApi.restQuizQuestionController.answerQuiz(
-            this.quizQuestion.id,
-            answerData
-          )
+const { managedApi } = useLoadingApi()
+const { popups } = usePopups()
 
-        this.$emit("answered", answerResult)
-      } catch (_e) {
-        await this.popups.alert(
-          "This review point doesn't exist any more or is being skipped now. Moving on to the next review point..."
-        )
-      }
-    },
+const props = defineProps({
+  quizQuestion: {
+    type: Object as PropType<QuizQuestion>,
+    required: true,
   },
+  correctChoiceIndex: Number,
+  answerChoiceIndex: Number,
+  disabled: Boolean,
+  answeredCurrentQuestion: Boolean,
 })
+
+const emits = defineEmits(["answered"])
+
+const submitAnswer = async (answerData: AnswerDTO) => {
+  try {
+    const answerResult = await managedApi.restQuizQuestionController.answerQuiz(
+      props.quizQuestion.id,
+      answerData
+    )
+
+    emits("answered", answerResult)
+  } catch (_e) {
+    await popups.alert(
+      "This review point doesn't exist any more or is being skipped now. Moving on to the next review point..."
+    )
+  }
+}
 </script>

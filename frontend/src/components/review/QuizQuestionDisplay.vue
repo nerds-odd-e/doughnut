@@ -37,60 +37,39 @@
       :answer-choice-index="answerChoiceIndex"
       :disabled="disabled"
       @answer="submitAnswer($event)"
-      :assessment-current-choice-index="checkAssessmentAnsweredIndex()"
+      :assessment-current-choice-index="assessmentAnsweredIndex"
     />
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
+import { PropType, ref } from "vue"
 import { AnswerDTO, QuizQuestion } from "@/generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
-import { PropType, defineComponent } from "vue"
-import usePopups from "../commons/Popups/usePopups"
 import TextInput from "../form/TextInput.vue"
 import ShowImage from "../notes/accessory/ShowImage.vue"
 import QuizQuestionChoices from "./QuizQuestionChoices.vue"
 
-export default defineComponent({
-  inheritAttrs: false,
-  setup() {
-    return { ...useLoadingApi(), ...usePopups() }
+defineProps({
+  quizQuestion: {
+    type: Object as PropType<QuizQuestion>,
+    required: true,
   },
-  props: {
-    quizQuestion: {
-      type: Object as PropType<QuizQuestion>,
-      required: true,
-    },
-    correctChoiceIndex: Number,
-    answerChoiceIndex: Number,
-    disabled: Boolean,
-    answeredCurrentQuestion: Boolean,
-  },
-  components: {
-    ShowImage,
-    TextInput,
-    QuizQuestionChoices,
-  },
-  emits: ["answer"],
-  data() {
-    return {
-      answer: "" as string,
-      assessmentAnsweredIndex: 1 as number,
-    }
-  },
-  methods: {
-    async submitAnswer(answerData: AnswerDTO) {
-      if (typeof answerData.choiceIndex === "number") {
-        this.assessmentAnsweredIndex = answerData.choiceIndex
-      }
-
-      this.$emit("answer", answerData)
-    },
-    checkAssessmentAnsweredIndex() {
-      return this.assessmentAnsweredIndex
-    },
-  },
+  correctChoiceIndex: Number,
+  answerChoiceIndex: Number,
+  disabled: Boolean,
+  answeredCurrentQuestion: Boolean,
 })
+const emits = defineEmits(["answer"])
+const answer = ref("")
+const assessmentAnsweredIndex = ref(1)
+
+const submitAnswer = async (answerData: AnswerDTO) => {
+  if (typeof answerData.choiceIndex === "number") {
+    assessmentAnsweredIndex.value = answerData.choiceIndex
+  }
+
+  emits("answer", answerData)
+}
 </script>
 
 <style lang="scss" scoped>
