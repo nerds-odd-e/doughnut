@@ -1643,6 +1643,30 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/AssessmentResult"
+  /api/assessment/questions/{notebook}:
+    post:
+      tags:
+      - rest-assessment-controller
+      operationId: generateAssessmentQuestions
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AssessmentAttempt"
   /api/ai/{note}/completion:
     post:
       tags:
@@ -2741,30 +2765,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/AssessmentAttempt"
-  /api/assessment/questions/{notebook}:
-    get:
-      tags:
-      - rest-assessment-controller
-      operationId: generateAssessmentQuestions
-      parameters:
-      - name: notebook
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/AssessmentAttempt"
   /api/ai/dummy:
     get:
       tags:

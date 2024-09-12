@@ -15,7 +15,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 @JsonPropertyOrder({"id", "checkSpell", "imageWithMask", "multipleChoicesQuestion"})
 public class QuizQuestion extends EntityIdentifiedByIdOnly {
-  @OneToOne(cascade = CascadeType.ALL)
+  @OneToOne
   @JoinColumn(name = "predefined_question_id", referencedColumnName = "id")
   @JsonIgnore
   private PredefinedQuestion predefinedQuestion;

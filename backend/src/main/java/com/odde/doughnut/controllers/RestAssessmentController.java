@@ -32,7 +32,8 @@ class RestAssessmentController {
     this.assessmentService = new AssessmentService(modelFactoryService, testabilitySettings);
   }
 
-  @GetMapping("/questions/{notebook}")
+  @PostMapping("/questions/{notebook}")
+  @Transactional
   public AssessmentAttempt generateAssessmentQuestions(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
