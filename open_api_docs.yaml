@@ -3225,10 +3225,10 @@ components:
         id:
           type: integer
           format: int32
-        quizQuestion1:
-          $ref: "#/components/schemas/QuizQuestion1"
         notebook:
           $ref: "#/components/schemas/Notebook"
+        quizQuestion1:
+          $ref: "#/components/schemas/QuizQuestion1"
     QuizQuestionContestResult:
       type: object
       properties:

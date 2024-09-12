@@ -6,7 +6,7 @@ import type { Notebook } from './Notebook';
 import type { QuizQuestion1 } from './QuizQuestion1';
 export type ReviewQuestionInstance = {
     id: number;
-    quizQuestion1: QuizQuestion1;
     notebook?: Notebook;
+    quizQuestion1: QuizQuestion1;
 };
 
