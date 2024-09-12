@@ -95,7 +95,7 @@ const openedQuestion = ref<PredefinedQuestion | undefined>()
 
 const fetchQuestions = async () => {
   questions.value =
-    await managedApi.restQuizQuestionController.getAllQuestionByNote(
+    await managedApi.restReviewQuestionController.getAllQuestionByNote(
       props.note.id
     )
 }
@@ -107,7 +107,7 @@ const questionAdded = (newQuestion: PredefinedQuestion) => {
 }
 const toggleApproval = async (questionId?: number) => {
   if (questionId) {
-    await managedApi.restQuizQuestionController.toggleApproval(questionId)
+    await managedApi.restReviewQuestionController.toggleApproval(questionId)
   }
 }
 onMounted(() => {

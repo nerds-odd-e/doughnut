@@ -20,13 +20,13 @@ describe("SuggestQuestion", () => {
     })
 
     it("should be able to suggest a question as good example", async () => {
-      helper.managedApi.restQuizQuestionController.suggestQuestionForFineTuning =
+      helper.managedApi.restReviewQuestionController.suggestQuestionForFineTuning =
         vi.fn().mockResolvedValue({})
       wrapper.get(".negative-feedback-btn").trigger("click")
       wrapper.get("button.btn-success").trigger("click")
       await flushPromises()
       expect(
-        helper.managedApi.restQuizQuestionController
+        helper.managedApi.restReviewQuestionController
           .suggestQuestionForFineTuning
       ).toBeCalledWith(predefinedQuestion.id, {
         comment: "",

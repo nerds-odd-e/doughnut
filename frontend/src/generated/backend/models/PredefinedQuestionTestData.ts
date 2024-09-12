@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type PredefinedQuestionQuestionTestData = {
+export type PredefinedQuestionTestData = {
     'Note Topic'?: string;
     Question?: string;
     Answer?: string;

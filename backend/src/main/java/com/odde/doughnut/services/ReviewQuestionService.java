@@ -10,12 +10,12 @@ import com.theokanning.openai.client.OpenAiApi;
 import jakarta.validation.Valid;
 import java.sql.Timestamp;
 
-public class QuizQuestionService {
+public class ReviewQuestionService {
   private final ModelFactoryService modelFactoryService;
 
   private final AiQuestionGenerator aiQuestionGenerator;
 
-  public QuizQuestionService(OpenAiApi openAiApi, ModelFactoryService modelFactoryService) {
+  public ReviewQuestionService(OpenAiApi openAiApi, ModelFactoryService modelFactoryService) {
     this.modelFactoryService = modelFactoryService;
     this.aiQuestionGenerator =
         new AiQuestionGenerator(openAiApi, new GlobalSettingsService(modelFactoryService));

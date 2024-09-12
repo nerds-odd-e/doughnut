@@ -2,10 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { PredefinedQuestionQuestionTestData } from './PredefinedQuestionQuestionTestData';
+import type { PredefinedQuestionTestData } from './PredefinedQuestionTestData';
 export type PredefinedQuestionsTestData = {
     notebookTitle?: string;
     notebookCertifiable?: boolean;
-    predefinedQuestionQuestionTestData?: Array<PredefinedQuestionQuestionTestData>;
+    predefinedQuestionTestData?: Array<PredefinedQuestionTestData>;
 };
 

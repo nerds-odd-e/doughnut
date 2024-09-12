@@ -14,10 +14,10 @@ import lombok.Setter;
 public class PredefinedQuestionsTestData {
   private String notebookTitle;
   private Boolean notebookCertifiable;
-  private List<PredefinedQuestionQuestionTestData> predefinedQuestionQuestionTestData;
+  private List<PredefinedQuestionTestData> predefinedQuestionTestData;
 
   @Setter
-  static class PredefinedQuestionQuestionTestData {
+  static class PredefinedQuestionTestData {
     @JsonProperty("Note Topic")
     private String noteTopic;
 
@@ -47,7 +47,7 @@ public class PredefinedQuestionsTestData {
   }
 
   public List<PredefinedQuestion> buildPredefinedQuestions(ModelFactoryService factoryService) {
-    return predefinedQuestionQuestionTestData.stream()
+    return predefinedQuestionTestData.stream()
         .map(
             question ->
                 question.buildPredefinedQuestion(

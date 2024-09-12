@@ -21,8 +21,8 @@ import { RestLinkControllerService } from './services/RestLinkControllerService'
 import { RestNotebookCertificateApprovalControllerService } from './services/RestNotebookCertificateApprovalControllerService';
 import { RestNotebookControllerService } from './services/RestNotebookControllerService';
 import { RestNoteControllerService } from './services/RestNoteControllerService';
-import { RestQuizQuestionControllerService } from './services/RestQuizQuestionControllerService';
 import { RestReviewPointControllerService } from './services/RestReviewPointControllerService';
+import { RestReviewQuestionControllerService } from './services/RestReviewQuestionControllerService';
 import { RestReviewsControllerService } from './services/RestReviewsControllerService';
 import { RestSubscriptionControllerService } from './services/RestSubscriptionControllerService';
 import { RestTextContentControllerService } from './services/RestTextContentControllerService';
@@ -47,8 +47,8 @@ export class DoughnutApi {
     public readonly restNotebookCertificateApprovalController: RestNotebookCertificateApprovalControllerService;
     public readonly restNotebookController: RestNotebookControllerService;
     public readonly restNoteController: RestNoteControllerService;
-    public readonly restQuizQuestionController: RestQuizQuestionControllerService;
     public readonly restReviewPointController: RestReviewPointControllerService;
+    public readonly restReviewQuestionController: RestReviewQuestionControllerService;
     public readonly restReviewsController: RestReviewsControllerService;
     public readonly restSubscriptionController: RestSubscriptionControllerService;
     public readonly restTextContentController: RestTextContentControllerService;
@@ -84,8 +84,8 @@ export class DoughnutApi {
         this.restNotebookCertificateApprovalController = new RestNotebookCertificateApprovalControllerService(this.request);
         this.restNotebookController = new RestNotebookControllerService(this.request);
         this.restNoteController = new RestNoteControllerService(this.request);
-        this.restQuizQuestionController = new RestQuizQuestionControllerService(this.request);
         this.restReviewPointController = new RestReviewPointControllerService(this.request);
+        this.restReviewQuestionController = new RestReviewQuestionControllerService(this.request);
         this.restReviewsController = new RestReviewsControllerService(this.request);
         this.restSubscriptionController = new RestSubscriptionControllerService(this.request);
         this.restTextContentController = new RestTextContentControllerService(this.request);

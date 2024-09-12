@@ -11,7 +11,7 @@ import type { ReviewQuestionInstance } from '../models/ReviewQuestionInstance';
 import type { SuggestedQuestionForFineTuning } from '../models/SuggestedQuestionForFineTuning';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
-export class RestQuizQuestionControllerService {
+export class RestReviewQuestionControllerService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
      * @param reviewQuestionInstance
@@ -23,33 +23,10 @@ export class RestQuizQuestionControllerService {
     ): CancelablePromise<PredefinedQuestion> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/quiz-questions/{reviewQuestionInstance}/toggle-approval',
+            url: '/api/review-questions/{reviewQuestionInstance}/toggle-approval',
             path: {
                 'reviewQuestionInstance': reviewQuestionInstance,
             },
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * @param reviewQuestionInstance
-     * @param requestBody
-     * @returns SuggestedQuestionForFineTuning OK
-     * @throws ApiError
-     */
-    public suggestQuestionForFineTuning(
-        reviewQuestionInstance: number,
-        requestBody: QuestionSuggestionCreationParams,
-    ): CancelablePromise<SuggestedQuestionForFineTuning> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/api/quiz-questions/{reviewQuestionInstance}/suggest-fine-tuning',
-            path: {
-                'reviewQuestionInstance': reviewQuestionInstance,
-            },
-            body: requestBody,
-            mediaType: 'application/json',
             errors: {
                 500: `Internal Server Error`,
             },
@@ -65,7 +42,7 @@ export class RestQuizQuestionControllerService {
     ): CancelablePromise<ReviewQuestionInstance> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/quiz-questions/{reviewQuestionInstance}/regenerate',
+            url: '/api/review-questions/{reviewQuestionInstance}/regenerate',
             path: {
                 'reviewQuestionInstance': reviewQuestionInstance,
             },
@@ -84,7 +61,7 @@ export class RestQuizQuestionControllerService {
     ): CancelablePromise<ReviewQuestionContestResult> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/quiz-questions/{reviewQuestionInstance}/contest',
+            url: '/api/review-questions/{reviewQuestionInstance}/contest',
             path: {
                 'reviewQuestionInstance': reviewQuestionInstance,
             },
@@ -105,9 +82,32 @@ export class RestQuizQuestionControllerService {
     ): CancelablePromise<AnsweredQuestion> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/quiz-questions/{reviewQuestionInstance}/answer',
+            url: '/api/review-questions/{reviewQuestionInstance}/answer',
             path: {
                 'reviewQuestionInstance': reviewQuestionInstance,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param predefinedQuestion
+     * @param requestBody
+     * @returns SuggestedQuestionForFineTuning OK
+     * @throws ApiError
+     */
+    public suggestQuestionForFineTuning(
+        predefinedQuestion: number,
+        requestBody: QuestionSuggestionCreationParams,
+    ): CancelablePromise<SuggestedQuestionForFineTuning> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/review-questions/{predefinedQuestion}/suggest-fine-tuning',
+            path: {
+                'predefinedQuestion': predefinedQuestion,
             },
             body: requestBody,
             mediaType: 'application/json',
@@ -128,7 +128,7 @@ export class RestQuizQuestionControllerService {
     ): CancelablePromise<PredefinedQuestion> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/quiz-questions/{note}/refine-question',
+            url: '/api/review-questions/{note}/refine-question',
             path: {
                 'note': note,
             },
@@ -149,7 +149,7 @@ export class RestQuizQuestionControllerService {
     ): CancelablePromise<Array<PredefinedQuestion>> {
         return this.httpRequest.request({
             method: 'GET',
-            url: '/api/quiz-questions/{note}/note-questions',
+            url: '/api/review-questions/{note}/note-questions',
             path: {
                 'note': note,
             },
@@ -170,7 +170,7 @@ export class RestQuizQuestionControllerService {
     ): CancelablePromise<PredefinedQuestion> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/quiz-questions/{note}/note-questions',
+            url: '/api/review-questions/{note}/note-questions',
             path: {
                 'note': note,
             },
@@ -191,7 +191,7 @@ export class RestQuizQuestionControllerService {
     ): CancelablePromise<ReviewQuestionInstance> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/quiz-questions/generate-question',
+            url: '/api/review-questions/generate-question',
             query: {
                 'note': note,
             },
@@ -210,7 +210,7 @@ export class RestQuizQuestionControllerService {
     ): CancelablePromise<PredefinedQuestion> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/quiz-questions/generate-question-without-save',
+            url: '/api/review-questions/generate-question-without-save',
             query: {
                 'note': note,
             },

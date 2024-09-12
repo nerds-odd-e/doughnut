@@ -51,19 +51,19 @@ class RestReviewQuestionInstanceControllerTests {
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
   OpenAIChatCompletionMock openAIChatCompletionMock;
 
-  RestQuizQuestionController controller;
+  RestReviewQuestionController controller;
 
   @BeforeEach
   void setup() {
     openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
     currentUser = makeMe.aUser().toModelPlease();
     controller =
-        new RestQuizQuestionController(
+        new RestReviewQuestionController(
             openAiApi, modelFactoryService, currentUser, testabilitySettings);
   }
 
-  RestQuizQuestionController nullUserController() {
-    return new RestQuizQuestionController(
+  RestReviewQuestionController nullUserController() {
+    return new RestReviewQuestionController(
         openAiApi, modelFactoryService, makeMe.aNullUserModelPlease(), testabilitySettings);
   }
 
@@ -256,8 +256,8 @@ class RestReviewQuestionInstanceControllerTests {
       assertThrows(
           ResponseStatusException.class,
           () -> {
-            RestQuizQuestionController restAiController =
-                new RestQuizQuestionController(
+            RestReviewQuestionController restAiController =
+                new RestReviewQuestionController(
                     openAiApi,
                     makeMe.modelFactoryService,
                     makeMe.aNullUserModelPlease(),
@@ -303,8 +303,8 @@ class RestReviewQuestionInstanceControllerTests {
       assertThrows(
           ResponseStatusException.class,
           () -> {
-            RestQuizQuestionController restAiController =
-                new RestQuizQuestionController(
+            RestReviewQuestionController restAiController =
+                new RestReviewQuestionController(
                     openAiApi,
                     makeMe.modelFactoryService,
                     makeMe.aNullUserModelPlease(),
@@ -342,8 +342,8 @@ class RestReviewQuestionInstanceControllerTests {
       assertThrows(
           ResponseStatusException.class,
           () -> {
-            RestQuizQuestionController restAiController =
-                new RestQuizQuestionController(
+            RestReviewQuestionController restAiController =
+                new RestReviewQuestionController(
                     openAiApi,
                     makeMe.modelFactoryService,
                     makeMe.aNullUserModelPlease(),
@@ -389,8 +389,8 @@ class RestReviewQuestionInstanceControllerTests {
       assertThrows(
           ResponseStatusException.class,
           () -> {
-            RestQuizQuestionController restAiController =
-                new RestQuizQuestionController(
+            RestReviewQuestionController restAiController =
+                new RestReviewQuestionController(
                     openAiApi,
                     makeMe.modelFactoryService,
                     makeMe.aNullUserModelPlease(),

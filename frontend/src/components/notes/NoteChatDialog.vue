@@ -102,7 +102,7 @@ const scrollToBottom = () => {
 
 const generateQuestion = async () => {
   reviewQuestionInstance.value =
-    await managedApi.restQuizQuestionController.generateQuestion(
+    await managedApi.restReviewQuestionController.generateQuestion(
       props.selectedNote.id
     )
   scrollToBottom()

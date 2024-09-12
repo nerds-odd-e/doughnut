@@ -35,10 +35,11 @@ const emits = defineEmits(["answered"])
 
 const submitAnswer = async (answerData: AnswerDTO) => {
   try {
-    const answerResult = await managedApi.restQuizQuestionController.answerQuiz(
-      props.reviewQuestionInstance.id,
-      answerData
-    )
+    const answerResult =
+      await managedApi.restReviewQuestionController.answerQuiz(
+        props.reviewQuestionInstance.id,
+        answerData
+      )
 
     emits("answered", answerResult)
   } catch (_e) {

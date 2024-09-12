@@ -24,7 +24,7 @@ describe("NoteChatDialog TestMe", () => {
   const mockedGenerateQuestion = vitest.fn()
 
   beforeEach(() => {
-    helper.managedApi.restQuizQuestionController.generateQuestion =
+    helper.managedApi.restReviewQuestionController.generateQuestion =
       mockedGenerateQuestion
   })
 
@@ -63,9 +63,9 @@ describe("NoteChatDialog TestMe", () => {
 
     beforeEach(async () => {
       mockedGenerateQuestion.mockResolvedValueOnce(reviewQuestionInstance)
-      helper.managedApi.restQuizQuestionController.contest =
+      helper.managedApi.restReviewQuestionController.contest =
         mockedContest.mockResolvedValue({})
-      helper.managedApi.restQuizQuestionController.regenerate =
+      helper.managedApi.restReviewQuestionController.regenerate =
         mockedRegenerate.mockResolvedValue(newQuestion)
       wrapper = await createWrapper()
       wrapper.find("button").trigger("click")

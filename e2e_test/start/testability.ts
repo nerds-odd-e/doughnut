@@ -4,7 +4,7 @@ import { Randomization } from './../../frontend/src/generated/backend/models/Ran
 import { QuestionSuggestionParams } from '../../frontend/src/generated/backend/models/QuestionSuggestionParams'
 import ServiceMocker from '../support/ServiceMocker'
 import { NoteTestData } from './../../frontend/src/generated/backend/models/NoteTestData'
-import { QuizQuestionsTestData } from './../../frontend/src/generated/backend/models/QuizQuestionsTestData'
+import { PredefinedQuestionsTestData } from './../../frontend/src/generated/backend/models/PredefinedQuestionsTestData'
 
 const hourOfDay = (days: number, hours: number) => {
   return new Date(1976, 5, 1 + days, hours)
@@ -91,13 +91,13 @@ const testability = () => {
       return this.injectNotes(notes, creatorId)
     },
     injectQuizQuestionsToNotebook(
-      quizQuestionsTestData: QuizQuestionsTestData
+      predefinedQuestionsTestData: PredefinedQuestionsTestData
     ) {
       postToTestabilityApi(cy, 'inject-predefined-questions', {
-        body: quizQuestionsTestData,
+        body: predefinedQuestionsTestData,
       }).then((response) => {
         expect(Object.keys(response.body).length).to.equal(
-          quizQuestionsTestData.quizQuestionTestData?.length
+          predefinedQuestionsTestData.predefinedQuestionTestData?.length
         )
       })
     },
@@ -106,7 +106,7 @@ const testability = () => {
       numberOfNotes: number,
       notebookCertifiable?: boolean
     ) {
-      const reviewQuestionInstance: Record<string, string>[] = new Array(
+      const predefinedQuestion: Record<string, string>[] = new Array(
         numberOfNotes
       )
         .fill(0)
@@ -120,7 +120,7 @@ const testability = () => {
       return this.injectQuizQuestionsToNotebook({
         notebookTitle: notebook,
         notebookCertifiable,
-        quizQuestionTestData: reviewQuestionInstance,
+        predefinedQuestionTestData: predefinedQuestion,
       })
     },
     injectNumbersNotebookWithQuestions(

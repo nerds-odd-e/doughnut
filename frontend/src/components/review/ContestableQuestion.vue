@@ -73,7 +73,7 @@ const scrollToBottom = () => {
 
 const contest = async () => {
   currentQuestionLegitMessage.value = ""
-  const contestResult = await managedApi.restQuizQuestionController.contest(
+  const contestResult = await managedApi.restReviewQuestionController.contest(
     currentQuestion.value.id
   )
 
@@ -84,7 +84,7 @@ const contest = async () => {
       badQuestionReason: contestResult.reason,
     })
     currentQuestion.value =
-      await managedApi.restQuizQuestionController.regenerate(
+      await managedApi.restReviewQuestionController.regenerate(
         currentQuestion.value.id
       )
   } else {

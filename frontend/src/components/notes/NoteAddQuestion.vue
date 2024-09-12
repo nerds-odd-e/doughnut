@@ -107,7 +107,7 @@ const removeChoice = () => {
 const submitQuestion = async () => {
   const reviewQuestionInstance = predefinedQuestion.value
   const response =
-    await managedApi.restQuizQuestionController.addQuestionManually(
+    await managedApi.restReviewQuestionController.addQuestionManually(
       props.note.id,
       reviewQuestionInstance
     )
@@ -116,14 +116,14 @@ const submitQuestion = async () => {
 const refineQuestion = async () => {
   const reviewQuestionInstance = predefinedQuestion.value
   predefinedQuestion.value =
-    await managedApi.restQuizQuestionController.refineQuestion(
+    await managedApi.restReviewQuestionController.refineQuestion(
       props.note.id,
       reviewQuestionInstance
     )
 }
 const generateQuestionByAI = async () => {
   predefinedQuestion.value =
-    await managedApi.restQuizQuestionController.generateAiQuestionWithoutSave(
+    await managedApi.restReviewQuestionController.generateAiQuestionWithoutSave(
       props.note.id
     )
 }

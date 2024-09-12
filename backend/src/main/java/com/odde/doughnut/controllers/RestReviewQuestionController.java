@@ -9,7 +9,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.AnswerModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GlobalSettingsService;
-import com.odde.doughnut.services.QuizQuestionService;
+import com.odde.doughnut.services.ReviewQuestionService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
@@ -22,10 +22,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/quiz-questions")
-class RestQuizQuestionController {
+@RequestMapping("/api/review-questions")
+class RestReviewQuestionController {
   private final ModelFactoryService modelFactoryService;
-  private final QuizQuestionService quizQuestionService;
+  private final ReviewQuestionService reviewQuestionService;
 
   private final UserModel currentUser;
 
@@ -34,7 +34,7 @@ class RestQuizQuestionController {
 
   private final AiQuestionGenerator aiQuestionGenerator;
 
-  public RestQuizQuestionController(
+  public RestReviewQuestionController(
       @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
@@ -44,7 +44,7 @@ class RestQuizQuestionController {
     this.testabilitySettings = testabilitySettings;
     this.aiQuestionGenerator =
         new AiQuestionGenerator(openAiApi, new GlobalSettingsService(modelFactoryService));
-    this.quizQuestionService = new QuizQuestionService(openAiApi, modelFactoryService);
+    this.reviewQuestionService = new ReviewQuestionService(openAiApi, modelFactoryService);
   }
 
   @PostMapping("/generate-question")
@@ -52,7 +52,7 @@ class RestQuizQuestionController {
   public ReviewQuestionInstance generateQuestion(
       @RequestParam(value = "note") @Schema(type = "integer") Note note) {
     currentUser.assertLoggedIn();
-    PredefinedQuestion question = quizQuestionService.generateQuestionForNote(note);
+    PredefinedQuestion question = reviewQuestionService.generateQuestionForNote(note);
     if (question == null) {
       return null;
     }
@@ -66,7 +66,7 @@ class RestQuizQuestionController {
           ReviewQuestionInstance reviewQuestionInstance) {
     currentUser.assertLoggedIn();
     PredefinedQuestion question =
-        quizQuestionService.generateQuestionForNote(
+        reviewQuestionService.generateQuestionForNote(
             reviewQuestionInstance.getPredefinedQuestion().getNote());
     if (question == null) {
       return null;
@@ -78,7 +78,7 @@ class RestQuizQuestionController {
   public PredefinedQuestion generateAIQuestionWithoutSave(
       @RequestParam(value = "note") @Schema(type = "integer") Note note) {
     currentUser.assertLoggedIn();
-    return quizQuestionService.generateMcqWithAnswer(note);
+    return reviewQuestionService.generateMcqWithAnswer(note);
   }
 
   @PostMapping("/{reviewQuestionInstance}/contest")
@@ -107,10 +107,10 @@ class RestQuizQuestionController {
     return answerModel.getAnswerViewedByUser(currentUser.getEntity());
   }
 
-  @PostMapping("/{reviewQuestionInstance}/suggest-fine-tuning")
+  @PostMapping("/{predefinedQuestion}/suggest-fine-tuning")
   @Transactional
   public SuggestedQuestionForFineTuning suggestQuestionForFineTuning(
-      @PathVariable("reviewQuestionInstance") @Schema(type = "integer")
+      @PathVariable("predefinedQuestion") @Schema(type = "integer")
           PredefinedQuestion predefinedQuestion,
       @Valid @RequestBody QuestionSuggestionCreationParams suggestion) {
     SuggestedQuestionForFineTuning sqft = new SuggestedQuestionForFineTuning();
@@ -138,7 +138,7 @@ class RestQuizQuestionController {
       @Valid @RequestBody PredefinedQuestion predefinedQuestion)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
-    return quizQuestionService.addQuestion(note, predefinedQuestion);
+    return reviewQuestionService.addQuestion(note, predefinedQuestion);
   }
 
   @PostMapping("/{note}/refine-question")
@@ -148,7 +148,7 @@ class RestQuizQuestionController {
       @RequestBody PredefinedQuestion predefinedQuestion)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
-    return quizQuestionService.refineQuestion(note, predefinedQuestion);
+    return reviewQuestionService.refineQuestion(note, predefinedQuestion);
   }
 
   @PostMapping("/{reviewQuestionInstance}/toggle-approval")
@@ -158,6 +158,6 @@ class RestQuizQuestionController {
           PredefinedQuestion predefinedQuestion)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(predefinedQuestion.getNote());
-    return quizQuestionService.toggleApproval(predefinedQuestion);
+    return reviewQuestionService.toggleApproval(predefinedQuestion);
   }
 }
