@@ -5,7 +5,7 @@ import makeMe from "../fixtures/makeMe"
 import helper from "../helpers"
 
 describe("repeat page", () => {
-  const reviewQuestionInstance = makeMe.aQuizQuestion.please()
+  const reviewQuestionInstance = makeMe.aReviewQuestionInstance.please()
   const mockedRandomQuestionCall = vi
     .fn()
     .mockResolvedValue(reviewQuestionInstance)

@@ -13,17 +13,18 @@ import org.springframework.web.server.ResponseStatusException;
 public record PredefinedQuestionGenerator(
     User user, Note note, Randomizer randomizer, ModelFactoryService modelFactoryService) {
 
-  private Optional<PredefinedQuestion> buildOne(QuizQuestionFactory quizQuestionFactory) {
+  private Optional<PredefinedQuestion> buildOne(
+      PredefinedQuestionFactory predefinedQuestionFactory) {
     try {
-      return Optional.of(quizQuestionFactory.buildValidQuizQuestion());
-    } catch (QuizQuestionNotPossibleException e) {
+      return Optional.of(predefinedQuestionFactory.buildValidPredefinedQuestion());
+    } catch (PredefinedQuestionNotPossibleException e) {
       return Optional.empty();
     }
   }
 
   private PredefinedQuestion generateAQuestionOfFirstPossibleType(
-      List<QuizQuestionFactory> quizQuestionFactoryStream) {
-    return quizQuestionFactoryStream.stream()
+      List<PredefinedQuestionFactory> predefinedQuestionFactoryStream) {
+    return predefinedQuestionFactoryStream.stream()
         .map(this::buildOne)
         .flatMap(Optional::stream)
         .findFirst()
@@ -31,14 +32,14 @@ public record PredefinedQuestionGenerator(
   }
 
   public PredefinedQuestion generateAQuestionOfRandomType(AiQuestionGenerator questionGenerator) {
-    List<QuizQuestionFactory> shuffled;
+    List<PredefinedQuestionFactory> shuffled;
     if (note instanceof HierarchicalNote && user.getAiQuestionTypeOnlyForReview()) {
       shuffled = List.of(new AiQuestionFactory(note, questionGenerator));
     } else {
       shuffled =
           randomizer.shuffle(
               note.getQuizQuestionFactories(
-                  new QuizQuestionServant(user, randomizer, modelFactoryService)));
+                  new PredefinedQuestionServant(user, randomizer, modelFactoryService)));
     }
     PredefinedQuestion result = generateAQuestionOfFirstPossibleType(shuffled);
     if (result == null) {

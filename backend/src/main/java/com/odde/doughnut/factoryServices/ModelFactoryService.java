@@ -150,7 +150,7 @@ public class ModelFactoryService {
     return new NotebookService(notebook, this);
   }
 
-  public ReviewQuestionInstance createQuizQuestion(PredefinedQuestion question) {
+  public ReviewQuestionInstance createReviewQuestion(PredefinedQuestion question) {
     ReviewQuestionInstance reviewQuestionInstance = new ReviewQuestionInstance();
     reviewQuestionInstance.setPredefinedQuestion(question);
     return save(reviewQuestionInstance);

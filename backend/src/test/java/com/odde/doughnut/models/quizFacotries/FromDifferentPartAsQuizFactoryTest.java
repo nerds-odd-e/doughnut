@@ -7,10 +7,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.LinkType;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
-import com.odde.doughnut.factoryServices.quizFacotries.factories.FromDifferentPartAsQuizFactory;
+import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionFactory;
+import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionNotPossibleException;
+import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionServant;
+import com.odde.doughnut.factoryServices.quizFacotries.factories.FromDifferentPartAsPredefinedFactory;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
@@ -170,11 +170,11 @@ class FromDifferentPartAsQuizFactoryTest {
 
         @Nested
         class Answer {
-          QuizQuestionFactory quizQuestionFactory;
+          PredefinedQuestionFactory predefinedQuestionFactory;
 
           @BeforeEach
           void setup() {
-            quizQuestionFactory = getQuizQuestionFactory();
+            predefinedQuestionFactory = getQuizQuestionFactory();
           }
 
           @Test
@@ -182,7 +182,7 @@ class FromDifferentPartAsQuizFactoryTest {
             AnsweredQuestion answerResult =
                 makeMe
                     .anAnswerViewedByUser()
-                    .validQuestionOfType(quizQuestionFactory)
+                    .validQuestionOfType(predefinedQuestionFactory)
                     .choiceIndex(2)
                     .inMemoryPlease();
             assertTrue(answerResult.correct);
@@ -193,7 +193,7 @@ class FromDifferentPartAsQuizFactoryTest {
             AnsweredQuestion answerResult =
                 makeMe
                     .anAnswerViewedByUser()
-                    .validQuestionOfType(quizQuestionFactory)
+                    .validQuestionOfType(predefinedQuestionFactory)
                     .choiceIndex(1)
                     .inMemoryPlease();
             assertFalse(answerResult.correct);
@@ -205,15 +205,15 @@ class FromDifferentPartAsQuizFactoryTest {
 
   private PredefinedQuestion buildQuestion() {
     try {
-      return getQuizQuestionFactory().buildValidQuizQuestion();
-    } catch (QuizQuestionNotPossibleException e) {
+      return getQuizQuestionFactory().buildValidPredefinedQuestion();
+    } catch (PredefinedQuestionNotPossibleException e) {
       return null;
     }
   }
 
-  private QuizQuestionFactory getQuizQuestionFactory() {
-    QuizQuestionServant servant =
-        new QuizQuestionServant(user, new NonRandomizer(), makeMe.modelFactoryService);
-    return new FromDifferentPartAsQuizFactory(uglySubjective, servant);
+  private PredefinedQuestionFactory getQuizQuestionFactory() {
+    PredefinedQuestionServant servant =
+        new PredefinedQuestionServant(user, new NonRandomizer(), makeMe.modelFactoryService);
+    return new FromDifferentPartAsPredefinedFactory(uglySubjective, servant);
   }
 }

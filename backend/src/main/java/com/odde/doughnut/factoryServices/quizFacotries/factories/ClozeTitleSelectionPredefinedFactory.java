@@ -1,12 +1,12 @@
 package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
+import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionNotPossibleException;
+import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionServant;
 import java.util.List;
 
-public class ClozeTitleSelectionQuizFactory extends QuestionOptionsFactory {
-  public ClozeTitleSelectionQuizFactory(Note note, QuizQuestionServant servant) {
+public class ClozeTitleSelectionPredefinedFactory extends QuestionOptionsFactory {
+  public ClozeTitleSelectionPredefinedFactory(Note note, PredefinedQuestionServant servant) {
     super(note, servant);
   }
 
@@ -21,9 +21,9 @@ public class ClozeTitleSelectionQuizFactory extends QuestionOptionsFactory {
   }
 
   @Override
-  public void validateBasicPossibility() throws QuizQuestionNotPossibleException {
+  public void validateBasicPossibility() throws PredefinedQuestionNotPossibleException {
     if (note.isDetailsBlankHtml()) {
-      throw new QuizQuestionNotPossibleException();
+      throw new PredefinedQuestionNotPossibleException();
     }
   }
 

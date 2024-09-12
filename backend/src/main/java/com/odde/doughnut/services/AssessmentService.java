@@ -55,7 +55,7 @@ public class AssessmentService {
 
     return questions.stream()
         .limit(numberOfQuestion)
-        .map(modelFactoryService::createQuizQuestion)
+        .map(modelFactoryService::createReviewQuestion)
         .toList();
   }
 

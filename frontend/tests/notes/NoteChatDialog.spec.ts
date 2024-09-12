@@ -28,7 +28,7 @@ describe("NoteChatDialog TestMe", () => {
       mockedGenerateQuestion
   })
 
-  const reviewQuestionInstance = makeMe.aQuizQuestion
+  const reviewQuestionInstance = makeMe.aReviewQuestionInstance
     .withQuestionStem("any question?")
     .withChoices(["option A", "option B", "option C"])
     .please()
@@ -57,7 +57,7 @@ describe("NoteChatDialog TestMe", () => {
     const mockedContest = vitest.fn()
     const mockedRegenerate = vitest.fn()
 
-    const newQuestion = makeMe.aQuizQuestion
+    const newQuestion = makeMe.aReviewQuestionInstance
       .withQuestionStem("is it raining?")
       .please()
 

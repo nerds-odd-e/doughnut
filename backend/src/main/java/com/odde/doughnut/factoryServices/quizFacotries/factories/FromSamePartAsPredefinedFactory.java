@@ -1,17 +1,17 @@
 package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
+import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionServant;
 import java.util.List;
 
-public class FromSamePartAsQuizFactory extends QuestionOptionsFactory {
+public class FromSamePartAsPredefinedFactory extends QuestionOptionsFactory {
 
   private LinkingNote parentGrandLink;
   private Note cachedAnswerLink = null;
   private List<Note> cachedFillingOptions = null;
   private final LinkingNote link;
 
-  public FromSamePartAsQuizFactory(LinkingNote note, QuizQuestionServant servant) {
+  public FromSamePartAsPredefinedFactory(LinkingNote note, PredefinedQuestionServant servant) {
     super(note, servant);
     link = note;
   }
@@ -40,7 +40,7 @@ public class FromSamePartAsQuizFactory extends QuestionOptionsFactory {
     return getAnswerLink(servant).getParent();
   }
 
-  protected Note getAnswerLink(QuizQuestionServant servant) {
+  protected Note getAnswerLink(PredefinedQuestionServant servant) {
     if (cachedAnswerLink == null) {
       List<LinkingNote> backwardPeers =
           servant.getSiblingLinksOfSameLinkTypeHavingReviewPoint(link).toList();

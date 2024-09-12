@@ -2,9 +2,9 @@ package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.PredefinedQuestion;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
-import com.odde.doughnut.factoryServices.quizFacotries.factories.SpellingQuizFactory;
+import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionFactory;
+import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionNotPossibleException;
+import com.odde.doughnut.factoryServices.quizFacotries.factories.SpellingPredefinedFactory;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
@@ -22,7 +22,7 @@ public class PredefinedQuestionBuilder extends EntityBuilder<PredefinedQuestion>
   }
 
   public PredefinedQuestionBuilder spellingQuestionOf(Note note) {
-    this.entity = new SpellingQuizFactory(note).buildSpellingQuestion();
+    this.entity = new SpellingPredefinedFactory(note).buildSpellingQuestion();
     this.entity.setApproved(false);
     return this;
   }
@@ -41,13 +41,13 @@ public class PredefinedQuestionBuilder extends EntityBuilder<PredefinedQuestion>
     return this;
   }
 
-  public PredefinedQuestionBuilder useFactory(QuizQuestionFactory quizQuestionFactory) {
+  public PredefinedQuestionBuilder useFactory(PredefinedQuestionFactory predefinedQuestionFactory) {
     try {
-      this.entity = quizQuestionFactory.buildValidQuizQuestion();
-    } catch (QuizQuestionNotPossibleException e) {
+      this.entity = predefinedQuestionFactory.buildValidPredefinedQuestion();
+    } catch (PredefinedQuestionNotPossibleException e) {
       throw new RuntimeException(
           "Failed to generate a question of type "
-              + quizQuestionFactory.getClass().getSimpleName()
+              + predefinedQuestionFactory.getClass().getSimpleName()
               + ", perhaps no enough data.");
     }
     return this;

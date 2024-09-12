@@ -56,7 +56,7 @@ class RestReviewQuestionController {
     if (question == null) {
       return null;
     }
-    return modelFactoryService.createQuizQuestion(question);
+    return modelFactoryService.createReviewQuestion(question);
   }
 
   @PostMapping("/{reviewQuestionInstance}/regenerate")
@@ -71,7 +71,7 @@ class RestReviewQuestionController {
     if (question == null) {
       return null;
     }
-    return modelFactoryService.createQuizQuestion(question);
+    return modelFactoryService.createReviewQuestion(question);
   }
 
   @PostMapping("/generate-question-without-save")

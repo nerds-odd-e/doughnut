@@ -7,7 +7,7 @@ import com.odde.doughnut.testability.MakeMe;
 import org.apache.logging.log4j.util.Strings;
 
 public class ConversationBuilder extends EntityBuilder<Conversation> {
-  private QuizQuestionBuilder quizQuestionBuilder = null;
+  private ReviewQuestionInstanceBuilder reviewQuestionInstanceBuilder = null;
   private User noteCreator = null;
 
   public ConversationBuilder(MakeMe makeMe) {
@@ -16,8 +16,9 @@ public class ConversationBuilder extends EntityBuilder<Conversation> {
 
   @Override
   protected void beforeCreate(boolean needPersist) {
-    if (this.quizQuestionBuilder != null) {
-      ReviewQuestionInstance reviewQuestionInstance = quizQuestionBuilder.please(needPersist);
+    if (this.reviewQuestionInstanceBuilder != null) {
+      ReviewQuestionInstance reviewQuestionInstance =
+          reviewQuestionInstanceBuilder.please(needPersist);
       entity.setReviewQuestionInstance(reviewQuestionInstance);
       entity.setNoteCreator(reviewQuestionInstance.getPredefinedQuestion().getNote().getCreator());
     }
@@ -33,7 +34,7 @@ public class ConversationBuilder extends EntityBuilder<Conversation> {
   }
 
   public ConversationBuilder forAQuizQuestion() {
-    this.quizQuestionBuilder = makeMe.aQuizQuestion();
+    this.reviewQuestionInstanceBuilder = makeMe.aReviewQuestionInstance();
     return this;
   }
 

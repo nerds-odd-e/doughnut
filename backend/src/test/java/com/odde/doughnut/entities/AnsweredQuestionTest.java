@@ -2,7 +2,7 @@ package com.odde.doughnut.entities;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.odde.doughnut.factoryServices.quizFacotries.factories.SpellingQuizFactory;
+import com.odde.doughnut.factoryServices.quizFacotries.factories.SpellingPredefinedFactory;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -21,7 +21,7 @@ class AnsweredQuestionTest {
   @Nested
   class ClozeSelectionQuestion {
     Note note;
-    SpellingQuizFactory spellingQuizFactory;
+    SpellingPredefinedFactory spellingQuizFactory;
 
     @BeforeEach
     void setup() {
@@ -30,7 +30,7 @@ class AnsweredQuestionTest {
       note =
           makeMe.aNote("this / that").details("description").under(top).rememberSpelling().please();
       makeMe.aNote().under(top).please();
-      spellingQuizFactory = new SpellingQuizFactory(note);
+      spellingQuizFactory = new SpellingPredefinedFactory(note);
     }
 
     @Test

@@ -64,7 +64,7 @@ class RestReviewPointController {
             reviewPoint.getUser(), reviewPoint.getNote(), randomizer, modelFactoryService);
     PredefinedQuestion question =
         predefinedQuestionGenerator.generateAQuestionOfRandomType(questionGenerator);
-    return modelFactoryService.createQuizQuestion(question);
+    return modelFactoryService.createReviewQuestion(question);
   }
 
   @PostMapping(path = "/{reviewPoint}/remove")

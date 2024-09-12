@@ -38,7 +38,7 @@ class RestFeedbackControllerTest {
   @Test
   void testSendFeedbackReturnsOk() {
     String feedback = "This is a feedback";
-    ReviewQuestionInstance reviewQuestionInstance = makeMe.aQuizQuestion().please();
+    ReviewQuestionInstance reviewQuestionInstance = makeMe.aReviewQuestionInstance().please();
 
     ResponseEntity<String> response = controller.sendFeedback(feedback, reviewQuestionInstance);
 

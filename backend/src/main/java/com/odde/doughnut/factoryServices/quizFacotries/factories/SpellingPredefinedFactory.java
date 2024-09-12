@@ -3,22 +3,23 @@ package com.odde.doughnut.factoryServices.quizFacotries.factories;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.PredefinedQuestion;
 import com.odde.doughnut.entities.ReviewSetting;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
+import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionFactory;
+import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionNotPossibleException;
 import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
 
-public class SpellingQuizFactory extends QuizQuestionFactory {
+public class SpellingPredefinedFactory extends PredefinedQuestionFactory {
 
   protected final Note answerNote;
 
-  public SpellingQuizFactory(Note note) {
+  public SpellingPredefinedFactory(Note note) {
     this.answerNote = note;
   }
 
   @Override
-  public PredefinedQuestion buildValidQuizQuestion() throws QuizQuestionNotPossibleException {
+  public PredefinedQuestion buildValidPredefinedQuestion()
+      throws PredefinedQuestionNotPossibleException {
     if (!needSpellingQuiz()) {
-      throw new QuizQuestionNotPossibleException();
+      throw new PredefinedQuestionNotPossibleException();
     }
     return buildSpellingQuestion();
   }

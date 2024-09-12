@@ -4,7 +4,7 @@ import generateId from "./generateId"
 import PredefinedQuestionBuilder from "./PredefinedQuestionBuilder"
 import NotebookBuilder from "./NotebookBuilder"
 
-class QuizQuestionBuilder extends Builder<ReviewQuestionInstance> {
+class ReviewQuestionInstanceBuilder extends Builder<ReviewQuestionInstance> {
   predefinedQuestionBuilder = new PredefinedQuestionBuilder()
 
   withQuestionStem(stem: string) {
@@ -18,13 +18,13 @@ class QuizQuestionBuilder extends Builder<ReviewQuestionInstance> {
   }
 
   do(): ReviewQuestionInstance {
-    const predefinedQuizQuestion = this.predefinedQuestionBuilder.do()
+    const predefinedQuestion = this.predefinedQuestionBuilder.do()
     return {
       id: generateId(),
-      quizQuestion1: predefinedQuizQuestion.quizQuestion1,
+      quizQuestion1: predefinedQuestion.quizQuestion1,
       notebook: new NotebookBuilder().do(),
     }
   }
 }
 
-export default QuizQuestionBuilder
+export default ReviewQuestionInstanceBuilder

@@ -3,7 +3,7 @@
     v-if="reviewQuestionInstance.notebook"
     :ancestors="[reviewQuestionInstance.notebook.headNote.noteTopic]"
   />
-  <div v-for="(q, index) in prevQuizQuestions" :key="index">
+  <div v-for="(q, index) in prevQuestions" :key="index">
     <h3>Previous Question Contested ...</h3>
     <p>{{ q.badQuestionReason }}</p>
     <ReviewQuestion :review-question-instance="q.quizeQuestion" :disabled="true" />
@@ -60,7 +60,7 @@ const regenerating = ref(false)
 const currentQuestionLegitMessage = ref<string | undefined>(undefined)
 const currentQuestion = ref(props.reviewQuestionInstance)
 const answeredQuestion = ref<AnsweredQuestion | undefined>(undefined)
-const prevQuizQuestions = ref<
+const prevQuestions = ref<
   {
     quizeQuestion: ReviewQuestionInstance
     badQuestionReason: string | undefined
@@ -79,7 +79,7 @@ const contest = async () => {
 
   if (!contestResult.rejected) {
     regenerating.value = true
-    prevQuizQuestions.value.push({
+    prevQuestions.value.push({
       quizeQuestion: currentQuestion.value,
       badQuestionReason: contestResult.reason,
     })

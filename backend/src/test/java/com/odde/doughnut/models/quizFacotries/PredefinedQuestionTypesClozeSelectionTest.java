@@ -5,9 +5,9 @@ import static org.hamcrest.Matchers.*;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.PredefinedQuestion;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
-import com.odde.doughnut.factoryServices.quizFacotries.factories.ClozeTitleSelectionQuizFactory;
+import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionNotPossibleException;
+import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionServant;
+import com.odde.doughnut.factoryServices.quizFacotries.factories.ClozeTitleSelectionPredefinedFactory;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
@@ -58,11 +58,12 @@ class PredefinedQuestionTypesClozeSelectionTest {
     }
 
     private PredefinedQuestion buildClozeQuizQuestion() {
-      QuizQuestionServant servant =
-          new QuizQuestionServant(null, new NonRandomizer(), makeMe.modelFactoryService);
+      PredefinedQuestionServant servant =
+          new PredefinedQuestionServant(null, new NonRandomizer(), makeMe.modelFactoryService);
       try {
-        return new ClozeTitleSelectionQuizFactory(note1, servant).buildValidQuizQuestion();
-      } catch (QuizQuestionNotPossibleException e) {
+        return new ClozeTitleSelectionPredefinedFactory(note1, servant)
+            .buildValidPredefinedQuestion();
+      } catch (PredefinedQuestionNotPossibleException e) {
         return null;
       }
     }

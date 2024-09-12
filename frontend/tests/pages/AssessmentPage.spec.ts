@@ -17,7 +17,7 @@ vitest.mock("vue-router", () => ({
 describe("assessment page", () => {
   describe("assessment with one question", () => {
     const notebook = makeMe.aNotebook.please()
-    const reviewQuestionInstance = makeMe.aQuizQuestion.please()
+    const reviewQuestionInstance = makeMe.aReviewQuestionInstance.please()
     const assessmentAttempt = makeMe.anAssessmentAttempt
       .forNotebook(notebook)
       .withQuestions([reviewQuestionInstance])
@@ -59,10 +59,10 @@ describe("assessment page", () => {
 
   describe("answering the assessment with two questions", () => {
     const notebook = makeMe.aNotebook.please()
-    const quizQuestion1 = makeMe.aQuizQuestion
+    const quizQuestion_1 = makeMe.aReviewQuestionInstance
       .withChoices(["answer1", "answer2"])
       .please()
-    const quizQuestion2 = makeMe.aQuizQuestion
+    const quizQuestion_2 = makeMe.aReviewQuestionInstance
       .withChoices(["answer3", "answer4"])
       .please()
     const answerResult1: AnsweredQuestion = {
@@ -75,7 +75,7 @@ describe("assessment page", () => {
     }
     const assessmentAttempt = makeMe.anAssessmentAttempt
       .forNotebook(notebook)
-      .withQuestions([quizQuestion1, quizQuestion2])
+      .withQuestions([quizQuestion_1, quizQuestion_2])
       .please()
     beforeEach(() => {
       helper.managedApi.restAssessmentController.generateAssessmentQuestions =
@@ -104,12 +104,12 @@ describe("assessment page", () => {
         {
           answerId: answerResult1.answerId,
           correctAnswers: true,
-          questionId: quizQuestion1.id,
+          questionId: quizQuestion_1.id,
         },
         {
           answerId: answerResult2.answerId,
           correctAnswers: true,
-          questionId: quizQuestion2.id,
+          questionId: quizQuestion_2.id,
         },
       ]
       expect(

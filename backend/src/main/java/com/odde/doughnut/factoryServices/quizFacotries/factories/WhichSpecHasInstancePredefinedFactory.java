@@ -2,15 +2,16 @@ package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.entities.LinkingNote;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
+import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionServant;
 import java.util.List;
 
-public class WhichSpecHasInstanceQuizFactory extends QuestionOptionsFactory {
+public class WhichSpecHasInstancePredefinedFactory extends QuestionOptionsFactory {
   private LinkingNote instanceLink = null;
   private List<Note> cachedFillingOptions = null;
   private final LinkingNote link;
 
-  public WhichSpecHasInstanceQuizFactory(LinkingNote note, QuizQuestionServant servant) {
+  public WhichSpecHasInstancePredefinedFactory(
+      LinkingNote note, PredefinedQuestionServant servant) {
     super(note, servant);
     this.link = note;
   }

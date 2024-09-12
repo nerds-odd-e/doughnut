@@ -2,8 +2,8 @@ package com.odde.doughnut.testability;
 
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
+import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionNotPossibleException;
+import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionServant;
 import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
@@ -125,20 +125,20 @@ public class MakeMe extends MakeMeWithoutDB {
     return new PredefinedQuestionBuilder(this);
   }
 
-  public QuizQuestionBuilder aQuizQuestion() {
-    return new QuizQuestionBuilder(this);
+  public ReviewQuestionInstanceBuilder aReviewQuestionInstance() {
+    return new ReviewQuestionInstanceBuilder(this);
   }
 
   public PredefinedQuestion buildAQuestionForLinkingNote(
       LinkQuestionType linkQuestionType, LinkingNote linkingNote, User user) {
-    QuizQuestionServant servant =
-        new QuizQuestionServant(user, new NonRandomizer(), modelFactoryService);
+    PredefinedQuestionServant servant =
+        new PredefinedQuestionServant(user, new NonRandomizer(), modelFactoryService);
     try {
       return linkQuestionType
           .factoryForLinkingNote
           .apply(linkingNote, servant)
-          .buildValidQuizQuestion();
-    } catch (QuizQuestionNotPossibleException e) {
+          .buildValidPredefinedQuestion();
+    } catch (PredefinedQuestionNotPossibleException e) {
       return null;
     }
   }

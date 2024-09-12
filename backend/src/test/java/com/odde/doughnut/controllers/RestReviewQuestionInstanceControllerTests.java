@@ -14,7 +14,7 @@ import com.odde.doughnut.controllers.dto.ReviewQuestionContestResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
+import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionNotPossibleException;
 import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GlobalSettingsService;
@@ -83,7 +83,7 @@ class RestReviewQuestionInstanceControllerTests {
               .forgettingCurveAndNextReviewAt(200)
               .please();
       reviewQuestionInstance =
-          makeMe.aQuizQuestion().approvedSpellingQuestionOf(answerNote).please();
+          makeMe.aReviewQuestionInstance().approvedSpellingQuestionOf(answerNote).please();
       answerDTO.setSpellingAnswer(answerNote.getTopicConstructor());
     }
 
@@ -126,7 +126,10 @@ class RestReviewQuestionInstanceControllerTests {
       @BeforeEach
       void setup() {
         reviewQuestionInstance =
-            makeMe.aQuizQuestion().approvedSpellingQuestionOf(reviewPoint.getNote()).please();
+            makeMe
+                .aReviewQuestionInstance()
+                .approvedSpellingQuestionOf(reviewPoint.getNote())
+                .please();
         answerDTO.setSpellingAnswer("wrong");
       }
 
@@ -174,7 +177,7 @@ class RestReviewQuestionInstanceControllerTests {
         new QuestionSuggestionCreationParams("this is a comment", false);
 
     @BeforeEach
-    void setup() throws QuizQuestionNotPossibleException {
+    void setup() throws PredefinedQuestionNotPossibleException {
       note = makeMe.aNote().creatorAndOwner(currentUser).please();
       mcqWithAnswer = makeMe.aMCQWithAnswer().please();
       predefinedQuestion =
@@ -334,7 +337,8 @@ class RestReviewQuestionInstanceControllerTests {
     void setUp() {
       note = makeMe.aNote().please();
 
-      reviewQuestionInstance = makeMe.aQuizQuestion().approvedSpellingQuestionOf(note).please();
+      reviewQuestionInstance =
+          makeMe.aReviewQuestionInstance().approvedSpellingQuestionOf(note).please();
     }
 
     @Test
@@ -381,7 +385,10 @@ class RestReviewQuestionInstanceControllerTests {
       MCQWithAnswer aiGeneratedQuestion = makeMe.aMCQWithAnswer().please();
       Note note = makeMe.aNote().please();
       reviewQuestionInstance =
-          makeMe.aQuizQuestion().ofAIGeneratedQuestion(aiGeneratedQuestion, note).please();
+          makeMe
+              .aReviewQuestionInstance()
+              .ofAIGeneratedQuestion(aiGeneratedQuestion, note)
+              .please();
     }
 
     @Test

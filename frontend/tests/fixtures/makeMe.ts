@@ -8,7 +8,7 @@ import NoteBuilder from "./NoteBuilder"
 import NoteRealmBuilder from "./NoteRealmBuilder"
 import NotebookBuilder from "./NotebookBuilder"
 import PredefinedQuestionBuilder from "./PredefinedQuestionBuilder"
-import QuizQuestionBuilder from "./QuizQuestionBuilder"
+import ReviewQuestionInstanceBuilder from "./ReviewQuestionInstanceBuilder"
 import ReviewPointBuilder from "./ReviewPointBuilder"
 import SuggestedQuestionForFineTuningBuilder from "./SuggestedQuestionForFineTuningBuilder"
 import UserBuilder from "./UserBuilder"
@@ -41,8 +41,8 @@ class MakeMe {
     return new DueReviewPointsBuilder()
   }
 
-  static get aQuizQuestion(): QuizQuestionBuilder {
-    return new QuizQuestionBuilder()
+  static get aReviewQuestionInstance(): ReviewQuestionInstanceBuilder {
+    return new ReviewQuestionInstanceBuilder()
   }
 
   static get aPredefinedQuestion(): PredefinedQuestionBuilder {

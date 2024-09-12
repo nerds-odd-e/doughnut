@@ -2,35 +2,36 @@ package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.PredefinedQuestion;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
+import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionFactory;
+import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionNotPossibleException;
+import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionServant;
 import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class QuestionOptionsFactory extends QuizQuestionFactory {
+public abstract class QuestionOptionsFactory extends PredefinedQuestionFactory {
   protected final Note note;
-  protected final QuizQuestionServant servant;
+  protected final PredefinedQuestionServant servant;
 
-  public QuestionOptionsFactory(Note note, QuizQuestionServant servant) {
+  public QuestionOptionsFactory(Note note, PredefinedQuestionServant servant) {
     this.note = note;
     this.servant = servant;
   }
 
   @Override
-  public PredefinedQuestion buildValidQuizQuestion() throws QuizQuestionNotPossibleException {
+  public PredefinedQuestion buildValidPredefinedQuestion()
+      throws PredefinedQuestionNotPossibleException {
     PredefinedQuestion predefinedQuestion = new PredefinedQuestion();
     predefinedQuestion.setNote(note);
     this.findCategoricalLink();
     this.validateBasicPossibility();
     Note answerNote = this.generateAnswer();
     if (answerNote == null) {
-      throw new QuizQuestionNotPossibleException();
+      throw new PredefinedQuestionNotPossibleException();
     }
     List<? extends Note> options = this.generateFillingOptions();
     if (options.size() < this.minimumOptionCount() - 1) {
-      throw new QuizQuestionNotPossibleException();
+      throw new PredefinedQuestionNotPossibleException();
     }
     List<Note> optionsEntities = new ArrayList<>(options);
     optionsEntities.add(answerNote);
@@ -43,7 +44,7 @@ public abstract class QuestionOptionsFactory extends QuizQuestionFactory {
     return predefinedQuestion;
   }
 
-  public void validateBasicPossibility() throws QuizQuestionNotPossibleException {}
+  public void validateBasicPossibility() throws PredefinedQuestionNotPossibleException {}
 
   public void findCategoricalLink() {}
 

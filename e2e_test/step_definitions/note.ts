@@ -79,7 +79,7 @@ Given(
 Given(
   'there are questions in the notebook {string} for the note:',
   (notebook: string, data: DataTable) => {
-    start.testability().injectQuizQuestionsToNotebook({
+    start.testability().injectPredefinedQuestionsToNotebook({
       notebookTitle: notebook,
       predefinedQuestionTestData: data.hashes(),
     })

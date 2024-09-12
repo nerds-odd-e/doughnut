@@ -48,12 +48,12 @@ public class PredefinedQuestion extends EntityIdentifiedByIdOnly {
   }
 
   public static PredefinedQuestion fromMCQWithAnswer(MCQWithAnswer MCQWithAnswer, Note note) {
-    PredefinedQuestion quizQuestionAIPredefinedQuestion = new PredefinedQuestion();
-    quizQuestionAIPredefinedQuestion.setNote(note);
-    quizQuestionAIPredefinedQuestion.quizQuestion1.setMultipleChoicesQuestion(
+    PredefinedQuestion predefinedQuestion = new PredefinedQuestion();
+    predefinedQuestion.setNote(note);
+    predefinedQuestion.quizQuestion1.setMultipleChoicesQuestion(
         MCQWithAnswer.getMultipleChoicesQuestion());
-    quizQuestionAIPredefinedQuestion.setCorrectAnswerIndex(MCQWithAnswer.getCorrectChoiceIndex());
-    return quizQuestionAIPredefinedQuestion;
+    predefinedQuestion.setCorrectAnswerIndex(MCQWithAnswer.getCorrectChoiceIndex());
+    return predefinedQuestion;
   }
 
   @Override

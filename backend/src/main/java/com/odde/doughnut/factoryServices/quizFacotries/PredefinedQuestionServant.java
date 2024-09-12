@@ -12,7 +12,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class QuizQuestionServant {
+public class PredefinedQuestionServant {
   private final User user;
   public final Randomizer randomizer;
   final ModelFactoryService modelFactoryService;
@@ -27,7 +27,7 @@ public class QuizQuestionServant {
           LinkType.USES,
           LinkType.RELATED_TO);
 
-  public QuizQuestionServant(
+  public PredefinedQuestionServant(
       User user, Randomizer randomizer, ModelFactoryService modelFactoryService) {
     this.user = user;
     this.randomizer = randomizer;

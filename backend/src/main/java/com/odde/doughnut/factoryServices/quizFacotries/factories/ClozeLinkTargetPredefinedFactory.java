@@ -2,11 +2,11 @@ package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.algorithms.ClozedString;
 import com.odde.doughnut.entities.LinkingNote;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
+import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionServant;
 
-public class ClozeLinkTargetQuizFactory extends LinkTargetQuizFactory {
+public class ClozeLinkTargetPredefinedFactory extends LinkTargetPredefinedFactory {
 
-  public ClozeLinkTargetQuizFactory(LinkingNote note, QuizQuestionServant servant) {
+  public ClozeLinkTargetPredefinedFactory(LinkingNote note, PredefinedQuestionServant servant) {
     super(note, servant);
   }
 

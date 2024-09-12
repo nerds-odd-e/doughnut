@@ -1,12 +1,12 @@
 package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
+import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionFactory;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 
 public class AnswerBuilder extends EntityBuilder<Answer> {
-  private QuizQuestionBuilder quizQuestionBuilder = null;
+  private ReviewQuestionInstanceBuilder reviewQuestionInstanceBuilder = null;
 
   public AnswerBuilder(MakeMe makeMe) {
     super(makeMe, new Answer());
@@ -14,8 +14,8 @@ public class AnswerBuilder extends EntityBuilder<Answer> {
 
   @Override
   protected void beforeCreate(boolean needPersist) {
-    if (this.quizQuestionBuilder != null) {
-      entity.setReviewQuestionInstance(quizQuestionBuilder.please(needPersist));
+    if (this.reviewQuestionInstanceBuilder != null) {
+      entity.setReviewQuestionInstance(reviewQuestionInstanceBuilder.please(needPersist));
     }
     if (needPersist) {
       if (entity.getReviewQuestionInstance().getId() == null) {
@@ -24,13 +24,15 @@ public class AnswerBuilder extends EntityBuilder<Answer> {
     }
   }
 
-  public AnswerBuilder withValidQuestion(QuizQuestionFactory quizQuestionFactory) {
-    this.quizQuestionBuilder = makeMe.aQuizQuestion().useFactory(quizQuestionFactory);
+  public AnswerBuilder withValidQuestion(PredefinedQuestionFactory predefinedQuestionFactory) {
+    this.reviewQuestionInstanceBuilder =
+        makeMe.aReviewQuestionInstance().useFactory(predefinedQuestionFactory);
     return this;
   }
 
   public AnswerBuilder ofSpellingQuestion(Note note) {
-    this.quizQuestionBuilder = makeMe.aQuizQuestion().approvedSpellingQuestionOf(note);
+    this.reviewQuestionInstanceBuilder =
+        makeMe.aReviewQuestionInstance().approvedSpellingQuestionOf(note);
     return this;
   }
 

@@ -11,7 +11,7 @@ import com.odde.doughnut.entities.ReviewQuestionInstance;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.MakeMe;
-import com.odde.doughnut.testability.builders.QuizQuestionBuilder;
+import com.odde.doughnut.testability.builders.ReviewQuestionInstanceBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -77,8 +77,8 @@ class AIGeneratedQuizFactoryTest {
     }
   }
 
-  private QuizQuestionBuilder questionBuilder() {
-    return makeMe.aQuizQuestion().ofAIGeneratedQuestion(mcqWithAnswer, note);
+  private ReviewQuestionInstanceBuilder questionBuilder() {
+    return makeMe.aReviewQuestionInstance().ofAIGeneratedQuestion(mcqWithAnswer, note);
   }
 
   private ReviewQuestionInstance buildQuestion() {

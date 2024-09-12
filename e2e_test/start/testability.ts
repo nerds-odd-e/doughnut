@@ -90,7 +90,7 @@ const testability = () => {
       ]
       return this.injectNotes(notes, creatorId)
     },
-    injectQuizQuestionsToNotebook(
+    injectPredefinedQuestionsToNotebook(
       predefinedQuestionsTestData: PredefinedQuestionsTestData
     ) {
       postToTestabilityApi(cy, 'inject-predefined-questions', {
@@ -117,7 +117,7 @@ const testability = () => {
           'One Wrong Choice': 'No',
           Approved: 'true',
         }))
-      return this.injectQuizQuestionsToNotebook({
+      return this.injectPredefinedQuestionsToNotebook({
         notebookTitle: notebook,
         notebookCertifiable,
         predefinedQuestionTestData: predefinedQuestion,

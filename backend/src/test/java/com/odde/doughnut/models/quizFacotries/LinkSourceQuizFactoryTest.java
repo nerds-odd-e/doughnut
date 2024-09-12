@@ -40,7 +40,7 @@ class LinkSourceQuizFactoryTest {
   @Test
   void shouldReturnNullIfCannotFindEnoughOptions() {
     makeMe.aLink().between(anotherSource, target).please();
-    PredefinedQuestion actual = buildLinkSourceQuizQuestion();
+    PredefinedQuestion actual = buildLinkSourcePredefinedQuestion();
     assertThat(actual, is(nullValue()));
   }
 
@@ -48,7 +48,7 @@ class LinkSourceQuizFactoryTest {
   class WhenThereAreMoreThanOneOptions {
     @Test
     void shouldIncludeRightAnswers() {
-      PredefinedQuestion predefinedQuestion = buildLinkSourceQuizQuestion();
+      PredefinedQuestion predefinedQuestion = buildLinkSourcePredefinedQuestion();
       assertThat(
           predefinedQuestion.getQuizQuestion1().getMultipleChoicesQuestion().getStem(),
           containsString("Which one <em>is immediately a specialization of</em>:"));
@@ -63,7 +63,7 @@ class LinkSourceQuizFactoryTest {
     }
   }
 
-  private PredefinedQuestion buildLinkSourceQuizQuestion() {
+  private PredefinedQuestion buildLinkSourcePredefinedQuestion() {
     return makeMe.buildAQuestionForLinkingNote(LinkQuestionType.LINK_SOURCE, subjectNote, user);
   }
 }

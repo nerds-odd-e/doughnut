@@ -6,7 +6,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
+import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.*;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
@@ -37,9 +37,9 @@ class PredefinedQuestionGeneratorTest {
     assertThat(
         questionTypes,
         contains(
-            SpellingQuizFactory.class,
-            ClozeTitleSelectionQuizFactory.class,
-            ImageTitleSelectionQuizFactory.class));
+            SpellingPredefinedFactory.class,
+            ClozeTitleSelectionPredefinedFactory.class,
+            ImageTitleSelectionPredefinedFactory.class));
   }
 
   @Test
@@ -49,12 +49,12 @@ class PredefinedQuestionGeneratorTest {
     assertThat(
         questionTypes,
         containsInAnyOrder(
-            LinkTargetQuizFactory.class,
-            LinkSourceQuizFactory.class,
-            WhichSpecHasInstanceQuizFactory.class,
-            FromSamePartAsQuizFactory.class,
-            FromDifferentPartAsQuizFactory.class,
-            DescriptionLinkTargetQuizFactory.class));
+            LinkTargetPredefinedFactory.class,
+            LinkSourcePredefinedFactory.class,
+            WhichSpecHasInstancePredefinedFactory.class,
+            FromSamePartAsPredefinedFactory.class,
+            FromDifferentPartAsPredefinedFactory.class,
+            DescriptionLinkTargetPredefinedFactory.class));
   }
 
   @Test
@@ -64,7 +64,9 @@ class PredefinedQuestionGeneratorTest {
     assertTrue(questionTypes.isEmpty());
   }
 
-  private List<? extends Class<? extends QuizQuestionFactory>> getQuestionTypes(Note note) {
-    return note.getQuizQuestionFactories(null).stream().map(QuizQuestionFactory::getClass).toList();
+  private List<? extends Class<? extends PredefinedQuestionFactory>> getQuestionTypes(Note note) {
+    return note.getQuizQuestionFactories(null).stream()
+        .map(PredefinedQuestionFactory::getClass)
+        .toList();
   }
 }

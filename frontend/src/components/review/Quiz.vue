@@ -2,7 +2,7 @@
   <div v-if="!minimized" class="content">
     <ContentLoader v-if="!currentQuestionFetched" />
     <template v-else>
-      <div v-if="!currentQuizQuestion">
+      <div v-if="!currentReviewQuestion">
         <JustReview
           v-bind="{
             reviewPointId: currentReviewPointId,
@@ -14,11 +14,11 @@
       <ContestableQuestion
         v-else
         v-bind="{
-          reviewQuestionInstance: currentQuizQuestion,
+          reviewQuestionInstance: currentReviewQuestion,
           storageAccessor,
         }"
         @answered="onAnswered($event)"
-        :key="currentQuizQuestion.id"
+        :key="currentReviewQuestion.id"
       />
     </template>
   </div>
@@ -65,7 +65,7 @@ export default defineComponent({
   },
   data() {
     return {
-      quizQuestionCache: [] as (ReviewQuestionInstance | undefined)[],
+      reviewQuestionCache: [] as (ReviewQuestionInstance | undefined)[],
       eagerFetchUntil: 0,
       fetching: false,
     }
@@ -75,10 +75,10 @@ export default defineComponent({
       return this.reviewPointIdAt(this.currentIndex)
     },
     currentQuestionFetched() {
-      return this.quizQuestionCache.length > this.currentIndex
+      return this.reviewQuestionCache.length > this.currentIndex
     },
-    currentQuizQuestion() {
-      return this.quizQuestionCache[this.currentIndex]
+    currentReviewQuestion() {
+      return this.reviewQuestionCache[this.currentIndex]
     },
   },
   watch: {
@@ -86,7 +86,7 @@ export default defineComponent({
       this.selectPosition()
     },
     QuizQuestions() {
-      this.quizQuestionCache = []
+      this.reviewQuestionCache = []
       this.eagerFetchUntil = 0
       this.fetchQuestion()
     },
@@ -122,7 +122,7 @@ export default defineComponent({
     },
 
     async fetchNextQuestion() {
-      const index = this.quizQuestionCache.length
+      const index = this.reviewQuestionCache.length
       if (this.eagerFetchUntil <= index) return
       const reviewPointId = this.reviewPointIdAt(index)
       if (reviewPointId === undefined) return
@@ -131,9 +131,9 @@ export default defineComponent({
           await this.managedApi.silent.restReviewPointController.generateRandomQuestion(
             reviewPointId
           )
-        this.quizQuestionCache.push(question)
+        this.reviewQuestionCache.push(question)
       } catch (e) {
-        this.quizQuestionCache.push(undefined)
+        this.reviewQuestionCache.push(undefined)
       }
       await this.fetchNextQuestion()
     },

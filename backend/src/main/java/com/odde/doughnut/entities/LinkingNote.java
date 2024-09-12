@@ -1,8 +1,8 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionFactory;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
+import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionFactory;
+import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionServant;
 import jakarta.persistence.Entity;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
@@ -37,7 +37,8 @@ public class LinkingNote extends Note {
   }
 
   @Override
-  public List<QuizQuestionFactory> getQuizQuestionFactories(QuizQuestionServant servant) {
+  public List<PredefinedQuestionFactory> getQuizQuestionFactories(
+      PredefinedQuestionServant servant) {
     return Arrays.stream(getLinkType().getQuestionTypes())
         .map(t -> t.factoryForLinkingNote.apply(this, servant))
         .toList();

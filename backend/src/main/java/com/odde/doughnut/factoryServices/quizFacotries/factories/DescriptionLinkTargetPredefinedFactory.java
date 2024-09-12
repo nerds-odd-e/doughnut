@@ -2,20 +2,21 @@ package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.algorithms.ClozedString;
 import com.odde.doughnut.entities.LinkingNote;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionNotPossibleException;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionServant;
+import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionNotPossibleException;
+import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionServant;
 
-public class DescriptionLinkTargetQuizFactory extends LinkTargetQuizFactory {
+public class DescriptionLinkTargetPredefinedFactory extends LinkTargetPredefinedFactory {
 
-  public DescriptionLinkTargetQuizFactory(LinkingNote note, QuizQuestionServant servant) {
+  public DescriptionLinkTargetPredefinedFactory(
+      LinkingNote note, PredefinedQuestionServant servant) {
     super(note, servant);
   }
 
   @Override
-  public void validateBasicPossibility() throws QuizQuestionNotPossibleException {
+  public void validateBasicPossibility() throws PredefinedQuestionNotPossibleException {
     super.validateBasicPossibility();
     if (!link.getParent().getClozeDescription().isPresent()) {
-      throw new QuizQuestionNotPossibleException();
+      throw new PredefinedQuestionNotPossibleException();
     }
   }
 
