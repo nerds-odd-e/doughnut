@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { QuizQuestionTestData } from './QuizQuestionTestData';
-export type QuizQuestionsTestData = {
+export type PredefinedQuestionsTestData = {
     notebookTitle?: string;
     notebookCertifiable?: boolean;
     quizQuestionTestData?: Array<QuizQuestionTestData>;

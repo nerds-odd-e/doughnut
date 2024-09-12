@@ -1,5 +1,5 @@
 <template>
-  <QuizQuestionDisplay
+  <QuestionDisplay
     v-bind="{
       quizQuestion1: reviewQuestionInstance.quizQuestion1,
       correctChoiceIndex,
@@ -16,7 +16,7 @@ import { PropType } from "vue"
 import { AnswerDTO, ReviewQuestionInstance } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import usePopups from "../commons/Popups/usePopups"
-import QuizQuestionDisplay from "../review/QuizQuestionDisplay.vue"
+import QuestionDisplay from "../review/QuestionDisplay.vue"
 
 const { managedApi } = useLoadingApi()
 const { popups } = usePopups()

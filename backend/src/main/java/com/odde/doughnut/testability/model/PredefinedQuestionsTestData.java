@@ -11,7 +11,7 @@ import lombok.Data;
 import lombok.Setter;
 
 @Data
-public class QuizQuestionsTestData {
+public class PredefinedQuestionsTestData {
   private String notebookTitle;
   private Boolean notebookCertifiable;
   private List<QuizQuestionTestData> quizQuestionTestData;

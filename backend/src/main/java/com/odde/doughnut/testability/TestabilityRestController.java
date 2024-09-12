@@ -12,7 +12,7 @@ import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GithubService;
 import com.odde.doughnut.services.NoteConstructionService;
-import com.odde.doughnut.testability.model.QuizQuestionsTestData;
+import com.odde.doughnut.testability.model.PredefinedQuestionsTestData;
 import jakarta.persistence.EntityManagerFactory;
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -182,14 +182,15 @@ class TestabilityRestController {
         .collect(Collectors.toMap(note -> note.getTopicConstructor(), Note::getId));
   }
 
-  @PostMapping("/inject_quiz_questions")
+  @PostMapping("/inject-predefined-questions")
   @Transactional
-  public List<PredefinedQuestion> injectQuizQuestion(
-      @RequestBody QuizQuestionsTestData quizQuestionsTestData) {
+  public List<PredefinedQuestion> injectPredefinedQuestion(
+      @RequestBody PredefinedQuestionsTestData predefinedQuestionsTestData) {
     List<PredefinedQuestion> predefinedQuestions =
-        quizQuestionsTestData.buildQuizQuestions(this.modelFactoryService);
+        predefinedQuestionsTestData.buildQuizQuestions(this.modelFactoryService);
     predefinedQuestions.forEach(question -> modelFactoryService.save(question));
-    updateNotebookSettings(predefinedQuestions, quizQuestionsTestData.getNotebookCertifiable());
+    updateNotebookSettings(
+        predefinedQuestions, predefinedQuestionsTestData.getNotebookCertifiable());
     return predefinedQuestions;
   }
 

@@ -93,7 +93,7 @@ const testability = () => {
     injectQuizQuestionsToNotebook(
       quizQuestionsTestData: QuizQuestionsTestData
     ) {
-      postToTestabilityApi(cy, 'inject_quiz_questions', {
+      postToTestabilityApi(cy, 'inject-predefined-questions', {
         body: quizQuestionsTestData,
       }).then((response) => {
         expect(Object.keys(response.body).length).to.equal(

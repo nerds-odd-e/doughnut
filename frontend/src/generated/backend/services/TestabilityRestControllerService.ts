@@ -4,7 +4,7 @@
 /* eslint-disable */
 import type { NotesTestData } from '../models/NotesTestData';
 import type { PredefinedQuestion } from '../models/PredefinedQuestion';
-import type { QuizQuestionsTestData } from '../models/QuizQuestionsTestData';
+import type { PredefinedQuestionsTestData } from '../models/PredefinedQuestionsTestData';
 import type { Randomization } from '../models/Randomization';
 import type { SuggestedQuestionsData } from '../models/SuggestedQuestionsData';
 import type { TimeTravel } from '../models/TimeTravel';
@@ -185,24 +185,6 @@ export class TestabilityRestControllerService {
     }
     /**
      * @param requestBody
-     * @returns PredefinedQuestion OK
-     * @throws ApiError
-     */
-    public injectQuizQuestion(
-        requestBody: QuizQuestionsTestData,
-    ): CancelablePromise<Array<PredefinedQuestion>> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/api/testability/inject_quiz_questions',
-            body: requestBody,
-            mediaType: 'application/json',
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * @param requestBody
      * @returns number OK
      * @throws ApiError
      */
@@ -230,6 +212,24 @@ export class TestabilityRestControllerService {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/testability/inject_circle',
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param requestBody
+     * @returns PredefinedQuestion OK
+     * @throws ApiError
+     */
+    public injectPredefinedQuestion(
+        requestBody: PredefinedQuestionsTestData,
+    ): CancelablePromise<Array<PredefinedQuestion>> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/testability/inject-predefined-questions',
             body: requestBody,
             mediaType: 'application/json',
             errors: {

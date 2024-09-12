@@ -290,32 +290,6 @@ paths:
             '*/*':
               schema:
                 type: string
-  /api/testability/inject_quiz_questions:
-    post:
-      tags:
-      - testability-rest-controller
-      operationId: injectQuizQuestion
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/QuizQuestionsTestData"
-        required: true
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/PredefinedQuestion"
   /api/testability/inject_notes:
     post:
       tags:
@@ -369,6 +343,32 @@ paths:
             '*/*':
               schema:
                 type: string
+  /api/testability/inject-predefined-questions:
+    post:
+      tags:
+      - testability-rest-controller
+      operationId: injectPredefinedQuestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PredefinedQuestionsTestData"
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PredefinedQuestion"
   /api/testability/feature_toggle:
     get:
       tags:
@@ -2920,6 +2920,48 @@ components:
           writeOnly: true
           items:
             $ref: "#/components/schemas/QuestionSuggestionParams"
+    NoteTestData:
+      type: object
+      properties:
+        Topic:
+          type: string
+        Details:
+          type: string
+        Parent Topic:
+          type: string
+        Skip Review:
+          type: boolean
+        Image Url:
+          type: string
+        Image Mask:
+          type: string
+        Wikidata Id:
+          type: string
+    NotesTestData:
+      type: object
+      properties:
+        noteTestData:
+          type: array
+          writeOnly: true
+          items:
+            $ref: "#/components/schemas/NoteTestData"
+        externalIdentifier:
+          type: string
+          writeOnly: true
+        circleName:
+          type: string
+          writeOnly: true
+    PredefinedQuestionsTestData:
+      type: object
+      properties:
+        notebookTitle:
+          type: string
+        notebookCertifiable:
+          type: boolean
+        quizQuestionTestData:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuizQuestionTestData"
     QuizQuestionTestData:
       type: object
       properties:
@@ -2933,17 +2975,6 @@ components:
           type: string
         Approved:
           type: boolean
-    QuizQuestionsTestData:
-      type: object
-      properties:
-        notebookTitle:
-          type: string
-        notebookCertifiable:
-          type: boolean
-        quizQuestionTestData:
-          type: array
-          items:
-            $ref: "#/components/schemas/QuizQuestionTestData"
     ImageWithMask:
       type: object
       properties:
@@ -2978,37 +3009,6 @@ components:
           type: boolean
         imageWithMask:
           $ref: "#/components/schemas/ImageWithMask"
-    NoteTestData:
-      type: object
-      properties:
-        Topic:
-          type: string
-        Details:
-          type: string
-        Parent Topic:
-          type: string
-        Skip Review:
-          type: boolean
-        Image Url:
-          type: string
-        Image Mask:
-          type: string
-        Wikidata Id:
-          type: string
-    NotesTestData:
-      type: object
-      properties:
-        noteTestData:
-          type: array
-          writeOnly: true
-          items:
-            $ref: "#/components/schemas/NoteTestData"
-        externalIdentifier:
-          type: string
-          writeOnly: true
-        circleName:
-          type: string
-          writeOnly: true
     SubscriptionDTO:
       type: object
       properties:
@@ -3225,10 +3225,10 @@ components:
         id:
           type: integer
           format: int32
-        notebook:
-          $ref: "#/components/schemas/Notebook"
         quizQuestion1:
           $ref: "#/components/schemas/QuizQuestion1"
+        notebook:
+          $ref: "#/components/schemas/Notebook"
     QuizQuestionContestResult:
       type: object
       properties:

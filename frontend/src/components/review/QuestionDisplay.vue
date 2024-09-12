@@ -29,7 +29,7 @@
         <input type="submit" value="OK" class="btn btn-primary btn-lg btn-block" />
       </form>
     </div>
-    <QuizQuestionChoices
+    <QuestionChoices
       v-if="quizQuestion1.multipleChoicesQuestion.choices"
       :choices="quizQuestion1.multipleChoicesQuestion.choices"
       :correct-choice-index="correctChoiceIndex"
@@ -47,7 +47,7 @@ import { PropType, ref } from "vue"
 import { AnswerDTO, QuizQuestion1 } from "@/generated/backend"
 import TextInput from "../form/TextInput.vue"
 import ShowImage from "../notes/accessory/ShowImage.vue"
-import QuizQuestionChoices from "./QuizQuestionChoices.vue"
+import QuestionChoices from "./QuestionChoices.vue"
 
 defineProps({
   quizQuestion1: {

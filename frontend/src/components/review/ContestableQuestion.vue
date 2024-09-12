@@ -6,7 +6,7 @@
   <div v-for="(q, index) in prevQuizQuestions" :key="index">
     <h3>Previous Question Contested ...</h3>
     <p>{{ q.badQuestionReason }}</p>
-    <QuizQuestion :review-question-instance="q.quizeQuestion" :disabled="true" />
+    <ReviewQuestion :review-question-instance="q.quizeQuestion" :disabled="true" />
   </div>
   <p v-if="currentQuestionLegitMessage">{{ currentQuestionLegitMessage }}</p>
   <ContentLoader v-if="regenerating" />
@@ -17,7 +17,7 @@
       :storage-accessor="storageAccessor"
     />
     <div v-else>
-    <QuizQuestion
+    <ReviewQuestion
       :review-question-instance="currentQuestion"
       @answered="onAnswered($event)"
     />
@@ -42,7 +42,7 @@ import type { StorageAccessor } from "@/store/createNoteStorage"
 import { PropType, ref } from "vue"
 import BasicBreadcrumb from "../commons/BasicBreadcrumb.vue"
 import AnsweredQuestionComponent from "./AnsweredQuestionComponent.vue"
-import QuizQuestion from "./QuizQuestion.vue"
+import ReviewQuestion from "./ReviewQuestion.vue"
 
 const { managedApi } = useLoadingApi()
 const props = defineProps({
