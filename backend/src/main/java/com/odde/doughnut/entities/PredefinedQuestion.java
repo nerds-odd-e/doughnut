@@ -55,7 +55,7 @@ public class PredefinedQuestion extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public boolean checkAnswer(Answer answer) {
-    if (quizQuestion.getCheckSpell() != null && quizQuestion.getCheckSpell()) {
+    if (getCheckSpell() != null && getCheckSpell()) {
       return getNote().matchAnswer(answer.getSpellingAnswer());
     }
     return Objects.equals(answer.getChoiceIndex(), getCorrectAnswerIndex());
