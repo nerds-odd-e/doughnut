@@ -1,27 +1,28 @@
 import { PredefinedQuestion } from "@/generated/backend"
 import Builder from "./Builder"
-import QuizQuestionBuilder from "./QuizQuestionBuilder"
+import generateId from "./generateId"
 
 class PredefinedQuestionBuilder extends Builder<PredefinedQuestion> {
-  quizQuestionBuilder = new QuizQuestionBuilder()
+  predefinedQuestion: PredefinedQuestion = {
+    id: generateId(),
+    multipleChoicesQuestion: {
+      stem: "answer",
+      choices: [],
+    },
+  }
 
   withQuestionStem(stem: string) {
-    this.quizQuestionBuilder.withQuestionStem(stem)
+    this.predefinedQuestion.multipleChoicesQuestion.stem = stem
     return this
   }
 
   withChoices(choices: string[]) {
-    this.quizQuestionBuilder.withChoices(choices)
+    this.predefinedQuestion.multipleChoicesQuestion.choices = [...choices]
     return this
   }
 
   do(): PredefinedQuestion {
-    const quizQuestion = this.quizQuestionBuilder.do()
-    return {
-      id: quizQuestion.id,
-      multipleChoicesQuestion: quizQuestion.multipleChoicesQuestion,
-      quizQuestion,
-    }
+    return this.predefinedQuestion
   }
 }
 

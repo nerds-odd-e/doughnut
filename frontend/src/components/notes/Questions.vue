@@ -26,7 +26,7 @@
       <tbody>
         <tr
           v-for="(question, outerIndex) in questions"
-          :key="question.quizQuestion.multipleChoicesQuestion.stem"
+          :key="question.multipleChoicesQuestion.stem"
         >
           <td>
             <input
@@ -38,14 +38,14 @@
           </td>
           <td>
             <span @click="openedQuestion=question">
-              {{ question.quizQuestion.multipleChoicesQuestion.stem }}
+              {{ question.multipleChoicesQuestion.stem }}
             </span>
           </td>
           <template
-            v-if="question.quizQuestion.multipleChoicesQuestion.choices"
+            v-if="question.multipleChoicesQuestion.choices"
           >
             <td
-              v-for="(choice, index) in question.quizQuestion
+              v-for="(choice, index) in question
                 .multipleChoicesQuestion.choices"
               :class="{
                 'correct-choice': index === question.correctAnswerIndex,

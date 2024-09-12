@@ -42,7 +42,6 @@ public class QuizQuestionsTestData {
       question.setCorrectAnswerIndex(0);
       question.setMultipleChoicesQuestion(mcq);
       question.setApproved(approved);
-      question.getQuizQuestion().setPredefinedQuestion(question);
       return question;
     }
   }

@@ -18,7 +18,7 @@
   <QuizQuestionComponent
     v-if="answeredQuestion.predefinedQuestion"
     v-bind="{
-      quizQuestion: answeredQuestion.predefinedQuestion.quizQuestion,
+      quizQuestion: answeredQuestion.predefinedQuestion,
       correctChoiceIndex: answeredQuestion.correctChoiceIndex,
       answerChoiceIndex: answeredQuestion.choiceIndex,
     }"

@@ -27,7 +27,6 @@ public class QuizQuestionService {
     Notebook parentNotebook = note.getNotebook();
     parentNotebook.setUpdated_at(new Timestamp(System.currentTimeMillis()));
     modelFactoryService.save(parentNotebook);
-    predefinedQuestion.getQuizQuestion().setPredefinedQuestion(predefinedQuestion);
     modelFactoryService.save(predefinedQuestion);
     return predefinedQuestion;
   }

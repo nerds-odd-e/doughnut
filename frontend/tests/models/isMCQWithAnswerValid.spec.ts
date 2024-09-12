@@ -10,13 +10,6 @@ describe("isMCQWithAnswerValid", () => {
         stem: "Valid question",
         choices: ["Valid choice 1", "Valid choice 2"],
       },
-      quizQuestion: {
-        id: 1,
-        multipleChoicesQuestion: {
-          stem: "Valid question",
-          choices: ["Valid choice 1", "Valid choice 2"],
-        },
-      },
     }
 
     expect(isMCQWithAnswerValid(validMCQWithAnswer)).toBe(true)
@@ -30,13 +23,6 @@ describe("isMCQWithAnswerValid", () => {
         stem: "",
         choices: ["", ""],
       },
-      quizQuestion: {
-        id: 1,
-        multipleChoicesQuestion: {
-          stem: "",
-          choices: ["", ""],
-        },
-      },
     }
 
     expect(isMCQWithAnswerValid(invalidMCQWithAnswer)).toBe(false)
@@ -48,13 +34,6 @@ describe("isMCQWithAnswerValid", () => {
       multipleChoicesQuestion: {
         stem: "Valid question",
         choices: ["Valid choice 1", "", "Valid choice 3"],
-      },
-      quizQuestion: {
-        id: 1,
-        multipleChoicesQuestion: {
-          stem: "Valid question",
-          choices: ["Valid choice 1", "", "Valid choice 3"],
-        },
       },
     }
 

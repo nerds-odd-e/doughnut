@@ -2955,14 +2955,11 @@ components:
       required:
       - id
       - multipleChoicesQuestion
-      - quizQuestion
       type: object
       properties:
         id:
           type: integer
           format: int32
-        quizQuestion:
-          $ref: "#/components/schemas/QuizQuestion"
         multipleChoicesQuestion:
           $ref: "#/components/schemas/MultipleChoicesQuestion"
         checkSpell:
@@ -2974,21 +2971,6 @@ components:
           format: int32
         approved:
           type: boolean
-    QuizQuestion:
-      required:
-      - id
-      - multipleChoicesQuestion
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        checkSpell:
-          type: boolean
-        imageWithMask:
-          $ref: "#/components/schemas/ImageWithMask"
-        multipleChoicesQuestion:
-          $ref: "#/components/schemas/MultipleChoicesQuestion"
     NoteTestData:
       type: object
       properties:
@@ -3227,6 +3209,21 @@ components:
           format: date-time
         positiveFeedback:
           type: boolean
+    QuizQuestion:
+      required:
+      - id
+      - multipleChoicesQuestion
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        checkSpell:
+          type: boolean
+        imageWithMask:
+          $ref: "#/components/schemas/ImageWithMask"
+        multipleChoicesQuestion:
+          $ref: "#/components/schemas/MultipleChoicesQuestion"
     QuizQuestionContestResult:
       type: object
       properties:

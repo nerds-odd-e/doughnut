@@ -5,7 +5,7 @@
     </template>
     <template #default="{ closer }">
       <SuggestQuestionForFineTuning
-        :quiz-question="predefinedQuestion.quizQuestion"
+        :predefined-question="predefinedQuestion"
         @close-dialog="closer()"
       />
     </template>

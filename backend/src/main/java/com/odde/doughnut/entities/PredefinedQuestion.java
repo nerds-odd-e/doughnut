@@ -21,10 +21,6 @@ public class PredefinedQuestion extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   private Note note;
 
-  @OneToOne(mappedBy = "predefinedQuestion", cascade = CascadeType.ALL)
-  @NotNull
-  private QuizQuestion quizQuestion = new QuizQuestion();
-
   @Column(name = "raw_json_question")
   @Convert(converter = MCQToJsonConverter.class)
   @NotNull
@@ -67,10 +63,6 @@ public class PredefinedQuestion extends EntityIdentifiedByIdOnly {
     quizQuestionAIPredefinedQuestion.setMultipleChoicesQuestion(
         MCQWithAnswer.getMultipleChoicesQuestion());
     quizQuestionAIPredefinedQuestion.setCorrectAnswerIndex(MCQWithAnswer.getCorrectChoiceIndex());
-    // for in memory consistency
-    quizQuestionAIPredefinedQuestion
-        .getQuizQuestion()
-        .setPredefinedQuestion(quizQuestionAIPredefinedQuestion);
     return quizQuestionAIPredefinedQuestion;
   }
 

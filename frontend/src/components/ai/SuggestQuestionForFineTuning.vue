@@ -39,8 +39,8 @@
 </template>
 <script setup lang="ts">
 import {
+  PredefinedQuestion,
   QuestionSuggestionCreationParams,
-  QuizQuestion,
 } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { ref } from "vue"
@@ -52,16 +52,16 @@ const params = ref<QuestionSuggestionCreationParams>({
 const { managedApi } = useLoadingApi()
 
 const props = defineProps<{
-  quizQuestion: QuizQuestion
+  predefinedQuestion: PredefinedQuestion
 }>()
 
 const emit = defineEmits(["closeDialog"])
 
-const { quizQuestion } = props
+const { predefinedQuestion } = props
 
 async function suggestQuestionForFineTuning() {
   await managedApi.restQuizQuestionController.suggestQuestionForFineTuning(
-    quizQuestion.id,
+    predefinedQuestion.id,
     params.value
   )
   emit("closeDialog")

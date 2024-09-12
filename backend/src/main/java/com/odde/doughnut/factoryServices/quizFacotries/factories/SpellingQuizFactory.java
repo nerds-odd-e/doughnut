@@ -43,8 +43,6 @@ public class SpellingQuizFactory extends QuizQuestionFactory {
     MultipleChoicesQuestion mcq = new MultipleChoicesQuestion();
     mcq.setStem(getStem());
     predefinedQuestionSpelling.setMultipleChoicesQuestion(mcq);
-    // for in memory consistency
-    predefinedQuestionSpelling.getQuizQuestion().setPredefinedQuestion(predefinedQuestionSpelling);
     return predefinedQuestionSpelling;
   }
 }

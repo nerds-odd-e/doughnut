@@ -4,10 +4,8 @@
 /* eslint-disable */
 import type { ImageWithMask } from './ImageWithMask';
 import type { MultipleChoicesQuestion } from './MultipleChoicesQuestion';
-import type { QuizQuestion } from './QuizQuestion';
 export type PredefinedQuestion = {
     id: number;
-    quizQuestion: QuizQuestion;
     multipleChoicesQuestion: MultipleChoicesQuestion;
     checkSpell?: boolean;
     imageWithMask?: ImageWithMask;

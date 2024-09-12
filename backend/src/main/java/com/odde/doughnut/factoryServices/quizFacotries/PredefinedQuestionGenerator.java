@@ -15,9 +15,7 @@ public record PredefinedQuestionGenerator(
 
   private Optional<PredefinedQuestion> buildOne(QuizQuestionFactory quizQuestionFactory) {
     try {
-      PredefinedQuestion predefinedQuestion = quizQuestionFactory.buildValidQuizQuestion();
-      predefinedQuestion.getQuizQuestion().setPredefinedQuestion(predefinedQuestion);
-      return Optional.of(predefinedQuestion);
+      return Optional.of(quizQuestionFactory.buildValidQuizQuestion());
     } catch (QuizQuestionNotPossibleException e) {
       return Optional.empty();
     }
