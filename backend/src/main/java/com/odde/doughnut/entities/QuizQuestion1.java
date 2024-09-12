@@ -1,5 +1,6 @@
 package com.odde.doughnut.entities;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.doughnut.entities.converters.MCQToJsonConverter;
 import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
 import jakarta.persistence.Column;
@@ -11,6 +12,7 @@ import lombok.Data;
 
 @Embeddable
 @Data
+@JsonPropertyOrder({"checkSpell", "imageWithMask", "multipleChoicesQuestion"})
 public class QuizQuestion1 {
   @Column(name = "raw_json_question")
   @Convert(converter = MCQToJsonConverter.class)

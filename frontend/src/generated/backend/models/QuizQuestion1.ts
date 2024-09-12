@@ -5,8 +5,8 @@
 import type { ImageWithMask } from './ImageWithMask';
 import type { MultipleChoicesQuestion } from './MultipleChoicesQuestion';
 export type QuizQuestion1 = {
-    multipleChoicesQuestion: MultipleChoicesQuestion;
     checkSpell?: boolean;
     imageWithMask?: ImageWithMask;
+    multipleChoicesQuestion: MultipleChoicesQuestion;
 };
 

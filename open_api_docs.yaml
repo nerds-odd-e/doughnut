@@ -3003,12 +3003,12 @@ components:
       - multipleChoicesQuestion
       type: object
       properties:
-        multipleChoicesQuestion:
-          $ref: "#/components/schemas/MultipleChoicesQuestion"
         checkSpell:
           type: boolean
         imageWithMask:
           $ref: "#/components/schemas/ImageWithMask"
+        multipleChoicesQuestion:
+          $ref: "#/components/schemas/MultipleChoicesQuestion"
     SubscriptionDTO:
       type: object
       properties:
