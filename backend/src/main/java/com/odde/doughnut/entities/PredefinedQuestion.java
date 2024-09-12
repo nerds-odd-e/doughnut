@@ -1,7 +1,6 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.odde.doughnut.controllers.dto.QuizQuestionInNotebook;
 import com.odde.doughnut.entities.converters.MCQToJsonConverter;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
@@ -73,13 +72,6 @@ public class PredefinedQuestion extends EntityIdentifiedByIdOnly {
         .getQuizQuestion()
         .setPredefinedQuestion(quizQuestionAIPredefinedQuestion);
     return quizQuestionAIPredefinedQuestion;
-  }
-
-  public QuizQuestionInNotebook toQuizQuestionInNotebook() {
-    QuizQuestionInNotebook quizQuestionInNotebook = new QuizQuestionInNotebook();
-    quizQuestionInNotebook.setNotebook(getNote().getNotebook());
-    quizQuestionInNotebook.setQuizQuestion(getQuizQuestion());
-    return quizQuestionInNotebook;
   }
 
   @Override

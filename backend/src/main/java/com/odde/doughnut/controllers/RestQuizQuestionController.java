@@ -53,11 +53,11 @@ class RestQuizQuestionController {
   public QuizQuestionInNotebook generateQuestion(
       @RequestParam(value = "note") @Schema(type = "integer") Note note) {
     currentUser.assertLoggedIn();
-    PredefinedQuestion predefinedQuestion = quizQuestionService.generateQuestionForNote(note);
-    if (predefinedQuestion == null) {
+    QuizQuestion quizQuestion = quizQuestionService.generateQuizQuestionForNote(note);
+    if (quizQuestion == null) {
       return null;
     }
-    return predefinedQuestion.toQuizQuestionInNotebook();
+    return quizQuestion.getQuizQuestionInNotebook();
   }
 
   @PostMapping("/{quizQuestion}/regenerate")
