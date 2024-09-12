@@ -10,11 +10,10 @@ import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
-public record QuizQuestionGenerator(
+public record PredefinedQuestionGenerator(
     User user, Note note, Randomizer randomizer, ModelFactoryService modelFactoryService) {
 
-  private Optional<PredefinedQuestion> getQuizQuestionEntity(
-      QuizQuestionFactory quizQuestionFactory) {
+  private Optional<PredefinedQuestion> buildOne(QuizQuestionFactory quizQuestionFactory) {
     try {
       PredefinedQuestion predefinedQuestion = quizQuestionFactory.buildValidQuizQuestion();
       predefinedQuestion.getQuizQuestion().setPredefinedQuestion(predefinedQuestion);
@@ -27,7 +26,7 @@ public record QuizQuestionGenerator(
   private PredefinedQuestion generateAQuestionOfFirstPossibleType(
       List<QuizQuestionFactory> quizQuestionFactoryStream) {
     return quizQuestionFactoryStream.stream()
-        .map(this::getQuizQuestionEntity)
+        .map(this::buildOne)
         .flatMap(Optional::stream)
         .findFirst()
         .orElse(null);

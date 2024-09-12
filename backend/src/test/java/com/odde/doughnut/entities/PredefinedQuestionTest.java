@@ -9,7 +9,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.controllers.dto.Randomization;
-import com.odde.doughnut.factoryServices.quizFacotries.QuizQuestionGenerator;
+import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionGenerator;
 import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
@@ -174,10 +174,10 @@ class PredefinedQuestionTest {
 
   private PredefinedQuestion generateQuizQuestion(
       Note note, Randomizer randomizer1, AiQuestionGenerator aiQuestionGenerator) {
-    QuizQuestionGenerator quizQuestionGenerator =
-        new QuizQuestionGenerator(
+    PredefinedQuestionGenerator predefinedQuestionGenerator =
+        new PredefinedQuestionGenerator(
             userModel.getEntity(), note, randomizer1, makeMe.modelFactoryService);
-    return quizQuestionGenerator.generateAQuestionOfRandomType(aiQuestionGenerator);
+    return predefinedQuestionGenerator.generateAQuestionOfRandomType(aiQuestionGenerator);
   }
 
   private PredefinedQuestion generateQuizQuestionEntity(Note note) {
