@@ -1,5 +1,6 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.controllers.dto.ReviewQuestionContestResult;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.PredefinedQuestion;
@@ -10,12 +11,12 @@ import com.theokanning.openai.client.OpenAiApi;
 import jakarta.validation.Valid;
 import java.sql.Timestamp;
 
-public class ReviewQuestionService {
+public class PredefinedQuestionService {
   private final ModelFactoryService modelFactoryService;
 
   private final AiQuestionGenerator aiQuestionGenerator;
 
-  public ReviewQuestionService(OpenAiApi openAiApi, ModelFactoryService modelFactoryService) {
+  public PredefinedQuestionService(OpenAiApi openAiApi, ModelFactoryService modelFactoryService) {
     this.modelFactoryService = modelFactoryService;
     this.aiQuestionGenerator =
         new AiQuestionGenerator(openAiApi, new GlobalSettingsService(modelFactoryService));
@@ -61,5 +62,9 @@ public class ReviewQuestionService {
       return null;
     }
     return modelFactoryService.save(question);
+  }
+
+  public ReviewQuestionContestResult contest(PredefinedQuestion predefinedQuestion) {
+    return aiQuestionGenerator.getReviewQuestionContestResult(predefinedQuestion);
   }
 }

@@ -125,6 +125,7 @@ export { RestLinkControllerService } from './services/RestLinkControllerService'
 export { RestNotebookCertificateApprovalControllerService } from './services/RestNotebookCertificateApprovalControllerService';
 export { RestNotebookControllerService } from './services/RestNotebookControllerService';
 export { RestNoteControllerService } from './services/RestNoteControllerService';
+export { RestPredefinedQuestionControllerService } from './services/RestPredefinedQuestionControllerService';
 export { RestReviewPointControllerService } from './services/RestReviewPointControllerService';
 export { RestReviewQuestionControllerService } from './services/RestReviewQuestionControllerService';
 export { RestReviewsControllerService } from './services/RestReviewsControllerService';

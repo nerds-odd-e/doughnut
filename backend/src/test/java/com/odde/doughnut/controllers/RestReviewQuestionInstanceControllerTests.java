@@ -3,18 +3,12 @@ package com.odde.doughnut.controllers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
-import com.odde.doughnut.controllers.dto.QuestionSuggestionCreationParams;
 import com.odde.doughnut.controllers.dto.ReviewQuestionContestResult;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionNotPossibleException;
 import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GlobalSettingsService;
@@ -26,14 +20,12 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import java.sql.Timestamp;
-import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -165,170 +157,6 @@ class RestReviewQuestionInstanceControllerTests {
   }
 
   @Nested
-  class SuggestQuestionForFineTuning {
-    PredefinedQuestion predefinedQuestion;
-    MCQWithAnswer mcqWithAnswer;
-    Note note;
-
-    QuestionSuggestionCreationParams suggestionWithPositiveFeedback =
-        new QuestionSuggestionCreationParams("this is a comment", true);
-
-    QuestionSuggestionCreationParams suggestionWithNegativeFeedback =
-        new QuestionSuggestionCreationParams("this is a comment", false);
-
-    @BeforeEach
-    void setup() throws PredefinedQuestionNotPossibleException {
-      note = makeMe.aNote().creatorAndOwner(currentUser).please();
-      mcqWithAnswer = makeMe.aMCQWithAnswer().please();
-      predefinedQuestion =
-          makeMe.aPredefinedQuestion().ofAIGeneratedQuestion(mcqWithAnswer, note).please();
-    }
-
-    @Test
-    void suggestQuestionWithAPositiveFeedback() {
-
-      SuggestedQuestionForFineTuning suggestedQuestionForFineTuning =
-          controller.suggestQuestionForFineTuning(
-              predefinedQuestion, suggestionWithPositiveFeedback);
-      assert suggestedQuestionForFineTuning != null;
-      assertEquals(
-          predefinedQuestion.getMcqWithAnswer(),
-          suggestedQuestionForFineTuning.getPreservedQuestion());
-      assertEquals("this is a comment", suggestedQuestionForFineTuning.getComment());
-      assertTrue(suggestedQuestionForFineTuning.isPositiveFeedback(), "Incorrect Feedback");
-      assertEquals("0", suggestedQuestionForFineTuning.getRealCorrectAnswers());
-    }
-
-    @Test
-    void suggestQuestionWithANegativeFeedback() {
-      SuggestedQuestionForFineTuning suggestedQuestionForFineTuning =
-          controller.suggestQuestionForFineTuning(
-              predefinedQuestion, suggestionWithNegativeFeedback);
-      assert suggestedQuestionForFineTuning != null;
-      assertEquals(
-          predefinedQuestion.getMcqWithAnswer(),
-          suggestedQuestionForFineTuning.getPreservedQuestion());
-      assertEquals("this is a comment", suggestedQuestionForFineTuning.getComment());
-      assertFalse(suggestedQuestionForFineTuning.isPositiveFeedback(), "Incorrect Feedback");
-      assertEquals("", suggestedQuestionForFineTuning.getRealCorrectAnswers());
-    }
-
-    @Test
-    void suggestQuestionWithSnapshotQuestionStem() {
-      var suggestedQuestionForFineTuning =
-          controller.suggestQuestionForFineTuning(
-              predefinedQuestion, suggestionWithPositiveFeedback);
-      assert suggestedQuestionForFineTuning != null;
-      assertThat(
-          suggestedQuestionForFineTuning
-              .getPreservedQuestion()
-              .getMultipleChoicesQuestion()
-              .getStem(),
-          equalTo(mcqWithAnswer.getMultipleChoicesQuestion().getStem()));
-    }
-
-    @Test
-    void createMarkedQuestionInDatabase() {
-      long oldCount = modelFactoryService.questionSuggestionForFineTuningRepository.count();
-      controller.suggestQuestionForFineTuning(predefinedQuestion, suggestionWithPositiveFeedback);
-      assertThat(
-          modelFactoryService.questionSuggestionForFineTuningRepository.count(),
-          equalTo(oldCount + 1));
-    }
-  }
-
-  @Nested
-  class GenerateQuestion {
-    MCQWithAnswer jsonQuestion;
-    Note note;
-
-    @BeforeEach
-    void setUp() {
-      note = makeMe.aNote().please();
-      jsonQuestion =
-          makeMe
-              .aMCQWithAnswer()
-              .stem("What is the first color in the rainbow?")
-              .choices("red", "black", "green")
-              .correctChoiceIndex(0)
-              .please();
-    }
-
-    @Test
-    void askWithNoteThatCannotAccess() {
-      assertThrows(
-          ResponseStatusException.class,
-          () -> {
-            RestReviewQuestionController restAiController =
-                new RestReviewQuestionController(
-                    openAiApi,
-                    makeMe.modelFactoryService,
-                    makeMe.aNullUserModelPlease(),
-                    testabilitySettings);
-            restAiController.generateQuestion(note);
-          });
-    }
-
-    @Test
-    void createQuizQuestion() {
-      openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(jsonQuestion, "");
-      ReviewQuestionInstance reviewQuestionInstance = controller.generateQuestion(note);
-
-      Assertions.assertThat(
-              reviewQuestionInstance.getBareQuestion().getMultipleChoicesQuestion().getStem())
-          .contains("What is the first color in the rainbow?");
-    }
-
-    @Test
-    void createQuizQuestionFailedWithGpt35WillNotTryAgain() throws JsonProcessingException {
-      openAIChatCompletionMock.mockChatCompletionAndReturnToolCallJsonNode(
-          new ObjectMapper().readTree("{\"stem\": \"\"}"), "");
-      assertThat(controller.generateQuestion(note), nullValue());
-      verify(openAiApi, Mockito.times(1)).createChatCompletion(any());
-    }
-
-    @Test
-    void mustUseTheRightModel() {
-      openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(jsonQuestion, "");
-      GlobalSettingsService globalSettingsService = new GlobalSettingsService(modelFactoryService);
-      globalSettingsService
-          .globalSettingQuestionGeneration()
-          .setKeyValue(makeMe.aTimestamp().please(), "gpt-new");
-      controller.generateQuestion(note);
-      ArgumentCaptor<ChatCompletionRequest> captor =
-          ArgumentCaptor.forClass(ChatCompletionRequest.class);
-      verify(openAiApi).createChatCompletion(captor.capture());
-      assertThat(captor.getValue().getModel(), equalTo("gpt-new"));
-    }
-
-    @Test
-    void generateQuestionForAssessmentOfNoteThatCannotAccess() {
-      assertThrows(
-          ResponseStatusException.class,
-          () -> {
-            RestReviewQuestionController restAiController =
-                new RestReviewQuestionController(
-                    openAiApi,
-                    makeMe.modelFactoryService,
-                    makeMe.aNullUserModelPlease(),
-                    testabilitySettings);
-            restAiController.generateAIQuestionWithoutSave(note);
-          });
-    }
-
-    @Test
-    void generateQuestionForAssessmentOfNote() {
-      openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(jsonQuestion, "");
-      PredefinedQuestion quizQuestionDTO = controller.generateAIQuestionWithoutSave(note);
-
-      Assertions.assertThat(
-              quizQuestionDTO.getBareQuestion().getMultipleChoicesQuestion().getStem())
-          .contains("What is the first color in the rainbow?");
-      Assertions.assertThat(quizQuestionDTO.getCorrectAnswerIndex()).isEqualTo(0);
-    }
-  }
-
-  @Nested
   class RegenerateQuestion {
     ReviewQuestionInstance reviewQuestionInstance;
     Note note;
@@ -433,152 +261,6 @@ class RestReviewQuestionInstanceControllerTests {
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(questionEvaluation, "");
       ReviewQuestionContestResult contest = controller.contest(reviewQuestionInstance);
       assertFalse(contest.rejected);
-    }
-  }
-
-  @Nested
-  class GetListOfPredefinedQuestionForNotebook {
-    Note noteWithoutQuestions;
-    Note noteWithQuestions;
-
-    @BeforeEach
-    void setUp() {
-      Note headNote = makeMe.aHeadNote("My reading list").creatorAndOwner(currentUser).please();
-      makeMe.theNote(headNote).withNChildren(10).please();
-      noteWithoutQuestions =
-          makeMe.aNote("Zen and the Art of Motorcycle Maintenance").under(headNote).please();
-      Note lila = makeMe.aNote("Lila").creatorAndOwner(currentUser).please();
-      noteWithQuestions = makeMe.theNote(lila).hasAnApprovedQuestion().please();
-    }
-
-    @Test
-    void authorization() {
-      Note note = makeMe.aNote().please();
-      assertThrows(
-          UnexpectedNoAccessRightException.class, () -> controller.getAllQuestionByNote(note));
-    }
-
-    @Test
-    void getQuestionsOfANoteWhenThereIsNotQuestion() throws UnexpectedNoAccessRightException {
-      List<PredefinedQuestion> results = controller.getAllQuestionByNote(noteWithoutQuestions);
-      assertThat(results, hasSize(0));
-    }
-
-    @Test
-    void getQuestionsOfANoteWhenThereIsOneQuestion() throws UnexpectedNoAccessRightException {
-      PredefinedQuestion questionOfNote =
-          makeMe.aPredefinedQuestion().approvedSpellingQuestionOf(noteWithoutQuestions).please();
-      List<PredefinedQuestion> results = controller.getAllQuestionByNote(noteWithoutQuestions);
-      assertThat(results, contains(questionOfNote));
-    }
-
-    @Test
-    void getAllQuestionsOfANoteWhenThereIsMoreThanOneQuestion()
-        throws UnexpectedNoAccessRightException {
-      makeMe.aPredefinedQuestion().approvedSpellingQuestionOf(noteWithQuestions).please();
-      List<PredefinedQuestion> results = controller.getAllQuestionByNote(noteWithQuestions);
-      assertThat(results, hasSize(2));
-    }
-  }
-
-  @Nested
-  class addQuestionToNote {
-    @Test
-    void authorization() {
-      Note note = makeMe.aNote().please();
-      PredefinedQuestion mcqWithAnswer = makeMe.aPredefinedQuestion().please();
-      assertThrows(
-          UnexpectedNoAccessRightException.class,
-          () -> controller.addQuestionManually(note, mcqWithAnswer));
-    }
-
-    @Test
-    void persistent() throws UnexpectedNoAccessRightException {
-      Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
-      PredefinedQuestion mcqWithAnswer = makeMe.aPredefinedQuestion().please();
-      controller.addQuestionManually(note, mcqWithAnswer);
-      makeMe.refresh(note);
-      assertThat(note.getPredefinedQuestions(), hasSize(1));
-    }
-  }
-
-  @Nested
-  class RefineQuestion {
-    @Test
-    void authorization() {
-      Note note = makeMe.aNote().please();
-      PredefinedQuestion mcqWithAnswer = makeMe.aPredefinedQuestion().please();
-      assertThrows(
-          UnexpectedNoAccessRightException.class,
-          () -> controller.addQuestionManually(note, mcqWithAnswer));
-    }
-
-    @Test
-    void givenQuestion_thenReturnRefineQuestion() throws UnexpectedNoAccessRightException {
-      Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
-      PredefinedQuestion predefinedQuestion = makeMe.aPredefinedQuestion().please();
-      MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
-      openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(mcqWithAnswer, "");
-      PredefinedQuestion result = controller.refineQuestion(note, predefinedQuestion);
-
-      assertEquals(0, result.getCorrectAnswerIndex());
-      assertEquals(
-          "a default question stem",
-          result.getBareQuestion().getMultipleChoicesQuestion().getStem());
-      assertEquals(
-          List.of("choice1", "choice2", "choice3"),
-          result.getBareQuestion().getMultipleChoicesQuestion().getChoices());
-    }
-
-    @Test
-    void refineQuestionFailedWithGpt35WillNotTryAgain() throws JsonProcessingException {
-      PredefinedQuestion mcqWithAnswer = makeMe.aPredefinedQuestion().please();
-      Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
-      openAIChatCompletionMock.mockChatCompletionAndReturnToolCallJsonNode(
-          new ObjectMapper()
-              .readTree(
-                  "{\"multipleChoicesQuestion\":{\"stem\":null,\"choices\":null},\"correctChoiceIndex\":0,\"approve\":false}"),
-          "");
-      assertThrows(RuntimeException.class, () -> controller.refineQuestion(note, mcqWithAnswer));
-      verify(openAiApi, Mockito.times(1)).createChatCompletion(any());
-    }
-  }
-
-  @Nested
-  class ApproveQuestion {
-    Note subjectNote;
-
-    @BeforeEach
-    void setUp() {
-      subjectNote = makeMe.aNote().creatorAndOwner(currentUser).please();
-    }
-
-    @Test
-    void mustNotBeAbleToApproveOtherPeoplesNoteQuestion() {
-      Note note = makeMe.aNote().creatorAndOwner(makeMe.aUser().please()).please();
-      PredefinedQuestion predefinedQuestion =
-          makeMe.aPredefinedQuestion().approvedSpellingQuestionOf(note).please();
-      assertThrows(
-          UnexpectedNoAccessRightException.class,
-          () -> controller.toggleApproval(predefinedQuestion));
-    }
-
-    @Test
-    void approveQuestion() throws UnexpectedNoAccessRightException {
-      PredefinedQuestion predefinedQuestion =
-          makeMe.aPredefinedQuestion().approvedSpellingQuestionOf(subjectNote).please();
-      predefinedQuestion.setApproved(false);
-      PredefinedQuestion approvedQuestion = controller.toggleApproval(predefinedQuestion);
-      assertTrue(approvedQuestion.isApproved());
-    }
-
-    @Test
-    void unApproveQuestion() throws UnexpectedNoAccessRightException {
-      PredefinedQuestion predefinedQuestion =
-          makeMe.aPredefinedQuestion().approvedSpellingQuestionOf(subjectNote).please();
-      predefinedQuestion.setApproved(true);
-      PredefinedQuestion approvedQuestion = controller.toggleApproval(predefinedQuestion);
-      assertFalse(approvedQuestion.isApproved());
     }
   }
 }

@@ -582,7 +582,7 @@ paths:
   /api/review-questions/{reviewQuestionInstance}/toggle-approval:
     post:
       tags:
-      - rest-review-question-controller
+      - rest-predefined-question-controller
       operationId: toggleApproval
       parameters:
       - name: reviewQuestionInstance
@@ -684,7 +684,7 @@ paths:
   /api/review-questions/{predefinedQuestion}/suggest-fine-tuning:
     post:
       tags:
-      - rest-review-question-controller
+      - rest-predefined-question-controller
       operationId: suggestQuestionForFineTuning
       parameters:
       - name: predefinedQuestion
@@ -714,7 +714,7 @@ paths:
   /api/review-questions/{note}/refine-question:
     post:
       tags:
-      - rest-review-question-controller
+      - rest-predefined-question-controller
       operationId: refineQuestion
       parameters:
       - name: note
@@ -744,7 +744,7 @@ paths:
   /api/review-questions/{note}/note-questions:
     get:
       tags:
-      - rest-review-question-controller
+      - rest-predefined-question-controller
       operationId: getAllQuestionByNote
       parameters:
       - name: note
@@ -769,7 +769,7 @@ paths:
                   $ref: "#/components/schemas/PredefinedQuestion"
     post:
       tags:
-      - rest-review-question-controller
+      - rest-predefined-question-controller
       operationId: addQuestionManually
       parameters:
       - name: note
@@ -823,7 +823,7 @@ paths:
   /api/review-questions/generate-question-without-save:
     post:
       tags:
-      - rest-review-question-controller
+      - rest-predefined-question-controller
       operationId: generateAIQuestionWithoutSave
       parameters:
       - name: note

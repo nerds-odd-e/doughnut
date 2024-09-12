@@ -21,6 +21,7 @@ import { RestLinkControllerService } from './services/RestLinkControllerService'
 import { RestNotebookCertificateApprovalControllerService } from './services/RestNotebookCertificateApprovalControllerService';
 import { RestNotebookControllerService } from './services/RestNotebookControllerService';
 import { RestNoteControllerService } from './services/RestNoteControllerService';
+import { RestPredefinedQuestionControllerService } from './services/RestPredefinedQuestionControllerService';
 import { RestReviewPointControllerService } from './services/RestReviewPointControllerService';
 import { RestReviewQuestionControllerService } from './services/RestReviewQuestionControllerService';
 import { RestReviewsControllerService } from './services/RestReviewsControllerService';
@@ -47,6 +48,7 @@ export class DoughnutApi {
     public readonly restNotebookCertificateApprovalController: RestNotebookCertificateApprovalControllerService;
     public readonly restNotebookController: RestNotebookControllerService;
     public readonly restNoteController: RestNoteControllerService;
+    public readonly restPredefinedQuestionController: RestPredefinedQuestionControllerService;
     public readonly restReviewPointController: RestReviewPointControllerService;
     public readonly restReviewQuestionController: RestReviewQuestionControllerService;
     public readonly restReviewsController: RestReviewsControllerService;
@@ -84,6 +86,7 @@ export class DoughnutApi {
         this.restNotebookCertificateApprovalController = new RestNotebookCertificateApprovalControllerService(this.request);
         this.restNotebookController = new RestNotebookControllerService(this.request);
         this.restNoteController = new RestNoteControllerService(this.request);
+        this.restPredefinedQuestionController = new RestPredefinedQuestionControllerService(this.request);
         this.restReviewPointController = new RestReviewPointControllerService(this.request);
         this.restReviewQuestionController = new RestReviewQuestionControllerService(this.request);
         this.restReviewsController = new RestReviewsControllerService(this.request);
