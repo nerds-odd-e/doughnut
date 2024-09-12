@@ -85,15 +85,10 @@ export default defineComponent({
     minimized() {
       this.selectPosition()
     },
-    QuizQuestions() {
-      this.reviewQuestionCache = []
-      this.eagerFetchUntil = 0
-      this.fetchQuestion()
-    },
     currentIndex() {
       this.fetchQuestion()
     },
-    currentQuizQuestion() {
+    currentReviewQuestion() {
       this.selectPosition()
     },
   },
