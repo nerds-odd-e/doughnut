@@ -42,7 +42,9 @@ describe("assessment page", () => {
         .component(AssessmentPage)
         .withProps({ notebookId: notebook.id })
         .render()
-      await screen.findByText(quizQuestion.multipleChoicesQuestion.stem!)
+      await screen.findByText(
+        quizQuestion.quizQuestion1.multipleChoicesQuestion.stem!
+      )
     })
 
     it("does not display score immediately after rendering", async () => {

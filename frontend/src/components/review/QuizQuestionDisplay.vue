@@ -1,21 +1,21 @@
 <template>
   <div class="quiz-instruction" data-test="question-section">
     <ShowImage
-      v-if="quizQuestion.imageWithMask"
-      v-bind="quizQuestion.imageWithMask"
+      v-if="quizQuestion1.imageWithMask"
+      v-bind="quizQuestion1.imageWithMask"
       :opacity="1"
     />
     <div
       style="white-space: pre-wrap"
       data-test="stem"
-      v-if="quizQuestion.multipleChoicesQuestion.stem"
-      v-html="quizQuestion.multipleChoicesQuestion.stem"
+      v-if="quizQuestion1.multipleChoicesQuestion.stem"
+      v-html="quizQuestion1.multipleChoicesQuestion.stem"
     ></div>
 
     <div
       v-if="
-        !quizQuestion.multipleChoicesQuestion.choices ||
-        quizQuestion.multipleChoicesQuestion.choices.length === 0
+        !quizQuestion1.multipleChoicesQuestion.choices ||
+        quizQuestion1.multipleChoicesQuestion.choices.length === 0
       "
     >
       <form @submit.prevent.once="submitAnswer({ spellingAnswer: answer })">
@@ -30,8 +30,8 @@
       </form>
     </div>
     <QuizQuestionChoices
-      v-if="quizQuestion.multipleChoicesQuestion.choices"
-      :choices="quizQuestion.multipleChoicesQuestion.choices"
+      v-if="quizQuestion1.multipleChoicesQuestion.choices"
+      :choices="quizQuestion1.multipleChoicesQuestion.choices"
       :correct-choice-index="correctChoiceIndex"
       :answered-current-question="answeredCurrentQuestion"
       :answer-choice-index="answerChoiceIndex"
@@ -50,7 +50,7 @@ import ShowImage from "../notes/accessory/ShowImage.vue"
 import QuizQuestionChoices from "./QuizQuestionChoices.vue"
 
 defineProps({
-  quizQuestion: {
+  quizQuestion1: {
     type: Object as PropType<QuizQuestion1>,
     required: true,
   },

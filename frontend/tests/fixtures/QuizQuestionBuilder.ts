@@ -21,7 +21,7 @@ class QuizQuestionBuilder extends Builder<QuizQuestion> {
     const predefinedQuizQuestion = this.predefinedQuestionBuilder.do()
     return {
       id: generateId(),
-      ...predefinedQuizQuestion.quizQuestion1,
+      quizQuestion1: predefinedQuizQuestion.quizQuestion1,
       notebook: new NotebookBuilder().do(),
     }
   }

@@ -2,7 +2,6 @@ package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -20,20 +19,12 @@ public class QuizQuestion extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   private PredefinedQuestion predefinedQuestion;
 
-  public Boolean getCheckSpell() {
-    return predefinedQuestion.getQuizQuestion1().getCheckSpell();
-  }
-
-  public ImageWithMask getImageWithMask() {
-    return predefinedQuestion.getQuizQuestion1().getImageWithMask();
-  }
-
   @NotNull
-  public MultipleChoicesQuestion getMultipleChoicesQuestion() {
-    return predefinedQuestion.getQuizQuestion1().getMultipleChoicesQuestion();
+  public QuizQuestion1 getQuizQuestion1() {
+    return predefinedQuestion.getQuizQuestion1();
   }
 
   public Notebook getNotebook() {
-    return getPredefinedQuestion().getNote().getNotebook();
+    return predefinedQuestion.getNote().getNotebook();
   }
 }

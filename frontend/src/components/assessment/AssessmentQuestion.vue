@@ -1,7 +1,7 @@
 <template>
   <QuizQuestionDisplay
     v-bind="{
-      quizQuestion,
+      quizQuestion1: quizQuestion.quizQuestion1,
       answeredCurrentQuestion,
     }"
     @answer="submitAnswer($event)"

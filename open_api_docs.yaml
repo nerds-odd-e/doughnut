@@ -3219,20 +3219,16 @@ components:
     QuizQuestion:
       required:
       - id
-      - multipleChoicesQuestion
+      - quizQuestion1
       type: object
       properties:
         id:
           type: integer
           format: int32
-        checkSpell:
-          type: boolean
-        imageWithMask:
-          $ref: "#/components/schemas/ImageWithMask"
-        multipleChoicesQuestion:
-          $ref: "#/components/schemas/MultipleChoicesQuestion"
         notebook:
           $ref: "#/components/schemas/Notebook"
+        quizQuestion1:
+          $ref: "#/components/schemas/QuizQuestion1"
     QuizQuestionContestResult:
       type: object
       properties:

@@ -2,14 +2,11 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { ImageWithMask } from './ImageWithMask';
-import type { MultipleChoicesQuestion } from './MultipleChoicesQuestion';
 import type { Notebook } from './Notebook';
+import type { QuizQuestion1 } from './QuizQuestion1';
 export type QuizQuestion = {
     id: number;
-    checkSpell?: boolean;
-    imageWithMask?: ImageWithMask;
-    multipleChoicesQuestion: MultipleChoicesQuestion;
     notebook?: Notebook;
+    quizQuestion1: QuizQuestion1;
 };
 

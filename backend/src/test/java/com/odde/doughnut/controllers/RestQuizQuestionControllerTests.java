@@ -270,7 +270,7 @@ class RestQuizQuestionControllerTests {
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(jsonQuestion, "");
       QuizQuestion quizQuestion = controller.generateQuestion(note);
 
-      Assertions.assertThat(quizQuestion.getMultipleChoicesQuestion().getStem())
+      Assertions.assertThat(quizQuestion.getQuizQuestion1().getMultipleChoicesQuestion().getStem())
           .contains("What is the first color in the rainbow?");
     }
 
@@ -358,7 +358,7 @@ class RestQuizQuestionControllerTests {
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(jsonQuestion, "");
       QuizQuestion quizQuestion = controller.regenerate(this.quizQuestion);
 
-      Assertions.assertThat(quizQuestion.getMultipleChoicesQuestion().getStem())
+      Assertions.assertThat(quizQuestion.getQuizQuestion1().getMultipleChoicesQuestion().getStem())
           .contains("What is the first color in the rainbow?");
     }
   }

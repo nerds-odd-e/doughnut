@@ -47,7 +47,7 @@ class AIGeneratedQuizFactoryTest {
   void shouldIncludeQuestionStem() {
     QuizQuestion quizQuestion = buildQuestion();
     assertThat(
-        quizQuestion.getMultipleChoicesQuestion().getStem(),
+        quizQuestion.getQuizQuestion1().getMultipleChoicesQuestion().getStem(),
         containsString("How long did it take to build Rome?"));
   }
 
