@@ -2,9 +2,7 @@
   <QuizQuestionDisplay
     v-bind="{
       quizQuestion,
-      correctChoiceIndex,
-      answerChoiceIndex,
-      disabled,
+      answeredCurrentQuestion,
     }"
     @answer="submitAnswer($event)"
     :key="quizQuestion.id"
@@ -26,9 +24,7 @@ const props = defineProps({
     type: Object as PropType<QuizQuestion>,
     required: true,
   },
-  correctChoiceIndex: Number,
-  answerChoiceIndex: Number,
-  disabled: Boolean,
+  answeredCurrentQuestion: Boolean,
 })
 
 const emits = defineEmits(["answered"])
