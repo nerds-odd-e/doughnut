@@ -10,7 +10,6 @@ import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.NoteBuilder;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -45,8 +44,9 @@ public class AssessmentServiceTests {
     Set<Integer> performAssessments(int numberOfAttempts) {
       Set<Integer> questionIds = new HashSet<>();
       for (int i = 0; i < numberOfAttempts; i++) {
-        List<ReviewQuestionInstance> assessment = service.generateAssessment(notebook);
-        Integer questionId = assessment.get(0).getId();
+        AssessmentAttempt assessment = service.generateAssessment(notebook);
+        Integer questionId =
+            assessment.getAssessmentQuestionInstances().get(0).getReviewQuestionInstance().getId();
         questionIds.add(questionId);
       }
       return questionIds;
@@ -95,8 +95,8 @@ public class AssessmentServiceTests {
     @Test
     void shouldReturn5QuestionsWhenThereAreMoreThan5NotesWithQuestions() {
       makeMe.theNote(topNote).withNChildrenThat(5, NoteBuilder::hasAnApprovedQuestion).please();
-      List<ReviewQuestionInstance> assessment = service.generateAssessment(notebook);
-      assertEquals(5, assessment.size());
+      AssessmentAttempt assessment = service.generateAssessment(notebook);
+      assertEquals(5, assessment.getAssessmentQuestionInstances().size());
     }
 
     @Test

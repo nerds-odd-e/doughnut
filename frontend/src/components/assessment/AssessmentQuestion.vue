@@ -1,17 +1,17 @@
 <template>
   <QuestionDisplay
     v-bind="{
-      bareQuestion: reviewQuestionInstance.bareQuestion,
+      bareQuestion: assessmentQuestionInstance.bareQuestion,
       answeredCurrentQuestion,
     }"
     @answer="submitAnswer($event)"
-    :key="reviewQuestionInstance.id"
+    :key="assessmentQuestionInstance.reviewQuestionInstance.id"
    />
 </template>
 
 <script setup lang="ts">
 import { PropType } from "vue"
-import { AnswerDTO, ReviewQuestionInstance } from "@/generated/backend"
+import { AnswerDTO, AssessmentQuestionInstance } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import usePopups from "../commons/Popups/usePopups"
 import QuestionDisplay from "../review/QuestionDisplay.vue"
@@ -20,8 +20,8 @@ const { managedApi } = useLoadingApi()
 const { popups } = usePopups()
 
 const props = defineProps({
-  reviewQuestionInstance: {
-    type: Object as PropType<ReviewQuestionInstance>,
+  assessmentQuestionInstance: {
+    type: Object as PropType<AssessmentQuestionInstance>,
     required: true,
   },
   answeredCurrentQuestion: Boolean,
@@ -33,7 +33,7 @@ const submitAnswer = async (answerData: AnswerDTO) => {
   try {
     const answerResult =
       await managedApi.restReviewQuestionController.answerQuiz(
-        props.reviewQuestionInstance.id,
+        props.assessmentQuestionInstance.reviewQuestionInstance.id,
         answerData
       )
 

@@ -36,7 +36,7 @@ public class AssessmentAttempt extends EntityIdentifiedByIdOnly {
   @Column(name = "answers_correct")
   private int answersCorrect;
 
-  @Transient private List<ReviewQuestionInstance> reviewQuestionInstances;
+  @Transient private List<AssessmentQuestionInstance> assessmentQuestionInstances;
 
   @NotNull
   public Integer getNotebookId() {

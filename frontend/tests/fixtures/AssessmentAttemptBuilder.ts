@@ -17,7 +17,11 @@ class AssessmentAttemptBuilder extends Builder<AssessmentAttempt> {
   }
 
   withQuestions(questions: ReviewQuestionInstance[]) {
-    this.data.reviewQuestionInstances = questions
+    this.data.assessmentQuestionInstances = questions.map((question) => ({
+      id: question.id,
+      bareQuestion: question.bareQuestion,
+      reviewQuestionInstance: question,
+    }))
     return this
   }
   passed(): AssessmentAttemptBuilder {

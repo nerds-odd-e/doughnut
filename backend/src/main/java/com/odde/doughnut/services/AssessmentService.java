@@ -24,7 +24,7 @@ public class AssessmentService {
     this.testabilitySettings = testabilitySettings;
   }
 
-  public List<ReviewQuestionInstance> generateAssessment(Notebook notebook) {
+  public AssessmentAttempt generateAssessment(Notebook notebook) {
     Randomizer randomizer = this.testabilitySettings.getRandomizer();
     List<Note> notes = randomizer.shuffle(notebook.getNotes());
 
@@ -53,10 +53,23 @@ public class AssessmentService {
           "Not enough questions", ASSESSMENT_SERVICE_ERROR, "Not enough questions");
     }
 
-    return questions.stream()
-        .limit(numberOfQuestion)
-        .map(modelFactoryService::createReviewQuestion)
-        .toList();
+    List<AssessmentQuestionInstance> reviewQuestionInstances =
+        questions.stream()
+            .limit(numberOfQuestion)
+            .map(this::createAssessmentQuestionInstance)
+            .toList();
+    AssessmentAttempt assessmentAttempt = new AssessmentAttempt();
+    assessmentAttempt.setNotebook(notebook);
+    assessmentAttempt.setAssessmentQuestionInstances(reviewQuestionInstances);
+    return assessmentAttempt;
+  }
+
+  private AssessmentQuestionInstance createAssessmentQuestionInstance(
+      PredefinedQuestion predefinedQuestion) {
+    AssessmentQuestionInstance assessmentQuestionInstance = new AssessmentQuestionInstance();
+    assessmentQuestionInstance.setReviewQuestionInstance(
+        modelFactoryService.createReviewQuestion(predefinedQuestion));
+    return assessmentQuestionInstance;
   }
 
   public AssessmentResult submitAssessmentResult(

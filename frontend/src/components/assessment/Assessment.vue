@@ -3,13 +3,13 @@
     <h5>Passing criteria: {{ passCriteriaPercentage }}%</h5>
     <div>
       <AssessmentQuestion
-        v-if="currentQuestion < reviewQuestionInstances.length"
+        v-if="currentQuestion < assessmentQuestionInstance.length"
         :answered-current-question="answeredCurrentQuestion"
-        :review-question-instance="reviewQuestionInstances[currentQuestion]!"
+        :assessment-question-instance="assessmentQuestionInstance[currentQuestion]!"
         @answered="questionAnswered"
       />
       <div v-else-if="assessmentResult">
-        <p>Your score: {{ correctAnswers }} / {{ reviewQuestionInstances.length }}</p>
+        <p>Your score: {{ correctAnswers }} / {{ assessmentQuestionInstance.length }}</p>
         <div class="alert alert-success" v-if="assessmentResult?.attempt?.isPass">
           You have passed the assessment.
         </div>
@@ -42,7 +42,7 @@
             closer();
             handleFormSubmission();
           "
-          :question="reviewQuestionInstances[currentQuestion]"
+          :question="assessmentQuestionInstance[currentQuestion]"
         />
       </template>
     </PopButton>
@@ -78,8 +78,8 @@ const assessmentResult = ref<AssessmentResult | undefined>(undefined)
 const questionsAnswerCollection = ref<AnswerSubmission[]>([])
 const certificate = ref<Certificate>()
 const formSubmitted = ref(false)
-const reviewQuestionInstances = computed(
-  () => props.assessmentAttempt.reviewQuestionInstances!
+const assessmentQuestionInstance = computed(
+  () => props.assessmentAttempt.assessmentQuestionInstances!
 )
 
 const passCriteriaPercentage = 80
@@ -91,7 +91,9 @@ const advance = () => {
 }
 const questionAnswered = (answerResult) => {
   questionsAnswerCollection.value.push({
-    questionId: reviewQuestionInstances.value[currentQuestion.value]!.id,
+    questionId:
+      assessmentQuestionInstance.value[currentQuestion.value]!
+        .reviewQuestionInstance.id,
     answerId: answerResult.answerId,
     correctAnswers: answerResult.correct,
   })
@@ -107,8 +109,8 @@ const questionAnswered = (answerResult) => {
 
 const checkIfQuizComplete = async () => {
   if (
-    currentQuestion.value >= reviewQuestionInstances.value.length &&
-    reviewQuestionInstances.value.length > 0
+    currentQuestion.value >= assessmentQuestionInstance.value.length &&
+    assessmentQuestionInstance.value.length > 0
   ) {
     assessmentResult.value =
       await managedApi.restAssessmentController.submitAssessmentResult(

@@ -22,7 +22,7 @@ public class AssessmentQuestionInstance extends EntityIdentifiedByIdOnly {
   @OneToOne
   @JoinColumn(name = "review_question_instance_id")
   @NotNull
-  @JsonIgnore
+  //  @JsonIgnore
   private ReviewQuestionInstance reviewQuestionInstance;
 
   @NotNull

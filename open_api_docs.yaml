@@ -3491,13 +3491,27 @@ components:
         answersCorrect:
           type: integer
           format: int32
-        reviewQuestionInstances:
+        assessmentQuestionInstances:
           type: array
           items:
-            $ref: "#/components/schemas/ReviewQuestionInstance"
+            $ref: "#/components/schemas/AssessmentQuestionInstance"
         notebookId:
           type: integer
           format: int32
+    AssessmentQuestionInstance:
+      required:
+      - bareQuestion
+      - id
+      - reviewQuestionInstance
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        bareQuestion:
+          $ref: "#/components/schemas/BareQuestion"
+        reviewQuestionInstance:
+          $ref: "#/components/schemas/ReviewQuestionInstance"
     AssessmentResult:
       type: object
       properties:
