@@ -57,7 +57,7 @@
     "vite": "5.4.4",
     "vite-plugin-checker": "0.8.0",
     "vite-plugin-compression": "^0.5.1",
-    "vite-plugin-vue-devtools": "^7.4.4",
+    "vite-plugin-vue-devtools": "^7.4.5",
     "vite-tsconfig-paths": "^5.0.1",
     "vitest": "2.0.5",
     "vitest-dom": "^0.1.1",

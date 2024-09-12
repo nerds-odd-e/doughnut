@@ -77,8 +77,8 @@ importers:
         specifier: 5.6.2
         version: 5.6.2
       wait-on:
-        specifier: ^8.0.0
-        version: 8.0.0
+        specifier: ^8.0.1
+        version: 8.0.1
 
   frontend:
     dependencies:
@@ -192,8 +192,8 @@ importers:
         specifier: ^0.5.1
         version: 0.5.1(vite@5.4.4(@types/node@22.5.4)(sass-embedded@1.77.5)(sass@1.77.6)(terser@5.31.3))
       vite-plugin-vue-devtools:
-        specifier: ^7.4.4
-        version: 7.4.4(rollup@4.21.0)(vite@5.4.4(@types/node@22.5.4)(sass-embedded@1.77.5)(sass@1.77.6)(terser@5.31.3))(vue@3.4.38(typescript@5.6.2))
+        specifier: ^7.4.5
+        version: 7.4.5(rollup@4.21.0)(vite@5.4.4(@types/node@22.5.4)(sass-embedded@1.77.5)(sass@1.77.6)(terser@5.31.3))(vue@3.4.38(typescript@5.6.2))
       vite-tsconfig-paths:
         specifier: ^5.0.1
         version: 5.0.1(typescript@5.6.2)(vite@5.4.4(@types/node@22.5.4)(sass-embedded@1.77.5)(sass@1.77.6)(terser@5.31.3))
@@ -1156,16 +1156,16 @@ packages:
   '@vue/devtools-api@6.6.4':
     resolution: {integrity: sha512-sGhTPMuXqZ1rVOk32RylztWkfXTRhuS7vgAKv0zjqk8gbsHkJ7xfFf+jbySxt7tWObEJwyKaHMikV/WGDiQm8g==}
 
-  '@vue/devtools-core@7.4.4':
-    resolution: {integrity: sha512-DLxgA3DfeADkRzhAfm3G2Rw/cWxub64SdP5b+s5dwL30+whOGj+QNhmyFpwZ8ZTrHDFRIPj0RqNzJ8IRR1pz7w==}
+  '@vue/devtools-core@7.4.5':
+    resolution: {integrity: sha512-QwrgKYxwafJUJrKRvJGbzQLuGt0BC1P4qTr4qlEKgOOs+GV0n6zTry2oeHiwmj5H6pOkLoHnwFMOTB9rFtn9QQ==}
     peerDependencies:
       vue: ^3.0.0
 
-  '@vue/devtools-kit@7.4.4':
-    resolution: {integrity: sha512-awK/4NfsUG0nQ7qnTM37m7ZkEUMREyPh8taFCX+uQYps/MTFEum0AD05VeGDRMXwWvMmGIcWX9xp8ZiBddY0jw==}
+  '@vue/devtools-kit@7.4.5':
+    resolution: {integrity: sha512-Uuki4Z6Bc/ExvtlPkeDNGSAe4580R+HPcVABfTE9TF7BTz3Nntk7vxIRUyWblZkUEcB/x+wn2uofyt5i2LaUew==}
 
-  '@vue/devtools-shared@7.4.4':
-    resolution: {integrity: sha512-yeJULXFHOKIm8yL2JFO050a9ztTVqOCKTqN9JHFxGTJN0b+gjtfn6zC+FfyHUgjwCwf6E3hfKrlohtthcqoYqw==}
+  '@vue/devtools-shared@7.4.5':
+    resolution: {integrity: sha512-2XgUOkL/7QDmyYI9J7cm+rz/qBhcGv+W5+i1fhwdQ0HQ1RowhdK66F0QBuJSz/5k12opJY8eN6m03/XZMs7imQ==}
 
   '@vue/language-core@2.1.6':
     resolution: {integrity: sha512-MW569cSky9R/ooKMh6xa2g1D0AtRKbL56k83dzus/bx//RDJk24RHWkMzbAlXjMdDNyxAaagKPRquBIxkxlCkg==}
@@ -1427,8 +1427,8 @@ packages:
   aws4@1.13.1:
     resolution: {integrity: sha512-u5w79Rd7SU4JaIlA/zFqG+gOiuq25q5VLyZ8E+ijJeILuTxVzZgp2CaGw/UTw6pXYN9XMO9yiqj/nEHmhTG5CA==}
 
-  axios@1.7.4:
-    resolution: {integrity: sha512-DukmaFRnY6AzAALSH4J2M3k6PkaC+MfaAGdEERRWcC9q3/TWQwLpHR8ZRLKTdQ3aBDL64EdluRDjJqKw+BPZEw==}
+  axios@1.7.7:
+    resolution: {integrity: sha512-S4kL7XrjgBmvdGut0sN3yJxqYzrDOnivkBiN0OFs6hLiUam3UPvswUo0kqGyhqUZGEOytHyumEdXsAkgCOUf3Q==}
 
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
@@ -4683,8 +4683,8 @@ packages:
       '@nuxt/kit':
         optional: true
 
-  vite-plugin-vue-devtools@7.4.4:
-    resolution: {integrity: sha512-lJ7Vr6gznv1nf2S75XJTpXl4XcwnHfyvqJQ7szOvTUfumQALDGo772TEH69wx8gkY/ZWZQea4DZR5IQZMOZKUA==}
+  vite-plugin-vue-devtools@7.4.5:
+    resolution: {integrity: sha512-8D9Dv7uw620r96uI45M7hCyfsBA9KwttdmxA/DAd0/1KpuGmrFEhNwo4ob/sjaou1noAeK2TrnKdW+sFMR6aKQ==}
     engines: {node: '>=v14.21.3'}
     peerDependencies:
       vite: ^3.1.0 || ^4.0.0-0 || ^5.0.0-0
@@ -4828,8 +4828,8 @@ packages:
     resolution: {integrity: sha512-o8qghlI8NZHU1lLPrpi2+Uq7abh4GGPpYANlalzWxyWteJOCsr/P+oPBA49TOLu5FTZO4d3F9MnWJfiMo4BkmA==}
     engines: {node: '>=18'}
 
-  wait-on@8.0.0:
-    resolution: {integrity: sha512-fNE5SXinLr2Bt7cJvjvLg2PcXfqznlqRvtE3f8AqYdRZ9BhE+XpsCp1mwQbRoO7s1q7uhAuCw0Ro3mG/KdZjEw==}
+  wait-on@8.0.1:
+    resolution: {integrity: sha512-1wWQOyR2LVVtaqrcIL2+OM+x7bkpmzVROa0Nf6FryXkS+er5Sa1kzFGjzZRqLnHa3n1rACFLeTwUqE1ETL9Mig==}
     engines: {node: '>=12.0.0'}
     hasBin: true
 
@@ -6160,10 +6160,10 @@ snapshots:
 
   '@vue/devtools-api@6.6.4': {}
 
-  '@vue/devtools-core@7.4.4(vite@5.4.4(@types/node@22.5.4)(sass-embedded@1.77.5)(sass@1.77.6)(terser@5.31.3))(vue@3.4.38(typescript@5.6.2))':
+  '@vue/devtools-core@7.4.5(vite@5.4.4(@types/node@22.5.4)(sass-embedded@1.77.5)(sass@1.77.6)(terser@5.31.3))(vue@3.4.38(typescript@5.6.2))':
     dependencies:
-      '@vue/devtools-kit': 7.4.4
-      '@vue/devtools-shared': 7.4.4
+      '@vue/devtools-kit': 7.4.5
+      '@vue/devtools-shared': 7.4.5
       mitt: 3.0.1
       nanoid: 3.3.7
       pathe: 1.1.2
@@ -6172,9 +6172,9 @@ snapshots:
     transitivePeerDependencies:
       - vite
 
-  '@vue/devtools-kit@7.4.4':
+  '@vue/devtools-kit@7.4.5':
     dependencies:
-      '@vue/devtools-shared': 7.4.4
+      '@vue/devtools-shared': 7.4.5
       birpc: 0.2.17
       hookable: 5.5.3
       mitt: 3.0.1
@@ -6182,7 +6182,7 @@ snapshots:
       speakingurl: 14.0.1
       superjson: 2.2.1
 
-  '@vue/devtools-shared@7.4.4':
+  '@vue/devtools-shared@7.4.5':
     dependencies:
       rfdc: 1.4.1
 
@@ -6472,7 +6472,7 @@ snapshots:
 
   aws4@1.13.1: {}
 
-  axios@1.7.4:
+  axios@1.7.7:
     dependencies:
       follow-redirects: 1.15.6
       form-data: 4.0.0
@@ -9885,7 +9885,7 @@ snapshots:
     dependencies:
       '@antfu/utils': 0.7.10
       '@rollup/pluginutils': 5.1.0(rollup@4.21.0)
-      debug: 4.3.6(supports-color@8.1.1)
+      debug: 4.3.7
       error-stack-parser-es: 0.1.5
       fs-extra: 11.2.0
       open: 10.1.0
@@ -9897,11 +9897,11 @@ snapshots:
       - rollup
       - supports-color
 
-  vite-plugin-vue-devtools@7.4.4(rollup@4.21.0)(vite@5.4.4(@types/node@22.5.4)(sass-embedded@1.77.5)(sass@1.77.6)(terser@5.31.3))(vue@3.4.38(typescript@5.6.2)):
+  vite-plugin-vue-devtools@7.4.5(rollup@4.21.0)(vite@5.4.4(@types/node@22.5.4)(sass-embedded@1.77.5)(sass@1.77.6)(terser@5.31.3))(vue@3.4.38(typescript@5.6.2)):
     dependencies:
-      '@vue/devtools-core': 7.4.4(vite@5.4.4(@types/node@22.5.4)(sass-embedded@1.77.5)(sass@1.77.6)(terser@5.31.3))(vue@3.4.38(typescript@5.6.2))
-      '@vue/devtools-kit': 7.4.4
-      '@vue/devtools-shared': 7.4.4
+      '@vue/devtools-core': 7.4.5(vite@5.4.4(@types/node@22.5.4)(sass-embedded@1.77.5)(sass@1.77.6)(terser@5.31.3))(vue@3.4.38(typescript@5.6.2))
+      '@vue/devtools-kit': 7.4.5
+      '@vue/devtools-shared': 7.4.5
       execa: 8.0.1
       sirv: 2.0.4
       vite: 5.4.4(@types/node@22.5.4)(sass-embedded@1.77.5)(sass@1.77.6)(terser@5.31.3)
@@ -10061,9 +10061,9 @@ snapshots:
     dependencies:
       xml-name-validator: 5.0.0
 
-  wait-on@8.0.0:
+  wait-on@8.0.1:
     dependencies:
-      axios: 1.7.4
+      axios: 1.7.7
       joi: 17.13.3
       lodash: 4.17.21
       minimist: 1.2.8
