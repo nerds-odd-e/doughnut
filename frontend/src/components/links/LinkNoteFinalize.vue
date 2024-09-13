@@ -18,21 +18,19 @@
     <CheckInput
       scope-name="link"
       v-model="formData.moveUnder"
-      :errors="linkFormErrors.moveUnder"
+      :errors="getErrorObject('moveUnder')"
       field="alsoMoveToUnderTargetNote"
     />
-
     <RadioButtons
-      v-if="!!formData.moveUnder"
+      v-if="formData.moveUnder"
       scope-name="link"
-      v-model="formData.asFirstChild"
-      :errors="linkFormErrors.asFirstChild"
+      v-model="asFirstChildModel"
+      :errors="getErrorObject('asFirstChild')"
       :options="[
-        { value: true, label: 'as its first child' },
-        { value: false, label: 'as its last child' },
+        { value: 'true', label: 'as its first child' },
+        { value: 'false', label: 'as its last child' },
       ]"
     />
-
     <button class="btn btn-secondary go-back-button" @click="$emit('goBack')">
       <SvgGoBack />
     </button>
@@ -43,7 +41,7 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, ref } from "vue"
+import { PropType, ref, computed } from "vue"
 import { LinkCreation, Note, NoteTopic } from "@/generated/backend"
 import LinkTypeSelect from "./LinkTypeSelect.vue"
 import NoteTopicComponent from "../notes/core/NoteTopicComponent.vue"
@@ -54,6 +52,7 @@ import usePopups from "../commons/Popups/usePopups"
 import { StorageAccessor } from "../../store/createNoteStorage"
 
 const { popups } = usePopups()
+
 const props = defineProps({
   note: { type: Object as PropType<Note>, required: true },
   targetNoteTopic: { type: Object as PropType<NoteTopic>, required: true },
@@ -62,6 +61,7 @@ const props = defineProps({
     required: true,
   },
 })
+
 const emit = defineEmits(["success", "goBack"])
 
 const formData = ref<LinkCreation>({
@@ -74,6 +74,22 @@ const linkFormErrors = ref({
   asFirstChild: undefined as string | undefined,
   linkType: undefined as string | undefined,
   moveUnder: undefined as string | undefined,
+})
+
+// Helper function to convert string errors to objects
+const getErrorObject = computed(
+  () => (field: keyof typeof linkFormErrors.value) => {
+    const error = linkFormErrors.value[field]
+    return error ? { [field]: error } : undefined
+  }
+)
+
+// Computed property to handle the string <-> boolean conversion for asFirstChild
+const asFirstChildModel = computed({
+  get: () => (formData.value.asFirstChild ?? false).toString(),
+  set: (value: string) => {
+    formData.value.asFirstChild = value === "true"
+  },
 })
 
 const createLink = async () => {

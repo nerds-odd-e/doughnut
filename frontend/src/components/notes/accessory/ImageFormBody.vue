@@ -3,11 +3,9 @@
     scope-name="note"
     field="uploadImage"
     placeholder="Optional. upload own image."
-    :errors="errors.uploadImage"
-    :model-value="modelValue.uploadImage"
-    @update:model-value="
-      $emit('update:modelValue', { ...modelValue, uploadImage: $event })
-    "
+    :errors="getErrorObject('uploadImage')"
+    :model-value="uploadImageFileName"
+    @update:model-value="handleFileUpload"
   />
   <TextInput
     scope-name="note"
@@ -23,7 +21,7 @@
     scope-name="note"
     field="useParentImage"
     :model-value="modelValue.useParentImage"
-    :errors="errors.useParentImage"
+    :errors="getErrorObject('useParentImage')"
     @update:model-value="
       $emit('update:modelValue', { ...modelValue, useParentImage: $event })
     "
@@ -41,7 +39,7 @@
 
 <script lang="ts">
 import { NoteAccessoriesDTO } from "@/generated/backend"
-import { PropType, defineComponent } from "vue"
+import { PropType, defineComponent, computed } from "vue"
 import CheckInput from "../../form/CheckInput.vue"
 import FileInput from "../../form/FileInput.vue"
 import TextInput from "../../form/TextInput.vue"
@@ -53,13 +51,40 @@ export default defineComponent({
       required: true,
     },
     errors: {
-      type: Object,
-      default() {
-        return {}
-      },
+      type: Object as PropType<Record<string, string | undefined>>,
+      default: () => ({}),
     },
   },
   emits: ["update:modelValue"],
   components: { TextInput, CheckInput, FileInput },
+  setup(props, { emit }) {
+    const uploadImageFileName = computed(() => {
+      const uploadImage = props.modelValue.uploadImage
+      if (uploadImage instanceof File) {
+        return uploadImage.name
+      } else if (uploadImage instanceof Blob) {
+        return "Unnamed file"
+      }
+      return undefined
+    })
+
+    const handleFileUpload = (file: File | null) => {
+      emit("update:modelValue", {
+        ...props.modelValue,
+        uploadImage: file || undefined,
+      })
+    }
+
+    const getErrorObject = (field: string) => {
+      const error = props.errors[field]
+      return error ? { [field]: error } : undefined
+    }
+
+    return {
+      uploadImageFileName,
+      handleFileUpload,
+      getErrorObject,
+    }
+  },
 })
 </script>

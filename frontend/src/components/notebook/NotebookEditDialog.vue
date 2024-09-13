@@ -5,7 +5,7 @@
       scope-name="notebook"
       field="skipReviewEntirely"
       v-model="formData.skipReviewEntirely"
-      :errors="errors.skipReviewEntirely"
+      :errors="getErrorObject('skipReviewEntirely')"
     />
     <TextInput
       scope-name="notebook"
@@ -23,15 +23,15 @@
     <button class="btn btn-primary btn-layout mt-2" @click="processForm">
       Update
     </button>
-    </div>
-    <hr/>
-    <div>
-      <NotebookCertificateRequest v-bind="{ notebook }" />
-    </div>
+  </div>
+  <hr/>
+  <div>
+    <NotebookCertificateRequest v-bind="{ notebook }" />
+  </div>
 </template>
 
 <script setup lang="ts">
-import { PropType, ref } from "vue"
+import { PropType, ref, computed } from "vue"
 import { useRouter } from "vue-router"
 import { Notebook } from "@/generated/backend"
 import CheckInput from "@/components/form/CheckInput.vue"
@@ -40,7 +40,6 @@ import TextInput from "../form/TextInput.vue"
 import NotebookCertificateRequest from "./NotebookCertificateRequest.vue"
 
 const { managedApi } = useLoadingApi()
-
 const router = useRouter()
 
 const props = defineProps({
@@ -58,10 +57,16 @@ const formData = ref({
   numberOfQuestionsInAssessment,
   certificateExpiry,
 })
+
 const errors = ref({
   skipReviewEntirely: undefined as string | undefined,
   numberOfQuestionsInAssessment: undefined as string | undefined,
   certificateExpiry: undefined as string | undefined,
+})
+
+const getErrorObject = computed(() => (field: "skipReviewEntirely") => {
+  const error = errors.value[field]
+  return error ? { [field]: error } : undefined
 })
 
 const processForm = () => {
@@ -70,6 +75,12 @@ const processForm = () => {
     .then(() => {
       router.go(0)
     })
-    .catch((err) => (errors.value = err))
+    .catch((err) => {
+      if (typeof err === "object" && err !== null) {
+        errors.value = err as typeof errors.value
+      } else {
+        console.error("Unexpected error format:", err)
+      }
+    })
 }
 </script>
