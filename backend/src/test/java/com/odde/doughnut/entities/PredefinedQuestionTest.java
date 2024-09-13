@@ -62,7 +62,6 @@ class PredefinedQuestionTest {
     @Test
     void shouldAlwaysChooseAIQuestionIfConfigured() {
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
-      userModel.getEntity().setAiQuestionTypeOnlyForReview(true);
       when(aiQuestionGenerator.getAiGeneratedQuestion(any())).thenReturn(mcqWithAnswer);
       PredefinedQuestion randomQuizQuestion = generateQuizQuestionEntity(note);
       assertThat(randomQuizQuestion, instanceOf(PredefinedQuestion.class));

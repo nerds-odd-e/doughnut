@@ -2877,8 +2877,6 @@ components:
           format: int32
         spaceIntervals:
           type: string
-        aiQuestionTypeOnlyForReview:
-          type: boolean
         admin:
           type: boolean
     TimeTravelRelativeToNow:
@@ -3790,8 +3788,6 @@ components:
         spaceIntervals:
           pattern: "^\\d+((,\\s*\\d+){1,1000})*$"
           type: string
-        aiQuestionTypeOnlyForReview:
-          type: boolean
     NoteUpdateTopicDTO:
       required:
       - topicConstructor

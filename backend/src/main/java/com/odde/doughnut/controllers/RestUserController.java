@@ -46,7 +46,6 @@ class RestUserController {
     user.setName(updates.getName());
     user.setSpaceIntervals(updates.getSpaceIntervals());
     user.setDailyNewNotesCount(updates.getDailyNewNotesCount());
-    user.setAiQuestionTypeOnlyForReview(updates.getAiQuestionTypeOnlyForReview());
     modelFactoryService.save(user);
     return user;
   }

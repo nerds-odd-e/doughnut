@@ -10,7 +10,6 @@ export type User = {
     ownership?: Ownership;
     dailyNewNotesCount?: number;
     spaceIntervals?: string;
-    aiQuestionTypeOnlyForReview?: boolean;
     admin?: boolean;
 };
 

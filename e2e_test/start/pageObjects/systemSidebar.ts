@@ -19,10 +19,6 @@ export const systemSidebar = () => {
         userSettings(userName: string) {
           cy.findByRole('button', { name: `Settings for ${userName}` }).click()
           return {
-            aiQuestionOnlyForReview() {
-              cy.formField('Ai Question Type Only For Review').check()
-              cy.findByText('Submit').click()
-            },
             changeName(name: string) {
               cy.formField('Name').assignFieldValue(name)
               cy.findByText('Submit').click()

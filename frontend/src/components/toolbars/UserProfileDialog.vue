@@ -26,55 +26,38 @@
           v-model="formData.spaceIntervals"
           :errors="errors.spaceIntervals"
         />
-        <CheckInput
-          scope-name="user"
-          field="aiQuestionTypeOnlyForReview"
-          v-model="formData.aiQuestionTypeOnlyForReview"
-          :errors="errors.aiQuestionTypeOnlyForReview"
-        />
         <input type="submit" value="Submit" class="btn btn-primary" />
       </form>
     </div>
   </ContainerPage>
 </template>
 
-<script lang="ts">
-import CheckInput from "@/components/form/CheckInput.vue"
+<script setup lang="ts">
 import TextInput from "@/components/form/TextInput.vue"
 import { User } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
-import { defineComponent } from "vue"
+import { defineEmits, onMounted, ref } from "vue"
 
-export default defineComponent({
-  setup() {
-    return { ...useLoadingApi() }
-  },
-  components: { ContainerPage, TextInput, CheckInput },
-  emits: ["user-updated"],
-  data() {
-    return {
-      formData: undefined as undefined | User,
-      errors: {} as Record<string, string>,
-    }
-  },
-  methods: {
-    async fetchData() {
-      this.formData = await this.managedApi.restUserController.getUserProfile()
-    },
-    async processForm() {
-      if (!this.formData) return
-      const updated = await this.managedApi.restUserController
-        .updateUser(this.formData.id, this.formData)
-        .catch((err) => {
-          this.errors = err
-        })
-      this.$emit("user-updated", updated)
-    },
-  },
+const { managedApi } = useLoadingApi()
+const emits = defineEmits(["user-updated"])
 
-  mounted() {
-    this.fetchData()
-  },
-})
+const formData = ref<User | undefined>()
+const errors = ref<Record<string, string>>({})
+
+const fetchData = async () => {
+  formData.value = await managedApi.restUserController.getUserProfile()
+}
+
+const processForm = async () => {
+  if (!formData.value) return
+  const updated = await managedApi.restUserController
+    .updateUser(formData.value.id, formData.value)
+    .catch((err) => {
+      errors.value = err
+    })
+  emits["user-updated"](updated)
+}
+
+onMounted(() => fetchData())
 </script>
