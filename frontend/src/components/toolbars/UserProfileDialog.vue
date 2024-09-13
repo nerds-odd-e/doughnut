@@ -30,7 +30,7 @@
           scope-name="user"
           field="aiQuestionTypeOnlyForReview"
           v-model="formData.aiQuestionTypeOnlyForReview"
-          :errors="errors.aiQuestionTypeOnlyForReview"
+          :errors="getErrorObject('aiQuestionTypeOnlyForReview')"
         />
         <input type="submit" value="Submit" class="btn btn-primary" />
       </form>
@@ -39,42 +39,55 @@
 </template>
 
 <script lang="ts">
+import { defineComponent, ref, computed } from "vue"
 import CheckInput from "@/components/form/CheckInput.vue"
 import TextInput from "@/components/form/TextInput.vue"
 import { User } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
-import { defineComponent } from "vue"
 
 export default defineComponent({
-  setup() {
-    return { ...useLoadingApi() }
-  },
   components: { ContainerPage, TextInput, CheckInput },
   emits: ["user-updated"],
-  data() {
-    return {
-      formData: undefined as undefined | User,
-      errors: {} as Record<string, string>,
-    }
-  },
-  methods: {
-    async fetchData() {
-      this.formData = await this.managedApi.restUserController.getUserProfile()
-    },
-    async processForm() {
-      if (!this.formData) return
-      const updated = await this.managedApi.restUserController
-        .updateUser(this.formData.id, this.formData)
-        .catch((err) => {
-          this.errors = err
-        })
-      this.$emit("user-updated", updated)
-    },
-  },
+  setup(_, { emit }) {
+    const { managedApi } = useLoadingApi()
+    const formData = ref<User | undefined>(undefined)
+    const errors = ref<Record<string, string>>({})
 
-  mounted() {
-    this.fetchData()
+    const getErrorObject = computed(() => (field: string) => {
+      const error = errors.value[field]
+      return error ? { [field]: error } : undefined
+    })
+
+    const fetchData = async () => {
+      formData.value = await managedApi.restUserController.getUserProfile()
+    }
+
+    const processForm = async () => {
+      if (!formData.value) return
+      try {
+        const updated = await managedApi.restUserController.updateUser(
+          formData.value.id,
+          formData.value
+        )
+        emit("user-updated", updated)
+      } catch (err) {
+        if (typeof err === "object" && err !== null) {
+          errors.value = err as Record<string, string>
+        } else {
+          console.error("Unexpected error format:", err)
+        }
+      }
+    }
+
+    fetchData()
+
+    return {
+      formData,
+      errors,
+      getErrorObject,
+      processForm,
+    }
   },
 })
 </script>
