@@ -32,8 +32,8 @@ const emits = defineEmits(["answered"])
 const submitAnswer = async (answerData: AnswerDTO) => {
   try {
     const answerResult =
-      await managedApi.restReviewQuestionController.answerQuiz(
-        props.assessmentQuestionInstance.reviewQuestionInstance.id,
+      await managedApi.restAssessmentController.answerQuestion(
+        props.assessmentQuestionInstance.id,
         answerData
       )
 

@@ -2,6 +2,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { AnswerDTO } from '../models/AnswerDTO';
+import type { AnsweredQuestion } from '../models/AnsweredQuestion';
 import type { AnswerSubmission } from '../models/AnswerSubmission';
 import type { AssessmentAttempt } from '../models/AssessmentAttempt';
 import type { AssessmentResult } from '../models/AssessmentResult';
@@ -9,6 +11,29 @@ import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestAssessmentControllerService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
+    /**
+     * @param assessmentQuestionInstance
+     * @param requestBody
+     * @returns AnsweredQuestion OK
+     * @throws ApiError
+     */
+    public answerQuestion(
+        assessmentQuestionInstance: number,
+        requestBody: AnswerDTO,
+    ): CancelablePromise<AnsweredQuestion> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/assessment/{assessmentQuestionInstance}/answer',
+            path: {
+                'assessmentQuestionInstance': assessmentQuestionInstance,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
     /**
      * @param assessmentAttempt
      * @param requestBody

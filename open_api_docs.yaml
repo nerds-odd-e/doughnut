@@ -1611,6 +1611,36 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BazaarNotebook"
+  /api/assessment/{assessmentQuestionInstance}/answer:
+    post:
+      tags:
+      - rest-assessment-controller
+      operationId: answerQuestion
+      parameters:
+      - name: assessmentQuestionInstance
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnswerDTO"
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AnsweredQuestion"
   /api/assessment/{assessmentAttempt}:
     post:
       tags:
