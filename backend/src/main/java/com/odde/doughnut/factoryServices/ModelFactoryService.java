@@ -134,7 +134,8 @@ public class ModelFactoryService {
       User creator,
       LinkType type,
       Timestamp currentUTCTimestamp) {
-    Note note = LinkingNote.createLink(creator, sourceNote, currentUTCTimestamp, ":" + type.label);
+    final Note note = new Note();
+    note.initialize(creator, sourceNote, currentUTCTimestamp, ":" + type.label);
     note.setTargetNote(targetNote);
     note.getReviewSetting()
         .setLevel(

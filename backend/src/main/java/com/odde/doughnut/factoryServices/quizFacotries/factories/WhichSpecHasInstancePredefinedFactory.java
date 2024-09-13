@@ -1,6 +1,5 @@
 package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
-import com.odde.doughnut.entities.LinkingNote;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionServant;
 import java.util.List;
@@ -17,7 +16,7 @@ public class WhichSpecHasInstancePredefinedFactory extends QuestionOptionsFactor
 
   @Override
   public void findCategoricalLink() {
-    List<LinkingNote> candidates = servant.getLinksFromSameSourceHavingReviewPoint(link).toList();
+    List<Note> candidates = servant.getLinksFromSameSourceHavingReviewPoint(link).toList();
     instanceLink = servant.randomizer.chooseOneRandomly(candidates).orElse(null);
   }
 

@@ -7,7 +7,7 @@ import java.util.List;
 
 public class LinkSourceWithinSameLinkTypePredefinedFactory extends QuestionOptionsFactory {
   protected final Note link;
-  private List<LinkingNote> cachedFillingOptions = null;
+  private List<Note> cachedFillingOptions = null;
 
   public LinkSourceWithinSameLinkTypePredefinedFactory(
       Note note, PredefinedQuestionServant servant) {
@@ -16,7 +16,7 @@ public class LinkSourceWithinSameLinkTypePredefinedFactory extends QuestionOptio
   }
 
   @Override
-  public List<LinkingNote> generateFillingOptions() {
+  public List<Note> generateFillingOptions() {
     if (cachedFillingOptions == null) {
       cachedFillingOptions =
           servant.chooseFromCohortAvoidSiblings(link).stream()

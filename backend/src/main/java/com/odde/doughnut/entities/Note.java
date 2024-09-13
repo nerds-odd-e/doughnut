@@ -81,11 +81,11 @@ public class Note extends EntityIdentifiedByIdOnly {
   private Timestamp deletedAt;
 
   @OneToMany(mappedBy = "targetNote")
-  private List<LinkingNote> refers = new ArrayList<>();
+  private List<Note> refers = new ArrayList<>();
 
   @OneToMany(mappedBy = "parent", cascade = CascadeType.DETACH)
   @OrderBy("siblingOrder")
-  private final List<LinkingNote> links = new ArrayList<>();
+  private final List<Note> links = new ArrayList<>();
 
   @OneToMany(mappedBy = "parent", cascade = CascadeType.DETACH)
   @JsonIgnore
@@ -138,12 +138,12 @@ public class Note extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  public List<LinkingNote> getLinks() {
+  public List<Note> getLinks() {
     return filterDeletedUnmodifiableNoteList(links);
   }
 
   @JsonIgnore
-  public List<LinkingNote> getRefers() {
+  public List<Note> getRefers() {
     return filterDeletedUnmodifiableNoteList(refers);
   }
 
@@ -392,7 +392,7 @@ public class Note extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  public Stream<LinkingNote> getSiblingLinksOfSameLinkType(User user) {
+  public Stream<Note> getSiblingLinksOfSameLinkType(User user) {
     return targetNoteViewer(user)
         .linksOfTypeThroughReverse(getLinkType())
         .filter(l -> !l.equals(this));

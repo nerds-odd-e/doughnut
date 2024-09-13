@@ -10,7 +10,7 @@ import lombok.Setter;
 
 @JsonPropertyOrder({"id", "note", "fromBazaar", "circle", "children", "refers"})
 public class NoteRealm {
-  @Getter @Setter private List<? extends Note> refers;
+  @Getter @Setter private List<Note> refers;
 
   @NotNull @Getter private Note note;
 

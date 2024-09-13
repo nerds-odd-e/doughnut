@@ -29,7 +29,7 @@ public abstract class QuestionOptionsFactory extends PredefinedQuestionFactory {
     if (answerNote == null) {
       throw new PredefinedQuestionNotPossibleException();
     }
-    List<? extends Note> options = this.generateFillingOptions();
+    List<Note> options = this.generateFillingOptions();
     if (options.size() < this.minimumOptionCount() - 1) {
       throw new PredefinedQuestionNotPossibleException();
     }
@@ -50,7 +50,7 @@ public abstract class QuestionOptionsFactory extends PredefinedQuestionFactory {
 
   public abstract Note generateAnswer();
 
-  public abstract List<? extends Note> generateFillingOptions();
+  public abstract List<Note> generateFillingOptions();
 
   public int minimumOptionCount() {
     return 2;

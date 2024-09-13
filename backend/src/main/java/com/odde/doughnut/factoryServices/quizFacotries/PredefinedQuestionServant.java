@@ -55,18 +55,18 @@ public class PredefinedQuestionServant {
     return randomizer.randomlyChoose(maxFillingOptionCount, candidates).toList();
   }
 
-  public Stream<LinkingNote> getSiblingLinksOfSameLinkTypeHavingReviewPoint(Note link) {
+  public Stream<Note> getSiblingLinksOfSameLinkTypeHavingReviewPoint(Note link) {
     return linksWithReviewPoint(link.getSiblingLinksOfSameLinkType(this.user));
   }
 
-  public Stream<LinkingNote> getLinksFromSameSourceHavingReviewPoint(Note link) {
-    List<LinkingNote> list =
+  public Stream<Note> getLinksFromSameSourceHavingReviewPoint(Note link) {
+    List<Note> list =
         new NoteViewer(this.user, link.getParent())
             .linksOfTypeThroughDirect(candidateQuestionLinkTypes);
     return linksWithReviewPoint(list.stream()).filter(l -> !link.equals(l));
   }
 
-  private Stream<LinkingNote> linksWithReviewPoint(Stream<LinkingNote> cousinLinksOfSameLinkType) {
+  private Stream<Note> linksWithReviewPoint(Stream<Note> cousinLinksOfSameLinkType) {
     return cousinLinksOfSameLinkType.filter(l -> getReviewPoint(l) != null);
   }
 
@@ -123,7 +123,7 @@ public class PredefinedQuestionServant {
     return new GlobalSettingsService(modelFactoryService);
   }
 
-  public List<LinkingNote> getCousinLinksAvoidingSiblings(Note link, Note parentGrandLink) {
+  public List<Note> getCousinLinksAvoidingSiblings(Note link, Note parentGrandLink) {
     if (parentGrandLink == null) return List.of();
     List<Note> linkedSiblingsOfSameLinkType = link.getLinkedSiblingsOfSameLinkType(user);
     List<Note> linkTargetOfType =
@@ -131,7 +131,7 @@ public class PredefinedQuestionServant {
             .linksOfTypeThroughDirect(List.of(link.getLinkType())).stream()
                 .map(Note::getTargetNote)
                 .toList();
-    Stream<LinkingNote> uncles =
+    Stream<Note> uncles =
         parentGrandLink
             .getSiblingLinksOfSameLinkType(user)
             .filter(cl1 -> !linkTargetOfType.contains(cl1.getParent()));
