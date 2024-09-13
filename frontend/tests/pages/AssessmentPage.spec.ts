@@ -114,7 +114,7 @@ describe("assessment page", () => {
       ]
       expect(
         helper.managedApi.restAssessmentController.submitAssessmentResult
-      ).toBeCalledWith(notebook.id, expectedAnswers)
+      ).toBeCalledWith(assessmentAttempt.id, expectedAnswers)
     })
   })
 })

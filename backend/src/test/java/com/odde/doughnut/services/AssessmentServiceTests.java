@@ -1,5 +1,6 @@
 package com.odde.doughnut.services;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.dto.Randomization;
@@ -64,9 +65,7 @@ public class AssessmentServiceTests {
     @Test
     void shouldPickRandomNotesForAssessment() {
       makeMe.theNote(topNote).withNChildrenThat(10, NoteBuilder::hasAnApprovedQuestion).please();
-
       Set<Integer> questionIds = performAssessments(representativeNumberOfAttempts);
-
       assertTrue(questionIds.size() > 1, "Expected questions from different notes.");
     }
 
@@ -98,6 +97,14 @@ public class AssessmentServiceTests {
       makeMe.theNote(topNote).withNChildrenThat(5, NoteBuilder::hasAnApprovedQuestion).please();
       AssessmentAttempt assessment = service.generateAssessment(notebook, currentUser.getEntity());
       assertEquals(5, assessment.getAssessmentQuestionInstances().size());
+    }
+
+    @Test
+    void shouldPersistTheQuestion() {
+      notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(1);
+      makeMe.theNote(topNote).withNChildrenThat(1, NoteBuilder::hasAnApprovedQuestion).please();
+      AssessmentAttempt assessment = service.generateAssessment(notebook, currentUser.getEntity());
+      assertThat(assessment.getAssessmentQuestionInstances().get(0).getId()).isNotNull();
     }
 
     @Test

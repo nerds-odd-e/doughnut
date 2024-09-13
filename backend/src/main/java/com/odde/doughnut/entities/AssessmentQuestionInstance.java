@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Entity
-@Table(name = "review_question_instance")
+@Table(name = "assessment_question_instance")
 @Data
 @EqualsAndHashCode(callSuper = false)
 @JsonPropertyOrder({"id", "bareQuestion", "notebook"})

@@ -63,13 +63,16 @@ public class AssessmentService {
                 reviewQuestionInstance -> {
                   AssessmentQuestionInstance assessmentQuestionInstance =
                       new AssessmentQuestionInstance();
+                  assessmentQuestionInstance.setAssessmentAttempt(assessmentAttempt);
                   assessmentQuestionInstance.setReviewQuestionInstance(reviewQuestionInstance);
+                  assessmentAttempt
+                      .getAssessmentQuestionInstances()
+                      .add(assessmentQuestionInstance);
                   return assessmentQuestionInstance;
                 })
             .toList();
     assessmentAttempt.setNotebook(notebook);
     assessmentAttempt.setUser(user);
-    assessmentAttempt.setAssessmentQuestionInstances(assessmentQuestionInstances);
     modelFactoryService.save(assessmentAttempt);
     return assessmentAttempt;
   }
