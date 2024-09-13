@@ -53,23 +53,23 @@ public class AssessmentService {
           "Not enough questions", ASSESSMENT_SERVICE_ERROR, "Not enough questions");
     }
 
-    List<AssessmentQuestionInstance> reviewQuestionInstances =
+    AssessmentAttempt assessmentAttempt = new AssessmentAttempt();
+
+    List<AssessmentQuestionInstance> assessmentQuestionInstances =
         questions.stream()
             .limit(numberOfQuestion)
-            .map(this::createAssessmentQuestionInstance)
+            .map(modelFactoryService::createReviewQuestion)
+            .map(
+                reviewQuestionInstance -> {
+                  AssessmentQuestionInstance assessmentQuestionInstance =
+                      new AssessmentQuestionInstance();
+                  assessmentQuestionInstance.setReviewQuestionInstance(reviewQuestionInstance);
+                  return assessmentQuestionInstance;
+                })
             .toList();
-    AssessmentAttempt assessmentAttempt = new AssessmentAttempt();
     assessmentAttempt.setNotebook(notebook);
-    assessmentAttempt.setAssessmentQuestionInstances(reviewQuestionInstances);
+    assessmentAttempt.setAssessmentQuestionInstances(assessmentQuestionInstances);
     return assessmentAttempt;
-  }
-
-  private AssessmentQuestionInstance createAssessmentQuestionInstance(
-      PredefinedQuestion predefinedQuestion) {
-    AssessmentQuestionInstance assessmentQuestionInstance = new AssessmentQuestionInstance();
-    assessmentQuestionInstance.setReviewQuestionInstance(
-        modelFactoryService.createReviewQuestion(predefinedQuestion));
-    return assessmentQuestionInstance;
   }
 
   public AssessmentResult submitAssessmentResult(
