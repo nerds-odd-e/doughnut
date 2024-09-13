@@ -95,13 +95,13 @@ public class RestAssessmentControllerTests {
     @BeforeEach
     void setup() {
       topNote = makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser).please();
+      notebook = topNote.getNotebook();
       answerSubmissions = new ArrayList<>();
     }
 
     @Test
     void shouldIncludeTheNotebookCertificateInTheResult() throws UnexpectedNoAccessRightException {
       makeMe.theNote(topNote).withNChildrenThat(3, NoteBuilder::hasAnApprovedQuestion).please();
-      notebook = topNote.getNotebook();
       makeMe
           .modelFactoryService
           .notebookService(notebook)
@@ -118,7 +118,6 @@ public class RestAssessmentControllerTests {
     @Test
     void shouldReturnAllAnswersCorrect() throws UnexpectedNoAccessRightException {
       makeMe.theNote(topNote).withNChildrenThat(3, NoteBuilder::hasAnApprovedQuestion).please();
-      notebook = topNote.getNotebook();
       notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(3);
 
       for (Note note : notebook.getNotes()) {
@@ -143,7 +142,6 @@ public class RestAssessmentControllerTests {
     @Test
     void shouldCreateNewAssessmentAttempt() throws UnexpectedNoAccessRightException {
       makeMe.theNote(topNote).withNChildrenThat(3, NoteBuilder::hasAnApprovedQuestion).please();
-      notebook = topNote.getNotebook();
       notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(3);
 
       for (Note note : notebook.getNotes()) {
@@ -171,7 +169,6 @@ public class RestAssessmentControllerTests {
     @Test
     void shouldReturnSomeAnswersCorrect() throws UnexpectedNoAccessRightException {
       makeMe.theNote(topNote).withNChildrenThat(2, NoteBuilder::hasAnApprovedQuestion).please();
-      notebook = topNote.getNotebook();
       notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(3);
 
       PredefinedQuestion predefinedQuestion =
@@ -203,7 +200,6 @@ public class RestAssessmentControllerTests {
     @Test
     void shouldNotBeAbleToAccessNotebookWhenUserHasNoPermission() {
       makeMe.theNote(topNote).withNChildrenThat(2, NoteBuilder::hasAnApprovedQuestion).please();
-      notebook = topNote.getNotebook();
       User anotherUser = makeMe.aUser().please();
       notebook.setOwnership(anotherUser.getOwnership());
       assertThrows(
