@@ -89,6 +89,7 @@ public class RestAssessmentControllerTests {
   @Nested
   class completeAssessmentTest {
     private Notebook notebook;
+    private AssessmentAttempt assessmentAttempt;
     private Note topNote;
     private List<AnswerSubmission> answerSubmissions;
 
@@ -96,6 +97,7 @@ public class RestAssessmentControllerTests {
     void setup() {
       topNote = makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser).please();
       notebook = topNote.getNotebook();
+      assessmentAttempt = makeMe.anAssessmentAttempt(currentUser.getEntity(), notebook).please();
       answerSubmissions = new ArrayList<>();
     }
 
@@ -110,7 +112,7 @@ public class RestAssessmentControllerTests {
       makeMe.refresh(notebook);
 
       AssessmentResult assessmentResult =
-          controller.submitAssessmentResult(notebook, answerSubmissions);
+          controller.submitAssessmentResult(assessmentAttempt, answerSubmissions);
 
       assertTrue(assessmentResult.isCertified());
     }
@@ -133,7 +135,7 @@ public class RestAssessmentControllerTests {
       }
 
       AssessmentResult assessmentResult =
-          controller.submitAssessmentResult(notebook, answerSubmissions);
+          controller.submitAssessmentResult(assessmentAttempt, answerSubmissions);
 
       assertEquals(answerSubmissions.size(), assessmentResult.getTotalCount());
       assertEquals(3, assessmentResult.getCorrectCount());
@@ -158,7 +160,7 @@ public class RestAssessmentControllerTests {
 
       Timestamp timestamp = makeMe.aTimestamp().please();
       testabilitySettings.timeTravelTo(timestamp);
-      controller.submitAssessmentResult(notebook, answerSubmissions);
+      controller.submitAssessmentResult(assessmentAttempt, answerSubmissions);
       AssessmentAttempt assessmentAttempt =
           makeMe.modelFactoryService.assessmentAttemptRepository.findAll().iterator().next();
 
@@ -191,7 +193,7 @@ public class RestAssessmentControllerTests {
       answerSubmissions.add(answerSubmission);
 
       AssessmentResult assessmentResult =
-          controller.submitAssessmentResult(notebook, answerSubmissions);
+          controller.submitAssessmentResult(assessmentAttempt, answerSubmissions);
 
       assertEquals(2, assessmentResult.getTotalCount());
       assertEquals(1, assessmentResult.getCorrectCount());
@@ -201,21 +203,20 @@ public class RestAssessmentControllerTests {
     void shouldNotBeAbleToAccessNotebookWhenUserHasNoPermission() {
       makeMe.theNote(topNote).withNChildrenThat(2, NoteBuilder::hasAnApprovedQuestion).please();
       User anotherUser = makeMe.aUser().please();
-      notebook.setOwnership(anotherUser.getOwnership());
+      assessmentAttempt.setUser(anotherUser);
       assertThrows(
           UnexpectedNoAccessRightException.class,
-          () -> controller.submitAssessmentResult(notebook, answerSubmissions));
+          () -> controller.submitAssessmentResult(assessmentAttempt, answerSubmissions));
     }
   }
 
   @Nested
   class showAssessmentHistoryTest {
     private Notebook notebook;
-    private Note topNote;
 
     @BeforeEach
     void setup() {
-      topNote = makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser).please();
+      Note topNote = makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser).please();
       makeMe.theNote(topNote).withNChildrenThat(2, NoteBuilder::hasAnApprovedQuestion).please();
       notebook = topNote.getNotebook();
     }

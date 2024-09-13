@@ -114,7 +114,7 @@ const checkIfQuizComplete = async () => {
   ) {
     assessmentResult.value =
       await managedApi.restAssessmentController.submitAssessmentResult(
-        props.assessmentAttempt.notebookId,
+        props.assessmentAttempt.id,
         questionsAnswerCollection.value
       )
     if (

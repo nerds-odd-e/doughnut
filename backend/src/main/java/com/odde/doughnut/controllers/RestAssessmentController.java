@@ -43,19 +43,17 @@ class RestAssessmentController {
     return assessmentService.generateAssessment(notebook, currentUser.getEntity());
   }
 
-  @PostMapping("{notebook}")
+  @PostMapping("{assessmentAttempt}")
   @Transactional
   public AssessmentResult submitAssessmentResult(
-      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
+      @PathVariable("assessmentAttempt") @Schema(type = "integer")
+          AssessmentAttempt assessmentAttempt,
       @RequestBody List<AnswerSubmission> answerSubmissions)
       throws UnexpectedNoAccessRightException {
     currentUser.assertLoggedIn();
-    currentUser.assertReadAuthorization(notebook);
+    currentUser.assertReadAuthorization(assessmentAttempt);
     return assessmentService.submitAssessmentResult(
-        currentUser.getEntity(),
-        notebook,
-        answerSubmissions,
-        testabilitySettings.getCurrentUTCTimestamp());
+        assessmentAttempt, answerSubmissions, testabilitySettings.getCurrentUTCTimestamp());
   }
 
   @GetMapping

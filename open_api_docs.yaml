@@ -1611,13 +1611,13 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BazaarNotebook"
-  /api/assessment/{notebook}:
+  /api/assessment/{assessmentAttempt}:
     post:
       tags:
       - rest-assessment-controller
       operationId: submitAssessmentResult
       parameters:
-      - name: notebook
+      - name: assessmentAttempt
         in: path
         required: true
         schema:

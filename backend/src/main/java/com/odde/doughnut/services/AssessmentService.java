@@ -75,13 +75,9 @@ public class AssessmentService {
   }
 
   public AssessmentResult submitAssessmentResult(
-      User user,
-      Notebook notebook,
+      AssessmentAttempt assessmentAttempt,
       List<AnswerSubmission> answerSubmission,
       Timestamp currentUTCTimestamp) {
-    AssessmentAttempt assessmentAttempt = new AssessmentAttempt();
-    assessmentAttempt.setUser(user);
-    assessmentAttempt.setNotebook(notebook);
     assessmentAttempt.setAnswersTotal(answerSubmission.size());
     assessmentAttempt.setSubmittedAt(currentUTCTimestamp);
 

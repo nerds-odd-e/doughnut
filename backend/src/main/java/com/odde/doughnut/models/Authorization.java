@@ -35,15 +35,15 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
 
   public <T> void assertReadAuthorization(T object) throws UnexpectedNoAccessRightException {
     switch (object) {
-      case Note note -> assertReadAuthorizationNote(note);
-      case Notebook notebook -> assertReadAuthorizationNotebook(notebook);
-      case Subscription subscription -> assertReadAuthorization(subscription);
-      case Answer answer -> assertReadAuthorizationAnswer(answer);
-      case PredefinedQuestion predefinedQuestion ->
-          assertReadAuthorizationPredefinedQuestion(predefinedQuestion);
-      case ReviewPoint reviewPoint -> assertReadAuthorizationReviewPoint(reviewPoint);
-      case User user -> assertAuthorizationUser(user);
-      case Audio audio -> assertAuthorizationUser(audio.getUser());
+      case Note obj -> assertReadAuthorizationNote(obj);
+      case Notebook obj -> assertReadAuthorizationNotebook(obj);
+      case Subscription obj -> assertReadAuthorization(obj);
+      case Answer obj -> assertReadAuthorizationAnswer(obj);
+      case PredefinedQuestion obj -> assertReadAuthorizationPredefinedQuestion(obj);
+      case ReviewPoint obj -> assertReadAuthorizationReviewPoint(obj);
+      case User obj -> assertAuthorizationUser(obj);
+      case Audio obj -> assertAuthorizationUser(obj.getUser());
+      case AssessmentAttempt obj -> assertAuthorizationUser(obj.getUser());
       default ->
           throw new ResponseStatusException(
               HttpStatus.INTERNAL_SERVER_ERROR, "Unknown object type");
