@@ -17,6 +17,7 @@ Feature: Logged in status
     Then I should be asked to log in again when I click the link "Triangle"
 
   @mockBrowserTime
+  @usingMockedOpenAiService
   Scenario: Session timeout out when post
     Given I added and learned one note "Fungible" on day 1
     And I am repeat-reviewing my old note on day 2
