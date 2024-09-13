@@ -162,7 +162,7 @@ jobs:
     runs-on: ${{ vars.RUNNER }}
     needs:
       [
-        Linting,
+        Lint-N-Backend-Generated-Types-For-Frontend,
         Backend-unit-tests,
         Frontend-unit-tests,
         Package-artifacts,
@@ -189,7 +189,7 @@ jobs:
     runs-on: ${{ vars.RUNNER }}
     needs:
       [
-        Linting,
+        Lint-N-Backend-Generated-Types-For-Frontend,
         Backend-unit-tests,
         Frontend-unit-tests,
         Package-artifacts,
