@@ -26,8 +26,8 @@ env:
   DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 
 jobs:
-  Linting:
-    name: Backend + Frontend + Cypress Static Code Analysis
+  Lint-N-Backend-Generated-Types-For-Frontend:
+    name: Linting & Types Gen for Frontend
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
