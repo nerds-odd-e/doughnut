@@ -2,29 +2,23 @@
   <RadioButtons
     scope-name="review_setting"
     field="level"
-    :model-value="formData.level"
-    :errors="errors.level"
-    :options="
-      [0, 1, 2, 3, 4, 5, 6].map((level) => ({
-        value: level,
-        label: level,
-      }))
-    "
-    @update:model-value="updateModelValue({ level: Number.parseInt($event) })"
+    :model-value="levelAsString"
+    :errors="getErrorObject('level')"
+    :options="levelOptions"
+    @update:model-value="updateLevel"
   />
-
   <CheckInput
     scope-name="review_setting"
     field="rememberSpelling"
     :model-value="formData.rememberSpelling"
-    :errors="errors.rememberSpelling"
+    :errors="getErrorObject('rememberSpelling')"
     @update:model-value="updateModelValue({ rememberSpelling: $event })"
   />
   <CheckInput
     scope-name="review_setting"
     field="skipReview"
     :model-value="formData.skipReview"
-    :errors="errors.skipReview"
+    :errors="getErrorObject('skipReview')"
     @update:model-value="updateModelValue({ skipReview: $event })"
   />
 </template>
@@ -32,14 +26,12 @@
 <script lang="ts">
 import { ReviewSetting } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { PropType, defineComponent } from "vue"
+import { PropType, defineComponent, computed, ref } from "vue"
 import CheckInput from "../form/CheckInput.vue"
 import RadioButtons from "../form/RadioButtons.vue"
 
 export default defineComponent({
-  setup() {
-    return useLoadingApi()
-  },
+  components: { CheckInput, RadioButtons },
   props: {
     noteId: { type: Number, required: true },
     reviewSetting: {
@@ -47,29 +39,59 @@ export default defineComponent({
       required: false,
     },
   },
-  components: { CheckInput, RadioButtons },
   emits: ["levelChanged"],
-  data() {
-    return {
-      formData: (this.reviewSetting ? this.reviewSetting : {}) as ReviewSetting,
-      errors: {} as Partial<ReviewSetting>,
+  setup(props, { emit }) {
+    const { managedApi } = useLoadingApi()
+
+    const formData = ref<ReviewSetting>(props.reviewSetting || {})
+    const errors = ref<Partial<Record<keyof ReviewSetting, string>>>({})
+
+    const levelAsString = computed(() =>
+      formData.value.level !== undefined
+        ? formData.value.level.toString()
+        : undefined
+    )
+
+    const levelOptions = [0, 1, 2, 3, 4, 5, 6].map((level) => ({
+      value: level.toString(),
+      label: level.toString(),
+    }))
+
+    const getErrorObject = (field: keyof ReviewSetting) => {
+      const error = errors.value[field]
+      return error ? { [field]: error } : undefined
     }
-  },
-  methods: {
-    updateModelValue(newValue: ReviewSetting) {
-      this.formData = {
-        ...this.formData,
+
+    const updateModelValue = (newValue: Partial<ReviewSetting>) => {
+      formData.value = {
+        ...formData.value,
         ...newValue,
       }
-      this.managedApi.restNoteController
-        .updateReviewSetting(this.noteId, this.formData)
+      managedApi.restNoteController
+        .updateReviewSetting(props.noteId, formData.value)
         .then(() => {
           if (newValue.level !== undefined) {
-            this.$emit("levelChanged", newValue.level)
+            emit("levelChanged", newValue.level)
           }
         })
-        .catch((error) => (this.errors = error))
-    },
+        .catch((error) => {
+          errors.value = error
+        })
+    }
+
+    const updateLevel = (value: string) => {
+      updateModelValue({ level: Number.parseInt(value) })
+    }
+
+    return {
+      formData,
+      errors,
+      levelAsString,
+      levelOptions,
+      getErrorObject,
+      updateModelValue,
+      updateLevel,
+    }
   },
 })
 </script>
