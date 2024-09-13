@@ -121,7 +121,7 @@ export class RestPredefinedQuestionControllerService {
      * @returns PredefinedQuestion OK
      * @throws ApiError
      */
-    public generateAiQuestionWithoutSave(
+    public generateQuestionWithoutSave(
         note: number,
     ): CancelablePromise<PredefinedQuestion> {
         return this.httpRequest.request({
