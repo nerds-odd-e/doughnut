@@ -1,3 +1,4 @@
+@usingMockedOpenAiService
 Feature: Repetition Quiz
   As a learner, I want to use quizzes in my repetition to help and gamify my learning.
 
@@ -8,6 +9,7 @@ Feature: Repetition Quiz
       | Topic            | Details                        | Parent Topic|
       | sedition         | Sedition means incite violence | English     |
       | sedation         | Put to sleep is sedation       | English     |
+    And the OpenAI service is unavailable due to invalid system token
 
   Scenario Outline: Spelling quiz
     Given I am learning new note on day 1

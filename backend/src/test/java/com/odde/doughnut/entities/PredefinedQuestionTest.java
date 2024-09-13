@@ -8,15 +8,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionGenerator;
-import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
-import com.odde.doughnut.models.randomizers.RealRandomizer;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.MakeMe;
-import java.util.HashSet;
-import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -32,6 +28,7 @@ class PredefinedQuestionTest {
   @Autowired MakeMe makeMe;
   UserModel userModel;
   NonRandomizer randomizer = new NonRandomizer();
+  AiQuestionGenerator aiQuestionGenerator = mock(AiQuestionGenerator.class);
 
   @BeforeEach
   void setup() {
@@ -42,7 +39,7 @@ class PredefinedQuestionTest {
   void aNoteWithNoDescriptionHasNoQuiz() {
     Note note = makeMe.aNote().withNoDescription().creatorAndOwner(userModel).please();
 
-    assertNull(generateQuizQuestion(note));
+    assertNull(generateQuizQuestionEntity(note));
   }
 
   @Nested
@@ -66,42 +63,20 @@ class PredefinedQuestionTest {
     void shouldAlwaysChooseAIQuestionIfConfigured() {
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
       userModel.getEntity().setAiQuestionTypeOnlyForReview(true);
-      AiQuestionGenerator questionGenerator = mock(AiQuestionGenerator.class);
-      when(questionGenerator.getAiGeneratedQuestion(any())).thenReturn(mcqWithAnswer);
-      PredefinedQuestion randomQuizQuestion =
-          generateQuizQuestion(note, new RealRandomizer(), questionGenerator);
+      when(aiQuestionGenerator.getAiGeneratedQuestion(any())).thenReturn(mcqWithAnswer);
+      PredefinedQuestion randomQuizQuestion = generateQuizQuestionEntity(note);
       assertThat(randomQuizQuestion, instanceOf(PredefinedQuestion.class));
       PredefinedQuestion qq = randomQuizQuestion;
       assertThat(
           qq.getBareQuestion().getMultipleChoicesQuestion().getStem(),
           containsString(mcqWithAnswer.getMultipleChoicesQuestion().getStem()));
     }
-
-    @Test
-    void shouldReturnTheSameType() {
-      PredefinedQuestion randomQuizQuestion =
-          generateQuizQuestion(note, new RealRandomizer(), null);
-      Set<Class<? extends PredefinedQuestion>> types = new HashSet<>();
-      for (int i = 0; i < 3; i++) {
-        types.add(randomQuizQuestion.getClass());
-      }
-      assertThat(types, hasSize(1));
-    }
-  }
-
-  private PredefinedQuestion generateQuizQuestion(
-      Note note, Randomizer randomizer1, AiQuestionGenerator aiQuestionGenerator) {
-    PredefinedQuestionGenerator predefinedQuestionGenerator =
-        new PredefinedQuestionGenerator(
-            userModel.getEntity(), note, randomizer1, makeMe.modelFactoryService);
-    return predefinedQuestionGenerator.generateAQuestionOfRandomType(aiQuestionGenerator);
   }
 
   private PredefinedQuestion generateQuizQuestionEntity(Note note) {
-    return generateQuizQuestion(note, randomizer, null);
-  }
-
-  private PredefinedQuestion generateQuizQuestion(Note note) {
-    return generateQuizQuestionEntity(note);
+    PredefinedQuestionGenerator predefinedQuestionGenerator =
+        new PredefinedQuestionGenerator(
+            userModel.getEntity(), note, randomizer, makeMe.modelFactoryService);
+    return predefinedQuestionGenerator.generateAQuestionOfRandomType(aiQuestionGenerator);
   }
 }

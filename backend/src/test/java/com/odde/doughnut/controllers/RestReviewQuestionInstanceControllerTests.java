@@ -268,6 +268,9 @@ class RestReviewQuestionInstanceControllerTests {
   class GenerateRandomQuestion {
     @Test
     void itMustPersistTheQuestionGenerated() {
+      MCQWithAnswer jsonQuestion =
+          makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
+      openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(jsonQuestion, "");
       Note note = makeMe.aNote().details("description long enough.").rememberSpelling().please();
       // another note is needed, otherwise the note will be the only note in the notebook, and the
       // question cannot be generated.

@@ -1,8 +1,10 @@
 package com.odde.doughnut.factoryServices.quizFacotries;
 
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.AiQuestionFactory;
+import com.odde.doughnut.factoryServices.quizFacotries.factories.SpellingPredefinedFactory;
 import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import java.util.List;
@@ -15,7 +17,7 @@ public record PredefinedQuestionGenerator(
       PredefinedQuestionFactory predefinedQuestionFactory) {
     try {
       return Optional.of(predefinedQuestionFactory.buildValidPredefinedQuestion());
-    } catch (PredefinedQuestionNotPossibleException e) {
+    } catch (PredefinedQuestionNotPossibleException | OpenAiUnauthorizedException e) {
       return Optional.empty();
     }
   }
@@ -31,14 +33,16 @@ public record PredefinedQuestionGenerator(
 
   public PredefinedQuestion generateAQuestionOfRandomType(AiQuestionGenerator questionGenerator) {
     List<PredefinedQuestionFactory> shuffled;
-    if (note.getLinkType() == null && user.getAiQuestionTypeOnlyForReview()) {
-      shuffled = List.of(new AiQuestionFactory(note, questionGenerator));
+    if (note.getLinkType() == null) {
+      shuffled =
+          List.of(
+              new AiQuestionFactory(note, questionGenerator), new SpellingPredefinedFactory(note));
     } else {
       shuffled =
-          randomizer.shuffle(
-              note.getPredefinedQuestionFactories(
-                  new PredefinedQuestionServant(user, randomizer, modelFactoryService)));
+          note.getPredefinedQuestionFactories(
+              new PredefinedQuestionServant(user, randomizer, modelFactoryService));
     }
+    shuffled = randomizer.shuffle(shuffled);
     PredefinedQuestion result = generateAQuestionOfFirstPossibleType(shuffled);
     if (result == null) {
       return null;
