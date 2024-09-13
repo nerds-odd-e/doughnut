@@ -268,7 +268,7 @@ class RestReviewQuestionInstanceControllerTests {
   class GenerateRandomQuestion {
     @Test
     void itMustPersistTheQuestionGenerated() {
-      Note note = makeMe.aNote().details("description long enough.").please();
+      Note note = makeMe.aNote().details("description long enough.").rememberSpelling().please();
       // another note is needed, otherwise the note will be the only note in the notebook, and the
       // question cannot be generated.
       makeMe.aNote().under(note).please();

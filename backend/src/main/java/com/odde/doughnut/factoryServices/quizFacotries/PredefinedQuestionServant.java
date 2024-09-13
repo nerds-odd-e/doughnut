@@ -34,14 +34,9 @@ public class PredefinedQuestionServant {
     this.modelFactoryService = modelFactoryService;
   }
 
-  public List<Note> chooseFromCohort(Note answerNote, Predicate<Note> notePredicate) {
-    List<Note> list = getCohort(answerNote, n -> !n.equals(answerNote) && notePredicate.test(n));
-    return randomizer.randomlyChoose(maxFillingOptionCount, list).toList();
-  }
-
   public List<Note> getCohort(Note note, Predicate<Note> notePredicate) {
     List<Note> list = note.getNoneLinkSiblings().stream().filter(notePredicate).toList();
-    if (list.size() > 0) return list;
+    if (!list.isEmpty()) return list;
 
     Note grand = note;
     for (int i = 0; i < 2; i++)
@@ -110,7 +105,11 @@ public class PredefinedQuestionServant {
 
   private List<Note> chooseCohortAndAvoid(
       Note answerNote, Note noteToAvoid, List<Note> notesToAvoid) {
-    return chooseFromCohort(answerNote, n -> !n.equals(noteToAvoid) && !notesToAvoid.contains(n));
+    List<Note> list =
+        getCohort(
+            answerNote,
+            n1 -> !n1.equals(answerNote) && !n1.equals(noteToAvoid) && !notesToAvoid.contains(n1));
+    return randomizer.randomlyChoose(maxFillingOptionCount, list).toList();
   }
 
   public List<Note> chooseFromCohortAvoidSiblings(Note answerLink) {

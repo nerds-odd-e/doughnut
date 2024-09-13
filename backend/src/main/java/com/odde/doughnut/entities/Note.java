@@ -13,7 +13,6 @@ import com.odde.doughnut.algorithms.SiblingOrder;
 import com.odde.doughnut.controllers.dto.NoteTopic;
 import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionServant;
-import com.odde.doughnut.factoryServices.quizFacotries.factories.ClozeTitleSelectionPredefinedFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.SpellingPredefinedFactory;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.TimestampOperations;
@@ -386,9 +385,7 @@ public class Note extends EntityIdentifiedByIdOnly {
           .map(t -> t.factoryForLinkingNote.apply(this, servant))
           .toList();
     }
-    return List.of(
-        new SpellingPredefinedFactory(this),
-        new ClozeTitleSelectionPredefinedFactory(this, servant));
+    return List.of(new SpellingPredefinedFactory(this));
   }
 
   @JsonIgnore

@@ -34,9 +34,7 @@ class PredefinedQuestionGeneratorTest {
   void note() {
     makeMe.theNote(note).rememberSpelling().please();
     var questionTypes = getQuestionTypes(note);
-    assertThat(
-        questionTypes,
-        contains(SpellingPredefinedFactory.class, ClozeTitleSelectionPredefinedFactory.class));
+    assertThat(questionTypes, contains(SpellingPredefinedFactory.class));
   }
 
   @Test
