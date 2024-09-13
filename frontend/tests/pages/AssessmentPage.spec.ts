@@ -80,7 +80,7 @@ describe("assessment page", () => {
     beforeEach(() => {
       helper.managedApi.restAssessmentController.generateAssessmentQuestions =
         vi.fn().mockResolvedValue(assessmentAttempt)
-      helper.managedApi.restReviewQuestionController.answerQuiz = vi
+      helper.managedApi.restAssessmentController.answerQuestion = vi
         .fn()
         .mockResolvedValueOnce(answerResult1)
         .mockResolvedValueOnce(answerResult2)

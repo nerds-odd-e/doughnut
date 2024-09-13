@@ -42,7 +42,7 @@ class RestPredefinedQuestionController {
   public PredefinedQuestion generateAIQuestionWithoutSave(
       @RequestParam(value = "note") @Schema(type = "integer") Note note) {
     currentUser.assertLoggedIn();
-    return predefinedQuestionService.generateMcqWithAnswer(note);
+    return predefinedQuestionService.generateQuestionWithoutSaving(note);
   }
 
   @PostMapping("/{predefinedQuestion}/suggest-fine-tuning")

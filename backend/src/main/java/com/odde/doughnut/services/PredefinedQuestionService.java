@@ -4,7 +4,10 @@ import com.odde.doughnut.controllers.dto.ReviewQuestionContestResult;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.PredefinedQuestion;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionGenerator;
+import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.theokanning.openai.client.OpenAiApi;
@@ -48,7 +51,7 @@ public class PredefinedQuestionService {
     return question;
   }
 
-  public PredefinedQuestion generateMcqWithAnswer(Note note) {
+  public PredefinedQuestion generateQuestionWithoutSaving(Note note) {
     MCQWithAnswer MCQWithAnswer = aiQuestionGenerator.getAiGeneratedQuestion(note);
     if (MCQWithAnswer == null) {
       return null;
@@ -57,7 +60,7 @@ public class PredefinedQuestionService {
   }
 
   public PredefinedQuestion generateQuestionForNote(Note note) {
-    PredefinedQuestion question = generateMcqWithAnswer(note);
+    PredefinedQuestion question = generateQuestionWithoutSaving(note);
     if (question == null) {
       return null;
     }
@@ -66,5 +69,12 @@ public class PredefinedQuestionService {
 
   public ReviewQuestionContestResult contest(PredefinedQuestion predefinedQuestion) {
     return aiQuestionGenerator.getReviewQuestionContestResult(predefinedQuestion);
+  }
+
+  public PredefinedQuestion generateAQuestionOfRandomType(
+      Note note, Randomizer randomizer, User user) {
+    PredefinedQuestionGenerator predefinedQuestionGenerator =
+        new PredefinedQuestionGenerator(user, note, randomizer, modelFactoryService);
+    return predefinedQuestionGenerator.generateAQuestionOfRandomType(aiQuestionGenerator);
   }
 }

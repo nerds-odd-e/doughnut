@@ -6,11 +6,8 @@ import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.ReviewQuestionInstance;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionGenerator;
-import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.GlobalSettingsService;
-import com.odde.doughnut.services.ai.AiQuestionGenerator;
+import com.odde.doughnut.services.PredefinedQuestionService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -25,12 +22,11 @@ import org.springframework.web.server.ResponseStatusException;
 @RequestMapping("/api/review-points")
 class RestReviewPointController {
   private final ModelFactoryService modelFactoryService;
+  private final PredefinedQuestionService predefinedQuestionService;
   private UserModel currentUser;
 
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
-
-  private final AiQuestionGenerator questionGenerator;
 
   public RestReviewPointController(
       @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
@@ -40,8 +36,7 @@ class RestReviewPointController {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
-    questionGenerator =
-        new AiQuestionGenerator(openAiApi, new GlobalSettingsService(modelFactoryService));
+    this.predefinedQuestionService = new PredefinedQuestionService(openAiApi, modelFactoryService);
   }
 
   @GetMapping("/{reviewPoint}")
@@ -58,12 +53,10 @@ class RestReviewPointController {
   public ReviewQuestionInstance generateRandomQuestion(
       @PathVariable("reviewPoint") @Schema(type = "integer") ReviewPoint reviewPoint) {
     currentUser.assertLoggedIn();
-    Randomizer randomizer = testabilitySettings.getRandomizer();
-    PredefinedQuestionGenerator predefinedQuestionGenerator =
-        new PredefinedQuestionGenerator(
-            reviewPoint.getUser(), reviewPoint.getNote(), randomizer, modelFactoryService);
+
     PredefinedQuestion question =
-        predefinedQuestionGenerator.generateAQuestionOfRandomType(questionGenerator);
+        predefinedQuestionService.generateAQuestionOfRandomType(
+            reviewPoint.getNote(), testabilitySettings.getRandomizer(), currentUser.getEntity());
     return modelFactoryService.createReviewQuestion(question);
   }
 
