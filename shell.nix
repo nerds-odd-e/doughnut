@@ -78,6 +78,7 @@ in mkShell {
     echo "##   JAVA VERSION: `javac --version`                    "
     echo "##   NODE VERSION: `node --version`                     "
     echo "##   PNPM VERSION: `pnpm --version`                     "
+    echo "##   BIOME VERSION: `pnpm biome --version`              "
     echo "##   PYTHON VERSION: `python --version`                 "
     echo "##   POETRY VERSION: `poetry --version`                 "
     echo "                                                                                "
