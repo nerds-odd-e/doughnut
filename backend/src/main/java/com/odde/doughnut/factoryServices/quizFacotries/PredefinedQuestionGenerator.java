@@ -17,10 +17,6 @@ public record PredefinedQuestionGenerator(
   public PredefinedQuestion generateAQuestionOfRandomType(AiQuestionGenerator questionGenerator) {
     List<PredefinedQuestionFactory> factories = getPredefinedQuestionFactories(questionGenerator);
     PredefinedQuestion result = generateAQuestionOfFirstPossibleType(randomizer.shuffle(factories));
-    if (result == null) {
-      return null;
-    }
-    modelFactoryService.save(result);
     return result;
   }
 

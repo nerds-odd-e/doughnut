@@ -52,19 +52,20 @@ public class PredefinedQuestionService {
     return question;
   }
 
-  public PredefinedQuestion generateAIQuestionWithoutSaving(Note note) {
-    MCQWithAnswer MCQWithAnswer = aiQuestionGenerator.getAiGeneratedQuestion(note);
-    if (MCQWithAnswer == null) {
-      return null;
-    }
-    return PredefinedQuestion.fromMCQWithAnswer(MCQWithAnswer, note);
-  }
-
   public ReviewQuestionContestResult contest(PredefinedQuestion predefinedQuestion) {
     return aiQuestionGenerator.getReviewQuestionContestResult(predefinedQuestion);
   }
 
   public PredefinedQuestion generateAQuestionOfRandomType(Note note, User user) {
+    PredefinedQuestion result = generateAQuestionOfRandomTypeWithoutSaving(note, user);
+    if (result == null) {
+      return null;
+    }
+    modelFactoryService.save(result);
+    return result;
+  }
+
+  public PredefinedQuestion generateAQuestionOfRandomTypeWithoutSaving(Note note, User user) {
     PredefinedQuestionGenerator predefinedQuestionGenerator =
         new PredefinedQuestionGenerator(user, note, randomizer, modelFactoryService);
     return predefinedQuestionGenerator.generateAQuestionOfRandomType(aiQuestionGenerator);

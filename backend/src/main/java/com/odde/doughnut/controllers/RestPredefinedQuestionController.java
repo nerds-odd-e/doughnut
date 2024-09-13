@@ -41,10 +41,11 @@ class RestPredefinedQuestionController {
   }
 
   @PostMapping("/generate-question-without-save")
-  public PredefinedQuestion generateAIQuestionWithoutSave(
+  public PredefinedQuestion generateQuestionWithoutSave(
       @RequestParam(value = "note") @Schema(type = "integer") Note note) {
     currentUser.assertLoggedIn();
-    return predefinedQuestionService.generateAIQuestionWithoutSaving(note);
+    return predefinedQuestionService.generateAQuestionOfRandomTypeWithoutSaving(
+        note, currentUser.getEntity());
   }
 
   @PostMapping("/{predefinedQuestion}/suggest-fine-tuning")
