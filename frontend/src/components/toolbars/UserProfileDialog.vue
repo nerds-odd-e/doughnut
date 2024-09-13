@@ -56,7 +56,7 @@ const processForm = async () => {
     .catch((err) => {
       errors.value = err
     })
-  emits["user-updated"](updated)
+  emits("user-updated", updated)
 }
 
 onMounted(() => fetchData())
