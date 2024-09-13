@@ -11,9 +11,6 @@ import com.odde.doughnut.algorithms.HtmlOrMarkdown;
 import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.algorithms.SiblingOrder;
 import com.odde.doughnut.controllers.dto.NoteTopic;
-import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionFactory;
-import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionServant;
-import com.odde.doughnut.factoryServices.quizFacotries.factories.SpellingPredefinedFactory;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.TimestampOperations;
 import jakarta.persistence.*;
@@ -376,16 +373,6 @@ public class Note extends EntityIdentifiedByIdOnly {
 
   public NoteViewer targetNoteViewer(User user) {
     return new NoteViewer(user, getTargetNote());
-  }
-
-  public List<PredefinedQuestionFactory> getPredefinedQuestionFactories(
-      PredefinedQuestionServant servant) {
-    if (getLinkType() != null) {
-      return Arrays.stream(getLinkType().getQuestionTypes())
-          .map(t -> t.factoryForLinkingNote.apply(this, servant))
-          .toList();
-    }
-    return List.of(new SpellingPredefinedFactory(this));
   }
 
   @JsonIgnore
