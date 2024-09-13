@@ -24,7 +24,7 @@ class ClozeLinkTargetQuizFactoryTest {
   Note target;
   Note source;
   Note anotherSource;
-  LinkingNote subjectNote;
+  Note subjectNote;
 
   @BeforeEach
   void setup() {

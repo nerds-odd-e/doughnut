@@ -6,11 +6,11 @@ import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionServant
 import java.util.List;
 
 public class LinkSourceWithinSameLinkTypePredefinedFactory extends QuestionOptionsFactory {
-  protected final LinkingNote link;
+  protected final Note link;
   private List<LinkingNote> cachedFillingOptions = null;
 
   public LinkSourceWithinSameLinkTypePredefinedFactory(
-      LinkingNote note, PredefinedQuestionServant servant) {
+      Note note, PredefinedQuestionServant servant) {
     super(note, servant);
     this.link = note;
   }

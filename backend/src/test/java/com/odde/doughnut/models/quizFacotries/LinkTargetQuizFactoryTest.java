@@ -28,7 +28,7 @@ class LinkTargetQuizFactoryTest {
   Note target;
   Note source;
   Note anotherTarget;
-  LinkingNote subjectNote;
+  Note subjectNote;
 
   @BeforeEach
   void setup() {

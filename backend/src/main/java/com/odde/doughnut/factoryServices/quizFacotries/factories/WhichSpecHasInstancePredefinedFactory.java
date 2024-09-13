@@ -6,12 +6,11 @@ import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionServant
 import java.util.List;
 
 public class WhichSpecHasInstancePredefinedFactory extends QuestionOptionsFactory {
-  private LinkingNote instanceLink = null;
+  private Note instanceLink = null;
   private List<Note> cachedFillingOptions = null;
-  private final LinkingNote link;
+  private final Note link;
 
-  public WhichSpecHasInstancePredefinedFactory(
-      LinkingNote note, PredefinedQuestionServant servant) {
+  public WhichSpecHasInstancePredefinedFactory(Note note, PredefinedQuestionServant servant) {
     super(note, servant);
     this.link = note;
   }

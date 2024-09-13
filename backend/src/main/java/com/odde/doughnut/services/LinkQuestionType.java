@@ -1,6 +1,6 @@
 package com.odde.doughnut.services;
 
-import com.odde.doughnut.entities.LinkingNote;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionServant;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.*;
@@ -16,11 +16,11 @@ public enum LinkQuestionType {
   FROM_SAME_PART_AS(FromSamePartAsPredefinedFactory::new),
   FROM_DIFFERENT_PART_AS(FromDifferentPartAsPredefinedFactory::new);
 
-  public final BiFunction<LinkingNote, PredefinedQuestionServant, PredefinedQuestionFactory>
+  public final BiFunction<Note, PredefinedQuestionServant, PredefinedQuestionFactory>
       factoryForLinkingNote;
 
   LinkQuestionType(
-      BiFunction<LinkingNote, PredefinedQuestionServant, PredefinedQuestionFactory>
+      BiFunction<Note, PredefinedQuestionServant, PredefinedQuestionFactory>
           factoryForLinkingNote) {
     this.factoryForLinkingNote = factoryForLinkingNote;
   }

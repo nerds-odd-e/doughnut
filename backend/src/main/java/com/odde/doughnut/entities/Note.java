@@ -13,6 +13,8 @@ import com.odde.doughnut.algorithms.SiblingOrder;
 import com.odde.doughnut.controllers.dto.NoteTopic;
 import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionServant;
+import com.odde.doughnut.factoryServices.quizFacotries.factories.ClozeTitleSelectionPredefinedFactory;
+import com.odde.doughnut.factoryServices.quizFacotries.factories.SpellingPredefinedFactory;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.TimestampOperations;
 import jakarta.persistence.*;
@@ -296,10 +298,6 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  public abstract List<PredefinedQuestionFactory> getPredefinedQuestionFactories(
-      PredefinedQuestionServant servant);
-
-  @JsonIgnore
   public NoteAccessory getOrInitializeNoteAccessory() {
     if (noteAccessory == null) {
       noteAccessory = new NoteAccessory();
@@ -379,5 +377,29 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
 
   public NoteViewer targetNoteViewer(User user) {
     return new NoteViewer(user, getTargetNote());
+  }
+
+  public List<PredefinedQuestionFactory> getPredefinedQuestionFactories(
+      PredefinedQuestionServant servant) {
+    if (getLinkType() != null) {
+      return Arrays.stream(getLinkType().getQuestionTypes())
+          .map(t -> t.factoryForLinkingNote.apply(this, servant))
+          .toList();
+    }
+    return List.of(
+        new SpellingPredefinedFactory(this),
+        new ClozeTitleSelectionPredefinedFactory(this, servant));
+  }
+
+  @JsonIgnore
+  public Stream<LinkingNote> getSiblingLinksOfSameLinkType(User user) {
+    return targetNoteViewer(user)
+        .linksOfTypeThroughReverse(getLinkType())
+        .filter(l -> !l.equals(this));
+  }
+
+  @JsonIgnore
+  public List<Note> getLinkedSiblingsOfSameLinkType(User user) {
+    return getSiblingLinksOfSameLinkType(user).map(Note::getParent).toList();
   }
 }

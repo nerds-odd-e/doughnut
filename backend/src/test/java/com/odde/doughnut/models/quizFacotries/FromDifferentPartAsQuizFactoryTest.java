@@ -38,7 +38,7 @@ class FromDifferentPartAsQuizFactoryTest {
   Note kind;
   Note subjectivePerspective;
   Note kindSubjective;
-  LinkingNote uglySubjective;
+  Note uglySubjective;
 
   @BeforeEach
   void setup() {

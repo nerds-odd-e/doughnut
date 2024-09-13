@@ -36,9 +36,7 @@ class PredefinedQuestionGeneratorTest {
     var questionTypes = getQuestionTypes(note);
     assertThat(
         questionTypes,
-        contains(
-            SpellingPredefinedFactory.class,
-            ClozeTitleSelectionPredefinedFactory.class));
+        contains(SpellingPredefinedFactory.class, ClozeTitleSelectionPredefinedFactory.class));
   }
 
   @Test

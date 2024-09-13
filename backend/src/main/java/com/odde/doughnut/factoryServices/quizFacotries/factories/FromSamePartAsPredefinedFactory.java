@@ -6,12 +6,12 @@ import java.util.List;
 
 public class FromSamePartAsPredefinedFactory extends QuestionOptionsFactory {
 
-  private LinkingNote parentGrandLink;
+  private Note parentGrandLink;
   private Note cachedAnswerLink = null;
   private List<Note> cachedFillingOptions = null;
-  private final LinkingNote link;
+  private final Note link;
 
-  public FromSamePartAsPredefinedFactory(LinkingNote note, PredefinedQuestionServant servant) {
+  public FromSamePartAsPredefinedFactory(Note note, PredefinedQuestionServant servant) {
     super(note, servant);
     link = note;
   }

@@ -130,7 +130,7 @@ public class MakeMe extends MakeMeWithoutDB {
   }
 
   public PredefinedQuestion buildAQuestionForLinkingNote(
-      LinkQuestionType linkQuestionType, LinkingNote linkingNote, User user) {
+      LinkQuestionType linkQuestionType, Note linkingNote, User user) {
     PredefinedQuestionServant servant =
         new PredefinedQuestionServant(user, new NonRandomizer(), modelFactoryService);
     try {

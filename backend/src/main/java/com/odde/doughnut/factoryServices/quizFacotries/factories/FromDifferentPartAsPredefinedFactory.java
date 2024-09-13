@@ -7,10 +7,10 @@ import java.util.stream.Collectors;
 
 public class FromDifferentPartAsPredefinedFactory extends QuestionOptionsFactory {
 
-  private LinkingNote parentGrandLink;
-  private final LinkingNote link;
+  private Note parentGrandLink;
+  private final Note link;
 
-  public FromDifferentPartAsPredefinedFactory(LinkingNote note, PredefinedQuestionServant servant) {
+  public FromDifferentPartAsPredefinedFactory(Note note, PredefinedQuestionServant servant) {
     super(note, servant);
     link = note;
   }

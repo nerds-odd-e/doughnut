@@ -6,7 +6,7 @@ import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
 
-public class LinkBuilder extends EntityBuilder<LinkingNote> {
+public class LinkBuilder extends EntityBuilder<Note> {
   User creator = null;
 
   public LinkBuilder(MakeMe makeMe) {

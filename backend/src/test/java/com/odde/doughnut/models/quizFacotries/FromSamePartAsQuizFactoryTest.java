@@ -32,7 +32,7 @@ class FromSamePartAsQuizFactoryTest {
   Note pretty;
   Note tall;
   Note subjectivePerspective;
-  LinkingNote uglySubjective;
+  Note uglySubjective;
 
   @BeforeEach
   void setup() {
