@@ -68,7 +68,10 @@ const filterByCertificate = ref(false)
 const assessmentHistories = ref<AssessmentAttempt[]>([])
 const filterText = ref("")
 
-const toLocalDateString = (date: string) => {
+const toLocalDateString = (date?: string) => {
+  if (!date) {
+    return ""
+  }
   return new Date(date).toLocaleString()
 }
 

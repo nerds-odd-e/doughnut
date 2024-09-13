@@ -6,7 +6,7 @@ import type { AssessmentQuestionInstance } from './AssessmentQuestionInstance';
 export type AssessmentAttempt = {
     id: number;
     notebookTitle?: string;
-    submittedAt: string;
+    submittedAt?: string;
     isPass?: boolean;
     answersTotal?: number;
     answersCorrect?: number;

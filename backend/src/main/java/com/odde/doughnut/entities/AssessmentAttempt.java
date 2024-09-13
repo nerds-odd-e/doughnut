@@ -27,7 +27,6 @@ public class AssessmentAttempt extends EntityIdentifiedByIdOnly {
   private Notebook notebook;
 
   @Column(name = "submitted_at")
-  @NotNull
   private Timestamp submittedAt;
 
   @Column(name = "answers_total")

@@ -44,7 +44,8 @@ public class AssessmentServiceTests {
     Set<Integer> performAssessments(int numberOfAttempts) {
       Set<Integer> questionIds = new HashSet<>();
       for (int i = 0; i < numberOfAttempts; i++) {
-        AssessmentAttempt assessment = service.generateAssessment(notebook);
+        AssessmentAttempt assessment =
+            service.generateAssessment(notebook, currentUser.getEntity());
         Integer questionId =
             assessment.getAssessmentQuestionInstances().get(0).getReviewQuestionInstance().getId();
         questionIds.add(questionId);
@@ -95,20 +96,22 @@ public class AssessmentServiceTests {
     @Test
     void shouldReturn5QuestionsWhenThereAreMoreThan5NotesWithQuestions() {
       makeMe.theNote(topNote).withNChildrenThat(5, NoteBuilder::hasAnApprovedQuestion).please();
-      AssessmentAttempt assessment = service.generateAssessment(notebook);
+      AssessmentAttempt assessment = service.generateAssessment(notebook, currentUser.getEntity());
       assertEquals(5, assessment.getAssessmentQuestionInstances().size());
     }
 
     @Test
     void shouldThrowExceptionWhenThereAreNotEnoughQuestions() {
       makeMe.theNote(topNote).withNChildrenThat(4, NoteBuilder::hasAnApprovedQuestion).please();
-      assertThrows(ApiException.class, () -> service.generateAssessment(notebook));
+      assertThrows(
+          ApiException.class, () -> service.generateAssessment(notebook, currentUser.getEntity()));
     }
 
     @Test
     void shouldGetOneApprovedQuestionFromEachNoteOnly() {
       makeMe.theNote(topNote).withNChildrenThat(5, NoteBuilder::hasAnUnapprovedQuestion).please();
-      assertThrows(ApiException.class, () -> service.generateAssessment(notebook));
+      assertThrows(
+          ApiException.class, () -> service.generateAssessment(notebook, currentUser.getEntity()));
     }
   }
 }

@@ -3472,7 +3472,6 @@ components:
       required:
       - id
       - notebookId
-      - submittedAt
       type: object
       properties:
         id:

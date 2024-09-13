@@ -24,7 +24,7 @@ public class AssessmentService {
     this.testabilitySettings = testabilitySettings;
   }
 
-  public AssessmentAttempt generateAssessment(Notebook notebook) {
+  public AssessmentAttempt generateAssessment(Notebook notebook, User user) {
     Randomizer randomizer = this.testabilitySettings.getRandomizer();
     List<Note> notes = randomizer.shuffle(notebook.getNotes());
 
@@ -68,7 +68,9 @@ public class AssessmentService {
                 })
             .toList();
     assessmentAttempt.setNotebook(notebook);
+    assessmentAttempt.setUser(user);
     assessmentAttempt.setAssessmentQuestionInstances(assessmentQuestionInstances);
+    modelFactoryService.save(assessmentAttempt);
     return assessmentAttempt;
   }
 

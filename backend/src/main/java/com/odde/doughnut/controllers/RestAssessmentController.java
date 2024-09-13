@@ -40,9 +40,7 @@ class RestAssessmentController {
     currentUser.assertLoggedIn();
     currentUser.assertReadAuthorization(notebook);
 
-    AssessmentAttempt assessmentAttempt = assessmentService.generateAssessment(notebook);
-
-    return assessmentAttempt;
+    return assessmentService.generateAssessment(notebook, currentUser.getEntity());
   }
 
   @PostMapping("{notebook}")
