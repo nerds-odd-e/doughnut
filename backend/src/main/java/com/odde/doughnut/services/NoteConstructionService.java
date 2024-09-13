@@ -1,6 +1,5 @@
 package com.odde.doughnut.services;
 
-import com.odde.doughnut.entities.HierarchicalNote;
 import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
@@ -16,8 +15,8 @@ public record NoteConstructionService(
     User user, Timestamp currentUTCTimestamp, ModelFactoryService modelFactoryService) {
 
   public Note createNote(Note parentNote, String topicConstructor) {
-    Note note =
-        HierarchicalNote.createNote(user, parentNote, currentUTCTimestamp, topicConstructor);
+    final Note note = new Note();
+    note.initialize(user, parentNote, currentUTCTimestamp, topicConstructor);
     if (modelFactoryService != null) {
       modelFactoryService.save(note);
     }

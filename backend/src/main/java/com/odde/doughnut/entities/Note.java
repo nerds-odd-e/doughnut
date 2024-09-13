@@ -32,7 +32,7 @@ import lombok.Setter;
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "note")
 @JsonPropertyOrder({"topic", "noteTopic", "details", "parentId", "linkType", "updatedAt"})
-public abstract class Note extends EntityIdentifiedByIdOnly {
+public class Note extends EntityIdentifiedByIdOnly {
   public static final int MAX_TITLE_LENGTH = 150;
   private static final String PATH_DELIMITER = " › ";
 
@@ -357,7 +357,7 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
     return noteBrief;
   }
 
-  protected void initialize(
+  public void initialize(
       User user, Note parentNote, Timestamp currentUTCTimestamp, String topicConstructor) {
     setParentNote(parentNote);
     setUpdatedAt(currentUTCTimestamp);

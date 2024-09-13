@@ -31,7 +31,7 @@ public record PredefinedQuestionGenerator(
 
   public PredefinedQuestion generateAQuestionOfRandomType(AiQuestionGenerator questionGenerator) {
     List<PredefinedQuestionFactory> shuffled;
-    if (note instanceof HierarchicalNote && user.getAiQuestionTypeOnlyForReview()) {
+    if (note.getLinkType() == null && user.getAiQuestionTypeOnlyForReview()) {
       shuffled = List.of(new AiQuestionFactory(note, questionGenerator));
     } else {
       shuffled =
