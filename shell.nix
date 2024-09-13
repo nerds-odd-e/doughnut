@@ -119,6 +119,6 @@ in mkShell {
     corepack use pnpm@9.10.0
     pnpm --frozen-lockfile recursive install
     # start biome daemon-server
-    pnpm biome start
+    pnpm biome stop && pnpm biome start
   '';
 }
