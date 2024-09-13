@@ -83,12 +83,7 @@ class RestReviewQuestionController {
           ReviewQuestionInstance reviewQuestionInstance,
       @Valid @RequestBody AnswerDTO answerDTO) {
     currentUser.assertLoggedIn();
-    Answer answer = new Answer();
-    answer.setReviewQuestionInstance(reviewQuestionInstance);
-    answer.setFromDTO(answerDTO);
-    AnswerModel answerModel = modelFactoryService.toAnswerModel(answer);
-    answerModel.makeAnswerToQuestion(
-        testabilitySettings.getCurrentUTCTimestamp(), currentUser.getEntity());
-    return answerModel.getAnswerViewedByUser(currentUser.getEntity());
+    return reviewService.answerQuestion(reviewQuestionInstance, answerDTO, currentUser.getEntity(), testabilitySettings.getCurrentUTCTimestamp());
   }
+
 }
