@@ -2,8 +2,7 @@ package com.odde.doughnut.entities;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -27,7 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -46,7 +44,7 @@ class PredefinedQuestionTest {
   void aNoteWithNoDescriptionHasNoQuiz() {
     Note note = makeMe.aNote().withNoDescription().creatorAndOwner(userModel).please();
 
-    assertThrows(ResponseStatusException.class, () -> generateQuizQuestion(note));
+    assertNull(generateQuizQuestion(note));
   }
 
   @Test
@@ -68,7 +66,7 @@ class PredefinedQuestionTest {
     @Test
     void aNoteWithNoSiblingsShouldNotGenerateAnyQuestion() {
       Note note = makeMe.aNote().please();
-      assertThrows(ResponseStatusException.class, () -> generateQuizQuestion(note));
+      assertNull(generateQuizQuestion(note));
     }
 
     @Nested

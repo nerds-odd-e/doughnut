@@ -7,8 +7,6 @@ import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
 public record PredefinedQuestionGenerator(
     User user, Note note, Randomizer randomizer, ModelFactoryService modelFactoryService) {
@@ -43,7 +41,7 @@ public record PredefinedQuestionGenerator(
     }
     PredefinedQuestion result = generateAQuestionOfFirstPossibleType(shuffled);
     if (result == null) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No question generated");
+      return null;
     }
 
     modelFactoryService.save(result);

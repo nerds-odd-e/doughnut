@@ -57,6 +57,9 @@ class RestReviewPointController {
     PredefinedQuestion question =
         predefinedQuestionService.generateAQuestionOfRandomType(
             reviewPoint.getNote(), testabilitySettings.getRandomizer(), currentUser.getEntity());
+    if (question == null) {
+      return null;
+    }
     return modelFactoryService.createReviewQuestion(question);
   }
 
