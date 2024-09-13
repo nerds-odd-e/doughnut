@@ -90,4 +90,23 @@ export class RestReviewQuestionControllerService {
             },
         });
     }
+    /**
+     * @param reviewPoint
+     * @returns ReviewQuestionInstance OK
+     * @throws ApiError
+     */
+    public generateRandomQuestion(
+        reviewPoint: number,
+    ): CancelablePromise<ReviewQuestionInstance> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/review-questions/{reviewPoint}/random-question',
+            path: {
+                'reviewPoint': reviewPoint,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
 }

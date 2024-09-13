@@ -3,7 +3,6 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { ReviewPoint } from '../models/ReviewPoint';
-import type { ReviewQuestionInstance } from '../models/ReviewQuestionInstance';
 import type { SelfEvaluation } from '../models/SelfEvaluation';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -86,25 +85,6 @@ export class RestReviewPointControllerService {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/review-points/{reviewPoint}',
-            path: {
-                'reviewPoint': reviewPoint,
-            },
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * @param reviewPoint
-     * @returns ReviewQuestionInstance OK
-     * @throws ApiError
-     */
-    public generateRandomQuestion(
-        reviewPoint: number,
-    ): CancelablePromise<ReviewQuestionInstance> {
-        return this.httpRequest.request({
-            method: 'GET',
-            url: '/api/review-points/{reviewPoint}/random-question',
             path: {
                 'reviewPoint': reviewPoint,
             },

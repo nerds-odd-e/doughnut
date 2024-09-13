@@ -43,7 +43,21 @@ class RestReviewQuestionController {
   public ReviewQuestionInstance generateQuestion(
       @RequestParam(value = "note") @Schema(type = "integer") Note note) {
     currentUser.assertLoggedIn();
-    PredefinedQuestion question = predefinedQuestionService.generateQuestionForNote(note);
+    PredefinedQuestion question = predefinedQuestionService.generateAIQuestionForNote(note);
+    if (question == null) {
+      return null;
+    }
+    return modelFactoryService.createReviewQuestion(question);
+  }
+
+  @GetMapping("/{reviewPoint}/random-question")
+  @Transactional
+  public ReviewQuestionInstance generateRandomQuestion(
+      @PathVariable("reviewPoint") @Schema(type = "integer") ReviewPoint reviewPoint) {
+    currentUser.assertLoggedIn();
+    PredefinedQuestion question =
+        predefinedQuestionService.generateAQuestionOfRandomType(
+            reviewPoint.getNote(), testabilitySettings.getRandomizer(), currentUser.getEntity());
     if (question == null) {
       return null;
     }
@@ -57,7 +71,7 @@ class RestReviewQuestionController {
           ReviewQuestionInstance reviewQuestionInstance) {
     currentUser.assertLoggedIn();
     PredefinedQuestion question =
-        predefinedQuestionService.generateQuestionForNote(
+        predefinedQuestionService.generateAIQuestionForNote(
             reviewQuestionInstance.getPredefinedQuestion().getNote());
     if (question == null) {
       return null;

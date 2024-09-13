@@ -11,12 +11,10 @@ import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.theokanning.openai.client.OpenAiApi;
-import jakarta.validation.Valid;
 import java.sql.Timestamp;
 
 public class PredefinedQuestionService {
   private final ModelFactoryService modelFactoryService;
-
   private final AiQuestionGenerator aiQuestionGenerator;
 
   public PredefinedQuestionService(OpenAiApi openAiApi, ModelFactoryService modelFactoryService) {
@@ -25,7 +23,7 @@ public class PredefinedQuestionService {
         new AiQuestionGenerator(openAiApi, new GlobalSettingsService(modelFactoryService));
   }
 
-  public PredefinedQuestion addQuestion(Note note, @Valid PredefinedQuestion predefinedQuestion) {
+  public PredefinedQuestion addQuestion(Note note, PredefinedQuestion predefinedQuestion) {
     predefinedQuestion.setNote(note);
 
     Notebook parentNotebook = note.getNotebook();
@@ -35,7 +33,7 @@ public class PredefinedQuestionService {
     return predefinedQuestion;
   }
 
-  public PredefinedQuestion refineQuestion(Note note, PredefinedQuestion predefinedQuestion) {
+  public PredefinedQuestion refineAIQuestion(Note note, PredefinedQuestion predefinedQuestion) {
     MCQWithAnswer aiGeneratedRefineQuestion =
         aiQuestionGenerator.getAiGeneratedRefineQuestion(
             note, predefinedQuestion.getMcqWithAnswer());
@@ -51,7 +49,7 @@ public class PredefinedQuestionService {
     return question;
   }
 
-  public PredefinedQuestion generateQuestionWithoutSaving(Note note) {
+  public PredefinedQuestion generateAIQuestionWithoutSaving(Note note) {
     MCQWithAnswer MCQWithAnswer = aiQuestionGenerator.getAiGeneratedQuestion(note);
     if (MCQWithAnswer == null) {
       return null;
@@ -59,8 +57,8 @@ public class PredefinedQuestionService {
     return PredefinedQuestion.fromMCQWithAnswer(MCQWithAnswer, note);
   }
 
-  public PredefinedQuestion generateQuestionForNote(Note note) {
-    PredefinedQuestion question = generateQuestionWithoutSaving(note);
+  public PredefinedQuestion generateAIQuestionForNote(Note note) {
+    PredefinedQuestion question = generateAIQuestionWithoutSaving(note);
     if (question == null) {
       return null;
     }

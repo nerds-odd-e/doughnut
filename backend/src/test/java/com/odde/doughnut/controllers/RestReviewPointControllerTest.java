@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.odde.doughnut.controllers.dto.SelfEvaluation;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.ReviewQuestionInstance;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
@@ -37,8 +36,7 @@ class RestReviewPointControllerTest {
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
-    controller =
-        new RestReviewPointController(null, modelFactoryService, userModel, testabilitySettings);
+    controller = new RestReviewPointController(modelFactoryService, userModel, testabilitySettings);
   }
 
   @Nested
@@ -127,20 +125,6 @@ class RestReviewPointControllerTest {
             };
         controller.selfEvaluate(rp, selfEvaluation);
       }
-    }
-  }
-
-  @Nested
-  class GenerateRandomQuestion {
-    @Test
-    void itMustPersistTheQuestionGenerated() {
-      Note note = makeMe.aNote().details("description long enough.").please();
-      // another note is needed, otherwise the note will be the only note in the notebook, and the
-      // question cannot be generated.
-      makeMe.aNote().under(note).please();
-      ReviewPoint rp = makeMe.aReviewPointFor(note).by(userModel).please();
-      ReviewQuestionInstance reviewQuestionInstance = controller.generateRandomQuestion(rp);
-      assertThat(reviewQuestionInstance.getId(), notNullValue());
     }
   }
 

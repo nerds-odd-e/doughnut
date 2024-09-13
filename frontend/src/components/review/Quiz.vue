@@ -123,7 +123,7 @@ export default defineComponent({
       if (reviewPointId === undefined) return
       try {
         const question =
-          await this.managedApi.silent.restReviewPointController.generateRandomQuestion(
+          await this.managedApi.silent.restReviewQuestionController.generateRandomQuestion(
             reviewPointId
           )
         this.reviewQuestionCache.push(question)

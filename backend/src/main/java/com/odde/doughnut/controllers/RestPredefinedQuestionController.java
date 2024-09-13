@@ -42,7 +42,7 @@ class RestPredefinedQuestionController {
   public PredefinedQuestion generateAIQuestionWithoutSave(
       @RequestParam(value = "note") @Schema(type = "integer") Note note) {
     currentUser.assertLoggedIn();
-    return predefinedQuestionService.generateQuestionWithoutSaving(note);
+    return predefinedQuestionService.generateAIQuestionWithoutSaving(note);
   }
 
   @PostMapping("/{predefinedQuestion}/suggest-fine-tuning")
@@ -86,7 +86,7 @@ class RestPredefinedQuestionController {
       @RequestBody PredefinedQuestion predefinedQuestion)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
-    return predefinedQuestionService.refineQuestion(note, predefinedQuestion);
+    return predefinedQuestionService.refineAIQuestion(note, predefinedQuestion);
   }
 
   @PostMapping("/{reviewQuestionInstance}/toggle-approval")

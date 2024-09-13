@@ -2381,6 +2381,30 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/AnsweredQuestion"
+  /api/review-questions/{reviewPoint}/random-question:
+    get:
+      tags:
+      - rest-review-question-controller
+      operationId: generateRandomQuestion
+      parameters:
+      - name: reviewPoint
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ReviewQuestionInstance"
   /api/review-points/{reviewPoint}:
     get:
       tags:
@@ -2405,30 +2429,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ReviewPoint"
-  /api/review-points/{reviewPoint}/random-question:
-    get:
-      tags:
-      - rest-review-point-controller
-      operationId: generateRandomQuestion
-      parameters:
-      - name: reviewPoint
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ReviewQuestionInstance"
   /api/notes/{note}/note-info:
     get:
       tags:
