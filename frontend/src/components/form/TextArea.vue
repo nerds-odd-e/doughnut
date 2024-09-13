@@ -1,5 +1,5 @@
 <template>
-  <InputWithType v-bind="{ class: $attrs.class, scopeName, field, errors }">
+  <InputWithType v-bind="{ class: $attrs.class, scopeName, field, errors: errorMessage }">
     <textarea
       :class="`area-control form-control ${!!errors ? 'is-invalid' : ''}`"
       :id="`${scopeName}-${field}`"
@@ -21,8 +21,10 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, ref, watch } from "vue"
+import { nextTick, ref, watch, computed, PropType } from "vue"
 import InputWithType from "./InputWithType.vue"
+
+type ErrorRecord = Record<string, string | string[]>
 
 const props = defineProps({
   modelValue: String,
@@ -33,11 +35,13 @@ const props = defineProps({
   enterSubmit: { type: Boolean, default: false },
   rows: { type: Number, default: 8 },
   autoExtendUntil: { type: Number, default: null },
-  errors: Object,
+  errors: {
+    type: Object as PropType<ErrorRecord | undefined>,
+    default: () => ({}),
+  },
 })
 
 const emit = defineEmits(["update:modelValue", "blur", "enterPressed"])
-
 const input = ref<HTMLTextAreaElement | null>(null)
 
 const focus = () => {
@@ -77,4 +81,12 @@ watch(
     }
   }
 )
+
+// Convert errors object to a string message
+const errorMessage = computed(() => {
+  if (props.errors) {
+    return Object.values(props.errors).flat().join(", ")
+  }
+  return undefined
+})
 </script>
