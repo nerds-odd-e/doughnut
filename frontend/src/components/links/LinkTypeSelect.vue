@@ -2,7 +2,8 @@
   <RadioButtons
     :model-value="modelValue"
     @update:model-value="$emit('update:modelValue', $event)"
-    v-bind="{ scopeName, field, options, errors }"
+    v-bind="{ scopeName, field, options }"
+    :errors="errorsObject"
   >
     <template #labelAddition="{ value }">
       <div class="text-center">
@@ -14,7 +15,7 @@
 
 <script lang="ts">
 import { NoteTopic } from "@/generated/backend"
-import { PropType, defineComponent } from "vue"
+import { PropType, defineComponent, computed } from "vue"
 import { linkTypeOptions } from "../../models/linkTypeOptions"
 import RadioButtons from "../form/RadioButtons.vue"
 import SvgLinkTypeIcon from "../svgs/SvgLinkTypeIcon.vue"
@@ -29,24 +30,31 @@ export default defineComponent({
     },
     errors: String,
     allowEmpty: { type: Boolean, default: false },
-    field: { type: String, defalt: "linkType" },
+    field: { type: String, default: "linkType" },
     inverseIcon: Boolean,
   },
   components: { RadioButtons, SvgLinkTypeIcon },
   emits: ["update:modelValue"],
-  computed: {
-    options() {
-      return this.optionsRaw.map(({ label }) => ({
+  setup(props) {
+    const errorsObject = computed(() =>
+      props.errors ? { [props.field || "linkType"]: props.errors } : undefined
+    )
+
+    const options = computed(() => {
+      const filteredOptions = props.allowEmpty
+        ? linkTypeOptions
+        : linkTypeOptions.filter(({ label }) => label !== "no link")
+
+      return filteredOptions.map(({ label }) => ({
         value: label,
         label,
       }))
-    },
-    optionsRaw() {
-      if (this.allowEmpty) {
-        return linkTypeOptions
-      }
-      return linkTypeOptions.filter(({ label }) => label !== "no link")
-    },
+    })
+
+    return {
+      errorsObject,
+      options,
+    }
   },
 })
 </script>
