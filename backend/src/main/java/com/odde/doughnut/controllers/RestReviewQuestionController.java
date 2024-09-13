@@ -6,7 +6,7 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.AnswerModel;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.PredefinedQuestionService;
+import com.odde.doughnut.services.ReviewService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -20,12 +20,13 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/review-questions")
 class RestReviewQuestionController {
   private final ModelFactoryService modelFactoryService;
-  private final PredefinedQuestionService predefinedQuestionService;
 
   private final UserModel currentUser;
 
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
+
+  private final ReviewService reviewService;
 
   public RestReviewQuestionController(
       @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
@@ -35,9 +36,8 @@ class RestReviewQuestionController {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
-    this.predefinedQuestionService =
-        new PredefinedQuestionService(
-            openAiApi, modelFactoryService, testabilitySettings.getRandomizer());
+    this.reviewService =
+        new ReviewService(openAiApi, modelFactoryService, testabilitySettings.getRandomizer());
   }
 
   @PostMapping("/generate-question")
@@ -45,12 +45,7 @@ class RestReviewQuestionController {
   public ReviewQuestionInstance generateQuestion(
       @RequestParam(value = "note") @Schema(type = "integer") Note note) {
     currentUser.assertLoggedIn();
-    PredefinedQuestion question =
-        predefinedQuestionService.generateAQuestionOfRandomType(note, currentUser.getEntity());
-    if (question == null) {
-      return null;
-    }
-    return modelFactoryService.createReviewQuestion(question);
+    return reviewService.generateAQuestionOfRandomType(note, currentUser.getEntity());
   }
 
   @GetMapping("/{reviewPoint}/random-question")
@@ -58,13 +53,8 @@ class RestReviewQuestionController {
   public ReviewQuestionInstance generateRandomQuestion(
       @PathVariable("reviewPoint") @Schema(type = "integer") ReviewPoint reviewPoint) {
     currentUser.assertLoggedIn();
-    PredefinedQuestion question =
-        predefinedQuestionService.generateAQuestionOfRandomType(
-            reviewPoint.getNote(), currentUser.getEntity());
-    if (question == null) {
-      return null;
-    }
-    return modelFactoryService.createReviewQuestion(question);
+    return reviewService.generateAQuestionOfRandomType(
+        reviewPoint.getNote(), currentUser.getEntity());
   }
 
   @PostMapping("/{reviewQuestionInstance}/regenerate")
@@ -73,13 +63,8 @@ class RestReviewQuestionController {
       @PathVariable("reviewQuestionInstance") @Schema(type = "integer")
           ReviewQuestionInstance reviewQuestionInstance) {
     currentUser.assertLoggedIn();
-    PredefinedQuestion question =
-        predefinedQuestionService.generateAQuestionOfRandomType(
-            reviewQuestionInstance.getPredefinedQuestion().getNote(), currentUser.getEntity());
-    if (question == null) {
-      return null;
-    }
-    return modelFactoryService.createReviewQuestion(question);
+    return reviewService.generateAQuestionOfRandomType(
+        reviewQuestionInstance.getPredefinedQuestion().getNote(), currentUser.getEntity());
   }
 
   @PostMapping("/{reviewQuestionInstance}/contest")
@@ -88,7 +73,7 @@ class RestReviewQuestionController {
       @PathVariable("reviewQuestionInstance") @Schema(type = "integer")
           ReviewQuestionInstance reviewQuestionInstance) {
     currentUser.assertLoggedIn();
-    return predefinedQuestionService.contest(reviewQuestionInstance.getPredefinedQuestion());
+    return reviewService.contest(reviewQuestionInstance);
   }
 
   @PostMapping("/{reviewQuestionInstance}/answer")
