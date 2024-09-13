@@ -21,7 +21,7 @@
           placeholder="put your answer here"
           v-focus
         />
-        <input type="submit" value="OK" class="btn btn-primary btn-lg btn-block" />
+        <input type="submit" value="Answer" class="btn btn-primary btn-lg btn-block" />
       </form>
     </div>
     <QuestionChoices
