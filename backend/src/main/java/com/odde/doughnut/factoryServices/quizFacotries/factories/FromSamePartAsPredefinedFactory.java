@@ -6,12 +6,12 @@ import java.util.List;
 
 public class FromSamePartAsPredefinedFactory extends QuestionOptionsFactory {
 
-  private LinkingNote parentGrandLink;
+  private Note parentGrandLink;
   private Note cachedAnswerLink = null;
   private List<Note> cachedFillingOptions = null;
-  private final LinkingNote link;
+  private final Note link;
 
-  public FromSamePartAsPredefinedFactory(LinkingNote note, PredefinedQuestionServant servant) {
+  public FromSamePartAsPredefinedFactory(Note note, PredefinedQuestionServant servant) {
     super(note, servant);
     link = note;
   }
@@ -24,8 +24,7 @@ public class FromSamePartAsPredefinedFactory extends QuestionOptionsFactory {
   @Override
   public List<Note> generateFillingOptions() {
     if (cachedFillingOptions == null) {
-      List<LinkingNote> remoteCousins =
-          servant.getCousinLinksAvoidingSiblings(link, parentGrandLink);
+      List<Note> remoteCousins = servant.getCousinLinksAvoidingSiblings(link, parentGrandLink);
       cachedFillingOptions =
           servant.chooseFillingOptionsRandomly(remoteCousins).stream()
               .map(Note::getParent)
@@ -42,7 +41,7 @@ public class FromSamePartAsPredefinedFactory extends QuestionOptionsFactory {
 
   protected Note getAnswerLink(PredefinedQuestionServant servant) {
     if (cachedAnswerLink == null) {
-      List<LinkingNote> backwardPeers =
+      List<Note> backwardPeers =
           servant.getSiblingLinksOfSameLinkTypeHavingReviewPoint(link).toList();
       cachedAnswerLink = servant.randomizer.chooseOneRandomly(backwardPeers).orElse(null);
     }

@@ -1,14 +1,13 @@
 package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.algorithms.ClozedString;
-import com.odde.doughnut.entities.LinkingNote;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionNotPossibleException;
 import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionServant;
 
 public class DescriptionLinkTargetPredefinedFactory extends LinkTargetPredefinedFactory {
 
-  public DescriptionLinkTargetPredefinedFactory(
-      LinkingNote note, PredefinedQuestionServant servant) {
+  public DescriptionLinkTargetPredefinedFactory(Note note, PredefinedQuestionServant servant) {
     super(note, servant);
   }
 

@@ -1,10 +1,5 @@
 <template>
   <div class="quiz-instruction" data-test="question-section">
-    <ShowImage
-      v-if="bareQuestion.imageWithMask"
-      v-bind="bareQuestion.imageWithMask"
-      :opacity="1"
-    />
     <div
       style="white-space: pre-wrap"
       data-test="stem"
@@ -26,7 +21,7 @@
           placeholder="put your answer here"
           v-focus
         />
-        <input type="submit" value="OK" class="btn btn-primary btn-lg btn-block" />
+        <input type="submit" value="Answer" class="btn btn-primary btn-lg btn-block" />
       </form>
     </div>
     <QuestionChoices
@@ -46,7 +41,6 @@
 import { PropType, ref } from "vue"
 import { AnswerDTO, BareQuestion } from "@/generated/backend"
 import TextInput from "../form/TextInput.vue"
-import ShowImage from "../notes/accessory/ShowImage.vue"
 import QuestionChoices from "./QuestionChoices.vue"
 
 defineProps({

@@ -2877,8 +2877,6 @@ components:
           format: int32
         spaceIntervals:
           type: string
-        aiQuestionTypeOnlyForReview:
-          type: boolean
         admin:
           type: boolean
     TimeTravelRelativeToNow:
@@ -3012,17 +3010,8 @@ components:
       properties:
         checkSpell:
           type: boolean
-        imageWithMask:
-          $ref: "#/components/schemas/ImageWithMask"
         multipleChoicesQuestion:
           $ref: "#/components/schemas/MultipleChoicesQuestion"
-    ImageWithMask:
-      type: object
-      properties:
-        noteImage:
-          type: string
-        imageMask:
-          type: string
     PredefinedQuestion:
       required:
       - bareQuestion
@@ -3799,8 +3788,6 @@ components:
         spaceIntervals:
           pattern: "^\\d+((,\\s*\\d+){1,1000})*$"
           type: string
-        aiQuestionTypeOnlyForReview:
-          type: boolean
     NoteUpdateTopicDTO:
       required:
       - topicConstructor
@@ -3844,6 +3831,13 @@ components:
           minLength: 1
           type: string
         contentType:
+          type: string
+    ImageWithMask:
+      type: object
+      properties:
+        noteImage:
+          type: string
+        imageMask:
           type: string
     NoteAccessory:
       required:

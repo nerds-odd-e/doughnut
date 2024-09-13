@@ -120,20 +120,6 @@ Then('I choose yes I remember', () => {
 })
 
 Then(
-  'I should be asked cloze deletion question {string} with options {string}',
-  (question: string, options: string) => {
-    cy.shouldSeeQuizWithOptions([question], options)
-  }
-)
-
-Then(
-  'I should be asked image question {string} with options {string}',
-  (_imageInQuestion: string, options: string) => {
-    cy.shouldSeeQuizWithOptions([], options)
-  }
-)
-
-Then(
   'I should be asked spelling question {string} from notebook {string}',
   (question: string, notebook: string) => {
     cy.expectBreadcrumb(notebook)

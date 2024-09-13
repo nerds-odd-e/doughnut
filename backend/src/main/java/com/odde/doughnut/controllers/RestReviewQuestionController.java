@@ -35,7 +35,9 @@ class RestReviewQuestionController {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
-    this.predefinedQuestionService = new PredefinedQuestionService(openAiApi, modelFactoryService);
+    this.predefinedQuestionService =
+        new PredefinedQuestionService(
+            openAiApi, modelFactoryService, testabilitySettings.getRandomizer());
   }
 
   @PostMapping("/generate-question")
@@ -43,7 +45,8 @@ class RestReviewQuestionController {
   public ReviewQuestionInstance generateQuestion(
       @RequestParam(value = "note") @Schema(type = "integer") Note note) {
     currentUser.assertLoggedIn();
-    PredefinedQuestion question = predefinedQuestionService.generateAIQuestionForNote(note);
+    PredefinedQuestion question =
+        predefinedQuestionService.generateAQuestionOfRandomType(note, currentUser.getEntity());
     if (question == null) {
       return null;
     }
@@ -57,7 +60,7 @@ class RestReviewQuestionController {
     currentUser.assertLoggedIn();
     PredefinedQuestion question =
         predefinedQuestionService.generateAQuestionOfRandomType(
-            reviewPoint.getNote(), testabilitySettings.getRandomizer(), currentUser.getEntity());
+            reviewPoint.getNote(), currentUser.getEntity());
     if (question == null) {
       return null;
     }
@@ -71,8 +74,8 @@ class RestReviewQuestionController {
           ReviewQuestionInstance reviewQuestionInstance) {
     currentUser.assertLoggedIn();
     PredefinedQuestion question =
-        predefinedQuestionService.generateAIQuestionForNote(
-            reviewQuestionInstance.getPredefinedQuestion().getNote());
+        predefinedQuestionService.generateAQuestionOfRandomType(
+            reviewQuestionInstance.getPredefinedQuestion().getNote(), currentUser.getEntity());
     if (question == null) {
       return null;
     }

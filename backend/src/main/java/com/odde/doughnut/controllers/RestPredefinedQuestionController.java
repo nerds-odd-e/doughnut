@@ -35,7 +35,9 @@ class RestPredefinedQuestionController {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
-    this.predefinedQuestionService = new PredefinedQuestionService(openAiApi, modelFactoryService);
+    this.predefinedQuestionService =
+        new PredefinedQuestionService(
+            openAiApi, modelFactoryService, testabilitySettings.getRandomizer());
   }
 
   @PostMapping("/generate-question-without-save")

@@ -116,26 +116,26 @@ public class ModelFactoryService {
     return nb;
   }
 
-  public LinkingNote createLink(
+  public Note createLink(
       Note sourceNote,
       Note targetNote,
       User creator,
       LinkType type,
       Timestamp currentUTCTimestamp) {
     if (type == null || type == LinkType.NO_LINK) return null;
-    LinkingNote link = buildALink(sourceNote, targetNote, creator, type, currentUTCTimestamp);
+    Note link = buildALink(sourceNote, targetNote, creator, type, currentUTCTimestamp);
     save(link);
     return link;
   }
 
-  public static LinkingNote buildALink(
+  public static Note buildALink(
       Note sourceNote,
       Note targetNote,
       User creator,
       LinkType type,
       Timestamp currentUTCTimestamp) {
-    LinkingNote note =
-        LinkingNote.createLink(creator, sourceNote, currentUTCTimestamp, ":" + type.label);
+    final Note note = new Note();
+    note.initialize(creator, sourceNote, currentUTCTimestamp, ":" + type.label);
     note.setTargetNote(targetNote);
     note.getReviewSetting()
         .setLevel(

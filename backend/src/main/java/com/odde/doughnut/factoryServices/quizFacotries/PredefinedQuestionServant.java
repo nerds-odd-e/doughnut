@@ -34,14 +34,9 @@ public class PredefinedQuestionServant {
     this.modelFactoryService = modelFactoryService;
   }
 
-  public List<Note> chooseFromCohort(Note answerNote, Predicate<Note> notePredicate) {
-    List<Note> list = getCohort(answerNote, n -> !n.equals(answerNote) && notePredicate.test(n));
-    return randomizer.randomlyChoose(maxFillingOptionCount, list).toList();
-  }
-
   public List<Note> getCohort(Note note, Predicate<Note> notePredicate) {
     List<Note> list = note.getNoneLinkSiblings().stream().filter(notePredicate).toList();
-    if (list.size() > 0) return list;
+    if (!list.isEmpty()) return list;
 
     Note grand = note;
     for (int i = 0; i < 2; i++)
@@ -55,22 +50,22 @@ public class PredefinedQuestionServant {
     return randomizer.randomlyChoose(maxFillingOptionCount, candidates).toList();
   }
 
-  public Stream<LinkingNote> getSiblingLinksOfSameLinkTypeHavingReviewPoint(LinkingNote link) {
+  public Stream<Note> getSiblingLinksOfSameLinkTypeHavingReviewPoint(Note link) {
     return linksWithReviewPoint(link.getSiblingLinksOfSameLinkType(this.user));
   }
 
-  public Stream<LinkingNote> getLinksFromSameSourceHavingReviewPoint(Note link) {
-    List<LinkingNote> list =
+  public Stream<Note> getLinksFromSameSourceHavingReviewPoint(Note link) {
+    List<Note> list =
         new NoteViewer(this.user, link.getParent())
             .linksOfTypeThroughDirect(candidateQuestionLinkTypes);
     return linksWithReviewPoint(list.stream()).filter(l -> !link.equals(l));
   }
 
-  private Stream<LinkingNote> linksWithReviewPoint(Stream<LinkingNote> cousinLinksOfSameLinkType) {
+  private Stream<Note> linksWithReviewPoint(Stream<Note> cousinLinksOfSameLinkType) {
     return cousinLinksOfSameLinkType.filter(l -> getReviewPoint(l) != null);
   }
 
-  public LinkingNote getParentGrandLink(LinkingNote link) {
+  public Note getParentGrandLink(Note link) {
     return randomizer
         .chooseOneRandomly(
             link.targetNoteViewer(this.user)
@@ -83,7 +78,7 @@ public class PredefinedQuestionServant {
         .orElse(null);
   }
 
-  public List<Note> chooseBackwardPeers(LinkingNote instanceLink, LinkingNote link1) {
+  public List<Note> chooseBackwardPeers(Note instanceLink, Note link1) {
     List<Note> instanceReverse = instanceLink.getLinkedSiblingsOfSameLinkType(user);
     List<Note> specReverse = link1.getLinkedSiblingsOfSameLinkType(user);
     List<Note> backwardPeers =
@@ -110,10 +105,14 @@ public class PredefinedQuestionServant {
 
   private List<Note> chooseCohortAndAvoid(
       Note answerNote, Note noteToAvoid, List<Note> notesToAvoid) {
-    return chooseFromCohort(answerNote, n -> !n.equals(noteToAvoid) && !notesToAvoid.contains(n));
+    List<Note> list =
+        getCohort(
+            answerNote,
+            n1 -> !n1.equals(answerNote) && !n1.equals(noteToAvoid) && !notesToAvoid.contains(n1));
+    return randomizer.randomlyChoose(maxFillingOptionCount, list).toList();
   }
 
-  public List<Note> chooseFromCohortAvoidSiblings(LinkingNote answerLink) {
+  public List<Note> chooseFromCohortAvoidSiblings(Note answerLink) {
     List<Note> linkedSiblingsOfSameLinkType = answerLink.getLinkedSiblingsOfSameLinkType(user);
     return chooseCohortAndAvoid(
         answerLink.getParent(), answerLink.getTargetNote(), linkedSiblingsOfSameLinkType);
@@ -123,8 +122,7 @@ public class PredefinedQuestionServant {
     return new GlobalSettingsService(modelFactoryService);
   }
 
-  public List<LinkingNote> getCousinLinksAvoidingSiblings(
-      LinkingNote link, LinkingNote parentGrandLink) {
+  public List<Note> getCousinLinksAvoidingSiblings(Note link, Note parentGrandLink) {
     if (parentGrandLink == null) return List.of();
     List<Note> linkedSiblingsOfSameLinkType = link.getLinkedSiblingsOfSameLinkType(user);
     List<Note> linkTargetOfType =
@@ -132,7 +130,7 @@ public class PredefinedQuestionServant {
             .linksOfTypeThroughDirect(List.of(link.getLinkType())).stream()
                 .map(Note::getTargetNote)
                 .toList();
-    Stream<LinkingNote> uncles =
+    Stream<Note> uncles =
         parentGrandLink
             .getSiblingLinksOfSameLinkType(user)
             .filter(cl1 -> !linkTargetOfType.contains(cl1.getParent()));

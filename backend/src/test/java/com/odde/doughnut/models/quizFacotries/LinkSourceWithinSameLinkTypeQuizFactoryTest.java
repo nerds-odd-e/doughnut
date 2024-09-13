@@ -25,7 +25,7 @@ class LinkSourceWithinSameLinkTypeQuizFactoryTest {
   Note target;
   Note source;
   Note anotherSource;
-  LinkingNote sourceTarget;
+  Note sourceTarget;
 
   @BeforeEach
   void setup() {

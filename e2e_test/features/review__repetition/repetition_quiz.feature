@@ -1,3 +1,4 @@
+@usingMockedOpenAiService
 Feature: Repetition Quiz
   As a learner, I want to use quizzes in my repetition to help and gamify my learning.
 
@@ -8,23 +9,7 @@ Feature: Repetition Quiz
       | Topic            | Details                        | Parent Topic|
       | sedition         | Sedition means incite violence | English     |
       | sedation         | Put to sleep is sedation       | English     |
-
-  Scenario: Cloze deletion question
-    Given I learned one note "sedition" on day 1
-    When I am repeat-reviewing my old note on day 2
-    Then I should be asked cloze deletion question "[...] means incite violence" with options "sedition, sedation"
-
-  Scenario Outline: Answering cloze question
-    Given I learned one note "sedition" on day 1
-    When I am repeat-reviewing my old note on day 2
-    When I choose answer "<answer>"
-    Then I should see that my answer <result>
-    And I should see the repetition is finished: "<should see finish>"
-
-    Examples:
-      | answer   | result                  | should see finish |
-      | sedation | "sedation" is incorrect | no                |
-      | sedition | is correct              | yes               |
+    And the OpenAI service is unavailable due to invalid system token
 
   Scenario Outline: Spelling quiz
     Given I am learning new note on day 1
@@ -33,8 +18,9 @@ Feature: Repetition Quiz
     Then I should be asked spelling question "means incite violence" from notebook "English"
     When I type my answer "<answer>"
     Then I should see that my answer <result>
+    And I should see the repetition is finished: "<should see finish>"
 
     Examples:
-      | answer   | result              |
-      | asdf     | "asdf" is incorrect |
-      | Sedition | is correct          |
+      | answer   | result              | should see finish |
+      | asdf     | "asdf" is incorrect | no                |
+      | Sedition | is correct          | yes               |

@@ -23,24 +23,24 @@ public class NoteViewer {
     return nvb;
   }
 
-  public List<LinkingNote> getRefers() {
+  public List<Note> getRefers() {
     return note.getRefers().stream().filter(l -> allowed(l)).toList();
   }
 
-  public List<LinkingNote> linksOfTypeThroughDirect(List<LinkType> linkTypes) {
+  public List<Note> linksOfTypeThroughDirect(List<LinkType> linkTypes) {
     return note.getLinks().stream()
         .filter(l -> l.targetVisibleAsSourceOrTo(viewer))
         .filter(l -> linkTypes.contains(l.getLinkType()))
         .toList();
   }
 
-  public Stream<LinkingNote> linksOfTypeThroughReverse(LinkType linkType) {
+  public Stream<Note> linksOfTypeThroughReverse(LinkType linkType) {
     return note.getRefers().stream()
         .filter(l -> l.getLinkType().equals(linkType))
         .filter(l -> allowed(l));
   }
 
-  private boolean allowed(LinkingNote l) {
+  private boolean allowed(Note l) {
     if (l.getParent().getNotebook() == l.getTargetNote().getNotebook()) return true;
     if (viewer == null) return false;
     return viewer.canReferTo(l.getParent().getNotebook());

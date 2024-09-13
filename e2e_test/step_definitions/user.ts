@@ -139,11 +139,3 @@ Then('I should be on the welcome page and asked to login', () => {
   cy.contains('Welcome')
   cy.findByRole('button', { name: 'Login via Github' }).click()
 })
-
-Then('I opt to do only AI generated questions', () => {
-  start
-    .systemSidebar()
-    .userOptions()
-    .userSettings('Old Learner')
-    .aiQuestionOnlyForReview()
-})

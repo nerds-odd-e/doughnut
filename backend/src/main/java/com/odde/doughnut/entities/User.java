@@ -44,11 +44,6 @@ public class User extends EntityIdentifiedByIdOnly {
   @Setter
   private String spaceIntervals = "0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55";
 
-  @Column(name = "ai_question_only")
-  @Getter
-  @Setter
-  private Boolean aiQuestionTypeOnlyForReview = false;
-
   @JoinTable(
       name = "circle_user",
       joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)},

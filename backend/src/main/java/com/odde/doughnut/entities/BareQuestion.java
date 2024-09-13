@@ -6,7 +6,6 @@ import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.Embedded;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -21,6 +20,4 @@ public class BareQuestion {
 
   @Column(name = "check_spell")
   private Boolean checkSpell;
-
-  @Embedded ImageWithMask imageWithMask;
 }

@@ -15,10 +15,13 @@ import java.sql.Timestamp;
 
 public class PredefinedQuestionService {
   private final ModelFactoryService modelFactoryService;
+  private final Randomizer randomizer;
   private final AiQuestionGenerator aiQuestionGenerator;
 
-  public PredefinedQuestionService(OpenAiApi openAiApi, ModelFactoryService modelFactoryService) {
+  public PredefinedQuestionService(
+      OpenAiApi openAiApi, ModelFactoryService modelFactoryService, Randomizer randomizer) {
     this.modelFactoryService = modelFactoryService;
+    this.randomizer = randomizer;
     this.aiQuestionGenerator =
         new AiQuestionGenerator(openAiApi, new GlobalSettingsService(modelFactoryService));
   }
@@ -57,20 +60,11 @@ public class PredefinedQuestionService {
     return PredefinedQuestion.fromMCQWithAnswer(MCQWithAnswer, note);
   }
 
-  public PredefinedQuestion generateAIQuestionForNote(Note note) {
-    PredefinedQuestion question = generateAIQuestionWithoutSaving(note);
-    if (question == null) {
-      return null;
-    }
-    return modelFactoryService.save(question);
-  }
-
   public ReviewQuestionContestResult contest(PredefinedQuestion predefinedQuestion) {
     return aiQuestionGenerator.getReviewQuestionContestResult(predefinedQuestion);
   }
 
-  public PredefinedQuestion generateAQuestionOfRandomType(
-      Note note, Randomizer randomizer, User user) {
+  public PredefinedQuestion generateAQuestionOfRandomType(Note note, User user) {
     PredefinedQuestionGenerator predefinedQuestionGenerator =
         new PredefinedQuestionGenerator(user, note, randomizer, modelFactoryService);
     return predefinedQuestionGenerator.generateAQuestionOfRandomType(aiQuestionGenerator);

@@ -11,8 +11,6 @@ import com.odde.doughnut.algorithms.HtmlOrMarkdown;
 import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.algorithms.SiblingOrder;
 import com.odde.doughnut.controllers.dto.NoteTopic;
-import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionFactory;
-import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionServant;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.TimestampOperations;
 import jakarta.persistence.*;
@@ -30,7 +28,7 @@ import lombok.Setter;
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "note")
 @JsonPropertyOrder({"topic", "noteTopic", "details", "parentId", "linkType", "updatedAt"})
-public abstract class Note extends EntityIdentifiedByIdOnly {
+public class Note extends EntityIdentifiedByIdOnly {
   public static final int MAX_TITLE_LENGTH = 150;
   private static final String PATH_DELIMITER = " › ";
 
@@ -79,11 +77,11 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
   private Timestamp deletedAt;
 
   @OneToMany(mappedBy = "targetNote")
-  private List<LinkingNote> refers = new ArrayList<>();
+  private List<Note> refers = new ArrayList<>();
 
   @OneToMany(mappedBy = "parent", cascade = CascadeType.DETACH)
   @OrderBy("siblingOrder")
-  private final List<LinkingNote> links = new ArrayList<>();
+  private final List<Note> links = new ArrayList<>();
 
   @OneToMany(mappedBy = "parent", cascade = CascadeType.DETACH)
   @JsonIgnore
@@ -136,12 +134,12 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  public List<LinkingNote> getLinks() {
+  public List<Note> getLinks() {
     return filterDeletedUnmodifiableNoteList(links);
   }
 
   @JsonIgnore
-  public List<LinkingNote> getRefers() {
+  public List<Note> getRefers() {
     return filterDeletedUnmodifiableNoteList(refers);
   }
 
@@ -296,10 +294,6 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  public abstract List<PredefinedQuestionFactory> getPredefinedQuestionFactories(
-      PredefinedQuestionServant servant);
-
-  @JsonIgnore
   public NoteAccessory getOrInitializeNoteAccessory() {
     if (noteAccessory == null) {
       noteAccessory = new NoteAccessory();
@@ -359,7 +353,7 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
     return noteBrief;
   }
 
-  protected void initialize(
+  public void initialize(
       User user, Note parentNote, Timestamp currentUTCTimestamp, String topicConstructor) {
     setParentNote(parentNote);
     setUpdatedAt(currentUTCTimestamp);
@@ -379,5 +373,17 @@ public abstract class Note extends EntityIdentifiedByIdOnly {
 
   public NoteViewer targetNoteViewer(User user) {
     return new NoteViewer(user, getTargetNote());
+  }
+
+  @JsonIgnore
+  public Stream<Note> getSiblingLinksOfSameLinkType(User user) {
+    return targetNoteViewer(user)
+        .linksOfTypeThroughReverse(getLinkType())
+        .filter(l -> !l.equals(this));
+  }
+
+  @JsonIgnore
+  public List<Note> getLinkedSiblingsOfSameLinkType(User user) {
+    return getSiblingLinksOfSameLinkType(user).map(Note::getParent).toList();
   }
 }

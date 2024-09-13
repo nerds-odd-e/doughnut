@@ -12,7 +12,7 @@ public class LinkViewed {
   @Setter
   @NotNull
   @JsonIgnoreProperties("targetNote")
-  private List<? extends Note> reverse;
+  private List<Note> reverse;
 
   public boolean notEmpty() {
     return (reverse != null && !reverse.isEmpty());

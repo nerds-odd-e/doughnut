@@ -6,6 +6,5 @@ export type UserDTO = {
     name: string;
     dailyNewNotesCount?: number;
     spaceIntervals?: string;
-    aiQuestionTypeOnlyForReview?: boolean;
 };
 

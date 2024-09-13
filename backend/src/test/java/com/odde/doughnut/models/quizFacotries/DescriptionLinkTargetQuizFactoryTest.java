@@ -32,7 +32,7 @@ class DescriptionLinkTargetQuizFactoryTest {
   Note source;
   Note anotherSource;
   ReviewPoint reviewPoint;
-  LinkingNote subjectNote;
+  Note subjectNote;
 
   @BeforeEach
   void setup() {
