@@ -5,7 +5,6 @@
       field="stem"
       v-model="multipleChoicesQuestion.stem"
     /><br />
-
     <div v-for="(_, index) in multipleChoicesQuestion.choices" :key="index">
       <TextArea
         :field="'choice ' + index"
@@ -14,13 +13,11 @@
       />
       <br />
     </div>
-
     <TextInput
       rows="2"
       field="correctChoiceIndex"
       v-model="predefinedQuestion.correctAnswerIndex"
     /><br />
-
     <button
       @click="addChoice"
       :disabled="
@@ -51,8 +48,10 @@ import useLoadingApi from "@/managedApi/useLoadingApi"
 import { Note, PredefinedQuestion } from "@/generated/backend"
 import isMCQWithAnswerValid from "@/models/isMCQWithAnswerValid"
 import TextArea from "../form/TextArea.vue"
+import TextInput from "../form/TextInput.vue"
 
 const { managedApi } = useLoadingApi()
+
 const props = defineProps({
   note: {
     type: Object as PropType<Note>,
@@ -78,9 +77,11 @@ const emit = defineEmits(["close-dialog"])
 const isValidQuestion = computed(() =>
   isMCQWithAnswerValid(predefinedQuestion.value)
 )
+
 const multipleChoicesQuestion = computed(
   () => predefinedQuestion.value.bareQuestion.multipleChoicesQuestion
 )
+
 const dirty = computed(() => {
   for (let i = 0; i < multipleChoicesQuestion.value.choices.length; i += 1) {
     if (multipleChoicesQuestion.value.choices[i]) {
@@ -104,6 +105,7 @@ const removeChoice = () => {
     multipleChoicesQuestion.value.choices.pop()
   }
 }
+
 const submitQuestion = async () => {
   const reviewQuestionInstance = predefinedQuestion.value
   const response =
@@ -113,6 +115,7 @@ const submitQuestion = async () => {
     )
   emit("close-dialog", response)
 }
+
 const refineQuestion = async () => {
   const reviewQuestionInstance = predefinedQuestion.value
   predefinedQuestion.value =
@@ -121,9 +124,10 @@ const refineQuestion = async () => {
       reviewQuestionInstance
     )
 }
+
 const generateQuestionByAI = async () => {
   predefinedQuestion.value =
-    await managedApi.restPredefinedQuestionController.generateAiQuestionWithoutSave(
+    await managedApi.restPredefinedQuestionController.generateQuestionWithoutSave(
       props.note.id
     )
 }
