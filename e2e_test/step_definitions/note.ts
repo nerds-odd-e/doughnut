@@ -296,10 +296,6 @@ When('I move note {string} left', (noteTopic: string) => {
   cy.findByRole('button', { name: 'Move Left' }).click()
 })
 
-When('I should see the screenshot matches', () => {
-  // cy.get('.content').compareSnapshot('page-snapshot', 0.001);
-})
-
 When('I move note {string} right', (noteTopic: string) => {
   start.jumpToNotePage(noteTopic)
   cy.findByText('Move This Note').click()

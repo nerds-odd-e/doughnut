@@ -27,7 +27,6 @@ public class HierarchicalNote extends Note {
       PredefinedQuestionServant servant) {
     return List.of(
         new SpellingPredefinedFactory(this),
-        new ClozeTitleSelectionPredefinedFactory(this, servant),
-        new ImageTitleSelectionPredefinedFactory(this, servant));
+        new ClozeTitleSelectionPredefinedFactory(this, servant));
   }
 }

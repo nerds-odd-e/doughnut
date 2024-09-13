@@ -21,6 +21,4 @@ public class BareQuestion {
 
   @Column(name = "check_spell")
   private Boolean checkSpell;
-
-  @Embedded ImageWithMask imageWithMask;
 }

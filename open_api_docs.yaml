@@ -3012,17 +3012,8 @@ components:
       properties:
         checkSpell:
           type: boolean
-        imageWithMask:
-          $ref: "#/components/schemas/ImageWithMask"
         multipleChoicesQuestion:
           $ref: "#/components/schemas/MultipleChoicesQuestion"
-    ImageWithMask:
-      type: object
-      properties:
-        noteImage:
-          type: string
-        imageMask:
-          type: string
     PredefinedQuestion:
       required:
       - bareQuestion
@@ -3844,6 +3835,13 @@ components:
           minLength: 1
           type: string
         contentType:
+          type: string
+    ImageWithMask:
+      type: object
+      properties:
+        noteImage:
+          type: string
+        imageMask:
           type: string
     NoteAccessory:
       required:

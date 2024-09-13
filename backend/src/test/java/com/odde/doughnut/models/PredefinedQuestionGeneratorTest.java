@@ -38,8 +38,7 @@ class PredefinedQuestionGeneratorTest {
         questionTypes,
         contains(
             SpellingPredefinedFactory.class,
-            ClozeTitleSelectionPredefinedFactory.class,
-            ImageTitleSelectionPredefinedFactory.class));
+            ClozeTitleSelectionPredefinedFactory.class));
   }
 
   @Test

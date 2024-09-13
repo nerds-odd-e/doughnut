@@ -127,13 +127,6 @@ Then(
 )
 
 Then(
-  'I should be asked image question {string} with options {string}',
-  (_imageInQuestion: string, options: string) => {
-    cy.shouldSeeQuizWithOptions([], options)
-  }
-)
-
-Then(
   'I should be asked spelling question {string} from notebook {string}',
   (question: string, notebook: string) => {
     cy.expectBreadcrumb(notebook)
