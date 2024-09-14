@@ -4,7 +4,6 @@ import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.ReviewQuestionContestResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.AnswerModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ReviewService;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -83,7 +82,10 @@ class RestReviewQuestionController {
           ReviewQuestionInstance reviewQuestionInstance,
       @Valid @RequestBody AnswerDTO answerDTO) {
     currentUser.assertLoggedIn();
-    return reviewService.answerQuestion(reviewQuestionInstance, answerDTO, currentUser.getEntity(), testabilitySettings.getCurrentUTCTimestamp());
+    return reviewService.answerQuestion(
+        reviewQuestionInstance,
+        answerDTO,
+        currentUser.getEntity(),
+        testabilitySettings.getCurrentUTCTimestamp());
   }
-
 }

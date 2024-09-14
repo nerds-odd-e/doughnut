@@ -8,7 +8,6 @@ import com.odde.doughnut.models.AnswerModel;
 import com.odde.doughnut.models.Randomizer;
 import com.theokanning.openai.client.OpenAiApi;
 import jakarta.validation.Valid;
-
 import java.sql.Timestamp;
 
 public class ReviewService {
@@ -35,12 +34,16 @@ public class ReviewService {
     return predefinedQuestionService.contest(reviewQuestionInstance.getPredefinedQuestion());
   }
 
-  public AnsweredQuestion answerQuestion(ReviewQuestionInstance reviewQuestionInstance, @Valid AnswerDTO answerDTO, User user, Timestamp currentUTCTimestamp) {
-      Answer answer = new Answer();
-      answer.setReviewQuestionInstance(reviewQuestionInstance);
-      answer.setFromDTO(answerDTO);
-      AnswerModel answerModel = modelFactoryService.toAnswerModel(answer);
-      answerModel.makeAnswerToQuestion(currentUTCTimestamp, user);
-      return answerModel.getAnswerViewedByUser(user);
+  public AnsweredQuestion answerQuestion(
+      ReviewQuestionInstance reviewQuestionInstance,
+      @Valid AnswerDTO answerDTO,
+      User user,
+      Timestamp currentUTCTimestamp) {
+    Answer answer = new Answer();
+    answer.setReviewQuestionInstance(reviewQuestionInstance);
+    answer.setFromDTO(answerDTO);
+    AnswerModel answerModel = modelFactoryService.toAnswerModel(answer);
+    answerModel.makeAnswerToQuestion(currentUTCTimestamp, user);
+    return answerModel.getAnswerViewedByUser(user);
   }
 }
