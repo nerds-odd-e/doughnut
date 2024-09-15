@@ -4,8 +4,6 @@ import com.odde.doughnut.entities.Certificate;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.AssessmentService;
-import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -18,15 +16,9 @@ public class RestCertificateController {
 
   private final ModelFactoryService modelFactoryService;
 
-  private final AssessmentService assessmentService;
-
-  public RestCertificateController(
-      UserModel currentUser,
-      TestabilitySettings testabilitySettings,
-      ModelFactoryService modelFactoryService) {
+  public RestCertificateController(UserModel currentUser, ModelFactoryService modelFactoryService) {
     this.currentUser = currentUser;
     this.modelFactoryService = modelFactoryService;
-    this.assessmentService = new AssessmentService(modelFactoryService, testabilitySettings);
   }
 
   @PostMapping("/{notebook}")

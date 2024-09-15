@@ -52,7 +52,6 @@ import useLoadingApi from "@/managedApi/useLoadingApi"
 import {
   AnswerSubmission,
   AssessmentResult,
-  Certificate,
   AssessmentAttempt,
 } from "@/generated/backend"
 import AssessmentQuestion from "./AssessmentQuestion.vue"
@@ -71,7 +70,6 @@ const answeredCurrentQuestion = ref(false)
 const correctAnswers = ref(0)
 const assessmentResult = ref<AssessmentResult | undefined>(undefined)
 const questionsAnswerCollection = ref<AnswerSubmission[]>([])
-const certificate = ref<Certificate>()
 const formSubmitted = ref(false)
 const assessmentQuestionInstance = computed(
   () => props.assessmentAttempt.assessmentQuestionInstances!
@@ -112,15 +110,6 @@ const checkIfQuizComplete = async () => {
         props.assessmentAttempt.id,
         questionsAnswerCollection.value
       )
-    if (
-      assessmentResult.value.attempt?.isPass &&
-      assessmentResult.value.isCertified
-    ) {
-      certificate.value =
-        await managedApi.restCertificateController.claimCertificate(
-          props.assessmentAttempt.notebookId
-        )
-    }
   }
 }
 

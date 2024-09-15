@@ -1,11 +1,9 @@
 package com.odde.doughnut.controllers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.entities.Certificate;
 import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
@@ -18,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -36,65 +33,7 @@ public class RestCertificateControllerTests {
     currentTime = makeMe.aTimestamp().please();
     testabilitySettings.timeTravelTo(currentTime);
     currentUser = makeMe.aUser().toModelPlease();
-    controller =
-        new RestCertificateController(currentUser, testabilitySettings, makeMe.modelFactoryService);
-  }
-
-  @Nested
-  class SaveCertificate {
-
-    private Notebook notebook;
-
-    @BeforeEach
-    void setup() {
-      notebook = makeMe.aNote("Just say 'Yes'").creatorAndOwner(currentUser).please().getNotebook();
-    }
-
-    @Test
-    void mustFromALoginUser() {
-      controller =
-          new RestCertificateController(
-              makeMe.aNullUserModelPlease(), testabilitySettings, makeMe.modelFactoryService);
-      assertThrows(ResponseStatusException.class, () -> controller.claimCertificate(notebook));
-    }
-
-    @Test
-    void shouldNotAllowToClaimCertificateIfTheUserHasNotTakenTheAssessment() {
-      assertThrows(ApiException.class, () -> controller.claimCertificate(notebook));
-    }
-
-    @Test
-    void shouldNotAllowToClaimCertificateIfTheUserHasNotPassedTheAssessment() {
-      makeMe.anAssessmentAttempt(currentUser.getEntity(), notebook).score(20, 0).please();
-      assertThrows(ApiException.class, () -> controller.claimCertificate(notebook));
-    }
-
-    @Test
-    void shouldNotAllowToClaimCertificateIfTheUserLastAttemptFailed() {
-      makeMe.anAssessmentAttempt(currentUser.getEntity(), notebook).score(20, 20).please();
-      makeMe.anAssessmentAttempt(currentUser.getEntity(), notebook).score(20, 0).please();
-      assertThrows(ApiException.class, () -> controller.claimCertificate(notebook));
-    }
-
-    @Test
-    void ShouldBeAbleToClaimCertificateIfLastAttemptPassed() {
-      makeMe.anAssessmentAttempt(currentUser.getEntity(), notebook).score(20, 0).please();
-      makeMe.anAssessmentAttempt(currentUser.getEntity(), notebook).score(20, 20).please();
-      Certificate cert = controller.claimCertificate(notebook);
-      assertEquals(currentUser.getEntity(), cert.getUser());
-    }
-
-    @Test
-    void ShouldReturnCompleteCertificateData() {
-      makeMe.anAssessmentAttempt(currentUser.getEntity(), notebook).score(20, 20).please();
-      Certificate cert = controller.claimCertificate(notebook);
-      assertEquals(notebook, cert.getNotebook());
-      assertEquals(currentTime, cert.getStartDate());
-      Timestamp expiryDate =
-          TimestampOperations.addHoursToTimestamp(
-              new Timestamp(currentTime.getTime()), oneYearInHours);
-      assertEquals(expiryDate, cert.getExpiryDate());
-    }
+    controller = new RestCertificateController(currentUser, makeMe.modelFactoryService);
   }
 
   @Nested

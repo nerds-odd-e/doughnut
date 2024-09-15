@@ -19,8 +19,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/assessment")
 class RestAssessmentController {
-  private final ModelFactoryService modelFactoryService;
-
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
@@ -31,7 +29,6 @@ class RestAssessmentController {
       ModelFactoryService modelFactoryService,
       TestabilitySettings testabilitySettings,
       UserModel currentUser) {
-    this.modelFactoryService = modelFactoryService;
     this.testabilitySettings = testabilitySettings;
     this.currentUser = currentUser;
     this.assessmentService = new AssessmentService(modelFactoryService, testabilitySettings);
