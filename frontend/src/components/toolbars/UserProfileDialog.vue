@@ -12,19 +12,19 @@
           field="name"
           v-model="formData.name"
           :autofocus="true"
-          :errors="errors.name"
+          :error-message="errors.name"
         />
         <TextInput
           scope-name="user"
           field="dailyNewNotesCount"
           v-model="formData.dailyNewNotesCount"
-          :errors="errors.dailyNewNotesCount"
+          :error-message="errors.dailyNewNotesCount"
         />
         <TextInput
           scope-name="user"
           field="spaceIntervals"
           v-model="formData.spaceIntervals"
-          :errors="errors.spaceIntervals"
+          :error-message="errors.spaceIntervals"
         />
         <input type="submit" value="Submit" class="btn btn-primary" />
       </form>

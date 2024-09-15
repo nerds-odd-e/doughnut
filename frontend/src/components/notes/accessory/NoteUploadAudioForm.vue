@@ -3,7 +3,7 @@
     scope-name="note"
     field="uploadAudioFile"
     accept=".mp3, .m4a, .wav"
-    :errors="getErrorObject('uploadAudioFile')"
+    :error-message="errors.uploadAudioFile"
     :model-value="uploadAudioFileName"
     @update:model-value="handleFileUpload"
   />
@@ -45,15 +45,9 @@ export default defineComponent({
       })
     }
 
-    const getErrorObject = (field: string) => {
-      const error = props.errors[field]
-      return error ? { [field]: error } : undefined
-    }
-
     return {
       uploadAudioFileName,
       handleFileUpload,
-      getErrorObject,
     }
   },
 })

@@ -3,7 +3,7 @@
     scope-name="note"
     field="uploadImage"
     placeholder="Optional. upload own image."
-    :errors="getErrorObject('uploadImage')"
+    :error-message="errors.uploadImage"
     :model-value="uploadImageFileName"
     @update:model-value="handleFileUpload"
   />
@@ -11,7 +11,7 @@
     scope-name="note"
     field="imageUrl"
     placeholder="Full url of existing image."
-    :errors="errors.imageUrl"
+    :error-message="errors.imageUrl"
     :model-value="modelValue.imageUrl"
     @update:model-value="
       $emit('update:modelValue', { ...modelValue, imageUrl: $event })
@@ -21,7 +21,7 @@
     scope-name="note"
     field="useParentImage"
     :model-value="modelValue.useParentImage"
-    :errors="getErrorObject('useParentImage')"
+    :error-message="errors.useParentImage"
     @update:model-value="
       $emit('update:modelValue', { ...modelValue, useParentImage: $event })
     "
@@ -30,7 +30,7 @@
     scope-name="note"
     field="imageMask"
     :model-value="modelValue.imageMask"
-    :errors="errors.imageMask"
+    :error-message="errors.imageMask"
     @update:model-value="
       $emit('update:modelValue', { ...modelValue, imageMask: $event })
     "
@@ -75,15 +75,9 @@ export default defineComponent({
       })
     }
 
-    const getErrorObject = (field: string) => {
-      const error = props.errors[field]
-      return error ? { [field]: error } : undefined
-    }
-
     return {
       uploadImageFileName,
       handleFileUpload,
-      getErrorObject,
     }
   },
 })

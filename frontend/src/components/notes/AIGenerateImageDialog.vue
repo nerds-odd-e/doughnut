@@ -1,7 +1,7 @@
 <template>
   <h2>How do you like this image from DALL-E?</h2>
   <form>
-    <TextInput v-model="prompt" field="prompt" :errors="promptError" />
+    <TextInput v-model="prompt" field="prompt" :error-message="promptError" />
     <div>
       <img class="ai-art" v-if="imageSrc" :src="imageSrc" />
     </div>

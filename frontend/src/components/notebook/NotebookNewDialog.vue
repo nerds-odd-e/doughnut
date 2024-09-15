@@ -2,7 +2,7 @@
   <form @submit.prevent.once="processForm">
     <NoteFormTopicOnly
       v-model="noteFormData.topicConstructor"
-      :errors="errors.topicConstructor"
+      :error-message="errors.topicConstructor"
     />
     <input type="submit" value="Submit" class="btn btn-primary" />
   </form>

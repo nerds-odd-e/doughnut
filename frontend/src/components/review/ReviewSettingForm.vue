@@ -3,7 +3,7 @@
     scope-name="review_setting"
     field="level"
     :model-value="levelAsString"
-    :errors="getErrorObject('level')"
+    :error-message="errors.level"
     :options="levelOptions"
     @update:model-value="updateLevel"
   />
@@ -11,14 +11,14 @@
     scope-name="review_setting"
     field="rememberSpelling"
     :model-value="formData.rememberSpelling"
-    :errors="getErrorObject('rememberSpelling')"
+    :error-message="errors.rememberSpelling"
     @update:model-value="updateModelValue({ rememberSpelling: $event })"
   />
   <CheckInput
     scope-name="review_setting"
     field="skipReview"
     :model-value="formData.skipReview"
-    :errors="getErrorObject('skipReview')"
+    :error-message="errors.skipReview"
     @update:model-value="updateModelValue({ skipReview: $event })"
   />
 </template>
@@ -57,11 +57,6 @@ export default defineComponent({
       label: level.toString(),
     }))
 
-    const getErrorObject = (field: keyof ReviewSetting) => {
-      const error = errors.value[field]
-      return error ? { [field]: error } : undefined
-    }
-
     const updateModelValue = (newValue: Partial<ReviewSetting>) => {
       formData.value = {
         ...formData.value,
@@ -88,7 +83,6 @@ export default defineComponent({
       errors,
       levelAsString,
       levelOptions,
-      getErrorObject,
       updateModelValue,
       updateLevel,
     }

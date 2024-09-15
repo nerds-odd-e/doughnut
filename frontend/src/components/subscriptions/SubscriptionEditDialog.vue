@@ -5,7 +5,7 @@
       scope-name="subscription"
       field="dailyTargetOfNewNotes"
       v-model="formData.dailyTargetOfNewNotes"
-      :errors="errors.dailyTargetOfNewNotes"
+      :error-message="errors.dailyTargetOfNewNotes"
     />
     <input type="submit" value="Update" class="btn btn-primary" />
   </form>

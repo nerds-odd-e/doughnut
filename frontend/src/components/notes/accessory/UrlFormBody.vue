@@ -3,7 +3,7 @@
     scope-name="note"
     field="url"
     :model-value="modelValue.url"
-    :errors="errors.url"
+    :error-message="errors.url"
     @update:model-value="
       $emit('update:modelValue', { ...modelValue, url: $event })
     "

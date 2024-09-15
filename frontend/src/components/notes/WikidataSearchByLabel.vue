@@ -4,7 +4,7 @@
     field="wikidataID"
     :model-value="modelValue"
     @update:model-value="$emit('update:modelValue', $event)"
-    :errors="errors"
+    :error-message="errorMessage"
     placeholder="example: `Q1234`"
   >
     <template #input_prepend>
@@ -54,7 +54,7 @@ export default defineComponent({
   props: {
     searchKey: { type: String, required: true },
     modelValue: String,
-    errors: String,
+    errorMessage: String,
   },
   emits: ["selected", "update:modelValue"],
   components: {

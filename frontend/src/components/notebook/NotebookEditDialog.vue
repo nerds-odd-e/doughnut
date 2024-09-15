@@ -5,20 +5,20 @@
       scope-name="notebook"
       field="skipReviewEntirely"
       v-model="formData.skipReviewEntirely"
-      :errors="getErrorObject('skipReviewEntirely')"
+      :error-message="errors.skipReviewEntirely"
     />
     <TextInput
       scope-name="notebook"
       field="numberOfQuestionsInAssessment"
       v-model="formData.numberOfQuestionsInAssessment"
-      :errors="errors.numberOfQuestionsInAssessment"
+      :error-message="errors.numberOfQuestionsInAssessment"
     />
     <TextInput
       scope-name="notebook"
       field="certificateExpiry"
       hint="Format (1y 1m 1d)"
       v-model="formData.certificateExpiry"
-      :errors="errors.certificateExpiry"
+      :error-message="errors.certificateExpiry"
     />
     <button class="btn btn-primary btn-layout mt-2" @click="processForm">
       Update
@@ -31,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, ref, computed } from "vue"
+import { PropType, ref } from "vue"
 import { useRouter } from "vue-router"
 import { Notebook } from "@/generated/backend"
 import CheckInput from "@/components/form/CheckInput.vue"
@@ -62,11 +62,6 @@ const errors = ref({
   skipReviewEntirely: undefined as string | undefined,
   numberOfQuestionsInAssessment: undefined as string | undefined,
   certificateExpiry: undefined as string | undefined,
-})
-
-const getErrorObject = computed(() => (field: "skipReviewEntirely") => {
-  const error = errors.value[field]
-  return error ? { [field]: error } : undefined
 })
 
 const processForm = () => {

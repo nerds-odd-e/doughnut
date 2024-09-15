@@ -14,7 +14,7 @@
     field="linkType"
     scope-name="link"
     v-model="formData.linkType"
-    :errors="linkFormErrors.linkType"
+    :error-message="linkFormErrors.linkType"
     :inverse-icon="true"
     @update:model-value="updateLink"
   />

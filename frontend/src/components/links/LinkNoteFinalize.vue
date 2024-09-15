@@ -4,7 +4,7 @@
       field="linkType"
       scope-name="link"
       v-model="formData.linkType"
-      :errors="linkFormErrors.linkType"
+      :error-message="linkFormErrors.linkType"
       :inverse-icon="true"
     />
     <div>
@@ -18,14 +18,14 @@
     <CheckInput
       scope-name="link"
       v-model="formData.moveUnder"
-      :errors="getErrorObject('moveUnder')"
+      :error-message="linkFormErrors.moveUnder"
       field="alsoMoveToUnderTargetNote"
     />
     <RadioButtons
       v-if="formData.moveUnder"
       scope-name="link"
       v-model="asFirstChildModel"
-      :errors="getErrorObject('asFirstChild')"
+      :error-message="linkFormErrors.asFirstChild"
       :options="[
         { value: 'true', label: 'as its first child' },
         { value: 'false', label: 'as its last child' },
@@ -75,14 +75,6 @@ const linkFormErrors = ref({
   linkType: undefined as string | undefined,
   moveUnder: undefined as string | undefined,
 })
-
-// Helper function to convert string errors to objects
-const getErrorObject = computed(
-  () => (field: keyof typeof linkFormErrors.value) => {
-    const error = linkFormErrors.value[field]
-    return error ? { [field]: error } : undefined
-  }
-)
 
 // Computed property to handle the string <-> boolean conversion for asFirstChild
 const asFirstChildModel = computed({

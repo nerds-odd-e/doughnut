@@ -11,7 +11,7 @@
         field="name"
         v-model="formData.name"
         :autofocus="true"
-        :errors="errors.name"
+        :error-message="errors.name"
         placeholder="Nickname"
       />
       <input type="submit" value="Submit" class="btn btn-primary" />

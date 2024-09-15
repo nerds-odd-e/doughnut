@@ -5,7 +5,7 @@
       scope-name="circle"
       field="name"
       v-model="formData.name"
-      :errors="errors['name']"
+      :error-message="errors['name']"
     />
     <input type="submit" value="Submit" class="btn btn-primary" />
   </form>

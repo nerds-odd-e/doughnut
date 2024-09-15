@@ -6,7 +6,7 @@
       field="invitationCode"
       v-model="formData.invitationCode"
       :autofocus="true"
-      :errors="errors.invitationCode"
+      :error-message="errors.invitationCode"
     />
     <input type="submit" value="Join" class="btn btn-primary" />
   </form>

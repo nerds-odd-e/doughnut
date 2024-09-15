@@ -6,11 +6,11 @@
         field="linkTypeToParent"
         :allow-empty="true"
         v-model="creationData.linkTypeToParent"
-        :errors="noteFormErrors.linkTypeToParent"
+        :error-message="noteFormErrors.linkTypeToParent"
       />
       <NoteFormTopicOnly
         v-model="creationData.topicConstructor"
-        :errors="noteFormErrors.topicConstructor"
+        :error-message="noteFormErrors.topicConstructor"
       />
       <SuggestTopic
         :original-topic="creationData.topicConstructor"
@@ -20,7 +20,7 @@
       <WikidataSearchByLabel
         :search-key="creationData.topicConstructor"
         v-model="creationData.wikidataId"
-        :errors="noteFormErrors.wikidataId"
+        :error-message="noteFormErrors.wikidataId"
         @selected="onSelectWikidataEntry"
       />
       <input type="submit" value="Submit" class="btn btn-primary" />

@@ -11,7 +11,7 @@
       scope-name="wikidataID"
       field="wikidataID"
       v-model="associationData.wikidataId"
-      :errors="wikidataIdError"
+      :error-message="wikidataIdError"
       placeholder="example: `Q12345`"
       v-focus
     />

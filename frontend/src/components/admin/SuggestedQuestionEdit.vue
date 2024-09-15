@@ -21,7 +21,7 @@
               index
             ]
           "
-          :errors="errors.preservedQuestion.choices[index]"
+          :error-message="errors.preservedQuestion.choices[index]"
         />
       </li>
     </ul>
@@ -29,14 +29,14 @@
       field="correctChoiceIndex"
       v-model="suggestionParams.preservedQuestion.correctChoiceIndex"
       placeholder="correct choice index"
-      :errors="errors.preservedQuestion.correctChoiceIndex"
+      :error-message="errors.preservedQuestion.correctChoiceIndex"
     />
     <TextInput
       field="realCorrectAnswers"
       v-if="!suggestionParams.positiveFeedback"
       v-model="suggestionParams.realCorrectAnswers"
       hint="The real correct answers, separated by comma. Leave empty if there's no real correct answer."
-      :errors="errors.realCorrectAnswers"
+      :error-message="errors.realCorrectAnswers"
     />
     <CheckInput
       field="positiveFeedback"
