@@ -15,7 +15,6 @@ import org.apache.logging.log4j.util.Strings;
 public class NoteBuilder extends EntityBuilder<Note> {
   static final TestObjectCounter titleCounter = new TestObjectCounter(n -> "title" + n);
 
-  UserBuilder creatorBuilder = null;
   List<LinkBuilder> linkBuilders = new ArrayList<>();
   private String audioFilename = null;
   private List<PredefinedQuestionBuilder> predefinedQuestionBuilders = new ArrayList<>();
@@ -35,17 +34,9 @@ public class NoteBuilder extends EntityBuilder<Note> {
     updatedAt(entity.getCreatedAt());
   }
 
-  private void buildCreatorIfNotExist() {
-    if (entity.getCreator() == null) {
-      creatorBuilder = makeMe.aUser();
-      creator(creatorBuilder.inMemoryPlease());
-    }
-  }
-
   public NoteBuilder asHeadNoteOfANotebook(Ownership ownership) {
     if (entity.getNotebook() != null)
       throw new AssertionError("Can add notebook for `" + entity + "`, a notebook already exist.");
-    buildCreatorIfNotExist();
     entity.buildNotebookForHeadNote(ownership, entity.getCreator());
     return this;
   }
@@ -91,13 +82,14 @@ public class NoteBuilder extends EntityBuilder<Note> {
 
   @Override
   protected void beforeCreate(boolean needPersist) {
-    buildCreatorIfNotExist();
     if (entity.getCreator() == null) {
       creator(makeMe.aUser().please(needPersist));
     }
-    if (creatorBuilder != null) creatorBuilder.please(needPersist);
     if (entity.getNotebook() == null) {
       asHeadNoteOfANotebook(entity.getCreator().getOwnership());
+    }
+    if (entity.getNotebook().getCreatorEntity() == null) {
+      entity.getNotebook().setCreatorEntity(entity.getCreator());
     }
     if (entity.getNotebook().getId() == null && needPersist) {
       makeMe.modelFactoryService.save(entity.getNotebook());
