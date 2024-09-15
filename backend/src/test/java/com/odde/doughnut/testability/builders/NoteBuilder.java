@@ -37,7 +37,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
   public NoteBuilder asHeadNoteOfANotebook(Ownership ownership) {
     if (entity.getNotebook() != null)
       throw new AssertionError("Can add notebook for `" + entity + "`, a notebook already exist.");
-    entity.buildNotebookForHeadNote(ownership, entity.getCreator());
+    entity.buildNotebookForHeadNote(ownership, null);
     return this;
   }
 

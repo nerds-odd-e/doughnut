@@ -43,12 +43,10 @@ public class RestAssessmentControllerTests {
   @Nested
   class generateOnlineAssessmentTest {
     private Notebook notebook;
-    private Note topNote;
 
     @BeforeEach
     void setup() {
-      topNote = makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser).please();
-      notebook = topNote.getNotebook();
+      notebook = makeMe.aNotebook().creatorAndOwner(currentUser).please();
     }
 
     @Test

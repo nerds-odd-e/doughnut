@@ -111,7 +111,7 @@ class RestNotebookControllerTest {
 
     @BeforeEach
     void setup() {
-      notebook = makeMe.aNote().creatorAndOwner(userModel).please().getNotebook();
+      notebook = makeMe.aNotebook().creatorAndOwner(userModel).please();
       makeMe.refresh(notebook);
     }
 
@@ -155,7 +155,7 @@ class RestNotebookControllerTest {
     @BeforeEach
     void setup() {
       userModel = makeMe.aUser().toModelPlease();
-      notebook = makeMe.aNote().creatorAndOwner(userModel).please().getNotebook();
+      notebook = makeMe.aNotebook().creatorAndOwner(userModel).please();
       makeMe.refresh(notebook);
     }
 

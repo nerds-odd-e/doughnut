@@ -97,7 +97,7 @@ class RestNotebookCertificateApprovalControllerTest {
     @BeforeEach
     void setup() {
       UserModel userModel = makeMe.anAdmin().toModelPlease();
-      notebook = makeMe.aNote().creatorAndOwner(userModel).please().getNotebook();
+      notebook = makeMe.aNotebook().creatorAndOwner(userModel).please();
       controller =
           new RestNotebookCertificateApprovalController(
               modelFactoryService, userModel, testabilitySettings);
