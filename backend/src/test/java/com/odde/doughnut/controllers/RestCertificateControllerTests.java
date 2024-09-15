@@ -67,7 +67,7 @@ public class RestCertificateControllerTests {
 
     @Test
     void SaveTwiceGetOriginalStartDate() {
-      makeMe.anAssessmentAttempt(currentUser.getEntity(), notebook).score(20, 20).please();
+      makeMe.anAssessmentAttempt(currentUser.getEntity()).notebook(notebook).score(20, 20).please();
       Timestamp currentTimeAtStart = currentTime;
       Timestamp newStartDate =
           TimestampOperations.addHoursToTimestamp(

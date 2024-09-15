@@ -64,11 +64,10 @@ public class MakeMe extends MakeMeWithoutDB {
     return new CertificateBuilder(notebook, user, startDate, this);
   }
 
-  public AssessmentAttemptBuilder anAssessmentAttempt(User currentUser, Notebook notebook) {
+  public AssessmentAttemptBuilder anAssessmentAttempt(User currentUser) {
     AssessmentAttempt assessmentAttempt = new AssessmentAttempt();
 
     assessmentAttempt.setUser(currentUser);
-    assessmentAttempt.setNotebook(notebook);
     assessmentAttempt.setSubmittedAt(aTimestamp().please());
     assessmentAttempt.setAnswersTotal(2);
     assessmentAttempt.setAnswersCorrect(2);

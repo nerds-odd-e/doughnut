@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.dto.AnswerDTO;
@@ -87,29 +88,32 @@ public class RestAssessmentControllerTests {
 
   @Nested
   class answerQuestion {
-    private Notebook notebook;
+    AssessmentQuestionInstance assessmentQuestionInstance;
+    AnswerDTO answerDTO = new AnswerDTO();
 
     @BeforeEach
     void setup() {
-
-      notebook =
-          makeMe
-              .aNotebook()
-              .creatorAndOwner(currentUser)
-              .withNChildrenThat(3, NoteBuilder::hasAnApprovedQuestion)
-              .please();
+      AssessmentAttempt assessmentAttempt =
+          makeMe.anAssessmentAttempt(currentUser.getEntity()).withOneQuestion().please();
+      assessmentQuestionInstance = assessmentAttempt.getAssessmentQuestionInstances().get(0);
+      answerDTO.setSpellingAnswer("my answer");
     }
 
     @Test
     void shouldNotBeAbleToAccessNotebookWhenUserHasNoPermission() {
-      User anotherUser = makeMe.aUser().please();
-      AssessmentAttempt assessmentAttempt =
-          makeMe.anAssessmentAttempt(anotherUser, notebook).withOneQuestion().please();
-      AssessmentQuestionInstance assessmentQuestionInstance =
-          assessmentAttempt.getAssessmentQuestionInstances().get(0);
+      controller =
+          new RestAssessmentController(
+              makeMe.modelFactoryService, testabilitySettings, makeMe.aUser().toModelPlease());
       assertThrows(
           UnexpectedNoAccessRightException.class,
-          () -> controller.answerQuestion(assessmentQuestionInstance, new AnswerDTO()));
+          () -> controller.answerQuestion(assessmentQuestionInstance, answerDTO));
+    }
+
+    @Test
+    void shouldCreateTheAnswerForTheQuestion() throws UnexpectedNoAccessRightException {
+      AnsweredQuestion answeredQuestion =
+          controller.answerQuestion(assessmentQuestionInstance, answerDTO);
+      assertThat(answeredQuestion.answerId).isNotNull();
     }
   }
 
@@ -124,7 +128,8 @@ public class RestAssessmentControllerTests {
     void setup() {
       topNote = makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser).please();
       notebook = topNote.getNotebook();
-      assessmentAttempt = makeMe.anAssessmentAttempt(currentUser.getEntity(), notebook).please();
+      assessmentAttempt =
+          makeMe.anAssessmentAttempt(currentUser.getEntity()).notebook(notebook).please();
       answerSubmissions = new ArrayList<>();
     }
 
@@ -256,21 +261,21 @@ public class RestAssessmentControllerTests {
 
     @Test
     void shouldReturnOneAssessmentHistory() {
-      makeMe.anAssessmentAttempt(currentUser.getEntity(), notebook).please();
+      makeMe.anAssessmentAttempt(currentUser.getEntity()).notebook(notebook).please();
       List<AssessmentAttempt> assessmentHistories = controller.getMyAssessments();
       assertEquals(1, assessmentHistories.size());
     }
 
     @Test
     void shouldReturnOnePassAssessmentHistory() {
-      makeMe.anAssessmentAttempt(currentUser.getEntity(), notebook).score(5, 4).please();
+      makeMe.anAssessmentAttempt(currentUser.getEntity()).notebook(notebook).score(5, 4).please();
       List<AssessmentAttempt> assessmentHistories = controller.getMyAssessments();
       assertTrue(assessmentHistories.getFirst().getIsPass());
     }
 
     @Test
     void shouldReturnOneFailAssessmentHistory() {
-      makeMe.anAssessmentAttempt(currentUser.getEntity(), notebook).score(5, 2).please();
+      makeMe.anAssessmentAttempt(currentUser.getEntity()).notebook(notebook).score(5, 2).please();
       List<AssessmentAttempt> assessmentHistories = controller.getMyAssessments();
       assertFalse(assessmentHistories.getFirst().getIsPass());
     }
@@ -278,7 +283,7 @@ public class RestAssessmentControllerTests {
     @Test
     void shouldReturnNoAssessmentHistoryForOtherUser() {
       User anotherUser = makeMe.aUser().please();
-      makeMe.anAssessmentAttempt(anotherUser, notebook).score(5, 5).please();
+      makeMe.anAssessmentAttempt(anotherUser).notebook(notebook).score(5, 5).please();
       List<AssessmentAttempt> assessmentHistories = controller.getMyAssessments();
       assertEquals(0, assessmentHistories.size());
     }

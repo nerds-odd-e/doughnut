@@ -2,6 +2,7 @@ package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.AssessmentAttempt;
 import com.odde.doughnut.entities.AssessmentQuestionInstance;
+import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.ReviewQuestionInstance;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
@@ -22,6 +23,10 @@ public class AssessmentAttemptBuilder extends EntityBuilder<AssessmentAttempt> {
       aq.setAssessmentAttempt(entity);
       entity.getAssessmentQuestionInstances().add(aq);
     }
+
+    if (entity.getNotebook() == null) {
+      entity.setNotebook(makeMe.aNotebook().please(needPersist));
+    }
   }
 
   public AssessmentAttemptBuilder score(int totalQuestions, int correctAnswers) {
@@ -33,6 +38,11 @@ public class AssessmentAttemptBuilder extends EntityBuilder<AssessmentAttempt> {
   public AssessmentAttemptBuilder withOneQuestion() {
     this.reviewQuestionInstanceBuilder = makeMe.aReviewQuestionInstance();
 
+    return this;
+  }
+
+  public AssessmentAttemptBuilder notebook(Notebook notebook) {
+    this.entity.setNotebook(notebook);
     return this;
   }
 }
