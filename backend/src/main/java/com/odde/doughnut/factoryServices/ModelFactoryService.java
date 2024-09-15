@@ -1,5 +1,6 @@
 package com.odde.doughnut.factoryServices;
 
+import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.SearchTerm;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.*;
@@ -154,5 +155,18 @@ public class ModelFactoryService {
     ReviewQuestionInstance reviewQuestionInstance = new ReviewQuestionInstance();
     reviewQuestionInstance.setPredefinedQuestion(question);
     return save(reviewQuestionInstance);
+  }
+
+  public AnswerModel createAnswerForQuestion(
+      ReviewQuestionInstance reviewQuestionInstance,
+      AnswerDTO answerDTO,
+      User user,
+      Timestamp currentUTCTimestamp) {
+    Answer answer = new Answer();
+    answer.setReviewQuestionInstance(reviewQuestionInstance);
+    answer.setFromDTO(answerDTO);
+    AnswerModel answerModel = toAnswerModel(answer);
+    answerModel.makeAnswerToQuestion(currentUTCTimestamp, user);
+    return answerModel;
   }
 }

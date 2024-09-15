@@ -6,7 +6,6 @@ import com.odde.doughnut.controllers.dto.AssessmentResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.AnswerModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AssessmentService;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -56,13 +55,11 @@ class RestAssessmentController {
           AssessmentQuestionInstance assessmentQuestionInstance,
       @Valid @RequestBody AnswerDTO answerDTO) {
     currentUser.assertLoggedIn();
-    Answer answer = new Answer();
-    answer.setReviewQuestionInstance(assessmentQuestionInstance.getReviewQuestionInstance());
-    answer.setFromDTO(answerDTO);
-    AnswerModel answerModel = modelFactoryService.toAnswerModel(answer);
-    answerModel.makeAnswerToQuestion(
-        testabilitySettings.getCurrentUTCTimestamp(), currentUser.getEntity());
-    return answerModel.getAnswerViewedByUser(currentUser.getEntity());
+
+    return assessmentService
+        .answerQuestion(
+            assessmentQuestionInstance, answerDTO, currentUser.getEntity());
+
   }
 
   @PostMapping("{assessmentAttempt}")

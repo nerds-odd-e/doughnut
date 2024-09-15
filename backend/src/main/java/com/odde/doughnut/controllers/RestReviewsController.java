@@ -98,5 +98,6 @@ class RestReviewsController {
       throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(answer);
     return modelFactoryService.toAnswerModel(answer).getAnswerViewedByUser(currentUser.getEntity());
+
   }
 }

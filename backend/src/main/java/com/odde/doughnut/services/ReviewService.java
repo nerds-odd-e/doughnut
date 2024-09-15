@@ -36,14 +36,15 @@ public class ReviewService {
 
   public AnsweredQuestion answerQuestion(
       ReviewQuestionInstance reviewQuestionInstance,
-      @Valid AnswerDTO answerDTO,
+     AnswerDTO answerDTO,
       User user,
       Timestamp currentUTCTimestamp) {
-    Answer answer = new Answer();
-    answer.setReviewQuestionInstance(reviewQuestionInstance);
-    answer.setFromDTO(answerDTO);
-    AnswerModel answerModel = modelFactoryService.toAnswerModel(answer);
-    answerModel.makeAnswerToQuestion(currentUTCTimestamp, user);
-    return answerModel.getAnswerViewedByUser(user);
+    return modelFactoryService
+      .createAnswerForQuestion(
+        reviewQuestionInstance,
+        answerDTO,
+        user,
+        currentUTCTimestamp)
+      .getAnswerViewedByUser(user);
   }
 }

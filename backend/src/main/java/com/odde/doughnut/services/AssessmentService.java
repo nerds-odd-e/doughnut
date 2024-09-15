@@ -2,6 +2,7 @@ package com.odde.doughnut.services;
 
 import static com.odde.doughnut.controllers.dto.ApiError.ErrorType.ASSESSMENT_SERVICE_ERROR;
 
+import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.AnswerSubmission;
 import com.odde.doughnut.controllers.dto.AssessmentResult;
 import com.odde.doughnut.entities.*;
@@ -9,6 +10,8 @@ import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.testability.TestabilitySettings;
+import jakarta.validation.Valid;
+
 import java.sql.Timestamp;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -55,22 +58,19 @@ public class AssessmentService {
 
     AssessmentAttempt assessmentAttempt = new AssessmentAttempt();
 
-    List<AssessmentQuestionInstance> assessmentQuestionInstances =
-        questions.stream()
-            .limit(numberOfQuestion)
-            .map(modelFactoryService::createReviewQuestion)
-            .map(
-                reviewQuestionInstance -> {
-                  AssessmentQuestionInstance assessmentQuestionInstance =
-                      new AssessmentQuestionInstance();
-                  assessmentQuestionInstance.setAssessmentAttempt(assessmentAttempt);
-                  assessmentQuestionInstance.setReviewQuestionInstance(reviewQuestionInstance);
-                  assessmentAttempt
-                      .getAssessmentQuestionInstances()
-                      .add(assessmentQuestionInstance);
-                  return assessmentQuestionInstance;
-                })
-            .toList();
+    questions.stream()
+        .limit(numberOfQuestion)
+        .map(modelFactoryService::createReviewQuestion)
+        .forEach(
+            reviewQuestionInstance -> {
+              AssessmentQuestionInstance assessmentQuestionInstance =
+                  new AssessmentQuestionInstance();
+              assessmentQuestionInstance.setAssessmentAttempt(assessmentAttempt);
+              assessmentQuestionInstance.setReviewQuestionInstance(reviewQuestionInstance);
+              assessmentAttempt
+                  .getAssessmentQuestionInstances()
+                  .add(assessmentQuestionInstance);
+            });
     assessmentAttempt.setNotebook(notebook);
     assessmentAttempt.setUser(user);
     modelFactoryService.save(assessmentAttempt);
@@ -136,5 +136,16 @@ public class AssessmentService {
                     "You have not passed the assessment",
                     ASSESSMENT_SERVICE_ERROR,
                     "You have not passed the assessment"));
+  }
+
+  public AnsweredQuestion answerQuestion(AssessmentQuestionInstance assessmentQuestionInstance, AnswerDTO answerDTO, User user) {
+    return modelFactoryService
+      .createAnswerForQuestion(
+        assessmentQuestionInstance.getReviewQuestionInstance(),
+        answerDTO,
+        user,
+        testabilitySettings.getCurrentUTCTimestamp())
+      .getAnswerViewedByUser(user);
+
   }
 }

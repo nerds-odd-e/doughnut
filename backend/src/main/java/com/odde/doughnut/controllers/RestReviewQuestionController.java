@@ -82,6 +82,7 @@ class RestReviewQuestionController {
           ReviewQuestionInstance reviewQuestionInstance,
       @Valid @RequestBody AnswerDTO answerDTO) {
     currentUser.assertLoggedIn();
+
     return reviewService.answerQuestion(
         reviewQuestionInstance,
         answerDTO,
