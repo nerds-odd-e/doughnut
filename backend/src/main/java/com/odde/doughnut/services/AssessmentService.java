@@ -85,6 +85,11 @@ public class AssessmentService {
     assessmentAttempt.setAnswersCorrect(totalCorrectAnswer);
 
     modelFactoryService.save(assessmentAttempt);
+
+    if (assessmentAttempt.getIsPass() && assessmentAttempt.getNotebook().isCertifiable()) {
+      claimCertificateForPassedAssessment(
+          assessmentAttempt.getNotebook(), assessmentAttempt.getUser());
+    }
     return assessmentAttempt.getAssessmentResult();
   }
 
@@ -92,23 +97,24 @@ public class AssessmentService {
     return modelFactoryService.assessmentAttemptRepository.findAllByUser(user);
   }
 
-  public Certificate claimCertificateForPassedAssessment(Notebook notebook, User user) {
+  private void claimCertificateForPassedAssessment(Notebook notebook, User user) {
     getLastAssessmentAttemptAndItMustBePassed(notebook, user);
 
     Certificate old_cert =
         modelFactoryService.certificateRepository.findFirstByUserAndNotebook(user, notebook);
     if (old_cert != null) {
-      return updateExpiry(old_cert);
+      updateExpiry(old_cert);
+      return;
     }
 
     Certificate certificate = new Certificate();
     certificate.setUser(user);
     certificate.setNotebook(notebook);
     certificate.setStartDate(this.testabilitySettings.getCurrentUTCTimestamp());
-    return updateExpiry(certificate);
+    updateExpiry(certificate);
   }
 
-  private Certificate updateExpiry(Certificate cert) {
+  private void updateExpiry(Certificate cert) {
     Timestamp expiryDate =
         Timestamp.from(
             ZonedDateTime.ofInstant(
@@ -118,7 +124,6 @@ public class AssessmentService {
                 .toInstant());
     cert.setExpiryDate(expiryDate);
     modelFactoryService.save(cert);
-    return cert;
   }
 
   private void getLastAssessmentAttemptAndItMustBePassed(Notebook notebook, User user) {

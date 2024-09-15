@@ -33,7 +33,8 @@ public class RestCertificateController {
   @Transactional
   public Certificate claimCertificate(@PathVariable @Schema(type = "integer") Notebook notebook) {
     currentUser.assertLoggedIn();
-    return assessmentService.claimCertificateForPassedAssessment(notebook, currentUser.getEntity());
+    return modelFactoryService.certificateRepository.findFirstByUserAndNotebook(
+        currentUser.getEntity(), notebook);
   }
 
   @GetMapping("/{notebook}")
