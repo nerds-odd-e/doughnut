@@ -65,7 +65,7 @@ class RestAssessmentController {
       @RequestBody List<AnswerSubmission> answerSubmissions)
       throws UnexpectedNoAccessRightException {
     currentUser.assertLoggedIn();
-    currentUser.assertReadAuthorization(assessmentAttempt);
+    currentUser.assertAuthorization(assessmentAttempt);
     return assessmentService.submitAssessmentResult(
         assessmentAttempt, answerSubmissions, testabilitySettings.getCurrentUTCTimestamp());
   }

@@ -9,20 +9,17 @@ import org.springframework.web.server.ResponseStatusException;
 public record Authorization(User user, ModelFactoryService modelFactoryService) {
 
   public <T> void assertAuthorization(T object) throws UnexpectedNoAccessRightException {
-    if (object instanceof Note) {
-      assertAuthorizationNote((Note) object);
-    } else if (object instanceof Notebook) {
-      assertAuthorizationNotebook((Notebook) object);
-    } else if (object instanceof BazaarNotebook) {
-      assertAuthorizationBazaarNotebook((BazaarNotebook) object);
-    } else if (object instanceof Circle) {
-      assertAuthorizationCircle((Circle) object);
-    } else if (object instanceof Subscription) {
-      assertAuthorizationSubscription((Subscription) object);
-    } else if (object instanceof User) {
-      assertAuthorizationUser((User) object);
-    } else {
-      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unknown object type");
+    switch (object) {
+      case Note obj -> assertAuthorizationNote(obj);
+      case Notebook obj -> assertAuthorizationNotebook(obj);
+      case BazaarNotebook obj -> assertAuthorizationBazaarNotebook(obj);
+      case Circle obj -> assertAuthorizationCircle(obj);
+      case Subscription obj -> assertAuthorizationSubscription(obj);
+      case User obj -> assertAuthorizationUser(obj);
+      case AssessmentAttempt obj -> assertAuthorizationUser(obj.getUser());
+      default ->
+          throw new ResponseStatusException(
+              HttpStatus.INTERNAL_SERVER_ERROR, "Unknown object type");
     }
   }
 
@@ -43,7 +40,6 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
       case ReviewPoint obj -> assertReadAuthorizationReviewPoint(obj);
       case User obj -> assertAuthorizationUser(obj);
       case Audio obj -> assertAuthorizationUser(obj.getUser());
-      case AssessmentAttempt obj -> assertAuthorizationUser(obj.getUser());
       default ->
           throw new ResponseStatusException(
               HttpStatus.INTERNAL_SERVER_ERROR, "Unknown object type");
