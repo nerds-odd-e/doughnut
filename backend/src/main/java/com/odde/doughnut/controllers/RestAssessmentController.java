@@ -46,7 +46,7 @@ class RestAssessmentController {
 
   @PostMapping("/{assessmentQuestionInstance}/answer")
   @Transactional
-  public AnsweredQuestion answerQuestion(
+  public AssessmentQuestionInstance answerQuestion(
       @PathVariable("assessmentQuestionInstance") @Schema(type = "integer")
           AssessmentQuestionInstance assessmentQuestionInstance,
       @Valid @RequestBody AnswerDTO answerDTO)

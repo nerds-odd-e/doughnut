@@ -29,4 +29,15 @@ public class AssessmentQuestionInstance extends EntityIdentifiedByIdOnly {
   public BareQuestion getBareQuestion() {
     return reviewQuestionInstance.getBareQuestion();
   }
+
+  public boolean isAnswered() {
+    return reviewQuestionInstance.getAnswer() != null;
+  }
+
+  public boolean isAnsweredCorrectly() {
+    if (reviewQuestionInstance.getAnswer() == null) {
+      return false;
+    }
+    return reviewQuestionInstance.getAnswer().getCorrect();
+  }
 }

@@ -7,10 +7,30 @@
     @answer="submitAnswer($event)"
     :key="assessmentQuestionInstance.reviewQuestionInstance.id"
    />
+  <div :hidden="!answeredCurrentQuestion">
+    <button class="btn btn-danger" @click="$emit('advance')">Continue</button>
+    <PopButton title="Send feedback">
+      <template #button_face>
+        <button class="btn btn-secondary">Send feedback</button>
+      </template>
+      <template #default="{ closer }">
+        <FeedbackForm
+          @submitted="
+            closer();
+            handleFormSubmission();
+          "
+          :question="assessmentQuestionInstance.reviewQuestionInstance"
+        />
+      </template>
+    </PopButton>
+    <div v-if="formSubmitted" class="alert alert-info">
+      Feedback received successfully
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { PropType } from "vue"
+import { PropType, ref } from "vue"
 import { AnswerDTO, AssessmentQuestionInstance } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import usePopups from "../commons/Popups/usePopups"
@@ -24,10 +44,12 @@ const props = defineProps({
     type: Object as PropType<AssessmentQuestionInstance>,
     required: true,
   },
-  answeredCurrentQuestion: Boolean,
 })
 
-const emits = defineEmits(["answered"])
+const answeredCurrentQuestion = ref(false)
+const formSubmitted = ref(false)
+
+const emits = defineEmits(["advance"])
 
 const submitAnswer = async (answerData: AnswerDTO) => {
   try {
@@ -37,11 +59,19 @@ const submitAnswer = async (answerData: AnswerDTO) => {
         answerData
       )
 
-    emits("answered", answerResult)
+    if (!answerResult.answeredCorrectly) {
+      answeredCurrentQuestion.value = true
+    } else {
+      emits("advance")
+    }
   } catch (_e) {
     await popups.alert(
       "This review point doesn't exist any more or is being skipped now. Moving on to the next review point..."
     )
   }
+}
+
+const handleFormSubmission = () => {
+  formSubmitted.value = true
 }
 </script>

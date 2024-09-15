@@ -168,6 +168,7 @@ public class ModelFactoryService {
     }
     Answer answer = new Answer();
     answer.setReviewQuestionInstance(reviewQuestionInstance);
+    reviewQuestionInstance.setAnswer(answer);
     answer.setFromDTO(answerDTO);
     AnswerModel answerModel = toAnswerModel(answer);
     answerModel.makeAnswerToQuestion(currentUTCTimestamp, user);

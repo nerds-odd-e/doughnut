@@ -143,14 +143,13 @@ public class AssessmentService {
                     "You have not passed the assessment"));
   }
 
-  public AnsweredQuestion answerQuestion(
+  public AssessmentQuestionInstance answerQuestion(
       AssessmentQuestionInstance assessmentQuestionInstance, AnswerDTO answerDTO, User user) {
-    return modelFactoryService
-        .createAnswerForQuestion(
-            assessmentQuestionInstance.getReviewQuestionInstance(),
-            answerDTO,
-            user,
-            testabilitySettings.getCurrentUTCTimestamp())
-        .getAnswerViewedByUser(user);
+    modelFactoryService.createAnswerForQuestion(
+        assessmentQuestionInstance.getReviewQuestionInstance(),
+        answerDTO,
+        user,
+        testabilitySettings.getCurrentUTCTimestamp());
+    return assessmentQuestionInstance;
   }
 }

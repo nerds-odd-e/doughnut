@@ -4,12 +4,12 @@
     <div>
       <AssessmentQuestion
         v-if="currentQuestion < assessmentQuestionInstance.length"
-        :answered-current-question="answeredCurrentQuestion"
         :assessment-question-instance="assessmentQuestionInstance[currentQuestion]!"
-        @answered="questionAnswered"
+        @advance="advance"
+        :key="currentQuestion"
       />
       <div v-else-if="assessmentResult">
-        <p>Your score: {{ correctAnswers }} / {{ assessmentQuestionInstance.length }}</p>
+        <p>Your score: {{ assessmentResult.correctCount }} / {{ assessmentResult.totalCount }}</p>
         <div v-if="assessmentResult?.attempt?.isPass">
           <div class="alert alert-success">
             You have passed the assessment.
@@ -24,26 +24,7 @@
       </div>
     </div>
   </div>
-  <div :hidden="!answeredCurrentQuestion">
-    <button class="btn btn-danger" @click="advance">Continue</button>
-    <PopButton title="Send feedback">
-      <template #button_face>
-        <button class="btn btn-secondary">Send feedback</button>
-      </template>
-      <template #default="{ closer }">
-        <FeedbackForm
-          @submitted="
-            closer();
-            handleFormSubmission();
-          "
-          :question="assessmentQuestionInstance[currentQuestion]?.reviewQuestionInstance"
-        />
-      </template>
-    </PopButton>
-    <div v-if="formSubmitted" class="alert alert-info">
-      Feedback received successfully
-    </div>
-  </div>
+
 </template>
 
 <script setup lang="ts">
@@ -62,10 +43,7 @@ const props = defineProps({
 })
 
 const currentQuestion = ref(0)
-const answeredCurrentQuestion = ref(false)
-const correctAnswers = ref(0)
 const assessmentResult = ref<AssessmentResult | undefined>(undefined)
-const formSubmitted = ref(false)
 const assessmentQuestionInstance = computed(
   () => props.assessmentAttempt.assessmentQuestionInstances!
 )
@@ -74,24 +52,6 @@ const passCriteriaPercentage = 80
 
 const advance = () => {
   currentQuestion.value += 1
-  answeredCurrentQuestion.value = false
-  checkIfQuizComplete()
-}
-const questionAnswered = (answerResult) => {
-  // questionsAnswerCollection.value.push({
-  //   questionId:
-  //     assessmentQuestionInstance.value[currentQuestion.value]!
-  //       .reviewQuestionInstance.id,
-  //   answerId: answerResult.answerId,
-  //   correctAnswers: answerResult.correct,
-  // })
-  if (answerResult.correct) {
-    correctAnswers.value += 1
-    currentQuestion.value += 1
-  } else {
-    answeredCurrentQuestion.value = true
-  }
-  formSubmitted.value = false
   checkIfQuizComplete()
 }
 
@@ -105,9 +65,5 @@ const checkIfQuizComplete = async () => {
         props.assessmentAttempt.id
       )
   }
-}
-
-const handleFormSubmission = () => {
-  formSubmitted.value = true
 }
 </script>

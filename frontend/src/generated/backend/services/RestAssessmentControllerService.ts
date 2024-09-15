@@ -3,8 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { AnswerDTO } from '../models/AnswerDTO';
-import type { AnsweredQuestion } from '../models/AnsweredQuestion';
 import type { AssessmentAttempt } from '../models/AssessmentAttempt';
+import type { AssessmentQuestionInstance } from '../models/AssessmentQuestionInstance';
 import type { AssessmentResult } from '../models/AssessmentResult';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -13,13 +13,13 @@ export class RestAssessmentControllerService {
     /**
      * @param assessmentQuestionInstance
      * @param requestBody
-     * @returns AnsweredQuestion OK
+     * @returns AssessmentQuestionInstance OK
      * @throws ApiError
      */
     public answerQuestion(
         assessmentQuestionInstance: number,
         requestBody: AnswerDTO,
-    ): CancelablePromise<AnsweredQuestion> {
+    ): CancelablePromise<AssessmentQuestionInstance> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/assessment/{assessmentQuestionInstance}/answer',

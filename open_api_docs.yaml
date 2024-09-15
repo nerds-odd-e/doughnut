@@ -1640,7 +1640,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/AnsweredQuestion"
+                $ref: "#/components/schemas/AssessmentQuestionInstance"
   /api/assessment/{assessmentAttempt}:
     post:
       tags:
@@ -3468,6 +3468,24 @@ components:
           format: int32
         notebook:
           $ref: "#/components/schemas/Notebook"
+    AssessmentQuestionInstance:
+      required:
+      - bareQuestion
+      - id
+      - reviewQuestionInstance
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        bareQuestion:
+          $ref: "#/components/schemas/BareQuestion"
+        reviewQuestionInstance:
+          $ref: "#/components/schemas/ReviewQuestionInstance"
+        answered:
+          type: boolean
+        answeredCorrectly:
+          type: boolean
     AssessmentAttempt:
       required:
       - id
@@ -3497,20 +3515,6 @@ components:
         notebookId:
           type: integer
           format: int32
-    AssessmentQuestionInstance:
-      required:
-      - bareQuestion
-      - id
-      - reviewQuestionInstance
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        bareQuestion:
-          $ref: "#/components/schemas/BareQuestion"
-        reviewQuestionInstance:
-          $ref: "#/components/schemas/ReviewQuestionInstance"
     AssessmentResult:
       type: object
       properties:

@@ -8,5 +8,7 @@ export type AssessmentQuestionInstance = {
     id: number;
     bareQuestion: BareQuestion;
     reviewQuestionInstance: ReviewQuestionInstance;
+    answered?: boolean;
+    answeredCorrectly?: boolean;
 };
 
