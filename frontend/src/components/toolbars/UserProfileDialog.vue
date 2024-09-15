@@ -37,7 +37,7 @@ import TextInput from "@/components/form/TextInput.vue"
 import { User } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
-import { defineEmits, onMounted, ref } from "vue"
+import { onMounted, ref } from "vue"
 
 const { managedApi } = useLoadingApi()
 const emits = defineEmits(["user-updated"])
