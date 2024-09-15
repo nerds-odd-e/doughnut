@@ -1,7 +1,6 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.AnswerDTO;
-import com.odde.doughnut.controllers.dto.AnswerSubmission;
 import com.odde.doughnut.controllers.dto.AssessmentResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -63,13 +62,12 @@ class RestAssessmentController {
   @Transactional
   public AssessmentResult submitAssessmentResult(
       @PathVariable("assessmentAttempt") @Schema(type = "integer")
-          AssessmentAttempt assessmentAttempt,
-      @RequestBody List<AnswerSubmission> answerSubmissions)
+          AssessmentAttempt assessmentAttempt)
       throws UnexpectedNoAccessRightException {
     currentUser.assertLoggedIn();
     currentUser.assertAuthorization(assessmentAttempt);
     return assessmentService.submitAssessmentResult(
-        assessmentAttempt, answerSubmissions, testabilitySettings.getCurrentUTCTimestamp());
+        assessmentAttempt, testabilitySettings.getCurrentUTCTimestamp());
   }
 
   @GetMapping

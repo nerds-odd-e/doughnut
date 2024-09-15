@@ -49,11 +49,7 @@
 <script setup lang="ts">
 import { computed, PropType, ref } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import {
-  AnswerSubmission,
-  AssessmentResult,
-  AssessmentAttempt,
-} from "@/generated/backend"
+import { AssessmentResult, AssessmentAttempt } from "@/generated/backend"
 import AssessmentQuestion from "./AssessmentQuestion.vue"
 import AssessmentClaimCertificate from "./AssessmentClaimCertificate.vue"
 
@@ -69,7 +65,6 @@ const currentQuestion = ref(0)
 const answeredCurrentQuestion = ref(false)
 const correctAnswers = ref(0)
 const assessmentResult = ref<AssessmentResult | undefined>(undefined)
-const questionsAnswerCollection = ref<AnswerSubmission[]>([])
 const formSubmitted = ref(false)
 const assessmentQuestionInstance = computed(
   () => props.assessmentAttempt.assessmentQuestionInstances!
@@ -83,13 +78,13 @@ const advance = () => {
   checkIfQuizComplete()
 }
 const questionAnswered = (answerResult) => {
-  questionsAnswerCollection.value.push({
-    questionId:
-      assessmentQuestionInstance.value[currentQuestion.value]!
-        .reviewQuestionInstance.id,
-    answerId: answerResult.answerId,
-    correctAnswers: answerResult.correct,
-  })
+  // questionsAnswerCollection.value.push({
+  //   questionId:
+  //     assessmentQuestionInstance.value[currentQuestion.value]!
+  //       .reviewQuestionInstance.id,
+  //   answerId: answerResult.answerId,
+  //   correctAnswers: answerResult.correct,
+  // })
   if (answerResult.correct) {
     correctAnswers.value += 1
     currentQuestion.value += 1
@@ -107,8 +102,7 @@ const checkIfQuizComplete = async () => {
   ) {
     assessmentResult.value =
       await managedApi.restAssessmentController.submitAssessmentResult(
-        props.assessmentAttempt.id,
-        questionsAnswerCollection.value
+        props.assessmentAttempt.id
       )
   }
 }

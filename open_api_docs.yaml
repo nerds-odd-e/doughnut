@@ -1652,14 +1652,6 @@ paths:
         required: true
         schema:
           type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                $ref: "#/components/schemas/AnswerSubmission"
-        required: true
       responses:
         "500":
           description: Internal Server Error
@@ -3476,17 +3468,6 @@ components:
           format: int32
         notebook:
           $ref: "#/components/schemas/Notebook"
-    AnswerSubmission:
-      type: object
-      properties:
-        questionId:
-          type: integer
-          format: int32
-        answerId:
-          type: integer
-          format: int32
-        correctAnswers:
-          type: boolean
     AssessmentAttempt:
       required:
       - id

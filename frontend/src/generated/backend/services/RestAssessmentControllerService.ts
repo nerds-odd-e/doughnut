@@ -4,7 +4,6 @@
 /* eslint-disable */
 import type { AnswerDTO } from '../models/AnswerDTO';
 import type { AnsweredQuestion } from '../models/AnsweredQuestion';
-import type { AnswerSubmission } from '../models/AnswerSubmission';
 import type { AssessmentAttempt } from '../models/AssessmentAttempt';
 import type { AssessmentResult } from '../models/AssessmentResult';
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -36,13 +35,11 @@ export class RestAssessmentControllerService {
     }
     /**
      * @param assessmentAttempt
-     * @param requestBody
      * @returns AssessmentResult OK
      * @throws ApiError
      */
     public submitAssessmentResult(
         assessmentAttempt: number,
-        requestBody: Array<AnswerSubmission>,
     ): CancelablePromise<AssessmentResult> {
         return this.httpRequest.request({
             method: 'POST',
@@ -50,8 +47,6 @@ export class RestAssessmentControllerService {
             path: {
                 'assessmentAttempt': assessmentAttempt,
             },
-            body: requestBody,
-            mediaType: 'application/json',
             errors: {
                 500: `Internal Server Error`,
             },

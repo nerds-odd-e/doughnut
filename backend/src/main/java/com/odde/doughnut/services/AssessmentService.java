@@ -3,7 +3,6 @@ package com.odde.doughnut.services;
 import static com.odde.doughnut.controllers.dto.ApiError.ErrorType.ASSESSMENT_SERVICE_ERROR;
 
 import com.odde.doughnut.controllers.dto.AnswerDTO;
-import com.odde.doughnut.controllers.dto.AnswerSubmission;
 import com.odde.doughnut.controllers.dto.AssessmentResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.ApiException;
@@ -14,6 +13,7 @@ import java.sql.Timestamp;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Objects;
 
 public class AssessmentService {
   private final ModelFactoryService modelFactoryService;
@@ -74,14 +74,18 @@ public class AssessmentService {
   }
 
   public AssessmentResult submitAssessmentResult(
-      AssessmentAttempt assessmentAttempt,
-      List<AnswerSubmission> answerSubmission,
-      Timestamp currentUTCTimestamp) {
-    assessmentAttempt.setAnswersTotal(answerSubmission.size());
+      AssessmentAttempt assessmentAttempt, Timestamp currentUTCTimestamp) {
+    assessmentAttempt.setAnswersTotal(assessmentAttempt.getAssessmentQuestionInstances().size());
     assessmentAttempt.setSubmittedAt(currentUTCTimestamp);
 
     int totalCorrectAnswer =
-        (int) answerSubmission.stream().filter(AnswerSubmission::isCorrectAnswers).count();
+        assessmentAttempt.getAssessmentQuestionInstances().stream()
+            .map(AssessmentQuestionInstance::getReviewQuestionInstance)
+            .map(ReviewQuestionInstance::getAnswer)
+            .filter(Objects::nonNull)
+            .map(Answer::getCorrect)
+            .mapToInt(correct -> correct ? 1 : 0)
+            .sum();
     assessmentAttempt.setAnswersCorrect(totalCorrectAnswer);
 
     modelFactoryService.save(assessmentAttempt);

@@ -6,9 +6,11 @@ import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.ReviewQuestionInstance;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AssessmentAttemptBuilder extends EntityBuilder<AssessmentAttempt> {
-  ReviewQuestionInstanceBuilder reviewQuestionInstanceBuilder = null;
+  List<ReviewQuestionInstanceBuilder> reviewQuestionInstanceBuilders = null;
 
   public AssessmentAttemptBuilder(MakeMe makeMe, AssessmentAttempt assessmentAttempt) {
     super(makeMe, assessmentAttempt);
@@ -16,12 +18,15 @@ public class AssessmentAttemptBuilder extends EntityBuilder<AssessmentAttempt> {
 
   @Override
   protected void beforeCreate(boolean needPersist) {
-    if (reviewQuestionInstanceBuilder != null) {
-      ReviewQuestionInstance rq = reviewQuestionInstanceBuilder.please(needPersist);
-      AssessmentQuestionInstance aq = new AssessmentQuestionInstance();
-      aq.setReviewQuestionInstance(rq);
-      aq.setAssessmentAttempt(entity);
-      entity.getAssessmentQuestionInstances().add(aq);
+    if (reviewQuestionInstanceBuilders != null) {
+      reviewQuestionInstanceBuilders.forEach(
+          rqb -> {
+            ReviewQuestionInstance rq = rqb.please(needPersist);
+            AssessmentQuestionInstance aq = new AssessmentQuestionInstance();
+            aq.setReviewQuestionInstance(rq);
+            aq.setAssessmentAttempt(entity);
+            entity.getAssessmentQuestionInstances().add(aq);
+          });
     }
 
     if (entity.getNotebook() == null) {
@@ -36,8 +41,14 @@ public class AssessmentAttemptBuilder extends EntityBuilder<AssessmentAttempt> {
   }
 
   public AssessmentAttemptBuilder withOneQuestion() {
-    this.reviewQuestionInstanceBuilder = makeMe.aReviewQuestionInstance();
+    return withNQuestions(1);
+  }
 
+  public AssessmentAttemptBuilder withNQuestions(int n) {
+    this.reviewQuestionInstanceBuilders = new ArrayList<>();
+    for (int i = 0; i < n; i++) {
+      this.reviewQuestionInstanceBuilders.add(makeMe.aReviewQuestionInstance());
+    }
     return this;
   }
 

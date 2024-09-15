@@ -34,8 +34,9 @@ public class Answer extends EntityIdentifiedByIdOnly {
 
   @Column(name = "correct")
   @Getter
+  @Setter
   @NotNull
-  private Boolean correct = false;
+  private Boolean correct;
 
   @JsonIgnore
   public String getAnswerDisplay() {

@@ -18,7 +18,6 @@ export type { AiGeneratedImage } from './models/AiGeneratedImage';
 export type { Annotation } from './models/Annotation';
 export type { AnswerDTO } from './models/AnswerDTO';
 export type { AnsweredQuestion } from './models/AnsweredQuestion';
-export type { AnswerSubmission } from './models/AnswerSubmission';
 export type { AssessmentAttempt } from './models/AssessmentAttempt';
 export type { AssessmentQuestionInstance } from './models/AssessmentQuestionInstance';
 export type { AssessmentResult } from './models/AssessmentResult';

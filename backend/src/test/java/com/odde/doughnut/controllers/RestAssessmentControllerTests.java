@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.dto.AnswerDTO;
-import com.odde.doughnut.controllers.dto.AnswerSubmission;
 import com.odde.doughnut.controllers.dto.AssessmentResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.QuestionAnswerException;
@@ -14,7 +13,6 @@ import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.NoteBuilder;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -132,23 +130,17 @@ public class RestAssessmentControllerTests {
 
   @Nested
   class completeAssessmentTest {
-    private Notebook notebook;
     private AssessmentAttempt assessmentAttempt;
-    private Note topNote;
-    private List<AnswerSubmission> answerSubmissions;
 
     @BeforeEach
     void setup() {
-      topNote = makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser).please();
-      notebook = topNote.getNotebook();
       assessmentAttempt =
-          makeMe.anAssessmentAttempt(currentUser.getEntity()).notebook(notebook).please();
-      answerSubmissions = new ArrayList<>();
+          makeMe.anAssessmentAttempt(currentUser.getEntity()).withNQuestions(3).please();
     }
 
     @Test
     void shouldIncludeTheNotebookCertificateInTheResult() throws UnexpectedNoAccessRightException {
-      makeMe.theNote(topNote).withNChildrenThat(3, NoteBuilder::hasAnApprovedQuestion).please();
+      Notebook notebook = assessmentAttempt.getNotebook();
       makeMe
           .modelFactoryService
           .notebookService(notebook)
@@ -156,102 +148,61 @@ public class RestAssessmentControllerTests {
           .approve(makeMe.aTimestamp().please());
       makeMe.refresh(notebook);
 
-      AssessmentResult assessmentResult =
-          controller.submitAssessmentResult(assessmentAttempt, answerSubmissions);
+      AssessmentResult assessmentResult = controller.submitAssessmentResult(assessmentAttempt);
 
       assertTrue(assessmentResult.isCertified());
     }
 
     @Test
     void shouldReturnAllAnswersCorrect() throws UnexpectedNoAccessRightException {
-      makeMe.theNote(topNote).withNChildrenThat(3, NoteBuilder::hasAnApprovedQuestion).please();
-      notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(3);
+      assessmentAttempt
+          .getAssessmentQuestionInstances()
+          .forEach(
+              aqi -> {
+                makeMe.anAnswer().forQuestion(aqi.getReviewQuestionInstance()).correct().please();
+              });
 
-      for (Note note : notebook.getNotes()) {
-        PredefinedQuestion predefinedQuestion = note.getPredefinedQuestions().get(0);
-        predefinedQuestion.setCorrectAnswerIndex(1);
+      AssessmentResult assessmentResult = controller.submitAssessmentResult(assessmentAttempt);
 
-        AnswerSubmission answerSubmission = new AnswerSubmission();
-        answerSubmission.setQuestionId(predefinedQuestion.getId());
-
-        answerSubmission.setAnswerId(0);
-        answerSubmission.setCorrectAnswers(true);
-        answerSubmissions.add(answerSubmission);
-      }
-
-      AssessmentResult assessmentResult =
-          controller.submitAssessmentResult(assessmentAttempt, answerSubmissions);
-
-      assertEquals(answerSubmissions.size(), assessmentResult.getTotalCount());
+      assertEquals(3, assessmentResult.getTotalCount());
       assertEquals(3, assessmentResult.getCorrectCount());
     }
 
     @Test
     void shouldCreateNewAssessmentAttempt() throws UnexpectedNoAccessRightException {
-      makeMe.theNote(topNote).withNChildrenThat(3, NoteBuilder::hasAnApprovedQuestion).please();
-      notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(3);
-
-      for (Note note : notebook.getNotes()) {
-        PredefinedQuestion predefinedQuestion = note.getPredefinedQuestions().get(0);
-        predefinedQuestion.setCorrectAnswerIndex(1);
-
-        AnswerSubmission answerSubmission = new AnswerSubmission();
-        answerSubmission.setQuestionId(predefinedQuestion.getId());
-
-        answerSubmission.setAnswerId(0);
-        answerSubmission.setCorrectAnswers(true);
-        answerSubmissions.add(answerSubmission);
-      }
-
       Timestamp timestamp = makeMe.aTimestamp().please();
       testabilitySettings.timeTravelTo(timestamp);
-      controller.submitAssessmentResult(assessmentAttempt, answerSubmissions);
+      controller.submitAssessmentResult(assessmentAttempt);
       AssessmentAttempt assessmentAttempt =
           makeMe.modelFactoryService.assessmentAttemptRepository.findAll().iterator().next();
-
-      assertEquals(3, assessmentAttempt.getAnswersCorrect());
       assertEquals(timestamp, assessmentAttempt.getSubmittedAt());
     }
 
     @Test
     void shouldReturnSomeAnswersCorrect() throws UnexpectedNoAccessRightException {
-      makeMe.theNote(topNote).withNChildrenThat(2, NoteBuilder::hasAnApprovedQuestion).please();
-      notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(3);
+      ReviewQuestionInstance q1 =
+          assessmentAttempt.getAssessmentQuestionInstances().get(0).getReviewQuestionInstance();
+      ReviewQuestionInstance q2 =
+          assessmentAttempt.getAssessmentQuestionInstances().get(1).getReviewQuestionInstance();
+      ReviewQuestionInstance q3 =
+          assessmentAttempt.getAssessmentQuestionInstances().get(2).getReviewQuestionInstance();
+      makeMe.anAnswer().forQuestion(q1).correct().please();
+      makeMe.anAnswer().forQuestion(q2).correct().please();
+      makeMe.anAnswer().forQuestion(q3).please();
 
-      PredefinedQuestion predefinedQuestion =
-          notebook.getNotes().get(0).getPredefinedQuestions().get(0);
-      predefinedQuestion.setCorrectAnswerIndex(0);
+      AssessmentResult assessmentResult = controller.submitAssessmentResult(assessmentAttempt);
 
-      AnswerSubmission answerSubmission = new AnswerSubmission();
-      answerSubmission.setQuestionId(predefinedQuestion.getId());
-      answerSubmission.setAnswerId(0);
-      answerSubmission.setCorrectAnswers(true);
-      answerSubmissions.add(answerSubmission);
-
-      predefinedQuestion = notebook.getNotes().get(1).getPredefinedQuestions().get(0);
-      predefinedQuestion.setCorrectAnswerIndex(0);
-
-      answerSubmission = new AnswerSubmission();
-      answerSubmission.setQuestionId(predefinedQuestion.getId());
-      answerSubmission.setAnswerId(0);
-      answerSubmission.setCorrectAnswers(false);
-      answerSubmissions.add(answerSubmission);
-
-      AssessmentResult assessmentResult =
-          controller.submitAssessmentResult(assessmentAttempt, answerSubmissions);
-
-      assertEquals(2, assessmentResult.getTotalCount());
-      assertEquals(1, assessmentResult.getCorrectCount());
+      assertEquals(3, assessmentResult.getTotalCount());
+      assertEquals(2, assessmentResult.getCorrectCount());
     }
 
     @Test
     void shouldNotBeAbleToAccessNotebookWhenUserHasNoPermission() {
-      makeMe.theNote(topNote).withNChildrenThat(2, NoteBuilder::hasAnApprovedQuestion).please();
       User anotherUser = makeMe.aUser().please();
       assessmentAttempt.setUser(anotherUser);
       assertThrows(
           UnexpectedNoAccessRightException.class,
-          () -> controller.submitAssessmentResult(assessmentAttempt, answerSubmissions));
+          () -> controller.submitAssessmentResult(assessmentAttempt));
     }
   }
 

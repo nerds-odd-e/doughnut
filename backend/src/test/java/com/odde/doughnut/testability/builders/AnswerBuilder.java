@@ -24,10 +24,12 @@ public class AnswerBuilder extends EntityBuilder<Answer> {
         makeMe.modelFactoryService.save(entity.getReviewQuestionInstance());
       }
     }
-    if (answerDTO.getSpellingAnswer() == null && answerDTO.getChoiceIndex() == null) {
-      answerDTO.setSpellingAnswer("spelling");
+    if (entity.getCorrect() == null) {
+      if (answerDTO.getSpellingAnswer() == null && answerDTO.getChoiceIndex() == null) {
+        answerDTO.setSpellingAnswer("spelling");
+      }
+      this.entity.setFromDTO(answerDTO);
     }
-    this.entity.setFromDTO(answerDTO);
   }
 
   public AnswerBuilder withValidQuestion(PredefinedQuestionFactory predefinedQuestionFactory) {
@@ -44,6 +46,7 @@ public class AnswerBuilder extends EntityBuilder<Answer> {
 
   public AnswerBuilder forQuestion(ReviewQuestionInstance reviewQuestionInstance) {
     entity.setReviewQuestionInstance(reviewQuestionInstance);
+    reviewQuestionInstance.setAnswer(entity);
     return this;
   }
 
@@ -54,6 +57,11 @@ public class AnswerBuilder extends EntityBuilder<Answer> {
 
   public AnswerBuilder choiceIndex(int index) {
     answerDTO.setChoiceIndex(index);
+    return this;
+  }
+
+  public AnswerBuilder correct() {
+    entity.setCorrect(true);
     return this;
   }
 }
