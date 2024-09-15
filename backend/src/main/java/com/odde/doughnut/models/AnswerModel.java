@@ -22,7 +22,7 @@ public class AnswerModel {
     answerResult.answerId = answer.getId();
     answerResult.answerDisplay = answer.getAnswerDisplay();
     answerResult.reviewPoint = getReviewPoint(user);
-    answerResult.correct = answer.isCorrect();
+    answerResult.correct = answer.getCorrect();
     answerResult.correctChoiceIndex = getQuestion().getCorrectAnswerIndex();
     answerResult.choiceIndex = answer.getChoiceIndex();
     answerResult.predefinedQuestion = getQuestion();
@@ -39,7 +39,7 @@ public class AnswerModel {
     if (reviewPoint == null) return;
     modelFactoryService
         .toReviewPointModel(reviewPoint)
-        .markAsRepeated(currentUTCTimestamp, answer.isCorrect());
+        .markAsRepeated(currentUTCTimestamp, answer.getCorrect());
   }
 
   private ReviewPoint getReviewPoint(User user) {

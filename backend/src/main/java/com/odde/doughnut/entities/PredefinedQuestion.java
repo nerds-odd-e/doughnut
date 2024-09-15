@@ -1,6 +1,7 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -40,7 +41,7 @@ public class PredefinedQuestion extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  public boolean checkAnswer(Answer answer) {
+  public boolean checkAnswer(AnswerDTO answer) {
     if (Boolean.TRUE.equals(bareQuestion.getCheckSpell())) {
       return getNote().matchAnswer(answer.getSpellingAnswer());
     }

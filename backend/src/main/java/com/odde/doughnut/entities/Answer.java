@@ -3,6 +3,7 @@ package com.odde.doughnut.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,12 +12,10 @@ import lombok.Setter;
 @Table(name = "quiz_answer")
 public class Answer extends EntityIdentifiedByIdOnly {
   @Getter
-  @Setter
   @Column(name = "answer")
   String spellingAnswer;
 
   @Getter
-  @Setter
   @Column(name = "choice_index")
   Integer choiceIndex;
 
@@ -33,10 +32,10 @@ public class Answer extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
-  @JsonIgnore
-  public boolean isCorrect() {
-    return reviewQuestionInstance.getPredefinedQuestion().checkAnswer(this);
-  }
+  @Column(name = "correct")
+  @Getter
+  @NotNull
+  private Boolean correct = false;
 
   @JsonIgnore
   public String getAnswerDisplay() {
@@ -51,7 +50,8 @@ public class Answer extends EntityIdentifiedByIdOnly {
   }
 
   public void setFromDTO(AnswerDTO answerDTO) {
-    setSpellingAnswer(answerDTO.getSpellingAnswer());
-    setChoiceIndex(answerDTO.getChoiceIndex());
+    spellingAnswer = answerDTO.getSpellingAnswer();
+    choiceIndex = answerDTO.getChoiceIndex();
+    correct = reviewQuestionInstance.getPredefinedQuestion().checkAnswer(answerDTO);
   }
 }

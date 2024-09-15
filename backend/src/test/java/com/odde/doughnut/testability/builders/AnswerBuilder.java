@@ -1,5 +1,6 @@
 package com.odde.doughnut.testability.builders;
 
+import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionFactory;
 import com.odde.doughnut.testability.EntityBuilder;
@@ -7,6 +8,7 @@ import com.odde.doughnut.testability.MakeMe;
 
 public class AnswerBuilder extends EntityBuilder<Answer> {
   private ReviewQuestionInstanceBuilder reviewQuestionInstanceBuilder = null;
+  AnswerDTO answerDTO = new AnswerDTO();
 
   public AnswerBuilder(MakeMe makeMe) {
     super(makeMe, new Answer());
@@ -22,6 +24,10 @@ public class AnswerBuilder extends EntityBuilder<Answer> {
         makeMe.modelFactoryService.save(entity.getReviewQuestionInstance());
       }
     }
+    if (answerDTO.getSpellingAnswer() == null && answerDTO.getChoiceIndex() == null) {
+      answerDTO.setSpellingAnswer("spelling");
+    }
+    this.entity.setFromDTO(answerDTO);
   }
 
   public AnswerBuilder withValidQuestion(PredefinedQuestionFactory predefinedQuestionFactory) {
@@ -42,14 +48,12 @@ public class AnswerBuilder extends EntityBuilder<Answer> {
   }
 
   public AnswerBuilder answerWithSpelling(String answer) {
-    this.entity.setChoiceIndex(null);
-    this.entity.setSpellingAnswer(answer);
+    answerDTO.setSpellingAnswer(answer);
     return this;
   }
 
   public AnswerBuilder choiceIndex(int index) {
-    this.entity.setSpellingAnswer(null);
-    this.entity.setChoiceIndex(index);
+    answerDTO.setChoiceIndex(index);
     return this;
   }
 }
