@@ -71,7 +71,7 @@
     "wait-on": "^8.0.1"
   },
   "dependencies": {
-    "@cucumber/cucumber": "^11.0.0"
+    "@cucumber/cucumber": "^11.0.1"
   },
   "resolutions": {
     "esbuild": "^0.23.1"

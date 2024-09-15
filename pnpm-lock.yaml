@@ -13,8 +13,8 @@ importers:
   .:
     dependencies:
       '@cucumber/cucumber':
-        specifier: ^11.0.0
-        version: 11.0.0
+        specifier: ^11.0.1
+        version: 11.0.1
     devDependencies:
       '@anev/ts-mountebank':
         specifier: 1.8.0
@@ -501,8 +501,8 @@ packages:
     engines: {node: 18 || >=20}
     hasBin: true
 
-  '@cucumber/cucumber@11.0.0':
-    resolution: {integrity: sha512-5Aswe6UWpoQ6oKrXvEaw0+m7tv9vdwCMDpeY6Pd9i2YfcUuM89R/LC8p1M/d6TAJv7Lv1v0E3+8FB3qj5MBhHQ==}
+  '@cucumber/cucumber@11.0.1':
+    resolution: {integrity: sha512-8ypR+tQiY0sZSzQ5WS+RIKL0rUI38skRuyIK0g/crP/JmDAovG6KNJ6t0YLnGQ43UofG9jR8HWt/EPz2mtZD0w==}
     engines: {node: 18 || 20 || >=22}
     hasBin: true
 
@@ -5345,7 +5345,7 @@ snapshots:
 
   '@bahmutov/cypress-esbuild-preprocessor@2.2.3(esbuild@0.23.1)':
     dependencies:
-      debug: 4.3.7
+      debug: 4.3.7(supports-color@8.1.1)
       esbuild: 0.23.1
     transitivePeerDependencies:
       - supports-color
@@ -5443,7 +5443,7 @@ snapshots:
       yaml: 2.5.0
       yup: 1.2.0
 
-  '@cucumber/cucumber@11.0.0':
+  '@cucumber/cucumber@11.0.1':
     dependencies:
       '@cucumber/ci-environment': 10.0.1
       '@cucumber/cucumber-expressions': 17.1.0
@@ -5459,7 +5459,7 @@ snapshots:
       chalk: 4.1.2
       cli-table3: 0.6.3
       commander: 10.0.1
-      debug: 4.3.6(supports-color@8.1.1)
+      debug: 4.3.7(supports-color@8.1.1)
       error-stack-parser: 2.1.4
       figures: 3.2.0
       glob: 10.4.5
@@ -5672,7 +5672,7 @@ snapshots:
   '@eslint/eslintrc@2.1.4':
     dependencies:
       ajv: 6.12.6
-      debug: 4.3.7
+      debug: 4.3.7(supports-color@8.1.1)
       espree: 9.6.1
       globals: 13.24.0
       ignore: 5.3.1
@@ -5696,7 +5696,7 @@ snapshots:
   '@humanwhocodes/config-array@0.11.14':
     dependencies:
       '@humanwhocodes/object-schema': 2.0.3
-      debug: 4.3.7
+      debug: 4.3.7(supports-color@8.1.1)
       minimatch: 3.1.2
     transitivePeerDependencies:
       - supports-color
@@ -6968,9 +6968,11 @@ snapshots:
     optionalDependencies:
       supports-color: 8.1.1
 
-  debug@4.3.7:
+  debug@4.3.7(supports-color@8.1.1):
     dependencies:
       ms: 2.1.3
+    optionalDependencies:
+      supports-color: 8.1.1
 
   decamelize@4.0.0: {}
 
@@ -7253,7 +7255,7 @@ snapshots:
       ajv: 6.12.6
       chalk: 4.1.2
       cross-spawn: 7.0.3
-      debug: 4.3.7
+      debug: 4.3.7(supports-color@8.1.1)
       doctrine: 3.0.0
       escape-string-regexp: 4.0.0
       eslint-scope: 7.2.2
@@ -9850,7 +9852,7 @@ snapshots:
   vite-node@2.1.1(@types/node@22.5.5)(sass-embedded@1.77.5)(sass@1.77.6)(terser@5.31.3):
     dependencies:
       cac: 6.7.14
-      debug: 4.3.7
+      debug: 4.3.7(supports-color@8.1.1)
       pathe: 1.1.2
       vite: 5.4.5(@types/node@22.5.5)(sass-embedded@1.77.5)(sass@1.77.6)(terser@5.31.3)
     transitivePeerDependencies:
@@ -9901,7 +9903,7 @@ snapshots:
     dependencies:
       '@antfu/utils': 0.7.10
       '@rollup/pluginutils': 5.1.0(rollup@4.21.0)
-      debug: 4.3.7
+      debug: 4.3.7(supports-color@8.1.1)
       error-stack-parser-es: 0.1.5
       fs-extra: 11.2.0
       open: 10.1.0
@@ -9994,7 +9996,7 @@ snapshots:
       '@vitest/spy': 2.1.1
       '@vitest/utils': 2.1.1
       chai: 5.1.1
-      debug: 4.3.7
+      debug: 4.3.7(supports-color@8.1.1)
       magic-string: 0.30.11
       pathe: 1.1.2
       std-env: 3.7.0
