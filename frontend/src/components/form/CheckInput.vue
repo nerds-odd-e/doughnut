@@ -1,29 +1,27 @@
 <template>
-  <InputWithType v-bind="{ scopeName, field, errors, beforeLabel: true }">
+  <InputWithType v-bind="{ scopeName, field, errorMessage, beforeLabel: true }">
     <input
       type="checkbox"
-      :class="`form-check-input ${!!errors ? 'is-invalid' : ''}`"
+      :class="`form-check-input ${!!errorMessage ? 'is-invalid' : ''}`"
       :id="`${scopeName}-${field}`"
       :name="field"
       :checked="modelValue"
       :disabled="disabled"
-      @change="$emit('update:modelValue', $event.target.checked)"
+      @change="$emit('update:modelValue', ($event.target as HTMLInputElement).checked)"
     />
   </InputWithType>
 </template>
 
-<script>
+<script setup lang="ts">
 import InputWithType from "./InputWithType.vue"
 
-export default {
-  props: {
-    modelValue: Boolean,
-    scopeName: String,
-    field: String,
-    errors: Object,
-    disabled: Boolean,
-  },
-  emits: ["update:modelValue"],
-  components: { InputWithType },
-}
+defineProps({
+  modelValue: Boolean,
+  scopeName: String,
+  field: String,
+  errorMessage: String,
+  disabled: Boolean,
+})
+
+defineEmits(["update:modelValue"])
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <InputWithType v-bind="{ scopeName, field, errors }">
+  <InputWithType v-bind="{ scopeName, field, errorMessage }">
     <output :id="`${scopeName}-${field}`" role="radiogroup" class="btn-group">
       <template v-for="option in options" :key="option.value">
         <input
@@ -24,24 +24,24 @@
   </InputWithType>
 </template>
 
-<script>
+<script setup lang="ts">
+import { PropType } from "vue"
 import InputWithType from "./InputWithType.vue"
 
-export default {
-  props: {
-    modelValue: String,
-    scopeName: String,
-    field: String,
-    options: Array,
-    errors: Object,
-  },
-  emits: ["update:modelValue"],
-  components: { InputWithType },
-  methods: {
-    selectionChanged(event) {
-      this.$emit("update:modelValue", event.target.value)
-    },
-  },
+defineProps({
+  modelValue: String,
+  scopeName: String,
+  field: String,
+  options: Array as PropType<
+    { value: string; label: string; title?: string }[]
+  >,
+  errorMessage: String,
+})
+
+const emit = defineEmits(["update:modelValue"])
+
+const selectionChanged = (event: Event) => {
+  emit("update:modelValue", (event.target as HTMLInputElement).value)
 }
 </script>
 

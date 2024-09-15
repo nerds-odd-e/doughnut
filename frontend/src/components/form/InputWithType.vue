@@ -12,32 +12,29 @@
         </div>
       </template>
       <slot v-if="!beforeLabel" />
-      <div class="error-msg" v-if="!!errors">{{ errors }}</div>
+      <div class="error-msg" v-if="!!errorMessage">{{ errorMessage }}</div>
     </div>
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import { computed } from "vue"
 import { camelCase, startCase } from "lodash"
 
-export default {
-  props: {
-    scopeName: String,
-    field: String,
-    title: String,
-    hint: String,
-    errors: String,
-    beforeLabel: { type: Boolean, default: false },
-  },
-  computed: {
-    titlized() {
-      return this.title ? this.title : startCase(camelCase(this.field))
-    },
-    controlId() {
-      return `${this.scopeName}-${this.field}`
-    },
-  },
-}
+const props = defineProps({
+  scopeName: String,
+  field: String,
+  title: String,
+  hint: String,
+  errorMessage: String,
+  beforeLabel: { type: Boolean, default: false },
+})
+
+const titlized = computed(() =>
+  props.title ? props.title : startCase(camelCase(props.field))
+)
+
+const controlId = computed(() => `${props.scopeName}-${props.field}`)
 </script>
 
 <style lang="sass" scoped>

@@ -2,8 +2,7 @@
   <RadioButtons
     :model-value="modelValue"
     @update:model-value="$emit('update:modelValue', $event)"
-    v-bind="{ scopeName, field, options }"
-    :errors="errorsObject"
+    v-bind="{ scopeName, field, options, errorMessage }"
   >
     <template #labelAddition="{ value }">
       <div class="text-center">
@@ -13,48 +12,35 @@
   </RadioButtons>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { NoteTopic } from "@/generated/backend"
-import { PropType, defineComponent, computed } from "vue"
+import { PropType, computed } from "vue"
 import { linkTypeOptions } from "../../models/linkTypeOptions"
 import RadioButtons from "../form/RadioButtons.vue"
 import SvgLinkTypeIcon from "../svgs/SvgLinkTypeIcon.vue"
 
-export default defineComponent({
-  name: "LinkTypeSelect",
-  props: {
-    scopeName: String,
-    modelValue: {
-      type: String as PropType<NoteTopic.linkType>,
-      required: true,
-    },
-    errors: String,
-    allowEmpty: { type: Boolean, default: false },
-    field: { type: String, default: "linkType" },
-    inverseIcon: Boolean,
+const { allowEmpty } = defineProps({
+  scopeName: String,
+  modelValue: {
+    type: String as PropType<NoteTopic.linkType>,
+    required: true,
   },
-  components: { RadioButtons, SvgLinkTypeIcon },
-  emits: ["update:modelValue"],
-  setup(props) {
-    const errorsObject = computed(() =>
-      props.errors ? { [props.field || "linkType"]: props.errors } : undefined
-    )
+  errorMessage: String,
+  allowEmpty: { type: Boolean, default: false },
+  field: { type: String, default: "linkType" },
+  inverseIcon: Boolean,
+})
 
-    const options = computed(() => {
-      const filteredOptions = props.allowEmpty
-        ? linkTypeOptions
-        : linkTypeOptions.filter(({ label }) => label !== "no link")
+defineEmits(["update:modelValue"])
 
-      return filteredOptions.map(({ label }) => ({
-        value: label,
-        label,
-      }))
-    })
+const options = computed(() => {
+  const filteredOptions = allowEmpty
+    ? linkTypeOptions
+    : linkTypeOptions.filter(({ label }) => label !== "no link")
 
-    return {
-      errorsObject,
-      options,
-    }
-  },
+  return filteredOptions.map(({ label }) => ({
+    value: label,
+    label,
+  }))
 })
 </script>

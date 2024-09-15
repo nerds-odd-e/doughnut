@@ -1,5 +1,5 @@
 <template>
-  <InputWithType v-bind="{ scopeName, field: '', errors, title: titlized }">
+  <InputWithType v-bind="{ scopeName, field: '', errorMessage, title: titlized }">
     <PopButton :aria-label="titlized">
       <template #button_face>
         <SvgLinkTypeIcon :link-type="modelValue" :inverse-icon="inverseIcon" />
@@ -11,7 +11,7 @@
           v-bind="{
             scopeName,
             modelValue: modelValue as string as NoteTopic.linkType,
-            errors,
+            errorMessage,
             allowEmpty,
             field,
             inverseIcon,
@@ -26,36 +26,29 @@
   </InputWithType>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { NoteCreationDTO, NoteTopic } from "@/generated/backend"
 import { camelCase, startCase } from "lodash"
-import { PropType, defineComponent } from "vue"
+import { PropType, computed } from "vue"
 import PopButton from "../commons/Popups/PopButton.vue"
 import InputWithType from "../form/InputWithType.vue"
 import SvgLinkTypeIcon from "../svgs/SvgLinkTypeIcon.vue"
 import LinkTypeSelect from "./LinkTypeSelect.vue"
 
-export default defineComponent({
-  props: {
-    scopeName: String,
-    modelValue: {
-      type: String as PropType<NoteCreationDTO.linkTypeToParent>,
-      default: () => "no link" as NoteTopic.linkType,
-    },
-    errors: String,
-    allowEmpty: { type: Boolean, default: false },
-    field: { type: String, defalt: "linkType" },
-    inverseIcon: Boolean,
+const { modelValue, field } = defineProps({
+  scopeName: String,
+  modelValue: {
+    type: String as PropType<NoteCreationDTO.linkTypeToParent>,
+    default: () => "no link" as NoteTopic.linkType,
   },
-  components: { PopButton, SvgLinkTypeIcon, LinkTypeSelect, InputWithType },
-  emits: ["update:modelValue"],
-  computed: {
-    titlized() {
-      return startCase(camelCase(this.field))
-    },
-    label() {
-      return this.modelValue ? this.modelValue : "default"
-    },
-  },
+  errorMessage: String,
+  allowEmpty: { type: Boolean, default: false },
+  field: { type: String, defalt: "linkType" },
+  inverseIcon: Boolean,
 })
+
+defineEmits(["update:modelValue"])
+
+const titlized = computed(() => startCase(camelCase(field)))
+const label = computed(() => modelValue || "default")
 </script>

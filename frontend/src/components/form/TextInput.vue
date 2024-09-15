@@ -1,14 +1,14 @@
 <template>
-  <InputWithType v-bind="{ scopeName, field, title, errors, hint }">
+  <InputWithType v-bind="{ scopeName, field, title, errorMessage, hint }">
     <template #input_prepend v-if="$slots.input_prepend">
       <slot name="input_prepend" />
     </template>
     <input
-      :class="`text-input-control form-control ${!!errors ? 'is-invalid' : ''}`"
+      :class="`text-input-control form-control ${!!errorMessage ? 'is-invalid' : ''}`"
       :id="`${scopeName}-${field}`"
       :name="field"
       :value="modelValue"
-      @input="$emit('update:modelValue', $event.target.value)"
+      @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
       :placeholder="placeholder"
       :autofocus="autofocus"
       autocomplete="off"
@@ -19,24 +19,18 @@
   </InputWithType>
 </template>
 
-<script>
+<script setup lang="ts">
 import InputWithType from "./InputWithType.vue"
 
-export default {
-  props: {
-    modelValue: [String, Number],
-    scopeName: String,
-    field: String,
-    title: String,
-    hint: String,
-    placeholder: { type: String, default: null },
-    autofocus: { type: Boolean, default: false },
-    errors: String,
-    disabled: { type: Boolean, default: false },
-  },
-  components: {
-    InputWithType,
-  },
-  emits: ["update:modelValue", "blur"],
-}
+defineProps({
+  modelValue: { type: [String, Number], required: false },
+  scopeName: String,
+  field: String,
+  title: String,
+  hint: String,
+  placeholder: { type: String, default: null },
+  autofocus: { type: Boolean, default: false },
+  errorMessage: String,
+  disabled: { type: Boolean, default: false },
+})
 </script>
