@@ -43,6 +43,10 @@ public class MakeMe extends MakeMeWithoutDB {
     return aNote().titleConstructor(title);
   }
 
+  public NotebookBuilder aNotebook() {
+    return new NotebookBuilder(this);
+  }
+
   public NoteBuilder aNote(String title, String details) {
     return aNote().titleConstructor(title).details(details);
   }

@@ -93,9 +93,12 @@ public class RestAssessmentControllerTests {
 
     @BeforeEach
     void setup() {
-      Note topNote = makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser).please();
-      makeMe.theNote(topNote).withNChildrenThat(3, NoteBuilder::hasAnApprovedQuestion).please();
-      notebook = topNote.getNotebook();
+
+      notebook = makeMe.aNotebook().creatorAndOwner(currentUser).please();
+      makeMe
+          .theNote(notebook.getHeadNote())
+          .withNChildrenThat(3, NoteBuilder::hasAnApprovedQuestion)
+          .please();
     }
 
     @Test
