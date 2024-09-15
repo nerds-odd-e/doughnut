@@ -30,15 +30,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, PropType } from "vue"
+import { ref, onMounted, computed } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { AssessmentAttempt, Certificate } from "@/generated/backend"
+import { Certificate } from "@/generated/backend"
 const props = defineProps({
   notebookId: { type: Number, required: true },
-  assessmentAttempt: {
-    type: Object as PropType<AssessmentAttempt>,
-    required: true,
-  },
 })
 const { managedApi } = useLoadingApi()
 const certificate = ref<Certificate | undefined>(undefined)

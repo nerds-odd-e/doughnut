@@ -4,27 +4,17 @@
     title="View Certificate"
   >
     <CertificatePopup
-      :assessment-attempt="assessmentAttempt"
-      :notebook-id="certificate?.notebook?.id"
+      :notebook-id="notebookId"
     >
     </CertificatePopup>
   </PopButton>
 </template>
 
 <script setup lang="ts">
-import { PropType } from "vue"
-// import useLoadingApi from "@/managedApi/useLoadingApi"
-import { Certificate, AssessmentAttempt } from "@/generated/backend"
-
-// const { managedApi } = useLoadingApi()
 defineProps({
-  assessmentAttempt: {
-    type: Object as PropType<AssessmentAttempt>,
+  notebookId: {
+    type: Number,
     required: true,
-  },
-  certificate: {
-    type: Object as PropType<Certificate>,
-    required: false,
   },
 })
 </script>

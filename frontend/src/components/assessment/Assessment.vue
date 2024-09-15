@@ -16,8 +16,8 @@
           </div>
           <AssessmentClaimCertificate
             v-if="assessmentResult.certified"
-            :assessment-attempt="assessmentResult.attempt!"
-            :certificate="certificate" />
+            :notebook-id="assessmentResult.notebookId!"
+          />
           <i v-else> (This is not a certifiable assessment.)</i>
         </div>
         <div class="alert alert-danger" v-else="">You have not passed the assessment.</div>

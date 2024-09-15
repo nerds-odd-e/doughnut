@@ -3539,6 +3539,9 @@ components:
         totalCount:
           type: integer
           format: int32
+        notebookId:
+          type: integer
+          format: int32
         isCertified:
           type: boolean
         attempt:
