@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.AnswerSubmission;
 import com.odde.doughnut.controllers.dto.AssessmentResult;
 import com.odde.doughnut.entities.*;
@@ -83,6 +84,30 @@ public class RestAssessmentControllerTests {
               .generateAssessmentQuestions(bazaarNotebook.getNotebook())
               .getAssessmentQuestionInstances();
       assertEquals(5, assessment.size());
+    }
+  }
+
+  @Nested
+  class answerQuestion {
+    private Notebook notebook;
+
+    @BeforeEach
+    void setup() {
+      Note topNote = makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser).please();
+      makeMe.theNote(topNote).withNChildrenThat(3, NoteBuilder::hasAnApprovedQuestion).please();
+      notebook = topNote.getNotebook();
+    }
+
+    @Test
+    void shouldNotBeAbleToAccessNotebookWhenUserHasNoPermission() {
+      User anotherUser = makeMe.aUser().please();
+      AssessmentAttempt assessmentAttempt =
+          makeMe.anAssessmentAttempt(anotherUser, notebook).withOneQuestion().please();
+      AssessmentQuestionInstance assessmentQuestionInstance =
+          assessmentAttempt.getAssessmentQuestionInstances().get(0);
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.answerQuestion(assessmentQuestionInstance, new AnswerDTO()));
     }
   }
 

@@ -50,8 +50,10 @@ class RestAssessmentController {
   public AnsweredQuestion answerQuestion(
       @PathVariable("assessmentQuestionInstance") @Schema(type = "integer")
           AssessmentQuestionInstance assessmentQuestionInstance,
-      @Valid @RequestBody AnswerDTO answerDTO) {
+      @Valid @RequestBody AnswerDTO answerDTO)
+      throws UnexpectedNoAccessRightException {
     currentUser.assertLoggedIn();
+    currentUser.assertAuthorization(assessmentQuestionInstance);
 
     return assessmentService.answerQuestion(
         assessmentQuestionInstance, answerDTO, currentUser.getEntity());

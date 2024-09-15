@@ -17,6 +17,7 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
       case Subscription obj -> assertAuthorizationSubscription(obj);
       case User obj -> assertAuthorizationUser(obj);
       case AssessmentAttempt obj -> assertAuthorizationUser(obj.getUser());
+      case AssessmentQuestionInstance obj -> assertAuthorization(obj.getAssessmentAttempt());
       default ->
           throw new ResponseStatusException(
               HttpStatus.INTERNAL_SERVER_ERROR, "Unknown object type");
