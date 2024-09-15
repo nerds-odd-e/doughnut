@@ -56,10 +56,8 @@ class RestAssessmentController {
       @Valid @RequestBody AnswerDTO answerDTO) {
     currentUser.assertLoggedIn();
 
-    return assessmentService
-        .answerQuestion(
-            assessmentQuestionInstance, answerDTO, currentUser.getEntity());
-
+    return assessmentService.answerQuestion(
+        assessmentQuestionInstance, answerDTO, currentUser.getEntity());
   }
 
   @PostMapping("{assessmentAttempt}")

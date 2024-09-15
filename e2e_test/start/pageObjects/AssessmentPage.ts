@@ -82,7 +82,8 @@ const endOfAssessment = () => {
       findCertificateButton().should('not.exist')
     },
     expectCertificateCannotBeObtained() {
-      findCertificateButton().should('have.class', 'disabled')
+      cy.findByText('(This is not a certifiable assessment.)')
+      this.expectNoCertificate()
     },
   }
 }

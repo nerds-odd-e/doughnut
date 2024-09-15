@@ -10,8 +10,6 @@ import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.testability.TestabilitySettings;
-import jakarta.validation.Valid;
-
 import java.sql.Timestamp;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -67,9 +65,7 @@ public class AssessmentService {
                   new AssessmentQuestionInstance();
               assessmentQuestionInstance.setAssessmentAttempt(assessmentAttempt);
               assessmentQuestionInstance.setReviewQuestionInstance(reviewQuestionInstance);
-              assessmentAttempt
-                  .getAssessmentQuestionInstances()
-                  .add(assessmentQuestionInstance);
+              assessmentAttempt.getAssessmentQuestionInstances().add(assessmentQuestionInstance);
             });
     assessmentAttempt.setNotebook(notebook);
     assessmentAttempt.setUser(user);
@@ -138,14 +134,14 @@ public class AssessmentService {
                     "You have not passed the assessment"));
   }
 
-  public AnsweredQuestion answerQuestion(AssessmentQuestionInstance assessmentQuestionInstance, AnswerDTO answerDTO, User user) {
+  public AnsweredQuestion answerQuestion(
+      AssessmentQuestionInstance assessmentQuestionInstance, AnswerDTO answerDTO, User user) {
     return modelFactoryService
-      .createAnswerForQuestion(
-        assessmentQuestionInstance.getReviewQuestionInstance(),
-        answerDTO,
-        user,
-        testabilitySettings.getCurrentUTCTimestamp())
-      .getAnswerViewedByUser(user);
-
+        .createAnswerForQuestion(
+            assessmentQuestionInstance.getReviewQuestionInstance(),
+            answerDTO,
+            user,
+            testabilitySettings.getCurrentUTCTimestamp())
+        .getAnswerViewedByUser(user);
   }
 }

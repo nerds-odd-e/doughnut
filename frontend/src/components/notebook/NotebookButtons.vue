@@ -32,7 +32,7 @@
       <template #default="{ closer }">
         <NotebookAssistantManagementDialog
           v-bind="{ notebook }"
-          @close="closer($event)"
+          @close="closer()"
         />
       </template>
     </PopButton>

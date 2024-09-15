@@ -10,23 +10,24 @@
       />
       <div v-else-if="assessmentResult">
         <p>Your score: {{ correctAnswers }} / {{ assessmentQuestionInstance.length }}</p>
-        <div class="alert alert-success" v-if="assessmentResult?.attempt?.isPass">
-          You have passed the assessment.
-        </div>
-        <PopButton
-          :disabled="!assessmentResult.isCertified"
-          disabledTitle="This notebook does not award a certificate."
-          btn-class="btn btn-light"
-          title="View Certificate"
-          v-if="assessmentResult.attempt?.isPass"
-        >
-          <CertificatePopup
-            :assessment-attempt="assessmentResult.attempt"
-            :notebook-id="certificate?.notebook?.id"
+        <div v-if="assessmentResult?.attempt?.isPass">
+          <div class="alert alert-success">
+            You have passed the assessment.
+          </div>
+          <PopButton
+            btn-class="btn btn-light"
+            title="View Certificate"
+            v-if="assessmentResult.isCertified"
           >
-          </CertificatePopup>
-        </PopButton>
-        <div class="alert alert-danger" v-else>You have not passed the assessment.</div>
+            <CertificatePopup
+              :assessment-attempt="assessmentResult.attempt"
+              :notebook-id="certificate?.notebook?.id"
+            >
+            </CertificatePopup>
+          </PopButton>
+          <i v-else> (This is not a certifiable assessment.)</i>
+        </div>
+        <div class="alert alert-danger" v-else="">You have not passed the assessment.</div>
       </div>
     </div>
   </div>

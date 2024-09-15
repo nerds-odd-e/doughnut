@@ -1,11 +1,10 @@
 <template>
   <a
-    :class="`btn btn-sm ${btnClass} ${disabled ? 'disabled' : ''}`"
+    :class="`btn btn-sm ${btnClass}`"
     :aria-label="ariaLabel"
     role="button"
-    @click.prevent="handleClick"
-    :title="computedTitle"
-    :style="{ pointerEvents: disabled ? 'none' : 'auto', opacity: disabled ? 0.6 : 1 }"
+    @click.prevent="show=true"
+    :title="title"
   >
     <slot name="button_face" />
     <template v-if="!$slots.button_face">
@@ -19,43 +18,23 @@
   </Modal>
 </template>
 
-<script lang="ts">
-import { PropType, defineComponent } from "vue"
+<script setup lang="ts">
+import { ref, PropType } from "vue"
 import Modal from "../Modal.vue"
 
-export default defineComponent({
-  props: {
-    title: {
-      type: String,
-      default: "",
-    },
-    disabledTitle: {
-      type: String,
-      default: "",
-    },
-    disabled: Boolean,
-    sidebar: String as PropType<"left" | "right">,
-    btnClass: String,
-    ariaLabel: String,
+defineProps({
+  title: {
+    type: String,
+    default: "",
   },
-  data() {
-    return { show: false }
-  },
-  components: { Modal },
-  methods: {
-    closeDialog() {
-      this.show = false
-    },
-    handleClick() {
-      if (!this.disabled) {
-        this.show = true
-      }
-    },
-  },
-  computed: {
-    computedTitle(): string {
-      return this.disabled ? this.disabledTitle : this.title
-    },
-  },
+  sidebar: String as PropType<"left" | "right">,
+  btnClass: String,
+  ariaLabel: String,
 })
+
+const show = ref(false)
+
+const closeDialog = () => {
+  show.value = false
+}
 </script>

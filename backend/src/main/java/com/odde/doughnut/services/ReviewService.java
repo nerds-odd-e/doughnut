@@ -4,10 +4,8 @@ import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.ReviewQuestionContestResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.AnswerModel;
 import com.odde.doughnut.models.Randomizer;
 import com.theokanning.openai.client.OpenAiApi;
-import jakarta.validation.Valid;
 import java.sql.Timestamp;
 
 public class ReviewService {
@@ -36,15 +34,11 @@ public class ReviewService {
 
   public AnsweredQuestion answerQuestion(
       ReviewQuestionInstance reviewQuestionInstance,
-     AnswerDTO answerDTO,
+      AnswerDTO answerDTO,
       User user,
       Timestamp currentUTCTimestamp) {
     return modelFactoryService
-      .createAnswerForQuestion(
-        reviewQuestionInstance,
-        answerDTO,
-        user,
-        currentUTCTimestamp)
-      .getAnswerViewedByUser(user);
+        .createAnswerForQuestion(reviewQuestionInstance, answerDTO, user, currentUTCTimestamp)
+        .getAnswerViewedByUser(user);
   }
 }
