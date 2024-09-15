@@ -5,13 +5,14 @@ import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
+import java.util.function.Consumer;
 
 public class NotebookBuilder extends EntityBuilder<Notebook> {
   private final NoteBuilder noteBuilder;
 
   public NotebookBuilder(MakeMe makeMe) {
     super(makeMe, null);
-    noteBuilder = makeMe.aNote();
+    noteBuilder = makeMe.aNote().asHeadNoteOfANotebook(null);
   }
 
   @Override
@@ -22,6 +23,11 @@ public class NotebookBuilder extends EntityBuilder<Notebook> {
 
   public NotebookBuilder creatorAndOwner(UserModel user) {
     noteBuilder.creatorAndOwner(user);
+    return this;
+  }
+
+  public NotebookBuilder withNChildrenThat(int count, Consumer<NoteBuilder> childNoteThat) {
+    noteBuilder.withNChildrenThat(count, childNoteThat);
     return this;
   }
 }
