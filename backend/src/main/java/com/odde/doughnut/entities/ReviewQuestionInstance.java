@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "review_question_instance")
@@ -18,6 +20,12 @@ public class ReviewQuestionInstance extends EntityIdentifiedByIdOnly {
   @NotNull
   @JsonIgnore
   private PredefinedQuestion predefinedQuestion;
+
+  @OneToOne(mappedBy = "reviewQuestionInstance")
+  @Getter
+  @Setter
+  @JsonIgnore
+  Answer answer;
 
   @NotNull
   public BareQuestion getBareQuestion() {

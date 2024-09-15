@@ -18,6 +18,7 @@ public class ApiError {
     OPENAI_SERVICE_ERROR,
     WIKIDATA_SERVICE_ERROR,
     ASSESSMENT_SERVICE_ERROR,
+    QUESTION_ANSWER_ERROR,
   };
 
   public ApiError(String message, ErrorType type) {

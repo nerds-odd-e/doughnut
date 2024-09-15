@@ -7,6 +7,7 @@ import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.AnswerSubmission;
 import com.odde.doughnut.controllers.dto.AssessmentResult;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.exceptions.QuestionAnswerException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
@@ -114,6 +115,18 @@ public class RestAssessmentControllerTests {
       AnsweredQuestion answeredQuestion =
           controller.answerQuestion(assessmentQuestionInstance, answerDTO);
       assertThat(answeredQuestion.answerId).isNotNull();
+    }
+
+    @Test
+    void shouldNotBeAbleToAnswerTheSameQuestionTwice() {
+      makeMe
+          .anAnswer()
+          .forQuestion(assessmentQuestionInstance.getReviewQuestionInstance())
+          .please();
+      makeMe.refresh(assessmentQuestionInstance.getReviewQuestionInstance());
+      assertThrows(
+          QuestionAnswerException.class,
+          () -> controller.answerQuestion(assessmentQuestionInstance, answerDTO));
     }
   }
 

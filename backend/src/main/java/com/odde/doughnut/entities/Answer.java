@@ -2,11 +2,7 @@ package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import java.sql.Timestamp;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,7 +20,7 @@ public class Answer extends EntityIdentifiedByIdOnly {
   @Column(name = "choice_index")
   Integer choiceIndex;
 
-  @ManyToOne
+  @OneToOne
   @JoinColumn(name = "review_question_instance_id", referencedColumnName = "id")
   @Getter
   @Setter

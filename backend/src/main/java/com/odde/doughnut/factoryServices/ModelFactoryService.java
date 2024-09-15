@@ -4,6 +4,7 @@ import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.SearchTerm;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.*;
+import com.odde.doughnut.exceptions.QuestionAnswerException;
 import com.odde.doughnut.models.*;
 import com.odde.doughnut.services.NotebookService;
 import jakarta.persistence.EntityManager;
@@ -162,6 +163,9 @@ public class ModelFactoryService {
       AnswerDTO answerDTO,
       User user,
       Timestamp currentUTCTimestamp) {
+    if (reviewQuestionInstance.getAnswer() != null) {
+      throw new QuestionAnswerException("The question is already answered");
+    }
     Answer answer = new Answer();
     answer.setReviewQuestionInstance(reviewQuestionInstance);
     answer.setFromDTO(answerDTO);
