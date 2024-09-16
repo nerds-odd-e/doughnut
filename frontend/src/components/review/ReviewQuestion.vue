@@ -2,9 +2,6 @@
   <QuestionDisplay
     v-bind="{
       bareQuestion: reviewQuestionInstance.bareQuestion,
-      correctChoiceIndex,
-      answerChoiceIndex,
-      disabled,
     }"
     @answer="submitAnswer($event)"
     :key="reviewQuestionInstance.id"
@@ -26,9 +23,6 @@ const props = defineProps({
     type: Object as PropType<ReviewQuestionInstance>,
     required: true,
   },
-  correctChoiceIndex: Number,
-  answerChoiceIndex: Number,
-  disabled: Boolean,
 })
 
 const emits = defineEmits(["answered"])

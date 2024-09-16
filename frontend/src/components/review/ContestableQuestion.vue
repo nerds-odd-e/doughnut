@@ -6,7 +6,7 @@
   <div v-for="(q, index) in prevQuestions" :key="index">
     <h3>Previous Question Contested ...</h3>
     <p>{{ q.badQuestionReason }}</p>
-    <ReviewQuestion :review-question-instance="q.quizeQuestion" :disabled="true" />
+    <QuestionDisplay :bare-question="q.quizeQuestion.bareQuestion" :disabled="true" />
   </div>
   <p v-if="currentQuestionLegitMessage">{{ currentQuestionLegitMessage }}</p>
   <ContentLoader v-if="regenerating" />
@@ -43,6 +43,7 @@ import { PropType, ref } from "vue"
 import BasicBreadcrumb from "../commons/BasicBreadcrumb.vue"
 import AnsweredQuestionComponent from "./AnsweredQuestionComponent.vue"
 import ReviewQuestion from "./ReviewQuestion.vue"
+import QuestionDisplay from "./QuestionDisplay.vue"
 
 const { managedApi } = useLoadingApi()
 const props = defineProps({

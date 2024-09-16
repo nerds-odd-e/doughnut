@@ -9,16 +9,14 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { AnsweredQuestion } from "@/generated/backend"
-import { PropType, defineComponent } from "vue"
+import { PropType } from "vue"
 
-export default defineComponent({
-  props: {
-    answeredQuestion: {
-      type: Object as PropType<AnsweredQuestion>,
-      required: true,
-    },
+defineProps({
+  answeredQuestion: {
+    type: Object as PropType<AnsweredQuestion>,
+    required: true,
   },
 })
 </script>
