@@ -10,13 +10,13 @@ export class RestFeedbackControllerService {
     /**
      * @param assessmentQuestion
      * @param requestBody
-     * @returns string OK
+     * @returns Conversation OK
      * @throws ApiError
      */
     public sendFeedback(
         assessmentQuestion: number,
         requestBody: string,
-    ): CancelablePromise<string> {
+    ): CancelablePromise<Conversation> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/feedback/send/{assessmentQuestion}',

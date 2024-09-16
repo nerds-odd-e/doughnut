@@ -12,7 +12,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +31,7 @@ class RestFeedbackControllerTest {
   @BeforeEach
   void setup() {
     currentUser = makeMe.aUser().toModelPlease();
-    controller = new RestFeedbackController(currentUser, conversationService, modelFactoryService);
+    controller = new RestFeedbackController(currentUser, conversationService);
     Notebook notebook = makeMe.aNotebook().please();
     AssessmentAttempt assessmentAttempt =
         makeMe.anAssessmentAttempt(notebook.getCreatorEntity()).withOneQuestion().please();
@@ -43,13 +42,12 @@ class RestFeedbackControllerTest {
   void testSendFeedbackReturnsOk() {
     String feedback = "This is a feedback";
 
-    ResponseEntity<String> response = controller.sendFeedback(feedback, assessmentQuestionInstance);
+    Conversation conversation = controller.sendFeedback(feedback, assessmentQuestionInstance);
 
     List<Conversation> conversations =
         (List<Conversation>) modelFactoryService.conversationRepository.findAll();
-    assertEquals("Feedback received successfully!", response.getBody());
     assertEquals(1, conversations.size());
-    assertEquals(feedback, conversations.getFirst().getMessage());
+    assertEquals(feedback, conversation.getMessage());
   }
 
   @Test

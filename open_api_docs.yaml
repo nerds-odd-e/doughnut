@@ -1440,7 +1440,7 @@ paths:
           content:
             '*/*':
               schema:
-                type: string
+                $ref: "#/components/schemas/Conversation"
   /api/circles:
     get:
       tags:
@@ -3418,6 +3418,35 @@ components:
           type: boolean
         asFirstChild:
           type: boolean
+    AssessmentQuestionInstance:
+      required:
+      - bareQuestion
+      - id
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        bareQuestion:
+          $ref: "#/components/schemas/BareQuestion"
+        answer:
+          $ref: "#/components/schemas/Answer"
+    Conversation:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        assessmentQuestionInstance:
+          $ref: "#/components/schemas/AssessmentQuestionInstance"
+        subjectOwnership:
+          $ref: "#/components/schemas/Ownership"
+        conversationInitiator:
+          $ref: "#/components/schemas/User"
+        message:
+          type: string
     CircleJoiningByInvitation:
       required:
       - invitationCode
@@ -3460,19 +3489,6 @@ components:
           format: int32
         notebook:
           $ref: "#/components/schemas/Notebook"
-    AssessmentQuestionInstance:
-      required:
-      - bareQuestion
-      - id
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        bareQuestion:
-          $ref: "#/components/schemas/BareQuestion"
-        answer:
-          $ref: "#/components/schemas/Answer"
     AssessmentAttempt:
       required:
       - id
@@ -3919,22 +3935,6 @@ components:
         createdAt:
           type: string
         target:
-          type: string
-    Conversation:
-      required:
-      - id
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        assessmentQuestionInstance:
-          $ref: "#/components/schemas/AssessmentQuestionInstance"
-        subjectOwnership:
-          $ref: "#/components/schemas/Ownership"
-        conversationInitiator:
-          $ref: "#/components/schemas/User"
-        message:
           type: string
     FailureReport:
       required:
