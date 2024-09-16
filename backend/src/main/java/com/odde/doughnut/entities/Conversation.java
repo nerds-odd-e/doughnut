@@ -9,21 +9,29 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "conversation")
-@Getter
-@Setter
 public class Conversation extends EntityIdentifiedByIdOnly {
 
   @ManyToOne
-  @JoinColumn(name = "review_question_instance_id", referencedColumnName = "id")
-  ReviewQuestionInstance reviewQuestionInstance;
+  @Getter
+  @JoinColumn(name = "assessment_question_instance_id", referencedColumnName = "id")
+  AssessmentQuestionInstance assessmentQuestionInstance;
 
   @ManyToOne
-  @JoinColumn(name = "note_creator_id", referencedColumnName = "id")
-  User noteCreator;
+  @Getter
+  @JoinColumn(name = "subject_ownership_id", referencedColumnName = "id")
+  Ownership subjectOwnership;
 
   @ManyToOne
+  @Getter
+  @Setter
   @JoinColumn(name = "conversation_initiator_id", referencedColumnName = "id")
   User conversationInitiator;
 
-  String message;
+  @Getter @Setter String message;
+
+  public void setAssessmentQuestionInstance(AssessmentQuestionInstance assessmentQuestionInstance) {
+    this.assessmentQuestionInstance = assessmentQuestionInstance;
+    this.subjectOwnership =
+        assessmentQuestionInstance.getAssessmentAttempt().getNotebook().getOwnership();
+  }
 }

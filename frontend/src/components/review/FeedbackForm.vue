@@ -19,13 +19,13 @@
 </template>
 
 <script setup lang="ts">
-import { ReviewQuestionInstance } from "@/generated/backend"
+import { AssessmentQuestionInstance } from "@/generated/backend"
 import { ref } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi.ts"
 
 const { managedApi } = useLoadingApi()
 const props = defineProps<{
-  question: ReviewQuestionInstance
+  question: AssessmentQuestionInstance
 }>()
 
 const feedback = ref<string>("")

@@ -43,6 +43,12 @@ public class Ownership {
   @Setter
   private List<Notebook> notebooks = new ArrayList<>();
 
+  public String getOwnerName() {
+    if (user != null) return user.getName();
+    if (circle != null) return circle.getName();
+    return null;
+  }
+
   public boolean ownsBy(User user) {
     if (this.user != null) {
       return this.user.getId().equals(user.getId());

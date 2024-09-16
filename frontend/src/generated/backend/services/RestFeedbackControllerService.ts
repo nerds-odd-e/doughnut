@@ -8,36 +8,23 @@ import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestFeedbackControllerService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
-     * @param question
+     * @param assessmentQuestion
      * @param requestBody
      * @returns string OK
      * @throws ApiError
      */
     public sendFeedback(
-        question: number,
+        assessmentQuestion: number,
         requestBody: string,
     ): CancelablePromise<string> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/feedback/send/{question}',
+            url: '/api/feedback/send/{assessmentQuestion}',
             path: {
-                'question': question,
+                'assessmentQuestion': assessmentQuestion,
             },
             body: requestBody,
             mediaType: 'application/json',
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * @returns Conversation OK
-     * @throws ApiError
-     */
-    public getFeedback(): CancelablePromise<Array<Conversation>> {
-        return this.httpRequest.request({
-            method: 'GET',
-            url: '/api/feedback',
             errors: {
                 500: `Internal Server Error`,
             },

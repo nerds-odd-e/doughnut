@@ -1411,13 +1411,13 @@ paths:
                 type: string
         "200":
           description: OK
-  /api/feedback/send/{question}:
+  /api/feedback/send/{assessmentQuestion}:
     post:
       tags:
       - rest-feedback-controller
       operationId: sendFeedback
       parameters:
-      - name: question
+      - name: assessmentQuestion
         in: path
         required: true
         schema:
@@ -2621,26 +2621,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/SuggestedQuestionForFineTuning"
-  /api/feedback:
-    get:
-      tags:
-      - rest-feedback-controller
-      operationId: getFeedback
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Conversation"
   /api/feedback/all:
     get:
       tags:
@@ -2848,6 +2828,8 @@ components:
           format: int32
         circle:
           $ref: "#/components/schemas/Circle"
+        ownerName:
+          type: string
     User:
       required:
       - externalIdentifier
@@ -3941,10 +3923,10 @@ components:
         id:
           type: integer
           format: int32
-        reviewQuestionInstance:
-          $ref: "#/components/schemas/ReviewQuestionInstance"
-        noteCreator:
-          $ref: "#/components/schemas/User"
+        assessmentQuestionInstance:
+          $ref: "#/components/schemas/AssessmentQuestionInstance"
+        subjectOwnership:
+          $ref: "#/components/schemas/Ownership"
         conversationInitiator:
           $ref: "#/components/schemas/User"
         message:

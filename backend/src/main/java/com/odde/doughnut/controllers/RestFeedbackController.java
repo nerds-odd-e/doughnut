@@ -1,7 +1,7 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.entities.AssessmentQuestionInstance;
 import com.odde.doughnut.entities.Conversation;
-import com.odde.doughnut.entities.ReviewQuestionInstance;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ConversationService;
@@ -26,26 +26,20 @@ public class RestFeedbackController {
     this.modelFactoryService = modelFactoryService;
   }
 
-  @PostMapping("/send/{question}")
+  @PostMapping("/send/{assessmentQuestion}")
   public ResponseEntity<String> sendFeedback(
       @RequestBody String feedback,
-      @PathVariable("question") @Schema(type = "integer")
-          ReviewQuestionInstance reviewQuestionInstance) {
+      @PathVariable("assessmentQuestion") @Schema(type = "integer")
+          AssessmentQuestionInstance assessmentQuestionInstance) {
     conversationService.startConversation(
-        reviewQuestionInstance, currentUser.getEntity(), feedback);
+        assessmentQuestionInstance, currentUser.getEntity(), feedback);
     return ResponseEntity.ok("Feedback received successfully!");
-  }
-
-  @GetMapping
-  public List<Conversation> getFeedback() {
-    currentUser.assertLoggedIn();
-    return modelFactoryService.conversationRepository.findByNoteCreator(currentUser.getEntity());
   }
 
   @GetMapping("/all")
   public List<Conversation> getFeedbackThreadsForUser() {
     currentUser.assertLoggedIn();
-    return modelFactoryService.conversationRepository.findByNoteCreatorOrConversationInitiator(
-        currentUser.getEntity(), currentUser.getEntity());
+    return modelFactoryService.conversationRepository.findBySubjectOwnershipOrConversationInitiator(
+        currentUser.getEntity().getOwnership(), currentUser.getEntity());
   }
 }

@@ -6,5 +6,6 @@ import type { Circle } from './Circle';
 export type Ownership = {
     id?: number;
     circle?: Circle;
+    ownerName?: string;
 };
 

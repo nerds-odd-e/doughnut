@@ -2,12 +2,13 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { ReviewQuestionInstance } from './ReviewQuestionInstance';
+import type { AssessmentQuestionInstance } from './AssessmentQuestionInstance';
+import type { Ownership } from './Ownership';
 import type { User } from './User';
 export type Conversation = {
     id: number;
-    reviewQuestionInstance?: ReviewQuestionInstance;
-    noteCreator?: User;
+    assessmentQuestionInstance?: AssessmentQuestionInstance;
+    subjectOwnership?: Ownership;
     conversationInitiator?: User;
     message?: string;
 };

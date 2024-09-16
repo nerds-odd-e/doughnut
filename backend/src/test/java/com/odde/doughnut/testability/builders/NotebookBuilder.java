@@ -2,6 +2,7 @@ package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
@@ -10,9 +11,13 @@ import java.util.function.Consumer;
 public class NotebookBuilder extends EntityBuilder<Notebook> {
   private final NoteBuilder noteBuilder;
 
-  public NotebookBuilder(MakeMe makeMe) {
-    super(makeMe, null);
-    noteBuilder = makeMe.aNote().asHeadNoteOfANotebook(null);
+  public NotebookBuilder(Notebook notebook, MakeMe makeMe) {
+    super(makeMe, notebook);
+    if (notebook != null) {
+      noteBuilder = makeMe.theNote(notebook.getHeadNote());
+    } else {
+      noteBuilder = makeMe.aNote().asHeadNoteOfANotebook(null);
+    }
   }
 
   @Override
@@ -28,6 +33,12 @@ public class NotebookBuilder extends EntityBuilder<Notebook> {
 
   public NotebookBuilder withNChildrenThat(int count, Consumer<NoteBuilder> childNoteThat) {
     noteBuilder.withNChildrenThat(count, childNoteThat);
+    return this;
+  }
+
+  public NotebookBuilder owner(User user) {
+    noteBuilder.owner(user);
+
     return this;
   }
 }

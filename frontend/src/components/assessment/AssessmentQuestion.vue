@@ -19,7 +19,7 @@
             closer();
             handleFormSubmission();
           "
-          :question="localAssessmentQuestionInstance.reviewQuestionInstance"
+          :question="localAssessmentQuestionInstance"
         />
       </template>
     </PopButton>

@@ -44,7 +44,11 @@ public class MakeMe extends MakeMeWithoutDB {
   }
 
   public NotebookBuilder aNotebook() {
-    return new NotebookBuilder(this);
+    return new NotebookBuilder(null, this);
+  }
+
+  public NotebookBuilder theNotebook(Notebook notebook) {
+    return new NotebookBuilder(notebook, this);
   }
 
   public NoteBuilder aNote(String title, String details) {

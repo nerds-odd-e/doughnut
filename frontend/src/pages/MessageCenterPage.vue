@@ -18,7 +18,7 @@
       </thead>
       <tbody>
       <tr v-for="conversation in conversations" :key="conversation.id">
-        <td>{{conversation.reviewQuestionInstance?.bareQuestion.multipleChoicesQuestion.stem}}</td>
+        <td>{{conversation.assessmentQuestionInstance?.bareQuestion.multipleChoicesQuestion.stem}}</td>
         <td>{{conversationPartner(conversation)}}</td>
         <td>{{conversation.message}}</td>
         <td>
@@ -56,7 +56,7 @@ const conversationPartner = (conversation: Conversation) => {
   if (conversation.conversationInitiator?.name !== props.user?.name) {
     return conversation.conversationInitiator?.name
   }
-  return conversation.noteCreator?.name
+  return conversation.subjectOwnership?.ownerName
 }
 </script>
 

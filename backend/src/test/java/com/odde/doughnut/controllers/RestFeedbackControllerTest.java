@@ -2,8 +2,7 @@ package com.odde.doughnut.controllers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.odde.doughnut.entities.Conversation;
-import com.odde.doughnut.entities.ReviewQuestionInstance;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ConversationService;
@@ -28,19 +27,23 @@ class RestFeedbackControllerTest {
   RestFeedbackController controller;
 
   @Autowired ModelFactoryService modelFactoryService;
+  AssessmentQuestionInstance assessmentQuestionInstance;
 
   @BeforeEach
   void setup() {
     currentUser = makeMe.aUser().toModelPlease();
     controller = new RestFeedbackController(currentUser, conversationService, modelFactoryService);
+    Notebook notebook = makeMe.aNotebook().please();
+    AssessmentAttempt assessmentAttempt =
+        makeMe.anAssessmentAttempt(notebook.getCreatorEntity()).withOneQuestion().please();
+    assessmentQuestionInstance = assessmentAttempt.getAssessmentQuestionInstances().get(0);
   }
 
   @Test
   void testSendFeedbackReturnsOk() {
     String feedback = "This is a feedback";
-    ReviewQuestionInstance reviewQuestionInstance = makeMe.aReviewQuestionInstance().please();
 
-    ResponseEntity<String> response = controller.sendFeedback(feedback, reviewQuestionInstance);
+    ResponseEntity<String> response = controller.sendFeedback(feedback, assessmentQuestionInstance);
 
     List<Conversation> conversations =
         (List<Conversation>) modelFactoryService.conversationRepository.findAll();
@@ -50,31 +53,25 @@ class RestFeedbackControllerTest {
   }
 
   @Test
-  void testGetFeedbackReturnsZeroConversationsForCurrentUser() {
-    List<Conversation> conversations = controller.getFeedback();
-    assertEquals(0, conversations.size());
-  }
-
-  @Test
-  void testGetFeedbackReturnsAllConversationsForCurrentUser() {
+  void testGetFeedbackThreadsSendFromTheUser() {
     makeMe
         .aConversation()
-        .forAReviewQuestionInstance()
-        .to(currentUser)
-        .messagge("This is a feedback for the current user")
+        .forAnAssessmentQuestionInstance(assessmentQuestionInstance)
+        .from(currentUser)
         .please();
-    List<Conversation> conversations = controller.getFeedback();
+    makeMe.aConversation().forAnAssessmentQuestionInstance(assessmentQuestionInstance).please();
+    List<Conversation> conversations = controller.getFeedbackThreadsForUser();
     assertEquals(1, conversations.size());
-    assertEquals("This is a feedback for the current user", conversations.getFirst().getMessage());
   }
 
   @Test
-  void testGetFeedbackThreadsForUser() {
-    makeMe.aConversation().forAReviewQuestionInstance().to(currentUser).please();
-    makeMe.aConversation().forAReviewQuestionInstance().from(currentUser).please();
-    makeMe.aConversation().forAReviewQuestionInstance().please();
+  void testGetFeedbackThreadsAsReceiver() {
+    makeMe
+        .theNotebook(assessmentQuestionInstance.getAssessmentAttempt().getNotebook())
+        .owner(currentUser.getEntity())
+        .please();
+    makeMe.aConversation().forAnAssessmentQuestionInstance(assessmentQuestionInstance).please();
     List<Conversation> conversations = controller.getFeedbackThreadsForUser();
-
-    assertEquals(2, conversations.size());
+    assertEquals(1, conversations.size());
   }
 }
