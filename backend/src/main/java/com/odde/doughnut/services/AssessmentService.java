@@ -29,19 +29,21 @@ public class AssessmentService {
             this.testabilitySettings.getRandomizer());
 
     AssessmentAttempt assessmentAttempt = new AssessmentAttempt();
-    assessmentAttempt.setNotebook(notebook);
-    assessmentAttempt.setUser(user);
-    assessmentAttempt.setTotalQuestionCount(questions.size());
-
     questions.stream()
         .map(modelFactoryService::createReviewQuestion)
         .forEach(assessmentAttempt::buildAssessmentQuestionInstance);
+
+    assessmentAttempt.setNotebook(notebook);
+    assessmentAttempt.setUser(user);
+
     return modelFactoryService.save(assessmentAttempt);
   }
 
   public AssessmentAttempt submitAssessmentResult(
       AssessmentAttempt assessmentAttempt, Timestamp currentUTCTimestamp) {
 
+    assessmentAttempt.setTotalQuestionCount(
+        assessmentAttempt.getAssessmentQuestionInstances().size());
     int totalCorrectAnswer =
         assessmentAttempt.getAssessmentQuestionInstances().stream()
             .map(AssessmentQuestionInstance::getReviewQuestionInstance)

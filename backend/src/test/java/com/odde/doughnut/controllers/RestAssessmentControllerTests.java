@@ -162,8 +162,8 @@ public class RestAssessmentControllerTests {
 
       AssessmentAttempt assessmentResult = controller.submitAssessmentResult(assessmentAttempt);
 
-      assertEquals(3, assessmentResult.getTotalQuestionCount());
       assertEquals(3, assessmentResult.getAnswersCorrect());
+      assertEquals(3, assessmentResult.getTotalQuestionCount());
     }
 
     @Test
@@ -190,8 +190,8 @@ public class RestAssessmentControllerTests {
 
       AssessmentAttempt assessmentResult = controller.submitAssessmentResult(assessmentAttempt);
 
-      assertEquals(3, assessmentResult.getTotalQuestionCount());
       assertEquals(2, assessmentResult.getAnswersCorrect());
+      assertEquals(3, assessmentResult.getTotalQuestionCount());
     }
 
     @Test
