@@ -14,7 +14,16 @@ import lombok.Setter;
 @Table(name = "assessment_attempt")
 @Getter
 @Setter
-@JsonPropertyOrder({"id", "notebookTitle", "submittedAt", "isPass"})
+@JsonPropertyOrder({
+  "id",
+  "totalQuestionCount",
+  "answersCorrect",
+  "notebookId",
+  "notebookTitle",
+  "submittedAt",
+  "isPass",
+  "isCertifiable"
+})
 public class AssessmentAttempt extends EntityIdentifiedByIdOnly {
   @ManyToOne
   @JoinColumn(name = "user_id")

@@ -5,13 +5,13 @@
 import type { AssessmentQuestionInstance } from './AssessmentQuestionInstance';
 export type AssessmentAttempt = {
     id: number;
+    totalQuestionCount?: number;
+    answersCorrect?: number;
+    notebookId: number;
     notebookTitle?: string;
     submittedAt?: string;
     isPass?: boolean;
-    totalQuestionCount?: number;
-    answersCorrect?: number;
     assessmentQuestionInstances?: Array<AssessmentQuestionInstance>;
     certifiable?: boolean;
-    notebookId: number;
 };
 

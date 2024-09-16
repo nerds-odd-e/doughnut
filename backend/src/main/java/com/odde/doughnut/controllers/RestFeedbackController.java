@@ -39,7 +39,7 @@ public class RestFeedbackController {
   @GetMapping("/all")
   public List<Conversation> getFeedbackThreadsForUser() {
     currentUser.assertLoggedIn();
-    return modelFactoryService.conversationRepository.findBySubjectOwnershipOrConversationInitiator(
-        currentUser.getEntity().getOwnership(), currentUser.getEntity());
+    return modelFactoryService.conversationRepository
+        .findByUserInSubjectOwnershipOrConversationInitiator(currentUser.getEntity());
   }
 }

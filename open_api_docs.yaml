@@ -3477,6 +3477,15 @@ components:
         id:
           type: integer
           format: int32
+        totalQuestionCount:
+          type: integer
+          format: int32
+        answersCorrect:
+          type: integer
+          format: int32
+        notebookId:
+          type: integer
+          format: int32
         notebookTitle:
           type: string
         submittedAt:
@@ -3484,21 +3493,12 @@ components:
           format: date-time
         isPass:
           type: boolean
-        totalQuestionCount:
-          type: integer
-          format: int32
-        answersCorrect:
-          type: integer
-          format: int32
         assessmentQuestionInstances:
           type: array
           items:
             $ref: "#/components/schemas/AssessmentQuestionInstance"
         certifiable:
           type: boolean
-        notebookId:
-          type: integer
-          format: int32
     AiCompletionParams:
       type: object
       properties:

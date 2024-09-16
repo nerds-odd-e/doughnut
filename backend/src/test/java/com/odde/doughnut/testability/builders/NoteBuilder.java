@@ -42,6 +42,9 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder creatorAndOwner(User user) {
+    if (entity.getNotebook() != null) {
+      ownership(user.getOwnership());
+    }
     return creator(user);
   }
 
@@ -56,8 +59,8 @@ public class NoteBuilder extends EntityBuilder<Note> {
     return creatorAndOwner(userModel.getEntity());
   }
 
-  public NoteBuilder owner(User user) {
-    entity.getNotebook().setOwnership(user.getOwnership());
+  public NoteBuilder ownership(Ownership ownership) {
+    entity.getNotebook().setOwnership(ownership);
     return this;
   }
 

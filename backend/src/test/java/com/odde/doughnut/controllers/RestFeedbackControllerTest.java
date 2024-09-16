@@ -74,4 +74,16 @@ class RestFeedbackControllerTest {
     List<Conversation> conversations = controller.getFeedbackThreadsForUser();
     assertEquals(1, conversations.size());
   }
+
+  @Test
+  void testGetFeedbackThreadsAsAMemberOfACircle() {
+    Circle myCircle = makeMe.aCircle().hasMember(currentUser.getEntity()).please();
+    makeMe
+        .theNotebook(assessmentQuestionInstance.getAssessmentAttempt().getNotebook())
+        .owner(myCircle)
+        .please();
+    makeMe.aConversation().forAnAssessmentQuestionInstance(assessmentQuestionInstance).please();
+    List<Conversation> conversations = controller.getFeedbackThreadsForUser();
+    assertEquals(1, conversations.size());
+  }
 }
