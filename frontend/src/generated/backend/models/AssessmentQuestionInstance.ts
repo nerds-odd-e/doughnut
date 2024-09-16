@@ -3,11 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { BareQuestion } from './BareQuestion';
-import type { ReviewQuestionInstance } from './ReviewQuestionInstance';
 export type AssessmentQuestionInstance = {
     id: number;
     bareQuestion: BareQuestion;
-    reviewQuestionInstance: ReviewQuestionInstance;
     answered?: boolean;
     answeredCorrectly?: boolean;
 };

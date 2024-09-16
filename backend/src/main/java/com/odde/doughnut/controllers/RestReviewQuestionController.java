@@ -18,8 +18,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/review-questions")
 class RestReviewQuestionController {
-  private final ModelFactoryService modelFactoryService;
-
   private final UserModel currentUser;
 
   @Resource(name = "testabilitySettings")
@@ -32,7 +30,6 @@ class RestReviewQuestionController {
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
       TestabilitySettings testabilitySettings) {
-    this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
     this.reviewService =

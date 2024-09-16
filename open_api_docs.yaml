@@ -3454,7 +3454,6 @@ components:
       required:
       - bareQuestion
       - id
-      - reviewQuestionInstance
       type: object
       properties:
         id:
@@ -3462,8 +3461,6 @@ components:
           format: int32
         bareQuestion:
           $ref: "#/components/schemas/BareQuestion"
-        reviewQuestionInstance:
-          $ref: "#/components/schemas/ReviewQuestionInstance"
         answered:
           type: boolean
         answeredCorrectly:

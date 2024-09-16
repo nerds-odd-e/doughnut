@@ -2,7 +2,6 @@ import { AssessmentQuestionInstance } from "@/generated/backend"
 import Builder from "./Builder"
 import generateId from "./generateId"
 import PredefinedQuestionBuilder from "./PredefinedQuestionBuilder"
-import NotebookBuilder from "./NotebookBuilder"
 
 class ReviewQuestionInstanceBuilder extends Builder<AssessmentQuestionInstance> {
   predefinedQuestionBuilder = new PredefinedQuestionBuilder()
@@ -22,11 +21,6 @@ class ReviewQuestionInstanceBuilder extends Builder<AssessmentQuestionInstance> 
     return {
       id: generateId(),
       bareQuestion: predefinedQuestion.bareQuestion,
-      reviewQuestionInstance: {
-        id: generateId(),
-        bareQuestion: predefinedQuestion.bareQuestion,
-        notebook: new NotebookBuilder().do(),
-      },
     }
   }
 }
