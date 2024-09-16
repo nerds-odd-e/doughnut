@@ -13,7 +13,6 @@
         <th>Question</th>
         <th>Name</th>
         <th>Feedback</th>
-        <th></th>
       </tr>
       </thead>
       <tbody>
@@ -21,9 +20,6 @@
         <td>{{conversation.assessmentQuestionInstance?.bareQuestion.multipleChoicesQuestion.stem}}</td>
         <td>{{conversationPartner(conversation)}}</td>
         <td>{{conversation.message}}</td>
-        <td>
-          <router-link :to="{ name: 'feedbackConversation',  params: { conversationId: '123' } }">View chat</router-link>
-        </td>
       </tr>
       </tbody>
     </table>

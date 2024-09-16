@@ -28,7 +28,6 @@ declare module 'vue-router/auto-routes' {
     '/commons/ContainerPage': RouteRecordInfo<'/commons/ContainerPage', '/commons/ContainerPage', Record<never, never>, Record<never, never>>,
     '/commons/TeleportToHeadStatus': RouteRecordInfo<'/commons/TeleportToHeadStatus', '/commons/TeleportToHeadStatus', Record<never, never>, Record<never, never>>,
     '/FailureReportPage': RouteRecordInfo<'/FailureReportPage', '/FailureReportPage', Record<never, never>, Record<never, never>>,
-    '/FeedbackConversationPage': RouteRecordInfo<'/FeedbackConversationPage', '/FeedbackConversationPage', Record<never, never>, Record<never, never>>,
     '/HomePage': RouteRecordInfo<'/HomePage', '/HomePage', Record<never, never>, Record<never, never>>,
     '/InitialReviewPage': RouteRecordInfo<'/InitialReviewPage', '/InitialReviewPage', Record<never, never>, Record<never, never>>,
     '/MessageCenterPage': RouteRecordInfo<'/MessageCenterPage', '/MessageCenterPage', Record<never, never>, Record<never, never>>,
