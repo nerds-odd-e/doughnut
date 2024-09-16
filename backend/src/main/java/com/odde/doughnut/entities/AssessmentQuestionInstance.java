@@ -19,7 +19,7 @@ public class AssessmentQuestionInstance extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   private AssessmentAttempt assessmentAttempt;
 
-  @OneToOne
+  @OneToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "review_question_instance_id")
   @NotNull
   @JsonIgnore // the reviewQuestionInstance should be hidden from the API

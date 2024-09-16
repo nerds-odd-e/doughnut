@@ -25,7 +25,9 @@ public class ReviewService {
     if (question == null) {
       return null;
     }
-    return modelFactoryService.createReviewQuestion(question);
+    ReviewQuestionInstance reviewQuestionInstance = new ReviewQuestionInstance();
+    reviewQuestionInstance.setPredefinedQuestion(question);
+    return modelFactoryService.save(reviewQuestionInstance);
   }
 
   public ReviewQuestionContestResult contest(ReviewQuestionInstance reviewQuestionInstance) {

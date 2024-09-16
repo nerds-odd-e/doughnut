@@ -152,12 +152,6 @@ public class ModelFactoryService {
     return new NotebookService(notebook, this);
   }
 
-  public ReviewQuestionInstance createReviewQuestion(PredefinedQuestion question) {
-    ReviewQuestionInstance reviewQuestionInstance = new ReviewQuestionInstance();
-    reviewQuestionInstance.setPredefinedQuestion(question);
-    return save(reviewQuestionInstance);
-  }
-
   public AnswerModel createAnswerForQuestion(
       ReviewQuestionInstance reviewQuestionInstance,
       AnswerDTO answerDTO,

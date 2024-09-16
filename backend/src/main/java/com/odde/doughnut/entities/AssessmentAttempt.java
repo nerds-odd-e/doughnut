@@ -70,4 +70,16 @@ public class AssessmentAttempt extends EntityIdentifiedByIdOnly {
     assessmentQuestionInstance.setReviewQuestionInstance(reviewQuestionInstance);
     getAssessmentQuestionInstances().add(assessmentQuestionInstance);
   }
+
+  public void buildQuestions(List<PredefinedQuestion> questions) {
+    setTotalQuestionCount(questions.size());
+    questions.stream()
+        .map(
+            question -> {
+              ReviewQuestionInstance reviewQuestionInstance = new ReviewQuestionInstance();
+              reviewQuestionInstance.setPredefinedQuestion(question);
+              return reviewQuestionInstance;
+            })
+        .forEach(this::buildAssessmentQuestionInstance);
+  }
 }
