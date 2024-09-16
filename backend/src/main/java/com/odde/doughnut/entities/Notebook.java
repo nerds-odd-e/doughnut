@@ -1,9 +1,12 @@
 package com.odde.doughnut.entities;
 
+import static com.odde.doughnut.controllers.dto.ApiError.ErrorType.ASSESSMENT_SERVICE_ERROR;
 import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.odde.doughnut.exceptions.ApiException;
+import com.odde.doughnut.models.Randomizer;
 import jakarta.persistence.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -105,5 +108,36 @@ public class Notebook extends EntityIdentifiedByIdOnly {
 
   public String getCreatorId() {
     return creatorEntity.getExternalIdentifier();
+  }
+
+  @JsonIgnore
+  public List<PredefinedQuestion> getApprovedPredefinedQuestionsForAssessment(
+      Randomizer randomizer) {
+    Integer numberOfQuestion = getNotebookSettings().getNumberOfQuestionsInAssessment();
+    if (numberOfQuestion == null || numberOfQuestion == 0) {
+      throw new ApiException(
+          "The assessment is not available",
+          ASSESSMENT_SERVICE_ERROR,
+          "The assessment is not available");
+    }
+
+    List<PredefinedQuestion> questions =
+        randomizer.shuffle(getNotes()).stream()
+            .flatMap(
+                note ->
+                    randomizer
+                        .chooseOneRandomly(
+                            note.getPredefinedQuestions().stream()
+                                .filter(PredefinedQuestion::isApproved)
+                                .toList())
+                        .stream())
+            .limit(numberOfQuestion)
+            .toList();
+
+    if (questions.size() < numberOfQuestion) {
+      throw new ApiException(
+          "Not enough questions", ASSESSMENT_SERVICE_ERROR, "Not enough questions");
+    }
+    return questions;
   }
 }

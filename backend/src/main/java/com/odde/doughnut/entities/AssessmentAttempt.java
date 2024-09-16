@@ -63,4 +63,11 @@ public class AssessmentAttempt extends EntityIdentifiedByIdOnly {
   public boolean isCertifiable() {
     return getNotebook().isCertifiable();
   }
+
+  public void buildAssessmentQuestionInstance(ReviewQuestionInstance reviewQuestionInstance) {
+    AssessmentQuestionInstance assessmentQuestionInstance = new AssessmentQuestionInstance();
+    assessmentQuestionInstance.setAssessmentAttempt(this);
+    assessmentQuestionInstance.setReviewQuestionInstance(reviewQuestionInstance);
+    getAssessmentQuestionInstances().add(assessmentQuestionInstance);
+  }
 }

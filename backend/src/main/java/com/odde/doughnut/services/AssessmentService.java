@@ -6,7 +6,6 @@ import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.sql.Timestamp;
 import java.time.ZoneOffset;
@@ -25,58 +24,23 @@ public class AssessmentService {
   }
 
   public AssessmentAttempt generateAssessment(Notebook notebook, User user) {
-    Randomizer randomizer = this.testabilitySettings.getRandomizer();
-    List<Note> notes = randomizer.shuffle(notebook.getNotes());
-
     List<PredefinedQuestion> questions =
-        notes.stream()
-            .flatMap(
-                note ->
-                    randomizer
-                        .chooseOneRandomly(
-                            note.getPredefinedQuestions().stream()
-                                .filter(PredefinedQuestion::isApproved)
-                                .toList())
-                        .stream())
-            .toList();
-
-    Integer numberOfQuestion = notebook.getNotebookSettings().getNumberOfQuestionsInAssessment();
-    if (numberOfQuestion == null || numberOfQuestion == 0) {
-      throw new ApiException(
-          "The assessment is not available",
-          ASSESSMENT_SERVICE_ERROR,
-          "The assessment is not available");
-    }
-
-    if (questions.size() < numberOfQuestion) {
-      throw new ApiException(
-          "Not enough questions", ASSESSMENT_SERVICE_ERROR, "Not enough questions");
-    }
+        notebook.getApprovedPredefinedQuestionsForAssessment(
+            this.testabilitySettings.getRandomizer());
 
     AssessmentAttempt assessmentAttempt = new AssessmentAttempt();
-
-    questions.stream()
-        .limit(numberOfQuestion)
-        .map(modelFactoryService::createReviewQuestion)
-        .forEach(
-            reviewQuestionInstance -> {
-              AssessmentQuestionInstance assessmentQuestionInstance =
-                  new AssessmentQuestionInstance();
-              assessmentQuestionInstance.setAssessmentAttempt(assessmentAttempt);
-              assessmentQuestionInstance.setReviewQuestionInstance(reviewQuestionInstance);
-              assessmentAttempt.getAssessmentQuestionInstances().add(assessmentQuestionInstance);
-            });
     assessmentAttempt.setNotebook(notebook);
     assessmentAttempt.setUser(user);
-    modelFactoryService.save(assessmentAttempt);
-    return assessmentAttempt;
+    assessmentAttempt.setTotalQuestionCount(questions.size());
+
+    questions.stream()
+        .map(modelFactoryService::createReviewQuestion)
+        .forEach(assessmentAttempt::buildAssessmentQuestionInstance);
+    return modelFactoryService.save(assessmentAttempt);
   }
 
   public AssessmentAttempt submitAssessmentResult(
       AssessmentAttempt assessmentAttempt, Timestamp currentUTCTimestamp) {
-    assessmentAttempt.setTotalQuestionCount(
-        assessmentAttempt.getAssessmentQuestionInstances().size());
-    assessmentAttempt.setSubmittedAt(currentUTCTimestamp);
 
     int totalCorrectAnswer =
         assessmentAttempt.getAssessmentQuestionInstances().stream()
@@ -87,6 +51,7 @@ public class AssessmentService {
             .mapToInt(correct -> correct ? 1 : 0)
             .sum();
     assessmentAttempt.setAnswersCorrect(totalCorrectAnswer);
+    assessmentAttempt.setSubmittedAt(currentUTCTimestamp);
 
     modelFactoryService.save(assessmentAttempt);
 
@@ -104,18 +69,20 @@ public class AssessmentService {
   private void claimCertificateForPassedAssessment(Notebook notebook, User user) {
     getLastAssessmentAttemptAndItMustBePassed(notebook, user);
 
-    Certificate old_cert =
-        modelFactoryService.certificateRepository.findFirstByUserAndNotebook(user, notebook);
-    if (old_cert != null) {
-      updateExpiry(old_cert);
-      return;
-    }
+    updateExpiry(getOrBuildACertificateFor(notebook, user));
+  }
 
-    Certificate certificate = new Certificate();
-    certificate.setUser(user);
-    certificate.setNotebook(notebook);
-    certificate.setStartDate(this.testabilitySettings.getCurrentUTCTimestamp());
-    updateExpiry(certificate);
+  private Certificate getOrBuildACertificateFor(Notebook notebook, User user) {
+    Certificate oldCert =
+        modelFactoryService.certificateRepository.findFirstByUserAndNotebook(user, notebook);
+    if (oldCert != null) {
+      return oldCert;
+    }
+    Certificate newCert = new Certificate();
+    newCert.setUser(user);
+    newCert.setNotebook(notebook);
+    newCert.setStartDate(this.testabilitySettings.getCurrentUTCTimestamp());
+    return newCert;
   }
 
   private void updateExpiry(Certificate cert) {
