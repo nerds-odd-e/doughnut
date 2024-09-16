@@ -2,6 +2,7 @@ import { flushPromises } from "@vue/test-utils"
 import AnsweredQuestionPage from "@/pages/AnsweredQuestionPage.vue"
 import helper from "../helpers"
 import makeMe from "../fixtures/makeMe"
+import { AnsweredQuestion } from "@/generated/backend"
 
 describe("repetition page", () => {
   describe("repetition page for a link", () => {
@@ -9,18 +10,19 @@ describe("repetition page", () => {
     const reviewPoint = makeMe.aReviewPoint.ofLink(link).please()
     const mockedShowAnswerCall = vitest.fn()
     const mockedNotePositionCall = vitest.fn()
-
+    const answeredQuestion: AnsweredQuestion = {
+      answer: {
+        id: 1,
+        correct: true,
+        answerDisplay: "",
+      },
+      reviewPoint,
+      predefinedQuestion: makeMe.aPredefinedQuestion.please(),
+    }
     beforeEach(async () => {
       vitest.resetAllMocks()
       helper.managedApi.restReviewsController.showAnswer =
-        mockedShowAnswerCall.mockResolvedValue({
-          answerResult: {
-            answerId: 1,
-            correct: true,
-          },
-          answerDisplay: "",
-          reviewPoint,
-        })
+        mockedShowAnswerCall.mockResolvedValue(answeredQuestion)
       helper.managedApi.restNoteController.show1 =
         mockedNotePositionCall.mockResolvedValue(makeMe.aNoteRealm.please())
     })
