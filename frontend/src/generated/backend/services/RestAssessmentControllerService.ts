@@ -5,7 +5,6 @@
 import type { AnswerDTO } from '../models/AnswerDTO';
 import type { AssessmentAttempt } from '../models/AssessmentAttempt';
 import type { AssessmentQuestionInstance } from '../models/AssessmentQuestionInstance';
-import type { AssessmentResult } from '../models/AssessmentResult';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestAssessmentControllerService {
@@ -35,12 +34,12 @@ export class RestAssessmentControllerService {
     }
     /**
      * @param assessmentAttempt
-     * @returns AssessmentResult OK
+     * @returns AssessmentAttempt OK
      * @throws ApiError
      */
     public submitAssessmentResult(
         assessmentAttempt: number,
-    ): CancelablePromise<AssessmentResult> {
+    ): CancelablePromise<AssessmentAttempt> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/assessment/{assessmentAttempt}',

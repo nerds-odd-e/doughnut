@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.dto.AnswerDTO;
-import com.odde.doughnut.controllers.dto.AssessmentResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.QuestionAnswerException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -147,9 +146,9 @@ public class RestAssessmentControllerTests {
           .approve(makeMe.aTimestamp().please());
       makeMe.refresh(notebook);
 
-      AssessmentResult assessmentResult = controller.submitAssessmentResult(assessmentAttempt);
+      AssessmentAttempt assessmentResult = controller.submitAssessmentResult(assessmentAttempt);
 
-      assertTrue(assessmentResult.isCertified());
+      assertTrue(assessmentResult.isCertifiable());
     }
 
     @Test
@@ -161,10 +160,10 @@ public class RestAssessmentControllerTests {
                 makeMe.anAnswer().forQuestion(aqi.getReviewQuestionInstance()).correct().please();
               });
 
-      AssessmentResult assessmentResult = controller.submitAssessmentResult(assessmentAttempt);
+      AssessmentAttempt assessmentResult = controller.submitAssessmentResult(assessmentAttempt);
 
-      assertEquals(3, assessmentResult.getTotalCount());
-      assertEquals(3, assessmentResult.getCorrectCount());
+      assertEquals(3, assessmentResult.getTotalQuestionCount());
+      assertEquals(3, assessmentResult.getAnswersCorrect());
     }
 
     @Test
@@ -189,10 +188,10 @@ public class RestAssessmentControllerTests {
       makeMe.anAnswer().forQuestion(q2).correct().please();
       makeMe.anAnswer().forQuestion(q3).please();
 
-      AssessmentResult assessmentResult = controller.submitAssessmentResult(assessmentAttempt);
+      AssessmentAttempt assessmentResult = controller.submitAssessmentResult(assessmentAttempt);
 
-      assertEquals(3, assessmentResult.getTotalCount());
-      assertEquals(2, assessmentResult.getCorrectCount());
+      assertEquals(3, assessmentResult.getTotalQuestionCount());
+      assertEquals(2, assessmentResult.getAnswersCorrect());
     }
 
     @Test

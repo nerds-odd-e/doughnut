@@ -35,7 +35,7 @@ public class AssessmentAttemptBuilder extends EntityBuilder<AssessmentAttempt> {
   }
 
   public AssessmentAttemptBuilder score(int totalQuestions, int correctAnswers) {
-    this.entity.setAnswersTotal(totalQuestions);
+    this.entity.setTotalQuestionCount(totalQuestions);
     this.entity.setAnswersCorrect(correctAnswers);
     return this;
   }

@@ -1664,7 +1664,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/AssessmentResult"
+                $ref: "#/components/schemas/AssessmentAttempt"
   /api/assessment/questions/{notebook}:
     post:
       tags:
@@ -3502,7 +3502,7 @@ components:
           format: date-time
         isPass:
           type: boolean
-        answersTotal:
+        totalQuestionCount:
           type: integer
           format: int32
         answersCorrect:
@@ -3512,27 +3512,11 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/AssessmentQuestionInstance"
+        certifiable:
+          type: boolean
         notebookId:
           type: integer
           format: int32
-    AssessmentResult:
-      type: object
-      properties:
-        correctCount:
-          type: integer
-          format: int32
-        totalCount:
-          type: integer
-          format: int32
-        notebookId:
-          type: integer
-          format: int32
-        isCertified:
-          type: boolean
-        attempt:
-          $ref: "#/components/schemas/AssessmentAttempt"
-        certified:
-          type: boolean
     AiCompletionParams:
       type: object
       properties:

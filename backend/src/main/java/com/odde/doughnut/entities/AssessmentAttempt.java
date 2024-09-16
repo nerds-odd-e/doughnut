@@ -2,7 +2,6 @@ package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.odde.doughnut.controllers.dto.AssessmentResult;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.sql.Timestamp;
@@ -31,7 +30,7 @@ public class AssessmentAttempt extends EntityIdentifiedByIdOnly {
   private Timestamp submittedAt;
 
   @Column(name = "answers_total")
-  private int answersTotal;
+  private int totalQuestionCount;
 
   @Column(name = "answers_correct")
   private int answersCorrect;
@@ -49,17 +48,10 @@ public class AssessmentAttempt extends EntityIdentifiedByIdOnly {
   }
 
   public Boolean getIsPass() {
-    return ((double) getAnswersCorrect() / getAnswersTotal()) >= 0.8;
+    return ((double) getAnswersCorrect() / getTotalQuestionCount()) >= 0.8;
   }
 
-  @JsonIgnore
-  public AssessmentResult getAssessmentResult() {
-    AssessmentResult assessmentResult = new AssessmentResult();
-    assessmentResult.attempt = this;
-    assessmentResult.setTotalCount(assessmentResult.getAttempt().getAnswersTotal());
-    assessmentResult.setCorrectCount(getAnswersCorrect());
-    assessmentResult.isCertified = getNotebook().isCertifiable();
-    assessmentResult.notebookId = getNotebook().getId();
-    return assessmentResult;
+  public boolean isCertifiable() {
+    return getNotebook().isCertifiable();
   }
 }

@@ -8,9 +8,10 @@ export type AssessmentAttempt = {
     notebookTitle?: string;
     submittedAt?: string;
     isPass?: boolean;
-    answersTotal?: number;
+    totalQuestionCount?: number;
     answersCorrect?: number;
     assessmentQuestionInstances?: Array<AssessmentQuestionInstance>;
+    certifiable?: boolean;
     notebookId: number;
 };
 

@@ -1,13 +1,13 @@
 <template>
   <QuestionDisplay
     v-bind="{
-      bareQuestion: assessmentQuestionInstance.bareQuestion,
-      answeredCurrentQuestion,
+      bareQuestion: localAssessmentQuestionInstance.bareQuestion,
+      answeredCurrentQuestion: localAssessmentQuestionInstance.answered,
     }"
     @answer="submitAnswer($event)"
-    :key="assessmentQuestionInstance.reviewQuestionInstance.id"
+    :key="localAssessmentQuestionInstance.id"
    />
-  <div :hidden="!answeredCurrentQuestion">
+  <div :hidden="!localAssessmentQuestionInstance.answered">
     <button class="btn btn-danger" @click="$emit('advance')">Continue</button>
     <PopButton title="Send feedback">
       <template #button_face>
@@ -19,7 +19,7 @@
             closer();
             handleFormSubmission();
           "
-          :question="assessmentQuestionInstance.reviewQuestionInstance"
+          :question="localAssessmentQuestionInstance.reviewQuestionInstance"
         />
       </template>
     </PopButton>
@@ -46,22 +46,20 @@ const props = defineProps({
   },
 })
 
-const answeredCurrentQuestion = ref(false)
+const localAssessmentQuestionInstance = ref(props.assessmentQuestionInstance)
 const formSubmitted = ref(false)
 
 const emits = defineEmits(["advance"])
 
 const submitAnswer = async (answerData: AnswerDTO) => {
   try {
-    const answerResult =
+    localAssessmentQuestionInstance.value =
       await managedApi.restAssessmentController.answerQuestion(
         props.assessmentQuestionInstance.id,
         answerData
       )
 
-    if (!answerResult.answeredCorrectly) {
-      answeredCurrentQuestion.value = true
-    } else {
+    if (localAssessmentQuestionInstance.value.answeredCorrectly) {
       emits("advance")
     }
   } catch (_e) {

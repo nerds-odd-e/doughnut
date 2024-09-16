@@ -69,7 +69,7 @@ public class MakeMe extends MakeMeWithoutDB {
 
     assessmentAttempt.setUser(currentUser);
     assessmentAttempt.setSubmittedAt(aTimestamp().please());
-    assessmentAttempt.setAnswersTotal(2);
+    assessmentAttempt.setTotalQuestionCount(2);
     assessmentAttempt.setAnswersCorrect(2);
     return new AssessmentAttemptBuilder(this, assessmentAttempt);
   }

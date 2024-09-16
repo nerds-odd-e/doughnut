@@ -3,7 +3,6 @@ package com.odde.doughnut.services;
 import static com.odde.doughnut.controllers.dto.ApiError.ErrorType.ASSESSMENT_SERVICE_ERROR;
 
 import com.odde.doughnut.controllers.dto.AnswerDTO;
-import com.odde.doughnut.controllers.dto.AssessmentResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -73,9 +72,10 @@ public class AssessmentService {
     return assessmentAttempt;
   }
 
-  public AssessmentResult submitAssessmentResult(
+  public AssessmentAttempt submitAssessmentResult(
       AssessmentAttempt assessmentAttempt, Timestamp currentUTCTimestamp) {
-    assessmentAttempt.setAnswersTotal(assessmentAttempt.getAssessmentQuestionInstances().size());
+    assessmentAttempt.setTotalQuestionCount(
+        assessmentAttempt.getAssessmentQuestionInstances().size());
     assessmentAttempt.setSubmittedAt(currentUTCTimestamp);
 
     int totalCorrectAnswer =
@@ -94,7 +94,7 @@ public class AssessmentService {
       claimCertificateForPassedAssessment(
           assessmentAttempt.getNotebook(), assessmentAttempt.getUser());
     }
-    return assessmentAttempt.getAssessmentResult();
+    return assessmentAttempt;
   }
 
   public List<AssessmentAttempt> getMyAssessments(User user) {

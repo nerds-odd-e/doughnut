@@ -1,7 +1,6 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.AnswerDTO;
-import com.odde.doughnut.controllers.dto.AssessmentResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -60,7 +59,7 @@ class RestAssessmentController {
 
   @PostMapping("{assessmentAttempt}")
   @Transactional
-  public AssessmentResult submitAssessmentResult(
+  public AssessmentAttempt submitAssessmentResult(
       @PathVariable("assessmentAttempt") @Schema(type = "integer")
           AssessmentAttempt assessmentAttempt)
       throws UnexpectedNoAccessRightException {

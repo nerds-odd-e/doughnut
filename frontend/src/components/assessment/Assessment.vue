@@ -8,15 +8,15 @@
         @advance="advance"
         :key="currentQuestion"
       />
-      <div v-else-if="assessmentResult">
-        <p>Your score: {{ assessmentResult.correctCount }} / {{ assessmentResult.totalCount }}</p>
-        <div v-if="assessmentResult?.attempt?.isPass">
+      <div v-else-if="localAssessmentAttempt?.submittedAt">
+        <p>Your score: {{ localAssessmentAttempt.answersCorrect }} / {{ localAssessmentAttempt.totalQuestionCount }}</p>
+        <div v-if="localAssessmentAttempt.isPass">
           <div class="alert alert-success">
             You have passed the assessment.
           </div>
           <AssessmentClaimCertificate
-            v-if="assessmentResult.certified"
-            :notebook-id="assessmentResult.notebookId!"
+            v-if="localAssessmentAttempt.certifiable"
+            :notebook-id="localAssessmentAttempt.notebookId!"
           />
           <i v-else> (This is not a certifiable assessment.)</i>
         </div>
@@ -30,7 +30,7 @@
 <script setup lang="ts">
 import { computed, PropType, ref } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { AssessmentResult, AssessmentAttempt } from "@/generated/backend"
+import { AssessmentAttempt } from "@/generated/backend"
 import AssessmentQuestion from "./AssessmentQuestion.vue"
 import AssessmentClaimCertificate from "./AssessmentClaimCertificate.vue"
 
@@ -43,7 +43,9 @@ const props = defineProps({
 })
 
 const currentQuestion = ref(0)
-const assessmentResult = ref<AssessmentResult | undefined>(undefined)
+const localAssessmentAttempt = ref<AssessmentAttempt | undefined>(
+  props.assessmentAttempt
+)
 const assessmentQuestionInstance = computed(
   () => props.assessmentAttempt.assessmentQuestionInstances!
 )
@@ -60,7 +62,7 @@ const checkIfQuizComplete = async () => {
     currentQuestion.value >= assessmentQuestionInstance.value.length &&
     assessmentQuestionInstance.value.length > 0
   ) {
-    assessmentResult.value =
+    localAssessmentAttempt.value =
       await managedApi.restAssessmentController.submitAssessmentResult(
         props.assessmentAttempt.id
       )

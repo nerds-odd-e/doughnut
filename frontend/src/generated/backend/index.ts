@@ -20,7 +20,6 @@ export type { AnswerDTO } from './models/AnswerDTO';
 export type { AnsweredQuestion } from './models/AnsweredQuestion';
 export type { AssessmentAttempt } from './models/AssessmentAttempt';
 export type { AssessmentQuestionInstance } from './models/AssessmentQuestionInstance';
-export type { AssessmentResult } from './models/AssessmentResult';
 export type { Attachment } from './models/Attachment';
 export type { Audio } from './models/Audio';
 export type { AudioUploadDTO } from './models/AudioUploadDTO';
