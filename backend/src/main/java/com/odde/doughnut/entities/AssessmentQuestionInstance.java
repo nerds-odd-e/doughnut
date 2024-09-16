@@ -22,7 +22,7 @@ public class AssessmentQuestionInstance extends EntityIdentifiedByIdOnly {
   @OneToOne
   @JoinColumn(name = "review_question_instance_id")
   @NotNull
-  //  @JsonIgnore
+  @JsonIgnore // the reviewQuestionInstance should be hidden from the API
   private ReviewQuestionInstance reviewQuestionInstance;
 
   @NotNull
