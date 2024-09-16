@@ -4,7 +4,7 @@ import AssessmentPage from "@/pages/AssessmentPage.vue"
 import helper from "../helpers"
 import makeMe from "../fixtures/makeMe"
 import { flushPromises } from "@vue/test-utils"
-import { AnsweredQuestion } from "@/generated/backend"
+import { AssessmentQuestionInstance } from "@/generated/backend"
 
 vitest.mock("vue-router", () => ({
   useRouter: () => ({
@@ -17,10 +17,11 @@ vitest.mock("vue-router", () => ({
 describe("assessment page", () => {
   describe("assessment with one question", () => {
     const notebook = makeMe.aNotebook.please()
-    const reviewQuestionInstance = makeMe.aReviewQuestionInstance.please()
+    const assessmentQuestionInstance =
+      makeMe.anAssessmentQuestionInstance.please()
     const assessmentAttempt = makeMe.anAssessmentAttempt
       .forNotebook(notebook)
-      .withQuestions([reviewQuestionInstance])
+      .withQuestions([assessmentQuestionInstance])
       .please()
     beforeEach(() => {
       helper.managedApi.restAssessmentController.generateAssessmentQuestions =
@@ -43,7 +44,7 @@ describe("assessment page", () => {
         .withProps({ notebookId: notebook.id })
         .render()
       await screen.findByText(
-        reviewQuestionInstance.bareQuestion.multipleChoicesQuestion.stem!
+        assessmentQuestionInstance.bareQuestion.multipleChoicesQuestion.stem!
       )
     })
 
@@ -59,19 +60,21 @@ describe("assessment page", () => {
 
   describe("answering the assessment with two questions", () => {
     const notebook = makeMe.aNotebook.please()
-    const quizQuestion_1 = makeMe.aReviewQuestionInstance
+    const quizQuestion_1 = makeMe.anAssessmentQuestionInstance
       .withChoices(["answer1", "answer2"])
       .please()
-    const quizQuestion_2 = makeMe.aReviewQuestionInstance
+    const quizQuestion_2 = makeMe.anAssessmentQuestionInstance
       .withChoices(["answer3", "answer4"])
       .please()
-    const answerResult1: AnsweredQuestion = {
-      answerId: 1,
-      correct: true,
+    const answerResult1: AssessmentQuestionInstance = {
+      ...quizQuestion_1,
+      answered: true,
+      answeredCorrectly: true,
     }
-    const answerResult2: AnsweredQuestion = {
-      answerId: 2,
-      correct: true,
+    const answerResult2: AssessmentQuestionInstance = {
+      ...quizQuestion_2,
+      answered: true,
+      answeredCorrectly: true,
     }
     const assessmentAttempt = makeMe.anAssessmentAttempt
       .forNotebook(notebook)
@@ -86,7 +89,7 @@ describe("assessment page", () => {
         .mockResolvedValueOnce(answerResult2)
       helper.managedApi.restAssessmentController.submitAssessmentResult = vi
         .fn()
-        .mockResolvedValue({})
+        .mockResolvedValue(assessmentAttempt)
     })
 
     it("should submit assessment result when answer all questions", async () => {
@@ -100,21 +103,9 @@ describe("assessment page", () => {
       ;(await wrapper.findByRole("button", { name: "answer3" })).click()
       await flushPromises()
 
-      const expectedAnswers = [
-        {
-          answerId: answerResult1.answerId,
-          correctAnswers: true,
-          questionId: quizQuestion_1.id,
-        },
-        {
-          answerId: answerResult2.answerId,
-          correctAnswers: true,
-          questionId: quizQuestion_2.id,
-        },
-      ]
       expect(
         helper.managedApi.restAssessmentController.submitAssessmentResult
-      ).toBeCalledWith(assessmentAttempt.id, expectedAnswers)
+      ).toBeCalledWith(assessmentAttempt.id)
     })
   })
 })

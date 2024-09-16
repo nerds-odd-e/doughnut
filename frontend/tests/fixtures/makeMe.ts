@@ -15,6 +15,7 @@ import UserBuilder from "./UserBuilder"
 import WikidataEntityBuilder from "./WikidataEntityBuilder"
 import WikidataSearchEntityBuilder from "./WikidataSearchEntityBuilder"
 import AssessmentAttemptBuilder from "./AssessmentAttemptBuilder"
+import AssessmentQuestionInstanceBuilder from "./AssessmentQuestionInstanceBuilder"
 
 class MakeMe {
   static get aUser() {
@@ -43,6 +44,10 @@ class MakeMe {
 
   static get aReviewQuestionInstance(): ReviewQuestionInstanceBuilder {
     return new ReviewQuestionInstanceBuilder()
+  }
+
+  static get anAssessmentQuestionInstance(): AssessmentQuestionInstanceBuilder {
+    return new AssessmentQuestionInstanceBuilder()
   }
 
   static get aPredefinedQuestion(): PredefinedQuestionBuilder {
