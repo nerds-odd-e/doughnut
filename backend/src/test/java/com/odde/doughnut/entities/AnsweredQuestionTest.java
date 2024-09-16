@@ -41,7 +41,7 @@ class AnsweredQuestionTest {
               .validQuestionOfType(spellingQuizFactory)
               .answerWithSpelling("this")
               .inMemoryPlease();
-      assertTrue(answer.correct);
+      assertTrue(answer.answer.getCorrect());
     }
 
     @Test
@@ -52,7 +52,7 @@ class AnsweredQuestionTest {
               .validQuestionOfType(spellingQuizFactory)
               .answerWithSpelling("this ")
               .inMemoryPlease();
-      assertTrue(answer.correct);
+      assertTrue(answer.answer.getCorrect());
     }
 
     @Test
@@ -63,7 +63,7 @@ class AnsweredQuestionTest {
               .validQuestionOfType(spellingQuizFactory)
               .answerWithSpelling("this / that")
               .inMemoryPlease();
-      assertTrue(answerResult.correct);
+      assertTrue(answerResult.answer.getCorrect());
     }
   }
 }

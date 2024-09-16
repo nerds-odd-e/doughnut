@@ -83,7 +83,7 @@ class RestReviewQuestionInstanceControllerTests {
     void shouldValidateTheAnswerAndUpdateReviewPoint() {
       Integer oldRepetitionCount = reviewPoint.getRepetitionCount();
       AnsweredQuestion answerResult = controller.answerQuiz(reviewQuestionInstance, answerDTO);
-      assertTrue(answerResult.correct);
+      assertTrue(answerResult.answer.getCorrect());
       assertThat(reviewPoint.getRepetitionCount(), greaterThan(oldRepetitionCount));
     }
 
@@ -130,7 +130,7 @@ class RestReviewQuestionInstanceControllerTests {
         testabilitySettings.timeTravelTo(reviewPoint.getNextReviewAt());
         Integer oldRepetitionCount = reviewPoint.getRepetitionCount();
         AnsweredQuestion answerResult = controller.answerQuiz(reviewQuestionInstance, answerDTO);
-        assertFalse(answerResult.correct);
+        assertFalse(answerResult.answer.getCorrect());
         assertThat(reviewPoint.getRepetitionCount(), greaterThan(oldRepetitionCount));
       }
 

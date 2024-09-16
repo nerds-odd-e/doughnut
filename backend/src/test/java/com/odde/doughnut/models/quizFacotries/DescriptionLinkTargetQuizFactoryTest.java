@@ -92,7 +92,7 @@ class DescriptionLinkTargetQuizFactoryTest {
               .validQuestionOfType(getQuizQuestionFactory())
               .choiceIndex(1)
               .inMemoryPlease();
-      assertTrue(answerResult.correct);
+      assertTrue(answerResult.answer.getCorrect());
     }
   }
 

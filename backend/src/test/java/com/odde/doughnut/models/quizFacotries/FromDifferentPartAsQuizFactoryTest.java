@@ -185,7 +185,7 @@ class FromDifferentPartAsQuizFactoryTest {
                     .validQuestionOfType(predefinedQuestionFactory)
                     .choiceIndex(2)
                     .inMemoryPlease();
-            assertTrue(answerResult.correct);
+            assertTrue(answerResult.answer.getCorrect());
           }
 
           @Test
@@ -196,7 +196,7 @@ class FromDifferentPartAsQuizFactoryTest {
                     .validQuestionOfType(predefinedQuestionFactory)
                     .choiceIndex(1)
                     .inMemoryPlease();
-            assertFalse(answerResult.correct);
+            assertFalse(answerResult.answer.getCorrect());
           }
         }
       }

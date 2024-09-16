@@ -34,7 +34,6 @@ public class Answer extends EntityIdentifiedByIdOnly {
   @NotNull
   private Boolean correct;
 
-  @JsonIgnore
   public String getAnswerDisplay() {
     if (reviewQuestionInstance != null && choiceIndex != null) {
       return reviewQuestionInstance

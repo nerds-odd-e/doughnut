@@ -1,11 +1,9 @@
 package com.odde.doughnut.entities;
 
+import jakarta.validation.constraints.NotNull;
+
 public class AnsweredQuestion {
-  public Integer answerId;
-  public boolean correct;
-  public Integer correctChoiceIndex;
-  public Integer choiceIndex;
-  public String answerDisplay;
   public ReviewPoint reviewPoint;
-  public PredefinedQuestion predefinedQuestion;
+  @NotNull public PredefinedQuestion predefinedQuestion;
+  @NotNull public Answer answer;
 }

@@ -6,12 +6,15 @@ import helper from "../helpers"
 
 describe("AnswerResult", () => {
   const answeredQuestion: AnsweredQuestion = {
-    answerId: 1,
-    correct: false,
-    choiceIndex: 1,
-    answerDisplay: "answerDisplay",
+    answer: {
+      id: 1,
+      correct: false,
+      choiceIndex: 1,
+      answerDisplay: "answerDisplay",
+    },
     predefinedQuestion: makeMe.aPredefinedQuestion.please(),
   }
+
   const wrapper = helper
     .component(AnswerResult)
     .withProps({ answeredQuestion })

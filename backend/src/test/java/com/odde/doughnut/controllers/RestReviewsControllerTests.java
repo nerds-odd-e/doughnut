@@ -160,7 +160,7 @@ class RestReviewsControllerTests {
             .please();
         makeMe.refresh(currentUser.getEntity());
         AnsweredQuestion answeredQuestion = controller.showAnswer(answer);
-        assertThat(answeredQuestion.answerId, equalTo(answer.getId()));
+        assertThat(answeredQuestion.answer, equalTo(answer));
       }
     }
   }

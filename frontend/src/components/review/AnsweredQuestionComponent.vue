@@ -19,8 +19,8 @@
     v-if="answeredQuestion.predefinedQuestion"
     v-bind="{
       bareQuestion: answeredQuestion.predefinedQuestion.bareQuestion,
-      correctChoiceIndex: answeredQuestion.correctChoiceIndex,
-      answerChoiceIndex: answeredQuestion.choiceIndex,
+      correctChoiceIndex: answeredQuestion.predefinedQuestion.correctAnswerIndex,
+      answerChoiceIndex: answeredQuestion.answer.choiceIndex,
     }"
   />
   <AnswerResult v-bind="{ answeredQuestion }" />

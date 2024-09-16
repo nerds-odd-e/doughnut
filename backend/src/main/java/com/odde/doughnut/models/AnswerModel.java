@@ -19,12 +19,8 @@ public class AnswerModel {
 
   public AnsweredQuestion getAnswerViewedByUser(User user) {
     AnsweredQuestion answerResult = new AnsweredQuestion();
-    answerResult.answerId = answer.getId();
-    answerResult.answerDisplay = answer.getAnswerDisplay();
+    answerResult.answer = answer;
     answerResult.reviewPoint = getReviewPoint(user);
-    answerResult.correct = answer.getCorrect();
-    answerResult.correctChoiceIndex = getQuestion().getCorrectAnswerIndex();
-    answerResult.choiceIndex = answer.getChoiceIndex();
     answerResult.predefinedQuestion = getQuestion();
     return answerResult;
   }

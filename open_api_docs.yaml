@@ -3202,26 +3202,36 @@ components:
         choiceIndex:
           type: integer
           format: int32
-    AnsweredQuestion:
+    Answer:
+      required:
+      - correct
+      - id
       type: object
       properties:
-        answerId:
+        id:
+          type: integer
+          format: int32
+        spellingAnswer:
+          type: string
+        choiceIndex:
           type: integer
           format: int32
         correct:
           type: boolean
-        correctChoiceIndex:
-          type: integer
-          format: int32
-        choiceIndex:
-          type: integer
-          format: int32
         answerDisplay:
           type: string
+    AnsweredQuestion:
+      required:
+      - answer
+      - predefinedQuestion
+      type: object
+      properties:
         reviewPoint:
           $ref: "#/components/schemas/ReviewPoint"
         predefinedQuestion:
           $ref: "#/components/schemas/PredefinedQuestion"
+        answer:
+          $ref: "#/components/schemas/Answer"
     QuestionSuggestionCreationParams:
       type: object
       properties:
@@ -3450,22 +3460,6 @@ components:
           format: int32
         notebook:
           $ref: "#/components/schemas/Notebook"
-    Answer:
-      required:
-      - correct
-      - id
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        spellingAnswer:
-          type: string
-        choiceIndex:
-          type: integer
-          format: int32
-        correct:
-          type: boolean
     AssessmentQuestionInstance:
       required:
       - bareQuestion

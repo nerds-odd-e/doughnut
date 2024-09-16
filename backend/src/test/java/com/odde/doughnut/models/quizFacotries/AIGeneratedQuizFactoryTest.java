@@ -62,7 +62,7 @@ class AIGeneratedQuizFactoryTest {
               .forQuestion(questionBuilder().inMemoryPlease())
               .choiceIndex(0)
               .inMemoryPlease();
-      assertFalse(answerResult.correct);
+      assertFalse(answerResult.answer.getCorrect());
     }
 
     @Test
@@ -73,7 +73,7 @@ class AIGeneratedQuizFactoryTest {
               .forQuestion(questionBuilder().inMemoryPlease())
               .choiceIndex(mcqWithAnswer.getCorrectChoiceIndex())
               .inMemoryPlease();
-      assertTrue(answerResult.correct);
+      assertTrue(answerResult.answer.getCorrect());
     }
   }
 
