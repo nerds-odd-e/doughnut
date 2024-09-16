@@ -16,6 +16,7 @@ export type { AiCompletionParams } from './models/AiCompletionParams';
 export type { AiCompletionRequiredAction } from './models/AiCompletionRequiredAction';
 export type { AiGeneratedImage } from './models/AiGeneratedImage';
 export type { Annotation } from './models/Annotation';
+export type { Answer } from './models/Answer';
 export type { AnswerDTO } from './models/AnswerDTO';
 export type { AnsweredQuestion } from './models/AnsweredQuestion';
 export type { AssessmentAttempt } from './models/AssessmentAttempt';

@@ -8,32 +8,28 @@ import java.sql.Timestamp;
 import lombok.Getter;
 import lombok.Setter;
 
+@Getter
 @Entity
 @Table(name = "quiz_answer")
 public class Answer extends EntityIdentifiedByIdOnly {
-  @Getter
   @Column(name = "answer")
   String spellingAnswer;
 
-  @Getter
   @Column(name = "choice_index")
   Integer choiceIndex;
 
   @OneToOne
   @JoinColumn(name = "review_question_instance_id", referencedColumnName = "id")
-  @Getter
   @Setter
   @JsonIgnore
   ReviewQuestionInstance reviewQuestionInstance;
 
   @Column(name = "created_at")
-  @Getter
   @Setter
   @JsonIgnore
   private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
   @Column(name = "correct")
-  @Getter
   @Setter
   @NotNull
   private Boolean correct;
@@ -50,6 +46,7 @@ public class Answer extends EntityIdentifiedByIdOnly {
     return getSpellingAnswer();
   }
 
+  @JsonIgnore
   public void setFromDTO(AnswerDTO answerDTO) {
     spellingAnswer = answerDTO.getSpellingAnswer();
     choiceIndex = answerDTO.getChoiceIndex();

@@ -110,7 +110,7 @@ public class RestAssessmentControllerTests {
     @Test
     void shouldCreateTheAnswerForTheQuestion() throws UnexpectedNoAccessRightException {
       controller.answerQuestion(assessmentQuestionInstance, answerDTO);
-      assertThat(assessmentQuestionInstance.isAnswered()).isTrue();
+      assertThat(assessmentQuestionInstance.getAnswer()).isNotNull();
     }
 
     @Test

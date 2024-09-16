@@ -11,7 +11,7 @@ import lombok.EqualsAndHashCode;
 @Table(name = "assessment_question_instance")
 @Data
 @EqualsAndHashCode(callSuper = false)
-@JsonPropertyOrder({"id", "bareQuestion", "notebook"})
+@JsonPropertyOrder({"id", "bareQuestion", "notebook", "answer"})
 public class AssessmentQuestionInstance extends EntityIdentifiedByIdOnly {
   @ManyToOne
   @JoinColumn(name = "assessment_attempt_id")
@@ -30,14 +30,7 @@ public class AssessmentQuestionInstance extends EntityIdentifiedByIdOnly {
     return reviewQuestionInstance.getBareQuestion();
   }
 
-  public boolean isAnswered() {
-    return reviewQuestionInstance.getAnswer() != null;
-  }
-
-  public boolean isAnsweredCorrectly() {
-    if (reviewQuestionInstance.getAnswer() == null) {
-      return false;
-    }
-    return reviewQuestionInstance.getAnswer().getCorrect();
+  public Answer getAnswer() {
+    return reviewQuestionInstance.getAnswer();
   }
 }

@@ -28,11 +28,9 @@
       v-if="bareQuestion.multipleChoicesQuestion.choices"
       :choices="bareQuestion.multipleChoicesQuestion.choices"
       :correct-choice-index="correctChoiceIndex"
-      :answered-current-question="answeredCurrentQuestion"
       :answer-choice-index="answerChoiceIndex"
       :disabled="disabled"
       @answer="submitAnswer($event)"
-      :assessment-current-choice-index="assessmentAnsweredIndex"
     />
   </div>
 </template>
@@ -51,17 +49,11 @@ defineProps({
   correctChoiceIndex: Number,
   answerChoiceIndex: Number,
   disabled: Boolean,
-  answeredCurrentQuestion: Boolean,
 })
 const emits = defineEmits(["answer"])
 const answer = ref("")
-const assessmentAnsweredIndex = ref(1)
 
 const submitAnswer = async (answerData: AnswerDTO) => {
-  if (typeof answerData.choiceIndex === "number") {
-    assessmentAnsweredIndex.value = answerData.choiceIndex
-  }
-
   emits("answer", answerData)
 }
 </script>

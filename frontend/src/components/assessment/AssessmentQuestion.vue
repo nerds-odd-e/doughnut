@@ -2,12 +2,15 @@
   <QuestionDisplay
     v-bind="{
       bareQuestion: localAssessmentQuestionInstance.bareQuestion,
-      answeredCurrentQuestion: localAssessmentQuestionInstance.answered,
+      answerChoiceIndex: localAssessmentQuestionInstance.answer?.choiceIndex,
     }"
     @answer="submitAnswer($event)"
     :key="localAssessmentQuestionInstance.id"
    />
-  <div :hidden="!localAssessmentQuestionInstance.answered">
+  <div v-if="localAssessmentQuestionInstance.answer && !localAssessmentQuestionInstance.answer.correct">
+    <div class="alert alert-danger">
+      <strong>The answer is incorrect.</strong>
+    </div>
     <button class="btn btn-danger" @click="$emit('advance')">Continue</button>
     <PopButton title="Send feedback">
       <template #button_face>
@@ -59,7 +62,7 @@ const submitAnswer = async (answerData: AnswerDTO) => {
         answerData
       )
 
-    if (localAssessmentQuestionInstance.value.answeredCorrectly) {
+    if (localAssessmentQuestionInstance.value.answer?.correct) {
       emits("advance")
     }
   } catch (_e) {

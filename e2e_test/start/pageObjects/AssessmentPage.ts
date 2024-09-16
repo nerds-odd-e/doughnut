@@ -4,7 +4,7 @@ const assumeWrongAnswerPage = () => {
   return {
     continueAssessment() {
       cy.findByRole('button', { name: 'Continue' }).click().pageIsNotLoading()
-      cy.get('.current-choice').should('have.length', 0)
+      cy.get('.is-selected').should('have.length', 0)
     },
     sendFeedback(feedback: string) {
       cy.findByText('Send feedback').click()
@@ -15,8 +15,9 @@ const assumeWrongAnswerPage = () => {
       cy.findByText('Feedback received successfully').should('be.visible')
     },
     highlightCurrentChoice(choice: string) {
-      cy.contains(choice).should('have.class', 'current-choice')
-      cy.get('.current-choice').should('have.length', 1)
+      cy.contains(choice).should('have.class', 'is-selected')
+      cy.get('.is-selected').should('have.length', 1)
+      cy.findByText('The answer is incorrect.')
     },
   }
 }

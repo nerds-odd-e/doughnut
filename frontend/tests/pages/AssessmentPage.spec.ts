@@ -68,13 +68,11 @@ describe("assessment page", () => {
       .please()
     const answerResult1: AssessmentQuestionInstance = {
       ...quizQuestion_1,
-      answered: true,
-      answeredCorrectly: true,
+      answer: { id: 1, correct: true, choiceIndex: 0 },
     }
     const answerResult2: AssessmentQuestionInstance = {
       ...quizQuestion_2,
-      answered: true,
-      answeredCorrectly: true,
+      answer: { id: 1, correct: true, choiceIndex: 0 },
     }
     const assessmentAttempt = makeMe.anAssessmentAttempt
       .forNotebook(notebook)

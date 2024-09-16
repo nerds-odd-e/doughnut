@@ -5,7 +5,6 @@
         :class="{
           'is-correct': isOptionCorrect(index),
           'is-incorrect': !isOptionCorrect(index),
-          'current-choice': isCurrentChoice(index),
           'is-selected': isSelectedOption(index),
         }"
         @click.once="submitAnswer({ choiceIndex: index })"
@@ -17,12 +16,50 @@
   </ol>
 </template>
 
+
+
+<script lang="ts">
+import { AnswerDTO } from "@/generated/backend"
+import { defineComponent } from "vue"
+
+export default defineComponent({
+  props: {
+    choices: {
+      type: Array<string>,
+    },
+    correctChoiceIndex: Number,
+    answerChoiceIndex: Number,
+    disabled: Boolean,
+  },
+  emits: ["answer"],
+  data() {
+    return {
+      answer: "" as string,
+    }
+  },
+  methods: {
+    isSelectedOption(optionIndex: number) {
+      return this.answerChoiceIndex === optionIndex
+    },
+    isOptionCorrect(index: number) {
+      return index === this.correctChoiceIndex
+    },
+    async submitAnswer(answerData: AnswerDTO) {
+      this.$emit("answer", answerData)
+    },
+  },
+})
+</script>
+
 <style scoped lang="sass">
 .choices
   display: flex
   flex-wrap: wrap
   flex-direction: row
   justify-content: flex-start
+  list-style-type: none
+  padding-left: 0
+
 .choice
   width: 46%
   min-height: 80px
@@ -57,59 +94,7 @@
 .is-correct
   background-color: #00ff00 !important
 
-.current-choice
-  border: solid 4px red !important
-
 .is-selected
   font-weight: bold
-  border-color: #000000
-  border: 2
-</style>
-
-<script lang="ts">
-import { AnswerDTO } from "@/generated/backend"
-import { defineComponent } from "vue"
-
-export default defineComponent({
-  props: {
-    choices: {
-      type: Array<string>,
-    },
-    correctChoiceIndex: Number,
-    answerChoiceIndex: Number,
-    disabled: Boolean,
-    assessmentCurrentChoiceIndex: Number,
-    answeredCurrentQuestion: Boolean,
-  },
-  emits: ["answer"],
-  data() {
-    return {
-      answer: "" as string,
-    }
-  },
-  methods: {
-    isSelectedOption(optionIndex: number) {
-      return this.answerChoiceIndex === optionIndex
-    },
-    isOptionCorrect(index: number) {
-      return index === this.correctChoiceIndex
-    },
-    async submitAnswer(answerData: AnswerDTO) {
-      this.$emit("answer", answerData)
-    },
-    isCurrentChoice(index: number) {
-      return (
-        this.answeredCurrentQuestion &&
-        this.assessmentCurrentChoiceIndex === index
-      )
-    },
-  },
-})
-</script>
-
-<style scoped>
-.choices {
-  list-style-type: none;
-  padding-left: 0;
-}
+  background-color: orange !important
 </style>

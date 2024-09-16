@@ -3450,6 +3450,22 @@ components:
           format: int32
         notebook:
           $ref: "#/components/schemas/Notebook"
+    Answer:
+      required:
+      - correct
+      - id
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        spellingAnswer:
+          type: string
+        choiceIndex:
+          type: integer
+          format: int32
+        correct:
+          type: boolean
     AssessmentQuestionInstance:
       required:
       - bareQuestion
@@ -3461,10 +3477,8 @@ components:
           format: int32
         bareQuestion:
           $ref: "#/components/schemas/BareQuestion"
-        answered:
-          type: boolean
-        answeredCorrectly:
-          type: boolean
+        answer:
+          $ref: "#/components/schemas/Answer"
     AssessmentAttempt:
       required:
       - id

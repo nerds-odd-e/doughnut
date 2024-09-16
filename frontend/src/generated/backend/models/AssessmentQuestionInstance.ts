@@ -2,11 +2,11 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { Answer } from './Answer';
 import type { BareQuestion } from './BareQuestion';
 export type AssessmentQuestionInstance = {
     id: number;
     bareQuestion: BareQuestion;
-    answered?: boolean;
-    answeredCorrectly?: boolean;
+    answer?: Answer;
 };
 
