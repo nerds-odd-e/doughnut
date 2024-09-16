@@ -2,7 +2,7 @@
   <QuestionDisplay
     v-bind="{
       bareQuestion: localAssessmentQuestionInstance.bareQuestion,
-      answerChoiceIndex: localAssessmentQuestionInstance.answer?.choiceIndex,
+      answer: localAssessmentQuestionInstance.answer,
     }"
     @answer="submitAnswer($event)"
     :key="localAssessmentQuestionInstance.id"

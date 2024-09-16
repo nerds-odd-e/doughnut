@@ -13,11 +13,11 @@
         bareQuestion.multipleChoicesQuestion.choices.length === 0
       "
     >
-      <form @submit.prevent.once="submitAnswer({ spellingAnswer: answer })">
+      <form @submit.prevent.once="submitAnswer({ spellingAnswer })">
         <TextInput
           scope-name="review_point"
           field="answer"
-          v-model="answer"
+          v-model="spellingAnswer"
           placeholder="put your answer here"
           v-focus
         />
@@ -28,7 +28,7 @@
       v-if="bareQuestion.multipleChoicesQuestion.choices"
       :choices="bareQuestion.multipleChoicesQuestion.choices"
       :correct-choice-index="correctChoiceIndex"
-      :answer-choice-index="answerChoiceIndex"
+      :answer-choice-index="answer?.choiceIndex"
       :disabled="disabled"
       @answer="submitAnswer($event)"
     />
@@ -37,7 +37,7 @@
 
 <script setup lang="ts">
 import { PropType, ref } from "vue"
-import { AnswerDTO, BareQuestion } from "@/generated/backend"
+import { Answer, AnswerDTO, BareQuestion } from "@/generated/backend"
 import TextInput from "../form/TextInput.vue"
 import QuestionChoices from "./QuestionChoices.vue"
 
@@ -47,11 +47,11 @@ defineProps({
     required: true,
   },
   correctChoiceIndex: Number,
-  answerChoiceIndex: Number,
+  answer: Object as PropType<Answer>,
   disabled: Boolean,
 })
 const emits = defineEmits(["answer"])
-const answer = ref("")
+const spellingAnswer = ref("")
 
 const submitAnswer = async (answerData: AnswerDTO) => {
   emits("answer", answerData)

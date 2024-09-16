@@ -20,7 +20,7 @@
     v-bind="{
       bareQuestion: answeredQuestion.predefinedQuestion.bareQuestion,
       correctChoiceIndex: answeredQuestion.predefinedQuestion.correctAnswerIndex,
-      answerChoiceIndex: answeredQuestion.answer.choiceIndex,
+      answer: answeredQuestion.answer,
     }"
   />
   <AnswerResult v-bind="{ answeredQuestion }" />
