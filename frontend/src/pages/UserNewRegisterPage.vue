@@ -19,44 +19,30 @@
   </ContainerPage>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue"
+<script setup lang="ts">
+import { ref } from "vue"
 import { User } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import TextInput from "@/components/form/TextInput.vue"
 import ContainerPage from "./commons/ContainerPage.vue"
 
-export default defineComponent({
-  setup() {
-    return useLoadingApi()
-  },
-  emits: ["updateUser"],
-  components: { ContainerPage, TextInput },
-  data() {
-    return {
-      formData: {
-        name: undefined as undefined | string,
-      } as User,
-      errors: {
-        name: undefined as undefined | string,
-      },
+const { managedApi } = useLoadingApi()
+
+const formData = ref({ name: undefined as undefined | string } as User)
+const errors = ref({ name: undefined as undefined | string })
+
+const emits = defineEmits(["updateUser"])
+
+const processForm = async () => {
+  try {
+    const user = await managedApi.restUserController.createUser(formData.value)
+    emits("updateUser", user)
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      errors.value = { name: err.message }
+    } else {
+      errors.value = { name: String(err) }
     }
-  },
-  methods: {
-    async processForm() {
-      try {
-        const user = await this.managedApi.restUserController.createUser(
-          this.formData
-        )
-        this.$emit("updateUser", user)
-      } catch (err: unknown) {
-        if (err instanceof Error) {
-          this.errors = { name: err.message }
-        } else {
-          this.errors = { name: String(err) }
-        }
-      }
-    },
-  },
-})
+  }
+}
 </script>
