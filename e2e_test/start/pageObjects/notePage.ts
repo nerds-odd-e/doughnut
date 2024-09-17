@@ -143,6 +143,11 @@ export const assumeNotePage = (noteTopic?: string) => {
     editAudioButton() {
       return this.toolbarButton('Upload audio')
     },
+    updateDetailsAsMarkdown(markdown: string) {
+      this.toolbarButton('edit as markdown').click()
+      cy.findByRole('textbox', { name: 'Details' }).type(markdown)
+      return this
+    },
     downloadAudioFile(fileName: string) {
       const downloadsFolder = Cypress.config('downloadsFolder')
       cy.findByRole('button', { name: `Download ${fileName}` }).click()

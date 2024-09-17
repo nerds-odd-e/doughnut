@@ -529,3 +529,10 @@ Then('the question in the form becomes:', (data: DataTable) => {
     }
   )
 })
+
+When(
+  'I update note {string} details using markdown to become:',
+  (noteTopic: string, newDetails: string) => {
+    start.jumpToNotePage(noteTopic).updateDetailsAsMarkdown(newDetails)
+  }
+)

@@ -15,8 +15,8 @@ Feature: Note Edit
       | Topic     | Details           |
       | Odd-e CSD | Our best training |
 
-  Scenario: Edit a note topic and edit details
-    And I update note topic "LeSS in Action" to become "Odd-e CSD"
+  Scenario: Edit a note topic and edit details and undo
+    Given I update note topic "LeSS in Action" to become "Odd-e CSD"
     And I should see "Odd-e CSD" in the page
     And I update note "Odd-e CSD" details from "An awesome training" to become "A super awesome training"
     And I should see "A super awesome training" in the page
@@ -25,3 +25,15 @@ Feature: Note Edit
     When I undo "edit topic" again
     Then I should see "LeSS in Action" in the page
     And there should be no more undo to do
+
+  @ignore
+  Scenario: Edit a note's details as markdown
+    When I update note "LeSS in Action" details using markdown to become:
+      """
+      # Odd-e LiA
+      ## Our best training
+      """
+    Then I should see note "LeSS in Action" with details:
+      | Tag | Content           |
+      | h1  | Odd-e LiA         |
+      | h2  | Our best training |
