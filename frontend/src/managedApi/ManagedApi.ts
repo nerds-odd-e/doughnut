@@ -51,7 +51,7 @@ class ManagedApi extends DoughnutApi {
   logout() {
     return this.request.request({
       method: "POST",
-      url: "logout",
+      url: "/logout",
     })
   }
 }

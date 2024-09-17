@@ -34,32 +34,23 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import SvgMissingAvatar from "@/components/svgs/SvgMissingAvatar.vue"
 import { User } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { PropType, defineComponent } from "vue"
+import { PropType } from "vue"
 import UserProfileDialog from "./UserProfileDialog.vue"
 
-export default defineComponent({
-  setup() {
-    return useLoadingApi()
-  },
-  props: {
-    user: { type: Object as PropType<User>, required: true },
-  },
-  emits: ["updateUser"],
-  components: {
-    PopButton,
-    UserProfileDialog,
-    SvgMissingAvatar,
-  },
-  methods: {
-    async logout() {
-      await this.managedApi.logout()
-      window.location.href = "/bazaar"
-    },
-  },
+const { managedApi } = useLoadingApi()
+defineProps({
+  user: { type: Object as PropType<User>, required: true },
 })
+
+defineEmits(["updateUser"])
+
+const logout = async () => {
+  await managedApi.logout()
+  window.location.href = "/d/bazaar"
+}
 </script>

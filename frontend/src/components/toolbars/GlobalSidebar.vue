@@ -59,11 +59,12 @@ import useLoadingApi from "@/managedApi/useLoadingApi"
 import { onMounted, PropType, ref } from "vue"
 import BrandBar from "./BrandBar.vue"
 import ReviewButton from "./ReviewButton.vue"
+import UserActionsButton from "./UserActionsButton.vue"
 
 const { managedApi } = useLoadingApi()
 
 defineProps({
-  user: { type: Object as PropType<User> },
+  user: { type: Object as PropType<User>, required: true },
 })
 
 defineEmits(["updateUser"])

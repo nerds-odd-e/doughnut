@@ -56,12 +56,13 @@
           </p>
           <p v-if="!user">Please login</p>
           <PopButton
+            v-else
             btn-class="btn btn-light"
             title="choose a circle"
             :sidebar="'left'"
           >
             <template #button_face> Go To Circles </template>
-            <GlobalSidebar />
+            <GlobalSidebar :user="user" />
           </PopButton>
         </div>
       </div>
