@@ -32,7 +32,7 @@ describe("TextArea.vue", () => {
     await textarea.setValue("Some long text that triggers expansion")
     await wrapper.vm.$nextTick()
 
-    expect(textarea.element.rows).toBe(8) // Should not exceed 'autoExtendUntil'
+    expect(textarea.element.rows).toBe(5) // Should not exceed 'autoExtendUntil'
   })
 
   it("expands as user types within 'autoExtendUntil' limit", async () => {

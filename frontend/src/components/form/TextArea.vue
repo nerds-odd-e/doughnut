@@ -21,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, ref, watch } from "vue"
+import { nextTick, onMounted, ref, watch } from "vue"
 import InputWithType from "./InputWithType.vue"
 
 const props = defineProps({
@@ -60,20 +60,29 @@ const handleKeydown = (event: KeyboardEvent) => {
   }
 }
 
+const resize = () => {
+  if (input.value && props.autoExtendUntil) {
+    const lineHeight = parseInt(
+      window.getComputedStyle(input.value).lineHeight,
+      10
+    )
+    const { scrollHeight } = input.value
+    const newRows = Math.floor(scrollHeight / lineHeight)
+    input.value.rows =
+      newRows > props.autoExtendUntil ? props.autoExtendUntil : newRows
+  }
+}
+
 watch(
   () => props.modelValue,
   async () => {
     await nextTick()
-    if (input.value && props.autoExtendUntil) {
-      const lineHeight = parseInt(
-        window.getComputedStyle(input.value).lineHeight,
-        10
-      )
-      const { scrollHeight } = input.value
-      const newRows = Math.floor(scrollHeight / lineHeight)
-      input.value.rows =
-        newRows > props.autoExtendUntil ? props.autoExtendUntil : newRows
-    }
+    resize()
   }
 )
+
+onMounted(async () => {
+  await nextTick()
+  resize()
+})
 </script>

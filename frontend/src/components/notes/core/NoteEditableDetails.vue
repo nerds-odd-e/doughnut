@@ -12,6 +12,7 @@
         scope-name="note"
         :model-value="value"
         :readonly="readonly"
+        :auto-extend-until="1000"
         @update:model-value="update(noteId, $event)"
         @blur="blur"
       />
