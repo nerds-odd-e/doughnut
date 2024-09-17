@@ -144,7 +144,7 @@ export const assumeNotePage = (noteTopic?: string) => {
       return this.toolbarButton('Upload audio')
     },
     updateDetailsAsMarkdown(markdown: string) {
-      this.toolbarButton('edit as markdown').click()
+      this.toolbarButton('Edit as markdown').click()
       cy.findByRole('textbox', { name: 'Details' }).type(markdown)
       return this
     },

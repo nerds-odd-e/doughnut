@@ -35,6 +35,10 @@
         </template>
       </PopButton>
 
+      <button class="btn" title="Edit as markdown" @click="$emit('edit-as-markdown', true)">
+        <SvgMarkdown />
+      </button>
+
       <button class="btn" title="Move up" @click="moveUp">
         <SvgUp />
       </button>
@@ -108,6 +112,7 @@ import NoteDetailsAutoCompletionButton from "./NoteDetailsAutoCompletionButton.v
 import NoteChatDialog from "../NoteChatDialog.vue"
 import Questions from "../Questions.vue"
 import NoteInfoBar from "../NoteInfoBar.vue"
+import SvgMarkdown from "@/components/svgs/SvgMarkdown.vue"
 
 const props = defineProps({
   storageAccessor: {
@@ -118,9 +123,10 @@ const props = defineProps({
     type: Object as PropType<Note>,
     required: true,
   },
+  asMarkdown: Boolean,
 })
 
-defineEmits(["note-accessory-updated"])
+defineEmits(["note-accessory-updated", "edit-as-markdown"])
 
 const moveUp = () => {
   props.storageAccessor.storedApi().moveUp(props.note.id)
