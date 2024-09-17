@@ -24,7 +24,7 @@ public class ProductionConfiguration {
     http.csrf(AbstractHttpConfigurer::disable);
     http.authorizeHttpRequests(auth -> auth.requestMatchers("/api/healthcheck").permitAll());
 
-    commonConfiguration.commonConfig(http, http.oauth2Login(Customizer.withDefaults()));
+    commonConfiguration.commonConfig(http.oauth2Login(Customizer.withDefaults()));
     return http.build();
   }
 }

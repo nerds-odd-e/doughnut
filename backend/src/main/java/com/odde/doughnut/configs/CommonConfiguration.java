@@ -7,8 +7,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CommonConfiguration {
 
-  void commonConfig(HttpSecurity http, HttpSecurity authenticationFilterConfigurer)
-      throws Exception {
+  void commonConfig(HttpSecurity http) throws Exception {
 
     String[] backendRoutes = {
       "/login",

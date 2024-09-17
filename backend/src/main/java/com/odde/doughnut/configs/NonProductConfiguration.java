@@ -36,7 +36,7 @@ public class NonProductConfiguration {
                     .permitAll())
         .rememberMe(rememberMe -> rememberMe.alwaysRemember(true));
 
-    commonConfiguration.commonConfig(http, http.httpBasic(Customizer.withDefaults()));
+    commonConfiguration.commonConfig(http.httpBasic(Customizer.withDefaults()));
     return http.build();
   }
 
