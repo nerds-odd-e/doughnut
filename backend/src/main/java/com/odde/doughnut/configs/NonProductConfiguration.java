@@ -29,12 +29,16 @@ public class NonProductConfiguration {
     http.csrf(AbstractHttpConfigurer::disable);
     http.authorizeHttpRequests(
             auth ->
-                auth.requestMatchers("/api/healthcheck", "/api/testability/**", "/api-docs.yaml")
+                auth.requestMatchers(
+                        "/api/healthcheck",
+                        "/api/testability/**",
+                        "/api-docs.yaml",
+                        "/users/identify" // in non-product env, we use frontend to identify user
+                        )
                     .permitAll())
         .rememberMe(rememberMe -> rememberMe.alwaysRemember(true));
 
-    commonConfiguration.commonConfig(
-        http, http.httpBasic(Customizer.withDefaults()).formLogin(Customizer.withDefaults()));
+    commonConfiguration.commonConfig(http, http.httpBasic(Customizer.withDefaults()));
     return http.build();
   }
 

@@ -33,16 +33,7 @@ Given('my session is logged out', () => {
 })
 
 Given("I'm on the login page", () => {
-  // I regret to put an if statement here.
-  // The login page is different when the frontend is built into the backend.
-  // Use the nonproduction login page when testing with standalone frontend server
-  const baseUrl = Cypress.config('baseUrl')
-  if (baseUrl && baseUrl.indexOf('5173') > -1) {
-    cy.visit('/users/identify')
-    return
-  }
-  // use the backend login page when testing with frontend built into the backend
-  cy.visit('/login')
+  cy.visit('/users/identify')
 })
 
 When('I identify myself as a new user', () => {
