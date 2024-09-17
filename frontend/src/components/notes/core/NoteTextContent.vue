@@ -12,10 +12,7 @@
   />
   <div role="details" class="note-details">
     <NoteEditableDetails
-      v-bind="{ readonly }"
-      :note-id="note.id"
-      :note-details="note.details"
-      :storage-accessor="storageAccessor"
+      v-bind="{ readonly, noteId: note.id, noteDetails: note.details, storageAccessor, asMarkdown }"
     />
   </div>
 </template>
@@ -31,6 +28,7 @@ import NoteEditableDetails from "./NoteEditableDetails.vue"
 defineProps({
   note: { type: Object as PropType<Note>, required: true },
   readonly: { type: Boolean, default: true },
+  asMarkdown: Boolean,
   storageAccessor: {
     type: Object as PropType<StorageAccessor>,
     required: true,

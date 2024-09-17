@@ -145,7 +145,7 @@ export const assumeNotePage = (noteTopic?: string) => {
     },
     updateDetailsAsMarkdown(markdown: string) {
       this.toolbarButton('Edit as markdown').click()
-      cy.findByRole('textbox', { name: 'Details' }).type(markdown)
+      cy.findByRole('markdown').clear().type(markdown)
       return this
     },
     downloadAudioFile(fileName: string) {
