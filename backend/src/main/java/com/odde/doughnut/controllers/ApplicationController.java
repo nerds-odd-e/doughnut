@@ -23,22 +23,10 @@ public class ApplicationController {
 
   @RequestMapping(
       value = {
-        // the following array has to be in sync with the frontend routes in
-        // CommonConfiguration.java
-        // Because java annotation does not allow variable, we have to repeat the routes here.
         "/",
-        "/bazaar/**",
-        "/circles/**",
-        "/notebooks/**",
-        "/assessment/**",
+        // most of the frontend routes start with /d/ except for notes which start with /n
+        "/d/**",
         "/n**",
-        "/reviews/**",
-        "/answers/**",
-        "/links/**",
-        "/feedback**",
-        "/failure-report-list/**",
-        "/admin-dashboard/**",
-        "/assessmentAndCertificateHistory"
       },
       method = RequestMethod.GET)
   public String home() {

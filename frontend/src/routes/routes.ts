@@ -18,12 +18,15 @@ import NestedPage from "../pages/commons/NestedPage"
 import MessageCenterPage from "../pages/MessageCenterPage.vue"
 
 const NestedInitialReviewPage = NestedPage(InitialReviewPage, "initial")
-
 const NestedRepeatPage = NestedPage(RepeatPage, "repeat")
+
+// Please start most of the path with "d/"
+// so that the server will render the page correctly
+// when refreshing the page or directly accessing the URL.
 
 const noteAndLinkRoutes = [
   {
-    path: "notebooks",
+    path: "d/notebooks",
     name: "notebooks",
     component: NotebooksPage,
     meta: { userProp: true },
@@ -36,14 +39,14 @@ const noteAndLinkRoutes = [
     meta: { useNoteStorageAccessor: true, userProp: true },
   },
   {
-    path: `answers/:answerId`,
+    path: `d/answers/:answerId`,
     name: "answer",
     component: AnsweredQuestionPage,
     props: true,
     meta: { useNoteStorageAccessor: true },
   },
   {
-    path: "circles/:circleId",
+    path: "d/circles/:circleId",
     name: "circleShow",
     component: CircleShowPage,
     props: true,
@@ -58,62 +61,62 @@ const routes = [
   ...noteAndLinkRoutes.map((route) => ({ ...route, path: `/${route.path}` })),
   { path: "/", name: "root", component: HomePage, meta: { userProp: true } },
   {
-    path: "/bazaar",
+    path: "d/bazaar",
     name: "bazaar",
     component: BazaarPage,
     meta: { userProp: true },
   },
   {
-    path: "/assessmentAndCertificateHistory",
+    path: "d/assessmentAndCertificateHistory",
     name: "assessmentAndCertificateHistory",
     component: AssessmentAndCertificateHistoryPage,
     meta: { userProp: true },
   },
   {
-    path: "/admin-dashboard",
+    path: "d/admin-dashboard",
     name: "adminDashboard",
     component: AdminDashboardPage,
     props: true,
   },
   {
-    path: "/circles/join/:invitationCode?",
+    path: "d/circles/join/:invitationCode?",
     name: "circleJoin",
     component: CircleJoinPage,
     props: true,
     meta: { userProp: true },
   },
   {
-    path: "/feedback",
+    path: "d/feedback",
     name: "messageCenter",
     component: MessageCenterPage,
     props: true,
     meta: { userProp: true },
   },
   {
-    path: "/assessment/notebook/:notebookId",
+    path: "d/assessment/notebook/:notebookId",
     name: "assessment",
     component: AssessmentPage,
     props: (route: RouteLocation) => ({
       notebookId: Number(route.params.notebookId),
     }),
   },
-  { path: "/reviews", name: "reviews", component: ReviewHome },
+  { path: "d/reviews", name: "reviews", component: ReviewHome },
   {
-    path: "/reviews/initial",
+    path: "d/reviews/initial",
     name: "initial",
     component: NestedInitialReviewPage,
     children: nestedNoteAndLinkRoutes("initial-"),
     meta: { useNoteStorageAccessor: true },
   },
   {
-    path: "/reviews/repeat",
+    path: "d/reviews/repeat",
     name: "repeat",
     component: NestedRepeatPage,
     children: [...nestedNoteAndLinkRoutes("repeat-")],
     meta: { useNoteStorageAccessor: true },
   },
   {
-    path: "/failure-report-list/show/:failureReportId",
+    path: "d/failure-report-list/show/:failureReportId",
     name: "failureReport",
     component: FailureReportPage,
     props: true,
