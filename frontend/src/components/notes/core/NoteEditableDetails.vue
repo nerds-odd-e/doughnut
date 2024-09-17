@@ -7,7 +7,6 @@
     <template #default="{ value, update, blur }">
       <TextArea
         v-if="asMarkdown"
-        role="markdown"
         :multiple-line="true"
         scope-name="note"
         :model-value="value"

@@ -35,9 +35,13 @@
         </template>
       </PopButton>
 
-      <button class="btn" title="Edit as markdown" @click="$emit('edit-as-markdown', true)">
+      <button v-if="!asMarkdown" class="btn" title="Edit as markdown" @click="$emit('edit-as-markdown', true)">
         <SvgMarkdown />
       </button>
+      <button v-else class="btn" title="Edit as rich content" @click="$emit('edit-as-markdown', false)">
+        <SvgMarkdown />
+      </button>
+
 
       <button class="btn" title="Move up" @click="moveUp">
         <SvgUp />

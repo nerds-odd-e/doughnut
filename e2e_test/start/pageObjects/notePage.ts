@@ -143,10 +143,19 @@ export const assumeNotePage = (noteTopic?: string) => {
     editAudioButton() {
       return this.toolbarButton('Upload audio')
     },
+    switchToRichContent() {
+      this.toolbarButton('Edit as rich content').click()
+      return this
+    },
     updateDetailsAsMarkdown(markdown: string) {
       this.toolbarButton('Edit as markdown').click()
-      cy.findByRole('markdown').clear().type(markdown)
+      cy.get('textarea').clear().type(markdown)
       return this
+    },
+    expectRichDetails(elements: Record<string, string>[]) {
+      elements.forEach((element) => {
+        cy.get(element.Tag as string).should('contain', element.Content)
+      })
     },
     downloadAudioFile(fileName: string) {
       const downloadsFolder = Cypress.config('downloadsFolder')

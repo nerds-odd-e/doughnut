@@ -536,3 +536,13 @@ When(
     start.jumpToNotePage(noteTopic).updateDetailsAsMarkdown(newDetails)
   }
 )
+
+Then(
+  'I should see the rich content of the note with details:',
+  (data: DataTable) => {
+    start
+      .assumeNotePage()
+      .switchToRichContent()
+      .expectRichDetails(data.hashes())
+  }
+)
