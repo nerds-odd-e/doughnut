@@ -97,9 +97,11 @@ export default defineComponent({
 
   computed: {
     invitationUrl() {
-      return `${window.location.origin}/circles/join/${
-        /* eslint-disable  @typescript-eslint/no-non-null-assertion */
-        this.circle!.invitationCode
+      return `${window.location.origin}${
+        this.$router.resolve({
+          name: "circleJoin",
+          params: { invitationCode: this.circle?.invitationCode },
+        }).href
       }`
     },
   },

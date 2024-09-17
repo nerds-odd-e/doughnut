@@ -54,7 +54,7 @@ const notebookSettingsPopup = () => {
 
 export const routerToNotebooksPage = () => {
   cy.pageIsNotLoading()
-  cy.routerPush('/notebooks', 'notebooks', {})
+  cy.routerPush('/d/notebooks', 'notebooks', {})
   cy.findByText('Notebooks')
   return {
     ...notebookList(),

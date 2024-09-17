@@ -7,7 +7,7 @@ export const assumeBazaarPage = () => {
 }
 
 export const navigateToBazaar = () => {
-  cy.visit('/bazaar')
+  cy.visit('/d/bazaar')
   cy.get('h2', { timeout: 3000 }).should('contain', 'Welcome To The Bazaar')
 
   return assumeBazaarPage()

@@ -272,7 +272,7 @@ Cypress.Commands.add('yesIRemember', () => {
 })
 
 Cypress.Commands.add('routerToInitialReview', () => {
-  cy.routerPush('/reviews/initial', 'initial', {})
+  cy.routerPush('/d/reviews/initial', 'initial', {})
 })
 
 Cypress.Commands.add('routerToRoot', () => {
@@ -281,11 +281,11 @@ Cypress.Commands.add('routerToRoot', () => {
 
 Cypress.Commands.add('routerToReviews', () => {
   cy.routerToRoot()
-  cy.routerPush('/reviews', 'reviews', {})
+  cy.routerPush('/d/reviews', 'reviews', {})
 })
 
 Cypress.Commands.add('routerToRepeatReview', () => {
-  cy.routerPush('/reviews/repeat', 'repeat', {})
+  cy.routerPush('/d/reviews/repeat', 'repeat', {})
 })
 
 Cypress.Commands.add('initialReviewInSequence', (reviews) => {

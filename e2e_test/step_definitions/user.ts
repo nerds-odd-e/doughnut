@@ -78,7 +78,7 @@ Then("I haven't login", () => {
 })
 
 When('I visit the falure reports on the admin page', () => {
-  cy.visit('/admin-dashboard')
+  cy.visit('/d/admin-dashboard')
   cy.findByRole('button', { name: 'Failure Reports' }).click()
 
   // prevent the test from failing due to uncaught exceptions
