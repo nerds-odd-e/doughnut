@@ -42,7 +42,7 @@ public class ApplicationController {
       },
       method = RequestMethod.GET)
   public String home() {
-    return "../static/index";
+    return "/index.html";
   }
 
   // This backend route is to trigger the authentication process to identify the user.

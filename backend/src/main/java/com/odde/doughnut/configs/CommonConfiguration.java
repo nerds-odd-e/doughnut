@@ -43,7 +43,7 @@ public class CommonConfiguration {
 
     http.authorizeHttpRequests(
             auth ->
-                auth.requestMatchers("/robots.txt")
+                auth.requestMatchers("/robots.txt", "/index.html")
                     .permitAll()
                     .requestMatchers(allRoutes)
                     .permitAll()
