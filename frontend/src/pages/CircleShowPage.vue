@@ -44,7 +44,7 @@
   </ContainerPage>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import BazaarNotebookButtons from "@/components/bazaar/BazaarNotebookButtons.vue"
 import NotebookButtons from "@/components/notebook/NotebookButtons.vue"
 import NotebookCardsWithButtons from "@/components/notebook/NotebookCardsWithButtons.vue"
@@ -53,67 +53,50 @@ import SvgMissingAvatar from "@/components/svgs/SvgMissingAvatar.vue"
 import { CircleForUserView, User } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { StorageAccessor } from "@/store/createNoteStorage"
-import { PropType, defineComponent } from "vue"
+import { PropType, computed, onBeforeUnmount, onMounted, ref } from "vue"
+import { useRouter } from "vue-router"
 import ContainerPage from "./commons/ContainerPage.vue"
 
-export default defineComponent({
-  setup() {
-    return useLoadingApi()
-  },
-  components: {
-    SvgMissingAvatar,
-    NotebookCardsWithButtons,
-    NotebookButtons,
-    NotebookNewButton,
-    BazaarNotebookButtons,
-    ContainerPage,
-  },
-  props: {
-    circleId: { type: Number, required: true },
-    user: { type: Object as PropType<User> },
-    storageAccessor: {
-      type: Object as PropType<StorageAccessor>,
-      required: true,
-    },
-  },
+const { managedApi } = useLoadingApi()
 
-  data() {
-    return {
-      circle: null as CircleForUserView | null,
-      timer: null as NodeJS.Timeout | null,
-    }
-  },
+const router = useRouter()
 
-  methods: {
-    async fetchData() {
-      this.timer = setTimeout(() => {
-        this.fetchData()
-      }, 5000)
-      this.circle = await this.managedApi.restCircleController.showCircle(
-        this.circleId
-      )
-    },
+const { circleId } = defineProps({
+  circleId: { type: Number, required: true },
+  user: { type: Object as PropType<User> },
+  storageAccessor: {
+    type: Object as PropType<StorageAccessor>,
+    required: true,
   },
+})
 
-  computed: {
-    invitationUrl() {
-      return `${window.location.origin}${
-        this.$router.resolve({
-          name: "circleJoin",
-          params: { invitationCode: this.circle?.invitationCode },
-        }).href
-      }`
-    },
-  },
+const circle = ref<CircleForUserView | null>(null)
+const timer = ref<NodeJS.Timeout | null>(null)
 
-  mounted() {
-    this.fetchData()
-  },
-  beforeUnmount() {
-    if (this.timer) {
-      clearTimeout(this.timer)
-    }
-  },
+const fetchData = async () => {
+  timer.value = setTimeout(() => {
+    fetchData()
+  }, 5000)
+  circle.value = await managedApi.restCircleController.showCircle(circleId)
+}
+
+const invitationUrl = computed(() => {
+  return `${window.location.origin}${
+    router.resolve({
+      name: "circleJoin",
+      params: { invitationCode: circle.value?.invitationCode },
+    }).href
+  }`
+})
+
+onMounted(() => {
+  fetchData()
+})
+
+onBeforeUnmount(() => {
+  if (timer.value) {
+    clearTimeout(timer.value)
+  }
 })
 </script>
 

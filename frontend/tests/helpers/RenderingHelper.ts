@@ -5,6 +5,7 @@ import { merge } from "lodash"
 import { ComponentPublicInstance, DefineComponent } from "vue"
 import { createRouter, createWebHistory, RouteLocationRaw } from "vue-router"
 import createNoteStorage from "../../src/store/createNoteStorage"
+import routes from "@/routes/routes"
 
 interface NoteStorageProps {
   storageAccessor?: ReturnType<typeof createNoteStorage>
@@ -62,13 +63,7 @@ class RenderingHelper {
   withRouter() {
     const router = createRouter({
       history: createWebHistory(),
-      routes: [
-        {
-          path: "/",
-          name: "Home",
-          component: {},
-        },
-      ],
+      routes,
     })
     this.withPlugin(router)
     return this

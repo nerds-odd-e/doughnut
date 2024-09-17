@@ -32,7 +32,7 @@ const noteAndLinkRoutes = [
     meta: { userProp: true },
   },
   {
-    path: `n:noteId`,
+    path: `/n:noteId`,
     name: "noteShow",
     component: NoteShowPage,
     props: (route: RouteLocation) => ({ noteId: Number(route.params.noteId) }),
@@ -46,7 +46,7 @@ const noteAndLinkRoutes = [
     meta: { useNoteStorageAccessor: true },
   },
   {
-    path: "d/circles/:circleId",
+    path: "/d/circles/:circleId",
     name: "circleShow",
     component: CircleShowPage,
     props: true,
@@ -58,7 +58,7 @@ const nestedNoteAndLinkRoutes = (prefix: string) =>
   noteAndLinkRoutes.map((route) => ({ ...route, name: prefix + route.name }))
 
 const routes = [
-  ...noteAndLinkRoutes.map((route) => ({ ...route, path: `/${route.path}` })),
+  ...noteAndLinkRoutes.map((route) => ({ ...route, path: `${route.path}` })),
   { path: "/", name: "root", component: HomePage, meta: { userProp: true } },
   {
     path: "/d/bazaar",
