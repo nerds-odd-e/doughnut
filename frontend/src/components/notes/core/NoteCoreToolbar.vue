@@ -39,7 +39,7 @@
         <SvgMarkdown />
       </button>
       <button v-else class="btn" title="Edit as rich content" @click="$emit('edit-as-markdown', false)">
-        <SvgMarkdown />
+        <SvgRichContent />
       </button>
 
 
@@ -117,6 +117,7 @@ import NoteChatDialog from "../NoteChatDialog.vue"
 import Questions from "../Questions.vue"
 import NoteInfoBar from "../NoteInfoBar.vue"
 import SvgMarkdown from "@/components/svgs/SvgMarkdown.vue"
+import SvgRichContent from "@/components/svgs/SvgRichContent.vue"
 
 const props = defineProps({
   storageAccessor: {
