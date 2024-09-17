@@ -30,7 +30,6 @@ public class NonProductConfiguration {
     http.authorizeHttpRequests(
             auth ->
                 auth.requestMatchers(
-                        "/api-docs.yaml",
                         "/users/identify" // in non-product env, we use frontend to identify user
                         )
                     .permitAll())
