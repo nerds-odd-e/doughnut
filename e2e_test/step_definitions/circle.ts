@@ -94,29 +94,6 @@ When(
   }
 )
 
-When(
-  'someone of my circle deletes the {string} notebook',
-  (noteTopic: string) => {
-    cy.noteByTitle(noteTopic).deleteNoteViaAPI()
-  }
-)
-
-Then(
-  'I should see {string} in the circle page within {int} seconds',
-  (noteTopic: string, seconds: number) => {
-    cy.tick(seconds * 1000)
-    cy.findCardTitle(noteTopic)
-  }
-)
-
-Then(
-  'I should not see {string} in the circle page within {int} seconds',
-  (noteTopic: string, seconds: number) => {
-    cy.tick(seconds * 1000)
-    cy.findCardTitle(noteTopic).should('not.exist')
-  }
-)
-
 Then(
   'I move the notebook {string} from {string} to {string}',
   (notebook: string, fromCircle: string, toCircle: string) => {

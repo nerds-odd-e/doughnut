@@ -53,7 +53,7 @@ import SvgMissingAvatar from "@/components/svgs/SvgMissingAvatar.vue"
 import { CircleForUserView, User } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { StorageAccessor } from "@/store/createNoteStorage"
-import { PropType, computed, onBeforeUnmount, onMounted, ref } from "vue"
+import { PropType, computed, onMounted, ref } from "vue"
 import { useRouter } from "vue-router"
 import ContainerPage from "./commons/ContainerPage.vue"
 
@@ -71,12 +71,8 @@ const { circleId } = defineProps({
 })
 
 const circle = ref<CircleForUserView | null>(null)
-const timer = ref<NodeJS.Timeout | null>(null)
 
 const fetchData = async () => {
-  timer.value = setTimeout(() => {
-    fetchData()
-  }, 5000)
   circle.value = await managedApi.restCircleController.showCircle(circleId)
 }
 
@@ -91,12 +87,6 @@ const invitationUrl = computed(() => {
 
 onMounted(() => {
   fetchData()
-})
-
-onBeforeUnmount(() => {
-  if (timer.value) {
-    clearTimeout(timer.value)
-  }
 })
 </script>
 

@@ -361,15 +361,6 @@ Cypress.Commands.add('undoLast', (undoType: string) => {
   cy.pageIsNotLoading()
 })
 
-Cypress.Commands.add('deleteNoteViaAPI', { prevSubject: true }, (subject) => {
-  cy.request({
-    method: 'POST',
-    url: `/api/notes/${subject}/delete`,
-  }).then((response) => {
-    expect(response.status).to.equal(200)
-  })
-})
-
 Cypress.Commands.add('noteByTitle', (noteTopic: string) => {
   return cy
     .findCardTitle(noteTopic)
