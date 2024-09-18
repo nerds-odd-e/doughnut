@@ -1,0 +1,96 @@
+<template>
+  <div ref="editor"></div>
+</template>
+
+<script setup lang="ts">
+import { ref, onMounted, watch } from "vue"
+import Quill, { type QuillOptions } from "quill"
+import "quill/dist/quill.snow.css"
+
+const { modelValue, readonly } = defineProps({
+  modelValue: String,
+  readonly: Boolean,
+})
+
+const emits = defineEmits(["update:modelValue", "blur"])
+
+const localValue = ref(modelValue)
+const hadFocus = ref(false)
+const editor = ref<HTMLElement | null>(null)
+const quill = ref<Quill | null>(null)
+
+const onBlurTextField = () => {
+  console.log("blur")
+  emits("blur")
+}
+
+const options: QuillOptions = {
+  modules: {
+    toolbar: false,
+  },
+  placeholder: readonly ? "" : "Enter note details here...",
+  readOnly: readonly,
+  theme: "snow",
+}
+
+onMounted(() => {
+  if (editor.value) {
+    quill.value = new Quill(editor.value, options)
+
+    // Set initial content
+    quill.value.root.innerHTML = localValue.value || ""
+
+    // Listen for text changes
+    quill.value.on("text-change", () => {
+      const content = quill.value!.root.innerHTML
+      localValue.value = content
+      onUpdateContent()
+    })
+
+    // Handle focus and blur events
+    quill.value.on("selection-change", (range) => {
+      if (range) {
+        // Focused
+        if (!hadFocus.value) {
+          hadFocus.value = true
+          // Emit focus event if needed
+        }
+      } else {
+        hadFocus.value = false
+        onBlurTextField()
+      }
+    })
+  }
+})
+
+// Watch for changes in modelValue prop
+watch(
+  () => modelValue,
+  (newValue) => {
+    if (quill.value && newValue !== quill.value.root.innerHTML) {
+      quill.value.root.innerHTML = newValue || ""
+    }
+  }
+)
+
+const onUpdateContent = () => {
+  if (localValue.value === modelValue) {
+    return
+  }
+  emits("update:modelValue", localValue.value)
+}
+</script>
+
+<style lang="sass">
+.ql-editor
+  padding: 0
+  margin-bottom: 15px
+  &::before
+    left: 0 !important
+    right: 0 !important
+  li
+    list-style-type: inherit
+.ql-container.ql-snow
+  border: none
+  font-size: inherit !important
+</style>

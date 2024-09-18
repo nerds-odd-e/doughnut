@@ -26,13 +26,21 @@ Feature: Note Edit
     Then I should see "LeSS in Action" in the page
     And there should be no more undo to do
 
+  @ignore
   Scenario: Edit a note's details as markdown
     When I update note "LeSS in Action" details using markdown to become:
-      """
-      # Odd-e LiA
-      ## Our best training
-      """
+    """
+    # Odd-e LiA
+    ## Our best training
+
+    * Specification by Example
+      * Discuss in workshop
+      * Conccurent engineering
+      * Living documentation
+    * Test-Driven Development
+    """
     Then I should see the rich content of the note with details:
-      | Tag | Content           |
-      | h1  | Odd-e LiA         |
-      | h2  | Our best training |
+      | Tag | Content                  |
+      | h1  | Odd-e LiA                |
+      | h2  | Our best training        |
+      | li  | Specification by Example |

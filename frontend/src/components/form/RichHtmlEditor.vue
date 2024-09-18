@@ -1,22 +1,16 @@
 <template>
   <QuillEditor
-    ref="quillEditor"
-    v-model:content="localValue"
-    :options="options"
-    :content-type="'html'"
+    v-model="localValue"
     :read-only="readonly"
-    @blur="onBlurTextField"
-    @update:content="onUpdateContent"
-    @focus="hadFocus = true"
+    @blur="$emit('blur')"
   />
 </template>
 
 <script setup lang="ts">
-import { QuillEditor } from "@vueup/vue-quill"
-import { onBeforeUnmount, onMounted, ref, watch } from "vue"
+import { onMounted, ref, watch } from "vue"
 
 import "quill/dist/quill.snow.css"
-import type { QuillOptions } from "quill"
+import QuillEditor from "./QuillEditor.vue"
 
 const { modelValue, readonly } = defineProps({
   multipleLine: Boolean,
@@ -46,15 +40,7 @@ onMounted(() => {
 
 const emits = defineEmits(["update:modelValue", "blur"])
 
-const options: QuillOptions = {
-  modules: {
-    toolbar: false,
-  },
-  placeholder: readonly ? "" : "Enter note details here...",
-}
-
 const localValue = ref(modelValue)
-const hadFocus = ref(false)
 
 watch(
   () => modelValue,
@@ -63,28 +49,13 @@ watch(
   }
 )
 
-const onUpdateContent = () => {
-  if (localValue.value === modelValue) {
-    return
+watch(
+  () => localValue.value,
+  () => {
+    if (localValue.value === modelValue) {
+      return
+    }
+    emits("update:modelValue", localValue.value)
   }
-  emits("update:modelValue", localValue.value)
-}
-
-onBeforeUnmount(() => {
-  onBlurTextField()
-})
+)
 </script>
-
-<style lang="sass">
-.ql-editor
-  padding: 0
-  margin-bottom: 15px
-  &::before
-    left: 0 !important
-    right:0 !important
-  li
-    list-style-type: inherit
-.ql-container.ql-snow
-  border: none
-  font-size: inherit !important
-</style>
