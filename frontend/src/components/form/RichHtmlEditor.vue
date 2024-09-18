@@ -2,21 +2,7 @@
   <QuillEditor
     ref="quillEditor"
     v-model:content="localValue"
-    :options="{
-      modules: {
-            toolbar: false,
-            keyboard: {
-              bindings: {
-                custom: {
-                  key: 13,
-                  shiftKey: true,
-                  handler: onBlurTextField,
-                },
-              },
-            },
-          },
-          placeholder: readonly ? '' : 'Enter note details here...',
-    }"
+    :options="options"
     :content-type="'html'"
     :read-only="readonly"
     @blur="onBlurTextField"
@@ -30,6 +16,7 @@ import { QuillEditor } from "@vueup/vue-quill"
 import { ref, watch } from "vue"
 
 import "quill/dist/quill.snow.css"
+import { QuillOptions } from "quill"
 
 const { modelValue, readonly } = defineProps({
   multipleLine: Boolean,
@@ -45,6 +32,22 @@ const emits = defineEmits(["update:modelValue", "blur"])
 
 const onBlurTextField = () => {
   emits("blur")
+}
+
+const options: QuillOptions = {
+  modules: {
+    toolbar: false,
+    keyboard: {
+      bindings: {
+        custom: {
+          key: 13,
+          shiftKey: true,
+          handler: onBlurTextField,
+        },
+      },
+    },
+  },
+  placeholder: readonly ? "" : "Enter note details here...",
 }
 
 const localValue = ref(modelValue)
