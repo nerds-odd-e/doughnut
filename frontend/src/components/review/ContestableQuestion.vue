@@ -36,10 +36,11 @@
 </template>
 
 <script setup lang="ts">
-import { AnsweredQuestion, ReviewQuestionInstance } from "@/generated/backend"
+import type { AnsweredQuestion, ReviewQuestionInstance } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
-import { PropType, ref } from "vue"
+import type { PropType } from "vue"
+import { ref } from "vue"
 import BasicBreadcrumb from "../commons/BasicBreadcrumb.vue"
 import AnsweredQuestionComponent from "./AnsweredQuestionComponent.vue"
 import ReviewQuestion from "./ReviewQuestion.vue"

@@ -16,11 +16,12 @@
 </template>
 
 <script lang="ts">
-import { Note } from "@/generated/backend"
+import type { Note } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
-import { StorageAccessor } from "@/store/createNoteStorage"
-import { PropType, defineComponent } from "vue"
+import type { StorageAccessor } from "@/store/createNoteStorage"
+import type { PropType } from "vue"
+import { defineComponent } from "vue"
 import usePopups from "../commons/Popups/usePopups"
 import NoteInfoBar from "../notes/NoteInfoBar.vue"
 import InitialReviewButtons from "./InitialReviewButtons.vue"

@@ -36,8 +36,9 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, ref } from "vue"
-import { Answer, AnswerDTO, BareQuestion } from "@/generated/backend"
+import type { PropType } from "vue"
+import { ref } from "vue"
+import type { Answer, AnswerDTO, BareQuestion } from "@/generated/backend"
 import TextInput from "../form/TextInput.vue"
 import QuestionChoices from "./QuestionChoices.vue"
 

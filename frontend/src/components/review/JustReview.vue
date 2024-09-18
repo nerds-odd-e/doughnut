@@ -14,8 +14,9 @@
 
 <script lang="ts">
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { StorageAccessor } from "@/store/createNoteStorage"
-import { PropType, defineComponent } from "vue"
+import type { StorageAccessor } from "@/store/createNoteStorage"
+import type { PropType } from "vue"
+import { defineComponent } from "vue"
 import ReviewPointAsync from "./ReviewPointAsync.vue"
 import SelfEvaluateButtons from "./SelfEvaluateButtons.vue"
 

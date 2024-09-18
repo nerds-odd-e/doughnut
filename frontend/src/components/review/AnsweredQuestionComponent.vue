@@ -27,9 +27,10 @@
 </template>
 
 <script setup lang="ts">
-import { AnsweredQuestion } from "@/generated/backend"
-import { PropType, computed, ref } from "vue"
-import { StorageAccessor } from "../../store/createNoteStorage"
+import type { AnsweredQuestion } from "@/generated/backend"
+import type { PropType } from "vue"
+import { computed, ref } from "vue"
+import type { StorageAccessor } from "../../store/createNoteStorage"
 import QuestionDisplay from "./QuestionDisplay.vue"
 
 const props = defineProps({

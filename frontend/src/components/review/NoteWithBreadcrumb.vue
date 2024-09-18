@@ -11,9 +11,9 @@
 </template>
 
 <script setup lang="ts">
-import { PropType } from "vue"
-import { Note } from "@/generated/backend"
-import { StorageAccessor } from "@/store/createNoteStorage"
+import type { PropType } from "vue"
+import type { Note } from "@/generated/backend"
+import type { StorageAccessor } from "@/store/createNoteStorage"
 import NoteShow from "../notes/NoteShow.vue"
 import Breadcrumb from "../toolbars/Breadcrumb.vue"
 

@@ -19,7 +19,7 @@
 
 
 <script lang="ts">
-import { AnswerDTO } from "@/generated/backend"
+import type { AnswerDTO } from "@/generated/backend"
 import { defineComponent } from "vue"
 
 export default defineComponent({
