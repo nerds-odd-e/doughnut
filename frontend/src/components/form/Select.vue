@@ -19,7 +19,8 @@
 </template>
 
 <script lang="ts" setup>
-import { PropType, ref, watch } from "vue"
+import type { PropType } from "vue"
+import { ref, watch } from "vue"
 import InputWithType from "./InputWithType.vue"
 
 const props = defineProps({

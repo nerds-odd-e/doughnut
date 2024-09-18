@@ -7,8 +7,8 @@
 </template>
 
 <script setup lang="ts">
-import { PropType } from "vue"
-import { BazaarNotebook } from "@/generated/backend"
+import type { PropType } from "vue"
+import type { BazaarNotebook } from "@/generated/backend"
 import NotebookCardsWithButtons from "../notebook/NotebookCardsWithButtons.vue"
 import BazaarNotebookButtons from "./BazaarNotebookButtons.vue"
 

@@ -32,9 +32,11 @@
 </template>
 
 <script lang="ts">
-import { Randomization, User } from "@/generated/backend"
+import type { User } from "@/generated/backend"
+import { Randomization } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { PropType, defineComponent } from "vue"
+import type { PropType } from "vue"
+import { defineComponent } from "vue"
 import CheckInput from "../form/CheckInput.vue"
 import TextInput from "../form/TextInput.vue"
 import PopButton from "./Popups/PopButton.vue"

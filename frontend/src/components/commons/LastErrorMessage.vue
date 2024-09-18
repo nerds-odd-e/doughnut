@@ -5,8 +5,9 @@
 </template>
 
 <script lang="ts">
-import { ApiError } from "@/managedApi/ManagedApi"
-import { PropType, defineComponent } from "vue"
+import type { ApiError } from "@/managedApi/ManagedApi"
+import type { PropType } from "vue"
+import { defineComponent } from "vue"
 import ToolbarCover from "./ToolbarOver.vue"
 
 export default defineComponent({

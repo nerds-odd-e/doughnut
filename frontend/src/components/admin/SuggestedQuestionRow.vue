@@ -28,9 +28,9 @@
 
 <script lang="ts">
 import usePopups from "@/components/commons/Popups/usePopups"
-import { SuggestedQuestionForFineTuning } from "@/generated/backend"
+import type { SuggestedQuestionForFineTuning } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { PropType } from "vue"
+import type { PropType } from "vue"
 
 export default {
   setup() {

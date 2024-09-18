@@ -34,7 +34,7 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { NotebookCertificateApproval } from "@/generated/backend"
+import type { NotebookCertificateApproval } from "@/generated/backend"
 import NoteTopicWithLink from "@/components/notes/NoteTopicWithLink.vue"
 import usePopups from "../commons/Popups/usePopups"
 

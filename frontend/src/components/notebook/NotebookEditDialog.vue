@@ -31,9 +31,10 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, ref } from "vue"
+import type { PropType } from "vue"
+import { ref } from "vue"
 import { useRouter } from "vue-router"
-import { Notebook } from "@/generated/backend"
+import type { Notebook } from "@/generated/backend"
 import CheckInput from "@/components/form/CheckInput.vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import TextInput from "../form/TextInput.vue"

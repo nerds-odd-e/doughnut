@@ -32,8 +32,8 @@
 </template>
 
 <script lang="ts">
-import { SuggestedQuestionForFineTuning } from "@/generated/backend"
-import { PropType } from "vue"
+import type { SuggestedQuestionForFineTuning } from "@/generated/backend"
+import type { PropType } from "vue"
 import Modal from "../commons/Modal.vue"
 import SuggestedQuestionRow from "./SuggestedQuestionRow.vue"
 

@@ -21,7 +21,8 @@
 </template>
 
 <script lang="ts">
-import { PropType, defineComponent } from "vue"
+import type { PropType } from "vue"
+import { defineComponent } from "vue"
 import SvgClose from "../svgs/SvgClose.vue"
 
 export default defineComponent({

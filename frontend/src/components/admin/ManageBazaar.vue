@@ -23,7 +23,7 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { BazaarNotebook } from "@/generated/backend"
+import type { BazaarNotebook } from "@/generated/backend"
 import NoteTopicWithLink from "../notes/NoteTopicWithLink.vue"
 import usePopups from "../commons/Popups/usePopups"
 

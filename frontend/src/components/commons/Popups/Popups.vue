@@ -40,7 +40,8 @@
 <script lang="ts">
 import { defineComponent } from "vue"
 import Modal from "../Modal.vue"
-import usePopups, { PopupInfo } from "./usePopups"
+import type { PopupInfo } from "./usePopups"
+import usePopups from "./usePopups"
 
 export default defineComponent({
   setup() {

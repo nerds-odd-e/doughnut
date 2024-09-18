@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { PropType } from "vue"
+import type { PropType } from "vue"
 import InputWithType from "./InputWithType.vue"
 
 defineProps({

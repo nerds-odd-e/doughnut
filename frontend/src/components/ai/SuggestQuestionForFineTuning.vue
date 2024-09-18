@@ -38,7 +38,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import {
+import type {
   PredefinedQuestion,
   QuestionSuggestionCreationParams,
 } from "@/generated/backend"

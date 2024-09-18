@@ -54,9 +54,10 @@
 </template>
 
 <script lang="ts">
-import { PropType, defineComponent } from "vue"
+import type { PropType } from "vue"
+import { defineComponent } from "vue"
 import _ from "lodash"
-import {
+import type {
   QuestionSuggestionParams,
   SuggestedQuestionForFineTuning,
 } from "@/generated/backend"

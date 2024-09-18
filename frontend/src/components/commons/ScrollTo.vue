@@ -4,7 +4,8 @@
 
 <script setup lang="ts">
 import "intersection-observer"
-import { Ref, nextTick, onBeforeUnmount, onMounted, ref } from "vue"
+import type { Ref } from "vue"
+import { nextTick, onBeforeUnmount, onMounted, ref } from "vue"
 
 const scrollRef: Ref<HTMLElement | null> = ref(null)
 
