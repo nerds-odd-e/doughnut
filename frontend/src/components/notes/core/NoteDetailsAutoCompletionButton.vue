@@ -22,15 +22,16 @@
 </template>
 
 <script lang="ts">
-import {
+import type {
   AiAssistantResponse,
   ClarifyingQuestion,
   Note,
 } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import ClarifyingQuestionAndAnswer from "@/models/ClarifyingQuestionAndAnswer"
-import { StorageAccessor } from "@/store/createNoteStorage"
-import { PropType, defineComponent } from "vue"
+import type ClarifyingQuestionAndAnswer from "@/models/ClarifyingQuestionAndAnswer"
+import type { StorageAccessor } from "@/store/createNoteStorage"
+import type { PropType } from "vue"
+import { defineComponent } from "vue"
 import Modal from "../../commons/Modal.vue"
 import SvgRobot from "../../svgs/SvgRobot.vue"
 import AIClarifyingQuestionDialog from "../AIClarifyingQuestionDialog.vue"

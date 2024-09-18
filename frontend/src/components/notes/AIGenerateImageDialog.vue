@@ -10,10 +10,11 @@
 </template>
 
 <script lang="ts">
-import { Note } from "@/generated/backend"
+import type { Note } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
-import { PropType, defineComponent } from "vue"
+import type { PropType } from "vue"
+import { defineComponent } from "vue"
 import TextInput from "../form/TextInput.vue"
 
 export default defineComponent({

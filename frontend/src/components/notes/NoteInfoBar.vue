@@ -7,7 +7,7 @@
 </template>
 
 <script lang="ts">
-import { NoteInfo } from "@/generated/backend"
+import type { NoteInfo } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { defineComponent } from "vue"
 import NoteInfoComponent from "./NoteInfoComponent.vue"

@@ -28,9 +28,10 @@
 </template>
 
 <script lang="ts">
-import { ClarifyingQuestion } from "@/generated/backend"
-import ClarifyingQuestionAndAnswer from "@/models/ClarifyingQuestionAndAnswer"
-import { PropType, defineComponent } from "vue"
+import type { ClarifyingQuestion } from "@/generated/backend"
+import type ClarifyingQuestionAndAnswer from "@/models/ClarifyingQuestionAndAnswer"
+import type { PropType } from "vue"
+import { defineComponent } from "vue"
 import TextInput from "../form/TextInput.vue"
 
 export default defineComponent({

@@ -20,9 +20,9 @@
 </template>
 
 <script setup lang="ts">
-import { PropType } from "vue"
+import type { PropType } from "vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
-import { StorageAccessor } from "../../store/createNoteStorage"
+import type { StorageAccessor } from "../../store/createNoteStorage"
 import NoteRealmLoader from "./NoteRealmLoader.vue"
 
 defineProps({

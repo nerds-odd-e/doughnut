@@ -38,9 +38,11 @@
 </template>
 
 <script lang="ts">
-import { NoteCreationDTO, WikidataSearchEntity } from "@/generated/backend"
-import { PropType, defineComponent } from "vue"
-import { StorageAccessor } from "../../store/createNoteStorage"
+import type { WikidataSearchEntity } from "@/generated/backend"
+import { NoteCreationDTO } from "@/generated/backend"
+import type { PropType } from "vue"
+import { defineComponent } from "vue"
+import type { StorageAccessor } from "../../store/createNoteStorage"
 import LinkTypeSelectCompact from "../links/LinkTypeSelectCompact.vue"
 import SearchResults from "../search/SearchResults.vue"
 import NoteFormTopicOnly from "./NoteFormTopicOnly.vue"

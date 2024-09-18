@@ -14,8 +14,9 @@
 </template>
 
 <script lang="ts">
-import { NoteInfo, ReviewPoint } from "@/generated/backend"
-import { PropType, defineComponent } from "vue"
+import type { NoteInfo, ReviewPoint } from "@/generated/backend"
+import type { PropType } from "vue"
+import { defineComponent } from "vue"
 import ReviewSettingForm from "../review/ReviewSettingForm.vue"
 import NoteInfoReviewPoint from "./NoteInfoReviewPoint.vue"
 

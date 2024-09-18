@@ -25,7 +25,8 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, computed, ref } from "vue"
+import type { PropType } from "vue"
+import { computed, ref } from "vue"
 import { NoteTopic } from "@/generated/backend"
 import SvgLinkTypeIcon from "@/components/svgs/SvgLinkTypeIcon.vue"
 import NoteTopicWithLink from "../NoteTopicWithLink.vue"

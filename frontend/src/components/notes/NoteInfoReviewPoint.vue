@@ -48,8 +48,9 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, ref, watch } from "vue"
-import { ReviewPoint } from "@/generated/backend"
+import type { PropType } from "vue"
+import { ref, watch } from "vue"
+import type { ReviewPoint } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import usePopups from "../commons/Popups/usePopups"
 import SvgNoReview from "../svgs/SvgNoReview.vue"

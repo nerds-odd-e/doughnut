@@ -29,8 +29,8 @@
 </template>
 
 <script setup lang="ts">
-import { PropType } from "vue"
-import { type StorageAccessor } from "../../../store/createNoteStorage"
+import type { PropType } from "vue"
+import type { StorageAccessor } from "../../../store/createNoteStorage"
 import RichMarkdownEditor from "../../form/RichMarkdownEditor.vue"
 import TextContentWrapper from "./TextContentWrapper.vue"
 import TextArea from "@/components/form/TextArea.vue"

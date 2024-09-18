@@ -43,9 +43,10 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, computed, ref } from "vue"
+import type { PropType } from "vue"
+import { computed, ref } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { Note, PredefinedQuestion } from "@/generated/backend"
+import type { Note, PredefinedQuestion } from "@/generated/backend"
 import isMCQWithAnswerValid from "@/models/isMCQWithAnswerValid"
 import TextArea from "../form/TextArea.vue"
 import TextInput from "../form/TextInput.vue"

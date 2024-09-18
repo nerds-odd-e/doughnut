@@ -26,9 +26,10 @@
 </template>
 
 <script lang="ts">
-import { Note } from "@/generated/backend"
-import { StorageAccessor } from "@/store/createNoteStorage"
-import { PropType, defineComponent } from "vue"
+import type { Note } from "@/generated/backend"
+import type { StorageAccessor } from "@/store/createNoteStorage"
+import type { PropType } from "vue"
+import { defineComponent } from "vue"
 import SvgWikidata from "../../svgs/SvgWikidata.vue"
 import WikidataIdEditButton from "./WikidataIdEditButton.vue"
 

@@ -9,7 +9,8 @@
 
 <script lang="ts">
 import { debounce } from "lodash"
-import { PropType, defineComponent, ref } from "vue"
+import type { PropType } from "vue"
+import { defineComponent, ref } from "vue"
 import { type StorageAccessor } from "../../../store/createNoteStorage"
 
 export default defineComponent({

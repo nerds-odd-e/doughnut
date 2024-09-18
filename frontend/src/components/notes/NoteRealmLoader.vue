@@ -3,8 +3,9 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, computed, toRefs } from "vue"
-import { StorageAccessor } from "../../store/createNoteStorage"
+import type { PropType } from "vue"
+import { computed, toRefs } from "vue"
+import type { StorageAccessor } from "../../store/createNoteStorage"
 
 const props = defineProps({
   noteId: { type: Number, required: true },

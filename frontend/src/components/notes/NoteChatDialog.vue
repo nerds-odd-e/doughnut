@@ -60,7 +60,7 @@
 </template>
 
 <script setup lang="ts">
-import {
+import type {
   Message,
   Note,
   ChatRequest,
@@ -69,7 +69,8 @@ import {
 } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
-import { PropType, computed, ref, onMounted } from "vue"
+import type { PropType } from "vue"
+import { computed, ref, onMounted } from "vue"
 import markdownizer from "@/components/form/markdownizer"
 import scrollToElement from "../commons/scrollToElement"
 
