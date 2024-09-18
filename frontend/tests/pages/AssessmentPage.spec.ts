@@ -4,7 +4,7 @@ import AssessmentPage from "@/pages/AssessmentPage.vue"
 import helper from "../helpers"
 import makeMe from "../fixtures/makeMe"
 import { flushPromises } from "@vue/test-utils"
-import { AssessmentQuestionInstance } from "@/generated/backend"
+import type { AssessmentQuestionInstance } from "@/generated/backend"
 
 vitest.mock("vue-router", () => ({
   useRouter: () => ({

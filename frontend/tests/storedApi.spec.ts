@@ -1,6 +1,6 @@
 import "vitest-fetch-mock"
 import ManagedApi from "../src/managedApi/ManagedApi"
-import { Router } from "vue-router"
+import type { Router } from "vue-router"
 import createNoteStorage from "../src/store/createNoteStorage"
 import makeMe from "./fixtures/makeMe"
 

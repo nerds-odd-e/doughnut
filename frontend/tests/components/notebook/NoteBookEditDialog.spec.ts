@@ -1,4 +1,4 @@
-import { Notebook } from "@/generated/backend"
+import type { Notebook } from "@/generated/backend"
 import NotebookEditDialog from "@/components/notebook/NotebookEditDialog.vue"
 import makeMe from "../../fixtures/makeMe"
 import helper from "../../helpers"

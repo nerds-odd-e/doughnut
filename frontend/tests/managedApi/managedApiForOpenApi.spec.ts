@@ -1,4 +1,5 @@
-import ManagedApi, { ApiStatus } from "@/managedApi/ManagedApi"
+import type { ApiStatus } from "@/managedApi/ManagedApi"
+import ManagedApi from "@/managedApi/ManagedApi"
 
 describe("managdApi", () => {
   const apiStatus: ApiStatus = { states: [], errors: [] }

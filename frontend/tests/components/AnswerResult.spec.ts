@@ -1,5 +1,5 @@
 import AnswerResult from "@/components/review/AnswerResult.vue"
-import { AnsweredQuestion } from "@/generated/backend"
+import type { AnsweredQuestion } from "@/generated/backend"
 import { flushPromises } from "@vue/test-utils"
 import makeMe from "../fixtures/makeMe"
 import helper from "../helpers"

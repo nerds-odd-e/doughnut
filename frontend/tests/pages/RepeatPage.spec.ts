@@ -1,4 +1,4 @@
-import { AnsweredQuestion } from "@/generated/backend"
+import type { AnsweredQuestion } from "@/generated/backend"
 import RepeatPage from "@/pages/RepeatPage.vue"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"

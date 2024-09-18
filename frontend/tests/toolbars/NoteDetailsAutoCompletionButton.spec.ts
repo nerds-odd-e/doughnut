@@ -1,11 +1,11 @@
 import AIClarifyingQuestionDialog from "@/components/notes/AIClarifyingQuestionDialog.vue"
 import NoteDetailsAutoCompletionButton from "@/components/notes/core/NoteDetailsAutoCompletionButton.vue"
-import {
+import type {
   AiAssistantResponse,
   AiCompletionParams,
-  CancelablePromise,
   Note,
 } from "@/generated/backend"
+import { CancelablePromise } from "@/generated/backend"
 import { flushPromises } from "@vue/test-utils"
 import makeMe from "../fixtures/makeMe"
 import helper from "../helpers"
