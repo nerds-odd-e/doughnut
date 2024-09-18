@@ -39,10 +39,10 @@
 </template>
 
 <script setup lang="ts">
-import { User } from "@/generated/backend"
+import type { User } from "@/generated/backend"
 import { type ApiStatus } from "@/managedApi/ManagedApi"
-import { StorageAccessor } from "@/store/createNoteStorage"
-import { PropType } from "vue"
+import type { StorageAccessor } from "@/store/createNoteStorage"
+import type { PropType } from "vue"
 
 defineProps({
   storageAccessor: {

@@ -16,7 +16,7 @@ import { QuillEditor } from "@vueup/vue-quill"
 import { ref, watch } from "vue"
 
 import "quill/dist/quill.snow.css"
-import { QuillOptions } from "quill"
+import type { QuillOptions } from "quill"
 
 const { modelValue, readonly } = defineProps({
   multipleLine: Boolean,

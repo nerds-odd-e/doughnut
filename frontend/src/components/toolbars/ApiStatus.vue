@@ -11,8 +11,9 @@
 <script lang="ts">
 import LastErrorMessage from "@/components/commons/LastErrorMessage.vue"
 import LoadingThinBar from "@/components/commons/LoadingThinBar.vue"
-import { ApiStatus } from "@/managedApi/ManagedApi"
-import { PropType, defineComponent } from "vue"
+import type { ApiStatus } from "@/managedApi/ManagedApi"
+import type { PropType } from "vue"
+import { defineComponent } from "vue"
 
 export default defineComponent({
   props: {

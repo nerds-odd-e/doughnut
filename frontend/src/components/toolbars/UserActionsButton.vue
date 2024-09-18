@@ -37,9 +37,9 @@
 <script setup lang="ts">
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import SvgMissingAvatar from "@/components/svgs/SvgMissingAvatar.vue"
-import { User } from "@/generated/backend"
+import type { User } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { PropType } from "vue"
+import type { PropType } from "vue"
 import UserProfileDialog from "./UserProfileDialog.vue"
 
 const { managedApi } = useLoadingApi()

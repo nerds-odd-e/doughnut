@@ -29,8 +29,8 @@
 </template>
 
 <script setup lang="ts">
-import { Circle, NoteTopic } from "@/generated/backend"
-import { PropType } from "vue"
+import type { Circle, NoteTopic } from "@/generated/backend"
+import type { PropType } from "vue"
 
 defineProps({
   noteTopic: {

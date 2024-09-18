@@ -11,8 +11,9 @@
 </template>
 
 <script lang="ts">
-import { PropType, defineComponent } from "vue"
-import { StorageAccessor } from "../../store/createNoteStorage"
+import type { PropType } from "vue"
+import { defineComponent } from "vue"
+import type { StorageAccessor } from "../../store/createNoteStorage"
 import SvgUndo from "../svgs/SvgUndo.vue"
 
 export default defineComponent({

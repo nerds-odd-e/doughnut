@@ -8,7 +8,8 @@
 
 <script setup lang="ts">
 import { NoteTopic } from "@/generated/backend"
-import { PropType, computed } from "vue"
+import type { PropType } from "vue"
+import { computed } from "vue"
 
 const props = defineProps({
   noteTopic: {

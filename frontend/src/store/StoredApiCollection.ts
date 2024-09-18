@@ -1,14 +1,16 @@
-import {
-  LinkCreation,
-  NoteCreationDTO,
+import type {
   NoteRealm,
   WikidataAssociationCreation,
 } from "@/generated/backend"
+import {
+  LinkCreation,
+  NoteCreationDTO,
+} from "@/generated/backend"
 import ManagedApi from "@/managedApi/ManagedApi"
-import { Ref } from "vue"
-import { Router } from "vue-router"
+import type { Ref } from "vue"
+import type { Router } from "vue-router"
 import NoteEditingHistory from "./NoteEditingHistory"
-import NoteStorage from "./NoteStorage"
+import type NoteStorage from "./NoteStorage"
 
 export interface StoredApi {
   getNoteRealmRefAndReloadPosition(
