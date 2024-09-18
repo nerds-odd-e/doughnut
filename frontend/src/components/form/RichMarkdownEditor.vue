@@ -10,7 +10,6 @@
 
 <script setup lang="ts">
 import { computed } from "vue"
-import "quill/dist/quill.snow.css"
 import RichHtmlEditor from "./RichHtmlEditor.vue"
 import markdownizer from "./markdownizer"
 

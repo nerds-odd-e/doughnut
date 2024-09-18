@@ -2,7 +2,21 @@
   <QuillEditor
     ref="quillEditor"
     v-model:content="localValue"
-    :options="editorOptions"
+    :options="{
+      modules: {
+            toolbar: false,
+            keyboard: {
+              bindings: {
+                custom: {
+                  key: 13,
+                  shiftKey: true,
+                  handler: onBlurTextField,
+                },
+              },
+            },
+          },
+          placeholder: readonly ? '' : 'Enter note details here...',
+    }"
     :content-type="'html'"
     :read-only="readonly"
     @blur="onBlurTextField"
@@ -11,64 +25,44 @@
   />
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { QuillEditor } from "@vueup/vue-quill"
-import { defineComponent } from "vue"
+import { ref, watch } from "vue"
 
 import "quill/dist/quill.snow.css"
 
-export default defineComponent({
-  props: {
-    multipleLine: Boolean,
-    modelValue: String,
-    scopeName: String,
-    field: String,
-    title: String,
-    errors: Object,
-    readonly: Boolean,
-  },
-  emits: ["update:modelValue", "blur"],
-  components: {
-    QuillEditor,
-  },
-  data() {
-    return {
-      editorOptions: {
-        modules: {
-          toolbar: false,
-          keyboard: {
-            bindings: {
-              custom: {
-                key: 13,
-                shiftKey: true,
-                handler: this.onBlurTextField,
-              },
-            },
-          },
-        },
-        placeholder: this.readonly ? "" : "Enter note details here...",
-      },
-      localValue: this.modelValue,
-      hadFocus: false as boolean,
-    }
-  },
-  watch: {
-    modelValue() {
-      this.localValue = this.modelValue
-    },
-  },
-  methods: {
-    onUpdateContent() {
-      if (this.localValue === this.modelValue) {
-        return
-      }
-      this.$emit("update:modelValue", this.localValue)
-    },
-    onBlurTextField() {
-      this.$emit("blur")
-    },
-  },
+const { modelValue, readonly } = defineProps({
+  multipleLine: Boolean,
+  modelValue: String,
+  scopeName: String,
+  field: String,
+  title: String,
+  errors: Object,
+  readonly: Boolean,
 })
+
+const emits = defineEmits(["update:modelValue", "blur"])
+
+const onBlurTextField = () => {
+  emits("blur")
+}
+
+const localValue = ref(modelValue)
+const hadFocus = ref(false)
+
+watch(
+  () => modelValue,
+  () => {
+    localValue.value = modelValue
+  }
+)
+
+const onUpdateContent = () => {
+  if (localValue.value === modelValue) {
+    return
+  }
+  emits("update:modelValue", localValue.value)
+}
 </script>
 
 <style lang="sass">
