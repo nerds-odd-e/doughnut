@@ -2,7 +2,6 @@
   "compilerOptions": {
     "sourceMap": true,
     "target": "ES2022",
-    "moduleResolution": "NodeNext",
     "esModuleInterop": true,
     "useDefineForClassFields": true,
     "strict": true,
@@ -17,9 +16,7 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": true,
     "isolatedModules": true,
-    "noImplicitAny": false,
-    "moduleDetection": "force",
-    "verbatimModuleSyntax": true
+    "noImplicitAny": false
   },
   "exclude": [
     "node_modules",

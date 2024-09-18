@@ -2,7 +2,10 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "module": "ESNext",
+    "moduleResolution": "Bundler",
     "resolveJsonModule": true,
+    "moduleDetection": "force",
+    "verbatimModuleSyntax": true,
     "baseUrl": ".",
     "lib": ["es2022", "dom", "dom.iterable"],
     "types": [
@@ -14,7 +17,6 @@
     "paths": {
       "@/*": ["src/*"]
     },
-    "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "noEmit": true,
     "jsx": "preserve"
