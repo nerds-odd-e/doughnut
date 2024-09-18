@@ -50,8 +50,9 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, computed, onMounted, ref } from "vue"
-import { AssessmentAttempt, User } from "@/generated/backend"
+import type { PropType } from "vue"
+import { computed, onMounted, ref } from "vue"
+import type { AssessmentAttempt, User } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import ContainerPage from "./commons/ContainerPage.vue"
 

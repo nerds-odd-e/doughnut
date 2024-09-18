@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts">
-import { AudioUploadDTO } from "@/generated/backend"
+import type { AudioUploadDTO } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { defineComponent } from "vue"
 import TextArea from "../../form/TextArea.vue"

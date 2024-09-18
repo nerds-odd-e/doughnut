@@ -27,10 +27,11 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, PropType, ref } from "vue"
+import type { PropType } from "vue"
+import { onMounted, ref } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
-import { Conversation, User } from "@/generated/backend"
+import type { Conversation, User } from "@/generated/backend"
 
 const { managedApi } = useLoadingApi()
 

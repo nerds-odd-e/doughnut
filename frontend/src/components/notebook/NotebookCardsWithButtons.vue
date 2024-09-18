@@ -17,8 +17,9 @@
 </template>
 
 <script lang="ts">
-import { Notebook } from "@/generated/backend"
-import { PropType, defineComponent } from "vue"
+import type { Notebook } from "@/generated/backend"
+import type { PropType } from "vue"
+import { defineComponent } from "vue"
 import Card from "../notes/Card.vue"
 
 export default defineComponent({

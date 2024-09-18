@@ -16,8 +16,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, PropType } from "vue"
-import { Circle, Notebook } from "@/generated/backend"
+import type { PropType } from "vue"
+import { ref, onMounted } from "vue"
+import type { Circle, Notebook } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import usePopups from "@/components/commons/Popups/usePopups"
 

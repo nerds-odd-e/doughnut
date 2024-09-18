@@ -15,8 +15,9 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, PropType } from "vue"
-import { Notebook, Subscription, User } from "@/generated/backend"
+import type { PropType } from "vue"
+import { onMounted, ref } from "vue"
+import type { Notebook, Subscription, User } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import NotebookNewButton from "@/components/notebook/NotebookNewButton.vue"
 import NotebookViewCards from "@/components/notebook/NotebookViewCards.vue"

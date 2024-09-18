@@ -39,7 +39,7 @@
 </template>
 
 <script lang="ts">
-import { NoteAccessory } from "@/generated/backend"
+import type { NoteAccessory } from "@/generated/backend"
 import { defineComponent } from "vue"
 import PopButton from "../../commons/Popups/PopButton.vue"
 import SvgImage from "../../svgs/SvgImage.vue"

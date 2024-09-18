@@ -8,9 +8,10 @@
 </template>
 
 <script lang="ts">
-import { NoteAccessory } from "@/generated/backend"
+import type { NoteAccessory } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { PropType, defineComponent } from "vue"
+import type { PropType } from "vue"
+import { defineComponent } from "vue"
 import NoteAccessoryDisplay from "./NoteAccessoryDisplay.vue"
 
 export default defineComponent({

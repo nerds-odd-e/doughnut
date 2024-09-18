@@ -40,14 +40,15 @@
 <script setup lang="ts">
 import Quiz from "@/components/review/Quiz.vue"
 import RepeatProgressBar from "@/components/review/RepeatProgressBar.vue"
-import { AnsweredQuestion } from "@/generated/backend"
+import type { AnsweredQuestion } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import getEnvironment from "@/managedApi/window/getEnvironment"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import { useRouter } from "vue-router"
-import { StorageAccessor } from "@/store/createNoteStorage"
+import type { StorageAccessor } from "@/store/createNoteStorage"
 import _ from "lodash"
-import { PropType, computed, onMounted, ref } from "vue"
+import type { PropType } from "vue"
+import { computed, onMounted, ref } from "vue"
 
 const $router = useRouter()
 const { managedApi } = useLoadingApi()

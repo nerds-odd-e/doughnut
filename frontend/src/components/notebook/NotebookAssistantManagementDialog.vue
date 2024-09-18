@@ -8,9 +8,10 @@
 </template>
 
 <script setup lang="ts">
-import { Notebook } from "@/generated/backend"
+import type { Notebook } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { PropType, ref } from "vue"
+import type { PropType } from "vue"
+import { ref } from "vue"
 import { saveAs } from "file-saver"
 import TextInput from "../form/TextInput.vue"
 

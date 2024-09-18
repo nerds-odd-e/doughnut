@@ -9,8 +9,9 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, computed, onMounted, ref } from "vue"
-import { Notebook, NotebookCertificateApproval } from "@/generated/backend"
+import type { PropType } from "vue"
+import { computed, onMounted, ref } from "vue"
+import type { Notebook, NotebookCertificateApproval } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 
 const { managedApi } = useLoadingApi()

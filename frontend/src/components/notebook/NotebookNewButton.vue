@@ -8,8 +8,9 @@
 </template>
 
 <script lang="ts">
-import { Circle } from "@/generated/backend"
-import { PropType, defineComponent } from "vue"
+import type { Circle } from "@/generated/backend"
+import type { PropType } from "vue"
+import { defineComponent } from "vue"
 import PopButton from "../commons/Popups/PopButton.vue"
 import NotebookNewDialog from "./NotebookNewDialog.vue"
 

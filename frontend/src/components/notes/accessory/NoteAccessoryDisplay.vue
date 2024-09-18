@@ -23,8 +23,9 @@
 </template>
 
 <script lang="ts">
-import { Audio, NoteAccessory } from "@/generated/backend"
-import { PropType, defineComponent } from "vue"
+import type { Audio, NoteAccessory } from "@/generated/backend"
+import type { PropType } from "vue"
+import { defineComponent } from "vue"
 import ShowImage from "./ShowImage.vue"
 
 export default defineComponent({

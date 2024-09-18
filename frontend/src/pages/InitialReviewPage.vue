@@ -21,14 +21,15 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, computed, onMounted, ref } from "vue"
+import type { PropType } from "vue"
+import { computed, onMounted, ref } from "vue"
 import { useRouter } from "vue-router"
-import { Note } from "@/generated/backend"
+import type { Note } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import ProgressBar from "@/components/commons/ProgressBar.vue"
 import InitialReview from "@/components/review/InitialReview.vue"
-import { StorageAccessor } from "@/store/createNoteStorage"
+import type { StorageAccessor } from "@/store/createNoteStorage"
 import ContainerPage from "./commons/ContainerPage.vue"
 
 const router = useRouter()

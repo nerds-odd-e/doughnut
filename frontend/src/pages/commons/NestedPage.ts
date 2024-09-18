@@ -1,9 +1,10 @@
-import { PropType, defineComponent, h, VNode } from "vue"
+import type { PropType, VNode } from "vue"
+import { defineComponent, h } from "vue"
 import { RouterView } from "vue-router"
-import { User } from "@/generated/backend"
+import type { User } from "@/generated/backend"
 import usePopups from "../../components/commons/Popups/usePopups"
 import routerScopeGuard from "../../routes/relative_routes"
-import { StorageAccessor } from "../../store/createNoteStorage"
+import type { StorageAccessor } from "../../store/createNoteStorage"
 
 interface NestedPageProps {
   storageAccessor: StorageAccessor

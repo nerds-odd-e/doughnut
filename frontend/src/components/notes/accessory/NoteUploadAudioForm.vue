@@ -10,8 +10,9 @@
 </template>
 
 <script lang="ts">
-import { AudioUploadDTO } from "@/generated/backend"
-import { PropType, defineComponent, computed } from "vue"
+import type { AudioUploadDTO } from "@/generated/backend"
+import type { PropType } from "vue"
+import { defineComponent, computed } from "vue"
 import FileInput from "../../form/FileInput.vue"
 
 export default defineComponent({

@@ -11,10 +11,11 @@
 <script lang="ts">
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import AnsweredQuestionComponent from "@/components/review/AnsweredQuestionComponent.vue"
-import { AnsweredQuestion } from "@/generated/backend"
+import type { AnsweredQuestion } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { StorageAccessor } from "@/store/createNoteStorage"
-import { PropType, defineComponent } from "vue"
+import type { StorageAccessor } from "@/store/createNoteStorage"
+import type { PropType } from "vue"
+import { defineComponent } from "vue"
 
 export default defineComponent({
   setup() {

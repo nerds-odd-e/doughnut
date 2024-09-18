@@ -38,8 +38,9 @@
 </template>
 
 <script lang="ts">
-import { NoteAccessoriesDTO } from "@/generated/backend"
-import { PropType, defineComponent, computed } from "vue"
+import type { NoteAccessoriesDTO } from "@/generated/backend"
+import type { PropType } from "vue"
+import { defineComponent, computed } from "vue"
 import CheckInput from "../../form/CheckInput.vue"
 import FileInput from "../../form/FileInput.vue"
 import TextInput from "../../form/TextInput.vue"

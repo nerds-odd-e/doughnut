@@ -7,8 +7,9 @@
   </div>
 </template>
 <script setup lang="ts">
-import { onMounted, PropType, ref } from "vue"
-import { Note, Notebook } from "@/generated/backend"
+import type { PropType } from "vue"
+import { onMounted, ref } from "vue"
+import type { Note, Notebook } from "@/generated/backend"
 import Questions from "../notes/Questions.vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 const props = defineProps({

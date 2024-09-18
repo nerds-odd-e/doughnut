@@ -16,8 +16,9 @@
 </template>
 
 <script lang="ts">
-import { PropType, defineComponent } from "vue"
-import { BazaarNotebook, User } from "@/generated/backend"
+import type { PropType } from "vue"
+import { defineComponent } from "vue"
+import type { BazaarNotebook, User } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import NotebookBazaarViewCards from "@/components/bazaar/NotebookBazaarViewCards.vue"
 import ContainerPage from "./commons/ContainerPage.vue"
