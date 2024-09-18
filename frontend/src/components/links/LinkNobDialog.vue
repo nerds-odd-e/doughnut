@@ -32,8 +32,9 @@
 
 <script lang="ts">
 import { LinkCreation, NoteTopic } from "@/generated/backend"
-import { PropType, defineComponent } from "vue"
-import { StorageAccessor } from "../../store/createNoteStorage"
+import type { PropType } from "vue"
+import { defineComponent } from "vue"
+import type { StorageAccessor } from "../../store/createNoteStorage"
 import usePopups from "../commons/Popups/usePopups"
 import NoteTopicWithLink from "../notes/NoteTopicWithLink.vue"
 import LinkTypeSelect from "./LinkTypeSelect.vue"

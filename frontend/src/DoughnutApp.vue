@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import { Ref, computed, onMounted, provide, ref } from "vue"
+import type { Ref } from "vue"
+import { computed, onMounted, provide, ref } from "vue"
 import { useRoute } from "vue-router"
 import Popups from "./components/commons/Popups/Popups.vue"
 import TestMenu from "./components/commons/TestMenu.vue"
 import UserNewRegisterPage from "./pages/UserNewRegisterPage.vue"
 import createNoteStorage from "./store/createNoteStorage"
-import ManagedApi, { ApiStatus } from "./managedApi/ManagedApi"
+import type { ApiStatus } from "./managedApi/ManagedApi"
+import ManagedApi from "./managedApi/ManagedApi"
 import GlobalBar from "./components/toolbars/GlobalBar.vue"
-import { User } from "./generated/backend"
+import type { User } from "./generated/backend"
 import getEnvironment from "./managedApi/window/getEnvironment"
 
 interface RouteViewProps {

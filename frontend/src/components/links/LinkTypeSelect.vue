@@ -14,7 +14,8 @@
 
 <script setup lang="ts">
 import { NoteTopic } from "@/generated/backend"
-import { PropType, computed } from "vue"
+import type { PropType } from "vue"
+import { computed } from "vue"
 import { linkTypeOptions } from "../../models/linkTypeOptions"
 import RadioButtons from "../form/RadioButtons.vue"
 import SvgLinkTypeIcon from "../svgs/SvgLinkTypeIcon.vue"

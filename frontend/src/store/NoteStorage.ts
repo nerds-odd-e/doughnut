@@ -1,5 +1,6 @@
-import { NoteRealm } from "@/generated/backend"
-import { Ref, ref } from "vue"
+import type { NoteRealm } from "@/generated/backend"
+import type { Ref } from "vue"
+import { ref } from "vue"
 
 export default interface NoteStorage {
   refreshNoteRealm(data: NoteRealm): NoteRealm

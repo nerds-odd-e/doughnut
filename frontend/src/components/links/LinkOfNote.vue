@@ -12,10 +12,11 @@
 </template>
 
 <script lang="ts">
-import { Note } from "@/generated/backend"
-import { PropType, defineComponent } from "vue"
+import type { Note } from "@/generated/backend"
+import type { PropType } from "vue"
+import { defineComponent } from "vue"
 import { colors } from "../../colors"
-import { StorageAccessor } from "../../store/createNoteStorage"
+import type { StorageAccessor } from "../../store/createNoteStorage"
 import NoteTopicComponent from "../notes/core/NoteTopicComponent.vue"
 import LinkNob from "./LinkNob.vue"
 

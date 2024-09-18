@@ -1,7 +1,10 @@
 import ManagedApi from "@/managedApi/ManagedApi"
-import NoteEditingHistory, { HistoryRecord } from "./NoteEditingHistory"
-import NoteStorage, { StorageImplementation } from "./NoteStorage"
-import StoredApiCollection, { StoredApi } from "./StoredApiCollection"
+import type { HistoryRecord } from "./NoteEditingHistory"
+import NoteEditingHistory from "./NoteEditingHistory"
+import type NoteStorage from "./NoteStorage"
+import { StorageImplementation } from "./NoteStorage"
+import type { StoredApi } from "./StoredApiCollection"
+import StoredApiCollection from "./StoredApiCollection"
 
 interface StorageAccessor extends NoteStorage {
   storedApi(): StoredApi

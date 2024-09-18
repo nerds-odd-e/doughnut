@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import { PropType } from "vue"
+import type { PropType } from "vue"
 import { NoteTopic } from "@/generated/backend"
 import SvgLinkTypeIcon from "../svgs/SvgLinkTypeIcon.vue"
 

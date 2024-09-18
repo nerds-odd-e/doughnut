@@ -24,7 +24,8 @@
 </template>
 
 <script lang="ts">
-import { NoteTopic, SearchTerm } from "@/generated/backend"
+import type { SearchTerm } from "@/generated/backend"
+import { NoteTopic } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { debounce } from "mini-debounce"
 import { defineComponent } from "vue"

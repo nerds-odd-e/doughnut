@@ -7,7 +7,8 @@
 
 <script lang="ts">
 import { NoteTopic } from "@/generated/backend"
-import { PropType, defineComponent } from "vue"
+import type { PropType } from "vue"
+import { defineComponent } from "vue"
 import Breadcrumb from "../toolbars/Breadcrumb.vue"
 
 export default defineComponent({

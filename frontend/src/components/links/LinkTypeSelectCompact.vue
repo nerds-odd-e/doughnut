@@ -29,7 +29,8 @@
 <script setup lang="ts">
 import { NoteCreationDTO, NoteTopic } from "@/generated/backend"
 import { camelCase, startCase } from "lodash"
-import { PropType, computed } from "vue"
+import type { PropType } from "vue"
+import { computed } from "vue"
 import PopButton from "../commons/Popups/PopButton.vue"
 import InputWithType from "../form/InputWithType.vue"
 import SvgLinkTypeIcon from "../svgs/SvgLinkTypeIcon.vue"

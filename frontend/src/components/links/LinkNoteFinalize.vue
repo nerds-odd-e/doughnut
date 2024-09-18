@@ -41,15 +41,17 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, ref, computed } from "vue"
-import { LinkCreation, Note, NoteTopic } from "@/generated/backend"
+import type { PropType } from "vue"
+import { ref, computed } from "vue"
+import type { Note } from "@/generated/backend"
+import { LinkCreation, NoteTopic } from "@/generated/backend"
 import LinkTypeSelect from "./LinkTypeSelect.vue"
 import NoteTopicComponent from "../notes/core/NoteTopicComponent.vue"
 import CheckInput from "../form/CheckInput.vue"
 import RadioButtons from "../form/RadioButtons.vue"
 import SvgGoBack from "../svgs/SvgGoBack.vue"
 import usePopups from "../commons/Popups/usePopups"
-import { StorageAccessor } from "../../store/createNoteStorage"
+import type { StorageAccessor } from "../../store/createNoteStorage"
 
 const { popups } = usePopups()
 

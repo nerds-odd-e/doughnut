@@ -1,4 +1,4 @@
-import { RouteLocation, RouteRecordRaw } from "vue-router"
+import type { RouteLocation, RouteRecordRaw } from "vue-router"
 import HomePage from "@/pages/HomePage.vue"
 import BazaarPage from "@/pages/BazaarPage.vue"
 import NotebooksPage from "@/pages/NotebooksPage.vue"
