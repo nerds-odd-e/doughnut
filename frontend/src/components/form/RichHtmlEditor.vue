@@ -13,7 +13,7 @@
 
 <script setup lang="ts">
 import { QuillEditor } from "@vueup/vue-quill"
-import { onBeforeUnmount, onMounted, ref, watch } from "vue"
+import { ref, watch } from "vue"
 
 import "quill/dist/quill.snow.css"
 import type { QuillOptions } from "quill"
@@ -28,24 +28,24 @@ const { modelValue, readonly } = defineProps({
   readonly: Boolean,
 })
 
-const quillEditor = ref<null | HTMLElement>(null)
+const emits = defineEmits(["update:modelValue", "blur"])
 
 const onBlurTextField = () => {
   emits("blur")
 }
 
-onMounted(() => {
-  quillEditor.value = document.querySelector(".ql-editor")
-  quillEditor.value!.addEventListener("blur", () => {
-    onBlurTextField()
-  })
-})
-
-const emits = defineEmits(["update:modelValue", "blur"])
-
 const options: QuillOptions = {
   modules: {
     toolbar: false,
+    keyboard: {
+      bindings: {
+        custom: {
+          key: 13,
+          shiftKey: true,
+          handler: onBlurTextField,
+        },
+      },
+    },
   },
   placeholder: readonly ? "" : "Enter note details here...",
 }
@@ -66,10 +66,6 @@ const onUpdateContent = () => {
   }
   emits("update:modelValue", localValue.value)
 }
-
-onBeforeUnmount(() => {
-  onBlurTextField()
-})
 </script>
 
 <style lang="sass">
