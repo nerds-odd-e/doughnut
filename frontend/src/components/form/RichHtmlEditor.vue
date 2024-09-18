@@ -1,16 +1,15 @@
 <template>
   <QuillEditor
     v-model="localValue"
-    :read-only="readonly"
+    :readonly="readonly"
     @blur="$emit('blur')"
   />
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref, watch } from "vue"
-
-import "quill/dist/quill.snow.css"
 import QuillEditor from "./QuillEditor.vue"
+import "quill/dist/quill.snow.css"
 
 const { modelValue, readonly } = defineProps({
   multipleLine: Boolean,
