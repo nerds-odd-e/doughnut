@@ -8,36 +8,28 @@
   />
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue"
+<script setup lang="ts">
+import { computed } from "vue"
 import "quill/dist/quill.snow.css"
 import RichHtmlEditor from "./RichHtmlEditor.vue"
 import markdownizer from "./markdownizer"
 
-export default defineComponent({
-  props: {
-    multipleLine: Boolean,
-    modelValue: String,
-    scopeName: String,
-    field: String,
-    title: String,
-    errors: Object,
-    readonly: Boolean,
-  },
-  emits: ["update:modelValue", "blur"],
-  components: {
-    RichHtmlEditor,
-  },
-  computed: {
-    htmlValue() {
-      return markdownizer.markdownToHtml(this.modelValue)
-    },
-  },
-  methods: {
-    htmlValueUpdated(htmlValue) {
-      const markdownValue = markdownizer.htmlToMarkdown(htmlValue)
-      this.$emit("update:modelValue", markdownValue)
-    },
-  },
+const { modelValue } = defineProps({
+  multipleLine: Boolean,
+  modelValue: String,
+  scopeName: String,
+  field: String,
+  title: String,
+  errors: Object,
+  readonly: Boolean,
 })
+
+const emits = defineEmits(["update:modelValue", "blur"])
+
+const htmlValue = computed(() => markdownizer.markdownToHtml(modelValue))
+
+const htmlValueUpdated = (htmlValue: string) => {
+  const markdownValue = markdownizer.htmlToMarkdown(htmlValue)
+  emits("update:modelValue", markdownValue)
+}
 </script>
