@@ -1,5 +1,5 @@
 import WikidataAssociationDialog from "@/components/notes/WikidataAssociationDialog.vue"
-import { Note } from "@/generated/backend"
+import type { Note } from "@/generated/backend"
 import { VueWrapper, flushPromises } from "@vue/test-utils"
 import makeMe from "../fixtures/makeMe"
 import helper from "../helpers"

@@ -1,8 +1,8 @@
 import NoteTextContent from "@/components/notes/core/NoteTextContent.vue"
 import TextContentWrapper from "@/components/notes/core/TextContentWrapper.vue"
-import { Note } from "@/generated/backend"
+import type { Note } from "@/generated/backend"
 import { VueWrapper, flushPromises } from "@vue/test-utils"
-import { ComponentPublicInstance } from "vue"
+import type { ComponentPublicInstance } from "vue"
 import makeMe from "../fixtures/makeMe"
 import helper from "../helpers"
 

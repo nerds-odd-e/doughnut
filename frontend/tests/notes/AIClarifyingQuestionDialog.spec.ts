@@ -1,5 +1,5 @@
 import AIClarifyingQuestionDialog from "@/components/notes/AIClarifyingQuestionDialog.vue"
-import { ClarifyingQuestion } from "@/generated/backend"
+import type { ClarifyingQuestion } from "@/generated/backend"
 import { VueWrapper } from "@vue/test-utils"
 import helper from "../helpers"
 

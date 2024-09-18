@@ -1,6 +1,6 @@
 import scrollToElement from "@/components/commons/scrollToElement"
 import NoteChatDialog from "@/components/notes/NoteChatDialog.vue"
-import { Message, MessageDelta } from "@/generated/backend"
+import type { Message, MessageDelta } from "@/generated/backend"
 import { VueWrapper, flushPromises } from "@vue/test-utils"
 import { beforeEach, expect } from "vitest"
 import makeMe from "../fixtures/makeMe"

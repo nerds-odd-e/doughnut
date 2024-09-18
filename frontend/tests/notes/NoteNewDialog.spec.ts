@@ -1,6 +1,6 @@
 import NoteNewDialog from "@/components/notes/NoteNewDialog.vue"
 import { VueWrapper, flushPromises } from "@vue/test-utils"
-import { ComponentPublicInstance } from "vue"
+import type { ComponentPublicInstance } from "vue"
 import makeMe from "../fixtures/makeMe"
 import helper from "../helpers"
 
