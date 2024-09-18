@@ -12,8 +12,8 @@
 </template>
 
 <script setup lang="ts">
-import { PropType } from "vue"
-import { StorageAccessor } from "../../store/createNoteStorage"
+import type { PropType } from "vue"
+import type { StorageAccessor } from "../../store/createNoteStorage"
 
 defineProps({
   noteId: { type: Number, required: true },

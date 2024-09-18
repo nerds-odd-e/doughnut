@@ -24,9 +24,10 @@
 </template>
 
 <script lang="ts">
-import { ReviewSetting } from "@/generated/backend"
+import type { ReviewSetting } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { PropType, defineComponent, computed, ref } from "vue"
+import type { PropType } from "vue"
+import { defineComponent, computed, ref } from "vue"
 import CheckInput from "../form/CheckInput.vue"
 import RadioButtons from "../form/RadioButtons.vue"
 

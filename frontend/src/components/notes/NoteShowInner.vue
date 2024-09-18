@@ -58,11 +58,12 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, ref } from "vue"
-import { NoteAccessory, NoteRealm } from "@/generated/backend"
+import type { PropType } from "vue"
+import { ref } from "vue"
+import type { NoteAccessory, NoteRealm } from "@/generated/backend"
 import NoteTextContent from "./core/NoteTextContent.vue"
 import ChildrenNotes from "./ChildrenNotes.vue"
-import { StorageAccessor } from "../../store/createNoteStorage"
+import type { StorageAccessor } from "../../store/createNoteStorage"
 import NoteAccessoryAsync from "./accessory/NoteAccessoryAsync.vue"
 import NoteCoreToolbar from "./core/NoteCoreToolbar.vue"
 import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue"

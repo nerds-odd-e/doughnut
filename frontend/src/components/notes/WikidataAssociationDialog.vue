@@ -39,10 +39,11 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, ref } from "vue"
-import { Note, WikidataAssociationCreation } from "@/generated/backend"
+import type { PropType } from "vue"
+import { ref } from "vue"
+import type { Note, WikidataAssociationCreation } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { StorageAccessor } from "@/store/createNoteStorage"
+import type { StorageAccessor } from "@/store/createNoteStorage"
 import TextInput from "../form/TextInput.vue"
 import NoteTopicComponent from "./core/NoteTopicComponent.vue"
 

@@ -9,8 +9,8 @@
 </template>
 
 <script setup lang="ts">
-import { PropType } from "vue"
-import { AnswerDTO, ReviewQuestionInstance } from "@/generated/backend"
+import type { PropType } from "vue"
+import type { AnswerDTO, ReviewQuestionInstance } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import usePopups from "../commons/Popups/usePopups"
 import QuestionDisplay from "../review/QuestionDisplay.vue"

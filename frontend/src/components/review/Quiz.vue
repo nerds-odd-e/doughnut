@@ -26,11 +26,12 @@
 
 <script lang="ts">
 import ContentLoader from "@/components/commons/ContentLoader.vue"
-import { AnsweredQuestion, ReviewQuestionInstance } from "@/generated/backend"
+import type { AnsweredQuestion, ReviewQuestionInstance } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { StorageAccessor } from "@/store/createNoteStorage"
+import type { StorageAccessor } from "@/store/createNoteStorage"
 import _ from "lodash"
-import { PropType, defineComponent } from "vue"
+import type { PropType } from "vue"
+import { defineComponent } from "vue"
 import ContestableQuestion from "./ContestableQuestion.vue"
 import JustReview from "./JustReview.vue"
 

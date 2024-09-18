@@ -7,10 +7,11 @@
 
 <script lang="ts">
 import ContentLoader from "@/components/commons/ContentLoader.vue"
-import { ReviewPoint } from "@/generated/backend"
+import type { ReviewPoint } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { StorageAccessor } from "@/store/createNoteStorage"
-import { PropType, defineComponent } from "vue"
+import type { StorageAccessor } from "@/store/createNoteStorage"
+import type { PropType } from "vue"
+import { defineComponent } from "vue"
 import NoteWithBreadcrumb from "./NoteWithBreadcrumb.vue"
 
 export default defineComponent({

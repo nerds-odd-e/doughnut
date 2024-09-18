@@ -75,8 +75,9 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, onMounted, ref } from "vue"
-import { Note, PredefinedQuestion } from "@/generated/backend"
+import type { PropType } from "vue"
+import { onMounted, ref } from "vue"
+import type { Note, PredefinedQuestion } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import NoteAddQuestion from "./NoteAddQuestion.vue"
 import QuestionManagement from "./QuestionManagement.vue"
