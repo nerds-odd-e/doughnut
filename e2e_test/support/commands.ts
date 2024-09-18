@@ -60,10 +60,14 @@ Cypress.Commands.add('inPlaceEdit', (noteAttributes) => {
   for (const propName in noteAttributes) {
     const value = noteAttributes[propName]
     if (value) {
+      const elm = cy.findByRole(propName.toLowerCase())
+      elm.click()
       cy.findByRole(propName.toLowerCase()).click()
-      cy.replaceFocusedTextAndEnter(value)
+      cy.clearFocusedText().type(value)
+      elm.focused().blur()
     }
   }
+  cy.pageIsNotLoading()
 })
 
 Cypress.Commands.add(
