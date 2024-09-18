@@ -117,8 +117,7 @@ When('I create a notebook with empty topic', () => {
 When(
   'I update note {string} to become:',
   (noteTopic: string, data: DataTable) => {
-    start.jumpToNotePage(noteTopic)
-    cy.inPlaceEdit(data.hashes()[0])
+    start.jumpToNotePage(noteTopic).editTextContent(data.hashes()[0]!)
   }
 )
 
@@ -171,8 +170,7 @@ When(
 When(
   'I can change the topic {string} to {string}',
   (noteTopic: string, newNoteTopic: string) => {
-    start.assumeNotePage(noteTopic)
-    cy.inPlaceEdit({ topic: newNoteTopic })
+    start.assumeNotePage(noteTopic).editTextContent({ topic: newNoteTopic })
     start.assumeNotePage(newNoteTopic)
   }
 )
@@ -180,24 +178,22 @@ When(
 Given(
   'I update note topic {string} to become {string}',
   (noteTopic: string, newNoteTopic: string) => {
-    start.jumpToNotePage(noteTopic)
-    cy.inPlaceEdit({ topic: newNoteTopic })
+    start.jumpToNotePage(noteTopic).editTextContent({ topic: newNoteTopic })
   }
 )
 
 Given(
   'I update note {string} details from {string} to become {string}',
-  (_noteTopic: string, noteDetails: string, newNoteDetails: string) => {
+  (noteTopic: string, noteDetails: string, newNoteDetails: string) => {
     cy.findByText(noteDetails).click({ force: true })
-    cy.replaceFocusedTextAndEnter(newNoteDetails)
+    start.assumeNotePage(noteTopic).editTextContent({ Details: newNoteDetails })
   }
 )
 
 When(
   'I update note {string} with details {string}',
   (noteTopic: string, newDetails: string) => {
-    start.jumpToNotePage(noteTopic)
-    cy.inPlaceEdit({ Details: newDetails })
+    start.jumpToNotePage(noteTopic).editTextContent({ Details: newDetails })
     start.assumeNotePage().findNoteDetails(newDetails)
   }
 )

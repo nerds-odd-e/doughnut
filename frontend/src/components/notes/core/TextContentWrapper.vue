@@ -1,10 +1,12 @@
 <template>
-  <slot
-    :value="localValue"
-    :update="onUpdate"
-    :blur="onBlur"
-    :errors="errors"
-  />
+  <div :class="wrapperClass">
+    <slot
+      :value="localValue"
+      :update="onUpdate"
+      :blur="onBlur"
+      :errors="errors"
+    />
+  </div>
 </template>
 
 <script lang="ts">
@@ -54,6 +56,15 @@ export default defineComponent({
     }
   },
 
+  computed: {
+    wrapperClass() {
+      if (this.version !== this.savedVersion) {
+        return "dirty"
+      }
+      return ""
+    },
+  },
+
   methods: {
     onUpdate(noteId: number, newValue: string) {
       this.version += 1
@@ -97,3 +108,21 @@ export default defineComponent({
   },
 })
 </script>
+
+<style lang="sass">
+.dirty
+  position: relative
+  background-color: transparent
+  &::after
+    content: ""
+    position: absolute
+    top: 0
+    right: 0
+    border-top: 5px solid transparent
+    border-left: 5px solid transparent
+    border-right: 5px solid red
+    border-bottom: 5px solid red
+    transform: rotate(-90deg)
+    z-index: 1000
+
+  </style>

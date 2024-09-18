@@ -30,7 +30,6 @@ declare namespace Cypress {
       additional_info,
       skip,
     }: any): Chainable<any>
-    inPlaceEdit(noteAttributes: any): Chainable<any>
     noteByTitle(noteTopic: string): Chainable<any>
     pageIsNotLoading(): Chainable<any>
     clearFocusedText(): Chainable<any>

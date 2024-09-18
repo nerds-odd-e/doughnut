@@ -18,7 +18,7 @@
 </template>
 
 <script setup lang="ts">
-import type { PropType } from "vue"
+import { type PropType } from "vue"
 import type { Note } from "@/generated/backend"
 import type { StorageAccessor } from "../../../store/createNoteStorage"
 import NoteEditableTopic from "./NoteEditableTopic.vue"

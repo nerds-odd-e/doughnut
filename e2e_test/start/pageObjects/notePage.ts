@@ -137,6 +137,17 @@ export const assumeNotePage = (noteTopic?: string) => {
     toolbarButton: (btnTextOrTitle: string) => {
       return privateToolbarButton(btnTextOrTitle)
     },
+    editTextContent: (noteAttributes: Record<string, string>) => {
+      for (const propName in noteAttributes) {
+        const value = noteAttributes[propName]
+        if (value) {
+          cy.findByRole(propName.toLowerCase()).click()
+          cy.clearFocusedText().type(value).blur()
+          cy.get('.dirty').should('not.exist')
+        }
+      }
+      cy.pageIsNotLoading()
+    },
     editNoteImage() {
       return this.toolbarButton('edit note image')
     },

@@ -53,21 +53,7 @@ Cypress.Commands.add('clearFocusedText', () => {
 })
 
 Cypress.Commands.add('replaceFocusedTextAndEnter', (text) => {
-  cy.clearFocusedText().type(text).type('{shift}{enter}')
-})
-
-Cypress.Commands.add('inPlaceEdit', (noteAttributes) => {
-  for (const propName in noteAttributes) {
-    const value = noteAttributes[propName]
-    if (value) {
-      const elm = cy.findByRole(propName.toLowerCase())
-      elm.click()
-      cy.findByRole(propName.toLowerCase()).click()
-      cy.clearFocusedText().type(value)
-      elm.focused().blur()
-    }
-  }
-  cy.pageIsNotLoading()
+  cy.clearFocusedText().type(text).type('{enter}')
 })
 
 Cypress.Commands.add(
