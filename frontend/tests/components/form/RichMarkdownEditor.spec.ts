@@ -8,7 +8,6 @@ describe("RichMarkdownEditor", () => {
       .component(RichMarkdownEditor)
       .withProps({
         modelValue: "initial value",
-        noteId: 3,
       })
       .mount()
 

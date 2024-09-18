@@ -1,5 +1,5 @@
-import { marked } from "marked"
 import TurndownService from "turndown"
+import markdownToQuillHtml from "./markdownToQuillHtml"
 
 export const turndownService = new TurndownService({
   br: "<br>",
@@ -17,10 +17,7 @@ turndownService.addRule("p", {
 })
 
 export default {
-  markdownToHtml(markdown: string | undefined): string {
-    const result = marked(markdown || "") as string
-    return result.trim().replace(/>\s+</g, "><")
-  },
+  markdownToHtml: markdownToQuillHtml,
   htmlToMarkdown(html: string) {
     return turndownService.turndown(html)
   },

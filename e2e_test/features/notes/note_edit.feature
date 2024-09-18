@@ -26,7 +26,6 @@ Feature: Note Edit
     Then I should see "LeSS in Action" in the page
     And there should be no more undo to do
 
-  @ignore
   Scenario: Edit a note's details as markdown
     When I update note "LeSS in Action" details using markdown to become:
     """
