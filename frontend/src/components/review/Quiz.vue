@@ -26,7 +26,10 @@
 
 <script lang="ts">
 import ContentLoader from "@/components/commons/ContentLoader.vue"
-import type { AnsweredQuestion, ReviewQuestionInstance } from "@/generated/backend"
+import type {
+  AnsweredQuestion,
+  ReviewQuestionInstance,
+} from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import _ from "lodash"
