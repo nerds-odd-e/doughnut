@@ -7,7 +7,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from "vue"
+import { ref, watch } from "vue"
 import QuillEditor from "./QuillEditor.vue"
 import "quill/dist/quill.snow.css"
 
@@ -19,22 +19,6 @@ const { modelValue, readonly } = defineProps({
   title: String,
   errors: Object,
   readonly: Boolean,
-})
-
-const quillEditor = ref<null | HTMLElement>(null)
-
-const onBlurTextField = () => {
-  emits("blur")
-}
-
-onMounted(() => {
-  quillEditor.value = document.querySelector(".ql-editor")
-  if (!quillEditor.value) {
-    return
-  }
-  quillEditor.value.addEventListener("blur", () => {
-    onBlurTextField()
-  })
 })
 
 const emits = defineEmits(["update:modelValue", "blur"])

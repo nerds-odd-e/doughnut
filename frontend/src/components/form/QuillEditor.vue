@@ -15,12 +15,10 @@ const { modelValue, readonly } = defineProps({
 const emits = defineEmits(["update:modelValue", "blur"])
 
 const localValue = ref(modelValue)
-const hadFocus = ref(false)
 const editor = ref<HTMLElement | null>(null)
 const quill = ref<Quill | null>(null)
 
 const onBlurTextField = () => {
-  console.log("blur")
   emits("blur")
 }
 
@@ -47,18 +45,15 @@ onMounted(() => {
       onUpdateContent()
     })
 
-    // Handle focus and blur events
     quill.value.on("selection-change", (range) => {
-      if (range) {
-        // Focused
-        if (!hadFocus.value) {
-          hadFocus.value = true
-          // Emit focus event if needed
-        }
-      } else {
-        hadFocus.value = false
+      if (!range) {
         onBlurTextField()
       }
+    })
+
+    // Strangely, Quill does not emit a blur event when the inner editor receives a blur event
+    quill.value.root.addEventListener("blur", () => {
+      quill.value?.blur()
     })
   }
 })
