@@ -1,5 +1,5 @@
 <template>
-  <RichHtmlEditor
+  <QuillEditor
     v-bind="{ multipleLine, scopeName, field, title, errors }"
     :model-value="htmlValue"
     :readonly="readonly"
@@ -10,7 +10,7 @@
 
 <script setup lang="ts">
 import { computed } from "vue"
-import RichHtmlEditor from "./RichHtmlEditor.vue"
+import QuillEditor from "./QuillEditor.vue"
 import markdownizer from "./markdownizer"
 
 const { modelValue } = defineProps({
