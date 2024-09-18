@@ -1,4 +1,5 @@
-import { Note, NoteTopic } from "@/generated/backend"
+import type { Note } from "@/generated/backend"
+import { NoteTopic } from "@/generated/backend"
 import Builder from "./Builder"
 import NoteBuilder from "./NoteBuilder"
 

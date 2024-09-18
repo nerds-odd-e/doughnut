@@ -1,4 +1,4 @@
-import { BazaarNotebook, Notebook } from "@/generated/backend"
+import type { BazaarNotebook, Notebook } from "@/generated/backend"
 import Builder from "./Builder"
 import generateId from "./generateId"
 

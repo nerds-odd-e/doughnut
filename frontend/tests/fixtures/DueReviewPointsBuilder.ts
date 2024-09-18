@@ -1,4 +1,4 @@
-import { DueReviewPoints } from "@/generated/backend"
+import type { DueReviewPoints } from "@/generated/backend"
 import Builder from "./Builder"
 
 class RepetitionBuilder extends Builder<DueReviewPoints> {

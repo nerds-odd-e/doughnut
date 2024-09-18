@@ -1,4 +1,4 @@
-import { WikidataEntityData } from "@/generated/backend"
+import type { WikidataEntityData } from "@/generated/backend"
 import Builder from "./Builder"
 
 class WikidataEntityBuilder extends Builder<WikidataEntityData> {
