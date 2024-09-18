@@ -12,7 +12,7 @@
 <script setup lang="ts">
 import { debounce } from "lodash"
 import type { PropType } from "vue"
-import { onUnmounted, ref, watch } from "vue"
+import { computed, onUnmounted, ref, watch } from "vue"
 import { type StorageAccessor } from "../../../store/createNoteStorage"
 
 const { storageAccessor, field, value } = defineProps({

@@ -1,5 +1,4 @@
 import NoteTextContent from "@/components/notes/core/NoteTextContent.vue"
-import TextContentWrapper from "@/components/notes/core/TextContentWrapper.vue"
 import type { Note } from "@/generated/backend"
 import { VueWrapper, flushPromises } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"
@@ -41,19 +40,10 @@ describe("in place edit on title", () => {
   })
 
   it("should not save change when not unmount", async () => {
-    // because the components always get unmounted after each test
-    // we simulate the before unmount siutation by replacing the unmounted method
-    // with an empty function.
-    const mockUnmounted = vitest
-      .spyOn(TextContentWrapper, "unmounted" as keyof typeof TextContentWrapper)
-      .mockImplementation(() => {
-        // noop
-      })
     const wrapper = mountComponent(note)
     await wrapper.find('[role="topic"]').trigger("click")
     await wrapper.find('[role="topic"] input').setValue("updated")
     wrapper.unmount()
-    mockUnmounted.mockRestore()
   })
 
   it("is not editable when readonly", async () => {

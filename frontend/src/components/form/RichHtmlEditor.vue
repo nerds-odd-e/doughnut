@@ -36,7 +36,10 @@ const onBlurTextField = () => {
 
 onMounted(() => {
   quillEditor.value = document.querySelector(".ql-editor")
-  quillEditor.value!.addEventListener("blur", () => {
+  if (!quillEditor.value) {
+    return
+  }
+  quillEditor.value.addEventListener("blur", () => {
     onBlurTextField()
   })
 })
