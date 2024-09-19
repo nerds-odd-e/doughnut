@@ -37,11 +37,6 @@ export default defineComponent({
       answeredQuestion: undefined as AnsweredQuestion | undefined,
     }
   },
-  computed: {
-    reviewPoint() {
-      return this.answeredQuestion?.reviewPoint
-    },
-  },
   methods: {
     async fetchData() {
       this.answeredQuestion =
