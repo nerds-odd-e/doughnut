@@ -22,6 +22,18 @@ public class AnswerModel {
     answerResult.answer = answer;
     answerResult.reviewPoint = getReviewPoint(user);
     answerResult.predefinedQuestion = getQuestion();
+    String result;
+    if (answer.getChoiceIndex() != null) {
+      result =
+          getQuestion()
+              .getBareQuestion()
+              .getMultipleChoicesQuestion()
+              .getChoices()
+              .get(answer.getChoiceIndex());
+    } else {
+      result = answer.getSpellingAnswer();
+    }
+    answerResult.answerDisplay = result;
     return answerResult;
   }
 

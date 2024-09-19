@@ -6,4 +6,5 @@ public class AnsweredQuestion {
   public ReviewPoint reviewPoint;
   @NotNull public PredefinedQuestion predefinedQuestion;
   @NotNull public Answer answer;
+  public String answerDisplay;
 }

@@ -3218,8 +3218,6 @@ components:
           format: int32
         correct:
           type: boolean
-        answerDisplay:
-          type: string
     AnsweredQuestion:
       required:
       - answer
@@ -3232,6 +3230,8 @@ components:
           $ref: "#/components/schemas/PredefinedQuestion"
         answer:
           $ref: "#/components/schemas/Answer"
+        answerDisplay:
+          type: string
     QuestionSuggestionCreationParams:
       type: object
       properties:

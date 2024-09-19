@@ -10,8 +10,8 @@ describe("AnswerResult", () => {
       id: 1,
       correct: false,
       choiceIndex: 1,
-      answerDisplay: "answerDisplay",
     },
+    answerDisplay: "answerDisplay",
     predefinedQuestion: makeMe.aPredefinedQuestion.please(),
   }
 

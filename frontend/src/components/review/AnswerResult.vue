@@ -4,7 +4,7 @@
   </div>
   <div class="alert alert-danger" v-else>
     <strong>
-      {{ "Your answer `" + answeredQuestion.answer.answerDisplay + "` is incorrect." }}
+      {{ "Your answer `" + answeredQuestion.answerDisplay + "` is incorrect." }}
     </strong>
   </div>
 </template>

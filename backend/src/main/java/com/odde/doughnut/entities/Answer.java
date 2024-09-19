@@ -33,17 +33,6 @@ public class Answer extends EntityIdentifiedByIdOnly {
   @NotNull
   private Boolean correct;
 
-  public String getAnswerDisplay() {
-    if (reviewQuestionInstance != null && choiceIndex != null) {
-      return reviewQuestionInstance
-          .getBareQuestion()
-          .getMultipleChoicesQuestion()
-          .getChoices()
-          .get(choiceIndex);
-    }
-    return getSpellingAnswer();
-  }
-
   @JsonIgnore
   public void setFromDTO(AnswerDTO answerDTO) {
     spellingAnswer = answerDTO.getSpellingAnswer();

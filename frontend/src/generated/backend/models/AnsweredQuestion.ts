@@ -9,5 +9,6 @@ export type AnsweredQuestion = {
     reviewPoint?: ReviewPoint;
     predefinedQuestion: PredefinedQuestion;
     answer: Answer;
+    answerDisplay?: string;
 };
 

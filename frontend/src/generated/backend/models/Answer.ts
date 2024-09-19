@@ -7,6 +7,5 @@ export type Answer = {
     spellingAnswer?: string;
     choiceIndex?: number;
     correct: boolean;
-    answerDisplay?: string;
 };
 

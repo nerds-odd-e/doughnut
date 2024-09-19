@@ -93,8 +93,8 @@ describe("repeat page", () => {
         answer: {
           id: 1,
           correct: false,
-          answerDisplay: "my answer",
         },
+        answerDisplay: "my answer",
         predefinedQuestion: makeMe.aPredefinedQuestion.please(),
       }
       const mockedMarkAsRepeatedCall = vi.fn().mockResolvedValue(answerResult)

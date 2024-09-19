@@ -14,8 +14,8 @@ describe("repetition page", () => {
       answer: {
         id: 1,
         correct: true,
-        answerDisplay: "",
       },
+      answerDisplay: "",
       reviewPoint,
       predefinedQuestion: makeMe.aPredefinedQuestion.please(),
     }
