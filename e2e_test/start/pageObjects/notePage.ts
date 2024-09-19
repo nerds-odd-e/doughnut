@@ -249,6 +249,25 @@ export const assumeNotePage = (noteTopic?: string) => {
       cy.pageIsNotLoading()
       this.toolbarButton('Move down').click()
     },
+    reviewPoint() {
+      clickNotePageMoreOptionsButton('Note Review Settings')
+      return {
+        expectReviewPointInfo(attrs: { [key: string]: string }) {
+          for (const k in attrs) {
+            cy.contains(k)
+              .findByText(attrs[k] ?? '')
+              .should('be.visible')
+          }
+        },
+        removeReviewPointFromReview() {
+          cy.findByRole('button', {
+            name: 'remove this note from review',
+          }).click()
+          cy.findByRole('button', { name: 'OK' }).click()
+          cy.findByText('This review point has been removed from reviewing.')
+        },
+      }
+    },
     wikidataOptions() {
       const openWikidataOptions = () =>
         privateToolbarButton('wikidata options').clickIfNotOpen()

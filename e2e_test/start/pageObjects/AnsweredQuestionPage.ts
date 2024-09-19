@@ -8,26 +8,8 @@ const assumeAnsweredQuestionPage = () => {
       cy.get('.alert-success').should('exist')
     },
     showReviewPoint(noteTopic?: string) {
-      cy.findByText('Review Point:').click()
-      if (noteTopic) {
-        assumeNotePage(noteTopic)
-      }
-      return {
-        expectReviewPointInfo(attrs: { [key: string]: string }) {
-          for (const k in attrs) {
-            cy.contains(k)
-              .findByText(attrs[k] ?? '')
-              .should('be.visible')
-          }
-        },
-        removeReviewPointFromReview() {
-          cy.findByRole('button', {
-            name: 'remove this note from review',
-          }).click()
-          cy.findByRole('button', { name: 'OK' }).click()
-          cy.findByText('This review point has been removed from reviewing.')
-        },
-      }
+      cy.findByText('Note reviewed:').click()
+      return assumeNotePage(noteTopic).reviewPoint()
     },
     goToLastResult: () => {
       cy.findByRole('button', { name: 'view last result' }).click()
