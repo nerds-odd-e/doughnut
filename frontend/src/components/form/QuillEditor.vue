@@ -7,10 +7,9 @@ import { ref, onMounted, watch } from "vue"
 import Quill, { type QuillOptions } from "quill"
 import "quill/dist/quill.snow.css"
 
-const { modelValue, modelRefresher, readonly } = defineProps({
+const { modelValue, readonly } = defineProps({
   modelValue: String,
   readonly: Boolean,
-  modelRefresher: Number,
 })
 
 const emits = defineEmits(["update:modelValue", "blur"])
@@ -61,19 +60,16 @@ onMounted(() => {
 
 // Watch for changes in modelValue prop
 watch(
-  () => modelRefresher,
-  () => {
-    if (quill.value && localValue.value !== modelValue) {
-      localValue.value = modelValue
-      quill.value.root.innerHTML = modelValue || ""
+  () => modelValue,
+  (newValue) => {
+    if (quill.value && localValue.value !== newValue) {
+      localValue.value = newValue
+      quill.value.root.innerHTML = newValue || ""
     }
   }
 )
 
 const onUpdateContent = () => {
-  if (localValue.value === modelValue) {
-    return
-  }
   emits("update:modelValue", localValue.value)
 }
 </script>

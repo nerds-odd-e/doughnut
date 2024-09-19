@@ -119,6 +119,7 @@ declare module 'vue' {
     QuestionManagement: typeof import('./src/components/notes/QuestionManagement.vue')['default']
     Questions: typeof import('./src/components/notes/Questions.vue')['default']
     QuillEditor: typeof import('./src/components/form/QuillEditor.vue')['default']
+    QuillEditor1: typeof import('./src/components/form/QuillEditor1.vue')['default']
     Quiz: typeof import('./src/components/review/Quiz.vue')['default']
     RadioButtons: typeof import('./src/components/form/RadioButtons.vue')['default']
     RepeatProgressBar: typeof import('./src/components/review/RepeatProgressBar.vue')['default']
