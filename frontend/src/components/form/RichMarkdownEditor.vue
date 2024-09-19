@@ -2,18 +2,19 @@
   <QuillEditor
     v-bind="{ multipleLine, scopeName, field, title, errors }"
     :model-value="htmlValue"
+    :model-refresher="modelRefresher"
     :readonly="readonly"
-    @update:model-value="htmlValueUpdated($event)"
+    @update:model-value="htmlValueUpdated"
     @blur="$emit('blur')"
   />
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue"
+import { ref, watch } from "vue"
 import QuillEditor from "./QuillEditor.vue"
 import markdownizer from "./markdownizer"
 
-const { modelValue } = defineProps({
+const props = defineProps({
   multipleLine: Boolean,
   modelValue: String,
   scopeName: String,
@@ -25,10 +26,26 @@ const { modelValue } = defineProps({
 
 const emits = defineEmits(["update:modelValue", "blur"])
 
-const htmlValue = computed(() => markdownizer.markdownToHtml(modelValue))
+// This is a hack to force QuillEditor to refresh when the modelValue changes
+const modelRefresher = ref(0)
 
-const htmlValueUpdated = (htmlValue: string) => {
-  const markdownValue = markdownizer.htmlToMarkdown(htmlValue)
+const htmlValue = ref(markdownizer.markdownToHtml(props.modelValue))
+let internalModelValue: string | undefined = undefined
+
+watch(
+  () => props.modelValue,
+  (newModelValue) => {
+    if (internalModelValue !== newModelValue) {
+      internalModelValue = newModelValue
+      htmlValue.value = markdownizer.markdownToHtml(newModelValue)
+      modelRefresher.value++
+    }
+  }
+)
+
+const htmlValueUpdated = (newHtmlValue: string) => {
+  const markdownValue = markdownizer.htmlToMarkdown(newHtmlValue)
+  internalModelValue = markdownValue
   emits("update:modelValue", markdownValue)
 }
 </script>

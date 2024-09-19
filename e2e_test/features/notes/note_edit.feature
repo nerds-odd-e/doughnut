@@ -26,6 +26,12 @@ Feature: Note Edit
     Then I should see "LeSS in Action" in the page
     And there should be no more undo to do
 
+  Scenario: Edit a note details with bullet points
+    When I update note "LeSS in Action" to become:
+      | Topic     | Details           |
+      | Odd-e CSD | * must join       |
+    Then I should see "must join" in the page
+
   Scenario: Edit a note's details as markdown
     When I update note "LeSS in Action" details using markdown to become:
     """
