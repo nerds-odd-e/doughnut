@@ -1,18 +1,17 @@
 <template>
-  <div v-if="reviewPoint">
+  <div v-if="note">
     <div
       v-if="!toggleReviewPoint"
       class="review-point-abbr"
       @click="toggleReviewPoint = true"
     >
-      <label class="me-1"><strong>Review Point: </strong></label>
-      <NoteTopicComponent v-bind="{ noteTopic: reviewPoint.note.noteTopic }" />
+      <label class="me-1"><strong>Note reviewed: </strong></label>
+      <NoteTopicComponent v-bind="{ noteTopic: note.noteTopic }" />
     </div>
     <div v-else>
       <NoteWithBreadcrumb
-        v-bind="{ note: reviewPoint.note, storageAccessor }"
+        v-bind="{ note, storageAccessor }"
       />
-      <NoteInfoReviewPoint v-model="reviewPoint" />
     </div>
   </div>
   <QuestionDisplay
@@ -45,7 +44,7 @@ const props = defineProps({
 })
 
 const toggleReviewPoint = ref(false)
-const reviewPoint = computed(() => props.answeredQuestion?.reviewPoint)
+const note = computed(() => props.answeredQuestion?.reviewPoint?.note)
 </script>
 
 <style lang="sass" scoped>
