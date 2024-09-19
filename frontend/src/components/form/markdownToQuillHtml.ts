@@ -35,8 +35,10 @@ export default function markdownToQuillHtml(
     const indentClass =
       indentLevel > 0 ? ` class="ql-indent-${indentLevel}"` : ""
 
+    const itemType = /^\d+\./.test(token.raw) ? "ordered" : "bullet"
+
     // Return the list item with the appropriate data-list attribute and class
-    return `<li${indentClass} data-list="bullet">${text}</li>`
+    return `<li${indentClass} data-list="${itemType}">${text}</li>`
   }
 
   // Override the paragraph method

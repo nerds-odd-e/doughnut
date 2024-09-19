@@ -27,6 +27,16 @@ describe("Markdown and HTML Conversion Tests", () => {
       expect(ol?.querySelector("li")).toHaveAttribute("data-list", "bullet")
     })
 
+    it("render ordered list item as Quill editor format", () => {
+      const elm = markdownToHTMLElement(`2. item1`)
+      expect(elm?.querySelector("li")).toHaveAttribute("data-list", "ordered")
+    })
+
+    it("render nested ordered list item as Quill editor format", () => {
+      const elm = markdownToHTMLElement(`* level1\n  2. item1`)
+      expect(elm?.querySelector("li[data-list='ordered']")).not.toBeNull()
+    })
+
     it("render nested list as Quill editor format", () => {
       const elm = markdownToHTMLElement(`* item1\n  * item1.1\n`)
       expect(elm.querySelectorAll("ol").length).toBe(1)
