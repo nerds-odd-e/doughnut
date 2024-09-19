@@ -18,8 +18,7 @@ public class Answer extends EntityIdentifiedByIdOnly {
   @Column(name = "choice_index")
   Integer choiceIndex;
 
-  @OneToOne
-  @JoinColumn(name = "review_question_instance_id", referencedColumnName = "id")
+  @OneToOne(mappedBy = "answer")
   @Setter
   @JsonIgnore
   ReviewQuestionInstance reviewQuestionInstance;

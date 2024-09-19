@@ -21,7 +21,8 @@ public class ReviewQuestionInstance extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   private PredefinedQuestion predefinedQuestion;
 
-  @OneToOne(mappedBy = "reviewQuestionInstance")
+  @OneToOne
+  @JoinColumn(name = "quiz_answer_id", referencedColumnName = "id")
   @Getter
   @Setter
   @JsonIgnore
