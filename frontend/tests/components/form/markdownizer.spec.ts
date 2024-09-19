@@ -32,6 +32,14 @@ describe("Markdown and HTML Conversion Tests", () => {
       expect(elm.querySelectorAll("ol").length).toBe(1)
       expect(elm.querySelector("li.ql-indent-1")).not.toBeNull()
     })
+
+    it("render multiple level nested list as Quill editor format", () => {
+      const elm = markdownToHTMLElement(
+        `* item1\n  * item1.1\n    * item1.1.1\n`
+      )
+      expect(elm.querySelectorAll("ol").length).toBe(1)
+      expect(elm.querySelector("li.ql-indent-2")).not.toBeNull()
+    })
   })
 
   describe("Html to markdown", () => {
@@ -40,9 +48,24 @@ describe("Markdown and HTML Conversion Tests", () => {
       const expectedMarkdown = "Hello World\n===========\n\nThis is _markdown_."
       expect(markdownizer.htmlToMarkdown(html)).toBe(expectedMarkdown)
     })
+
     it("converts empty lines with br correctly", () => {
       const html = "<p>a</p><p><br></p><p>b</p>"
       const expectedMarkdown = "a\n\n<p><br></p>\n\nb"
+      expect(markdownizer.htmlToMarkdown(html)).toBe(expectedMarkdown)
+    })
+
+    it("convert quill list to markdown list", () => {
+      const html =
+        "<ol><li data-list='bullet'>item1</li><li data-list='bullet'>item2</li></ol>"
+      const expectedMarkdown = "* item1\n* item2"
+      expect(markdownizer.htmlToMarkdown(html)).toBe(expectedMarkdown)
+    })
+
+    it("convert nested quill list to markdown list", () => {
+      const html =
+        "<ol><li data-list='bullet'>item1</li><li data-list='bullet' class='ql-indent-1'>item1.1</li></ol>"
+      const expectedMarkdown = "* item1\n  * item1.1"
       expect(markdownizer.htmlToMarkdown(html)).toBe(expectedMarkdown)
     })
   })
