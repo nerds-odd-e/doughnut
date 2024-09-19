@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-import { debounce } from "lodash"
+import { debounce } from "es-toolkit"
 import type { PropType } from "vue"
 import { computed, onUnmounted, ref, watch } from "vue"
 import { type StorageAccessor } from "../../../store/createNoteStorage"

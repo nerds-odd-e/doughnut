@@ -28,7 +28,7 @@
 
 <script setup lang="ts">
 import { NoteCreationDTO, NoteTopic } from "@/generated/backend"
-import { camelCase, startCase } from "lodash"
+import { camelCase, startCase } from "es-toolkit"
 import type { PropType } from "vue"
 import { computed } from "vue"
 import PopButton from "../commons/Popups/PopButton.vue"
@@ -36,7 +36,7 @@ import InputWithType from "../form/InputWithType.vue"
 import SvgLinkTypeIcon from "../svgs/SvgLinkTypeIcon.vue"
 import LinkTypeSelect from "./LinkTypeSelect.vue"
 
-const { modelValue, field } = defineProps({
+const props = defineProps({
   scopeName: String,
   modelValue: {
     type: String as PropType<NoteCreationDTO.linkTypeToParent>,
@@ -44,12 +44,12 @@ const { modelValue, field } = defineProps({
   },
   errorMessage: String,
   allowEmpty: { type: Boolean, default: false },
-  field: { type: String, defalt: "linkType" },
+  field: { type: String, default: "linkType" },
   inverseIcon: Boolean,
 })
 
 defineEmits(["update:modelValue"])
 
-const titlized = computed(() => startCase(camelCase(field)))
-const label = computed(() => modelValue || "default")
+const titlized = computed(() => startCase(camelCase(props.field ?? "")))
+const label = computed(() => props.modelValue || "default")
 </script>

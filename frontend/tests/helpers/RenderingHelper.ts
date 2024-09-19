@@ -1,7 +1,7 @@
 import ManagedApi from "@/managedApi/ManagedApi"
 import { render } from "@testing-library/vue"
 import { VueWrapper, mount } from "@vue/test-utils"
-import { merge } from "lodash"
+import { merge } from "es-toolkit"
 import type { ComponentPublicInstance, DefineComponent } from "vue"
 import type { RouteLocationRaw } from "vue-router"
 import { createRouter, createWebHistory } from "vue-router"

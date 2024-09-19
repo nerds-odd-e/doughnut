@@ -103,9 +103,6 @@ importers:
       intersection-observer:
         specifier: ^0.12.2
         version: 0.12.2
-      lodash:
-        specifier: ^4.17.21
-        version: 4.17.21
       marked:
         specifier: ^14.1.2
         version: 14.1.2
@@ -158,9 +155,15 @@ importers:
       css-loader:
         specifier: ^7.1.2
         version: 7.1.2(webpack@5.92.1(esbuild@0.23.1))
+      es-toolkit:
+        specifier: ^1.20.0
+        version: 1.20.0
       jsdom:
         specifier: ^25.0.0
         version: 25.0.0(bufferutil@4.0.8)(utf-8-validate@6.0.4)
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
       optionator:
         specifier: ^0.9.4
         version: 0.9.4
@@ -2082,6 +2085,9 @@ packages:
 
   es-module-lexer@1.5.4:
     resolution: {integrity: sha512-MVNK56NiMrOwitFB7cqDwq0CQutbw+0BvLshJSse0MUNU+y1FC3bUS/AQg7oUng+/wKrrki7JfmwtVHkVfPLlw==}
+
+  es-toolkit@1.20.0:
+    resolution: {integrity: sha512-dRaoLJVlrQEHGTwSLHcozC/371qY+5QYRsm9JZncos35zcGHyS00ogRTghzRyJLOTrOTWg/8qj+ckvLWPnYP7g==}
 
   esbuild@0.23.1:
     resolution: {integrity: sha512-VVNz/9Sa0bs5SELtn3f7qhJCDPCF5oMEl5cO9/SSinpE9hbPVvxbd572HH5AKiP7WD8INO53GgfDDhRjkylHEg==}
@@ -7112,6 +7118,8 @@ snapshots:
       stop-iteration-iterator: 1.0.0
 
   es-module-lexer@1.5.4: {}
+
+  es-toolkit@1.20.0: {}
 
   esbuild@0.23.1:
     optionalDependencies:
