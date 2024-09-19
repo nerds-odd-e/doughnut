@@ -7,7 +7,6 @@ import type { AnsweredQuestion } from "@/generated/backend"
 describe("repetition page", () => {
   describe("repetition page for a link", () => {
     const link = makeMe.aLink.please()
-    const reviewPoint = makeMe.aReviewPoint.ofLink(link).please()
     const mockedShowAnswerCall = vitest.fn()
     const mockedNotePositionCall = vitest.fn()
     const answeredQuestion: AnsweredQuestion = {
@@ -16,7 +15,7 @@ describe("repetition page", () => {
         correct: true,
       },
       answerDisplay: "",
-      reviewPoint,
+      note: link,
       predefinedQuestion: makeMe.aPredefinedQuestion.please(),
     }
     beforeEach(async () => {

@@ -3,10 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { Answer } from './Answer';
+import type { Note } from './Note';
 import type { PredefinedQuestion } from './PredefinedQuestion';
-import type { ReviewPoint } from './ReviewPoint';
 export type AnsweredQuestion = {
-    reviewPoint?: ReviewPoint;
+    note?: Note;
     predefinedQuestion: PredefinedQuestion;
     answer: Answer;
     answerDisplay?: string;

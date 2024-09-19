@@ -21,7 +21,7 @@ public class AnswerModel {
   public AnsweredQuestion getAnswerViewedByUser(User user) {
     AnsweredQuestion answerResult = new AnsweredQuestion();
     answerResult.answer = answer;
-    answerResult.reviewPoint = getReviewPoint(user);
+    answerResult.note = answer.getReviewQuestionInstance().getPredefinedQuestion().getNote();
     answerResult.predefinedQuestion = getQuestion();
     String result;
     if (answer.getChoiceIndex() != null) {

@@ -3224,8 +3224,8 @@ components:
       - predefinedQuestion
       type: object
       properties:
-        reviewPoint:
-          $ref: "#/components/schemas/ReviewPoint"
+        note:
+          $ref: "#/components/schemas/Note"
         predefinedQuestion:
           $ref: "#/components/schemas/PredefinedQuestion"
         answer:

@@ -28,11 +28,11 @@
 <script setup lang="ts">
 import type { AnsweredQuestion } from "@/generated/backend"
 import type { PropType } from "vue"
-import { computed, ref } from "vue"
+import { ref } from "vue"
 import type { StorageAccessor } from "../../store/createNoteStorage"
 import QuestionDisplay from "./QuestionDisplay.vue"
 
-const props = defineProps({
+const { answeredQuestion } = defineProps({
   answeredQuestion: {
     type: Object as PropType<AnsweredQuestion>,
     required: true,
@@ -44,7 +44,7 @@ const props = defineProps({
 })
 
 const toggleReviewPoint = ref(false)
-const note = computed(() => props.answeredQuestion?.reviewPoint?.note)
+const note = answeredQuestion?.note
 </script>
 
 <style lang="sass" scoped>
