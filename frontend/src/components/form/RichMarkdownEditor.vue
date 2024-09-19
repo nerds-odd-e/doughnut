@@ -46,6 +46,7 @@ watch(
 const htmlValueUpdated = (newHtmlValue: string) => {
   const markdownValue = markdownizer.htmlToMarkdown(newHtmlValue)
   internalModelValue = markdownValue
+  if (markdownValue === props.modelValue) return
   emits("update:modelValue", markdownValue)
 }
 </script>
