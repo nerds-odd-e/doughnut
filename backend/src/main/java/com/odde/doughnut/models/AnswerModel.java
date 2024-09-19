@@ -13,37 +13,13 @@ public class AnswerModel {
     this.modelFactoryService = modelFactoryService;
   }
 
-  public void save() {
-    modelFactoryService.save(answer);
-    modelFactoryService.save(answer.getReviewQuestionInstance());
-  }
-
-  public AnsweredQuestion getAnswerViewedByUser(User user) {
-    AnsweredQuestion answerResult = new AnsweredQuestion();
-    answerResult.answer = answer;
-    answerResult.note = answer.getReviewQuestionInstance().getPredefinedQuestion().getNote();
-    answerResult.predefinedQuestion = getQuestion();
-    String result;
-    if (answer.getChoiceIndex() != null) {
-      result =
-          getQuestion()
-              .getBareQuestion()
-              .getMultipleChoicesQuestion()
-              .getChoices()
-              .get(answer.getChoiceIndex());
-    } else {
-      result = answer.getSpellingAnswer();
-    }
-    answerResult.answerDisplay = result;
-    return answerResult;
-  }
-
   private PredefinedQuestion getQuestion() {
     return answer.getReviewQuestionInstance().getPredefinedQuestion();
   }
 
   public void makeAnswerToQuestion(Timestamp currentUTCTimestamp, User user) {
-    save();
+    modelFactoryService.save(answer);
+    modelFactoryService.save(answer.getReviewQuestionInstance());
     ReviewPoint reviewPoint = getReviewPoint(user);
     if (reviewPoint == null) return;
     modelFactoryService

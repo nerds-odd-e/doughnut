@@ -152,7 +152,7 @@ public class ModelFactoryService {
     return new NotebookService(notebook, this);
   }
 
-  public AnswerModel createAnswerForQuestion(
+  public Answer createAnswerForQuestion(
       ReviewQuestionInstance reviewQuestionInstance,
       AnswerDTO answerDTO,
       User user,
@@ -164,8 +164,7 @@ public class ModelFactoryService {
     answer.setReviewQuestionInstance(reviewQuestionInstance);
     reviewQuestionInstance.setAnswer(answer);
     answer.setFromDTO(answerDTO);
-    AnswerModel answerModel = toAnswerModel(answer);
-    answerModel.makeAnswerToQuestion(currentUTCTimestamp, user);
-    return answerModel;
+    toAnswerModel(answer).makeAnswerToQuestion(currentUTCTimestamp, user);
+    return answer;
   }
 }

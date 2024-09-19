@@ -19,9 +19,13 @@ public class Answer extends EntityIdentifiedByIdOnly {
   Integer choiceIndex;
 
   @OneToOne(mappedBy = "answer")
-  @Setter
   @JsonIgnore
   ReviewQuestionInstance reviewQuestionInstance;
+
+  public void setReviewQuestionInstance(ReviewQuestionInstance reviewQuestionInstance) {
+    this.reviewQuestionInstance = reviewQuestionInstance;
+    reviewQuestionInstance.setAnswer(this);
+  }
 
   @Column(name = "created_at")
   @Setter

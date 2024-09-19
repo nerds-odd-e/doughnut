@@ -41,6 +41,7 @@ public class ReviewService {
       Timestamp currentUTCTimestamp) {
     return modelFactoryService
         .createAnswerForQuestion(reviewQuestionInstance, answerDTO, user, currentUTCTimestamp)
-        .getAnswerViewedByUser(user);
+        .getReviewQuestionInstance()
+        .getAnsweredQuestion();
   }
 }

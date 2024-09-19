@@ -17,10 +17,7 @@ public class AnswerViewedByUserBuilder extends EntityBuilder<AnsweredQuestion> {
   @Override
   protected void beforeCreate(boolean needPersist) {
     this.entity =
-        makeMe
-            .modelFactoryService
-            .toAnswerModel(answerBuilder.please(needPersist))
-            .getAnswerViewedByUser(null);
+        answerBuilder.please(needPersist).getReviewQuestionInstance().getAnsweredQuestion();
   }
 
   public AnswerViewedByUserBuilder validQuestionOfType(

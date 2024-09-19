@@ -36,4 +36,22 @@ public class ReviewQuestionInstance extends EntityIdentifiedByIdOnly {
   public Notebook getNotebook() {
     return predefinedQuestion.getNote().getNotebook();
   }
+
+  @JsonIgnore
+  public AnsweredQuestion getAnsweredQuestion() {
+    Answer answer1 = getAnswer();
+    AnsweredQuestion answerResult = new AnsweredQuestion();
+    answerResult.answer = answer1;
+    answerResult.note = getPredefinedQuestion().getNote();
+    answerResult.predefinedQuestion = getPredefinedQuestion();
+    String result;
+    if (answer1.getChoiceIndex() != null) {
+      result =
+          getBareQuestion().getMultipleChoicesQuestion().getChoices().get(answer1.getChoiceIndex());
+    } else {
+      result = answer1.getSpellingAnswer();
+    }
+    answerResult.answerDisplay = result;
+    return answerResult;
+  }
 }

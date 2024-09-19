@@ -97,6 +97,6 @@ class RestReviewsController {
       @PathVariable("answer") @Schema(type = "integer") Answer answer)
       throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(answer);
-    return modelFactoryService.toAnswerModel(answer).getAnswerViewedByUser(currentUser.getEntity());
+    return answer.getReviewQuestionInstance().getAnsweredQuestion();
   }
 }
