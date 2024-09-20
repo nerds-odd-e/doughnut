@@ -21,7 +21,7 @@ public class ReviewQuestionInstance extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   private PredefinedQuestion predefinedQuestion;
 
-  @OneToOne
+  @OneToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "quiz_answer_id", referencedColumnName = "id")
   @Getter
   @Setter
