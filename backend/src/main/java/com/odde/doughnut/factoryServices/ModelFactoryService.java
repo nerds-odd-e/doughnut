@@ -159,6 +159,7 @@ public class ModelFactoryService {
     Answer answer = new Answer();
     answer.setReviewQuestionInstance(reviewQuestionInstance);
     answer.setFromDTO(answerDTO);
+    save(answer);
     save(answer.getReviewQuestionInstance());
     ReviewPoint reviewPoint =
         toUserModel(user)
