@@ -43,4 +43,12 @@ public class Answer extends EntityIdentifiedByIdOnly {
     choiceIndex = answerDTO.getChoiceIndex();
     correct = reviewQuestionInstance.getPredefinedQuestion().checkAnswer(answerDTO);
   }
+
+  @JsonIgnore
+  String getAnswerDisplay(BareQuestion bareQuestion) {
+    if (getChoiceIndex() != null) {
+      return bareQuestion.getMultipleChoicesQuestion().getChoices().get(getChoiceIndex());
+    }
+    return getSpellingAnswer();
+  }
 }

@@ -39,19 +39,17 @@ public class ReviewQuestionInstance extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public AnsweredQuestion getAnsweredQuestion() {
+    if (answer == null) {
+      return null;
+    }
+
     AnsweredQuestion answerResult = new AnsweredQuestion();
     answerResult.answer = answer;
     answerResult.note = getPredefinedQuestion().getNote();
     answerResult.predefinedQuestion = getPredefinedQuestion();
-    String result;
-    if (answer.getChoiceIndex() != null) {
-      result =
-          getBareQuestion().getMultipleChoicesQuestion().getChoices().get(answer.getChoiceIndex());
-    } else {
-      result = answer.getSpellingAnswer();
-    }
-    answerResult.answerDisplay = result;
-    answerResult.reviewQuestionInstanceId = getId();
+    answerResult.answerDisplay = answer.getAnswerDisplay(this.getBareQuestion());
+    answerResult.reviewQuestionInstanceId = id;
     return answerResult;
   }
+
 }
