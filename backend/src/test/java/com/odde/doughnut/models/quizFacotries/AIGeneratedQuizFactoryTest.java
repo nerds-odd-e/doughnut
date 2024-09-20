@@ -57,11 +57,7 @@ class AIGeneratedQuizFactoryTest {
     @Test
     void wrong() {
       AnsweredQuestion answerResult =
-          makeMe
-              .anAnswerViewedByUser()
-              .forQuestion(questionBuilder().inMemoryPlease())
-              .choiceIndex(0)
-              .inMemoryPlease();
+          makeMe.anAnswer().forQuestion(questionBuilder().inMemoryPlease()).choiceIndex(0).ooo();
       assertFalse(answerResult.answer.getCorrect());
     }
 
@@ -69,10 +65,10 @@ class AIGeneratedQuizFactoryTest {
     void correct() {
       AnsweredQuestion answerResult =
           makeMe
-              .anAnswerViewedByUser()
+              .anAnswer()
               .forQuestion(questionBuilder().inMemoryPlease())
               .choiceIndex(mcqWithAnswer.getCorrectChoiceIndex())
-              .inMemoryPlease();
+              .ooo();
       assertTrue(answerResult.answer.getCorrect());
     }
   }

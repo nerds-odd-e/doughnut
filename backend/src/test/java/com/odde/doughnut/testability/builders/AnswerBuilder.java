@@ -56,4 +56,8 @@ public class AnswerBuilder extends EntityBuilder<Answer> {
     forceCorrect = true;
     return this;
   }
+
+  public AnsweredQuestion ooo() {
+    return reviewQuestionInstanceBuilder.answer(answerDTO).please(false).getAnsweredQuestion();
+  }
 }

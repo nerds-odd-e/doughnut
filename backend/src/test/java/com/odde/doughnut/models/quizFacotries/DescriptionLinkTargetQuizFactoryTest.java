@@ -87,11 +87,7 @@ class DescriptionLinkTargetQuizFactoryTest {
     @Test
     void correct() {
       AnsweredQuestion answerResult =
-          makeMe
-              .anAnswerViewedByUser()
-              .validQuestionOfType(getQuizQuestionFactory())
-              .choiceIndex(1)
-              .inMemoryPlease();
+          makeMe.anAnswer().withValidQuestion(getQuizQuestionFactory()).choiceIndex(1).ooo();
       assertTrue(answerResult.answer.getCorrect());
     }
   }

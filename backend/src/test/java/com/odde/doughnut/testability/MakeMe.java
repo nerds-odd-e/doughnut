@@ -108,10 +108,6 @@ public class MakeMe extends MakeMeWithoutDB {
     return new ImageBuilder(new Image(), this);
   }
 
-  public AnswerViewedByUserBuilder anAnswerViewedByUser() {
-    return new AnswerViewedByUserBuilder(this);
-  }
-
   public AnswerBuilder anAnswer() {
     return new AnswerBuilder(this);
   }

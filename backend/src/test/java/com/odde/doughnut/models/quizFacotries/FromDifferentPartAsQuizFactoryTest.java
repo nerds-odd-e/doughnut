@@ -180,22 +180,14 @@ class FromDifferentPartAsQuizFactoryTest {
           @Test
           void correct() {
             AnsweredQuestion answerResult =
-                makeMe
-                    .anAnswerViewedByUser()
-                    .validQuestionOfType(predefinedQuestionFactory)
-                    .choiceIndex(2)
-                    .inMemoryPlease();
+                makeMe.anAnswer().withValidQuestion(predefinedQuestionFactory).choiceIndex(2).ooo();
             assertTrue(answerResult.answer.getCorrect());
           }
 
           @Test
           void wrongWhenChooseCousin() {
             AnsweredQuestion answerResult =
-                makeMe
-                    .anAnswerViewedByUser()
-                    .validQuestionOfType(predefinedQuestionFactory)
-                    .choiceIndex(1)
-                    .inMemoryPlease();
+                makeMe.anAnswer().withValidQuestion(predefinedQuestionFactory).choiceIndex(1).ooo();
             assertFalse(answerResult.answer.getCorrect());
           }
         }
