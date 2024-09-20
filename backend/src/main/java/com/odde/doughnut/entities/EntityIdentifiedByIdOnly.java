@@ -6,7 +6,7 @@ import java.util.Objects;
 import lombok.Getter;
 
 @MappedSuperclass
-public class EntityIdentifiedByIdOnly {
+public abstract class EntityIdentifiedByIdOnly {
   @Id
   @Getter
   @GeneratedValue(strategy = GenerationType.IDENTITY)
