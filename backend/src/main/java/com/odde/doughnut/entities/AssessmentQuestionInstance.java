@@ -24,7 +24,7 @@ public class AssessmentQuestionInstance extends AnswerableQuestionInstance {
   public BareQuestion getBareQuestion() {
     return getPredefinedQuestion().getBareQuestion();
   }
-  
+
   @Override
   @JsonProperty
   public Answer getAnswer() {
