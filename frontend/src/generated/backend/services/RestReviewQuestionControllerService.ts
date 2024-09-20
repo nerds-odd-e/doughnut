@@ -91,6 +91,25 @@ export class RestReviewQuestionControllerService {
         });
     }
     /**
+     * @param reviewQuestionInstance
+     * @returns AnsweredQuestion OK
+     * @throws ApiError
+     */
+    public showQuestion(
+        reviewQuestionInstance: number,
+    ): CancelablePromise<AnsweredQuestion> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/review-questions/{reviewQuestionInstance}',
+            path: {
+                'reviewQuestionInstance': reviewQuestionInstance,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
      * @param reviewPoint
      * @returns ReviewQuestionInstance OK
      * @throws ApiError
@@ -103,25 +122,6 @@ export class RestReviewQuestionControllerService {
             url: '/api/review-questions/{reviewPoint}/random-question',
             path: {
                 'reviewPoint': reviewPoint,
-            },
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * @param answer
-     * @returns AnsweredQuestion OK
-     * @throws ApiError
-     */
-    public showQuestion(
-        answer: number,
-    ): CancelablePromise<AnsweredQuestion> {
-        return this.httpRequest.request({
-            method: 'GET',
-            url: '/api/review-questions/{answer}',
-            path: {
-                'answer': answer,
             },
             errors: {
                 500: `Internal Server Error`,

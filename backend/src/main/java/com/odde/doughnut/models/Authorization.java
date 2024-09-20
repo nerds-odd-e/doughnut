@@ -36,7 +36,7 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
       case Note obj -> assertReadAuthorizationNote(obj);
       case Notebook obj -> assertReadAuthorizationNotebook(obj);
       case Subscription obj -> assertReadAuthorization(obj);
-      case Answer obj -> assertReadAuthorizationAnswer(obj);
+      case ReviewQuestionInstance obj -> assertReadAuthorizationReviewQuizQuestionInstance(obj);
       case PredefinedQuestion obj -> assertReadAuthorizationPredefinedQuestion(obj);
       case ReviewPoint obj -> assertReadAuthorizationReviewPoint(obj);
       case User obj -> assertAuthorizationUser(obj);
@@ -52,15 +52,14 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
     assertAuthorizationUser(object.getUser());
   }
 
-  private void assertReadAuthorizationAnswer(Answer object)
-      throws UnexpectedNoAccessRightException {
-    assertReadAuthorizationPredefinedQuestion(
-        object.getReviewQuestionInstance().getPredefinedQuestion());
-  }
-
   private void assertReadAuthorizationPredefinedQuestion(PredefinedQuestion question)
       throws UnexpectedNoAccessRightException {
     assertReadAuthorization(question.getNote());
+  }
+
+  private void assertReadAuthorizationReviewQuizQuestionInstance(ReviewQuestionInstance object)
+      throws UnexpectedNoAccessRightException {
+    assertReadAuthorizationPredefinedQuestion(object.getPredefinedQuestion());
   }
 
   private void assertAuthorizationNote(Note note) throws UnexpectedNoAccessRightException {

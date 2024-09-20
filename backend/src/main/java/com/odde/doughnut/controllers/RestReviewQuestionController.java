@@ -88,12 +88,13 @@ class RestReviewQuestionController {
         testabilitySettings.getCurrentUTCTimestamp());
   }
 
-  @GetMapping(path = "/{answer}")
+  @GetMapping(path = "/{reviewQuestionInstance}")
   @Transactional
   public AnsweredQuestion showQuestion(
-      @PathVariable("answer") @Schema(type = "integer") Answer answer)
+      @PathVariable("reviewQuestionInstance") @Schema(type = "integer")
+          ReviewQuestionInstance reviewQuestionInstance)
       throws UnexpectedNoAccessRightException {
-    currentUser.assertReadAuthorization(answer);
-    return answer.getReviewQuestionInstance().getAnsweredQuestion();
+    currentUser.assertReadAuthorization(reviewQuestionInstance);
+    return reviewQuestionInstance.getAnsweredQuestion();
   }
 }

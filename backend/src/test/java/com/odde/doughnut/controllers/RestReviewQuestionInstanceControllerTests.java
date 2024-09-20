@@ -284,45 +284,25 @@ class RestReviewQuestionInstanceControllerTests {
 
   @Nested
   class showQuestion {
-    Answer answer;
-    Note noteByAnotherUser;
-    ReviewPoint reviewPoint;
-    User anotherUser;
 
-    @Nested
-    class ANoteFromOtherUser {
-      @BeforeEach
-      void setup() {
-        anotherUser = makeMe.aUser().please();
-        noteByAnotherUser =
-            makeMe.aNote("title").creatorAndOwner(anotherUser).details("description").please();
-      }
+    @Test
+    void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
+      ReviewQuestionInstance reviewQuestionInstance = makeMe.aReviewQuestionInstance().please();
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.showQuestion(reviewQuestionInstance));
+    }
 
-      @Test
-      void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
-        reviewPoint = makeMe.aReviewPointFor(noteByAnotherUser).by(anotherUser).please();
-        answer = makeMe.anAnswer().ofSpellingQuestion(reviewPoint.getNote()).please();
-        assertThrows(UnexpectedNoAccessRightException.class, () -> controller.showQuestion(answer));
-      }
-
-      @Test
-      void canSeeNoteThatHasReadAccess() throws UnexpectedNoAccessRightException {
-        reviewPoint = makeMe.aReviewPointFor(noteByAnotherUser).by(currentUser).please();
-        answer =
-            makeMe
-                .anAnswer()
-                .ofSpellingQuestion(reviewPoint.getNote())
-                .answerWithSpelling("xx")
-                .please();
-        makeMe
-            .aSubscription()
-            .forUser(currentUser.getEntity())
-            .forNotebook(noteByAnotherUser.getNotebook())
-            .please();
-        makeMe.refresh(currentUser.getEntity());
-        AnsweredQuestion answeredQuestion = controller.showQuestion(answer);
-        assertThat(answeredQuestion.answer, equalTo(answer));
-      }
+    @Test
+    void canSeeNoteThatHasReadAccess() throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
+      ReviewQuestionInstance reviewQuestionInstance =
+          makeMe.aReviewQuestionInstance().spellingQuestionOf(note).please();
+      makeMe.anAnswer().forQuestion(reviewQuestionInstance).please();
+      makeMe.refresh(currentUser.getEntity());
+      AnsweredQuestion answeredQuestion = controller.showQuestion(reviewQuestionInstance);
+      assertThat(
+          answeredQuestion.answer.getReviewQuestionInstance(), equalTo(reviewQuestionInstance));
     }
   }
 }
