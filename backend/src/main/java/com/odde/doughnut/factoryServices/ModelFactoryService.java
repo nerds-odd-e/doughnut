@@ -148,9 +148,9 @@ public class ModelFactoryService {
   }
 
   public Answer createAnswerForQuestion(
-      ReviewQuestionInstance reviewQuestionInstance, AnswerDTO answerDTO) {
-    Answer answer = reviewQuestionInstance.buildAnswer(answerDTO);
-    save(reviewQuestionInstance);
+      AnswerableQuestionInstance answerableQuestionInstance, AnswerDTO answerDTO) {
+    Answer answer = answerableQuestionInstance.buildAnswer(answerDTO);
+    save(answerableQuestionInstance);
     return answer;
   }
 

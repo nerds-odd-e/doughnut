@@ -115,11 +115,9 @@ public class RestAssessmentControllerTests {
 
     @Test
     void shouldNotBeAbleToAnswerTheSameQuestionTwice() {
-      makeMe
-          .theReviewQuestionInstance(assessmentQuestionInstance.getReviewQuestionInstance())
-          .answerSpelling("my answer")
-          .please();
-      makeMe.refresh(assessmentQuestionInstance.getReviewQuestionInstance());
+      AnswerDTO answerDTO1 = new AnswerDTO();
+      answerDTO1.setSpellingAnswer("my answer");
+      assessmentQuestionInstance.buildAnswer(answerDTO1);
       assertThrows(
           QuestionAnswerException.class,
           () -> controller.answerQuestion(assessmentQuestionInstance, answerDTO));
@@ -157,10 +155,9 @@ public class RestAssessmentControllerTests {
           .getAssessmentQuestionInstances()
           .forEach(
               aqi -> {
-                makeMe
-                    .theReviewQuestionInstance(aqi.getReviewQuestionInstance())
-                    .forceAnswerCorrect()
-                    .please();
+                Answer answer = new Answer();
+                answer.setCorrect(true);
+                aqi.setAnswer(answer);
               });
 
       AssessmentAttempt assessmentResult = controller.submitAssessmentResult(assessmentAttempt);
@@ -181,15 +178,13 @@ public class RestAssessmentControllerTests {
 
     @Test
     void shouldReturnSomeAnswersCorrect() throws UnexpectedNoAccessRightException {
-      ReviewQuestionInstance q1 =
-          assessmentAttempt.getAssessmentQuestionInstances().get(0).getReviewQuestionInstance();
-      ReviewQuestionInstance q2 =
-          assessmentAttempt.getAssessmentQuestionInstances().get(1).getReviewQuestionInstance();
-      ReviewQuestionInstance q3 =
-          assessmentAttempt.getAssessmentQuestionInstances().get(2).getReviewQuestionInstance();
-      makeMe.theReviewQuestionInstance(q1).forceAnswerCorrect().please();
-      makeMe.theReviewQuestionInstance(q2).forceAnswerCorrect().please();
-      makeMe.theReviewQuestionInstance(q3).answerSpelling("wrong").please();
+      Answer correctAnswer = new Answer();
+      correctAnswer.setCorrect(true);
+      Answer wrongAnswer = new Answer();
+      wrongAnswer.setCorrect(false);
+      assessmentAttempt.getAssessmentQuestionInstances().get(0).setAnswer(correctAnswer);
+      assessmentAttempt.getAssessmentQuestionInstances().get(1).setAnswer(correctAnswer);
+      assessmentAttempt.getAssessmentQuestionInstances().get(2).setAnswer(wrongAnswer);
 
       AssessmentAttempt assessmentResult = controller.submitAssessmentResult(assessmentAttempt);
 

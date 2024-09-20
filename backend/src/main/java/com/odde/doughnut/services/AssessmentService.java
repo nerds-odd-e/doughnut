@@ -40,11 +40,10 @@ public class AssessmentService {
       AssessmentAttempt assessmentAttempt, Timestamp currentUTCTimestamp) {
     int totalCorrectAnswer =
         assessmentAttempt.getAssessmentQuestionInstances().stream()
-            .map(AssessmentQuestionInstance::getReviewQuestionInstance)
-            .map(ReviewQuestionInstance::getAnswer)
+            .map(AssessmentQuestionInstance::getAnswer)
             .filter(Objects::nonNull)
             .map(Answer::getCorrect)
-            .mapToInt(correct -> correct ? 1 : 0)
+            .mapToInt(correct -> Boolean.TRUE.equals(correct) ? 1 : 0)
             .sum();
     assessmentAttempt.setAnswersCorrect(totalCorrectAnswer);
     assessmentAttempt.setSubmittedAt(currentUTCTimestamp);
@@ -108,8 +107,7 @@ public class AssessmentService {
 
   public AssessmentQuestionInstance answerQuestion(
       AssessmentQuestionInstance assessmentQuestionInstance, AnswerDTO answerDTO) {
-    modelFactoryService.createAnswerForQuestion(
-        assessmentQuestionInstance.getReviewQuestionInstance(), answerDTO);
+    modelFactoryService.createAnswerForQuestion(assessmentQuestionInstance, answerDTO);
     return assessmentQuestionInstance;
   }
 }

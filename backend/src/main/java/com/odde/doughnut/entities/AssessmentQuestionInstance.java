@@ -12,25 +12,19 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @JsonPropertyOrder({"id", "bareQuestion", "notebook", "answer"})
-public class AssessmentQuestionInstance extends EntityIdentifiedByIdOnly {
+public class AssessmentQuestionInstance extends AnswerableQuestionInstance {
   @ManyToOne
   @JoinColumn(name = "assessment_attempt_id")
   @NotNull
   @JsonIgnore
   private AssessmentAttempt assessmentAttempt;
 
-  @OneToOne(cascade = CascadeType.PERSIST)
-  @JoinColumn(name = "review_question_instance_id")
-  @NotNull
-  @JsonIgnore // the reviewQuestionInstance should be hidden from the API
-  private ReviewQuestionInstance reviewQuestionInstance;
-
   @NotNull
   public BareQuestion getBareQuestion() {
-    return reviewQuestionInstance.getBareQuestion();
+    return getPredefinedQuestion().getBareQuestion();
   }
 
   public Answer getAnswer() {
-    return reviewQuestionInstance.getAnswer();
+    return super.getAnswer();
   }
 }

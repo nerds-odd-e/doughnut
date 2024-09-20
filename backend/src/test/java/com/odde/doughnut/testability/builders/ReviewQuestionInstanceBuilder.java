@@ -11,7 +11,6 @@ import com.odde.doughnut.testability.MakeMe;
 public class ReviewQuestionInstanceBuilder extends EntityBuilder<ReviewQuestionInstance> {
   private final PredefinedQuestionBuilder predefinedQuestionBuilder;
   private AnswerDTO answerDTO = null;
-  private boolean forceCorrectAnswer = false;
 
   public ReviewQuestionInstanceBuilder(
       MakeMe makeMe, ReviewQuestionInstance reviewQuestionInstance) {
@@ -27,9 +26,6 @@ public class ReviewQuestionInstanceBuilder extends EntityBuilder<ReviewQuestionI
     }
     if (answerDTO != null) {
       entity.buildAnswer(answerDTO);
-    }
-    if (forceCorrectAnswer) {
-      entity.getAnswer().setCorrect(true);
     }
   }
 
@@ -71,10 +67,5 @@ public class ReviewQuestionInstanceBuilder extends EntityBuilder<ReviewQuestionI
     AnswerDTO dto = new AnswerDTO();
     dto.setSpellingAnswer(answer);
     return answer(dto);
-  }
-
-  public ReviewQuestionInstanceBuilder forceAnswerCorrect() {
-    this.forceCorrectAnswer = true;
-    return answerSpelling("correct");
   }
 }

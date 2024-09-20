@@ -47,8 +47,7 @@ public class AssessmentServiceTests {
       for (int i = 0; i < numberOfAttempts; i++) {
         AssessmentAttempt assessment =
             service.generateAssessment(notebook, currentUser.getEntity());
-        Integer questionId =
-            assessment.getAssessmentQuestionInstances().get(0).getReviewQuestionInstance().getId();
+        Integer questionId = assessment.getAssessmentQuestionInstances().get(0).getId();
         questionIds.add(questionId);
       }
       return questionIds;

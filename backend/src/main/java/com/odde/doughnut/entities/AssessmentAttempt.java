@@ -64,22 +64,15 @@ public class AssessmentAttempt extends EntityIdentifiedByIdOnly {
     return getNotebook().isCertifiable();
   }
 
-  public void buildAssessmentQuestionInstance(ReviewQuestionInstance reviewQuestionInstance) {
+  public void buildAssessmentQuestionInstance(PredefinedQuestion predefinedQuestion) {
     AssessmentQuestionInstance assessmentQuestionInstance = new AssessmentQuestionInstance();
     assessmentQuestionInstance.setAssessmentAttempt(this);
-    assessmentQuestionInstance.setReviewQuestionInstance(reviewQuestionInstance);
+    assessmentQuestionInstance.setPredefinedQuestion(predefinedQuestion);
     getAssessmentQuestionInstances().add(assessmentQuestionInstance);
   }
 
   public void buildQuestions(List<PredefinedQuestion> questions) {
     setTotalQuestionCount(questions.size());
-    questions.stream()
-        .map(
-            question -> {
-              ReviewQuestionInstance reviewQuestionInstance = new ReviewQuestionInstance();
-              reviewQuestionInstance.setPredefinedQuestion(question);
-              return reviewQuestionInstance;
-            })
-        .forEach(this::buildAssessmentQuestionInstance);
+    questions.forEach(this::buildAssessmentQuestionInstance);
   }
 }
