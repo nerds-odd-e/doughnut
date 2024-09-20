@@ -18,8 +18,8 @@ import { onMounted, ref, watch, type PropType } from "vue"
 
 const { managedApi } = useLoadingApi()
 
-const { answerId } = defineProps({
-  answerId: { type: Number, required: true },
+const { reviewQuestionInstanceId } = defineProps({
+  reviewQuestionInstanceId: { type: Number, required: true },
   storageAccessor: {
     type: Object as PropType<StorageAccessor>,
     required: true,
@@ -29,10 +29,10 @@ const answeredQuestion = ref<AnsweredQuestion | undefined>()
 
 const fetchData = async () => {
   answeredQuestion.value =
-    await managedApi.restReviewQuestionController.showQuestion(answerId)
+    await managedApi.restReviewQuestionController.showQuestion(reviewQuestionInstanceId)
 }
 
-watch(() => answerId, fetchData, { immediate: true })
+watch(() => reviewQuestionInstanceId, fetchData, { immediate: true })
 
 onMounted(fetchData)
 </script>
