@@ -94,10 +94,6 @@ public class ModelFactoryService {
     return new SearchTermModel(entity, noteRepository, searchTerm);
   }
 
-  public AnswerModel toAnswerModel(Answer answer) {
-    return new AnswerModel(answer, this);
-  }
-
   public SuggestedQuestionForFineTuningModel toSuggestedQuestionForFineTuningService(
       SuggestedQuestionForFineTuning suggestion) {
     return new SuggestedQuestionForFineTuningModel(suggestion, this);
@@ -162,9 +158,16 @@ public class ModelFactoryService {
     }
     Answer answer = new Answer();
     answer.setReviewQuestionInstance(reviewQuestionInstance);
-    reviewQuestionInstance.setAnswer(answer);
     answer.setFromDTO(answerDTO);
-    toAnswerModel(answer).makeAnswerToQuestion(currentUTCTimestamp, user);
+    save(answer);
+    save(answer.getReviewQuestionInstance());
+    ReviewPoint reviewPoint =
+        toUserModel(user)
+            .getReviewPointFor(
+                answer.getReviewQuestionInstance().getPredefinedQuestion().getNote());
+    if (reviewPoint != null) {
+      toReviewPointModel(reviewPoint).markAsRepeated(currentUTCTimestamp, answer.getCorrect());
+    }
     return answer;
   }
 }
