@@ -39,7 +39,7 @@ const noteAndLinkRoutes = [
     meta: { useNoteStorageAccessor: true, userProp: true },
   },
   {
-    path: `/d/answers/:answerId`,
+    path: `/d/answers/:reviewQuestionInstanceId`,
     name: "answer",
     component: AnsweredQuestionPage,
     props: true,

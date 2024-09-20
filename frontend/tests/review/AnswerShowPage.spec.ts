@@ -17,6 +17,7 @@ describe("repetition page", () => {
       answerDisplay: "",
       note: link,
       predefinedQuestion: makeMe.aPredefinedQuestion.please(),
+      reviewQuestionInstanceId: 1,
     }
     beforeEach(async () => {
       vitest.resetAllMocks()

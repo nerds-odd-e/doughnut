@@ -3222,6 +3222,7 @@ components:
       required:
       - answer
       - predefinedQuestion
+      - reviewQuestionInstanceId
       type: object
       properties:
         note:
@@ -3232,6 +3233,9 @@ components:
           $ref: "#/components/schemas/Answer"
         answerDisplay:
           type: string
+        reviewQuestionInstanceId:
+          type: integer
+          format: int32
     QuestionSuggestionCreationParams:
       type: object
       properties:

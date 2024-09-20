@@ -51,6 +51,7 @@ public class ReviewQuestionInstance extends EntityIdentifiedByIdOnly {
       result = answer.getSpellingAnswer();
     }
     answerResult.answerDisplay = result;
+    answerResult.reviewQuestionInstanceId = getId();
     return answerResult;
   }
 }

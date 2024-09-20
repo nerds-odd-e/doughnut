@@ -13,6 +13,7 @@ describe("AnswerResult", () => {
     },
     answerDisplay: "answerDisplay",
     predefinedQuestion: makeMe.aPredefinedQuestion.please(),
+    reviewQuestionInstanceId: 1,
   }
 
   const wrapper = helper
