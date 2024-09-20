@@ -3,6 +3,7 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.ReviewQuestionContestResult;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ReviewService;
@@ -85,5 +86,14 @@ class RestReviewQuestionController {
         answerDTO,
         currentUser.getEntity(),
         testabilitySettings.getCurrentUTCTimestamp());
+  }
+
+  @GetMapping(path = "/{answer}")
+  @Transactional
+  public AnsweredQuestion showQuestion(
+      @PathVariable("answer") @Schema(type = "integer") Answer answer)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertReadAuthorization(answer);
+    return answer.getReviewQuestionInstance().getAnsweredQuestion();
   }
 }

@@ -4,19 +4,16 @@ import com.odde.doughnut.controllers.dto.DueReviewPoints;
 import com.odde.doughnut.controllers.dto.InitialInfo;
 import com.odde.doughnut.controllers.dto.ReviewStatus;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.ReviewPointModel;
 import com.odde.doughnut.models.Reviewing;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import java.time.ZoneId;
 import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -89,14 +86,5 @@ class RestReviewsController {
     Reviewing reviewing =
         currentUser.createReviewing(testabilitySettings.getCurrentUTCTimestamp(), timeZone);
     return reviewing.getDueReviewPoints(dueInDays == null ? 0 : dueInDays);
-  }
-
-  @GetMapping(path = "/answers/{answer}")
-  @Transactional
-  public AnsweredQuestion showAnswer(
-      @PathVariable("answer") @Schema(type = "integer") Answer answer)
-      throws UnexpectedNoAccessRightException {
-    currentUser.assertReadAuthorization(answer);
-    return answer.getReviewQuestionInstance().getAnsweredQuestion();
   }
 }

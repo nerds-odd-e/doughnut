@@ -1,7 +1,6 @@
 package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.*;
@@ -9,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.odde.doughnut.controllers.dto.DueReviewPoints;
 import com.odde.doughnut.controllers.dto.InitialInfo;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
@@ -118,50 +116,6 @@ class RestReviewsControllerTests {
           .please();
       DueReviewPoints dueReviewPoints = controller.repeatReview(timezone, null);
       assertThat(dueReviewPoints.getToRepeat(), hasSize(expectedCount));
-    }
-  }
-
-  @Nested
-  class showAnswer {
-    Answer answer;
-    Note noteByAnotherUser;
-    ReviewPoint reviewPoint;
-    User anotherUser;
-
-    @Nested
-    class ANoteFromOtherUser {
-      @BeforeEach
-      void setup() {
-        anotherUser = makeMe.aUser().please();
-        noteByAnotherUser =
-            makeMe.aNote("title").creatorAndOwner(anotherUser).details("description").please();
-      }
-
-      @Test
-      void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
-        reviewPoint = makeMe.aReviewPointFor(noteByAnotherUser).by(anotherUser).please();
-        answer = makeMe.anAnswer().ofSpellingQuestion(reviewPoint.getNote()).please();
-        assertThrows(UnexpectedNoAccessRightException.class, () -> controller.showAnswer(answer));
-      }
-
-      @Test
-      void canSeeNoteThatHasReadAccess() throws UnexpectedNoAccessRightException {
-        reviewPoint = makeMe.aReviewPointFor(noteByAnotherUser).by(currentUser).please();
-        answer =
-            makeMe
-                .anAnswer()
-                .ofSpellingQuestion(reviewPoint.getNote())
-                .answerWithSpelling("xx")
-                .please();
-        makeMe
-            .aSubscription()
-            .forUser(currentUser.getEntity())
-            .forNotebook(noteByAnotherUser.getNotebook())
-            .please();
-        makeMe.refresh(currentUser.getEntity());
-        AnsweredQuestion answeredQuestion = controller.showAnswer(answer);
-        assertThat(answeredQuestion.answer, equalTo(answer));
-      }
     }
   }
 }

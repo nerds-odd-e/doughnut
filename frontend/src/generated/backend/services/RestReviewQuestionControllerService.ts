@@ -109,4 +109,23 @@ export class RestReviewQuestionControllerService {
             },
         });
     }
+    /**
+     * @param answer
+     * @returns AnsweredQuestion OK
+     * @throws ApiError
+     */
+    public showQuestion(
+        answer: number,
+    ): CancelablePromise<AnsweredQuestion> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/review-questions/{answer}',
+            path: {
+                'answer': answer,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
 }

@@ -2349,30 +2349,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Note"
-  /api/reviews/answers/{answer}:
-    get:
-      tags:
-      - rest-reviews-controller
-      operationId: showAnswer
-      parameters:
-      - name: answer
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/AnsweredQuestion"
   /api/review-questions/{reviewPoint}/random-question:
     get:
       tags:
@@ -2397,6 +2373,30 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ReviewQuestionInstance"
+  /api/review-questions/{answer}:
+    get:
+      tags:
+      - rest-review-question-controller
+      operationId: showQuestion
+      parameters:
+      - name: answer
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AnsweredQuestion"
   /api/review-points/{reviewPoint}:
     get:
       tags:

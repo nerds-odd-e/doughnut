@@ -8,6 +8,7 @@ import static org.mockito.Mockito.*;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.ReviewQuestionContestResult;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
@@ -278,6 +279,50 @@ class RestReviewQuestionInstanceControllerTests {
       ReviewPoint rp = makeMe.aReviewPointFor(note).by(currentUser).please();
       ReviewQuestionInstance reviewQuestionInstance = controller.generateRandomQuestion(rp);
       assertThat(reviewQuestionInstance.getId(), notNullValue());
+    }
+  }
+
+  @Nested
+  class showQuestion {
+    Answer answer;
+    Note noteByAnotherUser;
+    ReviewPoint reviewPoint;
+    User anotherUser;
+
+    @Nested
+    class ANoteFromOtherUser {
+      @BeforeEach
+      void setup() {
+        anotherUser = makeMe.aUser().please();
+        noteByAnotherUser =
+            makeMe.aNote("title").creatorAndOwner(anotherUser).details("description").please();
+      }
+
+      @Test
+      void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
+        reviewPoint = makeMe.aReviewPointFor(noteByAnotherUser).by(anotherUser).please();
+        answer = makeMe.anAnswer().ofSpellingQuestion(reviewPoint.getNote()).please();
+        assertThrows(UnexpectedNoAccessRightException.class, () -> controller.showQuestion(answer));
+      }
+
+      @Test
+      void canSeeNoteThatHasReadAccess() throws UnexpectedNoAccessRightException {
+        reviewPoint = makeMe.aReviewPointFor(noteByAnotherUser).by(currentUser).please();
+        answer =
+            makeMe
+                .anAnswer()
+                .ofSpellingQuestion(reviewPoint.getNote())
+                .answerWithSpelling("xx")
+                .please();
+        makeMe
+            .aSubscription()
+            .forUser(currentUser.getEntity())
+            .forNotebook(noteByAnotherUser.getNotebook())
+            .please();
+        makeMe.refresh(currentUser.getEntity());
+        AnsweredQuestion answeredQuestion = controller.showQuestion(answer);
+        assertThat(answeredQuestion.answer, equalTo(answer));
+      }
     }
   }
 }

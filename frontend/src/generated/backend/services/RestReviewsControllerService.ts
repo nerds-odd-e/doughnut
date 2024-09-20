@@ -2,7 +2,6 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { AnsweredQuestion } from '../models/AnsweredQuestion';
 import type { DueReviewPoints } from '../models/DueReviewPoints';
 import type { InitialInfo } from '../models/InitialInfo';
 import type { Note } from '../models/Note';
@@ -84,25 +83,6 @@ export class RestReviewsControllerService {
             url: '/api/reviews/initial',
             query: {
                 'timezone': timezone,
-            },
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * @param answer
-     * @returns AnsweredQuestion OK
-     * @throws ApiError
-     */
-    public showAnswer(
-        answer: number,
-    ): CancelablePromise<AnsweredQuestion> {
-        return this.httpRequest.request({
-            method: 'GET',
-            url: '/api/reviews/answers/{answer}',
-            path: {
-                'answer': answer,
             },
             errors: {
                 500: `Internal Server Error`,
