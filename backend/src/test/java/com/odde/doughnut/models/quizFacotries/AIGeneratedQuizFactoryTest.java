@@ -57,18 +57,17 @@ class AIGeneratedQuizFactoryTest {
     @Test
     void wrong() {
       AnsweredQuestion answerResult =
-          makeMe.anAnswer().forQuestion(questionBuilder().inMemoryPlease()).choiceIndex(0).ooo();
+          questionBuilder().answerChoiceIndex(0).please(false).getAnsweredQuestion();
       assertFalse(answerResult.answer.getCorrect());
     }
 
     @Test
     void correct() {
       AnsweredQuestion answerResult =
-          makeMe
-              .anAnswer()
-              .forQuestion(questionBuilder().inMemoryPlease())
-              .choiceIndex(mcqWithAnswer.getCorrectChoiceIndex())
-              .ooo();
+          questionBuilder()
+              .answerChoiceIndex(mcqWithAnswer.getCorrectChoiceIndex())
+              .please(false)
+              .getAnsweredQuestion();
       assertTrue(answerResult.answer.getCorrect());
     }
   }

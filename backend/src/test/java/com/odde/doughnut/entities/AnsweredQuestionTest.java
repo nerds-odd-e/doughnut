@@ -36,7 +36,12 @@ class AnsweredQuestionTest {
     @Test
     void correct() {
       AnsweredQuestion answer =
-          makeMe.anAnswer().withValidQuestion(spellingQuizFactory).answerWithSpelling("this").ooo();
+          makeMe
+              .aReviewQuestionInstance()
+              .useFactory(spellingQuizFactory)
+              .answerSpelling("this")
+              .please(false)
+              .getAnsweredQuestion();
       assertTrue(answer.answer.getCorrect());
     }
 
@@ -44,10 +49,11 @@ class AnsweredQuestionTest {
     void correctWhenThereAreExtraSpace() {
       AnsweredQuestion answer =
           makeMe
-              .anAnswer()
-              .withValidQuestion(spellingQuizFactory)
-              .answerWithSpelling("this ")
-              .ooo();
+              .aReviewQuestionInstance()
+              .useFactory(spellingQuizFactory)
+              .answerSpelling("this ")
+              .please(false)
+              .getAnsweredQuestion();
       assertTrue(answer.answer.getCorrect());
     }
 
@@ -55,10 +61,11 @@ class AnsweredQuestionTest {
     void literalAnswer() {
       AnsweredQuestion answerResult =
           makeMe
-              .anAnswer()
-              .withValidQuestion(spellingQuizFactory)
-              .answerWithSpelling("this / that")
-              .ooo();
+              .aReviewQuestionInstance()
+              .useFactory(spellingQuizFactory)
+              .answerSpelling("this / that")
+              .please(false)
+              .getAnsweredQuestion();
       assertTrue(answerResult.answer.getCorrect());
     }
   }

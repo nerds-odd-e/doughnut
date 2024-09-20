@@ -116,9 +116,8 @@ public class RestAssessmentControllerTests {
     @Test
     void shouldNotBeAbleToAnswerTheSameQuestionTwice() {
       makeMe
-          .anAnswer()
-          .forQuestion(assessmentQuestionInstance.getReviewQuestionInstance())
-          .answered()
+          .theReviewQuestionInstance(assessmentQuestionInstance.getReviewQuestionInstance())
+          .answerSpelling("my answer")
           .please();
       makeMe.refresh(assessmentQuestionInstance.getReviewQuestionInstance());
       assertThrows(
@@ -158,7 +157,10 @@ public class RestAssessmentControllerTests {
           .getAssessmentQuestionInstances()
           .forEach(
               aqi -> {
-                makeMe.anAnswer().forQuestion(aqi.getReviewQuestionInstance()).correct().please();
+                makeMe
+                    .theReviewQuestionInstance(aqi.getReviewQuestionInstance())
+                    .forceAnswerCorrect()
+                    .please();
               });
 
       AssessmentAttempt assessmentResult = controller.submitAssessmentResult(assessmentAttempt);
@@ -185,9 +187,9 @@ public class RestAssessmentControllerTests {
           assessmentAttempt.getAssessmentQuestionInstances().get(1).getReviewQuestionInstance();
       ReviewQuestionInstance q3 =
           assessmentAttempt.getAssessmentQuestionInstances().get(2).getReviewQuestionInstance();
-      makeMe.anAnswer().forQuestion(q1).correct().please();
-      makeMe.anAnswer().forQuestion(q2).correct().please();
-      makeMe.anAnswer().forQuestion(q3).answered().please();
+      makeMe.theReviewQuestionInstance(q1).forceAnswerCorrect().please();
+      makeMe.theReviewQuestionInstance(q2).forceAnswerCorrect().please();
+      makeMe.theReviewQuestionInstance(q3).answerSpelling("wrong").please();
 
       AssessmentAttempt assessmentResult = controller.submitAssessmentResult(assessmentAttempt);
 
