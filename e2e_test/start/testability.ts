@@ -25,11 +25,9 @@ const postToTestabilityApi = (
 const postToTestabilityApiSuccessfully = (
   cy: Cypress.cy & CyEventEmitter,
   path: string,
-  options: { body?: Record<string, unknown>; failOnStatusCode?: boolean }
+  options: { body?: Record<string, unknown> }
 ) => {
-  return postToTestabilityApi(cy, path, options)
-    .its('status')
-    .should('equal', 200)
+  return postToTestabilityApi(cy, path, { failOnStatusCode: true, ...options })
 }
 
 const cleanAndReset = (cy: Cypress.cy & CyEventEmitter, countdown: number) => {
