@@ -302,7 +302,7 @@ class RestReviewQuestionInstanceControllerTests {
       makeMe.refresh(currentUser.getEntity());
       AnsweredQuestion answeredQuestion = controller.showQuestion(reviewQuestionInstance);
       assertThat(
-          answeredQuestion.answer.getReviewQuestionInstance(), equalTo(reviewQuestionInstance));
+          answeredQuestion.reviewQuestionInstanceId, equalTo(reviewQuestionInstance.getId()));
     }
   }
 }

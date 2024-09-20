@@ -7,11 +7,12 @@ import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 
 public class AnswerBuilder extends EntityBuilder<Answer> {
-  private ReviewQuestionInstanceBuilder reviewQuestionInstanceBuilder = null;
+  public ReviewQuestionInstanceBuilder reviewQuestionInstanceBuilder = null;
   AnswerDTO answerDTO = new AnswerDTO();
+  Boolean forceCorrect = null;
 
   public AnswerBuilder(MakeMe makeMe) {
-    super(makeMe, new Answer());
+    super(makeMe, null);
   }
 
   @Override
@@ -19,29 +20,20 @@ public class AnswerBuilder extends EntityBuilder<Answer> {
     if (this.reviewQuestionInstanceBuilder == null) {
       throw new RuntimeException("Question is required for Answer");
     }
-    entity.setReviewQuestionInstance(reviewQuestionInstanceBuilder.please(needPersist));
-    if (needPersist) {
-      if (entity.getReviewQuestionInstance().getId() == null) {
-        makeMe.modelFactoryService.save(entity.getReviewQuestionInstance());
-      }
+    if (answerDTO.getSpellingAnswer() == null && answerDTO.getChoiceIndex() == null) {
+      answerDTO.setSpellingAnswer("spelling");
     }
-    if (entity.getCorrect() == null) {
-      if (answerDTO.getSpellingAnswer() == null && answerDTO.getChoiceIndex() == null) {
-        answerDTO.setSpellingAnswer("spelling");
-      }
-      this.entity.setFromDTO(answerDTO);
+    ReviewQuestionInstance reviewQuestionInstance =
+        reviewQuestionInstanceBuilder.answer(answerDTO).please(needPersist);
+    entity = reviewQuestionInstance.getAnswer();
+    if (forceCorrect != null) {
+      entity.setCorrect(forceCorrect);
     }
   }
 
   public AnswerBuilder withValidQuestion(PredefinedQuestionFactory predefinedQuestionFactory) {
     this.reviewQuestionInstanceBuilder =
         makeMe.aReviewQuestionInstance().useFactory(predefinedQuestionFactory);
-    return this;
-  }
-
-  public AnswerBuilder ofSpellingQuestion(Note note) {
-    this.reviewQuestionInstanceBuilder =
-        makeMe.aReviewQuestionInstance().approvedSpellingQuestionOf(note);
     return this;
   }
 
@@ -61,7 +53,7 @@ public class AnswerBuilder extends EntityBuilder<Answer> {
   }
 
   public AnswerBuilder correct() {
-    entity.setCorrect(true);
+    forceCorrect = true;
     return this;
   }
 }

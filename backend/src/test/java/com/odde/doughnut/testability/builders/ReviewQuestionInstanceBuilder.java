@@ -1,5 +1,6 @@
 package com.odde.doughnut.testability.builders;
 
+import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewQuestionInstance;
 import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionFactory;
@@ -9,6 +10,7 @@ import com.odde.doughnut.testability.MakeMe;
 
 public class ReviewQuestionInstanceBuilder extends EntityBuilder<ReviewQuestionInstance> {
   private final PredefinedQuestionBuilder predefinedQuestionBuilder;
+  private AnswerDTO answerDTO = null;
 
   public ReviewQuestionInstanceBuilder(
       MakeMe makeMe, ReviewQuestionInstance reviewQuestionInstance) {
@@ -21,6 +23,9 @@ public class ReviewQuestionInstanceBuilder extends EntityBuilder<ReviewQuestionI
     if (entity == null) {
       entity = new ReviewQuestionInstance();
       entity.setPredefinedQuestion(predefinedQuestionBuilder.please(needPersist));
+    }
+    if (answerDTO != null) {
+      entity.buildAnswer(answerDTO);
     }
   }
 
@@ -44,6 +49,11 @@ public class ReviewQuestionInstanceBuilder extends EntityBuilder<ReviewQuestionI
       PredefinedQuestionFactory predefinedQuestionFactory) {
     this.predefinedQuestionBuilder.useFactory(predefinedQuestionFactory);
 
+    return this;
+  }
+
+  public ReviewQuestionInstanceBuilder answer(AnswerDTO answerDTO) {
+    this.answerDTO = answerDTO;
     return this;
   }
 }

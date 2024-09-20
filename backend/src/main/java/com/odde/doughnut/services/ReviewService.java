@@ -41,7 +41,7 @@ public class ReviewService {
       Timestamp currentUTCTimestamp) {
     Answer answer = modelFactoryService.createAnswerForQuestion(reviewQuestionInstance, answerDTO);
     modelFactoryService.updateReviewPointAfterAnsweringQuestion(
-        user, currentUTCTimestamp, answer.getCorrect(), answer.getReviewQuestionInstance());
+        user, currentUTCTimestamp, answer.getCorrect(), reviewQuestionInstance);
     return reviewQuestionInstance.getAnsweredQuestion();
   }
 }
