@@ -16,9 +16,10 @@ public class AnswerBuilder extends EntityBuilder<Answer> {
 
   @Override
   protected void beforeCreate(boolean needPersist) {
-    if (this.reviewQuestionInstanceBuilder != null) {
-      entity.setReviewQuestionInstance(reviewQuestionInstanceBuilder.please(needPersist));
+    if (this.reviewQuestionInstanceBuilder == null) {
+      throw new RuntimeException("Question is required for Answer");
     }
+    entity.setReviewQuestionInstance(reviewQuestionInstanceBuilder.please(needPersist));
     if (needPersist) {
       if (entity.getReviewQuestionInstance().getId() == null) {
         makeMe.modelFactoryService.save(entity.getReviewQuestionInstance());
@@ -45,8 +46,7 @@ public class AnswerBuilder extends EntityBuilder<Answer> {
   }
 
   public AnswerBuilder forQuestion(ReviewQuestionInstance reviewQuestionInstance) {
-    entity.setReviewQuestionInstance(reviewQuestionInstance);
-    reviewQuestionInstance.setAnswer(entity);
+    this.reviewQuestionInstanceBuilder = makeMe.theReviewQuestionInstance(reviewQuestionInstance);
     return this;
   }
 

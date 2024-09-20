@@ -10,8 +10,9 @@ import com.odde.doughnut.testability.MakeMe;
 public class ReviewQuestionInstanceBuilder extends EntityBuilder<ReviewQuestionInstance> {
   private final PredefinedQuestionBuilder predefinedQuestionBuilder;
 
-  public ReviewQuestionInstanceBuilder(MakeMe makeMe) {
-    super(makeMe, null);
+  public ReviewQuestionInstanceBuilder(
+      MakeMe makeMe, ReviewQuestionInstance reviewQuestionInstance) {
+    super(makeMe, reviewQuestionInstance);
     predefinedQuestionBuilder = new PredefinedQuestionBuilder(makeMe);
   }
 

@@ -133,7 +133,12 @@ public class MakeMe extends MakeMeWithoutDB {
   }
 
   public ReviewQuestionInstanceBuilder aReviewQuestionInstance() {
-    return new ReviewQuestionInstanceBuilder(this);
+    return new ReviewQuestionInstanceBuilder(this, null);
+  }
+
+  public ReviewQuestionInstanceBuilder theReviewQuestionInstance(
+      ReviewQuestionInstance reviewQuestionInstance) {
+    return new ReviewQuestionInstanceBuilder(this, reviewQuestionInstance);
   }
 
   public PredefinedQuestion buildAQuestionForLinkingNote(
