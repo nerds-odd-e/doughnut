@@ -107,12 +107,9 @@ public class AssessmentService {
   }
 
   public AssessmentQuestionInstance answerQuestion(
-      AssessmentQuestionInstance assessmentQuestionInstance, AnswerDTO answerDTO, User user) {
+      AssessmentQuestionInstance assessmentQuestionInstance, AnswerDTO answerDTO) {
     modelFactoryService.createAnswerForQuestion(
-        assessmentQuestionInstance.getReviewQuestionInstance(),
-        answerDTO,
-        user,
-        testabilitySettings.getCurrentUTCTimestamp());
+        assessmentQuestionInstance.getReviewQuestionInstance(), answerDTO);
     return assessmentQuestionInstance;
   }
 }

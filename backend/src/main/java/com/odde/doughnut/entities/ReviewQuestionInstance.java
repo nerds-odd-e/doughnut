@@ -51,5 +51,4 @@ public class ReviewQuestionInstance extends EntityIdentifiedByIdOnly {
     answerResult.reviewQuestionInstanceId = id;
     return answerResult;
   }
-
 }

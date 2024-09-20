@@ -149,10 +149,7 @@ public class ModelFactoryService {
   }
 
   public Answer createAnswerForQuestion(
-      ReviewQuestionInstance reviewQuestionInstance,
-      AnswerDTO answerDTO,
-      User user,
-      Timestamp currentUTCTimestamp) {
+      ReviewQuestionInstance reviewQuestionInstance, AnswerDTO answerDTO) {
     if (reviewQuestionInstance.getAnswer() != null) {
       throw new QuestionAnswerException("The question is already answered");
     }
@@ -161,13 +158,19 @@ public class ModelFactoryService {
     answer.setFromDTO(answerDTO);
     save(answer);
     save(answer.getReviewQuestionInstance());
+    return answer;
+  }
+
+  public void updateReviewPointAfterAnsweringQuestion(
+      User user,
+      Timestamp currentUTCTimestamp,
+      Boolean correct,
+      ReviewQuestionInstance reviewQuestionInstance) {
     ReviewPoint reviewPoint =
         toUserModel(user)
-            .getReviewPointFor(
-                answer.getReviewQuestionInstance().getPredefinedQuestion().getNote());
+            .getReviewPointFor(reviewQuestionInstance.getPredefinedQuestion().getNote());
     if (reviewPoint != null) {
-      toReviewPointModel(reviewPoint).markAsRepeated(currentUTCTimestamp, answer.getCorrect());
+      toReviewPointModel(reviewPoint).markAsRepeated(currentUTCTimestamp, correct);
     }
-    return answer;
   }
 }

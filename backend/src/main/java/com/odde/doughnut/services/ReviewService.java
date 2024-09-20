@@ -39,9 +39,9 @@ public class ReviewService {
       AnswerDTO answerDTO,
       User user,
       Timestamp currentUTCTimestamp) {
-    return modelFactoryService
-        .createAnswerForQuestion(reviewQuestionInstance, answerDTO, user, currentUTCTimestamp)
-        .getReviewQuestionInstance()
-        .getAnsweredQuestion();
+    Answer answer = modelFactoryService.createAnswerForQuestion(reviewQuestionInstance, answerDTO);
+    modelFactoryService.updateReviewPointAfterAnsweringQuestion(
+        user, currentUTCTimestamp, answer.getCorrect(), answer.getReviewQuestionInstance());
+    return reviewQuestionInstance.getAnsweredQuestion();
   }
 }
