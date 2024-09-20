@@ -1,6 +1,5 @@
 package com.odde.doughnut.testability.builders;
 
-import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionFactory;
 import com.odde.doughnut.testability.EntityBuilder;
@@ -8,8 +7,6 @@ import com.odde.doughnut.testability.MakeMe;
 
 public class AnswerBuilder extends EntityBuilder<Answer> {
   public ReviewQuestionInstanceBuilder reviewQuestionInstanceBuilder = null;
-  AnswerDTO answerDTO = new AnswerDTO();
-  Boolean forceCorrect = null;
 
   public AnswerBuilder(MakeMe makeMe) {
     super(makeMe, null);
@@ -20,15 +17,14 @@ public class AnswerBuilder extends EntityBuilder<Answer> {
     if (this.reviewQuestionInstanceBuilder == null) {
       throw new RuntimeException("Question is required for Answer");
     }
-    if (answerDTO.getSpellingAnswer() == null && answerDTO.getChoiceIndex() == null) {
-      answerDTO.setSpellingAnswer("spelling");
-    }
     ReviewQuestionInstance reviewQuestionInstance =
-        reviewQuestionInstanceBuilder.answer(answerDTO).please(needPersist);
+        reviewQuestionInstanceBuilder.please(needPersist);
     entity = reviewQuestionInstance.getAnswer();
-    if (forceCorrect != null) {
-      entity.setCorrect(forceCorrect);
-    }
+  }
+
+  public AnswerBuilder answered() {
+    reviewQuestionInstanceBuilder.answerSpelling("spelling");
+    return this;
   }
 
   public AnswerBuilder withValidQuestion(PredefinedQuestionFactory predefinedQuestionFactory) {
@@ -43,21 +39,21 @@ public class AnswerBuilder extends EntityBuilder<Answer> {
   }
 
   public AnswerBuilder answerWithSpelling(String answer) {
-    answerDTO.setSpellingAnswer(answer);
+    reviewQuestionInstanceBuilder.answerSpelling(answer);
     return this;
   }
 
   public AnswerBuilder choiceIndex(int index) {
-    answerDTO.setChoiceIndex(index);
+    reviewQuestionInstanceBuilder.answerChoiceIndex(index);
     return this;
   }
 
   public AnswerBuilder correct() {
-    forceCorrect = true;
+    reviewQuestionInstanceBuilder.forceAnswerCorrect();
     return this;
   }
 
   public AnsweredQuestion ooo() {
-    return reviewQuestionInstanceBuilder.answer(answerDTO).please(false).getAnsweredQuestion();
+    return reviewQuestionInstanceBuilder.please(false).getAnsweredQuestion();
   }
 }

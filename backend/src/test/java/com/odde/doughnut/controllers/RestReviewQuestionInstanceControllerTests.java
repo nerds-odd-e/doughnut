@@ -298,7 +298,7 @@ class RestReviewQuestionInstanceControllerTests {
       Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
       ReviewQuestionInstance reviewQuestionInstance =
           makeMe.aReviewQuestionInstance().spellingQuestionOf(note).please();
-      makeMe.anAnswer().forQuestion(reviewQuestionInstance).please();
+      makeMe.anAnswer().forQuestion(reviewQuestionInstance).answered().please();
       makeMe.refresh(currentUser.getEntity());
       AnsweredQuestion answeredQuestion = controller.showQuestion(reviewQuestionInstance);
       assertThat(

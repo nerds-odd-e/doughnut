@@ -118,6 +118,7 @@ public class RestAssessmentControllerTests {
       makeMe
           .anAnswer()
           .forQuestion(assessmentQuestionInstance.getReviewQuestionInstance())
+          .answered()
           .please();
       makeMe.refresh(assessmentQuestionInstance.getReviewQuestionInstance());
       assertThrows(
@@ -186,7 +187,7 @@ public class RestAssessmentControllerTests {
           assessmentAttempt.getAssessmentQuestionInstances().get(2).getReviewQuestionInstance();
       makeMe.anAnswer().forQuestion(q1).correct().please();
       makeMe.anAnswer().forQuestion(q2).correct().please();
-      makeMe.anAnswer().forQuestion(q3).please();
+      makeMe.anAnswer().forQuestion(q3).answered().please();
 
       AssessmentAttempt assessmentResult = controller.submitAssessmentResult(assessmentAttempt);
 
