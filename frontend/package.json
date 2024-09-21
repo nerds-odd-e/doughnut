@@ -28,7 +28,7 @@
     "mini-debounce": "^1.0.8",
     "quill": "2.0.2",
     "turndown": "^7.2.0",
-    "vue": "3.5.6",
+    "vue": "3.5.7",
     "vue-content-loader": "2.0.1",
     "vue-router": "4.4.5"
   },
@@ -54,7 +54,7 @@
     "unplugin-auto-import": "^0.18.3",
     "unplugin-vue-components": "0.27.4",
     "unplugin-vue-router": "^0.10.8",
-    "vite": "5.4.6",
+    "vite": "5.4.7",
     "vite-plugin-checker": "0.8.0",
     "vite-plugin-compression": "^0.5.1",
     "vite-plugin-vue-devtools": "^7.4.5",
