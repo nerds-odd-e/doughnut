@@ -43,6 +43,8 @@ export type { FailureReport } from './models/FailureReport';
 export type { FailureReportForView } from './models/FailureReportForView';
 export type { FileCitation } from './models/FileCitation';
 export type { FilePath } from './models/FilePath';
+export type { FileSearch } from './models/FileSearch';
+export type { FileSearchRankingOptions } from './models/FileSearchRankingOptions';
 export type { FileSearchTool } from './models/FileSearchTool';
 export type { FunctionTool } from './models/FunctionTool';
 export type { GithubIssue } from './models/GithubIssue';

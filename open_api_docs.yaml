@@ -3606,10 +3606,32 @@ components:
       properties:
         file_id:
           type: string
+    FileSearch:
+      type: object
+      properties:
+        max_num_results:
+          type: integer
+          format: int32
+        ranking_options:
+          $ref: "#/components/schemas/FileSearchRankingOptions"
+    FileSearchRankingOptions:
+      required:
+      - score_threshold
+      type: object
+      properties:
+        ranker:
+          type: string
+        score_threshold:
+          type: number
+          format: double
     FileSearchTool:
       type: object
       allOf:
       - $ref: "#/components/schemas/Tool"
+      - type: object
+        properties:
+          file_search:
+            $ref: "#/components/schemas/FileSearch"
     FunctionTool:
       type: object
       allOf:
@@ -3624,6 +3646,13 @@ components:
         detail:
           type: string
         file_id:
+          type: string
+    ImageUrl:
+      type: object
+      properties:
+        url:
+          type: string
+        detail:
           type: string
     IncompleteDetails:
       type: object
@@ -3679,6 +3708,8 @@ components:
           $ref: "#/components/schemas/Text"
         image_file:
           $ref: "#/components/schemas/ImageFile"
+        image_url:
+          $ref: "#/components/schemas/ImageUrl"
     Text:
       type: object
       properties:
@@ -4031,13 +4062,6 @@ components:
       properties:
         messageDelta:
           $ref: "#/components/schemas/MessageDelta"
-    ImageUrl:
-      type: object
-      properties:
-        url:
-          type: string
-        detail:
-          type: string
     MessageDelta:
       type: object
       properties:
