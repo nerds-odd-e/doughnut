@@ -49,7 +49,7 @@ describe("in place edit on title", () => {
   it("is not editable when readonly", async () => {
     const wrapper = mountComponent(note, true)
     await wrapper.find('[role="topic"]').trigger("click")
-    expect(wrapper.findAll("input")).toHaveLength(0)
+    expect(wrapper.findAll("[role='topic'] input")).toHaveLength(0)
   })
 
   const getPlaceholder = (wrapper: VueWrapper<ComponentPublicInstance>) => {

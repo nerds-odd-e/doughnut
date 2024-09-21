@@ -43,7 +43,7 @@ const changerInner = async (
     .catch(errorHander)
   savedVersion.value = version
 }
-const changer = debounce(changerInner, 5000)
+const changer = debounce(changerInner, 1000)
 
 const localValue = ref(value)
 const version = ref(0)
