@@ -5,7 +5,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from "vue"
 import Quill, { type QuillOptions } from "quill"
-import "quill/dist/quill.snow.css"
+import "quill/dist/quill.bubble.css"
 
 const { modelValue, readonly } = defineProps({
   modelValue: String,
@@ -24,11 +24,16 @@ const onBlurTextField = () => {
 
 const options: QuillOptions = {
   modules: {
-    toolbar: false,
+    toolbar: [
+      ["bold", "italic", "underline"],
+      [{ header: 1 }, { header: 2 }],
+      [{ list: "ordered" }, { list: "bullet" }],
+      ["link"],
+    ],
   },
   placeholder: readonly ? "" : "Enter note details here...",
   readOnly: readonly,
-  theme: "snow",
+  theme: "bubble",
 }
 
 onMounted(() => {
@@ -81,7 +86,7 @@ const onUpdateContent = () => {
   &::before
     left: 0 !important
     right: 0 !important
-.ql-container.ql-snow
+.ql-container.ql-bubble
   border: none
   font-size: inherit !important
 </style>

@@ -37,7 +37,7 @@
       />
     </aside>
     <main
-      class="flex-grow-1 overflow-auto"
+      class="flex-grow-1 overflow-visible"
       :class="{ 'd-none': !sidebarCollapsedForSmallScreen }"
     >
       <NoteShow
