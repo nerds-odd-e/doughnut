@@ -21,10 +21,6 @@ public record AiAdvisorWithStorageService(
     this(new AiAdvisorService(openAiApi), modelFactoryService);
   }
 
-  private AssistantService getDefaultChatService() {
-    return aiAdvisorService.getChatService(getDefaultChatAssistantSettingAccessor().getValue());
-  }
-
   private GlobalSettingsService.GlobalSettingsKeyValue getDefaultChatAssistantSettingAccessor() {
     return getGlobalSettingsService().chatAssistantId();
   }
@@ -33,9 +29,9 @@ public record AiAdvisorWithStorageService(
     NotebookAssistant assistant =
         modelFactoryService.notebookAssistantRepository.findByNotebook(note.getNotebook());
     if (assistant != null) {
-      return aiAdvisorService.getChatService(assistant.getAssistantId());
+      return aiAdvisorService.getContentCompletionService(assistant.getAssistantId());
     }
-    return getDefaultChatService();
+    return getContentCompletionService();
   }
 
   private GlobalSettingsService getGlobalSettingsService() {
@@ -69,7 +65,7 @@ public record AiAdvisorWithStorageService(
   }
 
   public Assistant createChatAssistant(Timestamp currentUTCTimestamp, String modelName) {
-    AssistantService service = getDefaultChatService();
+    AssistantService service = getContentCompletionService();
     Assistant chatAssistant = service.createDefaultAssistant(modelName, "chat assistant");
     getDefaultChatAssistantSettingAccessor()
         .setKeyValue(currentUTCTimestamp, chatAssistant.getId());
@@ -103,7 +99,7 @@ public record AiAdvisorWithStorageService(
   public NotebookAssistant recreateNotebookAssistant(
       Timestamp currentUTCTimestamp, User creator, Notebook notebook, String additionalInstruction)
       throws IOException {
-    AssistantService service = getDefaultChatService();
+    AssistantService service = getContentCompletionService();
     String modelName = getGlobalSettingsService().globalSettingOthers().getValue();
     String fileContent = notebook.getNotebookDump();
     Assistant chatAssistant =

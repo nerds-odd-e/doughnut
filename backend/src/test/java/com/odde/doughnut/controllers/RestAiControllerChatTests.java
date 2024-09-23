@@ -105,7 +105,7 @@ public class RestAiControllerChatTests {
       GlobalSettingsService globalSettingsService =
           new GlobalSettingsService(makeMe.modelFactoryService);
       globalSettingsService
-          .chatAssistantId()
+          .noteCompletionAssistantId()
           .setKeyValue(makeMe.aTimestamp().please(), "chat-assistant");
       controller.chat(note, new ChatRequest("What's your name?", null));
       ArgumentCaptor<RunCreateRequest> captor = ArgumentCaptor.forClass(RunCreateRequest.class);
