@@ -154,7 +154,7 @@ importers:
         version: 2.4.6
       css-loader:
         specifier: ^7.1.2
-        version: 7.1.2(webpack@5.94.0(esbuild@0.24.0))
+        version: 7.1.2(webpack@5.94.0)
       es-toolkit:
         specifier: ^1.20.0
         version: 1.20.0
@@ -172,10 +172,10 @@ importers:
         version: 1.79.3
       sass-loader:
         specifier: 16.0.2
-        version: 16.0.2(sass-embedded@1.79.3)(sass@1.79.3)(webpack@5.94.0(esbuild@0.24.0))
+        version: 16.0.2(sass-embedded@1.79.3)(sass@1.79.3)(webpack@5.94.0)
       style-loader:
         specifier: ^4.0.0
-        version: 4.0.0(webpack@5.94.0(esbuild@0.24.0))
+        version: 4.0.0(webpack@5.94.0)
       typescript:
         specifier: 5.6.2
         version: 5.6.2
@@ -4977,7 +4977,7 @@ snapshots:
       '@babel/traverse': 7.25.6
       '@babel/types': 7.25.6
       convert-source-map: 2.0.0
-      debug: 4.3.7(supports-color@8.1.1)
+      debug: 4.3.7
       gensync: 1.0.0-beta.2
       json5: 2.2.3
       semver: 6.3.1
@@ -5158,7 +5158,7 @@ snapshots:
       '@babel/parser': 7.25.6
       '@babel/template': 7.25.0
       '@babel/types': 7.25.6
-      debug: 4.3.7(supports-color@8.1.1)
+      debug: 4.3.7
       globals: 11.12.0
     transitivePeerDependencies:
       - supports-color
@@ -5541,7 +5541,7 @@ snapshots:
   '@eslint/config-array@0.18.0':
     dependencies:
       '@eslint/object-schema': 2.1.4
-      debug: 4.3.7(supports-color@8.1.1)
+      debug: 4.3.7
       minimatch: 3.1.2
     transitivePeerDependencies:
       - supports-color
@@ -5550,7 +5550,7 @@ snapshots:
   '@eslint/eslintrc@3.1.0':
     dependencies:
       ajv: 6.12.6
-      debug: 4.3.7(supports-color@8.1.1)
+      debug: 4.3.7
       espree: 10.1.0
       globals: 14.0.0
       ignore: 5.3.2
@@ -6201,7 +6201,7 @@ snapshots:
 
   agent-base@7.1.1:
     dependencies:
-      debug: 4.3.7(supports-color@8.1.1)
+      debug: 4.3.7
     transitivePeerDependencies:
       - supports-color
 
@@ -6681,7 +6681,7 @@ snapshots:
       shebang-command: 2.0.0
       which: 2.0.2
 
-  css-loader@7.1.2(webpack@5.94.0(esbuild@0.24.0)):
+  css-loader@7.1.2(webpack@5.94.0):
     dependencies:
       icss-utils: 5.1.0(postcss@8.4.47)
       postcss: 8.4.47
@@ -6692,7 +6692,7 @@ snapshots:
       postcss-value-parser: 4.2.0
       semver: 7.6.3
     optionalDependencies:
-      webpack: 5.94.0(esbuild@0.24.0)
+      webpack: 5.94.0
 
   css.escape@1.5.1: {}
 
@@ -6791,6 +6791,10 @@ snapshots:
       ms: 2.1.3
     optionalDependencies:
       supports-color: 8.1.1
+
+  debug@4.3.7:
+    dependencies:
+      ms: 2.1.3
 
   debug@4.3.7(supports-color@8.1.1):
     dependencies:
@@ -7071,7 +7075,7 @@ snapshots:
       ajv: 6.12.6
       chalk: 4.1.2
       cross-spawn: 7.0.3
-      debug: 4.3.7(supports-color@8.1.1)
+      debug: 4.3.7
       escape-string-regexp: 4.0.0
       eslint-scope: 8.0.2
       eslint-visitor-keys: 4.0.0
@@ -7625,7 +7629,7 @@ snapshots:
   http-proxy-agent@7.0.2:
     dependencies:
       agent-base: 7.1.1
-      debug: 4.3.7(supports-color@8.1.1)
+      debug: 4.3.7
     transitivePeerDependencies:
       - supports-color
 
@@ -7662,7 +7666,7 @@ snapshots:
   https-proxy-agent@7.0.5:
     dependencies:
       agent-base: 7.1.1
-      debug: 4.3.7(supports-color@8.1.1)
+      debug: 4.3.7
     transitivePeerDependencies:
       - supports-color
 
@@ -8973,13 +8977,13 @@ snapshots:
       sass-embedded-win32-x64: 1.79.3
     optional: true
 
-  sass-loader@16.0.2(sass-embedded@1.79.3)(sass@1.79.3)(webpack@5.94.0(esbuild@0.24.0)):
+  sass-loader@16.0.2(sass-embedded@1.79.3)(sass@1.79.3)(webpack@5.94.0):
     dependencies:
       neo-async: 2.6.2
     optionalDependencies:
       sass: 1.79.3
       sass-embedded: 1.79.3
-      webpack: 5.94.0(esbuild@0.24.0)
+      webpack: 5.94.0
 
   sass@1.79.3:
     dependencies:
@@ -9226,9 +9230,9 @@ snapshots:
     dependencies:
       js-tokens: 9.0.0
 
-  style-loader@4.0.0(webpack@5.94.0(esbuild@0.24.0)):
+  style-loader@4.0.0(webpack@5.94.0):
     dependencies:
-      webpack: 5.94.0(esbuild@0.24.0)
+      webpack: 5.94.0
 
   superagent@10.1.0:
     dependencies:
@@ -9310,16 +9314,14 @@ snapshots:
     dependencies:
       bintrees: 1.0.2
 
-  terser-webpack-plugin@5.3.10(esbuild@0.24.0)(webpack@5.94.0(esbuild@0.24.0)):
+  terser-webpack-plugin@5.3.10(webpack@5.94.0):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.25
       jest-worker: 27.5.1
       schema-utils: 3.3.0
       serialize-javascript: 6.0.2
       terser: 5.33.0
-      webpack: 5.94.0(esbuild@0.24.0)
-    optionalDependencies:
-      esbuild: 0.24.0
+      webpack: 5.94.0
 
   terser@5.33.0:
     dependencies:
@@ -9504,7 +9506,7 @@ snapshots:
       '@antfu/utils': 0.7.10
       '@rollup/pluginutils': 5.1.1(rollup@4.22.4)
       chokidar: 3.6.0
-      debug: 4.3.7(supports-color@8.1.1)
+      debug: 4.3.7
       fast-glob: 3.3.2
       local-pkg: 0.5.0
       magic-string: 0.30.11
@@ -9620,7 +9622,7 @@ snapshots:
   vite-node@2.1.1(@types/node@22.5.5)(sass-embedded@1.79.3)(sass@1.79.3)(terser@5.33.0):
     dependencies:
       cac: 6.7.14
-      debug: 4.3.7(supports-color@8.1.1)
+      debug: 4.3.7
       pathe: 1.1.2
       vite: 5.4.7(@types/node@22.5.5)(sass-embedded@1.79.3)(sass@1.79.3)(terser@5.33.0)
     transitivePeerDependencies:
@@ -9661,7 +9663,7 @@ snapshots:
   vite-plugin-compression@0.5.1(vite@5.4.7(@types/node@22.5.5)(sass-embedded@1.79.3)(sass@1.79.3)(terser@5.33.0)):
     dependencies:
       chalk: 4.1.2
-      debug: 4.3.7(supports-color@8.1.1)
+      debug: 4.3.7
       fs-extra: 10.1.0
       vite: 5.4.7(@types/node@22.5.5)(sass-embedded@1.79.3)(sass@1.79.3)(terser@5.33.0)
     transitivePeerDependencies:
@@ -9671,7 +9673,7 @@ snapshots:
     dependencies:
       '@antfu/utils': 0.7.10
       '@rollup/pluginutils': 5.1.1(rollup@4.22.4)
-      debug: 4.3.7(supports-color@8.1.1)
+      debug: 4.3.7
       error-stack-parser-es: 0.1.5
       fs-extra: 11.2.0
       open: 10.1.0
@@ -9716,7 +9718,7 @@ snapshots:
 
   vite-tsconfig-paths@5.0.1(typescript@5.6.2)(vite@5.4.7(@types/node@22.5.5)(sass-embedded@1.79.3)(sass@1.79.3)(terser@5.33.0)):
     dependencies:
-      debug: 4.3.7(supports-color@8.1.1)
+      debug: 4.3.7
       globrex: 0.1.2
       tsconfck: 3.1.3(typescript@5.6.2)
     optionalDependencies:
@@ -9764,7 +9766,7 @@ snapshots:
       '@vitest/spy': 2.1.1
       '@vitest/utils': 2.1.1
       chai: 5.1.1
-      debug: 4.3.7(supports-color@8.1.1)
+      debug: 4.3.7
       magic-string: 0.30.11
       pathe: 1.1.2
       std-env: 3.7.0
@@ -9871,7 +9873,7 @@ snapshots:
 
   webpack-virtual-modules@0.6.2: {}
 
-  webpack@5.94.0(esbuild@0.24.0):
+  webpack@5.94.0:
     dependencies:
       '@types/estree': 1.0.6
       '@webassemblyjs/ast': 1.12.1
@@ -9893,7 +9895,7 @@ snapshots:
       neo-async: 2.6.2
       schema-utils: 3.3.0
       tapable: 2.2.1
-      terser-webpack-plugin: 5.3.10(esbuild@0.24.0)(webpack@5.94.0(esbuild@0.24.0))
+      terser-webpack-plugin: 5.3.10(webpack@5.94.0)
       watchpack: 2.4.2
       webpack-sources: 3.2.3
     transitivePeerDependencies:
