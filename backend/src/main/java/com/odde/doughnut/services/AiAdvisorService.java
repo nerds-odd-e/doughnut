@@ -46,8 +46,4 @@ public class AiAdvisorService {
                   return result;
                 })));
   }
-
-  public AssistantService getChatService(String assistantId) {
-    return new AssistantService(openAiApiHandler, assistantId, List.of());
-  }
 }

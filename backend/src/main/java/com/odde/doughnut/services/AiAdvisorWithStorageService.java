@@ -21,10 +21,6 @@ public record AiAdvisorWithStorageService(
     this(new AiAdvisorService(openAiApi), modelFactoryService);
   }
 
-  private GlobalSettingsService.GlobalSettingsKeyValue getDefaultChatAssistantSettingAccessor() {
-    return getGlobalSettingsService().chatAssistantId();
-  }
-
   private AssistantService getChatService(Note note) {
     NotebookAssistant assistant =
         modelFactoryService.notebookAssistantRepository.findByNotebook(note.getNotebook());
@@ -52,8 +48,6 @@ public record AiAdvisorWithStorageService(
     String modelName = getGlobalSettingsService().globalSettingOthers().getValue();
     Assistant completionAssistant = createCompletionAssistant(currentUTCTimestamp, modelName);
     result.put(completionAssistant.getName(), completionAssistant.getId());
-    Assistant chatAssistant = createChatAssistant(currentUTCTimestamp, modelName);
-    result.put(chatAssistant.getName(), chatAssistant.getId());
     return result;
   }
 
@@ -62,14 +56,6 @@ public record AiAdvisorWithStorageService(
     Assistant assistant = service.createDefaultAssistant(modelName, "Note details completion");
     getCompletionAssistantSettingAccessor().setKeyValue(currentUTCTimestamp, assistant.getId());
     return assistant;
-  }
-
-  public Assistant createChatAssistant(Timestamp currentUTCTimestamp, String modelName) {
-    AssistantService service = getContentCompletionService();
-    Assistant chatAssistant = service.createDefaultAssistant(modelName, "chat assistant");
-    getDefaultChatAssistantSettingAccessor()
-        .setKeyValue(currentUTCTimestamp, chatAssistant.getId());
-    return chatAssistant;
   }
 
   public Flowable<AssistantSSE> getChatMessages(Note note, ChatRequest request, User user) {

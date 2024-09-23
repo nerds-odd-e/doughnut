@@ -92,16 +92,6 @@ class RestAiControllerForAssistantTest {
         assertThat(globalSettingsService.noteCompletionAssistantId().getValue())
             .isEqualTo("created-assistant-id");
       }
-
-      @Test
-      void createChatAssistant() throws UnexpectedNoAccessRightException {
-        Map<String, String> result = controller.recreateAllAssistants();
-        assertThat(result.get("Assistant created")).isEqualTo("created-assistant-id");
-        GlobalSettingsService globalSettingsService =
-            new GlobalSettingsService(makeMe.modelFactoryService);
-        assertThat(globalSettingsService.chatAssistantId().getValue())
-            .isEqualTo("created-assistant-id");
-      }
     }
   }
 
