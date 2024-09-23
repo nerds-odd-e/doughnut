@@ -407,6 +407,18 @@ Given(
   }
 )
 
+Given(
+  'I request to complete the details for the note {string} new',
+  (noteTopic: string) => {
+    start
+      .jumpToNotePage(noteTopic)
+      .chatAboutNote()
+      .sendMessage('please complete the details')
+    cy.pageIsNotLoading()
+    cy.get('button.close-button').click()
+  }
+)
+
 Then(
   'I should see a notification of OpenAI service unavailability in the controller bar',
   () => {
