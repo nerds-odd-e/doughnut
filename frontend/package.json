@@ -28,7 +28,7 @@
     "mini-debounce": "^1.0.8",
     "quill": "2.0.2",
     "turndown": "^7.2.0",
-    "vue": "3.5.7",
+    "vue": "3.5.8",
     "vue-content-loader": "2.0.1",
     "vue-router": "4.4.5"
   },
