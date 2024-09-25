@@ -13,6 +13,23 @@ interface BodyMatch {
   assistant_id?: string
 }
 
+function buildRunStreamEvent(
+  threadId: string,
+  runStreamData: RunStreamData
+): string {
+  const { runId, fullMessage } = runStreamData
+  return `event: thread.message.created
+data: {"thread_id": "${threadId}", "run_id": "${runId}", "role": "assistant", "content": []}
+
+event: thread.message.delta
+data: {"delta": {"content": [{"index": 0, "type": "text", "text": {"value": "${fullMessage}"}}]}}
+
+event: thread.run.step.completed
+data: {"run_id": "${runId}", "status": "completed"}
+
+`
+}
+
 const openAiService = () => {
   const serviceMocker = new ServiceMocker('openAi', 5001)
   return {
@@ -118,6 +135,7 @@ const openAiService = () => {
           fullMessage: row['assistant reply']!,
         }))
       )
+
       messages.forEach((row) => {
         const userMessage: MessageToMatch = {
           role: 'user',
@@ -158,19 +176,7 @@ const openAiService = () => {
         `/threads/${threadId}/runs`,
         bodyToMatch,
         undefined,
-        runStreamData.map(
-          ({ runId, fullMessage }) =>
-            `event: thread.message.created
-data: {"thread_id": "${threadId}", "run_id": "${runId}", "role": "assistant", "content": []}
-
-event: thread.message.delta
-data: {"delta": {"content": [{"index": 0, "type": "text", "text": {"value": "${fullMessage}"}}]}}
-
-event: thread.run.step.completed
-data: {"run_id": "${runId}", "status": "completed"}
-
-`
-        ),
+        runStreamData.map((event) => buildRunStreamEvent(threadId, event)),
         { 'Content-Type': 'text/event-stream' }
       )
       return openAiAssistantThreadMocker(serviceMocker, threadId, [])
