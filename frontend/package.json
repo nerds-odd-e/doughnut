@@ -33,7 +33,7 @@
     "vue-router": "4.4.5"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.9.2",
+    "@biomejs/biome": "1.9.3",
     "@testing-library/user-event": "^14.5.2",
     "@testing-library/vue": "^8.1.0",
     "@types/lodash": "^4.17.9",
@@ -43,7 +43,7 @@
     "@vitejs/plugin-vue-jsx": "^4.0.1",
     "@vue/test-utils": "2.4.6",
     "css-loader": "^7.1.2",
-    "es-toolkit": "^1.22.0",
+    "es-toolkit": "^1.23.0",
     "jsdom": "^25.0.1",
     "lodash": "^4.17.21",
     "optionator": "^0.9.4",
