@@ -1,10 +1,10 @@
 # Style Guide
 #### For biome to work correctly for _frontend_ Vue3 source files, you need IDE to open code from root of `doughnut/frontend` if you require linting/formatting rules for Vue3 work.
 #### For biome to work correctly for _cypress e2e_ source files, you need IDE to open code from root of `doughnut` if you require linting/formatting rules for cypress e2e work.
-- VSCode IDE:
-  - Install these following VSCode extension:
-    1. [Biome LSP VS Code Extension](https://marketplace.visualstudio.com/items?itemName=biomejs.biome)
-    2. [Vue - Official VSCode Typescript extension for Vue3](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (more info [here](https://blog.vuejs.org/posts/volar-a-new-beginning))
+- Cursor IDE:
+  - Install these following Cursor/VSCode extensions:
+    1. [Biome LSP Cursor/VSCode Extension](https://marketplace.visualstudio.com/items?itemName=biomejs.biome)
+    2. [Vue - Official Cursor/VSCode Typescript extension for Vue3](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (more info [here](https://blog.vuejs.org/posts/volar-a-new-beginning))
 
 - IntelliJ Ultimate IDE:
   - Install the following IntelliJ Ultimate plugin:

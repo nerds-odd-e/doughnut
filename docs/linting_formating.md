@@ -5,7 +5,7 @@
 Details of pnpm task aliases described below is visible in `doughnut/package.json`
 and `doughnut/frontend/package.json`.
 
-### 1. VSCode IDE extension for Vue3, Cypress, Typescript, Javascript code formating/linting
+### 1. Cursor/VSCode IDE extension for Vue3, Cypress, Typescript, Javascript code formating/linting
 
 ##### 1.1. Install [Biome](https://biomejs.dev/guides/editors/first-party-plugins/)
 
