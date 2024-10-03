@@ -10,7 +10,6 @@ import VueRouter from 'unplugin-vue-router/vite'
 import { defineConfig } from 'vite'
 import checker from 'vite-plugin-checker'
 import viteCompression from 'vite-plugin-compression'
-import VueDevTools from 'vite-plugin-vue-devtools'
 import tsconfigPaths from 'vite-tsconfig-paths'
 
 export default defineConfig({
@@ -33,7 +32,6 @@ export default defineConfig({
     },
   },
   plugins: [
-    VueDevTools(),
     tsconfigPaths(),
     checker({
       vueTsc: true,
