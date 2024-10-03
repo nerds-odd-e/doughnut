@@ -124,11 +124,23 @@ const openAiService = () => {
       )
     },
 
-    stubAIChat(messages: Record<string, string>[], assistantId?: string, threadId = 'thread-abc123') {
-      return this.stubCreateThread(threadId).createThreadAndStubMessages(threadId, messages, assistantId)
+    stubAIChat(
+      messages: Record<string, string>[],
+      assistantId?: string,
+      threadId = 'thread-abc123'
+    ) {
+      return this.stubCreateThread(threadId).createThreadAndStubMessages(
+        threadId,
+        messages,
+        assistantId
+      )
     },
 
-    createThreadAndStubMessages(threadId: string, messages: Record<string, string>[], assistantId?: string) {
+    createThreadAndStubMessages(
+      threadId: string,
+      messages: Record<string, string>[],
+      assistantId?: string
+    ) {
       const thread = this.stubCreateRunStreams(
         threadId,
         assistantId,

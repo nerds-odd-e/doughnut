@@ -79,7 +79,8 @@ Given(
 Given(
   'OpenAI assistant will reply below for user messages:',
   (data: DataTable) => {
-    mock_services.openAi()
+    mock_services
+      .openAi()
       .stubCreateThread('thread-123')
       .createThreadAndStubMessages('thread-123', data.hashes())
   }
@@ -88,7 +89,8 @@ Given(
 Given(
   'OpenAI assistant {string} will reply below for user messages:',
   (assistantId: string, data: DataTable) => {
-    mock_services.openAi()
+    mock_services
+      .openAi()
       .stubCreateThread('thread-123')
       .createThreadAndStubMessages('thread-123', data.hashes(), assistantId)
   }
