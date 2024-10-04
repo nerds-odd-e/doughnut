@@ -3,36 +3,13 @@ import testability from '../testability'
 import { MessageToMatch } from './MessageToMatch'
 import createOpenAiChatCompletionMock from './createOpenAiChatCompletionMock'
 import openAiAssistantThreadMocker from './openAiAssistantThreadMocker'
-
-type RunStreamData = {
-  runId: string
-  fullMessage: string
-}
+import {
+  buildRunStreamEvent,
+  type RunStreamData,
+} from './openAiMessageComposer'
 
 interface BodyMatch {
   assistant_id?: string
-}
-
-function buildEvent(runStreamData: RunStreamData): string {
-  const { fullMessage } = runStreamData
-  return `event: thread.message.delta
-data: {"delta": {"content": [{"index": 0, "type": "text", "text": {"value": "${fullMessage}"}}]}}
-`
-}
-
-function buildRunStreamEvent(
-  threadId: string,
-  runStreamData: RunStreamData
-): string {
-  const { runId } = runStreamData
-  return `event: thread.message.created
-data: {"thread_id": "${threadId}", "run_id": "${runId}", "role": "assistant", "content": []}
-
-${buildEvent(runStreamData)}
-event: thread.run.step.completed
-data: {"run_id": "${runId}", "status": "completed"}
-
-`
 }
 
 const openAiService = () => {
