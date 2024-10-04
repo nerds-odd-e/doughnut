@@ -4034,6 +4034,20 @@ components:
       properties:
         name:
           type: string
+    ChatResponseFormat:
+      type: object
+      properties:
+        type:
+          type: string
+        jsonSchema:
+          $ref: "#/components/schemas/ResponseJsonSchema"
+    CodeInterpreterResources:
+      type: object
+      properties:
+        file_ids:
+          type: array
+          items:
+            type: string
     Delta:
       type: object
       properties:
@@ -4062,6 +4076,61 @@ components:
       properties:
         messageDelta:
           $ref: "#/components/schemas/MessageDelta"
+        run:
+          $ref: "#/components/schemas/Run"
+        noteDetailsCompletion:
+          $ref: "#/components/schemas/NoteDetailsCompletion"
+    ExpiresAfter:
+      type: object
+      properties:
+        anchor:
+          type: string
+        days:
+          type: integer
+          format: int32
+    FileCounts:
+      type: object
+      properties:
+        completed:
+          type: integer
+          format: int32
+        failed:
+          type: integer
+          format: int32
+        cancelled:
+          type: integer
+          format: int32
+        total:
+          type: integer
+          format: int32
+        in_progress:
+          type: integer
+          format: int32
+    FileSearchResources:
+      type: object
+      properties:
+        vector_store_ids:
+          type: array
+          items:
+            type: string
+        vector_stores:
+          type: array
+          items:
+            $ref: "#/components/schemas/VectorStore"
+    Function:
+      type: object
+      properties:
+        name:
+          type: string
+    JsonNode:
+      type: object
+    LastError:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
     MessageDelta:
       type: object
       properties:
@@ -4071,3 +4140,225 @@ components:
           type: string
         delta:
           $ref: "#/components/schemas/Delta"
+    NoteDetailsCompletion:
+      required:
+      - completion
+      type: object
+      properties:
+        completion:
+          type: string
+    RequiredAction:
+      type: object
+      properties:
+        type:
+          type: string
+        submit_tool_outputs:
+          $ref: "#/components/schemas/SubmitToolOutputs"
+    ResponseJsonSchema:
+      type: object
+      properties:
+        name:
+          type: string
+        strict:
+          type: boolean
+        schema:
+          type: object
+    Run:
+      type: object
+      properties:
+        id:
+          type: string
+        object:
+          type: string
+        status:
+          type: string
+        model:
+          type: string
+        instructions:
+          type: string
+        tools:
+          type: array
+          items:
+            oneOf:
+            - $ref: "#/components/schemas/CodeInterpreterTool"
+            - $ref: "#/components/schemas/FileSearchTool"
+            - $ref: "#/components/schemas/FunctionTool"
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+        usage:
+          $ref: "#/components/schemas/Usage"
+        temperature:
+          type: number
+          format: double
+        created_at:
+          type: integer
+          format: int32
+        thread_id:
+          type: string
+        assistant_id:
+          type: string
+        required_action:
+          $ref: "#/components/schemas/RequiredAction"
+        last_error:
+          $ref: "#/components/schemas/LastError"
+        expires_at:
+          type: integer
+          format: int32
+        started_at:
+          type: integer
+          format: int32
+        cancelled_at:
+          type: integer
+          format: int32
+        failed_at:
+          type: integer
+          format: int32
+        completed_at:
+          type: integer
+          format: int32
+        incomplete_details:
+          $ref: "#/components/schemas/IncompleteDetails"
+        top_p:
+          type: number
+          format: double
+        max_prompt_tokens:
+          type: integer
+          format: int32
+        max_completion_tokens:
+          type: integer
+          format: int32
+        truncation_strategy:
+          $ref: "#/components/schemas/TruncationStrategy"
+        tool_choice:
+          $ref: "#/components/schemas/ToolChoice"
+        response_format:
+          $ref: "#/components/schemas/ChatResponseFormat"
+        tool_resources:
+          $ref: "#/components/schemas/ToolResources"
+    RunImage:
+      type: object
+      properties:
+        file_id:
+          type: string
+    SubmitToolOutputs:
+      type: object
+      properties:
+        tool_calls:
+          type: array
+          items:
+            $ref: "#/components/schemas/ToolCall"
+    ToolCall:
+      type: object
+      properties:
+        index:
+          type: integer
+          format: int32
+        id:
+          type: string
+        type:
+          type: string
+        function:
+          $ref: "#/components/schemas/ToolCallFunction"
+        code_interpreter:
+          $ref: "#/components/schemas/ToolCallCodeInterpreter"
+        file_search:
+          type: object
+          additionalProperties:
+            type: string
+    ToolCallCodeInterpreter:
+      type: object
+      properties:
+        input:
+          type: string
+        outputs:
+          type: array
+          items:
+            $ref: "#/components/schemas/ToolCallCodeInterpreterOutput"
+    ToolCallCodeInterpreterOutput:
+      type: object
+      properties:
+        index:
+          type: integer
+          format: int32
+        type:
+          type: string
+        logs:
+          type: string
+        image:
+          $ref: "#/components/schemas/RunImage"
+    ToolCallFunction:
+      type: object
+      properties:
+        name:
+          type: string
+        arguments:
+          $ref: "#/components/schemas/JsonNode"
+        output:
+          type: string
+    ToolChoice:
+      type: object
+      properties:
+        function:
+          $ref: "#/components/schemas/Function"
+        type:
+          type: string
+    ToolResources:
+      type: object
+      properties:
+        code_interpreter:
+          $ref: "#/components/schemas/CodeInterpreterResources"
+        file_search:
+          $ref: "#/components/schemas/FileSearchResources"
+    TruncationStrategy:
+      type: object
+      properties:
+        type:
+          type: string
+        last_messages:
+          type: integer
+          format: int32
+    Usage:
+      type: object
+      properties:
+        prompt_tokens:
+          type: integer
+          format: int64
+        completion_tokens:
+          type: integer
+          format: int64
+        total_tokens:
+          type: integer
+          format: int64
+    VectorStore:
+      type: object
+      properties:
+        id:
+          type: string
+        object:
+          type: string
+        name:
+          type: string
+        bytes:
+          type: integer
+          format: int32
+        status:
+          type: string
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+        created_at:
+          type: integer
+          format: int32
+        file_counts:
+          $ref: "#/components/schemas/FileCounts"
+        expires_after:
+          $ref: "#/components/schemas/ExpiresAfter"
+        expires_at:
+          type: integer
+          format: int32
+        last_active_at:
+          type: integer
+          format: int32
