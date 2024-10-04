@@ -13,17 +13,22 @@ interface BodyMatch {
   assistant_id?: string
 }
 
+function buildEvent(runStreamData: RunStreamData): string {
+  const { fullMessage } = runStreamData
+  return `event: thread.message.delta
+data: {"delta": {"content": [{"index": 0, "type": "text", "text": {"value": "${fullMessage}"}}]}}
+`
+}
+
 function buildRunStreamEvent(
   threadId: string,
   runStreamData: RunStreamData
 ): string {
-  const { runId, fullMessage } = runStreamData
+  const { runId } = runStreamData
   return `event: thread.message.created
 data: {"thread_id": "${threadId}", "run_id": "${runId}", "role": "assistant", "content": []}
 
-event: thread.message.delta
-data: {"delta": {"content": [{"index": 0, "type": "text", "text": {"value": "${fullMessage}"}}]}}
-
+${buildEvent(runStreamData)}
 event: thread.run.step.completed
 data: {"run_id": "${runId}", "status": "completed"}
 
