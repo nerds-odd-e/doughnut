@@ -12,3 +12,10 @@ Feature: Learner gives feedback on an assessment question
         When I answer the question wrongly and submit feedback saying 'I believe the question is incorrect'
         Then "a_trainer" can see the conversation "\"I believe the question is incorrect\"" with "Old Learner" in the message center
         Then "old_learner" can see the conversation "\"I believe the question is incorrect\"" with "A Trainer" in the message center
+    
+    Scenario: See default "No conversation" yet from message center screen
+        Given I begin the assessment from the "Just say 'Yes'" notebook in the bazaar
+        When I answer the question wrongly and submit feedback saying 'I believe the question is incorrect'
+        Then "a_trainer" can see the conversation "\"I believe the question is incorrect\"" with "Old Learner" in the message center
+        Then "a_trainer" can see the default message "No conversation" from message center screen
+        Then "old_learner" can see the default message "No conversation" from message center screen
