@@ -1,11 +1,12 @@
 package com.odde.doughnut.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import javax.validation.constraints.NotNull;
+import java.sql.Timestamp;
+import java.util.Date;
 
 @Getter
 @Entity
@@ -26,6 +27,17 @@ public class Conversation extends EntityIdentifiedByIdOnly {
   User conversationInitiator;
 
   @Setter String message;
+
+  @Column(name = "created_at")
+  @NotNull
+  private Timestamp createdAt = new Timestamp(new Date().getTime());
+
+  @Column(name = "updated_at")
+  @NotNull
+  @OrderBy("updatedAt DESC")
+  private Timestamp updatedAt = new Timestamp(new Date().getTime());
+
+  ;
 
   public void setAssessmentQuestionInstance(AssessmentQuestionInstance assessmentQuestionInstance) {
     this.assessmentQuestionInstance = assessmentQuestionInstance;

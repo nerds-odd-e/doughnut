@@ -3437,7 +3437,9 @@ components:
           $ref: "#/components/schemas/Answer"
     Conversation:
       required:
+      - createdAt
       - id
+      - updatedAt
       type: object
       properties:
         id:
@@ -3451,6 +3453,12 @@ components:
           $ref: "#/components/schemas/User"
         message:
           type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
     CircleJoiningByInvitation:
       required:
       - invitationCode
