@@ -66,8 +66,6 @@ import type {
   ChatRequest,
   MessageDelta,
   ReviewQuestionInstance,
-  Run,
-  NoteDetailsCompletion,
 } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
@@ -77,7 +75,7 @@ import markdownizer from "@/components/form/markdownizer"
 import scrollToElement from "../commons/scrollToElement"
 
 const { managedApi } = useLoadingApi()
-const { selectedNote, storageAccessor } = defineProps({
+const props = defineProps({
   selectedNote: { type: Object as PropType<Note>, required: true },
   storageAccessor: {
     type: Object as PropType<StorageAccessor>,
@@ -106,7 +104,7 @@ const scrollToBottom = () => {
 const generateQuestion = async () => {
   reviewQuestionInstance.value =
     await managedApi.restReviewQuestionController.generateQuestion(
-      selectedNote.id
+      props.selectedNote.id
     )
   scrollToBottom()
 }
@@ -135,20 +133,6 @@ const chat = async (id: Doughnut.ID, request: ChatRequest) => {
         const delta = response.delta?.content?.[0]?.text?.value
         message.content = [{ text: { value: currentValue! + delta } }]
       }
-      if (event === "thread.run.requires_action") {
-        const response = JSON.parse(data) as Run
-        const contentToAppend = JSON.parse(
-          response.required_action!.submit_tool_outputs!.tool_calls![0]!
-            .function!.arguments as unknown as string
-        ) as NoteDetailsCompletion
-        storageAccessor
-          .storedApi()
-          .updateTextField(
-            selectedNote.id,
-            "edit details",
-            (selectedNote.details ?? "") + contentToAppend!.completion
-          )
-      }
     })
     .onError((error) => {
       // eslint-disable-next-line no-console
@@ -168,13 +152,13 @@ const generateChatAnswer = async () => {
   }
   chatInput.value = ""
   focusChatInput()
-  chat(selectedNote.id, request)
+  chat(props.selectedNote.id, request)
 }
 
 onMounted(() => {
   focusChatInput()
   managedApi.restAiController
-    .tryRestoreChat(selectedNote.id)
+    .tryRestoreChat(props.selectedNote.id)
     .then((response) => {
       messages.value = response
       if (response.length > 0) {
