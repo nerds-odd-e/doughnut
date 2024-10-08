@@ -34,6 +34,4 @@ public class ConversationDetail extends EntityIdentifiedByIdOnly {
   @Column(name = "created_at")
   @NotNull
   private Timestamp createdAt = new Timestamp(new Date().getTime());
-
-  ;
 }
