@@ -11,6 +11,10 @@ export function assumeChatAboutNotePage() {
       cy.focused().type(msg)
       cy.get('#chat-button').click()
     },
+    askAI(msg: string) {
+      cy.focused().type(msg)
+      cy.get('#ask-ai').click()
+    },
     expectMessages(messages: Record<'role' | 'message', string>[]) {
       messages.forEach(({ role, message }) => {
         cy.findByText(message)
