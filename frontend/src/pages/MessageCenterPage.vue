@@ -13,6 +13,7 @@
         <th>Question</th>
         <th>Name</th>
         <th>Feedback</th>
+        <th>Marker</th>
       </tr>
       </thead>
       <tbody>
@@ -20,6 +21,9 @@
         <td>{{conversation.assessmentQuestionInstance?.bareQuestion.multipleChoicesQuestion.stem}}</td>
         <td>{{conversationPartner(conversation)}}</td>
         <td>{{conversation.message}}</td>
+        <td>
+          <AgreeButton></AgreeButton>
+        </td>
       </tr>
       </tbody>
     </table>
@@ -32,6 +36,7 @@ import { onMounted, ref } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
 import type { Conversation, User } from "@/generated/backend"
+import AgreeButton from "@/components/toolbars/AgreeButton.vue"
 
 const { managedApi } = useLoadingApi()
 

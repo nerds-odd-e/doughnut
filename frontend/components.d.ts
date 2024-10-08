@@ -7,6 +7,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AgreeButton: typeof import('./src/components/toolbars/AgreeButton.vue')['default']
     AIClarifyingQuestionDialog: typeof import('./src/components/notes/AIClarifyingQuestionDialog.vue')['default']
     AIGenerateImageDialog: typeof import('./src/components/notes/AIGenerateImageDialog.vue')['default']
     AnsweredQuestionComponent: typeof import('./src/components/review/AnsweredQuestionComponent.vue')['default']
@@ -150,6 +151,7 @@ declare module 'vue' {
     SvgAdd: typeof import('./src/components/svgs/SvgAdd.vue')['default']
     SvgAddChild: typeof import('./src/components/svgs/SvgAddChild.vue')['default']
     SvgAddSibling: typeof import('./src/components/svgs/SvgAddSibling.vue')['default']
+    SvgAgree: typeof import('./src/components/svgs/SvgAgree.vue')['default']
     SvgAssessment: typeof import('./src/components/svgs/SvgAssessment.vue')['default']
     SvgAssociation: typeof import('./src/components/svgs/SvgAssociation.vue')['default']
     SvgBackward: typeof import('./src/components/svgs/SvgBackward.vue')['default']
