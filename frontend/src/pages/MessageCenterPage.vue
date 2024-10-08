@@ -21,8 +21,9 @@
         <td>{{conversation.assessmentQuestionInstance?.bareQuestion.multipleChoicesQuestion.stem}}</td>
         <td>{{conversationPartner(conversation)}}</td>
         <td>{{conversation.message}}</td>
-        <td>
-          <AgreeButton></AgreeButton>
+        <td >
+          <AgreeButton v-if="conversation.id % 2 === 0"></AgreeButton>
+          <DeclineButton v-if="conversation.id % 2 === 0"></DeclineButton>
         </td>
       </tr>
       </tbody>
@@ -37,6 +38,7 @@ import useLoadingApi from "@/managedApi/useLoadingApi"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
 import type { Conversation, User } from "@/generated/backend"
 import AgreeButton from "@/components/toolbars/AgreeButton.vue"
+import DeclineButton from "@/components/toolbars/DeclineButton.vue"
 
 const { managedApi } = useLoadingApi()
 
