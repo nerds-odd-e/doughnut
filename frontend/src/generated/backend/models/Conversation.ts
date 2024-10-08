@@ -11,5 +11,7 @@ export type Conversation = {
     subjectOwnership?: Ownership;
     conversationInitiator?: User;
     message?: string;
+    createdAt: string;
+    updatedAt: string;
 };
 
