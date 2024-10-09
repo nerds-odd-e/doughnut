@@ -35,6 +35,11 @@ export const assumeMessageCenterPage = () => {
       cy.findByText(partner).should('be.visible')
       return this
     },
+    clickButton(message: string, partner: string) {
+      cy.findByTestId(message).should('be.visible').click()
+      cy.findByText(partner).should('be.visible')
+      return this
+    },
   }
 }
 
