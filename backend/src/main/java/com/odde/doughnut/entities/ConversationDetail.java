@@ -7,15 +7,16 @@ import java.util.Date;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+
+import lombok.*;
 
 @Setter
 @Getter
 @Entity
 @Table(name = "conversation_detail")
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ConversationDetail extends EntityIdentifiedByIdOnly {
 
   @ManyToOne

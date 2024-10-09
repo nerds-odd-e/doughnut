@@ -186,6 +186,25 @@ export class RestAiControllerService {
         });
     }
     /**
+     * @param conversationId
+     * @returns string OK
+     * @throws ApiError
+     */
+    public getCompletionAiOpinion1(
+        conversationId: number,
+    ): CancelablePromise<string> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/ai/completion-ai-opinion/{conversationId}',
+            path: {
+                'conversationId': conversationId,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
      * @returns string OK
      * @throws ApiError
      */

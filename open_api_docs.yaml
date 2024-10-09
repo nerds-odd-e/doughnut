@@ -2831,6 +2831,31 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/DummyForGeneratingTypes"
+  /api/ai/completion-ai-opinion/{conversationId}:
+    get:
+      tags:
+      - rest-ai-controller
+      operationId: getCompletionAiOpinion_1
+      parameters:
+      - name: conversationId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
   /api/ai/available-gpt-models:
     get:
       tags:
