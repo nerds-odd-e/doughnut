@@ -24,7 +24,7 @@ public class ConversationDetailService {
     return modelFactoryService.conversationDetailRepository.save(conversationDetail);
   }
 
-  public List<ConversationDetail> getConversionDetailRelatedByConversion(int conversationId) {
+  public List<ConversationDetail> getConversionDetailRelatedByConversationId(int conversationId) {
     return modelFactoryService.conversationDetailRepository.findByConversationInitiator(
         conversationId);
   }

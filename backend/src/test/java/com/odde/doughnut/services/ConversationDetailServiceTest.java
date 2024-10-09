@@ -64,7 +64,7 @@ class ConversationDetailServiceTest {
     void shouldReturnEmptyData_whenCallGetConversionDetailRelatedByConversion() {
       int conversationId = 1;
       assertThat(
-          conversationDetailService.getConversionDetailRelatedByConversion(conversationId),
+          conversationDetailService.getConversionDetailRelatedByConversationId(conversationId),
           hasSize(0));
     }
 
@@ -85,7 +85,8 @@ class ConversationDetailServiceTest {
       conversationDetailService.addConversationDetail(
           conversation, currentUser.getEntity(), message);
       List<ConversationDetail> conversationDetails =
-          conversationDetailService.getConversionDetailRelatedByConversion(conversation.getId());
+          conversationDetailService.getConversionDetailRelatedByConversationId(
+              conversation.getId());
       assertEquals(1, conversationDetails.size());
       assertEquals(message, conversationDetails.getFirst().getMessage());
     }
