@@ -1629,8 +1629,7 @@ paths:
           content:
             '*/*':
               schema:
-                type: integer
-                format: int32
+                $ref: "#/components/schemas/AssessmentAttempt"
   /api/assessment/{assessmentQuestionInstance}/answer:
     post:
       tags:

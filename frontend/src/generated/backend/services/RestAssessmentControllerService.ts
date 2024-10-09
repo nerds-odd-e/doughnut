@@ -10,10 +10,10 @@ import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestAssessmentControllerService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
-     * @returns number OK
+     * @returns AssessmentAttempt OK
      * @throws ApiError
      */
-    public updateScore(): CancelablePromise<number> {
+    public updateScore(): CancelablePromise<AssessmentAttempt> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/assessment/{updateScore}',
