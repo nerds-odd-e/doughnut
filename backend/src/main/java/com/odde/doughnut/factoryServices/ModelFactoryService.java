@@ -7,11 +7,12 @@ import com.odde.doughnut.entities.repositories.*;
 import com.odde.doughnut.models.*;
 import com.odde.doughnut.services.NotebookService;
 import jakarta.persistence.EntityManager;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 @Service
 public class ModelFactoryService {
@@ -30,6 +31,7 @@ public class ModelFactoryService {
   @Autowired public NotebookRepository notebookRepository;
   @Autowired public CertificateRepository certificateRepository;
   @Autowired public ConversationRepository conversationRepository;
+  @Autowired public ConversationDetailRepository conversationDetailRepository;
   @Autowired public NotebookCertificateApprovalRepository notebookCertificateApprovalRepository;
 
   @Autowired
