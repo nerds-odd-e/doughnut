@@ -3,6 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { Conversation } from '../models/Conversation';
+import type { ConversationDetail } from '../models/ConversationDetail';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestFeedbackControllerService {
@@ -22,6 +23,29 @@ export class RestFeedbackControllerService {
             url: '/api/feedback/send/{assessmentQuestion}',
             path: {
                 'assessmentQuestion': assessmentQuestion,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param conversationId
+     * @param requestBody
+     * @returns ConversationDetail OK
+     * @throws ApiError
+     */
+    public sendMessage(
+        conversationId: number,
+        requestBody: string,
+    ): CancelablePromise<ConversationDetail> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/feedback/detail/send/{conversationId}',
+            path: {
+                'conversationId': conversationId,
             },
             body: requestBody,
             mediaType: 'application/json',
