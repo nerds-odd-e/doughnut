@@ -1,5 +1,6 @@
 package com.odde.doughnut.testability.builders;
 
+import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.ConversationDetail;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
@@ -18,5 +19,10 @@ public class ConversationDetailBuilder extends EntityBuilder<ConversationDetail>
     if (Strings.isBlank(this.entity.getMessage())) {
       entity.setMessage("This is a feedback");
     }
+  }
+
+  public ConversationDetailBuilder forConversationInstance(Conversation conversation) {
+    this.entity.setConversation(conversation);
+    return this;
   }
 }

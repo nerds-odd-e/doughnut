@@ -103,4 +103,20 @@ class RestFeedbackControllerTest {
     assertEquals(1, conversationDetails.size());
     assertEquals(message, conversationDetail.getMessage());
   }
+
+  @Test
+  void testGetMessageThreadsFromConversation() {
+    makeMe
+        .aConversation()
+        .forAnAssessmentQuestionInstance(assessmentQuestionInstance)
+        .from(currentUser)
+        .please();
+    Conversation conversation =
+        makeMe.aConversation().forAnAssessmentQuestionInstance(assessmentQuestionInstance).please();
+
+    makeMe.aConversationDetail().forConversationInstance(conversation).please();
+    List<ConversationDetail> conversations =
+        controller.getMessageThreadsForConversation(conversation);
+    assertEquals(1, conversations.size());
+  }
 }

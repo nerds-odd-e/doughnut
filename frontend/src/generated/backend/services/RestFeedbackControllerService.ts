@@ -55,6 +55,25 @@ export class RestFeedbackControllerService {
         });
     }
     /**
+     * @param conversationId
+     * @returns ConversationDetail OK
+     * @throws ApiError
+     */
+    public getMessageThreadsForConversation(
+        conversationId: number,
+    ): CancelablePromise<Array<ConversationDetail>> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/feedback/detail/all/{conversationId}',
+            path: {
+                'conversationId': conversationId,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
      * @returns Conversation OK
      * @throws ApiError
      */

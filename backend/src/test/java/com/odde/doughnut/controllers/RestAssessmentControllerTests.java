@@ -204,6 +204,7 @@ public class RestAssessmentControllerTests {
 
   @Nested
   class showAssessmentHistoryTest {
+
     private Notebook notebook;
 
     @BeforeEach
@@ -249,18 +250,24 @@ public class RestAssessmentControllerTests {
     }
 
     @Test
-    void shouldReturnNoUpdateScore() {
-      /*
-       * Update score to add 5 points
-       * */
+    void shouldReturnUpdateScore() {
       AssessmentAttempt assessment =
           makeMe
               .anAssessmentAttempt(currentUser.getEntity())
               .notebook(notebook)
-              .score(5, 4)
+              .score(5, 3)
               .please();
 
-      assertEquals(5, controller.updateScore(assessment.getId()));
+      assertEquals(4, controller.updateScore(assessment, true));
+
+      assessment =
+          makeMe
+              .anAssessmentAttempt(currentUser.getEntity())
+              .notebook(notebook)
+              .score(5, 3)
+              .please();
+
+      assertEquals(3, controller.updateScore(assessment, false));
     }
   }
 }

@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 public class ConversationDetailService {
 
   private final ModelFactoryService modelFactoryService;
+  private static final int ADMIN_USER = 0;
+  private static final int NORMAL_USER = 1;
 
   public ConversationDetail addConversationDetail(
       Conversation conversation, User user, String message) {
@@ -28,7 +30,7 @@ public class ConversationDetailService {
     return modelFactoryService.conversationDetailRepository.save(conversationDetail);
   }
 
-  public List<ConversationDetail> getConversionDetailRelatedByConversion(int conversationId) {
+  public List<ConversationDetail> getConversionDetailRelatedByConversationId(int conversationId) {
     return modelFactoryService.conversationDetailRepository.findByConversationInitiator(
         conversationId);
   }
