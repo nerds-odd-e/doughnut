@@ -14,7 +14,7 @@
             <li v-for="conversation in conversations" :key="conversation.id" class="list-group-item list-group-item-action" @click="setInitialFeedback(conversation.message || '')">
               <div align="right">
                 <AgreeButton :conversation="conversation" data-testid="AgreeButton"></AgreeButton>
-                <DeclineButton :conversation="conversation" data-testid="AgreeButton"></DeclineButton>
+                <DeclineButton :conversation="conversation" data-testid="DeclineButton"></DeclineButton>
               </div>
               <div>{{ conversation.assessmentQuestionInstance?.bareQuestion.multipleChoicesQuestion.stem }}</div>
               <div>{{ conversationPartner(conversation) }}</div>
