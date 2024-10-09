@@ -50,7 +50,7 @@
     "sass": "^1.79.4",
     "sass-loader": "16.0.2",
     "style-loader": "^4.0.0",
-    "typescript": "5.6.2",
+    "typescript": "5.6.3",
     "unplugin-auto-import": "^0.18.3",
     "unplugin-vue-components": "0.27.4",
     "unplugin-vue-router": "^0.10.8",
