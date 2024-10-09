@@ -61,16 +61,6 @@ public class AssessmentService {
     return modelFactoryService.assessmentAttemptRepository.findAllByUser(user);
   }
 
-  public int updateScore(Integer assessmentId) {
-    AssessmentAttempt assessmentAttempt =
-        modelFactoryService.assessmentAttemptRepository.findById(assessmentId).get();
-    int answersCorrect = assessmentAttempt.getAnswersCorrect();
-    assessmentAttempt.setAnswersCorrect(answersCorrect + 1);
-    modelFactoryService.save(assessmentAttempt);
-
-    return assessmentAttempt.getAnswersCorrect();
-  }
-
   private void claimCertificateForPassedAssessment(Notebook notebook, User user) {
     getLastAssessmentAttemptAndItMustBePassed(notebook, user);
 

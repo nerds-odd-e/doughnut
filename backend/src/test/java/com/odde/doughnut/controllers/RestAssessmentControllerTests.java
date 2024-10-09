@@ -253,14 +253,10 @@ public class RestAssessmentControllerTests {
       /*
        * Update score to add 5 points
        * */
+      int currentScores = 75;
       AssessmentAttempt assessment =
-          makeMe
-              .anAssessmentAttempt(currentUser.getEntity())
-              .notebook(notebook)
-              .score(5, 4)
-              .please();
-
-      assertEquals(5, controller.updateScore(assessment.getId()));
+          makeMe.anAssessmentAttempt(currentUser.getEntity()).notebook(notebook).please();
+      assertEquals(80, controller.updateScore(assessment.getId()));
     }
   }
 }
