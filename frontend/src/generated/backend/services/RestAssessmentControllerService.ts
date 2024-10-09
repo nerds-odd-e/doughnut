@@ -10,6 +10,19 @@ import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestAssessmentControllerService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
+     * @returns AssessmentAttempt OK
+     * @throws ApiError
+     */
+    public updateScore(): CancelablePromise<AssessmentAttempt> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/assessment/{updateScore}',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
      * @param assessmentQuestionInstance
      * @param requestBody
      * @returns AssessmentQuestionInstance OK
