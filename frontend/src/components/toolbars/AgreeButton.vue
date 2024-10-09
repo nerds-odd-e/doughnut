@@ -1,9 +1,9 @@
 <template>
   <SvgAgree
     role="button"
-    aria-label="Login"
-    class="login"
-    @click="aggree"
+    aria-label="Agree"
+    class="agree"
+    @click="agree"
     width="30px"
     height="30px"
   />
@@ -18,7 +18,7 @@ const { popups } = usePopups()
 
 export default defineComponent({
   methods: {
-    aggree() {
+    agree() {
       popups.alert("Agree Success")
     },
   },

@@ -1,7 +1,7 @@
 <template>
   <SvgDecline
     role="button"
-    aria-label="Login"
+    aria-label="Decline"
     class="decline"
     @click="decline"
     width="30px"

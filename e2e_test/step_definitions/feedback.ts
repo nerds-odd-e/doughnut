@@ -10,3 +10,13 @@ Then(
       .expectMessage(feedback, partner)
   }
 )
+
+Then(
+  '{string} can see the button {string} with {string} in the message center',
+  (user: string, feedback: string, partner: string) => {
+    start
+      .reloginAndEnsureHomePage(user)
+      .navigateToMessageCenter()
+      .expectButton(feedback, partner)
+  }
+)

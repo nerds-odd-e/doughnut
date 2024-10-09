@@ -12,6 +12,10 @@
         <div class="col-md-3 bg-light sidebar">
           <ul class="list-group">
             <li v-for="conversation in conversations" :key="conversation.id" class="list-group-item list-group-item-action">
+              <div align="right">
+                <AgreeButton data-testid="AgreeButton"></AgreeButton>
+                <DeclineButton data-testid="DeclineButton"></DeclineButton>
+              </div>
               <div>{{ conversation.assessmentQuestionInstance?.bareQuestion.multipleChoicesQuestion.stem }}</div>
               <div>{{ conversationPartner(conversation) }}</div>
               <div>{{ conversation.message }}</div>
@@ -57,6 +61,8 @@ import { onMounted, ref } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import ContainerFluidPage from "@/pages/commons/ContainerFluidPage.vue"
 import type { Conversation, User } from "@/generated/backend"
+import AgreeButton from "@/components/toolbars/AgreeButton.vue"
+import DeclineButton from "@/components/toolbars/DeclineButton.vue"
 // import AgreeButton from "@/components/toolbars/AgreeButton.vue"
 
 const { managedApi } = useLoadingApi()
