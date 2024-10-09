@@ -111,7 +111,12 @@ public record AssistantService(
   public String createThread() {
     ThreadRequest threadRequest =
         ThreadRequest.builder()
-            .messages(List.of(MessageRequest.builder().role("assistant").content("").build()))
+            .messages(
+                List.of(
+                    MessageRequest.builder()
+                        .role("assistant")
+                        .content("Please give us your opinion based on the conversation")
+                        .build()))
             .build();
     return openAiApiHandler.createThread(threadRequest).getId();
   }

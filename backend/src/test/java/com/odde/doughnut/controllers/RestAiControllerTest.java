@@ -246,7 +246,7 @@ class RestAiControllerTest {
   }
 
   @Nested
-  class AutoCompleteNoteDetails1 {
+  class AiOpinionCompleteNoteDetails {
     AiCompletionParams params = new AiCompletionParams();
     ArgumentCaptor<ChatCompletionRequest> captor =
         ArgumentCaptor.forClass(ChatCompletionRequest.class);
@@ -296,6 +296,20 @@ class RestAiControllerTest {
         messages.add(new UserConversionMessage("user2", "hello"));
         String aiOpinion = controller.getCompletionAiOpinion(messages);
         System.out.println(aiOpinion);
+        assertTrue(StringUtils.isNotBlank(aiOpinion));
+        ArgumentCaptor<RunCreateRequest> runRequest =
+            ArgumentCaptor.forClass(RunCreateRequest.class);
+        verify(openAiApi).createRun(any(), runRequest.capture());
+        assertEquals("my-assistant-id", runRequest.getValue().getAssistantId());
+      }
+
+      @Test
+      void mustResponseAIOpinionWhenRequest() {
+        new GlobalSettingsService(makeMe.modelFactoryService)
+            .noteCompletionAssistantId()
+            .setKeyValue(makeMe.aTimestamp().please(), "my-assistant-id");
+        String aiOpinion = controller.getCompletionAiOpinion(1);
+        System.out.println("aiOpinion: " + aiOpinion);
         assertTrue(StringUtils.isNotBlank(aiOpinion));
         ArgumentCaptor<RunCreateRequest> runRequest =
             ArgumentCaptor.forClass(RunCreateRequest.class);

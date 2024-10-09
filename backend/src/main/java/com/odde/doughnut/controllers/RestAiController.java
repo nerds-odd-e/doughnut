@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.*;
+import com.odde.doughnut.entities.ConversationDetail;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.NotebookAssistant;
@@ -17,6 +18,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -71,6 +73,39 @@ public class RestAiController {
     for (UserConversionMessage message : messages) {
       prompt.append(message.getUser()).append(": ").append(message.getMessage()).append("\n");
     }
+    var response =
+        aiAdvisorWithStorageService
+            .getContentCompletionService()
+            .createThreadAndRunWithFirstMessage(prompt.toString())
+            .getMessages();
+    return !CollectionUtils.isEmpty(response) ? response.getFirst().toString() : "";
+  }
+
+  @GetMapping("/completion-ai-opinion/{conversationId}")
+  @Transactional
+  public String getCompletionAiOpinion(
+      @PathVariable(value = "conversationId") Integer conversationId) {
+    currentUser.assertLoggedIn();
+    List<ConversationDetail> conversationDetails = new ArrayList<>();
+    conversationDetails.add(ConversationDetail.builder().userType(1).message("Hello").build());
+    conversationDetails.add(
+        ConversationDetail.builder()
+            .userType(2)
+            .message("Hello, How can I help you today?")
+            .build());
+    conversationDetails.add(
+        ConversationDetail.builder()
+            .userType(1)
+            .message("I want to know the weather today")
+            .build());
+    conversationDetails.add(
+        ConversationDetail.builder().userType(2).message("Today is a rain day").build());
+
+    StringBuilder prompt = new StringBuilder();
+    for (ConversationDetail message : conversationDetails) {
+      prompt.append(message.getUserType()).append(": ").append(message.getMessage()).append("\n");
+    }
+
     var response =
         aiAdvisorWithStorageService
             .getContentCompletionService()

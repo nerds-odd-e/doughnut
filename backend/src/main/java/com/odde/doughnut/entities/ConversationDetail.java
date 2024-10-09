@@ -7,6 +7,7 @@ import java.util.Date;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,6 +15,7 @@ import lombok.Setter;
 @Getter
 @Entity
 @Table(name = "conversation_detail")
+@Builder
 public class ConversationDetail extends EntityIdentifiedByIdOnly {
 
   @ManyToOne
@@ -32,6 +34,7 @@ public class ConversationDetail extends EntityIdentifiedByIdOnly {
 
   @Column(name = "created_at")
   @NotNull
+  @Builder.Default
   @OrderBy("createdAt ASC")
   private Timestamp createdAt = new Timestamp(new Date().getTime());
 }
