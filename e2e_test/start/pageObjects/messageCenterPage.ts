@@ -7,6 +7,10 @@ export const assumeMessageCenterPage = () => {
       cy.findByText(partner).should('be.visible')
       return this
     },
+    expectDefaultMessage(message: string) {
+      cy.findByText(message).should('be.visible')
+      return this
+    },
   }
 }
 

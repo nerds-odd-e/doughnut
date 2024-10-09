@@ -1,5 +1,5 @@
 <template>
-  <ContainerPage
+  <ContainerFluidPage
     v-bind="{
       contentExists: true,
       title: 'Message Center',
@@ -7,7 +7,28 @@
   >
     <h2 v-if="!conversations?.length">There is no feedback currently.</h2>
 
-    <table v-if="conversations?.length" class="feedback-table mt-2">
+    <template v-if="conversations?.length">
+      <div class="row g-0 h-100">
+        <div class="col-md-3 bg-light sidebar">
+          <ul class="list-group">
+            <li v-for="conversation in conversations" :key="conversation.id" class="list-group-item list-group-item-action">
+              <div>{{ conversation.assessmentQuestionInstance?.bareQuestion.multipleChoicesQuestion.stem }}</div>
+              <div>{{ conversationPartner(conversation) }}</div>
+              <div>{{ conversation.message }}</div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="col-md-9 main-content">
+          <div class="p-4">
+            <h2>No conversation</h2>
+            <!-- You can add more content or components here -->
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <!-- <table v-if="conversations?.length" class="feedback-table mt-2">
       <thead>
       <tr>
         <th>Question</th>
@@ -21,24 +42,22 @@
         <td>{{conversation.assessmentQuestionInstance?.bareQuestion.multipleChoicesQuestion.stem}}</td>
         <td>{{conversationPartner(conversation)}}</td>
         <td>{{conversation.message}}</td>
-        <td >
-          <AgreeButton v-if="conversation.id % 2 === 0"></AgreeButton>
-          <DeclineButton v-if="conversation.id % 2 === 0"></DeclineButton>
+        <td>
+          <AgreeButton></AgreeButton>
         </td>
       </tr>
       </tbody>
-    </table>
-  </ContainerPage>
+    </table> -->
+  </ContainerFluidPage>
 </template>
 
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { onMounted, ref } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import ContainerPage from "@/pages/commons/ContainerPage.vue"
+import ContainerFluidPage from "@/pages/commons/ContainerFluidPage.vue"
 import type { Conversation, User } from "@/generated/backend"
-import AgreeButton from "@/components/toolbars/AgreeButton.vue"
-import DeclineButton from "@/components/toolbars/DeclineButton.vue"
+// import AgreeButton from "@/components/toolbars/AgreeButton.vue"
 
 const { managedApi } = useLoadingApi()
 
