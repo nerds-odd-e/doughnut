@@ -2,17 +2,15 @@ package com.odde.doughnut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.dto.Randomization;
-import com.odde.doughnut.entities.AssessmentAttempt;
-import com.odde.doughnut.entities.AssessmentQuestionInstance;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.Notebook;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -41,7 +39,7 @@ class ConversationDetailServiceTest {
   }
 
   @Nested
-  class getAllOpenAIChatGPTFineTuningExample {
+  class conversationActionTest {
 
     private Notebook notebook;
     private Note topNote;
@@ -70,21 +68,37 @@ class ConversationDetailServiceTest {
           hasSize(0));
     }
 
-    @Nested
-    class conversationDetailTest {
+    @Test
+    void shouldAddConversationDetail() {
+      Conversation conversation = getConversation();
+      int userType = 1;
+      String message = "This feedback is wrong";
+      ConversationDetail conversationDetail =
+          conversationDetailService.addConversationDetail(conversation, userType, message);
+      assertEquals(message, conversationDetail.getMessage());
+    }
 
-      @Test
-      void shouldReturnData_whenCallGetConversionDetailRelatedByConversion() {
-        AssessmentAttempt assessmentAttempt = createAssessmentAttempt();
-        AssessmentQuestionInstance assessmentQuestionInstance =
-            assessmentAttempt.getAssessmentQuestionInstances().getFirst();
-        makeMe
-            .aConversation()
-            .forAnAssessmentQuestionInstance(assessmentQuestionInstance)
-            .from(currentUser)
-            .please();
-        assertNotNull(assessmentAttempt);
-      }
+    @Test
+    void shouldReturnListConversationDetail() {
+      Conversation conversation = getConversation();
+      int userType = 1;
+      String message = "This feedback is wrong";
+      conversationDetailService.addConversationDetail(conversation, userType, message);
+      List<ConversationDetail> conversationDetails =
+          conversationDetailService.getConversionDetailRelatedByConversion(conversation.getId());
+      assertEquals(1, conversationDetails.size());
+      assertEquals(message, conversationDetails.getFirst().getMessage());
+    }
+
+    private Conversation getConversation() {
+      AssessmentAttempt assessmentAttempt = createAssessmentAttempt();
+      AssessmentQuestionInstance assessmentQuestionInstance =
+          assessmentAttempt.getAssessmentQuestionInstances().getFirst();
+      return makeMe
+          .aConversation()
+          .forAnAssessmentQuestionInstance(assessmentQuestionInstance)
+          .from(currentUser)
+          .please();
     }
   }
 }

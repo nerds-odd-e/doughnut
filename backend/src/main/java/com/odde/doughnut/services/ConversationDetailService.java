@@ -13,12 +13,13 @@ public class ConversationDetailService {
 
   private final ModelFactoryService modelFactoryService;
 
-  public ConversationDetail startConversationDetail(
-      Conversation conversation, int userType, String feedback) {
+  public ConversationDetail addConversationDetail(
+      Conversation conversation, int userType, String message) {
+
     ConversationDetail conversationDetail = new ConversationDetail();
     conversationDetail.setConversation(conversation);
     conversationDetail.setUserType(userType);
-    conversationDetail.setMessage(feedback);
+    conversationDetail.setMessage(message);
     return modelFactoryService.conversationDetailRepository.save(conversationDetail);
   }
 
