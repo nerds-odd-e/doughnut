@@ -10,3 +10,13 @@ Then(
       .expectSingleMessage(message)
   }
 )
+
+Then(
+  '{string} can see the input form and Send button when click on the question {string}',
+  (user: string, question: string) => {
+    start
+      .reloginAndEnsureHomePage(user)
+      .navigateToMessageCenter()
+      .clickToSeeExpectForm(question)
+  }
+)
