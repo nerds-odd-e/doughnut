@@ -3,10 +3,9 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.ConversationDetail;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @RequiredArgsConstructor
 @Service

@@ -1,0 +1,22 @@
+package com.odde.doughnut.testability.builders;
+
+import com.odde.doughnut.entities.ConversationDetail;
+import com.odde.doughnut.testability.EntityBuilder;
+import com.odde.doughnut.testability.MakeMe;
+import org.apache.logging.log4j.util.Strings;
+
+public class ConversationDetailBuilder extends EntityBuilder<ConversationDetail> {
+  public ConversationDetailBuilder(MakeMe makeMe) {
+    super(makeMe, new ConversationDetail());
+  }
+
+  @Override
+  protected void beforeCreate(boolean needPersist) {
+    if (entity.getConversation() == null) {
+      throw new RuntimeException("Conversation is required");
+    }
+    if (Strings.isBlank(this.entity.getMessage())) {
+      entity.setMessage("This is a feedback");
+    }
+  }
+}

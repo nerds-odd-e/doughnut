@@ -2,14 +2,13 @@ package com.odde.doughnut.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
-
+import java.sql.Timestamp;
+import java.util.Date;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import java.sql.Timestamp;
-import java.util.Date;
+import lombok.Getter;
+import lombok.Setter;
 
 @Setter
 @Getter
