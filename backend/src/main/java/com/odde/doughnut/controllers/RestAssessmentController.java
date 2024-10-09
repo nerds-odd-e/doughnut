@@ -73,4 +73,12 @@ class RestAssessmentController {
     currentUser.assertLoggedIn();
     return assessmentService.getMyAssessments(currentUser.getEntity());
   }
+
+  @PostMapping("/score/{updateScore}")
+  @Transactional
+  public int updateScore(@PathVariable("assessmentId") @Schema(type = "integer") int assessmentId) {
+    currentUser.assertLoggedIn();
+
+    return assessmentService.updateScore(assessmentId);
+  }
 }

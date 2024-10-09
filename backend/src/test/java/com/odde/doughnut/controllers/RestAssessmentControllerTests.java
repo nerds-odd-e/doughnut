@@ -247,5 +247,20 @@ public class RestAssessmentControllerTests {
       List<AssessmentAttempt> assessmentHistories = controller.getMyAssessments();
       assertEquals(0, assessmentHistories.size());
     }
+
+    @Test
+    void shouldReturnNoUpdateScore() {
+      /*
+       * Update score to add 5 points
+       * */
+      AssessmentAttempt assessment =
+          makeMe
+              .anAssessmentAttempt(currentUser.getEntity())
+              .notebook(notebook)
+              .score(5, 4)
+              .please();
+
+      assertEquals(5, controller.updateScore(assessment.getId()));
+    }
   }
 }

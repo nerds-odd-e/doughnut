@@ -52,6 +52,19 @@ export class RestAssessmentControllerService {
         });
     }
     /**
+     * @returns number OK
+     * @throws ApiError
+     */
+    public updateScore(): CancelablePromise<number> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/assessment/score/{updateScore}',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
      * @param notebook
      * @returns AssessmentAttempt OK
      * @throws ApiError
