@@ -2,14 +2,14 @@ package com.odde.doughnut.controllers;
 
 import static com.odde.doughnut.services.ai.tools.AiToolFactory.COMPLETE_NOTE_DETAILS;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import com.odde.doughnut.controllers.dto.AiAssistantResponse;
 import com.odde.doughnut.controllers.dto.AiCompletionAnswerClarifyingQuestionParams;
 import com.odde.doughnut.controllers.dto.AiCompletionParams;
+import com.odde.doughnut.controllers.dto.UserConversionMessage;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GlobalSettingsService;
@@ -29,6 +29,7 @@ import com.theokanning.openai.model.Model;
 import io.reactivex.Single;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -241,6 +242,66 @@ class RestAiControllerTest {
 
       when(openAiApi.listModels()).thenReturn(Single.just(fakeResponse));
       assertThat(controller.getAvailableGptModels()).contains("gpt-4");
+    }
+  }
+
+  @Nested
+  class AutoCompleteNoteDetails1 {
+    AiCompletionParams params = new AiCompletionParams();
+    ArgumentCaptor<ChatCompletionRequest> captor =
+        ArgumentCaptor.forClass(ChatCompletionRequest.class);
+    OpenAIAssistantMocker openAIAssistantMocker;
+
+    @BeforeEach
+    void setup() {
+      Note cosmos = makeMe.aNote("cosmos").please();
+      Note solar = makeMe.aNote("solar system").under(cosmos).please();
+      note = makeMe.aNote("Earth").under(solar).please();
+      openAIAssistantMocker = new OpenAIAssistantMocker(openAiApi);
+    }
+
+    @Nested
+    class StartACompletionThread {
+      @BeforeEach
+      void setup() {
+        openAIAssistantMocker
+            .mockThreadCreation("this-thread")
+            .mockCreateMessage()
+            .mockCreateRunInProcess("my-run-id")
+            .aRunThatCompleted()
+            .mockRetrieveRun()
+            .mockListMessages("mock answer from ai");
+      }
+
+      @Test
+      void useTheCorrectAssistant() {
+        new GlobalSettingsService(makeMe.modelFactoryService)
+            .noteCompletionAssistantId()
+            .setKeyValue(makeMe.aTimestamp().please(), "my-assistant-id");
+        List<UserConversionMessage> messages = new ArrayList<>();
+        controller.getCompletionAiOpinion(messages);
+        ArgumentCaptor<RunCreateRequest> runRequest =
+            ArgumentCaptor.forClass(RunCreateRequest.class);
+        verify(openAiApi).createRun(any(), runRequest.capture());
+        assertEquals("my-assistant-id", runRequest.getValue().getAssistantId());
+      }
+
+      @Test
+      void mustResponseAIOpinionToRequestAIOpinion() {
+        new GlobalSettingsService(makeMe.modelFactoryService)
+            .noteCompletionAssistantId()
+            .setKeyValue(makeMe.aTimestamp().please(), "my-assistant-id");
+        List<UserConversionMessage> messages = new ArrayList<>();
+        messages.add(new UserConversionMessage("user1", "hello"));
+        messages.add(new UserConversionMessage("user2", "hello"));
+        String aiOpinion = controller.getCompletionAiOpinion(messages);
+        System.out.println(aiOpinion);
+        assertTrue(StringUtils.isNotBlank(aiOpinion));
+        ArgumentCaptor<RunCreateRequest> runRequest =
+            ArgumentCaptor.forClass(RunCreateRequest.class);
+        verify(openAiApi).createRun(any(), runRequest.capture());
+        assertEquals("my-assistant-id", runRequest.getValue().getAssistantId());
+      }
     }
   }
 }

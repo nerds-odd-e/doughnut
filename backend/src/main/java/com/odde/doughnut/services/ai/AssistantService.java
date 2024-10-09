@@ -1,6 +1,8 @@
 package com.odde.doughnut.services.ai;
 
-import com.odde.doughnut.controllers.dto.*;
+import com.odde.doughnut.controllers.dto.AiAssistantResponse;
+import com.odde.doughnut.controllers.dto.AiCompletionAnswerClarifyingQuestionParams;
+import com.odde.doughnut.controllers.dto.AiCompletionRequiredAction;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiTool;
@@ -69,6 +71,14 @@ public record AssistantService(
     return getThreadResponse(threadId, run);
   }
 
+  public AiAssistantResponse createThreadAndRunWithFirstMessage(String prompt) {
+    String threadId = createThread();
+    MessageRequest messageRequest = MessageRequest.builder().role("user").content(prompt).build();
+    openAiApiHandler.createMessage(threadId, messageRequest);
+    Run run = openAiApiHandler.createRun(threadId, assistantId);
+    return getThreadResponse(threadId, run);
+  }
+
   public Flowable<AssistantSSE> createMessageRunAndGetResponseStream(
       String prompt, String threadId) {
     MessageRequest messageRequest = MessageRequest.builder().role("user").content(prompt).build();
@@ -94,6 +104,14 @@ public record AssistantService(
                         .role("assistant")
                         .content(note.getNoteDescription())
                         .build()))
+            .build();
+    return openAiApiHandler.createThread(threadRequest).getId();
+  }
+
+  public String createThread() {
+    ThreadRequest threadRequest =
+        ThreadRequest.builder()
+            .messages(List.of(MessageRequest.builder().role("assistant").content("").build()))
             .build();
     return openAiApiHandler.createThread(threadRequest).getId();
   }

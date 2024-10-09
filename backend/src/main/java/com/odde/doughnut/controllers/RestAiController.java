@@ -23,6 +23,7 @@ import java.util.Objects;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
@@ -60,6 +61,22 @@ public class RestAiController {
     return aiAdvisorWithStorageService
         .getContentCompletionService()
         .createThreadAndRunWithFirstMessage(note, aiCompletionParams.getCompletionPrompt());
+  }
+
+  @PostMapping("/completion-ai-opinion")
+  @Transactional
+  public String getCompletionAiOpinion(@RequestBody List<UserConversionMessage> messages) {
+    currentUser.assertLoggedIn();
+    StringBuilder prompt = new StringBuilder();
+    for (UserConversionMessage message : messages) {
+      prompt.append(message.getUser()).append(": ").append(message.getMessage()).append("\n");
+    }
+    var response =
+        aiAdvisorWithStorageService
+            .getContentCompletionService()
+            .createThreadAndRunWithFirstMessage(prompt.toString())
+            .getMessages();
+    return !CollectionUtils.isEmpty(response) ? response.getFirst().toString() : "";
   }
 
   @PostMapping("/answer-clarifying-question")
