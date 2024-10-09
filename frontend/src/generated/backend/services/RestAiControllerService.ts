@@ -12,6 +12,7 @@ import type { Message } from '../models/Message';
 import type { NotebookAssistant } from '../models/NotebookAssistant';
 import type { NotebookAssistantCreationParams } from '../models/NotebookAssistantCreationParams';
 import type { SseEmitter } from '../models/SseEmitter';
+import type { UserConversionMessage } from '../models/UserConversionMessage';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestAiControllerService {
@@ -86,6 +87,24 @@ export class RestAiControllerService {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/ai/generate-image',
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param requestBody
+     * @returns string OK
+     * @throws ApiError
+     */
+    public getCompletionAiOpinion(
+        requestBody: Array<UserConversionMessage>,
+    ): CancelablePromise<string> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/ai/completion-ai-opinion',
             body: requestBody,
             mediaType: 'application/json',
             errors: {
