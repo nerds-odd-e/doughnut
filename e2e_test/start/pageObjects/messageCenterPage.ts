@@ -12,8 +12,9 @@ export const assumeMessageCenterPage = () => {
       return this
     },
     clickToSeeExpectMessage(question: string, message: string) {
-      cy.findByText(question).should('be.visible').click()
+      cy.findByText(question).parent().should('be.visible').click()
       cy.findByText(message).should('be.visible')
+      return this
     },
     expectButton(message: string, partner: string) {
       cy.findByTestId(message).should('be.visible')
