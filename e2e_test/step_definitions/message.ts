@@ -7,6 +7,6 @@ Then(
     start
       .reloginAndEnsureHomePage(user)
       .navigateToMessageCenter()
-      .expectDefaultMessage(message)
+      .expectSingleMessage(message)
   }
 )
