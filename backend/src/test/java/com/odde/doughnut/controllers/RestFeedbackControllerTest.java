@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.ConversationDetailService;
 import com.odde.doughnut.services.ConversationService;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 class RestFeedbackControllerTest {
 
   @Autowired ConversationService conversationService;
+  @Autowired ConversationDetailService conversationDetailService;
   @Autowired MakeMe makeMe;
   private UserModel currentUser;
   RestFeedbackController controller;
@@ -31,7 +33,8 @@ class RestFeedbackControllerTest {
   @BeforeEach
   void setup() {
     currentUser = makeMe.aUser().toModelPlease();
-    controller = new RestFeedbackController(currentUser, conversationService);
+    controller =
+        new RestFeedbackController(currentUser, conversationService, conversationDetailService);
     Notebook notebook = makeMe.aNotebook().please();
     AssessmentAttempt assessmentAttempt =
         makeMe.anAssessmentAttempt(notebook.getCreatorEntity()).withOneQuestion().please();
@@ -83,5 +86,21 @@ class RestFeedbackControllerTest {
     makeMe.aConversation().forAnAssessmentQuestionInstance(assessmentQuestionInstance).please();
     List<Conversation> conversations = controller.getFeedbackThreadsForUser();
     assertEquals(1, conversations.size());
+  }
+
+  @Test
+  void testSendMessageReturnsOk() {
+    String message = "This is a message";
+    makeMe
+        .theNotebook(assessmentQuestionInstance.getAssessmentAttempt().getNotebook())
+        .owner(currentUser.getEntity())
+        .please();
+    Conversation conversation =
+        makeMe.aConversation().forAnAssessmentQuestionInstance(assessmentQuestionInstance).please();
+    ConversationDetail conversationDetail = controller.sendMessage(message, conversation);
+    List<ConversationDetail> conversationDetails =
+        (List<ConversationDetail>) modelFactoryService.conversationDetailRepository.findAll();
+    assertEquals(1, conversationDetails.size());
+    assertEquals(message, conversationDetail.getMessage());
   }
 }

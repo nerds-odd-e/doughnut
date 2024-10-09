@@ -71,19 +71,19 @@ class ConversationDetailServiceTest {
     @Test
     void shouldAddConversationDetail() {
       Conversation conversation = getConversation();
-      int userType = 1;
       String message = "This feedback is wrong";
       ConversationDetail conversationDetail =
-          conversationDetailService.addConversationDetail(conversation, userType, message);
+          conversationDetailService.addConversationDetail(
+              conversation, currentUser.getEntity(), message);
       assertEquals(message, conversationDetail.getMessage());
     }
 
     @Test
     void shouldReturnListConversationDetail() {
       Conversation conversation = getConversation();
-      int userType = 1;
       String message = "This feedback is wrong";
-      conversationDetailService.addConversationDetail(conversation, userType, message);
+      conversationDetailService.addConversationDetail(
+          conversation, currentUser.getEntity(), message);
       List<ConversationDetail> conversationDetails =
           conversationDetailService.getConversionDetailRelatedByConversion(conversation.getId());
       assertEquals(1, conversationDetails.size());
