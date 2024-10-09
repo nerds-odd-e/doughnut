@@ -18,7 +18,7 @@ public class ConversationDetailService {
 
   public ConversationDetail addConversationDetail(
       Conversation conversation, User user, String message) {
-    return addConversationDetail(conversation, user.isAdmin() ? 0 : 1, message);
+    return addConversationDetail(conversation, user.isAdmin() ? ADMIN_USER : NORMAL_USER, message);
   }
 
   public ConversationDetail addConversationDetail(

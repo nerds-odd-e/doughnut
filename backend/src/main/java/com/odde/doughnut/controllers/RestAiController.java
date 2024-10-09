@@ -78,7 +78,7 @@ public class RestAiController {
     currentUser.assertLoggedIn();
 
     var conversationDetails =
-        conversationDetailService.getConversionDetailRelatedByConversion(conversationId);
+        conversationDetailService.getConversionDetailRelatedByConversationId(conversationId);
 
     StringBuilder prompt = new StringBuilder();
     for (ConversationDetail message : conversationDetails) {
