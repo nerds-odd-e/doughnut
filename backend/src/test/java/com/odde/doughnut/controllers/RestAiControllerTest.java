@@ -9,9 +9,10 @@ import static org.mockito.Mockito.*;
 import com.odde.doughnut.controllers.dto.AiAssistantResponse;
 import com.odde.doughnut.controllers.dto.AiCompletionAnswerClarifyingQuestionParams;
 import com.odde.doughnut.controllers.dto.AiCompletionParams;
-import com.odde.doughnut.controllers.dto.UserConversionMessage;
+import com.odde.doughnut.entities.ConversationDetail;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.ConversationDetailService;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.NoteDetailsCompletion;
 import com.odde.doughnut.testability.MakeMe;
@@ -29,7 +30,6 @@ import com.theokanning.openai.model.Model;
 import io.reactivex.Single;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -52,6 +52,7 @@ class RestAiControllerTest {
   Note note;
   @Mock OpenAiApi openAiApi;
   @Autowired MakeMe makeMe;
+  @Autowired ConversationDetailService conversationDetailService;
   TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   @BeforeEach
@@ -60,7 +61,11 @@ class RestAiControllerTest {
     note = makeMe.aNote().please();
     controller =
         new RestAiController(
-            openAiApi, makeMe.modelFactoryService, currentUser, testabilitySettings);
+            openAiApi,
+            makeMe.modelFactoryService,
+            conversationDetailService,
+            currentUser,
+            testabilitySettings);
   }
 
   @Nested
@@ -86,6 +91,7 @@ class RestAiControllerTest {
               new RestAiController(
                       openAiApi,
                       makeMe.modelFactoryService,
+                      conversationDetailService,
                       makeMe.aNullUserModelPlease(),
                       testabilitySettings)
                   .getCompletion(note, params));
@@ -191,6 +197,7 @@ class RestAiControllerTest {
               new RestAiController(
                       openAiApi,
                       makeMe.modelFactoryService,
+                      conversationDetailService,
                       makeMe.aNullUserModelPlease(),
                       testabilitySettings)
                   .generateImage("create an image"));
@@ -274,43 +281,13 @@ class RestAiControllerTest {
       }
 
       @Test
-      void useTheCorrectAssistant() {
-        new GlobalSettingsService(makeMe.modelFactoryService)
-            .noteCompletionAssistantId()
-            .setKeyValue(makeMe.aTimestamp().please(), "my-assistant-id");
-        List<UserConversionMessage> messages = new ArrayList<>();
-        controller.getCompletionAiOpinion(messages);
-        ArgumentCaptor<RunCreateRequest> runRequest =
-            ArgumentCaptor.forClass(RunCreateRequest.class);
-        verify(openAiApi).createRun(any(), runRequest.capture());
-        assertEquals("my-assistant-id", runRequest.getValue().getAssistantId());
-      }
-
-      @Test
-      void mustResponseAIOpinionToRequestAIOpinion() {
-        new GlobalSettingsService(makeMe.modelFactoryService)
-            .noteCompletionAssistantId()
-            .setKeyValue(makeMe.aTimestamp().please(), "my-assistant-id");
-        List<UserConversionMessage> messages = new ArrayList<>();
-        messages.add(new UserConversionMessage("user1", "hello"));
-        messages.add(new UserConversionMessage("user2", "hello"));
-        String aiOpinion = controller.getCompletionAiOpinion(messages);
-        System.out.println(aiOpinion);
-        assertTrue(StringUtils.isNotBlank(aiOpinion));
-        ArgumentCaptor<RunCreateRequest> runRequest =
-            ArgumentCaptor.forClass(RunCreateRequest.class);
-        verify(openAiApi).createRun(any(), runRequest.capture());
-        assertEquals("my-assistant-id", runRequest.getValue().getAssistantId());
-      }
-
-      @Test
       void mustResponseAIOpinionWhenRequest() {
         new GlobalSettingsService(makeMe.modelFactoryService)
             .noteCompletionAssistantId()
             .setKeyValue(makeMe.aTimestamp().please(), "my-assistant-id");
-        String aiOpinion = controller.getCompletionAiOpinion(1);
-        System.out.println("aiOpinion: " + aiOpinion);
-        assertTrue(StringUtils.isNotBlank(aiOpinion));
+        ConversationDetail conversationDetail = controller.getCompletionAiOpinion(1);
+        System.out.println("conversationDetail: " + conversationDetail);
+        assertNotNull(conversationDetail);
         ArgumentCaptor<RunCreateRequest> runRequest =
             ArgumentCaptor.forClass(RunCreateRequest.class);
         verify(openAiApi).createRun(any(), runRequest.capture());

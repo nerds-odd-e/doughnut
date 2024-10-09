@@ -106,7 +106,6 @@ export type { TimeTravel } from './models/TimeTravel';
 export type { TimeTravelRelativeToNow } from './models/TimeTravelRelativeToNow';
 export type { Tool } from './models/Tool';
 export type { User } from './models/User';
-export type { UserConversionMessage } from './models/UserConversionMessage';
 export type { UserDTO } from './models/UserDTO';
 export type { UserForOtherUserView } from './models/UserForOtherUserView';
 export type { WikidataAssociationCreation } from './models/WikidataAssociationCreation';

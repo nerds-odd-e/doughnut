@@ -9,6 +9,7 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorWithStorageService;
+import com.odde.doughnut.services.ConversationDetailService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.assistants.message.Message;
 import com.theokanning.openai.client.OpenAiApi;
@@ -18,7 +19,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -43,11 +43,15 @@ public class RestAiController {
 
   private final AiAdvisorWithStorageService aiAdvisorWithStorageService;
 
+  private final ConversationDetailService conversationDetailService;
+
   public RestAiController(
       @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
       ModelFactoryService modelFactoryService,
+      ConversationDetailService conversationDetailService,
       UserModel currentUser,
       TestabilitySettings testabilitySettings) {
+    this.conversationDetailService = conversationDetailService;
     this.aiAdvisorWithStorageService =
         new AiAdvisorWithStorageService(openAiApi, modelFactoryService);
     this.currentUser = currentUser;
@@ -65,41 +69,16 @@ public class RestAiController {
         .createThreadAndRunWithFirstMessage(note, aiCompletionParams.getCompletionPrompt());
   }
 
-  @PostMapping("/completion-ai-opinion")
+  @GetMapping(
+      value = "/completion-ai-opinion/{conversationId}",
+      produces = MediaType.APPLICATION_JSON_VALUE)
   @Transactional
-  public String getCompletionAiOpinion(@RequestBody List<UserConversionMessage> messages) {
-    currentUser.assertLoggedIn();
-    StringBuilder prompt = new StringBuilder();
-    for (UserConversionMessage message : messages) {
-      prompt.append(message.getUser()).append(": ").append(message.getMessage()).append("\n");
-    }
-    var response =
-        aiAdvisorWithStorageService
-            .getContentCompletionService()
-            .createThreadAndRunWithFirstMessage(prompt.toString())
-            .getMessages();
-    return !CollectionUtils.isEmpty(response) ? response.getFirst().toString() : "";
-  }
-
-  @GetMapping("/completion-ai-opinion/{conversationId}")
-  @Transactional
-  public String getCompletionAiOpinion(
+  public ConversationDetail getCompletionAiOpinion(
       @PathVariable(value = "conversationId") Integer conversationId) {
     currentUser.assertLoggedIn();
-    List<ConversationDetail> conversationDetails = new ArrayList<>();
-    conversationDetails.add(ConversationDetail.builder().userType(1).message("Hello").build());
-    conversationDetails.add(
-        ConversationDetail.builder()
-            .userType(2)
-            .message("Hello, How can I help you today?")
-            .build());
-    conversationDetails.add(
-        ConversationDetail.builder()
-            .userType(1)
-            .message("I want to know the weather today")
-            .build());
-    conversationDetails.add(
-        ConversationDetail.builder().userType(2).message("Today is a rain day").build());
+
+    var conversationDetails =
+        conversationDetailService.getConversionDetailRelatedByConversion(conversationId);
 
     StringBuilder prompt = new StringBuilder();
     for (ConversationDetail message : conversationDetails) {
@@ -111,7 +90,11 @@ public class RestAiController {
             .getContentCompletionService()
             .createThreadAndRunWithFirstMessage(prompt.toString())
             .getMessages();
-    return !CollectionUtils.isEmpty(response) ? response.getFirst().toString() : "";
+
+    return !CollectionUtils.isEmpty(conversationDetails)
+        ? conversationDetailService.addConversationDetail(
+            conversationDetails.getFirst().getConversation(), 2, response.getFirst().toString())
+        : new ConversationDetail();
   }
 
   @PostMapping("/answer-clarifying-question")

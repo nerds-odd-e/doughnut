@@ -7,12 +7,12 @@ import type { AiCompletionAnswerClarifyingQuestionParams } from '../models/AiCom
 import type { AiCompletionParams } from '../models/AiCompletionParams';
 import type { AiGeneratedImage } from '../models/AiGeneratedImage';
 import type { ChatRequest } from '../models/ChatRequest';
+import type { ConversationDetail } from '../models/ConversationDetail';
 import type { DummyForGeneratingTypes } from '../models/DummyForGeneratingTypes';
 import type { Message } from '../models/Message';
 import type { NotebookAssistant } from '../models/NotebookAssistant';
 import type { NotebookAssistantCreationParams } from '../models/NotebookAssistantCreationParams';
 import type { SseEmitter } from '../models/SseEmitter';
-import type { UserConversionMessage } from '../models/UserConversionMessage';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestAiControllerService {
@@ -95,24 +95,6 @@ export class RestAiControllerService {
         });
     }
     /**
-     * @param requestBody
-     * @returns string OK
-     * @throws ApiError
-     */
-    public getCompletionAiOpinion(
-        requestBody: Array<UserConversionMessage>,
-    ): CancelablePromise<string> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/api/ai/completion-ai-opinion',
-            body: requestBody,
-            mediaType: 'application/json',
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
      * @param note
      * @returns Message OK
      * @throws ApiError
@@ -187,12 +169,12 @@ export class RestAiControllerService {
     }
     /**
      * @param conversationId
-     * @returns string OK
+     * @returns ConversationDetail OK
      * @throws ApiError
      */
-    public getCompletionAiOpinion1(
+    public getCompletionAiOpinion(
         conversationId: number,
-    ): CancelablePromise<string> {
+    ): CancelablePromise<ConversationDetail> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/ai/completion-ai-opinion/{conversationId}',

@@ -16,7 +16,11 @@ public class ConversationDetailService {
 
   public ConversationDetail addConversationDetail(
       Conversation conversation, User user, String message) {
-    int userType = user.isAdmin() ? 0 : 1;
+    return addConversationDetail(conversation, user.isAdmin() ? 0 : 1, message);
+  }
+
+  public ConversationDetail addConversationDetail(
+      Conversation conversation, int userType, String message) {
     ConversationDetail conversationDetail = new ConversationDetail();
     conversationDetail.setConversation(conversation);
     conversationDetail.setUserType(userType);

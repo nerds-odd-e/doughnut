@@ -12,8 +12,11 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NotebookAssistant;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.ConversationDetailService;
 import com.odde.doughnut.services.GlobalSettingsService;
-import com.odde.doughnut.testability.*;
+import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.OpenAIAssistantMocker;
+import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.assistants.message.Message;
 import com.theokanning.openai.assistants.message.MessageRequest;
 import com.theokanning.openai.assistants.run.RunCreateRequest;
@@ -40,6 +43,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 public class RestAiControllerChatTests {
 
   @Mock private OpenAiApi openAiApi;
+  @Autowired ConversationDetailService conversationDetailService;
 
   @Autowired MakeMe makeMe;
   RestAiController controller;
@@ -53,7 +57,11 @@ public class RestAiControllerChatTests {
     currentUser = makeMe.aUser().toModelPlease();
     controller =
         new RestAiController(
-            openAiApi, makeMe.modelFactoryService, currentUser, testabilitySettings);
+            openAiApi,
+            makeMe.modelFactoryService,
+            conversationDetailService,
+            currentUser,
+            testabilitySettings);
     note = makeMe.aNote().creatorAndOwner(currentUser).please();
     openAIAssistantMocker = new OpenAIAssistantMocker(openAiApi);
   }
@@ -158,6 +166,7 @@ public class RestAiControllerChatTests {
             new RestAiController(
                     openAiApi,
                     makeMe.modelFactoryService,
+                    conversationDetailService,
                     makeMe.aUser().toModelPlease(),
                     testabilitySettings)
                 .chat(note, new ChatRequest("What's your name?", null)));
