@@ -2707,6 +2707,32 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/SuggestedQuestionForFineTuning"
+  /api/feedback/detail/all/{conversationId}:
+    get:
+      tags:
+      - rest-feedback-controller
+      operationId: getMessageThreadsForConversation
+      parameters:
+      - name: conversationId
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ConversationDetail"
   /api/feedback/all:
     get:
       tags:

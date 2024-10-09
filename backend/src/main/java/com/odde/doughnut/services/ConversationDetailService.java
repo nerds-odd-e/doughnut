@@ -13,10 +13,12 @@ import org.springframework.stereotype.Service;
 public class ConversationDetailService {
 
   private final ModelFactoryService modelFactoryService;
+  private static final int ADMIN_USER = 0;
+  private static final int NORMAL_USER = 1;
 
   public ConversationDetail addConversationDetail(
       Conversation conversation, User user, String message) {
-    int userType = user.isAdmin() ? 0 : 1;
+    int userType = user.isAdmin() ? ADMIN_USER : NORMAL_USER;
     ConversationDetail conversationDetail = new ConversationDetail();
     conversationDetail.setConversation(conversation);
     conversationDetail.setUserType(userType);

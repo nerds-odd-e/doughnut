@@ -48,4 +48,12 @@ public class RestFeedbackController {
     return conversationDetailService.addConversationDetail(
         conversation, currentUser.getEntity(), message);
   }
+
+  @GetMapping("/detail/all/{conversationId}")
+  public List<ConversationDetail> getMessageThreadsForConversation(
+      @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation) {
+    currentUser.assertLoggedIn();
+    return conversationDetailService.getConversionDetailRelatedByConversationId(
+        conversation.getId());
+  }
 }

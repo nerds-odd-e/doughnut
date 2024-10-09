@@ -166,4 +166,8 @@ public class MakeMe extends MakeMeWithoutDB {
   public ConversationBuilder aConversation() {
     return new ConversationBuilder(this);
   }
+
+  public ConversationDetailBuilder aConversationDetail() {
+    return new ConversationDetailBuilder(this);
+  }
 }
