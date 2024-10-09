@@ -61,21 +61,6 @@ public class AssessmentService {
     return modelFactoryService.assessmentAttemptRepository.findAllByUser(user);
   }
 
-  public boolean updateScoreById(Integer assessmentId) {
-    AssessmentAttempt assessmentAttempt =  modelFactoryService.assessmentAttemptRepository.findById(assessmentId).orElse(null);
-    try {
-      if (assessmentAttempt != null) {
-        int currentCorrect = assessmentAttempt.getAnswersCorrect();
-        assessmentAttempt.setAnswersCorrect(currentCorrect + 1);
-        modelFactoryService.save(assessmentAttempt);
-        return true;
-      }
-    } catch (Exception e) {
-      return false;
-    }
-    return false;
-  }
-
   private void claimCertificateForPassedAssessment(Notebook notebook, User user) {
     getLastAssessmentAttemptAndItMustBePassed(notebook, user);
 

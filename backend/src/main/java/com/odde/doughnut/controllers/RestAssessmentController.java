@@ -43,13 +43,6 @@ class RestAssessmentController {
     return assessmentService.generateAssessment(notebook, currentUser.getEntity());
   }
 
-  @PostMapping("/update/{assessmentId}")
-  @Transactional
-  public boolean updateScore(
-    @PathVariable("assessmentId") @Schema(type = "integer") Integer assessmentId) {
-    return assessmentService.updateScoreById(assessmentId);
-  }
-
   @PostMapping("/{assessmentQuestionInstance}/answer")
   @Transactional
   public AssessmentQuestionInstance answerQuestion(
