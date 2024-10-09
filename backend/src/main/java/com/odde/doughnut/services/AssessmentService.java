@@ -61,9 +61,7 @@ public class AssessmentService {
     return modelFactoryService.assessmentAttemptRepository.findAllByUser(user);
   }
 
-  public int updateScore(Integer assessmentId, boolean marker) {
-    AssessmentAttempt assessmentAttempt =
-        modelFactoryService.assessmentAttemptRepository.findById(assessmentId).get();
+  public int updateScore(AssessmentAttempt assessmentAttempt, boolean marker) {
     int answersCorrect = assessmentAttempt.getAnswersCorrect();
     if (marker) {
       assessmentAttempt.setAnswersCorrect(answersCorrect + 1);

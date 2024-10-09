@@ -258,7 +258,7 @@ public class RestAssessmentControllerTests {
               .score(5, 3)
               .please();
 
-      assertEquals(4, controller.updateScore(assessment.getId(), true));
+      assertEquals(4, controller.updateScore(assessment, true));
 
       assessment =
           makeMe
@@ -267,7 +267,7 @@ public class RestAssessmentControllerTests {
               .score(5, 3)
               .please();
 
-      assertEquals(3, controller.updateScore(assessment.getId(), false));
+      assertEquals(3, controller.updateScore(assessment, false));
     }
   }
 }
