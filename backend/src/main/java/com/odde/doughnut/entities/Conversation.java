@@ -36,6 +36,10 @@ public class Conversation extends EntityIdentifiedByIdOnly {
   @OrderBy("updatedAt DESC")
   private Timestamp updatedAt = new Timestamp(new Date().getTime());
 
+  @Setter
+  @Column(name = "marker")
+  private Boolean marker = false;
+
   public void setAssessmentQuestionInstance(AssessmentQuestionInstance assessmentQuestionInstance) {
     this.assessmentQuestionInstance = assessmentQuestionInstance;
     this.subjectOwnership =

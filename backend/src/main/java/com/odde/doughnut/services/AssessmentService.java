@@ -61,25 +61,15 @@ public class AssessmentService {
     return modelFactoryService.assessmentAttemptRepository.findAllByUser(user);
   }
 
-  public int updateScore(AssessmentAttempt assessmentAttempt, boolean marker) {
+  public int updateScore(AssessmentAttempt assessmentAttempt) {
     int answersCorrect = assessmentAttempt.getAnswersCorrect();
-    if (marker) {
-      assessmentAttempt.setAnswersCorrect(answersCorrect + 1);
-      modelFactoryService.save(assessmentAttempt);
-    }
-    return assessmentAttempt.getAnswersCorrect();
-  }
 
-  public int updateCertificate(Integer assessmentId) {
-    AssessmentAttempt assessmentAttempt =
-        modelFactoryService.assessmentAttemptRepository.findById(assessmentId).get();
-    boolean isReceivedCertificate =
-        assessmentAttempt.getAnswersCorrect() / assessmentAttempt.getTotalQuestionCount() >= 0.8;
-    // assessmentAttempt.set
+    assessmentAttempt.setAnswersCorrect(answersCorrect + 1);
     modelFactoryService.save(assessmentAttempt);
-
     return assessmentAttempt.getAnswersCorrect();
   }
+
+  public void updateMarker() {}
 
   private void claimCertificateForPassedAssessment(Notebook notebook, User user) {
     getLastAssessmentAttemptAndItMustBePassed(notebook, user);

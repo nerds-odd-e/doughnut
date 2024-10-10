@@ -1706,11 +1706,6 @@ paths:
         required: true
         schema:
           type: integer
-      - name: marker
-        in: path
-        required: true
-        schema:
-          type: boolean
       responses:
         "500":
           description: Internal Server Error
@@ -3570,6 +3565,8 @@ components:
         updatedAt:
           type: string
           format: date-time
+        marker:
+          type: boolean
     ConversationDetail:
       required:
       - createdAt

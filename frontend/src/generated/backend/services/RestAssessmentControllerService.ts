@@ -53,20 +53,17 @@ export class RestAssessmentControllerService {
     }
     /**
      * @param assessmentId
-     * @param marker
      * @returns number OK
      * @throws ApiError
      */
     public updateScore(
         assessmentId: number,
-        marker: boolean,
     ): CancelablePromise<number> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/assessment/score/{assessmentId}/{marker}',
             path: {
                 'assessmentId': assessmentId,
-                'marker': marker,
             },
             errors: {
                 500: `Internal Server Error`,

@@ -78,9 +78,14 @@ class RestAssessmentController {
   @Transactional
   public int updateScore(
       @PathVariable("assessmentId") @Schema(type = "integer") AssessmentAttempt assessmentAttempt,
-      @PathVariable("marker") boolean marker) {
+      @PathVariable("isApproved") boolean isApproved) {
     currentUser.assertLoggedIn();
+    int correctAnswer = assessmentAttempt.getAnswersCorrect();
 
-    return assessmentService.updateScore(assessmentAttempt, marker);
+    if (isApproved) {
+      correctAnswer = assessmentService.updateScore(assessmentAttempt);
+    }
+    assessmentService.updateMarker();
+    return correctAnswer;
   }
 }
