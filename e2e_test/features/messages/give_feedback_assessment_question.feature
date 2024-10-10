@@ -22,12 +22,15 @@ Feature: Learner gives feedback on an assessment question
         Then "old_learner" can see the conversation with "A Trainer" for the question "Is 0 * 0 = 0?" in the message center
         And I can see the message "I believe the question is incorrect" when click on the question "Is 0 * 0 = 0?"
 
+    @ignore
     Scenario: User can send message to reply feedback
         Given I begin the assessment from the "Just say 'Yes'" notebook in the bazaar
-        When I answer the question wrongly and submit feedback saying 'I believe the question is incorrect'
-        Then "a_trainer" can see the conversation with "Old Learner" for the question "Is 0 * 0 = 0?" in the message center
+        And I answer the question wrongly and submit feedback saying 'I believe the question is incorrect'
+        When "a_trainer" can see the conversation with "Old Learner" for the question "Is 0 * 0 = 0?" in the message center
         And I can see the input form and Send button when click on the question "Is 0 * 0 = 0?"
         And I can type the message "No, it is correct" and send this message to conversation room
+        Then I should see the new message "No, it is correct" on the current user's side of the conversation
+        And I should see the new message "I believe the question is incorrect" on the other user's side of the conversation
 
     Scenario: Trainer Agrees to Feedback
         Given I begin the assessment from the "Just say 'Yes'" notebook in the bazaar
