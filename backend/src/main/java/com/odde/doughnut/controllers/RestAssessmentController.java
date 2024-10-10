@@ -74,7 +74,7 @@ class RestAssessmentController {
     return assessmentService.getMyAssessments(currentUser.getEntity());
   }
 
-  @PostMapping("/score/{assessmentId}/{marker}")
+  @PostMapping("/score/{assessmentId}/{isApproved}")
   @Transactional
   public int updateScore(
       @PathVariable("assessmentId") @Schema(type = "integer") AssessmentAttempt assessmentAttempt,

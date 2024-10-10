@@ -1695,7 +1695,7 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/AssessmentAttempt"
-  /api/assessment/score/{assessmentId}/{marker}:
+  /api/assessment/score/{assessmentId}/{isApproved}:
     post:
       tags:
       - rest-assessment-controller
@@ -1706,6 +1706,11 @@ paths:
         required: true
         schema:
           type: integer
+      - name: isApproved
+        in: path
+        required: true
+        schema:
+          type: boolean
       responses:
         "500":
           description: Internal Server Error
