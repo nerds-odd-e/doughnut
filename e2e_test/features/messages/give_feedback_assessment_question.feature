@@ -37,6 +37,7 @@ Feature: Learner gives feedback on an assessment question
         Then "a_trainer" can see the button "AgreeButton" with "Old Learner" in the message center
         Then "a_trainer" can see the conversation with "Old Learner" for the question "Is 0 * 0 = 0?" in the message center
         Then when "a_trainer" can click the "AgreeButton" button with "Old Learner" in the message center
+        Then I should see message that says "Feedback is Accepted"
 
     @ignore
     Scenario: Trainer Declines Feedback

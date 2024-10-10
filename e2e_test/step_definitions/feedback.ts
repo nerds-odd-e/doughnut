@@ -51,4 +51,3 @@ Then(
       .clickButton(button, partner)
   }
 )
-
