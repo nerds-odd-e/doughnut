@@ -77,31 +77,12 @@ public class RestAiController {
   public ConversationDetail getCompletionAiOpinion(
       @PathVariable(value = "conversationId") Integer conversationId) {
     currentUser.assertLoggedIn();
-
-    var conversationDetails =
+    List<ConversationDetail> conversationDetails =
         conversationDetailService.getConversionDetailRelatedByConversationId(conversationId);
-
-    StringBuilder prompt = new StringBuilder();
-    for (ConversationDetail message : conversationDetails) {
-      prompt.append(message.getUserType()).append(": ").append(message.getMessage()).append("\n");
-    }
-
-    List<Message> response =
-        aiAdvisorWithStorageService
-            .getContentCompletionService()
-            .createThreadAndRunWithFirstMessage(prompt.toString())
-            .getMessages();
-
-    if (!CollectionUtils.isEmpty(conversationDetails)
-        && !CollectionUtils.isEmpty(response)
-        && !CollectionUtils.isEmpty(response.getFirst().getContent())
-        && response.getFirst().getContent().getFirst().getText() != null
-        && StringUtils.isNotBlank(
-            response.getFirst().getContent().getFirst().getText().getValue())) {
+    String aiOpinion = aiAdvisorWithStorageService.getCompletionAiOpinion(conversationDetails);
+    if (StringUtils.isNotBlank(aiOpinion)) {
       return conversationDetailService.addConversationDetail(
-          conversationDetails.getFirst().getConversation(),
-          2,
-          response.getFirst().getContent().getFirst().getText().getValue());
+          conversationDetails.getFirst().getConversation(), 2, aiOpinion);
     } else {
       return new ConversationDetail();
     }
