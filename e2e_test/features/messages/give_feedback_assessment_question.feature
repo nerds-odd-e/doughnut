@@ -22,7 +22,6 @@ Feature: Learner gives feedback on an assessment question
         Then "old_learner" can see the conversation with "A Trainer" for the question "Is 0 * 0 = 0?" in the message center
         And I can see the message "I believe the question is incorrect" when click on the question "Is 0 * 0 = 0?"
 
-    @ignore
     Scenario: User can send message to reply feedback
         Given I begin the assessment from the "Just say 'Yes'" notebook in the bazaar
         When I answer the question wrongly and submit feedback saying 'I believe the question is incorrect'
