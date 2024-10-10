@@ -104,7 +104,11 @@ const fetchThreadsForConversation = async (conversationId: number) => {
 }
 
 const askAI = async () => {
-  console.log("OK")
+  await managedApi.restAiController
+    .getCompletionAiOpinion(conversationThreadId.value)
+    .then(() => {
+      fetchThreadsForConversation(conversationThreadId.value)
+    })
 }
 
 onMounted(() => {
