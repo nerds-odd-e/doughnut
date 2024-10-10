@@ -291,8 +291,6 @@ class RestAiControllerTest {
         new GlobalSettingsService(makeMe.modelFactoryService)
             .noteCompletionAssistantId()
             .setKeyValue(makeMe.aTimestamp().please(), "my-assistant-id");
-
-        System.out.println(assessmentQuestionInstance);
         makeMe
             .aConversation()
             .forAnAssessmentQuestionInstance(assessmentQuestionInstance)
@@ -313,7 +311,6 @@ class RestAiControllerTest {
         assertNotNull(conversationDetail.getMessage());
         assertNotNull(conversationDetail.getConversation());
         assertNotNull(conversationDetail.getConversation().getMessage());
-        System.out.println("conversationDetail: " + conversationDetail.getMessage());
         ArgumentCaptor<RunCreateRequest> runRequest =
             ArgumentCaptor.forClass(RunCreateRequest.class);
         verify(openAiApi).createRun(any(), runRequest.capture());
