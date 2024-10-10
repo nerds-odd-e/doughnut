@@ -13,7 +13,7 @@
           <ul class="list-group">
             <li v-for="conversation in conversations" :key="conversation.id" class="list-group-item list-group-item-action" @click="setInitialFeedback(conversation.message || '')">
               <div align="right">
-                <AgreeButton :conversation="conversation"></AgreeButton>
+                <AgreeAndDeclineButton :conversation="conversation"></AgreeAndDeclineButton>
               </div>
               <div>{{ conversation.assessmentQuestionInstance?.bareQuestion.multipleChoicesQuestion.stem }}</div>
               <div>{{ conversationPartner(conversation) }}</div>
@@ -38,7 +38,7 @@ import { onMounted, ref } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import ContainerFluidPage from "@/pages/commons/ContainerFluidPage.vue"
 import type { Conversation, User } from "@/generated/backend"
-import AgreeButton from "@/components/toolbars/AgreeButton.vue"
+import AgreeAndDeclineButton from "@/components/toolbars/AgreeAndDeclineButton.vue"
 
 const { managedApi } = useLoadingApi()
 

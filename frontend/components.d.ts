@@ -7,7 +7,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    AgreeButton: typeof import('./src/components/toolbars/AgreeButton.vue')['default']
+    AgreeAndDeclineButton: typeof import('./src/components/toolbars/AgreeAndDeclineButton.vue')['default']
     AIClarifyingQuestionDialog: typeof import('./src/components/notes/AIClarifyingQuestionDialog.vue')['default']
     AIGenerateImageDialog: typeof import('./src/components/notes/AIGenerateImageDialog.vue')['default']
     AnsweredQuestionComponent: typeof import('./src/components/review/AnsweredQuestionComponent.vue')['default']
@@ -32,7 +32,6 @@ declare module 'vue' {
     CircleNewDialog: typeof import('./src/components/circles/CircleNewDialog.vue')['default']
     ContentLoader: typeof import('./src/components/commons/ContentLoader.vue')['default']
     ContestableQuestion: typeof import('./src/components/review/ContestableQuestion.vue')['default']
-    DeclineButton: typeof import('./src/components/toolbars/DeclineButton.vue')['default']
     EditableText: typeof import('./src/components/form/EditableText.vue')['default']
     FailureReportList: typeof import('./src/components/admin/FailureReportList.vue')['default']
     Feather: typeof import('./src/components/svgs/link_types/Feather.vue')['default']

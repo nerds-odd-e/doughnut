@@ -31,15 +31,20 @@ Feature: Learner gives feedback on an assessment question
         And "a_trainer" can type the message "No, it is correct" and send this message to "old_learner"
         Then "old_learner" can see the message "No, it is correct" from "a_trainer"
 
-    Scenario: I see the button Agree and Decline
+    Scenario: Trainer Agrees to Feedback
         Given I begin the assessment from the "Just say 'Yes'" notebook in the bazaar
         When I answer the question wrongly and submit feedback saying 'I believe the question is incorrect'
         Then "a_trainer" can see the button "AgreeButton" with "Old Learner" in the message center
-        Then "a_trainer" can see the button "DeclineButton" with "Old Learner" in the message center
+        Then "a_trainer" can see the conversation with "Old Learner" for the question "Is 0 * 0 = 0?" in the message center
+        Then when "a_trainer" can click the "AgreeButton" button with "Old Learner" in the message center
 
     @ignore
-    Scenario: I click the button Agree
-        Given I begin the assessment from the "Just say 'Yes'" notebook in the bazaar
-        When I answer the question wrongly and submit feedback saying 'I believe the question is incorrect'
-        Then "a_trainer" can click the "AgreeButton" button with "Old Learner" in the message center
-        Then "a_trainer" can click the "DeclineButton" button with "Old Learner" in the message center        
+    Scenario: Trainer Declines Feedback
+        Given I start the assessment from the "Just say 'Yes'" notebook in the bazaar
+        When I answer the question incorrectly and submit feedback saying "I believe the question is incorrect"
+        And "a_trainer" sees the "Agree" button in the message center alongside the feedback from "Old Learner"
+        Then "a_trainer" can see the conversation with "Old Learner" for the question "Is 0 * 0 = 0?" in the message center
+        Then when "a_trainer" clicks the "Decline" button
+        Then the system confirms rejection of the feedback with a success message
+        And the "Decline" button becomes disabled to prevent further clicks
+        And the feedback status is updated to "Rejected" in the assessment system

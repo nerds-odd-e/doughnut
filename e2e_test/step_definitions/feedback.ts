@@ -42,12 +42,13 @@ Then(
 )
 
 Then(
-  '{string} can click the {string} button with {string} in the message center',
-  (user: string, feedback: string, partner: string) => {
+  'when {string} can click the {string} button with {string} in the message center',
+  (user: string, button: string, partner: string) => {
     start
       .reloginAndEnsureHomePage(user)
       .navigateToMessageCenter()
-      .expectButton(feedback, partner)
-      .clickButton(feedback, partner)
+      .expectButton(button, partner)
+      .clickButton(button, partner)
   }
 )
+
