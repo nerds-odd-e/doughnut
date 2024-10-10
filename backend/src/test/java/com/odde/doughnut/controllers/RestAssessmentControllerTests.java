@@ -8,6 +8,7 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.QuestionAnswerException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AssessmentService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.NoteBuilder;
@@ -31,12 +32,15 @@ public class RestAssessmentControllerTests {
   private RestAssessmentController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
+  private AssessmentService assessmentService;
+
   @BeforeEach
   void setup() {
     testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
     currentUser = makeMe.aUser().toModelPlease();
     controller =
         new RestAssessmentController(makeMe.modelFactoryService, testabilitySettings, currentUser);
+    assessmentService = new AssessmentService(makeMe.modelFactoryService, testabilitySettings);
   }
 
   @Nested
@@ -251,23 +255,32 @@ public class RestAssessmentControllerTests {
 
     @Test
     void shouldReturnUpdateScore() {
+
+      Note topNote = makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser).please();
+      notebook = topNote.getNotebook();
+      notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(1);
+
+      makeMe
+          .theNote(topNote)
+          .withNChildrenThat(1, noteBuilder -> noteBuilder.hasApprovedQuestions(10))
+          .please();
       AssessmentAttempt assessment =
+          assessmentService.generateAssessment(notebook, currentUser.getEntity());
+      assessment.setAnswersCorrect(3);
+      assessment.setTotalQuestionCount(5);
+
+      Conversation conversation =
           makeMe
-              .anAssessmentAttempt(currentUser.getEntity())
-              .notebook(notebook)
-              .score(5, 3)
+              .aConversation()
+              .messagge("Test")
+              .forAnAssessmentQuestionInstance(
+                  assessment.getAssessmentQuestionInstances().getFirst())
+              .from(currentUser)
               .please();
 
-      assertEquals(4, controller.updateScore(assessment, true));
+      assertEquals(4, controller.updateScore(assessment, conversation, true));
 
-      assessment =
-          makeMe
-              .anAssessmentAttempt(currentUser.getEntity())
-              .notebook(notebook)
-              .score(5, 3)
-              .please();
-
-      assertEquals(3, controller.updateScore(assessment, false));
+      assertTrue(conversation.getMarker());
     }
   }
 }

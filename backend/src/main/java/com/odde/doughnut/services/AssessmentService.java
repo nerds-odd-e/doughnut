@@ -69,7 +69,13 @@ public class AssessmentService {
     return assessmentAttempt.getAnswersCorrect();
   }
 
-  public void updateMarker() {}
+  public void updateMarker(Integer conversationId) {
+    Conversation conversation =
+        modelFactoryService.conversationRepository.findById(conversationId).get();
+
+    conversation.setMarker(true);
+    modelFactoryService.conversationRepository.save(conversation);
+  }
 
   private void claimCertificateForPassedAssessment(Notebook notebook, User user) {
     getLastAssessmentAttemptAndItMustBePassed(notebook, user);
