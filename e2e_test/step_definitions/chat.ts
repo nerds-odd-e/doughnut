@@ -20,3 +20,7 @@ When(
 Then('I should receive the following chat messages:', (data: DataTable) => {
   start.assumeChatAboutNotePage().expectMessages(data.hashes())
 })
+
+Then("I ask for AI's response", () => {
+  start.assumeChatAboutNotePage().askAI();
+})

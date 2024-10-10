@@ -23,7 +23,17 @@
 
         <div class="col-md-9 main-content">
           <div class="p-4">
-            <div v-if="feedback">{{ feedback }}</div>
+            <div v-if="feedback">
+            {{ feedback }}
+            <form class="chat-input-container" @submit.prevent="askAI">
+                <button
+                type="submit"
+                value="Chat"
+                id="ask-ai"
+                class="btn float-btn btn-secondary"
+                >AI</button>
+            </form>
+            </div>
             <h2 v-else>No conversation</h2>
           </div>
         </div>
@@ -56,6 +66,10 @@ const fetchData = async () => {
 
 const setInitialFeedback = (message: string) => {
   feedback.value = message.replace(/^"|"$/g, "").trim()
+}
+
+const askAI = async () => {
+  console.log("OK")
 }
 
 onMounted(() => {
