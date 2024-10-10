@@ -55,7 +55,6 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ["updated"],
   methods: {
     async agree() {
       if (this.conversation.id === undefined) {
@@ -72,7 +71,6 @@ export default defineComponent({
         this.isDisabled = true
         this.message = "Accepted"
       }
-      this.$emit("updated")
     },
     async decline() {
       if (this.conversation.id === undefined) {
@@ -89,7 +87,6 @@ export default defineComponent({
         this.isDisabled = true
         this.message = "Rejected"
       }
-      this.$emit("updated")
     },
   },
   components: { SvgAgree, SvgDecline },

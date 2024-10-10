@@ -15,17 +15,20 @@
       <div class="d-flex flex-grow-1 justify-content-between">
         <div class="d-flex flex-grow-1" id="head-status" />
         <div class="btn-group btn-group-sm">
-          <PopButton v-if="user" title="search note">
-            <template #button_face>
-              <SvgSearch />
-            </template>
-            <template #default="{ closer }">
-              <LinkNoteDialog
-                v-bind="{ storageAccessor }"
-                @close-dialog="closer"
-              />
-            </template>
-          </PopButton>
+          <button v-if="user" @click="navigateToPage" class="btn" title="Notification">
+            <SvgNotification />
+          </button>
+            <PopButton v-if="user" title="search note">
+              <template #button_face>
+                <SvgSearch />
+              </template>
+              <template #default="{ closer }">
+                <LinkNoteDialog
+                  v-bind="{ storageAccessor }"
+                  @close-dialog="closer"
+                />
+              </template>
+            </PopButton>
           <NoteUndoButton v-bind="{ storageAccessor }" />
         </div>
         <ApiStatus
@@ -39,10 +42,12 @@
 </template>
 
 <script setup lang="ts">
+import { useRouter } from "vue-router" // Import useRouter
 import type { User } from "@/generated/backend"
 import { type ApiStatus } from "@/managedApi/ManagedApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import type { PropType } from "vue"
+import SvgNotification from "../svgs/SvgNotification.vue"
 
 defineProps({
   storageAccessor: {
@@ -53,6 +58,14 @@ defineProps({
   user: { type: Object as PropType<User> },
 })
 defineEmits(["updateUser", "clearErrorMessage"])
+
+// Use router for navigation
+const router = useRouter()
+
+const navigateToPage = () => {
+  // Replace 'Notifications' with your target route name
+  router.push({ name: "messageCenter" })
+}
 </script>
 
 <style scoped lang="scss">

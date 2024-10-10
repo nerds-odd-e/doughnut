@@ -202,6 +202,7 @@ declare module 'vue' {
     SvgMissingAvatar: typeof import('./src/components/svgs/SvgMissingAvatar.vue')['default']
     SvgMoveToCircle: typeof import('./src/components/svgs/SvgMoveToCircle.vue')['default']
     SvgNoReview: typeof import('./src/components/svgs/SvgNoReview.vue')['default']
+    SvgNotification: typeof import('./src/components/svgs/SvgNotification.vue')['default']
     SvgPause: typeof import('./src/components/svgs/SvgPause.vue')['default']
     SvgRaiseHand: typeof import('./src/components/svgs/SvgRaiseHand.vue')['default']
     SvgRemove: typeof import('./src/components/svgs/SvgRemove.vue')['default']
