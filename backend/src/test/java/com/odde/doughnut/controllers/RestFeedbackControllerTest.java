@@ -54,6 +54,24 @@ class RestFeedbackControllerTest {
   }
 
   @Test
+  void testGetMessageDetailWhenSendFeedbackReturnsOk() {
+    String feedback = "This is a feedback";
+
+    Conversation conversation = controller.sendFeedback(feedback, assessmentQuestionInstance);
+
+    List<Conversation> conversations =
+        (List<Conversation>) modelFactoryService.conversationRepository.findAll();
+
+    var conversationDetail =
+        modelFactoryService.conversationDetailRepository.findByConversationInitiator(
+            conversation.getId());
+    assertEquals(1, conversations.size());
+    assertEquals(feedback, conversation.getMessage());
+    assertEquals(1, conversationDetail.size());
+    assertEquals(feedback, conversationDetail.getFirst().getMessage());
+  }
+
+  @Test
   void testGetFeedbackThreadsSendFromTheUser() {
     makeMe
         .aConversation()
