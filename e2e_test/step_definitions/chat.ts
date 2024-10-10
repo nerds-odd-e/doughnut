@@ -22,5 +22,5 @@ Then('I should receive the following chat messages:', (data: DataTable) => {
 })
 
 Then("I ask for AI's response", () => {
-  start.assumeChatAboutNotePage().askAI();
+  start.assumeChatAboutNotePage().askAI()
 })
