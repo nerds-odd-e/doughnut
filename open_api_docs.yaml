@@ -3586,8 +3586,6 @@ components:
           type: integer
           format: int32
         message:
-          maxLength: 150
-          minLength: 1
           type: string
         createdAt:
           type: string
