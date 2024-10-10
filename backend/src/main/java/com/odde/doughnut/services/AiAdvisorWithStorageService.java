@@ -131,7 +131,8 @@ public record AiAdvisorWithStorageService(
     if (!CollectionUtils.isEmpty(response)
         && !CollectionUtils.isEmpty(response.getFirst().getContent())
         && response.getFirst().getContent().getFirst().getText() != null
-        && StringUtils.isNotBlank(response.getFirst().getContent().getFirst().getText().getValue())) {
+        && StringUtils.isNotBlank(
+            response.getFirst().getContent().getFirst().getText().getValue())) {
       return response.getFirst().getContent().getFirst().getText().getValue();
     } else {
       return StringUtils.EMPTY;
