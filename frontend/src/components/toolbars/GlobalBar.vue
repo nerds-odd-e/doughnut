@@ -39,7 +39,6 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from "vue-router" // Import useRouter
 import type { User } from "@/generated/backend"
 import { type ApiStatus } from "@/managedApi/ManagedApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
