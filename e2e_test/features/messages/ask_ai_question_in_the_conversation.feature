@@ -13,6 +13,6 @@ Feature: Ask AI question in the conversation
     Given I begin the assessment from the "Just say 'Yes'" notebook in the bazaar
     When I answer the question wrongly and submit feedback saying 'I believe the question is incorrect'
     Then "a_trainer" can see the conversation with "Old Learner" for the question "Is 0 * 0 = 0?" in the message center
-    And "a_trainer" can see the message "I believe the question is incorrect" when click on the question "Is 0 * 0 = 0?"
+    And I can see the message "I believe the question is incorrect" when click on the question "Is 0 * 0 = 0?"
     Then I ask for AI's response
        
