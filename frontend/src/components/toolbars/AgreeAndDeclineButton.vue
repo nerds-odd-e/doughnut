@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="!isDisabled">
+    <div v-if="!isDisabled && conversation.maker === undefined">
       <SvgAgree
         role="button"
         aria-label="Agree"
@@ -22,6 +22,12 @@
     </div>
     <div v-else>
       <span>{{ message }}</span>
+    </div>
+    <div v-if="conversation.maker === true && isDisabled">
+      <span>Accepted</span>
+    </div>
+    <div v-if="conversation.maker === false && isDisabled">
+      <span>Rejected</span>
     </div>
   </div>
 </template>
