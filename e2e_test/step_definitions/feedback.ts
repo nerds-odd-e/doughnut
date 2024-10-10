@@ -22,12 +22,9 @@ Then(
 )
 
 Then(
-  '{string} can see the message {string} when click on the question {string}',
-  (user: string, feedback: string, question: string) => {
-    start
-      .reloginAndEnsureHomePage(user)
-      .navigateToMessageCenter()
-      .clickToSeeExpectMessage(question, feedback)
+  'I can see the message {string} when click on the question {string}',
+  (feedback: string, question: string) => {
+    start.assumeMessageCenterPage().clickToSeeExpectMessage(question, feedback)
   }
 )
 

@@ -2,6 +2,7 @@ import { assumeAnsweredQuestionPage } from './pageObjects/AnsweredQuestionPage'
 import { assumeAssessmentPage } from './pageObjects/AssessmentPage'
 import { assumeQuestionPage } from './pageObjects/QuizQuestionPage'
 import { assumeAdminDashboardPage } from './pageObjects/adminPages/adminDashboardPage'
+import { assumeMessageCenterPage } from './pageObjects/messageCenterPage'
 import { navigateToBazaar } from './pageObjects/bazaarPage'
 import { assumeChatAboutNotePage } from './pageObjects/chatAboutNotePage'
 import { navigateToCircle } from './pageObjects/circlePage'
@@ -24,6 +25,7 @@ export default {
   assumeChatAboutNotePage,
   assumeQuestionPage,
   assumeAdminDashboardPage,
+  assumeMessageCenterPage,
   assumeClarifyingQuestionDialog,
   routerToNotebooksPage,
   navigateToCircle,

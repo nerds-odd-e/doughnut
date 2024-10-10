@@ -18,16 +18,8 @@ export const assumeMessageCenterPage = () => {
     },
     clickToSeeExpectForm(question: string) {
       cy.findByText(question).parent().should('be.visible').click()
-      cy.findByRole('textbox', { name: 'Description' }).should(
-        'have.prop',
-        'tagName',
-        'TEXTAREA'
-      )
-      cy.findByRole('button', { type: 'submit', value: 'Send' }).should(
-        'have.prop',
-        'tagName',
-        'INPUT'
-      )
+      cy.get('textarea[name="Description"]').should('be.visible')
+      cy.get('input[type="submit"][value="Send"]').should('be.visible')
       return this
     },
     expectButton(message: string, partner: string) {
@@ -38,6 +30,12 @@ export const assumeMessageCenterPage = () => {
     clickButton(message: string, partner: string) {
       cy.findByTestId(message).should('be.visible').click()
       cy.findByText(partner).should('be.visible')
+      return this
+    },
+    typeAndSendMessage(message: string) {
+      cy.get('textarea[name="Description"]').type(message)
+      cy.get('input[type="submit"][value="Send"]').click()
+      cy.findByText(message).should('be.visible')
       return this
     },
   }

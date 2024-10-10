@@ -12,11 +12,15 @@ Then(
 )
 
 Then(
-  '{string} can see the input form and Send button when click on the question {string}',
-  (user: string, question: string) => {
-    start
-      .reloginAndEnsureHomePage(user)
-      .navigateToMessageCenter()
-      .clickToSeeExpectForm(question)
+  'I can see the input form and Send button when click on the question {string}',
+  (question: string) => {
+    start.assumeMessageCenterPage().clickToSeeExpectForm(question)
+  }
+)
+
+Then(
+  'I can type the message {string} and send this message to conversation room',
+  (message: string) => {
+    start.assumeMessageCenterPage().typeAndSendMessage(message)
   }
 )
