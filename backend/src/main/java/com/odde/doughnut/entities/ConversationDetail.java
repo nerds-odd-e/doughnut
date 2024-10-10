@@ -1,7 +1,6 @@
 package com.odde.doughnut.entities;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
 import java.sql.Timestamp;
 import java.util.Date;
 import javax.validation.constraints.Max;
@@ -28,8 +27,7 @@ public class ConversationDetail extends EntityIdentifiedByIdOnly {
   int userType;
 
   @NotNull
-  @Column(name = "message")
-  @Size(min = 1, max = Note.MAX_TITLE_LENGTH)
+  @Column(name = "message", columnDefinition = "TEXT")
   String message;
 
   @Column(name = "created_at")

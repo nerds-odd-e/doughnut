@@ -91,10 +91,14 @@ public class RestAiController {
             .createThreadAndRunWithFirstMessage(prompt.toString())
             .getMessages();
 
-    return !CollectionUtils.isEmpty(conversationDetails)
-        ? conversationDetailService.addConversationDetail(
-            conversationDetails.getFirst().getConversation(), 2, response.getFirst().toString())
-        : new ConversationDetail();
+    if (!CollectionUtils.isEmpty(conversationDetails)) {
+      return conversationDetailService.addConversationDetail(
+          conversationDetails.getFirst().getConversation(),
+          2,
+          response.getFirst().getContent().getFirst().getText().getValue());
+    } else {
+      return new ConversationDetail();
+    }
   }
 
   @PostMapping("/answer-clarifying-question")
