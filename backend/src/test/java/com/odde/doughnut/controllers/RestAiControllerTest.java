@@ -10,8 +10,7 @@ import static org.mockito.Mockito.*;
 import com.odde.doughnut.controllers.dto.AiAssistantResponse;
 import com.odde.doughnut.controllers.dto.AiCompletionAnswerClarifyingQuestionParams;
 import com.odde.doughnut.controllers.dto.AiCompletionParams;
-import com.odde.doughnut.entities.ConversationDetail;
-import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ConversationDetailService;
 import com.odde.doughnut.services.GlobalSettingsService;
@@ -49,6 +48,7 @@ import org.springframework.web.server.ResponseStatusException;
 class RestAiControllerTest {
   RestAiController controller;
   UserModel currentUser;
+  AssessmentQuestionInstance assessmentQuestionInstance;
 
   Note note;
   @Mock OpenAiApi openAiApi;
@@ -266,6 +266,11 @@ class RestAiControllerTest {
       Note solar = makeMe.aNote("solar system").under(cosmos).please();
       note = makeMe.aNote("Earth").under(solar).please();
       openAIAssistantMocker = new OpenAIAssistantMocker(openAiApi);
+
+      Notebook notebook = makeMe.aNotebook().please();
+      AssessmentAttempt assessmentAttempt =
+          makeMe.anAssessmentAttempt(notebook.getCreatorEntity()).withOneQuestion().please();
+      assessmentQuestionInstance = assessmentAttempt.getAssessmentQuestionInstances().get(0);
     }
 
     @Nested
@@ -286,9 +291,29 @@ class RestAiControllerTest {
         new GlobalSettingsService(makeMe.modelFactoryService)
             .noteCompletionAssistantId()
             .setKeyValue(makeMe.aTimestamp().please(), "my-assistant-id");
-        ConversationDetail conversationDetail = controller.getCompletionAiOpinion(1);
-        System.out.println("conversationDetail: " + conversationDetail);
+
+        System.out.println(assessmentQuestionInstance);
+        makeMe
+            .aConversation()
+            .forAnAssessmentQuestionInstance(assessmentQuestionInstance)
+            .from(currentUser)
+            .please();
+        Conversation conversation =
+            makeMe
+                .aConversation()
+                .forAnAssessmentQuestionInstance(assessmentQuestionInstance)
+                .please();
+
+        makeMe.aConversationDetail().forConversationInstance(conversation).please();
+        ConversationDetail conversationDetail =
+            controller.getCompletionAiOpinion(conversation.getId());
         assertNotNull(conversationDetail);
+
+        assertNotNull(conversationDetail);
+        assertNotNull(conversationDetail.getMessage());
+        assertNotNull(conversationDetail.getConversation());
+        assertNotNull(conversationDetail.getConversation().getMessage());
+        System.out.println("conversationDetail: " + conversationDetail.getMessage());
         ArgumentCaptor<RunCreateRequest> runRequest =
             ArgumentCaptor.forClass(RunCreateRequest.class);
         verify(openAiApi).createRun(any(), runRequest.capture());

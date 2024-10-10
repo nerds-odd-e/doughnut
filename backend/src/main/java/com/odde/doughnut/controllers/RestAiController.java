@@ -22,6 +22,7 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
@@ -85,13 +86,18 @@ public class RestAiController {
       prompt.append(message.getUserType()).append(": ").append(message.getMessage()).append("\n");
     }
 
-    var response =
+    List<Message> response =
         aiAdvisorWithStorageService
             .getContentCompletionService()
             .createThreadAndRunWithFirstMessage(prompt.toString())
             .getMessages();
 
-    if (!CollectionUtils.isEmpty(conversationDetails)) {
+    if (!CollectionUtils.isEmpty(conversationDetails)
+        && !CollectionUtils.isEmpty(response)
+        && !CollectionUtils.isEmpty(response.getFirst().getContent())
+        && response.getFirst().getContent().getFirst().getText() != null
+        && StringUtils.isNotBlank(
+            response.getFirst().getContent().getFirst().getText().getValue())) {
       return conversationDetailService.addConversationDetail(
           conversationDetails.getFirst().getConversation(),
           2,

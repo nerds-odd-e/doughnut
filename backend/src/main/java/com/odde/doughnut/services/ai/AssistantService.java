@@ -115,7 +115,8 @@ public record AssistantService(
                 List.of(
                     MessageRequest.builder()
                         .role("assistant")
-                        .content("Please give us your opinion based on the conversation")
+                        .content(
+                            "Please give us your opinion based on the conversation. If you don't have any opinion, please response you don't have any idea, do not ask me for more information.")
                         .build()))
             .build();
     return openAiApiHandler.createThread(threadRequest).getId();
