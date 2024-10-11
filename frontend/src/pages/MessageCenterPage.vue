@@ -23,9 +23,12 @@
         </div>
 
         <div class="col-md-9 main-content">
-          <div class="px-3 py-3" v-if="conversationDetailThreads">
+          <div class="px-3 py-3 conversations" v-if="conversationDetailThreads">
             <div v-for="thread in conversationDetailThreads" :key="thread.id" class="d-flex mb-3" :class="{ 'justify-content-end': isCurrentUser(thread.conversationDetailInitiator?.id || 0) }">
-              <div class="card py-2 px-3" :class="isCurrentUser(thread.conversationDetailInitiator?.id || 0) ? 'text-bg-dark': 'bg-light'">
+              <div class="card py-2 px-3" :class="[isCurrentUser(thread.conversationDetailInitiator?.id || 0) ? 'text-bg-dark': 'bg-light', thread.conversationDetailInitiator?.id === undefined ? 'ai-chat' : '']">
+                <template v-if="thread.conversationDetailInitiator?.id === undefined">
+                  <SvgRobot /> 
+                </template>
                 {{ formatMessage(thread.message) }}
               </div>
             </div>
@@ -138,6 +141,14 @@ const conversationPartner = (conversation: Conversation) => {
 </script>
 
 <style scoped>
+.conversations {
+  margin-bottom: 100px;
+}
+
+.ai-chat {
+  color: red;
+}
+
 .chat-controls {
   position: fixed;
   width: 75%;
@@ -149,3 +160,4 @@ const conversationPartner = (conversation: Conversation) => {
 }
 </style>
 
+ai-chat
