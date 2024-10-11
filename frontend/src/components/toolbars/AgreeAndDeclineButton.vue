@@ -62,6 +62,7 @@ export default defineComponent({
       }
       const response =
         await this.managedApi.restAssessmentController.updateScore(
+          this.conversation.assessment_question_instance_id,
           this.conversation.id,
           true
         )
@@ -78,6 +79,7 @@ export default defineComponent({
       }
       const response =
         await this.managedApi.restAssessmentController.updateScore(
+          this.conversation.assessment_question_instance_id,
           this.conversation.id,
           false
         )
