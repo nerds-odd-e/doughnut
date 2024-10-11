@@ -42,12 +42,14 @@ export const assumeMessageCenterPage = () => {
     },
     expectMessageDisplayAtUserSide(message: string) {
       cy.findByText(message)
+        .parent()
         .should('be.visible')
         .and('have.class', 'justify-content-end')
       return this
     },
     expectMessageDisplayAtOtherSide(message: string) {
       cy.findByText(message)
+        .parent()
         .should('be.visible')
         .and('not.have.class', 'justify-content-end')
       return this

@@ -22,9 +22,11 @@
         </div>
 
         <div class="col-md-9 main-content">
-          <div class="px-3 pb-3" v-if="conversationDetailThreads">
-            <div v-for="thread in conversationDetailThreads" :key="thread.id">
-              {{ formatMessage(thread.message) }}
+          <div class="px-3 py-3" v-if="conversationDetailThreads">
+            <div v-for="thread in conversationDetailThreads" :key="thread.id" class="d-flex mb-3" :class="{ 'justify-content-end': isCurrentUser(thread.conversationDetailInitiator?.id || 0) }">
+              <div class="card py-2 px-3" :class="isCurrentUser(thread.conversationDetailInitiator?.id || 0) ? 'text-bg-dark': 'bg-light'">
+                {{ formatMessage(thread.message) }}
+              </div>
             </div>
 
             <div class="chat-controls">
@@ -60,7 +62,7 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import { onMounted, ref } from "vue"
+import { onMounted, ref, toRefs } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import ContainerFluidPage from "@/pages/commons/ContainerFluidPage.vue"
 import type {
@@ -75,6 +77,7 @@ const { managedApi } = useLoadingApi()
 const props = defineProps({
   user: { type: Object as PropType<User> },
 })
+const { user } = toRefs(props)
 
 const conversations = ref<Conversation[] | undefined>(undefined)
 const conversationThreadId = ref(0)
@@ -85,6 +88,10 @@ const message = ref("")
 
 const formatMessage = (message: string) => {
   return message.replace(/^"|"$/g, "").trim()
+}
+
+const isCurrentUser = (id: number): boolean => {
+  return id === user?.value?.id
 }
 
 const fetchData = async () => {
