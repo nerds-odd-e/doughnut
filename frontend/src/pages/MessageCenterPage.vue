@@ -22,30 +22,36 @@
         </div>
 
         <div class="col-md-9 main-content">
-          <div class="p-4">
-            <div v-if="conversationDetailThreads">
-              <div v-for="thread in conversationDetailThreads" :key="thread.id">
-                {{ formatMessage(thread.message) }}
-              </div>
-
-              <form class="chat-input-container" @submit.prevent="handleSendMessage()">
-                <textarea name="Description" v-model="message" />
-                <input
-                  type="submit"
-                  value="Send"
-                  id="chat-button"
-                  class="btn float-btn btn-secondary"
-                />
-                <button
-                type="button"
-                value="Chat"
-                id="ask-ai"
-                class="btn float-btn btn-secondary"
-                @click="askAI">AI</button>
-              </form>
+          <div class="px-3 pb-3" v-if="conversationDetailThreads">
+            <div v-for="thread in conversationDetailThreads" :key="thread.id">
+              {{ formatMessage(thread.message) }}
             </div>
-            <h2 v-else>No conversation</h2>
+
+            <div class="chat-controls">
+              <form class="row chat-input-container" @submit.prevent="handleSendMessage()">
+                <div class="col-md-10">
+                  <textarea class="w-100" name="Description" v-model="message" />
+                </div>
+                <div class="col-md-1">
+                  <input
+                    type="submit"
+                    value="Send"
+                    id="chat-button"
+                    class="btn float-btn btn-secondary"
+                  />
+                </div>
+                <div class="col-md-1">
+                  <button
+                  type="button"
+                  value="Chat"
+                  id="ask-ai"
+                  class="btn float-btn btn-secondary"
+                  @click="askAI">AI</button>
+                </div>
+              </form>
+            </div>            
           </div>
+          <h2 v-else>No conversation</h2>
         </div>
       </div>
     </template>
@@ -124,20 +130,14 @@ const conversationPartner = (conversation: Conversation) => {
 </script>
 
 <style scoped>
-.feedback-table {
-  border-collapse: collapse;
-  width: 100%;
-}
-
-.feedback-table th,
-.feedback-table td {
-  border: 1px solid #dddddd;
-  text-align: left;
-  padding: 8px;
-}
-
-.feedback-table th {
-  background-color: #f2f2f2;
+.chat-controls {
+  position: fixed;
+  width: 75%;
+  bottom: 0;
+  right: 0;
+  background-color: white;
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+  padding: 10px;
 }
 </style>
 

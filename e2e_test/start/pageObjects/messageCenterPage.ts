@@ -1,6 +1,8 @@
 import { systemSidebar } from './systemSidebar'
 
 export const assumeMessageCenterPage = () => {
+  cy.findByText('Message Center').should('be.visible')
+
   return {
     expectMessage(message: string, partner: string) {
       cy.findByText(message).should('be.visible')
