@@ -52,22 +52,19 @@ export class RestAssessmentControllerService {
         });
     }
     /**
-     * @param assessmentId
      * @param conversationId
      * @param isApproved
      * @returns any OK
      * @throws ApiError
      */
     public updateScore(
-        assessmentId: number,
         conversationId: number,
         isApproved: boolean,
     ): CancelablePromise<any> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/assessment/score/{assessmentId}/{isApproved}/{conversationId}',
+            url: '/api/assessment/score/{conversationId}/{isApproved}',
             path: {
-                'assessmentId': assessmentId,
                 'conversationId': conversationId,
                 'isApproved': isApproved,
             },

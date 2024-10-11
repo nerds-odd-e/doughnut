@@ -74,16 +74,16 @@ class RestAssessmentController {
     return assessmentService.getMyAssessments(currentUser.getEntity());
   }
 
-  @PostMapping("/score/{assessmentId}/{isApproved}/{conversationId}")
+  @PostMapping("/score/{conversationId}/{isApproved}")
   @Transactional
   public void updateScore(
-      @PathVariable("assessmentId") @Schema(type = "integer") AssessmentAttempt assessmentAttempt,
       @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation,
       @PathVariable("isApproved") boolean isApproved) {
     currentUser.assertLoggedIn();
 
     if (isApproved) {
-      assessmentService.updateScore(assessmentAttempt);
+      assessmentService.updateScore(
+          conversation.getAssessmentQuestionInstance().getAssessmentAttempt());
     }
     assessmentService.updateMarker(conversation.getId());
   }

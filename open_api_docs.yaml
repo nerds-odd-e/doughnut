@@ -1695,17 +1695,12 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/AssessmentAttempt"
-  /api/assessment/score/{assessmentId}/{isApproved}/{conversationId}:
+  /api/assessment/score/{conversationId}/{isApproved}:
     post:
       tags:
       - rest-assessment-controller
       operationId: updateScore
       parameters:
-      - name: assessmentId
-        in: path
-        required: true
-        schema:
-          type: integer
       - name: conversationId
         in: path
         required: true

@@ -270,7 +270,7 @@ public class RestAssessmentControllerTests {
                   assessment.getAssessmentQuestionInstances().getFirst())
               .please();
       // Action
-      controller.updateScore(assessment, conversation, true);
+      controller.updateScore(conversation, true);
       // Assert
       assertEquals(4, assessment.getAnswersCorrect());
       assertTrue(conversation.getMarker());
