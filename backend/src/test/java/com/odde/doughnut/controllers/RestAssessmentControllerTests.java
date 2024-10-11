@@ -275,5 +275,54 @@ public class RestAssessmentControllerTests {
       assertEquals(4, assessment.getAnswersCorrect());
       assertTrue(conversation.getMarker());
     }
+
+    @Test
+    void shouldReturnUpdateScoreWhenOwnerDecline() {
+      // Arrange
+      AssessmentAttempt assessment =
+          makeMe
+              .anAssessmentAttempt(currentUser.getEntity())
+              .withOneQuestion()
+              .score(5, 3)
+              .please();
+
+      Conversation conversation =
+          makeMe
+              .aConversation()
+              .forAnAssessmentQuestionInstance(
+                  assessment.getAssessmentQuestionInstances().getFirst())
+              .please();
+      // Action
+      controller.updateScore(conversation, false);
+
+      // Assert
+      assertEquals(3, assessment.getAnswersCorrect());
+      assertTrue(conversation.getMarker());
+    }
+
+    @Test
+    void shouldReturnUpdateScoreWhenOwnerApprovedTwice() {
+      // Arrange
+      AssessmentAttempt assessment =
+          makeMe
+              .anAssessmentAttempt(currentUser.getEntity())
+              .withOneQuestion()
+              .score(5, 3)
+              .please();
+
+      Conversation conversation =
+          makeMe
+              .aConversation()
+              .forAnAssessmentQuestionInstance(
+                  assessment.getAssessmentQuestionInstances().getFirst())
+              .marker(true)
+              .please();
+      // Action
+      controller.updateScore(conversation, true);
+
+      // Assert
+      assertEquals(3, assessment.getAnswersCorrect());
+      assertTrue(conversation.getMarker());
+    }
   }
 }
