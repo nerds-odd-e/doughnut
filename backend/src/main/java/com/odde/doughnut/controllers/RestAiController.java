@@ -81,7 +81,7 @@ public class RestAiController {
     String aiOpinion = aiAdvisorWithStorageService.getCompletionAiOpinion(conversationDetails);
     if (StringUtils.isNotBlank(aiOpinion)) {
       return conversationDetailService.addConversationDetail(
-          conversationDetails.getFirst().getConversation(), 2, aiOpinion);
+          conversationDetails.getFirst().getConversation(), null, aiOpinion);
     } else {
       return new ConversationDetail();
     }

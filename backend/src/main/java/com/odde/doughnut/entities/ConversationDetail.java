@@ -3,8 +3,6 @@ package com.odde.doughnut.entities;
 import jakarta.persistence.*;
 import java.sql.Timestamp;
 import java.util.Date;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import lombok.*;
 
@@ -21,14 +19,14 @@ public class ConversationDetail extends EntityIdentifiedByIdOnly {
   @JoinColumn(name = "conversation_id", referencedColumnName = "id")
   Conversation conversation;
 
-  @Column(name = "user_type")
-  @Min(0)
-  @Max(2)
-  int userType;
-
   @NotNull
   @Column(name = "message", columnDefinition = "TEXT")
   String message;
+
+  @ManyToOne
+  @Setter
+  @JoinColumn(name = "conversation_detail_initiator_id", referencedColumnName = "id")
+  User conversationDetailInitiator;
 
   @Column(name = "created_at")
   @NotNull

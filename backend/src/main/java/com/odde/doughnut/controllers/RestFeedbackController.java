@@ -31,8 +31,12 @@ public class RestFeedbackController {
       @RequestBody String feedback,
       @PathVariable("assessmentQuestion") @Schema(type = "integer")
           AssessmentQuestionInstance assessmentQuestionInstance) {
-    return conversationService.startConversation(
-        assessmentQuestionInstance, currentUser.getEntity(), feedback);
+    Conversation conversation =
+        conversationService.startConversation(
+            assessmentQuestionInstance, currentUser.getEntity(), feedback);
+    conversationDetailService.addConversationDetail(
+        conversation, currentUser.getEntity(), feedback);
+    return conversation;
   }
 
   @GetMapping("/all")

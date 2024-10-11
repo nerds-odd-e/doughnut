@@ -3579,11 +3579,10 @@ components:
           format: int32
         conversation:
           $ref: "#/components/schemas/Conversation"
-        userType:
-          type: integer
-          format: int32
         message:
           type: string
+        conversationDetailInitiator:
+          $ref: "#/components/schemas/User"
         createdAt:
           type: string
           format: date-time

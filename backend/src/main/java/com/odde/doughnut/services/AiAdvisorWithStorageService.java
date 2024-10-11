@@ -14,6 +14,7 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 
@@ -142,7 +143,12 @@ public record AiAdvisorWithStorageService(
   private String buildAiPrompt(List<ConversationDetail> conversationDetails) {
     StringBuilder prompt = new StringBuilder();
     for (ConversationDetail detail : conversationDetails) {
-      prompt.append(detail.getUserType()).append(": ").append(detail.getMessage()).append("\n");
+      User conversationDetailOwner = detail.getConversationDetailInitiator();
+      String userChatId =
+          Objects.isNull(conversationDetailOwner)
+              ? "AI"
+              : conversationDetailOwner.getId().toString();
+      prompt.append(userChatId).append(": ").append(detail.getMessage()).append("\n");
     }
     return prompt.toString();
   }

@@ -3,11 +3,12 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { Conversation } from './Conversation';
+import type { User } from './User';
 export type ConversationDetail = {
     id: number;
     conversation?: Conversation;
-    userType?: number;
     message: string;
+    conversationDetailInitiator?: User;
     createdAt: string;
 };
 
