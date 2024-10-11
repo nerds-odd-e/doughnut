@@ -30,7 +30,7 @@ Feature: Learner gives feedback on an assessment question
         And I can type the message "No, it is correct" and send this message to conversation room
         Then I should see the new message "No, it is correct" on the current user's side of the conversation
         And I should see the new message "I believe the question is incorrect" on the other user's side of the conversation
-    @ignore
+
     Scenario: Trainer Agrees to Feedback
         Given I begin the assessment from the "Just say 'Yes'" notebook in the bazaar
         When I answer the question wrongly and submit feedback saying 'I believe the question is incorrect'
@@ -38,12 +38,8 @@ Feature: Learner gives feedback on an assessment question
         Then "a_trainer" can see the conversation with "Old Learner" for the question "Is 0 * 0 = 0?" in the message center
         Then when "a_trainer" can click the "AgreeButton" button with "Old Learner" in the message center
         Then I should see message that says "Feedback is Accepted"
-        And I should see message that says "Accepted"
-    @ignore
-    Scenario: Trainer Views Feedback
-        Given I begin the assessment from the "Just say 'Yes'" notebook in the bazaar
+        And I should see message that says "Resolved"
 
-    @ignore
     Scenario: Trainer Declines Feedback
         Given I begin the assessment from the "Just say 'Yes'" notebook in the bazaar
         When I answer the question wrongly and submit feedback saying 'I believe the question is incorrect'
@@ -51,18 +47,4 @@ Feature: Learner gives feedback on an assessment question
         Then "a_trainer" can see the conversation with "Old Learner" for the question "Is 0 * 0 = 0?" in the message center
         Then when "a_trainer" can click the "DeclineButton" button with "Old Learner" in the message center
         Then I should see message that says "Feedback is Rejected"
-        And I should see message that says "Rejected"
-
-    @ignore
-    Scenario: Trainer Views Accepted Feedback
-        Given I begin the assessment from the "Just say 'Yes'" notebook in the bazaar
-        When "Old Learner" has previously submitted feedback that was accepted
-        Then "a_trainer" can see the message "Accepted" in the message center
-        Then "a_trainer" should not see the "AgreeButton" or "DeclineButton"
-
-    @ignore
-    Scenario: Trainer Views Rejected Feedback
-        Given I begin the assessment from the "Just say 'Yes'" notebook in the bazaar
-        When "Old Learner" has previously submitted feedback that was rejected
-        Then "a_trainer" can see the message "Rejected" in the message center
-        Then "a_trainer" should not see the "AgreeButton" or "DeclineButton"
+        And I should see message that says "Resolved"

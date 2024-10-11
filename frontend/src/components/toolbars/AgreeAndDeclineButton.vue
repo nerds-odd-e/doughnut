@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="!isDisabled && conversation.maker === undefined">
+    <div v-if="!isDisabled && conversation.maker !== true">
       <SvgAgree
         role="button"
         aria-label="Agree"
@@ -22,12 +22,6 @@
     </div>
     <div v-else>
       <span>{{ message }}</span>
-    </div>
-    <div v-if="conversation.maker === true && isDisabled">
-      <span>Accepted</span>
-    </div>
-    <div v-if="conversation.maker === false && isDisabled">
-      <span>Rejected</span>
     </div>
   </div>
 </template>
@@ -60,35 +54,28 @@ export default defineComponent({
       if (this.conversation.id === undefined) {
         return
       }
-      const response =
-        await this.managedApi.restAssessmentController.updateScore(
-          this.conversation.assessment_question_instance_id,
-          this.conversation.id,
-          true
-        )
+      await this.managedApi.restAssessmentController.updateScore(
+        this.conversation.id,
+        true
+      )
 
-      if (response !== undefined) {
-        popups.alert("Feedback is Accepted")
-        this.isDisabled = true
-        this.message = "Accepted"
-      }
+      popups.alert("Feedback is Accepted")
+      this.isDisabled = true
+      this.message = "Resolved"
     },
     async decline() {
       if (this.conversation.id === undefined) {
         return
       }
-      const response =
-        await this.managedApi.restAssessmentController.updateScore(
-          this.conversation.assessment_question_instance_id,
-          this.conversation.id,
-          false
-        )
 
-      if (response !== undefined) {
-        popups.alert("Feedback is Rejected")
-        this.isDisabled = true
-        this.message = "Rejected"
-      }
+      await this.managedApi.restAssessmentController.updateScore(
+        this.conversation.id,
+        false
+      )
+
+      popups.alert("Feedback is Rejected")
+      this.isDisabled = true
+      this.message = "Resolved"
     },
   },
   components: { SvgAgree, SvgDecline },
