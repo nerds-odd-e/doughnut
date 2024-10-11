@@ -254,32 +254,25 @@ public class RestAssessmentControllerTests {
     }
 
     @Test
-    void shouldReturnUpdateScore() {
-
-      Note topNote = makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser).please();
-      notebook = topNote.getNotebook();
-      notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(1);
-
-      makeMe
-          .theNote(topNote)
-          .withNChildrenThat(1, noteBuilder -> noteBuilder.hasApprovedQuestions(10))
-          .please();
+    void shouldReturnUpdateScoreWhenOwnerApprove() {
+      // Arrange
       AssessmentAttempt assessment =
-          assessmentService.generateAssessment(notebook, currentUser.getEntity());
-      assessment.setAnswersCorrect(3);
-      assessment.setTotalQuestionCount(5);
+          makeMe
+              .anAssessmentAttempt(currentUser.getEntity())
+              .withOneQuestion()
+              .score(5, 3)
+              .please();
 
       Conversation conversation =
           makeMe
               .aConversation()
-              .messagge("Test")
               .forAnAssessmentQuestionInstance(
                   assessment.getAssessmentQuestionInstances().getFirst())
-              .from(currentUser)
               .please();
-
-      assertEquals(4, controller.updateScore(assessment, conversation, true));
-
+      // Action
+      controller.updateScore(assessment, conversation, true);
+      // Assert
+      assertEquals(4, assessment.getAnswersCorrect());
       assertTrue(conversation.getMarker());
     }
   }

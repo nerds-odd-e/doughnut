@@ -1725,11 +1725,6 @@ paths:
                 type: string
         "200":
           description: OK
-          content:
-            '*/*':
-              schema:
-                type: integer
-                format: int32
   /api/assessment/questions/{notebook}:
     post:
       tags:
