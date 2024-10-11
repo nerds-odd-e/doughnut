@@ -78,10 +78,10 @@ class RestAssessmentController {
   @Transactional
   public void updateScore(
       @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation,
-      @PathVariable("isApproved") boolean isApproved) {
+      @PathVariable("isApproved") Boolean isApproved) {
     currentUser.assertLoggedIn();
 
-    if (isApproved) {
+    if (isApproved && !conversation.getMarker()) {
       assessmentService.updateScore(
           conversation.getAssessmentQuestionInstance().getAssessmentAttempt());
     }
