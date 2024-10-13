@@ -12,10 +12,6 @@
         <div class="col-md-3 bg-light sidebar">
           <ul class="list-group">
             <li v-for="conversation in conversations" :key="conversation.id" class="list-group-item list-group-item-action" @click="fetchThreadsForConversation(conversation.id || 0)">
-              <div align="right">
-                <AgreeAndDeclineButton :conversation="conversation" v-if="!conversation.marker" ></AgreeAndDeclineButton>
-                <div v-if="conversation.marker">Resolved</div>
-              </div>
               <div>{{ conversation.assessmentQuestionInstance?.bareQuestion.multipleChoicesQuestion.stem }}</div>
               <div>{{ conversationPartner(conversation) }}</div>
             </li>
@@ -74,7 +70,6 @@ import type {
   User,
   ConversationDetail,
 } from "@/generated/backend"
-import AgreeAndDeclineButton from "@/components/toolbars/AgreeAndDeclineButton.vue"
 
 const { managedApi } = useLoadingApi()
 
