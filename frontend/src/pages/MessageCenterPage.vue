@@ -19,8 +19,8 @@
         </div>
 
         <div class="col-md-9 main-content">
-          <div class="px-3 py-3 conversations" v-if="conversationDetailThreads">
-            <div v-for="thread in conversationDetailThreads" :key="thread.id" class="d-flex mb-3" :class="{ 'justify-content-end': isCurrentUser(thread.conversationDetailInitiator?.id || 0) }">
+          <div class="px-3 py-3 conversations" v-if="currentConversationDetails">
+            <div v-for="thread in currentConversationDetails" :key="thread.id" class="d-flex mb-3" :class="{ 'justify-content-end': isCurrentUser(thread.conversationDetailInitiator?.id || 0) }">
               <div class="card py-2 px-3" :class="[isCurrentUser(thread.conversationDetailInitiator?.id || 0) ? 'text-bg-dark': 'bg-light', thread.conversationDetailInitiator?.id === undefined ? 'ai-chat' : '']">
                 <template v-if="thread.conversationDetailInitiator?.id === undefined">
                   <SvgRobot />
@@ -42,14 +42,6 @@
                     class="btn float-btn btn-secondary"
                   />
                 </div>
-                <div class="col-md-1">
-                  <button
-                  type="button"
-                  value="Chat"
-                  id="ask-ai"
-                  class="btn float-btn btn-secondary"
-                  @click="askAI">AI</button>
-                </div>
               </form>
             </div>
           </div>
@@ -62,7 +54,7 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import { onMounted, ref, toRefs } from "vue"
+import { onMounted, ref } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import ContainerFluidPage from "@/pages/commons/ContainerFluidPage.vue"
 import type {
@@ -73,14 +65,13 @@ import type {
 
 const { managedApi } = useLoadingApi()
 
-const props = defineProps({
+const { user } = defineProps({
   user: { type: Object as PropType<User> },
 })
-const { user } = toRefs(props)
 
 const conversations = ref<Conversation[] | undefined>(undefined)
-const conversationThreadId = ref(0)
-const conversationDetailThreads = ref<ConversationDetail[] | undefined>(
+const currentConversationId = ref(0)
+const currentConversationDetails = ref<ConversationDetail[] | undefined>(
   undefined
 )
 const message = ref("")
@@ -90,7 +81,7 @@ const formatMessage = (message: string) => {
 }
 
 const isCurrentUser = (id: number): boolean => {
-  return id === user?.value?.id
+  return id === user?.id
 }
 
 const fetchData = async () => {
@@ -100,27 +91,19 @@ const fetchData = async () => {
 
 const handleSendMessage = async () => {
   await managedApi.restFeedbackController.sendMessage(
-    conversationThreadId.value,
+    currentConversationId.value,
     message.value
   )
   message.value = ""
-  await fetchThreadsForConversation(conversationThreadId.value)
+  await fetchThreadsForConversation(currentConversationId.value)
 }
 
 const fetchThreadsForConversation = async (conversationId: number) => {
-  conversationDetailThreads.value =
+  currentConversationDetails.value =
     await managedApi.restFeedbackController.getMessageThreadsForConversation(
       conversationId
     )
-  conversationThreadId.value = conversationId
-}
-
-const askAI = async () => {
-  await managedApi.restAiController
-    .getCompletionAiOpinion(conversationThreadId.value)
-    .then(() => {
-      fetchThreadsForConversation(conversationThreadId.value)
-    })
+  currentConversationId.value = conversationId
 }
 
 onMounted(() => {
@@ -128,7 +111,7 @@ onMounted(() => {
 })
 
 const conversationPartner = (conversation: Conversation) => {
-  if (conversation.conversationInitiator?.name !== props.user?.name) {
+  if (conversation.conversationInitiator?.name !== user?.name) {
     return conversation.conversationInitiator?.name
   }
   return conversation.subjectOwnership?.ownerName
