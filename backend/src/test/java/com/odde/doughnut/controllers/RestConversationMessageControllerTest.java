@@ -1,8 +1,10 @@
 package com.odde.doughnut.controllers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ConversationService;
@@ -104,7 +106,15 @@ class RestConversationMessageControllerTest {
   }
 
   @Test
-  void testSendMessageReturnsOk() {
+  void shouldNotBeAbleToReplyToAConversationIAmNotIn() {
+    Conversation conversation = makeMe.aConversation().please();
+    assertThrows(
+        UnexpectedNoAccessRightException.class,
+        () -> controller.replyToConversation("hi", conversation));
+  }
+
+  @Test
+  void testSendMessageReturnsOk() throws UnexpectedNoAccessRightException {
     String message = "This is a message";
     makeMe
         .theNotebook(assessmentQuestionInstance.getAssessmentAttempt().getNotebook())

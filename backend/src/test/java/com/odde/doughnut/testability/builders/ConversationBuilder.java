@@ -14,7 +14,15 @@ public class ConversationBuilder extends EntityBuilder<Conversation> {
   @Override
   protected void beforeCreate(boolean needPersist) {
     if (entity.getAssessmentQuestionInstance() == null) {
-      throw new RuntimeException("AssessmentQuestionInstance is required");
+      User assessmentOwner = makeMe.aUser().please(needPersist);
+      AssessmentQuestionInstance instance =
+          makeMe
+              .anAssessmentAttempt(assessmentOwner)
+              .withOneQuestion()
+              .please(needPersist)
+              .getAssessmentQuestionInstances()
+              .getFirst();
+      forAnAssessmentQuestionInstance(instance);
     }
     if (Strings.isBlank(this.entity.getMessage())) {
       entity.setMessage("This is a feedback");
