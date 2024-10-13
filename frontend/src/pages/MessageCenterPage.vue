@@ -27,7 +27,7 @@
             <div v-for="thread in conversationDetailThreads" :key="thread.id" class="d-flex mb-3" :class="{ 'justify-content-end': isCurrentUser(thread.conversationDetailInitiator?.id || 0) }">
               <div class="card py-2 px-3" :class="[isCurrentUser(thread.conversationDetailInitiator?.id || 0) ? 'text-bg-dark': 'bg-light', thread.conversationDetailInitiator?.id === undefined ? 'ai-chat' : '']">
                 <template v-if="thread.conversationDetailInitiator?.id === undefined">
-                  <SvgRobot /> 
+                  <SvgRobot />
                 </template>
                 {{ formatMessage(thread.message) }}
               </div>
@@ -55,7 +55,7 @@
                   @click="askAI">AI</button>
                 </div>
               </form>
-            </div>            
+            </div>
           </div>
           <h2 v-else>No conversation</h2>
         </div>

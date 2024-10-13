@@ -16,6 +16,7 @@ import WikidataEntityBuilder from "./WikidataEntityBuilder"
 import WikidataSearchEntityBuilder from "./WikidataSearchEntityBuilder"
 import AssessmentAttemptBuilder from "./AssessmentAttemptBuilder"
 import AssessmentQuestionInstanceBuilder from "./AssessmentQuestionInstanceBuilder"
+import ConversationBuilder from "./ConversationBuilder"
 
 class MakeMe {
   static get aUser() {
@@ -84,6 +85,10 @@ class MakeMe {
 
   static get aSuggestedQuestionForFineTuning(): SuggestedQuestionForFineTuningBuilder {
     return new SuggestedQuestionForFineTuningBuilder()
+  }
+
+  static get aConversation(): ConversationBuilder {
+    return new ConversationBuilder()
   }
 
   static get anApiError(): ApiErrorBuilder {
