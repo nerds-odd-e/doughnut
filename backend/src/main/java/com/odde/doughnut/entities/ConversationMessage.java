@@ -13,7 +13,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ConversationDetail extends EntityIdentifiedByIdOnly {
+public class ConversationMessage extends EntityIdentifiedByIdOnly {
 
   @ManyToOne
   @JoinColumn(name = "conversation_id", referencedColumnName = "id")

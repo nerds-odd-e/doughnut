@@ -1,14 +1,14 @@
 package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.Conversation;
-import com.odde.doughnut.entities.ConversationDetail;
+import com.odde.doughnut.entities.ConversationMessage;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 import org.apache.logging.log4j.util.Strings;
 
-public class ConversationDetailBuilder extends EntityBuilder<ConversationDetail> {
+public class ConversationDetailBuilder extends EntityBuilder<ConversationMessage> {
   public ConversationDetailBuilder(MakeMe makeMe) {
-    super(makeMe, new ConversationDetail());
+    super(makeMe, new ConversationMessage());
   }
 
   @Override

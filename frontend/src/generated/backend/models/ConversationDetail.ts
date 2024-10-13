@@ -4,7 +4,7 @@
 /* eslint-disable */
 import type { Conversation } from './Conversation';
 import type { User } from './User';
-export type ConversationDetail = {
+export type ConversationMessage = {
     id: number;
     conversation?: Conversation;
     message: string;

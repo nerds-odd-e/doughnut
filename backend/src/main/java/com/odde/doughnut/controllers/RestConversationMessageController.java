@@ -2,7 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.AssessmentQuestionInstance;
 import com.odde.doughnut.entities.Conversation;
-import com.odde.doughnut.entities.ConversationDetail;
+import com.odde.doughnut.entities.ConversationMessage;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ConversationService;
@@ -41,7 +41,7 @@ public class RestConversationMessageController {
   }
 
   @PostMapping("/detail/send/{conversationId}")
-  public ConversationDetail replyToConversation(
+  public ConversationMessage replyToConversation(
       @RequestBody String message,
       @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation)
       throws UnexpectedNoAccessRightException {
@@ -51,7 +51,7 @@ public class RestConversationMessageController {
   }
 
   @GetMapping("/detail/all/{conversationId}")
-  public List<ConversationDetail> getConversationDetails(
+  public List<ConversationMessage> getConversationDetails(
       @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(conversation);

@@ -2,7 +2,7 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.entities.AssessmentQuestionInstance;
 import com.odde.doughnut.entities.Conversation;
-import com.odde.doughnut.entities.ConversationDetail;
+import com.odde.doughnut.entities.ConversationMessage;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.util.List;
@@ -30,16 +30,16 @@ public class ConversationService {
         .findByUserInSubjectOwnershipOrConversationInitiator(user);
   }
 
-  public ConversationDetail addConversationDetail(
+  public ConversationMessage addConversationDetail(
       Conversation conversation, User user, String message) {
-    ConversationDetail conversationDetail = new ConversationDetail();
-    conversationDetail.setConversation(conversation);
-    conversationDetail.setConversationDetailInitiator(user);
-    conversationDetail.setMessage(message);
-    return modelFactoryService.conversationDetailRepository.save(conversationDetail);
+    ConversationMessage conversationMessage = new ConversationMessage();
+    conversationMessage.setConversation(conversation);
+    conversationMessage.setConversationDetailInitiator(user);
+    conversationMessage.setMessage(message);
+    return modelFactoryService.conversationDetailRepository.save(conversationMessage);
   }
 
-  public List<ConversationDetail> getConversionDetailRelatedByConversationId(int conversationId) {
+  public List<ConversationMessage> getConversionDetailRelatedByConversationId(int conversationId) {
     return modelFactoryService.conversationDetailRepository.findByConversationInitiator(
         conversationId);
   }

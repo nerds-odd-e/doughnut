@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class ConversationDetailServiceTest {
+class ConversationMessageServiceTest {
   @Autowired ModelFactoryService modelFactoryService;
   @Autowired MakeMe makeMe;
   private ConversationService conversationService;
@@ -72,9 +72,9 @@ class ConversationDetailServiceTest {
     void shouldAddConversationDetail() {
       Conversation conversation = getConversation();
       String message = "This feedback is wrong";
-      ConversationDetail conversationDetail =
+      ConversationMessage conversationMessage =
           conversationService.addConversationDetail(conversation, currentUser.getEntity(), message);
-      assertEquals(message, conversationDetail.getMessage());
+      assertEquals(message, conversationMessage.getMessage());
     }
 
     @Test
@@ -82,10 +82,10 @@ class ConversationDetailServiceTest {
       Conversation conversation = getConversation();
       String message = "This feedback is wrong";
       conversationService.addConversationDetail(conversation, currentUser.getEntity(), message);
-      List<ConversationDetail> conversationDetails =
+      List<ConversationMessage> conversationMessages =
           conversationService.getConversionDetailRelatedByConversationId(conversation.getId());
-      assertEquals(1, conversationDetails.size());
-      assertEquals(message, conversationDetails.getFirst().getMessage());
+      assertEquals(1, conversationMessages.size());
+      assertEquals(message, conversationMessages.getFirst().getMessage());
     }
 
     private Conversation getConversation() {

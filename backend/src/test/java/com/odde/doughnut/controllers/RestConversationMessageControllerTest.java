@@ -122,19 +122,19 @@ class RestConversationMessageControllerTest {
         .please();
     Conversation conversation =
         makeMe.aConversation().forAnAssessmentQuestionInstance(assessmentQuestionInstance).please();
-    ConversationDetail conversationDetail = controller.replyToConversation(message, conversation);
-    List<ConversationDetail> conversationDetails =
-        (List<ConversationDetail>) modelFactoryService.conversationDetailRepository.findAll();
-    assertEquals(1, conversationDetails.size());
-    assertEquals(message, conversationDetail.getMessage());
+    ConversationMessage conversationMessage = controller.replyToConversation(message, conversation);
+    List<ConversationMessage> conversationMessages =
+        (List<ConversationMessage>) modelFactoryService.conversationDetailRepository.findAll();
+    assertEquals(1, conversationMessages.size());
+    assertEquals(message, conversationMessage.getMessage());
   }
 
   @Test
   void initiatorShouldBeAbleToReply() throws UnexpectedNoAccessRightException {
     String message = "This is a message";
     Conversation conversation = makeMe.aConversation().from(currentUser).please();
-    ConversationDetail conversationDetail = controller.replyToConversation(message, conversation);
-    assertEquals(message, conversationDetail.getMessage());
+    ConversationMessage conversationMessage = controller.replyToConversation(message, conversation);
+    assertEquals(message, conversationMessage.getMessage());
   }
 
   @Test
@@ -150,7 +150,7 @@ class RestConversationMessageControllerTest {
     Conversation conversation = makeMe.aConversation().from(currentUser).please();
 
     makeMe.aConversationDetail().forConversationInstance(conversation).please();
-    List<ConversationDetail> conversations = controller.getConversationDetails(conversation);
+    List<ConversationMessage> conversations = controller.getConversationDetails(conversation);
     assertEquals(1, conversations.size());
   }
 }

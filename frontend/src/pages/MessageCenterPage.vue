@@ -60,7 +60,7 @@ import ContainerFluidPage from "@/pages/commons/ContainerFluidPage.vue"
 import type {
   Conversation,
   User,
-  ConversationDetail,
+  ConversationMessage,
 } from "@/generated/backend"
 
 const { managedApi } = useLoadingApi()
@@ -71,7 +71,7 @@ const { user } = defineProps({
 
 const conversations = ref<Conversation[] | undefined>(undefined)
 const currentConversationId = ref(0)
-const currentConversationDetails = ref<ConversationDetail[] | undefined>(
+const currentConversationDetails = ref<ConversationMessage[] | undefined>(
   undefined
 )
 const message = ref("")

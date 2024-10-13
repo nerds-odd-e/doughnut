@@ -34,7 +34,7 @@ export type { CircleJoiningByInvitation } from './models/CircleJoiningByInvitati
 export type { ClarifyingQuestion } from './models/ClarifyingQuestion';
 export type { CodeInterpreterTool } from './models/CodeInterpreterTool';
 export type { Conversation } from './models/Conversation';
-export type { ConversationDetail } from './models/ConversationDetail';
+export type { ConversationMessage } from './models/ConversationMessage';
 export type { CurrentUserInfo } from './models/CurrentUserInfo';
 export type { Delta } from './models/Delta';
 export type { DeltaContent } from './models/DeltaContent';

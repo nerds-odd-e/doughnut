@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { Conversation } from '../models/Conversation';
-import type { ConversationDetail } from '../models/ConversationDetail';
+import type { ConversationMessage } from '../models/ConversationMessage';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestConversationMessageControllerService {
@@ -34,13 +34,13 @@ export class RestConversationMessageControllerService {
     /**
      * @param conversationId
      * @param requestBody
-     * @returns ConversationDetail OK
+     * @returns ConversationMessage OK
      * @throws ApiError
      */
     public replyToConversation(
         conversationId: number,
         requestBody: string,
-    ): CancelablePromise<ConversationDetail> {
+    ): CancelablePromise<ConversationMessage> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/message/detail/send/{conversationId}',
@@ -56,12 +56,12 @@ export class RestConversationMessageControllerService {
     }
     /**
      * @param conversationId
-     * @returns ConversationDetail OK
+     * @returns ConversationMessage OK
      * @throws ApiError
      */
     public getConversationDetails(
         conversationId: number,
-    ): CancelablePromise<Array<ConversationDetail>> {
+    ): CancelablePromise<Array<ConversationMessage>> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/message/detail/all/{conversationId}',
