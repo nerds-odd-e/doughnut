@@ -28,8 +28,7 @@ public class RestConversationMessageController {
       @PathVariable("assessmentQuestion") @Schema(type = "integer")
           AssessmentQuestionInstance assessmentQuestionInstance) {
     Conversation conversation =
-        conversationService.startConversation(
-            assessmentQuestionInstance, currentUser.getEntity());
+        conversationService.startConversation(assessmentQuestionInstance, currentUser.getEntity());
     conversationService.addMessageToConversation(conversation, currentUser.getEntity(), feedback);
     return conversation;
   }

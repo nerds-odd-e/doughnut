@@ -4,7 +4,6 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
-import org.apache.logging.log4j.util.Strings;
 
 public class ConversationBuilder extends EntityBuilder<Conversation> {
   public ConversationBuilder(MakeMe makeMe) {

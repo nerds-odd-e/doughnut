@@ -9,7 +9,7 @@ import lombok.*;
 @Setter
 @Getter
 @Entity
-@Table(name = "conversation_detail")
+@Table(name = "conversation_message")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -25,7 +25,7 @@ public class ConversationMessage extends EntityIdentifiedByIdOnly {
 
   @ManyToOne
   @Setter
-  @JoinColumn(name = "conversation_detail_initiator_id", referencedColumnName = "id")
+  @JoinColumn(name = "sender", referencedColumnName = "id")
   User sender;
 
   @Column(name = "created_at")

@@ -10,7 +10,6 @@ export type Conversation = {
     assessmentQuestionInstance?: AssessmentQuestionInstance;
     subjectOwnership?: Ownership;
     conversationInitiator?: User;
-    message?: string;
     createdAt: string;
     updatedAt: string;
 };

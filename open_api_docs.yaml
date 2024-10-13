@@ -3480,8 +3480,6 @@ components:
           $ref: "#/components/schemas/Ownership"
         conversationInitiator:
           $ref: "#/components/schemas/User"
-        message:
-          type: string
         createdAt:
           type: string
           format: date-time

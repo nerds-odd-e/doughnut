@@ -25,8 +25,6 @@ public class Conversation extends EntityIdentifiedByIdOnly {
   @JoinColumn(name = "conversation_initiator_id", referencedColumnName = "id")
   User conversationInitiator;
 
-  @Setter String message = "empty";
-
   @Column(name = "created_at")
   @NotNull
   private Timestamp createdAt = new Timestamp(new Date().getTime());
