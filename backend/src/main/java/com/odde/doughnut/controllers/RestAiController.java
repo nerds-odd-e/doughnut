@@ -1,7 +1,6 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.*;
-import com.odde.doughnut.entities.ConversationDetail;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.NotebookAssistant;
@@ -22,7 +21,6 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,24 +65,6 @@ public class RestAiController {
     return aiAdvisorWithStorageService
         .getContentCompletionService()
         .createThreadAndRunWithFirstMessage(note, aiCompletionParams.getCompletionPrompt());
-  }
-
-  @GetMapping(
-      value = "/completion-ai-opinion/{conversationId}",
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  @Transactional
-  public ConversationDetail getCompletionAiOpinion(
-      @PathVariable(value = "conversationId") Integer conversationId) {
-    currentUser.assertLoggedIn();
-    List<ConversationDetail> conversationDetails =
-        conversationDetailService.getConversionDetailRelatedByConversationId(conversationId);
-    String aiOpinion = aiAdvisorWithStorageService.getCompletionAiOpinion(conversationDetails);
-    if (StringUtils.isNotBlank(aiOpinion)) {
-      return conversationDetailService.addConversationDetail(
-          conversationDetails.getFirst().getConversation(), null, aiOpinion);
-    } else {
-      return new ConversationDetail();
-    }
   }
 
   @PostMapping("/answer-clarifying-question")

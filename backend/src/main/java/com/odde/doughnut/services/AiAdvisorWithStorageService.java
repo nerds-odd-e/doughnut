@@ -14,9 +14,6 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.CollectionUtils;
 
 public record AiAdvisorWithStorageService(
     AiAdvisorService aiAdvisorService, ModelFactoryService modelFactoryService) {
@@ -113,43 +110,5 @@ public record AiAdvisorWithStorageService(
     notebookAssistant.setAssistantId(chatAssistant.getId());
     this.modelFactoryService.save(notebookAssistant);
     return notebookAssistant;
-  }
-
-  public String getCompletionAiOpinion(List<ConversationDetail> conversationDetails) {
-    if (CollectionUtils.isEmpty(conversationDetails)) {
-      return StringUtils.EMPTY;
-    }
-    String prompt = buildAiPrompt(conversationDetails);
-    List<Message> response = fetchAiResponse(prompt);
-    return getAiOpinionMessage(response);
-  }
-
-  private List<Message> fetchAiResponse(String prompt) {
-    return getContentCompletionService().createThreadAndRunWithFirstMessage(prompt).getMessages();
-  }
-
-  private String getAiOpinionMessage(List<Message> response) {
-    if (!CollectionUtils.isEmpty(response)
-        && !CollectionUtils.isEmpty(response.getFirst().getContent())
-        && response.getFirst().getContent().getFirst().getText() != null
-        && StringUtils.isNotBlank(
-            response.getFirst().getContent().getFirst().getText().getValue())) {
-      return response.getFirst().getContent().getFirst().getText().getValue();
-    } else {
-      return StringUtils.EMPTY;
-    }
-  }
-
-  private String buildAiPrompt(List<ConversationDetail> conversationDetails) {
-    StringBuilder prompt = new StringBuilder();
-    for (ConversationDetail detail : conversationDetails) {
-      User conversationDetailOwner = detail.getConversationDetailInitiator();
-      String userChatId =
-          Objects.isNull(conversationDetailOwner)
-              ? "AI"
-              : conversationDetailOwner.getId().toString();
-      prompt.append(userChatId).append(": ").append(detail.getMessage()).append("\n");
-    }
-    return prompt.toString();
   }
 }

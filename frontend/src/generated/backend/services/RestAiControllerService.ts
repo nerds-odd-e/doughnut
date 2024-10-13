@@ -7,7 +7,6 @@ import type { AiCompletionAnswerClarifyingQuestionParams } from '../models/AiCom
 import type { AiCompletionParams } from '../models/AiCompletionParams';
 import type { AiGeneratedImage } from '../models/AiGeneratedImage';
 import type { ChatRequest } from '../models/ChatRequest';
-import type { ConversationDetail } from '../models/ConversationDetail';
 import type { DummyForGeneratingTypes } from '../models/DummyForGeneratingTypes';
 import type { Message } from '../models/Message';
 import type { NotebookAssistant } from '../models/NotebookAssistant';
@@ -162,25 +161,6 @@ export class RestAiControllerService {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/ai/dummy',
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * @param conversationId
-     * @returns ConversationDetail OK
-     * @throws ApiError
-     */
-    public getCompletionAiOpinion(
-        conversationId: number,
-    ): CancelablePromise<ConversationDetail> {
-        return this.httpRequest.request({
-            method: 'GET',
-            url: '/api/ai/completion-ai-opinion/{conversationId}',
-            path: {
-                'conversationId': conversationId,
-            },
             errors: {
                 500: `Internal Server Error`,
             },
