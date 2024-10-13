@@ -232,6 +232,14 @@ public class RestAssessmentControllerTests {
     }
 
     @Test
+    void shouldReturnNoAssessmentHistoryForOtherUser() {
+      User anotherUser = makeMe.aUser().please();
+      makeMe.anAssessmentAttempt(anotherUser).notebook(notebook).please();
+      List<AssessmentAttempt> assessmentHistories = controller.getMyAssessments();
+      assertEquals(0, assessmentHistories.size());
+    }
+
+    @Test
     void shouldReturnOnePassAssessmentHistory() {
       makeMe.anAssessmentAttempt(currentUser.getEntity()).notebook(notebook).score(5, 4).please();
       List<AssessmentAttempt> assessmentHistories = controller.getMyAssessments();
@@ -243,14 +251,6 @@ public class RestAssessmentControllerTests {
       makeMe.anAssessmentAttempt(currentUser.getEntity()).notebook(notebook).score(5, 2).please();
       List<AssessmentAttempt> assessmentHistories = controller.getMyAssessments();
       assertFalse(assessmentHistories.getFirst().getIsPass());
-    }
-
-    @Test
-    void shouldReturnNoAssessmentHistoryForOtherUser() {
-      User anotherUser = makeMe.aUser().please();
-      makeMe.anAssessmentAttempt(anotherUser).notebook(notebook).score(5, 5).please();
-      List<AssessmentAttempt> assessmentHistories = controller.getMyAssessments();
-      assertEquals(0, assessmentHistories.size());
     }
 
     @Test
