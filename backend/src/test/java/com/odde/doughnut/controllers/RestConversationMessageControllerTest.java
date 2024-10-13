@@ -114,7 +114,7 @@ class RestConversationMessageControllerTest {
   }
 
   @Test
-  void testSendMessageReturnsOk() throws UnexpectedNoAccessRightException {
+  void topicOwnerShouldBeAbleToReply() throws UnexpectedNoAccessRightException {
     String message = "This is a message";
     makeMe
         .theNotebook(assessmentQuestionInstance.getAssessmentAttempt().getNotebook())
@@ -126,6 +126,14 @@ class RestConversationMessageControllerTest {
     List<ConversationDetail> conversationDetails =
         (List<ConversationDetail>) modelFactoryService.conversationDetailRepository.findAll();
     assertEquals(1, conversationDetails.size());
+    assertEquals(message, conversationDetail.getMessage());
+  }
+
+  @Test
+  void initiatorShouldBeAbleToReply() throws UnexpectedNoAccessRightException {
+    String message = "This is a message";
+    Conversation conversation = makeMe.aConversation().from(currentUser).please();
+    ConversationDetail conversationDetail = controller.replyToConversation(message, conversation);
     assertEquals(message, conversationDetail.getMessage());
   }
 

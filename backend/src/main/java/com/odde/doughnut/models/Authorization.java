@@ -19,22 +19,17 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
       case AssessmentAttempt obj -> assertAuthorizationUser(obj.getUser());
       case AssessmentQuestionInstance obj -> assertAuthorization(obj.getAssessmentAttempt());
       case Conversation obj -> assertAuthorizationConversation(obj);
-      case Ownership obj -> assertAuthorizationOwnership(obj);
       default ->
           throw new ResponseStatusException(
               HttpStatus.INTERNAL_SERVER_ERROR, "Unknown object type");
     }
   }
 
-  private void assertAuthorizationOwnership(Ownership obj) throws UnexpectedNoAccessRightException {
-    if (!obj.ownsBy(user)) {
-      throw new UnexpectedNoAccessRightException();
-    }
-  }
-
   private void assertAuthorizationConversation(Conversation obj)
       throws UnexpectedNoAccessRightException {
-    assertAuthorizationOwnership(obj.getSubjectOwnership());
+    if (!obj.getSubjectOwnership().ownsBy(user) && !obj.getConversationInitiator().equals(user)) {
+      throw new UnexpectedNoAccessRightException();
+    }
   }
 
   private void assertAuthorizationBazaarNotebook(BazaarNotebook object)

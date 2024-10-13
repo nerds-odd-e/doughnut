@@ -42,14 +42,4 @@ public class ConversationBuilder extends EntityBuilder<Conversation> {
     this.entity.setConversationInitiator(currentUser.getEntity());
     return this;
   }
-
-  public ConversationBuilder messagge(String msg) {
-    this.entity.setMessage(msg);
-    return this;
-  }
-
-  public ConversationBuilder marker(Boolean isApproved) {
-    this.entity.setMarker(isApproved);
-    return this;
-  }
 }
