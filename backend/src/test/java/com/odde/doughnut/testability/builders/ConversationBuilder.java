@@ -24,9 +24,6 @@ public class ConversationBuilder extends EntityBuilder<Conversation> {
               .getFirst();
       forAnAssessmentQuestionInstance(instance);
     }
-    if (Strings.isBlank(this.entity.getMessage())) {
-      entity.setMessage("This is a feedback");
-    }
     if (this.entity.getConversationInitiator() == null) {
       entity.setConversationInitiator(makeMe.aUser().please(needPersist));
     }

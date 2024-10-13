@@ -16,11 +16,10 @@ public class ConversationService {
   private final ModelFactoryService modelFactoryService;
 
   public Conversation startConversation(
-      AssessmentQuestionInstance assessmentQuestionInstance, User initiator, String feedback) {
+      AssessmentQuestionInstance assessmentQuestionInstance, User initiator) {
     Conversation conversation = new Conversation();
     conversation.setAssessmentQuestionInstance(assessmentQuestionInstance);
     conversation.setConversationInitiator(initiator);
-    conversation.setMessage(feedback);
     modelFactoryService.conversationRepository.save(conversation);
     return conversation;
   }
@@ -34,7 +33,7 @@ public class ConversationService {
       Conversation conversation, User user, String message) {
     ConversationMessage conversationMessage = new ConversationMessage();
     conversationMessage.setConversation(conversation);
-    conversationMessage.setConversationDetailInitiator(user);
+    conversationMessage.setSender(user);
     conversationMessage.setMessage(message);
     return modelFactoryService.conversationMessageRepository.save(conversationMessage);
   }

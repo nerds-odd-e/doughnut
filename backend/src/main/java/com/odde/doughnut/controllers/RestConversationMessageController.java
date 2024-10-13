@@ -29,7 +29,7 @@ public class RestConversationMessageController {
           AssessmentQuestionInstance assessmentQuestionInstance) {
     Conversation conversation =
         conversationService.startConversation(
-            assessmentQuestionInstance, currentUser.getEntity(), feedback);
+            assessmentQuestionInstance, currentUser.getEntity());
     conversationService.addMessageToConversation(conversation, currentUser.getEntity(), feedback);
     return conversation;
   }

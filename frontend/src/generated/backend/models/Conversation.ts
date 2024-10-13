@@ -13,6 +13,5 @@ export type Conversation = {
     message?: string;
     createdAt: string;
     updatedAt: string;
-    marker?: boolean;
 };
 

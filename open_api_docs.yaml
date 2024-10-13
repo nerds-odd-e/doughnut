@@ -3488,8 +3488,6 @@ components:
         updatedAt:
           type: string
           format: date-time
-        marker:
-          type: boolean
     ConversationMessage:
       required:
       - createdAt
@@ -3504,7 +3502,7 @@ components:
           $ref: "#/components/schemas/Conversation"
         message:
           type: string
-        conversationDetailInitiator:
+        sender:
           $ref: "#/components/schemas/User"
         createdAt:
           type: string

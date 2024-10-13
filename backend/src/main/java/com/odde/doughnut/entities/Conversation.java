@@ -25,7 +25,7 @@ public class Conversation extends EntityIdentifiedByIdOnly {
   @JoinColumn(name = "conversation_initiator_id", referencedColumnName = "id")
   User conversationInitiator;
 
-  @Setter String message;
+  @Setter String message = "empty";
 
   @Column(name = "created_at")
   @NotNull
@@ -35,10 +35,6 @@ public class Conversation extends EntityIdentifiedByIdOnly {
   @NotNull
   @OrderBy("updatedAt DESC")
   private Timestamp updatedAt = new Timestamp(new Date().getTime());
-
-  @Setter
-  @Column(name = "marker")
-  private Boolean marker = false;
 
   public void setAssessmentQuestionInstance(AssessmentQuestionInstance assessmentQuestionInstance) {
     this.assessmentQuestionInstance = assessmentQuestionInstance;

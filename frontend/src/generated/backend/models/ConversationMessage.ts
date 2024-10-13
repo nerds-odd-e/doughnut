@@ -8,7 +8,7 @@ export type ConversationMessage = {
     id: number;
     conversation?: Conversation;
     message: string;
-    conversationDetailInitiator?: User;
+    sender?: User;
     createdAt: string;
 };
 

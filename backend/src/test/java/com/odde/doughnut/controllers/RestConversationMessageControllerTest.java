@@ -43,19 +43,15 @@ class RestConversationMessageControllerTest {
   @Test
   void testSendFeedbackReturnsOk() {
     String feedback = "This is a feedback";
-
-    Conversation conversation = controller.sendFeedback(feedback, assessmentQuestionInstance);
-
+    controller.sendFeedback(feedback, assessmentQuestionInstance);
     List<Conversation> conversations =
         (List<Conversation>) modelFactoryService.conversationRepository.findAll();
     assertEquals(1, conversations.size());
-    assertEquals(feedback, conversation.getMessage());
   }
 
   @Test
   void testGetMessageDetailWhenSendFeedbackReturnsOk() {
     String feedback = "This is a feedback";
-
     Conversation conversation = controller.sendFeedback(feedback, assessmentQuestionInstance);
 
     List<Conversation> conversations =
@@ -65,7 +61,6 @@ class RestConversationMessageControllerTest {
         modelFactoryService.conversationMessageRepository.findByConversationInitiator(
             conversation.getId());
     assertEquals(1, conversations.size());
-    assertEquals(feedback, conversation.getMessage());
     assertEquals(1, conversationDetail.size());
     assertEquals(feedback, conversationDetail.getFirst().getMessage());
   }

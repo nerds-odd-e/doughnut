@@ -26,7 +26,7 @@ public class ConversationMessage extends EntityIdentifiedByIdOnly {
   @ManyToOne
   @Setter
   @JoinColumn(name = "conversation_detail_initiator_id", referencedColumnName = "id")
-  User conversationDetailInitiator;
+  User sender;
 
   @Column(name = "created_at")
   @NotNull
