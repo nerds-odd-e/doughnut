@@ -14,13 +14,8 @@ export const assumeMessageCenterPage = () => {
       cy.findByText(message).should('be.visible')
       return this
     },
-    clickToSeeExpectForm(question: string) {
-      cy.findByText(question).parent().should('be.visible').click()
-      cy.get('textarea[name="Description"]').should('be.visible')
-      cy.get('input[type="submit"][value="Send"]').should('be.visible')
-      return this
-    },
-    typeAndSendMessage(message: string) {
+    replyInConversation(conversation: string, message: string) {
+      cy.findByText(conversation).parent().should('be.visible').click()
       cy.get('textarea[name="Description"]').type(message)
       cy.get('input[type="submit"][value="Send"]').click()
       cy.findByText(message).should('be.visible')
