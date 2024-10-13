@@ -37,7 +37,7 @@ export class RestConversationMessageControllerService {
      * @returns ConversationDetail OK
      * @throws ApiError
      */
-    public sendMessage(
+    public replyToConversation(
         conversationId: number,
         requestBody: string,
     ): CancelablePromise<ConversationDetail> {
@@ -59,7 +59,7 @@ export class RestConversationMessageControllerService {
      * @returns ConversationDetail OK
      * @throws ApiError
      */
-    public getMessageThreadsForConversation(
+    public getConversationDetails(
         conversationId: number,
     ): CancelablePromise<Array<ConversationDetail>> {
         return this.httpRequest.request({

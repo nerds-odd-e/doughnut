@@ -40,7 +40,7 @@ public class RestConversationMessageController {
   }
 
   @PostMapping("/detail/send/{conversationId}")
-  public ConversationDetail sendMessage(
+  public ConversationDetail replyToConversation(
       @RequestBody String message,
       @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation) {
     return conversationService.addConversationDetail(
@@ -48,7 +48,7 @@ public class RestConversationMessageController {
   }
 
   @GetMapping("/detail/all/{conversationId}")
-  public List<ConversationDetail> getMessageThreadsForConversation(
+  public List<ConversationDetail> getConversationDetails(
       @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation) {
     currentUser.assertLoggedIn();
     return conversationService.getConversionDetailRelatedByConversationId(conversation.getId());

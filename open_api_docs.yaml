@@ -1314,7 +1314,7 @@ paths:
     post:
       tags:
       - rest-conversation-message-controller
-      operationId: sendMessage
+      operationId: replyToConversation
       parameters:
       - name: conversationId
         in: path
@@ -2617,7 +2617,7 @@ paths:
     get:
       tags:
       - rest-conversation-message-controller
-      operationId: getMessageThreadsForConversation
+      operationId: getConversationDetails
       parameters:
       - name: conversationId
         in: path

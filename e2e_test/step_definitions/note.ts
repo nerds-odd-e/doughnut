@@ -413,7 +413,7 @@ Given(
     start
       .jumpToNotePage(noteTopic)
       .chatAboutNote()
-      .sendMessage('please complete the details')
+      .replyToConversation('please complete the details')
     cy.pageIsNotLoading()
     cy.get('button.close-button').click()
   }

@@ -7,7 +7,7 @@ export function assumeChatAboutNotePage() {
       cy.pageIsNotLoading() // wait for the response
       return assumeQuestionPage()
     },
-    sendMessage(msg: string) {
+    replyToConversation(msg: string) {
       cy.focused().type(msg)
       cy.get('#chat-button').click()
     },

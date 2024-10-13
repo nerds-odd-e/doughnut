@@ -90,7 +90,7 @@ const fetchData = async () => {
 }
 
 const handleSendMessage = async () => {
-  await managedApi.restConversationMessageController.sendMessage(
+  await managedApi.restConversationMessageController.replyToConversation(
     currentConversationId.value,
     message.value
   )
@@ -100,7 +100,7 @@ const handleSendMessage = async () => {
 
 const fetchThreadsForConversation = async (conversationId: number) => {
   currentConversationDetails.value =
-    await managedApi.restConversationMessageController.getMessageThreadsForConversation(
+    await managedApi.restConversationMessageController.getConversationDetails(
       conversationId
     )
   currentConversationId.value = conversationId

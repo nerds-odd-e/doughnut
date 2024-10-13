@@ -112,7 +112,7 @@ class RestConversationMessageControllerTest {
         .please();
     Conversation conversation =
         makeMe.aConversation().forAnAssessmentQuestionInstance(assessmentQuestionInstance).please();
-    ConversationDetail conversationDetail = controller.sendMessage(message, conversation);
+    ConversationDetail conversationDetail = controller.replyToConversation(message, conversation);
     List<ConversationDetail> conversationDetails =
         (List<ConversationDetail>) modelFactoryService.conversationDetailRepository.findAll();
     assertEquals(1, conversationDetails.size());
@@ -130,8 +130,7 @@ class RestConversationMessageControllerTest {
         makeMe.aConversation().forAnAssessmentQuestionInstance(assessmentQuestionInstance).please();
 
     makeMe.aConversationDetail().forConversationInstance(conversation).please();
-    List<ConversationDetail> conversations =
-        controller.getMessageThreadsForConversation(conversation);
+    List<ConversationDetail> conversations = controller.getConversationDetails(conversation);
     assertEquals(1, conversations.size());
   }
 }
