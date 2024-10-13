@@ -76,7 +76,7 @@ class RestConversationMessageControllerTest {
         .from(currentUser)
         .please();
     makeMe.aConversation().forAnAssessmentQuestionInstance(assessmentQuestionInstance).please();
-    List<Conversation> conversations = controller.getFeedbackThreadsForUser();
+    List<Conversation> conversations = controller.getConversationsOfCurrentUser();
     assertEquals(1, conversations.size());
   }
 
@@ -87,7 +87,7 @@ class RestConversationMessageControllerTest {
         .owner(currentUser.getEntity())
         .please();
     makeMe.aConversation().forAnAssessmentQuestionInstance(assessmentQuestionInstance).please();
-    List<Conversation> conversations = controller.getFeedbackThreadsForUser();
+    List<Conversation> conversations = controller.getConversationsOfCurrentUser();
     assertEquals(1, conversations.size());
   }
 
@@ -99,7 +99,7 @@ class RestConversationMessageControllerTest {
         .owner(myCircle)
         .please();
     makeMe.aConversation().forAnAssessmentQuestionInstance(assessmentQuestionInstance).please();
-    List<Conversation> conversations = controller.getFeedbackThreadsForUser();
+    List<Conversation> conversations = controller.getConversationsOfCurrentUser();
     assertEquals(1, conversations.size());
   }
 

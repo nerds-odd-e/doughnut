@@ -2643,7 +2643,7 @@ paths:
     get:
       tags:
       - rest-conversation-message-controller
-      operationId: getFeedbackThreadsForUser
+      operationId: getConversationsOfCurrentUser
       responses:
         "500":
           description: Internal Server Error

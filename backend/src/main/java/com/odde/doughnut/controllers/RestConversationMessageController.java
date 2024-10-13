@@ -34,7 +34,7 @@ public class RestConversationMessageController {
   }
 
   @GetMapping("/all")
-  public List<Conversation> getFeedbackThreadsForUser() {
+  public List<Conversation> getConversationsOfCurrentUser() {
     currentUser.assertLoggedIn();
     return conversationService.conversationRelatedToUser(currentUser.getEntity());
   }

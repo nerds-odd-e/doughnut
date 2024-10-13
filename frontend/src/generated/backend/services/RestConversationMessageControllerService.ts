@@ -77,7 +77,7 @@ export class RestConversationMessageControllerService {
      * @returns Conversation OK
      * @throws ApiError
      */
-    public getFeedbackThreadsForUser(): CancelablePromise<Array<Conversation>> {
+    public getConversationsOfCurrentUser(): CancelablePromise<Array<Conversation>> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/message/all',
