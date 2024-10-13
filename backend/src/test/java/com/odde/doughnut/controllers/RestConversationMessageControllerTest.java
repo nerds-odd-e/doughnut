@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.ConversationDetailService;
 import com.odde.doughnut.services.ConversationService;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
@@ -22,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 class RestConversationMessageControllerTest {
 
   @Autowired ConversationService conversationService;
-  @Autowired ConversationDetailService conversationDetailService;
   @Autowired MakeMe makeMe;
   private UserModel currentUser;
   RestConversationMessageController controller;
@@ -33,9 +31,7 @@ class RestConversationMessageControllerTest {
   @BeforeEach
   void setup() {
     currentUser = makeMe.aUser().toModelPlease();
-    controller =
-        new RestConversationMessageController(
-            currentUser, conversationService, conversationDetailService);
+    controller = new RestConversationMessageController(currentUser, conversationService);
     Notebook notebook = makeMe.aNotebook().please();
     AssessmentAttempt assessmentAttempt =
         makeMe.anAssessmentAttempt(notebook.getCreatorEntity()).withOneQuestion().please();

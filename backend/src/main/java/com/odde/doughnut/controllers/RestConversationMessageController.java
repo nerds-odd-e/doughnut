@@ -4,7 +4,6 @@ import com.odde.doughnut.entities.AssessmentQuestionInstance;
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.ConversationDetail;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.ConversationDetailService;
 import com.odde.doughnut.services.ConversationService;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
@@ -14,16 +13,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/message")
 public class RestConversationMessageController {
   private final ConversationService conversationService;
-  private final ConversationDetailService conversationDetailService;
   private final UserModel currentUser;
 
   public RestConversationMessageController(
-      UserModel currentUser,
-      ConversationService conversationService,
-      ConversationDetailService conversationDetailService) {
+      UserModel currentUser, ConversationService conversationService) {
     this.currentUser = currentUser;
     this.conversationService = conversationService;
-    this.conversationDetailService = conversationDetailService;
   }
 
   @PostMapping("/send/{assessmentQuestion}")
@@ -34,8 +29,7 @@ public class RestConversationMessageController {
     Conversation conversation =
         conversationService.startConversation(
             assessmentQuestionInstance, currentUser.getEntity(), feedback);
-    conversationDetailService.addConversationDetail(
-        conversation, currentUser.getEntity(), feedback);
+    conversationService.addConversationDetail(conversation, currentUser.getEntity(), feedback);
     return conversation;
   }
 
@@ -49,7 +43,7 @@ public class RestConversationMessageController {
   public ConversationDetail sendMessage(
       @RequestBody String message,
       @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation) {
-    return conversationDetailService.addConversationDetail(
+    return conversationService.addConversationDetail(
         conversation, currentUser.getEntity(), message);
   }
 
@@ -57,7 +51,6 @@ public class RestConversationMessageController {
   public List<ConversationDetail> getMessageThreadsForConversation(
       @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation) {
     currentUser.assertLoggedIn();
-    return conversationDetailService.getConversionDetailRelatedByConversationId(
-        conversation.getId());
+    return conversationService.getConversionDetailRelatedByConversationId(conversation.getId());
   }
 }

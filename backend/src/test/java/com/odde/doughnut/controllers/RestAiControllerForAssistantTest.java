@@ -10,7 +10,6 @@ import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.NotebookAssistant;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.ConversationDetailService;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -47,7 +46,6 @@ class RestAiControllerForAssistantTest {
   Note note;
   @Mock OpenAiApi openAiApi;
   @Autowired MakeMe makeMe;
-  @Autowired ConversationDetailService conversationDetailService;
   TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   @BeforeEach
@@ -56,11 +54,7 @@ class RestAiControllerForAssistantTest {
     note = makeMe.aNote().please();
     controller =
         new RestAiController(
-            openAiApi,
-            makeMe.modelFactoryService,
-            conversationDetailService,
-            currentUser,
-            testabilitySettings);
+            openAiApi, makeMe.modelFactoryService, currentUser, testabilitySettings);
   }
 
   @Nested
@@ -83,7 +77,6 @@ class RestAiControllerForAssistantTest {
             new RestAiController(
                 openAiApi,
                 makeMe.modelFactoryService,
-                conversationDetailService,
                 makeMe.aUser().toModelPlease(),
                 testabilitySettings);
         assertThrows(
@@ -141,7 +134,6 @@ class RestAiControllerForAssistantTest {
           new RestAiController(
               openAiApi,
               makeMe.modelFactoryService,
-              conversationDetailService,
               makeMe.aUser().toModelPlease(),
               testabilitySettings);
       assertThrows(

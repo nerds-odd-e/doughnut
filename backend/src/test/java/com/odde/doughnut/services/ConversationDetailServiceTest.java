@@ -25,14 +25,14 @@ import org.springframework.transaction.annotation.Transactional;
 class ConversationDetailServiceTest {
   @Autowired ModelFactoryService modelFactoryService;
   @Autowired MakeMe makeMe;
-  private ConversationDetailService conversationDetailService;
+  private ConversationService conversationService;
   private AssessmentService assessmentService;
   private UserModel currentUser;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   @BeforeEach
   void setup() {
-    conversationDetailService = new ConversationDetailService(this.modelFactoryService);
+    conversationService = new ConversationService(this.modelFactoryService);
     testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
     currentUser = makeMe.aUser().toModelPlease();
     assessmentService = new AssessmentService(makeMe.modelFactoryService, testabilitySettings);
@@ -64,7 +64,7 @@ class ConversationDetailServiceTest {
     void shouldReturnEmptyData_whenCallGetConversionDetailRelatedByConversion() {
       int conversationId = 1;
       assertThat(
-          conversationDetailService.getConversionDetailRelatedByConversationId(conversationId),
+          conversationService.getConversionDetailRelatedByConversationId(conversationId),
           hasSize(0));
     }
 
@@ -73,8 +73,7 @@ class ConversationDetailServiceTest {
       Conversation conversation = getConversation();
       String message = "This feedback is wrong";
       ConversationDetail conversationDetail =
-          conversationDetailService.addConversationDetail(
-              conversation, currentUser.getEntity(), message);
+          conversationService.addConversationDetail(conversation, currentUser.getEntity(), message);
       assertEquals(message, conversationDetail.getMessage());
     }
 
@@ -82,11 +81,9 @@ class ConversationDetailServiceTest {
     void shouldReturnListConversationDetail() {
       Conversation conversation = getConversation();
       String message = "This feedback is wrong";
-      conversationDetailService.addConversationDetail(
-          conversation, currentUser.getEntity(), message);
+      conversationService.addConversationDetail(conversation, currentUser.getEntity(), message);
       List<ConversationDetail> conversationDetails =
-          conversationDetailService.getConversionDetailRelatedByConversationId(
-              conversation.getId());
+          conversationService.getConversionDetailRelatedByConversationId(conversation.getId());
       assertEquals(1, conversationDetails.size());
       assertEquals(message, conversationDetails.getFirst().getMessage());
     }

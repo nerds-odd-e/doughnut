@@ -12,7 +12,6 @@ import com.odde.doughnut.controllers.dto.AiCompletionAnswerClarifyingQuestionPar
 import com.odde.doughnut.controllers.dto.AiCompletionParams;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.ConversationDetailService;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.NoteDetailsCompletion;
 import com.odde.doughnut.testability.MakeMe;
@@ -53,7 +52,6 @@ class RestAiControllerTest {
   Note note;
   @Mock OpenAiApi openAiApi;
   @Autowired MakeMe makeMe;
-  @Autowired ConversationDetailService conversationDetailService;
   TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   @BeforeEach
@@ -62,11 +60,7 @@ class RestAiControllerTest {
     note = makeMe.aNote().please();
     controller =
         new RestAiController(
-            openAiApi,
-            makeMe.modelFactoryService,
-            conversationDetailService,
-            currentUser,
-            testabilitySettings);
+            openAiApi, makeMe.modelFactoryService, currentUser, testabilitySettings);
   }
 
   @Nested
@@ -92,7 +86,6 @@ class RestAiControllerTest {
               new RestAiController(
                       openAiApi,
                       makeMe.modelFactoryService,
-                      conversationDetailService,
                       makeMe.aNullUserModelPlease(),
                       testabilitySettings)
                   .getCompletion(note, params));
@@ -198,7 +191,6 @@ class RestAiControllerTest {
               new RestAiController(
                       openAiApi,
                       makeMe.modelFactoryService,
-                      conversationDetailService,
                       makeMe.aNullUserModelPlease(),
                       testabilitySettings)
                   .generateImage("create an image"));

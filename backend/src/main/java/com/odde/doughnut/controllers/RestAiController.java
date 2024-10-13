@@ -8,7 +8,6 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorWithStorageService;
-import com.odde.doughnut.services.ConversationDetailService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.assistants.message.Message;
 import com.theokanning.openai.client.OpenAiApi;
@@ -41,15 +40,11 @@ public class RestAiController {
 
   private final AiAdvisorWithStorageService aiAdvisorWithStorageService;
 
-  private final ConversationDetailService conversationDetailService;
-
   public RestAiController(
       @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
       ModelFactoryService modelFactoryService,
-      ConversationDetailService conversationDetailService,
       UserModel currentUser,
       TestabilitySettings testabilitySettings) {
-    this.conversationDetailService = conversationDetailService;
     this.aiAdvisorWithStorageService =
         new AiAdvisorWithStorageService(openAiApi, modelFactoryService);
     this.currentUser = currentUser;
