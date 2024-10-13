@@ -22,6 +22,6 @@ describe("bazaar page", () => {
       .component(MessageCenterPage)
       .withRouter()
       .render()
-    await findByText("No conversation")
+    await findByText("No conversation selected")
   })
 })

@@ -57,7 +57,7 @@
               </form>
             </div>
           </div>
-          <h2 v-else>No conversation</h2>
+          <h2 v-else>No conversation selected</h2>
         </div>
       </div>
     </template>
