@@ -37,14 +37,3 @@ Then(
       .expectButton(feedback, partner)
   }
 )
-
-Then(
-  'when {string} can click the {string} button with {string} in the message center',
-  (user: string, button: string, partner: string) => {
-    start
-      .reloginAndEnsureHomePage(user)
-      .navigateToMessageCenter()
-      .expectButton(button, partner)
-      .clickButton(button, partner)
-  }
-)

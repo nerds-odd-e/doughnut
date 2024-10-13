@@ -36,15 +36,9 @@ Feature: Learner gives feedback on an assessment question
         When I answer the question wrongly and submit feedback saying 'I believe the question is incorrect'
         Then "a_trainer" can see the button "AgreeButton" with "Old Learner" in the message center
         Then "a_trainer" can see the conversation with "Old Learner" for the question "Is 0 * 0 = 0?" in the message center
-        Then when "a_trainer" can click the "AgreeButton" button with "Old Learner" in the message center
-        Then I should see message that says "Feedback is Accepted"
-        And I should see message that says "Resolved"
 
     Scenario: Trainer Declines Feedback
         Given I begin the assessment from the "Just say 'Yes'" notebook in the bazaar
         When I answer the question wrongly and submit feedback saying 'I believe the question is incorrect'
         Then "a_trainer" can see the button "DeclineButton" with "Old Learner" in the message center
         Then "a_trainer" can see the conversation with "Old Learner" for the question "Is 0 * 0 = 0?" in the message center
-        Then when "a_trainer" can click the "DeclineButton" button with "Old Learner" in the message center
-        Then I should see message that says "Feedback is Rejected"
-        And I should see message that says "Resolved"

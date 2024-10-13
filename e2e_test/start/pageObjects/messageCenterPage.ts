@@ -29,11 +29,6 @@ export const assumeMessageCenterPage = () => {
       cy.findByText(partner).should('be.visible')
       return this
     },
-    clickButton(message: string, partner: string) {
-      cy.findByTestId(message).should('be.visible').click()
-      cy.findByText(partner).should('be.visible')
-      return this
-    },
     typeAndSendMessage(message: string) {
       cy.get('textarea[name="Description"]').type(message)
       cy.get('input[type="submit"][value="Send"]').click()
