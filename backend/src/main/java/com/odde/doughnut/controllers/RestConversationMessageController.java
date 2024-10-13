@@ -52,8 +52,9 @@ public class RestConversationMessageController {
 
   @GetMapping("/detail/all/{conversationId}")
   public List<ConversationDetail> getConversationDetails(
-      @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation) {
-    currentUser.assertLoggedIn();
+      @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertAuthorization(conversation);
     return conversationService.getConversionDetailRelatedByConversationId(conversation.getId());
   }
 }

@@ -138,14 +138,16 @@ class RestConversationMessageControllerTest {
   }
 
   @Test
-  void testGetMessageThreadsFromConversation() {
-    makeMe
-        .aConversation()
-        .forAnAssessmentQuestionInstance(assessmentQuestionInstance)
-        .from(currentUser)
-        .please();
-    Conversation conversation =
-        makeMe.aConversation().forAnAssessmentQuestionInstance(assessmentQuestionInstance).please();
+  void shouldNotBeAbleToSeeAConversationIAmNotIn() {
+    Conversation conversation = makeMe.aConversation().please();
+    assertThrows(
+        UnexpectedNoAccessRightException.class,
+        () -> controller.getConversationDetails(conversation));
+  }
+
+  @Test
+  void testGetMessageThreadsFromConversation() throws UnexpectedNoAccessRightException {
+    Conversation conversation = makeMe.aConversation().from(currentUser).please();
 
     makeMe.aConversationDetail().forConversationInstance(conversation).please();
     List<ConversationDetail> conversations = controller.getConversationDetails(conversation);
