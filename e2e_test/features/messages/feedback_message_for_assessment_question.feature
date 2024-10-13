@@ -11,9 +11,9 @@ Feature: Learner gives feedback on an assessment question
 
     Scenario: Both sender and receiver can see the feedback message
         Then "a_trainer" can see the conversation with "Old Learner" for the question "Is 0 * 0 = 0?" in the message center
-        And I can see the message "I believe the question is incorrect" when click on the question "Is 0 * 0 = 0?"
+        And I can see the message "I believe the question is incorrect" in the conversation "Is 0 * 0 = 0?"
         Then "old_learner" can see the conversation with "A Trainer" for the question "Is 0 * 0 = 0?" in the message center
-        And I can see the message "I believe the question is incorrect" when click on the question "Is 0 * 0 = 0?"
+        And I can see the message "I believe the question is incorrect" in the conversation "Is 0 * 0 = 0?"
 
     Scenario: User can reply to the feedback message
         Given I am re-logged in as "a_trainer"

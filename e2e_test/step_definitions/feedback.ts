@@ -22,8 +22,8 @@ Then(
 )
 
 Then(
-  'I can see the message {string} when click on the question {string}',
-  (feedback: string, question: string) => {
-    start.assumeMessageCenterPage().clickToSeeExpectMessage(question, feedback)
+  'I can see the message {string} in the conversation {string}',
+  (feedback: string, conversation: string) => {
+    start.assumeMessageCenterPage().clickToSeeExpectMessage(conversation, feedback)
   }
 )
