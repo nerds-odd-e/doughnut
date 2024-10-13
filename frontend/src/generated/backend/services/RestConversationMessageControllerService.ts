@@ -6,7 +6,7 @@ import type { Conversation } from '../models/Conversation';
 import type { ConversationDetail } from '../models/ConversationDetail';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
-export class RestFeedbackControllerService {
+export class RestConversationMessageControllerService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
      * @param assessmentQuestion
@@ -20,7 +20,7 @@ export class RestFeedbackControllerService {
     ): CancelablePromise<Conversation> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/feedback/send/{assessmentQuestion}',
+            url: '/api/message/send/{assessmentQuestion}',
             path: {
                 'assessmentQuestion': assessmentQuestion,
             },
@@ -43,7 +43,7 @@ export class RestFeedbackControllerService {
     ): CancelablePromise<ConversationDetail> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/feedback/detail/send/{conversationId}',
+            url: '/api/message/detail/send/{conversationId}',
             path: {
                 'conversationId': conversationId,
             },
@@ -64,7 +64,7 @@ export class RestFeedbackControllerService {
     ): CancelablePromise<Array<ConversationDetail>> {
         return this.httpRequest.request({
             method: 'GET',
-            url: '/api/feedback/detail/all/{conversationId}',
+            url: '/api/message/detail/all/{conversationId}',
             path: {
                 'conversationId': conversationId,
             },
@@ -80,7 +80,7 @@ export class RestFeedbackControllerService {
     public getFeedbackThreadsForUser(): CancelablePromise<Array<Conversation>> {
         return this.httpRequest.request({
             method: 'GET',
-            url: '/api/feedback/all',
+            url: '/api/message/all',
             errors: {
                 500: `Internal Server Error`,
             },

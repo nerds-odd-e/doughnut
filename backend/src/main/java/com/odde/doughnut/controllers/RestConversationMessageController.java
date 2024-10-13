@@ -11,13 +11,13 @@ import java.util.List;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/feedback")
-public class RestFeedbackController {
+@RequestMapping("/api/message")
+public class RestConversationMessageController {
   private final ConversationService conversationService;
   private final ConversationDetailService conversationDetailService;
   private final UserModel currentUser;
 
-  public RestFeedbackController(
+  public RestConversationMessageController(
       UserModel currentUser,
       ConversationService conversationService,
       ConversationDetailService conversationDetailService) {

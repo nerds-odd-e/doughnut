@@ -86,11 +86,11 @@ const isCurrentUser = (id: number): boolean => {
 
 const fetchData = async () => {
   conversations.value =
-    await managedApi.restFeedbackController.getFeedbackThreadsForUser()
+    await managedApi.restConversationMessageController.getFeedbackThreadsForUser()
 }
 
 const handleSendMessage = async () => {
-  await managedApi.restFeedbackController.sendMessage(
+  await managedApi.restConversationMessageController.sendMessage(
     currentConversationId.value,
     message.value
   )
@@ -100,7 +100,7 @@ const handleSendMessage = async () => {
 
 const fetchThreadsForConversation = async (conversationId: number) => {
   currentConversationDetails.value =
-    await managedApi.restFeedbackController.getMessageThreadsForConversation(
+    await managedApi.restConversationMessageController.getMessageThreadsForConversation(
       conversationId
     )
   currentConversationId.value = conversationId

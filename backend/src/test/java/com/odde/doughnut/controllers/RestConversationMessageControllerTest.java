@@ -19,13 +19,13 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class RestFeedbackControllerTest {
+class RestConversationMessageControllerTest {
 
   @Autowired ConversationService conversationService;
   @Autowired ConversationDetailService conversationDetailService;
   @Autowired MakeMe makeMe;
   private UserModel currentUser;
-  RestFeedbackController controller;
+  RestConversationMessageController controller;
 
   @Autowired ModelFactoryService modelFactoryService;
   AssessmentQuestionInstance assessmentQuestionInstance;
@@ -34,7 +34,8 @@ class RestFeedbackControllerTest {
   void setup() {
     currentUser = makeMe.aUser().toModelPlease();
     controller =
-        new RestFeedbackController(currentUser, conversationService, conversationDetailService);
+        new RestConversationMessageController(
+            currentUser, conversationService, conversationDetailService);
     Notebook notebook = makeMe.aNotebook().please();
     AssessmentAttempt assessmentAttempt =
         makeMe.anAssessmentAttempt(notebook.getCreatorEntity()).withOneQuestion().please();

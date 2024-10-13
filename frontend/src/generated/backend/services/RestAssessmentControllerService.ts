@@ -52,28 +52,6 @@ export class RestAssessmentControllerService {
         });
     }
     /**
-     * @param conversationId
-     * @param isApproved
-     * @returns any OK
-     * @throws ApiError
-     */
-    public updateScore(
-        conversationId: number,
-        isApproved: boolean,
-    ): CancelablePromise<any> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/api/assessment/score/{conversationId}/{isApproved}',
-            path: {
-                'conversationId': conversationId,
-                'isApproved': isApproved,
-            },
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
      * @param notebook
      * @returns AssessmentAttempt OK
      * @throws ApiError

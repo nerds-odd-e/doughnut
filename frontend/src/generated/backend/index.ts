@@ -118,9 +118,9 @@ export { RestAssessmentControllerService } from './services/RestAssessmentContro
 export { RestBazaarControllerService } from './services/RestBazaarControllerService';
 export { RestCertificateControllerService } from './services/RestCertificateControllerService';
 export { RestCircleControllerService } from './services/RestCircleControllerService';
+export { RestConversationMessageControllerService } from './services/RestConversationMessageControllerService';
 export { RestCurrentUserInfoControllerService } from './services/RestCurrentUserInfoControllerService';
 export { RestFailureReportControllerService } from './services/RestFailureReportControllerService';
-export { RestFeedbackControllerService } from './services/RestFeedbackControllerService';
 export { RestFineTuningDataControllerService } from './services/RestFineTuningDataControllerService';
 export { RestGlobalSettingsControllerService } from './services/RestGlobalSettingsControllerService';
 export { RestHealthCheckControllerService } from './services/RestHealthCheckControllerService';
