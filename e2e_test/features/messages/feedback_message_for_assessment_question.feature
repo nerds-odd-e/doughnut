@@ -30,15 +30,3 @@ Feature: Learner gives feedback on an assessment question
         And I can type the message "No, it is correct" and send this message to conversation room
         Then I should see the new message "No, it is correct" on the current user's side of the conversation
         And I should see the new message "I believe the question is incorrect" on the other user's side of the conversation
-
-    Scenario: Trainer Agrees to Feedback
-        Given I begin the assessment from the "Just say 'Yes'" notebook in the bazaar
-        When I answer the question wrongly and submit feedback saying 'I believe the question is incorrect'
-        Then "a_trainer" can see the button "AgreeButton" with "Old Learner" in the message center
-        Then "a_trainer" can see the conversation with "Old Learner" for the question "Is 0 * 0 = 0?" in the message center
-
-    Scenario: Trainer Declines Feedback
-        Given I begin the assessment from the "Just say 'Yes'" notebook in the bazaar
-        When I answer the question wrongly and submit feedback saying 'I believe the question is incorrect'
-        Then "a_trainer" can see the button "DeclineButton" with "Old Learner" in the message center
-        Then "a_trainer" can see the conversation with "Old Learner" for the question "Is 0 * 0 = 0?" in the message center

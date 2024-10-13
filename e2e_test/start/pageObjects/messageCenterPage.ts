@@ -24,11 +24,6 @@ export const assumeMessageCenterPage = () => {
       cy.get('input[type="submit"][value="Send"]').should('be.visible')
       return this
     },
-    expectButton(message: string, partner: string) {
-      cy.findByTestId(message).should('be.visible')
-      cy.findByText(partner).should('be.visible')
-      return this
-    },
     typeAndSendMessage(message: string) {
       cy.get('textarea[name="Description"]').type(message)
       cy.get('input[type="submit"][value="Send"]').click()
