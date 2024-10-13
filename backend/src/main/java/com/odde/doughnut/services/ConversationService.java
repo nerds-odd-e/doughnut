@@ -30,17 +30,17 @@ public class ConversationService {
         .findByUserInSubjectOwnershipOrConversationInitiator(user);
   }
 
-  public ConversationMessage addConversationDetail(
+  public ConversationMessage addMessageToConversation(
       Conversation conversation, User user, String message) {
     ConversationMessage conversationMessage = new ConversationMessage();
     conversationMessage.setConversation(conversation);
     conversationMessage.setConversationDetailInitiator(user);
     conversationMessage.setMessage(message);
-    return modelFactoryService.conversationDetailRepository.save(conversationMessage);
+    return modelFactoryService.conversationMessageRepository.save(conversationMessage);
   }
 
   public List<ConversationMessage> getConversionDetailRelatedByConversationId(int conversationId) {
-    return modelFactoryService.conversationDetailRepository.findByConversationInitiator(
+    return modelFactoryService.conversationMessageRepository.findByConversationInitiator(
         conversationId);
   }
 }

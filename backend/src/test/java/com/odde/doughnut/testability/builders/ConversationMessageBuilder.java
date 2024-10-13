@@ -6,8 +6,8 @@ import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 import org.apache.logging.log4j.util.Strings;
 
-public class ConversationDetailBuilder extends EntityBuilder<ConversationMessage> {
-  public ConversationDetailBuilder(MakeMe makeMe) {
+public class ConversationMessageBuilder extends EntityBuilder<ConversationMessage> {
+  public ConversationMessageBuilder(MakeMe makeMe) {
     super(makeMe, new ConversationMessage());
   }
 
@@ -21,7 +21,7 @@ public class ConversationDetailBuilder extends EntityBuilder<ConversationMessage
     }
   }
 
-  public ConversationDetailBuilder forConversationInstance(Conversation conversation) {
+  public ConversationMessageBuilder forConversationInstance(Conversation conversation) {
     this.entity.setConversation(conversation);
     return this;
   }

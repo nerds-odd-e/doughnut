@@ -30,7 +30,7 @@ public class ModelFactoryService {
   @Autowired public NotebookRepository notebookRepository;
   @Autowired public CertificateRepository certificateRepository;
   @Autowired public ConversationRepository conversationRepository;
-  @Autowired public ConversationDetailRepository conversationDetailRepository;
+  @Autowired public ConversationMessageRepository conversationMessageRepository;
   @Autowired public NotebookCertificateApprovalRepository notebookCertificateApprovalRepository;
 
   @Autowired

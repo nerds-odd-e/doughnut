@@ -73,7 +73,8 @@ class ConversationMessageServiceTest {
       Conversation conversation = getConversation();
       String message = "This feedback is wrong";
       ConversationMessage conversationMessage =
-          conversationService.addConversationDetail(conversation, currentUser.getEntity(), message);
+          conversationService.addMessageToConversation(
+              conversation, currentUser.getEntity(), message);
       assertEquals(message, conversationMessage.getMessage());
     }
 
@@ -81,7 +82,7 @@ class ConversationMessageServiceTest {
     void shouldReturnListConversationDetail() {
       Conversation conversation = getConversation();
       String message = "This feedback is wrong";
-      conversationService.addConversationDetail(conversation, currentUser.getEntity(), message);
+      conversationService.addMessageToConversation(conversation, currentUser.getEntity(), message);
       List<ConversationMessage> conversationMessages =
           conversationService.getConversionDetailRelatedByConversationId(conversation.getId());
       assertEquals(1, conversationMessages.size());

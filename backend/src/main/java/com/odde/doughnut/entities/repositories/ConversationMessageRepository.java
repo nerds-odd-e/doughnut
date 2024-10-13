@@ -6,7 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
-public interface ConversationDetailRepository extends CrudRepository<ConversationMessage, Integer> {
+public interface ConversationMessageRepository
+    extends CrudRepository<ConversationMessage, Integer> {
   @Query("SELECT c FROM ConversationMessage c WHERE c.conversation.id = :conversationId")
   List<ConversationMessage> findByConversationInitiator(
       @Param("conversationId") int conversationId);

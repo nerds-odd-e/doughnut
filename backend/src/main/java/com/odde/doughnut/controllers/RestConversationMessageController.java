@@ -30,7 +30,7 @@ public class RestConversationMessageController {
     Conversation conversation =
         conversationService.startConversation(
             assessmentQuestionInstance, currentUser.getEntity(), feedback);
-    conversationService.addConversationDetail(conversation, currentUser.getEntity(), feedback);
+    conversationService.addMessageToConversation(conversation, currentUser.getEntity(), feedback);
     return conversation;
   }
 
@@ -46,7 +46,7 @@ public class RestConversationMessageController {
       @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(conversation);
-    return conversationService.addConversationDetail(
+    return conversationService.addMessageToConversation(
         conversation, currentUser.getEntity(), message);
   }
 

@@ -62,7 +62,7 @@ class RestConversationMessageControllerTest {
         (List<Conversation>) modelFactoryService.conversationRepository.findAll();
 
     var conversationDetail =
-        modelFactoryService.conversationDetailRepository.findByConversationInitiator(
+        modelFactoryService.conversationMessageRepository.findByConversationInitiator(
             conversation.getId());
     assertEquals(1, conversations.size());
     assertEquals(feedback, conversation.getMessage());
@@ -124,7 +124,7 @@ class RestConversationMessageControllerTest {
         makeMe.aConversation().forAnAssessmentQuestionInstance(assessmentQuestionInstance).please();
     ConversationMessage conversationMessage = controller.replyToConversation(message, conversation);
     List<ConversationMessage> conversationMessages =
-        (List<ConversationMessage>) modelFactoryService.conversationDetailRepository.findAll();
+        (List<ConversationMessage>) modelFactoryService.conversationMessageRepository.findAll();
     assertEquals(1, conversationMessages.size());
     assertEquals(message, conversationMessage.getMessage());
   }
@@ -149,7 +149,7 @@ class RestConversationMessageControllerTest {
   void testGetMessageThreadsFromConversation() throws UnexpectedNoAccessRightException {
     Conversation conversation = makeMe.aConversation().from(currentUser).please();
 
-    makeMe.aConversationDetail().forConversationInstance(conversation).please();
+    makeMe.aConversationMessage().forConversationInstance(conversation).please();
     List<ConversationMessage> conversations = controller.getConversationDetails(conversation);
     assertEquals(1, conversations.size());
   }
