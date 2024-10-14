@@ -1,6 +1,6 @@
 # WSL2 development environment setup
 
-### :warning: DO NOT CLONE doughnut source to a MS Windows directory (e.g. `/mnt/c/`)!!! Instead, in your WSL2 session, `cd ~` then `git clone git@github.com:nerds-odd-e/doughnut.git`
+### :warning: 🚨 **DO NOT CLONE doughnut source to a MS Windows directory (e.g. `/mnt/c/`)!!!** Instead, in your WSL2 session, `cd ~` then `git clone git@github.com:nerds-odd-e/doughnut.git`
 
 ### 1. Ensure you install WSL2g with Ubuntu-23.04 from official Microsoft Store
 
