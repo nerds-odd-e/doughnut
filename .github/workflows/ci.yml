@@ -184,56 +184,6 @@ jobs:
       - name: Perform rolling replace to GCP MIG doughnut-app-group
         run: infra/gcp/scripts/perform-rolling-replace-app-mig.sh
 
-  Check-Rollout:
-    name: Check GCP MIG Stable Rollout
-    runs-on: ${{ vars.RUNNER }}
-    needs: Deploy
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/gcloud_auth_n_sdk
-        with:
-          credentials_json: ${{ env.GCP_CREDENTIALS }}
-      - name: Check MIG Rollout Status
-        run: |
-          PROJECT_ID=$(gcloud config get-value project)
-          ZONE=us-east1-b
-          MIG_NAME=doughnut-app-group
-
-          # Check MIG status
-          max_attempts=30
-          attempt=1
-          while [ $attempt -le $max_attempts ]; do
-            echo "Attempt $attempt: Checking MIG status..."
-
-            status=$(gcloud compute instance-groups managed describe $MIG_NAME \
-              --project=$PROJECT_ID \
-              --zone=$ZONE \
-              --format='value(status.isStable)' 2>&1)
-
-            if [ $? -eq 0 ]; then
-              status_case_insensitive=$(echo "$status" | tr '[:upper:]' '[:lower:]')
-              if [ "$status_case_insensitive" = "true" ]; then
-                echo "MIG rollout is STABLE."
-                exit 0
-              else
-                echo "MIG is NOT YET Stable. Current status: $status"
-              fi
-            else
-              echo "Error querying MIG status: $status"
-              echo "Retrying..."
-            fi
-
-            sleep 15
-            attempt=$((attempt+1))
-          done
-
-          echo "MIG rollout did not stabilize within the expected time"
-          echo "Final MIG details:"
-          gcloud compute instance-groups managed describe $MIG_NAME \
-            --project=$PROJECT_ID \
-            --zone=$REGION
-          exit 1
-
   Notify-on-failure:
     name: Single slack/discord notification on CI/CD failure
     runs-on: ${{ vars.RUNNER }}
@@ -245,7 +195,6 @@ jobs:
         Package-artifacts,
         E2E-tests,
         Deploy,
-        Check-Rollout,
       ]
     if: always()
     steps:
