@@ -7,7 +7,6 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    AgreeAndDeclineButton: typeof import('./src/components/toolbars/AgreeAndDeclineButton.vue')['default']
     AIClarifyingQuestionDialog: typeof import('./src/components/notes/AIClarifyingQuestionDialog.vue')['default']
     AIGenerateImageDialog: typeof import('./src/components/notes/AIGenerateImageDialog.vue')['default']
     AnsweredQuestionComponent: typeof import('./src/components/review/AnsweredQuestionComponent.vue')['default']
@@ -163,7 +162,6 @@ declare module 'vue' {
     SvgCog: typeof import('./src/components/svgs/SvgCog.vue')['default']
     SvgCollapse: typeof import('./src/components/svgs/SvgCollapse.vue')['default']
     SvgContest: typeof import('./src/components/svgs/SvgContest.vue')['default']
-    SvgDecline: typeof import('./src/components/svgs/SvgDecline.vue')['default']
     SvgDescriptionIndicator: typeof import('./src/components/svgs/SvgDescriptionIndicator.vue')['default']
     SvgDown: typeof import('./src/components/svgs/SvgDown.vue')['default']
     SvgDownload: typeof import('./src/components/svgs/SvgDownload.vue')['default']
@@ -202,7 +200,6 @@ declare module 'vue' {
     SvgMissingAvatar: typeof import('./src/components/svgs/SvgMissingAvatar.vue')['default']
     SvgMoveToCircle: typeof import('./src/components/svgs/SvgMoveToCircle.vue')['default']
     SvgNoReview: typeof import('./src/components/svgs/SvgNoReview.vue')['default']
-    SvgNotification: typeof import('./src/components/svgs/SvgNotification.vue')['default']
     SvgPause: typeof import('./src/components/svgs/SvgPause.vue')['default']
     SvgRaiseHand: typeof import('./src/components/svgs/SvgRaiseHand.vue')['default']
     SvgRemove: typeof import('./src/components/svgs/SvgRemove.vue')['default']
