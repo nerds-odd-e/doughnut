@@ -196,24 +196,8 @@ jobs:
       - name: Check MIG Rollout Status
         run: |
           PROJECT_ID=$(gcloud config get-value project)
-          REGION=us-east1-b
+          ZONE=us-east1-b
           MIG_NAME=doughnut-app-group
-
-          check_mig_exists() {
-            gcloud compute instance-groups managed list \
-              --project=$PROJECT_ID \
-              --regions=$REGION \
-              --filter="name=($MIG_NAME)" \
-              --format="value(name)" | grep -q "$MIG_NAME"
-          }
-
-          # Check if MIG exists
-          if ! check_mig_exists; then
-            echo "Error: MIG '$MIG_NAME' not found in project '$PROJECT_ID', region '$REGION'"
-            echo "Available MIGs in the region:"
-            gcloud compute instance-groups managed list --project=$PROJECT_ID --regions=$REGION
-            exit 1
-          fi
 
           # Check MIG status
           max_attempts=30
@@ -223,15 +207,16 @@ jobs:
 
             status=$(gcloud compute instance-groups managed describe $MIG_NAME \
               --project=$PROJECT_ID \
-              --region=$REGION \
+              --zone=$ZONE \
               --format='value(status.isStable)' 2>&1)
 
             if [ $? -eq 0 ]; then
-              if [ "$status" = "true" ]; then
-                echo "MIG rollout is stable"
+              status_case_insensitive=$(echo "$status" | tr '[:upper:]' '[:lower:]')
+              if [ "$status_case_insensitive" = "true" ]; then
+                echo "MIG rollout is STABLE."
                 exit 0
               else
-                echo "MIG is not yet stable. Current status: $status"
+                echo "MIG is NOT YET Stable. Current status: $status"
               fi
             else
               echo "Error querying MIG status: $status"
@@ -246,7 +231,7 @@ jobs:
           echo "Final MIG details:"
           gcloud compute instance-groups managed describe $MIG_NAME \
             --project=$PROJECT_ID \
-            --region=$REGION
+            --zone=$REGION
           exit 1
 
   Notify-on-failure:
