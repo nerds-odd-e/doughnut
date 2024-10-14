@@ -184,6 +184,32 @@ jobs:
       - name: Perform rolling replace to GCP MIG doughnut-app-group
         run: infra/gcp/scripts/perform-rolling-replace-app-mig.sh
 
+  Check-Rollout:
+    name: Check GCP MIG Stable Rollout
+    runs-on: ${{ vars.RUNNER }}
+    needs: Deploy
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/gcloud_auth_n_sdk
+        with:
+          credentials_json: ${{ env.GCP_CREDENTIALS }}
+      - name: Check MIG Rollout Status
+        run: |
+          max_attempts=30
+          attempt=1
+          while [ $attempt -le $max_attempts ]; do
+            status=$(gcloud compute instance-groups managed describe doughnut-app-group --region=us-central1 --format='value(status.isStable)')
+            if [ "$status" = "true" ]; then
+              echo "MIG rollout is stable"
+              exit 0
+            fi
+            echo "Attempt $attempt: MIG rollout not yet stable. Waiting..."
+            sleep 15
+            attempt=$((attempt+1))
+          done
+          echo "MIG rollout did not stabilize within the expected time"
+          exit 1
+
   Notify-on-failure:
     name: Single slack/discord notification on CI/CD failure
     runs-on: ${{ vars.RUNNER }}
@@ -195,6 +221,7 @@ jobs:
         Package-artifacts,
         E2E-tests,
         Deploy,
+        Check-Rollout,
       ]
     if: always()
     steps:
