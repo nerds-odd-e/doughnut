@@ -40,7 +40,7 @@ Install Nix package manager if you haven't already with
 ```bash
 ./setup-doughnut-dev.sh
 ```
-For developers on macOS 15 Sequoia, please run the below if you face issue installing or starting up `nix`
+For developers on macOS 15 Sequoia, please run the below if you face issue installing or starting up `nix` ([see here for full details](https://github.com/NixOS/nix/issues/10892))
 
 ``` bash
 curl --proto '=https' --tlsv1.2 -sSf -L https://github.com/NixOS/nix/raw/master/scripts/sequoia-nixbld-user-migration.sh | bash -
