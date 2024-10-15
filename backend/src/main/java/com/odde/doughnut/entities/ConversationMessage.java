@@ -28,6 +28,10 @@ public class ConversationMessage extends EntityIdentifiedByIdOnly {
   @JoinColumn(name = "sender", referencedColumnName = "id")
   User sender;
 
+  @NotNull
+  @Column(name = "is_read", columnDefinition = "BOOLEAN")
+  Boolean is_read;
+
   @Column(name = "created_at")
   @NotNull
   @Builder.Default

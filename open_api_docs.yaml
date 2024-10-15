@@ -3541,6 +3541,7 @@ components:
       required:
       - createdAt
       - id
+      - is_read
       - message
       type: object
       properties:
@@ -3553,6 +3554,8 @@ components:
           type: string
         sender:
           $ref: "#/components/schemas/User"
+        is_read:
+          type: boolean
         createdAt:
           type: string
           format: date-time
