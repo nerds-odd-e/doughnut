@@ -23,6 +23,13 @@
         </template>
       </PopButton>
 
+      <NoteNewButton
+        button-title="Send message about note top bazaar"
+        v-bind="{ parentId: note.id, storageAccessor }"
+      >
+        <SvgChat />
+      </NoteNewButton>
+
       <PopButton title="search and link note">
         <template #button_face>
           <SvgSearchForLink />
