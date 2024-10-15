@@ -1,0 +1,67 @@
+name: doughnut GCP MIG Status Check
+
+on:
+  schedule:
+    - cron: '*/7 * * * *'  # Runs every 7 minutes
+
+env:
+  GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
+
+jobs:
+  Check-Rollout:
+    name: Check GCP MIG Stability
+    runs-on: ${{ vars.RUNNER }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/gcloud_auth_n_sdk
+        with:
+          credentials_json: ${{ env.GCP_CREDENTIALS }}
+      - name: Check doughnut MIG Status
+        run: |
+          PROJECT_ID=$(gcloud config get-value project)
+          ZONE=us-east1-b
+          MIG_NAME=doughnut-app-group
+
+          # Check MIG status
+          max_attempts=3
+          attempt=1
+          while [ $attempt -le $max_attempts ]; do
+            echo "Attempt $attempt: Checking MIG status..."
+
+            status=$(gcloud compute instance-groups managed describe $MIG_NAME \
+              --project=$PROJECT_ID \
+              --zone=$ZONE \
+              --format='value(status.isStable)' 2>&1)
+
+            if [ $? -eq 0 ]; then
+              status_case_insensitive=$(echo "$status" | tr '[:upper:]' '[:lower:]')
+              if [ "$status_case_insensitive" = "true" ]; then
+                echo "doughnut MIG is STABLE."
+                exit 0
+              else
+                echo "doughunt MIG is NOT Stable. Current status: $status"
+              fi
+            else
+              echo "Error querying doughnut MIG status: $status"
+              echo "Retrying..."
+            fi
+
+            sleep 120
+            attempt=$((attempt+1))
+          done
+
+          echo "doughnut MIG did not stabilize within the expected time"
+          echo "Final doughnut MIG details:"
+          gcloud compute instance-groups managed describe $MIG_NAME \
+            --project=$PROJECT_ID \
+            --zone=$REGION
+            exit 1
+          fi
+
+      - name: Send Notification on Failure
+        if: failure()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: "doughnut MIG Status Check Failed. Please check the logs for more details."
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
