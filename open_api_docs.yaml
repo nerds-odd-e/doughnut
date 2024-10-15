@@ -1050,7 +1050,7 @@ paths:
     post:
       tags:
       - rest-note-controller
-      operationId: sendFeedback
+      operationId: sendNoteFeedback
       parameters:
       - name: note
         in: path
@@ -1314,7 +1314,7 @@ paths:
     post:
       tags:
       - rest-conversation-message-controller
-      operationId: sendFeedback_1
+      operationId: sendFeedback
       parameters:
       - name: assessmentQuestion
         in: path

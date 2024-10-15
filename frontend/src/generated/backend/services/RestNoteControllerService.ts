@@ -3,6 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { AudioUploadDTO } from '../models/AudioUploadDTO';
+import type { Conversation } from '../models/Conversation';
 import type { NoteAccessoriesDTO } from '../models/NoteAccessoriesDTO';
 import type { NoteAccessory } from '../models/NoteAccessory';
 import type { NoteCreationDTO } from '../models/NoteCreationDTO';
@@ -124,6 +125,29 @@ export class RestNoteControllerService {
             path: {
                 'note': note,
             },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param note
+     * @param requestBody
+     * @returns Conversation OK
+     * @throws ApiError
+     */
+    public sendNoteFeedback(
+        note: number,
+        requestBody: string,
+    ): CancelablePromise<Conversation> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/notes/{note}/conversation',
+            path: {
+                'note': note,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
                 500: `Internal Server Error`,
             },
