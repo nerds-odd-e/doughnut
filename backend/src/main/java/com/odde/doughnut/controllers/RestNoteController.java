@@ -11,6 +11,7 @@ import com.odde.doughnut.models.NoteMotionModel;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.SearchTermModel;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.ConversationService;
 import com.odde.doughnut.services.NoteConstructionService;
 import com.odde.doughnut.services.WikidataService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
@@ -37,15 +38,18 @@ class RestNoteController {
   private final UserModel currentUser;
   private final WikidataService wikidataService;
   private final TestabilitySettings testabilitySettings;
+  private final ConversationService conversationService;
 
   public RestNoteController(
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
       HttpClientAdapter httpClientAdapter,
-      TestabilitySettings testabilitySettings) {
+      TestabilitySettings testabilitySettings,
+      ConversationService conversationService) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
+    this.conversationService = conversationService;
     this.wikidataService =
         new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
   }
@@ -249,5 +253,14 @@ class RestNoteController {
         .distinct()
         .map(parent -> new NoteViewer(currentUser.getEntity(), parent).toJsonObject())
         .toList();
+  }
+
+  @PostMapping("/{note}/conversation")
+  public Conversation sendFeedback(
+      @PathVariable("note") @Schema(type = "integer") Note note, @RequestBody String message) {
+    Conversation conversation =
+        conversationService.startConversationOfNote(note, currentUser.getEntity());
+    conversationService.addMessageToConversation(conversation, currentUser.getEntity(), message);
+    return conversation;
   }
 }

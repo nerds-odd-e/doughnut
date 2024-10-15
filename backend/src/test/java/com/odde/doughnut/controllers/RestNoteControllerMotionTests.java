@@ -11,6 +11,7 @@ import com.odde.doughnut.exceptions.MovementNotPossibleException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.ConversationService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -28,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class RestNoteControllerMotionTests {
   @Autowired ModelFactoryService modelFactoryService;
+  ConversationService conversationService;
 
   @Autowired MakeMe makeMe;
   @Mock HttpClientAdapter httpClientAdapter;
@@ -41,7 +43,11 @@ class RestNoteControllerMotionTests {
     userModel = makeMe.aUser().toModelPlease();
     controller =
         new RestNoteController(
-            modelFactoryService, userModel, httpClientAdapter, testabilitySettings);
+            modelFactoryService,
+            userModel,
+            httpClientAdapter,
+            testabilitySettings,
+            conversationService);
     subject = makeMe.aNote("subject").creatorAndOwner(userModel).please();
   }
 

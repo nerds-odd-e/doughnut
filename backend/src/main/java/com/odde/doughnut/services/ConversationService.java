@@ -3,6 +3,7 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.entities.AssessmentQuestionInstance;
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.ConversationMessage;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.util.List;
@@ -19,6 +20,14 @@ public class ConversationService {
       AssessmentQuestionInstance assessmentQuestionInstance, User initiator) {
     Conversation conversation = new Conversation();
     conversation.setAssessmentQuestionInstance(assessmentQuestionInstance);
+    conversation.setConversationInitiator(initiator);
+    modelFactoryService.conversationRepository.save(conversation);
+    return conversation;
+  }
+
+  public Conversation startConversationOfNote(Note note, User initiator) {
+    Conversation conversation = new Conversation();
+    conversation.setNote(note);
     conversation.setConversationInitiator(initiator);
     modelFactoryService.conversationRepository.save(conversation);
     return conversation;

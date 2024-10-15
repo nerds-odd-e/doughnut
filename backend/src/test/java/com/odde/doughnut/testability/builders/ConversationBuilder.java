@@ -34,6 +34,11 @@ public class ConversationBuilder extends EntityBuilder<Conversation> {
     return this;
   }
 
+  public ConversationBuilder forANote(Note note) {
+    this.entity.setNote(note);
+    return this;
+  }
+
   public ConversationBuilder from(UserModel currentUser) {
     this.entity.setConversationInitiator(currentUser.getEntity());
     return this;

@@ -17,6 +17,10 @@ public class Conversation extends EntityIdentifiedByIdOnly {
   AssessmentQuestionInstance assessmentQuestionInstance;
 
   @ManyToOne
+  @JoinColumn(name = "note_id", referencedColumnName = "id")
+  Note note;
+
+  @ManyToOne
   @JoinColumn(name = "subject_ownership_id", referencedColumnName = "id")
   Ownership subjectOwnership;
 
@@ -38,5 +42,10 @@ public class Conversation extends EntityIdentifiedByIdOnly {
     this.assessmentQuestionInstance = assessmentQuestionInstance;
     this.subjectOwnership =
         assessmentQuestionInstance.getAssessmentAttempt().getNotebook().getOwnership();
+  }
+
+  public void setNote(Note note) {
+    this.note = note;
+    this.subjectOwnership = note.getNotebook().getOwnership();
   }
 }

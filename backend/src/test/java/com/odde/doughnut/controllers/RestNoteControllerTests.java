@@ -12,6 +12,7 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.ConversationService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.MakeMeWithoutDB;
@@ -41,6 +42,7 @@ import org.springframework.validation.BindException;
 @Transactional
 class RestNoteControllerTests {
   @Autowired ModelFactoryService modelFactoryService;
+  @Autowired ConversationService conversationService;
 
   @Autowired MakeMe makeMe;
   @Mock HttpClientAdapter httpClientAdapter;
@@ -54,7 +56,11 @@ class RestNoteControllerTests {
 
     controller =
         new RestNoteController(
-            modelFactoryService, userModel, httpClientAdapter, testabilitySettings);
+            modelFactoryService,
+            userModel,
+            httpClientAdapter,
+            testabilitySettings,
+            conversationService);
   }
 
   private void mockWikidataEntity(String wikidataId, String label)
@@ -546,4 +552,6 @@ class RestNoteControllerTests {
       return link.getReviewSetting().getLevel();
     }
   }
+
+  
 }
