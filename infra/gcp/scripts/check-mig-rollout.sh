@@ -36,5 +36,5 @@ echo "MIG rollout did not stabilize within the expected time"
 echo "Final MIG details:"
 gcloud compute instance-groups managed describe $MIG_NAME \
   --project=$PROJECT_ID \
-  --zone=$REGION
+  --zone=$ZONE
 exit 1
