@@ -10,7 +10,6 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
-
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -75,8 +74,7 @@ class ConversationMessageServiceTest {
       List<Integer> conversationIds = new ArrayList<>();
       conversationIds.add(1);
       assertThat(
-          conversationService.getConversationDetailsByConversationIds(conversationIds),
-          hasSize(0));
+          conversationService.getConversationDetailsByConversationIds(conversationIds), hasSize(0));
     }
 
     @Test
@@ -86,8 +84,9 @@ class ConversationMessageServiceTest {
       conversationService.addMessageToConversation(conversation, currentUser.getEntity(), message);
       List<Integer> conversationIds = new ArrayList<>();
       conversationIds.add(conversation.getId());
-      List<ConversationMessage> conversationMessages = conversationService.getConversationDetailsByConversationIds(conversationIds);
-      assertThat(conversationMessages,hasSize(1));
+      List<ConversationMessage> conversationMessages =
+          conversationService.getConversationDetailsByConversationIds(conversationIds);
+      assertThat(conversationMessages, hasSize(1));
       assertEquals(message, conversationMessages.getFirst().getMessage());
     }
 

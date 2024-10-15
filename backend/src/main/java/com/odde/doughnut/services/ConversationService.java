@@ -8,7 +8,6 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -54,9 +53,10 @@ public class ConversationService {
         conversationId);
   }
 
-  public List<ConversationMessage> getConversationDetailsByConversationIds(List<Integer> conversationIds) {
+  public List<ConversationMessage> getConversationDetailsByConversationIds(
+      List<Integer> conversationIds) {
     return conversationIds.stream()
-    .flatMap(id -> getConversionDetailRelatedByConversationId(id).stream())
-    .collect(Collectors.toList());    
+        .flatMap(id -> getConversionDetailRelatedByConversationId(id).stream())
+        .collect(Collectors.toList());
   }
 }
