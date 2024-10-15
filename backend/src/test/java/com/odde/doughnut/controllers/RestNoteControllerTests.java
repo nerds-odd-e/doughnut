@@ -520,6 +520,25 @@ class RestNoteControllerTests {
   }
 
   @Nested
+  class SendNoteFeedbackTests {
+
+    @BeforeEach
+    void setup() {
+      userModel = makeMe.aUser().toModelPlease();
+    }
+
+    @Test
+    void testSendNoteFeedback() {
+      Note note = makeMe.aNote().creatorAndOwner(userModel).please();
+      String feedback = "This is a feedback sent from note";
+      controller.sendNoteFeedback(note, feedback);
+      List<Conversation> conversations =
+          (List<Conversation>) modelFactoryService.conversationRepository.findAll();
+      assertEquals(1, conversations.size());
+    }
+  }
+
+  @Nested
   class UpdateReviewSetting {
     Note source;
     Note target;
