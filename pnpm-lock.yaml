@@ -104,8 +104,8 @@ importers:
         specifier: ^0.12.2
         version: 0.12.2
       marked:
-        specifier: ^14.1.2
-        version: 14.1.2
+        specifier: ^14.1.3
+        version: 14.1.3
       mini-debounce:
         specifier: ^1.0.8
         version: 1.0.8
@@ -156,8 +156,8 @@ importers:
         specifier: ^7.1.2
         version: 7.1.2(webpack@5.95.0(esbuild@0.24.0))
       es-toolkit:
-        specifier: ^1.25.0
-        version: 1.25.0
+        specifier: ^1.25.1
+        version: 1.25.1
       jsdom:
         specifier: ^25.0.1
         version: 25.0.1(bufferutil@4.0.8)(utf-8-validate@6.0.4)
@@ -1459,8 +1459,8 @@ packages:
     resolution: {integrity: sha512-Izi8RQcffqCeNVgFigKli1ssklIbpHnCYc6AknXGYoB6grJqyeby7jv12JUQgmTAnIDnbck1uxksT4dzN3PWBA==}
     engines: {node: '>=12'}
 
-  ast-kit@1.2.1:
-    resolution: {integrity: sha512-h31wotR7rkFLrlmGPn0kGqOZ/n5EQFvp7dBs400chpHDhHc8BK3gpvyHDluRujuGgeoTAv3dSIMz9BI3JxAWyQ==}
+  ast-kit@1.3.0:
+    resolution: {integrity: sha512-ORycPY6qYSrAGMnSk1tlqy/Y0rFGk/WIYP/H6io0A+jXK2Jp3Il7h8vjfwaLvZUwanjiLwBeE5h3A9M+eQqeNw==}
     engines: {node: '>=16.14.0'}
 
   ast-module-types@6.0.0:
@@ -2125,8 +2125,8 @@ packages:
     engines: {node: '>=0.10.0'}
     hasBin: true
 
-  electron-to-chromium@1.5.36:
-    resolution: {integrity: sha512-HYTX8tKge/VNp6FGO+f/uVDmUkq+cEfcxYhKf15Akc4M5yxt5YmorwlAitKWjWhWQnKcDRBAQKXkhqqXMqcrjw==}
+  electron-to-chromium@1.5.38:
+    resolution: {integrity: sha512-VbeVexmZ1IFh+5EfrYz1I0HTzHVIlJa112UEWhciPyeOcKJGeTv6N8WnG4wsQB81DGCaVEGhpSb6o6a8WYFXXg==}
 
   emoji-regex@10.4.0:
     resolution: {integrity: sha512-EC+0oUMY1Rqm4O6LLrgjtYDvcVYTy7chDnM4Q7030tP4Kwj3u/pR6gP9ygnp2CJMK5Gq+9Q2oqmrFJAz01DXjw==}
@@ -2194,8 +2194,8 @@ packages:
   es-module-lexer@1.5.4:
     resolution: {integrity: sha512-MVNK56NiMrOwitFB7cqDwq0CQutbw+0BvLshJSse0MUNU+y1FC3bUS/AQg7oUng+/wKrrki7JfmwtVHkVfPLlw==}
 
-  es-toolkit@1.25.0:
-    resolution: {integrity: sha512-lFjz98f6ownLM2qBk0+FY10cSGqYX1vEkfwc+vuKhybQVTuUL9JmjZs73A7+GhOaq5afwHUCERHcP9Bl/AgCXw==}
+  es-toolkit@1.25.1:
+    resolution: {integrity: sha512-MVagOA/u9rgdFRfm6aQti7JmPhSDTYIBD3cm0P/l6us+LVf5XT9Drnv/woYXOtezKqwIGZWzb2FdUZyYo/eyug==}
 
   esbuild@0.24.0:
     resolution: {integrity: sha512-FuLPevChGDshgSicjisSooU0cemp/sGXR841D5LHMB7mTVOmsEHcAxaH3irL53+8YDIeVNQEySh4DaYU/iuPqQ==}
@@ -3228,8 +3228,8 @@ packages:
   mailsplit@5.4.0:
     resolution: {integrity: sha512-wnYxX5D5qymGIPYLwnp6h8n1+6P6vz/MJn5AzGjZ8pwICWssL+CCQjWBIToOVHASmATot4ktvlLo6CyLfOXWYA==}
 
-  marked@14.1.2:
-    resolution: {integrity: sha512-f3r0yqpz31VXiDB/wj9GaOB0a2PRLQl6vJmXiFrniNwjkKdvakqJRULhjFKJpxOchlCRiG5fcacoUZY5Xa6PEQ==}
+  marked@14.1.3:
+    resolution: {integrity: sha512-ZibJqTULGlt9g5k4VMARAktMAjXoVnnr+Y3aCqW1oDftcV4BA3UmrBifzXoZyenHRk75csiPu9iwsTj4VNBT0g==}
     engines: {node: '>= 18'}
     hasBin: true
 
@@ -6190,7 +6190,7 @@ snapshots:
       '@babel/types': 7.25.8
       '@rollup/pluginutils': 5.1.2(rollup@4.24.0)
       '@vue/compiler-sfc': 3.5.12
-      ast-kit: 1.2.1
+      ast-kit: 1.3.0
       local-pkg: 0.5.0
       magic-string-ast: 0.6.2
     optionalDependencies:
@@ -6529,7 +6529,7 @@ snapshots:
 
   assertion-error@2.0.1: {}
 
-  ast-kit@1.2.1:
+  ast-kit@1.3.0:
     dependencies:
       '@babel/parser': 7.25.8
       pathe: 1.1.2
@@ -6539,7 +6539,7 @@ snapshots:
   ast-walker-scope@0.6.2:
     dependencies:
       '@babel/parser': 7.25.8
-      ast-kit: 1.2.1
+      ast-kit: 1.3.0
 
   astral-regex@2.0.0: {}
 
@@ -6622,7 +6622,7 @@ snapshots:
   browserslist@4.24.0:
     dependencies:
       caniuse-lite: 1.0.30001668
-      electron-to-chromium: 1.5.36
+      electron-to-chromium: 1.5.38
       node-releases: 2.0.18
       update-browserslist-db: 1.1.1(browserslist@4.24.0)
 
@@ -7234,7 +7234,7 @@ snapshots:
     dependencies:
       jake: 10.9.2
 
-  electron-to-chromium@1.5.36: {}
+  electron-to-chromium@1.5.38: {}
 
   emoji-regex@10.4.0: {}
 
@@ -7304,7 +7304,7 @@ snapshots:
 
   es-module-lexer@1.5.4: {}
 
-  es-toolkit@1.25.0: {}
+  es-toolkit@1.25.1: {}
 
   esbuild@0.24.0:
     optionalDependencies:
@@ -8520,7 +8520,7 @@ snapshots:
       libmime: 5.2.0
       libqp: 2.0.1
 
-  marked@14.1.2: {}
+  marked@14.1.3: {}
 
   media-typer@0.3.0: {}
 
