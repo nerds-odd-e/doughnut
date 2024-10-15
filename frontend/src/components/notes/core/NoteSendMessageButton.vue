@@ -4,7 +4,7 @@
       <slot />
     </template>
     <template #default="{ closer }">
-      <NoteSendMessageDialogue
+      <NoteSendMessageDialog
         v-bind="{ parentId, storageAccessor }"
         @close-dialog="closer"
       />
