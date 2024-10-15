@@ -25,7 +25,7 @@
 
       <NoteSendMessageButton
         button-title="Send message about note top bazaar"
-        v-bind="{ parentId: note.id, storageAccessor }"
+        v-bind="{ noteId: note.id }"
       >
         <SvgChat />
       </NoteSendMessageButton>
