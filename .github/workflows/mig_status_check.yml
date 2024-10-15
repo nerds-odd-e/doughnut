@@ -39,7 +39,7 @@ jobs:
                 echo "doughnut MIG is STABLE."
                 exit 0
               else
-                echo "doughunt MIG is NOT Stable. Current status: $status"
+                echo "doughnut MIG is NOT Stable. Current status: $status"
               fi
             else
               echo "Error querying doughnut MIG status: $status"
@@ -54,9 +54,8 @@ jobs:
           echo "Final doughnut MIG details:"
           gcloud compute instance-groups managed describe $MIG_NAME \
             --project=$PROJECT_ID \
-            --zone=$REGION
-            exit 1
-          fi
+            --zone=$ZONE
+          exit 1
 
       - name: Send Notification on Failure
         if: failure()
