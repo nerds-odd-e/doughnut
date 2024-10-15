@@ -15,17 +15,9 @@
       <div class="d-flex flex-grow-1 justify-content-between">
         <div class="d-flex flex-grow-1" id="head-status" />
         <div class="btn-group btn-group-sm">
-          <PopButton v-if="user" title="Message center link">
-            <template #button_face>
-              <SvgMessage />
-            </template>
-            <template #default="{ closer }">
-              <LinkNoteDialog
-                v-bind="{ storageAccessor }"
-                @close-dialog="closer"
-              />
-            </template>
-          </PopButton>
+          <button v-if="user" class="btn btn-link" title="Message center link" @click="navigateToMessages">
+            <SvgMessage />
+          </button>
           <PopButton v-if="user" title="search note">
             <template #button_face>
               <SvgSearch />
@@ -54,6 +46,7 @@ import type { User } from "@/generated/backend"
 import { type ApiStatus } from "@/managedApi/ManagedApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import type { PropType } from "vue"
+import { useRouter } from "vue-router"
 
 defineProps({
   storageAccessor: {
@@ -64,6 +57,12 @@ defineProps({
   user: { type: Object as PropType<User> },
 })
 defineEmits(["updateUser", "clearErrorMessage"])
+
+const router = useRouter()
+
+const navigateToMessages = () => {
+  router.push('/d/feedback') // Replace '/messages' with the actual route path
+}
 </script>
 
 <style scoped lang="scss">

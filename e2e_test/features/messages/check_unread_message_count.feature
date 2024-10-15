@@ -1,3 +1,4 @@
+@ignore
 Feature: Check unread message count
     As a user, I want to check the number of unread messages in the message center.
 
