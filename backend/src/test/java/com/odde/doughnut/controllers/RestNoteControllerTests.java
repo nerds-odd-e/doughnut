@@ -552,6 +552,4 @@ class RestNoteControllerTests {
       return link.getReviewSetting().getLevel();
     }
   }
-
-  
 }
