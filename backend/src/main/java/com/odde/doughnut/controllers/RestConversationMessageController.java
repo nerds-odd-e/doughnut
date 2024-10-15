@@ -39,6 +39,12 @@ public class RestConversationMessageController {
     return conversationService.conversationRelatedToUser(currentUser.getEntity());
   }
 
+  @GetMapping("/unreadCount")
+  public int getUnreadConversationCountOfCurrentUser() {
+    currentUser.assertLoggedIn();
+    return 1;
+  }
+
   @PostMapping("/detail/send/{conversationId}")
   public ConversationMessage replyToConversation(
       @RequestBody String message,

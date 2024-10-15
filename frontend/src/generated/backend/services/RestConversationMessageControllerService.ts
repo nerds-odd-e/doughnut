@@ -55,6 +55,19 @@ export class RestConversationMessageControllerService {
         });
     }
     /**
+     * @returns number OK
+     * @throws ApiError
+     */
+    public getUnreadConversationCountOfCurrentUser(): CancelablePromise<number> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/message/unreadCount',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
      * @param conversationId
      * @returns ConversationMessage OK
      * @throws ApiError
