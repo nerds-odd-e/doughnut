@@ -23,12 +23,12 @@
         </template>
       </PopButton>
 
-      <NoteNewButton
+      <NoteSendMessageButton
         button-title="Send message about note top bazaar"
         v-bind="{ parentId: note.id, storageAccessor }"
       >
         <SvgChat />
-      </NoteNewButton>
+      </NoteSendMessageButton>
 
       <PopButton title="search and link note">
         <template #button_face>
@@ -125,6 +125,7 @@ import Questions from "../Questions.vue"
 import NoteInfoBar from "../NoteInfoBar.vue"
 import SvgMarkdown from "@/components/svgs/SvgMarkdown.vue"
 import SvgRichContent from "@/components/svgs/SvgRichContent.vue"
+import NoteSendMessageButton from "./NoteSendMessageButton.vue"
 
 const props = defineProps({
   storageAccessor: {

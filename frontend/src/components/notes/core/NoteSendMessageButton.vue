@@ -17,7 +17,7 @@ import type { PropType } from "vue"
 import { defineComponent } from "vue"
 import type { StorageAccessor } from "../../../store/createNoteStorage"
 import PopButton from "../../commons/Popups/PopButton.vue"
-import NoteSendMessageDialogue from "../NoteSendMessageDialogue.vue"
+import NoteSendMessageDialog from "../NoteSendMessageDialog.vue"
 
 export default defineComponent({
   props: {
@@ -28,6 +28,6 @@ export default defineComponent({
       required: true,
     },
   },
-  components: { PopButton, NoteSendMessageDialogue },
+  components: { PopButton, NoteSendMessageDialog },
 })
 </script>
