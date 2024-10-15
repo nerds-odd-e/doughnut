@@ -61,7 +61,7 @@ defineEmits(["updateUser", "clearErrorMessage"])
 const router = useRouter()
 
 const navigateToMessages = () => {
-  router.push('/d/feedback') // Replace '/messages' with the actual route path
+  router.push("/d/feedback")
 }
 </script>
 
