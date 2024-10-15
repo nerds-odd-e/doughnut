@@ -17,8 +17,9 @@ runs:
     - name: Install pnpm
       uses: pnpm/action-setup@v4
       with:
-        version: ${{ inputs.pnpm_version }}
-        run_install: false
+        run_install: |
+          - recursive: true
+            args: [--frozen-lockfile, --strict-peer-dependencies]
     - name: Get pnpm store directory
       shell: bash
       run: |

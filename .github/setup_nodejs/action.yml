@@ -17,7 +17,6 @@ runs:
     - name: Setup pnpm & install deps
       uses: pnpm/action-setup@v4
       with:
-        version: ${{ inputs.pnpm_version }}
         run_install: |
           - recursive: true
             args: [--frozen-lockfile, --strict-peer-dependencies]
