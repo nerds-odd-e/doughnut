@@ -101,6 +101,15 @@ class RestConversationMessageControllerTest {
   }
 
   @Test
+  void testGetUnreadConversationCountofCurrentUser() {
+    Conversation conversation = makeMe.aConversation().from(currentUser).please();
+
+    makeMe.aConversationMessage().forConversationInstance(conversation).please();
+    int conversations = controller.getUnreadConversationCountOfCurrentUser();
+    assertEquals(1, conversations);
+  }
+
+  @Test
   void shouldNotBeAbleToReplyToAConversationIAmNotIn() {
     Conversation conversation = makeMe.aConversation().please();
     assertThrows(
