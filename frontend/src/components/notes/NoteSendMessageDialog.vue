@@ -1,17 +1,18 @@
 <template>
-  <div>
-    <h2>Give Feedback</h2>
-    <p>
-      <i>
-        Please tell us if there is anything wrong with the question.
-      </i>
-    </p>
-    <TextArea
-      field="comment"
-      placeholder="Give feedback about the question"
-      :rows="5"
-    />
-  </div>
+    <div>
+      <h2>Send message to bazaar</h2>
+      <p>
+        <i>
+          Let's discuss about this note!
+        </i>
+      </p>
+      <TextArea
+        field="message"
+        placeholder="Send message about the question"
+        :rows="5"
+      />
+    </div>
 </template>
 
-<script/>
+<script>
+</script>
