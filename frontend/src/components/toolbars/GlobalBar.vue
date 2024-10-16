@@ -17,6 +17,9 @@
         <div class="btn-group btn-group-sm">
           <router-link to="/d/feedback">
             <div id="top-navbar-message-icon">
+              <!-- <div class="unread-count">
+                1
+              </div> -->
               <SvgMessage />
             </div>
           </router-link>

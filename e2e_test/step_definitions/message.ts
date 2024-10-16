@@ -57,3 +57,12 @@ Then(
     start.reloginAndEnsureHomePage(user).checkForMessageCenterIcon()
   }
 )
+
+Then(
+  '{string} can see the notification icon with {int} unread messages',
+  (user: string, unreadMessageCount: number) => {
+    start
+      .reloginAndEnsureHomePage(user)
+      .checkForUnreadMessageCount(unreadMessageCount)
+  }
+)

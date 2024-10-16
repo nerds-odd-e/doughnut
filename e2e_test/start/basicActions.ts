@@ -52,7 +52,13 @@ export default {
     this.reloginAsAdmin()
     return this.goToAdminDashboard()
   },
+  getUnreadMessageCount() {
+    return cy.get('#top-navbar-message-icon').get('.unread-count')
+  },
   checkForMessageCenterIcon() {
-    cy.get('#top-navbar-message-icon').should('exist')
+    this.getUnreadMessageCount().should('not.exist')
+  },
+  checkForUnreadMessageCount(unreadMessageCount: number) {
+    this.getUnreadMessageCount().should('contain', unreadMessageCount)
   },
 }
