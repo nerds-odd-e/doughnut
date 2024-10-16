@@ -136,7 +136,7 @@ export class RestNoteControllerService {
      * @returns Conversation OK
      * @throws ApiError
      */
-    public sendNoteFeedback(
+    public sendNoteMessage(
         note: number,
         requestBody: string,
     ): CancelablePromise<Conversation> {

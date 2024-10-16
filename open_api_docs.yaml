@@ -3,12 +3,12 @@ info:
   title: OpenAPI definition
   version: v0
 servers:
-- {}
+  - { }
 paths:
   /api/user:
     get:
       tags:
-      - rest-user-controller
+        - rest-user-controller
       operationId: getUserProfile
       responses:
         "500":
@@ -25,7 +25,7 @@ paths:
                 $ref: "#/components/schemas/User"
     post:
       tags:
-      - rest-user-controller
+        - rest-user-controller
       operationId: createUser
       requestBody:
         content:
@@ -49,7 +49,7 @@ paths:
   /api/testability/use_real_sandbox_github_and_close_all_github_issues:
     post:
       tags:
-      - testability-rest-controller
+        - testability-rest-controller
       operationId: closeAllGithubIssues
       responses:
         "500":
@@ -67,7 +67,7 @@ paths:
   /api/testability/update_current_user:
     post:
       tags:
-      - testability-rest-controller
+        - testability-rest-controller
       operationId: updateCurrentUser
       requestBody:
         content:
@@ -93,7 +93,7 @@ paths:
   /api/testability/trigger_exception:
     post:
       tags:
-      - testability-rest-controller
+        - testability-rest-controller
       operationId: triggerException
       responses:
         "500":
@@ -111,7 +111,7 @@ paths:
   /api/testability/time_travel_relative_to_now:
     post:
       tags:
-      - testability-rest-controller
+        - testability-rest-controller
       operationId: timeTravelRelativeToNow
       requestBody:
         content:
@@ -137,7 +137,7 @@ paths:
   /api/testability/time_travel:
     post:
       tags:
-      - testability-rest-controller
+        - testability-rest-controller
       operationId: timeTravel
       requestBody:
         content:
@@ -163,7 +163,7 @@ paths:
   /api/testability/share_to_bazaar:
     post:
       tags:
-      - testability-rest-controller
+        - testability-rest-controller
       operationId: shareToBazaar
       requestBody:
         content:
@@ -189,7 +189,7 @@ paths:
   /api/testability/replace_service_url:
     post:
       tags:
-      - testability-rest-controller
+        - testability-rest-controller
       operationId: replaceServiceUrl
       requestBody:
         content:
@@ -217,7 +217,7 @@ paths:
   /api/testability/randomizer:
     post:
       tags:
-      - testability-rest-controller
+        - testability-rest-controller
       operationId: randomizer
       requestBody:
         content:
@@ -243,7 +243,7 @@ paths:
   /api/testability/link_notes:
     post:
       tags:
-      - testability-rest-controller
+        - testability-rest-controller
       operationId: linkNotes
       requestBody:
         content:
@@ -269,7 +269,7 @@ paths:
   /api/testability/inject_suggested_questions:
     post:
       tags:
-      - testability-rest-controller
+        - testability-rest-controller
       operationId: injectSuggestedQuestion
       requestBody:
         content:
@@ -293,7 +293,7 @@ paths:
   /api/testability/inject_notes:
     post:
       tags:
-      - testability-rest-controller
+        - testability-rest-controller
       operationId: injectNotes
       requestBody:
         content:
@@ -320,7 +320,7 @@ paths:
   /api/testability/inject_circle:
     post:
       tags:
-      - testability-rest-controller
+        - testability-rest-controller
       operationId: injectCircle
       requestBody:
         content:
@@ -346,7 +346,7 @@ paths:
   /api/testability/inject-predefined-questions:
     post:
       tags:
-      - testability-rest-controller
+        - testability-rest-controller
       operationId: injectPredefinedQuestion
       requestBody:
         content:
@@ -372,7 +372,7 @@ paths:
   /api/testability/feature_toggle:
     get:
       tags:
-      - testability-rest-controller
+        - testability-rest-controller
       operationId: getFeatureToggle
       responses:
         "500":
@@ -389,7 +389,7 @@ paths:
                 type: boolean
     post:
       tags:
-      - testability-rest-controller
+        - testability-rest-controller
       operationId: enableFeatureToggle
       requestBody:
         content:
@@ -417,7 +417,7 @@ paths:
   /api/testability/clean_db_and_reset_testability_settings:
     post:
       tags:
-      - testability-rest-controller
+        - testability-rest-controller
       operationId: resetDBAndTestabilitySettings
       responses:
         "500":
@@ -435,14 +435,14 @@ paths:
   /api/subscriptions/{subscription}:
     post:
       tags:
-      - rest-subscription-controller
+        - rest-subscription-controller
       operationId: update
       parameters:
-      - name: subscription
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: subscription
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
         content:
           application/json:
@@ -465,9 +465,9 @@ paths:
   /api/subscriptions/{subscription}/delete:
     post:
       tags:
-      - rest-subscription-controller
+        - rest-subscription-controller
       operationId: destroySubscription
-      parameters: []
+      parameters: [ ]
       responses:
         "500":
           description: Internal Server Error
@@ -487,14 +487,14 @@ paths:
   /api/subscriptions/notebooks/{notebook}/subscribe:
     post:
       tags:
-      - rest-subscription-controller
+        - rest-subscription-controller
       operationId: createSubscription
       parameters:
-      - name: notebook
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: notebook
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
         content:
           application/json:
@@ -517,7 +517,7 @@ paths:
   /api/settings/current-model-version:
     get:
       tags:
-      - rest-global-settings-controller
+        - rest-global-settings-controller
       operationId: getCurrentModelVersions
       responses:
         "500":
@@ -534,7 +534,7 @@ paths:
                 $ref: "#/components/schemas/GlobalAiModelSettings"
     post:
       tags:
-      - rest-global-settings-controller
+        - rest-global-settings-controller
       operationId: setCurrentModelVersions
       requestBody:
         content:
@@ -558,7 +558,7 @@ paths:
   /api/reviews:
     post:
       tags:
-      - rest-reviews-controller
+        - rest-reviews-controller
       operationId: create
       requestBody:
         content:
@@ -582,14 +582,14 @@ paths:
   /api/review-questions/{reviewQuestionInstance}/toggle-approval:
     post:
       tags:
-      - rest-predefined-question-controller
+        - rest-predefined-question-controller
       operationId: toggleApproval
       parameters:
-      - name: reviewQuestionInstance
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: reviewQuestionInstance
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -606,14 +606,14 @@ paths:
   /api/review-questions/{reviewQuestionInstance}/regenerate:
     post:
       tags:
-      - rest-review-question-controller
+        - rest-review-question-controller
       operationId: regenerate
       parameters:
-      - name: reviewQuestionInstance
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: reviewQuestionInstance
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -630,14 +630,14 @@ paths:
   /api/review-questions/{reviewQuestionInstance}/contest:
     post:
       tags:
-      - rest-review-question-controller
+        - rest-review-question-controller
       operationId: contest
       parameters:
-      - name: reviewQuestionInstance
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: reviewQuestionInstance
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -654,14 +654,14 @@ paths:
   /api/review-questions/{reviewQuestionInstance}/answer:
     post:
       tags:
-      - rest-review-question-controller
+        - rest-review-question-controller
       operationId: answerQuiz
       parameters:
-      - name: reviewQuestionInstance
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: reviewQuestionInstance
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
         content:
           application/json:
@@ -684,14 +684,14 @@ paths:
   /api/review-questions/{predefinedQuestion}/suggest-fine-tuning:
     post:
       tags:
-      - rest-predefined-question-controller
+        - rest-predefined-question-controller
       operationId: suggestQuestionForFineTuning
       parameters:
-      - name: predefinedQuestion
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: predefinedQuestion
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
         content:
           application/json:
@@ -714,14 +714,14 @@ paths:
   /api/review-questions/{note}/refine-question:
     post:
       tags:
-      - rest-predefined-question-controller
+        - rest-predefined-question-controller
       operationId: refineQuestion
       parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: note
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
         content:
           application/json:
@@ -744,14 +744,14 @@ paths:
   /api/review-questions/{note}/note-questions:
     get:
       tags:
-      - rest-predefined-question-controller
+        - rest-predefined-question-controller
       operationId: getAllQuestionByNote
       parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: note
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -769,14 +769,14 @@ paths:
                   $ref: "#/components/schemas/PredefinedQuestion"
     post:
       tags:
-      - rest-predefined-question-controller
+        - rest-predefined-question-controller
       operationId: addQuestionManually
       parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: note
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
         content:
           application/json:
@@ -799,14 +799,14 @@ paths:
   /api/review-questions/generate-question:
     post:
       tags:
-      - rest-review-question-controller
+        - rest-review-question-controller
       operationId: generateQuestion
       parameters:
-      - name: note
-        in: query
-        required: true
-        schema:
-          type: integer
+        - name: note
+          in: query
+          required: true
+          schema:
+            type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -823,14 +823,14 @@ paths:
   /api/review-questions/generate-question-without-save:
     post:
       tags:
-      - rest-predefined-question-controller
+        - rest-predefined-question-controller
       operationId: generateQuestionWithoutSave
       parameters:
-      - name: note
-        in: query
-        required: true
-        schema:
-          type: integer
+        - name: note
+          in: query
+          required: true
+          schema:
+            type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -847,14 +847,14 @@ paths:
   /api/review-points/{reviewPoint}/self-evaluate:
     post:
       tags:
-      - rest-review-point-controller
+        - rest-review-point-controller
       operationId: selfEvaluate
       parameters:
-      - name: reviewPoint
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: reviewPoint
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
         content:
           application/json:
@@ -877,14 +877,14 @@ paths:
   /api/review-points/{reviewPoint}/remove:
     post:
       tags:
-      - rest-review-point-controller
+        - rest-review-point-controller
       operationId: removeFromRepeating
       parameters:
-      - name: reviewPoint
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: reviewPoint
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -901,14 +901,14 @@ paths:
   /api/notes/{parentNote}/create:
     post:
       tags:
-      - rest-note-controller
+        - rest-note-controller
       operationId: createNote
       parameters:
-      - name: parentNote
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: parentNote
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
         content:
           application/json:
@@ -931,14 +931,14 @@ paths:
   /api/notes/{note}/updateWikidataId:
     post:
       tags:
-      - rest-note-controller
+        - rest-note-controller
       operationId: updateWikidataId
       parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: note
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
         content:
           application/json:
@@ -961,14 +961,14 @@ paths:
   /api/notes/{note}/search:
     post:
       tags:
-      - rest-note-controller
+        - rest-note-controller
       operationId: searchForLinkTargetWithin
       parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: note
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
         content:
           application/json:
@@ -993,14 +993,14 @@ paths:
   /api/notes/{note}/review-setting:
     post:
       tags:
-      - rest-note-controller
+        - rest-note-controller
       operationId: updateReviewSetting
       parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: note
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
         content:
           application/json:
@@ -1023,14 +1023,14 @@ paths:
   /api/notes/{note}/delete:
     post:
       tags:
-      - rest-note-controller
+        - rest-note-controller
       operationId: deleteNote
       parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: note
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -1049,14 +1049,14 @@ paths:
   /api/notes/{note}/conversation:
     post:
       tags:
-      - rest-note-controller
-      operationId: sendNoteFeedback
+        - rest-note-controller
+      operationId: sendNoteMessage
       parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: note
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
         content:
           application/json:
@@ -1079,7 +1079,7 @@ paths:
   /api/notes/search:
     post:
       tags:
-      - rest-note-controller
+        - rest-note-controller
       operationId: searchForLinkTarget
       requestBody:
         content:
@@ -1105,24 +1105,24 @@ paths:
   /api/notes/move_after/{note}/{targetNote}/{asFirstChild}:
     post:
       tags:
-      - rest-note-controller
+        - rest-note-controller
       operationId: moveAfter
       parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
-      - name: targetNote
-        in: path
-        required: true
-        schema:
-          type: integer
-      - name: asFirstChild
-        in: path
-        required: true
-        schema:
-          type: string
+        - name: note
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: targetNote
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: asFirstChild
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         "500":
           description: Internal Server Error
@@ -1141,7 +1141,7 @@ paths:
   /api/notes/convertSrt:
     post:
       tags:
-      - rest-ai-audio-controller
+        - rest-ai-audio-controller
       operationId: convertSrt
       requestBody:
         content:
@@ -1164,14 +1164,14 @@ paths:
   /api/notebooks/{notebook}:
     get:
       tags:
-      - rest-notebook-controller
+        - rest-notebook-controller
       operationId: get
       parameters:
-      - name: notebook
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: notebook
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -1187,14 +1187,14 @@ paths:
                 $ref: "#/components/schemas/Notebook"
     post:
       tags:
-      - rest-notebook-controller
+        - rest-notebook-controller
       operationId: update_1
       parameters:
-      - name: notebook
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: notebook
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
         content:
           application/json:
@@ -1217,14 +1217,14 @@ paths:
   /api/notebooks/{notebook}/share:
     post:
       tags:
-      - rest-notebook-controller
+        - rest-notebook-controller
       operationId: shareNotebook
       parameters:
-      - name: notebook
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: notebook
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -1241,7 +1241,7 @@ paths:
   /api/notebooks/create:
     post:
       tags:
-      - rest-notebook-controller
+        - rest-notebook-controller
       operationId: createNotebook
       requestBody:
         content:
@@ -1265,14 +1265,14 @@ paths:
   /api/notebook_certificate_approvals/{notebookCertificateApproval}/approve:
     post:
       tags:
-      - rest-notebook-certificate-approval-controller
+        - rest-notebook-certificate-approval-controller
       operationId: approve
       parameters:
-      - name: notebookCertificateApproval
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: notebookCertificateApproval
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -1289,14 +1289,14 @@ paths:
   /api/notebook_certificate_approvals/request-approval/{notebook}:
     post:
       tags:
-      - rest-notebook-certificate-approval-controller
+        - rest-notebook-certificate-approval-controller
       operationId: requestApprovalForNotebook
       parameters:
-      - name: notebook
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: notebook
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -1313,14 +1313,14 @@ paths:
   /api/message/send/{assessmentQuestion}:
     post:
       tags:
-      - rest-conversation-message-controller
+        - rest-conversation-message-controller
       operationId: sendFeedback
       parameters:
-      - name: assessmentQuestion
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: assessmentQuestion
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
         content:
           application/json:
@@ -1343,14 +1343,14 @@ paths:
   /api/message/detail/send/{conversationId}:
     post:
       tags:
-      - rest-conversation-message-controller
+        - rest-conversation-message-controller
       operationId: replyToConversation
       parameters:
-      - name: conversationId
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: conversationId
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
         content:
           application/json:
@@ -1373,14 +1373,14 @@ paths:
   /api/links/{link}:
     post:
       tags:
-      - rest-link-controller
+        - rest-link-controller
       operationId: updateLink
       parameters:
-      - name: link
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: link
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
         content:
           application/json:
@@ -1405,19 +1405,19 @@ paths:
   /api/links/create/{sourceNote}/{targetNote}:
     post:
       tags:
-      - rest-link-controller
+        - rest-link-controller
       operationId: linkNoteFinalize
       parameters:
-      - name: sourceNote
-        in: path
-        required: true
-        schema:
-          type: integer
-      - name: targetNote
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: sourceNote
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: targetNote
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
         content:
           application/json:
@@ -1442,14 +1442,14 @@ paths:
   /api/fine-tuning/{suggestedQuestion}/duplicate:
     post:
       tags:
-      - rest-fine-tuning-data-controller
+        - rest-fine-tuning-data-controller
       operationId: duplicate
       parameters:
-      - name: suggestedQuestion
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: suggestedQuestion
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -1466,14 +1466,14 @@ paths:
   /api/fine-tuning/{suggestedQuestion}/delete:
     post:
       tags:
-      - rest-fine-tuning-data-controller
+        - rest-fine-tuning-data-controller
       operationId: delete
       parameters:
-      - name: suggestedQuestion
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: suggestedQuestion
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -1490,7 +1490,7 @@ paths:
   /api/fine-tuning/upload-and-trigger-fine-tuning:
     post:
       tags:
-      - rest-fine-tuning-data-controller
+        - rest-fine-tuning-data-controller
       operationId: uploadAndTriggerFineTuning
       responses:
         "500":
@@ -1504,7 +1504,7 @@ paths:
   /api/circles:
     get:
       tags:
-      - rest-circle-controller
+        - rest-circle-controller
       operationId: index
       responses:
         "500":
@@ -1523,7 +1523,7 @@ paths:
                   $ref: "#/components/schemas/Circle"
     post:
       tags:
-      - rest-circle-controller
+        - rest-circle-controller
       operationId: createCircle
       requestBody:
         content:
@@ -1547,14 +1547,14 @@ paths:
   /api/circles/{circle}/notebooks:
     post:
       tags:
-      - rest-circle-controller
+        - rest-circle-controller
       operationId: createNotebookInCircle
       parameters:
-      - name: circle
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: circle
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
         content:
           application/json:
@@ -1577,7 +1577,7 @@ paths:
   /api/circles/join:
     post:
       tags:
-      - rest-circle-controller
+        - rest-circle-controller
       operationId: joinCircle
       requestBody:
         content:
@@ -1601,14 +1601,14 @@ paths:
   /api/certificate/{notebook}:
     get:
       tags:
-      - rest-certificate-controller
+        - rest-certificate-controller
       operationId: getCertificate
       parameters:
-      - name: notebook
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: notebook
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -1624,14 +1624,14 @@ paths:
                 $ref: "#/components/schemas/Certificate"
     post:
       tags:
-      - rest-certificate-controller
+        - rest-certificate-controller
       operationId: claimCertificate
       parameters:
-      - name: notebook
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: notebook
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -1648,14 +1648,14 @@ paths:
   /api/bazaar/{bazaarNotebook}/remove:
     post:
       tags:
-      - rest-bazaar-controller
+        - rest-bazaar-controller
       operationId: removeFromBazaar
       parameters:
-      - name: bazaarNotebook
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: bazaarNotebook
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -1674,14 +1674,14 @@ paths:
   /api/assessment/{assessmentQuestionInstance}/answer:
     post:
       tags:
-      - rest-assessment-controller
+        - rest-assessment-controller
       operationId: answerQuestion
       parameters:
-      - name: assessmentQuestionInstance
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: assessmentQuestionInstance
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
         content:
           application/json:
@@ -1704,14 +1704,14 @@ paths:
   /api/assessment/{assessmentAttempt}:
     post:
       tags:
-      - rest-assessment-controller
+        - rest-assessment-controller
       operationId: submitAssessmentResult
       parameters:
-      - name: assessmentAttempt
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: assessmentAttempt
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -1728,14 +1728,14 @@ paths:
   /api/assessment/questions/{notebook}:
     post:
       tags:
-      - rest-assessment-controller
+        - rest-assessment-controller
       operationId: generateAssessmentQuestions
       parameters:
-      - name: notebook
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: notebook
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -1752,14 +1752,14 @@ paths:
   /api/ai/{note}/completion:
     post:
       tags:
-      - rest-ai-controller
+        - rest-ai-controller
       operationId: getCompletion
       parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: note
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
         content:
           application/json:
@@ -1782,14 +1782,14 @@ paths:
   /api/ai/recreate-notebook-assistant/{notebook}:
     post:
       tags:
-      - rest-ai-controller
+        - rest-ai-controller
       operationId: recreateNotebookAssistant
       parameters:
-      - name: notebook
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: notebook
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
         content:
           application/json:
@@ -1812,7 +1812,7 @@ paths:
   /api/ai/recreate-all-assistants:
     post:
       tags:
-      - rest-ai-controller
+        - rest-ai-controller
       operationId: recreateAllAssistants
       responses:
         "500":
@@ -1832,7 +1832,7 @@ paths:
   /api/ai/generate-image:
     post:
       tags:
-      - rest-ai-controller
+        - rest-ai-controller
       operationId: generateImage
       requestBody:
         content:
@@ -1856,14 +1856,14 @@ paths:
   /api/ai/chat/{note}:
     get:
       tags:
-      - rest-ai-controller
+        - rest-ai-controller
       operationId: tryRestoreChat
       parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: note
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -1881,14 +1881,14 @@ paths:
                   $ref: "#/components/schemas/Message"
     post:
       tags:
-      - rest-ai-controller
+        - rest-ai-controller
       operationId: chat
       parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: note
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
         content:
           application/json:
@@ -1911,7 +1911,7 @@ paths:
   /api/ai/answer-clarifying-question:
     post:
       tags:
-      - rest-ai-controller
+        - rest-ai-controller
       operationId: answerCompletionClarifyingQuestion
       requestBody:
         content:
@@ -1935,14 +1935,14 @@ paths:
   /api/user/{user}:
     patch:
       tags:
-      - rest-user-controller
+        - rest-user-controller
       operationId: updateUser
       parameters:
-      - name: user
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: user
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
         content:
           application/json:
@@ -1965,14 +1965,14 @@ paths:
   /api/text_content/{note}/topic-constructor:
     patch:
       tags:
-      - rest-text-content-controller
+        - rest-text-content-controller
       operationId: updateNoteTopicConstructor
       parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: note
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
         content:
           application/json:
@@ -1995,14 +1995,14 @@ paths:
   /api/text_content/{note}/details:
     patch:
       tags:
-      - rest-text-content-controller
+        - rest-text-content-controller
       operationId: updateNoteDetails
       parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: note
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
         content:
           application/json:
@@ -2025,19 +2025,19 @@ paths:
   /api/review-points/{reviewPoint}/mark-as-repeated:
     patch:
       tags:
-      - rest-review-point-controller
+        - rest-review-point-controller
       operationId: markAsRepeated
       parameters:
-      - name: reviewPoint
-        in: path
-        required: true
-        schema:
-          type: integer
-      - name: successful
-        in: query
-        required: true
-        schema:
-          type: boolean
+        - name: reviewPoint
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: successful
+          in: query
+          required: true
+          schema:
+            type: boolean
       responses:
         "500":
           description: Internal Server Error
@@ -2054,14 +2054,14 @@ paths:
   /api/notes/{note}:
     get:
       tags:
-      - rest-note-controller
+        - rest-note-controller
       operationId: show_1
       parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: note
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -2077,14 +2077,14 @@ paths:
                 $ref: "#/components/schemas/NoteRealm"
     patch:
       tags:
-      - rest-note-controller
+        - rest-note-controller
       operationId: updateNoteAccessories
       parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: note
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
         content:
           multipart/form-data:
@@ -2106,14 +2106,14 @@ paths:
   /api/notes/{note}/undo-delete:
     patch:
       tags:
-      - rest-note-controller
+        - rest-note-controller
       operationId: undoDeleteNote
       parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: note
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -2130,14 +2130,14 @@ paths:
   /api/notes/{note}/audio:
     patch:
       tags:
-      - rest-note-controller
+        - rest-note-controller
       operationId: uploadAudio
       parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: note
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
         content:
           multipart/form-data:
@@ -2159,14 +2159,14 @@ paths:
   /api/notes/{note}/audio-to-srt:
     patch:
       tags:
-      - rest-ai-audio-controller
+        - rest-ai-audio-controller
       operationId: convertNoteAudioToSRT
       parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: note
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -2183,19 +2183,19 @@ paths:
   /api/notebooks/{notebook}/move-to-circle/{circle}:
     patch:
       tags:
-      - rest-notebook-controller
+        - rest-notebook-controller
       operationId: moveToCircle
       parameters:
-      - name: notebook
-        in: path
-        required: true
-        schema:
-          type: integer
-      - name: circle
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: notebook
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: circle
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -2212,14 +2212,14 @@ paths:
   /api/fine-tuning/{suggestedQuestion}/update-suggested-question-for-fine-tuning:
     patch:
       tags:
-      - rest-fine-tuning-data-controller
+        - rest-fine-tuning-data-controller
       operationId: updateSuggestedQuestionForFineTuning
       parameters:
-      - name: suggestedQuestion
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: suggestedQuestion
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
         content:
           application/json:
@@ -2242,14 +2242,14 @@ paths:
   /api/wikidata/search/{search}:
     get:
       tags:
-      - rest-wikidata-controller
+        - rest-wikidata-controller
       operationId: searchWikidata
       parameters:
-      - name: search
-        in: path
-        required: true
-        schema:
-          type: string
+        - name: search
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         "500":
           description: Internal Server Error
@@ -2268,14 +2268,14 @@ paths:
   /api/wikidata/entity-data/{wikidataId}:
     get:
       tags:
-      - rest-wikidata-controller
+        - rest-wikidata-controller
       operationId: fetchWikidataEntityDataByID
       parameters:
-      - name: wikidataId
-        in: path
-        required: true
-        schema:
-          type: string
+        - name: wikidataId
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         "500":
           description: Internal Server Error
@@ -2292,7 +2292,7 @@ paths:
   /api/user/current-user-info:
     get:
       tags:
-      - rest-current-user-info-controller
+        - rest-current-user-info-controller
       operationId: currentUserInfo
       responses:
         "500":
@@ -2310,7 +2310,7 @@ paths:
   /api/testability/github_issues:
     get:
       tags:
-      - testability-rest-controller
+        - testability-rest-controller
       operationId: githubIssues
       responses:
         "500":
@@ -2332,20 +2332,20 @@ paths:
   /api/reviews/repeat:
     get:
       tags:
-      - rest-reviews-controller
+        - rest-reviews-controller
       operationId: repeatReview
       parameters:
-      - name: timezone
-        in: query
-        required: true
-        schema:
-          type: string
-      - name: dueindays
-        in: query
-        required: false
-        schema:
-          type: integer
-          format: int32
+        - name: timezone
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: dueindays
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
       responses:
         "500":
           description: Internal Server Error
@@ -2362,14 +2362,14 @@ paths:
   /api/reviews/overview:
     get:
       tags:
-      - rest-reviews-controller
+        - rest-reviews-controller
       operationId: overview
       parameters:
-      - name: timezone
-        in: query
-        required: true
-        schema:
-          type: string
+        - name: timezone
+          in: query
+          required: true
+          schema:
+            type: string
       responses:
         "500":
           description: Internal Server Error
@@ -2386,14 +2386,14 @@ paths:
   /api/reviews/initial:
     get:
       tags:
-      - rest-reviews-controller
+        - rest-reviews-controller
       operationId: initialReview
       parameters:
-      - name: timezone
-        in: query
-        required: true
-        schema:
-          type: string
+        - name: timezone
+          in: query
+          required: true
+          schema:
+            type: string
       responses:
         "500":
           description: Internal Server Error
@@ -2412,14 +2412,14 @@ paths:
   /api/review-questions/{reviewQuestionInstance}:
     get:
       tags:
-      - rest-review-question-controller
+        - rest-review-question-controller
       operationId: showQuestion
       parameters:
-      - name: reviewQuestionInstance
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: reviewQuestionInstance
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -2436,14 +2436,14 @@ paths:
   /api/review-questions/{reviewPoint}/random-question:
     get:
       tags:
-      - rest-review-question-controller
+        - rest-review-question-controller
       operationId: generateRandomQuestion
       parameters:
-      - name: reviewPoint
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: reviewPoint
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -2460,14 +2460,14 @@ paths:
   /api/review-points/{reviewPoint}:
     get:
       tags:
-      - rest-review-point-controller
+        - rest-review-point-controller
       operationId: show
       parameters:
-      - name: reviewPoint
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: reviewPoint
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -2484,14 +2484,14 @@ paths:
   /api/notes/{note}/note-info:
     get:
       tags:
-      - rest-note-controller
+        - rest-note-controller
       operationId: getNoteInfo
       parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: note
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -2508,14 +2508,14 @@ paths:
   /api/notes/{note}/accessory:
     get:
       tags:
-      - rest-note-controller
+        - rest-note-controller
       operationId: showNoteAccessory
       parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: note
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -2532,7 +2532,7 @@ paths:
   /api/notebooks:
     get:
       tags:
-      - rest-notebook-controller
+        - rest-notebook-controller
       operationId: myNotebooks
       responses:
         "500":
@@ -2550,14 +2550,14 @@ paths:
   /api/notebooks/{notebook}/notes:
     get:
       tags:
-      - rest-notebook-controller
+        - rest-notebook-controller
       operationId: getNotes
       parameters:
-      - name: notebook
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: notebook
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -2576,14 +2576,14 @@ paths:
   /api/notebooks/{notebook}/dump:
     get:
       tags:
-      - rest-notebook-controller
+        - rest-notebook-controller
       operationId: downloadNotebookDump
       parameters:
-      - name: notebook
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: notebook
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -2602,7 +2602,7 @@ paths:
   /api/notebook_certificate_approvals/get-all-pending-request:
     get:
       tags:
-      - rest-notebook-certificate-approval-controller
+        - rest-notebook-certificate-approval-controller
       operationId: getAllPendingRequest
       responses:
         "500":
@@ -2622,14 +2622,14 @@ paths:
   /api/notebook_certificate_approvals/for-notebook/{notebook}:
     get:
       tags:
-      - rest-notebook-certificate-approval-controller
+        - rest-notebook-certificate-approval-controller
       operationId: getApprovalForNotebook
       parameters:
-      - name: notebook
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: notebook
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -2646,7 +2646,7 @@ paths:
   /api/message/unreadCount:
     get:
       tags:
-      - rest-conversation-message-controller
+        - rest-conversation-message-controller
       operationId: getUnreadConversationCountOfCurrentUser
       responses:
         "500":
@@ -2665,14 +2665,14 @@ paths:
   /api/message/detail/all/{conversationId}:
     get:
       tags:
-      - rest-conversation-message-controller
+        - rest-conversation-message-controller
       operationId: getConversationDetails
       parameters:
-      - name: conversationId
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: conversationId
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -2691,7 +2691,7 @@ paths:
   /api/message/all:
     get:
       tags:
-      - rest-conversation-message-controller
+        - rest-conversation-message-controller
       operationId: getConversationsOfCurrentUser
       responses:
         "500":
@@ -2711,7 +2711,7 @@ paths:
   /api/healthcheck:
     get:
       tags:
-      - rest-health-check-controller
+        - rest-health-check-controller
       operationId: ping
       responses:
         "500":
@@ -2729,7 +2729,7 @@ paths:
   /api/fine-tuning/all-suggested-questions-for-fine-tuning:
     get:
       tags:
-      - rest-fine-tuning-data-controller
+        - rest-fine-tuning-data-controller
       operationId: getAllSuggestedQuestions
       responses:
         "500":
@@ -2749,7 +2749,7 @@ paths:
   /api/failure-reports:
     get:
       tags:
-      - rest-failure-report-controller
+        - rest-failure-report-controller
       operationId: failureReports
       responses:
         "500":
@@ -2767,14 +2767,14 @@ paths:
   /api/failure-reports/{failureReport}:
     get:
       tags:
-      - rest-failure-report-controller
+        - rest-failure-report-controller
       operationId: show_2
       parameters:
-      - name: failureReport
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: failureReport
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -2791,7 +2791,7 @@ paths:
   /api/data_upgrade:
     get:
       tags:
-      - rest-health-check-controller
+        - rest-health-check-controller
       operationId: dataUpgrade
       responses:
         "500":
@@ -2811,14 +2811,14 @@ paths:
   /api/circles/{circle}:
     get:
       tags:
-      - rest-circle-controller
+        - rest-circle-controller
       operationId: showCircle
       parameters:
-      - name: circle
-        in: path
-        required: true
-        schema:
-          type: integer
+        - name: circle
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -2835,7 +2835,7 @@ paths:
   /api/bazaar:
     get:
       tags:
-      - rest-bazaar-controller
+        - rest-bazaar-controller
       operationId: bazaar
       responses:
         "500":
@@ -2855,7 +2855,7 @@ paths:
   /api/assessment:
     get:
       tags:
-      - rest-assessment-controller
+        - rest-assessment-controller
       operationId: getMyAssessments
       responses:
         "500":
@@ -2875,7 +2875,7 @@ paths:
   /api/ai/dummy:
     get:
       tags:
-      - rest-ai-controller
+        - rest-ai-controller
       operationId: dummyEntryToGenerateDataTypesThatAreRequiredInEventStream
       responses:
         "500":
@@ -2893,7 +2893,7 @@ paths:
   /api/ai/available-gpt-models:
     get:
       tags:
-      - rest-ai-controller
+        - rest-ai-controller
       operationId: getAvailableGptModels
       responses:
         "500":
@@ -2914,8 +2914,8 @@ components:
   schemas:
     Circle:
       required:
-      - id
-      - name
+        - id
+        - name
       type: object
       properties:
         id:
@@ -2937,9 +2937,9 @@ components:
           type: string
     User:
       required:
-      - externalIdentifier
-      - id
-      - name
+        - externalIdentifier
+        - id
+        - name
       type: object
       properties:
         id:
@@ -2975,16 +2975,16 @@ components:
         choose:
           type: string
           enum:
-          - first
-          - last
-          - seed
+            - first
+            - last
+            - seed
         seed:
           type: integer
           format: int32
     MCQWithAnswer:
       required:
-      - correctChoiceIndex
-      - multipleChoicesQuestion
+        - correctChoiceIndex
+        - multipleChoicesQuestion
       type: object
       properties:
         multipleChoicesQuestion:
@@ -2994,7 +2994,7 @@ components:
           format: int32
     MultipleChoicesQuestion:
       required:
-      - choices
+        - choices
       type: object
       properties:
         stem:
@@ -3005,8 +3005,8 @@ components:
             type: string
     QuestionSuggestionParams:
       required:
-      - preservedQuestion
-      - realCorrectAnswers
+        - preservedQuestion
+        - realCorrectAnswers
       type: object
       properties:
         comment:
@@ -3084,7 +3084,7 @@ components:
             $ref: "#/components/schemas/PredefinedQuestionTestData"
     BareQuestion:
       required:
-      - multipleChoicesQuestion
+        - multipleChoicesQuestion
       type: object
       properties:
         checkSpell:
@@ -3093,8 +3093,8 @@ components:
           $ref: "#/components/schemas/MultipleChoicesQuestion"
     PredefinedQuestion:
       required:
-      - bareQuestion
-      - id
+        - bareQuestion
+        - id
       type: object
       properties:
         id:
@@ -3115,10 +3115,10 @@ components:
           format: int32
     Note:
       required:
-      - createdAt
-      - id
-      - noteTopic
-      - updatedAt
+        - createdAt
+        - id
+        - noteTopic
+        - updatedAt
       type: object
       properties:
         noteTopic:
@@ -3145,8 +3145,8 @@ components:
           type: string
     NoteTopic:
       required:
-      - id
-      - topicConstructor
+        - id
+        - topicConstructor
       type: object
       properties:
         id:
@@ -3159,31 +3159,31 @@ components:
         linkType:
           type: string
           enum:
-          - no link
-          - related to
-          - a specialization of
-          - an application of
-          - an instance of
-          - a part of
-          - tagged by
-          - an attribute of
-          - the opposite of
-          - author of
-          - using
-          - an example of
-          - before
-          - similar to
-          - confused with
+            - no link
+            - related to
+            - a specialization of
+            - an application of
+            - an instance of
+            - a part of
+            - tagged by
+            - an attribute of
+            - the opposite of
+            - author of
+            - using
+            - an example of
+            - before
+            - similar to
+            - confused with
         targetNoteTopic:
           $ref: "#/components/schemas/NoteTopic"
         parentNoteTopic:
           $ref: "#/components/schemas/NoteTopic"
     Notebook:
       required:
-      - headNote
-      - id
-      - notebookSettings
-      - updated_at
+        - headNote
+        - id
+        - notebookSettings
+        - updated_at
       type: object
       properties:
         id:
@@ -3214,7 +3214,7 @@ components:
           default: 1y
     Subscription:
       required:
-      - id
+        - id
       type: object
       properties:
         headNote:
@@ -3252,9 +3252,9 @@ components:
           type: boolean
     ReviewPoint:
       required:
-      - id
-      - nextReviewAt
-      - note
+        - id
+        - nextReviewAt
+        - note
       type: object
       properties:
         id:
@@ -3281,8 +3281,8 @@ components:
           type: boolean
     ReviewQuestionInstance:
       required:
-      - bareQuestion
-      - id
+        - bareQuestion
+        - id
       type: object
       properties:
         id:
@@ -3309,8 +3309,8 @@ components:
           format: int32
     Answer:
       required:
-      - correct
-      - id
+        - correct
+        - id
       type: object
       properties:
         id:
@@ -3325,9 +3325,9 @@ components:
           type: boolean
     AnsweredQuestion:
       required:
-      - answer
-      - predefinedQuestion
-      - reviewQuestionInstanceId
+        - answer
+        - predefinedQuestion
+        - reviewQuestionInstanceId
       type: object
       properties:
         note:
@@ -3350,8 +3350,8 @@ components:
           type: boolean
     SuggestedQuestionForFineTuning:
       required:
-      - id
-      - preservedQuestion
+        - id
+        - preservedQuestion
       type: object
       properties:
         id:
@@ -3378,7 +3378,7 @@ components:
           format: int32
     NoteCreationDTO:
       required:
-      - topicConstructor
+        - topicConstructor
       type: object
       properties:
         topicConstructor:
@@ -3388,28 +3388,28 @@ components:
         linkTypeToParent:
           type: string
           enum:
-          - no link
-          - related to
-          - a specialization of
-          - an application of
-          - an instance of
-          - a part of
-          - tagged by
-          - an attribute of
-          - the opposite of
-          - author of
-          - using
-          - an example of
-          - before
-          - similar to
-          - confused with
+            - no link
+            - related to
+            - a specialization of
+            - an application of
+            - an instance of
+            - a part of
+            - tagged by
+            - an attribute of
+            - the opposite of
+            - author of
+            - using
+            - an example of
+            - before
+            - similar to
+            - confused with
         wikidataId:
           pattern: ^$|Q\d+
           type: string
     NoteCreationRresult:
       required:
-      - created
-      - parent
+        - created
+        - parent
       type: object
       properties:
         created:
@@ -3418,8 +3418,8 @@ components:
           $ref: "#/components/schemas/NoteRealm"
     NoteRealm:
       required:
-      - id
-      - note
+        - id
+        - note
       type: object
       properties:
         id:
@@ -3441,14 +3441,14 @@ components:
             $ref: "#/components/schemas/Note"
     WikidataAssociationCreation:
       required:
-      - wikidataId
+        - wikidataId
       type: object
       properties:
         wikidataId:
           type: string
     SearchTerm:
       required:
-      - searchKey
+        - searchKey
       type: object
       properties:
         searchKey:
@@ -3475,8 +3475,8 @@ components:
           format: int32
     AssessmentQuestionInstance:
       required:
-      - bareQuestion
-      - id
+        - bareQuestion
+        - id
       type: object
       properties:
         id:
@@ -3488,9 +3488,9 @@ components:
           $ref: "#/components/schemas/Answer"
     Conversation:
       required:
-      - createdAt
-      - id
-      - updatedAt
+        - createdAt
+        - id
+        - updatedAt
       type: object
       properties:
         id:
@@ -3518,15 +3518,15 @@ components:
           format: binary
     SrtDto:
       required:
-      - srt
+        - srt
       type: object
       properties:
         srt:
           type: string
     NotebookCertificateApproval:
       required:
-      - id
-      - notebook
+        - id
+        - notebook
       type: object
       properties:
         id:
@@ -3539,10 +3539,10 @@ components:
           format: date-time
     ConversationMessage:
       required:
-      - createdAt
-      - id
-      - is_read
-      - message
+        - createdAt
+        - id
+        - is_read
+        - message
       type: object
       properties:
         id:
@@ -3561,34 +3561,34 @@ components:
           format: date-time
     LinkCreation:
       required:
-      - linkType
+        - linkType
       type: object
       properties:
         linkType:
           type: string
           enum:
-          - no link
-          - related to
-          - a specialization of
-          - an application of
-          - an instance of
-          - a part of
-          - tagged by
-          - an attribute of
-          - the opposite of
-          - author of
-          - using
-          - an example of
-          - before
-          - similar to
-          - confused with
+            - no link
+            - related to
+            - a specialization of
+            - an application of
+            - an instance of
+            - a part of
+            - tagged by
+            - an attribute of
+            - the opposite of
+            - author of
+            - using
+            - an example of
+            - before
+            - similar to
+            - confused with
         moveUnder:
           type: boolean
         asFirstChild:
           type: boolean
     CircleJoiningByInvitation:
       required:
-      - invitationCode
+        - invitationCode
       type: object
       properties:
         invitationCode:
@@ -3597,9 +3597,9 @@ components:
           type: string
     Certificate:
       required:
-      - expiryDate
-      - id
-      - startDate
+        - expiryDate
+        - id
+        - startDate
       type: object
       properties:
         id:
@@ -3619,8 +3619,8 @@ components:
           type: string
     BazaarNotebook:
       required:
-      - id
-      - notebook
+        - id
+        - notebook
       type: object
       properties:
         id:
@@ -3630,8 +3630,8 @@ components:
           $ref: "#/components/schemas/Notebook"
     AssessmentAttempt:
       required:
-      - id
-      - notebookId
+        - id
+        - notebookId
       type: object
       properties:
         id:
@@ -3713,14 +3713,14 @@ components:
           type: array
           items:
             oneOf:
-            - $ref: "#/components/schemas/CodeInterpreterTool"
-            - $ref: "#/components/schemas/FileSearchTool"
-            - $ref: "#/components/schemas/FunctionTool"
+              - $ref: "#/components/schemas/CodeInterpreterTool"
+              - $ref: "#/components/schemas/FileSearchTool"
+              - $ref: "#/components/schemas/FunctionTool"
         file_id:
           type: string
     ClarifyingQuestion:
       required:
-      - question
+        - question
       type: object
       properties:
         question:
@@ -3728,7 +3728,7 @@ components:
     CodeInterpreterTool:
       type: object
       allOf:
-      - $ref: "#/components/schemas/Tool"
+        - $ref: "#/components/schemas/Tool"
     FileCitation:
       type: object
       properties:
@@ -3751,7 +3751,7 @@ components:
           $ref: "#/components/schemas/FileSearchRankingOptions"
     FileSearchRankingOptions:
       required:
-      - score_threshold
+        - score_threshold
       type: object
       properties:
         ranker:
@@ -3762,19 +3762,19 @@ components:
     FileSearchTool:
       type: object
       allOf:
-      - $ref: "#/components/schemas/Tool"
-      - type: object
-        properties:
-          file_search:
-            $ref: "#/components/schemas/FileSearch"
+        - $ref: "#/components/schemas/Tool"
+        - type: object
+          properties:
+            file_search:
+              $ref: "#/components/schemas/FileSearch"
     FunctionTool:
       type: object
       allOf:
-      - $ref: "#/components/schemas/Tool"
-      - type: object
-        properties:
-          function:
-            type: object
+        - $ref: "#/components/schemas/Tool"
+        - type: object
+          properties:
+            function:
+              type: object
     ImageFile:
       type: object
       properties:
@@ -3868,11 +3868,11 @@ components:
           type: string
     NotebookAssistant:
       required:
-      - assistantId
-      - createdAt
-      - creator
-      - id
-      - notebook
+        - assistantId
+        - createdAt
+        - creator
+        - id
+        - notebook
       type: object
       properties:
         id:
@@ -3920,7 +3920,7 @@ components:
           type: string
     UserDTO:
       required:
-      - name
+        - name
       type: object
       properties:
         name:
@@ -3935,7 +3935,7 @@ components:
           type: string
     NoteUpdateTopicDTO:
       required:
-      - topicConstructor
+        - topicConstructor
       type: object
       properties:
         topicConstructor:
@@ -3964,8 +3964,8 @@ components:
           format: binary
     Audio:
       required:
-      - id
-      - name
+        - id
+        - name
       type: object
       properties:
         id:
@@ -3986,7 +3986,7 @@ components:
           type: string
     NoteAccessory:
       required:
-      - id
+        - id
       type: object
       properties:
         id:
@@ -4006,7 +4006,7 @@ components:
           $ref: "#/components/schemas/ImageWithMask"
     WikidataSearchEntity:
       required:
-      - label
+        - label
       type: object
       properties:
         id:
@@ -4017,8 +4017,8 @@ components:
           type: string
     WikidataEntityData:
       required:
-      - WikidataTitleInEnglish
-      - WikipediaEnglishUrl
+        - WikidataTitleInEnglish
+        - WikipediaEnglishUrl
       type: object
       properties:
         WikidataTitleInEnglish:
@@ -4045,10 +4045,10 @@ components:
           format: int32
     ReviewStatus:
       required:
-      - learntCount
-      - notLearntCount
-      - toInitialReviewCount
-      - toRepeatCount
+        - learntCount
+        - notLearntCount
+        - toInitialReviewCount
+        - toRepeatCount
       type: object
       properties:
         toRepeatCount:
@@ -4065,8 +4065,8 @@ components:
           format: int32
     NoteInfo:
       required:
-      - createdAt
-      - note
+        - createdAt
+        - note
       type: object
       properties:
         reviewPoint:
@@ -4080,7 +4080,7 @@ components:
           $ref: "#/components/schemas/ReviewSetting"
     NotebooksViewedByUser:
       required:
-      - notebooks
+        - notebooks
       type: object
       properties:
         notebooks:
@@ -4108,9 +4108,9 @@ components:
           type: string
     FailureReport:
       required:
-      - createDatetime
-      - errorDetail
-      - errorName
+        - createDatetime
+        - errorDetail
+        - errorName
       type: object
       properties:
         id:
@@ -4144,11 +4144,11 @@ components:
           type: string
     CircleForUserView:
       required:
-      - id
-      - invitationCode
-      - members
-      - name
-      - notebooks
+        - id
+        - invitationCode
+        - members
+        - name
+        - notebooks
       type: object
       properties:
         id:
