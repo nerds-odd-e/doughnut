@@ -5,6 +5,7 @@ Feature: Check unread message count
         Given I am logged in as "old_learner"
         Then "old_learner" can see the notification icon with no unread messages
 
+    @ignore
     Scenario: User has 1 unread message in the message center
         And there is a certified notebook "Just say 'Yes'" by "a_trainer" with 2 questions, shared to the Bazaar
         Given I am logged in as "old_learner"

@@ -16,7 +16,7 @@
         <div class="d-flex flex-grow-1" id="head-status" />
         <div class="btn-group btn-group-sm">
           <router-link to="/d/feedback">
-            <div id="top-navbar-message-icon">
+            <div v-if="user" id="top-navbar-message-icon">
               <div v-if="unreadMessageCount > 0" class="unread-count">
                 {{ unreadMessageCount }}
               </div>
@@ -53,7 +53,7 @@ import { type ApiStatus } from "@/managedApi/ManagedApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import type { PropType } from "vue"
 import { onMounted, ref } from "vue"
-defineProps({
+const props = defineProps({
   storageAccessor: {
     type: Object as PropType<StorageAccessor>,
     required: true,
@@ -73,7 +73,7 @@ const fetchUnreadMessageCount = async () => {
 }
 
 onMounted(() => {
-  fetchUnreadMessageCount()
+  !!props.user && fetchUnreadMessageCount()
 })
 </script>
 
