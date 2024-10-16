@@ -68,7 +68,7 @@ const unreadMessageCount = ref(0)
 
 const fetchUnreadMessageCount = async () => {
   const unreadMessageCountResponse =
-    await managedApi.restConversationMessageController.getUnreadMessageCountOfCurrentUser()
+    await managedApi.restConversationMessageController.getUnreadConversationCountOfCurrentUser()
   unreadMessageCount.value = unreadMessageCountResponse
 }
 
