@@ -18,12 +18,10 @@ import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.MakeMeWithoutDB;
 import com.odde.doughnut.testability.TestabilitySettings;
 import jakarta.validation.Valid;
-
 import java.io.IOException;
 import java.net.URI;
 import java.sql.Timestamp;
 import java.util.List;
-
 import org.apache.logging.log4j.util.Strings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -43,15 +41,11 @@ import org.springframework.validation.BindException;
 @ActiveProfiles("test")
 @Transactional
 class RestNoteControllerTests {
-  @Autowired
-  ModelFactoryService modelFactoryService;
-  @Autowired
-  ConversationService conversationService;
+  @Autowired ModelFactoryService modelFactoryService;
+  @Autowired ConversationService conversationService;
 
-  @Autowired
-  MakeMe makeMe;
-  @Mock
-  HttpClientAdapter httpClientAdapter;
+  @Autowired MakeMe makeMe;
+  @Mock HttpClientAdapter httpClientAdapter;
   private UserModel userModel;
   RestNoteController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
@@ -61,35 +55,35 @@ class RestNoteControllerTests {
     userModel = makeMe.aUser().toModelPlease();
 
     controller =
-      new RestNoteController(
-        modelFactoryService,
-        userModel,
-        httpClientAdapter,
-        testabilitySettings,
-        conversationService);
+        new RestNoteController(
+            modelFactoryService,
+            userModel,
+            httpClientAdapter,
+            testabilitySettings,
+            conversationService);
   }
 
   private void mockWikidataEntity(String wikidataId, String label)
-    throws IOException, InterruptedException {
+      throws IOException, InterruptedException {
     if (Strings.isEmpty(wikidataId) || Strings.isEmpty(label)) {
       return;
     }
     Mockito.when(
-        httpClientAdapter.getResponseString(
-          URI.create(
-            "https://www.wikidata.org/wiki/Special:EntityData/" + wikidataId + ".json")))
-      .thenReturn(makeMe.wikidataClaimsJson(wikidataId).labelIf(label).please());
+            httpClientAdapter.getResponseString(
+                URI.create(
+                    "https://www.wikidata.org/wiki/Special:EntityData/" + wikidataId + ".json")))
+        .thenReturn(makeMe.wikidataClaimsJson(wikidataId).labelIf(label).please());
   }
 
   private void mockWikidataWBGetEntity(String personWikidataId, String value)
-    throws IOException, InterruptedException {
+      throws IOException, InterruptedException {
     Mockito.when(
-        httpClientAdapter.getResponseString(
-          URI.create(
-            "https://www.wikidata.org/w/api.php?action=wbgetentities&ids="
-              + personWikidataId
-              + "&format=json&props=claims")))
-      .thenReturn(value);
+            httpClientAdapter.getResponseString(
+                URI.create(
+                    "https://www.wikidata.org/w/api.php?action=wbgetentities&ids="
+                        + personWikidataId
+                        + "&format=json&props=claims")))
+        .thenReturn(value);
   }
 
   @Nested
@@ -134,10 +128,10 @@ class RestNoteControllerTests {
       User otherUser = makeMe.aUser().please();
       Note note = makeMe.aNote().creatorAndOwner(otherUser).please();
       makeMe
-        .aSubscription()
-        .forUser(userModel.getEntity())
-        .forNotebook(note.getNotebook())
-        .please();
+          .aSubscription()
+          .forUser(userModel.getEntity())
+          .forNotebook(note.getNotebook())
+          .please();
       makeMe.refresh(userModel.getEntity());
       assertThat(controller.getNoteInfo(note).getNote().getId(), equalTo(note.getId()));
     }
@@ -157,14 +151,14 @@ class RestNoteControllerTests {
 
     @Test
     void shouldBeAbleToSaveNoteWhenValid()
-      throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
+        throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
       NoteRealm response = controller.createNote(parent, noteCreation).getCreated();
       assertThat(response.getId(), not(nullValue()));
     }
 
     @Test
     void shouldBeAbleToCreateAThing()
-      throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
+        throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
       long beforeThingCount = makeMe.modelFactoryService.noteRepository.count();
       controller.createNote(parent, noteCreation);
       long afterThingCount = makeMe.modelFactoryService.noteRepository.count();
@@ -173,9 +167,9 @@ class RestNoteControllerTests {
 
     @Test
     void shouldBeAbleToSaveNoteWithWikidataIdWhenValid()
-      throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
+        throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
       Mockito.when(httpClientAdapter.getResponseString(any()))
-        .thenReturn(new MakeMeWithoutDB().wikidataEntityJson().entityId("Q12345").please());
+          .thenReturn(new MakeMeWithoutDB().wikidataEntityJson().entityId("Q12345").please());
       noteCreation.setWikidataId("Q12345");
       NoteRealm response = controller.createNote(parent, noteCreation).getCreated();
       assertThat(response.getNote().getWikidataId(), equalTo("Q12345"));
@@ -183,7 +177,7 @@ class RestNoteControllerTests {
 
     @Test
     void shouldBeAbleToSaveNoteWithoutWikidataIdWhenValid()
-      throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
+        throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
       NoteRealm response = controller.createNote(parent, noteCreation).getCreated();
 
       assertThat(response.getNote().getWikidataId(), equalTo(null));
@@ -195,9 +189,9 @@ class RestNoteControllerTests {
       makeMe.aNote().under(parent).wikidataId(conflictingWikidataId).please();
       noteCreation.setWikidataId(conflictingWikidataId);
       BindException bindException =
-        assertThrows(BindException.class, () -> controller.createNote(parent, noteCreation));
+          assertThrows(BindException.class, () -> controller.createNote(parent, noteCreation));
       assertThat(
-        bindException.getMessage(), stringContainsInOrder("Duplicate Wikidata ID Detected."));
+          bindException.getMessage(), stringContainsInOrder("Duplicate Wikidata ID Detected."));
     }
 
     @Nested
@@ -212,34 +206,34 @@ class RestNoteControllerTests {
       }
 
       private void mockApiResponseWithLocationInfo(String locationInfo, String type)
-        throws IOException, InterruptedException {
+          throws IOException, InterruptedException {
         mockWikidataWBGetEntity(
-          wikidataIdOfALocation,
-          makeMe.wikidataClaimsJson("Q334").globeCoordinate(locationInfo, type).please());
+            wikidataIdOfALocation,
+            makeMe.wikidataClaimsJson("Q334").globeCoordinate(locationInfo, type).please());
       }
 
       @Test
       void shouldPrependLocationInfoWhenAddingNoteWithWikidataId()
-        throws BindException,
-        InterruptedException,
-        UnexpectedNoAccessRightException,
-        IOException {
+          throws BindException,
+              InterruptedException,
+              UnexpectedNoAccessRightException,
+              IOException {
         mockApiResponseWithLocationInfo(
-          "{\"latitude\":1.3,\"longitude\":103.8}", "globecoordinate");
+            "{\"latitude\":1.3,\"longitude\":103.8}", "globecoordinate");
         NoteRealm note = controller.createNote(parent, noteCreation).getCreated();
         assertThat(note.getNote().getDetails(), containsString("Location: " + lnglat));
       }
 
       @Test
       void shouldPrependLocationInfoWhenAddingNoteWithWikidataIdWithStringValue()
-        throws BindException,
-        InterruptedException,
-        UnexpectedNoAccessRightException,
-        IOException {
+          throws BindException,
+              InterruptedException,
+              UnexpectedNoAccessRightException,
+              IOException {
         mockApiResponseWithLocationInfo("\"center of the earth\"", "string");
         NoteRealm note = controller.createNote(parent, noteCreation).getCreated();
         assertThat(
-          note.getNote().getDetails(), stringContainsInOrder("Location: center of the earth"));
+            note.getNote().getDetails(), stringContainsInOrder("Location: center of the earth"));
       }
     }
 
@@ -251,24 +245,24 @@ class RestNoteControllerTests {
       }
 
       private void mockWikidataHumanEntity(
-        String personWikidataId, String birthdayByISO, String countryQId)
-        throws IOException, InterruptedException {
+          String personWikidataId, String birthdayByISO, String countryQId)
+          throws IOException, InterruptedException {
         mockWikidataWBGetEntity(
-          personWikidataId,
-          makeMe
-            .wikidataClaimsJson(personWikidataId)
-            .asAHuman()
-            .countryOfOrigin(countryQId)
-            .birthdayIf(birthdayByISO)
-            .please());
+            personWikidataId,
+            makeMe
+                .wikidataClaimsJson(personWikidataId)
+                .asAHuman()
+                .countryOfOrigin(countryQId)
+                .birthdayIf(birthdayByISO)
+                .please());
       }
 
       @ParameterizedTest
       @CsvSource(
-        useHeadersInDisplayName = true,
-        delimiter = '|',
-        textBlock =
-          """
+          useHeadersInDisplayName = true,
+          delimiter = '|',
+          textBlock =
+              """
              WikidataId | Birthday from Wikidata | CountryQID | Country Name | Expected Birthday    | Name
             #---------------------------------------------------------------------------------------------
              Q706446    | +1980-03-31T00:00:00Z  |            |              | 31 March 1980        |
@@ -278,15 +272,15 @@ class RestNoteControllerTests {
              Q706446    | +1980-03-31T00:00:00Z  | Q30        | The US of A  |  31 March 1980       |
             """)
       void shouldAddHumanBirthdayAndCountryOfOriginWhenAddingNoteWithWikidataId(
-        String wikidataIdOfHuman,
-        String birthdayByISO,
-        String countryQid,
-        String countryName,
-        String expectedBirthday)
-        throws BindException,
-        InterruptedException,
-        UnexpectedNoAccessRightException,
-        IOException {
+          String wikidataIdOfHuman,
+          String birthdayByISO,
+          String countryQid,
+          String countryName,
+          String expectedBirthday)
+          throws BindException,
+              InterruptedException,
+              UnexpectedNoAccessRightException,
+              IOException {
         mockWikidataHumanEntity(wikidataIdOfHuman, birthdayByISO, countryQid);
         mockWikidataEntity(countryQid, countryName);
         noteCreation.setWikidataId(wikidataIdOfHuman);
@@ -302,10 +296,10 @@ class RestNoteControllerTests {
 
       @Test
       void shouldAddPersonNoteWithCountryNoteWithWikidataId()
-        throws BindException,
-        InterruptedException,
-        UnexpectedNoAccessRightException,
-        IOException {
+          throws BindException,
+              InterruptedException,
+              UnexpectedNoAccessRightException,
+              IOException {
 
         mockWikidataHumanEntity("Q8337", null, "Q34660");
         mockWikidataEntity("Q34660", "Canada");
@@ -331,12 +325,12 @@ class RestNoteControllerTests {
 
       @Test
       void shouldAddBookNoteWithAuthorNoteWithWikidataId()
-        throws BindException,
-        InterruptedException,
-        UnexpectedNoAccessRightException,
-        IOException {
+          throws BindException,
+              InterruptedException,
+              UnexpectedNoAccessRightException,
+              IOException {
         mockWikidataWBGetEntity(
-          "Q8337", makeMe.wikidataClaimsJson("Q8337").asABookWithSingleAuthor("Q34660").please());
+            "Q8337", makeMe.wikidataClaimsJson("Q8337").asABookWithSingleAuthor("Q34660").please());
         NoteRealm note = controller.createNote(parent, noteCreation).getCreated();
 
         assertEquals("Harry Potter", note.getNote().getTopicConstructor());
@@ -346,21 +340,21 @@ class RestNoteControllerTests {
 
       @Test
       void shouldAddBookNoteWithMultipleAuthorsNoteWithWikidataId()
-        throws BindException,
-        InterruptedException,
-        UnexpectedNoAccessRightException,
-        IOException {
+          throws BindException,
+              InterruptedException,
+              UnexpectedNoAccessRightException,
+              IOException {
         mockWikidataWBGetEntity(
-          "Q8337",
-          makeMe
-            .wikidataClaimsJson("Q8337")
-            .asABookWithMultipleAuthors(List.of("Q34660", "Q12345"))
-            .please());
+            "Q8337",
+            makeMe
+                .wikidataClaimsJson("Q8337")
+                .asABookWithMultipleAuthors(List.of("Q34660", "Q12345"))
+                .please());
         NoteRealm note = controller.createNote(parent, noteCreation).getCreated();
 
         assertEquals(
-          "The girl sat next to the window",
-          note.getNote().getChildren().get(1).getTopicConstructor());
+            "The girl sat next to the window",
+            note.getNote().getChildren().get(1).getTopicConstructor());
       }
     }
   }
@@ -399,7 +393,7 @@ class RestNoteControllerTests {
 
     @Test
     void shouldNotRemoveTheImageIfNoNewImageInTheUpdate()
-      throws UnexpectedNoAccessRightException, IOException {
+        throws UnexpectedNoAccessRightException, IOException {
       makeMe.theNote(note).withUploadedImage();
       controller.updateNoteAccessories(note, noteAccessoriesDTO);
       assertThat(note.getNoteAccessory().getImageAttachment(), is(not(nullValue())));
@@ -420,7 +414,7 @@ class RestNoteControllerTests {
     void shouldPersistAudioToNoteAfterUpload() throws Exception {
       String filename = "podcast.wav";
       audioUploadDTO.setUploadAudioFile(
-        new MockMultipartFile(filename, filename, "audio/wav", new byte[]{}));
+          new MockMultipartFile(filename, filename, "audio/wav", new byte[] {}));
       controller.uploadAudio(note, audioUploadDTO);
       Note newNote = makeMe.modelFactoryService.noteRepository.findById(note.getId()).get();
       assertEquals(filename, newNote.getNoteAccessory().getAudioAttachment().getName());
@@ -502,7 +496,7 @@ class RestNoteControllerTests {
 
     @Test
     void shouldUpdateNoteWithUniqueWikidataId()
-      throws BindException, UnexpectedNoAccessRightException, IOException, InterruptedException {
+        throws BindException, UnexpectedNoAccessRightException, IOException, InterruptedException {
       WikidataAssociationCreation wikidataAssociationCreation = new WikidataAssociationCreation();
       wikidataAssociationCreation.wikidataId = "Q123";
       controller.updateWikidataId(note, wikidataAssociationCreation);
@@ -517,11 +511,11 @@ class RestNoteControllerTests {
       WikidataAssociationCreation wikidataAssociationCreation = new WikidataAssociationCreation();
       wikidataAssociationCreation.wikidataId = noteWikidataId;
       BindException bindException =
-        assertThrows(
-          BindException.class,
-          () -> controller.updateWikidataId(note, wikidataAssociationCreation));
+          assertThrows(
+              BindException.class,
+              () -> controller.updateWikidataId(note, wikidataAssociationCreation));
       assertThat(
-        bindException.getMessage(), stringContainsInOrder("Duplicate Wikidata ID Detected."));
+          bindException.getMessage(), stringContainsInOrder("Duplicate Wikidata ID Detected."));
     }
   }
 
@@ -540,7 +534,7 @@ class RestNoteControllerTests {
     void shouldStartConversation() {
       controller.sendNoteMessage(note, feedback);
       List<Conversation> conversations =
-        (List<Conversation>) modelFactoryService.conversationRepository.findAll();
+          (List<Conversation>) modelFactoryService.conversationRepository.findAll();
       assertEquals(1, conversations.size());
 
       Conversation conversation = conversations.getFirst();
@@ -551,12 +545,12 @@ class RestNoteControllerTests {
     void shouldSendFeedbackToConversation() {
       controller.sendNoteMessage(note, feedback);
       List<Conversation> conversations =
-        (List<Conversation>) modelFactoryService.conversationRepository.findAll();
+          (List<Conversation>) modelFactoryService.conversationRepository.findAll();
       assertEquals(1, conversations.size());
 
       Conversation conversation = conversations.getFirst();
       List<ConversationMessage> conversationMessages =
-        conversationService.getConversionDetailRelatedByConversationId(conversation.getId());
+          conversationService.getConversionDetailRelatedByConversationId(conversation.getId());
       assertEquals(1, conversationMessages.size());
 
       ConversationMessage message = conversationMessages.getFirst();
