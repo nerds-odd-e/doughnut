@@ -123,6 +123,16 @@ class RestConversationMessageControllerTest {
   }
 
   @Test
+  void testZeroUnreadConversationCountForSender() {
+    Conversation fristConversation = makeMe.aConversation().from(currentUser).please();
+    ConversationMessage msg = makeMe.aConversationMessage().forConversationInstance(fristConversation).please();
+    msg.setSender(currentUser.getEntity());
+
+    int conversations = controller.getUnreadConversationCountOfCurrentUser();
+    assertEquals(0, conversations);
+  }
+
+  @Test
   void testGetTOneUnreadAndOneReadConversationCountofCurrentUser() {
     Conversation fristConversation = makeMe.aConversation().from(currentUser).please();
     makeMe.aConversationMessage().forConversationInstance(fristConversation).please();
