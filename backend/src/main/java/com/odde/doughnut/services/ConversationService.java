@@ -59,4 +59,11 @@ public class ConversationService {
         .flatMap(id -> getConversionDetailRelatedByConversationId(id).stream())
         .collect(Collectors.toList());
   }
+
+  public List<ConversationMessage> getConversationMessages(User user) {
+    List<Conversation> conversations = conversationRelatedToUser(user);
+    List<Integer> conversationIds =
+        conversations.stream().map(Conversation::getId).collect(Collectors.toList());
+    return getConversationDetailsByConversationIds(conversationIds);
+  }
 }

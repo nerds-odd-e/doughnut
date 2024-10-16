@@ -8,7 +8,6 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ConversationService;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -43,12 +42,8 @@ public class RestConversationMessageController {
   @GetMapping("/unreadCount")
   public int getUnreadConversationCountOfCurrentUser() {
     currentUser.assertLoggedIn();
-    List<Conversation> conversations =
-        conversationService.conversationRelatedToUser(currentUser.getEntity());
-    List<Integer> conversationIds =
-        conversations.stream().map(Conversation::getId).collect(Collectors.toList());
     List<ConversationMessage> conversationMessages =
-        conversationService.getConversationDetailsByConversationIds(conversationIds);
+        conversationService.getConversationMessages(currentUser.getEntity());
     return (int)
         conversationMessages.stream()
             .filter(message -> !message.getIs_read())
