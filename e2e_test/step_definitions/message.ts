@@ -51,6 +51,9 @@ Then(
   }
 )
 
-Then('{string} can see the notification icon with no unread messages', (user: string) => {
-  start.reloginAndEnsureHomePage(user).checkForMessageCenterIcon()
-})
+Then(
+  '{string} can see the notification icon with no unread messages',
+  (user: string) => {
+    start.reloginAndEnsureHomePage(user).checkForMessageCenterIcon()
+  }
+)
