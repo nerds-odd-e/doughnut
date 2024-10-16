@@ -3,4 +3,4 @@ Feature: Check unread message count
 
     Scenario: User has no unread messages in the message center
         Given I am logged in as "old_learner"
-        Then "old_learner" can see the notification icon in the topbar
+        Then "old_learner" can see the notification icon with no unread messages
