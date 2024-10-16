@@ -17,9 +17,9 @@
         <div class="btn-group btn-group-sm">
           <router-link to="/d/feedback">
             <div id="top-navbar-message-icon">
-              <!-- <div class="unread-count">
-                1
-              </div> -->
+              <div v-if="unreadMessageCount > 0" class="unread-count">
+                {{ unreadMessageCount }}
+              </div>
               <SvgMessage />
             </div>
           </router-link>
@@ -67,9 +67,9 @@ const { managedApi } = useLoadingApi()
 const unreadMessageCount = ref(0)
 
 const fetchUnreadMessageCount = async () => {
-  const unreadMessageCount = await managedApi.restNotebookCertificateApprovalController.getAllPendingRequest()
-  unreadMessageCount.value = unreadMessageCount
-  return unreadMessageCount
+  const unreadMessageCountResponse =
+    await managedApi.restConversationMessageController.getUnreadMessageCountOfCurrentUser()
+  unreadMessageCount.value = unreadMessageCountResponse
 }
 
 onMounted(() => {
