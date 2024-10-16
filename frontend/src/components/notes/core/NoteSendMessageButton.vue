@@ -18,13 +18,12 @@
 import { defineComponent } from "vue"
 import PopButton from "../../commons/Popups/PopButton.vue"
 import NoteSendMessageDialog from "../NoteSendMessageDialog.vue"
-import SvgMessage from "@/components/svgs/SvgMessage.vue"
 
 export default defineComponent({
   props: {
     noteId: { type: Number, required: true },
     buttonTitle: { type: String, required: true },
   },
-  components: { PopButton, NoteSendMessageDialog, SvgMessage },
+  components: { PopButton, NoteSendMessageDialog },
 })
 </script>
