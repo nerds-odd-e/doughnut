@@ -52,4 +52,7 @@ export default {
     this.reloginAsAdmin()
     return this.goToAdminDashboard()
   },
+  checkForMessageCenterIcon() {
+    cy.get('#top-navbar-message-icon').should('exist')
+  },
 }

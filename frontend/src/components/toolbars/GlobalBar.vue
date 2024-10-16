@@ -16,7 +16,9 @@
         <div class="d-flex flex-grow-1" id="head-status" />
         <div class="btn-group btn-group-sm">
           <router-link to="/d/feedback">
-            <SvgMessage />
+            <div id="top-navbar-message-icon">
+              <SvgMessage />
+            </div>
           </router-link>
           <PopButton v-if="user" title="search note">
             <template #button_face>

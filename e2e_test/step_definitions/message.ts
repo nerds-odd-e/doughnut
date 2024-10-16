@@ -50,3 +50,7 @@ Then(
       .clickToSeeExpectMessage(conversation, feedback)
   }
 )
+
+Then('{string} can see the notification icon in the topbar', (user: string) => {
+  start.reloginAndEnsureHomePage(user).checkForMessageCenterIcon()
+})
