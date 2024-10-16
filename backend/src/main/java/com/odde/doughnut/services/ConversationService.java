@@ -45,6 +45,7 @@ public class ConversationService {
     conversationMessage.setConversation(conversation);
     conversationMessage.setSender(user);
     conversationMessage.setMessage(message);
+    conversationMessage.setIs_read(false);
     return modelFactoryService.conversationMessageRepository.save(conversationMessage);
   }
 
