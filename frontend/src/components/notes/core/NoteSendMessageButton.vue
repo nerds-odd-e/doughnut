@@ -6,6 +6,8 @@
     <template #default="{ closer }">
       <NoteSendMessageDialog
         v-bind="{ noteId }"
+        @submitted="
+            closer();"
         @close-dialog="closer"
       />
     </template>

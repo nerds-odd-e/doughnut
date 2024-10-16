@@ -270,7 +270,7 @@ class RestNoteControllerTests {
              Q706446    | +1980-03-31T00:00:00Z  | Q865       | Taiwan       | 31 March 1980        | Wang Chen-ming
              Q706446    |                        | Q865       | Taiwan       |                      |
              Q706446    | +1980-03-31T00:00:00Z  | Q30        | The US of A  |  31 March 1980       |
-             """)
+            """)
       void shouldAddHumanBirthdayAndCountryOfOriginWhenAddingNoteWithWikidataId(
           String wikidataIdOfHuman,
           String birthdayByISO,
@@ -521,20 +521,24 @@ class RestNoteControllerTests {
 
   @Nested
   class SendNoteFeedbackTests {
+    Note note;
+    String feedback = "This is a feedback sent from note";
 
     @BeforeEach
     void setup() {
-      userModel = makeMe.aUser().toModelPlease();
+      UserModel noteOwner = makeMe.aUser().toModelPlease();
+      note = makeMe.aNote().creatorAndOwner(noteOwner).please();
     }
 
     @Test
-    void testSendNoteFeedback() {
-      Note note = makeMe.aNote().creatorAndOwner(userModel).please();
-      String feedback = "This is a feedback sent from note";
+    void shouldStartConversation() {
       controller.sendNoteFeedback(note, feedback);
       List<Conversation> conversations =
           (List<Conversation>) modelFactoryService.conversationRepository.findAll();
       assertEquals(1, conversations.size());
+
+      Conversation conversation = conversations.getFirst();
+      assertEquals(conversation.getConversationInitiator(), userModel.getEntity());
     }
   }
 
