@@ -48,10 +48,11 @@
 
 <script setup lang="ts">
 import type { User } from "@/generated/backend"
+import useLoadingApi from "@/managedApi/useLoadingApi"
 import { type ApiStatus } from "@/managedApi/ManagedApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import type { PropType } from "vue"
-
+import { onMounted, ref } from "vue"
 defineProps({
   storageAccessor: {
     type: Object as PropType<StorageAccessor>,
@@ -61,6 +62,19 @@ defineProps({
   user: { type: Object as PropType<User> },
 })
 defineEmits(["updateUser", "clearErrorMessage"])
+const { managedApi } = useLoadingApi()
+
+const unreadMessageCount = ref(0)
+
+const fetchUnreadMessageCount = async () => {
+  const unreadMessageCount = await managedApi.restNotebookCertificateApprovalController.getAllPendingRequest()
+  unreadMessageCount.value = unreadMessageCount
+  return unreadMessageCount
+}
+
+onMounted(() => {
+  fetchUnreadMessageCount()
+})
 </script>
 
 <style scoped lang="scss">
