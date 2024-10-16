@@ -2,6 +2,7 @@ package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.ConversationMessage;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 import org.apache.logging.log4j.util.Strings;
@@ -24,6 +25,11 @@ public class ConversationMessageBuilder extends EntityBuilder<ConversationMessag
 
   public ConversationMessageBuilder forConversationInstance(Conversation conversation) {
     this.entity.setConversation(conversation);
+    return this;
+  }
+
+  public ConversationMessageBuilder withSender(User sender) {
+    this.entity.setSender(sender);
     return this;
   }
 }

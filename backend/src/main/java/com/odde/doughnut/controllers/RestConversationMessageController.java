@@ -54,14 +54,10 @@ public class RestConversationMessageController {
 
   @PatchMapping("/read/{conversationId}")
   public void markConversationAsRead(
-      @PathVariable("conversationId") @Schema(type = "integer") Integer conversationId)
+      @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation)
       throws UnexpectedNoAccessRightException {
-    // TODO: Implement this method
-    // Conversation conversation = conversationService.getConversationById(conversationId);
-    // currentUser.assertAuthorization(conversation);
-    // User user = currentUser.getEntity();
-
-    // conversationService.markConversationAsRead(conversation, currentUser.getEntity());
+    currentUser.assertAuthorization(conversation);
+    conversationService.markConversationAsRead(conversation, currentUser.getEntity());
   }
 
   @PostMapping("/detail/send/{conversationId}")

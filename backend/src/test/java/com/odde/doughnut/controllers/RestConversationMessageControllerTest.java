@@ -136,13 +136,27 @@ class RestConversationMessageControllerTest {
   }
 
   @Test
-  void testMarkConversationAsRead() throws UnexpectedNoAccessRightException {
-    // Conversation conversation = makeMe.aConversation().from(currentUser).please();
-    // controller.markConversationAsRead(conversation.getId());
-    // List<ConversationMessage> conversationMessages =
-    //     (List<ConversationMessage>) modelFactoryService.conversationMessageRepository.findAll();
-    // assertEquals(1, conversationMessages.size());
-    // assertEquals(true, conversationMessages.get(0).getIs_read());
+  void testMarkConversationAsReadByReceiver() throws UnexpectedNoAccessRightException {
+    Conversation conversation = makeMe.aConversation().from(currentUser).please();
+    ConversationMessage msg =
+        makeMe.aConversationMessage().forConversationInstance(conversation).please();
+    UserModel receiver = makeMe.aUser().toModelPlease();
+    msg.setSender(receiver.getEntity());
+    assertEquals(false, msg.getIs_read());
+
+    controller.markConversationAsRead(conversation);
+    assertEquals(true, msg.getIs_read());
+  }
+
+  @Test
+  void testMarkConversationAsReadBySender() throws UnexpectedNoAccessRightException {
+    Conversation conversation = makeMe.aConversation().from(currentUser).please();
+    ConversationMessage msg =
+        makeMe.aConversationMessage().forConversationInstance(conversation).please();
+    msg.setSender(currentUser.getEntity());
+
+    controller.markConversationAsRead(conversation);
+    assertEquals(false, msg.getIs_read());
   }
 
   @Test

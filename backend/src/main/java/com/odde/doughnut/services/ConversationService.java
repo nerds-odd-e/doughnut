@@ -66,4 +66,18 @@ public class ConversationService {
         conversations.stream().map(Conversation::getId).collect(Collectors.toList());
     return getConversationDetailsByConversationIds(conversationIds);
   }
+
+  public void markConversationAsRead(Conversation conversation, User user) {
+    Integer conversationId = conversation.getId();
+    List<ConversationMessage> conversationMessages =
+        getConversionDetailRelatedByConversationId(conversationId);
+    conversationMessages.forEach(
+        conversationMessage -> {
+          if (!conversationMessage.getIs_read()
+              && conversationMessage.getSender().getId() != user.getId()) {
+            conversationMessage.setIs_read(true);
+            modelFactoryService.conversationMessageRepository.save(conversationMessage);
+          }
+        });
+  }
 }
