@@ -46,7 +46,7 @@ public class RestConversationMessageController {
         conversationService.getConversationMessages(currentUser.getEntity());
     return (int)
         conversationMessages.stream()
-            .filter(message -> !message.getIs_read())
+            .filter(message -> !Boolean.TRUE.equals(message.getIs_read()))
             .map(ConversationMessage::getConversation)
             .distinct()
             .count();
