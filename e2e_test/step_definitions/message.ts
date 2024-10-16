@@ -1,4 +1,4 @@
-import { Then } from '@badeball/cypress-cucumber-preprocessor'
+import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 
 Then(
@@ -64,5 +64,12 @@ Then(
     start
       .reloginAndEnsureHomePage(user)
       .checkForUnreadMessageCount(unreadMessageCount)
+  }
+)
+
+When(
+  'I start a conversation about the note {string} with a message {string}',
+  (note: string, conversation: string) => {
+    start.jumpToNotePage(note).sendMessageToNoteOwner(conversation)
   }
 )

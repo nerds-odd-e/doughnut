@@ -241,6 +241,11 @@ export const assumeNotePage = (noteTopic?: string) => {
       this.toolbarButton('Chat with AI').click()
       return assumeChatAboutNotePage()
     },
+    sendMessageToNoteOwner(message: string) {
+      this.toolbarButton('Send message about note top bazaar').click()
+      cy.findByRole('textbox').type(message)
+      cy.findByRole('button', { name: 'Submit' }).click()
+    },
     moveUpAmongSiblings() {
       cy.pageIsNotLoading()
       this.toolbarButton('Move up').click()
