@@ -1,7 +1,7 @@
 <template>
   <PopButton :title="buttonTitle">
     <template #button_face>
-      <slot />
+      <SvgMessage />
     </template>
     <template #default="{ closer }">
       <NoteSendMessageDialog
@@ -18,6 +18,7 @@
 import { defineComponent } from "vue"
 import PopButton from "../../commons/Popups/PopButton.vue"
 import NoteSendMessageDialog from "../NoteSendMessageDialog.vue"
+import SvgMessage from "@/components/svgs/SvgMessage.vue"
 
 export default defineComponent({
   props: {
