@@ -43,6 +43,23 @@ Then(
 )
 
 Then(
+  '{string} can see the conversation with {string} in the message center',
+  (user: string, partner: string) => {
+    start
+      .reloginAndEnsureHomePage(user)
+      .navigateToMessageCenter()
+      .expectConvoWithPartner(partner)
+  }
+)
+
+Then(
+  'I can see the message {string} in the conversation with {string}',
+  (message: string, partner: string) => {
+    start.assumeMessageCenterPage().clickToSeeExpectMessage(partner, message)
+  }
+)
+
+Then(
   'I can see the message {string} in the conversation {string}',
   (feedback: string, conversation: string) => {
     start

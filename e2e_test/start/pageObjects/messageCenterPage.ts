@@ -9,6 +9,10 @@ export const assumeMessageCenterPage = () => {
       cy.findByText(partner).should('be.visible')
       return this
     },
+    expectConvoWithPartner(partner: string) {
+      cy.findByText(partner).should('be.visible')
+      return this
+    },
     clickToSeeExpectMessage(conversation: string, message: string) {
       cy.findByText(conversation).parent().should('be.visible').click()
       cy.findByText(message).should('be.visible')
