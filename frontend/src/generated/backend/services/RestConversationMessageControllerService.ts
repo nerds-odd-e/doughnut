@@ -55,6 +55,25 @@ export class RestConversationMessageControllerService {
         });
     }
     /**
+     * @param conversationId
+     * @returns any OK
+     * @throws ApiError
+     */
+    public markConversationAsRead(
+        conversationId: number,
+    ): CancelablePromise<any> {
+        return this.httpRequest.request({
+            method: 'PATCH',
+            url: '/api/message/read/{conversationId}',
+            path: {
+                'conversationId': conversationId,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
      * @returns number OK
      * @throws ApiError
      */

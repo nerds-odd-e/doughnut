@@ -2209,6 +2209,26 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Notebook"
+  /api/message/read/{conversationId}:
+    patch:
+      tags:
+      - rest-conversation-message-controller
+      operationId: markConversationAsRead
+      parameters:
+      - name: conversationId
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
   /api/fine-tuning/{suggestedQuestion}/update-suggested-question-for-fine-tuning:
     patch:
       tags:

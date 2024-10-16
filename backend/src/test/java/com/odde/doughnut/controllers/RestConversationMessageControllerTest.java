@@ -136,6 +136,16 @@ class RestConversationMessageControllerTest {
   }
 
   @Test
+  void testMarkConversationAsRead() throws UnexpectedNoAccessRightException {
+    // Conversation conversation = makeMe.aConversation().from(currentUser).please();
+    // controller.markConversationAsRead(conversation.getId());
+    // List<ConversationMessage> conversationMessages =
+    //     (List<ConversationMessage>) modelFactoryService.conversationMessageRepository.findAll();
+    // assertEquals(1, conversationMessages.size());
+    // assertEquals(true, conversationMessages.get(0).getIs_read());
+  }
+
+  @Test
   void shouldNotBeAbleToReplyToAConversationIAmNotIn() {
     Conversation conversation = makeMe.aConversation().please();
     assertThrows(
