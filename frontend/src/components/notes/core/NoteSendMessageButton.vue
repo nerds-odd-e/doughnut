@@ -25,6 +25,6 @@ export default defineComponent({
     noteId: { type: Number, required: true },
     buttonTitle: { type: String, required: true },
   },
-  components: { PopButton, NoteSendMessageDialog },
+  components: { PopButton, NoteSendMessageDialog, SvgMessage },
 })
 </script>
