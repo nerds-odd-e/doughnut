@@ -104,19 +104,32 @@ class RestConversationMessageControllerTest {
   void testGetOneUnreadConversationCountofCurrentUser() {
     Conversation conversation = makeMe.aConversation().from(currentUser).please();
 
-    makeMe.aConversationMessage().forConversationInstance(conversation).please();
-    makeMe.aConversationMessage().forConversationInstance(conversation).please();
+    var firstMsg = makeMe.aConversationMessage().forConversationInstance(conversation).please();
+    firstMsg.setSender(currentUser.getEntity());
+
+    var secondMsg = makeMe.aConversationMessage().forConversationInstance(conversation).please();
+    UserModel receiver = makeMe.aUser().toModelPlease();
+    secondMsg.setSender(receiver.getEntity());
+
     int conversations = controller.getUnreadConversationCountOfCurrentUser();
     assertEquals(1, conversations);
   }
 
   @Test
   void testGetTwoUnreadConversationCountofCurrentUser() {
+    UserModel receiver = makeMe.aUser().toModelPlease();
     Conversation fristConversation = makeMe.aConversation().from(currentUser).please();
-    makeMe.aConversationMessage().forConversationInstance(fristConversation).please();
+    var firstMsg =
+        makeMe.aConversationMessage().forConversationInstance(fristConversation).please();
+    firstMsg.setSender(receiver.getEntity());
 
     Conversation secondConversation = makeMe.aConversation().from(currentUser).please();
-    makeMe.aConversationMessage().forConversationInstance(secondConversation).please();
+    var secondMsg =
+        makeMe.aConversationMessage().forConversationInstance(secondConversation).please();
+    secondMsg.setSender(receiver.getEntity());
+    var thridMsg =
+        makeMe.aConversationMessage().forConversationInstance(secondConversation).please();
+    thridMsg.setSender(receiver.getEntity());
 
     int conversations = controller.getUnreadConversationCountOfCurrentUser();
     assertEquals(2, conversations);
@@ -134,16 +147,15 @@ class RestConversationMessageControllerTest {
   }
 
   @Test
-  void testGetTOneUnreadAndOneReadConversationCountofCurrentUser() {
-    Conversation fristConversation = makeMe.aConversation().from(currentUser).please();
-    makeMe.aConversationMessage().forConversationInstance(fristConversation).please();
+  void testGetZeroUnreadConversationWhenSenderIsCurrentUser() {
 
-    Conversation secondConversation = makeMe.aConversation().from(currentUser).please();
-    var msg = makeMe.aConversationMessage().forConversationInstance(secondConversation).please();
+    Conversation conversation = makeMe.aConversation().from(currentUser).please();
+    var msg = makeMe.aConversationMessage().forConversationInstance(conversation).please();
     msg.setIs_read(true);
+    msg.setSender(currentUser.getEntity());
 
     int conversations = controller.getUnreadConversationCountOfCurrentUser();
-    assertEquals(1, conversations);
+    assertEquals(0, conversations);
   }
 
   @Test
