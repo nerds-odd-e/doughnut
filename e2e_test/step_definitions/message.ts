@@ -34,23 +34,21 @@ Then(
 
 Then(
   '{string} can see the conversation with {string} for the question {string} in the message center',
-  (user: string, partner: string, question: string) => {
-    start
-      .reloginAndEnsureHomePage(user)
-      .navigateToMessageCenter()
-      .expectMessage(question, partner)
-  }
+  (user: string, partner: string, question: string) =>
+    findConversation(user, question, partner)
+)
+Then(
+  '{string} can see the conversation with {string} for the note {string} in the message center',
+  (user: string, partner: string, note: string) =>
+    findConversation(user, note, partner)
 )
 
-Then(
-  '{string} can see the conversation with {string} in the message center',
-  (user: string, partner: string) => {
-    start
-      .reloginAndEnsureHomePage(user)
-      .navigateToMessageCenter()
-      .expectConvoWithPartner(partner)
-  }
-)
+function findConversation(user: string, topic: string, partner: string) {
+  start
+    .reloginAndEnsureHomePage(user)
+    .navigateToMessageCenter()
+    .expectMessage(topic, partner)
+}
 
 Then(
   'I can see the message {string} in the conversation with {string}',

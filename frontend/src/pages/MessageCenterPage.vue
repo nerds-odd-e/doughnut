@@ -12,7 +12,7 @@
         <div class="col-md-3 bg-light sidebar">
           <ul class="list-group">
             <li v-for="conversation in conversations" :key="conversation.id" class="list-group-item list-group-item-action" @click="fetchThreadsForConversation(conversation.id || 0)">
-              <div>{{ conversation.assessmentQuestionInstance?.bareQuestion.multipleChoicesQuestion.stem }}</div>
+              <div>{{ conversationTopic(conversation) }}</div>
               <div>{{ conversationPartner(conversation) }}</div>
             </li>
           </ul>
@@ -109,6 +109,14 @@ const fetchThreadsForConversation = async (conversationId: number) => {
 onMounted(() => {
   fetchData()
 })
+
+const conversationTopic = (conversation: Conversation) => {
+  return (
+    conversation.assessmentQuestionInstance?.bareQuestion
+      .multipleChoicesQuestion.stem ||
+    conversation.note?.noteTopic?.topicConstructor
+  )
+}
 
 const conversationPartner = (conversation: Conversation) => {
   if (conversation.subjectOwnership?.circle?.name) {
