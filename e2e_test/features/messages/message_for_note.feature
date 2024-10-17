@@ -22,7 +22,7 @@ Feature: User having a conversation regarding a note
 
     Then "old_learner" can see the conversation with "Odd-e SG Team" in the message center
     And I can see the message "I believe the Earth is flat" in the conversation with "Odd-e SG Team"
-    And "a_trainer" can see the conversation with "Old Learner" in the message center
-    And I can see the message "I believe the Earth is flat" in the conversation with "Old Learner"
-    And "another_old_learner" can see the conversation with "Old Learner" in the message center
-    And I can see the message "I believe the Earth is flat" in the conversation with "Old Learner"
+    And "a_trainer" can see the conversation with "Odd-e SG Team" in the message center
+    And I can see the message "I believe the Earth is flat" in the conversation with "Odd-e SG Team"
+    And "another_old_learner" can see the conversation with "Odd-e SG Team" in the message center
+    And I can see the message "I believe the Earth is flat" in the conversation with "Odd-e SG Team"
