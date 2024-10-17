@@ -75,7 +75,7 @@ const fetchUnreadMessageCount = async () => {
 watch(
   () => props.user,
   () => {
-    fetchUnreadMessageCount()
+    !!props.user && fetchUnreadMessageCount()
   }
 )
 </script>
