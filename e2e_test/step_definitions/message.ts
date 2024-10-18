@@ -43,6 +43,18 @@ Then(
     findConversation(user, note, partner)
 )
 
+Then(
+  'all circle members {string} can view the message {string} in conversation with {string} for the note {string} in the message center',
+  (members: string, message: string, circleName: string, note: string) => {
+    members.split(', ').forEach((member) => {
+      findConversation(member, note, circleName)
+      start
+        .assumeMessageCenterPage()
+        .clickToSeeExpectMessage(circleName, message)
+    })
+  }
+)
+
 function findConversation(user: string, topic: string, partner: string) {
   start
     .reloginAndEnsureHomePage(user)

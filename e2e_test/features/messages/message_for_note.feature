@@ -5,11 +5,11 @@ Feature: User having a conversation regarding a note
   Scenario: Users can see the conversation regarding a note in a bazaar
     Given I am logged in as "old_learner"
     And there is a certified notebook "Rocket Science" by "a_trainer" with 2 questions, shared to the Bazaar
-    When I start a conversation about the note "Rocket Science" with a message "I believe the Earth is flat"
+    When I start a conversation about the note "Rocket Science" with a message "Hi"
     Then "a_trainer" can see the conversation with "Old Learner" for the note "Rocket Science" in the message center
-    And I can see the message "I believe the Earth is flat" in the conversation with "Old Learner"
+    And I can see the message "Hi" in the conversation with "Old Learner"
     And "old_learner" can see the conversation with "A Trainer" for the note "Rocket Science" in the message center
-    And I can see the message "I believe the Earth is flat" in the conversation with "A Trainer"
+    And I can see the message "Hi" in the conversation with "A Trainer"
 
   Scenario: Users can see the conversation regarding a note in a circle
     Given There is a circle "Odd-e SG Team" with "a_trainer, old_learner, another_old_learner" members
@@ -18,11 +18,6 @@ Feature: User having a conversation regarding a note
 
     When I am re-logged in as "old_learner"
     And There is a notebook "Team agreement" in circle "Odd-e SG Team"
-    And I start a conversation about the note "Team agreement" with a message "I believe the Earth is flat"
+    And I start a conversation about the note "Team agreement" with a message "Hi"
 
-    Then "old_learner" can see the conversation with "Odd-e SG Team" for the note "Team agreement" in the message center
-    And I can see the message "I believe the Earth is flat" in the conversation with "Odd-e SG Team"
-    And "a_trainer" can see the conversation with "Odd-e SG Team" for the note "Team agreement" in the message center
-    And I can see the message "I believe the Earth is flat" in the conversation with "Odd-e SG Team"
-    And "another_old_learner" can see the conversation with "Odd-e SG Team" for the note "Team agreement" in the message center
-    And I can see the message "I believe the Earth is flat" in the conversation with "Odd-e SG Team"
+    Then all circle members "a_trainer, old_learner, another_old_learner" can view the message "Hi" in conversation with "Odd-e SG Team" for the note "Team agreement" in the message center
