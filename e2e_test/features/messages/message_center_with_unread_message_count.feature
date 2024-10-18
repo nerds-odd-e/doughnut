@@ -14,11 +14,11 @@ Feature: Message Center with Unread Message Count
         Then "a_trainer" can see the notification icon with 1 unread messages
 
     Scenario: User has 1 unread message, after clicking the notification icon, the unread message count is 0
-        Then "a_trainer" can see the conversation with "Old Learner" for the question "Is 0 * 0 = 0?" in the message center
+        Then "a_trainer" can see the conversation with "Old Learner" for the topic "Is 0 * 0 = 0?" in the message center
         And I can see the message "I believe the question is incorrect" in the conversation "Is 0 * 0 = 0?"
         And The current page is reloaded
         Then "a_trainer" can see the notification icon with no unread messages
-        Then "old_learner" can see the conversation with "A Trainer" for the question "Is 0 * 0 = 0?" in the message center
+        Then "old_learner" can see the conversation with "A Trainer" for the topic "Is 0 * 0 = 0?" in the message center
         And I can see the message "I believe the question is incorrect" in the conversation "Is 0 * 0 = 0?"
         And The current page is reloaded
         Then "old_learner" can see the notification icon with no unread messages

@@ -33,14 +33,9 @@ Then(
 )
 
 Then(
-  '{string} can see the conversation with {string} for the question {string} in the message center',
-  (user: string, partner: string, question: string) =>
-    findConversation(user, question, partner)
-)
-Then(
-  '{string} can see the conversation with {string} for the note {string} in the message center',
-  (user: string, partner: string, note: string) =>
-    findConversation(user, note, partner)
+  '{string} can see the conversation with {string} for the topic {string} in the message center',
+  (user: string, partner: string, topic: string) =>
+    findConversation(user, topic, partner)
 )
 
 Then(
