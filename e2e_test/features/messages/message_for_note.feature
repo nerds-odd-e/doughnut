@@ -14,10 +14,9 @@ Feature: User having a conversation regarding a note
   Scenario: Users can see the conversation regarding a note in a circle
     Given There is a circle "Odd-e SG Team" with "a_trainer, old_learner, another_old_learner" members
     And I am logged in as "a_trainer"
-    And I create a notebook "Team agreement" in circle "Odd-e SG Team"
+    And There is a notebook "Team agreement" in circle "Odd-e SG Team"
 
     When I am re-logged in as "old_learner"
-    And There is a notebook "Team agreement" in circle "Odd-e SG Team"
     And I start a conversation about the note "Team agreement" with a message "Hi"
 
     Then all circle members "a_trainer, old_learner, another_old_learner" can view the message "Hi" in conversation with "Odd-e SG Team" for the note "Team agreement" in the message center
