@@ -65,6 +65,14 @@ Given(
 )
 
 Given(
+  'there is a notebook with head note {string} from user {string} shared to the Bazaar',
+  (noteTopic: string, externalIdentifier: string | undefined) => {
+    start.testability().injectNotes([{ Topic: noteTopic }], externalIdentifier)
+    start.testability().shareToBazaar(noteTopic)
+  }
+)
+
+Given(
   'there are notes from Note {int} to Note {int}',
   (from: number, to: number) => {
     const notes = Array(to - from + 1)

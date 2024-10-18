@@ -60,7 +60,7 @@ const testability = () => {
       externalIdentifier = '',
       circleName: string | null = null
     ) {
-      postToTestabilityApi(cy, 'inject_notes', {
+      return postToTestabilityApi(cy, 'inject_notes', {
         body: {
           externalIdentifier,
           circleName,
