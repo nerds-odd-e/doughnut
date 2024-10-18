@@ -75,6 +75,7 @@ Then(
     start
       .assumeMessageCenterPage()
       .clickToSeeExpectMessage(conversation, feedback)
+      .reloadCurrentPage()
   }
 )
 

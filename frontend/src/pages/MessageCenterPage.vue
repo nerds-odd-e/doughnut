@@ -104,6 +104,9 @@ const fetchThreadsForConversation = async (conversationId: number) => {
       conversationId
     )
   currentConversationId.value = conversationId
+  await managedApi.restConversationMessageController.markConversationAsRead(
+    conversationId
+  )
 }
 
 onMounted(() => {
