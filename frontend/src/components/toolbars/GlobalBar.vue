@@ -51,8 +51,8 @@ import type { User } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { type ApiStatus } from "@/managedApi/ManagedApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
-import type { PropType, Ref } from "vue"
-import { inject, watch } from "vue"
+import type { PropType } from "vue"
+import { ref, watch } from "vue"
 const props = defineProps({
   storageAccessor: {
     type: Object as PropType<StorageAccessor>,
@@ -63,15 +63,13 @@ const props = defineProps({
 })
 defineEmits(["updateUser", "clearErrorMessage"])
 const { managedApi } = useLoadingApi()
-const unreadMessageCount = inject("unreadMessageCount") as Ref<number>
-const updateUnreadMessageCount = inject("updateUnreadMessageCount") as (
-  count: number
-) => void
+
+const unreadMessageCount = ref(0)
 
 const fetchUnreadMessageCount = async () => {
   const unreadMessageCountResponse =
     await managedApi.restConversationMessageController.getUnreadConversationCountOfCurrentUser()
-  updateUnreadMessageCount(unreadMessageCountResponse)
+  unreadMessageCount.value = unreadMessageCountResponse
 }
 
 watch(
