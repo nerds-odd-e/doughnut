@@ -1,6 +1,5 @@
-Feature: Check unread message count
-    As a user, I want to check the number of unread messages in the message center.
-
+Feature: Message Center with Unread Message Count
+    As a user, I want to see the number of unread messages in the message center.
 
     Background:
         Given I am logged in as "old_learner"
@@ -11,7 +10,7 @@ Feature: Check unread message count
     Scenario: User has no unread messages in the message center
         Then "old_learner" can see the notification icon with no unread messages
 
-    Scenario: User has 1 unread message in the message center    
+    Scenario: User has 1 unread message in the message center
         Then "a_trainer" can see the notification icon with 1 unread messages
 
     Scenario: User has 1 unread message, after clicking the notification icon, the unread message count is 0
