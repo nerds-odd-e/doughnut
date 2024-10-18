@@ -75,9 +75,12 @@ Then(
     start
       .assumeMessageCenterPage()
       .clickToSeeExpectMessage(conversation, feedback)
-      .reloadCurrentPage()
   }
 )
+
+Then('The current page is reloaded', () => {
+  start.assumeMessageCenterPage().reloadCurrentPage()
+})
 
 Then(
   '{string} can see the notification icon with no unread messages',
