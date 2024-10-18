@@ -4,8 +4,8 @@ export const assumeMessageCenterPage = () => {
   cy.findByText('Message Center').should('be.visible')
 
   return {
-    expectMessage(message: string, partner: string) {
-      cy.findByText(message).should('be.visible')
+    expectConversation(topic: string, partner: string) {
+      cy.findByText(topic).should('be.visible')
       cy.findByText(partner).should('be.visible')
       return this
     },

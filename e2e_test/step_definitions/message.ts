@@ -23,16 +23,6 @@ Then(
 )
 
 Then(
-  '{string} can see the conversation {string} with {string} in the message center',
-  (user: string, feedback: string, partner: string) => {
-    start
-      .reloginAndEnsureHomePage(user)
-      .navigateToMessageCenter()
-      .expectMessage(feedback, partner)
-  }
-)
-
-Then(
   '{string} can see the conversation with {string} for the topic {string} in the message center',
   (user: string, partner: string, topic: string) =>
     findConversation(user, topic, partner)
@@ -54,7 +44,7 @@ function findConversation(user: string, topic: string, partner: string) {
   start
     .reloginAndEnsureHomePage(user)
     .navigateToMessageCenter()
-    .expectMessage(topic, partner)
+    .expectConversation(topic, partner)
 }
 
 Then(
