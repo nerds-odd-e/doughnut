@@ -54,7 +54,7 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import { onMounted, ref } from "vue"
+import { inject, onMounted, ref } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import ContainerFluidPage from "@/pages/commons/ContainerFluidPage.vue"
 import type {
@@ -75,6 +75,10 @@ const currentConversationDetails = ref<ConversationMessage[] | undefined>(
   undefined
 )
 const message = ref("")
+
+const updateUnreadMessageCount = inject("updateUnreadMessageCount") as (
+  count: number
+) => void
 
 const formatMessage = (message: string) => {
   return message.replace(/^"|"$/g, "").trim()
@@ -107,6 +111,9 @@ const fetchThreadsForConversation = async (conversationId: number) => {
   await managedApi.restConversationMessageController.markConversationAsRead(
     conversationId
   )
+  const unreadMessageCountResponse =
+    await managedApi.restConversationMessageController.getUnreadConversationCountOfCurrentUser()
+  updateUnreadMessageCount(unreadMessageCountResponse)
 }
 
 onMounted(() => {

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Ref } from "vue"
-import { computed, onMounted, provide, ref } from "vue"
+import { computed, onMounted, provide, ref, readonly } from "vue"
 import { useRoute } from "vue-router"
 import Popups from "./components/commons/Popups/Popups.vue"
 import TestMenu from "./components/commons/TestMenu.vue"
@@ -31,6 +31,14 @@ const user = ref<User | undefined>()
 const featureToggle = ref(false)
 const environment = ref("production")
 const userLoaded = ref(false)
+
+const unreadMessageCount = ref(0)
+const updateUnreadMessageCount = (count: number) => {
+  unreadMessageCount.value = count
+}
+
+provide("unreadMessageCount", readonly(unreadMessageCount))
+provide("updateUnreadMessageCount", updateUnreadMessageCount)
 
 const newUser = computed(() => {
   return !user.value && !!externalIdentifier.value
@@ -72,10 +80,13 @@ onMounted(async () => {
       v-bind="{ storageAccessor, user, apiStatus }"
       @update-user="user = $event"
       @clear-error-message="clearErrorMessage($event)"
+      @update-unread-message-count="updateUnreadMessageCount($event)"
     />
     <UserNewRegisterPage v-if="newUser" @update-user="user = $event" />
     <template v-else-if="userLoaded">
-      <router-view v-bind="routeViewProps" />
+      <router-view v-bind="routeViewProps" 
+        @update-unread-message-count="updateUnreadMessageCount($event)"
+      />
     </template>
   </div>
   <TestMenu

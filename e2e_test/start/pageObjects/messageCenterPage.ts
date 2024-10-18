@@ -39,10 +39,6 @@ export const assumeMessageCenterPage = () => {
         .and('not.have.class', 'justify-content-end')
       return this
     },
-    reloadCurrentPage() {
-      cy.reload()
-      return this
-    },
   }
 }
 

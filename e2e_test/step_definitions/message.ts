@@ -78,10 +78,6 @@ Then(
   }
 )
 
-Then('The current page is reloaded', () => {
-  start.assumeMessageCenterPage().reloadCurrentPage()
-})
-
 Then(
   '{string} can see the notification icon with no unread messages',
   (user: string) => {
