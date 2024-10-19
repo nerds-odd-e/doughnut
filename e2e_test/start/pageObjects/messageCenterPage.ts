@@ -31,9 +31,6 @@ export const assumeMessageCenterPage = () => {
       cy.reload()
       return this
     },
-    clickToSeeExpectMessage(conversation: string, message: string) {
-      return this.conversation(conversation).expectMessage(message)
-    },
     conversation(conversationTopic: string) {
       cy.findByText(conversationTopic).parent().should('be.visible').click()
       return {

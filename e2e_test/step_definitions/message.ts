@@ -26,39 +26,34 @@ Then(
 Then(
   '{string} can see the conversation with {string} for the topic {string} in the message center:',
   (user: string, partner: string, topic: string, data: DataTable) => {
-    findConversation(user, topic, partner)
     start
-      .assumeMessageCenterPage()
+      .reloginAndEnsureHomePage(user)
+      .navigateToMessageCenter()
+      .expectConversation(topic, partner)
       .conversation(topic)
       .expectMessage(data.hashes()[0]!.message!)
   }
 )
 
 Then(
-  'all circle members {string} can view the message {string} in conversation with {string} for the note {string} in the message center',
-  (members: string, message: string, circleName: string, note: string) => {
+  'all circle members {string} can view the conversation with {string} for the note {string} in the message center',
+  (members: string, circleName: string, note: string) => {
     members.split(', ').forEach((member) => {
-      findConversation(member, note, circleName)
       start
-        .assumeMessageCenterPage()
-        .clickToSeeExpectMessage(circleName, message)
+        .reloginAndEnsureHomePage(member)
+        .navigateToMessageCenter()
+        .expectConversation(note, circleName)
     })
   }
 )
 
-function findConversation(user: string, topic: string, partner: string) {
-  start
-    .reloginAndEnsureHomePage(user)
-    .navigateToMessageCenter()
-    .expectConversation(topic, partner)
-}
-
 Then(
   'I can see the message {string} in the conversation {string}',
-  (feedback: string, conversation: string) => {
+  (message: string, conversation: string) => {
     start
       .assumeMessageCenterPage()
-      .clickToSeeExpectMessage(conversation, feedback)
+      .conversation(conversation)
+      .expectMessage(message)
   }
 )
 
@@ -83,8 +78,11 @@ Then(
 )
 
 When(
-  'I start a conversation about the note {string} with a message {string}',
-  (note: string, conversation: string) => {
-    start.jumpToNotePage(note).sendMessageToNoteOwner(conversation)
+  '{string} start a conversation about the note {string} with a message {string}',
+  (externalIdentifier: string, note: string, conversation: string) => {
+    start
+      .loginAs(externalIdentifier)
+      .jumpToNotePage(note)
+      .sendMessageToNoteOwner(conversation)
   }
 )

@@ -88,9 +88,11 @@ When('I am on {string} circle page', (circleName: string) => {
 })
 
 When(
-  'There is a notebook {string} in circle {string}',
-  (topic: string, circleName: string) => {
-    start.testability().injectNotes([{ Topic: topic }], '', circleName)
+  'There is a notebook {string} in circle {string} by {string}',
+  (topic: string, circleName: string, externalIdentifier: string) => {
+    start
+      .testability()
+      .injectNotes([{ Topic: topic }], externalIdentifier, circleName)
   }
 )
 
