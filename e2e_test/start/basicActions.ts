@@ -55,7 +55,7 @@ export default {
   getUnreadMessageCount() {
     return cy.get('#top-navbar-message-icon').get('.unread-count')
   },
-  checkForMessageCenterIcon() {
+  expectMessageCenterIconWithNoCount() {
     this.getUnreadMessageCount().should('not.exist')
   },
   checkForUnreadMessageCount(unreadMessageCount: number) {

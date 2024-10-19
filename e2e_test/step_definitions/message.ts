@@ -24,10 +24,9 @@ Then(
 )
 
 Then(
-  '{string} read the conversation with {string} for the topic {string} in the message center',
-  (user: string, partner: string, topic: string) => {
+  'I read the conversation with {string} for the topic {string} in the message center',
+  (partner: string, topic: string) => {
     start
-      .reloginAndEnsureHomePage(user)
       .navigateToMessageCenter()
       .expectConversation(topic, partner)
       .conversation(topic)
@@ -71,9 +70,13 @@ Then(
 Then(
   'there should be no unread message for the user {string}',
   (user: string) => {
-    start.reloginAndEnsureHomePage(user).checkForMessageCenterIcon()
+    start.reloginAndEnsureHomePage(user).expectMessageCenterIconWithNoCount()
   }
 )
+
+Then('I should have no unread messages', () => {
+  start.expectMessageCenterIconWithNoCount()
+})
 
 Then(
   '{string} should have {int} unread messages',
