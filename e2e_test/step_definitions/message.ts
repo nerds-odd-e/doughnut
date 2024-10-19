@@ -68,10 +68,6 @@ Then(
   }
 )
 
-Then('The current page is reloaded', () => {
-  start.assumeMessageCenterPage().reloadCurrentPage()
-})
-
 Then(
   'there should be no unread message for the user {string}',
   (user: string) => {
@@ -80,7 +76,7 @@ Then(
 )
 
 Then(
-  '{string} can see the notification icon with {int} unread messages',
+  '{string} should have {int} unread messages',
   (user: string, unreadMessageCount: number) => {
     start
       .reloginAndEnsureHomePage(user)

@@ -7,9 +7,8 @@ Feature: Message Center with Unread Message Count
 
     Scenario: Message receiver should have 1 unread message while sender has none
       Then there should be no unread message for the user "old_learner"
-      And "a_trainer" can see the notification icon with 1 unread messages
+      And "a_trainer" should have 1 unread messages
 
     Scenario: The message is read by the receiver
         When "a_trainer" read the conversation with "Old Learner" for the topic "Rocket Science" in the message center
-        And The current page is reloaded
         Then there should be no unread message for the user "a_trainer"
