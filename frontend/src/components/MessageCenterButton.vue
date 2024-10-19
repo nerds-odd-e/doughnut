@@ -1,5 +1,5 @@
 <template>
-  <router-link to="/d/feedback">
+  <router-link to="/d/message-center">
     <div id="top-navbar-message-icon">
       <div v-if="unreadMessageCount > 0" class="unread-count">
         {{ unreadMessageCount }}

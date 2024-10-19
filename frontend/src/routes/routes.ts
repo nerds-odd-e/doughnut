@@ -86,7 +86,7 @@ const routes = [
     meta: { userProp: true },
   },
   {
-    path: "/d/feedback",
+    path: "/d/message-center",
     name: "messageCenter",
     component: MessageCenterPage,
     props: true,
