@@ -62,6 +62,7 @@ import type {
   User,
   ConversationMessage,
 } from "@/generated/backend"
+import { messageCenterConversations } from "@/store/messageStore"
 
 const { managedApi } = useLoadingApi()
 
@@ -107,6 +108,8 @@ const fetchThreadsForConversation = async (conversationId: number) => {
   await managedApi.restConversationMessageController.markConversationAsRead(
     conversationId
   )
+
+  messageCenterConversations.unreadMessageCount -= 1
 }
 
 onMounted(() => {

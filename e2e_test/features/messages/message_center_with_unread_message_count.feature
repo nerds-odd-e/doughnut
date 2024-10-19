@@ -9,7 +9,6 @@ Feature: Message Center with Unread Message Count
     Then there should be no unread message for the user "old_learner"
     And "a_trainer" should have 1 unread messages
 
-  @ignore
   Scenario: The message is read by the receiver
     Given I am re-logged in as "a_trainer" and reload the page
     When I read the conversation with "Old Learner" for the topic "Rocket Science" in the message center
