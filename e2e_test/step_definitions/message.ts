@@ -62,7 +62,7 @@ Then('The current page is reloaded', () => {
 })
 
 Then(
-  '{string} can see the notification icon with no unread messages',
+  'there should be no unread message for the user {string}',
   (user: string) => {
     start.reloginAndEnsureHomePage(user).checkForMessageCenterIcon()
   }
