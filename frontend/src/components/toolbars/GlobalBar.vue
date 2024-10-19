@@ -15,14 +15,7 @@
       <div class="d-flex flex-grow-1 justify-content-between">
         <div class="d-flex flex-grow-1" id="head-status" />
         <div class="btn-group btn-group-sm">
-          <router-link to="/d/feedback">
-            <div v-if="user" id="top-navbar-message-icon">
-              <div v-if="unreadMessageCount > 0" class="unread-count">
-                {{ unreadMessageCount }}
-              </div>
-              <SvgMessage />
-            </div>
-          </router-link>
+          <MessageCenterButton v-if="user" :user="user" />
           <PopButton v-if="user" title="search note">
             <template #button_face>
               <SvgSearch />
@@ -48,12 +41,12 @@
 
 <script setup lang="ts">
 import type { User } from "@/generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
 import { type ApiStatus } from "@/managedApi/ManagedApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import type { PropType } from "vue"
-import { ref, watch } from "vue"
-const props = defineProps({
+import MessageCenterButton from "@/components/MessageCenterButton.vue"
+
+defineProps({
   storageAccessor: {
     type: Object as PropType<StorageAccessor>,
     required: true,
@@ -62,22 +55,6 @@ const props = defineProps({
   user: { type: Object as PropType<User> },
 })
 defineEmits(["updateUser", "clearErrorMessage"])
-const { managedApi } = useLoadingApi()
-
-const unreadMessageCount = ref(0)
-
-const fetchUnreadMessageCount = async () => {
-  const unreadMessageCountResponse =
-    await managedApi.restConversationMessageController.getUnreadConversationCountOfCurrentUser()
-  unreadMessageCount.value = unreadMessageCountResponse
-}
-
-watch(
-  () => props.user,
-  () => {
-    !!props.user && fetchUnreadMessageCount()
-  }
-)
 </script>
 
 <style scoped lang="scss">
