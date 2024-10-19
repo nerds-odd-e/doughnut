@@ -44,7 +44,7 @@ import type { User } from "@/generated/backend"
 import { type ApiStatus } from "@/managedApi/ManagedApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import type { PropType } from "vue"
-import MessageCenterButton from "@/components/MessageCenterButton.vue"
+import MessageCenterButton from "@/components/toolbars/MessageCenterButton.vue"
 
 defineProps({
   storageAccessor: {
