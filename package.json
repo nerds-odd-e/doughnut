@@ -63,10 +63,10 @@
     "got": "^14.4.3",
     "jsdom": "^25.0.1",
     "mountebank": "^2.9.1",
-    "npm-run-all2": "^6.2.3",
+    "npm-run-all2": "^6.2.4",
     "openapi-typescript-codegen": "^0.29.0",
     "process": "^0.11.10",
-    "superagent": "^10.1.0",
+    "superagent": "^10.1.1",
     "syncpack": "^13.0.0",
     "typescript": "5.6.3",
     "util": "^0.12.5",
@@ -82,8 +82,7 @@
     "overrides": {
       "ejs@<3.1.7": ">=3.1.7",
       "jsonpath-plus@<10.0.0": ">=10.0.0",
-      "body-parser@<1.20.3": ">=1.20.3",
-      "path-to-regexp@<1.1.10": ">=1.1.10"
+      "body-parser@<1.20.3": ">=1.20.3"
     }
   },
   "packageManager": "pnpm@9.12.2+sha512.22721b3a11f81661ae1ec68ce1a7b879425a1ca5b991c975b074ac220b187ce56c708fe5db69f4c962c989452eee76c82877f4ee80f474cebd61ee13461b6228"
