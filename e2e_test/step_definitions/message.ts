@@ -1,10 +1,11 @@
 import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
+import { DataTable } from '@cucumber/cucumber'
 
 Then(
   'I reply {string} to the conversation {string}',
   (message: string, conversation: string) => {
-    start.navigateToMessageCenter().replyInConversation(conversation, message)
+    start.navigateToMessageCenter().conversation(conversation).reply(message)
   }
 )
 
@@ -23,9 +24,14 @@ Then(
 )
 
 Then(
-  '{string} can see the conversation with {string} for the topic {string} in the message center',
-  (user: string, partner: string, topic: string) =>
+  '{string} can see the conversation with {string} for the topic {string} in the message center:',
+  (user: string, partner: string, topic: string, data: DataTable) => {
     findConversation(user, topic, partner)
+    start
+      .assumeMessageCenterPage()
+      .conversation(topic)
+      .expectMessage(data.hashes()[0]!.message!)
+  }
 )
 
 Then(
@@ -46,13 +52,6 @@ function findConversation(user: string, topic: string, partner: string) {
     .navigateToMessageCenter()
     .expectConversation(topic, partner)
 }
-
-Then(
-  'I can see the message {string} in the conversation with {string}',
-  (message: string, partner: string) => {
-    start.assumeMessageCenterPage().clickToSeeExpectMessage(partner, message)
-  }
-)
 
 Then(
   'I can see the message {string} in the conversation {string}',
