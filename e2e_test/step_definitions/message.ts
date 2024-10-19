@@ -24,6 +24,17 @@ Then(
 )
 
 Then(
+  '{string} read the conversation with {string} for the topic {string} in the message center',
+  (user: string, partner: string, topic: string) => {
+    start
+      .reloginAndEnsureHomePage(user)
+      .navigateToMessageCenter()
+      .expectConversation(topic, partner)
+      .conversation(topic)
+  }
+)
+
+Then(
   '{string} can see the conversation with {string} for the topic {string} in the message center:',
   (user: string, partner: string, topic: string, data: DataTable) => {
     start
