@@ -46,18 +46,6 @@ Then(
 )
 
 Then(
-  'all circle members {string} can view the conversation with {string} for the note {string} in the message center',
-  (members: string, circleName: string, note: string) => {
-    members.split(', ').forEach((member) => {
-      start
-        .reloginAndEnsureHomePage(member)
-        .navigateToMessageCenter()
-        .expectConversation(note, circleName)
-    })
-  }
-)
-
-Then(
   'I can see the message {string} in the conversation {string}',
   (message: string, conversation: string) => {
     start
