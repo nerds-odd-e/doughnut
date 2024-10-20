@@ -70,12 +70,15 @@ Then(
 Then(
   'there should be no unread message for the user {string}',
   (user: string) => {
-    start.reloginAndEnsureHomePage(user).expectMessageCenterIconWithNoCount()
+    start
+      .reloginAndEnsureHomePage(user)
+      .messageCenterIndicator()
+      .expectNoCount()
   }
 )
 
 Then('I should have no unread messages', () => {
-  start.expectMessageCenterIconWithNoCount()
+  start.messageCenterIndicator().expectNoCount()
 })
 
 Then(
@@ -83,7 +86,8 @@ Then(
   (user: string, unreadMessageCount: number) => {
     start
       .reloginAndEnsureHomePage(user)
-      .checkForUnreadMessageCount(unreadMessageCount)
+      .messageCenterIndicator()
+      .expectCount(unreadMessageCount)
   }
 )
 

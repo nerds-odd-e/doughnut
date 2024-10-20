@@ -14,6 +14,7 @@ import { systemSidebar } from './pageObjects/systemSidebar'
 import { navigateToMessageCenter } from './pageObjects/messageCenterPage'
 import testability from './testability'
 import { logins } from './logins'
+import { messageCenterIndicator } from './pageObjects/messageCenterIndicator'
 
 export default {
   navigateToBazaar,
@@ -52,13 +53,5 @@ export default {
     this.reloginAsAdmin()
     return this.goToAdminDashboard()
   },
-  getUnreadMessageCount() {
-    return cy.get('#top-navbar-message-icon').get('.unread-count')
-  },
-  expectMessageCenterIconWithNoCount() {
-    this.getUnreadMessageCount().should('not.exist')
-  },
-  checkForUnreadMessageCount(unreadMessageCount: number) {
-    this.getUnreadMessageCount().should('contain', unreadMessageCount)
-  },
+  messageCenterIndicator,
 }
