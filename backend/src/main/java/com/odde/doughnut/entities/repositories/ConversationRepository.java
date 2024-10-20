@@ -1,6 +1,7 @@
 package com.odde.doughnut.entities.repositories;
 
 import com.odde.doughnut.entities.Conversation;
+import com.odde.doughnut.entities.ConversationMessage;
 import com.odde.doughnut.entities.User;
 import java.util.List;
 import org.springframework.data.jpa.repository.Query;
@@ -11,4 +12,12 @@ public interface ConversationRepository extends CrudRepository<Conversation, Int
   @Query(
       "SELECT c FROM Conversation c WHERE c.subjectOwnership.user = :user OR c.subjectOwnership IN (SELECT o FROM Ownership o JOIN o.circle.members mem WHERE mem = :user) OR c.conversationInitiator = :user")
   List<Conversation> findByUserInSubjectOwnershipOrConversationInitiator(@Param("user") User user);
+
+  @Query(
+      "SELECT cm FROM ConversationMessage cm "
+          + "JOIN cm.conversation c "
+          + "WHERE (c.subjectOwnership.user = :user OR c.subjectOwnership IN (SELECT o FROM Ownership o JOIN o.circle.members mem WHERE mem = :user) OR c.conversationInitiator = :user) "
+          + "AND cm.sender != :user "
+          + "AND cm.readByReceiver IS NOT TRUE ")
+  List<ConversationMessage> findUnreadMessagesByUser(@Param("user") User user);
 }

@@ -49,15 +49,7 @@ public class ConversationService {
     return modelFactoryService.conversationMessageRepository.save(conversationMessage);
   }
 
-  public List<ConversationMessage> getConversationMessages(User user) {
-    List<Conversation> conversations = conversationRelatedToUser(user);
-    return conversations.stream()
-        .flatMap(conversation -> conversation.getConversationMessages().stream())
-        .toList();
-  }
-
   public void markConversationAsRead(Conversation conversation, User user) {
-    Integer conversationId = conversation.getId();
     List<ConversationMessage> conversationMessages = conversation.getConversationMessages();
     conversationMessages.forEach(
         conversationMessage -> {
@@ -70,9 +62,7 @@ public class ConversationService {
   }
 
   public List<Conversation> getUnreadConversations(User user) {
-    List<ConversationMessage> conversationMessages = getConversationMessages(user);
-    return conversationMessages.stream()
-        .filter(message -> !message.getReadByReceiver() && !message.getSender().equals(user))
+    return modelFactoryService.conversationRepository.findUnreadMessagesByUser(user).stream()
         .map(ConversationMessage::getConversation)
         .toList();
   }
