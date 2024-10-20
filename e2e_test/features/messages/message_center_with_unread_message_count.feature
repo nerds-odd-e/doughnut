@@ -24,3 +24,13 @@ Feature: Message Center with Unread Message Count
     Given I am re-logged in as "old_learner" and reload the page
     When I read the conversation with "A Trainer" for the topic "Rocket Science" in the message center
     Then I should have no unread messages
+
+  @ignore
+  Scenario: Any user in a circle read the message count as read for all circle members
+    Given There is a circle "TDD Fan Club" with "a_trainer, old_learner" members
+    And There is a notebook "Critical Thinking" in circle "TDD Fan Club" by "a_trainer"
+    And notebook "Critical Thinking" is shared to the Bazaar
+    And "another_old_learner" start a conversation about the note "Critical Thinking" with a message "Hi"
+    Then "old_learner" should have 1 unread messages
+    When I read the conversation with "Another Old Learner" for the topic "Critical Thinking" in the message center
+    Then there should be no unread message for the user "a_trainer"
