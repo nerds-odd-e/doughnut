@@ -2229,6 +2229,12 @@ paths:
                 type: string
         "200":
           description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Conversation"
   /api/fine-tuning/{suggestedQuestion}/update-suggested-question-for-fine-tuning:
     patch:
       tags:

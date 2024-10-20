@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -159,6 +160,17 @@ class RestConversationMessageControllerTest {
   }
 
   @Test
+  void testMarkConversationAsReadReduceTheCount() throws UnexpectedNoAccessRightException {
+    Conversation conversation = makeMe.aConversation().from(currentUser).please();
+    ConversationMessage msg =
+      makeMe.aConversationMessage().forConversationInstance(conversation).please();
+    UserModel receiver = makeMe.aUser().toModelPlease();
+    msg.setSender(receiver.getEntity());
+    List<Conversation> conversations = controller.markConversationAsRead(conversation);
+    assertThat(conversations.size()).isEqualTo(0);
+  }
+
+  @Test
   void testMarkConversationAsReadByReceiver() throws UnexpectedNoAccessRightException {
     Conversation conversation = makeMe.aConversation().from(currentUser).please();
     ConversationMessage msg =
@@ -166,7 +178,6 @@ class RestConversationMessageControllerTest {
     UserModel receiver = makeMe.aUser().toModelPlease();
     msg.setSender(receiver.getEntity());
     assertEquals(false, msg.getIs_read());
-
     controller.markConversationAsRead(conversation);
     assertEquals(true, msg.getIs_read());
   }
@@ -177,7 +188,6 @@ class RestConversationMessageControllerTest {
     ConversationMessage msg =
         makeMe.aConversationMessage().forConversationInstance(conversation).please();
     msg.setSender(currentUser.getEntity());
-
     controller.markConversationAsRead(conversation);
     assertEquals(false, msg.getIs_read());
   }

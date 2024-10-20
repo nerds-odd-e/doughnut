@@ -105,11 +105,11 @@ const fetchThreadsForConversation = async (conversationId: number) => {
       conversationId
     )
   currentConversationId.value = conversationId
+  messageCenterConversations.unreadConversations =
   await managedApi.restConversationMessageController.markConversationAsRead(
     conversationId
   )
 
-  messageCenterConversations.unreadConversations.pop()
 }
 
 onMounted(() => {

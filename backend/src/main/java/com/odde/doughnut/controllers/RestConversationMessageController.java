@@ -8,6 +8,7 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ConversationService;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
+
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -42,23 +43,16 @@ public class RestConversationMessageController {
   @GetMapping("/unreadCount")
   public List<Conversation> getUnreadConversations() {
     currentUser.assertLoggedIn();
-    List<ConversationMessage> conversationMessages =
-        conversationService.getConversationMessages(currentUser.getEntity());
-    return conversationMessages.stream()
-        .filter(
-            message ->
-                !message.getIs_read() && !message.getSender().equals(currentUser.getEntity()))
-        .map(ConversationMessage::getConversation)
-        .distinct()
-        .toList();
+    return conversationService.getUnreadConversations(currentUser.getEntity());
   }
 
   @PatchMapping("/read/{conversationId}")
-  public void markConversationAsRead(
+  public List<Conversation> markConversationAsRead(
       @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(conversation);
     conversationService.markConversationAsRead(conversation, currentUser.getEntity());
+    return conversationService.getUnreadConversations(currentUser.getEntity());
   }
 
   @PostMapping("/detail/send/{conversationId}")

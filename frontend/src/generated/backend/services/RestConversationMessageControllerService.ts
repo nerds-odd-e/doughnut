@@ -56,12 +56,12 @@ export class RestConversationMessageControllerService {
     }
     /**
      * @param conversationId
-     * @returns any OK
+     * @returns Conversation OK
      * @throws ApiError
      */
     public markConversationAsRead(
         conversationId: number,
-    ): CancelablePromise<any> {
+    ): CancelablePromise<Array<Conversation>> {
         return this.httpRequest.request({
             method: 'PATCH',
             url: '/api/message/read/{conversationId}',

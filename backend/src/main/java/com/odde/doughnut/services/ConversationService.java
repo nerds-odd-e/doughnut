@@ -81,4 +81,16 @@ public class ConversationService {
           }
         });
   }
+
+  public List<Conversation> getUnreadConversations(User user) {
+    List<ConversationMessage> conversationMessages =
+        getConversationMessages(user);
+    return conversationMessages.stream()
+      .filter(
+        message ->
+          !message.getIs_read() && !message.getSender().equals(user))
+      .map(ConversationMessage::getConversation)
+      .distinct()
+      .toList();
+  }
 }
