@@ -8,7 +8,6 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ConversationService;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
-
 import org.springframework.web.bind.annotation.*;
 
 @RestController

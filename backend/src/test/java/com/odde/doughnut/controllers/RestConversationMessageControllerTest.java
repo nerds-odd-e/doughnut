@@ -163,7 +163,7 @@ class RestConversationMessageControllerTest {
   void testMarkConversationAsReadReduceTheCount() throws UnexpectedNoAccessRightException {
     Conversation conversation = makeMe.aConversation().from(currentUser).please();
     ConversationMessage msg =
-      makeMe.aConversationMessage().forConversationInstance(conversation).please();
+        makeMe.aConversationMessage().forConversationInstance(conversation).please();
     UserModel receiver = makeMe.aUser().toModelPlease();
     msg.setSender(receiver.getEntity());
     List<Conversation> conversations = controller.markConversationAsRead(conversation);
