@@ -29,7 +29,7 @@ public class ConversationMessage extends EntityIdentifiedByIdOnly {
   User sender;
 
   @NotNull
-  @Column(name = "is_read", columnDefinition = "BOOLEAN")
+  @Column(name = "read_by_receiver", columnDefinition = "BOOLEAN")
   Boolean readByReceiver;
 
   @Column(name = "created_at")
