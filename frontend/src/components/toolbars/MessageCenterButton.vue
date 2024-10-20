@@ -1,8 +1,8 @@
 <template>
   <router-link to="/d/message-center">
     <div id="top-navbar-message-icon">
-      <div v-if="messageCenterConversations.unreadMessageCount !== 0" class="unread-count">
-        {{ messageCenterConversations.unreadMessageCount }}
+      <div v-if="messageCenterConversations.unreadConversations.length !== 0" class="unread-count">
+        {{ messageCenterConversations.unreadConversations.length }}
       </div>
       <SvgMessage />
     </div>
@@ -23,10 +23,8 @@ const props = defineProps({
 const { managedApi } = useLoadingApi()
 
 const fetchUnreadMessageCount = async () => {
-  const unreadMessageCountResponse = (
+  messageCenterConversations.unreadConversations =
     await managedApi.restConversationMessageController.getUnreadConversations()
-  ).length
-  messageCenterConversations.unreadMessageCount = unreadMessageCountResponse
 }
 
 watch(

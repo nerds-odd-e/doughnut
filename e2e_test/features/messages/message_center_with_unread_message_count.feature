@@ -19,7 +19,6 @@ Feature: Message Center with Unread Message Count
     When I read the conversation with "Old Learner" for the topic "Rocket Science" in the message center
     Then I should have no unread messages
 
-  @ignore
   Scenario: An already read message is read again
     Given I am re-logged in as "old_learner" and reload the page
     When I read the conversation with "A Trainer" for the topic "Rocket Science" in the message center

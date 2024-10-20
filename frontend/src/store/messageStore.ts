@@ -1,5 +1,6 @@
+import type { Conversation } from "@/generated/backend"
 import { reactive } from "vue"
 
 export const messageCenterConversations = reactive({
-  unreadMessageCount: 0,
+  unreadConversations: [] as Conversation[],
 })

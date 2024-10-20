@@ -109,7 +109,7 @@ const fetchThreadsForConversation = async (conversationId: number) => {
     conversationId
   )
 
-  messageCenterConversations.unreadMessageCount -= 1
+  messageCenterConversations.unreadConversations.pop()
 }
 
 onMounted(() => {
