@@ -194,6 +194,6 @@ Then(
       .assumeAssessmentPage()
       .assumeQuestionSection()
       .answerIncorrectly('No')
-      .sendFeedback(feedback)
+      .startConversationAboutAssessmentQuestion(feedback)
   }
 )

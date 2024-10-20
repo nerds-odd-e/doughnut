@@ -3,6 +3,7 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.entities.AssessmentQuestionInstance;
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.ConversationMessage;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ConversationService;
@@ -22,8 +23,8 @@ public class RestConversationMessageController {
     this.conversationService = conversationService;
   }
 
-  @PostMapping("/send/{assessmentQuestion}")
-  public Conversation sendFeedback(
+  @PostMapping("/assessment-question/{assessmentQuestion}")
+  public Conversation startConversationAboutAssessmentQuestion(
       @RequestBody String feedback,
       @PathVariable("assessmentQuestion") @Schema(type = "integer")
           AssessmentQuestionInstance assessmentQuestionInstance) {
@@ -31,6 +32,12 @@ public class RestConversationMessageController {
         conversationService.startConversation(assessmentQuestionInstance, currentUser.getEntity());
     conversationService.addMessageToConversation(conversation, currentUser.getEntity(), feedback);
     return conversation;
+  }
+
+  @PostMapping("/note/{note}")
+  public Conversation startConversationAboutNote(
+      @PathVariable("note") @Schema(type = "integer") Note note, @RequestBody String message) {
+    return conversationService.startConversationOfNote(note, currentUser.getEntity(), message);
   }
 
   @GetMapping("/all")

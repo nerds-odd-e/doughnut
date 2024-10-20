@@ -33,7 +33,7 @@ const feedback = ref<string>("")
 const emit = defineEmits(["submitted"])
 
 async function submitFeedback() {
-  await managedApi.restConversationMessageController.sendFeedback(
+  await managedApi.restConversationMessageController.startConversationAboutAssessmentQuestion(
     props.question.id,
     feedback.value
   )

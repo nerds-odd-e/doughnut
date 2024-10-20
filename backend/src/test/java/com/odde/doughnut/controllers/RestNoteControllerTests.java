@@ -56,11 +56,7 @@ class RestNoteControllerTests {
 
     controller =
         new RestNoteController(
-            modelFactoryService,
-            userModel,
-            httpClientAdapter,
-            testabilitySettings,
-            conversationService);
+            modelFactoryService, userModel, httpClientAdapter, testabilitySettings);
   }
 
   private void mockWikidataEntity(String wikidataId, String label)
@@ -516,45 +512,6 @@ class RestNoteControllerTests {
               () -> controller.updateWikidataId(note, wikidataAssociationCreation));
       assertThat(
           bindException.getMessage(), stringContainsInOrder("Duplicate Wikidata ID Detected."));
-    }
-  }
-
-  @Nested
-  class SendNoteMessageTests {
-    Note note;
-    String feedback = "This is a feedback sent from note";
-
-    @BeforeEach
-    void setup() {
-      UserModel noteOwner = makeMe.aUser().toModelPlease();
-      note = makeMe.aNote().creatorAndOwner(noteOwner).please();
-    }
-
-    @Test
-    void shouldStartConversation() {
-      controller.sendNoteMessage(note, feedback);
-      List<Conversation> conversations =
-          (List<Conversation>) modelFactoryService.conversationRepository.findAll();
-      assertEquals(1, conversations.size());
-
-      Conversation conversation = conversations.getFirst();
-      assertEquals(conversation.getConversationInitiator(), userModel.getEntity());
-    }
-
-    @Test
-    void shouldSendFeedbackToConversation() {
-      controller.sendNoteMessage(note, feedback);
-      List<Conversation> conversations =
-          (List<Conversation>) modelFactoryService.conversationRepository.findAll();
-      assertEquals(1, conversations.size());
-
-      Conversation conversation = conversations.getFirst();
-      makeMe.refresh(conversation);
-      List<ConversationMessage> conversationMessages = conversation.getConversationMessages();
-      assertEquals(1, conversationMessages.size());
-
-      ConversationMessage message = conversationMessages.getFirst();
-      assertEquals(message.getMessage(), feedback);
     }
   }
 

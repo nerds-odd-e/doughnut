@@ -6,7 +6,7 @@ const assumeWrongAnswerPage = () => {
       cy.findByRole('button', { name: 'Continue' }).click().pageIsNotLoading()
       cy.get('.is-selected').should('have.length', 0)
     },
-    sendFeedback(feedback: string) {
+    startConversationAboutAssessmentQuestion(feedback: string) {
       cy.findByText('Send feedback').click()
       cy.findByPlaceholderText('Give feedback about the question').type(
         feedback

@@ -30,7 +30,7 @@ const props = defineProps<{
 const emit = defineEmits(["submitted"])
 
 async function submitMessage() {
-  await managedApi.restNoteController.sendNoteMessage(
+  await managedApi.restConversationMessageController.startConversationAboutNote(
     props.noteId,
     message.value
   )

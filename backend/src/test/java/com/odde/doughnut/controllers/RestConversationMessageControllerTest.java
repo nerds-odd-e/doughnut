@@ -45,18 +45,19 @@ class RestConversationMessageControllerTest {
   }
 
   @Test
-  void testSendFeedbackReturnsOk() {
+  void teststartConversationAboutAssessmentQuestionReturnsOk() {
     String feedback = "This is a feedback";
-    controller.sendFeedback(feedback, assessmentQuestionInstance);
+    controller.startConversationAboutAssessmentQuestion(feedback, assessmentQuestionInstance);
     List<Conversation> conversations =
         (List<Conversation>) modelFactoryService.conversationRepository.findAll();
     assertEquals(1, conversations.size());
   }
 
   @Test
-  void testGetMessageDetailWhenSendFeedbackReturnsOk() {
+  void testGetMessageDetailWhenstartConversationAboutAssessmentQuestionReturnsOk() {
     String feedback = "This is a feedback";
-    Conversation conversation = controller.sendFeedback(feedback, assessmentQuestionInstance);
+    Conversation conversation =
+        controller.startConversationAboutAssessmentQuestion(feedback, assessmentQuestionInstance);
 
     List<Conversation> conversations =
         (List<Conversation>) modelFactoryService.conversationRepository.findAll();
@@ -263,6 +264,38 @@ class RestConversationMessageControllerTest {
       makeMe.aConversationMessage(conversation).please();
       List<ConversationMessage> conversations = controller.getConversationDetails(conversation);
       assertEquals(1, conversations.size());
+    }
+  }
+
+  @Nested
+  class startConversationAboutNoteTests {
+    Note note;
+    String msg = "This is a feedback sent from note";
+
+    @BeforeEach
+    void setup() {
+      UserModel noteOwner = makeMe.aUser().toModelPlease();
+      note = makeMe.aNote().creatorAndOwner(noteOwner).please();
+    }
+
+    @Test
+    void shouldStartConversation() {
+      controller.startConversationAboutNote(note, msg);
+      List<Conversation> conversations =
+          (List<Conversation>) modelFactoryService.conversationRepository.findAll();
+      assertEquals(1, conversations.size());
+      Conversation conversation = conversations.getFirst();
+      assertEquals(conversation.getConversationInitiator(), currentUser.getEntity());
+    }
+
+    @Test
+    void shouldstartConversationAboutAssessmentQuestionToConversation() {
+      Conversation conversation = controller.startConversationAboutNote(note, msg);
+      makeMe.refresh(conversation);
+      List<ConversationMessage> conversationMessages = conversation.getConversationMessages();
+      assertEquals(1, conversationMessages.size());
+      ConversationMessage message = conversationMessages.getFirst();
+      assertEquals(message.getMessage(), msg);
     }
   }
 }

@@ -9,20 +9,20 @@ import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestConversationMessageControllerService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
-     * @param assessmentQuestion
+     * @param note
      * @param requestBody
      * @returns Conversation OK
      * @throws ApiError
      */
-    public sendFeedback(
-        assessmentQuestion: number,
+    public startConversationAboutNote(
+        note: number,
         requestBody: string,
     ): CancelablePromise<Conversation> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/message/send/{assessmentQuestion}',
+            url: '/api/message/note/{note}',
             path: {
-                'assessmentQuestion': assessmentQuestion,
+                'note': note,
             },
             body: requestBody,
             mediaType: 'application/json',
@@ -46,6 +46,29 @@ export class RestConversationMessageControllerService {
             url: '/api/message/detail/send/{conversationId}',
             path: {
                 'conversationId': conversationId,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param assessmentQuestion
+     * @param requestBody
+     * @returns Conversation OK
+     * @throws ApiError
+     */
+    public startConversationAboutAssessmentQuestion(
+        assessmentQuestion: number,
+        requestBody: string,
+    ): CancelablePromise<Conversation> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/message/assessment-question/{assessmentQuestion}',
+            path: {
+                'assessmentQuestion': assessmentQuestion,
             },
             body: requestBody,
             mediaType: 'application/json',
