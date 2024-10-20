@@ -1,7 +1,7 @@
 <template>
   <router-link to="/d/message-center">
     <div id="top-navbar-message-icon">
-      <div v-if="messageCenterConversations.unreadMessageCount > 0" class="unread-count">
+      <div v-if="messageCenterConversations.unreadMessageCount !== 0" class="unread-count">
         {{ messageCenterConversations.unreadMessageCount }}
       </div>
       <SvgMessage />
