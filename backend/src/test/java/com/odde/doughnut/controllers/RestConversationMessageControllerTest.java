@@ -61,9 +61,8 @@ class RestConversationMessageControllerTest {
     List<Conversation> conversations =
         (List<Conversation>) modelFactoryService.conversationRepository.findAll();
 
-    var conversationDetail =
-        modelFactoryService.conversationMessageRepository.findByConversationInitiator(
-            conversation.getId());
+    makeMe.refresh(conversation);
+    var conversationDetail = conversation.getConversationMessages();
     assertEquals(1, conversations.size());
     assertEquals(1, conversationDetail.size());
     assertEquals(feedback, conversationDetail.getFirst().getMessage());
