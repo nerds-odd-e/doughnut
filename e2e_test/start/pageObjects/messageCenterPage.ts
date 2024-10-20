@@ -9,10 +9,6 @@ export const assumeMessageCenterPage = () => {
       cy.findByText(partner).should('be.visible')
       return this
     },
-    expectConvoWithPartner(partner: string) {
-      cy.findByText(partner).should('be.visible')
-      return this
-    },
     expectMessageDisplayAtUserSide(message: string) {
       cy.findByText(message)
         .parent()
@@ -25,10 +21,6 @@ export const assumeMessageCenterPage = () => {
         .parent()
         .should('be.visible')
         .and('not.have.class', 'justify-content-end')
-      return this
-    },
-    reloadCurrentPage() {
-      cy.reload()
       return this
     },
     conversation(conversationTopic: string) {
