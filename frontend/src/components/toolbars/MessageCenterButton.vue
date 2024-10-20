@@ -23,8 +23,9 @@ const props = defineProps({
 const { managedApi } = useLoadingApi()
 
 const fetchUnreadMessageCount = async () => {
-  const unreadMessageCountResponse =
-    await managedApi.restConversationMessageController.getUnreadConversationCountOfCurrentUser()
+  const unreadMessageCountResponse = (
+    await managedApi.restConversationMessageController.getUnreadConversations()
+  ).length
   messageCenterConversations.unreadMessageCount = unreadMessageCountResponse
 }
 

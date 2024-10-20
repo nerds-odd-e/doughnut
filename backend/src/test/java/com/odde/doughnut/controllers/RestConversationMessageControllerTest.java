@@ -111,7 +111,7 @@ class RestConversationMessageControllerTest {
     UserModel receiver = makeMe.aUser().toModelPlease();
     secondMsg.setSender(receiver.getEntity());
 
-    int conversations = controller.getUnreadConversationCountOfCurrentUser();
+    int conversations = controller.getUnreadConversations().size();
     assertEquals(1, conversations);
   }
 
@@ -131,7 +131,7 @@ class RestConversationMessageControllerTest {
         makeMe.aConversationMessage().forConversationInstance(secondConversation).please();
     thridMsg.setSender(receiver.getEntity());
 
-    int conversations = controller.getUnreadConversationCountOfCurrentUser();
+    int conversations = controller.getUnreadConversations().size();
     assertEquals(2, conversations);
   }
 
@@ -142,7 +142,7 @@ class RestConversationMessageControllerTest {
         makeMe.aConversationMessage().forConversationInstance(fristConversation).please();
     msg.setSender(currentUser.getEntity());
 
-    int conversations = controller.getUnreadConversationCountOfCurrentUser();
+    int conversations = controller.getUnreadConversations().size();
     assertEquals(0, conversations);
   }
 
@@ -154,7 +154,7 @@ class RestConversationMessageControllerTest {
     msg.setIs_read(true);
     msg.setSender(currentUser.getEntity());
 
-    int conversations = controller.getUnreadConversationCountOfCurrentUser();
+    int conversations = controller.getUnreadConversations().size();
     assertEquals(0, conversations);
   }
 

@@ -40,18 +40,17 @@ public class RestConversationMessageController {
   }
 
   @GetMapping("/unreadCount")
-  public int getUnreadConversationCountOfCurrentUser() {
+  public List<Conversation> getUnreadConversations() {
     currentUser.assertLoggedIn();
     List<ConversationMessage> conversationMessages =
         conversationService.getConversationMessages(currentUser.getEntity());
-    return (int)
-        conversationMessages.stream()
-            .filter(
-                message ->
-                    !message.getIs_read() && !message.getSender().equals(currentUser.getEntity()))
-            .map(ConversationMessage::getConversation)
-            .distinct()
-            .count();
+    return conversationMessages.stream()
+        .filter(
+            message ->
+                !message.getIs_read() && !message.getSender().equals(currentUser.getEntity()))
+        .map(ConversationMessage::getConversation)
+        .distinct()
+        .toList();
   }
 
   @PatchMapping("/read/{conversationId}")

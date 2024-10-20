@@ -2667,7 +2667,7 @@ paths:
     get:
       tags:
       - rest-conversation-message-controller
-      operationId: getUnreadConversationCountOfCurrentUser
+      operationId: getUnreadConversations
       responses:
         "500":
           description: Internal Server Error
@@ -2680,8 +2680,9 @@ paths:
           content:
             '*/*':
               schema:
-                type: integer
-                format: int32
+                type: array
+                items:
+                  $ref: "#/components/schemas/Conversation"
   /api/message/detail/all/{conversationId}:
     get:
       tags:

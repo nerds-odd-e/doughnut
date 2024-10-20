@@ -74,10 +74,10 @@ export class RestConversationMessageControllerService {
         });
     }
     /**
-     * @returns number OK
+     * @returns Conversation OK
      * @throws ApiError
      */
-    public getUnreadConversationCountOfCurrentUser(): CancelablePromise<number> {
+    public getUnreadConversations(): CancelablePromise<Array<Conversation>> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/message/unreadCount',
