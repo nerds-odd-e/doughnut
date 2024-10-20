@@ -3568,8 +3568,8 @@ components:
       required:
       - createdAt
       - id
-      - is_read
       - message
+      - readByReceiver
       type: object
       properties:
         id:
@@ -3581,7 +3581,7 @@ components:
           type: string
         sender:
           $ref: "#/components/schemas/User"
-        is_read:
+        readByReceiver:
           type: boolean
         createdAt:
           type: string

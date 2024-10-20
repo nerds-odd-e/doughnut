@@ -20,7 +20,7 @@ public class ConversationMessageBuilder extends EntityBuilder<ConversationMessag
     if (Strings.isBlank(this.entity.getMessage())) {
       entity.setMessage("This is a feedback");
     }
-    entity.setIs_read(false);
+    entity.setReadByReceiver(false);
   }
 
   public ConversationMessageBuilder forConversationInstance(Conversation conversation) {

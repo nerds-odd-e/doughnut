@@ -9,7 +9,7 @@ export type ConversationMessage = {
     conversation?: Conversation;
     message: string;
     sender?: User;
-    is_read: boolean;
+    readByReceiver: boolean;
     createdAt: string;
 };
 

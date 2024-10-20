@@ -168,7 +168,7 @@ class RestConversationMessageControllerTest {
 
       Conversation conversation = makeMe.aConversation().from(currentUser).please();
       var msg = makeMe.aConversationMessage().forConversationInstance(conversation).please();
-      msg.setIs_read(true);
+      msg.setReadByReceiver(true);
       msg.setSender(currentUser.getEntity());
 
       int conversations = controller.getUnreadConversations().size();
@@ -209,9 +209,9 @@ class RestConversationMessageControllerTest {
           makeMe.aConversationMessage().forConversationInstance(conversation).please();
       UserModel receiver = makeMe.aUser().toModelPlease();
       msg.setSender(receiver.getEntity());
-      assertEquals(false, msg.getIs_read());
+      assertEquals(false, msg.getReadByReceiver());
       controller.markConversationAsRead(conversation);
-      assertEquals(true, msg.getIs_read());
+      assertEquals(true, msg.getReadByReceiver());
     }
 
     @Test
@@ -220,7 +220,7 @@ class RestConversationMessageControllerTest {
           makeMe.aConversationMessage().forConversationInstance(conversation).please();
       msg.setSender(currentUser.getEntity());
       controller.markConversationAsRead(conversation);
-      assertEquals(false, msg.getIs_read());
+      assertEquals(false, msg.getReadByReceiver());
     }
   }
 

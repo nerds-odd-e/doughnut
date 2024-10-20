@@ -45,7 +45,7 @@ public class ConversationService {
     conversationMessage.setConversation(conversation);
     conversationMessage.setSender(user);
     conversationMessage.setMessage(message);
-    conversationMessage.setIs_read(false);
+    conversationMessage.setReadByReceiver(false);
     return modelFactoryService.conversationMessageRepository.save(conversationMessage);
   }
 
@@ -74,9 +74,9 @@ public class ConversationService {
         getConversionDetailRelatedByConversationId(conversationId);
     conversationMessages.forEach(
         conversationMessage -> {
-          if (!conversationMessage.getIs_read()
+          if (!conversationMessage.getReadByReceiver()
               && conversationMessage.getSender().getId() != user.getId()) {
-            conversationMessage.setIs_read(true);
+            conversationMessage.setReadByReceiver(true);
             modelFactoryService.conversationMessageRepository.save(conversationMessage);
           }
         });
@@ -85,7 +85,7 @@ public class ConversationService {
   public List<Conversation> getUnreadConversations(User user) {
     List<ConversationMessage> conversationMessages = getConversationMessages(user);
     return conversationMessages.stream()
-        .filter(message -> !message.getIs_read() && !message.getSender().equals(user))
+        .filter(message -> !message.getReadByReceiver() && !message.getSender().equals(user))
         .map(ConversationMessage::getConversation)
         .toList();
   }
