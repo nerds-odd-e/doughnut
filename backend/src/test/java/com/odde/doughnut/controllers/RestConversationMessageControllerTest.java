@@ -177,10 +177,24 @@ class RestConversationMessageControllerTest {
   }
 
   @Nested
-  class MarkConversationAsReadTest {
+  class MarkConversationAsRead {
+    Conversation conversation;
+
+    @BeforeEach
+    void setup() {
+      conversation = makeMe.aConversation().from(currentUser).please();
+    }
+
+    @Test
+    void shouldNotBeAbleToMarkOtherPeopleMsg() {
+      Conversation uninvolvedConversation = makeMe.aConversation().please();
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.markConversationAsRead(uninvolvedConversation));
+    }
+
     @Test
     void testMarkConversationAsReadReduceTheCount() throws UnexpectedNoAccessRightException {
-      Conversation conversation = makeMe.aConversation().from(currentUser).please();
       ConversationMessage msg =
           makeMe.aConversationMessage().forConversationInstance(conversation).please();
       UserModel receiver = makeMe.aUser().toModelPlease();
@@ -191,7 +205,6 @@ class RestConversationMessageControllerTest {
 
     @Test
     void testMarkConversationAsReadByReceiver() throws UnexpectedNoAccessRightException {
-      Conversation conversation = makeMe.aConversation().from(currentUser).please();
       ConversationMessage msg =
           makeMe.aConversationMessage().forConversationInstance(conversation).please();
       UserModel receiver = makeMe.aUser().toModelPlease();
@@ -203,7 +216,6 @@ class RestConversationMessageControllerTest {
 
     @Test
     void testMarkConversationAsReadBySender() throws UnexpectedNoAccessRightException {
-      Conversation conversation = makeMe.aConversation().from(currentUser).please();
       ConversationMessage msg =
           makeMe.aConversationMessage().forConversationInstance(conversation).please();
       msg.setSender(currentUser.getEntity());
