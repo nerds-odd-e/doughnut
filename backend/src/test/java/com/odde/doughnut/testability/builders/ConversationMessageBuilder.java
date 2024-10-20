@@ -2,13 +2,16 @@ package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.ConversationMessage;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 import org.apache.logging.log4j.util.Strings;
 
 public class ConversationMessageBuilder extends EntityBuilder<ConversationMessage> {
-  public ConversationMessageBuilder(MakeMe makeMe) {
+  public ConversationMessageBuilder(Conversation conversation, MakeMe makeMe) {
     super(makeMe, new ConversationMessage());
+    this.entity.setConversation(conversation);
+    conversation.getConversationMessages().add(this.entity);
   }
 
   @Override
@@ -21,9 +24,13 @@ public class ConversationMessageBuilder extends EntityBuilder<ConversationMessag
     }
   }
 
-  public ConversationMessageBuilder forConversation(Conversation conversation) {
-    this.entity.setConversation(conversation);
-    conversation.getConversationMessages().add(this.entity);
+  public ConversationMessageBuilder sender(User user) {
+    entity.setSender(user);
+    return this;
+  }
+
+  public ConversationMessageBuilder readByReceiver() {
+    entity.setReadByReceiver(true);
     return this;
   }
 }
