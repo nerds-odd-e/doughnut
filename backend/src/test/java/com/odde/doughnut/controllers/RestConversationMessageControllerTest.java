@@ -12,11 +12,14 @@ import com.odde.doughnut.services.ConversationService;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -101,62 +104,76 @@ class RestConversationMessageControllerTest {
     assertEquals(1, conversations.size());
   }
 
-  @Test
-  void testGetOneUnreadConversationCountofCurrentUser() {
-    Conversation conversation = makeMe.aConversation().from(currentUser).please();
+  @Nested
+  class RestConversationMessageControllerUnreadCountTest {
+    Conversation conversation;
 
-    var firstMsg = makeMe.aConversationMessage().forConversationInstance(conversation).please();
-    firstMsg.setSender(currentUser.getEntity());
+    @BeforeEach
+    void setup() {
+      conversation = makeMe.aConversation().from(currentUser).please();
+    }
 
-    var secondMsg = makeMe.aConversationMessage().forConversationInstance(conversation).please();
-    UserModel receiver = makeMe.aUser().toModelPlease();
-    secondMsg.setSender(receiver.getEntity());
+    @Test
+    void forLoginUserOnly() {
+      controller =
+          new RestConversationMessageController(makeMe.aNullUserModelPlease(), conversationService);
+      ResponseStatusException exception =
+          assertThrows(ResponseStatusException.class, () -> controller.getUnreadConversations());
+      assertEquals(HttpStatusCode.valueOf(401), exception.getStatusCode());
+    }
 
-    int conversations = controller.getUnreadConversations().size();
-    assertEquals(1, conversations);
-  }
+    @Test
+    void testGetOneUnreadConversationCountOfCurrentUser() {
+      var firstMsg = makeMe.aConversationMessage().forConversationInstance(conversation).please();
+      firstMsg.setSender(currentUser.getEntity());
 
-  @Test
-  void testCountMessagesInsteadOfConversations() {
-    UserModel receiver = makeMe.aUser().toModelPlease();
-    Conversation fristConversation = makeMe.aConversation().from(currentUser).please();
-    var firstMsg =
-        makeMe.aConversationMessage().forConversationInstance(fristConversation).please();
-    firstMsg.setSender(receiver.getEntity());
+      var secondMsg = makeMe.aConversationMessage().forConversationInstance(conversation).please();
+      UserModel receiver = makeMe.aUser().toModelPlease();
+      secondMsg.setSender(receiver.getEntity());
 
-    Conversation secondConversation = makeMe.aConversation().from(currentUser).please();
-    var secondMsg =
-        makeMe.aConversationMessage().forConversationInstance(secondConversation).please();
-    secondMsg.setSender(receiver.getEntity());
-    var thirdMsg =
-        makeMe.aConversationMessage().forConversationInstance(secondConversation).please();
-    thirdMsg.setSender(receiver.getEntity());
+      int conversations = controller.getUnreadConversations().size();
+      assertEquals(1, conversations);
+    }
 
-    int conversations = controller.getUnreadConversations().size();
-    assertEquals(3, conversations);
-  }
+    @Test
+    void testCountMessagesInsteadOfConversations() {
+      UserModel receiver = makeMe.aUser().toModelPlease();
+      var firstMsg = makeMe.aConversationMessage().forConversationInstance(conversation).please();
+      firstMsg.setSender(receiver.getEntity());
 
-  @Test
-  void testZeroUnreadConversationCountForSender() {
-    Conversation fristConversation = makeMe.aConversation().from(currentUser).please();
-    ConversationMessage msg =
-        makeMe.aConversationMessage().forConversationInstance(fristConversation).please();
-    msg.setSender(currentUser.getEntity());
+      Conversation secondConversation = makeMe.aConversation().from(currentUser).please();
+      var secondMsg =
+          makeMe.aConversationMessage().forConversationInstance(secondConversation).please();
+      secondMsg.setSender(receiver.getEntity());
+      var thirdMsg =
+          makeMe.aConversationMessage().forConversationInstance(secondConversation).please();
+      thirdMsg.setSender(receiver.getEntity());
 
-    int conversations = controller.getUnreadConversations().size();
-    assertEquals(0, conversations);
-  }
+      int conversations = controller.getUnreadConversations().size();
+      assertEquals(3, conversations);
+    }
 
-  @Test
-  void testGetZeroUnreadConversationWhenSenderIsCurrentUser() {
+    @Test
+    void testZeroUnreadConversationCountForSender() {
+      ConversationMessage msg =
+          makeMe.aConversationMessage().forConversationInstance(conversation).please();
+      msg.setSender(currentUser.getEntity());
 
-    Conversation conversation = makeMe.aConversation().from(currentUser).please();
-    var msg = makeMe.aConversationMessage().forConversationInstance(conversation).please();
-    msg.setIs_read(true);
-    msg.setSender(currentUser.getEntity());
+      int conversations = controller.getUnreadConversations().size();
+      assertEquals(0, conversations);
+    }
 
-    int conversations = controller.getUnreadConversations().size();
-    assertEquals(0, conversations);
+    @Test
+    void testGetZeroUnreadConversationWhenSenderIsCurrentUser() {
+
+      Conversation conversation = makeMe.aConversation().from(currentUser).please();
+      var msg = makeMe.aConversationMessage().forConversationInstance(conversation).please();
+      msg.setIs_read(true);
+      msg.setSender(currentUser.getEntity());
+
+      int conversations = controller.getUnreadConversations().size();
+      assertEquals(0, conversations);
+    }
   }
 
   @Test
