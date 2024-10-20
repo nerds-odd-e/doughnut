@@ -9,15 +9,22 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 public interface ConversationRepository extends CrudRepository<Conversation, Integer> {
-  @Query(
-      "SELECT c FROM Conversation c WHERE c.subjectOwnership.user = :user OR c.subjectOwnership IN (SELECT o FROM Ownership o JOIN o.circle.members mem WHERE mem = :user) OR c.conversationInitiator = :user")
+
+  String USER_CONVERSATION_CONDITION =
+      "c.subjectOwnership.user = :user "
+          + "OR c.subjectOwnership IN (SELECT o FROM Ownership o JOIN o.circle.members mem WHERE mem = :user) "
+          + "OR c.conversationInitiator = :user";
+
+  @Query("SELECT c FROM Conversation c WHERE " + USER_CONVERSATION_CONDITION)
   List<Conversation> findByUserInSubjectOwnershipOrConversationInitiator(@Param("user") User user);
 
   @Query(
       "SELECT cm FROM ConversationMessage cm "
           + "JOIN cm.conversation c "
-          + "WHERE (c.subjectOwnership.user = :user OR c.subjectOwnership IN (SELECT o FROM Ownership o JOIN o.circle.members mem WHERE mem = :user) OR c.conversationInitiator = :user) "
+          + "WHERE ("
+          + USER_CONVERSATION_CONDITION
+          + ") "
           + "AND cm.sender != :user "
-          + "AND cm.readByReceiver IS NOT TRUE ")
+          + "AND cm.readByReceiver IS NOT TRUE")
   List<ConversationMessage> findUnreadMessagesByUser(@Param("user") User user);
 }
