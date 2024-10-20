@@ -69,6 +69,6 @@ public class RestConversationMessageController {
       @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(conversation);
-    return conversationService.getConversionDetailRelatedByConversationId(conversation.getId());
+    return conversation.getConversationMessages();
   }
 }

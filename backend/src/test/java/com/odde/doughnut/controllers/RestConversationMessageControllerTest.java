@@ -123,10 +123,10 @@ class RestConversationMessageControllerTest {
 
     @Test
     void testGetOneUnreadConversationCountOfCurrentUser() {
-      var firstMsg = makeMe.aConversationMessage().forConversationInstance(conversation).please();
+      var firstMsg = makeMe.aConversationMessage().forConversation(conversation).please();
       firstMsg.setSender(currentUser.getEntity());
 
-      var secondMsg = makeMe.aConversationMessage().forConversationInstance(conversation).please();
+      var secondMsg = makeMe.aConversationMessage().forConversation(conversation).please();
       UserModel receiver = makeMe.aUser().toModelPlease();
       secondMsg.setSender(receiver.getEntity());
 
@@ -137,15 +137,13 @@ class RestConversationMessageControllerTest {
     @Test
     void testCountMessagesInsteadOfConversations() {
       UserModel receiver = makeMe.aUser().toModelPlease();
-      var firstMsg = makeMe.aConversationMessage().forConversationInstance(conversation).please();
+      var firstMsg = makeMe.aConversationMessage().forConversation(conversation).please();
       firstMsg.setSender(receiver.getEntity());
 
       Conversation secondConversation = makeMe.aConversation().from(currentUser).please();
-      var secondMsg =
-          makeMe.aConversationMessage().forConversationInstance(secondConversation).please();
+      var secondMsg = makeMe.aConversationMessage().forConversation(secondConversation).please();
       secondMsg.setSender(receiver.getEntity());
-      var thirdMsg =
-          makeMe.aConversationMessage().forConversationInstance(secondConversation).please();
+      var thirdMsg = makeMe.aConversationMessage().forConversation(secondConversation).please();
       thirdMsg.setSender(receiver.getEntity());
 
       int conversations = controller.getUnreadConversations().size();
@@ -155,7 +153,7 @@ class RestConversationMessageControllerTest {
     @Test
     void testZeroUnreadConversationCountForSender() {
       ConversationMessage msg =
-          makeMe.aConversationMessage().forConversationInstance(conversation).please();
+          makeMe.aConversationMessage().forConversation(conversation).please();
       msg.setSender(currentUser.getEntity());
 
       int conversations = controller.getUnreadConversations().size();
@@ -166,7 +164,7 @@ class RestConversationMessageControllerTest {
     void testGetZeroUnreadConversationWhenSenderIsCurrentUser() {
 
       Conversation conversation = makeMe.aConversation().from(currentUser).please();
-      var msg = makeMe.aConversationMessage().forConversationInstance(conversation).please();
+      var msg = makeMe.aConversationMessage().forConversation(conversation).please();
       msg.setReadByReceiver(true);
       msg.setSender(currentUser.getEntity());
 
@@ -195,7 +193,7 @@ class RestConversationMessageControllerTest {
     @Test
     void testMarkConversationAsReadReduceTheCount() throws UnexpectedNoAccessRightException {
       ConversationMessage msg =
-          makeMe.aConversationMessage().forConversationInstance(conversation).please();
+          makeMe.aConversationMessage().forConversation(conversation).please();
       UserModel receiver = makeMe.aUser().toModelPlease();
       msg.setSender(receiver.getEntity());
       List<Conversation> conversations = controller.markConversationAsRead(conversation);
@@ -205,7 +203,7 @@ class RestConversationMessageControllerTest {
     @Test
     void testMarkConversationAsReadByReceiver() throws UnexpectedNoAccessRightException {
       ConversationMessage msg =
-          makeMe.aConversationMessage().forConversationInstance(conversation).please();
+          makeMe.aConversationMessage().forConversation(conversation).please();
       UserModel receiver = makeMe.aUser().toModelPlease();
       msg.setSender(receiver.getEntity());
       assertEquals(false, msg.getReadByReceiver());
@@ -216,7 +214,7 @@ class RestConversationMessageControllerTest {
     @Test
     void testMarkConversationAsReadBySender() throws UnexpectedNoAccessRightException {
       ConversationMessage msg =
-          makeMe.aConversationMessage().forConversationInstance(conversation).please();
+          makeMe.aConversationMessage().forConversation(conversation).please();
       msg.setSender(currentUser.getEntity());
       controller.markConversationAsRead(conversation);
       assertEquals(false, msg.getReadByReceiver());
@@ -278,7 +276,7 @@ class RestConversationMessageControllerTest {
     void testGetMessageThreadsFromConversation() throws UnexpectedNoAccessRightException {
       Conversation conversation = makeMe.aConversation().from(currentUser).please();
 
-      makeMe.aConversationMessage().forConversationInstance(conversation).please();
+      makeMe.aConversationMessage().forConversation(conversation).please();
       List<ConversationMessage> conversations = controller.getConversationDetails(conversation);
       assertEquals(1, conversations.size());
     }

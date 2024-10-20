@@ -1,7 +1,5 @@
 package com.odde.doughnut.services;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.dto.Randomization;
@@ -61,14 +59,6 @@ class ConversationMessageServiceTest {
     }
 
     @Test
-    void shouldReturnEmptyData_whenCallGetConversionDetailRelatedByConversion() {
-      int conversationId = 1;
-      assertThat(
-          conversationService.getConversionDetailRelatedByConversationId(conversationId),
-          hasSize(0));
-    }
-
-    @Test
     void shouldAddConversationDetail() {
       Conversation conversation = getConversation();
       String message = "This feedback is wrong";
@@ -83,8 +73,8 @@ class ConversationMessageServiceTest {
       Conversation conversation = getConversation();
       String message = "This feedback is wrong";
       conversationService.addMessageToConversation(conversation, currentUser.getEntity(), message);
-      List<ConversationMessage> conversationMessages =
-          conversationService.getConversionDetailRelatedByConversationId(conversation.getId());
+      makeMe.refresh(conversation);
+      List<ConversationMessage> conversationMessages = conversation.getConversationMessages();
       assertEquals(1, conversationMessages.size());
       assertEquals(message, conversationMessages.getFirst().getMessage());
     }

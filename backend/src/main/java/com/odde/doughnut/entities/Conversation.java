@@ -3,6 +3,7 @@ package com.odde.doughnut.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.validation.constraints.NotNull;
@@ -15,7 +16,7 @@ import lombok.Setter;
 public class Conversation extends EntityIdentifiedByIdOnly {
   @OneToMany(mappedBy = "conversation", fetch = FetchType.LAZY)
   @JsonIgnore
-  List<ConversationMessage> conversationMessages;
+  List<ConversationMessage> conversationMessages = new ArrayList<>();
 
   @ManyToOne
   @JoinColumn(name = "assessment_question_instance_id", referencedColumnName = "id")

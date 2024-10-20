@@ -549,8 +549,8 @@ class RestNoteControllerTests {
       assertEquals(1, conversations.size());
 
       Conversation conversation = conversations.getFirst();
-      List<ConversationMessage> conversationMessages =
-          conversationService.getConversionDetailRelatedByConversationId(conversation.getId());
+      makeMe.refresh(conversation);
+      List<ConversationMessage> conversationMessages = conversation.getConversationMessages();
       assertEquals(1, conversationMessages.size());
 
       ConversationMessage message = conversationMessages.getFirst();

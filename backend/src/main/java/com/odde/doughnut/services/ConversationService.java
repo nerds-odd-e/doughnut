@@ -7,7 +7,6 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -50,29 +49,16 @@ public class ConversationService {
     return modelFactoryService.conversationMessageRepository.save(conversationMessage);
   }
 
-  public List<ConversationMessage> getConversionDetailRelatedByConversationId(int conversationId) {
-    return modelFactoryService.conversationMessageRepository.findByConversationInitiator(
-        conversationId);
-  }
-
-  public List<ConversationMessage> getConversationDetailsByConversationIds(
-      List<Integer> conversationIds) {
-    return conversationIds.stream()
-        .flatMap(id -> getConversionDetailRelatedByConversationId(id).stream())
-        .collect(Collectors.toList());
-  }
-
   public List<ConversationMessage> getConversationMessages(User user) {
     List<Conversation> conversations = conversationRelatedToUser(user);
-    List<Integer> conversationIds =
-        conversations.stream().map(Conversation::getId).collect(Collectors.toList());
-    return getConversationDetailsByConversationIds(conversationIds);
+    return conversations.stream()
+        .flatMap(conversation -> conversation.getConversationMessages().stream())
+        .toList();
   }
 
   public void markConversationAsRead(Conversation conversation, User user) {
     Integer conversationId = conversation.getId();
-    List<ConversationMessage> conversationMessages =
-        getConversionDetailRelatedByConversationId(conversationId);
+    List<ConversationMessage> conversationMessages = conversation.getConversationMessages();
     conversationMessages.forEach(
         conversationMessage -> {
           if (!conversationMessage.getReadByReceiver()
