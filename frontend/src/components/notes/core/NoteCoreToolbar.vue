@@ -24,7 +24,6 @@
       </PopButton>
 
       <NoteSendMessageButton
-        button-title="Send message about note top bazaar"
         v-bind="{ noteId: note.id }"
       />
 

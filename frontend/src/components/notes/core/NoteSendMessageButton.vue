@@ -1,29 +1,25 @@
 <template>
-  <PopButton :title="buttonTitle">
+  <PopButton :title="`Send message about note top bazaar`">
     <template #button_face>
       <SvgMessage />
     </template>
     <template #default="{ closer }">
       <NoteSendMessageDialog
-        v-bind="{ noteId }"
-        @submitted="
-            closer();"
+        :noteId="noteId"
+        @submitted="closer()"
         @close-dialog="closer"
       />
     </template>
   </PopButton>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue"
+<script setup lang="ts">
+import { defineProps } from "vue"
 import PopButton from "../../commons/Popups/PopButton.vue"
 import NoteSendMessageDialog from "../NoteSendMessageDialog.vue"
+import SvgMessage from "../../svgs/SvgMessage.vue" // Make sure to import SvgMessage
 
-export default defineComponent({
-  props: {
-    noteId: { type: Number, required: true },
-    buttonTitle: { type: String, required: true },
-  },
-  components: { PopButton, NoteSendMessageDialog },
-})
+defineProps<{
+  noteId: number
+}>()
 </script>
