@@ -87,7 +87,6 @@ public class ConversationService {
     return conversationMessages.stream()
         .filter(message -> !message.getIs_read() && !message.getSender().equals(user))
         .map(ConversationMessage::getConversation)
-        .distinct()
         .toList();
   }
 }

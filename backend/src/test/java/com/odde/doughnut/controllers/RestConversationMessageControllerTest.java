@@ -117,7 +117,7 @@ class RestConversationMessageControllerTest {
   }
 
   @Test
-  void testGetTwoUnreadConversationCountofCurrentUser() {
+  void testCountMessagesInsteadOfConversations() {
     UserModel receiver = makeMe.aUser().toModelPlease();
     Conversation fristConversation = makeMe.aConversation().from(currentUser).please();
     var firstMsg =
@@ -128,12 +128,12 @@ class RestConversationMessageControllerTest {
     var secondMsg =
         makeMe.aConversationMessage().forConversationInstance(secondConversation).please();
     secondMsg.setSender(receiver.getEntity());
-    var thridMsg =
+    var thirdMsg =
         makeMe.aConversationMessage().forConversationInstance(secondConversation).please();
-    thridMsg.setSender(receiver.getEntity());
+    thirdMsg.setSender(receiver.getEntity());
 
     int conversations = controller.getUnreadConversations().size();
-    assertEquals(2, conversations);
+    assertEquals(3, conversations);
   }
 
   @Test

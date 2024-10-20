@@ -12,7 +12,8 @@ Feature: Message Center with Unread Message Count
   Scenario: The receiver's reply should increase the unread count of the sender
     Given I am re-logged in as "a_trainer"
     When I reply "Hi. What can I do for you?" to the conversation "Rocket Science"
-    Then "old_learner" should have 1 unread messages
+    And I reply "I'm glad to help." to the conversation "Rocket Science"
+    Then "old_learner" should have 2 unread messages
 
   Scenario: The message is read by the receiver
     Given I am re-logged in as "a_trainer" and reload the page
