@@ -258,9 +258,6 @@ class RestNoteController {
   @PostMapping("/{note}/conversation")
   public Conversation sendNoteMessage(
       @PathVariable("note") @Schema(type = "integer") Note note, @RequestBody String message) {
-    Conversation conversation =
-        conversationService.startConversationOfNote(note, currentUser.getEntity());
-    conversationService.addMessageToConversation(conversation, currentUser.getEntity(), message);
-    return conversation;
+    return conversationService.startConversationOfNote(note, currentUser.getEntity(), message);
   }
 }

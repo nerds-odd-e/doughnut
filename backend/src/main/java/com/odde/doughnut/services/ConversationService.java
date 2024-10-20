@@ -26,11 +26,12 @@ public class ConversationService {
     return conversation;
   }
 
-  public Conversation startConversationOfNote(Note note, User initiator) {
+  public Conversation startConversationOfNote(Note note, User initiator, String message) {
     Conversation conversation = new Conversation();
     conversation.setNote(note);
     conversation.setConversationInitiator(initiator);
     modelFactoryService.conversationRepository.save(conversation);
+    addMessageToConversation(conversation, initiator, message);
     return conversation;
   }
 
