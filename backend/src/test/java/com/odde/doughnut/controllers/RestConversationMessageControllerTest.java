@@ -176,85 +176,100 @@ class RestConversationMessageControllerTest {
     }
   }
 
-  @Test
-  void testMarkConversationAsReadReduceTheCount() throws UnexpectedNoAccessRightException {
-    Conversation conversation = makeMe.aConversation().from(currentUser).please();
-    ConversationMessage msg =
-        makeMe.aConversationMessage().forConversationInstance(conversation).please();
-    UserModel receiver = makeMe.aUser().toModelPlease();
-    msg.setSender(receiver.getEntity());
-    List<Conversation> conversations = controller.markConversationAsRead(conversation);
-    assertThat(conversations.size()).isEqualTo(0);
+  @Nested
+  class MarkConversationAsReadTest {
+    @Test
+    void testMarkConversationAsReadReduceTheCount() throws UnexpectedNoAccessRightException {
+      Conversation conversation = makeMe.aConversation().from(currentUser).please();
+      ConversationMessage msg =
+          makeMe.aConversationMessage().forConversationInstance(conversation).please();
+      UserModel receiver = makeMe.aUser().toModelPlease();
+      msg.setSender(receiver.getEntity());
+      List<Conversation> conversations = controller.markConversationAsRead(conversation);
+      assertThat(conversations.size()).isEqualTo(0);
+    }
+
+    @Test
+    void testMarkConversationAsReadByReceiver() throws UnexpectedNoAccessRightException {
+      Conversation conversation = makeMe.aConversation().from(currentUser).please();
+      ConversationMessage msg =
+          makeMe.aConversationMessage().forConversationInstance(conversation).please();
+      UserModel receiver = makeMe.aUser().toModelPlease();
+      msg.setSender(receiver.getEntity());
+      assertEquals(false, msg.getIs_read());
+      controller.markConversationAsRead(conversation);
+      assertEquals(true, msg.getIs_read());
+    }
+
+    @Test
+    void testMarkConversationAsReadBySender() throws UnexpectedNoAccessRightException {
+      Conversation conversation = makeMe.aConversation().from(currentUser).please();
+      ConversationMessage msg =
+          makeMe.aConversationMessage().forConversationInstance(conversation).please();
+      msg.setSender(currentUser.getEntity());
+      controller.markConversationAsRead(conversation);
+      assertEquals(false, msg.getIs_read());
+    }
   }
 
-  @Test
-  void testMarkConversationAsReadByReceiver() throws UnexpectedNoAccessRightException {
-    Conversation conversation = makeMe.aConversation().from(currentUser).please();
-    ConversationMessage msg =
-        makeMe.aConversationMessage().forConversationInstance(conversation).please();
-    UserModel receiver = makeMe.aUser().toModelPlease();
-    msg.setSender(receiver.getEntity());
-    assertEquals(false, msg.getIs_read());
-    controller.markConversationAsRead(conversation);
-    assertEquals(true, msg.getIs_read());
+  @Nested
+  class ReplyToConversation {
+    @Test
+    void shouldNotBeAbleToReplyToAConversationIAmNotIn() {
+      Conversation conversation = makeMe.aConversation().please();
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.replyToConversation("hi", conversation));
+    }
+
+    @Test
+    void topicOwnerShouldBeAbleToReply() throws UnexpectedNoAccessRightException {
+      String message = "This is a message";
+      makeMe
+          .theNotebook(assessmentQuestionInstance.getAssessmentAttempt().getNotebook())
+          .owner(currentUser.getEntity())
+          .please();
+      Conversation conversation =
+          makeMe
+              .aConversation()
+              .forAnAssessmentQuestionInstance(assessmentQuestionInstance)
+              .please();
+      ConversationMessage conversationMessage =
+          controller.replyToConversation(message, conversation);
+      List<ConversationMessage> conversationMessages =
+          (List<ConversationMessage>) modelFactoryService.conversationMessageRepository.findAll();
+      assertEquals(1, conversationMessages.size());
+      assertEquals(message, conversationMessage.getMessage());
+    }
+
+    @Test
+    void initiatorShouldBeAbleToReply() throws UnexpectedNoAccessRightException {
+      String message = "This is a message";
+      Conversation conversation = makeMe.aConversation().from(currentUser).please();
+      ConversationMessage conversationMessage =
+          controller.replyToConversation(message, conversation);
+      assertEquals(message, conversationMessage.getMessage());
+    }
   }
 
-  @Test
-  void testMarkConversationAsReadBySender() throws UnexpectedNoAccessRightException {
-    Conversation conversation = makeMe.aConversation().from(currentUser).please();
-    ConversationMessage msg =
-        makeMe.aConversationMessage().forConversationInstance(conversation).please();
-    msg.setSender(currentUser.getEntity());
-    controller.markConversationAsRead(conversation);
-    assertEquals(false, msg.getIs_read());
-  }
+  @Nested
+  class GetConversationDetails {
 
-  @Test
-  void shouldNotBeAbleToReplyToAConversationIAmNotIn() {
-    Conversation conversation = makeMe.aConversation().please();
-    assertThrows(
-        UnexpectedNoAccessRightException.class,
-        () -> controller.replyToConversation("hi", conversation));
-  }
+    @Test
+    void shouldNotBeAbleToSeeAConversationIAmNotIn() {
+      Conversation conversation = makeMe.aConversation().please();
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.getConversationDetails(conversation));
+    }
 
-  @Test
-  void topicOwnerShouldBeAbleToReply() throws UnexpectedNoAccessRightException {
-    String message = "This is a message";
-    makeMe
-        .theNotebook(assessmentQuestionInstance.getAssessmentAttempt().getNotebook())
-        .owner(currentUser.getEntity())
-        .please();
-    Conversation conversation =
-        makeMe.aConversation().forAnAssessmentQuestionInstance(assessmentQuestionInstance).please();
-    ConversationMessage conversationMessage = controller.replyToConversation(message, conversation);
-    List<ConversationMessage> conversationMessages =
-        (List<ConversationMessage>) modelFactoryService.conversationMessageRepository.findAll();
-    assertEquals(1, conversationMessages.size());
-    assertEquals(message, conversationMessage.getMessage());
-  }
+    @Test
+    void testGetMessageThreadsFromConversation() throws UnexpectedNoAccessRightException {
+      Conversation conversation = makeMe.aConversation().from(currentUser).please();
 
-  @Test
-  void initiatorShouldBeAbleToReply() throws UnexpectedNoAccessRightException {
-    String message = "This is a message";
-    Conversation conversation = makeMe.aConversation().from(currentUser).please();
-    ConversationMessage conversationMessage = controller.replyToConversation(message, conversation);
-    assertEquals(message, conversationMessage.getMessage());
-  }
-
-  @Test
-  void shouldNotBeAbleToSeeAConversationIAmNotIn() {
-    Conversation conversation = makeMe.aConversation().please();
-    assertThrows(
-        UnexpectedNoAccessRightException.class,
-        () -> controller.getConversationDetails(conversation));
-  }
-
-  @Test
-  void testGetMessageThreadsFromConversation() throws UnexpectedNoAccessRightException {
-    Conversation conversation = makeMe.aConversation().from(currentUser).please();
-
-    makeMe.aConversationMessage().forConversationInstance(conversation).please();
-    List<ConversationMessage> conversations = controller.getConversationDetails(conversation);
-    assertEquals(1, conversations.size());
+      makeMe.aConversationMessage().forConversationInstance(conversation).please();
+      List<ConversationMessage> conversations = controller.getConversationDetails(conversation);
+      assertEquals(1, conversations.size());
+    }
   }
 }
