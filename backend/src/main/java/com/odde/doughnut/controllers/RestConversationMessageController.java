@@ -40,13 +40,13 @@ public class RestConversationMessageController {
   }
 
   @GetMapping("/unreadCount")
-  public List<Conversation> getUnreadConversations() {
+  public List<ConversationMessage> getUnreadConversations() {
     currentUser.assertLoggedIn();
     return conversationService.getUnreadConversations(currentUser.getEntity());
   }
 
   @PatchMapping("/read/{conversationId}")
-  public List<Conversation> markConversationAsRead(
+  public List<ConversationMessage> markConversationAsRead(
       @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(conversation);

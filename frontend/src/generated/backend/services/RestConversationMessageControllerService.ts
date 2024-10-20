@@ -56,12 +56,12 @@ export class RestConversationMessageControllerService {
     }
     /**
      * @param conversationId
-     * @returns Conversation OK
+     * @returns ConversationMessage OK
      * @throws ApiError
      */
     public markConversationAsRead(
         conversationId: number,
-    ): CancelablePromise<Array<Conversation>> {
+    ): CancelablePromise<Array<ConversationMessage>> {
         return this.httpRequest.request({
             method: 'PATCH',
             url: '/api/message/read/{conversationId}',
@@ -74,10 +74,10 @@ export class RestConversationMessageControllerService {
         });
     }
     /**
-     * @returns Conversation OK
+     * @returns ConversationMessage OK
      * @throws ApiError
      */
-    public getUnreadConversations(): CancelablePromise<Array<Conversation>> {
+    public getUnreadConversations(): CancelablePromise<Array<ConversationMessage>> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/message/unreadCount',

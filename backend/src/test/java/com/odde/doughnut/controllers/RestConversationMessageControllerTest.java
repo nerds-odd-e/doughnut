@@ -196,8 +196,8 @@ class RestConversationMessageControllerTest {
           makeMe.aConversationMessage().forConversation(conversation).please();
       UserModel receiver = makeMe.aUser().toModelPlease();
       msg.setSender(receiver.getEntity());
-      List<Conversation> conversations = controller.markConversationAsRead(conversation);
-      assertThat(conversations.size()).isEqualTo(0);
+      List<ConversationMessage> messages = controller.markConversationAsRead(conversation);
+      assertThat(messages.size()).isEqualTo(0);
     }
 
     @Test

@@ -19,7 +19,6 @@ public class ConversationMessageBuilder extends EntityBuilder<ConversationMessag
     if (Strings.isBlank(this.entity.getMessage())) {
       entity.setMessage("This is a feedback");
     }
-    entity.setReadByReceiver(false);
   }
 
   public ConversationMessageBuilder forConversation(Conversation conversation) {

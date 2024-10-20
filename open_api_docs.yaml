@@ -2234,7 +2234,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Conversation"
+                  $ref: "#/components/schemas/ConversationMessage"
   /api/fine-tuning/{suggestedQuestion}/update-suggested-question-for-fine-tuning:
     patch:
       tags:
@@ -2688,7 +2688,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Conversation"
+                  $ref: "#/components/schemas/ConversationMessage"
   /api/message/detail/all/{conversationId}:
     get:
       tags:

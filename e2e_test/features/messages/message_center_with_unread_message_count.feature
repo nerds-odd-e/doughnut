@@ -25,7 +25,6 @@ Feature: Message Center with Unread Message Count
     When I read the conversation with "A Trainer" for the topic "Rocket Science" in the message center
     Then I should have no unread messages
 
-  @ignore
   Scenario: Any user in a circle read the message count as read for all circle members
     Given There is a circle "TDD Fan Club" with "a_trainer, old_learner" members
     And There is a notebook "Critical Thinking" in circle "TDD Fan Club" by "a_trainer"

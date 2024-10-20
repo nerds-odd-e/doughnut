@@ -124,11 +124,11 @@ const conversationTopic = (conversation: Conversation) => {
 }
 
 const conversationPartner = (conversation: Conversation) => {
-  if (conversation.subjectOwnership?.circle?.name) {
-    return conversation.subjectOwnership.circle.name
-  }
   if (conversation.conversationInitiator?.name !== user?.name) {
     return conversation.conversationInitiator?.name
+  }
+  if (conversation.subjectOwnership?.circle?.name) {
+    return conversation.subjectOwnership.circle.name
   }
   return conversation.subjectOwnership?.ownerName
 }
