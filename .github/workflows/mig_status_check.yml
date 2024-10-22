@@ -2,7 +2,7 @@ name: doughnut GCP MIG Status Check
 
 on:
   schedule:
-    - cron: '0 */3 * * *'  # Runs every 3 hours
+    - cron: '0 */6 * * *'  # Runs every 3 hours
 
 env:
   GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
