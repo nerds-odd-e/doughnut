@@ -10,7 +10,7 @@
   </div>
 
   <div class="row">
-    <NoteEditUploadAudioDialog
+    <NoteAudioTools
       v-if="audioTools"
       v-bind="{ noteId: noteRealm.id, storageAccessor }"
       @close-dialog="
@@ -78,7 +78,7 @@ import NoteCoreToolbar from "./core/NoteCoreToolbar.vue"
 import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue"
 import LinkOfNote from "../links/LinkOfNote.vue"
 import { reverseLabel } from "../../models/linkTypeOptions"
-import NoteEditUploadAudioDialog from "./accessory/NoteEditUploadAudioDialog.vue"
+import NoteAudioTools from "./accessory/NoteAudioTools.vue"
 
 defineProps({
   noteRealm: { type: Object as PropType<NoteRealm>, required: true },
