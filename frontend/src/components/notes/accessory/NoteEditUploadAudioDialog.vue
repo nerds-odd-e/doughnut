@@ -1,4 +1,6 @@
 <template>
+  <button class="btn">Record Audio</button>
+  <button class="btn">Stop Recording</button>
   <form @submit.prevent.once="uploadAudio">
     <NoteUploadAudioForm
       v-if="!!formData"

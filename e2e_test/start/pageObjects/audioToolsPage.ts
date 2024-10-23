@@ -22,3 +22,8 @@ const audioToolsPage = () => {
 }
 
 export default audioToolsPage
+
+export const assumeAudioTools = () => {
+  cy.findByText('Record Audio').should('exist')
+  return audioToolsPage()
+}

@@ -52,5 +52,5 @@ When('I start recording audio for the note {string}', (noteTopic: string) => {
 })
 
 When('I stop recording audio', () => {
-  start.assumeNotePage().audioTools().stopRecording()
+  start.assumeAudioTools().stopRecording()
 })

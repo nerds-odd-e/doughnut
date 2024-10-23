@@ -15,12 +15,14 @@ import { navigateToMessageCenter } from './pageObjects/messageCenterPage'
 import testability from './testability'
 import { logins } from './logins'
 import { messageCenterIndicator } from './pageObjects/messageCenterIndicator'
+import { assumeAudioTools } from './pageObjects/audioToolsPage'
 
 export default {
   navigateToBazaar,
   noteSidebar,
   systemSidebar,
   assumeNotePage,
+  assumeAudioTools,
   assumeAssessmentPage,
   assumeAnsweredQuestionPage,
   assumeChatAboutNotePage,
