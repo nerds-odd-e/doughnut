@@ -1,7 +1,6 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.odde.doughnut.controllers.dto.AudioUploadDTO;
 import com.odde.doughnut.controllers.dto.NoteAccessoriesDTO;
 import jakarta.persistence.*;
 import java.io.IOException;

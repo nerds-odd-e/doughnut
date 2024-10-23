@@ -155,10 +155,6 @@ public class MakeMe extends MakeMeWithoutDB {
     return new SuggestedQuestionForFineTuningBuilder(this);
   }
 
-  public AudioBuilder anAudio() {
-    return new AudioBuilder(new Audio(), this);
-  }
-
   public UserAssistantThreadBuilder aUserAssistantThread(String threadId) {
     return new UserAssistantThreadBuilder(this, threadId);
   }

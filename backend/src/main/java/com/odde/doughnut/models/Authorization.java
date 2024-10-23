@@ -48,7 +48,6 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
       case PredefinedQuestion obj -> assertReadAuthorizationPredefinedQuestion(obj);
       case ReviewPoint obj -> assertReadAuthorizationReviewPoint(obj);
       case User obj -> assertAuthorizationUser(obj);
-      case Audio obj -> assertAuthorizationUser(obj.getUser());
       default ->
           throw new ResponseStatusException(
               HttpStatus.INTERNAL_SERVER_ERROR, "Unknown object type");

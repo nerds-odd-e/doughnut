@@ -7,7 +7,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.controllers.dto.*;
-import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ai.TextFromAudio;
 import com.odde.doughnut.services.openAiApis.OpenAiApiExtended;

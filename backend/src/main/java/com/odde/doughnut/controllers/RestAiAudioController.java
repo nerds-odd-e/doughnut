@@ -1,14 +1,11 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.*;
-import com.odde.doughnut.entities.Audio;
-import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.TextFromAudio;
 import com.theokanning.openai.client.OpenAiApi;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.Optional;
