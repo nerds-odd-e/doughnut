@@ -45,19 +45,6 @@ public class NoteAccessory extends EntityIdentifiedByIdOnly {
   @Setter
   private Boolean useParentImage = false;
 
-  @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-  @JoinColumn(name = "audio_id", referencedColumnName = "id")
-  @Getter
-  @Setter
-  private Audio audioAttachment;
-
-  @JsonIgnore
-  public void setAudio(AudioUploadDTO audioUploadDTO, User user) throws IOException {
-    Audio audio = audioUploadDTO.fetchUploadedAudio();
-    audio.setUser(user);
-    setAudioAttachment(audio);
-  }
-
   @JsonIgnore
   public void setFromDTO(NoteAccessoriesDTO noteAccessoriesDTO, User user) throws IOException {
     BeanUtils.copyProperties(noteAccessoriesDTO, this);

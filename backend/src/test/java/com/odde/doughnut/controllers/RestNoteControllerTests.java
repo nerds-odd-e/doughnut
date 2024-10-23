@@ -397,27 +397,6 @@ class RestNoteControllerTests {
   }
 
   @Nested
-  class uploadAudioTest {
-    Note note;
-    AudioUploadDTO audioUploadDTO = new AudioUploadDTO();
-
-    @BeforeEach
-    void setup() {
-      note = makeMe.aNote("new").creatorAndOwner(userModel).please();
-    }
-
-    @Test
-    void shouldPersistAudioToNoteAfterUpload() throws Exception {
-      String filename = "podcast.wav";
-      audioUploadDTO.setUploadAudioFile(
-          new MockMultipartFile(filename, filename, "audio/wav", new byte[] {}));
-      controller.uploadAudio(note, audioUploadDTO);
-      Note newNote = makeMe.modelFactoryService.noteRepository.findById(note.getId()).get();
-      assertEquals(filename, newNote.getNoteAccessory().getAudioAttachment().getName());
-    }
-  }
-
-  @Nested
   class DeleteNoteTest {
     Note subject;
     Note parent;

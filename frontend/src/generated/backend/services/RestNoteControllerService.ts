@@ -2,7 +2,6 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { AudioUploadDTO } from '../models/AudioUploadDTO';
 import type { NoteAccessoriesDTO } from '../models/NoteAccessoriesDTO';
 import type { NoteAccessory } from '../models/NoteAccessory';
 import type { NoteCreationDTO } from '../models/NoteCreationDTO';
@@ -228,29 +227,6 @@ export class RestNoteControllerService {
             path: {
                 'note': note,
             },
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * @param note
-     * @param formData
-     * @returns NoteAccessory OK
-     * @throws ApiError
-     */
-    public uploadAudio(
-        note: number,
-        formData?: AudioUploadDTO,
-    ): CancelablePromise<NoteAccessory> {
-        return this.httpRequest.request({
-            method: 'PATCH',
-            url: '/api/notes/{note}/audio',
-            path: {
-                'note': note,
-            },
-            formData: formData,
-            mediaType: 'multipart/form-data',
             errors: {
                 500: `Internal Server Error`,
             },

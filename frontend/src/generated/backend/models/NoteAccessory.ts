@@ -2,7 +2,6 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { Audio } from './Audio';
 import type { ImageWithMask } from './ImageWithMask';
 export type NoteAccessory = {
     id: number;
@@ -10,7 +9,6 @@ export type NoteAccessory = {
     imageUrl?: string;
     imageMask?: string;
     useParentImage?: boolean;
-    audioAttachment?: Audio;
     imageWithMask?: ImageWithMask;
 };
 

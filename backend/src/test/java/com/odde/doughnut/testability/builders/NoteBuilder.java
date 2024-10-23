@@ -16,7 +16,6 @@ public class NoteBuilder extends EntityBuilder<Note> {
   static final TestObjectCounter titleCounter = new TestObjectCounter(n -> "title" + n);
 
   List<LinkBuilder> linkBuilders = new ArrayList<>();
-  private String audioFilename = null;
   private List<PredefinedQuestionBuilder> predefinedQuestionBuilders = new ArrayList<>();
   private List<NoteBuilder> childrenBuilders = new ArrayList<>();
 
@@ -104,11 +103,6 @@ public class NoteBuilder extends EntityBuilder<Note> {
     }
     if (entity.getNotebook().getId() == null && needPersist) {
       makeMe.modelFactoryService.save(entity.getNotebook());
-    }
-    if (audioFilename != null) {
-      entity
-          .getOrInitializeNoteAccessory()
-          .setAudioAttachment(makeMe.anAudio().name(audioFilename).please(needPersist));
     }
   }
 
@@ -198,11 +192,6 @@ public class NoteBuilder extends EntityBuilder<Note> {
 
   public NoteBuilder level(int i) {
     entity.getReviewSetting().setLevel(i);
-    return this;
-  }
-
-  public NoteBuilder audio(String filename) {
-    this.audioFilename = filename;
     return this;
   }
 

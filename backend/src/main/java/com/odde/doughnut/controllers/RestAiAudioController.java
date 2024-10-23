@@ -33,19 +33,6 @@ class RestAiAudioController {
     this.modelFactoryService = modelFactoryService;
   }
 
-  @PatchMapping(path = "/{note}/audio-to-srt")
-  @Transactional
-  public Optional<TextFromAudio> convertNoteAudioToSRT(
-      @PathVariable(name = "note") @Schema(type = "integer") Note note) throws IOException {
-    Audio audio = note.getNoteAccessory().getAudioAttachment();
-    return aiAdvisorService
-        .getOtherAiServices()
-        .getTextFromAudio(
-            audio.getName(),
-            audio.getBlob().getData(),
-            getGlobalSettingsService().globalSettingOthers().getValue());
-  }
-
   @PostMapping(
       path = "/convertSrt",
       consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})

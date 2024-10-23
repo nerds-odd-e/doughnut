@@ -22,7 +22,6 @@ export type { AnsweredQuestion } from './models/AnsweredQuestion';
 export type { AssessmentAttempt } from './models/AssessmentAttempt';
 export type { AssessmentQuestionInstance } from './models/AssessmentQuestionInstance';
 export type { Attachment } from './models/Attachment';
-export type { Audio } from './models/Audio';
 export type { AudioUploadDTO } from './models/AudioUploadDTO';
 export type { BareQuestion } from './models/BareQuestion';
 export type { BazaarNotebook } from './models/BazaarNotebook';

@@ -139,13 +139,6 @@ When(
   }
 )
 
-When(
-  'I upload an audio-file {string} to the note {string}',
-  (fileName: string, noteTopic: string) => {
-    start.jumpToNotePage(noteTopic).audioTools().uploadAudioFile(fileName)
-  }
-)
-
 When('I convert the audio-file to SRT without saving', () => {
   cy.findAllByDisplayValue('Convert to SRT').click()
 })

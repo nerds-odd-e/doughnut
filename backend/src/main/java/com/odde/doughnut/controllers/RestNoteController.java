@@ -128,23 +128,6 @@ class RestNoteController {
     return note.getNoteAccessory();
   }
 
-  @PatchMapping(
-      path = "/{note}/audio",
-      consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-  @Transactional
-  public NoteAccessory uploadAudio(
-      @PathVariable(name = "note") @Schema(type = "integer") Note note,
-      @Valid @ModelAttribute AudioUploadDTO audioUploadDTO)
-      throws IOException {
-    note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
-    final User user = currentUser.getEntity();
-    note.getOrInitializeNoteAccessory().setAudio(audioUploadDTO, user);
-    modelFactoryService.save(note.getNoteAccessory().getAudioAttachment());
-    modelFactoryService.save(note);
-
-    return note.getNoteAccessory();
-  }
-
   @GetMapping("/{note}/accessory")
   public NoteAccessory showNoteAccessory(@PathVariable("note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException {

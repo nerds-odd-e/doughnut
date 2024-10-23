@@ -12,12 +12,6 @@ const audioToolsPage = () => {
       cy.get('#note-uploadAudioFile').attachFile(fileName)
       return this
     },
-    uploadAudioFile: function (fileName: string) {
-      this.startToUploadAudioFile(fileName)
-      cy.findAllByText('Save').click()
-      cy.pageIsNotLoading()
-      return this
-    },
     downloadAudioFile(fileName: string) {
       const downloadsFolder = Cypress.config('downloadsFolder')
       cy.findByRole('button', { name: `Download ${fileName}` }).click()

@@ -26,23 +26,4 @@ export class RestAiAudioControllerService {
             },
         });
     }
-    /**
-     * @param note
-     * @returns TextFromAudio OK
-     * @throws ApiError
-     */
-    public convertNoteAudioToSrt(
-        note: number,
-    ): CancelablePromise<TextFromAudio> {
-        return this.httpRequest.request({
-            method: 'PATCH',
-            url: '/api/notes/{note}/audio-to-srt',
-            path: {
-                'note': note,
-            },
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
 }

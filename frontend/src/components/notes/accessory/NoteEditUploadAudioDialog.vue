@@ -1,19 +1,16 @@
 <template>
   <button class="btn" @click="startRecording" :disabled="isRecording">Record Audio</button>
   <button class="btn" @click="stopRecording" :disabled="!isRecording">Stop Recording</button>
-  <form @submit.prevent.once="uploadAudio">
-    <NoteUploadAudioForm
-      v-if="!!formData"
-      v-model="formData"
-      :errors="noteFormErrors"
-    />
-    <input type="submit" value="Save" class="btn btn-primary" />
-    <input
-      value="Convert to SRT"
-      class="btn btn-primary"
-      @click="convertToSRT"
-    />
-  </form>
+  <NoteUploadAudioForm
+    v-if="!!formData"
+    v-model="formData"
+    :errors="noteFormErrors"
+  />
+  <input
+    value="Convert to SRT"
+    class="btn btn-primary"
+    @click.once="convertToSRT"
+  />
 </template>
 
 <script setup lang="ts">
@@ -41,17 +38,6 @@ const isRecording = ref(false)
 let mediaRecorder: MediaRecorder | null = null
 let audioChunks: Blob[] = []
 
-const uploadAudio = async () => {
-  try {
-    const na = await managedApi.restNoteController.uploadAudio(
-      noteId,
-      formData.value
-    )
-    emit("closeDialog", na)
-  } catch (error: unknown) {
-    noteFormErrors.value = error as Record<string, string | undefined>
-  }
-}
 const convertToSRT = async () => {
   try {
     const response = await managedApi.restAiAudioController.convertSrt(

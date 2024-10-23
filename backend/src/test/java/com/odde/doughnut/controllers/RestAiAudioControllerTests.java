@@ -81,23 +81,4 @@ class RestAiAudioControllerTests {
       assertThat(resp, equalTo("test123"));
     }
   }
-
-  @Nested
-  class ConvertNoteAudioToSRT {
-    Note note;
-
-    @BeforeEach
-    void setup() {
-      note = makeMe.aNote("new").creatorAndOwner(userModel).audio("dog.mp3").please();
-      when(openAiApi.createTranscriptionSrt(any(RequestBody.class)))
-          .thenReturn(Single.just(ResponseBody.create("test", null)));
-    }
-
-    @Test
-    void convert() throws Exception {
-      String result =
-          controller.convertNoteAudioToSRT(note).map(TextFromAudio::getTextFromAudio).orElse("");
-      assertEquals("test123", result);
-    }
-  }
 }
