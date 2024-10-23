@@ -2,7 +2,7 @@
   <div class="row">
     <NoteCoreToolbar
       v-if="!readonly"
-      v-bind="{ note: noteRealm.note, storageAccessor, asMarkdown }"
+      v-bind="{ note: noteRealm.note, storageAccessor, asMarkdown, audioTools }"
       @note-accessory-updated="updatedNoteAccessory = $event"
       @edit-as-markdown="asMarkdown = $event"
     />
@@ -83,6 +83,7 @@ defineProps({
 
 const updatedNoteAccessory = ref<NoteAccessory | undefined>(undefined)
 const asMarkdown = ref(false)
+const audioTools = ref(false)
 
 const toLocalDateString = (date: string) => {
   return new Date(date).toLocaleDateString()

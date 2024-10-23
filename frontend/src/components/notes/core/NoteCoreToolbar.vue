@@ -93,10 +93,43 @@
         </div>
       </div>
     </div>
-    <NoteAccessoryToolbar
-      v-bind="{ noteId: note.id }"
-      @note-accessory-updated="$emit('note-accessory-updated', $event)"
-    />
+    <div class="btn-group btn-group-sm ms-auto">
+      <PopButton title="edit note image">
+        <template #button_face>
+          <SvgImage />
+        </template>
+        <template #default="{ closer }">
+          <NoteEditImageDialog
+            v-bind="{ noteId: note.id }"
+            @close-dialog="noteAccessoriesUpdated(closer, $event)"
+          />
+        </template>
+      </PopButton>
+
+      <PopButton title="edit note url">
+        <template #button_face>
+          <SvgUrlIndicator />
+        </template>
+        <template #default="{ closer }">
+          <NoteEditUrlDialog
+            v-bind="{ noteId: note.id }"
+            @close-dialog="noteAccessoriesUpdated(closer, $event)"
+          />
+        </template>
+      </PopButton>
+
+      <PopButton title="Upload audio">
+        <template #button_face>
+          <SvgResume />
+        </template>
+        <template #default="{ closer }">
+          <NoteEditUploadAudioDialog
+            v-bind="{ noteId: note.id }"
+            @close-dialog="noteAccessoriesUpdated(closer, $event)"
+          />
+        </template>
+      </PopButton>
+    </div>
   </nav>
 </template>
 
@@ -104,6 +137,7 @@
 import type { PropType } from "vue"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import type { Note } from "@/generated/backend"
+import type { NoteAccessory } from "@/generated/backend"
 import NoteNewButton from "./NoteNewButton.vue"
 import SvgAddChild from "../../svgs/SvgAddChild.vue"
 import WikidataButton from "./WikidataButton.vue"
@@ -123,6 +157,12 @@ import NoteInfoBar from "../NoteInfoBar.vue"
 import SvgMarkdown from "@/components/svgs/SvgMarkdown.vue"
 import SvgRichContent from "@/components/svgs/SvgRichContent.vue"
 import NoteSendMessageButton from "./NoteSendMessageButton.vue"
+import SvgImage from "../../svgs/SvgImage.vue"
+import SvgResume from "../../svgs/SvgResume.vue"
+import SvgUrlIndicator from "../../svgs/SvgUrlIndicator.vue"
+import NoteEditImageDialog from "../accessory/NoteEditImageDialog.vue"
+import NoteEditUploadAudioDialog from "../accessory/NoteEditUploadAudioDialog.vue"
+import NoteEditUrlDialog from "../accessory/NoteEditUrlDialog.vue"
 
 const props = defineProps({
   storageAccessor: {
@@ -133,15 +173,26 @@ const props = defineProps({
     type: Object as PropType<Note>,
     required: true,
   },
+  audioTools: {
+    type: Boolean,
+    required: true,
+  },
   asMarkdown: Boolean,
 })
 
-defineEmits(["note-accessory-updated", "edit-as-markdown"])
+const emit = defineEmits(["note-accessory-updated", "edit-as-markdown"])
 
 const moveUp = () => {
   props.storageAccessor.storedApi().moveUp(props.note.id)
 }
 const moveDown = () => {
   props.storageAccessor.storedApi().moveDown(props.note.id)
+}
+
+const noteAccessoriesUpdated = (closer: () => void, na: NoteAccessory) => {
+  if (na) {
+    emit("note-accessory-updated", na)
+  }
+  closer()
 }
 </script>
