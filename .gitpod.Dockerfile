@@ -1,5 +1,5 @@
 # syntax=docker.io/docker/dockerfile:1.10.0
-FROM yeongsheng/doughnut-gitpod:2024-09-11
+FROM yeongsheng/doughnut-gitpod:2024-10-23
 
 # -----------------------------------------------------
 # -------------------- USER gitpod --------------------
@@ -17,11 +17,11 @@ RUN export PATH="${PATH}:/nix/var/nix/profiles/default/bin"
 RUN . /home/gitpod/.nix-profile/etc/profile.d/nix.sh \
 # upgrade to lix
     && nix run \
-    --experimental-features "nix-command flakes" \
-    --extra-substituters https://cache.lix.systems --extra-trusted-public-keys "cache.lix.systems:aBnZUw8zA7H35Cz2RyKFVs3H4PlGTLawyY5KRbvJR8o=" \
-    'git+https://git.lix.systems/lix-project/lix?ref=refs/tags/2.91.0' -- \
-    upgrade-nix \
-    --extra-substituters https://cache.lix.systems --extra-trusted-public-keys "cache.lix.systems:aBnZUw8zA7H35Cz2RyKFVs3H4PlGTLawyY5KRbvJR8o=" \
+     --experimental-features "nix-command flakes" \
+     --extra-substituters https://cache.lix.systems --extra-trusted-public-keys "cache.lix.systems:aBnZUw8zA7H35Cz2RyKFVs3H4PlGTLawyY5KRbvJR8o=" \
+     'git+https://git.lix.systems/lix-project/lix?ref=refs/tags/2.91.1' -- \
+     upgrade-nix \
+     --extra-substituters https://cache.lix.systems --extra-trusted-public-keys "cache.lix.systems:aBnZUw8zA7H35Cz2RyKFVs3H4PlGTLawyY5KRbvJR8o=" \
 # install direnv
     && nix-env -iA nixpkgs.direnv && nix-env -iA nixpkgs.nix-direnv
 
