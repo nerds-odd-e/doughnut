@@ -21,7 +21,6 @@ Feature: Note details completion
     When I request to complete the details for the note "Taipei"
     Then the note details on the current page should be "It is a vigorous city."
 
-  @focus
   Scenario: Completing Note Details Using OpenAI (new)
     Given OpenAI assistant will reply below for user messages:
       | user message                      | response type   | assistant reply                 | run id |
