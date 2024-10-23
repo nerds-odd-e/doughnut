@@ -14,14 +14,12 @@
       @click="convertToSRT"
     />
   </form>
-  <TextArea :field="`convertedSrt`" v-model="convertedSrt" :rows="8" />
 </template>
 
 <script setup lang="ts">
 import type { AudioUploadDTO } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { ref, type PropType } from "vue"
-import TextArea from "../../form/TextArea.vue"
 import NoteUploadAudioForm from "./NoteUploadAudioForm.vue"
 import type { StorageAccessor } from "../../../store/createNoteStorage"
 
@@ -38,7 +36,6 @@ const emit = defineEmits(["closeDialog"])
 
 const formData = ref<AudioUploadDTO>({})
 const noteFormErrors = ref<Record<string, string | undefined>>({})
-const convertedSrt = ref<string>("")
 
 const isRecording = ref(false)
 let mediaRecorder: MediaRecorder | null = null
@@ -60,10 +57,9 @@ const convertToSRT = async () => {
     const response = await managedApi.restAiAudioController.convertSrt(
       formData.value
     )
-    convertedSrt.value = response?.srt
     storageAccessor
       .storedApi()
-      .updateTextField(noteId, "edit details", convertedSrt.value)
+      .updateTextField(noteId, "edit details", response?.srt)
   } catch (error: unknown) {
     noteFormErrors.value = error as Record<string, string | undefined>
   }
