@@ -1,6 +1,6 @@
 <template>
-  <button class="btn">Record Audio</button>
-  <button class="btn">Stop Recording</button>
+  <button class="btn" @click="startRecording" :disabled="isRecording">Record Audio</button>
+  <button class="btn" @click="stopRecording" :disabled="!isRecording">Stop Recording</button>
   <form @submit.prevent.once="uploadAudio">
     <NoteUploadAudioForm
       v-if="!!formData"
@@ -35,6 +35,10 @@ const formData = ref<AudioUploadDTO>({})
 const noteFormErrors = ref<Record<string, string | undefined>>({})
 const convertedSrt = ref<string>("")
 
+const isRecording = ref(false)
+let mediaRecorder: MediaRecorder | null = null
+let audioChunks: Blob[] = []
+
 const uploadAudio = async () => {
   try {
     const na = await managedApi.restNoteController.uploadAudio(
@@ -54,6 +58,36 @@ const convertToSRT = async () => {
     convertedSrt.value = response?.srt
   } catch (error: unknown) {
     noteFormErrors.value = error as Record<string, string | undefined>
+  }
+}
+
+const startRecording = async () => {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+    mediaRecorder = new MediaRecorder(stream)
+
+    mediaRecorder.ondataavailable = (event) => {
+      audioChunks.push(event.data)
+    }
+
+    mediaRecorder.onstop = () => {
+      const audioBlob = new Blob(audioChunks, { type: "audio/wav" })
+      formData.value.uploadAudioFile = audioBlob
+      audioChunks = []
+    }
+
+    mediaRecorder.start()
+    isRecording.value = true
+  } catch (error) {
+    console.error("Error starting recording:", error)
+    noteFormErrors.value = { recording: "Failed to start recording" }
+  }
+}
+
+const stopRecording = () => {
+  if (mediaRecorder && mediaRecorder.state !== "inactive") {
+    mediaRecorder.stop()
+    isRecording.value = false
   }
 }
 </script>
