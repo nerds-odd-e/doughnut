@@ -45,15 +45,7 @@ public class OpenAIChatRequestBuilder {
 
   public ChatCompletionRequest build() {
     ChatCompletionRequest.ChatCompletionRequestBuilder requestBuilder =
-        builder
-            .messages(messages)
-            //
-            // an effort has been made to make the api call more responsive by using stream(true)
-            // however, due to the library limitation, we cannot do it yet.
-            // find more details here:
-            //    https://github.com/TheoKanning/openai-java/issues/83
-            .stream(false)
-            .n(1);
+        builder.messages(messages).stream(false).n(1);
     if (!chatTools.isEmpty()) {
       requestBuilder.tools(chatTools);
     }

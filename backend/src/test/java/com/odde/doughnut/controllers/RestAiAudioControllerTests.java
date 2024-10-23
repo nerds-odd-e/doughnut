@@ -9,8 +9,10 @@ import static org.mockito.Mockito.when;
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.ai.TextFromAudio;
 import com.odde.doughnut.services.openAiApis.OpenAiApiExtended;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import io.reactivex.Single;
 import java.io.IOException;
 import okhttp3.RequestBody;
@@ -35,12 +37,18 @@ class RestAiAudioControllerTests {
   private UserModel userModel;
   RestAiAudioController controller;
   @Mock OpenAiApiExtended openAiApi;
+  OpenAIChatCompletionMock openAIChatCompletionMock;
 
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
 
-    controller = new RestAiAudioController(openAiApi);
+    controller = new RestAiAudioController(openAiApi, makeMe.modelFactoryService);
+    TextFromAudio textFromAudio = new TextFromAudio();
+    textFromAudio.setTextFromAudio("test123");
+    openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
+    openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(
+        textFromAudio, "audio_transcription_to_text");
   }
 
   @Nested
@@ -59,7 +67,7 @@ class RestAiAudioControllerTests {
       audioUploadDTO.setUploadAudioFile(
           new MockMultipartFile(filename, filename, "audio/mp3", new byte[] {}));
       String result = controller.convertSrt(audioUploadDTO).getSrt();
-      assertEquals("test", result);
+      assertEquals("test123", result);
     }
 
     @Test
@@ -69,7 +77,7 @@ class RestAiAudioControllerTests {
       var dto = new AudioUploadDTO();
       dto.setUploadAudioFile(mockFile);
       String resp = controller.convertSrt(dto).getSrt();
-      assertThat(resp, equalTo("test"));
+      assertThat(resp, equalTo("test123"));
     }
   }
 
@@ -87,7 +95,7 @@ class RestAiAudioControllerTests {
     @Test
     void convert() throws Exception {
       String result = controller.convertNoteAudioToSRT(note).getSrt();
-      assertEquals("test", result);
+      assertEquals("test123", result);
     }
   }
 }

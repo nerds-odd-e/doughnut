@@ -6,6 +6,8 @@ import static java.lang.Thread.sleep;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.odde.doughnut.controllers.dto.AiCompletionAnswerClarifyingQuestionParams;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
+import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
+import com.odde.doughnut.services.ai.tools.AiToolList;
 import com.theokanning.openai.assistants.assistant.Assistant;
 import com.theokanning.openai.assistants.assistant.AssistantRequest;
 import com.theokanning.openai.assistants.assistant.VectorStoreFileRequest;
@@ -216,5 +218,11 @@ public class OpenAiApiHandler {
     VectorStoreFileRequest request = VectorStoreFileRequest.builder().fileId(fileId).build();
     blockGet(openAiApi.createVectorStoreFile(storeId, request)).getId();
     return storeId;
+  }
+
+  public Optional<JsonNode> requestAndGetFunctionCallArguments(
+      AiToolList tool, OpenAIChatRequestBuilder chatAboutNoteRequestBuilder1) {
+    ChatCompletionRequest chatRequest = chatAboutNoteRequestBuilder1.addTool(tool).build();
+    return getFirstToolCallArguments(chatRequest);
   }
 }

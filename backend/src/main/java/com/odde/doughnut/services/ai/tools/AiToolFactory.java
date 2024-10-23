@@ -83,4 +83,16 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
                 .parametersDefinitionByClass(MCQWithAnswer.class)
                 .build()));
   }
+
+  public static AiToolList transcriptionToTextAiTool(String transcriptionFromAudio) {
+    return new AiToolList(
+        "You are a helpful assistant for converting audio transcription to text of paragraphs. Your task is to convert the following audio transcription to text with meaningful punctuations and paragraphs. Since the transcription is from audio, also fix the obvious mistakes.\n\n"
+            + transcriptionFromAudio,
+        List.of(
+            FunctionDefinition.<TextFromAudio>builder()
+                .name("audio_transcription_to_text")
+                .description("Convert audio transcription to text")
+                .parametersDefinitionByClass(TextFromAudio.class)
+                .build()));
+  }
 }

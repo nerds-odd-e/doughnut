@@ -24,14 +24,5 @@ Feature: Note Upload Audio File
     Scenario: Convert audio-file to SRT without saving
       When I try to upload an audio-file "sample-3s.mp3" to the note "podcast"
       And I convert the audio-file to SRT without saving
-      Then I should see the extracted SRT content
-      """
-      1
-      00:00:00,000 --> 00:00:02,000
-      You
-
-
-
-      """
       And the note details on the current page should be "You"
 

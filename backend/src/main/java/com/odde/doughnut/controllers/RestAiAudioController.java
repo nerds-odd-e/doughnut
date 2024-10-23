@@ -3,7 +3,9 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.Audio;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AiAdvisorService;
+import com.odde.doughnut.services.GlobalSettingsService;
 import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
@@ -20,9 +22,13 @@ import org.springframework.web.context.annotation.SessionScope;
 class RestAiAudioController {
 
   private final AiAdvisorService aiAdvisorService;
+  private final ModelFactoryService modelFactoryService;
 
-  public RestAiAudioController(@Qualifier("testableOpenAiApi") OpenAiApi openAiApi) {
+  public RestAiAudioController(
+      @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
+      ModelFactoryService modelFactoryService) {
     this.aiAdvisorService = new AiAdvisorService(openAiApi);
+    this.modelFactoryService = modelFactoryService;
   }
 
   @PatchMapping(path = "/{note}/audio-to-srt")
@@ -33,7 +39,10 @@ class RestAiAudioController {
     String transcription =
         aiAdvisorService
             .getOtherAiServices()
-            .getTranscription(audio.getName(), audio.getBlob().getData());
+            .getTextFromAudio(
+                audio.getName(),
+                audio.getBlob().getData(),
+                getGlobalSettingsService().globalSettingOthers().getValue());
     SrtDto srtDto = new SrtDto();
     srtDto.setSrt(transcription);
     return srtDto;
@@ -46,9 +55,17 @@ class RestAiAudioController {
   public SrtDto convertSrt(@Valid @ModelAttribute AudioUploadDTO audioFile) throws IOException {
     String filename = audioFile.getUploadAudioFile().getOriginalFilename();
     byte[] bytes = audioFile.getUploadAudioFile().getBytes();
-    String transcription = aiAdvisorService.getOtherAiServices().getTranscription(filename, bytes);
+    String transcription =
+        aiAdvisorService
+            .getOtherAiServices()
+            .getTextFromAudio(
+                filename, bytes, getGlobalSettingsService().globalSettingOthers().getValue());
     SrtDto srtDto = new SrtDto();
     srtDto.setSrt(transcription);
     return srtDto;
+  }
+
+  private GlobalSettingsService getGlobalSettingsService() {
+    return new GlobalSettingsService(modelFactoryService);
   }
 }

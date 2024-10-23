@@ -158,10 +158,6 @@ When('I convert the audio-file to SRT without saving', () => {
   cy.findAllByDisplayValue('Convert to SRT').click()
 })
 
-Then('I should see the extracted SRT content', (srtContent: string) => {
-  cy.get('textarea').should('have.value', srtContent)
-})
-
 When(
   'I should see note {string} has a image and a url {string}',
   (noteTopic: string, expectedUrl: string) => {

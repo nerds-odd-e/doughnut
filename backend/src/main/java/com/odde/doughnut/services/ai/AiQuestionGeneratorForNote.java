@@ -7,7 +7,6 @@ import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.ai.tools.AiToolList;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
-import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import java.util.Optional;
 import org.apache.logging.log4j.util.Strings;
 
@@ -16,7 +15,8 @@ public record AiQuestionGeneratorForNote(
 
   public MCQWithAnswer getAiGeneratedQuestion() {
     AiToolList tool = AiToolFactory.mcqWithAnswerAiTool();
-    return requestAndGetFunctionCallArguments(tool)
+    return openAiApiHandler
+        .requestAndGetFunctionCallArguments(tool, chatAboutNoteRequestBuilder)
         .flatMap(AiQuestionGeneratorForNote::getValidQuestion)
         .orElse(null);
   }
@@ -36,13 +36,15 @@ public record AiQuestionGeneratorForNote(
 
   public Optional<QuestionEvaluation> evaluateQuestion(MCQWithAnswer question) {
     AiToolList questionEvaluationAiTool = AiToolFactory.questionEvaluationAiTool(question);
-    return requestAndGetFunctionCallArguments(questionEvaluationAiTool)
+    return openAiApiHandler
+        .requestAndGetFunctionCallArguments(questionEvaluationAiTool, chatAboutNoteRequestBuilder)
         .flatMap(QuestionEvaluation::getQuestionEvaluation);
   }
 
   public Optional<MCQWithAnswer> refineQuestion(MCQWithAnswer question) {
     AiToolList questionEvaluationAiTool = AiToolFactory.questionRefineAiTool(question);
-    return requestAndGetFunctionCallArguments(questionEvaluationAiTool)
+    return openAiApiHandler
+        .requestAndGetFunctionCallArguments(questionEvaluationAiTool, chatAboutNoteRequestBuilder)
         .flatMap(
             jsonNode -> {
               try {
@@ -51,11 +53,5 @@ public record AiQuestionGeneratorForNote(
                 throw new RuntimeException(e);
               }
             });
-  }
-
-  private Optional<JsonNode> requestAndGetFunctionCallArguments(AiToolList tool) {
-    ChatCompletionRequest chatRequest =
-        chatAboutNoteRequestBuilder.addTool(tool).maxTokens(1500).build();
-    return openAiApiHandler.getFirstToolCallArguments(chatRequest);
   }
 }
