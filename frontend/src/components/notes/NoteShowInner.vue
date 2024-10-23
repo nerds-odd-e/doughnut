@@ -5,10 +5,19 @@
       v-bind="{ note: noteRealm.note, storageAccessor, asMarkdown, audioTools }"
       @note-accessory-updated="updatedNoteAccessory = $event"
       @edit-as-markdown="asMarkdown = $event"
+      @show-audio-tools="audioTools = true"
     />
   </div>
 
   <div class="row">
+    <NoteEditUploadAudioDialog
+      v-if="audioTools"
+      v-bind="{ noteId: noteRealm.id }"
+      @close-dialog="
+      audioTools = false;
+      updatedNoteAccessory = $event
+      "
+    />
     <div id="main-note-content" class="col-md-9">
       <NoteTextContent
         v-bind="{
@@ -69,6 +78,7 @@ import NoteCoreToolbar from "./core/NoteCoreToolbar.vue"
 import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue"
 import LinkOfNote from "../links/LinkOfNote.vue"
 import { reverseLabel } from "../../models/linkTypeOptions"
+import NoteEditUploadAudioDialog from "./accessory/NoteEditUploadAudioDialog.vue"
 
 defineProps({
   noteRealm: { type: Object as PropType<NoteRealm>, required: true },

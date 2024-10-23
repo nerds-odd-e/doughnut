@@ -118,17 +118,9 @@
         </template>
       </PopButton>
 
-      <PopButton title="Upload audio">
-        <template #button_face>
-          <SvgResume />
-        </template>
-        <template #default="{ closer }">
-          <NoteEditUploadAudioDialog
-            v-bind="{ noteId: note.id }"
-            @close-dialog="noteAccessoriesUpdated(closer, $event)"
-          />
-        </template>
-      </PopButton>
+      <button class="btn" title="Upload audio" v-if="!audioTools" @click="$emit('show-audio-tools')">
+        <SvgResume />
+      </button>
     </div>
   </nav>
 </template>
@@ -161,7 +153,6 @@ import SvgImage from "../../svgs/SvgImage.vue"
 import SvgResume from "../../svgs/SvgResume.vue"
 import SvgUrlIndicator from "../../svgs/SvgUrlIndicator.vue"
 import NoteEditImageDialog from "../accessory/NoteEditImageDialog.vue"
-import NoteEditUploadAudioDialog from "../accessory/NoteEditUploadAudioDialog.vue"
 import NoteEditUrlDialog from "../accessory/NoteEditUrlDialog.vue"
 
 const props = defineProps({
@@ -180,7 +171,11 @@ const props = defineProps({
   asMarkdown: Boolean,
 })
 
-const emit = defineEmits(["note-accessory-updated", "edit-as-markdown"])
+const emit = defineEmits([
+  "note-accessory-updated",
+  "edit-as-markdown",
+  "show-audio-tools",
+])
 
 const moveUp = () => {
   props.storageAccessor.storedApi().moveUp(props.note.id)
