@@ -12,7 +12,7 @@
   <div class="row">
     <NoteEditUploadAudioDialog
       v-if="audioTools"
-      v-bind="{ noteId: noteRealm.id }"
+      v-bind="{ noteId: noteRealm.id, storageAccessor }"
       @close-dialog="
       audioTools = false;
       updatedNoteAccessory = $event

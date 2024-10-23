@@ -20,13 +20,18 @@
 <script setup lang="ts">
 import type { AudioUploadDTO } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { ref } from "vue"
+import { ref, type PropType } from "vue"
 import TextArea from "../../form/TextArea.vue"
 import NoteUploadAudioForm from "./NoteUploadAudioForm.vue"
+import type { StorageAccessor } from "../../../store/createNoteStorage"
 
 const { managedApi } = useLoadingApi()
-const { noteId } = defineProps({
+const { noteId, storageAccessor } = defineProps({
   noteId: { type: Number, required: true },
+  storageAccessor: {
+    type: Object as PropType<StorageAccessor>,
+    required: true,
+  },
 })
 
 const emit = defineEmits(["closeDialog"])
@@ -56,6 +61,7 @@ const convertToSRT = async () => {
       formData.value
     )
     convertedSrt.value = response?.srt
+    storageAccessor.storedApi().updateTextField(noteId, "edit details", "You")
   } catch (error: unknown) {
     noteFormErrors.value = error as Record<string, string | undefined>
   }

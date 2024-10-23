@@ -19,6 +19,7 @@ Feature: Note Upload Audio File
         When I upload an audio-file "harvard.wav" to the note "podcast"
         Then I must be able to download the "harvard.wav" from the note "podcast"
 
+    @focus
     # this scenario uses real Open AI service. It costs less than $0.01 per 20 runs.
     Scenario: Convert audio-file to SRT without saving
       When I try to upload an audio-file "sample-3s.mp3" to the note "podcast"
@@ -32,4 +33,5 @@ Feature: Note Upload Audio File
 
 
       """
+      And the note details on the current page should be "You"
 
