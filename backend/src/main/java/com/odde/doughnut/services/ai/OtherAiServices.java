@@ -1,6 +1,5 @@
 package com.odde.doughnut.services.ai;
 
-import com.odde.doughnut.controllers.dto.SrtDto;
 import com.odde.doughnut.services.openAiApis.FineTuningExamples;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import java.io.IOException;
@@ -40,7 +39,7 @@ public record OtherAiServices(OpenAiApiHandler openAiApiHandler) {
     return openAiApiHandler.triggerFineTuning(fileId).getFineTunedModel();
   }
 
-  public SrtDto getTranscription(String filename, byte[] bytes) throws IOException {
+  public String getTranscription(String filename, byte[] bytes) throws IOException {
     RequestBody requestFile = RequestBody.create(bytes, MediaType.parse("multipart/form-data"));
 
     MultipartBody.Part body = MultipartBody.Part.createFormData("file", filename, requestFile);
