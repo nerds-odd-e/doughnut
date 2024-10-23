@@ -7,6 +7,7 @@ Feature: Recording a live audio and append to note details
 
   @ignore
   Scenario: Record audio of a live event
-    Given the browser is mocked to give permission to record audio and receive audio input as in "lecture.wav"
+    # Given the browser is mocked to give permission to record audio and receive audio input as in "lecture.wav"
     When I start recording audio for the note "Data Structure Lecture"
-    Then the note "Data Structure Lecture" should have details "Let's talk about data structure today."
+    And I stop recording audio
+    Then the note details on the current page should be "Let's talk about data structure today."
