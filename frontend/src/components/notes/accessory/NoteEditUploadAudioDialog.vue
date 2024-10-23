@@ -60,10 +60,22 @@ const startRecording = async () => {
       audioChunks.push(event.data)
     }
 
-    mediaRecorder.onstop = () => {
+    mediaRecorder.onstop = async () => {
       const audioBlob = new Blob(audioChunks, { type: "audio/wav" })
-      formData.value.uploadAudioFile = audioBlob
+      const fileName = `recorded_audio_${new Date().toISOString()}.wav`
+      const file = new File([audioBlob], fileName, { type: "audio/wav" })
+      formData.value.uploadAudioFile = file
       audioChunks = []
+      try {
+        const response = await managedApi.restAiAudioController.convertSrt(
+          formData.value
+        )
+        storageAccessor
+          .storedApi()
+          .updateTextField(noteId, "edit details", response?.textFromAudio)
+      } catch (error: unknown) {
+        noteFormErrors.value = error as Record<string, string | undefined>
+      }
     }
 
     mediaRecorder.start()

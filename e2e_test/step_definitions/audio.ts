@@ -10,40 +10,58 @@ Given(
   (audioFileName: string) => {
     // Mock the getUserMedia function to simulate permission granted
     cy.window().then((win) => {
-      win.navigator.mediaDevices.getUserMedia = async () => {
-        const audio = new Audio()
-        return new MediaStream([audio.captureStream().getAudioTracks()[0]])
-      }
+      cy.stub(win.navigator.mediaDevices, 'getUserMedia').resolves({
+        getTracks: () => [
+          {
+            stop: () => {
+              // Placeholder implementation
+            },
+          },
+        ],
+      })
     })
 
-    cy.fixture(audioFileName, 'base64').then((_audioContent) => {
-      cy.window().then((win) => {
-        // Mock the MediaRecorder to use the specified audio file
-        win.MediaRecorder = class MockMediaRecorder {
-          stop() {
-            const event = new Event('dataavailable')
-            // @ts-ignore
-            event.data = new Blob([new ArrayBuffer(0)], { type: 'audio/wav' })
-            this.ondataavailable(event)
-          }
+    // Mock the MediaRecorder
+    cy.on('window:before:load', (win) => {
+      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+      let ondataavailable: ((event: any) => void) | null = null
+      let onstop: (() => void) | null = null
 
-          static isTypeSupported(type: string): boolean {
-            return type === 'audio/wav'
+      class MockMediaRecorder {
+        state: 'inactive' | 'recording' | 'paused'
+        constructor() {
+          this.state = 'inactive'
+        }
+        start() {
+          this.state = 'recording'
+        }
+        stop() {
+          this.state = 'inactive'
+          // Simulate ondataavailable event
+          if (ondataavailable) {
+            cy.get('@audioBlob').then((audioBlob) => {
+              ondataavailable?.({ data: audioBlob })
+              if (onstop) onstop()
+            })
           }
         }
-      })
+        // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+        set ondataavailable(callback: (event: any) => void) {
+          ondataavailable = callback
+        }
+        set onstop(callback: () => void) {
+          onstop = callback
+        }
+      }
+      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+      ;(win as any).MediaRecorder = MockMediaRecorder
     })
 
-    // Grant microphone permissions
-    cy.wrap(
-      Cypress.automation('remote:debugger:protocol', {
-        command: 'Browser.grantPermissions',
-        params: {
-          permissions: ['audioCapture'],
-          origin: window.location.origin,
-        },
-      })
-    )
+    // Preload the audio fixture
+    cy.fixture(audioFileName, 'base64').then((audioBase64) => {
+      const blob = Cypress.Blob.base64StringToBlob(audioBase64, 'audio/wav')
+      cy.wrap(blob).as('audioBlob')
+    })
   }
 )
 
