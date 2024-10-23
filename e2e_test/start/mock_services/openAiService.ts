@@ -128,6 +128,7 @@ const openAiService = () => {
         assistantId,
         messages.map((row) => ({
           runId: row['run id']!,
+          responseType: row['response type'],
           fullMessage: row['assistant reply']!,
         }))
       )
