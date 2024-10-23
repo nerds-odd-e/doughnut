@@ -12,37 +12,15 @@
         noteAccessory.url
       }}</a>
     </div>
-    <button
-      class="btn btn-sm download-btn"
-      @click="downloadAudioFile(noteAccessory.audioAttachment)"
-      v-if="noteAccessory.audioAttachment"
-    >
-      Download {{ noteAccessory.audioAttachment.name }}
-    </button>
   </div>
 </template>
 
-<script lang="ts">
-import type { Audio, NoteAccessory } from "@/generated/backend"
+<script setup lang="ts">
+import type { NoteAccessory } from "@/generated/backend"
 import type { PropType } from "vue"
-import { defineComponent } from "vue"
 import ShowImage from "./ShowImage.vue"
 
-export default defineComponent({
-  props: {
-    noteAccessory: { type: Object as PropType<NoteAccessory>, required: true },
-  },
-  components: {
-    ShowImage,
-  },
-  methods: {
-    async downloadAudioFile(audioAttachment: Audio) {
-      const audioUrl = `/attachments/audio/${audioAttachment.id}`
-      const link = document.createElement("a")
-      link.href = audioUrl
-      link.download = audioAttachment.name!
-      link.click()
-    },
-  },
+defineProps({
+  noteAccessory: { type: Object as PropType<NoteAccessory>, required: true },
 })
 </script>

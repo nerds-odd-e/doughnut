@@ -18,6 +18,14 @@ const audioToolsPage = () => {
       cy.pageIsNotLoading()
       return this
     },
+    downloadAudioFile(fileName: string) {
+      const downloadsFolder = Cypress.config('downloadsFolder')
+      cy.findByRole('button', { name: `Download ${fileName}` }).click()
+      cy.task('fileShouldExistSoon', `${downloadsFolder}/${fileName}`).should(
+        'equal',
+        true
+      )
+    },
   }
 }
 

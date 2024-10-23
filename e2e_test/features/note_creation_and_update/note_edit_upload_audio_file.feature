@@ -8,7 +8,6 @@ Feature: Note Upload Audio File
 
     Scenario: Upload audio into a note
         When I upload an audio-file "Alison.mp3" to the note "podcast"
-        Then I must be able to download the "Alison.mp3" from the note "podcast"
 
     Scenario: I must not be able to upload an audio file with an invalid format
         When I upload an audio-file "moon.jpg" to the note "podcast"
@@ -17,7 +16,6 @@ Feature: Note Upload Audio File
     Scenario: Upload audio file into a note with existing audio file attached
         Given I upload an audio-file "Alison.mp3" to the note "podcast"
         When I upload an audio-file "harvard.wav" to the note "podcast"
-        Then I must be able to download the "harvard.wav" from the note "podcast"
 
     # this scenario uses real Open AI service. It costs less than $0.01 per 20 runs.
     Scenario: Convert audio-file to SRT without saving
