@@ -1,5 +1,6 @@
 import { commonSenseSplit } from '../../support/string_util'
 import submittableForm from '../submittableForm'
+import audioToolsPage from './audioToolsPage'
 import { assumeChatAboutNotePage } from './chatAboutNotePage'
 import noteCreationForm from './noteForms/noteCreationForm'
 import { questionListPage } from './questionListPage'
@@ -151,8 +152,9 @@ export const assumeNotePage = (noteTopic?: string) => {
     editNoteImage() {
       return this.toolbarButton('edit note image')
     },
-    editAudioButton() {
-      return this.toolbarButton('Upload audio')
+    audioTools() {
+      this.toolbarButton('Upload audio').click()
+      return audioToolsPage()
     },
     switchToRichContent() {
       this.toolbarButton('Edit as rich content').click()

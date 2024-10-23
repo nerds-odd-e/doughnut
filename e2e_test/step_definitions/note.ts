@@ -142,11 +142,7 @@ When(
 When(
   'I upload an audio-file {string} to the note {string}',
   (fileName: string, noteTopic: string) => {
-    start.jumpToNotePage(noteTopic)
-    start.assumeNotePage().editAudioButton().click()
-    cy.get('#note-uploadAudioFile').attachFile(fileName)
-    cy.findAllByText('Save').click()
-    cy.pageIsNotLoading()
+    start.jumpToNotePage(noteTopic).audioTools().uploadAudioFile(fileName)
   }
 )
 
@@ -479,8 +475,7 @@ Then('I should see a child note {string}', (childTopic: string) => {
 When(
   'I try to upload an audio-file {string} to the note {string}',
   (fileName: string, noteTopic: string) => {
-    start.jumpToNotePage(noteTopic)
-    start.assumeNotePage().editAudioButton().click()
+    start.jumpToNotePage(noteTopic).audioTools()
     cy.get('#note-uploadAudioFile').attachFile(fileName)
   }
 )
