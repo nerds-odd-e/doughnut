@@ -3,19 +3,19 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { AudioUploadDTO } from '../models/AudioUploadDTO';
-import type { SrtDto } from '../models/SrtDto';
+import type { TextFromAudio } from '../models/TextFromAudio';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestAiAudioControllerService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
      * @param formData
-     * @returns SrtDto OK
+     * @returns TextFromAudio OK
      * @throws ApiError
      */
     public convertSrt(
         formData?: AudioUploadDTO,
-    ): CancelablePromise<SrtDto> {
+    ): CancelablePromise<TextFromAudio> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/notes/convertSrt',
@@ -28,12 +28,12 @@ export class RestAiAudioControllerService {
     }
     /**
      * @param note
-     * @returns SrtDto OK
+     * @returns TextFromAudio OK
      * @throws ApiError
      */
     public convertNoteAudioToSrt(
         note: number,
-    ): CancelablePromise<SrtDto> {
+    ): CancelablePromise<TextFromAudio> {
         return this.httpRequest.request({
             method: 'PATCH',
             url: '/api/notes/{note}/audio-to-srt',

@@ -45,7 +45,7 @@ public record OtherAiServices(OpenAiApiHandler openAiApiHandler) {
     return openAiApiHandler.triggerFineTuning(fileId).getFineTunedModel();
   }
 
-  public String getTextFromAudio(String filename, byte[] bytes, String modelName)
+  public Optional<TextFromAudio> getTextFromAudio(String filename, byte[] bytes, String modelName)
       throws IOException {
     String transcriptionFromAudio = getTranscriptionFromAudio(filename, bytes);
 
@@ -53,21 +53,16 @@ public record OtherAiServices(OpenAiApiHandler openAiApiHandler) {
         new OpenAIChatRequestBuilder().model(modelName);
     AiToolList questionEvaluationAiTool =
         AiToolFactory.transcriptionToTextAiTool(transcriptionFromAudio);
-    Optional<TextFromAudio> textFromAudio =
-        openAiApiHandler
-            .requestAndGetFunctionCallArguments(
-                questionEvaluationAiTool, chatAboutNoteRequestBuilder)
-            .flatMap(
-                jsonNode -> {
-                  try {
-                    return Optional.of(
-                        new ObjectMapper().treeToValue(jsonNode, TextFromAudio.class));
-                  } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
-                  }
-                });
-
-    return textFromAudio.map(TextFromAudio::getTextFromAudio).orElse("");
+    return openAiApiHandler
+        .requestAndGetFunctionCallArguments(questionEvaluationAiTool, chatAboutNoteRequestBuilder)
+        .flatMap(
+            jsonNode -> {
+              try {
+                return Optional.of(new ObjectMapper().treeToValue(jsonNode, TextFromAudio.class));
+              } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+              }
+            });
   }
 
   private String getTranscriptionFromAudio(String filename, byte[] bytes) throws IOException {

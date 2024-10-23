@@ -1130,7 +1130,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/SrtDto"
+                $ref: "#/components/schemas/TextFromAudio"
   /api/notebooks/{notebook}:
     get:
       tags:
@@ -2179,7 +2179,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/SrtDto"
+                $ref: "#/components/schemas/TextFromAudio"
   /api/notebooks/{notebook}/move-to-circle/{circle}:
     patch:
       tags:
@@ -3506,12 +3506,12 @@ components:
         uploadAudioFile:
           type: string
           format: binary
-    SrtDto:
+    TextFromAudio:
       required:
-      - srt
+      - textFromAudio
       type: object
       properties:
-        srt:
+        textFromAudio:
           type: string
     NotebookCertificateApproval:
       required:

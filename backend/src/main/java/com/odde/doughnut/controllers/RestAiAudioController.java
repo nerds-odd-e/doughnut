@@ -6,10 +6,12 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.odde.doughnut.services.GlobalSettingsService;
+import com.odde.doughnut.services.ai.TextFromAudio;
 import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.io.IOException;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.*;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,36 +35,29 @@ class RestAiAudioController {
 
   @PatchMapping(path = "/{note}/audio-to-srt")
   @Transactional
-  public SrtDto convertNoteAudioToSRT(
+  public Optional<TextFromAudio> convertNoteAudioToSRT(
       @PathVariable(name = "note") @Schema(type = "integer") Note note) throws IOException {
     Audio audio = note.getNoteAccessory().getAudioAttachment();
-    String transcription =
-        aiAdvisorService
-            .getOtherAiServices()
-            .getTextFromAudio(
-                audio.getName(),
-                audio.getBlob().getData(),
-                getGlobalSettingsService().globalSettingOthers().getValue());
-    SrtDto srtDto = new SrtDto();
-    srtDto.setSrt(transcription);
-    return srtDto;
+    return aiAdvisorService
+        .getOtherAiServices()
+        .getTextFromAudio(
+            audio.getName(),
+            audio.getBlob().getData(),
+            getGlobalSettingsService().globalSettingOthers().getValue());
   }
 
   @PostMapping(
       path = "/convertSrt",
       consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   @Transactional
-  public SrtDto convertSrt(@Valid @ModelAttribute AudioUploadDTO audioFile) throws IOException {
+  public Optional<TextFromAudio> convertSrt(@Valid @ModelAttribute AudioUploadDTO audioFile)
+      throws IOException {
     String filename = audioFile.getUploadAudioFile().getOriginalFilename();
     byte[] bytes = audioFile.getUploadAudioFile().getBytes();
-    String transcription =
-        aiAdvisorService
-            .getOtherAiServices()
-            .getTextFromAudio(
-                filename, bytes, getGlobalSettingsService().globalSettingOthers().getValue());
-    SrtDto srtDto = new SrtDto();
-    srtDto.setSrt(transcription);
-    return srtDto;
+    return aiAdvisorService
+        .getOtherAiServices()
+        .getTextFromAudio(
+            filename, bytes, getGlobalSettingsService().globalSettingOthers().getValue());
   }
 
   private GlobalSettingsService getGlobalSettingsService() {

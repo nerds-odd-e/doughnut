@@ -59,7 +59,7 @@ const convertToSRT = async () => {
     )
     storageAccessor
       .storedApi()
-      .updateTextField(noteId, "edit details", response?.srt)
+      .updateTextField(noteId, "edit details", response?.textFromAudio)
   } catch (error: unknown) {
     noteFormErrors.value = error as Record<string, string | undefined>
   }

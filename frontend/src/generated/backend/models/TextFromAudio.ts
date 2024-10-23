@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type SrtDto = {
-    srt: string;
+export type TextFromAudio = {
+    textFromAudio: string;
 };
 

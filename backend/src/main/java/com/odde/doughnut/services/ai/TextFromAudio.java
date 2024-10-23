@@ -5,9 +5,9 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode
 @Data
-public class TextFromAudio extends MCQWithAnswer {
+public class TextFromAudio {
   @JsonPropertyDescription("text from audio")
   @JsonProperty(required = true)
   private String textFromAudio;
