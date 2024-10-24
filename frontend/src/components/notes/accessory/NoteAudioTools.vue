@@ -90,6 +90,15 @@ const stopRecording = () => {
   isRecording.value = false
   if (mediaRecorder && mediaRecorder.state !== "inactive") {
     mediaRecorder.stop()
+
+    // Stop all tracks in the media stream
+    if (mediaRecorder.stream) {
+      mediaRecorder.stream.getTracks().forEach((track) => track.stop())
+    }
+
+    // Reset mediaRecorder
+    mediaRecorder = null
   }
 }
 </script>
+

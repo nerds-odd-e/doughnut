@@ -137,4 +137,47 @@ describe("NoteAudioTools", () => {
     expect(mockStop).toHaveBeenCalled()
     expect(wrapper.vm.isRecording).toBe(false)
   })
+
+  it("stops browser recording and resets mediaRecorder when Stop Recording button is clicked", async () => {
+    // Mock the MediaRecorder stream
+    const mockTrackStop = vi.fn()
+    const mockStream = {
+      getTracks: () => [{ stop: mockTrackStop }],
+    }
+
+    // Override the MockMediaRecorder to include the stream
+    class MockMediaRecorderWithStream extends MockMediaRecorder {
+      stream = mockStream
+    }
+
+    // Apply the new mock
+    Object.defineProperty(global, "MediaRecorder", {
+      writable: true,
+      value: MockMediaRecorderWithStream,
+    })
+
+    // Start recording
+    await findButtonByText(wrapper, "Record Audio").trigger("click")
+    await flushPromises()
+
+    // Stop recording
+    const stopButton = findButtonByText(wrapper, "Stop Recording")
+    await stopButton.trigger("click")
+    await flushPromises()
+
+    // Check if MediaRecorder.stop() was called
+    expect(mockStop).toHaveBeenCalled()
+
+    // Check if all tracks in the media stream were stopped
+    expect(mockTrackStop).toHaveBeenCalled()
+
+    // Check if isRecording is set to false
+    expect(wrapper.vm.isRecording).toBe(false)
+
+    // Check if mediaRecorder is reset to null
+    // Note: We can't directly access mediaRecorder as it's not exposed,
+    // but we can infer its state by trying to stop recording again
+    await stopButton.trigger("click")
+    expect(mockStop).toHaveBeenCalledTimes(1) // Should still be 1, not 2
+  })
 })
