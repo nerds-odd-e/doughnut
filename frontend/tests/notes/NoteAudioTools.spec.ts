@@ -2,7 +2,6 @@ import { flushPromises } from "@vue/test-utils"
 import NoteAudioTools from "@/components/notes/accessory/NoteAudioTools.vue"
 import helper from "../helpers"
 import { vi } from "vitest"
-import { getAudioRecordingWorkerURL } from "@/models/audio/recorderWorklet"
 
 const mockMediaStreamSource = {
   connect: vi.fn(),
@@ -15,8 +14,17 @@ const mockAudioWorklet = {
 
 const mockAudioContext = {
   createMediaStreamSource: () => mockMediaStreamSource,
-  audioWorklet: () => mockAudioWorklet,
+  audioWorklet: mockAudioWorklet,
   destination: {},
+}
+
+const mockAudioWorkletNode = {
+  connect: vi.fn(),
+  disconnect: vi.fn(),
+  port: {
+    onmessage: null,
+    postMessage: vi.fn(),
+  },
 }
 
 // Mock navigator.mediaDevices
@@ -34,6 +42,12 @@ const mockMediaDevices = {
 Object.defineProperty(global, "AudioContext", {
   writable: true,
   value: vi.fn(() => mockAudioContext),
+})
+
+// Apply mocks to global object
+Object.defineProperty(global, "AudioWorkletNode", {
+  writable: true,
+  value: vi.fn(() => mockAudioWorkletNode),
 })
 
 Object.defineProperty(global.navigator, "mediaDevices", {
@@ -65,6 +79,9 @@ describe("NoteAudioTools", () => {
     mockMediaStreamSource.connect.mockClear()
     mockMediaStreamSource.disconnect.mockClear()
     mockAudioWorklet.addModule.mockClear()
+    mockAudioWorkletNode.connect.mockClear()
+    mockAudioWorkletNode.disconnect.mockClear()
+    mockAudioWorkletNode.port.postMessage.mockClear()
     mockMediaDevices.getUserMedia.mockClear()
   })
 
@@ -84,6 +101,7 @@ describe("NoteAudioTools", () => {
     const recordButton = findButtonByText(wrapper, "Record Audio")
     expect(recordButton.attributes("disabled")).toBeFalsy()
     await recordButton.trigger("click")
+    await flushPromises()
     expect(recordButton.attributes("disabled")).toBeDefined()
   })
 
@@ -94,6 +112,7 @@ describe("NoteAudioTools", () => {
     expect(stopButton.attributes("disabled")).toBeDefined()
 
     await recordButton.trigger("click")
+    await flushPromises()
     expect(stopButton.attributes("disabled")).toBeUndefined()
   })
 
@@ -130,8 +149,10 @@ describe("NoteAudioTools", () => {
     await flushPromises()
 
     expect(mockMediaDevices.getUserMedia).toHaveBeenCalledWith({ audio: true })
-    expect(mockMediaStreamSource.connect).toHaveBeenCalledWith(mockAudioWorklet)
-    expect(mockAudioWorklet.connect).toHaveBeenCalledWith(
+    expect(mockMediaStreamSource.connect).toHaveBeenCalledWith(
+      mockAudioWorkletNode
+    )
+    expect(mockAudioWorkletNode.connect).toHaveBeenCalledWith(
       mockAudioContext.destination
     )
     expect(wrapper.vm.isRecording).toBe(true)
@@ -146,7 +167,7 @@ describe("NoteAudioTools", () => {
     await stopButton.trigger("click")
     await flushPromises()
 
-    expect(mockAudioWorklet.disconnect).toHaveBeenCalled()
+    expect(mockAudioWorkletNode.disconnect).toHaveBeenCalled()
     expect(mockMediaStreamSource.disconnect).toHaveBeenCalled()
     expect(wrapper.vm.isRecording).toBe(false)
   })
