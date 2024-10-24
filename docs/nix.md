@@ -2,25 +2,16 @@
 
 ## :warning: 🚨 **ONLY PROCEED**  with the subsequent steps if `./setup-doughnut-dev.sh` (see [README.md](../README.md)) somehow failed for you!!!
 
-### 1. Install nix
+### 1. Install Lix
 
-We use nix to manage and ensure a reproducible development environment ([nixos.org](https://nixos.org)).
+We use Lix (a variant of Nix package manager) to manage and ensure a reproducible development environment ([https://lix.systems/](https://lix.systems/)).
 
-#### For macOS:
 
-Full details on nix installation on macOS [here](https://nixos.org/manual/nix/stable/#sect-macos-installation)
-
-```bash
- sh < (curl -k -L https://nixos.org/nix/install) --darwin-use-unencrypted-nix-store-volume
-```
-
-#### For Linux:
+Full details on Lix installation via lix-installer [here](https://git.lix.systems/lix-project/lix-installer)
 
 ```bash
-sh < (curl -k -L https://nixos.org/nix/install) --no-daemon
+curl --proto '=https' --tlsv1.2 -sSf -L https://install.lix.systems/lix | sh -s -- install
 ```
-
-(NB: if the install script fails to add sourcing of `nix.sh` in `.bashrc` or `.profile`, you can do it manually `source /etc/profile.d/nix.sh`)
 
 ### 2. Setup and run doughnut for the first time (local development profile)
 
@@ -82,4 +73,20 @@ Run headless E2E (doughnut full stack started on port 9081)
 ```bash
 # from doughnut source root dir
 pnpm verify
+```
+
+### 3. Upgrade Lix
+
+You can upgrade Lix with:
+
+```bash
+sudo -i nix upgrade-nix
+```
+
+### 4. Uninstalling
+
+I hope you don't, but IF YOU REALLY REALLY NEED TO, you can remove a lix-installer-installed Nix by running
+
+```bash
+/nix/lix-installer uninstall
 ```
