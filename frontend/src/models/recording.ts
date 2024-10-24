@@ -1,45 +1,34 @@
 export interface AudioRecorder {
-  audioContext: AudioContext | null
-  mediaStream: MediaStream | null
-  audioInput: MediaStreamAudioSourceNode | null
-  recorder: ScriptProcessorNode | null
-  audioData: Float32Array[]
   startRecording: () => Promise<void>
   stopRecording: () => File
 }
 
 export const createAudioRecorder = (): AudioRecorder => {
-  const audioRecorder: AudioRecorder = {
-    audioContext: null,
-    mediaStream: null,
-    audioInput: null,
-    recorder: null,
-    audioData: [],
+  let audioContext: AudioContext | null = null
+  let mediaStream: MediaStream | null = null
+  let audioInput: MediaStreamAudioSourceNode | null = null
+  let recorder: ScriptProcessorNode | null = null
+  let audioData: Float32Array[] = []
 
+  const audioRecorder: AudioRecorder = {
     startRecording: async function (): Promise<void> {
       try {
-        this.audioContext = new AudioContext()
-        this.mediaStream = await navigator.mediaDevices.getUserMedia({
+        audioContext = new AudioContext()
+        mediaStream = await navigator.mediaDevices.getUserMedia({
           audio: true,
         })
-        this.audioInput = this.audioContext.createMediaStreamSource(
-          this.mediaStream
-        )
+        audioInput = audioContext.createMediaStreamSource(mediaStream)
 
         const bufferSize = 4096
-        this.recorder = this.audioContext.createScriptProcessor(
-          bufferSize,
-          1,
-          1
-        )
+        recorder = audioContext.createScriptProcessor(bufferSize, 1, 1)
 
-        this.recorder.onaudioprocess = (event) => {
+        recorder.onaudioprocess = (event) => {
           const channelData = event.inputBuffer.getChannelData(0)
-          this.audioData.push(new Float32Array(channelData))
+          audioData.push(new Float32Array(channelData))
         }
 
-        this.audioInput.connect(this.recorder)
-        this.recorder.connect(this.audioContext.destination)
+        audioInput.connect(recorder)
+        recorder.connect(audioContext.destination)
       } catch (error) {
         console.error("Error starting recording:", error)
         throw new Error("Failed to start recording")
@@ -47,24 +36,22 @@ export const createAudioRecorder = (): AudioRecorder => {
     },
 
     stopRecording: function (): File {
-      if (this.recorder) {
-        this.recorder.disconnect()
+      if (recorder) {
+        recorder.disconnect()
       }
-      if (this.audioInput) {
-        this.audioInput.disconnect()
+      if (audioInput) {
+        audioInput.disconnect()
       }
-      if (this.mediaStream) {
-        this.mediaStream.getTracks().forEach((track) => track.stop())
+      if (mediaStream) {
+        mediaStream.getTracks().forEach((track) => track.stop())
       }
 
-      const wavBlob = encodeWAV(
-        this.audioData,
-        this.audioContext?.sampleRate || 44100
-      )
+      const wavBlob = encodeWAV(audioData, audioContext?.sampleRate || 44100)
       const fileName = `recorded_audio_${new Date().toISOString()}.wav`
       const file = new File([wavBlob], fileName, { type: "audio/wav" })
 
-      this.audioData = []
+      // Reset the audioData
+      audioData = []
       return file
     },
   }
