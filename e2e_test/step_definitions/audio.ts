@@ -2,7 +2,7 @@
 /// <reference types="../support" />
 // @ts-check
 
-import { Given, When } from '@badeball/cypress-cucumber-preprocessor'
+import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
 import start, { mock_services } from '../start'
 
 Given(
@@ -19,3 +19,10 @@ When('I start recording audio for the note {string}', (noteTopic: string) => {
 When('I stop recording audio', () => {
   start.assumeAudioTools().stopRecording()
 })
+
+Then(
+  'I must be able to download the audio file to my local machine and it matches the size {int}',
+  (_expectedSize: number) => {
+    start.assumeAudioTools().downloadAudioFile('recorded_audio.wav')
+  }
+)
