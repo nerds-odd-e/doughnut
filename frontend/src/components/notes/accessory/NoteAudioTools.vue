@@ -87,9 +87,9 @@ const startRecording = async () => {
 }
 
 const stopRecording = () => {
+  isRecording.value = false
   if (mediaRecorder && mediaRecorder.state !== "inactive") {
     mediaRecorder.stop()
-    isRecording.value = false
   }
 }
 </script>
