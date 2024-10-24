@@ -110,3 +110,24 @@ Given('OpenAI accepts the vector file upload requests', () => {
   mock_services.openAi().stubOpenAiUploadResponse(true)
   mock_services.openAi().stubOpenAiVectorFileUpload()
 })
+
+Given(
+  'the OpenAI transcription service will return the following srt transcript for a request with content length {int}:',
+  (contentLength: number, transcript: string) => {
+    mock_services.openAi().stubTranscription(contentLength, transcript)
+  }
+)
+
+Given(
+  'the OpenAI completion service will return the following response for the transcription to text request:',
+  (data: DataTable) => {
+    mock_services
+      .openAi()
+      .chatCompletion()
+      .requestMessageMatches({
+        role: 'user',
+        content: `.*${data.hashes()[0]!['request contains']}.*`,
+      })
+      .stubAudioTranscriptToText(data.hashes()[0]!.response!)
+  }
+)

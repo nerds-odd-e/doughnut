@@ -5,9 +5,18 @@ Feature: Recording a live audio and append to note details
     Given I am logged in as an existing user
     And I have a notebook with the head note "Data Structure Lecture"
 
-  @ignore
+  @usingMockedOpenAiService
   Scenario: Record audio of a live event
-    Given the browser is mocked to give permission to record audio and receive audio input as in "lecture.wav"
+    Given the OpenAI transcription service will return the following srt transcript for a request with content length 52564:
+      """
+      00:00:00,000 --> 00:00:01,000
+      its talk about dada struct day.
+
+      """
+    And the OpenAI completion service will return the following response for the transcription to text request:
+      | request contains              | response         |
+      | its talk about dada struct day. | Let's talk about data structure today. |
+    And the browser is mocked to give permission to record audio and receive audio input as in "lecture.wav"
     When I start recording audio for the note "Data Structure Lecture"
     And I stop recording audio
     Then the note details on the current page should be "Let's talk about data structure today."

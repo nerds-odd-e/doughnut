@@ -1,3 +1,4 @@
+import { FlexiPredicate, HttpMethod, Operator } from '@anev/ts-mountebank'
 import ServiceMocker from '../../support/ServiceMocker'
 import testability from '../testability'
 import { MessageToMatch } from './MessageToMatch'
@@ -206,6 +207,24 @@ const openAiService = () => {
           }
         }),
       })
+    },
+
+    stubTranscription(contentLength: number, transcript: string) {
+      const predicate = new FlexiPredicate()
+        .withOperator(Operator.matches)
+        .withPath(`/audio/transcriptions`)
+        .withMethod(HttpMethod.POST)
+        .withHeader('Content-Type', 'multipart/form-data')
+        .withHeader('Content-Length', `${contentLength}`)
+
+      return serviceMocker.mockWithPredicates(
+        [predicate],
+        [
+          {
+            text: transcript,
+          },
+        ]
+      )
     },
   }
 }

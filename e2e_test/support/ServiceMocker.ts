@@ -142,7 +142,7 @@ class ServiceMocker {
     return this.addStubToMountebank(stub)
   }
 
-  private mockWithPredicates(
+  public mockWithPredicates(
     predicates: Predicate[],
     responses: unknown[],
     headers?: Record<string, string>
