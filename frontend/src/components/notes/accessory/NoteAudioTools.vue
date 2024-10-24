@@ -21,8 +21,6 @@ import NoteUploadAudioForm from "./NoteUploadAudioForm.vue"
 import type { StorageAccessor } from "../../../store/createNoteStorage"
 import {
   createAudioRecorder,
-  startRecording as startAudioRecording,
-  stopRecording as stopAudioRecording,
   type AudioRecorder,
 } from "../../../models/recording"
 
@@ -58,7 +56,7 @@ const convertToSRT = async () => {
 
 const startRecording = async () => {
   try {
-    await startAudioRecording(audioRecorder.value)
+    await audioRecorder.value.startRecording()
     isRecording.value = true
   } catch (error) {
     console.error("Error starting recording:", error)
@@ -68,7 +66,7 @@ const startRecording = async () => {
 
 const stopRecording = async () => {
   isRecording.value = false
-  const file = stopAudioRecording(audioRecorder.value)
+  const file = audioRecorder.value.stopRecording()
   formData.value.uploadAudioFile = file
 
   try {
