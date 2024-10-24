@@ -2,21 +2,20 @@ import { flushPromises } from "@vue/test-utils"
 import NoteAudioTools from "@/components/notes/accessory/NoteAudioTools.vue"
 import helper from "../helpers"
 import { vi } from "vitest"
+import { getAudioRecordingWorkerURL } from "@/models/audio/recorderWorklet"
 
 const mockMediaStreamSource = {
   connect: vi.fn(),
   disconnect: vi.fn(),
 }
 
-const mockScriptProcessor = {
-  connect: vi.fn(),
-  disconnect: vi.fn(),
-  onaudioprocess: null,
+const mockAudioWorklet = {
+  addModule: vi.fn(),
 }
 
 const mockAudioContext = {
   createMediaStreamSource: () => mockMediaStreamSource,
-  createScriptProcessor: () => mockScriptProcessor,
+  audioWorklet: () => mockAudioWorklet,
   destination: {},
 }
 
@@ -42,6 +41,14 @@ Object.defineProperty(global.navigator, "mediaDevices", {
   writable: true,
 })
 
+// Mock URL.createObjectURL
+global.URL.createObjectURL = vi.fn(() => "blob:mocked-url")
+
+// Mock getAudioRecordingWorkerURL
+vi.mock("@/models/audio/recorderWorklet", () => ({
+  getAudioRecordingWorkerURL: vi.fn(() => "mocked-worker-url"),
+}))
+
 describe("NoteAudioTools", () => {
   let wrapper
   const noteId = 1
@@ -57,8 +64,7 @@ describe("NoteAudioTools", () => {
     // Reset Web Audio API mocks
     mockMediaStreamSource.connect.mockClear()
     mockMediaStreamSource.disconnect.mockClear()
-    mockScriptProcessor.connect.mockClear()
-    mockScriptProcessor.disconnect.mockClear()
+    mockAudioWorklet.addModule.mockClear()
     mockMediaDevices.getUserMedia.mockClear()
   })
 
@@ -124,10 +130,8 @@ describe("NoteAudioTools", () => {
     await flushPromises()
 
     expect(mockMediaDevices.getUserMedia).toHaveBeenCalledWith({ audio: true })
-    expect(mockMediaStreamSource.connect).toHaveBeenCalledWith(
-      mockScriptProcessor
-    )
-    expect(mockScriptProcessor.connect).toHaveBeenCalledWith(
+    expect(mockMediaStreamSource.connect).toHaveBeenCalledWith(mockAudioWorklet)
+    expect(mockAudioWorklet.connect).toHaveBeenCalledWith(
       mockAudioContext.destination
     )
     expect(wrapper.vm.isRecording).toBe(true)
@@ -142,7 +146,7 @@ describe("NoteAudioTools", () => {
     await stopButton.trigger("click")
     await flushPromises()
 
-    expect(mockScriptProcessor.disconnect).toHaveBeenCalled()
+    expect(mockAudioWorklet.disconnect).toHaveBeenCalled()
     expect(mockMediaStreamSource.disconnect).toHaveBeenCalled()
     expect(wrapper.vm.isRecording).toBe(false)
   })

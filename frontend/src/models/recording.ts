@@ -1,3 +1,5 @@
+import { getAudioRecordingWorkerURL } from "./audio/recorderWorklet"
+
 export interface AudioRecorder {
   startRecording: () => Promise<void>
   stopRecording: () => File
@@ -7,28 +9,35 @@ export const createAudioRecorder = (): AudioRecorder => {
   let audioContext: AudioContext | null = null
   let mediaStream: MediaStream | null = null
   let audioInput: MediaStreamAudioSourceNode | null = null
-  let recorder: ScriptProcessorNode | null = null
+  let workletNode: AudioWorkletNode | null = null
   let audioData: Float32Array[] = []
 
   const audioRecorder: AudioRecorder = {
     startRecording: async function (): Promise<void> {
+      const audioWorkletUrl = getAudioRecordingWorkerURL()
       try {
         audioContext = new AudioContext()
+
+        await audioContext.audioWorklet.addModule(audioWorkletUrl)
+
         mediaStream = await navigator.mediaDevices.getUserMedia({
           audio: true,
         })
         audioInput = audioContext.createMediaStreamSource(mediaStream)
 
-        const bufferSize = 4096
-        recorder = audioContext.createScriptProcessor(bufferSize, 1, 1)
+        workletNode = new AudioWorkletNode(
+          audioContext,
+          "recorder-worklet-processor"
+        )
 
-        recorder.onaudioprocess = (event) => {
-          const channelData = event.inputBuffer.getChannelData(0)
-          audioData.push(new Float32Array(channelData))
+        workletNode.port.onmessage = (event) => {
+          if (event.data.audioBuffer) {
+            audioData.push(...event.data.audioBuffer)
+          }
         }
 
-        audioInput.connect(recorder)
-        recorder.connect(audioContext.destination)
+        audioInput.connect(workletNode)
+        workletNode.connect(audioContext.destination)
       } catch (error) {
         console.error("Error starting recording:", error)
         throw new Error("Failed to start recording")
@@ -36,8 +45,8 @@ export const createAudioRecorder = (): AudioRecorder => {
     },
 
     stopRecording: function (): File {
-      if (recorder) {
-        recorder.disconnect()
+      if (workletNode) {
+        workletNode.disconnect()
       }
       if (audioInput) {
         audioInput.disconnect()
@@ -46,7 +55,7 @@ export const createAudioRecorder = (): AudioRecorder => {
         mediaStream.getTracks().forEach((track) => track.stop())
       }
 
-      const wavBlob = encodeWAV(audioData, audioContext?.sampleRate || 44100)
+      const wavBlob = encodeWAV(audioData, audioContext?.sampleRate || 16000)
       const fileName = `recorded_audio_${new Date().toISOString()}.wav`
       const file = new File([wavBlob], fileName, { type: "audio/wav" })
 
