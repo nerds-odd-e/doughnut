@@ -3,18 +3,21 @@ import NoteAudioTools from "@/components/notes/accessory/NoteAudioTools.vue"
 import helper from "../helpers"
 import { vi } from "vitest"
 
-// Mock MediaRecorder
-const mockStart = vi.fn()
-const mockStop = vi.fn()
-const mockOndataavailable = vi.fn()
-const mockOnstop = vi.fn()
+const mockMediaStreamSource = {
+  connect: vi.fn(),
+  disconnect: vi.fn(),
+}
 
-class MockMediaRecorder {
-  start = mockStart
-  stop = mockStop
-  ondataavailable = mockOndataavailable
-  onstop = mockOnstop
-  state = "active"
+const mockScriptProcessor = {
+  connect: vi.fn(),
+  disconnect: vi.fn(),
+  onaudioprocess: null,
+}
+
+const mockAudioContext = {
+  createMediaStreamSource: () => mockMediaStreamSource,
+  createScriptProcessor: () => mockScriptProcessor,
+  destination: {},
 }
 
 // Mock navigator.mediaDevices
@@ -29,9 +32,9 @@ const mockMediaDevices = {
 }
 
 // Apply mocks to global object
-Object.defineProperty(global, "MediaRecorder", {
+Object.defineProperty(global, "AudioContext", {
   writable: true,
-  value: MockMediaRecorder,
+  value: vi.fn(() => mockAudioContext),
 })
 
 Object.defineProperty(global.navigator, "mediaDevices", {
@@ -51,12 +54,12 @@ describe("NoteAudioTools", () => {
       })
       .mount()
 
-    // Reset mocks before each test
+    // Reset Web Audio API mocks
+    mockMediaStreamSource.connect.mockClear()
+    mockMediaStreamSource.disconnect.mockClear()
+    mockScriptProcessor.connect.mockClear()
+    mockScriptProcessor.disconnect.mockClear()
     mockMediaDevices.getUserMedia.mockClear()
-    mockStart.mockClear()
-    mockStop.mockClear()
-    mockOndataavailable.mockClear()
-    mockOnstop.mockClear()
   })
 
   const findButtonByText = (wrapper, text: string) => {
@@ -121,7 +124,12 @@ describe("NoteAudioTools", () => {
     await flushPromises()
 
     expect(mockMediaDevices.getUserMedia).toHaveBeenCalledWith({ audio: true })
-    expect(mockStart).toHaveBeenCalled()
+    expect(mockMediaStreamSource.connect).toHaveBeenCalledWith(
+      mockScriptProcessor
+    )
+    expect(mockScriptProcessor.connect).toHaveBeenCalledWith(
+      mockAudioContext.destination
+    )
     expect(wrapper.vm.isRecording).toBe(true)
   })
 
@@ -134,26 +142,15 @@ describe("NoteAudioTools", () => {
     await stopButton.trigger("click")
     await flushPromises()
 
-    expect(mockStop).toHaveBeenCalled()
+    expect(mockScriptProcessor.disconnect).toHaveBeenCalled()
+    expect(mockMediaStreamSource.disconnect).toHaveBeenCalled()
     expect(wrapper.vm.isRecording).toBe(false)
   })
 
-  it("stops browser recording and resets mediaRecorder when Stop Recording button is clicked", async () => {
-    // Mock the MediaRecorder stream
+  it("stops browser recording and resets audio context when Stop Recording button is clicked", async () => {
     const mockTrackStop = vi.fn()
-    const mockStream = {
+    mockMediaDevices.getUserMedia.mockResolvedValue({
       getTracks: () => [{ stop: mockTrackStop }],
-    }
-
-    // Override the MockMediaRecorder to include the stream
-    class MockMediaRecorderWithStream extends MockMediaRecorder {
-      stream = mockStream
-    }
-
-    // Apply the new mock
-    Object.defineProperty(global, "MediaRecorder", {
-      writable: true,
-      value: MockMediaRecorderWithStream,
     })
 
     // Start recording
@@ -165,19 +162,15 @@ describe("NoteAudioTools", () => {
     await stopButton.trigger("click")
     await flushPromises()
 
-    // Check if MediaRecorder.stop() was called
-    expect(mockStop).toHaveBeenCalled()
-
     // Check if all tracks in the media stream were stopped
     expect(mockTrackStop).toHaveBeenCalled()
 
     // Check if isRecording is set to false
     expect(wrapper.vm.isRecording).toBe(false)
 
-    // Check if mediaRecorder is reset to null
-    // Note: We can't directly access mediaRecorder as it's not exposed,
-    // but we can infer its state by trying to stop recording again
-    await stopButton.trigger("click")
-    expect(mockStop).toHaveBeenCalledTimes(1) // Should still be 1, not 2
+    // Check if audio context is reset
+    await findButtonByText(wrapper, "Record Audio").trigger("click")
+    await flushPromises()
+    expect(mockMediaStreamSource.connect).toHaveBeenCalledTimes(2)
   })
 })

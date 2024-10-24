@@ -13,46 +13,46 @@ const browser = {
       })
     })
 
-    // Mock the MediaRecorder
+    // Mock the AudioContext and related audio processing
     cy.on('window:before:load', (win) => {
-      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-      let ondataavailable: ((event: any) => void) | null = null
-      let onstop: (() => void) | null = null
-
-      class MockMediaRecorder {
-        state: 'inactive' | 'recording' | 'paused'
-        constructor() {
-          this.state = 'inactive'
-        }
-        start() {
-          this.state = 'recording'
-        }
-        stop() {
-          this.state = 'inactive'
-          // Simulate ondataavailable event
-          if (ondataavailable) {
-            cy.get('@audioBlob').then((audioBlob) => {
-              ondataavailable?.({ data: audioBlob })
-              if (onstop) onstop()
-            })
+      class MockAudioContext {
+        createMediaStreamSource() {
+          return {
+            // biome-ignore lint/suspicious/noEmptyBlockStatements: <explanation>
+            connect: () => {},
+            // biome-ignore lint/suspicious/noEmptyBlockStatements: <explanation>
+            disconnect: () => {},
           }
         }
-        // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-        set ondataavailable(callback: (event: any) => void) {
-          ondataavailable = callback
+        createScriptProcessor() {
+          return {
+            // biome-ignore lint/suspicious/noEmptyBlockStatements: <explanation>
+            connect: () => {},
+            // biome-ignore lint/suspicious/noEmptyBlockStatements: <explanation>
+            disconnect: () => {},
+            onaudioprocess: null,
+          }
         }
-        set onstop(callback: () => void) {
-          onstop = callback
+        get destination() {
+          return {}
         }
       }
       // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-      ;(win as any).MediaRecorder = MockMediaRecorder
+      ;(win as any).AudioContext = MockAudioContext
     })
 
     // Preload the audio fixture
     cy.fixture(audioFileName, 'base64').then((audioBase64) => {
       const blob = Cypress.Blob.base64StringToBlob(audioBase64, 'audio/wav')
       cy.wrap(blob).as('audioBlob')
+    })
+
+    // Mock the Float32Array for audio data
+    cy.on('window:before:load', (win) => {
+      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+      ;(win as any).Float32Array = function MockFloat32Array(length) {
+        return new Array(length).fill(0)
+      }
     })
   },
 }
