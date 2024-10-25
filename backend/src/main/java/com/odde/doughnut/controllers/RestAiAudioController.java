@@ -41,7 +41,10 @@ class RestAiAudioController {
     return aiAdvisorService
         .getOtherAiServices()
         .getTextFromAudio(
-            filename, bytes, getGlobalSettingsService().globalSettingOthers().getValue());
+            audioFile.getPreviousNoteDetails(),
+            filename,
+            bytes,
+            getGlobalSettingsService().globalSettingOthers().getValue());
   }
 
   private GlobalSettingsService getGlobalSettingsService() {

@@ -1,5 +1,7 @@
 package com.odde.doughnut.services.ai;
 
+import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
@@ -10,6 +12,7 @@ import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -45,12 +48,13 @@ public record OtherAiServices(OpenAiApiHandler openAiApiHandler) {
     return openAiApiHandler.triggerFineTuning(fileId).getFineTunedModel();
   }
 
-  public Optional<TextFromAudio> getTextFromAudio(String filename, byte[] bytes, String modelName)
+  public Optional<TextFromAudio> getTextFromAudio(
+      String previousTrailingNoteDetails, String filename, byte[] bytes, String modelName)
       throws IOException {
     String transcriptionFromAudio = getTranscriptionFromAudio(filename, bytes);
 
     OpenAIChatRequestBuilder chatAboutNoteRequestBuilder =
-        new OpenAIChatRequestBuilder().model(modelName);
+        getOpenAIChatRequestBuilder(previousTrailingNoteDetails, modelName);
     AiToolList questionEvaluationAiTool =
         AiToolFactory.transcriptionToTextAiTool(transcriptionFromAudio);
     return openAiApiHandler
@@ -63,6 +67,26 @@ public record OtherAiServices(OpenAiApiHandler openAiApiHandler) {
                 throw new RuntimeException(e);
               }
             });
+  }
+
+  private static OpenAIChatRequestBuilder getOpenAIChatRequestBuilder(
+      String previousTrailingNoteDetails, String modelName) {
+    String prettyString =
+        defaultObjectMapper()
+            .valueToTree(
+                Map.of(
+                    "previousTrailingNoteDetails",
+                    previousTrailingNoteDetails == null ? "" : previousTrailingNoteDetails))
+            .toPrettyString();
+    return new OpenAIChatRequestBuilder()
+        .model(modelName)
+        .addSystemMessage(
+            """
+      The trailing note details before appending the text from the audio are (in JSON format):
+
+      %s
+      """
+                .formatted(prettyString));
   }
 
   private String getTranscriptionFromAudio(String filename, byte[] bytes) throws IOException {

@@ -1,10 +1,11 @@
 package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.models.UserModel;
@@ -12,6 +13,7 @@ import com.odde.doughnut.services.ai.TextFromAudio;
 import com.odde.doughnut.services.openAiApis.OpenAiApiExtended;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
+import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import io.reactivex.Single;
 import java.io.IOException;
 import okhttp3.RequestBody;
@@ -21,6 +23,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -51,7 +54,7 @@ class RestAiAudioControllerTests {
   }
 
   @Nested
-  class ConvertAudioToSRT {
+  class ConvertAudioToText {
     AudioUploadDTO audioUploadDTO = new AudioUploadDTO();
 
     @BeforeEach
@@ -71,13 +74,29 @@ class RestAiAudioControllerTests {
     }
 
     @Test
-    void convertAudioToSRT() throws IOException {
+    void convertAudioToText() throws IOException {
       MockMultipartFile mockFile =
           new MockMultipartFile("file", "test.mp3", "text/plain", "test".getBytes());
       var dto = new AudioUploadDTO();
       dto.setUploadAudioFile(mockFile);
       String resp = controller.audioToText(dto).map(TextFromAudio::getTextFromAudio).orElse("");
       assertThat(resp, equalTo("test123"));
+    }
+
+    @Test
+    void usingThePreviousTrailingDetails() throws IOException {
+      MockMultipartFile mockFile =
+          new MockMultipartFile("file", "test.mp3", "text/plain", "test".getBytes());
+      var dto = new AudioUploadDTO();
+      dto.setUploadAudioFile(mockFile);
+      dto.setPreviousNoteDetails("Long long ago");
+      controller.audioToText(dto).map(TextFromAudio::getTextFromAudio);
+      ArgumentCaptor<ChatCompletionRequest> argumentCaptor =
+          ArgumentCaptor.forClass(ChatCompletionRequest.class);
+      verify(openAiApi, times(1)).createChatCompletion(argumentCaptor.capture());
+      ChatCompletionRequest capturedArgument = argumentCaptor.getValue();
+      assertThat(
+          capturedArgument.getMessages().get(0).getTextContent(), containsString("Long long ago"));
     }
   }
 }

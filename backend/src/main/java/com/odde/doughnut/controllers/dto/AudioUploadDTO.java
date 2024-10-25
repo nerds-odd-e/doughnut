@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
+@Setter
+@Getter
 public class AudioUploadDTO {
   @ValidateMultipartFile(
       maxSize = 20 * 1024 * 1024,
@@ -16,7 +18,7 @@ public class AudioUploadDTO {
         "audio/webm;codecs=opus",
         "audio/m4a"
       })
-  @Getter
-  @Setter
   private MultipartFile uploadAudioFile;
+
+  private String previousNoteDetails;
 }

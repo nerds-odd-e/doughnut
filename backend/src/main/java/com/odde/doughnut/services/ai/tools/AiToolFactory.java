@@ -89,7 +89,10 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
 
   public static AiToolList transcriptionToTextAiTool(String transcriptionFromAudio) {
     return new AiToolList(
-        "You are a helpful assistant for converting audio transcription to text of paragraphs. Your task is to convert the following audio transcription to text with meaningful punctuations and paragraphs. Since the transcription is from audio, also fix the obvious mistakes.\n\n"
+        """
+            You are a helpful assistant for converting audio transcription to text of paragraphs. Your task is to convert the following audio transcription to text with meaningful punctuations and paragraphs. Since the transcription is from audio, also fix the obvious mistakes.
+            Please note that the transcription is to continue the existing text, so add necessary white space or new line at the beginning to connect to existing text. The context should be in markdown format.
+            """
             + transcriptionFromAudio,
         List.of(
             FunctionDefinition.<TextFromAudio>builder()
