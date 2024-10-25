@@ -31,10 +31,10 @@ class RestAiAudioController {
   }
 
   @PostMapping(
-      path = "/convertSrt",
+      path = "/audio-to-text",
       consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   @Transactional
-  public Optional<TextFromAudio> convertSrt(@Valid @ModelAttribute AudioUploadDTO audioFile)
+  public Optional<TextFromAudio> audioToText(@Valid @ModelAttribute AudioUploadDTO audioFile)
       throws IOException {
     String filename = audioFile.getUploadAudioFile().getOriginalFilename();
     byte[] bytes = audioFile.getUploadAudioFile().getBytes();

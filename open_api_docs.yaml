@@ -1102,11 +1102,11 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/NoteRealm"
-  /api/notes/convertSrt:
+  /api/notes/audio-to-text:
     post:
       tags:
       - rest-ai-audio-controller
-      operationId: convertSrt
+      operationId: audioToText
       requestBody:
         content:
           multipart/form-data:

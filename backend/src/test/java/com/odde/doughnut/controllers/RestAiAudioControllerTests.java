@@ -66,7 +66,7 @@ class RestAiAudioControllerTests {
       audioUploadDTO.setUploadAudioFile(
           new MockMultipartFile(filename, filename, "audio/mp3", new byte[] {}));
       String result =
-          controller.convertSrt(audioUploadDTO).map(TextFromAudio::getTextFromAudio).orElse("");
+          controller.audioToText(audioUploadDTO).map(TextFromAudio::getTextFromAudio).orElse("");
       assertEquals("test123", result);
     }
 
@@ -76,7 +76,7 @@ class RestAiAudioControllerTests {
           new MockMultipartFile("file", "test.mp3", "text/plain", "test".getBytes());
       var dto = new AudioUploadDTO();
       dto.setUploadAudioFile(mockFile);
-      String resp = controller.convertSrt(dto).map(TextFromAudio::getTextFromAudio).orElse("");
+      String resp = controller.audioToText(dto).map(TextFromAudio::getTextFromAudio).orElse("");
       assertThat(resp, equalTo("test123"));
     }
   }

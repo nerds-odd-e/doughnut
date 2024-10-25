@@ -13,12 +13,12 @@ export class RestAiAudioControllerService {
      * @returns TextFromAudio OK
      * @throws ApiError
      */
-    public convertSrt(
+    public audioToText(
         formData?: AudioUploadDTO,
     ): CancelablePromise<TextFromAudio> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/notes/convertSrt',
+            url: '/api/notes/audio-to-text',
             formData: formData,
             mediaType: 'multipart/form-data',
             errors: {

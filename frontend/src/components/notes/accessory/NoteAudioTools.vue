@@ -90,7 +90,7 @@ const stopRecording = async () => {
   formData.value.uploadAudioFile = file
 
   try {
-    const response = await managedApi.restAiAudioController.convertSrt(
+    const response = await managedApi.restAiAudioController.audioToText(
       formData.value
     )
     storageAccessor
