@@ -24,6 +24,14 @@ export const createAudioProcessor = (
     return avg < SILENCE_THRESHOLD
   }
 
+  const processAndCallback = (data: Float32Array[]) => {
+    const isAllSilent = data.every((chunk) => isSilent(chunk))
+    if (!isAllSilent) {
+      const partialFile = createAudioFile(data, sampleRate, true)
+      processorCallback(partialFile)
+    }
+  }
+
   const processAudioData = (newData: Float32Array[]) => {
     // Filter out silent data
     const filteredData = newData.map((chunk) => {
@@ -41,12 +49,7 @@ export const createAudioProcessor = (
     processorTimer = setInterval(() => {
       if (audioData.length > lastProcessedIndex) {
         const newAudioData = audioData.slice(lastProcessedIndex)
-        // Check if the newAudioData contains only silence
-        const isAllSilent = newAudioData.every((chunk) => isSilent(chunk))
-        if (!isAllSilent) {
-          const partialFile = createAudioFile(newAudioData, sampleRate, true)
-          processorCallback(partialFile)
-        }
+        processAndCallback(newAudioData)
         lastProcessedIndex = audioData.length
       }
     }, 60 * 1000)
@@ -60,15 +63,7 @@ export const createAudioProcessor = (
     // Process any remaining audio data
     if (audioData.length > lastProcessedIndex) {
       const remainingAudioData = audioData.slice(lastProcessedIndex)
-      const isAllSilent = remainingAudioData.every((chunk) => isSilent(chunk))
-      if (!isAllSilent) {
-        const partialFile = createAudioFile(
-          remainingAudioData,
-          sampleRate,
-          true
-        )
-        processorCallback(partialFile)
-      }
+      processAndCallback(remainingAudioData)
     }
 
     const file = createAudioFile(audioData, sampleRate, false)
