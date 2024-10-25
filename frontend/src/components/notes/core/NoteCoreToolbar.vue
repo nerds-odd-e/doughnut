@@ -118,7 +118,7 @@
         </template>
       </PopButton>
 
-      <button class="btn" title="Upload audio" v-if="!audioTools" @click="$emit('show-audio-tools')">
+      <button class="btn" title="Audio tools" v-if="!audioTools" @click="$emit('show-audio-tools')">
         <SvgResume />
       </button>
     </div>

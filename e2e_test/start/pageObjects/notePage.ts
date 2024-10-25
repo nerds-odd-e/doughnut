@@ -153,7 +153,7 @@ export const assumeNotePage = (noteTopic?: string) => {
       return this.toolbarButton('edit note image')
     },
     audioTools() {
-      this.toolbarButton('Upload audio').click()
+      this.toolbarButton('Audio tools').click()
       return audioToolsPage()
     },
     switchToRichContent() {

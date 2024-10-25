@@ -2,7 +2,8 @@ import { getAudioRecordingWorkerURL } from "./audio/recorderWorklet"
 
 export interface AudioRecorder {
   startRecording: () => Promise<void>
-  stopRecording: () => File
+  stopRecording: () => void
+  setProcessor: (callback: (file: File) => void) => void
   getAudioData: () => Float32Array[]
 }
 
@@ -12,6 +13,7 @@ export const createAudioRecorder = (): AudioRecorder => {
   let audioInput: MediaStreamAudioSourceNode | null = null
   let workletNode: AudioWorkletNode | null = null
   let audioData: Float32Array[] = []
+  let processorCallback: ((file: File) => void) | null = null
 
   const audioRecorder: AudioRecorder = {
     startRecording: async function (): Promise<void> {
@@ -45,7 +47,7 @@ export const createAudioRecorder = (): AudioRecorder => {
       }
     },
 
-    stopRecording: function (): File {
+    stopRecording: function (): void {
       if (workletNode) {
         workletNode.disconnect()
       }
@@ -62,8 +64,17 @@ export const createAudioRecorder = (): AudioRecorder => {
 
       // Reset the audioData
       audioData = []
-      return file
+
+      // Call the callback with the file if it's set
+      if (processorCallback) {
+        processorCallback(file)
+      }
     },
+
+    setProcessor: function (callback: (file: File) => void): void {
+      processorCallback = callback
+    },
+
     getAudioData: function (): Float32Array[] {
       return audioData
     },

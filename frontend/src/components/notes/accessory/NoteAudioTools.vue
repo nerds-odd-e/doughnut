@@ -36,11 +36,8 @@
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { onUnmounted, ref, type PropType } from "vue"
 import type { StorageAccessor } from "../../../store/createNoteStorage"
-import {
-  createAudioRecorder,
-  type AudioRecorder,
-} from "../../../models/recording"
-import { createWakeLocker, type WakeLocker } from "../../../models/wakeLocker"
+import { createAudioRecorder } from "../../../models/recording"
+import { createWakeLocker } from "../../../models/wakeLocker"
 import type { Note } from "@/generated/backend"
 import Waveform from "./Waveform.vue"
 
@@ -59,39 +56,45 @@ const audioFile = ref<Blob | undefined>()
 const errors = ref<Record<string, string | undefined>>()
 
 const isRecording = ref(false)
-const audioRecorder = ref<AudioRecorder>(createAudioRecorder())
-const wakeLocker = ref<WakeLocker>(createWakeLocker())
+const wakeLocker = createWakeLocker()
 
-const startRecording = async () => {
-  errors.value = undefined
-  try {
-    await wakeLocker.value.request() // Request wake lock
-    await audioRecorder.value.startRecording()
-    isRecording.value = true
-  } catch (error) {
-    console.error("Error starting recording:", error)
-    errors.value = { recording: "Failed to start recording" }
-    await wakeLocker.value.release() // Release wake lock if recording fails
-  }
-}
-
-const stopRecording = async () => {
-  isRecording.value = false
-  const file = audioRecorder.value.stopRecording()
+const processAudio = async (file: Blob) => {
   audioFile.value = file
-
   try {
     const response = await managedApi.restAiAudioController.audioToText({
       previousNoteDetails: "Lets start",
-      uploadAudioFile: audioFile.value,
+      uploadAudioFile: file,
     })
     storageAccessor
       .storedApi()
       .appendDetails(note.id, response?.completionMarkdownFromAudio)
   } catch (error) {
     errors.value = error as Record<string, string | undefined>
+  }
+}
+
+const audioRecorder = createAudioRecorder()
+audioRecorder.setProcessor(processAudio)
+
+const startRecording = async () => {
+  errors.value = undefined
+  try {
+    await wakeLocker.request() // Request wake lock
+    await audioRecorder.startRecording()
+    isRecording.value = true
+  } catch (error) {
+    console.error("Error starting recording:", error)
+    errors.value = { recording: "Failed to start recording" }
+    await wakeLocker.release() // Release wake lock if recording fails
+  }
+}
+
+const stopRecording = async () => {
+  isRecording.value = false
+  try {
+    audioRecorder.stopRecording()
   } finally {
-    await wakeLocker.value.release() // Release wake lock when recording stops
+    await wakeLocker.release() // Release wake lock when recording stops
   }
 }
 
@@ -116,7 +119,7 @@ const closeDialog = () => {
 }
 
 onUnmounted(() => {
-  wakeLocker.value.release() // Ensure wake lock is released when component is unmounted
+  wakeLocker.release() // Ensure wake lock is released when component is unmounted
 })
 </script>
 
