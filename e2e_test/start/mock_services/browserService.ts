@@ -15,7 +15,15 @@ const browser = {
 
     // Mock the AudioContext and related audio processing
     cy.on('window:before:load', (win) => {
+      // as of now, AudioContext and AudioWorkletNode are not useable in cypress
+      // so we need to mock them.
+      // In the future, we should be able to use them in cypress directly
+      // and make the test more realistic.
+
       class MockAudioContext {
+        audioWorklet = {
+          addModule: cy.stub().resolves(),
+        }
         createMediaStreamSource() {
           return {
             // biome-ignore lint/suspicious/noEmptyBlockStatements: <explanation>
@@ -24,21 +32,25 @@ const browser = {
             disconnect: () => {},
           }
         }
-        createScriptProcessor() {
-          return {
-            // biome-ignore lint/suspicious/noEmptyBlockStatements: <explanation>
-            connect: () => {},
-            // biome-ignore lint/suspicious/noEmptyBlockStatements: <explanation>
-            disconnect: () => {},
-            onaudioprocess: null,
-          }
-        }
         get destination() {
           return {}
         }
       }
       // biome-ignore lint/suspicious/noExplicitAny: <explanation>
       ;(win as any).AudioContext = MockAudioContext
+
+      class MockAudioWorkletNode {
+        port = {
+          onmessage: null,
+          postMessage: cy.stub().resolves(),
+        }
+        // biome-ignore lint/suspicious/noEmptyBlockStatements: <explanation>
+        connect() {}
+        // biome-ignore lint/suspicious/noEmptyBlockStatements: <explanation>
+        disconnect() {}
+      }
+      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+      ;(win as any).AudioWorkletNode = MockAudioWorkletNode
     })
 
     // Preload the audio fixture
