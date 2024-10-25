@@ -12,8 +12,9 @@ export const createAudioProcessor = (
   let audioData: Float32Array[] = []
   let lastProcessedIndex = 0
   let processorTimer: NodeJS.Timeout | null = null
-
-  const SILENCE_THRESHOLD = 0.01 // Adjust this threshold as needed
+  let silenceCounter = 0
+  const SILENCE_THRESHOLD = 0.01
+  const SILENCE_DURATION_THRESHOLD = 3 * sampleRate // 2 seconds of silence
 
   const isSilent = (data: Float32Array): boolean => {
     let sum = 0
@@ -33,16 +34,30 @@ export const createAudioProcessor = (
   }
 
   const processAudioData = (newData: Float32Array[]) => {
-    // Filter out silent data
-    const filteredData = newData.map((chunk) => {
+    newData.forEach((chunk) => {
       if (isSilent(chunk)) {
-        // Replace silent chunk with minimal data to maintain duration
-        return new Float32Array(chunk.length) // Filled with zeros
+        silenceCounter += chunk.length
+        if (silenceCounter >= SILENCE_DURATION_THRESHOLD) {
+          // If there's data to process before the silence, process it
+          if (audioData.length > lastProcessedIndex) {
+            const dataToProcess = audioData.slice(lastProcessedIndex)
+            processAndCallback(dataToProcess)
+            lastProcessedIndex = audioData.length
+          }
+          // Reset the timer
+          if (processorTimer) {
+            clearInterval(processorTimer)
+            start()
+          }
+          silenceCounter = 0
+        }
       } else {
-        return chunk
+        silenceCounter = 0
       }
+
+      // Add the chunk to audioData (silent or not)
+      audioData.push(chunk)
     })
-    audioData.push(...filteredData)
   }
 
   const start = () => {

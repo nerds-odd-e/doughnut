@@ -59,4 +59,49 @@ describe("AudioProcessor", () => {
     expect(mockCallback).toHaveBeenCalled()
     processor.stop()
   })
+
+  it("should process data and reset timer when 2 seconds of silence is detected", () => {
+    const mockCallback = vi.fn()
+    const sampleRate = 44100
+    const processor = createAudioProcessor(sampleRate, mockCallback)
+
+    const nonSilentData = new Float32Array(sampleRate).fill(0.5)
+    const silentData = new Float32Array(sampleRate * 3).fill(0)
+    const moreNonSilentData = new Float32Array(sampleRate).fill(0.5)
+
+    processor.processAudioData([nonSilentData])
+    processor.start()
+
+    // Fast-forward less than a minute
+    vi.advanceTimersByTime(30 * 1000)
+
+    // Process silent data
+    processor.processAudioData([silentData])
+
+    // Fast-forward 3 seconds to trigger silence detection
+    vi.advanceTimersByTime(3000)
+
+    // Check if the callback was called with the non-silent data
+    expect(mockCallback).toHaveBeenCalledTimes(1)
+
+    // Reset mock to check if it's called again
+    mockCallback.mockClear()
+
+    // Process more non-silent data
+    processor.processAudioData([moreNonSilentData])
+
+    // Fast-forward the timer to just before the next minute
+    vi.advanceTimersByTime(27 * 1000)
+
+    // The callback should not have been called again yet
+    expect(mockCallback).not.toHaveBeenCalled()
+
+    // Fast-forward to complete the minute
+    vi.advanceTimersByTime(33 * 1000)
+
+    // Now the callback should have been called with the new non-silent data
+    expect(mockCallback).toHaveBeenCalledTimes(1)
+
+    processor.stop()
+  })
 })
