@@ -11,7 +11,7 @@
       <div class="row g-0 h-100">
         <div class="col-md-3 bg-light sidebar">
           <ul class="list-group">
-            <li v-for="conversation in conversations" :key="conversation.id" class="list-group-item list-group-item-action" @click="fetchThreadsForConversation(conversation.id || 0)">
+            <li v-for="conversation in conversations" :key="conversation.id" class="list-group-item list-group-item-action" @click="fetchConversationMessages(conversation.id || 0)">
               <div>{{ conversationTopic(conversation) }}</div>
               <div>{{ conversationPartner(conversation) }}</div>
             </li>
@@ -19,32 +19,12 @@
         </div>
 
         <div class="col-md-9 main-content">
-          <div class="px-3 py-3 conversations" v-if="currentConversationMessages">
-            <div v-for="conversationMessage in currentConversationMessages" :key="conversationMessage.id" class="d-flex mb-3" :class="{ 'justify-content-end': isCurrentUser(conversationMessage.sender?.id || 0) }">
-              <div class="card py-2 px-3" :class="[isCurrentUser(conversationMessage.sender?.id || 0) ? 'text-bg-dark': 'bg-light', conversationMessage.sender?.id === undefined ? 'ai-chat' : '']">
-                <template v-if="conversationMessage.sender?.id === undefined">
-                  <SvgRobot />
-                </template>
-                {{ formatMessage(conversationMessage.message) }}
-              </div>
-            </div>
-
-            <div class="chat-controls">
-              <form class="row chat-input-container" @submit.prevent="handleSendMessage()">
-                <div class="col-md-10">
-                  <textarea class="w-100" name="Description" v-model="message" />
-                </div>
-                <div class="col-md-1">
-                  <input
-                    type="submit"
-                    value="Send"
-                    id="chat-button"
-                    class="btn float-btn btn-secondary"
-                  />
-                </div>
-              </form>
-            </div>
-          </div>
+          <ConversationComponent
+            v-if="currentConversationId && user"
+            :conversation-id="currentConversationId"
+            :user="user"
+            @conversation-fetched="handleConversationFetched"
+          />
           <h2 v-else>No conversation selected</h2>
         </div>
       </div>
@@ -53,15 +33,11 @@
 </template>
 
 <script setup lang="ts">
-import type { PropType } from "vue"
-import { onMounted, ref } from "vue"
+import { onMounted, ref, type PropType } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import ContainerFluidPage from "@/pages/commons/ContainerFluidPage.vue"
-import type {
-  Conversation,
-  User,
-  ConversationMessage,
-} from "@/generated/backend"
+import ConversationComponent from "@/components/conversations/ConversationComponent.vue"
+import type { Conversation, User } from "@/generated/backend"
 import { messageCenterConversations } from "@/store/messageStore"
 
 const { managedApi } = useLoadingApi()
@@ -71,40 +47,18 @@ const { user } = defineProps({
 })
 
 const conversations = ref<Conversation[] | undefined>(undefined)
-const currentConversationId = ref(0)
-const currentConversationMessages = ref<ConversationMessage[] | undefined>(
-  undefined
-)
-const message = ref("")
-
-const formatMessage = (message: string) => {
-  return message.replace(/^"|"$/g, "").trim()
-}
-
-const isCurrentUser = (id: number): boolean => {
-  return id === user?.id
-}
+const currentConversationId = ref<number | null>(null)
 
 const fetchData = async () => {
   conversations.value =
     await managedApi.restConversationMessageController.getConversationsOfCurrentUser()
 }
 
-const handleSendMessage = async () => {
-  await managedApi.restConversationMessageController.replyToConversation(
-    currentConversationId.value,
-    message.value
-  )
-  message.value = ""
-  await fetchThreadsForConversation(currentConversationId.value)
+const fetchConversationMessages = async (conversationId: number) => {
+  currentConversationId.value = conversationId
 }
 
-const fetchThreadsForConversation = async (conversationId: number) => {
-  currentConversationMessages.value =
-    await managedApi.restConversationMessageController.getConversationMessages(
-      conversationId
-    )
-  currentConversationId.value = conversationId
+const handleConversationFetched = async (conversationId: number) => {
   messageCenterConversations.unreadConversations =
     await managedApi.restConversationMessageController.markConversationAsRead(
       conversationId
