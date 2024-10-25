@@ -41,6 +41,7 @@ import {
   createAudioRecorder,
   type AudioRecorder,
 } from "../../../models/recording"
+import { createWakeLocker, type WakeLocker } from "../../../models/wakeLocker"
 
 const { managedApi } = useLoadingApi()
 const { noteId, storageAccessor } = defineProps({
@@ -58,6 +59,7 @@ const errors = ref<Record<string, string | undefined>>()
 
 const isRecording = ref(false)
 const audioRecorder = ref<AudioRecorder>(createAudioRecorder())
+const wakeLocker = ref<WakeLocker>(createWakeLocker())
 
 const waveformCanvas = ref<HTMLCanvasElement | null>(null)
 let animationId: number | null = null
@@ -65,6 +67,7 @@ let animationId: number | null = null
 const startRecording = async () => {
   errors.value = undefined
   try {
+    await wakeLocker.value.request() // Request wake lock
     await audioRecorder.value.startRecording()
     isRecording.value = true
     if (!animationId) {
@@ -73,6 +76,7 @@ const startRecording = async () => {
   } catch (error) {
     console.error("Error starting recording:", error)
     errors.value = { recording: "Failed to start recording" }
+    await wakeLocker.value.release() // Release wake lock if recording fails
   }
 }
 
@@ -94,6 +98,8 @@ const stopRecording = async () => {
       .updateTextField(noteId, "edit details", response?.textFromAudio)
   } catch (error) {
     errors.value = error as Record<string, string | undefined>
+  } finally {
+    await wakeLocker.value.release() // Release wake lock when recording stops
   }
 }
 
@@ -176,6 +182,7 @@ onUnmounted(() => {
     cancelAnimationFrame(animationId)
     animationId = null
   }
+  wakeLocker.value.release() // Ensure wake lock is released when component is unmounted
 })
 </script>
 
