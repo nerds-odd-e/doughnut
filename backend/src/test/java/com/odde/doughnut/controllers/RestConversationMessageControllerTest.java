@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.entities.*;
@@ -296,6 +297,70 @@ class RestConversationMessageControllerTest {
       assertEquals(1, conversationMessages.size());
       ConversationMessage message = conversationMessages.getFirst();
       assertEquals(message.getMessage(), msg);
+    }
+  }
+
+  @Nested
+  class ConversationOrderingTests {
+    User otherUser;
+
+    @BeforeEach
+    void setup() {
+      otherUser = makeMe.aUser().please();
+    }
+
+    @Test
+    void testConversationsOrderedByLastMessageTime() {
+      Conversation conv1 = makeMe.aConversation().from(currentUser).please();
+      Conversation conv2 = makeMe.aConversation().from(currentUser).please();
+      Conversation conv3 = makeMe.aConversation().from(currentUser).please();
+
+      // Add messages with specific timestamps
+      makeMe
+          .aConversationMessage(conv1)
+          .sender(otherUser)
+          .createdAt(makeMe.aTimestamp().of(1, 1).please())
+          .please();
+      makeMe
+          .aConversationMessage(conv2)
+          .sender(otherUser)
+          .createdAt(makeMe.aTimestamp().of(1, 2).please())
+          .please();
+      makeMe
+          .aConversationMessage(conv3)
+          .sender(otherUser)
+          .createdAt(makeMe.aTimestamp().of(1, 3).please())
+          .please();
+
+      List<Conversation> orderedConversations = controller.getConversationsOfCurrentUser();
+
+      assertIterableEquals(List.of(conv3, conv2, conv1), orderedConversations);
+    }
+
+    @Test
+    void testConversationsOrderedByCreationTimeWhenNoMessages() {
+      Conversation conv1 =
+          makeMe
+              .aConversation()
+              .from(currentUser)
+              .createdAt(makeMe.aTimestamp().of(1, 1).please())
+              .please();
+      Conversation conv2 =
+          makeMe
+              .aConversation()
+              .from(currentUser)
+              .createdAt(makeMe.aTimestamp().of(1, 2).please())
+              .please();
+      Conversation conv3 =
+          makeMe
+              .aConversation()
+              .from(currentUser)
+              .createdAt(makeMe.aTimestamp().of(1, 3).please())
+              .please();
+
+      List<Conversation> orderedConversations = controller.getConversationsOfCurrentUser();
+
+      assertIterableEquals(List.of(conv3, conv2, conv1), orderedConversations);
     }
   }
 }

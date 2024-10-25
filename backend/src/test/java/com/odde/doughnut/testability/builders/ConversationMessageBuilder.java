@@ -5,6 +5,7 @@ import com.odde.doughnut.entities.ConversationMessage;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
+import java.sql.Timestamp;
 import org.apache.logging.log4j.util.Strings;
 
 public class ConversationMessageBuilder extends EntityBuilder<ConversationMessage> {
@@ -31,6 +32,11 @@ public class ConversationMessageBuilder extends EntityBuilder<ConversationMessag
 
   public ConversationMessageBuilder readByReceiver() {
     entity.setReadByReceiver(true);
+    return this;
+  }
+
+  public ConversationMessageBuilder createdAt(Timestamp time) {
+    entity.setCreatedAt(time);
     return this;
   }
 }

@@ -15,7 +15,14 @@ public interface ConversationRepository extends CrudRepository<Conversation, Int
           + "OR c.subjectOwnership IN (SELECT o FROM Ownership o JOIN o.circle.members mem WHERE mem = :user) "
           + "OR c.conversationInitiator = :user";
 
-  @Query("SELECT c FROM Conversation c WHERE " + USER_CONVERSATION_CONDITION)
+  @Query(
+      "SELECT c FROM Conversation c "
+          + "LEFT JOIN c.conversationMessages m "
+          + "WHERE "
+          + USER_CONVERSATION_CONDITION
+          + " "
+          + "GROUP BY c "
+          + "ORDER BY MAX(m.createdAt) DESC, c.createdAt DESC")
   List<Conversation> findByUserInSubjectOwnershipOrConversationInitiator(@Param("user") User user);
 
   @Query(

@@ -37,6 +37,7 @@ public class Conversation extends EntityIdentifiedByIdOnly {
 
   @Column(name = "created_at")
   @NotNull
+  @Setter
   private Timestamp createdAt = new Timestamp(new Date().getTime());
 
   @Column(name = "updated_at")
