@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.ApplicationScope;
@@ -23,13 +24,9 @@ public class TestabilitySettings {
   @Autowired GithubService githubService;
   @Getter private boolean featureToggleEnabled = false;
 
-  private Map<String, String> serviceUrls =
-      new HashMap<>() {
-        {
-          put("wikidata", "https://www.wikidata.org");
-          put("openAi", "https://api.openai.com/v1/");
-        }
-      };
+  private final Map<String, String> replacedServiceUrls = new HashMap<>();
+  private final Map<String, String> defaultServiceUrls =
+      Map.of("wikidata", "https://www.wikidata.org", "openAi", "https://api.openai.com/v1/");
 
   public void timeTravelTo(Timestamp timestamp) {
     this.timestamp = timestamp;
@@ -74,25 +71,34 @@ public class TestabilitySettings {
   }
 
   public String getWikidataServiceUrl() {
-    return this.serviceUrls.get("wikidata");
+    return getServiceUrl("wikidata");
   }
 
-  public Map<String, String> replaceServiceUrls(Map<String, String> setWikidataService) {
-    HashMap<String, String> saved = new HashMap<>();
-    replaceServiceUrl(setWikidataService, saved, "wikidata");
-    replaceServiceUrl(setWikidataService, saved, "openAi");
-    return saved;
+  private String getServiceUrl(String serviceName) {
+    return this.replacedServiceUrls.getOrDefault(
+        serviceName, this.defaultServiceUrls.get(serviceName));
   }
 
-  private void replaceServiceUrl(
-      Map<String, String> setWikidataService, HashMap<String, String> saved, String serviceName) {
-    if (setWikidataService.containsKey(serviceName)) {
-      saved.put(serviceName, this.serviceUrls.get(serviceName));
-      this.serviceUrls.put(serviceName, setWikidataService.get(serviceName));
-    }
+  public void replaceServiceUrls(Map<String, String> setWikidataService) {
+    setWikidataService.forEach(
+        (key, value) -> {
+          if (Strings.isBlank(value)) {
+            this.replacedServiceUrls.remove(key);
+            return;
+          }
+          this.replacedServiceUrls.put(key, value);
+        });
   }
 
   public String getOpenAiApiUrl() {
-    return this.serviceUrls.get("openAi");
+    return getServiceUrl("openAi");
+  }
+
+  void init() {
+    timeTravelTo(null);
+    setUseRealGithub(false);
+    enableFeatureToggle(false);
+    setRandomization(new Randomization(Randomization.RandomStrategy.first, 0));
+    replacedServiceUrls.clear();
   }
 }

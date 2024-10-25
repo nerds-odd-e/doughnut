@@ -249,9 +249,7 @@ const testability = () => {
       return postToTestabilityApi(cy, `replace_service_url`, {
         body: { [serviceName]: serviceUrl },
       }).then((response) => {
-        expect(response.body).to.haveOwnProperty(serviceName)
-        expect(response.body[serviceName]).to.include('http')
-        cy.wrap(response.body[serviceName])
+        expect(response.status).to.equal(200)
       })
     },
     mockBrowserTime() {
@@ -277,12 +275,7 @@ const testability = () => {
     },
 
     restoreMockedService(serviceMocker: ServiceMocker) {
-      cy.get(`@${serviceMocker.savedServiceUrlName}`).then((saved) =>
-        this.setServiceUrl(
-          serviceMocker.serviceName,
-          saved as unknown as string
-        )
-      )
+      this.setServiceUrl(serviceMocker.serviceName, '')
     },
   }
 }

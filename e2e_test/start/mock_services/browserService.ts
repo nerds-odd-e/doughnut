@@ -62,15 +62,53 @@ const browser = {
       blob.arrayBuffer().then((arrayBuffer) => {
         const audioContext = new AudioContext()
         audioContext.decodeAudioData(arrayBuffer).then((audioBuffer) => {
+          const originalSampleRate = audioBuffer.sampleRate
+          const targetSampleRate = 16000 // Assuming the target sample rate is 44.1kHz
           const float32Array = audioBuffer.getChannelData(0)
+
+          // Resample the audio data
+          const resampledBuffer = this.resampleAudio(
+            float32Array,
+            originalSampleRate,
+            targetSampleRate
+          )
+
           if (!this.audioWorletPort.onmessage)
             throw new Error('audioWorletPort.onmessage is not mocked')
           this.audioWorletPort.onmessage({
-            data: { audioBuffer: [float32Array] },
+            data: { audioBuffer: [resampledBuffer] },
           } as MessageEvent)
         })
       })
     })
+  },
+
+  // Add this new method to the browser object
+  resampleAudio: function (
+    audioBuffer: Float32Array,
+    fromSampleRate: number,
+    toSampleRate: number
+  ): Float32Array {
+    const ratio = toSampleRate / fromSampleRate
+    const newLength = Math.round(audioBuffer.length * ratio)
+    const result = new Float32Array(newLength)
+
+    for (let i = 0; i < newLength; i++) {
+      const index = i / ratio
+      const leftIndex = Math.floor(index)
+      const rightIndex = Math.ceil(index)
+      const interpolationFactor = index - leftIndex
+
+      if (rightIndex >= audioBuffer.length) {
+        result[i] = audioBuffer[leftIndex]
+      } else {
+        result[i] =
+          (1 - interpolationFactor) * audioBuffer[leftIndex] +
+          interpolationFactor * audioBuffer[rightIndex]
+      }
+    }
+
+    return result
   },
 }
 

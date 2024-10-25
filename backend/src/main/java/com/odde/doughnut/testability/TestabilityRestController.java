@@ -49,10 +49,7 @@ class TestabilityRestController {
     createUser("admin", "admin");
     createUser("non_admin", "Non Admin");
     createUser("a_trainer", "A Trainer");
-    testabilitySettings.timeTravelTo(null);
-    testabilitySettings.setUseRealGithub(false);
-    testabilitySettings.enableFeatureToggle(false);
-    testabilitySettings.setRandomization(new Randomization(Randomization.RandomStrategy.first, 0));
+    testabilitySettings.init();
     return "OK";
   }
 
@@ -360,9 +357,8 @@ class TestabilityRestController {
   }
 
   @PostMapping(value = "/replace_service_url")
-  public Map<String, String> replaceServiceUrl(
-      @RequestBody Map<String, String> setWikidataService) {
-    return testabilitySettings.replaceServiceUrls(setWikidataService);
+  public void replaceServiceUrl(@RequestBody Map<String, String> setWikidataService) {
+    testabilitySettings.replaceServiceUrls(setWikidataService);
   }
 
   @PostMapping(value = "/randomizer")
