@@ -1,12 +1,12 @@
 const audioToolsPage = () => {
   return {
     startRecording: () => {
-      cy.findByText('Record Audio').click()
-      cy.findByText('Record Audio').should('be.disabled')
+      cy.findByRole('button', { name: 'Record Audio' }).click()
+      cy.findByRole('button', { name: 'Record Audio' }).should('be.disabled')
       return this
     },
     stopRecording: () => {
-      cy.findByText('Stop Recording').click()
+      cy.findByRole('button', { name: 'Stop Recording' }).click()
       return this
     },
     startToUploadAudioFile: (fileName: string) => {
@@ -27,6 +27,6 @@ const audioToolsPage = () => {
 export default audioToolsPage
 
 export const assumeAudioTools = () => {
-  cy.findByText('Record Audio').should('exist')
+  cy.findByRole('button', { name: 'Record Audio' }).should('exist')
   return audioToolsPage()
 }

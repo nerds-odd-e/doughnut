@@ -63,6 +63,12 @@ vi.mock("@/models/audio/recorderWorklet", () => ({
   getAudioRecordingWorkerURL: vi.fn(() => "mocked-worker-url"),
 }))
 
+const findButtonByTitle = (wrapper, title: string) => {
+  return wrapper
+    .findAll("button")
+    .find((button) => button.attributes("title") === title)
+}
+
 describe("NoteAudioTools", () => {
   let wrapper
   const noteId = 1
@@ -85,19 +91,13 @@ describe("NoteAudioTools", () => {
     mockMediaDevices.getUserMedia.mockClear()
   })
 
-  const findButtonByText = (wrapper, text: string) => {
-    return wrapper
-      .findAll("button")
-      .find((button) => button.text().trim() === text)
-  }
-
   it("renders the component with correct buttons", () => {
-    expect(findButtonByText(wrapper, "Record Audio")).toBeTruthy()
-    expect(findButtonByText(wrapper, "Stop Recording")).toBeTruthy()
+    expect(findButtonByTitle(wrapper, "Record Audio")).toBeTruthy()
+    expect(findButtonByTitle(wrapper, "Stop Recording")).toBeTruthy()
   })
 
   it("disables Record Audio button when recording", async () => {
-    const recordButton = findButtonByText(wrapper, "Record Audio")
+    const recordButton = findButtonByTitle(wrapper, "Record Audio")
     expect(recordButton.attributes("disabled")).toBeFalsy()
     await recordButton.trigger("click")
     await flushPromises()
@@ -105,8 +105,8 @@ describe("NoteAudioTools", () => {
   })
 
   it("enables Stop Recording button when recording", async () => {
-    const recordButton = findButtonByText(wrapper, "Record Audio")
-    const stopButton = findButtonByText(wrapper, "Stop Recording")
+    const recordButton = findButtonByTitle(wrapper, "Record Audio")
+    const stopButton = findButtonByTitle(wrapper, "Stop Recording")
 
     expect(stopButton.attributes("disabled")).toBeDefined()
 
@@ -116,7 +116,7 @@ describe("NoteAudioTools", () => {
   })
 
   it("starts recording when Record Audio button is clicked", async () => {
-    const recordButton = findButtonByText(wrapper, "Record Audio")
+    const recordButton = findButtonByTitle(wrapper, "Record Audio")
 
     await recordButton.trigger("click")
     await flushPromises()
@@ -133,10 +133,10 @@ describe("NoteAudioTools", () => {
 
   it("stops recording when Stop Recording button is clicked", async () => {
     // First, start recording
-    await findButtonByText(wrapper, "Record Audio").trigger("click")
+    await findButtonByTitle(wrapper, "Record Audio").trigger("click")
     await flushPromises()
 
-    const stopButton = findButtonByText(wrapper, "Stop Recording")
+    const stopButton = findButtonByTitle(wrapper, "Stop Recording")
     await stopButton.trigger("click")
     await flushPromises()
 
@@ -152,11 +152,11 @@ describe("NoteAudioTools", () => {
     })
 
     // Start recording
-    await findButtonByText(wrapper, "Record Audio").trigger("click")
+    await findButtonByTitle(wrapper, "Record Audio").trigger("click")
     await flushPromises()
 
     // Stop recording
-    const stopButton = findButtonByText(wrapper, "Stop Recording")
+    const stopButton = findButtonByTitle(wrapper, "Stop Recording")
     await stopButton.trigger("click")
     await flushPromises()
 
@@ -167,33 +167,33 @@ describe("NoteAudioTools", () => {
     expect(wrapper.vm.isRecording).toBe(false)
 
     // Check if audio context is reset
-    await findButtonByText(wrapper, "Record Audio").trigger("click")
+    await findButtonByTitle(wrapper, "Record Audio").trigger("click")
     await flushPromises()
     expect(mockMediaStreamSource.connect).toHaveBeenCalledTimes(2)
   })
 
   it("renders Save Audio Locally button", () => {
-    expect(findButtonByText(wrapper, "Save Audio Locally")).toBeTruthy()
+    expect(findButtonByTitle(wrapper, "Save Audio Locally")).toBeTruthy()
   })
 
   it("disables Save Audio Locally button when recording", async () => {
-    const saveButton = findButtonByText(wrapper, "Save Audio Locally")
+    const saveButton = findButtonByTitle(wrapper, "Save Audio Locally")
     expect(saveButton.attributes("disabled")).toBeDefined()
 
-    await findButtonByText(wrapper, "Record Audio").trigger("click")
+    await findButtonByTitle(wrapper, "Record Audio").trigger("click")
     await flushPromises()
 
     expect(saveButton.attributes("disabled")).toBeDefined()
   })
 
   it("enables Save Audio Locally button when not recording and audio file exists", async () => {
-    const saveButton = findButtonByText(wrapper, "Save Audio Locally")
+    const saveButton = findButtonByTitle(wrapper, "Save Audio Locally")
     expect(saveButton.attributes("disabled")).toBeDefined()
 
     // Simulate recording and stopping
-    await findButtonByText(wrapper, "Record Audio").trigger("click")
+    await findButtonByTitle(wrapper, "Record Audio").trigger("click")
     await flushPromises()
-    await findButtonByText(wrapper, "Stop Recording").trigger("click")
+    await findButtonByTitle(wrapper, "Stop Recording").trigger("click")
     await flushPromises()
 
     // Mock the existence of an audio file
@@ -204,7 +204,7 @@ describe("NoteAudioTools", () => {
   })
 
   it("calls saveAudioLocally when Save Audio Locally button is clicked", async () => {
-    const saveButton = findButtonByText(wrapper, "Save Audio Locally")
+    const saveButton = findButtonByTitle(wrapper, "Save Audio Locally")
 
     // Mock the existence of an audio file
     wrapper.vm.formData.uploadAudioFile = new File([], "test.webm")
@@ -231,5 +231,27 @@ describe("NoteAudioTools", () => {
     expect(mockClick).toHaveBeenCalled()
     expect(mockRemoveChild).toHaveBeenCalled()
     expect(mockRevokeObjectURL).toHaveBeenCalledWith("blob:mocked-url")
+  })
+
+  it("renders close button and emits closeDialog event when clicked", async () => {
+    const closeButton = wrapper.find(".close-btn")
+    expect(closeButton.exists()).toBe(true)
+
+    await closeButton.trigger("click")
+    expect(wrapper.emitted().closeDialog).toBeTruthy()
+  })
+
+  it("stops recording and emits closeDialog event when close button is clicked while recording", async () => {
+    // Start recording
+    await findButtonByTitle(wrapper, "Record Audio").trigger("click")
+    await flushPromises()
+
+    const closeButton = wrapper.find(".close-btn")
+    await closeButton.trigger("click")
+
+    expect(wrapper.vm.isRecording).toBe(false)
+    expect(mockAudioWorkletNode.disconnect).toHaveBeenCalled()
+    expect(mockMediaStreamSource.disconnect).toHaveBeenCalled()
+    expect(wrapper.emitted().closeDialog).toBeTruthy()
   })
 })
