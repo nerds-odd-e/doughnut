@@ -13,18 +13,40 @@ export const createAudioProcessor = (
   let lastProcessedIndex = 0
   let processorTimer: NodeJS.Timeout | null = null
 
+  const SILENCE_THRESHOLD = 0.01 // Adjust this threshold as needed
+
+  const isSilent = (data: Float32Array): boolean => {
+    let sum = 0
+    for (let i = 0; i < data.length; i++) {
+      sum += Math.abs(data[i] ?? 0)
+    }
+    const avg = sum / data.length
+    return avg < SILENCE_THRESHOLD
+  }
+
   const processAudioData = (newData: Float32Array[]) => {
-    audioData.push(...newData)
-    // Remove the direct call to processorCallback here
+    // Filter out silent data
+    const filteredData = newData.map((chunk) => {
+      if (isSilent(chunk)) {
+        // Replace silent chunk with minimal data to maintain duration
+        return new Float32Array(chunk.length) // Filled with zeros
+      } else {
+        return chunk
+      }
+    })
+    audioData.push(...filteredData)
   }
 
   const start = () => {
-    // Set up the timer to call processorCallback periodically
     processorTimer = setInterval(() => {
       if (audioData.length > lastProcessedIndex) {
         const newAudioData = audioData.slice(lastProcessedIndex)
-        const partialFile = createAudioFile(newAudioData, sampleRate, true)
-        processorCallback(partialFile)
+        // Check if the newAudioData contains only silence
+        const isAllSilent = newAudioData.every((chunk) => isSilent(chunk))
+        if (!isAllSilent) {
+          const partialFile = createAudioFile(newAudioData, sampleRate, true)
+          processorCallback(partialFile)
+        }
         lastProcessedIndex = audioData.length
       }
     }, 60 * 1000)
@@ -38,8 +60,15 @@ export const createAudioProcessor = (
     // Process any remaining audio data
     if (audioData.length > lastProcessedIndex) {
       const remainingAudioData = audioData.slice(lastProcessedIndex)
-      const partialFile = createAudioFile(remainingAudioData, sampleRate, true)
-      processorCallback(partialFile)
+      const isAllSilent = remainingAudioData.every((chunk) => isSilent(chunk))
+      if (!isAllSilent) {
+        const partialFile = createAudioFile(
+          remainingAudioData,
+          sampleRate,
+          true
+        )
+        processorCallback(partialFile)
+      }
     }
 
     const file = createAudioFile(audioData, sampleRate, false)
