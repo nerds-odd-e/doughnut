@@ -3451,10 +3451,10 @@ components:
           type: string
     TextFromAudio:
       required:
-      - textFromAudio
+      - completionMarkdownFromAudio
       type: object
       properties:
-        textFromAudio:
+        completionMarkdownFromAudio:
           type: string
     NotebookCertificateApproval:
       required:

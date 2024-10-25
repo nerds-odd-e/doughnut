@@ -88,7 +88,7 @@ const openAiChatCompletionStubber = (
       return stubSingleToolCall(
         'audio_transcription_to_text',
         JSON.stringify({
-          textFromAudio: argumentsString,
+          completionMarkdownFromAudio: argumentsString,
         })
       )
     },

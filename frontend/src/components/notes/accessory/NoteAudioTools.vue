@@ -94,7 +94,9 @@ const stopRecording = async () => {
       previousNoteDetails: "Lets start",
       uploadAudioFile: audioFile.value,
     })
-    storageAccessor.storedApi().appendDetails(note.id, response?.textFromAudio)
+    storageAccessor
+      .storedApi()
+      .appendDetails(note.id, response?.completionMarkdownFromAudio)
   } catch (error) {
     errors.value = error as Record<string, string | undefined>
   } finally {

@@ -46,11 +46,11 @@ class RestAiAudioControllerTests {
     userModel = makeMe.aUser().toModelPlease();
 
     controller = new RestAiAudioController(openAiApi, makeMe.modelFactoryService);
-    TextFromAudio textFromAudio = new TextFromAudio();
-    textFromAudio.setTextFromAudio("test123");
+    TextFromAudio completionMarkdownFromAudio = new TextFromAudio();
+    completionMarkdownFromAudio.setCompletionMarkdownFromAudio("test123");
     openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
     openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(
-        textFromAudio, "audio_transcription_to_text");
+        completionMarkdownFromAudio, "audio_transcription_to_text");
   }
 
   @Nested
@@ -69,7 +69,10 @@ class RestAiAudioControllerTests {
       audioUploadDTO.setUploadAudioFile(
           new MockMultipartFile(filename, filename, "audio/mp3", new byte[] {}));
       String result =
-          controller.audioToText(audioUploadDTO).map(TextFromAudio::getTextFromAudio).orElse("");
+          controller
+              .audioToText(audioUploadDTO)
+              .map(TextFromAudio::getCompletionMarkdownFromAudio)
+              .orElse("");
       assertEquals("test123", result);
     }
 
@@ -79,7 +82,8 @@ class RestAiAudioControllerTests {
           new MockMultipartFile("file", "test.mp3", "text/plain", "test".getBytes());
       var dto = new AudioUploadDTO();
       dto.setUploadAudioFile(mockFile);
-      String resp = controller.audioToText(dto).map(TextFromAudio::getTextFromAudio).orElse("");
+      String resp =
+          controller.audioToText(dto).map(TextFromAudio::getCompletionMarkdownFromAudio).orElse("");
       assertThat(resp, equalTo("test123"));
     }
 
@@ -90,7 +94,7 @@ class RestAiAudioControllerTests {
       var dto = new AudioUploadDTO();
       dto.setUploadAudioFile(mockFile);
       dto.setPreviousNoteDetails("Long long ago");
-      controller.audioToText(dto).map(TextFromAudio::getTextFromAudio);
+      controller.audioToText(dto).map(TextFromAudio::getCompletionMarkdownFromAudio);
       ArgumentCaptor<ChatCompletionRequest> argumentCaptor =
           ArgumentCaptor.forClass(ChatCompletionRequest.class);
       verify(openAiApi, times(1)).createChatCompletion(argumentCaptor.capture());
