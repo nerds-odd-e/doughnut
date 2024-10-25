@@ -3,7 +3,7 @@ Feature: Recording a live audio and append to note details
 
   Background:
     Given I am logged in as an existing user
-    And I have a notebook with the head note "Data Structure Lecture"
+    And I have a notebook with the head note "Data Structure Lecture" and details "This is class 1."
     And the OpenAI transcription service will return the following srt transcript for a request with content length 74257:
       """
       00:00:00,000 --> 00:00:01,000
@@ -20,7 +20,7 @@ Feature: Recording a live audio and append to note details
     Given I start recording audio for the note "Data Structure Lecture"
     And the browser records audio input from the microphone as in "lecture.wav"
     When I stop recording audio
-    Then the note details on the current page should be "Let's talk about data structure today."
+    Then the note details on the current page should be "This is class 1. Let's talk about data structure today."
 
   @usingMockedOpenAiService
   Scenario: Download the audio file to local machine

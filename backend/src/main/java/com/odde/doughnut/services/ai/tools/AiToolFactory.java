@@ -1,6 +1,9 @@
 package com.odde.doughnut.services.ai.tools;
 
+import static com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder.askClarificationQuestion;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.doughnut.controllers.dto.AiCompletionRequiredAction;
 import com.odde.doughnut.services.ai.*;
 import com.theokanning.openai.function.FunctionDefinition;
 import java.util.List;
@@ -94,5 +97,27 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
                 .description("Convert audio transcription to text")
                 .parametersDefinitionByClass(TextFromAudio.class)
                 .build()));
+  }
+
+  public static List<AiTool> getCompletionAiTools() {
+    return List.of(
+        AiTool.build(
+            COMPLETE_NOTE_DETAILS,
+            "Text completion for the details of the note of focus",
+            NoteDetailsCompletion.class,
+            (noteDetailsCompletion) -> {
+              AiCompletionRequiredAction result = new AiCompletionRequiredAction();
+              result.setContentToAppend(noteDetailsCompletion.completion);
+              return result;
+            }),
+        AiTool.build(
+            askClarificationQuestion,
+            "Ask question to get more context",
+            ClarifyingQuestion.class,
+            (clarifyingQuestion) -> {
+              AiCompletionRequiredAction result = new AiCompletionRequiredAction();
+              result.setClarifyingQuestion(clarifyingQuestion);
+              return result;
+            }));
   }
 }
