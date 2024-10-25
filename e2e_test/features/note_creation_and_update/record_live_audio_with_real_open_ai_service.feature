@@ -3,7 +3,6 @@ Feature: Record live audio with real OpenAI service
 
     Background:
         Given I am logged in as an existing user
-        And I have a notebook with the head note "podcast"
 
     # this scenario uses real Open AI service.
     Scenario: Record audio of a live event with real OpenAI service

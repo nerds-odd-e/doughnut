@@ -59,9 +59,9 @@ const browser = {
   receiveAudioFromMicrophone: function (audioFileName: string) {
     cy.fixture(audioFileName, 'base64').then((audioBase64) => {
       const blob = Cypress.Blob.base64StringToBlob(audioBase64, 'audio/wav')
-      blob.arrayBuffer().then((arrayBuffer) => {
+      return blob.arrayBuffer().then((arrayBuffer) => {
         const audioContext = new AudioContext()
-        audioContext.decodeAudioData(arrayBuffer).then((audioBuffer) => {
+        return audioContext.decodeAudioData(arrayBuffer).then((audioBuffer) => {
           const originalSampleRate = audioBuffer.sampleRate
           const targetSampleRate = 16000 // Assuming the target sample rate is 44.1kHz
           const float32Array = audioBuffer.getChannelData(0)
