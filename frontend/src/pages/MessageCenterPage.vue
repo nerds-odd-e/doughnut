@@ -19,13 +19,13 @@
         </div>
 
         <div class="col-md-9 main-content">
-          <div class="px-3 py-3 conversations" v-if="currentConversationDetails">
-            <div v-for="thread in currentConversationDetails" :key="thread.id" class="d-flex mb-3" :class="{ 'justify-content-end': isCurrentUser(thread.sender?.id || 0) }">
-              <div class="card py-2 px-3" :class="[isCurrentUser(thread.sender?.id || 0) ? 'text-bg-dark': 'bg-light', thread.sender?.id === undefined ? 'ai-chat' : '']">
-                <template v-if="thread.sender?.id === undefined">
+          <div class="px-3 py-3 conversations" v-if="currentConversationMessages">
+            <div v-for="conversationMessage in currentConversationMessages" :key="conversationMessage.id" class="d-flex mb-3" :class="{ 'justify-content-end': isCurrentUser(conversationMessage.sender?.id || 0) }">
+              <div class="card py-2 px-3" :class="[isCurrentUser(conversationMessage.sender?.id || 0) ? 'text-bg-dark': 'bg-light', conversationMessage.sender?.id === undefined ? 'ai-chat' : '']">
+                <template v-if="conversationMessage.sender?.id === undefined">
                   <SvgRobot />
                 </template>
-                {{ formatMessage(thread.message) }}
+                {{ formatMessage(conversationMessage.message) }}
               </div>
             </div>
 
@@ -72,7 +72,7 @@ const { user } = defineProps({
 
 const conversations = ref<Conversation[] | undefined>(undefined)
 const currentConversationId = ref(0)
-const currentConversationDetails = ref<ConversationMessage[] | undefined>(
+const currentConversationMessages = ref<ConversationMessage[] | undefined>(
   undefined
 )
 const message = ref("")
@@ -100,8 +100,8 @@ const handleSendMessage = async () => {
 }
 
 const fetchThreadsForConversation = async (conversationId: number) => {
-  currentConversationDetails.value =
-    await managedApi.restConversationMessageController.getConversationDetails(
+  currentConversationMessages.value =
+    await managedApi.restConversationMessageController.getConversationMessages(
       conversationId
     )
   currentConversationId.value = conversationId

@@ -1274,96 +1274,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NotebookCertificateApproval"
-  /api/message/note/{note}:
-    post:
-      tags:
-      - rest-conversation-message-controller
-      operationId: startConversationAboutNote
-      parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: string
-        required: true
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Conversation"
-  /api/message/detail/send/{conversationId}:
-    post:
-      tags:
-      - rest-conversation-message-controller
-      operationId: replyToConversation
-      parameters:
-      - name: conversationId
-        in: path
-        required: true
-        schema:
-          type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: string
-        required: true
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ConversationMessage"
-  /api/message/assessment-question/{assessmentQuestion}:
-    post:
-      tags:
-      - rest-conversation-message-controller
-      operationId: startConversationAboutAssessmentQuestion
-      parameters:
-      - name: assessmentQuestion
-        in: path
-        required: true
-        schema:
-          type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: string
-        required: true
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Conversation"
   /api/links/{link}:
     post:
       tags:
@@ -1495,6 +1405,96 @@ paths:
                 type: string
         "200":
           description: OK
+  /api/conversation/{conversationId}/send:
+    post:
+      tags:
+      - rest-conversation-message-controller
+      operationId: replyToConversation
+      parameters:
+      - name: conversationId
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ConversationMessage"
+  /api/conversation/note/{note}:
+    post:
+      tags:
+      - rest-conversation-message-controller
+      operationId: startConversationAboutNote
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Conversation"
+  /api/conversation/assessment-question/{assessmentQuestion}:
+    post:
+      tags:
+      - rest-conversation-message-controller
+      operationId: startConversationAboutAssessmentQuestion
+      parameters:
+      - name: assessmentQuestion
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Conversation"
   /api/circles:
     get:
       tags:
@@ -2150,32 +2150,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Notebook"
-  /api/message/read/{conversationId}:
-    patch:
-      tags:
-      - rest-conversation-message-controller
-      operationId: markConversationAsRead
-      parameters:
-      - name: conversationId
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/ConversationMessage"
   /api/fine-tuning/{suggestedQuestion}/update-suggested-question-for-fine-tuning:
     patch:
       tags:
@@ -2206,6 +2180,32 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/SuggestedQuestionForFineTuning"
+  /api/conversation/{conversationId}/read:
+    patch:
+      tags:
+      - rest-conversation-message-controller
+      operationId: markConversationAsRead
+      parameters:
+      - name: conversationId
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ConversationMessage"
   /api/wikidata/search/{search}:
     get:
       tags:
@@ -2610,72 +2610,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NotebookCertificateApproval"
-  /api/message/unreadCount:
-    get:
-      tags:
-      - rest-conversation-message-controller
-      operationId: getUnreadConversations
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/ConversationMessage"
-  /api/message/detail/all/{conversationId}:
-    get:
-      tags:
-      - rest-conversation-message-controller
-      operationId: getConversationDetails
-      parameters:
-      - name: conversationId
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/ConversationMessage"
-  /api/message/all:
-    get:
-      tags:
-      - rest-conversation-message-controller
-      operationId: getConversationsOfCurrentUser
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Conversation"
   /api/healthcheck:
     get:
       tags:
@@ -2776,6 +2710,72 @@ paths:
                 type: array
                 items:
                   type: object
+  /api/conversation/{conversationId}/messages:
+    get:
+      tags:
+      - rest-conversation-message-controller
+      operationId: getConversationMessages
+      parameters:
+      - name: conversationId
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ConversationMessage"
+  /api/conversation/unread:
+    get:
+      tags:
+      - rest-conversation-message-controller
+      operationId: getUnreadConversations
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ConversationMessage"
+  /api/conversation/all:
+    get:
+      tags:
+      - rest-conversation-message-controller
+      operationId: getConversationsOfCurrentUser
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Conversation"
   /api/circles/{circle}:
     get:
       tags:
@@ -3470,6 +3470,33 @@ components:
         lastApprovalTime:
           type: string
           format: date-time
+    LinkCreation:
+      required:
+      - linkType
+      type: object
+      properties:
+        linkType:
+          type: string
+          enum:
+          - no link
+          - related to
+          - a specialization of
+          - an application of
+          - an instance of
+          - a part of
+          - tagged by
+          - an attribute of
+          - the opposite of
+          - author of
+          - using
+          - an example of
+          - before
+          - similar to
+          - confused with
+        moveUnder:
+          type: boolean
+        asFirstChild:
+          type: boolean
     AssessmentQuestionInstance:
       required:
       - bareQuestion
@@ -3529,33 +3556,6 @@ components:
         createdAt:
           type: string
           format: date-time
-    LinkCreation:
-      required:
-      - linkType
-      type: object
-      properties:
-        linkType:
-          type: string
-          enum:
-          - no link
-          - related to
-          - a specialization of
-          - an application of
-          - an instance of
-          - a part of
-          - tagged by
-          - an attribute of
-          - the opposite of
-          - author of
-          - using
-          - an example of
-          - before
-          - similar to
-          - confused with
-        moveUnder:
-          type: boolean
-        asFirstChild:
-          type: boolean
     CircleJoiningByInvitation:
       required:
       - invitationCode

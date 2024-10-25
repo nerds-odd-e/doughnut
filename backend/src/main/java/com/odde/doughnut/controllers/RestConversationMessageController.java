@@ -12,7 +12,7 @@ import java.util.List;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/message")
+@RequestMapping("/api/conversation")
 public class RestConversationMessageController {
   private final ConversationService conversationService;
   private final UserModel currentUser;
@@ -46,13 +46,13 @@ public class RestConversationMessageController {
     return conversationService.conversationRelatedToUser(currentUser.getEntity());
   }
 
-  @GetMapping("/unreadCount")
+  @GetMapping("/unread")
   public List<ConversationMessage> getUnreadConversations() {
     currentUser.assertLoggedIn();
     return conversationService.getUnreadConversations(currentUser.getEntity());
   }
 
-  @PatchMapping("/read/{conversationId}")
+  @PatchMapping("/{conversationId}/read")
   public List<ConversationMessage> markConversationAsRead(
       @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation)
       throws UnexpectedNoAccessRightException {
@@ -61,7 +61,7 @@ public class RestConversationMessageController {
     return conversationService.getUnreadConversations(currentUser.getEntity());
   }
 
-  @PostMapping("/detail/send/{conversationId}")
+  @PostMapping("/{conversationId}/send")
   public ConversationMessage replyToConversation(
       @RequestBody String message,
       @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation)
@@ -71,8 +71,8 @@ public class RestConversationMessageController {
         conversation, currentUser.getEntity(), message);
   }
 
-  @GetMapping("/detail/all/{conversationId}")
-  public List<ConversationMessage> getConversationDetails(
+  @GetMapping("/{conversationId}/messages")
+  public List<ConversationMessage> getConversationMessages(
       @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(conversation);

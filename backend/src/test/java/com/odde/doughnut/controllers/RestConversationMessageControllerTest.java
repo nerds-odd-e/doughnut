@@ -255,7 +255,7 @@ class RestConversationMessageControllerTest {
       Conversation conversation = makeMe.aConversation().please();
       assertThrows(
           UnexpectedNoAccessRightException.class,
-          () -> controller.getConversationDetails(conversation));
+          () -> controller.getConversationMessages(conversation));
     }
 
     @Test
@@ -263,7 +263,7 @@ class RestConversationMessageControllerTest {
       Conversation conversation = makeMe.aConversation().from(currentUser).please();
 
       makeMe.aConversationMessage(conversation).please();
-      List<ConversationMessage> conversations = controller.getConversationDetails(conversation);
+      List<ConversationMessage> conversations = controller.getConversationMessages(conversation);
       assertEquals(1, conversations.size());
     }
   }

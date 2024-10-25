@@ -9,29 +9,6 @@ import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestConversationMessageControllerService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
-     * @param note
-     * @param requestBody
-     * @returns Conversation OK
-     * @throws ApiError
-     */
-    public startConversationAboutNote(
-        note: number,
-        requestBody: string,
-    ): CancelablePromise<Conversation> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/api/message/note/{note}',
-            path: {
-                'note': note,
-            },
-            body: requestBody,
-            mediaType: 'application/json',
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
      * @param conversationId
      * @param requestBody
      * @returns ConversationMessage OK
@@ -43,9 +20,32 @@ export class RestConversationMessageControllerService {
     ): CancelablePromise<ConversationMessage> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/message/detail/send/{conversationId}',
+            url: '/api/conversation/{conversationId}/send',
             path: {
                 'conversationId': conversationId,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param note
+     * @param requestBody
+     * @returns Conversation OK
+     * @throws ApiError
+     */
+    public startConversationAboutNote(
+        note: number,
+        requestBody: string,
+    ): CancelablePromise<Conversation> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/conversation/note/{note}',
+            path: {
+                'note': note,
             },
             body: requestBody,
             mediaType: 'application/json',
@@ -66,7 +66,7 @@ export class RestConversationMessageControllerService {
     ): CancelablePromise<Conversation> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/message/assessment-question/{assessmentQuestion}',
+            url: '/api/conversation/assessment-question/{assessmentQuestion}',
             path: {
                 'assessmentQuestion': assessmentQuestion,
             },
@@ -87,7 +87,26 @@ export class RestConversationMessageControllerService {
     ): CancelablePromise<Array<ConversationMessage>> {
         return this.httpRequest.request({
             method: 'PATCH',
-            url: '/api/message/read/{conversationId}',
+            url: '/api/conversation/{conversationId}/read',
+            path: {
+                'conversationId': conversationId,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param conversationId
+     * @returns ConversationMessage OK
+     * @throws ApiError
+     */
+    public getConversationMessages(
+        conversationId: number,
+    ): CancelablePromise<Array<ConversationMessage>> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/conversation/{conversationId}/messages',
             path: {
                 'conversationId': conversationId,
             },
@@ -103,26 +122,7 @@ export class RestConversationMessageControllerService {
     public getUnreadConversations(): CancelablePromise<Array<ConversationMessage>> {
         return this.httpRequest.request({
             method: 'GET',
-            url: '/api/message/unreadCount',
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * @param conversationId
-     * @returns ConversationMessage OK
-     * @throws ApiError
-     */
-    public getConversationDetails(
-        conversationId: number,
-    ): CancelablePromise<Array<ConversationMessage>> {
-        return this.httpRequest.request({
-            method: 'GET',
-            url: '/api/message/detail/all/{conversationId}',
-            path: {
-                'conversationId': conversationId,
-            },
+            url: '/api/conversation/unread',
             errors: {
                 500: `Internal Server Error`,
             },
@@ -135,7 +135,7 @@ export class RestConversationMessageControllerService {
     public getConversationsOfCurrentUser(): CancelablePromise<Array<Conversation>> {
         return this.httpRequest.request({
             method: 'GET',
-            url: '/api/message/all',
+            url: '/api/conversation/all',
             errors: {
                 500: `Internal Server Error`,
             },
