@@ -146,8 +146,8 @@ onUnmounted(() => {
 
 .button-group {
   display: flex;
-  justify-content: space-around;
-  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
 }
 
 .btn {
@@ -158,7 +158,7 @@ onUnmounted(() => {
   border-radius: 50%;
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.2s ease;
-  margin: 5px;
+  flex-shrink: 0;
 }
 
 .btn:hover:not(:disabled) {
@@ -177,12 +177,11 @@ onUnmounted(() => {
   }
 
   .button-group {
-    flex-direction: column;
-    align-items: center;
+    gap: 10px;
   }
 
   .btn {
-    margin: 10px 0;
+    padding: 8px;
   }
 }
 </style>
