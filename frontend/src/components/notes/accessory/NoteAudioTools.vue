@@ -21,7 +21,7 @@
       <button
         class="btn"
         @click="saveAudioLocally"
-        :disabled="isRecording || !formData.uploadAudioFile"
+        :disabled="isRecording || !audioFile"
         title="Save Audio Locally"
       >
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
@@ -54,7 +54,7 @@ const { noteId, storageAccessor } = defineProps({
 
 const emit = defineEmits(["closeDialog"])
 
-const formData = ref<AudioUploadDTO>({})
+const audioFile = ref<Blob | undefined>()
 const errors = ref<Record<string, string | undefined>>()
 
 const isRecording = ref(false)
@@ -87,12 +87,12 @@ const stopRecording = async () => {
     animationId = null
   }
   const file = audioRecorder.value.stopRecording()
-  formData.value.uploadAudioFile = file
+  audioFile.value = file
 
   try {
-    const response = await managedApi.restAiAudioController.audioToText(
-      formData.value
-    )
+    const response = await managedApi.restAiAudioController.audioToText({
+      uploadAudioFile: audioFile.value,
+    })
     storageAccessor.storedApi().appendDetails(noteId, response?.textFromAudio)
   } catch (error) {
     errors.value = error as Record<string, string | undefined>
@@ -102,8 +102,8 @@ const stopRecording = async () => {
 }
 
 const saveAudioLocally = () => {
-  if (formData.value.uploadAudioFile) {
-    const url = URL.createObjectURL(formData.value.uploadAudioFile)
+  if (audioFile.value) {
+    const url = URL.createObjectURL(audioFile.value)
     const a = document.createElement("a")
     a.href = url
     a.download = "recorded_audio.wav"
