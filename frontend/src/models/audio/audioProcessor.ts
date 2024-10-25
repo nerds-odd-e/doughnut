@@ -1,6 +1,7 @@
 export interface AudioProcessor {
   processAudioData: (newData: Float32Array[]) => void
   getAudioData: () => Float32Array[]
+  start: () => void
   stop: () => File
 }
 
@@ -10,16 +11,23 @@ export const createAudioProcessor = (
 ): AudioProcessor => {
   let audioData: Float32Array[] = []
   let lastProcessedIndex = 0
-  let processorTimer: number | null = null
+  let processorTimer: NodeJS.Timeout | null = null
 
   const processAudioData = (newData: Float32Array[]) => {
     audioData.push(...newData)
-    if (audioData.length > lastProcessedIndex) {
-      const newAudioData = audioData.slice(lastProcessedIndex)
-      const partialFile = createAudioFile(newAudioData, sampleRate, true)
-      processorCallback(partialFile)
-      lastProcessedIndex = audioData.length
-    }
+    // Remove the direct call to processorCallback here
+  }
+
+  const start = () => {
+    // Set up the timer to call processorCallback periodically
+    processorTimer = setInterval(() => {
+      if (audioData.length > lastProcessedIndex) {
+        const newAudioData = audioData.slice(lastProcessedIndex)
+        const partialFile = createAudioFile(newAudioData, sampleRate, true)
+        processorCallback(partialFile)
+        lastProcessedIndex = audioData.length
+      }
+    }, 60 * 1000)
   }
 
   const stop = () => {
@@ -46,6 +54,7 @@ export const createAudioProcessor = (
 
   return {
     processAudioData,
+    start,
     stop,
     getAudioData,
   }

@@ -43,6 +43,7 @@ export const createAudioRecorder = (
           }
         }
 
+        audioProcessor.start()
         audioInput.connect(workletNode)
         workletNode.connect(audioContext.destination)
       } catch (error) {
