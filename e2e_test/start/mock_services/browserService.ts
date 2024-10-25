@@ -58,13 +58,18 @@ const browser = {
   },
   receiveAudioFromMicrophone: function (audioFileName: string) {
     cy.fixture(audioFileName, 'base64').then((audioBase64) => {
-      // will comeback and use the blob a bit later
-      Cypress.Blob.base64StringToBlob(audioBase64, 'audio/wav')
-      if (!this.audioWorletPort.onmessage)
-        throw new Error('audioWorletPort.onmessage is not mocked')
-      this.audioWorletPort.onmessage({
-        data: { audioBuffer: [] },
-      } as MessageEvent)
+      const blob = Cypress.Blob.base64StringToBlob(audioBase64, 'audio/wav')
+      blob.arrayBuffer().then((arrayBuffer) => {
+        const audioContext = new AudioContext()
+        audioContext.decodeAudioData(arrayBuffer).then((audioBuffer) => {
+          const float32Array = audioBuffer.getChannelData(0)
+          if (!this.audioWorletPort.onmessage)
+            throw new Error('audioWorletPort.onmessage is not mocked')
+          this.audioWorletPort.onmessage({
+            data: { audioBuffer: [float32Array] },
+          } as MessageEvent)
+        })
+      })
     })
   },
 }
