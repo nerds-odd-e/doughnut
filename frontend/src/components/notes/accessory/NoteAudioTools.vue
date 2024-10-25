@@ -1,16 +1,7 @@
 <template>
+  <div class="alert alert-info" v-if="errors">{{ errors.recording }}</div>
   <button class="btn" @click="startRecording" :disabled="isRecording">Record Audio</button>
   <button class="btn" @click="stopRecording" :disabled="!isRecording">Stop Recording</button>
-  <NoteUploadAudioForm
-    v-if="!!formData"
-    v-model="formData"
-    :errors="noteFormErrors"
-  />
-  <input
-    value="Convert to SRT"
-    class="btn btn-primary"
-    @click.once="convertToSRT"
-  />
   <button
     class="btn"
     @click="saveAudioLocally"
@@ -24,7 +15,6 @@
 import type { AudioUploadDTO } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { ref, type PropType } from "vue"
-import NoteUploadAudioForm from "./NoteUploadAudioForm.vue"
 import type { StorageAccessor } from "../../../store/createNoteStorage"
 import {
   createAudioRecorder,
@@ -43,31 +33,19 @@ const { noteId, storageAccessor } = defineProps({
 const emit = defineEmits(["closeDialog"])
 
 const formData = ref<AudioUploadDTO>({})
-const noteFormErrors = ref<Record<string, string | undefined>>({})
+const errors = ref<Record<string, string | undefined>>()
 
 const isRecording = ref(false)
 const audioRecorder = ref<AudioRecorder>(createAudioRecorder())
 
-const convertToSRT = async () => {
-  try {
-    const response = await managedApi.restAiAudioController.convertSrt(
-      formData.value
-    )
-    storageAccessor
-      .storedApi()
-      .updateTextField(noteId, "edit details", response?.textFromAudio)
-  } catch (error: unknown) {
-    noteFormErrors.value = error as Record<string, string | undefined>
-  }
-}
-
 const startRecording = async () => {
+  errors.value = undefined
   try {
     await audioRecorder.value.startRecording()
     isRecording.value = true
   } catch (error) {
     console.error("Error starting recording:", error)
-    noteFormErrors.value = { recording: "Failed to start recording" }
+    errors.value = { recording: "Failed to start recording" }
   }
 }
 
@@ -84,7 +62,7 @@ const stopRecording = async () => {
       .storedApi()
       .updateTextField(noteId, "edit details", response?.textFromAudio)
   } catch (error) {
-    noteFormErrors.value = error as Record<string, string | undefined>
+    errors.value = error as Record<string, string | undefined>
   }
 }
 

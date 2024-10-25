@@ -4,7 +4,7 @@ Feature: Recording a live audio and append to note details
   Background:
     Given I am logged in as an existing user
     And I have a notebook with the head note "Data Structure Lecture"
-    And the OpenAI transcription service will return the following srt transcript for a request with content length 295442:
+    And the OpenAI transcription service will return the following srt transcript for a request with content length 74257:
       """
       00:00:00,000 --> 00:00:01,000
       its talk about dada struct day.

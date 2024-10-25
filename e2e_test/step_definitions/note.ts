@@ -139,10 +139,6 @@ When(
   }
 )
 
-When('I convert the audio-file to SRT without saving', () => {
-  cy.findAllByDisplayValue('Convert to SRT').click()
-})
-
 When(
   'I should see note {string} has a image and a url {string}',
   (noteTopic: string, expectedUrl: string) => {
@@ -452,14 +448,6 @@ When(
 Then('I should see a child note {string}', (childTopic: string) => {
   start.assumeNotePage().expectChildren([{ 'note-topic': childTopic }])
 })
-
-When(
-  'I try to upload an audio-file {string} to the note {string}',
-  (fileName: string, noteTopic: string) => {
-    start.jumpToNotePage(noteTopic).audioTools()
-    cy.get('#note-uploadAudioFile').attachFile(fileName)
-  }
-)
 
 When('I collapse the children of note {string}', (noteTopic: string) => {
   start.assumeNotePage(noteTopic).collapseChildren()
