@@ -1,5 +1,8 @@
 const browser = {
-  mockAudioRecording: (audioFileName: string) => {
+  audioWorletPort: {
+    onmessage: null as ((event: MessageEvent) => void) | null,
+  },
+  mockAudioRecording: function () {
     // Mock the getUserMedia function to simulate permission granted
     cy.window().then((win) => {
       cy.stub(win.navigator.mediaDevices, 'getUserMedia').resolves({
@@ -39,11 +42,9 @@ const browser = {
       // biome-ignore lint/suspicious/noExplicitAny: <explanation>
       ;(win as any).AudioContext = MockAudioContext
 
+      const port = this.audioWorletPort
       class MockAudioWorkletNode {
-        port = {
-          onmessage: null,
-          postMessage: cy.stub().resolves(),
-        }
+        port = port
         // biome-ignore lint/suspicious/noEmptyBlockStatements: <explanation>
         connect() {}
         // biome-ignore lint/suspicious/noEmptyBlockStatements: <explanation>
@@ -54,17 +55,16 @@ const browser = {
     })
 
     // Preload the audio fixture
+  },
+  receiveAudioFromMicrophone: function (audioFileName: string) {
     cy.fixture(audioFileName, 'base64').then((audioBase64) => {
-      const blob = Cypress.Blob.base64StringToBlob(audioBase64, 'audio/wav')
-      cy.wrap(blob).as('audioBlob')
-    })
-
-    // Mock the Float32Array for audio data
-    cy.on('window:before:load', (win) => {
-      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-      ;(win as any).Float32Array = function MockFloat32Array(length) {
-        return new Array(length).fill(0)
-      }
+      // will comeback and use the blob a bit later
+      Cypress.Blob.base64StringToBlob(audioBase64, 'audio/wav')
+      if (!this.audioWorletPort.onmessage)
+        throw new Error('audioWorletPort.onmessage is not mocked')
+      this.audioWorletPort.onmessage({
+        data: { audioBuffer: [] },
+      } as MessageEvent)
     })
   },
 }

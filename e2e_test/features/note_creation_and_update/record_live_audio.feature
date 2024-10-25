@@ -14,11 +14,12 @@ Feature: Recording a live audio and append to note details
     And the OpenAI completion service will return the following response for the transcription to text request:
       | request contains              | response         |
       | its talk about dada struct day. | Let's talk about data structure today. |
-    And the browser is mocked to give permission to record audio and receive audio input as in "lecture.wav"
+    And the browser is mocked to give permission to record audio
 
   Scenario: Record audio of a live event
-    When I start recording audio for the note "Data Structure Lecture"
-    And I stop recording audio
+    Given I start recording audio for the note "Data Structure Lecture"
+    And the browser records audio input from the microphone as in "lecture.wav"
+    When I stop recording audio
     Then the note details on the current page should be "Let's talk about data structure today."
 
   @ignore

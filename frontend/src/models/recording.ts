@@ -18,9 +18,7 @@ export const createAudioRecorder = (): AudioRecorder => {
       try {
         audioContext = new AudioContext()
 
-        console.log("audioWorkletUrl", audioWorkletUrl)
-        const r = await audioContext.audioWorklet.addModule(audioWorkletUrl)
-        console.log("r", r)
+        await audioContext.audioWorklet.addModule(audioWorkletUrl)
 
         mediaStream = await navigator.mediaDevices.getUserMedia({
           audio: true,

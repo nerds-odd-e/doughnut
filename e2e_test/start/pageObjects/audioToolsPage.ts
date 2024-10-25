@@ -2,6 +2,7 @@ const audioToolsPage = () => {
   return {
     startRecording: () => {
       cy.findByText('Record Audio').click()
+      cy.findByText('Record Audio').should('be.disabled')
       return this
     },
     stopRecording: () => {

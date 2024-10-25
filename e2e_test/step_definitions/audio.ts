@@ -5,10 +5,14 @@
 import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
 import start, { mock_services } from '../start'
 
+Given('the browser is mocked to give permission to record audio', () => {
+  mock_services.browser.mockAudioRecording()
+})
+
 Given(
-  'the browser is mocked to give permission to record audio and receive audio input as in {string}',
+  'the browser records audio input from the microphone as in {string}',
   (audioFileName: string) => {
-    mock_services.browser.mockAudioRecording(audioFileName)
+    mock_services.browser.receiveAudioFromMicrophone(audioFileName)
   }
 )
 
