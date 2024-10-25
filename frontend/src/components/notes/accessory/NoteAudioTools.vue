@@ -11,6 +11,13 @@
     class="btn btn-primary"
     @click.once="convertToSRT"
   />
+  <button
+    class="btn"
+    @click="saveAudioLocally"
+    :disabled="isRecording || !formData.uploadAudioFile"
+  >
+    Save Audio Locally
+  </button>
 </template>
 
 <script setup lang="ts">
@@ -78,6 +85,19 @@ const stopRecording = async () => {
       .updateTextField(noteId, "edit details", response?.textFromAudio)
   } catch (error) {
     noteFormErrors.value = error as Record<string, string | undefined>
+  }
+}
+
+const saveAudioLocally = () => {
+  if (formData.value.uploadAudioFile) {
+    const url = URL.createObjectURL(formData.value.uploadAudioFile)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = "recorded_audio.wav"
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
   }
 }
 </script>

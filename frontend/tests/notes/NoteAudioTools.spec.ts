@@ -198,4 +198,65 @@ describe("NoteAudioTools", () => {
     await flushPromises()
     expect(mockMediaStreamSource.connect).toHaveBeenCalledTimes(2)
   })
+
+  it("renders Save Audio Locally button", () => {
+    expect(findButtonByText(wrapper, "Save Audio Locally")).toBeTruthy()
+  })
+
+  it("disables Save Audio Locally button when recording", async () => {
+    const saveButton = findButtonByText(wrapper, "Save Audio Locally")
+    expect(saveButton.attributes("disabled")).toBeDefined()
+
+    await findButtonByText(wrapper, "Record Audio").trigger("click")
+    await flushPromises()
+
+    expect(saveButton.attributes("disabled")).toBeDefined()
+  })
+
+  it("enables Save Audio Locally button when not recording and audio file exists", async () => {
+    const saveButton = findButtonByText(wrapper, "Save Audio Locally")
+    expect(saveButton.attributes("disabled")).toBeDefined()
+
+    // Simulate recording and stopping
+    await findButtonByText(wrapper, "Record Audio").trigger("click")
+    await flushPromises()
+    await findButtonByText(wrapper, "Stop Recording").trigger("click")
+    await flushPromises()
+
+    // Mock the existence of an audio file
+    wrapper.vm.formData.uploadAudioFile = new File([], "test.webm")
+
+    await wrapper.vm.$nextTick()
+    expect(saveButton.attributes("disabled")).toBeUndefined()
+  })
+
+  it("calls saveAudioLocally when Save Audio Locally button is clicked", async () => {
+    const saveButton = findButtonByText(wrapper, "Save Audio Locally")
+
+    // Mock the existence of an audio file
+    wrapper.vm.formData.uploadAudioFile = new File([], "test.webm")
+    await wrapper.vm.$nextTick()
+
+    const mockCreateObjectURL = vi.fn(() => "blob:mocked-url")
+    const mockRevokeObjectURL = vi.fn()
+    global.URL.createObjectURL = mockCreateObjectURL
+    global.URL.revokeObjectURL = mockRevokeObjectURL
+
+    const mockAppendChild = vi.fn()
+    const mockRemoveChild = vi.fn()
+    const mockClick = vi.fn()
+    document.body.appendChild = mockAppendChild
+    document.body.removeChild = mockRemoveChild
+    HTMLAnchorElement.prototype.click = mockClick
+
+    await saveButton.trigger("click")
+
+    expect(mockCreateObjectURL).toHaveBeenCalledWith(
+      wrapper.vm.formData.uploadAudioFile
+    )
+    expect(mockAppendChild).toHaveBeenCalled()
+    expect(mockClick).toHaveBeenCalled()
+    expect(mockRemoveChild).toHaveBeenCalled()
+    expect(mockRevokeObjectURL).toHaveBeenCalledWith("blob:mocked-url")
+  })
 })
