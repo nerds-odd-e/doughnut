@@ -88,11 +88,7 @@ export default defineComponent({
       this.clarifyingQuestion = undefined
       this.storageAccessor
         .storedApi()
-        .updateTextField(
-          this.note.id,
-          "edit details",
-          this.note.details + response.requiredAction!.contentToAppend!
-        )
+        .appendDetails(this.note.id, response.requiredAction!.contentToAppend!)
     },
     async clarifyingQuestionAnswered(
       clarifyingQuestionAndAnswer: ClarifyingQuestionAndAnswer

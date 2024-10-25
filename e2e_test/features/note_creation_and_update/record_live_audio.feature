@@ -20,7 +20,7 @@ Feature: Recording a live audio and append to note details
     Given I start recording audio for the note "Data Structure Lecture"
     And the browser records audio input from the microphone as in "lecture.wav"
     When I stop recording audio
-    Then the note details on the current page should be "Let's talk about data structure today."
+    Then the note details on the current page should be "This is class 1.Let's talk about data structure today."
 
   @usingMockedOpenAiService
   Scenario: Download the audio file to local machine

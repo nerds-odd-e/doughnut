@@ -44,6 +44,8 @@ export interface StoredApi {
     value: string
   ): Promise<void>
 
+  appendDetails(noteId: Doughnut.ID, value: string): Promise<void>
+
   updateWikidataId(
     noteId: Doughnut.ID,
     data: WikidataAssociationCreation
@@ -233,6 +235,12 @@ export default class StoredApiCollection implements StoredApi {
       this.noteEditingHistory.addEditingToUndoHistory(noteId, field, old)
     }
     await this.updateTextContentWithoutUndo(noteId, field, value)
+  }
+
+  async appendDetails(noteId: Doughnut.ID, value: string) {
+    const currentNote = this.storage.refOfNoteRealm(noteId).value?.note
+    const old = currentNote?.details ?? ""
+    return this.updateTextField(noteId, "edit details", old + value)
   }
 
   private async undoInner() {

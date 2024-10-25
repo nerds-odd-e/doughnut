@@ -143,11 +143,7 @@ const chat = async (id: Doughnut.ID, request: ChatRequest) => {
         ) as NoteDetailsCompletion
         storageAccessor
           .storedApi()
-          .updateTextField(
-            selectedNote.id,
-            "edit details",
-            (selectedNote.details ?? "") + contentToAppend!.completion
-          )
+          .appendDetails(selectedNote.id, contentToAppend!.completion)
       }
     })
     .onError((error) => {

@@ -93,9 +93,7 @@ const stopRecording = async () => {
     const response = await managedApi.restAiAudioController.audioToText(
       formData.value
     )
-    storageAccessor
-      .storedApi()
-      .updateTextField(noteId, "edit details", response?.textFromAudio)
+    storageAccessor.storedApi().appendDetails(noteId, response?.textFromAudio)
   } catch (error) {
     errors.value = error as Record<string, string | undefined>
   } finally {
