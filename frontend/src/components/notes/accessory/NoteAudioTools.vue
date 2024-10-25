@@ -33,7 +33,6 @@
 </template>
 
 <script setup lang="ts">
-import type { AudioUploadDTO } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { onMounted, onUnmounted, ref, type PropType } from "vue"
 import type { StorageAccessor } from "../../../store/createNoteStorage"
@@ -42,10 +41,11 @@ import {
   type AudioRecorder,
 } from "../../../models/recording"
 import { createWakeLocker, type WakeLocker } from "../../../models/wakeLocker"
+import type { Note } from "@/generated/backend"
 
 const { managedApi } = useLoadingApi()
-const { noteId, storageAccessor } = defineProps({
-  noteId: { type: Number, required: true },
+const { note, storageAccessor } = defineProps({
+  note: { type: Object as PropType<Note>, required: true },
   storageAccessor: {
     type: Object as PropType<StorageAccessor>,
     required: true,
@@ -91,9 +91,10 @@ const stopRecording = async () => {
 
   try {
     const response = await managedApi.restAiAudioController.audioToText({
+      previousNoteDetails: "Lets start",
       uploadAudioFile: audioFile.value,
     })
-    storageAccessor.storedApi().appendDetails(noteId, response?.textFromAudio)
+    storageAccessor.storedApi().appendDetails(note.id, response?.textFromAudio)
   } catch (error) {
     errors.value = error as Record<string, string | undefined>
   } finally {

@@ -12,7 +12,7 @@
   <div class="row">
     <NoteAudioTools
       v-if="audioTools"
-      v-bind="{ noteId: noteRealm.id, storageAccessor }"
+      v-bind="{ note: noteRealm.note, storageAccessor }"
       @close-dialog="
       audioTools = false;
       updatedNoteAccessory = $event

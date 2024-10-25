@@ -2,6 +2,7 @@ import { flushPromises } from "@vue/test-utils"
 import NoteAudioTools from "@/components/notes/accessory/NoteAudioTools.vue"
 import helper from "../helpers"
 import { vi } from "vitest"
+import makeMe from "tests/fixtures/makeMe"
 
 const mockMediaStreamSource = {
   connect: vi.fn(),
@@ -71,7 +72,7 @@ const findButtonByTitle = (wrapper, title: string) => {
 
 describe("NoteAudioTools", () => {
   let wrapper
-  const noteId = 1
+  const note = makeMe.aNote.please()
 
   beforeEach(() => {
     // Mock the canvas element
@@ -87,7 +88,7 @@ describe("NoteAudioTools", () => {
     wrapper = helper
       .component(NoteAudioTools)
       .withStorageProps({
-        noteId,
+        note,
       })
       .mount()
 
@@ -207,7 +208,7 @@ describe("NoteAudioTools", () => {
     await flushPromises()
 
     // Mock the existence of an audio file
-    wrapper.vm.formData.uploadAudioFile = new File([], "test.webm")
+    wrapper.vm.audioFile = new File([], "test.webm")
 
     await wrapper.vm.$nextTick()
     expect(saveButton.attributes("disabled")).toBeUndefined()
@@ -217,7 +218,7 @@ describe("NoteAudioTools", () => {
     const saveButton = findButtonByTitle(wrapper, "Save Audio Locally")
 
     // Mock the existence of an audio file
-    wrapper.vm.formData.uploadAudioFile = new File([], "test.webm")
+    wrapper.vm.audioFile = new File([], "test.webm")
     await wrapper.vm.$nextTick()
 
     const mockCreateObjectURL = vi.fn(() => "blob:mocked-url")
@@ -234,9 +235,7 @@ describe("NoteAudioTools", () => {
 
     await saveButton.trigger("click")
 
-    expect(mockCreateObjectURL).toHaveBeenCalledWith(
-      wrapper.vm.formData.uploadAudioFile
-    )
+    expect(mockCreateObjectURL).toHaveBeenCalledWith(wrapper.vm.audioFile)
     expect(mockAppendChild).toHaveBeenCalled()
     expect(mockClick).toHaveBeenCalled()
     expect(mockRemoveChild).toHaveBeenCalled()
