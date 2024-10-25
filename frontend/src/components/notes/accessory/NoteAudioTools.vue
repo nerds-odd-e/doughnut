@@ -36,7 +36,7 @@
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { onUnmounted, ref, type PropType } from "vue"
 import type { StorageAccessor } from "../../../store/createNoteStorage"
-import { createAudioRecorder } from "../../../models/recording"
+import { createAudioRecorder } from "../../../models/audio/recording"
 import { createWakeLocker } from "../../../models/wakeLocker"
 import type { Note } from "@/generated/backend"
 import Waveform from "./Waveform.vue"
@@ -59,7 +59,6 @@ const isRecording = ref(false)
 const wakeLocker = createWakeLocker()
 
 const processAudio = async (file: Blob) => {
-  audioFile.value = file
   try {
     const response = await managedApi.restAiAudioController.audioToText({
       previousNoteDetails: "Lets start",
@@ -73,8 +72,7 @@ const processAudio = async (file: Blob) => {
   }
 }
 
-const audioRecorder = createAudioRecorder()
-audioRecorder.setProcessor(processAudio)
+const audioRecorder = createAudioRecorder(processAudio)
 
 const startRecording = async () => {
   errors.value = undefined
@@ -92,7 +90,7 @@ const startRecording = async () => {
 const stopRecording = async () => {
   isRecording.value = false
   try {
-    audioRecorder.stopRecording()
+    audioFile.value = audioRecorder.stopRecording()
   } finally {
     await wakeLocker.release() // Release wake lock when recording stops
   }

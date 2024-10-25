@@ -4,7 +4,7 @@
 
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref, watch } from "vue"
-import type { AudioRecorder } from "../../../models/recording"
+import type { AudioRecorder } from "../../../models/audio/recording"
 
 const props = defineProps<{
   audioRecorder: AudioRecorder
