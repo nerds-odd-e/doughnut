@@ -112,9 +112,9 @@ Given('OpenAI accepts the vector file upload requests', () => {
 })
 
 Given(
-  'the OpenAI transcription service will return the following srt transcript for a request with content length {int}:',
-  (contentLength: number, transcript: string) => {
-    mock_services.openAi().stubTranscription(contentLength, transcript)
+  'the OpenAI transcription service will return the following srt transcript:',
+  (transcript: string) => {
+    mock_services.openAi().stubTranscription(transcript)
   }
 )
 

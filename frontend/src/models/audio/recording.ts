@@ -14,6 +14,8 @@ export const createAudioRecorder = (
   let audioInput: MediaStreamAudioSourceNode | null = null
   let workletNode: AudioWorkletNode | null = null
   let audioData: Float32Array[] = []
+  let lastProcessedIndex = 0
+  let processorTimer: number | null = null
 
   const audioRecorder: AudioRecorder = {
     startRecording: async function (): Promise<void> {
@@ -41,6 +43,20 @@ export const createAudioRecorder = (
 
         audioInput.connect(workletNode)
         workletNode.connect(audioContext.destination)
+
+        // Start the timer to process audio data every minute
+        processorTimer = window.setInterval(() => {
+          if (audioData.length > lastProcessedIndex) {
+            const newAudioData = audioData.slice(lastProcessedIndex)
+            const partialFile = createAudioFile(
+              newAudioData,
+              audioContext?.sampleRate ?? 16000,
+              true
+            )
+            processorCallback(partialFile)
+            lastProcessedIndex = audioData.length
+          }
+        }, 60000) // 60000 ms = 1 minute
       } catch (error) {
         console.error("Error starting recording:", error)
         throw new Error("Failed to start recording")
@@ -48,6 +64,11 @@ export const createAudioRecorder = (
     },
 
     stopRecording: function (): File {
+      if (processorTimer) {
+        clearInterval(processorTimer)
+        processorTimer = null
+      }
+
       if (workletNode) {
         workletNode.disconnect()
       }
@@ -58,19 +79,29 @@ export const createAudioRecorder = (
         mediaStream.getTracks().forEach((track) => track.stop())
       }
 
-      const wavBlob = encodeWAV(audioData, audioContext?.sampleRate ?? 16000)
-      const fileName = `recorded_audio_${new Date().toISOString()}.wav`
-      const file = new File([wavBlob], fileName, { type: "audio/wav" })
-
-      // Reset the audioData
-      audioData = []
-
-      // Call the callback with the file if it's set
-      if (processorCallback) {
-        processorCallback(file)
+      // Process any remaining audio data
+      if (audioData.length > lastProcessedIndex) {
+        const remainingAudioData = audioData.slice(lastProcessedIndex)
+        const partialFile = createAudioFile(
+          remainingAudioData,
+          audioContext?.sampleRate ?? 16000,
+          true
+        )
+        processorCallback(partialFile)
       }
 
-      return file
+      // Create and return the full audio file
+      const fullFile = createAudioFile(
+        audioData,
+        audioContext?.sampleRate ?? 16000,
+        false
+      )
+
+      // Reset the audioData and lastProcessedIndex
+      audioData = []
+      lastProcessedIndex = 0
+
+      return fullFile
     },
 
     getAudioData: function (): Float32Array[] {
@@ -79,6 +110,18 @@ export const createAudioRecorder = (
   }
 
   return audioRecorder
+}
+
+// Helper function to create audio files
+const createAudioFile = (
+  data: Float32Array[],
+  sampleRate: number,
+  isPartial: boolean
+): File => {
+  const wavBlob = encodeWAV(data, sampleRate)
+  const timestamp = new Date().toISOString()
+  const fileName = `recorded_audio_${isPartial ? "partial_" : ""}${timestamp}.wav`
+  return new File([wavBlob], fileName, { type: "audio/wav" })
 }
 
 const encodeWAV = (samples: Float32Array[], sampleRate: number): Blob => {

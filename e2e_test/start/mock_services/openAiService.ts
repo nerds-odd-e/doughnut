@@ -209,13 +209,12 @@ const openAiService = () => {
       })
     },
 
-    stubTranscription(contentLength: number, transcript: string) {
+    stubTranscription(transcript: string) {
       const predicate = new FlexiPredicate()
         .withOperator(Operator.matches)
         .withPath(`/audio/transcriptions`)
         .withMethod(HttpMethod.POST)
         .withHeader('Content-Type', 'multipart/form-data')
-        .withHeader('Content-Length', `${contentLength}`)
 
       return serviceMocker.mockWithPredicates(
         [predicate],
