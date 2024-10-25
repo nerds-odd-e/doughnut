@@ -232,6 +232,7 @@ declare module 'vue' {
     UrlFormBody: typeof import('./src/components/notes/accessory/UrlFormBody.vue')['default']
     UserActionsButton: typeof import('./src/components/toolbars/UserActionsButton.vue')['default']
     UserProfileDialog: typeof import('./src/components/toolbars/UserProfileDialog.vue')['default']
+    Waveform: typeof import('./src/components/notes/accessory/Waveform.vue')['default']
     WikidataAssociationDialog: typeof import('./src/components/notes/WikidataAssociationDialog.vue')['default']
     WikidataButton: typeof import('./src/components/notes/core/WikidataButton.vue')['default']
     WikidataIdEditButton: typeof import('./src/components/notes/core/WikidataIdEditButton.vue')['default']

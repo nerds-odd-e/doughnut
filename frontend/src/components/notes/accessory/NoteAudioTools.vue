@@ -6,7 +6,7 @@
       </svg>
     </button>
     <div class="alert alert-info" v-if="errors">{{ errors }}</div>
-    <canvas ref="waveformCanvas" class="waveform-canvas"></canvas>
+    <Waveform :audioRecorder="audioRecorder" :isRecording="isRecording" />
     <div class="button-group">
       <button class="btn" @click="startRecording" :disabled="isRecording" title="Record Audio">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
@@ -34,7 +34,7 @@
 
 <script setup lang="ts">
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { onMounted, onUnmounted, ref, type PropType } from "vue"
+import { onUnmounted, ref, type PropType } from "vue"
 import type { StorageAccessor } from "../../../store/createNoteStorage"
 import {
   createAudioRecorder,
@@ -42,6 +42,7 @@ import {
 } from "../../../models/recording"
 import { createWakeLocker, type WakeLocker } from "../../../models/wakeLocker"
 import type { Note } from "@/generated/backend"
+import Waveform from "./Waveform.vue"
 
 const { managedApi } = useLoadingApi()
 const { note, storageAccessor } = defineProps({
@@ -61,18 +62,12 @@ const isRecording = ref(false)
 const audioRecorder = ref<AudioRecorder>(createAudioRecorder())
 const wakeLocker = ref<WakeLocker>(createWakeLocker())
 
-const waveformCanvas = ref<HTMLCanvasElement | null>(null)
-let animationId: number | null = null
-
 const startRecording = async () => {
   errors.value = undefined
   try {
     await wakeLocker.value.request() // Request wake lock
     await audioRecorder.value.startRecording()
     isRecording.value = true
-    if (!animationId) {
-      drawWaveform()
-    }
   } catch (error) {
     console.error("Error starting recording:", error)
     errors.value = { recording: "Failed to start recording" }
@@ -82,10 +77,6 @@ const startRecording = async () => {
 
 const stopRecording = async () => {
   isRecording.value = false
-  if (animationId) {
-    cancelAnimationFrame(animationId)
-    animationId = null
-  }
   const file = audioRecorder.value.stopRecording()
   audioFile.value = file
 
@@ -124,65 +115,7 @@ const closeDialog = () => {
   emit("closeDialog")
 }
 
-function drawWaveform() {
-  if (!waveformCanvas.value) return
-
-  const canvas = waveformCanvas.value
-  const ctx = canvas.getContext("2d")
-  if (!ctx) return
-
-  const audioData = audioRecorder.value.getAudioData()
-  const dataLength = audioData.length
-  const bufferLength = 3
-  const start = dataLength > bufferLength ? dataLength - bufferLength : 0
-  const data = audioData.slice(start, dataLength)
-
-  // Shift canvas content to the left
-  ctx.drawImage(canvas, -1, 0)
-
-  // Clear the rightmost column
-  ctx.fillStyle = "#ffffff"
-  ctx.fillRect(canvas.width - 1, 0, 1, canvas.height)
-
-  // Draw new data on the right edge
-  const height = canvas.height
-
-  // Compute average of data
-  let sum = 0
-  for (let i = 0; i < data.length; i++) {
-    const channel = data[i]
-    if (!channel) continue
-    for (let j = 0; j < channel.length; j++) {
-      sum += channel[j]!
-    }
-  }
-
-  const avgSample = sum / data.length
-
-  const y = height - Math.abs(avgSample) * height
-
-  ctx.fillStyle = "#4299e1"
-  ctx.fillRect(canvas.width - 1, y, 1, height - y)
-
-  // Schedule next frame
-  animationId = requestAnimationFrame(drawWaveform)
-}
-
-onMounted(() => {
-  const canvas = waveformCanvas.value
-  if (canvas) {
-    // Set canvas dimensions to match its display size
-    const rect = canvas.getBoundingClientRect()
-    canvas.width = rect.width
-    canvas.height = rect.height
-  }
-})
-
 onUnmounted(() => {
-  if (animationId) {
-    cancelAnimationFrame(animationId)
-    animationId = null
-  }
   wakeLocker.value.release() // Ensure wake lock is released when component is unmounted
 })
 </script>
@@ -237,16 +170,6 @@ onUnmounted(() => {
   background-color: #a0aec0;
   cursor: not-allowed;
 }
-
-
-.waveform-canvas {
-  width: 100%;
-  height: 50px;
-  background-color: #e2e8f0;
-  border-radius: 8px;
-  margin-bottom: 20px;
-}
-
 
 @media (max-width: 480px) {
   .audio-tools-container {
