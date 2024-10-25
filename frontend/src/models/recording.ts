@@ -16,7 +16,7 @@ export const createAudioRecorder = (): AudioRecorder => {
     startRecording: async function (): Promise<void> {
       const audioWorkletUrl = getAudioRecordingWorkerURL()
       try {
-        audioContext = new AudioContext()
+        audioContext = new AudioContext({ sampleRate: 16000 })
 
         await audioContext.audioWorklet.addModule(audioWorkletUrl)
 
@@ -55,7 +55,7 @@ export const createAudioRecorder = (): AudioRecorder => {
         mediaStream.getTracks().forEach((track) => track.stop())
       }
 
-      const wavBlob = encodeWAV(audioData, audioContext?.sampleRate || 16000)
+      const wavBlob = encodeWAV(audioData, audioContext?.sampleRate ?? 16000)
       const fileName = `recorded_audio_${new Date().toISOString()}.wav`
       const file = new File([wavBlob], fileName, { type: "audio/wav" })
 
