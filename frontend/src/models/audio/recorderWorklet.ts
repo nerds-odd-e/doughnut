@@ -14,7 +14,7 @@ class RecorderWorkletProcessor extends AudioWorkletProcessor {
       this.totalSamples += inputData.length;
 
       // Send data to the main thread every 4096 samples
-      if (this.totalSamples >= 4096) {
+      if (this.totalSamples >= 512) {
         this.port.postMessage({ audioBuffer: this.buffer });
         this.buffer = [];
         this.totalSamples = 0;

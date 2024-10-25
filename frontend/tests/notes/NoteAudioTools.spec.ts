@@ -74,6 +74,16 @@ describe("NoteAudioTools", () => {
   const noteId = 1
 
   beforeEach(() => {
+    // Mock the canvas element
+    const mockContext = {
+      drawImage: vi.fn(),
+      fillRect: vi.fn(),
+      fillStyle: "",
+    }
+    vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(
+      mockContext as unknown as CanvasRenderingContext2D
+    )
+
     wrapper = helper
       .component(NoteAudioTools)
       .withStorageProps({

@@ -3,6 +3,7 @@ import { getAudioRecordingWorkerURL } from "./audio/recorderWorklet"
 export interface AudioRecorder {
   startRecording: () => Promise<void>
   stopRecording: () => File
+  getAudioData: () => Float32Array[]
 }
 
 export const createAudioRecorder = (): AudioRecorder => {
@@ -62,6 +63,9 @@ export const createAudioRecorder = (): AudioRecorder => {
       // Reset the audioData
       audioData = []
       return file
+    },
+    getAudioData: function (): Float32Array[] {
+      return audioData
     },
   }
 
