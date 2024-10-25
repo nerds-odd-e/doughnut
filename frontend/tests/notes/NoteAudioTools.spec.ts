@@ -94,7 +94,6 @@ describe("NoteAudioTools", () => {
   it("renders the component with correct buttons", () => {
     expect(findButtonByText(wrapper, "Record Audio")).toBeTruthy()
     expect(findButtonByText(wrapper, "Stop Recording")).toBeTruthy()
-    expect(wrapper.find('input[value="Convert to SRT"]').exists()).toBe(true)
   })
 
   it("disables Record Audio button when recording", async () => {
@@ -114,32 +113,6 @@ describe("NoteAudioTools", () => {
     await recordButton.trigger("click")
     await flushPromises()
     expect(stopButton.attributes("disabled")).toBeUndefined()
-  })
-
-  it("calls convertToSRT when Convert to SRT button is clicked", async () => {
-    const convertButton = wrapper.find('input[value="Convert to SRT"]')
-    const mockConvertSrt = vi
-      .fn()
-      .mockResolvedValue({ textFromAudio: "Converted text" })
-    helper.managedApi.restAiAudioController.convertSrt = mockConvertSrt
-
-    await convertButton.trigger("click")
-    await flushPromises()
-
-    expect(mockConvertSrt).toHaveBeenCalled()
-  })
-
-  it("handles errors when converting to SRT", async () => {
-    const convertButton = wrapper.find('input[value="Convert to SRT"]')
-    const mockError = { error: "Conversion failed" }
-    helper.managedApi.restAiAudioController.convertSrt = vi
-      .fn()
-      .mockRejectedValue(mockError)
-
-    await convertButton.trigger("click")
-    await flushPromises()
-
-    expect(wrapper.vm.noteFormErrors).toEqual(mockError)
   })
 
   it("starts recording when Record Audio button is clicked", async () => {

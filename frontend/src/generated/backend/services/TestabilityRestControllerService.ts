@@ -113,12 +113,12 @@ export class TestabilityRestControllerService {
     }
     /**
      * @param requestBody
-     * @returns string OK
+     * @returns any OK
      * @throws ApiError
      */
     public replaceServiceUrl(
         requestBody: Record<string, string>,
-    ): CancelablePromise<Record<string, string>> {
+    ): CancelablePromise<any> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/testability/replace_service_url',

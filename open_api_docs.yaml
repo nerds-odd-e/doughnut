@@ -208,12 +208,6 @@ paths:
                 type: string
         "200":
           description: OK
-          content:
-            '*/*':
-              schema:
-                type: object
-                additionalProperties:
-                  type: string
   /api/testability/randomizer:
     post:
       tags:
