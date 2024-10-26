@@ -17,6 +17,7 @@
               v-for="conversation in conversations"
               :key="conversation.id"
               class="list-group-item list-group-item-action"
+              :class="{ 'active': currentConversationId === conversation.id }"
               @click="currentConversationId = conversation.id"
             >
               <div>{{ conversationTopic(conversation) }}</div>
@@ -168,6 +169,12 @@ const conversationPartner = (conversation: Conversation) => {
   height: 120px; /* Adjust this value to make the SVG twice as big */
   margin-bottom: 20px;
   opacity: 0.5; /* This makes the SVG half-tone */
+}
+
+.list-group-item.active {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
 }
 </style>
 
