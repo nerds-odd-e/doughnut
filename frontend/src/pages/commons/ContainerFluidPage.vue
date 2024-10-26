@@ -3,7 +3,7 @@
     <h2>{{ title }}</h2>
   </TeleportToHeadStatus>
 
-  <div class="container-fluid px-0 vh-100">
+  <div class="container-fluid px-0">
     <ContentLoader v-if="!contentExists" />
     <template v-else>
       <slot />
