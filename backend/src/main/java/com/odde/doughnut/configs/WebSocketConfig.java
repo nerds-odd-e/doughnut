@@ -1,5 +1,6 @@
 package com.odde.doughnut.configs;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.handlers.AudioWebSocketHandler;
 import com.theokanning.openai.client.OpenAiApi;
@@ -22,6 +23,8 @@ public class WebSocketConfig implements WebSocketConfigurer {
   @Qualifier("testableOpenAiApi")
   private OpenAiApi openAiApi;
 
+  @Autowired private ObjectMapper objectMapper;
+
   @Override
   public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
     registry.addHandler(audioWebSocketHandler(), "/ws/audio").setAllowedOrigins("*");
@@ -29,6 +32,6 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
   @Bean
   public WebSocketHandler audioWebSocketHandler() {
-    return new AudioWebSocketHandler(openAiApi, modelFactoryService);
+    return new AudioWebSocketHandler(openAiApi, modelFactoryService, objectMapper);
   }
 }

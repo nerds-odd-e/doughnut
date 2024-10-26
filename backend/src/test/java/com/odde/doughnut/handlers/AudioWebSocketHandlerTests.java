@@ -3,6 +3,8 @@ package com.odde.doughnut.handlers;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.doughnut.controllers.dto.AudioUploadDTO;
 import com.odde.doughnut.services.ai.TextFromAudio;
 import com.odde.doughnut.services.openAiApis.OpenAiApiExtended;
 import com.odde.doughnut.testability.MakeMe;
@@ -35,10 +37,12 @@ class AudioWebSocketHandlerTests {
 
   private AudioWebSocketHandler handler;
   OpenAIChatCompletionMock openAIChatCompletionMock;
+  ObjectMapper objectMapper;
 
   @BeforeEach
   void setup() {
-    handler = new AudioWebSocketHandler(openAiApi, makeMe.modelFactoryService);
+    objectMapper = new ObjectMapper();
+    handler = new AudioWebSocketHandler(openAiApi, makeMe.modelFactoryService, objectMapper);
     when(openAiApi.createTranscriptionSrt(any(RequestBody.class)))
         .thenReturn(Single.just(ResponseBody.create("test", null)));
     TextFromAudio completionMarkdownFromAudio = new TextFromAudio();
@@ -50,8 +54,14 @@ class AudioWebSocketHandlerTests {
 
   @Test
   void handleBinaryMessage_shouldSendTextMessageWhenTextFromAudioIsPresent() throws IOException {
-    byte[] audioData = "test audio data".getBytes();
-    BinaryMessage binaryMessage = new BinaryMessage(audioData);
+    // Create a sample AudioUploadDTO
+    AudioUploadDTO audioUploadDTO = new AudioUploadDTO();
+    audioUploadDTO.setAudioData("test audio data".getBytes());
+    audioUploadDTO.setPreviousNoteDetails("Previous note details");
+
+    // Serialize the AudioUploadDTO to JSON
+    byte[] jsonBytes = objectMapper.writeValueAsBytes(audioUploadDTO);
+    BinaryMessage binaryMessage = new BinaryMessage(jsonBytes);
 
     TextFromAudio textFromAudio = new TextFromAudio();
     textFromAudio.setCompletionMarkdownFromAudio("Transcribed text");

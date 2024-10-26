@@ -3589,6 +3589,9 @@ components:
         uploadAudioFile:
           type: string
           format: binary
+        audioData:
+          type: string
+          format: byte
         previousNoteDetails:
           type: string
     TextFromAudio:
