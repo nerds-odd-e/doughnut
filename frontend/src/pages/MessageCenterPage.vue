@@ -5,7 +5,9 @@
       title: 'Message Center',
     }"
   >
-    <h2 v-if="!conversations?.length" class="info-heading">There is no feedback currently.</h2>
+    <h2 v-if="!conversations?.length" class="info-heading">
+      There is no conversation currently.
+    </h2>
 
     <template v-if="conversations?.length">
       <div class="message-center-container">
@@ -30,7 +32,10 @@
             :user="user"
             @conversation-fetched="handleConversationFetched"
           />
-          <h2 class="info-heading" v-else>No conversation selected</h2>
+          <div v-else class="no-conversation-message">
+            <SvgMessage class="large-svg-message" />
+            <h2 class="info-heading">No conversation selected</h2>
+          </div>
         </div>
       </div>
     </template>
@@ -42,6 +47,7 @@ import { onMounted, ref, type PropType } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import ContainerFluidPage from "@/pages/commons/ContainerFluidPage.vue"
 import ConversationComponent from "@/components/conversations/ConversationComponent.vue"
+import SvgMessage from "@/components/svgs/SvgMessage.vue"
 import type { Conversation, User } from "@/generated/backend"
 import { messageCenterConversations } from "@/store/messageStore"
 
@@ -93,7 +99,7 @@ const conversationPartner = (conversation: Conversation) => {
 .message-center-container {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 150px); /* Adjust this value based on your layout */
+  height: calc(100vh - 80px);
   min-height: 400px; /* Ensure a minimum height on smaller screens */
 }
 
@@ -101,6 +107,7 @@ const conversationPartner = (conversation: Conversation) => {
   flex: 0 0 auto;
   overflow-y: auto;
   max-height: 300px; /* Limit height on mobile */
+  border-right: 1px solid #e0e0e0; /* Add this line */
 }
 
 .main-content {
@@ -146,7 +153,21 @@ const conversationPartner = (conversation: Conversation) => {
   padding: 10px 20px;
   display: inline-block;
   color: #808080; /* Grayed out color */
+}
 
+.no-conversation-message {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.large-svg-message {
+  width: 120px; /* Adjust this value to make the SVG twice as big */
+  height: 120px; /* Adjust this value to make the SVG twice as big */
+  margin-bottom: 20px;
+  opacity: 0.5; /* This makes the SVG half-tone */
 }
 </style>
 

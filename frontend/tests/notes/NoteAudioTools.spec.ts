@@ -75,6 +75,7 @@ describe("NoteAudioTools", () => {
   const note = makeMe.aNote.please()
 
   beforeEach(() => {
+    vi.useFakeTimers()
     // Mock the canvas element
     const mockContext = {
       drawImage: vi.fn(),
