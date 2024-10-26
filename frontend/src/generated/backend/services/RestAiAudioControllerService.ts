@@ -18,7 +18,7 @@ export class RestAiAudioControllerService {
     ): CancelablePromise<TextFromAudio> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/notes/audio-to-text',
+            url: '/api/audio/audio-to-text',
             formData: formData,
             mediaType: 'multipart/form-data',
             errors: {

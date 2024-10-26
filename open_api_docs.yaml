@@ -1102,29 +1102,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/NoteRealm"
-  /api/notes/audio-to-text:
-    post:
-      tags:
-      - rest-ai-audio-controller
-      operationId: audioToText
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              $ref: "#/components/schemas/AudioUploadDTO"
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/TextFromAudio"
   /api/notebooks/{notebook}:
     get:
       tags:
@@ -1665,6 +1642,29 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BazaarNotebook"
+  /api/audio/audio-to-text:
+    post:
+      tags:
+      - rest-ai-audio-controller
+      operationId: audioToText
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/AudioUploadDTO"
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/TextFromAudio"
   /api/assessment/{assessmentQuestionInstance}/answer:
     post:
       tags:
@@ -3441,21 +3441,6 @@ components:
         noteId:
           type: integer
           format: int32
-    AudioUploadDTO:
-      type: object
-      properties:
-        uploadAudioFile:
-          type: string
-          format: binary
-        previousNoteDetails:
-          type: string
-    TextFromAudio:
-      required:
-      - completionMarkdownFromAudio
-      type: object
-      properties:
-        completionMarkdownFromAudio:
-          type: string
     NotebookCertificateApproval:
       required:
       - id
@@ -3598,6 +3583,21 @@ components:
           format: int32
         notebook:
           $ref: "#/components/schemas/Notebook"
+    AudioUploadDTO:
+      type: object
+      properties:
+        uploadAudioFile:
+          type: string
+          format: binary
+        previousNoteDetails:
+          type: string
+    TextFromAudio:
+      required:
+      - completionMarkdownFromAudio
+      type: object
+      properties:
+        completionMarkdownFromAudio:
+          type: string
     AssessmentAttempt:
       required:
       - id

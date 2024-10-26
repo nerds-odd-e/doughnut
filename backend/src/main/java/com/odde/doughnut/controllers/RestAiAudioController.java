@@ -17,7 +17,7 @@ import org.springframework.web.context.annotation.SessionScope;
 
 @RestController
 @SessionScope
-@RequestMapping("/api/notes")
+@RequestMapping("/api/audio")
 class RestAiAudioController {
 
   private final AiAdvisorService aiAdvisorService;

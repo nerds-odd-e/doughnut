@@ -8,7 +8,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import com.odde.doughnut.controllers.dto.*;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ai.TextFromAudio;
 import com.odde.doughnut.services.openAiApis.OpenAiApiExtended;
 import com.odde.doughnut.testability.MakeMe;
@@ -36,15 +35,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class RestAiAudioControllerTests {
   @Autowired MakeMe makeMe;
-  private UserModel userModel;
   RestAiAudioController controller;
   @Mock OpenAiApiExtended openAiApi;
   OpenAIChatCompletionMock openAIChatCompletionMock;
 
   @BeforeEach
   void setup() {
-    userModel = makeMe.aUser().toModelPlease();
-
     controller = new RestAiAudioController(openAiApi, makeMe.modelFactoryService);
     TextFromAudio completionMarkdownFromAudio = new TextFromAudio();
     completionMarkdownFromAudio.setCompletionMarkdownFromAudio("test123");
