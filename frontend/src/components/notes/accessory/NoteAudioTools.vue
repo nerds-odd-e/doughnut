@@ -61,7 +61,7 @@ const wakeLocker = createWakeLocker()
 const processAudio = async (file: Blob) => {
   try {
     const response = await managedApi.restAiAudioController.audioToText({
-      previousNoteDetails: "Lets start",
+      previousNoteDetails: note.details?.slice(-100) ?? "",
       uploadAudioFile: file,
     })
     storageAccessor
