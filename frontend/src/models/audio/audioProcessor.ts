@@ -26,92 +26,71 @@ export const createAudioProcessor = (
     return avg < SILENCE_THRESHOLD
   }
 
-  const processAndCallback = (data: Float32Array[]) => {
-    const isAllSilent = data.every((chunk) => isSilent(chunk))
-    if (!isAllSilent) {
-      const partialFile = createAudioFile(data, sampleRate, true)
-      processorCallback(partialFile)
+  const processAndCallback = async () => {
+    if (audioData.length > lastProcessedIndex) {
+      const dataToProcess = audioData.slice(lastProcessedIndex)
+      lastProcessedIndex = audioData.length
+      const isAllSilent = dataToProcess.every((chunk) => isSilent(chunk))
+      if (!isAllSilent) {
+        const partialFile = createAudioFile(dataToProcess, sampleRate, true)
+        await processorCallback(partialFile)
+      }
     }
   }
 
-  const processAudioData = (newData: Float32Array[]) => {
-    newData.forEach((chunk) => {
-      if (isSilent(chunk)) {
-        silenceCounter += chunk.length
-        if (silenceCounter >= SILENCE_DURATION_THRESHOLD) {
-          // If there's data to process before the silence, process it
-          if (audioData.length > lastProcessedIndex) {
-            const dataToProcess = audioData.slice(lastProcessedIndex)
-            processAndCallback(dataToProcess)
-            lastProcessedIndex = audioData.length
-          }
-          // Reset the timer
-          if (processorTimer) {
-            clearInterval(processorTimer)
-            start()
-          }
-          silenceCounter = 0
-        }
-      } else {
-        silenceCounter = 0
-      }
-
-      // Add the chunk to audioData (silent or not)
-      audioData.push(chunk)
-    })
-  }
-
-  const start = () => {
+  const startTimer = () => {
     processorTimer = setInterval(() => {
-      if (audioData.length > lastProcessedIndex) {
-        const newAudioData = audioData.slice(lastProcessedIndex)
-        processAndCallback(newAudioData)
-        lastProcessedIndex = audioData.length
-      }
+      processAndCallback()
     }, 60 * 1000)
   }
 
-  const stop = () => {
-    if (processorTimer) {
-      clearInterval(processorTimer)
-      processorTimer = null
-    }
-    // Process any remaining audio data
-    if (audioData.length > lastProcessedIndex) {
-      const remainingAudioData = audioData.slice(lastProcessedIndex)
-      processAndCallback(remainingAudioData)
-    }
-
-    const file = createAudioFile(audioData, sampleRate, false)
-    audioData = []
-    lastProcessedIndex = 0
-    return file
-  }
-
-  const getAudioData = () => {
-    return audioData
-  }
-
-  const flush = async (): Promise<void> => {
-    if (processorTimer) {
-      clearInterval(processorTimer)
-      processorTimer = null
-    }
-    // Process any remaining audio data
-    if (audioData.length > lastProcessedIndex) {
-      const remainingAudioData = audioData.slice(lastProcessedIndex)
-      const partialFile = createAudioFile(remainingAudioData, sampleRate, true)
-      await processorCallback(partialFile)
-      lastProcessedIndex = audioData.length
-    }
-  }
-
   return {
-    processAudioData,
-    start,
-    stop,
-    getAudioData,
-    flush,
+    processAudioData(newData: Float32Array[]) {
+      newData.forEach((chunk) => {
+        if (isSilent(chunk)) {
+          silenceCounter += chunk.length
+          if (silenceCounter >= SILENCE_DURATION_THRESHOLD) {
+            this.flush()
+            silenceCounter = 0
+          }
+        } else {
+          silenceCounter = 0
+        }
+
+        // Add the chunk to audioData (silent or not)
+        audioData.push(chunk)
+      })
+    },
+
+    start: () => {
+      startTimer()
+    },
+
+    stop() {
+      if (processorTimer) {
+        clearInterval(processorTimer)
+        processorTimer = null
+      }
+      // Process any remaining audio data
+      this.flush()
+
+      const file = createAudioFile(audioData, sampleRate, false)
+      audioData = []
+      lastProcessedIndex = 0
+      return file
+    },
+
+    getAudioData: () => {
+      return audioData
+    },
+
+    flush: async (): Promise<void> => {
+      if (processorTimer) {
+        clearInterval(processorTimer)
+        startTimer()
+      }
+      await processAndCallback()
+    },
   }
 }
 
