@@ -3,7 +3,7 @@ import { type AudioProcessor, createAudioProcessor } from "./audioProcessor"
 
 export interface AudioRecorder {
   startRecording: () => Promise<void>
-  stopRecording: () => File
+  stopRecording: () => Promise<File>
   getAudioData: () => Float32Array[]
   flush: () => Promise<void>
 }
@@ -53,7 +53,7 @@ export const createAudioRecorder = (
       }
     },
 
-    stopRecording: function (): File {
+    stopRecording: async function (): Promise<File> {
       if (workletNode) {
         workletNode.disconnect()
       }

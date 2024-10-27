@@ -2,7 +2,7 @@ export interface AudioProcessor {
   processAudioData: (newData: Float32Array[]) => void
   getAudioData: () => Float32Array[]
   start: () => void
-  stop: () => File
+  stop: () => Promise<File>
   flush: () => Promise<void> // New method
 }
 
@@ -66,13 +66,12 @@ export const createAudioProcessor = (
       startTimer()
     },
 
-    stop() {
+    async stop() {
       if (processorTimer) {
         clearInterval(processorTimer)
         processorTimer = null
       }
-      // Process any remaining audio data
-      this.flush()
+      await this.flush()
 
       const file = createAudioFile(audioData, sampleRate, false)
       audioData = []

@@ -90,7 +90,7 @@ const startRecording = async () => {
 const stopRecording = async () => {
   isRecording.value = false
   try {
-    audioFile.value = audioRecorder.stopRecording()
+    audioFile.value = await audioRecorder.stopRecording()
   } finally {
     await wakeLocker.release() // Release wake lock when recording stops
   }
