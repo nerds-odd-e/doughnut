@@ -64,7 +64,7 @@ const processAudio = async (file: Blob) => {
       previousNoteDetails: note.details?.slice(-100) ?? "",
       uploadAudioFile: file,
     })
-    storageAccessor
+    await storageAccessor
       .storedApi()
       .appendDetails(note.id, response?.completionMarkdownFromAudio)
   } catch (error) {

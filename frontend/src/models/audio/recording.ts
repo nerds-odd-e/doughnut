@@ -8,7 +8,7 @@ export interface AudioRecorder {
 }
 
 export const createAudioRecorder = (
-  processorCallback: (file: File) => void
+  processorCallback: (file: File) => Promise<void>
 ): AudioRecorder => {
   let audioContext: AudioContext | null = null
   let mediaStream: MediaStream | null = null
