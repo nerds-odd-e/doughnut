@@ -1,7 +1,7 @@
 import BazaarPage from "@/pages/BazaarPage.vue"
 import { describe, it } from "vitest"
-import makeMe from "../fixtures/makeMe"
-import helper from "../helpers"
+import makeMe from "@tests/fixtures/makeMe"
+import helper from "@tests/helpers"
 
 describe("bazaar page", () => {
   it("fetch API to be called ONCE on mount", async () => {

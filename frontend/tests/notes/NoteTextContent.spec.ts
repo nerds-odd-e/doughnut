@@ -2,8 +2,8 @@ import NoteTextContent from "@/components/notes/core/NoteTextContent.vue"
 import type { Note } from "@/generated/backend"
 import { VueWrapper, flushPromises } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"
-import makeMe from "../fixtures/makeMe"
-import helper from "../helpers"
+import makeMe from "@tests/fixtures/makeMe"
+import helper from "@tests/helpers"
 
 const mockedUpdateTopicCall = vi.fn()
 

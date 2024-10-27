@@ -7,8 +7,8 @@ import type {
 } from "@/generated/backend"
 import { CancelablePromise } from "@/generated/backend"
 import { flushPromises } from "@vue/test-utils"
-import makeMe from "../fixtures/makeMe"
-import helper from "../helpers"
+import makeMe from "@tests/fixtures/makeMe"
+import helper from "@tests/helpers"
 
 describe("NoteDetailsAutoCompletionButton", () => {
   const note = makeMe.aNote.please()

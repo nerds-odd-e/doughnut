@@ -6,8 +6,8 @@ import createNoteStorage from "@/store/createNoteStorage"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import { screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
-import makeMe from "../fixtures/makeMe"
-import helper from "../helpers"
+import makeMe from "@tests/fixtures/makeMe"
+import helper from "@tests/helpers"
 
 describe("global bar", () => {
   let noteEditingHistory: NoteEditingHistory

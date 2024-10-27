@@ -1,8 +1,8 @@
 import "vitest-fetch-mock"
-import ManagedApi from "../src/managedApi/ManagedApi"
+import ManagedApi from "@/managedApi/ManagedApi"
 import type { Router } from "vue-router"
-import createNoteStorage from "../src/store/createNoteStorage"
-import makeMe from "./fixtures/makeMe"
+import createNoteStorage from "@/store/createNoteStorage"
+import makeMe from "@tests/fixtures/makeMe"
 
 beforeEach(() => {
   fetchMock.resetMocks()

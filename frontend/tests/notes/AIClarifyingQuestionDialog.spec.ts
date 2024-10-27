@@ -1,7 +1,7 @@
 import AIClarifyingQuestionDialog from "@/components/notes/AIClarifyingQuestionDialog.vue"
 import type { ClarifyingQuestion } from "@/generated/backend"
 import { VueWrapper } from "@vue/test-utils"
-import helper from "../helpers"
+import helper from "@tests/helpers"
 
 describe("answering a clarifying question for note details geeration", () => {
   let wrapper: VueWrapper

@@ -1,7 +1,7 @@
 import Card from "@/components/notes/Card.vue"
 import { screen } from "@testing-library/vue"
-import makeMe from "../fixtures/makeMe"
-import helper from "../helpers"
+import makeMe from "@tests/fixtures/makeMe"
+import helper from "@tests/helpers"
 
 describe("A child card of a note", () => {
   it("render the card", async () => {

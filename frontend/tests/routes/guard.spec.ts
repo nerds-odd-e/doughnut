@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest"
-import routerScopeGuard from "../../src/routes/relative_routes"
+import routerScopeGuard from "@/routes/relative_routes"
 
 describe("router guards", () => {
   let guard

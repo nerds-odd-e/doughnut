@@ -1,7 +1,7 @@
-import NotebookMoveDialog from "../../src/components/notebook/NotebookMoveDialog.vue"
+import NotebookMoveDialog from "@/components/notebook/NotebookMoveDialog.vue"
 import { describe, it } from "vitest"
-import makeMe from "../fixtures/makeMe"
-import helper from "../helpers"
+import makeMe from "@tests/fixtures/makeMe"
+import helper from "@tests/helpers"
 import { screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 

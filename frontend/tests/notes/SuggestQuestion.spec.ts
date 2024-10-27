@@ -2,8 +2,8 @@ import SuggestQuestionForFineTuning from "@/components/ai/SuggestQuestionForFine
 import type { PredefinedQuestion } from "@/generated/backend"
 import { flushPromises } from "@vue/test-utils"
 import { beforeEach, describe, it } from "vitest"
-import makeMe from "../fixtures/makeMe"
-import helper from "../helpers"
+import makeMe from "@tests/fixtures/makeMe"
+import helper from "@tests/helpers"
 
 describe("SuggestQuestion", () => {
   describe("suggest question for fine tuning AI", () => {

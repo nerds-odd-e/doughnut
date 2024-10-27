@@ -1,7 +1,7 @@
 import type { Notebook } from "@/generated/backend"
 import NotebookEditDialog from "@/components/notebook/NotebookEditDialog.vue"
-import makeMe from "../../fixtures/makeMe"
-import helper from "../../helpers"
+import makeMe from "@tests/fixtures/makeMe"
+import helper from "@tests/helpers"
 
 describe("NotebookEditDialog.spec", () => {
   const notebook: Notebook = {

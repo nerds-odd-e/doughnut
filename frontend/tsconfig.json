@@ -12,10 +12,12 @@
       "vite/client",
       "vitest/globals",
       "vitest-dom/extend-expect",
-      "node"
+      "node",
+      "./tests/vitest-setup"
     ],
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@tests/*": ["tests/*"]
     },
     "allowImportingTsExtensions": true,
     "noEmit": true,
@@ -35,7 +37,8 @@
     "src/**/*.d.ts",
     "src/**/*.tsx",
     "src/**/*.vue",
-    "tests/**/*.ts"
+    "tests/**/*.ts",
+    "tests/**/*.d.ts"
   ],
   "exclude": [
     "node_modules",

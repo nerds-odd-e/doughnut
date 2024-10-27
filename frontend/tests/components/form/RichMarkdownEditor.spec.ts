@@ -1,6 +1,6 @@
 import RichMarkdownEditor from "@/components/form/RichMarkdownEditor.vue"
 import { flushPromises } from "@vue/test-utils"
-import helper from "../../helpers"
+import helper from "@tests/helpers"
 
 describe("RichMarkdownEditor", () => {
   const mountEditor = async (initialValue: string, options = {}) => {

@@ -2,8 +2,8 @@ import NoteShow from "@/components/notes/NoteShow.vue"
 import type { NoteRealm } from "@/generated/backend"
 import { screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
-import makeMe from "../fixtures/makeMe"
-import helper from "../helpers"
+import makeMe from "@tests/fixtures/makeMe"
+import helper from "@tests/helpers"
 
 describe("new/updated pink banner", () => {
   beforeAll(() => {

@@ -5,7 +5,7 @@ import { merge } from "es-toolkit"
 import type { ComponentPublicInstance, DefineComponent } from "vue"
 import type { RouteLocationRaw } from "vue-router"
 import { createRouter, createWebHistory } from "vue-router"
-import createNoteStorage from "../../src/store/createNoteStorage"
+import createNoteStorage from "@/store/createNoteStorage"
 import routes from "@/routes/routes"
 
 interface NoteStorageProps {

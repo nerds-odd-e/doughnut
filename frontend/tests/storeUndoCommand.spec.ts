@@ -1,5 +1,5 @@
-import NoteEditingHistory from "../src/store/NoteEditingHistory"
-import makeMe from "./fixtures/makeMe"
+import NoteEditingHistory from "@/store/NoteEditingHistory"
+import makeMe from "@tests/fixtures/makeMe"
 
 describe("storeUndoCommand", () => {
   const note = makeMe.aNoteRealm.topicConstructor("Dummy Title").please()

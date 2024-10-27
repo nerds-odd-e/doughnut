@@ -1,7 +1,7 @@
 import NoteCoreToolbar from "@/components/notes/core/NoteCoreToolbar.vue"
-import SvgCog from "../../src/components/svgs/SvgCog.vue"
-import makeMe from "../fixtures/makeMe"
-import helper from "../helpers"
+import SvgCog from "@/components/svgs/SvgCog.vue"
+import makeMe from "@tests/fixtures/makeMe"
+import helper from "@tests/helpers"
 
 it("displays menu items when dropdown is open", async () => {
   const noteRealm = makeMe.aNoteRealm.topicConstructor("Dummy Title").please()

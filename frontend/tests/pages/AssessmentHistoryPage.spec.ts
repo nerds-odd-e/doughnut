@@ -1,7 +1,7 @@
 import { describe, it } from "vitest"
 import AssessmentAndCertificateHistoryPage from "@/pages/AssessmentAndCertificateHistoryPage.vue"
-import helper from "../helpers"
-import makeMe from "../fixtures/makeMe"
+import helper from "@tests/helpers"
+import makeMe from "@tests/fixtures/makeMe"
 import { nextTick } from "vue"
 import type { AssessmentAttempt } from "@/generated/backend"
 

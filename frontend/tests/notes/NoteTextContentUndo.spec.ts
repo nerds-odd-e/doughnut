@@ -1,9 +1,9 @@
 import NoteTextContent from "@/components/notes/core/NoteTextContent.vue"
 import ManagedApi from "@/managedApi/ManagedApi"
 import { flushPromises } from "@vue/test-utils"
-import createNoteStorage from "../../src/store/createNoteStorage"
-import makeMe from "../fixtures/makeMe"
-import helper from "../helpers"
+import createNoteStorage from "@/store/createNoteStorage"
+import makeMe from "@tests/fixtures/makeMe"
+import helper from "@tests/helpers"
 
 describe("undo editing", () => {
   it("should call addEditingToUndoHistory on submitChange", async () => {

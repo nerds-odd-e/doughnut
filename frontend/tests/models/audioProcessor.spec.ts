@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest"
-import { createAudioProcessor } from "../../src/models/audio/audioProcessor"
+import { createAudioProcessor } from "@/models/audio/audioProcessor"
 
 describe("AudioProcessor", () => {
   beforeEach(() => {

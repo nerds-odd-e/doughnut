@@ -1,8 +1,8 @@
 import SuggestedQuestionEdit from "@/components/admin/SuggestedQuestionEdit.vue"
 import { flushPromises } from "@vue/test-utils"
 import { beforeEach, describe, expect, it } from "vitest"
-import makeMe from "../../fixtures/makeMe"
-import helper from "../../helpers"
+import makeMe from "@tests/fixtures/makeMe"
+import helper from "@tests/helpers"
 
 describe("Edit Suggested Question", () => {
   describe("suggest question for fine tuning AI", () => {

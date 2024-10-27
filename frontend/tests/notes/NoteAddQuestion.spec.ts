@@ -2,8 +2,8 @@ import NoteAddQuestion from "@/components/notes/NoteAddQuestion.vue"
 import { userEvent } from "@testing-library/user-event"
 import { screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
-import makeMe from "../fixtures/makeMe"
-import helper from "../helpers"
+import makeMe from "@tests/fixtures/makeMe"
+import helper from "@tests/helpers"
 
 const note = makeMe.aNoteRealm.please()
 const createWrapper = async () => {

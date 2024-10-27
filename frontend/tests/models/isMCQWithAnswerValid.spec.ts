@@ -1,6 +1,6 @@
 import type { PredefinedQuestion } from "@/generated/backend"
 import isMCQWithAnswerValid from "@/models/isMCQWithAnswerValid"
-import makeMe from "tests/fixtures/makeMe"
+import makeMe from "@tests/fixtures/makeMe"
 
 describe("isMCQWithAnswerValid", () => {
   it("should return true when the MCQWithAnswer is valid", () => {

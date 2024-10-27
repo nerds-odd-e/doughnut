@@ -1,7 +1,7 @@
 import BreadcrumbWithCircle from "@/components/toolbars/BreadcrumbWithCircle.vue"
 import { screen } from "@testing-library/vue"
-import makeMe from "../fixtures/makeMe"
-import helper from "../helpers"
+import makeMe from "@tests/fixtures/makeMe"
+import helper from "@tests/helpers"
 
 describe("breadcrumb with circles", () => {
   const parentNote = makeMe.aNote.topicConstructor("parent").please()

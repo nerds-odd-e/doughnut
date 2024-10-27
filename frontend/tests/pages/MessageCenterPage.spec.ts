@@ -1,7 +1,7 @@
 import MessageCenterPage from "@/pages/MessageCenterPage.vue"
 import { describe, it, expect } from "vitest"
-import helper from "../helpers"
-import makeMe from "../fixtures/makeMe"
+import helper from "@tests/helpers"
+import makeMe from "@tests/fixtures/makeMe"
 import { fireEvent } from "@testing-library/vue"
 
 describe("MessageCenterPage", () => {

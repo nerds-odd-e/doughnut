@@ -1,8 +1,8 @@
 import NoteNewDialog from "@/components/notes/NoteNewDialog.vue"
 import { VueWrapper, flushPromises } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"
-import makeMe from "../fixtures/makeMe"
-import helper from "../helpers"
+import makeMe from "@tests/fixtures/makeMe"
+import helper from "@tests/helpers"
 
 const mockedSearch = vitest.fn()
 const mockedSearchWithin = vitest.fn()

@@ -3,8 +3,8 @@ import NoteChatDialog from "@/components/notes/NoteChatDialog.vue"
 import type { Message, MessageDelta } from "@/generated/backend"
 import { VueWrapper, flushPromises } from "@vue/test-utils"
 import { beforeEach, expect } from "vitest"
-import makeMe from "../fixtures/makeMe"
-import helper from "../helpers"
+import makeMe from "@tests/fixtures/makeMe"
+import helper from "@tests/helpers"
 
 vitest.mock("@/components/commons/scrollToElement")
 

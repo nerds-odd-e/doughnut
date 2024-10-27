@@ -1,7 +1,7 @@
 import NoteInfoBar from "@/components/notes/NoteInfoBar.vue"
 import { flushPromises } from "@vue/test-utils"
-import makeMe from "../fixtures/makeMe"
-import helper from "../helpers"
+import makeMe from "@tests/fixtures/makeMe"
+import helper from "@tests/helpers"
 
 const stubResponse = {
   reviewPoint: makeMe.aReviewPoint.please(),

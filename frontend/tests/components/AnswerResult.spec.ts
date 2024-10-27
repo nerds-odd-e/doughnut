@@ -1,8 +1,8 @@
 import AnswerResult from "@/components/review/AnswerResult.vue"
 import type { AnsweredQuestion } from "@/generated/backend"
 import { flushPromises } from "@vue/test-utils"
-import makeMe from "../fixtures/makeMe"
-import helper from "../helpers"
+import makeMe from "@tests/fixtures/makeMe"
+import helper from "@tests/helpers"
 
 describe("AnswerResult", () => {
   const answeredQuestion: AnsweredQuestion = {

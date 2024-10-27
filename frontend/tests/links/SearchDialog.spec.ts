@@ -1,8 +1,8 @@
 import LinkNoteDialog from "@/components/links/LinkNoteDialog.vue"
 import { screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
-import MakeMe from "../fixtures/makeMe"
-import helper from "../helpers"
+import MakeMe from "@tests/fixtures/makeMe"
+import helper from "@tests/helpers"
 
 describe("LinkNoteDialog", () => {
   it("Search at the top level with no note", async () => {

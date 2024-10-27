@@ -1,8 +1,8 @@
 import { flushPromises } from "@vue/test-utils"
 import NoteAudioTools from "@/components/notes/accessory/NoteAudioTools.vue"
-import helper from "../helpers"
+import helper from "@tests/helpers"
 import { vi } from "vitest"
-import makeMe from "tests/fixtures/makeMe"
+import makeMe from "@tests/fixtures/makeMe"
 
 const mockMediaStreamSource = {
   connect: vi.fn(),

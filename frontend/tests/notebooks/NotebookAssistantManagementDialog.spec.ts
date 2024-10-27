@@ -1,8 +1,8 @@
 import { flushPromises } from "@vue/test-utils"
 import { saveAs } from "file-saver"
 import NotebookAssistantManagementDialog from "@/components/notebook/NotebookAssistantManagementDialog.vue"
-import makeMe from "tests/fixtures/makeMe"
-import helper from "../helpers"
+import makeMe from "@tests/fixtures/makeMe"
+import helper from "@tests/helpers"
 
 vitest.mock("file-saver", () => ({ saveAs: vitest.fn() }))
 

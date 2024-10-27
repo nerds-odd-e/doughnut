@@ -2,8 +2,8 @@ import NoteTopicComponent from "@/components/notes/core/NoteTopicComponent.vue"
 import type { Note } from "@/generated/backend"
 import { VueWrapper } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"
-import makeMe from "../fixtures/makeMe"
-import helper from "../helpers"
+import makeMe from "@tests/fixtures/makeMe"
+import helper from "@tests/helpers"
 
 describe("note topic", () => {
   const mountComponent = (n: Note): VueWrapper<ComponentPublicInstance> => {

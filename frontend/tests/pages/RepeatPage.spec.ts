@@ -3,10 +3,10 @@ import RepeatPage from "@/pages/RepeatPage.vue"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { useRouter } from "vue-router"
-import makeMe from "../fixtures/makeMe"
-import helper from "../helpers"
-import RenderingHelper from "../helpers/RenderingHelper"
-import mockBrowserTimeZone from "../helpers/mockBrowserTimeZone"
+import makeMe from "@tests/fixtures/makeMe"
+import helper from "@tests/helpers"
+import RenderingHelper from "@tests/helpers/RenderingHelper"
+import mockBrowserTimeZone from "@tests/helpers/mockBrowserTimeZone"
 
 vitest.mock("vue-router", () => ({
   useRouter: () => ({

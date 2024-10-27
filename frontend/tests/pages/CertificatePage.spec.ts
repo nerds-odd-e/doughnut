@@ -1,7 +1,7 @@
 import NotebooksPage from "@/pages/NotebooksPage.vue"
 import { describe, it } from "vitest"
-import makeMe from "../fixtures/makeMe"
-import helper from "../helpers"
+import makeMe from "@tests/fixtures/makeMe"
+import helper from "@tests/helpers"
 
 describe("Notebooks Page", () => {
   it("fetch API to be called ONCE", async () => {

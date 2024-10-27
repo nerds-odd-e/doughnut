@@ -1,8 +1,8 @@
 import AIGenerateImageDialog from "@/components/notes/AIGenerateImageDialog.vue"
 import { flushPromises } from "@vue/test-utils"
 import { expect } from "vitest"
-import makeMe from "../fixtures/makeMe"
-import helper from "../helpers"
+import makeMe from "@tests/fixtures/makeMe"
+import helper from "@tests/helpers"
 
 const createWrapper = async () => {
   const note = makeMe.aNoteRealm.please()

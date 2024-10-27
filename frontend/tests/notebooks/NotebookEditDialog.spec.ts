@@ -1,6 +1,6 @@
-import makeMe from "tests/fixtures/makeMe"
-import helper from "../helpers"
-import NotebookEditDialog from "../../src/components/notebook/NotebookEditDialog.vue"
+import makeMe from "@tests/fixtures/makeMe"
+import helper from "@tests/helpers"
+import NotebookEditDialog from "@/components/notebook/NotebookEditDialog.vue"
 
 describe("NoteBookEditDialog.vue", () => {
   it("shows the current number of questions in assessment if set", () => {

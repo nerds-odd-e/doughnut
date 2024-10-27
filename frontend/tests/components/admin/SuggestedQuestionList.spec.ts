@@ -1,9 +1,9 @@
 import SuggestedQuestionList from "@/components/admin/SuggestedQuestionList.vue"
 import { flushPromises } from "@vue/test-utils"
 import { describe, expect, it } from "vitest"
-import usePopups from "../../../src/components/commons/Popups/usePopups"
-import makeMe from "../../fixtures/makeMe"
-import helper, { matchByText } from "../../helpers"
+import usePopups from "@/components/commons/Popups/usePopups"
+import makeMe from "@tests/fixtures/makeMe"
+import helper, { matchByText } from "@tests/helpers"
 
 describe("Edit Suggested Question", () => {
   describe("suggest question for fine tuning AI", () => {

@@ -1,8 +1,8 @@
 import { screen } from "@testing-library/vue"
 import { describe, it } from "vitest"
 import AssessmentPage from "@/pages/AssessmentPage.vue"
-import helper from "../helpers"
-import makeMe from "../fixtures/makeMe"
+import helper from "@tests/helpers"
+import makeMe from "@tests/fixtures/makeMe"
 import { flushPromises } from "@vue/test-utils"
 import type { AssessmentQuestionInstance } from "@/generated/backend"
 
