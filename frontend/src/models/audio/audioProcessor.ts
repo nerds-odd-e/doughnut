@@ -3,11 +3,12 @@ export interface AudioProcessor {
   getAudioData: () => Float32Array[]
   start: () => void
   stop: () => File
+  flush: () => Promise<void> // New method
 }
 
 export const createAudioProcessor = (
   sampleRate: number,
-  processorCallback: (file: File) => void
+  processorCallback: (file: File) => Promise<void>
 ): AudioProcessor => {
   let audioData: Float32Array[] = []
   let lastProcessedIndex = 0
@@ -91,11 +92,26 @@ export const createAudioProcessor = (
     return audioData
   }
 
+  const flush = async (): Promise<void> => {
+    if (processorTimer) {
+      clearInterval(processorTimer)
+      processorTimer = null
+    }
+    // Process any remaining audio data
+    if (audioData.length > lastProcessedIndex) {
+      const remainingAudioData = audioData.slice(lastProcessedIndex)
+      const partialFile = createAudioFile(remainingAudioData, sampleRate, true)
+      await processorCallback(partialFile)
+      lastProcessedIndex = audioData.length
+    }
+  }
+
   return {
     processAudioData,
     start,
     stop,
     getAudioData,
+    flush,
   }
 }
 

@@ -104,4 +104,39 @@ describe("AudioProcessor", () => {
 
     processor.stop()
   })
+
+  it("should flush remaining data and call processorCallback", async () => {
+    const mockCallback = vi.fn().mockResolvedValue(undefined)
+    const processor = createAudioProcessor(44100, mockCallback)
+
+    const nonSilentData = [new Float32Array([0.5, 0.4, 0.3, 0.2, 0.1])]
+    processor.processAudioData(nonSilentData)
+    processor.start()
+
+    // Fast-forward less than a minute
+    vi.advanceTimersByTime(30 * 1000)
+
+    await processor.flush()
+
+    expect(mockCallback).toHaveBeenCalledTimes(1)
+    const callArgument = mockCallback.mock.calls[0]?.[0]
+    expect(callArgument).toBeInstanceOf(File)
+    expect(callArgument.name).toMatch(/^recorded_audio_partial_.*\.wav$/)
+  })
+
+  it("should not call processorCallback on flush if no new data", async () => {
+    const mockCallback = vi.fn().mockResolvedValue(undefined)
+    const processor = createAudioProcessor(44100, mockCallback)
+
+    processor.start()
+
+    // Fast-forward more than a minute
+    vi.advanceTimersByTime(65 * 1000)
+
+    mockCallback.mockClear()
+
+    await processor.flush()
+
+    expect(mockCallback).not.toHaveBeenCalled()
+  })
 })

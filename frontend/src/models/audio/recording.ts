@@ -5,6 +5,7 @@ export interface AudioRecorder {
   startRecording: () => Promise<void>
   stopRecording: () => File
   getAudioData: () => Float32Array[]
+  flush: () => Promise<void>
 }
 
 export const createAudioRecorder = (
@@ -68,6 +69,10 @@ export const createAudioRecorder = (
 
     getAudioData: function (): Float32Array[] {
       return audioProcessor.getAudioData()
+    },
+
+    flush: async function (): Promise<void> {
+      await audioProcessor.flush()
     },
   }
 
