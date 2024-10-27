@@ -264,4 +264,38 @@ describe("NoteAudioTools", () => {
     expect(mockMediaStreamSource.disconnect).toHaveBeenCalled()
     expect(wrapper.emitted().closeDialog).toBeTruthy()
   })
+
+  it("renders Flush Audio button", () => {
+    expect(findButtonByTitle(wrapper, "Flush Audio")).toBeTruthy()
+  })
+
+  it("disables Flush Audio button when not recording", () => {
+    const flushButton = findButtonByTitle(wrapper, "Flush Audio")
+    expect(flushButton.attributes("disabled")).toBeDefined()
+  })
+
+  it("enables Flush Audio button when recording", async () => {
+    const recordButton = findButtonByTitle(wrapper, "Record Audio")
+    const flushButton = findButtonByTitle(wrapper, "Flush Audio")
+
+    expect(flushButton.attributes("disabled")).toBeDefined()
+
+    await recordButton.trigger("click")
+    await flushPromises()
+    expect(flushButton.attributes("disabled")).toBeUndefined()
+  })
+
+  it("calls audioRecorder.flush when Flush Audio button is clicked", async () => {
+    const mockFlush = vi.fn()
+    wrapper.vm.audioRecorder.flush = mockFlush
+
+    // Start recording
+    await findButtonByTitle(wrapper, "Record Audio").trigger("click")
+    await flushPromises()
+
+    const flushButton = findButtonByTitle(wrapper, "Flush Audio")
+    await flushButton.trigger("click")
+
+    expect(mockFlush).toHaveBeenCalled()
+  })
 })

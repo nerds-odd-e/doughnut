@@ -13,6 +13,11 @@
           <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
         </svg>
       </button>
+      <button class="btn" @click="flushAudio" :disabled="!isRecording" title="Flush Audio">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+        </svg>
+      </button>
       <button class="btn" @click="stopRecording" :disabled="!isRecording" title="Stop Recording">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
           <path d="M6 6h12v12H6z"/>
@@ -114,6 +119,12 @@ const closeDialog = () => {
     stopRecording()
   }
   emit("closeDialog")
+}
+
+const flushAudio = async () => {
+  if (isRecording.value) {
+    await audioRecorder.flush()
+  }
 }
 
 onUnmounted(() => {
