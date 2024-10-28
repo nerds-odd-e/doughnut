@@ -4,7 +4,7 @@
       <div v-if="messageCenterConversations.unreadConversations.length !== 0" class="unread-count">
         {{ messageCenterConversations.unreadConversations.length }}
       </div>
-      <SvgMessage />
+      <SvgChat />
     </div>
   </router-link>
 </template>

@@ -1,7 +1,7 @@
 <template>
   <PopButton :title="`Send message about note top bazaar`">
     <template #button_face>
-      <SvgMessage />
+      <SvgChat />
     </template>
     <template #default="{ closer }">
       <NoteSendMessageDialog
@@ -17,7 +17,7 @@
 import { defineProps } from "vue"
 import PopButton from "../../commons/Popups/PopButton.vue"
 import NoteSendMessageDialog from "../NoteSendMessageDialog.vue"
-import SvgMessage from "../../svgs/SvgMessage.vue" // Make sure to import SvgMessage
+import SvgChat from "../../svgs/SvgChat.vue"
 
 defineProps<{
   noteId: number

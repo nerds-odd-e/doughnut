@@ -35,7 +35,7 @@
             @conversation-fetched="handleConversationFetched"
           />
           <div v-else class="no-conversation-message">
-            <SvgMessage class="large-svg-message" />
+            <SvgChat class="large-svg-message" />
             <h2 class="info-heading">No conversation selected</h2>
           </div>
         </div>
@@ -49,7 +49,7 @@ import { onMounted, ref, type PropType } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import ContainerFluidPage from "@/pages/commons/ContainerFluidPage.vue"
 import ConversationComponent from "@/components/conversations/ConversationComponent.vue"
-import SvgMessage from "@/components/svgs/SvgMessage.vue"
+import SvgChat from "@/components/svgs/SvgChat.vue"
 import type { Conversation, User } from "@/generated/backend"
 import { messageCenterConversations } from "@/store/messageStore"
 import type { StorageAccessor } from "@/store/createNoteStorage"
