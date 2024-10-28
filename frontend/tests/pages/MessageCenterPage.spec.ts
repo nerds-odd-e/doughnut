@@ -8,7 +8,11 @@ describe("MessageCenterPage", () => {
   it("fetch API to be called ONCE on mount", async () => {
     helper.managedApi.restConversationMessageController.getConversationsOfCurrentUser =
       vi.fn().mockResolvedValue([])
-    helper.component(MessageCenterPage).withRouter().render()
+    helper
+      .component(MessageCenterPage)
+      .withRouter()
+      .withStorageProps({})
+      .render()
     expect(
       helper.managedApi.restConversationMessageController
         .getConversationsOfCurrentUser
@@ -22,6 +26,7 @@ describe("MessageCenterPage", () => {
     const { findByText } = helper
       .component(MessageCenterPage)
       .withRouter()
+      .withStorageProps({})
       .render()
     await findByText("No conversation selected")
   })
@@ -37,6 +42,7 @@ describe("MessageCenterPage", () => {
     const { findAllByRole } = helper
       .component(MessageCenterPage)
       .withRouter()
+      .withStorageProps({})
       .render()
 
     const listItems = await findAllByRole("listitem")
