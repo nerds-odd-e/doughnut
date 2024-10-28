@@ -1,6 +1,7 @@
 <template>
-  <ContainerFluidPage
+  <ContainerPage
     v-bind="{
+      fluid: true,
       contentExists: true,
       title: 'Message Center',
     }"
@@ -41,13 +42,13 @@
         </div>
       </div>
     </template>
-  </ContainerFluidPage>
+  </ContainerPage>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref, type PropType } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import ContainerFluidPage from "@/pages/commons/ContainerFluidPage.vue"
+import ContainerPage from "@/pages/commons/ContainerPage.vue"
 import ConversationComponent from "@/components/conversations/ConversationComponent.vue"
 import SvgChat from "@/components/svgs/SvgChat.vue"
 import type { Conversation, User } from "@/generated/backend"
