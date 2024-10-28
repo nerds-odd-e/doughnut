@@ -31,6 +31,7 @@
             v-if="currentConversation && user"
             :conversation="currentConversation"
             :user="user"
+            :storageAccessor="storageAccessor"
             @conversation-fetched="handleConversationFetched"
           />
           <div v-else class="no-conversation-message">
@@ -51,11 +52,16 @@ import ConversationComponent from "@/components/conversations/ConversationCompon
 import SvgMessage from "@/components/svgs/SvgMessage.vue"
 import type { Conversation, User } from "@/generated/backend"
 import { messageCenterConversations } from "@/store/messageStore"
+import type { StorageAccessor } from "@/store/createNoteStorage"
 
 const { managedApi } = useLoadingApi()
 
 const { user } = defineProps({
   user: { type: Object as PropType<User> },
+  storageAccessor: {
+    type: Object as PropType<StorageAccessor>,
+    required: true,
+  },
 })
 
 const conversations = ref<Conversation[] | undefined>(undefined)

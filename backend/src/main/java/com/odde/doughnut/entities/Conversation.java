@@ -39,12 +39,14 @@ public class Conversation extends EntityIdentifiedByIdOnly {
   @OrderBy("updatedAt DESC")
   private Timestamp updatedAt = new Timestamp(new Date().getTime());
 
+  @JsonIgnore
   public void setAssessmentQuestionInstance(AssessmentQuestionInstance assessmentQuestionInstance) {
     this.subject.setAssessmentQuestionInstance(assessmentQuestionInstance);
     this.subjectOwnership =
         assessmentQuestionInstance.getAssessmentAttempt().getNotebook().getOwnership();
   }
 
+  @JsonIgnore
   public void setNote(Note note) {
     this.subject.setNote(note);
     this.subjectOwnership = note.getNotebook().getOwnership();

@@ -1,39 +1,50 @@
 <template>
-  <div class="px-3 py-3 conversations" v-if="currentConversationMessages">
-    <div
-      v-for="conversationMessage in currentConversationMessages"
-      :key="conversationMessage.id"
-      class="d-flex mb-3"
-      :class="{ 'justify-content-end': isCurrentUser(conversationMessage.sender?.id || 0) }"
-    >
-      <div
-        class="card py-2 px-3"
-        :class="[
-          isCurrentUser(conversationMessage.sender?.id || 0) ? 'text-bg-dark' : 'bg-light',
-          conversationMessage.sender?.id === undefined ? 'ai-chat' : '',
-        ]"
-      >
-        <template v-if="conversationMessage.sender?.id === undefined">
-          <SvgRobot />
-        </template>
-        {{ formatMessage(conversationMessage.message) }}
-      </div>
+  <div class="conversation-container">
+    <!-- Upper half -->
+    <div class="subject-container">
+      <NoteShow v-if="conversation.subject?.note?.id" :noteId="conversation.subject?.note?.id" :storageAccessor="storageAccessor" :expandChildren="false" />
+      <AssessmentQuestion v-else-if="conversation.subject?.assessmentQuestionInstance" :assessmentQuestionInstance="conversation.subject?.assessmentQuestionInstance" />
     </div>
 
-    <div class="chat-controls">
-      <form class="row chat-input-container" @submit.prevent="handleSendMessage()">
-        <div class="col-md-10">
-          <textarea class="w-100" name="Description" v-model="message" />
+    <!-- Lower half -->
+    <div class="conversation-messages">
+      <div class="messages-container" v-if="currentConversationMessages">
+        <div
+          v-for="conversationMessage in currentConversationMessages"
+          :key="conversationMessage.id"
+          class="d-flex mb-3"
+          :class="{ 'justify-content-end': isCurrentUser(conversationMessage.sender?.id || 0) }"
+        >
+          <div
+            class="card py-2 px-3"
+            :class="[
+              isCurrentUser(conversationMessage.sender?.id || 0) ? 'text-bg-dark' : 'bg-light',
+              conversationMessage.sender?.id === undefined ? 'ai-chat' : '',
+            ]"
+          >
+            <template v-if="conversationMessage.sender?.id === undefined">
+              <SvgRobot />
+            </template>
+            {{ formatMessage(conversationMessage.message) }}
+          </div>
         </div>
-        <div class="col-md-1">
-          <input
-            type="submit"
-            value="Send"
-            id="chat-button"
-            class="btn float-btn btn-secondary"
-          />
-        </div>
-      </form>
+      </div>
+
+      <div class="chat-controls">
+        <form class="row chat-input-container" @submit.prevent="handleSendMessage()">
+          <div class="col-md-10">
+            <textarea class="w-100" name="Description" v-model="message" />
+          </div>
+          <div class="col-md-1">
+            <input
+              type="submit"
+              value="Send"
+              id="chat-button"
+              class="btn float-btn btn-secondary"
+            />
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 </template>
@@ -47,10 +58,14 @@ import type {
   Conversation,
 } from "@/generated/backend"
 import SvgRobot from "@/components/svgs/SvgRobot.vue"
+import NoteShow from "@/components/notes/NoteShow.vue"
+import AssessmentQuestion from "@/components/assessment/AssessmentQuestion.vue"
+import type { StorageAccessor } from "@/store/createNoteStorage"
 
 const props = defineProps<{
   conversation: Conversation
   user: User
+  storageAccessor: StorageAccessor
 }>()
 
 const emit = defineEmits<{
@@ -97,21 +112,44 @@ watch(() => props.conversation, fetchConversationMessages)
 </script>
 
 <style scoped>
-.conversations {
-  margin-bottom: 100px;
+.conversation-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
-.ai-chat {
-  color: red;
+.subject-container {
+  height: 50%;
+  overflow-y: auto;
+  border-bottom: 1px solid #dee2e6;
+  padding: 1rem;
+}
+
+.conversation-messages {
+  height: 50%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.messages-container {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  margin-bottom: 80px; /* Space for chat controls */
 }
 
 .chat-controls {
-  position: fixed;
-  width: 75%;
+  position: absolute;
   bottom: 0;
+  left: 0;
   right: 0;
   background-color: white;
   box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
   padding: 10px;
+}
+
+.ai-chat {
+  color: red;
 }
 </style>

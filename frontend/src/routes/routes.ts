@@ -90,7 +90,7 @@ const routes = [
     name: "messageCenter",
     component: MessageCenterPage,
     props: true,
-    meta: { userProp: true },
+    meta: { userProp: true, useNoteStorageAccessor: true },
   },
   {
     path: "/d/assessment/notebook/:notebookId",
