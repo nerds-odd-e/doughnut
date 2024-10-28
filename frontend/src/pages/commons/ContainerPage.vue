@@ -1,6 +1,6 @@
 <template>
   <TeleportToHeadStatus v-if="title">
-    <h2>{{ title }}</h2>
+    <h2 class="fs-4">{{ title }}</h2>
   </TeleportToHeadStatus>
 
   <div :class="containerClass">

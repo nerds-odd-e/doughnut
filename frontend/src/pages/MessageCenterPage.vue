@@ -12,14 +12,14 @@
 
     <template v-if="conversations?.length">
       <div class="message-center-container">
-        <div class="sidebar">
+        <div class="sidebar" v-show="showSidebarOnMobile">
           <ul class="list-group">
             <li
               v-for="conversation in conversations"
               :key="conversation.id"
               class="list-group-item list-group-item-action"
               :class="{ 'active': currentConversation?.id === conversation.id }"
-              @click="currentConversation = conversation"
+              @click="selectConversation(conversation)"
             >
               <div>{{ conversationTopic(conversation) }}</div>
               <div>{{ conversationPartner(conversation) }}</div>
@@ -27,7 +27,10 @@
           </ul>
         </div>
 
-        <div class="main-content">
+        <div class="main-content" v-show="showMainContentOnMobile">
+          <div class="mobile-back-button" @click="backToList">
+            <span>&larr; Back to conversations</span>
+          </div>
           <ConversationComponent
             v-if="currentConversation && user"
             :conversation="currentConversation"
@@ -46,7 +49,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, type PropType } from "vue"
+import { onMounted, ref, computed, type PropType } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
 import ConversationComponent from "@/components/conversations/ConversationComponent.vue"
@@ -100,6 +103,17 @@ const conversationPartner = (conversation: Conversation) => {
     return conversation.subjectOwnership.circle.name
   }
   return conversation.subjectOwnership?.ownerName
+}
+
+const showSidebarOnMobile = computed(() => !currentConversation.value)
+const showMainContentOnMobile = computed(() => currentConversation.value)
+
+const selectConversation = (conversation: Conversation) => {
+  currentConversation.value = conversation
+}
+
+const backToList = () => {
+  currentConversation.value = null
 }
 </script>
 
@@ -182,6 +196,29 @@ const conversationPartner = (conversation: Conversation) => {
   background-color: #007bff;
   color: white;
   border-color: #007bff;
+}
+
+.mobile-back-button {
+  display: none;
+  padding: 10px;
+  cursor: pointer;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.mobile-back-button:hover {
+  background-color: #e9ecef;
+}
+
+@media (max-width: 767px) {
+  .mobile-back-button {
+    display: block;
+  }
+
+  .sidebar, .main-content {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
 }
 </style>
 
