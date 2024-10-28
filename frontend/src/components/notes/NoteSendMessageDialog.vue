@@ -1,9 +1,9 @@
 <template>
     <div>
-      <h2>Send message to bazaar</h2>
+      <h2>Start a conversation about this note</h2>
       <p>
         <i>
-          Let's discuss about this note!
+          To talk with AI and/or other people who have access to this note.
         </i>
       </p>
       <TextArea
