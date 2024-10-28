@@ -17,8 +17,8 @@
               v-for="conversation in conversations"
               :key="conversation.id"
               class="list-group-item list-group-item-action"
-              :class="{ 'active': currentConversationId === conversation.id }"
-              @click="currentConversationId = conversation.id"
+              :class="{ 'active': currentConversation?.id === conversation.id }"
+              @click="currentConversation = conversation"
             >
               <div>{{ conversationTopic(conversation) }}</div>
               <div>{{ conversationPartner(conversation) }}</div>
@@ -28,8 +28,8 @@
 
         <div class="main-content">
           <ConversationComponent
-            v-if="currentConversationId && user"
-            :conversation-id="currentConversationId"
+            v-if="currentConversation && user"
+            :conversation="currentConversation"
             :user="user"
             @conversation-fetched="handleConversationFetched"
           />
@@ -59,7 +59,7 @@ const { user } = defineProps({
 })
 
 const conversations = ref<Conversation[] | undefined>(undefined)
-const currentConversationId = ref<number | null>(null)
+const currentConversation = ref<Conversation | null>(null)
 
 const fetchData = async () => {
   conversations.value =

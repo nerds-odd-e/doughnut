@@ -41,11 +41,15 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import type { User, ConversationMessage } from "@/generated/backend"
+import type {
+  User,
+  ConversationMessage,
+  Conversation,
+} from "@/generated/backend"
 import SvgRobot from "@/components/svgs/SvgRobot.vue"
 
 const props = defineProps<{
-  conversationId: number
+  conversation: Conversation
   user: User
 }>()
 
@@ -71,14 +75,14 @@ const isCurrentUser = (id: number): boolean => {
 const fetchConversationMessages = async () => {
   currentConversationMessages.value =
     await managedApi.restConversationMessageController.getConversationMessages(
-      props.conversationId
+      props.conversation.id
     )
-  emit("conversation-fetched", props.conversationId)
+  emit("conversation-fetched", props.conversation.id)
 }
 
 const handleSendMessage = async () => {
   await managedApi.restConversationMessageController.replyToConversation(
-    props.conversationId,
+    props.conversation.id,
     message.value
   )
   message.value = ""
@@ -89,7 +93,7 @@ onMounted(() => {
   fetchConversationMessages()
 })
 
-watch(() => props.conversationId, fetchConversationMessages)
+watch(() => props.conversation, fetchConversationMessages)
 </script>
 
 <style scoped>
