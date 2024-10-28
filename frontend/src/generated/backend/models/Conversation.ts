@@ -3,16 +3,18 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { AssessmentQuestionInstance } from './AssessmentQuestionInstance';
+import type { ConversationSubject } from './ConversationSubject';
 import type { Note } from './Note';
 import type { Ownership } from './Ownership';
 import type { User } from './User';
 export type Conversation = {
     id: number;
-    assessmentQuestionInstance?: AssessmentQuestionInstance;
-    note?: Note;
+    subject?: ConversationSubject;
     subjectOwnership?: Ownership;
     conversationInitiator?: User;
     createdAt: string;
     updatedAt: string;
+    assessmentQuestionInstance?: AssessmentQuestionInstance;
+    note?: Note;
 };
 

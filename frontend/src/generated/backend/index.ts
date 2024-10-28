@@ -36,6 +36,7 @@ export type { CodeInterpreterResources } from './models/CodeInterpreterResources
 export type { CodeInterpreterTool } from './models/CodeInterpreterTool';
 export type { Conversation } from './models/Conversation';
 export type { ConversationMessage } from './models/ConversationMessage';
+export type { ConversationSubject } from './models/ConversationSubject';
 export type { CurrentUserInfo } from './models/CurrentUserInfo';
 export type { Delta } from './models/Delta';
 export type { DeltaContent } from './models/DeltaContent';

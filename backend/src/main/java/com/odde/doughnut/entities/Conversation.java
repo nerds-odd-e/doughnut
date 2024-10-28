@@ -18,13 +18,7 @@ public class Conversation extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   List<ConversationMessage> conversationMessages = new ArrayList<>();
 
-  @ManyToOne
-  @JoinColumn(name = "assessment_question_instance_id", referencedColumnName = "id")
-  AssessmentQuestionInstance assessmentQuestionInstance;
-
-  @ManyToOne
-  @JoinColumn(name = "note_id", referencedColumnName = "id")
-  Note note;
+  @Embedded private ConversationSubject subject = new ConversationSubject();
 
   @ManyToOne
   @JoinColumn(name = "subject_ownership_id", referencedColumnName = "id")
@@ -46,13 +40,13 @@ public class Conversation extends EntityIdentifiedByIdOnly {
   private Timestamp updatedAt = new Timestamp(new Date().getTime());
 
   public void setAssessmentQuestionInstance(AssessmentQuestionInstance assessmentQuestionInstance) {
-    this.assessmentQuestionInstance = assessmentQuestionInstance;
+    this.subject.setAssessmentQuestionInstance(assessmentQuestionInstance);
     this.subjectOwnership =
         assessmentQuestionInstance.getAssessmentAttempt().getNotebook().getOwnership();
   }
 
   public void setNote(Note note) {
-    this.note = note;
+    this.subject.setNote(note);
     this.subjectOwnership = note.getNotebook().getOwnership();
   }
 }

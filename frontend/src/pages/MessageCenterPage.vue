@@ -79,9 +79,9 @@ onMounted(() => {
 
 const conversationTopic = (conversation: Conversation) => {
   return (
-    conversation.assessmentQuestionInstance?.bareQuestion
+    conversation.subject?.assessmentQuestionInstance?.bareQuestion
       .multipleChoicesQuestion.stem ||
-    conversation.note?.noteTopic?.topicConstructor
+    conversation.subject?.note?.noteTopic?.topicConstructor
   )
 }
 

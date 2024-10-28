@@ -3505,10 +3505,8 @@ components:
         id:
           type: integer
           format: int32
-        assessmentQuestionInstance:
-          $ref: "#/components/schemas/AssessmentQuestionInstance"
-        note:
-          $ref: "#/components/schemas/Note"
+        subject:
+          $ref: "#/components/schemas/ConversationSubject"
         subjectOwnership:
           $ref: "#/components/schemas/Ownership"
         conversationInitiator:
@@ -3519,6 +3517,10 @@ components:
         updatedAt:
           type: string
           format: date-time
+        assessmentQuestionInstance:
+          $ref: "#/components/schemas/AssessmentQuestionInstance"
+        note:
+          $ref: "#/components/schemas/Note"
     ConversationMessage:
       required:
       - createdAt
@@ -3541,6 +3543,13 @@ components:
         createdAt:
           type: string
           format: date-time
+    ConversationSubject:
+      type: object
+      properties:
+        assessmentQuestionInstance:
+          $ref: "#/components/schemas/AssessmentQuestionInstance"
+        note:
+          $ref: "#/components/schemas/Note"
     CircleJoiningByInvitation:
       required:
       - invitationCode

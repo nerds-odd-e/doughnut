@@ -13,7 +13,7 @@ public class ConversationBuilder extends EntityBuilder<Conversation> {
 
   @Override
   protected void beforeCreate(boolean needPersist) {
-    if (entity.getAssessmentQuestionInstance() == null) {
+    if (entity.getSubject().isEmpty()) {
       User assessmentOwner = makeMe.aUser().please(needPersist);
       AssessmentQuestionInstance instance =
           makeMe
