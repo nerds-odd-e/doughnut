@@ -4,8 +4,8 @@ export const assumeMessageCenterPage = () => {
   cy.findByText('Message Center').should('be.visible')
 
   return {
-    expectConversation(topic: string, partner: string) {
-      cy.findByText(topic).should('be.visible')
+    expectConversation(subject: string, partner: string) {
+      cy.findByText(subject).should('be.visible')
       cy.findByText(partner).should('be.visible')
       return this
     },
@@ -23,8 +23,8 @@ export const assumeMessageCenterPage = () => {
         .and('not.have.class', 'justify-content-end')
       return this
     },
-    conversation(conversationTopic: string) {
-      cy.findByText(conversationTopic).parent().should('be.visible').click()
+    conversation(conversationSubject: string) {
+      cy.findByText(conversationSubject).parent().should('be.visible').click()
       return {
         expectMessage(message: string) {
           cy.findByText(message).should('be.visible')

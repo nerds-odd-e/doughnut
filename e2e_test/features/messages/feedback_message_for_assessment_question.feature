@@ -1,6 +1,6 @@
 Feature: Learner gives feedback on an assessment question
     As a learner, I want to provide feedback on an assessment question,
-    so that trainers can improve the content and I can learn more about the topic.
+    so that trainers can improve the content and I can learn more about the subject.
 
   Background:
     Given I am logged in as "old_learner"
@@ -9,10 +9,10 @@ Feature: Learner gives feedback on an assessment question
     And I answer the question wrongly and submit feedback saying 'I believe the question is incorrect'
 
   Scenario: Both sender and receiver can see the feedback message
-    Then "a_trainer" can see the conversation with "Old Learner" for the topic "Is 0 * 0 = 0?" in the message center:
+    Then "a_trainer" can see the conversation with "Old Learner" for the subject "Is 0 * 0 = 0?" in the message center:
       | message                             |
       | I believe the question is incorrect |
-    Then "old_learner" can see the conversation with "A Trainer" for the topic "Is 0 * 0 = 0?" in the message center:
+    Then "old_learner" can see the conversation with "A Trainer" for the subject "Is 0 * 0 = 0?" in the message center:
       | message                             |
       | I believe the question is incorrect |
 

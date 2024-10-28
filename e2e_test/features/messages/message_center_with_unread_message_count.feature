@@ -17,12 +17,12 @@ Feature: Message Center with Unread Message Count
 
   Scenario: The message is read by the receiver
     Given I am re-logged in as "a_trainer" and reload the page
-    When I read the conversation with "Old Learner" for the topic "Rocket Science" in the message center
+    When I read the conversation with "Old Learner" for the subject "Rocket Science" in the message center
     Then I should have no unread messages
 
   Scenario: An already read message is read again
     Given I am re-logged in as "old_learner" and reload the page
-    When I read the conversation with "A Trainer" for the topic "Rocket Science" in the message center
+    When I read the conversation with "A Trainer" for the subject "Rocket Science" in the message center
     Then I should have no unread messages
 
   Scenario: Any user in a circle read the message count as read for all circle members
@@ -31,5 +31,5 @@ Feature: Message Center with Unread Message Count
     And notebook "Critical Thinking" is shared to the Bazaar
     And "another_old_learner" start a conversation about the note "Critical Thinking" with a message "Hi"
     Then "old_learner" should have 1 unread messages
-    When I read the conversation with "Another Old Learner" for the topic "Critical Thinking" in the message center
+    When I read the conversation with "Another Old Learner" for the subject "Critical Thinking" in the message center
     Then there should be no unread message for the user "a_trainer"

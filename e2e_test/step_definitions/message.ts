@@ -24,23 +24,23 @@ Then(
 )
 
 Then(
-  'I read the conversation with {string} for the topic {string} in the message center',
-  (partner: string, topic: string) => {
+  'I read the conversation with {string} for the subject {string} in the message center',
+  (partner: string, subject: string) => {
     start
       .navigateToMessageCenter()
-      .expectConversation(topic, partner)
-      .conversation(topic)
+      .expectConversation(subject, partner)
+      .conversation(subject)
   }
 )
 
 Then(
-  '{string} can see the conversation with {string} for the topic {string} in the message center:',
-  (user: string, partner: string, topic: string, data: DataTable) => {
+  '{string} can see the conversation with {string} for the subject {string} in the message center:',
+  (user: string, partner: string, subject: string, data: DataTable) => {
     start
       .reloginAndEnsureHomePage(user)
       .navigateToMessageCenter()
-      .expectConversation(topic, partner)
-      .conversation(topic)
+      .expectConversation(subject, partner)
+      .conversation(subject)
       .expectMessage(data.hashes()[0]!.message!)
   }
 )
