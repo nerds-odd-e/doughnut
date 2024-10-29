@@ -1,6 +1,7 @@
 <template>
   <a
-  class="btn"
+    class="btn"
+    role="button"
     @click="$emit('show-conversations')"
     title="Star a conversation about this note"
   >
