@@ -29,15 +29,25 @@
           :class="{ 'justify-content-end': isCurrentUser(conversationMessage.sender?.id || 0) }"
         >
           <div
+            v-if="!isCurrentUser(conversationMessage.sender?.id || 0)"
+            class="message-avatar me-2"
+            :title="conversationMessage.sender?.name || 'AI Assistant'"
+          >
+            <template v-if="conversationMessage.sender?.id === undefined">
+              <SvgRobot />
+            </template>
+            <template v-else>
+              <SvgMissingAvatar />
+            </template>
+          </div>
+
+          <div
             class="card py-2 px-3"
             :class="[
               isCurrentUser(conversationMessage.sender?.id || 0) ? 'text-bg-dark' : 'bg-light',
               conversationMessage.sender?.id === undefined ? 'ai-chat' : '',
             ]"
           >
-            <template v-if="conversationMessage.sender?.id === undefined">
-              <SvgRobot />
-            </template>
             {{ formatMessage(conversationMessage.message) }}
           </div>
         </div>
@@ -87,6 +97,7 @@ import NoteShow from "@/components/notes/NoteShow.vue"
 import AssessmentQuestion from "@/components/assessment/AssessmentQuestion.vue"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
 import type { StorageAccessor } from "@/store/createNoteStorage"
+import SvgMissingAvatar from "@/components/svgs/SvgMissingAvatar.vue"
 
 const props = defineProps<{
   conversation: Conversation
@@ -215,5 +226,13 @@ watch(() => props.conversation, fetchConversationMessages)
 
 .ai-chat {
   color: red;
+}
+
+.message-avatar {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>
