@@ -49,6 +49,7 @@ import SvgRobot from "@/components/svgs/SvgRobot.vue"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import SvgMissingAvatar from "@/components/svgs/SvgMissingAvatar.vue"
+import ConversationTemplate from "./ConversationTemplate.vue"
 
 const props = defineProps<{
   conversation: Conversation
@@ -65,7 +66,6 @@ const { managedApi } = useLoadingApi()
 const currentConversationMessages = ref<ConversationMessage[] | undefined>(
   undefined
 )
-const message = ref("")
 
 const formatMessage = (message: string) => {
   return message.replace(/^"|"$/g, "").trim()
@@ -85,12 +85,11 @@ const fetchConversationMessages = async () => {
   emit("conversation-fetched", props.conversation.id)
 }
 
-const handleSendMessage = async () => {
+const handleSendMessage = async (message: string) => {
   await managedApi.restConversationMessageController.replyToConversation(
     props.conversation.id,
-    message.value
+    message
   )
-  message.value = ""
   await fetchConversationMessages()
 }
 

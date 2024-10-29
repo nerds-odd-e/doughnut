@@ -28,7 +28,7 @@ describe("NoteConversation", () => {
 
   it("call api to start conversation", async () => {
     await wrapper.find("textarea").setValue("Hello")
-    await wrapper.find("button.send-button").trigger("click")
+    await wrapper.find("form.chat-input-form").trigger("submit")
     await flushPromises()
 
     expect(
