@@ -46,17 +46,24 @@
 
       <div class="chat-controls">
         <form class="row chat-input-container" @submit.prevent="handleSendMessage()">
-          <div class="col-md-10">
-            <textarea class="w-100" name="Description" v-model="message" />
-          </div>
-          <div class="col-md-1">
-            <input
-              type="submit"
-              value="Send"
-              id="chat-button"
-              class="btn float-btn btn-secondary"
-            />
-          </div>
+          <TextArea
+            ref="chatInputTextArea"
+            v-focus
+            class="flex-grow-1"
+            id="chat-input"
+            :rows="1"
+            :auto-extend-until="5"
+            :enter-submit="true"
+            v-model="message"
+            @enter-pressed="handleSendMessage"
+          />
+
+          <input
+            type="submit"
+            value="Send"
+            id="chat-button"
+            class="btn float-btn btn-secondary"
+          />
         </form>
       </div>
     </div>
