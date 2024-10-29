@@ -45,11 +45,11 @@
       </div>
 
       <div class="chat-controls">
-        <form class="row chat-input-container" @submit.prevent="handleSendMessage()">
+        <form class="chat-input-form" @submit.prevent="handleSendMessage()">
           <TextArea
             ref="chatInputTextArea"
             v-focus
-            class="flex-grow-1"
+            class="chat-input"
             id="chat-input"
             :rows="1"
             :auto-extend-until="5"
@@ -58,12 +58,16 @@
             @enter-pressed="handleSendMessage"
           />
 
-          <input
+          <button
             type="submit"
-            value="Send"
-            id="chat-button"
-            class="btn float-btn btn-secondary"
-          />
+            class="send-button"
+            aria-label="Send message"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
         </form>
       </div>
     </div>
@@ -171,7 +175,47 @@ watch(() => props.conversation, fetchConversationMessages)
   right: 0;
   background-color: white;
   box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
-  padding: 10px;
+  padding: 1rem;
+}
+
+.chat-input-form {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 0.5rem;
+}
+
+.chat-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 0.5rem;
+  resize: none;
+}
+
+.chat-input:focus {
+  outline: none;
+}
+
+.send-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #0d6efd;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  padding: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.send-button:hover {
+  background-color: #0b5ed7;
 }
 
 .ai-chat {
