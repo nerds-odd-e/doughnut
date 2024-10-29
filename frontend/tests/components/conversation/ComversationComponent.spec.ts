@@ -1,9 +1,16 @@
-import { expect } from "vitest"
+import { expect, vi } from "vitest"
 import ConversationComponent from "@/components/conversations/ConversationComponent.vue"
 import NoteShow from "@/components/notes/NoteShow.vue"
 import helper from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
 import type { ConversationMessage } from "@/generated/backend"
+
+const mockedPush = vi.fn()
+vitest.mock("vue-router", () => ({
+  useRouter: () => ({
+    push: mockedPush,
+  }),
+}))
 
 describe("ConversationComponent", () => {
   let wrapper
@@ -47,5 +54,63 @@ describe("ConversationComponent", () => {
     expect(
       wrapper.findComponent({ name: "ScrollTo" }).props("scrollTrigger")
     ).toBe(2)
+  })
+
+  it("handles new conversation creation when conversation.id is undefined", async () => {
+    const newConversation = makeMe.aConversation.please()
+    const conversationWithoutId = makeMe.aConversation
+      .note(note)
+      .withoutId()
+      .please()
+
+    wrapper = helper
+      .component(ConversationComponent)
+      .withStorageProps({
+        conversation: conversationWithoutId,
+        user,
+      })
+      .mount()
+
+    // Mock the API call
+    const startConversationSpy = vi
+      .spyOn(
+        wrapper.vm.managedApi.restConversationMessageController,
+        "startConversationAboutNote"
+      )
+      .mockResolvedValue(newConversation)
+
+    // Submit message
+    wrapper.vm.message = "Test message"
+    await wrapper.vm.handleSendMessage()
+
+    expect(startConversationSpy).toHaveBeenCalledWith(note.id, "Test message")
+    expect(mockedPush).toHaveBeenCalledWith({
+      name: "messageCenter",
+      params: { conversationId: newConversation.id },
+    })
+  })
+
+  it("does not fetch messages when conversation.id is undefined", async () => {
+    const conversationWithoutId = makeMe.aConversation
+      .note(note)
+      .withoutId()
+      .please()
+
+    wrapper = helper
+      .component(ConversationComponent)
+      .withStorageProps({
+        conversation: conversationWithoutId,
+        user,
+      })
+      .mount()
+
+    const getMessagesSpy = vi.spyOn(
+      wrapper.vm.managedApi.restConversationMessageController,
+      "getConversationMessages"
+    )
+
+    await wrapper.vm.fetchConversationMessages()
+
+    expect(getMessagesSpy).not.toHaveBeenCalled()
   })
 })

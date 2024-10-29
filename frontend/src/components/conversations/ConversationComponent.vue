@@ -98,6 +98,9 @@ import AssessmentQuestion from "@/components/assessment/AssessmentQuestion.vue"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import SvgMissingAvatar from "@/components/svgs/SvgMissingAvatar.vue"
+import { useRouter } from "vue-router"
+
+const router = useRouter()
 
 const props = defineProps<{
   conversation: Conversation
@@ -125,6 +128,8 @@ const isCurrentUser = (id: number): boolean => {
 }
 
 const fetchConversationMessages = async () => {
+  if (!props.conversation.id) return
+
   currentConversationMessages.value =
     await managedApi.restConversationMessageController.getConversationMessages(
       props.conversation.id
@@ -133,6 +138,20 @@ const fetchConversationMessages = async () => {
 }
 
 const handleSendMessage = async () => {
+  if (!props.conversation.id) {
+    // Start new conversation about note
+    const newConversation =
+      await managedApi.restConversationMessageController.startConversationAboutNote(
+        props.conversation.subject?.note?.id!,
+        message.value
+      )
+    router.push({
+      name: "messageCenter",
+      params: { conversationId: newConversation.id },
+    })
+    return
+  }
+
   await managedApi.restConversationMessageController.replyToConversation(
     props.conversation.id,
     message.value

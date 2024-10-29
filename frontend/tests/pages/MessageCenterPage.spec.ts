@@ -48,7 +48,7 @@ describe("MessageCenterPage", () => {
     it("should highlight the selected conversation", async () => {
       const { findAllByRole } = helper
         .component(MessageCenterPage)
-        .withStorageProps({ conversationId: conversations[1]?.id })
+        .withStorageProps({ conversationId: conversations[1].id })
         .render()
       const listItems = await findAllByRole("listitem")
       expect(listItems).toHaveLength(2)

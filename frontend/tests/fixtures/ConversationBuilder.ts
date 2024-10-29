@@ -15,6 +15,11 @@ class ConversationBuilder extends Builder<Conversation> {
     this.data.subject!.note = note
     return this
   }
+  withoutId() {
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    ;(this.data as any).id = undefined
+    return this
+  }
 
   do() {
     if (
