@@ -2,8 +2,21 @@
   <div class="conversation-container">
     <!-- Upper half -->
     <div class="subject-container">
-      <NoteShow v-if="conversation.subject?.note?.id" :noteId="conversation.subject?.note?.id" :storageAccessor="storageAccessor" :expandChildren="false" :readOnly="false" />
-      <AssessmentQuestion v-else-if="conversation.subject?.assessmentQuestionInstance" :assessmentQuestionInstance="conversation.subject?.assessmentQuestionInstance" />
+      <NoteShow
+        v-if="conversation.subject?.note?.id"
+        v-bind="{
+          noteId: conversation.subject?.note?.id,
+          storageAccessor,
+          expandChildren: false,
+          readonly: false
+        }"
+      />
+      <AssessmentQuestion
+        v-else-if="conversation.subject?.assessmentQuestionInstance"
+        v-bind="{
+          assessmentQuestionInstance: conversation.subject?.assessmentQuestionInstance
+        }"
+      />
     </div>
 
     <!-- Lower half -->
