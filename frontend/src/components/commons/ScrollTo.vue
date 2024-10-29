@@ -5,7 +5,11 @@
 <script setup lang="ts">
 import "intersection-observer"
 import type { Ref } from "vue"
-import { nextTick, onBeforeUnmount, onMounted, ref } from "vue"
+import { nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue"
+
+const props = defineProps<{
+  scrollTrigger?: number | string
+}>()
 
 const scrollRef: Ref<HTMLElement | null> = ref(null)
 
@@ -36,6 +40,15 @@ onBeforeUnmount(() => {
     observer?.unobserve(scrollRef.value)
   }
 })
+
+watch(
+  () => props.scrollTrigger,
+  () => {
+    if (scrollRef.value) {
+      scrollRef.value.scrollIntoView({ behavior: "smooth" })
+    }
+  }
+)
 </script>
 
 <style scoped>

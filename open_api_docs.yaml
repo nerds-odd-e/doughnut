@@ -3482,6 +3482,24 @@ components:
           type: boolean
         asFirstChild:
           type: boolean
+    ConversationMessage:
+      required:
+      - id
+      - message
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        message:
+          type: string
+        sender:
+          $ref: "#/components/schemas/User"
+        readByReceiver:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
     AssessmentQuestionInstance:
       required:
       - bareQuestion
@@ -3515,28 +3533,6 @@ components:
           type: string
           format: date-time
         updatedAt:
-          type: string
-          format: date-time
-    ConversationMessage:
-      required:
-      - createdAt
-      - id
-      - message
-      - readByReceiver
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        conversation:
-          $ref: "#/components/schemas/Conversation"
-        message:
-          type: string
-        sender:
-          $ref: "#/components/schemas/User"
-        readByReceiver:
-          type: boolean
-        createdAt:
           type: string
           format: date-time
     ConversationSubject:

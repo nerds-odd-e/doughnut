@@ -2,14 +2,12 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { Conversation } from './Conversation';
 import type { User } from './User';
 export type ConversationMessage = {
     id: number;
-    conversation?: Conversation;
     message: string;
     sender?: User;
-    readByReceiver: boolean;
-    createdAt: string;
+    readByReceiver?: boolean;
+    createdAt?: string;
 };
 

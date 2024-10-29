@@ -1,5 +1,6 @@
 package com.odde.doughnut.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.sql.Timestamp;
 import java.util.Date;
@@ -17,6 +18,7 @@ public class ConversationMessage extends EntityIdentifiedByIdOnly {
 
   @ManyToOne
   @JoinColumn(name = "conversation_id", referencedColumnName = "id")
+  @JsonIgnore
   Conversation conversation;
 
   @NotNull
@@ -28,12 +30,10 @@ public class ConversationMessage extends EntityIdentifiedByIdOnly {
   @JoinColumn(name = "sender", referencedColumnName = "id")
   User sender;
 
-  @NotNull
   @Column(name = "read_by_receiver", columnDefinition = "BOOLEAN")
   Boolean readByReceiver = false;
 
   @Column(name = "created_at")
-  @NotNull
   @Builder.Default
   @OrderBy("createdAt ASC")
   private Timestamp createdAt = new Timestamp(new Date().getTime());

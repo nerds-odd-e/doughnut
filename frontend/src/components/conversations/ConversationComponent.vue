@@ -28,6 +28,7 @@
             {{ formatMessage(conversationMessage.message) }}
           </div>
         </div>
+        <ScrollTo :scrollTrigger="currentConversationMessages.length" />
       </div>
 
       <div class="chat-controls">
@@ -60,6 +61,7 @@ import type {
 import SvgRobot from "@/components/svgs/SvgRobot.vue"
 import NoteShow from "@/components/notes/NoteShow.vue"
 import AssessmentQuestion from "@/components/assessment/AssessmentQuestion.vue"
+import ScrollTo from "@/components/commons/ScrollTo.vue"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 
 const props = defineProps<{
@@ -130,6 +132,7 @@ watch(() => props.conversation, fetchConversationMessages)
   position: relative;
   display: flex;
   flex-direction: column;
+  background-color: #f8f9fa;
 }
 
 .messages-container {
