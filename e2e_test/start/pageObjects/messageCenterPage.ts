@@ -31,8 +31,7 @@ export const assumeMessageCenterPage = () => {
           return this
         },
         reply(message: string) {
-          cy.get('textarea[name="Description"]').type(message)
-          cy.get('input[type="submit"][value="Send"]').click()
+          cy.get('textarea').type(message).type('{enter}')
           cy.findByText(message).should('be.visible')
           return this
         },

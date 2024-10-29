@@ -154,7 +154,6 @@ watch(() => props.conversation, fetchConversationMessages)
 
 .conversation-messages {
   flex: 1;
-  position: relative;
   display: flex;
   flex-direction: column;
   background-color: #f8f9fa;
@@ -162,17 +161,13 @@ watch(() => props.conversation, fetchConversationMessages)
 }
 
 .messages-container {
-  flex-grow: 1;
+  flex: 1;
   overflow-y: auto;
   padding: 1rem;
-  padding-bottom: 90px;
 }
 
 .chat-controls {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  flex-shrink: 0;
   background-color: white;
   box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
   padding: 1rem;
