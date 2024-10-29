@@ -24,6 +24,7 @@ import type { PropType } from "vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import type { StorageAccessor } from "../../store/createNoteStorage"
 import NoteRealmLoader from "./NoteRealmLoader.vue"
+import NoteShowInner from "./NoteShowInner.vue"
 
 defineProps({
   noteId: { type: Number, required: true },
