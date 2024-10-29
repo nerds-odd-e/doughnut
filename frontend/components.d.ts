@@ -33,6 +33,8 @@ declare module 'vue' {
     ContestableQuestion: typeof import('./src/components/review/ContestableQuestion.vue')['default']
     ConversationComponent: typeof import('./src/components/conversations/ConversationComponent.vue')['default']
     ConversationInner: typeof import('./src/components/conversations/ConversationInner.vue')['default']
+    ConversationTemplate: typeof import('./src/components/conversations/ConversationTemplate.vue')['default']
+    copy: typeof import('./src/components/conversations/ConversationInner copy.vue')['default']
     EditableText: typeof import('./src/components/form/EditableText.vue')['default']
     FailureReportList: typeof import('./src/components/admin/FailureReportList.vue')['default']
     Feather: typeof import('./src/components/svgs/link_types/Feather.vue')['default']
