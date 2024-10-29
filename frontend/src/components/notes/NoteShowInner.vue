@@ -66,7 +66,7 @@
     </div>
 
     <div class="conversation-wrapper" v-if="showConversation">
-      <NoteSendMessageDialog
+      <NoteConversation
         v-if="showConversation"
         :note-id="noteRealm.id"
       />
@@ -87,7 +87,7 @@ import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue"
 import LinkOfNote from "../links/LinkOfNote.vue"
 import { reverseLabel } from "../../models/linkTypeOptions"
 import NoteAudioTools from "./accessory/NoteAudioTools.vue"
-import NoteSendMessageDialog from "./NoteSendMessageDialog.vue"
+import NoteConversation from "../conversations/NoteConversation.vue"
 
 defineProps({
   noteRealm: { type: Object as PropType<NoteRealm>, required: true },
