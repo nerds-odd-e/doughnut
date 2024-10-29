@@ -18,7 +18,7 @@
               v-for="conversation in conversations"
               :key="conversation.id"
               class="list-group-item list-group-item-action"
-              :class="{ 'active': currentConversation?.id === conversation.id }"
+              :class="{ 'active': conversationId === conversation.id }"
               @click="selectConversation(conversation)"
             >
               <div>{{ conversationTopic(conversation) }}</div>
