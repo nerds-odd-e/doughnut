@@ -1,5 +1,5 @@
 <template>
-  <PopButton :title="`Send message about note top bazaar`">
+  <PopButton :title="`Star a conversation about this note`">
     <template #button_face>
       <SvgChat />
     </template>

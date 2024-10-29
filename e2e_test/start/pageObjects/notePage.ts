@@ -237,7 +237,7 @@ export const assumeNotePage = (noteTopic?: string) => {
       return assumeChatAboutNotePage()
     },
     sendMessageToNoteOwner(message: string) {
-      this.toolbarButton('Send message about note top bazaar').click()
+      this.toolbarButton('Star a conversation about this note').click()
       cy.findByRole('textbox').type(message)
       cy.findByRole('button', { name: 'Submit' }).click()
     },
