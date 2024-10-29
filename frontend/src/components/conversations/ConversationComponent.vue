@@ -68,4 +68,5 @@ const emit = defineEmits<{
   background-color: #f8f9fa;
   min-height: 0;
 }
+
 </style>

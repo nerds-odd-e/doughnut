@@ -1,20 +1,17 @@
 <template>
   <NoteRealmLoader v-bind="{ noteId, storageAccessor }">
     <template #default="{ noteRealm }">
-      <div class="container">
-        <ContentLoader v-if="!noteRealm" />
-        <div v-else>
-          <NoteShowInner
-            v-bind="{
-              noteRealm,
-              expandChildren,
-              readonly,
-              storageAccessor,
-            }"
-            :key="noteId"
-          />
-        </div>
-      </div>
+      <ContentLoader v-if="!noteRealm" />
+      <NoteShowInner
+        v-else
+        v-bind="{
+          noteRealm,
+          expandChildren,
+          readonly,
+          storageAccessor,
+        }"
+        :key="noteId"
+      />
     </template>
   </NoteRealmLoader>
 </template>

@@ -131,6 +131,11 @@ const toLocalDateString = (date: string) => {
 .conversation-wrapper {
   height: 50%;
   border-top: 1px solid #e9ecef;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: #f8f9fa;
+  min-height: 0;
 }
 
 .refers {

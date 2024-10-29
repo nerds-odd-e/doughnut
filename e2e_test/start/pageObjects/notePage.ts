@@ -239,7 +239,7 @@ export const assumeNotePage = (noteTopic?: string) => {
     sendMessageToNoteOwner(message: string) {
       this.toolbarButton('Star a conversation about this note').click()
       cy.findByRole('textbox').type(message)
-      cy.findByRole('button', { name: 'Submit' }).click()
+      cy.findByRole('button', { name: 'Send message' }).click()
     },
     moveUpAmongSiblings() {
       cy.pageIsNotLoading()

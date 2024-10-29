@@ -1,38 +1,30 @@
 <template>
-    <div>
-      <h2>Start a conversation about this note</h2>
-      <p>
-        <i>
-          To talk with AI and/or other people who have access to this note.
-        </i>
-      </p>
-      <TextArea
-        field="message"
-        v-model="message"
-        placeholder="Send message about the question"
-        :rows="5"
-      />
-    <button class="btn btn-success" @click="submitMessage">
-      Submit
-    </button>
-    </div>
+   <ConversationTemplate @send-message="submitMessage" >
+      <template #messages>
+        <h2>Start a conversation about this note</h2>
+        <p>
+          <i>
+            To talk with AI and/or other people who have access to this note.
+          </i>
+        </p>
+      </template>
+    </ConversationTemplate>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi.ts"
+import ConversationTemplate from "@/components/conversations/ConversationTemplate.vue"
 
 const { managedApi } = useLoadingApi()
-const message = ref<string>("")
 const props = defineProps<{
   noteId: number
 }>()
 const emit = defineEmits(["submitted"])
 
-async function submitMessage() {
+async function submitMessage(message: string) {
   await managedApi.restConversationMessageController.startConversationAboutNote(
     props.noteId,
-    message.value
+    message
   )
 
   emit("submitted")

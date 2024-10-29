@@ -19,6 +19,7 @@
 
       <button
         type="submit"
+        role="button"
         class="send-button"
         aria-label="Send message"
       >
