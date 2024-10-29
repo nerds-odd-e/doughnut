@@ -81,7 +81,6 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: "conversation-fetched", conversationId: number): void
-  (e: "conversation-created", conversation: Conversation): void
 }>()
 
 const { managedApi } = useLoadingApi()
@@ -110,17 +109,6 @@ const fetchConversationMessages = async () => {
 }
 
 const handleSendMessage = async () => {
-  if (!props.conversation.id) {
-    // Start new conversation about note
-    const newConversation =
-      await managedApi.restConversationMessageController.startConversationAboutNote(
-        props.conversation.subject?.note?.id!,
-        message.value
-      )
-    emit("conversation-created", newConversation)
-    return
-  }
-
   await managedApi.restConversationMessageController.replyToConversation(
     props.conversation.id,
     message.value

@@ -8,13 +8,13 @@
           noteId: conversation.subject?.note?.id,
           storageAccessor,
           expandChildren: false,
-          readonly: false
+          readonly: false,
         }"
       />
       <AssessmentQuestion
         v-else-if="conversation.subject?.assessmentQuestionInstance"
         v-bind="{
-          assessmentQuestionInstance: conversation.subject?.assessmentQuestionInstance
+          assessmentQuestionInstance: conversation.subject?.assessmentQuestionInstance,
         }"
       />
     </div>
@@ -24,7 +24,6 @@
       <ConversationInner
         v-bind="{ conversation, user, storageAccessor }"
         @conversation-fetched="emit('conversation-fetched', $event)"
-        @conversation-created="onConversationCreated($event)"
       />
     </div>
   </div>
@@ -35,9 +34,6 @@ import type { User, Conversation } from "@/generated/backend"
 import NoteShow from "@/components/notes/NoteShow.vue"
 import AssessmentQuestion from "@/components/assessment/AssessmentQuestion.vue"
 import type { StorageAccessor } from "@/store/createNoteStorage"
-import { useRouter } from "vue-router"
-
-const router = useRouter()
 
 defineProps<{
   conversation: Conversation
@@ -48,14 +44,6 @@ defineProps<{
 const emit = defineEmits<{
   (e: "conversation-fetched", conversationId: number): void
 }>()
-
-const onConversationCreated = async (newConversation: Conversation) => {
-  router.push({
-    name: "messageCenter",
-    params: { conversationId: newConversation.id },
-  })
-  return
-}
 </script>
 
 <style scoped>
