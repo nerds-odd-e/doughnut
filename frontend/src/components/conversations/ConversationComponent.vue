@@ -2,7 +2,7 @@
   <div class="conversation-container">
     <!-- Upper half -->
     <div class="subject-container">
-      <NoteShow v-if="conversation.subject?.note?.id" :noteId="conversation.subject?.note?.id" :storageAccessor="storageAccessor" :expandChildren="false" />
+      <NoteShow v-if="conversation.subject?.note?.id" :noteId="conversation.subject?.note?.id" :storageAccessor="storageAccessor" :expandChildren="false" :readOnly="false" />
       <AssessmentQuestion v-else-if="conversation.subject?.assessmentQuestionInstance" :assessmentQuestionInstance="conversation.subject?.assessmentQuestionInstance" />
     </div>
 
@@ -117,29 +117,31 @@ watch(() => props.conversation, fetchConversationMessages)
 .conversation-container {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  flex: 1;
+  min-height: 0;
 }
 
 .subject-container {
-  height: 50%;
+  flex: 1;
   overflow-y: auto;
   border-bottom: 1px solid #dee2e6;
   padding: 1rem;
 }
 
 .conversation-messages {
-  height: 50%;
+  flex: 1;
   position: relative;
   display: flex;
   flex-direction: column;
   background-color: #f8f9fa;
+  min-height: 0;
 }
 
 .messages-container {
   flex-grow: 1;
   overflow-y: auto;
   padding: 1rem;
-  margin-bottom: 80px; /* Space for chat controls */
+  padding-bottom: 90px;
 }
 
 .chat-controls {

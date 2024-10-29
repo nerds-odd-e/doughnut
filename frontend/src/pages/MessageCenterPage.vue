@@ -10,9 +10,9 @@
       There is no conversation currently.
     </h2>
 
-    <template v-if="conversations?.length">
+    <template v-else>
       <div class="message-center-container">
-        <div class="sidebar" v-show="showSidebarOnMobile">
+        <div class="sidebar" :class="{ 'hide-on-mobile': !showSidebarOnMobile }">
           <ul class="list-group">
             <li
               v-for="conversation in conversations"
@@ -27,7 +27,7 @@
           </ul>
         </div>
 
-        <div class="main-content" v-show="showMainContentOnMobile">
+        <div class="main-content" :class="{ 'hide-on-mobile': !showMainContentOnMobile }">
           <div class="mobile-back-button" @click="backToList">
             <span>&larr; Back to conversations</span>
           </div>
@@ -136,6 +136,8 @@ const backToList = () => {
   flex: 1 1 auto;
   overflow-y: auto;
   min-height: 200px; /* Ensure minimum height for content */
+  display: flex;
+  flex-direction: column;
 }
 
 @media (min-width: 768px) {
@@ -204,6 +206,7 @@ const backToList = () => {
   cursor: pointer;
   background-color: #f8f9fa;
   border-bottom: 1px solid #e0e0e0;
+  flex: 0 0 auto;
 }
 
 .mobile-back-button:hover {
@@ -211,6 +214,10 @@ const backToList = () => {
 }
 
 @media (max-width: 767px) {
+  .hide-on-mobile {
+    display: none !important;
+  }
+
   .mobile-back-button {
     display: block;
   }
