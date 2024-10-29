@@ -25,6 +25,7 @@
 
       <NoteSendMessageButton
         v-bind="{ noteId: note.id }"
+        @show-conversations="$emit('show-conversations')"
       />
 
       <PopButton title="search and link note">
@@ -175,6 +176,7 @@ const emit = defineEmits([
   "note-accessory-updated",
   "edit-as-markdown",
   "show-audio-tools",
+  "show-conversations",
 ])
 
 const moveUp = () => {

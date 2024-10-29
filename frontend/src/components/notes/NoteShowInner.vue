@@ -1,67 +1,75 @@
 <template>
-  <div class="row">
+  <div class="note-show-container">
     <NoteCoreToolbar
       v-if="!readonly"
       v-bind="{ note: noteRealm.note, storageAccessor, asMarkdown, audioTools }"
       @note-accessory-updated="updatedNoteAccessory = $event"
       @edit-as-markdown="asMarkdown = $event"
       @show-audio-tools="audioTools = true"
+      @show-conversations="showConversation = true"
     />
-  </div>
 
-  <div class="row">
-    <NoteAudioTools
-      v-if="audioTools"
-      v-bind="{ note: noteRealm.note, storageAccessor }"
-      @close-dialog="
-      audioTools = false;
-      updatedNoteAccessory = $event
-      "
-    />
-    <div id="main-note-content" class="col-md-9">
-      <NoteTextContent
-        v-bind="{
-          note: noteRealm.note,
-          asMarkdown,
-          readonly,
-          storageAccessor,
-        }"
+    <div class="note-content-wrapper" :class="{ 'with-conversation': showConversation }">
+      <NoteAudioTools
+        v-if="audioTools"
+        v-bind="{ note: noteRealm.note, storageAccessor }"
+        @close-dialog="
+        audioTools = false;
+        updatedNoteAccessory = $event
+        "
       />
-      <NoteAccessoryAsync
-        v-bind="{ noteId: noteRealm.id, updatedNoteAccessory, readonly }"
-      />
-      <NoteRecentUpdateIndicator
-        v-bind="{
-          id: noteRealm.id,
-          updatedAt: noteRealm.note.updatedAt,
-        }"
-      >
-        <p>
-          <span class="me-3">
-            Created: {{ toLocalDateString(noteRealm.note.createdAt) }}
-          </span>
-          <span>
-            Last updated: {{ toLocalDateString(noteRealm.note.updatedAt) }}
-          </span>
-        </p>
-      </NoteRecentUpdateIndicator>
-      <ChildrenNotes
-        v-bind="{ expandChildren, readonly, storageAccessor }"
-        :notes="noteRealm.children ?? []"
-      />
+      <div id="main-note-content" class="col-md-9">
+        <NoteTextContent
+          v-bind="{
+            note: noteRealm.note,
+            asMarkdown,
+            readonly,
+            storageAccessor,
+          }"
+        />
+        <NoteAccessoryAsync
+          v-bind="{ noteId: noteRealm.id, updatedNoteAccessory, readonly }"
+        />
+        <NoteRecentUpdateIndicator
+          v-bind="{
+            id: noteRealm.id,
+            updatedAt: noteRealm.note.updatedAt,
+          }"
+        >
+          <p>
+            <span class="me-3">
+              Created: {{ toLocalDateString(noteRealm.note.createdAt) }}
+            </span>
+            <span>
+              Last updated: {{ toLocalDateString(noteRealm.note.updatedAt) }}
+            </span>
+          </p>
+        </NoteRecentUpdateIndicator>
+        <ChildrenNotes
+          v-bind="{ expandChildren, readonly, storageAccessor }"
+          :notes="noteRealm.children ?? []"
+        />
+      </div>
+      <div class="col-md-3 refers" v-if="noteRealm.refers">
+        <ul>
+          <li v-for="link in noteRealm.refers" :key="link.id">
+            <span>{{ reverseLabel(link.noteTopic.linkType) }} </span>
+            <LinkOfNote
+              class="link-multi"
+              :key="link.id"
+              v-bind="{ note: link, storageAccessor }"
+              :reverse="true"
+            />
+          </li>
+        </ul>
+      </div>
     </div>
-    <div class="col-md-3 refers" v-if="noteRealm.refers">
-      <ul>
-        <li v-for="link in noteRealm.refers" :key="link.id">
-          <span>{{ reverseLabel(link.noteTopic.linkType) }} </span>
-          <LinkOfNote
-            class="link-multi"
-            :key="link.id"
-            v-bind="{ note: link, storageAccessor }"
-            :reverse="true"
-          />
-        </li>
-      </ul>
+
+    <div class="conversation-wrapper" v-if="showConversation">
+      <NoteSendMessageDialog
+        v-if="showConversation"
+        :note-id="noteRealm.id"
+      />
     </div>
   </div>
 </template>
@@ -79,6 +87,7 @@ import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue"
 import LinkOfNote from "../links/LinkOfNote.vue"
 import { reverseLabel } from "../../models/linkTypeOptions"
 import NoteAudioTools from "./accessory/NoteAudioTools.vue"
+import NoteSendMessageDialog from "./NoteSendMessageDialog.vue"
 
 defineProps({
   noteRealm: { type: Object as PropType<NoteRealm>, required: true },
@@ -94,6 +103,7 @@ defineProps({
 const updatedNoteAccessory = ref<NoteAccessory | undefined>(undefined)
 const asMarkdown = ref(false)
 const audioTools = ref(false)
+const showConversation = ref(false)
 
 const toLocalDateString = (date: string) => {
   return new Date(date).toLocaleDateString()
@@ -101,6 +111,28 @@ const toLocalDateString = (date: string) => {
 </script>
 
 <style scoped>
+.note-show-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.note-content-wrapper {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  transition: height 0.3s ease;
+}
+
+.note-content-wrapper.with-conversation {
+  height: 50%;
+}
+
+.conversation-wrapper {
+  height: 50%;
+  border-top: 1px solid #e9ecef;
+}
+
 .refers {
   border-left: 1px solid #e9ecef;
 }
