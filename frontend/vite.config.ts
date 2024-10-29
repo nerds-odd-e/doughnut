@@ -34,6 +34,10 @@ export default defineConfig({
     preprocessorOptions: {
       scss: {
 	charset: false,
+	quietDeps: true,
+	sassOptions: {
+          api: 'modern'
+        }
       },
     },
   },
@@ -41,9 +45,6 @@ export default defineConfig({
     tsconfigPaths(),
     checker({
       vueTsc: true,
-      biome: {
-        command: 'check',
-      },
     }),
     vue({
       template: {
