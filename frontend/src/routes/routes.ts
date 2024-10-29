@@ -86,10 +86,14 @@ const routes = [
     meta: { userProp: true },
   },
   {
-    path: "/d/message-center",
+    path: "/d/message-center/:conversationId?",
     name: "messageCenter",
     component: MessageCenterPage,
-    props: true,
+    props: (route: RouteLocation) => ({
+      conversationId: route.params.conversationId
+        ? Number(route.params.conversationId)
+        : undefined,
+    }),
     meta: { userProp: true, useNoteStorageAccessor: true },
   },
   {

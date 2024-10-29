@@ -98,6 +98,25 @@ export class RestConversationMessageControllerService {
     }
     /**
      * @param conversationId
+     * @returns Conversation OK
+     * @throws ApiError
+     */
+    public getConversation(
+        conversationId: number,
+    ): CancelablePromise<Conversation> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/conversation/{conversationId}',
+            path: {
+                'conversationId': conversationId,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param conversationId
      * @returns ConversationMessage OK
      * @throws ApiError
      */

@@ -49,7 +49,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, computed, type PropType } from "vue"
+import { onMounted, ref, computed, type PropType, watch } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
 import ConversationComponent from "@/components/conversations/ConversationComponent.vue"
@@ -57,23 +57,47 @@ import SvgChat from "@/components/svgs/SvgChat.vue"
 import type { Conversation, User } from "@/generated/backend"
 import { messageCenterConversations } from "@/store/messageStore"
 import type { StorageAccessor } from "@/store/createNoteStorage"
+import { useRouter } from "vue-router"
 
 const { managedApi } = useLoadingApi()
 
-const { user } = defineProps({
+const props = defineProps({
   user: { type: Object as PropType<User> },
   storageAccessor: {
     type: Object as PropType<StorageAccessor>,
     required: true,
   },
+  conversationId: { type: Number, required: false },
 })
 
 const conversations = ref<Conversation[] | undefined>(undefined)
 const currentConversation = ref<Conversation | null>(null)
 
+const router = useRouter()
+
+watch(
+  () => props.conversationId,
+  async (newId) => {
+    if (newId) {
+      currentConversation.value =
+        await managedApi.restConversationMessageController.getConversation(
+          newId
+        )
+      return
+    }
+    currentConversation.value = null
+  }
+)
+
 const fetchData = async () => {
   conversations.value =
     await managedApi.restConversationMessageController.getConversationsOfCurrentUser()
+
+  if (props.conversationId && conversations.value) {
+    currentConversation.value =
+      conversations.value.find((c) => c.id === Number(props.conversationId)) ||
+      null
+  }
 }
 
 const handleConversationFetched = async (conversationId: number) => {
@@ -96,7 +120,7 @@ const conversationTopic = (conversation: Conversation) => {
 }
 
 const conversationPartner = (conversation: Conversation) => {
-  if (conversation.conversationInitiator?.name !== user?.name) {
+  if (conversation.conversationInitiator?.name !== props.user?.name) {
     return conversation.conversationInitiator?.name
   }
   if (conversation.subjectOwnership?.circle?.name) {
@@ -109,11 +133,14 @@ const showSidebarOnMobile = computed(() => !currentConversation.value)
 const showMainContentOnMobile = computed(() => currentConversation.value)
 
 const selectConversation = (conversation: Conversation) => {
-  currentConversation.value = conversation
+  router.push({
+    name: "messageCenter",
+    params: { conversationId: conversation.id },
+  })
 }
 
 const backToList = () => {
-  currentConversation.value = null
+  router.push({ name: "messageCenter" })
 }
 </script>
 
