@@ -10,6 +10,7 @@ in mkShell {
   buildInputs = [
     python312
     poetry
+    bun
     nodejs_22
     corepack_22
     zsh

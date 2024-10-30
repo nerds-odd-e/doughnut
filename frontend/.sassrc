@@ -1,0 +1,10 @@
+{
+  "api": "modern",
+  "quietDeps": true,
+  "quiet": true,
+  "loadPaths": ["node_modules"],
+  "implementation": "sass",
+  "logger": {
+    "silent": true
+  }
+}

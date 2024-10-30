@@ -31,15 +31,19 @@ export default defineConfig({
     setupFiles: ['./tests/setupVitest.js'],
   },
   css: {
+    devSourcemap: true,
     preprocessorOptions: {
       scss: {
+	additionalData: '@use "sass:math";',
 	charset: false,
-	quietDeps: true,
-	sassOptions: {
-          api: 'modern'
-        }
+	logger: { silent: true },
+        quietDeps: true,
+        warnRuleAsError: false
       },
     },
+  },
+  optimizeDeps: {
+    include: ['@popperjs/core'],
   },
   plugins: [
     tsconfigPaths(),
