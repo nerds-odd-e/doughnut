@@ -8,11 +8,25 @@
     <div class="alert alert-info" v-if="errors">{{ errors }}</div>
     <Waveform :audioRecorder="audioRecorder" :isRecording="isRecording" />
     <div class="button-group">
-      <button class="btn" @click="startRecording" :disabled="isRecording" title="Record Audio">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
-          <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
-        </svg>
-      </button>
+      <template v-if="!isRecording">
+        <button class="btn" @click="startRecording" title="Record Audio">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+            <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5zm6 6c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+          </svg>
+        </button>
+      </template>
+      <template v-else>
+        <select
+          class="device-select"
+          :value="selectedDevice"
+          @change="onDeviceChange"
+          title="Select Audio Device"
+        >
+          <option v-for="device in audioDevices" :key="device.deviceId" :value="device.deviceId">
+            {{ device.label || `Microphone ${device.deviceId.slice(0, 4)}...` }}
+          </option>
+        </select>
+      </template>
       <button class="btn" @click="flushAudio" :disabled="!isRecording" title="Flush Audio">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
           <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
@@ -63,6 +77,8 @@ const errors = ref<Record<string, string | undefined>>()
 const isRecording = ref(false)
 const wakeLocker = createWakeLocker()
 
+const selectedDevice = ref<string>("")
+
 const processAudio = async (file: Blob) => {
   try {
     const response = await managedApi.restAiAudioController.audioToText({
@@ -78,17 +94,29 @@ const processAudio = async (file: Blob) => {
 }
 
 const audioRecorder = createAudioRecorder(processAudio)
+const audioDevices = audioRecorder.getAudioDevices()
+
+const onDeviceChange = async (event: Event) => {
+  const deviceId = (event.target as HTMLSelectElement).value
+  try {
+    await audioRecorder.switchAudioDevice(deviceId)
+    selectedDevice.value = deviceId
+  } catch (error) {
+    console.error("Error switching audio device:", error)
+    errors.value = { devices: "Failed to switch audio device" }
+  }
+}
 
 const startRecording = async () => {
   errors.value = undefined
   try {
-    await wakeLocker.request() // Request wake lock
+    await wakeLocker.request()
     await audioRecorder.startRecording()
     isRecording.value = true
   } catch (error) {
     console.error("Error starting recording:", error)
     errors.value = { recording: "Failed to start recording" }
-    await wakeLocker.release() // Release wake lock if recording fails
+    await wakeLocker.release()
   }
 }
 
@@ -97,7 +125,7 @@ const stopRecording = async () => {
   try {
     audioFile.value = await audioRecorder.stopRecording()
   } finally {
-    await wakeLocker.release() // Release wake lock when recording stops
+    await wakeLocker.release()
   }
 }
 
@@ -128,7 +156,7 @@ const flushAudio = async () => {
 }
 
 onUnmounted(() => {
-  wakeLocker.release() // Ensure wake lock is released when component is unmounted
+  wakeLocker.release()
 })
 </script>
 
@@ -195,5 +223,21 @@ onUnmounted(() => {
   .btn {
     padding: 8px;
   }
+}
+
+.device-select {
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #4299e1;
+  background-color: white;
+  color: #2d3748;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.device-select:focus {
+  outline: none;
+  border-color: #3182ce;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
 }
 </style>

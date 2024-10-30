@@ -2,7 +2,6 @@ const audioToolsPage = () => {
   return {
     startRecording: () => {
       cy.findByRole('button', { name: 'Record Audio' }).click()
-      cy.findByRole('button', { name: 'Record Audio' }).should('be.disabled')
       return this
     },
     stopRecording: () => {
@@ -27,6 +26,6 @@ const audioToolsPage = () => {
 export default audioToolsPage
 
 export const assumeAudioTools = () => {
-  cy.findByRole('button', { name: 'Record Audio' }).should('exist')
+  cy.findByRole('button', { name: 'Stop Recording' }).should('exist')
   return audioToolsPage()
 }

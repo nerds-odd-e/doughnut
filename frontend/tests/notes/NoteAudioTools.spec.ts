@@ -37,7 +37,16 @@ const mockMediaDevices = {
       },
     ],
   }),
+  enumerateDevices: vi.fn(),
 }
+
+// Add mock for enumerateDevices
+const mockDevices = [
+  { deviceId: "device1", kind: "audioinput", label: "Microphone 1" },
+  { deviceId: "device2", kind: "audioinput", label: "Microphone 2" },
+]
+
+mockMediaDevices.enumerateDevices = vi.fn().mockResolvedValue(mockDevices)
 
 // Apply mocks to global object
 Object.defineProperty(global, "AudioContext", {
@@ -101,6 +110,7 @@ describe("NoteAudioTools", () => {
     mockAudioWorkletNode.disconnect.mockClear()
     mockAudioWorkletNode.port.postMessage.mockClear()
     mockMediaDevices.getUserMedia.mockClear()
+    mockMediaDevices.enumerateDevices.mockClear()
   })
 
   it("renders the component with correct buttons", () => {
@@ -108,12 +118,13 @@ describe("NoteAudioTools", () => {
     expect(findButtonByTitle(wrapper, "Stop Recording")).toBeTruthy()
   })
 
-  it("disables Record Audio button when recording", async () => {
-    const recordButton = findButtonByTitle(wrapper, "Record Audio")
-    expect(recordButton.attributes("disabled")).toBeFalsy()
-    await recordButton.trigger("click")
+  it("replace Record Audio button when recording", async () => {
+    const recordButtonBefore = findButtonByTitle(wrapper, "Record Audio")
+    expect(recordButtonBefore.attributes("disabled")).toBeFalsy()
+    await recordButtonBefore.trigger("click")
     await flushPromises()
-    expect(recordButton.attributes("disabled")).toBeDefined()
+    const recordButtonAfter = findButtonByTitle(wrapper, "Record Audio")
+    expect(recordButtonAfter).toBeUndefined()
   })
 
   it("enables Stop Recording button when recording", async () => {
@@ -297,5 +308,33 @@ describe("NoteAudioTools", () => {
     await flushButton.trigger("click")
 
     expect(mockFlush).toHaveBeenCalled()
+  })
+
+  describe("Audio Device Selection", () => {
+    it("loads audio devices when recording starts", async () => {
+      const recordButton = findButtonByTitle(wrapper, "Record Audio")
+      await recordButton.trigger("click")
+      await flushPromises()
+
+      expect(mockMediaDevices.enumerateDevices).toHaveBeenCalled()
+      const deviceSelect = wrapper.find(".device-select")
+      expect(deviceSelect.exists()).toBe(true)
+      expect(deviceSelect.findAll("option").length).toBe(mockDevices.length)
+    })
+
+    it("switches audio device when selection changes", async () => {
+      // Start recording
+      await findButtonByTitle(wrapper, "Record Audio").trigger("click")
+      await flushPromises()
+
+      const deviceSelect = wrapper.find(".device-select")
+      await deviceSelect.setValue("device2")
+      await flushPromises()
+
+      // Verify that getUserMedia was called with the new device ID
+      expect(mockMediaDevices.getUserMedia).toHaveBeenCalledWith({
+        audio: { deviceId: { exact: "device2" } },
+      })
+    })
   })
 })
