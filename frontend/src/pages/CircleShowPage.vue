@@ -53,8 +53,8 @@ import SvgMissingAvatar from "@/components/svgs/SvgMissingAvatar.vue"
 import type { CircleForUserView, User } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
-import type { PropType } from "vue"
-import { computed, onMounted, ref } from "vue"
+import type { PropType, Ref } from "vue"
+import { computed, inject, onMounted, ref } from "vue"
 import { useRouter } from "vue-router"
 import ContainerPage from "./commons/ContainerPage.vue"
 
@@ -64,13 +64,13 @@ const router = useRouter()
 
 const { circleId } = defineProps({
   circleId: { type: Number, required: true },
-  user: { type: Object as PropType<User> },
   storageAccessor: {
     type: Object as PropType<StorageAccessor>,
     required: true,
   },
 })
 
+const user = inject<Ref<User | undefined>>("currentUser")
 const circle = ref<CircleForUserView | undefined>(undefined)
 
 const fetchData = async () => {

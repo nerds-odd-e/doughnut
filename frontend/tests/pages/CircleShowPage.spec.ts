@@ -34,7 +34,8 @@ describe("circle show page", () => {
     helper
       .component(CircleShowPage)
       .withRouter()
-      .withStorageProps({ circleId: circleNote.id, user: currentUser })
+      .withCurrentUser(currentUser)
+      .withStorageProps({ circleId: circleNote.id })
       .render()
     await flushPromises()
     screen.getByRole("button", { name: moveButtonTitle })
@@ -44,9 +45,9 @@ describe("circle show page", () => {
     helper
       .component(CircleShowPage)
       .withRouter()
+      .withCurrentUser(makeMe.aUser.please())
       .withStorageProps({
         circleId: circleNote.id,
-        user: makeMe.aUser.please(),
       })
       .render()
     await flushPromises()
