@@ -1,7 +1,7 @@
 <template>
   <ContainerPage
     v-bind="{
-      contentExists: !!bazaarNotebooks,
+      contentExists: bazaarNotebooks !== undefined,
       title: 'Welcome To The Bazaar',
     }"
   >
@@ -9,46 +9,33 @@
     <div v-if="bazaarNotebooks">
       <NotebookBazaarViewCards
         :bazaar-notebooks="bazaarNotebooks"
-        :logged-in="!!user"
+        :logged-in="!!props.user"
       />
     </div>
   </ContainerPage>
 </template>
 
-<script lang="ts">
-import type { PropType } from "vue"
-import { defineComponent } from "vue"
+<script setup lang="ts">
+import { ref, onMounted } from "vue"
 import type { BazaarNotebook, User } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import NotebookBazaarViewCards from "@/components/bazaar/NotebookBazaarViewCards.vue"
 import ContainerPage from "./commons/ContainerPage.vue"
 
-export default defineComponent({
-  setup() {
-    return useLoadingApi()
-  },
-  components: { ContainerPage, NotebookBazaarViewCards },
-  props: {
-    user: {
-      type: Object as PropType<User>,
-      required: false,
-    },
-  },
-  data() {
-    return {
-      bazaarNotebooks: null as BazaarNotebook[] | null,
-    }
-  },
+const props = defineProps<{
+  user?: User
+}>()
 
-  methods: {
-    fetchData() {
-      this.managedApi.restBazaarController.bazaar().then((res) => {
-        this.bazaarNotebooks = res
-      })
-    },
-  },
-  mounted() {
-    this.fetchData()
-  },
+const { managedApi } = useLoadingApi()
+const bazaarNotebooks = ref<BazaarNotebook[] | undefined>(undefined)
+
+const fetchData = () => {
+  managedApi.restBazaarController.bazaar().then((res) => {
+    bazaarNotebooks.value = res
+  })
+}
+
+onMounted(() => {
+  fetchData()
 })
 </script>
