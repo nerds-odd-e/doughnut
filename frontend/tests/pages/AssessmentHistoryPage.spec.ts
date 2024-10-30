@@ -20,7 +20,7 @@ describe("assessment and certificate history page", () => {
       .mockResolvedValue([assessmentForArt, assessmentForTech])
     wrapper = helper
       .component(AssessmentAndCertificateHistoryPage)
-      .withProps({ user })
+      .withCurrentUser(user)
       .mount()
   })
 
