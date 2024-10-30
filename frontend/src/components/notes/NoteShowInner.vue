@@ -118,10 +118,10 @@ const toLocalDateString = (date: string) => {
 }
 
 .note-content-wrapper {
-  display: flex;
   flex: 1;
   min-height: 0;
   transition: height 0.3s ease;
+  overflow: auto;
 }
 
 .note-content-wrapper.with-conversation {
