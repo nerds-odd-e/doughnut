@@ -10,76 +10,66 @@
     />
     <InitialReviewButtons
       :key="buttonKey"
-      @do-initial-review="processForm($event)"
+      @do-initial-review="processForm"
     />
   </ContainerPage>
 </template>
 
-<script lang="ts">
-import type { Note } from "@/generated/backend"
+<script setup lang="ts">
+import type { Note, ReviewPoint } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
 import type { StorageAccessor } from "@/store/createNoteStorage"
-import type { PropType } from "vue"
-import { defineComponent } from "vue"
 import usePopups from "../commons/Popups/usePopups"
 import NoteInfoBar from "../notes/NoteInfoBar.vue"
 import InitialReviewButtons from "./InitialReviewButtons.vue"
 import NoteWithBreadcrumb from "./NoteWithBreadcrumb.vue"
+import { computed } from "vue"
 
-export default defineComponent({
-  name: "InitialReview",
-  setup() {
-    return { ...useLoadingApi(), ...usePopups() }
-  },
-  props: {
-    note: {
-      type: Object as PropType<Note>,
-      required: true,
-    },
-    storageAccessor: {
-      type: Object as PropType<StorageAccessor>,
-      required: true,
-    },
-  },
-  emits: ["reloadNeeded", "initialReviewDone"],
-  components: {
-    NoteWithBreadcrumb,
-    ContainerPage,
-    NoteInfoBar,
-    InitialReviewButtons,
-  },
-  computed: {
-    buttonKey() {
-      return this.note.id
-    },
-  },
+// Props
+const { note } = defineProps<{
+  note: Note
+  storageAccessor: StorageAccessor
+}>()
 
-  methods: {
-    async processForm(skipReview: boolean) {
+// Emits
+const emit = defineEmits<{
+  (e: "reloadNeeded", data: ReviewPoint): void
+  (e: "initialReviewDone", data: ReviewPoint): void
+}>()
+
+// Composables
+const { managedApi } = useLoadingApi()
+const { popups } = usePopups()
+
+// Computed
+const buttonKey = computed(() => note.id)
+
+// Methods
+const processForm = async (skipReview: boolean) => {
+  if (skipReview) {
+    if (
+      !(await popups.confirm(
+        "Confirm to hide this note from reviewing in the future?"
+      ))
+    ) {
+      return
+    }
+  }
+
+  managedApi.restReviewsController
+    .create({
+      noteId: note.id,
+      skipReview,
+    })
+    .then((data) => {
       if (skipReview) {
-        if (
-          !(await this.popups.confirm(
-            "Confirm to hide this note from reviewing in the future?"
-          ))
-        )
-          return
+        emit("reloadNeeded", data)
+      } else {
+        emit("initialReviewDone", data)
       }
-      this.managedApi.restReviewsController
-        .create({
-          noteId: this.note.id,
-          skipReview,
-        })
-        .then((data) => {
-          if (skipReview) {
-            this.$emit("reloadNeeded", data)
-          } else {
-            this.$emit("initialReviewDone", data)
-          }
-        })
-    },
-  },
-})
+    })
+}
 </script>
 
 <style>
