@@ -50,20 +50,12 @@
 </template>
 
 <script setup lang="ts">
-import type { PropType } from "vue"
 import { computed, onMounted, ref } from "vue"
-import type { AssessmentAttempt, User } from "@/generated/backend"
+import type { AssessmentAttempt } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import ContainerPage from "./commons/ContainerPage.vue"
 
 const { managedApi } = useLoadingApi()
-
-defineProps({
-  user: {
-    type: Object as PropType<User>,
-    required: false,
-  },
-})
 
 const filterByCertificate = ref(false)
 const assessmentHistories = ref<undefined | AssessmentAttempt[]>(undefined)

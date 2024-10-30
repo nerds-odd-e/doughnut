@@ -68,7 +68,6 @@ const routes = [
     path: "/d/assessmentAndCertificateHistory",
     name: "assessmentAndCertificateHistory",
     component: AssessmentAndCertificateHistoryPage,
-    meta: { userProp: true },
   },
   {
     path: "/d/admin-dashboard",
