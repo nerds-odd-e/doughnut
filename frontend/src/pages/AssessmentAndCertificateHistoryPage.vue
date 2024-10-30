@@ -1,7 +1,7 @@
 <template>
   <ContainerPage
     v-bind="{
-      contentExists: true,
+      contentExists: assessmentHistories !== undefined,
       title: 'My Assessment and Certificate History',
     }"
   >
@@ -66,7 +66,7 @@ defineProps({
 })
 
 const filterByCertificate = ref(false)
-const assessmentHistories = ref<AssessmentAttempt[]>([])
+const assessmentHistories = ref<undefined | AssessmentAttempt[]>(undefined)
 const filterText = ref("")
 
 const toLocalDateString = (date?: string) => {
@@ -77,6 +77,9 @@ const toLocalDateString = (date?: string) => {
 }
 
 const filteredAssessmentHistories = computed(() => {
+  if (!assessmentHistories.value) {
+    return []
+  }
   return assessmentHistories.value.filter((assessmentAndCertificateHistory) => {
     const matchesTitle = assessmentAndCertificateHistory.notebookTitle
       ?.toLowerCase()
