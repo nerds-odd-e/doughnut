@@ -1,5 +1,5 @@
 <template>
-  <ContainerPage v-bind="{ contentExists: true }">
+  <ContainerPage>
     <main>
       <NoteWithBreadcrumb v-bind="{ note, storageAccessor }" />
     </main>

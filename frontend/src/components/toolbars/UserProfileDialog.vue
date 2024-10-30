@@ -1,7 +1,7 @@
 <template>
   <ContainerPage
     v-bind="{
-      contentExists: formData !== undefined,
+      contentLoaded: formData !== undefined,
       title: 'Edit User Setting',
     }"
   >

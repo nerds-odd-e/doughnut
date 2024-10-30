@@ -1,5 +1,5 @@
 <template>
-  <ContainerPage v-bind="{ contentExists: true, title: 'Joining a circle' }">
+  <ContainerPage v-bind="{ title: 'Joining a circle' }">
     <CircleJoinForm v-bind="{ invitationCode }" />
   </ContainerPage>
 </template>

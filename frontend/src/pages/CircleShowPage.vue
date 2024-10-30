@@ -1,6 +1,6 @@
 <template>
   <ContainerPage
-    v-bind="{ contentExists: circle !== undefined, title: `Circle: ${circle?.name}` }"
+    v-bind="{ contentLoaded: circle !== undefined, title: `Circle: ${circle?.name}` }"
   >
     <div v-if="circle">
       <p>

@@ -4,7 +4,7 @@
   </TeleportToHeadStatus>
 
   <div :class="containerClass">
-    <ContentLoader v-if="!contentExists" />
+    <ContentLoader v-if="!contentLoaded" />
     <template v-else>
       <slot />
     </template>
@@ -18,12 +18,13 @@ import { computed } from "vue"
 
 interface Props {
   title?: string
-  contentExists?: boolean
+  contentLoaded?: boolean
   fluid?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   fluid: false,
+  contentLoaded: true,
 })
 
 const containerClass = computed(() => ({

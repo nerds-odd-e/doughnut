@@ -1,5 +1,5 @@
 <template>
-  <ContainerPage v-bind="{ contentExists: true, title: 'Admin Dashboard' }" />
+  <ContainerPage v-bind="{ title: 'Admin Dashboard' }" />
   <ul class="nav nav-tabs">
     <li class="nav-item">
       <a

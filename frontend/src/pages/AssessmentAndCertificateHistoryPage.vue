@@ -1,7 +1,7 @@
 <template>
   <ContainerPage
     v-bind="{
-      contentExists: assessmentHistories !== undefined,
+      contentLoaded: assessmentHistories !== undefined,
       title: 'My Assessment and Certificate History',
     }"
   >

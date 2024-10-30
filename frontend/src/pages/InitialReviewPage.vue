@@ -1,5 +1,5 @@
 <template>
-  <ContainerPage v-bind="{ contentExists: note !== undefined }">
+  <ContainerPage v-bind="{ contentLoaded: note !== undefined }">
     <ProgressBar
       v-bind="{
         paused: minimized,

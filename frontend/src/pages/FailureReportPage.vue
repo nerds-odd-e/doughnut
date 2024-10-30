@@ -1,7 +1,7 @@
 <template>
   <ContainerPage
     v-bind="{
-      contentExists: failureReport !== undefined,
+      contentLoaded: failureReport !== undefined,
       title: 'Failure Report',
     }"
   >

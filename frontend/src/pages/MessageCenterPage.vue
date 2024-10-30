@@ -2,7 +2,7 @@
   <ContainerPage
     v-bind="{
       fluid: true,
-      contentExists: conversations !== undefined,
+      contentLoaded: conversations !== undefined,
       title: 'Message Center',
     }"
   >

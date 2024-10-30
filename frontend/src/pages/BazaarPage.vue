@@ -1,7 +1,7 @@
 <template>
   <ContainerPage
     v-bind="{
-      contentExists: bazaarNotebooks !== undefined,
+      contentLoaded: bazaarNotebooks !== undefined,
       title: 'Welcome To The Bazaar',
     }"
   >

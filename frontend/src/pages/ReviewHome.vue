@@ -1,5 +1,5 @@
 <template>
-  <ContainerPage v-bind="{ contentExists: reviewing !== undefined }">
+  <ContainerPage v-bind="{ contentLoaded: reviewing !== undefined }">
     <ReviewWelcome v-if="!!reviewing" v-bind="{ reviewing }" />
   </ContainerPage>
 </template>

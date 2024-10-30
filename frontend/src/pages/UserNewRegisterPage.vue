@@ -1,7 +1,6 @@
 <template>
   <ContainerPage
     v-bind="{
-      contentExists: true,
       title: 'Welcome, new user. Please create your profile',
     }"
   >
