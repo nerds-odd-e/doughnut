@@ -8,6 +8,7 @@ export interface AudioRecorder {
   getAudioData: () => Float32Array[]
   flush: () => Promise<void>
   getAudioDevices: () => Ref<MediaDeviceInfo[]>
+  getSelectedDevice: () => Ref<string>
   switchAudioDevice: (deviceId: string) => Promise<void>
 }
 
@@ -22,9 +23,9 @@ export const createAudioRecorder = (
     16000,
     processorCallback
   )
-  let currentDeviceId: string | null = null
   let isRecording: boolean = false
   const audioDevices: Ref<MediaDeviceInfo[]> = ref([])
+  const selectedDevice: Ref<string> = ref("")
 
   const audioRecorder: AudioRecorder = {
     startRecording: async function (): Promise<void> {
@@ -41,6 +42,10 @@ export const createAudioRecorder = (
         audioDevices.value = devices.filter(
           (device) => device.kind === "audioinput"
         )
+
+        const currentTrack = mediaStream.getAudioTracks()[0]
+        const currentDeviceId = currentTrack?.getSettings().deviceId
+        selectedDevice.value = currentDeviceId || ""
 
         audioInput = audioContext.createMediaStreamSource(mediaStream)
 
@@ -92,10 +97,14 @@ export const createAudioRecorder = (
       return audioDevices
     },
 
-    switchAudioDevice: async function (deviceId: string): Promise<void> {
-      if (currentDeviceId === deviceId) return
+    getSelectedDevice: function (): Ref<string> {
+      return selectedDevice
+    },
 
-      currentDeviceId = deviceId
+    switchAudioDevice: async function (deviceId: string): Promise<void> {
+      if (selectedDevice.value === deviceId) return
+
+      selectedDevice.value = deviceId
       if (isRecording) {
         // Stop current recording
         if (workletNode) workletNode.disconnect()

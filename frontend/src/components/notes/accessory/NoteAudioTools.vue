@@ -77,8 +77,6 @@ const errors = ref<Record<string, string | undefined>>()
 const isRecording = ref(false)
 const wakeLocker = createWakeLocker()
 
-const selectedDevice = ref<string>("")
-
 const processAudio = async (file: Blob) => {
   try {
     const response = await managedApi.restAiAudioController.audioToText({
@@ -95,12 +93,12 @@ const processAudio = async (file: Blob) => {
 
 const audioRecorder = createAudioRecorder(processAudio)
 const audioDevices = audioRecorder.getAudioDevices()
+const selectedDevice = audioRecorder.getSelectedDevice()
 
 const onDeviceChange = async (event: Event) => {
   const deviceId = (event.target as HTMLSelectElement).value
   try {
     await audioRecorder.switchAudioDevice(deviceId)
-    selectedDevice.value = deviceId
   } catch (error) {
     console.error("Error switching audio device:", error)
     errors.value = { devices: "Failed to switch audio device" }
