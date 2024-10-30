@@ -58,12 +58,11 @@ const nestedNoteAndLinkRoutes = (prefix: string) =>
 
 const routes = [
   ...noteAndLinkRoutes.map((route) => ({ ...route, path: `${route.path}` })),
-  { path: "/", name: "root", component: HomePage, meta: { userProp: true } },
+  { path: "/", name: "root", component: HomePage },
   {
     path: "/d/bazaar",
     name: "bazaar",
     component: BazaarPage,
-    meta: { userProp: true },
   },
   {
     path: "/d/assessmentAndCertificateHistory",

@@ -70,20 +70,11 @@
   </div>
 </template>
 
-<script lang="ts">
-import type { PropType } from "vue"
-import { defineComponent } from "vue"
+<script setup lang="ts">
+import { type Ref, inject } from "vue"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import GlobalSidebar from "@/components/toolbars/GlobalSidebar.vue"
 import type { User } from "@/generated/backend"
 
-export default defineComponent({
-  props: {
-    user: {
-      type: Object as PropType<User>,
-      required: false,
-    },
-  },
-  components: { PopButton, GlobalSidebar },
-})
+const user = inject<Ref<User | undefined>>("currentUser")
 </script>

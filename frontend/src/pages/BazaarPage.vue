@@ -9,22 +9,20 @@
     <div v-if="bazaarNotebooks">
       <NotebookBazaarViewCards
         :bazaar-notebooks="bazaarNotebooks"
-        :logged-in="!!props.user"
+        :logged-in="!!user"
       />
     </div>
   </ContainerPage>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue"
+import { ref, onMounted, inject, type Ref } from "vue"
 import type { BazaarNotebook, User } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import NotebookBazaarViewCards from "@/components/bazaar/NotebookBazaarViewCards.vue"
 import ContainerPage from "./commons/ContainerPage.vue"
 
-const props = defineProps<{
-  user?: User
-}>()
+const user = inject<Ref<User | undefined>>("currentUser")
 
 const { managedApi } = useLoadingApi()
 const bazaarNotebooks = ref<BazaarNotebook[] | undefined>(undefined)
