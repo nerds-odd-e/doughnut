@@ -136,7 +136,7 @@ export const createAudioRecorder = (
     )
     if (!deviceExists && audioDevices.value.length > 0) {
       // Switch to first available device if current one is disconnected
-      await audioRecorder.switchAudioDevice(audioDevices.value[0].deviceId)
+      await audioRecorder.switchAudioDevice(audioDevices.value[0]?.deviceId!)
     }
   })
 
