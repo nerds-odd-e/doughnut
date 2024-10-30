@@ -75,9 +75,9 @@
 </template>
 
 <script setup lang="ts">
-import type { PropType } from "vue"
-import { ref } from "vue"
-import type { NoteAccessory, NoteRealm } from "@/generated/backend"
+import type { PropType, Ref } from "vue"
+import { computed, inject, ref } from "vue"
+import type { NoteAccessory, NoteRealm, User } from "@/generated/backend"
 import NoteTextContent from "./core/NoteTextContent.vue"
 import ChildrenNotes from "./ChildrenNotes.vue"
 import type { StorageAccessor } from "../../store/createNoteStorage"
@@ -93,12 +93,14 @@ defineProps({
   noteRealm: { type: Object as PropType<NoteRealm>, required: true },
   expandChildren: { type: Boolean, required: true },
   expandInfo: { type: Boolean, default: false },
-  readonly: { type: Boolean, default: true },
   storageAccessor: {
     type: Object as PropType<StorageAccessor>,
     required: true,
   },
 })
+
+const currentUser = inject<Ref<User | undefined>>("currentUser")
+const readonly = computed(() => !currentUser?.value)
 
 const updatedNoteAccessory = ref<NoteAccessory | undefined>(undefined)
 const asMarkdown = ref(false)

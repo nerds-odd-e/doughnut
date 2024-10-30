@@ -44,7 +44,6 @@
         v-bind="{
           noteId,
           expandChildren: true,
-          readonly: !user,
           storageAccessor,
         }"
       />
@@ -55,7 +54,6 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { ref } from "vue"
-import type { User } from "@/generated/backend"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
 import NoteShow from "../components/notes/NoteShow.vue"
 import TeleportToHeadStatus from "@/pages/commons/TeleportToHeadStatus.vue"
@@ -68,7 +66,6 @@ defineProps({
     type: Object as PropType<StorageAccessor>,
     required: true,
   },
-  user: { type: Object as PropType<User> },
 })
 
 const sidebarCollapsedForSmallScreen = ref(true)

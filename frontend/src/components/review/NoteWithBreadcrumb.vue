@@ -4,7 +4,6 @@
     v-bind="{
       noteId: note.id,
       expandChildren: false,
-      readonly: false,
       storageAccessor,
     }"
   />

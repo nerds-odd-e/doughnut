@@ -35,7 +35,7 @@ const noteAndLinkRoutes = [
     name: "noteShow",
     component: NoteShowPage,
     props: (route: RouteLocation) => ({ noteId: Number(route.params.noteId) }),
-    meta: { useNoteStorageAccessor: true, userProp: true },
+    meta: { useNoteStorageAccessor: true },
   },
   {
     path: `/d/answers/:reviewQuestionInstanceId`,

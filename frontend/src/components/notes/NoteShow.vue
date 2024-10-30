@@ -7,7 +7,6 @@
         v-bind="{
           noteRealm,
           expandChildren,
-          readonly,
           storageAccessor,
         }"
         :key="noteId"
@@ -26,7 +25,6 @@ import NoteShowInner from "./NoteShowInner.vue"
 defineProps({
   noteId: { type: Number, required: true },
   expandChildren: { type: Boolean, required: true },
-  readonly: { type: Boolean, default: true },
   storageAccessor: {
     type: Object as PropType<StorageAccessor>,
     required: true,

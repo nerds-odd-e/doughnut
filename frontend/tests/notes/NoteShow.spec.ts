@@ -28,7 +28,6 @@ describe("new/updated pink banner", () => {
         .withStorageProps({
           noteId: note.id,
           expandChildren: true,
-          readonly: false,
         })
         .mount()
       await flushPromises()
