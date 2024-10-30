@@ -133,14 +133,7 @@ describe("NoteAudioTools", () => {
     await recordButton.trigger("click")
     await flushPromises()
 
-    expect(mockMediaDevices.getUserMedia).toHaveBeenCalledWith({
-      audio: {
-        autoGainControl: true,
-        echoCancellation: true,
-        noiseSuppression: true,
-        deviceId: "default",
-      },
-    })
+    expect(mockMediaDevices.getUserMedia).toHaveBeenCalledWith({ audio: true })
     expect(mockMediaStreamSource.connect).toHaveBeenCalledWith(
       mockAudioWorkletNode
     )

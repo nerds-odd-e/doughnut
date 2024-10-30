@@ -29,12 +29,7 @@ export const createAudioRecorder = (
         await audioContext.audioWorklet.addModule(audioWorkletUrl)
 
         mediaStream = await navigator.mediaDevices.getUserMedia({
-          audio: {
-            autoGainControl: true,
-            echoCancellation: true,
-            noiseSuppression: true,
-            deviceId: "default",
-          },
+          audio: true,
         })
         audioInput = audioContext.createMediaStreamSource(mediaStream)
 
