@@ -17,10 +17,6 @@ export default {
   components: { CircleJoinForm, ContainerPage },
   props: {
     invitationCode: Number,
-    user: {
-      type: Object,
-      required: false,
-    },
   },
   beforeRouteEnter(_to, _from, next) {
     next(async (vm) => {
