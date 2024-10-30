@@ -4,7 +4,11 @@
   </div>
 
   <div class="chat-controls">
-    <form class="chat-input-form" @submit.prevent="handleSendMessage()">
+    <form
+      class="chat-input-form"
+      @submit.prevent="handleSendMessage()"
+      :disabled="!trimmedMessage"
+    >
       <TextArea
         ref="chatInputTextArea"
         v-focus
@@ -22,6 +26,7 @@
         role="button"
         class="send-button"
         aria-label="Send message"
+        :disabled="!trimmedMessage"
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <line x1="22" y1="2" x2="11" y2="13"></line>
@@ -33,7 +38,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue"
+import { ref, computed } from "vue"
 
 const emit = defineEmits<{
   (e: "send-message", message: string): void
@@ -41,8 +46,11 @@ const emit = defineEmits<{
 
 const message = ref("")
 
+const trimmedMessage = computed(() => message.value.trim())
+
 const handleSendMessage = async () => {
-  emit("send-message", message.value)
+  if (!trimmedMessage.value) return
+  emit("send-message", trimmedMessage.value)
   message.value = ""
 }
 </script>
@@ -99,5 +107,15 @@ const handleSendMessage = async () => {
 
 .send-button:hover {
   background-color: #0b5ed7;
+}
+
+.send-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.chat-input-form[disabled] {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 </style>
