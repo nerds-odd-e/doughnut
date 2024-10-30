@@ -15,8 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import type { PropType } from "vue"
-import { onMounted, ref } from "vue"
+import { inject, onMounted, ref, type Ref } from "vue"
 import type { Notebook, Subscription, User } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import NotebookNewButton from "@/components/notebook/NotebookNewButton.vue"
@@ -26,10 +25,7 @@ import ContainerPage from "./commons/ContainerPage.vue"
 
 const { managedApi } = useLoadingApi()
 
-defineProps({
-  user: { type: Object as PropType<User> },
-})
-
+const user = inject<Ref<User | undefined>>("currentUser")
 const subscriptions = ref<Subscription[] | undefined>(undefined)
 const notebooks = ref<Notebook[] | undefined>(undefined)
 

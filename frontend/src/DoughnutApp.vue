@@ -22,12 +22,13 @@ const apiStatus: Ref<ApiStatus> = ref({
   states: [],
 })
 const managedApi = new ManagedApi(apiStatus.value)
-const storageAccessor = ref(createNoteStorage(managedApi))
 provide("managedApi", managedApi)
-const $route = useRoute()
-
-const externalIdentifier = ref<string | undefined>()
 const user = ref<User | undefined>()
+provide("currentUser", user)
+
+const storageAccessor = ref(createNoteStorage(managedApi))
+const $route = useRoute()
+const externalIdentifier = ref<string | undefined>()
 const featureToggle = ref(false)
 const environment = ref("production")
 const userLoaded = ref(false)

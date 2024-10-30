@@ -2,11 +2,12 @@ import ManagedApi from "@/managedApi/ManagedApi"
 import { render } from "@testing-library/vue"
 import { VueWrapper, mount } from "@vue/test-utils"
 import { merge } from "es-toolkit"
-import type { ComponentPublicInstance, DefineComponent } from "vue"
+import { ref, type ComponentPublicInstance, type DefineComponent } from "vue"
 import type { RouteLocationRaw } from "vue-router"
 import { createRouter, createWebHistory } from "vue-router"
 import createNoteStorage from "@/store/createNoteStorage"
 import routes from "@/routes/routes"
+import type { User } from "@/generated/backend"
 
 interface NoteStorageProps {
   storageAccessor?: ReturnType<typeof createNoteStorage>
@@ -36,6 +37,7 @@ class RenderingHelper {
       },
       provide: {
         managedApi: this.managedApi,
+        currentUser: ref<User | undefined>(),
       },
       stubs: {
         "router-view": true,
@@ -67,6 +69,11 @@ class RenderingHelper {
       routes,
     })
     this.withPlugin(router)
+    return this
+  }
+
+  withCurrentUser(user: User) {
+    this.global.provide.currentUser = ref(user)
     return this
   }
 
