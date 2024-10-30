@@ -1,34 +1,27 @@
 <template>
-  <ContainerPage v-bind="{ contentExists: reviewing }">
+  <ContainerPage v-bind="{ contentExists: reviewing !== undefined }">
     <ReviewWelcome v-if="!!reviewing" v-bind="{ reviewing }" />
   </ContainerPage>
 </template>
 
-<script>
+<script setup lang="ts">
+import { ref, onMounted } from "vue"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import ReviewWelcome from "@/components/review/ReviewWelcome.vue"
 import ContainerPage from "./commons/ContainerPage.vue"
+import type { ReviewStatus } from "@/generated/backend"
 
-export default {
-  setup() {
-    return useLoadingApi()
-  },
-  data() {
-    return {
-      reviewing: null,
-    }
-  },
-  components: { ReviewWelcome, ContainerPage },
-  methods: {
-    async fetchData() {
-      this.reviewing = await this.managedApi.restReviewsController.overview(
-        timezoneParam()
-      )
-    },
-  },
-  mounted() {
-    this.fetchData()
-  },
+const { managedApi } = useLoadingApi()
+const reviewing = ref<ReviewStatus | undefined>(undefined) // Replace 'any' with proper type from your API
+
+const fetchData = async () => {
+  reviewing.value = await managedApi.restReviewsController.overview(
+    timezoneParam()
+  )
 }
+
+onMounted(() => {
+  fetchData()
+})
 </script>
