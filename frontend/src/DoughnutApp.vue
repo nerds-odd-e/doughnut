@@ -43,9 +43,6 @@ const routeViewProps = computed(() => {
   if ($route.meta.useNoteStorageAccessor) {
     props.storageAccessor = storageAccessor.value
   }
-  if ($route.meta.userProp) {
-    props.user = user.value
-  }
   return props
 })
 

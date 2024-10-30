@@ -49,7 +49,15 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, computed, type PropType, watch } from "vue"
+import {
+  onMounted,
+  ref,
+  computed,
+  type PropType,
+  watch,
+  inject,
+  type Ref,
+} from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
 import ConversationComponent from "@/components/conversations/ConversationComponent.vue"
@@ -62,13 +70,14 @@ import { useRouter } from "vue-router"
 const { managedApi } = useLoadingApi()
 
 const props = defineProps({
-  user: { type: Object as PropType<User> },
   storageAccessor: {
     type: Object as PropType<StorageAccessor>,
     required: true,
   },
   conversationId: { type: Number, required: false },
 })
+
+const user = inject<Ref<User | undefined>>("currentUser")
 
 const conversations = ref<Conversation[] | undefined>(undefined)
 const currentConversation = ref<Conversation | null>(null)

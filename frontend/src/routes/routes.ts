@@ -90,7 +90,7 @@ const routes = [
         ? Number(route.params.conversationId)
         : undefined,
     }),
-    meta: { userProp: true, useNoteStorageAccessor: true },
+    meta: { useNoteStorageAccessor: true },
   },
   {
     path: "/d/assessment/notebook/:notebookId",
