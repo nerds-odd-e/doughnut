@@ -129,7 +129,7 @@ const conversationTopic = (conversation: Conversation) => {
 }
 
 const conversationPartner = (conversation: Conversation) => {
-  if (conversation.conversationInitiator?.name !== props.user?.name) {
+  if (conversation.conversationInitiator?.name !== user?.value?.name) {
     return conversation.conversationInitiator?.name
   }
   if (conversation.subjectOwnership?.circle?.name) {
