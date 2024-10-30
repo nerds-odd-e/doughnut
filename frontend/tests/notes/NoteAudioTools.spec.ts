@@ -28,16 +28,27 @@ const mockAudioWorkletNode = {
   },
 }
 
+const mockMediaStop = vi.fn()
+
 // Mock navigator.mediaDevices
 const mockMediaDevices = {
+  callback: null,
   getUserMedia: vi.fn().mockResolvedValue({
     getTracks: () => [
       {
-        stop: vi.fn(),
+        stop: mockMediaStop,
+      },
+    ],
+    getAudioTracks: () => [
+      {
+        getSettings: () => ({ deviceId: "device1" }),
       },
     ],
   }),
   enumerateDevices: vi.fn(),
+  addEventListener(callback) {
+    this.callback = callback
+  },
 }
 
 // Add mock for enumerateDevices
@@ -111,6 +122,7 @@ describe("NoteAudioTools", () => {
     mockAudioWorkletNode.port.postMessage.mockClear()
     mockMediaDevices.getUserMedia.mockClear()
     mockMediaDevices.enumerateDevices.mockClear()
+    mockMediaStop.mockClear()
   })
 
   it("renders the component with correct buttons", () => {
@@ -169,11 +181,6 @@ describe("NoteAudioTools", () => {
   })
 
   it("stops browser recording and resets audio context when Stop Recording button is clicked", async () => {
-    const mockTrackStop = vi.fn()
-    mockMediaDevices.getUserMedia.mockResolvedValue({
-      getTracks: () => [{ stop: mockTrackStop }],
-    })
-
     // Start recording
     await findButtonByTitle(wrapper, "Record Audio").trigger("click")
     await flushPromises()
@@ -184,7 +191,7 @@ describe("NoteAudioTools", () => {
     await flushPromises()
 
     // Check if all tracks in the media stream were stopped
-    expect(mockTrackStop).toHaveBeenCalled()
+    expect(mockMediaStop).toHaveBeenCalled()
 
     // Check if isRecording is set to false
     expect(wrapper.vm.isRecording).toBe(false)

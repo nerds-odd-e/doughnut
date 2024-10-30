@@ -123,5 +123,22 @@ export const createAudioRecorder = (
     },
   }
 
+  // Add device change listener
+  navigator.mediaDevices.addEventListener("devicechange", async () => {
+    const devices = await navigator.mediaDevices.enumerateDevices()
+    audioDevices.value = devices.filter(
+      (device) => device.kind === "audioinput"
+    )
+
+    // Check if selected device still exists
+    const deviceExists = audioDevices.value.some(
+      (device) => device.deviceId === selectedDevice.value
+    )
+    if (!deviceExists && audioDevices.value.length > 0) {
+      // Switch to first available device if current one is disconnected
+      await audioRecorder.switchAudioDevice(audioDevices.value[0].deviceId)
+    }
+  })
+
   return audioRecorder
 }
