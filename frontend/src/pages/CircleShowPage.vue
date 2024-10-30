@@ -1,6 +1,6 @@
 <template>
   <ContainerPage
-    v-bind="{ contentExists: !!circle, title: `Circle: ${circle?.name}` }"
+    v-bind="{ contentExists: circle !== undefined, title: `Circle: ${circle?.name}` }"
   >
     <div v-if="circle">
       <p>
@@ -71,7 +71,7 @@ const { circleId } = defineProps({
   },
 })
 
-const circle = ref<CircleForUserView | null>(null)
+const circle = ref<CircleForUserView | undefined>(undefined)
 
 const fetchData = async () => {
   circle.value = await managedApi.restCircleController.showCircle(circleId)

@@ -4,30 +4,34 @@
   </ContainerPage>
 </template>
 
-<script setup>
+<script lang="js">
 import CircleJoinForm from "@/components/circles/CircleJoinForm.vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import loginOrRegisterAndHaltThisThread from "@/managedApi/window/loginOrRegisterAndHaltThisThread"
 import ContainerPage from "./commons/ContainerPage.vue"
-import { onBeforeRouteEnter } from "vue-router"
 
-const props = defineProps({
-  invitationCode: Number,
-  user: {
-    type: Object,
-    required: false,
+export default {
+  setup() {
+    return useLoadingApi()
   },
-})
-
-const managedApi = useLoadingApi()
-
-onBeforeRouteEnter(async (to, from, next) => {
-  const x = await managedApi.restCurrentUserInfoController.currentUserInfo()
-  if (!x?.user) {
-    loginOrRegisterAndHaltThisThread()
-    next(false)
-    return
-  }
-  next()
-})
+  components: { CircleJoinForm, ContainerPage },
+  props: {
+    invitationCode: Number,
+    user: {
+      type: Object,
+      required: false,
+    },
+  },
+  beforeRouteEnter(_to, _from, next) {
+    next(async (vm) => {
+      const x =
+        await vm.managedApi.restCurrentUserInfoController.currentUserInfo()
+      if (!x?.user) {
+        loginOrRegisterAndHaltThisThread()
+        next(false)
+      }
+      next()
+    })
+  },
+}
 </script>

@@ -1,7 +1,7 @@
 <template>
   <ContainerPage
     v-bind="{
-      contentExists: !!failureReport,
+      contentExists: failureReport !== undefined,
       title: 'Failure Report',
     }"
   >
@@ -21,34 +21,31 @@
   </ContainerPage>
 </template>
 
-<script>
+<script setup lang="ts">
+import { ref, onMounted } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import ContainerPage from "./commons/ContainerPage.vue"
+import type { FailureReport } from "@/generated/backend"
 
-export default {
-  setup() {
-    return useLoadingApi()
-  },
-  props: { failureReportId: [String, Number] },
-  components: { ContainerPage },
-  data() {
-    return {
-      failureReport: null,
-      githubIssueUrl: null,
-    }
-  },
-  methods: {
-    fetchData() {
-      this.managedApi.restFailureReportController
-        .show2(this.failureReportId)
-        .then((res) => {
-          this.failureReport = res.failureReport
-          this.githubIssueUrl = res.githubIssueUrl
-        })
-    },
-  },
-  mounted() {
-    this.fetchData()
-  },
+interface Props {
+  failureReportId: number
 }
+
+const props = defineProps<Props>()
+const { managedApi } = useLoadingApi()
+
+const failureReport = ref<FailureReport | undefined>(undefined)
+const githubIssueUrl = ref<string | undefined>(undefined)
+
+const fetchData = async () => {
+  const res = await managedApi.restFailureReportController.show2(
+    props.failureReportId
+  )
+  failureReport.value = res.failureReport
+  githubIssueUrl.value = res.githubIssueUrl
+}
+
+onMounted(() => {
+  fetchData()
+})
 </script>
