@@ -2,7 +2,7 @@
   <div class="note-show-container">
     <NoteCoreToolbar
       v-if="!readonly"
-      v-bind="{ note: noteRealm.note, storageAccessor, asMarkdown, audioTools }"
+      v-bind="{ note: noteRealm.note, storageAccessor, asMarkdown, audioTools, showConversation }"
       @note-accessory-updated="updatedNoteAccessory = $event"
       @edit-as-markdown="asMarkdown = $event"
       @show-audio-tools="audioTools = true"

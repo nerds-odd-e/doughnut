@@ -24,6 +24,7 @@
       </PopButton>
 
       <NoteSendMessageButton
+        v-if="!showConversation"
         v-bind="{ noteId: note.id }"
         @show-conversations="$emit('show-conversations')"
       />
@@ -170,6 +171,10 @@ const props = defineProps({
     required: true,
   },
   asMarkdown: Boolean,
+  showConversation: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const emit = defineEmits([
