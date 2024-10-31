@@ -1,12 +1,14 @@
 <template>
   <div class="audio-tools-container bg-dark animate-dropdown">
-    <button class="close-btn" @click="closeDialog" title="Close">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
-        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-      </svg>
-    </button>
+    <div class="waveform-container">
+      <Waveform :audioRecorder="audioRecorder" :isRecording="isRecording" />
+      <button class="close-btn" @click="closeDialog" title="Close">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+          <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/>
+        </svg>
+      </button>
+    </div>
     <div class="alert alert-info" v-if="errors">{{ errors }}</div>
-    <Waveform :audioRecorder="audioRecorder" :isRecording="isRecording" />
     <div class="button-group">
       <template v-if="!isRecording">
         <button class="btn" @click="startRecording" title="Record Audio">
@@ -178,19 +180,32 @@ onUnmounted(() => {
   }
 }
 
+.waveform-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.waveform-container :deep(.waveform) {
+  flex: 1;
+}
+
 .close-btn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
+  flex-shrink: 0;
   background: none;
   border: none;
   cursor: pointer;
   color: #4a5568;
   transition: color 0.3s ease;
+  padding: 8px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .close-btn:hover {
   color: #2d3748;
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 .button-group {
