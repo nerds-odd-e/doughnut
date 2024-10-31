@@ -5,10 +5,12 @@
       :conversation="conversation"
       :user="user"
       :storage-accessor="storageAccessor"
+      @close-dialog="$emit('close-dialog')"
     />
     <ConversationTemplate
       v-else
       @send-message="startConversationWithMessage"
+      @close-dialog="$emit('close-dialog')"
     >
       <template #messages>
         <h2>Start a conversation about this note</h2>
@@ -38,7 +40,7 @@ const props = defineProps<{
   noteId: number
   storageAccessor: StorageAccessor
 }>()
-const emit = defineEmits(["submitted"])
+const emit = defineEmits(["submitted", "close-dialog"])
 
 async function startConversationWithMessage(message: string) {
   conversation.value =

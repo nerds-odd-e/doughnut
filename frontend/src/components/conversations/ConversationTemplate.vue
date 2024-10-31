@@ -1,4 +1,27 @@
 <template>
+  <div class="dialog-bar">
+    <div class="spacer"></div>
+    <button 
+      class="minimize-button" 
+      @click="$emit('close-dialog')" 
+      aria-label="Close dialog"
+    >
+      <svg 
+        xmlns="http://www.w3.org/2000/svg" 
+        width="20" 
+        height="20" 
+        viewBox="0 0 24 24" 
+        fill="none" 
+        stroke="currentColor" 
+        stroke-width="2" 
+        stroke-linecap="round" 
+        stroke-linejoin="round"
+      >
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+      </svg>
+    </button>
+  </div>
+
   <div class="messages-container">
     <slot name="messages" />
   </div>
@@ -42,6 +65,7 @@ import { ref, computed } from "vue"
 
 const emit = defineEmits<{
   (e: "send-message", message: string): void
+  (e: "close-dialog"): void
 }>()
 
 const message = ref("")
@@ -117,5 +141,29 @@ const handleSendMessage = async () => {
 .chat-input-form[disabled] {
   opacity: 0.7;
   cursor: not-allowed;
+}
+
+.dialog-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.minimize-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.minimize-button:hover {
+  background-color: #e9ecef;
 }
 </style>

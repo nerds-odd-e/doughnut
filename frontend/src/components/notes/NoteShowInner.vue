@@ -63,6 +63,7 @@
         v-if="showConversation"
         :note-id="noteRealm.id"
         :storage-accessor="storageAccessor"
+        @close-dialog="showConversation = false"
       />
     </div>
   </div>

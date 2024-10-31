@@ -1,6 +1,7 @@
 <template>
   <ConversationTemplate
     @send-message="handleSendMessage"
+    @close-dialog="$emit('close-dialog')"
   >
     <template #messages v-if="currentConversationMessages">
       <div
@@ -59,6 +60,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: "conversation-fetched", conversationId: number): void
+  (e: "close-dialog"): void
 }>()
 
 const { managedApi } = useLoadingApi()
