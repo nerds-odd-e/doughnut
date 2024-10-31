@@ -120,7 +120,7 @@
       </PopButton>
 
       <button class="btn" title="Audio tools" v-if="!audioTools" @click="$emit('show-audio-tools')">
-        <SvgResume />
+        <SvgAudioInput />
       </button>
     </div>
   </nav>
@@ -151,7 +151,7 @@ import SvgMarkdown from "@/components/svgs/SvgMarkdown.vue"
 import SvgRichContent from "@/components/svgs/SvgRichContent.vue"
 import NoteSendMessageButton from "./NoteSendMessageButton.vue"
 import SvgImage from "../../svgs/SvgImage.vue"
-import SvgResume from "../../svgs/SvgResume.vue"
+import SvgAudioInput from "../../svgs/SvgAudioInput.vue"
 import SvgUrlIndicator from "../../svgs/SvgUrlIndicator.vue"
 import NoteEditImageDialog from "../accessory/NoteEditImageDialog.vue"
 import NoteEditUrlDialog from "../accessory/NoteEditUrlDialog.vue"
