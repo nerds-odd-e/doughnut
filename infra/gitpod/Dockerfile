@@ -1,4 +1,4 @@
-# syntax=docker.io/docker/dockerfile:1.10.0
+# syntax=docker.io/docker/dockerfile:1.11.0
 
 ARG TARGET_PLATFORM=linux/amd64
 
@@ -9,14 +9,17 @@ FROM --platform=$TARGET_PLATFORM gitpod/workspace-full-vnc
 
 USER root
 
+ENV TERM=xterm
+ENV DEBIAN_FRONTEND=noninteractive
+
 # Install Cypress dependencies.
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y update \
+RUN apt-get -y update \
     && apt-get install -y lsb-release ca-certificates curl apt-utils \
     && curl -sSLo /tmp/debsuryorg-archive-keyring.deb https://packages.sury.org/debsuryorg-archive-keyring.deb \
     && dpkg -i /tmp/debsuryorg-archive-keyring.deb \
     && sh -c 'echo "deb [signed-by=/usr/share/keyrings/deb.sury.org-php.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list'
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
+RUN apt-get install -y \
     libgtk2.0-0 \
     libgtk-3-0 \
     libgbm-dev \
@@ -57,7 +60,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
     && rm -rf /home/gitpod/.config/nixpkgs
 
 # use bash over dash for /bin/sh
-RUN DEBIAN_FRONTEND=noninteractive dpkg-reconfigure -p critical dash
+RUN dpkg-reconfigure -p critical dash
 
 RUN mkdir -m 0755 /nix && chown gitpod /nix \
     && mkdir -p /etc/nix && echo 'sandbox = false' > /etc/nix/nix.conf
