@@ -86,4 +86,11 @@ public class RestConversationMessageController {
     currentUser.assertAuthorization(conversation);
     return conversation.getConversationMessages();
   }
+
+  @GetMapping("/note/{note}")
+  public List<Conversation> getConversationsAboutNote(
+      @PathVariable("note") @Schema(type = "integer") Note note) {
+    currentUser.assertLoggedIn();
+    return conversationService.getConversationsAboutNote(note, currentUser.getEntity());
+  }
 }

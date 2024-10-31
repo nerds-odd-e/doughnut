@@ -2,8 +2,10 @@ package com.odde.doughnut.controllers;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -361,6 +363,56 @@ class RestConversationMessageControllerTest {
       List<Conversation> orderedConversations = controller.getConversationsOfCurrentUser();
 
       assertIterableEquals(List.of(conv3, conv2, conv1), orderedConversations);
+    }
+  }
+
+  @Nested
+  class GetConversationsAboutNoteTests {
+    Note note;
+    User otherUser;
+
+    @BeforeEach
+    void setup() {
+      UserModel noteOwner = makeMe.aUser().toModelPlease();
+      note = makeMe.aNote().creatorAndOwner(noteOwner).please();
+      otherUser = makeMe.aUser().please();
+    }
+
+    @Test
+    void shouldReturnConversationsAboutNote() {
+      // Create conversations about the note
+      Conversation conv1 = makeMe.aConversation().from(currentUser).forANote(note).please();
+      Conversation conv2 = makeMe.aConversation().from(currentUser).forANote(note).please();
+      // Create an unrelated conversation
+      makeMe.aConversation().from(currentUser).please();
+
+      List<Conversation> conversations = controller.getConversationsAboutNote(note);
+      assertEquals(2, conversations.size());
+      assertTrue(conversations.contains(conv1));
+      assertTrue(conversations.contains(conv2));
+    }
+
+    @Test
+    void shouldOnlyReturnAccessibleConversations() {
+      // Create a conversation the current user initiated
+      Conversation conv1 = makeMe.aConversation().from(currentUser).forANote(note).please();
+      // Create a conversation between other users about the same note
+      Conversation conv2 = makeMe.aConversation().from(otherUser).forANote(note).please();
+
+      List<Conversation> conversations = controller.getConversationsAboutNote(note);
+      assertEquals(1, conversations.size());
+      assertTrue(conversations.contains(conv1));
+      assertFalse(conversations.contains(conv2));
+    }
+
+    @Test
+    void shouldRequireLogin() {
+      controller =
+          new RestConversationMessageController(makeMe.aNullUserModelPlease(), conversationService);
+      ResponseStatusException exception =
+          assertThrows(
+              ResponseStatusException.class, () -> controller.getConversationsAboutNote(note));
+      assertEquals(HttpStatusCode.valueOf(401), exception.getStatusCode());
     }
   }
 }

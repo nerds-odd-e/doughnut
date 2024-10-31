@@ -64,4 +64,10 @@ public class ConversationService {
   public List<ConversationMessage> getUnreadConversations(User user) {
     return modelFactoryService.conversationRepository.findUnreadMessagesByUser(user);
   }
+
+  public List<Conversation> getConversationsAboutNote(Note note, User entity) {
+    return conversationRelatedToUser(entity).stream()
+        .filter(conversation -> note.equals(conversation.getSubject().getNote()))
+        .toList();
+  }
 }

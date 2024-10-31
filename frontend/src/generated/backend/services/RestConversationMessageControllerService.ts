@@ -33,6 +33,25 @@ export class RestConversationMessageControllerService {
     }
     /**
      * @param note
+     * @returns Conversation OK
+     * @throws ApiError
+     */
+    public getConversationsAboutNote(
+        note: number,
+    ): CancelablePromise<Array<Conversation>> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/conversation/note/{note}',
+            path: {
+                'note': note,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param note
      * @param requestBody
      * @returns Conversation OK
      * @throws ApiError
