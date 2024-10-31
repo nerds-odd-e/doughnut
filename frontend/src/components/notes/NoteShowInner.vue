@@ -69,6 +69,7 @@
       <NoteConversation
         v-if="showConversation"
         :note-id="noteRealm.id"
+        :storage-accessor="storageAccessor"
       />
     </div>
   </div>
