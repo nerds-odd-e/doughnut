@@ -6,21 +6,11 @@
         note: noteRealm.note,
         storageAccessor,
         asMarkdown,
-        audioTools,
         showConversation,
       }"
       @note-accessory-updated="updatedNoteAccessory = $event"
       @edit-as-markdown="asMarkdown = $event"
-      @show-audio-tools="audioTools = true"
       @show-conversations="showConversation = true"
-    />
-    <NoteAudioTools
-      v-if="audioTools"
-      v-bind="{ note: noteRealm.note, storageAccessor }"
-      @close-dialog="
-        audioTools = false;
-        updatedNoteAccessory = $event;
-      "
     />
     <div class="note-content-wrapper" :class="{ 'with-conversation': showConversation }">
       <div id="main-note-content" class="col-md-9">
@@ -90,7 +80,6 @@ import NoteToolbar from "./core/NoteToolbar.vue"
 import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue"
 import LinkOfNote from "../links/LinkOfNote.vue"
 import { reverseLabel } from "../../models/linkTypeOptions"
-import NoteAudioTools from "./accessory/NoteAudioTools.vue"
 import NoteConversation from "../conversations/NoteConversation.vue"
 
 defineProps<{
@@ -105,7 +94,6 @@ const readonly = computed(() => !currentUser?.value)
 
 const updatedNoteAccessory = ref<NoteAccessory | undefined>(undefined)
 const asMarkdown = ref(false)
-const audioTools = ref(false)
 const showConversation = ref(false)
 
 const toLocalDateString = (date: string) => {

@@ -120,15 +120,21 @@
         </template>
       </PopButton>
 
-      <button class="btn" title="Audio tools" v-if="!audioTools" @click="$emit('show-audio-tools')">
+      <button class="btn" title="Audio tools" v-if="!audioTools" @click="audioTools = true">
         <SvgAudioInput />
       </button>
-    </div>
+   </div>
   </nav>
+  <NoteAudioTools
+    v-if="audioTools"
+    v-bind="{ note, storageAccessor }"
+    @close-dialog="audioTools = false"
+  />
+
 </template>
 
 <script setup lang="ts">
-import type { PropType } from "vue"
+import { ref, type PropType } from "vue"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import type { Note } from "@/generated/backend"
 import type { NoteAccessory } from "@/generated/backend"
@@ -156,6 +162,7 @@ import SvgAudioInput from "../../svgs/SvgAudioInput.vue"
 import SvgUrlIndicator from "../../svgs/SvgUrlIndicator.vue"
 import NoteEditImageDialog from "../accessory/NoteEditImageDialog.vue"
 import NoteEditUrlDialog from "../accessory/NoteEditUrlDialog.vue"
+import NoteAudioTools from "../accessory/NoteAudioTools.vue"
 
 const props = defineProps({
   storageAccessor: {
@@ -166,10 +173,6 @@ const props = defineProps({
     type: Object as PropType<Note>,
     required: true,
   },
-  audioTools: {
-    type: Boolean,
-    required: true,
-  },
   asMarkdown: Boolean,
   showConversation: {
     type: Boolean,
@@ -177,10 +180,11 @@ const props = defineProps({
   },
 })
 
+const audioTools = ref(false)
+
 const emit = defineEmits([
   "note-accessory-updated",
   "edit-as-markdown",
-  "show-audio-tools",
   "show-conversations",
 ])
 
