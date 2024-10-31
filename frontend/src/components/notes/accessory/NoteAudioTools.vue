@@ -1,5 +1,5 @@
 <template>
-  <div class="audio-tools-container">
+  <div class="audio-tools-container bg-dark animate-dropdown">
     <button class="close-btn" @click="closeDialog" title="Close">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
         <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
@@ -160,10 +160,22 @@ onUnmounted(() => {
 <style scoped>
 .audio-tools-container {
   position: relative;
-  background-color: #f0f4f8;
-  border-radius: 12px;
+  border-radius: 0 0 12px 12px;
   padding: 20px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  animation: dropDown 0.3s ease-out;
+  transform-origin: top;
+}
+
+@keyframes dropDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .close-btn {
