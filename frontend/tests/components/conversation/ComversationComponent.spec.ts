@@ -1,5 +1,6 @@
 import { expect, vi } from "vitest"
 import ConversationInner from "@/components/conversations/ConversationInner.vue"
+import ConversationComponent from "@/components/conversations/ConversationComponent.vue"
 import helper from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
 import type { ConversationMessage } from "@/generated/backend"
@@ -80,5 +81,33 @@ describe("ConversationInner", () => {
     expect(
       helper.managedApi.restConversationMessageController.replyToConversation
     ).toHaveBeenCalled()
+  })
+})
+
+describe("ConversationComponent", () => {
+  let wrapper
+  const note = makeMe.aNote.please()
+  const conversation = makeMe.aConversation.note(note).please()
+  const user = makeMe.aUser.please()
+
+  beforeEach(() => {
+    mockedPush.mockClear()
+    wrapper = helper
+      .component(ConversationComponent)
+      .withStorageProps({
+        conversation,
+        user,
+      })
+      .mount()
+  })
+
+  it("routes to note show page when minimize button is clicked and subject is a note", async () => {
+    const minimizeButton = wrapper.find("button.minimize-button")
+    await minimizeButton.trigger("click")
+
+    expect(mockedPush).toHaveBeenCalledWith({
+      name: "noteShow",
+      params: { noteId: note.id },
+    })
   })
 })
