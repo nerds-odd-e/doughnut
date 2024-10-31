@@ -2,7 +2,7 @@ import { expect, vi } from "vitest"
 import NoteConversation from "@/components/conversations/NoteConversation.vue"
 import helper from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
-import { flushPromises, type VueWrapper } from "@vue/test-utils"
+import { flushPromises } from "@vue/test-utils"
 import ConversationInner from "@/components/conversations/ConversationInner.vue"
 import ConversationTemplate from "@/components/conversations/ConversationTemplate.vue"
 
@@ -14,24 +14,31 @@ vitest.mock("vue-router", () => ({
 }))
 
 describe("NoteConversation", () => {
-  let wrapper: VueWrapper
   const note = makeMe.aNote.please()
-  const mockConversation = { id: 1, title: "Test Conversation" }
+  const conversation = { id: 1, title: "Test Conversation" }
   const user = makeMe.aUser.please()
 
-  beforeEach(() => {
-    wrapper = helper
+  const mount = async () => {
+    const wrapper = helper
       .component(NoteConversation)
       .withCurrentUser(user)
       .withStorageProps({
         noteId: note.id,
       })
       .mount()
+    await flushPromises()
+    return wrapper
+  }
+
+  beforeEach(() => {
     helper.managedApi.restConversationMessageController.startConversationAboutNote =
-      vi.fn().mockResolvedValue(mockConversation)
+      vi.fn().mockResolvedValue(conversation)
   })
 
   it("calls api to start conversation and shows ConversationInner when successful", async () => {
+    helper.managedApi.restConversationMessageController.getConversationsAboutNote =
+      vi.fn().mockResolvedValue([])
+    const wrapper = await mount()
     await wrapper.find("textarea").setValue("Hello")
     await wrapper.find("form.chat-input-form").trigger("submit")
     await flushPromises()
@@ -44,10 +51,23 @@ describe("NoteConversation", () => {
     // Verify ConversationInner is rendered with correct props
     const conversationInner = wrapper.findComponent(ConversationInner)
     expect(conversationInner.exists()).toBe(true)
-    expect(conversationInner.props("conversation")).toEqual(mockConversation)
+    expect(conversationInner.props("conversation")).toEqual(conversation)
   })
 
-  it("shows ConversationTemplate when no conversation exists", () => {
+  it("shows the first conversation if conversation exists", async () => {
+    helper.managedApi.restConversationMessageController.getConversationsAboutNote =
+      vi.fn().mockResolvedValue([conversation])
+    const wrapper = await mount()
+    const conversationInner = wrapper.findComponent(ConversationInner)
+
+    expect(conversationInner.exists()).toBe(true)
+    expect(conversationInner.props("conversation")).toEqual(conversation)
+  })
+
+  it("shows ConversationTemplate when no conversation exists", async () => {
+    helper.managedApi.restConversationMessageController.getConversationsAboutNote =
+      vi.fn().mockResolvedValue([])
+    const wrapper = await mount()
     const conversationTemplate = wrapper.findComponent(ConversationTemplate)
     const conversationInner = wrapper.findComponent(ConversationInner)
 
