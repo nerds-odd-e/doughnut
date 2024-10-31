@@ -76,7 +76,7 @@
 </template>
 
 <script setup lang="ts">
-import type { PropType, Ref } from "vue"
+import type { Ref } from "vue"
 import { computed, inject, ref } from "vue"
 import type { NoteAccessory, NoteRealm, User } from "@/generated/backend"
 import NoteTextContent from "./core/NoteTextContent.vue"
@@ -90,15 +90,12 @@ import { reverseLabel } from "../../models/linkTypeOptions"
 import NoteAudioTools from "./accessory/NoteAudioTools.vue"
 import NoteConversation from "../conversations/NoteConversation.vue"
 
-defineProps({
-  noteRealm: { type: Object as PropType<NoteRealm>, required: true },
-  expandChildren: { type: Boolean, required: true },
-  expandInfo: { type: Boolean, default: false },
-  storageAccessor: {
-    type: Object as PropType<StorageAccessor>,
-    required: true,
-  },
-})
+defineProps<{
+  noteRealm: NoteRealm
+  expandChildren: boolean
+  expandInfo?: boolean
+  storageAccessor: StorageAccessor
+}>()
 
 const currentUser = inject<Ref<User | undefined>>("currentUser")
 const readonly = computed(() => !currentUser?.value)
