@@ -6,7 +6,7 @@
         note: noteRealm.note,
         storageAccessor,
         asMarkdown,
-        showConversation,
+        conversationButton: showConversation || noConversationButton,
       }"
       @note-accessory-updated="updatedNoteAccessory = $event"
       @edit-as-markdown="asMarkdown = $event"
@@ -87,6 +87,7 @@ defineProps<{
   expandChildren: boolean
   expandInfo?: boolean
   storageAccessor: StorageAccessor
+  noConversationButton?: boolean
 }>()
 
 const currentUser = inject<Ref<User | undefined>>("currentUser")

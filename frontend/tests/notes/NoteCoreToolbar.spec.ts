@@ -10,7 +10,6 @@ it("displays menu items when dropdown is open", async () => {
     .component(NoteToolbar)
     .withStorageProps({
       note: noteRealm.note,
-      audioTools: false,
     })
     .mount()
 

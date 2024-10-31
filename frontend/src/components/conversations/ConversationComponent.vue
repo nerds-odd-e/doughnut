@@ -8,6 +8,7 @@
           noteId: conversation.subject?.note?.id,
           storageAccessor,
           expandChildren: false,
+          noConversationButton: true,
         }"
       />
       <AssessmentQuestion

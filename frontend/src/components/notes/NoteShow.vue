@@ -8,6 +8,7 @@
           noteRealm,
           expandChildren,
           storageAccessor,
+          noConversationButton,
         }"
         :key="noteId"
       />
@@ -25,6 +26,7 @@ import NoteShowInner from "./NoteShowInner.vue"
 defineProps({
   noteId: { type: Number, required: true },
   expandChildren: { type: Boolean, required: true },
+  noConversationButton: { type: Boolean, default: false },
   storageAccessor: {
     type: Object as PropType<StorageAccessor>,
     required: true,
