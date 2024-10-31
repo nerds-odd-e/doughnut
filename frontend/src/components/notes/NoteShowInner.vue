@@ -1,23 +1,28 @@
 <template>
   <div class="note-show-container">
-    <NoteCoreToolbar
+    <NoteToolbar
       v-if="!readonly"
-      v-bind="{ note: noteRealm.note, storageAccessor, asMarkdown, audioTools, showConversation }"
+      v-bind="{
+        note: noteRealm.note,
+        storageAccessor,
+        asMarkdown,
+        audioTools,
+        showConversation,
+      }"
       @note-accessory-updated="updatedNoteAccessory = $event"
       @edit-as-markdown="asMarkdown = $event"
       @show-audio-tools="audioTools = true"
       @show-conversations="showConversation = true"
     />
-
-    <div class="note-content-wrapper" :class="{ 'with-conversation': showConversation }">
-      <NoteAudioTools
-        v-if="audioTools"
-        v-bind="{ note: noteRealm.note, storageAccessor }"
-        @close-dialog="
+    <NoteAudioTools
+      v-if="audioTools"
+      v-bind="{ note: noteRealm.note, storageAccessor }"
+      @close-dialog="
         audioTools = false;
-        updatedNoteAccessory = $event
-        "
-      />
+        updatedNoteAccessory = $event;
+      "
+    />
+    <div class="note-content-wrapper" :class="{ 'with-conversation': showConversation }">
       <div id="main-note-content" class="col-md-9">
         <NoteTextContent
           v-bind="{
@@ -40,9 +45,7 @@
             <span class="me-3">
               Created: {{ toLocalDateString(noteRealm.note.createdAt) }}
             </span>
-            <span>
-              Last updated: {{ toLocalDateString(noteRealm.note.updatedAt) }}
-            </span>
+            <span> Last updated: {{ toLocalDateString(noteRealm.note.updatedAt) }} </span>
           </p>
         </NoteRecentUpdateIndicator>
         <ChildrenNotes
@@ -83,7 +86,7 @@ import NoteTextContent from "./core/NoteTextContent.vue"
 import ChildrenNotes from "./ChildrenNotes.vue"
 import type { StorageAccessor } from "../../store/createNoteStorage"
 import NoteAccessoryAsync from "./accessory/NoteAccessoryAsync.vue"
-import NoteCoreToolbar from "./core/NoteCoreToolbar.vue"
+import NoteToolbar from "./core/NoteToolbar.vue"
 import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue"
 import LinkOfNote from "../links/LinkOfNote.vue"
 import { reverseLabel } from "../../models/linkTypeOptions"
