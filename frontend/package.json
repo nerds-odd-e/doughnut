@@ -48,7 +48,7 @@
     "lodash": "^4.17.21",
     "optionator": "^0.9.4",
     "sass": "^1.80.5",
-    "sass-loader": "16.0.2",
+    "sass-loader": "16.0.3",
     "style-loader": "^4.0.0",
     "typescript": "5.6.3",
     "unplugin-auto-import": "^0.18.3",
