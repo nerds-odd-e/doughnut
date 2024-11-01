@@ -13,5 +13,6 @@ export type Conversation = {
     createdAt: string;
     updatedAt: string;
     aiAssistantThreadId?: string;
+    lastAiAssistantThreadSync?: string;
 };
 

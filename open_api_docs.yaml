@@ -3610,6 +3610,9 @@ components:
           format: date-time
         aiAssistantThreadId:
           type: string
+        lastAiAssistantThreadSync:
+          type: string
+          format: date-time
     ConversationSubject:
       type: object
       properties:

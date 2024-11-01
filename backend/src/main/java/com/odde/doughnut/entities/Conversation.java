@@ -43,6 +43,10 @@ public class Conversation extends EntityIdentifiedByIdOnly {
   @Setter
   private String aiAssistantThreadId;
 
+  @Column(name = "last_ai_assistant_thread_sync")
+  @Setter
+  private Timestamp lastAiAssistantThreadSync;
+
   @JsonIgnore
   public void setAssessmentQuestionInstance(AssessmentQuestionInstance assessmentQuestionInstance) {
     this.subject.setAssessmentQuestionInstance(assessmentQuestionInstance);
