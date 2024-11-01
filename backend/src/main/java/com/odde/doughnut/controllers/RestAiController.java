@@ -7,6 +7,7 @@ import com.odde.doughnut.entities.NotebookAssistant;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorWithStorageService;
+import com.odde.doughnut.services.ChatAboutNoteService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.assistants.message.Message;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -69,7 +70,12 @@ public class RestAiController {
       @PathVariable(value = "note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(note);
-    return aiAdvisorWithStorageService.getMessageList(note, currentUser.getEntity());
+    String threadId =
+        aiAdvisorWithStorageService.getExistingThreadId(currentUser.getEntity(), note);
+    if (threadId == null) {
+      return List.of();
+    }
+    return aiAdvisorWithStorageService.getChatService(note, threadId).getMessageList();
   }
 
   @PostMapping(path = "/chat/{note}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
@@ -79,10 +85,10 @@ public class RestAiController {
       @RequestBody ChatRequest request)
       throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(note);
-    String threadId =
-        aiAdvisorWithStorageService.getOrCreateThread(
-            note, currentUser.getEntity(), request.getThreadId());
-    return aiAdvisorWithStorageService.getAIReplySSE(note, threadId, request.getUserMessage());
+    ChatAboutNoteService chatService =
+        aiAdvisorWithStorageService.getChatService(note, request.getThreadId());
+    chatService.createUserMessage(request.getUserMessage());
+    return chatService.getAIReplySSE();
   }
 
   @GetMapping("/dummy")

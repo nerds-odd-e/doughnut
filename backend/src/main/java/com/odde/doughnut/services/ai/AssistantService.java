@@ -65,25 +65,18 @@ public record AssistantService(
 
   public AiAssistantResponse createThreadAndRunWithFirstMessage(Note note, String prompt) {
     String threadId = createThread(note);
-    MessageRequest messageRequest = MessageRequest.builder().role("user").content(prompt).build();
-    openAiApiHandler.createMessage(threadId, messageRequest);
+    createUserMessage(prompt, threadId);
     Run run = openAiApiHandler.createRun(threadId, assistantId);
     return getThreadResponse(threadId, run);
   }
 
-  public AiAssistantResponse createThreadAndRunWithFirstMessage(String prompt) {
-    String threadId = createThread();
-    MessageRequest messageRequest = MessageRequest.builder().role("user").content(prompt).build();
-    openAiApiHandler.createMessage(threadId, messageRequest);
-    Run run = openAiApiHandler.createRun(threadId, assistantId);
-    return getThreadResponse(threadId, run);
-  }
-
-  public Flowable<AssistantSSE> createMessageRunAndGetResponseStream(
-      String prompt, String threadId) {
-    MessageRequest messageRequest = MessageRequest.builder().role("user").content(prompt).build();
-    openAiApiHandler.createMessage(threadId, messageRequest);
+  public Flowable<AssistantSSE> getRunStream(String threadId) {
     return openAiApiHandler.createRunStream(threadId, assistantId);
+  }
+
+  public void createUserMessage(String prompt, String threadId) {
+    MessageRequest messageRequest = MessageRequest.builder().role("user").content(prompt).build();
+    openAiApiHandler.createMessage(threadId, messageRequest);
   }
 
   public AiAssistantResponse answerAiCompletionClarifyingQuestion(
