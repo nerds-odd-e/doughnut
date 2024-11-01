@@ -6,6 +6,7 @@ import com.odde.doughnut.entities.ConversationMessage;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AiAdvisorWithStorageService;
 import com.odde.doughnut.services.ConversationService;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
@@ -15,12 +16,16 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/conversation")
 public class RestConversationMessageController {
   private final ConversationService conversationService;
+  private final AiAdvisorWithStorageService aiAdvisorWithStorageService;
   private final UserModel currentUser;
 
   public RestConversationMessageController(
-      UserModel currentUser, ConversationService conversationService) {
+      UserModel currentUser,
+      ConversationService conversationService,
+      AiAdvisorWithStorageService aiAdvisorWithStorageService) {
     this.currentUser = currentUser;
     this.conversationService = conversationService;
+    this.aiAdvisorWithStorageService = aiAdvisorWithStorageService;
   }
 
   @PostMapping("/assessment-question/{assessmentQuestion}")

@@ -10,6 +10,8 @@ import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.NotebookAssistant;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AiAdvisorService;
+import com.odde.doughnut.services.AiAdvisorWithStorageService;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -47,14 +49,18 @@ class RestAiControllerForAssistantTest {
   @Mock OpenAiApi openAiApi;
   @Autowired MakeMe makeMe;
   TestabilitySettings testabilitySettings = new TestabilitySettings();
+  AiAdvisorService aiAdvisorService;
+  AiAdvisorWithStorageService aiAdvisorWithStorageService;
 
   @BeforeEach
   void Setup() {
+    aiAdvisorService = new AiAdvisorService(openAiApi);
+    aiAdvisorWithStorageService =
+        new AiAdvisorWithStorageService(aiAdvisorService, makeMe.modelFactoryService);
     currentUser = makeMe.anAdmin().toModelPlease();
     note = makeMe.aNote().please();
     controller =
-        new RestAiController(
-            openAiApi, makeMe.modelFactoryService, currentUser, testabilitySettings);
+        new RestAiController(aiAdvisorWithStorageService, currentUser, testabilitySettings);
   }
 
   @Nested
@@ -75,10 +81,7 @@ class RestAiControllerForAssistantTest {
       void authentication() {
         controller =
             new RestAiController(
-                openAiApi,
-                makeMe.modelFactoryService,
-                makeMe.aUser().toModelPlease(),
-                testabilitySettings);
+                aiAdvisorWithStorageService, makeMe.aUser().toModelPlease(), testabilitySettings);
         assertThrows(
             UnexpectedNoAccessRightException.class, () -> controller.recreateAllAssistants());
       }
@@ -132,10 +135,7 @@ class RestAiControllerForAssistantTest {
     void authentication() {
       controller =
           new RestAiController(
-              openAiApi,
-              makeMe.modelFactoryService,
-              makeMe.aUser().toModelPlease(),
-              testabilitySettings);
+              aiAdvisorWithStorageService, makeMe.aUser().toModelPlease(), testabilitySettings);
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.recreateNotebookAssistant(notebook, notebookAssistantCreationParams));

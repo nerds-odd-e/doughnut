@@ -26,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class AiAdvisorServiceAssistantsTest {
 
-  private AiAdvisorWithStorageService aiAdvisorService;
+  private AiAdvisorWithStorageService aiAdvisorServiceWithStorage;
   @Autowired MakeMe makeMe;
   @Mock private OpenAiApi openAiApi;
   OpenAIChatCompletionMock openAIChatCompletionMock;
@@ -35,7 +35,9 @@ class AiAdvisorServiceAssistantsTest {
   void Setup() {
     MockitoAnnotations.openMocks(this);
     openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
-    aiAdvisorService = new AiAdvisorWithStorageService(openAiApi, makeMe.modelFactoryService);
+    aiAdvisorServiceWithStorage =
+        new AiAdvisorWithStorageService(
+            new AiAdvisorService(openAiApi), makeMe.modelFactoryService);
   }
 
   @Nested
@@ -47,7 +49,7 @@ class AiAdvisorServiceAssistantsTest {
       Assistant item = new Assistant();
       item.setId("1234");
       when(openAiApi.createAssistant(ArgumentMatchers.any())).thenReturn(Single.just(item));
-      aiAdvisorService.createCompletionAssistant(makeMe.aTimestamp().please(), "gpt4o");
+      aiAdvisorServiceWithStorage.createCompletionAssistant(makeMe.aTimestamp().please(), "gpt4o");
       ArgumentCaptor<AssistantRequest> captor = ArgumentCaptor.forClass(AssistantRequest.class);
       verify(openAiApi).createAssistant(captor.capture());
       assistantRequest = captor.getValue();

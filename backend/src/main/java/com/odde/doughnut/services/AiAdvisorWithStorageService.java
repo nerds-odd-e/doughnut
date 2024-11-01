@@ -5,7 +5,6 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.ai.AssistantService;
 import com.theokanning.openai.assistants.assistant.Assistant;
 import com.theokanning.openai.assistants.message.Message;
-import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.service.assistant_stream.AssistantSSE;
 import io.reactivex.Flowable;
 import java.io.IOException;
@@ -14,13 +13,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-public record AiAdvisorWithStorageService(
-    AiAdvisorService aiAdvisorService, ModelFactoryService modelFactoryService) {
-  public AiAdvisorWithStorageService(OpenAiApi openAiApi, ModelFactoryService modelFactoryService) {
-    this(new AiAdvisorService(openAiApi), modelFactoryService);
-  }
+@RequiredArgsConstructor
+@Service
+public final class AiAdvisorWithStorageService {
+  @Getter private final AiAdvisorService aiAdvisorService;
+  private final ModelFactoryService modelFactoryService;
 
   private AssistantService getChatService(Note note) {
     NotebookAssistant assistant =
@@ -66,13 +68,13 @@ public record AiAdvisorWithStorageService(
     userAssistantThread.setThreadId(threadId);
     userAssistantThread.setNote(note);
     userAssistantThread.setUser(user);
-    modelFactoryService().entityManager.persist(userAssistantThread);
+    modelFactoryService.entityManager.persist(userAssistantThread);
     return threadId;
   }
 
   public List<Message> getMessageList(Note note, User entity) {
     UserAssistantThread byUserAndNote =
-        modelFactoryService().userAssistantThreadRepository.findByUserAndNote(entity, note);
+        modelFactoryService.userAssistantThreadRepository.findByUserAndNote(entity, note);
     if (byUserAndNote == null) {
       return List.of();
     }

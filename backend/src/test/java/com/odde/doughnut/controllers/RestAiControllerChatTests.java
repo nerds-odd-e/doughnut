@@ -12,6 +12,8 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NotebookAssistant;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AiAdvisorService;
+import com.odde.doughnut.services.AiAdvisorWithStorageService;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIAssistantMocker;
@@ -49,13 +51,17 @@ public class RestAiControllerChatTests {
   Note note;
   TestabilitySettings testabilitySettings = new TestabilitySettings();
   OpenAIAssistantMocker openAIAssistantMocker;
+  AiAdvisorService aiAdvisorService;
+  AiAdvisorWithStorageService aiAdvisorWithStorageService;
 
   @BeforeEach
   void setUp() {
+    aiAdvisorService = new AiAdvisorService(openAiApi);
+    aiAdvisorWithStorageService =
+        new AiAdvisorWithStorageService(aiAdvisorService, makeMe.modelFactoryService);
     currentUser = makeMe.aUser().toModelPlease();
     controller =
-        new RestAiController(
-            openAiApi, makeMe.modelFactoryService, currentUser, testabilitySettings);
+        new RestAiController(aiAdvisorWithStorageService, currentUser, testabilitySettings);
     note = makeMe.aNote().creatorAndOwner(currentUser).please();
     openAIAssistantMocker = new OpenAIAssistantMocker(openAiApi);
   }
@@ -158,8 +164,7 @@ public class RestAiControllerChatTests {
         UnexpectedNoAccessRightException.class,
         () ->
             new RestAiController(
-                    openAiApi,
-                    makeMe.modelFactoryService,
+                    aiAdvisorWithStorageService,
                     makeMe.aUser().toModelPlease(),
                     testabilitySettings)
                 .chat(note, new ChatRequest("What's your name?", null)));

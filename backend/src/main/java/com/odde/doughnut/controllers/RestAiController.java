@@ -5,19 +5,16 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.NotebookAssistant;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorWithStorageService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.assistants.message.Message;
-import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
@@ -38,12 +35,10 @@ public class RestAiController {
   private final AiAdvisorWithStorageService aiAdvisorWithStorageService;
 
   public RestAiController(
-      @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
-      ModelFactoryService modelFactoryService,
+      AiAdvisorWithStorageService aiAdvisorWithStorageService,
       UserModel currentUser,
       TestabilitySettings testabilitySettings) {
-    this.aiAdvisorWithStorageService =
-        new AiAdvisorWithStorageService(openAiApi, modelFactoryService);
+    this.aiAdvisorWithStorageService = aiAdvisorWithStorageService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
   }
@@ -101,13 +96,13 @@ public class RestAiController {
   public AiGeneratedImage generateImage(@RequestBody String prompt) {
     currentUser.assertLoggedIn();
     return new AiGeneratedImage(
-        aiAdvisorWithStorageService.aiAdvisorService().getOtherAiServices().getTimage(prompt));
+        aiAdvisorWithStorageService.getAiAdvisorService().getOtherAiServices().getTimage(prompt));
   }
 
   @GetMapping("/available-gpt-models")
   public List<String> getAvailableGptModels() {
     return aiAdvisorWithStorageService
-        .aiAdvisorService()
+        .getAiAdvisorService()
         .getOtherAiServices()
         .getAvailableGptModels();
   }

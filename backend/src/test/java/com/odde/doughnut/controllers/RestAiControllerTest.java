@@ -12,6 +12,8 @@ import com.odde.doughnut.controllers.dto.AiCompletionAnswerClarifyingQuestionPar
 import com.odde.doughnut.controllers.dto.AiCompletionParams;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AiAdvisorService;
+import com.odde.doughnut.services.AiAdvisorWithStorageService;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.NoteDetailsCompletion;
 import com.odde.doughnut.testability.MakeMe;
@@ -53,14 +55,18 @@ class RestAiControllerTest {
   @Mock OpenAiApi openAiApi;
   @Autowired MakeMe makeMe;
   TestabilitySettings testabilitySettings = new TestabilitySettings();
+  AiAdvisorService aiAdvisorService;
+  AiAdvisorWithStorageService aiAdvisorWithStorageService;
 
   @BeforeEach
   void Setup() {
+    aiAdvisorService = new AiAdvisorService(openAiApi);
+    aiAdvisorWithStorageService =
+        new AiAdvisorWithStorageService(aiAdvisorService, makeMe.modelFactoryService);
     currentUser = makeMe.aUser().toModelPlease();
     note = makeMe.aNote().please();
     controller =
-        new RestAiController(
-            openAiApi, makeMe.modelFactoryService, currentUser, testabilitySettings);
+        new RestAiController(aiAdvisorWithStorageService, currentUser, testabilitySettings);
   }
 
   @Nested
@@ -84,8 +90,7 @@ class RestAiControllerTest {
           ResponseStatusException.class,
           () ->
               new RestAiController(
-                      openAiApi,
-                      makeMe.modelFactoryService,
+                      aiAdvisorWithStorageService,
                       makeMe.aNullUserModelPlease(),
                       testabilitySettings)
                   .getCompletion(note, params));
@@ -189,8 +194,7 @@ class RestAiControllerTest {
           ResponseStatusException.class,
           () ->
               new RestAiController(
-                      openAiApi,
-                      makeMe.modelFactoryService,
+                      aiAdvisorWithStorageService,
                       makeMe.aNullUserModelPlease(),
                       testabilitySettings)
                   .generateImage("create an image"));

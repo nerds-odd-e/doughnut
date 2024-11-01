@@ -40,7 +40,7 @@ class RestConversationMessageControllerTest {
   @BeforeEach
   void setup() {
     currentUser = makeMe.aUser().toModelPlease();
-    controller = new RestConversationMessageController(currentUser, conversationService);
+    controller = new RestConversationMessageController(currentUser, conversationService, null);
     Notebook notebook = makeMe.aNotebook().please();
     AssessmentAttempt assessmentAttempt =
         makeMe.anAssessmentAttempt(notebook.getCreatorEntity()).withOneQuestion().please();
@@ -119,7 +119,8 @@ class RestConversationMessageControllerTest {
     @Test
     void forLoginUserOnly() {
       controller =
-          new RestConversationMessageController(makeMe.aNullUserModelPlease(), conversationService);
+          new RestConversationMessageController(
+              makeMe.aNullUserModelPlease(), conversationService, null);
       ResponseStatusException exception =
           assertThrows(ResponseStatusException.class, () -> controller.getUnreadConversations());
       assertEquals(HttpStatusCode.valueOf(401), exception.getStatusCode());
@@ -408,7 +409,8 @@ class RestConversationMessageControllerTest {
     @Test
     void shouldRequireLogin() {
       controller =
-          new RestConversationMessageController(makeMe.aNullUserModelPlease(), conversationService);
+          new RestConversationMessageController(
+              makeMe.aNullUserModelPlease(), conversationService, null);
       ResponseStatusException exception =
           assertThrows(
               ResponseStatusException.class, () -> controller.getConversationsAboutNote(note));
