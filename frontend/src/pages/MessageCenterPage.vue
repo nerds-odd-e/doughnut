@@ -37,6 +37,7 @@
             :user="user"
             :storageAccessor="storageAccessor"
             @conversation-fetched="handleConversationFetched"
+            @conversation-changed="handleConversationChanged"
           />
           <div v-else class="no-conversation-message">
             <SvgChat class="large-svg-message" />
@@ -150,6 +151,13 @@ const selectConversation = (conversation: Conversation) => {
 
 const backToList = () => {
   router.push({ name: "messageCenter" })
+}
+
+const handleConversationChanged = (conversationId: number) => {
+  router.push({
+    name: "messageCenter",
+    params: { conversationId },
+  })
 }
 </script>
 

@@ -42,10 +42,12 @@ import NoteShow from "@/components/notes/NoteShow.vue"
 import AssessmentQuestion from "@/components/assessment/AssessmentQuestion.vue"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import { useRouter } from "vue-router"
+import { ref, onMounted } from "vue"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import ConversationInner from "@/components/conversations/ConversationInner.vue"
 
 const props = defineProps<{
   conversation: Conversation
-  conversations?: Conversation[]
   user: User
   storageAccessor: StorageAccessor
 }>()
@@ -56,9 +58,25 @@ const emit = defineEmits<{
 }>()
 
 const router = useRouter()
+const { managedApi } = useLoadingApi()
+const conversations = ref<Conversation[]>([])
+
+onMounted(async () => {
+  if (props.conversation.subject?.note?.id) {
+    conversations.value =
+      await managedApi.restConversationMessageController.getConversationsAboutNote(
+        props.conversation.subject.note.id
+      )
+  }
+})
 
 const handleConversationChange = (conversationId: number) => {
-  emit("conversation-changed", conversationId)
+  const newConversation = conversations.value.find(
+    (c) => c.id === conversationId
+  )
+  if (newConversation) {
+    emit("conversation-changed", conversationId)
+  }
 }
 
 const handleCloseDialog = () => {
