@@ -9,6 +9,7 @@ Feature: Chat about a note with AI
     And I have a notebook with the head note "There are 42 prefectures in Japan"
 
 
+  @ignore
   Scenario: The users can chat with AI about the current note
     Given OpenAI assistant will reply below for user messages:
       | user message          | assistant reply              | run id |

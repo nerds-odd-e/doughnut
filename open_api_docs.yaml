@@ -3608,6 +3608,8 @@ components:
         updatedAt:
           type: string
           format: date-time
+        aiAssistantThreadId:
+          type: string
     ConversationSubject:
       type: object
       properties:

@@ -12,5 +12,6 @@ export type Conversation = {
     conversationInitiator?: User;
     createdAt: string;
     updatedAt: string;
+    aiAssistantThreadId?: string;
 };
 

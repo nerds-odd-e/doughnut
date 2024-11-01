@@ -39,6 +39,10 @@ public class Conversation extends EntityIdentifiedByIdOnly {
   @OrderBy("updatedAt DESC")
   private Timestamp updatedAt = new Timestamp(new Date().getTime());
 
+  @Column(name = "ai_assistant_thread_id")
+  @Setter
+  private String aiAssistantThreadId;
+
   @JsonIgnore
   public void setAssessmentQuestionInstance(AssessmentQuestionInstance assessmentQuestionInstance) {
     this.subject.setAssessmentQuestionInstance(assessmentQuestionInstance);
