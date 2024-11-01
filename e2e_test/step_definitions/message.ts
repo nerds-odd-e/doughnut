@@ -88,3 +88,13 @@ When(
       .sendMessageToNoteOwner(conversation)
   }
 )
+
+When(
+  'I start a conversation about the note {string} with a message {string} to AI',
+  (externalIdentifier: string, note: string, conversation: string) => {
+    start
+      .reloginAndEnsureHomePage(externalIdentifier)
+      .jumpToNotePage(note)
+      .sendMessageToAI(conversation)
+  }
+)

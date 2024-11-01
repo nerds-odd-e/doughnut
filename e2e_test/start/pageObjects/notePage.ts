@@ -241,6 +241,13 @@ export const assumeNotePage = (noteTopic?: string) => {
       cy.findByRole('textbox').type(message)
       cy.findByRole('button', { name: 'Send message' }).click()
     },
+    sendMessageToAI(message: string) {
+      this.toolbarButton('Star a conversation about this note').click()
+      cy.findByRole('textbox').type(message)
+      cy.findByRole('button', {
+        name: 'Send message and invite AI to reply',
+      }).click()
+    },
     moveUpAmongSiblings() {
       cy.pageIsNotLoading()
       this.toolbarButton('Move up').click()

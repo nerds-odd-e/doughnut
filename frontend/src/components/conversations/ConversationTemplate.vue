@@ -1,15 +1,15 @@
 <template>
   <div class="dialog-bar">
     <div class="d-flex align-items-center gap-2">
-      <select 
-        v-if="conversations?.length && conversations.length > 1" 
-        class="conversation-select" 
+      <select
+        v-if="conversations?.length && conversations.length > 1"
+        class="conversation-select"
         :value="selectedConversation?.id"
         @change="handleConversationChange"
       >
-        <option 
-          v-for="conv in conversations" 
-          :key="conv.id" 
+        <option
+          v-for="conv in conversations"
+          :key="conv.id"
           :value="conv.id"
         >
           {{ `Conversation ${conv.id}` }}
@@ -19,25 +19,26 @@
         v-if="allowNewConversation"
         class="btn btn-sm btn-outline-primary"
         @click="$emit('new-conversation')"
+        aria-label="New Conversation"
       >
-        New Conversation
+      +
       </button>
     </div>
     <div class="spacer"></div>
-    <button 
-      class="minimize-button" 
-      @click="$emit('close-dialog')" 
+    <button
+      class="minimize-button"
+      @click="$emit('close-dialog')"
       aria-label="Close dialog"
     >
-      <svg 
-        xmlns="http://www.w3.org/2000/svg" 
-        width="20" 
-        height="20" 
-        viewBox="0 0 24 24" 
-        fill="none" 
-        stroke="currentColor" 
-        stroke-width="2" 
-        stroke-linecap="round" 
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
         stroke-linejoin="round"
       >
         <line x1="5" y1="12" x2="19" y2="12"></line>
