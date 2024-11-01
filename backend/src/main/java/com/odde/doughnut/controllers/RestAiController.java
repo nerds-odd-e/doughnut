@@ -11,15 +11,12 @@ import com.odde.doughnut.services.AiAdvisorWithStorageService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.assistants.message.Message;
 import com.theokanning.openai.client.OpenAiApi;
-import com.theokanning.openai.service.assistant_stream.AssistantSSE;
-import io.reactivex.Flowable;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
@@ -87,23 +84,10 @@ public class RestAiController {
       @RequestBody ChatRequest request)
       throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(note);
-    Flowable<AssistantSSE> runStream =
-        aiAdvisorWithStorageService.getChatMessages(note, request, currentUser.getEntity());
-    SseEmitter emitter = new SseEmitter();
-    runStream.subscribe(
-        sse -> {
-          try {
-            SseEmitter.SseEventBuilder builder =
-                SseEmitter.event().name(sse.getEvent().eventName).data(sse.getData());
-            emitter.send(builder);
-            if (Objects.equals(sse.getEvent().eventName, "done")) {
-              emitter.complete();
-            }
-          } catch (Exception e) {
-            emitter.completeWithError(e);
-          }
-        });
-    return emitter;
+    String threadId =
+        aiAdvisorWithStorageService.getOrCreateThread(
+            note, currentUser.getEntity(), request.getThreadId());
+    return aiAdvisorWithStorageService.getAIReplySSE(note, threadId, request.getUserMessage());
   }
 
   @GetMapping("/dummy")

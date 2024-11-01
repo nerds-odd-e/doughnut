@@ -1,6 +1,5 @@
 package com.odde.doughnut.services;
 
-import com.odde.doughnut.controllers.dto.ChatRequest;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.ai.AssistantService;
@@ -14,6 +13,8 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 public record AiAdvisorWithStorageService(
     AiAdvisorService aiAdvisorService, ModelFactoryService modelFactoryService) {
@@ -58,19 +59,15 @@ public record AiAdvisorWithStorageService(
     return assistant;
   }
 
-  public Flowable<AssistantSSE> getChatMessages(Note note, ChatRequest request, User user) {
-    AssistantService assistantService = getChatService(note);
-    String threadId = request.getThreadId();
-    if (threadId == null) {
-      threadId = assistantService.createThread(note);
-      UserAssistantThread userAssistantThread = new UserAssistantThread();
-      userAssistantThread.setThreadId(threadId);
-      userAssistantThread.setNote(note);
-      userAssistantThread.setUser(user);
-      modelFactoryService().entityManager.persist(userAssistantThread);
-    }
-    return assistantService.createMessageRunAndGetResponseStream(
-        request.getUserMessage(), threadId);
+  private String createThread(Note note, User user, AssistantService assistantService) {
+    String threadId;
+    threadId = assistantService.createThread(note);
+    UserAssistantThread userAssistantThread = new UserAssistantThread();
+    userAssistantThread.setThreadId(threadId);
+    userAssistantThread.setNote(note);
+    userAssistantThread.setUser(user);
+    modelFactoryService().entityManager.persist(userAssistantThread);
+    return threadId;
   }
 
   public List<Message> getMessageList(Note note, User entity) {
@@ -110,5 +107,34 @@ public record AiAdvisorWithStorageService(
     notebookAssistant.setAssistantId(chatAssistant.getId());
     this.modelFactoryService.save(notebookAssistant);
     return notebookAssistant;
+  }
+
+  public SseEmitter getAIReplySSE(Note note, String threadId, String userMessage) {
+    AssistantService assistantService = getChatService(note);
+    Flowable<AssistantSSE> runStream =
+        assistantService.createMessageRunAndGetResponseStream(userMessage, threadId);
+    SseEmitter emitter = new SseEmitter();
+    runStream.subscribe(
+        sse -> {
+          try {
+            SseEmitter.SseEventBuilder builder =
+                SseEmitter.event().name(sse.getEvent().eventName).data(sse.getData());
+            emitter.send(builder);
+            if (Objects.equals(sse.getEvent().eventName, "done")) {
+              emitter.complete();
+            }
+          } catch (Exception e) {
+            emitter.completeWithError(e);
+          }
+        });
+    return emitter;
+  }
+
+  public String getOrCreateThread(Note note, User user, String threadId) {
+    if (threadId != null) {
+      return threadId;
+    }
+    AssistantService assistantService = getChatService(note);
+    return createThread(note, user, assistantService);
   }
 }
