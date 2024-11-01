@@ -110,4 +110,37 @@ describe("NoteConversation", () => {
     // Verify selector is not shown with single conversation
     expect(wrapper.find("select.conversation-select").exists()).toBe(false)
   })
+
+  it("allows starting a new conversation when in conversation view", async () => {
+    // Setup with existing conversation
+    const existingConversation = { id: 1, title: "Test Conversation" }
+    helper.managedApi.restConversationMessageController.getConversationsAboutNote =
+      vi.fn().mockResolvedValue([existingConversation])
+
+    const wrapper = await mount()
+
+    // Verify we're showing the ConversationInner initially
+    expect(wrapper.findComponent(ConversationInner).exists()).toBe(true)
+
+    // Click new conversation button
+    await wrapper.find("button.btn-outline-primary").trigger("click")
+
+    // Verify we're now showing the ConversationTemplate
+    expect(wrapper.findComponent(ConversationTemplate).exists()).toBe(true)
+    expect(wrapper.findComponent(ConversationInner).exists()).toBe(false)
+
+    // Start new conversation
+    await wrapper.find("textarea").setValue("New conversation message")
+    await wrapper.find("form.chat-input-form").trigger("submit")
+    await flushPromises()
+
+    // Verify API was called
+    expect(
+      helper.managedApi.restConversationMessageController
+        .startConversationAboutNote
+    ).toHaveBeenCalledWith(note.id, "New conversation message")
+
+    // Verify we're back to showing ConversationInner
+    expect(wrapper.findComponent(ConversationInner).exists()).toBe(true)
+  })
 })

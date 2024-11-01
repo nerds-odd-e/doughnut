@@ -1,19 +1,28 @@
 <template>
   <div class="dialog-bar">
-    <select 
-      v-if="conversations?.length && conversations.length > 1" 
-      class="conversation-select" 
-      :value="selectedConversation?.id"
-      @change="handleConversationChange"
-    >
-      <option 
-        v-for="conv in conversations" 
-        :key="conv.id" 
-        :value="conv.id"
+    <div class="d-flex align-items-center gap-2">
+      <select 
+        v-if="conversations?.length && conversations.length > 1" 
+        class="conversation-select" 
+        :value="selectedConversation?.id"
+        @change="handleConversationChange"
       >
-        {{ `Conversation ${conv.id}` }}
-      </option>
-    </select>
+        <option 
+          v-for="conv in conversations" 
+          :key="conv.id" 
+          :value="conv.id"
+        >
+          {{ `Conversation ${conv.id}` }}
+        </option>
+      </select>
+      <button
+        v-if="allowNewConversation"
+        class="btn btn-sm btn-outline-primary"
+        @click="$emit('new-conversation')"
+      >
+        New Conversation
+      </button>
+    </div>
     <div class="spacer"></div>
     <button 
       class="minimize-button" 
@@ -81,12 +90,14 @@ import type { Conversation } from "@/generated/backend"
 defineProps<{
   conversations?: Conversation[]
   selectedConversation?: Conversation
+  allowNewConversation?: boolean
 }>()
 
 const emit = defineEmits<{
   (e: "send-message", message: string): void
   (e: "close-dialog"): void
   (e: "conversation-changed", conversationId: number): void
+  (e: "new-conversation"): void
 }>()
 
 const message = ref("")

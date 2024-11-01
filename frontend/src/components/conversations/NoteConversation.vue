@@ -7,12 +7,16 @@
       :conversations="conversations"
       :user="user"
       :storage-accessor="storageAccessor"
+      :allow-new-conversation="true"
       @close-dialog="$emit('close-dialog')"
       @conversation-changed="handleConversationChange"
+      @new-conversation="handleNewConversation"
     />
     <ConversationTemplate
       v-else
       @send-message="startConversationWithMessage"
+      :conversations="conversations"
+      @conversation-changed="handleConversationChange"
       @close-dialog="$emit('close-dialog')"
     >
       <template #messages>
@@ -74,5 +78,9 @@ async function startConversationWithMessage(message: string) {
     )
 
   emit("submitted")
+}
+
+const handleNewConversation = () => {
+  conversation.value = undefined
 }
 </script>

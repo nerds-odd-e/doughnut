@@ -3,8 +3,10 @@
     @send-message="handleSendMessage"
     @close-dialog="$emit('close-dialog')"
     @conversation-changed="$emit('conversation-changed', $event)"
+    @new-conversation="$emit('new-conversation')"
     :conversations="conversations"
     :selectedConversation="conversation"
+    :allow-new-conversation="allowNewConversation"
   >
     <template #messages v-if="currentConversationMessages">
       <div
@@ -60,12 +62,14 @@ const props = defineProps<{
   conversations?: Conversation[]
   user: User
   storageAccessor: StorageAccessor
+  allowNewConversation?: boolean
 }>()
 
 const emit = defineEmits<{
   (e: "conversation-fetched", conversationId: number): void
   (e: "close-dialog"): void
   (e: "conversation-changed", conversationId: number): void
+  (e: "new-conversation"): void
 }>()
 
 const { managedApi } = useLoadingApi()
