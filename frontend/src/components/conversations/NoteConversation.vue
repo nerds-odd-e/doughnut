@@ -4,9 +4,11 @@
     <ConversationInner
       v-if="conversation"
       :conversation="conversation"
+      :conversations="conversations"
       :user="user"
       :storage-accessor="storageAccessor"
       @close-dialog="$emit('close-dialog')"
+      @conversation-changed="handleConversationChange"
     />
     <ConversationTemplate
       v-else
@@ -37,6 +39,7 @@ import ContentLoader from "../commons/ContentLoader.vue"
 const conversation = ref<Conversation | undefined>()
 const user = inject<Ref<User | undefined>>("currentUser")
 const isLoading = ref(true)
+const conversations = ref<Conversation[]>([])
 
 const { managedApi } = useLoadingApi()
 const props = defineProps<{
@@ -47,15 +50,21 @@ const emit = defineEmits(["submitted", "close-dialog"])
 
 onMounted(async () => {
   try {
-    const conversations =
+    const fetchedConversations =
       await managedApi.restConversationMessageController.getConversationsAboutNote(
         props.noteId
       )
-    conversation.value = conversations.length > 0 ? conversations[0] : undefined
+    conversations.value = fetchedConversations
+    conversation.value =
+      fetchedConversations.length > 0 ? fetchedConversations[0] : undefined
   } finally {
     isLoading.value = false
   }
 })
+
+const handleConversationChange = (conversationId: number) => {
+  conversation.value = conversations.value.find((c) => c.id === conversationId)
+}
 
 async function startConversationWithMessage(message: string) {
   conversation.value =

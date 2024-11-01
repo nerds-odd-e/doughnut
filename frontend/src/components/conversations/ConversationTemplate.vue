@@ -1,5 +1,19 @@
 <template>
   <div class="dialog-bar">
+    <select 
+      v-if="conversations?.length && conversations.length > 1" 
+      class="conversation-select" 
+      :value="selectedConversation?.id"
+      @change="handleConversationChange"
+    >
+      <option 
+        v-for="conv in conversations" 
+        :key="conv.id" 
+        :value="conv.id"
+      >
+        {{ `Conversation ${conv.id}` }}
+      </option>
+    </select>
     <div class="spacer"></div>
     <button 
       class="minimize-button" 
@@ -62,10 +76,17 @@
 
 <script setup lang="ts">
 import { ref, computed } from "vue"
+import type { Conversation } from "@/generated/backend"
+
+defineProps<{
+  conversations?: Conversation[]
+  selectedConversation?: Conversation
+}>()
 
 const emit = defineEmits<{
   (e: "send-message", message: string): void
   (e: "close-dialog"): void
+  (e: "conversation-changed", conversationId: number): void
 }>()
 
 const message = ref("")
@@ -76,6 +97,11 @@ const handleSendMessage = async () => {
   if (!trimmedMessage.value) return
   emit("send-message", trimmedMessage.value)
   message.value = ""
+}
+
+const handleConversationChange = (event: Event) => {
+  const select = event.target as HTMLSelectElement
+  emit("conversation-changed", parseInt(select.value))
 }
 </script>
 
@@ -165,5 +191,13 @@ const handleSendMessage = async () => {
 
 .minimize-button:hover {
   background-color: #e9ecef;
+}
+
+.conversation-select {
+  padding: 0.25rem;
+  border-radius: 4px;
+  border: 1px solid #dee2e6;
+  background-color: white;
+  font-size: 0.9rem;
 }
 </style>

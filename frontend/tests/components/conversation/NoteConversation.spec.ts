@@ -74,4 +74,40 @@ describe("NoteConversation", () => {
     expect(conversationTemplate.exists()).toBe(true)
     expect(conversationInner.exists()).toBe(false)
   })
+
+  it("allows switching between conversations", async () => {
+    const conversations = [
+      { id: 1, title: "First Conversation" },
+      { id: 2, title: "Second Conversation" },
+    ]
+
+    helper.managedApi.restConversationMessageController.getConversationsAboutNote =
+      vi.fn().mockResolvedValue(conversations)
+
+    const wrapper = await mount()
+
+    // Verify initial conversation is selected
+    expect(
+      wrapper.findComponent(ConversationInner).props("conversation")
+    ).toEqual(conversations[0])
+
+    // Change conversation
+    await wrapper.find("select.conversation-select").setValue("2")
+    await wrapper.find("select.conversation-select").trigger("change")
+
+    // Verify conversation changed
+    expect(
+      wrapper.findComponent(ConversationInner).props("conversation")
+    ).toEqual(conversations[1])
+  })
+
+  it("shows conversation selector only when multiple conversations exist", async () => {
+    helper.managedApi.restConversationMessageController.getConversationsAboutNote =
+      vi.fn().mockResolvedValue([conversation])
+
+    const wrapper = await mount()
+
+    // Verify selector is not shown with single conversation
+    expect(wrapper.find("select.conversation-select").exists()).toBe(false)
+  })
 })

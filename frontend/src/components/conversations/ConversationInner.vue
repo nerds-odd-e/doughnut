@@ -2,6 +2,9 @@
   <ConversationTemplate
     @send-message="handleSendMessage"
     @close-dialog="$emit('close-dialog')"
+    @conversation-changed="$emit('conversation-changed', $event)"
+    :conversations="conversations"
+    :selectedConversation="conversation"
   >
     <template #messages v-if="currentConversationMessages">
       <div
@@ -54,6 +57,7 @@ import ConversationTemplate from "./ConversationTemplate.vue"
 
 const props = defineProps<{
   conversation: Conversation
+  conversations?: Conversation[]
   user: User
   storageAccessor: StorageAccessor
 }>()
@@ -61,6 +65,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: "conversation-fetched", conversationId: number): void
   (e: "close-dialog"): void
+  (e: "conversation-changed", conversationId: number): void
 }>()
 
 const { managedApi } = useLoadingApi()

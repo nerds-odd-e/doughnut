@@ -22,8 +22,14 @@
     <!-- Lower half -->
     <div class="conversation-messages">
       <ConversationInner
-        v-bind="{ conversation, user, storageAccessor }"
+        v-bind="{ 
+          conversation, 
+          conversations,
+          user, 
+          storageAccessor 
+        }"
         @conversation-fetched="emit('conversation-fetched', $event)"
+        @conversation-changed="handleConversationChange"
         @close-dialog="handleCloseDialog"
       />
     </div>
@@ -37,23 +43,29 @@ import AssessmentQuestion from "@/components/assessment/AssessmentQuestion.vue"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import { useRouter } from "vue-router"
 
-const { conversation } = defineProps<{
+const props = defineProps<{
   conversation: Conversation
+  conversations?: Conversation[]
   user: User
   storageAccessor: StorageAccessor
 }>()
 
 const emit = defineEmits<{
   (e: "conversation-fetched", conversationId: number): void
+  (e: "conversation-changed", conversationId: number): void
 }>()
 
 const router = useRouter()
 
+const handleConversationChange = (conversationId: number) => {
+  emit("conversation-changed", conversationId)
+}
+
 const handleCloseDialog = () => {
-  if (conversation.subject?.note?.id) {
+  if (props.conversation.subject?.note?.id) {
     router.push({
       name: "noteShow",
-      params: { noteId: conversation.subject.note.id },
+      params: { noteId: props.conversation.subject.note.id },
     })
   }
 }
