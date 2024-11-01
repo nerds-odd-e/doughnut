@@ -92,8 +92,6 @@ When(
 When(
   'I start a conversation about the note {string} with a message {string} to AI',
   (note: string, conversation: string) => {
-    start
-      .jumpToNotePage(note)
-      .sendMessageToAI(conversation)
+    start.jumpToNotePage(note).sendMessageToAI(conversation)
   }
 )

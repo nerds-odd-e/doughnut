@@ -143,4 +143,62 @@ describe("NoteConversation", () => {
     // Verify we're back to showing ConversationInner
     expect(wrapper.findComponent(ConversationInner).exists()).toBe(true)
   })
+
+  it("handles AI reply when starting new conversation with AI invite", async () => {
+    helper.managedApi.restConversationMessageController.getConversationsAboutNote =
+      vi.fn().mockResolvedValue([])
+    helper.managedApi.restConversationMessageController.getAiReply = vi
+      .fn()
+      .mockResolvedValue({ message: "AI response" })
+
+    const wrapper = await mount()
+
+    // Trigger send message with AI invite
+    await wrapper.find("textarea").setValue("Hello AI")
+    await wrapper.find("button.with-ai").trigger("click")
+    await flushPromises()
+
+    // Verify conversation was started
+    expect(
+      helper.managedApi.restConversationMessageController
+        .startConversationAboutNote
+    ).toHaveBeenCalledWith(note.id, "Hello AI")
+
+    // Verify AI reply was requested
+    expect(
+      helper.managedApi.restConversationMessageController.getAiReply
+    ).toHaveBeenCalledWith(conversation.id)
+
+    // Verify ConversationInner is rendered with correct props
+    const conversationInner = wrapper.findComponent(ConversationInner)
+    expect(conversationInner.exists()).toBe(true)
+    expect(conversationInner.props("conversation")).toEqual(conversation)
+    expect(conversationInner.props("initialAiReply")).toBe(true)
+  })
+
+  it("handles AI reply when sending message with AI invite in existing conversation", async () => {
+    helper.managedApi.restConversationMessageController.getConversationsAboutNote =
+      vi.fn().mockResolvedValue([conversation])
+    helper.managedApi.restConversationMessageController.replyToConversation =
+      vi.fn()
+    helper.managedApi.restConversationMessageController.getAiReply = vi
+      .fn()
+      .mockResolvedValue({ message: "AI response" })
+
+    const wrapper = await mount()
+
+    await wrapper.find("textarea").setValue("Hello AI")
+    await wrapper.find("button.with-ai").trigger("click")
+    await flushPromises()
+
+    // Verify message was sent
+    expect(
+      helper.managedApi.restConversationMessageController.replyToConversation
+    ).toHaveBeenCalledWith(conversation.id, "Hello AI")
+
+    // Verify AI reply was requested
+    expect(
+      helper.managedApi.restConversationMessageController.getAiReply
+    ).toHaveBeenCalledWith(conversation.id)
+  })
 })

@@ -154,6 +154,25 @@ export class RestConversationMessageControllerService {
         });
     }
     /**
+     * @param conversationId
+     * @returns Conversation OK
+     * @throws ApiError
+     */
+    public getAiReply(
+        conversationId: number,
+    ): CancelablePromise<Conversation> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/conversation/{conversationId}/ai-reply',
+            path: {
+                'conversationId': conversationId,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
      * @returns ConversationMessage OK
      * @throws ApiError
      */

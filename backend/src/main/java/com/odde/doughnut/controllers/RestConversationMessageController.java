@@ -79,6 +79,14 @@ public class RestConversationMessageController {
     return conversation;
   }
 
+  @GetMapping("/{conversationId}/ai-reply")
+  public Conversation getAiReply(
+      @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertAuthorization(conversation);
+    return conversation;
+  }
+
   @GetMapping("/{conversationId}/messages")
   public List<ConversationMessage> getConversationMessages(
       @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation)

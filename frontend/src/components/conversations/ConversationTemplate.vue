@@ -82,11 +82,12 @@
       </button>
 
       <button
-        type="submit"
+        type="button"
         role="button"
         class="send-button with-ai"
         aria-label="Send message and invite AI to reply"
         :disabled="!trimmedMessage"
+        @click="handleSendMessageWithAI"
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/>
@@ -113,6 +114,7 @@ defineProps<{
 
 const emit = defineEmits<{
   (e: "send-message", message: string): void
+  (e: "send-message-and-invite-ai", message: string): void
   (e: "close-dialog"): void
   (e: "conversation-changed", conversationId: number): void
   (e: "new-conversation"): void
@@ -122,10 +124,20 @@ const message = ref("")
 
 const trimmedMessage = computed(() => message.value.trim())
 
-const handleSendMessage = async () => {
+const handleSendMessage = async (withAI: boolean = false) => {
   if (!trimmedMessage.value) return
-  emit("send-message", trimmedMessage.value)
+
+  if (withAI) {
+    emit("send-message-and-invite-ai", trimmedMessage.value)
+  } else {
+    emit("send-message", trimmedMessage.value)
+  }
+
   message.value = ""
+}
+
+const handleSendMessageWithAI = () => {
+  handleSendMessage(true)
 }
 
 const handleConversationChange = (event: Event) => {

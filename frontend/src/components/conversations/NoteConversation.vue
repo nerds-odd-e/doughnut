@@ -8,6 +8,7 @@
       :user="user"
       :storage-accessor="storageAccessor"
       :allow-new-conversation="true"
+      :initial-ai-reply="initialAiReply"
       @close-dialog="$emit('close-dialog')"
       @conversation-changed="handleConversationChange"
       @new-conversation="handleNewConversation"
@@ -15,6 +16,7 @@
     <ConversationTemplate
       v-else
       @send-message="startConversationWithMessage"
+      @send-message-and-invite-ai="startConversationWithMessageAndAI"
       :conversations="conversations"
       @conversation-changed="handleConversationChange"
       @close-dialog="$emit('close-dialog')"
@@ -52,6 +54,8 @@ const props = defineProps<{
 }>()
 const emit = defineEmits(["submitted", "close-dialog"])
 
+const initialAiReply = ref(false)
+
 onMounted(async () => {
   try {
     const fetchedConversations =
@@ -71,12 +75,22 @@ const handleConversationChange = (conversationId: number) => {
 }
 
 async function startConversationWithMessage(message: string) {
+  initialAiReply.value = false
   conversation.value =
     await managedApi.restConversationMessageController.startConversationAboutNote(
       props.noteId,
       message
     )
+  emit("submitted")
+}
 
+async function startConversationWithMessageAndAI(message: string) {
+  initialAiReply.value = true
+  conversation.value =
+    await managedApi.restConversationMessageController.startConversationAboutNote(
+      props.noteId,
+      message
+    )
   emit("submitted")
 }
 

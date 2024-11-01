@@ -1,6 +1,7 @@
 <template>
   <ConversationTemplate
     @send-message="handleSendMessage"
+    @send-message-and-invite-ai="handleSendMessageAndInviteAI"
     @close-dialog="$emit('close-dialog')"
     @conversation-changed="$emit('conversation-changed', $event)"
     @new-conversation="$emit('new-conversation')"
@@ -63,6 +64,7 @@ const props = defineProps<{
   user: User
   storageAccessor: StorageAccessor
   allowNewConversation?: boolean
+  initialAiReply?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -96,19 +98,40 @@ const fetchConversationMessages = async () => {
   emit("conversation-fetched", props.conversation.id)
 }
 
-const handleSendMessage = async (message: string) => {
+const handleSendMessage = async (
+  message: string,
+  inviteAI: boolean = false
+) => {
   await managedApi.restConversationMessageController.replyToConversation(
     props.conversation.id,
     message
   )
   await fetchConversationMessages()
+
+  if (inviteAI) {
+    await getAiReply()
+  }
 }
 
-onMounted(() => {
-  fetchConversationMessages()
+const getAiReply = async () => {
+  await managedApi.restConversationMessageController.getAiReply(
+    props.conversation.id
+  )
+  await fetchConversationMessages()
+}
+
+onMounted(async () => {
+  await fetchConversationMessages()
+  if (props.initialAiReply) {
+    await getAiReply()
+  }
 })
 
 watch(() => props.conversation, fetchConversationMessages)
+
+const handleSendMessageAndInviteAI = async (message: string) => {
+  await handleSendMessage(message, true)
+}
 </script>
 
 <style scoped>
