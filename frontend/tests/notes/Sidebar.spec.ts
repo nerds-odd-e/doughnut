@@ -72,6 +72,13 @@ describe("Sidebar", () => {
     // biome-ignore lint/suspicious/noExplicitAny: <explanation>
     global.IntersectionObserver = MockIntersectionObserver as any
     /* eslint-enable */
+
+    // Mock getBoundingClientRect
+    Element.prototype.getBoundingClientRect = vitest.fn().mockReturnValue({
+      top: 0,
+      bottom: 100,
+      height: 100,
+    })
   })
 
   beforeEach(() => {
@@ -230,23 +237,42 @@ describe("Sidebar", () => {
       expect(listItem).not.toHaveClass("dragging")
     })
 
-    it("should add drag-over class when dragging over a target", async () => {
+    it("should show and hide drop indicator when dragging over a target", async () => {
       render(firstGeneration)
       await flushPromises()
 
+      const draggedNote = await screen.findByText(
+        firstGeneration.note.noteTopic.topicConstructor
+      )
       const dropTarget = await screen.findByText(
         firstGenerationSibling.note.noteTopic.topicConstructor
       )
-      const listItem = dropTarget.closest("li")
-      expect(listItem).not.toHaveClass("drag-over")
 
-      // Drag enter
+      // Start drag
+      await fireEvent.dragStart(draggedNote)
+
+      // Before drag enter
+      expect(
+        screen.queryByRole("presentation", {
+          name: "Drop position indicator",
+        })
+      ).not.toBeInTheDocument()
+
+      // After drag enter
       await fireEvent.dragEnter(dropTarget)
-      expect(listItem).toHaveClass("drag-over")
+      expect(
+        screen.getByRole("presentation", {
+          name: "Drop position indicator",
+        })
+      ).toBeVisible()
 
-      // Drag leave
+      // After drag leave
       await fireEvent.dragLeave(dropTarget)
-      expect(listItem).not.toHaveClass("drag-over")
+      expect(
+        screen.queryByRole("presentation", {
+          name: "Drop position indicator",
+        })
+      ).not.toBeInTheDocument()
     })
 
     it("should not call moveAfter when dragging to the same note", async () => {
@@ -312,6 +338,110 @@ describe("Sidebar", () => {
         expect.any(Error)
       )
       consoleError.mockRestore()
+    })
+
+    it("should show drop indicator when dragging over a note", async () => {
+      render(firstGeneration)
+      await flushPromises()
+
+      const draggedNote = await screen.findByText(
+        firstGeneration.note.noteTopic.topicConstructor
+      )
+      const dropTarget = await screen.findByText(
+        firstGenerationSibling.note.noteTopic.topicConstructor
+      )
+
+      // Start drag
+      await fireEvent.dragStart(draggedNote)
+
+      // Drag over target
+      await fireEvent.dragEnter(dropTarget)
+
+      // Check for drop indicator
+      const dropIndicator = screen.getByRole("presentation", {
+        name: "Drop position indicator",
+      })
+      expect(dropIndicator).toBeVisible()
+      expect(dropIndicator).toHaveClass("drop-indicator")
+
+      // Indicator should disappear after drag leave
+      await fireEvent.dragLeave(dropTarget)
+      expect(dropIndicator).not.toBeVisible()
+    })
+
+    it("should not show drop indicator when dragging over notes with different parents", async () => {
+      render(firstGeneration)
+      await flushPromises()
+
+      const secondGenNote = await screen.findByText(
+        secondGeneration.note.noteTopic.topicConstructor
+      )
+      const firstGenNote = await screen.findByText(
+        firstGeneration.note.noteTopic.topicConstructor
+      )
+
+      // Start drag from second generation
+      await fireEvent.dragStart(secondGenNote)
+
+      // Try to drag over first generation
+      await fireEvent.dragEnter(firstGenNote)
+
+      // Check that drop indicator is not shown
+      const dropIndicator = screen.queryByRole("presentation", {
+        name: "Drop position indicator",
+      })
+      expect(dropIndicator).not.toBeInTheDocument()
+    })
+
+    it("should not show drop indicator when dragging over itself", async () => {
+      render(firstGeneration)
+      await flushPromises()
+
+      const note = await screen.findByText(
+        firstGeneration.note.noteTopic.topicConstructor
+      )
+
+      // Start drag
+      await fireEvent.dragStart(note)
+
+      // Drag over itself
+      await fireEvent.dragEnter(note)
+
+      // Check that drop indicator is not shown
+      const dropIndicator = screen.queryByRole("presentation", {
+        name: "Drop position indicator",
+      })
+      expect(dropIndicator).not.toBeInTheDocument()
+    })
+
+    it("should maintain drop indicator while dragging within the target", async () => {
+      render(firstGeneration)
+      await flushPromises()
+
+      const draggedNote = await screen.findByText(
+        firstGeneration.note.noteTopic.topicConstructor
+      )
+      const dropTarget = await screen.findByText(
+        firstGenerationSibling.note.noteTopic.topicConstructor
+      )
+
+      // Start drag
+      await fireEvent.dragStart(draggedNote)
+      await fireEvent.dragEnter(dropTarget)
+
+      const dropIndicator = screen.getByRole("presentation", {
+        name: "Drop position indicator",
+      })
+      expect(dropIndicator).toBeVisible()
+
+      // Multiple dragOver events shouldn't remove the indicator
+      await fireEvent.dragOver(dropTarget)
+      await fireEvent.dragOver(dropTarget)
+      expect(dropIndicator).toBeVisible()
+
+      // Only dragleave should remove it
+      await fireEvent.dragLeave(dropTarget)
+      expect(dropIndicator).not.toBeVisible()
     })
   })
 })

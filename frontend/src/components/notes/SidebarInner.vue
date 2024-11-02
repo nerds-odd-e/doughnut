@@ -7,13 +7,12 @@
       :class="{
         'active-item': note.id === activeNoteRealm.note.id,
         'dragging': draggedNote?.id === note.id,
-        'drag-over': isDraggedOver === note.id
       }"
       draggable="true"
       @dragstart="handleDragStart($event, note)"
-      @dragover.prevent="handleDragOver($event)"
-      @dragenter="isDraggedOver = note.id"
-      @dragleave="isDraggedOver = null"
+      @dragover.prevent="handleDragOver($event, note)"
+      @dragenter="handleDragEnter($event, note)"
+      @dragleave="handleDragLeave($event)"
       @drop="handleDrop($event, note)"
       @dragend="handleDragEnd"
     >
@@ -35,6 +34,13 @@
           >{{ childrenCount(note.id) ?? "..." }}</span
         >
       </div>
+      <div
+        v-if="isDraggedOver === note.id && draggedNote"
+        class="drop-indicator"
+        role="presentation"
+        aria-label="Drop position indicator"
+        :style="dropIndicatorStyle"
+      ></div>
       <SidebarInner
         v-if="expandedIds.some((id) => id === note.id)"
         v-bind="{
@@ -105,6 +111,8 @@ watch(
 
 const draggedNote = ref<Note | null>(null)
 
+const dropIndicatorStyle = ref({})
+
 const handleDragStart = (event: DragEvent, note: Note) => {
   draggedNote.value = note
   if (event.dataTransfer) {
@@ -112,9 +120,49 @@ const handleDragStart = (event: DragEvent, note: Note) => {
   }
 }
 
-const handleDragOver = (event: DragEvent) => {
+const handleDragOver = (event: DragEvent, targetNote: Note) => {
+  event.preventDefault()
+  if (
+    !draggedNote.value ||
+    draggedNote.value.id === targetNote.id ||
+    draggedNote.value.parentId !== targetNote.parentId
+  ) {
+    return
+  }
+
   if (event.dataTransfer) {
     event.dataTransfer.dropEffect = "move"
+  }
+
+  // Calculate if we're in the upper or lower half of the target
+  const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
+  const mouseY = event.clientY
+  const threshold = rect.top + rect.height / 2
+
+  // Update drop indicator position
+  dropIndicatorStyle.value = {
+    top: mouseY >= threshold ? "100%" : "0",
+    transform: mouseY >= threshold ? "translateY(-2px)" : "translateY(-1px)",
+  }
+}
+
+const handleDragEnter = (_event: DragEvent, targetNote: Note) => {
+  if (
+    !draggedNote.value ||
+    draggedNote.value.id === targetNote.id ||
+    draggedNote.value.parentId !== targetNote.parentId
+  ) {
+    return
+  }
+  isDraggedOver.value = targetNote.id
+}
+
+const handleDragLeave = (event: DragEvent) => {
+  // Only clear if we're actually leaving the element (not entering a child)
+  const relatedTarget = event.relatedTarget as HTMLElement
+  const currentTarget = event.currentTarget as HTMLElement
+  if (!currentTarget.contains(relatedTarget)) {
+    isDraggedOver.value = null
   }
 }
 
@@ -154,7 +202,9 @@ const handleDragEnd = () => {
 }
 
 .list-group-item {
+  position: relative;
   border-radius: 0 !important;
+  min-height: 24px; // Ensure minimum height for drag target
 }
 
 .badge {
@@ -173,7 +223,13 @@ const handleDragEnd = () => {
   opacity: 0.5;
 }
 
-.note-item.drag-over {
-  background-color: rgba(0, 0, 0, 0.1);
+.drop-indicator {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #0d6efd;
+  z-index: 1;
+  pointer-events: none; // Prevent the indicator from interfering with drag events
 }
 </style>
