@@ -8,6 +8,7 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import jakarta.annotation.Resource;
+import java.sql.Timestamp;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -46,15 +47,17 @@ public class ConversationService {
 
   public ConversationMessage addMessageToConversation(
       Conversation conversation, User user, String message) {
+    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     ConversationMessage conversationMessage = new ConversationMessage();
     conversationMessage.setConversation(conversation);
     conversation.getConversationMessages().add(conversationMessage); // for in memory consistency
     conversationMessage.setSender(user);
     conversationMessage.setMessage(message);
+    conversationMessage.setCreatedAt(currentUTCTimestamp);
 
     // Update sync timestamp when AI sends a message
     if (user == null) { // AI message
-      conversation.setLastAiAssistantThreadSync(testabilitySettings.getCurrentUTCTimestamp());
+      conversation.setLastAiAssistantThreadSync(currentUTCTimestamp);
     }
 
     return modelFactoryService.conversationMessageRepository.save(conversationMessage);
