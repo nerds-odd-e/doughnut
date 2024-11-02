@@ -49,7 +49,7 @@
         </div>
       </div>
 
-      <ScrollTo :scrollTrigger="currentConversationMessages.length + (currentAiReply ? 1 : 0)" />
+      <ScrollTo :scrollTrigger="currentConversationMessages.length + (currentAiReply ? currentAiReply.length : 0)" />
     </template>
   </ConversationTemplate>
 </template>
@@ -139,6 +139,11 @@ const getAiReply = async () => {
         const response = JSON.parse(data) as MessageDelta
         const delta = response.delta?.content?.[0]?.text?.value
         currentAiReply.value = currentAiReply.value! + delta
+      }
+      if (event === "done") {
+        fetchConversationMessages().then(() => {
+          currentAiReply.value = undefined
+        })
       }
     })
     .onError((error) => {
