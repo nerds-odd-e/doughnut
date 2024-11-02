@@ -393,10 +393,11 @@ Given(
   (noteTopic: string) => {
     start
       .jumpToNotePage(noteTopic)
-      .chatAboutNote()
-      .replyToConversation('Please complete the note details.')
+      .chatAboutNoteNew()
+      .replyToConversationAndInviteAiToReply(
+        'Please complete the note details.'
+      )
     cy.pageIsNotLoading()
-    cy.get('button.close-button').click()
   }
 )
 

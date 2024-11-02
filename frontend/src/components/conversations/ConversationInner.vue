@@ -63,6 +63,8 @@ import type {
   Conversation,
   Message,
   MessageDelta,
+  Run,
+  NoteDetailsCompletion,
 } from "@/generated/backend"
 import SvgRobot from "@/components/svgs/SvgRobot.vue"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
@@ -70,7 +72,7 @@ import type { StorageAccessor } from "@/store/createNoteStorage"
 import SvgMissingAvatar from "@/components/svgs/SvgMissingAvatar.vue"
 import ConversationTemplate from "./ConversationTemplate.vue"
 
-const props = defineProps<{
+const { conversation, user, initialAiReply, storageAccessor } = defineProps<{
   conversation: Conversation
   conversations?: Conversation[]
   user: User
@@ -99,17 +101,17 @@ const formatMessage = (message: string) => {
 }
 
 const isCurrentUser = (id: number): boolean => {
-  return id === props.user?.id
+  return id === user?.id
 }
 
 const fetchConversationMessages = async () => {
-  if (!props.conversation.id) return
+  if (!conversation.id) return
 
   currentConversationMessages.value =
     await managedApi.restConversationMessageController.getConversationMessages(
-      props.conversation.id
+      conversation.id
     )
-  emit("conversation-fetched", props.conversation.id)
+  emit("conversation-fetched", conversation.id)
 }
 
 const handleSendMessage = async (
@@ -117,7 +119,7 @@ const handleSendMessage = async (
   inviteAI: boolean = false
 ) => {
   await managedApi.restConversationMessageController.replyToConversation(
-    props.conversation.id,
+    conversation.id,
     message
   )
   await fetchConversationMessages()
@@ -140,6 +142,21 @@ const getAiReply = async () => {
         const delta = response.delta?.content?.[0]?.text?.value
         currentAiReply.value = currentAiReply.value! + delta
       }
+      if (event === "thread.run.requires_action") {
+        const note = conversation.subject?.note
+        if (!note) {
+          console.error("No note found in conversation")
+          return
+        }
+        const response = JSON.parse(data) as Run
+        const contentToAppend = JSON.parse(
+          response.required_action!.submit_tool_outputs!.tool_calls![0]!
+            .function!.arguments as unknown as string
+        ) as NoteDetailsCompletion
+        storageAccessor
+          .storedApi()
+          .appendDetails(note.id, contentToAppend!.completion)
+      }
       if (event === "done") {
         fetchConversationMessages().then(() => {
           currentAiReply.value = undefined
@@ -150,17 +167,17 @@ const getAiReply = async () => {
       // eslint-disable-next-line no-console
       console.error(error)
     })
-    .restConversationMessageController.getAiReply(props.conversation.id)
+    .restConversationMessageController.getAiReply(conversation.id)
 }
 
 onMounted(async () => {
   await fetchConversationMessages()
-  if (props.initialAiReply) {
+  if (initialAiReply) {
     await getAiReply()
   }
 })
 
-watch(() => props.conversation, fetchConversationMessages)
+watch(() => conversation, fetchConversationMessages)
 
 const handleSendMessageAndInviteAI = async (message: string) => {
   await handleSendMessage(message, true)
