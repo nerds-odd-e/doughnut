@@ -9,6 +9,7 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorWithStorageService;
 import com.odde.doughnut.services.ChatAboutNoteService;
 import com.odde.doughnut.services.ConversationService;
+import com.theokanning.openai.assistants.message.Message;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
@@ -92,32 +93,46 @@ public class RestConversationMessageController {
   public SseEmitter getAiReply(
       @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation)
       throws UnexpectedNoAccessRightException {
+    validateConversation(conversation);
+    ChatAboutNoteService chatService = setupChatService(conversation);
+    setupMessageHandler(conversation, chatService);
+    return chatService.getAIReplySSE();
+  }
+
+  private void validateConversation(Conversation conversation)
+      throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(conversation);
     Note note = conversation.getSubject().getNote();
     if (note == null) {
       throw new RuntimeException("Only note related conversation can have AI reply");
     }
+  }
+
+  private ChatAboutNoteService setupChatService(Conversation conversation) {
+    Note note = conversation.getSubject().getNote();
     ChatAboutNoteService chatService =
         aiAdvisorWithStorageService.getChatService(note, conversation.getAiAssistantThreadId());
     chatService.createUserMessage("just say something.");
+    return chatService;
+  }
 
-    // Add event listener before getting the SSE emitter
+  private void setupMessageHandler(Conversation conversation, ChatAboutNoteService chatService) {
     chatService.onMessageCompleted(
         message -> {
-          String content =
-              message.getContent().stream()
-                  .filter(c -> "text".equals(c.getType()))
-                  .map(c -> c.getText().getValue())
-                  .findFirst()
-                  .orElse("");
-
+          String content = extractMessageContent(message);
           conversationService.addMessageToConversation(
               conversation,
               null, // AI message has no user
               content);
         });
+  }
 
-    return chatService.getAIReplySSE();
+  private static String extractMessageContent(Message message) {
+    return message.getContent().stream()
+        .filter(c -> "text".equals(c.getType()))
+        .map(c -> c.getText().getValue())
+        .findFirst()
+        .orElse("");
   }
 
   @GetMapping("/{conversationId}/messages")
