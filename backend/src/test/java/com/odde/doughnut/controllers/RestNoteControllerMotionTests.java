@@ -129,7 +129,6 @@ class RestNoteControllerMotionTests {
               MovementNotPossibleException {
         // Move subject as first child of previousYounger
         controller.moveAfter(subject, previousYounger, "asFirstChild");
-        makeMe.refresh(previousYounger);
 
         assertThat(previousYounger.getChildren(), hasItem(subject));
       }

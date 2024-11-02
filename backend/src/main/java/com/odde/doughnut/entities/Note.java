@@ -217,16 +217,16 @@ public class Note extends EntityIdentifiedByIdOnly {
     this.notebook = notebook;
   }
 
-  public void updateSiblingOrder(Note relativeToNote, boolean asFirstChildOfNote) {
-    if (!asFirstChildOfNote) {
-      this.siblingOrder =
-          relativeToNote
-              .nextSibling()
-              .map(x -> (relativeToNote.siblingOrder + x.getSiblingOrder()) / 2)
-              .orElse(relativeToNote.siblingOrder + SiblingOrder.MINIMUM_SIBLING_ORDER_INCREMENT);
-      return;
-    }
-    relativeToNote.getChildren().stream()
+  public void updateSiblingOrderAfter(Note relativeToNote) {
+    this.siblingOrder =
+        relativeToNote
+            .nextSibling()
+            .map(x -> (relativeToNote.siblingOrder + x.getSiblingOrder()) / 2)
+            .orElse(relativeToNote.siblingOrder + SiblingOrder.MINIMUM_SIBLING_ORDER_INCREMENT);
+  }
+
+  public void updateSiblingOrderAsFirstChild(Note parentNote) {
+    parentNote.getChildren().stream()
         .findFirst()
         .ifPresent(
             firstChild ->
@@ -316,6 +316,20 @@ public class Note extends EntityIdentifiedByIdOnly {
       noteTopic.setTargetNoteTopic(getTargetNote().getNoteTopic());
     }
     return noteTopic;
+  }
+
+  @JsonIgnore
+  public void adjustPositionAsAChildOfParentInMemory() {
+    List<Note> siblings = getParent().children;
+    siblings.remove(this);
+    int insertIndex = 0;
+    for (Note sibling : siblings) {
+      if (sibling.getSiblingOrder() > getSiblingOrder()) {
+        break;
+      }
+      insertIndex++;
+    }
+    siblings.add(insertIndex, this);
   }
 
   public static class NoteBrief {

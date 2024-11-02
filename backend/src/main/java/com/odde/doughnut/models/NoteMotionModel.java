@@ -17,20 +17,18 @@ public class NoteMotionModel {
   public void execute() throws CyclicLinkDetectedException {
     Notebook notebook = subject.getNotebook();
     moveHeadNoteOnly();
-    subject.updateSiblingOrder(relativeToNote, asFirstChildOfNote);
-    Note parent = getNewParent();
-    subject.setParentNote(parent);
+    if (asFirstChildOfNote) {
+      subject.updateSiblingOrderAsFirstChild(relativeToNote);
+      subject.setParentNote(relativeToNote);
+    } else {
+      subject.updateSiblingOrderAfter(relativeToNote);
+      subject.setParentNote(relativeToNote.getParent());
+    }
+    subject.adjustPositionAsAChildOfParentInMemory();
     modelFactoryService.save(subject);
     if (notebook.getHeadNote() == subject) {
       modelFactoryService.remove(notebook);
     }
-  }
-
-  private Note getNewParent() {
-    if (asFirstChildOfNote) {
-      return relativeToNote;
-    }
-    return relativeToNote.getParent();
   }
 
   private void moveHeadNoteOnly() throws CyclicLinkDetectedException {
