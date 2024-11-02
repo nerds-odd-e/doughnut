@@ -1,5 +1,4 @@
 import type {
-  Note,
   NoteRealm,
   WikidataAssociationCreation,
 } from "@/generated/backend"
@@ -34,10 +33,6 @@ export interface StoredApi {
   ): Promise<void>
 
   updateLink(linkId: Doughnut.ID, data: LinkCreation): Promise<void>
-
-  moveUp(noteId: Doughnut.ID): Promise<NoteRealm | void>
-
-  moveDown(noteId: Doughnut.ID): Promise<NoteRealm | void>
 
   moveAfter(
     noteId: number,
@@ -188,32 +183,6 @@ export default class StoredApiCollection implements StoredApi {
     noteRealms.forEach((n) => this.storage.refreshNoteRealm(n))
   }
 
-  async moveUp(noteId: Doughnut.ID) {
-    const { parentId, siblings } = this.siblingsOf(noteId)
-    if (!siblings) return
-    const currentIndex = siblings.map((n) => n.id).indexOf(noteId)
-    this.refreshNoteRealms(
-      await this.managedApi.restNoteController.moveAfter(
-        noteId,
-        currentIndex === 1 ? parentId : siblings[currentIndex - 2]!.id,
-        currentIndex === 1 ? "asFirstChild" : "after"
-      )
-    )
-  }
-
-  async moveDown(noteId: Doughnut.ID) {
-    const { siblings } = this.siblingsOf(noteId)
-    if (!siblings) return
-    const currentIndex = siblings.map((n) => n.id).indexOf(noteId)
-    this.refreshNoteRealms(
-      await this.managedApi.restNoteController.moveAfter(
-        noteId,
-        siblings[currentIndex + 1]!.id,
-        "after"
-      )
-    )
-  }
-
   async moveAfter(
     noteId: number,
     targetNoteId: number,
@@ -289,24 +258,5 @@ export default class StoredApiCollection implements StoredApi {
     const noteRealm = this.storage.refreshNoteRealm(res[0]!)
     this.routerReplaceFocus(router, noteRealm)
     return noteRealm
-  }
-
-  private siblingsOf(noteId: Doughnut.ID): {
-    parentId: number
-    siblings: Note[] | undefined
-  } {
-    const noteRealm = this.storage.refOfNoteRealm(noteId).value
-    if (!noteRealm) return { parentId: 0, siblings: undefined }
-
-    const parentId = noteRealm.note.noteTopic.parentNoteTopic?.id
-    if (!parentId) return { parentId: 0, siblings: undefined }
-
-    const parentRealm = this.storage.refOfNoteRealm(parentId).value
-    if (!parentRealm) return { parentId, siblings: undefined }
-
-    return {
-      parentId,
-      siblings: parentRealm.children,
-    }
   }
 }

@@ -49,14 +49,6 @@
       </button>
 
 
-      <button class="btn" title="Move up" @click="moveUp">
-        <SvgUp />
-      </button>
-
-      <button class="btn" title="Move down" @click="moveDown">
-        <SvgDown />
-      </button>
-
       <div class="dropdown">
         <button
           id="dropdownMenuButton"
@@ -145,8 +137,6 @@ import SvgSearchForLink from "../../svgs/SvgSearchForLink.vue"
 import LinkNoteDialog from "../../links/LinkNoteDialog.vue"
 import SvgCog from "../../svgs/SvgCog.vue"
 import SvgChat from "../../svgs/SvgChat.vue"
-import SvgUp from "../../svgs/SvgUp.vue"
-import SvgDown from "../../svgs/SvgDown.vue"
 import NoteDeleteButton from "./NoteDeleteButton.vue"
 import PopButton from "../../commons/Popups/PopButton.vue"
 import AIGenerateImageDialog from "../AIGenerateImageDialog.vue"
@@ -178,13 +168,6 @@ const emit = defineEmits([
   "edit-as-markdown",
   "show-conversations",
 ])
-
-const moveUp = () => {
-  storageAccessor.storedApi().moveUp(note.id)
-}
-const moveDown = () => {
-  storageAccessor.storedApi().moveDown(note.id)
-}
 
 const noteAccessoriesUpdated = (closer: () => void, na: NoteAccessory) => {
   if (na) {
