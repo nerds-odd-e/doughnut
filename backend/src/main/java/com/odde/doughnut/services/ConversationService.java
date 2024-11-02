@@ -58,6 +58,7 @@ public class ConversationService {
     // Update sync timestamp when AI sends a message
     if (user == null) { // AI message
       conversation.setLastAiAssistantThreadSync(currentUTCTimestamp);
+      modelFactoryService.conversationRepository.save(conversation);
     }
 
     return modelFactoryService.conversationMessageRepository.save(conversationMessage);

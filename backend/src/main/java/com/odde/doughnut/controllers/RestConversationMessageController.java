@@ -45,6 +45,7 @@ public class RestConversationMessageController {
   }
 
   @PostMapping("/note/{note}")
+  @Transactional
   public Conversation startConversationAboutNote(
       @PathVariable("note") @Schema(type = "integer") Note note, @RequestBody String message) {
     return conversationService.startConversationOfNote(note, currentUser.getEntity(), message);
@@ -72,6 +73,7 @@ public class RestConversationMessageController {
   }
 
   @PostMapping("/{conversationId}/send")
+  @Transactional
   public ConversationMessage replyToConversation(
       @RequestBody String message,
       @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation)
@@ -120,7 +122,30 @@ public class RestConversationMessageController {
     }
     ChatAboutNoteService chatService =
         aiAdvisorWithStorageService.getChatAboutNoteService(threadId, assistantService);
-    chatService.createUserMessage("just say something.");
+
+    // Get unsynchronized messages and create one combined message
+    List<ConversationMessage> unsynced =
+        conversation.getConversationMessages().stream()
+            .filter(
+                msg ->
+                    conversation.getLastAiAssistantThreadSync() == null
+                        || msg.getCreatedAt().after(conversation.getLastAiAssistantThreadSync()))
+            .filter(msg -> msg.getSender() != null) // Only user messages
+            .toList();
+
+    if (!unsynced.isEmpty()) {
+      StringBuilder combinedMessage = new StringBuilder();
+      for (ConversationMessage msg : unsynced) {
+        combinedMessage.append(String.format("user `%s` says:%n", msg.getSender().getName()));
+        combinedMessage.append("-----------------\n");
+        combinedMessage.append(msg.getMessage());
+        combinedMessage.append("\n\n");
+      }
+      chatService.createUserMessage(combinedMessage.toString());
+    } else {
+      chatService.createUserMessage("just say something.");
+    }
+
     return chatService;
   }
 

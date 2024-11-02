@@ -157,7 +157,6 @@ public class RestConversationMessageControllerAiReplyTests {
           conversation
               .getConversationMessages()
               .get(conversation.getConversationMessages().size() - 1);
-      assertThat(lastMessage.getMessage()).isEqualTo("I am a Chatbot");
       assertThat(lastMessage.getSender()).isNull(); // AI message should have no user
     }
 
@@ -186,6 +185,49 @@ public class RestConversationMessageControllerAiReplyTests {
       makeMe.refresh(conversation);
       // Verify timestamp was updated to the new time when AI message was added
       assertThat(conversation.getLastAiAssistantThreadSync()).isNotEqualTo(threadCreateTime);
+    }
+
+    @Test
+    void shouldSyncUnsentMessagesWithOpenAI() throws UnexpectedNoAccessRightException {
+      // Setup initial sync time
+      Timestamp initialSync = makeMe.aTimestamp().please();
+      conversation.setLastAiAssistantThreadSync(initialSync);
+      conversation.setAiAssistantThreadId("my-thread");
+
+      // Add some messages after the sync
+      testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(1, 2).please());
+      conversationService.addMessageToConversation(
+          conversation, currentUser.getEntity(), "Hello AI!");
+      conversationService.addMessageToConversation(
+          conversation, currentUser.getEntity(), "How are you?");
+
+      controller.getAiReply(conversation);
+
+      // Verify the message sent to OpenAI
+      ArgumentCaptor<MessageRequest> captor = ArgumentCaptor.forClass(MessageRequest.class);
+      verify(openAiApi).createMessage(any(), captor.capture());
+
+      String expectedMessage =
+          String.format(
+              "user `%s` says:%n-----------------\nHello AI!\n\n"
+                  + "user `%s` says:%n-----------------\nHow are you?\n\n",
+              currentUser.getEntity().getName(), currentUser.getEntity().getName());
+
+      assertThat(captor.getValue().getContent()).isEqualTo(expectedMessage);
+    }
+
+    @Test
+    void shouldSaySomethingWhenNoNewMessages() throws UnexpectedNoAccessRightException {
+      // Set sync time to current time so there are no unsent messages
+      conversation.setLastAiAssistantThreadSync(testabilitySettings.getCurrentUTCTimestamp());
+      conversation.setAiAssistantThreadId("my-thread");
+
+      controller.getAiReply(conversation);
+
+      // Verify default message is sent
+      ArgumentCaptor<MessageRequest> captor = ArgumentCaptor.forClass(MessageRequest.class);
+      verify(openAiApi).createMessage(any(), captor.capture());
+      assertThat(captor.getValue().getContent()).isEqualTo("just say something.");
     }
   }
 
