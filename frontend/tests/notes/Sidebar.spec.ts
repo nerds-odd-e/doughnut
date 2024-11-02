@@ -199,7 +199,7 @@ describe("Sidebar", () => {
       helper.managedApi.restNoteController.show1 = vitest
         .fn()
         .mockResolvedValueOnce(topNoteRealm)
-        .mockResolvedValueOnce(firstGeneration)
+        .mockResolvedValue(firstGeneration)
     })
 
     it("should call moveAfter when dragging and dropping notes", async () => {

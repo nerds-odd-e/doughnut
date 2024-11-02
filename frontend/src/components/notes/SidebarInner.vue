@@ -196,6 +196,14 @@ const handleDrop = async (event: DragEvent, targetNote: Note) => {
     await props.storageAccessor
       .storedApi()
       .moveAfter(draggedNote.value.id, targetNote.id, dropMode.value)
+
+    // Expand the target note if dropping as first child
+    if (
+      dropMode.value === "asFirstChild" &&
+      !expandedIds.value.includes(targetNote.id)
+    ) {
+      expandedIds.value.push(targetNote.id)
+    }
   } catch (error) {
     console.error("Failed to move note:", error)
   }
