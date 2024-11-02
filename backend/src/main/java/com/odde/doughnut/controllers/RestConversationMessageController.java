@@ -7,10 +7,13 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorWithStorageService;
+import com.odde.doughnut.services.ChatAboutNoteService;
 import com.odde.doughnut.services.ConversationService;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @RestController
 @RequestMapping("/api/conversation")
@@ -84,12 +87,19 @@ public class RestConversationMessageController {
     return conversation;
   }
 
-  @GetMapping("/{conversationId}/ai-reply")
-  public Conversation getAiReply(
+  @PostMapping("/{conversationId}/ai-reply")
+  @Transactional
+  public SseEmitter getAiReply(
       @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(conversation);
-    return conversation;
+    Note note = conversation.getSubject().getNote();
+    if (note == null) {
+      throw new RuntimeException("Only note related conversation can have AI reply");
+    }
+    ChatAboutNoteService chatService = aiAdvisorWithStorageService.getChatService(note, null);
+    chatService.createUserMessage("just say something.");
+    return chatService.getAIReplySSE();
   }
 
   @GetMapping("/{conversationId}/messages")

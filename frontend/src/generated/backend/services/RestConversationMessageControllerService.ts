@@ -4,6 +4,7 @@
 /* eslint-disable */
 import type { Conversation } from '../models/Conversation';
 import type { ConversationMessage } from '../models/ConversationMessage';
+import type { SseEmitter } from '../models/SseEmitter';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestConversationMessageControllerService {
@@ -26,6 +27,25 @@ export class RestConversationMessageControllerService {
             },
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param conversationId
+     * @returns SseEmitter OK
+     * @throws ApiError
+     */
+    public getAiReply(
+        conversationId: number,
+    ): CancelablePromise<SseEmitter> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/conversation/{conversationId}/ai-reply',
+            path: {
+                'conversationId': conversationId,
+            },
             errors: {
                 500: `Internal Server Error`,
             },
@@ -145,25 +165,6 @@ export class RestConversationMessageControllerService {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/conversation/{conversationId}/messages',
-            path: {
-                'conversationId': conversationId,
-            },
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * @param conversationId
-     * @returns Conversation OK
-     * @throws ApiError
-     */
-    public getAiReply(
-        conversationId: number,
-    ): CancelablePromise<Conversation> {
-        return this.httpRequest.request({
-            method: 'GET',
-            url: '/api/conversation/{conversationId}/ai-reply',
             path: {
                 'conversationId': conversationId,
             },

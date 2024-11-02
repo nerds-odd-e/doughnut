@@ -1412,6 +1412,30 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ConversationMessage"
+  /api/conversation/{conversationId}/ai-reply:
+    post:
+      tags:
+      - rest-conversation-message-controller
+      operationId: getAiReply
+      parameters:
+      - name: conversationId
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/SseEmitter"
   /api/conversation/note/{note}:
     get:
       tags:
@@ -2761,30 +2785,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ConversationMessage"
-  /api/conversation/{conversationId}/ai-reply:
-    get:
-      tags:
-      - rest-conversation-message-controller
-      operationId: getAiReply
-      parameters:
-      - name: conversationId
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Conversation"
   /api/conversation/unread:
     get:
       tags:
@@ -3549,6 +3549,12 @@ components:
         createdAt:
           type: string
           format: date-time
+    SseEmitter:
+      type: object
+      properties:
+        timeout:
+          type: integer
+          format: int64
     AssessmentQuestionInstance:
       required:
       - bareQuestion
@@ -3918,12 +3924,6 @@ components:
           type: string
         threadId:
           type: string
-    SseEmitter:
-      type: object
-      properties:
-        timeout:
-          type: integer
-          format: int64
     UserDTO:
       required:
       - name

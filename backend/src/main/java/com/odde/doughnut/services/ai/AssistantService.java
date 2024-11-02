@@ -85,6 +85,11 @@ public record AssistantService(
                 List.of(
                     MessageRequest.builder()
                         .role("assistant")
+                        .content(
+                            "Please only call the complete_note_details function when use asks to.")
+                        .build(),
+                    MessageRequest.builder()
+                        .role("assistant")
                         .content(note.getNoteDescription())
                         .build()))
             .build();

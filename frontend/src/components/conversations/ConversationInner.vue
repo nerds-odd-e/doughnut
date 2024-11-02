@@ -39,7 +39,17 @@
           {{ formatMessage(conversationMessage.message) }}
         </div>
       </div>
-      <ScrollTo :scrollTrigger="currentConversationMessages.length" />
+
+      <div v-if="currentAiReply" class="d-flex mb-3">
+        <div class="message-avatar me-2" title="AI Assistant">
+          <SvgRobot />
+        </div>
+        <div class="card py-2 px-3 bg-light ai-chat">
+          {{ formatMessage(currentAiReply) }}
+        </div>
+      </div>
+
+      <ScrollTo :scrollTrigger="currentConversationMessages.length + (currentAiReply ? 1 : 0)" />
     </template>
   </ConversationTemplate>
 </template>
@@ -51,6 +61,8 @@ import type {
   User,
   ConversationMessage,
   Conversation,
+  Message,
+  MessageDelta,
 } from "@/generated/backend"
 import SvgRobot from "@/components/svgs/SvgRobot.vue"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
@@ -79,6 +91,8 @@ const { managedApi } = useLoadingApi()
 const currentConversationMessages = ref<ConversationMessage[] | undefined>(
   undefined
 )
+
+const currentAiReply = ref<string | undefined>()
 
 const formatMessage = (message: string) => {
   return message.replace(/^"|"$/g, "").trim()
@@ -114,10 +128,24 @@ const handleSendMessage = async (
 }
 
 const getAiReply = async () => {
-  await managedApi.restConversationMessageController.getAiReply(
-    props.conversation.id
-  )
-  await fetchConversationMessages()
+  await managedApi.eventSource
+    .onMessage((event, data) => {
+      if (event === "thread.message.created") {
+        const response = JSON.parse(data) as Message
+        response.content = [{ text: { value: "" } }]
+        currentAiReply.value = response.content?.[0]?.text?.value
+      }
+      if (event === "thread.message.delta") {
+        const response = JSON.parse(data) as MessageDelta
+        const delta = response.delta?.content?.[0]?.text?.value
+        currentAiReply.value = currentAiReply.value! + delta
+      }
+    })
+    .onError((error) => {
+      // eslint-disable-next-line no-console
+      console.error(error)
+    })
+    .restConversationMessageController.getAiReply(props.conversation.id)
 }
 
 onMounted(async () => {

@@ -132,6 +132,8 @@ class RestAiControllerTest {
         controller.getCompletion(note, params);
         verify(openAiApi, times(1)).createThread(captor.capture());
         assertThat(captor.getAllValues().get(0).getMessages().getFirst().getContent().toString())
+            .contains("only call");
+        assertThat(captor.getAllValues().get(0).getMessages().get(1).getContent().toString())
             .contains("cosmos › solar system");
       }
 
