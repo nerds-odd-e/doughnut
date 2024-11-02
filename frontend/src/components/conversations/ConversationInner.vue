@@ -49,7 +49,11 @@
         </div>
       </div>
 
-      <ScrollTo :scrollTrigger="currentConversationMessages.length + (currentAiReply ? currentAiReply.length : 0)" />
+      <div v-if="lastErrorMessage" class="last-error-message text-danger mb-3">
+        {{ lastErrorMessage }}
+      </div>
+
+      <ScrollTo :scrollTrigger="currentConversationMessages.length + (currentAiReply ? currentAiReply.length : 0) + (lastErrorMessage ? 1 : 0)" />
     </template>
   </ConversationTemplate>
 </template>
@@ -95,6 +99,8 @@ const currentConversationMessages = ref<ConversationMessage[] | undefined>(
 )
 
 const currentAiReply = ref<string | undefined>()
+
+const lastErrorMessage = ref<string | undefined>()
 
 const formatMessage = (message: string) => {
   return message.replace(/^"|"$/g, "").trim()
@@ -163,9 +169,11 @@ const getAiReply = async () => {
         })
       }
     })
-    .onError((error) => {
-      // eslint-disable-next-line no-console
-      console.error(error)
+    .onError((e) => {
+      const error = e as Error
+      if (error.message.indexOf("400") !== -1) {
+        lastErrorMessage.value = "Bad Request"
+      }
     })
     .restConversationMessageController.getAiReply(conversation.id)
 }

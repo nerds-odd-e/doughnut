@@ -401,16 +401,9 @@ Given(
   }
 )
 
-Then(
-  'I should see a notification of OpenAI service unavailability in the controller bar',
-  () => {
-    cy.get('.last-error-message')
-      .should((elem) => {
-        expect(elem.text()).to.equal('The OpenAI request was not Authorized.')
-      })
-      .click()
-  }
-)
+Then('I should see a notification of a bad request', () => {
+  start.assumeChatAboutNotePage().expectErrorMessage('Bad Request')
+})
 
 When('I start to chat about the note {string}', (noteTopic: string) => {
   start.jumpToNotePage(noteTopic).chatAboutNoteNew()

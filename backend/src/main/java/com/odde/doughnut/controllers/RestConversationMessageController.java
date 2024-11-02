@@ -4,12 +4,14 @@ import com.odde.doughnut.entities.AssessmentQuestionInstance;
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.ConversationMessage;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorWithStorageService;
 import com.odde.doughnut.services.ConversationService;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
+import org.apache.coyote.BadRequestException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -92,9 +94,16 @@ public class RestConversationMessageController {
   @Transactional
   public SseEmitter getAiReply(
       @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation)
-      throws UnexpectedNoAccessRightException {
+      throws UnexpectedNoAccessRightException, BadRequestException {
     currentUser.assertAuthorization(conversation);
-    return aiAdvisorWithStorageService.getAiReplyForConversation(conversation, conversationService);
+    try {
+      return aiAdvisorWithStorageService.getAiReplyForConversation(
+          conversation, conversationService);
+    } catch (OpenAiUnauthorizedException e) {
+      // Since this method is asynchronous, the exception body is not returned to the client.
+      // Instead, the client will receive a 400 Bad Request status code, with no body.
+      throw new BadRequestException(e.getMessage(), e);
+    }
   }
 
   @GetMapping("/{conversationId}/messages")

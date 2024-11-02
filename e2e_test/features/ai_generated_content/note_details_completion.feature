@@ -11,8 +11,8 @@ Feature: Note details completion
 
   Scenario: OpenAI Service Unavailability
     Given the OpenAI service is unavailable due to invalid system token
-    When I request to complete the details for the note "Taipei"
-    Then I should see a notification of OpenAI service unavailability in the controller bar
+    When I request to complete the details for the note "Taipei" new
+    Then I should see a notification of a bad request
 
   Scenario: Completing Note Details Using OpenAI
     Given the OpenAI assistant will create a thread and request for the following actions:

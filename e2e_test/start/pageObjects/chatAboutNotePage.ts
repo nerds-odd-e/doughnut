@@ -17,5 +17,8 @@ export function assumeChatAboutNotePage() {
         })
       })
     },
+    expectErrorMessage(message: string) {
+      cy.get('.last-error-message').should('have.text', message)
+    },
   }
 }
