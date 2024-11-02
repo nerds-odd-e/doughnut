@@ -68,6 +68,20 @@
           >
             <NoteInfoBar v-bind="{ noteId: note.id }" />
           </PopButton>
+
+          <PopButton title="Test me" sidebar="right">
+            <template #button_face>
+              <SvgRobot />
+              <span class="ms-2">Test me</span>
+            </template>
+            <template #default="{ closer }">
+              <NoteTestMeDialog
+                v-bind="{ selectedNote: note, storageAccessor }"
+                @close-dialog="closer"
+              />
+            </template>
+          </PopButton>
+
           <PopButton
             btn-class="dropdown-item btn-primary"
             title="Generate Image with DALL-E"
@@ -142,6 +156,7 @@ import PopButton from "../../commons/Popups/PopButton.vue"
 import AIGenerateImageDialog from "../AIGenerateImageDialog.vue"
 import NoteDetailsAutoCompletionButton from "./NoteDetailsAutoCompletionButton.vue"
 import NoteChatDialog from "../NoteChatDialog.vue"
+import NoteTestMeDialog from "../NoteTestMeDialog.vue"
 import Questions from "../Questions.vue"
 import NoteInfoBar from "../NoteInfoBar.vue"
 import SvgMarkdown from "@/components/svgs/SvgMarkdown.vue"
@@ -153,6 +168,7 @@ import SvgUrlIndicator from "../../svgs/SvgUrlIndicator.vue"
 import NoteEditImageDialog from "../accessory/NoteEditImageDialog.vue"
 import NoteEditUrlDialog from "../accessory/NoteEditUrlDialog.vue"
 import NoteAudioTools from "../accessory/NoteAudioTools.vue"
+import SvgRobot from "@/components/svgs/SvgRobot.vue"
 
 const { storageAccessor, note } = defineProps<{
   storageAccessor: StorageAccessor

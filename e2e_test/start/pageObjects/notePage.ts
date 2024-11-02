@@ -4,6 +4,7 @@ import audioToolsPage from './audioToolsPage'
 import { assumeChatAboutNotePage } from './chatAboutNotePage'
 import noteCreationForm from './noteForms/noteCreationForm'
 import { questionListPage } from './questionListPage'
+import { assumeQuestionPage } from './QuizQuestionPage'
 
 function filterAttributes(
   attributes: Record<string, string>,
@@ -231,6 +232,11 @@ export const assumeNotePage = (noteTopic?: string) => {
         return false
       })
       cy.findByRole('button', { name: 'auto-complete details' }).click()
+    },
+    testMe() {
+      clickNotePageMoreOptionsButton('Test me')
+      cy.pageIsNotLoading() // wait for the response
+      return assumeQuestionPage()
     },
     chatAboutNote() {
       this.toolbarButton('Chat with AI').click()
