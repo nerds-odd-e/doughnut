@@ -39,7 +39,11 @@ export interface StoredApi {
 
   moveDown(noteId: Doughnut.ID): Promise<NoteRealm | void>
 
-  moveAfter(noteId: number, targetNoteId: number): Promise<NoteRealm[]>
+  moveAfter(
+    noteId: number,
+    targetNoteId: number,
+    dropMode: "after" | "asFirstChild"
+  ): Promise<NoteRealm[]>
 
   updateTextField(
     noteId: Doughnut.ID,
@@ -210,11 +214,15 @@ export default class StoredApiCollection implements StoredApi {
     )
   }
 
-  async moveAfter(noteId: number, targetNoteId: number): Promise<NoteRealm[]> {
+  async moveAfter(
+    noteId: number,
+    targetNoteId: number,
+    dropMode: "after" | "asFirstChild"
+  ): Promise<NoteRealm[]> {
     const updatedNotes = await this.managedApi.restNoteController.moveAfter(
       noteId,
       targetNoteId,
-      "after"
+      dropMode
     )
     this.refreshNoteRealms(updatedNotes)
     return updatedNotes

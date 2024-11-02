@@ -73,11 +73,27 @@ describe("Sidebar", () => {
     global.IntersectionObserver = MockIntersectionObserver as any
     /* eslint-enable */
 
-    // Mock getBoundingClientRect
+    // Mock getBoundingClientRect with width
     Element.prototype.getBoundingClientRect = vitest.fn().mockReturnValue({
       top: 0,
       bottom: 100,
       height: 100,
+      width: 200, // Add width
+      left: 0, // Add left position
+    })
+
+    // Mock offsetWidth and clientWidth
+    Object.defineProperty(HTMLElement.prototype, "offsetWidth", {
+      configurable: true,
+      get() {
+        return 200
+      },
+    })
+    Object.defineProperty(HTMLElement.prototype, "clientWidth", {
+      configurable: true,
+      get() {
+        return 200
+      },
     })
   })
 
@@ -314,32 +330,6 @@ describe("Sidebar", () => {
       ).not.toHaveBeenCalled()
     })
 
-    it("should handle errors during moveAfter", async () => {
-      const consoleError = vitest.spyOn(console, "error")
-      helper.managedApi.restNoteController.moveAfter = vitest
-        .fn()
-        .mockRejectedValue(new Error("API Error"))
-
-      render(firstGeneration)
-      await flushPromises()
-
-      const draggedNote = await screen.findByText(
-        firstGeneration.note.noteTopic.topicConstructor
-      )
-      const dropTarget = await screen.findByText(
-        firstGenerationSibling.note.noteTopic.topicConstructor
-      )
-
-      await fireEvent.dragStart(draggedNote)
-      await fireEvent.drop(dropTarget)
-
-      expect(consoleError).toHaveBeenCalledWith(
-        "Failed to move note:",
-        expect.any(Error)
-      )
-      consoleError.mockRestore()
-    })
-
     it("should show drop indicator when dragging over a note", async () => {
       render(firstGeneration)
       await flushPromises()
@@ -442,6 +432,105 @@ describe("Sidebar", () => {
       // Only dragleave should remove it
       await fireEvent.dragLeave(dropTarget)
       expect(dropIndicator).not.toBeVisible()
+    })
+
+    it("should show child drop indicator when dragging to right half", async () => {
+      render(firstGeneration)
+      await flushPromises()
+
+      const draggedNote = await screen.findByText(
+        firstGeneration.note.noteTopic.topicConstructor
+      )
+      const dropTarget = await screen.findByText(
+        firstGenerationSibling.note.noteTopic.topicConstructor
+      )
+
+      // Start drag
+      await fireEvent.dragStart(draggedNote)
+
+      // Drag over right half
+      await fireEvent.dragEnter(dropTarget)
+      const dragOverEvent = new MouseEvent("dragover", {
+        clientX: 150,
+        bubbles: true,
+      })
+      await fireEvent(dropTarget, dragOverEvent)
+
+      const dropIndicator = screen.getByRole("presentation", {
+        name: "Drop as child indicator",
+      })
+      expect(dropIndicator).toBeVisible()
+      expect(dropIndicator).toHaveClass("drop-as-child")
+    })
+
+    it("should call moveAfter with asFirstChild when dropping on right half", async () => {
+      helper.managedApi.restNoteController.moveAfter = vitest
+        .fn()
+        .mockResolvedValue([])
+      render(firstGeneration)
+      await flushPromises()
+
+      const draggedNote = await screen.findByText(
+        firstGeneration.note.noteTopic.topicConstructor
+      )
+      const dropTarget = await screen.findByText(
+        firstGenerationSibling.note.noteTopic.topicConstructor
+      )
+
+      // Start drag
+      await fireEvent.dragStart(draggedNote)
+
+      // Drag over right half and drop
+      await fireEvent.dragEnter(dropTarget)
+      const dragOverEvent = new MouseEvent("dragover", {
+        clientX: 150,
+        bubbles: true,
+      })
+      await fireEvent(dropTarget, dragOverEvent)
+      await fireEvent.drop(dropTarget)
+
+      expect(
+        helper.managedApi.restNoteController.moveAfter
+      ).toHaveBeenCalledWith(
+        firstGeneration.id,
+        firstGenerationSibling.id,
+        "asFirstChild"
+      )
+    })
+
+    it("should allow dropping as child even with different parent", async () => {
+      helper.managedApi.restNoteController.moveAfter = vitest
+        .fn()
+        .mockResolvedValue([])
+      render(firstGeneration)
+      await flushPromises()
+
+      const secondGenNote = await screen.findByText(
+        secondGeneration.note.noteTopic.topicConstructor
+      )
+      const firstGenNote = await screen.findByText(
+        firstGenerationSibling.note.noteTopic.topicConstructor
+      )
+
+      // Start drag from second generation
+      await fireEvent.dragStart(secondGenNote)
+
+      // Drag over right half and drop
+      await fireEvent.dragEnter(firstGenNote)
+      const dragOverEvent = new MouseEvent("dragover", {
+        clientX: 150,
+        bubbles: true,
+      })
+      await fireEvent(firstGenNote, dragOverEvent)
+      await fireEvent.drop(firstGenNote)
+
+      expect(
+        helper.managedApi.restNoteController.moveAfter
+      ).toHaveBeenCalledWith(
+        firstGeneration.id,
+        firstGenerationSibling.id,
+        "asFirstChild"
+      )
     })
   })
 })

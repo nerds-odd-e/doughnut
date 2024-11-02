@@ -38,7 +38,8 @@
         v-if="isDraggedOver === note.id && draggedNote"
         class="drop-indicator"
         role="presentation"
-        aria-label="Drop position indicator"
+        :aria-label="dropMode === 'after' ? 'Drop position indicator' : 'Drop as child indicator'"
+        :class="{ 'drop-as-child': dropMode === 'asFirstChild' }"
         :style="dropIndicatorStyle"
       ></div>
       <SidebarInner
@@ -113,6 +114,8 @@ const draggedNote = ref<Note | null>(null)
 
 const dropIndicatorStyle = ref({})
 
+const dropMode = ref<"after" | "asFirstChild">("after")
+
 const handleDragStart = (event: DragEvent, note: Note) => {
   draggedNote.value = note
   if (event.dataTransfer) {
@@ -122,11 +125,7 @@ const handleDragStart = (event: DragEvent, note: Note) => {
 
 const handleDragOver = (event: DragEvent, targetNote: Note) => {
   event.preventDefault()
-  if (
-    !draggedNote.value ||
-    draggedNote.value.id === targetNote.id ||
-    draggedNote.value.parentId !== targetNote.parentId
-  ) {
+  if (!draggedNote.value || draggedNote.value.id === targetNote.id) {
     return
   }
 
@@ -134,24 +133,40 @@ const handleDragOver = (event: DragEvent, targetNote: Note) => {
     event.dataTransfer.dropEffect = "move"
   }
 
-  // Calculate if we're in the upper or lower half of the target
+  // Calculate if we're in the right half (child) or left half (sibling)
   const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
-  const mouseY = event.clientY
-  const threshold = rect.top + rect.height / 2
+  const mouseX = event.clientX - rect.left
+  const isRightHalf = mouseX > rect.width / 2
+
+  dropMode.value = isRightHalf ? "asFirstChild" : "after"
+
+  // Only check for same parent when not dropping as child
+  if (
+    dropMode.value === "after" &&
+    draggedNote.value.parentId !== targetNote.parentId
+  ) {
+    isDraggedOver.value = null
+    return
+  }
 
   // Update drop indicator position
   dropIndicatorStyle.value = {
-    top: mouseY >= threshold ? "100%" : "0",
-    transform: mouseY >= threshold ? "translateY(-2px)" : "translateY(-1px)",
+    top: "100%",
+    transform: "translateY(-2px)",
+    ...(dropMode.value === "asFirstChild"
+      ? {
+          left: "20px", // Add indentation for child indicator
+          right: "0",
+        }
+      : {
+          left: "0",
+          right: "0",
+        }),
   }
 }
 
 const handleDragEnter = (_event: DragEvent, targetNote: Note) => {
-  if (
-    !draggedNote.value ||
-    draggedNote.value.id === targetNote.id ||
-    draggedNote.value.parentId !== targetNote.parentId
-  ) {
+  if (!draggedNote.value || draggedNote.value.id === targetNote.id) {
     return
   }
   isDraggedOver.value = targetNote.id
@@ -171,17 +186,22 @@ const handleDrop = async (event: DragEvent, targetNote: Note) => {
 
   if (!draggedNote.value || draggedNote.value.id === targetNote.id) return
 
-  if (draggedNote.value.parentId !== targetNote.parentId) return
+  if (
+    dropMode.value === "after" &&
+    draggedNote.value.parentId !== targetNote.parentId
+  )
+    return
 
   try {
     await props.storageAccessor
       .storedApi()
-      .moveAfter(draggedNote.value.id, targetNote.id)
+      .moveAfter(draggedNote.value.id, targetNote.id, dropMode.value)
   } catch (error) {
     console.error("Failed to move note:", error)
   }
 
   draggedNote.value = null
+  dropMode.value = "after"
 }
 
 const isDraggedOver = ref<number | null>(null)
@@ -189,6 +209,7 @@ const isDraggedOver = ref<number | null>(null)
 const handleDragEnd = () => {
   draggedNote.value = null
   isDraggedOver.value = null
+  dropMode.value = "after"
 }
 </script>
 
@@ -225,11 +246,14 @@ const handleDragEnd = () => {
 
 .drop-indicator {
   position: absolute;
-  left: 0;
-  right: 0;
   height: 2px;
   background-color: #0d6efd;
   z-index: 1;
-  pointer-events: none; // Prevent the indicator from interfering with drag events
+  pointer-events: none;
+  transition: all 0.2s ease;
+
+  &.drop-as-child {
+    background-color: #198754; // Bootstrap success color for visual distinction
+  }
 }
 </style>
