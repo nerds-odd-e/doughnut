@@ -1,5 +1,6 @@
 package com.odde.doughnut.services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.ai.AssistantService;
@@ -8,6 +9,7 @@ import com.theokanning.openai.service.assistant_stream.AssistantSSE;
 import io.reactivex.Flowable;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -30,6 +32,15 @@ public class ChatAboutNoteService {
             SseEmitter.SseEventBuilder builder =
                 SseEmitter.event().name(sse.getEvent().eventName).data(sse.getData());
             emitter.send(builder);
+
+            // Handle thread.message.completed event
+            if (Objects.equals(sse.getEvent().eventName, "thread.message.completed")) {
+              Message message = new ObjectMapper().readValue(sse.getData(), Message.class);
+              if (messageCompletedCallback != null) {
+                messageCompletedCallback.accept(message);
+              }
+            }
+
             if (Objects.equals(sse.getEvent().eventName, "done")) {
               emitter.complete();
             }
@@ -42,5 +53,11 @@ public class ChatAboutNoteService {
 
   public void createUserMessage(String userMessage) {
     assistantService.createUserMessage(userMessage, threadId);
+  }
+
+  private Consumer<Message> messageCompletedCallback;
+
+  public void onMessageCompleted(Consumer<Message> callback) {
+    this.messageCompletedCallback = callback;
   }
 }

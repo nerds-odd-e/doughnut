@@ -43,6 +43,7 @@ public class ConversationService {
       Conversation conversation, User user, String message) {
     ConversationMessage conversationMessage = new ConversationMessage();
     conversationMessage.setConversation(conversation);
+    conversation.getConversationMessages().add(conversationMessage); // for in memory consistency
     conversationMessage.setSender(user);
     conversationMessage.setMessage(message);
     return modelFactoryService.conversationMessageRepository.save(conversationMessage);

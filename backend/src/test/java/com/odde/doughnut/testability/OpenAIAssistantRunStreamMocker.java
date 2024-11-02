@@ -5,6 +5,8 @@ import static org.mockito.ArgumentMatchers.any;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.theokanning.openai.assistants.StreamEvent;
+import com.theokanning.openai.assistants.message.Message;
+import com.theokanning.openai.assistants.message.MessageContent;
 import com.theokanning.openai.assistants.message.content.Delta;
 import com.theokanning.openai.assistants.message.content.DeltaContent;
 import com.theokanning.openai.assistants.message.content.MessageDelta;
@@ -25,6 +27,7 @@ public final class OpenAIAssistantRunStreamMocker {
   private final OpenAiApi openAiApi;
   private final String runId;
   List<MessageDelta> messageDeltas = new ArrayList<>();
+  private Message completedMessage = null;
 
   public OpenAIAssistantRunStreamMocker(OpenAiApi openAiApi, String runId) {
     this.openAiApi = openAiApi;
@@ -50,9 +53,15 @@ public final class OpenAIAssistantRunStreamMocker {
         Stream.concat(
                 messageDeltas.stream()
                     .map(delta -> toSSEString(StreamEvent.THREAD_MESSAGE_DELTA.eventName, delta)),
-                Stream.of(
-                    toSSEString(StreamEvent.THREAD_RUN_STEP_COMPLETED.eventName, runStep),
-                    toSSEString("done", "DONE")))
+                Stream.concat(
+                    completedMessage != null
+                        ? Stream.of(
+                            toSSEString(
+                                StreamEvent.THREAD_MESSAGE_COMPLETED.eventName, completedMessage))
+                        : Stream.empty(),
+                    Stream.of(
+                        toSSEString(StreamEvent.THREAD_RUN_STEP_COMPLETED.eventName, runStep),
+                        toSSEString("done", "DONE"))))
             .collect(Collectors.joining());
     ResponseBody responseBody =
         ResponseBody.create(assistantSSEString, MediaType.parse("text/event-stream"));
@@ -70,5 +79,15 @@ public final class OpenAIAssistantRunStreamMocker {
     }
 
     return "event: " + streamEvent + "\n" + "data: " + data + "\n\n";
+  }
+
+  public OpenAIAssistantRunStreamMocker withMessageCompleted(String message) {
+    Text text = new Text(message, List.of());
+    MessageContent msgCnt = new MessageContent();
+    msgCnt.setType("text");
+    msgCnt.setText(text);
+    List<MessageContent> content = List.of(msgCnt);
+    completedMessage = Message.builder().role("assistant").content(content).build();
+    return this;
   }
 }

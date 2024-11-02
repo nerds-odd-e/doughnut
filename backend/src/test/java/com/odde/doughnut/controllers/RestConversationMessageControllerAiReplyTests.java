@@ -7,6 +7,7 @@ import static org.mockito.Mockito.verify;
 
 import com.odde.doughnut.controllers.dto.ChatRequest;
 import com.odde.doughnut.entities.Conversation;
+import com.odde.doughnut.entities.ConversationMessage;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NotebookAssistant;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -78,6 +79,7 @@ public class RestConversationMessageControllerAiReplyTests {
           .mockCreateMessage()
           .andARunStream("my-run-id")
           .withMessageDeltas("I", " am", " a", " Chatbot")
+          .withMessageCompleted("I am a Chatbot")
           .mockTheRunStream();
     }
 
@@ -100,7 +102,7 @@ public class RestConversationMessageControllerAiReplyTests {
       assertThat(res.getTimeout()).isNull();
       List<ResponseBodyEmitter.DataWithMediaType> events =
           peekIntoEmitterWithExtremelyInappropriateIntimacy(res);
-      assertThat(events.size()).isEqualTo(18);
+      assertThat(events.size()).isEqualTo(21);
     }
 
     @Test
@@ -137,6 +139,25 @@ public class RestConversationMessageControllerAiReplyTests {
       ArgumentCaptor<RunCreateRequest> captor = ArgumentCaptor.forClass(RunCreateRequest.class);
       verify(openAiApi).createRunStream(any(), captor.capture());
       assertThat(captor.getValue().getAssistantId()).isEqualTo("notebook-assistant");
+    }
+
+    @Test
+    void shouldAddMessageToConversationWhenMessageCompleted()
+        throws UnexpectedNoAccessRightException {
+      int initialMessageCount = conversation.getConversationMessages().size();
+
+      controller.getAiReply(conversation);
+
+      // Verify a new message was added to the conversation
+      assertThat(conversation.getConversationMessages().size()).isEqualTo(initialMessageCount + 1);
+
+      // Verify the content of the added message
+      ConversationMessage lastMessage =
+          conversation
+              .getConversationMessages()
+              .get(conversation.getConversationMessages().size() - 1);
+      assertThat(lastMessage.getMessage()).isEqualTo("I am a Chatbot");
+      assertThat(lastMessage.getSender()).isNull(); // AI message should have no user
     }
   }
 

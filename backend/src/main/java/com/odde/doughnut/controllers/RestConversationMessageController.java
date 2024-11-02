@@ -100,6 +100,23 @@ public class RestConversationMessageController {
     ChatAboutNoteService chatService =
         aiAdvisorWithStorageService.getChatService(note, conversation.getAiAssistantThreadId());
     chatService.createUserMessage("just say something.");
+
+    // Add event listener before getting the SSE emitter
+    chatService.onMessageCompleted(
+        message -> {
+          String content =
+              message.getContent().stream()
+                  .filter(c -> "text".equals(c.getType()))
+                  .map(c -> c.getText().getValue())
+                  .findFirst()
+                  .orElse("");
+
+          conversationService.addMessageToConversation(
+              conversation,
+              null, // AI message has no user
+              content);
+        });
+
     return chatService.getAIReplySSE();
   }
 
