@@ -1,7 +1,5 @@
 package com.odde.doughnut.services.ai.tools;
 
-import static com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder.askClarificationQuestion;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.AiCompletionRequiredAction;
 import com.odde.doughnut.services.ai.*;
@@ -111,15 +109,6 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
             (noteDetailsCompletion) -> {
               AiCompletionRequiredAction result = new AiCompletionRequiredAction();
               result.setContentToAppend(noteDetailsCompletion.completion);
-              return result;
-            }),
-        AiTool.build(
-            askClarificationQuestion,
-            "Ask question to get more context",
-            ClarifyingQuestion.class,
-            (clarifyingQuestion) -> {
-              AiCompletionRequiredAction result = new AiCompletionRequiredAction();
-              result.setClarifyingQuestion(clarifyingQuestion);
               return result;
             }));
   }

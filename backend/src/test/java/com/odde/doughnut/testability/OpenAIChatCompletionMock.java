@@ -1,13 +1,10 @@
 package com.odde.doughnut.testability;
 
-import static com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder.askClarificationQuestion;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionResult;
 import io.reactivex.Single;
-import java.util.Objects;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
@@ -24,12 +21,8 @@ public record OpenAIChatCompletionMock(OpenAiApi openAiApi) {
   }
 
   private void mockChatCompletion(String functionName, ChatCompletionResult toBeReturned) {
-    if (Objects.equals(functionName, askClarificationQuestion)) {
-      throw new RuntimeException();
-    } else {
-      Mockito.doReturn(Single.just(toBeReturned))
-          .when(openAiApi)
-          .createChatCompletion(ArgumentMatchers.argThat(request -> request.getTools() != null));
-    }
+    Mockito.doReturn(Single.just(toBeReturned))
+        .when(openAiApi)
+        .createChatCompletion(ArgumentMatchers.argThat(request -> request.getTools() != null));
   }
 }

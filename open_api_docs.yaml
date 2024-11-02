@@ -1927,30 +1927,6 @@ paths:
             text/event-stream:
               schema:
                 $ref: "#/components/schemas/SseEmitter"
-  /api/ai/answer-clarifying-question:
-    post:
-      tags:
-      - rest-ai-controller
-      operationId: answerCompletionClarifyingQuestion
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/AiCompletionAnswerClarifyingQuestionParams"
-        required: true
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/AiAssistantResponse"
   /api/user/{user}:
     patch:
       tags:
@@ -3734,8 +3710,6 @@ components:
       properties:
         toolCallId:
           type: string
-        clarifyingQuestion:
-          $ref: "#/components/schemas/ClarifyingQuestion"
         contentToAppend:
           type: string
     Annotation:
@@ -3769,13 +3743,6 @@ components:
             - $ref: "#/components/schemas/FileSearchTool"
             - $ref: "#/components/schemas/FunctionTool"
         file_id:
-          type: string
-    ClarifyingQuestion:
-      required:
-      - question
-      type: object
-      properties:
-        question:
           type: string
     CodeInterpreterTool:
       type: object
@@ -3957,19 +3924,6 @@ components:
         timeout:
           type: integer
           format: int64
-    AiCompletionAnswerClarifyingQuestionParams:
-      type: object
-      properties:
-        detailsToComplete:
-          type: string
-        threadId:
-          type: string
-        runId:
-          type: string
-        toolCallId:
-          type: string
-        answer:
-          type: string
     UserDTO:
       required:
       - name

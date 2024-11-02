@@ -415,36 +415,6 @@ When('I start to chat about the note {string}', (noteTopic: string) => {
   start.jumpToNotePage(noteTopic).chatAboutNote()
 })
 
-When(
-  'I answer {string} to the clarifying question {string}',
-  (answer: string, question: string) => {
-    start.assumeClarifyingQuestionDialog(question).answer(answer)
-  }
-)
-
-When(
-  'I respond with "cancel" to the clarifying question {string}',
-  (question: string) => {
-    start.assumeClarifyingQuestionDialog(question).close()
-  }
-)
-
-When('I should see a follow-up question {string}', (question: string) => {
-  start.assumeClarifyingQuestionDialog(question)
-  cy.wrap(question).as('lastClarifyingQuestion')
-})
-
-When(
-  'the initial clarifying question with the response {string} should be visible',
-  (oldAnswer: string) => {
-    cy.get('@lastClarifyingQuestion').then((question) => {
-      start
-        .assumeClarifyingQuestionDialog(question as unknown as string)
-        .oldAnswer(oldAnswer)
-    })
-  }
-)
-
 Then('I should see a child note {string}', (childTopic: string) => {
   start.assumeNotePage().expectChildren([{ 'note-topic': childTopic }])
 })

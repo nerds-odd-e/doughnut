@@ -1,13 +1,11 @@
 package com.odde.doughnut.services;
 
-import static com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder.askClarificationQuestion;
 import static com.odde.doughnut.services.ai.tools.AiToolFactory.COMPLETE_NOTE_DETAILS;
 import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.*;
@@ -16,15 +14,12 @@ import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.exceptions.OpenAITimeoutException;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.services.ai.AssistantService;
-import com.odde.doughnut.services.ai.ClarifyingQuestion;
 import com.odde.doughnut.services.ai.NoteDetailsCompletion;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIAssistantMocker;
 import com.odde.doughnut.testability.OpenAIAssistantThreadMocker;
 import com.theokanning.openai.OpenAiError;
 import com.theokanning.openai.OpenAiHttpException;
-import com.theokanning.openai.assistants.run.SubmitToolOutputRequestItem;
-import com.theokanning.openai.assistants.run.SubmitToolOutputsRequest;
 import com.theokanning.openai.client.OpenAiApi;
 import io.reactivex.Single;
 import java.net.SocketTimeoutException;
@@ -136,80 +131,6 @@ class AiAdvisorServiceAutoCompleteTest {
       aiCompletionParams.setDetailsToComplete(incompleteContent);
       return completionService.createThreadAndRunWithFirstMessage(
           note, aiCompletionParams.getCompletionPrompt());
-    }
-  }
-
-  @Nested
-  class CompleteNoteDetailWithClarifyingQuestion {
-    Note note;
-    AiCompletionAnswerClarifyingQuestionParams params =
-        new AiCompletionAnswerClarifyingQuestionParams();
-    OpenAIAssistantMocker openAIAssistantMocker;
-
-    @BeforeEach
-    void setup() {
-      params.setThreadId("any-thread-id");
-      note = makeMe.aNote().inMemoryPlease();
-      openAIAssistantMocker = new OpenAIAssistantMocker(openAiApi);
-    }
-
-    @Test
-    void askCompletionAndUseQuestionResponse() {
-      openAIAssistantMocker
-          .aCreatedRun("any-thread-id", "my-run-id")
-          .aRunThatRequireAction(
-              new ClarifyingQuestion(
-                  "Are you referring to American football or association football (soccer) ?"),
-              askClarificationQuestion)
-          .mockSubmitOutput();
-      AiAssistantResponse aiAssistantResponse =
-          completionService.answerAiCompletionClarifyingQuestion(params);
-      assertEquals("mocked-tool-call-id", aiAssistantResponse.getRequiredAction().toolCallId);
-      assertEquals(
-          "Are you referring to American football or association football (soccer) ?",
-          aiAssistantResponse.getRequiredAction().getClarifyingQuestion().question);
-    }
-
-    @Nested
-    class userAnswerToClarifyingQuestion {
-      @BeforeEach
-      void setup() {
-        params.setDetailsToComplete("Tea");
-        params.setAnswer("green tea");
-      }
-
-      @Test
-      void mustSubmitTheAnswer() {
-        Object result = new NoteDetailsCompletion("blue planet");
-        openAIAssistantMocker
-            .aCreatedRun("any-thread-id", "my-run-id")
-            .aRunThatRequireAction(result, COMPLETE_NOTE_DETAILS)
-            .mockSubmitOutput();
-        params.setToolCallId("tool-call-id");
-        completionService.answerAiCompletionClarifyingQuestion(params);
-        ArgumentCaptor<SubmitToolOutputsRequest> captor =
-            ArgumentCaptor.forClass(SubmitToolOutputsRequest.class);
-        verify(openAiApi)
-            .submitToolOutputs(ArgumentMatchers.any(), ArgumentMatchers.any(), captor.capture());
-        SubmitToolOutputRequestItem submit = captor.getValue().getToolOutputs().get(0);
-        assertThat(submit.getToolCallId(), equalTo("tool-call-id"));
-        assertThat(submit.getOutput(), containsString("green tea"));
-      }
-
-      @Test
-      void askCompletionAndUseStopResponseWithQuestionAnswer() {
-        Object result =
-            new NoteDetailsCompletion(" is common in China, if you are referring to green tea.");
-        openAIAssistantMocker
-            .aCreatedRun("any-thread-id", "my-run-id")
-            .aRunThatRequireAction(result, COMPLETE_NOTE_DETAILS)
-            .mockSubmitOutput();
-        AiAssistantResponse aiAssistantResponse =
-            completionService.answerAiCompletionClarifyingQuestion(params);
-        assertEquals(
-            " is common in China, if you are referring to green tea.",
-            aiAssistantResponse.getRequiredAction().getContentToAppend());
-      }
     }
   }
 

@@ -1,6 +1,5 @@
 package com.odde.doughnut.controllers.dto;
 
-import com.odde.doughnut.services.ai.ClarifyingQuestion;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -8,6 +7,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public final class AiCompletionRequiredAction {
   public String toolCallId;
-  ClarifyingQuestion clarifyingQuestion;
   String contentToAppend;
 }

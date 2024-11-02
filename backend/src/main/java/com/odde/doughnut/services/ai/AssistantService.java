@@ -1,7 +1,6 @@
 package com.odde.doughnut.services.ai;
 
 import com.odde.doughnut.controllers.dto.AiAssistantResponse;
-import com.odde.doughnut.controllers.dto.AiCompletionAnswerClarifyingQuestionParams;
 import com.odde.doughnut.controllers.dto.AiCompletionRequiredAction;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
@@ -77,15 +76,6 @@ public record AssistantService(
   public void createUserMessage(String prompt, String threadId) {
     MessageRequest messageRequest = MessageRequest.builder().role("user").content(prompt).build();
     openAiApiHandler.createMessage(threadId, messageRequest);
-  }
-
-  public AiAssistantResponse answerAiCompletionClarifyingQuestion(
-      AiCompletionAnswerClarifyingQuestionParams answerClarifyingQuestionParams) {
-    String threadId = answerClarifyingQuestionParams.getThreadId();
-
-    Run retrievedRun = openAiApiHandler.submitToolOutputs(answerClarifyingQuestionParams);
-
-    return getThreadResponse(threadId, retrievedRun);
   }
 
   public String createThread(Note note) {

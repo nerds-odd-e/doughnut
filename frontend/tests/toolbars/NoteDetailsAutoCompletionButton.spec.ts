@@ -1,4 +1,3 @@
-import AIClarifyingQuestionDialog from "@/components/notes/AIClarifyingQuestionDialog.vue"
 import NoteDetailsAutoCompletionButton from "@/components/notes/core/NoteDetailsAutoCompletionButton.vue"
 import type {
   AiAssistantResponse,
@@ -89,28 +88,6 @@ describe("NoteDetailsAutoCompletionButton", () => {
     await triggerAutoCompletion(note)
 
     expect(mockedUpldateDetails).toHaveBeenCalled()
-  })
-
-  it("ask for clarifying question", async () => {
-    mockedGetCompletion.mockResolvedValue({
-      runId: "run-id",
-      threadId: "thread-id",
-      requiredAction: {
-        toolCallId: "tool-call-id",
-        clarifyingQuestion: {
-          question: "what do you mean?",
-        },
-      },
-    })
-    const wrapper = await triggerAutoCompletion(note)
-    const dialog = wrapper.getComponent(AIClarifyingQuestionDialog)
-    await dialog.find("input#note-answerToAI").setValue("I mean this")
-    await dialog.find("input[type='submit']").trigger("click")
-    expect(mockedAnswerClarifyingQuestion).toHaveBeenCalledWith(
-      expect.objectContaining({
-        toolCallId: "tool-call-id",
-      })
-    )
   })
 
   it("stop updating if the component is unmounted", async () => {

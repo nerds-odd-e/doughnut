@@ -11,7 +11,6 @@ export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
 export type { AiAssistantResponse } from './models/AiAssistantResponse';
-export type { AiCompletionAnswerClarifyingQuestionParams } from './models/AiCompletionAnswerClarifyingQuestionParams';
 export type { AiCompletionParams } from './models/AiCompletionParams';
 export type { AiCompletionRequiredAction } from './models/AiCompletionRequiredAction';
 export type { AiGeneratedImage } from './models/AiGeneratedImage';
@@ -31,7 +30,6 @@ export type { ChatResponseFormat } from './models/ChatResponseFormat';
 export type { Circle } from './models/Circle';
 export type { CircleForUserView } from './models/CircleForUserView';
 export type { CircleJoiningByInvitation } from './models/CircleJoiningByInvitation';
-export type { ClarifyingQuestion } from './models/ClarifyingQuestion';
 export type { CodeInterpreterResources } from './models/CodeInterpreterResources';
 export type { CodeInterpreterTool } from './models/CodeInterpreterTool';
 export type { Conversation } from './models/Conversation';

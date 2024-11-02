@@ -3,7 +3,6 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { AiAssistantResponse } from '../models/AiAssistantResponse';
-import type { AiCompletionAnswerClarifyingQuestionParams } from '../models/AiCompletionAnswerClarifyingQuestionParams';
 import type { AiCompletionParams } from '../models/AiCompletionParams';
 import type { AiGeneratedImage } from '../models/AiGeneratedImage';
 import type { ChatRequest } from '../models/ChatRequest';
@@ -128,24 +127,6 @@ export class RestAiControllerService {
             path: {
                 'note': note,
             },
-            body: requestBody,
-            mediaType: 'application/json',
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * @param requestBody
-     * @returns AiAssistantResponse OK
-     * @throws ApiError
-     */
-    public answerCompletionClarifyingQuestion(
-        requestBody: AiCompletionAnswerClarifyingQuestionParams,
-    ): CancelablePromise<AiAssistantResponse> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/api/ai/answer-clarifying-question',
             body: requestBody,
             mediaType: 'application/json',
             errors: {

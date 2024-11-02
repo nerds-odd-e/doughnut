@@ -8,7 +8,6 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 import com.odde.doughnut.controllers.dto.AiAssistantResponse;
-import com.odde.doughnut.controllers.dto.AiCompletionAnswerClarifyingQuestionParams;
 import com.odde.doughnut.controllers.dto.AiCompletionParams;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.models.UserModel;
@@ -145,36 +144,6 @@ class RestAiControllerTest {
             .contains(" \"details_to_complete\" : \"\"");
         assertThat(captor.getAllValues().get(0).getContent().toString())
             .contains("Don't make assumptions");
-      }
-    }
-
-    @Nested
-    class AnswerClarifyingQuestion {
-      AiCompletionAnswerClarifyingQuestionParams params =
-          new AiCompletionAnswerClarifyingQuestionParams();
-
-      @BeforeEach
-      void setup() {
-        params.setThreadId("any-thread-id");
-        Object result = new NoteDetailsCompletion("blue planet");
-        openAIAssistantMocker
-            .aCreatedRun("any-thread-id", "my-run-id")
-            .aRunThatRequireAction(result, COMPLETE_NOTE_DETAILS)
-            .mockSubmitOutput();
-      }
-
-      @Test
-      void askCompletionAndUseStopResponse() {
-        AiAssistantResponse aiAssistantResponse =
-            controller.answerCompletionClarifyingQuestion(params);
-        assertEquals("blue planet", aiAssistantResponse.getRequiredAction().getContentToAppend());
-      }
-
-      @Test
-      void itMustPassTheThreadIdBack() {
-        AiAssistantResponse aiAssistantResponse =
-            controller.answerCompletionClarifyingQuestion(params);
-        assertEquals("any-thread-id", aiAssistantResponse.getThreadId());
       }
     }
   }

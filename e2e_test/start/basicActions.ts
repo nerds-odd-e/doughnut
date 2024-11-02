@@ -6,7 +6,6 @@ import { assumeMessageCenterPage } from './pageObjects/messageCenterPage'
 import { navigateToBazaar } from './pageObjects/bazaarPage'
 import { assumeChatAboutNotePage } from './pageObjects/chatAboutNotePage'
 import { navigateToCircle } from './pageObjects/circlePage'
-import { assumeClarifyingQuestionDialog } from './pageObjects/clarifyingQuestionDialog'
 import { assumeNotePage } from './pageObjects/notePage'
 import { routerToNotebooksPage } from './pageObjects/notebooksPage'
 import { noteSidebar } from './pageObjects/noteSidebar'
@@ -29,7 +28,6 @@ export default {
   assumeQuestionPage,
   assumeAdminDashboardPage,
   assumeMessageCenterPage,
-  assumeClarifyingQuestionDialog,
   routerToNotebooksPage,
   navigateToCircle,
   navigateToMessageCenter,

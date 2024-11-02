@@ -55,16 +55,6 @@ public class RestAiController {
         .createThreadAndRunWithFirstMessage(note, aiCompletionParams.getCompletionPrompt());
   }
 
-  @PostMapping("/answer-clarifying-question")
-  @Transactional
-  public AiAssistantResponse answerCompletionClarifyingQuestion(
-      @RequestBody AiCompletionAnswerClarifyingQuestionParams answerClarifyingQuestionParams) {
-    currentUser.assertLoggedIn();
-    return aiAdvisorWithStorageService
-        .getContentCompletionService()
-        .answerAiCompletionClarifyingQuestion(answerClarifyingQuestionParams);
-  }
-
   @GetMapping("/chat/{note}")
   public List<Message> tryRestoreChat(
       @PathVariable(value = "note") @Schema(type = "integer") Note note)
