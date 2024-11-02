@@ -6,6 +6,8 @@ import com.odde.doughnut.entities.ConversationMessage;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.testability.TestabilitySettings;
+import jakarta.annotation.Resource;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,6 +15,9 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Service
 public class ConversationService {
+
+  @Resource(name = "testabilitySettings")
+  private final TestabilitySettings testabilitySettings;
 
   private final ModelFactoryService modelFactoryService;
 
@@ -70,5 +75,11 @@ public class ConversationService {
     return conversationRelatedToUser(entity).stream()
         .filter(conversation -> note.equals(conversation.getSubject().getNote()))
         .toList();
+  }
+
+  public void setConversationAiAssistantThreadId(Conversation conversation, String threadId) {
+    conversation.setAiAssistantThreadId(threadId);
+    conversation.setLastAiAssistantThreadSync(testabilitySettings.getCurrentUTCTimestamp());
+    modelFactoryService.save(conversation);
   }
 }

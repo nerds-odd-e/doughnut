@@ -60,7 +60,7 @@ public class RestConversationMessageControllerAiReplyTests {
     aiAdvisorService = new AiAdvisorService(openAiApi);
     aiAdvisorWithStorageService =
         new AiAdvisorWithStorageService(aiAdvisorService, makeMe.modelFactoryService);
-    conversationService = new ConversationService(makeMe.modelFactoryService);
+    conversationService = new ConversationService(testabilitySettings, makeMe.modelFactoryService);
     currentUser = makeMe.aUser().toModelPlease();
     controller =
         new RestConversationMessageController(
@@ -158,6 +158,19 @@ public class RestConversationMessageControllerAiReplyTests {
               .get(conversation.getConversationMessages().size() - 1);
       assertThat(lastMessage.getMessage()).isEqualTo("I am a Chatbot");
       assertThat(lastMessage.getSender()).isNull(); // AI message should have no user
+    }
+
+    @Test
+    void itShouldPersistThreadIdInConversation() throws UnexpectedNoAccessRightException {
+      testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
+      assertThat(conversation.getAiAssistantThreadId()).isNull();
+      assertThat(conversation.getLastAiAssistantThreadSync()).isNull();
+
+      controller.getAiReply(conversation);
+
+      assertThat(conversation.getAiAssistantThreadId()).isEqualTo("my-thread");
+      assertThat(conversation.getLastAiAssistantThreadSync())
+          .isEqualTo(testabilitySettings.getCurrentUTCTimestamp());
     }
   }
 

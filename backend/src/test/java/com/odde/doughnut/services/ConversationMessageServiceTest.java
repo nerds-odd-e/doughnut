@@ -30,7 +30,7 @@ class ConversationMessageServiceTest {
 
   @BeforeEach
   void setup() {
-    conversationService = new ConversationService(this.modelFactoryService);
+    conversationService = new ConversationService(testabilitySettings, this.modelFactoryService);
     testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
     currentUser = makeMe.aUser().toModelPlease();
     assessmentService = new AssessmentService(makeMe.modelFactoryService, testabilitySettings);

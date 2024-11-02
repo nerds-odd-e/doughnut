@@ -147,9 +147,8 @@ describe("NoteConversation", () => {
   it("handles AI reply when starting new conversation with AI invite", async () => {
     helper.managedApi.restConversationMessageController.getConversationsAboutNote =
       vi.fn().mockResolvedValue([])
-    helper.managedApi.restConversationMessageController.getAiReply = vi
-      .fn()
-      .mockResolvedValue({ message: "AI response" })
+    helper.managedApi.eventSource.restConversationMessageController.getAiReply =
+      vi.fn()
 
     const wrapper = await mount()
 
@@ -166,7 +165,7 @@ describe("NoteConversation", () => {
 
     // Verify AI reply was requested
     expect(
-      helper.managedApi.restConversationMessageController.getAiReply
+      helper.managedApi.eventSource.restConversationMessageController.getAiReply
     ).toHaveBeenCalledWith(conversation.id)
 
     // Verify ConversationInner is rendered with correct props
@@ -181,9 +180,8 @@ describe("NoteConversation", () => {
       vi.fn().mockResolvedValue([conversation])
     helper.managedApi.restConversationMessageController.replyToConversation =
       vi.fn()
-    helper.managedApi.restConversationMessageController.getAiReply = vi
-      .fn()
-      .mockResolvedValue({ message: "AI response" })
+    helper.managedApi.eventSource.restConversationMessageController.getAiReply =
+      vi.fn()
 
     const wrapper = await mount()
 
@@ -198,7 +196,7 @@ describe("NoteConversation", () => {
 
     // Verify AI reply was requested
     expect(
-      helper.managedApi.restConversationMessageController.getAiReply
+      helper.managedApi.eventSource.restConversationMessageController.getAiReply
     ).toHaveBeenCalledWith(conversation.id)
   })
 })

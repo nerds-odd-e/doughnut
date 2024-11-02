@@ -116,6 +116,7 @@ public class RestConversationMessageController {
     if (threadId == null) {
       threadId =
           aiAdvisorWithStorageService.createThread(note.getCreator(), assistantService, note);
+      conversationService.setConversationAiAssistantThreadId(conversation, threadId);
     }
     ChatAboutNoteService chatService =
         aiAdvisorWithStorageService.getChatAboutNoteService(threadId, assistantService);
