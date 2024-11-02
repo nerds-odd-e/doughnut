@@ -17,6 +17,7 @@ public class NoteMotionModel {
   public void execute() throws CyclicLinkDetectedException {
     Notebook notebook = subject.getNotebook();
     moveHeadNoteOnly();
+    subject.updateSiblingOrder(relativeToNote, asFirstChildOfNote);
     Note parent = getNewParent();
     subject.setParentNote(parent);
     modelFactoryService.save(subject);
@@ -36,7 +37,6 @@ public class NoteMotionModel {
     if (relativeToNote.getAncestors().contains(subject)) {
       throw new CyclicLinkDetectedException();
     }
-    subject.updateSiblingOrder(relativeToNote, asFirstChildOfNote);
   }
 
   public void validate() throws MovementNotPossibleException {

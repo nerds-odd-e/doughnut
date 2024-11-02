@@ -121,6 +121,18 @@ class RestNoteControllerMotionTests {
         assertThat(grand.getParent(), equalTo(parent));
         assertThat(noteRealms.size(), equalTo(2));
       }
+
+      @Test
+      void shouldUpdateTargetNoteChildrenWhenMovingAsFirstChild()
+          throws UnexpectedNoAccessRightException,
+              CyclicLinkDetectedException,
+              MovementNotPossibleException {
+        // Move subject as first child of previousYounger
+        controller.moveAfter(subject, previousYounger, "asFirstChild");
+        makeMe.refresh(previousYounger);
+
+        assertThat(previousYounger.getChildren(), hasItem(subject));
+      }
     }
   }
 }
