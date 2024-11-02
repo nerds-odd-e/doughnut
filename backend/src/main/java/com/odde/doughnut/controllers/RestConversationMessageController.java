@@ -9,6 +9,7 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorWithStorageService;
 import com.odde.doughnut.services.ChatAboutNoteService;
 import com.odde.doughnut.services.ConversationService;
+import com.odde.doughnut.services.ai.AssistantService;
 import com.theokanning.openai.assistants.message.Message;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
@@ -110,8 +111,14 @@ public class RestConversationMessageController {
 
   private ChatAboutNoteService setupChatService(Conversation conversation) {
     Note note = conversation.getSubject().getNote();
+    String threadId = conversation.getAiAssistantThreadId();
+    AssistantService assistantService = aiAdvisorWithStorageService.getChatAssistantService(note);
+    if (threadId == null) {
+      threadId =
+          aiAdvisorWithStorageService.createThread(note.getCreator(), assistantService, note);
+    }
     ChatAboutNoteService chatService =
-        aiAdvisorWithStorageService.getChatService(note, conversation.getAiAssistantThreadId());
+        aiAdvisorWithStorageService.getChatAboutNoteService(threadId, assistantService);
     chatService.createUserMessage("just say something.");
     return chatService;
   }

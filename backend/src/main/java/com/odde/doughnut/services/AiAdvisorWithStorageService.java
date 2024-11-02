@@ -28,7 +28,7 @@ public final class AiAdvisorWithStorageService {
     return threadId;
   }
 
-  private String createThread(User user, AssistantService assistantService, Note note) {
+  public String createThread(User user, AssistantService assistantService, Note note) {
     String threadId = assistantService.createThread(note);
     UserAssistantThread userAssistantThread = new UserAssistantThread();
     userAssistantThread.setThreadId(threadId);
@@ -38,19 +38,18 @@ public final class AiAdvisorWithStorageService {
     return threadId;
   }
 
-  public ChatAboutNoteService getChatService(Note note, String threadId) {
+  public ChatAboutNoteService getChatAboutNoteService(
+      String threadId, AssistantService assistantService) {
+    return new ChatAboutNoteService(threadId, assistantService, modelFactoryService);
+  }
+
+  public AssistantService getChatAssistantService(Note note) {
     NotebookAssistant assistant =
         modelFactoryService.notebookAssistantRepository.findByNotebook(note.getNotebook());
-    AssistantService assistantService;
     if (assistant != null) {
-      assistantService = aiAdvisorService.getContentCompletionService(assistant.getAssistantId());
-    } else {
-      assistantService = getContentCompletionService();
+      return aiAdvisorService.getContentCompletionService(assistant.getAssistantId());
     }
-    if (threadId == null) {
-      threadId = createThread(note.getCreator(), assistantService, note);
-    }
-    return new ChatAboutNoteService(threadId, assistantService, modelFactoryService);
+    return getContentCompletionService();
   }
 
   private GlobalSettingsService getGlobalSettingsService() {
