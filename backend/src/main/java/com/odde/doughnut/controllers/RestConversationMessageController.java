@@ -97,7 +97,8 @@ public class RestConversationMessageController {
     if (note == null) {
       throw new RuntimeException("Only note related conversation can have AI reply");
     }
-    ChatAboutNoteService chatService = aiAdvisorWithStorageService.getChatService(note, null);
+    ChatAboutNoteService chatService =
+        aiAdvisorWithStorageService.getChatService(note, conversation.getAiAssistantThreadId());
     chatService.createUserMessage("just say something.");
     return chatService.getAIReplySSE();
   }

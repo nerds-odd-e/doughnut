@@ -25,7 +25,6 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -153,13 +152,13 @@ public class RestConversationMessageControllerAiReplyTests {
           .mockTheRunStream();
     }
 
-    @Disabled
     @Test
     void continueChat() throws UnexpectedNoAccessRightException {
+      conversation.setAiAssistantThreadId("existing-thread-id");
       controller.getAiReply(conversation);
       ArgumentCaptor<MessageRequest> captor = ArgumentCaptor.forClass(MessageRequest.class);
       verify(openAiApi).createMessage(any(), captor.capture());
-      assertThat(captor.getValue().getContent().toString()).isEqualTo("What's your name?");
+      assertThat(captor.getValue().getContent().toString()).isEqualTo("just say something.");
     }
   }
 
