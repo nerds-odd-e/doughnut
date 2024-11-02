@@ -51,6 +51,12 @@ public class ConversationService {
     conversation.getConversationMessages().add(conversationMessage); // for in memory consistency
     conversationMessage.setSender(user);
     conversationMessage.setMessage(message);
+
+    // Update sync timestamp when AI sends a message
+    if (user == null) { // AI message
+      conversation.setLastAiAssistantThreadSync(testabilitySettings.getCurrentUTCTimestamp());
+    }
+
     return modelFactoryService.conversationMessageRepository.save(conversationMessage);
   }
 

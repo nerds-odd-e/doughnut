@@ -16,7 +16,7 @@ import lombok.*;
 @AllArgsConstructor
 public class ConversationMessage extends EntityIdentifiedByIdOnly {
 
-  @ManyToOne
+  @ManyToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "conversation_id", referencedColumnName = "id")
   @JsonIgnore
   Conversation conversation;

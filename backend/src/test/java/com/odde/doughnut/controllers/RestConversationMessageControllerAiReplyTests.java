@@ -23,6 +23,7 @@ import com.theokanning.openai.assistants.message.MessageRequest;
 import com.theokanning.openai.assistants.run.RunCreateRequest;
 import com.theokanning.openai.client.OpenAiApi;
 import java.lang.reflect.Field;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
@@ -171,6 +172,20 @@ public class RestConversationMessageControllerAiReplyTests {
       assertThat(conversation.getAiAssistantThreadId()).isEqualTo("my-thread");
       assertThat(conversation.getLastAiAssistantThreadSync())
           .isEqualTo(testabilitySettings.getCurrentUTCTimestamp());
+    }
+
+    @Test
+    void shouldUpdateSyncTimestampWhenAIMessageIsAdded() throws UnexpectedNoAccessRightException {
+      Timestamp threadCreateTime = makeMe.aTimestamp().please();
+      conversation.setLastAiAssistantThreadSync(threadCreateTime);
+      conversation.setAiAssistantThreadId("my-thread");
+      makeMe.modelFactoryService.save(conversation);
+      testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(1, 1).please());
+      controller.getAiReply(conversation);
+
+      makeMe.refresh(conversation);
+      // Verify timestamp was updated to the new time when AI message was added
+      assertThat(conversation.getLastAiAssistantThreadSync()).isNotEqualTo(threadCreateTime);
     }
   }
 
