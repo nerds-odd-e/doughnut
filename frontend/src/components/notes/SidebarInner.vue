@@ -17,7 +17,7 @@
       @dragend="handleDragEnd"
     >
       <div
-        class="d-flex w-100 justify-content-between align-items-start"
+        class="d-flex w-100 justify-content-between align-items-start note-content"
         @click="toggleChildren(note.id)"
       >
         <NoteTopicWithLink
@@ -33,15 +33,15 @@
           class="badge rounded-pill"
           >{{ childrenCount(note.id) ?? "..." }}</span
         >
+        <div
+          v-if="isDraggedOver === note.id && draggedNote"
+          class="drop-indicator"
+          role="presentation"
+          :aria-label="dropMode === 'after' ? 'Drop position indicator' : 'Drop as child indicator'"
+          :class="{ 'drop-as-child': dropMode === 'asFirstChild' }"
+          :style="dropIndicatorStyle"
+        ></div>
       </div>
-      <div
-        v-if="isDraggedOver === note.id && draggedNote"
-        class="drop-indicator"
-        role="presentation"
-        :aria-label="dropMode === 'after' ? 'Drop position indicator' : 'Drop as child indicator'"
-        :class="{ 'drop-as-child': dropMode === 'asFirstChild' }"
-        :style="dropIndicatorStyle"
-      ></div>
       <SidebarInner
         v-if="expandedIds.some((id) => id === note.id)"
         v-bind="{
@@ -252,6 +252,11 @@ const handleDragEnd = () => {
   opacity: 0.5;
 }
 
+.note-content {
+  position: relative;
+  padding-bottom: 4px;
+}
+
 .drop-indicator {
   position: absolute;
   height: 2px;
@@ -259,9 +264,10 @@ const handleDragEnd = () => {
   z-index: 1;
   pointer-events: none;
   transition: all 0.2s ease;
+  bottom: 0;
 
   &.drop-as-child {
-    background-color: #198754; // Bootstrap success color for visual distinction
+    background-color: #198754;
   }
 }
 </style>
