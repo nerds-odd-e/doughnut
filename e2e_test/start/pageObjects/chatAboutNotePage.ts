@@ -11,11 +11,17 @@ export function assumeChatAboutNotePage() {
       cy.focused().type(msg)
       cy.get('#chat-button').click()
     },
+    replyToConversationNew(msg: string) {
+      cy.focused().type(msg)
+      cy.findByRole('button', {
+        name: 'Send message and invite AI to reply',
+      }).click()
+    },
     expectMessages(messages: Record<'role' | 'message', string>[]) {
       messages.forEach(({ role, message }) => {
-        cy.findByText(message)
-          .parents('.chat-answer-container')
-          .should('have.class', role)
+        cy.findByText(message, {
+          selector: role === 'user' ? '.card' : '.ai-chat',
+        })
       })
     },
   }

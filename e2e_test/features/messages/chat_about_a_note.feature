@@ -9,7 +9,6 @@ Feature: Chat about a note with AI
     And I have a notebook with the head note "There are 42 prefectures in Japan"
 
 
-  @ignore
   Scenario: The users can chat with AI about the current note
     Given OpenAI assistant will reply below for user messages:
       | user message          | assistant reply              | run id |
@@ -20,7 +19,7 @@ Feature: Chat about a note with AI
       | role      | message              |
       | user      | Is Naba one of them? |
       | assistant | No. It is not.       |
-    When I send the message "Is this note correct?" to AI
+    When I send the message "Is this note correct?" to AI 1
     Then I should receive the following chat messages:
       | role      | message                      |
       | user      | Is Naba one of them?         |
