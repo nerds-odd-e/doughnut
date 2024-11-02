@@ -89,6 +89,10 @@ public class ConversationService {
 
   public void setConversationAiAssistantThreadId(Conversation conversation, String threadId) {
     conversation.setAiAssistantThreadId(threadId);
+    modelFactoryService.save(conversation);
+  }
+
+  public void updateLastAiAssistantThreadSync(Conversation conversation) {
     conversation.setLastAiAssistantThreadSync(testabilitySettings.getCurrentUTCTimestamp());
     modelFactoryService.save(conversation);
   }

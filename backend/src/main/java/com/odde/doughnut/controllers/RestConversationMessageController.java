@@ -7,10 +7,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorWithStorageService;
-import com.odde.doughnut.services.ChatAboutNoteService;
 import com.odde.doughnut.services.ConversationService;
-import com.odde.doughnut.services.ai.AssistantService;
-import com.theokanning.openai.assistants.message.Message;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
@@ -96,76 +93,8 @@ public class RestConversationMessageController {
   public SseEmitter getAiReply(
       @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation)
       throws UnexpectedNoAccessRightException {
-    validateConversation(conversation);
-    ChatAboutNoteService chatService = setupChatService(conversation);
-    setupMessageHandler(conversation, chatService);
-    return chatService.getAIReplySSE();
-  }
-
-  private void validateConversation(Conversation conversation)
-      throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(conversation);
-    Note note = conversation.getSubject().getNote();
-    if (note == null) {
-      throw new RuntimeException("Only note related conversation can have AI reply");
-    }
-  }
-
-  private ChatAboutNoteService setupChatService(Conversation conversation) {
-    Note note = conversation.getSubject().getNote();
-    String threadId = conversation.getAiAssistantThreadId();
-    AssistantService assistantService = aiAdvisorWithStorageService.getChatAssistantService(note);
-    if (threadId == null) {
-      threadId =
-          aiAdvisorWithStorageService.createThread(note.getCreator(), assistantService, note);
-      conversationService.setConversationAiAssistantThreadId(conversation, threadId);
-    }
-    ChatAboutNoteService chatService =
-        aiAdvisorWithStorageService.getChatAboutNoteService(threadId, assistantService);
-
-    // Get unsynchronized messages and create one combined message
-    List<ConversationMessage> unsynced =
-        conversation.getConversationMessages().stream()
-            .filter(
-                msg ->
-                    conversation.getLastAiAssistantThreadSync() == null
-                        || msg.getCreatedAt().after(conversation.getLastAiAssistantThreadSync()))
-            .filter(msg -> msg.getSender() != null) // Only user messages
-            .toList();
-
-    if (!unsynced.isEmpty()) {
-      StringBuilder combinedMessage = new StringBuilder();
-      for (ConversationMessage msg : unsynced) {
-        combinedMessage.append(String.format("user `%s` says:%n", msg.getSender().getName()));
-        combinedMessage.append("-----------------\n");
-        combinedMessage.append(msg.getMessage());
-        combinedMessage.append("\n\n");
-      }
-      chatService.createUserMessage(combinedMessage.toString());
-    } else {
-      chatService.createUserMessage("just say something.");
-    }
-
-    return chatService;
-  }
-
-  private void setupMessageHandler(Conversation conversation, ChatAboutNoteService chatService) {
-    chatService.onMessageCompleted(
-        message -> {
-          String content = extractMessageContent(message);
-          conversationService.addMessageToConversation(
-              conversation,
-              null, // AI message has no user
-              content);
-        });
-  }
-
-  private static String extractMessageContent(Message message) {
-    return message.getContent().stream()
-        .filter(c -> "text".equals(c.getType()))
-        .map(c -> c.getText().getValue())
-        .findFirst()
-        .orElse("");
+    return aiAdvisorWithStorageService.getAiReplyForConversation(conversation, conversationService);
   }
 
   @GetMapping("/{conversationId}/messages")
