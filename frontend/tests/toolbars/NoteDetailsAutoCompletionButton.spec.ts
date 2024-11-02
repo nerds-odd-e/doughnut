@@ -18,17 +18,10 @@ describe("NoteDetailsAutoCompletionButton", () => {
         params: AiCompletionParams
       ) => CancelablePromise<AiAssistantResponse>
     >()
-  const mockedAnswerClarifyingQuestion = vitest.fn().mockResolvedValue({
-    requiredAction: {
-      contentToAppend: "auto completed content",
-    },
-  })
   const mockedUpldateDetails = vitest.fn()
 
   beforeEach(() => {
     helper.managedApi.restAiController.getCompletion = mockedGetCompletion
-    helper.managedApi.restAiController.answerCompletionClarifyingQuestion =
-      mockedAnswerClarifyingQuestion
     helper.managedApi.restTextContentController.updateNoteDetails =
       mockedUpldateDetails
   })
