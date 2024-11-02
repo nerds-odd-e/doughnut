@@ -5,6 +5,7 @@ import type { NoteRealm } from "@/generated/backend"
 import { flushPromises } from "@vue/test-utils"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
+import { fireEvent } from "@testing-library/vue"
 
 function isBefore(node1: Node, node2: Node) {
   return !!(
@@ -168,5 +169,149 @@ describe("Sidebar", () => {
     await rerender({ noteRealm: undefined })
     await flushPromises()
     await screen.findByText(firstGeneration.note.noteTopic.topicConstructor)
+  })
+
+  describe("drag and drop functionality", () => {
+    beforeEach(() => {
+      helper.managedApi.restNoteController.show1 = vitest
+        .fn()
+        .mockResolvedValueOnce(topNoteRealm)
+        .mockResolvedValueOnce(firstGeneration)
+    })
+
+    it("should call moveAfter when dragging and dropping notes", async () => {
+      helper.managedApi.restNoteController.moveAfter = vitest
+        .fn()
+        .mockResolvedValue([])
+      render(firstGeneration)
+
+      await flushPromises()
+
+      const draggedNote = await screen.findByText(
+        firstGeneration.note.noteTopic.topicConstructor
+      )
+      const dropTarget = await screen.findByText(
+        firstGenerationSibling.note.noteTopic.topicConstructor
+      )
+
+      // Start drag
+      await fireEvent.dragStart(draggedNote)
+
+      // Perform drop
+      await fireEvent.drop(dropTarget)
+
+      expect(
+        helper.managedApi.restNoteController.moveAfter
+      ).toHaveBeenCalledWith(
+        firstGeneration.id,
+        firstGenerationSibling.id,
+        "after"
+      )
+    })
+
+    it("should add dragging class while dragging", async () => {
+      render(firstGeneration)
+      await flushPromises()
+
+      const draggedNote = await screen.findByText(
+        firstGeneration.note.noteTopic.topicConstructor
+      )
+
+      // Get the li element (parent of the div containing the text)
+      const listItem = draggedNote.closest("li")
+      expect(listItem).not.toHaveClass("dragging")
+
+      // Start drag
+      await fireEvent.dragStart(draggedNote)
+      expect(listItem).toHaveClass("dragging")
+
+      // End drag
+      await fireEvent.dragEnd(draggedNote)
+      expect(listItem).not.toHaveClass("dragging")
+    })
+
+    it("should add drag-over class when dragging over a target", async () => {
+      render(firstGeneration)
+      await flushPromises()
+
+      const dropTarget = await screen.findByText(
+        firstGenerationSibling.note.noteTopic.topicConstructor
+      )
+      const listItem = dropTarget.closest("li")
+      expect(listItem).not.toHaveClass("drag-over")
+
+      // Drag enter
+      await fireEvent.dragEnter(dropTarget)
+      expect(listItem).toHaveClass("drag-over")
+
+      // Drag leave
+      await fireEvent.dragLeave(dropTarget)
+      expect(listItem).not.toHaveClass("drag-over")
+    })
+
+    it("should not call moveAfter when dragging to the same note", async () => {
+      helper.managedApi.restNoteController.moveAfter = vitest.fn()
+      render(firstGeneration)
+      await flushPromises()
+
+      const note = await screen.findByText(
+        firstGeneration.note.noteTopic.topicConstructor
+      )
+
+      // Drag and drop on itself
+      await fireEvent.dragStart(note)
+      await fireEvent.drop(note)
+
+      expect(
+        helper.managedApi.restNoteController.moveAfter
+      ).not.toHaveBeenCalled()
+    })
+
+    it("should not call moveAfter when dragging between different parents", async () => {
+      helper.managedApi.restNoteController.moveAfter = vitest.fn()
+      render(firstGeneration)
+      await flushPromises()
+
+      const firstGenNote = await screen.findByText(
+        firstGeneration.note.noteTopic.topicConstructor
+      )
+      const secondGenNote = await screen.findByText(
+        secondGeneration.note.noteTopic.topicConstructor
+      )
+
+      // Try to drag between different parent levels
+      await fireEvent.dragStart(secondGenNote)
+      await fireEvent.drop(firstGenNote)
+
+      expect(
+        helper.managedApi.restNoteController.moveAfter
+      ).not.toHaveBeenCalled()
+    })
+
+    it("should handle errors during moveAfter", async () => {
+      const consoleError = vitest.spyOn(console, "error")
+      helper.managedApi.restNoteController.moveAfter = vitest
+        .fn()
+        .mockRejectedValue(new Error("API Error"))
+
+      render(firstGeneration)
+      await flushPromises()
+
+      const draggedNote = await screen.findByText(
+        firstGeneration.note.noteTopic.topicConstructor
+      )
+      const dropTarget = await screen.findByText(
+        firstGenerationSibling.note.noteTopic.topicConstructor
+      )
+
+      await fireEvent.dragStart(draggedNote)
+      await fireEvent.drop(dropTarget)
+
+      expect(consoleError).toHaveBeenCalledWith(
+        "Failed to move note:",
+        expect.any(Error)
+      )
+      consoleError.mockRestore()
+    })
   })
 })

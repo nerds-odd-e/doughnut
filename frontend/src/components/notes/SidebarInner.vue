@@ -4,7 +4,18 @@
       v-for="note in noteRealm?.children"
       :key="note.id"
       class="list-group-item list-group-item-action pb-0 pe-0 border-0"
-      :class="{ 'active-item': note.id === activeNoteRealm.note.id }"
+      :class="{
+        'active-item': note.id === activeNoteRealm.note.id,
+        'dragging': draggedNote?.id === note.id,
+        'drag-over': isDraggedOver === note.id
+      }"
+      draggable="true"
+      @dragstart="handleDragStart($event, note)"
+      @dragover.prevent="handleDragOver($event)"
+      @dragenter="isDraggedOver = note.id"
+      @dragleave="isDraggedOver = null"
+      @drop="handleDrop($event, note)"
+      @dragend="handleDragEnd"
     >
       <div
         class="d-flex w-100 justify-content-between align-items-start"
@@ -40,7 +51,7 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { ref, watch } from "vue"
-import type { NoteRealm } from "@/generated/backend"
+import type { Note, NoteRealm } from "@/generated/backend"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
 import type { StorageAccessor } from "../../store/createNoteStorage"
 import NoteTopicWithLink from "./NoteTopicWithLink.vue"
@@ -91,6 +102,46 @@ watch(
   },
   { immediate: true }
 )
+
+const draggedNote = ref<Note | null>(null)
+
+const handleDragStart = (event: DragEvent, note: Note) => {
+  draggedNote.value = note
+  if (event.dataTransfer) {
+    event.dataTransfer.effectAllowed = "move"
+  }
+}
+
+const handleDragOver = (event: DragEvent) => {
+  if (event.dataTransfer) {
+    event.dataTransfer.dropEffect = "move"
+  }
+}
+
+const handleDrop = async (event: DragEvent, targetNote: Note) => {
+  event.preventDefault()
+
+  if (!draggedNote.value || draggedNote.value.id === targetNote.id) return
+
+  if (draggedNote.value.parentId !== targetNote.parentId) return
+
+  try {
+    await props.storageAccessor
+      .storedApi()
+      .moveAfter(draggedNote.value.id, targetNote.id)
+  } catch (error) {
+    console.error("Failed to move note:", error)
+  }
+
+  draggedNote.value = null
+}
+
+const isDraggedOver = ref<number | null>(null)
+
+const handleDragEnd = () => {
+  draggedNote.value = null
+  isDraggedOver.value = null
+}
 </script>
 
 <style lang="scss" scoped>
@@ -110,5 +161,19 @@ watch(
   cursor: pointer;
   background-color: #aaa;
   font-weight: initial;
+}
+
+.note-item {
+  cursor: move;
+  padding: 4px;
+  transition: background-color 0.2s;
+}
+
+.note-item.dragging {
+  opacity: 0.5;
+}
+
+.note-item.drag-over {
+  background-color: rgba(0, 0, 0, 0.1);
 }
 </style>

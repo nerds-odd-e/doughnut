@@ -134,7 +134,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, type PropType } from "vue"
+import { ref } from "vue"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import type { Note } from "@/generated/backend"
 import type { NoteAccessory } from "@/generated/backend"
@@ -164,21 +164,12 @@ import NoteEditImageDialog from "../accessory/NoteEditImageDialog.vue"
 import NoteEditUrlDialog from "../accessory/NoteEditUrlDialog.vue"
 import NoteAudioTools from "../accessory/NoteAudioTools.vue"
 
-const props = defineProps({
-  storageAccessor: {
-    type: Object as PropType<StorageAccessor>,
-    required: true,
-  },
-  note: {
-    type: Object as PropType<Note>,
-    required: true,
-  },
-  asMarkdown: Boolean,
-  conversationButton: {
-    type: Boolean,
-    default: false,
-  },
-})
+const { storageAccessor, note } = defineProps<{
+  storageAccessor: StorageAccessor
+  note: Note
+  asMarkdown?: boolean
+  conversationButton?: boolean
+}>()
 
 const audioTools = ref(false)
 
@@ -189,10 +180,10 @@ const emit = defineEmits([
 ])
 
 const moveUp = () => {
-  props.storageAccessor.storedApi().moveUp(props.note.id)
+  storageAccessor.storedApi().moveUp(note.id)
 }
 const moveDown = () => {
-  props.storageAccessor.storedApi().moveDown(props.note.id)
+  storageAccessor.storedApi().moveDown(note.id)
 }
 
 const noteAccessoriesUpdated = (closer: () => void, na: NoteAccessory) => {

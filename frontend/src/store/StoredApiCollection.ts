@@ -1,4 +1,5 @@
 import type {
+  Note,
   NoteRealm,
   WikidataAssociationCreation,
 } from "@/generated/backend"
@@ -37,6 +38,8 @@ export interface StoredApi {
   moveUp(noteId: Doughnut.ID): Promise<NoteRealm | void>
 
   moveDown(noteId: Doughnut.ID): Promise<NoteRealm | void>
+
+  moveAfter(noteId: number, targetNoteId: number): Promise<NoteRealm[]>
 
   updateTextField(
     noteId: Doughnut.ID,
@@ -177,17 +180,6 @@ export default class StoredApiCollection implements StoredApi {
     )
   }
 
-  private siblingsOf(noteId: Doughnut.ID) {
-    const noteRealm = this.storage.refOfNoteRealm(noteId)
-    if (!noteRealm.value) return {}
-    const { parentId } = noteRealm.value.note
-    if (!parentId) return {}
-    return {
-      parentId,
-      siblings: this.storage.refOfNoteRealm(parentId).value?.children,
-    }
-  }
-
   private refreshNoteRealms(noteRealms: NoteRealm[]) {
     noteRealms.forEach((n) => this.storage.refreshNoteRealm(n))
   }
@@ -216,6 +208,16 @@ export default class StoredApiCollection implements StoredApi {
         "after"
       )
     )
+  }
+
+  async moveAfter(noteId: number, targetNoteId: number): Promise<NoteRealm[]> {
+    const updatedNotes = await this.managedApi.restNoteController.moveAfter(
+      noteId,
+      targetNoteId,
+      "after"
+    )
+    this.refreshNoteRealms(updatedNotes)
+    return updatedNotes
   }
 
   async updateTextField(
@@ -279,5 +281,24 @@ export default class StoredApiCollection implements StoredApi {
     const noteRealm = this.storage.refreshNoteRealm(res[0]!)
     this.routerReplaceFocus(router, noteRealm)
     return noteRealm
+  }
+
+  private siblingsOf(noteId: Doughnut.ID): {
+    parentId: number
+    siblings: Note[] | undefined
+  } {
+    const noteRealm = this.storage.refOfNoteRealm(noteId).value
+    if (!noteRealm) return { parentId: 0, siblings: undefined }
+
+    const parentId = noteRealm.note.noteTopic.parentNoteTopic?.id
+    if (!parentId) return { parentId: 0, siblings: undefined }
+
+    const parentRealm = this.storage.refOfNoteRealm(parentId).value
+    if (!parentRealm) return { parentId, siblings: undefined }
+
+    return {
+      parentId,
+      siblings: parentRealm.children,
+    }
   }
 }
