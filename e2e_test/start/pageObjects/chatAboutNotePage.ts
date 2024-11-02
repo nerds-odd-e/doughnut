@@ -11,7 +11,7 @@ export function assumeChatAboutNotePage() {
       cy.focused().type(msg)
       cy.get('#chat-button').click()
     },
-    replyToConversationNew(msg: string) {
+    replyToConversationAndInviteAiToReply(msg: string) {
       cy.focused().type(msg)
       cy.findByRole('button', {
         name: 'Send message and invite AI to reply',

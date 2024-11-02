@@ -241,13 +241,16 @@ export const assumeNotePage = (noteTopic?: string) => {
       cy.findByRole('textbox').type(message)
       cy.findByRole('button', { name: 'Send message' }).click()
     },
-    sendMessageToAI(message: string) {
+
+    chatAboutNoteNew() {
       this.toolbarButton('Star a conversation about this note').click()
-      cy.findByRole('textbox').type(message)
-      cy.findByRole('button', {
-        name: 'Send message and invite AI to reply',
-      }).click()
+      return assumeChatAboutNotePage()
     },
+
+    sendMessageToAI(message: string) {
+      this.chatAboutNoteNew().replyToConversationAndInviteAiToReply(message)
+    },
+
     moveUpAmongSiblings() {
       cy.pageIsNotLoading()
       // Find current note in sidebar

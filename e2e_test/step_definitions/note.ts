@@ -412,7 +412,7 @@ Then(
 )
 
 When('I start to chat about the note {string}', (noteTopic: string) => {
-  start.jumpToNotePage(noteTopic).chatAboutNote()
+  start.jumpToNotePage(noteTopic).chatAboutNoteNew()
 })
 
 Then('I should see a child note {string}', (childTopic: string) => {

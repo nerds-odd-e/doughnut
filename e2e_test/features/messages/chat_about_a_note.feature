@@ -19,7 +19,7 @@ Feature: Chat about a note with AI
       | role      | message              |
       | user      | Is Naba one of them? |
       | assistant | No. It is not.       |
-    When I send the message "Is this note correct?" to AI 1
+    When I send the message "Is this note correct?" to AI
     Then I should receive the following chat messages:
       | role      | message                      |
       | user      | Is Naba one of them?         |
