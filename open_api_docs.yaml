@@ -1896,61 +1896,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/AiGeneratedImage"
-  /api/ai/chat/{note}:
-    get:
-      tags:
-      - rest-ai-controller
-      operationId: tryRestoreChat
-      parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Message"
-    post:
-      tags:
-      - rest-ai-controller
-      operationId: chat
-      parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ChatRequest"
-        required: true
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            text/event-stream:
-              schema:
-                $ref: "#/components/schemas/SseEmitter"
   /api/user/{user}:
     patch:
       tags:
@@ -2907,6 +2852,32 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/DummyForGeneratingTypes"
+  /api/ai/chat/{note}:
+    get:
+      tags:
+      - rest-ai-controller
+      operationId: tryRestoreChat
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Message"
   /api/ai/available-gpt-models:
     get:
       tags:
@@ -3916,13 +3887,6 @@ components:
       type: object
       properties:
         b64encoded:
-          type: string
-    ChatRequest:
-      type: object
-      properties:
-        userMessage:
-          type: string
-        threadId:
           type: string
     UserDTO:
       required:

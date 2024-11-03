@@ -1,11 +1,9 @@
 package com.odde.doughnut.controllers;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 
-import com.odde.doughnut.controllers.dto.ChatRequest;
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.ConversationMessage;
 import com.odde.doughnut.entities.Note;
@@ -255,17 +253,5 @@ public class RestConversationMessageControllerAiReplyTests {
       verify(openAiApi).createMessage(any(), captor.capture());
       assertThat(captor.getValue().getContent().toString()).isEqualTo("just say something.");
     }
-  }
-
-  @Test
-  void chatWithNoteThatCannotAccess() {
-    assertThrows(
-        UnexpectedNoAccessRightException.class,
-        () ->
-            new RestAiController(
-                    aiAdvisorWithStorageService,
-                    makeMe.aUser().toModelPlease(),
-                    testabilitySettings)
-                .chat(note, new ChatRequest("What's your name?", null)));
   }
 }

@@ -7,7 +7,6 @@ import com.odde.doughnut.entities.NotebookAssistant;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorWithStorageService;
-import com.odde.doughnut.services.ChatAboutNoteService;
 import com.odde.doughnut.services.ai.AssistantService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.assistants.message.Message;
@@ -17,12 +16,10 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
-import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @RestController
 @SessionScope
@@ -70,25 +67,6 @@ public class RestAiController {
     return aiAdvisorWithStorageService
         .getChatAboutNoteService(threadId, assistantService)
         .getMessageList();
-  }
-
-  @PostMapping(path = "/chat/{note}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-  @Transactional
-  public SseEmitter chat(
-      @PathVariable(value = "note") @Schema(type = "integer") Note note,
-      @RequestBody ChatRequest request)
-      throws UnexpectedNoAccessRightException {
-    currentUser.assertReadAuthorization(note);
-    String threadId = request.getThreadId();
-    AssistantService assistantService = aiAdvisorWithStorageService.getChatAssistantService(note);
-    if (threadId == null) {
-      threadId =
-          aiAdvisorWithStorageService.createThread(note.getCreator(), assistantService, note);
-    }
-    ChatAboutNoteService chatService =
-        aiAdvisorWithStorageService.getChatAboutNoteService(threadId, assistantService);
-    chatService.createUserMessage(request.getUserMessage());
-    return chatService.getAIReplySSE();
   }
 
   @GetMapping("/dummy")
