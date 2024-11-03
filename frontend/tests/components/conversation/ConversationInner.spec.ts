@@ -207,4 +207,44 @@ describe("ConversationInner", () => {
       expect(aiMessage.find("strong").exists()).toBe(true)
     })
   })
+
+  describe("Tool Call Handling", () => {
+    beforeEach(async () => {
+      await submitForm("Hello")
+      helper.managedApi.restAiController.submitToolCallResult = vi.fn()
+    })
+
+    it("handles tool calls and submits results", async () => {
+      const runResponse = {
+        id: "run-123",
+        thread_id: "thread-123",
+        required_action: {
+          submit_tool_outputs: {
+            tool_calls: [
+              {
+                id: "call-456",
+                function: {
+                  arguments: JSON.stringify({
+                    completion: "test completion",
+                  }),
+                },
+              },
+            ],
+          },
+        },
+      }
+
+      helper.managedApi.eventSource.eventSourceRequest.onMessage(
+        "thread.run.requires_action",
+        JSON.stringify(runResponse)
+      )
+      await flushPromises()
+
+      expect(
+        helper.managedApi.restAiController.submitToolCallResult
+      ).toHaveBeenCalledWith("thread-123", "run-123", "call-456", {
+        status: "accepted",
+      })
+    })
+  })
 })

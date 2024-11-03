@@ -120,6 +120,7 @@ export type { ToolCall } from './models/ToolCall';
 export type { ToolCallCodeInterpreter } from './models/ToolCallCodeInterpreter';
 export type { ToolCallCodeInterpreterOutput } from './models/ToolCallCodeInterpreterOutput';
 export type { ToolCallFunction } from './models/ToolCallFunction';
+export type { ToolCallResult } from './models/ToolCallResult';
 export type { ToolChoice } from './models/ToolChoice';
 export type { ToolResources } from './models/ToolResources';
 export type { TruncationStrategy } from './models/TruncationStrategy';

@@ -1,5 +1,7 @@
 package com.odde.doughnut.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.odde.doughnut.controllers.dto.ToolCallResult;
 import com.odde.doughnut.services.ai.*;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
@@ -22,5 +24,11 @@ public class AiAdvisorService {
   public AssistantService getContentCompletionService(String assistantId) {
     return new AssistantService(
         openAiApiHandler, assistantId, AiToolFactory.getCompletionAiTools());
+  }
+
+  public void submitToolOutputs(
+      String threadId, String runId, String toolCallId, ToolCallResult result)
+      throws JsonProcessingException {
+    openAiApiHandler.submitToolOutputs(threadId, runId, toolCallId, result);
   }
 }

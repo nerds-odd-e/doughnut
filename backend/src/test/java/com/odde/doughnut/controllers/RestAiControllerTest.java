@@ -7,8 +7,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.AiAssistantResponse;
 import com.odde.doughnut.controllers.dto.AiCompletionParams;
+import com.odde.doughnut.controllers.dto.ToolCallResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
@@ -20,6 +22,7 @@ import com.odde.doughnut.testability.OpenAIAssistantMocker;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.OpenAiResponse;
 import com.theokanning.openai.assistants.message.MessageRequest;
+import com.theokanning.openai.assistants.run.Run;
 import com.theokanning.openai.assistants.run.RunCreateRequest;
 import com.theokanning.openai.assistants.thread.ThreadRequest;
 import com.theokanning.openai.client.OpenAiApi;
@@ -217,6 +220,34 @@ class RestAiControllerTest {
 
       when(openAiApi.listModels()).thenReturn(Single.just(fakeResponse));
       assertThat(controller.getAvailableGptModels()).contains("gpt-4");
+    }
+  }
+
+  @Nested
+  class SubmitToolCallResult {
+    @Test
+    void shouldSubmitToolOutputSuccessfully() throws JsonProcessingException {
+      String threadId = "thread-123";
+      String runId = "run-123";
+      String toolCallId = "call-456";
+
+      when(openAiApi.submitToolOutputs(
+              eq(threadId),
+              eq(runId),
+              argThat(
+                  request -> {
+                    assertEquals(1, request.getToolOutputs().size());
+                    assertEquals(toolCallId, request.getToolOutputs().get(0).getToolCallId());
+                    return true;
+                  })))
+          .thenReturn(Single.just(new Run()));
+
+      ToolCallResult result = new ToolCallResult();
+      result.status = "accepted";
+
+      controller.submitToolCallResult(threadId, runId, toolCallId, result);
+
+      verify(openAiApi).submitToolOutputs(eq(threadId), eq(runId), any());
     }
   }
 }

@@ -152,7 +152,7 @@ const handleSendMessage = async (
 const getAiReply = async () => {
   aiStatus.value = "Starting AI reply..."
   await managedApi.eventSource
-    .onMessage((event, data) => {
+    .onMessage(async (event, data) => {
       if (event === "thread.message.created") {
         aiStatus.value = "Generating response..."
         const response = JSON.parse(data) as Message
@@ -175,9 +175,17 @@ const getAiReply = async () => {
           response.required_action!.submit_tool_outputs!.tool_calls![0]!
             .function!.arguments as unknown as string
         ) as NoteDetailsCompletion
-        storageAccessor
+
+        await storageAccessor
           .storedApi()
           .appendDetails(note.id, contentToAppend!.completion)
+
+        await managedApi.restAiController.submitToolCallResult(
+          response.thread_id!,
+          response.id!,
+          response.required_action!.submit_tool_outputs!.tool_calls![0]!.id!,
+          { status: "accepted" }
+        )
       } else if (event === "done") {
         aiStatus.value = undefined
         fetchConversationMessages().then(() => {

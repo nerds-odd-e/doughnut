@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
@@ -112,5 +113,17 @@ public class RestAiController {
         currentUser.getEntity(),
         notebook,
         notebookAssistantCreationParams.getAdditionalInstruction());
+  }
+
+  @PostMapping("/submit-tool-result/{threadId}/{runId}/{toolCallId}")
+  @Transactional
+  public void submitToolCallResult(
+      @PathVariable String threadId,
+      @PathVariable String runId,
+      @PathVariable String toolCallId,
+      @RequestBody ToolCallResult result)
+      throws JsonProcessingException {
+    currentUser.assertLoggedIn();
+    aiAdvisorWithStorageService.submitToolOutputs(threadId, runId, toolCallId, result);
   }
 }

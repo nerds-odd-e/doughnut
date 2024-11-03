@@ -1,5 +1,7 @@
 package com.odde.doughnut.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.odde.doughnut.controllers.dto.ToolCallResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.ai.AssistantService;
@@ -193,5 +195,11 @@ public final class AiAdvisorWithStorageService {
         .map(c -> c.getText().getValue())
         .findFirst()
         .orElse("");
+  }
+
+  public void submitToolOutputs(
+      String threadId, String runId, String toolCallId, ToolCallResult result)
+      throws JsonProcessingException {
+    aiAdvisorService.submitToolOutputs(threadId, runId, toolCallId, result);
   }
 }

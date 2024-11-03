@@ -3,8 +3,10 @@ package com.odde.doughnut.services.openAiApis;
 import static com.odde.doughnut.services.openAiApis.ApiExecutor.blockGet;
 import static java.lang.Thread.sleep;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.odde.doughnut.controllers.dto.AiCompletionAnswerClarifyingQuestionParams;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.doughnut.controllers.dto.ToolCallResult;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolList;
@@ -181,22 +183,19 @@ public class OpenAiApiHandler {
     }
   }
 
-  public Run submitToolOutputs(
-      AiCompletionAnswerClarifyingQuestionParams answerClarifyingQuestionParams) {
+  public void submitToolOutputs(
+      String threadId, String runId, String toolCallId, ToolCallResult result)
+      throws JsonProcessingException {
     SubmitToolOutputRequestItem toolOutputRequestItem =
         SubmitToolOutputRequestItem.builder()
-            .toolCallId(answerClarifyingQuestionParams.getToolCallId())
-            .output(answerClarifyingQuestionParams.getAnswer())
+            .toolCallId(toolCallId)
+            .output(new ObjectMapper().writeValueAsString(result))
             .build();
     List<SubmitToolOutputRequestItem> toolOutputRequestItems = new ArrayList<>();
     toolOutputRequestItems.add(toolOutputRequestItem);
     SubmitToolOutputsRequest submitToolOutputsRequest =
         SubmitToolOutputsRequest.builder().toolOutputs(toolOutputRequestItems).build();
-    return blockGet(
-        openAiApi.submitToolOutputs(
-            answerClarifyingQuestionParams.getThreadId(),
-            answerClarifyingQuestionParams.getRunId(),
-            submitToolOutputsRequest));
+    blockGet(openAiApi.submitToolOutputs(threadId, runId, submitToolOutputsRequest));
   }
 
   public List<Message> getThreadMessages(String threadId, String runId) {

@@ -9,6 +9,7 @@ import type { DummyForGeneratingTypes } from '../models/DummyForGeneratingTypes'
 import type { Message } from '../models/Message';
 import type { NotebookAssistant } from '../models/NotebookAssistant';
 import type { NotebookAssistantCreationParams } from '../models/NotebookAssistantCreationParams';
+import type { ToolCallResult } from '../models/ToolCallResult';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestAiControllerService {
@@ -28,6 +29,35 @@ export class RestAiControllerService {
             url: '/api/ai/{note}/completion',
             path: {
                 'note': note,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param threadId
+     * @param runId
+     * @param toolCallId
+     * @param requestBody
+     * @returns any OK
+     * @throws ApiError
+     */
+    public submitToolCallResult(
+        threadId: string,
+        runId: string,
+        toolCallId: string,
+        requestBody: ToolCallResult,
+    ): CancelablePromise<any> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/ai/submit-tool-result/{threadId}/{runId}/{toolCallId}',
+            path: {
+                'threadId': threadId,
+                'runId': runId,
+                'toolCallId': toolCallId,
             },
             body: requestBody,
             mediaType: 'application/json',
