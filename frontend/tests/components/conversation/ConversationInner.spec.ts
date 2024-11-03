@@ -2,7 +2,40 @@ import { expect, vi } from "vitest"
 import ConversationInner from "@/components/conversations/ConversationInner.vue"
 import helper from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
-import type { ConversationMessage } from "@/generated/backend"
+import type {
+  ConversationMessage,
+  Message,
+  MessageDelta,
+} from "@/generated/backend"
+import { flushPromises } from "@vue/test-utils"
+
+const simulateAiResponse = () => {
+  const newMessage: Message = {
+    role: "assistant",
+    thread_id: "test-thread-id",
+    content: [],
+  }
+  const messageDelta: MessageDelta = {
+    delta: {
+      content: [
+        {
+          text: {
+            value: "## I'm ChatGPT",
+          },
+        },
+      ],
+    },
+  }
+
+  helper.managedApi.eventSource.eventSourceRequest.onMessage(
+    "thread.message.created",
+    JSON.stringify(newMessage)
+  )
+  helper.managedApi.eventSource.eventSourceRequest.onMessage(
+    "thread.message.delta",
+    JSON.stringify(messageDelta)
+  )
+}
 
 describe("ConversationInner", () => {
   let wrapper
@@ -73,5 +106,22 @@ describe("ConversationInner", () => {
     expect(
       helper.managedApi.restConversationMessageController.replyToConversation
     ).toHaveBeenCalled()
+  })
+
+  it.only("disables AI reply", async () => {
+    helper.managedApi.eventSource.restConversationMessageController.getAiReply =
+      vi.fn()
+    const form = wrapper.find("form.chat-input-form")
+    const textarea = wrapper.find("textarea")
+    await textarea.setValue("Hello")
+    await form.trigger("submit")
+    await flushPromises()
+    expect(
+      helper.managedApi.eventSource.restConversationMessageController.getAiReply
+    ).toHaveBeenCalled()
+
+    simulateAiResponse()
+
+    expect(wrapper.vm.currentAiReply).toEqual("## I'm ChatGPT")
   })
 })
