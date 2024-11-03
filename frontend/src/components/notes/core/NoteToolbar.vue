@@ -11,18 +11,6 @@
       <WikidataButton v-bind="{ note, storageAccessor }" />
       <NoteDetailsAutoCompletionButton v-bind="{ note, storageAccessor }" />
 
-      <PopButton title="Chat with AI" sidebar="right">
-        <template #button_face>
-          <SvgChat />
-        </template>
-        <template #default="{ closer }">
-          <NoteChatDialog
-            v-bind="{ selectedNote: note, storageAccessor }"
-            @close-dialog="closer"
-          />
-        </template>
-      </PopButton>
-
       <NoteSendMessageButton
         v-if="!conversationButton"
         v-bind="{ noteId: note.id }"
@@ -150,12 +138,10 @@ import WikidataButton from "./WikidataButton.vue"
 import SvgSearchForLink from "../../svgs/SvgSearchForLink.vue"
 import LinkNoteDialog from "../../links/LinkNoteDialog.vue"
 import SvgCog from "../../svgs/SvgCog.vue"
-import SvgChat from "../../svgs/SvgChat.vue"
 import NoteDeleteButton from "./NoteDeleteButton.vue"
 import PopButton from "../../commons/Popups/PopButton.vue"
 import AIGenerateImageDialog from "../AIGenerateImageDialog.vue"
 import NoteDetailsAutoCompletionButton from "./NoteDetailsAutoCompletionButton.vue"
-import NoteChatDialog from "../NoteChatDialog.vue"
 import NoteTestMeDialog from "../NoteTestMeDialog.vue"
 import Questions from "../Questions.vue"
 import NoteInfoBar from "../NoteInfoBar.vue"

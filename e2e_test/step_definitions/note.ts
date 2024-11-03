@@ -393,7 +393,7 @@ Given(
   (noteTopic: string) => {
     start
       .jumpToNotePage(noteTopic)
-      .chatAboutNoteNew()
+      .startAConversationAboutNote()
       .replyToConversationAndInviteAiToReply(
         'Please complete the note details.'
       )
@@ -402,11 +402,11 @@ Given(
 )
 
 Then('I should see a notification of a bad request', () => {
-  start.assumeChatAboutNotePage().expectErrorMessage('Bad Request')
+  start.assumeConversationAboutNotePage().expectErrorMessage('Bad Request')
 })
 
 When('I start to chat about the note {string}', (noteTopic: string) => {
-  start.jumpToNotePage(noteTopic).chatAboutNoteNew()
+  start.jumpToNotePage(noteTopic).startAConversationAboutNote()
 })
 
 Then('I should see a child note {string}', (childTopic: string) => {

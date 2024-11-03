@@ -95,3 +95,13 @@ When(
     start.jumpToNotePage(note).sendMessageToAI(conversation)
   }
 )
+
+When('I send the message {string} to AI', (question: string) => {
+  start
+    .assumeConversationAboutNotePage()
+    .replyToConversationAndInviteAiToReply(question)
+})
+
+Then('I should receive the following chat messages:', (data: DataTable) => {
+  start.assumeConversationAboutNotePage().expectMessages(data.hashes())
+})

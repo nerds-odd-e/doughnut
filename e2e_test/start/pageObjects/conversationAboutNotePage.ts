@@ -1,4 +1,4 @@
-export function assumeChatAboutNotePage() {
+export function assumeConversationAboutNotePage() {
   return {
     replyToConversation(msg: string) {
       cy.focused().type(msg)

@@ -1,7 +1,7 @@
 import { commonSenseSplit } from '../../support/string_util'
 import submittableForm from '../submittableForm'
 import audioToolsPage from './audioToolsPage'
-import { assumeChatAboutNotePage } from './chatAboutNotePage'
+import { assumeConversationAboutNotePage } from './conversationAboutNotePage'
 import noteCreationForm from './noteForms/noteCreationForm'
 import { questionListPage } from './questionListPage'
 import { assumeQuestionPage } from './QuizQuestionPage'
@@ -238,23 +238,21 @@ export const assumeNotePage = (noteTopic?: string) => {
       cy.pageIsNotLoading() // wait for the response
       return assumeQuestionPage()
     },
-    chatAboutNote() {
-      this.toolbarButton('Chat with AI').click()
-      return assumeChatAboutNotePage()
-    },
     sendMessageToNoteOwner(message: string) {
       this.toolbarButton('Star a conversation about this note').click()
       cy.findByRole('textbox').type(message)
       cy.findByRole('button', { name: 'Send message' }).click()
     },
 
-    chatAboutNoteNew() {
+    startAConversationAboutNote() {
       this.toolbarButton('Star a conversation about this note').click()
-      return assumeChatAboutNotePage()
+      return assumeConversationAboutNotePage()
     },
 
     sendMessageToAI(message: string) {
-      this.chatAboutNoteNew().replyToConversationAndInviteAiToReply(message)
+      this.startAConversationAboutNote().replyToConversationAndInviteAiToReply(
+        message
+      )
     },
 
     moveUpAmongSiblings() {

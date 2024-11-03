@@ -4,7 +4,7 @@ import { assumeQuestionPage } from './pageObjects/QuizQuestionPage'
 import { assumeAdminDashboardPage } from './pageObjects/adminPages/adminDashboardPage'
 import { assumeMessageCenterPage } from './pageObjects/messageCenterPage'
 import { navigateToBazaar } from './pageObjects/bazaarPage'
-import { assumeChatAboutNotePage } from './pageObjects/chatAboutNotePage'
+import { assumeConversationAboutNotePage } from './pageObjects/conversationAboutNotePage'
 import { navigateToCircle } from './pageObjects/circlePage'
 import { assumeNotePage } from './pageObjects/notePage'
 import { routerToNotebooksPage } from './pageObjects/notebooksPage'
@@ -24,7 +24,7 @@ export default {
   assumeAudioTools,
   assumeAssessmentPage,
   assumeAnsweredQuestionPage,
-  assumeChatAboutNotePage,
+  assumeConversationAboutNotePage,
   assumeQuestionPage,
   assumeAdminDashboardPage,
   assumeMessageCenterPage,
