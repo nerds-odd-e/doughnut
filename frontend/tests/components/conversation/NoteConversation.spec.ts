@@ -31,6 +31,10 @@ describe("NoteConversation", () => {
   }
 
   beforeEach(() => {
+    window.HTMLElement.prototype.scrollIntoView = vitest.fn()
+  })
+
+  beforeEach(() => {
     helper.managedApi.restConversationMessageController.startConversationAboutNote =
       vi.fn().mockResolvedValue(conversation)
   })

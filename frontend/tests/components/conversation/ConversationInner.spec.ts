@@ -44,6 +44,10 @@ describe("ConversationInner", () => {
   const user = makeMe.aUser.please()
 
   beforeEach(() => {
+    window.HTMLElement.prototype.scrollIntoView = vitest.fn()
+  })
+
+  beforeEach(() => {
     helper.managedApi.restConversationMessageController.replyToConversation =
       vi.fn()
     wrapper = helper

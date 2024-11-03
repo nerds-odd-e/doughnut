@@ -9,7 +9,7 @@
     :selectedConversation="conversation"
     :allow-new-conversation="allowNewConversation"
   >
-    <template #messages v-if="currentConversationMessages">
+    <template #messages v-if="currentConversationMessages !== undefined">
       <div
         v-for="conversationMessage in currentConversationMessages"
         :key="conversationMessage.id"
