@@ -217,7 +217,8 @@ const handleSendMessageAndInviteAI = async (message: string) => {
 
 <style scoped>
 .ai-chat {
-  color: red;
+  background-color: #f8f9fa;
+  border-left: 3px solid #0d6efd;
 }
 
 .message-avatar {

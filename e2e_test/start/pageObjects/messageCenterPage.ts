@@ -11,9 +11,8 @@ export const assumeMessageCenterPage = () => {
     },
     expectMessageDisplayAtUserSide(message: string) {
       cy.findByText(message)
-        .parent()
+        .parents('.justify-content-end')
         .should('be.visible')
-        .and('have.class', 'justify-content-end')
       return this
     },
     expectMessageDisplayAtOtherSide(message: string) {
@@ -31,7 +30,8 @@ export const assumeMessageCenterPage = () => {
           return this
         },
         reply(message: string) {
-          cy.get('textarea').type(message).type('{enter}')
+          cy.get('textarea').type(message)
+          cy.findByRole('button', { name: 'Send message' }).click()
           cy.findByText(message).should('be.visible')
           return this
         },
