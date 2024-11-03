@@ -28,11 +28,12 @@ public class TestabilitySettings {
   private final Map<String, String> defaultServiceUrls =
       Map.of("wikidata", "https://www.wikidata.org", "openAi", "https://api.openai.com/v1/");
 
-  public void timeTravelTo(Timestamp timestamp) {
+  public Timestamp timeTravelTo(Timestamp timestamp) {
     this.timestamp = timestamp;
     if (randomizer == null) {
       randomizer = new NonRandomizer();
     }
+    return timestamp;
   }
 
   public Timestamp getCurrentUTCTimestamp() {

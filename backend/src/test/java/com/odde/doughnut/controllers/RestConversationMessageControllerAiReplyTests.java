@@ -60,11 +60,20 @@ public class RestConversationMessageControllerAiReplyTests {
 
   @BeforeEach
   void setUp() {
-    testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(0, 0).please());
-    currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    Timestamp oneHourAgo = TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, -1);
+    currentUTCTimestamp = testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(0, 0).please());
     currentUser = makeMe.aUser().toModelPlease();
-    note = makeMe.aNote().creatorAndOwner(currentUser).updatedAt(oneHourAgo).please();
+    note =
+        makeMe
+            .aNote()
+            .creatorAndOwner(currentUser)
+            .updatedAt(TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, -1))
+            .please();
+
+    setupServices();
+    conversation = makeMe.aConversation().forANote(note).from(currentUser).please();
+  }
+
+  private void setupServices() {
     aiAdvisorService = new AiAdvisorService(openAiApi);
     aiAdvisorWithStorageService =
         new AiAdvisorWithStorageService(aiAdvisorService, makeMe.modelFactoryService);
@@ -73,11 +82,10 @@ public class RestConversationMessageControllerAiReplyTests {
         new RestConversationMessageController(
             currentUser, conversationService, aiAdvisorWithStorageService);
     openAIAssistantMocker = new OpenAIAssistantMocker(openAiApi);
-    conversation = makeMe.aConversation().forANote(note).from(currentUser).please();
   }
 
   @Nested
-  class NewChat {
+  class NewChatTests {
     @BeforeEach
     void setUp() {
       openAIAssistantMocker
@@ -112,9 +120,12 @@ public class RestConversationMessageControllerAiReplyTests {
     }
 
     @Test
-    void itWillPersistTheThreadId() throws UnexpectedNoAccessRightException, BadRequestException {
+    void shouldPersistThreadIdWhenStartingNewChat()
+        throws UnexpectedNoAccessRightException, BadRequestException {
       long oldCount = makeMe.modelFactoryService.userAssistantThreadRepository.count();
+
       controller.getAiReply(conversation);
+
       long newCount = makeMe.modelFactoryService.userAssistantThreadRepository.count();
       assertThat(newCount).isEqualTo(oldCount + 1);
     }
@@ -134,16 +145,17 @@ public class RestConversationMessageControllerAiReplyTests {
     }
 
     @Test
-    void chatWithUseTheNotebookChatAssistantIfExisting()
+    void shouldUseNotebookSpecificAssistantWhenAvailable()
         throws UnexpectedNoAccessRightException, BadRequestException {
       NotebookAssistant notebookAssistant = new NotebookAssistant();
       notebookAssistant.setAssistantId("notebook-assistant");
       notebookAssistant.setNotebook(note.getNotebook());
       notebookAssistant.setCreator(currentUser.getEntity());
-      notebookAssistant.setCreatedAt(makeMe.aTimestamp().please());
+      notebookAssistant.setCreatedAt(currentUTCTimestamp);
       makeMe.modelFactoryService.save(notebookAssistant);
 
       controller.getAiReply(conversation);
+
       ArgumentCaptor<RunCreateRequest> captor = ArgumentCaptor.forClass(RunCreateRequest.class);
       verify(openAiApi).createRunStream(any(), captor.capture());
       assertThat(captor.getValue().getAssistantId()).isEqualTo("notebook-assistant");
@@ -237,7 +249,7 @@ public class RestConversationMessageControllerAiReplyTests {
   }
 
   @Nested
-  class ContinueChat {
+  class ContinueChatTests {
     @BeforeEach
     void setUp() {
       openAIAssistantMocker
@@ -259,7 +271,7 @@ public class RestConversationMessageControllerAiReplyTests {
   }
 
   @Nested
-  class NoteUpdateSync {
+  class NoteUpdateSyncTests {
     @BeforeEach
     void setUp() {
       openAIAssistantMocker
