@@ -4,7 +4,6 @@
 /* eslint-disable */
 import type { AiGeneratedImage } from '../models/AiGeneratedImage';
 import type { DummyForGeneratingTypes } from '../models/DummyForGeneratingTypes';
-import type { Message } from '../models/Message';
 import type { NotebookAssistant } from '../models/NotebookAssistant';
 import type { NotebookAssistantCreationParams } from '../models/NotebookAssistantCreationParams';
 import type { ToolCallResult } from '../models/ToolCallResult';
@@ -103,25 +102,6 @@ export class RestAiControllerService {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/ai/dummy',
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * @param note
-     * @returns Message OK
-     * @throws ApiError
-     */
-    public tryRestoreChat(
-        note: number,
-    ): CancelablePromise<Array<Message>> {
-        return this.httpRequest.request({
-            method: 'GET',
-            url: '/api/ai/chat/{note}',
-            path: {
-                'note': note,
-            },
             errors: {
                 500: `Internal Server Error`,
             },

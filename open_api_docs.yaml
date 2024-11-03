@@ -2858,32 +2858,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/DummyForGeneratingTypes"
-  /api/ai/chat/{note}:
-    get:
-      tags:
-      - rest-ai-controller
-      operationId: tryRestoreChat
-      parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Message"
   /api/ai/available-gpt-models:
     get:
       tags:
@@ -4373,66 +4347,3 @@ components:
         last_active_at:
           type: integer
           format: int32
-    Attachment:
-      type: object
-      properties:
-        tools:
-          type: array
-          items:
-            oneOf:
-            - $ref: "#/components/schemas/CodeInterpreterTool"
-            - $ref: "#/components/schemas/FileSearchTool"
-            - $ref: "#/components/schemas/FunctionTool"
-        file_id:
-          type: string
-    Message:
-      type: object
-      properties:
-        id:
-          type: string
-        object:
-          type: string
-        status:
-          type: string
-        role:
-          type: string
-        content:
-          type: array
-          items:
-            $ref: "#/components/schemas/MessageContent"
-        attachments:
-          type: array
-          items:
-            $ref: "#/components/schemas/Attachment"
-        metadata:
-          type: object
-          additionalProperties:
-            type: string
-        created_at:
-          type: integer
-          format: int32
-        thread_id:
-          type: string
-        incomplete_details:
-          $ref: "#/components/schemas/IncompleteDetails"
-        completed_at:
-          type: integer
-          format: int32
-        incomplete_at:
-          type: integer
-          format: int32
-        assistant_id:
-          type: string
-        run_id:
-          type: string
-    MessageContent:
-      type: object
-      properties:
-        type:
-          type: string
-        text:
-          $ref: "#/components/schemas/Text"
-        image_file:
-          $ref: "#/components/schemas/ImageFile"
-        image_url:
-          $ref: "#/components/schemas/ImageUrl"
