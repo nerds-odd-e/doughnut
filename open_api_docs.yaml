@@ -3934,6 +3934,18 @@ components:
         end_index:
           type: integer
           format: int32
+    Attachment:
+      type: object
+      properties:
+        tools:
+          type: array
+          items:
+            oneOf:
+            - $ref: "#/components/schemas/CodeInterpreterTool"
+            - $ref: "#/components/schemas/FileSearchTool"
+            - $ref: "#/components/schemas/FunctionTool"
+        file_id:
+          type: string
     ChatResponseFormat:
       type: object
       properties:
@@ -3978,6 +3990,8 @@ components:
     DummyForGeneratingTypes:
       type: object
       properties:
+        message:
+          $ref: "#/components/schemas/Message"
         messageDelta:
           $ref: "#/components/schemas/MessageDelta"
         run:
@@ -4100,6 +4114,57 @@ components:
           type: string
         message:
           type: string
+    Message:
+      type: object
+      properties:
+        id:
+          type: string
+        object:
+          type: string
+        status:
+          type: string
+        role:
+          type: string
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/MessageContent"
+        attachments:
+          type: array
+          items:
+            $ref: "#/components/schemas/Attachment"
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+        created_at:
+          type: integer
+          format: int32
+        thread_id:
+          type: string
+        incomplete_details:
+          $ref: "#/components/schemas/IncompleteDetails"
+        completed_at:
+          type: integer
+          format: int32
+        incomplete_at:
+          type: integer
+          format: int32
+        assistant_id:
+          type: string
+        run_id:
+          type: string
+    MessageContent:
+      type: object
+      properties:
+        type:
+          type: string
+        text:
+          $ref: "#/components/schemas/Text"
+        image_file:
+          $ref: "#/components/schemas/ImageFile"
+        image_url:
+          $ref: "#/components/schemas/ImageUrl"
     MessageDelta:
       type: object
       properties:
