@@ -55,7 +55,7 @@
       </button>
       <button
         class="minimize-button"
-        @click="$emit('close-dialog')"
+        @click="handleCloseDialog"
         aria-label="Close dialog"
       >
         <svg
@@ -135,7 +135,7 @@
 import { ref, computed } from "vue"
 import type { Conversation } from "@/generated/backend"
 
-defineProps<{
+const { isMaximized } = defineProps<{
   conversations?: Conversation[]
   selectedConversation?: Conversation
   allowNewConversation?: boolean
@@ -174,6 +174,13 @@ const handleSendMessageWithAI = () => {
 const handleConversationChange = (event: Event) => {
   const select = event.target as HTMLSelectElement
   emit("conversation-changed", parseInt(select.value))
+}
+
+const handleCloseDialog = () => {
+  if (isMaximized) {
+    emit("toggle-maximize")
+  }
+  emit("close-dialog")
 }
 </script>
 
