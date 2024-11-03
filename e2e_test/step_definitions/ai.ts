@@ -86,6 +86,10 @@ Given(
   }
 )
 
+Given('OpenAI assistant can accept tool call results submission', () => {
+  mock_services.openAi().stubToolCallSubmission()
+})
+
 Given(
   'OpenAI assistant {string} will reply below for user messages:',
   (assistantId: string, data: DataTable) => {

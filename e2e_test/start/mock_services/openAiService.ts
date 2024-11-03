@@ -48,6 +48,13 @@ const openAiService = () => {
       return serviceMocker.stubGetterWithError500Response(`/*`, {})
     },
 
+    stubToolCallSubmission() {
+      return serviceMocker.stubPoster(
+        `/threads/.*/runs/.*/submit_tool_outputs`,
+        {}
+      )
+    },
+
     async alwaysResponseAsUnauthorized() {
       await serviceMocker.install()
       await serviceMocker.stubPosterUnauthorized(`/*`, {

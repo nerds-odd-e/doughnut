@@ -25,5 +25,6 @@ Feature: Note details completion
     Given OpenAI assistant will reply below for user messages:
       | user message                      | response type   | assistant reply                 | run id |
       | Please complete the note details. | requires action | {"completion": " vigorous city."} | run1   |
+    And OpenAI assistant can accept tool call results submission
     When I request to complete the details for the note "Taipei" new
     Then the note details on the current page should be "It is a vigorous city."
