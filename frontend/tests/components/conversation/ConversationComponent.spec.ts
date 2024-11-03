@@ -38,4 +38,30 @@ describe("ConversationComponent", () => {
       params: { noteId: note.id },
     })
   })
+
+  describe("maximize/restore functionality", () => {
+    it("should toggle maximize state when maximize button is clicked", async () => {
+      const note = makeMe.aNote.please()
+      const conversation = makeMe.aConversation.note(note).please()
+      const user = makeMe.aUser.please()
+
+      const wrapper = helper
+        .component(ConversationComponent)
+        .withStorageProps({
+          conversation,
+          user,
+        })
+        .mount()
+
+      // Click maximize button
+      await wrapper.find('[aria-label="Toggle maximize"]').trigger("click")
+
+      expect(wrapper.find(".subject-container").exists()).toBe(false)
+
+      // Click restore button
+      await wrapper.find('[aria-label="Toggle maximize"]').trigger("click")
+
+      expect(wrapper.find(".subject-container").exists()).toBe(true)
+    })
+  })
 })

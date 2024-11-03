@@ -25,25 +25,54 @@
       </button>
     </div>
     <div class="spacer"></div>
-    <button
-      class="minimize-button"
-      @click="$emit('close-dialog')"
-      aria-label="Close dialog"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+    <div class="d-flex align-items-center gap-2">
+      <button
+        class="maximize-button"
+        @click="$emit('toggle-maximize')"
+        aria-label="Toggle maximize"
       >
-        <line x1="5" y1="12" x2="19" y2="12"></line>
-      </svg>
-    </button>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <template v-if="isMaximized">
+            <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3" />
+          </template>
+          <template v-else>
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <polyline points="9 21 3 21 3 15"></polyline>
+            <line x1="21" y1="3" x2="14" y2="10"></line>
+            <line x1="3" y1="21" x2="10" y2="14"></line>
+          </template>
+        </svg>
+      </button>
+      <button
+        class="minimize-button"
+        @click="$emit('close-dialog')"
+        aria-label="Close dialog"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+      </button>
+    </div>
   </div>
 
   <div class="messages-container">
@@ -110,6 +139,7 @@ defineProps<{
   conversations?: Conversation[]
   selectedConversation?: Conversation
   allowNewConversation?: boolean
+  isMaximized?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -118,6 +148,7 @@ const emit = defineEmits<{
   (e: "close-dialog"): void
   (e: "conversation-changed", conversationId: number): void
   (e: "new-conversation"): void
+  (e: "toggle-maximize"): void
 }>()
 
 const message = ref("")
@@ -219,7 +250,8 @@ const handleConversationChange = (event: Event) => {
   border-bottom: 1px solid #dee2e6;
 }
 
-.minimize-button {
+.minimize-button,
+.maximize-button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -230,7 +262,8 @@ const handleConversationChange = (event: Event) => {
   border-radius: 4px;
 }
 
-.minimize-button:hover {
+.minimize-button:hover,
+.maximize-button:hover {
   background-color: #e9ecef;
 }
 

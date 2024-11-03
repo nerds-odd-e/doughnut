@@ -9,9 +9,11 @@
       :storage-accessor="storageAccessor"
       :allow-new-conversation="true"
       :initial-ai-reply="initialAiReply"
+      :is-maximized="isMaximized"
       @close-dialog="$emit('close-dialog')"
       @conversation-changed="handleConversationChange"
       @new-conversation="handleNewConversation"
+      @toggle-maximize="$emit('toggle-maximize')"
     />
     <ConversationTemplate
       v-else
@@ -20,6 +22,8 @@
       :conversations="conversations"
       @conversation-changed="handleConversationChange"
       @close-dialog="$emit('close-dialog')"
+      @toggle-maximize="$emit('toggle-maximize')"
+      :is-maximized="isMaximized"
     >
       <template #messages>
         <h2>Start a conversation about this note</h2>
@@ -51,8 +55,9 @@ const { managedApi } = useLoadingApi()
 const props = defineProps<{
   noteId: number
   storageAccessor: StorageAccessor
+  isMaximized?: boolean
 }>()
-const emit = defineEmits(["submitted", "close-dialog"])
+const emit = defineEmits(["submitted", "close-dialog", "toggle-maximize"])
 
 const initialAiReply = ref(false)
 

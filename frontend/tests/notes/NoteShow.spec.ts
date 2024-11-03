@@ -65,3 +65,41 @@ describe("note wth children", () => {
     expect(screen.queryAllByTitle("collapse children")).toHaveLength(0)
   })
 })
+
+describe("conversation maximize/minimize", () => {
+  it("should maximize conversation when maximize button is clicked", async () => {
+    const note = makeMe.aNoteRealm.please()
+    helper.managedApi.restNoteController.show1 = vitest
+      .fn()
+      .mockResolvedValue(note)
+
+    helper.managedApi.restConversationMessageController.getConversationsAboutNote =
+      vitest.fn().mockResolvedValue([])
+
+    const wrapper = helper
+      .component(NoteShow)
+      .withCurrentUser(makeMe.aUser.please())
+      .withStorageProps({
+        noteId: note.id,
+        expandChildren: true,
+      })
+      .mount()
+
+    await flushPromises()
+
+    // Show conversation
+    await wrapper
+      .find('[title="Star a conversation about this note"]')
+      .trigger("click")
+
+    // Click maximize button
+    await wrapper.find('[aria-label="Toggle maximize"]').trigger("click")
+
+    expect(wrapper.find(".note-content-wrapper").exists()).toBe(false)
+
+    // // // Click restore button
+    await wrapper.find('[aria-label="Toggle maximize"]').trigger("click")
+
+    expect(wrapper.find(".note-content-wrapper").exists()).toBe(true)
+  })
+})

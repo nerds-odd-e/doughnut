@@ -5,6 +5,8 @@
     @close-dialog="$emit('close-dialog')"
     @conversation-changed="$emit('conversation-changed', $event)"
     @new-conversation="$emit('new-conversation')"
+    @toggle-maximize="$emit('toggle-maximize')"
+    :is-maximized="isMaximized"
     :conversations="conversations"
     :selectedConversation="conversation"
     :allow-new-conversation="allowNewConversation"
@@ -85,20 +87,23 @@ import SvgMissingAvatar from "@/components/svgs/SvgMissingAvatar.vue"
 import ConversationTemplate from "./ConversationTemplate.vue"
 import markdownizer from "../form/markdownizer"
 
-const { conversation, user, initialAiReply, storageAccessor } = defineProps<{
-  conversation: Conversation
-  conversations?: Conversation[]
-  user: User
-  storageAccessor: StorageAccessor
-  allowNewConversation?: boolean
-  initialAiReply?: boolean
-}>()
+const { conversation, user, initialAiReply, storageAccessor, isMaximized } =
+  defineProps<{
+    conversation: Conversation
+    conversations?: Conversation[]
+    user: User
+    storageAccessor: StorageAccessor
+    allowNewConversation?: boolean
+    initialAiReply?: boolean
+    isMaximized?: boolean
+  }>()
 
 const emit = defineEmits<{
   (e: "conversation-fetched", conversationId: number): void
   (e: "close-dialog"): void
   (e: "conversation-changed", conversationId: number): void
   (e: "new-conversation"): void
+  (e: "toggle-maximize"): void
 }>()
 
 const { managedApi } = useLoadingApi()

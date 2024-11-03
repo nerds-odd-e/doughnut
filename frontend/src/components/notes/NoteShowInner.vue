@@ -1,5 +1,8 @@
 <template>
   <div class="note-show-container">
+    <template
+      v-if="!conversationMaximized"
+    >
     <NoteToolbar
       v-if="!readonly"
       v-bind="{
@@ -12,7 +15,7 @@
       @edit-as-markdown="asMarkdown = $event"
       @show-conversations="showConversation = true"
     />
-    <div class="note-content-wrapper" :class="{ 'with-conversation': showConversation }">
+    <div class="note-content-wrapper" :class="{ 'with-conversation': showConversation, 'minimized': conversationMaximized }">
       <div id="main-note-content" class="col-md-9">
         <NoteTextContent
           v-bind="{
@@ -57,13 +60,15 @@
         </ul>
       </div>
     </div>
+    </template>
 
-    <div class="conversation-wrapper" v-if="showConversation">
+    <div class="conversation-wrapper" v-if="showConversation" :class="{ 'maximized': conversationMaximized }">
       <NoteConversation
-        v-if="showConversation"
         :note-id="noteRealm.id"
         :storage-accessor="storageAccessor"
+        :is-maximized="conversationMaximized"
         @close-dialog="showConversation = false"
+        @toggle-maximize="conversationMaximized = !conversationMaximized"
       />
     </div>
   </div>
@@ -97,6 +102,7 @@ const readonly = computed(() => !currentUser?.value)
 const updatedNoteAccessory = ref<NoteAccessory | undefined>(undefined)
 const asMarkdown = ref(false)
 const showConversation = ref(false)
+const conversationMaximized = ref(false)
 
 const toLocalDateString = (date: string) => {
   return new Date(date).toLocaleDateString()
@@ -133,5 +139,14 @@ const toLocalDateString = (date: string) => {
 
 .refers {
   border-left: 1px solid #e9ecef;
+}
+
+.note-content-wrapper.minimized {
+  height: 50px;
+  overflow: hidden;
+}
+
+.conversation-wrapper.maximized {
+  height: calc(100% - 50px);
 }
 </style>

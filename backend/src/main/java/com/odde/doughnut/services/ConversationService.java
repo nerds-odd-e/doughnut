@@ -10,6 +10,7 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import jakarta.annotation.Resource;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -70,7 +71,7 @@ public class ConversationService {
         .forEach(
             conversationMessage -> {
               if (!conversationMessage.getReadByReceiver()
-                  && !conversationMessage.getSender().equals(user)) {
+                  && !Objects.equals(conversationMessage.getSender(), user)) {
                 conversationMessage.setReadByReceiver(true);
                 modelFactoryService.conversationMessageRepository.save(conversationMessage);
               }

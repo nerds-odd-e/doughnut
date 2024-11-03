@@ -1,7 +1,7 @@
 <template>
   <div class="conversation-container">
     <!-- Upper half -->
-    <div class="subject-container">
+    <div class="subject-container" v-if="!isMaximized">
       <NoteShow
         v-if="conversation.subject?.note?.id"
         v-bind="{
@@ -20,17 +20,19 @@
     </div>
 
     <!-- Lower half -->
-    <div class="conversation-messages">
+    <div class="conversation-messages" :class="{ 'maximized': isMaximized }">
       <ConversationInner
-        v-bind="{ 
-          conversation, 
+        v-bind="{
+          conversation,
           conversations,
-          user, 
-          storageAccessor 
+          user,
+          storageAccessor,
+          isMaximized
         }"
         @conversation-fetched="emit('conversation-fetched', $event)"
         @conversation-changed="handleConversationChange"
         @close-dialog="handleCloseDialog"
+        @toggle-maximize="isMaximized = !isMaximized"
       />
     </div>
   </div>
@@ -60,6 +62,7 @@ const emit = defineEmits<{
 const router = useRouter()
 const { managedApi } = useLoadingApi()
 const conversations = ref<Conversation[]>([])
+const isMaximized = ref(false)
 
 onMounted(async () => {
   if (props.conversation.subject?.note?.id) {
@@ -110,6 +113,15 @@ const handleCloseDialog = () => {
   flex-direction: column;
   background-color: #f8f9fa;
   min-height: 0;
+}
+
+.subject-container.minimized {
+  height: 50px;
+  overflow: hidden;
+}
+
+.conversation-messages.maximized {
+  height: calc(100% - 50px);
 }
 
 </style>
