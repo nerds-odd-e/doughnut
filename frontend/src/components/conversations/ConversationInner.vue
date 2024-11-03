@@ -36,7 +36,8 @@
             conversationMessage.sender?.id === undefined ? 'ai-chat' : '',
           ]"
         >
-          {{ formatMessage(conversationMessage.message) }}
+          <pre v-if="isCurrentUser(conversationMessage.sender?.id || 0)" class="user-message">{{ formatMessage(conversationMessage.message) }}</pre>
+          <div v-else v-html="markdowntToHtml(formatMessage(conversationMessage.message))" />
         </div>
       </div>
 
@@ -228,5 +229,12 @@ const handleSendMessageAndInviteAI = async (message: string) => {
   background-color: #f8f9fa;
   padding: 0.5rem;
   border-radius: 0.25rem;
+}
+
+.user-message {
+  margin: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-family: inherit;
 }
 </style>

@@ -179,4 +179,32 @@ describe("ConversationInner", () => {
       })
     })
   })
+
+  describe("Message formatting", () => {
+    it("renders user messages in pre tags", async () => {
+      const messages: ConversationMessage[] = [
+        { id: 1, message: "Hello\nWorld", sender: user },
+      ]
+      wrapper.vm.currentConversationMessages = messages
+      await wrapper.vm.$nextTick()
+
+      const userMessage = wrapper.find(".user-message")
+      expect(userMessage.exists()).toBe(true)
+      expect(userMessage.element.tagName).toBe("PRE")
+      expect(userMessage.text()).toBe("Hello\nWorld")
+    })
+
+    it("renders AI messages as markdown HTML", async () => {
+      const messages: ConversationMessage[] = [
+        { id: 2, message: "## Hello\n**World**", sender: undefined },
+      ]
+      wrapper.vm.currentConversationMessages = messages
+      await wrapper.vm.$nextTick()
+
+      const aiMessage = wrapper.find(".ai-chat")
+      expect(aiMessage.exists()).toBe(true)
+      expect(aiMessage.find("h2").exists()).toBe(true)
+      expect(aiMessage.find("strong").exists()).toBe(true)
+    })
+  })
 })
