@@ -7,7 +7,6 @@ import com.odde.doughnut.services.ai.AssistantService;
 import com.theokanning.openai.assistants.message.Message;
 import com.theokanning.openai.service.assistant_stream.AssistantSSE;
 import io.reactivex.Flowable;
-import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import lombok.RequiredArgsConstructor;
@@ -18,10 +17,6 @@ public class ChatAboutNoteService {
   private final String threadId;
   private final AssistantService assistantService;
   private final ModelFactoryService modelFactoryService;
-
-  public List<Message> getMessageList() {
-    return assistantService.loadPreviousMessages(threadId);
-  }
 
   public SseEmitter getAIReplySSE() {
     Flowable<AssistantSSE> runStream = assistantService.getRunStream(threadId);

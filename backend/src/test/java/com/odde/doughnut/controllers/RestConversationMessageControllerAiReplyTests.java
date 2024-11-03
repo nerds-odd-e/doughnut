@@ -120,17 +120,6 @@ public class RestConversationMessageControllerAiReplyTests {
     }
 
     @Test
-    void shouldPersistThreadIdWhenStartingNewChat()
-        throws UnexpectedNoAccessRightException, BadRequestException {
-      long oldCount = makeMe.modelFactoryService.userAssistantThreadRepository.count();
-
-      controller.getAiReply(conversation);
-
-      long newCount = makeMe.modelFactoryService.userAssistantThreadRepository.count();
-      assertThat(newCount).isEqualTo(oldCount + 1);
-    }
-
-    @Test
     void chatWithUseTheChatAssistant()
         throws UnexpectedNoAccessRightException, BadRequestException {
       GlobalSettingsService globalSettingsService =

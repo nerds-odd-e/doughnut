@@ -2,15 +2,12 @@ package com.odde.doughnut.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.*;
-import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.NotebookAssistant;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorWithStorageService;
-import com.odde.doughnut.services.ai.AssistantService;
 import com.odde.doughnut.testability.TestabilitySettings;
-import com.theokanning.openai.assistants.message.Message;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import java.io.IOException;
@@ -41,22 +38,6 @@ public class RestAiController {
     this.aiAdvisorWithStorageService = aiAdvisorWithStorageService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
-  }
-
-  @GetMapping("/chat/{note}")
-  public List<Message> tryRestoreChat(
-      @PathVariable(value = "note") @Schema(type = "integer") Note note)
-      throws UnexpectedNoAccessRightException {
-    currentUser.assertReadAuthorization(note);
-    String threadId =
-        aiAdvisorWithStorageService.getExistingThreadId(currentUser.getEntity(), note);
-    if (threadId == null) {
-      return List.of();
-    }
-    AssistantService assistantService = aiAdvisorWithStorageService.getChatAssistantService(note);
-    return aiAdvisorWithStorageService
-        .getChatAboutNoteService(threadId, assistantService)
-        .getMessageList();
   }
 
   @GetMapping("/dummy")

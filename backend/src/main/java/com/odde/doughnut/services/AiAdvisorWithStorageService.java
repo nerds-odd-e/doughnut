@@ -23,24 +23,8 @@ public final class AiAdvisorWithStorageService {
   @Getter private final AiAdvisorService aiAdvisorService;
   private final ModelFactoryService modelFactoryService;
 
-  public String getExistingThreadId(User user, Note note) {
-    UserAssistantThread byUserAndNote =
-        modelFactoryService.userAssistantThreadRepository.findByUserAndNote(user, note);
-    String threadId = null;
-    if (byUserAndNote != null) {
-      threadId = byUserAndNote.getThreadId();
-    }
-    return threadId;
-  }
-
-  public String createThread(User user, AssistantService assistantService, Note note) {
-    String threadId = assistantService.createThread(note);
-    UserAssistantThread userAssistantThread = new UserAssistantThread();
-    userAssistantThread.setThreadId(threadId);
-    userAssistantThread.setNote(note);
-    userAssistantThread.setUser(user);
-    modelFactoryService.entityManager.persist(userAssistantThread);
-    return threadId;
+  public String createThread(AssistantService assistantService, Note note) {
+    return assistantService.createThread(note);
   }
 
   public ChatAboutNoteService getChatAboutNoteService(
@@ -138,7 +122,7 @@ public final class AiAdvisorWithStorageService {
     AssistantService assistantService = getChatAssistantService(note);
 
     if (threadId == null) {
-      threadId = createThread(note.getCreator(), assistantService, note);
+      threadId = createThread(assistantService, note);
       conversationService.setConversationAiAssistantThreadId(conversation, threadId);
     }
 

@@ -7,7 +7,6 @@ import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.assistants.assistant.*;
-import com.theokanning.openai.assistants.message.Message;
 import com.theokanning.openai.assistants.message.MessageRequest;
 import com.theokanning.openai.assistants.run.RequiredAction;
 import com.theokanning.openai.assistants.run.Run;
@@ -149,9 +148,5 @@ public record AssistantService(
 
     actionRequired.setToolCallId(toolCall.getId());
     return actionRequired;
-  }
-
-  public List<Message> loadPreviousMessages(String threadId) {
-    return openAiApiHandler.getThreadMessages(threadId, null);
   }
 }
