@@ -78,6 +78,11 @@ public record AssistantService(
     openAiApiHandler.createMessage(threadId, messageRequest);
   }
 
+  public void createAssistantMessage(String msg, String threadId) {
+    MessageRequest messageRequest = MessageRequest.builder().role("assistant").content(msg).build();
+    openAiApiHandler.createMessage(threadId, messageRequest);
+  }
+
   public String createThread(Note note) {
     ThreadRequest threadRequest =
         ThreadRequest.builder()

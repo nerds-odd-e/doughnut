@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.odde.doughnut.entities.Conversation;
@@ -9,6 +10,7 @@ import com.odde.doughnut.entities.ConversationMessage;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NotebookAssistant;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.odde.doughnut.services.AiAdvisorWithStorageService;
@@ -54,18 +56,22 @@ public class RestConversationMessageControllerAiReplyTests {
   AiAdvisorWithStorageService aiAdvisorWithStorageService;
   private ConversationService conversationService;
   Conversation conversation;
+  Timestamp currentUTCTimestamp;
 
   @BeforeEach
   void setUp() {
+    testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(0, 0).please());
+    currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
+    Timestamp oneHourAgo = TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, -1);
+    currentUser = makeMe.aUser().toModelPlease();
+    note = makeMe.aNote().creatorAndOwner(currentUser).updatedAt(oneHourAgo).please();
     aiAdvisorService = new AiAdvisorService(openAiApi);
     aiAdvisorWithStorageService =
         new AiAdvisorWithStorageService(aiAdvisorService, makeMe.modelFactoryService);
     conversationService = new ConversationService(testabilitySettings, makeMe.modelFactoryService);
-    currentUser = makeMe.aUser().toModelPlease();
     controller =
         new RestConversationMessageController(
             currentUser, conversationService, aiAdvisorWithStorageService);
-    note = makeMe.aNote().creatorAndOwner(currentUser).please();
     openAIAssistantMocker = new OpenAIAssistantMocker(openAiApi);
     conversation = makeMe.aConversation().forANote(note).from(currentUser).please();
   }
@@ -161,7 +167,6 @@ public class RestConversationMessageControllerAiReplyTests {
     @Test
     void itShouldPersistThreadIdInConversation()
         throws UnexpectedNoAccessRightException, BadRequestException {
-      testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
       assertThat(conversation.getAiAssistantThreadId()).isNull();
       assertThat(conversation.getLastAiAssistantThreadSync()).isNull();
 
@@ -175,8 +180,7 @@ public class RestConversationMessageControllerAiReplyTests {
     @Test
     void shouldUpdateSyncTimestampWhenAIMessageIsAdded()
         throws UnexpectedNoAccessRightException, BadRequestException {
-      Timestamp threadCreateTime = makeMe.aTimestamp().please();
-      conversation.setLastAiAssistantThreadSync(threadCreateTime);
+      conversation.setLastAiAssistantThreadSync(currentUTCTimestamp);
       conversation.setAiAssistantThreadId("my-thread");
       makeMe.modelFactoryService.save(conversation);
       testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(1, 1).please());
@@ -184,15 +188,14 @@ public class RestConversationMessageControllerAiReplyTests {
 
       makeMe.refresh(conversation);
       // Verify timestamp was updated to the new time when AI message was added
-      assertThat(conversation.getLastAiAssistantThreadSync()).isNotEqualTo(threadCreateTime);
+      assertThat(conversation.getLastAiAssistantThreadSync()).isNotEqualTo(currentUTCTimestamp);
     }
 
     @Test
     void shouldSyncUnsentMessagesWithOpenAI()
         throws UnexpectedNoAccessRightException, BadRequestException {
       // Setup initial sync time
-      Timestamp initialSync = makeMe.aTimestamp().please();
-      conversation.setLastAiAssistantThreadSync(initialSync);
+      conversation.setLastAiAssistantThreadSync(currentUTCTimestamp);
       conversation.setAiAssistantThreadId("my-thread");
 
       // Add some messages after the sync
@@ -221,7 +224,7 @@ public class RestConversationMessageControllerAiReplyTests {
     void shouldSaySomethingWhenNoNewMessages()
         throws UnexpectedNoAccessRightException, BadRequestException {
       // Set sync time to current time so there are no unsent messages
-      conversation.setLastAiAssistantThreadSync(testabilitySettings.getCurrentUTCTimestamp());
+      conversation.setLastAiAssistantThreadSync(currentUTCTimestamp);
       conversation.setAiAssistantThreadId("my-thread");
 
       controller.getAiReply(conversation);
@@ -252,6 +255,71 @@ public class RestConversationMessageControllerAiReplyTests {
       ArgumentCaptor<MessageRequest> captor = ArgumentCaptor.forClass(MessageRequest.class);
       verify(openAiApi).createMessage(any(), captor.capture());
       assertThat(captor.getValue().getContent().toString()).isEqualTo("just say something.");
+    }
+  }
+
+  @Nested
+  class NoteUpdateSync {
+    @BeforeEach
+    void setUp() {
+      openAIAssistantMocker
+          .aThread("existing-thread-id")
+          .mockCreateMessage()
+          .andARunStream("my-run-id")
+          .withMessageDeltas("I'm", " Chatbot")
+          .mockTheRunStream();
+
+      conversation.setAiAssistantThreadId("existing-thread-id");
+    }
+
+    @Test
+    void shouldSendNoteUpdateMessageWhenNoteIsUpdatedAfterLastSync()
+        throws UnexpectedNoAccessRightException, BadRequestException {
+      conversation.setLastAiAssistantThreadSync(currentUTCTimestamp);
+
+      makeMe
+          .theNote(note)
+          .details("Updated content")
+          .updatedAt(makeMe.aTimestamp().of(0, 1).please())
+          .please();
+
+      controller.getAiReply(conversation);
+
+      // Verify the note update message was sent
+      ArgumentCaptor<MessageRequest> captor = ArgumentCaptor.forClass(MessageRequest.class);
+      verify(openAiApi, times(2)).createMessage(any(), captor.capture());
+
+      List<MessageRequest> messages = captor.getAllValues();
+      String expectedUpdateMessage =
+          String.format("The note content has been update:%n%n%s", note.getNoteDescription());
+      assertThat(messages.get(0).getContent()).isEqualTo(expectedUpdateMessage);
+      assertThat(messages.get(0).getRole()).isEqualTo("assistant");
+    }
+
+    @Test
+    void shouldNotSendNoteUpdateMessageWhenNoteIsNotUpdated()
+        throws UnexpectedNoAccessRightException, BadRequestException {
+      conversation.setLastAiAssistantThreadSync(testabilitySettings.getCurrentUTCTimestamp());
+
+      controller.getAiReply(conversation);
+
+      // Verify only the default message was sent
+      ArgumentCaptor<MessageRequest> captor = ArgumentCaptor.forClass(MessageRequest.class);
+      verify(openAiApi).createMessage(any(), captor.capture());
+      assertThat(captor.getValue().getContent()).isEqualTo("just say something.");
+    }
+
+    @Test
+    void shouldNotSendNoteUpdateMessageWhenLastSyncIsNull()
+        throws UnexpectedNoAccessRightException, BadRequestException {
+      conversation.setLastAiAssistantThreadSync(null);
+
+      controller.getAiReply(conversation);
+
+      // Verify only the default message was sent
+      ArgumentCaptor<MessageRequest> captor = ArgumentCaptor.forClass(MessageRequest.class);
+      verify(openAiApi).createMessage(any(), captor.capture());
+      assertThat(captor.getValue().getContent()).isEqualTo("just say something.");
     }
   }
 }

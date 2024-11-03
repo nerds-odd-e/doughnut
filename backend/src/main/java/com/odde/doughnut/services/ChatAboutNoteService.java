@@ -60,4 +60,12 @@ public class ChatAboutNoteService {
   public void onMessageCompleted(Consumer<Message> callback) {
     this.messageCompletedCallback = callback;
   }
+
+  public void sendNoteUpdateMessageIfNeeded(Note note, Conversation conversation) {
+    if (conversation.getLastAiAssistantThreadSync() != null
+        && note.getUpdatedAt().after(conversation.getLastAiAssistantThreadSync())) {
+      assistantService.createAssistantMessage(
+          "The note content has been update:\n\n%s".formatted(note.getNoteDescription()), threadId);
+    }
+  }
 }

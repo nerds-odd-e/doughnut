@@ -143,6 +143,7 @@ public final class AiAdvisorWithStorageService {
     }
 
     ChatAboutNoteService chatService = getChatAboutNoteService(threadId, assistantService);
+    chatService.sendNoteUpdateMessageIfNeeded(note, conversation);
     sendUnsentMessagesToAI(conversation, chatService);
     conversationService.updateLastAiAssistantThreadSync(conversation);
 
