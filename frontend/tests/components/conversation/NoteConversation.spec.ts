@@ -40,7 +40,7 @@ describe("NoteConversation", () => {
       vi.fn().mockResolvedValue([])
     const wrapper = await mount()
     await wrapper.find("textarea").setValue("Hello")
-    await wrapper.find("form.chat-input-form").trigger("submit")
+    await wrapper.find("button.send-button[type='button']").trigger("click")
     await flushPromises()
 
     expect(
@@ -131,7 +131,7 @@ describe("NoteConversation", () => {
 
     // Start new conversation
     await wrapper.find("textarea").setValue("New conversation message")
-    await wrapper.find("form.chat-input-form").trigger("submit")
+    await wrapper.find("button.send-button[type='button']").trigger("click")
     await flushPromises()
 
     // Verify API was called
@@ -154,7 +154,7 @@ describe("NoteConversation", () => {
 
     // Trigger send message with AI invite
     await wrapper.find("textarea").setValue("Hello AI")
-    await wrapper.find("button.with-ai").trigger("click")
+    await wrapper.find("form.chat-input-form").trigger("submit")
     await flushPromises()
 
     // Verify conversation was started
@@ -186,7 +186,7 @@ describe("NoteConversation", () => {
     const wrapper = await mount()
 
     await wrapper.find("textarea").setValue("Hello AI")
-    await wrapper.find("button.with-ai").trigger("click")
+    await wrapper.find("form.chat-input-form").trigger("submit")
     await flushPromises()
 
     // Verify message was sent

@@ -26,6 +26,7 @@ import java.lang.reflect.Field;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Set;
+import org.apache.coyote.BadRequestException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -98,7 +99,7 @@ public class RestConversationMessageControllerAiReplyTests {
     }
 
     @Test
-    void chatWithAIAndGetResponse() throws UnexpectedNoAccessRightException {
+    void chatWithAIAndGetResponse() throws UnexpectedNoAccessRightException, BadRequestException {
       SseEmitter res = controller.getAiReply(conversation);
       assertThat(res.getTimeout()).isNull();
       List<ResponseBodyEmitter.DataWithMediaType> events =
@@ -107,7 +108,7 @@ public class RestConversationMessageControllerAiReplyTests {
     }
 
     @Test
-    void itWillPersistTheThreadId() throws UnexpectedNoAccessRightException {
+    void itWillPersistTheThreadId() throws UnexpectedNoAccessRightException, BadRequestException {
       long oldCount = makeMe.modelFactoryService.userAssistantThreadRepository.count();
       controller.getAiReply(conversation);
       long newCount = makeMe.modelFactoryService.userAssistantThreadRepository.count();
@@ -115,7 +116,8 @@ public class RestConversationMessageControllerAiReplyTests {
     }
 
     @Test
-    void chatWithUseTheChatAssistant() throws UnexpectedNoAccessRightException {
+    void chatWithUseTheChatAssistant()
+        throws UnexpectedNoAccessRightException, BadRequestException {
       GlobalSettingsService globalSettingsService =
           new GlobalSettingsService(makeMe.modelFactoryService);
       globalSettingsService
@@ -128,7 +130,8 @@ public class RestConversationMessageControllerAiReplyTests {
     }
 
     @Test
-    void chatWithUseTheNotebookChatAssistantIfExisting() throws UnexpectedNoAccessRightException {
+    void chatWithUseTheNotebookChatAssistantIfExisting()
+        throws UnexpectedNoAccessRightException, BadRequestException {
       NotebookAssistant notebookAssistant = new NotebookAssistant();
       notebookAssistant.setAssistantId("notebook-assistant");
       notebookAssistant.setNotebook(note.getNotebook());
@@ -144,7 +147,7 @@ public class RestConversationMessageControllerAiReplyTests {
 
     @Test
     void shouldAddMessageToConversationWhenMessageCompleted()
-        throws UnexpectedNoAccessRightException {
+        throws UnexpectedNoAccessRightException, BadRequestException {
       int initialMessageCount = conversation.getConversationMessages().size();
 
       controller.getAiReply(conversation);
@@ -153,15 +156,13 @@ public class RestConversationMessageControllerAiReplyTests {
       assertThat(conversation.getConversationMessages().size()).isEqualTo(initialMessageCount + 1);
 
       // Verify the content of the added message
-      ConversationMessage lastMessage =
-          conversation
-              .getConversationMessages()
-              .get(conversation.getConversationMessages().size() - 1);
+      ConversationMessage lastMessage = conversation.getConversationMessages().getLast();
       assertThat(lastMessage.getSender()).isNull(); // AI message should have no user
     }
 
     @Test
-    void itShouldPersistThreadIdInConversation() throws UnexpectedNoAccessRightException {
+    void itShouldPersistThreadIdInConversation()
+        throws UnexpectedNoAccessRightException, BadRequestException {
       testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
       assertThat(conversation.getAiAssistantThreadId()).isNull();
       assertThat(conversation.getLastAiAssistantThreadSync()).isNull();
@@ -174,7 +175,8 @@ public class RestConversationMessageControllerAiReplyTests {
     }
 
     @Test
-    void shouldUpdateSyncTimestampWhenAIMessageIsAdded() throws UnexpectedNoAccessRightException {
+    void shouldUpdateSyncTimestampWhenAIMessageIsAdded()
+        throws UnexpectedNoAccessRightException, BadRequestException {
       Timestamp threadCreateTime = makeMe.aTimestamp().please();
       conversation.setLastAiAssistantThreadSync(threadCreateTime);
       conversation.setAiAssistantThreadId("my-thread");
@@ -188,7 +190,8 @@ public class RestConversationMessageControllerAiReplyTests {
     }
 
     @Test
-    void shouldSyncUnsentMessagesWithOpenAI() throws UnexpectedNoAccessRightException {
+    void shouldSyncUnsentMessagesWithOpenAI()
+        throws UnexpectedNoAccessRightException, BadRequestException {
       // Setup initial sync time
       Timestamp initialSync = makeMe.aTimestamp().please();
       conversation.setLastAiAssistantThreadSync(initialSync);
@@ -217,7 +220,8 @@ public class RestConversationMessageControllerAiReplyTests {
     }
 
     @Test
-    void shouldSaySomethingWhenNoNewMessages() throws UnexpectedNoAccessRightException {
+    void shouldSaySomethingWhenNoNewMessages()
+        throws UnexpectedNoAccessRightException, BadRequestException {
       // Set sync time to current time so there are no unsent messages
       conversation.setLastAiAssistantThreadSync(testabilitySettings.getCurrentUTCTimestamp());
       conversation.setAiAssistantThreadId("my-thread");
@@ -244,7 +248,7 @@ public class RestConversationMessageControllerAiReplyTests {
     }
 
     @Test
-    void continueChat() throws UnexpectedNoAccessRightException {
+    void continueChat() throws UnexpectedNoAccessRightException, BadRequestException {
       conversation.setAiAssistantThreadId("existing-thread-id");
       controller.getAiReply(conversation);
       ArgumentCaptor<MessageRequest> captor = ArgumentCaptor.forClass(MessageRequest.class);
