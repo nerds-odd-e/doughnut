@@ -1,6 +1,5 @@
 package com.odde.doughnut.controllers;
 
-import static com.odde.doughnut.services.ai.tools.AiToolFactory.COMPLETE_NOTE_DETAILS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -8,25 +7,16 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.odde.doughnut.controllers.dto.AiAssistantResponse;
-import com.odde.doughnut.controllers.dto.AiCompletionParams;
 import com.odde.doughnut.controllers.dto.ToolCallResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.odde.doughnut.services.AiAdvisorWithStorageService;
-import com.odde.doughnut.services.GlobalSettingsService;
-import com.odde.doughnut.services.ai.NoteDetailsCompletion;
 import com.odde.doughnut.testability.MakeMe;
-import com.odde.doughnut.testability.OpenAIAssistantMocker;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.OpenAiResponse;
-import com.theokanning.openai.assistants.message.MessageRequest;
 import com.theokanning.openai.assistants.run.Run;
-import com.theokanning.openai.assistants.run.RunCreateRequest;
-import com.theokanning.openai.assistants.thread.ThreadRequest;
 import com.theokanning.openai.client.OpenAiApi;
-import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.image.Image;
 import com.theokanning.openai.image.ImageResult;
 import com.theokanning.openai.model.Model;
@@ -36,7 +26,6 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,88 +58,6 @@ class RestAiControllerTest {
     note = makeMe.aNote().please();
     controller =
         new RestAiController(aiAdvisorWithStorageService, currentUser, testabilitySettings);
-  }
-
-  @Nested
-  class AutoCompleteNoteDetails {
-    AiCompletionParams params = new AiCompletionParams();
-    ArgumentCaptor<ChatCompletionRequest> captor =
-        ArgumentCaptor.forClass(ChatCompletionRequest.class);
-    OpenAIAssistantMocker openAIAssistantMocker;
-
-    @BeforeEach
-    void setup() {
-      Note cosmos = makeMe.aNote("cosmos").please();
-      Note solar = makeMe.aNote("solar system").under(cosmos).please();
-      note = makeMe.aNote("Earth").under(solar).please();
-      openAIAssistantMocker = new OpenAIAssistantMocker(openAiApi);
-    }
-
-    @Test
-    void askWithNoteThatCannotAccess() {
-      assertThrows(
-          ResponseStatusException.class,
-          () ->
-              new RestAiController(
-                      aiAdvisorWithStorageService,
-                      makeMe.aNullUserModelPlease(),
-                      testabilitySettings)
-                  .getCompletion(note, params));
-    }
-
-    @Nested
-    class StartACompletionThread {
-      @BeforeEach
-      void setup() {
-        openAIAssistantMocker
-            .mockThreadCreation("this-thread")
-            .mockCreateMessage()
-            .mockCreateRunInProcess("my-run-id")
-            .aRunThatRequireAction(new NoteDetailsCompletion("blue planet"), COMPLETE_NOTE_DETAILS)
-            .mockRetrieveRun();
-      }
-
-      @Test
-      void useTheCorrectAssistant() {
-        new GlobalSettingsService(makeMe.modelFactoryService)
-            .noteCompletionAssistantId()
-            .setKeyValue(makeMe.aTimestamp().please(), "my-assistant-id");
-        controller.getCompletion(note, params);
-        ArgumentCaptor<RunCreateRequest> runRequest =
-            ArgumentCaptor.forClass(RunCreateRequest.class);
-        verify(openAiApi).createRun(any(), runRequest.capture());
-        assertEquals("my-assistant-id", runRequest.getValue().getAssistantId());
-      }
-
-      @Test
-      void mustCreateANewThreadIfNoThreadIDGiven() {
-        AiAssistantResponse aiAssistantResponse = controller.getCompletion(note, params);
-        assertEquals("this-thread", aiAssistantResponse.getThreadId());
-        assertEquals("my-run-id", aiAssistantResponse.getRunId());
-      }
-
-      @Test
-      void mustPutNoteInformInMessageWhenCreatethThread() {
-        ArgumentCaptor<ThreadRequest> captor = ArgumentCaptor.forClass(ThreadRequest.class);
-        controller.getCompletion(note, params);
-        verify(openAiApi, times(1)).createThread(captor.capture());
-        assertThat(captor.getAllValues().get(0).getMessages().getFirst().getContent().toString())
-            .contains("only call");
-        assertThat(captor.getAllValues().get(0).getMessages().get(1).getContent().toString())
-            .contains("cosmos › solar system");
-      }
-
-      @Test
-      void mustCreateMessageToRequestCompletion() {
-        ArgumentCaptor<MessageRequest> captor = ArgumentCaptor.forClass(MessageRequest.class);
-        controller.getCompletion(note, params);
-        verify(openAiApi, times(1)).createMessage(any(), captor.capture());
-        assertThat(captor.getAllValues().get(0).getContent().toString())
-            .contains(" \"details_to_complete\" : \"\"");
-        assertThat(captor.getAllValues().get(0).getContent().toString())
-            .contains("Don't make assumptions");
-      }
-    }
   }
 
   @Nested

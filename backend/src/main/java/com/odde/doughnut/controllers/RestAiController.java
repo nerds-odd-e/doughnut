@@ -43,17 +43,6 @@ public class RestAiController {
     this.testabilitySettings = testabilitySettings;
   }
 
-  @PostMapping("/{note}/completion")
-  @Transactional
-  public AiAssistantResponse getCompletion(
-      @PathVariable(name = "note") @Schema(type = "integer") Note note,
-      @RequestBody AiCompletionParams aiCompletionParams) {
-    currentUser.assertLoggedIn();
-    return aiAdvisorWithStorageService
-        .getContentCompletionService()
-        .createThreadAndRunWithFirstMessage(note, aiCompletionParams.getCompletionPrompt());
-  }
-
   @GetMapping("/chat/{note}")
   public List<Message> tryRestoreChat(
       @PathVariable(value = "note") @Schema(type = "integer") Note note)

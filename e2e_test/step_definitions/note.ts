@@ -384,13 +384,6 @@ Then('I should find an art created by the ai', () => {
 Given(
   'I request to complete the details for the note {string}',
   (noteTopic: string) => {
-    start.jumpToNotePage(noteTopic).aiSuggestDetailsForNote()
-  }
-)
-
-Given(
-  'I request to complete the details for the note {string} new',
-  (noteTopic: string) => {
     start
       .jumpToNotePage(noteTopic)
       .startAConversationAboutNote()

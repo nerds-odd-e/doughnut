@@ -9,7 +9,6 @@
       </NoteNewButton>
 
       <WikidataButton v-bind="{ note, storageAccessor }" />
-      <NoteDetailsAutoCompletionButton v-bind="{ note, storageAccessor }" />
 
       <NoteSendMessageButton
         v-if="!conversationButton"
@@ -141,7 +140,6 @@ import SvgCog from "../../svgs/SvgCog.vue"
 import NoteDeleteButton from "./NoteDeleteButton.vue"
 import PopButton from "../../commons/Popups/PopButton.vue"
 import AIGenerateImageDialog from "../AIGenerateImageDialog.vue"
-import NoteDetailsAutoCompletionButton from "./NoteDetailsAutoCompletionButton.vue"
 import NoteTestMeDialog from "../NoteTestMeDialog.vue"
 import Questions from "../Questions.vue"
 import NoteInfoBar from "../NoteInfoBar.vue"

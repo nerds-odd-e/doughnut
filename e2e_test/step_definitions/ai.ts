@@ -60,23 +60,6 @@ Then('I contest the question', () => {
 })
 
 Given(
-  'the OpenAI assistant will create a thread and request for the following actions:',
-  (data: DataTable) => {
-    mock_services
-      .openAi()
-      .stubCreateThread('thread-abc123')
-      .stubCreateRuns('thread-abc123', ['run-run-id'])
-      .stubCreateMessage({
-        role: 'user',
-        content: 'Please complete',
-      })
-      .aRun('run-run-id')
-      .stubRetrieveRunsThatRequireAction(data.hashes())
-      .stubSubmitToolOutputs()
-  }
-)
-
-Given(
   'OpenAI assistant will reply below for user messages:',
   (data: DataTable) => {
     mock_services

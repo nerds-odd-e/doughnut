@@ -11,20 +11,13 @@ Feature: Note details completion
 
   Scenario: OpenAI Service Unavailability
     Given the OpenAI service is unavailable due to invalid system token
-    When I request to complete the details for the note "Taipei" new
+    When I request to complete the details for the note "Taipei"
     Then I should see a notification of a bad request
 
   Scenario: Completing Note Details Using OpenAI
-    Given the OpenAI assistant will create a thread and request for the following actions:
-      | response              | arguments         |
-      | complete note details | " vigorous city." |
-    When I request to complete the details for the note "Taipei"
-    Then the note details on the current page should be "It is a vigorous city."
-
-  Scenario: Completing Note Details Using OpenAI (new)
     Given OpenAI assistant will reply below for user messages:
       | user message                      | response type   | assistant reply                 | run id |
       | Please complete the note details. | requires action | {"completion": " vigorous city."} | run1   |
     And OpenAI assistant can accept tool call results submission
-    When I request to complete the details for the note "Taipei" new
+    When I request to complete the details for the note "Taipei"
     Then the note details on the current page should be "It is a vigorous city."

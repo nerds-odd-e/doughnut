@@ -2,8 +2,6 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { AiAssistantResponse } from '../models/AiAssistantResponse';
-import type { AiCompletionParams } from '../models/AiCompletionParams';
 import type { AiGeneratedImage } from '../models/AiGeneratedImage';
 import type { DummyForGeneratingTypes } from '../models/DummyForGeneratingTypes';
 import type { Message } from '../models/Message';
@@ -14,29 +12,6 @@ import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestAiControllerService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
-    /**
-     * @param note
-     * @param requestBody
-     * @returns AiAssistantResponse OK
-     * @throws ApiError
-     */
-    public getCompletion(
-        note: number,
-        requestBody: AiCompletionParams,
-    ): CancelablePromise<AiAssistantResponse> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/api/ai/{note}/completion',
-            path: {
-                'note': note,
-            },
-            body: requestBody,
-            mediaType: 'application/json',
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
     /**
      * @param threadId
      * @param runId

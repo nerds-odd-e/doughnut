@@ -227,12 +227,6 @@ export const assumeNotePage = (noteTopic?: string) => {
     expectQuestionsInList(expectedQuestions: Record<string, string>[]) {
       this.openQuestionList().expectQuestion(expectedQuestions)
     },
-    aiSuggestDetailsForNote: () => {
-      cy.on('uncaught:exception', () => {
-        return false
-      })
-      cy.findByRole('button', { name: 'auto-complete details' }).click()
-    },
     testMe() {
       clickNotePageMoreOptionsButton('Test me')
       cy.pageIsNotLoading() // wait for the response

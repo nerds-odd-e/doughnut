@@ -10,9 +10,6 @@ export { CancelablePromise, CancelError } from './core/CancelablePromise';
 export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
-export type { AiAssistantResponse } from './models/AiAssistantResponse';
-export type { AiCompletionParams } from './models/AiCompletionParams';
-export type { AiCompletionRequiredAction } from './models/AiCompletionRequiredAction';
 export type { AiGeneratedImage } from './models/AiGeneratedImage';
 export type { Annotation } from './models/Annotation';
 export type { Answer } from './models/Answer';

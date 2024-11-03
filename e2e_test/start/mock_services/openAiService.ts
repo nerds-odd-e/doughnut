@@ -50,7 +50,7 @@ const openAiService = () => {
 
     stubToolCallSubmission() {
       return serviceMocker.stubPoster(
-        `/threads/.*/runs/.*/submit_tool_outputs`,
+        `/threads/undefined/runs/run1/submit_tool_outputs`,
         {}
       )
     },
