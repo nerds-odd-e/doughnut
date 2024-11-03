@@ -158,14 +158,12 @@ const getAiReply = async () => {
         const response = JSON.parse(data) as Message
         response.content = [{ text: { value: "" } }]
         currentAiReply.value = response.content?.[0]?.text?.value
-      }
-      else if (event === "thread.message.delta") {
+      } else if (event === "thread.message.delta") {
         aiStatus.value = "Writing response..."
         const response = JSON.parse(data) as MessageDelta
         const delta = response.delta?.content?.[0]?.text?.value
         currentAiReply.value = currentAiReply.value! + delta
-      }
-      else if (event === "thread.run.requires_action") {
+      } else if (event === "thread.run.requires_action") {
         aiStatus.value = "Processing actions..."
         const note = conversation.subject?.note
         if (!note) {
@@ -180,14 +178,12 @@ const getAiReply = async () => {
         storageAccessor
           .storedApi()
           .appendDetails(note.id, contentToAppend!.completion)
-      }
-      else if (event === "done") {
+      } else if (event === "done") {
         aiStatus.value = undefined
         fetchConversationMessages().then(() => {
           currentAiReply.value = undefined
         })
-      }
-      else {
+      } else {
         aiStatus.value = event
       }
     })
