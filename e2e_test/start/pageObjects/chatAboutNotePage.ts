@@ -13,7 +13,7 @@ export function assumeChatAboutNotePage() {
     expectMessages(messages: Record<'role' | 'message', string>[]) {
       messages.forEach(({ role, message }) => {
         cy.findByText(message, {
-          selector: role === 'user' ? '.card' : '.ai-chat',
+          selector: role === 'user' ? 'pre' : '.ai-chat *',
         })
       })
     },

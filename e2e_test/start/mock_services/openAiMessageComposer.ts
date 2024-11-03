@@ -1,7 +1,7 @@
 export type RunStreamData = {
   runId: string
   fullMessage: string
-  responseType?: 'requires action' | 'message delta'
+  responseType?: 'requires action' | 'message delta & complete'
 }
 
 export const createRequiresActionRun = (
@@ -41,9 +41,13 @@ function buildSSEEvent(runStreamData: RunStreamData): string {
 data: ${JSON.stringify(actionData)}
 `
   }
-  if (!responseType || responseType === 'message delta') {
+  if (!responseType || responseType === 'message delta & complete') {
     return `event: thread.message.delta
 data: {"delta": {"content": [{"index": 0, "type": "text", "text": {"value": "${fullMessage}"}}]}}
+
+event: thread.message.completed
+data: {"role":"assistant","content":[{"type":"text","text":{"value":"${fullMessage}"}}]}
+
 `
   }
 
@@ -61,6 +65,9 @@ data: {"thread_id": "${threadId}", "run_id": "${runId}", "role": "assistant", "c
 ${buildSSEEvent(runStreamData)}
 event: thread.run.step.completed
 data: {"run_id": "${runId}", "status": "completed"}
+
+event: done
+data: [DONE]
 
 `
 }
