@@ -44,9 +44,9 @@
         <div class="message-avatar me-2" title="AI Assistant">
           <SvgRobot />
         </div>
-        <div class="card py-2 px-3 bg-light ai-chat">
-          {{ formatMessage(currentAiReply) }}
-        </div>
+        <div class="card py-2 px-3 bg-light ai-chat"
+        v-html="markdowntToHtml(currentAiReply)"
+        />
       </div>
 
       <div v-if="lastErrorMessage" class="last-error-message text-danger mb-3">
@@ -82,6 +82,7 @@ import ScrollTo from "@/components/commons/ScrollTo.vue"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import SvgMissingAvatar from "@/components/svgs/SvgMissingAvatar.vue"
 import ConversationTemplate from "./ConversationTemplate.vue"
+import markdownizer from "../form/markdownizer"
 
 const { conversation, user, initialAiReply, storageAccessor } = defineProps<{
   conversation: Conversation
@@ -104,6 +105,9 @@ const { managedApi } = useLoadingApi()
 const currentConversationMessages = ref<ConversationMessage[] | undefined>(
   undefined
 )
+
+const markdowntToHtml = (content?: string) =>
+  markdownizer.markdownToHtml(content)
 
 const currentAiReply = ref<string | undefined>()
 

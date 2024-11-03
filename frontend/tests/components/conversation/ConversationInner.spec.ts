@@ -126,7 +126,9 @@ describe("ConversationInner", () => {
 
     simulateAiResponse()
 
-    expect(wrapper.vm.currentAiReply).toEqual("## I'm ChatGPT")
+    await flushPromises()
+
+    expect(wrapper.find(".ai-chat h2").text()).toEqual("I'm ChatGPT")
   })
 
   it("shows and updates status bar during AI reply", async () => {
