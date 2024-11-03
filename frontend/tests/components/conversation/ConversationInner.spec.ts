@@ -108,7 +108,7 @@ describe("ConversationInner", () => {
     ).toHaveBeenCalled()
   })
 
-  it.only("disables AI reply", async () => {
+  it("disables AI reply", async () => {
     helper.managedApi.eventSource.restConversationMessageController.getAiReply =
       vi.fn()
     const form = wrapper.find("form.chat-input-form")
@@ -123,5 +123,75 @@ describe("ConversationInner", () => {
     simulateAiResponse()
 
     expect(wrapper.vm.currentAiReply).toEqual("## I'm ChatGPT")
+  })
+
+  it("shows and updates status bar during AI reply", async () => {
+    helper.managedApi.eventSource.restConversationMessageController.getAiReply =
+      vi.fn()
+    const form = wrapper.find("form.chat-input-form")
+    const textarea = wrapper.find("textarea")
+    await textarea.setValue("Hello")
+    await form.trigger("submit")
+    await flushPromises()
+
+    // Check initial status
+    expect(wrapper.find(".status-bar").exists()).toBe(true)
+    expect(wrapper.find(".status-bar small").text()).toBe(
+      "Starting AI reply..."
+    )
+
+    // Simulate message created
+    helper.managedApi.eventSource.eventSourceRequest.onMessage(
+      "thread.message.created",
+      JSON.stringify({
+        role: "assistant",
+        thread_id: "test-thread-id",
+        content: [],
+      })
+    )
+    await wrapper.vm.$nextTick()
+    expect(wrapper.find(".status-bar small").text()).toBe(
+      "Generating response..."
+    )
+
+    // Simulate message delta
+    helper.managedApi.eventSource.eventSourceRequest.onMessage(
+      "thread.message.delta",
+      JSON.stringify({
+        delta: {
+          content: [{ text: { value: "Test" } }],
+        },
+      })
+    )
+    await wrapper.vm.$nextTick()
+    expect(wrapper.find(".status-bar small").text()).toBe("Writing response...")
+
+    // Simulate done event
+    helper.managedApi.eventSource.eventSourceRequest.onMessage("done", "")
+    await wrapper.vm.$nextTick()
+    expect(wrapper.find(".status-bar").exists()).toBe(false)
+  })
+
+  it("hides status bar on error", async () => {
+    helper.managedApi.eventSource.restConversationMessageController.getAiReply =
+      vi.fn()
+    const form = wrapper.find("form.chat-input-form")
+    const textarea = wrapper.find("textarea")
+    await textarea.setValue("Hello")
+    await form.trigger("submit")
+    await flushPromises()
+
+    expect(wrapper.find(".status-bar").exists()).toBe(true)
+    // Simulate error
+    const onError = helper.managedApi.eventSource.eventSourceRequest!.onError
+    if (!onError) {
+      throw new Error("onError is not defined")
+    }
+
+    onError(new Error("400 Bad Request"))
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.find(".status-bar").exists()).toBe(false)
+    expect(wrapper.find(".last-error-message").text()).toBe("Bad Request")
   })
 })

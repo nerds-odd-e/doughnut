@@ -53,7 +53,14 @@
         {{ lastErrorMessage }}
       </div>
 
-      <ScrollTo :scrollTrigger="currentConversationMessages.length + (currentAiReply ? currentAiReply.length : 0) + (lastErrorMessage ? 1 : 0)" />
+      <div v-if="aiStatus" class="d-flex align-items-center status-bar mb-3">
+        <div class="spinner-border spinner-border-sm me-2" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <small class="text-secondary">{{ aiStatus }}</small>
+      </div>
+
+      <ScrollTo :scrollTrigger="currentConversationMessages.length + (currentAiReply ? currentAiReply.length : 0) + (lastErrorMessage ? 1 : 0) + (aiStatus ? 1 : 0)" />
     </template>
   </ConversationTemplate>
 </template>
@@ -102,6 +109,8 @@ const currentAiReply = ref<string | undefined>()
 
 const lastErrorMessage = ref<string | undefined>()
 
+const aiStatus = ref<string | undefined>()
+
 const formatMessage = (message: string) => {
   return message.replace(/^"|"$/g, "").trim()
 }
@@ -136,19 +145,23 @@ const handleSendMessage = async (
 }
 
 const getAiReply = async () => {
+  aiStatus.value = "Starting AI reply..."
   await managedApi.eventSource
     .onMessage((event, data) => {
       if (event === "thread.message.created") {
+        aiStatus.value = "Generating response..."
         const response = JSON.parse(data) as Message
         response.content = [{ text: { value: "" } }]
         currentAiReply.value = response.content?.[0]?.text?.value
       }
       if (event === "thread.message.delta") {
+        aiStatus.value = "Writing response..."
         const response = JSON.parse(data) as MessageDelta
         const delta = response.delta?.content?.[0]?.text?.value
         currentAiReply.value = currentAiReply.value! + delta
       }
       if (event === "thread.run.requires_action") {
+        aiStatus.value = "Processing actions..."
         const note = conversation.subject?.note
         if (!note) {
           console.error("No note found in conversation")
@@ -164,12 +177,14 @@ const getAiReply = async () => {
           .appendDetails(note.id, contentToAppend!.completion)
       }
       if (event === "done") {
+        aiStatus.value = undefined
         fetchConversationMessages().then(() => {
           currentAiReply.value = undefined
         })
       }
     })
     .onError((e) => {
+      aiStatus.value = undefined
       const error = e as Error
       if (error.message.indexOf("400") !== -1) {
         lastErrorMessage.value = "Bad Request"
@@ -203,5 +218,11 @@ const handleSendMessageAndInviteAI = async (message: string) => {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.status-bar {
+  background-color: #f8f9fa;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
 }
 </style>
