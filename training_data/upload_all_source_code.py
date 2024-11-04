@@ -119,8 +119,8 @@ def main(assistant_id, project_dir, gitignore):
 # assistant_id = 'asst_4wvS7l1MYpjtjV72Ip9l37cs'
 assistant_id = 'asst_H4YJwXqLyOh6yNXim2L0lMHy'
 
-project_dir = '../../less_site'
-gitignore = '../../less_site/.gitignore'
+project_dir = '../'
+gitignore = '../.gitignore'
 
 if __name__ == "__main__":
     main(assistant_id, project_dir, gitignore)
