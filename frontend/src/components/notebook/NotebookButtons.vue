@@ -56,7 +56,6 @@ import SvgMoveToCircle from "@/components/svgs/SvgMoveToCircle.vue"
 import SvgRaiseHand from "@/components/svgs/SvgRaiseHand.vue"
 import type { Notebook, User } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import type { PropType } from "vue"
 import NotebookEditDialog from "./NotebookEditDialog.vue"
 import NotebookMoveDialog from "./NotebookMoveDialog.vue"
 import NotebookQuestionsDialog from "./NotebookQuestionsDialog.vue"
@@ -67,10 +66,11 @@ const { managedApi } = useLoadingApi()
 const router = useRouter()
 const { popups } = usePopups()
 
-const props = defineProps({
-  notebook: { type: Object as PropType<Notebook>, required: true },
-  user: { type: Object as PropType<User>, required: false },
-})
+const props = defineProps<{
+  notebook: Notebook
+  user?: User
+}>()
+
 const shareNotebook = async () => {
   if (await popups.confirm(`Confirm to share?`)) {
     await managedApi.restNotebookController.shareNotebook(props.notebook.id)
