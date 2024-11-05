@@ -15,11 +15,7 @@
             <NotebookButtons
               v-bind="{ notebook, user }"
               class="card-header-btn"
-            >
-              <template #additional-buttons>
-                <BazaarNotebookButtons :notebook="notebook" :logged-in="true" />
-              </template>
-            </NotebookButtons>
+            />
           </template>
         </NotebookCardsWithButtons>
       </main>
@@ -45,7 +41,6 @@
 </template>
 
 <script setup lang="ts">
-import BazaarNotebookButtons from "@/components/bazaar/BazaarNotebookButtons.vue"
 import NotebookButtons from "@/components/notebook/NotebookButtons.vue"
 import NotebookCardsWithButtons from "@/components/notebook/NotebookCardsWithButtons.vue"
 import NotebookNewButton from "@/components/notebook/NotebookNewButton.vue"

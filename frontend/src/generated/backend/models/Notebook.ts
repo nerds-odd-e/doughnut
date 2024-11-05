@@ -10,8 +10,8 @@ export type Notebook = {
     certifiable?: boolean;
     notebookSettings: NotebookSettings;
     creatorId?: string;
-    updated_at: string;
-    circle?: Circle;
     headNoteTopic: NoteTopic;
+    circle?: Circle;
+    updated_at: string;
 };
 

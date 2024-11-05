@@ -1,6 +1,6 @@
 <template>
   <div class="btn-group btn-group-sm">
-    <slot name="additional-buttons" />
+    <BazaarNotebookButtons v-if="notebook.circle" :notebook="notebook" :logged-in="true" />
     <PopButton title="Edit notebook settings">
       <template #button_face>
         <SvgEditNotebook />
@@ -60,6 +60,7 @@ import NotebookEditDialog from "./NotebookEditDialog.vue"
 import NotebookMoveDialog from "./NotebookMoveDialog.vue"
 import NotebookQuestionsDialog from "./NotebookQuestionsDialog.vue"
 import NotebookAssistantManagementDialog from "./NotebookAssistantManagementDialog.vue"
+import BazaarNotebookButtons from "@/components/bazaar/BazaarNotebookButtons.vue"
 import SvgRobot from "../svgs/SvgRobot.vue"
 
 const { managedApi } = useLoadingApi()

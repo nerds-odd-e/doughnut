@@ -3163,13 +3163,13 @@ components:
           $ref: "#/components/schemas/NotebookSettings"
         creatorId:
           type: string
+        headNoteTopic:
+          $ref: "#/components/schemas/NoteTopic"
+        circle:
+          $ref: "#/components/schemas/Circle"
         updated_at:
           type: string
           format: date-time
-        circle:
-          $ref: "#/components/schemas/Circle"
-        headNoteTopic:
-          $ref: "#/components/schemas/NoteTopic"
     NotebookSettings:
       type: object
       properties:
