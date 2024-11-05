@@ -3388,6 +3388,7 @@ components:
       required:
       - id
       - note
+      - notebook
       type: object
       properties:
         id:
@@ -3407,6 +3408,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Note"
+        notebook:
+          $ref: "#/components/schemas/Notebook"
     WikidataAssociationCreation:
       required:
       - wikidataId

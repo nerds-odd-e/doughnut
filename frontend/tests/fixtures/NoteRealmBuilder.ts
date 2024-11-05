@@ -2,6 +2,7 @@ import type { NoteRealm } from "@/generated/backend"
 import Builder from "./Builder"
 import NoteBuilder from "./NoteBuilder"
 import generateId from "./generateId"
+import NotebookBuilder from "./NotebookBuilder"
 
 class NoteRealmBuilder extends Builder<NoteRealm> {
   data: NoteRealm
@@ -17,6 +18,7 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
       note: noteData,
       refers: [],
       children: [],
+      notebook: new NotebookBuilder().please(),
     }
   }
 
