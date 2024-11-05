@@ -1,7 +1,6 @@
 package com.odde.doughnut.controllers.dto;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import jakarta.validation.constraints.NotNull;
@@ -28,10 +27,6 @@ public class NoteRealm {
 
   public List<Note> getChildren() {
     return note.getChildren();
-  }
-
-  public Circle getCircle() {
-    return note.getNotebook().getOwnership().getCircle();
   }
 
   @NotNull

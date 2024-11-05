@@ -28,7 +28,7 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
   }
 
   inCircle(circleName: string) {
-    this.data.circle = {
+    this.data.notebook.circle = {
       id: generateId(),
       name: circleName,
     }

@@ -147,4 +147,8 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   public NoteTopic getHeadNoteTopic() {
     return headNote.getNoteTopic();
   }
+
+  public Circle getCircle() {
+    return getOwnership().getCircle();
+  }
 }

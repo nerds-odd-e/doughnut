@@ -3166,6 +3166,8 @@ components:
         updated_at:
           type: string
           format: date-time
+        circle:
+          $ref: "#/components/schemas/Circle"
         headNoteTopic:
           $ref: "#/components/schemas/NoteTopic"
     NotebookSettings:
@@ -3398,8 +3400,6 @@ components:
           $ref: "#/components/schemas/Note"
         fromBazaar:
           type: boolean
-        circle:
-          $ref: "#/components/schemas/Circle"
         children:
           type: array
           items:
