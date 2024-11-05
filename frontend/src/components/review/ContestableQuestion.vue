@@ -1,7 +1,7 @@
 <template>
   <BasicBreadcrumb
     v-if="reviewQuestionInstance.notebook"
-    :ancestors="[reviewQuestionInstance.notebook.headNote.noteTopic]"
+    :ancestors="[reviewQuestionInstance.notebook.headNoteTopic]"
   />
   <div v-for="(q, index) in prevQuestions" :key="index">
     <h3>Previous Question Contested ...</h3>

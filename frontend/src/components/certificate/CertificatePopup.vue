@@ -6,7 +6,7 @@
       <p class="certificate-detail">
         <span>by completing the qualifications, </span>
         <span>is granted the Certified
-          <span class="certificate-name"> {{ certificate.notebook?.headNote.noteTopic.topicConstructor  }}</span>
+          <span class="certificate-name"> {{ certificate.notebook?.headNoteTopic.topicConstructor  }}</span>
         </span>
       </p>
       <div class="date-container">

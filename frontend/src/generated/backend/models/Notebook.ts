@@ -2,14 +2,14 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { Note } from './Note';
 import type { NotebookSettings } from './NotebookSettings';
+import type { NoteTopic } from './NoteTopic';
 export type Notebook = {
     id: number;
-    headNote: Note;
     certifiable?: boolean;
     notebookSettings: NotebookSettings;
     creatorId?: string;
     updated_at: string;
+    headNoteTopic: NoteTopic;
 };
 

@@ -9,7 +9,7 @@
     <tbody>
     <tr v-for="approval in approvals" :key="approval.id">
       <td>
-        <NoteTopicWithLink v-bind="{ noteTopic: approval.notebook.headNote.noteTopic }" />
+        <NoteTopicWithLink v-bind="{ noteTopic: approval.notebook.headNoteTopic }" />
       </td>
       <td>
         {{ approval.notebook.creatorId }}

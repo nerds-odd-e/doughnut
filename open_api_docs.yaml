@@ -3148,7 +3148,7 @@ components:
           $ref: "#/components/schemas/NoteTopic"
     Notebook:
       required:
-      - headNote
+      - headNoteTopic
       - id
       - notebookSettings
       - updated_at
@@ -3157,8 +3157,6 @@ components:
         id:
           type: integer
           format: int32
-        headNote:
-          $ref: "#/components/schemas/Note"
         certifiable:
           type: boolean
         notebookSettings:
@@ -3168,6 +3166,8 @@ components:
         updated_at:
           type: string
           format: date-time
+        headNoteTopic:
+          $ref: "#/components/schemas/NoteTopic"
     NotebookSettings:
       type: object
       properties:

@@ -12,7 +12,7 @@ class NotebookBuilder extends Builder<Notebook> {
     super()
     this.data = {
       id: generateId(),
-      headNote: this.notebuilder.data,
+      headNoteTopic: this.notebuilder.data.noteTopic,
       notebookSettings: {
         skipReviewEntirely: false,
       },
@@ -36,7 +36,7 @@ class NotebookBuilder extends Builder<Notebook> {
   }
 
   do(): Notebook {
-    this.data.headNote = this.notebuilder.do()
+    this.data.headNoteTopic = this.notebuilder.do().noteTopic
     return this.data
   }
 }

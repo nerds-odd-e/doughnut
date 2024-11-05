@@ -5,6 +5,7 @@ import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.odde.doughnut.controllers.dto.NoteTopic;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.models.Randomizer;
 import jakarta.persistence.*;
@@ -42,6 +43,7 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @Getter
   @Setter
   @NonNull
+  @JsonIgnore
   private Note headNote;
 
   @OneToMany(mappedBy = "notebook", cascade = CascadeType.DETACH)
@@ -139,5 +141,10 @@ public class Notebook extends EntityIdentifiedByIdOnly {
           "Not enough questions", ASSESSMENT_SERVICE_ERROR, "Not enough questions");
     }
     return questions;
+  }
+
+  @NonNull
+  public NoteTopic getHeadNoteTopic() {
+    return headNote.getNoteTopic();
   }
 }

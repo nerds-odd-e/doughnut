@@ -54,8 +54,8 @@ describe("global bar", () => {
   })
 
   it("show undo when there is something to undo", async () => {
-    const notebook = makeMe.aNotebook.please()
-    noteEditingHistory.deleteNote(notebook.headNote.id)
+    const note = makeMe.aNote.please()
+    noteEditingHistory.deleteNote(note.id)
     helper
       .component(GlobalBar)
       .withProps({
