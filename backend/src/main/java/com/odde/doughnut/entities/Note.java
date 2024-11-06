@@ -211,9 +211,8 @@ public class Note extends EntityIdentifiedByIdOnly {
     if (parentNote == null) return;
     setNotebook(parentNote.getNotebook());
     this.parent = parentNote;
-    // Update notebook for all descendants
-    getAllNoneLinkDescendants()
-        .forEach(descendant -> descendant.setNotebook(parentNote.getNotebook()));
+    // Update notebook for all descendants including links
+    getAllDescendants().forEach(descendant -> descendant.setNotebook(parentNote.getNotebook()));
   }
 
   private void setNotebook(Notebook notebook) {
@@ -286,9 +285,14 @@ public class Note extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
+  public Stream<Note> getAllDescendants() {
+    return Stream.concat(
+        getChildren().stream(), getChildren().stream().flatMap(Note::getAllDescendants));
+  }
+
+  @JsonIgnore
   public Stream<Note> getAllNoneLinkDescendants() {
-    return getNoneLinkChildren().stream()
-        .flatMap(c -> Stream.concat(Stream.of(c), c.getAllNoneLinkDescendants()));
+    return getAllDescendants().filter(n -> n.getLinkType() == null);
   }
 
   @JsonIgnore

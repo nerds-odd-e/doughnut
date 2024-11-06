@@ -186,5 +186,21 @@ public class NoteMotionModelTest {
       assertThat(secondChild.getNotebook(), equalTo(otherNotebook.getNotebook()));
       assertThat(thirdLevel.getNotebook(), equalTo(otherNotebook.getNotebook()));
     }
+
+    @Test
+    void shouldUpdateNotebookForAllDescendantsIncludingLinks()
+        throws CyclicLinkDetectedException, MovementNotPossibleException {
+      // Create a linking note under secondChild
+      Note targetNote = makeMe.aNote("targetNote").please();
+      Note linkingNote = makeMe.aLink().between(secondChild, targetNote).please();
+
+      move(secondChild, otherNotebook, true);
+
+      makeMe.refresh(secondChild);
+      makeMe.refresh(linkingNote);
+
+      assertThat(secondChild.getNotebook(), equalTo(otherNotebook.getNotebook()));
+      assertThat(linkingNote.getNotebook(), equalTo(otherNotebook.getNotebook()));
+    }
   }
 }
