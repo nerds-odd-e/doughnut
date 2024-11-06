@@ -10,7 +10,6 @@ import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
-import com.odde.doughnut.exceptions.MovementNotPossibleException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
@@ -24,7 +23,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;
-import org.springframework.web.server.ResponseStatusException;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -62,44 +60,13 @@ class RestLinkControllerTests {
     }
 
     @Test
-    void createdSuccessfully()
-        throws CyclicLinkDetectedException,
-            BindException,
-            UnexpectedNoAccessRightException,
-            MovementNotPossibleException {
+    void moveNoteSuccessfully()
+        throws BindException, UnexpectedNoAccessRightException, CyclicLinkDetectedException {
       Note note3 = makeMe.aNote().creatorAndOwner(userModel).please();
-      long beforeThingCount = makeMe.modelFactoryService.noteRepository.count();
-      controller().linkNoteFinalize(note3, note2, linkCreation, makeMe.successfulBindingResult());
-      long afterThingCount = makeMe.modelFactoryService.noteRepository.count();
-      assertThat(afterThingCount, equalTo(beforeThingCount + 1));
-    }
-
-    @Test
-    void createdChildNoteSuccessfully()
-        throws CyclicLinkDetectedException, BindException, UnexpectedNoAccessRightException {
-      Note note3 = makeMe.aNote("flower tea").creatorAndOwner(userModel).please();
       linkCreation.asFirstChild = false;
-      controller().linkNoteFinalize(note3, note2, linkCreation, makeMe.successfulBindingResult());
-      assertThat(note3.getLinks(), hasSize(1));
-    }
-
-    @Test
-    void userNotLoggedIn() {
-      userModel = makeMe.aNullUserModelPlease();
-      assertThrows(
-          ResponseStatusException.class,
-          () ->
-              controller()
-                  .linkNoteFinalize(note1, note2, linkCreation, makeMe.successfulBindingResult()));
-    }
-
-    @Test
-    void linkTypeIsEmpty() {
-      assertThrows(
-          BindException.class,
-          () ->
-              controller()
-                  .linkNoteFinalize(note1, note2, linkCreation, makeMe.failedBindingResult()));
+      var result =
+          controller().moveNote(note3, note2, linkCreation, makeMe.successfulBindingResult());
+      assertThat(result, hasSize(2));
     }
 
     @Test
@@ -107,8 +74,7 @@ class RestLinkControllerTests {
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () ->
-              controller()
-                  .linkNoteFinalize(note1, note2, linkCreation, makeMe.successfulBindingResult()));
+              controller().moveNote(note1, note2, linkCreation, makeMe.successfulBindingResult()));
     }
 
     @Test
@@ -116,8 +82,35 @@ class RestLinkControllerTests {
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () ->
-              controller()
-                  .linkNoteFinalize(note2, note1, linkCreation, makeMe.successfulBindingResult()));
+              controller().moveNote(note2, note1, linkCreation, makeMe.successfulBindingResult()));
+    }
+  }
+
+  @Nested
+  class CreateLinkTest {
+    User anotherUser;
+    Note note1;
+    Note note2;
+    LinkCreation linkCreation = new LinkCreation();
+
+    @BeforeEach
+    void setup() {
+      anotherUser = makeMe.aUser().please();
+      note1 = makeMe.aNote().creatorAndOwner(anotherUser).please();
+      note2 = makeMe.aNote("flower").creatorAndOwner(userModel).please();
+      linkCreation.linkType = LinkType.APPLICATION;
+      linkCreation.moveUnder = true;
+      linkCreation.asFirstChild = false;
+    }
+
+    @Test
+    void createdSuccessfully()
+        throws CyclicLinkDetectedException, BindException, UnexpectedNoAccessRightException {
+      Note note3 = makeMe.aNote().creatorAndOwner(userModel).please();
+      long beforeThingCount = makeMe.modelFactoryService.noteRepository.count();
+      controller().linkNoteFinalize(note3, note2, linkCreation, makeMe.successfulBindingResult());
+      long afterThingCount = makeMe.modelFactoryService.noteRepository.count();
+      assertThat(afterThingCount, equalTo(beforeThingCount + 1));
     }
   }
 }

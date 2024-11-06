@@ -27,8 +27,9 @@ public class NoteMotionModel {
     subject.adjustPositionAsAChildOfParentInMemory();
 
     // Save all descendants as their notebooks have changed
-    subject.getAllNoneLinkDescendants().forEach(modelFactoryService::save);
+    subject.getAllDescendants().forEach(modelFactoryService::save);
     modelFactoryService.save(subject);
+    modelFactoryService.entityManager.flush();
 
     if (notebook.getHeadNote() == subject) {
       modelFactoryService.remove(notebook);

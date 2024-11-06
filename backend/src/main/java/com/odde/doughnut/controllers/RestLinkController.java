@@ -53,6 +53,26 @@ class RestLinkController {
     return getNoteRealm(link, currentUser.getEntity());
   }
 
+  @PostMapping(value = "/move/{sourceNote}/{targetNote}")
+  @Transactional
+  public List<NoteRealm> moveNote(
+      @PathVariable @Schema(type = "integer") Note sourceNote,
+      @PathVariable @Schema(type = "integer") Note targetNote,
+      @RequestBody @Valid LinkCreation linkCreation,
+      BindingResult bindingResult)
+      throws UnexpectedNoAccessRightException, BindException, CyclicLinkDetectedException {
+    if (bindingResult.hasErrors()) throw new BindException(bindingResult);
+    currentUser.assertAuthorization(sourceNote);
+    currentUser.assertAuthorization(targetNote);
+    modelFactoryService
+        .motionOfMoveUnder(sourceNote, targetNote, linkCreation.asFirstChild)
+        .execute();
+    User user = currentUser.getEntity();
+    return List.of(
+        new NoteViewer(user, sourceNote).toJsonObject(),
+        new NoteViewer(user, targetNote).toJsonObject());
+  }
+
   @PostMapping(value = "/create/{sourceNote}/{targetNote}")
   @Transactional
   public List<NoteRealm> linkNoteFinalize(
@@ -64,12 +84,6 @@ class RestLinkController {
     if (bindingResult.hasErrors()) throw new BindException(bindingResult);
     currentUser.assertAuthorization(sourceNote);
     currentUser.assertReadAuthorization(targetNote);
-    if (linkCreation != null && linkCreation.moveUnder != null && linkCreation.moveUnder) {
-      currentUser.assertAuthorization(targetNote);
-      modelFactoryService
-          .motionOfMoveUnder(sourceNote, targetNote, linkCreation.asFirstChild)
-          .execute();
-    }
     User user = currentUser.getEntity();
     Note link =
         modelFactoryService.createLink(

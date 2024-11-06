@@ -59,6 +59,12 @@ export interface StoredApi {
     router: Router,
     noteId: Doughnut.ID
   ): Promise<NoteRealm | undefined>
+
+  moveNote(
+    sourceId: Doughnut.ID,
+    targetId: Doughnut.ID,
+    data: LinkCreation
+  ): Promise<void>
 }
 export default class StoredApiCollection implements StoredApi {
   noteEditingHistory: NoteEditingHistory
@@ -258,5 +264,19 @@ export default class StoredApiCollection implements StoredApi {
     const noteRealm = this.storage.refreshNoteRealm(res[0]!)
     this.routerReplaceFocus(router, noteRealm)
     return noteRealm
+  }
+
+  async moveNote(
+    sourceId: Doughnut.ID,
+    targetId: Doughnut.ID,
+    data: LinkCreation
+  ) {
+    this.refreshNoteRealms(
+      await this.managedApi.restLinkController.moveNote(
+        sourceId,
+        targetId,
+        data
+      )
+    )
   }
 }

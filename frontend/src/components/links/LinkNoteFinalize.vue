@@ -96,12 +96,37 @@ const createLink = async () => {
       return
     }
   }
-  props.storageAccessor
-    .storedApi()
-    .createLink(props.note.id, props.targetNoteTopic.id, formData.value)
-    .then((r) => emit("success", r))
-    .catch((res) => {
-      linkFormErrors.value = res
-    })
+
+  try {
+    // First create the link
+    if (formData.value.linkType !== NoteTopic.linkType.NO_LINK) {
+      await props.storageAccessor
+        .storedApi()
+        .createLink(props.note.id, props.targetNoteTopic.id, {
+          linkType: formData.value.linkType,
+          moveUnder: false,
+          asFirstChild: false,
+        })
+    }
+
+    // Then move the note if needed
+    if (formData.value.moveUnder) {
+      await props.storageAccessor
+        .storedApi()
+        .moveNote(props.note.id, props.targetNoteTopic.id, {
+          linkType: formData.value.linkType,
+          moveUnder: true,
+          asFirstChild: formData.value.asFirstChild,
+        })
+    }
+
+    emit("success")
+  } catch (res) {
+    linkFormErrors.value = res as {
+      asFirstChild: string | undefined
+      linkType: string | undefined
+      moveUnder: string | undefined
+    }
+  }
 }
 </script>

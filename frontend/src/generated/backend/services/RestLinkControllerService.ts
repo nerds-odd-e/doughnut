@@ -38,6 +38,32 @@ export class RestLinkControllerService {
      * @returns NoteRealm OK
      * @throws ApiError
      */
+    public moveNote(
+        sourceNote: number,
+        targetNote: number,
+        requestBody: LinkCreation,
+    ): CancelablePromise<Array<NoteRealm>> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/links/move/{sourceNote}/{targetNote}',
+            path: {
+                'sourceNote': sourceNote,
+                'targetNote': targetNote,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param sourceNote
+     * @param targetNote
+     * @param requestBody
+     * @returns NoteRealm OK
+     * @throws ApiError
+     */
     public linkNoteFinalize(
         sourceNote: number,
         targetNote: number,

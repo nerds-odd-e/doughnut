@@ -1283,6 +1283,43 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/NoteRealm"
+  /api/links/move/{sourceNote}/{targetNote}:
+    post:
+      tags:
+      - rest-link-controller
+      operationId: moveNote
+      parameters:
+      - name: sourceNote
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: targetNote
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LinkCreation"
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NoteRealm"
   /api/links/create/{sourceNote}/{targetNote}:
     post:
       tags:
