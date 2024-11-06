@@ -25,7 +25,11 @@ public class NoteMotionModel {
       subject.setParentNote(relativeToNote.getParent());
     }
     subject.adjustPositionAsAChildOfParentInMemory();
+
+    // Save all descendants as their notebooks have changed
+    subject.getAllNoneLinkDescendants().forEach(modelFactoryService::save);
     modelFactoryService.save(subject);
+
     if (notebook.getHeadNote() == subject) {
       modelFactoryService.remove(notebook);
     }

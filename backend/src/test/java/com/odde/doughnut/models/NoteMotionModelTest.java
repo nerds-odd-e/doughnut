@@ -157,4 +157,34 @@ public class NoteMotionModelTest {
       }
     }
   }
+
+  @Nested
+  class WhenMovingBetweenNotebooks {
+    Note otherNotebook;
+    Note firstChild;
+    Note secondChild;
+    Note thirdLevel;
+
+    @BeforeEach
+    void setup() {
+      otherNotebook = makeMe.aHeadNote("otherNotebook").please();
+      firstChild = makeMe.aNote("firstChild").under(topNote).please();
+      secondChild = makeMe.aNote("secondChild").under(firstChild).please();
+      thirdLevel = makeMe.aNote("thirdLevel").under(secondChild).please();
+    }
+
+    @Test
+    void shouldUpdateNotebookForAllDescendants()
+        throws CyclicLinkDetectedException, MovementNotPossibleException {
+      move(firstChild, otherNotebook, true);
+
+      makeMe.refresh(firstChild);
+      makeMe.refresh(secondChild);
+      makeMe.refresh(thirdLevel);
+
+      assertThat(firstChild.getNotebook(), equalTo(otherNotebook.getNotebook()));
+      assertThat(secondChild.getNotebook(), equalTo(otherNotebook.getNotebook()));
+      assertThat(thirdLevel.getNotebook(), equalTo(otherNotebook.getNotebook()));
+    }
+  }
 }

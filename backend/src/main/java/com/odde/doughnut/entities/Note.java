@@ -211,6 +211,9 @@ public class Note extends EntityIdentifiedByIdOnly {
     if (parentNote == null) return;
     setNotebook(parentNote.getNotebook());
     this.parent = parentNote;
+    // Update notebook for all descendants
+    getAllNoneLinkDescendants()
+        .forEach(descendant -> descendant.setNotebook(parentNote.getNotebook()));
   }
 
   private void setNotebook(Notebook notebook) {
