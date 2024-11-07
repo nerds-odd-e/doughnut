@@ -52,6 +52,29 @@ const notebookSettingsPopup = () => {
   }
 }
 
+const notebookCard = (notebook: string) => ({
+  shareNotebookToBazaar() {
+    cy.findByRole('button', { name: `Share ${notebook} to bazaar` }).click()
+    cy.findByRole('button', { name: 'OK' }).click()
+  },
+  updateSubscription() {
+    cy.findByRole('button', { name: `Edit ${notebook} subscription` }).click()
+    cy.findByRole('button', { name: 'Update' }).click()
+  },
+  unsubscribe() {
+    cy.findByRole('button', { name: `Unsubscribe ${notebook}` }).click()
+    cy.findByRole('button', { name: 'OK' }).click()
+  },
+  openNotebookQuestions() {
+    cy.findByRole('button', { name: `Notebook Questions` }).click()
+    return notebookQuestionsList()
+  },
+  editNotebookSettings() {
+    cy.findByRole('button', { name: `Edit ${notebook} settings` }).click()
+    return notebookSettingsPopup()
+  },
+})
+
 const notebooksPage = () => ({
   ...notebookList(),
   navigateToPath(notePath: NotePath) {
@@ -64,25 +87,23 @@ const notebooksPage = () => ({
     cy.findByText('Add New Notebook').click()
     return noteCreationForm.createNote(notebookTopic, undefined)
   },
+  notebookCard(notebook: string) {
+    return notebookCard(notebook)
+  },
   shareNotebookToBazaar(notebook: string) {
-    this.findNotebookCardButton(notebook, 'Share notebook to bazaar').click()
-    cy.findByRole('button', { name: 'OK' }).click()
+    return this.notebookCard(notebook).shareNotebookToBazaar()
   },
   updateSubscription(notebook: string) {
-    this.findNotebookCardButton(notebook, 'Edit subscription').click()
-    cy.findByRole('button', { name: 'Update' }).click()
+    return this.notebookCard(notebook).updateSubscription()
   },
   unsubscribe(notebook: string) {
-    this.findNotebookCardButton(notebook, 'Unsubscribe').click()
-    cy.findByRole('button', { name: 'OK' }).click()
+    return this.notebookCard(notebook).unsubscribe()
   },
   openNotebookQuestions(notebook: string) {
-    this.findNotebookCardButton(notebook, 'Notebook Questions').click()
-    return notebookQuestionsList()
+    return this.notebookCard(notebook).openNotebookQuestions()
   },
   editNotebookSettings(notebook: string) {
-    this.findNotebookCardButton(notebook, 'Edit notebook settings').click()
-    return notebookSettingsPopup()
+    return this.notebookCard(notebook).editNotebookSettings()
   },
   ...notebookSettingsPopup(),
 })
