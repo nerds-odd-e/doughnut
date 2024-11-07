@@ -52,42 +52,44 @@ const notebookSettingsPopup = () => {
   }
 }
 
+const notebooksPage = () => ({
+  ...notebookList(),
+  navigateToPath(notePath: NotePath) {
+    return notePath.path.reduce(
+      (page, noteTopic) => page.navigateToChild(noteTopic),
+      assumeNotePage()
+    )
+  },
+  creatingNotebook(notebookTopic: string) {
+    cy.findByText('Add New Notebook').click()
+    return noteCreationForm.createNote(notebookTopic, undefined)
+  },
+  shareNotebookToBazaar(notebook: string) {
+    this.findNotebookCardButton(notebook, 'Share notebook to bazaar').click()
+    cy.findByRole('button', { name: 'OK' }).click()
+  },
+  updateSubscription(notebook: string) {
+    this.findNotebookCardButton(notebook, 'Edit subscription').click()
+    cy.findByRole('button', { name: 'Update' }).click()
+  },
+  unsubscribe(notebook: string) {
+    this.findNotebookCardButton(notebook, 'Unsubscribe').click()
+    cy.findByRole('button', { name: 'OK' }).click()
+  },
+  openNotebookQuestions(notebook: string) {
+    this.findNotebookCardButton(notebook, 'Notebook Questions').click()
+    return notebookQuestionsList()
+  },
+  editNotebookSettings(notebook: string) {
+    this.findNotebookCardButton(notebook, 'Edit notebook settings').click()
+    return notebookSettingsPopup()
+  },
+  ...notebookSettingsPopup(),
+})
+
 export const routerToNotebooksPage = () => {
   cy.pageIsNotLoading()
   cy.routerPush('/d/notebooks', 'notebooks', {})
   cy.findByText('Notebooks')
-  return {
-    ...notebookList(),
-    navigateToPath(notePath: NotePath) {
-      return notePath.path.reduce(
-        (page, noteTopic) => page.navigateToChild(noteTopic),
-        assumeNotePage()
-      )
-    },
-    creatingNotebook(notebookTopic: string) {
-      cy.findByText('Add New Notebook').click()
-      return noteCreationForm.createNote(notebookTopic, undefined)
-    },
-    shareNotebookToBazaar(notebook: string) {
-      this.findNotebookCardButton(notebook, 'Share notebook to bazaar').click()
-      cy.findByRole('button', { name: 'OK' }).click()
-    },
-    updateSubscription(notebook: string) {
-      this.findNotebookCardButton(notebook, 'Edit subscription').click()
-      cy.findByRole('button', { name: 'Update' }).click()
-    },
-    unsubscribe(notebook: string) {
-      this.findNotebookCardButton(notebook, 'Unsubscribe').click()
-      cy.findByRole('button', { name: 'OK' }).click()
-    },
-    openNotebookQuestions(notebook: string) {
-      this.findNotebookCardButton(notebook, 'Notebook Questions').click()
-      return notebookQuestionsList()
-    },
-    editNotebookSettings(notebook: string) {
-      this.findNotebookCardButton(notebook, 'Edit notebook settings').click()
-      return notebookSettingsPopup()
-    },
-    ...notebookSettingsPopup(),
-  }
+  return notebooksPage()
 }
