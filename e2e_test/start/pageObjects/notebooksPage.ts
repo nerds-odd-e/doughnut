@@ -1,5 +1,6 @@
 import NotePath from '../../support/NotePath'
 import { notebookList } from './NotebookList'
+import notebookQuestionsList from './notebookQuestionsList'
 import noteCreationForm from './noteForms/noteCreationForm'
 import { assumeNotePage } from './notePage'
 
@@ -64,6 +65,7 @@ const notebookCard = (notebook: string) => ({
   },
   openNotebookQuestions() {
     this.findNotebookCardButton(notebook, 'Notebook Questions').click()
+    return notebookQuestionsList()
   },
   editNotebookSettings() {
     this.findNotebookCardButton(notebook, 'Edit notebook settings').click()
