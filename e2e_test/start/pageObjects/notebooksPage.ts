@@ -56,6 +56,7 @@ const notebookCard = (notebook: string) => ({
   ...notebookList(),
   shareNotebookToBazaar() {
     this.findNotebookCardButton(notebook, 'Share notebook to bazaar').click()
+    cy.findByRole('button', { name: 'OK' }).click()
   },
   updateSubscription() {
     this.findNotebookCardButton(notebook, 'Edit subscription').click()
