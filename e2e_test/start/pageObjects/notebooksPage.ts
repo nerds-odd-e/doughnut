@@ -86,21 +86,6 @@ const notebooksPage = () => ({
   notebookCard(notebook: string) {
     return notebookCard(notebook)
   },
-  shareNotebookToBazaar(notebook: string) {
-    return this.notebookCard(notebook).shareNotebookToBazaar()
-  },
-  updateSubscription(notebook: string) {
-    return this.notebookCard(notebook).updateSubscription()
-  },
-  unsubscribe(notebook: string) {
-    return this.notebookCard(notebook).unsubscribe()
-  },
-  openNotebookQuestions(notebook: string) {
-    return this.notebookCard(notebook).openNotebookQuestions()
-  },
-  editNotebookSettings(notebook: string) {
-    return this.notebookCard(notebook).editNotebookSettings()
-  },
   ...notebookSettingsPopup(),
 })
 

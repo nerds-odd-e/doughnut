@@ -12,7 +12,7 @@ import {
 import start from '../start'
 
 Given('I choose to share my notebook {string}', (noteTopic: string) => {
-  start.routerToNotebooksPage().shareNotebookToBazaar(noteTopic)
+  start.routerToNotebooksPage().notebookCard(noteTopic).shareNotebookToBazaar()
 })
 
 Then(
@@ -28,18 +28,23 @@ Then(
 Then(
   'I should be able to edit the subscription to notebook {string}',
   (noteTopic: string) => {
-    start.routerToNotebooksPage().updateSubscription(noteTopic)
+    start.routerToNotebooksPage().notebookCard(noteTopic).updateSubscription()
   }
 )
 
 When('I change notebook {string} to skip review', (noteTopic: string) => {
-  start.routerToNotebooksPage().editNotebookSettings(noteTopic).skipReview()
+  start
+    .routerToNotebooksPage()
+    .notebookCard(noteTopic)
+    .editNotebookSettings()
+    .skipReview()
 })
 
 When('I request for an approval for notebook {string}', (notebook: string) => {
   start
     .routerToNotebooksPage()
-    .editNotebookSettings(notebook)
+    .notebookCard(notebook)
+    .editNotebookSettings()
     .requestForNotebookApproval()
 })
 
@@ -48,7 +53,8 @@ When(
   (noteTopic: string, status: string) => {
     start
       .routerToNotebooksPage()
-      .editNotebookSettings(noteTopic)
+      .notebookCard(noteTopic)
+      .editNotebookSettings()
       .expectNotebookApprovalStatus(status)
   }
 )
@@ -58,13 +64,14 @@ Then(
   (status: string, noteTopic: string) => {
     start
       .routerToNotebooksPage()
-      .editNotebookSettings(noteTopic)
+      .notebookCard(noteTopic)
+      .editNotebookSettings()
       .expectNotebookApprovalStatus(status)
   }
 )
 
 Then('I unsubscribe from notebook {string}', (noteTopic: string) => {
-  start.routerToNotebooksPage().unsubscribe(noteTopic)
+  start.routerToNotebooksPage().notebookCard(noteTopic).unsubscribe()
 })
 
 Given(
@@ -72,7 +79,8 @@ Given(
   (notebook: string, numberOfQuestion: number) => {
     start
       .routerToNotebooksPage()
-      .editNotebookSettings(notebook)
+      .notebookCard(notebook)
+      .editNotebookSettings()
       .updateAssessmentSettings({ numberOfQuestion })
   }
 )
@@ -82,7 +90,8 @@ Given(
   (notebook: string, numberOfQuestion: number) => {
     start
       .routerToNotebooksPage()
-      .editNotebookSettings(notebook)
+      .notebookCard(notebook)
+      .editNotebookSettings()
       .updateAssessmentSettings({ numberOfQuestion })
   }
 )
@@ -106,7 +115,8 @@ Then(
   (notebook: string, topics: DataTable) => {
     const notebookQuestionsPage = start
       .routerToNotebooksPage()
-      .openNotebookQuestions(notebook)
+      .notebookCard(notebook)
+      .openNotebookQuestions()
     topics.rows().forEach((topic: string[]) => {
       const topicName = topic[0]!
       notebookQuestionsPage.expectNoQuestionsForTopic(topicName)
@@ -118,7 +128,8 @@ Then(
   (notebook: string, topics: DataTable) => {
     const notebookQuestionsPage = start
       .routerToNotebooksPage()
-      .openNotebookQuestions(notebook)
+      .notebookCard(notebook)
+      .openNotebookQuestions()
     topics.rows().forEach((topic: string[]) => {
       const topicName = topic[0]!
       const question = topic[1]!
@@ -132,7 +143,8 @@ Given('following notebooks have pending approval:', (notebooks: DataTable) => {
     const notebookName = notebookRaw[0]!
     start
       .routerToNotebooksPage()
-      .editNotebookSettings(notebookName)
+      .notebookCard(notebookName)
+      .editNotebookSettings()
       .requestForNotebookApproval()
   })
 })
