@@ -2,7 +2,6 @@ import NotePath from '../../support/NotePath'
 import { notebookList } from './NotebookList'
 import noteCreationForm from './noteForms/noteCreationForm'
 import { assumeNotePage } from './notePage'
-import notebookQuestionsList from './notebookQuestionsList'
 
 const notebookSettingsPopup = () => {
   const clickButton = (name: string) =>
@@ -53,24 +52,21 @@ const notebookSettingsPopup = () => {
 }
 
 const notebookCard = (notebook: string) => ({
+  ...notebookList(),
   shareNotebookToBazaar() {
-    cy.findByRole('button', { name: `Share ${notebook} to bazaar` }).click()
-    cy.findByRole('button', { name: 'OK' }).click()
+    this.findNotebookCardButton(notebook, 'Share notebook to bazaar').click()
   },
   updateSubscription() {
-    cy.findByRole('button', { name: `Edit ${notebook} subscription` }).click()
-    cy.findByRole('button', { name: 'Update' }).click()
+    this.findNotebookCardButton(notebook, 'Edit subscription').click()
   },
   unsubscribe() {
-    cy.findByRole('button', { name: `Unsubscribe ${notebook}` }).click()
-    cy.findByRole('button', { name: 'OK' }).click()
+    this.findNotebookCardButton(notebook, 'Unsubscribe').click()
   },
   openNotebookQuestions() {
-    cy.findByRole('button', { name: `Notebook Questions` }).click()
-    return notebookQuestionsList()
+    this.findNotebookCardButton(notebook, 'Notebook Questions').click()
   },
   editNotebookSettings() {
-    cy.findByRole('button', { name: `Edit ${notebook} settings` }).click()
+    this.findNotebookCardButton(notebook, 'Edit notebook settings').click()
     return notebookSettingsPopup()
   },
 })
