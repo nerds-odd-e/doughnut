@@ -1,10 +1,10 @@
-import { routerToNotebooksPage } from './notebooksPage'
+import { routerToMyNotebooksPage } from './myNotebooksPage'
 import { assumeAdminDashboardPage } from './adminPages/adminDashboardPage'
 import { assumeAssessmentAndCertificateHistoryPage } from './assessmentAndCertificateHistoryPage'
 import { assumeMessageCenterPage } from './messageCenterPage'
 
 export const systemSidebar = () => {
-  routerToNotebooksPage()
+  routerToMyNotebooksPage()
   cy.pageIsNotLoading()
   cy.findByRole('button', { name: 'open sidebar' }).click({ force: true })
 

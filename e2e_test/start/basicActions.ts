@@ -7,7 +7,7 @@ import { navigateToBazaar } from './pageObjects/bazaarPage'
 import { assumeConversationAboutNotePage } from './pageObjects/conversationAboutNotePage'
 import { navigateToCircle } from './pageObjects/circlePage'
 import { assumeNotePage } from './pageObjects/notePage'
-import { routerToNotebooksPage } from './pageObjects/notebooksPage'
+import { routerToMyNotebooksPage } from './pageObjects/myNotebooksPage'
 import { noteSidebar } from './pageObjects/noteSidebar'
 import { systemSidebar } from './pageObjects/systemSidebar'
 import { navigateToMessageCenter } from './pageObjects/messageCenterPage'
@@ -28,7 +28,7 @@ export default {
   assumeQuestionPage,
   assumeAdminDashboardPage,
   assumeMessageCenterPage,
-  routerToNotebooksPage,
+  routerToNotebooksPage: routerToMyNotebooksPage,
   navigateToCircle,
   navigateToMessageCenter,
   ...logins,

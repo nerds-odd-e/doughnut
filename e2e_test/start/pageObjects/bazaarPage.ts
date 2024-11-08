@@ -1,4 +1,4 @@
-import { bazaarOrCircle } from './NotebookList'
+import { bazaarOrCircle } from './BazaarOrCircle'
 
 export const assumeBazaarPage = () => {
   cy.findByText('Welcome To The Bazaar')

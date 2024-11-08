@@ -3,7 +3,7 @@ import { notebookCard } from './notebookCard'
 import noteCreationForm from './noteForms/noteCreationForm'
 import { assumeNotePage } from './notePage'
 
-const notebooksPage = () => {
+const myNotebooksPage = () => {
   cy.findByText('Notebooks')
   return {
     navigateToPath(notePath: NotePath) {
@@ -22,8 +22,8 @@ const notebooksPage = () => {
   }
 }
 
-export const routerToNotebooksPage = () => {
+export const routerToMyNotebooksPage = () => {
   cy.pageIsNotLoading()
   cy.routerPush('/d/notebooks', 'notebooks', {})
-  return notebooksPage()
+  return myNotebooksPage()
 }
