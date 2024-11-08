@@ -72,12 +72,23 @@ const notebookCard = (notebook: string) => ({
     this.findNotebookCardButton(notebook, 'Edit notebook settings').click()
     return notebookSettingsPopup()
   },
+  notebookAssistant() {
+    this.findNotebookCardButton(notebook, 'Notebook Assistant').click()
+    return {
+      create(instruction: string) {
+        cy.formField('Additional Instruction').type(instruction)
+        cy.findByRole('button', {
+          name: 'Create Assistant For Notebook',
+        }).click()
+        cy.pageIsNotLoading()
+      },
+    }
+  },
 })
 
 const notebooksPage = () => {
   cy.findByText('Notebooks')
   return {
-    ...notebookList(),
     navigateToPath(notePath: NotePath) {
       return notePath.path.reduce(
         (page, noteTopic) => page.navigateToChild(noteTopic),

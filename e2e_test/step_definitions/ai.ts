@@ -88,7 +88,8 @@ Given(
   (notebook: string, instruction: string) => {
     start
       .routerToNotebooksPage()
-      .notebookAssistant(notebook)
+      .notebookCard(notebook)
+      .notebookAssistant()
       .create(instruction)
   }
 )
