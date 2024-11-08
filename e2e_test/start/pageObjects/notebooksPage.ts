@@ -74,27 +74,29 @@ const notebookCard = (notebook: string) => ({
   },
 })
 
-const notebooksPage = () => ({
-  ...notebookList(),
-  navigateToPath(notePath: NotePath) {
-    return notePath.path.reduce(
-      (page, noteTopic) => page.navigateToChild(noteTopic),
-      assumeNotePage()
-    )
-  },
-  creatingNotebook(notebookTopic: string) {
-    cy.findByText('Add New Notebook').click()
-    return noteCreationForm.createNote(notebookTopic, undefined)
-  },
-  notebookCard(notebook: string) {
-    return notebookCard(notebook)
-  },
-  ...notebookSettingsPopup(),
-})
+const notebooksPage = () => {
+  cy.findByText('Notebooks')
+  return {
+    ...notebookList(),
+    navigateToPath(notePath: NotePath) {
+      return notePath.path.reduce(
+        (page, noteTopic) => page.navigateToChild(noteTopic),
+        assumeNotePage()
+      )
+    },
+    creatingNotebook(notebookTopic: string) {
+      cy.findByText('Add New Notebook').click()
+      return noteCreationForm.createNote(notebookTopic, undefined)
+    },
+    notebookCard(notebook: string) {
+      return notebookCard(notebook)
+    },
+    ...notebookSettingsPopup(),
+  }
+}
 
 export const routerToNotebooksPage = () => {
   cy.pageIsNotLoading()
   cy.routerPush('/d/notebooks', 'notebooks', {})
-  cy.findByText('Notebooks')
   return notebooksPage()
 }
