@@ -3441,7 +3441,6 @@ components:
       required:
       - id
       - note
-      - notebook
       type: object
       properties:
         id:

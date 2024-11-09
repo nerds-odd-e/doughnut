@@ -10,6 +10,6 @@ export type NoteRealm = {
     fromBazaar?: boolean;
     children?: Array<Note>;
     refers?: Array<Note>;
-    notebook: Notebook;
+    notebook?: Notebook;
 };
 

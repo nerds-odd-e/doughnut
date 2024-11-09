@@ -29,7 +29,6 @@ public class NoteRealm {
     return note.getChildren();
   }
 
-  @NotNull
   public Notebook getNotebook() {
     return note.getNotebook();
   }
