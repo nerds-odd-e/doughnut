@@ -20,30 +20,33 @@
   </Teleport>
 </template>
 
-<script lang="ts">
-import type { PropType } from "vue"
-import { defineComponent } from "vue"
+<script setup lang="ts">
+import { computed, watch } from "vue"
 import SvgClose from "../svgs/SvgClose.vue"
+import { useRoute } from "vue-router"
 
-export default defineComponent({
-  props: {
-    sidebar: String as PropType<"left" | "right">,
-  },
-  emits: ["close_request"],
-  components: { SvgClose },
-  computed: {
-    sidebarStyle() {
-      if (this.sidebar === "left") return "modal-sidebar modal-left"
-      if (this.sidebar === "right") return "modal-sidebar modal-right"
-      return "modal-container"
-    },
-  },
-  watch: {
-    // When the route changes, close the modal.
-    $route() {
-      this.$emit("close_request")
-    },
-  },
+// Props
+interface Props {
+  sidebar?: "left" | "right"
+}
+const props = defineProps<Props>()
+
+// Emits
+const emit = defineEmits<{
+  close_request: []
+}>()
+
+// Computed
+const sidebarStyle = computed(() => {
+  if (props.sidebar === "left") return "modal-sidebar modal-left"
+  if (props.sidebar === "right") return "modal-sidebar modal-right"
+  return "modal-container"
+})
+
+// Route watcher
+const route = useRoute()
+watch(route, () => {
+  emit("close_request")
 })
 </script>
 

@@ -65,7 +65,7 @@ When(
     cy.tick(500)
     start
       .assumeNoteTargetSearchDialog()
-      .expectExactLinkTargets(
+      .expectExactDropdownTargets(
         commonSenseSplit(noteTopicsAsString, ',').map((i: string) => i.trim())
       )
   }

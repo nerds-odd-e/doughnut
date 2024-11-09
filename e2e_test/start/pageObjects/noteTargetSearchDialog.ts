@@ -19,6 +19,11 @@ export const assumeNoteTargetSearchDialog = () => {
         .then((elms) => Cypress._.map(elms, 'innerText'))
         .should('deep.equal', targets)
     },
+    expectExactDropdownTargets: (targets: string[]) => {
+      cy.get('.dropdown-list a')
+        .then((elms) => Cypress._.map(elms, 'innerText'))
+        .should('deep.equal', targets)
+    },
     moveUnder() {
       cy.findByRole('button', { name: 'Move Under' }).click()
       cy.findByRole('button', { name: 'OK' }).click()
