@@ -10,19 +10,15 @@
         <span class="navbar-toggler-icon"></span>
       </button>
     </div>
-    <NoteRealmLoader v-bind="{ noteId, storageAccessor }">
-      <template #default="{ noteRealm }">
-        <ScrollTo />
-        <BreadcrumbWithCircle
-          v-if="noteRealm"
-          v-bind="{
-            fromBazaar: noteRealm?.fromBazaar,
-            circle: noteRealm.notebook?.circle,
-            noteTopic: noteRealm?.note.noteTopic,
-          }"
-        />
-      </template>
-    </NoteRealmLoader>
+    <ScrollTo />
+    <BreadcrumbWithCircle
+      v-if="noteRealm"
+      v-bind="{
+        fromBazaar: noteRealm?.fromBazaar,
+        circle: noteRealm.notebook?.circle,
+        noteTopic: noteRealm?.note.noteTopic,
+      }"
+    />
   </TeleportToHeadStatus>
   <div class="d-flex flex-grow-1 overflow-auto h-full">
     <aside
@@ -53,19 +49,23 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import { ref } from "vue"
+import { computed, ref } from "vue"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
 import NoteShow from "../components/notes/NoteShow.vue"
 import TeleportToHeadStatus from "@/pages/commons/TeleportToHeadStatus.vue"
 import BreadcrumbWithCircle from "../components/toolbars/BreadcrumbWithCircle.vue"
 import type { StorageAccessor } from "../store/createNoteStorage"
 
-defineProps({
+const props = defineProps({
   noteId: { type: Number, required: true },
   storageAccessor: {
     type: Object as PropType<StorageAccessor>,
     required: true,
   },
+})
+
+const noteRealm = computed(() => {
+  return props.storageAccessor.refOfNoteRealm(props.noteId).value
 })
 
 const sidebarCollapsedForSmallScreen = ref(true)
