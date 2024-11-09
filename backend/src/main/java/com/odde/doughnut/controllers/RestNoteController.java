@@ -78,7 +78,8 @@ class RestNoteController {
       @Valid @RequestBody NoteCreationDTO noteCreation)
       throws UnexpectedNoAccessRightException, InterruptedException, IOException, BindException {
     currentUser.assertAuthorization(parentNote);
-    return createNoteInternal(parentNote, noteCreation);
+    return getNoteConstructionService(currentUser.getEntity())
+        .createNoteInternal(parentNote, noteCreation, currentUser.getEntity(), wikidataService);
   }
 
   @PostMapping(value = "/{referenceNote}/create-after")
@@ -93,35 +94,14 @@ class RestNoteController {
       throw new UnexpectedNoAccessRightException();
     }
 
-    Note note = createNoteInternal(parentNote, noteCreation).getCreated().getNote();
-    note.setSiblingOrderToInsertAfter(referenceNote);
-    note.adjustPositionAsAChildOfParentInMemory();
-    modelFactoryService.save(note);
+    Note note =
+        getNoteConstructionService(currentUser.getEntity())
+            .createNoteAfter(
+                referenceNote, noteCreation, parentNote, currentUser.getEntity(), wikidataService);
 
     return new NoteCreationRresult(
         new NoteViewer(currentUser.getEntity(), note).toJsonObject(),
         new NoteViewer(currentUser.getEntity(), parentNote).toJsonObject());
-  }
-
-  private NoteCreationRresult createNoteInternal(Note parentNote, NoteCreationDTO noteCreation)
-      throws InterruptedException, IOException, BindException {
-    User user = currentUser.getEntity();
-    try {
-      Note note =
-          getNoteConstructionService(user)
-              .createNoteWithWikidataInfo(
-                  parentNote,
-                  wikidataService.wrapWikidataIdWithApi(noteCreation.wikidataId),
-                  noteCreation.getLinkTypeToParent(),
-                  noteCreation.getTopicConstructor());
-      return new NoteCreationRresult(
-          new NoteViewer(user, note).toJsonObject(),
-          new NoteViewer(user, parentNote).toJsonObject());
-    } catch (DuplicateWikidataIdException e) {
-      BindingResult bindingResult = new BeanPropertyBindingResult(noteCreation, "noteCreation");
-      bindingResult.rejectValue("wikidataId", "duplicate", "Duplicate Wikidata ID Detected.");
-      throw new BindException(bindingResult);
-    }
   }
 
   private NoteConstructionService getNoteConstructionService(User user) {

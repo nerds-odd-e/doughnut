@@ -1,15 +1,21 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.controllers.dto.NoteCreationDTO;
+import com.odde.doughnut.controllers.dto.NoteCreationRresult;
 import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.DuplicateWikidataIdException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.services.wikidataApis.WikidataIdWithApi;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Optional;
 import lombok.SneakyThrows;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindException;
+import org.springframework.validation.BindingResult;
 
 public record NoteConstructionService(
     User user, Timestamp currentUTCTimestamp, ModelFactoryService modelFactoryService) {
@@ -23,7 +29,7 @@ public record NoteConstructionService(
     return note;
   }
 
-  public Note createNoteWithWikidataInfo(
+  private Note createNoteWithWikidataInfo(
       Note parentNote,
       WikidataIdWithApi wikidataIdWithApi,
       LinkType linkTypeToParent,
@@ -66,5 +72,40 @@ public record NoteConstructionService(
                         throw new RuntimeException(e);
                       }
                     }));
+  }
+
+  public NoteCreationRresult createNoteInternal(
+      Note parentNote, NoteCreationDTO noteCreation, User user, WikidataService wikidataService1)
+      throws InterruptedException, IOException, BindException {
+    try {
+      Note note =
+          createNoteWithWikidataInfo(
+              parentNote,
+              wikidataService1.wrapWikidataIdWithApi(noteCreation.wikidataId),
+              noteCreation.getLinkTypeToParent(),
+              noteCreation.getTopicConstructor());
+      return new NoteCreationRresult(
+          new NoteViewer(user, note).toJsonObject(),
+          new NoteViewer(user, parentNote).toJsonObject());
+    } catch (DuplicateWikidataIdException e) {
+      BindingResult bindingResult = new BeanPropertyBindingResult(noteCreation, "noteCreation");
+      bindingResult.rejectValue("wikidataId", "duplicate", "Duplicate Wikidata ID Detected.");
+      throw new BindException(bindingResult);
+    }
+  }
+
+  public Note createNoteAfter(
+      Note referenceNote,
+      NoteCreationDTO noteCreation,
+      Note parentNote,
+      User user,
+      WikidataService wikidataService1)
+      throws InterruptedException, IOException, BindException {
+    Note note =
+        createNoteInternal(parentNote, noteCreation, user, wikidataService1).getCreated().getNote();
+    note.setSiblingOrderToInsertAfter(referenceNote);
+    note.adjustPositionAsAChildOfParentInMemory();
+    modelFactoryService.save(note);
+    return note;
   }
 }
