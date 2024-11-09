@@ -31,133 +31,146 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import type { SearchTerm } from "@/generated/backend"
 import { NoteTopic } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { debounce } from "mini-debounce"
-import { defineComponent } from "vue"
+import { ref, computed, watch, onMounted, onBeforeUnmount } from "vue"
 import CheckInput from "../form/CheckInput.vue"
 import Cards from "../notes/Cards.vue"
 
+// Props definition
+const props = defineProps({
+  noteId: Number,
+  inputSearchKey: { type: String, required: true },
+  isDropdown: { type: Boolean, default: false },
+})
+
+// Emit slot for template
+defineSlots<{
+  button: (props: { noteTopic: NoteTopic }) => void
+}>()
+
+const { managedApi } = useLoadingApi()
+
+// Data properties
+const searchTerm = ref<SearchTerm>({
+  searchKey: "",
+  allMyNotebooksAndSubscriptions: false,
+  allMyCircles: false,
+})
+
+const oldSearchTerm = ref<SearchTerm>({
+  searchKey: "",
+  allMyNotebooksAndSubscriptions: false,
+  allMyCircles: false,
+})
+
+const cache = ref<{
+  global: Record<string, NoteTopic[]>
+  local: Record<string, NoteTopic[]>
+}>({
+  global: {},
+  local: {},
+})
+
+const recentResult = ref<NoteTopic[] | undefined>()
+const timeoutId = ref<ReturnType<typeof setTimeout>>()
+
+// Computed properties
+const trimmedSearchKey = computed(() => searchTerm.value.searchKey.trim())
+
+const cachedSearches = computed(() =>
+  searchTerm.value.allMyNotebooksAndSubscriptions
+    ? cache.value.global
+    : cache.value.local
+)
+
+const cachedResult = computed(
+  () => cachedSearches.value[trimmedSearchKey.value]
+)
+
+const searchResult = computed(() =>
+  cachedResult.value ? cachedResult.value : recentResult.value
+)
+
+// Methods
+const relativeSearch = async (
+  noteId: undefined | Doughnut.ID,
+  searchTerm: SearchTerm
+) => {
+  if (noteId) {
+    return managedApi.restNoteController.searchForLinkTargetWithin(
+      noteId,
+      searchTerm
+    )
+  }
+  return managedApi.restNoteController.searchForLinkTarget(searchTerm)
+}
+
 const debounced = debounce((callback) => callback(), 500)
 
-export default defineComponent({
-  setup() {
-    return useLoadingApi()
-  },
-  name: "SearchNote",
-  props: {
-    noteId: Number,
-    inputSearchKey: { type: String, required: true },
-    isDropdown: { type: Boolean, default: false },
-  },
-  components: { CheckInput, Cards },
-  data() {
-    return {
-      searchTerm: {
-        searchKey: "",
-        allMyNotebooksAndSubscriptions: false,
-        allMyCircles: false,
-      } as SearchTerm,
-      oldSearchTerm: {
-        searchKey: "",
-        allMyNotebooksAndSubscriptions: false,
-        allMyCircles: false,
-      } as SearchTerm,
-      cache: {
-        global: {},
-        local: {},
-      } as {
-        global: Record<string, NoteTopic[]>
-        local: Record<string, NoteTopic[]>
-      },
-      recentResult: undefined as NoteTopic[] | undefined,
-      timeoutId: null as unknown as ReturnType<typeof setTimeout>,
-    }
-  },
-  watch: {
-    searchTerm: {
-      handler() {
-        if (
-          this.searchTerm.allMyCircles &&
-          !this.oldSearchTerm.allMyNotebooksAndSubscriptions
-        ) {
-          this.searchTerm.allMyNotebooksAndSubscriptions = true
-        } else if (
-          !this.searchTerm.allMyNotebooksAndSubscriptions &&
-          this.oldSearchTerm.allMyCircles
-        ) {
-          this.searchTerm.allMyCircles = false
-        }
-        if (this.searchTerm.searchKey.trim() !== "") {
-          this.search()
-        }
-        this.oldSearchTerm = { ...this.searchTerm }
-      },
-      deep: true,
-    },
-    inputSearchKey() {
-      this.searchTerm.searchKey = this.inputSearchKey
-    },
-  },
-  computed: {
-    trimmedSearchKey() {
-      return this.searchTerm.searchKey.trim()
-    },
-    cachedSearches() {
-      return this.searchTerm.allMyNotebooksAndSubscriptions
-        ? this.cache.global
-        : this.cache.local
-    },
-    cachedResult() {
-      return this.cachedSearches[this.trimmedSearchKey]
-    },
-    searchResult() {
-      return this.cachedResult ? this.cachedResult : this.recentResult
-    },
-  },
-  methods: {
-    async relativeSearch(
-      noteId: undefined | Doughnut.ID,
-      searchTerm: SearchTerm
+const search = () => {
+  if (
+    Object.prototype.hasOwnProperty.call(
+      cachedSearches.value,
+      "trimmedSearchKey"
+    )
+  ) {
+    return
+  }
+
+  timeoutId.value = debounced(async () => {
+    const originalTrimmedKey = trimmedSearchKey.value
+    const result = await relativeSearch(props.noteId, searchTerm.value)
+    recentResult.value = result
+    cachedSearches.value[originalTrimmedKey] = result
+  })
+}
+
+// Watchers
+watch(
+  () => searchTerm.value,
+  () => {
+    if (
+      searchTerm.value.allMyCircles &&
+      !oldSearchTerm.value.allMyNotebooksAndSubscriptions
     ) {
-      if (noteId) {
-        return this.managedApi.restNoteController.searchForLinkTargetWithin(
-          noteId,
-          searchTerm
-        )
-      }
-      return this.managedApi.restNoteController.searchForLinkTarget(searchTerm)
-    },
-
-    search() {
-      if (
-        Object.prototype.hasOwnProperty.call(
-          this.cachedSearches,
-          "trimmedSearchKey"
-        )
-      ) {
-        return
-      }
-
-      this.timeoutId = debounced(async () => {
-        const originalTrimmedKey = this.trimmedSearchKey
-        const result = await this.relativeSearch(this.noteId, this.searchTerm)
-        this.recentResult = result
-        this.cachedSearches[originalTrimmedKey] = result
-      })
-    },
-  },
-  mounted() {
-    if (!this.noteId) {
-      this.searchTerm.allMyNotebooksAndSubscriptions = true
+      searchTerm.value.allMyNotebooksAndSubscriptions = true
+    } else if (
+      !searchTerm.value.allMyNotebooksAndSubscriptions &&
+      oldSearchTerm.value.allMyCircles
+    ) {
+      searchTerm.value.allMyCircles = false
     }
-    this.searchTerm.searchKey = this.inputSearchKey
+    if (searchTerm.value.searchKey.trim() !== "") {
+      search()
+    }
+    oldSearchTerm.value = { ...searchTerm.value }
   },
-  beforeUnmount() {
-    clearTimeout(this.timeoutId)
-  },
+  { deep: true }
+)
+
+watch(
+  () => props.inputSearchKey,
+  () => {
+    searchTerm.value.searchKey = props.inputSearchKey
+  }
+)
+
+// Lifecycle hooks
+onMounted(() => {
+  if (!props.noteId) {
+    searchTerm.value.allMyNotebooksAndSubscriptions = true
+  }
+  searchTerm.value.searchKey = props.inputSearchKey
+})
+
+onBeforeUnmount(() => {
+  if (timeoutId.value) {
+    clearTimeout(timeoutId.value)
+  }
 })
 </script>
 
