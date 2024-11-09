@@ -1,4 +1,4 @@
-import { notebookList } from './NotebookList'
+import { findNotebookCardButton, notebookList } from './NotebookList'
 import { assumeAssessmentPage } from './AssessmentPage'
 
 const addToMyLearning = 'Add to my learning'
@@ -7,14 +7,14 @@ export const bazaarOrCircle = () => {
   return {
     ...notebookList(),
     beginAssessmentOnNotebook(notebook: string) {
-      this.findNotebookCardButton(notebook, 'Start Assessment').click()
+      findNotebookCardButton(notebook, 'Start Assessment').click()
       return assumeAssessmentPage()
     },
     expectNoAddToMyLearningButton(noteTopic: string) {
-      this.findNotebookCardButton(noteTopic, addToMyLearning).shouldNotExist()
+      findNotebookCardButton(noteTopic, addToMyLearning).shouldNotExist()
     },
     subscribe(notebook: string, dailyLearningCount: string) {
-      this.findNotebookCardButton(notebook, addToMyLearning).click()
+      findNotebookCardButton(notebook, addToMyLearning).click()
       cy.get('#subscription-dailyTargetOfNewNotes')
         .clear()
         .type(dailyLearningCount)

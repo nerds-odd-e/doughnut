@@ -10,25 +10,26 @@ export const notebookList = () => {
         expect(cardTitles).to.deep.eq(commonSenseSplit(notebooks, ','))
       })
     },
-    findNotebookCardButton: (notebook: string, name: string) => {
-      const finder = () =>
-        cy
-          .findCardTitle(notebook)
-          .parent()
-          .parent()
-          .parent()
-          .parent()
-          .parent()
-          .findByRole('button', { name: name })
+  }
+}
 
-      return {
-        click() {
-          finder().click()
-        },
-        shouldNotExist() {
-          finder().should('not.exist')
-        },
-      }
+export const findNotebookCardButton = (notebook: string, name: string) => {
+  const finder = () =>
+    cy
+      .findCardTitle(notebook)
+      .parent()
+      .parent()
+      .parent()
+      .parent()
+      .parent()
+      .findByRole('button', { name: name })
+
+  return {
+    click() {
+      finder().click()
+    },
+    shouldNotExist() {
+      finder().should('not.exist')
     },
   }
 }
