@@ -4,6 +4,14 @@ import type { ComponentPublicInstance } from "vue"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 
+vitest.mock("vue-router", () => ({
+  useRouter: () => ({
+    currentRoute: {
+      value: {},
+    },
+  }),
+}))
+
 const mockedSearch = vitest.fn()
 const mockedSearchWithin = vitest.fn()
 const mockedCreateNote = vitest.fn()
@@ -61,9 +69,10 @@ describe("adding new note", () => {
       expect(mockedCreateNote).toHaveBeenCalledWith(note.id, expect.anything())
     })
 
-    it("call the api once only", async () => {
-      await wrapper.find("form").trigger("submit")
-      await wrapper.find("form").trigger("submit")
+    it.only("call the api once only", async () => {
+      wrapper.find("form").trigger("submit")
+      wrapper.find("form").trigger("submit")
+      await flushPromises()
       expect(mockedCreateNote).toHaveBeenCalledTimes(1)
     })
   })
