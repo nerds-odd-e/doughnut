@@ -1,10 +1,10 @@
 <template>
   <SidebarInner
     :class="{ 'is-disabled': !noteRealm }"
-    v-if="lastDefinedNoteRealm && headNoteId"
+    v-if="noteRealm && headNoteId"
     v-bind="{
       noteId: headNoteId,
-      activeNoteRealm: lastDefinedNoteRealm,
+      activeNoteRealm: noteRealm,
       storageAccessor,
     }"
     :key="headNoteId"
@@ -12,8 +12,8 @@
 </template>
 
 <script setup lang="ts">
-import type { PropType, Ref } from "vue"
-import { computed, ref, toRefs, watch } from "vue"
+import type { PropType  } from "vue"
+import { computed } from "vue"
 import type { NoteRealm } from "@/generated/backend"
 import type { StorageAccessor } from "../../store/createNoteStorage"
 import SidebarInner from "./SidebarInner.vue"
@@ -26,24 +26,9 @@ const props = defineProps({
   },
 })
 
-const reactiveProps = toRefs(props)
-
-const lastDefinedNoteRealm: Ref<NoteRealm | undefined> = ref(undefined)
-
-watch(
-  () => reactiveProps.noteRealm?.value,
-  (newNoteRealm) => {
-    if (newNoteRealm !== undefined) {
-      lastDefinedNoteRealm.value = newNoteRealm
-    }
-  },
-  { immediate: true }
-)
-
 const headNoteId = computed(() => {
-  const noteRealm = lastDefinedNoteRealm.value
-  if (!noteRealm) return undefined
-  let cursor = noteRealm.note.noteTopic
+  if (!props.noteRealm) return undefined
+  let cursor = props.noteRealm.note.noteTopic
   while (cursor.parentNoteTopic) {
     cursor = cursor.parentNoteTopic
   }
