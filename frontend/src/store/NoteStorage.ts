@@ -1,10 +1,11 @@
-import type { NoteRealm } from "@/generated/backend"
+import type { Note, NoteRealm } from "@/generated/backend"
 import type { Ref } from "vue"
 import { ref } from "vue"
 
 export default interface NoteStorage {
   refreshNoteRealm(data: NoteRealm): NoteRealm
   refOfNoteRealm(noteId: Doughnut.ID): Ref<NoteRealm | undefined>
+  refOfNoteRealmWithFallback(note: Note): Ref<NoteRealm | undefined>
 }
 
 export class StorageImplementation implements NoteStorage {
@@ -20,5 +21,16 @@ export class StorageImplementation implements NoteStorage {
       this.cache.set(noteId, ref(undefined))
     }
     return this.cache.get(noteId) as Ref<NoteRealm | undefined>
+  }
+
+  refOfNoteRealmWithFallback(note: Note): Ref<NoteRealm | undefined> {
+    const ref = this.refOfNoteRealm(note.id)
+    if (ref.value) {
+      ref.value = {
+        id: note.id,
+        note: note,
+      }
+    }
+    return ref
   }
 }

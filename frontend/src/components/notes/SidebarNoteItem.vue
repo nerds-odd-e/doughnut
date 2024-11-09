@@ -95,5 +95,52 @@ const toggleChildren = (noteId: number) => {
 </script>
 
 <style lang="scss" scoped>
-/* ... styles remain the same ... */
-</style> 
+.active-item {
+  border-left: 1px solid gray !important;
+}
+
+.active-topic {
+  font-weight: bold;
+}
+
+.list-group-item {
+  position: relative;
+  border-radius: 0 !important;
+  min-height: 24px; // Ensure minimum height for drag target
+}
+
+.badge {
+  cursor: pointer;
+  background-color: #aaa;
+  font-weight: initial;
+}
+
+.note-item {
+  cursor: move;
+  padding: 4px;
+  transition: background-color 0.2s;
+}
+
+.note-item.dragging {
+  opacity: 0.5;
+}
+
+.note-content {
+  position: relative;
+  padding-bottom: 4px;
+}
+
+.drop-indicator {
+  position: absolute;
+  height: 2px;
+  background-color: #0d6efd;
+  z-index: 1;
+  pointer-events: none;
+  transition: all 0.2s ease;
+  bottom: 0;
+
+  &.drop-as-child {
+    background-color: #198754;
+  }
+}
+</style>
