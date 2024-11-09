@@ -17,12 +17,20 @@
     <div v-if="!searchResult || searchResult.length === 0">
       <em>No matching notes found.</em>
     </div>
+
+    <div v-else-if="isDropdown" class="dropdown-list">
+      <NoteTopicWithLink
+        v-for="noteTopic in searchResult"
+        :key="noteTopic.id"
+        :note-topic="noteTopic"
+      />
+    </div>
+
     <Cards
       v-else
       class="search-result"
-      :class="{ 'dropdown-cards': isDropdown }"
       :note-topics="searchResult"
-      :columns="isDropdown ? 1 : 3"
+      :columns="3"
     >
       <template #button="{ noteTopic }">
         <slot name="button" :note-topic="noteTopic" />
@@ -39,6 +47,7 @@ import { debounce } from "mini-debounce"
 import { ref, computed, watch, onMounted, onBeforeUnmount } from "vue"
 import CheckInput from "../form/CheckInput.vue"
 import Cards from "../notes/Cards.vue"
+import NoteTopicWithLink from "../notes/NoteTopicWithLink.vue"
 
 // Props definition
 const props = defineProps({
@@ -201,6 +210,22 @@ onBeforeUnmount(() => {
 }
 
 .dropdown-cards :deep(.card:hover) {
+  background-color: #f8f9fa;
+}
+
+.dropdown-list {
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 0.5rem;
+}
+
+.dropdown-list :deep(a) {
+  display: block;
+  padding: 0.25rem 0.5rem;
+  color: inherit;
+}
+
+.dropdown-list :deep(a:hover) {
   background-color: #f8f9fa;
 }
 </style>

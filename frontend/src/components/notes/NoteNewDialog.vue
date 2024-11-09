@@ -8,6 +8,11 @@
           @focus="showDropdown = true"
           @blur="onTopicBlur"
         />
+        <SuggestTopic
+          :original-topic="creationData.topicConstructor"
+          :suggested-topic="suggestedTopic"
+          @suggested-topic-selected="takeSuggestedTopic"
+        />
         <SearchResults
           v-if="showDropdown && creationData.topicConstructor"
           v-bind="{
@@ -18,11 +23,7 @@
           class="topic-search-results"
         />
       </div>
-      <SuggestTopic
-        :original-topic="creationData.topicConstructor"
-        :suggested-topic="suggestedTopic"
-        @suggested-topic-selected="takeSuggestedTopic"
-      />
+
       <WikidataSearchByLabel
         :search-key="creationData.topicConstructor"
         v-model="creationData.wikidataId"
