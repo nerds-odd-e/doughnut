@@ -199,6 +199,11 @@ export const assumeNotePage = (noteTopic?: string) => {
       this.toolbarButton('Add Child Note').click()
       return noteCreationForm
     },
+    addingNextSiblingNote() {
+      cy.pageIsNotLoading()
+      this.toolbarButton('Add Next Sibling Note').click()
+      return noteCreationForm
+    },
     aiGenerateImage() {
       clickNotePageMoreOptionsButton('Generate Image with DALL-E')
     },
