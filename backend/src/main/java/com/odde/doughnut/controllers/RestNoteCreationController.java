@@ -11,6 +11,8 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.io.IOException;
+
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
@@ -39,6 +41,7 @@ class RestNoteCreationController {
   }
 
   @PostMapping(value = "/{parentNote}/create")
+  @Transactional
   public NoteCreationRresult createNote(
       @PathVariable(name = "parentNote") @Schema(type = "integer") Note parentNote,
       @Valid @RequestBody NoteCreationDTO noteCreation)
@@ -52,6 +55,7 @@ class RestNoteCreationController {
   }
 
   @PostMapping(value = "/{referenceNote}/create-after")
+  @Transactional
   public NoteCreationRresult createNoteAfter(
       @PathVariable(name = "referenceNote") @Schema(type = "integer") Note referenceNote,
       @Valid @RequestBody NoteCreationDTO noteCreation)
