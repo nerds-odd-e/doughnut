@@ -16,14 +16,6 @@
         <SvgAddSibling />
       </NoteNewButton>
 
-      <WikidataButton v-bind="{ note, storageAccessor }" />
-
-      <NoteSendMessageButton
-        v-if="!conversationButton"
-        v-bind="{ noteId: note.id }"
-        @show-conversations="$emit('show-conversations')"
-      />
-
       <PopButton title="search and link note">
         <template #button_face>
           <SvgSearchForLink />
@@ -35,6 +27,14 @@
           />
         </template>
       </PopButton>
+
+      <NoteSendMessageButton
+        v-if="!conversationButton"
+        v-bind="{ noteId: note.id }"
+        @show-conversations="$emit('show-conversations')"
+      />
+
+      <WikidataButton v-bind="{ note, storageAccessor }" />
 
       <button v-if="!asMarkdown" class="btn" title="Edit as markdown" @click="$emit('edit-as-markdown', true)">
         <SvgMarkdown />
