@@ -26,8 +26,9 @@
       :class="{ 'd-none': sidebarCollapsedForSmallScreen }"
     >
       <NoteSidebar
+        v-if="noteRealm"
         v-bind="{
-          noteId,
+          noteRealm,
           storageAccessor,
         }"
       />
@@ -52,6 +53,7 @@ import type { PropType } from "vue"
 import { computed, ref } from "vue"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
 import NoteShow from "../components/notes/NoteShow.vue"
+import NoteSidebar from "../components/notes/NoteSidebar.vue"
 import TeleportToHeadStatus from "@/pages/commons/TeleportToHeadStatus.vue"
 import BreadcrumbWithCircle from "../components/toolbars/BreadcrumbWithCircle.vue"
 import type { StorageAccessor } from "../store/createNoteStorage"
