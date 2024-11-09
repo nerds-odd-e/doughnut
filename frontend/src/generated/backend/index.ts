@@ -77,6 +77,7 @@ export type { NoteCreationDTO } from './models/NoteCreationDTO';
 export type { NoteCreationRresult } from './models/NoteCreationRresult';
 export type { NoteDetailsCompletion } from './models/NoteDetailsCompletion';
 export type { NoteInfo } from './models/NoteInfo';
+export type { NoteMoveDTO } from './models/NoteMoveDTO';
 export type { NoteRealm } from './models/NoteRealm';
 export type { NotesTestData } from './models/NotesTestData';
 export type { NoteTestData } from './models/NoteTestData';

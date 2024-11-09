@@ -4,8 +4,6 @@
 /* eslint-disable */
 export type LinkCreation = {
     linkType: LinkCreation.linkType;
-    moveUnder?: boolean;
-    asFirstChild?: boolean;
 };
 export namespace LinkCreation {
     export enum linkType {

@@ -44,8 +44,6 @@ async function moveUnder(targetNoteTopic: NoteTopic) {
   storageAccessor
     .storedApi()
     .moveNote(note!.id, targetNoteTopic.id, {
-      linkType: NoteTopic.linkType.NO_LINK,
-      moveUnder: true,
       asFirstChild: false,
     })
     .then(() => {

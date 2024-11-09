@@ -3,6 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { LinkCreation } from '../models/LinkCreation';
+import type { NoteMoveDTO } from '../models/NoteMoveDTO';
 import type { NoteRealm } from '../models/NoteRealm';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -41,7 +42,7 @@ export class RestLinkControllerService {
     public moveNote(
         sourceNote: number,
         targetNote: number,
-        requestBody: LinkCreation,
+        requestBody: NoteMoveDTO,
     ): CancelablePromise<Array<NoteRealm>> {
         return this.httpRequest.request({
             method: 'POST',

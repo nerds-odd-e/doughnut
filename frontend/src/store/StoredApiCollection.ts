@@ -1,4 +1,5 @@
 import type {
+  NoteMoveDTO,
   NoteRealm,
   WikidataAssociationCreation,
 } from "@/generated/backend"
@@ -69,7 +70,7 @@ export interface StoredApi {
   moveNote(
     sourceId: Doughnut.ID,
     targetId: Doughnut.ID,
-    data: LinkCreation
+    data: NoteMoveDTO
   ): Promise<void>
 }
 export default class StoredApiCollection implements StoredApi {
@@ -291,7 +292,7 @@ export default class StoredApiCollection implements StoredApi {
   async moveNote(
     sourceId: Doughnut.ID,
     targetId: Doughnut.ID,
-    data: LinkCreation
+    data: NoteMoveDTO
   ) {
     this.refreshNoteRealms(
       await this.managedApi.restLinkController.moveNote(

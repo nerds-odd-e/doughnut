@@ -1333,7 +1333,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/LinkCreation"
+              $ref: "#/components/schemas/NoteMoveDTO"
         required: true
       responses:
         "500":
@@ -3532,8 +3532,9 @@ components:
           - before
           - similar to
           - confused with
-        moveUnder:
-          type: boolean
+    NoteMoveDTO:
+      type: object
+      properties:
         asFirstChild:
           type: boolean
     ConversationMessage:
