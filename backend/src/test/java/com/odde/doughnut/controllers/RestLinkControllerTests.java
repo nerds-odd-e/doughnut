@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.dto.LinkCreation;
+import com.odde.doughnut.controllers.dto.NoteMoveDTO;
 import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
@@ -47,25 +48,23 @@ class RestLinkControllerTests {
     User anotherUser;
     Note note1;
     Note note2;
-    LinkCreation linkCreation = new LinkCreation();
+    NoteMoveDTO noteMoveDTO = new NoteMoveDTO();
 
     @BeforeEach
     void setup() {
       anotherUser = makeMe.aUser().please();
       note1 = makeMe.aNote().creatorAndOwner(anotherUser).please();
       note2 = makeMe.aNote("flower").creatorAndOwner(userModel).please();
-      linkCreation.linkType = LinkType.APPLICATION;
-      linkCreation.moveUnder = true;
-      linkCreation.asFirstChild = false;
+      noteMoveDTO.asFirstChild = false;
     }
 
     @Test
     void moveNoteSuccessfully()
         throws BindException, UnexpectedNoAccessRightException, CyclicLinkDetectedException {
       Note note3 = makeMe.aNote().creatorAndOwner(userModel).please();
-      linkCreation.asFirstChild = false;
+      noteMoveDTO.asFirstChild = false;
       var result =
-          controller().moveNote(note3, note2, linkCreation, makeMe.successfulBindingResult());
+          controller().moveNote(note3, note2, noteMoveDTO, makeMe.successfulBindingResult());
       assertThat(result, hasSize(2));
     }
 
@@ -73,16 +72,14 @@ class RestLinkControllerTests {
     void shouldNotAllowMoveOtherPeoplesNote() {
       assertThrows(
           UnexpectedNoAccessRightException.class,
-          () ->
-              controller().moveNote(note1, note2, linkCreation, makeMe.successfulBindingResult()));
+          () -> controller().moveNote(note1, note2, noteMoveDTO, makeMe.successfulBindingResult()));
     }
 
     @Test
     void shouldNotAllowMoveToOtherPeoplesNote() {
       assertThrows(
           UnexpectedNoAccessRightException.class,
-          () ->
-              controller().moveNote(note2, note1, linkCreation, makeMe.successfulBindingResult()));
+          () -> controller().moveNote(note2, note1, noteMoveDTO, makeMe.successfulBindingResult()));
     }
   }
 
@@ -99,8 +96,6 @@ class RestLinkControllerTests {
       note1 = makeMe.aNote().creatorAndOwner(anotherUser).please();
       note2 = makeMe.aNote("flower").creatorAndOwner(userModel).please();
       linkCreation.linkType = LinkType.APPLICATION;
-      linkCreation.moveUnder = true;
-      linkCreation.asFirstChild = false;
     }
 
     @Test

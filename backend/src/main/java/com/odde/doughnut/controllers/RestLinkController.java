@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.LinkCreation;
+import com.odde.doughnut.controllers.dto.NoteMoveDTO;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
@@ -58,14 +59,14 @@ class RestLinkController {
   public List<NoteRealm> moveNote(
       @PathVariable @Schema(type = "integer") Note sourceNote,
       @PathVariable @Schema(type = "integer") Note targetNote,
-      @RequestBody @Valid LinkCreation linkCreation,
+      @RequestBody @Valid NoteMoveDTO noteMoveDTO,
       BindingResult bindingResult)
       throws UnexpectedNoAccessRightException, BindException, CyclicLinkDetectedException {
     if (bindingResult.hasErrors()) throw new BindException(bindingResult);
     currentUser.assertAuthorization(sourceNote);
     currentUser.assertAuthorization(targetNote);
     modelFactoryService
-        .motionOfMoveUnder(sourceNote, targetNote, linkCreation.asFirstChild)
+        .motionOfMoveUnder(sourceNote, targetNote, noteMoveDTO.asFirstChild)
         .execute();
     User user = currentUser.getEntity();
     return List.of(
