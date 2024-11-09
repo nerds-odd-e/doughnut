@@ -14,7 +14,7 @@
           @suggested-topic-selected="takeSuggestedTopic"
         />
         <SearchResults
-          v-if="showDropdown && creationData.topicConstructor"
+          v-show="showDropdown && creationData.topicConstructor"
           v-bind="{
             noteId: referenceNote.id,
             inputSearchKey: creationData.topicConstructor,
