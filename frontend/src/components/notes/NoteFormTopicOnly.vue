@@ -6,19 +6,23 @@
     :error-message="errorMessage"
     v-focus
     @update:model-value="$emit('update:modelValue', $event)"
+    @blur="emit('blur')"
+    @focus="emit('focus')"
+
   />
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue"
+<script setup lang="ts">
 import TextInput from "../form/TextInput.vue"
 
-export default defineComponent({
-  props: {
-    modelValue: { type: String },
-    errorMessage: { type: String },
-  },
-  emits: ["update:modelValue"],
-  components: { TextInput },
-})
+defineProps<{
+  modelValue?: string
+  errorMessage?: string
+}>()
+
+const emit = defineEmits<{
+  "update:modelValue": [value: string]
+  blur: []
+  focus: []
+}>()
 </script>

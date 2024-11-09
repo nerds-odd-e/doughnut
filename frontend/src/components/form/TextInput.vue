@@ -13,7 +13,8 @@
       :autofocus="autofocus"
       autocomplete="off"
       autocapitalize="off"
-      @blur="$emit('blur', $event)"
+      @blur="$emit('blur')"
+      @focus="$emit('focus')"
       :disabled="disabled"
     />
   </InputWithType>
@@ -33,4 +34,10 @@ defineProps({
   errorMessage: String,
   disabled: { type: Boolean, default: false },
 })
+
+defineEmits<{
+  "update:modelValue": [value: string]
+  blur: []
+  focus: []
+}>()
 </script>

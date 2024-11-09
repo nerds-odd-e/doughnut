@@ -1,26 +1,34 @@
 <template>
-  <div>
-    <CheckInput
-      scope-name="searchTerm"
-      field="allMyNotebooksAndSubscriptions"
-      v-model="searchTerm.allMyNotebooksAndSubscriptions"
-      :disabled="!noteId"
-    />
-    <CheckInput
-      scope-name="searchTerm"
-      field="allMyCircles"
-      v-model="searchTerm.allMyCircles"
-    />
-  </div>
+  <div :class="{ 'dropdown-style': isDropdown }">
+    <div v-if="!isDropdown">
+      <CheckInput
+        scope-name="searchTerm"
+        field="allMyNotebooksAndSubscriptions"
+        v-model="searchTerm.allMyNotebooksAndSubscriptions"
+        :disabled="!noteId"
+      />
+      <CheckInput
+        scope-name="searchTerm"
+        field="allMyCircles"
+        v-model="searchTerm.allMyCircles"
+      />
+    </div>
 
-  <div v-if="!searchResult || searchResult.length === 0">
-    <em>No matching notes found.</em>
+    <div v-if="!searchResult || searchResult.length === 0">
+      <em>No matching notes found.</em>
+    </div>
+    <Cards
+      v-else
+      class="search-result"
+      :class="{ 'dropdown-cards': isDropdown }"
+      :note-topics="searchResult"
+      :columns="isDropdown ? 1 : 3"
+    >
+      <template #button="{ noteTopic }">
+        <slot name="button" :note-topic="noteTopic" />
+      </template>
+    </Cards>
   </div>
-  <Cards v-else class="search-result" :note-topics="searchResult" :columns="3">
-    <template #button="{ noteTopic }">
-      <slot name="button" :note-topic="noteTopic" />
-    </template>
-  </Cards>
 </template>
 
 <script lang="ts">
@@ -39,7 +47,11 @@ export default defineComponent({
     return useLoadingApi()
   },
   name: "SearchNote",
-  props: { noteId: Number, inputSearchKey: { type: String, required: true } },
+  props: {
+    noteId: Number,
+    inputSearchKey: { type: String, required: true },
+    isDropdown: { type: Boolean, default: false },
+  },
   components: { CheckInput, Cards },
   data() {
     return {
@@ -153,5 +165,29 @@ export default defineComponent({
 .search-result {
   max-height: 300px;
   overflow-y: auto;
+}
+
+.dropdown-style {
+  position: absolute;
+  width: 100%;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  z-index: 1000;
+}
+
+.dropdown-cards {
+  max-height: 200px;
+  padding: 0.5rem;
+}
+
+.dropdown-cards :deep(.card) {
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+}
+
+.dropdown-cards :deep(.card:hover) {
+  background-color: #f8f9fa;
 }
 </style>

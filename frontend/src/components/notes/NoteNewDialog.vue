@@ -1,10 +1,23 @@
 <template>
   <form @submit.prevent="processForm">
     <fieldset :disabled="processing">
-      <NoteFormTopicOnly
-        v-model="creationData.topicConstructor"
-        :error-message="noteFormErrors.topicConstructor"
-      />
+      <div class="topic-search-container">
+        <NoteFormTopicOnly
+          v-model="creationData.topicConstructor"
+          :error-message="noteFormErrors.topicConstructor"
+          @focus="showDropdown = true"
+          @blur="onTopicBlur"
+        />
+        <SearchResults
+          v-if="showDropdown && creationData.topicConstructor"
+          v-bind="{
+            noteId: referenceNote.id,
+            inputSearchKey: creationData.topicConstructor,
+            isDropdown: true
+          }"
+          class="topic-search-results"
+        />
+      </div>
       <SuggestTopic
         :original-topic="creationData.topicConstructor"
         :suggested-topic="suggestedTopic"
@@ -17,15 +30,6 @@
         @selected="onSelectWikidataEntry"
       />
       <input type="submit" value="Submit" class="btn btn-primary" />
-      <fieldset class="secondary-info">
-        <legend>Similar Notes</legend>
-        <SearchResults
-          v-bind="{
-            noteId: referenceNote.id,
-            inputSearchKey: creationData.topicConstructor,
-          }"
-        />
-      </fieldset>
     </fieldset>
   </form>
 </template>
@@ -72,6 +76,7 @@ const noteFormErrors = ref({
 
 const suggestedTopic = ref("")
 const processing = ref(false)
+const showDropdown = ref(false)
 
 // Methods
 const processForm = async () => {
@@ -121,9 +126,26 @@ const takeSuggestedTopic = (topic: string) => {
   creationData.value.topicConstructor = topic
   suggestedTopic.value = ""
 }
+
+const onTopicBlur = () => {
+  setTimeout(() => {
+    showDropdown.value = false
+  }, 200)
+}
 </script>
 
-<style lang="sass">
+<style lang="sass" scoped>
+.topic-search-container
+  position: relative
+  margin-bottom: 1rem
+
+.topic-search-results
+  position: absolute
+  top: 100%
+  left: 0
+  right: 0
+  z-index: 1000
+
 .secondary-info
   margin-top: 1rem
   padding: 5px
