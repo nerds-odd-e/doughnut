@@ -69,7 +69,7 @@ describe("adding new note", () => {
       expect(mockedCreateNote).toHaveBeenCalledWith(note.id, expect.anything())
     })
 
-    it.only("call the api once only", async () => {
+    it("call the api once only", async () => {
       wrapper.find("form").trigger("submit")
       wrapper.find("form").trigger("submit")
       await flushPromises()
