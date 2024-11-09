@@ -9,8 +9,9 @@
       </NoteNewButton>
 
       <NoteNewButton
+        v-if="note.parentId"
         button-title="Add Next Sibling Note"
-        v-bind="{ parentId: note.parentId!, insertAfterId: note.id, storageAccessor }"
+        v-bind="{ parentId: note.parentId, insertAfterId: note.id, storageAccessor }"
       >
         <SvgAddSibling />
       </NoteNewButton>
