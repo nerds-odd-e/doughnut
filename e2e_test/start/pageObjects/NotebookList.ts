@@ -17,11 +17,7 @@ export const findNotebookCardButton = (notebook: string, name: string) => {
   const finder = () =>
     cy
       .findCardTitle(notebook)
-      .parent()
-      .parent()
-      .parent()
-      .parent()
-      .parent()
+      .parents('.card')
       .findByRole('button', { name: name })
 
   return {
