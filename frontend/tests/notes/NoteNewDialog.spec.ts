@@ -7,7 +7,6 @@ import helper from "@tests/helpers"
 const mockedSearch = vitest.fn()
 const mockedSearchWithin = vitest.fn()
 const mockedCreateNote = vitest.fn()
-const note = makeMe.aNote.please()
 
 describe("adding new note", () => {
   beforeEach(() => {

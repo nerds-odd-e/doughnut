@@ -74,7 +74,7 @@ public record NoteConstructionService(
                     }));
   }
 
-  public NoteCreationRresult createNoteInternal(
+  public NoteCreationRresult createNoteWithWikidataService(
       Note parentNote, NoteCreationDTO noteCreation, User user, WikidataService wikidataService1)
       throws InterruptedException, IOException, BindException {
     try {
@@ -102,7 +102,9 @@ public record NoteConstructionService(
       WikidataService wikidataService1)
       throws InterruptedException, IOException, BindException {
     Note note =
-        createNoteInternal(parentNote, noteCreation, user, wikidataService1).getCreated().getNote();
+        createNoteWithWikidataService(parentNote, noteCreation, user, wikidataService1)
+            .getCreated()
+            .getNote();
     note.setSiblingOrderToInsertAfter(referenceNote);
     note.adjustPositionAsAChildOfParentInMemory();
     modelFactoryService.save(note);
