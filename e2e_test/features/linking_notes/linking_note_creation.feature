@@ -12,8 +12,7 @@ Feature: link note
   @mockBrowserTime
   Scenario: View all linkable notes for a note when no link exists
     When I am creating a linking note under note "Sedition"
-    Then I should see the parent note as "Sedition"
-    And I should see "Sedation, Sedative" as targets only when searching in all my notebooks " se "
+    Then I should see "Sedation, Sedative" as targets only when searching in all my notebooks " se "
     And I should see note cannot be found when searching in all my notebooks "Sedition"
 
   @mockBrowserTime

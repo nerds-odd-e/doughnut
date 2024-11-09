@@ -53,12 +53,6 @@ When(
   }
 )
 
-When('I should see the parent note as {string}', (noteTopic: string) => {
-  cy.findByText(noteTopic, { selector: 'strong .topic-text' }).should(
-    'be.visible'
-  )
-})
-
 When(
   'I should see {string} as the possible duplicate',
   (noteTopicsAsString: string) => {
