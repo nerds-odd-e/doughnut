@@ -173,12 +173,6 @@ Cypress.Commands.add('startSearching', () => {
   start.assumeNotePage().toolbarButton('search note').click()
 })
 
-Cypress.Commands.add('expectExactLinkTargets', (targets) => {
-  cy.get('.search-result a.card-title')
-    .then((elms) => Cypress._.map(elms, 'innerText'))
-    .should('deep.equal', targets)
-})
-
 Cypress.Commands.add(
   'initialReviewOneNoteIfThereIs',
   ({
@@ -334,12 +328,6 @@ Cypress.Commands.add(
 
 Cypress.Commands.add('formField', (label) => {
   return cy.findByLabelText(label)
-})
-
-Cypress.Commands.add('searchNote', (searchKey: string, options: string[]) => {
-  options?.forEach((option: string) => cy.formField(option).check())
-  cy.findByPlaceholderText('Search').clear().type(searchKey)
-  cy.tick(500)
 })
 
 Cypress.Commands.add('failure', () => {

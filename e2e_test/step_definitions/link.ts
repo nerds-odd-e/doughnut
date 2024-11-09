@@ -22,8 +22,10 @@ When(
 When(
   'I link note {string} as {string} note {string}',
   (fromNoteTopic: string, linkType: string, toNoteTopic: string) => {
-    start.jumpToNotePage(fromNoteTopic).startSearchingAndLinkNote()
-    cy.searchNote(toNoteTopic, ['All My Notebooks And Subscriptions'])
+    start
+      .jumpToNotePage(fromNoteTopic)
+      .startSearchingAndLinkNote()
+      .findTarget(toNoteTopic)
     cy.clickButtonOnCardBody(toNoteTopic, 'Select')
     cy.clickRadioByLabel(linkType)
     cy.findByRole('button', { name: 'Create Link' }).click()
@@ -33,8 +35,10 @@ When(
 When(
   'I move note {string} to be under note {string}',
   (fromNoteTopic: string, toNoteTopic: string) => {
-    start.jumpToNotePage(fromNoteTopic).startSearchingAndLinkNote()
-    cy.searchNote(toNoteTopic, ['All My Notebooks And Subscriptions'])
+    start
+      .jumpToNotePage(fromNoteTopic)
+      .startSearchingAndLinkNote()
+      .findTarget(toNoteTopic)
     cy.clickButtonOnCardBody(toNoteTopic, 'Select')
     cy.formField('Also Move To Under Target Note').check()
     cy.findByRole('button', { name: 'Create Link' }).click()
@@ -59,36 +63,42 @@ When(
   'I should see {string} as the possible duplicate',
   (noteTopicsAsString: string) => {
     cy.tick(500)
-    cy.expectExactLinkTargets(
-      commonSenseSplit(noteTopicsAsString, ',').map((i: string) => i.trim())
-    )
+    start
+      .assumeNoteTargetSearchDialog()
+      .expectExactLinkTargets(
+        commonSenseSplit(noteTopicsAsString, ',').map((i: string) => i.trim())
+      )
   }
 )
 
 When(
   'I should see {string} as targets only when searching {string}',
   (noteTopicsAsString: string, searchKey: string) => {
-    cy.searchNote(searchKey, [])
-    cy.expectExactLinkTargets(
-      commonSenseSplit(noteTopicsAsString, ',').map((i: string) => i.trim())
-    )
+    start
+      .assumeNoteTargetSearchDialog()
+      .findTargetWithinNotebook(searchKey)
+      .expectExactLinkTargets(
+        commonSenseSplit(noteTopicsAsString, ',').map((i: string) => i.trim())
+      )
   }
 )
 
 When(
   'I should see {string} as targets only when searching in all my notebooks {string}',
   (noteTopicsAsString: string, searchKey: string) => {
-    cy.searchNote(searchKey, ['All My Notebooks And Subscriptions'])
-    cy.expectExactLinkTargets(
-      commonSenseSplit(noteTopicsAsString, ',').map((i: string) => i.trim())
-    )
+    start
+      .assumeNoteTargetSearchDialog()
+      .findTarget(searchKey)
+      .expectExactLinkTargets(
+        commonSenseSplit(noteTopicsAsString, ',').map((i: string) => i.trim())
+      )
   }
 )
 
 When(
   'I should see note cannot be found when searching in all my notebooks {string}',
   (searchKey: string) => {
-    cy.searchNote(searchKey, ['All My Notebooks And Subscriptions'])
+    start.assumeNoteTargetSearchDialog().findTarget(searchKey)
     cy.findByText('No matching notes found.').should('be.visible')
   }
 )

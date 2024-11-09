@@ -15,6 +15,7 @@ import testability from './testability'
 import { logins } from './logins'
 import { messageCenterIndicator } from './pageObjects/messageCenterIndicator'
 import { assumeAudioTools } from './pageObjects/audioToolsPage'
+import { assumeNoteTargetSearchDialog } from './pageObjects/noteTargetSearchDialog'
 
 export default {
   navigateToBazaar,
@@ -28,6 +29,7 @@ export default {
   assumeQuestionPage,
   assumeAdminDashboardPage,
   assumeMessageCenterPage,
+  assumeNoteTargetSearchDialog,
   routerToNotebooksPage: routerToMyNotebooksPage,
   navigateToCircle,
   navigateToMessageCenter,

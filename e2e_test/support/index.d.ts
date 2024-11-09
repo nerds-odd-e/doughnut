@@ -13,7 +13,6 @@ declare namespace Cypress {
       item: string,
       addChildButton: boolean = true
     ): Chainable<any>
-    expectExactLinkTargets(targets: any): Chainable<any>
     expectFieldErrorMessage(field: string, message: string): Chainable<any>
     expectNoteCards(expectedCards: any): Chainable<any>
     findCardTitle(topic: string): Chainable<any>
@@ -42,7 +41,6 @@ declare namespace Cypress {
     routerToRoot(): Chainable<any>
     routerToInitialReview(): Chainable<any>
     routerToRepeatReview(): Chainable<any>
-    searchNote(searchKey: any, options: any): Chainable<any>
     shouldSeeQuizWithOptions(questionParts: any, options: any): Chainable<any>
     startSearching(): Chainable<any>
     undoLast(undoThpe: string): Chainable<any>

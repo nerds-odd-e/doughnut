@@ -5,6 +5,7 @@ import { assumeConversationAboutNotePage } from './conversationAboutNotePage'
 import noteCreationForm from './noteForms/noteCreationForm'
 import { questionListPage } from './questionListPage'
 import { assumeQuestionPage } from './QuizQuestionPage'
+import { assumeNoteTargetSearchDialog } from './noteTargetSearchDialog'
 
 function filterAttributes(
   attributes: Record<string, string>,
@@ -193,6 +194,7 @@ export const assumeNotePage = (noteTopic?: string) => {
 
     startSearchingAndLinkNote() {
       this.toolbarButton('search and link note').click()
+      return assumeNoteTargetSearchDialog()
     },
     addingChildNote() {
       cy.pageIsNotLoading()
