@@ -37,104 +37,98 @@
   </form>
 </template>
 
-<script lang="ts">
-import type { WikidataSearchEntity } from "@/generated/backend"
+<script setup lang="ts">
+import type { WikidataSearchEntity, Note } from "@/generated/backend"
 import { NoteCreationDTO } from "@/generated/backend"
-import type { PropType } from "vue"
-import { defineComponent } from "vue"
+import type { InsertMode } from "@/models/InsertMode"
 import type { StorageAccessor } from "../../store/createNoteStorage"
+import { ref } from "vue"
 import LinkTypeSelectCompact from "../links/LinkTypeSelectCompact.vue"
 import SearchResults from "../search/SearchResults.vue"
 import NoteFormTopicOnly from "./NoteFormTopicOnly.vue"
 import SuggestTopic from "./SuggestTopic.vue"
 import WikidataSearchByLabel from "./WikidataSearchByLabel.vue"
-import type { Note } from "@/generated/backend"
-import type { InsertMode } from "@/models/InsertMode"
+import { useRouter } from "vue-router"
 
-export default defineComponent({
-  components: {
-    NoteFormTopicOnly,
-    SearchResults,
-    LinkTypeSelectCompact,
-    WikidataSearchByLabel,
-    SuggestTopic,
-  },
-  props: {
-    referenceNote: { type: Object as PropType<Note>, required: true },
-    insertMode: { type: String as PropType<InsertMode>, required: true },
-    storageAccessor: {
-      type: Object as PropType<StorageAccessor>,
-      required: true,
-    },
-  },
-  emits: ["closeDialog"],
-  data() {
-    return {
-      creationData: <NoteCreationDTO>{
-        linkTypeToParent: "no link",
-        topicConstructor: "",
-        wikidataId: "",
-      },
-      noteFormErrors: {
-        linkTypeToParent: undefined,
-        topicConstructor: undefined as undefined | string,
-        wikidataId: undefined as undefined | string,
-      },
-      suggestedTopic: "",
-      processing: false,
-    }
-  },
-  methods: {
-    processForm() {
-      if (this.processing) return
-      this.processing = true
-      this.noteFormErrors.wikidataId = undefined
-      this.noteFormErrors.topicConstructor = undefined
+const router = useRouter()
 
-      const api = this.storageAccessor.storedApi()
-      const promise =
-        this.insertMode === "as-child"
-          ? api.createNote(
-              this.$router,
-              this.referenceNote.id,
-              this.creationData
-            )
-          : api.createNoteAfter(
-              this.$router,
-              this.referenceNote.id,
-              this.creationData
-            )
+// Props
+const props = defineProps<{
+  referenceNote: Note
+  insertMode: InsertMode
+  storageAccessor: StorageAccessor
+}>()
 
-      promise
-        .then(() => {
-          this.$emit("closeDialog")
-        })
-        .catch((res) => {
-          this.noteFormErrors = res
-        })
-        .finally(() => {
-          this.processing = false
-        })
-    },
-    onSelectWikidataEntry(selectedSuggestion: WikidataSearchEntity) {
-      const currentLabel = this.creationData.topicConstructor.toUpperCase()
-      const newLabel = selectedSuggestion.label.toUpperCase()
+// Emits
+const emit = defineEmits<{
+  closeDialog: []
+}>()
 
-      if (currentLabel === newLabel) {
-        this.creationData.topicConstructor = selectedSuggestion.label
-        this.suggestedTopic = ""
-      } else {
-        this.suggestedTopic = selectedSuggestion.label
-      }
-
-      this.creationData.wikidataId = selectedSuggestion.id
-    },
-    takeSuggestedTopic(topic: string) {
-      this.creationData.topicConstructor = topic
-      this.suggestedTopic = ""
-    },
-  },
+// Reactive state
+const creationData = ref<NoteCreationDTO>({
+  linkTypeToParent: NoteCreationDTO.linkTypeToParent.NO_LINK,
+  topicConstructor: "",
+  wikidataId: "",
 })
+
+const noteFormErrors = ref({
+  linkTypeToParent: undefined,
+  topicConstructor: undefined as undefined | string,
+  wikidataId: undefined as undefined | string,
+})
+
+const suggestedTopic = ref("")
+const processing = ref(false)
+
+// Methods
+const processForm = async () => {
+  if (processing.value) return
+  processing.value = true
+  noteFormErrors.value.wikidataId = undefined
+  noteFormErrors.value.topicConstructor = undefined
+
+  const api = props.storageAccessor.storedApi()
+  try {
+    if (props.insertMode === "as-child") {
+      await api.createNote(router, props.referenceNote.id, creationData.value)
+    } else {
+      await api.createNoteAfter(
+        router,
+        props.referenceNote.id,
+        creationData.value
+      )
+    }
+    emit("closeDialog")
+  } catch (res: unknown) {
+    noteFormErrors.value = {
+      linkTypeToParent: undefined,
+      topicConstructor: undefined,
+      wikidataId: undefined,
+      ...(res as object),
+    }
+  } finally {
+    processing.value = false
+  }
+}
+
+const onSelectWikidataEntry = (selectedSuggestion: WikidataSearchEntity) => {
+  const currentLabel = creationData.value.topicConstructor.toUpperCase()
+  const newLabel = selectedSuggestion.label.toUpperCase()
+
+  if (currentLabel === newLabel) {
+    creationData.value.topicConstructor = selectedSuggestion.label
+    suggestedTopic.value = ""
+  } else {
+    suggestedTopic.value = selectedSuggestion.label
+  }
+
+  creationData.value.wikidataId = selectedSuggestion.id
+}
+
+const takeSuggestedTopic = (topic: string) => {
+  creationData.value.topicConstructor = topic
+  suggestedTopic.value = ""
+}
 </script>
 
 <style lang="sass">
