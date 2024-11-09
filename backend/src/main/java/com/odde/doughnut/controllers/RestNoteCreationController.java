@@ -19,21 +19,23 @@ import org.springframework.web.context.annotation.SessionScope;
 @SessionScope
 @RequestMapping("/api/notes")
 class RestNoteCreationController {
-  private final ModelFactoryService modelFactoryService;
   private final UserModel currentUser;
   private final WikidataService wikidataService;
-  private final TestabilitySettings testabilitySettings;
+  private final NoteConstructionService noteConstructionService;
 
   public RestNoteCreationController(
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
       HttpClientAdapter httpClientAdapter,
       TestabilitySettings testabilitySettings) {
-    this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
-    this.testabilitySettings = testabilitySettings;
     this.wikidataService =
         new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
+    this.noteConstructionService =
+        new NoteConstructionService(
+            currentUser.getEntity(),
+            testabilitySettings.getCurrentUTCTimestamp(),
+            modelFactoryService);
   }
 
   @PostMapping(value = "/{parentNote}/create")
@@ -42,9 +44,8 @@ class RestNoteCreationController {
       @Valid @RequestBody NoteCreationDTO noteCreation)
       throws UnexpectedNoAccessRightException, InterruptedException, IOException, BindException {
     currentUser.assertAuthorization(parentNote);
-    return getNoteConstructionService(currentUser.getEntity())
-        .createNoteWithWikidataService(
-            parentNote, noteCreation, currentUser.getEntity(), wikidataService);
+    return noteConstructionService.createNoteWithWikidataService(
+        parentNote, noteCreation, currentUser.getEntity(), wikidataService);
   }
 
   @PostMapping(value = "/{referenceNote}/create-after")
@@ -59,17 +60,11 @@ class RestNoteCreationController {
     }
 
     Note note =
-        getNoteConstructionService(currentUser.getEntity())
-            .createNoteAfter(
-                referenceNote, noteCreation, parentNote, currentUser.getEntity(), wikidataService);
+        noteConstructionService.createNoteAfter(
+            referenceNote, noteCreation, parentNote, currentUser.getEntity(), wikidataService);
 
     return new NoteCreationRresult(
         new NoteViewer(currentUser.getEntity(), note).toJsonObject(),
         new NoteViewer(currentUser.getEntity(), parentNote).toJsonObject());
-  }
-
-  private NoteConstructionService getNoteConstructionService(User user) {
-    return new NoteConstructionService(
-        user, testabilitySettings.getCurrentUTCTimestamp(), modelFactoryService);
   }
 }
