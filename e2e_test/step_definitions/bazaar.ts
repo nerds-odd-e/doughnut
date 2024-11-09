@@ -15,7 +15,7 @@ Then('notebook {string} is shared to the Bazaar', (noteTopic: string) => {
 })
 
 Then("there shouldn't be any note edit button", () => {
-  start.assumeNotePage().editNoteImage().shouldNotExist()
+  start.assumeNotePage().addingChildNoteButton().shouldNotExist()
 })
 
 When('I open the notebook {string} in the Bazaar', (noteTopic: string) => {

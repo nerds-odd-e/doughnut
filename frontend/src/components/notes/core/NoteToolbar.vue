@@ -43,6 +43,9 @@
         <SvgRichContent />
       </button>
 
+      <button class="btn" title="Audio tools" v-if="!audioTools" @click="audioTools = true">
+        <SvgAudioInput />
+      </button>
 
       <div class="dropdown">
         <button
@@ -129,11 +132,6 @@
         </div>
       </div>
     </div>
-    <div class="btn-group btn-group-sm ms-auto">
-      <button class="btn" title="Audio tools" v-if="!audioTools" @click="audioTools = true">
-        <SvgAudioInput />
-      </button>
-   </div>
   </nav>
   <NoteAudioTools
     v-if="audioTools"

@@ -200,9 +200,12 @@ export const assumeNotePage = (noteTopic?: string) => {
       this.toolbarButton('search and link note').click()
       return assumeNoteTargetSearchDialog()
     },
-    addingChildNote() {
+    addingChildNoteButton() {
       cy.pageIsNotLoading()
-      this.toolbarButton('Add Child Note').click()
+      return this.toolbarButton('Add Child Note')
+    },
+    addingChildNote() {
+      this.addingChildNoteButton().click()
       return noteCreationForm
     },
     addingNextSiblingNote() {
