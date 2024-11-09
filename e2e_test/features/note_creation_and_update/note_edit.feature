@@ -28,25 +28,35 @@ Feature: Note Edit
 
   Scenario: Edit a note details with bullet points
     When I update note "LeSS in Action" to become:
-      | Topic     | Details           |
-      | Odd-e CSD | * must join       |
+      | Topic     | Details     |
+      | Odd-e CSD | * must join |
     Then I should see "must join" in the page
 
   Scenario: Edit a note's details as markdown
     When I update note "LeSS in Action" details using markdown to become:
-    """
-    # Odd-e LiA
-    ## Our best training
+      """
+      # Odd-e LiA
+      ## Our best training
 
-    * Specification by Example
-      * Discuss in workshop
-      * Conccurent engineering
-      * Living documentation
-    * Test-Driven Development
-    """
+      * Specification by Example
+        * Discuss in workshop
+        * Conccurent engineering
+        * Living documentation
+      * Test-Driven Development
+      """
     Then I should see the rich content of the note with details:
-      | Tag | Content                  |
-      | h1  | Odd-e LiA                |
-      | h2  | Our best training        |
-      | li  | Specification by Example |
-      | li.ql-indent-1  | Living documentation     |
+      | Tag            | Content                  |
+      | h1             | Odd-e LiA                |
+      | h2             | Our best training        |
+      | li             | Specification by Example |
+      | li.ql-indent-1 | Living documentation     |
+
+  @ignore
+  Scenario: Edit a note topic should update the sidebar
+    Given there are some notes:
+      | Topic | Parent Topic   |
+      | TDD   | LeSS in Action |
+    When I update note topic "TDD" to become "Critical thinking"
+    Then I should see the note tree in the sidebar
+      | note-topic        |
+      | Critical thinking |

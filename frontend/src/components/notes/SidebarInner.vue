@@ -56,21 +56,19 @@
 </template>
 
 <script setup lang="ts">
-import type { PropType } from "vue"
-import { ref, watch } from "vue"
 import type { Note, NoteRealm } from "@/generated/backend"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
 import type { StorageAccessor } from "../../store/createNoteStorage"
 import NoteTopicWithLink from "./NoteTopicWithLink.vue"
+import { ref, watch } from "vue"
 
-const props = defineProps({
-  noteId: { type: Number, required: true },
-  activeNoteRealm: { type: Object as PropType<NoteRealm>, required: true },
-  storageAccessor: {
-    type: Object as PropType<StorageAccessor>,
-    required: true,
-  },
-})
+interface Props {
+  noteId: number
+  activeNoteRealm: NoteRealm
+  storageAccessor: StorageAccessor
+}
+
+const props = defineProps<Props>()
 
 const noteRealm = props.storageAccessor
   .storedApi()
