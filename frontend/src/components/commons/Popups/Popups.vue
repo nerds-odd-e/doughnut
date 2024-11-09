@@ -3,6 +3,7 @@
     <Modal
       v-if="popupInfo.type === 'alert'"
       class="popups"
+      :isPopup="true"
       @close_request="resolve(true)"
     >
       <template #header>
@@ -19,6 +20,7 @@
     <Modal
       v-if="popupInfo.type === 'confirm'"
       class="popups"
+      :isPopup="true"
       @close_request="resolve(false)"
     >
       <template #header>

@@ -8,6 +8,15 @@ import { screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
+import { ref } from "vue"
+
+const mockedPush = vi.fn()
+vitest.mock("vue-router", () => ({
+  useRoute: () => vi.fn().mockReturnValue(ref(null)),
+  useRouter: () => ({
+    push: mockedPush,
+  }),
+}))
 
 describe("global bar", () => {
   let noteEditingHistory: NoteEditingHistory

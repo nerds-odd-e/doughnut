@@ -21,13 +21,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed, watch } from "vue"
+import { computed, watch, onMounted, onUnmounted } from "vue"
 import SvgClose from "../svgs/SvgClose.vue"
 import { useRoute } from "vue-router"
 
 // Props
 interface Props {
   sidebar?: "left" | "right"
+  isPopup?: boolean
 }
 const props = defineProps<Props>()
 
@@ -47,6 +48,26 @@ const sidebarStyle = computed(() => {
 const route = useRoute()
 watch(route, () => {
   emit("close_request")
+})
+
+// ESC key handler - only for non-popup modals
+const handleEscape = (event: KeyboardEvent) => {
+  if (!props.isPopup && event.key === "Escape") {
+    emit("close_request")
+  }
+}
+
+// Add/remove event listener
+onMounted(() => {
+  if (!props.isPopup) {
+    document.addEventListener("keydown", handleEscape)
+  }
+})
+
+onUnmounted(() => {
+  if (!props.isPopup) {
+    document.removeEventListener("keydown", handleEscape)
+  }
 })
 </script>
 
