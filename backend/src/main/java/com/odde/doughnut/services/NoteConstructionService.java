@@ -97,12 +97,12 @@ public record NoteConstructionService(
   public Note createNoteAfter(
       Note referenceNote,
       NoteCreationDTO noteCreation,
-      Note parentNote,
       User user,
       WikidataIdWithApi wikidataIdWithApi)
       throws InterruptedException, IOException, BindException {
     Note note =
-        createNoteWithWikidataService(parentNote, noteCreation, user, wikidataIdWithApi)
+        createNoteWithWikidataService(
+                referenceNote.getParent(), noteCreation, user, wikidataIdWithApi)
             .getCreated()
             .getNote();
     note.setSiblingOrderToInsertAfter(referenceNote);

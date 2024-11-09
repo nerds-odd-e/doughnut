@@ -11,7 +11,6 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.io.IOException;
-
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.*;
@@ -61,8 +60,7 @@ class RestNoteCreationController {
       @Valid @RequestBody NoteCreationDTO noteCreation)
       throws UnexpectedNoAccessRightException, InterruptedException, IOException, BindException {
     currentUser.assertAuthorization(referenceNote);
-    Note parentNote = referenceNote.getParent();
-    if (parentNote == null) {
+    if (referenceNote.getParent() == null) {
       throw new UnexpectedNoAccessRightException();
     }
 
@@ -70,12 +68,11 @@ class RestNoteCreationController {
         noteConstructionService.createNoteAfter(
             referenceNote,
             noteCreation,
-            parentNote,
             currentUser.getEntity(),
             wikidataService.wrapWikidataIdWithApi(noteCreation.wikidataId));
 
     return new NoteCreationRresult(
         new NoteViewer(currentUser.getEntity(), note).toJsonObject(),
-        new NoteViewer(currentUser.getEntity(), parentNote).toJsonObject());
+        new NoteViewer(currentUser.getEntity(), note.getParent()).toJsonObject());
   }
 }
