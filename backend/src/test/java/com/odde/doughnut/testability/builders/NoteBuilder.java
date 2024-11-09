@@ -203,7 +203,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
 
   public NoteBuilder after(Note note) {
     under(note.getParent());
-    entity.updateSiblingOrderAfter(note);
+    entity.setSiblingOrderToInsertAfter(note);
     return this;
   }
 

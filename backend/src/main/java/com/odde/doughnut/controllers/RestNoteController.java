@@ -94,7 +94,7 @@ class RestNoteController {
     }
 
     Note note = createNoteInternal(parentNote, noteCreation).getCreated().getNote();
-    note.updateSiblingOrderAfter(referenceNote);
+    note.setSiblingOrderToInsertAfter(referenceNote);
     note.adjustPositionAsAChildOfParentInMemory();
     modelFactoryService.save(note);
 

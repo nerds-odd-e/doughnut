@@ -21,7 +21,7 @@ public class NoteMotionModel {
       subject.updateSiblingOrderAsFirstChild(relativeToNote);
       subject.setParentNote(relativeToNote);
     } else {
-      subject.updateSiblingOrderAfter(relativeToNote);
+      subject.setSiblingOrderToInsertAfter(relativeToNote);
       subject.setParentNote(relativeToNote.getParent());
     }
     subject.adjustPositionAsAChildOfParentInMemory();

@@ -219,7 +219,7 @@ public class Note extends EntityIdentifiedByIdOnly {
     this.notebook = notebook;
   }
 
-  public void updateSiblingOrderAfter(Note relativeToNote) {
+  public void setSiblingOrderToInsertAfter(Note relativeToNote) {
     this.siblingOrder =
         relativeToNote
             .nextSibling()
