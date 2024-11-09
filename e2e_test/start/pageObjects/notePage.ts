@@ -51,9 +51,13 @@ export const assumeNotePage = (noteTopic?: string) => {
     }
   }
 
-  const clickNotePageMoreOptionsButton = (btnTextOrTitle: string) => {
+  const notePageMoreOptionsButton = (btnTextOrTitle: string) => {
     privateToolbarButton('more options').click()
-    privateToolbarButton(btnTextOrTitle).click()
+    return privateToolbarButton(btnTextOrTitle)
+  }
+
+  const clickNotePageMoreOptionsButton = (btnTextOrTitle: string) => {
+    return notePageMoreOptionsButton(btnTextOrTitle).click()
   }
 
   return {
@@ -152,7 +156,7 @@ export const assumeNotePage = (noteTopic?: string) => {
       cy.pageIsNotLoading()
     },
     editNoteImage() {
-      return this.toolbarButton('edit note image')
+      return notePageMoreOptionsButton('Edit Note Image')
     },
     audioTools() {
       this.toolbarButton('Audio tools').click()
@@ -186,9 +190,9 @@ export const assumeNotePage = (noteTopic?: string) => {
       return this
     },
     updateNoteUrl(attributes: Record<string, string>) {
-      this.toolbarButton('edit note url')
-        .click()
-        .submitWith(filterAttributes(attributes, ['Url']))
+      clickNotePageMoreOptionsButton('Edit Note URL').submitWith(
+        filterAttributes(attributes, ['Url'])
+      )
       return this
     },
 

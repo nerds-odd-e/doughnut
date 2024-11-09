@@ -83,6 +83,39 @@
           >
             <AIGenerateImageDialog v-bind="{ note, storageAccessor }" />
           </PopButton>
+
+          <PopButton
+            btn-class="dropdown-item btn-primary"
+            title="Edit Note Image"
+          >
+            <template #button_face>
+              <SvgImage />
+              <span class="ms-2">Edit Note Image</span>
+            </template>
+            <template #default="{ closer }">
+              <NoteEditImageDialog
+                v-bind="{ noteId: note.id }"
+                @close-dialog="noteAccessoriesUpdated(closer, $event)"
+              />
+            </template>
+          </PopButton>
+
+          <PopButton
+            btn-class="dropdown-item btn-primary"
+            title="Edit Note URL"
+          >
+            <template #button_face>
+              <SvgUrlIndicator />
+              <span class="ms-2">Edit Note URL</span>
+            </template>
+            <template #default="{ closer }">
+              <NoteEditUrlDialog
+                v-bind="{ noteId: note.id }"
+                @close-dialog="noteAccessoriesUpdated(closer, $event)"
+              />
+            </template>
+          </PopButton>
+
           <PopButton
             btn-class="dropdown-item btn-primary"
             title="Questions for the note"
@@ -97,30 +130,6 @@
       </div>
     </div>
     <div class="btn-group btn-group-sm ms-auto">
-      <PopButton title="edit note image">
-        <template #button_face>
-          <SvgImage />
-        </template>
-        <template #default="{ closer }">
-          <NoteEditImageDialog
-            v-bind="{ noteId: note.id }"
-            @close-dialog="noteAccessoriesUpdated(closer, $event)"
-          />
-        </template>
-      </PopButton>
-
-      <PopButton title="edit note url">
-        <template #button_face>
-          <SvgUrlIndicator />
-        </template>
-        <template #default="{ closer }">
-          <NoteEditUrlDialog
-            v-bind="{ noteId: note.id }"
-            @close-dialog="noteAccessoriesUpdated(closer, $event)"
-          />
-        </template>
-      </PopButton>
-
       <button class="btn" title="Audio tools" v-if="!audioTools" @click="audioTools = true">
         <SvgAudioInput />
       </button>
