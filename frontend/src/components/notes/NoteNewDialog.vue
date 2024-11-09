@@ -28,7 +28,7 @@
         <legend>Similar Notes</legend>
         <SearchResults
           v-bind="{
-            noteId: parentId,
+            noteId: referenceNote.id,
             inputSearchKey: creationData.topicConstructor,
           }"
         />
@@ -48,6 +48,8 @@ import SearchResults from "../search/SearchResults.vue"
 import NoteFormTopicOnly from "./NoteFormTopicOnly.vue"
 import SuggestTopic from "./SuggestTopic.vue"
 import WikidataSearchByLabel from "./WikidataSearchByLabel.vue"
+import type { Note } from "@/generated/backend"
+import type { InsertMode } from "@/models/InsertMode"
 
 export default defineComponent({
   components: {
@@ -58,8 +60,8 @@ export default defineComponent({
     SuggestTopic,
   },
   props: {
-    parentId: { type: Number, required: true },
-    insertAfterId: { type: Number, required: false },
+    referenceNote: { type: Object as PropType<Note>, required: true },
+    insertMode: { type: String as PropType<InsertMode>, required: true },
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
       required: true,
@@ -91,12 +93,18 @@ export default defineComponent({
 
       const creationData = {
         ...this.creationData,
-        insertAfterId: this.insertAfterId,
+        insertAfterId:
+          this.insertMode === "after" ? this.referenceNote.id : undefined,
       }
+
+      const parentId =
+        this.insertMode === "as-child"
+          ? this.referenceNote.id
+          : this.referenceNote.parentId!
 
       this.storageAccessor
         .storedApi()
-        .createNote(this.$router, this.parentId, creationData)
+        .createNote(this.$router, parentId, creationData)
         .then(() => {
           this.$emit("closeDialog")
         })

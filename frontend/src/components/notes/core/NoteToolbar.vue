@@ -3,7 +3,7 @@
     <div class="btn-group btn-group-sm">
       <NoteNewButton
         button-title="Add Child Note"
-        v-bind="{ parentId: note.id, storageAccessor }"
+        v-bind="{ referenceNote: note, insertMode: 'as-child', storageAccessor }"
       >
         <SvgAddChild />
       </NoteNewButton>
@@ -11,7 +11,7 @@
       <NoteNewButton
         v-if="note.parentId"
         button-title="Add Next Sibling Note"
-        v-bind="{ parentId: note.parentId, insertAfterId: note.id, storageAccessor }"
+        v-bind="{ referenceNote: note, insertMode: 'after', storageAccessor }"
       >
         <SvgAddSibling />
       </NoteNewButton>
