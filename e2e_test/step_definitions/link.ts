@@ -19,30 +19,23 @@ When(
   }
 )
 
-function makingLink(
-  cy,
-  fromNoteTopic: string,
-  linkType: string,
-  toNoteTopic: string
-) {
-  start.jumpToNotePage(fromNoteTopic).startSearchingAndLinkNote()
-  cy.searchNote(toNoteTopic, ['All My Notebooks And Subscriptions'])
-  cy.clickButtonOnCardBody(toNoteTopic, 'Select')
-  cy.clickRadioByLabel(linkType)
-}
-
 When(
   'I link note {string} as {string} note {string}',
   (fromNoteTopic: string, linkType: string, toNoteTopic: string) => {
-    makingLink(cy, fromNoteTopic, linkType, toNoteTopic)
+    start.jumpToNotePage(fromNoteTopic).startSearchingAndLinkNote()
+    cy.searchNote(toNoteTopic, ['All My Notebooks And Subscriptions'])
+    cy.clickButtonOnCardBody(toNoteTopic, 'Select')
+    cy.clickRadioByLabel(linkType)
     cy.findByRole('button', { name: 'Create Link' }).click()
   }
 )
 
 When(
-  'I link note {string} as {string} note {string} and move under it',
-  (fromNoteTopic: string, linkType: string, toNoteTopic: string) => {
-    makingLink(cy, fromNoteTopic, linkType, toNoteTopic)
+  'I move note {string} to be under note {string}',
+  (fromNoteTopic: string, toNoteTopic: string) => {
+    start.jumpToNotePage(fromNoteTopic).startSearchingAndLinkNote()
+    cy.searchNote(toNoteTopic, ['All My Notebooks And Subscriptions'])
+    cy.clickButtonOnCardBody(toNoteTopic, 'Select')
     cy.formField('Also Move To Under Target Note').check()
     cy.findByRole('button', { name: 'Create Link' }).click()
     cy.findByRole('button', { name: 'OK' }).click()

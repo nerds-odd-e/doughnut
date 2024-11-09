@@ -30,11 +30,3 @@ Feature: link note
     When I link note "Sedition" as "similar to" note "Sedation"
     And I link note "Sedition" as "similar to" note "Sedative"
     Then I should see "Sedition" has link "similar to" "Sedation, Sedative"
-
-  @mockBrowserTime
-  Scenario: link and move
-    Given I link note "Sedition" as "similar to" note "Sedation" and move under it
-    When I navigate to "My Notes/Sedation/Sedition" note
-    Then I should see "Sedition" has link "similar to" "Sedation"
-    When I visit all my notebooks
-    Then I should not see note "Sedition" at the top level of all my notes
