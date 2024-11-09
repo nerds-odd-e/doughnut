@@ -7,6 +7,7 @@ import helper from "@tests/helpers"
 const mockedSearch = vitest.fn()
 const mockedSearchWithin = vitest.fn()
 const mockedCreateNote = vitest.fn()
+const note = makeMe.aNote.please()
 
 describe("adding new note", () => {
   beforeEach(() => {
@@ -15,7 +16,7 @@ describe("adding new note", () => {
     helper.managedApi.restNoteController.searchForLinkTarget = mockedSearch
     helper.managedApi.restNoteController.searchForLinkTargetWithin =
       mockedSearchWithin
-    helper.managedApi.restNoteController.createNote =
+    helper.managedApi.restNoteCreationController.createNote =
       mockedCreateNote.mockResolvedValue({})
   })
 
@@ -30,7 +31,7 @@ describe("adding new note", () => {
     mockedSearchWithin.mockResolvedValue([note.noteTopic])
     const wrapper = helper
       .component(NoteNewDialog)
-      .withStorageProps({ parentId: 123 })
+      .withStorageProps({ referenceNote: note, insertMode: "as-child" })
       .mount()
     await wrapper.find("input#note-topic").setValue("myth")
 
@@ -39,7 +40,7 @@ describe("adding new note", () => {
 
     expect(wrapper.text()).toContain("mythical")
     expect(mockedSearchWithin).toHaveBeenCalledWith(
-      123,
+      note.id,
       expect.objectContaining({ searchKey: "myth" })
     )
   })
@@ -50,7 +51,7 @@ describe("adding new note", () => {
     beforeEach(async () => {
       wrapper = helper
         .component(NoteNewDialog)
-        .withStorageProps({ parentId: 123 })
+        .withStorageProps({ referenceNote: note, insertMode: "as-child" })
         .mount({ attachTo: document.body })
       await wrapper.find("input#note-topic").setValue("note title")
       vi.clearAllTimers()
@@ -58,7 +59,7 @@ describe("adding new note", () => {
 
     it("call the api", async () => {
       await wrapper.find("form").trigger("submit")
-      expect(mockedCreateNote).toHaveBeenCalledWith(123, expect.anything())
+      expect(mockedCreateNote).toHaveBeenCalledWith(note.id, expect.anything())
     })
 
     it("call the api once only", async () => {
@@ -78,7 +79,7 @@ describe("adding new note", () => {
         mockedWikidataSearch
       wrapper = helper
         .component(NoteNewDialog)
-        .withStorageProps({ parentId: 123 })
+        .withStorageProps({ referenceNote: note, insertMode: "as-child" })
         .mount({ attachTo: document.body })
     })
 

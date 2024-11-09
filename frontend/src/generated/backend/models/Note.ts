@@ -12,5 +12,6 @@ export type Note = {
     createdAt: string;
     readonly deletedAt?: string;
     wikidataId?: string;
+    siblingOrderToInsertAfter?: Note;
 };
 

@@ -11,7 +11,6 @@ import com.odde.doughnut.models.NoteMotionModel;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.SearchTermModel;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.NoteConstructionService;
 import com.odde.doughnut.services.WikidataService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.services.wikidataApis.WikidataIdWithApi;
@@ -69,44 +68,6 @@ class RestNoteController {
     }
     modelFactoryService.save(note);
     return new NoteViewer(currentUser.getEntity(), note).toJsonObject();
-  }
-
-  @PostMapping(value = "/{parentNote}/create")
-  @Transactional
-  public NoteCreationRresult createNote(
-      @PathVariable(name = "parentNote") @Schema(type = "integer") Note parentNote,
-      @Valid @RequestBody NoteCreationDTO noteCreation)
-      throws UnexpectedNoAccessRightException, InterruptedException, IOException, BindException {
-    currentUser.assertAuthorization(parentNote);
-    return getNoteConstructionService(currentUser.getEntity())
-        .createNoteInternal(parentNote, noteCreation, currentUser.getEntity(), wikidataService);
-  }
-
-  @PostMapping(value = "/{referenceNote}/create-after")
-  @Transactional
-  public NoteCreationRresult createNoteAfter(
-      @PathVariable(name = "referenceNote") @Schema(type = "integer") Note referenceNote,
-      @Valid @RequestBody NoteCreationDTO noteCreation)
-      throws UnexpectedNoAccessRightException, InterruptedException, IOException, BindException {
-    currentUser.assertAuthorization(referenceNote);
-    Note parentNote = referenceNote.getParent();
-    if (parentNote == null) {
-      throw new UnexpectedNoAccessRightException();
-    }
-
-    Note note =
-        getNoteConstructionService(currentUser.getEntity())
-            .createNoteAfter(
-                referenceNote, noteCreation, parentNote, currentUser.getEntity(), wikidataService);
-
-    return new NoteCreationRresult(
-        new NoteViewer(currentUser.getEntity(), note).toJsonObject(),
-        new NoteViewer(currentUser.getEntity(), parentNote).toJsonObject());
-  }
-
-  private NoteConstructionService getNoteConstructionService(User user) {
-    return new NoteConstructionService(
-        user, testabilitySettings.getCurrentUTCTimestamp(), modelFactoryService);
   }
 
   @GetMapping("/{note}")

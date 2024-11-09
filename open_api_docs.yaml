@@ -895,7 +895,7 @@ paths:
   /api/notes/{referenceNote}/create-after:
     post:
       tags:
-      - rest-note-controller
+      - rest-note-creation-controller
       operationId: createNoteAfter
       parameters:
       - name: referenceNote
@@ -925,7 +925,7 @@ paths:
   /api/notes/{parentNote}/create:
     post:
       tags:
-      - rest-note-controller
+      - rest-note-creation-controller
       operationId: createNote
       parameters:
       - name: parentNote
@@ -3178,6 +3178,8 @@ components:
           readOnly: true
         wikidataId:
           type: string
+        siblingOrderToInsertAfter:
+          $ref: "#/components/schemas/Note"
     NoteTopic:
       required:
       - id

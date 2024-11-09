@@ -161,7 +161,7 @@ export default class StoredApiCollection implements StoredApi {
     parentId: Doughnut.ID,
     data: NoteCreationDTO
   ) {
-    const nrwp = await this.managedApi.restNoteController.createNote(
+    const nrwp = await this.managedApi.restNoteCreationController.createNote(
       parentId,
       data
     )
@@ -176,10 +176,11 @@ export default class StoredApiCollection implements StoredApi {
     referenceId: Doughnut.ID,
     data: NoteCreationDTO
   ) {
-    const nrwp = await this.managedApi.restNoteController.createNoteAfter(
-      referenceId,
-      data
-    )
+    const nrwp =
+      await this.managedApi.restNoteCreationController.createNoteAfter(
+        referenceId,
+        data
+      )
     const focus = this.storage.refreshNoteRealm(nrwp.created)
     this.storage.refreshNoteRealm(nrwp.parent)
     this.routerReplaceFocus(router, focus)
