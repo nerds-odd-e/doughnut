@@ -1,65 +1,33 @@
 <template>
   <ul v-if="(noteRealm?.children?.length ?? 0) > 0" class="list-group">
-    <li
+    <SidebarNoteItem
       v-for="note in noteRealm?.children"
       :key="note.id"
-      class="list-group-item list-group-item-action pb-0 pe-0 border-0"
-      :class="{
-        'active-item': note.id === activeNoteRealm.note.id,
-        'dragging': draggedNote?.id === note.id,
+      v-bind="{
+        note,
+        activeNoteRealm,
+        storageAccessor,
+        expandedIds,
+        onToggleExpand: toggleChildren,
+        draggedNote,
+        isDraggedOver,
+        dropMode,
+        dropIndicatorStyle,
+        onDragStart: handleDragStart,
+        onDragOver: handleDragOver,
+        onDragEnter: handleDragEnter,
+        onDragLeave: handleDragLeave,
+        onDrop: handleDrop,
+        onDragEnd: handleDragEnd,
       }"
-      draggable="true"
-      @dragstart="handleDragStart($event, note)"
-      @dragover.prevent="handleDragOver($event, note)"
-      @dragenter="handleDragEnter($event, note)"
-      @dragleave="handleDragLeave($event)"
-      @drop="handleDrop($event, note)"
-      @dragend="handleDragEnd"
-    >
-      <div
-        class="d-flex w-100 justify-content-between align-items-start note-content"
-        @click="toggleChildren(note.id)"
-      >
-        <NoteTopicWithLink
-          class="card-title"
-          :class="{ 'active-topic': note.id === activeNoteRealm.note.id }"
-          v-bind="{ noteTopic: note.noteTopic }"
-          @click.stop
-        />
-        <ScrollTo v-if="note.id === activeNoteRealm.note.id" />
-        <span
-          role="button"
-          title="expand children"
-          class="badge rounded-pill"
-          >{{ childrenCount(note.id) ?? "..." }}</span
-        >
-        <div
-          v-if="isDraggedOver === note.id && draggedNote"
-          class="drop-indicator"
-          role="presentation"
-          :aria-label="dropMode === 'after' ? 'Drop position indicator' : 'Drop as child indicator'"
-          :class="{ 'drop-as-child': dropMode === 'asFirstChild' }"
-          :style="dropIndicatorStyle"
-        ></div>
-      </div>
-      <SidebarInner
-        v-if="expandedIds.some((id) => id === note.id)"
-        v-bind="{
-          noteId: note.id,
-          activeNoteRealm,
-          storageAccessor,
-        }"
-        :key="note.id"
-      />
-    </li>
+    />
   </ul>
 </template>
 
 <script setup lang="ts">
 import type { Note, NoteRealm } from "@/generated/backend"
-import ScrollTo from "@/components/commons/ScrollTo.vue"
 import type { StorageAccessor } from "../../store/createNoteStorage"
-import NoteTopicWithLink from "./NoteTopicWithLink.vue"
+import SidebarNoteItem from "./SidebarNoteItem.vue"
 import { ref, watch } from "vue"
 
 interface Props {
@@ -85,12 +53,6 @@ const toggleChildren = (noteId: number) => {
   }
 }
 
-const childrenCount = (noteId: number) => {
-  const noteRef = props.storageAccessor.refOfNoteRealm(noteId)
-  if (!noteRef.value) return undefined
-  return noteRef.value.children?.length ?? 0
-}
-
 watch(
   () => props.activeNoteRealm.note.noteTopic.parentNoteTopic,
   (parentNoteTopic) => {
@@ -108,11 +70,11 @@ watch(
   { immediate: true }
 )
 
+// Drag and drop state
 const draggedNote = ref<Note | null>(null)
-
 const dropIndicatorStyle = ref({})
-
 const dropMode = ref<"after" | "asFirstChild">("after")
+const isDraggedOver = ref<number | null>(null)
 
 const handleDragStart = (event: DragEvent, note: Note) => {
   draggedNote.value = note
@@ -131,14 +93,12 @@ const handleDragOver = (event: DragEvent, targetNote: Note) => {
     event.dataTransfer.dropEffect = "move"
   }
 
-  // Calculate if we're in the right half (child) or left half (sibling)
   const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
   const mouseX = event.clientX - rect.left
   const isRightHalf = mouseX > rect.width / 2
 
   dropMode.value = isRightHalf ? "asFirstChild" : "after"
 
-  // Only check for same parent when not dropping as child
   if (
     dropMode.value === "after" &&
     draggedNote.value.parentId !== targetNote.parentId
@@ -147,13 +107,12 @@ const handleDragOver = (event: DragEvent, targetNote: Note) => {
     return
   }
 
-  // Update drop indicator position
   dropIndicatorStyle.value = {
     top: "100%",
     transform: "translateY(-2px)",
     ...(dropMode.value === "asFirstChild"
       ? {
-          left: "20px", // Add indentation for child indicator
+          left: "20px",
           right: "0",
         }
       : {
@@ -171,7 +130,6 @@ const handleDragEnter = (_event: DragEvent, targetNote: Note) => {
 }
 
 const handleDragLeave = (event: DragEvent) => {
-  // Only clear if we're actually leaving the element (not entering a child)
   const relatedTarget = event.relatedTarget as HTMLElement
   const currentTarget = event.currentTarget as HTMLElement
   if (!currentTarget.contains(relatedTarget)) {
@@ -195,12 +153,8 @@ const handleDrop = async (event: DragEvent, targetNote: Note) => {
       .storedApi()
       .moveAfter(draggedNote.value.id, targetNote.id, dropMode.value)
 
-    // Expand the target note if dropping as first child
-    if (
-      dropMode.value === "asFirstChild" &&
-      !expandedIds.value.includes(targetNote.id)
-    ) {
-      expandedIds.value.push(targetNote.id)
+    if (dropMode.value === "asFirstChild") {
+      toggleChildren(targetNote.id)
     }
   } catch (error) {
     console.error("Failed to move note:", error)
@@ -209,8 +163,6 @@ const handleDrop = async (event: DragEvent, targetNote: Note) => {
   draggedNote.value = null
   dropMode.value = "after"
 }
-
-const isDraggedOver = ref<number | null>(null)
 
 const handleDragEnd = () => {
   draggedNote.value = null

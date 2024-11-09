@@ -146,6 +146,7 @@ declare module 'vue' {
     ShowImage: typeof import('./src/components/notes/accessory/ShowImage.vue')['default']
     Sidebar: typeof import('./src/components/notes/Sidebar.vue')['default']
     SidebarInner: typeof import('./src/components/notes/SidebarInner.vue')['default']
+    SidebarNoteItem: typeof import('./src/components/notes/SidebarNoteItem.vue')['default']
     SubscribeDialog: typeof import('./src/components/bazaar/SubscribeDialog.vue')['default']
     SubscriptionEditDialog: typeof import('./src/components/subscriptions/SubscriptionEditDialog.vue')['default']
     SubscriptionNoteButtons: typeof import('./src/components/subscriptions/SubscriptionNoteButtons.vue')['default']
