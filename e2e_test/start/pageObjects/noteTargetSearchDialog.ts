@@ -28,5 +28,9 @@ export const assumeNoteTargetSearchDialog = () => {
       cy.clickButtonOnCardBody(toNoteTopic, 'Link')
       cy.clickRadioByLabel(linkType)
     },
+    linkTopLevelNoteToTargetAs(toNoteTopic: string, linkType: string) {
+      this.linkToTargetAs(toNoteTopic, linkType)
+      cy.findByRole('button', { name: 'OK' }).click()
+    },
   }
 }

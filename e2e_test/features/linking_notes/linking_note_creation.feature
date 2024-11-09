@@ -26,6 +26,6 @@ Feature: link note
 
   @mockBrowserTime
   Scenario: creating link
-    When I link note "Sedition" as "similar to" note "Sedation"
-    And I link note "Sedition" as "similar to" note "Sedative"
+    When I link top level note "Sedition" as "similar to" note "Sedation"
+    And I link top level note "Sedition" as "similar to" note "Sedative"
     Then I should see "Sedition" has link "similar to" "Sedation, Sedative"

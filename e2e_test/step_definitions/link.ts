@@ -31,6 +31,17 @@ When(
 )
 
 When(
+  'I link top level note {string} as {string} note {string}',
+  (fromNoteTopic: string, linkType: string, toNoteTopic: string) => {
+    start
+      .jumpToNotePage(fromNoteTopic)
+      .startSearchingAndLinkNote()
+      .findTarget(toNoteTopic)
+      .linkTopLevelNoteToTargetAs(toNoteTopic, linkType)
+  }
+)
+
+When(
   'I move note {string} to be under note {string}',
   (fromNoteTopic: string, toNoteTopic: string) => {
     start
