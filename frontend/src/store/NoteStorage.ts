@@ -5,7 +5,7 @@ import { ref } from "vue"
 export default interface NoteStorage {
   refreshNoteRealm(data: NoteRealm): NoteRealm
   refOfNoteRealm(noteId: Doughnut.ID): Ref<NoteRealm | undefined>
-  refOfNoteRealmWithFallback(note: Note): Ref<NoteRealm | undefined>
+  refOfNoteRealmWithFallback(note: Note): Ref<NoteRealm>
 }
 
 export class StorageImplementation implements NoteStorage {
@@ -23,14 +23,14 @@ export class StorageImplementation implements NoteStorage {
     return this.cache.get(noteId) as Ref<NoteRealm | undefined>
   }
 
-  refOfNoteRealmWithFallback(note: Note): Ref<NoteRealm | undefined> {
+  refOfNoteRealmWithFallback(note: Note): Ref<NoteRealm> {
     const ref = this.refOfNoteRealm(note.id)
-    if (ref.value) {
+    if (ref.value === undefined) {
       ref.value = {
         id: note.id,
         note: note,
       }
     }
-    return ref
+    return ref as Ref<NoteRealm>
   }
 }

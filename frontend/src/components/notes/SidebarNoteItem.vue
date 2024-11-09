@@ -2,28 +2,28 @@
   <li
     class="list-group-item list-group-item-action pb-0 pe-0 border-0"
     :class="{
-      'active-item': note.id === activeNoteRealm.note.id,
-      'dragging': draggedNote?.id === note.id,
+      'active-item': noteRealm.id === activeNoteRealm.note.id,
+      'dragging': draggedNote?.id === noteRealm.id,
     }"
     draggable="true"
-    @dragstart="(e) => onDragStart(e, note)"
-    @dragover.prevent="(e) => onDragOver(e, note)"
-    @dragenter="(e) => onDragEnter(e, note)"
+    @dragstart="(e) => onDragStart(e, noteRealm.note)"
+    @dragover.prevent="(e) => onDragOver(e, noteRealm.note)"
+    @dragenter="(e) => onDragEnter(e, noteRealm.note)"
     @dragleave="onDragLeave"
-    @drop="(e) => onDrop(e, note)"
+    @drop="(e) => onDrop(e, noteRealm.note)"
     @dragend="onDragEnd"
   >
     <div
       class="d-flex w-100 justify-content-between align-items-start note-content"
-      @click="toggleChildren(note.id)"
+      @click="toggleChildren(noteRealm.id)"
     >
       <NoteTopicWithLink
         class="card-title"
-        :class="{ 'active-topic': note.id === activeNoteRealm.note.id }"
-        v-bind="{ noteTopic: note.noteTopic }"
+        :class="{ 'active-topic': noteRealm.id === activeNoteRealm.note.id }"
+        v-bind="{ noteTopic: noteRealm.note.noteTopic }"
         @click.stop
       />
-      <ScrollTo v-if="note.id === activeNoteRealm.note.id" />
+      <ScrollTo v-if="noteRealm.id === activeNoteRealm.note.id" />
       <span
         role="button"
         title="expand children"
@@ -31,7 +31,7 @@
         >{{ childrenCount ?? "..." }}</span
       >
       <div
-        v-if="isDraggedOver === note.id && draggedNote"
+        v-if="isDraggedOver === noteRealm.id && draggedNote"
         class="drop-indicator"
         role="presentation"
         :aria-label="dropMode === 'after' ? 'Drop position indicator' : 'Drop as child indicator'"
@@ -42,11 +42,11 @@
     <SidebarInner
       v-if="isExpanded"
       v-bind="{
-        noteId: note.id,
+        noteId: noteRealm.id,
         activeNoteRealm,
         storageAccessor,
       }"
-      :key="note.id"
+      :key="noteRealm.id"
     />
   </li>
 </template>
@@ -79,6 +79,7 @@ interface Props {
 
 const props = defineProps<Props>()
 
+const noteRealm = props.storageAccessor.refOfNoteRealmWithFallback(props.note)
 const isExpanded = computed(() =>
   props.expandedIds.some((id) => id === props.note.id)
 )

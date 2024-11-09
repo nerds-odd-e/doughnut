@@ -51,7 +51,6 @@ Feature: Note Edit
       | li             | Specification by Example |
       | li.ql-indent-1 | Living documentation     |
 
-  @ignore
   Scenario: Edit a note topic should update the sidebar
     Given there are some notes:
       | Topic | Parent Topic   |
