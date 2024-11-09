@@ -55,7 +55,7 @@ const linkFormErrors = ref({
 })
 
 const linkTypeSelected = async (linkType: LinkCreation["linkType"]) => {
-  if (formData.value.moveUnder && props.note.parentId === null) {
+  if (props.note.parentId === null) {
     if (
       !(await popups.confirm(
         `"${props.note.noteTopic.topicConstructor}" is a top level notebook. Do you want to move it under other notebook?`
