@@ -1,13 +1,6 @@
 <template>
   <form @submit.prevent="processForm">
     <fieldset :disabled="processing">
-      <LinkTypeSelectCompact
-        scope-name="note"
-        field="linkTypeToParent"
-        :allow-empty="true"
-        v-model="creationData.linkTypeToParent"
-        :error-message="noteFormErrors.linkTypeToParent"
-      />
       <NoteFormTopicOnly
         v-model="creationData.topicConstructor"
         :error-message="noteFormErrors.topicConstructor"
@@ -43,7 +36,6 @@ import { NoteCreationDTO } from "@/generated/backend"
 import type { InsertMode } from "@/models/InsertMode"
 import type { StorageAccessor } from "../../store/createNoteStorage"
 import { ref } from "vue"
-import LinkTypeSelectCompact from "../links/LinkTypeSelectCompact.vue"
 import SearchResults from "../search/SearchResults.vue"
 import NoteFormTopicOnly from "./NoteFormTopicOnly.vue"
 import SuggestTopic from "./SuggestTopic.vue"
@@ -66,13 +58,11 @@ const emit = defineEmits<{
 
 // Reactive state
 const creationData = ref<NoteCreationDTO>({
-  linkTypeToParent: NoteCreationDTO.linkTypeToParent.NO_LINK,
   topicConstructor: "",
   wikidataId: "",
 })
 
 const noteFormErrors = ref({
-  linkTypeToParent: undefined,
   topicConstructor: undefined as undefined | string,
   wikidataId: undefined as undefined | string,
 })
@@ -101,7 +91,6 @@ const processForm = async () => {
     emit("closeDialog")
   } catch (res: unknown) {
     noteFormErrors.value = {
-      linkTypeToParent: undefined,
       topicConstructor: undefined,
       wikidataId: undefined,
       ...(res as object),
