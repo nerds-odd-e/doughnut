@@ -82,7 +82,6 @@ class RestNoteCreationControllerTests {
     void setup() {
       parent = makeMe.aNote().creatorAndOwner(userModel).please();
       noteCreation.setTopicConstructor("new title");
-      noteCreation.setLinkTypeToParent(LinkType.NO_LINK);
     }
 
     @Test
@@ -303,7 +302,6 @@ class RestNoteCreationControllerTests {
       referenceNote = makeMe.aNote().under(parent).please();
       makeMe.aNote("next sibling").under(parent).please();
       noteCreation.setTopicConstructor("new note");
-      noteCreation.setLinkTypeToParent(LinkType.NO_LINK);
     }
 
     @Test

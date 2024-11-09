@@ -101,16 +101,6 @@ When(
 )
 
 Then(
-  '[deprecating] On the current page, I should see {string} has link {string} {string}',
-  (_noteTopic: string, linkType: string, targetNoteTopics: string) => {
-    cy.findByText(commonSenseSplit(targetNoteTopics, ',').pop() ?? '', {
-      selector: '.card .topic-text',
-    })
-    cy.findAllByText(linkType)
-  }
-)
-
-Then(
   'I should see {string} has link {string} {string}',
   (noteTopic: string, linkType: string, targetNoteTopics: string) => {
     start

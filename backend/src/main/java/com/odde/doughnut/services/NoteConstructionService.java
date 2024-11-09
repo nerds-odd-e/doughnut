@@ -30,14 +30,9 @@ public record NoteConstructionService(
   }
 
   private Note createNoteWithWikidataInfo(
-      Note parentNote,
-      WikidataIdWithApi wikidataIdWithApi,
-      LinkType linkTypeToParent,
-      String topicConstructor)
+      Note parentNote, WikidataIdWithApi wikidataIdWithApi, String topicConstructor)
       throws DuplicateWikidataIdException, IOException, InterruptedException {
     Note note = createNote(parentNote, topicConstructor);
-    modelFactoryService.createLink(
-        note, note.getParent(), user, linkTypeToParent, currentUTCTimestamp);
     if (wikidataIdWithApi != null) {
       wikidataIdWithApi.associateNoteToWikidata(note, modelFactoryService);
       wikidataIdWithApi.getCountryOfOrigin().ifPresent(wwa -> createSubNote(note, wwa));
@@ -66,8 +61,7 @@ public record NoteConstructionService(
                     },
                     () -> {
                       try {
-                        createNoteWithWikidataInfo(
-                            parentNote, subWikidataIdWithApi, LinkType.RELATED_TO, subNoteTitle);
+                        createNoteWithWikidataInfo(parentNote, subWikidataIdWithApi, subNoteTitle);
                       } catch (Exception | DuplicateWikidataIdException e) {
                         throw new RuntimeException(e);
                       }
@@ -80,10 +74,7 @@ public record NoteConstructionService(
     try {
       Note note =
           createNoteWithWikidataInfo(
-              parentNote,
-              wikidataIdWithApi,
-              noteCreation.getLinkTypeToParent(),
-              noteCreation.getTopicConstructor());
+              parentNote, wikidataIdWithApi, noteCreation.getTopicConstructor());
       return new NoteCreationRresult(
           new NoteViewer(user, note).toJsonObject(),
           new NoteViewer(user, parentNote).toJsonObject());
