@@ -526,4 +526,44 @@ class RestNoteControllerTests {
       return link.getReviewSetting().getLevel();
     }
   }
+
+  @Nested
+  class createNoteAfterTest {
+    Note referenceNote;
+    NoteCreationDTO noteCreation = new NoteCreationDTO();
+
+    @BeforeEach
+    void setup() {
+      Note parent = makeMe.aNote().creatorAndOwner(userModel).please();
+      referenceNote = makeMe.aNote().under(parent).please();
+      makeMe.aNote("next sibling").under(parent).please();
+      noteCreation.setTopicConstructor("new note");
+      noteCreation.setLinkTypeToParent(LinkType.NO_LINK);
+    }
+
+    @Test
+    void shouldCreateNoteAfterReferenceNote()
+        throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
+      NoteRealm response = controller.createNoteAfter(referenceNote, noteCreation).getCreated();
+      assertThat(response.getId(), not(nullValue()));
+      assertThat(response.getNote().getTopicConstructor(), equalTo("new note"));
+    }
+
+    @Test
+    void shouldNotAllowCreatingSiblingForRootNote() {
+      Note rootNote = makeMe.aNote().creatorAndOwner(userModel).please();
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.createNoteAfter(rootNote, noteCreation));
+    }
+
+    @Test
+    void shouldNotAllowCreatingSiblingForNoteWithoutAccess() {
+      User otherUser = makeMe.aUser().please();
+      Note otherNote = makeMe.aNote().creatorAndOwner(otherUser).please();
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.createNoteAfter(otherNote, noteCreation));
+    }
+  }
 }

@@ -78,8 +78,26 @@ class RestNoteController {
       @Valid @RequestBody NoteCreationDTO noteCreation)
       throws UnexpectedNoAccessRightException, InterruptedException, IOException, BindException {
     currentUser.assertAuthorization(parentNote);
-    User user = currentUser.getEntity();
+    return createNoteInternal(parentNote, noteCreation);
+  }
 
+  @PostMapping(value = "/{referenceNote}/create-after")
+  @Transactional
+  public NoteCreationRresult createNoteAfter(
+      @PathVariable(name = "referenceNote") @Schema(type = "integer") Note referenceNote,
+      @Valid @RequestBody NoteCreationDTO noteCreation)
+      throws UnexpectedNoAccessRightException, InterruptedException, IOException, BindException {
+    currentUser.assertAuthorization(referenceNote);
+    Note parentNote = referenceNote.getParent();
+    if (parentNote == null) {
+      throw new UnexpectedNoAccessRightException();
+    }
+    return createNoteInternal(parentNote, noteCreation);
+  }
+
+  private NoteCreationRresult createNoteInternal(Note parentNote, NoteCreationDTO noteCreation)
+      throws InterruptedException, IOException, BindException {
+    User user = currentUser.getEntity();
     try {
       Note note =
           getNoteConstructionService(user)

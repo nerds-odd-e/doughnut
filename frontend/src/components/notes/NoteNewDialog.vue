@@ -91,20 +91,21 @@ export default defineComponent({
       this.noteFormErrors.wikidataId = undefined
       this.noteFormErrors.topicConstructor = undefined
 
-      const creationData = {
-        ...this.creationData,
-        insertAfterId:
-          this.insertMode === "after" ? this.referenceNote.id : undefined,
-      }
-
-      const parentId =
+      const api = this.storageAccessor.storedApi()
+      const promise =
         this.insertMode === "as-child"
-          ? this.referenceNote.id
-          : this.referenceNote.parentId!
+          ? api.createNote(
+              this.$router,
+              this.referenceNote.id,
+              this.creationData
+            )
+          : api.createNoteAfter(
+              this.$router,
+              this.referenceNote.id,
+              this.creationData
+            )
 
-      this.storageAccessor
-        .storedApi()
-        .createNote(this.$router, parentId, creationData)
+      promise
         .then(() => {
           this.$emit("closeDialog")
         })

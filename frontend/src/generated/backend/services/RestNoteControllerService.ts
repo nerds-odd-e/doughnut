@@ -18,6 +18,29 @@ import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestNoteControllerService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
+     * @param referenceNote
+     * @param requestBody
+     * @returns NoteCreationRresult OK
+     * @throws ApiError
+     */
+    public createNoteAfter(
+        referenceNote: number,
+        requestBody: NoteCreationDTO,
+    ): CancelablePromise<NoteCreationRresult> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/notes/{referenceNote}/create-after',
+            path: {
+                'referenceNote': referenceNote,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
      * @param parentNote
      * @param requestBody
      * @returns NoteCreationRresult OK
