@@ -39,10 +39,7 @@ When(
       .jumpToNotePage(fromNoteTopic)
       .startSearchingAndLinkNote()
       .findTarget(toNoteTopic)
-    cy.clickButtonOnCardBody(toNoteTopic, 'Select')
-    cy.formField('Also Move To Under Target Note').check()
-    cy.findByRole('button', { name: 'Create Link' }).click()
-    cy.findByRole('button', { name: 'OK' }).click()
+      .moveUnder()
   }
 )
 

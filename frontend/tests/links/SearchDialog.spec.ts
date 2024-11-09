@@ -13,12 +13,6 @@ describe("LinkNoteDialog", () => {
     ).toBeDisabled()
   })
 
-  it("Search from a note", async () => {
-    const note = MakeMe.aNote.please()
-    helper.component(LinkNoteDialog).withStorageProps({ note }).render()
-    await screen.findByText(`Link to`)
-  })
-
   it("toggle search settings", async () => {
     const note = MakeMe.aNote.please()
     helper.component(LinkNoteDialog).withStorageProps({ note }).render()

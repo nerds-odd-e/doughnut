@@ -5,6 +5,7 @@
     v-if="!targetNoteTopic"
     v-bind="{ noteId: note?.id }"
     @selected="targetNoteTopic = $event"
+    @moveUnder="moveUnder($event)"
   />
   <LinkNoteFinalize
     v-if="targetNoteTopic && note"
@@ -15,22 +16,40 @@
 </template>
 
 <script setup lang="ts">
-import type { PropType } from "vue"
 import { ref } from "vue"
 import type { Note } from "@/generated/backend"
 import { NoteTopic } from "@/generated/backend"
 import LinkNoteFinalize from "./LinkNoteFinalize.vue"
 import SearchNote from "../search/SearchNote.vue"
 import type { StorageAccessor } from "../../store/createNoteStorage"
+import usePopups from "../commons/Popups/usePopups"
 
-defineProps({
-  note: Object as PropType<Note>,
-  storageAccessor: {
-    type: Object as PropType<StorageAccessor>,
-    required: true,
-  },
-})
-defineEmits(["closeDialog"])
+const { popups } = usePopups()
+
+const { note, storageAccessor } = defineProps<{
+  note?: Note
+  storageAccessor: StorageAccessor
+}>()
+
+const emit = defineEmits<{
+  closeDialog: []
+}>()
 
 const targetNoteTopic = ref<NoteTopic | undefined>(undefined)
+
+async function moveUnder(targetNoteTopic: NoteTopic) {
+  if (!(await popups.confirm("Move note under target note?"))) {
+    return
+  }
+  storageAccessor
+    .storedApi()
+    .moveNote(note!.id, targetNoteTopic.id, {
+      linkType: NoteTopic.linkType.NO_LINK,
+      moveUnder: true,
+      asFirstChild: false,
+    })
+    .then(() => {
+      emit("closeDialog")
+    })
+}
 </script>
