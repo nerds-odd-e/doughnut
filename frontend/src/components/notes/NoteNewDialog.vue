@@ -31,8 +31,11 @@
 </template>
 
 <script setup lang="ts">
-import type { WikidataSearchEntity, Note } from "@/generated/backend"
-import { NoteCreationDTO } from "@/generated/backend"
+import type {
+  WikidataSearchEntity,
+  Note,
+  NoteCreationDTO,
+} from "@/generated/backend"
 import type { InsertMode } from "@/models/InsertMode"
 import type { StorageAccessor } from "../../store/createNoteStorage"
 import { ref } from "vue"

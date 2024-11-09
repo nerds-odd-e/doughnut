@@ -10,8 +10,7 @@
 
 <script lang="ts">
 import NoteFormTopicOnly from "@/components/notes/NoteFormTopicOnly.vue"
-import type { Circle } from "@/generated/backend"
-import { NoteCreationDTO } from "@/generated/backend"
+import type { Circle, NoteCreationDTO } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { PropType } from "vue"
 

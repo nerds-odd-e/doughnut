@@ -27,7 +27,7 @@
 </template>
 
 <script setup lang="ts">
-import { NoteCreationDTO, NoteTopic } from "@/generated/backend"
+import { NoteTopic } from "@/generated/backend"
 import { camelCase, startCase } from "es-toolkit"
 import type { PropType } from "vue"
 import { computed } from "vue"
@@ -39,7 +39,7 @@ import LinkTypeSelect from "./LinkTypeSelect.vue"
 const props = defineProps({
   scopeName: String,
   modelValue: {
-    type: String as PropType<NoteCreationDTO.linkTypeToParent>,
+    type: String as PropType<NoteTopic.linkType>,
     default: () => "no link" as NoteTopic.linkType,
   },
   errorMessage: String,
