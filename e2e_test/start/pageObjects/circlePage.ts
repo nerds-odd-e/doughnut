@@ -1,6 +1,7 @@
-import { bazaarOrCircle } from './NotebookList'
 import noteCreationForm from './noteForms/noteCreationForm'
 import start from '../../start'
+import { bazaarOrCircle } from './BazaarOrCircle'
+import { findNotebookCardButton } from './NotebookList'
 
 export const navigateToCircle = (circleName: string) => {
   start.systemSidebar()
@@ -15,7 +16,7 @@ export const navigateToCircle = (circleName: string) => {
       cy.get('body').find('.circle-member').should('have.length', count)
     },
     moveNotebook(notebookTitle: string) {
-      this.findNotebookCardButton(notebookTitle, 'Move to ...').click()
+      findNotebookCardButton(notebookTitle, 'Move to ...').click()
       return {
         toCircle(circleName: string) {
           cy.findByText(circleName).click()

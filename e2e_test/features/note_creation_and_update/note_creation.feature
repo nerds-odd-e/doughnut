@@ -40,3 +40,21 @@ Feature: Nested Note creation
       | tech       |
       | Re-Design  |
     And [deprecating] On the current page, I should see "LeSS in Action" has link "a generalization of" "Re-Design"
+
+  @ignore
+  Scenario: Create a new note as next sibling
+    When I create a note after "team":
+      | Topic        |
+      | coordination |
+    Then I should see the note tree in the sidebar
+      | note-topic   |
+      | team         |
+      | coordination |
+      | tech         |
+      | Re-quirement |
+    And I should see "My Notes/LeSS in Action" with these children
+      | note-topic   |
+      | team         |
+      | coordination |
+      | tech         |
+      | Re-quirement |

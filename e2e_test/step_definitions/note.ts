@@ -483,3 +483,14 @@ Then(
       .expectRichDetails(data.hashes())
   }
 )
+
+When(
+  'I create a note after {string}:',
+  (noteTopic: string, data: DataTable) => {
+    expect(data.hashes().length).to.equal(1)
+    start
+      .jumpToNotePage(noteTopic)
+      .addingNextSiblingNote()
+      .createNoteWithAttributes(data.hashes()[0]!)
+  }
+)
