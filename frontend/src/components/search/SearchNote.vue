@@ -14,7 +14,7 @@
             class="btn btn-primary"
             @click.prevent="emit('selected', noteTopic)"
           >
-            Select
+            Link
           </button>
           <button
             class="btn btn-sm btn-secondary"

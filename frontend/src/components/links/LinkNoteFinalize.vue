@@ -6,6 +6,7 @@
       v-model="formData.linkType"
       :error-message="linkFormErrors.linkType"
       :inverse-icon="true"
+      @update:model-value="linkTypeSelected"
     />
     <div>
       Target:
@@ -33,9 +34,6 @@
     />
     <button class="btn btn-secondary go-back-button" @click="$emit('goBack')">
       <SvgGoBack />
-    </button>
-    <button class="btn btn-primary" @click.once="createLink()">
-      Create Link
     </button>
   </div>
 </template>
@@ -86,7 +84,7 @@ const asFirstChildModel = computed({
   },
 })
 
-const createLink = async () => {
+const linkTypeSelected = async (linkType: LinkCreation["linkType"]) => {
   if (formData.value.moveUnder && props.note.parentId === null) {
     if (
       !(await popups.confirm(
@@ -99,24 +97,13 @@ const createLink = async () => {
 
   try {
     // First create the link
-    if (formData.value.linkType !== NoteTopic.linkType.NO_LINK) {
+    if (linkType !== NoteTopic.linkType.NO_LINK) {
       await props.storageAccessor
         .storedApi()
         .createLink(props.note.id, props.targetNoteTopic.id, {
           linkType: formData.value.linkType,
           moveUnder: false,
           asFirstChild: false,
-        })
-    }
-
-    // Then move the note if needed
-    if (formData.value.moveUnder) {
-      await props.storageAccessor
-        .storedApi()
-        .moveNote(props.note.id, props.targetNoteTopic.id, {
-          linkType: formData.value.linkType,
-          moveUnder: true,
-          asFirstChild: formData.value.asFirstChild,
         })
     }
 

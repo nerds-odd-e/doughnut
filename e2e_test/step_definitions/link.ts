@@ -26,9 +26,7 @@ When(
       .jumpToNotePage(fromNoteTopic)
       .startSearchingAndLinkNote()
       .findTarget(toNoteTopic)
-    cy.clickButtonOnCardBody(toNoteTopic, 'Select')
-    cy.clickRadioByLabel(linkType)
-    cy.findByRole('button', { name: 'Create Link' }).click()
+      .linkToTargetAs(toNoteTopic, linkType)
   }
 )
 

@@ -24,5 +24,9 @@ export const assumeNoteTargetSearchDialog = () => {
       cy.findByRole('button', { name: 'OK' }).click()
       cy.pageIsNotLoading()
     },
+    linkToTargetAs(toNoteTopic: string, linkType: string) {
+      cy.clickButtonOnCardBody(toNoteTopic, 'Link')
+      cy.clickRadioByLabel(linkType)
+    },
   }
 }
