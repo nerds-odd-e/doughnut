@@ -565,5 +565,21 @@ class RestNoteControllerTests {
           UnexpectedNoAccessRightException.class,
           () -> controller.createNoteAfter(otherNote, noteCreation));
     }
+
+    @Test
+    void shouldInsertNoteAfterReferenceNoteAndBeforeNextSibling()
+        throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
+      NoteRealm response = controller.createNoteAfter(referenceNote, noteCreation).getCreated();
+      Note createdNote = makeMe.modelFactoryService.noteRepository.findById(response.getId()).get();
+
+      // Get all siblings in order
+      List<Note> siblings = createdNote.getParent().getChildren();
+
+      // Verify order: referenceNote -> createdNote -> "next sibling"
+      assertThat(
+          siblings.get(0).getTopicConstructor(), equalTo(referenceNote.getTopicConstructor()));
+      assertThat(siblings.get(1).getTopicConstructor(), equalTo("new note"));
+      assertThat(siblings.get(2).getTopicConstructor(), equalTo("next sibling"));
+    }
   }
 }

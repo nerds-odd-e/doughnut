@@ -92,7 +92,15 @@ class RestNoteController {
     if (parentNote == null) {
       throw new UnexpectedNoAccessRightException();
     }
-    return createNoteInternal(parentNote, noteCreation);
+
+    Note note = createNoteInternal(parentNote, noteCreation).getCreated().getNote();
+    note.updateSiblingOrderAfter(referenceNote);
+    note.adjustPositionAsAChildOfParentInMemory();
+    modelFactoryService.save(note);
+
+    return new NoteCreationRresult(
+        new NoteViewer(currentUser.getEntity(), note).toJsonObject(),
+        new NoteViewer(currentUser.getEntity(), parentNote).toJsonObject());
   }
 
   private NoteCreationRresult createNoteInternal(Note parentNote, NoteCreationDTO noteCreation)
