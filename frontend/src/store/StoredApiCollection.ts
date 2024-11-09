@@ -149,7 +149,9 @@ export default class StoredApiCollection implements StoredApi {
 
   getNoteRealmRefAndLoadWhenNeeded(noteId: Doughnut.ID) {
     const result = this.storage.refOfNoteRealm(noteId)
-    if (!result.value) this.loadNote(noteId)
+    // if children are undefined instead of empty array, we need to load the note
+    if (!result.value || result.value.children === undefined)
+      this.loadNote(noteId)
     return result
   }
 

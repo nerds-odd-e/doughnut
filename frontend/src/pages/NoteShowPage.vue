@@ -17,7 +17,7 @@
           v-if="noteRealm"
           v-bind="{
             fromBazaar: noteRealm?.fromBazaar,
-            circle: noteRealm.notebook.circle,
+            circle: noteRealm.notebook?.circle,
             noteTopic: noteRealm?.note.noteTopic,
           }"
         />

@@ -87,7 +87,7 @@ const isExpanded = computed(() =>
 const childrenCount = computed(() => {
   const noteRef = props.storageAccessor.refOfNoteRealm(props.note.id)
   if (!noteRef.value) return undefined
-  return noteRef.value.children?.length ?? 0
+  return noteRef.value.children?.length ?? undefined
 })
 
 const toggleChildren = (noteId: number) => {
