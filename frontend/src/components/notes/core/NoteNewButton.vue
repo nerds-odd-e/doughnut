@@ -5,7 +5,7 @@
     </template>
     <template #default="{ closer }">
       <NoteNewDialog
-        v-bind="{ parentId, storageAccessor }"
+        v-bind="{ parentId, insertAfterId, storageAccessor }"
         @close-dialog="closer"
       />
     </template>
@@ -22,6 +22,7 @@ import NoteNewDialog from "../NoteNewDialog.vue"
 export default defineComponent({
   props: {
     parentId: { type: Number, required: true },
+    insertAfterId: { type: Number, required: false },
     buttonTitle: { type: String, required: true },
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,

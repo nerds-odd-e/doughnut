@@ -8,6 +8,13 @@
         <SvgAddChild />
       </NoteNewButton>
 
+      <NoteNewButton
+        button-title="Add Next Sibling Note"
+        v-bind="{ parentId: note.parentId!, insertAfterId: note.id, storageAccessor }"
+      >
+        <SvgAddSibling />
+      </NoteNewButton>
+
       <WikidataButton v-bind="{ note, storageAccessor }" />
 
       <NoteSendMessageButton
@@ -133,6 +140,7 @@ import type { Note } from "@/generated/backend"
 import type { NoteAccessory } from "@/generated/backend"
 import NoteNewButton from "./NoteNewButton.vue"
 import SvgAddChild from "../../svgs/SvgAddChild.vue"
+import SvgAddSibling from "../../svgs/SvgAddSibling.vue"
 import WikidataButton from "./WikidataButton.vue"
 import SvgSearchForLink from "../../svgs/SvgSearchForLink.vue"
 import LinkNoteDialog from "../../links/LinkNoteDialog.vue"

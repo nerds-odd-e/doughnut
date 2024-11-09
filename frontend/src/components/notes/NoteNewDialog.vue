@@ -59,6 +59,7 @@ export default defineComponent({
   },
   props: {
     parentId: { type: Number, required: true },
+    insertAfterId: { type: Number, required: false },
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
       required: true,
@@ -87,9 +88,15 @@ export default defineComponent({
       this.processing = true
       this.noteFormErrors.wikidataId = undefined
       this.noteFormErrors.topicConstructor = undefined
+
+      const creationData = {
+        ...this.creationData,
+        insertAfterId: this.insertAfterId,
+      }
+
       this.storageAccessor
         .storedApi()
-        .createNote(this.$router, this.parentId, this.creationData)
+        .createNote(this.$router, this.parentId, creationData)
         .then(() => {
           this.$emit("closeDialog")
         })
