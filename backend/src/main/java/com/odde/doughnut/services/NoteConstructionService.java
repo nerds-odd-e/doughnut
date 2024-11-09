@@ -75,13 +75,13 @@ public record NoteConstructionService(
   }
 
   public NoteCreationRresult createNoteWithWikidataService(
-      Note parentNote, NoteCreationDTO noteCreation, User user, WikidataService wikidataService1)
+      Note parentNote, NoteCreationDTO noteCreation, User user, WikidataIdWithApi wikidataIdWithApi)
       throws InterruptedException, IOException, BindException {
     try {
       Note note =
           createNoteWithWikidataInfo(
               parentNote,
-              wikidataService1.wrapWikidataIdWithApi(noteCreation.wikidataId),
+              wikidataIdWithApi,
               noteCreation.getLinkTypeToParent(),
               noteCreation.getTopicConstructor());
       return new NoteCreationRresult(
@@ -99,10 +99,10 @@ public record NoteConstructionService(
       NoteCreationDTO noteCreation,
       Note parentNote,
       User user,
-      WikidataService wikidataService1)
+      WikidataIdWithApi wikidataIdWithApi)
       throws InterruptedException, IOException, BindException {
     Note note =
-        createNoteWithWikidataService(parentNote, noteCreation, user, wikidataService1)
+        createNoteWithWikidataService(parentNote, noteCreation, user, wikidataIdWithApi)
             .getCreated()
             .getNote();
     note.setSiblingOrderToInsertAfter(referenceNote);

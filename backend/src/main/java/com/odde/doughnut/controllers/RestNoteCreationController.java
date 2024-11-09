@@ -45,7 +45,10 @@ class RestNoteCreationController {
       throws UnexpectedNoAccessRightException, InterruptedException, IOException, BindException {
     currentUser.assertAuthorization(parentNote);
     return noteConstructionService.createNoteWithWikidataService(
-        parentNote, noteCreation, currentUser.getEntity(), wikidataService);
+        parentNote,
+        noteCreation,
+        currentUser.getEntity(),
+        wikidataService.wrapWikidataIdWithApi(noteCreation.wikidataId));
   }
 
   @PostMapping(value = "/{referenceNote}/create-after")
@@ -61,7 +64,11 @@ class RestNoteCreationController {
 
     Note note =
         noteConstructionService.createNoteAfter(
-            referenceNote, noteCreation, parentNote, currentUser.getEntity(), wikidataService);
+            referenceNote,
+            noteCreation,
+            parentNote,
+            currentUser.getEntity(),
+            wikidataService.wrapWikidataIdWithApi(noteCreation.wikidataId));
 
     return new NoteCreationRresult(
         new NoteViewer(currentUser.getEntity(), note).toJsonObject(),
