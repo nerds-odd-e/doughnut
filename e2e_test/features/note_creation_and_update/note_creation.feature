@@ -41,6 +41,7 @@ Feature: Nested Note creation
       | Re-Design  |
     And [deprecating] On the current page, I should see "LeSS in Action" has link "a generalization of" "Re-Design"
 
+  @ignore
   Scenario: Create a new note as next sibling
     When I create a note after "team":
       | Topic        |

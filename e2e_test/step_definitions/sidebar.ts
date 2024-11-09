@@ -15,7 +15,7 @@ Then('I expand the side bar', () => {
 })
 
 Then('I should see the note tree in the sidebar', (data: DataTable) => {
-  start.noteSidebar().expectItems(data.hashes())
+  start.noteSidebar().expectOrderedNotes(data.hashes())
 })
 
 Then('I move the note {string} up among its siblings', (noteToMove: string) => {
