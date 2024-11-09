@@ -6,6 +6,7 @@ import { flushPromises } from "@vue/test-utils"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 import { fireEvent } from "@testing-library/vue"
+import createNoteStorage from "@/store/createNoteStorage"
 
 function isBefore(node1: Node, node2: Node) {
   return !!(
@@ -15,6 +16,7 @@ function isBefore(node1: Node, node2: Node) {
 }
 
 describe("Sidebar", () => {
+  const storageAccessor = createNoteStorage(helper.managedApi)
   const topNoteRealm = makeMe.aNoteRealm.topicConstructor("top").please()
   const firstGeneration = makeMe.aNoteRealm
     .topicConstructor("first gen")
@@ -29,11 +31,18 @@ describe("Sidebar", () => {
     .under(firstGeneration)
     .please()
 
+  storageAccessor.refOfNoteRealm(topNoteRealm.id).value = topNoteRealm
+  storageAccessor.refOfNoteRealm(firstGeneration.id).value = firstGeneration
+  storageAccessor.refOfNoteRealm(firstGenerationSibling.id).value =
+    firstGenerationSibling
+  storageAccessor.refOfNoteRealm(secondGeneration.id).value = secondGeneration
+
   const render = (n: NoteRealm) => {
     return helper
       .component(Sidebar)
-      .withStorageProps({
-        noteRealm: n,
+      .withProps({
+        storageAccessor,
+        activeNoteRealm: n,
       })
       .render()
   }
@@ -102,33 +111,11 @@ describe("Sidebar", () => {
   })
 
   it("should call the api once if top note", async () => {
-    helper.managedApi.restNoteController.show1 = vitest
-      .fn()
-      .mockResolvedValueOnce(topNoteRealm)
     render(topNoteRealm)
-    expect(helper.managedApi.restNoteController.show1).toBeCalled()
     await screen.findByText(firstGeneration.note.noteTopic.topicConstructor)
   })
 
   describe("first generation", () => {
-    beforeEach(() => {
-      helper.managedApi.restNoteController.show1 = vitest
-        .fn()
-        .mockResolvedValueOnce(topNoteRealm)
-        .mockResolvedValueOnce(firstGeneration)
-    })
-
-    it("should call the api if not top note", async () => {
-      render(firstGeneration)
-      await flushPromises()
-      expect(helper.managedApi.restNoteController.show1).toBeCalledWith(
-        topNoteRealm.id
-      )
-      expect(helper.managedApi.restNoteController.show1).toBeCalledWith(
-        firstGeneration.id
-      )
-    })
-
     it("should scroll to active note", async () => {
       render(firstGeneration)
       await flushPromises()
@@ -173,20 +160,12 @@ describe("Sidebar", () => {
   })
 
   it("should start from notebook top", async () => {
-    helper.managedApi.restNoteController.show1 = vitest
-      .fn()
-      .mockResolvedValueOnce(topNoteRealm)
-      .mockResolvedValueOnce(firstGeneration)
-      .mockResolvedValueOnce(secondGeneration)
     render(secondGeneration)
     await screen.findByText(firstGeneration.note.noteTopic.topicConstructor)
     await screen.findByText(secondGeneration.note.noteTopic.topicConstructor)
   })
 
   it("should disable the menu and keep the content when loading", async () => {
-    helper.managedApi.restNoteController.show1 = vitest
-      .fn()
-      .mockResolvedValueOnce(topNoteRealm)
     const { rerender } = render(topNoteRealm)
     await flushPromises()
     await rerender({ noteRealm: undefined })
@@ -195,13 +174,6 @@ describe("Sidebar", () => {
   })
 
   describe("drag and drop functionality", () => {
-    beforeEach(() => {
-      helper.managedApi.restNoteController.show1 = vitest
-        .fn()
-        .mockResolvedValueOnce(topNoteRealm)
-        .mockResolvedValue(firstGeneration)
-    })
-
     it("should call moveAfter when dragging and dropping notes", async () => {
       helper.managedApi.restNoteController.moveAfter = vitest
         .fn()

@@ -1,28 +1,26 @@
 <template>
-  <NoteRealmLoader v-bind="{ noteId, storageAccessor }">
-    <template #default="{ noteRealm }">
-      <Sidebar
-        v-bind="{
-          noteRealm,
-          storageAccessor,
-        }"
-      />
-    </template>
-  </NoteRealmLoader>
+  <Sidebar
+    v-bind="{
+      activeNoteRealm: noteRealm,
+      storageAccessor,
+    }"
+  />
 </template>
 
 <script setup lang="ts">
-import type { PropType } from "vue"
+import { computed, type PropType } from "vue"
 import type { StorageAccessor } from "../../store/createNoteStorage"
-import NoteRealmLoader from "./NoteRealmLoader.vue"
 import Sidebar from "./Sidebar.vue"
 
-
-defineProps({
+const props = defineProps({
   noteId: { type: Number, required: true },
   storageAccessor: {
     type: Object as PropType<StorageAccessor>,
     required: true,
   },
 })
+
+const noteRealm = computed(
+  () => props.storageAccessor.refOfNoteRealm(props.noteId).value
+)
 </script>
