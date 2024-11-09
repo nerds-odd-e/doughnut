@@ -16,7 +16,7 @@ const myNotebooksPage = () => {
     },
     creatingNotebook(notebookTopic: string) {
       cy.findByText('Add New Notebook').click()
-      return noteCreationForm.createNote(notebookTopic, undefined)
+      return noteCreationForm.createNote(notebookTopic)
     },
     notebookCard(notebook: string) {
       return notebookCard(notebook)

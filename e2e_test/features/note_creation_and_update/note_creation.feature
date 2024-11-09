@@ -30,17 +30,6 @@ Feature: Nested Note creation
       |       |
     Then I should see that the note creation is not successful
 
-  Scenario: Create a new child note with link to parent
-    When I create a note belonging to "LeSS in Action":
-      | Topic     | Link Type To Parent |
-      | Re-Design | a specialization of |
-    Then I should see "My Notes/LeSS in Action" with these children
-      | note-topic |
-      | team       |
-      | tech       |
-      | Re-Design  |
-    And [deprecating] On the current page, I should see "LeSS in Action" has link "a generalization of" "Re-Design"
-
   Scenario: Create a new note as next sibling
     When I create a note after "team":
       | Topic        |
