@@ -4,6 +4,7 @@
     field="topic"
     :model-value="modelValue"
     :error-message="errorMessage"
+    :initial-select-all="true"
     v-focus
     @update:model-value="$emit('update:modelValue', $event)"
     @blur="emit('blur')"

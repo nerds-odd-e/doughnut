@@ -66,7 +66,7 @@ const emit = defineEmits<{
 
 // Reactive state
 const creationData = ref<NoteCreationDTO>({
-  topicConstructor: "",
+  topicConstructor: "Untitled",
   wikidataId: "",
 })
 

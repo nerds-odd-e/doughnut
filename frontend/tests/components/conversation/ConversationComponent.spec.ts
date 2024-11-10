@@ -10,6 +10,14 @@ vitest.mock("vue-router", () => ({
   }),
 }))
 
+beforeEach(() => {
+  vi.useFakeTimers()
+})
+
+afterEach(() => {
+  vi.clearAllTimers()
+})
+
 describe("ConversationComponent", () => {
   let wrapper
   const note = makeMe.aNote.please()

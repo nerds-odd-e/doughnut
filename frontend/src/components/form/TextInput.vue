@@ -22,8 +22,9 @@
 
 <script setup lang="ts">
 import InputWithType from "./InputWithType.vue"
+import { onMounted } from "vue"
 
-defineProps({
+const props = defineProps({
   modelValue: { type: [String, Number], required: false },
   scopeName: String,
   field: String,
@@ -33,6 +34,7 @@ defineProps({
   autofocus: { type: Boolean, default: false },
   errorMessage: String,
   disabled: { type: Boolean, default: false },
+  initialSelectAll: { type: Boolean, default: false },
 })
 
 defineEmits<{
@@ -40,4 +42,15 @@ defineEmits<{
   blur: []
   focus: []
 }>()
+
+onMounted(() => {
+  if (props.initialSelectAll && props.modelValue) {
+    const input = document.getElementById(
+      `${props.scopeName}-${props.field}`
+    ) as HTMLInputElement
+    if (input) {
+      input.select()
+    }
+  }
+})
 </script>

@@ -27,4 +27,65 @@ describe("TextInput.vue", () => {
     const input = wrapper.find("input")
     expect(input.element.disabled).toBe(true)
   })
+
+  it("selects all text when initialSelectAll is true", async () => {
+    // Mock select function
+    const selectMock = vi.fn()
+
+    // Create a mock input element
+    const mockInput = document.createElement("input")
+    mockInput.select = selectMock
+
+    // Mock getElementById
+    const getElementByIdSpy = vi.spyOn(document, "getElementById")
+    getElementByIdSpy.mockReturnValue(mockInput)
+
+    const wrapper = mount(TextInput, {
+      props: {
+        modelValue: "test text",
+        scopeName: "test",
+        field: "test",
+        title: "test",
+        initialSelectAll: true,
+      },
+    })
+
+    // Wait for mounted hook to execute
+    await wrapper.vm.$nextTick()
+
+    expect(getElementByIdSpy).toHaveBeenCalledWith("test-test")
+    expect(selectMock).toHaveBeenCalled()
+
+    // Clean up
+    getElementByIdSpy.mockRestore()
+  })
+
+  it("does not select text when initialSelectAll is false", async () => {
+    const selectMock = vi.fn()
+
+    // Create a mock input element
+    const mockInput = document.createElement("input")
+    mockInput.select = selectMock
+
+    // Mock getElementById
+    const getElementByIdSpy = vi.spyOn(document, "getElementById")
+    getElementByIdSpy.mockReturnValue(mockInput)
+
+    const wrapper = mount(TextInput, {
+      props: {
+        modelValue: "test text",
+        scopeName: "test",
+        field: "test",
+        title: "test",
+        initialSelectAll: false,
+      },
+    })
+
+    await wrapper.vm.$nextTick()
+
+    expect(selectMock).not.toHaveBeenCalled()
+
+    // Clean up
+    getElementByIdSpy.mockRestore()
+  })
 })
