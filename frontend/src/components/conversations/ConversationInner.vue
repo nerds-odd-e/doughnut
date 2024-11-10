@@ -56,26 +56,21 @@
         <div class="message-avatar me-2" title="AI Assistant">
           <SvgRobot />
         </div>
-        <div class="card py-2 px-3 bg-light ai-chat">
-          <div>Suggested completion:</div>
-          <div class="completion-text mb-2" v-html="markdowntToHtml(formattedCompletionSuggestion)" />
-          <div class="d-flex gap-2">
-            <button
-              class="btn btn-primary btn-sm"
-              @click="handleAcceptCompletion"
-              :disabled="isProcessingToolCall"
-            >
-              Accept
-            </button>
-            <button
-              class="btn btn-secondary btn-sm"
-              @click="handleRejectCompletion"
-              :disabled="isProcessingToolCall"
-            >
-              Reject
-            </button>
-          </div>
-        </div>
+        <AcceptRejectButtons
+          :disabled="isProcessingToolCall"
+          @accept="handleAcceptCompletion"
+          @reject="handleRejectCompletion"
+        >
+          <template #title>
+            Suggested completion:
+          </template>
+          <template #content>
+            <div
+              class="completion-text"
+              v-html="markdowntToHtml(formattedCompletionSuggestion)"
+            />
+          </template>
+        </AcceptRejectButtons>
       </div>
 
       <div v-if="lastErrorMessage" class="last-error-message text-danger mb-3">
@@ -93,26 +88,18 @@
         <div class="message-avatar me-2" title="AI Assistant">
           <SvgRobot />
         </div>
-        <div class="card py-2 px-3 bg-light ai-chat">
-          <div>Suggested title:</div>
-          <div class="title-suggestion mb-2">{{ topicTitleSuggestion }}</div>
-          <div class="d-flex gap-2">
-            <button
-              class="btn btn-primary btn-sm"
-              @click="handleAcceptTitle"
-              :disabled="isProcessingToolCall"
-            >
-              Accept
-            </button>
-            <button
-              class="btn btn-secondary btn-sm"
-              @click="handleRejectTitle"
-              :disabled="isProcessingToolCall"
-            >
-              Reject
-            </button>
-          </div>
-        </div>
+        <AcceptRejectButtons
+          :disabled="isProcessingToolCall"
+          @accept="handleAcceptTitle"
+          @reject="handleRejectTitle"
+        >
+          <template #title>
+            Suggested title:
+          </template>
+          <template #content>
+            <div class="title-suggestion">{{ topicTitleSuggestion }}</div>
+          </template>
+        </AcceptRejectButtons>
       </div>
 
       <ScrollTo :scrollTrigger="currentConversationMessages.length + (currentAiReply ? currentAiReply.length : 0) + (completionSuggestion ? 1 : 0) + (lastErrorMessage ? 1 : 0) + (aiStatus ? 1 : 0) + (topicTitleSuggestion ? 1 : 0)" />
@@ -134,7 +121,11 @@ import type { StorageAccessor } from "@/store/createNoteStorage"
 import SvgMissingAvatar from "@/components/svgs/SvgMissingAvatar.vue"
 import ConversationTemplate from "./ConversationTemplate.vue"
 import markdownizer from "../form/markdownizer"
-import { createAiReplyStates, AiActionContext } from "@/models/aiReplyState"
+import {
+  createAiReplyStates,
+  type AiActionContext,
+} from "@/models/aiReplyState"
+import AcceptRejectButtons from "@/components/commons/AcceptRejectButtons.vue"
 
 const { conversation, user, initialAiReply, storageAccessor, isMaximized } =
   defineProps<{
@@ -397,11 +388,6 @@ const handleSendMessageAndInviteAI = async (message: string) => {
 </script>
 
 <style scoped>
-.ai-chat {
-  background-color: #f8f9fa;
-  border-left: 3px solid #0d6efd;
-}
-
 .message-avatar {
   width: 32px;
   height: 32px;

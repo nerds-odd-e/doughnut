@@ -7,6 +7,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AcceptRejectButtons: typeof import('./src/components/commons/AcceptRejectButtons.vue')['default']
     AIClarifyingQuestionDialog: typeof import('./src/components/notes/AIClarifyingQuestionDialog.vue')['default']
     AIGenerateImageDialog: typeof import('./src/components/notes/AIGenerateImageDialog.vue')['default']
     AnsweredQuestionComponent: typeof import('./src/components/review/AnsweredQuestionComponent.vue')['default']
