@@ -9,6 +9,7 @@ import java.util.List;
 public class AiToolFactory {
 
   public static final String COMPLETE_NOTE_DETAILS = "complete_note_details";
+  public static final String GENERATE_TOPIC_TITLE = "generate_topic_title";
 
   public static AiToolList mcqWithAnswerAiTool() {
     return new AiToolList(
@@ -114,6 +115,15 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
             (noteDetailsCompletion) -> {
               AiCompletionRequiredAction result = new AiCompletionRequiredAction();
               result.setContentToAppend(noteDetailsCompletion.completion);
+              return result;
+            }),
+        AiTool.build(
+            GENERATE_TOPIC_TITLE,
+            "Generate a concise and descriptive title based on the note content",
+            TopicTitleGeneration.class,
+            (topicTitleGeneration) -> {
+              AiCompletionRequiredAction result = new AiCompletionRequiredAction();
+              result.setTopicTitle(topicTitleGeneration.title);
               return result;
             }));
   }

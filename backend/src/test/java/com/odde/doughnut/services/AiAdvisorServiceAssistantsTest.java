@@ -59,7 +59,7 @@ class AiAdvisorServiceAssistantsTest {
     void getAiSuggestion_givenAString_returnsAiSuggestionObject() {
       assertThat(assistantRequest.getName(), is("Note details completion"));
       assertThat(assistantRequest.getInstructions(), containsString("PKM system"));
-      assertThat(assistantRequest.getTools(), hasSize(1));
+      assertThat(assistantRequest.getTools(), hasSize(2));
     }
 
     @Test
