@@ -4066,11 +4066,20 @@ components:
           $ref: "#/components/schemas/ImageFile"
         image_url:
           $ref: "#/components/schemas/ImageUrl"
+    DeltaOfRunStep:
+      type: object
+      properties:
+        delta:
+          $ref: "#/components/schemas/StepDelta"
     DummyForGeneratingTypes:
       type: object
       properties:
         message:
           $ref: "#/components/schemas/Message"
+        runStep:
+          $ref: "#/components/schemas/RunStep"
+        runStepDelta:
+          $ref: "#/components/schemas/DeltaOfRunStep"
         messageDelta:
           $ref: "#/components/schemas/MessageDelta"
         run:
@@ -4244,6 +4253,11 @@ components:
           $ref: "#/components/schemas/ImageFile"
         image_url:
           $ref: "#/components/schemas/ImageUrl"
+    MessageCreation:
+      type: object
+      properties:
+        message_id:
+          type: string
     MessageDelta:
       type: object
       properties:
@@ -4355,6 +4369,67 @@ components:
       properties:
         file_id:
           type: string
+    RunStep:
+      type: object
+      properties:
+        id:
+          type: string
+        object:
+          type: string
+        type:
+          type: string
+        status:
+          type: string
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+        usage:
+          $ref: "#/components/schemas/Usage"
+        created_at:
+          type: integer
+          format: int32
+        assistant_id:
+          type: string
+        thread_id:
+          type: string
+        run_id:
+          type: string
+        step_details:
+          $ref: "#/components/schemas/StepDetails"
+        last_error:
+          $ref: "#/components/schemas/LastError"
+        expired_at:
+          type: integer
+          format: int32
+        cancelled_at:
+          type: integer
+          format: int32
+        failed_at:
+          type: integer
+          format: int32
+        completed_at:
+          type: integer
+          format: int32
+        expires_at:
+          type: integer
+          format: int32
+    StepDelta:
+      type: object
+      properties:
+        step_details:
+          $ref: "#/components/schemas/StepDetails"
+    StepDetails:
+      type: object
+      properties:
+        type:
+          type: string
+        message_creation:
+          $ref: "#/components/schemas/MessageCreation"
+        tool_calls:
+          type: array
+          items:
+            $ref: "#/components/schemas/ToolCall"
     SubmitToolOutputs:
       type: object
       properties:

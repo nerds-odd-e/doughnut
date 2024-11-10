@@ -49,10 +49,16 @@ const openAiService = () => {
     },
 
     stubToolCallSubmission() {
-      return serviceMocker.stubPoster(
+      serviceMocker.stubPoster(
         `/threads/undefined/runs/run1/submit_tool_outputs`,
         {}
       )
+      return this
+    },
+
+    stubRunCancellation() {
+      serviceMocker.stubPoster(`/threads/undefined/runs/run1/cancel`, {})
+      return this
     },
 
     async alwaysResponseAsUnauthorized() {

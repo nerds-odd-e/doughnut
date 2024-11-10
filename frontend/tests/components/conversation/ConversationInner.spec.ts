@@ -248,6 +248,7 @@ describe("ConversationInner", () => {
     beforeEach(async () => {
       await submitMessage(wrapper, "Hello")
       helper.managedApi.restAiController.submitToolCallResult = vi.fn()
+      helper.managedApi.restAiController.cancelRun = vi.fn()
       helper.managedApi.restTextContentController.updateNoteDetails = vi.fn()
 
       // Simulate the run response
@@ -311,11 +312,10 @@ describe("ConversationInner", () => {
         helper.managedApi.restTextContentController.updateNoteDetails
       ).not.toHaveBeenCalled()
 
-      expect(
-        helper.managedApi.restAiController.submitToolCallResult
-      ).toHaveBeenCalledWith("thread-123", "run-123", "call-456", {
-        status: "rejected",
-      })
+      expect(helper.managedApi.restAiController.cancelRun).toHaveBeenCalledWith(
+        "thread-123",
+        "run-123"
+      )
 
       expect(wrapper.find(".completion-text").exists()).toBe(false)
     })

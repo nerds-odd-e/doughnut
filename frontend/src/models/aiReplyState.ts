@@ -3,6 +3,8 @@ import type {
   MessageDelta,
   Run,
   NoteDetailsCompletion,
+  RunStep,
+  DeltaOfRunStep,
 } from "@/generated/backend"
 
 export type AiReplyState = {
@@ -56,6 +58,25 @@ export const createAiReplyStates = (
           response.id!,
           response.required_action!.submit_tool_outputs!.tool_calls![0]!.id!
         )
+      },
+    },
+    "thread.run.step.created": {
+      status: "Starting tool execution...",
+      handleEvent: async (data) => {
+        const response = JSON.parse(data) as RunStep
+        if (response.type === "tool_calls") {
+          context.set("")
+        }
+      },
+    },
+    "thread.run.step.delta": {
+      status: "Processing tool call...",
+      handleEvent: async (data) => {
+        const response = JSON.parse(data) as DeltaOfRunStep
+        // the arguments are in fact a string, but the type system doesn't know that
+        const delta = response.delta?.step_details?.tool_calls?.[0]?.function
+          ?.arguments as unknown as string
+        context.append(delta)
       },
     },
     done: {

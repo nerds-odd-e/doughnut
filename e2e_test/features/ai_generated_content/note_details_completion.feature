@@ -18,7 +18,7 @@ Feature: Note details completion
     Given OpenAI assistant will reply below for user messages:
       | user message                      | response type   | assistant reply                 | run id |
       | Please complete the note details. | requires action | {"completion": " vigorous city."} | run1   |
-    And OpenAI assistant can accept tool call results submission
+    And OpenAI assistant can accept tool call results submission and run cancellation
     When I request to complete the details for the note "Taipei"
     Then I should see the suggested completion "... vigorous city." in the chat dialog
     When I <action> the suggested completion

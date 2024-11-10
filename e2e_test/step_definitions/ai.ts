@@ -74,9 +74,12 @@ Given(
   }
 )
 
-Given('OpenAI assistant can accept tool call results submission', () => {
-  mock_services.openAi().stubToolCallSubmission()
-})
+Given(
+  'OpenAI assistant can accept tool call results submission and run cancellation',
+  () => {
+    mock_services.openAi().stubToolCallSubmission().stubRunCancellation()
+  }
+)
 
 Given(
   'OpenAI assistant {string} will reply below for user messages:',

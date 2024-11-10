@@ -165,8 +165,7 @@ class RestAiControllerTest {
       String threadId = "thread-123";
       String runId = "run-123";
 
-      when(openAiApi.cancelRun(threadId, runId))
-          .thenReturn(Single.just(new Run()));
+      when(openAiApi.cancelRun(threadId, runId)).thenReturn(Single.just(new Run()));
 
       controller.cancelRun(threadId, runId);
 
@@ -175,14 +174,12 @@ class RestAiControllerTest {
 
     @Test
     void shouldRequireUserToBeLoggedIn() {
-      controller = new RestAiController(
-          aiAdvisorWithStorageService,
-          makeMe.aNullUserModelPlease(),
-          testabilitySettings);
+      controller =
+          new RestAiController(
+              aiAdvisorWithStorageService, makeMe.aNullUserModelPlease(), testabilitySettings);
 
       assertThrows(
-          ResponseStatusException.class,
-          () -> controller.cancelRun("thread-123", "run-123"));
+          ResponseStatusException.class, () -> controller.cancelRun("thread-123", "run-123"));
     }
   }
 }

@@ -275,13 +275,8 @@ const handleRejectCompletion = async () => {
 
   try {
     isProcessingToolCall.value = true
-    const { threadId, runId, toolCallId } = pendingCompletionData
-    await managedApi.restAiController.submitToolCallResult(
-      threadId,
-      runId,
-      toolCallId,
-      { status: "rejected" }
-    )
+    const { threadId, runId } = pendingCompletionData
+    await managedApi.restAiController.cancelRun(threadId, runId)
 
     completionSuggestion.value = undefined
     pendingCompletionData = undefined

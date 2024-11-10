@@ -5,8 +5,8 @@ import com.odde.doughnut.controllers.dto.ToolCallResult;
 import com.odde.doughnut.services.ai.*;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
-import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.assistants.run.Run;
+import com.theokanning.openai.client.OpenAiApi;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
