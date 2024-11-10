@@ -13,7 +13,10 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.odde.doughnut.services.AiAdvisorWithStorageService;
+import com.odde.doughnut.services.ai.TopicTitleGeneration;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.OpenAIAssistantMocker;
+import com.odde.doughnut.testability.OpenAIAssistantThreadMocker;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.OpenAiResponse;
 import com.theokanning.openai.assistants.run.Run;
@@ -187,13 +190,26 @@ class RestAiControllerTest {
   @Nested
   class SuggestTopicTitle {
     Note testNote;
+    OpenAIAssistantMocker openAIAssistantMocker;
+    OpenAIAssistantThreadMocker openAIAssistantThreadMocker;
 
     @BeforeEach
     void setup() {
       testNote = makeMe.aNote().creatorAndOwner(currentUser).please();
+      openAIAssistantMocker = new OpenAIAssistantMocker(openAiApi);
+      openAIAssistantThreadMocker = openAIAssistantMocker.mockThreadCreation(null);
     }
 
+    @Test
     void shouldReturnSuggestedTopicTitle() throws UnexpectedNoAccessRightException {
+      TopicTitleGeneration suggestedTopic = new TopicTitleGeneration();
+      suggestedTopic.setTopic("Suggested Title");
+      openAIAssistantThreadMocker
+          .mockCreateRunInProcess("my-run-id")
+          .aRunThatRequireAction(suggestedTopic, "suggest_topic_title")
+          .mockRetrieveRun()
+          .mockCancelRun("my-run-id");
+
       String result = controller.suggestTopicTitle(testNote);
 
       assertThat(result).isEqualTo("Suggested Title");

@@ -36,18 +36,17 @@ public final class AiAdvisorWithStorageService {
     NotebookAssistant assistant =
         modelFactoryService.notebookAssistantRepository.findByNotebook(note.getNotebook());
     if (assistant != null) {
-      return aiAdvisorService.getContentCompletionService(assistant.getAssistantId());
+      return aiAdvisorService.getChatService(assistant.getAssistantId());
     }
-    return getContentCompletionService();
+    return getDefaultChatService();
   }
 
   private GlobalSettingsService getGlobalSettingsService() {
     return new GlobalSettingsService(modelFactoryService);
   }
 
-  public AssistantService getContentCompletionService() {
-    return aiAdvisorService.getContentCompletionService(
-        getCompletionAssistantSettingAccessor().getValue());
+  public AssistantService getDefaultChatService() {
+    return aiAdvisorService.getChatService(getCompletionAssistantSettingAccessor().getValue());
   }
 
   private GlobalSettingsService.GlobalSettingsKeyValue getCompletionAssistantSettingAccessor() {
@@ -63,7 +62,7 @@ public final class AiAdvisorWithStorageService {
   }
 
   public Assistant createCompletionAssistant(Timestamp currentUTCTimestamp, String modelName) {
-    AssistantService service = getContentCompletionService();
+    AssistantService service = getDefaultChatService();
     Assistant assistant = service.createDefaultAssistant(modelName, "Note details completion");
     getCompletionAssistantSettingAccessor().setKeyValue(currentUTCTimestamp, assistant.getId());
     return assistant;
@@ -72,7 +71,7 @@ public final class AiAdvisorWithStorageService {
   public NotebookAssistant recreateNotebookAssistant(
       Timestamp currentUTCTimestamp, User creator, Notebook notebook, String additionalInstruction)
       throws IOException {
-    AssistantService service = getContentCompletionService();
+    AssistantService service = getDefaultChatService();
     String modelName = getGlobalSettingsService().globalSettingOthers().getValue();
     String fileContent = notebook.getNotebookDump();
     Assistant chatAssistant =

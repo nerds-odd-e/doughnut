@@ -45,7 +45,7 @@ class AiAdvisorServiceAutoCompleteTest {
   @BeforeEach
   void Setup() {
     MockitoAnnotations.openMocks(this);
-    completionService = new AiAdvisorService(openAiApi).getContentCompletionService("example-id");
+    completionService = new AiAdvisorService(openAiApi).getChatService("example-id");
     openAIAssistantMocker = new OpenAIAssistantMocker(openAiApi);
     openAIAssistantThreadMocker =
         openAIAssistantMocker.mockThreadCreation(null).mockCreateMessage();

@@ -82,32 +82,23 @@ public record AssistantService(
   }
 
   public String createThread(Note note) {
+    MessageRequest leadingMsg =
+        MessageRequest.builder()
+            .role("assistant")
+            .content("Please only call function to update content when use asks to.")
+            .build();
+    return createThreadForNoteWithLeadingMessage(note, leadingMsg);
+  }
+
+  private String createThreadForNoteWithLeadingMessage(Note note, MessageRequest leadingMsg) {
     ThreadRequest threadRequest =
         ThreadRequest.builder()
             .messages(
                 List.of(
-                    MessageRequest.builder()
-                        .role("assistant")
-                        .content(
-                            "Please only call the complete_note_details function when use asks to.")
-                        .build(),
+                    leadingMsg,
                     MessageRequest.builder()
                         .role("assistant")
                         .content(note.getNoteDescription())
-                        .build()))
-            .build();
-    return openAiApiHandler.createThread(threadRequest).getId();
-  }
-
-  public String createThread() {
-    ThreadRequest threadRequest =
-        ThreadRequest.builder()
-            .messages(
-                List.of(
-                    MessageRequest.builder()
-                        .role("assistant")
-                        .content(
-                            "Please give us your opinion based on the conversation. If you don't have any opinion, please response you don't have any idea, do not ask me for more information.")
                         .build()))
             .build();
     return openAiApiHandler.createThread(threadRequest).getId();
@@ -135,5 +126,25 @@ public record AssistantService(
       throw new RuntimeException("Unexpected number of tool calls: " + size);
     }
     return requiredAction.getSubmitToolOutputs().getToolCalls();
+  }
+
+  public String suggestTopicTitle(Note note) {
+    String threadId =
+        createThreadForNoteWithLeadingMessage(
+            note,
+            MessageRequest.builder()
+                .role("assistant")
+                .content("Please suggest a topic title for the following note.")
+                .build());
+    Run run = openAiApiHandler.createRun(threadId, assistantId);
+    AiAssistantResponse threadResponse = getThreadResponse(threadId, run);
+    openAiApiHandler.cancelRun(threadId, run.getId());
+    return threadResponse
+        .getToolCalls()
+        .getFirst()
+        .getFunction()
+        .getArguments()
+        .get("topic")
+        .asText();
   }
 }

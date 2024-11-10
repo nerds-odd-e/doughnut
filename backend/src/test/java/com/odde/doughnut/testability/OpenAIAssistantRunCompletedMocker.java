@@ -41,4 +41,8 @@ public record OpenAIAssistantRunCompletedMocker(OpenAiApi openAiApi, String thre
         .when(openAiApi)
         .submitToolOutputs(eq(threadId), any(), any());
   }
+
+  public void mockCancelRun(String runId) {
+    Mockito.doReturn(Single.just(run)).when(openAiApi).cancelRun(eq(threadId), eq(runId));
+  }
 }

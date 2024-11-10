@@ -110,6 +110,6 @@ public class RestAiController {
   public String suggestTopicTitle(@PathVariable(value = "note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
-    return aiAdvisorWithStorageService.getAiAdvisorService().suggestTopicTitle(note);
+    return aiAdvisorWithStorageService.getChatAssistantService(note).suggestTopicTitle(note);
   }
 }
