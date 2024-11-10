@@ -2,10 +2,10 @@ import type {
   Message,
   MessageDelta,
   Run,
-  NoteDetailsCompletion,
-  TopicTitleGeneration,
   RunStep,
   DeltaOfRunStep,
+  NoteDetailsCompletion,
+  TopicTitleGeneration,
 } from "@/generated/backend"
 
 export type AiReplyState = {
@@ -92,7 +92,6 @@ export const createAiReplyStates = (
       status: "Processing tool call...",
       handleEvent: async (data) => {
         const response = JSON.parse(data) as DeltaOfRunStep
-        // the arguments are in fact a string, but the type system doesn't know that
         const delta = response.delta?.step_details?.tool_calls?.[0]?.function
           ?.arguments as unknown as string
         context.append(delta)

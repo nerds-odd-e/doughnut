@@ -134,8 +134,7 @@ import type { StorageAccessor } from "@/store/createNoteStorage"
 import SvgMissingAvatar from "@/components/svgs/SvgMissingAvatar.vue"
 import ConversationTemplate from "./ConversationTemplate.vue"
 import markdownizer from "../form/markdownizer"
-import { createAiReplyStates } from "@/models/aiReplyState"
-import type { AiActionContext } from "@/models/aiReplyState"
+import { createAiReplyStates, AiActionContext } from "@/models/aiReplyState"
 
 const { conversation, user, initialAiReply, storageAccessor, isMaximized } =
   defineProps<{
@@ -180,6 +179,8 @@ const topicTitleSuggestion = ref<string | undefined>()
 let pendingTitleData:
   | { threadId: string; runId: string; toolCallId: string }
   | undefined
+
+const isProcessingToolCall = ref(false)
 
 const formatMessage = (message: string) => {
   return message.replace(/^"|"$/g, "").trim()
@@ -273,8 +274,6 @@ const getAiReply = async () => {
     .restConversationMessageController.getAiReply(conversation.id)
 }
 
-const isProcessingToolCall = ref(false)
-
 const handleAcceptCompletion = async () => {
   if (
     !completionSuggestion.value ||
@@ -334,7 +333,6 @@ const formattedCompletionSuggestion = computed(() => {
 })
 
 const handleAcceptTitle = async () => {
-  console.log("handleAcceptTitle", topicTitleSuggestion.value)
   if (
     !topicTitleSuggestion.value ||
     !pendingTitleData ||
