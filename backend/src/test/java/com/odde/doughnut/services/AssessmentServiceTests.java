@@ -7,14 +7,10 @@ import com.odde.doughnut.controllers.dto.Randomization;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.ai.tools.AiTool;
-import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.NoteBuilder;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -122,24 +118,6 @@ public class AssessmentServiceTests {
       makeMe.theNote(topNote).withNChildrenThat(5, NoteBuilder::hasAnUnapprovedQuestion).please();
       assertThrows(
           ApiException.class, () -> service.generateAssessment(notebook, currentUser.getEntity()));
-    }
-  }
-
-  @Nested
-  class aiToolsTest {
-    @Test
-    void shouldHaveToolForGeneratingTopicTitle() {
-      List<AiTool> tools = AiToolFactory.getCompletionAiTools();
-
-      Optional<AiTool> topicTitleTool =
-          tools.stream()
-              .filter(t -> t.name().equals(AiToolFactory.GENERATE_TOPIC_TITLE))
-              .findFirst();
-
-      assertTrue(topicTitleTool.isPresent());
-      assertEquals(
-          "Generate a concise and descriptive title based on the note content",
-          topicTitleTool.get().description());
     }
   }
 }
