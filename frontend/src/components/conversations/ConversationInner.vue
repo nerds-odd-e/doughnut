@@ -164,14 +164,27 @@ const aiAction: AiAction = {
     await fetchConversationMessages()
     currentAiReply.value = undefined
   },
+  async appendNoteDetails(
+    noteId: number,
+    completion: string,
+    threadId: string,
+    runId: string,
+    toolCallId: string
+  ) {
+    await storageAccessor.storedApi().appendDetails(noteId, completion)
+    await managedApi.restAiController.submitToolCallResult(
+      threadId,
+      runId,
+      toolCallId,
+      { status: "accepted" }
+    )
+  },
 }
 
 // Update getAiReply to use the state pattern
 const getAiReply = async () => {
   const states = createAiReplyStates({
     aiAction,
-    storageAccessor,
-    managedApi,
     note: conversation.subject?.note,
   })
 

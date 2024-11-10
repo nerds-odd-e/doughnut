@@ -5,8 +5,6 @@ import type {
   NoteDetailsCompletion,
   Note,
 } from "@/generated/backend"
-import type { StorageAccessor } from "@/store/createNoteStorage"
-import type ManagedApi from "@/managedApi/ManagedApi"
 
 export type AiReplyState = {
   handleEvent: (data: string) => Promise<void>
@@ -16,12 +14,17 @@ export type AiReplyState = {
 export interface AiAction {
   append: (text: string) => void
   reset: () => Promise<void>
+  appendNoteDetails: (
+    noteId: number,
+    completion: string,
+    threadId: string,
+    runId: string,
+    toolCallId: string
+  ) => Promise<void>
 }
 
 type AiReplyContext = {
   aiAction: AiAction
-  storageAccessor: StorageAccessor
-  managedApi: ManagedApi
   note: Note | undefined
 }
 
@@ -57,15 +60,12 @@ export const createAiReplyStates = (
             .function!.arguments as unknown as string
         ) as NoteDetailsCompletion
 
-        await context.storageAccessor
-          .storedApi()
-          .appendDetails(context.note!.id, contentToAppend!.completion)
-
-        await context.managedApi.restAiController.submitToolCallResult(
+        await context.aiAction.appendNoteDetails(
+          context.note.id,
+          contentToAppend!.completion,
           response.thread_id!,
           response.id!,
-          response.required_action!.submit_tool_outputs!.tool_calls![0]!.id!,
-          { status: "accepted" }
+          response.required_action!.submit_tool_outputs!.tool_calls![0]!.id!
         )
       },
     },
