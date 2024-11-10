@@ -1882,7 +1882,7 @@ paths:
           content:
             '*/*':
               schema:
-                type: string
+                $ref: "#/components/schemas/SuggestedTopicDTO"
   /api/ai/submit-tool-result/{threadId}/{runId}/{toolCallId}:
     post:
       tags:
@@ -3747,6 +3747,11 @@ components:
             $ref: "#/components/schemas/AssessmentQuestionInstance"
         certifiable:
           type: boolean
+    SuggestedTopicDTO:
+      type: object
+      properties:
+        topic:
+          type: string
     ToolCallResult:
       type: object
       properties:

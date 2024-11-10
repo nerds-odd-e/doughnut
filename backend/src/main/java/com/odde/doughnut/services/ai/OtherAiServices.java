@@ -3,6 +3,7 @@ package com.odde.doughnut.services.ai;
 import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
@@ -62,7 +63,9 @@ public record OtherAiServices(OpenAiApiHandler openAiApiHandler) {
         .flatMap(
             jsonNode -> {
               try {
-                return Optional.of(new ObjectMapper().treeToValue(jsonNode, TextFromAudio.class));
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+                return Optional.of(mapper.treeToValue(jsonNode, TextFromAudio.class));
               } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
               }

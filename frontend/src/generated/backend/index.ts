@@ -114,6 +114,7 @@ export type { Subscription } from './models/Subscription';
 export type { SubscriptionDTO } from './models/SubscriptionDTO';
 export type { SuggestedQuestionForFineTuning } from './models/SuggestedQuestionForFineTuning';
 export type { SuggestedQuestionsData } from './models/SuggestedQuestionsData';
+export type { SuggestedTopicDTO } from './models/SuggestedTopicDTO';
 export type { Text } from './models/Text';
 export type { TextFromAudio } from './models/TextFromAudio';
 export type { TimeTravel } from './models/TimeTravel';

@@ -87,10 +87,22 @@ const processAudio = async (file: Blob) => {
     await storageAccessor
       .storedApi()
       .appendDetails(note.id, response?.completionMarkdownFromAudio)
+
+    if (processAudio.callCount < 3) {
+      const suggestedTopic =
+        await managedApi.restAiController.suggestTopicTitle(note.id)
+      if (suggestedTopic?.topic) {
+        await storageAccessor
+          .storedApi()
+          .updateTextField(note.id, "edit topic", suggestedTopic.topic)
+      }
+    }
   } catch (error) {
     errors.value = error as Record<string, string | undefined>
   }
 }
+
+processAudio.callCount = 0
 
 const audioRecorder = createAudioRecorder(processAudio)
 const audioDevices = audioRecorder.getAudioDevices()

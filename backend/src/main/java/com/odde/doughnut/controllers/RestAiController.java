@@ -107,9 +107,12 @@ public class RestAiController {
 
   @PostMapping("/suggest-topic-title/{note}")
   @Transactional
-  public String suggestTopicTitle(@PathVariable(value = "note") @Schema(type = "integer") Note note)
+  public SuggestedTopicDTO suggestTopicTitle(
+      @PathVariable(value = "note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
-    return aiAdvisorWithStorageService.getChatAssistantService(note).suggestTopicTitle(note);
+    String title =
+        aiAdvisorWithStorageService.getChatAssistantService(note).suggestTopicTitle(note);
+    return new SuggestedTopicDTO(title);
   }
 }

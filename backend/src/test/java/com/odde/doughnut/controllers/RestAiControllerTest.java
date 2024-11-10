@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.odde.doughnut.controllers.dto.SuggestedTopicDTO;
 import com.odde.doughnut.controllers.dto.ToolCallResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -210,9 +211,9 @@ class RestAiControllerTest {
           .mockRetrieveRun()
           .mockCancelRun("my-run-id");
 
-      String result = controller.suggestTopicTitle(testNote);
+      SuggestedTopicDTO result = controller.suggestTopicTitle(testNote);
 
-      assertThat(result).isEqualTo("Suggested Title");
+      assertThat(result.getTopic()).isEqualTo("Suggested Title");
     }
 
     @Test

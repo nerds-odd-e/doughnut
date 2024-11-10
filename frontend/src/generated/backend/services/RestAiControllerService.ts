@@ -6,6 +6,7 @@ import type { AiGeneratedImage } from '../models/AiGeneratedImage';
 import type { DummyForGeneratingTypes } from '../models/DummyForGeneratingTypes';
 import type { NotebookAssistant } from '../models/NotebookAssistant';
 import type { NotebookAssistantCreationParams } from '../models/NotebookAssistantCreationParams';
+import type { SuggestedTopicDTO } from '../models/SuggestedTopicDTO';
 import type { ToolCallResult } from '../models/ToolCallResult';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -13,12 +14,12 @@ export class RestAiControllerService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
      * @param note
-     * @returns string OK
+     * @returns SuggestedTopicDTO OK
      * @throws ApiError
      */
     public suggestTopicTitle(
         note: number,
-    ): CancelablePromise<string> {
+    ): CancelablePromise<SuggestedTopicDTO> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/ai/suggest-topic-title/{note}',
