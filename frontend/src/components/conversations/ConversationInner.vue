@@ -58,7 +58,7 @@
         </div>
         <div class="card py-2 px-3 bg-light ai-chat">
           <div>Suggested completion:</div>
-          <div class="completion-text mb-2">{{ completionSuggestion }}</div>
+          <div class="completion-text mb-2" v-html="markdowntToHtml(formattedCompletionSuggestion)" />
           <div class="d-flex gap-2">
             <button class="btn btn-primary btn-sm" @click="handleAcceptCompletion">Accept</button>
             <button class="btn btn-secondary btn-sm" @click="handleRejectCompletion">Reject</button>
@@ -83,7 +83,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from "vue"
+import { ref, onMounted, watch, computed } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type {
   User,
@@ -260,6 +260,14 @@ const handleRejectCompletion = async () => {
   completionSuggestion.value = undefined
   pendingCompletionData = undefined
 }
+
+const formattedCompletionSuggestion = computed(() => {
+  if (!completionSuggestion.value) return ""
+  const currentDetails = conversation.subject?.note?.details?.trim() || ""
+  return currentDetails
+    ? `...${completionSuggestion.value}`
+    : completionSuggestion.value
+})
 
 onMounted(async () => {
   await fetchConversationMessages()

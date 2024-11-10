@@ -58,7 +58,7 @@ const createRunResponse = (completion: string) => ({
 
 describe("ConversationInner", () => {
   let wrapper
-  const note = makeMe.aNote.please()
+  const note = makeMe.aNote.details("").please()
   const conversation = makeMe.aConversation.note(note).please()
   const user = makeMe.aUser.please()
 
@@ -228,7 +228,7 @@ describe("ConversationInner", () => {
   })
 
   describe("Tool Call Handling", () => {
-    const testCompletion = "test completion"
+    const testCompletion = "**bold completion**"
 
     beforeEach(async () => {
       await submitForm("Hello")
@@ -241,10 +241,42 @@ describe("ConversationInner", () => {
         JSON.stringify(createRunResponse(testCompletion))
       )
       await flushPromises()
+    })
 
-      // Verify suggestion is shown
-      const completionCard = wrapper.find(".ai-chat .completion-text")
-      expect(completionCard.text()).toBe(testCompletion)
+    it("renders completion suggestion as markdown", async () => {
+      const completionText = wrapper.find(".ai-chat .completion-text")
+      expect(completionText.find("strong").exists()).toBe(true)
+      expect(completionText.find("strong").text()).toBe("bold completion")
+    })
+
+    it("adds '...' prefix when note has existing details", async () => {
+      // First test without existing details
+      let completionText = wrapper.find(".ai-chat .completion-text")
+      expect(completionText.text()).toBe("bold completion")
+
+      // Recreate wrapper with note having existing details
+      const noteWithDetails = makeMe.aNote.details("existing text").please()
+      const conversationWithDetails = makeMe.aConversation
+        .note(noteWithDetails)
+        .please()
+
+      wrapper = helper
+        .component(ConversationInner)
+        .withStorageProps({
+          conversation: conversationWithDetails,
+          user,
+        })
+        .mount()
+
+      await submitForm("Hello")
+      helper.managedApi.eventSource.eventSourceRequest.onMessage(
+        "thread.run.requires_action",
+        JSON.stringify(createRunResponse(testCompletion))
+      )
+      await flushPromises()
+
+      completionText = wrapper.find(".ai-chat .completion-text")
+      expect(completionText.text()).toBe("...bold completion")
     })
 
     it("shows completion suggestion and handles acceptance", async () => {

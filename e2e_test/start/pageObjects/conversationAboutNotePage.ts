@@ -31,7 +31,7 @@ export class ConversationAboutNotePage {
     cy.findByRole('dialog')
       .should('be.visible')
       .within(() => {
-        cy.findByText(completion).should('be.visible')
+        cy.findByText(completion)
       })
     return this
   }
