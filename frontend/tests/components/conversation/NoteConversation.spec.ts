@@ -13,6 +13,10 @@ vitest.mock("vue-router", () => ({
   }),
 }))
 
+afterEach(() => {
+  vi.clearAllTimers()
+})
+
 describe("NoteConversation", () => {
   const note = makeMe.aNote.please()
   const conversation = { id: 1, title: "Test Conversation" }

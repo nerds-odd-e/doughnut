@@ -165,13 +165,17 @@ const aiAction: AiAction = {
     currentAiReply.value = undefined
   },
   async appendNoteDetails(
-    noteId: number,
     completion: string,
     threadId: string,
     runId: string,
     toolCallId: string
   ) {
-    await storageAccessor.storedApi().appendDetails(noteId, completion)
+    const note = conversation.subject?.note
+    if (!note) {
+      console.error("No note found in conversation")
+      return
+    }
+    await storageAccessor.storedApi().appendDetails(note.id, completion)
     await managedApi.restAiController.submitToolCallResult(
       threadId,
       runId,
@@ -185,7 +189,6 @@ const aiAction: AiAction = {
 const getAiReply = async () => {
   const states = createAiReplyStates({
     aiAction,
-    note: conversation.subject?.note,
   })
 
   aiStatus.value = "Starting AI reply..."

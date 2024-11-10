@@ -3,7 +3,6 @@ import type {
   MessageDelta,
   Run,
   NoteDetailsCompletion,
-  Note,
 } from "@/generated/backend"
 
 export type AiReplyState = {
@@ -15,7 +14,6 @@ export interface AiAction {
   append: (text: string) => void
   reset: () => Promise<void>
   appendNoteDetails: (
-    noteId: number,
     completion: string,
     threadId: string,
     runId: string,
@@ -25,7 +23,6 @@ export interface AiAction {
 
 type AiReplyContext = {
   aiAction: AiAction
-  note: Note | undefined
 }
 
 export const createAiReplyStates = (
@@ -50,10 +47,6 @@ export const createAiReplyStates = (
     "thread.run.requires_action": {
       status: "Processing actions...",
       handleEvent: async (data) => {
-        if (!context.note) {
-          console.error("No note found in conversation")
-          return
-        }
         const response = JSON.parse(data) as Run
         const contentToAppend = JSON.parse(
           response.required_action!.submit_tool_outputs!.tool_calls![0]!
@@ -61,7 +54,6 @@ export const createAiReplyStates = (
         ) as NoteDetailsCompletion
 
         await context.aiAction.appendNoteDetails(
-          context.note.id,
           contentToAppend!.completion,
           response.thread_id!,
           response.id!,
