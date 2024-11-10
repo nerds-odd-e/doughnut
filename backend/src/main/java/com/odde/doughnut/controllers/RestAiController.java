@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.*;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.NotebookAssistant;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -102,5 +103,13 @@ public class RestAiController {
   public void cancelRun(@PathVariable String threadId, @PathVariable String runId) {
     currentUser.assertLoggedIn();
     aiAdvisorWithStorageService.getAiAdvisorService().cancelRun(threadId, runId);
+  }
+
+  @PostMapping("/suggest-topic-title/{note}")
+  @Transactional
+  public String suggestTopicTitle(@PathVariable(value = "note") @Schema(type = "integer") Note note)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertAuthorization(note);
+    return aiAdvisorWithStorageService.getAiAdvisorService().suggestTopicTitle(note);
   }
 }

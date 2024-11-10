@@ -9,6 +9,7 @@ import static org.mockito.Mockito.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.ToolCallResult;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.odde.doughnut.services.AiAdvisorWithStorageService;
@@ -180,6 +181,31 @@ class RestAiControllerTest {
 
       assertThrows(
           ResponseStatusException.class, () -> controller.cancelRun("thread-123", "run-123"));
+    }
+  }
+
+  @Nested
+  class SuggestTopicTitle {
+    Note testNote;
+
+    @BeforeEach
+    void setup() {
+      testNote = makeMe.aNote().creatorAndOwner(currentUser).please();
+    }
+
+    void shouldReturnSuggestedTopicTitle() throws UnexpectedNoAccessRightException {
+      String result = controller.suggestTopicTitle(testNote);
+
+      assertThat(result).isEqualTo("Suggested Title");
+    }
+
+    @Test
+    void shouldRequireUserToBeLoggedIn() {
+      controller =
+          new RestAiController(
+              aiAdvisorWithStorageService, makeMe.aNullUserModelPlease(), testabilitySettings);
+
+      assertThrows(ResponseStatusException.class, () -> controller.suggestTopicTitle(testNote));
     }
   }
 }

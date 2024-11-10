@@ -12,6 +12,25 @@ import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestAiControllerService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
+     * @param note
+     * @returns string OK
+     * @throws ApiError
+     */
+    public suggestTopicTitle(
+        note: number,
+    ): CancelablePromise<string> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/ai/suggest-topic-title/{note}',
+            path: {
+                'note': note,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
      * @param threadId
      * @param runId
      * @param toolCallId

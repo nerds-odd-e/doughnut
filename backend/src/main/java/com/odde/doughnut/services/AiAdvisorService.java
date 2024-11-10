@@ -2,6 +2,7 @@ package com.odde.doughnut.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.ToolCallResult;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.*;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
@@ -35,5 +36,9 @@ public class AiAdvisorService {
 
   public Run cancelRun(String threadId, String runId) {
     return openAiApiHandler.cancelRun(threadId, runId);
+  }
+
+  public String suggestTopicTitle(Note note) {
+    return null;
   }
 }
