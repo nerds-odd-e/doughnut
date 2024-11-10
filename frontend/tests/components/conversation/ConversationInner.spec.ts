@@ -37,7 +37,7 @@ const simulateAiResponse = (content = "## I'm ChatGPT") => {
   )
 }
 
-const createRunResponse = (completion: string) => ({
+const createRunResponse = (functionName: string, args: object) => ({
   id: "run-123",
   thread_id: "thread-123",
   required_action: {
@@ -46,10 +46,8 @@ const createRunResponse = (completion: string) => ({
         {
           id: "call-456",
           function: {
-            name: "complete_note_details",
-            arguments: JSON.stringify({
-              completion,
-            }),
+            name: functionName,
+            arguments: JSON.stringify(args),
           },
         },
       ],
@@ -57,7 +55,6 @@ const createRunResponse = (completion: string) => ({
   },
 })
 
-// New helper functions to reduce duplication
 const setupTestData = () => {
   const note = makeMe.aNote.details("").please()
   const conversation = makeMe.aConversation.note(note).please()
@@ -80,6 +77,19 @@ const submitMessage = async (wrapper, message: string) => {
   await flushPromises()
 }
 
+const submitMessageAndSimulateRunResponse = async (
+  wrapper,
+  message,
+  runResponse
+) => {
+  await submitMessage(wrapper, message)
+  helper.managedApi.eventSource.eventSourceRequest.onMessage(
+    "thread.run.requires_action",
+    JSON.stringify(runResponse)
+  )
+  await flushPromises()
+}
+
 describe("ConversationInner", () => {
   let wrapper
   let note
@@ -87,7 +97,7 @@ describe("ConversationInner", () => {
   let user
 
   beforeEach(() => {
-    window.HTMLElement.prototype.scrollIntoView = vitest.fn()
+    window.HTMLElement.prototype.scrollIntoView = vi.fn()
     helper.managedApi.restConversationMessageController.replyToConversation =
       vi.fn()
     helper.managedApi.eventSource.restConversationMessageController.getAiReply =
@@ -159,10 +169,6 @@ describe("ConversationInner", () => {
     })
 
     describe("Status Bar", () => {
-      beforeEach(async () => {
-        await submitMessage(wrapper, "Hello")
-      })
-
       it("shows correct status messages during AI reply lifecycle", async () => {
         const statusBar = wrapper.find(".status-bar")
         const statusText = () => statusBar.find("small").text()
@@ -247,17 +253,17 @@ describe("ConversationInner", () => {
     const testCompletion = "**bold completion**"
 
     beforeEach(async () => {
-      await submitMessage(wrapper, "Hello")
       helper.managedApi.restAiController.submitToolCallResult = vi.fn()
       helper.managedApi.restAiController.cancelRun = vi.fn()
       helper.managedApi.restTextContentController.updateNoteDetails = vi.fn()
 
-      // Simulate the run response
-      helper.managedApi.eventSource.eventSourceRequest.onMessage(
-        "thread.run.requires_action",
-        JSON.stringify(createRunResponse(testCompletion))
+      await submitMessageAndSimulateRunResponse(
+        wrapper,
+        "Hello",
+        createRunResponse("complete_note_details", {
+          completion: testCompletion,
+        })
       )
-      await flushPromises()
     })
 
     it("renders completion suggestion as markdown", async () => {
@@ -275,12 +281,13 @@ describe("ConversationInner", () => {
 
       wrapper = mountComponent(conversationWithDetails, user)
 
-      await submitMessage(wrapper, "Hello")
-      helper.managedApi.eventSource.eventSourceRequest.onMessage(
-        "thread.run.requires_action",
-        JSON.stringify(createRunResponse(testCompletion))
+      await submitMessageAndSimulateRunResponse(
+        wrapper,
+        "Hello",
+        createRunResponse("complete_note_details", {
+          completion: testCompletion,
+        })
       )
-      await flushPromises()
 
       const completionText = wrapper.find(".ai-chat .completion-text")
       expect(completionText.text()).toBe("...bold completion")
@@ -326,36 +333,18 @@ describe("ConversationInner", () => {
     const testTitle = "Generated Title"
 
     beforeEach(async () => {
-      await submitMessage(wrapper, "Hello")
       helper.managedApi.restAiController.submitToolCallResult = vi.fn()
       helper.managedApi.restAiController.cancelRun = vi.fn()
       helper.managedApi.restTextContentController.updateNoteTopicConstructor =
         vi.fn()
 
-      // Simulate the run response for topic title generation
-      helper.managedApi.eventSource.eventSourceRequest.onMessage(
-        "thread.run.requires_action",
-        JSON.stringify({
-          id: "run-123",
-          thread_id: "thread-123",
-          required_action: {
-            submit_tool_outputs: {
-              tool_calls: [
-                {
-                  id: "call-456",
-                  function: {
-                    name: "generate_topic_title",
-                    arguments: JSON.stringify({
-                      topic: testTitle,
-                    }),
-                  },
-                },
-              ],
-            },
-          },
+      await submitMessageAndSimulateRunResponse(
+        wrapper,
+        "Hello",
+        createRunResponse("generate_topic_title", {
+          topic: testTitle,
         })
       )
-      await flushPromises()
     })
 
     it("renders title suggestion", async () => {

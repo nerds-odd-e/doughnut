@@ -29,7 +29,7 @@ public class GlobalSettingsService {
 
   public GlobalSettingsKeyValue noteCompletionAssistantId() {
     return new GlobalSettingsKeyValue(
-        "note_completion_assistant", "asst_mGLNAgjtMR60NUheP2QtXJ2D", modelFactoryService);
+        "note_completion_assistant", "asst_CjQTQn6wULnxjnFvQCRlcOXl", modelFactoryService);
   }
 
   public static class GlobalSettingsKeyValue implements SettingAccessor {
