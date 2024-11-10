@@ -1,5 +1,4 @@
 <template>
-  <div role="dialog">
   <div class="dialog-bar">
     <div class="d-flex align-items-center gap-2">
       <select
@@ -76,7 +75,7 @@
     </div>
   </div>
 
-  <div class="messages-container">
+  <div role="dialog" class="messages-container">
     <slot name="messages" />
   </div>
 
@@ -129,7 +128,6 @@
       </button>
 
     </form>
-  </div>
   </div>
 </template>
 

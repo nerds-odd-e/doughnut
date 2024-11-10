@@ -37,6 +37,25 @@ const simulateAiResponse = (content = "## I'm ChatGPT") => {
   )
 }
 
+const createRunResponse = (completion: string) => ({
+  id: "run-123",
+  thread_id: "thread-123",
+  required_action: {
+    submit_tool_outputs: {
+      tool_calls: [
+        {
+          id: "call-456",
+          function: {
+            arguments: JSON.stringify({
+              completion,
+            }),
+          },
+        },
+      ],
+    },
+  },
+})
+
 describe("ConversationInner", () => {
   let wrapper
   const note = makeMe.aNote.please()
@@ -209,42 +228,59 @@ describe("ConversationInner", () => {
   })
 
   describe("Tool Call Handling", () => {
+    const testCompletion = "test completion"
+
     beforeEach(async () => {
       await submitForm("Hello")
       helper.managedApi.restAiController.submitToolCallResult = vi.fn()
-    })
+      helper.managedApi.restTextContentController.updateNoteDetails = vi.fn()
 
-    it("handles tool calls and submits results", async () => {
-      const runResponse = {
-        id: "run-123",
-        thread_id: "thread-123",
-        required_action: {
-          submit_tool_outputs: {
-            tool_calls: [
-              {
-                id: "call-456",
-                function: {
-                  arguments: JSON.stringify({
-                    completion: "test completion",
-                  }),
-                },
-              },
-            ],
-          },
-        },
-      }
-
+      // Simulate the run response
       helper.managedApi.eventSource.eventSourceRequest.onMessage(
         "thread.run.requires_action",
-        JSON.stringify(runResponse)
+        JSON.stringify(createRunResponse(testCompletion))
       )
       await flushPromises()
+
+      // Verify suggestion is shown
+      const completionCard = wrapper.find(".ai-chat .completion-text")
+      expect(completionCard.text()).toBe(testCompletion)
+    })
+
+    it("shows completion suggestion and handles acceptance", async () => {
+      // Accept the suggestion
+      await wrapper.find('button[class*="btn-primary"]').trigger("click")
+      await flushPromises()
+
+      expect(
+        helper.managedApi.restTextContentController.updateNoteDetails
+      ).toHaveBeenCalledWith(note.id, { details: testCompletion })
 
       expect(
         helper.managedApi.restAiController.submitToolCallResult
       ).toHaveBeenCalledWith("thread-123", "run-123", "call-456", {
         status: "accepted",
       })
+
+      expect(wrapper.find(".completion-text").exists()).toBe(false)
+    })
+
+    it("handles rejection of completion suggestion", async () => {
+      // Reject the suggestion
+      await wrapper.find('button[class*="btn-secondary"]').trigger("click")
+      await flushPromises()
+
+      expect(
+        helper.managedApi.restTextContentController.updateNoteDetails
+      ).not.toHaveBeenCalled()
+
+      expect(
+        helper.managedApi.restAiController.submitToolCallResult
+      ).toHaveBeenCalledWith("thread-123", "run-123", "call-456", {
+        status: "rejected",
+      })
+
+      expect(wrapper.find(".completion-text").exists()).toBe(false)
     })
   })
 })

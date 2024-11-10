@@ -52,6 +52,20 @@
         />
       </div>
 
+      <div v-if="completionSuggestion" class="d-flex mb-3">
+        <div class="message-avatar me-2" title="AI Assistant">
+          <SvgRobot />
+        </div>
+        <div class="card py-2 px-3 bg-light ai-chat">
+          <div>Suggested completion:</div>
+          <div class="completion-text mb-2">{{ completionSuggestion }}</div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-primary btn-sm" @click="handleAcceptCompletion">Accept</button>
+            <button class="btn btn-secondary btn-sm" @click="handleRejectCompletion">Reject</button>
+          </div>
+        </div>
+      </div>
+
       <div v-if="lastErrorMessage" class="last-error-message text-danger mb-3">
         {{ lastErrorMessage }}
       </div>
@@ -63,7 +77,7 @@
         <small class="text-secondary">{{ aiStatus }}</small>
       </div>
 
-      <ScrollTo :scrollTrigger="currentConversationMessages.length + (currentAiReply ? currentAiReply.length : 0) + (lastErrorMessage ? 1 : 0) + (aiStatus ? 1 : 0)" />
+      <ScrollTo :scrollTrigger="currentConversationMessages.length + (currentAiReply ? currentAiReply.length : 0) + (completionSuggestion ? 1 : 0) + (lastErrorMessage ? 1 : 0) + (aiStatus ? 1 : 0)" />
     </template>
   </ConversationTemplate>
 </template>
@@ -118,6 +132,11 @@ const currentAiReply = ref<string | undefined>()
 const lastErrorMessage = ref<string | undefined>()
 
 const aiStatus = ref<string | undefined>()
+
+const completionSuggestion = ref<string | undefined>()
+let pendingCompletionData:
+  | { threadId: string; runId: string; toolCallId: string }
+  | undefined
 
 const formatMessage = (message: string) => {
   return message.replace(/^"|"$/g, "").trim()
@@ -174,18 +193,8 @@ const getAiReply = async () => {
       runId: string,
       toolCallId: string
     ) {
-      const note = conversation.subject?.note
-      if (!note) {
-        console.error("No note found in conversation")
-        return
-      }
-      await storageAccessor.storedApi().appendDetails(note.id, completion)
-      await managedApi.restAiController.submitToolCallResult(
-        threadId,
-        runId,
-        toolCallId,
-        { status: "accepted" }
-      )
+      completionSuggestion.value = completion
+      pendingCompletionData = { threadId, runId, toolCallId }
     },
   }
 
@@ -210,6 +219,46 @@ const getAiReply = async () => {
       }
     })
     .restConversationMessageController.getAiReply(conversation.id)
+}
+
+const handleAcceptCompletion = async () => {
+  if (!completionSuggestion.value || !pendingCompletionData) return
+
+  const { threadId, runId, toolCallId } = pendingCompletionData
+  const note = conversation.subject?.note
+  if (!note) {
+    console.error("No note found in conversation")
+    return
+  }
+
+  await storageAccessor
+    .storedApi()
+    .appendDetails(note.id, completionSuggestion.value)
+  await managedApi.restAiController.submitToolCallResult(
+    threadId,
+    runId,
+    toolCallId,
+    { status: "accepted" }
+  )
+
+  completionSuggestion.value = undefined
+  pendingCompletionData = undefined
+  await fetchConversationMessages()
+}
+
+const handleRejectCompletion = async () => {
+  if (!pendingCompletionData) return
+
+  const { threadId, runId, toolCallId } = pendingCompletionData
+  await managedApi.restAiController.submitToolCallResult(
+    threadId,
+    runId,
+    toolCallId,
+    { status: "rejected" }
+  )
+
+  completionSuggestion.value = undefined
+  pendingCompletionData = undefined
 }
 
 onMounted(async () => {
@@ -251,5 +300,10 @@ const handleSendMessageAndInviteAI = async (message: string) => {
   white-space: pre-wrap;
   word-wrap: break-word;
   font-family: inherit;
+}
+
+.completion-text {
+  font-style: italic;
+  color: #666;
 }
 </style>
