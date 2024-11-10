@@ -92,7 +92,7 @@ public record OtherAiServices(OpenAiApiHandler openAiApiHandler) {
                 .formatted(prettyString));
   }
 
-  private String getTranscriptionFromAudio(String filename, byte[] bytes) throws IOException {
+  public String getTranscriptionFromAudio(String filename, byte[] bytes) throws IOException {
     RequestBody requestFile = RequestBody.create(bytes, MediaType.parse("multipart/form-data"));
 
     MultipartBody.Part body = MultipartBody.Part.createFormData("file", filename, requestFile);

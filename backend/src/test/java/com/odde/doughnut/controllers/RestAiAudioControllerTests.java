@@ -99,4 +99,32 @@ class RestAiAudioControllerTests {
           capturedArgument.getMessages().get(0).getTextContent(), containsString("Long long ago"));
     }
   }
+
+  @Nested
+  class ConvertAudioToTextForNote {
+    AudioUploadDTO audioUploadDTO = new AudioUploadDTO();
+
+    @BeforeEach
+    void setup() {
+      when(openAiApi.createTranscriptionSrt(any(RequestBody.class)))
+          .thenReturn(Single.just(ResponseBody.create("test transcription", null)));
+    }
+
+    @Test
+    void convertAudioToTextForExistingNote() throws IOException {
+      // Arrange
+      var note = makeMe.aNote().please();
+      MockMultipartFile mockFile =
+          new MockMultipartFile("file", "test.mp3", "text/plain", "test".getBytes());
+      var dto = new AudioUploadDTO();
+      dto.setUploadAudioFile(mockFile);
+
+      // Act
+      TextFromAudio result = controller.audioToTextForNote(note, dto);
+
+      // Assert
+      verify(openAiApi).createTranscriptionSrt(any(RequestBody.class));
+      assertNotNull(result);
+    }
+  }
 }

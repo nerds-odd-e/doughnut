@@ -1781,6 +1781,35 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/TextFromAudio"
+  /api/audio/audio-to-text/{noteId}:
+    post:
+      tags:
+      - rest-ai-audio-controller
+      operationId: audioToTextForNote
+      parameters:
+      - name: noteId
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/AudioUploadDTO"
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/TextFromAudio"
   /api/assessment/{assessmentQuestionInstance}/answer:
     post:
       tags:
