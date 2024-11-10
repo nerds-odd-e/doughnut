@@ -4086,6 +4086,8 @@ components:
           $ref: "#/components/schemas/Run"
         noteDetailsCompletion:
           $ref: "#/components/schemas/NoteDetailsCompletion"
+        topicTitleGeneration:
+          $ref: "#/components/schemas/TopicTitleGeneration"
     ExpiresAfter:
       type: object
       properties:
@@ -4515,6 +4517,13 @@ components:
           $ref: "#/components/schemas/CodeInterpreterResources"
         file_search:
           $ref: "#/components/schemas/FileSearchResources"
+    TopicTitleGeneration:
+      required:
+      - topic title for the note
+      type: object
+      properties:
+        topic title for the note:
+          type: string
     TruncationStrategy:
       type: object
       properties:
