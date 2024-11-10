@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
@@ -20,6 +21,7 @@ import com.odde.doughnut.testability.OpenAIAssistantMocker;
 import com.odde.doughnut.testability.OpenAIAssistantThreadMocker;
 import com.theokanning.openai.OpenAiError;
 import com.theokanning.openai.OpenAiHttpException;
+import com.theokanning.openai.assistants.run.ToolCall;
 import com.theokanning.openai.client.OpenAiApi;
 import io.reactivex.Single;
 import java.net.SocketTimeoutException;
@@ -122,7 +124,10 @@ class AiAdvisorServiceAutoCompleteTest {
     }
 
     private String getAiCompletionAndResult(String incompleteContent) {
-      return getAiCompletionResponse(incompleteContent).getRequiredAction().getContentToAppend();
+      ToolCall first = getAiCompletionResponse(incompleteContent).getToolCalls().getFirst();
+      JsonNode arguments = first.getFunction().getArguments();
+
+      return arguments.get("completion").asText();
     }
 
     private AiAssistantResponse getAiCompletionResponse(String incompleteContent) {

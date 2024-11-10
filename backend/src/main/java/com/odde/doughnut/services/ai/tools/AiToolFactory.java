@@ -1,7 +1,6 @@
 package com.odde.doughnut.services.ai.tools;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.odde.doughnut.controllers.dto.AiCompletionRequiredAction;
 import com.odde.doughnut.services.ai.*;
 import com.theokanning.openai.function.FunctionDefinition;
 import java.util.List;
@@ -108,23 +107,13 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
 
   public static List<AiTool> getCompletionAiTools() {
     return List.of(
-        AiTool.build(
+        new AiTool(
             COMPLETE_NOTE_DETAILS,
             "Text completion for the details of the note of focus",
-            NoteDetailsCompletion.class,
-            (noteDetailsCompletion) -> {
-              AiCompletionRequiredAction result = new AiCompletionRequiredAction();
-              result.setContentToAppend(noteDetailsCompletion.completion);
-              return result;
-            }),
-        AiTool.build(
+            NoteDetailsCompletion.class),
+        new AiTool(
             GENERATE_TOPIC_TITLE,
             "Generate a concise and descriptive title based on the note content",
-            TopicTitleGeneration.class,
-            (topicTitleGeneration) -> {
-              AiCompletionRequiredAction result = new AiCompletionRequiredAction();
-              result.setTopicTitle(topicTitleGeneration.title);
-              return result;
-            }));
+            TopicTitleGeneration.class));
   }
 }

@@ -1,7 +1,6 @@
 package com.odde.doughnut.services.ai;
 
 import com.odde.doughnut.controllers.dto.AiAssistantResponse;
-import com.odde.doughnut.controllers.dto.AiCompletionRequiredAction;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiTool;
@@ -122,7 +121,7 @@ public record AssistantService(
 
     Run run = openAiApiHandler.retrieveUntilCompletedOrRequiresAction(threadId, currentRun);
     if (run.getStatus().equals("requires_action")) {
-      completionResponse.setRequiredAction(getAiCompletionRequiredAction(run.getRequiredAction()));
+      completionResponse.setToolCalls(getAiCompletionRequiredAction(run.getRequiredAction()));
     } else {
       completionResponse.setMessages(openAiApiHandler.getThreadMessages(threadId, id));
     }
@@ -130,23 +129,11 @@ public record AssistantService(
     return completionResponse;
   }
 
-  private AiCompletionRequiredAction getAiCompletionRequiredAction(RequiredAction requiredAction) {
+  private List<ToolCall> getAiCompletionRequiredAction(RequiredAction requiredAction) {
     int size = requiredAction.getSubmitToolOutputs().getToolCalls().size();
     if (size != 1) {
       throw new RuntimeException("Unexpected number of tool calls: " + size);
     }
-    ToolCall toolCall = requiredAction.getSubmitToolOutputs().getToolCalls().getFirst();
-
-    AiCompletionRequiredAction actionRequired =
-        tools.stream()
-            .flatMap(t -> t.tryConsume(toolCall))
-            .findFirst()
-            .orElseThrow(
-                () ->
-                    new RuntimeException(
-                        "Unknown function name: " + toolCall.getFunction().getName()));
-
-    actionRequired.setToolCallId(toolCall.getId());
-    return actionRequired;
+    return requiredAction.getSubmitToolOutputs().getToolCalls();
   }
 }
