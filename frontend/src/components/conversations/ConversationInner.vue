@@ -114,6 +114,7 @@ import type {
   User,
   ConversationMessage,
   Conversation,
+  Note,
 } from "@/generated/backend"
 import SvgRobot from "@/components/svgs/SvgRobot.vue"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
@@ -262,13 +263,8 @@ const getAiReply = async () => {
     .restConversationMessageController.getAiReply(conversation.id)
 }
 
-const handleAcceptCompletion = async () => {
-  if (
-    !completionSuggestion.value ||
-    !pendingToolCall ||
-    isProcessingToolCall.value
-  )
-    return
+const handleToolCallAccept = async (action: (note: Note) => Promise<void>) => {
+  if (!pendingToolCall || isProcessingToolCall.value) return
 
   try {
     isProcessingToolCall.value = true
@@ -279,9 +275,7 @@ const handleAcceptCompletion = async () => {
       return
     }
 
-    await storageAccessor
-      .storedApi()
-      .appendDetails(note.id, completionSuggestion.value)
+    await action(note)
     await managedApi.restAiController.submitToolCallResult(
       threadId,
       runId,
@@ -290,11 +284,30 @@ const handleAcceptCompletion = async () => {
     )
 
     completionSuggestion.value = undefined
+    topicTitleSuggestion.value = undefined
     pendingToolCall = undefined
   } finally {
     isProcessingToolCall.value = false
   }
   await fetchConversationMessages()
+}
+
+const handleAcceptCompletion = () => {
+  if (!completionSuggestion.value) return
+  return handleToolCallAccept(async (note) => {
+    await storageAccessor
+      .storedApi()
+      .appendDetails(note.id, completionSuggestion.value!)
+  })
+}
+
+const handleAcceptTitle = () => {
+  if (!topicTitleSuggestion.value) return
+  return handleToolCallAccept(async (note) => {
+    await storageAccessor
+      .storedApi()
+      .updateTextField(note.id, "edit topic", topicTitleSuggestion.value!)
+  })
 }
 
 const handleReject = async () => {
@@ -320,41 +333,6 @@ const formattedCompletionSuggestion = computed(() => {
     ? `...${completionSuggestion.value}`
     : completionSuggestion.value
 })
-
-const handleAcceptTitle = async () => {
-  if (
-    !topicTitleSuggestion.value ||
-    !pendingToolCall ||
-    isProcessingToolCall.value
-  )
-    return
-
-  try {
-    isProcessingToolCall.value = true
-    const { threadId, runId, toolCallId } = pendingToolCall
-    const note = conversation.subject?.note
-    if (!note) {
-      console.error("No note found in conversation")
-      return
-    }
-
-    await storageAccessor
-      .storedApi()
-      .updateTextField(note.id, "edit topic", topicTitleSuggestion.value)
-    await managedApi.restAiController.submitToolCallResult(
-      threadId,
-      runId,
-      toolCallId,
-      { status: "accepted" }
-    )
-
-    topicTitleSuggestion.value = undefined
-    pendingToolCall = undefined
-  } finally {
-    isProcessingToolCall.value = false
-  }
-  await fetchConversationMessages()
-}
 
 onMounted(async () => {
   await fetchConversationMessages()
