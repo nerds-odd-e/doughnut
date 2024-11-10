@@ -2,7 +2,12 @@
 /// <reference types="../support" />
 // @ts-check
 
-import { DataTable, Given, Then } from '@badeball/cypress-cucumber-preprocessor'
+import {
+  DataTable,
+  Given,
+  Then,
+  When,
+} from '@badeball/cypress-cucumber-preprocessor'
 import '../support/string_util'
 import start, { mock_services } from '../start'
 
@@ -119,3 +124,18 @@ Given(
       .stubAudioTranscriptToText(data.hashes()[0]!.response!)
   }
 )
+
+Then(
+  'I should see the suggested completion {string} in the chat dialog',
+  (completion: string) => {
+    start.assumeConversationAboutNotePage().shouldShowCompletion(completion)
+  }
+)
+
+When('I accept the suggested completion', () => {
+  start.assumeConversationAboutNotePage().acceptCompletion()
+})
+
+When('I reject the suggested completion', () => {
+  start.assumeConversationAboutNotePage().rejectCompletion()
+})

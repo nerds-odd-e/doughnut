@@ -1,4 +1,5 @@
 <template>
+  <div role="dialog">
   <div class="dialog-bar">
     <div class="d-flex align-items-center gap-2">
       <select
@@ -128,6 +129,7 @@
       </button>
 
     </form>
+  </div>
   </div>
 </template>
 
