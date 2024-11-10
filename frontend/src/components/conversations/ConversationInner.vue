@@ -69,16 +69,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, type Ref } from "vue"
+import { ref, onMounted, watch } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type {
   User,
   ConversationMessage,
   Conversation,
-  Message,
-  MessageDelta,
-  Run,
-  NoteDetailsCompletion,
 } from "@/generated/backend"
 import SvgRobot from "@/components/svgs/SvgRobot.vue"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
@@ -86,7 +82,7 @@ import type { StorageAccessor } from "@/store/createNoteStorage"
 import SvgMissingAvatar from "@/components/svgs/SvgMissingAvatar.vue"
 import ConversationTemplate from "./ConversationTemplate.vue"
 import markdownizer from "../form/markdownizer"
-import type ManagedApi from "@/managedApi/ManagedApi"
+import { createAiReplyStates } from "@/models/aiReplyState"
 
 const { conversation, user, initialAiReply, storageAccessor, isMaximized } =
   defineProps<{
@@ -155,89 +151,17 @@ const handleSendMessage = async (
   }
 }
 
-// First create a type for the state handlers
-type AiReplyState = {
-  handleEvent: (data: string) => Promise<void>
-  status: string
-}
-
-// Create state handlers
-const createAiReplyStates = (context: {
-  currentAiReply: Ref<string | undefined>
-  aiStatus: Ref<string | undefined>
-  storageAccessor: StorageAccessor
-  managedApi: ManagedApi
-  conversation: Conversation
-  fetchConversationMessages: () => Promise<void>
-}) => {
-  const states: Record<string, AiReplyState> = {
-    "thread.message.created": {
-      status: "Generating response...",
-      handleEvent: async (data) => {
-        const response = JSON.parse(data) as Message
-        response.content = [{ text: { value: "" } }]
-        context.currentAiReply.value = response.content?.[0]?.text?.value
-      },
-    },
-    "thread.message.delta": {
-      status: "Writing response...",
-      handleEvent: async (data) => {
-        const response = JSON.parse(data) as MessageDelta
-        const delta = response.delta?.content?.[0]?.text?.value
-        context.currentAiReply.value = context.currentAiReply.value! + delta
-      },
-    },
-    "thread.run.requires_action": {
-      status: "Processing actions...",
-      handleEvent: async (data) => {
-        const note = context.conversation.subject?.note
-        if (!note) {
-          console.error("No note found in conversation")
-          return
-        }
-        const response = JSON.parse(data) as Run
-        const contentToAppend = JSON.parse(
-          response.required_action!.submit_tool_outputs!.tool_calls![0]!
-            .function!.arguments as unknown as string
-        ) as NoteDetailsCompletion
-
-        await context.storageAccessor
-          .storedApi()
-          .appendDetails(note.id, contentToAppend!.completion)
-
-        await context.managedApi.restAiController.submitToolCallResult(
-          response.thread_id!,
-          response.id!,
-          response.required_action!.submit_tool_outputs!.tool_calls![0]!.id!,
-          { status: "accepted" }
-        )
-      },
-    },
-    done: {
-      status: "",
-      handleEvent: async () => {
-        context.aiStatus.value = undefined
-        await context.fetchConversationMessages()
-        context.currentAiReply.value = undefined
-      },
-    },
-  }
-
-  return states
-}
-
 // Update getAiReply to use the state pattern
 const getAiReply = async () => {
-  aiStatus.value = "Starting AI reply..."
   const states = createAiReplyStates({
     currentAiReply,
-    aiStatus,
     storageAccessor,
     managedApi,
-    conversation,
+    note: conversation.subject?.note,
     fetchConversationMessages,
   })
 
+  aiStatus.value = "Starting AI reply..."
   await managedApi.eventSource
     .onMessage(async (event, data) => {
       const state = states[event]
