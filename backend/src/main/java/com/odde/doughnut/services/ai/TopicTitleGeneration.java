@@ -1,12 +1,12 @@
 package com.odde.doughnut.services.ai;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
 public class TopicTitleGeneration {
-  @JsonProperty("topic title for the note")
   @NotNull
-  public String title;
+  @JsonPropertyDescription("The topic title for the note.")
+  public String topic;
 }

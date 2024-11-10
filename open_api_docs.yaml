@@ -4519,10 +4519,10 @@ components:
           $ref: "#/components/schemas/FileSearchResources"
     TopicTitleGeneration:
       required:
-      - topic title for the note
+      - topic
       type: object
       properties:
-        topic title for the note:
+        topic:
           type: string
     TruncationStrategy:
       type: object

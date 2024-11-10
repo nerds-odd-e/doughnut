@@ -3,6 +3,6 @@
 /* tslint:disable */
 /* eslint-disable */
 export type TopicTitleGeneration = {
-    'topic title for the note': string;
+    topic: string;
 };
 

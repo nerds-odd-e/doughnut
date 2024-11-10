@@ -89,7 +89,33 @@
         <small class="text-secondary">{{ aiStatus }}</small>
       </div>
 
-      <ScrollTo :scrollTrigger="currentConversationMessages.length + (currentAiReply ? currentAiReply.length : 0) + (completionSuggestion ? 1 : 0) + (lastErrorMessage ? 1 : 0) + (aiStatus ? 1 : 0)" />
+      <div v-if="topicTitleSuggestion" class="d-flex mb-3">
+        <div class="message-avatar me-2" title="AI Assistant">
+          <SvgRobot />
+        </div>
+        <div class="card py-2 px-3 bg-light ai-chat">
+          <div>Suggested title:</div>
+          <div class="title-suggestion mb-2">{{ topicTitleSuggestion }}</div>
+          <div class="d-flex gap-2">
+            <button
+              class="btn btn-primary btn-sm"
+              @click="handleAcceptTitle"
+              :disabled="isProcessingToolCall"
+            >
+              Accept
+            </button>
+            <button
+              class="btn btn-secondary btn-sm"
+              @click="handleRejectTitle"
+              :disabled="isProcessingToolCall"
+            >
+              Reject
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <ScrollTo :scrollTrigger="currentConversationMessages.length + (currentAiReply ? currentAiReply.length : 0) + (completionSuggestion ? 1 : 0) + (lastErrorMessage ? 1 : 0) + (aiStatus ? 1 : 0) + (topicTitleSuggestion ? 1 : 0)" />
     </template>
   </ConversationTemplate>
 </template>
@@ -150,6 +176,11 @@ let pendingCompletionData:
   | { threadId: string; runId: string; toolCallId: string }
   | undefined
 
+const topicTitleSuggestion = ref<string | undefined>()
+let pendingTitleData:
+  | { threadId: string; runId: string; toolCallId: string }
+  | undefined
+
 const formatMessage = (message: string) => {
   return message.replace(/^"|"$/g, "").trim()
 }
@@ -207,6 +238,15 @@ const getAiReply = async () => {
     ) {
       completionSuggestion.value = completion
       pendingCompletionData = { threadId, runId, toolCallId }
+    },
+    async setTopicTitle(
+      title: string,
+      threadId: string,
+      runId: string,
+      toolCallId: string
+    ) {
+      topicTitleSuggestion.value = title
+      pendingTitleData = { threadId, runId, toolCallId }
     },
   }
 
@@ -293,6 +333,57 @@ const formattedCompletionSuggestion = computed(() => {
     : completionSuggestion.value
 })
 
+const handleAcceptTitle = async () => {
+  console.log("handleAcceptTitle", topicTitleSuggestion.value)
+  if (
+    !topicTitleSuggestion.value ||
+    !pendingTitleData ||
+    isProcessingToolCall.value
+  )
+    return
+
+  try {
+    isProcessingToolCall.value = true
+    const { threadId, runId, toolCallId } = pendingTitleData
+    const note = conversation.subject?.note
+    if (!note) {
+      console.error("No note found in conversation")
+      return
+    }
+
+    await storageAccessor
+      .storedApi()
+      .updateTextField(note.id, "edit topic", topicTitleSuggestion.value)
+    await managedApi.restAiController.submitToolCallResult(
+      threadId,
+      runId,
+      toolCallId,
+      { status: "accepted" }
+    )
+
+    topicTitleSuggestion.value = undefined
+    pendingTitleData = undefined
+  } finally {
+    isProcessingToolCall.value = false
+  }
+  await fetchConversationMessages()
+}
+
+const handleRejectTitle = async () => {
+  if (!pendingTitleData || isProcessingToolCall.value) return
+
+  try {
+    isProcessingToolCall.value = true
+    const { threadId, runId } = pendingTitleData
+    await managedApi.restAiController.cancelRun(threadId, runId)
+
+    topicTitleSuggestion.value = undefined
+    pendingTitleData = undefined
+  } finally {
+    isProcessingToolCall.value = false
+  }
+}
+
 onMounted(async () => {
   await fetchConversationMessages()
   if (initialAiReply) {
@@ -337,5 +428,11 @@ const handleSendMessageAndInviteAI = async (message: string) => {
 .completion-text {
   font-style: italic;
   color: #666;
+}
+
+.title-suggestion {
+  font-style: italic;
+  color: #666;
+  font-weight: bold;
 }
 </style>

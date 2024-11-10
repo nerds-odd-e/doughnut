@@ -3,6 +3,7 @@ import type {
   MessageDelta,
   Run,
   NoteDetailsCompletion,
+  TopicTitleGeneration,
   RunStep,
   DeltaOfRunStep,
 } from "@/generated/backend"
@@ -18,6 +19,12 @@ export interface AiActionContext {
   reset: () => Promise<void>
   appendNoteDetails: (
     completion: string,
+    threadId: string,
+    runId: string,
+    toolCallId: string
+  ) => Promise<void>
+  setTopicTitle: (
+    title: string,
     threadId: string,
     runId: string,
     toolCallId: string
@@ -47,17 +54,29 @@ export const createAiReplyStates = (
       status: "Processing actions...",
       handleEvent: async (data) => {
         const response = JSON.parse(data) as Run
-        const contentToAppend = JSON.parse(
+        const toolCall =
           response.required_action!.submit_tool_outputs!.tool_calls![0]!
-            .function!.arguments as unknown as string
-        ) as NoteDetailsCompletion
-
-        await context.appendNoteDetails(
-          contentToAppend!.completion,
-          response.thread_id!,
-          response.id!,
-          response.required_action!.submit_tool_outputs!.tool_calls![0]!.id!
+        const functionArgs = JSON.parse(
+          toolCall.function!.arguments as unknown as string
         )
+
+        if (toolCall.function!.name === "complete_note_details") {
+          const contentToAppend = functionArgs as NoteDetailsCompletion
+          await context.appendNoteDetails(
+            contentToAppend!.completion,
+            response.thread_id!,
+            response.id!,
+            toolCall.id!
+          )
+        } else if (toolCall.function!.name === "generate_topic_title") {
+          const titleGeneration = functionArgs as TopicTitleGeneration
+          await context.setTopicTitle(
+            titleGeneration.topic,
+            response.thread_id!,
+            response.id!,
+            toolCall.id!
+          )
+        }
       },
     },
     "thread.run.step.created": {

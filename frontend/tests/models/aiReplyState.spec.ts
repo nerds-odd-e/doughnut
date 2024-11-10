@@ -8,6 +8,7 @@ describe("aiReplyState", () => {
     append: vi.fn(),
     reset: vi.fn(),
     appendNoteDetails: vi.fn(),
+    setTopicTitle: vi.fn(),
   }
 
   beforeEach(() => {

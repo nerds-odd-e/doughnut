@@ -46,6 +46,7 @@ const createRunResponse = (completion: string) => ({
         {
           id: "call-456",
           function: {
+            name: "complete_note_details",
             arguments: JSON.stringify({
               completion,
             }),
@@ -318,6 +319,85 @@ describe("ConversationInner", () => {
       )
 
       expect(wrapper.find(".completion-text").exists()).toBe(false)
+    })
+  })
+
+  describe("Topic Title Generation", () => {
+    const testTitle = "Generated Title"
+
+    beforeEach(async () => {
+      await submitMessage(wrapper, "Hello")
+      helper.managedApi.restAiController.submitToolCallResult = vi.fn()
+      helper.managedApi.restAiController.cancelRun = vi.fn()
+      helper.managedApi.restTextContentController.updateNoteTopicConstructor =
+        vi.fn()
+
+      // Simulate the run response for topic title generation
+      helper.managedApi.eventSource.eventSourceRequest.onMessage(
+        "thread.run.requires_action",
+        JSON.stringify({
+          id: "run-123",
+          thread_id: "thread-123",
+          required_action: {
+            submit_tool_outputs: {
+              tool_calls: [
+                {
+                  id: "call-456",
+                  function: {
+                    name: "generate_topic_title",
+                    arguments: JSON.stringify({
+                      topic: testTitle,
+                    }),
+                  },
+                },
+              ],
+            },
+          },
+        })
+      )
+      await flushPromises()
+    })
+
+    it("renders title suggestion", async () => {
+      const titleSuggestion = wrapper.find(".title-suggestion")
+      expect(titleSuggestion.exists()).toBe(true)
+      expect(titleSuggestion.text()).toBe(testTitle)
+      expect(
+        await wrapper.findAll('button[class*="btn-primary"]')
+      ).toHaveLength(1)
+    })
+
+    it("accepts the title suggestion and updates the note", async () => {
+      await wrapper.find('button[class*="btn-primary"]').trigger("click")
+      await flushPromises()
+
+      expect(
+        helper.managedApi.restTextContentController.updateNoteTopicConstructor
+      ).toHaveBeenCalledWith(note.id, { topicConstructor: testTitle })
+
+      expect(
+        helper.managedApi.restAiController.submitToolCallResult
+      ).toHaveBeenCalledWith("thread-123", "run-123", "call-456", {
+        status: "accepted",
+      })
+
+      expect(wrapper.find(".title-suggestion").exists()).toBe(false)
+    })
+
+    it("rejects the title suggestion without updating the note", async () => {
+      await wrapper.find('button[class*="btn-secondary"]').trigger("click")
+      await flushPromises()
+
+      expect(
+        helper.managedApi.restTextContentController.updateNoteTopicConstructor
+      ).not.toHaveBeenCalled()
+
+      expect(helper.managedApi.restAiController.cancelRun).toHaveBeenCalledWith(
+        "thread-123",
+        "run-123"
+      )
+
+      expect(wrapper.find(".title-suggestion").exists()).toBe(false)
     })
   })
 })
