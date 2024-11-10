@@ -10,7 +10,7 @@ export type AiReplyState = {
   status: string | undefined
 }
 
-export interface AiAction {
+export interface AiActionContext {
   append: (text: string) => void
   reset: () => Promise<void>
   appendNoteDetails: (
@@ -21,19 +21,15 @@ export interface AiAction {
   ) => Promise<void>
 }
 
-type AiReplyContext = {
-  aiAction: AiAction
-}
-
 export const createAiReplyStates = (
-  context: AiReplyContext
+  context: AiActionContext
 ): Record<string, AiReplyState> => {
   const states: Record<string, AiReplyState> = {
     "thread.message.created": {
       status: "Generating response...",
       handleEvent: async (data) => {
         const response = JSON.parse(data) as Message
-        context.aiAction.append(response.content?.[0]?.text?.value || "")
+        context.append(response.content?.[0]?.text?.value || "")
       },
     },
     "thread.message.delta": {
@@ -41,7 +37,7 @@ export const createAiReplyStates = (
       handleEvent: async (data) => {
         const response = JSON.parse(data) as MessageDelta
         const delta = response.delta?.content?.[0]?.text?.value || ""
-        context.aiAction.append(delta)
+        context.append(delta)
       },
     },
     "thread.run.requires_action": {
@@ -53,7 +49,7 @@ export const createAiReplyStates = (
             .function!.arguments as unknown as string
         ) as NoteDetailsCompletion
 
-        await context.aiAction.appendNoteDetails(
+        await context.appendNoteDetails(
           contentToAppend!.completion,
           response.thread_id!,
           response.id!,
@@ -64,7 +60,7 @@ export const createAiReplyStates = (
     done: {
       status: undefined,
       handleEvent: async () => {
-        await context.aiAction.reset()
+        await context.reset()
       },
     },
   }

@@ -83,7 +83,7 @@ import SvgMissingAvatar from "@/components/svgs/SvgMissingAvatar.vue"
 import ConversationTemplate from "./ConversationTemplate.vue"
 import markdownizer from "../form/markdownizer"
 import { createAiReplyStates } from "@/models/aiReplyState"
-import type { AiAction } from "@/models/aiReplyState"
+import type { AiActionContext } from "@/models/aiReplyState"
 
 const { conversation, user, initialAiReply, storageAccessor, isMaximized } =
   defineProps<{
@@ -152,44 +152,41 @@ const handleSendMessage = async (
   }
 }
 
-const aiAction: AiAction = {
-  append(text: string) {
-    if (!currentAiReply.value) {
-      currentAiReply.value = text
-    } else {
-      currentAiReply.value += text
-    }
-  },
-  async reset() {
-    await fetchConversationMessages()
-    currentAiReply.value = undefined
-  },
-  async appendNoteDetails(
-    completion: string,
-    threadId: string,
-    runId: string,
-    toolCallId: string
-  ) {
-    const note = conversation.subject?.note
-    if (!note) {
-      console.error("No note found in conversation")
-      return
-    }
-    await storageAccessor.storedApi().appendDetails(note.id, completion)
-    await managedApi.restAiController.submitToolCallResult(
-      threadId,
-      runId,
-      toolCallId,
-      { status: "accepted" }
-    )
-  },
-}
-
-// Update getAiReply to use the state pattern
 const getAiReply = async () => {
-  const states = createAiReplyStates({
-    aiAction,
-  })
+  const aiActionContext: AiActionContext = {
+    append(text: string) {
+      if (!currentAiReply.value) {
+        currentAiReply.value = text
+      } else {
+        currentAiReply.value += text
+      }
+    },
+    async reset() {
+      await fetchConversationMessages()
+      currentAiReply.value = undefined
+    },
+    async appendNoteDetails(
+      completion: string,
+      threadId: string,
+      runId: string,
+      toolCallId: string
+    ) {
+      const note = conversation.subject?.note
+      if (!note) {
+        console.error("No note found in conversation")
+        return
+      }
+      await storageAccessor.storedApi().appendDetails(note.id, completion)
+      await managedApi.restAiController.submitToolCallResult(
+        threadId,
+        runId,
+        toolCallId,
+        { status: "accepted" }
+      )
+    },
+  }
+
+  const states = createAiReplyStates(aiActionContext)
 
   aiStatus.value = "Starting AI reply..."
   await managedApi.eventSource
