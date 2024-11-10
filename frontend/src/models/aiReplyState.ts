@@ -34,8 +34,6 @@ export const createAiReplyStates = (
       status: "Generating response...",
       handleEvent: async (data) => {
         const response = JSON.parse(data) as Message
-        response.content = [{ text: { value: "" } }]
-        context.aiAction.reset()
         context.aiAction.append(response.content?.[0]?.text?.value || "")
       },
     },
