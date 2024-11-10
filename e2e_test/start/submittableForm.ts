@@ -4,6 +4,8 @@ const submittableForm = {
       const value = noteAttributes[propName]
       if (value) {
         cy.formField(propName).assignFieldValue(value)
+      } else {
+        cy.formField(propName).clear()
       }
     }
     cy.get('input[value="Submit"]').click()
