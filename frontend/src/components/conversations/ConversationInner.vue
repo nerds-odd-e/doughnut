@@ -59,7 +59,7 @@
         <AcceptRejectButtons
           :disabled="isProcessingToolCall"
           @accept="handleAcceptCompletion"
-          @reject="handleRejectCompletion"
+          @reject="handleReject"
         >
           <template #title>
             Suggested completion:
@@ -91,7 +91,7 @@
         <AcceptRejectButtons
           :disabled="isProcessingToolCall"
           @accept="handleAcceptTitle"
-          @reject="handleRejectTitle"
+          @reject="handleReject"
         >
           <template #title>
             Suggested title:
@@ -162,14 +162,11 @@ const lastErrorMessage = ref<string | undefined>()
 const aiStatus = ref<string | undefined>()
 
 const completionSuggestion = ref<string | undefined>()
-let pendingCompletionData:
+let pendingToolCall:
   | { threadId: string; runId: string; toolCallId: string }
   | undefined
 
 const topicTitleSuggestion = ref<string | undefined>()
-let pendingTitleData:
-  | { threadId: string; runId: string; toolCallId: string }
-  | undefined
 
 const isProcessingToolCall = ref(false)
 
@@ -229,7 +226,7 @@ const getAiReply = async () => {
       toolCallId: string
     ) {
       completionSuggestion.value = completion
-      pendingCompletionData = { threadId, runId, toolCallId }
+      pendingToolCall = { threadId, runId, toolCallId }
     },
     async setTopicTitle(
       title: string,
@@ -238,7 +235,7 @@ const getAiReply = async () => {
       toolCallId: string
     ) {
       topicTitleSuggestion.value = title
-      pendingTitleData = { threadId, runId, toolCallId }
+      pendingToolCall = { threadId, runId, toolCallId }
     },
   }
 
@@ -268,14 +265,14 @@ const getAiReply = async () => {
 const handleAcceptCompletion = async () => {
   if (
     !completionSuggestion.value ||
-    !pendingCompletionData ||
+    !pendingToolCall ||
     isProcessingToolCall.value
   )
     return
 
   try {
     isProcessingToolCall.value = true
-    const { threadId, runId, toolCallId } = pendingCompletionData
+    const { threadId, runId, toolCallId } = pendingToolCall
     const note = conversation.subject?.note
     if (!note) {
       console.error("No note found in conversation")
@@ -293,23 +290,24 @@ const handleAcceptCompletion = async () => {
     )
 
     completionSuggestion.value = undefined
-    pendingCompletionData = undefined
+    pendingToolCall = undefined
   } finally {
     isProcessingToolCall.value = false
   }
   await fetchConversationMessages()
 }
 
-const handleRejectCompletion = async () => {
-  if (!pendingCompletionData || isProcessingToolCall.value) return
+const handleReject = async () => {
+  if (!pendingToolCall || isProcessingToolCall.value) return
 
   try {
     isProcessingToolCall.value = true
-    const { threadId, runId } = pendingCompletionData
+    const { threadId, runId } = pendingToolCall
     await managedApi.restAiController.cancelRun(threadId, runId)
 
     completionSuggestion.value = undefined
-    pendingCompletionData = undefined
+    topicTitleSuggestion.value = undefined
+    pendingToolCall = undefined
   } finally {
     isProcessingToolCall.value = false
   }
@@ -326,14 +324,14 @@ const formattedCompletionSuggestion = computed(() => {
 const handleAcceptTitle = async () => {
   if (
     !topicTitleSuggestion.value ||
-    !pendingTitleData ||
+    !pendingToolCall ||
     isProcessingToolCall.value
   )
     return
 
   try {
     isProcessingToolCall.value = true
-    const { threadId, runId, toolCallId } = pendingTitleData
+    const { threadId, runId, toolCallId } = pendingToolCall
     const note = conversation.subject?.note
     if (!note) {
       console.error("No note found in conversation")
@@ -351,26 +349,11 @@ const handleAcceptTitle = async () => {
     )
 
     topicTitleSuggestion.value = undefined
-    pendingTitleData = undefined
+    pendingToolCall = undefined
   } finally {
     isProcessingToolCall.value = false
   }
   await fetchConversationMessages()
-}
-
-const handleRejectTitle = async () => {
-  if (!pendingTitleData || isProcessingToolCall.value) return
-
-  try {
-    isProcessingToolCall.value = true
-    const { threadId, runId } = pendingTitleData
-    await managedApi.restAiController.cancelRun(threadId, runId)
-
-    topicTitleSuggestion.value = undefined
-    pendingTitleData = undefined
-  } finally {
-    isProcessingToolCall.value = false
-  }
 }
 
 onMounted(async () => {
