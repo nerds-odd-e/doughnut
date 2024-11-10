@@ -69,7 +69,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from "vue"
+import { ref, onMounted, watch, type Ref } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type {
   User,
@@ -86,6 +86,7 @@ import type { StorageAccessor } from "@/store/createNoteStorage"
 import SvgMissingAvatar from "@/components/svgs/SvgMissingAvatar.vue"
 import ConversationTemplate from "./ConversationTemplate.vue"
 import markdownizer from "../form/markdownizer"
+import type ManagedApi from "@/managedApi/ManagedApi"
 
 const { conversation, user, initialAiReply, storageAccessor, isMaximized } =
   defineProps<{
@@ -154,23 +155,42 @@ const handleSendMessage = async (
   }
 }
 
-const getAiReply = async () => {
-  aiStatus.value = "Starting AI reply..."
-  await managedApi.eventSource
-    .onMessage(async (event, data) => {
-      if (event === "thread.message.created") {
-        aiStatus.value = "Generating response..."
+// First create a type for the state handlers
+type AiReplyState = {
+  handleEvent: (data: string) => Promise<void>
+  status: string
+}
+
+// Create state handlers
+const createAiReplyStates = (context: {
+  currentAiReply: Ref<string | undefined>
+  aiStatus: Ref<string | undefined>
+  storageAccessor: StorageAccessor
+  managedApi: ManagedApi
+  conversation: Conversation
+  fetchConversationMessages: () => Promise<void>
+}) => {
+  const states: Record<string, AiReplyState> = {
+    "thread.message.created": {
+      status: "Generating response...",
+      handleEvent: async (data) => {
         const response = JSON.parse(data) as Message
         response.content = [{ text: { value: "" } }]
-        currentAiReply.value = response.content?.[0]?.text?.value
-      } else if (event === "thread.message.delta") {
-        aiStatus.value = "Writing response..."
+        context.currentAiReply.value = response.content?.[0]?.text?.value
+      },
+    },
+    "thread.message.delta": {
+      status: "Writing response...",
+      handleEvent: async (data) => {
         const response = JSON.parse(data) as MessageDelta
         const delta = response.delta?.content?.[0]?.text?.value
-        currentAiReply.value = currentAiReply.value! + delta
-      } else if (event === "thread.run.requires_action") {
-        aiStatus.value = "Processing actions..."
-        const note = conversation.subject?.note
+        context.currentAiReply.value = context.currentAiReply.value! + delta
+      },
+    },
+    "thread.run.requires_action": {
+      status: "Processing actions...",
+      handleEvent: async (data) => {
+        const note = context.conversation.subject?.note
         if (!note) {
           console.error("No note found in conversation")
           return
@@ -181,21 +201,49 @@ const getAiReply = async () => {
             .function!.arguments as unknown as string
         ) as NoteDetailsCompletion
 
-        await storageAccessor
+        await context.storageAccessor
           .storedApi()
           .appendDetails(note.id, contentToAppend!.completion)
 
-        await managedApi.restAiController.submitToolCallResult(
+        await context.managedApi.restAiController.submitToolCallResult(
           response.thread_id!,
           response.id!,
           response.required_action!.submit_tool_outputs!.tool_calls![0]!.id!,
           { status: "accepted" }
         )
-      } else if (event === "done") {
-        aiStatus.value = undefined
-        fetchConversationMessages().then(() => {
-          currentAiReply.value = undefined
-        })
+      },
+    },
+    done: {
+      status: "",
+      handleEvent: async () => {
+        context.aiStatus.value = undefined
+        await context.fetchConversationMessages()
+        context.currentAiReply.value = undefined
+      },
+    },
+  }
+
+  return states
+}
+
+// Update getAiReply to use the state pattern
+const getAiReply = async () => {
+  aiStatus.value = "Starting AI reply..."
+  const states = createAiReplyStates({
+    currentAiReply,
+    aiStatus,
+    storageAccessor,
+    managedApi,
+    conversation,
+    fetchConversationMessages,
+  })
+
+  await managedApi.eventSource
+    .onMessage(async (event, data) => {
+      const state = states[event]
+      if (state) {
+        aiStatus.value = state.status
+        await state.handleEvent(data)
       } else {
         aiStatus.value = event
       }
