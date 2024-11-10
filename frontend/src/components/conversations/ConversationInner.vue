@@ -83,6 +83,7 @@ import SvgMissingAvatar from "@/components/svgs/SvgMissingAvatar.vue"
 import ConversationTemplate from "./ConversationTemplate.vue"
 import markdownizer from "../form/markdownizer"
 import { createAiReplyStates } from "@/models/aiReplyState"
+import type { AiAction } from "@/models/aiReplyState"
 
 const { conversation, user, initialAiReply, storageAccessor, isMaximized } =
   defineProps<{
@@ -151,10 +152,23 @@ const handleSendMessage = async (
   }
 }
 
+const aiAction: AiAction = {
+  append(text: string) {
+    if (!currentAiReply.value) {
+      currentAiReply.value = text
+    } else {
+      currentAiReply.value += text
+    }
+  },
+  reset() {
+    currentAiReply.value = undefined
+  },
+}
+
 // Update getAiReply to use the state pattern
 const getAiReply = async () => {
   const states = createAiReplyStates({
-    currentAiReply,
+    aiAction,
     storageAccessor,
     managedApi,
     note: conversation.subject?.note,

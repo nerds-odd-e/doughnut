@@ -1,4 +1,3 @@
-import { type Ref } from "vue"
 import type {
   Message,
   MessageDelta,
@@ -14,8 +13,13 @@ export type AiReplyState = {
   status: string | undefined
 }
 
+export interface AiAction {
+  append: (text: string) => void
+  reset: () => void
+}
+
 type AiReplyContext = {
-  currentAiReply: Ref<string | undefined>
+  aiAction: AiAction
   storageAccessor: StorageAccessor
   managedApi: ManagedApi
   note: Note | undefined
@@ -31,15 +35,16 @@ export const createAiReplyStates = (
       handleEvent: async (data) => {
         const response = JSON.parse(data) as Message
         response.content = [{ text: { value: "" } }]
-        context.currentAiReply.value = response.content?.[0]?.text?.value
+        context.aiAction.reset()
+        context.aiAction.append(response.content?.[0]?.text?.value || "")
       },
     },
     "thread.message.delta": {
       status: "Writing response...",
       handleEvent: async (data) => {
         const response = JSON.parse(data) as MessageDelta
-        const delta = response.delta?.content?.[0]?.text?.value
-        context.currentAiReply.value = context.currentAiReply.value! + delta
+        const delta = response.delta?.content?.[0]?.text?.value || ""
+        context.aiAction.append(delta)
       },
     },
     "thread.run.requires_action": {
@@ -71,7 +76,7 @@ export const createAiReplyStates = (
       status: undefined,
       handleEvent: async () => {
         await context.fetchConversationMessages()
-        context.currentAiReply.value = undefined
+        context.aiAction.reset()
       },
     },
   }
