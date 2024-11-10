@@ -56,20 +56,34 @@ const createRunResponse = (completion: string) => ({
   },
 })
 
-describe("ConversationInner", () => {
-  let wrapper
+// New helper functions to reduce duplication
+const setupTestData = () => {
   const note = makeMe.aNote.details("").please()
   const conversation = makeMe.aConversation.note(note).please()
   const user = makeMe.aUser.please()
+  return { note, conversation, user }
+}
 
-  // Helper functions
-  const submitForm = async (message: string) => {
-    const form = wrapper.find("form.chat-input-form")
-    const textarea = wrapper.find("textarea")
-    await textarea.setValue(message)
-    await form.trigger("submit")
-    await flushPromises()
-  }
+const mountComponent = (conversation, user) => {
+  return helper
+    .component(ConversationInner)
+    .withStorageProps({ conversation, user })
+    .mount()
+}
+
+const submitMessage = async (wrapper, message: string) => {
+  const form = wrapper.find("form.chat-input-form")
+  const textarea = wrapper.find("textarea")
+  await textarea.setValue(message)
+  await form.trigger("submit")
+  await flushPromises()
+}
+
+describe("ConversationInner", () => {
+  let wrapper
+  let note
+  let conversation
+  let user
 
   beforeEach(() => {
     window.HTMLElement.prototype.scrollIntoView = vitest.fn()
@@ -78,13 +92,12 @@ describe("ConversationInner", () => {
     helper.managedApi.eventSource.restConversationMessageController.getAiReply =
       vi.fn()
 
-    wrapper = helper
-      .component(ConversationInner)
-      .withStorageProps({
-        conversation,
-        user,
-      })
-      .mount()
+    const testData = setupTestData()
+    note = testData.note
+    conversation = testData.conversation
+    user = testData.user
+
+    wrapper = mountComponent(conversation, user)
   })
 
   describe("ScrollTo behavior", () => {
@@ -118,14 +131,14 @@ describe("ConversationInner", () => {
     })
 
     it("prevents form submission for empty messages", async () => {
-      await submitForm("   ")
+      await submitMessage(wrapper, "   ")
       expect(
         helper.managedApi.restConversationMessageController.replyToConversation
       ).not.toHaveBeenCalled()
     })
 
     it("allows form submission for non-empty messages", async () => {
-      await submitForm("Hello")
+      await submitMessage(wrapper, "Hello")
       expect(
         helper.managedApi.restConversationMessageController.replyToConversation
       ).toHaveBeenCalled()
@@ -133,8 +146,11 @@ describe("ConversationInner", () => {
   })
 
   describe("AI Reply", () => {
+    beforeEach(async () => {
+      await submitMessage(wrapper, "Hello")
+    })
+
     it("processes AI response and displays content", async () => {
-      await submitForm("Hello")
       simulateAiResponse()
       await flushPromises()
 
@@ -143,7 +159,7 @@ describe("ConversationInner", () => {
 
     describe("Status Bar", () => {
       beforeEach(async () => {
-        await submitForm("Hello")
+        await submitMessage(wrapper, "Hello")
       })
 
       it("shows correct status messages during AI reply lifecycle", async () => {
@@ -181,8 +197,7 @@ describe("ConversationInner", () => {
         // After completion
         helper.managedApi.eventSource.eventSourceRequest.onMessage("done", "")
         await wrapper.vm.$nextTick()
-        const statusBarAfter = wrapper.find(".status-bar")
-        expect(statusBarAfter.exists()).toBe(false)
+        expect(wrapper.find(".status-bar").exists()).toBe(false)
       })
 
       it("hides status bar and shows error message on failure", async () => {
@@ -231,7 +246,7 @@ describe("ConversationInner", () => {
     const testCompletion = "**bold completion**"
 
     beforeEach(async () => {
-      await submitForm("Hello")
+      await submitMessage(wrapper, "Hello")
       helper.managedApi.restAiController.submitToolCallResult = vi.fn()
       helper.managedApi.restTextContentController.updateNoteDetails = vi.fn()
 
@@ -250,36 +265,26 @@ describe("ConversationInner", () => {
     })
 
     it("adds '...' prefix when note has existing details", async () => {
-      // First test without existing details
-      let completionText = wrapper.find(".ai-chat .completion-text")
-      expect(completionText.text()).toBe("bold completion")
-
       // Recreate wrapper with note having existing details
       const noteWithDetails = makeMe.aNote.details("existing text").please()
       const conversationWithDetails = makeMe.aConversation
         .note(noteWithDetails)
         .please()
 
-      wrapper = helper
-        .component(ConversationInner)
-        .withStorageProps({
-          conversation: conversationWithDetails,
-          user,
-        })
-        .mount()
+      wrapper = mountComponent(conversationWithDetails, user)
 
-      await submitForm("Hello")
+      await submitMessage(wrapper, "Hello")
       helper.managedApi.eventSource.eventSourceRequest.onMessage(
         "thread.run.requires_action",
         JSON.stringify(createRunResponse(testCompletion))
       )
       await flushPromises()
 
-      completionText = wrapper.find(".ai-chat .completion-text")
+      const completionText = wrapper.find(".ai-chat .completion-text")
       expect(completionText.text()).toBe("...bold completion")
     })
 
-    it("shows completion suggestion and handles acceptance", async () => {
+    it("accepts the completion suggestion and updates the note", async () => {
       // Accept the suggestion
       await wrapper.find('button[class*="btn-primary"]').trigger("click")
       await flushPromises()
@@ -297,7 +302,7 @@ describe("ConversationInner", () => {
       expect(wrapper.find(".completion-text").exists()).toBe(false)
     })
 
-    it("handles rejection of completion suggestion", async () => {
+    it("rejects the completion suggestion without updating the note", async () => {
       // Reject the suggestion
       await wrapper.find('button[class*="btn-secondary"]').trigger("click")
       await flushPromises()
