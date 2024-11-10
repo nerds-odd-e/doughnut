@@ -154,6 +154,9 @@ const handleSendMessage = async (
 
 const getAiReply = async () => {
   const aiActionContext: AiActionContext = {
+    set(text: string) {
+      currentAiReply.value = text
+    },
     append(text: string) {
       if (!currentAiReply.value) {
         currentAiReply.value = text

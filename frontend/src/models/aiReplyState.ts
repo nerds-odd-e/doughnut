@@ -11,6 +11,7 @@ export type AiReplyState = {
 }
 
 export interface AiActionContext {
+  set: (text: string) => void
   append: (text: string) => void
   reset: () => Promise<void>
   appendNoteDetails: (
@@ -29,7 +30,7 @@ export const createAiReplyStates = (
       status: "Generating response...",
       handleEvent: async (data) => {
         const response = JSON.parse(data) as Message
-        context.append(response.content?.[0]?.text?.value || "")
+        context.set(response.content?.[0]?.text?.value || "")
       },
     },
     "thread.message.delta": {
