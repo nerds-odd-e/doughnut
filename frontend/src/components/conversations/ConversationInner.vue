@@ -160,7 +160,8 @@ const aiAction: AiAction = {
       currentAiReply.value += text
     }
   },
-  reset() {
+  async reset() {
+    await fetchConversationMessages()
     currentAiReply.value = undefined
   },
 }
@@ -172,7 +173,6 @@ const getAiReply = async () => {
     storageAccessor,
     managedApi,
     note: conversation.subject?.note,
-    fetchConversationMessages,
   })
 
   aiStatus.value = "Starting AI reply..."

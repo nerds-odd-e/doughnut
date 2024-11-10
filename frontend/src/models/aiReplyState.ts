@@ -15,7 +15,7 @@ export type AiReplyState = {
 
 export interface AiAction {
   append: (text: string) => void
-  reset: () => void
+  reset: () => Promise<void>
 }
 
 type AiReplyContext = {
@@ -23,7 +23,6 @@ type AiReplyContext = {
   storageAccessor: StorageAccessor
   managedApi: ManagedApi
   note: Note | undefined
-  fetchConversationMessages: () => Promise<void>
 }
 
 export const createAiReplyStates = (
@@ -73,8 +72,7 @@ export const createAiReplyStates = (
     done: {
       status: undefined,
       handleEvent: async () => {
-        await context.fetchConversationMessages()
-        context.aiAction.reset()
+        await context.aiAction.reset()
       },
     },
   }
