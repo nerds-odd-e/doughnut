@@ -3709,6 +3709,8 @@ components:
           format: byte
         previousNoteDetails:
           type: string
+        threadId:
+          type: string
     TextFromAudio:
       required:
       - completionMarkdownFromAudio

@@ -23,4 +23,6 @@ public class AudioUploadDTO {
   private byte[] audioData;
 
   private String previousNoteDetails;
+
+  private String threadId;
 }
