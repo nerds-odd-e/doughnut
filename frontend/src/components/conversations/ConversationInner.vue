@@ -60,8 +60,20 @@
           <div>Suggested completion:</div>
           <div class="completion-text mb-2" v-html="markdowntToHtml(formattedCompletionSuggestion)" />
           <div class="d-flex gap-2">
-            <button class="btn btn-primary btn-sm" @click="handleAcceptCompletion">Accept</button>
-            <button class="btn btn-secondary btn-sm" @click="handleRejectCompletion">Reject</button>
+            <button
+              class="btn btn-primary btn-sm"
+              @click="handleAcceptCompletion"
+              :disabled="isProcessingToolCall"
+            >
+              Accept
+            </button>
+            <button
+              class="btn btn-secondary btn-sm"
+              @click="handleRejectCompletion"
+              :disabled="isProcessingToolCall"
+            >
+              Reject
+            </button>
           </div>
         </div>
       </div>
@@ -221,44 +233,61 @@ const getAiReply = async () => {
     .restConversationMessageController.getAiReply(conversation.id)
 }
 
+const isProcessingToolCall = ref(false)
+
 const handleAcceptCompletion = async () => {
-  if (!completionSuggestion.value || !pendingCompletionData) return
-
-  const { threadId, runId, toolCallId } = pendingCompletionData
-  const note = conversation.subject?.note
-  if (!note) {
-    console.error("No note found in conversation")
-    return
-  }
-
-  await storageAccessor
-    .storedApi()
-    .appendDetails(note.id, completionSuggestion.value)
-  await managedApi.restAiController.submitToolCallResult(
-    threadId,
-    runId,
-    toolCallId,
-    { status: "accepted" }
+  if (
+    !completionSuggestion.value ||
+    !pendingCompletionData ||
+    isProcessingToolCall.value
   )
+    return
 
-  completionSuggestion.value = undefined
-  pendingCompletionData = undefined
+  try {
+    isProcessingToolCall.value = true
+    const { threadId, runId, toolCallId } = pendingCompletionData
+    const note = conversation.subject?.note
+    if (!note) {
+      console.error("No note found in conversation")
+      return
+    }
+
+    await storageAccessor
+      .storedApi()
+      .appendDetails(note.id, completionSuggestion.value)
+    await managedApi.restAiController.submitToolCallResult(
+      threadId,
+      runId,
+      toolCallId,
+      { status: "accepted" }
+    )
+
+    completionSuggestion.value = undefined
+    pendingCompletionData = undefined
+  } finally {
+    isProcessingToolCall.value = false
+  }
   await fetchConversationMessages()
 }
 
 const handleRejectCompletion = async () => {
-  if (!pendingCompletionData) return
+  if (!pendingCompletionData || isProcessingToolCall.value) return
 
-  const { threadId, runId, toolCallId } = pendingCompletionData
-  await managedApi.restAiController.submitToolCallResult(
-    threadId,
-    runId,
-    toolCallId,
-    { status: "rejected" }
-  )
+  try {
+    isProcessingToolCall.value = true
+    const { threadId, runId, toolCallId } = pendingCompletionData
+    await managedApi.restAiController.submitToolCallResult(
+      threadId,
+      runId,
+      toolCallId,
+      { status: "rejected" }
+    )
 
-  completionSuggestion.value = undefined
-  pendingCompletionData = undefined
+    completionSuggestion.value = undefined
+    pendingCompletionData = undefined
+  } finally {
+    isProcessingToolCall.value = false
+  }
 }
 
 const formattedCompletionSuggestion = computed(() => {

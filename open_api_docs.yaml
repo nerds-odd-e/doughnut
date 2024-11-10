@@ -1969,6 +1969,31 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/AiGeneratedImage"
+  /api/ai/cancel-run/{threadId}/{runId}:
+    post:
+      tags:
+      - rest-ai-controller
+      operationId: cancelRun
+      parameters:
+      - name: threadId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: runId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
   /api/user/{user}:
     patch:
       tags:

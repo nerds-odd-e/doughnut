@@ -6,6 +6,7 @@ import com.odde.doughnut.services.ai.*;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.client.OpenAiApi;
+import com.theokanning.openai.assistants.run.Run;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -30,5 +31,9 @@ public class AiAdvisorService {
       String threadId, String runId, String toolCallId, ToolCallResult result)
       throws JsonProcessingException {
     openAiApiHandler.submitToolOutputs(threadId, runId, toolCallId, result);
+  }
+
+  public Run cancelRun(String threadId, String runId) {
+    return openAiApiHandler.cancelRun(threadId, runId);
   }
 }

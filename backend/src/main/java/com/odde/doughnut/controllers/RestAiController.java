@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
+import com.theokanning.openai.assistants.run.Run;
 
 @RestController
 @SessionScope
@@ -95,5 +96,14 @@ public class RestAiController {
       throws JsonProcessingException {
     currentUser.assertLoggedIn();
     aiAdvisorWithStorageService.submitToolOutputs(threadId, runId, toolCallId, result);
+  }
+
+  @PostMapping("/cancel-run/{threadId}/{runId}")
+  @Transactional
+  public void cancelRun(
+      @PathVariable String threadId,
+      @PathVariable String runId) {
+    currentUser.assertLoggedIn();
+    aiAdvisorWithStorageService.getAiAdvisorService().cancelRun(threadId, runId);
   }
 }

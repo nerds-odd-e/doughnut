@@ -224,4 +224,8 @@ public class OpenAiApiHandler {
     ChatCompletionRequest chatRequest = chatAboutNoteRequestBuilder1.addTool(tool).build();
     return getFirstToolCallArguments(chatRequest);
   }
+
+  public Run cancelRun(String threadId, String runId) {
+    return openAiApi.cancelRun(threadId, runId).blockingGet();
+  }
 }

@@ -95,6 +95,28 @@ export class RestAiControllerService {
         });
     }
     /**
+     * @param threadId
+     * @param runId
+     * @returns any OK
+     * @throws ApiError
+     */
+    public cancelRun(
+        threadId: string,
+        runId: string,
+    ): CancelablePromise<any> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/ai/cancel-run/{threadId}/{runId}',
+            path: {
+                'threadId': threadId,
+                'runId': runId,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
      * @returns DummyForGeneratingTypes OK
      * @throws ApiError
      */
