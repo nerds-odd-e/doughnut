@@ -344,4 +344,62 @@ describe("NoteAudioTools", () => {
       })
     })
   })
+
+  describe("Topic suggestion", () => {
+    beforeEach(() => {
+      // Reset mocks and wrapper before each test
+      vi.clearAllMocks()
+      helper.managedApi.restTextContentController.updateNoteTopicConstructor =
+        vi.fn()
+      helper.managedApi.restAiAudioController.audioToText = vi
+        .fn()
+        .mockResolvedValue({ completionMarkdownFromAudio: "text" })
+    })
+
+    it("suggests topic for first 3 audio processes", async () => {
+      const note = makeMe.aNote.topicConstructor("Untitled").please()
+      wrapper = helper
+        .component(NoteAudioTools)
+        .withStorageProps({ note })
+        .mount()
+
+      helper.managedApi.restAiController.suggestTopicTitle = vi
+        .fn()
+        .mockResolvedValue({ topic: "Suggested Topic" })
+
+      // Simulate 4 audio processes
+      for (let i = 0; i < 4; i++) {
+        await wrapper.vm.processAudio(new Blob())
+      }
+
+      // Should only call suggestTopicTitle 3 times
+      expect(
+        helper.managedApi.restAiController.suggestTopicTitle
+      ).toHaveBeenCalledTimes(3)
+      expect(
+        helper.managedApi.restTextContentController.updateNoteTopicConstructor
+      ).toHaveBeenCalledTimes(3)
+    })
+
+    it("does not update topic when suggestion is empty", async () => {
+      const note = makeMe.aNote.topicConstructor("Untitled").please()
+      wrapper = helper
+        .component(NoteAudioTools)
+        .withStorageProps({ note })
+        .mount()
+
+      helper.managedApi.restAiController.suggestTopicTitle = vi
+        .fn()
+        .mockResolvedValue({ topic: "" })
+
+      await wrapper.vm.processAudio(new Blob())
+
+      expect(
+        helper.managedApi.restAiController.suggestTopicTitle
+      ).toHaveBeenCalled()
+      expect(
+        helper.managedApi.restTextContentController.updateNoteTopicConstructor
+      ).not.toHaveBeenCalled()
+    })
+  })
 })

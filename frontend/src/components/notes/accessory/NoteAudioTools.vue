@@ -97,6 +97,7 @@ const processAudio = async (file: Blob) => {
           .updateTextField(note.id, "edit topic", suggestedTopic.topic)
       }
     }
+    processAudio.callCount++
   } catch (error) {
     errors.value = error as Record<string, string | undefined>
   }
