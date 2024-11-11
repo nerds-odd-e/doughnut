@@ -113,7 +113,7 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
             NoteDetailsCompletion.class),
         new AiTool(
             GENERATE_TOPIC_TITLE,
-            "Generate a concise and descriptive title based on the note content. The title should be a single word phrase or at most a single sentence that captures the essence of the note. It should be specific within the note's context path and do not need to include general information that's already in the context path. Also consider the note's current topic title and only change it when necessary.",
+            "Generate a concise and descriptive title based on the note content. The title should be a single word phrase or at most a single sentence that captures the essence of the note. It should be specific within the note's context path and do not need to include general information that's already in the context path.",
             TopicTitleGeneration.class));
   }
 }
