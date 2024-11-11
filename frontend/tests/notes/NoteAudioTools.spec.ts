@@ -356,7 +356,7 @@ describe("NoteAudioTools", () => {
         .mockResolvedValue({ completionMarkdownFromAudio: "text" })
     })
 
-    it("suggests topic for first 3 audio processes", async () => {
+    it("suggests topic for power-of-2 audio processes", async () => {
       const note = makeMe.aNote.topicConstructor("Untitled").please()
       wrapper = helper
         .component(NoteAudioTools)
@@ -367,18 +367,18 @@ describe("NoteAudioTools", () => {
         .fn()
         .mockResolvedValue({ topic: "Suggested Topic" })
 
-      // Simulate 4 audio processes
-      for (let i = 0; i < 4; i++) {
+      // Simulate 9 audio processes (should trigger on 1st, 2nd, 4th, 8th calls)
+      for (let i = 0; i < 9; i++) {
         await wrapper.vm.processAudio(new Blob())
       }
 
-      // Should only call suggestTopicTitle 3 times
+      // Should call suggestTopicTitle 4 times (on calls 1, 2, 4, and 8)
       expect(
         helper.managedApi.restAiController.suggestTopicTitle
-      ).toHaveBeenCalledTimes(3)
+      ).toHaveBeenCalledTimes(4)
       expect(
         helper.managedApi.restTextContentController.updateNoteTopicConstructor
-      ).toHaveBeenCalledTimes(3)
+      ).toHaveBeenCalledTimes(4)
     })
 
     it("does not update topic when suggestion is empty", async () => {

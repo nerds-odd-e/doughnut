@@ -78,6 +78,24 @@ const errors = ref<Record<string, string | undefined>>()
 const isRecording = ref(false)
 const wakeLocker = createWakeLocker()
 
+const isPowerOfTwo = (n: number): boolean => {
+  return n > 0 && (n & (n - 1)) === 0
+}
+
+const shouldSuggestTopic = (callCount: number): boolean => {
+  return isPowerOfTwo(callCount)
+}
+
+const updateTopicIfSuggested = async (noteId: number) => {
+  const suggestedTopic =
+    await managedApi.restAiController.suggestTopicTitle(noteId)
+  if (suggestedTopic?.topic) {
+    await storageAccessor
+      .storedApi()
+      .updateTextField(noteId, "edit topic", suggestedTopic.topic)
+  }
+}
+
 const processAudio = async (file: Blob) => {
   try {
     const response = await managedApi.restAiAudioController.audioToText({
@@ -88,16 +106,10 @@ const processAudio = async (file: Blob) => {
       .storedApi()
       .appendDetails(note.id, response?.completionMarkdownFromAudio)
 
-    if (processAudio.callCount < 3) {
-      const suggestedTopic =
-        await managedApi.restAiController.suggestTopicTitle(note.id)
-      if (suggestedTopic?.topic) {
-        await storageAccessor
-          .storedApi()
-          .updateTextField(note.id, "edit topic", suggestedTopic.topic)
-      }
-    }
     processAudio.callCount++
+    if (shouldSuggestTopic(processAudio.callCount)) {
+      await updateTopicIfSuggested(note.id)
+    }
   } catch (error) {
     errors.value = error as Record<string, string | undefined>
   }
