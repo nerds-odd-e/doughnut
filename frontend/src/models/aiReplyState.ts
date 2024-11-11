@@ -5,7 +5,7 @@ import type {
   RunStep,
   DeltaOfRunStep,
   NoteDetailsCompletion,
-  TopicTitleGeneration,
+  TopicTitleReplacement,
 } from "@/generated/backend"
 
 export type AiReplyState = {
@@ -68,10 +68,10 @@ export const createAiReplyStates = (
             response.id!,
             toolCall.id!
           )
-        } else if (toolCall.function!.name === "generate_topic_title") {
-          const titleGeneration = functionArgs as TopicTitleGeneration
+        } else if (toolCall.function!.name === "suggest_note_topic_title") {
+          const titleGeneration = functionArgs as TopicTitleReplacement
           await context.setTopicTitle(
-            titleGeneration.topic,
+            titleGeneration.newTopic,
             response.thread_id!,
             response.id!,
             toolCall.id!

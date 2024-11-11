@@ -62,8 +62,8 @@ public record AssistantService(
   }
 
   public AiAssistantResponse createThreadAndRunWithFirstMessage(Note note, String prompt) {
-    String threadId = createThread(note, List.of());
-    createUserMessage(prompt, threadId);
+    MessageRequest messageRequest = MessageRequest.builder().role("user").content(prompt).build();
+    String threadId = createThread(note, List.of(messageRequest));
     Run run = openAiApiHandler.createRun(threadId, assistantId);
     return getThreadResponse(threadId, run);
   }
@@ -143,7 +143,7 @@ public record AssistantService(
         .getFirst()
         .getFunction()
         .getArguments()
-        .get("topic")
+        .get("newTopic")
         .asText();
   }
 }

@@ -6,6 +6,7 @@ import type {
   ConversationMessage,
   Message,
   MessageDelta,
+  TopicTitleReplacement,
 } from "@/generated/backend"
 import { flushPromises } from "@vue/test-utils"
 
@@ -341,8 +342,8 @@ describe("ConversationInner", () => {
       await submitMessageAndSimulateRunResponse(
         wrapper,
         "Hello",
-        createRunResponse("generate_topic_title", {
-          topic: testTitle,
+        createRunResponse("suggest_note_topic_title", <TopicTitleReplacement>{
+          newTopic: testTitle,
         })
       )
     })

@@ -127,7 +127,7 @@ export type { ToolCallFunction } from './models/ToolCallFunction';
 export type { ToolCallResult } from './models/ToolCallResult';
 export type { ToolChoice } from './models/ToolChoice';
 export type { ToolResources } from './models/ToolResources';
-export type { TopicTitleGeneration } from './models/TopicTitleGeneration';
+export type { TopicTitleReplacement } from './models/TopicTitleReplacement';
 export type { TruncationStrategy } from './models/TruncationStrategy';
 export type { Usage } from './models/Usage';
 export type { User } from './models/User';

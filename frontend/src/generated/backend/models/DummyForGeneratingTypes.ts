@@ -8,7 +8,7 @@ import type { MessageDelta } from './MessageDelta';
 import type { NoteDetailsCompletion } from './NoteDetailsCompletion';
 import type { Run } from './Run';
 import type { RunStep } from './RunStep';
-import type { TopicTitleGeneration } from './TopicTitleGeneration';
+import type { TopicTitleReplacement } from './TopicTitleReplacement';
 export type DummyForGeneratingTypes = {
     message?: Message;
     runStep?: RunStep;
@@ -16,6 +16,6 @@ export type DummyForGeneratingTypes = {
     messageDelta?: MessageDelta;
     run?: Run;
     noteDetailsCompletion?: NoteDetailsCompletion;
-    topicTitleGeneration?: TopicTitleGeneration;
+    topicTitleReplacement?: TopicTitleReplacement;
 };
 

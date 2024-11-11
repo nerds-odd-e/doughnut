@@ -51,7 +51,7 @@ class AiAdvisorServiceTest {
 
       Optional<AiTool> topicTitleTool =
           tools.stream()
-              .filter(t -> t.name().equals(AiToolFactory.GENERATE_TOPIC_TITLE))
+              .filter(t -> t.name().equals(AiToolFactory.SUGGEST_TOPIC_TITLE))
               .findFirst();
 
       assertTrue(topicTitleTool.isPresent());
@@ -59,7 +59,7 @@ class AiAdvisorServiceTest {
           topicTitleTool
               .get()
               .description()
-              .contains("Generate a concise and descriptive title based on the note content"));
+              .contains("Generate a concise and accurate note topic"));
     }
   }
 }

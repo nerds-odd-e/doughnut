@@ -31,6 +31,7 @@ import lombok.Setter;
 public class Note extends EntityIdentifiedByIdOnly {
   public static final int MAX_TITLE_LENGTH = 150;
   private static final String PATH_DELIMITER = " › ";
+  public static final String NOTE_OF_CURRENT_FOCUS = "note of current focus";
 
   @OneToOne
   @JoinColumn(name = "creator_id")
@@ -352,10 +353,10 @@ public class Note extends EntityIdentifiedByIdOnly {
   public String getNoteDescription() {
     String prettyString = defaultObjectMapper().valueToTree(getNoteBrief()).toPrettyString();
     return """
-        The note of current focus (in JSON format):
+        The %s (in JSON format):
         %s
         """
-        .formatted(prettyString);
+        .formatted(NOTE_OF_CURRENT_FOCUS, prettyString);
   }
 
   @JsonIgnore

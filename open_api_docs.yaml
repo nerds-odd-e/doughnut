@@ -4146,8 +4146,8 @@ components:
           $ref: "#/components/schemas/Run"
         noteDetailsCompletion:
           $ref: "#/components/schemas/NoteDetailsCompletion"
-        topicTitleGeneration:
-          $ref: "#/components/schemas/TopicTitleGeneration"
+        topicTitleReplacement:
+          $ref: "#/components/schemas/TopicTitleReplacement"
     ExpiresAfter:
       type: object
       properties:
@@ -4577,12 +4577,12 @@ components:
           $ref: "#/components/schemas/CodeInterpreterResources"
         file_search:
           $ref: "#/components/schemas/FileSearchResources"
-    TopicTitleGeneration:
+    TopicTitleReplacement:
       required:
-      - topic
+      - newTopic
       type: object
       properties:
-        topic:
+        newTopic:
           maxLength: 150
           minLength: 1
           type: string

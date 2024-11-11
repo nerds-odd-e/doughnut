@@ -14,7 +14,8 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.odde.doughnut.services.AiAdvisorWithStorageService;
-import com.odde.doughnut.services.ai.TopicTitleGeneration;
+import com.odde.doughnut.services.ai.TopicTitleReplacement;
+import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIAssistantMocker;
 import com.odde.doughnut.testability.OpenAIAssistantThreadMocker;
@@ -199,11 +200,11 @@ class RestAiControllerTest {
       testNote = makeMe.aNote().creatorAndOwner(currentUser).please();
       openAIAssistantMocker = new OpenAIAssistantMocker(openAiApi);
       openAIAssistantThreadMocker = openAIAssistantMocker.mockThreadCreation(null);
-      TopicTitleGeneration suggestedTopic = new TopicTitleGeneration();
-      suggestedTopic.setTopic("Suggested Title");
+      TopicTitleReplacement suggestedTopic = new TopicTitleReplacement();
+      suggestedTopic.setNewTopic("Suggested Title");
       openAIAssistantThreadMocker
           .mockCreateRunInProcess("my-run-id")
-          .aRunThatRequireAction(suggestedTopic, "suggest_topic_title")
+          .aRunThatRequireAction(suggestedTopic, AiToolFactory.SUGGEST_TOPIC_TITLE)
           .mockRetrieveRun()
           .mockCancelRun("my-run-id");
     }
