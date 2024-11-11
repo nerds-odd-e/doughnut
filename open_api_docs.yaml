@@ -4583,6 +4583,8 @@ components:
       type: object
       properties:
         topic:
+          maxLength: 150
+          minLength: 1
           type: string
     TruncationStrategy:
       type: object

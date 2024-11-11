@@ -55,9 +55,11 @@ class AiAdvisorServiceTest {
               .findFirst();
 
       assertTrue(topicTitleTool.isPresent());
-      assertEquals(
-          "Generate a concise and descriptive title based on the note content",
-          topicTitleTool.get().description());
+      assertTrue(
+          topicTitleTool
+              .get()
+              .description()
+              .contains("Generate a concise and descriptive title based on the note content"));
     }
   }
 }
