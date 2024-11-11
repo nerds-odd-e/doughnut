@@ -112,7 +112,7 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
             "Text completion for the details of the note of focus",
             NoteDetailsCompletion.class),
         new AiTool(
-          SUGGEST_TOPIC_TITLE,
+            SUGGEST_TOPIC_TITLE,
             "Generate a concise and accurate note topic (a title) based on the note content and pass it to the function for the use to update their note. The topic should be a single word, a phrase or at most a single sentence that captures the atomic concept of the note. It should be specific within the note's context path and do not need to include general information that's already in the context path. Keep the existing topic if it's already correct and concise.",
             TopicTitleReplacement.class));
   }
