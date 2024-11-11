@@ -199,10 +199,6 @@ class RestAiControllerTest {
       testNote = makeMe.aNote().creatorAndOwner(currentUser).please();
       openAIAssistantMocker = new OpenAIAssistantMocker(openAiApi);
       openAIAssistantThreadMocker = openAIAssistantMocker.mockThreadCreation(null);
-    }
-
-    @Test
-    void shouldReturnSuggestedTopicTitle() throws UnexpectedNoAccessRightException {
       TopicTitleGeneration suggestedTopic = new TopicTitleGeneration();
       suggestedTopic.setTopic("Suggested Title");
       openAIAssistantThreadMocker
@@ -210,10 +206,25 @@ class RestAiControllerTest {
           .aRunThatRequireAction(suggestedTopic, "suggest_topic_title")
           .mockRetrieveRun()
           .mockCancelRun("my-run-id");
+    }
 
+    @Test
+    void shouldReturnSuggestedTopicTitle() throws UnexpectedNoAccessRightException {
       SuggestedTopicDTO result = controller.suggestTopicTitle(testNote);
-
       assertThat(result.getTopic()).isEqualTo("Suggested Title");
+    }
+
+    @Test
+    void shouldCallCreateThreadWithRightMessage() throws UnexpectedNoAccessRightException {
+      controller.suggestTopicTitle(testNote);
+      verify(openAiApi)
+          .createThread(
+              argThat(
+                  request -> {
+                    assertThat(request.getMessages().get(2).getContent())
+                        .isEqualTo("Please suggest a better topic title for the note.");
+                    return true;
+                  }));
     }
 
     @Test

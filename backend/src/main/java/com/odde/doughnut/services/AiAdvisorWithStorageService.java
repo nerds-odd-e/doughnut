@@ -24,7 +24,7 @@ public final class AiAdvisorWithStorageService {
   private final ModelFactoryService modelFactoryService;
 
   public String createThread(AssistantService assistantService, Note note) {
-    return assistantService.createThread(note);
+    return assistantService.createThread(note, List.of());
   }
 
   public ChatAboutNoteService getChatAboutNoteService(

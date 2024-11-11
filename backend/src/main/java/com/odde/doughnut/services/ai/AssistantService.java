@@ -14,6 +14,7 @@ import com.theokanning.openai.assistants.thread.ThreadRequest;
 import com.theokanning.openai.service.assistant_stream.AssistantSSE;
 import io.reactivex.Flowable;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public record AssistantService(
@@ -61,7 +62,7 @@ public record AssistantService(
   }
 
   public AiAssistantResponse createThreadAndRunWithFirstMessage(Note note, String prompt) {
-    String threadId = createThread(note);
+    String threadId = createThread(note, List.of());
     createUserMessage(prompt, threadId);
     Run run = openAiApiHandler.createRun(threadId, assistantId);
     return getThreadResponse(threadId, run);
@@ -81,26 +82,23 @@ public record AssistantService(
     openAiApiHandler.createMessage(threadId, messageRequest);
   }
 
-  public String createThread(Note note) {
-    MessageRequest leadingMsg =
-        MessageRequest.builder()
-            .role("assistant")
-            .content("Please only call function to update content when use asks to.")
-            .build();
-    return createThreadForNoteWithLeadingMessage(note, leadingMsg);
-  }
+  public String createThread(Note note, List<MessageRequest> additionalMessages) {
+    List<MessageRequest> messages =
+        new ArrayList<>(
+            List.of(
+                MessageRequest.builder()
+                    .role("assistant")
+                    .content("Please only call function to update content when user asks to.")
+                    .build(),
+                MessageRequest.builder()
+                    .role("assistant")
+                    .content(note.getNoteDescription())
+                    .build()));
 
-  private String createThreadForNoteWithLeadingMessage(Note note, MessageRequest leadingMsg) {
-    ThreadRequest threadRequest =
-        ThreadRequest.builder()
-            .messages(
-                List.of(
-                    leadingMsg,
-                    MessageRequest.builder()
-                        .role("assistant")
-                        .content(note.getNoteDescription())
-                        .build()))
-            .build();
+    if (additionalMessages != null && !additionalMessages.isEmpty()) {
+      messages.addAll(additionalMessages);
+    }
+    ThreadRequest threadRequest = ThreadRequest.builder().messages(messages).build();
     return openAiApiHandler.createThread(threadRequest).getId();
   }
 
@@ -130,12 +128,13 @@ public record AssistantService(
 
   public String suggestTopicTitle(Note note) {
     String threadId =
-        createThreadForNoteWithLeadingMessage(
+        createThread(
             note,
-            MessageRequest.builder()
-                .role("assistant")
-                .content("Please suggest a topic title for the following note.")
-                .build());
+            List.of(
+                MessageRequest.builder()
+                    .role("user")
+                    .content("Please suggest a better topic title for the note.")
+                    .build()));
     Run run = openAiApiHandler.createRun(threadId, assistantId);
     AiAssistantResponse threadResponse = getThreadResponse(threadId, run);
     openAiApiHandler.cancelRun(threadId, run.getId());
