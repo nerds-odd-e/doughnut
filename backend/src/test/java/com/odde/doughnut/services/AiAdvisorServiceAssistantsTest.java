@@ -9,8 +9,10 @@ import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.theokanning.openai.assistants.assistant.Assistant;
 import com.theokanning.openai.assistants.assistant.AssistantRequest;
+import com.theokanning.openai.assistants.assistant.FunctionTool;
 import com.theokanning.openai.assistants.assistant.Tool;
 import com.theokanning.openai.client.OpenAiApi;
+import com.theokanning.openai.function.FunctionDefinition;
 import io.reactivex.Single;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -66,6 +68,11 @@ class AiAdvisorServiceAssistantsTest {
     void parameters() {
       Tool tool = assistantRequest.getTools().get(0);
       assertThat(tool.getType(), is("function"));
+      assertThat(tool, instanceOf(FunctionTool.class));
+      FunctionTool functionTool = (FunctionTool) tool;
+      FunctionDefinition functionDefinition = (FunctionDefinition) functionTool.getFunction();
+      assertThat(functionDefinition.getName(), is("complete_note_details"));
+      //      assertThat(functionDefinition.getStrict(), is(true));
     }
   }
 }

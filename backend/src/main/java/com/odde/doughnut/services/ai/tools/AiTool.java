@@ -12,6 +12,7 @@ public record AiTool(String name, String description, Class<?> parameterClass) {
         FunctionDefinition.builder()
             .name(name)
             .description(description)
+            .strict(Boolean.TRUE)
             .parametersDefinitionByClass(castParameterClass)
             .build());
   }
