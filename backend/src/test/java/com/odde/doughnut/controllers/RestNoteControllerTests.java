@@ -26,6 +26,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;
+import org.springframework.web.server.ResponseStatusException;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -269,6 +270,32 @@ class RestNoteControllerTests {
 
     private static Integer getLevel(Note link) {
       return link.getReviewSetting().getLevel();
+    }
+  }
+
+  @Nested
+  class SearchTests {
+    @BeforeEach
+    void setup() {
+      userModel = makeMe.aNullUserModelPlease();
+      controller =
+          new RestNoteController(
+              modelFactoryService, userModel, httpClientAdapter, testabilitySettings);
+    }
+
+    @Test
+    void shouldNotAllowSearchForLinkTargetWhenNotLoggedIn() {
+      SearchTerm searchTerm = new SearchTerm();
+      assertThrows(ResponseStatusException.class, () -> controller.searchForLinkTarget(searchTerm));
+    }
+
+    @Test
+    void shouldNotAllowSearchForLinkTargetWithinWhenNotLoggedIn() {
+      Note note = makeMe.aNote().please();
+      SearchTerm searchTerm = new SearchTerm();
+      assertThrows(
+          ResponseStatusException.class,
+          () -> controller.searchForLinkTargetWithin(note, searchTerm));
     }
   }
 }

@@ -116,7 +116,9 @@ class RestNoteController {
 
   @PostMapping("/search")
   @Transactional
-  public List<NoteTopic> searchForLinkTarget(@Valid @RequestBody SearchTerm searchTerm) {
+  public List<NoteTopic> searchForLinkTarget(@Valid @RequestBody SearchTerm searchTerm)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertLoggedIn();
     SearchTermModel searchTermModel =
         modelFactoryService.toSearchTermModel(currentUser.getEntity(), searchTerm);
     return searchTermModel.searchForNotes();
@@ -126,7 +128,9 @@ class RestNoteController {
   @Transactional
   public List<NoteTopic> searchForLinkTargetWithin(
       @PathVariable("note") @Schema(type = "integer") Note note,
-      @Valid @RequestBody SearchTerm searchTerm) {
+      @Valid @RequestBody SearchTerm searchTerm)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertLoggedIn();
     SearchTermModel searchTermModel =
         modelFactoryService.toSearchTermModel(currentUser.getEntity(), searchTerm);
     return searchTermModel.searchForNotesInRelateTo(note);
