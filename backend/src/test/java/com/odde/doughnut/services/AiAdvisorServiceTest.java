@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
+import com.odde.doughnut.services.ai.tools.AiToolName;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.image.Image;
@@ -51,7 +52,7 @@ class AiAdvisorServiceTest {
 
       Optional<AiTool> topicTitleTool =
           tools.stream()
-              .filter(t -> t.name().equals(AiToolFactory.SUGGEST_TOPIC_TITLE))
+              .filter(t -> t.name().equals(AiToolName.SUGGEST_TOPIC_TITLE.getValue()))
               .findFirst();
 
       assertTrue(topicTitleTool.isPresent());

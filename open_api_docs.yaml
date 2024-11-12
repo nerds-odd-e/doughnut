@@ -4148,6 +4148,11 @@ components:
           $ref: "#/components/schemas/NoteDetailsCompletion"
         topicTitleReplacement:
           $ref: "#/components/schemas/TopicTitleReplacement"
+        aiToolName:
+          type: string
+          enum:
+          - COMPLETE_NOTE_DETAILS
+          - SUGGEST_TOPIC_TITLE
     ExpiresAfter:
       type: object
       properties:

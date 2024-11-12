@@ -1,6 +1,5 @@
 package com.odde.doughnut.services;
 
-import static com.odde.doughnut.services.ai.tools.AiToolFactory.COMPLETE_NOTE_DETAILS;
 import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -16,6 +15,7 @@ import com.odde.doughnut.exceptions.OpenAITimeoutException;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.services.ai.AssistantService;
 import com.odde.doughnut.services.ai.NoteDetailsCompletion;
+import com.odde.doughnut.services.ai.tools.AiToolName;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIAssistantMocker;
 import com.odde.doughnut.testability.OpenAIAssistantThreadMocker;
@@ -59,7 +59,7 @@ class AiAdvisorServiceAutoCompleteTest {
       openAIAssistantThreadMocker
           .mockCreateRunInProcess("my-run-id")
           .aRunThatRequireAction(
-              new NoteDetailsCompletion(" must come down"), COMPLETE_NOTE_DETAILS)
+              new NoteDetailsCompletion(" must come down"), AiToolName.COMPLETE_NOTE_DETAILS.getValue())
           .mockRetrieveRun();
       assertEquals(" must come down", getAiCompletionAndResult("what goes up"));
     }

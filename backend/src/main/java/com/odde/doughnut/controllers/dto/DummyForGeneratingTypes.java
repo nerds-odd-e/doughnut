@@ -3,6 +3,7 @@ package com.odde.doughnut.controllers.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.odde.doughnut.services.ai.NoteDetailsCompletion;
 import com.odde.doughnut.services.ai.TopicTitleReplacement;
+import com.odde.doughnut.services.ai.tools.AiToolName;
 import com.theokanning.openai.assistants.message.Message;
 import com.theokanning.openai.assistants.message.content.MessageDelta;
 import com.theokanning.openai.assistants.run.*;
@@ -17,6 +18,7 @@ public class DummyForGeneratingTypes {
   public Run run;
   public NoteDetailsCompletion noteDetailsCompletion;
   public TopicTitleReplacement topicTitleReplacement;
+  public AiToolName aiToolName;
 
   // The open api library we use messed up the class name Delta, so we have to use a different name
   // here.

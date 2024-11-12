@@ -17,5 +17,12 @@ export type DummyForGeneratingTypes = {
     run?: Run;
     noteDetailsCompletion?: NoteDetailsCompletion;
     topicTitleReplacement?: TopicTitleReplacement;
+    aiToolName?: DummyForGeneratingTypes.aiToolName;
 };
+export namespace DummyForGeneratingTypes {
+    export enum aiToolName {
+        COMPLETE_NOTE_DETAILS = 'COMPLETE_NOTE_DETAILS',
+        SUGGEST_TOPIC_TITLE = 'SUGGEST_TOPIC_TITLE',
+    }
+}
 
