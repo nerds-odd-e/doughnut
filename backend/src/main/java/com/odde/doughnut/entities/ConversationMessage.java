@@ -31,7 +31,8 @@ public class ConversationMessage extends EntityIdentifiedByIdOnly {
   User sender;
 
   @Column(name = "read_by_receiver", columnDefinition = "BOOLEAN")
-  Boolean readByReceiver = false;
+  @Builder.Default
+  private Boolean readByReceiver = false;
 
   @Column(name = "created_at")
   @Builder.Default

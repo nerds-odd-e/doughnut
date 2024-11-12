@@ -1,23 +1,12 @@
 /etc/hosts:
-  file.append:
-    - text: 10.111.16.12      db-server
-
-/etc/profile.d/doughnut_env.sh:
-  file.managed:
-    - source: salt://base_os/templates/doughnut_env.sh
-    - template: jinja
-    - mode: 755
-
-mysql-repo:
-  pkgrepo.managed:
-    - humanname: MySQL
-    - name: deb [signed-by=/usr/share/keyrings/mysql-archive-keyring.gpg] http://repo.mysql.com/apt/debian bookworm mysql-8.0
-    - file: /etc/apt/sources.list.d/mysql.list
-    - key_url: https://repo.mysql.com/RPM-GPG-KEY-mysql-2023
-    - aptkey: False
-    - gpgcheck: 1
-    - require_in:
-      - pkg: doughnut-app-deps
+  file.blockreplace:
+    - marker_start: "# BEGIN SALT MANAGED ZONE"
+    - marker_end: "# END SALT MANAGED ZONE"
+    - content: |
+        10.111.16.12      db-server
+    - append_if_not_found: True
+    - backup: '.bak'
+    - show_changes: True
 
 mysql-repo-key:
   file.managed:
@@ -27,8 +16,17 @@ mysql-repo-key:
     - mode: 644
     - user: root
     - group: root
-    - require_in:
-      - pkgrepo: mysql-repo
+
+mysql-repo:
+  pkgrepo.managed:
+    - humanname: MySQL
+    - name: deb [signed-by=/usr/share/keyrings/mysql-archive-keyring.gpg] http://repo.mysql.com/apt/debian bookworm mysql-8.0
+    - file: /etc/apt/sources.list.d/mysql.list
+    - key_url: https://repo.mysql.com/RPM-GPG-KEY-mysql-2023
+    - aptkey: False
+    - gpgcheck: 1
+    - require:
+      - file: mysql-repo-key
 
 doughnut-app-deps:
   pkg.installed:
@@ -50,29 +48,37 @@ doughnut-app-deps:
         - jq
         - libmysqlclient21
         - mysql-community-client
-    - require_in:
-      - cmd: os-dist-upgrade
-      - cmd: doughnut-jre
-      - file: /etc/profile.d/doughnut_env.sh
+    - require:
+      - pkgrepo: mysql-repo
+
+/etc/profile.d/doughnut_env.sh:
+  file.managed:
+    - source: salt://base_os/templates/doughnut_env.sh
+    - template: jinja
+    - mode: 755
+    - require:
+      - pkg: doughnut-app-deps
 
 zulu{{ pillar['doughnut_app']['jre_version'] }}-linux_amd64.deb:
   file.managed:
     - name: /tmp/zulu{{ pillar['doughnut_app']['jre_version'] }}-linux_amd64.deb
     - source: https://cdn.azul.com/zulu/bin/zulu{{ pillar['doughnut_app']['jre_version'] }}-linux_amd64.deb
     - skip_verify: True
-    - require_in:
-      - cmd: install-jre
 
 install-jre:
   cmd.run:
     - name: apt-get install -y /tmp/zulu{{ pillar['doughnut_app']['jre_version'] }}-linux_amd64.deb
-    - require_in:
-      - cmd: doughnut-jre
+    - require:
+      - file: zulu{{ pillar['doughnut_app']['jre_version'] }}-linux_amd64.deb
 
 doughnut-jre:
   cmd.run:
     - name: update-alternatives --set java {{ pillar['doughnut_app']['java_home'] }}/bin/java
+    - require:
+      - cmd: install-jre
 
 os-dist-upgrade:
   cmd.run:
     - name: apt-get -y update && apt-get -y dist-upgrade
+    - require:
+      - pkg: doughnut-app-deps
