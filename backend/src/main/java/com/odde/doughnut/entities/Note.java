@@ -289,7 +289,7 @@ public class Note extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public Stream<Note> getAllNoneLinkDescendants() {
-    return getAllDescendants().filter(n -> n.getLinkType() == null);
+    return getAllDescendants().filter(n -> !n.isLink());
   }
 
   @JsonIgnore
@@ -337,7 +337,7 @@ public class Note extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  private boolean isLink() {
+  public boolean isLink() {
     return getTargetNote() != null;
   }
 

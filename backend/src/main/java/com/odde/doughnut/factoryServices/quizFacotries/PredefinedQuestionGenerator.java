@@ -40,7 +40,7 @@ public record PredefinedQuestionGenerator(
 
   private List<PredefinedQuestionFactory> getPredefinedQuestionFactories(
       AiQuestionGenerator questionGenerator) {
-    if (note.getLinkType() == null) {
+    if (!note.isLink()) {
       return List.of(
           new AiQuestionFactory(note, questionGenerator), new SpellingPredefinedFactory(note));
     }
