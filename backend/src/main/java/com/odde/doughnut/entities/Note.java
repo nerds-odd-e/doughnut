@@ -81,10 +81,6 @@ public class Note extends EntityIdentifiedByIdOnly {
   private List<Note> refers = new ArrayList<>();
 
   @OneToMany(mappedBy = "parent", cascade = CascadeType.DETACH)
-  @OrderBy("siblingOrder")
-  private final List<Note> links = new ArrayList<>();
-
-  @OneToMany(mappedBy = "parent", cascade = CascadeType.DETACH)
   @JsonIgnore
   @OrderBy("siblingOrder")
   private final List<Note> children = new ArrayList<>();
@@ -136,7 +132,12 @@ public class Note extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public List<Note> getLinks() {
-    return filterDeletedUnmodifiableNoteList(links);
+    return getChildren().stream().filter(Note::isLink).toList();
+  }
+
+  @JsonIgnore
+  private List<Note> getNoneLinkChildren() {
+    return getChildren().stream().filter(c -> !c.isLink()).toList();
   }
 
   @JsonIgnore
@@ -273,11 +274,6 @@ public class Note extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  private List<Note> getNoneLinkChildren() {
-    return getChildren().stream().filter(c -> c.getLinkType() == null).toList();
-  }
-
-  @JsonIgnore
   public List<Note> getNoneLinkSiblings() {
     if (getParent() == null) {
       return new ArrayList<>();
@@ -338,6 +334,11 @@ public class Note extends EntityIdentifiedByIdOnly {
       insertIndex++;
     }
     siblings.add(insertIndex, this);
+  }
+
+  @JsonIgnore
+  private boolean isLink() {
+    return getTargetNote() != null;
   }
 
   public static class NoteBrief {
