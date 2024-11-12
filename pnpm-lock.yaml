@@ -23,7 +23,7 @@ importers:
         version: 1.8.0
       '@badeball/cypress-cucumber-preprocessor':
         specifier: ^21.0.2
-        version: 21.0.2(@babel/core@7.26.0)(cypress@13.15.1)(typescript@5.6.3)
+        version: 21.0.2(@babel/core@7.26.0)(cypress@13.15.2)(typescript@5.6.3)
       '@bahmutov/cypress-esbuild-preprocessor':
         specifier: ^2.2.3
         version: 2.2.3(esbuild@0.24.0)
@@ -32,7 +32,7 @@ importers:
         version: 1.9.4
       '@testing-library/cypress':
         specifier: 10.0.2
-        version: 10.0.2(cypress@13.15.1)
+        version: 10.0.2(cypress@13.15.2)
       '@types/cypress-cucumber-preprocessor':
         specifier: ^4.0.5
         version: 4.0.5
@@ -46,16 +46,16 @@ importers:
         specifier: ^5.0.13
         version: 5.0.13
       cypress:
-        specifier: 13.15.1
-        version: 13.15.1
+        specifier: 13.15.2
+        version: 13.15.2
       cypress-file-upload:
         specifier: ^5.0.8
-        version: 5.0.8(cypress@13.15.1)
+        version: 5.0.8(cypress@13.15.2)
       github_action_sound:
         specifier: ^1.0.5
         version: 1.0.5
       got:
-        specifier: ^14.4.3
+        specifier: ^14.4.4
         version: 14.4.4
       jsdom:
         specifier: ^25.0.1
@@ -1606,8 +1606,8 @@ packages:
     resolution: {integrity: sha512-rNjApaLzuwaOTjCiT8lSDdGN1APCiqkChLMJxJPWLunPAt5fy8xgU9/jNOchV84wfIxrA0lRQB7oCT8jrn/wrQ==}
     engines: {node: '>=6.0'}
 
-  ci-info@3.9.0:
-    resolution: {integrity: sha512-NIxF55hv4nSqQswkAeiOi1r83xy8JldOFDTWiug55KBu9Jnblncd2U6ViHmYgHf01TPZS77NJBhBMKdWj9HQMQ==}
+  ci-info@4.0.0:
+    resolution: {integrity: sha512-TdHqgGf9odd8SXNuxtUBVx8Nv+qZOejE6qyqiy5NtbYYQOeFa6zmHkxlPzmaLxWWHsU6nJmB7AETdVPi+2NBUg==}
     engines: {node: '>=8'}
 
   class-transformer@0.5.1:
@@ -1835,8 +1835,8 @@ packages:
     peerDependencies:
       cypress: '>3.0.0'
 
-  cypress@13.15.1:
-    resolution: {integrity: sha512-DwUFiKXo4lef9kA0M4iEhixFqoqp2hw8igr0lTqafRb9qtU3X0XGxKbkSYsUFdkrAkphc7MPDxoNPhk5pj9PVg==}
+  cypress@13.15.2:
+    resolution: {integrity: sha512-ARbnUorjcCM3XiPwgHKuqsyr5W9Qn+pIIBPaoilnoBkLdSC2oLQjV1BUpnmc7KR+b7Avah3Ly2RMFnfxr96E/A==}
     engines: {node: ^16.0.0 || ^18.0.0 || >=20.0.0}
     hasBin: true
 
@@ -2724,10 +2724,6 @@ packages:
   is-callable@1.2.7:
     resolution: {integrity: sha512-1BC0BVFhS/p0qtw6enp8e+8OD0UrK0oFLztSjNzhcKA3WDuJxxAPXzPuPtKkjEY9UUoEWlX/8fgKeu2S8i9JTA==}
     engines: {node: '>= 0.4'}
-
-  is-ci@3.0.1:
-    resolution: {integrity: sha512-ZYvCgrefwqoQ6yTyYUbQu64HsITZ3NfKX1lzaEYdkTDcfKzzCI/wthRRYKkdjHKFVgNiXKAKm65Zo1pk2as/QQ==}
-    hasBin: true
 
   is-core-module@2.15.1:
     resolution: {integrity: sha512-z0vtXSwucUJtANQWldhbtbt7BnL0vxiFjIdDLAatwhDYty2bad6s+rijD6Ri4YuYJubLzIJLUidCh09e1djEVQ==}
@@ -5107,7 +5103,7 @@ snapshots:
       '@babel/helper-string-parser': 7.25.9
       '@babel/helper-validator-identifier': 7.25.9
 
-  '@badeball/cypress-cucumber-preprocessor@21.0.2(@babel/core@7.26.0)(cypress@13.15.1)(typescript@5.6.3)':
+  '@badeball/cypress-cucumber-preprocessor@21.0.2(@babel/core@7.26.0)(cypress@13.15.2)(typescript@5.6.3)':
     dependencies:
       '@cucumber/ci-environment': 10.0.1
       '@cucumber/cucumber': 11.0.1
@@ -5123,7 +5119,7 @@ snapshots:
       cli-table: 0.3.11
       common-ancestor-path: 1.0.1
       cosmiconfig: 9.0.0(typescript@5.6.3)
-      cypress: 13.15.1
+      cypress: 13.15.2
       debug: 4.3.7(supports-color@8.1.1)
       error-stack-parser: 2.1.4
       find-cypress-specs: 1.45.2(@babel/core@7.26.0)
@@ -5657,11 +5653,11 @@ snapshots:
 
   '@teppeis/multimaps@3.0.0': {}
 
-  '@testing-library/cypress@10.0.2(cypress@13.15.1)':
+  '@testing-library/cypress@10.0.2(cypress@13.15.2)':
     dependencies:
       '@babel/runtime': 7.26.0
       '@testing-library/dom': 10.4.0
-      cypress: 13.15.1
+      cypress: 13.15.2
 
   '@testing-library/dom@10.4.0':
     dependencies:
@@ -5767,7 +5763,7 @@ snapshots:
   '@types/testing-library__cypress@5.0.13':
     dependencies:
       '@testing-library/dom': 7.31.2
-      cypress: 13.15.1
+      cypress: 13.15.2
 
   '@types/triple-beam@1.3.5': {}
 
@@ -6409,7 +6405,7 @@ snapshots:
 
   chrome-trace-event@1.0.4: {}
 
-  ci-info@3.9.0: {}
+  ci-info@4.0.0: {}
 
   class-transformer@0.5.1: {}
 
@@ -6610,11 +6606,11 @@ snapshots:
 
   csv-parse@5.4.0: {}
 
-  cypress-file-upload@5.0.8(cypress@13.15.1):
+  cypress-file-upload@5.0.8(cypress@13.15.2):
     dependencies:
-      cypress: 13.15.1
+      cypress: 13.15.2
 
-  cypress@13.15.1:
+  cypress@13.15.2:
     dependencies:
       '@cypress/request': 3.0.6
       '@cypress/xvfb': 1.2.4(supports-color@8.1.1)
@@ -6627,6 +6623,7 @@ snapshots:
       cachedir: 2.4.0
       chalk: 4.1.2
       check-more-types: 2.24.0
+      ci-info: 4.0.0
       cli-cursor: 3.1.0
       cli-table3: 0.6.5
       commander: 6.2.1
@@ -6641,7 +6638,6 @@ snapshots:
       figures: 3.2.0
       fs-extra: 9.1.0
       getos: 3.2.1
-      is-ci: 3.0.1
       is-installed-globally: 0.4.0
       lazy-ass: 1.6.0
       listr2: 3.14.0(enquirer@2.4.1)
@@ -7677,10 +7673,6 @@ snapshots:
       has-tostringtag: 1.0.2
 
   is-callable@1.2.7: {}
-
-  is-ci@3.0.1:
-    dependencies:
-      ci-info: 3.9.0
 
   is-core-module@2.15.1:
     dependencies:
