@@ -2,7 +2,6 @@ package com.odde.doughnut.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.ai.AssistantService;
 import com.theokanning.openai.assistants.message.Message;
 import com.theokanning.openai.service.assistant_stream.AssistantSSE;
@@ -16,7 +15,6 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 public class ChatAboutNoteService {
   private final String threadId;
   private final AssistantService assistantService;
-  private final ModelFactoryService modelFactoryService;
 
   public SseEmitter getAIReplySSE() {
     Flowable<AssistantSSE> runStream = assistantService.getRunStream(threadId);

@@ -112,7 +112,9 @@ public class RestAiController {
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
     String title =
-        aiAdvisorWithStorageService.getChatAssistantService(note).suggestTopicTitle(note);
+        aiAdvisorWithStorageService
+            .getChatAssistantServiceForNotebook(note.getNotebook())
+            .suggestTopicTitle(note);
     return new SuggestedTopicDTO(title);
   }
 }

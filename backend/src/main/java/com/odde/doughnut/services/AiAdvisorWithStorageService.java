@@ -29,12 +29,12 @@ public final class AiAdvisorWithStorageService {
 
   public ChatAboutNoteService getChatAboutNoteService(
       String threadId, AssistantService assistantService) {
-    return new ChatAboutNoteService(threadId, assistantService, modelFactoryService);
+    return new ChatAboutNoteService(threadId, assistantService);
   }
 
-  public AssistantService getChatAssistantService(Note note) {
+  public AssistantService getChatAssistantServiceForNotebook(Notebook notebook) {
     NotebookAssistant assistant =
-        modelFactoryService.notebookAssistantRepository.findByNotebook(note.getNotebook());
+        modelFactoryService.notebookAssistantRepository.findByNotebook(notebook);
     if (assistant != null) {
       return aiAdvisorService.getChatService(assistant.getAssistantId());
     }
@@ -118,7 +118,7 @@ public final class AiAdvisorWithStorageService {
       Conversation conversation, ConversationService conversationService) {
     Note note = conversation.getSubject().getNote();
     String threadId = conversation.getAiAssistantThreadId();
-    AssistantService assistantService = getChatAssistantService(note);
+    AssistantService assistantService = getChatAssistantServiceForNotebook(note.getNotebook());
 
     if (threadId == null) {
       threadId = createThread(assistantService, note);
