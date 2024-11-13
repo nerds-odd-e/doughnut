@@ -114,4 +114,8 @@ public final class OtherAiServices {
     RequestBody requestBody = builder.build();
     return openAiApiHandler.getTranscription(requestBody);
   }
+
+  public AssistantRunService getAssistantRunService(String threadId, String runId) {
+    return new AssistantRunService(openAiApiHandler, threadId, runId);
+  }
 }

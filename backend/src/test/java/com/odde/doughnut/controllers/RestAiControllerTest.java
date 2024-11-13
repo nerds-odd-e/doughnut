@@ -12,8 +12,8 @@ import com.odde.doughnut.controllers.dto.ToolCallResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.AiAssistantFacade;
 import com.odde.doughnut.services.GlobalSettingsService;
+import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
 import com.odde.doughnut.services.ai.OtherAiServices;
 import com.odde.doughnut.services.ai.TopicTitleReplacement;
 import com.odde.doughnut.services.ai.tools.AiToolName;
@@ -50,17 +50,19 @@ class RestAiControllerTest {
   Note note;
   @Mock OpenAiApi openAiApi;
   @Autowired MakeMe makeMe;
-  AiAssistantFacade aiAssistantFacade;
+  NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory;
 
   @BeforeEach
   void Setup() {
     GlobalSettingsService globalSettingsService =
         new GlobalSettingsService(makeMe.modelFactoryService);
-    aiAssistantFacade = new AiAssistantFacade(openAiApi, globalSettingsService);
+    notebookAssistantForNoteServiceFactory =
+        new NotebookAssistantForNoteServiceFactory(openAiApi, globalSettingsService);
     currentUser = makeMe.aUser().toModelPlease();
     note = makeMe.aNote().please();
     controller =
-        new RestAiController(aiAssistantFacade, new OtherAiServices(openAiApi), currentUser);
+        new RestAiController(
+            notebookAssistantForNoteServiceFactory, new OtherAiServices(openAiApi), currentUser);
   }
 
   @Nested
@@ -78,7 +80,7 @@ class RestAiControllerTest {
           ResponseStatusException.class,
           () ->
               new RestAiController(
-                      aiAssistantFacade,
+                      notebookAssistantForNoteServiceFactory,
                       new OtherAiServices(openAiApi),
                       makeMe.aNullUserModelPlease())
                   .generateImage("create an image"));
@@ -179,7 +181,9 @@ class RestAiControllerTest {
     void shouldRequireUserToBeLoggedIn() {
       controller =
           new RestAiController(
-              aiAssistantFacade, new OtherAiServices(openAiApi), makeMe.aNullUserModelPlease());
+              notebookAssistantForNoteServiceFactory,
+              new OtherAiServices(openAiApi),
+              makeMe.aNullUserModelPlease());
 
       assertThrows(
           ResponseStatusException.class, () -> controller.cancelRun("thread-123", "run-123"));
@@ -229,7 +233,9 @@ class RestAiControllerTest {
     void shouldRequireUserToBeLoggedIn() {
       controller =
           new RestAiController(
-              aiAssistantFacade, new OtherAiServices(openAiApi), makeMe.aNullUserModelPlease());
+              notebookAssistantForNoteServiceFactory,
+              new OtherAiServices(openAiApi),
+              makeMe.aNullUserModelPlease());
 
       assertThrows(ResponseStatusException.class, () -> controller.suggestTopicTitle(testNote));
     }

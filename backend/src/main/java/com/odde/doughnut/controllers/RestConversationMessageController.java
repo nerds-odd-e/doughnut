@@ -7,8 +7,8 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.AiAssistantFacade;
 import com.odde.doughnut.services.ConversationService;
+import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import org.apache.coyote.BadRequestException;
@@ -20,16 +20,16 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @RequestMapping("/api/conversation")
 public class RestConversationMessageController {
   private final ConversationService conversationService;
-  private final AiAssistantFacade aiAssistantFacade;
+  private final NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory;
   private final UserModel currentUser;
 
   public RestConversationMessageController(
       UserModel currentUser,
       ConversationService conversationService,
-      AiAssistantFacade aiAssistantFacade) {
+      NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory) {
     this.currentUser = currentUser;
     this.conversationService = conversationService;
-    this.aiAssistantFacade = aiAssistantFacade;
+    this.notebookAssistantForNoteServiceFactory = notebookAssistantForNoteServiceFactory;
   }
 
   @PostMapping("/assessment-question/{assessmentQuestion}")
@@ -101,7 +101,9 @@ public class RestConversationMessageController {
       if (note == null) {
         throw new RuntimeException("Only note related conversation can have AI reply");
       }
-      return aiAssistantFacade.getAiReplyForConversation(conversation, conversationService, note);
+      return notebookAssistantForNoteServiceFactory
+          .create(note)
+          .getAiReplyForConversation(conversation, conversationService, note);
     } catch (OpenAiUnauthorizedException e) {
       // Since this method is asynchronous, the exception body is not returned to the client.
       // Instead, the client will receive a 400 Bad Request status code, with no body.

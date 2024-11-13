@@ -5,7 +5,7 @@ import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.AiAssistantFacade;
+import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
 import com.odde.doughnut.services.ai.OtherAiServices;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
@@ -21,11 +21,13 @@ public class RestAiController {
 
   private final OtherAiServices otherAiServices;
   private final UserModel currentUser;
-  private final AiAssistantFacade aiAssistantFacade;
+  private final NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory;
 
   public RestAiController(
-      AiAssistantFacade aiAssistantFacade, OtherAiServices otherAiServices, UserModel currentUser) {
-    this.aiAssistantFacade = aiAssistantFacade;
+      NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory,
+      OtherAiServices otherAiServices,
+      UserModel currentUser) {
+    this.notebookAssistantForNoteServiceFactory = notebookAssistantForNoteServiceFactory;
     this.otherAiServices = otherAiServices;
     this.currentUser = currentUser;
   }
@@ -57,14 +59,14 @@ public class RestAiController {
       @RequestBody ToolCallResult result)
       throws JsonProcessingException {
     currentUser.assertLoggedIn();
-    aiAssistantFacade.getAssistantRunService(threadId, runId).submitToolOutputs(toolCallId, result);
+    otherAiServices.getAssistantRunService(threadId, runId).submitToolOutputs(toolCallId, result);
   }
 
   @PostMapping("/cancel-run/{threadId}/{runId}")
   @Transactional
   public void cancelRun(@PathVariable String threadId, @PathVariable String runId) {
     currentUser.assertLoggedIn();
-    aiAssistantFacade.getAssistantRunService(threadId, runId).cancelRun();
+    otherAiServices.getAssistantRunService(threadId, runId).cancelRun();
   }
 
   @PostMapping("/suggest-topic-title/{note}")
@@ -73,7 +75,7 @@ public class RestAiController {
       @PathVariable(value = "note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
-    String title = aiAssistantFacade.suggestTopicTitle(note);
+    String title = notebookAssistantForNoteServiceFactory.create(note).suggestTopicTitle(note);
     return new SuggestedTopicDTO(title);
   }
 }
