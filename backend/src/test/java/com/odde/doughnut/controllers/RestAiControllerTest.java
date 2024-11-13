@@ -14,6 +14,7 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorWithStorageService;
 import com.odde.doughnut.services.AiServiceFactory;
+import com.odde.doughnut.services.ai.OtherAiServices;
 import com.odde.doughnut.services.ai.TopicTitleReplacement;
 import com.odde.doughnut.services.ai.tools.AiToolName;
 import com.odde.doughnut.testability.MakeMe;
@@ -63,7 +64,11 @@ class RestAiControllerTest {
     currentUser = makeMe.aUser().toModelPlease();
     note = makeMe.aNote().please();
     controller =
-        new RestAiController(aiAdvisorWithStorageService, currentUser, testabilitySettings);
+        new RestAiController(
+            aiAdvisorWithStorageService,
+            new OtherAiServices(openAiApi),
+            currentUser,
+            testabilitySettings);
   }
 
   @Nested
@@ -82,6 +87,7 @@ class RestAiControllerTest {
           () ->
               new RestAiController(
                       aiAdvisorWithStorageService,
+                      new OtherAiServices(openAiApi),
                       makeMe.aNullUserModelPlease(),
                       testabilitySettings)
                   .generateImage("create an image"));
@@ -182,7 +188,10 @@ class RestAiControllerTest {
     void shouldRequireUserToBeLoggedIn() {
       controller =
           new RestAiController(
-              aiAdvisorWithStorageService, makeMe.aNullUserModelPlease(), testabilitySettings);
+              aiAdvisorWithStorageService,
+              new OtherAiServices(openAiApi),
+              makeMe.aNullUserModelPlease(),
+              testabilitySettings);
 
       assertThrows(
           ResponseStatusException.class, () -> controller.cancelRun("thread-123", "run-123"));
@@ -232,7 +241,10 @@ class RestAiControllerTest {
     void shouldRequireUserToBeLoggedIn() {
       controller =
           new RestAiController(
-              aiAdvisorWithStorageService, makeMe.aNullUserModelPlease(), testabilitySettings);
+              aiAdvisorWithStorageService,
+              new OtherAiServices(openAiApi),
+              makeMe.aNullUserModelPlease(),
+              testabilitySettings);
 
       assertThrows(ResponseStatusException.class, () -> controller.suggestTopicTitle(testNote));
     }

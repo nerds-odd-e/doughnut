@@ -3,9 +3,8 @@ package com.odde.doughnut.configs;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.handlers.AudioWebSocketHandler;
-import com.theokanning.openai.client.OpenAiApi;
+import com.odde.doughnut.services.ai.OtherAiServices;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.WebSocketHandler;
@@ -19,9 +18,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
   @Autowired private ModelFactoryService modelFactoryService;
 
-  @Autowired
-  @Qualifier("testableOpenAiApi")
-  private OpenAiApi openAiApi;
+  @Autowired private OtherAiServices otherAiServices;
 
   @Autowired private ObjectMapper objectMapper;
 
@@ -32,6 +29,6 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
   @Bean
   public WebSocketHandler audioWebSocketHandler() {
-    return new AudioWebSocketHandler(openAiApi, modelFactoryService, objectMapper);
+    return new AudioWebSocketHandler(otherAiServices, modelFactoryService, objectMapper);
   }
 }

@@ -13,6 +13,7 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorWithStorageService;
 import com.odde.doughnut.services.AiServiceFactory;
 import com.odde.doughnut.services.GlobalSettingsService;
+import com.odde.doughnut.services.ai.OtherAiServices;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.assistants.assistant.Assistant;
@@ -60,7 +61,11 @@ class RestAiControllerForAssistantTest {
     currentUser = makeMe.anAdmin().toModelPlease();
     note = makeMe.aNote().please();
     controller =
-        new RestAiController(aiAdvisorWithStorageService, currentUser, testabilitySettings);
+        new RestAiController(
+            aiAdvisorWithStorageService,
+            new OtherAiServices(openAiApi),
+            currentUser,
+            testabilitySettings);
   }
 
   @Nested
@@ -81,7 +86,10 @@ class RestAiControllerForAssistantTest {
       void authentication() {
         controller =
             new RestAiController(
-                aiAdvisorWithStorageService, makeMe.aUser().toModelPlease(), testabilitySettings);
+                aiAdvisorWithStorageService,
+                new OtherAiServices(openAiApi),
+                makeMe.aUser().toModelPlease(),
+                testabilitySettings);
         assertThrows(
             UnexpectedNoAccessRightException.class, () -> controller.recreateAllAssistants());
       }
@@ -135,7 +143,10 @@ class RestAiControllerForAssistantTest {
     void authentication() {
       controller =
           new RestAiController(
-              aiAdvisorWithStorageService, makeMe.aUser().toModelPlease(), testabilitySettings);
+              aiAdvisorWithStorageService,
+              new OtherAiServices(openAiApi),
+              makeMe.aUser().toModelPlease(),
+              testabilitySettings);
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.recreateNotebookAssistant(notebook, notebookAssistantCreationParams));

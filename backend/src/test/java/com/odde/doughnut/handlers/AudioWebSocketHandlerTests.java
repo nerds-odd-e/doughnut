@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.AudioUploadDTO;
+import com.odde.doughnut.services.ai.OtherAiServices;
 import com.odde.doughnut.services.ai.TextFromAudio;
 import com.odde.doughnut.services.openAiApis.OpenAiApiExtended;
 import com.odde.doughnut.testability.MakeMe;
@@ -42,7 +43,9 @@ class AudioWebSocketHandlerTests {
   @BeforeEach
   void setup() {
     objectMapper = new ObjectMapper();
-    handler = new AudioWebSocketHandler(openAiApi, makeMe.modelFactoryService, objectMapper);
+    handler =
+        new AudioWebSocketHandler(
+            new OtherAiServices(openAiApi), makeMe.modelFactoryService, objectMapper);
     when(openAiApi.createTranscriptionSrt(any(RequestBody.class)))
         .thenReturn(Single.just(ResponseBody.create("test", null)));
     TextFromAudio completionMarkdownFromAudio = new TextFromAudio();

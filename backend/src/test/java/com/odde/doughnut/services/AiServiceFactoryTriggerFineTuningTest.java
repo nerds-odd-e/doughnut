@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
+import com.odde.doughnut.services.ai.OtherAiServices;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.file.File;
@@ -35,14 +36,12 @@ import org.springframework.transaction.annotation.Transactional;
 class AiServiceFactoryTriggerFineTuningTest {
   @Autowired ModelFactoryService modelFactoryService;
   @Autowired MakeMe makeMe;
-  private FineTuningService fineTuningService;
   @Mock private OpenAiApi openAiApi;
-  private AiServiceFactory aiServiceFactory;
+  private OtherAiServices otherAiServices;
 
   @BeforeEach
   void setup() {
-    fineTuningService = new FineTuningService(this.modelFactoryService, openAiApi);
-    aiServiceFactory = new AiServiceFactory(openAiApi);
+    otherAiServices = new OtherAiServices(openAiApi);
   }
 
   @Nested
@@ -55,7 +54,7 @@ class AiServiceFactoryTriggerFineTuningTest {
               OpenAIServiceErrorException.class,
               () -> {
                 List<OpenAIChatGPTFineTuningExample> examples = makeExamples(0);
-                aiServiceFactory.getOtherAiServices().uploadAndTriggerFineTuning(examples, "test");
+                otherAiServices.uploadAndTriggerFineTuning(examples, "test");
               });
       assertEquals(result.getMessage(), "Positive feedback cannot be less than 10.");
     }
@@ -69,7 +68,7 @@ class AiServiceFactoryTriggerFineTuningTest {
               OpenAIServiceErrorException.class,
               () -> {
                 List<OpenAIChatGPTFineTuningExample> examples = makeExamples(10);
-                aiServiceFactory.getOtherAiServices().uploadAndTriggerFineTuning(examples, "test");
+                otherAiServices.uploadAndTriggerFineTuning(examples, "test");
               });
       assertEquals(result.getMessage(), "Upload failed.");
     }
@@ -97,7 +96,8 @@ class AiServiceFactoryTriggerFineTuningTest {
       @Test
       void shouldPassPositiveExamplesForQuestionGeneration() throws IOException {
         List<OpenAIChatGPTFineTuningExample> examples = makeExamples(10);
-        aiServiceFactory.getOtherAiServices().uploadAndTriggerFineTuning(examples, "test");
+        otherAiServices.uploadAndTriggerFineTuning(examples, "test");
+
         List<String> lines = fileContents.get(0).lines().toList();
         assertThat(lines, hasSize(10));
         assertThat(lines.get(0), containsString("{\"messages\":["));

@@ -10,16 +10,23 @@ import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.ai.tools.AiToolList;
 import com.odde.doughnut.services.openAiApis.FineTuningExamples;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
+import com.theokanning.openai.client.OpenAiApi;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 
-public record OtherAiServices(OpenAiApiHandler openAiApiHandler) {
+@Service
+public final class OtherAiServices {
+  private final OpenAiApiHandler openAiApiHandler;
+
+  public OtherAiServices(@Qualifier("testableOpenAiApi") OpenAiApi openAiApi) {
+    this.openAiApiHandler = new OpenAiApiHandler(openAiApi);
+  }
+
   public String getTimage(String prompt) {
     return openAiApiHandler.getOpenAiImage(prompt);
   }
@@ -85,10 +92,10 @@ public record OtherAiServices(OpenAiApiHandler openAiApiHandler) {
         .model(modelName)
         .addSystemMessage(
             """
-      The trailing note details before appending the text from the audio are (in JSON format):
+          The trailing note details before appending the text from the audio are (in JSON format):
 
-      %s
-      """
+          %s
+          """
                 .formatted(prettyString));
   }
 

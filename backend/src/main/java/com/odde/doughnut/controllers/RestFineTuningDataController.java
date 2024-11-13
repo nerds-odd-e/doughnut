@@ -5,7 +5,6 @@ import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.AiServiceFactory;
 import com.odde.doughnut.services.FineTuningService;
 import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
 import com.odde.doughnut.services.ai.OtherAiServices;
@@ -27,12 +26,14 @@ class RestFineTuningDataController {
   private final OtherAiServices otherAiServices;
 
   public RestFineTuningDataController(
-      ModelFactoryService modelFactoryService, UserModel currentUser, OpenAiApi openAiApi) {
+      ModelFactoryService modelFactoryService,
+      UserModel currentUser,
+      OpenAiApi openAiApi,
+      OtherAiServices otherAiServices) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.fineTuningService = new FineTuningService(this.modelFactoryService, openAiApi);
-    AiServiceFactory aiServiceFactory = new AiServiceFactory(openAiApi);
-    this.otherAiServices = aiServiceFactory.getOtherAiServices();
+    this.otherAiServices = otherAiServices;
   }
 
   @PatchMapping("/{suggestedQuestion}/update-suggested-question-for-fine-tuning")

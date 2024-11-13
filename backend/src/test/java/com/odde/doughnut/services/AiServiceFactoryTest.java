@@ -3,6 +3,7 @@ package com.odde.doughnut.services;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.odde.doughnut.services.ai.OtherAiServices;
 import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.ai.tools.AiToolName;
@@ -20,7 +21,6 @@ import org.mockito.*;
 
 class AiServiceFactoryTest {
 
-  private AiServiceFactory aiServiceFactory;
   @Mock private OpenAiApi openAiApi;
   OpenAIChatCompletionMock openAIChatCompletionMock;
 
@@ -28,7 +28,6 @@ class AiServiceFactoryTest {
   void Setup() {
     MockitoAnnotations.openMocks(this);
     openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
-    aiServiceFactory = new AiServiceFactory(openAiApi);
   }
 
   @Nested
@@ -40,7 +39,7 @@ class AiServiceFactoryTest {
       image.setB64Json("https://image.com");
       result.setData(List.of(image));
       Mockito.when(openAiApi.createImage(Mockito.any())).thenReturn(Single.just(result));
-      assertEquals("https://image.com", aiServiceFactory.getOtherAiServices().getTimage("prompt"));
+      assertEquals("https://image.com", new OtherAiServices(openAiApi).getTimage("prompt"));
     }
   }
 

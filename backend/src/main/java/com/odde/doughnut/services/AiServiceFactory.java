@@ -16,10 +16,6 @@ public class AiServiceFactory {
     openAiApiHandler = new OpenAiApiHandler(openAiApi);
   }
 
-  public OtherAiServices getOtherAiServices() {
-    return new OtherAiServices(openAiApiHandler);
-  }
-
   public AssistantService getAssistantService(String assistantId) {
     return new AssistantService(openAiApiHandler, assistantId);
   }

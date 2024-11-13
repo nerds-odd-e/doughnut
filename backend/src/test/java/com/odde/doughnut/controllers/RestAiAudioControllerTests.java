@@ -8,6 +8,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import com.odde.doughnut.controllers.dto.*;
+import com.odde.doughnut.services.ai.OtherAiServices;
 import com.odde.doughnut.services.ai.TextFromAudio;
 import com.odde.doughnut.services.openAiApis.OpenAiApiExtended;
 import com.odde.doughnut.testability.MakeMe;
@@ -41,7 +42,8 @@ class RestAiAudioControllerTests {
 
   @BeforeEach
   void setup() {
-    controller = new RestAiAudioController(openAiApi, makeMe.modelFactoryService);
+    controller =
+        new RestAiAudioController(new OtherAiServices(openAiApi), makeMe.modelFactoryService);
     TextFromAudio completionMarkdownFromAudio = new TextFromAudio();
     completionMarkdownFromAudio.setCompletionMarkdownFromAudio("test123");
     openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);

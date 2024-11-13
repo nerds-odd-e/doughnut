@@ -3,15 +3,13 @@ package com.odde.doughnut.handlers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.AudioUploadDTO;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.services.AiServiceFactory;
 import com.odde.doughnut.services.GlobalSettingsService;
+import com.odde.doughnut.services.ai.OtherAiServices;
 import com.odde.doughnut.services.ai.TextFromAudio;
-import com.theokanning.openai.client.OpenAiApi;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -19,17 +17,17 @@ import org.springframework.web.socket.handler.BinaryWebSocketHandler;
 
 public class AudioWebSocketHandler extends BinaryWebSocketHandler {
 
-  private final AiServiceFactory aiServiceFactory;
+  private final OtherAiServices otherAiServices;
   private final ModelFactoryService modelFactoryService;
   private final ObjectMapper objectMapper;
 
   @Autowired
   public AudioWebSocketHandler(
-      @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
+      OtherAiServices otherAiServices,
       ModelFactoryService modelFactoryService,
       ObjectMapper objectMapper) {
+    this.otherAiServices = otherAiServices;
     this.modelFactoryService = modelFactoryService;
-    this.aiServiceFactory = new AiServiceFactory(openAiApi);
     this.objectMapper = objectMapper;
   }
 
@@ -43,13 +41,11 @@ public class AudioWebSocketHandler extends BinaryWebSocketHandler {
     AudioUploadDTO audioUploadDTO = objectMapper.readValue(payload, AudioUploadDTO.class);
 
     Optional<TextFromAudio> result =
-        aiServiceFactory
-            .getOtherAiServices()
-            .getTextFromAudio(
-                audioUploadDTO.getPreviousNoteDetails(),
-                "stream.wav",
-                audioUploadDTO.getAudioData(),
-                getGlobalSettingsService().globalSettingOthers().getValue());
+        otherAiServices.getTextFromAudio(
+            audioUploadDTO.getPreviousNoteDetails(),
+            "stream.wav",
+            audioUploadDTO.getAudioData(),
+            getGlobalSettingsService().globalSettingOthers().getValue());
 
     if (result.isPresent()) {
       session.sendMessage(new TextMessage(result.get().getCompletionMarkdownFromAudio()));

@@ -8,6 +8,7 @@ import com.odde.doughnut.entities.NotebookAssistant;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorWithStorageService;
+import com.odde.doughnut.services.ai.OtherAiServices;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
@@ -25,6 +26,7 @@ import org.springframework.web.context.annotation.SessionScope;
 @RequestMapping("/api/ai")
 public class RestAiController {
 
+  private final OtherAiServices otherAiServices;
   private final UserModel currentUser;
 
   @Resource(name = "testabilitySettings")
@@ -34,9 +36,11 @@ public class RestAiController {
 
   public RestAiController(
       AiAdvisorWithStorageService aiAdvisorWithStorageService,
+      OtherAiServices otherAiServices,
       UserModel currentUser,
       TestabilitySettings testabilitySettings) {
     this.aiAdvisorWithStorageService = aiAdvisorWithStorageService;
+    this.otherAiServices = otherAiServices;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
   }
@@ -51,16 +55,12 @@ public class RestAiController {
   @Transactional
   public AiGeneratedImage generateImage(@RequestBody String prompt) {
     currentUser.assertLoggedIn();
-    return new AiGeneratedImage(
-        aiAdvisorWithStorageService.getAiServiceFactory().getOtherAiServices().getTimage(prompt));
+    return new AiGeneratedImage(otherAiServices.getTimage(prompt));
   }
 
   @GetMapping("/available-gpt-models")
   public List<String> getAvailableGptModels() {
-    return aiAdvisorWithStorageService
-        .getAiServiceFactory()
-        .getOtherAiServices()
-        .getAvailableGptModels();
+    return otherAiServices.getAvailableGptModels();
   }
 
   @PostMapping("/recreate-all-assistants")
