@@ -80,6 +80,11 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @NonNull
   private Timestamp updated_at;
 
+  @OneToOne(mappedBy = "notebook", fetch = FetchType.LAZY)
+  @JsonIgnore
+  @Getter
+  private NotebookAssistant notebookAssistant;
+
   public boolean isCertifiable() {
     return notebookCertificateApproval != null
         && notebookCertificateApproval.getLastApprovalTime() != null;

@@ -142,6 +142,7 @@ public class RestConversationMessageControllerAiReplyTests {
       notebookAssistant.setCreator(currentUser.getEntity());
       notebookAssistant.setCreatedAt(currentUTCTimestamp);
       makeMe.modelFactoryService.save(notebookAssistant);
+      makeMe.refresh(note.getNotebook());
 
       controller.getAiReply(conversation);
 

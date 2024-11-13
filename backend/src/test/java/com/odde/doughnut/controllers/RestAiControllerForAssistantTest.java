@@ -195,6 +195,7 @@ class RestAiControllerForAssistantTest {
       notebookAssistant.setCreator(currentUser.getEntity());
       notebookAssistant.setNotebook(notebook);
       makeMe.modelFactoryService.save(notebookAssistant);
+      makeMe.refresh(notebook);
       controller.recreateNotebookAssistant(notebook, notebookAssistantCreationParams);
       makeMe.refresh(notebookAssistant);
       assertThat(notebookAssistant.getAssistantId()).isEqualTo("created-assistant-id");

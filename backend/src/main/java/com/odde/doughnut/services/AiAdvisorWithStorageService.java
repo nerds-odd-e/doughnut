@@ -33,8 +33,7 @@ public final class AiAdvisorWithStorageService {
   }
 
   public AssistantService getChatAssistantServiceForNotebook(Notebook notebook) {
-    NotebookAssistant assistant =
-        modelFactoryService.notebookAssistantRepository.findByNotebook(notebook);
+    NotebookAssistant assistant = notebook.getNotebookAssistant();
     if (assistant != null) {
       return aiAdvisorService.getChatService(assistant.getAssistantId());
     }
@@ -85,8 +84,7 @@ public final class AiAdvisorWithStorageService {
 
   private NotebookAssistant updateNotebookAssistant(
       Timestamp currentUTCTimestamp, User creator, Notebook notebook, Assistant chatAssistant) {
-    NotebookAssistant notebookAssistant =
-        this.modelFactoryService.notebookAssistantRepository.findByNotebook(notebook);
+    NotebookAssistant notebookAssistant = notebook.getNotebookAssistant();
     if (notebookAssistant == null) {
       notebookAssistant = new NotebookAssistant();
       notebookAssistant.setNotebook(notebook);
