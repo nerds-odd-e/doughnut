@@ -27,7 +27,7 @@ public class GlobalSettingsService {
     return new GlobalSettingsKeyValue("others_model", DEFAULT_CHAT_MODEL, modelFactoryService);
   }
 
-  public GlobalSettingsKeyValue noteCompletionAssistantId() {
+  public GlobalSettingsKeyValue defaultAssistantId() {
     return new GlobalSettingsKeyValue(
         "note_completion_assistant", "asst_2wmumAdlmb6IL5q5sP7YINuo", modelFactoryService);
   }

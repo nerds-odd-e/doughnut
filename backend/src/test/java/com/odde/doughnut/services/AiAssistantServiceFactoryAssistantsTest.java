@@ -15,6 +15,7 @@ import com.theokanning.openai.assistants.assistant.Tool;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.function.FunctionDefinition;
 import io.reactivex.Single;
+import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -51,7 +52,8 @@ class AiAssistantServiceFactoryAssistantsTest {
       Assistant item = new Assistant();
       item.setId("1234");
       when(openAiApi.createAssistant(ArgumentMatchers.any())).thenReturn(Single.just(item));
-      aiAdvisorServiceWithStorage.recreateDefaultAssistants(makeMe.aTimestamp().please());
+      Timestamp currentUTCTimestamp = makeMe.aTimestamp().please();
+      aiAdvisorServiceWithStorage.recreateDefaultAssistant(currentUTCTimestamp);
       ArgumentCaptor<AssistantRequest> captor = ArgumentCaptor.forClass(AssistantRequest.class);
       verify(openAiApi).createAssistant(captor.capture());
       assistantRequest = captor.getValue();

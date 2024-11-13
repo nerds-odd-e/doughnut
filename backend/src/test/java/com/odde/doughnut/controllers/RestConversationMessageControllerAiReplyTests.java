@@ -122,7 +122,7 @@ public class RestConversationMessageControllerAiReplyTests {
       GlobalSettingsService globalSettingsService =
           new GlobalSettingsService(makeMe.modelFactoryService);
       globalSettingsService
-          .noteCompletionAssistantId()
+          .defaultAssistantId()
           .setKeyValue(makeMe.aTimestamp().please(), "chat-assistant");
       controller.getAiReply(conversation);
       ArgumentCaptor<RunCreateRequest> captor = ArgumentCaptor.forClass(RunCreateRequest.class);

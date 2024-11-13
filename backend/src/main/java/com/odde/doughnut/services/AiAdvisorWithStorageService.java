@@ -10,9 +10,7 @@ import com.theokanning.openai.assistants.message.Message;
 import com.theokanning.openai.client.OpenAiApi;
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -43,7 +41,7 @@ public final class AiAdvisorWithStorageService {
     if (assistant != null) {
       return assistant.getAssistantId();
     }
-    return getCompletionAssistantSettingAccessor().getValue();
+    return getDefaultAssistantSettingAccessor().getValue();
   }
 
   public AssistantService getChatAssistantServiceForNotebook(Notebook notebook) {
@@ -54,22 +52,15 @@ public final class AiAdvisorWithStorageService {
     return new GlobalSettingsService(modelFactoryService);
   }
 
-  private GlobalSettingsService.GlobalSettingsKeyValue getCompletionAssistantSettingAccessor() {
-    return getGlobalSettingsService().noteCompletionAssistantId();
+  private GlobalSettingsService.GlobalSettingsKeyValue getDefaultAssistantSettingAccessor() {
+    return getGlobalSettingsService().defaultAssistantId();
   }
 
-  public Map<String, String> recreateDefaultAssistants(Timestamp currentUTCTimestamp) {
-    Map<String, String> result = new HashMap<>();
+  public Assistant recreateDefaultAssistant(Timestamp currentUTCTimestamp) {
     String modelName = getGlobalSettingsService().globalSettingOthers().getValue();
-    Assistant completionAssistant = createCompletionAssistant(currentUTCTimestamp, modelName);
-    result.put(completionAssistant.getName(), completionAssistant.getId());
-    return result;
-  }
-
-  private Assistant createCompletionAssistant(Timestamp currentUTCTimestamp, String modelName) {
     AssistantCreationService service = aiAssistantServiceFactory.getAssistantCreationService();
     Assistant assistant = service.createDefaultAssistant(modelName, "Note details completion");
-    getCompletionAssistantSettingAccessor().setKeyValue(currentUTCTimestamp, assistant.getId());
+    getDefaultAssistantSettingAccessor().setKeyValue(currentUTCTimestamp, assistant.getId());
     return assistant;
   }
 

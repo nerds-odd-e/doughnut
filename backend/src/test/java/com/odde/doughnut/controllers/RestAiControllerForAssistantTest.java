@@ -96,7 +96,7 @@ class RestAiControllerForAssistantTest {
         assertThat(result.get("Assistant created")).isEqualTo("created-assistant-id");
         GlobalSettingsService globalSettingsService =
             new GlobalSettingsService(makeMe.modelFactoryService);
-        assertThat(globalSettingsService.noteCompletionAssistantId().getValue())
+        assertThat(globalSettingsService.defaultAssistantId().getValue())
             .isEqualTo("created-assistant-id");
       }
     }

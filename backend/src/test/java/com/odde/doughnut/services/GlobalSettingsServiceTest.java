@@ -25,7 +25,7 @@ class GlobalSettingsServiceTest {
   @Test
   void ShouldGetDefaultAssistantID() {
     GlobalSettingsService.GlobalSettingsKeyValue noteCompletionAssistantId =
-        globalSettingsService.noteCompletionAssistantId();
+        globalSettingsService.defaultAssistantId();
     assertThat(noteCompletionAssistantId.getValue()).startsWith("asst_");
   }
 }

@@ -11,10 +11,12 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorWithStorageService;
 import com.odde.doughnut.services.ai.OtherAiServices;
 import com.odde.doughnut.testability.TestabilitySettings;
+import com.theokanning.openai.assistants.assistant.Assistant;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.transaction.annotation.Transactional;
@@ -72,7 +74,10 @@ public class RestAiController {
   public Map<String, String> recreateAllAssistants() throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    return aiAdvisorWithStorageService.recreateDefaultAssistants(currentUTCTimestamp);
+    Assistant assistant = aiAdvisorWithStorageService.recreateDefaultAssistant(currentUTCTimestamp);
+    Map<String, String> result = new HashMap<>();
+    result.put(assistant.getName(), assistant.getId());
+    return result;
   }
 
   @PostMapping("/recreate-notebook-assistant/{notebook}")
