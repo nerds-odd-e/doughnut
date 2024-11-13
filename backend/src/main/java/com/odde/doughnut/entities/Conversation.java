@@ -59,4 +59,15 @@ public class Conversation extends EntityIdentifiedByIdOnly {
     this.subject.setNote(note);
     this.subjectOwnership = note.getNotebook().getOwnership();
   }
+
+  @JsonIgnore
+  public List<ConversationMessage> getUnseenMessagesByAssistant() {
+    return getConversationMessages().stream()
+        .filter(
+            msg ->
+                getLastAiAssistantThreadSync() == null
+                    || msg.getCreatedAt().after(getLastAiAssistantThreadSync()))
+        .filter(msg -> msg.getSender() != null)
+        .toList();
+  }
 }

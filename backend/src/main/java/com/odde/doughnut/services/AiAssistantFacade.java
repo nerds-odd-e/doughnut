@@ -5,6 +5,7 @@ import com.odde.doughnut.services.ai.AssistantRunService;
 import com.odde.doughnut.services.ai.AssistantService;
 import com.theokanning.openai.assistants.message.Message;
 import com.theokanning.openai.client.OpenAiApi;
+import java.sql.Timestamp;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -24,17 +25,6 @@ public final class AiAssistantFacade {
 
   public SseEmitter getAiReplyForConversation(
       Conversation conversation, ConversationService conversationService, Note note) {
-    ChatAboutNoteService chatService =
-        setupChatServiceForConversation(conversation, conversationService, note);
-    return chatService.getAIReplySSE(
-        (message -> {
-          String content = extractMessageContent(message);
-          conversationService.addMessageToConversation(conversation, null, content);
-        }));
-  }
-
-  private ChatAboutNoteService setupChatServiceForConversation(
-      Conversation conversation, ConversationService conversationService, Note note) {
     String threadId = conversation.getAiAssistantThreadId();
     AssistantService assistantService = getAssistantServiceForNotebook(note.getNotebook());
 
@@ -43,12 +33,36 @@ public final class AiAssistantFacade {
       conversationService.setConversationAiAssistantThreadId(conversation, threadId);
     }
 
-    ChatAboutNoteService chatService = new ChatAboutNoteService(threadId, assistantService);
-    chatService.sendNoteUpdateMessageIfNeeded(note, conversation);
-    chatService.sendUnsentMessagesToAI(conversation);
+    Timestamp lastAiAssistantThreadSync = conversation.getLastAiAssistantThreadSync();
+    if (lastAiAssistantThreadSync != null && note.getUpdatedAt().after(lastAiAssistantThreadSync)) {
+      assistantService.createAssistantMessage(
+          "The note content has been update:\n\n%s".formatted(note.getNoteDescription()), threadId);
+    }
+    List<ConversationMessage> unseen = conversation.getUnseenMessagesByAssistant();
+
+    if (!unseen.isEmpty()) {
+      String combinedMessage = formatUnsentMessages(unseen);
+      assistantService.createUserMessage(combinedMessage, threadId);
+    }
     conversationService.updateLastAiAssistantThreadSync(conversation);
 
-    return chatService;
+    return assistantService.getRunStreamAsSSE(
+        (message -> {
+          String content = extractMessageContent(message);
+          conversationService.addMessageToConversation(conversation, null, content);
+        }),
+        threadId);
+  }
+
+  public static String formatUnsentMessages(List<ConversationMessage> messages) {
+    StringBuilder combined = new StringBuilder();
+    for (ConversationMessage msg : messages) {
+      combined.append(String.format("user `%s` says:%n", msg.getSender().getName()));
+      combined.append("-----------------\n");
+      combined.append(msg.getMessage());
+      combined.append("\n\n");
+    }
+    return combined.toString();
   }
 
   private static String extractMessageContent(Message message) {
