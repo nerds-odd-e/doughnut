@@ -46,11 +46,11 @@ dependencies {
   implementation 'com.squareup.retrofit2:adapter-rxjava3:2.11.0'
   implementation 'com.squareup.retrofit2:converter-jackson:2.11.0'
   implementation 'com.vladsch.flexmark:flexmark-all:0.64.8'
-  compileOnly 'org.projectlombok:lombok'
+  compileOnly 'org.projectlombok:lombok:1.18.34'
+  annotationProcessor 'org.projectlombok:lombok:1.18.34'
   developmentOnly 'org.springframework.boot:spring-boot-devtools'
   runtimeOnly 'com.mysql:mysql-connector-j:9.0.0'
   annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-  annotationProcessor 'org.projectlombok:lombok'
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
   testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
