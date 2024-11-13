@@ -10,8 +10,8 @@ import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.NotebookAssistant;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.AiAssistantFacade;
 import com.odde.doughnut.services.GlobalSettingsService;
+import com.odde.doughnut.services.ai.AssistantCreationService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.assistants.assistant.Assistant;
@@ -46,20 +46,20 @@ class RestAiAssistantCreationControllerTest {
   @Mock OpenAiApi openAiApi;
   @Autowired MakeMe makeMe;
   TestabilitySettings testabilitySettings = new TestabilitySettings();
-  AiAssistantFacade aiAssistantFacade;
 
   @BeforeEach
   void Setup() {
-    GlobalSettingsService globalSettingsService =
-        new GlobalSettingsService(makeMe.modelFactoryService);
-    aiAssistantFacade = new AiAssistantFacade(openAiApi, globalSettingsService);
     currentUser = makeMe.anAdmin().toModelPlease();
     controller = createController(currentUser);
   }
 
   private RestAiAssistantCreationController createController(UserModel user) {
     return new RestAiAssistantCreationController(
-        makeMe.modelFactoryService, aiAssistantFacade, user, testabilitySettings);
+        new AssistantCreationService(openAiApi),
+        new GlobalSettingsService(makeMe.modelFactoryService),
+        makeMe.modelFactoryService,
+        user,
+        testabilitySettings);
   }
 
   // Move relevant tests from RestAiControllerTest here

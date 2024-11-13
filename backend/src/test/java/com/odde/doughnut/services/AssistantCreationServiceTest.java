@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.odde.doughnut.services.ai.AssistantCreationService;
 import com.odde.doughnut.services.ai.tools.AiToolName;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
@@ -15,7 +16,6 @@ import com.theokanning.openai.assistants.assistant.Tool;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.function.FunctionDefinition;
 import io.reactivex.Single;
-import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -28,9 +28,9 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class AiAssistantServiceFactoryAssistantsTest {
+class AssistantCreationServiceTest {
 
-  private AiAssistantFacade aiAdvisorServiceWithStorage;
+  private AssistantCreationService assistantCreationService;
   @Autowired MakeMe makeMe;
   @Mock private OpenAiApi openAiApi;
   OpenAIChatCompletionMock openAIChatCompletionMock;
@@ -39,9 +39,7 @@ class AiAssistantServiceFactoryAssistantsTest {
   void Setup() {
     MockitoAnnotations.openMocks(this);
     openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
-    GlobalSettingsService globalSettingsService =
-        new GlobalSettingsService(makeMe.modelFactoryService);
-    aiAdvisorServiceWithStorage = new AiAssistantFacade(openAiApi, globalSettingsService);
+    assistantCreationService = new AssistantCreationService(openAiApi);
   }
 
   @Nested
@@ -53,8 +51,8 @@ class AiAssistantServiceFactoryAssistantsTest {
       Assistant item = new Assistant();
       item.setId("1234");
       when(openAiApi.createAssistant(ArgumentMatchers.any())).thenReturn(Single.just(item));
-      Timestamp currentUTCTimestamp = makeMe.aTimestamp().please();
-      aiAdvisorServiceWithStorage.recreateDefaultAssistant(currentUTCTimestamp);
+      String modelName = "model-name";
+      assistantCreationService.createDefaultAssistant(modelName, "Note details completion");
       ArgumentCaptor<AssistantRequest> captor = ArgumentCaptor.forClass(AssistantRequest.class);
       verify(openAiApi).createAssistant(captor.capture());
       assistantRequest = captor.getValue();

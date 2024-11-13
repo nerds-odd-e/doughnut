@@ -1,14 +1,10 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.services.ai.AssistantCreationService;
 import com.odde.doughnut.services.ai.AssistantRunService;
 import com.odde.doughnut.services.ai.AssistantService;
-import com.theokanning.openai.assistants.assistant.Assistant;
 import com.theokanning.openai.assistants.message.Message;
 import com.theokanning.openai.client.OpenAiApi;
-import java.io.IOException;
-import java.sql.Timestamp;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -24,22 +20,6 @@ public final class AiAssistantFacade {
       GlobalSettingsService globalSettingsService) {
     this.aiAssistantServiceFactory = new AiAssistantServiceFactory(openAiApi);
     this.globalSettingsService = globalSettingsService;
-  }
-
-  public Assistant recreateDefaultAssistant(Timestamp currentUTCTimestamp) {
-    String modelName = getModelName();
-    AssistantCreationService service = aiAssistantServiceFactory.getAssistantCreationService();
-    Assistant assistant = service.createDefaultAssistant(modelName, "Note details completion");
-    getDefaultAssistantSettingAccessor().setKeyValue(currentUTCTimestamp, assistant.getId());
-    return assistant;
-  }
-
-  public NotebookAssistant recreateNotebookAssistant(
-      Timestamp currentUTCTimestamp, User creator, Notebook notebook, String additionalInstruction)
-      throws IOException {
-    AssistantCreationService service = aiAssistantServiceFactory.getAssistantCreationService();
-    return service.recreateNotebookAssistant(
-        currentUTCTimestamp, creator, notebook, additionalInstruction, getModelName());
   }
 
   public SseEmitter getAiReplyForConversation(
@@ -118,9 +98,5 @@ public final class AiAssistantFacade {
 
   private AssistantService getAssistantServiceForNotebook(Notebook notebook) {
     return aiAssistantServiceFactory.getAssistantService(getAssistantIdForNotebook(notebook));
-  }
-
-  private String getModelName() {
-    return globalSettingsService.globalSettingOthers().getValue();
   }
 }

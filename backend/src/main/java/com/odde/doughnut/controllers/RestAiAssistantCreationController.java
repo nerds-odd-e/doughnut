@@ -6,7 +6,8 @@ import com.odde.doughnut.entities.NotebookAssistant;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.AiAssistantFacade;
+import com.odde.doughnut.services.GlobalSettingsService;
+import com.odde.doughnut.services.ai.AssistantCreationService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.assistants.assistant.Assistant;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -22,19 +23,22 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/ai/assistant")
 public class RestAiAssistantCreationController {
   private final UserModel currentUser;
+  private final AssistantCreationService assistantCreationService;
+  private final GlobalSettingsService globalSettingsService;
   private final ModelFactoryService modelFactoryService;
-  private final AiAssistantFacade aiAssistantFacade;
 
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
   public RestAiAssistantCreationController(
+      AssistantCreationService assistantCreationService,
+      GlobalSettingsService globalSettingsService,
       ModelFactoryService modelFactoryService,
-      AiAssistantFacade aiAssistantFacade,
       UserModel currentUser,
       TestabilitySettings testabilitySettings) {
+    this.assistantCreationService = assistantCreationService;
+    this.globalSettingsService = globalSettingsService;
     this.modelFactoryService = modelFactoryService;
-    this.aiAssistantFacade = aiAssistantFacade;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
   }
@@ -44,7 +48,10 @@ public class RestAiAssistantCreationController {
   public Map<String, String> recreateDefaultAssistant() throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    Assistant assistant = aiAssistantFacade.recreateDefaultAssistant(currentUTCTimestamp);
+    String modelName = getModelName();
+    Assistant assistant =
+        assistantCreationService.createDefaultAssistant(modelName, "Note details completion");
+    globalSettingsService.defaultAssistantId().setKeyValue(currentUTCTimestamp, assistant.getId());
     Map<String, String> result = new HashMap<>();
     result.put(assistant.getName(), assistant.getId());
     return result;
@@ -59,12 +66,17 @@ public class RestAiAssistantCreationController {
     currentUser.assertAdminAuthorization();
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     NotebookAssistant notebookAssistant =
-        aiAssistantFacade.recreateNotebookAssistant(
+        assistantCreationService.recreateNotebookAssistant(
             currentUTCTimestamp,
             currentUser.getEntity(),
             notebook,
-            notebookAssistantCreationParams.getAdditionalInstruction());
+            notebookAssistantCreationParams.getAdditionalInstruction(),
+            getModelName());
     this.modelFactoryService.save(notebookAssistant);
     return notebookAssistant;
+  }
+
+  private String getModelName() {
+    return globalSettingsService.globalSettingOthers().getValue();
   }
 }

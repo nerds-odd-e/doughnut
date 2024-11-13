@@ -5,20 +5,25 @@ import com.odde.doughnut.entities.NotebookAssistant;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiTool;
+import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.assistants.assistant.*;
+import com.theokanning.openai.client.OpenAiApi;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 
+@Service
 public class AssistantCreationService {
   protected final OpenAiApiHandler openAiApiHandler;
   protected final List<AiTool> tools;
 
-  public AssistantCreationService(OpenAiApiHandler openAiApiHandler, List<AiTool> tools) {
-    this.openAiApiHandler = openAiApiHandler;
-    this.tools = tools;
+  public AssistantCreationService(@Qualifier("testableOpenAiApi") OpenAiApi openAiApi) {
+    this.openAiApiHandler = new OpenAiApiHandler(openAiApi);
+    this.tools = AiToolFactory.getAllAssistantTools();
   }
 
   public Assistant createDefaultAssistant(String modelName, String assistantName) {

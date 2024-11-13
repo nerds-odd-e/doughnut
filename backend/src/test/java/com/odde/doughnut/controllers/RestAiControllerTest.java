@@ -20,7 +20,6 @@ import com.odde.doughnut.services.ai.tools.AiToolName;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIAssistantMocker;
 import com.odde.doughnut.testability.OpenAIAssistantThreadMocker;
-import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.OpenAiResponse;
 import com.theokanning.openai.assistants.run.Run;
 import com.theokanning.openai.client.OpenAiApi;
@@ -47,12 +46,10 @@ import org.springframework.web.server.ResponseStatusException;
 class RestAiControllerTest {
   RestAiController controller;
   UserModel currentUser;
-  AssessmentQuestionInstance assessmentQuestionInstance;
 
   Note note;
   @Mock OpenAiApi openAiApi;
   @Autowired MakeMe makeMe;
-  TestabilitySettings testabilitySettings = new TestabilitySettings();
   AiAssistantFacade aiAssistantFacade;
 
   @BeforeEach
@@ -63,12 +60,7 @@ class RestAiControllerTest {
     currentUser = makeMe.aUser().toModelPlease();
     note = makeMe.aNote().please();
     controller =
-        new RestAiController(
-            makeMe.modelFactoryService,
-            aiAssistantFacade,
-            new OtherAiServices(openAiApi),
-            currentUser,
-            testabilitySettings);
+        new RestAiController(aiAssistantFacade, new OtherAiServices(openAiApi), currentUser);
   }
 
   @Nested
@@ -86,11 +78,9 @@ class RestAiControllerTest {
           ResponseStatusException.class,
           () ->
               new RestAiController(
-                      makeMe.modelFactoryService,
                       aiAssistantFacade,
                       new OtherAiServices(openAiApi),
-                      makeMe.aNullUserModelPlease(),
-                      testabilitySettings)
+                      makeMe.aNullUserModelPlease())
                   .generateImage("create an image"));
     }
 
@@ -189,11 +179,7 @@ class RestAiControllerTest {
     void shouldRequireUserToBeLoggedIn() {
       controller =
           new RestAiController(
-              makeMe.modelFactoryService,
-              aiAssistantFacade,
-              new OtherAiServices(openAiApi),
-              makeMe.aNullUserModelPlease(),
-              testabilitySettings);
+              aiAssistantFacade, new OtherAiServices(openAiApi), makeMe.aNullUserModelPlease());
 
       assertThrows(
           ResponseStatusException.class, () -> controller.cancelRun("thread-123", "run-123"));
@@ -243,11 +229,7 @@ class RestAiControllerTest {
     void shouldRequireUserToBeLoggedIn() {
       controller =
           new RestAiController(
-              makeMe.modelFactoryService,
-              aiAssistantFacade,
-              new OtherAiServices(openAiApi),
-              makeMe.aNullUserModelPlease(),
-              testabilitySettings);
+              aiAssistantFacade, new OtherAiServices(openAiApi), makeMe.aNullUserModelPlease());
 
       assertThrows(ResponseStatusException.class, () -> controller.suggestTopicTitle(testNote));
     }

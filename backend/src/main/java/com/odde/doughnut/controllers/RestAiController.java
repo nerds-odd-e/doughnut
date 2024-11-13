@@ -4,13 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAssistantFacade;
 import com.odde.doughnut.services.ai.OtherAiServices;
-import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.annotation.Resource;
 import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
@@ -24,24 +21,13 @@ public class RestAiController {
 
   private final OtherAiServices otherAiServices;
   private final UserModel currentUser;
-
-  @Resource(name = "testabilitySettings")
-  private final TestabilitySettings testabilitySettings;
-
-  private final ModelFactoryService modelFactoryService;
   private final AiAssistantFacade aiAssistantFacade;
 
   public RestAiController(
-      ModelFactoryService modelFactoryService,
-      AiAssistantFacade aiAssistantFacade,
-      OtherAiServices otherAiServices,
-      UserModel currentUser,
-      TestabilitySettings testabilitySettings) {
-    this.modelFactoryService = modelFactoryService;
+      AiAssistantFacade aiAssistantFacade, OtherAiServices otherAiServices, UserModel currentUser) {
     this.aiAssistantFacade = aiAssistantFacade;
     this.otherAiServices = otherAiServices;
     this.currentUser = currentUser;
-    this.testabilitySettings = testabilitySettings;
   }
 
   @GetMapping("/dummy")
