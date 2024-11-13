@@ -6,6 +6,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.NotebookAssistant;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorWithStorageService;
 import com.odde.doughnut.services.ai.OtherAiServices;
@@ -32,13 +33,16 @@ public class RestAiController {
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
+  private final ModelFactoryService modelFactoryService;
   private final AiAdvisorWithStorageService aiAdvisorWithStorageService;
 
   public RestAiController(
+    ModelFactoryService modelFactoryService,
       AiAdvisorWithStorageService aiAdvisorWithStorageService,
       OtherAiServices otherAiServices,
       UserModel currentUser,
       TestabilitySettings testabilitySettings) {
+    this.modelFactoryService = modelFactoryService;
     this.aiAdvisorWithStorageService = aiAdvisorWithStorageService;
     this.otherAiServices = otherAiServices;
     this.currentUser = currentUser;
@@ -79,11 +83,13 @@ public class RestAiController {
       throws UnexpectedNoAccessRightException, IOException {
     currentUser.assertAdminAuthorization();
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    return aiAdvisorWithStorageService.recreateNotebookAssistant(
-        currentUTCTimestamp,
-        currentUser.getEntity(),
-        notebook,
-        notebookAssistantCreationParams.getAdditionalInstruction());
+    NotebookAssistant notebookAssistant = aiAdvisorWithStorageService.recreateNotebookAssistant(
+      currentUTCTimestamp,
+      currentUser.getEntity(),
+      notebook,
+      notebookAssistantCreationParams.getAdditionalInstruction());
+    this.modelFactoryService.save(notebookAssistant);
+    return notebookAssistant;
   }
 
   @PostMapping("/submit-tool-result/{threadId}/{runId}/{toolCallId}")

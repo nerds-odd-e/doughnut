@@ -98,7 +98,6 @@ public final class AiAdvisorWithStorageService {
     notebookAssistant.setCreator(creator);
     notebookAssistant.setCreatedAt(currentUTCTimestamp);
     notebookAssistant.setAssistantId(chatAssistant.getId());
-    this.modelFactoryService.save(notebookAssistant);
     return notebookAssistant;
   }
 

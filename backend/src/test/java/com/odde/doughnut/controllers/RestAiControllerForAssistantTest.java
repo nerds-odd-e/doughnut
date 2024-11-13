@@ -59,6 +59,7 @@ class RestAiControllerForAssistantTest {
     note = makeMe.aNote().please();
     controller =
         new RestAiController(
+          makeMe.modelFactoryService,
             aiAdvisorWithStorageService,
             new OtherAiServices(openAiApi),
             currentUser,
@@ -83,6 +84,7 @@ class RestAiControllerForAssistantTest {
       void authentication() {
         controller =
             new RestAiController(
+              makeMe.modelFactoryService,
                 aiAdvisorWithStorageService,
                 new OtherAiServices(openAiApi),
                 makeMe.aUser().toModelPlease(),
@@ -140,6 +142,7 @@ class RestAiControllerForAssistantTest {
     void authentication() {
       controller =
           new RestAiController(
+            makeMe.modelFactoryService,
               aiAdvisorWithStorageService,
               new OtherAiServices(openAiApi),
               makeMe.aUser().toModelPlease(),
