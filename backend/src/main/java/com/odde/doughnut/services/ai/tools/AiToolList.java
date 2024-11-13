@@ -3,10 +3,11 @@ package com.odde.doughnut.services.ai.tools;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.theokanning.openai.function.FunctionDefinition;
 import java.util.*;
+import lombok.Getter;
 
 public class AiToolList {
   final Map<String, FunctionDefinition> functions = new HashMap<>();
-  private String messageBody;
+  @Getter private String messageBody;
 
   public AiToolList(String message, List<FunctionDefinition> functions) {
     this.messageBody = message;

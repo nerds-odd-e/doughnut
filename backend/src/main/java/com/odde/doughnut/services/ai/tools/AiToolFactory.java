@@ -87,11 +87,14 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
         """
             You are a helpful assistant for converting audio transcription in SRT format to text of paragraphs. Your task is to convert the following audio transcription to text with meaningful punctuations and paragraphs.
              * fix obvious audio transcription mistakes.
-             * Do not translate the text to another language.
+             * Do not translate the text to another language (unless asked to).
              * If the transcription is not clear, leave the text as it is.
              * Don't add any additional information than what is in the transcription.
              * the completionMarkdownFromAudio is to be appended after the previousTrailingNoteDetails, so add necessary white space or new line at the beginning to connect to existing text.
              * The context should be in markdown format.
+
+             Here's the transcription from audio:
+             ------------
             """
             + transcriptionFromAudio,
         List.of(

@@ -158,8 +158,7 @@ class RestAiAudioControllerTests {
                         equalTo(note.getNoteDescription()));
                     assertThat(
                         request.getMessages().get(2).getContent().toString(),
-                        containsString(
-                            "Please convert this audio transcription to an article: test transcription"));
+                        containsString("test transcription"));
                     return true;
                   }));
       assertNotNull(result);
