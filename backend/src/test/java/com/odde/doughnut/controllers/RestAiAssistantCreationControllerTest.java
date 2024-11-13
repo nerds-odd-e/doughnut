@@ -1,7 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import com.odde.doughnut.controllers.dto.NotebookAssistantCreationParams;
@@ -12,7 +12,6 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAssistantFacade;
 import com.odde.doughnut.services.GlobalSettingsService;
-import com.odde.doughnut.services.ai.OtherAiServices;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.assistants.assistant.Assistant;
@@ -41,24 +40,13 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class RestAiControllerForAssistantTest {
-  RestAiController controller;
+class RestAiAssistantCreationControllerTest {
+  RestAiAssistantCreationController controller;
   UserModel currentUser;
-
-  Note note;
   @Mock OpenAiApi openAiApi;
   @Autowired MakeMe makeMe;
   TestabilitySettings testabilitySettings = new TestabilitySettings();
   AiAssistantFacade aiAssistantFacade;
-
-  private RestAiController createController(UserModel user) {
-    return new RestAiController(
-        makeMe.modelFactoryService,
-        aiAssistantFacade,
-        new OtherAiServices(openAiApi),
-        user,
-        testabilitySettings);
-  }
 
   @BeforeEach
   void Setup() {
@@ -66,10 +54,15 @@ class RestAiControllerForAssistantTest {
         new GlobalSettingsService(makeMe.modelFactoryService);
     aiAssistantFacade = new AiAssistantFacade(openAiApi, globalSettingsService);
     currentUser = makeMe.anAdmin().toModelPlease();
-    note = makeMe.aNote().please();
     controller = createController(currentUser);
   }
 
+  private RestAiAssistantCreationController createController(UserModel user) {
+    return new RestAiAssistantCreationController(
+        makeMe.modelFactoryService, aiAssistantFacade, user, testabilitySettings);
+  }
+
+  // Move relevant tests from RestAiControllerTest here
   @Nested
   class CreateDefaultAssistants {
 
@@ -88,12 +81,12 @@ class RestAiControllerForAssistantTest {
       void authentication() {
         controller = createController(makeMe.aUser().toModelPlease());
         assertThrows(
-            UnexpectedNoAccessRightException.class, () -> controller.recreateAllAssistants());
+            UnexpectedNoAccessRightException.class, () -> controller.recreateDefaultAssistant());
       }
 
       @Test
       void createCompletionAssistant() throws UnexpectedNoAccessRightException {
-        Map<String, String> result = controller.recreateAllAssistants();
+        Map<String, String> result = controller.recreateDefaultAssistant();
         assertThat(result.get("Assistant created")).isEqualTo("created-assistant-id");
         GlobalSettingsService globalSettingsService =
             new GlobalSettingsService(makeMe.modelFactoryService);
@@ -112,7 +105,7 @@ class RestAiControllerForAssistantTest {
 
     @BeforeEach
     public void setup() {
-      notebook = note.getNotebook();
+      notebook = makeMe.aNotebook().please();
       Assistant assistantToReturn = new Assistant();
       assistantToReturn.setId("created-assistant-id");
       assistantToReturn.setName("Assistant created");

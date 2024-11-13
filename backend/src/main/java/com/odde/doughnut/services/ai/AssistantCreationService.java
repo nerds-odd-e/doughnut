@@ -32,24 +32,6 @@ public class AssistantCreationService {
     return openAiApiHandler.createAssistant(assistantRequest);
   }
 
-  private Assistant createAssistantWithFile(
-      String modelName, String assistantName, String textContent, String additionalInstruction)
-      throws IOException {
-    ToolResources tooResources = uploadToolResources(assistantName, textContent);
-    List<Tool> toolList = new ArrayList<>(tools.stream().map(AiTool::getTool).toList());
-    toolList.add(new FileSearchTool());
-    AssistantRequest assistantRequest =
-        AssistantRequest.builder()
-            .model(modelName)
-            .name(assistantName)
-            .toolResources(tooResources)
-            .instructions(
-                OpenAIChatRequestBuilder.systemInstruction + "\n\n" + additionalInstruction)
-            .tools(toolList)
-            .build();
-    return openAiApiHandler.createAssistant(assistantRequest);
-  }
-
   private ToolResources uploadToolResources(String assistantName, String textContent)
       throws IOException {
     String fileId =
@@ -70,12 +52,21 @@ public class AssistantCreationService {
       String modelName)
       throws IOException {
     String fileContent = notebook.getNotebookDump();
-    Assistant notebookAssistant =
-        createAssistantWithFile(
-            modelName,
-            "Assistant for notebook %s".formatted(notebook.getHeadNote().getTopicConstructor()),
-            fileContent,
-            additionalInstruction);
+    String assistantName =
+        "Assistant for notebook %s".formatted(notebook.getHeadNote().getTopicConstructor());
+    ToolResources tooResources = uploadToolResources(assistantName, fileContent);
+    List<Tool> toolList = new ArrayList<>(tools.stream().map(AiTool::getTool).toList());
+    toolList.add(new FileSearchTool());
+    AssistantRequest assistantRequest =
+        AssistantRequest.builder()
+            .model(modelName)
+            .name(assistantName)
+            .toolResources(tooResources)
+            .instructions(
+                OpenAIChatRequestBuilder.systemInstruction + "\n\n" + additionalInstruction)
+            .tools(toolList)
+            .build();
+    Assistant notebookAssistant = openAiApiHandler.createAssistant(assistantRequest);
     return notebook.buildOrEditNotebookAssistant(
         currentUTCTimestamp, creator, notebookAssistant.getId());
   }

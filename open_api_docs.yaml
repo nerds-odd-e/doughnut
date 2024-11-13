@@ -1948,56 +1948,6 @@ paths:
                 type: string
         "200":
           description: OK
-  /api/ai/recreate-notebook-assistant/{notebook}:
-    post:
-      tags:
-      - rest-ai-controller
-      operationId: recreateNotebookAssistant
-      parameters:
-      - name: notebook
-        in: path
-        required: true
-        schema:
-          type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/NotebookAssistantCreationParams"
-        required: true
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/NotebookAssistant"
-  /api/ai/recreate-all-assistants:
-    post:
-      tags:
-      - rest-ai-controller
-      operationId: recreateAllAssistants
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: object
-                additionalProperties:
-                  type: string
   /api/ai/generate-image:
     post:
       tags:
@@ -2047,6 +1997,56 @@ paths:
                 type: string
         "200":
           description: OK
+  /api/ai/assistant/recreate-notebook/{notebook}:
+    post:
+      tags:
+      - rest-ai-assistant-creation-controller
+      operationId: recreateNotebookAssistant
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NotebookAssistantCreationParams"
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/NotebookAssistant"
+  /api/ai/assistant/recreate-default:
+    post:
+      tags:
+      - rest-ai-assistant-creation-controller
+      operationId: recreateDefaultAssistant
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
   /api/user/{user}:
     patch:
       tags:
@@ -3788,6 +3788,11 @@ components:
       properties:
         status:
           type: string
+    AiGeneratedImage:
+      type: object
+      properties:
+        b64encoded:
+          type: string
     NotebookAssistantCreationParams:
       type: object
       properties:
@@ -3814,11 +3819,6 @@ components:
         createdAt:
           type: string
           format: date-time
-    AiGeneratedImage:
-      type: object
-      properties:
-        b64encoded:
-          type: string
     UserDTO:
       required:
       - name

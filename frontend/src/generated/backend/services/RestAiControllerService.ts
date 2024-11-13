@@ -4,8 +4,6 @@
 /* eslint-disable */
 import type { AiGeneratedImage } from '../models/AiGeneratedImage';
 import type { DummyForGeneratingTypes } from '../models/DummyForGeneratingTypes';
-import type { NotebookAssistant } from '../models/NotebookAssistant';
-import type { NotebookAssistantCreationParams } from '../models/NotebookAssistantCreationParams';
 import type { SuggestedTopicDTO } from '../models/SuggestedTopicDTO';
 import type { ToolCallResult } from '../models/ToolCallResult';
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -55,42 +53,6 @@ export class RestAiControllerService {
             },
             body: requestBody,
             mediaType: 'application/json',
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * @param notebook
-     * @param requestBody
-     * @returns NotebookAssistant OK
-     * @throws ApiError
-     */
-    public recreateNotebookAssistant(
-        notebook: number,
-        requestBody: NotebookAssistantCreationParams,
-    ): CancelablePromise<NotebookAssistant> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/api/ai/recreate-notebook-assistant/{notebook}',
-            path: {
-                'notebook': notebook,
-            },
-            body: requestBody,
-            mediaType: 'application/json',
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * @returns string OK
-     * @throws ApiError
-     */
-    public recreateAllAssistants(): CancelablePromise<Record<string, string>> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/api/ai/recreate-all-assistants',
             errors: {
                 500: `Internal Server Error`,
             },

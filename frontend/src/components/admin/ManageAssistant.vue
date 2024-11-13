@@ -1,5 +1,5 @@
 <template>
-  <button @click="recreateAllAssistants">Recreate All Assistants</button>
+  <button @click="recreateAllAssistants">Recreate Default Assistant</button>
   <div v-if="assistants">
     <div v-for="(assistant, assistantId) in assistants" :key="assistantId">
       <label
@@ -18,6 +18,7 @@ const { managedApi } = useLoadingApi()
 const assistants = ref<Record<string, string> | undefined>(undefined)
 
 const recreateAllAssistants = async () => {
-  assistants.value = await managedApi.restAiController.recreateAllAssistants()
+  assistants.value =
+    await managedApi.restAiAssistantCreationController.recreateDefaultAssistant()
 }
 </script>

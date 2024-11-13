@@ -138,6 +138,7 @@ export type { WikidataAssociationCreation } from './models/WikidataAssociationCr
 export type { WikidataEntityData } from './models/WikidataEntityData';
 export type { WikidataSearchEntity } from './models/WikidataSearchEntity';
 
+export { RestAiAssistantCreationControllerService } from './services/RestAiAssistantCreationControllerService';
 export { RestAiAudioControllerService } from './services/RestAiAudioControllerService';
 export { RestAiControllerService } from './services/RestAiControllerService';
 export { RestAssessmentControllerService } from './services/RestAssessmentControllerService';
