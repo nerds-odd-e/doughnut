@@ -102,7 +102,10 @@ public class RestAiController {
   @Transactional
   public void cancelRun(@PathVariable String threadId, @PathVariable String runId) {
     currentUser.assertLoggedIn();
-    aiAdvisorWithStorageService.getAiAdvisorService().cancelRun(threadId, runId);
+    aiAdvisorWithStorageService
+        .getAiAdvisorService()
+        .getAssistantRunService(threadId, runId)
+        .cancelRun();
   }
 
   @PostMapping("/suggest-topic-title/{note}")

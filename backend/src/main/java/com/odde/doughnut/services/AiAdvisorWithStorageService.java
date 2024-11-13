@@ -42,7 +42,7 @@ public final class AiAdvisorWithStorageService {
   }
 
   public AssistantService getChatAssistantServiceForNotebook(Notebook notebook) {
-    return aiAdvisorService.getChatService(getChatAssistantIdForNotebook(notebook));
+    return aiAdvisorService.getAssistantService(getChatAssistantIdForNotebook(notebook));
   }
 
   private GlobalSettingsService getGlobalSettingsService() {
@@ -62,7 +62,7 @@ public final class AiAdvisorWithStorageService {
   }
 
   private Assistant createCompletionAssistant(Timestamp currentUTCTimestamp, String modelName) {
-    AssistantCreationService service = aiAdvisorService.getAsisstantCreationService();
+    AssistantCreationService service = aiAdvisorService.getAssistantCreationService();
     Assistant assistant = service.createDefaultAssistant(modelName, "Note details completion");
     getCompletionAssistantSettingAccessor().setKeyValue(currentUTCTimestamp, assistant.getId());
     return assistant;
@@ -71,7 +71,7 @@ public final class AiAdvisorWithStorageService {
   public NotebookAssistant recreateNotebookAssistant(
       Timestamp currentUTCTimestamp, User creator, Notebook notebook, String additionalInstruction)
       throws IOException {
-    AssistantCreationService service = aiAdvisorService.getAsisstantCreationService();
+    AssistantCreationService service = aiAdvisorService.getAssistantCreationService();
     String modelName = getGlobalSettingsService().globalSettingOthers().getValue();
     String fileContent = notebook.getNotebookDump();
     Assistant chatAssistant =
@@ -183,6 +183,6 @@ public final class AiAdvisorWithStorageService {
   public void submitToolOutputs(
       String threadId, String runId, String toolCallId, ToolCallResult result)
       throws JsonProcessingException {
-    aiAdvisorService.submitToolOutputs(threadId, runId, toolCallId, result);
+    aiAdvisorService.getAssistantRunService(threadId, runId).submitToolOutputs(toolCallId, result);
   }
 }

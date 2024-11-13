@@ -1,18 +1,16 @@
 package com.odde.doughnut.services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.odde.doughnut.controllers.dto.ToolCallResult;
 import com.odde.doughnut.services.ai.*;
+import com.odde.doughnut.services.ai.AssistantRunService;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
-import com.theokanning.openai.assistants.run.Run;
 import com.theokanning.openai.client.OpenAiApi;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AiAdvisorService {
-  private final OpenAiApiHandler openAiApiHandler;
+  protected final OpenAiApiHandler openAiApiHandler;
 
   public AiAdvisorService(@Qualifier("testableOpenAiApi") OpenAiApi openAiApi) {
     openAiApiHandler = new OpenAiApiHandler(openAiApi);
@@ -22,21 +20,15 @@ public class AiAdvisorService {
     return new OtherAiServices(openAiApiHandler);
   }
 
-  public AssistantService getChatService(String assistantId) {
+  public AssistantService getAssistantService(String assistantId) {
     return new AssistantService(openAiApiHandler, assistantId);
   }
 
-  public void submitToolOutputs(
-      String threadId, String runId, String toolCallId, ToolCallResult result)
-      throws JsonProcessingException {
-    openAiApiHandler.submitToolOutputs(threadId, runId, toolCallId, result);
+  public AssistantRunService getAssistantRunService(String threadId, String runId) {
+    return new AssistantRunService(openAiApiHandler, threadId, runId);
   }
 
-  public Run cancelRun(String threadId, String runId) {
-    return openAiApiHandler.cancelRun(threadId, runId);
-  }
-
-  public AssistantCreationService getAsisstantCreationService() {
+  public AssistantCreationService getAssistantCreationService() {
     return new AssistantCreationService(openAiApiHandler, AiToolFactory.getAllAssistantTools());
   }
 }
