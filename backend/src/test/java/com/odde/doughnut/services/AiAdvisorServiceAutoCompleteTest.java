@@ -59,7 +59,8 @@ class AiAdvisorServiceAutoCompleteTest {
       openAIAssistantThreadMocker
           .mockCreateRunInProcess("my-run-id")
           .aRunThatRequireAction(
-              new NoteDetailsCompletion(" must come down"), AiToolName.COMPLETE_NOTE_DETAILS.getValue())
+              new NoteDetailsCompletion(" must come down"),
+              AiToolName.COMPLETE_NOTE_DETAILS.getValue())
           .mockRetrieveRun();
       assertEquals(" must come down", getAiCompletionAndResult("what goes up"));
     }

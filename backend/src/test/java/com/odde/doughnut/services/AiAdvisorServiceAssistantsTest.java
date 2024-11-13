@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.odde.doughnut.services.ai.tools.AiToolName;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.theokanning.openai.assistants.assistant.Assistant;
@@ -71,7 +72,7 @@ class AiAdvisorServiceAssistantsTest {
       assertThat(tool, instanceOf(FunctionTool.class));
       FunctionTool functionTool = (FunctionTool) tool;
       FunctionDefinition functionDefinition = (FunctionDefinition) functionTool.getFunction();
-      assertThat(functionDefinition.getName(), is("complete_note_details"));
+      assertThat(functionDefinition.getName(), is(AiToolName.COMPLETE_NOTE_DETAILS.getValue()));
       //      assertThat(functionDefinition.getStrict(), is(true));
     }
   }

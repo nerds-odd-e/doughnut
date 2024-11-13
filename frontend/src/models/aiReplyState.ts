@@ -1,11 +1,12 @@
-import type {
-  Message,
-  MessageDelta,
-  Run,
-  RunStep,
-  DeltaOfRunStep,
-  NoteDetailsCompletion,
-  TopicTitleReplacement,
+import {
+  type Message,
+  type MessageDelta,
+  type Run,
+  type RunStep,
+  type DeltaOfRunStep,
+  type NoteDetailsCompletion,
+  type TopicTitleReplacement,
+  DummyForGeneratingTypes,
 } from "@/generated/backend"
 
 export type AiReplyState = {
@@ -60,7 +61,10 @@ export const createAiReplyStates = (
           toolCall.function!.arguments as unknown as string
         )
 
-        if (toolCall.function!.name === "complete_note_details") {
+        if (
+          toolCall.function!.name ===
+          DummyForGeneratingTypes.aiToolName.COMPLETE_NOTE_DETAILS
+        ) {
           const contentToAppend = functionArgs as NoteDetailsCompletion
           await context.appendNoteDetails(
             contentToAppend!.completion,
@@ -68,7 +72,10 @@ export const createAiReplyStates = (
             response.id!,
             toolCall.id!
           )
-        } else if (toolCall.function!.name === "suggest_note_topic_title") {
+        } else if (
+          toolCall.function!.name ===
+          DummyForGeneratingTypes.aiToolName.SUGGEST_TOPIC_TITLE
+        ) {
           const titleGeneration = functionArgs as TopicTitleReplacement
           await context.setTopicTitle(
             titleGeneration.newTopic,

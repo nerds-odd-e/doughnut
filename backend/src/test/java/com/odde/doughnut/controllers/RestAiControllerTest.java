@@ -15,7 +15,6 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorService;
 import com.odde.doughnut.services.AiAdvisorWithStorageService;
 import com.odde.doughnut.services.ai.TopicTitleReplacement;
-import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.ai.tools.AiToolName;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIAssistantMocker;

@@ -2,11 +2,12 @@ import { expect, vi } from "vitest"
 import ConversationInner from "@/components/conversations/ConversationInner.vue"
 import helper from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
-import type {
-  ConversationMessage,
-  Message,
-  MessageDelta,
-  TopicTitleReplacement,
+import {
+  DummyForGeneratingTypes,
+  type ConversationMessage,
+  type Message,
+  type MessageDelta,
+  type TopicTitleReplacement,
 } from "@/generated/backend"
 import { flushPromises } from "@vue/test-utils"
 
@@ -261,9 +262,12 @@ describe("ConversationInner", () => {
       await submitMessageAndSimulateRunResponse(
         wrapper,
         "Hello",
-        createRunResponse("complete_note_details", {
-          completion: testCompletion,
-        })
+        createRunResponse(
+          DummyForGeneratingTypes.aiToolName.COMPLETE_NOTE_DETAILS,
+          {
+            completion: testCompletion,
+          }
+        )
       )
     })
 
@@ -285,9 +289,12 @@ describe("ConversationInner", () => {
       await submitMessageAndSimulateRunResponse(
         wrapper,
         "Hello",
-        createRunResponse("complete_note_details", {
-          completion: testCompletion,
-        })
+        createRunResponse(
+          DummyForGeneratingTypes.aiToolName.COMPLETE_NOTE_DETAILS,
+          {
+            completion: testCompletion,
+          }
+        )
       )
 
       const completionText = wrapper.find(".ai-chat .completion-text")
@@ -342,9 +349,12 @@ describe("ConversationInner", () => {
       await submitMessageAndSimulateRunResponse(
         wrapper,
         "Hello",
-        createRunResponse("suggest_note_topic_title", <TopicTitleReplacement>{
-          newTopic: testTitle,
-        })
+        createRunResponse(
+          DummyForGeneratingTypes.aiToolName.SUGGEST_TOPIC_TITLE,
+          <TopicTitleReplacement>{
+            newTopic: testTitle,
+          }
+        )
       )
     })
 
