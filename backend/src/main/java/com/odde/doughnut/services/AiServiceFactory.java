@@ -9,10 +9,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AiAdvisorService {
+public class AiServiceFactory {
   protected final OpenAiApiHandler openAiApiHandler;
 
-  public AiAdvisorService(@Qualifier("testableOpenAiApi") OpenAiApi openAiApi) {
+  public AiServiceFactory(@Qualifier("testableOpenAiApi") OpenAiApi openAiApi) {
     openAiApiHandler = new OpenAiApiHandler(openAiApi);
   }
 

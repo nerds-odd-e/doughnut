@@ -27,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class AiAdvisorServiceWithDBTest {
+class AiServiceFactoryWithDBTest {
 
   private AiQuestionGenerator aiQuestionGenerator;
   @Mock private OpenAiApi openAiApi;

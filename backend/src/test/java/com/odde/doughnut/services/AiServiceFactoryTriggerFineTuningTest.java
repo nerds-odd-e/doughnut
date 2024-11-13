@@ -32,17 +32,17 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class AiAdvisorServiceTriggerFineTuningTest {
+class AiServiceFactoryTriggerFineTuningTest {
   @Autowired ModelFactoryService modelFactoryService;
   @Autowired MakeMe makeMe;
   private FineTuningService fineTuningService;
   @Mock private OpenAiApi openAiApi;
-  private AiAdvisorService aiAdvisorService;
+  private AiServiceFactory aiServiceFactory;
 
   @BeforeEach
   void setup() {
     fineTuningService = new FineTuningService(this.modelFactoryService, openAiApi);
-    aiAdvisorService = new AiAdvisorService(openAiApi);
+    aiServiceFactory = new AiServiceFactory(openAiApi);
   }
 
   @Nested
@@ -55,7 +55,7 @@ class AiAdvisorServiceTriggerFineTuningTest {
               OpenAIServiceErrorException.class,
               () -> {
                 List<OpenAIChatGPTFineTuningExample> examples = makeExamples(0);
-                aiAdvisorService.getOtherAiServices().uploadAndTriggerFineTuning(examples, "test");
+                aiServiceFactory.getOtherAiServices().uploadAndTriggerFineTuning(examples, "test");
               });
       assertEquals(result.getMessage(), "Positive feedback cannot be less than 10.");
     }
@@ -69,7 +69,7 @@ class AiAdvisorServiceTriggerFineTuningTest {
               OpenAIServiceErrorException.class,
               () -> {
                 List<OpenAIChatGPTFineTuningExample> examples = makeExamples(10);
-                aiAdvisorService.getOtherAiServices().uploadAndTriggerFineTuning(examples, "test");
+                aiServiceFactory.getOtherAiServices().uploadAndTriggerFineTuning(examples, "test");
               });
       assertEquals(result.getMessage(), "Upload failed.");
     }
@@ -97,7 +97,7 @@ class AiAdvisorServiceTriggerFineTuningTest {
       @Test
       void shouldPassPositiveExamplesForQuestionGeneration() throws IOException {
         List<OpenAIChatGPTFineTuningExample> examples = makeExamples(10);
-        aiAdvisorService.getOtherAiServices().uploadAndTriggerFineTuning(examples, "test");
+        aiServiceFactory.getOtherAiServices().uploadAndTriggerFineTuning(examples, "test");
         List<String> lines = fileContents.get(0).lines().toList();
         assertThat(lines, hasSize(10));
         assertThat(lines.get(0), containsString("{\"messages\":["));

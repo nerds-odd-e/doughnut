@@ -3,7 +3,7 @@ package com.odde.doughnut.handlers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.AudioUploadDTO;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.services.AiAdvisorService;
+import com.odde.doughnut.services.AiServiceFactory;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.TextFromAudio;
 import com.theokanning.openai.client.OpenAiApi;
@@ -19,7 +19,7 @@ import org.springframework.web.socket.handler.BinaryWebSocketHandler;
 
 public class AudioWebSocketHandler extends BinaryWebSocketHandler {
 
-  private final AiAdvisorService aiAdvisorService;
+  private final AiServiceFactory aiServiceFactory;
   private final ModelFactoryService modelFactoryService;
   private final ObjectMapper objectMapper;
 
@@ -29,7 +29,7 @@ public class AudioWebSocketHandler extends BinaryWebSocketHandler {
       ModelFactoryService modelFactoryService,
       ObjectMapper objectMapper) {
     this.modelFactoryService = modelFactoryService;
-    this.aiAdvisorService = new AiAdvisorService(openAiApi);
+    this.aiServiceFactory = new AiServiceFactory(openAiApi);
     this.objectMapper = objectMapper;
   }
 
@@ -43,7 +43,7 @@ public class AudioWebSocketHandler extends BinaryWebSocketHandler {
     AudioUploadDTO audioUploadDTO = objectMapper.readValue(payload, AudioUploadDTO.class);
 
     Optional<TextFromAudio> result =
-        aiAdvisorService
+        aiServiceFactory
             .getOtherAiServices()
             .getTextFromAudio(
                 audioUploadDTO.getPreviousNoteDetails(),

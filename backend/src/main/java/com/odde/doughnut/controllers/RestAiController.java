@@ -52,13 +52,13 @@ public class RestAiController {
   public AiGeneratedImage generateImage(@RequestBody String prompt) {
     currentUser.assertLoggedIn();
     return new AiGeneratedImage(
-        aiAdvisorWithStorageService.getAiAdvisorService().getOtherAiServices().getTimage(prompt));
+        aiAdvisorWithStorageService.getAiServiceFactory().getOtherAiServices().getTimage(prompt));
   }
 
   @GetMapping("/available-gpt-models")
   public List<String> getAvailableGptModels() {
     return aiAdvisorWithStorageService
-        .getAiAdvisorService()
+        .getAiServiceFactory()
         .getOtherAiServices()
         .getAvailableGptModels();
   }
@@ -103,7 +103,7 @@ public class RestAiController {
   public void cancelRun(@PathVariable String threadId, @PathVariable String runId) {
     currentUser.assertLoggedIn();
     aiAdvisorWithStorageService
-        .getAiAdvisorService()
+        .getAiServiceFactory()
         .getAssistantRunService(threadId, runId)
         .cancelRun();
   }

@@ -3,8 +3,8 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.services.AiAdvisorService;
 import com.odde.doughnut.services.AiAdvisorWithStorageService;
+import com.odde.doughnut.services.AiServiceFactory;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.TextFromAudio;
 import com.theokanning.openai.client.OpenAiApi;
@@ -23,17 +23,17 @@ import org.springframework.web.context.annotation.SessionScope;
 @RequestMapping("/api/audio")
 class RestAiAudioController {
 
-  private final AiAdvisorService aiAdvisorService;
+  private final AiServiceFactory aiServiceFactory;
   private final ModelFactoryService modelFactoryService;
   private final AiAdvisorWithStorageService aiAdvisorWithStorageService;
 
   public RestAiAudioController(
       @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
       ModelFactoryService modelFactoryService) {
-    this.aiAdvisorService = new AiAdvisorService(openAiApi);
+    this.aiServiceFactory = new AiServiceFactory(openAiApi);
     this.modelFactoryService = modelFactoryService;
     this.aiAdvisorWithStorageService =
-        new AiAdvisorWithStorageService(aiAdvisorService, modelFactoryService);
+        new AiAdvisorWithStorageService(aiServiceFactory, modelFactoryService);
   }
 
   @PostMapping(
@@ -44,7 +44,7 @@ class RestAiAudioController {
       throws IOException {
     String filename = audioFile.getUploadAudioFile().getOriginalFilename();
     byte[] bytes = audioFile.getUploadAudioFile().getBytes();
-    return aiAdvisorService
+    return aiServiceFactory
         .getOtherAiServices()
         .getTextFromAudio(
             audioFile.getPreviousNoteDetails(),
@@ -64,7 +64,7 @@ class RestAiAudioController {
     String filename = audioFile.getUploadAudioFile().getOriginalFilename();
     byte[] bytes = audioFile.getUploadAudioFile().getBytes();
     String transcriptionFromAudio =
-        aiAdvisorService.getOtherAiServices().getTranscriptionFromAudio(filename, bytes);
+        aiServiceFactory.getOtherAiServices().getTranscriptionFromAudio(filename, bytes);
     return new TextFromAudio();
   }
 

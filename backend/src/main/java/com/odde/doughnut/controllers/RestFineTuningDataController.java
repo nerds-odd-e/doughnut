@@ -5,7 +5,7 @@ import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.AiAdvisorService;
+import com.odde.doughnut.services.AiServiceFactory;
 import com.odde.doughnut.services.FineTuningService;
 import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
 import com.theokanning.openai.client.OpenAiApi;
@@ -23,14 +23,14 @@ class RestFineTuningDataController {
   private final ModelFactoryService modelFactoryService;
   private final UserModel currentUser;
   private final FineTuningService fineTuningService;
-  private final AiAdvisorService aiAdvisorService;
+  private final AiServiceFactory aiServiceFactory;
 
   public RestFineTuningDataController(
       ModelFactoryService modelFactoryService, UserModel currentUser, OpenAiApi openAiApi) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.fineTuningService = new FineTuningService(this.modelFactoryService, openAiApi);
-    this.aiAdvisorService = new AiAdvisorService(openAiApi);
+    this.aiServiceFactory = new AiServiceFactory(openAiApi);
   }
 
   @PatchMapping("/{suggestedQuestion}/update-suggested-question-for-fine-tuning")
@@ -74,10 +74,10 @@ class RestFineTuningDataController {
     currentUser.assertAdminAuthorization();
     List<OpenAIChatGPTFineTuningExample> examples1 =
         fineTuningService.getQuestionGenerationTrainingExamples();
-    aiAdvisorService.getOtherAiServices().uploadAndTriggerFineTuning(examples1, "Question");
+    aiServiceFactory.getOtherAiServices().uploadAndTriggerFineTuning(examples1, "Question");
     List<OpenAIChatGPTFineTuningExample> examples =
         fineTuningService.getQuestionEvaluationTrainingExamples();
-    aiAdvisorService.getOtherAiServices().uploadAndTriggerFineTuning(examples, "Evaluation");
+    aiServiceFactory.getOtherAiServices().uploadAndTriggerFineTuning(examples, "Evaluation");
   }
 
   @GetMapping("/all-suggested-questions-for-fine-tuning")

@@ -18,9 +18,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
 
-class AiAdvisorServiceTest {
+class AiServiceFactoryTest {
 
-  private AiAdvisorService aiAdvisorService;
+  private AiServiceFactory aiServiceFactory;
   @Mock private OpenAiApi openAiApi;
   OpenAIChatCompletionMock openAIChatCompletionMock;
 
@@ -28,7 +28,7 @@ class AiAdvisorServiceTest {
   void Setup() {
     MockitoAnnotations.openMocks(this);
     openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
-    aiAdvisorService = new AiAdvisorService(openAiApi);
+    aiServiceFactory = new AiServiceFactory(openAiApi);
   }
 
   @Nested
@@ -40,7 +40,7 @@ class AiAdvisorServiceTest {
       image.setB64Json("https://image.com");
       result.setData(List.of(image));
       Mockito.when(openAiApi.createImage(Mockito.any())).thenReturn(Single.just(result));
-      assertEquals("https://image.com", aiAdvisorService.getOtherAiServices().getTimage("prompt"));
+      assertEquals("https://image.com", aiServiceFactory.getOtherAiServices().getTimage("prompt"));
     }
   }
 

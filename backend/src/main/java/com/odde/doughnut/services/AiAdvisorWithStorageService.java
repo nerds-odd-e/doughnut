@@ -21,7 +21,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @RequiredArgsConstructor
 @Service
 public final class AiAdvisorWithStorageService {
-  @Getter private final AiAdvisorService aiAdvisorService;
+  @Getter private final AiServiceFactory aiServiceFactory;
   private final ModelFactoryService modelFactoryService;
 
   public String createThread(AssistantService assistantService, Note note) {
@@ -42,7 +42,7 @@ public final class AiAdvisorWithStorageService {
   }
 
   public AssistantService getChatAssistantServiceForNotebook(Notebook notebook) {
-    return aiAdvisorService.getAssistantService(getChatAssistantIdForNotebook(notebook));
+    return aiServiceFactory.getAssistantService(getChatAssistantIdForNotebook(notebook));
   }
 
   private GlobalSettingsService getGlobalSettingsService() {
@@ -62,7 +62,7 @@ public final class AiAdvisorWithStorageService {
   }
 
   private Assistant createCompletionAssistant(Timestamp currentUTCTimestamp, String modelName) {
-    AssistantCreationService service = aiAdvisorService.getAssistantCreationService();
+    AssistantCreationService service = aiServiceFactory.getAssistantCreationService();
     Assistant assistant = service.createDefaultAssistant(modelName, "Note details completion");
     getCompletionAssistantSettingAccessor().setKeyValue(currentUTCTimestamp, assistant.getId());
     return assistant;
@@ -71,7 +71,7 @@ public final class AiAdvisorWithStorageService {
   public NotebookAssistant recreateNotebookAssistant(
       Timestamp currentUTCTimestamp, User creator, Notebook notebook, String additionalInstruction)
       throws IOException {
-    AssistantCreationService service = aiAdvisorService.getAssistantCreationService();
+    AssistantCreationService service = aiServiceFactory.getAssistantCreationService();
     String modelName = getGlobalSettingsService().globalSettingOthers().getValue();
     String fileContent = notebook.getNotebookDump();
     Assistant chatAssistant =
@@ -183,6 +183,6 @@ public final class AiAdvisorWithStorageService {
   public void submitToolOutputs(
       String threadId, String runId, String toolCallId, ToolCallResult result)
       throws JsonProcessingException {
-    aiAdvisorService.getAssistantRunService(threadId, runId).submitToolOutputs(toolCallId, result);
+    aiServiceFactory.getAssistantRunService(threadId, runId).submitToolOutputs(toolCallId, result);
   }
 }

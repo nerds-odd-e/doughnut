@@ -34,7 +34,7 @@ import org.mockito.*;
 import retrofit2.HttpException;
 import retrofit2.Response;
 
-class AiAdvisorServiceAutoCompleteTest {
+class AiServiceFactoryAutoCompleteTest {
 
   private AssistantService completionService;
   @Mock private OpenAiApi openAiApi;
@@ -45,7 +45,7 @@ class AiAdvisorServiceAutoCompleteTest {
   @BeforeEach
   void Setup() {
     MockitoAnnotations.openMocks(this);
-    completionService = new AiAdvisorService(openAiApi).getAssistantService("example-id");
+    completionService = new AiServiceFactory(openAiApi).getAssistantService("example-id");
     openAIAssistantMocker = new OpenAIAssistantMocker(openAiApi);
     openAIAssistantThreadMocker =
         openAIAssistantMocker.mockThreadCreation(null).mockCreateMessage();
