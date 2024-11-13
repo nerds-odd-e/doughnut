@@ -42,8 +42,6 @@ public class ChatAboutNoteService {
     if (!unsynced.isEmpty()) {
       String combinedMessage = formatUnsentMessages(unsynced);
       createUserMessage(combinedMessage);
-    } else {
-      createUserMessage("just say something.");
     }
   }
 

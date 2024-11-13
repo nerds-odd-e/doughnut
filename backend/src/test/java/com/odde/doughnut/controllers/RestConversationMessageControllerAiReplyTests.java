@@ -229,31 +229,7 @@ public class RestConversationMessageControllerAiReplyTests {
       controller.getAiReply(conversation);
 
       // Verify default message is sent
-      ArgumentCaptor<MessageRequest> captor = ArgumentCaptor.forClass(MessageRequest.class);
-      verify(openAiApi).createMessage(any(), captor.capture());
-      assertThat(captor.getValue().getContent()).isEqualTo("just say something.");
-    }
-  }
-
-  @Nested
-  class ContinueChatTests {
-    @BeforeEach
-    void setUp() {
-      openAIAssistantMocker
-          .aThread("existing-thread-id")
-          .mockCreateMessage()
-          .andARunStream("my-run-id")
-          .withMessageDeltas("I'm", " Chatbot")
-          .mockTheRunStream();
-    }
-
-    @Test
-    void continueChat() throws UnexpectedNoAccessRightException, BadRequestException {
-      conversation.setAiAssistantThreadId("existing-thread-id");
-      controller.getAiReply(conversation);
-      ArgumentCaptor<MessageRequest> captor = ArgumentCaptor.forClass(MessageRequest.class);
-      verify(openAiApi).createMessage(any(), captor.capture());
-      assertThat(captor.getValue().getContent().toString()).isEqualTo("just say something.");
+      verify(openAiApi, times(0)).createMessage(any(), any());
     }
   }
 
@@ -286,7 +262,7 @@ public class RestConversationMessageControllerAiReplyTests {
 
       // Verify the note update message was sent
       ArgumentCaptor<MessageRequest> captor = ArgumentCaptor.forClass(MessageRequest.class);
-      verify(openAiApi, times(2)).createMessage(any(), captor.capture());
+      verify(openAiApi, times(1)).createMessage(any(), captor.capture());
 
       List<MessageRequest> messages = captor.getAllValues();
       String expectedUpdateMessage =
@@ -302,10 +278,7 @@ public class RestConversationMessageControllerAiReplyTests {
 
       controller.getAiReply(conversation);
 
-      // Verify only the default message was sent
-      ArgumentCaptor<MessageRequest> captor = ArgumentCaptor.forClass(MessageRequest.class);
-      verify(openAiApi).createMessage(any(), captor.capture());
-      assertThat(captor.getValue().getContent()).isEqualTo("just say something.");
+      verify(openAiApi, times(0)).createMessage(any(), any());
     }
 
     @Test
@@ -315,10 +288,7 @@ public class RestConversationMessageControllerAiReplyTests {
 
       controller.getAiReply(conversation);
 
-      // Verify only the default message was sent
-      ArgumentCaptor<MessageRequest> captor = ArgumentCaptor.forClass(MessageRequest.class);
-      verify(openAiApi).createMessage(any(), captor.capture());
-      assertThat(captor.getValue().getContent()).isEqualTo("just say something.");
+      verify(openAiApi, times(0)).createMessage(any(), any());
     }
   }
 }
