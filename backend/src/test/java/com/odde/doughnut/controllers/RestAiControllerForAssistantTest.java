@@ -11,7 +11,6 @@ import com.odde.doughnut.entities.NotebookAssistant;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorWithStorageService;
-import com.odde.doughnut.services.AiServiceFactory;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.OtherAiServices;
 import com.odde.doughnut.testability.MakeMe;
@@ -50,14 +49,12 @@ class RestAiControllerForAssistantTest {
   @Mock OpenAiApi openAiApi;
   @Autowired MakeMe makeMe;
   TestabilitySettings testabilitySettings = new TestabilitySettings();
-  AiServiceFactory aiServiceFactory;
   AiAdvisorWithStorageService aiAdvisorWithStorageService;
 
   @BeforeEach
   void Setup() {
-    aiServiceFactory = new AiServiceFactory(openAiApi);
     aiAdvisorWithStorageService =
-        new AiAdvisorWithStorageService(aiServiceFactory, makeMe.modelFactoryService);
+        new AiAdvisorWithStorageService(openAiApi, makeMe.modelFactoryService);
     currentUser = makeMe.anAdmin().toModelPlease();
     note = makeMe.aNote().please();
     controller =

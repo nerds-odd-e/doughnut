@@ -27,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class AiServiceFactoryAssistantsTest {
+class AiAssistantServiceFactoryAssistantsTest {
 
   private AiAdvisorWithStorageService aiAdvisorServiceWithStorage;
   @Autowired MakeMe makeMe;
@@ -39,8 +39,7 @@ class AiServiceFactoryAssistantsTest {
     MockitoAnnotations.openMocks(this);
     openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
     aiAdvisorServiceWithStorage =
-        new AiAdvisorWithStorageService(
-            new AiServiceFactory(openAiApi), makeMe.modelFactoryService);
+        new AiAdvisorWithStorageService(openAiApi, makeMe.modelFactoryService);
   }
 
   @Nested

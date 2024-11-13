@@ -33,7 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class AiServiceFactoryTriggerFineTuningTest {
+class AiAssistantServiceFactoryTriggerFineTuningTest {
   @Autowired ModelFactoryService modelFactoryService;
   @Autowired MakeMe makeMe;
   @Mock private OpenAiApi openAiApi;

@@ -1,28 +1,33 @@
 package com.odde.doughnut.services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.odde.doughnut.controllers.dto.ToolCallResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.ai.AssistantCreationService;
+import com.odde.doughnut.services.ai.AssistantRunService;
 import com.odde.doughnut.services.ai.AssistantService;
 import com.theokanning.openai.assistants.assistant.Assistant;
 import com.theokanning.openai.assistants.message.Message;
+import com.theokanning.openai.client.OpenAiApi;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-@RequiredArgsConstructor
 @Service
 public final class AiAdvisorWithStorageService {
-  @Getter private final AiServiceFactory aiServiceFactory;
+  private final AiAssistantServiceFactory aiAssistantServiceFactory;
   private final ModelFactoryService modelFactoryService;
+
+  public AiAdvisorWithStorageService(
+      @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
+      ModelFactoryService modelFactoryService) {
+    this.aiAssistantServiceFactory = new AiAssistantServiceFactory(openAiApi);
+    this.modelFactoryService = modelFactoryService;
+  }
 
   public String createThread(AssistantService assistantService, Note note) {
     return assistantService.createThread(note, List.of());
@@ -42,7 +47,7 @@ public final class AiAdvisorWithStorageService {
   }
 
   public AssistantService getChatAssistantServiceForNotebook(Notebook notebook) {
-    return aiServiceFactory.getAssistantService(getChatAssistantIdForNotebook(notebook));
+    return aiAssistantServiceFactory.getAssistantService(getChatAssistantIdForNotebook(notebook));
   }
 
   private GlobalSettingsService getGlobalSettingsService() {
@@ -62,7 +67,7 @@ public final class AiAdvisorWithStorageService {
   }
 
   private Assistant createCompletionAssistant(Timestamp currentUTCTimestamp, String modelName) {
-    AssistantCreationService service = aiServiceFactory.getAssistantCreationService();
+    AssistantCreationService service = aiAssistantServiceFactory.getAssistantCreationService();
     Assistant assistant = service.createDefaultAssistant(modelName, "Note details completion");
     getCompletionAssistantSettingAccessor().setKeyValue(currentUTCTimestamp, assistant.getId());
     return assistant;
@@ -71,7 +76,7 @@ public final class AiAdvisorWithStorageService {
   public NotebookAssistant recreateNotebookAssistant(
       Timestamp currentUTCTimestamp, User creator, Notebook notebook, String additionalInstruction)
       throws IOException {
-    AssistantCreationService service = aiServiceFactory.getAssistantCreationService();
+    AssistantCreationService service = aiAssistantServiceFactory.getAssistantCreationService();
     String modelName = getGlobalSettingsService().globalSettingOthers().getValue();
     String fileContent = notebook.getNotebookDump();
     Assistant chatAssistant =
@@ -180,9 +185,7 @@ public final class AiAdvisorWithStorageService {
         .orElse("");
   }
 
-  public void submitToolOutputs(
-      String threadId, String runId, String toolCallId, ToolCallResult result)
-      throws JsonProcessingException {
-    aiServiceFactory.getAssistantRunService(threadId, runId).submitToolOutputs(toolCallId, result);
+  public AssistantRunService getAssistantRunService(String threadId, String runId) {
+    return aiAssistantServiceFactory.getAssistantRunService(threadId, runId);
   }
 }
