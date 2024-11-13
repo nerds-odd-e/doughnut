@@ -26,8 +26,11 @@ public final class AiAssistantFacade {
       Conversation conversation, ConversationService conversationService, Note note) {
     ChatAboutNoteService chatService =
         setupChatServiceForConversation(conversation, conversationService, note);
-    setupMessageHandler(conversation, chatService, conversationService);
-    return chatService.getAIReplySSE();
+    return chatService.getAIReplySSE(
+        (message -> {
+          String content = extractMessageContent(message);
+          conversationService.addMessageToConversation(conversation, null, content);
+        }));
   }
 
   private ChatAboutNoteService setupChatServiceForConversation(
@@ -46,17 +49,6 @@ public final class AiAssistantFacade {
     conversationService.updateLastAiAssistantThreadSync(conversation);
 
     return chatService;
-  }
-
-  private void setupMessageHandler(
-      Conversation conversation,
-      ChatAboutNoteService chatService,
-      ConversationService conversationService) {
-    chatService.onMessageCompleted(
-        message -> {
-          String content = extractMessageContent(message);
-          conversationService.addMessageToConversation(conversation, null, content);
-        });
   }
 
   private static String extractMessageContent(Message message) {
