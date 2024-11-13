@@ -97,7 +97,11 @@ public class RestConversationMessageController {
       throws UnexpectedNoAccessRightException, BadRequestException {
     currentUser.assertAuthorization(conversation);
     try {
-      return aiAssistantFacade.getAiReplyForConversation(conversation, conversationService);
+      Note note = conversation.getSubject().getNote();
+      if (note == null) {
+        throw new RuntimeException("Only note related conversation can have AI reply");
+      }
+      return aiAssistantFacade.getAiReplyForConversation(conversation, conversationService, note);
     } catch (OpenAiUnauthorizedException e) {
       // Since this method is asynchronous, the exception body is not returned to the client.
       // Instead, the client will receive a 400 Bad Request status code, with no body.

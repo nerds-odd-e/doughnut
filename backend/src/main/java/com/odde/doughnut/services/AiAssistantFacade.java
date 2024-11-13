@@ -23,24 +23,15 @@ public final class AiAssistantFacade {
   }
 
   public SseEmitter getAiReplyForConversation(
-      Conversation conversation, ConversationService conversationService) {
-    validateConversationForAiReply(conversation);
+      Conversation conversation, ConversationService conversationService, Note note) {
     ChatAboutNoteService chatService =
-        setupChatServiceForConversation(conversation, conversationService);
+        setupChatServiceForConversation(conversation, conversationService, note);
     setupMessageHandler(conversation, chatService, conversationService);
     return chatService.getAIReplySSE();
   }
 
-  private void validateConversationForAiReply(Conversation conversation) {
-    Note note = conversation.getSubject().getNote();
-    if (note == null) {
-      throw new RuntimeException("Only note related conversation can have AI reply");
-    }
-  }
-
   private ChatAboutNoteService setupChatServiceForConversation(
-      Conversation conversation, ConversationService conversationService) {
-    Note note = conversation.getSubject().getNote();
+      Conversation conversation, ConversationService conversationService, Note note) {
     String threadId = conversation.getAiAssistantThreadId();
     AssistantService assistantService = getAssistantServiceForNotebook(note.getNotebook());
 
