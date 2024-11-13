@@ -62,7 +62,7 @@ class RestAiControllerTest {
     note = makeMe.aNote().please();
     controller =
         new RestAiController(
-          makeMe.modelFactoryService,
+            makeMe.modelFactoryService,
             aiAdvisorWithStorageService,
             new OtherAiServices(openAiApi),
             currentUser,
@@ -84,7 +84,7 @@ class RestAiControllerTest {
           ResponseStatusException.class,
           () ->
               new RestAiController(
-                makeMe.modelFactoryService,
+                      makeMe.modelFactoryService,
                       aiAdvisorWithStorageService,
                       new OtherAiServices(openAiApi),
                       makeMe.aNullUserModelPlease(),
@@ -187,7 +187,7 @@ class RestAiControllerTest {
     void shouldRequireUserToBeLoggedIn() {
       controller =
           new RestAiController(
-            makeMe.modelFactoryService,
+              makeMe.modelFactoryService,
               aiAdvisorWithStorageService,
               new OtherAiServices(openAiApi),
               makeMe.aNullUserModelPlease(),
@@ -241,7 +241,7 @@ class RestAiControllerTest {
     void shouldRequireUserToBeLoggedIn() {
       controller =
           new RestAiController(
-            makeMe.modelFactoryService,
+              makeMe.modelFactoryService,
               aiAdvisorWithStorageService,
               new OtherAiServices(openAiApi),
               makeMe.aNullUserModelPlease(),

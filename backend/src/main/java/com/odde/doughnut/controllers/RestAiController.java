@@ -37,7 +37,7 @@ public class RestAiController {
   private final AiAdvisorWithStorageService aiAdvisorWithStorageService;
 
   public RestAiController(
-    ModelFactoryService modelFactoryService,
+      ModelFactoryService modelFactoryService,
       AiAdvisorWithStorageService aiAdvisorWithStorageService,
       OtherAiServices otherAiServices,
       UserModel currentUser,
@@ -83,11 +83,12 @@ public class RestAiController {
       throws UnexpectedNoAccessRightException, IOException {
     currentUser.assertAdminAuthorization();
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    NotebookAssistant notebookAssistant = aiAdvisorWithStorageService.recreateNotebookAssistant(
-      currentUTCTimestamp,
-      currentUser.getEntity(),
-      notebook,
-      notebookAssistantCreationParams.getAdditionalInstruction());
+    NotebookAssistant notebookAssistant =
+        aiAdvisorWithStorageService.recreateNotebookAssistant(
+            currentUTCTimestamp,
+            currentUser.getEntity(),
+            notebook,
+            notebookAssistantCreationParams.getAdditionalInstruction());
     this.modelFactoryService.save(notebookAssistant);
     return notebookAssistant;
   }

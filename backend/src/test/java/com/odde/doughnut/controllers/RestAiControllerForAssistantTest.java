@@ -51,19 +51,22 @@ class RestAiControllerForAssistantTest {
   TestabilitySettings testabilitySettings = new TestabilitySettings();
   AiAdvisorWithStorageService aiAdvisorWithStorageService;
 
+  private RestAiController createController(UserModel user) {
+    return new RestAiController(
+        makeMe.modelFactoryService,
+        aiAdvisorWithStorageService,
+        new OtherAiServices(openAiApi),
+        user,
+        testabilitySettings);
+  }
+
   @BeforeEach
   void Setup() {
     aiAdvisorWithStorageService =
         new AiAdvisorWithStorageService(openAiApi, makeMe.modelFactoryService);
     currentUser = makeMe.anAdmin().toModelPlease();
     note = makeMe.aNote().please();
-    controller =
-        new RestAiController(
-          makeMe.modelFactoryService,
-            aiAdvisorWithStorageService,
-            new OtherAiServices(openAiApi),
-            currentUser,
-            testabilitySettings);
+    controller = createController(currentUser);
   }
 
   @Nested
@@ -82,13 +85,7 @@ class RestAiControllerForAssistantTest {
     class recreateAllAssistants {
       @Test
       void authentication() {
-        controller =
-            new RestAiController(
-              makeMe.modelFactoryService,
-                aiAdvisorWithStorageService,
-                new OtherAiServices(openAiApi),
-                makeMe.aUser().toModelPlease(),
-                testabilitySettings);
+        controller = createController(makeMe.aUser().toModelPlease());
         assertThrows(
             UnexpectedNoAccessRightException.class, () -> controller.recreateAllAssistants());
       }
@@ -140,13 +137,7 @@ class RestAiControllerForAssistantTest {
 
     @Test
     void authentication() {
-      controller =
-          new RestAiController(
-            makeMe.modelFactoryService,
-              aiAdvisorWithStorageService,
-              new OtherAiServices(openAiApi),
-              makeMe.aUser().toModelPlease(),
-              testabilitySettings);
+      controller = createController(makeMe.aUser().toModelPlease());
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.recreateNotebookAssistant(notebook, notebookAssistantCreationParams));
