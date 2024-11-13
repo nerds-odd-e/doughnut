@@ -6,6 +6,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AiAdvisorWithStorageService;
 import com.odde.doughnut.services.AiServiceFactory;
 import com.odde.doughnut.services.GlobalSettingsService;
+import com.odde.doughnut.services.ai.OtherAiServices;
 import com.odde.doughnut.services.ai.TextFromAudio;
 import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -23,14 +24,15 @@ import org.springframework.web.context.annotation.SessionScope;
 @RequestMapping("/api/audio")
 class RestAiAudioController {
 
-  private final AiServiceFactory aiServiceFactory;
+  OtherAiServices otherAiServices;
   private final ModelFactoryService modelFactoryService;
   private final AiAdvisorWithStorageService aiAdvisorWithStorageService;
 
   public RestAiAudioController(
       @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
       ModelFactoryService modelFactoryService) {
-    this.aiServiceFactory = new AiServiceFactory(openAiApi);
+    AiServiceFactory aiServiceFactory = new AiServiceFactory(openAiApi);
+    this.otherAiServices = aiServiceFactory.getOtherAiServices();
     this.modelFactoryService = modelFactoryService;
     this.aiAdvisorWithStorageService =
         new AiAdvisorWithStorageService(aiServiceFactory, modelFactoryService);
@@ -44,13 +46,11 @@ class RestAiAudioController {
       throws IOException {
     String filename = audioFile.getUploadAudioFile().getOriginalFilename();
     byte[] bytes = audioFile.getUploadAudioFile().getBytes();
-    return aiServiceFactory
-        .getOtherAiServices()
-        .getTextFromAudio(
-            audioFile.getPreviousNoteDetails(),
-            filename,
-            bytes,
-            getGlobalSettingsService().globalSettingOthers().getValue());
+    return otherAiServices.getTextFromAudio(
+        audioFile.getPreviousNoteDetails(),
+        filename,
+        bytes,
+        getGlobalSettingsService().globalSettingOthers().getValue());
   }
 
   @PostMapping(
@@ -63,8 +63,7 @@ class RestAiAudioController {
       throws IOException {
     String filename = audioFile.getUploadAudioFile().getOriginalFilename();
     byte[] bytes = audioFile.getUploadAudioFile().getBytes();
-    String transcriptionFromAudio =
-        aiServiceFactory.getOtherAiServices().getTranscriptionFromAudio(filename, bytes);
+    String transcriptionFromAudio = otherAiServices.getTranscriptionFromAudio(filename, bytes);
     return new TextFromAudio();
   }
 
