@@ -114,7 +114,6 @@ class RestAiAudioControllerTests {
 
   @Nested
   class ConvertAudioToTextForNote {
-    AudioUploadDTO audioUploadDTO = new AudioUploadDTO();
     OpenAIAssistantMocker openAIAssistantMocker;
     OpenAIAssistantThreadMocker openAIAssistantThreadMocker;
 
@@ -164,6 +163,7 @@ class RestAiAudioControllerTests {
                     return true;
                   }));
       assertNotNull(result);
+      assertThat(result.getCompletionMarkdownFromAudio(), equalTo("text from audio transcription"));
     }
   }
 }

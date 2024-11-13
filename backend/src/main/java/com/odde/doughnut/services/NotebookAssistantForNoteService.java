@@ -78,10 +78,27 @@ public final class NotebookAssistantForNoteService {
                         "Please convert this audio transcription to an article: " + transcription)
                     .build()));
     AiAssistantResponse threadResponse = assistantService.createRunAndGetThreadResponse(threadId);
+
+    // Extract completion from tool call
+    String completion =
+        threadResponse
+            .getToolCalls()
+            .getFirst()
+            .getFunction()
+            .getArguments()
+            .get("completion")
+            .asText();
+
+    // Create and populate response
+    TextFromAudio textFromAudio = new TextFromAudio();
+    textFromAudio.setCompletionMarkdownFromAudio(completion);
+
+    // Submit tool outputs
     assistantService
         .getAssistantRunService(threadId, threadResponse.getRunId())
         .submitToolOutputs(
             threadResponse.getToolCalls().getFirst().getId(), new ToolCallResult("appended"));
-    return new TextFromAudio();
+
+    return textFromAudio;
   }
 }
