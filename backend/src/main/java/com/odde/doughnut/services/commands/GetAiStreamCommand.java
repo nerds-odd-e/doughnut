@@ -25,8 +25,8 @@ public class GetAiStreamCommand {
     this.assistantService = assistantService;
   }
 
-  public SseEmitter execute() {
-    String threadId = getOrCreateThreadId();
+  public SseEmitter execute(String threadId) {
+
     syncNoteUpdates(threadId);
     syncUnseenMessages(threadId);
     conversationService.updateLastAiAssistantThreadSync(conversation);
@@ -37,15 +37,6 @@ public class GetAiStreamCommand {
           conversationService.addMessageToConversation(conversation, null, content);
         }),
         threadId);
-  }
-
-  private String getOrCreateThreadId() {
-    String threadId = conversation.getAiAssistantThreadId();
-    if (threadId == null) {
-      threadId = assistantService.createThread(note, List.of());
-      conversationService.setConversationAiAssistantThreadId(conversation, threadId);
-    }
-    return threadId;
   }
 
   private void syncNoteUpdates(String threadId) {

@@ -2,7 +2,6 @@ package com.odde.doughnut.services.ai;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.AiAssistantResponse;
-import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.assistants.message.Message;
 import com.theokanning.openai.assistants.message.MessageRequest;
@@ -41,17 +40,13 @@ public final class AssistantService {
     openAiApiHandler.createMessage(threadId, messageRequest);
   }
 
-  public String createThread(Note note, List<MessageRequest> additionalMessages) {
+  public String createThread(List<MessageRequest> additionalMessages) {
     List<MessageRequest> messages =
         new ArrayList<>(
             List.of(
                 MessageRequest.builder()
                     .role("assistant")
                     .content("Please only call function to update content when user asks to.")
-                    .build(),
-                MessageRequest.builder()
-                    .role("assistant")
-                    .content(note.getNoteDescription())
                     .build()));
 
     if (additionalMessages != null && !additionalMessages.isEmpty()) {
@@ -85,25 +80,13 @@ public final class AssistantService {
     return requiredAction.getSubmitToolOutputs().getToolCalls();
   }
 
-  public String suggestTopicTitle(Note note) {
-    String threadId =
-        createThread(
-            note,
-            List.of(
-                MessageRequest.builder()
-                    .role("user")
-                    .content("Please suggest a better topic title for the note.")
-                    .build()));
+  public AiAssistantResponse createRunAndGetThreadResponse(String threadId) {
     Run run = openAiApiHandler.createRun(threadId, assistantId);
-    AiAssistantResponse threadResponse = getThreadResponse(threadId, run);
-    openAiApiHandler.cancelRun(threadId, run.getId());
-    return threadResponse
-        .getToolCalls()
-        .getFirst()
-        .getFunction()
-        .getArguments()
-        .get("newTopic")
-        .asText();
+    return getThreadResponse(threadId, run);
+  }
+
+  public AssistantRunService getAssistantRunService(String threadId, String runId) {
+    return new AssistantRunService(openAiApiHandler, threadId, runId);
   }
 
   public SseEmitter getRunStreamAsSSE(Consumer<Message> messageConsumer, String threadId1) {
