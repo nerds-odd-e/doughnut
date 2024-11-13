@@ -75,7 +75,7 @@ public class RestAiController {
       @PathVariable(value = "note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
-    String title = notebookAssistantForNoteServiceFactory.create(note).suggestTopicTitle(note);
+    String title = notebookAssistantForNoteServiceFactory.create(note).suggestTopicTitle();
     return new SuggestedTopicDTO(title);
   }
 }

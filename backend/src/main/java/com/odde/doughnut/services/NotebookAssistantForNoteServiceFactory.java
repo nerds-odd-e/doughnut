@@ -35,6 +35,6 @@ public final class NotebookAssistantForNoteServiceFactory {
   public NotebookAssistantForNoteService create(Note note) {
     AssistantService assistantServiceForNotebook =
         getAssistantServiceForNotebook(note.getNotebook());
-    return new NotebookAssistantForNoteService(assistantServiceForNotebook);
+    return new NotebookAssistantForNoteService(assistantServiceForNotebook, note);
   }
 }

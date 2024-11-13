@@ -27,13 +27,6 @@ public final class AssistantService {
     this.assistantId = assistantId;
   }
 
-  public AiAssistantResponse createThreadAndRunWithFirstMessage(Note note, String prompt) {
-    MessageRequest messageRequest = MessageRequest.builder().role("user").content(prompt).build();
-    String threadId = createThread(note, List.of(messageRequest));
-    Run run = openAiApiHandler.createRun(threadId, assistantId);
-    return getThreadResponse(threadId, run);
-  }
-
   public Flowable<AssistantSSE> getRunStream(String threadId) {
     return openAiApiHandler.createRunStream(threadId, assistantId);
   }
