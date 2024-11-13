@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.ToolCallResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.services.ai.AssistantCreationService;
 import com.odde.doughnut.services.ai.AssistantService;
 import com.theokanning.openai.assistants.assistant.Assistant;
 import com.theokanning.openai.assistants.message.Message;
@@ -32,27 +33,27 @@ public final class AiAdvisorWithStorageService {
     return new ChatAboutNoteService(threadId, assistantService);
   }
 
-  public AssistantService getChatAssistantServiceForNotebook(Notebook notebook) {
+  public String getChatAssistantIdForNotebook(Notebook notebook) {
     NotebookAssistant assistant = notebook.getNotebookAssistant();
     if (assistant != null) {
-      return aiAdvisorService.getChatService(assistant.getAssistantId());
+      return assistant.getAssistantId();
     }
-    return getDefaultChatService();
+    return getCompletionAssistantSettingAccessor().getValue();
+  }
+
+  public AssistantService getChatAssistantServiceForNotebook(Notebook notebook) {
+    return aiAdvisorService.getChatService(getChatAssistantIdForNotebook(notebook));
   }
 
   private GlobalSettingsService getGlobalSettingsService() {
     return new GlobalSettingsService(modelFactoryService);
   }
 
-  public AssistantService getDefaultChatService() {
-    return aiAdvisorService.getChatService(getCompletionAssistantSettingAccessor().getValue());
-  }
-
   private GlobalSettingsService.GlobalSettingsKeyValue getCompletionAssistantSettingAccessor() {
     return getGlobalSettingsService().noteCompletionAssistantId();
   }
 
-  public Map<String, String> recreateAllAssistants(Timestamp currentUTCTimestamp) {
+  public Map<String, String> recreateDefaultAssistants(Timestamp currentUTCTimestamp) {
     Map<String, String> result = new HashMap<>();
     String modelName = getGlobalSettingsService().globalSettingOthers().getValue();
     Assistant completionAssistant = createCompletionAssistant(currentUTCTimestamp, modelName);
@@ -60,8 +61,8 @@ public final class AiAdvisorWithStorageService {
     return result;
   }
 
-  public Assistant createCompletionAssistant(Timestamp currentUTCTimestamp, String modelName) {
-    AssistantService service = getDefaultChatService();
+  private Assistant createCompletionAssistant(Timestamp currentUTCTimestamp, String modelName) {
+    AssistantCreationService service = aiAdvisorService.getAsisstantCreationService();
     Assistant assistant = service.createDefaultAssistant(modelName, "Note details completion");
     getCompletionAssistantSettingAccessor().setKeyValue(currentUTCTimestamp, assistant.getId());
     return assistant;
@@ -70,7 +71,7 @@ public final class AiAdvisorWithStorageService {
   public NotebookAssistant recreateNotebookAssistant(
       Timestamp currentUTCTimestamp, User creator, Notebook notebook, String additionalInstruction)
       throws IOException {
-    AssistantService service = getDefaultChatService();
+    AssistantCreationService service = aiAdvisorService.getAsisstantCreationService();
     String modelName = getGlobalSettingsService().globalSettingOthers().getValue();
     String fileContent = notebook.getNotebookDump();
     Assistant chatAssistant =

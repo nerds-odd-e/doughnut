@@ -68,7 +68,7 @@ public class RestAiController {
   public Map<String, String> recreateAllAssistants() throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    return aiAdvisorWithStorageService.recreateAllAssistants(currentUTCTimestamp);
+    return aiAdvisorWithStorageService.recreateDefaultAssistants(currentUTCTimestamp);
   }
 
   @PostMapping("/recreate-notebook-assistant/{notebook}")

@@ -102,7 +102,7 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
                 .build()));
   }
 
-  public static List<AiTool> getCompletionAiTools() {
+  public static List<AiTool> getAllAssistantTools() {
     return List.of(
         new AiTool(
             AiToolName.COMPLETE_NOTE_DETAILS.getValue(),

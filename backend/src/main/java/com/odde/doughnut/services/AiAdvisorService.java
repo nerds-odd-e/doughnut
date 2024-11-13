@@ -23,8 +23,7 @@ public class AiAdvisorService {
   }
 
   public AssistantService getChatService(String assistantId) {
-    return new AssistantService(
-        openAiApiHandler, assistantId, AiToolFactory.getCompletionAiTools());
+    return new AssistantService(openAiApiHandler, assistantId);
   }
 
   public void submitToolOutputs(
@@ -35,5 +34,9 @@ public class AiAdvisorService {
 
   public Run cancelRun(String threadId, String runId) {
     return openAiApiHandler.cancelRun(threadId, runId);
+  }
+
+  public AssistantCreationService getAsisstantCreationService() {
+    return new AssistantCreationService(openAiApiHandler, AiToolFactory.getAllAssistantTools());
   }
 }

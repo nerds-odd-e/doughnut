@@ -48,7 +48,7 @@ class AiAdvisorServiceTest {
   class AiToolsTest {
     @Test
     void shouldHaveToolForGeneratingTopicTitle() {
-      List<AiTool> tools = AiToolFactory.getCompletionAiTools();
+      List<AiTool> tools = AiToolFactory.getAllAssistantTools();
 
       Optional<AiTool> topicTitleTool =
           tools.stream()
