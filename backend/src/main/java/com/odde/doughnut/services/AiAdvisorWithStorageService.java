@@ -1,7 +1,6 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.ai.AssistantCreationService;
 import com.odde.doughnut.services.ai.AssistantRunService;
 import com.odde.doughnut.services.ai.AssistantService;
@@ -18,13 +17,13 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @Service
 public final class AiAdvisorWithStorageService {
   private final AiAssistantServiceFactory aiAssistantServiceFactory;
-  private final ModelFactoryService modelFactoryService;
+  private final GlobalSettingsService globalSettingsService;
 
   public AiAdvisorWithStorageService(
       @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
-      ModelFactoryService modelFactoryService) {
+      GlobalSettingsService globalSettingsService) {
     this.aiAssistantServiceFactory = new AiAssistantServiceFactory(openAiApi);
-    this.modelFactoryService = modelFactoryService;
+    this.globalSettingsService = globalSettingsService;
   }
 
   public String createThread(AssistantService assistantService, Note note) {
@@ -48,27 +47,27 @@ public final class AiAdvisorWithStorageService {
     return aiAssistantServiceFactory.getAssistantService(getChatAssistantIdForNotebook(notebook));
   }
 
-  private GlobalSettingsService getGlobalSettingsService() {
-    return new GlobalSettingsService(modelFactoryService);
-  }
-
   private GlobalSettingsService.GlobalSettingsKeyValue getDefaultAssistantSettingAccessor() {
-    return getGlobalSettingsService().defaultAssistantId();
+    return globalSettingsService.defaultAssistantId();
   }
 
   public Assistant recreateDefaultAssistant(Timestamp currentUTCTimestamp) {
-    String modelName = getGlobalSettingsService().globalSettingOthers().getValue();
+    String modelName = getModelName();
     AssistantCreationService service = aiAssistantServiceFactory.getAssistantCreationService();
     Assistant assistant = service.createDefaultAssistant(modelName, "Note details completion");
     getDefaultAssistantSettingAccessor().setKeyValue(currentUTCTimestamp, assistant.getId());
     return assistant;
   }
 
+  private String getModelName() {
+    return globalSettingsService.globalSettingOthers().getValue();
+  }
+
   public NotebookAssistant recreateNotebookAssistant(
       Timestamp currentUTCTimestamp, User creator, Notebook notebook, String additionalInstruction)
       throws IOException {
     AssistantCreationService service = aiAssistantServiceFactory.getAssistantCreationService();
-    String modelName = getGlobalSettingsService().globalSettingOthers().getValue();
+    String modelName = getModelName();
     String fileContent = notebook.getNotebookDump();
     Assistant chatAssistant =
         service.createAssistantWithFile(

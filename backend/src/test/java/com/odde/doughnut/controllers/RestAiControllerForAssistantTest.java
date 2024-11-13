@@ -62,8 +62,9 @@ class RestAiControllerForAssistantTest {
 
   @BeforeEach
   void Setup() {
-    aiAdvisorWithStorageService =
-        new AiAdvisorWithStorageService(openAiApi, makeMe.modelFactoryService);
+    GlobalSettingsService globalSettingsService =
+        new GlobalSettingsService(makeMe.modelFactoryService);
+    aiAdvisorWithStorageService = new AiAdvisorWithStorageService(openAiApi, globalSettingsService);
     currentUser = makeMe.anAdmin().toModelPlease();
     note = makeMe.aNote().please();
     controller = createController(currentUser);

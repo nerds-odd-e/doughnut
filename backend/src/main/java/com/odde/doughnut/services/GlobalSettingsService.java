@@ -4,7 +4,9 @@ import com.odde.doughnut.controllers.dto.GlobalAiModelSettings;
 import com.odde.doughnut.entities.GlobalSettings;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;
+import org.springframework.stereotype.Service;
 
+@Service
 public class GlobalSettingsService {
 
   public static final String DEFAULT_CHAT_MODEL = "gpt-3.5-turbo";

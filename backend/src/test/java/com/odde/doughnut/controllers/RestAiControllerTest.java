@@ -13,6 +13,7 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AiAdvisorWithStorageService;
+import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.OtherAiServices;
 import com.odde.doughnut.services.ai.TopicTitleReplacement;
 import com.odde.doughnut.services.ai.tools.AiToolName;
@@ -56,8 +57,9 @@ class RestAiControllerTest {
 
   @BeforeEach
   void Setup() {
-    aiAdvisorWithStorageService =
-        new AiAdvisorWithStorageService(openAiApi, makeMe.modelFactoryService);
+    GlobalSettingsService globalSettingsService =
+        new GlobalSettingsService(makeMe.modelFactoryService);
+    aiAdvisorWithStorageService = new AiAdvisorWithStorageService(openAiApi, globalSettingsService);
     currentUser = makeMe.aUser().toModelPlease();
     note = makeMe.aNote().please();
     controller =

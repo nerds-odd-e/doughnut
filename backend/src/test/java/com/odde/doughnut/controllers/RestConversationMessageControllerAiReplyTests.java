@@ -72,8 +72,9 @@ public class RestConversationMessageControllerAiReplyTests {
   }
 
   private void setupServices() {
-    aiAdvisorWithStorageService =
-        new AiAdvisorWithStorageService(openAiApi, makeMe.modelFactoryService);
+    GlobalSettingsService globalSettingsService =
+        new GlobalSettingsService(makeMe.modelFactoryService);
+    aiAdvisorWithStorageService = new AiAdvisorWithStorageService(openAiApi, globalSettingsService);
     conversationService = new ConversationService(testabilitySettings, makeMe.modelFactoryService);
     controller =
         new RestConversationMessageController(

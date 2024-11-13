@@ -39,8 +39,9 @@ class AiAssistantServiceFactoryAssistantsTest {
   void Setup() {
     MockitoAnnotations.openMocks(this);
     openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
-    aiAdvisorServiceWithStorage =
-        new AiAdvisorWithStorageService(openAiApi, makeMe.modelFactoryService);
+    GlobalSettingsService globalSettingsService =
+        new GlobalSettingsService(makeMe.modelFactoryService);
+    aiAdvisorServiceWithStorage = new AiAdvisorWithStorageService(openAiApi, globalSettingsService);
   }
 
   @Nested
