@@ -30,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class AiAssistantServiceFactoryAssistantsTest {
 
-  private AiAdvisorWithStorageService aiAdvisorServiceWithStorage;
+  private AiAssistantFacade aiAdvisorServiceWithStorage;
   @Autowired MakeMe makeMe;
   @Mock private OpenAiApi openAiApi;
   OpenAIChatCompletionMock openAIChatCompletionMock;
@@ -41,7 +41,7 @@ class AiAssistantServiceFactoryAssistantsTest {
     openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
     GlobalSettingsService globalSettingsService =
         new GlobalSettingsService(makeMe.modelFactoryService);
-    aiAdvisorServiceWithStorage = new AiAdvisorWithStorageService(openAiApi, globalSettingsService);
+    aiAdvisorServiceWithStorage = new AiAssistantFacade(openAiApi, globalSettingsService);
   }
 
   @Nested

@@ -12,7 +12,7 @@ import com.odde.doughnut.controllers.dto.ToolCallResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.AiAdvisorWithStorageService;
+import com.odde.doughnut.services.AiAssistantFacade;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.OtherAiServices;
 import com.odde.doughnut.services.ai.TopicTitleReplacement;
@@ -53,19 +53,19 @@ class RestAiControllerTest {
   @Mock OpenAiApi openAiApi;
   @Autowired MakeMe makeMe;
   TestabilitySettings testabilitySettings = new TestabilitySettings();
-  AiAdvisorWithStorageService aiAdvisorWithStorageService;
+  AiAssistantFacade aiAssistantFacade;
 
   @BeforeEach
   void Setup() {
     GlobalSettingsService globalSettingsService =
         new GlobalSettingsService(makeMe.modelFactoryService);
-    aiAdvisorWithStorageService = new AiAdvisorWithStorageService(openAiApi, globalSettingsService);
+    aiAssistantFacade = new AiAssistantFacade(openAiApi, globalSettingsService);
     currentUser = makeMe.aUser().toModelPlease();
     note = makeMe.aNote().please();
     controller =
         new RestAiController(
             makeMe.modelFactoryService,
-            aiAdvisorWithStorageService,
+            aiAssistantFacade,
             new OtherAiServices(openAiApi),
             currentUser,
             testabilitySettings);
@@ -87,7 +87,7 @@ class RestAiControllerTest {
           () ->
               new RestAiController(
                       makeMe.modelFactoryService,
-                      aiAdvisorWithStorageService,
+                      aiAssistantFacade,
                       new OtherAiServices(openAiApi),
                       makeMe.aNullUserModelPlease(),
                       testabilitySettings)
@@ -190,7 +190,7 @@ class RestAiControllerTest {
       controller =
           new RestAiController(
               makeMe.modelFactoryService,
-              aiAdvisorWithStorageService,
+              aiAssistantFacade,
               new OtherAiServices(openAiApi),
               makeMe.aNullUserModelPlease(),
               testabilitySettings);
@@ -244,7 +244,7 @@ class RestAiControllerTest {
       controller =
           new RestAiController(
               makeMe.modelFactoryService,
-              aiAdvisorWithStorageService,
+              aiAssistantFacade,
               new OtherAiServices(openAiApi),
               makeMe.aNullUserModelPlease(),
               testabilitySettings);

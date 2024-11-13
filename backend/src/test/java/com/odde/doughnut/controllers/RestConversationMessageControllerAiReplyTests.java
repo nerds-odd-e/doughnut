@@ -12,7 +12,7 @@ import com.odde.doughnut.entities.NotebookAssistant;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.AiAdvisorWithStorageService;
+import com.odde.doughnut.services.AiAssistantFacade;
 import com.odde.doughnut.services.ConversationService;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.testability.MakeMe;
@@ -51,7 +51,7 @@ public class RestConversationMessageControllerAiReplyTests {
   Note note;
   TestabilitySettings testabilitySettings = new TestabilitySettings();
   OpenAIAssistantMocker openAIAssistantMocker;
-  AiAdvisorWithStorageService aiAdvisorWithStorageService;
+  AiAssistantFacade aiAssistantFacade;
   private ConversationService conversationService;
   Conversation conversation;
   Timestamp currentUTCTimestamp;
@@ -74,11 +74,10 @@ public class RestConversationMessageControllerAiReplyTests {
   private void setupServices() {
     GlobalSettingsService globalSettingsService =
         new GlobalSettingsService(makeMe.modelFactoryService);
-    aiAdvisorWithStorageService = new AiAdvisorWithStorageService(openAiApi, globalSettingsService);
+    aiAssistantFacade = new AiAssistantFacade(openAiApi, globalSettingsService);
     conversationService = new ConversationService(testabilitySettings, makeMe.modelFactoryService);
     controller =
-        new RestConversationMessageController(
-            currentUser, conversationService, aiAdvisorWithStorageService);
+        new RestConversationMessageController(currentUser, conversationService, aiAssistantFacade);
     openAIAssistantMocker = new OpenAIAssistantMocker(openAiApi);
   }
 

@@ -7,7 +7,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.AiAdvisorWithStorageService;
+import com.odde.doughnut.services.AiAssistantFacade;
 import com.odde.doughnut.services.ConversationService;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
@@ -20,16 +20,16 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @RequestMapping("/api/conversation")
 public class RestConversationMessageController {
   private final ConversationService conversationService;
-  private final AiAdvisorWithStorageService aiAdvisorWithStorageService;
+  private final AiAssistantFacade aiAssistantFacade;
   private final UserModel currentUser;
 
   public RestConversationMessageController(
       UserModel currentUser,
       ConversationService conversationService,
-      AiAdvisorWithStorageService aiAdvisorWithStorageService) {
+      AiAssistantFacade aiAssistantFacade) {
     this.currentUser = currentUser;
     this.conversationService = conversationService;
-    this.aiAdvisorWithStorageService = aiAdvisorWithStorageService;
+    this.aiAssistantFacade = aiAssistantFacade;
   }
 
   @PostMapping("/assessment-question/{assessmentQuestion}")
@@ -97,8 +97,7 @@ public class RestConversationMessageController {
       throws UnexpectedNoAccessRightException, BadRequestException {
     currentUser.assertAuthorization(conversation);
     try {
-      return aiAdvisorWithStorageService.getAiReplyForConversation(
-          conversation, conversationService);
+      return aiAssistantFacade.getAiReplyForConversation(conversation, conversationService);
     } catch (OpenAiUnauthorizedException e) {
       // Since this method is asynchronous, the exception body is not returned to the client.
       // Instead, the client will receive a 400 Bad Request status code, with no body.

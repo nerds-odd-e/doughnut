@@ -15,40 +15,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @Service
-public final class AiAdvisorWithStorageService {
+public final class AiAssistantFacade {
   private final AiAssistantServiceFactory aiAssistantServiceFactory;
   private final GlobalSettingsService globalSettingsService;
 
-  public AiAdvisorWithStorageService(
+  public AiAssistantFacade(
       @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
       GlobalSettingsService globalSettingsService) {
     this.aiAssistantServiceFactory = new AiAssistantServiceFactory(openAiApi);
     this.globalSettingsService = globalSettingsService;
-  }
-
-  public String createThread(AssistantService assistantService, Note note) {
-    return assistantService.createThread(note, List.of());
-  }
-
-  public ChatAboutNoteService getChatAboutNoteService(
-      String threadId, AssistantService assistantService) {
-    return new ChatAboutNoteService(threadId, assistantService);
-  }
-
-  public String getChatAssistantIdForNotebook(Notebook notebook) {
-    NotebookAssistant assistant = notebook.getNotebookAssistant();
-    if (assistant != null) {
-      return assistant.getAssistantId();
-    }
-    return getDefaultAssistantSettingAccessor().getValue();
-  }
-
-  public AssistantService getChatAssistantServiceForNotebook(Notebook notebook) {
-    return aiAssistantServiceFactory.getAssistantService(getChatAssistantIdForNotebook(notebook));
-  }
-
-  private GlobalSettingsService.GlobalSettingsKeyValue getDefaultAssistantSettingAccessor() {
-    return globalSettingsService.defaultAssistantId();
   }
 
   public Assistant recreateDefaultAssistant(Timestamp currentUTCTimestamp) {
@@ -59,36 +34,12 @@ public final class AiAdvisorWithStorageService {
     return assistant;
   }
 
-  private String getModelName() {
-    return globalSettingsService.globalSettingOthers().getValue();
-  }
-
   public NotebookAssistant recreateNotebookAssistant(
       Timestamp currentUTCTimestamp, User creator, Notebook notebook, String additionalInstruction)
       throws IOException {
     AssistantCreationService service = aiAssistantServiceFactory.getAssistantCreationService();
-    String modelName = getModelName();
-    String fileContent = notebook.getNotebookDump();
-    Assistant chatAssistant =
-        service.createAssistantWithFile(
-            modelName,
-            "Assistant for notebook %s".formatted(notebook.getHeadNote().getTopicConstructor()),
-            fileContent,
-            additionalInstruction);
-    return updateNotebookAssistant(currentUTCTimestamp, creator, notebook, chatAssistant);
-  }
-
-  private NotebookAssistant updateNotebookAssistant(
-      Timestamp currentUTCTimestamp, User creator, Notebook notebook, Assistant chatAssistant) {
-    NotebookAssistant notebookAssistant = notebook.getNotebookAssistant();
-    if (notebookAssistant == null) {
-      notebookAssistant = new NotebookAssistant();
-      notebookAssistant.setNotebook(notebook);
-    }
-    notebookAssistant.setCreator(creator);
-    notebookAssistant.setCreatedAt(currentUTCTimestamp);
-    notebookAssistant.setAssistantId(chatAssistant.getId());
-    return notebookAssistant;
+    return service.recreateNotebookAssistant(
+        currentUTCTimestamp, creator, notebook, additionalInstruction, getModelName());
   }
 
   public SseEmitter getAiReplyForConversation(
@@ -111,48 +62,19 @@ public final class AiAdvisorWithStorageService {
       Conversation conversation, ConversationService conversationService) {
     Note note = conversation.getSubject().getNote();
     String threadId = conversation.getAiAssistantThreadId();
-    AssistantService assistantService = getChatAssistantServiceForNotebook(note.getNotebook());
+    AssistantService assistantService = getAssistantServiceForNotebook(note.getNotebook());
 
     if (threadId == null) {
-      threadId = createThread(assistantService, note);
+      threadId = assistantService.createThread(note, List.of());
       conversationService.setConversationAiAssistantThreadId(conversation, threadId);
     }
 
-    ChatAboutNoteService chatService = getChatAboutNoteService(threadId, assistantService);
+    ChatAboutNoteService chatService = new ChatAboutNoteService(threadId, assistantService);
     chatService.sendNoteUpdateMessageIfNeeded(note, conversation);
-    sendUnsentMessagesToAI(conversation, chatService);
+    chatService.sendUnsentMessagesToAI(conversation);
     conversationService.updateLastAiAssistantThreadSync(conversation);
 
     return chatService;
-  }
-
-  private void sendUnsentMessagesToAI(Conversation conversation, ChatAboutNoteService chatService) {
-    List<ConversationMessage> unsynced =
-        conversation.getConversationMessages().stream()
-            .filter(
-                msg ->
-                    conversation.getLastAiAssistantThreadSync() == null
-                        || msg.getCreatedAt().after(conversation.getLastAiAssistantThreadSync()))
-            .filter(msg -> msg.getSender() != null)
-            .toList();
-
-    if (!unsynced.isEmpty()) {
-      String combinedMessage = formatUnsentMessages(unsynced);
-      chatService.createUserMessage(combinedMessage);
-    } else {
-      chatService.createUserMessage("just say something.");
-    }
-  }
-
-  private String formatUnsentMessages(List<ConversationMessage> messages) {
-    StringBuilder combined = new StringBuilder();
-    for (ConversationMessage msg : messages) {
-      combined.append(String.format("user `%s` says:%n", msg.getSender().getName()));
-      combined.append("-----------------\n");
-      combined.append(msg.getMessage());
-      combined.append("\n\n");
-    }
-    return combined.toString();
   }
 
   private void setupMessageHandler(
@@ -176,5 +98,29 @@ public final class AiAdvisorWithStorageService {
 
   public AssistantRunService getAssistantRunService(String threadId, String runId) {
     return aiAssistantServiceFactory.getAssistantRunService(threadId, runId);
+  }
+
+  public String suggestTopicTitle(Note note) {
+    return getAssistantServiceForNotebook(note.getNotebook()).suggestTopicTitle(note);
+  }
+
+  private String getAssistantIdForNotebook(Notebook notebook) {
+    NotebookAssistant assistant = notebook.getNotebookAssistant();
+    if (assistant != null) {
+      return assistant.getAssistantId();
+    }
+    return getDefaultAssistantSettingAccessor().getValue();
+  }
+
+  private GlobalSettingsService.GlobalSettingsKeyValue getDefaultAssistantSettingAccessor() {
+    return globalSettingsService.defaultAssistantId();
+  }
+
+  private AssistantService getAssistantServiceForNotebook(Notebook notebook) {
+    return aiAssistantServiceFactory.getAssistantService(getAssistantIdForNotebook(notebook));
+  }
+
+  private String getModelName() {
+    return globalSettingsService.globalSettingOthers().getValue();
   }
 }

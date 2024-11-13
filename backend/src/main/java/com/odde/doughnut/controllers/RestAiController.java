@@ -8,7 +8,7 @@ import com.odde.doughnut.entities.NotebookAssistant;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.AiAdvisorWithStorageService;
+import com.odde.doughnut.services.AiAssistantFacade;
 import com.odde.doughnut.services.ai.OtherAiServices;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.assistants.assistant.Assistant;
@@ -36,16 +36,16 @@ public class RestAiController {
   private final TestabilitySettings testabilitySettings;
 
   private final ModelFactoryService modelFactoryService;
-  private final AiAdvisorWithStorageService aiAdvisorWithStorageService;
+  private final AiAssistantFacade aiAssistantFacade;
 
   public RestAiController(
       ModelFactoryService modelFactoryService,
-      AiAdvisorWithStorageService aiAdvisorWithStorageService,
+      AiAssistantFacade aiAssistantFacade,
       OtherAiServices otherAiServices,
       UserModel currentUser,
       TestabilitySettings testabilitySettings) {
     this.modelFactoryService = modelFactoryService;
-    this.aiAdvisorWithStorageService = aiAdvisorWithStorageService;
+    this.aiAssistantFacade = aiAssistantFacade;
     this.otherAiServices = otherAiServices;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
@@ -74,7 +74,7 @@ public class RestAiController {
   public Map<String, String> recreateAllAssistants() throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    Assistant assistant = aiAdvisorWithStorageService.recreateDefaultAssistant(currentUTCTimestamp);
+    Assistant assistant = aiAssistantFacade.recreateDefaultAssistant(currentUTCTimestamp);
     Map<String, String> result = new HashMap<>();
     result.put(assistant.getName(), assistant.getId());
     return result;
@@ -89,7 +89,7 @@ public class RestAiController {
     currentUser.assertAdminAuthorization();
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     NotebookAssistant notebookAssistant =
-        aiAdvisorWithStorageService.recreateNotebookAssistant(
+        aiAssistantFacade.recreateNotebookAssistant(
             currentUTCTimestamp,
             currentUser.getEntity(),
             notebook,
@@ -107,16 +107,14 @@ public class RestAiController {
       @RequestBody ToolCallResult result)
       throws JsonProcessingException {
     currentUser.assertLoggedIn();
-    aiAdvisorWithStorageService
-        .getAssistantRunService(threadId, runId)
-        .submitToolOutputs(toolCallId, result);
+    aiAssistantFacade.getAssistantRunService(threadId, runId).submitToolOutputs(toolCallId, result);
   }
 
   @PostMapping("/cancel-run/{threadId}/{runId}")
   @Transactional
   public void cancelRun(@PathVariable String threadId, @PathVariable String runId) {
     currentUser.assertLoggedIn();
-    aiAdvisorWithStorageService.getAssistantRunService(threadId, runId).cancelRun();
+    aiAssistantFacade.getAssistantRunService(threadId, runId).cancelRun();
   }
 
   @PostMapping("/suggest-topic-title/{note}")
@@ -125,10 +123,7 @@ public class RestAiController {
       @PathVariable(value = "note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
-    String title =
-        aiAdvisorWithStorageService
-            .getChatAssistantServiceForNotebook(note.getNotebook())
-            .suggestTopicTitle(note);
+    String title = aiAssistantFacade.suggestTopicTitle(note);
     return new SuggestedTopicDTO(title);
   }
 }

@@ -1,10 +1,14 @@
 package com.odde.doughnut.services.ai;
 
+import com.odde.doughnut.entities.Notebook;
+import com.odde.doughnut.entities.NotebookAssistant;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.assistants.assistant.*;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +32,7 @@ public class AssistantCreationService {
     return openAiApiHandler.createAssistant(assistantRequest);
   }
 
-  public Assistant createAssistantWithFile(
+  private Assistant createAssistantWithFile(
       String modelName, String assistantName, String textContent, String additionalInstruction)
       throws IOException {
     ToolResources tooResources = uploadToolResources(assistantName, textContent);
@@ -56,5 +60,23 @@ public class AssistantCreationService {
     FileSearchResources fileSearchResources = new FileSearchResources();
     fileSearchResources.setVectorStoreIds(List.of(vectorStoreId));
     return new ToolResources(null, fileSearchResources);
+  }
+
+  public NotebookAssistant recreateNotebookAssistant(
+      Timestamp currentUTCTimestamp,
+      User creator,
+      Notebook notebook,
+      String additionalInstruction,
+      String modelName)
+      throws IOException {
+    String fileContent = notebook.getNotebookDump();
+    Assistant notebookAssistant =
+        createAssistantWithFile(
+            modelName,
+            "Assistant for notebook %s".formatted(notebook.getHeadNote().getTopicConstructor()),
+            fileContent,
+            additionalInstruction);
+    return notebook.buildOrEditNotebookAssistant(
+        currentUTCTimestamp, creator, notebookAssistant.getId());
   }
 }

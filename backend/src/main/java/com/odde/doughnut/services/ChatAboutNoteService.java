@@ -6,6 +6,7 @@ import com.odde.doughnut.services.ai.AssistantService;
 import com.theokanning.openai.assistants.message.Message;
 import com.theokanning.openai.service.assistant_stream.AssistantSSE;
 import io.reactivex.Flowable;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import lombok.RequiredArgsConstructor;
@@ -60,5 +61,34 @@ public class ChatAboutNoteService {
       assistantService.createAssistantMessage(
           "The note content has been update:\n\n%s".formatted(note.getNoteDescription()), threadId);
     }
+  }
+
+  void sendUnsentMessagesToAI(Conversation conversation) {
+    List<ConversationMessage> unsynced =
+        conversation.getConversationMessages().stream()
+            .filter(
+                msg ->
+                    conversation.getLastAiAssistantThreadSync() == null
+                        || msg.getCreatedAt().after(conversation.getLastAiAssistantThreadSync()))
+            .filter(msg -> msg.getSender() != null)
+            .toList();
+
+    if (!unsynced.isEmpty()) {
+      String combinedMessage = formatUnsentMessages(unsynced);
+      createUserMessage(combinedMessage);
+    } else {
+      createUserMessage("just say something.");
+    }
+  }
+
+  private String formatUnsentMessages(List<ConversationMessage> messages) {
+    StringBuilder combined = new StringBuilder();
+    for (ConversationMessage msg : messages) {
+      combined.append(String.format("user `%s` says:%n", msg.getSender().getName()));
+      combined.append("-----------------\n");
+      combined.append(msg.getMessage());
+      combined.append("\n\n");
+    }
+    return combined.toString();
   }
 }

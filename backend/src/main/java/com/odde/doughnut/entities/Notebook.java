@@ -164,4 +164,18 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   public Circle getCircle() {
     return getOwnership().getCircle();
   }
+
+  @JsonIgnore
+  public NotebookAssistant buildOrEditNotebookAssistant(
+      Timestamp currentUTCTimestamp, User creator, String id) {
+    NotebookAssistant notebookAssistant = getNotebookAssistant();
+    if (notebookAssistant == null) {
+      notebookAssistant = new NotebookAssistant();
+      notebookAssistant.setNotebook(this);
+    }
+    notebookAssistant.setCreator(creator);
+    notebookAssistant.setCreatedAt(currentUTCTimestamp);
+    notebookAssistant.setAssistantId(id);
+    return notebookAssistant;
+  }
 }
