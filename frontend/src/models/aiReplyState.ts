@@ -74,7 +74,7 @@ export const createAiReplyStates = (
           )
         } else if (
           toolCall.function!.name ===
-          DummyForGeneratingTypes.aiToolName.SUGGEST_TOPIC_TITLE
+          DummyForGeneratingTypes.aiToolName.SUGGEST_NOTE_TOPIC_TITLE
         ) {
           const titleGeneration = functionArgs as TopicTitleReplacement
           await context.setTopicTitle(

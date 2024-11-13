@@ -21,8 +21,8 @@ export type DummyForGeneratingTypes = {
 };
 export namespace DummyForGeneratingTypes {
     export enum aiToolName {
-        COMPLETE_NOTE_DETAILS = 'COMPLETE_NOTE_DETAILS',
-        SUGGEST_TOPIC_TITLE = 'SUGGEST_TOPIC_TITLE',
+        COMPLETE_NOTE_DETAILS = 'complete_note_details',
+        SUGGEST_NOTE_TOPIC_TITLE = 'suggest_note_topic_title',
     }
 }
 

@@ -204,7 +204,7 @@ class RestAiControllerTest {
       suggestedTopic.setNewTopic("Suggested Title");
       openAIAssistantThreadMocker
           .mockCreateRunInProcess("my-run-id")
-          .aRunThatRequireAction(suggestedTopic, AiToolName.SUGGEST_TOPIC_TITLE.getValue())
+          .aRunThatRequireAction(suggestedTopic, AiToolName.SUGGEST_NOTE_TOPIC_TITLE.getValue())
           .mockRetrieveRun()
           .mockCancelRun("my-run-id");
     }

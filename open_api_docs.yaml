@@ -4151,8 +4151,8 @@ components:
         aiToolName:
           type: string
           enum:
-          - COMPLETE_NOTE_DETAILS
-          - SUGGEST_TOPIC_TITLE
+          - complete_note_details
+          - suggest_note_topic_title
     ExpiresAfter:
       type: object
       properties:

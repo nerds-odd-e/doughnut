@@ -350,7 +350,7 @@ describe("ConversationInner", () => {
         wrapper,
         "Hello",
         createRunResponse(
-          DummyForGeneratingTypes.aiToolName.SUGGEST_TOPIC_TITLE,
+          DummyForGeneratingTypes.aiToolName.SUGGEST_NOTE_TOPIC_TITLE,
           <TopicTitleReplacement>{
             newTopic: testTitle,
           }
