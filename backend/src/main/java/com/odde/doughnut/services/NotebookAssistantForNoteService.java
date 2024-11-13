@@ -1,8 +1,11 @@
 package com.odde.doughnut.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.AiAssistantResponse;
+import com.odde.doughnut.controllers.dto.ToolCallResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.services.ai.AssistantService;
+import com.odde.doughnut.services.ai.TextFromAudio;
 import com.odde.doughnut.services.commands.GetAiStreamCommand;
 import com.theokanning.openai.assistants.message.MessageRequest;
 import java.util.ArrayList;
@@ -62,5 +65,23 @@ public final class NotebookAssistantForNoteService {
         .getArguments()
         .get("newTopic")
         .asText();
+  }
+
+  public TextFromAudio audioTranscriptionToArticle(String transcription)
+      throws JsonProcessingException {
+    String threadId =
+        createThread(
+            List.of(
+                MessageRequest.builder()
+                    .role("user")
+                    .content(
+                        "Please convert this audio transcription to an article: " + transcription)
+                    .build()));
+    AiAssistantResponse threadResponse = assistantService.createRunAndGetThreadResponse(threadId);
+    assistantService
+        .getAssistantRunService(threadId, threadResponse.getRunId())
+        .submitToolOutputs(
+            threadResponse.getToolCalls().getFirst().getId(), new ToolCallResult("appended"));
+    return new TextFromAudio();
   }
 }

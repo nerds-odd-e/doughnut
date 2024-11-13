@@ -8,10 +8,16 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import com.odde.doughnut.controllers.dto.*;
+import com.odde.doughnut.services.GlobalSettingsService;
+import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
+import com.odde.doughnut.services.ai.NoteDetailsCompletion;
 import com.odde.doughnut.services.ai.OtherAiServices;
 import com.odde.doughnut.services.ai.TextFromAudio;
+import com.odde.doughnut.services.ai.tools.AiToolName;
 import com.odde.doughnut.services.openAiApis.OpenAiApiExtended;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.OpenAIAssistantMocker;
+import com.odde.doughnut.testability.OpenAIAssistantThreadMocker;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import io.reactivex.Single;
@@ -43,7 +49,11 @@ class RestAiAudioControllerTests {
   @BeforeEach
   void setup() {
     controller =
-        new RestAiAudioController(new OtherAiServices(openAiApi), makeMe.modelFactoryService);
+        new RestAiAudioController(
+            new OtherAiServices(openAiApi),
+            makeMe.modelFactoryService,
+            new NotebookAssistantForNoteServiceFactory(
+                openAiApi, new GlobalSettingsService(makeMe.modelFactoryService)));
     TextFromAudio completionMarkdownFromAudio = new TextFromAudio();
     completionMarkdownFromAudio.setCompletionMarkdownFromAudio("test123");
     openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
@@ -105,11 +115,16 @@ class RestAiAudioControllerTests {
   @Nested
   class ConvertAudioToTextForNote {
     AudioUploadDTO audioUploadDTO = new AudioUploadDTO();
+    OpenAIAssistantMocker openAIAssistantMocker;
+    OpenAIAssistantThreadMocker openAIAssistantThreadMocker;
 
     @BeforeEach
     void setup() {
       when(openAiApi.createTranscriptionSrt(any(RequestBody.class)))
           .thenReturn(Single.just(ResponseBody.create("test transcription", null)));
+
+      openAIAssistantMocker = new OpenAIAssistantMocker(openAiApi);
+      openAIAssistantThreadMocker = openAIAssistantMocker.mockThreadCreation(null);
     }
 
     @Test
@@ -121,11 +136,33 @@ class RestAiAudioControllerTests {
       var dto = new AudioUploadDTO();
       dto.setUploadAudioFile(mockFile);
 
+      NoteDetailsCompletion completion = new NoteDetailsCompletion();
+      completion.completion = "text from audio transcription";
+
+      openAIAssistantThreadMocker
+          .mockCreateRunInProcess("my-run-id")
+          .aRunThatRequireAction(completion, AiToolName.COMPLETE_NOTE_DETAILS.getValue())
+          .mockRetrieveRun()
+          .mockSubmitOutput();
+
       // Act
       TextFromAudio result = controller.audioToTextForNote(note, dto);
 
       // Assert
       verify(openAiApi).createTranscriptionSrt(any(RequestBody.class));
+      verify(openAiApi)
+          .createThread(
+              argThat(
+                  request -> {
+                    assertThat(
+                        request.getMessages().get(1).getContent().toString(),
+                        equalTo(note.getNoteDescription()));
+                    assertThat(
+                        request.getMessages().get(2).getContent().toString(),
+                        containsString(
+                            "Please convert this audio transcription to an article: test transcription"));
+                    return true;
+                  }));
       assertNotNull(result);
     }
   }

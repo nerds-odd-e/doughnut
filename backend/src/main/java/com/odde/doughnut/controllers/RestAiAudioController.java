@@ -4,6 +4,7 @@ import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.GlobalSettingsService;
+import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
 import com.odde.doughnut.services.ai.OtherAiServices;
 import com.odde.doughnut.services.ai.TextFromAudio;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -22,11 +23,15 @@ class RestAiAudioController {
 
   OtherAiServices otherAiServices;
   private final ModelFactoryService modelFactoryService;
+  private final NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory;
 
   public RestAiAudioController(
-      OtherAiServices otherAiServices, ModelFactoryService modelFactoryService) {
+      OtherAiServices otherAiServices,
+      ModelFactoryService modelFactoryService,
+      NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory) {
     this.otherAiServices = otherAiServices;
     this.modelFactoryService = modelFactoryService;
+    this.notebookAssistantForNoteServiceFactory = notebookAssistantForNoteServiceFactory;
   }
 
   @PostMapping(
@@ -55,7 +60,9 @@ class RestAiAudioController {
     String filename = audioFile.getUploadAudioFile().getOriginalFilename();
     byte[] bytes = audioFile.getUploadAudioFile().getBytes();
     String transcriptionFromAudio = otherAiServices.getTranscriptionFromAudio(filename, bytes);
-    return new TextFromAudio();
+    return notebookAssistantForNoteServiceFactory
+        .create(note)
+        .audioTranscriptionToArticle(transcriptionFromAudio);
   }
 
   private GlobalSettingsService getGlobalSettingsService() {
