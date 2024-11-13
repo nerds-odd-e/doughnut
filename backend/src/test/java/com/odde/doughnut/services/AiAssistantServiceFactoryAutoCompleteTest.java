@@ -16,6 +16,7 @@ import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.services.ai.AssistantService;
 import com.odde.doughnut.services.ai.NoteDetailsCompletion;
 import com.odde.doughnut.services.ai.tools.AiToolName;
+import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIAssistantMocker;
 import com.odde.doughnut.testability.OpenAIAssistantThreadMocker;
@@ -45,7 +46,7 @@ class AiAssistantServiceFactoryAutoCompleteTest {
   @BeforeEach
   void Setup() {
     MockitoAnnotations.openMocks(this);
-    completionService = new AiAssistantServiceFactory(openAiApi).getAssistantService("example-id");
+    completionService = new AssistantService(new OpenAiApiHandler(openAiApi), "example-id");
     openAIAssistantMocker = new OpenAIAssistantMocker(openAiApi);
     openAIAssistantThreadMocker =
         openAIAssistantMocker.mockThreadCreation(null).mockCreateMessage();

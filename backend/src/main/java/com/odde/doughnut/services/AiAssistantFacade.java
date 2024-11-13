@@ -3,6 +3,7 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.services.ai.AssistantRunService;
 import com.odde.doughnut.services.ai.AssistantService;
+import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.assistants.message.Message;
 import com.theokanning.openai.client.OpenAiApi;
 import java.sql.Timestamp;
@@ -13,14 +14,14 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @Service
 public final class AiAssistantFacade {
-  private final AiAssistantServiceFactory aiAssistantServiceFactory;
   private final GlobalSettingsService globalSettingsService;
+  private final OpenAiApiHandler openAiApiHandler;
 
   public AiAssistantFacade(
       @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
       GlobalSettingsService globalSettingsService) {
-    this.aiAssistantServiceFactory = new AiAssistantServiceFactory(openAiApi);
     this.globalSettingsService = globalSettingsService;
+    this.openAiApiHandler = new OpenAiApiHandler(openAiApi);
   }
 
   public SseEmitter getAiReplyForConversation(
@@ -74,7 +75,7 @@ public final class AiAssistantFacade {
   }
 
   public AssistantRunService getAssistantRunService(String threadId, String runId) {
-    return aiAssistantServiceFactory.getAssistantRunService(threadId, runId);
+    return new AssistantRunService(openAiApiHandler, threadId, runId);
   }
 
   public String suggestTopicTitle(Note note) {
@@ -86,14 +87,11 @@ public final class AiAssistantFacade {
     if (assistant != null) {
       return assistant.getAssistantId();
     }
-    return getDefaultAssistantSettingAccessor().getValue();
-  }
-
-  private GlobalSettingsService.GlobalSettingsKeyValue getDefaultAssistantSettingAccessor() {
-    return globalSettingsService.defaultAssistantId();
+    return globalSettingsService.defaultAssistantId().getValue();
   }
 
   private AssistantService getAssistantServiceForNotebook(Notebook notebook) {
-    return aiAssistantServiceFactory.getAssistantService(getAssistantIdForNotebook(notebook));
+    String assistantId = getAssistantIdForNotebook(notebook);
+    return new AssistantService(openAiApiHandler, assistantId);
   }
 }
