@@ -11,12 +11,9 @@ Feature: Recording a live audio and append to note details
       its talk about dada struct day.
 
       """
-    Given OpenAI assistant will reply below for user messages in a non-stream run:
+    And OpenAI assistant will reply below for user messages in a non-stream run:
       | response                | arguments                 |
       | complete note details   |"Let's talk about data structure today."|
-    # And the OpenAI completion service will return the following response for the transcription to text request:
-    #   | request contains              | response         |
-    #   | its talk about dada struct day. | Let's talk about data structure today. |
     And the browser is mocked to give permission to record audio
 
   Scenario: Record audio of a live event

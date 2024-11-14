@@ -84,14 +84,6 @@ const openAiChatCompletionStubber = (
         messages: [message],
       })
     },
-    stubAudioTranscriptToText(argumentsString: string) {
-      return stubSingleToolCall(
-        'audio_transcription_to_text',
-        JSON.stringify({
-          completionMarkdownFromAudio: argumentsString,
-        })
-      )
-    },
     stubQuestionGeneration(argumentsString: string) {
       return stubSingleToolCall(
         'ask_single_answer_multiple_choice_question',
