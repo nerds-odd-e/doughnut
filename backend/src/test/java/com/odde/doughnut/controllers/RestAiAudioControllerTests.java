@@ -9,6 +9,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import com.odde.doughnut.controllers.dto.*;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
 import com.odde.doughnut.services.ai.NoteDetailsCompletion;
@@ -60,6 +61,12 @@ class RestAiAudioControllerTests {
     openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
     openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(
         completionMarkdownFromAudio, "audio_transcription_to_text");
+    mockTranscriptionSrtResponse("test transcription");
+  }
+
+  protected void mockTranscriptionSrtResponse(String responseBody) {
+    when(openAiApi.createTranscriptionSrt(any(RequestBody.class)))
+        .thenReturn(Single.just(ResponseBody.create(responseBody, null)));
   }
 
   private MockMultipartFile createMockAudioFile(String filename) {
@@ -74,12 +81,13 @@ class RestAiAudioControllerTests {
 
   @Nested
   class ConvertAudioToText {
-    AudioUploadDTO audioUploadDTO = new AudioUploadDTO();
+    AudioUploadDTO audioUploadDTO;
 
     @BeforeEach
     void setup() {
-      when(openAiApi.createTranscriptionSrt(any(RequestBody.class)))
-          .thenReturn(Single.just(ResponseBody.create("test", null)));
+      mockTranscriptionSrtResponse("test");
+      audioUploadDTO = new AudioUploadDTO();
+      audioUploadDTO.setUploadAudioFile(createMockAudioFile("test.mp3"));
     }
 
     @ParameterizedTest
@@ -96,17 +104,18 @@ class RestAiAudioControllerTests {
 
     @Test
     void convertAudioToText() throws IOException {
-      var dto = createAudioUploadDTO(createMockAudioFile("test.mp3"));
       String resp =
-          controller.audioToText(dto).map(TextFromAudio::getCompletionMarkdownFromAudio).orElse("");
+          controller
+              .audioToText(audioUploadDTO)
+              .map(TextFromAudio::getCompletionMarkdownFromAudio)
+              .orElse("");
       assertThat(resp, equalTo("test123"));
     }
 
     @Test
     void usingThePreviousTrailingDetails() throws IOException {
-      var dto = createAudioUploadDTO(createMockAudioFile("test.mp3"));
-      dto.setPreviousNoteDetails("Long long ago");
-      controller.audioToText(dto).map(TextFromAudio::getCompletionMarkdownFromAudio);
+      audioUploadDTO.setPreviousNoteDetails("Long long ago");
+      controller.audioToText(audioUploadDTO).map(TextFromAudio::getCompletionMarkdownFromAudio);
       ArgumentCaptor<ChatCompletionRequest> argumentCaptor =
           ArgumentCaptor.forClass(ChatCompletionRequest.class);
       verify(openAiApi, times(1)).createChatCompletion(argumentCaptor.capture());
@@ -120,21 +129,15 @@ class RestAiAudioControllerTests {
   class ConvertAudioToTextForNote {
     OpenAIAssistantMocker openAIAssistantMocker;
     OpenAIAssistantThreadMocker openAIAssistantThreadMocker;
+    AudioUploadDTO audioUploadDTO;
+    Note note;
 
     @BeforeEach
     void setup() {
-      when(openAiApi.createTranscriptionSrt(any(RequestBody.class)))
-          .thenReturn(Single.just(ResponseBody.create("test transcription", null)));
-
+      note = makeMe.aNote().please();
+      audioUploadDTO = createAudioUploadDTO(createMockAudioFile("test.mp3"));
       openAIAssistantMocker = new OpenAIAssistantMocker(openAiApi);
       openAIAssistantThreadMocker = openAIAssistantMocker.mockThreadCreation(null);
-    }
-
-    @Test
-    void convertAudioToTextForExistingNote() throws IOException {
-      var note = makeMe.aNote().please();
-      var dto = createAudioUploadDTO(createMockAudioFile("test.mp3"));
-
       NoteDetailsCompletion completion = new NoteDetailsCompletion();
       completion.completion = "text from audio transcription";
 
@@ -143,8 +146,11 @@ class RestAiAudioControllerTests {
           .aRunThatRequireAction(completion, AiToolName.COMPLETE_NOTE_DETAILS.getValue())
           .mockRetrieveRun()
           .mockSubmitOutput();
+    }
 
-      TextFromAudio result = controller.audioToTextForNote(note, dto);
+    @Test
+    void convertAudioToTextForExistingNote() throws IOException {
+      TextFromAudio result = controller.audioToTextForNote(note, audioUploadDTO);
 
       verify(openAiApi).createTranscriptionSrt(any(RequestBody.class));
       verify(openAiApi)
@@ -165,19 +171,7 @@ class RestAiAudioControllerTests {
 
     @Test
     void shouldOnlyIncludeCompleteNoteDetailsToolInRun() throws IOException {
-      var note = makeMe.aNote().please();
-      var dto = createAudioUploadDTO(createMockAudioFile("test.mp3"));
-
-      NoteDetailsCompletion completion = new NoteDetailsCompletion();
-      completion.completion = "text from audio transcription";
-
-      openAIAssistantThreadMocker
-          .mockCreateRunInProcess("my-run-id")
-          .aRunThatRequireAction(completion, AiToolName.COMPLETE_NOTE_DETAILS.getValue())
-          .mockRetrieveRun()
-          .mockSubmitOutput();
-
-      controller.audioToTextForNote(note, dto);
+      controller.audioToTextForNote(note, audioUploadDTO);
 
       verify(openAiApi)
           .createRun(

@@ -12,7 +12,6 @@ import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.commands.GetAiStreamCommand;
 import com.theokanning.openai.assistants.message.MessageRequest;
 import com.theokanning.openai.assistants.run.RunCreateRequest;
-import java.util.ArrayList;
 import java.util.List;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -33,7 +32,7 @@ public final class NotebookAssistantForNoteService {
 
     String threadId = conversation.getAiAssistantThreadId();
     if (threadId == null) {
-      threadId = createThread(List.of());
+      threadId = assistantService.createThread(List.of(getNoteDescriptionMessage()));
       conversationService.setConversationAiAssistantThreadId(conversation, threadId);
     }
 
@@ -41,32 +40,21 @@ public final class NotebookAssistantForNoteService {
         .execute(threadId);
   }
 
-  private String createThread(List<MessageRequest> additionalMessages) {
-    List<MessageRequest> messages =
-        new ArrayList<>(
-            List.of(
-                MessageRequest.builder()
-                    .role("assistant")
-                    .content(note.getNoteDescription())
-                    .build()));
-    if (additionalMessages != null && !additionalMessages.isEmpty()) {
-      messages.addAll(additionalMessages);
-    }
-    return assistantService.createThread(messages);
+  private MessageRequest getNoteDescriptionMessage() {
+    return MessageRequest.builder().role("assistant").content(note.getNoteDescription()).build();
   }
 
   public String suggestTopicTitle() {
-    List<MessageRequest> messages =
-        List.of(
-            MessageRequest.builder()
-                .role("user")
-                .content("Please suggest a better topic title for the note.")
-                .build());
+    MessageRequest message =
+        MessageRequest.builder()
+            .role("user")
+            .content("Please suggest a better topic title for the note.")
+            .build();
 
     try {
       final String[] result = new String[1];
       executeAssistantProcess(
-          messages,
+          message,
           AiToolFactory.suggestNoteTopicTitle(),
           (runService, threadResponse, parsedResponse) -> {
             TopicTitleReplacement replacement = (TopicTitleReplacement) parsedResponse;
@@ -95,12 +83,11 @@ public final class NotebookAssistantForNoteService {
        ------------
       """
             + transcription;
-    List<MessageRequest> messages =
-        List.of(MessageRequest.builder().role("user").content(content).build());
+    MessageRequest message = MessageRequest.builder().role("user").content(content).build();
 
     final TextFromAudio textFromAudio = new TextFromAudio();
     executeAssistantProcess(
-        messages,
+        message,
         AiToolFactory.completeNoteDetails(),
         (runService, toolCallId, parsedResponse) -> {
           try {
@@ -116,11 +103,12 @@ public final class NotebookAssistantForNoteService {
   }
 
   private void executeAssistantProcess(
-      List<MessageRequest> userMessages,
+      MessageRequest userMessage,
       AiTool tool,
       TriConsumer<AssistantRunService, String, Object> runServiceAction)
       throws JsonProcessingException {
-    String threadId = createThread(userMessages);
+    String threadId =
+        assistantService.createThread(List.of(getNoteDescriptionMessage(), userMessage));
     RunCreateRequest.RunCreateRequestBuilder builder =
         RunCreateRequest.builder().tools(List.of(tool.getTool()));
     AiAssistantResponse threadResponse =
