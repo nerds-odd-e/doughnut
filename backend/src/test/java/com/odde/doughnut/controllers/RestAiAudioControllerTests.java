@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -163,6 +164,39 @@ class RestAiAudioControllerTests {
                   }));
       assertNotNull(result);
       assertThat(result.getCompletionMarkdownFromAudio(), equalTo("text from audio transcription"));
+    }
+
+    @Test
+    void shouldOnlyIncludeCompleteNoteDetailsToolInRun() throws IOException {
+      // Arrange
+      var note = makeMe.aNote().please();
+      MockMultipartFile mockFile =
+          new MockMultipartFile("file", "test.mp3", "text/plain", "test".getBytes());
+      var dto = new AudioUploadDTO();
+      dto.setUploadAudioFile(mockFile);
+
+      NoteDetailsCompletion completion = new NoteDetailsCompletion();
+      completion.completion = "text from audio transcription";
+
+      openAIAssistantThreadMocker
+          .mockCreateRunInProcess("my-run-id")
+          .aRunThatRequireAction(completion, AiToolName.COMPLETE_NOTE_DETAILS.getValue())
+          .mockRetrieveRun()
+          .mockSubmitOutput();
+
+      // Act
+      controller.audioToTextForNote(note, dto);
+
+      // Assert
+      verify(openAiApi)
+          .createRun(
+              any(),
+              argThat(
+                  request -> {
+                    assertThat(request.getTools(), hasSize(1));
+                    assertThat(request.getTools().getFirst().getType(), equalTo("function"));
+                    return true;
+                  }));
     }
   }
 }

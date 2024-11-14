@@ -121,7 +121,8 @@ public final class NotebookAssistantForNoteService {
       TriConsumer<AssistantRunService, String, Object> runServiceAction)
       throws JsonProcessingException {
     String threadId = createThread(userMessages);
-    RunCreateRequest.RunCreateRequestBuilder builder = RunCreateRequest.builder();
+    RunCreateRequest.RunCreateRequestBuilder builder =
+        RunCreateRequest.builder().tools(List.of(tool.getTool()));
     AiAssistantResponse threadResponse =
         assistantService.createRunAndGetThreadResponse(threadId, builder);
     AssistantRunService runService =
