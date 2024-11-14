@@ -78,7 +78,7 @@ Given there are some notes:
 
 Example:
 ```typescript
-Given('OpenAI assistant will reply below for user messages:', (data: DataTable) => {
+Given('OpenAI assistant will reply below for user messages in a stream run:', (data: DataTable) => {
   mock_services.openAi()
     .stubCreateThread('thread-123')
     .createThreadAndStubMessages('thread-123', data.hashes())

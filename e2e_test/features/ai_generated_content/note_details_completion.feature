@@ -15,7 +15,7 @@ Feature: Note details completion
     Then I should see a notification of a bad request
 
   Scenario Outline: Completing Note Details Using OpenAI
-    Given OpenAI assistant will reply below for user messages:
+    Given OpenAI assistant will reply below for user messages in a stream run:
       | user message                      | response type   | assistant reply                 | run id |
       | Please complete the note details. | requires action | {"completion": " vigorous city."} | run1   |
     And OpenAI assistant can accept tool call results submission and run cancellation

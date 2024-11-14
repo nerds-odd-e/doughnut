@@ -10,7 +10,7 @@ Feature: Chat about a note with AI
 
 
   Scenario: The users can chat with AI about the current note
-    Given OpenAI assistant will reply below for user messages:
+    Given OpenAI assistant will reply below for user messages in a stream run:
       | user message          | assistant reply              | run id |
       | Is Naba one of them?  | No. It is not.               | run1   |
       | Is this note correct? | No, there are 47 prefectures | run2   |

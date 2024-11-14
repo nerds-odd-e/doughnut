@@ -65,12 +65,25 @@ Then('I contest the question', () => {
 })
 
 Given(
-  'OpenAI assistant will reply below for user messages:',
+  'OpenAI assistant will reply below for user messages in a stream run:',
   (data: DataTable) => {
     mock_services
       .openAi()
       .stubCreateThread('thread-123')
-      .createThreadAndStubMessages('thread-123', data.hashes())
+      .createThreadWithRunStreamAndStubMessages('thread-123', data.hashes())
+  }
+)
+
+Given(
+  'OpenAI assistant will reply below for user messages in a non-stream run:',
+  (data: DataTable) => {
+    mock_services
+      .openAi()
+      .stubCreateThread('thread-123')
+      .stubCreateRuns('thread-123', ['run-123'])
+      .aRun('run-123')
+      .stubRetrieveRunsThatRequireAction(data.hashes())
+      .stubSubmitToolOutputs()
   }
 )
 
@@ -87,7 +100,11 @@ Given(
     mock_services
       .openAi()
       .stubCreateThread('thread-123')
-      .createThreadAndStubMessages('thread-123', data.hashes(), assistantId)
+      .createThreadWithRunStreamAndStubMessages(
+        'thread-123',
+        data.hashes(),
+        assistantId
+      )
   }
 )
 

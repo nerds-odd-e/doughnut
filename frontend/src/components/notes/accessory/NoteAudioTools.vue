@@ -98,10 +98,13 @@ const updateTopicIfSuggested = async (noteId: number) => {
 
 const processAudio = async (file: Blob) => {
   try {
-    const response = await managedApi.restAiAudioController.audioToText({
-      previousNoteDetails: note.details?.slice(-500) ?? "",
-      uploadAudioFile: file,
-    })
+    const response = await managedApi.restAiAudioController.audioToTextForNote(
+      note.id,
+      {
+        previousNoteDetails: note.details?.slice(-500) ?? "",
+        uploadAudioFile: file,
+      }
+    )
     await storageAccessor
       .storedApi()
       .appendDetails(note.id, response?.completionMarkdownFromAudio)

@@ -125,14 +125,16 @@ const openAiService = () => {
       assistantId?: string,
       threadId = 'thread-abc123'
     ) {
-      return this.stubCreateThread(threadId).createThreadAndStubMessages(
+      return this.stubCreateThread(
+        threadId
+      ).createThreadWithRunStreamAndStubMessages(
         threadId,
         messages,
         assistantId
       )
     },
 
-    createThreadAndStubMessages(
+    createThreadWithRunStreamAndStubMessages(
       threadId: string,
       messages: Record<string, string>[],
       assistantId?: string
