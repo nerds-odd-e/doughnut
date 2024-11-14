@@ -373,6 +373,13 @@ Then(
   }
 )
 
+Then(
+  'the note details on the current page should be {string} within {int} seconds',
+  (detailsText: string, timeout: number) => {
+    start.assumeNotePage().findNoteDetails(detailsText, timeout * 1000)
+  }
+)
+
 When('I generate an image for {string}', (noteTopic: string) => {
   start.jumpToNotePage(noteTopic).aiGenerateImage()
 })

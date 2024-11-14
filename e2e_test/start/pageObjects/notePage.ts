@@ -136,10 +136,12 @@ export const assumeNotePage = (noteTopic?: string) => {
     collapsedChildrenWithCount: (count: number) => {
       cy.findByText(count, { selector: '[role=collapsed-children-count]' })
     },
-    findNoteDetails: (expected: string) => {
+    findNoteDetails: (expected: string, timeout?: number) => {
       expected
         .split('\\n')
-        .forEach((line) => cy.get('[role=details]').should('contain', line))
+        .forEach((line) =>
+          cy.get('[role=details]', { timeout }).should('contain', line)
+        )
     },
     toolbarButton: (btnTextOrTitle: string) => {
       return privateToolbarButton(btnTextOrTitle)

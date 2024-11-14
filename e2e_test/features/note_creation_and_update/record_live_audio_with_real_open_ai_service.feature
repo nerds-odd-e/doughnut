@@ -11,5 +11,5 @@ Feature: Record live audio with real OpenAI service
       And I start recording audio for the note "Data Structure Lecture"
       And the browser records audio input from the microphone as in "lecture.wav"
       When I stop recording audio
-      Then the note details on the current page should be "Please be very quiet."
+      Then the note details on the current page should be "Please be very quiet." within 20 seconds
 
