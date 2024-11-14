@@ -138,8 +138,7 @@ public class OpenAiApiHandler {
     return blockGet(openAiApi.retrieveRun(threadId, runId));
   }
 
-  public Run createRun(String threadId, String assistantId) {
-    RunCreateRequest runCreateRequest = RunCreateRequest.builder().assistantId(assistantId).build();
+  public Run createRun(String threadId, RunCreateRequest runCreateRequest) {
     return blockGet(openAiApi.createRun(threadId, runCreateRequest));
   }
 

@@ -9,6 +9,7 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.services.ai.*;
 import com.odde.doughnut.services.commands.GetAiStreamCommand;
 import com.theokanning.openai.assistants.message.MessageRequest;
+import com.theokanning.openai.assistants.run.RunCreateRequest;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -53,12 +54,19 @@ public final class NotebookAssistantForNoteService {
   }
 
   public String suggestTopicTitle() {
+    List<MessageRequest> messages =
+        List.of(
+            MessageRequest.builder()
+                .role("user")
+                .content("Please suggest a better topic title for the note.")
+                .build());
+
     try {
       final String[] result = new String[1];
       executeAssistantProcess(
-          "Please suggest a better topic title for the note.",
+          messages,
           TopicTitleReplacement.class,
-          (runService, toolCallId, parsedResponse) -> {
+          (runService, threadResponse, parsedResponse) -> {
             TopicTitleReplacement replacement = (TopicTitleReplacement) parsedResponse;
             result[0] = replacement.newTopic;
             runService.cancelRun();
@@ -71,7 +79,7 @@ public final class NotebookAssistantForNoteService {
 
   public TextFromAudio audioTranscriptionToArticle(String transcription)
       throws JsonProcessingException {
-    String userMessage =
+    String content =
         """
       You are a helpful assistant for converting audio transcription in SRT format to text of paragraphs. Your task is to convert the following audio transcription to text with meaningful punctuations and paragraphs.
        * Fix obvious audio transcription mistakes.
@@ -85,10 +93,12 @@ public final class NotebookAssistantForNoteService {
        ------------
       """
             + transcription;
+    List<MessageRequest> messages =
+        List.of(MessageRequest.builder().role("user").content(content).build());
 
     final TextFromAudio textFromAudio = new TextFromAudio();
     executeAssistantProcess(
-        userMessage,
+        messages,
         NoteDetailsCompletion.class,
         (runService, toolCallId, parsedResponse) -> {
           try {
@@ -104,15 +114,14 @@ public final class NotebookAssistantForNoteService {
   }
 
   private void executeAssistantProcess(
-      String userMessage,
+      List<MessageRequest> userMessages,
       Class<?> responseType,
       TriConsumer<AssistantRunService, String, Object> runServiceAction)
       throws JsonProcessingException {
-    List<MessageRequest> userMessages =
-        List.of(MessageRequest.builder().role("user").content(userMessage).build());
-
     String threadId = createThread(userMessages);
-    AiAssistantResponse threadResponse = assistantService.createRunAndGetThreadResponse(threadId);
+    RunCreateRequest.RunCreateRequestBuilder builder = RunCreateRequest.builder();
+    AiAssistantResponse threadResponse =
+        assistantService.createRunAndGetThreadResponse(threadId, builder);
     AssistantRunService runService =
         assistantService.getAssistantRunService(threadId, threadResponse.getRunId());
     if (runServiceAction != null) {

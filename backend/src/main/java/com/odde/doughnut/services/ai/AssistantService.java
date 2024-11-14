@@ -7,6 +7,7 @@ import com.theokanning.openai.assistants.message.Message;
 import com.theokanning.openai.assistants.message.MessageRequest;
 import com.theokanning.openai.assistants.run.RequiredAction;
 import com.theokanning.openai.assistants.run.Run;
+import com.theokanning.openai.assistants.run.RunCreateRequest;
 import com.theokanning.openai.assistants.run.ToolCall;
 import com.theokanning.openai.assistants.thread.ThreadRequest;
 import com.theokanning.openai.service.assistant_stream.AssistantSSE;
@@ -80,8 +81,11 @@ public final class AssistantService {
     return requiredAction.getSubmitToolOutputs().getToolCalls();
   }
 
-  public AiAssistantResponse createRunAndGetThreadResponse(String threadId) {
-    Run run = openAiApiHandler.createRun(threadId, assistantId);
+  public AiAssistantResponse createRunAndGetThreadResponse(
+      String threadId, RunCreateRequest.RunCreateRequestBuilder runCreateRequestBuilder) {
+    Run run =
+        openAiApiHandler.createRun(
+            threadId, runCreateRequestBuilder.assistantId(assistantId).build());
     return getThreadResponse(threadId, run);
   }
 
