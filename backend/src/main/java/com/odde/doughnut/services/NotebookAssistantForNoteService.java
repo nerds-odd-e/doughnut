@@ -100,11 +100,9 @@ public final class NotebookAssistantForNoteService {
         executeAssistantProcess(
             messages,
             NoteDetailsCompletion.class,
-            (runService, threadResponse) -> {
+            (runService, toolCallId) -> {
               try {
-                runService.submitToolOutputs(
-                    threadResponse.getToolCalls().getFirst().getId(),
-                    new ToolCallResult("appended"));
+                runService.submitToolOutputs(toolCallId, new ToolCallResult("appended"));
               } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
               }
@@ -118,14 +116,14 @@ public final class NotebookAssistantForNoteService {
   private <T> T executeAssistantProcess(
       List<MessageRequest> userMessages,
       Class<T> responseType,
-      BiConsumer<AssistantRunService, AiAssistantResponse> runServiceAction)
+      BiConsumer<AssistantRunService, String> runServiceAction)
       throws JsonProcessingException {
     String threadId = createThread(userMessages);
     AiAssistantResponse threadResponse = assistantService.createRunAndGetThreadResponse(threadId);
     AssistantRunService runService =
         assistantService.getAssistantRunService(threadId, threadResponse.getRunId());
     if (runServiceAction != null) {
-      runServiceAction.accept(runService, threadResponse);
+      runServiceAction.accept(runService, threadResponse.getToolCalls().getFirst().getId());
     }
 
     // Parse the first tool call's function's arguments into responseType
