@@ -11,7 +11,6 @@ import com.odde.doughnut.services.commands.GetAiStreamCommand;
 import com.theokanning.openai.assistants.message.MessageRequest;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BiConsumer;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 public final class NotebookAssistantForNoteService {
@@ -62,13 +61,16 @@ public final class NotebookAssistantForNoteService {
                 .build());
 
     try {
-      TopicTitleReplacement replacement =
-          executeAssistantProcess(
-              messages,
-              TopicTitleReplacement.class,
-              (runService, threadResponse) -> runService.cancelRun());
-
-      return replacement.newTopic;
+      final String[] result = new String[1];
+      executeAssistantProcess(
+          messages,
+          TopicTitleReplacement.class,
+          (runService, threadResponse, parsedResponse) -> {
+            TopicTitleReplacement replacement = (TopicTitleReplacement) parsedResponse;
+            result[0] = replacement.newTopic;
+            runService.cancelRun();
+          });
+      return result[0];
     } catch (JsonProcessingException e) {
       throw new RuntimeException("Failed to parse topic title replacement", e);
     }
@@ -96,39 +98,39 @@ public final class NotebookAssistantForNoteService {
                         + transcription)
                 .build());
 
-    NoteDetailsCompletion noteDetails =
-        executeAssistantProcess(
-            messages,
-            NoteDetailsCompletion.class,
-            (runService, toolCallId) -> {
-              try {
-                runService.submitToolOutputs(toolCallId, new ToolCallResult("appended"));
-              } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-              }
-            });
+    final TextFromAudio textFromAudio = new TextFromAudio();
+    executeAssistantProcess(
+        messages,
+        NoteDetailsCompletion.class,
+        (runService, toolCallId, parsedResponse) -> {
+          try {
+            NoteDetailsCompletion noteDetails = (NoteDetailsCompletion) parsedResponse;
+            textFromAudio.setCompletionMarkdownFromAudio(noteDetails.completion);
+            runService.submitToolOutputs(toolCallId, new ToolCallResult("appended"));
+          } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+          }
+        });
 
-    TextFromAudio textFromAudio = new TextFromAudio();
-    textFromAudio.setCompletionMarkdownFromAudio(noteDetails.completion);
     return textFromAudio;
   }
 
-  private <T> T executeAssistantProcess(
+  private void executeAssistantProcess(
       List<MessageRequest> userMessages,
-      Class<T> responseType,
-      BiConsumer<AssistantRunService, String> runServiceAction)
+      Class<?> responseType,
+      TriConsumer<AssistantRunService, String, Object> runServiceAction)
       throws JsonProcessingException {
     String threadId = createThread(userMessages);
     AiAssistantResponse threadResponse = assistantService.createRunAndGetThreadResponse(threadId);
     AssistantRunService runService =
         assistantService.getAssistantRunService(threadId, threadResponse.getRunId());
     if (runServiceAction != null) {
-      runServiceAction.accept(runService, threadResponse.getToolCalls().getFirst().getId());
+      Object parsedResponse =
+          objectMapper.readValue(
+              threadResponse.getToolCalls().getFirst().getFunction().getArguments().toString(),
+              responseType);
+      runServiceAction.accept(
+          runService, threadResponse.getToolCalls().getFirst().getId(), parsedResponse);
     }
-
-    // Parse the first tool call's function's arguments into responseType
-    return objectMapper.readValue(
-        threadResponse.getToolCalls().getFirst().getFunction().getArguments().toString(),
-        responseType);
   }
 }
