@@ -65,21 +65,3 @@ Before({ tags: '@usingMockedOpenAiService' }, () => {
 After({ tags: '@usingMockedOpenAiService' }, () => {
   mock_services.openAi().restore()
 })
-
-Before({ tags: '@longerTimeout' }, () => {
-  // Store the original timeout value
-  const originalTimeout = Cypress.config('defaultCommandTimeout')
-  cy.wrap(originalTimeout).as('originalTimeout')
-  // Set a longer timeout for tests with this tag
-  Cypress.config('defaultCommandTimeout', 60 * 1000)
-})
-
-After({ tags: '@longerTimeout' }, () => {
-  // Restore the original timeout
-  cy.get('@originalTimeout').then((originalTimeout) => {
-    Cypress.config(
-      'defaultCommandTimeout',
-      originalTimeout as unknown as number
-    )
-  })
-})
