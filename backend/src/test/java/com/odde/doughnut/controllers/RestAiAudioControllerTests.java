@@ -62,6 +62,16 @@ class RestAiAudioControllerTests {
         completionMarkdownFromAudio, "audio_transcription_to_text");
   }
 
+  private MockMultipartFile createMockAudioFile(String filename) {
+    return new MockMultipartFile(filename, filename, "audio/mp3", "test".getBytes());
+  }
+
+  private AudioUploadDTO createAudioUploadDTO(MockMultipartFile file) {
+    var dto = new AudioUploadDTO();
+    dto.setUploadAudioFile(file);
+    return dto;
+  }
+
   @Nested
   class ConvertAudioToText {
     AudioUploadDTO audioUploadDTO = new AudioUploadDTO();
@@ -75,8 +85,7 @@ class RestAiAudioControllerTests {
     @ParameterizedTest
     @ValueSource(strings = {"podcast.mp3", "podcast.m4a", "podcast.wav"})
     void convertingFormat(String filename) throws Exception {
-      audioUploadDTO.setUploadAudioFile(
-          new MockMultipartFile(filename, filename, "audio/mp3", new byte[] {}));
+      audioUploadDTO.setUploadAudioFile(createMockAudioFile(filename));
       String result =
           controller
               .audioToText(audioUploadDTO)
@@ -87,10 +96,7 @@ class RestAiAudioControllerTests {
 
     @Test
     void convertAudioToText() throws IOException {
-      MockMultipartFile mockFile =
-          new MockMultipartFile("file", "test.mp3", "text/plain", "test".getBytes());
-      var dto = new AudioUploadDTO();
-      dto.setUploadAudioFile(mockFile);
+      var dto = createAudioUploadDTO(createMockAudioFile("test.mp3"));
       String resp =
           controller.audioToText(dto).map(TextFromAudio::getCompletionMarkdownFromAudio).orElse("");
       assertThat(resp, equalTo("test123"));
@@ -98,10 +104,7 @@ class RestAiAudioControllerTests {
 
     @Test
     void usingThePreviousTrailingDetails() throws IOException {
-      MockMultipartFile mockFile =
-          new MockMultipartFile("file", "test.mp3", "text/plain", "test".getBytes());
-      var dto = new AudioUploadDTO();
-      dto.setUploadAudioFile(mockFile);
+      var dto = createAudioUploadDTO(createMockAudioFile("test.mp3"));
       dto.setPreviousNoteDetails("Long long ago");
       controller.audioToText(dto).map(TextFromAudio::getCompletionMarkdownFromAudio);
       ArgumentCaptor<ChatCompletionRequest> argumentCaptor =
@@ -129,12 +132,8 @@ class RestAiAudioControllerTests {
 
     @Test
     void convertAudioToTextForExistingNote() throws IOException {
-      // Arrange
       var note = makeMe.aNote().please();
-      MockMultipartFile mockFile =
-          new MockMultipartFile("file", "test.mp3", "text/plain", "test".getBytes());
-      var dto = new AudioUploadDTO();
-      dto.setUploadAudioFile(mockFile);
+      var dto = createAudioUploadDTO(createMockAudioFile("test.mp3"));
 
       NoteDetailsCompletion completion = new NoteDetailsCompletion();
       completion.completion = "text from audio transcription";
@@ -145,10 +144,8 @@ class RestAiAudioControllerTests {
           .mockRetrieveRun()
           .mockSubmitOutput();
 
-      // Act
       TextFromAudio result = controller.audioToTextForNote(note, dto);
 
-      // Assert
       verify(openAiApi).createTranscriptionSrt(any(RequestBody.class));
       verify(openAiApi)
           .createThread(
@@ -168,12 +165,8 @@ class RestAiAudioControllerTests {
 
     @Test
     void shouldOnlyIncludeCompleteNoteDetailsToolInRun() throws IOException {
-      // Arrange
       var note = makeMe.aNote().please();
-      MockMultipartFile mockFile =
-          new MockMultipartFile("file", "test.mp3", "text/plain", "test".getBytes());
-      var dto = new AudioUploadDTO();
-      dto.setUploadAudioFile(mockFile);
+      var dto = createAudioUploadDTO(createMockAudioFile("test.mp3"));
 
       NoteDetailsCompletion completion = new NoteDetailsCompletion();
       completion.completion = "text from audio transcription";
@@ -184,10 +177,8 @@ class RestAiAudioControllerTests {
           .mockRetrieveRun()
           .mockSubmitOutput();
 
-      // Act
       controller.audioToTextForNote(note, dto);
 
-      // Assert
       verify(openAiApi)
           .createRun(
               any(),
