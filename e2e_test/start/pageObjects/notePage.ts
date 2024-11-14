@@ -140,7 +140,9 @@ export const assumeNotePage = (noteTopic?: string) => {
       expected
         .split('\\n')
         .forEach((line) =>
-          cy.get('[role=details]', { timeout }).should('contain', line)
+          timeout
+            ? cy.get('[role=details]', { timeout }).should('contain', line)
+            : cy.get('[role=details]').should('contain', line)
         )
     },
     toolbarButton: (btnTextOrTitle: string) => {

@@ -1,7 +1,11 @@
 package com.odde.doughnut.services.ai;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.AiAssistantResponse;
+import com.odde.doughnut.services.TriConsumer;
+import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.assistants.message.Message;
 import com.theokanning.openai.assistants.message.MessageRequest;
@@ -21,10 +25,13 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 public final class AssistantService {
   private final OpenAiApiHandler openAiApiHandler;
   private final String assistantId;
+  private final ObjectMapper objectMapper;
 
   public AssistantService(OpenAiApiHandler openAiApiHandler, String assistantId) {
     this.openAiApiHandler = openAiApiHandler;
     this.assistantId = assistantId;
+    this.objectMapper =
+        new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
   }
 
   public Flowable<AssistantSSE> getRunStream(String threadId) {
@@ -119,5 +126,25 @@ public final class AssistantService {
           }
         });
     return emitter;
+  }
+
+  public void createThreadAndRunForToolCall(
+      List<MessageRequest> userMessages,
+      AiTool tool,
+      TriConsumer<AssistantRunService, String, Object> runServiceAction)
+      throws JsonProcessingException {
+    String threadId = createThread(userMessages);
+    RunCreateRequest.RunCreateRequestBuilder builder =
+        RunCreateRequest.builder().tools(List.of(tool.getTool()));
+    AiAssistantResponse threadResponse = createRunAndGetThreadResponse(threadId, builder);
+    AssistantRunService runService = getAssistantRunService(threadId, threadResponse.getRunId());
+    if (runServiceAction != null) {
+      Object parsedResponse =
+          objectMapper.readValue(
+              threadResponse.getToolCalls().getFirst().getFunction().getArguments().toString(),
+              tool.parameterClass());
+      runServiceAction.accept(
+          runService, threadResponse.getToolCalls().getFirst().getId(), parsedResponse);
+    }
   }
 }

@@ -1,30 +1,22 @@
 package com.odde.doughnut.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.odde.doughnut.controllers.dto.AiAssistantResponse;
 import com.odde.doughnut.controllers.dto.ToolCallResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.services.ai.*;
-import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.commands.GetAiStreamCommand;
 import com.theokanning.openai.assistants.message.MessageRequest;
-import com.theokanning.openai.assistants.run.RunCreateRequest;
 import java.util.List;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 public final class NotebookAssistantForNoteService {
   private final AssistantService assistantService;
   private final Note note;
-  private final ObjectMapper objectMapper;
 
   public NotebookAssistantForNoteService(AssistantService assistantService, Note note) {
     this.assistantService = assistantService;
     this.note = note;
-    this.objectMapper =
-        new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
   }
 
   public SseEmitter getAiReplyForConversation(
@@ -53,8 +45,8 @@ public final class NotebookAssistantForNoteService {
 
     try {
       final String[] result = new String[1];
-      executeAssistantProcess(
-          message,
+      assistantService.createThreadAndRunForToolCall(
+          List.of(getNoteDescriptionMessage(), message),
           AiToolFactory.suggestNoteTopicTitle(),
           (runService, threadResponse, parsedResponse) -> {
             TopicTitleReplacement replacement = (TopicTitleReplacement) parsedResponse;
@@ -86,8 +78,8 @@ public final class NotebookAssistantForNoteService {
     MessageRequest message = MessageRequest.builder().role("user").content(content).build();
 
     final TextFromAudio textFromAudio = new TextFromAudio();
-    executeAssistantProcess(
-        message,
+    assistantService.createThreadAndRunForToolCall(
+        List.of(getNoteDescriptionMessage(), message),
         AiToolFactory.completeNoteDetails(),
         (runService, toolCallId, parsedResponse) -> {
           try {
@@ -100,28 +92,5 @@ public final class NotebookAssistantForNoteService {
         });
 
     return textFromAudio;
-  }
-
-  private void executeAssistantProcess(
-      MessageRequest userMessage,
-      AiTool tool,
-      TriConsumer<AssistantRunService, String, Object> runServiceAction)
-      throws JsonProcessingException {
-    String threadId =
-        assistantService.createThread(List.of(getNoteDescriptionMessage(), userMessage));
-    RunCreateRequest.RunCreateRequestBuilder builder =
-        RunCreateRequest.builder().tools(List.of(tool.getTool()));
-    AiAssistantResponse threadResponse =
-        assistantService.createRunAndGetThreadResponse(threadId, builder);
-    AssistantRunService runService =
-        assistantService.getAssistantRunService(threadId, threadResponse.getRunId());
-    if (runServiceAction != null) {
-      Object parsedResponse =
-          objectMapper.readValue(
-              threadResponse.getToolCalls().getFirst().getFunction().getArguments().toString(),
-              tool.parameterClass());
-      runServiceAction.accept(
-          runService, threadResponse.getToolCalls().getFirst().getId(), parsedResponse);
-    }
   }
 }
