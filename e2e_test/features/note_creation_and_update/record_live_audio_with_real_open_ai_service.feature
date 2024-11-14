@@ -1,3 +1,4 @@
+@longerTimeout
 Feature: Record live audio with real OpenAI service
     As a learner, I want to record audio of a live event and get the transcription
 
