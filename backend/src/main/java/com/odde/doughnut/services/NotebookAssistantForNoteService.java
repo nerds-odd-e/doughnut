@@ -53,19 +53,12 @@ public final class NotebookAssistantForNoteService {
   }
 
   public String suggestTopicTitle() {
-    List<MessageRequest> messages =
-        List.of(
-            MessageRequest.builder()
-                .role("user")
-                .content("Please suggest a better topic title for the note.")
-                .build());
-
     try {
       final String[] result = new String[1];
       executeAssistantProcess(
-          messages,
+          "Please suggest a better topic title for the note.",
           TopicTitleReplacement.class,
-          (runService, threadResponse, parsedResponse) -> {
+          (runService, toolCallId, parsedResponse) -> {
             TopicTitleReplacement replacement = (TopicTitleReplacement) parsedResponse;
             result[0] = replacement.newTopic;
             runService.cancelRun();
@@ -78,29 +71,24 @@ public final class NotebookAssistantForNoteService {
 
   public TextFromAudio audioTranscriptionToArticle(String transcription)
       throws JsonProcessingException {
-    List<MessageRequest> messages =
-        List.of(
-            MessageRequest.builder()
-                .role("user")
-                .content(
-                    """
-          You are a helpful assistant for converting audio transcription in SRT format to text of paragraphs. Your task is to convert the following audio transcription to text with meaningful punctuations and paragraphs.
-           * Fix obvious audio transcription mistakes.
-           * Do not translate the text to another language (unless asked to).
-           * If the transcription is not clear, leave the text as it is.
-           * Don't add any additional information than what is in the transcription.
-           * Call function to append text from audio to complete the current note details, so add necessary white space or new line at the beginning to connect to existing text.
-           * The context should be in markdown format.
+    String userMessage =
+        """
+      You are a helpful assistant for converting audio transcription in SRT format to text of paragraphs. Your task is to convert the following audio transcription to text with meaningful punctuations and paragraphs.
+       * Fix obvious audio transcription mistakes.
+       * Do not translate the text to another language (unless asked to).
+       * If the transcription is not clear, leave the text as it is.
+       * Don't add any additional information than what is in the transcription.
+       * Call function to append text from audio to complete the current note details, so add necessary white space or new line at the beginning to connect to existing text.
+       * The context should be in markdown format.
 
-           Here's the transcription from audio:
-           ------------
-          """
-                        + transcription)
-                .build());
+       Here's the transcription from audio:
+       ------------
+      """
+            + transcription;
 
     final TextFromAudio textFromAudio = new TextFromAudio();
     executeAssistantProcess(
-        messages,
+        userMessage,
         NoteDetailsCompletion.class,
         (runService, toolCallId, parsedResponse) -> {
           try {
@@ -116,10 +104,13 @@ public final class NotebookAssistantForNoteService {
   }
 
   private void executeAssistantProcess(
-      List<MessageRequest> userMessages,
+      String userMessage,
       Class<?> responseType,
       TriConsumer<AssistantRunService, String, Object> runServiceAction)
       throws JsonProcessingException {
+    List<MessageRequest> userMessages =
+        List.of(MessageRequest.builder().role("user").content(userMessage).build());
+
     String threadId = createThread(userMessages);
     AiAssistantResponse threadResponse = assistantService.createRunAndGetThreadResponse(threadId);
     AssistantRunService runService =
