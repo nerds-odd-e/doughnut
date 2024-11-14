@@ -7,6 +7,8 @@ import com.odde.doughnut.controllers.dto.AiAssistantResponse;
 import com.odde.doughnut.controllers.dto.ToolCallResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.services.ai.*;
+import com.odde.doughnut.services.ai.tools.AiTool;
+import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.commands.GetAiStreamCommand;
 import com.theokanning.openai.assistants.message.MessageRequest;
 import com.theokanning.openai.assistants.run.RunCreateRequest;
@@ -65,7 +67,7 @@ public final class NotebookAssistantForNoteService {
       final String[] result = new String[1];
       executeAssistantProcess(
           messages,
-          TopicTitleReplacement.class,
+          AiToolFactory.suggestNoteTopicTitle(),
           (runService, threadResponse, parsedResponse) -> {
             TopicTitleReplacement replacement = (TopicTitleReplacement) parsedResponse;
             result[0] = replacement.newTopic;
@@ -99,7 +101,7 @@ public final class NotebookAssistantForNoteService {
     final TextFromAudio textFromAudio = new TextFromAudio();
     executeAssistantProcess(
         messages,
-        NoteDetailsCompletion.class,
+        AiToolFactory.completeNoteDetails(),
         (runService, toolCallId, parsedResponse) -> {
           try {
             NoteDetailsCompletion noteDetails = (NoteDetailsCompletion) parsedResponse;
@@ -115,7 +117,7 @@ public final class NotebookAssistantForNoteService {
 
   private void executeAssistantProcess(
       List<MessageRequest> userMessages,
-      Class<?> responseType,
+      AiTool tool,
       TriConsumer<AssistantRunService, String, Object> runServiceAction)
       throws JsonProcessingException {
     String threadId = createThread(userMessages);
@@ -128,7 +130,7 @@ public final class NotebookAssistantForNoteService {
       Object parsedResponse =
           objectMapper.readValue(
               threadResponse.getToolCalls().getFirst().getFunction().getArguments().toString(),
-              responseType);
+              tool.parameterClass());
       runServiceAction.accept(
           runService, threadResponse.getToolCalls().getFirst().getId(), parsedResponse);
     }
