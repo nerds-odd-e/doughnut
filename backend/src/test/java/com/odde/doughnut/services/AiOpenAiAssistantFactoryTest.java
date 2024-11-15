@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
 
-class AiAssistantServiceFactoryTest {
+class AiOpenAiAssistantFactoryTest {
 
   @Mock private OpenAiApi openAiApi;
   OpenAIChatCompletionMock openAIChatCompletionMock;

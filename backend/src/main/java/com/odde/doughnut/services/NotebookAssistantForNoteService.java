@@ -13,11 +13,11 @@ import java.util.List;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 public final class NotebookAssistantForNoteService {
-  private final AssistantService assistantService;
+  private final OpenAiAssistant assistantService;
   private final Note note;
 
-  public NotebookAssistantForNoteService(AssistantService assistantService, Note note) {
-    this.assistantService = assistantService;
+  public NotebookAssistantForNoteService(OpenAiAssistant openAiAssistant, Note note) {
+    this.assistantService = openAiAssistant;
     this.note = note;
   }
 
@@ -44,12 +44,11 @@ public final class NotebookAssistantForNoteService {
     }
     conversationService.updateLastAiAssistantThreadSync(conversation);
 
-    return assistantService.getRunStreamAsSSE(
+    return thread.getRunStreamAsSSE(
         (message -> {
           String content = GetAiStreamHelper.extractMessageContent(message);
           conversationService.addMessageToConversation(conversation, null, content);
-        }),
-        thread);
+        }));
   }
 
   private AssistantThread createThread(List<MessageRequest> additionalMessages) {

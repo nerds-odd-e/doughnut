@@ -3,7 +3,7 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.NotebookAssistant;
-import com.odde.doughnut.services.ai.AssistantService;
+import com.odde.doughnut.services.ai.OpenAiAssistant;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.client.OpenAiApi;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -21,7 +21,7 @@ public final class NotebookAssistantForNoteServiceFactory {
     this.openAiApiHandler = new OpenAiApiHandler(openAiApi);
   }
 
-  private AssistantService getAssistantServiceForNotebook(Notebook notebook) {
+  private OpenAiAssistant getAssistantServiceForNotebook(Notebook notebook) {
     String assistantId;
     NotebookAssistant assistant = notebook.getNotebookAssistant();
     if (assistant != null) {
@@ -29,11 +29,11 @@ public final class NotebookAssistantForNoteServiceFactory {
     } else {
       assistantId = globalSettingsService.defaultAssistantId().getValue();
     }
-    return new AssistantService(openAiApiHandler, assistantId);
+    return new OpenAiAssistant(openAiApiHandler, assistantId);
   }
 
   public NotebookAssistantForNoteService create(Note note) {
-    AssistantService assistantServiceForNotebook =
+    OpenAiAssistant assistantServiceForNotebook =
         getAssistantServiceForNotebook(note.getNotebook());
     return new NotebookAssistantForNoteService(assistantServiceForNotebook, note);
   }

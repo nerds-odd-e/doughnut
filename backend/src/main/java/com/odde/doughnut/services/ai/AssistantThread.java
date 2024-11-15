@@ -7,11 +7,17 @@ import com.odde.doughnut.controllers.dto.AiAssistantResponse;
 import com.odde.doughnut.services.TriConsumer;
 import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
+import com.theokanning.openai.assistants.message.Message;
 import com.theokanning.openai.assistants.run.RequiredAction;
 import com.theokanning.openai.assistants.run.Run;
 import com.theokanning.openai.assistants.run.RunCreateRequest;
 import com.theokanning.openai.assistants.run.ToolCall;
+import com.theokanning.openai.service.assistant_stream.AssistantSSE;
+import io.reactivex.Flowable;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Consumer;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 public class AssistantThread {
   public final String assistantId;
@@ -68,5 +74,33 @@ public class AssistantThread {
       throw new RuntimeException("Unexpected number of tool calls: " + size);
     }
     return requiredAction.getSubmitToolOutputs().getToolCalls();
+  }
+
+  public SseEmitter getRunStreamAsSSE(Consumer<Message> messageConsumer) {
+    Flowable<AssistantSSE> runStream = openAiApiHandler.createRunStream(threadId, assistantId);
+    SseEmitter emitter = new SseEmitter();
+    runStream.subscribe(
+        sse -> {
+          try {
+            SseEmitter.SseEventBuilder builder =
+                SseEmitter.event().name(sse.getEvent().eventName).data(sse.getData());
+            emitter.send(builder);
+
+            // Handle thread.message.completed event
+            if (Objects.equals(sse.getEvent().eventName, "thread.message.completed")) {
+              Message message = new ObjectMapper().readValue(sse.getData(), Message.class);
+              if (messageConsumer != null) {
+                messageConsumer.accept(message);
+              }
+            }
+
+            if (Objects.equals(sse.getEvent().eventName, "done")) {
+              emitter.complete();
+            }
+          } catch (Exception e) {
+            emitter.completeWithError(e);
+          }
+        });
+    return emitter;
   }
 }
