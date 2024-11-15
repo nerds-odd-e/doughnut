@@ -11,12 +11,6 @@ public class OpenAiRunExpectingAction extends OpenAiRun {
     super(openAiApiHandler, threadId, run, tool);
   }
 
-  public OpenAiRunExpectingAction(
-      OpenAiApiHandler openAiApiHandler, String threadId, String runId, AiTool tool) {
-    super(openAiApiHandler, threadId, new Run(), tool);
-    this.run.setId(runId);
-  }
-
   public OpenAiRunRequiredAction getToolCallResponse() {
     Run updatedRun = openAiApiHandler.retrieveUntilCompletedOrRequiresAction(threadId, run);
     if (updatedRun.getStatus().equals("requires_action")) {

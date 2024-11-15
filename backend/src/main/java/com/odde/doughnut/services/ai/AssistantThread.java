@@ -65,7 +65,7 @@ public class AssistantThread {
     openAiApiHandler.createMessage(threadId, messageRequest);
   }
 
-  public OpenAiRunExpectingAction resumeRun(String runId) {
-    return new OpenAiRunExpectingAction(openAiApiHandler, threadId, runId, tool);
+  public OpenAiRun resumeRun(String runId) {
+    return new OpenAiRunResumed(openAiApiHandler, threadId, runId, tool);
   }
 }
