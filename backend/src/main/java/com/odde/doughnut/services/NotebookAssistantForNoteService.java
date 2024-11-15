@@ -5,8 +5,9 @@ import com.odde.doughnut.controllers.dto.ToolCallResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.services.ai.*;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
-import com.odde.doughnut.services.commands.GetAiStreamCommand;
+import com.odde.doughnut.services.commands.GetAiStreamHelper;
 import com.theokanning.openai.assistants.message.MessageRequest;
+import java.sql.Timestamp;
 import java.util.List;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -28,8 +29,24 @@ public final class NotebookAssistantForNoteService {
       conversationService.setConversationAiAssistantThreadId(conversation, threadId);
     }
 
-    return new GetAiStreamCommand(conversation, conversationService, note, assistantService)
-        .execute(threadId);
+    Timestamp lastAiAssistantThreadSync = conversation.getLastAiAssistantThreadSync();
+    if (lastAiAssistantThreadSync != null && note.getUpdatedAt().after(lastAiAssistantThreadSync)) {
+      assistantService.createAssistantMessage(
+          "The note content has been update:\n\n%s".formatted(note.getNoteDescription()), threadId);
+    }
+    List<ConversationMessage> unseen = conversation.getUnseenMessagesByAssistant();
+    if (!unseen.isEmpty()) {
+      String combinedMessage = GetAiStreamHelper.formatUnsentMessages(unseen);
+      assistantService.createUserMessage(combinedMessage, threadId);
+    }
+    conversationService.updateLastAiAssistantThreadSync(conversation);
+
+    return assistantService.getRunStreamAsSSE(
+        (message -> {
+          String content = GetAiStreamHelper.extractMessageContent(message);
+          conversationService.addMessageToConversation(conversation, null, content);
+        }),
+        threadId);
   }
 
   private MessageRequest getNoteDescriptionMessage() {
