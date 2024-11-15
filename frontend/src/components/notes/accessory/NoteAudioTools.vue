@@ -163,7 +163,8 @@ const processAudio = async (file: Blob) => {
 
     threadContext.value.callCount++
     if (shouldSuggestTopic(threadContext.value.callCount)) {
-      await updateTopicIfSuggested(note.id)
+      // no await to allow the user to continue interacting
+      updateTopicIfSuggested(note.id)
     }
   } catch (error) {
     errors.value = error as Record<string, string | undefined>
