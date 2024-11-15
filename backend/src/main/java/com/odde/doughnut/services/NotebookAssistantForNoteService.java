@@ -74,24 +74,20 @@ public final class NotebookAssistantForNoteService {
     return MessageRequest.builder().role("assistant").content(note.getNoteDescription()).build();
   }
 
-  public String suggestTopicTitle() {
-    try {
-      final String[] result = new String[1];
-      createThread(List.of())
-          .withTool(AiToolFactory.suggestNoteTopicTitle())
-          .withInstructions(
-              "Please suggest a better topic title for the note by calling the function. Don't change it if it's already good enough.")
-          .run()
-          .getToolCallResponse(
-              (runService, threadResponse, parsedResponse) -> {
-                TopicTitleReplacement replacement = (TopicTitleReplacement) parsedResponse;
-                result[0] = replacement.newTopic;
-                runService.cancelRun();
-              });
-      return result[0];
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException("Failed to parse topic title replacement", e);
-    }
+  public String suggestTopicTitle() throws JsonProcessingException {
+    final String[] result = new String[1];
+    createThread(List.of())
+        .withTool(AiToolFactory.suggestNoteTopicTitle())
+        .withInstructions(
+            "Please suggest a better topic title for the note by calling the function. Don't change it if it's already good enough.")
+        .run()
+        .getToolCallResponse(
+            (runService, threadResponse, parsedResponse) -> {
+              TopicTitleReplacement replacement = (TopicTitleReplacement) parsedResponse;
+              result[0] = replacement.newTopic;
+              runService.cancelRun();
+            });
+    return result[0];
   }
 
   public TextFromAudio audioTranscriptionToArticle(String transcription)

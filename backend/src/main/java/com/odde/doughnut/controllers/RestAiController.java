@@ -73,7 +73,7 @@ public class RestAiController {
   @Transactional
   public SuggestedTopicDTO suggestTopicTitle(
       @PathVariable(value = "note") @Schema(type = "integer") Note note)
-      throws UnexpectedNoAccessRightException {
+      throws UnexpectedNoAccessRightException, JsonProcessingException {
     currentUser.assertAuthorization(note);
     String title = notebookAssistantForNoteServiceFactory.create(note).suggestTopicTitle();
     return new SuggestedTopicDTO(title);

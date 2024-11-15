@@ -211,20 +211,23 @@ class RestAiControllerTest {
     }
 
     @Test
-    void shouldReturnSuggestedTopicTitle() throws UnexpectedNoAccessRightException {
+    void shouldReturnSuggestedTopicTitle()
+        throws UnexpectedNoAccessRightException, JsonProcessingException {
       SuggestedTopicDTO result = controller.suggestTopicTitle(testNote);
       assertThat(result.getTopic()).isEqualTo("Suggested Title");
     }
 
     @Test
-    void shouldCallCreateThreadWithRightMessage() throws UnexpectedNoAccessRightException {
+    void shouldCallCreateThreadWithRightMessage()
+        throws UnexpectedNoAccessRightException, JsonProcessingException {
       controller.suggestTopicTitle(testNote);
       verify(openAiApi)
-          .createThread(
+          .createRun(
+              any(),
               argThat(
                   request -> {
-                    assertThat(request.getMessages().get(1).getContent())
-                        .isEqualTo("Please suggest a better topic title for the note.");
+                    assertThat(request.getInstructions())
+                        .contains("Please suggest a better topic title for the note");
                     return true;
                   }));
     }
