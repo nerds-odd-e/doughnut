@@ -1,10 +1,10 @@
 package com.odde.doughnut.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.odde.doughnut.controllers.dto.AiAssistantResponse;
 import com.odde.doughnut.controllers.dto.AudioUploadDTO;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.services.ai.*;
+import com.odde.doughnut.services.ai.OpenAiRunRequiredAction;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.commands.GetAiStreamHelper;
 import com.theokanning.openai.OpenAiHttpException;
@@ -82,7 +82,7 @@ public final class NotebookAssistantForNoteService {
             .withInstructions(
                 "Please suggest a better topic title for the note by calling the function. Don't change it if it's already good enough.")
             .run();
-    AiAssistantResponse toolCallResponse = openAiRunExpectingAction.getToolCallResponse();
+    OpenAiRunRequiredAction toolCallResponse = openAiRunExpectingAction.getToolCallResponse();
     openAiRunExpectingAction.cancelRun();
     TopicTitleReplacement replacement = (TopicTitleReplacement) toolCallResponse.getFirstArgument();
     return replacement.newTopic;
@@ -134,7 +134,7 @@ public final class NotebookAssistantForNoteService {
   private static TextFromAudio getTextFromAudioFromOngoingRun(
       String transcription, OpenAiRunExpectingAction openAiRunExpectingAction)
       throws JsonProcessingException {
-    AiAssistantResponse toolCallResponse = openAiRunExpectingAction.getToolCallResponse();
+    OpenAiRunRequiredAction toolCallResponse = openAiRunExpectingAction.getToolCallResponse();
 
     NoteDetailsCompletion noteDetails = (NoteDetailsCompletion) toolCallResponse.getFirstArgument();
     final TextFromAudio textFromAudio = new TextFromAudio();

@@ -1,4 +1,4 @@
-package com.odde.doughnut.controllers.dto;
+package com.odde.doughnut.services.ai;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -8,20 +8,13 @@ import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.assistants.run.RequiredAction;
 import com.theokanning.openai.assistants.run.Run;
 import com.theokanning.openai.assistants.run.ToolCall;
-import lombok.Setter;
 
-public final class AiAssistantResponse {
-  private final AiTool tool;
-  private final OpenAiApiHandler openAiApiHandler;
-  @Setter Run run;
-
+public final class OpenAiRunRequiredAction extends OpenAiRun {
   private final ObjectMapper objectMapper =
       new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-  public AiAssistantResponse(OpenAiApiHandler openAiApiHandler, Run updatedRun, AiTool tool) {
-    this.openAiApiHandler = openAiApiHandler;
-    this.run = updatedRun;
-    this.tool = tool;
+  public OpenAiRunRequiredAction(OpenAiApiHandler openAiApiHandler, Run updatedRun, AiTool tool) {
+    super(openAiApiHandler, updatedRun.getThreadId(), updatedRun, tool);
   }
 
   public Object getFirstArgument() throws JsonProcessingException {
