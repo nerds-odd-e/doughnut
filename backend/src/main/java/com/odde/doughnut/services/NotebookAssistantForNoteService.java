@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.ToolCallResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.services.ai.*;
+import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.commands.GetAiStreamHelper;
 import com.theokanning.openai.assistants.message.MessageRequest;
@@ -76,13 +77,15 @@ public final class NotebookAssistantForNoteService {
     AssistantThread thread = createThread(List.of(message));
     try {
       final String[] result = new String[1];
-      thread.createRunForToolCall(
-          AiToolFactory.suggestNoteTopicTitle(),
-          (runService, threadResponse, parsedResponse) -> {
-            TopicTitleReplacement replacement = (TopicTitleReplacement) parsedResponse;
-            result[0] = replacement.newTopic;
-            runService.cancelRun();
-          });
+      AiTool tool = AiToolFactory.suggestNoteTopicTitle();
+      thread
+          .withTool(tool)
+          .createRunForToolCall1(
+              (runService, threadResponse, parsedResponse) -> {
+                TopicTitleReplacement replacement = (TopicTitleReplacement) parsedResponse;
+                result[0] = replacement.newTopic;
+                runService.cancelRun();
+              });
       return result[0];
     } catch (JsonProcessingException e) {
       throw new RuntimeException("Failed to parse topic title replacement", e);
@@ -109,17 +112,19 @@ public final class NotebookAssistantForNoteService {
 
     final TextFromAudio textFromAudio = new TextFromAudio();
     AssistantThread thread = createThread(List.of(message));
-    thread.createRunForToolCall(
-        AiToolFactory.completeNoteDetails(),
-        (runService, toolCallId, parsedResponse) -> {
-          try {
-            NoteDetailsCompletion noteDetails = (NoteDetailsCompletion) parsedResponse;
-            textFromAudio.setCompletionMarkdownFromAudio(noteDetails.completion);
-            runService.submitToolOutputs(toolCallId, new ToolCallResult("appended"));
-          } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-          }
-        });
+    AiTool tool = AiToolFactory.completeNoteDetails();
+    thread
+        .withTool(tool)
+        .createRunForToolCall1(
+            (runService, toolCallId, parsedResponse) -> {
+              try {
+                NoteDetailsCompletion noteDetails = (NoteDetailsCompletion) parsedResponse;
+                textFromAudio.setCompletionMarkdownFromAudio(noteDetails.completion);
+                runService.submitToolOutputs(toolCallId, new ToolCallResult("appended"));
+              } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+              }
+            });
 
     return textFromAudio;
   }

@@ -22,6 +22,7 @@ public class AssistantThread {
   private final ObjectMapper objectMapper;
   @Getter private String threadId;
   private final OpenAiApiHandler openAiApiHandler;
+  private AiTool tool;
 
   public AssistantThread(String assistantId, String threadId, OpenAiApiHandler openAiApiHandler) {
     this.assistantId = assistantId;
@@ -31,12 +32,21 @@ public class AssistantThread {
         new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
   }
 
-  public void createRunForToolCall(
-      AiTool tool, TriConsumer<AssistantRunService, String, Object> runServiceAction)
+  public void createRunForToolCall1(
+      TriConsumer<AssistantRunService, String, Object> runServiceAction)
       throws JsonProcessingException {
-    RunCreateRequest.RunCreateRequestBuilder builder =
-        getCreateRequestBuilder().tools(List.of(tool.getTool()));
-    Run run = openAiApiHandler.createRun(threadId, builder.build());
+    Run run = run(tool);
+    getToolCallResponse(tool, runServiceAction, run);
+  }
+
+  public AssistantThread withTool(AiTool tool) {
+    this.tool = tool;
+    return this;
+  }
+
+  private void getToolCallResponse(
+      AiTool tool, TriConsumer<AssistantRunService, String, Object> runServiceAction, Run run)
+      throws JsonProcessingException {
     AiAssistantResponse threadResponse = getThreadResponse(threadId, run);
     AssistantRunService runService =
         new AssistantRunService(openAiApiHandler, threadId, threadResponse.getRunId());
@@ -48,6 +58,13 @@ public class AssistantThread {
       runServiceAction.accept(
           runService, threadResponse.getToolCalls().getFirst().getId(), parsedResponse);
     }
+  }
+
+  private Run run(AiTool tool) {
+    RunCreateRequest.RunCreateRequestBuilder builder =
+        getCreateRequestBuilder().tools(List.of(tool.getTool()));
+    Run run = openAiApiHandler.createRun(threadId, builder.build());
+    return run;
   }
 
   private RunCreateRequest.RunCreateRequestBuilder getCreateRequestBuilder() {
