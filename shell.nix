@@ -38,6 +38,9 @@ in mkShell {
   shellHook = ''
     #!/usr/bin/env bash
 
+    # Add git push script alias
+    alias g='./git_push.sh'
+
     # Deactivate nvm if exists
     command -v nvm >/dev/null 2>&1 && { nvm deactivate; }
 
