@@ -3753,6 +3753,8 @@ components:
           type: string
         rawSRT:
           type: string
+        threadId:
+          type: string
         runId:
           type: string
         toolCallId:

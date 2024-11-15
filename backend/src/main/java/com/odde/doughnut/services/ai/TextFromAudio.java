@@ -14,6 +14,10 @@ public class TextFromAudio {
   private String completionMarkdownFromAudio;
 
   private String rawSRT;
+
+  private String threadId;
+
   private String runId;
+
   private String toolCallId;
 }

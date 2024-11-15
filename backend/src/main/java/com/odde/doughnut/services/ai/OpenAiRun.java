@@ -11,10 +11,11 @@ import com.theokanning.openai.assistants.run.RequiredAction;
 import com.theokanning.openai.assistants.run.Run;
 import com.theokanning.openai.assistants.run.ToolCall;
 import java.util.List;
+import lombok.Getter;
 
 public class OpenAiRun {
   private final OpenAiApiHandler openAiApiHandler;
-  private final String threadId;
+  @Getter private final String threadId;
   private final Run run;
   private final AiTool tool;
   private final ObjectMapper objectMapper =

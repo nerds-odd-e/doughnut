@@ -96,6 +96,20 @@ const updateTopicIfSuggested = async (noteId: number) => {
   }
 }
 
+interface ThreadContext {
+  threadId?: string
+  runId?: string
+  toolCallId?: string
+  callCount: number
+}
+
+const threadContext = ref<ThreadContext>({
+  threadId: undefined,
+  runId: undefined,
+  toolCallId: undefined,
+  callCount: 0,
+})
+
 const processAudio = async (file: Blob) => {
   try {
     const response = await managedApi.restAiAudioController.audioToTextForNote(
@@ -103,22 +117,29 @@ const processAudio = async (file: Blob) => {
       {
         previousNoteDetails: note.details?.slice(-500) ?? "",
         uploadAudioFile: file,
+        threadId: threadContext.value.threadId,
+        runId: threadContext.value.runId,
+        toolCallId: threadContext.value.toolCallId,
       }
     )
+
+    // Store thread context for next calls
+    threadContext.value.threadId = response?.threadId
+    threadContext.value.runId = response?.runId
+    threadContext.value.toolCallId = response?.toolCallId
+
     await storageAccessor
       .storedApi()
       .appendDetails(note.id, response?.completionMarkdownFromAudio)
 
-    processAudio.callCount++
-    if (shouldSuggestTopic(processAudio.callCount)) {
+    threadContext.value.callCount++
+    if (shouldSuggestTopic(threadContext.value.callCount)) {
       await updateTopicIfSuggested(note.id)
     }
   } catch (error) {
     errors.value = error as Record<string, string | undefined>
   }
 }
-
-processAudio.callCount = 0
 
 const audioRecorder = createAudioRecorder(processAudio)
 const audioDevices = audioRecorder.getAudioDevices()

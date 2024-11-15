@@ -114,6 +114,7 @@ public final class NotebookAssistantForNoteService {
               (runService, tcId, parsedResponse) -> {
                 NoteDetailsCompletion noteDetails = (NoteDetailsCompletion) parsedResponse;
                 textFromAudio.setCompletionMarkdownFromAudio(noteDetails.completion);
+                textFromAudio.setThreadId(threadId);
                 textFromAudio.setRunId(runService.getRunId());
                 textFromAudio.setToolCallId(tcId);
               });
@@ -143,6 +144,7 @@ public final class NotebookAssistantForNoteService {
             (runService, tcId, parsedResponse) -> {
               NoteDetailsCompletion noteDetails = (NoteDetailsCompletion) parsedResponse;
               textFromAudio.setCompletionMarkdownFromAudio(noteDetails.completion);
+              textFromAudio.setThreadId(runService.getThreadId());
               textFromAudio.setRunId(runService.getRunId());
               textFromAudio.setToolCallId(tcId);
             });

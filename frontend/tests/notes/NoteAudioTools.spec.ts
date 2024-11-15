@@ -402,4 +402,91 @@ describe("NoteAudioTools", () => {
       ).not.toHaveBeenCalled()
     })
   })
+
+  describe("Audio processing with thread context", () => {
+    let audioToTextForNoteMock
+    beforeEach(() => {
+      audioToTextForNoteMock = vi.fn()
+      helper.managedApi.restAiAudioController.audioToTextForNote =
+        audioToTextForNoteMock
+    })
+
+    it("stores and reuses thread context between calls", async () => {
+      const mockResponse1 = {
+        completionMarkdownFromAudio: "text1",
+        threadId: "thread-123",
+        runId: "run-123",
+        toolCallId: "tool-123",
+      }
+
+      const mockResponse2 = {
+        completionMarkdownFromAudio: "text2",
+        threadId: "thread-123",
+        runId: "run-124",
+        toolCallId: "tool-124",
+      }
+
+      audioToTextForNoteMock
+        .mockResolvedValueOnce(mockResponse1)
+        .mockResolvedValueOnce(mockResponse2)
+
+      // First call
+      await wrapper.vm.processAudio(new Blob())
+
+      expect(
+        helper.managedApi.restAiAudioController.audioToTextForNote
+      ).toHaveBeenLastCalledWith(
+        expect.any(Number),
+        expect.objectContaining({
+          threadId: undefined,
+          runId: undefined,
+          toolCallId: undefined,
+        })
+      )
+
+      // Second call should include previous thread context
+      await wrapper.vm.processAudio(new Blob())
+
+      expect(
+        helper.managedApi.restAiAudioController.audioToTextForNote
+      ).toHaveBeenLastCalledWith(
+        expect.any(Number),
+        expect.objectContaining({
+          threadId: "thread-123",
+          runId: "run-123",
+          toolCallId: "tool-123",
+        })
+      )
+    })
+
+    it("maintains thread context even after errors", async () => {
+      const mockResponse = {
+        completionMarkdownFromAudio: "text1",
+        threadId: "thread-123",
+        runId: "run-123",
+        toolCallId: "tool-123",
+      }
+
+      audioToTextForNoteMock
+        .mockResolvedValueOnce(mockResponse)
+        .mockRejectedValueOnce(new Error("API Error"))
+        .mockResolvedValueOnce(mockResponse)
+
+      // First successful call
+      await wrapper.vm.processAudio(new Blob())
+
+      // Failed call
+      await wrapper.vm.processAudio(new Blob())
+
+      // Third call should still have thread context
+      await wrapper.vm.processAudio(new Blob())
+
+      const lastCall = audioToTextForNoteMock.mock.calls.pop()
+      expect(lastCall[1]).toMatchObject({
+        threadId: "thread-123",
+        runId: "run-123",
+        toolCallId: "tool-123",
+      })
+    })
+  })
 })
