@@ -25,13 +25,7 @@ public final class NotebookAssistantForNoteService {
   public SseEmitter getAiReplyForConversation(
       Conversation conversation, ConversationService conversationService) {
 
-    AssistantThread thread;
-    if (conversation.getAiAssistantThreadId() == null) {
-      thread = createThread(List.of());
-      conversationService.setConversationAiAssistantThreadId(conversation, thread.getThreadId());
-    } else {
-      thread = assistantService.getThread(conversation.getAiAssistantThreadId());
-    }
+    AssistantThread thread = getOrCreateThread(conversation, conversationService);
 
     Timestamp lastAiAssistantThreadSync = conversation.getLastAiAssistantThreadSync();
     if (lastAiAssistantThreadSync != null && note.getUpdatedAt().after(lastAiAssistantThreadSync)) {
@@ -40,18 +34,31 @@ public final class NotebookAssistantForNoteService {
     }
     List<ConversationMessage> unseen = conversation.getUnseenMessagesByAssistant();
     if (!unseen.isEmpty()) {
-      String combinedMessage = GetAiStreamHelper.formatUnsentMessages(unseen);
-      thread.createUserMessage(combinedMessage);
+      thread.createUserMessage(GetAiStreamHelper.formatUnsentMessages(unseen));
     }
     conversationService.updateLastAiAssistantThreadSync(conversation);
 
     return thread
+        .withInstructions(
+            "User is seeking for having a conversation, so don't call functions to update the note unless user asks explicitly.")
         .runStream()
         .getSseEmitter(
             (message -> {
               String content = GetAiStreamHelper.extractMessageContent(message);
               conversationService.addMessageToConversation(conversation, null, content);
             }));
+  }
+
+  private AssistantThread getOrCreateThread(
+      Conversation conversation, ConversationService conversationService) {
+    AssistantThread thread;
+    if (conversation.getAiAssistantThreadId() == null) {
+      thread = createThread(List.of());
+      conversationService.setConversationAiAssistantThreadId(conversation, thread.getThreadId());
+    } else {
+      thread = assistantService.getThread(conversation.getAiAssistantThreadId());
+    }
+    return thread;
   }
 
   private AssistantThread createThread(List<MessageRequest> additionalMessages) {

@@ -233,6 +233,19 @@ public class RestConversationMessageControllerAiReplyTests {
       // Verify default message is sent
       verify(openAiApi, times(0)).createMessage(any(), any());
     }
+
+    @Test
+    void shouldSetConversationInstructionsForRun()
+        throws UnexpectedNoAccessRightException, BadRequestException {
+      controller.getAiReply(conversation);
+
+      ArgumentCaptor<RunCreateRequest> captor = ArgumentCaptor.forClass(RunCreateRequest.class);
+      verify(openAiApi).createRunStream(any(), captor.capture());
+
+      assertThat(captor.getValue().getInstructions())
+          .isEqualTo(
+              "User is seeking for having a conversation, so don't call functions to update the note unless user asks explicitly.");
+    }
   }
 
   @Nested
