@@ -158,10 +158,10 @@ class RestAiAudioControllerTests {
               argThat(
                   request -> {
                     assertThat(
-                        request.getMessages().get(1).getContent().toString(),
+                        request.getMessages().get(0).getContent().toString(),
                         equalTo(note.getNoteDescription()));
                     assertThat(
-                        request.getMessages().get(2).getContent().toString(),
+                        request.getMessages().get(1).getContent().toString(),
                         containsString("test transcription"));
                     return true;
                   }));

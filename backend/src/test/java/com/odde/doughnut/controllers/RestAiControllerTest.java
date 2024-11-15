@@ -223,7 +223,7 @@ class RestAiControllerTest {
           .createThread(
               argThat(
                   request -> {
-                    assertThat(request.getMessages().get(2).getContent())
+                    assertThat(request.getMessages().get(1).getContent())
                         .isEqualTo("Please suggest a better topic title for the note.");
                     return true;
                   }));
