@@ -156,10 +156,7 @@ public class OpenAiApiHandler {
   public Run retrieveUntilCompletedOrRequiresAction(String threadId, Run currentRun) {
     Run retrievedRun = currentRun;
     int count = 0;
-    while (retrievedRun.getStatus() == null
-        || !(retrievedRun.getStatus().equals("completed"))
-            && !(retrievedRun.getStatus().equals("failed"))
-            && !(retrievedRun.getStatus().equals("requires_action"))) {
+    while (processingStatus(retrievedRun.getStatus())) {
       count++;
       if (count > 15) {
         break;
@@ -167,11 +164,17 @@ public class OpenAiApiHandler {
       wait(count - 1);
       retrievedRun = retrieveRun(threadId, currentRun.getId());
     }
-    if (retrievedRun.getStatus().equals("requires_action")
-        || retrievedRun.getStatus().equals("completed")) {
-      return retrievedRun;
-    }
-    throw new RuntimeException("OpenAI run status: " + retrievedRun.getStatus());
+    return retrievedRun;
+  }
+
+  private static boolean processingStatus(String status) {
+    return status == null
+        || !(status.equals("completed"))
+            && !(status.equals("incomplete"))
+            && !(status.equals("cancelled"))
+            && !(status.equals("failed"))
+            && !(status.equals("expired"))
+            && !(status.equals("requires_action"));
   }
 
   private static void wait(int hundredMilliSeconds) {

@@ -6,8 +6,8 @@ import com.theokanning.openai.client.OpenAiApi;
 import java.util.List;
 
 public record OpenAIAssistantCreatedRunMocker(OpenAiApi openAiApi, String threadId, String runId) {
-  public OpenAIAssistantRunMocker theRun() {
-    Run run = getRun("completed");
+  public OpenAIAssistantRunMocker anExpiredRun() {
+    Run run = getRun("expired");
     return new OpenAIAssistantRunMocker(openAiApi, threadId, run);
   }
 

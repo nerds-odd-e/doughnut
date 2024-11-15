@@ -109,17 +109,13 @@ public final class NotebookAssistantForNoteService {
                         "Previous content was appended, now there's more to process. Note that this is to be appended to the previous note details and the transcription could be from audio that was truncated in the middle of a sentence or word. Follow the same run instructions.",
                         transcription,
                         previousNoteDetails));
-        AiAssistantResponse toolCallResponse = openAiRun.getToolCallResponse();
 
-        NoteDetailsCompletion noteDetails =
-            (NoteDetailsCompletion) toolCallResponse.getFirstArgument();
-        final TextFromAudio textFromAudio = new TextFromAudio();
-        textFromAudio.setRawSRT(transcription);
-        textFromAudio.setCompletionMarkdownFromAudio(noteDetails.completion);
-        textFromAudio.setThreadId(openAiRun.getThreadId());
-        textFromAudio.setRunId(openAiRun.getRunId());
-        textFromAudio.setToolCallId(toolCallResponse.getFirstToolCallId());
-        return textFromAudio;
+        // Add check for run status
+        if (!openAiRun.isRequiresAction()) {
+          return createNewThreadForTranscription(transcription);
+        }
+
+        return getTextFromAudioFromOngoingRun(transcription, openAiRun);
       } catch (OpenAiHttpException e) {
         // Fallback to creating a new thread if submission fails
         return createNewThreadForTranscription(transcription);
@@ -127,6 +123,20 @@ public final class NotebookAssistantForNoteService {
     }
 
     return createNewThreadForTranscription(transcription);
+  }
+
+  private static TextFromAudio getTextFromAudioFromOngoingRun(
+      String transcription, OpenAiRun openAiRun) throws JsonProcessingException {
+    AiAssistantResponse toolCallResponse = openAiRun.getToolCallResponse();
+
+    NoteDetailsCompletion noteDetails = (NoteDetailsCompletion) toolCallResponse.getFirstArgument();
+    final TextFromAudio textFromAudio = new TextFromAudio();
+    textFromAudio.setRawSRT(transcription);
+    textFromAudio.setCompletionMarkdownFromAudio(noteDetails.completion);
+    textFromAudio.setThreadId(openAiRun.getThreadId());
+    textFromAudio.setRunId(openAiRun.getRunId());
+    textFromAudio.setToolCallId(toolCallResponse.getFirstToolCallId());
+    return textFromAudio;
   }
 
   private TextFromAudio createNewThreadForTranscription(String transcription)
@@ -151,15 +161,6 @@ public final class NotebookAssistantForNoteService {
 
           """)
             .run();
-    AiAssistantResponse toolCallResponse = openAiRun.getToolCallResponse();
-    final TextFromAudio textFromAudio = new TextFromAudio();
-    NoteDetailsCompletion noteDetails = (NoteDetailsCompletion) toolCallResponse.getFirstArgument();
-    textFromAudio.setRawSRT(transcription);
-    textFromAudio.setCompletionMarkdownFromAudio(noteDetails.completion);
-    textFromAudio.setThreadId(openAiRun.getThreadId());
-    textFromAudio.setRunId(openAiRun.getRunId());
-    textFromAudio.setToolCallId(toolCallResponse.getFirstToolCallId());
-
-    return textFromAudio;
+    return getTextFromAudioFromOngoingRun(transcription, openAiRun);
   }
 }

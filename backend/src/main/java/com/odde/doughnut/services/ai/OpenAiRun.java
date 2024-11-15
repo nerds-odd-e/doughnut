@@ -49,7 +49,7 @@ public class OpenAiRun {
     response.setRunStatus(updatedRun.getStatus());
     if (updatedRun.getStatus().equals("requires_action")) {
       response.setToolCalls(getAiCompletionRequiredAction(updatedRun.getRequiredAction()));
-    } else {
+    } else if (updatedRun.getStatus().equals("completed")) {
       response.setMessages(openAiApiHandler.getThreadMessages(threadId, id));
     }
 
@@ -66,5 +66,9 @@ public class OpenAiRun {
 
   public String getRunId() {
     return run.getId();
+  }
+
+  public boolean isRequiresAction() {
+    return run.getStatus().equals("requires_action");
   }
 }

@@ -261,5 +261,43 @@ class RestAiAudioControllerTests {
       verify(openAiApi).submitToolOutputs(eq("existing-thread"), eq("my-run-id"), any());
       verify(openAiApi).createThread(any());
     }
+
+    @Test
+    void shouldFallbackToNewThreadWhenToolCallResponseStatusIsNotRequiresAction()
+        throws IOException {
+      // Setup
+      audioUploadDTO.setThreadId("existing-thread");
+      audioUploadDTO.setRunId("my-run-id");
+      audioUploadDTO.setToolCallId("existing-call");
+
+      // Mock the initial thread with a completed status
+      openAIAssistantThreadMocker
+          .mockCreateRunInProcess("my-run-id")
+          .anExpiredRun()
+          .mockRetrieveRun()
+          .mockSubmitOutput();
+
+      // Mock the fallback thread creation
+      OpenAIAssistantThreadMocker fallbackThreadMocker =
+          openAIAssistantMocker.mockThreadCreation("fallback-thread");
+      NoteDetailsCompletion fallbackCompletion = new NoteDetailsCompletion();
+      fallbackCompletion.completion = "fallback text from audio transcription";
+
+      fallbackThreadMocker
+          .mockCreateRunInProcess("fallback-run-id")
+          .aRunThatRequireAction(fallbackCompletion, AiToolName.COMPLETE_NOTE_DETAILS.getValue())
+          .mockRetrieveRun()
+          .mockSubmitOutput();
+
+      // Execute
+      TextFromAudio result = controller.audioToTextForNote(note, audioUploadDTO);
+
+      // Verify
+      assertNotNull(result);
+      assertEquals(
+          "fallback text from audio transcription", result.getCompletionMarkdownFromAudio());
+      verify(openAiApi).submitToolOutputs(eq("existing-thread"), eq("my-run-id"), any());
+      verify(openAiApi).createThread(any());
+    }
   }
 }
