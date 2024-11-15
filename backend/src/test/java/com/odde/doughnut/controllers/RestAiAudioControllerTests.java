@@ -122,7 +122,7 @@ class RestAiAudioControllerTests {
 
     @Test
     void usingThePreviousTrailingDetails() throws IOException {
-      audioUploadDTO.getConfig().setPreviousNoteDetails("Long long ago");
+      audioUploadDTO.setPreviousNoteDetails("Long long ago");
       controller.audioToText(audioUploadDTO).map(TextFromAudio::getCompletionMarkdownFromAudio);
       ArgumentCaptor<ChatCompletionRequest> argumentCaptor =
           ArgumentCaptor.forClass(ChatCompletionRequest.class);
@@ -229,9 +229,9 @@ class RestAiAudioControllerTests {
 
     @Test
     void shouldUseExistingThreadAndRunWhenProvided() throws IOException {
-      audioUploadDTO.getConfig().setThreadId("existing-thread");
-      audioUploadDTO.getConfig().setRunId("my-run-id");
-      audioUploadDTO.getConfig().setToolCallId("existing-call");
+      audioUploadDTO.setThreadId("existing-thread");
+      audioUploadDTO.setRunId("my-run-id");
+      audioUploadDTO.setToolCallId("existing-call");
 
       TextFromAudio result = controller.audioToTextForNote(note, audioUploadDTO);
 
@@ -259,9 +259,9 @@ class RestAiAudioControllerTests {
     @Test
     void shouldFallbackToNewThreadWhenSubmitToolOutputsFails() throws IOException {
       // Setup
-      audioUploadDTO.getConfig().setThreadId("existing-thread");
-      audioUploadDTO.getConfig().setRunId("my-run-id");
-      audioUploadDTO.getConfig().setToolCallId("existing-call");
+      audioUploadDTO.setThreadId("existing-thread");
+      audioUploadDTO.setRunId("my-run-id");
+      audioUploadDTO.setToolCallId("existing-call");
 
       // Mock the failure of submitToolOutputs
       OpenAiError error = new OpenAiError();
@@ -285,38 +285,9 @@ class RestAiAudioControllerTests {
     }
 
     @Test
-    void shouldFallbackToNewThreadWhenToolCallResponseStatusIsNotRequiresAction()
-        throws IOException {
-      // Setup
-      audioUploadDTO.getConfig().setThreadId("existing-thread");
-      audioUploadDTO.getConfig().setRunId("my-run-id");
-      audioUploadDTO.getConfig().setToolCallId("existing-call");
-
-      // Mock the initial thread with a completed status
-      openAIAssistantThreadMocker
-          .mockCreateRunInProcess("my-run-id")
-          .anExpiredRun()
-          .mockRetrieveRun()
-          .mockSubmitOutput();
-
-      // Mock the fallback thread creation
-      setupFallbackThread("fallback text from audio transcription");
-
-      // Execute
-      TextFromAudio result = controller.audioToTextForNote(note, audioUploadDTO);
-
-      // Verify
-      assertNotNull(result);
-      assertEquals(
-          "fallback text from audio transcription", result.getCompletionMarkdownFromAudio());
-      verify(openAiApi).submitToolOutputs(eq("existing-thread"), eq("my-run-id"), any());
-      verify(openAiApi).createThread(any());
-    }
-
-    @Test
     void shouldIncludeAdditionalInstructionsInNewThread() throws IOException {
       // Setup
-      audioUploadDTO.getConfig().setAdditionalProcessingInstructions("Translate to Spanish");
+      audioUploadDTO.setAdditionalProcessingInstructions("Translate to Spanish");
 
       // Execute
       controller.audioToTextForNote(note, audioUploadDTO);
@@ -337,10 +308,10 @@ class RestAiAudioControllerTests {
     @Test
     void shouldIncludeAdditionalInstructionsInExistingThread() throws IOException {
       // Setup
-      audioUploadDTO.getConfig().setThreadId("existing-thread");
-      audioUploadDTO.getConfig().setRunId("my-run-id");
-      audioUploadDTO.getConfig().setToolCallId("existing-call");
-      audioUploadDTO.getConfig().setAdditionalProcessingInstructions("Format as bullet points");
+      audioUploadDTO.setThreadId("existing-thread");
+      audioUploadDTO.setRunId("my-run-id");
+      audioUploadDTO.setToolCallId("existing-call");
+      audioUploadDTO.setAdditionalProcessingInstructions("Format as bullet points");
 
       // Execute
       controller.audioToTextForNote(note, audioUploadDTO);

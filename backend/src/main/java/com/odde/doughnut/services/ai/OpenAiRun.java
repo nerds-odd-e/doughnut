@@ -67,8 +67,4 @@ public class OpenAiRun {
   public String getRunId() {
     return run.getId();
   }
-
-  public boolean isRequiresAction() {
-    return run.getStatus().equals("requires_action");
-  }
 }

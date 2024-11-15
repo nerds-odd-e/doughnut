@@ -438,11 +438,9 @@ describe("NoteAudioTools", () => {
       ).toHaveBeenLastCalledWith(
         expect.any(Number),
         expect.objectContaining({
-          config: expect.objectContaining({
-            threadId: undefined,
-            runId: undefined,
-            toolCallId: undefined,
-          }),
+          threadId: undefined,
+          runId: undefined,
+          toolCallId: undefined,
         })
       )
 
@@ -454,11 +452,9 @@ describe("NoteAudioTools", () => {
       ).toHaveBeenLastCalledWith(
         expect.any(Number),
         expect.objectContaining({
-          config: expect.objectContaining({
-            threadId: "thread-123",
-            runId: "run-123",
-            toolCallId: "tool-123",
-          }),
+          threadId: "thread-123",
+          runId: "run-123",
+          toolCallId: "tool-123",
         })
       )
     })
@@ -487,11 +483,9 @@ describe("NoteAudioTools", () => {
 
       const lastCall = audioToTextForNoteMock.mock.calls.pop()
       expect(lastCall[1]).toMatchObject({
-        config: {
-          threadId: "thread-123",
-          runId: "run-123",
-          toolCallId: "tool-123",
-        },
+        threadId: "thread-123",
+        runId: "run-123",
+        toolCallId: "tool-123",
       })
     })
   })
@@ -530,9 +524,7 @@ describe("NoteAudioTools", () => {
       ).toHaveBeenCalledWith(
         expect.any(Number),
         expect.objectContaining({
-          config: expect.objectContaining({
-            additionalProcessingInstructions: "Test instructions",
-          }),
+          additionalProcessingInstructions: "Test instructions",
         })
       )
     })
@@ -553,10 +545,10 @@ describe("NoteAudioTools", () => {
       await wrapper.vm.processAudio(testBlob2)
 
       const calls = audioToTextForNoteMock.mock.calls
-      expect(calls[0][1].config.additionalProcessingInstructions).toBe(
+      expect(calls[0][1].additionalProcessingInstructions).toBe(
         "Test instructions"
       )
-      expect(calls[1][1].config.additionalProcessingInstructions).toBe(
+      expect(calls[1][1].additionalProcessingInstructions).toBe(
         "Test instructions"
       )
     })

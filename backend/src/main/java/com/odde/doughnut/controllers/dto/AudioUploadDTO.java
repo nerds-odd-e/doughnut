@@ -5,12 +5,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
+@Getter
+@Setter
 public class AudioUploadDTO {
-  @Getter
-  private final AudioTranscriptConversionConfig config = new AudioTranscriptConversionConfig();
-
-  @Setter
-  @Getter
   @ValidateMultipartFile(
       maxSize = 20 * 1024 * 1024,
       allowedTypes = {
@@ -23,5 +20,10 @@ public class AudioUploadDTO {
       })
   private MultipartFile uploadAudioFile;
 
-  @Setter @Getter private byte[] audioData;
+  private byte[] audioData;
+  private String additionalProcessingInstructions;
+  private String previousNoteDetails;
+  private String threadId;
+  private String runId;
+  private String toolCallId;
 }

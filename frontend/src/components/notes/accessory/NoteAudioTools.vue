@@ -144,13 +144,11 @@ const processAudio = async (file: Blob) => {
       note.id,
       {
         uploadAudioFile: file,
-        config: {
-          previousNoteDetails: note.details?.slice(-500) ?? "",
-          threadId: threadContext.value.threadId,
-          runId: threadContext.value.runId,
-          toolCallId: threadContext.value.toolCallId,
-          additionalProcessingInstructions: processingInstructions.value,
-        },
+        previousNoteDetails: note.details?.slice(-500) ?? "",
+        threadId: threadContext.value.threadId,
+        runId: threadContext.value.runId,
+        toolCallId: threadContext.value.toolCallId,
+        additionalProcessingInstructions: processingInstructions.value,
       }
     )
 

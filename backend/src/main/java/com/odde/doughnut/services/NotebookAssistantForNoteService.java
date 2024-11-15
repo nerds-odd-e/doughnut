@@ -2,7 +2,7 @@ package com.odde.doughnut.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.AiAssistantResponse;
-import com.odde.doughnut.controllers.dto.AudioTranscriptConversionConfig;
+import com.odde.doughnut.controllers.dto.AudioUploadDTO;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.services.ai.*;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
@@ -88,8 +88,7 @@ public final class NotebookAssistantForNoteService {
     return replacement.newTopic;
   }
 
-  private String appendAdditionalInstructions(
-      String instructions, AudioTranscriptConversionConfig config) {
+  private String appendAdditionalInstructions(String instructions, AudioUploadDTO config) {
     if (config.getAdditionalProcessingInstructions() != null
         && !config.getAdditionalProcessingInstructions().isEmpty()) {
       return instructions
@@ -100,8 +99,7 @@ public final class NotebookAssistantForNoteService {
   }
 
   public TextFromAudio audioTranscriptionToArticle(
-      String transcriptionFromAudio, AudioTranscriptConversionConfig config)
-      throws JsonProcessingException {
+      String transcriptionFromAudio, AudioUploadDTO config) throws JsonProcessingException {
 
     if (config.getThreadId() != null
         && !config.getThreadId().isEmpty()
@@ -123,9 +121,7 @@ public final class NotebookAssistantForNoteService {
                     new AudioToTextToolCallResult(
                         instruction, transcriptionFromAudio, config.getPreviousNoteDetails()));
 
-        if (openAiRun.isRequiresAction()) {
-          return getTextFromAudioFromOngoingRun(transcriptionFromAudio, openAiRun);
-        }
+        return getTextFromAudioFromOngoingRun(transcriptionFromAudio, openAiRun);
 
       } catch (OpenAiHttpException e) {
         // Fallback to creating a new thread if submission fails
@@ -149,8 +145,8 @@ public final class NotebookAssistantForNoteService {
     return textFromAudio;
   }
 
-  private TextFromAudio createNewThreadForTranscription(
-      String transcription, AudioTranscriptConversionConfig config) throws JsonProcessingException {
+  private TextFromAudio createNewThreadForTranscription(String transcription, AudioUploadDTO config)
+      throws JsonProcessingException {
     String content = "Here's the new transcription from audio:\n------------\n" + transcription;
     MessageRequest message = MessageRequest.builder().role("user").content(content).build();
 
