@@ -107,7 +107,7 @@ public final class NotebookAssistantForNoteService {
           .submitToolOutputs(
               toolCallId,
               new AudioToTextToolCallResult(
-                  "Previous content was appended, now there's more to process",
+                  "Previous content was appended, now there's more to process. Note that this is to be appended to the previous note details and the transcription could be from audio that was truncated in the middle of a sentence or word. Follow the same run instructions.",
                   transcription,
                   previousNoteDetails))
           .getToolCallResponse(
@@ -136,6 +136,7 @@ public final class NotebookAssistantForNoteService {
        * If the transcription is not clear, leave the text as it is.
        * Don't add any additional information than what is in the transcription.
        * Call function to append text from audio to complete the current note details, so add necessary white space or new line at the beginning to connect to existing text.
+       * The transcription could be from audio that was truncated in the middle of a sentence or word. So never add new lines or white spaces at the end of the output.
        * The context should be in markdown format.
 
       """)
