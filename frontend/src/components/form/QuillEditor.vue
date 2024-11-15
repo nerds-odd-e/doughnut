@@ -86,6 +86,8 @@ const onUpdateContent = () => {
   &::before
     left: 0 !important
     right: 0 !important
+  p
+    margin: inherit !important
 .ql-container.ql-bubble
   border: none
   font-size: inherit !important
