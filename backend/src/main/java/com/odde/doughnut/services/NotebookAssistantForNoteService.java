@@ -29,7 +29,7 @@ public final class NotebookAssistantForNoteService {
       thread = createThread(List.of());
       conversationService.setConversationAiAssistantThreadId(conversation, thread.threadId);
     } else {
-      thread = new AssistantThread(conversation.getAiAssistantThreadId());
+      thread = assistantService.getThread(conversation.getAiAssistantThreadId());
     }
 
     Timestamp lastAiAssistantThreadSync = conversation.getLastAiAssistantThreadSync();
