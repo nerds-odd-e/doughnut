@@ -88,6 +88,17 @@ public final class NotebookAssistantForNoteService {
     return replacement.newTopic;
   }
 
+  private String appendAdditionalInstructions(
+      String instructions, AudioTranscriptConversionConfig config) {
+    if (config.getAdditionalProcessingInstructions() != null
+        && !config.getAdditionalProcessingInstructions().isEmpty()) {
+      return instructions
+          + "\nAdditional instruction:\n"
+          + config.getAdditionalProcessingInstructions();
+    }
+    return instructions;
+  }
+
   public TextFromAudio audioTranscriptionToArticle(
       String transcriptionFromAudio, AudioTranscriptConversionConfig config)
       throws JsonProcessingException {
@@ -100,11 +111,7 @@ public final class NotebookAssistantForNoteService {
         String instruction =
             "Previous content was appended, now there's more to process. Note that this is to be appended to the previous note details and the transcription could be from audio that was truncated in the middle of a sentence or word. Follow the same run instructions.";
 
-        if (config.getAdditionalProcessingInstructions() != null
-            && !config.getAdditionalProcessingInstructions().isEmpty()) {
-          instruction +=
-              "\nAdditional instruction:\n" + config.getAdditionalProcessingInstructions();
-        }
+        instruction = appendAdditionalInstructions(instruction, config);
 
         OpenAiRun openAiRun =
             assistantService
@@ -159,10 +166,7 @@ public final class NotebookAssistantForNoteService {
            * The context should be in markdown format.
           """;
 
-    if (config.getAdditionalProcessingInstructions() != null
-        && !config.getAdditionalProcessingInstructions().isEmpty()) {
-      instructions += "\nAdditional instruction:\n" + config.getAdditionalProcessingInstructions();
-    }
+    instructions = appendAdditionalInstructions(instructions, config);
 
     OpenAiRun openAiRun =
         createThread(List.of(message))
