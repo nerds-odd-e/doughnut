@@ -3,11 +3,12 @@ package com.odde.doughnut.services.ai;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.ToolCallResult;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
+import lombok.Getter;
 
 public class AssistantRunService {
   protected final OpenAiApiHandler openAiApiHandler;
   private final String threadId;
-  private final String runId;
+  @Getter private final String runId;
 
   public AssistantRunService(OpenAiApiHandler openAiApiHandler, String threadId, String runId) {
     this.openAiApiHandler = openAiApiHandler;

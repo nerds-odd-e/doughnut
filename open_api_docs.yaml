@@ -3747,6 +3747,10 @@ components:
       properties:
         completionMarkdownFromAudio:
           type: string
+        rawSRT:
+          type: string
+        runId:
+          type: string
     AssessmentAttempt:
       required:
       - id

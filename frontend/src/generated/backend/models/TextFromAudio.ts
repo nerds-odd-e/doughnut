@@ -4,5 +4,7 @@
 /* eslint-disable */
 export type TextFromAudio = {
     completionMarkdownFromAudio: string;
+    rawSRT?: string;
+    runId?: string;
 };
 

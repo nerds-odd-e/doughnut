@@ -12,4 +12,7 @@ public class TextFromAudio {
       "The combined text from the audio transcript (SRT) to complete the previous text (previousTrailingNoteDetails. Add necessary white space or new line at the beginning to connect to the previous text. The context should be in markdown format.")
   @JsonProperty(required = true)
   private String completionMarkdownFromAudio;
+
+  private String rawSRT;
+  private String runId;
 }

@@ -100,6 +100,8 @@ public final class NotebookAssistantForNoteService {
     MessageRequest message = MessageRequest.builder().role("user").content(content).build();
 
     final TextFromAudio textFromAudio = new TextFromAudio();
+    textFromAudio.setRawSRT(transcription);
+
     createThread(List.of(message))
         .withTool(AiToolFactory.completeNoteDetails())
         .withInstructions(
@@ -119,6 +121,7 @@ public final class NotebookAssistantForNoteService {
               try {
                 NoteDetailsCompletion noteDetails = (NoteDetailsCompletion) parsedResponse;
                 textFromAudio.setCompletionMarkdownFromAudio(noteDetails.completion);
+                textFromAudio.setRunId(runService.getRunId());
                 runService.submitToolOutputs(toolCallId, new ToolCallResult("appended"));
               } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);

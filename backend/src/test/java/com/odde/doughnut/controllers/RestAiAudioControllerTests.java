@@ -183,5 +183,15 @@ class RestAiAudioControllerTests {
                     return true;
                   }));
     }
+
+    @Test
+    void shouldSetRawSRTAndRunId() throws IOException {
+      TextFromAudio result = controller.audioToTextForNote(note, audioUploadDTO);
+
+      assertNotNull(result.getRawSRT());
+      assertNotNull(result.getRunId());
+      assertEquals("test transcription", result.getRawSRT());
+      assertEquals("my-run-id", result.getRunId());
+    }
   }
 }
