@@ -1,8 +1,6 @@
 package com.odde.doughnut.services.ai;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.AiAssistantResponse;
 import com.odde.doughnut.services.TriConsumer;
 import com.odde.doughnut.services.ai.tools.AiTool;
@@ -18,8 +16,6 @@ public class OpenAiRun {
   @Getter private final String threadId;
   private final Run run;
   private final AiTool tool;
-  private final ObjectMapper objectMapper =
-      new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
   public OpenAiRun(OpenAiApiHandler openAiApiHandler, String threadId, Run run, AiTool tool) {
     this.openAiApiHandler = openAiApiHandler;
@@ -50,10 +46,7 @@ public class OpenAiRun {
       throws JsonProcessingException {
     AiAssistantResponse threadResponse = getThreadResponse(threadId, run);
     if (runServiceAction != null) {
-      Object parsedResponse =
-          objectMapper.readValue(
-              threadResponse.getToolCalls().getFirst().getFunction().getArguments().toString(),
-              tool.parameterClass());
+      Object parsedResponse = threadResponse.getFirstArgument();
       runServiceAction.accept(
           this, threadResponse.getToolCalls().getFirst().getId(), parsedResponse);
     }
@@ -61,7 +54,7 @@ public class OpenAiRun {
 
   private AiAssistantResponse getThreadResponse(String threadId, Run currentRun) {
     String id = currentRun.getId();
-    AiAssistantResponse completionResponse = new AiAssistantResponse();
+    AiAssistantResponse completionResponse = new AiAssistantResponse(tool);
 
     Run run = openAiApiHandler.retrieveUntilCompletedOrRequiresAction(threadId, currentRun);
     if (run.getStatus().equals("requires_action")) {
