@@ -94,43 +94,44 @@ public final class NotebookAssistantForNoteService {
       String runId,
       String toolCallId)
       throws JsonProcessingException {
-    final TextFromAudio textFromAudio = new TextFromAudio();
-    textFromAudio.setRawSRT(transcription);
 
     if (threadId != null && !threadId.isEmpty() && runId != null && !runId.isEmpty()) {
       try {
         // Use existing thread and run
-        assistantService
-            .getThread(threadId)
-            .withTool(AiToolFactory.completeNoteDetails())
-            .resumeRun(runId)
-            .submitToolOutputs(
-                toolCallId,
-                new AudioToTextToolCallResult(
-                    "Previous content was appended, now there's more to process. Note that this is to be appended to the previous note details and the transcription could be from audio that was truncated in the middle of a sentence or word. Follow the same run instructions.",
-                    transcription,
-                    previousNoteDetails))
-            .getToolCallResponse(
-                (runService, tcId, parsedResponse) -> {
-                  NoteDetailsCompletion noteDetails = (NoteDetailsCompletion) parsedResponse;
-                  textFromAudio.setCompletionMarkdownFromAudio(noteDetails.completion);
-                  textFromAudio.setThreadId(threadId);
-                  textFromAudio.setRunId(runService.getRunId());
-                  textFromAudio.setToolCallId(tcId);
-                });
+        OpenAiRun openAiRun =
+            assistantService
+                .getThread(threadId)
+                .withTool(AiToolFactory.completeNoteDetails())
+                .resumeRun(runId)
+                .submitToolOutputs(
+                    toolCallId,
+                    new AudioToTextToolCallResult(
+                        "Previous content was appended, now there's more to process. Note that this is to be appended to the previous note details and the transcription could be from audio that was truncated in the middle of a sentence or word. Follow the same run instructions.",
+                        transcription,
+                        previousNoteDetails));
+        AiAssistantResponse toolCallResponse = openAiRun.getToolCallResponse(null);
 
+        NoteDetailsCompletion noteDetails =
+            (NoteDetailsCompletion) toolCallResponse.getFirstArgument();
+        final TextFromAudio textFromAudio = new TextFromAudio();
+        textFromAudio.setRawSRT(transcription);
+        textFromAudio.setCompletionMarkdownFromAudio(noteDetails.completion);
+        textFromAudio.setThreadId(threadId);
+        textFromAudio.setRunId(openAiRun.getRunId());
+        textFromAudio.setToolCallId(toolCallResponse.getToolCalls().getFirst().getId());
         return textFromAudio;
       } catch (OpenAiHttpException e) {
         // Fallback to creating a new thread if submission fails
-        return createNewThreadForTranscription(transcription, textFromAudio);
+        return createNewThreadForTranscription(transcription);
       }
     }
 
-    return createNewThreadForTranscription(transcription, textFromAudio);
+    return createNewThreadForTranscription(transcription);
   }
 
-  private TextFromAudio createNewThreadForTranscription(
-      String transcription, TextFromAudio textFromAudio) throws JsonProcessingException {
+  private TextFromAudio createNewThreadForTranscription(String transcription)
+      throws JsonProcessingException {
+    final TextFromAudio textFromAudio = new TextFromAudio();
     // Original flow for new threads
     String content = "Here's the new transcription from audio:\n------------\n" + transcription;
     MessageRequest message = MessageRequest.builder().role("user").content(content).build();
@@ -153,6 +154,7 @@ public final class NotebookAssistantForNoteService {
         .getToolCallResponse(
             (runService, tcId, parsedResponse) -> {
               NoteDetailsCompletion noteDetails = (NoteDetailsCompletion) parsedResponse;
+              textFromAudio.setRawSRT(transcription);
               textFromAudio.setCompletionMarkdownFromAudio(noteDetails.completion);
               textFromAudio.setThreadId(runService.getThreadId());
               textFromAudio.setRunId(runService.getRunId());
