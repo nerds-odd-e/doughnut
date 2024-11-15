@@ -34,8 +34,8 @@ public class OpenAiRun {
 
   public OpenAiRun submitToolOutputs(String toolCallId, Object result)
       throws JsonProcessingException {
-    openAiApiHandler.submitToolOutputs(threadId, run.getId(), toolCallId, result);
-    return this;
+    Run currentRun = openAiApiHandler.submitToolOutputs(threadId, run.getId(), toolCallId, result);
+    return new OpenAiRun(openAiApiHandler, threadId, currentRun, tool);
   }
 
   public void cancelRun() {

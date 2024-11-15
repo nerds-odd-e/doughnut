@@ -182,7 +182,7 @@ public class OpenAiApiHandler {
     }
   }
 
-  public void submitToolOutputs(String threadId, String runId, String toolCallId, Object result)
+  public Run submitToolOutputs(String threadId, String runId, String toolCallId, Object result)
       throws JsonProcessingException {
     SubmitToolOutputRequestItem toolOutputRequestItem =
         SubmitToolOutputRequestItem.builder()
@@ -193,7 +193,7 @@ public class OpenAiApiHandler {
     toolOutputRequestItems.add(toolOutputRequestItem);
     SubmitToolOutputsRequest submitToolOutputsRequest =
         SubmitToolOutputsRequest.builder().toolOutputs(toolOutputRequestItems).build();
-    blockGet(openAiApi.submitToolOutputs(threadId, runId, submitToolOutputsRequest));
+    return blockGet(openAiApi.submitToolOutputs(threadId, runId, submitToolOutputsRequest));
   }
 
   public List<Message> getThreadMessages(String threadId, String runId) {
