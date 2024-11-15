@@ -76,14 +76,14 @@ public final class NotebookAssistantForNoteService {
   }
 
   public String suggestTopicTitle() throws JsonProcessingException {
-    OpenAiRun openAiRun =
+    OpenAiRunExpectingAction openAiRunExpectingAction =
         createThread(List.of())
             .withTool(AiToolFactory.suggestNoteTopicTitle())
             .withInstructions(
                 "Please suggest a better topic title for the note by calling the function. Don't change it if it's already good enough.")
             .run();
-    AiAssistantResponse toolCallResponse = openAiRun.getToolCallResponse();
-    openAiRun.cancelRun();
+    AiAssistantResponse toolCallResponse = openAiRunExpectingAction.getToolCallResponse();
+    openAiRunExpectingAction.cancelRun();
     TopicTitleReplacement replacement = (TopicTitleReplacement) toolCallResponse.getFirstArgument();
     return replacement.newTopic;
   }
@@ -111,7 +111,7 @@ public final class NotebookAssistantForNoteService {
 
         instruction = appendAdditionalInstructions(instruction, config);
 
-        OpenAiRun openAiRun =
+        OpenAiRunExpectingAction openAiRunExpectingAction =
             assistantService
                 .getThread(config.getThreadId())
                 .withTool(AiToolFactory.completeNoteDetails())
@@ -121,7 +121,7 @@ public final class NotebookAssistantForNoteService {
                     new AudioToTextToolCallResult(
                         instruction, transcriptionFromAudio, config.getPreviousNoteDetails()));
 
-        return getTextFromAudioFromOngoingRun(transcriptionFromAudio, openAiRun);
+        return getTextFromAudioFromOngoingRun(transcriptionFromAudio, openAiRunExpectingAction);
 
       } catch (OpenAiHttpException e) {
         // Fallback to creating a new thread if submission fails
@@ -132,15 +132,16 @@ public final class NotebookAssistantForNoteService {
   }
 
   private static TextFromAudio getTextFromAudioFromOngoingRun(
-      String transcription, OpenAiRun openAiRun) throws JsonProcessingException {
-    AiAssistantResponse toolCallResponse = openAiRun.getToolCallResponse();
+      String transcription, OpenAiRunExpectingAction openAiRunExpectingAction)
+      throws JsonProcessingException {
+    AiAssistantResponse toolCallResponse = openAiRunExpectingAction.getToolCallResponse();
 
     NoteDetailsCompletion noteDetails = (NoteDetailsCompletion) toolCallResponse.getFirstArgument();
     final TextFromAudio textFromAudio = new TextFromAudio();
     textFromAudio.setRawSRT(transcription);
     textFromAudio.setCompletionMarkdownFromAudio(noteDetails.completion);
-    textFromAudio.setThreadId(openAiRun.getThreadId());
-    textFromAudio.setRunId(openAiRun.getRunId());
+    textFromAudio.setThreadId(openAiRunExpectingAction.getThreadId());
+    textFromAudio.setRunId(openAiRunExpectingAction.getRunId());
     textFromAudio.setToolCallId(toolCallResponse.getFirstToolCallId());
     return textFromAudio;
   }
@@ -164,11 +165,11 @@ public final class NotebookAssistantForNoteService {
 
     instructions = appendAdditionalInstructions(instructions, config);
 
-    OpenAiRun openAiRun =
+    OpenAiRunExpectingAction openAiRunExpectingAction =
         createThread(List.of(message))
             .withTool(AiToolFactory.completeNoteDetails())
             .withInstructions(instructions)
             .run();
-    return getTextFromAudioFromOngoingRun(transcription, openAiRun);
+    return getTextFromAudioFromOngoingRun(transcription, openAiRunExpectingAction);
   }
 }

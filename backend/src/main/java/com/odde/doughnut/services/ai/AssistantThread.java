@@ -32,10 +32,10 @@ public class AssistantThread {
     return this;
   }
 
-  public OpenAiRun run() {
+  public OpenAiRunExpectingAction run() {
     RunCreateRequest.RunCreateRequestBuilder builder =
         getCreateRequestBuilder().tools(List.of(tool.getTool()));
-    return new OpenAiRun(
+    return new OpenAiRunExpectingAction(
         openAiApiHandler, threadId, openAiApiHandler.createRun(threadId, builder.build()), tool);
   }
 
@@ -65,7 +65,7 @@ public class AssistantThread {
     openAiApiHandler.createMessage(threadId, messageRequest);
   }
 
-  public OpenAiRun resumeRun(String runId) {
-    return new OpenAiRun(openAiApiHandler, threadId, runId, tool);
+  public OpenAiRunExpectingAction resumeRun(String runId) {
+    return new OpenAiRunExpectingAction(openAiApiHandler, threadId, runId, tool);
   }
 }

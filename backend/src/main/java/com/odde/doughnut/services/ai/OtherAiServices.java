@@ -115,7 +115,7 @@ public final class OtherAiServices {
     return openAiApiHandler.getTranscription(requestBody);
   }
 
-  public OpenAiRun getAssistantRunService(String threadId, String runId) {
-    return new OpenAiRun(openAiApiHandler, threadId, runId, null);
+  public OpenAiRunExpectingAction resumeRun(String threadId, String runId) {
+    return new OpenAiRunExpectingAction(openAiApiHandler, threadId, runId, null);
   }
 }

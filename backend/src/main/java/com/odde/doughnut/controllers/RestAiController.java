@@ -59,14 +59,14 @@ public class RestAiController {
       @RequestBody ToolCallResult result)
       throws JsonProcessingException {
     currentUser.assertLoggedIn();
-    otherAiServices.getAssistantRunService(threadId, runId).submitToolOutputs(toolCallId, result);
+    otherAiServices.resumeRun(threadId, runId).submitToolOutputs(toolCallId, result);
   }
 
   @PostMapping("/cancel-run/{threadId}/{runId}")
   @Transactional
   public void cancelRun(@PathVariable String threadId, @PathVariable String runId) {
     currentUser.assertLoggedIn();
-    otherAiServices.getAssistantRunService(threadId, runId).cancelRun();
+    otherAiServices.resumeRun(threadId, runId).cancelRun();
   }
 
   @PostMapping("/suggest-topic-title/{note}")
