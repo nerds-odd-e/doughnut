@@ -51,13 +51,21 @@ class RestAiAudioControllerTests {
   OpenAIChatCompletionMock openAIChatCompletionMock;
 
   @BeforeEach
-  void setup() {
+  void commonSetup() {
+    initializeController();
+    setupMocks();
+  }
+
+  private void initializeController() {
     controller =
         new RestAiAudioController(
             new OtherAiServices(openAiApi),
             makeMe.modelFactoryService,
             new NotebookAssistantForNoteServiceFactory(
                 openAiApi, new GlobalSettingsService(makeMe.modelFactoryService)));
+  }
+
+  private void setupMocks() {
     TextFromAudio completionMarkdownFromAudio = new TextFromAudio();
     completionMarkdownFromAudio.setCompletionMarkdownFromAudio("test123");
     openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
@@ -82,14 +90,12 @@ class RestAiAudioControllerTests {
   }
 
   @Nested
-  class ConvertAudioToText {
-    AudioUploadDTO audioUploadDTO;
+  class ConvertAudioToTextTests {
+    private AudioUploadDTO audioUploadDTO;
 
     @BeforeEach
     void setup() {
-      mockTranscriptionSrtResponse("test");
-      audioUploadDTO = new AudioUploadDTO();
-      audioUploadDTO.setUploadAudioFile(createMockAudioFile("test.mp3"));
+      audioUploadDTO = createAudioUploadDTO(createMockAudioFile("test.mp3"));
     }
 
     @ParameterizedTest
@@ -128,24 +134,49 @@ class RestAiAudioControllerTests {
   }
 
   @Nested
-  class ConvertAudioToTextForNote {
-    OpenAIAssistantMocker openAIAssistantMocker;
-    OpenAIAssistantThreadMocker openAIAssistantThreadMocker;
-    AudioUploadDTO audioUploadDTO;
-    Note note;
+  class ConvertAudioToTextForNoteTests {
+    private OpenAIAssistantMocker openAIAssistantMocker;
+    private OpenAIAssistantThreadMocker openAIAssistantThreadMocker;
+    private AudioUploadDTO audioUploadDTO;
+    private Note note;
 
     @BeforeEach
     void setup() {
+      setupTestData();
+      setupMocks();
+    }
+
+    private void setupTestData() {
       note = makeMe.aNote().please();
       audioUploadDTO = createAudioUploadDTO(createMockAudioFile("test.mp3"));
+    }
+
+    private void setupMocks() {
       openAIAssistantMocker = new OpenAIAssistantMocker(openAiApi);
       openAIAssistantThreadMocker = openAIAssistantMocker.mockThreadCreation("existing-thread");
+      mockNoteDetailsCompletion("text from audio transcription");
+    }
+
+    private void mockNoteDetailsCompletion(String completionText) {
       NoteDetailsCompletion completion = new NoteDetailsCompletion();
-      completion.completion = "text from audio transcription";
+      completion.completion = completionText;
 
       openAIAssistantThreadMocker
           .mockCreateRunInProcess("my-run-id")
           .aRunThatRequireAction(completion, AiToolName.COMPLETE_NOTE_DETAILS.getValue())
+          .mockRetrieveRun()
+          .mockSubmitOutput();
+    }
+
+    private void setupFallbackThread(String completionText) {
+      OpenAIAssistantThreadMocker fallbackThreadMocker =
+          openAIAssistantMocker.mockThreadCreation("fallback-thread");
+      NoteDetailsCompletion fallbackCompletion = new NoteDetailsCompletion();
+      fallbackCompletion.completion = completionText;
+
+      fallbackThreadMocker
+          .mockCreateRunInProcess("fallback-run-id")
+          .aRunThatRequireAction(fallbackCompletion, AiToolName.COMPLETE_NOTE_DETAILS.getValue())
           .mockRetrieveRun()
           .mockSubmitOutput();
     }
@@ -240,16 +271,7 @@ class RestAiAudioControllerTests {
           .thenThrow(new OpenAiHttpException(error, null, 400));
 
       // Mock the fallback thread creation
-      OpenAIAssistantThreadMocker fallbackThreadMocker =
-          openAIAssistantMocker.mockThreadCreation("fallback-thread");
-      NoteDetailsCompletion fallbackCompletion = new NoteDetailsCompletion();
-      fallbackCompletion.completion = "fallback text from audio transcription";
-
-      fallbackThreadMocker
-          .mockCreateRunInProcess("fallback-run-id")
-          .aRunThatRequireAction(fallbackCompletion, AiToolName.COMPLETE_NOTE_DETAILS.getValue())
-          .mockRetrieveRun()
-          .mockSubmitOutput();
+      setupFallbackThread("fallback text from audio transcription");
 
       // Execute
       TextFromAudio result = controller.audioToTextForNote(note, audioUploadDTO);
@@ -278,16 +300,7 @@ class RestAiAudioControllerTests {
           .mockSubmitOutput();
 
       // Mock the fallback thread creation
-      OpenAIAssistantThreadMocker fallbackThreadMocker =
-          openAIAssistantMocker.mockThreadCreation("fallback-thread");
-      NoteDetailsCompletion fallbackCompletion = new NoteDetailsCompletion();
-      fallbackCompletion.completion = "fallback text from audio transcription";
-
-      fallbackThreadMocker
-          .mockCreateRunInProcess("fallback-run-id")
-          .aRunThatRequireAction(fallbackCompletion, AiToolName.COMPLETE_NOTE_DETAILS.getValue())
-          .mockRetrieveRun()
-          .mockSubmitOutput();
+      setupFallbackThread("fallback text from audio transcription");
 
       // Execute
       TextFromAudio result = controller.audioToTextForNote(note, audioUploadDTO);
