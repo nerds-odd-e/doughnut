@@ -78,9 +78,10 @@ public final class NotebookAssistantForNoteService {
     try {
       final String[] result = new String[1];
       AiTool tool = AiToolFactory.suggestNoteTopicTitle();
-      thread
-          .withTool(tool)
-          .createRunForToolCall1(
+      AssistantThread assistantThread = thread.withTool(tool);
+      assistantThread
+          .run()
+          .getToolCallResponse(
               (runService, threadResponse, parsedResponse) -> {
                 TopicTitleReplacement replacement = (TopicTitleReplacement) parsedResponse;
                 result[0] = replacement.newTopic;
@@ -113,9 +114,10 @@ public final class NotebookAssistantForNoteService {
     final TextFromAudio textFromAudio = new TextFromAudio();
     AssistantThread thread = createThread(List.of(message));
     AiTool tool = AiToolFactory.completeNoteDetails();
-    thread
-        .withTool(tool)
-        .createRunForToolCall1(
+    AssistantThread assistantThread = thread.withTool(tool);
+    assistantThread
+        .run()
+        .getToolCallResponse(
             (runService, toolCallId, parsedResponse) -> {
               try {
                 NoteDetailsCompletion noteDetails = (NoteDetailsCompletion) parsedResponse;
