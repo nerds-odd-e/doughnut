@@ -38,14 +38,14 @@ public final class AssistantService {
     return openAiApiHandler.createRunStream(threadId, assistantId);
   }
 
-  public void createUserMessage(String prompt, String threadId) {
+  public void createUserMessage(String prompt, AssistantThread thread) {
     MessageRequest messageRequest = MessageRequest.builder().role("user").content(prompt).build();
-    openAiApiHandler.createMessage(threadId, messageRequest);
+    openAiApiHandler.createMessage(thread.threadId, messageRequest);
   }
 
-  public void createAssistantMessage(String msg, String threadId) {
+  public void createAssistantMessage(String msg, AssistantThread thread) {
     MessageRequest messageRequest = MessageRequest.builder().role("assistant").content(msg).build();
-    openAiApiHandler.createMessage(threadId, messageRequest);
+    openAiApiHandler.createMessage(thread.threadId, messageRequest);
   }
 
   public String createThread(List<MessageRequest> additionalMessages) {
@@ -100,8 +100,8 @@ public final class AssistantService {
     return new AssistantRunService(openAiApiHandler, threadId, runId);
   }
 
-  public SseEmitter getRunStreamAsSSE(Consumer<Message> messageConsumer, String threadId1) {
-    Flowable<AssistantSSE> runStream = getRunStream(threadId1);
+  public SseEmitter getRunStreamAsSSE(Consumer<Message> messageConsumer, AssistantThread thread) {
+    Flowable<AssistantSSE> runStream = getRunStream(thread.threadId);
     SseEmitter emitter = new SseEmitter();
     runStream.subscribe(
         sse -> {
@@ -131,12 +131,13 @@ public final class AssistantService {
   public void createThreadAndRunForToolCall(
       AiTool tool,
       TriConsumer<AssistantRunService, String, Object> runServiceAction,
-      String threadId)
+      AssistantThread thread)
       throws JsonProcessingException {
     RunCreateRequest.RunCreateRequestBuilder builder =
         RunCreateRequest.builder().tools(List.of(tool.getTool()));
-    AiAssistantResponse threadResponse = createRunAndGetThreadResponse(threadId, builder);
-    AssistantRunService runService = getAssistantRunService(threadId, threadResponse.getRunId());
+    AiAssistantResponse threadResponse = createRunAndGetThreadResponse(thread.threadId, builder);
+    AssistantRunService runService =
+        getAssistantRunService(thread.threadId, threadResponse.getRunId());
     if (runServiceAction != null) {
       Object parsedResponse =
           objectMapper.readValue(

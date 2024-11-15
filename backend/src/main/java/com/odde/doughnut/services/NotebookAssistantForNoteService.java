@@ -24,22 +24,23 @@ public final class NotebookAssistantForNoteService {
   public SseEmitter getAiReplyForConversation(
       Conversation conversation, ConversationService conversationService) {
 
-    String threadId = conversation.getAiAssistantThreadId();
-    if (threadId == null) {
-      AssistantThread thread = createThread(List.of());
+    AssistantThread thread;
+    if (conversation.getAiAssistantThreadId() == null) {
+      thread = createThread(List.of());
       conversationService.setConversationAiAssistantThreadId(conversation, thread.threadId);
-      threadId = thread.threadId;
+    } else {
+      thread = new AssistantThread(conversation.getAiAssistantThreadId());
     }
 
     Timestamp lastAiAssistantThreadSync = conversation.getLastAiAssistantThreadSync();
     if (lastAiAssistantThreadSync != null && note.getUpdatedAt().after(lastAiAssistantThreadSync)) {
       assistantService.createAssistantMessage(
-          "The note content has been update:\n\n%s".formatted(note.getNoteDescription()), threadId);
+          "The note content has been update:\n\n%s".formatted(note.getNoteDescription()), thread);
     }
     List<ConversationMessage> unseen = conversation.getUnseenMessagesByAssistant();
     if (!unseen.isEmpty()) {
       String combinedMessage = GetAiStreamHelper.formatUnsentMessages(unseen);
-      assistantService.createUserMessage(combinedMessage, threadId);
+      assistantService.createUserMessage(combinedMessage, thread);
     }
     conversationService.updateLastAiAssistantThreadSync(conversation);
 
@@ -48,7 +49,7 @@ public final class NotebookAssistantForNoteService {
           String content = GetAiStreamHelper.extractMessageContent(message);
           conversationService.addMessageToConversation(conversation, null, content);
         }),
-        threadId);
+        thread);
   }
 
   private AssistantThread createThread(List<MessageRequest> additionalMessages) {
@@ -81,7 +82,7 @@ public final class NotebookAssistantForNoteService {
             result[0] = replacement.newTopic;
             runService.cancelRun();
           },
-          thread.threadId);
+          thread);
       return result[0];
     } catch (JsonProcessingException e) {
       throw new RuntimeException("Failed to parse topic title replacement", e);
@@ -119,7 +120,7 @@ public final class NotebookAssistantForNoteService {
             throw new RuntimeException(e);
           }
         },
-        thread.threadId);
+        thread);
 
     return textFromAudio;
   }
