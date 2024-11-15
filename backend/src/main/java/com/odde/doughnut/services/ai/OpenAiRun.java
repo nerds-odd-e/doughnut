@@ -2,7 +2,6 @@ package com.odde.doughnut.services.ai;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.AiAssistantResponse;
-import com.odde.doughnut.services.TriConsumer;
 import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.assistants.run.RequiredAction;
@@ -42,29 +41,19 @@ public class OpenAiRun {
     openAiApiHandler.cancelRun(threadId, run.getId());
   }
 
-  public AiAssistantResponse getToolCallResponse(
-      TriConsumer<OpenAiRun, String, Object> runServiceAction) throws JsonProcessingException {
-    AiAssistantResponse threadResponse = getThreadResponse(threadId, run);
-    if (runServiceAction != null) {
-      Object parsedResponse = threadResponse.getFirstArgument();
-      runServiceAction.accept(
-          this, threadResponse.getToolCalls().getFirst().getId(), parsedResponse);
-    }
-    return threadResponse;
-  }
+  public AiAssistantResponse getToolCallResponse() {
+    String id = run.getId();
+    AiAssistantResponse response = new AiAssistantResponse(tool);
 
-  private AiAssistantResponse getThreadResponse(String threadId, Run currentRun) {
-    String id = currentRun.getId();
-    AiAssistantResponse completionResponse = new AiAssistantResponse(tool);
-
-    Run run = openAiApiHandler.retrieveUntilCompletedOrRequiresAction(threadId, currentRun);
-    if (run.getStatus().equals("requires_action")) {
-      completionResponse.setToolCalls(getAiCompletionRequiredAction(run.getRequiredAction()));
+    Run updatedRun = openAiApiHandler.retrieveUntilCompletedOrRequiresAction(threadId, run);
+    response.setRunStatus(updatedRun.getStatus());
+    if (updatedRun.getStatus().equals("requires_action")) {
+      response.setToolCalls(getAiCompletionRequiredAction(updatedRun.getRequiredAction()));
     } else {
-      completionResponse.setMessages(openAiApiHandler.getThreadMessages(threadId, id));
+      response.setMessages(openAiApiHandler.getThreadMessages(threadId, id));
     }
 
-    return completionResponse;
+    return response;
   }
 
   private List<ToolCall> getAiCompletionRequiredAction(RequiredAction requiredAction) {

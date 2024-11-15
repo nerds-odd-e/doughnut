@@ -81,7 +81,7 @@ public final class NotebookAssistantForNoteService {
             .withInstructions(
                 "Please suggest a better topic title for the note by calling the function. Don't change it if it's already good enough.")
             .run();
-    AiAssistantResponse toolCallResponse = openAiRun.getToolCallResponse(null);
+    AiAssistantResponse toolCallResponse = openAiRun.getToolCallResponse();
     openAiRun.cancelRun();
     TopicTitleReplacement replacement = (TopicTitleReplacement) toolCallResponse.getFirstArgument();
     return replacement.newTopic;
@@ -109,7 +109,7 @@ public final class NotebookAssistantForNoteService {
                         "Previous content was appended, now there's more to process. Note that this is to be appended to the previous note details and the transcription could be from audio that was truncated in the middle of a sentence or word. Follow the same run instructions.",
                         transcription,
                         previousNoteDetails));
-        AiAssistantResponse toolCallResponse = openAiRun.getToolCallResponse(null);
+        AiAssistantResponse toolCallResponse = openAiRun.getToolCallResponse();
 
         NoteDetailsCompletion noteDetails =
             (NoteDetailsCompletion) toolCallResponse.getFirstArgument();
@@ -118,7 +118,7 @@ public final class NotebookAssistantForNoteService {
         textFromAudio.setCompletionMarkdownFromAudio(noteDetails.completion);
         textFromAudio.setThreadId(openAiRun.getThreadId());
         textFromAudio.setRunId(openAiRun.getRunId());
-        textFromAudio.setToolCallId(toolCallResponse.getToolCalls().getFirst().getId());
+        textFromAudio.setToolCallId(toolCallResponse.getFirstToolCallId());
         return textFromAudio;
       } catch (OpenAiHttpException e) {
         // Fallback to creating a new thread if submission fails
@@ -151,14 +151,14 @@ public final class NotebookAssistantForNoteService {
 
           """)
             .run();
-    AiAssistantResponse toolCallResponse = openAiRun.getToolCallResponse(null);
+    AiAssistantResponse toolCallResponse = openAiRun.getToolCallResponse();
     final TextFromAudio textFromAudio = new TextFromAudio();
     NoteDetailsCompletion noteDetails = (NoteDetailsCompletion) toolCallResponse.getFirstArgument();
     textFromAudio.setRawSRT(transcription);
     textFromAudio.setCompletionMarkdownFromAudio(noteDetails.completion);
     textFromAudio.setThreadId(openAiRun.getThreadId());
     textFromAudio.setRunId(openAiRun.getRunId());
-    textFromAudio.setToolCallId(toolCallResponse.getToolCalls().getFirst().getId());
+    textFromAudio.setToolCallId(toolCallResponse.getFirstToolCallId());
 
     return textFromAudio;
   }

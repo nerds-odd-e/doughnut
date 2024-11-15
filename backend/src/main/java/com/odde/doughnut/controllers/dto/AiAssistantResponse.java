@@ -7,13 +7,14 @@ import com.odde.doughnut.services.ai.tools.AiTool;
 import com.theokanning.openai.assistants.message.Message;
 import com.theokanning.openai.assistants.run.ToolCall;
 import java.util.List;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
 public final class AiAssistantResponse {
   private final AiTool tool;
-  List<Message> messages;
-  List<ToolCall> toolCalls;
+  @Setter List<Message> messages;
+  @Setter List<ToolCall> toolCalls;
+  @Getter @Setter String runStatus;
 
   private final ObjectMapper objectMapper =
       new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -25,5 +26,9 @@ public final class AiAssistantResponse {
   public Object getFirstArgument() throws JsonProcessingException {
     return objectMapper.readValue(
         this.toolCalls.getFirst().getFunction().getArguments().toString(), tool.parameterClass());
+  }
+
+  public String getFirstToolCallId() {
+    return this.toolCalls.getFirst().getId();
   }
 }
