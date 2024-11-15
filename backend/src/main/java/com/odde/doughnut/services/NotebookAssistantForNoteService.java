@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.ToolCallResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.services.ai.*;
-import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.commands.GetAiStreamHelper;
 import com.theokanning.openai.assistants.message.MessageRequest;
@@ -94,6 +93,17 @@ public final class NotebookAssistantForNoteService {
       throws JsonProcessingException {
     String content =
         """
+      Here's the new transcription from audio:
+      ------------
+      """
+            + transcription;
+    MessageRequest message = MessageRequest.builder().role("user").content(content).build();
+
+    final TextFromAudio textFromAudio = new TextFromAudio();
+    createThread(List.of(message))
+        .withTool(AiToolFactory.completeNoteDetails())
+        .withInstructions(
+            """
       You are a helpful assistant for converting audio transcription in SRT format to text of paragraphs. Your task is to convert the following audio transcription to text with meaningful punctuations and paragraphs.
        * Fix obvious audio transcription mistakes.
        * Do not translate the text to another language (unless asked to).
@@ -102,17 +112,7 @@ public final class NotebookAssistantForNoteService {
        * Call function to append text from audio to complete the current note details, so add necessary white space or new line at the beginning to connect to existing text.
        * The context should be in markdown format.
 
-       Here's the transcription from audio:
-       ------------
-      """
-            + transcription;
-    MessageRequest message = MessageRequest.builder().role("user").content(content).build();
-
-    final TextFromAudio textFromAudio = new TextFromAudio();
-    AssistantThread thread = createThread(List.of(message));
-    AiTool tool = AiToolFactory.completeNoteDetails();
-    thread
-        .withTool(tool)
+      """)
         .run()
         .getToolCallResponse(
             (runService, toolCallId, parsedResponse) -> {
