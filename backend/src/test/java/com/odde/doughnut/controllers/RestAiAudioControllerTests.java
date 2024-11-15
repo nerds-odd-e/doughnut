@@ -21,6 +21,8 @@ import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIAssistantMocker;
 import com.odde.doughnut.testability.OpenAIAssistantThreadMocker;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
+import com.theokanning.openai.OpenAiError;
+import com.theokanning.openai.OpenAiHttpException;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import io.reactivex.Single;
 import java.io.IOException;
@@ -221,6 +223,43 @@ class RestAiAudioControllerTests {
                         containsString("test transcription"));
                     return true;
                   }));
+    }
+
+    @Test
+    void shouldFallbackToNewThreadWhenSubmitToolOutputsFails() throws IOException {
+      // Setup
+      audioUploadDTO.setThreadId("existing-thread");
+      audioUploadDTO.setRunId("my-run-id");
+      audioUploadDTO.setToolCallId("existing-call");
+
+      // Mock the failure of submitToolOutputs
+      OpenAiError error = new OpenAiError();
+      error.setError(new OpenAiError.OpenAiErrorDetails());
+
+      when(openAiApi.submitToolOutputs(eq("existing-thread"), eq("my-run-id"), any()))
+          .thenThrow(new OpenAiHttpException(error, null, 400));
+
+      // Mock the fallback thread creation
+      OpenAIAssistantThreadMocker fallbackThreadMocker =
+          openAIAssistantMocker.mockThreadCreation("fallback-thread");
+      NoteDetailsCompletion fallbackCompletion = new NoteDetailsCompletion();
+      fallbackCompletion.completion = "fallback text from audio transcription";
+
+      fallbackThreadMocker
+          .mockCreateRunInProcess("fallback-run-id")
+          .aRunThatRequireAction(fallbackCompletion, AiToolName.COMPLETE_NOTE_DETAILS.getValue())
+          .mockRetrieveRun()
+          .mockSubmitOutput();
+
+      // Execute
+      TextFromAudio result = controller.audioToTextForNote(note, audioUploadDTO);
+
+      // Verify
+      assertNotNull(result);
+      assertEquals(
+          "fallback text from audio transcription", result.getCompletionMarkdownFromAudio());
+      verify(openAiApi).submitToolOutputs(eq("existing-thread"), eq("my-run-id"), any());
+      verify(openAiApi).createThread(any());
     }
   }
 }

@@ -5,6 +5,7 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.services.ai.*;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.commands.GetAiStreamHelper;
+import com.theokanning.openai.OpenAiHttpException;
 import com.theokanning.openai.assistants.message.MessageRequest;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -99,29 +100,39 @@ public final class NotebookAssistantForNoteService {
     textFromAudio.setRawSRT(transcription);
 
     if (threadId != null && !threadId.isEmpty() && runId != null && !runId.isEmpty()) {
-      // Use existing thread and run
-      assistantService
-          .getThread(threadId)
-          .withTool(AiToolFactory.completeNoteDetails())
-          .resumeRun(runId)
-          .submitToolOutputs(
-              toolCallId,
-              new AudioToTextToolCallResult(
-                  "Previous content was appended, now there's more to process. Note that this is to be appended to the previous note details and the transcription could be from audio that was truncated in the middle of a sentence or word. Follow the same run instructions.",
-                  transcription,
-                  previousNoteDetails))
-          .getToolCallResponse(
-              (runService, tcId, parsedResponse) -> {
-                NoteDetailsCompletion noteDetails = (NoteDetailsCompletion) parsedResponse;
-                textFromAudio.setCompletionMarkdownFromAudio(noteDetails.completion);
-                textFromAudio.setThreadId(threadId);
-                textFromAudio.setRunId(runService.getRunId());
-                textFromAudio.setToolCallId(tcId);
-              });
+      try {
+        // Use existing thread and run
+        assistantService
+            .getThread(threadId)
+            .withTool(AiToolFactory.completeNoteDetails())
+            .resumeRun(runId)
+            .submitToolOutputs(
+                toolCallId,
+                new AudioToTextToolCallResult(
+                    "Previous content was appended, now there's more to process. Note that this is to be appended to the previous note details and the transcription could be from audio that was truncated in the middle of a sentence or word. Follow the same run instructions.",
+                    transcription,
+                    previousNoteDetails))
+            .getToolCallResponse(
+                (runService, tcId, parsedResponse) -> {
+                  NoteDetailsCompletion noteDetails = (NoteDetailsCompletion) parsedResponse;
+                  textFromAudio.setCompletionMarkdownFromAudio(noteDetails.completion);
+                  textFromAudio.setThreadId(threadId);
+                  textFromAudio.setRunId(runService.getRunId());
+                  textFromAudio.setToolCallId(tcId);
+                });
 
-      return textFromAudio;
+        return textFromAudio;
+      } catch (OpenAiHttpException e) {
+        // Fallback to creating a new thread if submission fails
+        return createNewThreadForTranscription(transcription, textFromAudio);
+      }
     }
 
+    return createNewThreadForTranscription(transcription, textFromAudio);
+  }
+
+  private TextFromAudio createNewThreadForTranscription(
+      String transcription, TextFromAudio textFromAudio) throws JsonProcessingException {
     // Original flow for new threads
     String content = "Here's the new transcription from audio:\n------------\n" + transcription;
     MessageRequest message = MessageRequest.builder().role("user").content(content).build();
