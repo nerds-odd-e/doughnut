@@ -111,14 +111,12 @@ public final class NotebookAssistantForNoteService {
                         previousNoteDetails));
 
         // Add check for run status
-        if (!openAiRun.isRequiresAction()) {
-          return createNewThreadForTranscription(transcription);
+        if (openAiRun.isRequiresAction()) {
+          return getTextFromAudioFromOngoingRun(transcription, openAiRun);
         }
 
-        return getTextFromAudioFromOngoingRun(transcription, openAiRun);
       } catch (OpenAiHttpException e) {
         // Fallback to creating a new thread if submission fails
-        return createNewThreadForTranscription(transcription);
       }
     }
 
