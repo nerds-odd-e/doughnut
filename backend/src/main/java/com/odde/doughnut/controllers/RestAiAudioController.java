@@ -43,7 +43,7 @@ class RestAiAudioController {
     String filename = audioFile.getUploadAudioFile().getOriginalFilename();
     byte[] bytes = audioFile.getUploadAudioFile().getBytes();
     return otherAiServices.getTextFromAudio(
-        audioFile.getPreviousNoteDetails(),
+        audioFile.getConfig().getPreviousNoteDetails(),
         filename,
         bytes,
         getGlobalSettingsService().globalSettingOthers().getValue());
@@ -62,12 +62,7 @@ class RestAiAudioController {
     String transcriptionFromAudio = otherAiServices.getTranscriptionFromAudio(filename, bytes);
     return notebookAssistantForNoteServiceFactory
         .create(note)
-        .audioTranscriptionToArticle(
-            audioUpload.getPreviousNoteDetails(),
-            transcriptionFromAudio,
-            audioUpload.getThreadId(),
-            audioUpload.getRunId(),
-            audioUpload.getToolCallId());
+        .audioTranscriptionToArticle(transcriptionFromAudio, audioUpload.getConfig());
   }
 
   private GlobalSettingsService getGlobalSettingsService() {

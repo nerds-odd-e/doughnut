@@ -60,7 +60,7 @@ class AudioWebSocketHandlerTests {
     // Create a sample AudioUploadDTO
     AudioUploadDTO audioUploadDTO = new AudioUploadDTO();
     audioUploadDTO.setAudioData("test audio data".getBytes());
-    audioUploadDTO.setPreviousNoteDetails("Previous note details");
+    audioUploadDTO.getConfig().setPreviousNoteDetails("Previous note details");
 
     // Serialize the AudioUploadDTO to JSON
     byte[] jsonBytes = objectMapper.writeValueAsBytes(audioUploadDTO);

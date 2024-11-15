@@ -122,7 +122,7 @@ class RestAiAudioControllerTests {
 
     @Test
     void usingThePreviousTrailingDetails() throws IOException {
-      audioUploadDTO.setPreviousNoteDetails("Long long ago");
+      audioUploadDTO.getConfig().setPreviousNoteDetails("Long long ago");
       controller.audioToText(audioUploadDTO).map(TextFromAudio::getCompletionMarkdownFromAudio);
       ArgumentCaptor<ChatCompletionRequest> argumentCaptor =
           ArgumentCaptor.forClass(ChatCompletionRequest.class);
@@ -229,9 +229,9 @@ class RestAiAudioControllerTests {
 
     @Test
     void shouldUseExistingThreadAndRunWhenProvided() throws IOException {
-      audioUploadDTO.setThreadId("existing-thread");
-      audioUploadDTO.setRunId("my-run-id");
-      audioUploadDTO.setToolCallId("existing-call");
+      audioUploadDTO.getConfig().setThreadId("existing-thread");
+      audioUploadDTO.getConfig().setRunId("my-run-id");
+      audioUploadDTO.getConfig().setToolCallId("existing-call");
 
       TextFromAudio result = controller.audioToTextForNote(note, audioUploadDTO);
 
@@ -259,9 +259,9 @@ class RestAiAudioControllerTests {
     @Test
     void shouldFallbackToNewThreadWhenSubmitToolOutputsFails() throws IOException {
       // Setup
-      audioUploadDTO.setThreadId("existing-thread");
-      audioUploadDTO.setRunId("my-run-id");
-      audioUploadDTO.setToolCallId("existing-call");
+      audioUploadDTO.getConfig().setThreadId("existing-thread");
+      audioUploadDTO.getConfig().setRunId("my-run-id");
+      audioUploadDTO.getConfig().setToolCallId("existing-call");
 
       // Mock the failure of submitToolOutputs
       OpenAiError error = new OpenAiError();
@@ -288,9 +288,9 @@ class RestAiAudioControllerTests {
     void shouldFallbackToNewThreadWhenToolCallResponseStatusIsNotRequiresAction()
         throws IOException {
       // Setup
-      audioUploadDTO.setThreadId("existing-thread");
-      audioUploadDTO.setRunId("my-run-id");
-      audioUploadDTO.setToolCallId("existing-call");
+      audioUploadDTO.getConfig().setThreadId("existing-thread");
+      audioUploadDTO.getConfig().setRunId("my-run-id");
+      audioUploadDTO.getConfig().setToolCallId("existing-call");
 
       // Mock the initial thread with a completed status
       openAIAssistantThreadMocker

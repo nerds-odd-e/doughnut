@@ -3727,17 +3727,11 @@ components:
           format: int32
         notebook:
           $ref: "#/components/schemas/Notebook"
-    AudioUploadDTO:
+    AudioTranscriptConversionConfig:
       type: object
       properties:
-        uploadAudioFile:
-          type: string
-          format: binary
         additionalProcessingInstructions:
           type: string
-        audioData:
-          type: string
-          format: byte
         previousNoteDetails:
           type: string
         threadId:
@@ -3746,6 +3740,17 @@ components:
           type: string
         toolCallId:
           type: string
+    AudioUploadDTO:
+      type: object
+      properties:
+        config:
+          $ref: "#/components/schemas/AudioTranscriptConversionConfig"
+        uploadAudioFile:
+          type: string
+          format: binary
+        audioData:
+          type: string
+          format: byte
     TextFromAudio:
       required:
       - completionMarkdownFromAudio

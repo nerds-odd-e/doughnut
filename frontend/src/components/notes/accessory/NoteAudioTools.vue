@@ -143,12 +143,14 @@ const processAudio = async (file: Blob) => {
     const response = await managedApi.restAiAudioController.audioToTextForNote(
       note.id,
       {
-        previousNoteDetails: note.details?.slice(-500) ?? "",
         uploadAudioFile: file,
-        threadId: threadContext.value.threadId,
-        runId: threadContext.value.runId,
-        toolCallId: threadContext.value.toolCallId,
-        additionalProcessingInstructions: processingInstructions.value,
+        config: {
+          previousNoteDetails: note.details?.slice(-500) ?? "",
+          threadId: threadContext.value.threadId,
+          runId: threadContext.value.runId,
+          toolCallId: threadContext.value.toolCallId,
+          additionalProcessingInstructions: processingInstructions.value,
+        },
       }
     )
 

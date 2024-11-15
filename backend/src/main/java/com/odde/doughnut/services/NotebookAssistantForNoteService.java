@@ -2,6 +2,7 @@ package com.odde.doughnut.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.AiAssistantResponse;
+import com.odde.doughnut.controllers.dto.AudioTranscriptConversionConfig;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.services.ai.*;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
@@ -88,31 +89,30 @@ public final class NotebookAssistantForNoteService {
   }
 
   public TextFromAudio audioTranscriptionToArticle(
-      String previousNoteDetails,
-      String transcription,
-      String threadId,
-      String runId,
-      String toolCallId)
+      String transcriptionFromAudio, AudioTranscriptConversionConfig config)
       throws JsonProcessingException {
 
-    if (threadId != null && !threadId.isEmpty() && runId != null && !runId.isEmpty()) {
+    if (config.getThreadId() != null
+        && !config.getThreadId().isEmpty()
+        && config.getRunId() != null
+        && !config.getRunId().isEmpty()) {
       try {
         // Use existing thread and run
         OpenAiRun openAiRun =
             assistantService
-                .getThread(threadId)
+                .getThread(config.getThreadId())
                 .withTool(AiToolFactory.completeNoteDetails())
-                .resumeRun(runId)
+                .resumeRun(config.getRunId())
                 .submitToolOutputs(
-                    toolCallId,
+                    config.getToolCallId(),
                     new AudioToTextToolCallResult(
                         "Previous content was appended, now there's more to process. Note that this is to be appended to the previous note details and the transcription could be from audio that was truncated in the middle of a sentence or word. Follow the same run instructions.",
-                        transcription,
-                        previousNoteDetails));
+                        transcriptionFromAudio,
+                        config.getPreviousNoteDetails()));
 
         // Add check for run status
         if (openAiRun.isRequiresAction()) {
-          return getTextFromAudioFromOngoingRun(transcription, openAiRun);
+          return getTextFromAudioFromOngoingRun(transcriptionFromAudio, openAiRun);
         }
 
       } catch (OpenAiHttpException e) {
@@ -120,7 +120,7 @@ public final class NotebookAssistantForNoteService {
       }
     }
 
-    return createNewThreadForTranscription(transcription);
+    return createNewThreadForTranscription(transcriptionFromAudio);
   }
 
   private static TextFromAudio getTextFromAudioFromOngoingRun(

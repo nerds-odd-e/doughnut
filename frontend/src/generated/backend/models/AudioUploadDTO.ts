@@ -2,13 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { AudioTranscriptConversionConfig } from './AudioTranscriptConversionConfig';
 export type AudioUploadDTO = {
+    config?: AudioTranscriptConversionConfig;
     uploadAudioFile?: Blob;
-    additionalProcessingInstructions?: string;
     audioData?: string;
-    previousNoteDetails?: string;
-    threadId?: string;
-    runId?: string;
-    toolCallId?: string;
 };
 

@@ -42,7 +42,7 @@ public class AudioWebSocketHandler extends BinaryWebSocketHandler {
 
     Optional<TextFromAudio> result =
         otherAiServices.getTextFromAudio(
-            audioUploadDTO.getPreviousNoteDetails(),
+            audioUploadDTO.getConfig().getPreviousNoteDetails(),
             "stream.wav",
             audioUploadDTO.getAudioData(),
             getGlobalSettingsService().globalSettingOthers().getValue());
