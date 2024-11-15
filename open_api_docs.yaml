@@ -3740,6 +3740,10 @@ components:
           type: string
         threadId:
           type: string
+        runId:
+          type: string
+        toolCallId:
+          type: string
     TextFromAudio:
       required:
       - completionMarkdownFromAudio
@@ -3750,6 +3754,8 @@ components:
         rawSRT:
           type: string
         runId:
+          type: string
+        toolCallId:
           type: string
     AssessmentAttempt:
       required:

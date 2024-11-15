@@ -1,7 +1,6 @@
 package com.odde.doughnut.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.odde.doughnut.controllers.dto.ToolCallResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.services.ai.*;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
@@ -90,7 +89,11 @@ public final class NotebookAssistantForNoteService {
   }
 
   public TextFromAudio audioTranscriptionToArticle(
-      String transcription, String threadId, String runId, String toolCallId)
+      String previousNoteDetails,
+      String transcription,
+      String threadId,
+      String runId,
+      String toolCallId)
       throws JsonProcessingException {
     final TextFromAudio textFromAudio = new TextFromAudio();
     textFromAudio.setRawSRT(transcription);
@@ -103,7 +106,10 @@ public final class NotebookAssistantForNoteService {
           .resumeRun(runId)
           .submitToolOutputs(
               toolCallId,
-              new ToolCallResult("Previous content was appended, now there's more to process"))
+              new AudioToTextToolCallResult(
+                  "Previous content was appended, now there's more to process",
+                  transcription,
+                  previousNoteDetails))
           .getToolCallResponse(
               (runService, tcId, parsedResponse) -> {
                 NoteDetailsCompletion noteDetails = (NoteDetailsCompletion) parsedResponse;

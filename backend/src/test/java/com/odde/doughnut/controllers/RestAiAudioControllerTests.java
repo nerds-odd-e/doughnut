@@ -216,6 +216,9 @@ class RestAiAudioControllerTests {
                     assertThat(
                         arg.getToolOutputs().getFirst().getOutput(),
                         containsString("more to process"));
+                    assertThat(
+                        arg.getToolOutputs().getFirst().getOutput(),
+                        containsString("test transcription"));
                     return true;
                   }));
     }

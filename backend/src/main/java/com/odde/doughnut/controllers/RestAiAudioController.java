@@ -63,6 +63,7 @@ class RestAiAudioController {
     return notebookAssistantForNoteServiceFactory
         .create(note)
         .audioTranscriptionToArticle(
+            audioUpload.getPreviousNoteDetails(),
             transcriptionFromAudio,
             audioUpload.getThreadId(),
             audioUpload.getRunId(),

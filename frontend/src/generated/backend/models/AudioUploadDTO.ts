@@ -7,5 +7,7 @@ export type AudioUploadDTO = {
     audioData?: string;
     previousNoteDetails?: string;
     threadId?: string;
+    runId?: string;
+    toolCallId?: string;
 };
 

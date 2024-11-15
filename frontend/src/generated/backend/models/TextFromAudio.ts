@@ -6,5 +6,6 @@ export type TextFromAudio = {
     completionMarkdownFromAudio: string;
     rawSRT?: string;
     runId?: string;
+    toolCallId?: string;
 };
 
