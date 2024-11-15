@@ -26,8 +26,9 @@ public final class NotebookAssistantForNoteService {
 
     String threadId = conversation.getAiAssistantThreadId();
     if (threadId == null) {
-      threadId = createThread(List.of());
-      conversationService.setConversationAiAssistantThreadId(conversation, threadId);
+      AssistantThread thread = createThread(List.of());
+      conversationService.setConversationAiAssistantThreadId(conversation, thread.threadId);
+      threadId = thread.threadId;
     }
 
     Timestamp lastAiAssistantThreadSync = conversation.getLastAiAssistantThreadSync();
@@ -50,13 +51,13 @@ public final class NotebookAssistantForNoteService {
         threadId);
   }
 
-  private String createThread(List<MessageRequest> additionalMessages) {
+  private AssistantThread createThread(List<MessageRequest> additionalMessages) {
     List<MessageRequest> messages = new ArrayList<>();
     messages.add(getNoteDescriptionMessage());
     if (!additionalMessages.isEmpty()) {
       messages.addAll(additionalMessages);
     }
-    return assistantService.createThread(messages);
+    return new AssistantThread(assistantService.createThread(messages));
   }
 
   private MessageRequest getNoteDescriptionMessage() {
@@ -70,7 +71,7 @@ public final class NotebookAssistantForNoteService {
             .content("Please suggest a better topic title for the note.")
             .build();
 
-    String threadId = createThread(List.of(message));
+    AssistantThread thread = createThread(List.of(message));
     try {
       final String[] result = new String[1];
       assistantService.createThreadAndRunForToolCall(
@@ -80,7 +81,7 @@ public final class NotebookAssistantForNoteService {
             result[0] = replacement.newTopic;
             runService.cancelRun();
           },
-          threadId);
+          thread.threadId);
       return result[0];
     } catch (JsonProcessingException e) {
       throw new RuntimeException("Failed to parse topic title replacement", e);
@@ -106,7 +107,7 @@ public final class NotebookAssistantForNoteService {
     MessageRequest message = MessageRequest.builder().role("user").content(content).build();
 
     final TextFromAudio textFromAudio = new TextFromAudio();
-    String threadId = createThread(List.of(message));
+    AssistantThread thread = createThread(List.of(message));
     assistantService.createThreadAndRunForToolCall(
         AiToolFactory.completeNoteDetails(),
         (runService, toolCallId, parsedResponse) -> {
@@ -118,7 +119,7 @@ public final class NotebookAssistantForNoteService {
             throw new RuntimeException(e);
           }
         },
-        threadId);
+        thread.threadId);
 
     return textFromAudio;
   }
