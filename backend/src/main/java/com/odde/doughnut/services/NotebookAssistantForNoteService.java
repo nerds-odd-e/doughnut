@@ -58,7 +58,7 @@ public final class NotebookAssistantForNoteService {
     if (!additionalMessages.isEmpty()) {
       messages.addAll(additionalMessages);
     }
-    return new AssistantThread(assistantService.createThread(messages));
+    return assistantService.createThread(messages);
   }
 
   private MessageRequest getNoteDescriptionMessage() {

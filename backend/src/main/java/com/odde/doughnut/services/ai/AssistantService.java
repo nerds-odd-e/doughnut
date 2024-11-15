@@ -48,7 +48,7 @@ public final class AssistantService {
     openAiApiHandler.createMessage(thread.threadId, messageRequest);
   }
 
-  public String createThread(List<MessageRequest> additionalMessages) {
+  public AssistantThread createThread(List<MessageRequest> additionalMessages) {
     List<MessageRequest> messages =
         new ArrayList<>(
             List.of(
@@ -61,7 +61,8 @@ public final class AssistantService {
       messages.addAll(additionalMessages);
     }
     ThreadRequest threadRequest = ThreadRequest.builder().messages(messages).build();
-    return openAiApiHandler.createThread(threadRequest).getId();
+    String threadId = openAiApiHandler.createThread(threadRequest).getId();
+    return new AssistantThread(threadId);
   }
 
   private AiAssistantResponse getThreadResponse(String threadId, Run currentRun) {
