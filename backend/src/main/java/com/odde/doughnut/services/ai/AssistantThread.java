@@ -64,4 +64,8 @@ public class AssistantThread {
     MessageRequest messageRequest = MessageRequest.builder().role("assistant").content(msg).build();
     openAiApiHandler.createMessage(threadId, messageRequest);
   }
+
+  public OpenAiRun resumeRun(String runId) {
+    return new OpenAiRun(openAiApiHandler, threadId, runId, tool);
+  }
 }

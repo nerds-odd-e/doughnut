@@ -137,7 +137,7 @@ class RestAiAudioControllerTests {
       note = makeMe.aNote().please();
       audioUploadDTO = createAudioUploadDTO(createMockAudioFile("test.mp3"));
       openAIAssistantMocker = new OpenAIAssistantMocker(openAiApi);
-      openAIAssistantThreadMocker = openAIAssistantMocker.mockThreadCreation(null);
+      openAIAssistantThreadMocker = openAIAssistantMocker.mockThreadCreation("existing-thread");
       NoteDetailsCompletion completion = new NoteDetailsCompletion();
       completion.completion = "text from audio transcription";
 
@@ -192,6 +192,32 @@ class RestAiAudioControllerTests {
       assertNotNull(result.getRunId());
       assertEquals("test transcription", result.getRawSRT());
       assertEquals("my-run-id", result.getRunId());
+    }
+
+    @Test
+    void shouldUseExistingThreadAndRunWhenProvided() throws IOException {
+      audioUploadDTO.setThreadId("existing-thread");
+      audioUploadDTO.setRunId("my-run-id");
+      audioUploadDTO.setToolCallId("existing-call");
+
+      TextFromAudio result = controller.audioToTextForNote(note, audioUploadDTO);
+
+      assertNotNull(result);
+      assertEquals("text from audio transcription", result.getCompletionMarkdownFromAudio());
+      assertEquals("my-run-id", result.getRunId());
+      verify(openAiApi)
+          .submitToolOutputs(
+              eq("existing-thread"),
+              eq("my-run-id"),
+              argThat(
+                  arg -> {
+                    assertThat(
+                        arg.getToolOutputs().getFirst().getToolCallId(), equalTo("existing-call"));
+                    assertThat(
+                        arg.getToolOutputs().getFirst().getOutput(),
+                        containsString("more to process"));
+                    return true;
+                  }));
     }
   }
 }

@@ -55,14 +55,18 @@ class RestAiAudioController {
   @Transactional
   public TextFromAudio audioToTextForNote(
       @PathVariable("noteId") @Schema(type = "integer") Note note,
-      @Valid @ModelAttribute AudioUploadDTO audioFile)
+      @Valid @ModelAttribute AudioUploadDTO audioUpload)
       throws IOException {
-    String filename = audioFile.getUploadAudioFile().getOriginalFilename();
-    byte[] bytes = audioFile.getUploadAudioFile().getBytes();
+    String filename = audioUpload.getUploadAudioFile().getOriginalFilename();
+    byte[] bytes = audioUpload.getUploadAudioFile().getBytes();
     String transcriptionFromAudio = otherAiServices.getTranscriptionFromAudio(filename, bytes);
     return notebookAssistantForNoteServiceFactory
         .create(note)
-        .audioTranscriptionToArticle(transcriptionFromAudio);
+        .audioTranscriptionToArticle(
+            transcriptionFromAudio,
+            audioUpload.getThreadId(),
+            audioUpload.getRunId(),
+            audioUpload.getToolCallId());
   }
 
   private GlobalSettingsService getGlobalSettingsService() {

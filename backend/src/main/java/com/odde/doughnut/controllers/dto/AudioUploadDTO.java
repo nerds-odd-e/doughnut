@@ -25,4 +25,8 @@ public class AudioUploadDTO {
   private String previousNoteDetails;
 
   private String threadId;
+
+  private String runId;
+
+  private String toolCallId;
 }

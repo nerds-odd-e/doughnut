@@ -116,6 +116,6 @@ public final class OtherAiServices {
   }
 
   public OpenAiRun getAssistantRunService(String threadId, String runId) {
-    return new OpenAiRun(openAiApiHandler, threadId, runId);
+    return new OpenAiRun(openAiApiHandler, threadId, runId, null);
   }
 }

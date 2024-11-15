@@ -28,9 +28,4 @@ public record OpenAIAssistantThreadMocker(OpenAiApi openAiApi, String threadId) 
   public OpenAIAssistantRunStreamMocker andARunStream(String runId) {
     return new OpenAIAssistantRunStreamMocker(openAiApi, runId);
   }
-
-  public OpenAIAssistantThreadMocker mockListMessages(String msg) {
-    new OpenAIAssistantRunCompletedMocker(openAiApi, threadId, null).mockListMessages(msg);
-    return this;
-  }
 }

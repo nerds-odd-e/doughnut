@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.AiAssistantResponse;
-import com.odde.doughnut.controllers.dto.ToolCallResult;
 import com.odde.doughnut.services.TriConsumer;
 import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
@@ -28,17 +27,18 @@ public class OpenAiRun {
     this.tool = tool;
   }
 
-  public OpenAiRun(OpenAiApiHandler openAiApiHandler, String threadId, String runId) {
+  public OpenAiRun(OpenAiApiHandler openAiApiHandler, String threadId, String runId, AiTool tool) {
     this.openAiApiHandler = openAiApiHandler;
     this.threadId = threadId;
+    this.tool = tool;
     this.run = new Run();
     this.run.setId(runId);
-    this.tool = null;
   }
 
-  public void submitToolOutputs(String toolCallId, ToolCallResult result)
+  public OpenAiRun submitToolOutputs(String toolCallId, Object result)
       throws JsonProcessingException {
     openAiApiHandler.submitToolOutputs(threadId, run.getId(), toolCallId, result);
+    return this;
   }
 
   public void cancelRun() {

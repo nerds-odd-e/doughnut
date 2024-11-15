@@ -15,4 +15,5 @@ public class TextFromAudio {
 
   private String rawSRT;
   private String runId;
+  private String toolCallId;
 }

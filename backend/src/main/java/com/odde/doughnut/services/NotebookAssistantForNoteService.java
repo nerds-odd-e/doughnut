@@ -89,18 +89,35 @@ public final class NotebookAssistantForNoteService {
     return result[0];
   }
 
-  public TextFromAudio audioTranscriptionToArticle(String transcription)
+  public TextFromAudio audioTranscriptionToArticle(
+      String transcription, String threadId, String runId, String toolCallId)
       throws JsonProcessingException {
-    String content =
-        """
-      Here's the new transcription from audio:
-      ------------
-      """
-            + transcription;
-    MessageRequest message = MessageRequest.builder().role("user").content(content).build();
-
     final TextFromAudio textFromAudio = new TextFromAudio();
     textFromAudio.setRawSRT(transcription);
+
+    if (threadId != null && !threadId.isEmpty() && runId != null && !runId.isEmpty()) {
+      // Use existing thread and run
+      assistantService
+          .getThread(threadId)
+          .withTool(AiToolFactory.completeNoteDetails())
+          .resumeRun(runId)
+          .submitToolOutputs(
+              toolCallId,
+              new ToolCallResult("Previous content was appended, now there's more to process"))
+          .getToolCallResponse(
+              (runService, tcId, parsedResponse) -> {
+                NoteDetailsCompletion noteDetails = (NoteDetailsCompletion) parsedResponse;
+                textFromAudio.setCompletionMarkdownFromAudio(noteDetails.completion);
+                textFromAudio.setRunId(runService.getRunId());
+                textFromAudio.setToolCallId(tcId);
+              });
+
+      return textFromAudio;
+    }
+
+    // Original flow for new threads
+    String content = "Here's the new transcription from audio:\n------------\n" + transcription;
+    MessageRequest message = MessageRequest.builder().role("user").content(content).build();
 
     createThread(List.of(message))
         .withTool(AiToolFactory.completeNoteDetails())
@@ -117,15 +134,11 @@ public final class NotebookAssistantForNoteService {
       """)
         .run()
         .getToolCallResponse(
-            (runService, toolCallId, parsedResponse) -> {
-              try {
-                NoteDetailsCompletion noteDetails = (NoteDetailsCompletion) parsedResponse;
-                textFromAudio.setCompletionMarkdownFromAudio(noteDetails.completion);
-                textFromAudio.setRunId(runService.getRunId());
-                runService.submitToolOutputs(toolCallId, new ToolCallResult("appended"));
-              } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-              }
+            (runService, tcId, parsedResponse) -> {
+              NoteDetailsCompletion noteDetails = (NoteDetailsCompletion) parsedResponse;
+              textFromAudio.setCompletionMarkdownFromAudio(noteDetails.completion);
+              textFromAudio.setRunId(runService.getRunId());
+              textFromAudio.setToolCallId(tcId);
             });
 
     return textFromAudio;

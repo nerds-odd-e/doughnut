@@ -6,15 +6,14 @@ import com.theokanning.openai.client.OpenAiApi;
 import java.util.List;
 
 public record OpenAIAssistantCreatedRunMocker(OpenAiApi openAiApi, String threadId, String runId) {
-  public OpenAIAssistantRunCompletedMocker aRunThatCompleted() {
+  public OpenAIAssistantRunMocker theRun() {
     Run run = getRun("completed");
-    return new OpenAIAssistantRunCompletedMocker(openAiApi, threadId, run);
+    return new OpenAIAssistantRunMocker(openAiApi, threadId, run);
   }
 
-  public OpenAIAssistantRunCompletedMocker aRunThatRequireAction(
-      Object result, String function_name) {
+  public OpenAIAssistantRunMocker aRunThatRequireAction(Object result, String function_name) {
     Run run = getRunThatRequiresAction(result, function_name);
-    return new OpenAIAssistantRunCompletedMocker(openAiApi, threadId, run);
+    return new OpenAIAssistantRunMocker(openAiApi, threadId, run);
   }
 
   private Run getRun(String status) {

@@ -6,7 +6,6 @@ import static java.lang.Thread.sleep;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.odde.doughnut.controllers.dto.ToolCallResult;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolList;
@@ -157,9 +156,10 @@ public class OpenAiApiHandler {
   public Run retrieveUntilCompletedOrRequiresAction(String threadId, Run currentRun) {
     Run retrievedRun = currentRun;
     int count = 0;
-    while (!(retrievedRun.getStatus().equals("completed"))
-        && !(retrievedRun.getStatus().equals("failed"))
-        && !(retrievedRun.getStatus().equals("requires_action"))) {
+    while (retrievedRun.getStatus() == null
+        || !(retrievedRun.getStatus().equals("completed"))
+            && !(retrievedRun.getStatus().equals("failed"))
+            && !(retrievedRun.getStatus().equals("requires_action"))) {
       count++;
       if (count > 15) {
         break;
@@ -182,8 +182,7 @@ public class OpenAiApiHandler {
     }
   }
 
-  public void submitToolOutputs(
-      String threadId, String runId, String toolCallId, ToolCallResult result)
+  public void submitToolOutputs(String threadId, String runId, String toolCallId, Object result)
       throws JsonProcessingException {
     SubmitToolOutputRequestItem toolOutputRequestItem =
         SubmitToolOutputRequestItem.builder()
