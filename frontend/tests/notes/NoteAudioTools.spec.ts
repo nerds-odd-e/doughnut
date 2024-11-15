@@ -489,4 +489,68 @@ describe("NoteAudioTools", () => {
       })
     })
   })
+
+  describe("Advanced Options", () => {
+    let audioToTextForNoteMock
+    beforeEach(() => {
+      audioToTextForNoteMock = vi.fn()
+      helper.managedApi.restAiAudioController.audioToTextForNote =
+        audioToTextForNoteMock
+    })
+
+    it("shows advanced options when toggle button is clicked", async () => {
+      const advancedButton = findButtonByTitle(wrapper, "Advanced Options")
+      expect(wrapper.find(".advanced-options").exists()).toBe(false)
+
+      await advancedButton.trigger("click")
+      expect(wrapper.find(".advanced-options").exists()).toBe(true)
+
+      await advancedButton.trigger("click")
+      expect(wrapper.find(".advanced-options").exists()).toBe(false)
+    })
+
+    it("includes processing instructions in API call", async () => {
+      const advancedButton = findButtonByTitle(wrapper, "Advanced Options")
+      await advancedButton.trigger("click")
+
+      const input = wrapper.find("#processingInstructions")
+      await input.setValue("Test instructions")
+
+      const testBlob = new Blob(["test"])
+      await wrapper.vm.processAudio(testBlob)
+
+      expect(
+        helper.managedApi.restAiAudioController.audioToTextForNote
+      ).toHaveBeenCalledWith(
+        expect.any(Number),
+        expect.objectContaining({
+          additionalProcessingInstructions: "Test instructions",
+        })
+      )
+    })
+
+    it("maintains processing instructions between recordings", async () => {
+      const advancedButton = findButtonByTitle(wrapper, "Advanced Options")
+      await advancedButton.trigger("click")
+
+      const input = wrapper.find("#processingInstructions")
+      await input.setValue("Test instructions")
+
+      // First recording
+      const testBlob1 = new Blob(["test1"])
+      await wrapper.vm.processAudio(testBlob1)
+
+      // Second recording
+      const testBlob2 = new Blob(["test2"])
+      await wrapper.vm.processAudio(testBlob2)
+
+      const calls = audioToTextForNoteMock.mock.calls
+      expect(calls[0][1].additionalProcessingInstructions).toBe(
+        "Test instructions"
+      )
+      expect(calls[1][1].additionalProcessingInstructions).toBe(
+        "Test instructions"
+      )
+    })
+  })
 })

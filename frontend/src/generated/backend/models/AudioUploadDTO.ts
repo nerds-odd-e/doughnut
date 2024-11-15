@@ -4,6 +4,7 @@
 /* eslint-disable */
 export type AudioUploadDTO = {
     uploadAudioFile?: Blob;
+    additionalProcessingInstructions?: string;
     audioData?: string;
     previousNoteDetails?: string;
     threadId?: string;

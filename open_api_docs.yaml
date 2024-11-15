@@ -3733,6 +3733,8 @@ components:
         uploadAudioFile:
           type: string
           format: binary
+        additionalProcessingInstructions:
+          type: string
         audioData:
           type: string
           format: byte

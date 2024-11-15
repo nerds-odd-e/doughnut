@@ -20,6 +20,8 @@ public class AudioUploadDTO {
       })
   private MultipartFile uploadAudioFile;
 
+  private String additionalProcessingInstructions;
+
   private byte[] audioData;
 
   private String previousNoteDetails;
