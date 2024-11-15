@@ -9,8 +9,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public final class AiAssistantResponse {
-  String threadId;
-  String runId;
   List<Message> messages;
   List<ToolCall> toolCalls;
 }
