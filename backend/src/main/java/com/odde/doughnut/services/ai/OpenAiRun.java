@@ -42,14 +42,15 @@ public class OpenAiRun {
     openAiApiHandler.cancelRun(threadId, run.getId());
   }
 
-  public void getToolCallResponse(TriConsumer<OpenAiRun, String, Object> runServiceAction)
-      throws JsonProcessingException {
+  public AiAssistantResponse getToolCallResponse(
+      TriConsumer<OpenAiRun, String, Object> runServiceAction) throws JsonProcessingException {
     AiAssistantResponse threadResponse = getThreadResponse(threadId, run);
     if (runServiceAction != null) {
       Object parsedResponse = threadResponse.getFirstArgument();
       runServiceAction.accept(
           this, threadResponse.getToolCalls().getFirst().getId(), parsedResponse);
     }
+    return threadResponse;
   }
 
   private AiAssistantResponse getThreadResponse(String threadId, Run currentRun) {

@@ -1,6 +1,7 @@
 package com.odde.doughnut.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.odde.doughnut.controllers.dto.AiAssistantResponse;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.services.ai.*;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
@@ -74,19 +75,16 @@ public final class NotebookAssistantForNoteService {
   }
 
   public String suggestTopicTitle() throws JsonProcessingException {
-    final String[] result = new String[1];
-    createThread(List.of())
-        .withTool(AiToolFactory.suggestNoteTopicTitle())
-        .withInstructions(
-            "Please suggest a better topic title for the note by calling the function. Don't change it if it's already good enough.")
-        .run()
-        .getToolCallResponse(
-            (runService, threadResponse, parsedResponse) -> {
-              TopicTitleReplacement replacement = (TopicTitleReplacement) parsedResponse;
-              result[0] = replacement.newTopic;
-              runService.cancelRun();
-            });
-    return result[0];
+    OpenAiRun openAiRun =
+        createThread(List.of())
+            .withTool(AiToolFactory.suggestNoteTopicTitle())
+            .withInstructions(
+                "Please suggest a better topic title for the note by calling the function. Don't change it if it's already good enough.")
+            .run();
+    AiAssistantResponse toolCallResponse = openAiRun.getToolCallResponse(null);
+    openAiRun.cancelRun();
+    TopicTitleReplacement replacement = (TopicTitleReplacement) toolCallResponse.getFirstArgument();
+    return replacement.newTopic;
   }
 
   public TextFromAudio audioTranscriptionToArticle(
