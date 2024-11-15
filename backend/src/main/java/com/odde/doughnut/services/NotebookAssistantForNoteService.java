@@ -27,28 +27,30 @@ public final class NotebookAssistantForNoteService {
     AssistantThread thread;
     if (conversation.getAiAssistantThreadId() == null) {
       thread = createThread(List.of());
-      conversationService.setConversationAiAssistantThreadId(conversation, thread.threadId);
+      conversationService.setConversationAiAssistantThreadId(conversation, thread.getThreadId());
     } else {
       thread = assistantService.getThread(conversation.getAiAssistantThreadId());
     }
 
     Timestamp lastAiAssistantThreadSync = conversation.getLastAiAssistantThreadSync();
     if (lastAiAssistantThreadSync != null && note.getUpdatedAt().after(lastAiAssistantThreadSync)) {
-      assistantService.createAssistantMessage(
-          "The note content has been update:\n\n%s".formatted(note.getNoteDescription()), thread);
+      thread.createAssistantMessage(
+          "The note content has been update:\n\n%s".formatted(note.getNoteDescription()));
     }
     List<ConversationMessage> unseen = conversation.getUnseenMessagesByAssistant();
     if (!unseen.isEmpty()) {
       String combinedMessage = GetAiStreamHelper.formatUnsentMessages(unseen);
-      assistantService.createUserMessage(combinedMessage, thread);
+      thread.createUserMessage(combinedMessage);
     }
     conversationService.updateLastAiAssistantThreadSync(conversation);
 
-    return thread.getRunStreamAsSSE(
-        (message -> {
-          String content = GetAiStreamHelper.extractMessageContent(message);
-          conversationService.addMessageToConversation(conversation, null, content);
-        }));
+    return thread
+        .runStream()
+        .getSseEmitter(
+            (message -> {
+              String content = GetAiStreamHelper.extractMessageContent(message);
+              conversationService.addMessageToConversation(conversation, null, content);
+            }));
   }
 
   private AssistantThread createThread(List<MessageRequest> additionalMessages) {
@@ -74,7 +76,7 @@ public final class NotebookAssistantForNoteService {
     AssistantThread thread = createThread(List.of(message));
     try {
       final String[] result = new String[1];
-      thread.createThreadAndRunForToolCall(
+      thread.createRunForToolCall(
           AiToolFactory.suggestNoteTopicTitle(),
           (runService, threadResponse, parsedResponse) -> {
             TopicTitleReplacement replacement = (TopicTitleReplacement) parsedResponse;
@@ -107,7 +109,7 @@ public final class NotebookAssistantForNoteService {
 
     final TextFromAudio textFromAudio = new TextFromAudio();
     AssistantThread thread = createThread(List.of(message));
-    thread.createThreadAndRunForToolCall(
+    thread.createRunForToolCall(
         AiToolFactory.completeNoteDetails(),
         (runService, toolCallId, parsedResponse) -> {
           try {

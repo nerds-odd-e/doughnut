@@ -148,9 +148,9 @@ public class OpenAiApiHandler {
         BackpressureStrategy.BUFFER);
   }
 
-  public Flowable<AssistantSSE> createRunStream(String threadId, String assistantId) {
-    RunCreateRequest runCreateRequest =
-        RunCreateRequest.builder().assistantId(assistantId).stream(true).build();
+  public Flowable<AssistantSSE> createRunStream(
+      String threadId, RunCreateRequest.RunCreateRequestBuilder runCreateRequestBuilder) {
+    RunCreateRequest runCreateRequest = runCreateRequestBuilder.stream(true).build();
     return assistantStream(openAiApi.createRunStream(threadId, runCreateRequest));
   }
 

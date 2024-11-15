@@ -15,16 +15,6 @@ public final class OpenAiAssistant {
     this.assistantId = assistantId;
   }
 
-  public void createUserMessage(String prompt, AssistantThread thread) {
-    MessageRequest messageRequest = MessageRequest.builder().role("user").content(prompt).build();
-    openAiApiHandler.createMessage(thread.threadId, messageRequest);
-  }
-
-  public void createAssistantMessage(String msg, AssistantThread thread) {
-    MessageRequest messageRequest = MessageRequest.builder().role("assistant").content(msg).build();
-    openAiApiHandler.createMessage(thread.threadId, messageRequest);
-  }
-
   public AssistantThread getThread(String threadId) {
     return new AssistantThread(assistantId, threadId, openAiApiHandler);
   }

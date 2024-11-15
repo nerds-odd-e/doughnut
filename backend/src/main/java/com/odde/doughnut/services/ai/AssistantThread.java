@@ -7,7 +7,7 @@ import com.odde.doughnut.controllers.dto.AiAssistantResponse;
 import com.odde.doughnut.services.TriConsumer;
 import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
-import com.theokanning.openai.assistants.message.Message;
+import com.theokanning.openai.assistants.message.MessageRequest;
 import com.theokanning.openai.assistants.run.RequiredAction;
 import com.theokanning.openai.assistants.run.Run;
 import com.theokanning.openai.assistants.run.RunCreateRequest;
@@ -15,14 +15,12 @@ import com.theokanning.openai.assistants.run.ToolCall;
 import com.theokanning.openai.service.assistant_stream.AssistantSSE;
 import io.reactivex.Flowable;
 import java.util.List;
-import java.util.Objects;
-import java.util.function.Consumer;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import lombok.Getter;
 
 public class AssistantThread {
-  public final String assistantId;
+  private final String assistantId;
   private final ObjectMapper objectMapper;
-  public String threadId;
+  @Getter private String threadId;
   private final OpenAiApiHandler openAiApiHandler;
 
   public AssistantThread(String assistantId, String threadId, OpenAiApiHandler openAiApiHandler) {
@@ -33,12 +31,12 @@ public class AssistantThread {
         new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
   }
 
-  public void createThreadAndRunForToolCall(
+  public void createRunForToolCall(
       AiTool tool, TriConsumer<AssistantRunService, String, Object> runServiceAction)
       throws JsonProcessingException {
     RunCreateRequest.RunCreateRequestBuilder builder =
-        RunCreateRequest.builder().tools(List.of(tool.getTool()));
-    Run run = openAiApiHandler.createRun(threadId, builder.assistantId(this.assistantId).build());
+        getCreateRequestBuilder().tools(List.of(tool.getTool()));
+    Run run = openAiApiHandler.createRun(threadId, builder.build());
     AiAssistantResponse threadResponse = getThreadResponse(threadId, run);
     AssistantRunService runService =
         new AssistantRunService(openAiApiHandler, threadId, threadResponse.getRunId());
@@ -50,6 +48,10 @@ public class AssistantThread {
       runServiceAction.accept(
           runService, threadResponse.getToolCalls().getFirst().getId(), parsedResponse);
     }
+  }
+
+  private RunCreateRequest.RunCreateRequestBuilder getCreateRequestBuilder() {
+    return RunCreateRequest.builder().assistantId(assistantId);
   }
 
   private AiAssistantResponse getThreadResponse(String threadId, Run currentRun) {
@@ -76,31 +78,20 @@ public class AssistantThread {
     return requiredAction.getSubmitToolOutputs().getToolCalls();
   }
 
-  public SseEmitter getRunStreamAsSSE(Consumer<Message> messageConsumer) {
-    Flowable<AssistantSSE> runStream = openAiApiHandler.createRunStream(threadId, assistantId);
-    SseEmitter emitter = new SseEmitter();
-    runStream.subscribe(
-        sse -> {
-          try {
-            SseEmitter.SseEventBuilder builder =
-                SseEmitter.event().name(sse.getEvent().eventName).data(sse.getData());
-            emitter.send(builder);
+  public OpenAiRunStream runStream() {
+    RunCreateRequest.RunCreateRequestBuilder runCreateRequestBuilder = getCreateRequestBuilder();
+    Flowable<AssistantSSE> runStream =
+        openAiApiHandler.createRunStream(threadId, runCreateRequestBuilder);
+    return new OpenAiRunStream(runStream);
+  }
 
-            // Handle thread.message.completed event
-            if (Objects.equals(sse.getEvent().eventName, "thread.message.completed")) {
-              Message message = new ObjectMapper().readValue(sse.getData(), Message.class);
-              if (messageConsumer != null) {
-                messageConsumer.accept(message);
-              }
-            }
+  public void createUserMessage(String prompt) {
+    MessageRequest messageRequest = MessageRequest.builder().role("user").content(prompt).build();
+    openAiApiHandler.createMessage(threadId, messageRequest);
+  }
 
-            if (Objects.equals(sse.getEvent().eventName, "done")) {
-              emitter.complete();
-            }
-          } catch (Exception e) {
-            emitter.completeWithError(e);
-          }
-        });
-    return emitter;
+  public void createAssistantMessage(String msg) {
+    MessageRequest messageRequest = MessageRequest.builder().role("assistant").content(msg).build();
+    openAiApiHandler.createMessage(threadId, messageRequest);
   }
 }
