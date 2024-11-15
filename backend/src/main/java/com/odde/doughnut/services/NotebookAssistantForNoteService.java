@@ -97,7 +97,15 @@ public final class NotebookAssistantForNoteService {
         && config.getRunId() != null
         && !config.getRunId().isEmpty()) {
       try {
-        // Use existing thread and run
+        String instruction =
+            "Previous content was appended, now there's more to process. Note that this is to be appended to the previous note details and the transcription could be from audio that was truncated in the middle of a sentence or word. Follow the same run instructions.";
+
+        if (config.getAdditionalProcessingInstructions() != null
+            && !config.getAdditionalProcessingInstructions().isEmpty()) {
+          instruction +=
+              "\nAdditional instruction:\n" + config.getAdditionalProcessingInstructions();
+        }
+
         OpenAiRun openAiRun =
             assistantService
                 .getThread(config.getThreadId())
@@ -106,11 +114,8 @@ public final class NotebookAssistantForNoteService {
                 .submitToolOutputs(
                     config.getToolCallId(),
                     new AudioToTextToolCallResult(
-                        "Previous content was appended, now there's more to process. Note that this is to be appended to the previous note details and the transcription could be from audio that was truncated in the middle of a sentence or word. Follow the same run instructions.",
-                        transcriptionFromAudio,
-                        config.getPreviousNoteDetails()));
+                        instruction, transcriptionFromAudio, config.getPreviousNoteDetails()));
 
-        // Add check for run status
         if (openAiRun.isRequiresAction()) {
           return getTextFromAudioFromOngoingRun(transcriptionFromAudio, openAiRun);
         }
@@ -120,7 +125,7 @@ public final class NotebookAssistantForNoteService {
       }
     }
 
-    return createNewThreadForTranscription(transcriptionFromAudio);
+    return createNewThreadForTranscription(transcriptionFromAudio, config);
   }
 
   private static TextFromAudio getTextFromAudioFromOngoingRun(
@@ -137,17 +142,13 @@ public final class NotebookAssistantForNoteService {
     return textFromAudio;
   }
 
-  private TextFromAudio createNewThreadForTranscription(String transcription)
-      throws JsonProcessingException {
-    // Original flow for new threads
+  private TextFromAudio createNewThreadForTranscription(
+      String transcription, AudioTranscriptConversionConfig config) throws JsonProcessingException {
     String content = "Here's the new transcription from audio:\n------------\n" + transcription;
     MessageRequest message = MessageRequest.builder().role("user").content(content).build();
 
-    OpenAiRun openAiRun =
-        createThread(List.of(message))
-            .withTool(AiToolFactory.completeNoteDetails())
-            .withInstructions(
-                """
+    String instructions =
+        """
           You are a helpful assistant for converting audio transcription in SRT format to text of paragraphs. Your task is to convert the following audio transcription to text with meaningful punctuations and paragraphs.
            * Fix obvious audio transcription mistakes.
            * Do not translate the text to another language (unless asked to).
@@ -156,8 +157,17 @@ public final class NotebookAssistantForNoteService {
            * Call function to append text from audio to complete the current note details, so add necessary white space or new line at the beginning to connect to existing text.
            * The transcription could be from audio that was truncated in the middle of a sentence or word. So never add new lines or white spaces at the end of the output.
            * The context should be in markdown format.
+          """;
 
-          """)
+    if (config.getAdditionalProcessingInstructions() != null
+        && !config.getAdditionalProcessingInstructions().isEmpty()) {
+      instructions += "\nAdditional instruction:\n" + config.getAdditionalProcessingInstructions();
+    }
+
+    OpenAiRun openAiRun =
+        createThread(List.of(message))
+            .withTool(AiToolFactory.completeNoteDetails())
+            .withInstructions(instructions)
             .run();
     return getTextFromAudioFromOngoingRun(transcription, openAiRun);
   }

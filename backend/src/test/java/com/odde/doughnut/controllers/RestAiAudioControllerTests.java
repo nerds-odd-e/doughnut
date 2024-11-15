@@ -312,5 +312,51 @@ class RestAiAudioControllerTests {
       verify(openAiApi).submitToolOutputs(eq("existing-thread"), eq("my-run-id"), any());
       verify(openAiApi).createThread(any());
     }
+
+    @Test
+    void shouldIncludeAdditionalInstructionsInNewThread() throws IOException {
+      // Setup
+      audioUploadDTO.getConfig().setAdditionalProcessingInstructions("Translate to Spanish");
+
+      // Execute
+      controller.audioToTextForNote(note, audioUploadDTO);
+
+      // Verify
+      verify(openAiApi)
+          .createRun(
+              any(),
+              argThat(
+                  request -> {
+                    assertThat(
+                        request.getInstructions(),
+                        containsString("Additional instruction:\nTranslate to Spanish"));
+                    return true;
+                  }));
+    }
+
+    @Test
+    void shouldIncludeAdditionalInstructionsInExistingThread() throws IOException {
+      // Setup
+      audioUploadDTO.getConfig().setThreadId("existing-thread");
+      audioUploadDTO.getConfig().setRunId("my-run-id");
+      audioUploadDTO.getConfig().setToolCallId("existing-call");
+      audioUploadDTO.getConfig().setAdditionalProcessingInstructions("Format as bullet points");
+
+      // Execute
+      controller.audioToTextForNote(note, audioUploadDTO);
+
+      // Verify
+      verify(openAiApi)
+          .submitToolOutputs(
+              eq("existing-thread"),
+              eq("my-run-id"),
+              argThat(
+                  arg -> {
+                    assertThat(
+                        arg.getToolOutputs().getFirst().getOutput(),
+                        containsString("Format as bullet points"));
+                    return true;
+                  }));
+    }
   }
 }
