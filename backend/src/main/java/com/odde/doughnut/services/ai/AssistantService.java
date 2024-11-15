@@ -129,11 +129,10 @@ public final class AssistantService {
   }
 
   public void createThreadAndRunForToolCall(
-      List<MessageRequest> userMessages,
       AiTool tool,
-      TriConsumer<AssistantRunService, String, Object> runServiceAction)
+      TriConsumer<AssistantRunService, String, Object> runServiceAction,
+      String threadId)
       throws JsonProcessingException {
-    String threadId = createThread(userMessages);
     RunCreateRequest.RunCreateRequestBuilder builder =
         RunCreateRequest.builder().tools(List.of(tool.getTool()));
     AiAssistantResponse threadResponse = createRunAndGetThreadResponse(threadId, builder);

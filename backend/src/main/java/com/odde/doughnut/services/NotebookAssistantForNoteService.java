@@ -8,6 +8,7 @@ import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.commands.GetAiStreamHelper;
 import com.theokanning.openai.assistants.message.MessageRequest;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -25,7 +26,7 @@ public final class NotebookAssistantForNoteService {
 
     String threadId = conversation.getAiAssistantThreadId();
     if (threadId == null) {
-      threadId = assistantService.createThread(List.of(getNoteDescriptionMessage()));
+      threadId = createThread(List.of());
       conversationService.setConversationAiAssistantThreadId(conversation, threadId);
     }
 
@@ -49,6 +50,15 @@ public final class NotebookAssistantForNoteService {
         threadId);
   }
 
+  private String createThread(List<MessageRequest> additionalMessages) {
+    List<MessageRequest> messages = new ArrayList<>();
+    messages.add(getNoteDescriptionMessage());
+    if (!additionalMessages.isEmpty()) {
+      messages.addAll(additionalMessages);
+    }
+    return assistantService.createThread(messages);
+  }
+
   private MessageRequest getNoteDescriptionMessage() {
     return MessageRequest.builder().role("assistant").content(note.getNoteDescription()).build();
   }
@@ -60,16 +70,17 @@ public final class NotebookAssistantForNoteService {
             .content("Please suggest a better topic title for the note.")
             .build();
 
+    String threadId = createThread(List.of(message));
     try {
       final String[] result = new String[1];
       assistantService.createThreadAndRunForToolCall(
-          List.of(getNoteDescriptionMessage(), message),
           AiToolFactory.suggestNoteTopicTitle(),
           (runService, threadResponse, parsedResponse) -> {
             TopicTitleReplacement replacement = (TopicTitleReplacement) parsedResponse;
             result[0] = replacement.newTopic;
             runService.cancelRun();
-          });
+          },
+          threadId);
       return result[0];
     } catch (JsonProcessingException e) {
       throw new RuntimeException("Failed to parse topic title replacement", e);
@@ -95,8 +106,8 @@ public final class NotebookAssistantForNoteService {
     MessageRequest message = MessageRequest.builder().role("user").content(content).build();
 
     final TextFromAudio textFromAudio = new TextFromAudio();
+    String threadId = createThread(List.of(message));
     assistantService.createThreadAndRunForToolCall(
-        List.of(getNoteDescriptionMessage(), message),
         AiToolFactory.completeNoteDetails(),
         (runService, toolCallId, parsedResponse) -> {
           try {
@@ -106,7 +117,8 @@ public final class NotebookAssistantForNoteService {
           } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
           }
-        });
+        },
+        threadId);
 
     return textFromAudio;
   }
