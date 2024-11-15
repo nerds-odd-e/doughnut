@@ -5,16 +5,16 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.services.ai.tools.AiTool;
 import com.theokanning.openai.assistants.message.Message;
+import com.theokanning.openai.assistants.run.Run;
 import com.theokanning.openai.assistants.run.ToolCall;
 import java.util.List;
-import lombok.Getter;
 import lombok.Setter;
 
 public final class AiAssistantResponse {
   private final AiTool tool;
   @Setter List<Message> messages;
   @Setter List<ToolCall> toolCalls;
-  @Getter @Setter String runStatus;
+  @Setter Run run;
 
   private final ObjectMapper objectMapper =
       new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);

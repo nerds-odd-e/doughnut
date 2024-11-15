@@ -42,15 +42,14 @@ public class OpenAiRun {
   }
 
   public AiAssistantResponse getToolCallResponse() {
-    String id = run.getId();
-    AiAssistantResponse response = new AiAssistantResponse(tool);
-
     Run updatedRun = openAiApiHandler.retrieveUntilCompletedOrRequiresAction(threadId, run);
-    response.setRunStatus(updatedRun.getStatus());
+    AiAssistantResponse response = new AiAssistantResponse(tool);
+    response.setRun(updatedRun);
     if (updatedRun.getStatus().equals("requires_action")) {
       response.setToolCalls(getAiCompletionRequiredAction(updatedRun.getRequiredAction()));
     } else if (updatedRun.getStatus().equals("completed")) {
-      response.setMessages(openAiApiHandler.getThreadMessages(threadId, id));
+      // this seems to have performance issue
+      response.setMessages(openAiApiHandler.getThreadMessages(threadId, updatedRun.getId()));
     }
 
     return response;
