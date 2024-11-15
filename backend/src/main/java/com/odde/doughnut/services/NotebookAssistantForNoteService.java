@@ -116,7 +116,7 @@ public final class NotebookAssistantForNoteService {
         final TextFromAudio textFromAudio = new TextFromAudio();
         textFromAudio.setRawSRT(transcription);
         textFromAudio.setCompletionMarkdownFromAudio(noteDetails.completion);
-        textFromAudio.setThreadId(threadId);
+        textFromAudio.setThreadId(openAiRun.getThreadId());
         textFromAudio.setRunId(openAiRun.getRunId());
         textFromAudio.setToolCallId(toolCallResponse.getToolCalls().getFirst().getId());
         return textFromAudio;
@@ -131,35 +131,34 @@ public final class NotebookAssistantForNoteService {
 
   private TextFromAudio createNewThreadForTranscription(String transcription)
       throws JsonProcessingException {
-    final TextFromAudio textFromAudio = new TextFromAudio();
     // Original flow for new threads
     String content = "Here's the new transcription from audio:\n------------\n" + transcription;
     MessageRequest message = MessageRequest.builder().role("user").content(content).build();
 
-    createThread(List.of(message))
-        .withTool(AiToolFactory.completeNoteDetails())
-        .withInstructions(
-            """
-      You are a helpful assistant for converting audio transcription in SRT format to text of paragraphs. Your task is to convert the following audio transcription to text with meaningful punctuations and paragraphs.
-       * Fix obvious audio transcription mistakes.
-       * Do not translate the text to another language (unless asked to).
-       * If the transcription is not clear, leave the text as it is.
-       * Don't add any additional information than what is in the transcription.
-       * Call function to append text from audio to complete the current note details, so add necessary white space or new line at the beginning to connect to existing text.
-       * The transcription could be from audio that was truncated in the middle of a sentence or word. So never add new lines or white spaces at the end of the output.
-       * The context should be in markdown format.
+    OpenAiRun openAiRun =
+        createThread(List.of(message))
+            .withTool(AiToolFactory.completeNoteDetails())
+            .withInstructions(
+                """
+          You are a helpful assistant for converting audio transcription in SRT format to text of paragraphs. Your task is to convert the following audio transcription to text with meaningful punctuations and paragraphs.
+           * Fix obvious audio transcription mistakes.
+           * Do not translate the text to another language (unless asked to).
+           * If the transcription is not clear, leave the text as it is.
+           * Don't add any additional information than what is in the transcription.
+           * Call function to append text from audio to complete the current note details, so add necessary white space or new line at the beginning to connect to existing text.
+           * The transcription could be from audio that was truncated in the middle of a sentence or word. So never add new lines or white spaces at the end of the output.
+           * The context should be in markdown format.
 
-      """)
-        .run()
-        .getToolCallResponse(
-            (runService, tcId, parsedResponse) -> {
-              NoteDetailsCompletion noteDetails = (NoteDetailsCompletion) parsedResponse;
-              textFromAudio.setRawSRT(transcription);
-              textFromAudio.setCompletionMarkdownFromAudio(noteDetails.completion);
-              textFromAudio.setThreadId(runService.getThreadId());
-              textFromAudio.setRunId(runService.getRunId());
-              textFromAudio.setToolCallId(tcId);
-            });
+          """)
+            .run();
+    AiAssistantResponse toolCallResponse = openAiRun.getToolCallResponse(null);
+    final TextFromAudio textFromAudio = new TextFromAudio();
+    NoteDetailsCompletion noteDetails = (NoteDetailsCompletion) toolCallResponse.getFirstArgument();
+    textFromAudio.setRawSRT(transcription);
+    textFromAudio.setCompletionMarkdownFromAudio(noteDetails.completion);
+    textFromAudio.setThreadId(openAiRun.getThreadId());
+    textFromAudio.setRunId(openAiRun.getRunId());
+    textFromAudio.setToolCallId(toolCallResponse.getToolCalls().getFirst().getId());
 
     return textFromAudio;
   }
