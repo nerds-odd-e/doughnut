@@ -75,14 +75,13 @@ public final class NotebookAssistantForNoteService {
     AssistantThread thread = createThread(List.of(message));
     try {
       final String[] result = new String[1];
-      assistantService.createThreadAndRunForToolCall(
+      thread.createThreadAndRunForToolCall(
           AiToolFactory.suggestNoteTopicTitle(),
           (runService, threadResponse, parsedResponse) -> {
             TopicTitleReplacement replacement = (TopicTitleReplacement) parsedResponse;
             result[0] = replacement.newTopic;
             runService.cancelRun();
-          },
-          thread);
+          });
       return result[0];
     } catch (JsonProcessingException e) {
       throw new RuntimeException("Failed to parse topic title replacement", e);
@@ -109,7 +108,7 @@ public final class NotebookAssistantForNoteService {
 
     final TextFromAudio textFromAudio = new TextFromAudio();
     AssistantThread thread = createThread(List.of(message));
-    assistantService.createThreadAndRunForToolCall(
+    thread.createThreadAndRunForToolCall(
         AiToolFactory.completeNoteDetails(),
         (runService, toolCallId, parsedResponse) -> {
           try {
@@ -119,8 +118,7 @@ public final class NotebookAssistantForNoteService {
           } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
           }
-        },
-        thread);
+        });
 
     return textFromAudio;
   }

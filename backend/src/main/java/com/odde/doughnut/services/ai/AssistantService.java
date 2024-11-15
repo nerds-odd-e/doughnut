@@ -1,18 +1,9 @@
 package com.odde.doughnut.services.ai;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.odde.doughnut.controllers.dto.AiAssistantResponse;
-import com.odde.doughnut.services.TriConsumer;
-import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.assistants.message.Message;
 import com.theokanning.openai.assistants.message.MessageRequest;
-import com.theokanning.openai.assistants.run.RequiredAction;
-import com.theokanning.openai.assistants.run.Run;
-import com.theokanning.openai.assistants.run.RunCreateRequest;
-import com.theokanning.openai.assistants.run.ToolCall;
 import com.theokanning.openai.assistants.thread.ThreadRequest;
 import com.theokanning.openai.service.assistant_stream.AssistantSSE;
 import io.reactivex.Flowable;
@@ -25,13 +16,10 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 public final class AssistantService {
   private final OpenAiApiHandler openAiApiHandler;
   private final String assistantId;
-  private final ObjectMapper objectMapper;
 
   public AssistantService(OpenAiApiHandler openAiApiHandler, String assistantId) {
     this.openAiApiHandler = openAiApiHandler;
     this.assistantId = assistantId;
-    this.objectMapper =
-        new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
   }
 
   public Flowable<AssistantSSE> getRunStream(String threadId) {
@@ -49,7 +37,7 @@ public final class AssistantService {
   }
 
   public AssistantThread getThread(String threadId) {
-    return new AssistantThread(threadId, openAiApiHandler);
+    return new AssistantThread(assistantId, threadId, openAiApiHandler);
   }
 
   public AssistantThread createThread(List<MessageRequest> additionalMessages) {
@@ -67,42 +55,6 @@ public final class AssistantService {
     ThreadRequest threadRequest = ThreadRequest.builder().messages(messages).build();
     String threadId = openAiApiHandler.createThread(threadRequest).getId();
     return getThread(threadId);
-  }
-
-  private AiAssistantResponse getThreadResponse(String threadId, Run currentRun) {
-    String id = currentRun.getId();
-    AiAssistantResponse completionResponse = new AiAssistantResponse();
-    completionResponse.setThreadId(threadId);
-    completionResponse.setRunId(id);
-
-    Run run = openAiApiHandler.retrieveUntilCompletedOrRequiresAction(threadId, currentRun);
-    if (run.getStatus().equals("requires_action")) {
-      completionResponse.setToolCalls(getAiCompletionRequiredAction(run.getRequiredAction()));
-    } else {
-      completionResponse.setMessages(openAiApiHandler.getThreadMessages(threadId, id));
-    }
-
-    return completionResponse;
-  }
-
-  private List<ToolCall> getAiCompletionRequiredAction(RequiredAction requiredAction) {
-    int size = requiredAction.getSubmitToolOutputs().getToolCalls().size();
-    if (size != 1) {
-      throw new RuntimeException("Unexpected number of tool calls: " + size);
-    }
-    return requiredAction.getSubmitToolOutputs().getToolCalls();
-  }
-
-  public AiAssistantResponse createRunAndGetThreadResponse(
-      String threadId, RunCreateRequest.RunCreateRequestBuilder runCreateRequestBuilder) {
-    Run run =
-        openAiApiHandler.createRun(
-            threadId, runCreateRequestBuilder.assistantId(assistantId).build());
-    return getThreadResponse(threadId, run);
-  }
-
-  public AssistantRunService getAssistantRunService(String threadId, String runId) {
-    return new AssistantRunService(openAiApiHandler, threadId, runId);
   }
 
   public SseEmitter getRunStreamAsSSE(Consumer<Message> messageConsumer, AssistantThread thread) {
@@ -131,25 +83,5 @@ public final class AssistantService {
           }
         });
     return emitter;
-  }
-
-  public void createThreadAndRunForToolCall(
-      AiTool tool,
-      TriConsumer<AssistantRunService, String, Object> runServiceAction,
-      AssistantThread thread)
-      throws JsonProcessingException {
-    RunCreateRequest.RunCreateRequestBuilder builder =
-        RunCreateRequest.builder().tools(List.of(tool.getTool()));
-    AiAssistantResponse threadResponse = createRunAndGetThreadResponse(thread.threadId, builder);
-    AssistantRunService runService =
-        getAssistantRunService(thread.threadId, threadResponse.getRunId());
-    if (runServiceAction != null) {
-      Object parsedResponse =
-          objectMapper.readValue(
-              threadResponse.getToolCalls().getFirst().getFunction().getArguments().toString(),
-              tool.parameterClass());
-      runServiceAction.accept(
-          runService, threadResponse.getToolCalls().getFirst().getId(), parsedResponse);
-    }
   }
 }
