@@ -14,6 +14,7 @@ Feature: Recording a live audio and append to note details
     And OpenAI assistant will reply below for user messages in a non-stream run:
       | response                | arguments                 |
       | complete note details   |"Let's talk about data structure today."|
+    And OpenAI assistant can accept tool call results submission and run cancellation
     And the browser is mocked to give permission to record audio
 
   Scenario: Record audio of a live event

@@ -14,7 +14,7 @@ public final class OpenAiRunRequiredAction extends OpenAiRun {
       new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
   public OpenAiRunRequiredAction(OpenAiApiHandler openAiApiHandler, Run updatedRun, AiTool tool) {
-    super(openAiApiHandler, updatedRun.getThreadId(), updatedRun, tool);
+    super(openAiApiHandler, updatedRun, tool);
   }
 
   @Override

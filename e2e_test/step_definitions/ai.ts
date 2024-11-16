@@ -90,7 +90,10 @@ Given(
 Given(
   'OpenAI assistant can accept tool call results submission and run cancellation',
   () => {
-    mock_services.openAi().stubToolCallSubmission().stubRunCancellation()
+    mock_services
+      .openAi()
+      .stubToolCallSubmission()
+      .stubRunCancellation('thread-123')
   }
 )
 

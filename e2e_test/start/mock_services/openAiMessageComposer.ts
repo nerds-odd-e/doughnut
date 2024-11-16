@@ -1,16 +1,19 @@
 export type RunStreamData = {
   runId: string
+  threadId: string
   fullMessage: string
   responseType?: 'requires action' | 'message delta & complete'
 }
 
 export const createRequiresActionRun = (
   runId: string,
+  threadId: string,
   functionName: string,
   argumentsObj: unknown
 ) => {
   return {
     id: runId,
+    thread_id: threadId,
     status: 'requires_action',
     required_action: {
       type: 'submit_tool_outputs',
@@ -30,10 +33,11 @@ export const createRequiresActionRun = (
 }
 
 function buildSSEEvent(runStreamData: RunStreamData): string {
-  const { runId, fullMessage, responseType } = runStreamData
+  const { runId, threadId, fullMessage, responseType } = runStreamData
   if (responseType === 'requires action') {
     const actionData = createRequiresActionRun(
       runId,
+      threadId,
       'complete_note_details',
       JSON.parse(fullMessage)
     )

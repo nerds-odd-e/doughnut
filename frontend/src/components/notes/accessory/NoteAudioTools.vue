@@ -153,13 +153,13 @@ const processAudio = async (file: Blob) => {
     )
 
     // Store thread context for next calls
-    threadContext.value.threadId = response?.threadId
-    threadContext.value.runId = response?.runId
-    threadContext.value.toolCallId = response?.toolCallId
+    threadContext.value.threadId = response?.toolCallInfo?.threadId
+    threadContext.value.runId = response?.toolCallInfo?.runId
+    threadContext.value.toolCallId = response?.toolCallInfo?.toolCallId
 
     await storageAccessor
       .storedApi()
-      .appendDetails(note.id, response?.completionMarkdownFromAudio)
+      .appendDetails(note.id, response?.completionMarkdownFromAudio ?? "")
 
     threadContext.value.callCount++
     if (shouldSuggestTopic(threadContext.value.callCount)) {

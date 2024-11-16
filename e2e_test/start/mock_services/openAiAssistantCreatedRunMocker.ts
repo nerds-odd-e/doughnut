@@ -28,15 +28,21 @@ const openAiAssistantCreatedRunMocker = (
           case 'ask clarification question':
             return createRequiresActionRun(
               runId,
+              threadId,
               'ask_clarification_question',
               {
                 question: hash.arguments,
               }
             )
           case 'complete note details':
-            return createRequiresActionRun(runId, 'complete_note_details', {
-              completion: hash.arguments?.match(/"(.*)"/)?.[1],
-            })
+            return createRequiresActionRun(
+              runId,
+              threadId,
+              'complete_note_details',
+              {
+                completion: hash.arguments?.match(/"(.*)"/)?.[1],
+              }
+            )
           default:
             throw new Error(`Unknown response: ${hash.response}`)
         }

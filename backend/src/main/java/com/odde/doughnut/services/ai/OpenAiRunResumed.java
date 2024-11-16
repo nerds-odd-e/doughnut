@@ -9,8 +9,9 @@ public class OpenAiRunResumed extends OpenAiRun {
 
   public OpenAiRunResumed(
       OpenAiApiHandler openAiApiHandler, String threadId, String runId, AiTool tool) {
-    super(openAiApiHandler, threadId, new Run(), tool);
+    super(openAiApiHandler, new Run(), tool);
     this.run.setId(runId);
+    this.run.setThreadId(threadId);
   }
 
   @Override

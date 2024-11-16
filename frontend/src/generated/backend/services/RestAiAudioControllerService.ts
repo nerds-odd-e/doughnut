@@ -3,19 +3,19 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { AudioUploadDTO } from '../models/AudioUploadDTO';
-import type { TextFromAudio } from '../models/TextFromAudio';
+import type { TextFromAudioWithCallInfo } from '../models/TextFromAudioWithCallInfo';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestAiAudioControllerService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
      * @param formData
-     * @returns TextFromAudio OK
+     * @returns TextFromAudioWithCallInfo OK
      * @throws ApiError
      */
     public audioToText(
         formData?: AudioUploadDTO,
-    ): CancelablePromise<TextFromAudio> {
+    ): CancelablePromise<TextFromAudioWithCallInfo> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/audio/audio-to-text',
@@ -29,13 +29,13 @@ export class RestAiAudioControllerService {
     /**
      * @param noteId
      * @param formData
-     * @returns TextFromAudio OK
+     * @returns TextFromAudioWithCallInfo OK
      * @throws ApiError
      */
     public audioToTextForNote(
         noteId: number,
         formData?: AudioUploadDTO,
-    ): CancelablePromise<TextFromAudio> {
+    ): CancelablePromise<TextFromAudioWithCallInfo> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/audio/audio-to-text/{noteId}',

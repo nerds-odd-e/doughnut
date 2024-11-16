@@ -116,7 +116,7 @@ export type { SuggestedQuestionForFineTuning } from './models/SuggestedQuestionF
 export type { SuggestedQuestionsData } from './models/SuggestedQuestionsData';
 export type { SuggestedTopicDTO } from './models/SuggestedTopicDTO';
 export type { Text } from './models/Text';
-export type { TextFromAudio } from './models/TextFromAudio';
+export type { TextFromAudioWithCallInfo } from './models/TextFromAudioWithCallInfo';
 export type { TimeTravel } from './models/TimeTravel';
 export type { TimeTravelRelativeToNow } from './models/TimeTravelRelativeToNow';
 export type { Tool } from './models/Tool';
@@ -124,6 +124,7 @@ export type { ToolCall } from './models/ToolCall';
 export type { ToolCallCodeInterpreter } from './models/ToolCallCodeInterpreter';
 export type { ToolCallCodeInterpreterOutput } from './models/ToolCallCodeInterpreterOutput';
 export type { ToolCallFunction } from './models/ToolCallFunction';
+export type { ToolCallInfo } from './models/ToolCallInfo';
 export type { ToolCallResult } from './models/ToolCallResult';
 export type { ToolChoice } from './models/ToolChoice';
 export type { ToolResources } from './models/ToolResources';

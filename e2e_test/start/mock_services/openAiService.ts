@@ -56,8 +56,8 @@ const openAiService = () => {
       return this
     },
 
-    stubRunCancellation() {
-      serviceMocker.stubPoster(`/threads/undefined/runs/run1/cancel`, {})
+    stubRunCancellation(threadId: string) {
+      serviceMocker.stubPoster(`/threads/${threadId}/runs/run-123/cancel`, {})
       return this
     },
 
@@ -144,6 +144,7 @@ const openAiService = () => {
         assistantId,
         messages.map((row) => ({
           runId: row['run id']!,
+          thread_id: threadId,
           responseType: row['response type'],
           fullMessage: row['assistant reply']!,
         }))
@@ -170,6 +171,7 @@ const openAiService = () => {
         `/threads/${threadId}/runs`,
         runIds.map((runId) => ({
           id: runId,
+          thread_id: threadId,
           status: 'queued',
         }))
       )

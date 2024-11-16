@@ -1780,7 +1780,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/TextFromAudio"
+                $ref: "#/components/schemas/TextFromAudioWithCallInfo"
   /api/audio/audio-to-text/{noteId}:
     post:
       tags:
@@ -1809,7 +1809,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/TextFromAudio"
+                $ref: "#/components/schemas/TextFromAudioWithCallInfo"
   /api/assessment/{assessmentQuestionInstance}/answer:
     post:
       tags:
@@ -3746,15 +3746,18 @@ components:
           type: string
         toolCallId:
           type: string
-    TextFromAudio:
-      required:
-      - completionMarkdownFromAudio
+    TextFromAudioWithCallInfo:
       type: object
       properties:
         completionMarkdownFromAudio:
           type: string
         rawSRT:
           type: string
+        toolCallInfo:
+          $ref: "#/components/schemas/ToolCallInfo"
+    ToolCallInfo:
+      type: object
+      properties:
         threadId:
           type: string
         runId:

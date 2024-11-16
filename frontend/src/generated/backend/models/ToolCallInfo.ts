@@ -2,9 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type TextFromAudio = {
-    completionMarkdownFromAudio: string;
-    rawSRT?: string;
+export type ToolCallInfo = {
     threadId?: string;
     runId?: string;
     toolCallId?: string;

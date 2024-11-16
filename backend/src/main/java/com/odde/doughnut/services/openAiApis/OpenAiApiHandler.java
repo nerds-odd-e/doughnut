@@ -226,7 +226,7 @@ public class OpenAiApiHandler {
     return getFirstToolCallArguments(chatRequest);
   }
 
-  public Run cancelRun(String threadId, String runId) {
-    return openAiApi.cancelRun(threadId, runId).blockingGet();
+  public void cancelRun(String threadId, String runId) {
+    openAiApi.cancelRun(threadId, runId).blockingGet();
   }
 }
