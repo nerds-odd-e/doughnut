@@ -53,7 +53,7 @@ public final class NotebookAssistantForNoteService {
       Conversation conversation, ConversationService conversationService) {
     AssistantThread thread;
     if (conversation.getAiAssistantThreadId() == null) {
-      thread = createThread(List.of());
+      thread = createThreadWithNoteInfo(List.of());
       conversationService.setConversationAiAssistantThreadId(conversation, thread.getThreadId());
     } else {
       thread = assistantService.getThread(conversation.getAiAssistantThreadId());
@@ -61,17 +61,14 @@ public final class NotebookAssistantForNoteService {
     return thread;
   }
 
-  private AssistantThread createThread(List<MessageRequest> additionalMessages) {
+  private AssistantThread createThreadWithNoteInfo(List<MessageRequest> additionalMessages) {
     List<MessageRequest> messages = new ArrayList<>();
-    messages.add(getNoteDescriptionMessage());
+    messages.add(
+        MessageRequest.builder().role("assistant").content(note.getNoteDescription()).build());
     if (!additionalMessages.isEmpty()) {
       messages.addAll(additionalMessages);
     }
     return assistantService.createThread(messages);
-  }
-
-  private MessageRequest getNoteDescriptionMessage() {
-    return MessageRequest.builder().role("assistant").content(note.getNoteDescription()).build();
   }
 
   public String suggestTopicTitle() throws JsonProcessingException {
@@ -80,7 +77,7 @@ public final class NotebookAssistantForNoteService {
 
     TopicTitleReplacement argument =
         (TopicTitleReplacement)
-            createThread(List.of())
+            createThreadWithNoteInfo(List.of())
                 .withTool(AiToolFactory.suggestNoteTopicTitle())
                 .withInstructions(instructions)
                 .run()
@@ -159,7 +156,7 @@ public final class NotebookAssistantForNoteService {
 
     instructions = appendAdditionalInstructions(instructions, config);
 
-    return createThread(List.of(message))
+    return createThreadWithNoteInfo(List.of(message))
         .withTool(AiToolFactory.completeNoteDetails())
         .withInstructions(instructions)
         .run();
