@@ -3746,6 +3746,8 @@ components:
           type: string
         toolCallId:
           type: string
+        incomplete:
+          type: boolean
     TextFromAudioWithCallInfo:
       type: object
       properties:
@@ -3755,6 +3757,8 @@ components:
           type: string
         toolCallInfo:
           $ref: "#/components/schemas/ToolCallInfo"
+        endTimestamp:
+          type: string
     ToolCallInfo:
       type: object
       properties:

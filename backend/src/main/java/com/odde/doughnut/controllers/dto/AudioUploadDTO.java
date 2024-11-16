@@ -26,4 +26,5 @@ public class AudioUploadDTO {
   private String threadId;
   private String runId;
   private String toolCallId;
+  private boolean incomplete;
 }

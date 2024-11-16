@@ -103,7 +103,6 @@ public final class NotebookAssistantForNoteService {
         getOpenAiRunExpectingAction(transcriptionFromAudio, config).getToolCallResponse();
     final TextFromAudioWithCallInfo textFromAudio = new TextFromAudioWithCallInfo();
     NoteDetailsCompletion noteDetails = (NoteDetailsCompletion) toolCallResponse.getFirstArgument();
-    textFromAudio.setRawSRT(transcriptionFromAudio);
     textFromAudio.setCompletionMarkdownFromAudio(noteDetails.completion);
     textFromAudio.setToolCallInfo(toolCallResponse.getToolCallInfo());
     return textFromAudio;

@@ -150,6 +150,7 @@ const processAudio = async (chunk: AudioChunk) => {
         runId: threadContext.value.runId,
         toolCallId: threadContext.value.toolCallId,
         additionalProcessingInstructions: processingInstructions.value,
+        incomplete: chunk.incomplete,
       }
     )
 

@@ -7,5 +7,6 @@ export type TextFromAudioWithCallInfo = {
     completionMarkdownFromAudio?: string;
     rawSRT?: string;
     toolCallInfo?: ToolCallInfo;
+    endTimestamp?: string;
 };
 

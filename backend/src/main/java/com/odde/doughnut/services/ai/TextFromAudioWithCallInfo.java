@@ -11,4 +11,6 @@ public class TextFromAudioWithCallInfo {
   private String rawSRT;
 
   private ToolCallInfo toolCallInfo;
+
+  private String endTimestamp;
 }

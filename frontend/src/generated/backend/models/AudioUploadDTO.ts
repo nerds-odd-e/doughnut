@@ -10,5 +10,6 @@ export type AudioUploadDTO = {
     threadId?: string;
     runId?: string;
     toolCallId?: string;
+    incomplete?: boolean;
 };
 

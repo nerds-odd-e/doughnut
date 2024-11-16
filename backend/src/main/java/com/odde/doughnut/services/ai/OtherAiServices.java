@@ -57,9 +57,7 @@ public final class OtherAiServices {
   }
 
   public Optional<TextFromAudioWithCallInfo> getTextFromAudio(
-      String previousTrailingNoteDetails, String filename, byte[] bytes, String modelName)
-      throws IOException {
-    String transcriptionFromAudio = getTranscriptionFromAudio(filename, bytes);
+      String previousTrailingNoteDetails, String modelName, String transcriptionFromAudio) {
 
     OpenAIChatRequestBuilder chatAboutNoteRequestBuilder =
         getOpenAIChatRequestBuilder(previousTrailingNoteDetails, modelName);

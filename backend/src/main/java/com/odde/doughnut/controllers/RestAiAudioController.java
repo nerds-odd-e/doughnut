@@ -5,6 +5,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
+import com.odde.doughnut.services.SRTProcessor;
 import com.odde.doughnut.services.ai.OtherAiServices;
 import com.odde.doughnut.services.ai.TextFromAudioWithCallInfo;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -42,11 +43,23 @@ class RestAiAudioController {
       @Valid @ModelAttribute AudioUploadDTO audioFile) throws IOException {
     String filename = audioFile.getUploadAudioFile().getOriginalFilename();
     byte[] bytes = audioFile.getUploadAudioFile().getBytes();
-    return otherAiServices.getTextFromAudio(
-        audioFile.getPreviousNoteDetails(),
-        filename,
-        bytes,
-        getGlobalSettingsService().globalSettingOthers().getValue());
+    String transcriptionFromAudio = otherAiServices.getTranscriptionFromAudio(filename, bytes);
+
+    SRTProcessor srtProcessor = new SRTProcessor();
+    SRTProcessor.SRTProcessingResult processedResult =
+        srtProcessor.process(transcriptionFromAudio, audioFile.isIncomplete());
+
+    return otherAiServices
+        .getTextFromAudio(
+            audioFile.getPreviousNoteDetails(),
+            getGlobalSettingsService().globalSettingOthers().getValue(),
+            processedResult.getProcessedSRT())
+        .map(
+            textFromAudioWithCallInfo -> {
+              textFromAudioWithCallInfo.setEndTimestamp(processedResult.getEndTimestamp());
+              textFromAudioWithCallInfo.setRawSRT(processedResult.getProcessedSRT());
+              return textFromAudioWithCallInfo;
+            });
   }
 
   @PostMapping(
@@ -60,9 +73,16 @@ class RestAiAudioController {
     String filename = audioUpload.getUploadAudioFile().getOriginalFilename();
     byte[] bytes = audioUpload.getUploadAudioFile().getBytes();
     String transcriptionFromAudio = otherAiServices.getTranscriptionFromAudio(filename, bytes);
-    return notebookAssistantForNoteServiceFactory
-        .create(note)
-        .audioTranscriptionToArticle(transcriptionFromAudio, audioUpload);
+    SRTProcessor srtProcessor = new SRTProcessor();
+    SRTProcessor.SRTProcessingResult processedResult =
+        srtProcessor.process(transcriptionFromAudio, audioUpload.isIncomplete());
+    TextFromAudioWithCallInfo textFromAudioWithCallInfo =
+        notebookAssistantForNoteServiceFactory
+            .create(note)
+            .audioTranscriptionToArticle(processedResult.getProcessedSRT(), audioUpload);
+    textFromAudioWithCallInfo.setRawSRT(processedResult.getProcessedSRT());
+    textFromAudioWithCallInfo.setEndTimestamp(processedResult.getEndTimestamp());
+    return textFromAudioWithCallInfo;
   }
 
   private GlobalSettingsService getGlobalSettingsService() {

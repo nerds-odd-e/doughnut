@@ -133,6 +133,37 @@ class RestAiAudioControllerTests {
       assertThat(
           capturedArgument.getMessages().get(0).getTextContent(), containsString("Long long ago"));
     }
+
+    @Test
+    void shouldTruncateSRTWhenIncomplete() throws IOException {
+      audioUploadDTO.setIncomplete(true);
+      mockTranscriptionSrtResponse(
+          "1\n00:00:00,000 --> 00:00:03,000\nFirst segment\n\n"
+              + "2\n00:00:03,000 --> 00:00:06,000\nSecond segment\n\n"
+              + "3\n00:00:06,000 --> 00:00:09,000\nLast segment");
+
+      TextFromAudioWithCallInfo result = controller.audioToText(audioUploadDTO).orElse(null);
+      assertNotNull(result);
+      assertEquals("00:00:06,000", result.getEndTimestamp());
+      assertTrue(result.getRawSRT().contains("First segment"));
+      assertTrue(result.getRawSRT().contains("Second segment"));
+      assertFalse(result.getRawSRT().contains("Last segment"));
+    }
+
+    @Test
+    void shouldNotTruncateSRTWhenComplete() throws IOException {
+      audioUploadDTO.setIncomplete(false);
+      String fullSRT =
+          "1\n00:00:00,000 --> 00:00:03,000\nFirst segment\n\n"
+              + "2\n00:00:03,000 --> 00:00:06,000\nSecond segment\n\n"
+              + "3\n00:00:06,000 --> 00:00:09,000\nLast segment";
+      mockTranscriptionSrtResponse(fullSRT);
+
+      TextFromAudioWithCallInfo result = controller.audioToText(audioUploadDTO).orElse(null);
+      assertNotNull(result);
+      assertEquals("00:00:09,000", result.getEndTimestamp());
+      assertEquals(fullSRT, result.getRawSRT());
+    }
   }
 
   @Nested
@@ -329,6 +360,22 @@ class RestAiAudioControllerTests {
                         containsString("Format as bullet points"));
                     return true;
                   }));
+    }
+
+    @Test
+    void shouldTruncateSRTWhenIncompleteForNote() throws IOException {
+      audioUploadDTO.setIncomplete(true);
+      mockTranscriptionSrtResponse(
+          "1\n00:00:00,000 --> 00:00:03,000\nFirst segment\n\n"
+              + "2\n00:00:03,000 --> 00:00:06,000\nSecond segment\n\n"
+              + "3\n00:00:06,000 --> 00:00:09,000\nLast segment");
+
+      TextFromAudioWithCallInfo result = controller.audioToTextForNote(note, audioUploadDTO);
+      assertNotNull(result);
+      assertEquals("00:00:06,000", result.getEndTimestamp());
+      assertTrue(result.getRawSRT().contains("First segment"));
+      assertTrue(result.getRawSRT().contains("Second segment"));
+      assertFalse(result.getRawSRT().contains("Last segment"));
     }
   }
 }
