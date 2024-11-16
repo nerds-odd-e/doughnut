@@ -75,16 +75,19 @@ public final class NotebookAssistantForNoteService {
   }
 
   public String suggestTopicTitle() throws JsonProcessingException {
-    return ((TopicTitleReplacement)
+    String instructions =
+        "Please suggest a better topic title for the note by calling the function. Don't change it if it's already good enough.";
+
+    TopicTitleReplacement argument =
+        (TopicTitleReplacement)
             createThread(List.of())
                 .withTool(AiToolFactory.suggestNoteTopicTitle())
-                .withInstructions(
-                    "Please suggest a better topic title for the note by calling the function. Don't change it if it's already good enough.")
+                .withInstructions(instructions)
                 .run()
                 .getToolCallResponse()
                 .cancelRun()
-                .getFirstArgument())
-        .newTopic;
+                .getFirstArgument();
+    return argument.newTopic;
   }
 
   private String appendAdditionalInstructions(String instructions, AudioUploadDTO config) {
