@@ -42,45 +42,64 @@ class AudioProcessorImpl implements AudioProcessor {
     isIncomplete: boolean = true
   ): Promise<void> {
     if (this.audioData.length > this.lastProcessedArrayIndex) {
-      const dataToProcess = this.audioData.slice(this.lastProcessedArrayIndex)
-      this.lastProcessedArrayIndex = this.audioData.length
-      const isAllSilent = dataToProcess.every((chunk) => this.isSilent(chunk))
-      if (!isAllSilent) {
-        const file = createAudioFile(dataToProcess, this.sampleRate, true)
-        const timestamp = await this.processorCallback({
-          data: file,
-          incomplete: isIncomplete,
-        })
+      let dataToProcess: Float32Array[] = []
 
-        // Update indices based on timestamp if provided
-        if (timestamp) {
-          const processedSeconds = parseTimestamp(timestamp)
-          if (processedSeconds !== undefined) {
-            const processedSamples = Math.floor(
-              processedSeconds * this.sampleRate
-            )
-            let remainingSamples = processedSamples
+      // Handle the first array by slicing from lastProcessedInternalIndex
+      const firstChunk = this.audioData[this.lastProcessedArrayIndex]
+      if (firstChunk) {
+        dataToProcess.push(firstChunk.slice(this.lastProcessedInternalIndex))
+      }
 
-            // Find the new array and internal indices
-            for (let i = 0; i < this.audioData.length; i++) {
-              const arrayLength = this.audioData[i]?.length ?? 0
-              if (remainingSamples >= arrayLength) {
-                remainingSamples -= arrayLength
-              } else {
-                this.lastProcessedArrayIndex = i
-                this.lastProcessedInternalIndex = remainingSamples
-                break
+      // Add the rest of the arrays
+      dataToProcess = dataToProcess.concat(
+        this.audioData.slice(this.lastProcessedArrayIndex + 1)
+      )
+
+      if (dataToProcess.length > 0) {
+        const isAllSilent = dataToProcess.every((chunk) => this.isSilent(chunk))
+        if (!isAllSilent) {
+          const file = createAudioFile(dataToProcess, this.sampleRate, true)
+          const timestamp = await this.processorCallback({
+            data: file,
+            incomplete: isIncomplete,
+          })
+
+          if (timestamp && typeof timestamp === "string") {
+            const processedSeconds = parseTimestamp(timestamp)
+            if (processedSeconds !== undefined) {
+              const processedSamples = Math.floor(
+                processedSeconds * this.sampleRate
+              )
+              let totalSamples = this.lastProcessedInternalIndex // Start with existing processed samples
+
+              // Find the new array and internal indices
+              for (
+                let i = this.lastProcessedArrayIndex;
+                i < this.audioData.length;
+                i++
+              ) {
+                const arrayLength = this.audioData[i]?.length ?? 0
+                if (totalSamples + arrayLength <= processedSamples) {
+                  totalSamples += arrayLength
+                  this.lastProcessedArrayIndex = i + 1
+                  this.lastProcessedInternalIndex = 0
+                } else {
+                  this.lastProcessedArrayIndex = i
+                  this.lastProcessedInternalIndex =
+                    processedSamples - totalSamples
+                  break
+                }
               }
+            } else {
+              // Fallback if timestamp parsing fails
+              this.lastProcessedArrayIndex = this.audioData.length
+              this.lastProcessedInternalIndex = 0
             }
           } else {
-            // Fallback if timestamp parsing fails
+            // If no timestamp provided, process everything
             this.lastProcessedArrayIndex = this.audioData.length
             this.lastProcessedInternalIndex = 0
           }
-        } else {
-          // If no timestamp provided, process everything
-          this.lastProcessedArrayIndex = this.audioData.length
-          this.lastProcessedInternalIndex = 0
         }
       }
     }

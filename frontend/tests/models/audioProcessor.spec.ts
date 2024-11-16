@@ -237,4 +237,59 @@ describe("AudioProcessor", () => {
     // Should process all data despite invalid timestamp
     expect(processor.getAudioData().length).toBe(1)
   })
+
+  it("should correctly process partial chunks based on lastProcessedInternalIndex", async () => {
+    const mockCallback = vi.fn().mockResolvedValue("00:00:00,500") // 0.5 seconds
+    const processor = createAudioProcessor(44100, mockCallback)
+
+    // Create 1 second of non-silent data
+    const nonSilentData = new Float32Array(44100).fill(0.5)
+    processor.processAudioData([nonSilentData])
+    processor.start()
+
+    // Process first chunk
+    await processor.flush()
+
+    // Should process only first 0.5 seconds
+    const firstCall = mockCallback.mock.calls[0][0] as AudioChunk
+    const firstFileSize = firstCall.data.size
+
+    // Process remaining data
+    await processor.flush()
+
+    // Second chunk should be smaller than first (remaining 0.5 seconds)
+    const secondCall = mockCallback.mock.calls[1][0] as AudioChunk
+    expect(secondCall.data.size).toBeLessThan(firstFileSize)
+    expect(mockCallback).toHaveBeenCalledTimes(2)
+  })
+
+  it("should accumulate processed samples on top of existing indices", async () => {
+    const mockCallback = vi
+      .fn()
+      .mockResolvedValueOnce("00:00:00,500") // First call: 0.5 seconds
+      .mockResolvedValueOnce("00:00:01,000") // Second call: 1 second from the remaining data
+
+    const processor = createAudioProcessor(44100, mockCallback)
+
+    // Create 2 seconds of non-silent data
+    const nonSilentData = new Float32Array(44100 * 2).fill(0.5)
+    processor.processAudioData([nonSilentData])
+    processor.start()
+
+    // Process first chunk - should process 0.5 seconds
+    await processor.flush()
+    expect(mockCallback).toHaveBeenCalledTimes(1)
+
+    // Add more data
+    const additionalData = new Float32Array(44100).fill(0.5)
+    processor.processAudioData([additionalData])
+
+    // Process next chunk - should process 1 second from the remaining data
+    await processor.flush()
+    expect(mockCallback).toHaveBeenCalledTimes(2)
+
+    // Process final chunk - should process the rest
+    await processor.flush()
+    expect(mockCallback).toHaveBeenCalledTimes(3)
+  })
 })
