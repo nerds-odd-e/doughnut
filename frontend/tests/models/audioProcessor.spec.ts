@@ -120,10 +120,9 @@ describe("AudioProcessor", () => {
     processor.processAudioData(nonSilentData)
     processor.start()
 
-    // Fast-forward less than a minute
     vi.advanceTimersByTime(30 * 1000)
 
-    await processor.flush()
+    await processor.tryFlush()
 
     expect(mockCallback).toHaveBeenCalledTimes(1)
     const callArgument = mockCallback.mock.calls[0]?.[0] as AudioChunk
@@ -131,18 +130,15 @@ describe("AudioProcessor", () => {
     expect(callArgument.data.name).toMatch(/^recorded_audio_partial_.*\.wav$/)
   })
 
-  it("should not call processorCallback on flush if no new data", async () => {
+  it("should not call processorCallback on tryFlush if no new data", async () => {
     const mockCallback = vi.fn().mockResolvedValue(undefined)
     const processor = createAudioProcessor(44100, mockCallback)
 
     processor.start()
-
-    // Fast-forward more than a minute
     vi.advanceTimersByTime(65 * 1000)
-
     mockCallback.mockClear()
 
-    await processor.flush()
+    await processor.tryFlush()
 
     expect(mockCallback).not.toHaveBeenCalled()
   })
@@ -219,13 +215,13 @@ describe("AudioProcessor", () => {
     processor.start()
 
     // Process first chunk
-    await processor.flush()
+    await processor.tryFlush()
 
     // The lastProcessedIndex should be at 1.5 seconds worth of samples
     expect(mockCallback).toHaveBeenCalledTimes(1)
 
     // Process remaining data
-    await processor.flush()
+    await processor.tryFlush()
     expect(mockCallback).toHaveBeenCalledTimes(2)
   })
 
@@ -237,7 +233,7 @@ describe("AudioProcessor", () => {
     processor.processAudioData([nonSilentData])
     processor.start()
 
-    await processor.flush()
+    await processor.tryFlush()
     // Should process all data despite invalid timestamp
     expect(processor.getAudioData().length).toBe(1)
   })
@@ -252,14 +248,14 @@ describe("AudioProcessor", () => {
     processor.start()
 
     // Process first chunk
-    await processor.flush()
+    await processor.tryFlush()
 
     // Should process only first 0.5 seconds
     const firstCall = mockCallback.mock.calls[0]?.[0] as AudioChunk
     const firstFileSize = firstCall.data.size
 
     // Process remaining data
-    await processor.flush()
+    await processor.tryFlush()
 
     // Second chunk should be smaller than first (remaining 0.5 seconds)
     const secondCall = mockCallback.mock.calls[1]?.[0] as AudioChunk
@@ -281,7 +277,7 @@ describe("AudioProcessor", () => {
     processor.start()
 
     // Process first chunk - should process 0.5 seconds
-    await processor.flush()
+    await processor.tryFlush()
     expect(mockCallback).toHaveBeenCalledTimes(1)
 
     // Add more data
@@ -289,11 +285,11 @@ describe("AudioProcessor", () => {
     processor.processAudioData([additionalData])
 
     // Process next chunk - should process 1 second from the remaining data
-    await processor.flush()
+    await processor.tryFlush()
     expect(mockCallback).toHaveBeenCalledTimes(2)
 
     // Process final chunk - should process the rest
-    await processor.flush()
+    await processor.tryFlush()
     expect(mockCallback).toHaveBeenCalledTimes(3)
   })
 
@@ -307,9 +303,9 @@ describe("AudioProcessor", () => {
     const nonSilentData = new Float32Array(44100).fill(0.5)
     processor.processAudioData([nonSilentData])
 
-    const promise1 = processor.flush()
-    const promise2 = processor.flush()
-    const promise3 = processor.flush()
+    const promise1 = processor.tryFlush()
+    const promise2 = processor.tryFlush()
+    const promise3 = processor.tryFlush()
 
     vi.advanceTimersByTime(100)
     await Promise.all([promise1, promise2, promise3])

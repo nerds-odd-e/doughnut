@@ -3,7 +3,7 @@ export interface AudioProcessor {
   getAudioData: () => Float32Array[]
   start: () => void
   stop: () => Promise<File>
-  flush: () => Promise<void>
+  tryFlush: () => Promise<void>
 }
 
 export interface AudioChunk {
@@ -128,7 +128,7 @@ class AudioProcessorImpl implements AudioProcessor {
       if (this.isSilent(chunk)) {
         this.silenceCounter += chunk.length
         if (this.silenceCounter >= this.SILENCE_DURATION_THRESHOLD) {
-          this.flush()
+          this.tryFlush()
           this.silenceCounter = 0
         }
       } else {
@@ -148,7 +148,7 @@ class AudioProcessorImpl implements AudioProcessor {
       clearInterval(this.processorTimer)
       this.processorTimer = null
     }
-    await this.flush()
+    await this.tryFlush()
     return createAudioFile(this.audioData, this.sampleRate, false)
   }
 
@@ -156,7 +156,7 @@ class AudioProcessorImpl implements AudioProcessor {
     return this.audioData
   }
 
-  async flush(): Promise<void> {
+  async tryFlush(): Promise<void> {
     if (this.processorTimer) {
       clearInterval(this.processorTimer)
       this.startTimer()

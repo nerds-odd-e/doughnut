@@ -10,7 +10,7 @@ export interface AudioRecorder {
   startRecording: () => Promise<void>
   stopRecording: () => Promise<File>
   getAudioData: () => Float32Array[]
-  flush: () => Promise<void>
+  tryFlush: () => Promise<void>
   getAudioDevices: () => Ref<MediaDeviceInfo[]>
   getSelectedDevice: () => Ref<string>
   switchAudioDevice: (deviceId: string) => Promise<void>
@@ -93,8 +93,8 @@ export const createAudioRecorder = (
       return audioProcessor.getAudioData()
     },
 
-    flush: async function (): Promise<void> {
-      await audioProcessor.flush()
+    tryFlush: async function (): Promise<void> {
+      await audioProcessor.tryFlush()
     },
 
     getAudioDevices: function (): Ref<MediaDeviceInfo[]> {

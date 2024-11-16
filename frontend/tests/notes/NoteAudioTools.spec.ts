@@ -305,9 +305,9 @@ describe("NoteAudioTools", () => {
     expect(flushButton.attributes("disabled")).toBeUndefined()
   })
 
-  it("calls audioRecorder.flush when Flush Audio button is clicked", async () => {
+  it("calls audioRecorder.tryFlush when Flush Audio button is clicked", async () => {
     const mockFlush = vi.fn()
-    wrapper.vm.audioRecorder.flush = mockFlush
+    wrapper.vm.audioRecorder.tryFlush = mockFlush
 
     // Start recording
     await findButtonByTitle(wrapper, "Record Audio").trigger("click")

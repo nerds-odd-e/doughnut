@@ -27,7 +27,7 @@
           </option>
         </select>
       </template>
-      <button class="btn" @click="flushAudio" :disabled="!isRecording || isProcessing" title="Flush Audio">
+      <button class="btn" @click="tryFlushAudio" :disabled="!isRecording || isProcessing" title="Flush Audio">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
           <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
         </svg>
@@ -236,9 +236,9 @@ const closeDialog = () => {
   emit("closeDialog")
 }
 
-const flushAudio = async () => {
+const tryFlushAudio = async () => {
   if (isRecording.value) {
-    await audioRecorder.flush()
+    await audioRecorder.tryFlush()
   }
 }
 
