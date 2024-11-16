@@ -27,7 +27,7 @@
           </option>
         </select>
       </template>
-      <button class="btn" @click="flushAudio" :disabled="!isRecording" title="Flush Audio">
+      <button class="btn" @click="flushAudio" :disabled="!isRecording || isProcessing" title="Flush Audio">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
           <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
         </svg>
@@ -139,7 +139,10 @@ const toggleAdvancedOptions = () => {
   showAdvancedOptions.value = !showAdvancedOptions.value
 }
 
+const isProcessing = ref(false)
+
 const processAudio = async (chunk: AudioChunk): Promise<string | undefined> => {
+  isProcessing.value = true
   try {
     const response = await managedApi.restAiAudioController.audioToTextForNote(
       note.id,
@@ -172,6 +175,8 @@ const processAudio = async (chunk: AudioChunk): Promise<string | undefined> => {
   } catch (error) {
     errors.value = error as Record<string, string | undefined>
     return undefined
+  } finally {
+    isProcessing.value = false
   }
 }
 

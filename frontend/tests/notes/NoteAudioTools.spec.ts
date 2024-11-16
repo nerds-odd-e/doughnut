@@ -319,6 +319,39 @@ describe("NoteAudioTools", () => {
     expect(mockFlush).toHaveBeenCalled()
   })
 
+  it("disables Flush Audio button during audio processing", async () => {
+    // Start recording
+    await findButtonByTitle(wrapper, "Record Audio").trigger("click")
+    await flushPromises()
+
+    const flushButton = findButtonByTitle(wrapper, "Flush Audio")
+
+    // Mock a long-running audio processing
+    let resolveProcess
+    const processPromise = new Promise((resolve) => {
+      resolveProcess = resolve
+    })
+    const audioToTextForNoteMock = vi.fn()
+    helper.managedApi.restAiAudioController.audioToTextForNote =
+      audioToTextForNoteMock
+    audioToTextForNoteMock.mockReturnValue(processPromise)
+
+    // Trigger audio processing
+    const processPromise2 = wrapper.vm.processAudio(new Blob())
+    await flushPromises()
+
+    // Button should be disabled during processing
+    expect(flushButton.attributes("disabled")).toBeDefined()
+
+    // Resolve the processing
+    resolveProcess!({ completionMarkdownFromAudio: "test" })
+    await processPromise2
+    await flushPromises()
+
+    // Button should be enabled again after processing (when recording)
+    expect(flushButton.attributes("disabled")).toBeUndefined()
+  })
+
   describe("Audio Device Selection", () => {
     it("loads audio devices when recording starts", async () => {
       const recordButton = findButtonByTitle(wrapper, "Record Audio")
