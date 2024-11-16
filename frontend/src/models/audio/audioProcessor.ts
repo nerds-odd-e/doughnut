@@ -11,34 +11,40 @@ export interface AudioChunk {
   incomplete: boolean
 }
 
-export const createAudioProcessor = (
-  sampleRate: number,
-  processorCallback: (chunk: AudioChunk) => Promise<void>
-): AudioProcessor => {
-  const audioData: Float32Array[] = []
-  let lastProcessedIndex = 0
-  let processorTimer: NodeJS.Timeout | null = null
-  let silenceCounter = 0
-  const SILENCE_THRESHOLD = 0.01
-  const SILENCE_DURATION_THRESHOLD = 3 * sampleRate // 2 seconds of silence
+class AudioProcessorImpl implements AudioProcessor {
+  private audioData: Float32Array[] = []
+  private lastProcessedIndex = 0
+  private processorTimer: NodeJS.Timeout | null = null
+  private silenceCounter = 0
+  private readonly SILENCE_THRESHOLD = 0.01
+  private readonly SILENCE_DURATION_THRESHOLD: number
 
-  const isSilent = (data: Float32Array): boolean => {
+  constructor(
+    private readonly sampleRate: number,
+    private readonly processorCallback: (chunk: AudioChunk) => Promise<void>
+  ) {
+    this.SILENCE_DURATION_THRESHOLD = 3 * sampleRate
+  }
+
+  private isSilent(data: Float32Array): boolean {
     let sum = 0
     for (let i = 0; i < data.length; i++) {
       sum += Math.abs(data[i] ?? 0)
     }
     const avg = sum / data.length
-    return avg < SILENCE_THRESHOLD
+    return avg < this.SILENCE_THRESHOLD
   }
 
-  const processAndCallback = async (isIncomplete: boolean = true) => {
-    if (audioData.length > lastProcessedIndex) {
-      const dataToProcess = audioData.slice(lastProcessedIndex)
-      lastProcessedIndex = audioData.length
-      const isAllSilent = dataToProcess.every((chunk) => isSilent(chunk))
+  private async processAndCallback(
+    isIncomplete: boolean = true
+  ): Promise<void> {
+    if (this.audioData.length > this.lastProcessedIndex) {
+      const dataToProcess = this.audioData.slice(this.lastProcessedIndex)
+      this.lastProcessedIndex = this.audioData.length
+      const isAllSilent = dataToProcess.every((chunk) => this.isSilent(chunk))
       if (!isAllSilent) {
-        const file = createAudioFile(dataToProcess, sampleRate, true)
-        await processorCallback({
+        const file = createAudioFile(dataToProcess, this.sampleRate, true)
+        await this.processorCallback({
           data: file,
           incomplete: isIncomplete,
         })
@@ -46,55 +52,59 @@ export const createAudioProcessor = (
     }
   }
 
-  const startTimer = () => {
-    processorTimer = setInterval(() => {
-      processAndCallback()
+  private startTimer(): void {
+    this.processorTimer = setInterval(() => {
+      this.processAndCallback()
     }, 60 * 1000)
   }
 
-  return {
-    processAudioData(newData: Float32Array[]) {
-      newData.forEach((chunk) => {
-        if (isSilent(chunk)) {
-          silenceCounter += chunk.length
-          if (silenceCounter >= SILENCE_DURATION_THRESHOLD) {
-            this.flush()
-            silenceCounter = 0
-          }
-        } else {
-          silenceCounter = 0
+  processAudioData(newData: Float32Array[]): void {
+    newData.forEach((chunk) => {
+      if (this.isSilent(chunk)) {
+        this.silenceCounter += chunk.length
+        if (this.silenceCounter >= this.SILENCE_DURATION_THRESHOLD) {
+          this.flush()
+          this.silenceCounter = 0
         }
-
-        // Add the chunk to audioData (silent or not)
-        audioData.push(chunk)
-      })
-    },
-
-    start: () => {
-      startTimer()
-    },
-
-    async stop() {
-      if (processorTimer) {
-        clearInterval(processorTimer)
-        processorTimer = null
+      } else {
+        this.silenceCounter = 0
       }
-      await this.flush()
-      return createAudioFile(audioData, sampleRate, false)
-    },
 
-    getAudioData: () => {
-      return audioData
-    },
-
-    flush: async (): Promise<void> => {
-      if (processorTimer) {
-        clearInterval(processorTimer)
-        startTimer()
-      }
-      await processAndCallback(false)
-    },
+      this.audioData.push(chunk)
+    })
   }
+
+  start(): void {
+    this.startTimer()
+  }
+
+  async stop(): Promise<File> {
+    if (this.processorTimer) {
+      clearInterval(this.processorTimer)
+      this.processorTimer = null
+    }
+    await this.flush()
+    return createAudioFile(this.audioData, this.sampleRate, false)
+  }
+
+  getAudioData(): Float32Array[] {
+    return this.audioData
+  }
+
+  async flush(): Promise<void> {
+    if (this.processorTimer) {
+      clearInterval(this.processorTimer)
+      this.startTimer()
+    }
+    await this.processAndCallback(false)
+  }
+}
+
+export const createAudioProcessor = (
+  sampleRate: number,
+  processorCallback: (chunk: AudioChunk) => Promise<void>
+): AudioProcessor => {
+  return new AudioProcessorImpl(sampleRate, processorCallback)
 }
 
 // Helper function to create audio files
