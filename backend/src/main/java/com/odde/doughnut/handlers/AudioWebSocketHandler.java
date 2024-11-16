@@ -5,7 +5,7 @@ import com.odde.doughnut.controllers.dto.AudioUploadDTO;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.OtherAiServices;
-import com.odde.doughnut.services.ai.TextFromAudio;
+import com.odde.doughnut.services.ai.TextFromAudioWithCallInfo;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Optional;
@@ -40,7 +40,7 @@ public class AudioWebSocketHandler extends BinaryWebSocketHandler {
 
     AudioUploadDTO audioUploadDTO = objectMapper.readValue(payload, AudioUploadDTO.class);
 
-    Optional<TextFromAudio> result =
+    Optional<TextFromAudioWithCallInfo> result =
         otherAiServices.getTextFromAudio(
             audioUploadDTO.getPreviousNoteDetails(),
             "stream.wav",

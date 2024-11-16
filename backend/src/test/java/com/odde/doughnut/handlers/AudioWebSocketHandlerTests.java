@@ -6,7 +6,7 @@ import static org.mockito.Mockito.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.AudioUploadDTO;
 import com.odde.doughnut.services.ai.OtherAiServices;
-import com.odde.doughnut.services.ai.TextFromAudio;
+import com.odde.doughnut.services.ai.TextFromAudioWithCallInfo;
 import com.odde.doughnut.services.openAiApis.OpenAiApiExtended;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
@@ -48,7 +48,7 @@ class AudioWebSocketHandlerTests {
             new OtherAiServices(openAiApi), makeMe.modelFactoryService, objectMapper);
     when(openAiApi.createTranscriptionSrt(any(RequestBody.class)))
         .thenReturn(Single.just(ResponseBody.create("test", null)));
-    TextFromAudio completionMarkdownFromAudio = new TextFromAudio();
+    TextFromAudioWithCallInfo completionMarkdownFromAudio = new TextFromAudioWithCallInfo();
     completionMarkdownFromAudio.setCompletionMarkdownFromAudio("test123");
     openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
     openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(
@@ -66,7 +66,7 @@ class AudioWebSocketHandlerTests {
     byte[] jsonBytes = objectMapper.writeValueAsBytes(audioUploadDTO);
     BinaryMessage binaryMessage = new BinaryMessage(jsonBytes);
 
-    TextFromAudio textFromAudio = new TextFromAudio();
+    TextFromAudioWithCallInfo textFromAudio = new TextFromAudioWithCallInfo();
     textFromAudio.setCompletionMarkdownFromAudio("Transcribed text");
 
     handler.handleBinaryMessage(session, binaryMessage);

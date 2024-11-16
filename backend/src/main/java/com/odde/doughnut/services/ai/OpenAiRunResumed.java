@@ -19,7 +19,7 @@ public class OpenAiRunResumed extends OpenAiRun {
   }
 
   @Override
-  public String getFirstToolCallId() {
-    return "";
+  public ToolCallInfo getToolCallInfo() {
+    return null;
   }
 }

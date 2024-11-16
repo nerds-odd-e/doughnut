@@ -100,7 +100,7 @@ public final class NotebookAssistantForNoteService {
     return instructions;
   }
 
-  public TextFromAudio audioTranscriptionToArticle(
+  public TextFromAudioWithCallInfo audioTranscriptionToArticle(
       String transcriptionFromAudio, AudioUploadDTO config) throws JsonProcessingException {
 
     if (config.getThreadId() != null
@@ -133,23 +133,25 @@ public final class NotebookAssistantForNoteService {
     return createNewThreadForTranscription(transcriptionFromAudio, config);
   }
 
-  private static TextFromAudio getTextFromAudioFromOngoingRun(
+  private static TextFromAudioWithCallInfo getTextFromAudioFromOngoingRun(
       String transcription, OpenAiRunExpectingAction openAiRunExpectingAction)
       throws JsonProcessingException {
     OpenAiRun toolCallResponse = openAiRunExpectingAction.getToolCallResponse();
+    return getTextFromToolCallResponse(transcription, toolCallResponse);
+  }
 
+  private static TextFromAudioWithCallInfo getTextFromToolCallResponse(
+      String transcription, OpenAiRun toolCallResponse) throws JsonProcessingException {
+    final TextFromAudioWithCallInfo textFromAudio = new TextFromAudioWithCallInfo();
     NoteDetailsCompletion noteDetails = (NoteDetailsCompletion) toolCallResponse.getFirstArgument();
-    final TextFromAudio textFromAudio = new TextFromAudio();
     textFromAudio.setRawSRT(transcription);
     textFromAudio.setCompletionMarkdownFromAudio(noteDetails.completion);
-    textFromAudio.setThreadId(toolCallResponse.getRun().getThreadId());
-    textFromAudio.setRunId(toolCallResponse.getRun().getId());
-    textFromAudio.setToolCallId(toolCallResponse.getFirstToolCallId());
+    textFromAudio.setToolCallInfo(toolCallResponse.getToolCallInfo());
     return textFromAudio;
   }
 
-  private TextFromAudio createNewThreadForTranscription(String transcription, AudioUploadDTO config)
-      throws JsonProcessingException {
+  private TextFromAudioWithCallInfo createNewThreadForTranscription(
+      String transcription, AudioUploadDTO config) throws JsonProcessingException {
     String content = "Here's the new transcription from audio:\n------------\n" + transcription;
     MessageRequest message = MessageRequest.builder().role("user").content(content).build();
 

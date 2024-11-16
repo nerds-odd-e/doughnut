@@ -9,7 +9,7 @@ import lombok.Getter;
 public abstract class OpenAiRun {
   protected final OpenAiApiHandler openAiApiHandler;
   @Getter protected final String threadId;
-  @Getter protected final Run run;
+  protected final Run run;
   protected final AiTool tool;
 
   public OpenAiRun(OpenAiApiHandler openAiApiHandler, String threadId, Run run, AiTool tool) {
@@ -36,5 +36,5 @@ public abstract class OpenAiRun {
 
   public abstract Object getFirstArgument() throws JsonProcessingException;
 
-  public abstract String getFirstToolCallId();
+  public abstract ToolCallInfo getToolCallInfo();
 }

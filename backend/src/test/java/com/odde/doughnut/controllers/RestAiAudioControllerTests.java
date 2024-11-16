@@ -14,7 +14,7 @@ import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
 import com.odde.doughnut.services.ai.NoteDetailsCompletion;
 import com.odde.doughnut.services.ai.OtherAiServices;
-import com.odde.doughnut.services.ai.TextFromAudio;
+import com.odde.doughnut.services.ai.TextFromAudioWithCallInfo;
 import com.odde.doughnut.services.ai.tools.AiToolName;
 import com.odde.doughnut.services.openAiApis.OpenAiApiExtended;
 import com.odde.doughnut.testability.MakeMe;
@@ -66,7 +66,7 @@ class RestAiAudioControllerTests {
   }
 
   private void setupMocks() {
-    TextFromAudio completionMarkdownFromAudio = new TextFromAudio();
+    TextFromAudioWithCallInfo completionMarkdownFromAudio = new TextFromAudioWithCallInfo();
     completionMarkdownFromAudio.setCompletionMarkdownFromAudio("test123");
     openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
     openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(
@@ -105,7 +105,7 @@ class RestAiAudioControllerTests {
       String result =
           controller
               .audioToText(audioUploadDTO)
-              .map(TextFromAudio::getCompletionMarkdownFromAudio)
+              .map(TextFromAudioWithCallInfo::getCompletionMarkdownFromAudio)
               .orElse("");
       assertEquals("test123", result);
     }
@@ -115,7 +115,7 @@ class RestAiAudioControllerTests {
       String resp =
           controller
               .audioToText(audioUploadDTO)
-              .map(TextFromAudio::getCompletionMarkdownFromAudio)
+              .map(TextFromAudioWithCallInfo::getCompletionMarkdownFromAudio)
               .orElse("");
       assertThat(resp, equalTo("test123"));
     }
@@ -123,7 +123,9 @@ class RestAiAudioControllerTests {
     @Test
     void usingThePreviousTrailingDetails() throws IOException {
       audioUploadDTO.setPreviousNoteDetails("Long long ago");
-      controller.audioToText(audioUploadDTO).map(TextFromAudio::getCompletionMarkdownFromAudio);
+      controller
+          .audioToText(audioUploadDTO)
+          .map(TextFromAudioWithCallInfo::getCompletionMarkdownFromAudio);
       ArgumentCaptor<ChatCompletionRequest> argumentCaptor =
           ArgumentCaptor.forClass(ChatCompletionRequest.class);
       verify(openAiApi, times(1)).createChatCompletion(argumentCaptor.capture());
@@ -183,7 +185,7 @@ class RestAiAudioControllerTests {
 
     @Test
     void convertAudioToTextForExistingNote() throws IOException {
-      TextFromAudio result = controller.audioToTextForNote(note, audioUploadDTO);
+      TextFromAudioWithCallInfo result = controller.audioToTextForNote(note, audioUploadDTO);
 
       verify(openAiApi).createTranscriptionSrt(any(RequestBody.class));
       verify(openAiApi)
@@ -219,12 +221,11 @@ class RestAiAudioControllerTests {
 
     @Test
     void shouldSetRawSRTAndRunId() throws IOException {
-      TextFromAudio result = controller.audioToTextForNote(note, audioUploadDTO);
+      TextFromAudioWithCallInfo result = controller.audioToTextForNote(note, audioUploadDTO);
 
       assertNotNull(result.getRawSRT());
-      assertNotNull(result.getRunId());
       assertEquals("test transcription", result.getRawSRT());
-      assertEquals("my-run-id", result.getRunId());
+      assertEquals("my-run-id", result.getToolCallInfo().getRunId());
     }
 
     @Test
@@ -233,11 +234,11 @@ class RestAiAudioControllerTests {
       audioUploadDTO.setRunId("my-run-id");
       audioUploadDTO.setToolCallId("existing-call");
 
-      TextFromAudio result = controller.audioToTextForNote(note, audioUploadDTO);
+      TextFromAudioWithCallInfo result = controller.audioToTextForNote(note, audioUploadDTO);
 
       assertNotNull(result);
       assertEquals("text from audio transcription", result.getCompletionMarkdownFromAudio());
-      assertEquals("my-run-id", result.getRunId());
+      assertEquals("my-run-id", result.getToolCallInfo().getRunId());
       verify(openAiApi)
           .submitToolOutputs(
               eq("existing-thread"),
@@ -274,7 +275,7 @@ class RestAiAudioControllerTests {
       setupFallbackThread("fallback text from audio transcription");
 
       // Execute
-      TextFromAudio result = controller.audioToTextForNote(note, audioUploadDTO);
+      TextFromAudioWithCallInfo result = controller.audioToTextForNote(note, audioUploadDTO);
 
       // Verify
       assertNotNull(result);

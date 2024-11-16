@@ -56,7 +56,7 @@ public final class OtherAiServices {
     return openAiApiHandler.triggerFineTuning(fileId).getFineTunedModel();
   }
 
-  public Optional<TextFromAudio> getTextFromAudio(
+  public Optional<TextFromAudioWithCallInfo> getTextFromAudio(
       String previousTrailingNoteDetails, String filename, byte[] bytes, String modelName)
       throws IOException {
     String transcriptionFromAudio = getTranscriptionFromAudio(filename, bytes);
@@ -72,7 +72,7 @@ public final class OtherAiServices {
               try {
                 ObjectMapper mapper = new ObjectMapper();
                 mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-                return Optional.of(mapper.treeToValue(jsonNode, TextFromAudio.class));
+                return Optional.of(mapper.treeToValue(jsonNode, TextFromAudioWithCallInfo.class));
               } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
               }

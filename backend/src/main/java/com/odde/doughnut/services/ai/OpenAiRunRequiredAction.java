@@ -17,13 +17,19 @@ public final class OpenAiRunRequiredAction extends OpenAiRun {
     super(openAiApiHandler, updatedRun.getThreadId(), updatedRun, tool);
   }
 
+  @Override
   public Object getFirstArgument() throws JsonProcessingException {
     return objectMapper.readValue(
         getFirstToolCall().getFunction().getArguments().toString(), tool.parameterClass());
   }
 
-  public String getFirstToolCallId() {
-    return getFirstToolCall().getId();
+  @Override
+  public ToolCallInfo getToolCallInfo() {
+    ToolCallInfo toolCallInfo = new ToolCallInfo();
+    toolCallInfo.setThreadId(run.getThreadId());
+    toolCallInfo.setRunId(run.getId());
+    toolCallInfo.setToolCallId(getFirstToolCall().getId());
+    return toolCallInfo;
   }
 
   private ToolCall getFirstToolCall() {

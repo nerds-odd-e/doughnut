@@ -6,7 +6,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
 import com.odde.doughnut.services.ai.OtherAiServices;
-import com.odde.doughnut.services.ai.TextFromAudio;
+import com.odde.doughnut.services.ai.TextFromAudioWithCallInfo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.io.IOException;
@@ -38,8 +38,8 @@ class RestAiAudioController {
       path = "/audio-to-text",
       consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   @Transactional
-  public Optional<TextFromAudio> audioToText(@Valid @ModelAttribute AudioUploadDTO audioFile)
-      throws IOException {
+  public Optional<TextFromAudioWithCallInfo> audioToText(
+      @Valid @ModelAttribute AudioUploadDTO audioFile) throws IOException {
     String filename = audioFile.getUploadAudioFile().getOriginalFilename();
     byte[] bytes = audioFile.getUploadAudioFile().getBytes();
     return otherAiServices.getTextFromAudio(
@@ -53,7 +53,7 @@ class RestAiAudioController {
       path = "/audio-to-text/{noteId}",
       consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   @Transactional
-  public TextFromAudio audioToTextForNote(
+  public TextFromAudioWithCallInfo audioToTextForNote(
       @PathVariable("noteId") @Schema(type = "integer") Note note,
       @Valid @ModelAttribute AudioUploadDTO audioUpload)
       throws IOException {
