@@ -81,6 +81,7 @@ import { createWakeLocker } from "../../../models/wakeLocker"
 import type { Note } from "@/generated/backend"
 import Waveform from "./Waveform.vue"
 import SvgAudioInput from "@/components/svgs/SvgAudioInput.vue"
+import type { AudioChunk } from "@/models/audio/audioProcessor"
 
 const { managedApi } = useLoadingApi()
 const { note, storageAccessor } = defineProps({

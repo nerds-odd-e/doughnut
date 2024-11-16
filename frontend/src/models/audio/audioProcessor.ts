@@ -3,7 +3,7 @@ export interface AudioProcessor {
   getAudioData: () => Float32Array[]
   start: () => void
   stop: () => Promise<File>
-  flush: () => Promise<void> // New method
+  flush: () => Promise<void>
 }
 
 export interface AudioChunk {
@@ -31,7 +31,7 @@ export const createAudioProcessor = (
     return avg < SILENCE_THRESHOLD
   }
 
-  const processAndCallback = async () => {
+  const processAndCallback = async (isIncomplete: boolean = true) => {
     if (audioData.length > lastProcessedIndex) {
       const dataToProcess = audioData.slice(lastProcessedIndex)
       lastProcessedIndex = audioData.length
@@ -40,7 +40,7 @@ export const createAudioProcessor = (
         const file = createAudioFile(dataToProcess, sampleRate, true)
         await processorCallback({
           data: file,
-          incomplete: true,
+          incomplete: isIncomplete,
         })
       }
     }
@@ -81,7 +81,7 @@ export const createAudioProcessor = (
       }
       await this.flush()
 
-      const file = createAudioFile(audioData, sampleRate, false)
+      const file = createAudioFile(audioData, sampleRate, true)
       audioData = []
       lastProcessedIndex = 0
       await processorCallback({
@@ -100,7 +100,7 @@ export const createAudioProcessor = (
         clearInterval(processorTimer)
         startTimer()
       }
-      await processAndCallback()
+      await processAndCallback(false)
     },
   }
 }
