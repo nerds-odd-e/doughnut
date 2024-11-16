@@ -4,6 +4,7 @@ import helper from "@tests/helpers"
 import { vi } from "vitest"
 import makeMe from "@tests/fixtures/makeMe"
 import type { TextFromAudioWithCallInfo } from "@/generated/backend"
+import type { AudioChunk } from "@/models/audio/audioProcessor"
 
 const mockMediaStreamSource = {
   connect: vi.fn(),
@@ -557,6 +558,39 @@ describe("NoteAudioTools", () => {
       )
       expect(calls[1][1].additionalProcessingInstructions).toBe(
         "Test instructions"
+      )
+    })
+  })
+
+  describe("Audio processing with incomplete flag", () => {
+    let audioToTextForNoteMock: ReturnType<typeof vi.fn>
+
+    beforeEach(() => {
+      audioToTextForNoteMock = vi.fn().mockResolvedValue({
+        completionMarkdownFromAudio: "text",
+        toolCallInfo: {
+          threadId: "thread-123",
+          runId: "run-123",
+          toolCallId: "tool-123",
+        },
+      })
+      helper.managedApi.restAiAudioController.audioToTextForNote =
+        audioToTextForNoteMock
+    })
+
+    it("should pass incomplete=true when processing timer-triggered chunk", async () => {
+      const testBlob2 = new Blob(["test2"])
+      await wrapper.vm.processAudio(<AudioChunk>{
+        data: testBlob2,
+        incomplete: true,
+      })
+      await flushPromises()
+
+      expect(audioToTextForNoteMock).toHaveBeenCalledWith(
+        expect.any(Number),
+        expect.objectContaining({
+          incomplete: true,
+        })
       )
     })
   })
