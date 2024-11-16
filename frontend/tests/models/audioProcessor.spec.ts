@@ -179,4 +179,29 @@ describe("AudioProcessor", () => {
       })
     )
   })
+
+  it("should mark chunk as not incomplete when silence triggers callback", async () => {
+    const mockCallback = vi.fn().mockResolvedValue(undefined)
+    const processor = createAudioProcessor(44100, mockCallback)
+
+    // Create 1 second of non-silent data followed by 3 seconds of silence
+    const nonSilentData = new Float32Array(44100).fill(0.5)
+    const silentData = new Float32Array(44100 * 3).fill(0)
+
+    processor.processAudioData([nonSilentData])
+    processor.start()
+
+    // Process silent data to trigger silence detection
+    processor.processAudioData([silentData])
+
+    expect(mockCallback).toHaveBeenCalledWith(
+      expect.objectContaining({
+        incomplete: false,
+        data: expect.any(File),
+      })
+    )
+
+    // Verify it was called exactly once
+    expect(mockCallback).toHaveBeenCalledTimes(1)
+  })
 })
