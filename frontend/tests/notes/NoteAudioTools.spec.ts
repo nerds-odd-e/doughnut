@@ -3,6 +3,7 @@ import NoteAudioTools from "@/components/notes/accessory/NoteAudioTools.vue"
 import helper from "@tests/helpers"
 import { vi } from "vitest"
 import makeMe from "@tests/fixtures/makeMe"
+import type { TextFromAudioWithCallInfo } from "@/generated/backend"
 
 const mockMediaStreamSource = {
   connect: vi.fn(),
@@ -412,18 +413,22 @@ describe("NoteAudioTools", () => {
     })
 
     it("stores and reuses thread context between calls", async () => {
-      const mockResponse1 = {
+      const mockResponse1: TextFromAudioWithCallInfo = {
         completionMarkdownFromAudio: "text1",
-        threadId: "thread-123",
-        runId: "run-123",
-        toolCallId: "tool-123",
+        toolCallInfo: {
+          threadId: "thread-123",
+          runId: "run-123",
+          toolCallId: "tool-123",
+        },
       }
 
-      const mockResponse2 = {
+      const mockResponse2: TextFromAudioWithCallInfo = {
         completionMarkdownFromAudio: "text2",
-        threadId: "thread-123",
-        runId: "run-124",
-        toolCallId: "tool-124",
+        toolCallInfo: {
+          threadId: "thread-123",
+          runId: "run-124",
+          toolCallId: "tool-124",
+        },
       }
 
       audioToTextForNoteMock
@@ -460,11 +465,13 @@ describe("NoteAudioTools", () => {
     })
 
     it("maintains thread context even after errors", async () => {
-      const mockResponse = {
+      const mockResponse: TextFromAudioWithCallInfo = {
         completionMarkdownFromAudio: "text1",
-        threadId: "thread-123",
-        runId: "run-123",
-        toolCallId: "tool-123",
+        toolCallInfo: {
+          threadId: "thread-123",
+          runId: "run-123",
+          toolCallId: "tool-123",
+        },
       }
 
       audioToTextForNoteMock
