@@ -102,7 +102,18 @@ public final class NotebookAssistantForNoteService {
 
   public TextFromAudioWithCallInfo audioTranscriptionToArticle(
       String transcriptionFromAudio, AudioUploadDTO config) throws JsonProcessingException {
+    OpenAiRun toolCallResponse =
+        getOpenAiRunExpectingAction(transcriptionFromAudio, config).getToolCallResponse();
+    final TextFromAudioWithCallInfo textFromAudio = new TextFromAudioWithCallInfo();
+    NoteDetailsCompletion noteDetails = (NoteDetailsCompletion) toolCallResponse.getFirstArgument();
+    textFromAudio.setRawSRT(transcriptionFromAudio);
+    textFromAudio.setCompletionMarkdownFromAudio(noteDetails.completion);
+    textFromAudio.setToolCallInfo(toolCallResponse.getToolCallInfo());
+    return textFromAudio;
+  }
 
+  private OpenAiRunExpectingAction getOpenAiRunExpectingAction(
+      String transcriptionFromAudio, AudioUploadDTO config) throws JsonProcessingException {
     if (config.getThreadId() != null
         && !config.getThreadId().isEmpty()
         && config.getRunId() != null
@@ -113,44 +124,23 @@ public final class NotebookAssistantForNoteService {
 
         instruction = appendAdditionalInstructions(instruction, config);
 
-        OpenAiRunExpectingAction openAiRunExpectingAction =
-            assistantService
-                .getThread(config.getThreadId())
-                .withTool(AiToolFactory.completeNoteDetails())
-                .resumeRun(config.getRunId())
-                .submitToolOutputs(
-                    config.getToolCallId(),
-                    new AudioToTextToolCallResult(
-                        instruction, transcriptionFromAudio, config.getPreviousNoteDetails()));
-
-        return getTextFromAudioFromOngoingRun(transcriptionFromAudio, openAiRunExpectingAction);
+        return assistantService
+            .getThread(config.getThreadId())
+            .withTool(AiToolFactory.completeNoteDetails())
+            .resumeRun(config.getRunId())
+            .submitToolOutputs(
+                config.getToolCallId(),
+                new AudioToTextToolCallResult(
+                    instruction, transcriptionFromAudio, config.getPreviousNoteDetails()));
 
       } catch (OpenAiHttpException e) {
         // Fallback to creating a new thread if submission fails
       }
     }
-
     return createNewThreadForTranscription(transcriptionFromAudio, config);
   }
 
-  private static TextFromAudioWithCallInfo getTextFromAudioFromOngoingRun(
-      String transcription, OpenAiRunExpectingAction openAiRunExpectingAction)
-      throws JsonProcessingException {
-    OpenAiRun toolCallResponse = openAiRunExpectingAction.getToolCallResponse();
-    return getTextFromToolCallResponse(transcription, toolCallResponse);
-  }
-
-  private static TextFromAudioWithCallInfo getTextFromToolCallResponse(
-      String transcription, OpenAiRun toolCallResponse) throws JsonProcessingException {
-    final TextFromAudioWithCallInfo textFromAudio = new TextFromAudioWithCallInfo();
-    NoteDetailsCompletion noteDetails = (NoteDetailsCompletion) toolCallResponse.getFirstArgument();
-    textFromAudio.setRawSRT(transcription);
-    textFromAudio.setCompletionMarkdownFromAudio(noteDetails.completion);
-    textFromAudio.setToolCallInfo(toolCallResponse.getToolCallInfo());
-    return textFromAudio;
-  }
-
-  private TextFromAudioWithCallInfo createNewThreadForTranscription(
+  private OpenAiRunExpectingAction createNewThreadForTranscription(
       String transcription, AudioUploadDTO config) throws JsonProcessingException {
     String content = "Here's the new transcription from audio:\n------------\n" + transcription;
     MessageRequest message = MessageRequest.builder().role("user").content(content).build();
@@ -169,11 +159,9 @@ public final class NotebookAssistantForNoteService {
 
     instructions = appendAdditionalInstructions(instructions, config);
 
-    OpenAiRunExpectingAction openAiRunExpectingAction =
-        createThread(List.of(message))
-            .withTool(AiToolFactory.completeNoteDetails())
-            .withInstructions(instructions)
-            .run();
-    return getTextFromAudioFromOngoingRun(transcription, openAiRunExpectingAction);
+    return createThread(List.of(message))
+        .withTool(AiToolFactory.completeNoteDetails())
+        .withInstructions(instructions)
+        .run();
   }
 }
