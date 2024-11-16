@@ -15,7 +15,7 @@ export const createAudioProcessor = (
   sampleRate: number,
   processorCallback: (chunk: AudioChunk) => Promise<void>
 ): AudioProcessor => {
-  let audioData: Float32Array[] = []
+  const audioData: Float32Array[] = []
   let lastProcessedIndex = 0
   let processorTimer: NodeJS.Timeout | null = null
   let silenceCounter = 0
@@ -80,15 +80,7 @@ export const createAudioProcessor = (
         processorTimer = null
       }
       await this.flush()
-
-      const file = createAudioFile(audioData, sampleRate, true)
-      audioData = []
-      lastProcessedIndex = 0
-      await processorCallback({
-        data: file,
-        incomplete: false,
-      })
-      return file
+      return createAudioFile(audioData, sampleRate, false)
     },
 
     getAudioData: () => {
