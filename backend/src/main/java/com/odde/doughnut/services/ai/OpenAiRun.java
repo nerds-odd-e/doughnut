@@ -25,8 +25,9 @@ public abstract class OpenAiRun {
     return new OpenAiRunExpectingAction(openAiApiHandler, currentRun, tool);
   }
 
-  public void cancelRun() {
+  public OpenAiRun cancelRun() {
     openAiApiHandler.cancelRun(threadId, run.getId());
+    return this;
   }
 
   public String getRunId() {

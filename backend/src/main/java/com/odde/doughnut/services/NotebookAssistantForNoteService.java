@@ -75,16 +75,16 @@ public final class NotebookAssistantForNoteService {
   }
 
   public String suggestTopicTitle() throws JsonProcessingException {
-    OpenAiRunExpectingAction openAiRunExpectingAction =
-        createThread(List.of())
-            .withTool(AiToolFactory.suggestNoteTopicTitle())
-            .withInstructions(
-                "Please suggest a better topic title for the note by calling the function. Don't change it if it's already good enough.")
-            .run();
-    OpenAiRun toolCallResponse = openAiRunExpectingAction.getToolCallResponse();
-    toolCallResponse.cancelRun();
-    TopicTitleReplacement replacement = (TopicTitleReplacement) toolCallResponse.getFirstArgument();
-    return replacement.newTopic;
+    return ((TopicTitleReplacement)
+            createThread(List.of())
+                .withTool(AiToolFactory.suggestNoteTopicTitle())
+                .withInstructions(
+                    "Please suggest a better topic title for the note by calling the function. Don't change it if it's already good enough.")
+                .run()
+                .getToolCallResponse()
+                .cancelRun()
+                .getFirstArgument())
+        .newTopic;
   }
 
   private String appendAdditionalInstructions(String instructions, AudioUploadDTO config) {
