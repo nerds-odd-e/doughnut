@@ -36,7 +36,7 @@ public class AssistantThread {
     RunCreateRequest.RunCreateRequestBuilder builder =
         getCreateRequestBuilder().tools(List.of(tool.getTool()));
     return new OpenAiRunExpectingAction(
-        openAiApiHandler, threadId, openAiApiHandler.createRun(threadId, builder.build()), tool);
+        openAiApiHandler, openAiApiHandler.createRun(threadId, builder.build()), tool);
   }
 
   private RunCreateRequest.RunCreateRequestBuilder getCreateRequestBuilder() {

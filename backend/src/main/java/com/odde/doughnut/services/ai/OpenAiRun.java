@@ -9,7 +9,7 @@ import lombok.Getter;
 public abstract class OpenAiRun {
   protected final OpenAiApiHandler openAiApiHandler;
   @Getter protected final String threadId;
-  protected final Run run;
+  @Getter protected final Run run;
   protected final AiTool tool;
 
   public OpenAiRun(OpenAiApiHandler openAiApiHandler, String threadId, Run run, AiTool tool) {
@@ -22,7 +22,7 @@ public abstract class OpenAiRun {
   public OpenAiRunExpectingAction submitToolOutputs(String toolCallId, Object result)
       throws JsonProcessingException {
     Run currentRun = openAiApiHandler.submitToolOutputs(threadId, run.getId(), toolCallId, result);
-    return new OpenAiRunExpectingAction(openAiApiHandler, threadId, currentRun, tool);
+    return new OpenAiRunExpectingAction(openAiApiHandler, currentRun, tool);
   }
 
   public void cancelRun() {
@@ -32,4 +32,8 @@ public abstract class OpenAiRun {
   public String getRunId() {
     return run.getId();
   }
+
+  public abstract Object getFirstArgument() throws JsonProcessingException;
+
+  public abstract String getFirstToolCallId();
 }
