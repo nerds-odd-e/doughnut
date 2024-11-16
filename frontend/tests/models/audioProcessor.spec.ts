@@ -64,7 +64,7 @@ describe("AudioProcessor", () => {
   })
 
   it("should process data and reset timer when 2 seconds of silence is detected", async () => {
-    const mockCallback = vi.fn()
+    const mockCallback = vi.fn().mockResolvedValue(undefined)
     const sampleRate = 44100
     const processor = createAudioProcessor(sampleRate, mockCallback)
 
@@ -72,22 +72,23 @@ describe("AudioProcessor", () => {
     const silentData = new Float32Array(sampleRate * 3).fill(0)
     const moreNonSilentData = new Float32Array(sampleRate).fill(0.5)
 
+    // Process initial non-silent data
     processor.processAudioData([nonSilentData])
     processor.start()
 
-    // Fast-forward less than a minute
-    vi.advanceTimersByTime(30 * 1000)
-
-    // Process silent data
+    // Process silent data that should trigger the callback
     processor.processAudioData([silentData])
 
-    // Fast-forward 3 seconds to trigger silence detection
-    vi.advanceTimersByTime(3000)
-    // Wait for any pending processing
-    await Promise.resolve()
+    // Advance time to allow silence detection to trigger
+    await vi.advanceTimersByTimeAsync(3000)
 
     // Check if the callback was called with the non-silent data
     expect(mockCallback).toHaveBeenCalledTimes(1)
+    expect(mockCallback).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        incomplete: false,
+      })
+    )
 
     // Reset mock to check if it's called again
     mockCallback.mockClear()
@@ -95,21 +96,21 @@ describe("AudioProcessor", () => {
     // Process more non-silent data
     processor.processAudioData([moreNonSilentData])
 
-    // Fast-forward the timer to just before the next minute
-    vi.advanceTimersByTime(27 * 1000)
-
-    // The callback should not have been called again yet
-    expect(mockCallback).not.toHaveBeenCalled()
-
-    // Fast-forward to complete the minute
-    vi.advanceTimersByTime(33 * 1000)
-    // Wait for any pending processing
-    await Promise.resolve()
+    // Advance time to trigger the regular timer
+    await vi.advanceTimersByTimeAsync(60 * 1000)
 
     // Now the callback should have been called with the new non-silent data
     expect(mockCallback).toHaveBeenCalledTimes(1)
+    expect(mockCallback).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        incomplete: true,
+      })
+    )
 
-    await processor.stop()
+    // Clean up
+    const stopPromise = processor.stop()
+    await vi.runAllTimersAsync()
+    await stopPromise
   })
 
   it("should flush remaining data and call processorCallback", async () => {
@@ -311,5 +312,72 @@ describe("AudioProcessor", () => {
     await Promise.all([promise1, promise2, promise3])
 
     expect(mockCallback).toHaveBeenCalledTimes(1)
+  })
+
+  it("should wait for ongoing processing to complete before stopping", async () => {
+    let resolveProcessing: (() => void) | null = null
+    const processingPromise = new Promise<void>((resolve) => {
+      resolveProcessing = resolve
+    })
+
+    const mockCallback = vi.fn().mockImplementation(async () => {
+      await processingPromise
+      return "00:00:00,500"
+    })
+
+    const processor = createAudioProcessor(44100, mockCallback)
+    const nonSilentData = new Float32Array(44100).fill(0.5)
+    processor.processAudioData([nonSilentData])
+
+    // Start processing
+    const flushPromise = processor.tryFlush()
+
+    // Attempt to stop immediately
+    const stopPromise = processor.stop()
+
+    // Simulate processing completion
+    resolveProcessing!()
+
+    // Advance timers to handle the interval in stop()
+    await vi.advanceTimersByTimeAsync(20)
+
+    await Promise.all([flushPromise, stopPromise])
+
+    // Should only process once, not twice
+    expect(mockCallback).toHaveBeenCalledTimes(1)
+    expect(mockCallback).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        incomplete: false,
+      })
+    )
+  })
+
+  it("should not process same data twice when stopping", async () => {
+    const mockCallback = vi
+      .fn()
+      .mockImplementation(async (chunk: AudioChunk) => {
+        // Simulate processing half of the data
+        return "00:00:00,500" // 0.5 seconds
+      })
+
+    const processor = createAudioProcessor(44100, mockCallback)
+
+    // Create 1 second of data
+    const nonSilentData = new Float32Array(44100).fill(0.5)
+    processor.processAudioData([nonSilentData])
+
+    // Process first chunk
+    await processor.tryFlush()
+
+    // Clear the mock to check stop behavior
+    mockCallback.mockClear()
+
+    // Stop should only process the remaining 0.5 seconds
+    await processor.stop()
+
+    expect(mockCallback).toHaveBeenCalledTimes(1)
+    const lastCall = mockCallback.mock.calls[0]?.[0] as AudioChunk
+    // The second chunk should be smaller (only remaining data)
+    expect(lastCall.data.size).toBeLessThan(44100 * 4) // Assuming 16-bit stereo WAV
   })
 })

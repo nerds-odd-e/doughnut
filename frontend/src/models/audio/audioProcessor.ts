@@ -39,6 +39,75 @@ class AudioProcessorImpl implements AudioProcessor {
     return avg < this.SILENCE_THRESHOLD
   }
 
+  private async processDataChunk(isIncomplete: boolean = true): Promise<void> {
+    if (this.audioData.length > this.lastProcessedArrayIndex) {
+      let dataToProcess: Float32Array[] = []
+
+      // Handle the first array by slicing from lastProcessedInternalIndex
+      const firstChunk = this.audioData[this.lastProcessedArrayIndex]
+      if (firstChunk) {
+        dataToProcess.push(firstChunk.slice(this.lastProcessedInternalIndex))
+      }
+
+      // Add the rest of the arrays
+      dataToProcess = dataToProcess.concat(
+        this.audioData.slice(this.lastProcessedArrayIndex + 1)
+      )
+
+      if (dataToProcess.length > 0) {
+        const isAllSilent = dataToProcess.every((chunk) => this.isSilent(chunk))
+        if (!isAllSilent) {
+          // Calculate new indices before processing
+          const file = createAudioFile(dataToProcess, this.sampleRate, true)
+          const newLastProcessedArrayIndex = this.audioData.length
+          const newLastProcessedInternalIndex = 0
+
+          const timestamp = await this.processorCallback({
+            data: file,
+            incomplete: isIncomplete,
+          })
+
+          if (timestamp && typeof timestamp === "string") {
+            const processedSeconds = parseTimestamp(timestamp)
+            if (processedSeconds !== undefined) {
+              const processedSamples = Math.floor(
+                processedSeconds * this.sampleRate
+              )
+              let totalSamples = this.lastProcessedInternalIndex
+
+              // Find the new array and internal indices
+              for (
+                let i = this.lastProcessedArrayIndex;
+                i < this.audioData.length;
+                i++
+              ) {
+                const arrayLength = this.audioData[i]?.length ?? 0
+                if (totalSamples + arrayLength <= processedSamples) {
+                  totalSamples += arrayLength
+                  this.lastProcessedArrayIndex = i + 1
+                  this.lastProcessedInternalIndex = 0
+                } else {
+                  this.lastProcessedArrayIndex = i
+                  this.lastProcessedInternalIndex =
+                    processedSamples - totalSamples
+                  break
+                }
+              }
+            } else {
+              // Fallback if timestamp parsing fails
+              this.lastProcessedArrayIndex = newLastProcessedArrayIndex
+              this.lastProcessedInternalIndex = newLastProcessedInternalIndex
+            }
+          } else {
+            // If no timestamp provided, use calculated indices
+            this.lastProcessedArrayIndex = newLastProcessedArrayIndex
+            this.lastProcessedInternalIndex = newLastProcessedInternalIndex
+          }
+        }
+      }
+    }
+  }
+
   private async processAndCallback(
     isIncomplete: boolean = true
   ): Promise<void> {
@@ -48,70 +117,7 @@ class AudioProcessorImpl implements AudioProcessor {
 
     this.isProcessing = true
     try {
-      if (this.audioData.length > this.lastProcessedArrayIndex) {
-        let dataToProcess: Float32Array[] = []
-
-        // Handle the first array by slicing from lastProcessedInternalIndex
-        const firstChunk = this.audioData[this.lastProcessedArrayIndex]
-        if (firstChunk) {
-          dataToProcess.push(firstChunk.slice(this.lastProcessedInternalIndex))
-        }
-
-        // Add the rest of the arrays
-        dataToProcess = dataToProcess.concat(
-          this.audioData.slice(this.lastProcessedArrayIndex + 1)
-        )
-
-        if (dataToProcess.length > 0) {
-          const isAllSilent = dataToProcess.every((chunk) =>
-            this.isSilent(chunk)
-          )
-          if (!isAllSilent) {
-            const file = createAudioFile(dataToProcess, this.sampleRate, true)
-            const timestamp = await this.processorCallback({
-              data: file,
-              incomplete: isIncomplete,
-            })
-
-            if (timestamp && typeof timestamp === "string") {
-              const processedSeconds = parseTimestamp(timestamp)
-              if (processedSeconds !== undefined) {
-                const processedSamples = Math.floor(
-                  processedSeconds * this.sampleRate
-                )
-                let totalSamples = this.lastProcessedInternalIndex // Start with existing processed samples
-
-                // Find the new array and internal indices
-                for (
-                  let i = this.lastProcessedArrayIndex;
-                  i < this.audioData.length;
-                  i++
-                ) {
-                  const arrayLength = this.audioData[i]?.length ?? 0
-                  if (totalSamples + arrayLength <= processedSamples) {
-                    totalSamples += arrayLength
-                    this.lastProcessedArrayIndex = i + 1
-                    this.lastProcessedInternalIndex = 0
-                  } else {
-                    this.lastProcessedArrayIndex = i
-                    this.lastProcessedInternalIndex =
-                      processedSamples - totalSamples
-                    break
-                  }
-                }
-              } else {
-                // Fallback if timestamp parsing fails
-                this.lastProcessedArrayIndex = this.audioData.length
-                this.lastProcessedInternalIndex = 0
-              }
-            } else {
-              // If no timestamp provided, process everything
-              this.lastProcessedArrayIndex = this.audioData.length
-              this.lastProcessedInternalIndex = 0
-            }
-          }
-        }
-      }
+      await this.processDataChunk(isIncomplete)
     } finally {
       this.isProcessing = false
     }
@@ -148,7 +154,34 @@ class AudioProcessorImpl implements AudioProcessor {
       clearInterval(this.processorTimer)
       this.processorTimer = null
     }
-    await this.tryFlush()
+
+    // Wait for any ongoing processing to complete, with a maximum number of attempts
+    let attempts = 0
+    const maxAttempts = 100 // Prevent infinite loops
+    const wasProcessing = this.isProcessing
+    while (this.isProcessing && attempts < maxAttempts) {
+      await new Promise((resolve) => setTimeout(resolve, 10))
+      attempts++
+    }
+
+    // Only process if there was no ongoing processing
+    if (!wasProcessing) {
+      const hasUnprocessedData =
+        this.lastProcessedArrayIndex < this.audioData.length ||
+        (this.lastProcessedArrayIndex === this.audioData.length - 1 &&
+          this.lastProcessedInternalIndex <
+            (this.audioData[this.lastProcessedArrayIndex]?.length ?? 0))
+
+      if (hasUnprocessedData) {
+        this.isProcessing = true
+        try {
+          await this.processDataChunk(false)
+        } finally {
+          this.isProcessing = false
+        }
+      }
+    }
+
     return createAudioFile(this.audioData, this.sampleRate, false)
   }
 
