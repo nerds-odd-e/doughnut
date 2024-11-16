@@ -594,4 +594,28 @@ describe("NoteAudioTools", () => {
       )
     })
   })
+
+  it("should handle returned timestamp from audio processing", async () => {
+    const mockResponse = {
+      completionMarkdownFromAudio: "text",
+      endTimestamp: "00:00:37,270",
+      toolCallInfo: {
+        threadId: "thread-123",
+        runId: "run-123",
+        toolCallId: "tool-123",
+      },
+    }
+
+    helper.managedApi.restAiAudioController.audioToTextForNote = vi
+      .fn()
+      .mockResolvedValue(mockResponse)
+
+    const testBlob = new Blob(["test"])
+    const result = await wrapper.vm.processAudio({
+      data: testBlob,
+      incomplete: true,
+    })
+
+    expect(result).toBe("00:00:37,270")
+  })
 })

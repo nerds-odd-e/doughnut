@@ -139,7 +139,7 @@ const toggleAdvancedOptions = () => {
   showAdvancedOptions.value = !showAdvancedOptions.value
 }
 
-const processAudio = async (chunk: AudioChunk) => {
+const processAudio = async (chunk: AudioChunk): Promise<string | undefined> => {
   try {
     const response = await managedApi.restAiAudioController.audioToTextForNote(
       note.id,
@@ -159,7 +159,7 @@ const processAudio = async (chunk: AudioChunk) => {
     threadContext.value.runId = response?.toolCallInfo?.runId
     threadContext.value.toolCallId = response?.toolCallInfo?.toolCallId
 
-    storageAccessor
+    await storageAccessor
       .storedApi()
       .appendDetails(note.id, response?.completionMarkdownFromAudio ?? "")
 
@@ -167,8 +167,11 @@ const processAudio = async (chunk: AudioChunk) => {
     if (shouldSuggestTopic(threadContext.value.callCount)) {
       updateTopicIfSuggested(note.id)
     }
+
+    return response?.endTimestamp
   } catch (error) {
     errors.value = error as Record<string, string | undefined>
+    return undefined
   }
 }
 

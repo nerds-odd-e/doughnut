@@ -17,7 +17,7 @@ export interface AudioRecorder {
 }
 
 export const createAudioRecorder = (
-  processorCallback: (chunk: AudioChunk) => Promise<void>
+  processorCallback: (chunk: AudioChunk) => Promise<string | undefined>
 ): AudioRecorder => {
   let audioContext: AudioContext | null = null
   let mediaStream: MediaStream | null = null

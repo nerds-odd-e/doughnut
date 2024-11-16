@@ -204,4 +204,37 @@ describe("AudioProcessor", () => {
     // Verify it was called exactly once
     expect(mockCallback).toHaveBeenCalledTimes(1)
   })
+
+  it.only("should adjust lastProcessedIndex based on returned timestamp", async () => {
+    const mockCallback = vi.fn().mockResolvedValue("00:00:01,500") // 1.5 seconds
+    const processor = createAudioProcessor(44100, mockCallback)
+
+    // Create 3 seconds of non-silent data
+    const nonSilentData = new Float32Array(44100 * 3).fill(0.5)
+    processor.processAudioData([nonSilentData])
+    processor.start()
+
+    // Process first chunk
+    await processor.flush()
+
+    // The lastProcessedIndex should be at 1.5 seconds worth of samples
+    expect(mockCallback).toHaveBeenCalledTimes(1)
+
+    // Process remaining data
+    await processor.flush()
+    expect(mockCallback).toHaveBeenCalledTimes(2)
+  })
+
+  it("should handle invalid timestamp gracefully", async () => {
+    const mockCallback = vi.fn().mockResolvedValue("invalid")
+    const processor = createAudioProcessor(44100, mockCallback)
+
+    const nonSilentData = new Float32Array(44100).fill(0.5)
+    processor.processAudioData([nonSilentData])
+    processor.start()
+
+    await processor.flush()
+    // Should process all data despite invalid timestamp
+    expect(processor.getAudioData().length).toBe(1)
+  })
 })

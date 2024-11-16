@@ -13,14 +13,15 @@ export interface AudioChunk {
 
 export const createAudioProcessor = (
   sampleRate: number,
-  processorCallback: (chunk: AudioChunk) => Promise<void>
+  processorCallback: (chunk: AudioChunk) => Promise<string | undefined>
 ): AudioProcessor => {
   const audioData: Float32Array[] = []
-  let lastProcessedIndex = 0
+  let lastProcessedChunkIndex = 0
+  let internalSampleIndex = 0
   let processorTimer: NodeJS.Timeout | null = null
   let silenceCounter = 0
   const SILENCE_THRESHOLD = 0.01
-  const SILENCE_DURATION_THRESHOLD = 3 * sampleRate // 2 seconds of silence
+  const SILENCE_DURATION_THRESHOLD = 3 * sampleRate
 
   const isSilent = (data: Float32Array): boolean => {
     let sum = 0
@@ -32,16 +33,54 @@ export const createAudioProcessor = (
   }
 
   const processAndCallback = async (isIncomplete: boolean = true) => {
-    if (audioData.length > lastProcessedIndex) {
-      const dataToProcess = audioData.slice(lastProcessedIndex)
-      lastProcessedIndex = audioData.length
+    // Check if there's new data to process
+    if (
+      lastProcessedChunkIndex < audioData.length ||
+      (lastProcessedChunkIndex === audioData.length - 1 &&
+        audioData[lastProcessedChunkIndex]?.length !== undefined &&
+        internalSampleIndex < (audioData[lastProcessedChunkIndex]?.length ?? 0))
+    ) {
+      const dataToProcess: Float32Array[] = []
+      // Collect data from lastProcessedChunkIndex and internalSampleIndex
+      for (let i = lastProcessedChunkIndex; i < audioData.length; i++) {
+        const chunk = audioData[i]
+        if (chunk && i === lastProcessedChunkIndex && internalSampleIndex > 0) {
+          // Truncate the first chunk from internalSampleIndex
+          dataToProcess.push(chunk.subarray(internalSampleIndex))
+        } else if (chunk) {
+          dataToProcess.push(chunk)
+        }
+      }
+
       const isAllSilent = dataToProcess.every((chunk) => isSilent(chunk))
       if (!isAllSilent) {
         const file = createAudioFile(dataToProcess, sampleRate, true)
-        await processorCallback({
+        const timestamp = await processorCallback({
           data: file,
           incomplete: isIncomplete,
         })
+
+        if (timestamp) {
+          const samples = timestampToSamples(timestamp, sampleRate)
+          if (samples !== undefined) {
+            const { chunkIndex, internalIndex } = findChunkIndexAndSampleIndex(
+              samples,
+              audioData
+            )
+            lastProcessedChunkIndex = chunkIndex
+            internalSampleIndex = internalIndex
+          } else {
+            // If timestamp parsing failed, reset internalSampleIndex
+            internalSampleIndex = 0
+          }
+        } else {
+          // If no timestamp is returned, reset internalSampleIndex
+          internalSampleIndex = 0
+        }
+      } else {
+        // If all data is silent, advance the indices to the end
+        lastProcessedChunkIndex = audioData.length - 1
+        internalSampleIndex = audioData[lastProcessedChunkIndex]?.length ?? 0
       }
     }
   }
@@ -50,6 +89,54 @@ export const createAudioProcessor = (
     processorTimer = setInterval(() => {
       processAndCallback()
     }, 60 * 1000)
+  }
+
+  const timestampToSamples = (
+    timestamp: string,
+    sampleRate: number
+  ): number | undefined => {
+    const [hms, millisecondsString] = timestamp.split(",")
+    if (!hms || !millisecondsString) {
+      return undefined
+    }
+    const [hours, minutes, seconds] = hms.split(":").map(Number)
+    const milliseconds = Number(millisecondsString)
+    if (
+      hours === undefined ||
+      minutes === undefined ||
+      seconds === undefined ||
+      milliseconds === undefined
+    ) {
+      return undefined
+    }
+    const totalSeconds =
+      (hours * 60 + minutes) * 60 + seconds + milliseconds / 1000
+    return Math.floor(totalSeconds * sampleRate)
+  }
+
+  const findChunkIndexAndSampleIndex = (
+    samples: number,
+    audioData: Float32Array[]
+  ): { chunkIndex: number; internalIndex: number } => {
+    let cumulativeSamples = 0
+    for (let i = 0; i < audioData.length; i++) {
+      const chunk = audioData[i]
+      if (!chunk) continue
+      const chunkLength = chunk.length
+      if (cumulativeSamples + chunkLength > samples) {
+        // The sample is in this chunk
+        const internalIndex = samples - cumulativeSamples
+        return { chunkIndex: i, internalIndex }
+      } else {
+        cumulativeSamples += chunkLength
+      }
+    }
+    // If samples exceed total samples, return the last position
+    const lastChunkIndex = audioData.length - 1
+    return {
+      chunkIndex: lastChunkIndex,
+      internalIndex: audioData[lastChunkIndex]?.length ?? 0,
+    }
   }
 
   return {
