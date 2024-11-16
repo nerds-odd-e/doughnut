@@ -353,12 +353,10 @@ describe("AudioProcessor", () => {
   })
 
   it("should not process same data twice when stopping", async () => {
-    const mockCallback = vi
-      .fn()
-      .mockImplementation(async (chunk: AudioChunk) => {
-        // Simulate processing half of the data
-        return "00:00:00,500" // 0.5 seconds
-      })
+    const mockCallback = vi.fn().mockImplementation(async () => {
+      // Simulate processing half of the data
+      return "00:00:00,500" // 0.5 seconds
+    })
 
     const processor = createAudioProcessor(44100, mockCallback)
 
