@@ -251,14 +251,14 @@ describe("AudioProcessor", () => {
     await processor.flush()
 
     // Should process only first 0.5 seconds
-    const firstCall = mockCallback.mock.calls[0][0] as AudioChunk
+    const firstCall = mockCallback.mock.calls[0]?.[0] as AudioChunk
     const firstFileSize = firstCall.data.size
 
     // Process remaining data
     await processor.flush()
 
     // Second chunk should be smaller than first (remaining 0.5 seconds)
-    const secondCall = mockCallback.mock.calls[1][0] as AudioChunk
+    const secondCall = mockCallback.mock.calls[1]?.[0] as AudioChunk
     expect(secondCall.data.size).toBeLessThan(firstFileSize)
     expect(mockCallback).toHaveBeenCalledTimes(2)
   })
