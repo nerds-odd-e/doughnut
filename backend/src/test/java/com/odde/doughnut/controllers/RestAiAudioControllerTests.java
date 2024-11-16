@@ -249,7 +249,7 @@ class RestAiAudioControllerTests {
                         arg.getToolOutputs().getFirst().getToolCallId(), equalTo("existing-call"));
                     assertThat(
                         arg.getToolOutputs().getFirst().getOutput(),
-                        containsString("more to process"));
+                        containsString("transcription to process"));
                     assertThat(
                         arg.getToolOutputs().getFirst().getOutput(),
                         containsString("test transcription"));

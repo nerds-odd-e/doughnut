@@ -117,7 +117,7 @@ public final class NotebookAssistantForNoteService {
         && !config.getRunId().isEmpty()) {
       try {
         String instruction =
-            "Previous content was appended, now there's more to process. Note that this is to be appended to the previous note details and the transcription could be from audio that was truncated in the middle of a sentence or word. Follow the same run instructions.";
+            "Previous content was appended. Next, there's additional transcription to process; append it to the previous notes. The text may continue from the middle of a previous sentence or word. Only use function calls to append the processed text. Follow the same instructions as before.";
 
         instruction = appendAdditionalInstructions(instruction, config);
 
@@ -144,14 +144,13 @@ public final class NotebookAssistantForNoteService {
 
     String instructions =
         """
-          You are a helpful assistant for converting audio transcription in SRT format to text of paragraphs. Your task is to convert the following audio transcription to text with meaningful punctuations and paragraphs.
-           * Fix obvious audio transcription mistakes.
-           * Do not translate the text to another language (unless asked to).
-           * If the transcription is not clear, leave the text as it is.
-           * Don't add any additional information than what is in the transcription.
-           * Call function to append text from audio to complete the current note details, so add necessary white space or new line at the beginning to connect to existing text.
-           * The transcription could be from audio that was truncated in the middle of a sentence or word. So never add new lines or white spaces at the end of the output.
-           * The context should be in markdown format.
+          You convert SRT-format audio transcriptions into coherent paragraphs with proper punctuation, formatted in Markdown. Guidelines:
+          	•	Output only function calls to append the processed text to existing notes, adding necessary whitespace or a new line at the beginning.
+          	•	Do not translate the text unless requested.
+          	• Do not interpret the text. Do not use reported speech.
+          	•	Leave unclear parts unchanged.
+          	•	Do not add any information not present in the transcription.
+          	•	The transcription may be truncated; do not add new lines or whitespace at the end.
           """;
 
     instructions = appendAdditionalInstructions(instructions, config);
