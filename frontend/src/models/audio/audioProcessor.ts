@@ -19,6 +19,7 @@ class AudioProcessorImpl implements AudioProcessor {
   private silenceCounter = 0
   private readonly SILENCE_THRESHOLD = 0.01
   private readonly SILENCE_DURATION_THRESHOLD: number
+  private isProcessing = false
 
   constructor(
     private readonly sampleRate: number,
@@ -41,67 +42,78 @@ class AudioProcessorImpl implements AudioProcessor {
   private async processAndCallback(
     isIncomplete: boolean = true
   ): Promise<void> {
-    if (this.audioData.length > this.lastProcessedArrayIndex) {
-      let dataToProcess: Float32Array[] = []
+    if (this.isProcessing) {
+      return
+    }
 
-      // Handle the first array by slicing from lastProcessedInternalIndex
-      const firstChunk = this.audioData[this.lastProcessedArrayIndex]
-      if (firstChunk) {
-        dataToProcess.push(firstChunk.slice(this.lastProcessedInternalIndex))
-      }
+    this.isProcessing = true
+    try {
+      if (this.audioData.length > this.lastProcessedArrayIndex) {
+        let dataToProcess: Float32Array[] = []
 
-      // Add the rest of the arrays
-      dataToProcess = dataToProcess.concat(
-        this.audioData.slice(this.lastProcessedArrayIndex + 1)
-      )
+        // Handle the first array by slicing from lastProcessedInternalIndex
+        const firstChunk = this.audioData[this.lastProcessedArrayIndex]
+        if (firstChunk) {
+          dataToProcess.push(firstChunk.slice(this.lastProcessedInternalIndex))
+        }
 
-      if (dataToProcess.length > 0) {
-        const isAllSilent = dataToProcess.every((chunk) => this.isSilent(chunk))
-        if (!isAllSilent) {
-          const file = createAudioFile(dataToProcess, this.sampleRate, true)
-          const timestamp = await this.processorCallback({
-            data: file,
-            incomplete: isIncomplete,
-          })
+        // Add the rest of the arrays
+        dataToProcess = dataToProcess.concat(
+          this.audioData.slice(this.lastProcessedArrayIndex + 1)
+        )
 
-          if (timestamp && typeof timestamp === "string") {
-            const processedSeconds = parseTimestamp(timestamp)
-            if (processedSeconds !== undefined) {
-              const processedSamples = Math.floor(
-                processedSeconds * this.sampleRate
-              )
-              let totalSamples = this.lastProcessedInternalIndex // Start with existing processed samples
+        if (dataToProcess.length > 0) {
+          const isAllSilent = dataToProcess.every((chunk) =>
+            this.isSilent(chunk)
+          )
+          if (!isAllSilent) {
+            const file = createAudioFile(dataToProcess, this.sampleRate, true)
+            const timestamp = await this.processorCallback({
+              data: file,
+              incomplete: isIncomplete,
+            })
 
-              // Find the new array and internal indices
-              for (
-                let i = this.lastProcessedArrayIndex;
-                i < this.audioData.length;
-                i++
-              ) {
-                const arrayLength = this.audioData[i]?.length ?? 0
-                if (totalSamples + arrayLength <= processedSamples) {
-                  totalSamples += arrayLength
-                  this.lastProcessedArrayIndex = i + 1
-                  this.lastProcessedInternalIndex = 0
-                } else {
-                  this.lastProcessedArrayIndex = i
-                  this.lastProcessedInternalIndex =
-                    processedSamples - totalSamples
-                  break
+            if (timestamp && typeof timestamp === "string") {
+              const processedSeconds = parseTimestamp(timestamp)
+              if (processedSeconds !== undefined) {
+                const processedSamples = Math.floor(
+                  processedSeconds * this.sampleRate
+                )
+                let totalSamples = this.lastProcessedInternalIndex // Start with existing processed samples
+
+                // Find the new array and internal indices
+                for (
+                  let i = this.lastProcessedArrayIndex;
+                  i < this.audioData.length;
+                  i++
+                ) {
+                  const arrayLength = this.audioData[i]?.length ?? 0
+                  if (totalSamples + arrayLength <= processedSamples) {
+                    totalSamples += arrayLength
+                    this.lastProcessedArrayIndex = i + 1
+                    this.lastProcessedInternalIndex = 0
+                  } else {
+                    this.lastProcessedArrayIndex = i
+                    this.lastProcessedInternalIndex =
+                      processedSamples - totalSamples
+                    break
+                  }
                 }
+              } else {
+                // Fallback if timestamp parsing fails
+                this.lastProcessedArrayIndex = this.audioData.length
+                this.lastProcessedInternalIndex = 0
               }
             } else {
-              // Fallback if timestamp parsing fails
+              // If no timestamp provided, process everything
               this.lastProcessedArrayIndex = this.audioData.length
               this.lastProcessedInternalIndex = 0
             }
-          } else {
-            // If no timestamp provided, process everything
-            this.lastProcessedArrayIndex = this.audioData.length
-            this.lastProcessedInternalIndex = 0
           }
         }
       }
+    } finally {
+      this.isProcessing = false
     }
   }
 

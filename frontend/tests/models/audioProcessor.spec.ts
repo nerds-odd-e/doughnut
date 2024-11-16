@@ -63,7 +63,7 @@ describe("AudioProcessor", () => {
     processor.stop()
   })
 
-  it("should process data and reset timer when 2 seconds of silence is detected", () => {
+  it("should process data and reset timer when 2 seconds of silence is detected", async () => {
     const mockCallback = vi.fn()
     const sampleRate = 44100
     const processor = createAudioProcessor(sampleRate, mockCallback)
@@ -83,6 +83,8 @@ describe("AudioProcessor", () => {
 
     // Fast-forward 3 seconds to trigger silence detection
     vi.advanceTimersByTime(3000)
+    // Wait for any pending processing
+    await Promise.resolve()
 
     // Check if the callback was called with the non-silent data
     expect(mockCallback).toHaveBeenCalledTimes(1)
@@ -101,11 +103,13 @@ describe("AudioProcessor", () => {
 
     // Fast-forward to complete the minute
     vi.advanceTimersByTime(33 * 1000)
+    // Wait for any pending processing
+    await Promise.resolve()
 
     // Now the callback should have been called with the new non-silent data
     expect(mockCallback).toHaveBeenCalledTimes(1)
 
-    processor.stop()
+    await processor.stop()
   })
 
   it("should flush remaining data and call processorCallback", async () => {
@@ -291,5 +295,25 @@ describe("AudioProcessor", () => {
     // Process final chunk - should process the rest
     await processor.flush()
     expect(mockCallback).toHaveBeenCalledTimes(3)
+  })
+
+  it("should not process in parallel when multiple calls are made", async () => {
+    const mockCallback = vi.fn().mockImplementation(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 100))
+      return "00:00:00,500"
+    })
+
+    const processor = createAudioProcessor(44100, mockCallback)
+    const nonSilentData = new Float32Array(44100).fill(0.5)
+    processor.processAudioData([nonSilentData])
+
+    const promise1 = processor.flush()
+    const promise2 = processor.flush()
+    const promise3 = processor.flush()
+
+    vi.advanceTimersByTime(100)
+    await Promise.all([promise1, promise2, promise3])
+
+    expect(mockCallback).toHaveBeenCalledTimes(1)
   })
 })
