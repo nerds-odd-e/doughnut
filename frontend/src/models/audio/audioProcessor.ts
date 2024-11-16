@@ -13,7 +13,8 @@ export interface AudioChunk {
 
 class AudioProcessorImpl implements AudioProcessor {
   private audioData: Float32Array[] = []
-  private lastProcessedIndex = 0
+  private lastProcessedArrayIndex = 0
+  private lastProcessedInternalIndex = 0
   private processorTimer: NodeJS.Timeout | null = null
   private silenceCounter = 0
   private readonly SILENCE_THRESHOLD = 0.01
@@ -21,7 +22,9 @@ class AudioProcessorImpl implements AudioProcessor {
 
   constructor(
     private readonly sampleRate: number,
-    private readonly processorCallback: (chunk: AudioChunk) => Promise<void>
+    private readonly processorCallback: (
+      chunk: AudioChunk
+    ) => Promise<string | undefined>
   ) {
     this.SILENCE_DURATION_THRESHOLD = 3 * sampleRate
   }
@@ -38,16 +41,47 @@ class AudioProcessorImpl implements AudioProcessor {
   private async processAndCallback(
     isIncomplete: boolean = true
   ): Promise<void> {
-    if (this.audioData.length > this.lastProcessedIndex) {
-      const dataToProcess = this.audioData.slice(this.lastProcessedIndex)
-      this.lastProcessedIndex = this.audioData.length
+    if (this.audioData.length > this.lastProcessedArrayIndex) {
+      const dataToProcess = this.audioData.slice(this.lastProcessedArrayIndex)
+      this.lastProcessedArrayIndex = this.audioData.length
       const isAllSilent = dataToProcess.every((chunk) => this.isSilent(chunk))
       if (!isAllSilent) {
         const file = createAudioFile(dataToProcess, this.sampleRate, true)
-        await this.processorCallback({
+        const timestamp = await this.processorCallback({
           data: file,
           incomplete: isIncomplete,
         })
+
+        // Update indices based on timestamp if provided
+        if (timestamp) {
+          const processedSeconds = parseTimestamp(timestamp)
+          if (processedSeconds !== undefined) {
+            const processedSamples = Math.floor(
+              processedSeconds * this.sampleRate
+            )
+            let remainingSamples = processedSamples
+
+            // Find the new array and internal indices
+            for (let i = 0; i < this.audioData.length; i++) {
+              const arrayLength = this.audioData[i]?.length ?? 0
+              if (remainingSamples >= arrayLength) {
+                remainingSamples -= arrayLength
+              } else {
+                this.lastProcessedArrayIndex = i
+                this.lastProcessedInternalIndex = remainingSamples
+                break
+              }
+            }
+          } else {
+            // Fallback if timestamp parsing fails
+            this.lastProcessedArrayIndex = this.audioData.length
+            this.lastProcessedInternalIndex = 0
+          }
+        } else {
+          // If no timestamp provided, process everything
+          this.lastProcessedArrayIndex = this.audioData.length
+          this.lastProcessedInternalIndex = 0
+        }
       }
     }
   }
@@ -102,7 +136,7 @@ class AudioProcessorImpl implements AudioProcessor {
 
 export const createAudioProcessor = (
   sampleRate: number,
-  processorCallback: (chunk: AudioChunk) => Promise<void>
+  processorCallback: (chunk: AudioChunk) => Promise<string | undefined>
 ): AudioProcessor => {
   return new AudioProcessorImpl(sampleRate, processorCallback)
 }
@@ -153,4 +187,24 @@ const writeString = (view: DataView, offset: number, string: string): void => {
   for (let i = 0; i < string.length; i++) {
     view.setUint8(offset + i, string.charCodeAt(i))
   }
+}
+
+const parseTimestamp = (timestamp: string): number | undefined => {
+  const [hms, millisecondsString] = timestamp.split(",")
+  if (!hms || !millisecondsString) {
+    return undefined
+  }
+  const [hours, minutes, seconds] = hms.split(":").map(Number)
+  const milliseconds = Number(millisecondsString)
+  if (
+    hours === undefined ||
+    minutes === undefined ||
+    seconds === undefined ||
+    milliseconds === undefined
+  ) {
+    return undefined
+  }
+  const totalSeconds =
+    (hours * 60 + minutes) * 60 + seconds + milliseconds / 1000
+  return totalSeconds
 }

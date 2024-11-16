@@ -205,7 +205,7 @@ describe("AudioProcessor", () => {
     expect(mockCallback).toHaveBeenCalledTimes(1)
   })
 
-  it.skip("should adjust lastProcessedIndex based on returned timestamp", async () => {
+  it("should adjust lastProcessedIndex based on returned timestamp", async () => {
     const mockCallback = vi.fn().mockResolvedValue("00:00:01,500") // 1.5 seconds
     const processor = createAudioProcessor(44100, mockCallback)
 
