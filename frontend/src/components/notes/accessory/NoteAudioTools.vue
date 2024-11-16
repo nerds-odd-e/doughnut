@@ -159,7 +159,7 @@ const processAudio = async (chunk: AudioChunk) => {
     threadContext.value.runId = response?.toolCallInfo?.runId
     threadContext.value.toolCallId = response?.toolCallInfo?.toolCallId
 
-    await storageAccessor
+    storageAccessor
       .storedApi()
       .appendDetails(note.id, response?.completionMarkdownFromAudio ?? "")
 
