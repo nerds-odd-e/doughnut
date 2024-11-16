@@ -6,9 +6,14 @@ export interface AudioProcessor {
   flush: () => Promise<void> // New method
 }
 
+export interface AudioChunk {
+  data: File
+  incomplete: boolean
+}
+
 export const createAudioProcessor = (
   sampleRate: number,
-  processorCallback: (file: File) => Promise<void>
+  processorCallback: (chunk: AudioChunk) => Promise<void>
 ): AudioProcessor => {
   let audioData: Float32Array[] = []
   let lastProcessedIndex = 0
@@ -32,8 +37,11 @@ export const createAudioProcessor = (
       lastProcessedIndex = audioData.length
       const isAllSilent = dataToProcess.every((chunk) => isSilent(chunk))
       if (!isAllSilent) {
-        const partialFile = createAudioFile(dataToProcess, sampleRate, true)
-        await processorCallback(partialFile)
+        const file = createAudioFile(dataToProcess, sampleRate, true)
+        await processorCallback({
+          data: file,
+          incomplete: true,
+        })
       }
     }
   }
@@ -76,6 +84,10 @@ export const createAudioProcessor = (
       const file = createAudioFile(audioData, sampleRate, false)
       audioData = []
       lastProcessedIndex = 0
+      await processorCallback({
+        data: file,
+        incomplete: false,
+      })
       return file
     },
 

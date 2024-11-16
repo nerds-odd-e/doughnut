@@ -1,6 +1,10 @@
 import { type Ref, ref } from "vue"
 import { getAudioRecordingWorkerURL } from "./recorderWorklet"
-import { type AudioProcessor, createAudioProcessor } from "./audioProcessor"
+import {
+  type AudioChunk,
+  type AudioProcessor,
+  createAudioProcessor,
+} from "./audioProcessor"
 
 export interface AudioRecorder {
   startRecording: () => Promise<void>
@@ -13,7 +17,7 @@ export interface AudioRecorder {
 }
 
 export const createAudioRecorder = (
-  processorCallback: (file: File) => Promise<void>
+  processorCallback: (chunk: AudioChunk) => Promise<void>
 ): AudioRecorder => {
   let audioContext: AudioContext | null = null
   let mediaStream: MediaStream | null = null

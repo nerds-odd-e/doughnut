@@ -1,5 +1,8 @@
 import { describe, it, expect, vi } from "vitest"
-import { createAudioProcessor } from "@/models/audio/audioProcessor"
+import {
+  createAudioProcessor,
+  type AudioChunk,
+} from "@/models/audio/audioProcessor"
 
 describe("AudioProcessor", () => {
   beforeEach(() => {
@@ -119,9 +122,9 @@ describe("AudioProcessor", () => {
     await processor.flush()
 
     expect(mockCallback).toHaveBeenCalledTimes(1)
-    const callArgument = mockCallback.mock.calls[0]?.[0]
-    expect(callArgument).toBeInstanceOf(File)
-    expect(callArgument.name).toMatch(/^recorded_audio_partial_.*\.wav$/)
+    const callArgument = mockCallback.mock.calls[0]?.[0] as AudioChunk
+    expect(callArgument.data).toBeInstanceOf(File)
+    expect(callArgument.data.name).toMatch(/^recorded_audio_partial_.*\.wav$/)
   })
 
   it("should not call processorCallback on flush if no new data", async () => {
@@ -138,5 +141,42 @@ describe("AudioProcessor", () => {
     await processor.flush()
 
     expect(mockCallback).not.toHaveBeenCalled()
+  })
+
+  it("should mark chunk as incomplete when processing due to timer", async () => {
+    const mockCallback = vi.fn().mockResolvedValue(undefined)
+    const processor = createAudioProcessor(44100, mockCallback)
+
+    const nonSilentData = [new Float32Array([0.5, 0.4, 0.3, 0.2, 0.1])]
+    processor.processAudioData(nonSilentData)
+    processor.start()
+
+    // Fast-forward to trigger timer
+    vi.advanceTimersByTime(60 * 1000)
+
+    expect(mockCallback).toHaveBeenCalledWith(
+      expect.objectContaining({
+        incomplete: true,
+        data: expect.any(File),
+      })
+    )
+  })
+
+  it("should mark chunk as complete when stopping", async () => {
+    const mockCallback = vi.fn().mockResolvedValue(undefined)
+    const processor = createAudioProcessor(44100, mockCallback)
+
+    const nonSilentData = [new Float32Array([0.5, 0.4, 0.3, 0.2, 0.1])]
+    processor.processAudioData(nonSilentData)
+    processor.start()
+
+    await processor.stop()
+
+    expect(mockCallback).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        incomplete: false,
+        data: expect.any(File),
+      })
+    )
   })
 })

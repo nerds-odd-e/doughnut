@@ -138,12 +138,12 @@ const toggleAdvancedOptions = () => {
   showAdvancedOptions.value = !showAdvancedOptions.value
 }
 
-const processAudio = async (file: Blob) => {
+const processAudio = async (chunk: AudioChunk) => {
   try {
     const response = await managedApi.restAiAudioController.audioToTextForNote(
       note.id,
       {
-        uploadAudioFile: file,
+        uploadAudioFile: chunk.data,
         previousNoteDetails: note.details?.slice(-500) ?? "",
         threadId: threadContext.value.threadId,
         runId: threadContext.value.runId,
@@ -163,7 +163,6 @@ const processAudio = async (file: Blob) => {
 
     threadContext.value.callCount++
     if (shouldSuggestTopic(threadContext.value.callCount)) {
-      // no await to allow the user to continue interacting
       updateTopicIfSuggested(note.id)
     }
   } catch (error) {
