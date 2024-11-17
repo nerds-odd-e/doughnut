@@ -1,9 +1,9 @@
 export interface AudioProcessor {
-  processAudioData: (newData: Float32Array[]) => void
-  getAudioData: () => Float32Array[]
-  start: () => void
-  stop: () => Promise<File>
-  tryFlush: () => Promise<void>
+  processAudioData(newData: Float32Array[]): void
+  getAudioData(): Float32Array[]
+  start(): void
+  stop(): Promise<File>
+  tryFlush(): Promise<void>
 }
 
 export interface AudioChunk {
@@ -27,93 +27,84 @@ class AudioProcessorImpl implements AudioProcessor {
       chunk: AudioChunk
     ) => Promise<string | undefined>
   ) {
-    this.SILENCE_DURATION_THRESHOLD = 3 * sampleRate
+    this.SILENCE_DURATION_THRESHOLD = 3 * this.sampleRate
   }
 
   private isSilent(data: Float32Array): boolean {
-    let sum = 0
-    for (let i = 0; i < data.length; i++) {
-      sum += Math.abs(data[i] ?? 0)
-    }
+    const sum = data.reduce((acc, val) => acc + Math.abs(val), 0)
     const avg = sum / data.length
     return avg < this.SILENCE_THRESHOLD
   }
 
-  private async processDataChunk(isIncomplete: boolean = true): Promise<void> {
-    if (this.audioData.length > this.lastProcessedArrayIndex) {
-      let dataToProcess: Float32Array[] = []
+  private async processDataChunk(isIncomplete = true): Promise<void> {
+    if (this.audioData.length <= this.lastProcessedArrayIndex) return
 
-      // Handle the first array by slicing from lastProcessedInternalIndex
-      const firstChunk = this.audioData[this.lastProcessedArrayIndex]
-      if (firstChunk) {
-        dataToProcess.push(firstChunk.slice(this.lastProcessedInternalIndex))
-      }
+    const dataToProcess: Float32Array[] = []
 
-      // Add the rest of the arrays
-      dataToProcess = dataToProcess.concat(
-        this.audioData.slice(this.lastProcessedArrayIndex + 1)
-      )
+    // Slice the first chunk from the last processed internal index
+    const firstChunk = this.audioData[this.lastProcessedArrayIndex]
+    if (firstChunk) {
+      dataToProcess.push(firstChunk.slice(this.lastProcessedInternalIndex))
+    }
 
-      if (dataToProcess.length > 0) {
-        const isAllSilent = dataToProcess.every((chunk) => this.isSilent(chunk))
-        if (!isAllSilent) {
-          // Calculate new indices before processing
-          const file = createAudioFile(dataToProcess, this.sampleRate, true)
-          const newLastProcessedArrayIndex = this.audioData.length
-          const newLastProcessedInternalIndex = 0
+    // Add the remaining chunks
+    dataToProcess.push(
+      ...this.audioData.slice(this.lastProcessedArrayIndex + 1)
+    )
 
-          const timestamp = await this.processorCallback({
-            data: file,
-            incomplete: isIncomplete,
-          })
+    if (dataToProcess.length === 0) return
 
-          if (timestamp && typeof timestamp === "string") {
-            const processedSeconds = parseTimestamp(timestamp)
-            if (processedSeconds !== undefined) {
-              const processedSamples = Math.floor(
-                processedSeconds * this.sampleRate
-              )
-              let totalSamples = this.lastProcessedInternalIndex
+    const isAllSilent = dataToProcess.every((chunk) => this.isSilent(chunk))
+    if (isAllSilent) return
 
-              // Find the new array and internal indices
-              for (
-                let i = this.lastProcessedArrayIndex;
-                i < this.audioData.length;
-                i++
-              ) {
-                const arrayLength = this.audioData[i]?.length ?? 0
-                if (totalSamples + arrayLength <= processedSamples) {
-                  totalSamples += arrayLength
-                  this.lastProcessedArrayIndex = i + 1
-                  this.lastProcessedInternalIndex = 0
-                } else {
-                  this.lastProcessedArrayIndex = i
-                  this.lastProcessedInternalIndex =
-                    processedSamples - totalSamples
-                  break
-                }
-              }
-            } else {
-              // Fallback if timestamp parsing fails
-              this.lastProcessedArrayIndex = newLastProcessedArrayIndex
-              this.lastProcessedInternalIndex = newLastProcessedInternalIndex
-            }
+    // Create an audio file from the data chunks
+    const file = createAudioFile(dataToProcess, this.sampleRate, isIncomplete)
+
+    // Store current indices before processing
+    const newLastProcessedArrayIndex = this.audioData.length
+    const newLastProcessedInternalIndex = 0
+
+    const timestamp = await this.processorCallback({
+      data: file,
+      incomplete: isIncomplete,
+    })
+
+    if (timestamp && typeof timestamp === "string") {
+      const processedSeconds = parseTimestamp(timestamp)
+      if (processedSeconds !== undefined) {
+        const processedSamples = Math.floor(processedSeconds * this.sampleRate)
+        let totalSamples = this.lastProcessedInternalIndex
+
+        for (
+          let i = this.lastProcessedArrayIndex;
+          i < this.audioData.length;
+          i++
+        ) {
+          const arrayLength = this.audioData[i]?.length ?? 0
+          if (totalSamples + arrayLength <= processedSamples) {
+            totalSamples += arrayLength
+            this.lastProcessedArrayIndex = i + 1
+            this.lastProcessedInternalIndex = 0
           } else {
-            // If no timestamp provided, use calculated indices
-            this.lastProcessedArrayIndex = newLastProcessedArrayIndex
-            this.lastProcessedInternalIndex = newLastProcessedInternalIndex
+            this.lastProcessedArrayIndex = i
+            this.lastProcessedInternalIndex = processedSamples - totalSamples
+            break
           }
         }
+      } else {
+        // Use new indices if timestamp parsing fails
+        this.lastProcessedArrayIndex = newLastProcessedArrayIndex
+        this.lastProcessedInternalIndex = newLastProcessedInternalIndex
       }
+    } else {
+      // Use new indices if no timestamp is provided
+      this.lastProcessedArrayIndex = newLastProcessedArrayIndex
+      this.lastProcessedInternalIndex = newLastProcessedInternalIndex
     }
   }
 
-  private async processAndCallback(
-    isIncomplete: boolean = true
-  ): Promise<void> {
-    if (this.isProcessing) {
-      return
-    }
+  private async processAndCallback(isIncomplete = true): Promise<void> {
+    if (this.isProcessing) return
 
     this.isProcessing = true
     try {
@@ -130,7 +121,7 @@ class AudioProcessorImpl implements AudioProcessor {
   }
 
   processAudioData(newData: Float32Array[]): void {
-    newData.forEach((chunk) => {
+    for (const chunk of newData) {
       if (this.isSilent(chunk)) {
         this.silenceCounter += chunk.length
         if (this.silenceCounter >= this.SILENCE_DURATION_THRESHOLD) {
@@ -140,9 +131,8 @@ class AudioProcessorImpl implements AudioProcessor {
       } else {
         this.silenceCounter = 0
       }
-
       this.audioData.push(chunk)
-    })
+    }
   }
 
   start(): void {
@@ -155,15 +145,12 @@ class AudioProcessorImpl implements AudioProcessor {
       this.processorTimer = null
     }
 
-    // Wait for any ongoing processing to complete, with a maximum number of attempts
-    let attempts = 0
-    const maxAttempts = 100 // Prevent infinite loops
-    while (this.isProcessing && attempts < maxAttempts) {
+    // Wait for any ongoing processing to complete
+    while (this.isProcessing) {
       await new Promise((resolve) => setTimeout(resolve, 10))
-      attempts++
     }
 
-    // Process any remaining data regardless of previous processing state
+    // Process any remaining data
     const hasUnprocessedData =
       this.lastProcessedArrayIndex < this.audioData.length ||
       (this.lastProcessedArrayIndex === this.audioData.length - 1 &&
@@ -219,44 +206,46 @@ const encodeWAV = (samples: Float32Array[], sampleRate: number): Blob => {
   const buffer = new ArrayBuffer(44 + bufferLength * 2)
   const view = new DataView(buffer)
 
+  // Write WAV header
   writeString(view, 0, "RIFF")
   view.setUint32(4, 36 + bufferLength * 2, true)
   writeString(view, 8, "WAVE")
   writeString(view, 12, "fmt ")
-  view.setUint32(16, 16, true)
-  view.setUint16(20, 1, true)
-  view.setUint16(22, 1, true)
-  view.setUint32(24, sampleRate, true)
-  view.setUint32(28, sampleRate * 2, true)
-  view.setUint16(32, 2, true)
-  view.setUint16(34, 16, true)
+  view.setUint32(16, 16, true) // Subchunk1Size (16 for PCM)
+  view.setUint16(20, 1, true) // AudioFormat (1 for PCM)
+  view.setUint16(22, 1, true) // NumChannels
+  view.setUint32(24, sampleRate, true) // SampleRate
+  view.setUint32(28, sampleRate * 2, true) // ByteRate
+  view.setUint16(32, 2, true) // BlockAlign
+  view.setUint16(34, 16, true) // BitsPerSample
   writeString(view, 36, "data")
-  view.setUint32(40, bufferLength * 2, true)
+  view.setUint32(40, bufferLength * 2, true) // Subchunk2Size
 
+  // Write audio samples
   let offset = 44
-  samples.forEach((sample) => {
+  for (const sample of samples) {
     for (let i = 0; i < sample.length; i++, offset += 2) {
       const s = Math.max(-1, Math.min(1, sample[i] ?? 0))
       view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7fff, true)
     }
-  })
+  }
 
   return new Blob([view], { type: "audio/wav" })
 }
 
-const writeString = (view: DataView, offset: number, string: string): void => {
-  for (let i = 0; i < string.length; i++) {
-    view.setUint8(offset + i, string.charCodeAt(i))
+const writeString = (view: DataView, offset: number, str: string): void => {
+  for (let i = 0; i < str.length; i++) {
+    view.setUint8(offset + i, str.charCodeAt(i))
   }
 }
 
 const parseTimestamp = (timestamp: string): number | undefined => {
   const [hms, millisecondsString] = timestamp.split(",")
-  if (!hms || !millisecondsString) {
-    return undefined
-  }
+  if (!hms || !millisecondsString) return undefined
+
   const [hours, minutes, seconds] = hms.split(":").map(Number)
   const milliseconds = Number(millisecondsString)
+
   if (
     hours === undefined ||
     minutes === undefined ||
@@ -265,7 +254,8 @@ const parseTimestamp = (timestamp: string): number | undefined => {
   ) {
     return undefined
   }
+
   const totalSeconds =
-    (hours * 60 + minutes) * 60 + seconds + milliseconds / 1000
+    hours * 3600 + minutes * 60 + seconds + milliseconds / 1000
   return totalSeconds
 }
