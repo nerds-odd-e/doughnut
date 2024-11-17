@@ -320,13 +320,19 @@ describe("AudioProcessor", () => {
       resolveProcessing = resolve
     })
 
-    const mockCallback = vi.fn().mockImplementation(async () => {
-      await processingPromise
-      return "00:00:00,500"
-    })
+    const mockCallback = vi
+      .fn()
+      .mockImplementationOnce(async () => {
+        await processingPromise
+        return "00:00:00,250" // Process 0.25 seconds
+      })
+      .mockImplementationOnce(async () => {
+        // Second call for remaining data
+        return undefined
+      })
 
     const processor = createAudioProcessor(44100, mockCallback)
-    const nonSilentData = new Float32Array(44100).fill(0.5)
+    const nonSilentData = new Float32Array(44100).fill(0.5) // 1 second of data
     processor.processAudioData([nonSilentData])
 
     // Start processing
@@ -340,16 +346,58 @@ describe("AudioProcessor", () => {
 
     // Advance timers to handle the interval in stop()
     await vi.advanceTimersByTimeAsync(20)
-
     await Promise.all([flushPromise, stopPromise])
 
-    // Should only process once, not twice
-    expect(mockCallback).toHaveBeenCalledTimes(1)
-    expect(mockCallback).toHaveBeenLastCalledWith(
+    // Should be called twice:
+    // 1. First call processes 0.25 seconds
+    // 2. Second call processes remaining 0.75 seconds
+    expect(mockCallback).toHaveBeenCalledTimes(2)
+    expect(mockCallback.mock.calls[1]?.[0]).toEqual(
       expect.objectContaining({
         incomplete: false,
       })
     )
+  })
+
+  it("should process remaining data when stopping during ongoing processing", async () => {
+    let resolveFirstProcessing: (() => void) | null = null
+    const firstProcessingPromise = new Promise<void>((resolve) => {
+      resolveFirstProcessing = resolve
+    })
+
+    const mockCallback = vi
+      .fn()
+      .mockImplementationOnce(async () => {
+        await firstProcessingPromise
+        return "00:00:00,500" // Process 0.5 seconds
+      })
+      .mockImplementationOnce(async () => {
+        return undefined
+      })
+
+    const processor = createAudioProcessor(44100, mockCallback)
+    const nonSilentData = new Float32Array(44100 * 2).fill(0.5)
+    processor.processAudioData([nonSilentData])
+
+    // Start processing first chunk
+    const processingPromise = processor.tryFlush()
+
+    // Give the first processing a chance to start
+    await vi.advanceTimersByTimeAsync(10)
+
+    // Start stopping while first processing is still ongoing
+    const stopPromise = processor.stop()
+
+    // Now resolve the first processing
+    resolveFirstProcessing!()
+
+    // Wait for everything to complete
+    await vi.advanceTimersByTimeAsync(100)
+    await Promise.all([processingPromise, stopPromise])
+
+    expect(mockCallback).toHaveBeenCalledTimes(2)
+    const lastCall = mockCallback.mock.calls[1]?.[0] as AudioChunk
+    expect(lastCall.incomplete).toBe(false)
   })
 
   it("should not process same data twice when stopping", async () => {

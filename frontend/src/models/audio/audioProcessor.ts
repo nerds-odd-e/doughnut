@@ -126,7 +126,7 @@ class AudioProcessorImpl implements AudioProcessor {
   private startTimer(): void {
     this.processorTimer = setInterval(() => {
       this.processAndCallback()
-    }, 60 * 1000)
+    }, 20 * 1000)
   }
 
   processAudioData(newData: Float32Array[]): void {
@@ -158,27 +158,24 @@ class AudioProcessorImpl implements AudioProcessor {
     // Wait for any ongoing processing to complete, with a maximum number of attempts
     let attempts = 0
     const maxAttempts = 100 // Prevent infinite loops
-    const wasProcessing = this.isProcessing
     while (this.isProcessing && attempts < maxAttempts) {
       await new Promise((resolve) => setTimeout(resolve, 10))
       attempts++
     }
 
-    // Only process if there was no ongoing processing
-    if (!wasProcessing) {
-      const hasUnprocessedData =
-        this.lastProcessedArrayIndex < this.audioData.length ||
-        (this.lastProcessedArrayIndex === this.audioData.length - 1 &&
-          this.lastProcessedInternalIndex <
-            (this.audioData[this.lastProcessedArrayIndex]?.length ?? 0))
+    // Process any remaining data regardless of previous processing state
+    const hasUnprocessedData =
+      this.lastProcessedArrayIndex < this.audioData.length ||
+      (this.lastProcessedArrayIndex === this.audioData.length - 1 &&
+        this.lastProcessedInternalIndex <
+          (this.audioData[this.lastProcessedArrayIndex]?.length ?? 0))
 
-      if (hasUnprocessedData) {
-        this.isProcessing = true
-        try {
-          await this.processDataChunk(false)
-        } finally {
-          this.isProcessing = false
-        }
+    if (hasUnprocessedData) {
+      this.isProcessing = true
+      try {
+        await this.processDataChunk(false)
+      } finally {
+        this.isProcessing = false
       }
     }
 
