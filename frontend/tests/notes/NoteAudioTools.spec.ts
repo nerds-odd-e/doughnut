@@ -651,4 +651,106 @@ describe("NoteAudioTools", () => {
 
     expect(result).toBe("00:00:37,270")
   })
+
+  describe("Fullscreen Mode", () => {
+    beforeEach(() => {
+      // Mock document fullscreen methods
+      document.documentElement.requestFullscreen = vi
+        .fn()
+        .mockResolvedValue(undefined)
+      document.documentElement.requestPointerLock = vi.fn()
+      document.exitFullscreen = vi.fn().mockResolvedValue(undefined)
+      document.exitPointerLock = vi.fn()
+
+      // Mock fullscreenElement and pointerLockElement
+      Object.defineProperty(document, "fullscreenElement", {
+        writable: true,
+        value: document.documentElement, // Set this to simulate being in fullscreen
+      })
+
+      Object.defineProperty(document, "pointerLockElement", {
+        writable: true,
+        value: document.documentElement, // Set this to simulate pointer being locked
+      })
+    })
+
+    it("shows fullscreen button in advanced options", async () => {
+      const advancedButton = findButtonByTitle(wrapper, "Advanced Options")
+      await advancedButton.trigger("click")
+
+      const fullscreenButton = findButtonByTitle(wrapper, "Toggle Full Screen")
+      expect(fullscreenButton.exists()).toBe(true)
+    })
+
+    it("enters fullscreen mode when button is clicked", async () => {
+      const advancedButton = findButtonByTitle(wrapper, "Advanced Options")
+      await advancedButton.trigger("click")
+
+      const fullscreenButton = findButtonByTitle(wrapper, "Toggle Full Screen")
+      await fullscreenButton.trigger("click")
+
+      expect(document.documentElement.requestFullscreen).toHaveBeenCalled()
+      expect(document.documentElement.requestPointerLock).toHaveBeenCalled()
+      expect(wrapper.vm.isFullscreen).toBe(true)
+      expect(wrapper.find(".fullscreen-overlay").exists()).toBe(true)
+    })
+
+    it("exits fullscreen mode when exit button is clicked", async () => {
+      // Enter fullscreen first
+      const advancedButton = findButtonByTitle(wrapper, "Advanced Options")
+      await advancedButton.trigger("click")
+      await findButtonByTitle(wrapper, "Toggle Full Screen").trigger("click")
+
+      const exitButton = wrapper.find(".exit-fullscreen-btn")
+      await exitButton.trigger("click")
+
+      expect(document.exitFullscreen).toHaveBeenCalled()
+      expect(document.exitPointerLock).toHaveBeenCalled()
+      expect(wrapper.vm.isFullscreen).toBe(false)
+      expect(wrapper.find(".fullscreen-overlay").exists()).toBe(false)
+    })
+
+    it("handles fullscreen request errors", async () => {
+      document.documentElement.requestFullscreen = vi
+        .fn()
+        .mockRejectedValue(new Error("Fullscreen error"))
+
+      const advancedButton = findButtonByTitle(wrapper, "Advanced Options")
+      await advancedButton.trigger("click")
+
+      const fullscreenButton = findButtonByTitle(wrapper, "Toggle Full Screen")
+      await fullscreenButton.trigger("click")
+
+      expect(wrapper.vm.errors).toEqual({
+        fullscreen: "Failed to enter full screen mode",
+      })
+    })
+
+    it("exits fullscreen mode on component unmount", async () => {
+      // Enter fullscreen first
+      const advancedButton = findButtonByTitle(wrapper, "Advanced Options")
+      await advancedButton.trigger("click")
+      await findButtonByTitle(wrapper, "Toggle Full Screen").trigger("click")
+
+      wrapper.unmount()
+
+      expect(document.exitFullscreen).toHaveBeenCalled()
+      expect(document.exitPointerLock).toHaveBeenCalled()
+    })
+
+    it("displays error message in fullscreen overlay when errors exist", async () => {
+      // Enter fullscreen first
+      const advancedButton = findButtonByTitle(wrapper, "Advanced Options")
+      await advancedButton.trigger("click")
+      await findButtonByTitle(wrapper, "Toggle Full Screen").trigger("click")
+
+      // Set an error
+      wrapper.vm.errors = { someError: "Test error message" }
+      await wrapper.vm.$nextTick()
+
+      const errorElement = wrapper.find(".fullscreen-error")
+      expect(errorElement.exists()).toBe(true)
+      expect(errorElement.text()).toContain("Test error message")
+    })
+  })
 })
