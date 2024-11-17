@@ -15,13 +15,15 @@ export interface AudioChunk {
 }
 
 class AudioProcessorImpl implements AudioProcessor {
+  private readonly SILENCE_THRESHOLD = 0.01
+  private readonly SILENCE_DURATION_THRESHOLD: number
+  private readonly PROCESSOR_INTERVAL = 20 * 1000 // 20 seconds
+
   private audioData: Float32Array[] = []
   private lastProcessedArrayIndex = 0
   private lastProcessedInternalIndex = 0
   private processorTimer: NodeJS.Timeout | null = null
   private silenceCounter = 0
-  private readonly SILENCE_THRESHOLD = 0.01
-  private readonly SILENCE_DURATION_THRESHOLD: number
   private isProcessing = false
 
   constructor(
@@ -42,67 +44,76 @@ class AudioProcessorImpl implements AudioProcessor {
   private async processDataChunk(isIncomplete = true): Promise<void> {
     if (this.audioData.length <= this.lastProcessedArrayIndex) return
 
-    const dataToProcess: Float32Array[] = []
+    const dataToProcess = this.getUnprocessedData()
+    if (dataToProcess.length === 0 || this.isAllSilent(dataToProcess)) return
 
-    // Slice the first chunk from the last processed internal index
-    const firstChunk = this.audioData[this.lastProcessedArrayIndex]
-    if (firstChunk) {
-      dataToProcess.push(firstChunk.slice(this.lastProcessedInternalIndex))
-    }
-
-    // Add the remaining chunks
-    dataToProcess.push(
-      ...this.audioData.slice(this.lastProcessedArrayIndex + 1)
-    )
-
-    if (dataToProcess.length === 0) return
-
-    const isAllSilent = dataToProcess.every((chunk) => this.isSilent(chunk))
-    if (isAllSilent) return
-
-    // Create an audio file from the data chunks
     const file = createAudioFile(dataToProcess, this.sampleRate, isIncomplete)
-
-    // Store current indices before processing
-    const newLastProcessedArrayIndex = this.audioData.length
-    const newLastProcessedInternalIndex = 0
+    const currentIndices = {
+      arrayIndex: this.audioData.length,
+      internalIndex: 0,
+    }
 
     const timestamp = await this.processorCallback({
       data: file,
       incomplete: isIncomplete,
     })
 
-    if (timestamp && typeof timestamp === "string") {
-      const processedSeconds = parseTimestamp(timestamp)
-      if (processedSeconds !== undefined) {
-        const processedSamples = Math.floor(processedSeconds * this.sampleRate)
-        let totalSamples = this.lastProcessedInternalIndex
+    this.updateProcessedIndices(timestamp, currentIndices)
+  }
 
-        for (
-          let i = this.lastProcessedArrayIndex;
-          i < this.audioData.length;
-          i++
-        ) {
-          const arrayLength = this.audioData[i]?.length ?? 0
-          if (totalSamples + arrayLength <= processedSamples) {
-            totalSamples += arrayLength
-            this.lastProcessedArrayIndex = i + 1
-            this.lastProcessedInternalIndex = 0
-          } else {
-            this.lastProcessedArrayIndex = i
-            this.lastProcessedInternalIndex = processedSamples - totalSamples
-            break
-          }
-        }
+  private getUnprocessedData(): Float32Array[] {
+    const dataToProcess: Float32Array[] = []
+    const firstChunk = this.audioData[this.lastProcessedArrayIndex]
+
+    if (firstChunk) {
+      dataToProcess.push(firstChunk.slice(this.lastProcessedInternalIndex))
+    }
+
+    dataToProcess.push(
+      ...this.audioData.slice(this.lastProcessedArrayIndex + 1)
+    )
+    return dataToProcess
+  }
+
+  private isAllSilent(chunks: Float32Array[]): boolean {
+    return chunks.every((chunk) => this.isSilent(chunk))
+  }
+
+  private updateProcessedIndices(
+    timestamp: string | undefined,
+    fallbackIndices: { arrayIndex: number; internalIndex: number }
+  ): void {
+    if (!timestamp) {
+      this.lastProcessedArrayIndex = fallbackIndices.arrayIndex
+      this.lastProcessedInternalIndex = fallbackIndices.internalIndex
+      return
+    }
+
+    const processedSeconds = parseTimestamp(timestamp)
+    if (processedSeconds === undefined) {
+      this.lastProcessedArrayIndex = fallbackIndices.arrayIndex
+      this.lastProcessedInternalIndex = fallbackIndices.internalIndex
+      return
+    }
+
+    this.calculateNewIndices(processedSeconds)
+  }
+
+  private calculateNewIndices(processedSeconds: number): void {
+    const processedSamples = Math.floor(processedSeconds * this.sampleRate)
+    let totalSamples = this.lastProcessedInternalIndex
+
+    for (let i = this.lastProcessedArrayIndex; i < this.audioData.length; i++) {
+      const arrayLength = this.audioData[i]?.length ?? 0
+      if (totalSamples + arrayLength <= processedSamples) {
+        totalSamples += arrayLength
+        this.lastProcessedArrayIndex = i + 1
+        this.lastProcessedInternalIndex = 0
       } else {
-        // Use new indices if timestamp parsing fails
-        this.lastProcessedArrayIndex = newLastProcessedArrayIndex
-        this.lastProcessedInternalIndex = newLastProcessedInternalIndex
+        this.lastProcessedArrayIndex = i
+        this.lastProcessedInternalIndex = processedSamples - totalSamples
+        break
       }
-    } else {
-      // Use new indices if no timestamp is provided
-      this.lastProcessedArrayIndex = newLastProcessedArrayIndex
-      this.lastProcessedInternalIndex = newLastProcessedInternalIndex
     }
   }
 
@@ -120,7 +131,7 @@ class AudioProcessorImpl implements AudioProcessor {
   private startTimer(): void {
     this.processorTimer = setInterval(() => {
       this.processAndCallback()
-    }, 20 * 1000)
+    }, this.PROCESSOR_INTERVAL)
   }
 
   processAudioData(newData: Float32Array[]): void {
