@@ -10,10 +10,10 @@ in mkShell {
   buildInputs = [
     python312
     poetry
-    nodejs_22
-    corepack_22
+    nodejs_23
+    corepack_23
     zsh
-    jdk22
+    jdk23
     git
     git-secret
     gitleaks
