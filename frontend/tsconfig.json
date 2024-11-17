@@ -30,7 +30,9 @@
   "files": [
     "./src/components/form/markdownizer.ts",
     "./src/managedApi/BindingHttpRequest.ts",
-    "./src/managedApi/ApiStatusHandler.ts"
+    "./src/managedApi/ApiStatusHandler.ts",
+    "./src/models/audio/parseTimestamp.ts",
+    "./src/models/audio/createAudioFile.ts"
   ],
   "include": [
     "src/**/*.ts",
