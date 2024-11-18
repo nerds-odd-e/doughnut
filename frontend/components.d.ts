@@ -40,6 +40,7 @@ declare module 'vue' {
     FeedbackForm: typeof import('./src/components/review/FeedbackForm.vue')['default']
     FileInput: typeof import('./src/components/form/FileInput.vue')['default']
     FineTuningData: typeof import('./src/components/admin/FineTuningData.vue')['default']
+    FullScreen: typeof import('./src/components/common/FullScreen.vue')['default']
     GlobalBar: typeof import('./src/components/toolbars/GlobalBar.vue')['default']
     GlobalSidebar: typeof import('./src/components/toolbars/GlobalSidebar.vue')['default']
     ImageFormBody: typeof import('./src/components/notes/accessory/ImageFormBody.vue')['default']

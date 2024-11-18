@@ -658,19 +658,21 @@ describe("NoteAudioTools", () => {
       document.documentElement.requestFullscreen = vi
         .fn()
         .mockResolvedValue(undefined)
-      document.documentElement.requestPointerLock = vi.fn()
       document.exitFullscreen = vi.fn().mockResolvedValue(undefined)
-      document.exitPointerLock = vi.fn()
 
-      // Mock fullscreenElement and pointerLockElement
+      // Create spy for exitPointerLock
+      document.exitPointerLock = vi.fn()
+      document.documentElement.requestPointerLock = vi.fn()
+
+      // Mock fullscreenElement and pointerLockElement getters
       Object.defineProperty(document, "fullscreenElement", {
-        writable: true,
-        value: document.documentElement, // Set this to simulate being in fullscreen
+        configurable: true,
+        get: () => document.documentElement,
       })
 
       Object.defineProperty(document, "pointerLockElement", {
-        writable: true,
-        value: document.documentElement, // Set this to simulate pointer being locked
+        configurable: true,
+        get: () => document.documentElement,
       })
     })
 
@@ -699,7 +701,9 @@ describe("NoteAudioTools", () => {
       // Enter fullscreen first
       const advancedButton = findButtonByTitle(wrapper, "Advanced Options")
       await advancedButton.trigger("click")
-      await findButtonByTitle(wrapper, "Toggle Full Screen").trigger("click")
+
+      const fullscreenButton = findButtonByTitle(wrapper, "Toggle Full Screen")
+      await fullscreenButton.trigger("click")
 
       const exitButton = wrapper.find(".exit-fullscreen-btn")
       await exitButton.trigger("click")
@@ -731,8 +735,11 @@ describe("NoteAudioTools", () => {
       const advancedButton = findButtonByTitle(wrapper, "Advanced Options")
       await advancedButton.trigger("click")
       await findButtonByTitle(wrapper, "Toggle Full Screen").trigger("click")
+      await flushPromises()
 
+      // Unmount and wait for promises to resolve
       wrapper.unmount()
+      await flushPromises()
 
       expect(document.exitFullscreen).toHaveBeenCalled()
       expect(document.exitPointerLock).toHaveBeenCalled()

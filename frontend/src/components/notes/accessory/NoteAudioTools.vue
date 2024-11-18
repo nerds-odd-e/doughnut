@@ -265,7 +265,7 @@ const toggleFullscreen = async () => {
     } catch (error) {
       console.error("Error entering fullscreen:", error)
       errors.value = { fullscreen: "Failed to enter full screen mode" }
-      throw error
+      return
     }
   } else {
     await exitFullscreen()
@@ -294,7 +294,7 @@ const exitFullscreen = async () => {
 
 onUnmounted(async () => {
   wakeLocker.release()
-  if (isFullscreen.value && document.fullscreenElement) {
+  if (isFullscreen.value) {
     await exitFullscreen()
   }
 })
