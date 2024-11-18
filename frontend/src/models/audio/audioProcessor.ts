@@ -47,7 +47,7 @@ class AudioProcessorImpl implements AudioProcessor {
     const dataToProcess = this.getUnprocessedData()
     if (dataToProcess.length === 0 || this.isAllSilent(dataToProcess)) return
 
-    const file = createAudioFile(dataToProcess, this.sampleRate, isIncomplete)
+    const file = createAudioFile(dataToProcess, this.sampleRate, true)
     const currentIndices = {
       arrayIndex: this.audioData.length,
       internalIndex: 0,
