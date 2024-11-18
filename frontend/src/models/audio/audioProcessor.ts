@@ -17,7 +17,7 @@ export interface AudioChunk {
 class AudioProcessorImpl implements AudioProcessor {
   private readonly SILENCE_THRESHOLD = 0.01
   private readonly SILENCE_DURATION_THRESHOLD: number
-  private readonly PROCESSOR_INTERVAL = 20 * 1000 // 20 seconds
+  private readonly PROCESSOR_INTERVAL = 60 * 1000 // 60 seconds
 
   private audioData: Float32Array[] = []
   private lastProcessedArrayIndex = 0
