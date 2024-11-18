@@ -200,7 +200,6 @@ const onDeviceChange = async (event: Event) => {
   try {
     await audioRecorder.switchAudioDevice(deviceId)
   } catch (error) {
-    console.error("Error switching audio device:", error)
     errors.value = { devices: "Failed to switch audio device" }
   }
 }
@@ -212,7 +211,6 @@ const startRecording = async () => {
     await audioRecorder.startRecording()
     isRecording.value = true
   } catch (error) {
-    console.error("Error starting recording:", error)
     errors.value = { recording: "Failed to start recording" }
     await wakeLocker.release()
   }
@@ -263,7 +261,6 @@ const toggleFullscreen = async () => {
       isFullscreen.value = true
       errors.value = {}
     } catch (error) {
-      console.error("Error entering fullscreen:", error)
       errors.value = { fullscreen: "Failed to enter full screen mode" }
       return
     }
@@ -284,7 +281,6 @@ const exitFullscreen = async () => {
       document.exitPointerLock()
     }
   } catch (error) {
-    console.error("Error exiting fullscreen:", error)
     errors.value = { fullscreen: "Failed to exit full screen mode" }
     throw error
   } finally {
