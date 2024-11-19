@@ -47,11 +47,11 @@ class AudioProcessorImpl implements AudioProcessor {
 
   private startTimer(): void {
     this.processorTimer = setInterval(() => {
-      this.processAndCallback()
+      this.processAndCallback(true)
     }, this.PROCESSOR_INTERVAL)
   }
 
-  private async processAndCallback(isMidSpeech = true): Promise<void> {
+  private async processAndCallback(isMidSpeech: boolean): Promise<void> {
     if (this.isProcessing) return
 
     this.isProcessing = true
@@ -102,7 +102,7 @@ class AudioProcessorImpl implements AudioProcessor {
       }
     }
 
-    return createAudioFile(this.audioBuffer.getAll(), this.sampleRate, false)
+    return this.audioBuffer.createFinalAudioFile()
   }
 
   getAudioData(): Float32Array[] {

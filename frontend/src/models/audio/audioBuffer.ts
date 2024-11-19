@@ -141,4 +141,8 @@ export class AudioBuffer {
     const processedSamples = Math.floor(processedSeconds * this.sampleRate)
     this.calculateNewIndices(processedSamples)
   }
+
+  createFinalAudioFile(): File {
+    return createAudioFile(this.audioData, this.sampleRate, false)
+  }
 }
