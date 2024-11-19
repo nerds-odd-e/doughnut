@@ -5,6 +5,7 @@ import { vi } from "vitest"
 import makeMe from "@tests/fixtures/makeMe"
 import type { TextFromAudioWithCallInfo } from "@/generated/backend"
 import type { AudioChunk } from "@/models/audio/audioProcessor"
+import FullScreen from "@/components/common/FullScreen.vue"
 
 const mockMediaStreamSource = {
   connect: vi.fn(),
@@ -652,112 +653,56 @@ describe("NoteAudioTools", () => {
     expect(result).toBe("00:00:37,270")
   })
 
-  describe("Fullscreen Mode", () => {
+  describe("Fullscreen Integration", () => {
     beforeEach(() => {
+      document.body.innerHTML = ""
+
       // Mock document fullscreen methods
       document.documentElement.requestFullscreen = vi
         .fn()
         .mockResolvedValue(undefined)
       document.exitFullscreen = vi.fn().mockResolvedValue(undefined)
-
-      // Create spy for exitPointerLock
       document.exitPointerLock = vi.fn()
       document.documentElement.requestPointerLock = vi.fn()
 
-      // Mock fullscreenElement and pointerLockElement getters
+      // Mock fullscreenElement
       Object.defineProperty(document, "fullscreenElement", {
         configurable: true,
         get: () => document.documentElement,
       })
-
-      Object.defineProperty(document, "pointerLockElement", {
-        configurable: true,
-        get: () => document.documentElement,
-      })
     })
 
-    it("shows fullscreen button in advanced options", async () => {
+    afterEach(() => {
+      document.body.innerHTML = ""
+    })
+
+    it("shows FullScreen component in advanced options", async () => {
       const advancedButton = findButtonByTitle(wrapper, "Advanced Options")
       await advancedButton.trigger("click")
 
-      const fullscreenButton = findButtonByTitle(wrapper, "Toggle Full Screen")
-      expect(fullscreenButton.exists()).toBe(true)
-    })
-
-    it("enters fullscreen mode when button is clicked", async () => {
-      const advancedButton = findButtonByTitle(wrapper, "Advanced Options")
-      await advancedButton.trigger("click")
-
-      const fullscreenButton = findButtonByTitle(wrapper, "Toggle Full Screen")
-      await fullscreenButton.trigger("click")
-
-      expect(document.documentElement.requestFullscreen).toHaveBeenCalled()
-      expect(document.documentElement.requestPointerLock).toHaveBeenCalled()
-      expect(wrapper.vm.isFullscreen).toBe(true)
-      expect(wrapper.find(".fullscreen-overlay").exists()).toBe(true)
-    })
-
-    it("exits fullscreen mode when exit button is clicked", async () => {
-      // Enter fullscreen first
-      const advancedButton = findButtonByTitle(wrapper, "Advanced Options")
-      await advancedButton.trigger("click")
-
-      const fullscreenButton = findButtonByTitle(wrapper, "Toggle Full Screen")
-      await fullscreenButton.trigger("click")
-
-      const exitButton = wrapper.find(".exit-fullscreen-btn")
-      await exitButton.trigger("click")
-
-      expect(document.exitFullscreen).toHaveBeenCalled()
-      expect(document.exitPointerLock).toHaveBeenCalled()
-      expect(wrapper.vm.isFullscreen).toBe(false)
-      expect(wrapper.find(".fullscreen-overlay").exists()).toBe(false)
-    })
-
-    it("handles fullscreen request errors", async () => {
-      document.documentElement.requestFullscreen = vi
-        .fn()
-        .mockRejectedValue(new Error("Fullscreen error"))
-
-      const advancedButton = findButtonByTitle(wrapper, "Advanced Options")
-      await advancedButton.trigger("click")
-
-      const fullscreenButton = findButtonByTitle(wrapper, "Toggle Full Screen")
-      await fullscreenButton.trigger("click")
-
-      expect(wrapper.vm.errors).toEqual({
-        fullscreen: "Failed to enter full screen mode",
-      })
-    })
-
-    it("exits fullscreen mode on component unmount", async () => {
-      // Enter fullscreen first
-      const advancedButton = findButtonByTitle(wrapper, "Advanced Options")
-      await advancedButton.trigger("click")
-      await findButtonByTitle(wrapper, "Toggle Full Screen").trigger("click")
-      await flushPromises()
-
-      // Unmount and wait for promises to resolve
-      wrapper.unmount()
-      await flushPromises()
-
-      expect(document.exitFullscreen).toHaveBeenCalled()
-      expect(document.exitPointerLock).toHaveBeenCalled()
+      expect(wrapper.findComponent(FullScreen).exists()).toBe(true)
     })
 
     it("displays error message in fullscreen overlay when errors exist", async () => {
-      // Enter fullscreen first
+      wrapper = helper
+        .component(NoteAudioTools)
+        .withStorageProps({ note })
+        .mount({ attachTo: document.body })
+
       const advancedButton = findButtonByTitle(wrapper, "Advanced Options")
       await advancedButton.trigger("click")
-      await findButtonByTitle(wrapper, "Toggle Full Screen").trigger("click")
 
       // Set an error
       wrapper.vm.errors = { someError: "Test error message" }
       await wrapper.vm.$nextTick()
 
-      const errorElement = wrapper.find(".fullscreen-error")
-      expect(errorElement.exists()).toBe(true)
-      expect(errorElement.text()).toContain("Test error message")
+      const fullscreenComponent = wrapper.findComponent(FullScreen)
+      await fullscreenComponent.find(".fullscreen-btn").trigger("click")
+      await wrapper.vm.$nextTick()
+
+      const errorElement = document.body.querySelector(".fullscreen-error")
+      expect(errorElement).toBeTruthy()
+      expect(errorElement?.textContent?.trim()).toBe("Test error message")
     })
   })
 })
