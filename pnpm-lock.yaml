@@ -15,8 +15,8 @@ importers:
   .:
     dependencies:
       '@cucumber/cucumber':
-        specifier: ^11.0.1
-        version: 11.0.1
+        specifier: ^11.1.0
+        version: 11.1.0
     devDependencies:
       '@anev/ts-mountebank':
         specifier: 1.8.0
@@ -446,9 +446,9 @@ packages:
   '@cucumber/cucumber-expressions@18.0.1':
     resolution: {integrity: sha512-NSid6bI+7UlgMywl5octojY5NXnxR9uq+JisjOrO52VbFsQM6gTWuQFE8syI10KnIBEdPzuEUSVEeZ0VFzRnZA==}
 
-  '@cucumber/cucumber@11.0.1':
-    resolution: {integrity: sha512-8ypR+tQiY0sZSzQ5WS+RIKL0rUI38skRuyIK0g/crP/JmDAovG6KNJ6t0YLnGQ43UofG9jR8HWt/EPz2mtZD0w==}
-    engines: {node: 18 || 20 || >=22}
+  '@cucumber/cucumber@11.1.0':
+    resolution: {integrity: sha512-INDycPL2AR1Ky3X+81n2MfChvVe8Z8we52GG6I0lld34755Dn3xsiM7a2g9eCr6wRX8+9vnOom1D7Pbc2238RQ==}
+    engines: {node: 18 || 20 || 22 || >=23}
     hasBin: true
 
   '@cucumber/gherkin-streams@5.0.1':
@@ -479,6 +479,11 @@ packages:
     peerDependencies:
       '@cucumber/messages': '>=18'
 
+  '@cucumber/junit-xml-formatter@0.6.0':
+    resolution: {integrity: sha512-++PAuxliQhq7yr2Bn9P0fwBUo46OoKAK5f6M4PrwoHBqIsl/6pUS4mqpviuBrgZ8RD7BTrmASk4lUDJClAz/qA==}
+    peerDependencies:
+      '@cucumber/messages': '*'
+
   '@cucumber/message-streams@4.0.1':
     resolution: {integrity: sha512-Kxap9uP5jD8tHUZVjTWgzxemi/0uOsbGjd4LBOSxcJoOCRbESFwemUzilJuzNTB8pcTQUh8D5oudUyxfkJOKmA==}
     peerDependencies:
@@ -497,6 +502,11 @@ packages:
     resolution: {integrity: sha512-A1lU4VVP0aUWdOTmpdzvXOyEYuPtBDI0xYwYJnmoMDplzxMdhcHk86lyyvYDoMoPzzq6OkOE3isuosvUU4X7IQ==}
     peerDependencies:
       '@cucumber/cucumber': '>=7.0.0'
+      '@cucumber/messages': '*'
+
+  '@cucumber/query@13.0.2':
+    resolution: {integrity: sha512-ykjwL99F5ZmJ3XnIRPe/eA8LvfSTc+C6ZZXrD5QrAfhfMRomBNpZT03MNnxrJ92ge18eDbculhclrIJQiVJCJg==}
+    peerDependencies:
       '@cucumber/messages': '*'
 
   '@cucumber/tag-expressions@6.1.0':
@@ -1415,6 +1425,9 @@ packages:
   assert-plus@1.0.0:
     resolution: {integrity: sha512-NfJ4UzBCcQGLDlQq7nHxH+tv3kyZ0hHQqF5BO6J7tNJeP5do1llPr8dZ8zHonfhAu0PHAdMkSo+8o0wxg9lZWw==}
     engines: {node: '>=0.8'}
+
+  assert@2.1.0:
+    resolution: {integrity: sha512-eLHpSK/Y4nhMJ07gDaAzoX/XAKS8PSaojml3M0DM4JpV1LAi5JOJ/p6H/XWrl8L+DzVEvVCW1z3vWAaB9oTsQw==}
 
   assertion-error-formatter@3.0.0:
     resolution: {integrity: sha512-6YyAVLrEze0kQ7CmJfUgrLHb+Y7XghmL2Ie7ijVa2Y9ynP3LV+VDiwFk62Dn0qtqbmY0BT0ss6p1xxpiF2PYbQ==}
@@ -2762,6 +2775,10 @@ packages:
 
   is-map@2.0.3:
     resolution: {integrity: sha512-1Qed0/Hr2m+YqxnM09CjA2d/i6YZNfF6R2oRAOj36eUdS6qIV/huPJNSEpKbupewFs+ZsJlxsjjPbc0/afW6Lw==}
+    engines: {node: '>= 0.4'}
+
+  is-nan@1.3.2:
+    resolution: {integrity: sha512-E+zBKpQ2t6MEo1VsonYmluk9NxGrbzpeeLC2xIViuO2EjU2xsXsBPwTr3Ykv9l08UYEVEdWeRZNouaZqF6RN0w==}
     engines: {node: '>= 0.4'}
 
   is-number-object@1.0.7:
@@ -5104,13 +5121,13 @@ snapshots:
   '@badeball/cypress-cucumber-preprocessor@21.0.3(@babel/core@7.26.0)(cypress@13.15.2)(typescript@5.6.3)':
     dependencies:
       '@cucumber/ci-environment': 10.0.1
-      '@cucumber/cucumber': 11.0.1
+      '@cucumber/cucumber': 11.1.0
       '@cucumber/cucumber-expressions': 18.0.1
       '@cucumber/gherkin': 30.0.4
       '@cucumber/html-formatter': 21.7.0(@cucumber/messages@27.0.2)
       '@cucumber/message-streams': 4.0.1(@cucumber/messages@27.0.2)
       '@cucumber/messages': 27.0.2
-      '@cucumber/pretty-formatter': 1.0.1(@cucumber/cucumber@11.0.1)(@cucumber/messages@27.0.2)
+      '@cucumber/pretty-formatter': 1.0.1(@cucumber/cucumber@11.1.0)(@cucumber/messages@27.0.2)
       '@cucumber/tag-expressions': 6.1.1
       base64-js: 1.5.1
       chalk: 4.1.2
@@ -5188,7 +5205,7 @@ snapshots:
     dependencies:
       regexp-match-indices: 1.0.2
 
-  '@cucumber/cucumber@11.0.1':
+  '@cucumber/cucumber@11.1.0':
     dependencies:
       '@cucumber/ci-environment': 10.0.1
       '@cucumber/cucumber-expressions': 17.1.0
@@ -5196,6 +5213,7 @@ snapshots:
       '@cucumber/gherkin-streams': 5.0.1(@cucumber/gherkin@28.0.0)(@cucumber/message-streams@4.0.1(@cucumber/messages@24.1.0))(@cucumber/messages@24.1.0)
       '@cucumber/gherkin-utils': 9.0.0
       '@cucumber/html-formatter': 21.6.0(@cucumber/messages@24.1.0)
+      '@cucumber/junit-xml-formatter': 0.6.0(@cucumber/messages@24.1.0)
       '@cucumber/message-streams': 4.0.1(@cucumber/messages@24.1.0)
       '@cucumber/messages': 24.1.0
       '@cucumber/tag-expressions': 6.1.0
@@ -5224,12 +5242,10 @@ snapshots:
       resolve-pkg: 2.0.0
       semver: 7.5.3
       string-argv: 0.3.1
-      strip-ansi: 6.0.1
       supports-color: 8.1.1
       tmp: 0.2.3
       type-fest: 4.27.0
       util-arity: 1.1.0
-      xmlbuilder: 15.1.1
       yaml: 2.6.0
       yup: 1.2.0
 
@@ -5265,6 +5281,13 @@ snapshots:
     dependencies:
       '@cucumber/messages': 27.0.2
 
+  '@cucumber/junit-xml-formatter@0.6.0(@cucumber/messages@24.1.0)':
+    dependencies:
+      '@cucumber/messages': 24.1.0
+      '@cucumber/query': 13.0.2(@cucumber/messages@24.1.0)
+      '@teppeis/multimaps': 3.0.0
+      xmlbuilder: 15.1.1
+
   '@cucumber/message-streams@4.0.1(@cucumber/messages@24.1.0)':
     dependencies:
       '@cucumber/messages': 24.1.0
@@ -5294,14 +5317,20 @@ snapshots:
       reflect-metadata: 0.2.2
       uuid: 10.0.0
 
-  '@cucumber/pretty-formatter@1.0.1(@cucumber/cucumber@11.0.1)(@cucumber/messages@27.0.2)':
+  '@cucumber/pretty-formatter@1.0.1(@cucumber/cucumber@11.1.0)(@cucumber/messages@27.0.2)':
     dependencies:
-      '@cucumber/cucumber': 11.0.1
+      '@cucumber/cucumber': 11.1.0
       '@cucumber/messages': 27.0.2
       ansi-styles: 5.2.0
       cli-table3: 0.6.5
       figures: 3.2.0
       ts-dedent: 2.2.0
+
+  '@cucumber/query@13.0.2(@cucumber/messages@24.1.0)':
+    dependencies:
+      '@cucumber/messages': 24.1.0
+      '@teppeis/multimaps': 3.0.0
+      assert: 2.1.0
 
   '@cucumber/tag-expressions@6.1.0': {}
 
@@ -6199,6 +6228,14 @@ snapshots:
       safer-buffer: 2.1.2
 
   assert-plus@1.0.0: {}
+
+  assert@2.1.0:
+    dependencies:
+      call-bind: 1.0.7
+      is-nan: 1.3.2
+      object-is: 1.1.6
+      object.assign: 4.1.5
+      util: 0.12.5
 
   assertion-error-formatter@3.0.0:
     dependencies:
@@ -7704,6 +7741,11 @@ snapshots:
   is-interactive@2.0.0: {}
 
   is-map@2.0.3: {}
+
+  is-nan@1.3.2:
+    dependencies:
+      call-bind: 1.0.7
+      define-properties: 1.2.1
 
   is-number-object@1.0.7:
     dependencies:

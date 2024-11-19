@@ -4,7 +4,7 @@
   "license": "MIT",
   "type": "module",
   "engines": {
-    "node": ">=22",
+    "node": ">=23",
     "pnpm": ">=9.13.2"
   },
   "scripts": {

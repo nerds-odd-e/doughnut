@@ -6,7 +6,7 @@
   "author": "Terry Yin <terry.yinzhe@gmail.com>",
   "license": "MIT",
   "engines": {
-    "node": ">=22",
+    "node": ">=23",
     "pnpm": ">=9.13.2"
   },
   "scripts": {
@@ -73,7 +73,7 @@
     "wait-on": "^8.0.1"
   },
   "dependencies": {
-    "@cucumber/cucumber": "^11.0.1"
+    "@cucumber/cucumber": "^11.1.0"
   },
   "resolutions": {
     "esbuild": "^0.24.0"
