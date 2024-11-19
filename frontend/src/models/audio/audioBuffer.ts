@@ -17,6 +17,11 @@ export class AudioBuffer {
   private audioData: Float32Array[] = []
   private lastProcessedArrayIndex = 0
   private lastProcessedInternalIndex = 0
+  private readonly sampleRate: number
+
+  constructor(sampleRate: number) {
+    this.sampleRate = sampleRate
+  }
 
   private isAllSilent(data: Float32Array[]): boolean {
     return data.every((chunk) => isSilent(chunk))
@@ -101,19 +106,16 @@ export class AudioBuffer {
     return dataToProcess
   }
 
-  tryGetProcessableData(sampleRate: number): File | null {
+  tryGetProcessableData(): File | null {
     if (this.hasNoUnprocessedData()) return null
 
     const dataToProcess = this.getProcessableData()
     if (!dataToProcess) return null
 
-    return createAudioFile(dataToProcess, sampleRate, true)
+    return createAudioFile(dataToProcess, this.sampleRate, true)
   }
 
-  updateProcessedIndices(
-    timestamp: string | undefined,
-    sampleRate: number
-  ): void {
+  updateProcessedIndices(timestamp: string | undefined): void {
     const fallbackIndices = {
       arrayIndex: this.length(),
       internalIndex: 0,
@@ -136,7 +138,7 @@ export class AudioBuffer {
       return
     }
 
-    const processedSamples = Math.floor(processedSeconds * sampleRate)
+    const processedSamples = Math.floor(processedSeconds * this.sampleRate)
     this.calculateNewIndices(processedSamples)
   }
 }
