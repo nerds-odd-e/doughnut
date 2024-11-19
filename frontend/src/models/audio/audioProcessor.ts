@@ -37,8 +37,7 @@ class AudioProcessorImpl implements AudioProcessor {
   private async processDataChunk(isMidSpeech = true): Promise<void> {
     const file = this.audioBuffer.tryGetProcessableData(
       this.SILENCE_THRESHOLD,
-      this.sampleRate,
-      true
+      this.sampleRate
     )
     if (!file) return
 

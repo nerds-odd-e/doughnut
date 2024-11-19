@@ -40,10 +40,10 @@ const writeString = (view: DataView, offset: number, str: string): void => {
 export const createAudioFile = (
   data: Float32Array[],
   sampleRate: number,
-  isPartial: boolean
+  isNotFullRecord: boolean
 ): File => {
   const wavBlob = encodeWAV(data, sampleRate)
   const timestamp = new Date().toISOString()
-  const fileName = `recorded_audio_${isPartial ? "partial_" : ""}${timestamp}.wav`
+  const fileName = `recorded_audio_${isNotFullRecord ? "partial_" : ""}${timestamp}.wav`
   return new File([wavBlob], fileName, { type: "audio/wav" })
 }

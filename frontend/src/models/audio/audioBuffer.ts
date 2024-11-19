@@ -103,14 +103,13 @@ export class AudioBuffer {
 
   tryGetProcessableData(
     silenceThreshold: number,
-    sampleRate: number,
-    isPartial: boolean
+    sampleRate: number
   ): File | null {
     if (this.hasNoUnprocessedData()) return null
 
     const dataToProcess = this.getProcessableData(silenceThreshold)
     if (!dataToProcess) return null
 
-    return createAudioFile(dataToProcess, sampleRate, isPartial)
+    return createAudioFile(dataToProcess, sampleRate, true)
   }
 }
