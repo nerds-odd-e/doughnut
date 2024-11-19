@@ -596,7 +596,7 @@ describe("NoteAudioTools", () => {
     })
   })
 
-  describe("Audio processing with incomplete flag", () => {
+  describe("Audio processing with isMidSpeech flag", () => {
     let audioToTextForNoteMock: ReturnType<typeof vi.fn>
 
     beforeEach(() => {
@@ -612,18 +612,18 @@ describe("NoteAudioTools", () => {
         audioToTextForNoteMock
     })
 
-    it("should pass incomplete=true when processing timer-triggered chunk", async () => {
+    it("should pass isMidSpeech=true when processing timer-triggered chunk", async () => {
       const testBlob2 = new Blob(["test2"])
       await wrapper.vm.processAudio(<AudioChunk>{
         data: testBlob2,
-        incomplete: true,
+        isMidSpeech: true,
       })
       await flushPromises()
 
       expect(audioToTextForNoteMock).toHaveBeenCalledWith(
         expect.any(Number),
         expect.objectContaining({
-          incomplete: true,
+          isMidSpeech: true,
         })
       )
     })
@@ -647,7 +647,7 @@ describe("NoteAudioTools", () => {
     const testBlob = new Blob(["test"])
     const result = await wrapper.vm.processAudio({
       data: testBlob,
-      incomplete: true,
+      isMidSpeech: true,
     })
 
     expect(result).toBe("00:00:37,270")

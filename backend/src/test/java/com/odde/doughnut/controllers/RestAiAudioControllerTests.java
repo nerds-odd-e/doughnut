@@ -136,7 +136,7 @@ class RestAiAudioControllerTests {
 
     @Test
     void shouldTruncateSRTWhenIncomplete() throws IOException {
-      audioUploadDTO.setIncomplete(true);
+      audioUploadDTO.setMidSpeech(true);
       mockTranscriptionSrtResponse(
           "1\n00:00:00,000 --> 00:00:03,000\nFirst segment\n\n"
               + "2\n00:00:03,000 --> 00:00:06,000\nSecond segment\n\n"
@@ -152,7 +152,7 @@ class RestAiAudioControllerTests {
 
     @Test
     void shouldNotTruncateSRTWhenComplete() throws IOException {
-      audioUploadDTO.setIncomplete(false);
+      audioUploadDTO.setMidSpeech(false);
       String fullSRT =
           "1\n00:00:00,000 --> 00:00:03,000\nFirst segment\n\n"
               + "2\n00:00:03,000 --> 00:00:06,000\nSecond segment\n\n"
@@ -364,7 +364,7 @@ class RestAiAudioControllerTests {
 
     @Test
     void shouldTruncateSRTWhenIncompleteForNote() throws IOException {
-      audioUploadDTO.setIncomplete(true);
+      audioUploadDTO.setMidSpeech(true);
       mockTranscriptionSrtResponse(
           "1\n00:00:00,000 --> 00:00:03,000\nFirst segment\n\n"
               + "2\n00:00:03,000 --> 00:00:06,000\nSecond segment\n\n"

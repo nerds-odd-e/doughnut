@@ -86,7 +86,7 @@ describe("AudioProcessor", () => {
     expect(mockCallback).toHaveBeenCalledTimes(1)
     expect(mockCallback).toHaveBeenLastCalledWith(
       expect.objectContaining({
-        incomplete: false,
+        isMidSpeech: false,
       })
     )
 
@@ -103,7 +103,7 @@ describe("AudioProcessor", () => {
     expect(mockCallback).toHaveBeenCalledTimes(1)
     expect(mockCallback).toHaveBeenLastCalledWith(
       expect.objectContaining({
-        incomplete: true,
+        isMidSpeech: true,
       })
     )
 
@@ -144,7 +144,7 @@ describe("AudioProcessor", () => {
     expect(mockCallback).not.toHaveBeenCalled()
   })
 
-  it("should mark chunk as incomplete when processing due to timer", async () => {
+  it("should mark chunk as isMidSpeech when processing due to timer", async () => {
     const mockCallback = vi.fn().mockResolvedValue(undefined)
     const processor = createAudioProcessor(44100, mockCallback)
 
@@ -157,7 +157,7 @@ describe("AudioProcessor", () => {
 
     expect(mockCallback).toHaveBeenCalledWith(
       expect.objectContaining({
-        incomplete: true,
+        isMidSpeech: true,
         data: expect.any(File),
       })
     )
@@ -175,13 +175,13 @@ describe("AudioProcessor", () => {
 
     expect(mockCallback).toHaveBeenLastCalledWith(
       expect.objectContaining({
-        incomplete: false,
+        isMidSpeech: false,
         data: expect.any(File),
       })
     )
   })
 
-  it("should mark chunk as not incomplete when silence triggers callback", async () => {
+  it("should mark chunk as not isMidSpeech when silence triggers callback", async () => {
     const mockCallback = vi.fn().mockResolvedValue(undefined)
     const processor = createAudioProcessor(44100, mockCallback)
 
@@ -197,7 +197,7 @@ describe("AudioProcessor", () => {
 
     expect(mockCallback).toHaveBeenCalledWith(
       expect.objectContaining({
-        incomplete: false,
+        isMidSpeech: false,
         data: expect.any(File),
       })
     )
@@ -354,7 +354,7 @@ describe("AudioProcessor", () => {
     expect(mockCallback).toHaveBeenCalledTimes(2)
     expect(mockCallback.mock.calls[1]?.[0]).toEqual(
       expect.objectContaining({
-        incomplete: false,
+        isMidSpeech: false,
       })
     )
   })
@@ -397,7 +397,7 @@ describe("AudioProcessor", () => {
 
     expect(mockCallback).toHaveBeenCalledTimes(2)
     const lastCall = mockCallback.mock.calls[1]?.[0] as AudioChunk
-    expect(lastCall.incomplete).toBe(false)
+    expect(lastCall.isMidSpeech).toBe(false)
   })
 
   it("should not process same data twice when stopping", async () => {

@@ -47,7 +47,7 @@ class RestAiAudioController {
 
     SRTProcessor srtProcessor = new SRTProcessor();
     SRTProcessor.SRTProcessingResult processedResult =
-        srtProcessor.process(transcriptionFromAudio, audioFile.isIncomplete());
+        srtProcessor.process(transcriptionFromAudio, audioFile.isMidSpeech());
 
     return otherAiServices
         .getTextFromAudio(
@@ -75,7 +75,7 @@ class RestAiAudioController {
     String transcriptionFromAudio = otherAiServices.getTranscriptionFromAudio(filename, bytes);
     SRTProcessor srtProcessor = new SRTProcessor();
     SRTProcessor.SRTProcessingResult processedResult =
-        srtProcessor.process(transcriptionFromAudio, audioUpload.isIncomplete());
+        srtProcessor.process(transcriptionFromAudio, audioUpload.isMidSpeech());
     TextFromAudioWithCallInfo textFromAudioWithCallInfo =
         notebookAssistantForNoteServiceFactory
             .create(note)

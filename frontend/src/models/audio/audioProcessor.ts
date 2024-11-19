@@ -12,7 +12,7 @@ export interface AudioProcessor {
 
 export interface AudioChunk {
   data: File
-  incomplete: boolean
+  isMidSpeech: boolean
 }
 
 class AudioProcessorImpl implements AudioProcessor {
@@ -34,7 +34,7 @@ class AudioProcessorImpl implements AudioProcessor {
     this.SILENCE_DURATION_THRESHOLD = 3 * this.sampleRate
   }
 
-  private async processDataChunk(isIncomplete = true): Promise<void> {
+  private async processDataChunk(isMidSpeech = true): Promise<void> {
     const file = this.audioBuffer.tryGetProcessableData(
       this.SILENCE_THRESHOLD,
       this.sampleRate,
@@ -49,7 +49,7 @@ class AudioProcessorImpl implements AudioProcessor {
 
     const timestamp = await this.processorCallback({
       data: file,
-      incomplete: isIncomplete,
+      isMidSpeech,
     })
 
     this.updateProcessedIndices(timestamp, currentIndices)
@@ -86,12 +86,12 @@ class AudioProcessorImpl implements AudioProcessor {
     }, this.PROCESSOR_INTERVAL)
   }
 
-  private async processAndCallback(isIncomplete = true): Promise<void> {
+  private async processAndCallback(isMidSpeech = true): Promise<void> {
     if (this.isProcessing) return
 
     this.isProcessing = true
     try {
-      await this.processDataChunk(isIncomplete)
+      await this.processDataChunk(isMidSpeech)
     } finally {
       this.isProcessing = false
     }

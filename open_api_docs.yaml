@@ -3746,7 +3746,7 @@ components:
           type: string
         toolCallId:
           type: string
-        incomplete:
+        isMidSpeech:
           type: boolean
     TextFromAudioWithCallInfo:
       type: object
