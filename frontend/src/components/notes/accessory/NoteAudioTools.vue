@@ -69,11 +69,9 @@
         />
       </div>
       <FullScreen>
-        <template #error>
-          <div v-if="errors" class="fullscreen-error">
-            {{ Object.values(errors)[0] }}
-          </div>
-        </template>
+        <div v-if="errors" class="fullscreen-error">
+          {{ Object.values(errors)[0] }}
+        </div>
       </FullScreen>
     </div>
   </div>

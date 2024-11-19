@@ -10,7 +10,7 @@
         <button class="exit-fullscreen-btn" @click="exitFullscreen">
           Exit Full Screen
         </button>
-        <slot name="error"></slot>
+        <slot></slot>
       </div>
     </Teleport>
   </div>

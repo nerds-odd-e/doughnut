@@ -95,13 +95,11 @@ describe("FullScreen", () => {
     expect(document.exitPointerLock).toHaveBeenCalled()
   })
 
-  it("renders error slot content when in fullscreen", async () => {
+  it("renders slot content when in fullscreen", async () => {
     const TestComponent = {
       template: `
         <FullScreen>
-          <template #error>
-            <div class="test-error">Test Error Message</div>
-          </template>
+          <div class="test-error">Test Error Message</div>
         </FullScreen>
       `,
       components: { FullScreen },
