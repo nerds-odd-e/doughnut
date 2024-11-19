@@ -1,4 +1,4 @@
-export const parseTimestamp = (timestamp: string): number | undefined => {
+export const timestampToSeconds = (timestamp: string): number | undefined => {
   const [hms, millisecondsString] = timestamp.split(",")
   if (!hms || !millisecondsString) return undefined
 

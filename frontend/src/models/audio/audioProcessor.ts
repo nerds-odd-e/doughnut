@@ -1,5 +1,5 @@
 import { createAudioFile } from "./createAudioFile"
-import { parseTimestamp } from "./parseTimestamp"
+import { timestampToSeconds } from "./parseTimestamp"
 import { AudioBuffer, isSilent } from "./audioBuffer"
 
 export interface AudioProcessor {
@@ -63,7 +63,7 @@ class AudioProcessorImpl implements AudioProcessor {
       return
     }
 
-    const processedSeconds = parseTimestamp(timestamp)
+    const processedSeconds = timestampToSeconds(timestamp)
     if (processedSeconds === undefined) {
       this.audioBuffer.updateProcessedPosition(
         fallbackIndices.arrayIndex,
