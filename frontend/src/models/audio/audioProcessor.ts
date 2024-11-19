@@ -1,6 +1,6 @@
 import { createAudioFile } from "./createAudioFile"
 import { parseTimestamp } from "./parseTimestamp"
-import { AudioBuffer } from "./audioBuffer"
+import { AudioBuffer, isSilent, isAllSilent } from "./audioBuffer"
 
 export interface AudioProcessor {
   processAudioData(newData: Float32Array[]): void
@@ -34,17 +34,15 @@ class AudioProcessorImpl implements AudioProcessor {
     this.SILENCE_DURATION_THRESHOLD = 3 * this.sampleRate
   }
 
-  private isSilent(data: Float32Array): boolean {
-    const sum = data.reduce((acc, val) => acc + Math.abs(val), 0)
-    const avg = sum / data.length
-    return avg < this.SILENCE_THRESHOLD
-  }
-
   private async processDataChunk(isIncomplete = true): Promise<void> {
     if (this.audioBuffer.hasNoUnprocessedData()) return
 
     const dataToProcess = this.audioBuffer.getUnprocessedData()
-    if (dataToProcess.length === 0 || this.isAllSilent(dataToProcess)) return
+    if (
+      dataToProcess.length === 0 ||
+      isAllSilent(dataToProcess, this.SILENCE_THRESHOLD)
+    )
+      return
 
     const file = createAudioFile(dataToProcess, this.sampleRate, true)
     const currentIndices = {
@@ -85,10 +83,6 @@ class AudioProcessorImpl implements AudioProcessor {
     this.audioBuffer.calculateNewIndices(processedSamples)
   }
 
-  private isAllSilent(chunks: Float32Array[]): boolean {
-    return chunks.every((chunk) => this.isSilent(chunk))
-  }
-
   private startTimer(): void {
     this.processorTimer = setInterval(() => {
       this.processAndCallback()
@@ -108,7 +102,7 @@ class AudioProcessorImpl implements AudioProcessor {
 
   processAudioData(newData: Float32Array[]): void {
     for (const chunk of newData) {
-      if (this.isSilent(chunk)) {
+      if (isSilent(chunk, this.SILENCE_THRESHOLD)) {
         this.silenceCounter += chunk.length
         if (this.silenceCounter >= this.SILENCE_DURATION_THRESHOLD) {
           this.tryFlush()

@@ -1,3 +1,16 @@
+export function isSilent(data: Float32Array, threshold: number): boolean {
+  const sum = data.reduce((acc, val) => acc + Math.abs(val), 0)
+  const avg = sum / data.length
+  return avg < threshold
+}
+
+export function isAllSilent(
+  chunks: Float32Array[],
+  threshold: number
+): boolean {
+  return chunks.every((chunk) => isSilent(chunk, threshold))
+}
+
 export class AudioBuffer {
   private audioData: Float32Array[] = []
   private lastProcessedArrayIndex = 0
