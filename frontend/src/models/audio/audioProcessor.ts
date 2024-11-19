@@ -41,11 +41,7 @@ class AudioProcessorImpl implements AudioProcessor {
   }
 
   private async processDataChunk(isIncomplete = true): Promise<void> {
-    if (
-      this.audioBuffer.length() <=
-      this.audioBuffer.getCurrentPosition().arrayIndex
-    )
-      return
+    if (this.audioBuffer.hasNoUnprocessedData()) return
 
     const dataToProcess = this.audioBuffer.getUnprocessedData()
     if (dataToProcess.length === 0 || this.isAllSilent(dataToProcess)) return

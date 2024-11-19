@@ -60,10 +60,14 @@ export class AudioBuffer {
     return this.audioData.length
   }
 
-  getCurrentPosition(): { arrayIndex: number; internalIndex: number } {
+  private getCurrentPosition(): { arrayIndex: number; internalIndex: number } {
     return {
       arrayIndex: this.lastProcessedArrayIndex,
       internalIndex: this.lastProcessedInternalIndex,
     }
+  }
+
+  public hasNoUnprocessedData(): boolean {
+    return this.length() <= this.getCurrentPosition().arrayIndex
   }
 }

@@ -24,14 +24,10 @@ const isFullscreen = ref(false)
 
 const toggleFullscreen = async () => {
   if (!isFullscreen.value) {
-    try {
-      await document.documentElement.requestFullscreen()
-      document.documentElement.requestPointerLock()
-      isFullscreen.value = true
-      emit("fullscreenChange", true)
-    } catch (error) {
-      console.error("Failed to enter fullscreen:", error)
-    }
+    await document.documentElement.requestFullscreen()
+    document.documentElement.requestPointerLock()
+    isFullscreen.value = true
+    emit("fullscreenChange", true)
   } else {
     await exitFullscreen()
   }
@@ -47,8 +43,6 @@ const exitFullscreen = async () => {
     if (document.pointerLockElement) {
       document.exitPointerLock()
     }
-  } catch (error) {
-    console.error("Failed to exit fullscreen:", error)
   } finally {
     isFullscreen.value = false
     emit("fullscreenChange", false)
