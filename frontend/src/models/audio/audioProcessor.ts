@@ -1,5 +1,4 @@
-import { createAudioFile } from "./createAudioFile"
-import { AudioBuffer, isSilent } from "./audioBuffer"
+import { AudioBuffer } from "./audioBuffer"
 
 export interface AudioProcessor {
   processAudioData(newData: Float32Array[]): void
@@ -15,11 +14,9 @@ export interface AudioChunk {
 }
 
 class AudioProcessorImpl implements AudioProcessor {
-  private readonly SILENCE_DURATION_THRESHOLD: number
   private readonly PROCESSOR_INTERVAL = 60 * 1000 // 60 seconds
 
   private processorTimer: NodeJS.Timeout | null = null
-  private silenceCounter = 0
   private isProcessing = false
 
   constructor(
@@ -27,9 +24,7 @@ class AudioProcessorImpl implements AudioProcessor {
     private readonly processorCallback: (
       chunk: AudioChunk
     ) => Promise<string | undefined>
-  ) {
-    this.SILENCE_DURATION_THRESHOLD = 3 * audioBuffer.sampleRate
-  }
+  ) {}
 
   private async processDataChunk(isMidSpeech = true): Promise<void> {
     const file = this.audioBuffer.tryGetProcessableData()
@@ -62,16 +57,7 @@ class AudioProcessorImpl implements AudioProcessor {
 
   processAudioData(newData: Float32Array[]): void {
     for (const chunk of newData) {
-      if (isSilent(chunk)) {
-        this.silenceCounter += chunk.length
-        if (this.silenceCounter >= this.SILENCE_DURATION_THRESHOLD) {
-          this.tryFlush()
-          this.silenceCounter = 0
-        }
-      } else {
-        this.silenceCounter = 0
-      }
-      this.audioBuffer.push(chunk)
+      this.audioBuffer.processNewChunk(chunk, () => this.tryFlush())
     }
   }
 

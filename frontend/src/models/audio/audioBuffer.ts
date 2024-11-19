@@ -14,13 +14,16 @@ export function isAllSilent(chunks: Float32Array[]): boolean {
 }
 
 export class AudioBuffer {
+  private readonly SILENCE_DURATION_THRESHOLD: number
   private audioData: Float32Array[] = []
   private lastProcessedArrayIndex = 0
   private lastProcessedInternalIndex = 0
   public readonly sampleRate: number
+  public silenceCounter = 0
 
   constructor(sampleRate: number) {
     this.sampleRate = sampleRate
+    this.SILENCE_DURATION_THRESHOLD = 3 * sampleRate
   }
 
   private isAllSilent(data: Float32Array[]): boolean {
@@ -144,5 +147,21 @@ export class AudioBuffer {
 
   createFinalAudioFile(): File {
     return createAudioFile(this.audioData, this.sampleRate, false)
+  }
+
+  processNewChunk(
+    chunk: Float32Array,
+    onSilenceThresholdReached: () => void
+  ): void {
+    if (isSilent(chunk)) {
+      this.silenceCounter += chunk.length
+      if (this.silenceCounter >= this.SILENCE_DURATION_THRESHOLD) {
+        onSilenceThresholdReached()
+        this.silenceCounter = 0
+      }
+    } else {
+      this.silenceCounter = 0
+    }
+    this.push(chunk)
   }
 }
