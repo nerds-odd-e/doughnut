@@ -41,23 +41,20 @@ class AudioProcessorImpl implements AudioProcessor {
     )
     if (!file) return
 
-    const currentIndices = {
-      arrayIndex: this.audioBuffer.length(),
-      internalIndex: 0,
-    }
-
     const timestamp = await this.processorCallback({
       data: file,
       isMidSpeech,
     })
 
-    this.updateProcessedIndices(timestamp, currentIndices)
+    this.updateProcessedIndices(timestamp)
   }
 
-  private updateProcessedIndices(
-    timestamp: string | undefined,
-    fallbackIndices: { arrayIndex: number; internalIndex: number }
-  ): void {
+  private updateProcessedIndices(timestamp: string | undefined): void {
+    const fallbackIndices = {
+      arrayIndex: this.audioBuffer.length(),
+      internalIndex: 0,
+    }
+
     if (!timestamp) {
       this.audioBuffer.updateProcessedPosition(
         fallbackIndices.arrayIndex,
