@@ -11,6 +11,30 @@ import {
 } from "@/generated/backend"
 import { flushPromises } from "@vue/test-utils"
 
+class MockIntersectionObserver {
+  readonly root: Element | null = null
+  readonly rootMargin: string = "0px"
+  readonly thresholds: ReadonlyArray<number> = [0]
+
+  observe = vi.fn()
+  unobserve = vi.fn()
+  disconnect = vi.fn()
+  takeRecords = vi.fn().mockReturnValue([])
+}
+
+beforeAll(() => {
+  // Mock IntersectionObserver
+  global.IntersectionObserver = MockIntersectionObserver
+
+  // Mock window.performance
+  Object.defineProperty(window, "performance", {
+    value: {
+      now: () => Date.now(),
+    },
+    configurable: true,
+  })
+})
+
 const simulateAiResponse = (content = "## I'm ChatGPT") => {
   const newMessage: Message = {
     role: "assistant",
