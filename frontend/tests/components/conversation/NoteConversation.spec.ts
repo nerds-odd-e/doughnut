@@ -13,8 +13,26 @@ vitest.mock("vue-router", () => ({
   }),
 }))
 
+// At the top of the file, add these mocks
+const mockIntersectionObserver = vi.fn()
+mockIntersectionObserver.mockReturnValue({
+  observe: () => null,
+  unobserve: () => null,
+  disconnect: () => null,
+})
+
+vi.stubGlobal("IntersectionObserver", mockIntersectionObserver)
+
+// Add window.performance mock
+const mockPerformance = {
+  now: vi.fn(() => Date.now()),
+}
+vi.stubGlobal("performance", mockPerformance)
+
 afterEach(() => {
+  vi.clearAllMocks()
   vi.clearAllTimers()
+  vi.useRealTimers() // Restore real timers
 })
 
 describe("NoteConversation", () => {
@@ -35,7 +53,8 @@ describe("NoteConversation", () => {
   }
 
   beforeEach(() => {
-    window.HTMLElement.prototype.scrollIntoView = vitest.fn()
+    window.HTMLElement.prototype.scrollIntoView = vi.fn()
+    vi.useFakeTimers() // Use fake timers to control timing
   })
 
   beforeEach(() => {
