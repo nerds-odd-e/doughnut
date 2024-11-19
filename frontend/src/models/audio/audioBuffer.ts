@@ -1,3 +1,5 @@
+import { createAudioFile } from "./createAudioFile"
+
 export function isSilent(data: Float32Array, threshold: number): boolean {
   const sum = data.reduce((acc, val) => acc + Math.abs(val), 0)
   const avg = sum / data.length
@@ -16,7 +18,11 @@ export class AudioBuffer {
   private lastProcessedArrayIndex = 0
   private lastProcessedInternalIndex = 0
 
-  getUnprocessedData(): Float32Array[] {
+  private isAllSilent(data: Float32Array[], threshold: number): boolean {
+    return data.every((chunk) => isSilent(chunk, threshold))
+  }
+
+  private getUnprocessedData(): Float32Array[] {
     const dataToProcess: Float32Array[] = []
     const firstChunk = this.audioData[this.lastProcessedArrayIndex]
 
@@ -80,7 +86,31 @@ export class AudioBuffer {
     }
   }
 
-  public hasNoUnprocessedData(): boolean {
+  private hasNoUnprocessedData(): boolean {
     return this.length() <= this.getCurrentPosition().arrayIndex
+  }
+
+  private getProcessableData(silenceThreshold: number): Float32Array[] | null {
+    const dataToProcess = this.getUnprocessedData()
+    if (
+      dataToProcess.length === 0 ||
+      this.isAllSilent(dataToProcess, silenceThreshold)
+    ) {
+      return null
+    }
+    return dataToProcess
+  }
+
+  tryGetProcessableData(
+    silenceThreshold: number,
+    sampleRate: number,
+    isPartial: boolean
+  ): File | null {
+    if (this.hasNoUnprocessedData()) return null
+
+    const dataToProcess = this.getProcessableData(silenceThreshold)
+    if (!dataToProcess) return null
+
+    return createAudioFile(dataToProcess, sampleRate, isPartial)
   }
 }

@@ -1,6 +1,6 @@
 import { createAudioFile } from "./createAudioFile"
 import { parseTimestamp } from "./parseTimestamp"
-import { AudioBuffer, isSilent, isAllSilent } from "./audioBuffer"
+import { AudioBuffer, isSilent } from "./audioBuffer"
 
 export interface AudioProcessor {
   processAudioData(newData: Float32Array[]): void
@@ -35,16 +35,13 @@ class AudioProcessorImpl implements AudioProcessor {
   }
 
   private async processDataChunk(isIncomplete = true): Promise<void> {
-    if (this.audioBuffer.hasNoUnprocessedData()) return
-
-    const dataToProcess = this.audioBuffer.getUnprocessedData()
-    if (
-      dataToProcess.length === 0 ||
-      isAllSilent(dataToProcess, this.SILENCE_THRESHOLD)
+    const file = this.audioBuffer.tryGetProcessableData(
+      this.SILENCE_THRESHOLD,
+      this.sampleRate,
+      true
     )
-      return
+    if (!file) return
 
-    const file = createAudioFile(dataToProcess, this.sampleRate, true)
     const currentIndices = {
       arrayIndex: this.audioBuffer.length(),
       internalIndex: 0,
