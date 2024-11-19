@@ -86,7 +86,7 @@ import { createWakeLocker } from "../../../models/wakeLocker"
 import type { Note } from "@/generated/backend"
 import Waveform from "./Waveform.vue"
 import SvgAudioInput from "@/components/svgs/SvgAudioInput.vue"
-import type { AudioChunk } from "@/models/audio/audioProcessor"
+import type { AudioChunk } from "@/models/audio/audioProcessingScheduler"
 import FullScreen from "@/components/common/FullScreen.vue"
 
 const { managedApi } = useLoadingApi()

@@ -1,6 +1,6 @@
 import { AudioBuffer } from "./audioBuffer"
 
-export interface AudioProcessor {
+export interface AudioProcessingScheduler {
   processAudioData(newData: Float32Array[]): void
   getAudioData(): Float32Array[]
   start(): void
@@ -13,7 +13,7 @@ export interface AudioChunk {
   isMidSpeech: boolean
 }
 
-class AudioProcessorImpl implements AudioProcessor {
+class AudioProcessingSchedulerImpl implements AudioProcessingScheduler {
   private readonly PROCESSOR_INTERVAL = 60 * 1000 // 60 seconds
 
   private processorTimer: NodeJS.Timeout | null = null
@@ -102,10 +102,10 @@ class AudioProcessorImpl implements AudioProcessor {
   }
 }
 
-export const createAudioProcessor = (
+export const createAudioProcessingScheduler = (
   sampleRate: number,
   processorCallback: (chunk: AudioChunk) => Promise<string | undefined>
-): AudioProcessor => {
+): AudioProcessingScheduler => {
   const audioBuffer = new AudioBuffer(sampleRate)
-  return new AudioProcessorImpl(audioBuffer, processorCallback)
+  return new AudioProcessingSchedulerImpl(audioBuffer, processorCallback)
 }

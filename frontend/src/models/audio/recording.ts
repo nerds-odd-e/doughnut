@@ -2,9 +2,9 @@ import { type Ref, ref } from "vue"
 import { getAudioRecordingWorkerURL } from "./recorderWorklet"
 import {
   type AudioChunk,
-  type AudioProcessor,
-  createAudioProcessor,
-} from "./audioProcessor"
+  type AudioProcessingScheduler,
+  createAudioProcessingScheduler,
+} from "./audioProcessingScheduler"
 
 export interface AudioRecorder {
   startRecording: () => Promise<void>
@@ -23,10 +23,8 @@ export const createAudioRecorder = (
   let mediaStream: MediaStream | null = null
   let audioInput: MediaStreamAudioSourceNode | null = null
   let workletNode: AudioWorkletNode | null = null
-  const audioProcessor: AudioProcessor = createAudioProcessor(
-    16000,
-    processorCallback
-  )
+  const audioProcessingScheduler: AudioProcessingScheduler =
+    createAudioProcessingScheduler(16000, processorCallback)
   let isRecording: boolean = false
   const audioDevices: Ref<MediaDeviceInfo[]> = ref([])
   const selectedDevice: Ref<string> = ref("")
@@ -60,11 +58,11 @@ export const createAudioRecorder = (
 
         workletNode.port.onmessage = (event) => {
           if (event.data.audioBuffer) {
-            audioProcessor.processAudioData(event.data.audioBuffer)
+            audioProcessingScheduler.processAudioData(event.data.audioBuffer)
           }
         }
 
-        audioProcessor.start()
+        audioProcessingScheduler.start()
         audioInput.connect(workletNode)
         workletNode.connect(audioContext.destination)
         isRecording = true
@@ -86,15 +84,15 @@ export const createAudioRecorder = (
         mediaStream.getTracks().forEach((track) => track.stop())
       }
 
-      return audioProcessor.stop()
+      return audioProcessingScheduler.stop()
     },
 
     getAudioData: function (): Float32Array[] {
-      return audioProcessor.getAudioData()
+      return audioProcessingScheduler.getAudioData()
     },
 
     tryFlush: async function (): Promise<void> {
-      await audioProcessor.tryFlush()
+      await audioProcessingScheduler.tryFlush()
     },
 
     getAudioDevices: function (): Ref<MediaDeviceInfo[]> {

@@ -4,7 +4,7 @@ import helper from "@tests/helpers"
 import { vi } from "vitest"
 import makeMe from "@tests/fixtures/makeMe"
 import type { TextFromAudioWithCallInfo } from "@/generated/backend"
-import type { AudioChunk } from "@/models/audio/audioProcessor"
+import type { AudioChunk } from "@/models/audio/audioProcessingScheduler"
 import FullScreen from "@/components/common/FullScreen.vue"
 
 const mockMediaStreamSource = {

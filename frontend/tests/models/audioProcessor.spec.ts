@@ -1,21 +1,21 @@
 import { describe, it, expect, vi } from "vitest"
 import {
-  createAudioProcessor,
+  createAudioProcessingScheduler,
   type AudioChunk,
-} from "@/models/audio/audioProcessor"
+} from "@/models/audio/audioProcessingScheduler"
 
-describe("AudioProcessor", () => {
+describe("AudioProcessingScheduler", () => {
   beforeEach(() => {
     vi.useFakeTimers()
   })
 
   it("should be defined", () => {
-    expect(createAudioProcessor).toBeDefined()
+    expect(createAudioProcessingScheduler).toBeDefined()
   })
 
   it("should process non-silent audio data", () => {
     const mockCallback = vi.fn()
-    const processor = createAudioProcessor(44100, mockCallback)
+    const processor = createAudioProcessingScheduler(44100, mockCallback)
 
     const nonSilentData = [new Float32Array([0.5, 0.4, 0.3, 0.2, 0.1])]
     processor.processAudioData(nonSilentData)
@@ -25,7 +25,7 @@ describe("AudioProcessor", () => {
 
   it("should replace silent audio data with minimal data", () => {
     const mockCallback = vi.fn()
-    const processor = createAudioProcessor(44100, mockCallback)
+    const processor = createAudioProcessingScheduler(44100, mockCallback)
 
     const silentData = [new Float32Array([0, 0, 0, 0, 0])]
     processor.processAudioData(silentData)
@@ -35,7 +35,7 @@ describe("AudioProcessor", () => {
 
   it("should not call processorCallback if data is all silent", () => {
     const mockCallback = vi.fn()
-    const processor = createAudioProcessor(44100, mockCallback)
+    const processor = createAudioProcessingScheduler(44100, mockCallback)
 
     const silentData = [new Float32Array([0, 0, 0, 0, 0])]
     processor.processAudioData(silentData)
@@ -50,7 +50,7 @@ describe("AudioProcessor", () => {
 
   it("should call processorCallback if data is not all silent", () => {
     const mockCallback = vi.fn()
-    const processor = createAudioProcessor(44100, mockCallback)
+    const processor = createAudioProcessingScheduler(44100, mockCallback)
 
     const nonSilentData = [new Float32Array([0.5, 0.4, 0.3, 0.2, 0.1])]
     processor.processAudioData(nonSilentData)
@@ -66,7 +66,7 @@ describe("AudioProcessor", () => {
   it("should process data and reset timer when 2 seconds of silence is detected", async () => {
     const mockCallback = vi.fn().mockResolvedValue(undefined)
     const sampleRate = 44100
-    const processor = createAudioProcessor(sampleRate, mockCallback)
+    const processor = createAudioProcessingScheduler(sampleRate, mockCallback)
 
     const nonSilentData = new Float32Array(sampleRate).fill(0.5)
     const silentData = new Float32Array(sampleRate * 3).fill(0)
@@ -115,7 +115,7 @@ describe("AudioProcessor", () => {
 
   it("should flush remaining data and call processorCallback", async () => {
     const mockCallback = vi.fn().mockResolvedValue(undefined)
-    const processor = createAudioProcessor(44100, mockCallback)
+    const processor = createAudioProcessingScheduler(44100, mockCallback)
 
     const nonSilentData = [new Float32Array([0.5, 0.4, 0.3, 0.2, 0.1])]
     processor.processAudioData(nonSilentData)
@@ -133,7 +133,7 @@ describe("AudioProcessor", () => {
 
   it("should not call processorCallback on tryFlush if no new data", async () => {
     const mockCallback = vi.fn().mockResolvedValue(undefined)
-    const processor = createAudioProcessor(44100, mockCallback)
+    const processor = createAudioProcessingScheduler(44100, mockCallback)
 
     processor.start()
     vi.advanceTimersByTime(65 * 1000)
@@ -146,7 +146,7 @@ describe("AudioProcessor", () => {
 
   it("should mark chunk as isMidSpeech when processing due to timer", async () => {
     const mockCallback = vi.fn().mockResolvedValue(undefined)
-    const processor = createAudioProcessor(44100, mockCallback)
+    const processor = createAudioProcessingScheduler(44100, mockCallback)
 
     const nonSilentData = [new Float32Array([0.5, 0.4, 0.3, 0.2, 0.1])]
     processor.processAudioData(nonSilentData)
@@ -165,7 +165,7 @@ describe("AudioProcessor", () => {
 
   it("should mark chunk as complete when stopping", async () => {
     const mockCallback = vi.fn().mockResolvedValue(undefined)
-    const processor = createAudioProcessor(44100, mockCallback)
+    const processor = createAudioProcessingScheduler(44100, mockCallback)
 
     const nonSilentData = [new Float32Array([0.5, 0.4, 0.3, 0.2, 0.1])]
     processor.processAudioData(nonSilentData)
@@ -183,7 +183,7 @@ describe("AudioProcessor", () => {
 
   it("should mark chunk as not isMidSpeech when silence triggers callback", async () => {
     const mockCallback = vi.fn().mockResolvedValue(undefined)
-    const processor = createAudioProcessor(44100, mockCallback)
+    const processor = createAudioProcessingScheduler(44100, mockCallback)
 
     // Create 1 second of non-silent data followed by 3 seconds of silence
     const nonSilentData = new Float32Array(44100).fill(0.5)
@@ -208,7 +208,7 @@ describe("AudioProcessor", () => {
 
   it("should adjust lastProcessedIndex based on returned timestamp", async () => {
     const mockCallback = vi.fn().mockResolvedValue("00:00:01,500") // 1.5 seconds
-    const processor = createAudioProcessor(44100, mockCallback)
+    const processor = createAudioProcessingScheduler(44100, mockCallback)
 
     // Create 3 seconds of non-silent data
     const nonSilentData = new Float32Array(44100 * 3).fill(0.5)
@@ -228,7 +228,7 @@ describe("AudioProcessor", () => {
 
   it("should handle invalid timestamp gracefully", async () => {
     const mockCallback = vi.fn().mockResolvedValue("invalid")
-    const processor = createAudioProcessor(44100, mockCallback)
+    const processor = createAudioProcessingScheduler(44100, mockCallback)
 
     const nonSilentData = new Float32Array(44100).fill(0.5)
     processor.processAudioData([nonSilentData])
@@ -241,7 +241,7 @@ describe("AudioProcessor", () => {
 
   it("should correctly process partial chunks based on lastProcessedInternalIndex", async () => {
     const mockCallback = vi.fn().mockResolvedValue("00:00:00,500") // 0.5 seconds
-    const processor = createAudioProcessor(44100, mockCallback)
+    const processor = createAudioProcessingScheduler(44100, mockCallback)
 
     // Create 1 second of non-silent data
     const nonSilentData = new Float32Array(44100).fill(0.5)
@@ -270,7 +270,7 @@ describe("AudioProcessor", () => {
       .mockResolvedValueOnce("00:00:00,500") // First call: 0.5 seconds
       .mockResolvedValueOnce("00:00:01,000") // Second call: 1 second from the remaining data
 
-    const processor = createAudioProcessor(44100, mockCallback)
+    const processor = createAudioProcessingScheduler(44100, mockCallback)
 
     // Create 2 seconds of non-silent data
     const nonSilentData = new Float32Array(44100 * 2).fill(0.5)
@@ -300,7 +300,7 @@ describe("AudioProcessor", () => {
       return "00:00:00,500"
     })
 
-    const processor = createAudioProcessor(44100, mockCallback)
+    const processor = createAudioProcessingScheduler(44100, mockCallback)
     const nonSilentData = new Float32Array(44100).fill(0.5)
     processor.processAudioData([nonSilentData])
 
@@ -331,7 +331,7 @@ describe("AudioProcessor", () => {
         return undefined
       })
 
-    const processor = createAudioProcessor(44100, mockCallback)
+    const processor = createAudioProcessingScheduler(44100, mockCallback)
     const nonSilentData = new Float32Array(44100).fill(0.5) // 1 second of data
     processor.processAudioData([nonSilentData])
 
@@ -375,7 +375,7 @@ describe("AudioProcessor", () => {
         return undefined
       })
 
-    const processor = createAudioProcessor(44100, mockCallback)
+    const processor = createAudioProcessingScheduler(44100, mockCallback)
     const nonSilentData = new Float32Array(44100 * 2).fill(0.5)
     processor.processAudioData([nonSilentData])
 
@@ -406,7 +406,7 @@ describe("AudioProcessor", () => {
       return "00:00:00,500" // 0.5 seconds
     })
 
-    const processor = createAudioProcessor(44100, mockCallback)
+    const processor = createAudioProcessingScheduler(44100, mockCallback)
 
     // Create 1 second of data
     const nonSilentData = new Float32Array(44100).fill(0.5)
