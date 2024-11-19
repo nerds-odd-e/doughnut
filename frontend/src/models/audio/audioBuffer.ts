@@ -17,7 +17,7 @@ export class AudioBuffer {
   private audioData: Float32Array[] = []
   private lastProcessedArrayIndex = 0
   private lastProcessedInternalIndex = 0
-  private readonly sampleRate: number
+  public readonly sampleRate: number
 
   constructor(sampleRate: number) {
     this.sampleRate = sampleRate

@@ -18,19 +18,17 @@ class AudioProcessorImpl implements AudioProcessor {
   private readonly SILENCE_DURATION_THRESHOLD: number
   private readonly PROCESSOR_INTERVAL = 60 * 1000 // 60 seconds
 
-  private audioBuffer: AudioBuffer
   private processorTimer: NodeJS.Timeout | null = null
   private silenceCounter = 0
   private isProcessing = false
 
   constructor(
-    private readonly sampleRate: number,
+    private readonly audioBuffer: AudioBuffer,
     private readonly processorCallback: (
       chunk: AudioChunk
     ) => Promise<string | undefined>
   ) {
-    this.SILENCE_DURATION_THRESHOLD = 3 * this.sampleRate
-    this.audioBuffer = new AudioBuffer(this.sampleRate)
+    this.SILENCE_DURATION_THRESHOLD = 3 * audioBuffer.sampleRate
   }
 
   private async processDataChunk(isMidSpeech = true): Promise<void> {
@@ -122,5 +120,6 @@ export const createAudioProcessor = (
   sampleRate: number,
   processorCallback: (chunk: AudioChunk) => Promise<string | undefined>
 ): AudioProcessor => {
-  return new AudioProcessorImpl(sampleRate, processorCallback)
+  const audioBuffer = new AudioBuffer(sampleRate)
+  return new AudioProcessorImpl(audioBuffer, processorCallback)
 }
