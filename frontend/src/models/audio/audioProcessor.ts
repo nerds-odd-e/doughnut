@@ -15,7 +15,6 @@ export interface AudioChunk {
 }
 
 class AudioProcessorImpl implements AudioProcessor {
-  private readonly SILENCE_THRESHOLD = 0.01
   private readonly SILENCE_DURATION_THRESHOLD: number
   private readonly PROCESSOR_INTERVAL = 60 * 1000 // 60 seconds
 
@@ -34,10 +33,7 @@ class AudioProcessorImpl implements AudioProcessor {
   }
 
   private async processDataChunk(isMidSpeech = true): Promise<void> {
-    const file = this.audioBuffer.tryGetProcessableData(
-      this.SILENCE_THRESHOLD,
-      this.sampleRate
-    )
+    const file = this.audioBuffer.tryGetProcessableData(this.sampleRate)
     if (!file) return
 
     const timestamp = await this.processorCallback({
@@ -67,7 +63,7 @@ class AudioProcessorImpl implements AudioProcessor {
 
   processAudioData(newData: Float32Array[]): void {
     for (const chunk of newData) {
-      if (isSilent(chunk, this.SILENCE_THRESHOLD)) {
+      if (isSilent(chunk)) {
         this.silenceCounter += chunk.length
         if (this.silenceCounter >= this.SILENCE_DURATION_THRESHOLD) {
           this.tryFlush()

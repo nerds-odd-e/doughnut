@@ -1,17 +1,16 @@
 import { createAudioFile } from "./createAudioFile"
 import { timestampToSeconds } from "./parseTimestamp"
 
-export function isSilent(data: Float32Array, threshold: number): boolean {
+const SILENCE_THRESHOLD = 0.01
+
+export function isSilent(data: Float32Array): boolean {
   const sum = data.reduce((acc, val) => acc + Math.abs(val), 0)
   const avg = sum / data.length
-  return avg < threshold
+  return avg < SILENCE_THRESHOLD
 }
 
-export function isAllSilent(
-  chunks: Float32Array[],
-  threshold: number
-): boolean {
-  return chunks.every((chunk) => isSilent(chunk, threshold))
+export function isAllSilent(chunks: Float32Array[]): boolean {
+  return chunks.every((chunk) => isSilent(chunk))
 }
 
 export class AudioBuffer {
@@ -19,8 +18,8 @@ export class AudioBuffer {
   private lastProcessedArrayIndex = 0
   private lastProcessedInternalIndex = 0
 
-  private isAllSilent(data: Float32Array[], threshold: number): boolean {
-    return data.every((chunk) => isSilent(chunk, threshold))
+  private isAllSilent(data: Float32Array[]): boolean {
+    return data.every((chunk) => isSilent(chunk))
   }
 
   private getUnprocessedData(): Float32Array[] {
@@ -94,24 +93,18 @@ export class AudioBuffer {
     return this.length() <= this.getCurrentPosition().arrayIndex
   }
 
-  private getProcessableData(silenceThreshold: number): Float32Array[] | null {
+  private getProcessableData(): Float32Array[] | null {
     const dataToProcess = this.getUnprocessedData()
-    if (
-      dataToProcess.length === 0 ||
-      this.isAllSilent(dataToProcess, silenceThreshold)
-    ) {
+    if (dataToProcess.length === 0 || this.isAllSilent(dataToProcess)) {
       return null
     }
     return dataToProcess
   }
 
-  tryGetProcessableData(
-    silenceThreshold: number,
-    sampleRate: number
-  ): File | null {
+  tryGetProcessableData(sampleRate: number): File | null {
     if (this.hasNoUnprocessedData()) return null
 
-    const dataToProcess = this.getProcessableData(silenceThreshold)
+    const dataToProcess = this.getProcessableData()
     if (!dataToProcess) return null
 
     return createAudioFile(dataToProcess, sampleRate, true)
