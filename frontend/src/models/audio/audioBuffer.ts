@@ -1,4 +1,5 @@
 import { createAudioFile } from "./createAudioFile"
+import { timestampToSeconds } from "./parseTimestamp"
 
 export function isSilent(data: Float32Array, threshold: number): boolean {
   const sum = data.reduce((acc, val) => acc + Math.abs(val), 0)
@@ -44,12 +45,15 @@ export class AudioBuffer {
     return this.audioData
   }
 
-  updateProcessedPosition(arrayIndex: number, internalIndex: number): void {
+  private updateProcessedPosition(
+    arrayIndex: number,
+    internalIndex: number
+  ): void {
     this.lastProcessedArrayIndex = arrayIndex
     this.lastProcessedInternalIndex = internalIndex
   }
 
-  calculateNewIndices(processedSamples: number): void {
+  private calculateNewIndices(processedSamples: number): void {
     let totalSamples = this.lastProcessedInternalIndex
 
     for (let i = this.lastProcessedArrayIndex; i < this.audioData.length; i++) {
@@ -75,7 +79,7 @@ export class AudioBuffer {
     )
   }
 
-  length(): number {
+  private length(): number {
     return this.audioData.length
   }
 
@@ -111,5 +115,35 @@ export class AudioBuffer {
     if (!dataToProcess) return null
 
     return createAudioFile(dataToProcess, sampleRate, true)
+  }
+
+  updateProcessedIndices(
+    timestamp: string | undefined,
+    sampleRate: number
+  ): void {
+    const fallbackIndices = {
+      arrayIndex: this.length(),
+      internalIndex: 0,
+    }
+
+    if (!timestamp) {
+      this.updateProcessedPosition(
+        fallbackIndices.arrayIndex,
+        fallbackIndices.internalIndex
+      )
+      return
+    }
+
+    const processedSeconds = timestampToSeconds(timestamp)
+    if (processedSeconds === undefined) {
+      this.updateProcessedPosition(
+        fallbackIndices.arrayIndex,
+        fallbackIndices.internalIndex
+      )
+      return
+    }
+
+    const processedSamples = Math.floor(processedSeconds * sampleRate)
+    this.calculateNewIndices(processedSamples)
   }
 }

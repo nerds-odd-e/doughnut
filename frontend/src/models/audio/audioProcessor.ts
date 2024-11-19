@@ -1,5 +1,4 @@
 import { createAudioFile } from "./createAudioFile"
-import { timestampToSeconds } from "./parseTimestamp"
 import { AudioBuffer, isSilent } from "./audioBuffer"
 
 export interface AudioProcessor {
@@ -46,34 +45,7 @@ class AudioProcessorImpl implements AudioProcessor {
       isMidSpeech,
     })
 
-    this.updateProcessedIndices(timestamp)
-  }
-
-  private updateProcessedIndices(timestamp: string | undefined): void {
-    const fallbackIndices = {
-      arrayIndex: this.audioBuffer.length(),
-      internalIndex: 0,
-    }
-
-    if (!timestamp) {
-      this.audioBuffer.updateProcessedPosition(
-        fallbackIndices.arrayIndex,
-        fallbackIndices.internalIndex
-      )
-      return
-    }
-
-    const processedSeconds = timestampToSeconds(timestamp)
-    if (processedSeconds === undefined) {
-      this.audioBuffer.updateProcessedPosition(
-        fallbackIndices.arrayIndex,
-        fallbackIndices.internalIndex
-      )
-      return
-    }
-
-    const processedSamples = Math.floor(processedSeconds * this.sampleRate)
-    this.audioBuffer.calculateNewIndices(processedSamples)
+    this.audioBuffer.updateProcessedIndices(timestamp, this.sampleRate)
   }
 
   private startTimer(): void {
