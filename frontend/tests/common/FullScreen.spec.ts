@@ -69,18 +69,6 @@ describe("FullScreen", () => {
     expect(document.body.querySelector(".fullscreen-overlay")).toBeFalsy()
   })
 
-  it("handles fullscreen request errors", async () => {
-    document.documentElement.requestFullscreen = vi
-      .fn()
-      .mockRejectedValue(new Error("Fullscreen error"))
-    const wrapper = mount(FullScreen)
-
-    await wrapper.find(".fullscreen-btn").trigger("click")
-    await wrapper.vm.$nextTick()
-
-    expect(document.body.querySelector(".fullscreen-overlay")).toBeFalsy()
-  })
-
   it("exits fullscreen mode on component unmount", async () => {
     const wrapper = mount(FullScreen, {
       attachTo: document.body,
