@@ -11,7 +11,7 @@ export interface AudioChunk {
   isMidSpeech: boolean
 }
 
-export class AudioProcessingSchedulerImpl implements AudioProcessingScheduler {
+class AudioProcessingSchedulerImpl implements AudioProcessingScheduler {
   private readonly PROCESSOR_INTERVAL = 60 * 1000 // 60 seconds
 
   private processorTimer: NodeJS.Timeout | null = null
