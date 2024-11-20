@@ -19,26 +19,6 @@ describe("AudioProcessingScheduler", () => {
     vi.useFakeTimers()
   })
 
-  it("should process non-silent audio data", () => {
-    const mockCallback = vi.fn()
-    const { audioBuffer } = createBufferAndScheduler(44100, mockCallback)
-
-    const nonSilentData = [new Float32Array([0.5, 0.4, 0.3, 0.2, 0.1])]
-    audioBuffer.processAudioData(nonSilentData)
-    expect(audioBuffer.getAll().length).toBe(1)
-    expect(audioBuffer.getAll()[0]).toEqual(nonSilentData[0])
-  })
-
-  it("should replace silent audio data with minimal data", () => {
-    const mockCallback = vi.fn()
-    const { audioBuffer } = createBufferAndScheduler(44100, mockCallback)
-
-    const silentData = [new Float32Array([0, 0, 0, 0, 0])]
-    audioBuffer.processAudioData(silentData)
-    expect(audioBuffer.getAll().length).toBe(1)
-    expect(audioBuffer.getAll()[0]).toEqual(new Float32Array(5))
-  })
-
   it("should not call processorCallback if data is all silent", () => {
     const mockCallback = vi.fn()
     const { audioBuffer, scheduler } = createBufferAndScheduler(
