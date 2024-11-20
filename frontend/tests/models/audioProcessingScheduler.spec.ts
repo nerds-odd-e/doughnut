@@ -2,16 +2,28 @@ import { describe, it, expect, vi } from "vitest"
 import {
   type AudioChunk,
   type AudioProcessingScheduler,
-  wireAudioProcessingScheduler,
+  AudioProcessingSchedulerImpl,
 } from "@/models/audio/audioProcessingScheduler"
 import { AudioBuffer } from "@/models/audio/audioBuffer"
+
+class AudioDataProcessorImpl extends AudioProcessingSchedulerImpl {
+  processAudioData(newData: Float32Array[]): void {
+    this.audioBuffer.processAudioData(newData)
+  }
+
+  getAudioData(): Float32Array[] {
+    return this.audioBuffer.getAll()
+  }
+}
 
 const createAudioProcessingScheduler = (
   sampleRate: number,
   processorCallback: (chunk: AudioChunk) => Promise<string | undefined>
 ): AudioProcessingScheduler => {
   const audioBuffer = new AudioBuffer(sampleRate)
-  return wireAudioProcessingScheduler(audioBuffer, processorCallback)
+  const scheduler = new AudioDataProcessorImpl(audioBuffer, processorCallback)
+  audioBuffer.setOnSilenceThresholdReached(() => scheduler.tryFlush())
+  return scheduler
 }
 
 describe("AudioProcessingScheduler", () => {

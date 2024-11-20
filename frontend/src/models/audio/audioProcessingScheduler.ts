@@ -1,11 +1,6 @@
 import { AudioBuffer } from "./audioBuffer"
 
-export interface AudioDataProcessor {
-  processAudioData(newData: Float32Array[]): void
-  getAudioData(): Float32Array[]
-}
-
-export interface AudioProcessingScheduler extends AudioDataProcessor {
+export interface AudioProcessingScheduler {
   start(): void
   stop(): Promise<File>
   tryFlush(): Promise<void>
@@ -16,14 +11,14 @@ export interface AudioChunk {
   isMidSpeech: boolean
 }
 
-class AudioProcessingSchedulerImpl implements AudioProcessingScheduler {
+export class AudioProcessingSchedulerImpl implements AudioProcessingScheduler {
   private readonly PROCESSOR_INTERVAL = 60 * 1000 // 60 seconds
 
   private processorTimer: NodeJS.Timeout | null = null
   private isProcessing = false
 
   constructor(
-    private readonly audioBuffer: AudioBuffer,
+    protected readonly audioBuffer: AudioBuffer,
     private readonly processorCallback: (
       chunk: AudioChunk
     ) => Promise<string | undefined>
@@ -58,10 +53,6 @@ class AudioProcessingSchedulerImpl implements AudioProcessingScheduler {
     }
   }
 
-  processAudioData(newData: Float32Array[]): void {
-    this.audioBuffer.processAudioData(newData)
-  }
-
   start(): void {
     this.startTimer()
   }
@@ -88,10 +79,6 @@ class AudioProcessingSchedulerImpl implements AudioProcessingScheduler {
     }
 
     return this.audioBuffer.createFinalAudioFile()
-  }
-
-  getAudioData(): Float32Array[] {
-    return this.audioBuffer.getAll()
   }
 
   async tryFlush(): Promise<void> {
