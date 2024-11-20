@@ -70,12 +70,7 @@ class AudioProcessingSchedulerImpl implements AudioProcessingScheduler {
 
     // Process any remaining data
     if (this.audioBuffer.hasUnprocessedData()) {
-      this.isProcessing = true
-      try {
-        await this.processDataChunk(false)
-      } finally {
-        this.isProcessing = false
-      }
+      await this.processAndCallback(false)
     }
 
     return this.audioBuffer.createFinalAudioFile()
