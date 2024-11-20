@@ -152,7 +152,7 @@ export class AudioBuffer {
     return createAudioFile(this.audioData, this.sampleRate, false)
   }
 
-  processNewChunk(chunk: Float32Array): void {
+  private processNewChunk(chunk: Float32Array): void {
     if (isSilent(chunk)) {
       this.silenceCounter += chunk.length
       if (this.silenceCounter >= this.SILENCE_DURATION_THRESHOLD) {
@@ -167,5 +167,11 @@ export class AudioBuffer {
 
   public setOnSilenceThresholdReached(callback: () => void): void {
     this.onSilenceThresholdReached = callback
+  }
+
+  processAudioData(newData: Float32Array[]): void {
+    for (const chunk of newData) {
+      this.processNewChunk(chunk)
+    }
   }
 }

@@ -59,9 +59,7 @@ class AudioProcessingSchedulerImpl implements AudioProcessingScheduler {
   }
 
   processAudioData(newData: Float32Array[]): void {
-    for (const chunk of newData) {
-      this.audioBuffer.processNewChunk(chunk)
-    }
+    this.audioBuffer.processAudioData(newData)
   }
 
   start(): void {
