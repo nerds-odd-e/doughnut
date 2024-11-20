@@ -81,7 +81,7 @@
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { ref, type PropType } from "vue"
 import type { StorageAccessor } from "../../../store/createNoteStorage"
-import { createAudioRecorder } from "../../../models/audio/recording"
+import { createAudioRecorder } from "../../../models/audio/audioRecorder"
 import { createWakeLocker } from "../../../models/wakeLocker"
 import type { Note } from "@/generated/backend"
 import Waveform from "./Waveform.vue"
