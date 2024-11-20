@@ -1,8 +1,11 @@
 import { AudioBuffer } from "./audioBuffer"
 
-export interface AudioProcessingScheduler {
+export interface AudioDataProcessor {
   processAudioData(newData: Float32Array[]): void
   getAudioData(): Float32Array[]
+}
+
+export interface AudioProcessingScheduler extends AudioDataProcessor {
   start(): void
   stop(): Promise<File>
   tryFlush(): Promise<void>
@@ -57,7 +60,7 @@ class AudioProcessingSchedulerImpl implements AudioProcessingScheduler {
 
   processAudioData(newData: Float32Array[]): void {
     for (const chunk of newData) {
-      this.audioBuffer.processNewChunk(chunk, () => this.tryFlush())
+      this.audioBuffer.processNewChunk(chunk)
     }
   }
 
@@ -102,10 +105,14 @@ class AudioProcessingSchedulerImpl implements AudioProcessingScheduler {
   }
 }
 
-export const createAudioProcessingScheduler = (
-  sampleRate: number,
+export const wireAudioProcessingScheduler = (
+  audioBuffer: AudioBuffer,
   processorCallback: (chunk: AudioChunk) => Promise<string | undefined>
 ): AudioProcessingScheduler => {
-  const audioBuffer = new AudioBuffer(sampleRate)
-  return new AudioProcessingSchedulerImpl(audioBuffer, processorCallback)
+  const scheduler = new AudioProcessingSchedulerImpl(
+    audioBuffer,
+    processorCallback
+  )
+  audioBuffer.setOnSilenceThresholdReached(() => scheduler.tryFlush())
+  return scheduler
 }

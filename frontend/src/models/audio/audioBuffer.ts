@@ -20,6 +20,9 @@ export class AudioBuffer {
   private lastProcessedInternalIndex = 0
   public readonly sampleRate: number
   public silenceCounter = 0
+  private onSilenceThresholdReached: () => void = () => {
+    /* intentionally empty */
+  }
 
   constructor(sampleRate: number) {
     this.sampleRate = sampleRate
@@ -149,19 +152,20 @@ export class AudioBuffer {
     return createAudioFile(this.audioData, this.sampleRate, false)
   }
 
-  processNewChunk(
-    chunk: Float32Array,
-    onSilenceThresholdReached: () => void
-  ): void {
+  processNewChunk(chunk: Float32Array): void {
     if (isSilent(chunk)) {
       this.silenceCounter += chunk.length
       if (this.silenceCounter >= this.SILENCE_DURATION_THRESHOLD) {
-        onSilenceThresholdReached()
+        this.onSilenceThresholdReached()
         this.silenceCounter = 0
       }
     } else {
       this.silenceCounter = 0
     }
     this.push(chunk)
+  }
+
+  public setOnSilenceThresholdReached(callback: () => void): void {
+    this.onSilenceThresholdReached = callback
   }
 }

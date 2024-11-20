@@ -1,8 +1,18 @@
 import { describe, it, expect, vi } from "vitest"
 import {
-  createAudioProcessingScheduler,
   type AudioChunk,
+  type AudioProcessingScheduler,
+  wireAudioProcessingScheduler,
 } from "@/models/audio/audioProcessingScheduler"
+import { AudioBuffer } from "@/models/audio/audioBuffer"
+
+const createAudioProcessingScheduler = (
+  sampleRate: number,
+  processorCallback: (chunk: AudioChunk) => Promise<string | undefined>
+): AudioProcessingScheduler => {
+  const audioBuffer = new AudioBuffer(sampleRate)
+  return wireAudioProcessingScheduler(audioBuffer, processorCallback)
+}
 
 describe("AudioProcessingScheduler", () => {
   beforeEach(() => {

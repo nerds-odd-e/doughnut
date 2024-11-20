@@ -2,9 +2,9 @@ import { type Ref, ref } from "vue"
 import { getAudioRecordingWorkerURL } from "./recorderWorklet"
 import {
   type AudioChunk,
-  type AudioProcessingScheduler,
-  createAudioProcessingScheduler,
+  wireAudioProcessingScheduler,
 } from "./audioProcessingScheduler"
+import { AudioBuffer } from "./audioBuffer"
 
 export interface AudioRecorder {
   startRecording: () => Promise<void>
@@ -23,8 +23,11 @@ export const createAudioRecorder = (
   let mediaStream: MediaStream | null = null
   let audioInput: MediaStreamAudioSourceNode | null = null
   let workletNode: AudioWorkletNode | null = null
-  const audioProcessingScheduler: AudioProcessingScheduler =
-    createAudioProcessingScheduler(16000, processorCallback)
+  const audioBuffer = new AudioBuffer(16000)
+  const audioProcessingScheduler = wireAudioProcessingScheduler(
+    audioBuffer,
+    processorCallback
+  )
   let isRecording: boolean = false
   const audioDevices: Ref<MediaDeviceInfo[]> = ref([])
   const selectedDevice: Ref<string> = ref("")
