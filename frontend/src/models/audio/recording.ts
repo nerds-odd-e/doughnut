@@ -61,7 +61,7 @@ export const createAudioRecorder = (
 
         workletNode.port.onmessage = (event) => {
           if (event.data.audioBuffer) {
-            audioProcessingScheduler.processAudioData(event.data.audioBuffer)
+            audioBuffer.processAudioData(event.data.audioBuffer)
           }
         }
 
@@ -91,7 +91,7 @@ export const createAudioRecorder = (
     },
 
     getAudioData: function (): Float32Array[] {
-      return audioProcessingScheduler.getAudioData()
+      return audioBuffer.getAll()
     },
 
     tryFlush: async function (): Promise<void> {
