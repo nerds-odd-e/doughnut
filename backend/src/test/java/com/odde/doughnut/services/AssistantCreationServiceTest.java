@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.services.ai.AssistantCreationService;
 import com.odde.doughnut.services.ai.tools.AiToolName;
+import com.odde.doughnut.services.ai.tools.FunctionDefinition;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.theokanning.openai.assistants.assistant.Assistant;
@@ -14,7 +15,6 @@ import com.theokanning.openai.assistants.assistant.AssistantRequest;
 import com.theokanning.openai.assistants.assistant.FunctionTool;
 import com.theokanning.openai.assistants.assistant.Tool;
 import com.theokanning.openai.client.OpenAiApi;
-import com.theokanning.openai.function.FunctionDefinition;
 import io.reactivex.Single;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -73,7 +73,7 @@ class AssistantCreationServiceTest {
       FunctionTool functionTool = (FunctionTool) tool;
       FunctionDefinition functionDefinition = (FunctionDefinition) functionTool.getFunction();
       assertThat(functionDefinition.getName(), is(AiToolName.COMPLETE_NOTE_DETAILS.getValue()));
-      //      assertThat(functionDefinition.getStrict(), is(true));
+      assertThat(functionDefinition.getStrict(), is(true));
     }
   }
 }

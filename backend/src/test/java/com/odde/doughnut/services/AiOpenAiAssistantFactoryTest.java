@@ -7,7 +7,9 @@ import com.odde.doughnut.services.ai.OtherAiServices;
 import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.ai.tools.AiToolName;
+import com.odde.doughnut.services.ai.tools.FunctionDefinition;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
+import com.theokanning.openai.assistants.assistant.FunctionTool;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.image.Image;
 import com.theokanning.openai.image.ImageResult;
@@ -60,6 +62,20 @@ class AiOpenAiAssistantFactoryTest {
               .get()
               .description()
               .contains("Generate a concise and accurate note topic"));
+    }
+
+    @Test
+    void shouldHaveStrictToolForGeneratingTopicTitle() {
+      List<AiTool> tools = AiToolFactory.getAllAssistantTools();
+
+      Optional<AiTool> topicTitleTool =
+          tools.stream()
+              .filter(t -> t.name().equals(AiToolName.SUGGEST_NOTE_TOPIC_TITLE.getValue()))
+              .findFirst();
+
+      FunctionTool tool = (FunctionTool) topicTitleTool.get().getTool();
+      FunctionDefinition fun = (FunctionDefinition) tool.getFunction();
+      assertTrue(fun.getStrict());
     }
   }
 }
