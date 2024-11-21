@@ -3,7 +3,6 @@ import {
   type AudioChunk,
   wireAudioProcessingScheduler,
 } from "./audioProcessingScheduler"
-import { createAudioBuffer } from "./audioBuffer"
 import { createAudioReceiver } from "./audioReceiver"
 
 export interface AudioRecorder {
@@ -19,12 +18,9 @@ export interface AudioRecorder {
 export const createAudioRecorder = (
   processorCallback: (chunk: AudioChunk) => Promise<string | undefined>
 ): AudioRecorder => {
-  const audioBuffer = createAudioBuffer(16000)
-  const audioReceiver = createAudioReceiver((audioData) =>
-    audioBuffer.receiveAudioData(audioData)
-  )
+  const audioReceiver = createAudioReceiver()
   const audioProcessingScheduler = wireAudioProcessingScheduler(
-    audioBuffer,
+    audioReceiver.getBuffer(),
     processorCallback
   )
   let isRecording: boolean = false
@@ -62,7 +58,7 @@ export const createAudioRecorder = (
     },
 
     getAudioData: function (): number {
-      return audioBuffer.getCurrentAverageSample()
+      return audioReceiver.getBuffer().getCurrentAverageSample()
     },
 
     tryFlush: async function (): Promise<void> {

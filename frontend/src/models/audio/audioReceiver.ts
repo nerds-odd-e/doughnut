@@ -1,3 +1,4 @@
+import { createAudioBuffer, type AudioBuffer } from "./audioBuffer"
 import { getAudioRecordingWorkerURL } from "./recorderWorklet"
 
 export interface AudioReceiver {
@@ -5,15 +6,15 @@ export interface AudioReceiver {
   disconnect: () => void
   isInitialized: () => boolean
   reconnect: (deviceId: string) => Promise<void>
+  getBuffer: () => AudioBuffer
 }
 
-export const createAudioReceiver = (
-  onAudioData: (audioBuffer: Float32Array[]) => void
-): AudioReceiver => {
+export const createAudioReceiver = (): AudioReceiver => {
   let audioContext: AudioContext | null = null
   let mediaStream: MediaStream | null = null
   let audioInput: MediaStreamAudioSourceNode | null = null
   let workletNode: AudioWorkletNode | null = null
+  const audioBuffer = createAudioBuffer(16000)
 
   const disconnect = () => {
     if (workletNode) {
@@ -45,7 +46,7 @@ export const createAudioReceiver = (
 
         workletNode.port.onmessage = (event) => {
           if (event.data.audioBuffer) {
-            onAudioData(event.data.audioBuffer)
+            audioBuffer.receiveAudioData(event.data.audioBuffer)
           }
         }
         audioInput.connect(workletNode)
@@ -64,5 +65,7 @@ export const createAudioReceiver = (
       disconnect()
       await this.initialize(deviceId)
     },
+
+    getBuffer: () => audioBuffer,
   }
 }
