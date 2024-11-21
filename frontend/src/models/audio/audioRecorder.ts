@@ -1,10 +1,10 @@
 import { type Ref, ref } from "vue"
-import { getAudioRecordingWorkerURL } from "./recorderWorklet"
 import {
   type AudioChunk,
   wireAudioProcessingScheduler,
 } from "./audioProcessingScheduler"
 import { createAudioBuffer } from "./audioBuffer"
+import { createAudioReceiver } from "./audioReceiver"
 
 export interface AudioRecorder {
   startRecording: () => Promise<void>
@@ -19,14 +19,13 @@ export interface AudioRecorder {
 export const createAudioRecorder = (
   processorCallback: (chunk: AudioChunk) => Promise<string | undefined>
 ): AudioRecorder => {
-  let audioContext: AudioContext | null = null
-  let mediaStream: MediaStream | null = null
-  let audioInput: MediaStreamAudioSourceNode | null = null
-  let workletNode: AudioWorkletNode | null = null
   const audioBuffer = createAudioBuffer(16000)
   const audioProcessingScheduler = wireAudioProcessingScheduler(
     audioBuffer,
     processorCallback
+  )
+  const audioReceiver = createAudioReceiver((audioData) =>
+    audioBuffer.receiveAudioData(audioData)
   )
   let isRecording: boolean = false
   const audioDevices: Ref<MediaDeviceInfo[]> = ref([])
@@ -35,34 +34,18 @@ export const createAudioRecorder = (
   const audioRecorder: AudioRecorder = {
     startRecording: async function (): Promise<void> {
       try {
-        mediaStream = await navigator.mediaDevices.getUserMedia({
-          audio: true,
-        })
+        await audioReceiver.initialize()
         const devices = await navigator.mediaDevices.enumerateDevices()
         audioDevices.value = devices.filter(
           (device) => device.kind === "audioinput"
         )
 
+        const mediaStream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+        })
         const currentTrack = mediaStream.getAudioTracks()[0]
         const currentDeviceId = currentTrack?.getSettings().deviceId
         selectedDevice.value = currentDeviceId || ""
-
-        const audioWorkletUrl = getAudioRecordingWorkerURL()
-        audioContext = new AudioContext({ sampleRate: 16000 })
-        await audioContext.audioWorklet.addModule(audioWorkletUrl)
-        audioInput = audioContext.createMediaStreamSource(mediaStream)
-        workletNode = new AudioWorkletNode(
-          audioContext,
-          "recorder-worklet-processor"
-        )
-
-        workletNode.port.onmessage = (event) => {
-          if (event.data.audioBuffer) {
-            audioBuffer.receiveAudioData(event.data.audioBuffer)
-          }
-        }
-        audioInput.connect(workletNode)
-        workletNode.connect(audioContext.destination)
 
         audioProcessingScheduler.start()
         isRecording = true
@@ -74,16 +57,7 @@ export const createAudioRecorder = (
 
     stopRecording: async function (): Promise<File> {
       isRecording = false
-      if (workletNode) {
-        workletNode.disconnect()
-      }
-      if (audioInput) {
-        audioInput.disconnect()
-      }
-      if (mediaStream) {
-        mediaStream.getTracks().forEach((track) => track.stop())
-      }
-
+      audioReceiver.disconnect()
       return audioProcessingScheduler.stop()
     },
 
@@ -108,19 +82,7 @@ export const createAudioRecorder = (
 
       selectedDevice.value = deviceId
       if (isRecording) {
-        // Stop current recording
-        if (workletNode) workletNode.disconnect()
-        if (audioInput) audioInput.disconnect()
-        if (mediaStream)
-          mediaStream.getTracks().forEach((track) => track.stop())
-
-        // Restart with new device
-        mediaStream = await navigator.mediaDevices.getUserMedia({
-          audio: { deviceId: { exact: deviceId } },
-        })
-        audioInput = audioContext!.createMediaStreamSource(mediaStream)
-        audioInput.connect(workletNode!)
-        workletNode!.connect(audioContext!.destination)
+        await audioReceiver.reconnect(deviceId)
       }
     },
   }
