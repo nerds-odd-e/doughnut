@@ -44,19 +44,20 @@ export class AudioBuffer {
   }
 
   push(chunk: Float32Array): void {
+    if (isSilent(chunk)) {
+      this.silenceCounter += chunk.length
+      if (this.silenceCounter >= this.SILENCE_DURATION_THRESHOLD) {
+        this.onSilenceThresholdReached()
+        this.silenceCounter = 0
+      }
+    } else {
+      this.silenceCounter = 0
+    }
     this.audioData.push(chunk)
   }
 
   getAll(): Float32Array[] {
     return this.audioData
-  }
-
-  private updateProcessedPosition(
-    arrayIndex: number,
-    internalIndex: number
-  ): void {
-    this.lastProcessedArrayIndex = arrayIndex
-    this.lastProcessedInternalIndex = internalIndex
   }
 
   private calculateNewIndices(processedSamples: number): void {
@@ -91,10 +92,9 @@ export class AudioBuffer {
 
   private getProcessableData(): Float32Array[] | null {
     const dataToProcess = this.getUnprocessedData()
-    if (dataToProcess.length === 0 || isAllSilent(dataToProcess)) {
-      return null
-    }
-    return dataToProcess
+    return dataToProcess.length === 0 || isAllSilent(dataToProcess)
+      ? null
+      : dataToProcess
   }
 
   tryGetProcessableData(): File | null {
@@ -107,19 +107,16 @@ export class AudioBuffer {
   }
 
   updateProcessedIndices(timestamp: string | undefined): void {
-    const fallbackIndices = {
-      arrayIndex: this.length(),
-      internalIndex: 0,
+    if (!timestamp) {
+      this.lastProcessedArrayIndex = this.length()
+      this.lastProcessedInternalIndex = 0
+      return
     }
 
-    const processedSeconds = timestamp
-      ? timestampToSeconds(timestamp)
-      : undefined
+    const processedSeconds = timestampToSeconds(timestamp)
     if (processedSeconds === undefined) {
-      this.updateProcessedPosition(
-        fallbackIndices.arrayIndex,
-        fallbackIndices.internalIndex
-      )
+      this.lastProcessedArrayIndex = this.length()
+      this.lastProcessedInternalIndex = 0
       return
     }
 
@@ -131,26 +128,13 @@ export class AudioBuffer {
     return createAudioFile(this.audioData, this.sampleRate, false)
   }
 
-  private receiveNewChunk(chunk: Float32Array): void {
-    if (isSilent(chunk)) {
-      this.silenceCounter += chunk.length
-      if (this.silenceCounter >= this.SILENCE_DURATION_THRESHOLD) {
-        this.onSilenceThresholdReached()
-        this.silenceCounter = 0
-      }
-    } else {
-      this.silenceCounter = 0
-    }
-    this.push(chunk)
-  }
-
   public setOnSilenceThresholdReached(callback: () => void): void {
     this.onSilenceThresholdReached = callback
   }
 
   receiveAudioData(newData: Float32Array[]): void {
     for (const chunk of newData) {
-      this.receiveNewChunk(chunk)
+      this.push(chunk)
     }
   }
 }
