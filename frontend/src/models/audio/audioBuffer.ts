@@ -127,15 +127,9 @@ export class AudioBuffer {
       internalIndex: 0,
     }
 
-    if (!timestamp) {
-      this.updateProcessedPosition(
-        fallbackIndices.arrayIndex,
-        fallbackIndices.internalIndex
-      )
-      return
-    }
-
-    const processedSeconds = timestampToSeconds(timestamp)
+    const processedSeconds = timestamp
+      ? timestampToSeconds(timestamp)
+      : undefined
     if (processedSeconds === undefined) {
       this.updateProcessedPosition(
         fallbackIndices.arrayIndex,
