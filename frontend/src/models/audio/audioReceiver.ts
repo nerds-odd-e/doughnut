@@ -1,6 +1,8 @@
 import { createAudioBuffer, type AudioBuffer } from "./audioBuffer"
 import { getAudioRecordingWorkerURL } from "./recorderWorklet"
 
+const SAMPLE_RATE = 16000
+
 export interface AudioReceiver {
   initialize: (deviceId?: string) => Promise<void>
   disconnect: () => void
@@ -14,19 +16,7 @@ export const createAudioReceiver = (): AudioReceiver => {
   let mediaStream: MediaStream | null = null
   let audioInput: MediaStreamAudioSourceNode | null = null
   let workletNode: AudioWorkletNode | null = null
-  const audioBuffer = createAudioBuffer(16000)
-
-  const disconnect = () => {
-    if (workletNode) {
-      workletNode.disconnect()
-    }
-    if (audioInput) {
-      audioInput.disconnect()
-    }
-    if (mediaStream) {
-      mediaStream.getTracks().forEach((track) => track.stop())
-    }
-  }
+  const audioBuffer = createAudioBuffer(SAMPLE_RATE)
 
   return {
     initialize: async (deviceId?: string): Promise<void> => {
@@ -36,7 +26,7 @@ export const createAudioReceiver = (): AudioReceiver => {
         })
 
         const audioWorkletUrl = getAudioRecordingWorkerURL()
-        audioContext = new AudioContext({ sampleRate: 16000 })
+        audioContext = new AudioContext({ sampleRate: SAMPLE_RATE })
         await audioContext.audioWorklet.addModule(audioWorkletUrl)
         audioInput = audioContext.createMediaStreamSource(mediaStream)
         workletNode = new AudioWorkletNode(
@@ -57,12 +47,22 @@ export const createAudioReceiver = (): AudioReceiver => {
       }
     },
 
-    disconnect,
+    disconnect: () => {
+      if (workletNode) {
+        workletNode.disconnect()
+      }
+      if (audioInput) {
+        audioInput.disconnect()
+      }
+      if (mediaStream) {
+        mediaStream.getTracks().forEach((track) => track.stop())
+      }
+    },
 
     isInitialized: () => !!audioContext,
 
     async reconnect(deviceId: string): Promise<void> {
-      disconnect()
+      this.disconnect()
       await this.initialize(deviceId)
     },
 
