@@ -34,12 +34,7 @@ export const createAudioRecorder = (
 
   const audioRecorder: AudioRecorder = {
     startRecording: async function (): Promise<void> {
-      const audioWorkletUrl = getAudioRecordingWorkerURL()
       try {
-        audioContext = new AudioContext({ sampleRate: 16000 })
-
-        await audioContext.audioWorklet.addModule(audioWorkletUrl)
-
         mediaStream = await navigator.mediaDevices.getUserMedia({
           audio: true,
         })
@@ -52,8 +47,10 @@ export const createAudioRecorder = (
         const currentDeviceId = currentTrack?.getSettings().deviceId
         selectedDevice.value = currentDeviceId || ""
 
+        const audioWorkletUrl = getAudioRecordingWorkerURL()
+        audioContext = new AudioContext({ sampleRate: 16000 })
+        await audioContext.audioWorklet.addModule(audioWorkletUrl)
         audioInput = audioContext.createMediaStreamSource(mediaStream)
-
         workletNode = new AudioWorkletNode(
           audioContext,
           "recorder-worklet-processor"
