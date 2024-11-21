@@ -106,8 +106,8 @@ importers:
         specifier: ^0.12.2
         version: 0.12.2
       marked:
-        specifier: ^15.0.1
-        version: 15.0.1
+        specifier: ^15.0.2
+        version: 15.0.2
       mini-debounce:
         specifier: ^1.0.8
         version: 1.0.8
@@ -2325,8 +2325,8 @@ packages:
     resolution: {integrity: sha512-5uXcUVftlQMFnWC9qu/svkWv3GTd2PfUhK/3PLkYNAe7FbqJMt3515HaxE6eRL74GdsriiwujiawdaB1BpEISg==}
     engines: {node: '>= 0.8'}
 
-  find-cypress-specs@1.45.2:
-    resolution: {integrity: sha512-D289NM0Dpqoz4+yl8oEtbioqm7zPKQo0hLcvwlg5Z9iBm7EioMIFiOYgluthDNPxUES/aJF+1xHRHAJpC3ejcA==}
+  find-cypress-specs@1.46.2:
+    resolution: {integrity: sha512-eXvGQMftYDTbQflVX6TzJj7hA0ypO5+FfUrnMdRf1+yCu5xVY5wPv721AWp/xPBOpQXwx5jdoZRH9m95U/1c7A==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -3144,8 +3144,8 @@ packages:
   mailsplit@5.4.0:
     resolution: {integrity: sha512-wnYxX5D5qymGIPYLwnp6h8n1+6P6vz/MJn5AzGjZ8pwICWssL+CCQjWBIToOVHASmATot4ktvlLo6CyLfOXWYA==}
 
-  marked@15.0.1:
-    resolution: {integrity: sha512-VnnE19XO2Vb2oZeH8quAepfrb6Aaz4OoY8yZQACfuy/5KVJ0GxYC0Qxzz/iuc+g5UF7H0HJ+QROfvH26XeBdDA==}
+  marked@15.0.2:
+    resolution: {integrity: sha512-85RUkoYKIVB21PbMKrnD6aCl9ws+XKEyhJNMbLn206NyD3jbBo7Ec7Wi4Jrsn4dV1a2ng7K/jfkmIN0DNoS41w==}
     engines: {node: '>= 18'}
     hasBin: true
 
@@ -4272,11 +4272,11 @@ packages:
     resolution: {integrity: sha512-1OYJQenswGZSOdRw7Bql5Qu7uf75b+F3HFBXbqnG/ifHa0fev1XcG+3pJf3pA/KC6RtHQzfKgIf1vkMlMG7mtQ==}
     hasBin: true
 
-  tldts-core@6.1.61:
-    resolution: {integrity: sha512-In7VffkDWUPgwa+c9picLUxvb0RltVwTkSgMNFgvlGSWveCzGBemBqTsgJCL4EDFWZ6WH0fKTsot6yNhzy3ZzQ==}
+  tldts-core@6.1.62:
+    resolution: {integrity: sha512-ohONqbfobpuaylhqFbtCzc0dFFeNz85FVKSesgT8DS9OV3a25Yj730pTj7/dDtCqmgoCgEj6gDiU9XxgHKQlBw==}
 
-  tldts@6.1.61:
-    resolution: {integrity: sha512-rv8LUyez4Ygkopqn+M6OLItAOT9FF3REpPQDkdMx5ix8w4qkuE7Vo2o/vw1nxKQYmJDV8JpAMJQr1b+lTKf0FA==}
+  tldts@6.1.62:
+    resolution: {integrity: sha512-TF+wo3MgTLbf37keEwQD0IxvOZO8UZxnpPJDg5iFGAASGxYzbX/Q0y944ATEjrfxG/pF1TWRHCPbFp49Mz1Y1w==}
     hasBin: true
 
   tmp@0.2.3:
@@ -5146,7 +5146,7 @@ snapshots:
       cypress: 13.16.0
       debug: 4.3.7(supports-color@8.1.1)
       error-stack-parser: 2.1.4
-      find-cypress-specs: 1.45.2(@babel/core@7.26.0)
+      find-cypress-specs: 1.46.2(@babel/core@7.26.0)
       glob: 10.4.5
       mocha: 10.8.2
       seedrandom: 3.0.5
@@ -7231,7 +7231,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  find-cypress-specs@1.45.2(@babel/core@7.26.0):
+  find-cypress-specs@1.46.2(@babel/core@7.26.0):
     dependencies:
       '@actions/core': 1.11.1
       arg: 5.0.2
@@ -8142,7 +8142,7 @@ snapshots:
       libmime: 5.2.0
       libqp: 2.0.1
 
-  marked@15.0.1: {}
+  marked@15.0.2: {}
 
   media-typer@0.3.0: {}
 
@@ -9295,11 +9295,11 @@ snapshots:
 
   tlds@1.240.0: {}
 
-  tldts-core@6.1.61: {}
+  tldts-core@6.1.62: {}
 
-  tldts@6.1.61:
+  tldts@6.1.62:
     dependencies:
-      tldts-core: 6.1.61
+      tldts-core: 6.1.62
 
   tmp@0.2.3: {}
 
@@ -9320,7 +9320,7 @@ snapshots:
 
   tough-cookie@5.0.0:
     dependencies:
-      tldts: 6.1.61
+      tldts: 6.1.62
 
   tr46@0.0.3: {}
 
