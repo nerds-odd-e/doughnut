@@ -29,10 +29,6 @@ export class AudioBuffer {
     this.SILENCE_DURATION_THRESHOLD = 3 * sampleRate
   }
 
-  private isAllSilent(data: Float32Array[]): boolean {
-    return data.every((chunk) => isSilent(chunk))
-  }
-
   private getUnprocessedData(): Float32Array[] {
     const dataToProcess: Float32Array[] = []
     const firstChunk = this.audioData[this.lastProcessedArrayIndex]
@@ -93,27 +89,16 @@ export class AudioBuffer {
     return this.audioData.length
   }
 
-  private getCurrentPosition(): { arrayIndex: number; internalIndex: number } {
-    return {
-      arrayIndex: this.lastProcessedArrayIndex,
-      internalIndex: this.lastProcessedInternalIndex,
-    }
-  }
-
-  private hasNoUnprocessedData(): boolean {
-    return this.length() <= this.getCurrentPosition().arrayIndex
-  }
-
   private getProcessableData(): Float32Array[] | null {
     const dataToProcess = this.getUnprocessedData()
-    if (dataToProcess.length === 0 || this.isAllSilent(dataToProcess)) {
+    if (dataToProcess.length === 0 || isAllSilent(dataToProcess)) {
       return null
     }
     return dataToProcess
   }
 
   tryGetProcessableData(): File | null {
-    if (this.hasNoUnprocessedData()) return null
+    if (!this.hasUnprocessedData()) return null
 
     const dataToProcess = this.getProcessableData()
     if (!dataToProcess) return null
