@@ -14,28 +14,12 @@ const props = defineProps<{
 const waveformCanvas = ref<HTMLCanvasElement | null>(null)
 let animationId: number | null = null
 
-function drawWaveform() {
-  if (!waveformCanvas.value) return
-
-  const canvas = waveformCanvas.value
-  const ctx = canvas.getContext("2d")
-  if (!ctx) return
-
+function getCurrentAverageSample() {
   const audioData = props.audioRecorder.getAudioData()
   const dataLength = audioData.length
   const bufferLength = 3
   const start = dataLength > bufferLength ? dataLength - bufferLength : 0
   const data = audioData.slice(start, dataLength)
-
-  // Shift canvas content to the left
-  ctx.drawImage(canvas, -1, 0)
-
-  // Clear the rightmost column
-  ctx.fillStyle = "#ffffff"
-  ctx.fillRect(canvas.width - 1, 0, 1, canvas.height)
-
-  // Draw new data on the right edge
-  const height = canvas.height
 
   // Compute average of data
   let sum = 0
@@ -47,8 +31,27 @@ function drawWaveform() {
     }
   }
 
-  const avgSample = sum / data.length
+  return sum / data.length
+}
 
+function drawWaveform() {
+  if (!waveformCanvas.value) return
+
+  const canvas = waveformCanvas.value
+  const ctx = canvas.getContext("2d")
+  if (!ctx) return
+
+  const avgSample = getCurrentAverageSample()
+
+  // Shift canvas content to the left
+  ctx.drawImage(canvas, -1, 0)
+
+  // Clear the rightmost column
+  ctx.fillStyle = "#ffffff"
+  ctx.fillRect(canvas.width - 1, 0, 1, canvas.height)
+
+  // Draw new data on the right edge
+  const height = canvas.height
   const y = height - Math.abs(avgSample) * height
 
   ctx.fillStyle = "#4299e1"
