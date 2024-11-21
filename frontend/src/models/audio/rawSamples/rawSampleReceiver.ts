@@ -1,15 +1,8 @@
-import { createAudioBuffer, type AudioBuffer } from "./rawSampleAudioBuffer"
+import { createAudioBuffer } from "./rawSampleAudioBuffer"
 import { getAudioRecordingWorkerURL } from "./recorderWorklet"
+import type { AudioReceiver, AudioBuffer } from "../audioReceiver"
 
 const SAMPLE_RATE = 16000
-
-export interface AudioReceiver {
-  initialize: (deviceId?: string) => Promise<void>
-  disconnect: () => void
-  isInitialized: () => boolean
-  reconnect: (deviceId: string) => Promise<void>
-  getBuffer: () => AudioBuffer
-}
 
 export class RawAudioReceiver implements AudioReceiver {
   private audioContext: AudioContext | null = null

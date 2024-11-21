@@ -1,6 +1,7 @@
 import type { AudioChunk } from "../audioProcessingScheduler"
 import { createAudioFile } from "../createAudioFile"
 import { timestampToSeconds } from "../parseTimestamp"
+import type { AudioBuffer } from "../audioReceiver"
 
 const SILENCE_THRESHOLD = 0.01
 
@@ -8,18 +9,6 @@ function isSilent(data: Float32Array): boolean {
   const sum = data.reduce((acc, val) => acc + Math.abs(val), 0)
   const avg = sum / data.length
   return avg < SILENCE_THRESHOLD
-}
-
-export interface AudioBuffer {
-  receiveAudioData: (data: Float32Array[]) => void
-  hasUnprocessedData: () => boolean
-  processDataChunk: (
-    processorCallback: (chunk: AudioChunk) => Promise<string | undefined>,
-    isMidSpeech?: boolean
-  ) => Promise<void>
-  getCurrentAverageSample: () => number
-  setOnSilenceThresholdReached: (callback: () => void) => void
-  createFinalAudioFile(): File
 }
 
 class RawAudioBuffer implements AudioBuffer {
