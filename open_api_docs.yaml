@@ -4554,9 +4554,7 @@ components:
         code_interpreter:
           $ref: "#/components/schemas/ToolCallCodeInterpreter"
         file_search:
-          type: object
-          additionalProperties:
-            type: string
+          $ref: "#/components/schemas/ToolCallFileSearch"
     ToolCallCodeInterpreter:
       type: object
       properties:
@@ -4578,6 +4576,36 @@ components:
           type: string
         image:
           $ref: "#/components/schemas/RunImage"
+    ToolCallFileSearch:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/ToolCallFileSearchResult"
+        ranking_options:
+          $ref: "#/components/schemas/FileSearchRankingOptions"
+    ToolCallFileSearchResult:
+      type: object
+      properties:
+        score:
+          type: number
+          format: double
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/ToolCallFileSearchResultContent"
+        file_id:
+          type: string
+        file_name:
+          type: string
+    ToolCallFileSearchResultContent:
+      type: object
+      properties:
+        type:
+          type: string
+        text:
+          type: string
     ToolCallFunction:
       type: object
       properties:
