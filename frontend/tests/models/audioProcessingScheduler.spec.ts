@@ -27,7 +27,7 @@ describe("AudioProcessingScheduler", () => {
     )
 
     const nonSilentData = [new Float32Array([0.5, 0.4, 0.3, 0.2, 0.1])]
-    audioBuffer.processAudioData(nonSilentData)
+    audioBuffer.receiveAudioData(nonSilentData)
     scheduler.start()
 
     vi.advanceTimersByTime(30 * 1000)
@@ -61,7 +61,7 @@ describe("AudioProcessingScheduler", () => {
     )
 
     const nonSilentData = [new Float32Array([0.5, 0.4, 0.3, 0.2, 0.1])]
-    audioBuffer.processAudioData(nonSilentData)
+    audioBuffer.receiveAudioData(nonSilentData)
     scheduler.start()
 
     // Fast-forward to trigger timer
@@ -83,7 +83,7 @@ describe("AudioProcessingScheduler", () => {
     )
 
     const nonSilentData = [new Float32Array([0.5, 0.4, 0.3, 0.2, 0.1])]
-    audioBuffer.processAudioData(nonSilentData)
+    audioBuffer.receiveAudioData(nonSilentData)
     scheduler.start()
 
     await scheduler.stop()
@@ -107,11 +107,11 @@ describe("AudioProcessingScheduler", () => {
     const nonSilentData = new Float32Array(44100).fill(0.5)
     const silentData = new Float32Array(44100 * 3).fill(0)
 
-    audioBuffer.processAudioData([nonSilentData])
+    audioBuffer.receiveAudioData([nonSilentData])
     scheduler.start()
 
     // Process silent data to trigger silence detection
-    audioBuffer.processAudioData([silentData])
+    audioBuffer.receiveAudioData([silentData])
 
     expect(mockCallback).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -137,7 +137,7 @@ describe("AudioProcessingScheduler", () => {
 
     // Create 2 seconds of non-silent data
     const nonSilentData = new Float32Array(44100 * 2).fill(0.5)
-    audioBuffer.processAudioData([nonSilentData])
+    audioBuffer.receiveAudioData([nonSilentData])
     scheduler.start()
 
     // Process first chunk - should process 0.5 seconds
@@ -146,7 +146,7 @@ describe("AudioProcessingScheduler", () => {
 
     // Add more data
     const additionalData = new Float32Array(44100).fill(0.5)
-    audioBuffer.processAudioData([additionalData])
+    audioBuffer.receiveAudioData([additionalData])
 
     // Process next chunk - should process 1 second from the remaining data
     await scheduler.tryFlush()
@@ -168,7 +168,7 @@ describe("AudioProcessingScheduler", () => {
       mockCallback
     )
     const nonSilentData = new Float32Array(44100).fill(0.5)
-    audioBuffer.processAudioData([nonSilentData])
+    audioBuffer.receiveAudioData([nonSilentData])
 
     const promise1 = scheduler.tryFlush()
     const promise2 = scheduler.tryFlush()
@@ -202,7 +202,7 @@ describe("AudioProcessingScheduler", () => {
       mockCallback
     )
     const nonSilentData = new Float32Array(44100).fill(0.5) // 1 second of data
-    audioBuffer.processAudioData([nonSilentData])
+    audioBuffer.receiveAudioData([nonSilentData])
 
     // Start processing
     const flushPromise = scheduler.tryFlush()
@@ -249,7 +249,7 @@ describe("AudioProcessingScheduler", () => {
       mockCallback
     )
     const nonSilentData = new Float32Array(44100 * 2).fill(0.5)
-    audioBuffer.processAudioData([nonSilentData])
+    audioBuffer.receiveAudioData([nonSilentData])
 
     // Start processing first chunk
     const processingPromise = scheduler.tryFlush()
@@ -285,7 +285,7 @@ describe("AudioProcessingScheduler", () => {
 
     // Create 1 second of data
     const nonSilentData = new Float32Array(44100).fill(0.5)
-    audioBuffer.processAudioData([nonSilentData])
+    audioBuffer.receiveAudioData([nonSilentData])
 
     // Process first chunk
     await scheduler.tryFlush()

@@ -61,7 +61,7 @@ export const createAudioRecorder = (
 
         workletNode.port.onmessage = (event) => {
           if (event.data.audioBuffer) {
-            audioBuffer.processAudioData(event.data.audioBuffer)
+            audioBuffer.receiveAudioData(event.data.audioBuffer)
           }
         }
 

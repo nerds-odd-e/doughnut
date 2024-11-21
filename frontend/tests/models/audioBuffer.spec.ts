@@ -5,7 +5,7 @@ describe("AudioBuffer", () => {
   it("should process non-silent audio data", () => {
     const audioBuffer = new AudioBuffer(44100)
     const nonSilentData = [new Float32Array([0.5, 0.4, 0.3, 0.2, 0.1])]
-    audioBuffer.processAudioData(nonSilentData)
+    audioBuffer.receiveAudioData(nonSilentData)
     expect(audioBuffer.getAll().length).toBe(1)
     expect(audioBuffer.getAll()[0]).toEqual(nonSilentData[0])
   })
@@ -13,7 +13,7 @@ describe("AudioBuffer", () => {
   it("should detect silent audio data", () => {
     const audioBuffer = new AudioBuffer(44100)
     const silentData = [new Float32Array([0, 0, 0, 0, 0])]
-    audioBuffer.processAudioData(silentData)
+    audioBuffer.receiveAudioData(silentData)
     expect(audioBuffer.getAll().length).toBe(1)
     expect(audioBuffer.getAll()[0]).toEqual(silentData[0])
   })
@@ -25,7 +25,7 @@ describe("AudioBuffer", () => {
 
     // Create 3 seconds of silent data (threshold is 3 seconds)
     const silentData = new Float32Array(44100 * 3).fill(0)
-    audioBuffer.processAudioData([silentData])
+    audioBuffer.receiveAudioData([silentData])
 
     expect(mockCallback).toHaveBeenCalledTimes(1)
   })
@@ -37,14 +37,14 @@ describe("AudioBuffer", () => {
 
     // Add 2 seconds of silent data
     const silentData = new Float32Array(44100 * 2).fill(0)
-    audioBuffer.processAudioData([silentData])
+    audioBuffer.receiveAudioData([silentData])
 
     // Add non-silent data
     const nonSilentData = new Float32Array(44100).fill(0.5)
-    audioBuffer.processAudioData([nonSilentData])
+    audioBuffer.receiveAudioData([nonSilentData])
 
     // Add 2 more seconds of silent data (shouldn't trigger callback)
-    audioBuffer.processAudioData([silentData])
+    audioBuffer.receiveAudioData([silentData])
 
     expect(mockCallback).not.toHaveBeenCalled()
   })
@@ -54,7 +54,7 @@ describe("AudioBuffer", () => {
 
     // Add 2 seconds of data
     const data = new Float32Array(44100 * 2).fill(0.5)
-    audioBuffer.processAudioData([data])
+    audioBuffer.receiveAudioData([data])
 
     // Update to process first second
     audioBuffer.updateProcessedIndices("00:00:01,000")
@@ -67,7 +67,7 @@ describe("AudioBuffer", () => {
   it("should handle invalid timestamp gracefully", () => {
     const audioBuffer = new AudioBuffer(44100)
     const data = new Float32Array(44100).fill(0.5)
-    audioBuffer.processAudioData([data])
+    audioBuffer.receiveAudioData([data])
 
     audioBuffer.updateProcessedIndices("invalid")
 
@@ -81,7 +81,7 @@ describe("AudioBuffer", () => {
     expect(audioBuffer.hasUnprocessedData()).toBe(false)
 
     const data = new Float32Array(44100).fill(0.5)
-    audioBuffer.processAudioData([data])
+    audioBuffer.receiveAudioData([data])
 
     expect(audioBuffer.hasUnprocessedData()).toBe(true)
 
