@@ -4172,6 +4172,7 @@ components:
           enum:
           - complete_note_details
           - suggest_note_topic_title
+          - ask_single_answer_multiple_choice_question
     ExpiresAfter:
       type: object
       properties:

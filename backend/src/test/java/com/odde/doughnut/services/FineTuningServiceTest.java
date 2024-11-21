@@ -1,5 +1,6 @@
 package com.odde.doughnut.services;
 
+import static com.odde.doughnut.services.ai.tools.AiToolName.ASK_SINGLE_ANSWER_MULTIPLE_CHOICE_QUESTION;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -83,7 +84,7 @@ class FineTuningServiceTest {
           goodOpenAIChatGPTFineTuningExampleList.get(0).getMessages();
       assertThat(
           goodTrainingData.get(2).getFunctionCall().getName(),
-          containsString("ask_single_answer_multiple_choice_question"));
+          containsString(ASK_SINGLE_ANSWER_MULTIPLE_CHOICE_QUESTION.getValue()));
       assertThat(
           goodTrainingData.get(2).getFunctionCall().getArguments().toString(),
           containsString("This is the raw Json question"));

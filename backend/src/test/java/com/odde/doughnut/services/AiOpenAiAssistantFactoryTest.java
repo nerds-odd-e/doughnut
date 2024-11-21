@@ -77,5 +77,20 @@ class AiOpenAiAssistantFactoryTest {
       FunctionDefinition fun = (FunctionDefinition) tool.getFunction();
       assertTrue(fun.getStrict());
     }
+
+    @Test
+    void shouldHaveQuestionGenerationTool() {
+      List<AiTool> tools = AiToolFactory.getAllAssistantTools();
+
+      Optional<AiTool> topicTitleTool =
+          tools.stream()
+              .filter(
+                  t ->
+                      t.name()
+                          .equals(AiToolName.ASK_SINGLE_ANSWER_MULTIPLE_CHOICE_QUESTION.getValue()))
+              .findFirst();
+
+      assertTrue(topicTitleTool.isPresent());
+    }
   }
 }

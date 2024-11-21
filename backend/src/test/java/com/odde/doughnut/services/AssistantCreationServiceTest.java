@@ -52,7 +52,7 @@ class AssistantCreationServiceTest {
       item.setId("1234");
       when(openAiApi.createAssistant(ArgumentMatchers.any())).thenReturn(Single.just(item));
       String modelName = "model-name";
-      assistantCreationService.createDefaultAssistant(modelName, "Note details completion");
+      assistantCreationService.createDefaultAssistant(modelName, "Notebook assistant");
       ArgumentCaptor<AssistantRequest> captor = ArgumentCaptor.forClass(AssistantRequest.class);
       verify(openAiApi).createAssistant(captor.capture());
       assistantRequest = captor.getValue();
@@ -60,9 +60,9 @@ class AssistantCreationServiceTest {
 
     @Test
     void getAiSuggestion_givenAString_returnsAiSuggestionObject() {
-      assertThat(assistantRequest.getName(), is("Note details completion"));
+      assertThat(assistantRequest.getName(), is("Notebook assistant"));
       assertThat(assistantRequest.getInstructions(), containsString("PKM system"));
-      assertThat(assistantRequest.getTools(), hasSize(2));
+      assertThat(assistantRequest.getTools(), hasSize(3));
     }
 
     @Test

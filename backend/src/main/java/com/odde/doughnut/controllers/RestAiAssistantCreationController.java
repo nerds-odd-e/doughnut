@@ -50,7 +50,7 @@ public class RestAiAssistantCreationController {
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     String modelName = getModelName();
     Assistant assistant =
-        assistantCreationService.createDefaultAssistant(modelName, "Note details completion");
+        assistantCreationService.createDefaultAssistant(modelName, "Notebook assistant");
     globalSettingsService.defaultAssistantId().setKeyValue(currentUTCTimestamp, assistant.getId());
     Map<String, String> result = new HashMap<>();
     result.put(assistant.getName(), assistant.getId());

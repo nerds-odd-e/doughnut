@@ -15,4 +15,19 @@ public record AiTool(String name, String description, Class<?> parameterClass) {
             .parametersDefinitionByClass(castParameterClass)
             .build());
   }
+
+  /**
+   * we are copying and modifying the FunctionDefinition class to add the strict field to avoid
+   * breaking changes this won't be needed after our pull request is merged
+   * https://github.com/Lambdua/openai4j/pull/74
+   */
+  @SuppressWarnings("unchecked")
+  public com.theokanning.openai.function.FunctionDefinition getFunctionDefinition() {
+    Class<Object> castParameterClass = (Class<Object>) parameterClass;
+    return com.theokanning.openai.function.FunctionDefinition.builder()
+        .name(name)
+        .description(description)
+        .parametersDefinitionByClass(castParameterClass)
+        .build();
+  }
 }

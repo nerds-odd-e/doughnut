@@ -1,11 +1,20 @@
 package com.odde.doughnut.services.ai.tools;
 
+import static com.odde.doughnut.services.ai.tools.AiToolName.ASK_SINGLE_ANSWER_MULTIPLE_CHOICE_QUESTION;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.services.ai.*;
 import com.theokanning.openai.function.FunctionDefinition;
 import java.util.List;
 
 public class AiToolFactory {
+
+  public static AiTool askSingleAnswerMultipleChoiceQuestion() {
+    return new AiTool(
+        ASK_SINGLE_ANSWER_MULTIPLE_CHOICE_QUESTION.getValue(),
+        "Ask a single-answer multiple-choice question to the user",
+        MCQWithAnswer.class);
+  }
 
   public static AiToolList mcqWithAnswerAiTool() {
     return new AiToolList(
@@ -20,12 +29,7 @@ public class AiToolFactory {
 
       Note: The specific note of focus and its more detailed contexts are not known. Focus on memory reinforcement and recall across various subjects.
       """,
-        List.of(
-            FunctionDefinition.<MCQWithAnswer>builder()
-                .name("ask_single_answer_multiple_choice_question")
-                .description("Ask a single-answer multiple-choice question to the user")
-                .parametersDefinitionByClass(MCQWithAnswer.class)
-                .build()));
+        List.of(askSingleAnswerMultipleChoiceQuestion().getFunctionDefinition()));
   }
 
   public static AiToolList questionEvaluationAiTool(MCQWithAnswer question) {
@@ -106,7 +110,8 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
   }
 
   public static List<AiTool> getAllAssistantTools() {
-    return List.of(completeNoteDetails(), suggestNoteTopicTitle());
+    return List.of(
+        completeNoteDetails(), suggestNoteTopicTitle(), askSingleAnswerMultipleChoiceQuestion());
   }
 
   public static AiTool suggestNoteTopicTitle() {
