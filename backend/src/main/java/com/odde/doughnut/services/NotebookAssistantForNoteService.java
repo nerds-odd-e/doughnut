@@ -1,7 +1,5 @@
 package com.odde.doughnut.services;
 
-import static com.odde.doughnut.services.ai.AiQuestionGeneratorForNote.getOptionalMCQWithAnswer;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.AudioUploadDTO;
 import com.odde.doughnut.entities.*;
@@ -13,7 +11,7 @@ import com.theokanning.openai.assistants.message.MessageRequest;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 public final class NotebookAssistantForNoteService {
@@ -159,14 +157,21 @@ public final class NotebookAssistantForNoteService {
         .run();
   }
 
-  public Optional<MCQWithAnswer> generateQuestion() throws JsonProcessingException {
-    AssistantThread thread =
-        createThreadWithNoteInfo(List.of())
-            .withTool(AiToolFactory.askSingleAnswerMultipleChoiceQuestion())
-            .withInstructions(AiToolFactory.mcqWithAnswerAiTool().getMessageBody());
-
+  public MCQWithAnswer generateQuestion() throws JsonProcessingException {
     MCQWithAnswer questionNode =
-        (MCQWithAnswer) thread.run().getToolCallResponse().cancelRun().getFirstArgument();
-    return getOptionalMCQWithAnswer(questionNode);
+        (MCQWithAnswer)
+            createThreadWithNoteInfo(List.of())
+                .withTool(AiToolFactory.askSingleAnswerMultipleChoiceQuestion())
+                .withInstructions(AiToolFactory.mcqWithAnswerAiTool().getMessageBody())
+                .run()
+                .getToolCallResponse()
+                .cancelRun()
+                .getFirstArgument();
+
+    if (questionNode.getMultipleChoicesQuestion().getStem() != null
+        && !Strings.isBlank(questionNode.getMultipleChoicesQuestion().getStem())) {
+      return questionNode;
+    }
+    return null;
   }
 }

@@ -19,7 +19,7 @@ public record AiQuestionGenerator(
         new NotebookAssistantForNoteServiceFactory(openAiApi, globalSettingsService);
     NotebookAssistantForNoteService service = notebookAssistantForNoteServiceFactory.create(note);
     try {
-      return service.generateQuestion().orElse(null);
+      return service.generateQuestion();
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }
