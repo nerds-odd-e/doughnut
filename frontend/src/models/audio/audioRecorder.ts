@@ -3,7 +3,7 @@ import {
   type AudioChunk,
   wireAudioProcessingScheduler,
 } from "./audioProcessingScheduler"
-import { createAudioReceiver } from "./audioReceiver"
+import { createAudioReceiver } from "./rawSamples/audioReceiver"
 
 export interface AudioRecorder {
   startRecording: () => Promise<void>

@@ -1,6 +1,6 @@
-import type { AudioChunk } from "./audioProcessingScheduler"
-import { createAudioFile } from "./createAudioFile"
-import { timestampToSeconds } from "./parseTimestamp"
+import type { AudioChunk } from "../audioProcessingScheduler"
+import { createAudioFile } from "../createAudioFile"
+import { timestampToSeconds } from "../parseTimestamp"
 
 const SILENCE_THRESHOLD = 0.01
 

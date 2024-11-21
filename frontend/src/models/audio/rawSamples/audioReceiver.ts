@@ -1,4 +1,4 @@
-import { createAudioBuffer, type AudioBuffer } from "./audioBuffer"
+import { createAudioBuffer, type AudioBuffer } from "./rawSampleAudioBuffer"
 import { getAudioRecordingWorkerURL } from "./recorderWorklet"
 
 const SAMPLE_RATE = 16000

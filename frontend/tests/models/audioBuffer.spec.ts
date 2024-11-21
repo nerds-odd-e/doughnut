@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest"
-import { createAudioBuffer } from "@/models/audio/audioBuffer"
+import { createAudioBuffer } from "@/models/audio/rawSamples/rawSampleAudioBuffer"
 
 describe("AudioBuffer", () => {
   it("should process non-silent audio data", () => {

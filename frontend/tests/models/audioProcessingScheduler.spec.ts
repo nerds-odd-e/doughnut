@@ -3,7 +3,7 @@ import {
   type AudioChunk,
   wireAudioProcessingScheduler,
 } from "@/models/audio/audioProcessingScheduler"
-import { createAudioBuffer } from "@/models/audio/audioBuffer"
+import { createAudioBuffer } from "@/models/audio/rawSamples/rawSampleAudioBuffer"
 
 const createBufferAndScheduler = (
   sampleRate: number,
