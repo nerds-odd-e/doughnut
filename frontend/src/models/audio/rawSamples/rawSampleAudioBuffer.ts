@@ -100,7 +100,7 @@ class RawAudioBuffer implements AudioBuffer {
     newData.forEach((chunk) => this.push(chunk))
   }
 
-  async processDataChunk(
+  async processUnprocessedData(
     processorCallback: (chunk: AudioChunk) => Promise<string | undefined>,
     isMidSpeech = true
   ): Promise<void> {
@@ -166,6 +166,6 @@ class RawAudioBuffer implements AudioBuffer {
   }
 }
 
-export const createAudioBuffer = (sampleRate: number): AudioBuffer => {
+export const createAudioBuffer = (sampleRate: number) => {
   return new RawAudioBuffer(sampleRate)
 }

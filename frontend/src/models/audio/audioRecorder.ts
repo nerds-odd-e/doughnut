@@ -63,7 +63,7 @@ export const createAudioRecorder = (
     },
 
     getAudioData: function (): number {
-      return audioReceiver.getBuffer().getCurrentAverageSample()
+      return audioReceiver.getCurrentAverageSample()
     },
 
     tryFlush: async function (): Promise<void> {

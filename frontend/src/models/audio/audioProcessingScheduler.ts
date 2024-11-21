@@ -25,7 +25,10 @@ class AudioProcessingSchedulerImpl implements AudioProcessingScheduler {
   ) {}
 
   private async processDataChunk(isMidSpeech = true): Promise<void> {
-    await this.audioBuffer.processDataChunk(this.processorCallback, isMidSpeech)
+    await this.audioBuffer.processUnprocessedData(
+      this.processorCallback,
+      isMidSpeech
+    )
   }
 
   private startTimer(): void {

@@ -56,10 +56,10 @@ describe("AudioBuffer", () => {
 
     // Process first second
     const processorCallback = vi.fn().mockResolvedValue("00:00:01,000")
-    await audioBuffer.processDataChunk(processorCallback)
+    await audioBuffer.processUnprocessedData(processorCallback)
 
     // Process remaining data
-    await audioBuffer.processDataChunk(processorCallback)
+    await audioBuffer.processUnprocessedData(processorCallback)
     expect(processorCallback).toHaveBeenCalledTimes(2)
   })
 
@@ -69,7 +69,7 @@ describe("AudioBuffer", () => {
     audioBuffer.receiveAudioData([data])
 
     const processorCallback = vi.fn().mockResolvedValue("invalid")
-    await audioBuffer.processDataChunk(processorCallback)
+    await audioBuffer.processUnprocessedData(processorCallback)
 
     // Should have attempted to process the data
     expect(processorCallback).toHaveBeenCalled()
@@ -80,7 +80,7 @@ describe("AudioBuffer", () => {
 
     // Initially no unprocessed data
     const processorCallback = vi.fn().mockResolvedValue("00:00:01,000")
-    await audioBuffer.processDataChunk(processorCallback)
+    await audioBuffer.processUnprocessedData(processorCallback)
     expect(processorCallback).not.toHaveBeenCalled()
 
     // Add some data
@@ -88,7 +88,7 @@ describe("AudioBuffer", () => {
     audioBuffer.receiveAudioData([data])
 
     // Process the data
-    await audioBuffer.processDataChunk(processorCallback)
+    await audioBuffer.processUnprocessedData(processorCallback)
     expect(processorCallback).toHaveBeenCalled()
   })
 
@@ -109,13 +109,13 @@ describe("AudioBuffer", () => {
     })
 
     // Process the first chunk
-    await audioBuffer.processDataChunk(processorCallback)
+    await audioBuffer.processUnprocessedData(processorCallback)
 
     // The second chunk should still be available for processing
     expect(audioBuffer.hasUnprocessedData()).toBe(true)
 
     // Process the second chunk
-    await audioBuffer.processDataChunk(processorCallback)
+    await audioBuffer.processUnprocessedData(processorCallback)
 
     // Verify both chunks were processed
     expect(processorCallback).toHaveBeenCalledTimes(2)

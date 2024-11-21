@@ -1,11 +1,9 @@
 export interface AudioBuffer {
-  receiveAudioData: (data: Float32Array[]) => void
   hasUnprocessedData: () => boolean
-  processDataChunk: (
+  processUnprocessedData: (
     processorCallback: (chunk: AudioChunk) => Promise<string | undefined>,
     isMidSpeech?: boolean
   ) => Promise<void>
-  getCurrentAverageSample: () => number
   setOnSilenceThresholdReached: (callback: () => void) => void
   createFinalAudioFile(): File
 }
@@ -14,6 +12,7 @@ export interface AudioReceiver {
   connect: (mediaStream: MediaStream) => Promise<void>
   disconnect: () => void
   getBuffer: () => AudioBuffer
+  getCurrentAverageSample: () => number
 }
 
 import { createRawSampleAudioReceiver } from "./rawSamples/rawSampleReceiver"

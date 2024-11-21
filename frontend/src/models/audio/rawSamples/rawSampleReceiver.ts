@@ -8,11 +8,7 @@ export class RawAudioReceiver implements AudioReceiver {
   private audioContext: AudioContext | null = null
   private audioInput: MediaStreamAudioSourceNode | null = null
   private workletNode: AudioWorkletNode | null = null
-  private audioBuffer: AudioBuffer
-
-  constructor() {
-    this.audioBuffer = createAudioBuffer(SAMPLE_RATE)
-  }
+  private audioBuffer = createAudioBuffer(SAMPLE_RATE)
 
   async connect(mediaStream: MediaStream): Promise<void> {
     try {
@@ -62,6 +58,10 @@ export class RawAudioReceiver implements AudioReceiver {
 
   getBuffer(): AudioBuffer {
     return this.audioBuffer
+  }
+
+  getCurrentAverageSample(): number {
+    return this.audioBuffer.getCurrentAverageSample()
   }
 }
 
