@@ -49,44 +49,48 @@ describe("AudioBuffer", () => {
     expect(mockCallback).not.toHaveBeenCalled()
   })
 
-  it("should update processed indices based on timestamp", () => {
+  it("should process data based on timestamp", async () => {
     const audioBuffer = new AudioBuffer(44100)
 
     // Add 2 seconds of data
     const data = new Float32Array(44100 * 2).fill(0.5)
     audioBuffer.receiveAudioData([data])
 
-    // Update to process first second
-    audioBuffer.updateProcessedIndices("00:00:01,000")
+    // Process first second
+    const processorCallback = vi.fn().mockResolvedValue("00:00:01,000")
+    await audioBuffer.processDataChunk(processorCallback)
 
-    // Try to get processable data - should only get the second half
-    const file = audioBuffer.tryGetProcessableData()
-    expect(file).toBeTruthy()
+    // Process remaining data
+    const secondCall = await audioBuffer.processDataChunk(processorCallback)
+    expect(processorCallback).toHaveBeenCalledTimes(2)
   })
 
-  it("should handle invalid timestamp gracefully", () => {
+  it("should handle invalid timestamp in processor callback gracefully", async () => {
     const audioBuffer = new AudioBuffer(44100)
     const data = new Float32Array(44100).fill(0.5)
     audioBuffer.receiveAudioData([data])
 
-    audioBuffer.updateProcessedIndices("invalid")
+    const processorCallback = vi.fn().mockResolvedValue("invalid")
+    await audioBuffer.processDataChunk(processorCallback)
 
-    // Should process all data despite invalid timestamp
-    expect(audioBuffer.hasUnprocessedData()).toBe(false)
+    // Should have attempted to process the data
+    expect(processorCallback).toHaveBeenCalled()
   })
 
-  it("should correctly identify unprocessed data status", () => {
+  it("should correctly process data chunks", async () => {
     const audioBuffer = new AudioBuffer(44100)
 
-    expect(audioBuffer.hasUnprocessedData()).toBe(false)
+    // Initially no unprocessed data
+    const processorCallback = vi.fn().mockResolvedValue("00:00:01,000")
+    await audioBuffer.processDataChunk(processorCallback)
+    expect(processorCallback).not.toHaveBeenCalled()
 
+    // Add some data
     const data = new Float32Array(44100).fill(0.5)
     audioBuffer.receiveAudioData([data])
 
-    expect(audioBuffer.hasUnprocessedData()).toBe(true)
-
-    audioBuffer.updateProcessedIndices("00:00:01,000")
-
-    expect(audioBuffer.hasUnprocessedData()).toBe(false)
+    // Process the data
+    await audioBuffer.processDataChunk(processorCallback)
+    expect(processorCallback).toHaveBeenCalled()
   })
 })

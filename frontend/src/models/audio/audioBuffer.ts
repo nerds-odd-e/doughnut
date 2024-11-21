@@ -85,7 +85,7 @@ export class AudioBuffer {
       : dataToProcess
   }
 
-  tryGetProcessableData(): File | null {
+  private tryGetProcessableData(): File | null {
     if (!this.hasUnprocessedData()) return null
 
     const dataToProcess = this.getProcessableData()
@@ -99,7 +99,7 @@ export class AudioBuffer {
     this.lastProcessedInternalIndex = 0
   }
 
-  updateProcessedIndices(timestamp: string | undefined): void {
+  private updateProcessedIndices(timestamp: string | undefined): void {
     if (!timestamp) {
       this.moveProcessedIndicesToEnd()
       return
