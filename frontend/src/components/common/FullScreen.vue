@@ -24,8 +24,26 @@ const isFullscreen = ref(false)
 
 const toggleFullscreen = async () => {
   if (!isFullscreen.value) {
-    await document.documentElement.requestFullscreen()
-    document.documentElement.requestPointerLock()
+    if (
+      (
+        document.documentElement as HTMLElement & {
+          webkitRequestFullscreen(): Promise<void>
+        }
+      ).webkitRequestFullscreen
+    ) {
+      await (
+        document.documentElement as HTMLElement & {
+          webkitRequestFullscreen(): Promise<void>
+        }
+      ).webkitRequestFullscreen()
+    } else if (document.documentElement.requestFullscreen) {
+      await document.documentElement.requestFullscreen()
+    }
+
+    if (document.documentElement.requestPointerLock) {
+      document.documentElement.requestPointerLock()
+    }
+
     isFullscreen.value = true
     emit("fullscreenChange", true)
   } else {
@@ -37,9 +55,17 @@ const exitFullscreen = async () => {
   if (!isFullscreen.value) return
 
   try {
-    if (document.fullscreenElement) {
+    if (
+      (document as Document & { webkitFullscreenElement: Element | null })
+        .webkitFullscreenElement
+    ) {
+      await (
+        document as Document & { webkitExitFullscreen(): Promise<void> }
+      ).webkitExitFullscreen()
+    } else if (document.fullscreenElement) {
       await document.exitFullscreen()
     }
+
     if (document.pointerLockElement) {
       document.exitPointerLock()
     }

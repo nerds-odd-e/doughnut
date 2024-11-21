@@ -116,7 +116,7 @@ public final class NotebookAssistantForNoteService {
         && !config.getRunId().isEmpty()) {
       try {
         String instruction =
-            "Previous content was appended. More transcription to process; append it to the previous output. Follow the same instructions as before.";
+            "Previous content was appended. More transcription to process; append it to the previous output. The previous output could be incomplete sentence, so only start new sentence or new line when make sense. Follow the same instructions as before.";
 
         instruction = appendAdditionalInstructions(instruction, config);
 
