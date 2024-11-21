@@ -65,4 +65,63 @@ class FunctionDefinitionTest {
     assertThat(jsonNode.get("description").asText()).isEqualTo("Test function");
     assertThat(jsonNode.has("strict")).isFalse();
   }
+
+  @Test
+  void shouldSetAdditionalPropertiesFalseWhenStrictIsTrue() throws Exception {
+    // given
+    FunctionDefinition function =
+        FunctionDefinition.<TestParameters>builder()
+            .name("test_function")
+            .description("Test function")
+            .strict(true)
+            .parametersDefinitionByClass(TestParameters.class)
+            .build();
+
+    // when
+    String json = objectMapper.writeValueAsString(function);
+    JsonNode jsonNode = objectMapper.readTree(json);
+    JsonNode parametersNode = jsonNode.get("parameters");
+
+    // then
+    assertThat(parametersNode.get("additionalProperties").asBoolean()).isFalse();
+  }
+
+  @Test
+  void whenStrictIsFalse() throws Exception {
+    // given
+    FunctionDefinition function =
+        FunctionDefinition.<TestParameters>builder()
+            .name("test_function")
+            .description("Test function")
+            .strict(false)
+            .parametersDefinitionByClass(TestParameters.class)
+            .build();
+
+    // when
+    String json = objectMapper.writeValueAsString(function);
+    JsonNode jsonNode = objectMapper.readTree(json);
+    JsonNode parametersNode = jsonNode.get("parameters");
+
+    // then
+    assertThat(parametersNode.has("additionalProperties")).isTrue();
+  }
+
+  @Test
+  void shouldNotSetAdditionalPropertiesWhenStrictIsNull() throws Exception {
+    // given
+    FunctionDefinition function =
+        FunctionDefinition.<TestParameters>builder()
+            .name("test_function")
+            .description("Test function")
+            .parametersDefinitionByClass(TestParameters.class)
+            .build();
+
+    // when
+    String json = objectMapper.writeValueAsString(function);
+    JsonNode jsonNode = objectMapper.readTree(json);
+    JsonNode parametersNode = jsonNode.get("parameters");
+
+    // then
+    assertThat(parametersNode.has("additionalProperties")).isFalse();
+  }
 }
