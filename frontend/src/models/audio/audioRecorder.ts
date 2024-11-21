@@ -3,7 +3,7 @@ import {
   type AudioChunk,
   wireAudioProcessingScheduler,
 } from "./audioProcessingScheduler"
-import { createAudioReceiver } from "./rawSamples/audioReceiver"
+import { createRawSampleAudioReceiver } from "./rawSamples/rawSampleReceiver"
 
 export interface AudioRecorder {
   startRecording: () => Promise<void>
@@ -18,7 +18,7 @@ export interface AudioRecorder {
 export const createAudioRecorder = (
   processorCallback: (chunk: AudioChunk) => Promise<string | undefined>
 ): AudioRecorder => {
-  const audioReceiver = createAudioReceiver()
+  const audioReceiver = createRawSampleAudioReceiver()
   const audioProcessingScheduler = wireAudioProcessingScheduler(
     audioReceiver.getBuffer(),
     processorCallback

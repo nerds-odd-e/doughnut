@@ -78,6 +78,6 @@ export class RawAudioReceiver implements AudioReceiver {
   }
 }
 
-export function createAudioReceiver(): AudioReceiver {
+export function createRawSampleAudioReceiver(): AudioReceiver {
   return new RawAudioReceiver()
 }
