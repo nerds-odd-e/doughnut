@@ -61,7 +61,7 @@ describe("AudioBuffer", () => {
     await audioBuffer.processDataChunk(processorCallback)
 
     // Process remaining data
-    const secondCall = await audioBuffer.processDataChunk(processorCallback)
+    await audioBuffer.processDataChunk(processorCallback)
     expect(processorCallback).toHaveBeenCalledTimes(2)
   })
 
@@ -92,5 +92,34 @@ describe("AudioBuffer", () => {
     // Process the data
     await audioBuffer.processDataChunk(processorCallback)
     expect(processorCallback).toHaveBeenCalled()
+  })
+
+  it("should not miss data that arrives during processing", async () => {
+    const audioBuffer = new AudioBuffer(44100)
+
+    // Add initial 1 second of data
+    const initialData = new Float32Array(44100).fill(0.5)
+    audioBuffer.receiveAudioData([initialData])
+
+    // Simulate slow processing with delayed response
+    const processorCallback = vi.fn().mockImplementation(async () => {
+      // While we're "processing", new data arrives
+      const newData = new Float32Array(44100).fill(0.7)
+      audioBuffer.receiveAudioData([newData])
+
+      return undefined
+    })
+
+    // Process the first chunk
+    await audioBuffer.processDataChunk(processorCallback)
+
+    // The second chunk should still be available for processing
+    expect(audioBuffer.hasUnprocessedData()).toBe(true)
+
+    // Process the second chunk
+    await audioBuffer.processDataChunk(processorCallback)
+
+    // Verify both chunks were processed
+    expect(processorCallback).toHaveBeenCalledTimes(2)
   })
 })

@@ -48,23 +48,6 @@ export class AudioBuffer {
     return this.audioData
   }
 
-  private calculateNewIndices(processedSamples: number): void {
-    let totalSamples = this.lastProcessedInternalIndex
-
-    for (let i = this.lastProcessedArrayIndex; i < this.audioData.length; i++) {
-      const arrayLength = this.audioData[i]?.length ?? 0
-      if (totalSamples + arrayLength <= processedSamples) {
-        totalSamples += arrayLength
-        this.lastProcessedArrayIndex = i + 1
-        this.lastProcessedInternalIndex = 0
-      } else {
-        this.lastProcessedArrayIndex = i
-        this.lastProcessedInternalIndex = processedSamples - totalSamples
-        break
-      }
-    }
-  }
-
   hasUnprocessedData(): boolean {
     return (
       this.lastProcessedArrayIndex < this.audioData.length ||
@@ -83,36 +66,6 @@ export class AudioBuffer {
     return dataToProcess.length === 0 || isAllSilent(dataToProcess)
       ? null
       : dataToProcess
-  }
-
-  private tryGetProcessableData(): File | null {
-    if (!this.hasUnprocessedData()) return null
-
-    const dataToProcess = this.getProcessableData()
-    if (!dataToProcess) return null
-
-    return createAudioFile(dataToProcess, this.sampleRate, true)
-  }
-
-  private moveProcessedIndicesToEnd(): void {
-    this.lastProcessedArrayIndex = this.length()
-    this.lastProcessedInternalIndex = 0
-  }
-
-  private updateProcessedIndices(timestamp: string | undefined): void {
-    if (!timestamp) {
-      this.moveProcessedIndicesToEnd()
-      return
-    }
-
-    const processedSeconds = timestampToSeconds(timestamp)
-    if (processedSeconds === undefined) {
-      this.moveProcessedIndicesToEnd()
-      return
-    }
-
-    const processedSamples = Math.floor(processedSeconds * this.sampleRate)
-    this.calculateNewIndices(processedSamples)
   }
 
   createFinalAudioFile(): File {
@@ -146,14 +99,46 @@ export class AudioBuffer {
     processorCallback: (chunk: AudioChunk) => Promise<string | undefined>,
     isMidSpeech = true
   ): Promise<void> {
-    const file = this.tryGetProcessableData()
-    if (!file) return
+    const dataToProcess = this.getProcessableData()
+    if (!dataToProcess) return
 
+    const startArrayIndex = this.lastProcessedArrayIndex
+    const startInternalIndex = this.lastProcessedInternalIndex
+    const snapshotLength = this.audioData.length
+
+    const file = createAudioFile(dataToProcess, this.sampleRate, true)
     const timestamp = await processorCallback({
       data: file,
       isMidSpeech,
     })
 
-    this.updateProcessedIndices(timestamp)
+    if (!timestamp) {
+      this.lastProcessedArrayIndex = snapshotLength
+      this.lastProcessedInternalIndex = 0
+      return
+    }
+
+    const processedSeconds = timestampToSeconds(timestamp)
+    if (processedSeconds === undefined) {
+      this.lastProcessedArrayIndex = snapshotLength
+      this.lastProcessedInternalIndex = 0
+      return
+    }
+
+    const processedSamples = Math.floor(processedSeconds * this.sampleRate)
+
+    let totalSamples = startInternalIndex
+    for (let i = startArrayIndex; i < snapshotLength; i++) {
+      const arrayLength = this.audioData[i]?.length ?? 0
+      if (totalSamples + arrayLength <= processedSamples) {
+        totalSamples += arrayLength
+        this.lastProcessedArrayIndex = i + 1
+        this.lastProcessedInternalIndex = 0
+      } else {
+        this.lastProcessedArrayIndex = i
+        this.lastProcessedInternalIndex = processedSamples - totalSamples
+        break
+      }
+    }
   }
 }
