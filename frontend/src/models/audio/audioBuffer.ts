@@ -14,10 +14,12 @@ export interface AudioBuffer {
   receiveAudioData: (data: Float32Array[]) => void
   hasUnprocessedData: () => boolean
   processDataChunk: (
-    processorCallback: (chunk: Float32Array) => Promise<string | undefined>
+    processorCallback: (chunk: AudioChunk) => Promise<string | undefined>,
+    isMidSpeech?: boolean
   ) => Promise<void>
   getCurrentAverageSample: () => number
   setOnSilenceThresholdReached: (callback: () => void) => void
+  createFinalAudioFile(): File
 }
 
 class RawAudioBuffer implements AudioBuffer {
