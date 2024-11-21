@@ -50,10 +50,6 @@ export class AudioBuffer {
     return unprocessedData
   }
 
-  getAll(): Float32Array[] {
-    return this.audioData
-  }
-
   hasUnprocessedData(): boolean {
     const currentIndex = this.lastProcessedArrayIndex
 
@@ -147,5 +143,24 @@ export class AudioBuffer {
         break
       }
     }
+  }
+
+  getCurrentAverageSample(): number {
+    const dataLength = this.audioData.length
+    const bufferLength = 3
+    const start = dataLength > bufferLength ? dataLength - bufferLength : 0
+    const data = this.audioData.slice(start, dataLength)
+
+    // Compute average of data
+    let sum = 0
+    for (let i = 0; i < data.length; i++) {
+      const channel = data[i]
+      if (!channel) continue
+      for (let j = 0; j < channel.length; j++) {
+        sum += channel[j]!
+      }
+    }
+
+    return sum / data.length
   }
 }

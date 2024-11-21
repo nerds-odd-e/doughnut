@@ -14,26 +14,6 @@ const props = defineProps<{
 const waveformCanvas = ref<HTMLCanvasElement | null>(null)
 let animationId: number | null = null
 
-function getCurrentAverageSample() {
-  const audioData = props.audioRecorder.getAudioData()
-  const dataLength = audioData.length
-  const bufferLength = 3
-  const start = dataLength > bufferLength ? dataLength - bufferLength : 0
-  const data = audioData.slice(start, dataLength)
-
-  // Compute average of data
-  let sum = 0
-  for (let i = 0; i < data.length; i++) {
-    const channel = data[i]
-    if (!channel) continue
-    for (let j = 0; j < channel.length; j++) {
-      sum += channel[j]!
-    }
-  }
-
-  return sum / data.length
-}
-
 function drawWaveform() {
   if (!waveformCanvas.value) return
 
@@ -41,7 +21,7 @@ function drawWaveform() {
   const ctx = canvas.getContext("2d")
   if (!ctx) return
 
-  const avgSample = getCurrentAverageSample()
+  const avgSample = props.audioRecorder.getAudioData()
 
   // Shift canvas content to the left
   ctx.drawImage(canvas, -1, 0)

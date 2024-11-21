@@ -9,7 +9,7 @@ import { AudioBuffer } from "./audioBuffer"
 export interface AudioRecorder {
   startRecording: () => Promise<void>
   stopRecording: () => Promise<File>
-  getAudioData: () => Float32Array[]
+  getAudioData: () => number
   tryFlush: () => Promise<void>
   getAudioDevices: () => Ref<MediaDeviceInfo[]>
   getSelectedDevice: () => Ref<string>
@@ -90,8 +90,8 @@ export const createAudioRecorder = (
       return audioProcessingScheduler.stop()
     },
 
-    getAudioData: function (): Float32Array[] {
-      return audioBuffer.getAll()
+    getAudioData: function (): number {
+      return audioBuffer.getCurrentAverageSample()
     },
 
     tryFlush: async function (): Promise<void> {

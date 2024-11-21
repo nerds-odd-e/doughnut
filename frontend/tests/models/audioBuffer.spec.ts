@@ -6,16 +6,14 @@ describe("AudioBuffer", () => {
     const audioBuffer = new AudioBuffer(44100)
     const nonSilentData = [new Float32Array([0.5, 0.4, 0.3, 0.2, 0.1])]
     audioBuffer.receiveAudioData(nonSilentData)
-    expect(audioBuffer.getAll().length).toBe(1)
-    expect(audioBuffer.getAll()[0]).toEqual(nonSilentData[0])
+    expect(audioBuffer.hasUnprocessedData()).toBe(true)
   })
 
   it("should detect silent audio data", () => {
     const audioBuffer = new AudioBuffer(44100)
     const silentData = [new Float32Array([0, 0, 0, 0, 0])]
     audioBuffer.receiveAudioData(silentData)
-    expect(audioBuffer.getAll().length).toBe(1)
-    expect(audioBuffer.getAll()[0]).toEqual(silentData[0])
+    expect(audioBuffer.hasUnprocessedData()).toBe(true)
   })
 
   it("should trigger silence callback after threshold duration", () => {
