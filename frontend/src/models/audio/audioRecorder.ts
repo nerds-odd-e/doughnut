@@ -4,7 +4,7 @@ import {
   type AudioChunk,
   wireAudioProcessingScheduler,
 } from "./audioProcessingScheduler"
-import { AudioBuffer } from "./audioBuffer"
+import { createAudioBuffer } from "./audioBuffer"
 
 export interface AudioRecorder {
   startRecording: () => Promise<void>
@@ -23,7 +23,7 @@ export const createAudioRecorder = (
   let mediaStream: MediaStream | null = null
   let audioInput: MediaStreamAudioSourceNode | null = null
   let workletNode: AudioWorkletNode | null = null
-  const audioBuffer = new AudioBuffer(16000)
+  const audioBuffer = createAudioBuffer(16000)
   const audioProcessingScheduler = wireAudioProcessingScheduler(
     audioBuffer,
     processorCallback
@@ -64,10 +64,10 @@ export const createAudioRecorder = (
             audioBuffer.receiveAudioData(event.data.audioBuffer)
           }
         }
-
-        audioProcessingScheduler.start()
         audioInput.connect(workletNode)
         workletNode.connect(audioContext.destination)
+
+        audioProcessingScheduler.start()
         isRecording = true
       } catch (error) {
         console.error("Error starting recording:", error)

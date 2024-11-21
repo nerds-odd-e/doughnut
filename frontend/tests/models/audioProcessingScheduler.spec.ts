@@ -3,13 +3,13 @@ import {
   type AudioChunk,
   wireAudioProcessingScheduler,
 } from "@/models/audio/audioProcessingScheduler"
-import { AudioBuffer } from "@/models/audio/audioBuffer"
+import { createAudioBuffer } from "@/models/audio/audioBuffer"
 
 const createBufferAndScheduler = (
   sampleRate: number,
   processorCallback: (chunk: AudioChunk) => Promise<string | undefined>
 ) => {
-  const audioBuffer = new AudioBuffer(sampleRate)
+  const audioBuffer = createAudioBuffer(sampleRate)
   const scheduler = wireAudioProcessingScheduler(audioBuffer, processorCallback)
   return { audioBuffer, scheduler }
 }

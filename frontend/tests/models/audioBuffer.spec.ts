@@ -1,23 +1,23 @@
 import { describe, it, expect, vi } from "vitest"
-import { AudioBuffer } from "@/models/audio/audioBuffer"
+import { createAudioBuffer } from "@/models/audio/audioBuffer"
 
 describe("AudioBuffer", () => {
   it("should process non-silent audio data", () => {
-    const audioBuffer = new AudioBuffer(44100)
+    const audioBuffer = createAudioBuffer(44100)
     const nonSilentData = [new Float32Array([0.5, 0.4, 0.3, 0.2, 0.1])]
     audioBuffer.receiveAudioData(nonSilentData)
     expect(audioBuffer.hasUnprocessedData()).toBe(true)
   })
 
   it("should detect silent audio data", () => {
-    const audioBuffer = new AudioBuffer(44100)
+    const audioBuffer = createAudioBuffer(44100)
     const silentData = [new Float32Array([0, 0, 0, 0, 0])]
     audioBuffer.receiveAudioData(silentData)
     expect(audioBuffer.hasUnprocessedData()).toBe(true)
   })
 
   it("should trigger silence callback after threshold duration", () => {
-    const audioBuffer = new AudioBuffer(44100)
+    const audioBuffer = createAudioBuffer(44100)
     const mockCallback = vi.fn()
     audioBuffer.setOnSilenceThresholdReached(mockCallback)
 
@@ -29,7 +29,7 @@ describe("AudioBuffer", () => {
   })
 
   it("should reset silence counter when non-silent data is received", () => {
-    const audioBuffer = new AudioBuffer(44100)
+    const audioBuffer = createAudioBuffer(44100)
     const mockCallback = vi.fn()
     audioBuffer.setOnSilenceThresholdReached(mockCallback)
 
@@ -48,7 +48,7 @@ describe("AudioBuffer", () => {
   })
 
   it("should process data based on timestamp", async () => {
-    const audioBuffer = new AudioBuffer(44100)
+    const audioBuffer = createAudioBuffer(44100)
 
     // Add 2 seconds of data
     const data = new Float32Array(44100 * 2).fill(0.5)
@@ -64,7 +64,7 @@ describe("AudioBuffer", () => {
   })
 
   it("should handle invalid timestamp in processor callback gracefully", async () => {
-    const audioBuffer = new AudioBuffer(44100)
+    const audioBuffer = createAudioBuffer(44100)
     const data = new Float32Array(44100).fill(0.5)
     audioBuffer.receiveAudioData([data])
 
@@ -76,7 +76,7 @@ describe("AudioBuffer", () => {
   })
 
   it("should correctly process data chunks", async () => {
-    const audioBuffer = new AudioBuffer(44100)
+    const audioBuffer = createAudioBuffer(44100)
 
     // Initially no unprocessed data
     const processorCallback = vi.fn().mockResolvedValue("00:00:01,000")
@@ -93,7 +93,7 @@ describe("AudioBuffer", () => {
   })
 
   it("should not miss data that arrives during processing", async () => {
-    const audioBuffer = new AudioBuffer(44100)
+    const audioBuffer = createAudioBuffer(44100)
 
     // Add initial 1 second of data
     const initialData = new Float32Array(44100).fill(0.5)

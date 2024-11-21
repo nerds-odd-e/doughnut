@@ -10,7 +10,17 @@ function isSilent(data: Float32Array): boolean {
   return avg < SILENCE_THRESHOLD
 }
 
-export class AudioBuffer {
+export interface AudioBuffer {
+  receiveAudioData: (data: Float32Array[]) => void
+  hasUnprocessedData: () => boolean
+  processDataChunk: (
+    processorCallback: (chunk: Float32Array) => Promise<string | undefined>
+  ) => Promise<void>
+  getCurrentAverageSample: () => number
+  setOnSilenceThresholdReached: (callback: () => void) => void
+}
+
+class RawAudioBuffer implements AudioBuffer {
   private readonly SILENCE_DURATION_THRESHOLD: number
   private audioData: Float32Array[] = []
   private lastProcessedArrayIndex = 0
@@ -163,4 +173,8 @@ export class AudioBuffer {
 
     return sum / data.length
   }
+}
+
+export const createAudioBuffer = (sampleRate: number): AudioBuffer => {
+  return new RawAudioBuffer(sampleRate)
 }
