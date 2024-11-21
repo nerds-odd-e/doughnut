@@ -1,3 +1,4 @@
+import type { AudioChunk } from "./audioProcessingScheduler"
 import { createAudioFile } from "./createAudioFile"
 import { timestampToSeconds } from "./parseTimestamp"
 
@@ -139,5 +140,20 @@ export class AudioBuffer {
     for (const chunk of newData) {
       this.push(chunk)
     }
+  }
+
+  async processDataChunk(
+    processorCallback: (chunk: AudioChunk) => Promise<string | undefined>,
+    isMidSpeech = true
+  ): Promise<void> {
+    const file = this.tryGetProcessableData()
+    if (!file) return
+
+    const timestamp = await processorCallback({
+      data: file,
+      isMidSpeech,
+    })
+
+    this.updateProcessedIndices(timestamp)
   }
 }
