@@ -11,10 +11,8 @@ export interface AudioBuffer {
 }
 
 export interface AudioReceiver {
-  initialize: (deviceId?: string) => Promise<void>
+  connect: (mediaStream: MediaStream) => Promise<void>
   disconnect: () => void
-  isInitialized: () => boolean
-  reconnect: (deviceId: string) => Promise<void>
   getBuffer: () => AudioBuffer
 }
 

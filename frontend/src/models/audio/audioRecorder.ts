@@ -26,23 +26,24 @@ export const createAudioRecorder = (
   let isRecording: boolean = false
   const audioDevices: Ref<MediaDeviceInfo[]> = ref([])
   const selectedDevice: Ref<string> = ref("")
+  let mediaStream: MediaStream | null = null
 
   const audioRecorder: AudioRecorder = {
     startRecording: async function (): Promise<void> {
       try {
-        await audioReceiver.initialize()
         const devices = await navigator.mediaDevices.enumerateDevices()
         audioDevices.value = devices.filter(
           (device) => device.kind === "audioinput"
         )
 
-        const mediaStream = await navigator.mediaDevices.getUserMedia({
+        mediaStream = await navigator.mediaDevices.getUserMedia({
           audio: true,
         })
         const currentTrack = mediaStream.getAudioTracks()[0]
         const currentDeviceId = currentTrack?.getSettings().deviceId
         selectedDevice.value = currentDeviceId || ""
 
+        await audioReceiver.connect(mediaStream)
         audioProcessingScheduler.start()
         isRecording = true
       } catch (error) {
@@ -54,6 +55,10 @@ export const createAudioRecorder = (
     stopRecording: async function (): Promise<File> {
       isRecording = false
       audioReceiver.disconnect()
+      if (mediaStream) {
+        mediaStream.getTracks().forEach((track) => track.stop())
+        mediaStream = null
+      }
       return audioProcessingScheduler.stop()
     },
 
@@ -78,7 +83,14 @@ export const createAudioRecorder = (
 
       selectedDevice.value = deviceId
       if (isRecording) {
-        await audioReceiver.reconnect(deviceId)
+        audioReceiver.disconnect()
+        if (mediaStream) {
+          mediaStream.getTracks().forEach((track) => track.stop())
+        }
+        mediaStream = await navigator.mediaDevices.getUserMedia({
+          audio: { deviceId: { exact: deviceId } },
+        })
+        await audioReceiver.connect(mediaStream)
       }
     },
   }

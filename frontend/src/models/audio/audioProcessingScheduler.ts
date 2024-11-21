@@ -1,4 +1,4 @@
-import type { AudioBuffer } from "./rawSamples/rawSampleAudioBuffer"
+import type { AudioBuffer } from "./audioReceiver"
 
 export interface AudioProcessingScheduler {
   start(): void
