@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.odde.doughnut.validators.ValidateMultipartFile;
 import lombok.Getter;
@@ -29,4 +30,12 @@ public class AudioUploadDTO {
 
   @JsonProperty("isMidSpeech")
   private boolean isMidSpeech;
+
+  @JsonIgnore
+  public boolean hasValidThreadAndRunId() {
+    return getThreadId() != null
+        && !getThreadId().isEmpty()
+        && getRunId() != null
+        && !getRunId().isEmpty();
+  }
 }

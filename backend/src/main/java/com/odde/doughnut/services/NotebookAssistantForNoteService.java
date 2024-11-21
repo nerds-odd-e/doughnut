@@ -110,10 +110,7 @@ public final class NotebookAssistantForNoteService {
 
   private OpenAiRunExpectingAction getOpenAiRunExpectingAction(
       String transcriptionFromAudio, AudioUploadDTO config) throws JsonProcessingException {
-    if (config.getThreadId() != null
-        && !config.getThreadId().isEmpty()
-        && config.getRunId() != null
-        && !config.getRunId().isEmpty()) {
+    if (config.hasValidThreadAndRunId()) {
       try {
         String instruction =
             "Previous content was appended. More transcription to process; append it to the previous output. The previous output could be incomplete sentence, so only start new sentence or new line when make sense. Follow the same instructions as before.";
