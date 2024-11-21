@@ -9,7 +9,7 @@ import lombok.Data;
 public class MultipleChoicesQuestion {
   @JsonPropertyDescription(
       "The stem of the multiple-choice question. Provide background or disclosure necessary to clarify the question when needed.")
-  @JsonProperty(required = false)
+  @JsonProperty(required = true)
   private String stem;
 
   @JsonPropertyDescription("All choices. Only one should be correct.")

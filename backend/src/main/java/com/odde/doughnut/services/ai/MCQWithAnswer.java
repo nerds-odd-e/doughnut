@@ -9,7 +9,6 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode
 public class MCQWithAnswer {
 
-  @JsonPropertyDescription("Question stem and choices.")
   @JsonProperty(required = true)
   private MultipleChoicesQuestion multipleChoicesQuestion = new MultipleChoicesQuestion();
 
