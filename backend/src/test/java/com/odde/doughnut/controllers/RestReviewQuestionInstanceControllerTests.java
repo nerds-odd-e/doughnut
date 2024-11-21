@@ -15,7 +15,10 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
+import com.odde.doughnut.services.ai.tools.AiToolName;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.OpenAIAssistantMocker;
+import com.odde.doughnut.testability.OpenAIAssistantThreadMocker;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
@@ -43,6 +46,8 @@ class RestReviewQuestionInstanceControllerTests {
   private UserModel currentUser;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
   OpenAIChatCompletionMock openAIChatCompletionMock;
+  OpenAIAssistantMocker openAIAssistantMocker;
+  OpenAIAssistantThreadMocker openAIAssistantThreadMocker;
 
   RestReviewQuestionController controller;
 
@@ -53,6 +58,10 @@ class RestReviewQuestionInstanceControllerTests {
     controller =
         new RestReviewQuestionController(
             openAiApi, modelFactoryService, currentUser, testabilitySettings);
+
+    // Initialize assistant mocker
+    openAIAssistantMocker = new OpenAIAssistantMocker(openAiApi);
+    openAIAssistantThreadMocker = openAIAssistantMocker.mockThreadCreation(null);
   }
 
   RestReviewQuestionController nullUserController() {
@@ -165,7 +174,6 @@ class RestReviewQuestionInstanceControllerTests {
     @BeforeEach
     void setUp() {
       note = makeMe.aNote().please();
-
       reviewQuestionInstance =
           makeMe.aReviewQuestionInstance().approvedSpellingQuestionOf(note).please();
     }
@@ -190,12 +198,18 @@ class RestReviewQuestionInstanceControllerTests {
       MCQWithAnswer jsonQuestion =
           makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
 
-      openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(jsonQuestion, "");
-      ReviewQuestionInstance reviewQuestionInstance =
-          controller.regenerate(this.reviewQuestionInstance);
+      // Mock the assistant API calls using the same pattern as GenerateRandomQuestion
+      openAIAssistantThreadMocker
+          .mockCreateRunInProcess("my-run-id")
+          .aRunThatRequireAction(
+              jsonQuestion, AiToolName.ASK_SINGLE_ANSWER_MULTIPLE_CHOICE_QUESTION.getValue())
+          .mockRetrieveRun()
+          .mockCancelRun("my-run-id");
+
+      ReviewQuestionInstance regeneratedQuestion = controller.regenerate(reviewQuestionInstance);
 
       Assertions.assertThat(
-              reviewQuestionInstance.getBareQuestion().getMultipleChoicesQuestion().getStem())
+              regeneratedQuestion.getBareQuestion().getMultipleChoicesQuestion().getStem())
           .contains("What is the first color in the rainbow?");
     }
   }
@@ -271,13 +285,23 @@ class RestReviewQuestionInstanceControllerTests {
     void itMustPersistTheQuestionGenerated() {
       MCQWithAnswer jsonQuestion =
           makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
-      openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(jsonQuestion, "");
+
+      // Mock the assistant API calls
+      openAIAssistantThreadMocker
+          .mockCreateRunInProcess("my-run-id")
+          .aRunThatRequireAction(
+              jsonQuestion, AiToolName.ASK_SINGLE_ANSWER_MULTIPLE_CHOICE_QUESTION.getValue())
+          .mockRetrieveRun()
+          .mockCancelRun("my-run-id");
+
       Note note = makeMe.aNote().details("description long enough.").rememberSpelling().please();
       // another note is needed, otherwise the note will be the only note in the notebook, and the
       // question cannot be generated.
       makeMe.aNote().under(note).please();
       ReviewPoint rp = makeMe.aReviewPointFor(note).by(currentUser).please();
+
       ReviewQuestionInstance reviewQuestionInstance = controller.generateRandomQuestion(rp);
+
       assertThat(reviewQuestionInstance.getId(), notNullValue());
     }
   }
