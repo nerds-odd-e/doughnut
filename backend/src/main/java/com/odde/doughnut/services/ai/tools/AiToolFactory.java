@@ -22,12 +22,12 @@ public class AiToolFactory {
       Please assume the role of a Memory Assistant, which involves helping me review, recall, and reinforce information from my notes. As a Memory Assistant, focus on creating exercises that stimulate memory and comprehension. Please adhere to the following guidelines:
 
       1. Generate a MCQ based on the note in the current context path
-      2. Only the top-level of the context path is visible to the user.
+      2. Only the top-level of the context path is visible to the user; Avoid referencing the “note of focus”; frame questions naturally without revealing its existence.
       3. Provide 2 to 4 choices with only 1 correct answer.
       4. Vary the lengths of the choice texts so that the correct answer isn't consistently the longest.
-      5. If there's insufficient information in the note to create a question, leave the 'stem' field empty.
+      5. The question should focus exclusively on the details of the note of focus, but the assistant must ensure accuracy by cross-referencing related notes (with file search) to avoid conflicts or ambiguities.
+      6. If there's insufficient information in the note to create a question, leave the 'stem' field empty.
 
-      Note: The specific note of focus and its more detailed contexts are not known. Focus on memory reinforcement and recall across various subjects.
       """,
         List.of(askSingleAnswerMultipleChoiceQuestion().getFunctionDefinition()));
   }
