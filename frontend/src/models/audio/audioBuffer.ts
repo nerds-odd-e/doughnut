@@ -43,19 +43,6 @@ export class AudioBuffer {
     return dataToProcess
   }
 
-  push(chunk: Float32Array): void {
-    if (isSilent(chunk)) {
-      this.silenceCounter += chunk.length
-      if (this.silenceCounter >= this.SILENCE_DURATION_THRESHOLD) {
-        this.onSilenceThresholdReached()
-        this.silenceCounter = 0
-      }
-    } else {
-      this.silenceCounter = 0
-    }
-    this.audioData.push(chunk)
-  }
-
   getAll(): Float32Array[] {
     return this.audioData
   }
@@ -106,17 +93,20 @@ export class AudioBuffer {
     return createAudioFile(dataToProcess, this.sampleRate, true)
   }
 
+  private moveProcessedIndicesToEnd(): void {
+    this.lastProcessedArrayIndex = this.length()
+    this.lastProcessedInternalIndex = 0
+  }
+
   updateProcessedIndices(timestamp: string | undefined): void {
     if (!timestamp) {
-      this.lastProcessedArrayIndex = this.length()
-      this.lastProcessedInternalIndex = 0
+      this.moveProcessedIndicesToEnd()
       return
     }
 
     const processedSeconds = timestampToSeconds(timestamp)
     if (processedSeconds === undefined) {
-      this.lastProcessedArrayIndex = this.length()
-      this.lastProcessedInternalIndex = 0
+      this.moveProcessedIndicesToEnd()
       return
     }
 
@@ -130,6 +120,19 @@ export class AudioBuffer {
 
   public setOnSilenceThresholdReached(callback: () => void): void {
     this.onSilenceThresholdReached = callback
+  }
+
+  private push(chunk: Float32Array): void {
+    if (isSilent(chunk)) {
+      this.silenceCounter += chunk.length
+      if (this.silenceCounter >= this.SILENCE_DURATION_THRESHOLD) {
+        this.onSilenceThresholdReached()
+        this.silenceCounter = 0
+      }
+    } else {
+      this.silenceCounter = 0
+    }
+    this.audioData.push(chunk)
   }
 
   receiveAudioData(newData: Float32Array[]): void {
