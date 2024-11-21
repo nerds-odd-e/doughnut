@@ -103,7 +103,7 @@ class FunctionDefinitionTest {
     JsonNode parametersNode = jsonNode.get("parameters");
 
     // then
-    assertThat(parametersNode.has("additionalProperties")).isTrue();
+    assertThat(parametersNode.has("additionalProperties")).isFalse();
   }
 
   @Test
