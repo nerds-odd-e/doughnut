@@ -4,14 +4,10 @@ import { timestampToSeconds } from "./parseTimestamp"
 
 const SILENCE_THRESHOLD = 0.01
 
-export function isSilent(data: Float32Array): boolean {
+function isSilent(data: Float32Array): boolean {
   const sum = data.reduce((acc, val) => acc + Math.abs(val), 0)
   const avg = sum / data.length
   return avg < SILENCE_THRESHOLD
-}
-
-export function isAllSilent(chunks: Float32Array[]): boolean {
-  return chunks.every((chunk) => isSilent(chunk))
 }
 
 export class AudioBuffer {
@@ -31,17 +27,27 @@ export class AudioBuffer {
   }
 
   private getUnprocessedData(): Float32Array[] {
-    const dataToProcess: Float32Array[] = []
-    const firstChunk = this.audioData[this.lastProcessedArrayIndex]
+    const unprocessedData: Float32Array[] = []
+    const currentIndex = this.lastProcessedArrayIndex
 
-    if (firstChunk) {
-      dataToProcess.push(firstChunk.slice(this.lastProcessedInternalIndex))
+    if (currentIndex >= this.audioData.length) {
+      return unprocessedData
     }
 
-    dataToProcess.push(
-      ...this.audioData.slice(this.lastProcessedArrayIndex + 1)
-    )
-    return dataToProcess
+    const currentChunk = this.audioData[currentIndex]
+    if (currentChunk) {
+      const unprocessedFirstChunk = currentChunk.slice(
+        this.lastProcessedInternalIndex
+      )
+      if (unprocessedFirstChunk.length > 0) {
+        unprocessedData.push(unprocessedFirstChunk)
+      }
+    }
+
+    const remainingChunks = this.audioData.slice(currentIndex + 1)
+    unprocessedData.push(...remainingChunks)
+
+    return unprocessedData
   }
 
   getAll(): Float32Array[] {
@@ -49,21 +55,25 @@ export class AudioBuffer {
   }
 
   hasUnprocessedData(): boolean {
-    return (
-      this.lastProcessedArrayIndex < this.audioData.length ||
-      (this.lastProcessedArrayIndex === this.audioData.length - 1 &&
-        this.lastProcessedInternalIndex <
-          (this.audioData[this.lastProcessedArrayIndex]?.length ?? 0))
-    )
-  }
+    const currentIndex = this.lastProcessedArrayIndex
 
-  private length(): number {
-    return this.audioData.length
+    if (currentIndex >= this.audioData.length) {
+      return false
+    }
+
+    const currentChunk = this.audioData[currentIndex]
+    const currentChunkLength = currentChunk?.length ?? 0
+
+    if (this.lastProcessedInternalIndex < currentChunkLength) {
+      return true
+    }
+
+    return currentIndex + 1 < this.audioData.length
   }
 
   private getProcessableData(): Float32Array[] | null {
     const dataToProcess = this.getUnprocessedData()
-    return dataToProcess.length === 0 || isAllSilent(dataToProcess)
+    return dataToProcess.length === 0 || dataToProcess.every(isSilent)
       ? null
       : dataToProcess
   }
@@ -90,9 +100,7 @@ export class AudioBuffer {
   }
 
   receiveAudioData(newData: Float32Array[]): void {
-    for (const chunk of newData) {
-      this.push(chunk)
-    }
+    newData.forEach((chunk) => this.push(chunk))
   }
 
   async processDataChunk(
@@ -107,18 +115,11 @@ export class AudioBuffer {
     const snapshotLength = this.audioData.length
 
     const file = createAudioFile(dataToProcess, this.sampleRate, true)
-    const timestamp = await processorCallback({
-      data: file,
-      isMidSpeech,
-    })
+    const timestamp = await processorCallback({ data: file, isMidSpeech })
 
-    if (!timestamp) {
-      this.lastProcessedArrayIndex = snapshotLength
-      this.lastProcessedInternalIndex = 0
-      return
-    }
-
-    const processedSeconds = timestampToSeconds(timestamp)
+    const processedSeconds = timestamp
+      ? timestampToSeconds(timestamp)
+      : undefined
     if (processedSeconds === undefined) {
       this.lastProcessedArrayIndex = snapshotLength
       this.lastProcessedInternalIndex = 0
@@ -127,16 +128,22 @@ export class AudioBuffer {
 
     const processedSamples = Math.floor(processedSeconds * this.sampleRate)
 
-    let totalSamples = startInternalIndex
+    let totalSamples = 0
     for (let i = startArrayIndex; i < snapshotLength; i++) {
-      const arrayLength = this.audioData[i]?.length ?? 0
-      if (totalSamples + arrayLength <= processedSamples) {
-        totalSamples += arrayLength
+      const chunk = this.audioData[i]
+      if (!chunk) continue
+      const chunkLength = chunk.length
+      const startIdx = i === startArrayIndex ? startInternalIndex : 0
+      const remainingSamplesInChunk = chunkLength - startIdx
+
+      if (totalSamples + remainingSamplesInChunk <= processedSamples) {
+        totalSamples += remainingSamplesInChunk
         this.lastProcessedArrayIndex = i + 1
         this.lastProcessedInternalIndex = 0
       } else {
         this.lastProcessedArrayIndex = i
-        this.lastProcessedInternalIndex = processedSamples - totalSamples
+        this.lastProcessedInternalIndex =
+          startIdx + (processedSamples - totalSamples)
         break
       }
     }
