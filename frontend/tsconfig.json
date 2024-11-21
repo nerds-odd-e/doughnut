@@ -32,7 +32,7 @@
     "./src/managedApi/BindingHttpRequest.ts",
     "./src/managedApi/ApiStatusHandler.ts",
     "./src/models/audio/parseTimestamp.ts",
-    "./src/models/audio/createAudioFile.ts"
+    "src/models/audio/rawSamples/createAudioFile.ts"
   ],
   "include": [
     "src/**/*.ts",

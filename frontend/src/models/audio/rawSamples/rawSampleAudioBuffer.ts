@@ -1,5 +1,5 @@
 import type { AudioChunk } from "../audioProcessingScheduler"
-import { createAudioFile } from "../createAudioFile"
+import { createAudioFile } from "./createAudioFile"
 import { timestampToSeconds } from "../parseTimestamp"
 import type { AudioBuffer } from "../audioReceiver"
 
