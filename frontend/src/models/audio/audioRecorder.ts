@@ -20,12 +20,12 @@ export const createAudioRecorder = (
   processorCallback: (chunk: AudioChunk) => Promise<string | undefined>
 ): AudioRecorder => {
   const audioBuffer = createAudioBuffer(16000)
+  const audioReceiver = createAudioReceiver((audioData) =>
+    audioBuffer.receiveAudioData(audioData)
+  )
   const audioProcessingScheduler = wireAudioProcessingScheduler(
     audioBuffer,
     processorCallback
-  )
-  const audioReceiver = createAudioReceiver((audioData) =>
-    audioBuffer.receiveAudioData(audioData)
   )
   let isRecording: boolean = false
   const audioDevices: Ref<MediaDeviceInfo[]> = ref([])
