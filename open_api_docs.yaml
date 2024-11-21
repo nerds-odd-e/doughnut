@@ -3108,6 +3108,7 @@ components:
     MultipleChoicesQuestion:
       required:
       - choices
+      - stem
       type: object
       properties:
         stem:

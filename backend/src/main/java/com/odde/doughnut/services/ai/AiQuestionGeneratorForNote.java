@@ -22,14 +22,20 @@ public record AiQuestionGeneratorForNote(
   }
 
   private static Optional<MCQWithAnswer> getValidQuestion(JsonNode question) {
+    MCQWithAnswer mcqWithAnswer;
     try {
-      MCQWithAnswer mcqWithAnswer = new ObjectMapper().treeToValue(question, MCQWithAnswer.class);
-      if (mcqWithAnswer.getMultipleChoicesQuestion().getStem() != null
-          && !Strings.isBlank(mcqWithAnswer.getMultipleChoicesQuestion().getStem())) {
-        return Optional.of(mcqWithAnswer);
-      }
+      mcqWithAnswer = new ObjectMapper().treeToValue(question, MCQWithAnswer.class);
     } catch (JsonProcessingException e) {
       e.printStackTrace();
+      return Optional.empty();
+    }
+    return getOptionalMCQWithAnswer(mcqWithAnswer);
+  }
+
+  public static Optional<MCQWithAnswer> getOptionalMCQWithAnswer(MCQWithAnswer mcqWithAnswer) {
+    if (mcqWithAnswer.getMultipleChoicesQuestion().getStem() != null
+        && !Strings.isBlank(mcqWithAnswer.getMultipleChoicesQuestion().getStem())) {
+      return Optional.of(mcqWithAnswer);
     }
     return Optional.empty();
   }

@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type MultipleChoicesQuestion = {
-    stem?: string;
+    stem: string;
     choices: Array<string>;
 };
 

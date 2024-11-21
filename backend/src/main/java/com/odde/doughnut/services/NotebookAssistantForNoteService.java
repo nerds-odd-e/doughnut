@@ -1,5 +1,7 @@
 package com.odde.doughnut.services;
 
+import static com.odde.doughnut.services.ai.AiQuestionGeneratorForNote.getOptionalMCQWithAnswer;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.AudioUploadDTO;
 import com.odde.doughnut.entities.*;
@@ -11,6 +13,7 @@ import com.theokanning.openai.assistants.message.MessageRequest;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 public final class NotebookAssistantForNoteService {
@@ -154,5 +157,16 @@ public final class NotebookAssistantForNoteService {
         .withTool(AiToolFactory.completeNoteDetails())
         .withInstructions(instructions)
         .run();
+  }
+
+  public Optional<MCQWithAnswer> generateQuestion() throws JsonProcessingException {
+    AssistantThread thread =
+        createThreadWithNoteInfo(List.of())
+            .withTool(AiToolFactory.askSingleAnswerMultipleChoiceQuestion())
+            .withInstructions(AiToolFactory.mcqWithAnswerAiTool().getMessageBody());
+
+    MCQWithAnswer questionNode =
+        (MCQWithAnswer) thread.run().getToolCallResponse().cancelRun().getFirstArgument();
+    return getOptionalMCQWithAnswer(questionNode);
   }
 }
