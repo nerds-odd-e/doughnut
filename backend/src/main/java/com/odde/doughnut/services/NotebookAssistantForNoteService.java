@@ -116,7 +116,7 @@ public final class NotebookAssistantForNoteService {
         && !config.getRunId().isEmpty()) {
       try {
         String instruction =
-            "Previous content was appended. Next, there's additional transcription to process; append it to the previous notes. The text may continue from the middle of a previous sentence or word. Only use function calls to append the processed text. Follow the same instructions as before.";
+            "Previous content was appended. More transcription to process; append it to the previous output. Follow the same instructions as before.";
 
         instruction = appendAdditionalInstructions(instruction, config);
 
@@ -126,8 +126,7 @@ public final class NotebookAssistantForNoteService {
             .resumeRun(config.getRunId())
             .submitToolOutputs(
                 config.getToolCallId(),
-                new AudioToTextToolCallResult(
-                    instruction, transcriptionFromAudio, config.getPreviousNoteDetails()));
+                new AudioToTextToolCallResult(instruction, transcriptionFromAudio));
 
       } catch (OpenAiHttpException e) {
         // Fallback to creating a new thread if submission fails

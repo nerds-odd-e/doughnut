@@ -8,5 +8,4 @@ import lombok.Getter;
 public class AudioToTextToolCallResult {
   private final String instruction;
   private final String newTranscription;
-  private final String tailOfPreviousCompletedNoteDetails;
 }
