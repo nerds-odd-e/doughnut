@@ -154,7 +154,6 @@ const processAudio = async (chunk: AudioChunk): Promise<string | undefined> => {
       note.id,
       {
         uploadAudioFile: chunk.data,
-        previousNoteDetails: note.details?.slice(-500) ?? "",
         threadId: threadContext.value.threadId,
         runId: threadContext.value.runId,
         toolCallId: threadContext.value.toolCallId,

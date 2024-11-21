@@ -6,7 +6,6 @@ export type AudioUploadDTO = {
     uploadAudioFile?: Blob;
     audioData?: string;
     additionalProcessingInstructions?: string;
-    previousNoteDetails?: string;
     threadId?: string;
     runId?: string;
     toolCallId?: string;

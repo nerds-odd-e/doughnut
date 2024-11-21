@@ -1,7 +1,5 @@
 package com.odde.doughnut.services.ai;
 
-import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -57,10 +55,9 @@ public final class OtherAiServices {
   }
 
   public Optional<TextFromAudioWithCallInfo> getTextFromAudio(
-      String previousTrailingNoteDetails, String modelName, String transcriptionFromAudio) {
+      String modelName, String transcriptionFromAudio) {
 
-    OpenAIChatRequestBuilder chatAboutNoteRequestBuilder =
-        getOpenAIChatRequestBuilder(previousTrailingNoteDetails, modelName);
+    OpenAIChatRequestBuilder chatAboutNoteRequestBuilder = getOpenAIChatRequestBuilder(modelName);
     AiToolList questionEvaluationAiTool =
         AiToolFactory.transcriptionToTextAiTool(transcriptionFromAudio);
     return openAiApiHandler
@@ -77,24 +74,8 @@ public final class OtherAiServices {
             });
   }
 
-  private static OpenAIChatRequestBuilder getOpenAIChatRequestBuilder(
-      String previousTrailingNoteDetails, String modelName) {
-    String prettyString =
-        defaultObjectMapper()
-            .valueToTree(
-                Map.of(
-                    "previousTrailingNoteDetails",
-                    previousTrailingNoteDetails == null ? "" : previousTrailingNoteDetails))
-            .toPrettyString();
-    return new OpenAIChatRequestBuilder()
-        .model(modelName)
-        .addSystemMessage(
-            """
-          The trailing note details before appending the text from the audio are (in JSON format):
-
-          %s
-          """
-                .formatted(prettyString));
+  private static OpenAIChatRequestBuilder getOpenAIChatRequestBuilder(String modelName) {
+    return new OpenAIChatRequestBuilder().model(modelName);
   }
 
   public String getTranscriptionFromAudio(String filename, byte[] bytes) throws IOException {

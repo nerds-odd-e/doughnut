@@ -23,7 +23,6 @@ import com.odde.doughnut.testability.OpenAIAssistantThreadMocker;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.theokanning.openai.OpenAiError;
 import com.theokanning.openai.OpenAiHttpException;
-import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import io.reactivex.Single;
 import java.io.IOException;
 import okhttp3.RequestBody;
@@ -33,7 +32,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -118,20 +116,6 @@ class RestAiAudioControllerTests {
               .map(TextFromAudioWithCallInfo::getCompletionMarkdownFromAudio)
               .orElse("");
       assertThat(resp, equalTo("test123"));
-    }
-
-    @Test
-    void usingThePreviousTrailingDetails() throws IOException {
-      audioUploadDTO.setPreviousNoteDetails("Long long ago");
-      controller
-          .audioToText(audioUploadDTO)
-          .map(TextFromAudioWithCallInfo::getCompletionMarkdownFromAudio);
-      ArgumentCaptor<ChatCompletionRequest> argumentCaptor =
-          ArgumentCaptor.forClass(ChatCompletionRequest.class);
-      verify(openAiApi, times(1)).createChatCompletion(argumentCaptor.capture());
-      ChatCompletionRequest capturedArgument = argumentCaptor.getValue();
-      assertThat(
-          capturedArgument.getMessages().get(0).getTextContent(), containsString("Long long ago"));
     }
 
     @Test

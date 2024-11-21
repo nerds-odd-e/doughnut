@@ -51,7 +51,6 @@ class RestAiAudioController {
 
     return otherAiServices
         .getTextFromAudio(
-            audioFile.getPreviousNoteDetails(),
             getGlobalSettingsService().globalSettingOthers().getValue(),
             processedResult.getProcessedSRT())
         .map(

@@ -3738,8 +3738,6 @@ components:
           format: byte
         additionalProcessingInstructions:
           type: string
-        previousNoteDetails:
-          type: string
         threadId:
           type: string
         runId:
