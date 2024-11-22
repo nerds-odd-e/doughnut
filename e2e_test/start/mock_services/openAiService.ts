@@ -145,7 +145,8 @@ const openAiService = () => {
         messages.map((row) => ({
           runId: row['run id']!,
           thread_id: threadId,
-          responseType: row['response type'],
+          threadId: threadId,
+          responseType: row['response type'] as 'requires action',
           fullMessage: row['assistant reply']!,
         }))
       )
@@ -157,6 +158,7 @@ const openAiService = () => {
         }
         thread.stubCreateMessage(userMessage)
       })
+      return this
     },
 
     stubCreateThread(threadId: string) {
