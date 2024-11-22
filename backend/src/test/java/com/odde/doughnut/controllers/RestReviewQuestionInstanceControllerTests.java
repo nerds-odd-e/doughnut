@@ -1,11 +1,13 @@
 package com.odde.doughnut.controllers;
 
+import static com.odde.doughnut.controllers.dto.Randomization.RandomStrategy.first;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import com.odde.doughnut.controllers.dto.AnswerDTO;
+import com.odde.doughnut.controllers.dto.Randomization;
 import com.odde.doughnut.controllers.dto.ReviewQuestionContestResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -21,6 +23,7 @@ import com.odde.doughnut.testability.OpenAIAssistantMocker;
 import com.odde.doughnut.testability.OpenAIAssistantThreadMocker;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.odde.doughnut.testability.TestabilitySettings;
+import com.theokanning.openai.assistants.run.RunCreateRequest;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import java.sql.Timestamp;
@@ -53,6 +56,7 @@ class RestReviewQuestionInstanceControllerTests {
 
   @BeforeEach
   void setup() {
+    testabilitySettings.setRandomization(new Randomization(first, 1));
     openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
     currentUser = makeMe.aUser().toModelPlease();
     controller =
@@ -323,16 +327,14 @@ class RestReviewQuestionInstanceControllerTests {
 
       controller.generateRandomQuestion(rp);
 
-      // Verify the run creation includes file search in tools
-      verify(openAiApi)
-          .createRun(
-              any(),
-              argThat(
-                  request -> {
-                    assertThat(
-                        request.getTools(), hasItem(hasProperty("type", equalTo("file_search"))));
-                    return true;
-                  }));
+      // Capture the actual request
+      ArgumentCaptor<RunCreateRequest> runRequestCaptor =
+          ArgumentCaptor.forClass(RunCreateRequest.class);
+      verify(openAiApi).createRun(any(), runRequestCaptor.capture());
+
+      // Assert on the captured request
+      RunCreateRequest actualRequest = runRequestCaptor.getValue();
+      assertThat(actualRequest.getTools(), hasItem(hasProperty("type", equalTo("file_search"))));
     }
   }
 
