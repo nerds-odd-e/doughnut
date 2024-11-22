@@ -158,12 +158,23 @@ public final class NotebookAssistantForNoteService {
   }
 
   public MCQWithAnswer generateQuestion() throws JsonProcessingException {
+    /*
+     * The file search will only happen if the request is from a user message.
+     * And also the run instruction will override the default instruction of the assistant.
+     *
+     * So here we pass the question generation instruction to the assistant as a user message,
+     * and leave the instruction for the run out.
+     */
+    MessageRequest message =
+        MessageRequest.builder()
+            .role("user")
+            .content(AiToolFactory.mcqWithAnswerAiTool().getMessageBody())
+            .build();
     MCQWithAnswer questionNode =
         (MCQWithAnswer)
-            createThreadWithNoteInfo(List.of())
+            createThreadWithNoteInfo(List.of(message))
                 .withTool(AiToolFactory.askSingleAnswerMultipleChoiceQuestion())
                 .withFileSearch()
-                .withInstructions(AiToolFactory.mcqWithAnswerAiTool().getMessageBody())
                 .run()
                 .getToolCallResponse()
                 .cancelRun()
