@@ -19,16 +19,19 @@ public class AiToolFactory {
   public static AiToolList mcqWithAnswerAiTool() {
     return new AiToolList(
         """
-      Please assume the role of a Memory Assistant, which involves helping me review, recall, and reinforce information from my notes. As a Memory Assistant, focus on creating exercises that stimulate memory and comprehension. Please adhere to the following guidelines:
+      Please assume the role of a Memory Assistant, which involves helping me review, recall, and reinforce information from my notes. As a Memory Assistant, focus on creating exercises that stimulate memory and comprehension. Please adhere to the following steps and guidelines:
 
-      1. Generate a MCQ based on the note in the current context path
-      2. Only the top-level of the context path is visible to the user; Avoid referencing the “note of focus”; frame questions naturally without revealing its existence.
-      3. Provide 2 to 4 choices with only 1 correct answer.
-      4. Vary the lengths of the choice texts so that the correct answer isn't consistently the longest.
-      5. The question should focus exclusively on the details of the note of focus, but the assistant must ensure accuracy by cross-referencing related notes (with file search) to avoid conflicts or ambiguities.
-      6. If there's insufficient information in the note to create a question, leave the 'stem' field empty.
+      1. MUST first search the JSON file to retrieve related context of the note of focus (e.g., parent notes, child notes, and linked notes).
+      2. Then generate a MCQ based on the note in the current context path, only for the note of focus
+      3. The retrieved content is used to ensure accuracy and avoid conflicts or ambiguities.
+      4. Only the top-level of the context path is visible to the user; Avoid referencing the “note of focus”; frame questions naturally without revealing its existence.
+      5. Provide 2 to 4 choices with only 1 correct answer.
+      6. Vary the lengths of the choice texts so that the correct answer isn't consistently the longest.
+      7. If there's insufficient information in the note to create a question, leave the 'stem' field empty.
+      8. Provide the question ONLY by calling function `%s`, even if file search failed.
 
-      """,
+      """
+            .formatted(ASK_SINGLE_ANSWER_MULTIPLE_CHOICE_QUESTION.getValue()),
         List.of(askSingleAnswerMultipleChoiceQuestion().getFunctionDefinition()));
   }
 
