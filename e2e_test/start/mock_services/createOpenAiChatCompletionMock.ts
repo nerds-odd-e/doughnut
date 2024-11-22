@@ -84,12 +84,6 @@ const openAiChatCompletionStubber = (
         messages: [message],
       })
     },
-    stubQuestionGeneration(argumentsString: string) {
-      return stubSingleToolCall(
-        'ask_single_answer_multiple_choice_question',
-        argumentsString
-      )
-    },
     stubQuestionEvaluation(argumentsString: string) {
       return stubSingleToolCall('evaluate_question', argumentsString)
     },

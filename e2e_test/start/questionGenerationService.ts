@@ -14,14 +14,21 @@ export const questionGenerationService = () => ({
         ],
       },
     }
-    const reply = JSON.stringify(mcqWithAnswer)
+
     cy.then(async () => {
       await mock_services.openAi().restartImposter()
       await mock_services
         .openAi()
-        .chatCompletion()
-        .requestMessageMatches({ role: 'user', content: 'Memory Assistant' })
-        .stubQuestionGeneration(reply)
+        .stubCreateThread('thread-123')
+        .stubCreateRuns('thread-123', ['run-123'])
+        .aRun('run-123')
+        .stubRetrieveRunsThatRequireAction([
+          {
+            response: 'ask_single_answer_multiple_choice_question',
+            arguments: JSON.stringify(mcqWithAnswer),
+          },
+        ])
+      mock_services.openAi().stubRunCancellation('thread-123')
     })
   },
   stubEvaluationQuestion: (

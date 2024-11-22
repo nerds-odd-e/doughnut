@@ -25,14 +25,12 @@ const openAiAssistantCreatedRunMocker = (
     stubRetrieveRunsThatRequireAction(hashes: Record<string, string>[]) {
       const responses = hashes.map((hash) => {
         switch (hash.response) {
-          case 'ask clarification question':
+          case 'ask_single_answer_multiple_choice_question':
             return createRequiresActionRun(
               runId,
               threadId,
-              'ask_clarification_question',
-              {
-                question: hash.arguments,
-              }
+              'ask_single_answer_multiple_choice_question',
+              JSON.parse(hash.arguments!)
             )
           case 'complete note details':
             return createRequiresActionRun(
