@@ -6,14 +6,16 @@ import com.theokanning.openai.assistants.message.MessageRequest;
 import com.theokanning.openai.assistants.run.RunCreateRequest;
 import com.theokanning.openai.service.assistant_stream.AssistantSSE;
 import io.reactivex.Flowable;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.Getter;
 
 public class AssistantThread {
   private final String assistantId;
   @Getter private String threadId;
   private final OpenAiApiHandler openAiApiHandler;
-  private AiTool tool;
+  private final List<AiTool> tools = new ArrayList<>();
   private String instructions;
 
   public AssistantThread(String assistantId, String threadId, OpenAiApiHandler openAiApiHandler) {
@@ -23,7 +25,7 @@ public class AssistantThread {
   }
 
   public AssistantThread withTool(AiTool tool) {
-    this.tool = tool;
+    this.tools.add(tool);
     return this;
   }
 
@@ -34,9 +36,10 @@ public class AssistantThread {
 
   public OpenAiRunExpectingAction run() {
     RunCreateRequest.RunCreateRequestBuilder builder =
-        getCreateRequestBuilder().tools(List.of(tool.getTool()));
+        getCreateRequestBuilder()
+            .tools(tools.stream().map(AiTool::getTool).collect(Collectors.toList()));
     return new OpenAiRunExpectingAction(
-        openAiApiHandler, openAiApiHandler.createRun(threadId, builder.build()), tool);
+        openAiApiHandler, openAiApiHandler.createRun(threadId, builder.build()), tools.get(0));
   }
 
   private RunCreateRequest.RunCreateRequestBuilder getCreateRequestBuilder() {
@@ -66,6 +69,6 @@ public class AssistantThread {
   }
 
   public OpenAiRun resumeRun(String runId) {
-    return new OpenAiRunResumed(openAiApiHandler, threadId, runId, tool);
+    return new OpenAiRunResumed(openAiApiHandler, threadId, runId, tools.get(0));
   }
 }
