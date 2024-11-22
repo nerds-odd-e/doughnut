@@ -2,13 +2,14 @@ package com.odde.doughnut.services.ai;
 
 import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
+import com.theokanning.openai.assistants.assistant.FileSearchTool;
+import com.theokanning.openai.assistants.assistant.Tool;
 import com.theokanning.openai.assistants.message.MessageRequest;
 import com.theokanning.openai.assistants.run.RunCreateRequest;
 import com.theokanning.openai.service.assistant_stream.AssistantSSE;
 import io.reactivex.Flowable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.Getter;
 
 public class AssistantThread {
@@ -16,6 +17,7 @@ public class AssistantThread {
   @Getter private String threadId;
   private final OpenAiApiHandler openAiApiHandler;
   private final List<AiTool> tools = new ArrayList<>();
+  private final List<Tool> mappedTools = new ArrayList<>();
   private String instructions;
 
   public AssistantThread(String assistantId, String threadId, OpenAiApiHandler openAiApiHandler) {
@@ -26,6 +28,12 @@ public class AssistantThread {
 
   public AssistantThread withTool(AiTool tool) {
     this.tools.add(tool);
+    this.mappedTools.add(tool.getTool());
+    return this;
+  }
+
+  public AssistantThread withFileSearch() {
+    this.mappedTools.add(new FileSearchTool());
     return this;
   }
 
@@ -35,9 +43,7 @@ public class AssistantThread {
   }
 
   public OpenAiRunExpectingAction run() {
-    RunCreateRequest.RunCreateRequestBuilder builder =
-        getCreateRequestBuilder()
-            .tools(tools.stream().map(AiTool::getTool).collect(Collectors.toList()));
+    RunCreateRequest.RunCreateRequestBuilder builder = getCreateRequestBuilder().tools(mappedTools);
     return new OpenAiRunExpectingAction(
         openAiApiHandler, openAiApiHandler.createRun(threadId, builder.build()), tools.get(0));
   }

@@ -162,6 +162,7 @@ public final class NotebookAssistantForNoteService {
         (MCQWithAnswer)
             createThreadWithNoteInfo(List.of())
                 .withTool(AiToolFactory.askSingleAnswerMultipleChoiceQuestion())
+                .withFileSearch()
                 .withInstructions(AiToolFactory.mcqWithAnswerAiTool().getMessageBody())
                 .run()
                 .getToolCallResponse()

@@ -304,6 +304,36 @@ class RestReviewQuestionInstanceControllerTests {
 
       assertThat(reviewQuestionInstance.getId(), notNullValue());
     }
+
+    @Test
+    void shouldIncludeFileSearchInTools() {
+      Note note = makeMe.aNote().details("description long enough.").rememberSpelling().please();
+      makeMe.aNote().under(note).please();
+      ReviewPoint rp = makeMe.aReviewPointFor(note).by(currentUser).please();
+      MCQWithAnswer jsonQuestion =
+          makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
+
+      // Mock basic assistant API calls
+      openAIAssistantThreadMocker
+          .mockCreateRunInProcess("my-run-id")
+          .aRunThatRequireAction(
+              jsonQuestion, AiToolName.ASK_SINGLE_ANSWER_MULTIPLE_CHOICE_QUESTION.getValue())
+          .mockRetrieveRun()
+          .mockCancelRun("my-run-id");
+
+      controller.generateRandomQuestion(rp);
+
+      // Verify the run creation includes file search in tools
+      verify(openAiApi)
+          .createRun(
+              any(),
+              argThat(
+                  request -> {
+                    assertThat(
+                        request.getTools(), hasItem(hasProperty("type", equalTo("file_search"))));
+                    return true;
+                  }));
+    }
   }
 
   @Nested
