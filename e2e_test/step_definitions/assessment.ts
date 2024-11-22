@@ -63,7 +63,7 @@ Given(
   (questionTable: DataTable) => {
     start
       .questionGenerationService()
-      .resetAndStubAskingMCQ(questionTable.hashes()[0]!)
+      .resetAndStubAskingMCQByChatCompletion(questionTable.hashes()[0]!)
   }
 )
 

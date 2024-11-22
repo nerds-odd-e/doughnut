@@ -79,6 +79,12 @@ const openAiChatCompletionStubber = (
   }
 
   return {
+    stubQuestionGeneration(argumentsString: string) {
+      return stubSingleToolCall(
+        'ask_single_answer_multiple_choice_question',
+        argumentsString
+      )
+    },
     requestDoesNotMessageMatch(message: MessageToMatch) {
       return openAiChatCompletionStubber(serviceMocker, bodyToMatch, {
         messages: [message],
