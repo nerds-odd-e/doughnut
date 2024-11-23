@@ -11,6 +11,7 @@ import ManagedApi from "./managedApi/ManagedApi"
 import GlobalBar from "./components/toolbars/GlobalBar.vue"
 import type { User } from "./generated/backend"
 import getEnvironment from "./managedApi/window/getEnvironment"
+import SidebarControl from "./components/toolbars/SidebarControl.vue"
 
 interface RouteViewProps {
   storageAccessor?: typeof storageAccessor.value
@@ -66,6 +67,10 @@ onMounted(async () => {
 <template>
   <Popups />
   <div clas="d-flex flex-column vh-100">
+    <SidebarControl
+      :user="user"
+      @update-user="user = $event"
+    />
     <GlobalBar
       v-bind="{ storageAccessor, user, apiStatus }"
       @update-user="user = $event"

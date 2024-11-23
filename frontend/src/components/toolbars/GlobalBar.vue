@@ -1,8 +1,4 @@
 <template>
-  <SidebarControl
-    :user="user"
-    @update-user="$emit('updateUser', $event)"
-  />
   <nav class="navbar justify-content-between global-bar sticky-top bg-white">
     <div class="container-fluid d-flex">
 
@@ -39,7 +35,6 @@ import { type ApiStatus } from "@/managedApi/ManagedApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import type { PropType } from "vue"
 import MessageCenterButton from "@/components/toolbars/MessageCenterButton.vue"
-import SidebarControl from "./SidebarControl.vue"
 
 defineProps({
   storageAccessor: {
