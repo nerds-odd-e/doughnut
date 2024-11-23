@@ -14,7 +14,9 @@ export const systemSidebar = () => {
       return assumeAdminDashboardPage()
     },
     userOptions() {
-      cy.findByRole('button', { name: 'User actions' }).click()
+      cy.get('.modal-body').within(() => {
+        cy.findByRole('button', { name: 'User actions' }).click()
+      })
       return {
         userSettings(userName: string) {
           cy.findByRole('button', { name: `Settings for ${userName}` }).click()
