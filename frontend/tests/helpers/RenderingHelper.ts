@@ -14,7 +14,7 @@ interface NoteStorageProps {
   [key: string]: unknown
 }
 class RenderingHelper<T = DefineComponent> {
-  private comp
+  private comp: T
   private props = {}
 
   private route = {}

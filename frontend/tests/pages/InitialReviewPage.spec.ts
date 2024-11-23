@@ -15,7 +15,7 @@ vitest.mock("vue-router", () => ({
   }),
 }))
 
-let renderer: RenderingHelper
+let renderer: RenderingHelper<typeof InitialReviewPage>
 const mockedInitialReviewCall = vi.fn()
 const mockedNoteInfoCall = vi.fn()
 const mockedGetNoteCall = vi.fn()
