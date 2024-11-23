@@ -16,11 +16,7 @@
             <NoteTopicWithLink :noteTopic="note.note.noteTopic" />
           </td>
           <td>
-            <router-link
-              :to="{ name: 'notebookShow', params: { notebookId: note.notebook?.id } }"
-            >
-              {{ note.notebook?.headNoteTopic?.topicConstructor }}
-            </router-link>
+            {{ note.notebook?.headNoteTopic?.topicConstructor }}
           </td>
           <td>{{ new Date(note.note.createdAt).toLocaleString() }}</td>
           <td>{{ new Date(note.note.updatedAt).toLocaleString() }}</td>
