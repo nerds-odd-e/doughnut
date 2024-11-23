@@ -25,6 +25,21 @@ class ReviewPointBuilder extends Builder<ReviewPoint> {
     return this
   }
 
+  nextReviewAt(nextReviewAt: string): ReviewPointBuilder {
+    this.data.nextReviewAt = nextReviewAt
+    return this
+  }
+
+  repetitionCount(repetitionCount: number): ReviewPointBuilder {
+    this.data.repetitionCount = repetitionCount
+    return this
+  }
+
+  forgettingCurveIndex(forgettingCurveIndex: number): ReviewPointBuilder {
+    this.data.forgettingCurveIndex = forgettingCurveIndex
+    return this
+  }
+
   removedFromReview(removedFromReview: boolean): ReviewPointBuilder {
     this.data.removedFromReview = removedFromReview
     return this
