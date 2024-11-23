@@ -1,7 +1,5 @@
 <template>
-  <nav class="navbar justify-content-between global-bar sticky-top bg-white">
-    <div class="container-fluid d-flex">
-
+  <nav class="navbar justify-content-between sticky-top bg-white">
       <div class="d-flex flex-grow-1 justify-content-between">
         <div class="d-flex flex-grow-1" id="head-status" />
         <div class="btn-group btn-group-sm">
@@ -24,7 +22,6 @@
           @clear-error-message="$emit('clearErrorMessage')"
         />
       </div>
-    </div>
   </nav>
 </template>
 
