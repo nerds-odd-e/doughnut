@@ -29,6 +29,7 @@ declare module 'vue' {
     ChildrenNotes: typeof import('./src/components/notes/ChildrenNotes.vue')['default']
     CircleJoinForm: typeof import('./src/components/circles/CircleJoinForm.vue')['default']
     CircleNewDialog: typeof import('./src/components/circles/CircleNewDialog.vue')['default']
+    CirclesList: typeof import('./src/components/circles/CirclesList.vue')['default']
     ContentLoader: typeof import('./src/components/commons/ContentLoader.vue')['default']
     ContestableQuestion: typeof import('./src/components/review/ContestableQuestion.vue')['default']
     ConversationComponent: typeof import('./src/components/conversations/ConversationComponent.vue')['default']
