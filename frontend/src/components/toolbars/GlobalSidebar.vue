@@ -94,6 +94,17 @@ defineEmits(["updateUser"])
   flex-direction: column;
   height: 100vh;
   overflow: hidden;
+
+  // Update dropdown positioning to stay on the left
+  :deep(.dropup) {
+    position: static;
+
+    .dropdown-menu {
+      position: fixed;
+      bottom: 60px;
+      left: 0;
+    }
+  }
 }
 
 .scrolling-body {
