@@ -21,17 +21,17 @@
       </li>
       <li class="nav-item">
         <a
-          :class="`nav-link ${activePage === 'dueForReview' ? 'active' : ''}`"
+          :class="`nav-link ${activePage === 'recentlyReviewed' ? 'active' : ''}`"
           role="button"
           href="#"
-          @click="activePage = 'dueForReview'"
-        >Due for Review</a>
+          @click="activePage = 'recentlyReviewed'"
+        >Recently Reviewed</a>
       </li>
     </ul>
 
     <RecentlyAddedNotes v-if="activePage === 'recentlyAdded'" />
     <RecentlyLearnedNotes v-if="activePage === 'recentlyLearned'" />
-    <DueForReviewNotes v-if="activePage === 'dueForReview'" />
+    <RecentlyReviewedNotes v-if="activePage === 'recentlyReviewed'" />
   </ContainerPage>
 </template>
 
@@ -40,13 +40,13 @@ import { ref } from "vue"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
 import RecentlyAddedNotes from "@/components/recent/RecentlyAddedNotes.vue"
 import RecentlyLearnedNotes from "@/components/recent/RecentlyLearnedNotes.vue"
-import DueForReviewNotes from "@/components/recent/DueForReviewNotes.vue"
+import RecentlyReviewedNotes from "@/components/recent/RecentlyReviewedNotes.vue"
 
 const activePage = ref(
   "recentlyAdded" as
     | "recentlyAdded"
     | "recentlyLearned"
-    | "dueForReview"
+    | "recentlyReviewed"
     | undefined
 )
 </script>

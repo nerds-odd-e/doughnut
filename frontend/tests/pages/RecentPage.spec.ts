@@ -29,18 +29,18 @@ describe("RecentPage.vue", () => {
       ).toBe(true)
     })
 
-    it("switches to Due for Review tab when clicked", async () => {
+    it("switches to Recently Reviewed tab when clicked", async () => {
       const wrapper = helper.component(RecentPage).mount()
 
       const tab = wrapper
         .findAll(".nav-link")
-        .find((el) => el.text() === "Due for Review")
+        .find((el) => el.text() === "Recently Reviewed")
       await tab?.trigger("click")
 
       const activeTab = wrapper.find(".nav-link.active")
-      expect(activeTab.text()).toBe("Due for Review")
+      expect(activeTab.text()).toBe("Recently Reviewed")
       expect(
-        wrapper.findComponent({ name: "DueForReviewNotes" }).exists()
+        wrapper.findComponent({ name: "RecentlyReviewedNotes" }).exists()
       ).toBe(true)
     })
   })

@@ -129,6 +129,7 @@ declare module 'vue' {
     RadioButtons: typeof import('./src/components/form/RadioButtons.vue')['default']
     RecentlyAddedNotes: typeof import('./src/components/recent/RecentlyAddedNotes.vue')['default']
     RecentlyLearnedNotes: typeof import('./src/components/recent/RecentlyLearnedNotes.vue')['default']
+    RecentlyReviewedNotes: typeof import('./src/components/recent/RecentlyReviewedNotes.vue')['default']
     RepeatProgressBar: typeof import('./src/components/review/RepeatProgressBar.vue')['default']
     ResumeButton: typeof import('./src/components/commons/ResumeButton.vue')['default']
     ReviewButton: typeof import('./src/components/toolbars/ReviewButton.vue')['default']
