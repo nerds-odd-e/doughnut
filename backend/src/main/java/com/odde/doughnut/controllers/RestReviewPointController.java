@@ -83,4 +83,11 @@ class RestReviewPointController {
     return modelFactoryService.reviewPointRepository.findLast100ByUser(
         currentUser.getEntity().getId());
   }
+
+  @GetMapping("/recently-reviewed")
+  public List<ReviewPoint> getRecentlyReviewedPoints() {
+    currentUser.assertLoggedIn();
+    return modelFactoryService.reviewPointRepository.findLast100ReviewedByUser(
+        currentUser.getEntity().getId());
+  }
 }

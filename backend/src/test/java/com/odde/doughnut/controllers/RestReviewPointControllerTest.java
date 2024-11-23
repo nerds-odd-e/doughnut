@@ -178,4 +178,36 @@ class RestReviewPointControllerTest {
       assertThrows(ResponseStatusException.class, () -> controller.getRecentReviewPoints());
     }
   }
+
+  @Nested
+  class GetRecentlyReviewedPoints {
+    @Test
+    void shouldReturnEmptyListWhenNoReviewedPoints() {
+      List<ReviewPoint> reviewPoints = controller.getRecentlyReviewedPoints();
+      assertThat(reviewPoints, empty());
+    }
+
+    @Test
+    void shouldReturnRecentlyReviewedPointsForCurrentUser() {
+      ReviewPoint rp1 = makeMe.aReviewPointFor(makeMe.aNote().please()).by(userModel).please();
+      ReviewPoint rp2 = makeMe.aReviewPointFor(makeMe.aNote().please()).by(userModel).please();
+
+      // Mark as reviewed
+      controller.markAsRepeated(rp1, true);
+      controller.markAsRepeated(rp2, true);
+
+      List<ReviewPoint> reviewPoints = controller.getRecentlyReviewedPoints();
+
+      assertThat(reviewPoints, hasSize(2));
+      assertThat(reviewPoints, containsInAnyOrder(rp1, rp2));
+    }
+
+    @Test
+    void shouldRequireUserToBeLoggedIn() {
+      userModel = makeMe.aNullUserModelPlease();
+      controller =
+          new RestReviewPointController(modelFactoryService, userModel, testabilitySettings);
+      assertThrows(ResponseStatusException.class, () -> controller.getRecentlyReviewedPoints());
+    }
+  }
 }

@@ -2569,6 +2569,26 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ReviewPoint"
+  /api/review-points/recently-reviewed:
+    get:
+      tags:
+      - rest-review-point-controller
+      operationId: getRecentlyReviewedPoints
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ReviewPoint"
   /api/review-points/recent:
     get:
       tags:

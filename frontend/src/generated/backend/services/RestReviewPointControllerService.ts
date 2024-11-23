@@ -97,6 +97,19 @@ export class RestReviewPointControllerService {
      * @returns ReviewPoint OK
      * @throws ApiError
      */
+    public getRecentlyReviewedPoints(): CancelablePromise<Array<ReviewPoint>> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/review-points/recently-reviewed',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @returns ReviewPoint OK
+     * @throws ApiError
+     */
     public getRecentReviewPoints(): CancelablePromise<Array<ReviewPoint>> {
         return this.httpRequest.request({
             method: 'GET',
