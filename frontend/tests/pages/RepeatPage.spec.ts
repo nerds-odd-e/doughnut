@@ -20,7 +20,7 @@ vitest.mock("vue-router", () => ({
 
 useRouter().currentRoute.value.name = "repeat"
 
-let renderer: RenderingHelper
+let renderer: RenderingHelper<typeof RepeatPage>
 const mockedRepeatCall = vi.fn()
 
 let teleportTarget: HTMLDivElement
@@ -113,6 +113,30 @@ describe("repeat page", () => {
       await flushPromises()
       expect(teleportTarget.textContent).toContain("1/3")
       expect(mockedRandomQuestionCall).toHaveBeenCalledWith(secondReviewPointId)
+    })
+
+    it("should move current review point to end when requested", async () => {
+      const wrapper = await mountPage()
+
+      // Initial order should be [123, 456, 3]
+      expect(wrapper.vm.toRepeat).toEqual([123, 456, 3])
+
+      // Trigger moveToEnd for the first item
+      await wrapper.findComponent({ name: "Quiz" }).vm.$emit("moveToEnd", 0)
+
+      // New order should be [456, 3, 123]
+      expect(wrapper.vm.toRepeat).toEqual([456, 3, 123])
+    })
+
+    it("should not show move to end button for last item", async () => {
+      const wrapper = await mountPage()
+
+      // Move to last item
+      wrapper.vm.currentIndex = 2
+      await wrapper.vm.$nextTick()
+
+      const quiz = wrapper.findComponent({ name: "Quiz" })
+      expect(quiz.vm.canMoveToEnd).toBe(false)
     })
   })
 })

@@ -17,6 +17,7 @@
       :eager-fetch-count="eagerFetchCount ?? 5"
       :storage-accessor="storageAccessor"
       @answered="onAnswered($event)"
+      @move-to-end="moveReviewPointToEnd"
     />
     <template v-else-if="!minimized">
       <div class="alert alert-success">
@@ -114,7 +115,25 @@ const onAnswered = (answerResult: AnsweredQuestion) => {
   }
 }
 
+const moveReviewPointToEnd = (index: number) => {
+  const currentToRepeat = toRepeat.value
+  if (!currentToRepeat) return
+
+  const item = currentToRepeat[index]
+  if (item === undefined) return
+  toRepeat.value = [
+    ...currentToRepeat.slice(0, index),
+    ...currentToRepeat.slice(index + 1),
+    item,
+  ]
+}
+
 onMounted(() => {
   loadMore(0)
+})
+
+defineExpose({
+  toRepeat,
+  currentIndex,
 })
 </script>

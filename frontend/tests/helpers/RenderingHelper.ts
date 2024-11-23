@@ -1,8 +1,8 @@
 import ManagedApi from "@/managedApi/ManagedApi"
 import { render } from "@testing-library/vue"
-import { VueWrapper, mount } from "@vue/test-utils"
+import { mount } from "@vue/test-utils"
 import { merge } from "es-toolkit"
-import { ref, type ComponentPublicInstance, type DefineComponent } from "vue"
+import { ref, type DefineComponent } from "vue"
 import type { RouteLocationRaw } from "vue-router"
 import { createRouter, createWebHistory } from "vue-router"
 import createNoteStorage from "@/store/createNoteStorage"
@@ -13,9 +13,8 @@ interface NoteStorageProps {
   storageAccessor?: ReturnType<typeof createNoteStorage>
   [key: string]: unknown
 }
-class RenderingHelper {
+class RenderingHelper<T = DefineComponent> {
   private comp
-
   private props = {}
 
   private route = {}
@@ -24,7 +23,7 @@ class RenderingHelper {
 
   private global
 
-  constructor(comp: DefineComponent, managedApi: ManagedApi) {
+  constructor(comp: T, managedApi: ManagedApi) {
     this.comp = comp
     this.managedApi = managedApi
     this.global = {
@@ -91,13 +90,14 @@ class RenderingHelper {
     return render(this.comp, this.options)
   }
 
-  mount(
-    options: Record<string, unknown> = {}
-  ): VueWrapper<ComponentPublicInstance> {
-    return mount(this.comp, { ...this.options, ...options })
+  mount(options: Record<string, unknown> = {}) {
+    return mount<T>(this.comp, {
+      ...this.options,
+      ...options,
+    })
   }
 
-  private get options() {
+  private get options(): Record<string, unknown> {
     return {
       propsData: this.props,
       global: merge(this.global, {

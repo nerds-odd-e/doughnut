@@ -20,6 +20,14 @@
         @answered="onAnswered($event)"
         :key="currentReviewQuestion.id"
       />
+      <button
+        v-if="canMoveToEnd"
+        class="btn btn-icon"
+        title="Move to end of list"
+        @click="moveToEnd"
+      >
+        <i class="fas fa-arrow-down"></i>
+      </button>
     </template>
   </div>
 </template>
@@ -51,6 +59,7 @@ const props = defineProps<QuizProps>()
 // Emits definition
 const emit = defineEmits<{
   (e: "answered", result: AnsweredQuestion): void
+  (e: "moveToEnd", currentIndex: number): void
 }>()
 
 // Composable for question fetching logic
@@ -132,6 +141,14 @@ const selectPosition = () => {
 
 const onAnswered = (answerResult: AnsweredQuestion) => {
   emit("answered", answerResult)
+}
+
+const canMoveToEnd = computed(() => {
+  return props.currentIndex < (props.reviewPoints?.length ?? 0) - 1
+})
+
+const moveToEnd = () => {
+  emit("moveToEnd", props.currentIndex)
 }
 
 // Watchers
