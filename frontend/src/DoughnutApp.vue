@@ -66,20 +66,22 @@ onMounted(async () => {
 
 <template>
   <Popups />
-  <div clas="d-flex flex-column vh-100">
+  <div class="d-flex vh-100">
     <SidebarControl
       :user="user"
       @update-user="user = $event"
     />
-    <GlobalBar
-      v-bind="{ storageAccessor, user, apiStatus }"
-      @update-user="user = $event"
-      @clear-error-message="clearErrorMessage($event)"
-    />
-    <UserNewRegisterPage v-if="newUser" @update-user="user = $event" />
-    <template v-else-if="userLoaded">
-      <router-view v-bind="routeViewProps" />
-    </template>
+    <div class="d-flex flex-column flex-grow-1">
+      <GlobalBar
+        v-bind="{ storageAccessor, user, apiStatus }"
+        @update-user="user = $event"
+        @clear-error-message="clearErrorMessage($event)"
+      />
+      <UserNewRegisterPage v-if="newUser" @update-user="user = $event" />
+      <template v-else-if="userLoaded">
+        <router-view v-bind="routeViewProps" />
+      </template>
+    </div>
   </div>
   <TestMenu
     v-if="environment === 'testing'"

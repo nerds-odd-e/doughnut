@@ -1,14 +1,22 @@
 <template>
-  <PopButton v-if="user" title="open sidebar" :sidebar="'left'">
-    <template #button_face>
-      <SvgSidebar />
-    </template>
+  <div class="d-flex flex-column h-100">
+    <PopButton v-if="user" title="open sidebar" :sidebar="'left'">
+      <template #button_face>
+        <SvgSidebar />
+      </template>
+      <GlobalSidebar
+        :user="user"
+        @update-user="$emit('updateUser', $event)"
+      />
+    </PopButton>
     <GlobalSidebar
+      v-if="user"
       :user="user"
+      :iconized="true"
       @update-user="$emit('updateUser', $event)"
     />
-  </PopButton>
-  <LoginButton v-else />
+    <LoginButton v-else />
+  </div>
 </template>
 
 <script setup lang="ts">
