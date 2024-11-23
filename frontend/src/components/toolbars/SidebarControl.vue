@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex flex-column h-100">
+  <div class="d-flex flex-column h-100 sidebar-control">
     <PopButton v-if="user" title="open sidebar" :sidebar="'left'">
       <template #button_face>
         <SvgSidebar />
@@ -32,3 +32,9 @@ defineProps({
 })
 defineEmits(["updateUser"])
 </script>
+
+<style scoped>
+.sidebar-control {
+  background-color: #f5f5f5; /* Light gray background - you can change this to any color you prefer */
+}
+</style>
