@@ -147,6 +147,7 @@ declare module 'vue' {
     SelfEvaluateButtons: typeof import('./src/components/review/SelfEvaluateButtons.vue')['default']
     ShowImage: typeof import('./src/components/notes/accessory/ShowImage.vue')['default']
     Sidebar: typeof import('./src/components/notes/Sidebar.vue')['default']
+    SidebarControl: typeof import('./src/components/toolbars/SidebarControl.vue')['default']
     SidebarInner: typeof import('./src/components/notes/SidebarInner.vue')['default']
     SidebarNoteItem: typeof import('./src/components/notes/SidebarNoteItem.vue')['default']
     SubscribeDialog: typeof import('./src/components/bazaar/SubscribeDialog.vue')['default']

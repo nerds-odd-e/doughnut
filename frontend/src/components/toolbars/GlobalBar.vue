@@ -1,16 +1,10 @@
 <template>
+  <SidebarControl
+    :user="user"
+    @update-user="$emit('updateUser', $event)"
+  />
   <nav class="navbar justify-content-between global-bar sticky-top bg-white">
     <div class="container-fluid d-flex">
-      <PopButton v-if="user" title="open sidebar" :sidebar="'left'">
-        <template #button_face>
-          <SvgSidebar />
-        </template>
-        <GlobalSidebar
-          :user="user"
-          @update-user="$emit('updateUser', $event)"
-        />
-      </PopButton>
-      <LoginButton v-else />
 
       <div class="d-flex flex-grow-1 justify-content-between">
         <div class="d-flex flex-grow-1" id="head-status" />
@@ -45,7 +39,7 @@ import { type ApiStatus } from "@/managedApi/ManagedApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import type { PropType } from "vue"
 import MessageCenterButton from "@/components/toolbars/MessageCenterButton.vue"
-import GlobalSidebar from "./GlobalSidebar.vue"
+import SidebarControl from "./SidebarControl.vue"
 
 defineProps({
   storageAccessor: {
