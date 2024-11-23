@@ -16,11 +16,6 @@ const browser = {
       })
     })
 
-    cy.url().then((url) => {
-      if (url === 'about:blank') {
-        cy.visit('/')
-      }
-    })
     // Return a promise that resolves when the audio worklet is fully set up
     return new Cypress.Promise<void>((resolve) => {
       cy.on('window:before:load', (win: Cypress.AUTWindow) => {
@@ -75,7 +70,13 @@ const browser = {
         // Remove biome-ignore as we're adding proper type annotation
         ;(win as Window & typeof globalThis).AudioWorkletNode =
           MockAudioWorkletNode
+
         resolve()
+      })
+      cy.url().then((url) => {
+        if (url === 'about:blank') {
+          cy.visit('/')
+        }
       })
     })
   },
