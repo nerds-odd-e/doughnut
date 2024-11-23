@@ -16,45 +16,68 @@ const browser = {
       })
     })
 
-    // Mock the AudioContext and related audio processing
-    cy.on('window:before:load', (win) => {
-      // as of now, AudioContext and AudioWorkletNode are not useable in cypress
-      // so we need to mock them.
-      // In the future, we should be able to use them in cypress directly
-      // and make the test more realistic.
+    cy.url().then((url) => {
+      if (url === 'about:blank') {
+        cy.visit('about:blank')
+      }
+    })
+    // Return a promise that resolves when the audio worklet is fully set up
+    return new Cypress.Promise<void>((resolve) => {
+      cy.on('window:before:load', (win: Cypress.AUTWindow) => {
+        // as of now, AudioContext and AudioWorkletNode are not useable in cypress
+        // so we need to mock them.
+        // In the future, we should be able to use them in cypress directly
+        // and make the test more realistic.
 
-      class MockAudioContext {
-        audioWorklet = {
-          addModule: cy.stub().resolves(),
-        }
-        createMediaStreamSource() {
-          return {
-            // biome-ignore lint/suspicious/noEmptyBlockStatements: <explanation>
-            connect: () => {},
-            // biome-ignore lint/suspicious/noEmptyBlockStatements: <explanation>
-            disconnect: () => {},
+        class MockAudioContext {
+          audioWorklet = {
+            addModule: cy.stub().resolves(),
+          }
+          createMediaStreamSource() {
+            return {
+              // Implement stubs for connect and disconnect
+              connect: () => {
+                // Stub implementation for connecting audio nodes
+                return undefined
+              },
+              disconnect: () => {
+                // Stub implementation for disconnecting audio nodes
+                return undefined
+              },
+            }
+          }
+          get destination() {
+            return {}
           }
         }
-        get destination() {
-          return {}
+        // Remove biome-ignore as we're adding proper type annotation
+        ;(win as Window & typeof globalThis).AudioContext = MockAudioContext
+
+        const port = this.audioWorletPort
+        class MockAudioWorkletNode {
+          port = port
+          constructor() {
+            // Initialize onmessage handler right away
+            this.port.onmessage = () => {
+              // Handle incoming messages from the audio worklet
+            }
+          }
+          // Add implementations for connect and disconnect
+          connect() {
+            // Stub implementation for connecting audio worklet node
+            return undefined
+          }
+          disconnect() {
+            // Stub implementation for disconnecting audio worklet node
+            return undefined
+          }
         }
-      }
-      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-      ;(win as any).AudioContext = MockAudioContext
-
-      const port = this.audioWorletPort
-      class MockAudioWorkletNode {
-        port = port
-        // biome-ignore lint/suspicious/noEmptyBlockStatements: <explanation>
-        connect() {}
-        // biome-ignore lint/suspicious/noEmptyBlockStatements: <explanation>
-        disconnect() {}
-      }
-      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-      ;(win as any).AudioWorkletNode = MockAudioWorkletNode
+        // Remove biome-ignore as we're adding proper type annotation
+        ;(win as Window & typeof globalThis).AudioWorkletNode =
+          MockAudioWorkletNode
+        resolve()
+      })
     })
-
-    // Preload the audio fixture
   },
   receiveAudioFromMicrophone: function (audioFileName: string) {
     cy.fixture(audioFileName, 'base64').then((audioBase64) => {
