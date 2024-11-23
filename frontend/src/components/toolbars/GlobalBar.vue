@@ -5,7 +5,6 @@
       <div class="d-flex flex-grow-1 justify-content-between">
         <div class="d-flex flex-grow-1" id="head-status" />
         <div class="btn-group btn-group-sm">
-          <MessageCenterButton v-if="user" :user="user" />
           <PopButton v-if="user" title="search note">
             <template #button_face>
               <SvgSearch />
@@ -34,7 +33,6 @@ import type { User } from "@/generated/backend"
 import { type ApiStatus } from "@/managedApi/ManagedApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import type { PropType } from "vue"
-import MessageCenterButton from "@/components/toolbars/MessageCenterButton.vue"
 
 defineProps({
   storageAccessor: {
