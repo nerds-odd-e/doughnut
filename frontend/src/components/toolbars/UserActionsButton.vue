@@ -8,8 +8,7 @@
       aria-haspopup="true"
       aria-expanded="false"
     >
-      <SvgMissingAvatar :x="-13" :y="-20" :height="40" />
-      {{ user.name }}
+      <slot />
     </button>
     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
       <PopButton btn-class="dropdown-item" title="user settings">
@@ -36,7 +35,6 @@
 
 <script setup lang="ts">
 import PopButton from "@/components/commons/Popups/PopButton.vue"
-import SvgMissingAvatar from "@/components/svgs/SvgMissingAvatar.vue"
 import type { User } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { PropType } from "vue"
