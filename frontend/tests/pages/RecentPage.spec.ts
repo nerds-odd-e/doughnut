@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import RecentPage from "./RecentPage.vue"
+import RecentPage from "@/pages/RecentPage.vue"
 import helper from "@tests/helpers"
 
 describe("RecentPage.vue", () => {
@@ -17,9 +17,10 @@ describe("RecentPage.vue", () => {
     it("switches to Recently Learned tab when clicked", async () => {
       const wrapper = helper.component(RecentPage).mount()
 
-      await wrapper
-        .find('a[href="#"]:contains("Recently Learned")')
-        .trigger("click")
+      const tab = wrapper
+        .findAll(".nav-link")
+        .find((el) => el.text() === "Recently Learned")
+      await tab?.trigger("click")
 
       const activeTab = wrapper.find(".nav-link.active")
       expect(activeTab.text()).toBe("Recently Learned")
@@ -31,9 +32,10 @@ describe("RecentPage.vue", () => {
     it("switches to Due for Review tab when clicked", async () => {
       const wrapper = helper.component(RecentPage).mount()
 
-      await wrapper
-        .find('a[href="#"]:contains("Due for Review")')
-        .trigger("click")
+      const tab = wrapper
+        .findAll(".nav-link")
+        .find((el) => el.text() === "Due for Review")
+      await tab?.trigger("click")
 
       const activeTab = wrapper.find(".nav-link.active")
       expect(activeTab.text()).toBe("Due for Review")

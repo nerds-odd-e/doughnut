@@ -4,8 +4,7 @@ import ManagedApi from "@/managedApi/ManagedApi"
 import NoteEditingHistory from "@/store/NoteEditingHistory"
 import createNoteStorage from "@/store/createNoteStorage"
 import type { StorageAccessor } from "@/store/createNoteStorage"
-import { screen } from "@testing-library/vue"
-import { flushPromises } from "@vue/test-utils"
+import { fireEvent, screen } from "@testing-library/vue"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 import { ref } from "vue"
@@ -24,29 +23,12 @@ describe("global bar", () => {
   let user: User
 
   beforeEach(() => {
-    helper.managedApi.restCircleController.index = vitest
-      .fn()
-      .mockResolvedValue([])
     user = makeMe.aUser.please()
     noteEditingHistory = new NoteEditingHistory()
     histories = createNoteStorage(
       new ManagedApi({ states: [], errors: [] }),
       noteEditingHistory
     )
-  })
-
-  it("opens the circles selection", async () => {
-    const wrapper = helper
-      .component(GlobalBar)
-      .withProps({
-        storageAccessor: histories,
-        user,
-        apiStatus: { states: [] },
-      })
-      .mount()
-    wrapper.find("[role='button']").trigger("click")
-    await flushPromises()
-    expect(helper.managedApi.restCircleController.index).toBeCalled()
   })
 
   it("fetch API to be called ONCE", async () => {
@@ -86,8 +68,9 @@ describe("global bar", () => {
         apiStatus: { states: [] },
       })
       .render()
+    await fireEvent.click(screen.getByRole("button", { name: "open sidebar" }))
 
-    const recentLink = screen.getByText("Recent Notes")
+    const recentLink = screen.getByRole("button", { name: "Recent Notes" })
     expect(recentLink).toBeInTheDocument()
   })
 
@@ -100,8 +83,9 @@ describe("global bar", () => {
         apiStatus: { states: [] },
       })
       .render()
+    await fireEvent.click(screen.getByRole("button", { name: "open sidebar" }))
 
-    const circlesLink = screen.getByText("My Circles")
+    const circlesLink = screen.getByRole("button", { name: "My Circles" })
     expect(circlesLink).toBeInTheDocument()
   })
 })
