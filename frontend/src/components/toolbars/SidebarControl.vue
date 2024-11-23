@@ -37,7 +37,7 @@ defineEmits(["updateUser"])
 .sidebar-control {
   background-color: #f5f5f5;
   flex-direction: column;
-  height: 100%;
+  height: 100vh;
 }
 
 @media (max-width: 768px) {
