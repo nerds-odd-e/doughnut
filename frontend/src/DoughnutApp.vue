@@ -66,12 +66,12 @@ onMounted(async () => {
 
 <template>
   <Popups />
-  <div class="d-flex vh-100">
+  <div class="app-container">
     <SidebarControl
       :user="user"
       @update-user="user = $event"
     />
-    <div class="d-flex flex-column flex-grow-1">
+    <div class="main-content">
       <GlobalBar
         v-bind="{ storageAccessor, user, apiStatus }"
         @update-user="user = $event"
@@ -90,3 +90,27 @@ onMounted(async () => {
     @feature-toggle="featureToggle = $event"
   />
 </template>
+
+<style scoped>
+.app-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main-content {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+@media (max-width: 768px) {
+  .app-container {
+    flex-direction: column;
+  }
+
+  .main-content {
+    height: calc(100vh - 56px); /* Adjust this value based on your horizontal bar height */
+    overflow-y: auto;
+  }
+}
+</style>

@@ -1,5 +1,5 @@
 <template>
-  <div class="sidebar-container">
+  <div class="sidebar-container" :class="{ iconized }">
     <div class="scrolling-body">
       <nav v-if="!iconized" class="navbar navbar-expand-lg navbar-dark bg-dark">
         <BrandBar />
@@ -95,6 +95,14 @@ defineEmits(["updateUser"])
   height: 100vh;
   overflow: hidden;
 
+  &.iconized {
+    height: auto;
+
+    .fixed-bottom-bar {
+      display: none;
+    }
+  }
+
   // Update dropdown positioning to stay on the left
   :deep(.dropup) {
     position: static;
@@ -110,12 +118,35 @@ defineEmits(["updateUser"])
 .scrolling-body {
   flex: 1;
   overflow-y: auto;
+
+  .list-group {
+    display: flex;
+    flex-direction: column;
+  }
 }
 
 .fixed-bottom-bar {
   position: sticky;
   bottom: 0;
   width: 100%;
-  height: 60px; /* Adjust this value to match the height of the fixed-bottom-bar */
+  height: 60px;
+}
+
+@media (max-width: 768px) {
+  .sidebar-container.iconized {
+    width: 100%;
+
+    .list-group {
+      flex-direction: row;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      justify-content: space-around;
+    }
+
+    .list-group-item {
+      border: none;
+      padding: 0.5rem;
+    }
+  }
 }
 </style>
