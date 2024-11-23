@@ -96,11 +96,10 @@ defineEmits(["updateUser"])
   overflow: hidden;
 
   &.iconized {
-    height: auto;
-
-    .fixed-bottom-bar {
-      display: none;
-    }
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
   }
 
   // Update dropdown positioning to stay on the left
@@ -135,17 +134,24 @@ defineEmits(["updateUser"])
 @media (max-width: 768px) {
   .sidebar-container.iconized {
     width: 100%;
+    height: auto;
+    display: block;
 
     .list-group {
       flex-direction: row;
       flex-wrap: nowrap;
       overflow-x: auto;
-      justify-content: space-around;
+      justify-content: center;
+      gap: 1rem;
     }
 
     .list-group-item {
       border: none;
       padding: 0.5rem;
+    }
+
+    .fixed-bottom-bar {
+      display: none;
     }
   }
 }
