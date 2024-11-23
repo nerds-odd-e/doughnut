@@ -20,6 +20,16 @@ class ReviewPointBuilder extends Builder<ReviewPoint> {
     }
   }
 
+  initialReviewedAt(initialReviewedAt: string): ReviewPointBuilder {
+    this.data.initialReviewedAt = initialReviewedAt
+    return this
+  }
+
+  removedFromReview(removedFromReview: boolean): ReviewPointBuilder {
+    this.data.removedFromReview = removedFromReview
+    return this
+  }
+
   ofNote(note: NoteRealm): ReviewPointBuilder {
     this.data.note = note.note
     return this
