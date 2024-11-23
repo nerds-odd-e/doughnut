@@ -37,28 +37,71 @@ import _ from "lodash"
 import ContestableQuestion from "./ContestableQuestion.vue"
 import JustReview from "./JustReview.vue"
 
-// Props definition
-const props = defineProps<{
-  minimized: boolean
+// Interface definitions for better type safety
+interface QuizProps {
+  minimized?: boolean
   reviewPoints: number[]
   currentIndex: number
   eagerFetchCount: number
   storageAccessor: StorageAccessor
-}>()
+}
+
+const props = defineProps<QuizProps>()
 
 // Emits definition
 const emit = defineEmits<{
   (e: "answered", result: AnsweredQuestion): void
 }>()
 
-// Data properties
-const reviewQuestionCache = ref<(ReviewQuestionInstance | undefined)[]>([])
-const eagerFetchUntil = ref(0)
-const fetching = ref(false)
+// Composable for question fetching logic
+const useQuestionFetching = (props: QuizProps) => {
+  const reviewQuestionCache = ref<(ReviewQuestionInstance | undefined)[]>([])
+  const eagerFetchUntil = ref(0)
+  const fetching = ref(false)
+  const { managedApi } = useLoadingApi()
 
-const { managedApi } = useLoadingApi()
+  const fetchNextQuestion = async () => {
+    const index = reviewQuestionCache.value.length
+    if (eagerFetchUntil.value <= index) return
 
-// Computed properties
+    const reviewPointId = reviewPointIdAt(index)
+    if (reviewPointId === undefined) return
+
+    try {
+      const question =
+        await managedApi.silent.restReviewQuestionController.generateRandomQuestion(
+          reviewPointId
+        )
+      reviewQuestionCache.value.push(question)
+    } catch (e) {
+      reviewQuestionCache.value.push(undefined)
+    }
+    await fetchNextQuestion()
+  }
+
+  const fetchQuestion = async () => {
+    eagerFetchUntil.value = _.max([
+      eagerFetchUntil.value,
+      props.currentIndex + props.eagerFetchCount,
+    ]) as number
+
+    if (!fetching.value) {
+      fetching.value = true
+      await fetchNextQuestion()
+      fetching.value = false
+    }
+  }
+
+  return {
+    reviewQuestionCache,
+    fetchQuestion,
+  }
+}
+
+// Use the composable
+const { reviewQuestionCache, fetchQuestion } = useQuestionFetching(props)
+
+// Computed properties with better naming
 const currentReviewPointId = computed(() => reviewPointIdAt(props.currentIndex))
 const currentQuestionFetched = computed(
   () => reviewQuestionCache.value.length > props.currentIndex
@@ -77,35 +120,6 @@ const reviewPointIdAt = (index: number): number | undefined => {
 
 const selectPosition = () => {
   if (props.minimized) return
-}
-
-const fetchNextQuestion = async () => {
-  const index = reviewQuestionCache.value.length
-  if (eagerFetchUntil.value <= index) return
-  const reviewPointId = reviewPointIdAt(index)
-  if (reviewPointId === undefined) return
-  try {
-    const question =
-      await managedApi.silent.restReviewQuestionController.generateRandomQuestion(
-        reviewPointId
-      )
-    reviewQuestionCache.value.push(question)
-  } catch (e) {
-    reviewQuestionCache.value.push(undefined)
-  }
-  await fetchNextQuestion()
-}
-
-const fetchQuestion = async () => {
-  eagerFetchUntil.value = _.max([
-    eagerFetchUntil.value,
-    props.currentIndex + props.eagerFetchCount,
-  ]) as number
-  if (!fetching.value) {
-    fetching.value = true
-    await fetchNextQuestion()
-    fetching.value = false
-  }
 }
 
 const onAnswered = (answerResult: AnsweredQuestion) => {
