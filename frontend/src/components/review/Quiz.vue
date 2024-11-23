@@ -55,13 +55,15 @@ const emit = defineEmits<{
 
 // Composable for question fetching logic
 const useQuestionFetching = (props: QuizProps) => {
-  const reviewQuestionCache = ref<(ReviewQuestionInstance | undefined)[]>([])
+  const reviewQuestionCache = ref<
+    Record<number, ReviewQuestionInstance | undefined>
+  >({})
   const eagerFetchUntil = ref(0)
   const fetching = ref(false)
   const { managedApi } = useLoadingApi()
 
   const fetchNextQuestion = async () => {
-    const index = reviewQuestionCache.value.length
+    const index = Object.keys(reviewQuestionCache.value).length
     if (eagerFetchUntil.value <= index) return
 
     const reviewPointId = reviewPointIdAt(index)
@@ -72,9 +74,9 @@ const useQuestionFetching = (props: QuizProps) => {
         await managedApi.silent.restReviewQuestionController.generateRandomQuestion(
           reviewPointId
         )
-      reviewQuestionCache.value.push(question)
+      reviewQuestionCache.value[reviewPointId] = question
     } catch (e) {
-      reviewQuestionCache.value.push(undefined)
+      reviewQuestionCache.value[reviewPointId] = undefined
     }
     await fetchNextQuestion()
   }
@@ -103,12 +105,18 @@ const { reviewQuestionCache, fetchQuestion } = useQuestionFetching(props)
 
 // Computed properties with better naming
 const currentReviewPointId = computed(() => reviewPointIdAt(props.currentIndex))
-const currentQuestionFetched = computed(
-  () => reviewQuestionCache.value.length > props.currentIndex
-)
-const currentReviewQuestion = computed(
-  () => reviewQuestionCache.value[props.currentIndex]
-)
+const currentQuestionFetched = computed(() => {
+  const reviewPointId = currentReviewPointId.value
+  return (
+    reviewPointId !== undefined && reviewPointId in reviewQuestionCache.value
+  )
+})
+const currentReviewQuestion = computed(() => {
+  const reviewPointId = currentReviewPointId.value
+  return reviewPointId !== undefined
+    ? reviewQuestionCache.value[reviewPointId]
+    : undefined
+})
 
 // Methods
 const reviewPointIdAt = (index: number): number | undefined => {
