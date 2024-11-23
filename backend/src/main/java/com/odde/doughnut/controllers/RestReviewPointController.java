@@ -46,6 +46,7 @@ class RestReviewPointController {
   public ReviewPoint removeFromRepeating(
       @PathVariable("reviewPoint") @Schema(type = "integer") ReviewPoint reviewPoint) {
     reviewPoint.setRemovedFromReview(true);
+    reviewPoint.setLastReviewedAt(testabilitySettings.getCurrentUTCTimestamp());
     modelFactoryService.save(reviewPoint);
     return reviewPoint;
   }

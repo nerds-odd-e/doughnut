@@ -64,9 +64,10 @@ class RestReviewPointControllerTest {
       }
 
       @Test
-      void remove() {
+      void removeAndUpdateLastReviewedAt() {
         controller.removeFromRepeating(rp);
         assertThat(rp.getRemovedFromReview(), is(true));
+        assertThat(rp.getLastReviewedAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
       }
     }
   }
