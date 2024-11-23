@@ -9,16 +9,7 @@ import start from '../start'
 When(
   'I create a new circle {string} and copy the invitation code',
   (circleName: string) => {
-    start.systemSidebar()
-    cy.findByRole('button', { name: 'Create a new circle' }).click()
-    cy.formField('Name').type(circleName)
-    cy.get('input[value="Submit"]').click()
-
-    cy.get('#invitation-code')
-      .invoke('val')
-      .then((text) => {
-        cy.wrap(text).as('savedInvitationCode')
-      })
+    start.navigateToMyCircles().createNewCircle(circleName).copyInvitationCode()
   }
 )
 

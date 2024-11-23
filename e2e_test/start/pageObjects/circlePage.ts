@@ -5,7 +5,8 @@ import { findNotebookCardButton } from './NotebookList'
 
 export const navigateToCircle = (circleName: string) => {
   start.systemSidebar()
-  cy.findByText(circleName, { selector: '.modal-body a' }).click()
+  cy.findByText('My Circles').click()
+  cy.findByText(circleName, { selector: 'a' }).click()
 
   return {
     creatingNotebook(notebookTopic: string) {

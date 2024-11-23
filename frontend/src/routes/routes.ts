@@ -17,6 +17,7 @@ import NonproductionOnlyLoginPage from "@/pages/NonproductionOnlyLoginPage.vue"
 import NestedPage from "../pages/commons/NestedPage"
 import MessageCenterPage from "../pages/MessageCenterPage.vue"
 import RecentPage from "@/pages/RecentPage.vue"
+import CirclesPage from "@/pages/CirclesPage.vue"
 
 const NestedInitialReviewPage = NestedPage(InitialReviewPage, "initial")
 const NestedRepeatPage = NestedPage(RepeatPage, "repeat")
@@ -131,6 +132,11 @@ const routes = [
     path: "/d/recent",
     name: "recent",
     component: RecentPage,
+  },
+  {
+    path: "/d/circles",
+    name: "circles",
+    component: CirclesPage,
   },
 ] as RouteRecordRaw[]
 

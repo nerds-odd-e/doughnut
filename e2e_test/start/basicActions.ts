@@ -16,6 +16,7 @@ import { logins } from './logins'
 import { messageCenterIndicator } from './pageObjects/messageCenterIndicator'
 import { assumeAudioTools } from './pageObjects/audioToolsPage'
 import { assumeNoteTargetSearchDialog } from './pageObjects/noteTargetSearchDialog'
+import { navigateToMyCircles } from './pageObjects/myCirclesPage'
 
 export default {
   navigateToBazaar,
@@ -56,4 +57,5 @@ export default {
     return this.goToAdminDashboard()
   },
   messageCenterIndicator,
+  navigateToMyCircles,
 }

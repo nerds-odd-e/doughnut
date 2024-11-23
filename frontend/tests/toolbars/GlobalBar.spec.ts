@@ -90,4 +90,18 @@ describe("global bar", () => {
     const recentLink = screen.getByText("Recent Notes")
     expect(recentLink).toBeInTheDocument()
   })
+
+  it("shows circles link in sidebar", async () => {
+    helper
+      .component(GlobalBar)
+      .withProps({
+        storageAccessor: histories,
+        user,
+        apiStatus: { states: [] },
+      })
+      .render()
+
+    const circlesLink = screen.getByText("My Circles")
+    expect(circlesLink).toBeInTheDocument()
+  })
 })
