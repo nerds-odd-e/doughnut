@@ -76,4 +76,18 @@ describe("global bar", () => {
 
     expect(await screen.findByTitle("undo delete note")).not.toBeDisabled()
   })
+
+  it("shows recent notes link in sidebar", async () => {
+    helper
+      .component(GlobalBar)
+      .withProps({
+        storageAccessor: histories,
+        user,
+        apiStatus: { states: [] },
+      })
+      .render()
+
+    const recentLink = screen.getByText("Recent Notes")
+    expect(recentLink).toBeInTheDocument()
+  })
 })
