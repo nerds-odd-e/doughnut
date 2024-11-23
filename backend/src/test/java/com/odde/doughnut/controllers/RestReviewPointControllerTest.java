@@ -48,6 +48,8 @@ class RestReviewPointControllerTest {
 
       @BeforeEach
       void setup() {
+        // fix the time
+        testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
         rp = makeMe.aReviewPointFor(makeMe.aNote().please()).by(userModel).please();
       }
 

@@ -45,6 +45,7 @@ defineEmits(["updateUser"])
     flex-direction: row;
     width: 100%;
     height: auto;
+    padding: 0.5rem 0;
   }
 }
 </style>
