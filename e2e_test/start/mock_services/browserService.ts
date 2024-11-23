@@ -18,7 +18,7 @@ const browser = {
 
     cy.url().then((url) => {
       if (url === 'about:blank') {
-        cy.visit('about:blank')
+        cy.visit('/')
       }
     })
     // Return a promise that resolves when the audio worklet is fully set up

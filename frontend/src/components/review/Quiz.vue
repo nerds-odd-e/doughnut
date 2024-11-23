@@ -24,7 +24,8 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
+import { ref, computed, watch, onMounted } from "vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import type {
   AnsweredQuestion,
@@ -33,116 +34,91 @@ import type {
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import _ from "lodash"
-import type { PropType } from "vue"
-import { defineComponent } from "vue"
 import ContestableQuestion from "./ContestableQuestion.vue"
 import JustReview from "./JustReview.vue"
 
-export default defineComponent({
-  setup() {
-    return useLoadingApi()
-  },
-  props: {
-    minimized: Boolean,
-    reviewPoints: {
-      type: Object as PropType<number[]>,
-      required: true,
-    },
-    currentIndex: {
-      type: Number,
-      required: true,
-    },
-    eagerFetchCount: {
-      type: Number,
-      required: true,
-    },
-    storageAccessor: {
-      type: Object as PropType<StorageAccessor>,
-      required: true,
-    },
-  },
-  emits: ["answered"],
-  components: {
-    JustReview,
-    ContentLoader,
-    ContestableQuestion,
-  },
-  data() {
-    return {
-      reviewQuestionCache: [] as (ReviewQuestionInstance | undefined)[],
-      eagerFetchUntil: 0,
-      fetching: false,
-    }
-  },
-  computed: {
-    currentReviewPointId() {
-      return this.reviewPointIdAt(this.currentIndex)
-    },
-    currentQuestionFetched() {
-      return this.reviewQuestionCache.length > this.currentIndex
-    },
-    currentReviewQuestion() {
-      return this.reviewQuestionCache[this.currentIndex]
-    },
-  },
-  watch: {
-    minimized() {
-      this.selectPosition()
-    },
-    currentIndex() {
-      this.fetchQuestion()
-    },
-    currentReviewQuestion() {
-      this.selectPosition()
-    },
-  },
-  methods: {
-    reviewPointIdAt(index: number): number | undefined {
-      if (this.reviewPoints && index < this.reviewPoints.length) {
-        return this.reviewPoints[index] as number
-      }
-      return undefined
-    },
+// Props definition
+const props = defineProps<{
+  minimized: boolean
+  reviewPoints: number[]
+  currentIndex: number
+  eagerFetchCount: number
+  storageAccessor: StorageAccessor
+}>()
 
-    selectPosition() {
-      if (this.minimized) return
-    },
+// Emits definition
+const emit = defineEmits<{
+  (e: "answered", result: AnsweredQuestion): void
+}>()
 
-    async fetchQuestion() {
-      this.eagerFetchUntil = _.max([
-        this.eagerFetchUntil,
-        this.currentIndex + this.eagerFetchCount,
-      ]) as number
-      if (!this.fetching) {
-        this.fetching = true
-        await this.fetchNextQuestion()
-        this.fetching = false
-      }
-    },
+// Data properties
+const reviewQuestionCache = ref<(ReviewQuestionInstance | undefined)[]>([])
+const eagerFetchUntil = ref(0)
+const fetching = ref(false)
 
-    async fetchNextQuestion() {
-      const index = this.reviewQuestionCache.length
-      if (this.eagerFetchUntil <= index) return
-      const reviewPointId = this.reviewPointIdAt(index)
-      if (reviewPointId === undefined) return
-      try {
-        const question =
-          await this.managedApi.silent.restReviewQuestionController.generateRandomQuestion(
-            reviewPointId
-          )
-        this.reviewQuestionCache.push(question)
-      } catch (e) {
-        this.reviewQuestionCache.push(undefined)
-      }
-      await this.fetchNextQuestion()
-    },
+const { managedApi } = useLoadingApi()
 
-    onAnswered(answerResult: AnsweredQuestion) {
-      this.$emit("answered", answerResult)
-    },
-  },
-  async mounted() {
-    this.fetchQuestion()
-  },
+// Computed properties
+const currentReviewPointId = computed(() => reviewPointIdAt(props.currentIndex))
+const currentQuestionFetched = computed(
+  () => reviewQuestionCache.value.length > props.currentIndex
+)
+const currentReviewQuestion = computed(
+  () => reviewQuestionCache.value[props.currentIndex]
+)
+
+// Methods
+const reviewPointIdAt = (index: number): number | undefined => {
+  if (props.reviewPoints && index < props.reviewPoints.length) {
+    return props.reviewPoints[index]
+  }
+  return undefined
+}
+
+const selectPosition = () => {
+  if (props.minimized) return
+}
+
+const fetchNextQuestion = async () => {
+  const index = reviewQuestionCache.value.length
+  if (eagerFetchUntil.value <= index) return
+  const reviewPointId = reviewPointIdAt(index)
+  if (reviewPointId === undefined) return
+  try {
+    const question =
+      await managedApi.silent.restReviewQuestionController.generateRandomQuestion(
+        reviewPointId
+      )
+    reviewQuestionCache.value.push(question)
+  } catch (e) {
+    reviewQuestionCache.value.push(undefined)
+  }
+  await fetchNextQuestion()
+}
+
+const fetchQuestion = async () => {
+  eagerFetchUntil.value = _.max([
+    eagerFetchUntil.value,
+    props.currentIndex + props.eagerFetchCount,
+  ]) as number
+  if (!fetching.value) {
+    fetching.value = true
+    await fetchNextQuestion()
+    fetching.value = false
+  }
+}
+
+const onAnswered = (answerResult: AnsweredQuestion) => {
+  emit("answered", answerResult)
+}
+
+// Watchers
+watch(() => props.minimized, selectPosition)
+watch(() => props.currentIndex, fetchQuestion)
+watch(() => currentReviewQuestion.value, selectPosition)
+
+// Lifecycle hooks
+onMounted(() => {
+  fetchQuestion()
 })
 </script>
