@@ -8,6 +8,7 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -74,5 +75,12 @@ class RestReviewPointController {
         .toReviewPointModel(reviewPoint)
         .markAsRepeated(testabilitySettings.getCurrentUTCTimestamp(), successful);
     return reviewPoint;
+  }
+
+  @GetMapping("/recent")
+  public List<ReviewPoint> getRecentReviewPoints() {
+    currentUser.assertLoggedIn();
+    return modelFactoryService.reviewPointRepository.findLast100ByUser(
+        currentUser.getEntity().getId());
   }
 }

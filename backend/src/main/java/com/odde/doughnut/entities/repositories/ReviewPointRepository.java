@@ -27,6 +27,11 @@ public interface ReviewPointRepository extends CrudRepository<ReviewPoint, Integ
   @Query(value = "SELECT * " + byUserId + "AND rp.note_id =:noteId", nativeQuery = true)
   ReviewPoint findByUserAndNote(Integer userId, @Param("noteId") Integer noteId);
 
+  @Query(
+      value = "SELECT * " + byUserId + " ORDER BY initial_reviewed_at DESC LIMIT 100",
+      nativeQuery = true)
+  List<ReviewPoint> findLast100ByUser(Integer userId);
+
   String byUserId =
       " FROM review_point rp "
           + " WHERE rp.user_id = :userId "

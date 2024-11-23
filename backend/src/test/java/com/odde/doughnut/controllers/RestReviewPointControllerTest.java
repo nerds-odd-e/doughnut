@@ -13,6 +13,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -137,6 +138,44 @@ class RestReviewPointControllerTest {
       Integer oldRepetitionCount = rp.getRepetitionCount();
       controller.markAsRepeated(rp, true);
       assertThat(rp.getRepetitionCount(), equalTo(oldRepetitionCount + 1));
+    }
+  }
+
+  @Nested
+  class GetRecentReviewPoints {
+    @Test
+    void shouldReturnEmptyListWhenNoReviewPoints() {
+      List<ReviewPoint> reviewPoints = controller.getRecentReviewPoints();
+      assertThat(reviewPoints, empty());
+    }
+
+    @Test
+    void shouldReturnReviewPointsForCurrentUser() {
+      ReviewPoint rp1 = makeMe.aReviewPointFor(makeMe.aNote().please()).by(userModel).please();
+      ReviewPoint rp2 = makeMe.aReviewPointFor(makeMe.aNote().please()).by(userModel).please();
+
+      List<ReviewPoint> reviewPoints = controller.getRecentReviewPoints();
+
+      assertThat(reviewPoints, hasSize(2));
+      assertThat(reviewPoints, containsInAnyOrder(rp1, rp2));
+    }
+
+    @Test
+    void shouldNotReturnReviewPointsFromOtherUsers() {
+      UserModel otherUser = makeMe.aUser().toModelPlease();
+      makeMe.aReviewPointBy(otherUser).please();
+
+      List<ReviewPoint> reviewPoints = controller.getRecentReviewPoints();
+
+      assertThat(reviewPoints, empty());
+    }
+
+    @Test
+    void shouldRequireUserToBeLoggedIn() {
+      userModel = makeMe.aNullUserModelPlease();
+      controller =
+          new RestReviewPointController(modelFactoryService, userModel, testabilitySettings);
+      assertThrows(ResponseStatusException.class, () -> controller.getRecentReviewPoints());
     }
   }
 }
