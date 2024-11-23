@@ -1,10 +1,50 @@
 <template>
   <div class="recently-added-notes">
-    <h2>Recently Added/Updated Notes</h2>
-    <!-- Content will be added later -->
+    <ContentLoader v-if="!notes" />
+    <table v-else class="table">
+      <thead>
+        <tr>
+          <th>Note</th>
+          <th>Notebook</th>
+          <th>Created</th>
+          <th>Updated</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="note in notes" :key="note.id">
+          <td>
+            <NoteTopicWithLink :noteTopic="note.note.noteTopic" />
+          </td>
+          <td>
+            <router-link
+              :to="{ name: 'notebookShow', params: { notebookId: note.notebook?.id } }"
+            >
+              {{ note.notebook?.headNoteTopic?.topicConstructor }}
+            </router-link>
+          </td>
+          <td>{{ new Date(note.note.createdAt).toLocaleString() }}</td>
+          <td>{{ new Date(note.note.updatedAt).toLocaleString() }}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 
 <script setup lang="ts">
-// Component logic will be added later
-</script> 
+import { ref, onMounted } from "vue"
+import type { NoteRealm } from "@/generated/backend"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import NoteTopicWithLink from "@/components/notes/NoteTopicWithLink.vue"
+import ContentLoader from "@/components/commons/ContentLoader.vue"
+
+const { managedApi } = useLoadingApi()
+const notes = ref<NoteRealm[] | undefined>(undefined)
+
+const fetchData = async () => {
+  notes.value = await managedApi.restNoteController.getRecentNotes()
+}
+
+onMounted(() => {
+  fetchData()
+})
+</script>

@@ -35,6 +35,21 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
     return this
   }
 
+  createdAt(value: string): NoteRealmBuilder {
+    this.noteBuilder.createdAt(value)
+    return this
+  }
+
+  updatedAt(value: string): NoteRealmBuilder {
+    this.noteBuilder.updatedAt(value)
+    return this
+  }
+
+  updatedAtDate(value: Date): NoteRealmBuilder {
+    this.noteBuilder.updatedAt(value.toJSON())
+    return this
+  }
+
   wikidataId(value: string): NoteRealmBuilder {
     this.noteBuilder.wikidataId(value)
     return this
@@ -55,11 +70,6 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
     this.data.note.parentId = value.id
     this.data.note.noteTopic.parentNoteTopic = value.note.noteTopic
 
-    return this
-  }
-
-  updatedAt(value: Date): NoteRealmBuilder {
-    this.noteBuilder.updatedAt(value)
     return this
   }
 

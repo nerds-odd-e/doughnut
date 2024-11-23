@@ -18,7 +18,7 @@ describe("new/updated pink banner", () => {
   ])(
     "should show fresher color if recently updated",
     async (updatedAt, expectedColor) => {
-      const note = makeMe.aNoteRealm.updatedAt(updatedAt).please()
+      const note = makeMe.aNoteRealm.updatedAtDate(updatedAt).please()
       helper.managedApi.restNoteController.show1 = vitest
         .fn()
         .mockResolvedValue(note)

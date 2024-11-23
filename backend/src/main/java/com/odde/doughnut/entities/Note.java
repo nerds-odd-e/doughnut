@@ -221,6 +221,7 @@ public class Note extends EntityIdentifiedByIdOnly {
     this.notebook = notebook;
   }
 
+  @JsonIgnore
   public void setSiblingOrderToInsertAfter(Note relativeToNote) {
     this.siblingOrder =
         relativeToNote

@@ -2636,7 +2636,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Note"
+                  $ref: "#/components/schemas/NoteRealm"
   /api/notebooks:
     get:
       tags:
@@ -3277,8 +3277,6 @@ components:
           readOnly: true
         wikidataId:
           type: string
-        siblingOrderToInsertAfter:
-          $ref: "#/components/schemas/Note"
     NoteTopic:
       required:
       - id

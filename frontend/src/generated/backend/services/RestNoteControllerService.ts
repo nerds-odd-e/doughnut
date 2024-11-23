@@ -2,7 +2,6 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { Note } from '../models/Note';
 import type { NoteAccessoriesDTO } from '../models/NoteAccessoriesDTO';
 import type { NoteAccessory } from '../models/NoteAccessory';
 import type { NoteInfo } from '../models/NoteInfo';
@@ -247,10 +246,10 @@ export class RestNoteControllerService {
         });
     }
     /**
-     * @returns Note OK
+     * @returns NoteRealm OK
      * @throws ApiError
      */
-    public getRecentNotes(): CancelablePromise<Array<Note>> {
+    public getRecentNotes(): CancelablePromise<Array<NoteRealm>> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/notes/recent',
