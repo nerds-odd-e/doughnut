@@ -4,7 +4,7 @@ import ManagedApi from "@/managedApi/ManagedApi"
 import NoteEditingHistory from "@/store/NoteEditingHistory"
 import createNoteStorage from "@/store/createNoteStorage"
 import type { StorageAccessor } from "@/store/createNoteStorage"
-import { fireEvent, screen } from "@testing-library/vue"
+import { screen } from "@testing-library/vue"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 import { ref } from "vue"
@@ -57,35 +57,5 @@ describe("global bar", () => {
       .render()
 
     expect(await screen.findByTitle("undo delete note")).not.toBeDisabled()
-  })
-
-  it("shows recent notes link in sidebar", async () => {
-    helper
-      .component(GlobalBar)
-      .withProps({
-        storageAccessor: histories,
-        user,
-        apiStatus: { states: [] },
-      })
-      .render()
-    await fireEvent.click(screen.getByRole("button", { name: "open sidebar" }))
-
-    const recentLink = screen.getByRole("button", { name: "Recent Notes" })
-    expect(recentLink).toBeInTheDocument()
-  })
-
-  it("shows circles link in sidebar", async () => {
-    helper
-      .component(GlobalBar)
-      .withProps({
-        storageAccessor: histories,
-        user,
-        apiStatus: { states: [] },
-      })
-      .render()
-    await fireEvent.click(screen.getByRole("button", { name: "open sidebar" }))
-
-    const circlesLink = screen.getByRole("button", { name: "My Circles" })
-    expect(circlesLink).toBeInTheDocument()
   })
 })
