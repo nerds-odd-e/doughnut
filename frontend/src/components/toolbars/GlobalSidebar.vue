@@ -61,13 +61,13 @@
         </li>
       </ul>
     </div>
-    <nav v-if="!iconized" class="navbar justify-content-between fixed-bottom-bar bg-white">
+    <nav class="navbar justify-content-between fixed-bottom-bar bg-white">
       <UserActionsButton
         v-bind="{ user }"
         @update-user="$emit('updateUser', $event)"
       >
         <SvgMissingAvatar :x="-13" :y="-20" :height="40" />
-        {{ user.name }}
+        <span v-if="!iconized">{{ user.name }}</span>
       </UserActionsButton>
     </nav>
   </div>
