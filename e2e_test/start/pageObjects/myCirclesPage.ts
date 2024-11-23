@@ -2,7 +2,9 @@ import { systemSidebar } from './systemSidebar'
 
 export const navigateToMyCircles = () => {
   systemSidebar()
-  cy.findByRole('button', { name: 'My Circles' }).click()
+  cy.get('.modal-body').within(() => {
+    cy.findByRole('button', { name: 'My Circles' }).click()
+  })
 
   return assumeMyCirclesPage()
 }
