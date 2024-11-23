@@ -45,6 +45,7 @@ import { type ApiStatus } from "@/managedApi/ManagedApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import type { PropType } from "vue"
 import MessageCenterButton from "@/components/toolbars/MessageCenterButton.vue"
+import GlobalSidebar from "./GlobalSidebar.vue"
 
 defineProps({
   storageAccessor: {
