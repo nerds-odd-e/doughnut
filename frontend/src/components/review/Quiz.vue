@@ -85,29 +85,30 @@ const useQuestionFetching = (props: QuizProps) => {
   const { managedApi } = useLoadingApi()
 
   const fetchNextQuestion = async () => {
-    const index = Object.keys(reviewQuestionCache.value).length
-    if (eagerFetchUntil.value <= index) return
+    for (
+      let index = props.currentIndex;
+      index < props.currentIndex + props.eagerFetchCount;
+      index++
+    ) {
+      const reviewPointId = reviewPointIdAt(index)
+      if (reviewPointId === undefined) break
 
-    const reviewPointId = reviewPointIdAt(index)
-    if (reviewPointId === undefined) return
+      if (reviewPointId in reviewQuestionCache.value) continue
 
-    try {
-      const question =
-        await managedApi.silent.restReviewQuestionController.generateRandomQuestion(
-          reviewPointId
-        )
-      reviewQuestionCache.value[reviewPointId] = question
-    } catch (e) {
-      reviewQuestionCache.value[reviewPointId] = undefined
+      try {
+        const question =
+          await managedApi.silent.restReviewQuestionController.generateRandomQuestion(
+            reviewPointId
+          )
+        reviewQuestionCache.value[reviewPointId] = question
+      } catch (e) {
+        reviewQuestionCache.value[reviewPointId] = undefined
+      }
     }
-    await fetchNextQuestion()
   }
 
   const fetchQuestion = async () => {
-    eagerFetchUntil.value = _.max([
-      eagerFetchUntil.value,
-      props.currentIndex + props.eagerFetchCount,
-    ]) as number
+    eagerFetchUntil.value = props.currentIndex + props.eagerFetchCount
 
     if (!fetching.value) {
       fetching.value = true
@@ -148,10 +149,6 @@ const reviewPointIdAt = (index: number): number | undefined => {
   return undefined
 }
 
-const selectPosition = () => {
-  if (props.minimized) return
-}
-
 const onAnswered = (answerResult: AnsweredQuestion) => {
   emit("answered", answerResult)
 }
@@ -165,9 +162,7 @@ const moveToEnd = () => {
 }
 
 // Watchers
-watch(() => props.minimized, selectPosition)
-watch(() => props.currentIndex, fetchQuestion)
-watch(() => currentReviewQuestion.value, selectPosition)
+watch(() => currentReviewPointId.value, fetchQuestion)
 
 // Lifecycle hooks
 onMounted(() => {

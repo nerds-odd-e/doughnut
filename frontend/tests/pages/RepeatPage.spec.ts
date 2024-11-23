@@ -121,8 +121,8 @@ describe("repeat page", () => {
       // Initial order should be [123, 456, 3]
       expect(wrapper.vm.toRepeat).toEqual([123, 456, 3])
 
-      // Trigger moveToEnd for the first item
-      await wrapper.findComponent({ name: "Quiz" }).vm.$emit("moveToEnd", 0)
+      // Click the "Move to end" button
+      await wrapper.find('button[title="Move to end of list"]').trigger("click")
 
       // New order should be [456, 3, 123]
       expect(wrapper.vm.toRepeat).toEqual([456, 3, 123])
