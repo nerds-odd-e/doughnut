@@ -10,7 +10,7 @@ describe("global bar", () => {
   })
 
   it("opens the circles selection", async () => {
-    const wrapper = helper.component(CirclesPage).mount()
+    const wrapper = helper.component(CirclesPage).withRouter().mount()
     wrapper.find("[role='button']").trigger("click")
     await flushPromises()
     expect(helper.managedApi.restCircleController.index).toBeCalled()
