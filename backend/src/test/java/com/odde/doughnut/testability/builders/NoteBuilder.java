@@ -227,4 +227,10 @@ public class NoteBuilder extends EntityBuilder<Note> {
     }
     return this;
   }
+
+  public NoteBuilder createdAt(Timestamp timestamp) {
+    this.entity.setCreatedAt(timestamp);
+    this.entity.setUpdatedAt(timestamp);
+    return this;
+  }
 }

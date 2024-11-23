@@ -2617,6 +2617,26 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NoteAccessory"
+  /api/notes/recent:
+    get:
+      tags:
+      - rest-note-controller
+      operationId: getRecentNotes
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Note"
   /api/notebooks:
     get:
       tags:

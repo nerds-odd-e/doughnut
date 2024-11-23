@@ -204,4 +204,11 @@ class RestNoteController {
         .map(parent -> new NoteViewer(currentUser.getEntity(), parent).toJsonObject())
         .toList();
   }
+
+  @GetMapping("/recent")
+  public List<Note> getRecentNotes() throws UnexpectedNoAccessRightException {
+    currentUser.assertLoggedIn();
+    return modelFactoryService.noteRepository.findRecentNotesByUser(
+        currentUser.getEntity().getId());
+  }
 }

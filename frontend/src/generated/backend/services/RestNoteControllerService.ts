@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { Note } from '../models/Note';
 import type { NoteAccessoriesDTO } from '../models/NoteAccessoriesDTO';
 import type { NoteAccessory } from '../models/NoteAccessory';
 import type { NoteInfo } from '../models/NoteInfo';
@@ -240,6 +241,19 @@ export class RestNoteControllerService {
             path: {
                 'note': note,
             },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @returns Note OK
+     * @throws ApiError
+     */
+    public getRecentNotes(): CancelablePromise<Array<Note>> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/notes/recent',
             errors: {
                 500: `Internal Server Error`,
             },

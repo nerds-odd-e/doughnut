@@ -52,4 +52,13 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
               + " AND n.wikidataId = :wikidataId AND n.wikidataId IS NOT NULL AND n.deletedAt IS NULL ")
   List<Note> noteWithWikidataIdWithinNotebook(
       @Param("notebookId") Integer notebookId, @Param("wikidataId") String wikidataId);
+
+  @Query(
+      value =
+          selectFromNote
+              + " WHERE n.notebook.ownership.user.id = :userId"
+              + " AND n.deletedAt IS NULL"
+              + " ORDER BY n.updatedAt DESC"
+              + " LIMIT 100")
+  List<Note> findRecentNotesByUser(@Param("userId") Integer userId);
 }
