@@ -1,10 +1,13 @@
 <template>
-  <router-link to="/d/message-center">
-    <div id="top-navbar-message-icon">
-      <div v-if="messageCenterConversations.unreadConversations.length !== 0" class="unread-count">
-        {{ messageCenterConversations.unreadConversations.length }}
+  <router-link to="/d/message-center" class="message-center-link">
+    <div id="top-navbar-message-icon" class="d-flex flex-column align-items-center gap-1">
+      <div class="icon-container">
+        <div v-if="messageCenterConversations.unreadConversations.length !== 0" class="unread-count">
+          {{ messageCenterConversations.unreadConversations.length }}
+        </div>
+        <slot />
       </div>
-      <slot />
+      <slot name="label" />
     </div>
   </router-link>
 </template>
@@ -39,5 +42,28 @@ watch(
 </script>
 
 <style scoped>
-/* Add any specific styles for the message center button here */
+.message-center-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.icon-container {
+  position: relative;
+}
+
+.unread-count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: red;
+  color: white;
+  border-radius: 50%;
+  min-width: 18px;
+  height: 18px;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+}
 </style>
