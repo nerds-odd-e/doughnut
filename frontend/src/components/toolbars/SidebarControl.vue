@@ -62,8 +62,10 @@
               v-bind="{ user }"
               @update-user="$emit('updateUser', $event)"
             >
-              <SvgMissingAvatar :x="-13" :y="-20" :height="40" />
-              <span class="menu-label">Account</span>
+              <div class="d-flex flex-column align-items-center gap-1">
+                <SvgMissingAvatar width="24" height="24" />
+                <span class="menu-label">Account</span>
+              </div>
             </UserActionsButton>
           </li>
         </ul>
