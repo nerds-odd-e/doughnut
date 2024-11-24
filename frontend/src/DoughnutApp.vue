@@ -101,6 +101,7 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+  width: 0;
 }
 
 @media (max-width: 1024px) {
@@ -111,6 +112,7 @@ onMounted(async () => {
   .main-content {
     height: calc(100vh - 56px);
     overflow-y: auto;
+    width: 100%;
   }
 }
 </style>
