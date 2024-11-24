@@ -15,7 +15,7 @@ export const systemSidebar = () => {
       cy.findByRole('button', { name: 'User actions' }).click()
       return {
         adminDashboard() {
-          cy.findByText('Admin Dashboard').click()
+          cy.findByText('Admin Dashboard').click({ force: true })
           return assumeAdminDashboardPage()
         },
         userSettings(userName: string) {

@@ -4,14 +4,7 @@
   </ToolbarOver>
 </template>
 
-<script>
+<script setup lang="ts">
 import { ContentLoader } from "vue-content-loader"
 import ToolbarOver from "./ToolbarOver.vue"
-
-export default {
-  components: {
-    ContentLoader,
-    ToolbarOver,
-  },
-}
 </script>
