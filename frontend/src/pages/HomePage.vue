@@ -62,7 +62,6 @@
             :sidebar="'left'"
           >
             <template #button_face> Go To Circles </template>
-            <GlobalSidebar :user="user" />
           </PopButton>
         </div>
       </div>
@@ -73,7 +72,6 @@
 <script setup lang="ts">
 import { type Ref, inject } from "vue"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
-import GlobalSidebar from "@/components/toolbars/GlobalSidebar.vue"
 import type { User } from "@/generated/backend"
 
 const user = inject<Ref<User | undefined>>("currentUser")
