@@ -114,6 +114,12 @@ defineEmits(["updateUser"])
   }
 }
 
+.list-group {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
 .list-item {
   border: none;
   padding: 0.5rem;

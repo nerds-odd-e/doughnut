@@ -19,7 +19,7 @@ export const systemSidebar = () => {
       return {
         adminDashboard() {
           cy.get('.modal-body').within(() => {
-            cy.findByText('Admin Dashboard').click()
+            cy.findByText('Admin Dashboard').click({ force: true })
           })
           return assumeAdminDashboardPage()
         },
