@@ -1,17 +1,17 @@
 <template>
-  <ToolbarCover class="loading-bar">
+  <ToolbarOver class="loading-bar">
     <ContentLoader :height="15" :speed="2" primary-color="#888"></ContentLoader>
-  </ToolbarCover>
+  </ToolbarOver>
 </template>
 
 <script>
 import { ContentLoader } from "vue-content-loader"
-import ToolbarCover from "./ToolbarOver.vue"
+import ToolbarOver from "./ToolbarOver.vue"
 
 export default {
   components: {
     ContentLoader,
-    ToolbarCover,
+    ToolbarOver,
   },
 }
 </script>
