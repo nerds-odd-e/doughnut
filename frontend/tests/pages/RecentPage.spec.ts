@@ -51,7 +51,7 @@ describe("RecentPage.vue", () => {
 
       const containerPage = wrapper.findComponent({ name: "ContainerPage" })
       expect(containerPage.props("contentLoaded")).toBe(true)
-      expect(containerPage.props("title")).toBe("Recent Notes")
+      expect(containerPage.props("title")).toBe("Recent")
     })
   })
 })

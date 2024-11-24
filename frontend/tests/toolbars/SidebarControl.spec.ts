@@ -23,14 +23,14 @@ describe("sidebar control", () => {
   it("shows recent notes link in sidebar", async () => {
     helper.component(SidebarControl).withProps({ user }).render()
 
-    const recentLink = screen.getByRole("button", { name: "Recent Notes" })
+    const recentLink = screen.getByRole("button", { name: "Recent" })
     expect(recentLink).toBeInTheDocument()
   })
 
   it("shows circles link in sidebar", async () => {
     helper.component(SidebarControl).withProps({ user }).render()
 
-    const circlesLink = screen.getByRole("button", { name: "My Circles" })
+    const circlesLink = screen.getByRole("button", { name: "Circles" })
     expect(circlesLink).toBeInTheDocument()
   })
 })

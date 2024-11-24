@@ -1,6 +1,6 @@
 <template>
   <ContainerPage
-    v-bind="{ contentLoaded: true, title: `Recent Notes` }"
+    v-bind="{ contentLoaded: true, title: `Recent` }"
   >
     <ul class="nav nav-tabs">
       <li class="nav-item">
