@@ -1,15 +1,14 @@
 <template>
   <div class="dropup w-100">
-    <button
+    <a
       aria-label="User actions"
-      class="user-icon-menu btn d-block w-100 text-start"
       data-bs-toggle="dropdown"
       data-toggle="dropdown"
       aria-haspopup="true"
       aria-expanded="false"
     >
       <slot />
-    </button>
+    </a>
     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
       <router-link
         v-if="user?.admin"
