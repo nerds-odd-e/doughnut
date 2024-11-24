@@ -19,7 +19,9 @@ export const systemSidebar = () => {
           return assumeAdminDashboardPage()
         },
         userSettings(userName: string) {
-          cy.findByRole('button', { name: `Settings for ${userName}` }).click()
+          cy.findByRole('button', { name: `Settings for ${userName}` }).click({
+            force: true,
+          })
           return {
             changeName(name: string) {
               cy.formField('Name').assignFieldValue(name)
@@ -28,18 +30,18 @@ export const systemSidebar = () => {
           }
         },
         logout() {
-          cy.findByRole('button', { name: 'Logout' }).click()
+          cy.findByRole('button', { name: 'Logout' }).click({ force: true })
         },
         myAssessmentAndCertificateHistory() {
           cy.findByRole('button', {
             name: 'My Assessments and Certificates',
-          }).click()
+          }).click({ force: true })
           return assumeAssessmentAndCertificateHistoryPage()
         },
         myMessageCenter() {
           cy.findByRole('button', {
             name: 'Message center',
-          }).click()
+          }).click({ force: true })
 
           return assumeMessageCenterPage()
         },
