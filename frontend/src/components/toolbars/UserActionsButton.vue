@@ -11,6 +11,14 @@
       <slot />
     </button>
     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+      <router-link
+        v-if="user?.admin"
+        role="button"
+        class="dropdown-item"
+        :to="{ name: 'adminDashboard' }"
+      >
+        Admin Dashboard
+      </router-link>
       <PopButton btn-class="dropdown-item" title="user settings">
         <template #button_face> Settings for {{ user.name }}</template>
         <!-- prettier-ignore -->

@@ -10,14 +10,19 @@ export const systemSidebar = () => {
 
   return {
     adminDashboard() {
-      cy.findByText('Admin Dashboard').click()
-      return assumeAdminDashboardPage()
+      return this.userOptions().adminDashboard()
     },
     userOptions() {
       cy.get('.modal-body').within(() => {
         cy.findByRole('button', { name: 'User actions' }).click()
       })
       return {
+        adminDashboard() {
+          cy.get('.modal-body').within(() => {
+            cy.findByText('Admin Dashboard').click()
+          })
+          return assumeAdminDashboardPage()
+        },
         userSettings(userName: string) {
           cy.findByRole('button', { name: `Settings for ${userName}` }).click()
           return {
