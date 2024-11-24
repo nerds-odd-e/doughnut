@@ -6,21 +6,16 @@ import { assumeMessageCenterPage } from './messageCenterPage'
 export const systemSidebar = () => {
   routerToMyNotebooksPage()
   cy.pageIsNotLoading()
-  cy.findByRole('button', { name: 'open sidebar' }).click({ force: true })
 
   return {
     adminDashboard() {
       return this.userOptions().adminDashboard()
     },
     userOptions() {
-      cy.get('.modal-body').within(() => {
-        cy.findByRole('button', { name: 'User actions' }).click()
-      })
+      cy.findByRole('button', { name: 'User actions' }).click()
       return {
         adminDashboard() {
-          cy.get('.modal-body').within(() => {
-            cy.findByText('Admin Dashboard').click({ force: true })
-          })
+          cy.findByText('Admin Dashboard').click()
           return assumeAdminDashboardPage()
         },
         userSettings(userName: string) {
