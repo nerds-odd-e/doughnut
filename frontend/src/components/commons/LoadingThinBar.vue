@@ -1,10 +1,26 @@
 <template>
-  <ToolbarOver class="loading-bar">
+  <div class="toolbar-overlap loading-bar">
     <ContentLoader :height="15" :speed="2" primary-color="#888"></ContentLoader>
-  </ToolbarOver>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ContentLoader } from "vue-content-loader"
-import ToolbarOver from "./ToolbarOver.vue"
 </script>
+
+<style lang="scss" scoped>
+.toolbar-overlap {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 5px;
+  z-index: 999999;
+
+  svg {
+    width: 100%;
+    height: 100%;
+    z-index: 999999;
+  }
+}
+</style>
