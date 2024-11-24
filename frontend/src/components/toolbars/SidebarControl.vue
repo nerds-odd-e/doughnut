@@ -63,7 +63,7 @@
               @update-user="$emit('updateUser', $event)"
             >
               <SvgMissingAvatar :x="-13" :y="-20" :height="40" />
-              <span class="menu-label">{{ user.name }}</span>
+              <span class="menu-label">Account</span>
             </UserActionsButton>
           </li>
         </ul>

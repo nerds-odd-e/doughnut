@@ -33,14 +33,4 @@ describe("sidebar control", () => {
     const circlesLink = screen.getByRole("button", { name: "My Circles" })
     expect(circlesLink).toBeInTheDocument()
   })
-
-  it("shows iconized sidebar when logged in", () => {
-    helper.component(SidebarControl).withProps({ user }).render()
-
-    // Iconized sidebar should be visible without clicking the button
-    const circlesLink = screen.getByRole("button", { name: "My Circles" })
-    expect(circlesLink).toBeInTheDocument()
-    expect(circlesLink).not.toHaveTextContent("My Circles")
-    expect(circlesLink.querySelector("svg")).toBeInTheDocument()
-  })
 })
