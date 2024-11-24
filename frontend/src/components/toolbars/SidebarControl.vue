@@ -1,10 +1,6 @@
 <template>
   <div class="d-flex sidebar-control">
     <div v-if="user" class="sidebar-container" :class="{ iconized }">
-      <div class="scrolling-body">
-        <nav v-if="!iconized" class="navbar navbar-expand-lg navbar-dark bg-dark">
-          <BrandBar />
-        </nav>
         <ul class="list-group">
           <li role="button" class="list-item" title="Daily Review">
             <router-link :to="{ name: 'reviews' }" class="d-flex align-items-center gap-2">
@@ -70,8 +66,17 @@
           </li>
         </ul>
       </div>
-    </div>
     <LoginButton v-else />
+    <span class="vertical-text">Doughnut by</span>
+    <a href="https://odd-e.com" target="_blank">
+    <img
+      src="/odd-e.png"
+      width="35"
+      height="35"
+      class="d-inline-block align-top"
+      alt=""
+    />
+  </a>
   </div>
 </template>
 
@@ -82,7 +87,6 @@ import LoginButton from "@/components/toolbars/LoginButton.vue"
 import UserActionsButton from "./UserActionsButton.vue"
 import SvgMissingAvatar from "@/components/svgs/SvgMissingAvatar.vue"
 import MessageCenterButton from "@/components/toolbars/MessageCenterButton.vue"
-import BrandBar from "./BrandBar.vue"
 
 const iconized = true
 
@@ -97,19 +101,21 @@ defineEmits(["updateUser"])
   background-color: #f5f5f5;
   flex-direction: column;
   height: 100vh;
+  align-items: center;
 }
 
 .sidebar-container {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: auto;
   overflow: hidden;
+  width: 100%;
 
   &.iconized {
-    height: 100%;
+    height: auto;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-start;
   }
 
   :deep(.dropup) {
@@ -135,12 +141,24 @@ defineEmits(["updateUser"])
   background: none;
 }
 
+.vertical-text {
+  writing-mode: vertical-lr;
+  transform: none;
+  text-align: center;
+  padding: 1rem 0;
+  font-weight: bold;
+  color: #666;
+  white-space: nowrap;
+  margin-top: 1rem;
+}
+
 @media (max-width: 768px) {
   .sidebar-control {
     flex-direction: row;
     width: 100%;
     height: auto;
     padding: 0.5rem 0;
+    align-items: center;
   }
 
   .sidebar-container.iconized {
@@ -169,6 +187,12 @@ defineEmits(["updateUser"])
     .fixed-bottom-bar {
       display: none;
     }
+  }
+
+  .vertical-text {
+    writing-mode: horizontal-tb;
+    transform: none;
+    padding: 0 0.5rem;
   }
 }
 </style>
