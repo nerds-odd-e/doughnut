@@ -15,12 +15,12 @@ import { ContentLoader } from "vue-content-loader"
   top: 0;
   width: 100%;
   height: 5px;
-  z-index: 999999;
+  z-index: 2147483647;
 
   svg {
     width: 100%;
     height: 100%;
-    z-index: 999999;
+    z-index: 2147483647;
   }
 }
 </style>
