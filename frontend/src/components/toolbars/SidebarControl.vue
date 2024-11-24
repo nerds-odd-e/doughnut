@@ -107,10 +107,11 @@ const isActiveRoute = (routeNames: string[]) => {
 
 <style lang="scss" scoped>
 .sidebar-control {
-  background-color: #f5f5f5;
+  background-color: #2d2d2d;
   flex-direction: column;
   height: 100vh;
   align-items: center;
+  color: #e0e0e0;
 }
 
 .sidebar-container {
@@ -127,6 +128,7 @@ const isActiveRoute = (routeNames: string[]) => {
       position: fixed;
       bottom: 60px;
       left: 0;
+      z-index: 10000;
     }
   }
 }
@@ -154,10 +156,10 @@ const isActiveRoute = (routeNames: string[]) => {
   }
 
   &.active {
-    background-color: #dee2e6;
+    background-color: #404040;
 
     :deep(a) {
-      color: #0d6efd;
+      color: #66b0ff;
     }
   }
 }
@@ -168,7 +170,7 @@ const isActiveRoute = (routeNames: string[]) => {
   text-align: center;
   padding: 1rem 0;
   font-weight: bold;
-  color: #666;
+  color: #a0a0a0;
   white-space: nowrap;
   margin-top: 1rem;
 }
