@@ -5,7 +5,9 @@ import noteCreationForm from './noteForms/noteCreationForm'
 import { assumeNotePage } from './notePage'
 
 const myNotebooksPage = () => {
-  cy.findByText('Notebooks')
+  cy.get('.main-content').within(() => {
+    cy.findByText('Notebooks')
+  })
   return {
     ...notebookList(),
     navigateToPath(notePath: NotePath) {

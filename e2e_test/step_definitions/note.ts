@@ -254,7 +254,9 @@ Then(
   'I should not see note {string} at the top level of all my notes',
   (noteTopic: string) => {
     cy.pageIsNotLoading()
-    cy.findByText('Notebooks')
+    cy.get('.main-content').within(() => {
+      cy.findByText('Notebooks')
+    })
     cy.get('main').within(() => cy.findCardTitle(noteTopic).should('not.exist'))
   }
 )
