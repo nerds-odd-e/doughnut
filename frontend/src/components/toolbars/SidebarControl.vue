@@ -148,8 +148,13 @@ const isActiveRoute = (routeNames: string[]) => {
     line-height: 1;
   }
 
+  :deep(a) {
+    text-decoration: none;
+    color: inherit;
+  }
+
   &.active {
-    background-color: #e9ecef;
+    background-color: #dee2e6;
 
     :deep(a) {
       color: #0d6efd;
