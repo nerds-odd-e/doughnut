@@ -1,11 +1,10 @@
 import noteCreationForm from './noteForms/noteCreationForm'
-import start from '../../start'
 import { bazaarOrCircle } from './BazaarOrCircle'
 import { findNotebookCardButton } from './NotebookList'
+import { navigateToMyCircles } from './myCirclesPage'
 
 export const navigateToCircle = (circleName: string) => {
-  start.systemSidebar()
-  cy.findByText('My Circles').click()
+  navigateToMyCircles()
   cy.findByText(circleName, { selector: 'a' }).click()
 
   return {
