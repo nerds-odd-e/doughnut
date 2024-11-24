@@ -103,13 +103,13 @@ onMounted(async () => {
   flex-grow: 1;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .app-container {
     flex-direction: column;
   }
 
   .main-content {
-    height: calc(100vh - 56px); /* Adjust this value based on your horizontal bar height */
+    height: calc(100vh - 56px);
     overflow-y: auto;
   }
 }

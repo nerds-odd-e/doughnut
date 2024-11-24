@@ -153,7 +153,7 @@ defineEmits(["updateUser"])
   margin-top: 1rem;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .sidebar-control {
     flex-direction: row;
     width: 100%;
