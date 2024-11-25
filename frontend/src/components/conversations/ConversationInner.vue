@@ -108,7 +108,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, computed } from "vue"
+import { ref, onMounted, computed, watch } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type {
   User,
@@ -164,13 +164,24 @@ const lastErrorMessage = ref<string | undefined>()
 const aiStatus = ref<string | undefined>()
 
 const completionSuggestion = ref<string | undefined>()
-let pendingToolCall:
-  | { threadId: string; runId: string; toolCallId: string }
-  | undefined
 
 const topicTitleSuggestion = ref<string | undefined>()
 
 const isProcessingToolCall = ref(false)
+
+const pendingToolCall = ref<
+  | {
+      threadId: string
+      runId: string
+      toolCallId: string
+    }
+  | undefined
+>()
+
+const toolCallResolver = ref<{
+  resolve: (result: ToolCallResult) => void
+  reject: (error: Error) => void
+} | null>(null)
 
 const formatMessage = (message: string) => {
   return message.replace(/^"|"$/g, "").trim()
@@ -205,57 +216,97 @@ const handleSendMessage = async (
   }
 }
 
-const toolCallResolver = ref<{
-  resolve: (result: ToolCallResult) => void
-  reject: (error: Error) => void
-} | null>(null)
+const createAiActionContext = (): AiActionContext => ({
+  set(text: string) {
+    currentAiReply.value = text
+  },
+  append(text: string) {
+    currentAiReply.value = currentAiReply.value
+      ? currentAiReply.value + text
+      : text
+  },
+  async reset() {
+    await fetchConversationMessages()
+    currentAiReply.value = undefined
+  },
+  async appendNoteDetails(completion, threadId, runId, toolCallId) {
+    completionSuggestion.value = completion
+    pendingToolCall.value = { threadId, runId, toolCallId }
+    return createToolCallPromise()
+  },
+  async setTopicTitle(title, threadId, runId, toolCallId) {
+    topicTitleSuggestion.value = title
+    pendingToolCall.value = { threadId, runId, toolCallId }
+    return createToolCallPromise()
+  },
+})
+
+const createToolCallPromise = () => {
+  return new Promise<ToolCallResult>((resolve, reject) => {
+    toolCallResolver.value = { resolve, reject }
+  })
+}
+
+const clearToolCallState = () => {
+  completionSuggestion.value = undefined
+  topicTitleSuggestion.value = undefined
+  pendingToolCall.value = undefined
+  toolCallResolver.value = null
+}
+
+const handleToolCallAccept = async (action: (note: Note) => Promise<void>) => {
+  if (!pendingToolCall.value || isProcessingToolCall.value) return
+
+  try {
+    isProcessingToolCall.value = true
+    const note = conversation.subject?.note
+    if (!note) {
+      console.error("No note found in conversation")
+      return
+    }
+
+    await action(note)
+    toolCallResolver.value?.resolve({ status: "accepted" })
+    clearToolCallState()
+  } finally {
+    isProcessingToolCall.value = false
+  }
+  await fetchConversationMessages()
+}
+
+const handleReject = async () => {
+  if (!pendingToolCall.value || isProcessingToolCall.value) return
+
+  try {
+    isProcessingToolCall.value = true
+    toolCallResolver.value?.reject(new Error("Tool call was rejected"))
+    clearToolCallState()
+  } finally {
+    isProcessingToolCall.value = false
+  }
+}
+
+const handleAcceptCompletion = () => {
+  if (!completionSuggestion.value) return
+  return handleToolCallAccept(async (note) => {
+    await storageAccessor
+      .storedApi()
+      .appendDetails(note.id, completionSuggestion.value!)
+  })
+}
+
+const handleAcceptTitle = () => {
+  if (!topicTitleSuggestion.value) return
+  return handleToolCallAccept(async (note) => {
+    await storageAccessor
+      .storedApi()
+      .updateTextField(note.id, "edit topic", topicTitleSuggestion.value!)
+  })
+}
 
 const getAiReply = async () => {
-  const aiActionContext: AiActionContext = {
-    set(text: string) {
-      currentAiReply.value = text
-    },
-    append(text: string) {
-      if (!currentAiReply.value) {
-        currentAiReply.value = text
-      } else {
-        currentAiReply.value += text
-      }
-    },
-    async reset() {
-      await fetchConversationMessages()
-      currentAiReply.value = undefined
-    },
-    async appendNoteDetails(
-      completion: string,
-      threadId: string,
-      runId: string,
-      toolCallId: string
-    ) {
-      completionSuggestion.value = completion
-      pendingToolCall = { threadId, runId, toolCallId }
-
-      return new Promise<ToolCallResult>((resolve, reject) => {
-        toolCallResolver.value = { resolve, reject }
-      })
-    },
-    async setTopicTitle(
-      title: string,
-      threadId: string,
-      runId: string,
-      toolCallId: string
-    ) {
-      topicTitleSuggestion.value = title
-      pendingToolCall = { threadId, runId, toolCallId }
-
-      return new Promise<ToolCallResult>((resolve, reject) => {
-        toolCallResolver.value = { resolve, reject }
-      })
-    },
-  }
-
   const states = createAiReplyStates(
-    aiActionContext,
+    createAiActionContext(),
     managedApi.restAiController
   )
 
@@ -280,68 +331,6 @@ const getAiReply = async () => {
     .restConversationMessageController.getAiReply(conversation.id)
 }
 
-const handleToolCallAccept = async (action: (note: Note) => Promise<void>) => {
-  if (!pendingToolCall || isProcessingToolCall.value) return
-
-  try {
-    isProcessingToolCall.value = true
-    const note = conversation.subject?.note
-    if (!note) {
-      console.error("No note found in conversation")
-      return
-    }
-
-    await action(note)
-
-    const result: ToolCallResult = { status: "accepted" }
-    toolCallResolver.value?.resolve(result)
-    toolCallResolver.value = null
-
-    completionSuggestion.value = undefined
-    topicTitleSuggestion.value = undefined
-    pendingToolCall = undefined
-  } finally {
-    isProcessingToolCall.value = false
-  }
-  await fetchConversationMessages()
-}
-
-const handleAcceptCompletion = () => {
-  if (!completionSuggestion.value) return
-  return handleToolCallAccept(async (note) => {
-    await storageAccessor
-      .storedApi()
-      .appendDetails(note.id, completionSuggestion.value!)
-  })
-}
-
-const handleAcceptTitle = () => {
-  if (!topicTitleSuggestion.value) return
-  return handleToolCallAccept(async (note) => {
-    await storageAccessor
-      .storedApi()
-      .updateTextField(note.id, "edit topic", topicTitleSuggestion.value!)
-  })
-}
-
-const handleReject = async () => {
-  if (!pendingToolCall || isProcessingToolCall.value) return
-
-  try {
-    isProcessingToolCall.value = true
-
-    const error = new Error("Tool call was rejected")
-    toolCallResolver.value?.reject(error)
-    toolCallResolver.value = null
-
-    completionSuggestion.value = undefined
-    topicTitleSuggestion.value = undefined
-    pendingToolCall = undefined
-  } finally {
-    isProcessingToolCall.value = false
-  }
-}
-
 const formattedCompletionSuggestion = computed(() => {
   if (!completionSuggestion.value) return ""
   const currentDetails = conversation.subject?.note?.details?.trim() || ""
@@ -359,9 +348,8 @@ onMounted(async () => {
 
 watch(() => conversation, fetchConversationMessages)
 
-const handleSendMessageAndInviteAI = async (message: string) => {
-  await handleSendMessage(message, true)
-}
+const handleSendMessageAndInviteAI = (message: string) =>
+  handleSendMessage(message, true)
 </script>
 
 <style scoped>
