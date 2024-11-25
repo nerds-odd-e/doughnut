@@ -59,43 +59,49 @@ export const createAiReplyStates = (
       handleEvent: async (data) => {
         const response = JSON.parse(data) as Run
         try {
-          const toolCall =
-            response.required_action!.submit_tool_outputs!.tool_calls![0]!
-          const functionArgs = JSON.parse(
-            toolCall.function!.arguments as unknown as string
-          )
+          const toolCalls =
+            response.required_action!.submit_tool_outputs!.tool_calls!
+          const results: Record<string, ToolCallResult> = {}
 
-          let result: ToolCallResult
-          if (
-            toolCall.function!.name ===
-            DummyForGeneratingTypes.aiToolName.COMPLETE_NOTE_DETAILS
-          ) {
-            const contentToAppend = functionArgs as NoteDetailsCompletion
-            result = await context.appendNoteDetails(
-              contentToAppend!.completion,
-              response.thread_id!,
-              response.id!,
-              toolCall.id!
+          for (const toolCall of toolCalls) {
+            const functionArgs = JSON.parse(
+              toolCall.function!.arguments as unknown as string
             )
-          } else if (
-            toolCall.function!.name ===
-            DummyForGeneratingTypes.aiToolName.SUGGEST_NOTE_TOPIC_TITLE
-          ) {
-            const titleGeneration = functionArgs as TopicTitleReplacement
-            result = await context.setTopicTitle(
-              titleGeneration.newTopic,
-              response.thread_id!,
-              response.id!,
-              toolCall.id!
-            )
-          } else {
-            throw new Error("Unknown tool call")
+
+            let result: ToolCallResult
+            if (
+              toolCall.function!.name ===
+              DummyForGeneratingTypes.aiToolName.COMPLETE_NOTE_DETAILS
+            ) {
+              const contentToAppend = functionArgs as NoteDetailsCompletion
+              result = await context.appendNoteDetails(
+                contentToAppend!.completion,
+                response.thread_id!,
+                response.id!,
+                toolCall.id!
+              )
+            } else if (
+              toolCall.function!.name ===
+              DummyForGeneratingTypes.aiToolName.SUGGEST_NOTE_TOPIC_TITLE
+            ) {
+              const titleGeneration = functionArgs as TopicTitleReplacement
+              result = await context.setTopicTitle(
+                titleGeneration.newTopic,
+                response.thread_id!,
+                response.id!,
+                toolCall.id!
+              )
+            } else {
+              throw new Error("Unknown tool call")
+            }
+
+            results[toolCall.id!] = result
           }
 
           await aiController.submitToolCallsResult(
             response.thread_id!,
             response.id!,
-            { [toolCall.id!]: result }
+            results
           )
         } catch (e) {
           if (e instanceof Error && e.message === "Tool call was rejected") {

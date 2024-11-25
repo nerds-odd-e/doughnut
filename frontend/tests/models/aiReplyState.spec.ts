@@ -5,7 +5,9 @@ import type {
   DeltaOfRunStep,
   JsonNode,
   RestAiControllerService,
+  Run,
 } from "@/generated/backend"
+import { DummyForGeneratingTypes } from "@/generated/backend"
 
 describe("aiReplyState", () => {
   const mockContext = {
@@ -17,7 +19,7 @@ describe("aiReplyState", () => {
   }
 
   const mockAiController = {
-    submitToolCallsResult: vi.fn(),
+    submitToolCallsResult: vi.fn().mockResolvedValue({}),
     cancelRun: vi.fn(),
   } as unknown as RestAiControllerService
 
@@ -100,6 +102,181 @@ describe("aiReplyState", () => {
       )
 
       expect(mockContext.append).toHaveBeenCalledWith(undefined)
+    })
+  })
+
+  describe("thread.run.requires_action", () => {
+    const mockRun: Run = {
+      id: "run-123",
+      thread_id: "thread-123",
+      required_action: {
+        submit_tool_outputs: {
+          tool_calls: [],
+        },
+      },
+    }
+
+    beforeEach(() => {
+      mockContext.appendNoteDetails.mockResolvedValue({ status: "accepted" })
+      mockContext.setTopicTitle.mockResolvedValue({ status: "accepted" })
+    })
+
+    it("handles single tool call successfully", async () => {
+      const run = {
+        ...mockRun,
+        required_action: {
+          submit_tool_outputs: {
+            tool_calls: [
+              {
+                id: "call-1",
+                function: {
+                  name: DummyForGeneratingTypes.aiToolName
+                    .COMPLETE_NOTE_DETAILS,
+                  arguments: JSON.stringify({ completion: "test content" }),
+                },
+              },
+            ],
+          },
+        },
+      }
+
+      const states = createAiReplyStates(mockContext, mockAiController)
+      await states["thread.run.requires_action"]?.handleEvent(
+        JSON.stringify(run)
+      )
+
+      expect(mockContext.appendNoteDetails).toHaveBeenCalledWith(
+        "test content",
+        "thread-123",
+        "run-123",
+        "call-1"
+      )
+      expect(mockAiController.submitToolCallsResult).toHaveBeenCalledWith(
+        "thread-123",
+        "run-123",
+        { "call-1": { status: "accepted" } }
+      )
+    })
+
+    it("handles multiple tool calls successfully", async () => {
+      const run = {
+        ...mockRun,
+        required_action: {
+          submit_tool_outputs: {
+            tool_calls: [
+              {
+                id: "call-1",
+                function: {
+                  name: DummyForGeneratingTypes.aiToolName
+                    .COMPLETE_NOTE_DETAILS,
+                  arguments: JSON.stringify({ completion: "test content" }),
+                },
+              },
+              {
+                id: "call-2",
+                function: {
+                  name: DummyForGeneratingTypes.aiToolName
+                    .SUGGEST_NOTE_TOPIC_TITLE,
+                  arguments: JSON.stringify({ newTopic: "test title" }),
+                },
+              },
+            ],
+          },
+        },
+      }
+
+      const states = createAiReplyStates(mockContext, mockAiController)
+      await states["thread.run.requires_action"]?.handleEvent(
+        JSON.stringify(run)
+      )
+
+      expect(mockContext.appendNoteDetails).toHaveBeenCalledWith(
+        "test content",
+        "thread-123",
+        "run-123",
+        "call-1"
+      )
+      expect(mockContext.setTopicTitle).toHaveBeenCalledWith(
+        "test title",
+        "thread-123",
+        "run-123",
+        "call-2"
+      )
+      expect(mockAiController.submitToolCallsResult).toHaveBeenCalledWith(
+        "thread-123",
+        "run-123",
+        {
+          "call-1": { status: "accepted" },
+          "call-2": { status: "accepted" },
+        }
+      )
+    })
+
+    it("cancels run when any tool call is rejected", async () => {
+      const run = {
+        ...mockRun,
+        required_action: {
+          submit_tool_outputs: {
+            tool_calls: [
+              {
+                id: "call-1",
+                function: {
+                  name: DummyForGeneratingTypes.aiToolName
+                    .COMPLETE_NOTE_DETAILS,
+                  arguments: JSON.stringify({ completion: "test content" }),
+                },
+              },
+              {
+                id: "call-2",
+                function: {
+                  name: DummyForGeneratingTypes.aiToolName
+                    .SUGGEST_NOTE_TOPIC_TITLE,
+                  arguments: JSON.stringify({ newTopic: "test title" }),
+                },
+              },
+            ],
+          },
+        },
+      }
+
+      mockContext.setTopicTitle.mockRejectedValue(
+        new Error("Tool call was rejected")
+      )
+
+      const states = createAiReplyStates(mockContext, mockAiController)
+      await states["thread.run.requires_action"]?.handleEvent(
+        JSON.stringify(run)
+      )
+
+      expect(mockAiController.cancelRun).toHaveBeenCalledWith(
+        "thread-123",
+        "run-123"
+      )
+      expect(mockAiController.submitToolCallsResult).not.toHaveBeenCalled()
+    })
+
+    it("throws error for unknown tool call", async () => {
+      const run = {
+        ...mockRun,
+        required_action: {
+          submit_tool_outputs: {
+            tool_calls: [
+              {
+                id: "call-1",
+                function: {
+                  name: "unknown_tool",
+                  arguments: JSON.stringify({}),
+                },
+              },
+            ],
+          },
+        },
+      }
+
+      const states = createAiReplyStates(mockContext, mockAiController)
+      await expect(
+        states["thread.run.requires_action"]?.handleEvent(JSON.stringify(run))
+      ).rejects.toThrow("Unknown tool call")
     })
   })
 })
