@@ -442,4 +442,10 @@ const handleSendMessageAndInviteAI = (message: string) =>
   white-space: pre-wrap;
   word-wrap: break-word;
 }
+
+.unknown-request pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  margin: 0;
+}
 </style>
