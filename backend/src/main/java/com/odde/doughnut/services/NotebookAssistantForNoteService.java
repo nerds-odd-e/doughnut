@@ -42,7 +42,7 @@ public final class NotebookAssistantForNoteService {
     conversationService.updateLastAiAssistantThreadSync(conversation);
 
     return thread
-        .withInstructions(
+        .withAdditionalInstructions(
             "User is seeking for having a conversation, so don't call functions to update the note unless user asks explicitly.")
         .runStream()
         .getSseEmitter(
@@ -82,7 +82,7 @@ public final class NotebookAssistantForNoteService {
         (TopicTitleReplacement)
             createThreadWithNoteInfo(List.of())
                 .withTool(AiToolFactory.suggestNoteTopicTitle())
-                .withInstructions(instructions)
+                .withAdditionalInstructions(instructions)
                 .run()
                 .getToolCallResponse()
                 .cancelRun()
@@ -157,7 +157,7 @@ public final class NotebookAssistantForNoteService {
 
     return createThreadWithNoteInfo(List.of(message))
         .withTool(AiToolFactory.completeNoteDetails())
-        .withInstructions(instructions)
+        .withAdditionalInstructions(instructions)
         .run();
   }
 

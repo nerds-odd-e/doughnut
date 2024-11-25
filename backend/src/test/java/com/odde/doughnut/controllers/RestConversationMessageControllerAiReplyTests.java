@@ -242,7 +242,7 @@ public class RestConversationMessageControllerAiReplyTests {
       ArgumentCaptor<RunCreateRequest> captor = ArgumentCaptor.forClass(RunCreateRequest.class);
       verify(openAiApi).createRunStream(any(), captor.capture());
 
-      assertThat(captor.getValue().getInstructions())
+      assertThat(captor.getValue().getAdditionalInstructions())
           .isEqualTo(
               "User is seeking for having a conversation, so don't call functions to update the note unless user asks explicitly.");
     }

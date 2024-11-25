@@ -315,7 +315,7 @@ class RestAiAudioControllerTests {
               argThat(
                   request -> {
                     assertThat(
-                        request.getInstructions(),
+                        request.getAdditionalInstructions(),
                         containsString("Additional instruction:\nTranslate to Spanish"));
                     return true;
                   }));

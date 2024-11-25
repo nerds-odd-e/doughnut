@@ -18,7 +18,7 @@ public class AssistantThread {
   private final OpenAiApiHandler openAiApiHandler;
   private final List<AiTool> tools = new ArrayList<>();
   private final List<Tool> mappedTools = new ArrayList<>();
-  private String instructions;
+  private String additionalInstructions;
 
   public AssistantThread(String assistantId, String threadId, OpenAiApiHandler openAiApiHandler) {
     this.assistantId = assistantId;
@@ -37,8 +37,8 @@ public class AssistantThread {
     return this;
   }
 
-  public AssistantThread withInstructions(String instructions) {
-    this.instructions = instructions;
+  public AssistantThread withAdditionalInstructions(String instructions) {
+    this.additionalInstructions = instructions;
     return this;
   }
 
@@ -51,8 +51,8 @@ public class AssistantThread {
   private RunCreateRequest.RunCreateRequestBuilder getCreateRequestBuilder() {
     RunCreateRequest.RunCreateRequestBuilder builder =
         RunCreateRequest.builder().assistantId(assistantId);
-    if (instructions != null) {
-      builder.instructions(instructions);
+    if (additionalInstructions != null) {
+      builder.additionalInstructions(additionalInstructions);
     }
     return builder;
   }
