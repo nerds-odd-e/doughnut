@@ -285,7 +285,6 @@ const handleToolCallAccept = async (action: (note: Note) => Promise<void>) => {
 
   try {
     isProcessingToolCall.value = true
-    const { threadId, runId, toolCallId } = pendingToolCall
     const note = conversation.subject?.note
     if (!note) {
       console.error("No note found in conversation")
@@ -293,9 +292,6 @@ const handleToolCallAccept = async (action: (note: Note) => Promise<void>) => {
     }
 
     await action(note)
-    await managedApi.restAiController.submitToolCallsResult(threadId, runId, {
-      [toolCallId]: { status: "accepted" },
-    })
 
     const result: ToolCallResult = { status: "accepted" }
     toolCallResolver.value?.resolve(result)

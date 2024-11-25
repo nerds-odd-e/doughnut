@@ -65,12 +65,13 @@ export const createAiReplyStates = (
             toolCall.function!.arguments as unknown as string
           )
 
+          let result: ToolCallResult
           if (
             toolCall.function!.name ===
             DummyForGeneratingTypes.aiToolName.COMPLETE_NOTE_DETAILS
           ) {
             const contentToAppend = functionArgs as NoteDetailsCompletion
-            await context.appendNoteDetails(
+            result = await context.appendNoteDetails(
               contentToAppend!.completion,
               response.thread_id!,
               response.id!,
@@ -81,13 +82,21 @@ export const createAiReplyStates = (
             DummyForGeneratingTypes.aiToolName.SUGGEST_NOTE_TOPIC_TITLE
           ) {
             const titleGeneration = functionArgs as TopicTitleReplacement
-            await context.setTopicTitle(
+            result = await context.setTopicTitle(
               titleGeneration.newTopic,
               response.thread_id!,
               response.id!,
               toolCall.id!
             )
+          } else {
+            throw new Error("Unknown tool call")
           }
+
+          await aiController.submitToolCallsResult(
+            response.thread_id!,
+            response.id!,
+            { [toolCall.id!]: result }
+          )
         } catch (e) {
           if (e instanceof Error && e.message === "Tool call was rejected") {
             await aiController.cancelRun(response.thread_id!, response.id!)
