@@ -1,6 +1,11 @@
 import { describe, it, expect, vi } from "vitest"
 import { createAiReplyStates } from "@/models/aiReplyState"
-import type { RunStep, DeltaOfRunStep, JsonNode } from "@/generated/backend"
+import type {
+  RunStep,
+  DeltaOfRunStep,
+  JsonNode,
+  RestAiControllerService,
+} from "@/generated/backend"
 
 describe("aiReplyState", () => {
   const mockContext = {
@@ -11,13 +16,18 @@ describe("aiReplyState", () => {
     setTopicTitle: vi.fn(),
   }
 
+  const mockAiController = {
+    submitToolCallsResult: vi.fn(),
+    cancelRun: vi.fn(),
+  } as unknown as RestAiControllerService
+
   beforeEach(() => {
     vi.clearAllMocks()
   })
 
   describe("thread.run.step.created", () => {
     it("resets content when receiving a tool_calls step", async () => {
-      const states = createAiReplyStates(mockContext)
+      const states = createAiReplyStates(mockContext, mockAiController)
       const runStep: RunStep = {
         type: "tool_calls",
         step_details: {
@@ -34,7 +44,7 @@ describe("aiReplyState", () => {
     })
 
     it("does not reset content for non-tool_calls steps", async () => {
-      const states = createAiReplyStates(mockContext)
+      const states = createAiReplyStates(mockContext, mockAiController)
       const runStep: RunStep = {
         type: "message_creation",
         step_details: {
@@ -53,7 +63,7 @@ describe("aiReplyState", () => {
 
   describe("thread.run.step.delta", () => {
     it("appends tool call arguments from delta", async () => {
-      const states = createAiReplyStates(mockContext)
+      const states = createAiReplyStates(mockContext, mockAiController)
       const stepDelta: DeltaOfRunStep = {
         delta: {
           step_details: {
@@ -76,7 +86,7 @@ describe("aiReplyState", () => {
     })
 
     it("handles empty or malformed delta gracefully", async () => {
-      const states = createAiReplyStates(mockContext)
+      const states = createAiReplyStates(mockContext, mockAiController)
       const emptyDelta: DeltaOfRunStep = {
         delta: {
           step_details: {
