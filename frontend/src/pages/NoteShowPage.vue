@@ -89,6 +89,13 @@ aside {
 
 .h-full {
   height: calc(100vh - 4rem);
-  /* max-width: calc(-webkit-fill-available - 4rem); */
+
+  @media (max-width: 1024px) {
+    height: calc(100vh - 8rem);
+  }
+
+  @media (max-width: 700px) {
+    height: calc(100vh - 7rem);
+  }
 }
 </style>
