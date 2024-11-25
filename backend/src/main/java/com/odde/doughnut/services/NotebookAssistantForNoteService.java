@@ -10,7 +10,9 @@ import com.theokanning.openai.OpenAiHttpException;
 import com.theokanning.openai.assistants.message.MessageRequest;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -118,13 +120,15 @@ public final class NotebookAssistantForNoteService {
 
         instruction = appendAdditionalInstructions(instruction, config);
 
+        Map<String, Object> results = new HashMap<>();
+        results.put(
+            config.getToolCallId(),
+            new AudioToTextToolCallResult(instruction, transcriptionFromAudio));
         return assistantService
             .getThread(config.getThreadId())
             .withTool(AiToolFactory.completeNoteDetails())
             .resumeRun(config.getRunId())
-            .submitToolOutputs(
-                config.getToolCallId(),
-                new AudioToTextToolCallResult(instruction, transcriptionFromAudio));
+            .submitToolOutputs(results);
 
       } catch (OpenAiHttpException e) {
         // Fallback to creating a new thread if submission fails

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.assistants.run.Run;
+import java.util.Map;
 
 public abstract class OpenAiRun {
   protected final OpenAiApiHandler openAiApiHandler;
@@ -16,10 +17,9 @@ public abstract class OpenAiRun {
     this.tool = tool;
   }
 
-  public OpenAiRunExpectingAction submitToolOutputs(String toolCallId, Object result)
+  public OpenAiRunExpectingAction submitToolOutputs(Map<String, ?> results)
       throws JsonProcessingException {
-    Run currentRun =
-        openAiApiHandler.submitToolOutputs(run.getThreadId(), run.getId(), toolCallId, result);
+    Run currentRun = openAiApiHandler.submitToolOutputs(run.getThreadId(), run.getId(), results);
     return new OpenAiRunExpectingAction(openAiApiHandler, currentRun, tool);
   }
 

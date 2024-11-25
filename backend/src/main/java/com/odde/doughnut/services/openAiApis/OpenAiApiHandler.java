@@ -6,6 +6,7 @@ import static java.lang.Thread.sleep;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.doughnut.controllers.dto.ToolCallResult;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolList;
@@ -185,15 +186,26 @@ public class OpenAiApiHandler {
     }
   }
 
+  @Deprecated
   public Run submitToolOutputs(String threadId, String runId, String toolCallId, Object result)
       throws JsonProcessingException {
-    SubmitToolOutputRequestItem toolOutputRequestItem =
-        SubmitToolOutputRequestItem.builder()
-            .toolCallId(toolCallId)
-            .output(new ObjectMapper().writeValueAsString(result))
-            .build();
+    Map<String, ToolCallResult> results = new HashMap<>();
+    results.put(toolCallId, (ToolCallResult) result);
+    return submitToolOutputs(threadId, runId, results);
+  }
+
+  public Run submitToolOutputs(String threadId, String runId, Map<String, ?> results)
+      throws JsonProcessingException {
     List<SubmitToolOutputRequestItem> toolOutputRequestItems = new ArrayList<>();
-    toolOutputRequestItems.add(toolOutputRequestItem);
+    for (Map.Entry<String, ?> entry : results.entrySet()) {
+      SubmitToolOutputRequestItem build =
+          SubmitToolOutputRequestItem.builder()
+              .toolCallId(entry.getKey())
+              .output(new ObjectMapper().writeValueAsString(entry.getValue()))
+              .build();
+      toolOutputRequestItems.add(build);
+    }
+
     SubmitToolOutputsRequest submitToolOutputsRequest =
         SubmitToolOutputsRequest.builder().toolOutputs(toolOutputRequestItems).build();
     return blockGet(openAiApi.submitToolOutputs(threadId, runId, submitToolOutputsRequest));

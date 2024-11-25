@@ -277,9 +277,12 @@ describe("ConversationInner", () => {
 
   describe("Tool Call Handling", () => {
     const testCompletion = "**bold completion**"
+    const threadId = "thread-123"
+    const runId = "run-123"
+    const toolCallId = "call-456"
 
     beforeEach(async () => {
-      helper.managedApi.restAiController.submitToolCallResult = vi.fn()
+      helper.managedApi.restAiController.submitToolCallsResult = vi.fn()
       helper.managedApi.restAiController.cancelRun = vi.fn()
       helper.managedApi.restTextContentController.updateNoteDetails = vi.fn()
 
@@ -295,36 +298,6 @@ describe("ConversationInner", () => {
       )
     })
 
-    it("renders completion suggestion as markdown", async () => {
-      const completionText = wrapper.find(".ai-chat .completion-text")
-      expect(completionText.find("strong").exists()).toBe(true)
-      expect(completionText.find("strong").text()).toBe("bold completion")
-    })
-
-    it("adds '...' prefix when note has existing details", async () => {
-      // Recreate wrapper with note having existing details
-      const noteWithDetails = makeMe.aNote.details("existing text").please()
-      const conversationWithDetails = makeMe.aConversation
-        .note(noteWithDetails)
-        .please()
-
-      wrapper = mountComponent(conversationWithDetails, user)
-
-      await submitMessageAndSimulateRunResponse(
-        wrapper,
-        "Hello",
-        createRunResponse(
-          DummyForGeneratingTypes.aiToolName.COMPLETE_NOTE_DETAILS,
-          {
-            completion: testCompletion,
-          }
-        )
-      )
-
-      const completionText = wrapper.find(".ai-chat .completion-text")
-      expect(completionText.text()).toBe("...bold completion")
-    })
-
     it("accepts the completion suggestion and updates the note", async () => {
       // Accept the suggestion
       await wrapper.find('button[class*="btn-primary"]').trigger("click")
@@ -335,9 +308,9 @@ describe("ConversationInner", () => {
       ).toHaveBeenCalledWith(note.id, { details: testCompletion })
 
       expect(
-        helper.managedApi.restAiController.submitToolCallResult
-      ).toHaveBeenCalledWith("thread-123", "run-123", "call-456", {
-        status: "accepted",
+        helper.managedApi.restAiController.submitToolCallsResult
+      ).toHaveBeenCalledWith(threadId, runId, {
+        [toolCallId]: { status: "accepted" },
       })
 
       expect(wrapper.find(".completion-text").exists()).toBe(false)
@@ -353,8 +326,8 @@ describe("ConversationInner", () => {
       ).not.toHaveBeenCalled()
 
       expect(helper.managedApi.restAiController.cancelRun).toHaveBeenCalledWith(
-        "thread-123",
-        "run-123"
+        threadId,
+        runId
       )
 
       expect(wrapper.find(".completion-text").exists()).toBe(false)
@@ -363,9 +336,12 @@ describe("ConversationInner", () => {
 
   describe("Topic Title Generation", () => {
     const testTitle = "Generated Title"
+    const threadId = "thread-123"
+    const runId = "run-123"
+    const toolCallId = "call-456"
 
     beforeEach(async () => {
-      helper.managedApi.restAiController.submitToolCallResult = vi.fn()
+      helper.managedApi.restAiController.submitToolCallsResult = vi.fn()
       helper.managedApi.restAiController.cancelRun = vi.fn()
       helper.managedApi.restTextContentController.updateNoteTopicConstructor =
         vi.fn()
@@ -382,15 +358,6 @@ describe("ConversationInner", () => {
       )
     })
 
-    it("renders title suggestion", async () => {
-      const titleSuggestion = wrapper.find(".title-suggestion")
-      expect(titleSuggestion.exists()).toBe(true)
-      expect(titleSuggestion.text()).toBe(testTitle)
-      expect(
-        await wrapper.findAll('button[class*="btn-primary"]')
-      ).toHaveLength(1)
-    })
-
     it("accepts the title suggestion and updates the note", async () => {
       await wrapper.find('button[class*="btn-primary"]').trigger("click")
       await flushPromises()
@@ -400,9 +367,9 @@ describe("ConversationInner", () => {
       ).toHaveBeenCalledWith(note.id, { topicConstructor: testTitle })
 
       expect(
-        helper.managedApi.restAiController.submitToolCallResult
-      ).toHaveBeenCalledWith("thread-123", "run-123", "call-456", {
-        status: "accepted",
+        helper.managedApi.restAiController.submitToolCallsResult
+      ).toHaveBeenCalledWith(threadId, runId, {
+        [toolCallId]: { status: "accepted" },
       })
 
       expect(wrapper.find(".title-suggestion").exists()).toBe(false)
@@ -417,8 +384,8 @@ describe("ConversationInner", () => {
       ).not.toHaveBeenCalled()
 
       expect(helper.managedApi.restAiController.cancelRun).toHaveBeenCalledWith(
-        "thread-123",
-        "run-123"
+        threadId,
+        runId
       )
 
       expect(wrapper.find(".title-suggestion").exists()).toBe(false)

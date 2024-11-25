@@ -32,24 +32,21 @@ export class RestAiControllerService {
     /**
      * @param threadId
      * @param runId
-     * @param toolCallId
      * @param requestBody
      * @returns any OK
      * @throws ApiError
      */
-    public submitToolCallResult(
+    public submitToolCallsResult(
         threadId: string,
         runId: string,
-        toolCallId: string,
-        requestBody: ToolCallResult,
+        requestBody: Record<string, ToolCallResult>,
     ): CancelablePromise<any> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/ai/submit-tool-result/{threadId}/{runId}/{toolCallId}',
+            url: '/api/ai/submit-tool-results/{threadId}/{runId}',
             path: {
                 'threadId': threadId,
                 'runId': runId,
-                'toolCallId': toolCallId,
             },
             body: requestBody,
             mediaType: 'application/json',

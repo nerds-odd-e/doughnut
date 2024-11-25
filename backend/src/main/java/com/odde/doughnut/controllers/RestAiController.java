@@ -9,6 +9,7 @@ import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
 import com.odde.doughnut.services.ai.OtherAiServices;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
+import java.util.Map;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.bind.annotation.*;
@@ -50,16 +51,15 @@ public class RestAiController {
     return otherAiServices.getAvailableGptModels();
   }
 
-  @PostMapping("/submit-tool-result/{threadId}/{runId}/{toolCallId}")
+  @PostMapping("/submit-tool-results/{threadId}/{runId}")
   @Transactional
-  public void submitToolCallResult(
+  public void submitToolCallsResult(
       @PathVariable String threadId,
       @PathVariable String runId,
-      @PathVariable String toolCallId,
-      @RequestBody ToolCallResult result)
+      @RequestBody Map<String, ToolCallResult> results)
       throws JsonProcessingException {
     currentUser.assertLoggedIn();
-    otherAiServices.resumeRun(threadId, runId).submitToolOutputs(toolCallId, result);
+    otherAiServices.resumeRun(threadId, runId).submitToolOutputs(results);
   }
 
   @PostMapping("/cancel-run/{threadId}/{runId}")

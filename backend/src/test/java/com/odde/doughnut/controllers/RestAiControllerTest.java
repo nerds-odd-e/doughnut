@@ -28,7 +28,9 @@ import com.theokanning.openai.image.ImageResult;
 import com.theokanning.openai.model.Model;
 import io.reactivex.Single;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -136,7 +138,7 @@ class RestAiControllerTest {
   }
 
   @Nested
-  class SubmitToolCallResult {
+  class SubmitToolCallsResult {
     @Test
     void shouldSubmitToolOutputSuccessfully() throws JsonProcessingException {
       String threadId = "thread-123";
@@ -154,10 +156,39 @@ class RestAiControllerTest {
                   })))
           .thenReturn(Single.just(new Run()));
 
-      ToolCallResult result = new ToolCallResult();
-      result.status = "accepted";
+      Map<String, ToolCallResult> results = new HashMap<>();
+      results.put(toolCallId, new ToolCallResult("accepted"));
 
-      controller.submitToolCallResult(threadId, runId, toolCallId, result);
+      controller.submitToolCallsResult(threadId, runId, results);
+
+      verify(openAiApi).submitToolOutputs(eq(threadId), eq(runId), any());
+    }
+
+    @Test
+    void shouldSubmitMultipleToolOutputsSuccessfully() throws JsonProcessingException {
+      String threadId = "thread-123";
+      String runId = "run-123";
+      String toolCallId1 = "call-456";
+      String toolCallId2 = "call-789";
+
+      when(openAiApi.submitToolOutputs(
+              eq(threadId),
+              eq(runId),
+              argThat(
+                  request -> {
+                    assertEquals(2, request.getToolOutputs().size());
+                    var toolOutputs = request.getToolOutputs();
+                    assertEquals(toolCallId1, toolOutputs.get(0).getToolCallId());
+                    assertEquals(toolCallId2, toolOutputs.get(1).getToolCallId());
+                    return true;
+                  })))
+          .thenReturn(Single.just(new Run()));
+
+      Map<String, ToolCallResult> results = new HashMap<>();
+      results.put(toolCallId1, new ToolCallResult("accepted"));
+      results.put(toolCallId2, new ToolCallResult("accepted"));
+
+      controller.submitToolCallsResult(threadId, runId, results);
 
       verify(openAiApi).submitToolOutputs(eq(threadId), eq(runId), any());
     }

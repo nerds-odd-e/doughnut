@@ -276,12 +276,9 @@ const handleToolCallAccept = async (action: (note: Note) => Promise<void>) => {
     }
 
     await action(note)
-    await managedApi.restAiController.submitToolCallResult(
-      threadId,
-      runId,
-      toolCallId,
-      { status: "accepted" }
-    )
+    await managedApi.restAiController.submitToolCallsResult(threadId, runId, {
+      [toolCallId]: { status: "accepted" },
+    })
 
     completionSuggestion.value = undefined
     topicTitleSuggestion.value = undefined
