@@ -15,6 +15,13 @@
         Accept
       </button>
       <button
+        class="btn btn-outline-secondary btn-sm"
+        @click="$emit('skip')"
+        :disabled="disabled"
+      >
+        Skip
+      </button>
+      <button
         class="btn btn-secondary btn-sm"
         @click="$emit('cancel')"
         :disabled="disabled"
@@ -33,6 +40,7 @@ defineProps<{
 defineEmits<{
   (e: "accept"): void
   (e: "cancel"): void
+  (e: "skip"): void
 }>()
 </script>
 

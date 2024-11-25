@@ -59,7 +59,8 @@
         <AcceptRejectButtons
           :disabled="isProcessingToolCall"
           @accept="handleAcceptCompletion"
-          @reject="handleCancellation"
+          @cancel="handleCancellation"
+          @skip="handleSkip"
         >
           <template #title>
             Suggested completion:
@@ -92,6 +93,7 @@
           :disabled="isProcessingToolCall"
           @accept="handleAcceptTitle"
           @cancel="handleCancellation"
+          @skip="handleSkip"
         >
           <template #title>
             Suggested title:
@@ -302,6 +304,18 @@ const handleAcceptTitle = () => {
       .storedApi()
       .updateTextField(note.id, "edit topic", topicTitleSuggestion.value!)
   })
+}
+
+const handleSkip = async () => {
+  if (!pendingToolCall.value || isProcessingToolCall.value) return
+
+  try {
+    isProcessingToolCall.value = true
+    toolCallResolver.value?.resolve({ status: "skipped" })
+    clearToolCallState()
+  } finally {
+    isProcessingToolCall.value = false
+  }
 }
 
 const getAiReply = async () => {

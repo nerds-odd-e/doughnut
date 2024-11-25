@@ -332,6 +332,26 @@ describe("ConversationInner", () => {
 
       expect(wrapper.find(".completion-text").exists()).toBe(false)
     })
+
+    it("skips the completion suggestion without updating the note", async () => {
+      // Skip the suggestion
+      await wrapper
+        .find('button[class*="btn-outline-secondary"]')
+        .trigger("click")
+      await flushPromises()
+
+      expect(
+        helper.managedApi.restTextContentController.updateNoteDetails
+      ).not.toHaveBeenCalled()
+
+      expect(
+        helper.managedApi.restAiController.submitToolCallsResult
+      ).toHaveBeenCalledWith(threadId, runId, {
+        [toolCallId]: { status: "skipped" },
+      })
+
+      expect(wrapper.find(".completion-text").exists()).toBe(false)
+    })
   })
 
   describe("Topic Title Generation", () => {
@@ -387,6 +407,25 @@ describe("ConversationInner", () => {
         threadId,
         runId
       )
+
+      expect(wrapper.find(".title-suggestion").exists()).toBe(false)
+    })
+
+    it("skips the title suggestion without updating the note", async () => {
+      await wrapper
+        .find('button[class*="btn-outline-secondary"]')
+        .trigger("click")
+      await flushPromises()
+
+      expect(
+        helper.managedApi.restTextContentController.updateNoteTopicConstructor
+      ).not.toHaveBeenCalled()
+
+      expect(
+        helper.managedApi.restAiController.submitToolCallsResult
+      ).toHaveBeenCalledWith(threadId, runId, {
+        [toolCallId]: { status: "skipped" },
+      })
 
       expect(wrapper.find(".title-suggestion").exists()).toBe(false)
     })
