@@ -430,4 +430,61 @@ describe("ConversationInner", () => {
       expect(wrapper.find(".title-suggestion").exists()).toBe(false)
     })
   })
+
+  describe("Unknown Tool Call Handling", () => {
+    const testJson = { unknown: "data" }
+    const threadId = "thread-123"
+    const runId = "run-123"
+    const toolCallId = "call-456"
+
+    beforeEach(async () => {
+      helper.managedApi.restAiController.submitToolCallsResult = vi.fn()
+      helper.managedApi.restAiController.cancelRun = vi.fn()
+
+      const run = createRunResponse("unknown_tool", testJson)
+
+      await submitMessageAndSimulateRunResponse(wrapper, "Hello", run)
+    })
+
+    it("displays unknown tool call with raw JSON", () => {
+      const unknownRequest = wrapper.find(".unknown-request")
+      expect(unknownRequest.exists()).toBe(true)
+      expect(unknownRequest.text()).toContain(JSON.stringify(testJson))
+
+      const title = wrapper.find(".ai-chat")
+      expect(title.text()).toContain("unknown_tool")
+    })
+
+    it("has accept button disabled", () => {
+      const acceptButton = wrapper.find('button[class*="btn-primary"]')
+      expect(acceptButton.exists()).toBe(false)
+    })
+
+    it("skips the unknown request", async () => {
+      await wrapper
+        .find('button[class*="btn-outline-secondary"]')
+        .trigger("click")
+      await flushPromises()
+
+      expect(
+        helper.managedApi.restAiController.submitToolCallsResult
+      ).toHaveBeenCalledWith(threadId, runId, {
+        [toolCallId]: { status: "skipped" },
+      })
+
+      expect(wrapper.find(".unknown-request").exists()).toBe(false)
+    })
+
+    it("cancels the unknown request", async () => {
+      await wrapper.find('button[class*="btn-secondary"]').trigger("click")
+      await flushPromises()
+
+      expect(helper.managedApi.restAiController.cancelRun).toHaveBeenCalledWith(
+        threadId,
+        runId
+      )
+
+      expect(wrapper.find(".unknown-request").exists()).toBe(false)
+    })
+  })
 })

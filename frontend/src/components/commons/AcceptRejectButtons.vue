@@ -8,6 +8,7 @@
     </div>
     <div class="d-flex gap-2">
       <button
+        v-if="!hideAccept"
         class="btn btn-primary btn-sm"
         @click="$emit('accept')"
         :disabled="disabled"
@@ -35,6 +36,7 @@
 <script setup lang="ts">
 defineProps<{
   disabled?: boolean
+  hideAccept?: boolean
 }>()
 
 defineEmits<{

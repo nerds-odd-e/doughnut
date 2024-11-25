@@ -32,6 +32,13 @@ export interface AiActionContext {
     runId: string,
     toolCallId: string
   ) => Promise<ToolCallResult>
+  unknownRequest: (
+    rawJson: string,
+    functionName: string,
+    threadId: string,
+    runId: string,
+    toolCallId: string
+  ) => Promise<ToolCallResult>
 }
 
 export const createAiReplyStates = (
@@ -64,16 +71,18 @@ export const createAiReplyStates = (
           const results: Record<string, ToolCallResult> = {}
 
           for (const toolCall of toolCalls) {
-            const functionArgs = JSON.parse(
-              toolCall.function!.arguments as unknown as string
-            )
+            const functionArgs = toolCall.function!
+              .arguments as unknown as string
+            const functionName = toolCall.function!.name
 
             let result: ToolCallResult
             if (
-              toolCall.function!.name ===
+              functionName ===
               DummyForGeneratingTypes.aiToolName.COMPLETE_NOTE_DETAILS
             ) {
-              const contentToAppend = functionArgs as NoteDetailsCompletion
+              const contentToAppend = JSON.parse(
+                functionArgs
+              ) as NoteDetailsCompletion
               result = await context.appendNoteDetails(
                 contentToAppend!.completion,
                 response.thread_id!,
@@ -81,10 +90,12 @@ export const createAiReplyStates = (
                 toolCall.id!
               )
             } else if (
-              toolCall.function!.name ===
+              functionName ===
               DummyForGeneratingTypes.aiToolName.SUGGEST_NOTE_TOPIC_TITLE
             ) {
-              const titleGeneration = functionArgs as TopicTitleReplacement
+              const titleGeneration = JSON.parse(
+                functionArgs
+              ) as TopicTitleReplacement
               result = await context.setTopicTitle(
                 titleGeneration.newTopic,
                 response.thread_id!,
@@ -92,7 +103,13 @@ export const createAiReplyStates = (
                 toolCall.id!
               )
             } else {
-              throw new Error("Unknown tool call")
+              result = await context.unknownRequest(
+                functionArgs,
+                functionName!,
+                response.thread_id!,
+                response.id!,
+                toolCall.id!
+              )
             }
 
             results[toolCall.id!] = result

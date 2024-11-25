@@ -16,6 +16,7 @@ describe("aiReplyState", () => {
     reset: vi.fn(),
     appendNoteDetails: vi.fn(),
     setTopicTitle: vi.fn(),
+    unknownRequest: vi.fn(),
   }
 
   const mockAiController = {
@@ -255,7 +256,9 @@ describe("aiReplyState", () => {
       expect(mockAiController.submitToolCallsResult).not.toHaveBeenCalled()
     })
 
-    it("throws error for unknown tool call", async () => {
+    it("handles unknown tool call through unknownRequest", async () => {
+      const unknownToolName = "unknown_tool"
+      const unknownToolArgs = { test: "data" }
       const run = {
         ...mockRun,
         required_action: {
@@ -264,8 +267,8 @@ describe("aiReplyState", () => {
               {
                 id: "call-1",
                 function: {
-                  name: "unknown_tool",
-                  arguments: JSON.stringify({}),
+                  name: unknownToolName,
+                  arguments: JSON.stringify(unknownToolArgs),
                 },
               },
             ],
@@ -273,10 +276,25 @@ describe("aiReplyState", () => {
         },
       }
 
+      mockContext.unknownRequest.mockResolvedValue({ status: "skipped" })
+
       const states = createAiReplyStates(mockContext, mockAiController)
-      await expect(
-        states["thread.run.requires_action"]?.handleEvent(JSON.stringify(run))
-      ).rejects.toThrow("Unknown tool call")
+      await states["thread.run.requires_action"].handleEvent(
+        JSON.stringify(run)
+      )
+
+      expect(mockContext.unknownRequest).toHaveBeenCalledWith(
+        JSON.stringify(unknownToolArgs),
+        unknownToolName,
+        "thread-123",
+        "run-123",
+        "call-1"
+      )
+      expect(mockAiController.submitToolCallsResult).toHaveBeenCalledWith(
+        "thread-123",
+        "run-123",
+        { "call-1": { status: "skipped" } }
+      )
     })
   })
 })

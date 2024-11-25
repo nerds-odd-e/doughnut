@@ -104,7 +104,28 @@
         </AcceptRejectButtons>
       </div>
 
-      <ScrollTo :scrollTrigger="currentConversationMessages.length + (currentAiReply ? currentAiReply.length : 0) + (completionSuggestion ? 1 : 0) + (lastErrorMessage ? 1 : 0) + (aiStatus ? 1 : 0) + (topicTitleSuggestion ? 1 : 0)" />
+      <div v-if="unknownRequestSuggestion" class="d-flex mb-3">
+        <div class="message-avatar me-2" title="AI Assistant">
+          <SvgRobot />
+        </div>
+        <AcceptRejectButtons
+          :disabled="isProcessingToolCall"
+          @cancel="handleCancellation"
+          @skip="handleSkip"
+          :hideAccept="true"
+        >
+          <template #title>
+            Unknown tool call: {{ unknownRequestSuggestion.functionName }}
+          </template>
+          <template #content>
+            <div class="unknown-request">
+              <pre>{{ unknownRequestSuggestion.rawJson }}</pre>
+            </div>
+          </template>
+        </AcceptRejectButtons>
+      </div>
+
+      <ScrollTo :scrollTrigger="currentConversationMessages.length + (currentAiReply ? currentAiReply.length : 0) + (completionSuggestion ? 1 : 0) + (lastErrorMessage ? 1 : 0) + (aiStatus ? 1 : 0) + (topicTitleSuggestion ? 1 : 0) + (unknownRequestSuggestion ? 1 : 0)" />
     </template>
   </ConversationTemplate>
 </template>
@@ -168,6 +189,14 @@ const aiStatus = ref<string | undefined>()
 const completionSuggestion = ref<string | undefined>()
 
 const topicTitleSuggestion = ref<string | undefined>()
+
+const unknownRequestSuggestion = ref<
+  | {
+      rawJson: string
+      functionName: string
+    }
+  | undefined
+>()
 
 const isProcessingToolCall = ref(false)
 
@@ -241,6 +270,11 @@ const createAiActionContext = (): AiActionContext => ({
     pendingToolCall.value = { threadId, runId, toolCallId }
     return createToolCallPromise()
   },
+  async unknownRequest(rawJson, functionName, threadId, runId, toolCallId) {
+    unknownRequestSuggestion.value = { rawJson, functionName }
+    pendingToolCall.value = { threadId, runId, toolCallId }
+    return createToolCallPromise()
+  },
 })
 
 const createToolCallPromise = () => {
@@ -252,6 +286,7 @@ const createToolCallPromise = () => {
 const clearToolCallState = () => {
   completionSuggestion.value = undefined
   topicTitleSuggestion.value = undefined
+  unknownRequestSuggestion.value = undefined
   pendingToolCall.value = undefined
   toolCallResolver.value = null
 }
@@ -397,5 +432,14 @@ const handleSendMessageAndInviteAI = (message: string) =>
   font-style: italic;
   color: #666;
   font-weight: bold;
+}
+
+.unknown-request {
+  font-family: monospace;
+  background-color: #f8f9fa;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
 </style>
