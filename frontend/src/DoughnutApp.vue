@@ -94,25 +94,17 @@ onMounted(async () => {
 <style scoped>
 .app-container {
   display: flex;
-  min-height: 100vh;
 }
 
 .main-content {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  width: 0;
 }
 
 @media (max-width: 1024px) {
   .app-container {
     flex-direction: column;
-  }
-
-  .main-content {
-    height: calc(100vh - 56px);
-    overflow-y: auto;
-    width: 100%;
   }
 }
 </style>
