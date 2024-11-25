@@ -56,8 +56,8 @@ const openAiService = () => {
       return this
     },
 
-    stubRunCancellation(threadId: string) {
-      serviceMocker.stubPoster(`/threads/${threadId}/runs/run-123/cancel`, {})
+    stubRunCancellation(threadId: string, runId: string) {
+      serviceMocker.stubPoster(`/threads/${threadId}/runs/${runId}/cancel`, {})
       return this
     },
 

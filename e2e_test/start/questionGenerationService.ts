@@ -51,7 +51,7 @@ export const questionGenerationService = () => ({
             arguments: JSON.stringify(mcqWithAnswer),
           },
         ])
-      mock_services.openAi().stubRunCancellation('thread-123')
+      mock_services.openAi().stubRunCancellation('thread-123', 'run-123')
     })
   },
   stubEvaluationQuestion: (

@@ -11,10 +11,10 @@ Feature: Recording a live audio and append to note details
       its talk about dada struct day.
 
       """
-    And OpenAI assistant will reply below for user messages in a non-stream run:
+    And OpenAI assistant will reply below for user messages in a non-stream run "run123":
       | response                | arguments                 |
       | complete note details   |"Let's talk about data structure today."|
-    And OpenAI assistant can accept tool call results submission and run cancellation
+    And OpenAI assistant can accept tool call results submission and run cancellation for run "run123"
     And the browser is mocked to give permission to record audio
 
   Scenario: Record audio of a live event

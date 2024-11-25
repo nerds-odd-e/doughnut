@@ -75,25 +75,25 @@ Given(
 )
 
 Given(
-  'OpenAI assistant will reply below for user messages in a non-stream run:',
-  (data: DataTable) => {
+  'OpenAI assistant will reply below for user messages in a non-stream run {string}:',
+  (runId: string, data: DataTable) => {
     mock_services
       .openAi()
       .stubCreateThread('thread-123')
-      .stubCreateRuns('thread-123', ['run-123'])
-      .aRun('run-123')
+      .stubCreateRuns('thread-123', [runId])
+      .aRun(runId)
       .stubRetrieveRunsThatRequireAction(data.hashes())
       .stubSubmitToolOutputs()
   }
 )
 
 Given(
-  'OpenAI assistant can accept tool call results submission and run cancellation',
-  () => {
+  'OpenAI assistant can accept tool call results submission and run cancellation for run {string}',
+  (runId: string) => {
     mock_services
       .openAi()
       .stubToolCallSubmission()
-      .stubRunCancellation('thread-123')
+      .stubRunCancellation('thread-123', runId)
   }
 )
 
