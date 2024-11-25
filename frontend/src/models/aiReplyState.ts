@@ -6,9 +6,10 @@ import {
   type DeltaOfRunStep,
   type NoteDetailsCompletion,
   type TopicTitleReplacement,
-  DummyForGeneratingTypes,
   type ToolCallResult,
+  DummyForGeneratingTypes,
 } from "@/generated/backend"
+import type { RestAiControllerService } from "@/generated/backend/services/RestAiControllerService"
 
 export type AiReplyState = {
   handleEvent: (data: string) => Promise<void>
@@ -34,7 +35,8 @@ export interface AiActionContext {
 }
 
 export const createAiReplyStates = (
-  context: AiActionContext
+  context: AiActionContext,
+  aiController: RestAiControllerService
 ): Record<string, AiReplyState> => {
   const states: Record<string, AiReplyState> = {
     "thread.message.created": {
@@ -86,8 +88,12 @@ export const createAiReplyStates = (
               toolCall.id!
             )
           }
-        } catch (_e) {
-          // later
+        } catch (e) {
+          if (e instanceof Error && e.message === "Tool call was rejected") {
+            await aiController.cancelRun(response.thread_id!, response.id!)
+          } else {
+            throw e
+          }
         }
       },
     },

@@ -254,7 +254,10 @@ const getAiReply = async () => {
     },
   }
 
-  const states = createAiReplyStates(aiActionContext)
+  const states = createAiReplyStates(
+    aiActionContext,
+    managedApi.restAiController
+  )
 
   aiStatus.value = "Starting AI reply..."
   await managedApi.eventSource
@@ -330,8 +333,6 @@ const handleReject = async () => {
 
   try {
     isProcessingToolCall.value = true
-    const { threadId, runId } = pendingToolCall
-    await managedApi.restAiController.cancelRun(threadId, runId)
 
     const error = new Error("Tool call was rejected")
     toolCallResolver.value?.reject(error)
