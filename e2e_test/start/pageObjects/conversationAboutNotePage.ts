@@ -43,9 +43,9 @@ export class ConversationAboutNotePage {
     return this
   }
 
-  rejectCompletion() {
+  cancelCompletion() {
     cy.findByRole('dialog').within(() => {
-      cy.findByRole('button', { name: 'Reject' }).click()
+      cy.findByRole('button', { name: 'Cancel' }).click()
     })
     return this
   }

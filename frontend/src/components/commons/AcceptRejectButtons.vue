@@ -16,10 +16,10 @@
       </button>
       <button
         class="btn btn-secondary btn-sm"
-        @click="$emit('reject')"
+        @click="$emit('cancel')"
         :disabled="disabled"
       >
-        Reject
+        Cancel
       </button>
     </div>
   </div>
@@ -32,7 +32,7 @@ defineProps<{
 
 defineEmits<{
   (e: "accept"): void
-  (e: "reject"): void
+  (e: "cancel"): void
 }>()
 </script>
 

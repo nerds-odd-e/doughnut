@@ -59,7 +59,7 @@
         <AcceptRejectButtons
           :disabled="isProcessingToolCall"
           @accept="handleAcceptCompletion"
-          @reject="handleReject"
+          @reject="handleCancellation"
         >
           <template #title>
             Suggested completion:
@@ -91,7 +91,7 @@
         <AcceptRejectButtons
           :disabled="isProcessingToolCall"
           @accept="handleAcceptTitle"
-          @reject="handleReject"
+          @cancel="handleCancellation"
         >
           <template #title>
             Suggested title:
@@ -274,7 +274,7 @@ const handleToolCallAccept = async (action: (note: Note) => Promise<void>) => {
   await fetchConversationMessages()
 }
 
-const handleReject = async () => {
+const handleCancellation = async () => {
   if (!pendingToolCall.value || isProcessingToolCall.value) return
 
   try {

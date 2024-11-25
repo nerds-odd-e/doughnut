@@ -316,8 +316,8 @@ describe("ConversationInner", () => {
       expect(wrapper.find(".completion-text").exists()).toBe(false)
     })
 
-    it("rejects the completion suggestion without updating the note", async () => {
-      // Reject the suggestion
+    it("cancel the completion suggestion without updating the note", async () => {
+      // Cancel the suggestion
       await wrapper.find('button[class*="btn-secondary"]').trigger("click")
       await flushPromises()
 

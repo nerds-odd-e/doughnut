@@ -146,5 +146,5 @@ When('I accept the suggested completion', () => {
 })
 
 When('I reject the suggested completion', () => {
-  start.assumeConversationAboutNotePage().rejectCompletion()
+  start.assumeConversationAboutNotePage().cancelCompletion()
 })
