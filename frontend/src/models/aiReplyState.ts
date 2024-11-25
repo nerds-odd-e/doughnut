@@ -7,6 +7,7 @@ import {
   type NoteDetailsCompletion,
   type TopicTitleReplacement,
   DummyForGeneratingTypes,
+  type ToolCallResult,
 } from "@/generated/backend"
 
 export type AiReplyState = {
@@ -55,34 +56,38 @@ export const createAiReplyStates = (
       status: "Processing actions...",
       handleEvent: async (data) => {
         const response = JSON.parse(data) as Run
-        const toolCall =
-          response.required_action!.submit_tool_outputs!.tool_calls![0]!
-        const functionArgs = JSON.parse(
-          toolCall.function!.arguments as unknown as string
-        )
+        try {
+          const toolCall =
+            response.required_action!.submit_tool_outputs!.tool_calls![0]!
+          const functionArgs = JSON.parse(
+            toolCall.function!.arguments as unknown as string
+          )
 
-        if (
-          toolCall.function!.name ===
-          DummyForGeneratingTypes.aiToolName.COMPLETE_NOTE_DETAILS
-        ) {
-          const contentToAppend = functionArgs as NoteDetailsCompletion
-          await context.appendNoteDetails(
-            contentToAppend!.completion,
-            response.thread_id!,
-            response.id!,
-            toolCall.id!
-          )
-        } else if (
-          toolCall.function!.name ===
-          DummyForGeneratingTypes.aiToolName.SUGGEST_NOTE_TOPIC_TITLE
-        ) {
-          const titleGeneration = functionArgs as TopicTitleReplacement
-          await context.setTopicTitle(
-            titleGeneration.newTopic,
-            response.thread_id!,
-            response.id!,
-            toolCall.id!
-          )
+          if (
+            toolCall.function!.name ===
+            DummyForGeneratingTypes.aiToolName.COMPLETE_NOTE_DETAILS
+          ) {
+            const contentToAppend = functionArgs as NoteDetailsCompletion
+            await context.appendNoteDetails(
+              contentToAppend!.completion,
+              response.thread_id!,
+              response.id!,
+              toolCall.id!
+            )
+          } else if (
+            toolCall.function!.name ===
+            DummyForGeneratingTypes.aiToolName.SUGGEST_NOTE_TOPIC_TITLE
+          ) {
+            const titleGeneration = functionArgs as TopicTitleReplacement
+            await context.setTopicTitle(
+              titleGeneration.newTopic,
+              response.thread_id!,
+              response.id!,
+              toolCall.id!
+            )
+          }
+        } catch (_e) {
+          // later
         }
       },
     },

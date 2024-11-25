@@ -205,6 +205,11 @@ const handleSendMessage = async (
   }
 }
 
+const toolCallResolver = ref<{
+  resolve: (result: ToolCallResult) => void
+  reject: (error: Error) => void
+} | null>(null)
+
 const getAiReply = async () => {
   const aiActionContext: AiActionContext = {
     set(text: string) {
@@ -230,13 +235,8 @@ const getAiReply = async () => {
       completionSuggestion.value = completion
       pendingToolCall = { threadId, runId, toolCallId }
 
-      return new Promise<ToolCallResult>((resolve) => {
-        const unwatch = watch([completionSuggestion], () => {
-          if (!completionSuggestion.value) {
-            unwatch()
-            resolve({ status: "accepted" })
-          }
-        })
+      return new Promise<ToolCallResult>((resolve, reject) => {
+        toolCallResolver.value = { resolve, reject }
       })
     },
     async setTopicTitle(
@@ -248,13 +248,8 @@ const getAiReply = async () => {
       topicTitleSuggestion.value = title
       pendingToolCall = { threadId, runId, toolCallId }
 
-      return new Promise<ToolCallResult>((resolve) => {
-        const unwatch = watch([topicTitleSuggestion], () => {
-          if (!topicTitleSuggestion.value) {
-            unwatch()
-            resolve({ status: "accepted" })
-          }
-        })
+      return new Promise<ToolCallResult>((resolve, reject) => {
+        toolCallResolver.value = { resolve, reject }
       })
     },
   }
@@ -299,6 +294,10 @@ const handleToolCallAccept = async (action: (note: Note) => Promise<void>) => {
       [toolCallId]: { status: "accepted" },
     })
 
+    const result: ToolCallResult = { status: "accepted" }
+    toolCallResolver.value?.resolve(result)
+    toolCallResolver.value = null
+
     completionSuggestion.value = undefined
     topicTitleSuggestion.value = undefined
     pendingToolCall = undefined
@@ -333,6 +332,10 @@ const handleReject = async () => {
     isProcessingToolCall.value = true
     const { threadId, runId } = pendingToolCall
     await managedApi.restAiController.cancelRun(threadId, runId)
+
+    const error = new Error("Tool call was rejected")
+    toolCallResolver.value?.reject(error)
+    toolCallResolver.value = null
 
     completionSuggestion.value = undefined
     topicTitleSuggestion.value = undefined
