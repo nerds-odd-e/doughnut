@@ -101,9 +101,6 @@ const isActiveRoute = (routeNames: string[]) => {
   height: 100vh;
   align-items: center;
   color: #e0e0e0;
-  position: sticky;
-  top: 0;
-  flex-shrink: 0;
 }
 
 .sidebar-container {
