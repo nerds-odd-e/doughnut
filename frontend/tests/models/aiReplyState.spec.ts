@@ -279,7 +279,7 @@ describe("aiReplyState", () => {
       mockContext.unknownRequest.mockResolvedValue({ status: "skipped" })
 
       const states = createAiReplyStates(mockContext, mockAiController)
-      await states["thread.run.requires_action"].handleEvent(
+      await states["thread.run.requires_action"]?.handleEvent(
         JSON.stringify(run)
       )
 
