@@ -23,13 +23,13 @@ export interface AiActionContext {
     threadId: string,
     runId: string,
     toolCallId: string
-  ) => Promise<void>
+  ) => Promise<ToolCallResult>
   setTopicTitle: (
     title: string,
     threadId: string,
     runId: string,
     toolCallId: string
-  ) => Promise<void>
+  ) => Promise<ToolCallResult>
 }
 
 export const createAiReplyStates = (

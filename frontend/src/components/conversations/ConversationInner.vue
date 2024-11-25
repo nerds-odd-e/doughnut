@@ -115,6 +115,7 @@ import type {
   ConversationMessage,
   Conversation,
   Note,
+  ToolCallResult,
 } from "@/generated/backend"
 import SvgRobot from "@/components/svgs/SvgRobot.vue"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
@@ -228,6 +229,15 @@ const getAiReply = async () => {
     ) {
       completionSuggestion.value = completion
       pendingToolCall = { threadId, runId, toolCallId }
+
+      return new Promise<ToolCallResult>((resolve) => {
+        const unwatch = watch([completionSuggestion], () => {
+          if (!completionSuggestion.value) {
+            unwatch()
+            resolve({ status: "accepted" })
+          }
+        })
+      })
     },
     async setTopicTitle(
       title: string,
@@ -237,6 +247,15 @@ const getAiReply = async () => {
     ) {
       topicTitleSuggestion.value = title
       pendingToolCall = { threadId, runId, toolCallId }
+
+      return new Promise<ToolCallResult>((resolve) => {
+        const unwatch = watch([topicTitleSuggestion], () => {
+          if (!topicTitleSuggestion.value) {
+            unwatch()
+            resolve({ status: "accepted" })
+          }
+        })
+      })
     },
   }
 
