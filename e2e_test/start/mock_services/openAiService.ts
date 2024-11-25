@@ -48,9 +48,9 @@ const openAiService = () => {
       return serviceMocker.stubGetterWithError500Response(`/*`, {})
     },
 
-    stubToolCallSubmission() {
+    stubToolCallSubmission(threadId: string, runId: string) {
       serviceMocker.stubPoster(
-        `/threads/undefined/runs/run1/submit_tool_outputs`,
+        `/threads/${threadId}/runs/${runId}/submit_tool_outputs`,
         {}
       )
       return this
@@ -190,7 +190,7 @@ const openAiService = () => {
         bodyToMatch.assistant_id = assistantId
       }
       serviceMocker.mockPostMatchsAndNotMatches(
-        `/threads/${threadId}/runs`,
+        `/threads/${threadId}/runs$`,
         bodyToMatch,
         undefined,
         runStreamData.map((event) => buildRunStreamEvent(threadId, event)),

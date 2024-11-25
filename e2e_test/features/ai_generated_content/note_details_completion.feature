@@ -16,7 +16,7 @@ Feature: Note details completion
 
   Scenario Outline: Completing Note Details Using OpenAI
     Given OpenAI assistant will reply below for user messages in a stream run:
-      | user message                      | response type   | assistant reply                 | run id |
+      | user message                      | response type   | assistant reply                   | run id |
       | Please complete the note details. | requires action | {"completion": " vigorous city."} | run1   |
     And OpenAI assistant can accept tool call results submission and run cancellation for run "run1"
     When I request to complete the details for the note "Taipei"
@@ -25,6 +25,6 @@ Feature: Note details completion
     Then the note details on the current page should be "<expected_details>"
 
     Examples:
-      | action | expected_details              |
-      | accept | It is a vigorous city.       |
-      | reject | It is a                      |
+      | action | expected_details       |
+      | accept | It is a vigorous city. |
+      | reject | It is a                |

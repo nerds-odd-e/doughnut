@@ -92,7 +92,7 @@ Given(
   (runId: string) => {
     mock_services
       .openAi()
-      .stubToolCallSubmission()
+      .stubToolCallSubmission('thread-123', runId)
       .stubRunCancellation('thread-123', runId)
   }
 )
