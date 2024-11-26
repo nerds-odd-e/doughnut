@@ -2,7 +2,6 @@ package com.odde.doughnut.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.AudioUploadDTO;
-import com.odde.doughnut.entities.*;
 import com.odde.doughnut.services.ai.*;
 import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
@@ -18,9 +17,9 @@ public final class NotebookAssistantForNoteService {
   private final NotebookAssistantForNoteService1 notebookAssistantForNoteService;
 
   public NotebookAssistantForNoteService(
-      OpenAiAssistant openAiAssistant, Note note, GlobalSettingsService globalSettingsService) {
-    this.notebookAssistantForNoteService =
-        new NotebookAssistantForNoteService1(openAiAssistant, note);
+      GlobalSettingsService globalSettingsService,
+      NotebookAssistantForNoteService1 notebookAssistantForNoteService1) {
+    this.notebookAssistantForNoteService = notebookAssistantForNoteService1;
     this.globalSettingsService = globalSettingsService;
   }
 

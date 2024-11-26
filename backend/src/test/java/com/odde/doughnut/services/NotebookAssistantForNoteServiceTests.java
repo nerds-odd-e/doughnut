@@ -56,7 +56,9 @@ class NotebookAssistantForNoteServiceTests {
     // Initialize common services
     assistant = new OpenAiAssistant(new OpenAiApiHandler(openAiApi), "ass-id");
     globalSettingsService = new GlobalSettingsService(makeMe.modelFactoryService);
-    service = new NotebookAssistantForNoteService(assistant, testNote, globalSettingsService);
+    service =
+        new NotebookAssistantForNoteService(
+            globalSettingsService, new NotebookAssistantForNoteService1(assistant, testNote));
   }
 
   @Nested

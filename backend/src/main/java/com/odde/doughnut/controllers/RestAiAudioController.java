@@ -77,7 +77,7 @@ class RestAiAudioController {
         srtProcessor.process(transcriptionFromAudio, audioUpload.isMidSpeech());
     TextFromAudioWithCallInfo textFromAudioWithCallInfo =
         notebookAssistantForNoteServiceFactory
-            .create(note)
+            .createNoteAutomationService(note)
             .audioTranscriptionToArticle(processedResult.getProcessedSRT(), audioUpload);
     textFromAudioWithCallInfo.setRawSRT(processedResult.getProcessedSRT());
     textFromAudioWithCallInfo.setEndTimestamp(processedResult.getEndTimestamp());

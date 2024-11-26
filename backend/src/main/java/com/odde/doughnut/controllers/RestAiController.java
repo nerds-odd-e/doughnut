@@ -75,7 +75,10 @@ public class RestAiController {
       @PathVariable(value = "note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException, JsonProcessingException {
     currentUser.assertAuthorization(note);
-    String title = notebookAssistantForNoteServiceFactory.create(note).suggestTopicTitle();
+    String title =
+        notebookAssistantForNoteServiceFactory
+            .createNoteAutomationService(note)
+            .suggestTopicTitle();
     return new SuggestedTopicDTO(title);
   }
 }

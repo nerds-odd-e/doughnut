@@ -17,7 +17,8 @@ public record AiQuestionGenerator(
   public MCQWithAnswer getAiGeneratedQuestion(Note note) {
     NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory =
         new NotebookAssistantForNoteServiceFactory(openAiApi, globalSettingsService);
-    NotebookAssistantForNoteService service = notebookAssistantForNoteServiceFactory.create(note);
+    NotebookAssistantForNoteService service =
+        notebookAssistantForNoteServiceFactory.createNoteAutomationService(note);
     try {
       return service.generateQuestion();
     } catch (JsonProcessingException e) {
