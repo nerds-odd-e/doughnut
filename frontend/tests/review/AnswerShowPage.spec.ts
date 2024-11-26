@@ -3,7 +3,6 @@ import AnsweredQuestionPage from "@/pages/AnsweredQuestionPage.vue"
 import helper from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
 import type { AnsweredQuestion } from "@/generated/backend"
-import { useRouter, type Router } from "vue-router"
 
 const mockedPush = vi.fn()
 vitest.mock("vue-router", () => ({
