@@ -4,6 +4,7 @@ import com.odde.doughnut.entities.AssessmentQuestionInstance;
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.ConversationMessage;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.ReviewQuestionInstance;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -27,6 +28,15 @@ public class ConversationService {
       AssessmentQuestionInstance assessmentQuestionInstance, User initiator) {
     Conversation conversation = new Conversation();
     conversation.setAssessmentQuestionInstance(assessmentQuestionInstance);
+    conversation.setConversationInitiator(initiator);
+    modelFactoryService.conversationRepository.save(conversation);
+    return conversation;
+  }
+
+  public Conversation startConversation(
+      ReviewQuestionInstance reviewQuestionInstance, User initiator) {
+    Conversation conversation = new Conversation();
+    conversation.setReviewQuestionInstance(reviewQuestionInstance);
     conversation.setConversationInitiator(initiator);
     modelFactoryService.conversationRepository.save(conversation);
     return conversation;

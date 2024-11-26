@@ -4,6 +4,7 @@ import com.odde.doughnut.entities.AssessmentQuestionInstance;
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.ConversationMessage;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.ReviewQuestionInstance;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
@@ -124,5 +125,16 @@ public class RestConversationMessageController {
       @PathVariable("note") @Schema(type = "integer") Note note) {
     currentUser.assertLoggedIn();
     return conversationService.getConversationsAboutNote(note, currentUser.getEntity());
+  }
+
+  @PostMapping("/review-question/{reviewQuestion}")
+  public Conversation startConversationAboutReviewQuestion(
+      @RequestBody String feedback,
+      @PathVariable("reviewQuestion") @Schema(type = "integer")
+          ReviewQuestionInstance reviewQuestionInstance) {
+    Conversation conversation =
+        conversationService.startConversation(reviewQuestionInstance, currentUser.getEntity());
+    conversationService.addMessageToConversation(conversation, currentUser.getEntity(), feedback);
+    return conversation;
   }
 }

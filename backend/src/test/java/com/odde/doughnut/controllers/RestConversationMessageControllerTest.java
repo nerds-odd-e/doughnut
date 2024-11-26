@@ -417,4 +417,47 @@ class RestConversationMessageControllerTest {
       assertEquals(HttpStatusCode.valueOf(401), exception.getStatusCode());
     }
   }
+
+  @Nested
+  class StartConversationAboutReviewQuestionTests {
+    ReviewQuestionInstance reviewQuestionInstance;
+    String feedback = "This is a feedback about review question";
+
+    @BeforeEach
+    void setup() {
+      Note note = makeMe.aNote().please();
+      reviewQuestionInstance = makeMe.aReviewQuestionInstance().spellingQuestionOf(note).please();
+    }
+
+    @Test
+    void shouldStartConversation() {
+      controller.startConversationAboutReviewQuestion(feedback, reviewQuestionInstance);
+      List<Conversation> conversations =
+          (List<Conversation>) modelFactoryService.conversationRepository.findAll();
+      assertEquals(1, conversations.size());
+      Conversation conversation = conversations.getFirst();
+      assertEquals(conversation.getConversationInitiator(), currentUser.getEntity());
+    }
+
+    @Test
+    void shouldAddMessageToConversation() {
+      Conversation conversation =
+          controller.startConversationAboutReviewQuestion(feedback, reviewQuestionInstance);
+      makeMe.refresh(conversation);
+      List<ConversationMessage> conversationMessages = conversation.getConversationMessages();
+      assertEquals(1, conversationMessages.size());
+      ConversationMessage message = conversationMessages.getFirst();
+      assertEquals(message.getMessage(), feedback);
+    }
+
+    @Test
+    void shouldSetReviewQuestionInstanceAsSubject() {
+      Conversation conversation =
+          controller.startConversationAboutReviewQuestion(feedback, reviewQuestionInstance);
+      makeMe.refresh(conversation);
+      assertEquals(reviewQuestionInstance, conversation.getSubject().getReviewQuestionInstance());
+      assertEquals(
+          reviewQuestionInstance.getNotebook().getOwnership(), conversation.getSubjectOwnership());
+    }
+  }
 }

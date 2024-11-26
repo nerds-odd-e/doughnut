@@ -17,8 +17,12 @@ public class ConversationSubject {
   @JoinColumn(name = "note_id", referencedColumnName = "id")
   private Note note;
 
+  @ManyToOne
+  @JoinColumn(name = "review_question_instance_id", referencedColumnName = "id")
+  private ReviewQuestionInstance reviewQuestionInstance;
+
   @JsonIgnore
   public boolean isEmpty() {
-    return assessmentQuestionInstance == null && note == null;
+    return assessmentQuestionInstance == null && note == null && reviewQuestionInstance == null;
   }
 }

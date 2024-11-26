@@ -61,6 +61,12 @@ public class Conversation extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
+  public void setReviewQuestionInstance(ReviewQuestionInstance reviewQuestionInstance) {
+    this.subject.setReviewQuestionInstance(reviewQuestionInstance);
+    this.subjectOwnership = reviewQuestionInstance.getNotebook().getOwnership();
+  }
+
+  @JsonIgnore
   public List<ConversationMessage> getUnseenMessagesByAssistant() {
     return getConversationMessages().stream()
         .filter(
