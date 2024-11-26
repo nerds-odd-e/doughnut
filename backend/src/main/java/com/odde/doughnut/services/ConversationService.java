@@ -1,5 +1,7 @@
 package com.odde.doughnut.services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.odde.doughnut.entities.AssessmentQuestionInstance;
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.ConversationMessage;
@@ -39,6 +41,26 @@ public class ConversationService {
     conversation.setReviewQuestionInstance(reviewQuestionInstance);
     conversation.setConversationInitiator(initiator);
     modelFactoryService.conversationRepository.save(conversation);
+
+    // Create initial message with question details
+    ObjectMapper mapper = new ObjectMapper();
+    ObjectNode questionDetails = mapper.createObjectNode();
+    questionDetails.put("question", reviewQuestionInstance.getBareQuestion().toString());
+    questionDetails.put(
+        "correctAnswerIndex",
+        reviewQuestionInstance.getPredefinedQuestion().getCorrectAnswerIndex());
+
+    // Only add answer details if an answer exists
+    if (reviewQuestionInstance.getAnswer() != null) {
+      questionDetails.put("userAnswer", reviewQuestionInstance.getAnswer().getChoiceIndex());
+      questionDetails.put("isCorrect", reviewQuestionInstance.getAnswer().getCorrect());
+    }
+
+    addMessageToConversation(
+        conversation,
+        null, // null user indicates system message
+        questionDetails.toPrettyString());
+
     return conversation;
   }
 

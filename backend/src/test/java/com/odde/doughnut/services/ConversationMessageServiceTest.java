@@ -90,4 +90,46 @@ class ConversationMessageServiceTest {
           .please();
     }
   }
+
+  @Nested
+  class ReviewQuestionConversationTest {
+    private ReviewQuestionInstance reviewQuestionInstance;
+    private Note note;
+
+    @BeforeEach
+    void setup() {
+      note = makeMe.aNote().creatorAndOwner(currentUser).please();
+      reviewQuestionInstance = makeMe.aReviewQuestionInstance().answerChoiceIndex(1).please();
+    }
+
+    @Test
+    void shouldCreateConversationWithInitialSystemMessage() {
+      Conversation conversation =
+          conversationService.startConversation(reviewQuestionInstance, currentUser.getEntity());
+
+      makeMe.refresh(conversation);
+      List<ConversationMessage> messages = conversation.getConversationMessages();
+
+      assertEquals(1, messages.size());
+      ConversationMessage systemMessage = messages.getFirst();
+      assertNull(systemMessage.getSender()); // System message has null sender
+
+      String messageContent = systemMessage.getMessage();
+      assertTrue(messageContent.contains("\"question\""));
+      assertTrue(messageContent.contains("\"correctAnswerIndex\": 1"));
+      assertTrue(messageContent.contains("\"userAnswer\": 1"));
+      assertTrue(messageContent.contains("\"isCorrect\": true"));
+    }
+
+    @Test
+    void shouldSetCorrectOwnershipAndSubject() {
+      Conversation conversation =
+          conversationService.startConversation(reviewQuestionInstance, currentUser.getEntity());
+
+      makeMe.refresh(conversation);
+      assertEquals(reviewQuestionInstance, conversation.getSubject().getReviewQuestionInstance());
+      assertEquals(note.getNotebook().getOwnership(), conversation.getSubjectOwnership());
+      assertEquals(currentUser.getEntity(), conversation.getConversationInitiator());
+    }
+  }
 }
