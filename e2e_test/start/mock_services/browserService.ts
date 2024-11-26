@@ -54,30 +54,32 @@ const browser = {
         // Remove biome-ignore as we're adding proper type annotation
         ;(win as Window & typeof globalThis).AudioContext = MockAudioContext
 
-        const port = this.audioWorletPort
         class MockAudioWorkletNode {
-          port = port
+          // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+          port: any
           constructor() {
-            // Only set onmessage if it hasn't been set already
-            if (!this.port.onmessage) {
-              this.port.onmessage = () => {
-                // Handle incoming messages from the audio worklet
-              }
-            }
+            this.port = {}
+            Object.defineProperty(this.port, 'onmessage', {
+              get: () => {
+                return browser.audioWorletPort.onmessage
+              },
+              set: (handler) => {
+                browser.audioWorletPort.onmessage = handler
+              },
+              configurable: true,
+              enumerable: true,
+            })
           }
-          // Add implementations for connect and disconnect
           connect() {
-            // Stub implementation for connecting audio worklet node
             return undefined
           }
           disconnect() {
-            // Stub implementation for disconnecting audio worklet node
             return undefined
           }
         }
-        // Remove biome-ignore as we're adding proper type annotation
         ;(win as Window & typeof globalThis).AudioWorkletNode =
           MockAudioWorkletNode
+
         this.log.push('mocking audio worklet done')
         resolve()
       })
