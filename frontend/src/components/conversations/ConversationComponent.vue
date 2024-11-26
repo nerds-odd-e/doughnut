@@ -17,6 +17,13 @@
           assessmentQuestionInstance: conversation.subject?.assessmentQuestionInstance,
         }"
       />
+      <AnsweredQuestionComponent
+        v-else-if="conversation.subject?.answeredQuestion"
+        v-bind="{
+          answeredQuestion: conversation.subject.answeredQuestion,
+          storageAccessor,
+        }"
+      />
     </div>
 
     <!-- Lower half -->
@@ -42,6 +49,7 @@
 import type { User, Conversation } from "@/generated/backend"
 import NoteShow from "@/components/notes/NoteShow.vue"
 import AssessmentQuestion from "@/components/assessment/AssessmentQuestion.vue"
+import AnsweredQuestionComponent from "@/components/review/AnsweredQuestionComponent.vue"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import { useRouter } from "vue-router"
 import { ref, onMounted } from "vue"

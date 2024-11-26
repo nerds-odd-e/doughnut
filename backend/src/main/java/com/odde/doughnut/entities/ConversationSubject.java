@@ -18,19 +18,11 @@ public class ConversationSubject {
   private Note note;
 
   @ManyToOne
-  @JsonIgnore
   @JoinColumn(name = "review_question_instance_id", referencedColumnName = "id")
   private ReviewQuestionInstance reviewQuestionInstance;
 
   @JsonIgnore
   public boolean isEmpty() {
     return assessmentQuestionInstance == null && note == null && reviewQuestionInstance == null;
-  }
-
-  public AnsweredQuestion getAnsweredQuestion() {
-    if (reviewQuestionInstance == null) {
-      return null;
-    }
-    return reviewQuestionInstance.getAnsweredQuestion();
   }
 }
