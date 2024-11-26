@@ -113,6 +113,8 @@ import SvgShop from "@/components/svgs/SvgShop.vue"
 import SvgPeople from "@/components/svgs/SvgPeople.vue"
 import SvgChat from "@/components/svgs/SvgChat.vue"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
+import UserProfileDialog from "./UserProfileDialog.vue"
+import useLoadingApi from "@/managedApi/useLoadingApi"
 
 defineProps({
   user: { type: Object as PropType<User> },
@@ -125,8 +127,11 @@ const isActiveRoute = (routeNames: string[]) => {
   return routeNames.includes(route.name as string)
 }
 
-const logout = () => {
-  // Implement logout functionality
+const { managedApi } = useLoadingApi()
+
+const logout = async () => {
+  await managedApi.logout()
+  window.location.href = "/d/bazaar"
 }
 </script>
 
