@@ -9,7 +9,7 @@ import com.theokanning.openai.assistants.run.RequiredAction;
 import com.theokanning.openai.assistants.run.Run;
 import com.theokanning.openai.assistants.run.ToolCall;
 
-public final class OpenAiRunRequiredAction extends OpenAiRun {
+public final class OpenAiRunRequiredAction extends OpenAiRun implements OpenAiRunResult {
   private final ObjectMapper objectMapper =
       new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 

@@ -81,16 +81,21 @@ public final class NotebookAssistantForNoteService {
     String instructions =
         "Please suggest a better topic title for the note by calling the function. Don't change it if it's already good enough.";
 
-    TopicTitleReplacement argument =
-        (TopicTitleReplacement)
-            createThreadWithNoteInfo(List.of())
-                .withTool(AiToolFactory.suggestNoteTopicTitle())
-                .withAdditionalInstructions(instructions)
-                .run()
-                .getToolCallRequiredAction()
-                .cancelRun()
-                .getFirstArgument();
-    return argument.newTopic;
+    OpenAiRunResult result =
+        createThreadWithNoteInfo(List.of())
+            .withTool(AiToolFactory.suggestNoteTopicTitle())
+            .withAdditionalInstructions(instructions)
+            .run()
+            .getRunResult();
+
+    return switch (result) {
+      case OpenAiRunRequiredAction action -> {
+        TopicTitleReplacement argument = (TopicTitleReplacement) action.getFirstArgument();
+        action.cancelRun();
+        yield argument.newTopic;
+      }
+      case OpenAiRunCompleted completed -> null;
+    };
   }
 
   private String appendAdditionalInstructions(String instructions, AudioUploadDTO config) {
@@ -105,13 +110,20 @@ public final class NotebookAssistantForNoteService {
 
   public TextFromAudioWithCallInfo audioTranscriptionToArticle(
       String transcriptionFromAudio, AudioUploadDTO config) throws JsonProcessingException {
-    OpenAiRun toolCallResponse =
-        getOpenAiRunExpectingAction(transcriptionFromAudio, config).getToolCallRequiredAction();
-    final TextFromAudioWithCallInfo textFromAudio = new TextFromAudioWithCallInfo();
-    NoteDetailsCompletion noteDetails = (NoteDetailsCompletion) toolCallResponse.getFirstArgument();
-    textFromAudio.setCompletionMarkdownFromAudio(noteDetails.completion);
-    textFromAudio.setToolCallInfo(toolCallResponse.getToolCallInfo());
-    return textFromAudio;
+    OpenAiRunResult result =
+        getOpenAiRunExpectingAction(transcriptionFromAudio, config).getRunResult();
+
+    return switch (result) {
+      case OpenAiRunRequiredAction action -> {
+        final TextFromAudioWithCallInfo textFromAudio = new TextFromAudioWithCallInfo();
+        NoteDetailsCompletion noteDetails = (NoteDetailsCompletion) action.getFirstArgument();
+        textFromAudio.setCompletionMarkdownFromAudio(noteDetails.completion);
+        textFromAudio.setToolCallInfo(action.getToolCallInfo());
+        yield textFromAudio;
+      }
+      case OpenAiRunCompleted _ ->
+          throw new IllegalStateException("Expected tool call action but got completed run");
+    };
   }
 
   private OpenAiRunExpectingAction getOpenAiRunExpectingAction(
@@ -165,34 +177,33 @@ public final class NotebookAssistantForNoteService {
   }
 
   public MCQWithAnswer generateQuestion() throws JsonProcessingException {
-    /*
-     * The file search will only happen if the request is from a user message.
-     * And also the run instruction will override the default instruction of the assistant.
-     *
-     * So here we pass the question generation instruction to the assistant as a user message,
-     * and leave the instruction for the run out.
-     */
     MessageRequest message =
         MessageRequest.builder()
             .role("user")
             .content(AiToolFactory.mcqWithAnswerAiTool().getMessageBody())
             .build();
-    MCQWithAnswer questionNode =
-        (MCQWithAnswer)
-            createThreadWithNoteInfo(List.of(message))
-                .withTool(AiToolFactory.askSingleAnswerMultipleChoiceQuestion())
-                .withFileSearch()
-                .withModelName(globalSettingsService.globalSettingQuestionGeneration().getValue())
-                .run()
-                .getToolCallRequiredAction()
-                .cancelRun()
-                .getFirstArgument();
 
-    if (questionNode != null
-        && questionNode.getMultipleChoicesQuestion().getStem() != null
-        && !Strings.isBlank(questionNode.getMultipleChoicesQuestion().getStem())) {
-      return questionNode;
-    }
-    return null;
+    OpenAiRunResult result =
+        createThreadWithNoteInfo(List.of(message))
+            .withTool(AiToolFactory.askSingleAnswerMultipleChoiceQuestion())
+            .withFileSearch()
+            .withModelName(globalSettingsService.globalSettingQuestionGeneration().getValue())
+            .run()
+            .getRunResult();
+
+    // Pattern matching with sealed interface
+    return switch (result) {
+      case OpenAiRunRequiredAction action -> {
+        MCQWithAnswer questionNode = (MCQWithAnswer) action.getFirstArgument();
+        action.cancelRun();
+        if (questionNode != null
+            && questionNode.getMultipleChoicesQuestion().getStem() != null
+            && !Strings.isBlank(questionNode.getMultipleChoicesQuestion().getStem())) {
+          yield questionNode;
+        }
+        yield null;
+      }
+      case OpenAiRunCompleted _ -> null;
+    };
   }
 }

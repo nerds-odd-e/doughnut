@@ -2,10 +2,12 @@ package com.odde.doughnut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.odde.doughnut.controllers.dto.AudioUploadDTO;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.OpenAiAssistant;
@@ -132,18 +134,16 @@ class NotebookAssistantForNoteServiceTests {
 
     @Test
     void shouldHandleCompletedRunWithoutAction() throws JsonProcessingException {
-      // Mock AI response for a completed run without requiring action
+      // Mock AI response for a completed run
       openAIAssistantThreadMocker
           .mockCreateRunInProcess("my-run-id")
-          .aCompletedRun() // This will return a run with status "completed" instead of
-          // "requires_action"
-          .mockRetrieveRun()
-          .mockCancelRun("my-run-id"); // need to be removed
+          .aCompletedRun()
+          .mockRetrieveRun();
 
       // Execute and verify
       MCQWithAnswer result = service.generateQuestion();
 
-      // Since the run completed without requiring action, no question was generated
+      // Verify that a completed run returns null
       assertThat(result, is(nullValue()));
     }
 
@@ -155,5 +155,31 @@ class NotebookAssistantForNoteServiceTests {
           .mockRetrieveRun()
           .mockCancelRun("my-run-id");
     }
+  }
+
+  @Test
+  void shouldHandleCompletedRunWhenSuggestingTopicTitle() throws JsonProcessingException {
+    openAIAssistantThreadMocker
+        .mockCreateRunInProcess("my-run-id")
+        .aCompletedRun()
+        .mockRetrieveRun();
+
+    String result = service.suggestTopicTitle();
+
+    assertThat(result, is(nullValue()));
+  }
+
+  @Test
+  void shouldThrowExceptionWhenAudioTranscriptionGetsCompletedRun() {
+    openAIAssistantThreadMocker
+        .mockCreateRunInProcess("my-run-id")
+        .aCompletedRun()
+        .mockRetrieveRun();
+
+    AudioUploadDTO config = new AudioUploadDTO();
+
+    assertThrows(
+        IllegalStateException.class,
+        () -> service.audioTranscriptionToArticle("test transcription", config));
   }
 }

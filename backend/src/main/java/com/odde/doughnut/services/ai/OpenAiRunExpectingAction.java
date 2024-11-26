@@ -16,13 +16,12 @@ public class OpenAiRunExpectingAction {
     this.tool = tool;
   }
 
-  public OpenAiRun getToolCallRequiredAction() {
+  public OpenAiRunResult getRunResult() {
     Run updatedRun =
         openAiApiHandler.retrieveUntilCompletedOrRequiresAction(run.getThreadId(), run);
     if (updatedRun.getStatus().equals("requires_action")) {
       return new OpenAiRunRequiredAction(this.openAiApiHandler, updatedRun, tool);
     }
-    return new OpenAiRunResumed(
-        this.openAiApiHandler, updatedRun.getThreadId(), updatedRun.getId(), tool);
+    return new OpenAiRunCompleted(this.openAiApiHandler, updatedRun, tool);
   }
 }
