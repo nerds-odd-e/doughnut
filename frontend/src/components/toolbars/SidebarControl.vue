@@ -195,6 +195,12 @@ const logout = async () => {
   color: #a0a0a0;
   white-space: nowrap;
   margin-top: 1rem;
+  align-self: center;
+}
+
+a[href="https://odd-e.com"] {
+  align-self: center;
+  margin-bottom: 1rem;
 }
 
 @media (max-width: $tablet-breakpoint) {

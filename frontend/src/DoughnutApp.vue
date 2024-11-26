@@ -100,6 +100,10 @@ onMounted(async () => {
 <style scoped lang="scss">
 @import '@/styles/_variables.scss';
 
+$sidebar-width: 64px;
+$sidebar-height-tablet: 70px;
+$sidebar-height-mobile: 55px;
+
 .app-container {
   display: flex;
   min-height: 100vh;
@@ -110,7 +114,7 @@ onMounted(async () => {
   background-color: #2d2d2d;
   flex-direction: column;
   height: 100vh;
-  width: 64px;
+  width: $sidebar-width;
   color: #e0e0e0;
   position: fixed;
   z-index: 10000;
@@ -120,7 +124,7 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  margin-left: 64px;
+  margin-left: $sidebar-width;
 }
 
 .sticky-top {
@@ -145,24 +149,24 @@ onMounted(async () => {
     left: 0;
     flex-direction: row;
     width: 100%;
-    height: 70px;
+    height: $sidebar-height-tablet;
     padding: 0.5rem;
     z-index: 200;
   }
 
   .path-and-content {
     margin-left: 0;
-    margin-top: 70px;
+    margin-top: $sidebar-height-tablet;
   }
 }
 
 @media (max-width: $mobile-breakpoint) {
   .sidebar-control {
-    height: 55px;
+    height: $sidebar-height-mobile;
   }
 
   .path-and-content {
-    margin-top: 55px;
+    margin-top: $sidebar-height-mobile;
   }
 }
 </style>
