@@ -71,16 +71,18 @@ onMounted(async () => {
       :user="user"
       @update-user="user = $event"
     />
-    <div class="main-content">
+    <div class="path-and-content">
       <GlobalBar
         v-bind="{ storageAccessor, user, apiStatus }"
         @update-user="user = $event"
         @clear-error-message="clearErrorMessage($event)"
       />
-      <UserNewRegisterPage v-if="newUser" @update-user="user = $event" />
-      <template v-else-if="userLoaded">
-        <router-view v-bind="routeViewProps" />
-      </template>
+      <div class="main-content">
+        <UserNewRegisterPage v-if="newUser" @update-user="user = $event" />
+        <template v-else-if="userLoaded">
+          <router-view v-bind="routeViewProps" />
+        </template>
+      </div>
     </div>
   </div>
   <TestMenu
@@ -96,7 +98,7 @@ onMounted(async () => {
   display: flex;
 }
 
-.main-content {
+.path-and-content {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
