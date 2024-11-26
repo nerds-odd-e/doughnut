@@ -240,7 +240,6 @@ declare module 'vue' {
     Tool: typeof import('./src/components/svgs/link_types/Tool.vue')['default']
     ToolbarOver: typeof import('./src/components/commons/ToolbarOver.vue')['default']
     UrlFormBody: typeof import('./src/components/notes/accessory/UrlFormBody.vue')['default']
-    UserActionsButton: typeof import('./src/components/toolbars/UserActionsButton.vue')['default']
     UserProfileDialog: typeof import('./src/components/toolbars/UserProfileDialog.vue')['default']
     Waveform: typeof import('./src/components/notes/accessory/Waveform.vue')['default']
     WikidataAssociationDialog: typeof import('./src/components/notes/WikidataAssociationDialog.vue')['default']
