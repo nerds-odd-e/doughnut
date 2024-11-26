@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NotebookAssistantForNoteService1 {
-  protected final OpenAiAssistant assistantService;
-  protected final Note note;
+  private final OpenAiAssistant assistantService;
+  private final Note note;
 
   public NotebookAssistantForNoteService1(OpenAiAssistant openAiAssistant, Note note) {
     this.assistantService = openAiAssistant;

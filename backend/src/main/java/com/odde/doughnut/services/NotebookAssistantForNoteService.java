@@ -16,12 +16,17 @@ import java.util.Map;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-public final class NotebookAssistantForNoteService extends NotebookAssistantForNoteService1 {
+public final class NotebookAssistantForNoteService {
   private final GlobalSettingsService globalSettingsService;
+  private final NotebookAssistantForNoteService1 notebookAssistantForNoteService1;
+  private final OpenAiAssistant assistantService;
+  private final Note note;
 
   public NotebookAssistantForNoteService(
       OpenAiAssistant openAiAssistant, Note note, GlobalSettingsService globalSettingsService) {
-    super(openAiAssistant, note);
+    this.assistantService = openAiAssistant;
+    this.note = note;
+    notebookAssistantForNoteService1 = new NotebookAssistantForNoteService1(openAiAssistant, note);
     this.globalSettingsService = globalSettingsService;
   }
 
@@ -56,7 +61,7 @@ public final class NotebookAssistantForNoteService extends NotebookAssistantForN
       Conversation conversation, ConversationService conversationService) {
     AssistantThread thread;
     if (conversation.getAiAssistantThreadId() == null) {
-      thread = createThreadWithNoteInfo(List.of());
+      thread = notebookAssistantForNoteService1.createThreadWithNoteInfo(List.of());
       conversationService.setConversationAiAssistantThreadId(conversation, thread.getThreadId());
     } else {
       thread = assistantService.getThread(conversation.getAiAssistantThreadId());
@@ -64,23 +69,19 @@ public final class NotebookAssistantForNoteService extends NotebookAssistantForN
     return thread;
   }
 
-  // Common method to create and run thread with tools
-  private OpenAiRunResult createAndRunThread(
-      List<MessageRequest> messages, AiTool tool, String instructions) {
-    return createThreadWithNoteInfo(messages)
-        .withTool(tool)
-        .withAdditionalInstructions(instructions)
-        .run()
-        .getRunResult();
-  }
-
   public String suggestTopicTitle() throws JsonProcessingException {
     String instructions =
         "Please suggest a better topic title for the note by calling the function. Don't change it if it's already good enough.";
 
+    AiTool tool = AiToolFactory.suggestNoteTopicTitle();
     TopicTitleReplacement replacement =
-        createAndRunThread(List.of(), AiToolFactory.suggestNoteTopicTitle(), instructions)
-            .processRunResult(TopicTitleReplacement.class);
+        notebookAssistantForNoteService1
+            .createThreadWithNoteInfo(List.of())
+            .withTool(tool)
+            .withAdditionalInstructions(instructions)
+            .run()
+            .getRunResult()
+            .getAssumedToolCallArgument(TopicTitleReplacement.class);
     return replacement != null ? replacement.newTopic : null;
   }
 
@@ -92,13 +93,14 @@ public final class NotebookAssistantForNoteService extends NotebookAssistantForN
             .build();
 
     MCQWithAnswer question =
-        createThreadWithNoteInfo(List.of(message))
+        notebookAssistantForNoteService1
+            .createThreadWithNoteInfo(List.of(message))
             .withTool(AiToolFactory.askSingleAnswerMultipleChoiceQuestion())
             .withFileSearch()
             .withModelName(globalSettingsService.globalSettingQuestionGeneration().getValue())
             .run()
             .getRunResult()
-            .processRunResult(MCQWithAnswer.class);
+            .getAssumedToolCallArgument(MCQWithAnswer.class);
     if (question != null
         && question.getMultipleChoicesQuestion().getStem() != null
         && !Strings.isBlank(question.getMultipleChoicesQuestion().getStem())) {
@@ -179,7 +181,8 @@ public final class NotebookAssistantForNoteService extends NotebookAssistantForN
 
     instructions = appendAdditionalInstructions(instructions, config);
 
-    return createThreadWithNoteInfo(List.of(message))
+    return notebookAssistantForNoteService1
+        .createThreadWithNoteInfo(List.of(message))
         .withTool(AiToolFactory.completeNoteDetails())
         .withAdditionalInstructions(instructions)
         .run();

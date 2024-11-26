@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 public sealed interface OpenAiRunResult permits OpenAiRunRequiredAction, OpenAiRunCompleted {
   // Common method to handle OpenAiRunResult processing
-  default <T> T processRunResult(Class<T> expectedType) throws JsonProcessingException {
+  default <T> T getAssumedToolCallArgument(Class<T> expectedType) throws JsonProcessingException {
     return switch (this) {
       case OpenAiRunRequiredAction action -> {
         T argument = expectedType.cast(action.getFirstArgument());
