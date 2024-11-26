@@ -26,23 +26,31 @@ public class ConversationService {
 
   private final ModelFactoryService modelFactoryService;
 
-  public Conversation startConversation(
-      AssessmentQuestionInstance assessmentQuestionInstance, User initiator) {
+  private Conversation initializeConversation(User initiator) {
     Conversation conversation = new Conversation();
-    conversation.setAssessmentQuestionInstance(assessmentQuestionInstance);
     conversation.setConversationInitiator(initiator);
-    modelFactoryService.conversationRepository.save(conversation);
     return conversation;
   }
 
   public Conversation startConversation(
+      AssessmentQuestionInstance assessmentQuestionInstance, User initiator) {
+    Conversation conversation = initializeConversation(initiator);
+    conversation.setAssessmentQuestionInstance(assessmentQuestionInstance);
+    return modelFactoryService.conversationRepository.save(conversation);
+  }
+
+  public Conversation startConversation(
       ReviewQuestionInstance reviewQuestionInstance, User initiator) {
-    Conversation conversation = new Conversation();
+    Conversation conversation = initializeConversation(initiator);
     conversation.setReviewQuestionInstance(reviewQuestionInstance);
-    conversation.setConversationInitiator(initiator);
     modelFactoryService.conversationRepository.save(conversation);
 
-    // Create initial message with question details
+    addQuestionDetailsMessage(conversation, reviewQuestionInstance);
+    return conversation;
+  }
+
+  private void addQuestionDetailsMessage(
+      Conversation conversation, ReviewQuestionInstance reviewQuestionInstance) {
     ObjectMapper mapper = new ObjectMapper();
     ObjectNode questionDetails = mapper.createObjectNode();
     questionDetails.put("question", reviewQuestionInstance.getBareQuestion().toString());
@@ -50,24 +58,17 @@ public class ConversationService {
         "correctAnswerIndex",
         reviewQuestionInstance.getPredefinedQuestion().getCorrectAnswerIndex());
 
-    // Only add answer details if an answer exists
     if (reviewQuestionInstance.getAnswer() != null) {
       questionDetails.put("userAnswer", reviewQuestionInstance.getAnswer().getChoiceIndex());
       questionDetails.put("isCorrect", reviewQuestionInstance.getAnswer().getCorrect());
     }
 
-    addMessageToConversation(
-        conversation,
-        null, // null user indicates system message
-        questionDetails.toPrettyString());
-
-    return conversation;
+    addMessageToConversation(conversation, null, questionDetails.toPrettyString());
   }
 
   public Conversation startConversationOfNote(Note note, User initiator, String message) {
-    Conversation conversation = new Conversation();
+    Conversation conversation = initializeConversation(initiator);
     conversation.setNote(note);
-    conversation.setConversationInitiator(initiator);
     modelFactoryService.conversationRepository.save(conversation);
     addMessageToConversation(conversation, initiator, message);
     return conversation;
