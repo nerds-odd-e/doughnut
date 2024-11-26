@@ -25,4 +25,8 @@ public class NotebookAssistantForNoteService1 {
     }
     return assistantService.createThread(messages);
   }
+
+  public AssistantThread getThread(String threadId) {
+    return assistantService.getThread(threadId);
+  }
 }

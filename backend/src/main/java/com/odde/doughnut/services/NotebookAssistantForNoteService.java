@@ -19,12 +19,10 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 public final class NotebookAssistantForNoteService {
   private final GlobalSettingsService globalSettingsService;
   private final NotebookAssistantForNoteService1 notebookAssistantForNoteService1;
-  private final OpenAiAssistant assistantService;
   private final Note note;
 
   public NotebookAssistantForNoteService(
       OpenAiAssistant openAiAssistant, Note note, GlobalSettingsService globalSettingsService) {
-    this.assistantService = openAiAssistant;
     this.note = note;
     notebookAssistantForNoteService1 = new NotebookAssistantForNoteService1(openAiAssistant, note);
     this.globalSettingsService = globalSettingsService;
@@ -64,7 +62,7 @@ public final class NotebookAssistantForNoteService {
       thread = notebookAssistantForNoteService1.createThreadWithNoteInfo(List.of());
       conversationService.setConversationAiAssistantThreadId(conversation, thread.getThreadId());
     } else {
-      thread = assistantService.getThread(conversation.getAiAssistantThreadId());
+      thread = notebookAssistantForNoteService1.getThread(conversation.getAiAssistantThreadId());
     }
     return thread;
   }
@@ -121,24 +119,8 @@ public final class NotebookAssistantForNoteService {
 
   public TextFromAudioWithCallInfo audioTranscriptionToArticle(
       String transcriptionFromAudio, AudioUploadDTO config) throws JsonProcessingException {
-    OpenAiRunResult result =
-        getOpenAiRunExpectingAction(transcriptionFromAudio, config).getRunResult();
-
-    return switch (result) {
-      case OpenAiRunRequiredAction action -> {
-        final TextFromAudioWithCallInfo textFromAudio = new TextFromAudioWithCallInfo();
-        NoteDetailsCompletion noteDetails = (NoteDetailsCompletion) action.getFirstArgument();
-        textFromAudio.setCompletionMarkdownFromAudio(noteDetails.completion);
-        textFromAudio.setToolCallInfo(action.getToolCallInfo());
-        yield textFromAudio;
-      }
-      case OpenAiRunCompleted _ ->
-          throw new IllegalStateException("Expected tool call action but got completed run");
-    };
-  }
-
-  private OpenAiRunExpectingAction getOpenAiRunExpectingAction(
-      String transcriptionFromAudio, AudioUploadDTO config) throws JsonProcessingException {
+    OpenAiRunExpectingAction runExpectingAction = null;
+    boolean finished = false;
     if (config.hasValidThreadAndRunId()) {
       try {
         String instruction =
@@ -150,41 +132,54 @@ public final class NotebookAssistantForNoteService {
         results.put(
             config.getToolCallId(),
             new AudioToTextToolCallResult(instruction, transcriptionFromAudio));
-        return assistantService
-            .getThread(config.getThreadId())
-            .withTool(AiToolFactory.completeNoteDetails())
-            .resumeRun(config.getRunId())
-            .submitToolOutputs(results);
+        runExpectingAction =
+            notebookAssistantForNoteService1
+                .getThread(config.getThreadId())
+                .withTool(AiToolFactory.completeNoteDetails())
+                .resumeRun(config.getRunId())
+                .submitToolOutputs(results);
+        finished = true;
 
       } catch (OpenAiHttpException e) {
         // Fallback to creating a new thread if submission fails
       }
     }
-    return createNewThreadForTranscription(transcriptionFromAudio, config);
-  }
+    if (!finished) {
+      String content =
+          "Here's the new transcription from audio:\n------------\n" + transcriptionFromAudio;
+      MessageRequest message = MessageRequest.builder().role("user").content(content).build();
 
-  private OpenAiRunExpectingAction createNewThreadForTranscription(
-      String transcription, AudioUploadDTO config) {
-    String content = "Here's the new transcription from audio:\n------------\n" + transcription;
-    MessageRequest message = MessageRequest.builder().role("user").content(content).build();
+      String instructions =
+          """
+            You convert SRT-format audio transcriptions into coherent paragraphs with proper punctuation, formatted in Markdown. Guidelines:
+              •	Output only function calls to append the processed text to existing notes, adding necessary whitespace or a new line at the beginning.
+              •	Do not translate the text unless requested.
+              • Do not interpret the text. Do not use reported speech.
+              •	Leave unclear parts unchanged.
+              •	Do not add any information not present in the transcription.
+              •	The transcription may be truncated; do not add new lines or whitespace at the end.
+            """;
 
-    String instructions =
-        """
-          You convert SRT-format audio transcriptions into coherent paragraphs with proper punctuation, formatted in Markdown. Guidelines:
-          	•	Output only function calls to append the processed text to existing notes, adding necessary whitespace or a new line at the beginning.
-          	•	Do not translate the text unless requested.
-          	• Do not interpret the text. Do not use reported speech.
-          	•	Leave unclear parts unchanged.
-          	•	Do not add any information not present in the transcription.
-          	•	The transcription may be truncated; do not add new lines or whitespace at the end.
-          """;
+      instructions = appendAdditionalInstructions(instructions, config);
 
-    instructions = appendAdditionalInstructions(instructions, config);
+      runExpectingAction =
+          notebookAssistantForNoteService1
+              .createThreadWithNoteInfo(List.of(message))
+              .withTool(AiToolFactory.completeNoteDetails())
+              .withAdditionalInstructions(instructions)
+              .run();
+    }
 
-    return notebookAssistantForNoteService1
-        .createThreadWithNoteInfo(List.of(message))
-        .withTool(AiToolFactory.completeNoteDetails())
-        .withAdditionalInstructions(instructions)
-        .run();
+    return switch (runExpectingAction.getRunResult()) {
+      case OpenAiRunRequiredAction action -> {
+        final TextFromAudioWithCallInfo textFromAudio = new TextFromAudioWithCallInfo();
+        NoteDetailsCompletion noteDetails = (NoteDetailsCompletion) action.getFirstArgument();
+        textFromAudio.setCompletionMarkdownFromAudio(noteDetails.completion);
+        textFromAudio.setToolCallInfo(action.getToolCallInfo());
+        yield textFromAudio;
+      }
+      case OpenAiRunCompleted _ ->
+          throw new IllegalStateException("Expected tool call action but got completed run");
+    };
   }
 }
