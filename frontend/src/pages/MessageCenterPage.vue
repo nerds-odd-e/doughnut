@@ -165,7 +165,7 @@ const handleConversationChanged = (conversationId: number) => {
 .message-center-container {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 80px);
+  height: calc(100vh - 180px);
   min-height: 400px; /* Ensure a minimum height on smaller screens */
 }
 
