@@ -103,10 +103,12 @@ onMounted(async () => {
 $sidebar-width: 64px;
 $sidebar-height-tablet: 70px;
 $sidebar-height-mobile: 55px;
+$global-bar-height: 45px;
 
 .app-container {
   display: flex;
   min-height: 100vh;
+  height: 100vh;
 }
 
 .sidebar-control {
@@ -125,18 +127,20 @@ $sidebar-height-mobile: 55px;
   flex-direction: column;
   flex-grow: 1;
   margin-left: $sidebar-width;
+  height: 100vh;
 }
 
 .sticky-top {
   position: sticky;
   top: 0;
   z-index: 100;
+  height: $global-bar-height;
 }
 
 .main-content {
   flex-grow: 1;
   overflow-y: auto;
-  display: grid;
+  height: calc(100vh - #{$global-bar-height});
 }
 
 @media (max-width: $tablet-breakpoint) {
@@ -158,6 +162,11 @@ $sidebar-height-mobile: 55px;
   .path-and-content {
     margin-left: 0;
     margin-top: $sidebar-height-tablet;
+    height: calc(100vh - #{$sidebar-height-tablet});
+  }
+
+  .main-content {
+    height: calc(100vh - #{$sidebar-height-tablet} - #{$global-bar-height});
   }
 }
 
@@ -168,6 +177,11 @@ $sidebar-height-mobile: 55px;
 
   .path-and-content {
     margin-top: $sidebar-height-mobile;
+    height: calc(100vh - #{$sidebar-height-mobile});
+  }
+
+  .main-content {
+    height: calc(100vh - #{$sidebar-height-mobile} - #{$global-bar-height});
   }
 }
 </style>
