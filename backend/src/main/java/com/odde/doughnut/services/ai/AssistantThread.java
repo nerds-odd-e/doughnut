@@ -83,7 +83,7 @@ public class AssistantThread {
     openAiApiHandler.createMessage(threadId, messageRequest);
   }
 
-  public OpenAiRun resumeRun(String runId) {
+  public OpenAiOngoingRun resumeRun(String runId) {
     return new OpenAiRunResumed(openAiApiHandler, threadId, runId, tools.get(0));
   }
 }

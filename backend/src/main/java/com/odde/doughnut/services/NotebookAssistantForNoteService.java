@@ -94,7 +94,7 @@ public final class NotebookAssistantForNoteService {
         action.cancelRun();
         yield argument.newTopic;
       }
-      case OpenAiRunCompleted completed -> null;
+      case OpenAiRunCompleted _ -> null;
     };
   }
 

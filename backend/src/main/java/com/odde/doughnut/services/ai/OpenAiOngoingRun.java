@@ -6,12 +6,12 @@ import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.assistants.run.Run;
 import java.util.Map;
 
-public abstract class OpenAiRun {
+public abstract class OpenAiOngoingRun {
   protected final OpenAiApiHandler openAiApiHandler;
   protected final Run run;
   protected final AiTool tool;
 
-  public OpenAiRun(OpenAiApiHandler openAiApiHandler, Run run, AiTool tool) {
+  public OpenAiOngoingRun(OpenAiApiHandler openAiApiHandler, Run run, AiTool tool) {
     this.openAiApiHandler = openAiApiHandler;
     this.run = run;
     this.tool = tool;
@@ -23,7 +23,7 @@ public abstract class OpenAiRun {
     return new OpenAiRunExpectingAction(openAiApiHandler, currentRun, tool);
   }
 
-  public OpenAiRun cancelRun() {
+  public OpenAiOngoingRun cancelRun() {
     openAiApiHandler.cancelRun(run.getThreadId(), run.getId());
     return this;
   }
@@ -31,8 +31,4 @@ public abstract class OpenAiRun {
   public String getRunId() {
     return run.getId();
   }
-
-  public abstract Object getFirstArgument() throws JsonProcessingException;
-
-  public abstract ToolCallInfo getToolCallInfo();
 }
