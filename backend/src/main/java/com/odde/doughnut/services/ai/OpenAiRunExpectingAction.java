@@ -16,7 +16,7 @@ public class OpenAiRunExpectingAction {
     this.tool = tool;
   }
 
-  public OpenAiRun getToolCallResponse() {
+  public OpenAiRun getToolCallRequiredAction() {
     Run updatedRun =
         openAiApiHandler.retrieveUntilCompletedOrRequiresAction(run.getThreadId(), run);
     if (updatedRun.getStatus().equals("requires_action")) {

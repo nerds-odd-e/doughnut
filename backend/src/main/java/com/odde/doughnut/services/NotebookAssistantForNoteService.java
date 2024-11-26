@@ -87,7 +87,7 @@ public final class NotebookAssistantForNoteService {
                 .withTool(AiToolFactory.suggestNoteTopicTitle())
                 .withAdditionalInstructions(instructions)
                 .run()
-                .getToolCallResponse()
+                .getToolCallRequiredAction()
                 .cancelRun()
                 .getFirstArgument();
     return argument.newTopic;
@@ -106,7 +106,7 @@ public final class NotebookAssistantForNoteService {
   public TextFromAudioWithCallInfo audioTranscriptionToArticle(
       String transcriptionFromAudio, AudioUploadDTO config) throws JsonProcessingException {
     OpenAiRun toolCallResponse =
-        getOpenAiRunExpectingAction(transcriptionFromAudio, config).getToolCallResponse();
+        getOpenAiRunExpectingAction(transcriptionFromAudio, config).getToolCallRequiredAction();
     final TextFromAudioWithCallInfo textFromAudio = new TextFromAudioWithCallInfo();
     NoteDetailsCompletion noteDetails = (NoteDetailsCompletion) toolCallResponse.getFirstArgument();
     textFromAudio.setCompletionMarkdownFromAudio(noteDetails.completion);
@@ -184,7 +184,7 @@ public final class NotebookAssistantForNoteService {
                 .withFileSearch()
                 .withModelName(globalSettingsService.globalSettingQuestionGeneration().getValue())
                 .run()
-                .getToolCallResponse()
+                .getToolCallRequiredAction()
                 .cancelRun()
                 .getFirstArgument();
 
