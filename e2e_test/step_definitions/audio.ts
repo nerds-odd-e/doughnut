@@ -12,7 +12,6 @@ Given('the browser is mocked to give permission to record audio', () => {
 Given(
   'the browser records audio input from the microphone as in {string}',
   (audioFileName: string) => {
-    cy.log(mock_services.browser.getLog())
     cy.wrap(null).then(() => {
       mock_services.browser.receiveAudioFromMicrophone(audioFileName)
     })
