@@ -2,12 +2,12 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { AnsweredQuestion } from './AnsweredQuestion';
 import type { AssessmentQuestionInstance } from './AssessmentQuestionInstance';
 import type { Note } from './Note';
-import type { ReviewQuestionInstance } from './ReviewQuestionInstance';
 export type ConversationSubject = {
     assessmentQuestionInstance?: AssessmentQuestionInstance;
     note?: Note;
-    reviewQuestionInstance?: ReviewQuestionInstance;
+    answeredQuestion?: AnsweredQuestion;
 };
 
