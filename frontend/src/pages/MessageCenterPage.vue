@@ -27,7 +27,7 @@
           </ul>
         </div>
 
-        <div class="main-content" :class="{ 'hide-on-mobile': !showMainContentOnMobile }">
+        <div class="path-and-content" :class="{ 'hide-on-mobile': !showMainContentOnMobile }">
           <div class="mobile-back-button" @click="backToList">
             <span>&larr; Back to conversations</span>
           </div>
@@ -176,7 +176,7 @@ const handleConversationChanged = (conversationId: number) => {
   border-right: 1px solid #e0e0e0; /* Add this line */
 }
 
-.main-content {
+.path-and-content {
   flex: 1 1 auto;
   overflow-y: auto;
   min-height: 200px; /* Ensure minimum height for content */
@@ -194,7 +194,7 @@ const handleConversationChanged = (conversationId: number) => {
     max-height: none; /* Remove max-height limit on larger screens */
   }
 
-  .main-content {
+  .path-and-content {
     flex: 0 0 75%;
   }
 }
@@ -266,7 +266,7 @@ const handleConversationChanged = (conversationId: number) => {
     display: block;
   }
 
-  .sidebar, .main-content {
+  .sidebar, .path-and-content {
     flex: 0 0 100%;
     max-width: 100%;
   }
