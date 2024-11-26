@@ -74,11 +74,13 @@ onMounted(async () => {
       />
     </div>
     <div class="path-and-content">
-      <GlobalBar
-        v-bind="{ storageAccessor, user, apiStatus }"
-        @update-user="user = $event"
-        @clear-error-message="clearErrorMessage($event)"
-      />
+      <div class="sticky-top">
+        <GlobalBar
+          v-bind="{ storageAccessor, user, apiStatus }"
+          @update-user="user = $event"
+          @clear-error-message="clearErrorMessage($event)"
+        />
+      </div>
       <div class="main-content">
         <UserNewRegisterPage v-if="newUser" @update-user="user = $event" />
         <template v-else-if="userLoaded">

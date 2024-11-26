@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar justify-content-between sticky-top bg-white">
+  <nav class="navbar justify-content-between bg-white">
       <div class="d-flex flex-grow-1 justify-content-between">
         <div class="d-flex flex-grow-1" id="head-status" />
         <div class="btn-group btn-group-sm">
