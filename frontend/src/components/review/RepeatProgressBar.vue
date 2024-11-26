@@ -5,7 +5,7 @@
       @resume="$emit('viewLastResult', undefined)"
     >
       <template #buttons>
-        <div class="btn-group">
+        <div class="btn-group btn-group-sm">
           <template v-if="previousResultCursor !== undefined">
             <button
               class="btn large-btn"
@@ -72,8 +72,8 @@ const paused = computed(() => {
 <style lang="scss" scoped>
 .large-btn {
   svg {
-    width: 30px;
-    height: 30px;
+    width: 25px;
+    height: 25px;
   }
   &:disabled {
     opacity: 0.5;
