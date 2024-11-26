@@ -53,13 +53,11 @@ export class RestConversationMessageControllerService {
     }
     /**
      * @param reviewQuestion
-     * @param requestBody
      * @returns Conversation OK
      * @throws ApiError
      */
     public startConversationAboutReviewQuestion(
         reviewQuestion: number,
-        requestBody: string,
     ): CancelablePromise<Conversation> {
         return this.httpRequest.request({
             method: 'POST',
@@ -67,8 +65,6 @@ export class RestConversationMessageControllerService {
             path: {
                 'reviewQuestion': reviewQuestion,
             },
-            body: requestBody,
-            mediaType: 'application/json',
             errors: {
                 500: `Internal Server Error`,
             },

@@ -129,12 +129,8 @@ public class RestConversationMessageController {
 
   @PostMapping("/review-question/{reviewQuestion}")
   public Conversation startConversationAboutReviewQuestion(
-      @RequestBody String feedback,
       @PathVariable("reviewQuestion") @Schema(type = "integer")
           ReviewQuestionInstance reviewQuestionInstance) {
-    Conversation conversation =
-        conversationService.startConversation(reviewQuestionInstance, currentUser.getEntity());
-    conversationService.addMessageToConversation(conversation, currentUser.getEntity(), feedback);
-    return conversation;
+    return conversationService.startConversation(reviewQuestionInstance, currentUser.getEntity());
   }
 }

@@ -61,8 +61,7 @@ const startConversation = async () => {
 
   const conversation =
     await managedApi.restConversationMessageController.startConversationAboutReviewQuestion(
-      answeredQuestion.value.reviewQuestionInstanceId,
-      "I have a question about this review question."
+      answeredQuestion.value.reviewQuestionInstanceId
     )
 
   router.push({

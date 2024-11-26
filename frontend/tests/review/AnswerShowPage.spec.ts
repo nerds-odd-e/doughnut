@@ -77,10 +77,7 @@ describe("repetition page", () => {
         await button.trigger("click")
         await flushPromises()
 
-        expect(mockedStartConversationCall).toHaveBeenCalledWith(
-          1,
-          "I have a question about this review question."
-        )
+        expect(mockedStartConversationCall).toHaveBeenCalledWith(1)
         expect(mockedPush).toHaveBeenCalledWith({
           name: "messageCenter",
           params: { conversationId: 123 },
