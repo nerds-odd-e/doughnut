@@ -99,8 +99,13 @@ public class RestConversationMessageController {
     currentUser.assertAuthorization(conversation);
     try {
       Note note = conversation.getSubject().getNote();
+      if (note == null && conversation.getSubject().getReviewQuestionInstance() != null) {
+        note =
+            conversation.getSubject().getReviewQuestionInstance().getPredefinedQuestion().getNote();
+      }
       if (note == null) {
-        throw new RuntimeException("Only note related conversation can have AI reply");
+        throw new RuntimeException(
+            "Only note or review question related conversation can have AI reply");
       }
       return notebookAssistantForNoteServiceFactory
           .create(note)

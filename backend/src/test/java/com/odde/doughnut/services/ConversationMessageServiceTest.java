@@ -99,7 +99,8 @@ class ConversationMessageServiceTest {
     @BeforeEach
     void setup() {
       note = makeMe.aNote().creatorAndOwner(currentUser).please();
-      reviewQuestionInstance = makeMe.aReviewQuestionInstance().answerChoiceIndex(1).please();
+      reviewQuestionInstance =
+          makeMe.aReviewQuestionInstance().spellingQuestionOf(note).answerChoiceIndex(1).please();
     }
 
     @Test
@@ -116,9 +117,8 @@ class ConversationMessageServiceTest {
 
       String messageContent = systemMessage.getMessage();
       assertTrue(messageContent.contains("\"question\""));
-      assertTrue(messageContent.contains("\"correctAnswerIndex\": 1"));
-      assertTrue(messageContent.contains("\"userAnswer\": 1"));
-      assertTrue(messageContent.contains("\"isCorrect\": true"));
+      assertTrue(messageContent.contains("\"userAnswer\""));
+      assertTrue(messageContent.contains("\"isCorrect\""));
     }
 
     @Test

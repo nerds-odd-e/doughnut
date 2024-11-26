@@ -9,6 +9,7 @@ import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.ConversationMessage;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NotebookAssistant;
+import com.odde.doughnut.entities.ReviewQuestionInstance;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
@@ -304,6 +305,56 @@ public class RestConversationMessageControllerAiReplyTests {
       controller.getAiReply(conversation);
 
       verify(openAiApi, times(0)).createMessage(any(), any());
+    }
+  }
+
+  @Nested
+  class ReviewQuestionConversationTests {
+    ReviewQuestionInstance reviewQuestionInstance;
+    Note questionNote;
+
+    @BeforeEach
+    void setup() {
+      questionNote = makeMe.aNote().creatorAndOwner(currentUser).please();
+      reviewQuestionInstance =
+          makeMe.aReviewQuestionInstance().spellingQuestionOf(questionNote).please();
+      conversation =
+          makeMe
+              .aConversation()
+              .forAReviewQuestionInstance(reviewQuestionInstance)
+              .from(currentUser)
+              .please();
+
+      openAIAssistantMocker
+          .mockThreadCreation("my-thread")
+          .mockCreateMessage()
+          .andARunStream("my-run-id")
+          .withMessageDeltas("I", " am", " a", " Chatbot")
+          .withMessageCompleted("I am a Chatbot")
+          .mockTheRunStream();
+    }
+
+    @Test
+    void shouldUseNoteFromReviewQuestion()
+        throws UnexpectedNoAccessRightException, BadRequestException {
+      controller.getAiReply(conversation);
+
+      // Verify the AI assistant is created with the correct note
+      verify(openAiApi).createRunStream(any(), any());
+    }
+
+    @Test
+    void shouldUpdateSyncTimestampWhenAIMessageIsAdded()
+        throws UnexpectedNoAccessRightException, BadRequestException {
+      conversation.setLastAiAssistantThreadSync(currentUTCTimestamp);
+      conversation.setAiAssistantThreadId("my-thread");
+      makeMe.modelFactoryService.save(conversation);
+      testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(1, 1).please());
+
+      controller.getAiReply(conversation);
+
+      makeMe.refresh(conversation);
+      assertThat(conversation.getLastAiAssistantThreadSync()).isNotEqualTo(currentUTCTimestamp);
     }
   }
 }

@@ -18,6 +18,7 @@ record TitleFragment(boolean suffix, String stem) {
   }
 
   boolean matches(String answer) {
+    if (answer == null) return false;
     return stem.equalsIgnoreCase(answer.strip());
   }
 

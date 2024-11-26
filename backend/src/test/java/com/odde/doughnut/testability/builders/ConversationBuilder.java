@@ -53,4 +53,10 @@ public class ConversationBuilder extends EntityBuilder<Conversation> {
     entity.setCreatedAt(time);
     return this;
   }
+
+  public ConversationBuilder forAReviewQuestionInstance(
+      ReviewQuestionInstance reviewQuestionInstance) {
+    this.entity.setReviewQuestionInstance(reviewQuestionInstance);
+    return this;
+  }
 }
