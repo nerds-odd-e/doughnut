@@ -1,4 +1,8 @@
 const browser = {
+  log: [] as string[],
+  getLog: function () {
+    return this.log
+  },
   audioWorletPort: {
     onmessage: null as ((event: MessageEvent) => void) | null,
   },
@@ -18,7 +22,9 @@ const browser = {
 
     // Return a promise that resolves when the audio worklet is fully set up
     return new Cypress.Promise<void>((resolve) => {
+      this.log.push('mocking audio worklet')
       cy.on('window:before:load', (win: Cypress.AUTWindow) => {
+        this.log.push('mocking audio context')
         // as of now, AudioContext and AudioWorkletNode are not useable in cypress
         // so we need to mock them.
         // In the future, we should be able to use them in cypress directly
@@ -70,7 +76,7 @@ const browser = {
         // Remove biome-ignore as we're adding proper type annotation
         ;(win as Window & typeof globalThis).AudioWorkletNode =
           MockAudioWorkletNode
-
+        this.log.push('mocking audio worklet done')
         resolve()
       })
       cy.url().then((url) => {
@@ -97,8 +103,11 @@ const browser = {
             targetSampleRate
           )
 
+          this.log.push('sending audio to audio worklet')
           if (!this.audioWorletPort.onmessage)
-            throw new Error('audioWorletPort.onmessage is not mocked')
+            throw new Error(
+              `audioWorletPort.onmessage is not mocked ${this.log}`
+            )
           this.audioWorletPort.onmessage({
             data: { audioBuffer: [resampledBuffer] },
           } as MessageEvent)
