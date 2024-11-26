@@ -108,7 +108,7 @@ public class RestConversationMessageController {
             "Only note or review question related conversation can have AI reply");
       }
       return notebookAssistantForNoteServiceFactory
-          .create(note)
+          .createChatAboutNoteService(note)
           .getAiReplyForConversation(conversation, conversationService);
     } catch (OpenAiUnauthorizedException e) {
       // Since this method is asynchronous, the exception body is not returned to the client.

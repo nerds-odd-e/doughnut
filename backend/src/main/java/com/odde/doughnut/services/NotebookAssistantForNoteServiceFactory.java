@@ -38,4 +38,10 @@ public final class NotebookAssistantForNoteServiceFactory {
     return new NotebookAssistantForNoteService(
         assistantServiceForNotebook, note, globalSettingsService);
   }
+
+  public ChatAboutNoteService createChatAboutNoteService(Note note) {
+    OpenAiAssistant assistantServiceForNotebook =
+        getAssistantServiceForNotebook(note.getNotebook());
+    return new ChatAboutNoteService(assistantServiceForNotebook, note);
+  }
 }

@@ -6,65 +6,20 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.services.ai.*;
 import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
-import com.odde.doughnut.services.commands.GetAiStreamHelper;
 import com.theokanning.openai.OpenAiHttpException;
 import com.theokanning.openai.assistants.message.MessageRequest;
-import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.logging.log4j.util.Strings;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-public final class NotebookAssistantForNoteService {
+public final class NotebookAssistantForNoteService extends ChatAboutNoteService {
   private final GlobalSettingsService globalSettingsService;
-  private final NotebookAssistantForNoteService1 notebookAssistantForNoteService1;
-  private final Note note;
 
   public NotebookAssistantForNoteService(
       OpenAiAssistant openAiAssistant, Note note, GlobalSettingsService globalSettingsService) {
-    this.note = note;
-    notebookAssistantForNoteService1 = new NotebookAssistantForNoteService1(openAiAssistant, note);
+    super(openAiAssistant, note);
     this.globalSettingsService = globalSettingsService;
-  }
-
-  public SseEmitter getAiReplyForConversation(
-      Conversation conversation, ConversationService conversationService) {
-
-    AssistantThread thread = getOrCreateThread(conversation, conversationService);
-
-    Timestamp lastAiAssistantThreadSync = conversation.getLastAiAssistantThreadSync();
-    if (lastAiAssistantThreadSync != null && note.getUpdatedAt().after(lastAiAssistantThreadSync)) {
-      thread.createAssistantMessage(
-          "The note content has been update:\n\n%s".formatted(note.getNoteDescription()));
-    }
-    List<ConversationMessage> unseen = conversation.getUnseenMessagesByAssistant();
-    if (!unseen.isEmpty()) {
-      thread.createUserMessage(GetAiStreamHelper.formatUnsentMessages(unseen));
-    }
-    conversationService.updateLastAiAssistantThreadSync(conversation);
-
-    return thread
-        .withAdditionalInstructions(
-            "User is seeking for having a conversation, so don't call functions to update the note unless user asks explicitly.")
-        .runStream()
-        .getSseEmitter(
-            (message -> {
-              String content = GetAiStreamHelper.extractMessageContent(message);
-              conversationService.addMessageToConversation(conversation, null, content);
-            }));
-  }
-
-  private AssistantThread getOrCreateThread(
-      Conversation conversation, ConversationService conversationService) {
-    AssistantThread thread;
-    if (conversation.getAiAssistantThreadId() == null) {
-      thread = notebookAssistantForNoteService1.createThreadWithNoteInfo(List.of());
-      conversationService.setConversationAiAssistantThreadId(conversation, thread.getThreadId());
-    } else {
-      thread = notebookAssistantForNoteService1.getThread(conversation.getAiAssistantThreadId());
-    }
-    return thread;
   }
 
   public String suggestTopicTitle() throws JsonProcessingException {
