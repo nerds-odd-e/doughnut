@@ -19,10 +19,13 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 public final class NotebookAssistantForNoteService {
   private final OpenAiAssistant assistantService;
   private final Note note;
+  private final GlobalSettingsService globalSettingsService;
 
-  public NotebookAssistantForNoteService(OpenAiAssistant openAiAssistant, Note note) {
+  public NotebookAssistantForNoteService(
+      OpenAiAssistant openAiAssistant, Note note, GlobalSettingsService globalSettingsService) {
     this.assistantService = openAiAssistant;
     this.note = note;
+    this.globalSettingsService = globalSettingsService;
   }
 
   public SseEmitter getAiReplyForConversation(

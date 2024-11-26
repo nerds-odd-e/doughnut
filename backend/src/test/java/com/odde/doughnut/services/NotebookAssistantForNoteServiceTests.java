@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class NotebookAssistantForNoteServiceTests {
   @Mock OpenAiApi openAiApi;
+  @Mock GlobalSettingsService globalSettingsService;
   @Autowired MakeMe makeMe;
   OpenAIAssistantMocker openAIAssistantMocker;
   OpenAIAssistantThreadMocker openAIAssistantThreadMocker;
@@ -50,7 +51,7 @@ class NotebookAssistantForNoteServiceTests {
 
     // Initialize common services
     assistant = new OpenAiAssistant(new OpenAiApiHandler(openAiApi), "ass-id");
-    service = new NotebookAssistantForNoteService(assistant, testNote);
+    service = new NotebookAssistantForNoteService(assistant, testNote, globalSettingsService);
   }
 
   @Nested
