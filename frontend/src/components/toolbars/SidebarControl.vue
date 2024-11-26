@@ -41,15 +41,47 @@
             </MessageCenterButton>
           </li>
           <li role="button" class="list-item" title="User Actions">
-            <UserActionsButton
-              v-bind="{ user }"
-              @update-user="$emit('updateUser', $event)"
-            >
-              <div class="d-flex flex-column align-items-center gap-1">
-                <SvgMissingAvatar width="24" height="24" />
-                <span class="menu-label">Account</span>
+            <div class="dropup w-100">
+              <a
+                aria-label="User actions"
+                data-bs-toggle="dropdown"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+              >
+                <div class="d-flex flex-column align-items-center gap-1">
+                  <SvgMissingAvatar width="24" height="24" />
+                  <span class="menu-label">Account</span>
+                </div>
+              </a>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <router-link
+                  v-if="user?.admin"
+                  role="button"
+                  class="dropdown-item"
+                  :to="{ name: 'adminDashboard' }"
+                >
+                  Admin Dashboard
+                </router-link>
+                <PopButton btn-class="dropdown-item" title="user settings">
+                  <template #button_face> Settings for {{ user.name }}</template>
+                  <template #default="{ closer }">
+                    <UserProfileDialog
+                      v-bind="{ user }"
+                      @user-updated="
+                        if ($event) {
+                          $emit('updateUser', $event);
+                        }
+                        closer();
+                      "
+                    />
+                  </template>
+                </PopButton>
+                <router-link role="button" class="dropdown-item" :to="{ name: 'messageCenter' }">Message center</router-link>
+                <router-link role="button" class="dropdown-item" :to="{ name: 'assessmentAndCertificateHistory' }">My Assessments and Certificates</router-link>
+                <a href="#" class="dropdown-item" role="button" @click="logout">Logout</a>
               </div>
-            </UserActionsButton>
+            </div>
           </li>
         </ul>
       </div>
@@ -71,7 +103,6 @@
 import type { User } from "@/generated/backend"
 import type { PropType } from "vue"
 import LoginButton from "@/components/toolbars/LoginButton.vue"
-import UserActionsButton from "./UserActionsButton.vue"
 import SvgMissingAvatar from "@/components/svgs/SvgMissingAvatar.vue"
 import MessageCenterButton from "@/components/toolbars/MessageCenterButton.vue"
 import { useRoute } from "vue-router"
@@ -81,6 +112,7 @@ import SvgClockHistory from "@/components/svgs/SvgClockHistory.vue"
 import SvgShop from "@/components/svgs/SvgShop.vue"
 import SvgPeople from "@/components/svgs/SvgPeople.vue"
 import SvgChat from "@/components/svgs/SvgChat.vue"
+import PopButton from "@/components/commons/Popups/PopButton.vue"
 
 defineProps({
   user: { type: Object as PropType<User> },
@@ -91,6 +123,10 @@ const route = useRoute()
 
 const isActiveRoute = (routeNames: string[]) => {
   return routeNames.includes(route.name as string)
+}
+
+const logout = () => {
+  // Implement logout functionality
 }
 </script>
 
