@@ -4,18 +4,18 @@ import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.ConversationMessage;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.AssistantThread;
-import com.odde.doughnut.services.ai.OpenAiAssistant;
 import com.odde.doughnut.services.commands.GetAiStreamHelper;
 import java.sql.Timestamp;
 import java.util.List;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 public class ChatAboutNoteService {
-  protected final NotebookAssistantForNoteService1 notebookAssistantForNoteService1;
+  protected final NotebookAssistantForNoteService1 notebookAssistantForNoteService;
   protected final Note note;
 
-  public ChatAboutNoteService(OpenAiAssistant openAiAssistant, Note note) {
-    notebookAssistantForNoteService1 = new NotebookAssistantForNoteService1(openAiAssistant, note);
+  public ChatAboutNoteService(
+      NotebookAssistantForNoteService1 notebookAssistantForNoteService, Note note) {
+    this.notebookAssistantForNoteService = notebookAssistantForNoteService;
     this.note = note;
   }
 
@@ -24,10 +24,10 @@ public class ChatAboutNoteService {
 
     AssistantThread thread;
     if (conversation.getAiAssistantThreadId() == null) {
-      thread = notebookAssistantForNoteService1.createThreadWithNoteInfo(List.of());
+      thread = notebookAssistantForNoteService.createThreadWithNoteInfo(List.of());
       conversationService.setConversationAiAssistantThreadId(conversation, thread.getThreadId());
     } else {
-      thread = notebookAssistantForNoteService1.getThread(conversation.getAiAssistantThreadId());
+      thread = notebookAssistantForNoteService.getThread(conversation.getAiAssistantThreadId());
     }
 
     Timestamp lastAiAssistantThreadSync = conversation.getLastAiAssistantThreadSync();

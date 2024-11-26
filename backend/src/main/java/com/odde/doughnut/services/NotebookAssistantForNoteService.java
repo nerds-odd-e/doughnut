@@ -13,12 +13,14 @@ import java.util.List;
 import java.util.Map;
 import org.apache.logging.log4j.util.Strings;
 
-public final class NotebookAssistantForNoteService extends ChatAboutNoteService {
+public final class NotebookAssistantForNoteService {
   private final GlobalSettingsService globalSettingsService;
+  private final NotebookAssistantForNoteService1 notebookAssistantForNoteService;
 
   public NotebookAssistantForNoteService(
       OpenAiAssistant openAiAssistant, Note note, GlobalSettingsService globalSettingsService) {
-    super(openAiAssistant, note);
+    this.notebookAssistantForNoteService =
+        new NotebookAssistantForNoteService1(openAiAssistant, note);
     this.globalSettingsService = globalSettingsService;
   }
 
@@ -28,7 +30,7 @@ public final class NotebookAssistantForNoteService extends ChatAboutNoteService 
 
     AiTool tool = AiToolFactory.suggestNoteTopicTitle();
     TopicTitleReplacement replacement =
-        notebookAssistantForNoteService1
+        notebookAssistantForNoteService
             .createThreadWithNoteInfo(List.of())
             .withTool(tool)
             .withAdditionalInstructions(instructions)
@@ -46,7 +48,7 @@ public final class NotebookAssistantForNoteService extends ChatAboutNoteService 
             .build();
 
     MCQWithAnswer question =
-        notebookAssistantForNoteService1
+        notebookAssistantForNoteService
             .createThreadWithNoteInfo(List.of(message))
             .withTool(AiToolFactory.askSingleAnswerMultipleChoiceQuestion())
             .withFileSearch()
@@ -88,7 +90,7 @@ public final class NotebookAssistantForNoteService extends ChatAboutNoteService 
             config.getToolCallId(),
             new AudioToTextToolCallResult(instruction, transcriptionFromAudio));
         runExpectingAction =
-            notebookAssistantForNoteService1
+            notebookAssistantForNoteService
                 .getThread(config.getThreadId())
                 .withTool(AiToolFactory.completeNoteDetails())
                 .resumeRun(config.getRunId())
@@ -118,7 +120,7 @@ public final class NotebookAssistantForNoteService extends ChatAboutNoteService 
       instructions = appendAdditionalInstructions(instructions, config);
 
       runExpectingAction =
-          notebookAssistantForNoteService1
+          notebookAssistantForNoteService
               .createThreadWithNoteInfo(List.of(message))
               .withTool(AiToolFactory.completeNoteDetails())
               .withAdditionalInstructions(instructions)
