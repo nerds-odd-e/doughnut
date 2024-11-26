@@ -78,24 +78,16 @@ const toggleSideBar = () => {
 </script>
 
 <style scoped lang="scss">
-@import "bootstrap/scss/bootstrap";
+@import '@/styles/_variables.scss';
 
 aside {
   width: 100%;
-  @include media-breakpoint-up(md) {
+  @media (min-width: $mobile-breakpoint) {
     width: 18rem;
   }
 }
 
 .h-full {
-  height: calc(100vh - 4rem);
-
-  @media (max-width: 1024px) {
-    height: calc(100vh - 8rem);
-  }
-
-  @media (max-width: 700px) {
-    height: calc(100vh - 7rem);
-  }
+  height: 100%;
 }
 </style>
