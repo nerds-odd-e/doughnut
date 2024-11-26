@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.AudioUploadDTO;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.services.ai.*;
+import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.commands.GetAiStreamHelper;
 import com.theokanning.openai.OpenAiHttpException;
@@ -77,25 +78,62 @@ public final class NotebookAssistantForNoteService {
     return assistantService.createThread(messages);
   }
 
-  public String suggestTopicTitle() throws JsonProcessingException {
-    String instructions =
-        "Please suggest a better topic title for the note by calling the function. Don't change it if it's already good enough.";
-
-    OpenAiRunResult result =
-        createThreadWithNoteInfo(List.of())
-            .withTool(AiToolFactory.suggestNoteTopicTitle())
-            .withAdditionalInstructions(instructions)
-            .run()
-            .getRunResult();
-
+  // Common method to handle OpenAiRunResult processing
+  private <T> T processRunResult(OpenAiRunResult result, Class<T> expectedType)
+      throws JsonProcessingException {
     return switch (result) {
       case OpenAiRunRequiredAction action -> {
-        TopicTitleReplacement argument = (TopicTitleReplacement) action.getFirstArgument();
+        T argument = expectedType.cast(action.getFirstArgument());
         action.cancelRun();
-        yield argument.newTopic;
+        yield argument;
       }
       case OpenAiRunCompleted _ -> null;
     };
+  }
+
+  // Common method to create and run thread with tools
+  private OpenAiRunResult createAndRunThread(
+      List<MessageRequest> messages, AiTool tool, String instructions)
+      throws JsonProcessingException {
+    return createThreadWithNoteInfo(messages)
+        .withTool(tool)
+        .withAdditionalInstructions(instructions)
+        .run()
+        .getRunResult();
+  }
+
+  public String suggestTopicTitle() throws JsonProcessingException {
+    String instructions =
+        "Please suggest a better topic title for the note by calling the function. Don't change it if it's already good enough.";
+    OpenAiRunResult result =
+        createAndRunThread(List.of(), AiToolFactory.suggestNoteTopicTitle(), instructions);
+
+    TopicTitleReplacement replacement = processRunResult(result, TopicTitleReplacement.class);
+    return replacement != null ? replacement.newTopic : null;
+  }
+
+  public MCQWithAnswer generateQuestion() throws JsonProcessingException {
+    MessageRequest message =
+        MessageRequest.builder()
+            .role("user")
+            .content(AiToolFactory.mcqWithAnswerAiTool().getMessageBody())
+            .build();
+
+    OpenAiRunResult result =
+        createThreadWithNoteInfo(List.of(message))
+            .withTool(AiToolFactory.askSingleAnswerMultipleChoiceQuestion())
+            .withFileSearch()
+            .withModelName(globalSettingsService.globalSettingQuestionGeneration().getValue())
+            .run()
+            .getRunResult();
+
+    MCQWithAnswer question = processRunResult(result, MCQWithAnswer.class);
+    if (question != null
+        && question.getMultipleChoicesQuestion().getStem() != null
+        && !Strings.isBlank(question.getMultipleChoicesQuestion().getStem())) {
+      return question;
+    }
+    return null;
   }
 
   private String appendAdditionalInstructions(String instructions, AudioUploadDTO config) {
@@ -174,36 +212,5 @@ public final class NotebookAssistantForNoteService {
         .withTool(AiToolFactory.completeNoteDetails())
         .withAdditionalInstructions(instructions)
         .run();
-  }
-
-  public MCQWithAnswer generateQuestion() throws JsonProcessingException {
-    MessageRequest message =
-        MessageRequest.builder()
-            .role("user")
-            .content(AiToolFactory.mcqWithAnswerAiTool().getMessageBody())
-            .build();
-
-    OpenAiRunResult result =
-        createThreadWithNoteInfo(List.of(message))
-            .withTool(AiToolFactory.askSingleAnswerMultipleChoiceQuestion())
-            .withFileSearch()
-            .withModelName(globalSettingsService.globalSettingQuestionGeneration().getValue())
-            .run()
-            .getRunResult();
-
-    // Pattern matching with sealed interface
-    return switch (result) {
-      case OpenAiRunRequiredAction action -> {
-        MCQWithAnswer questionNode = (MCQWithAnswer) action.getFirstArgument();
-        action.cancelRun();
-        if (questionNode != null
-            && questionNode.getMultipleChoicesQuestion().getStem() != null
-            && !Strings.isBlank(questionNode.getMultipleChoicesQuestion().getStem())) {
-          yield questionNode;
-        }
-        yield null;
-      }
-      case OpenAiRunCompleted _ -> null;
-    };
   }
 }
