@@ -52,6 +52,29 @@ export class RestConversationMessageControllerService {
         });
     }
     /**
+     * @param reviewQuestion
+     * @param requestBody
+     * @returns Conversation OK
+     * @throws ApiError
+     */
+    public startConversationAboutReviewQuestion(
+        reviewQuestion: number,
+        requestBody: string,
+    ): CancelablePromise<Conversation> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/conversation/review-question/{reviewQuestion}',
+            path: {
+                'reviewQuestion': reviewQuestion,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
      * @param note
      * @returns Conversation OK
      * @throws ApiError
