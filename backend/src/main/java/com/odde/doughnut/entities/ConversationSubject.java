@@ -28,6 +28,9 @@ public class ConversationSubject {
   }
 
   public AnsweredQuestion getAnsweredQuestion() {
+    if (reviewQuestionInstance == null) {
+      return null;
+    }
     return reviewQuestionInstance.getAnsweredQuestion();
   }
 }
