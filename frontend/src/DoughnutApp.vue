@@ -103,6 +103,7 @@ onMounted(async () => {
 }
 
 .sidebar-control {
+  display: flex;
   background-color: #2d2d2d;
   flex-direction: column;
   height: 100vh;
