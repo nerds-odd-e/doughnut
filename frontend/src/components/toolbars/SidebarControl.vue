@@ -142,6 +142,9 @@ const logout = async () => {
   height: 100vh;
   align-items: center;
   color: #e0e0e0;
+  position: sticky;
+  top: 0;
+  z-index: 10000;
 }
 
 .sidebar-container {
@@ -158,7 +161,6 @@ const logout = async () => {
       position: fixed;
       bottom: 60px;
       left: 0;
-      z-index: 10000;
     }
   }
 }
