@@ -19,16 +19,23 @@ import { computed } from "vue"
 interface Props {
   title?: string
   contentLoaded?: boolean
-  fluid?: boolean
+  fullHeight?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  fluid: false,
+  fullHeight: false,
   contentLoaded: true,
 })
 
 const containerClass = computed(() => ({
-  "container-fluid px-0": props.fluid,
-  "container mt-3": !props.fluid,
+  "container-full-height": props.fullHeight,
+  "container mt-3": !props.fullHeight,
 }))
 </script>
+<style scoped>
+.container-full-height {
+  height: 100%;
+  min-height: 100%;
+}
+</style>
+

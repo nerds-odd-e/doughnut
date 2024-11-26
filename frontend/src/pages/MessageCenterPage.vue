@@ -1,7 +1,7 @@
 <template>
   <ContainerPage
     v-bind="{
-      fluid: true,
+      fullHeight: true,
       contentLoaded: conversations !== undefined,
       title: 'Message Center',
     }"
@@ -27,7 +27,7 @@
           </ul>
         </div>
 
-        <div class="path-and-content" :class="{ 'hide-on-mobile': !showMainContentOnMobile }">
+        <div class="conversation" :class="{ 'hide-on-mobile': !showMainContentOnMobile }">
           <div class="mobile-back-button" @click="backToList">
             <span>&larr; Back to conversations</span>
           </div>
@@ -165,8 +165,7 @@ const handleConversationChanged = (conversationId: number) => {
 .message-center-container {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 180px);
-  min-height: 400px; /* Ensure a minimum height on smaller screens */
+  height: 100%;
 }
 
 .sidebar {
@@ -176,7 +175,7 @@ const handleConversationChanged = (conversationId: number) => {
   border-right: 1px solid #e0e0e0; /* Add this line */
 }
 
-.path-and-content {
+.conversation {
   flex: 1 1 auto;
   overflow-y: auto;
   min-height: 200px; /* Ensure minimum height for content */
@@ -194,7 +193,7 @@ const handleConversationChanged = (conversationId: number) => {
     max-height: none; /* Remove max-height limit on larger screens */
   }
 
-  .path-and-content {
+  .conversation {
     flex: 0 0 75%;
   }
 }
@@ -266,7 +265,7 @@ const handleConversationChanged = (conversationId: number) => {
     display: block;
   }
 
-  .sidebar, .path-and-content {
+  .sidebar, .conversation {
     flex: 0 0 100%;
     max-width: 100%;
   }

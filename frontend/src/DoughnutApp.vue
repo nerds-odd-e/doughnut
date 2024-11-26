@@ -136,6 +136,7 @@ $sidebar-height-mobile: 55px;
 .main-content {
   flex-grow: 1;
   overflow-y: auto;
+  display: grid;
 }
 
 @media (max-width: $tablet-breakpoint) {
