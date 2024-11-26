@@ -1,13 +1,28 @@
 package com.odde.doughnut.testability;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.theokanning.openai.assistants.run.*;
 import com.theokanning.openai.client.OpenAiApi;
+import io.reactivex.Single;
 import java.util.List;
 
 public record OpenAIAssistantCreatedRunMocker(OpenAiApi openAiApi, String threadId, String runId) {
   public OpenAIAssistantRunMocker anExpiredRun() {
     Run run = getRun("expired");
+    return new OpenAIAssistantRunMocker(openAiApi, threadId, run);
+  }
+
+  public OpenAIAssistantRunMocker aCompletedRun() {
+    Run run = new Run();
+    run.setId(runId);
+    run.setThreadId(threadId);
+    run.setStatus("completed");
+    when(openAiApi.createRun(eq(threadId), any(RunCreateRequest.class)))
+        .thenReturn(Single.just(run));
     return new OpenAIAssistantRunMocker(openAiApi, threadId, run);
   }
 

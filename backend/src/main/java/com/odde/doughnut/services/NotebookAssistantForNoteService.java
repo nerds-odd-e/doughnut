@@ -188,7 +188,8 @@ public final class NotebookAssistantForNoteService {
                 .cancelRun()
                 .getFirstArgument();
 
-    if (questionNode.getMultipleChoicesQuestion().getStem() != null
+    if (questionNode != null
+        && questionNode.getMultipleChoicesQuestion().getStem() != null
         && !Strings.isBlank(questionNode.getMultipleChoicesQuestion().getStem())) {
       return questionNode;
     }

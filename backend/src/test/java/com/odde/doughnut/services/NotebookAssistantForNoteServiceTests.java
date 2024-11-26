@@ -130,6 +130,23 @@ class NotebookAssistantForNoteServiceTests {
       assertThat(runRequestCaptor.getValue().getModel(), is("gpt-3.5-turbo"));
     }
 
+    @Test
+    void shouldHandleCompletedRunWithoutAction() throws JsonProcessingException {
+      // Mock AI response for a completed run without requiring action
+      openAIAssistantThreadMocker
+          .mockCreateRunInProcess("my-run-id")
+          .aCompletedRun() // This will return a run with status "completed" instead of
+          // "requires_action"
+          .mockRetrieveRun()
+          .mockCancelRun("my-run-id"); // need to be removed
+
+      // Execute and verify
+      MCQWithAnswer result = service.generateQuestion();
+
+      // Since the run completed without requiring action, no question was generated
+      assertThat(result, is(nullValue()));
+    }
+
     private void mockSuccessfulQuestionGeneration(MCQWithAnswer question) {
       openAIAssistantThreadMocker
           .mockCreateRunInProcess("my-run-id")
