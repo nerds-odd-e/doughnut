@@ -161,7 +161,9 @@ const handleConversationChanged = (conversationId: number) => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import '@/styles/_variables.scss';
+
 .message-center-container {
   display: flex;
   flex-direction: column;
@@ -183,7 +185,7 @@ const handleConversationChanged = (conversationId: number) => {
   flex-direction: column;
 }
 
-@media (min-width: 768px) {
+@media (min-width: $mobile-breakpoint) {
   .message-center-container {
     flex-direction: row;
   }
@@ -256,7 +258,7 @@ const handleConversationChanged = (conversationId: number) => {
   background-color: #e9ecef;
 }
 
-@media (max-width: 767px) {
+@media (max-width: $mobile-breakpoint) {
   .hide-on-mobile {
     display: none !important;
   }
