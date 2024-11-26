@@ -102,6 +102,7 @@ onMounted(async () => {
 
 .app-container {
   display: flex;
+  min-height: 100vh;
 }
 
 .sidebar-control {
@@ -109,29 +110,59 @@ onMounted(async () => {
   background-color: #2d2d2d;
   flex-direction: column;
   height: 100vh;
-  align-items: center;
+  width: 64px;
   color: #e0e0e0;
-}
-
-@media (max-width: $tablet-breakpoint) {
-  .sidebar-control {
-    flex-direction: row;
-    width: 100%;
-    height: auto;
-    padding: 0.5rem 0;
-    align-items: center;
-  }
+  position: fixed;
+  z-index: 10000;
 }
 
 .path-and-content {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+  margin-left: 64px;
+}
+
+.sticky-top {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.main-content {
+  flex-grow: 1;
+  overflow-y: auto;
 }
 
 @media (max-width: $tablet-breakpoint) {
   .app-container {
     flex-direction: column;
+  }
+
+  .sidebar-control {
+    position: fixed;
+    top: 0;
+    left: 0;
+    flex-direction: row;
+    width: 100%;
+    height: 70px;
+    padding: 0.5rem;
+    z-index: 200;
+  }
+
+  .path-and-content {
+    margin-left: 0;
+    margin-top: 70px;
+  }
+}
+
+@media (max-width: $mobile-breakpoint) {
+  .sidebar-control {
+    height: 55px;
+  }
+
+  .path-and-content {
+    margin-top: 55px;
   }
 }
 </style>
