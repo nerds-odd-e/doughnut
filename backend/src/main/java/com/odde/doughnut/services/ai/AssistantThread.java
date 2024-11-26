@@ -19,6 +19,7 @@ public class AssistantThread {
   private final List<AiTool> tools = new ArrayList<>();
   private final List<Tool> mappedTools = new ArrayList<>();
   private String additionalInstructions;
+  private String modelName;
 
   public AssistantThread(String assistantId, String threadId, OpenAiApiHandler openAiApiHandler) {
     this.assistantId = assistantId;
@@ -42,6 +43,11 @@ public class AssistantThread {
     return this;
   }
 
+  public AssistantThread withModelName(String modelName) {
+    this.modelName = modelName;
+    return this;
+  }
+
   public OpenAiRunExpectingAction run() {
     RunCreateRequest.RunCreateRequestBuilder builder = getCreateRequestBuilder().tools(mappedTools);
     return new OpenAiRunExpectingAction(
@@ -53,6 +59,9 @@ public class AssistantThread {
         RunCreateRequest.builder().assistantId(assistantId);
     if (additionalInstructions != null) {
       builder.additionalInstructions(additionalInstructions);
+    }
+    if (modelName != null) {
+      builder.model(modelName);
     }
     return builder;
   }

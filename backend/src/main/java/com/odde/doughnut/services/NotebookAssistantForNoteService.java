@@ -182,6 +182,7 @@ public final class NotebookAssistantForNoteService {
             createThreadWithNoteInfo(List.of(message))
                 .withTool(AiToolFactory.askSingleAnswerMultipleChoiceQuestion())
                 .withFileSearch()
+                .withModelName(globalSettingsService.globalSettingQuestionGeneration().getValue())
                 .run()
                 .getToolCallResponse()
                 .cancelRun()

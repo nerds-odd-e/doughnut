@@ -2,6 +2,7 @@ package com.odde.doughnut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -14,6 +15,7 @@ import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIAssistantMocker;
 import com.odde.doughnut.testability.OpenAIAssistantThreadMocker;
 import com.theokanning.openai.assistants.message.MessageRequest;
+import com.theokanning.openai.assistants.run.RunCreateRequest;
 import com.theokanning.openai.assistants.thread.ThreadRequest;
 import com.theokanning.openai.client.OpenAiApi;
 import java.util.List;
@@ -32,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class NotebookAssistantForNoteServiceTests {
   @Mock OpenAiApi openAiApi;
-  @Mock GlobalSettingsService globalSettingsService;
+  GlobalSettingsService globalSettingsService;
   @Autowired MakeMe makeMe;
   OpenAIAssistantMocker openAIAssistantMocker;
   OpenAIAssistantThreadMocker openAIAssistantThreadMocker;
@@ -43,7 +45,7 @@ class NotebookAssistantForNoteServiceTests {
   @BeforeEach
   void setup() {
     openAIAssistantMocker = new OpenAIAssistantMocker(openAiApi);
-    openAIAssistantThreadMocker = openAIAssistantMocker.mockThreadCreation(null);
+    openAIAssistantThreadMocker = openAIAssistantMocker.mockThreadCreation("thread-id");
 
     // Create common test data
     testNote = makeMe.aNote().details("description long enough.").please();
@@ -51,6 +53,7 @@ class NotebookAssistantForNoteServiceTests {
 
     // Initialize common services
     assistant = new OpenAiAssistant(new OpenAiApiHandler(openAiApi), "ass-id");
+    globalSettingsService = new GlobalSettingsService(makeMe.modelFactoryService);
     service = new NotebookAssistantForNoteService(assistant, testNote, globalSettingsService);
   }
 
@@ -101,6 +104,30 @@ class NotebookAssistantForNoteServiceTests {
       assertThat(
           instructionMessage.getContent().toString(),
           containsString("assume the role of a Memory Assistant"));
+    }
+
+    @Test
+    void shouldUseModelNameFromGlobalSettings() throws JsonProcessingException {
+
+      MCQWithAnswer mcqWithAnswer =
+          makeMe
+              .aMCQWithAnswer()
+              .stem("What is the capital of France?")
+              .choices("Paris", "London", "Berlin")
+              .correctChoiceIndex(0)
+              .please();
+
+      mockSuccessfulQuestionGeneration(mcqWithAnswer);
+
+      // Act
+      service.generateQuestion();
+
+      // Verify
+      ArgumentCaptor<RunCreateRequest> runRequestCaptor =
+          ArgumentCaptor.forClass(RunCreateRequest.class);
+      verify(openAiApi).createRun(anyString(), runRequestCaptor.capture());
+
+      assertThat(runRequestCaptor.getValue().getModel(), is("gpt-3.5-turbo"));
     }
 
     private void mockSuccessfulQuestionGeneration(MCQWithAnswer question) {
