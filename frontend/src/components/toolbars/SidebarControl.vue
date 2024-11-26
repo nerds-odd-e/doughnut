@@ -1,93 +1,92 @@
 <template>
-  <div class="d-flex sidebar-control">
-    <div v-if="user" class="sidebar-container">
-        <ul class="list-group">
-          <li role="button" class="list-item" :class="{ active: isActiveRoute(['reviews', 'initial', 'repeat']) }" title="Daily Review">
-            <router-link :to="{ name: 'reviews' }" class="d-flex flex-column align-items-center gap-1">
-              <SvgCalendarCheck />
-              <span class="menu-label">Review</span>
-            </router-link>
-          </li>
-          <li role="button" class="list-item" :class="{ active: isActiveRoute(['notebooks', 'noteShow']) }" title="My Notebooks">
-            <router-link :to="{ name: 'notebooks' }" class="d-flex flex-column align-items-center gap-1">
-              <SvgJournalText />
-              <span class="menu-label">Notebooks</span>
-            </router-link>
-          </li>
-          <li role="button" class="list-item" :class="{ active: isActiveRoute(['recent']) }" title="Recent">
-            <router-link :to="{ name: 'recent' }" class="d-flex flex-column align-items-center gap-1">
-              <SvgClockHistory />
-              <span class="menu-label">Recent</span>
-            </router-link>
-          </li>
-          <li role="button" class="list-item" :class="{ active: isActiveRoute(['bazaar']) }" title="Bazaar">
-            <router-link :to="{ name: 'bazaar' }" class="d-flex flex-column align-items-center gap-1">
-              <SvgShop />
-              <span class="menu-label">Bazaar</span>
-            </router-link>
-          </li>
-          <li role="button" class="list-item" :class="{ active: isActiveRoute(['circles', 'circleShow', 'circleJoin']) }" title="Circles">
-            <router-link :to="{ name: 'circles' }" class="d-flex flex-column align-items-center gap-1">
-              <SvgPeople />
-              <span class="menu-label">Circles</span>
-            </router-link>
-          </li>
-          <li role="button" class="list-item" :class="{ active: isActiveRoute(['messageCenter']) }" title="Messages">
-            <MessageCenterButton :user="user">
-              <SvgChat />
-              <template #label>
-                <span class="menu-label">Messages</span>
-              </template>
-            </MessageCenterButton>
-          </li>
-          <li role="button" class="list-item" title="User Actions">
-            <div class="dropup w-100">
-              <a
-                aria-label="User actions"
-                data-bs-toggle="dropdown"
-                data-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false"
-              >
-                <div class="d-flex flex-column align-items-center gap-1">
-                  <SvgMissingAvatar width="24" height="24" />
-                  <span class="menu-label">Account</span>
-                </div>
-              </a>
-              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <router-link
-                  v-if="user?.admin"
-                  role="button"
-                  class="dropdown-item"
-                  :to="{ name: 'adminDashboard' }"
-                >
-                  Admin Dashboard
-                </router-link>
-                <PopButton btn-class="dropdown-item" title="user settings">
-                  <template #button_face> Settings for {{ user.name }}</template>
-                  <template #default="{ closer }">
-                    <UserProfileDialog
-                      v-bind="{ user }"
-                      @user-updated="
-                        if ($event) {
-                          $emit('updateUser', $event);
-                        }
-                        closer();
-                      "
-                    />
-                  </template>
-                </PopButton>
-                <router-link role="button" class="dropdown-item" :to="{ name: 'messageCenter' }">Message center</router-link>
-                <router-link role="button" class="dropdown-item" :to="{ name: 'assessmentAndCertificateHistory' }">My Assessments and Certificates</router-link>
-                <a href="#" class="dropdown-item" role="button" @click="logout">Logout</a>
+  <div v-if="user" class="sidebar-container">
+      <ul class="list-group">
+        <li role="button" class="list-item" :class="{ active: isActiveRoute(['reviews', 'initial', 'repeat']) }" title="Daily Review">
+          <router-link :to="{ name: 'reviews' }" class="d-flex flex-column align-items-center gap-1">
+            <SvgCalendarCheck />
+            <span class="menu-label">Review</span>
+          </router-link>
+        </li>
+        <li role="button" class="list-item" :class="{ active: isActiveRoute(['notebooks', 'noteShow']) }" title="My Notebooks">
+          <router-link :to="{ name: 'notebooks' }" class="d-flex flex-column align-items-center gap-1">
+            <SvgJournalText />
+            <span class="menu-label">Notebooks</span>
+          </router-link>
+        </li>
+        <li role="button" class="list-item" :class="{ active: isActiveRoute(['recent']) }" title="Recent">
+          <router-link :to="{ name: 'recent' }" class="d-flex flex-column align-items-center gap-1">
+            <SvgClockHistory />
+            <span class="menu-label">Recent</span>
+          </router-link>
+        </li>
+        <li role="button" class="list-item" :class="{ active: isActiveRoute(['bazaar']) }" title="Bazaar">
+          <router-link :to="{ name: 'bazaar' }" class="d-flex flex-column align-items-center gap-1">
+            <SvgShop />
+            <span class="menu-label">Bazaar</span>
+          </router-link>
+        </li>
+        <li role="button" class="list-item" :class="{ active: isActiveRoute(['circles', 'circleShow', 'circleJoin']) }" title="Circles">
+          <router-link :to="{ name: 'circles' }" class="d-flex flex-column align-items-center gap-1">
+            <SvgPeople />
+            <span class="menu-label">Circles</span>
+          </router-link>
+        </li>
+        <li role="button" class="list-item" :class="{ active: isActiveRoute(['messageCenter']) }" title="Messages">
+          <MessageCenterButton :user="user">
+            <SvgChat />
+            <template #label>
+              <span class="menu-label">Messages</span>
+            </template>
+          </MessageCenterButton>
+        </li>
+        <li role="button" class="list-item" title="User Actions">
+          <div class="dropup w-100">
+            <a
+              aria-label="User actions"
+              data-bs-toggle="dropdown"
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
+            >
+              <div class="d-flex flex-column align-items-center gap-1">
+                <SvgMissingAvatar width="24" height="24" />
+                <span class="menu-label">Account</span>
               </div>
+            </a>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <router-link
+                v-if="user?.admin"
+                role="button"
+                class="dropdown-item"
+                :to="{ name: 'adminDashboard' }"
+              >
+                Admin Dashboard
+              </router-link>
+              <PopButton btn-class="dropdown-item" title="user settings">
+                <template #button_face> Settings for {{ user.name }}</template>
+                <template #default="{ closer }">
+                  <UserProfileDialog
+                    v-bind="{ user }"
+                    @user-updated="
+                      if ($event) {
+                        $emit('updateUser', $event);
+                      }
+                      closer();
+                    "
+                  />
+                </template>
+              </PopButton>
+              <router-link role="button" class="dropdown-item" :to="{ name: 'messageCenter' }">Message center</router-link>
+              <router-link role="button" class="dropdown-item" :to="{ name: 'assessmentAndCertificateHistory' }">My Assessments and Certificates</router-link>
+              <a href="#" class="dropdown-item" role="button" @click="logout">Logout</a>
             </div>
-          </li>
-        </ul>
-      </div>
-    <LoginButton v-else />
-    <span class="vertical-text">Doughnut by</span>
-    <a href="https://odd-e.com" target="_blank">
+          </div>
+        </li>
+      </ul>
+    </div>
+  <LoginButton v-else />
+  <span class="vertical-text">Doughnut by</span>
+  <a href="https://odd-e.com" target="_blank">
     <img
       src="/odd-e.png"
       width="35"
@@ -96,7 +95,6 @@
       alt=""
     />
   </a>
-  </div>
 </template>
 
 <script setup lang="ts">
@@ -136,13 +134,6 @@ const logout = async () => {
 </script>
 
 <style lang="scss" scoped>
-.sidebar-control {
-  background-color: #2d2d2d;
-  flex-direction: column;
-  height: 100vh;
-  align-items: center;
-  color: #e0e0e0;
-}
 
 .sidebar-container {
   display: flex;
@@ -206,14 +197,6 @@ const logout = async () => {
 }
 
 @media (max-width: 1024px) {
-  .sidebar-control {
-    flex-direction: row;
-    width: 100%;
-    height: auto;
-    padding: 0.5rem 0;
-    align-items: center;
-  }
-
   .sidebar-container {
     width: 100%;
     height: auto;

@@ -67,10 +67,12 @@ onMounted(async () => {
 <template>
   <Popups />
   <div class="app-container">
-    <SidebarControl
-      :user="user"
-      @update-user="user = $event"
-    />
+    <div class="sidebar-control">
+      <SidebarControl
+        :user="user"
+        @update-user="user = $event"
+      />
+    </div>
     <div class="path-and-content">
       <GlobalBar
         v-bind="{ storageAccessor, user, apiStatus }"
@@ -96,6 +98,24 @@ onMounted(async () => {
 <style scoped>
 .app-container {
   display: flex;
+}
+
+.sidebar-control {
+  background-color: #2d2d2d;
+  flex-direction: column;
+  height: 100vh;
+  align-items: center;
+  color: #e0e0e0;
+}
+
+@media (max-width: 1024px) {
+  .sidebar-control {
+    flex-direction: row;
+    width: 100%;
+    height: auto;
+    padding: 0.5rem 0;
+    align-items: center;
+  }
 }
 
 .path-and-content {
