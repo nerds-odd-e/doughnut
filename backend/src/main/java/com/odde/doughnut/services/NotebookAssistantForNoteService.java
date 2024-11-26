@@ -10,22 +10,18 @@ import com.odde.doughnut.services.commands.GetAiStreamHelper;
 import com.theokanning.openai.OpenAiHttpException;
 import com.theokanning.openai.assistants.message.MessageRequest;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-public final class NotebookAssistantForNoteService {
-  private final OpenAiAssistant assistantService;
-  private final Note note;
+public final class NotebookAssistantForNoteService extends NotebookAssistantForNoteService1 {
   private final GlobalSettingsService globalSettingsService;
 
   public NotebookAssistantForNoteService(
       OpenAiAssistant openAiAssistant, Note note, GlobalSettingsService globalSettingsService) {
-    this.assistantService = openAiAssistant;
-    this.note = note;
+    super(openAiAssistant, note);
     this.globalSettingsService = globalSettingsService;
   }
 
@@ -68,33 +64,9 @@ public final class NotebookAssistantForNoteService {
     return thread;
   }
 
-  private AssistantThread createThreadWithNoteInfo(List<MessageRequest> additionalMessages) {
-    List<MessageRequest> messages = new ArrayList<>();
-    messages.add(
-        MessageRequest.builder().role("assistant").content(note.getNoteDescription()).build());
-    if (!additionalMessages.isEmpty()) {
-      messages.addAll(additionalMessages);
-    }
-    return assistantService.createThread(messages);
-  }
-
-  // Common method to handle OpenAiRunResult processing
-  private <T> T processRunResult(OpenAiRunResult result, Class<T> expectedType)
-      throws JsonProcessingException {
-    return switch (result) {
-      case OpenAiRunRequiredAction action -> {
-        T argument = expectedType.cast(action.getFirstArgument());
-        action.cancelRun();
-        yield argument;
-      }
-      case OpenAiRunCompleted _ -> null;
-    };
-  }
-
   // Common method to create and run thread with tools
   private OpenAiRunResult createAndRunThread(
-      List<MessageRequest> messages, AiTool tool, String instructions)
-      throws JsonProcessingException {
+      List<MessageRequest> messages, AiTool tool, String instructions) {
     return createThreadWithNoteInfo(messages)
         .withTool(tool)
         .withAdditionalInstructions(instructions)
@@ -105,10 +77,10 @@ public final class NotebookAssistantForNoteService {
   public String suggestTopicTitle() throws JsonProcessingException {
     String instructions =
         "Please suggest a better topic title for the note by calling the function. Don't change it if it's already good enough.";
-    OpenAiRunResult result =
-        createAndRunThread(List.of(), AiToolFactory.suggestNoteTopicTitle(), instructions);
 
-    TopicTitleReplacement replacement = processRunResult(result, TopicTitleReplacement.class);
+    TopicTitleReplacement replacement =
+        createAndRunThread(List.of(), AiToolFactory.suggestNoteTopicTitle(), instructions)
+            .processRunResult(TopicTitleReplacement.class);
     return replacement != null ? replacement.newTopic : null;
   }
 
@@ -119,15 +91,14 @@ public final class NotebookAssistantForNoteService {
             .content(AiToolFactory.mcqWithAnswerAiTool().getMessageBody())
             .build();
 
-    OpenAiRunResult result =
+    MCQWithAnswer question =
         createThreadWithNoteInfo(List.of(message))
             .withTool(AiToolFactory.askSingleAnswerMultipleChoiceQuestion())
             .withFileSearch()
             .withModelName(globalSettingsService.globalSettingQuestionGeneration().getValue())
             .run()
-            .getRunResult();
-
-    MCQWithAnswer question = processRunResult(result, MCQWithAnswer.class);
+            .getRunResult()
+            .processRunResult(MCQWithAnswer.class);
     if (question != null
         && question.getMultipleChoicesQuestion().getStem() != null
         && !Strings.isBlank(question.getMultipleChoicesQuestion().getStem())) {
@@ -191,7 +162,7 @@ public final class NotebookAssistantForNoteService {
   }
 
   private OpenAiRunExpectingAction createNewThreadForTranscription(
-      String transcription, AudioUploadDTO config) throws JsonProcessingException {
+      String transcription, AudioUploadDTO config) {
     String content = "Here's the new transcription from audio:\n------------\n" + transcription;
     MessageRequest message = MessageRequest.builder().role("user").content(content).build();
 
