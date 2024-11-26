@@ -19,10 +19,15 @@ public class ConversationSubject {
 
   @ManyToOne
   @JoinColumn(name = "review_question_instance_id", referencedColumnName = "id")
+  @JsonIgnore
   private ReviewQuestionInstance reviewQuestionInstance;
 
   @JsonIgnore
   public boolean isEmpty() {
     return assessmentQuestionInstance == null && note == null && reviewQuestionInstance == null;
+  }
+
+  public AnsweredQuestion getAnsweredQuestion() {
+    return reviewQuestionInstance.getAnsweredQuestion();
   }
 }
