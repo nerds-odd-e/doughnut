@@ -134,6 +134,7 @@ const logout = async () => {
 </script>
 
 <style lang="scss" scoped>
+@import '@/styles/_variables.scss';
 
 .sidebar-container {
   display: flex;
@@ -196,7 +197,7 @@ const logout = async () => {
   margin-top: 1rem;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: $tablet-breakpoint) {
   .sidebar-container {
     width: 100%;
     height: auto;
@@ -237,8 +238,7 @@ const logout = async () => {
   }
 }
 
-// Add new media query for smaller screens
-@media (max-width: 700px) {
+@media (max-width: $mobile-breakpoint) {
   .menu-label {
     display: none;
   }

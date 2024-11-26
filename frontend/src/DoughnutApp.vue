@@ -95,7 +95,9 @@ onMounted(async () => {
   />
 </template>
 
-<style scoped>
+<style scoped lang="scss">
+@import '@/styles/_variables.scss';
+
 .app-container {
   display: flex;
 }
@@ -108,7 +110,7 @@ onMounted(async () => {
   color: #e0e0e0;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: $tablet-breakpoint) {
   .sidebar-control {
     flex-direction: row;
     width: 100%;
@@ -124,7 +126,7 @@ onMounted(async () => {
   flex-grow: 1;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: $tablet-breakpoint) {
   .app-container {
     flex-direction: column;
   }
