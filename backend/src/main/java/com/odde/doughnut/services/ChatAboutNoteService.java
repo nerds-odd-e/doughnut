@@ -10,11 +10,11 @@ import java.util.List;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 public class ChatAboutNoteService {
-  protected final NotebookAssistantForNoteService1 notebookAssistantForNoteService;
+  protected final NotebookAssistantForNoteService notebookAssistantForNoteService;
   protected final Note note;
 
   public ChatAboutNoteService(
-      NotebookAssistantForNoteService1 notebookAssistantForNoteService, Note note) {
+      NotebookAssistantForNoteService notebookAssistantForNoteService, Note note) {
     this.notebookAssistantForNoteService = notebookAssistantForNoteService;
     this.note = note;
   }

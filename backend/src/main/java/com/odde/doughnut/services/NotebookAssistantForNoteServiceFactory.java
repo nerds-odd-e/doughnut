@@ -32,21 +32,20 @@ public final class NotebookAssistantForNoteServiceFactory {
     return new OpenAiAssistant(openAiApiHandler, assistantId);
   }
 
-  private NotebookAssistantForNoteService1 getNotebookAssistantForNoteService(Note note) {
+  private NotebookAssistantForNoteService getNotebookAssistantForNoteService(Note note) {
     OpenAiAssistant assistantServiceForNotebook =
         getAssistantServiceForNotebook(note.getNotebook());
-    return new NotebookAssistantForNoteService1(assistantServiceForNotebook, note);
+    return new NotebookAssistantForNoteService(assistantServiceForNotebook, note);
   }
 
-  public NotebookAssistantForNoteService createNoteAutomationService(Note note) {
-    NotebookAssistantForNoteService1 notebookAssistantForNoteService1 =
+  public NoteAutomationService createNoteAutomationService(Note note) {
+    NotebookAssistantForNoteService notebookAssistantForNoteService =
         getNotebookAssistantForNoteService(note);
-    return new NotebookAssistantForNoteService(
-        globalSettingsService, notebookAssistantForNoteService1);
+    return new NoteAutomationService(globalSettingsService, notebookAssistantForNoteService);
   }
 
   public ChatAboutNoteService createChatAboutNoteService(Note note) {
-    NotebookAssistantForNoteService1 notebookAssistantForNoteService =
+    NotebookAssistantForNoteService notebookAssistantForNoteService =
         getNotebookAssistantForNoteService(note);
     return new ChatAboutNoteService(notebookAssistantForNoteService, note);
   }

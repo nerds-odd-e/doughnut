@@ -34,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class NotebookAssistantForNoteServiceTests {
+class NoteAutomationServiceTests {
   @Mock OpenAiApi openAiApi;
   GlobalSettingsService globalSettingsService;
   @Autowired MakeMe makeMe;
@@ -42,7 +42,7 @@ class NotebookAssistantForNoteServiceTests {
   OpenAIAssistantThreadMocker openAIAssistantThreadMocker;
   private Note testNote;
   private OpenAiAssistant assistant;
-  private NotebookAssistantForNoteService service;
+  private NoteAutomationService service;
 
   @BeforeEach
   void setup() {
@@ -57,8 +57,8 @@ class NotebookAssistantForNoteServiceTests {
     assistant = new OpenAiAssistant(new OpenAiApiHandler(openAiApi), "ass-id");
     globalSettingsService = new GlobalSettingsService(makeMe.modelFactoryService);
     service =
-        new NotebookAssistantForNoteService(
-            globalSettingsService, new NotebookAssistantForNoteService1(assistant, testNote));
+        new NoteAutomationService(
+            globalSettingsService, new NotebookAssistantForNoteService(assistant, testNote));
   }
 
   @Nested
