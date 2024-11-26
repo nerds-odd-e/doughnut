@@ -58,9 +58,11 @@ const browser = {
         class MockAudioWorkletNode {
           port = port
           constructor() {
-            // Initialize onmessage handler right away
-            this.port.onmessage = () => {
-              // Handle incoming messages from the audio worklet
+            // Only set onmessage if it hasn't been set already
+            if (!this.port.onmessage) {
+              this.port.onmessage = () => {
+                // Handle incoming messages from the audio worklet
+              }
             }
           }
           // Add implementations for connect and disconnect
@@ -106,7 +108,7 @@ const browser = {
           this.log.push('sending audio to audio worklet')
           if (!this.audioWorletPort.onmessage)
             throw new Error(
-              `audioWorletPort.onmessage is not mocked ${this.log}`
+              `audioWorletPort.onmessage is not mocked:\n ${this.log}`
             )
           this.audioWorletPort.onmessage({
             data: { audioBuffer: [resampledBuffer] },
