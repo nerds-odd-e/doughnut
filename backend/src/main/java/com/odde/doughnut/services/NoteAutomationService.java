@@ -10,17 +10,15 @@ import com.theokanning.openai.assistants.message.MessageRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.logging.log4j.util.Strings;
 
-public final class NoteAutomationService {
-  private final GlobalSettingsService globalSettingsService;
+public final class NoteAutomationService extends NoteQuestionGenerationService {
   private final NotebookAssistantForNoteService notebookAssistantForNoteService;
 
   public NoteAutomationService(
       GlobalSettingsService globalSettingsService,
       NotebookAssistantForNoteService notebookAssistantForNoteService) {
+    super(globalSettingsService, notebookAssistantForNoteService);
     this.notebookAssistantForNoteService = notebookAssistantForNoteService;
-    this.globalSettingsService = globalSettingsService;
   }
 
   public String suggestTopicTitle() throws JsonProcessingException {
@@ -37,30 +35,6 @@ public final class NoteAutomationService {
             .getRunResult()
             .getAssumedToolCallArgument(TopicTitleReplacement.class);
     return replacement != null ? replacement.newTopic : null;
-  }
-
-  public MCQWithAnswer generateQuestion() throws JsonProcessingException {
-    MessageRequest message =
-        MessageRequest.builder()
-            .role("user")
-            .content(AiToolFactory.mcqWithAnswerAiTool().getMessageBody())
-            .build();
-
-    MCQWithAnswer question =
-        notebookAssistantForNoteService
-            .createThreadWithNoteInfo(List.of(message))
-            .withTool(AiToolFactory.askSingleAnswerMultipleChoiceQuestion())
-            .withFileSearch()
-            .withModelName(globalSettingsService.globalSettingQuestionGeneration().getValue())
-            .run()
-            .getRunResult()
-            .getAssumedToolCallArgument(MCQWithAnswer.class);
-    if (question != null
-        && question.getMultipleChoicesQuestion().getStem() != null
-        && !Strings.isBlank(question.getMultipleChoicesQuestion().getStem())) {
-      return question;
-    }
-    return null;
   }
 
   private String appendAdditionalInstructions(String instructions, AudioUploadDTO config) {
