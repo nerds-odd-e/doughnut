@@ -21,6 +21,7 @@ import com.odde.doughnut.testability.OpenAIAssistantMocker;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.assistants.message.MessageRequest;
 import com.theokanning.openai.assistants.run.RunCreateRequest;
+import com.theokanning.openai.assistants.thread.ThreadRequest;
 import com.theokanning.openai.client.OpenAiApi;
 import java.lang.reflect.Field;
 import java.sql.Timestamp;
@@ -355,6 +356,39 @@ public class RestConversationMessageControllerAiReplyTests {
 
       makeMe.refresh(conversation);
       assertThat(conversation.getLastAiAssistantThreadSync()).isNotEqualTo(currentUTCTimestamp);
+    }
+
+    @Test
+    void shouldIncludeQuestionDetailsWhenCreatingNewThread()
+        throws UnexpectedNoAccessRightException, BadRequestException {
+      // Capture the message sent to OpenAI
+      ArgumentCaptor<ThreadRequest> threadRequestArgumentCaptor =
+          ArgumentCaptor.forClass(ThreadRequest.class);
+
+      controller.getAiReply(conversation);
+
+      verify(openAiApi).createThread(threadRequestArgumentCaptor.capture());
+
+      // Verify the question details were included in the message
+      String expectedQuestionDetails = reviewQuestionInstance.getQuestionDetails();
+      MessageRequest second = threadRequestArgumentCaptor.getValue().getMessages().get(1);
+      assertThat(second.getContent().toString())
+          .contains("User attempted to answer")
+          .contains(expectedQuestionDetails);
+      assertThat(second.getRole()).isEqualTo("assistant");
+    }
+
+    @Test
+    void shouldNotIncludeQuestionDetailsWhenThreadExists()
+        throws UnexpectedNoAccessRightException, BadRequestException {
+      // Set existing thread ID
+      conversation.setAiAssistantThreadId("existing-thread-id");
+      makeMe.modelFactoryService.save(conversation);
+
+      controller.getAiReply(conversation);
+
+      // Verify no question details message was sent
+      verify(openAiApi, times(0)).createMessage(any(), any());
     }
   }
 }

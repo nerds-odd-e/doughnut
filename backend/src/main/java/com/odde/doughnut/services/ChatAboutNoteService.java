@@ -5,7 +5,9 @@ import com.odde.doughnut.entities.ConversationMessage;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.AssistantThread;
 import com.odde.doughnut.services.commands.GetAiStreamHelper;
+import com.theokanning.openai.assistants.message.MessageRequest;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -52,7 +54,22 @@ public class ChatAboutNoteService {
     public MessageStage createOrResumeThread() {
       AssistantThread newThread;
       if (conversation.getAiAssistantThreadId() == null) {
-        newThread = service.notebookAssistantForNoteService.createThreadWithNoteInfo(List.of());
+        List<MessageRequest> initialMessages = new ArrayList<>();
+        if (conversation.getSubject().getReviewQuestionInstance() != null) {
+          MessageRequest msg =
+              MessageRequest.builder()
+                  .role("assistant")
+                  .content(
+                      "User attempted to answer the following question about the note of focus:\n"
+                          + conversation
+                              .getSubject()
+                              .getReviewQuestionInstance()
+                              .getQuestionDetails())
+                  .build();
+          initialMessages.add(msg);
+        }
+        newThread =
+            service.notebookAssistantForNoteService.createThreadWithNoteInfo(initialMessages);
         conversationService.setConversationAiAssistantThreadId(
             conversation, newThread.getThreadId());
       } else {
