@@ -6,6 +6,8 @@ import makeMe from "./makeMe"
 class AnsweredQuestionBuilder extends Builder<AnsweredQuestion> {
   private noteToUse?: Note
   private reviewQuestionInstanceIdToUse?: number
+  private isCorrect: boolean = true
+  private choiceIndexToUse?: number
 
   withNote(note: Note): this {
     this.noteToUse = note
@@ -17,11 +19,24 @@ class AnsweredQuestionBuilder extends Builder<AnsweredQuestion> {
     return this
   }
 
+  answerCorrect(correct: boolean): this {
+    this.isCorrect = correct
+    return this
+  }
+
+  withChoiceIndex(index: number): this {
+    this.choiceIndexToUse = index
+    return this
+  }
+
   do(): AnsweredQuestion {
     return {
       answer: {
         id: generateId(),
-        correct: true,
+        correct: this.isCorrect,
+        ...(this.choiceIndexToUse !== undefined && {
+          choiceIndex: this.choiceIndexToUse,
+        }),
       },
       answerDisplay: "",
       note: this.noteToUse ?? makeMe.aNote.please(),

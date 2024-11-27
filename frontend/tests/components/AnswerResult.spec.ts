@@ -1,20 +1,14 @@
 import AnswerResult from "@/components/review/AnswerResult.vue"
-import type { AnsweredQuestion } from "@/generated/backend"
 import { flushPromises } from "@vue/test-utils"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 
 describe("AnswerResult", () => {
-  const answeredQuestion: AnsweredQuestion = {
-    answer: {
-      id: 1,
-      correct: false,
-      choiceIndex: 1,
-    },
-    answerDisplay: "answerDisplay",
-    predefinedQuestion: makeMe.aPredefinedQuestion.please(),
-    reviewQuestionInstanceId: 1,
-  }
+  const answeredQuestion = makeMe.anAnsweredQuestion
+    .withReviewQuestionInstanceId(1)
+    .answerCorrect(false)
+    .withChoiceIndex(1)
+    .please()
 
   const wrapper = helper
     .component(AnswerResult)

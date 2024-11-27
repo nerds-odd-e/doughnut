@@ -1,4 +1,3 @@
-import type { AnsweredQuestion } from "@/generated/backend"
 import RepeatPage from "@/pages/RepeatPage.vue"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
@@ -89,15 +88,10 @@ describe("repeat page", () => {
 
     it("should show progress", async () => {
       const wrapper = await mountPage()
-      const answerResult: AnsweredQuestion = {
-        answer: {
-          id: 1,
-          correct: false,
-        },
-        answerDisplay: "my answer",
-        predefinedQuestion: makeMe.aPredefinedQuestion.please(),
-        reviewQuestionInstanceId: 1,
-      }
+      const answerResult = makeMe.anAnsweredQuestion
+        .withReviewQuestionInstanceId(1)
+        .answerCorrect(false)
+        .please()
       const mockedMarkAsRepeatedCall = vi.fn().mockResolvedValue(answerResult)
       helper.managedApi.restReviewPointController.markAsRepeated =
         mockedMarkAsRepeatedCall
