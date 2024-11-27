@@ -309,6 +309,10 @@ const formattedCompletionSuggestion = computed(() => {
     ? `...${completionSuggestion.value}`
     : completionSuggestion.value
 })
+
+defineExpose({
+  getAiReply,
+})
 </script>
 
 <style scoped>
