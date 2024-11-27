@@ -80,6 +80,16 @@
   </div>
 
   <div class="chat-controls">
+    <div v-if="defaultMessages" class="default-messages">
+      <button
+        v-for="(message, index) in defaultMessages"
+        :key="index"
+        class="default-message-button"
+        @click="handleDefaultMessageClick(message)"
+      >
+        {{ message }}
+      </button>
+    </div>
     <form
       class="chat-input-form"
       @submit.prevent="handleSendMessageWithAI()"
@@ -135,11 +145,12 @@
 import { ref, computed } from "vue"
 import type { Conversation } from "@/generated/backend"
 
-const { isMaximized } = defineProps<{
+const { isMaximized, defaultMessages } = defineProps<{
   conversations?: Conversation[]
   selectedConversation?: Conversation
   allowNewConversation?: boolean
   isMaximized?: boolean
+  defaultMessages?: string[]
 }>()
 
 const emit = defineEmits<{
@@ -181,6 +192,10 @@ const handleCloseDialog = () => {
     emit("toggle-maximize")
   }
   emit("close-dialog")
+}
+
+const handleDefaultMessageClick = (message: string) => {
+  emit("send-message-and-invite-ai", message)
 }
 </script>
 
@@ -292,5 +307,26 @@ const handleCloseDialog = () => {
 
 .send-button.with-ai:disabled {
   background-color: #ccc;
+}
+
+.default-messages {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.default-message-button {
+  text-align: left;
+  padding: 0.75rem 1rem;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.default-message-button:hover {
+  background-color: #e9ecef;
 }
 </style>

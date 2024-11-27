@@ -156,4 +156,60 @@ describe("ConversationInner", () => {
       expect(aiMessage.find("strong").exists()).toBe(true)
     })
   })
+
+  describe("Default review questions", () => {
+    it("shows default messages for review conversations with no messages", async () => {
+      const reviewConversation = {
+        ...conversation,
+        subject: {
+          answeredQuestion: makeMe.anAnsweredQuestion.please(),
+        },
+      }
+      wrapper = mountComponent(reviewConversation, user)
+
+      // Simulate empty conversation messages
+      wrapper.vm.currentConversationMessages = []
+      await wrapper.vm.$nextTick()
+
+      const defaultButtons = wrapper.findAll(".default-message-button")
+      expect(defaultButtons.length).toBe(4)
+      expect(defaultButtons[0].text()).toBe("Why is my answer wrong?")
+    })
+
+    it("doesn't show default messages for non-review conversations", async () => {
+      const nonReviewConversation = {
+        ...conversation,
+        subject: {
+          answeredQuestion: undefined,
+        },
+      }
+      wrapper = mountComponent(nonReviewConversation, user)
+
+      wrapper.vm.currentConversationMessages = []
+      await wrapper.vm.$nextTick()
+
+      const defaultButtons = wrapper.findAll(".default-message-button")
+      expect(defaultButtons.length).toBe(0)
+    })
+
+    it("sends message when default question is clicked", async () => {
+      const reviewConversation = {
+        ...conversation,
+        subject: {
+          answeredQuestion: makeMe.anAnsweredQuestion.please(),
+        },
+      }
+      wrapper = mountComponent(reviewConversation, user)
+
+      wrapper.vm.currentConversationMessages = []
+      await wrapper.vm.$nextTick()
+
+      const firstButton = wrapper.find(".default-message-button")
+      await firstButton.trigger("click")
+
+      expect(
+        helper.managedApi.restConversationMessageController.replyToConversation
+      ).toHaveBeenCalledWith(reviewConversation.id, "Why is my answer wrong?")
+    })
+  })
 })

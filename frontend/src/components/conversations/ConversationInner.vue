@@ -10,6 +10,7 @@
     :conversations="conversations"
     :selectedConversation="conversation"
     :allow-new-conversation="allowNewConversation"
+    :default-messages="showDefaultMessages ? defaultReviewQuestions : undefined"
   >
     <template #messages v-if="currentConversationMessages !== undefined">
       <div
@@ -57,7 +58,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from "vue"
+import { ref, onMounted, watch, computed } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type {
   User,
@@ -151,6 +152,23 @@ watch(() => conversation, fetchConversationMessages)
 
 const handleSendMessageAndInviteAI = (message: string) =>
   handleSendMessage(message, true)
+
+const defaultReviewQuestions = [
+  "Why is my answer wrong?",
+  "I think the question is wrong. Please check.",
+  "Please explain the question and answer to me.",
+  "Why are other choices incorrect?",
+]
+
+const showDefaultMessages = computed(() => {
+  return (
+    conversation.subject?.answeredQuestion !== undefined &&
+    (!currentConversationMessages.value ||
+      currentConversationMessages.value.length === 0)
+  )
+})
+
+defineExpose([currentConversationMessages])
 </script>
 
 <style scoped>
