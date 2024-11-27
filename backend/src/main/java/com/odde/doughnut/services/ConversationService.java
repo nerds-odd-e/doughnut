@@ -1,7 +1,5 @@
 package com.odde.doughnut.services;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.odde.doughnut.entities.AssessmentQuestionInstance;
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.ConversationMessage;
@@ -44,26 +42,8 @@ public class ConversationService {
     Conversation conversation = initializeConversation(initiator);
     conversation.setReviewQuestionInstance(reviewQuestionInstance);
     modelFactoryService.conversationRepository.save(conversation);
-
-    addQuestionDetailsMessage(conversation, reviewQuestionInstance);
+    addMessageToConversation(conversation, null, reviewQuestionInstance.getQuestionDetails());
     return conversation;
-  }
-
-  private void addQuestionDetailsMessage(
-      Conversation conversation, ReviewQuestionInstance reviewQuestionInstance) {
-    ObjectMapper mapper = new ObjectMapper();
-    ObjectNode questionDetails = mapper.createObjectNode();
-    questionDetails.put("question", reviewQuestionInstance.getBareQuestion().toString());
-    questionDetails.put(
-        "correctAnswerIndex",
-        reviewQuestionInstance.getPredefinedQuestion().getCorrectAnswerIndex());
-
-    if (reviewQuestionInstance.getAnswer() != null) {
-      questionDetails.put("userAnswer", reviewQuestionInstance.getAnswer().getChoiceIndex());
-      questionDetails.put("isCorrect", reviewQuestionInstance.getAnswer().getCorrect());
-    }
-
-    addMessageToConversation(conversation, null, questionDetails.toPrettyString());
   }
 
   public Conversation startConversationOfNote(Note note, User initiator, String message) {
