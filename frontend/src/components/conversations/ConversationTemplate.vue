@@ -79,7 +79,7 @@
     <slot name="messages" />
   </div>
 
-  <div class="chat-controls">
+  <div class="bottom-container">
     <div v-if="defaultMessages" class="default-messages">
       <button
         v-for="(message, index) in defaultMessages"
@@ -90,54 +90,57 @@
         {{ message }}
       </button>
     </div>
-    <form
-      class="chat-input-form"
-      @submit.prevent="handleSendMessageWithAI()"
-      :disabled="!trimmedMessage"
-    >
-      <TextArea
-        ref="chatInputTextArea"
-        v-focus
-        class="chat-input"
-        id="chat-input"
-        :rows="1"
-        :auto-extend-until="5"
-        :enter-submit="true"
-        v-model="message"
-        @enter-pressed="handleSendMessageWithAI"
-      />
 
-      <button
-        type="submit"
-        role="button"
-        class="send-button with-ai"
-        aria-label="Send message and invite AI to reply"
+    <div class="chat-controls">
+      <form
+        class="chat-input-form"
+        @submit.prevent="handleSendMessageWithAI()"
         :disabled="!trimmedMessage"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/>
-          <path d="M12 8v8"/>
-          <path d="M5 3a2 2 0 0 0-2 2v2c0 1.1.9 2 2 2"/>
-          <path d="M19 3a2 2 0 0 1 2 2v2c0 1.1-.9 2-2 2"/>
-          <path d="M12 16a2 2 0 0 0-2 2v2a2 2 0 0 0 4 0v-2a2 2 0 0 0-2-2z"/>
-          <path d="M4 19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2"/>
-        </svg>
-      </button>
-      <button
-        type="button"
-        role="button"
-        class="send-button"
-        aria-label="Send message"
-        @click="handleSendMessage()"
-        :disabled="!trimmedMessage"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="22" y1="2" x2="11" y2="13"></line>
-          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-        </svg>
-      </button>
+        <TextArea
+          ref="chatInputTextArea"
+          v-focus
+          class="chat-input"
+          id="chat-input"
+          :rows="1"
+          :auto-extend-until="5"
+          :enter-submit="true"
+          v-model="message"
+          @enter-pressed="handleSendMessageWithAI"
+        />
 
-    </form>
+        <button
+          type="submit"
+          role="button"
+          class="send-button with-ai"
+          aria-label="Send message and invite AI to reply"
+          :disabled="!trimmedMessage"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/>
+            <path d="M12 8v8"/>
+            <path d="M5 3a2 2 0 0 0-2 2v2c0 1.1.9 2 2 2"/>
+            <path d="M19 3a2 2 0 0 1 2 2v2c0 1.1-.9 2-2 2"/>
+            <path d="M12 16a2 2 0 0 0-2 2v2a2 2 0 0 0 4 0v-2a2 2 0 0 0-2-2z"/>
+            <path d="M4 19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2"/>
+          </svg>
+        </button>
+        <button
+          type="button"
+          role="button"
+          class="send-button"
+          aria-label="Send message"
+          @click="handleSendMessage()"
+          :disabled="!trimmedMessage"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
+
+      </form>
+    </div>
   </div>
 </template>
 
@@ -309,11 +312,24 @@ const handleDefaultMessageClick = (message: string) => {
   background-color: #ccc;
 }
 
+.bottom-container {
+  flex-shrink: 0;
+  background-color: white;
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+}
+
 .default-messages {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr;
   gap: 0.5rem;
   margin-bottom: 1rem;
+}
+
+@media (min-width: 768px) {
+  .default-messages {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 .default-message-button {
@@ -324,6 +340,7 @@ const handleDefaultMessageClick = (message: string) => {
   border-radius: 0.5rem;
   cursor: pointer;
   transition: background-color 0.2s;
+  color: #6c757d;  /* Bootstrap's gray-600 color */
 }
 
 .default-message-button:hover {
