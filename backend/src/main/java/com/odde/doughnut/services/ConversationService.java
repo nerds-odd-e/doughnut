@@ -30,14 +30,14 @@ public class ConversationService {
     return conversation;
   }
 
-  public Conversation startConversation(
+  public Conversation startConversationAboutReviewQuestion(
       AssessmentQuestionInstance assessmentQuestionInstance, User initiator) {
     Conversation conversation = initializeConversation(initiator);
     conversation.setAssessmentQuestionInstance(assessmentQuestionInstance);
     return modelFactoryService.conversationRepository.save(conversation);
   }
 
-  public Conversation startConversation(
+  public Conversation startConversationAboutReviewQuestion(
       ReviewQuestionInstance reviewQuestionInstance, User initiator) {
     Conversation conversation = initializeConversation(initiator);
     conversation.setReviewQuestionInstance(reviewQuestionInstance);

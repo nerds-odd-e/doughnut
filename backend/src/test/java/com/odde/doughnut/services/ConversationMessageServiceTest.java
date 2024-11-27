@@ -106,7 +106,8 @@ class ConversationMessageServiceTest {
     @Test
     void shouldCreateConversationWithInitialSystemMessage() {
       Conversation conversation =
-          conversationService.startConversation(reviewQuestionInstance, currentUser.getEntity());
+          conversationService.startConversationAboutReviewQuestion(
+              reviewQuestionInstance, currentUser.getEntity());
 
       makeMe.refresh(conversation);
       List<ConversationMessage> messages = conversation.getConversationMessages();
@@ -124,7 +125,8 @@ class ConversationMessageServiceTest {
     @Test
     void shouldSetCorrectOwnershipAndSubject() {
       Conversation conversation =
-          conversationService.startConversation(reviewQuestionInstance, currentUser.getEntity());
+          conversationService.startConversationAboutReviewQuestion(
+              reviewQuestionInstance, currentUser.getEntity());
 
       makeMe.refresh(conversation);
       assertEquals(reviewQuestionInstance, conversation.getSubject().getReviewQuestionInstance());

@@ -39,7 +39,8 @@ public class RestConversationMessageController {
       @PathVariable("assessmentQuestion") @Schema(type = "integer")
           AssessmentQuestionInstance assessmentQuestionInstance) {
     Conversation conversation =
-        conversationService.startConversation(assessmentQuestionInstance, currentUser.getEntity());
+        conversationService.startConversationAboutReviewQuestion(
+            assessmentQuestionInstance, currentUser.getEntity());
     conversationService.addMessageToConversation(conversation, currentUser.getEntity(), feedback);
     return conversation;
   }
@@ -139,6 +140,7 @@ public class RestConversationMessageController {
   public Conversation startConversationAboutReviewQuestion(
       @PathVariable("reviewQuestion") @Schema(type = "integer")
           ReviewQuestionInstance reviewQuestionInstance) {
-    return conversationService.startConversation(reviewQuestionInstance, currentUser.getEntity());
+    return conversationService.startConversationAboutReviewQuestion(
+        reviewQuestionInstance, currentUser.getEntity());
   }
 }
