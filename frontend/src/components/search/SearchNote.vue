@@ -29,7 +29,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineEmits, defineProps } from "vue"
+import { ref } from "vue"
 import TextInput from "../form/TextInput.vue"
 import SearchResults from "./SearchResults.vue"
 import type { NoteTopic } from "@/generated/backend"
