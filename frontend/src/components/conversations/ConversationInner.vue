@@ -43,87 +43,20 @@
         </div>
       </div>
 
-      <div v-if="currentAiReply" class="d-flex mb-3">
-        <div class="message-avatar me-2" title="AI Assistant">
-          <SvgRobot />
-        </div>
-        <div class="card py-2 px-3 bg-light ai-chat"
-        v-html="markdowntToHtml(currentAiReply)"
-        />
-      </div>
-
-      <div v-if="completionSuggestion" class="d-flex mb-3">
-        <div class="message-avatar me-2" title="AI Assistant">
-          <SvgRobot />
-        </div>
-        <AcceptRejectButtons
-          :disabled="isProcessingToolCall"
-          @accept="handleAcceptCompletion"
-          @cancel="handleCancellation"
-          @skip="handleSkip"
-        >
-          <template #title>
-            Suggested completion:
-          </template>
-          <template #content>
-            <div
-              class="completion-text"
-              v-html="markdowntToHtml(formattedCompletionSuggestion)"
-            />
-          </template>
-        </AcceptRejectButtons>
-      </div>
-
-      <div v-if="lastErrorMessage" class="last-error-message text-danger mb-3">
-        {{ lastErrorMessage }}
-      </div>
-
-      <div v-if="aiStatus" class="d-flex align-items-center status-bar mb-3">
-        <div class="spinner-border spinner-border-sm me-2" role="status">
-          <span class="visually-hidden">Loading...</span>
-        </div>
-        <small class="text-secondary">{{ aiStatus }}</small>
-      </div>
-
-      <div v-if="topicTitleSuggestion" class="d-flex mb-3">
-        <div class="message-avatar me-2" title="AI Assistant">
-          <SvgRobot />
-        </div>
-        <AcceptRejectButtons
-          :disabled="isProcessingToolCall"
-          @accept="handleAcceptTitle"
-          @cancel="handleCancellation"
-          @skip="handleSkip"
-        >
-          <template #title>
-            Suggested title:
-          </template>
-          <template #content>
-            <div class="title-suggestion">{{ topicTitleSuggestion }}</div>
-          </template>
-        </AcceptRejectButtons>
-      </div>
-
-      <div v-if="unknownRequestSuggestion" class="d-flex mb-3">
-        <div class="message-avatar me-2" title="AI Assistant">
-          <SvgRobot />
-        </div>
-        <AcceptRejectButtons
-          :disabled="isProcessingToolCall"
-          @cancel="handleCancellation"
-          @skip="handleSkip"
-          :hideAccept="true"
-        >
-          <template #title>
-            Unknown tool call: {{ unknownRequestSuggestion.functionName }}
-          </template>
-          <template #content>
-            <div class="unknown-request">
-              <pre>{{ unknownRequestSuggestion.rawJson }}</pre>
-            </div>
-          </template>
-        </AcceptRejectButtons>
-      </div>
+      <AiResponses
+        :current-ai-reply="currentAiReply"
+        :completion-suggestion="completionSuggestion"
+        :ai-status="aiStatus"
+        :topic-title-suggestion="topicTitleSuggestion"
+        :unknown-request-suggestion="unknownRequestSuggestion"
+        :last-error-message="lastErrorMessage"
+        :is-processing-tool-call="isProcessingToolCall"
+        :current-details="conversation.subject?.note?.details?.trim()"
+        @accept-completion="handleAcceptCompletion"
+        @accept-title="handleAcceptTitle"
+        @cancel="handleCancellation"
+        @skip="handleSkip"
+      />
 
       <ScrollTo :scrollTrigger="currentConversationMessages.length + (currentAiReply ? currentAiReply.length : 0) + (completionSuggestion ? 1 : 0) + (lastErrorMessage ? 1 : 0) + (aiStatus ? 1 : 0) + (topicTitleSuggestion ? 1 : 0) + (unknownRequestSuggestion ? 1 : 0)" />
     </template>
@@ -131,7 +64,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, watch } from "vue"
+import { ref, onMounted, watch } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type {
   User,
@@ -150,7 +83,7 @@ import {
   createAiReplyStates,
   type AiActionContext,
 } from "@/models/aiReplyState"
-import AcceptRejectButtons from "@/components/commons/AcceptRejectButtons.vue"
+import AiResponses from "./AiResponses.vue"
 
 const { conversation, user, initialAiReply, storageAccessor, isMaximized } =
   defineProps<{
@@ -379,14 +312,6 @@ const getAiReply = async () => {
     })
     .restConversationMessageController.getAiReply(conversation.id)
 }
-
-const formattedCompletionSuggestion = computed(() => {
-  if (!completionSuggestion.value) return ""
-  const currentDetails = conversation.subject?.note?.details?.trim() || ""
-  return currentDetails
-    ? `...${completionSuggestion.value}`
-    : completionSuggestion.value
-})
 
 onMounted(async () => {
   await fetchConversationMessages()
