@@ -9,7 +9,6 @@ declare module 'vue' {
   export interface GlobalComponents {
     AcceptRejectButtons: typeof import('./src/components/commons/AcceptRejectButtons.vue')['default']
     AIGenerateImageDialog: typeof import('./src/components/notes/AIGenerateImageDialog.vue')['default']
-    AiResponses: typeof import('./src/components/conversations/AiResponses.vue')['default']
     AnsweredQuestionComponent: typeof import('./src/components/review/AnsweredQuestionComponent.vue')['default']
     AnswerResult: typeof import('./src/components/review/AnswerResult.vue')['default']
     ApiStatus: typeof import('./src/components/toolbars/ApiStatus.vue')['default']
