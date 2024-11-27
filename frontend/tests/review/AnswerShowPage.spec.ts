@@ -2,7 +2,6 @@ import { flushPromises } from "@vue/test-utils"
 import AnsweredQuestionPage from "@/pages/AnsweredQuestionPage.vue"
 import helper from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
-import type { AnsweredQuestion } from "@/generated/backend"
 
 const mockedPush = vi.fn()
 vitest.mock("vue-router", () => ({
@@ -13,20 +12,15 @@ vitest.mock("vue-router", () => ({
 
 describe("repetition page", () => {
   describe("repetition page for a link", () => {
+    const REVIEW_QUESTION_ID = 1
     const link = makeMe.aLink.please()
     const mockedShowAnswerCall = vi.fn()
     const mockedNotePositionCall = vi.fn()
     const mockedStartConversationCall = vi.fn()
-    const answeredQuestion: AnsweredQuestion = {
-      answer: {
-        id: 1,
-        correct: true,
-      },
-      answerDisplay: "",
-      note: link,
-      predefinedQuestion: makeMe.aPredefinedQuestion.please(),
-      reviewQuestionInstanceId: 1,
-    }
+    const answeredQuestion = makeMe.anAnsweredQuestion
+      .withNote(link)
+      .withReviewQuestionInstanceId(REVIEW_QUESTION_ID)
+      .please()
 
     beforeEach(async () => {
       vitest.resetAllMocks()
@@ -41,19 +35,19 @@ describe("repetition page", () => {
     it("click on note when doing review", async () => {
       const wrapper = helper
         .component(AnsweredQuestionPage)
-        .withStorageProps({ reviewQuestionInstanceId: 1 })
+        .withStorageProps({ reviewQuestionInstanceId: REVIEW_QUESTION_ID })
         .currentRoute({ name: "repeat" })
         .mount()
       await flushPromises()
       wrapper.find(".review-point-abbr").trigger("click")
       await flushPromises()
-      expect(mockedShowAnswerCall).toHaveBeenCalledWith(1)
+      expect(mockedShowAnswerCall).toHaveBeenCalledWith(REVIEW_QUESTION_ID)
     })
 
     it("click on note when doing review and in a nested page", async () => {
       const wrapper = helper
         .component(AnsweredQuestionPage)
-        .withStorageProps({ reviewQuestionInstanceId: 1 })
+        .withStorageProps({ reviewQuestionInstanceId: REVIEW_QUESTION_ID })
         .currentRoute({ name: "repeat-noteShow", params: { noteId: 123 } })
         .mount()
       await flushPromises()
@@ -64,7 +58,7 @@ describe("repetition page", () => {
       it("should start a conversation and redirect to message center", async () => {
         const wrapper = helper
           .component(AnsweredQuestionPage)
-          .withStorageProps({ reviewQuestionInstanceId: 1 })
+          .withStorageProps({ reviewQuestionInstanceId: REVIEW_QUESTION_ID })
           .mount()
 
         await flushPromises()
@@ -77,7 +71,9 @@ describe("repetition page", () => {
         await button.trigger("click")
         await flushPromises()
 
-        expect(mockedStartConversationCall).toHaveBeenCalledWith(1)
+        expect(mockedStartConversationCall).toHaveBeenCalledWith(
+          REVIEW_QUESTION_ID
+        )
         expect(mockedPush).toHaveBeenCalledWith({
           name: "messageCenter",
           params: { conversationId: 123 },
@@ -88,7 +84,7 @@ describe("repetition page", () => {
         mockedShowAnswerCall.mockResolvedValue(undefined)
         const wrapper = helper
           .component(AnsweredQuestionPage)
-          .withStorageProps({ reviewQuestionInstanceId: 1 })
+          .withStorageProps({ reviewQuestionInstanceId: REVIEW_QUESTION_ID })
           .mount()
 
         expect(wrapper.find(".conversation-button").exists()).toBe(false)

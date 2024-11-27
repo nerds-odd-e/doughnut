@@ -17,6 +17,7 @@ import WikidataSearchEntityBuilder from "./WikidataSearchEntityBuilder"
 import AssessmentAttemptBuilder from "./AssessmentAttemptBuilder"
 import AssessmentQuestionInstanceBuilder from "./AssessmentQuestionInstanceBuilder"
 import ConversationBuilder from "./ConversationBuilder"
+import AnsweredQuestionBuilder from "./AnsweredQuestionBuilder"
 
 class MakeMe {
   static get aUser() {
@@ -93,6 +94,10 @@ class MakeMe {
 
   static get anApiError(): ApiErrorBuilder {
     return new ApiErrorBuilder().error404()
+  }
+
+  static get anAnsweredQuestion(): AnsweredQuestionBuilder {
+    return new AnsweredQuestionBuilder()
   }
 }
 
