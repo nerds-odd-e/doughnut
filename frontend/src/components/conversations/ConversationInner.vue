@@ -167,8 +167,6 @@ const showDefaultMessages = computed(() => {
       currentConversationMessages.value.length === 0)
   )
 })
-
-defineExpose([currentConversationMessages])
 </script>
 
 <style scoped>
