@@ -42,7 +42,6 @@ public class ConversationService {
     Conversation conversation = initializeConversation(initiator);
     conversation.setReviewQuestionInstance(reviewQuestionInstance);
     modelFactoryService.conversationRepository.save(conversation);
-    addMessageToConversation(conversation, null, reviewQuestionInstance.getQuestionDetails());
     return conversation;
   }
 
