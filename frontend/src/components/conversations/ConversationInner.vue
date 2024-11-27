@@ -59,7 +59,7 @@
         @scroll-index="scrollIndex = $event"
       />
 
-      <ScrollTo :scrollTrigger="scrollIndex + currentConversationMessages.length"/>
+      <ScrollTo :scrollTrigger="scrollIndex + currentConversationMessages.length + (currentAiReply ? currentAiReply.length : 0) + (completionSuggestion ? 1 : 0) + (lastErrorMessage ? 1 : 0) + (aiStatus ? 1 : 0) + (topicTitleSuggestion ? 1 : 0) + (unknownRequestSuggestion ? 1 : 0)"/>
     </template>
   </ConversationTemplate>
 </template>
