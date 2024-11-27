@@ -102,7 +102,16 @@ const emit = defineEmits<{
 }>()
 
 const scrollIndex = computed(() => {
-  return props.aiStatus ? props.aiStatus.length : 0
+  return (
+    (props.aiStatus ? props.aiStatus.length : 0) +
+    (props.topicTitleSuggestion ? props.topicTitleSuggestion.length : 0) +
+    (props.unknownRequestSuggestion
+      ? props.unknownRequestSuggestion.rawJson.length
+      : 0) +
+    (props.lastErrorMessage ? props.lastErrorMessage.length : 0) +
+    (props.currentAiReply ? props.currentAiReply.length : 0) +
+    (props.completionSuggestion ? props.completionSuggestion.length : 0)
+  )
 })
 
 watch(scrollIndex, (newVal) => {
