@@ -2,12 +2,9 @@ import { expect, vi } from "vitest"
 import ConversationInner from "@/components/conversations/ConversationInner.vue"
 import helper from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
-import {
-  type ConversationMessage,
-  type Message,
-  type MessageDelta,
-} from "@/generated/backend"
+import { type ConversationMessage } from "@/generated/backend"
 import { flushPromises } from "@vue/test-utils"
+import { simulateAiResponse } from "./AiResponse.spec"
 
 class MockIntersectionObserver {
   readonly root: Element | null = null
@@ -32,34 +29,6 @@ beforeAll(() => {
     configurable: true,
   })
 })
-
-const simulateAiResponse = (content = "## I'm ChatGPT") => {
-  const newMessage: Message = {
-    role: "assistant",
-    thread_id: "test-thread-id",
-    content: [],
-  }
-  const messageDelta: MessageDelta = {
-    delta: {
-      content: [
-        {
-          text: {
-            value: content,
-          },
-        },
-      ],
-    },
-  }
-
-  helper.managedApi.eventSource.eventSourceRequest.onMessage(
-    "thread.message.created",
-    JSON.stringify(newMessage)
-  )
-  helper.managedApi.eventSource.eventSourceRequest.onMessage(
-    "thread.message.delta",
-    JSON.stringify(messageDelta)
-  )
-}
 
 const setupTestData = () => {
   const note = makeMe.aNote.details("").please()

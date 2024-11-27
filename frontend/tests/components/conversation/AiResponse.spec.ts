@@ -34,7 +34,7 @@ beforeAll(() => {
   })
 })
 
-const simulateAiResponse = (content = "## I'm ChatGPT") => {
+export const simulateAiResponse = (content = "## I'm ChatGPT") => {
   const newMessage: Message = {
     role: "assistant",
     thread_id: "test-thread-id",
