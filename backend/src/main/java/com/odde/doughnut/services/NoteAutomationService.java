@@ -11,13 +11,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public final class NoteAutomationService extends NoteQuestionGenerationService {
+public final class NoteAutomationService {
   private final NotebookAssistantForNoteService notebookAssistantForNoteService;
 
-  public NoteAutomationService(
-      GlobalSettingsService globalSettingsService,
-      NotebookAssistantForNoteService notebookAssistantForNoteService) {
-    super(globalSettingsService, notebookAssistantForNoteService);
+  public NoteAutomationService(NotebookAssistantForNoteService notebookAssistantForNoteService) {
     this.notebookAssistantForNoteService = notebookAssistantForNoteService;
   }
 

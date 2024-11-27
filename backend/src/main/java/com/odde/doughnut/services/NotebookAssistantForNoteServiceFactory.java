@@ -41,7 +41,14 @@ public final class NotebookAssistantForNoteServiceFactory {
   public NoteAutomationService createNoteAutomationService(Note note) {
     NotebookAssistantForNoteService notebookAssistantForNoteService =
         getNotebookAssistantForNoteService(note);
-    return new NoteAutomationService(globalSettingsService, notebookAssistantForNoteService);
+    return new NoteAutomationService(notebookAssistantForNoteService);
+  }
+
+  public NoteQuestionGenerationService createNoteQuestionGenerationService(Note note) {
+    NotebookAssistantForNoteService notebookAssistantForNoteService =
+        getNotebookAssistantForNoteService(note);
+    return new NoteQuestionGenerationService(
+        globalSettingsService, notebookAssistantForNoteService);
   }
 
   public ChatAboutNoteService createChatAboutNoteService(Note note) {

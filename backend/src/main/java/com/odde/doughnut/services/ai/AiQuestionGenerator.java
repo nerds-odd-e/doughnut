@@ -5,7 +5,7 @@ import com.odde.doughnut.controllers.dto.ReviewQuestionContestResult;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.PredefinedQuestion;
 import com.odde.doughnut.services.GlobalSettingsService;
-import com.odde.doughnut.services.NoteAutomationService;
+import com.odde.doughnut.services.NoteQuestionGenerationService;
 import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
@@ -17,8 +17,8 @@ public record AiQuestionGenerator(
   public MCQWithAnswer getAiGeneratedQuestion(Note note) {
     NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory =
         new NotebookAssistantForNoteServiceFactory(openAiApi, globalSettingsService);
-    NoteAutomationService service =
-        notebookAssistantForNoteServiceFactory.createNoteAutomationService(note);
+    NoteQuestionGenerationService service =
+        notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(note);
     try {
       return service.generateQuestion();
     } catch (JsonProcessingException e) {

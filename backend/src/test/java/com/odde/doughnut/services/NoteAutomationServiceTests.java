@@ -26,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class NoteAutomationServiceTests {
   @Mock OpenAiApi openAiApi;
-  GlobalSettingsService globalSettingsService;
   @Autowired MakeMe makeMe;
   OpenAIAssistantMocker openAIAssistantMocker;
   OpenAIAssistantThreadMocker openAIAssistantThreadMocker;
@@ -45,10 +44,7 @@ class NoteAutomationServiceTests {
 
     // Initialize common services
     assistant = new OpenAiAssistant(new OpenAiApiHandler(openAiApi), "ass-id");
-    globalSettingsService = new GlobalSettingsService(makeMe.modelFactoryService);
-    service =
-        new NoteAutomationService(
-            globalSettingsService, new NotebookAssistantForNoteService(assistant, testNote));
+    service = new NoteAutomationService(new NotebookAssistantForNoteService(assistant, testNote));
   }
 
   @Test
