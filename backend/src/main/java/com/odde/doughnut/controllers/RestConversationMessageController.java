@@ -109,7 +109,10 @@ public class RestConversationMessageController {
       }
       return notebookAssistantForNoteServiceFactory
           .createChatAboutNoteService(note)
-          .getAiReplyForConversation(conversation, conversationService);
+          .startChat(conversation, conversationService)
+          .createOrResumeThread()
+          .provideUnseenMessages()
+          .getReplyStream();
     } catch (OpenAiUnauthorizedException e) {
       // Since this method is asynchronous, the exception body is not returned to the client.
       // Instead, the client will receive a 400 Bad Request status code, with no body.
