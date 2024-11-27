@@ -56,10 +56,9 @@
         @accept-title="handleAcceptTitle"
         @cancel="handleCancellation"
         @skip="handleSkip"
-        @scroll-index="scrollIndex = $event"
       />
 
-      <ScrollTo :scrollTrigger="scrollIndex + currentConversationMessages.length + (currentAiReply ? currentAiReply.length : 0) + (completionSuggestion ? 1 : 0) + (lastErrorMessage ? 1 : 0) + (aiStatus ? 1 : 0) + (topicTitleSuggestion ? 1 : 0) + (unknownRequestSuggestion ? 1 : 0)"/>
+      <ScrollTo :scrollTrigger="currentConversationMessages.length + (currentAiReply ? currentAiReply.length : 0) + (completionSuggestion ? 1 : 0) + (lastErrorMessage ? 1 : 0) + (aiStatus ? 1 : 0) + (topicTitleSuggestion ? 1 : 0) + (unknownRequestSuggestion ? 1 : 0)" />
     </template>
   </ConversationTemplate>
 </template>
@@ -113,8 +112,6 @@ const currentConversationMessages = ref<ConversationMessage[] | undefined>(
 
 const markdowntToHtml = (content?: string) =>
   markdownizer.markdownToHtml(content)
-
-const scrollIndex = ref(0)
 
 const currentAiReply = ref<string | undefined>()
 
