@@ -74,7 +74,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue"
+import { computed, watch } from "vue"
 import SvgRobot from "@/components/svgs/SvgRobot.vue"
 import AcceptRejectButtons from "@/components/commons/AcceptRejectButtons.vue"
 import markdownizer from "../form/markdownizer"
@@ -93,12 +93,21 @@ const props = defineProps<{
   currentDetails?: string
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
   (e: "accept-completion"): void
   (e: "accept-title"): void
   (e: "cancel"): void
   (e: "skip"): void
+  (e: "scroll-index", value: number): void
 }>()
+
+const scrollIndex = computed(() => {
+  return props.aiStatus ? props.aiStatus.length : 0
+})
+
+watch(scrollIndex, (newVal) => {
+  emit("scroll-index", newVal)
+})
 
 const markdowntToHtml = (content?: string) =>
   markdownizer.markdownToHtml(content)
