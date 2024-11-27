@@ -23,38 +23,48 @@ public class ChatAboutNoteService {
     return new ThreadStage(conversation, conversationService, this);
   }
 
-  public static class ThreadStage {
-    private final Conversation conversation;
-    private final ConversationService conversationService;
+  private abstract static class BaseStage {
+    protected final Conversation conversation;
+    protected final ConversationService conversationService;
+    protected final AssistantThread thread;
+
+    protected BaseStage(
+        Conversation conversation,
+        ConversationService conversationService,
+        AssistantThread thread) {
+      this.conversation = conversation;
+      this.conversationService = conversationService;
+      this.thread = thread;
+    }
+  }
+
+  public static class ThreadStage extends BaseStage {
     private final ChatAboutNoteService service;
 
     private ThreadStage(
         Conversation conversation,
         ConversationService conversationService,
         ChatAboutNoteService service) {
-      this.conversation = conversation;
-      this.conversationService = conversationService;
+      super(conversation, conversationService, null);
       this.service = service;
     }
 
     public MessageStage createOrResumeThread() {
-      AssistantThread thread;
+      AssistantThread newThread;
       if (conversation.getAiAssistantThreadId() == null) {
-        thread = service.notebookAssistantForNoteService.createThreadWithNoteInfo(List.of());
-        conversationService.setConversationAiAssistantThreadId(conversation, thread.getThreadId());
+        newThread = service.notebookAssistantForNoteService.createThreadWithNoteInfo(List.of());
+        conversationService.setConversationAiAssistantThreadId(
+            conversation, newThread.getThreadId());
       } else {
-        thread =
+        newThread =
             service.notebookAssistantForNoteService.getThread(
                 conversation.getAiAssistantThreadId());
       }
-      return new MessageStage(conversation, conversationService, thread, service);
+      return new MessageStage(conversation, conversationService, newThread, service);
     }
   }
 
-  public static class MessageStage {
-    private final Conversation conversation;
-    private final ConversationService conversationService;
-    private final AssistantThread thread;
+  public static class MessageStage extends BaseStage {
     private final ChatAboutNoteService service;
 
     private MessageStage(
@@ -62,9 +72,7 @@ public class ChatAboutNoteService {
         ConversationService conversationService,
         AssistantThread thread,
         ChatAboutNoteService service) {
-      this.conversation = conversation;
-      this.conversationService = conversationService;
-      this.thread = thread;
+      super(conversation, conversationService, thread);
       this.service = service;
     }
 
@@ -84,18 +92,12 @@ public class ChatAboutNoteService {
     }
   }
 
-  public static class FinalStage {
-    private final Conversation conversation;
-    private final ConversationService conversationService;
-    private final AssistantThread thread;
-
+  public static class FinalStage extends BaseStage {
     private FinalStage(
         Conversation conversation,
         ConversationService conversationService,
         AssistantThread thread) {
-      this.conversation = conversation;
-      this.conversationService = conversationService;
-      this.thread = thread;
+      super(conversation, conversationService, thread);
     }
 
     public SseEmitter getReplyStream() {
