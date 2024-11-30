@@ -6,7 +6,7 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.ReviewService;
+import com.odde.doughnut.services.RecallQuestionService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -24,7 +24,7 @@ class RestReviewQuestionController {
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
-  private final ReviewService reviewService;
+  private final RecallQuestionService recallQuestionService;
 
   public RestReviewQuestionController(
       @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
@@ -33,8 +33,9 @@ class RestReviewQuestionController {
       TestabilitySettings testabilitySettings) {
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
-    this.reviewService =
-        new ReviewService(openAiApi, modelFactoryService, testabilitySettings.getRandomizer());
+    this.recallQuestionService =
+        new RecallQuestionService(
+            openAiApi, modelFactoryService, testabilitySettings.getRandomizer());
   }
 
   @PostMapping("/generate-question")
@@ -42,7 +43,7 @@ class RestReviewQuestionController {
   public ReviewQuestionInstance generateQuestion(
       @RequestParam(value = "note") @Schema(type = "integer") Note note) {
     currentUser.assertLoggedIn();
-    return reviewService.generateAQuestionOfRandomType(note, currentUser.getEntity());
+    return recallQuestionService.generateAQuestionOfRandomType(note, currentUser.getEntity());
   }
 
   @GetMapping("/{memoryTracker}/random-question")
@@ -50,7 +51,7 @@ class RestReviewQuestionController {
   public ReviewQuestionInstance generateRandomQuestion(
       @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker) {
     currentUser.assertLoggedIn();
-    return reviewService.generateAQuestionOfRandomType(
+    return recallQuestionService.generateAQuestionOfRandomType(
         memoryTracker.getNote(), currentUser.getEntity());
   }
 
@@ -60,7 +61,7 @@ class RestReviewQuestionController {
       @PathVariable("reviewQuestionInstance") @Schema(type = "integer")
           ReviewQuestionInstance reviewQuestionInstance) {
     currentUser.assertLoggedIn();
-    return reviewService.generateAQuestionOfRandomType(
+    return recallQuestionService.generateAQuestionOfRandomType(
         reviewQuestionInstance.getPredefinedQuestion().getNote(), currentUser.getEntity());
   }
 
@@ -70,7 +71,7 @@ class RestReviewQuestionController {
       @PathVariable("reviewQuestionInstance") @Schema(type = "integer")
           ReviewQuestionInstance reviewQuestionInstance) {
     currentUser.assertLoggedIn();
-    return reviewService.contest(reviewQuestionInstance);
+    return recallQuestionService.contest(reviewQuestionInstance);
   }
 
   @PostMapping("/{reviewQuestionInstance}/answer")
@@ -81,7 +82,7 @@ class RestReviewQuestionController {
       @Valid @RequestBody AnswerDTO answerDTO) {
     currentUser.assertLoggedIn();
 
-    return reviewService.answerQuestion(
+    return recallQuestionService.answerQuestion(
         reviewQuestionInstance,
         answerDTO,
         currentUser.getEntity(),

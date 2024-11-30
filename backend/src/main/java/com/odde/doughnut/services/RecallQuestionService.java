@@ -8,11 +8,11 @@ import com.odde.doughnut.models.Randomizer;
 import com.theokanning.openai.client.OpenAiApi;
 import java.sql.Timestamp;
 
-public class ReviewService {
+public class RecallQuestionService {
   private final PredefinedQuestionService predefinedQuestionService;
   private final ModelFactoryService modelFactoryService;
 
-  public ReviewService(
+  public RecallQuestionService(
       OpenAiApi openAiApi, ModelFactoryService modelFactoryService, Randomizer randomizer) {
     this.modelFactoryService = modelFactoryService;
     this.predefinedQuestionService =
