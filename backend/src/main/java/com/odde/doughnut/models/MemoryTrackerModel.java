@@ -5,7 +5,7 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;
 
-public record ReviewPointModel(MemoryTracker entity, ModelFactoryService modelFactoryService) {
+public record MemoryTrackerModel(MemoryTracker entity, ModelFactoryService modelFactoryService) {
 
   public MemoryTracker getEntity() {
     return entity;

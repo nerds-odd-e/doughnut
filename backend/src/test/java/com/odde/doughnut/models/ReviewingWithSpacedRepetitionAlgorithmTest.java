@@ -112,7 +112,7 @@ public class ReviewingWithSpacedRepetitionAlgorithmTest {
       })
       void aReviewPointHasBeenReviewedStrictly(
           int ntimes, Integer daysDelay, int expectedForgettingCurveIndex) {
-        ReviewPointModel memoryTracker =
+        MemoryTrackerModel memoryTracker =
             makeMe
                 .aReviewPointFor(note)
                 .by(userModel)
@@ -131,7 +131,7 @@ public class ReviewingWithSpacedRepetitionAlgorithmTest {
 
   private MemoryTracker getOneReviewPointNeedToRepeat(Timestamp timestamp) {
     return userModel
-        .getReviewPointsNeedToRepeat(timestamp, ZoneId.of("Asia/Shanghai"))
+        .getMemoryTrackerNeedToRepeat(timestamp, ZoneId.of("Asia/Shanghai"))
         .findFirst()
         .orElse(null);
   }

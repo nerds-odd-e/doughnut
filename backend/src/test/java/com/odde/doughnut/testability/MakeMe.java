@@ -84,14 +84,14 @@ public class MakeMe extends MakeMeWithoutDB {
     return object;
   }
 
-  public ReviewPointBuilder aReviewPointFor(Note note) {
+  public MemoryTrackerBuilder aReviewPointFor(Note note) {
     MemoryTracker memoryTracker = MemoryTracker.buildReviewPointForNote(note);
-    ReviewPointBuilder reviewPointBuilder = new ReviewPointBuilder(memoryTracker, this);
-    reviewPointBuilder.entity.setNote(note);
-    return reviewPointBuilder;
+    MemoryTrackerBuilder memoryTrackerBuilder = new MemoryTrackerBuilder(memoryTracker, this);
+    memoryTrackerBuilder.entity.setNote(note);
+    return memoryTrackerBuilder;
   }
 
-  public ReviewPointBuilder aReviewPointBy(UserModel user) {
+  public MemoryTrackerBuilder aReviewPointBy(UserModel user) {
     Note note = aNote().please();
     return aReviewPointFor(note).by(user);
   }

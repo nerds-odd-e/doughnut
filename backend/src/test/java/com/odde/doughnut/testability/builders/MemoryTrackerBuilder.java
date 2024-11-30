@@ -1,61 +1,61 @@
 package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.models.ReviewPointModel;
+import com.odde.doughnut.models.MemoryTrackerModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
 
-public class ReviewPointBuilder extends EntityBuilder<MemoryTracker> {
+public class MemoryTrackerBuilder extends EntityBuilder<MemoryTracker> {
 
-  public ReviewPointBuilder(MemoryTracker memoryTracker, MakeMe makeMe) {
+  public MemoryTrackerBuilder(MemoryTracker memoryTracker, MakeMe makeMe) {
     super(makeMe, memoryTracker);
     initiallyReviewedOn(makeMe.aTimestamp().of(0, 0).please());
   }
 
-  public ReviewPointBuilder by(UserModel userModel) {
+  public MemoryTrackerBuilder by(UserModel userModel) {
     return by(userModel.getEntity());
   }
 
-  public ReviewPointBuilder by(User user) {
+  public MemoryTrackerBuilder by(User user) {
     entity.setUser(user);
     return this;
   }
 
-  public ReviewPointBuilder initiallyReviewedOn(Timestamp reviewTimestamp) {
+  public MemoryTrackerBuilder initiallyReviewedOn(Timestamp reviewTimestamp) {
     entity.setInitialReviewedAt(reviewTimestamp);
     entity.setLastReviewedAt(reviewTimestamp);
     entity.setNextReviewAt(reviewTimestamp);
     return this;
   }
 
-  public ReviewPointBuilder afterNthStrictRepetition(Integer repetitionDone) {
+  public MemoryTrackerBuilder afterNthStrictRepetition(Integer repetitionDone) {
     for (int i = 0; i < repetitionDone; i++) {
       entity.reviewedSuccessfully(entity.getNextReviewAt());
     }
     return this;
   }
 
-  public ReviewPointModel toModelPlease() {
+  public MemoryTrackerModel toModelPlease() {
     return makeMe.modelFactoryService.toReviewPointModel(please());
   }
 
   @Override
   protected void beforeCreate(boolean needPersist) {}
 
-  public ReviewPointBuilder forgettingCurveAndNextReviewAt(int value) {
+  public MemoryTrackerBuilder forgettingCurveAndNextReviewAt(int value) {
     entity.setForgettingCurveIndex(value);
     entity.setNextReviewAt(entity.calculateNextReviewAt());
     return this;
   }
 
-  public ReviewPointBuilder removedFromReview() {
+  public MemoryTrackerBuilder removedFromReview() {
     entity.setRemovedFromReview(true);
     return this;
   }
 
-  public ReviewPointBuilder nextReviewAt(Timestamp timestamp) {
+  public MemoryTrackerBuilder nextReviewAt(Timestamp timestamp) {
     entity.setNextReviewAt(timestamp);
     return this;
   }

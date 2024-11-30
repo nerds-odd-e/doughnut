@@ -65,8 +65,8 @@ public class ModelFactoryService {
     return new UserModel(user, this);
   }
 
-  public ReviewPointModel toReviewPointModel(MemoryTracker memoryTracker) {
-    return new ReviewPointModel(memoryTracker, this);
+  public MemoryTrackerModel toReviewPointModel(MemoryTracker memoryTracker) {
+    return new MemoryTrackerModel(memoryTracker, this);
   }
 
   public CircleModel toCircleModel(Circle circle) {

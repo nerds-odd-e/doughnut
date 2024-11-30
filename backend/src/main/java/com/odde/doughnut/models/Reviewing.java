@@ -38,18 +38,18 @@ public class Reviewing {
             getSubscriptionModelStream()
                 .flatMap(
                     sub ->
-                        getDueNewReviewPoint(
+                        getDueNewMemoryTracker(
                             sub, sub.needToLearnCountToday(alreadyInitialReviewed))),
-            getDueNewReviewPoint(userModel, count))
+            getDueNewMemoryTracker(userModel, count))
         .limit(count);
   }
 
-  private Stream<Note> getDueNewReviewPoint(ReviewScope reviewScope, int count) {
+  private Stream<Note> getDueNewMemoryTracker(ReviewScope reviewScope, int count) {
     return reviewScope.getThingHaveNotBeenReviewedAtAll().limit(count);
   }
 
-  private Stream<MemoryTracker> getReviewPointsNeedToRepeat(int dueInDays) {
-    return userModel.getReviewPointsNeedToRepeat(
+  private Stream<MemoryTracker> getMemoryTrackersNeedToRepeat(int dueInDays) {
+    return userModel.getMemoryTrackerNeedToRepeat(
         TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, dueInDays * 24), timeZone);
   }
 
@@ -93,7 +93,7 @@ public class Reviewing {
 
   public DueReviewPoints getDueReviewPoints(int dueInDays) {
     List<Integer> toRepeat =
-        getReviewPointsNeedToRepeat(dueInDays).map(MemoryTracker::getId).toList();
+        getMemoryTrackersNeedToRepeat(dueInDays).map(MemoryTracker::getId).toList();
     DueReviewPoints dueReviewPoints = new DueReviewPoints();
     dueReviewPoints.setDueInDays(dueInDays);
     dueReviewPoints.setToRepeat(toRepeat);
@@ -102,7 +102,7 @@ public class Reviewing {
 
   public ReviewStatus getReviewStatus() {
     ReviewStatus reviewStatus = new ReviewStatus();
-    reviewStatus.toRepeatCount = (int) getReviewPointsNeedToRepeat(0).count();
+    reviewStatus.toRepeatCount = (int) getMemoryTrackersNeedToRepeat(0).count();
     reviewStatus.learntCount = userModel.learntCount();
     reviewStatus.notLearntCount = notLearntCount();
     reviewStatus.toInitialReviewCount = toInitialReviewCount();

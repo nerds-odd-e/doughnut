@@ -11,19 +11,19 @@ public interface NoteReviewRepository extends CrudRepository<Note, Integer> {
   String selectThingsFrom = "SELECT n  from Note n  ";
 
   @Query(value = selectThingsFrom + selectNoteThings + joinReviewPoint + whereClaus + orderByDate)
-  Stream<Note> findByOwnershipWhereThereIsNoReviewPoint(Integer userId, Integer ownershipId);
+  Stream<Note> findByOwnershipWhereThereIsNoMemoryTracker(Integer userId, Integer ownershipId);
 
   @Query(
       value =
           "SELECT count(1) as count from Note n " + selectNoteThings + joinReviewPoint + whereClaus)
-  int countByOwnershipWhereThereIsNoReviewPoint(Integer userId, Integer ownershipId);
+  int countByOwnershipWhereThereIsNoMemoryTracker(Integer userId, Integer ownershipId);
 
   @Query(value = selectThingsFrom + joinReviewPoint + whereClaus + fromNotebook + orderByDate)
-  Stream<Note> findByAncestorWhereThereIsNoReviewPoint(Integer userId, Integer notebookId);
+  Stream<Note> findByAncestorWhereThereIsNoMemoryTracker(Integer userId, Integer notebookId);
 
   @Query(
       value = "SELECT count(1) as count from Note n " + joinReviewPoint + whereClaus + fromNotebook)
-  int countByAncestorWhereThereIsNoReviewPoint(Integer userId, Integer notebookId);
+  int countByAncestorWhereThereIsNoMemoryTracker(Integer userId, Integer notebookId);
 
   @Query(value = "SELECT count(1) as count from Note n " + " WHERE n.id in :noteIds" + fromNotebook)
   int countByAncestorAndInTheList(Integer notebookId, @Param("noteIds") List<Integer> noteIds);

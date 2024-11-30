@@ -5,7 +5,7 @@ import com.odde.doughnut.controllers.dto.InitialInfo;
 import com.odde.doughnut.controllers.dto.ReviewStatus;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.ReviewPointModel;
+import com.odde.doughnut.models.MemoryTrackerModel;
 import com.odde.doughnut.models.Reviewing;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -70,10 +70,10 @@ class RestReviewsController {
             modelFactoryService.entityManager.find(Note.class, initialInfo.noteId));
     memoryTracker.setRemovedFromReview(initialInfo.skipReview);
 
-    ReviewPointModel reviewPointModel = modelFactoryService.toReviewPointModel(memoryTracker);
-    reviewPointModel.initialReview(
+    MemoryTrackerModel memoryTrackerModel = modelFactoryService.toReviewPointModel(memoryTracker);
+    memoryTrackerModel.initialReview(
         testabilitySettings.getCurrentUTCTimestamp(), currentUser.getEntity());
-    return reviewPointModel.getEntity();
+    return memoryTrackerModel.getEntity();
   }
 
   @GetMapping(value = {"/repeat"})

@@ -41,13 +41,13 @@ public class UserModel implements ReviewScope {
 
   @Override
   public int getThingsHaveNotBeenReviewedAtAllCount() {
-    return modelFactoryService.noteReviewRepository.countByOwnershipWhereThereIsNoReviewPoint(
+    return modelFactoryService.noteReviewRepository.countByOwnershipWhereThereIsNoMemoryTracker(
         entity.getId(), entity.getOwnership().getId());
   }
 
   @Override
   public Stream<Note> getThingHaveNotBeenReviewedAtAll() {
-    return modelFactoryService.noteReviewRepository.findByOwnershipWhereThereIsNoReviewPoint(
+    return modelFactoryService.noteReviewRepository.findByOwnershipWhereThereIsNoMemoryTracker(
         entity.getId(), entity.getOwnership().getId());
   }
 
@@ -56,7 +56,7 @@ public class UserModel implements ReviewScope {
         entity, since);
   }
 
-  public Stream<MemoryTracker> getReviewPointsNeedToRepeat(
+  public Stream<MemoryTracker> getMemoryTrackerNeedToRepeat(
       Timestamp currentUTCTimestamp, ZoneId timeZone) {
     final Timestamp timestamp = TimestampOperations.alignByHalfADay(currentUTCTimestamp, timeZone);
     return modelFactoryService.memoryTrackerRepository
