@@ -32,29 +32,29 @@ class RestReviewPointController {
     this.testabilitySettings = testabilitySettings;
   }
 
-  @GetMapping("/{reviewPoint}")
+  @GetMapping("/{memoryTracker}")
   public MemoryTracker show(
-      @PathVariable("reviewPoint") @Schema(type = "integer") MemoryTracker memoryTracker)
+      @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker)
       throws UnexpectedNoAccessRightException {
     currentUser.assertLoggedIn();
     currentUser.assertReadAuthorization(memoryTracker);
     return memoryTracker;
   }
 
-  @PostMapping(path = "/{reviewPoint}/remove")
+  @PostMapping(path = "/{memoryTracker}/remove")
   @Transactional
   public MemoryTracker removeFromRepeating(
-      @PathVariable("reviewPoint") @Schema(type = "integer") MemoryTracker memoryTracker) {
+      @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker) {
     memoryTracker.setRemovedFromReview(true);
     memoryTracker.setLastReviewedAt(testabilitySettings.getCurrentUTCTimestamp());
     modelFactoryService.save(memoryTracker);
     return memoryTracker;
   }
 
-  @PostMapping(path = "/{reviewPoint}/self-evaluate")
+  @PostMapping(path = "/{memoryTracker}/self-evaluate")
   @Transactional
   public MemoryTracker selfEvaluate(
-      @PathVariable("reviewPoint") @Schema(type = "integer") MemoryTracker memoryTracker,
+      @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker,
       @RequestBody SelfEvaluation selfEvaluation) {
     currentUser.assertLoggedIn();
     if (memoryTracker == null || memoryTracker.getId() == null) {
@@ -66,10 +66,10 @@ class RestReviewPointController {
     return memoryTracker;
   }
 
-  @PatchMapping(path = "/{reviewPoint}/mark-as-repeated")
+  @PatchMapping(path = "/{memoryTracker}/mark-as-repeated")
   @Transactional
   public MemoryTracker markAsRepeated(
-      @PathVariable("reviewPoint") @Schema(type = "integer") MemoryTracker memoryTracker,
+      @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker,
       @RequestParam("successful") boolean successful) {
     currentUser.assertLoggedIn();
     modelFactoryService

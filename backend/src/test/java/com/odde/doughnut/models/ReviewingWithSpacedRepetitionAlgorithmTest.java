@@ -112,18 +112,18 @@ public class ReviewingWithSpacedRepetitionAlgorithmTest {
       })
       void aReviewPointHasBeenReviewedStrictly(
           int ntimes, Integer daysDelay, int expectedForgettingCurveIndex) {
-        ReviewPointModel reviewPoint =
+        ReviewPointModel memoryTracker =
             makeMe
                 .aReviewPointFor(note)
                 .by(userModel)
                 .afterNthStrictRepetition(ntimes)
                 .toModelPlease();
-        reviewPoint.markAsRepeated(
+        memoryTracker.markAsRepeated(
             TimestampOperations.addHoursToTimestamp(
-                reviewPoint.getEntity().getNextReviewAt(), daysDelay * 24),
+                memoryTracker.getEntity().getNextReviewAt(), daysDelay * 24),
             true);
         assertThat(
-            reviewPoint.getEntity().getForgettingCurveIndex(),
+            memoryTracker.getEntity().getForgettingCurveIndex(),
             equalTo(expectedForgettingCurveIndex));
       }
     }

@@ -318,7 +318,7 @@ export const assumeNotePage = (noteTopic?: string) => {
           cy.get('@currentNote').trigger('dragend')
         })
     },
-    reviewPoint() {
+    memoryTracker() {
       clickNotePageMoreOptionsButton('Note Review Settings')
       return {
         expectReviewPointInfo(attrs: { [key: string]: string }) {

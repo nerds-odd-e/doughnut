@@ -79,14 +79,14 @@ watch(
 )
 
 const selfEvaluate = async (adjustment: number) => {
-  const reviewPoint = await managedApi.restReviewPointController.selfEvaluate(
+  const memoryTracker = await managedApi.restReviewPointController.selfEvaluate(
     localReviewPoint.value.id,
     {
       adjustment,
     }
   )
-  localReviewPoint.value = reviewPoint
-  emit("update:modelValue", reviewPoint)
+  localReviewPoint.value = memoryTracker
+  emit("update:modelValue", memoryTracker)
 }
 
 const removeFromReview = async () => {
@@ -97,11 +97,11 @@ const removeFromReview = async () => {
   ) {
     return
   }
-  const reviewPoint =
+  const memoryTracker =
     await managedApi.restReviewPointController.removeFromRepeating(
       localReviewPoint.value.id
     )
-  localReviewPoint.value = reviewPoint
-  emit("update:modelValue", reviewPoint)
+  localReviewPoint.value = memoryTracker
+  emit("update:modelValue", memoryTracker)
 }
 </script>

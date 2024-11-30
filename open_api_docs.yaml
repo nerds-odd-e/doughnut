@@ -1227,13 +1227,13 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NotebookCertificateApproval"
-  /api/memory-trackers/{reviewPoint}/self-evaluate:
+  /api/memory-trackers/{memoryTracker}/self-evaluate:
     post:
       tags:
       - rest-review-point-controller
       operationId: selfEvaluate
       parameters:
-      - name: reviewPoint
+      - name: memoryTracker
         in: path
         required: true
         schema:
@@ -1257,13 +1257,13 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/MemoryTracker"
-  /api/memory-trackers/{reviewPoint}/remove:
+  /api/memory-trackers/{memoryTracker}/remove:
     post:
       tags:
       - rest-review-point-controller
       operationId: removeFromRepeating
       parameters:
-      - name: reviewPoint
+      - name: memoryTracker
         in: path
         required: true
         schema:
@@ -2263,13 +2263,13 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Notebook"
-  /api/memory-trackers/{reviewPoint}/mark-as-repeated:
+  /api/memory-trackers/{memoryTracker}/mark-as-repeated:
     patch:
       tags:
       - rest-review-point-controller
       operationId: markAsRepeated
       parameters:
-      - name: reviewPoint
+      - name: memoryTracker
         in: path
         required: true
         schema:
@@ -2542,13 +2542,13 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/AnsweredQuestion"
-  /api/review-questions/{reviewPoint}/random-question:
+  /api/review-questions/{memoryTracker}/random-question:
     get:
       tags:
       - rest-review-question-controller
       operationId: generateRandomQuestion
       parameters:
-      - name: reviewPoint
+      - name: memoryTracker
         in: path
         required: true
         schema:
@@ -2748,13 +2748,13 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NotebookCertificateApproval"
-  /api/memory-trackers/{reviewPoint}:
+  /api/memory-trackers/{memoryTracker}:
     get:
       tags:
       - rest-review-point-controller
       operationId: show_1
       parameters:
-      - name: reviewPoint
+      - name: memoryTracker
         in: path
         required: true
         schema:

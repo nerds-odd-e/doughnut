@@ -9,20 +9,20 @@ import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestReviewPointControllerService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
-     * @param reviewPoint
+     * @param memoryTracker
      * @param requestBody
      * @returns MemoryTracker OK
      * @throws ApiError
      */
     public selfEvaluate(
-        reviewPoint: number,
+        memoryTracker: number,
         requestBody: SelfEvaluation,
     ): CancelablePromise<MemoryTracker> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/memory-trackers/{reviewPoint}/self-evaluate',
+            url: '/api/memory-trackers/{memoryTracker}/self-evaluate',
             path: {
-                'reviewPoint': reviewPoint,
+                'memoryTracker': memoryTracker,
             },
             body: requestBody,
             mediaType: 'application/json',
@@ -32,18 +32,18 @@ export class RestReviewPointControllerService {
         });
     }
     /**
-     * @param reviewPoint
+     * @param memoryTracker
      * @returns MemoryTracker OK
      * @throws ApiError
      */
     public removeFromRepeating(
-        reviewPoint: number,
+        memoryTracker: number,
     ): CancelablePromise<MemoryTracker> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/memory-trackers/{reviewPoint}/remove',
+            url: '/api/memory-trackers/{memoryTracker}/remove',
             path: {
-                'reviewPoint': reviewPoint,
+                'memoryTracker': memoryTracker,
             },
             errors: {
                 500: `Internal Server Error`,
@@ -51,20 +51,20 @@ export class RestReviewPointControllerService {
         });
     }
     /**
-     * @param reviewPoint
+     * @param memoryTracker
      * @param successful
      * @returns MemoryTracker OK
      * @throws ApiError
      */
     public markAsRepeated(
-        reviewPoint: number,
+        memoryTracker: number,
         successful: boolean,
     ): CancelablePromise<MemoryTracker> {
         return this.httpRequest.request({
             method: 'PATCH',
-            url: '/api/memory-trackers/{reviewPoint}/mark-as-repeated',
+            url: '/api/memory-trackers/{memoryTracker}/mark-as-repeated',
             path: {
-                'reviewPoint': reviewPoint,
+                'memoryTracker': memoryTracker,
             },
             query: {
                 'successful': successful,
@@ -75,18 +75,18 @@ export class RestReviewPointControllerService {
         });
     }
     /**
-     * @param reviewPoint
+     * @param memoryTracker
      * @returns MemoryTracker OK
      * @throws ApiError
      */
     public show1(
-        reviewPoint: number,
+        memoryTracker: number,
     ): CancelablePromise<MemoryTracker> {
         return this.httpRequest.request({
             method: 'GET',
-            url: '/api/memory-trackers/{reviewPoint}',
+            url: '/api/memory-trackers/{memoryTracker}',
             path: {
-                'reviewPoint': reviewPoint,
+                'memoryTracker': memoryTracker,
             },
             errors: {
                 500: `Internal Server Error`,

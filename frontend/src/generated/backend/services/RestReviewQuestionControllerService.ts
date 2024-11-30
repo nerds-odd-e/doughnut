@@ -110,18 +110,18 @@ export class RestReviewQuestionControllerService {
         });
     }
     /**
-     * @param reviewPoint
+     * @param memoryTracker
      * @returns ReviewQuestionInstance OK
      * @throws ApiError
      */
     public generateRandomQuestion(
-        reviewPoint: number,
+        memoryTracker: number,
     ): CancelablePromise<ReviewQuestionInstance> {
         return this.httpRequest.request({
             method: 'GET',
-            url: '/api/review-questions/{reviewPoint}/random-question',
+            url: '/api/review-questions/{memoryTracker}/random-question',
             path: {
-                'reviewPoint': reviewPoint,
+                'memoryTracker': memoryTracker,
             },
             errors: {
                 500: `Internal Server Error`,

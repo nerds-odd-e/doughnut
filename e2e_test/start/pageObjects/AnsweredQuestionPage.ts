@@ -9,7 +9,7 @@ const assumeAnsweredQuestionPage = () => {
     },
     showReviewPoint(noteTopic?: string) {
       cy.findByText('Note reviewed:').click()
-      return assumeNotePage(noteTopic).reviewPoint()
+      return assumeNotePage(noteTopic).memoryTracker()
     },
     goToLastResult: () => {
       cy.findByRole('button', { name: 'view last result' }).click()

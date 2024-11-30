@@ -4,7 +4,7 @@ import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 
 const stubResponse = {
-  reviewPoint: makeMe.aReviewPoint.please(),
+  memoryTracker: makeMe.aReviewPoint.please(),
   note: makeMe.aNoteRealm.please(),
 }
 

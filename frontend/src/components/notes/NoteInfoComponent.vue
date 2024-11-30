@@ -4,10 +4,10 @@
     v-bind="{ noteId: noteInfo.note.id, reviewSetting }"
     @level-changed="$emit('levelChanged', $event)"
   />
-  <template v-if="reviewPoint">
+  <template v-if="memoryTracker">
     <h6>Memory Tracker</h6>
     <NoteInfoReviewPoint
-      v-model="reviewPoint"
+      v-model="memoryTracker"
       @update:model-value="onSelfEvaluated($event)"
     />
   </template>
@@ -27,7 +27,7 @@ export default defineComponent({
   emits: ["levelChanged"],
   data() {
     return {
-      reviewPoint: this.noteInfo.reviewPoint,
+      memoryTracker: this.noteInfo.memoryTracker,
     }
   },
   computed: {
@@ -37,8 +37,8 @@ export default defineComponent({
   },
   components: { ReviewSettingForm, NoteInfoReviewPoint },
   methods: {
-    onSelfEvaluated(reviewPoint: MemoryTracker) {
-      this.reviewPoint = reviewPoint
+    onSelfEvaluated(memoryTracker: MemoryTracker) {
+      this.memoryTracker = memoryTracker
     },
   },
 })

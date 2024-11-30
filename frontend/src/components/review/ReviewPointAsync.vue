@@ -1,7 +1,7 @@
 <template>
-  <ContentLoader v-if="!reviewPoint" />
+  <ContentLoader v-if="!memoryTracker" />
   <main v-else>
-    <NoteWithBreadcrumb v-bind="{ note: reviewPoint.note, storageAccessor }" />
+    <NoteWithBreadcrumb v-bind="{ note: memoryTracker.note, storageAccessor }" />
   </main>
 </template>
 
@@ -31,12 +31,12 @@ export default defineComponent({
   },
   data() {
     return {
-      reviewPoint: undefined as MemoryTracker | undefined,
+      memoryTracker: undefined as MemoryTracker | undefined,
     }
   },
   methods: {
     async fetchData() {
-      this.reviewPoint = await this.managedApi.restReviewPointController.show(
+      this.memoryTracker = await this.managedApi.restReviewPointController.show(
         this.reviewPointId
       )
     },

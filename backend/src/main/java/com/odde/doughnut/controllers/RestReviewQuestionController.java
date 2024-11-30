@@ -45,10 +45,10 @@ class RestReviewQuestionController {
     return reviewService.generateAQuestionOfRandomType(note, currentUser.getEntity());
   }
 
-  @GetMapping("/{reviewPoint}/random-question")
+  @GetMapping("/{memoryTracker}/random-question")
   @Transactional
   public ReviewQuestionInstance generateRandomQuestion(
-      @PathVariable("reviewPoint") @Schema(type = "integer") MemoryTracker memoryTracker) {
+      @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker) {
     currentUser.assertLoggedIn();
     return reviewService.generateAQuestionOfRandomType(
         memoryTracker.getNote(), currentUser.getEntity());
