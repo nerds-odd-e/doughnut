@@ -93,13 +93,13 @@ describe("repeat page", () => {
     it("should show progress", async () => {
       const wrapper = await mountPage()
       const answerResult = makeMe.anAnsweredQuestion
-        .withReviewQuestionInstanceId(1)
+        .withRecallPromptId(1)
         .answerCorrect(false)
         .please()
       const mockedMarkAsRepeatedCall = vi.fn().mockResolvedValue(answerResult)
       helper.managedApi.restMemoryTrackerController.markAsRepeated =
         mockedMarkAsRepeatedCall
-      const reviewQuestionInstance = makeMe.aReviewQuestionInstance.please()
+      const reviewQuestionInstance = makeMe.aRecallPrompt.please()
       mockedRandomQuestionCall.mockResolvedValueOnce(reviewQuestionInstance)
       vi.runOnlyPendingTimers()
       await flushPromises()

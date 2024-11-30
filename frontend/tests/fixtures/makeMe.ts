@@ -8,7 +8,7 @@ import NoteBuilder from "./NoteBuilder"
 import NoteRealmBuilder from "./NoteRealmBuilder"
 import NotebookBuilder from "./NotebookBuilder"
 import PredefinedQuestionBuilder from "./PredefinedQuestionBuilder"
-import ReviewQuestionInstanceBuilder from "./ReviewQuestionInstanceBuilder"
+import RecallPromptBuilder from "./RecallPromptBuilder"
 import MemoryTrackerBuilder from "./MemoryTrackerBuilder"
 import SuggestedQuestionForFineTuningBuilder from "./SuggestedQuestionForFineTuningBuilder"
 import UserBuilder from "./UserBuilder"
@@ -44,8 +44,8 @@ class MakeMe {
     return new DueMemoryTrackersBuilder()
   }
 
-  static get aReviewQuestionInstance(): ReviewQuestionInstanceBuilder {
-    return new ReviewQuestionInstanceBuilder()
+  static get aRecallPrompt(): RecallPromptBuilder {
+    return new RecallPromptBuilder()
   }
 
   static get anAssessmentQuestionInstance(): AssessmentQuestionInstanceBuilder {

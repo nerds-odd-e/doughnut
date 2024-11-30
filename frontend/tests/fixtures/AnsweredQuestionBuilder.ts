@@ -14,7 +14,7 @@ class AnsweredQuestionBuilder extends Builder<AnsweredQuestion> {
     return this
   }
 
-  withReviewQuestionInstanceId(id: number): this {
+  withRecallPromptId(id: number): this {
     this.reviewQuestionInstanceIdToUse = id
     return this
   }

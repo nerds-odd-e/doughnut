@@ -19,7 +19,7 @@ describe("repetition page", () => {
     const mockedStartConversationCall = vi.fn()
     const answeredQuestion = makeMe.anAnsweredQuestion
       .withNote(link)
-      .withReviewQuestionInstanceId(REVIEW_QUESTION_ID)
+      .withRecallPromptId(REVIEW_QUESTION_ID)
       .please()
 
     beforeEach(async () => {

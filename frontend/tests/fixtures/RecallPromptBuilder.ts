@@ -4,7 +4,7 @@ import generateId from "./generateId"
 import PredefinedQuestionBuilder from "./PredefinedQuestionBuilder"
 import NotebookBuilder from "./NotebookBuilder"
 
-class ReviewQuestionInstanceBuilder extends Builder<RecallPrompt> {
+class RecallPromptBuilder extends Builder<RecallPrompt> {
   predefinedQuestionBuilder = new PredefinedQuestionBuilder()
 
   withQuestionStem(stem: string) {
@@ -27,4 +27,4 @@ class ReviewQuestionInstanceBuilder extends Builder<RecallPrompt> {
   }
 }
 
-export default ReviewQuestionInstanceBuilder
+export default RecallPromptBuilder
