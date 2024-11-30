@@ -61,7 +61,7 @@ public class Conversation extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  public void setReviewQuestionInstance(RecallPrompt recallPrompt) {
+  public void setRecallPrompt(RecallPrompt recallPrompt) {
     this.subject.setRecallPrompt(recallPrompt);
     this.subjectOwnership = recallPrompt.getNotebook().getOwnership();
   }

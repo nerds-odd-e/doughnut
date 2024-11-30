@@ -40,7 +40,7 @@ public class ConversationService {
   public Conversation startConversationAboutReviewQuestion(
       RecallPrompt recallPrompt, User initiator) {
     Conversation conversation = initializeConversation(initiator);
-    conversation.setReviewQuestionInstance(recallPrompt);
+    conversation.setRecallPrompt(recallPrompt);
     modelFactoryService.conversationRepository.save(conversation);
     return conversation;
   }

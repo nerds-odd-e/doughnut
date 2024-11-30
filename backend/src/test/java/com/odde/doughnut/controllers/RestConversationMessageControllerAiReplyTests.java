@@ -319,11 +319,7 @@ public class RestConversationMessageControllerAiReplyTests {
       questionNote = makeMe.aNote().creatorAndOwner(currentUser).please();
       recallPrompt = makeMe.aRecallPrompt().spellingQuestionOf(questionNote).please();
       conversation =
-          makeMe
-              .aConversation()
-              .forAReviewQuestionInstance(recallPrompt)
-              .from(currentUser)
-              .please();
+          makeMe.aConversation().forARecallPrompt(recallPrompt).from(currentUser).please();
 
       openAIAssistantMocker
           .mockThreadCreation("my-thread")

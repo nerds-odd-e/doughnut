@@ -54,8 +54,8 @@ public class ConversationBuilder extends EntityBuilder<Conversation> {
     return this;
   }
 
-  public ConversationBuilder forAReviewQuestionInstance(RecallPrompt recallPrompt) {
-    this.entity.setReviewQuestionInstance(recallPrompt);
+  public ConversationBuilder forARecallPrompt(RecallPrompt recallPrompt) {
+    this.entity.setRecallPrompt(recallPrompt);
     return this;
   }
 }

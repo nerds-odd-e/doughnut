@@ -438,7 +438,7 @@ class RestConversationMessageControllerTest {
     }
 
     @Test
-    void shouldSetReviewQuestionInstanceAsSubject() {
+    void shouldSetRecallPromptAsSubject() {
       Conversation conversation = controller.startConversationAboutReviewQuestion(recallPrompt);
       makeMe.refresh(conversation);
       assertEquals(recallPrompt, conversation.getSubject().getRecallPrompt());
