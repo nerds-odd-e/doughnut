@@ -15,7 +15,7 @@
     >
       <form @submit.prevent.once="submitAnswer({ spellingAnswer })">
         <TextInput
-          scope-name="review_point"
+          scope-name="memory_tracker"
           field="answer"
           v-model="spellingAnswer"
           placeholder="put your answer here"

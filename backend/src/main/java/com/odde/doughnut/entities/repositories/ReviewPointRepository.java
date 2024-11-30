@@ -30,7 +30,7 @@ public interface ReviewPointRepository extends CrudRepository<ReviewPoint, Integ
   @Query(
       value =
           "SELECT * "
-              + " FROM review_point rp "
+              + " FROM memory_tracker rp "
               + " WHERE rp.user_id = :userId "
               + " ORDER BY initial_reviewed_at DESC LIMIT 100",
       nativeQuery = true)
@@ -39,7 +39,7 @@ public interface ReviewPointRepository extends CrudRepository<ReviewPoint, Integ
   @Query(
       value =
           "SELECT * "
-              + " FROM review_point rp "
+              + " FROM memory_tracker rp "
               + " WHERE rp.user_id = :userId "
               + " AND rp.last_reviewed_at IS NOT NULL "
               + " ORDER BY last_reviewed_at DESC LIMIT 100",
@@ -47,7 +47,7 @@ public interface ReviewPointRepository extends CrudRepository<ReviewPoint, Integ
   List<ReviewPoint> findLast100ReviewedByUser(Integer userId);
 
   String byUserId =
-      " FROM review_point rp "
+      " FROM memory_tracker rp "
           + " WHERE rp.user_id = :userId "
           + "   AND rp.removed_from_review IS FALSE ";
 }

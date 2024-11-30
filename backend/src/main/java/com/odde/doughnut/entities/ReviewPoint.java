@@ -15,7 +15,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "review_point")
+@Table(name = "memory_tracker")
 public class ReviewPoint extends EntityIdentifiedByIdOnly {
   public static ReviewPoint buildReviewPointForNote(Note note) {
     ReviewPoint entity = new ReviewPoint();
