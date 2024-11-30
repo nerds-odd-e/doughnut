@@ -18,7 +18,7 @@ public class ConversationSubject {
   private Note note;
 
   @ManyToOne
-  @JoinColumn(name = "review_question_instance_id", referencedColumnName = "id")
+  @JoinColumn(name = "recall_prompt_id", referencedColumnName = "id")
   @JsonIgnore
   private ReviewQuestionInstance reviewQuestionInstance;
 

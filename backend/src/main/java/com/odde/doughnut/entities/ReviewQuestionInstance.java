@@ -9,7 +9,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Entity
-@Table(name = "review_question_instance")
+@Table(name = "recall_prompt")
 @Data
 @EqualsAndHashCode(callSuper = false)
 @JsonPropertyOrder({"id", "bareQuestion", "notebook"})
