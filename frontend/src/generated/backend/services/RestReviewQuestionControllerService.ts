@@ -4,20 +4,20 @@
 /* eslint-disable */
 import type { AnswerDTO } from '../models/AnswerDTO';
 import type { AnsweredQuestion } from '../models/AnsweredQuestion';
+import type { RecallPrompt } from '../models/RecallPrompt';
 import type { ReviewQuestionContestResult } from '../models/ReviewQuestionContestResult';
-import type { ReviewQuestionInstance } from '../models/ReviewQuestionInstance';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestReviewQuestionControllerService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
      * @param reviewQuestionInstance
-     * @returns ReviewQuestionInstance OK
+     * @returns RecallPrompt OK
      * @throws ApiError
      */
     public regenerate(
         reviewQuestionInstance: number,
-    ): CancelablePromise<ReviewQuestionInstance> {
+    ): CancelablePromise<RecallPrompt> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/review-questions/{reviewQuestionInstance}/regenerate',
@@ -73,12 +73,12 @@ export class RestReviewQuestionControllerService {
     }
     /**
      * @param note
-     * @returns ReviewQuestionInstance OK
+     * @returns RecallPrompt OK
      * @throws ApiError
      */
     public generateQuestion(
         note: number,
-    ): CancelablePromise<ReviewQuestionInstance> {
+    ): CancelablePromise<RecallPrompt> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/review-questions/generate-question',
@@ -111,12 +111,12 @@ export class RestReviewQuestionControllerService {
     }
     /**
      * @param memoryTracker
-     * @returns ReviewQuestionInstance OK
+     * @returns RecallPrompt OK
      * @throws ApiError
      */
     public generateRandomQuestion(
         memoryTracker: number,
-    ): CancelablePromise<ReviewQuestionInstance> {
+    ): CancelablePromise<RecallPrompt> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/review-questions/{memoryTracker}/random-question',

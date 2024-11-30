@@ -61,9 +61,9 @@ public class Conversation extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  public void setReviewQuestionInstance(ReviewQuestionInstance reviewQuestionInstance) {
-    this.subject.setReviewQuestionInstance(reviewQuestionInstance);
-    this.subjectOwnership = reviewQuestionInstance.getNotebook().getOwnership();
+  public void setReviewQuestionInstance(RecallPrompt recallPrompt) {
+    this.subject.setRecallPrompt(recallPrompt);
+    this.subjectOwnership = recallPrompt.getNotebook().getOwnership();
   }
 
   @JsonIgnore

@@ -40,7 +40,7 @@ class RestReviewQuestionController {
 
   @PostMapping("/generate-question")
   @Transactional
-  public ReviewQuestionInstance generateQuestion(
+  public RecallPrompt generateQuestion(
       @RequestParam(value = "note") @Schema(type = "integer") Note note) {
     currentUser.assertLoggedIn();
     return recallQuestionService.generateAQuestionOfRandomType(note, currentUser.getEntity());
@@ -48,7 +48,7 @@ class RestReviewQuestionController {
 
   @GetMapping("/{memoryTracker}/random-question")
   @Transactional
-  public ReviewQuestionInstance generateRandomQuestion(
+  public RecallPrompt generateRandomQuestion(
       @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker) {
     currentUser.assertLoggedIn();
     return recallQuestionService.generateAQuestionOfRandomType(
@@ -57,33 +57,30 @@ class RestReviewQuestionController {
 
   @PostMapping("/{reviewQuestionInstance}/regenerate")
   @Transactional
-  public ReviewQuestionInstance regenerate(
-      @PathVariable("reviewQuestionInstance") @Schema(type = "integer")
-          ReviewQuestionInstance reviewQuestionInstance) {
+  public RecallPrompt regenerate(
+      @PathVariable("reviewQuestionInstance") @Schema(type = "integer") RecallPrompt recallPrompt) {
     currentUser.assertLoggedIn();
     return recallQuestionService.generateAQuestionOfRandomType(
-        reviewQuestionInstance.getPredefinedQuestion().getNote(), currentUser.getEntity());
+        recallPrompt.getPredefinedQuestion().getNote(), currentUser.getEntity());
   }
 
   @PostMapping("/{reviewQuestionInstance}/contest")
   @Transactional
   public ReviewQuestionContestResult contest(
-      @PathVariable("reviewQuestionInstance") @Schema(type = "integer")
-          ReviewQuestionInstance reviewQuestionInstance) {
+      @PathVariable("reviewQuestionInstance") @Schema(type = "integer") RecallPrompt recallPrompt) {
     currentUser.assertLoggedIn();
-    return recallQuestionService.contest(reviewQuestionInstance);
+    return recallQuestionService.contest(recallPrompt);
   }
 
   @PostMapping("/{reviewQuestionInstance}/answer")
   @Transactional
   public AnsweredQuestion answerQuiz(
-      @PathVariable("reviewQuestionInstance") @Schema(type = "integer")
-          ReviewQuestionInstance reviewQuestionInstance,
+      @PathVariable("reviewQuestionInstance") @Schema(type = "integer") RecallPrompt recallPrompt,
       @Valid @RequestBody AnswerDTO answerDTO) {
     currentUser.assertLoggedIn();
 
     return recallQuestionService.answerQuestion(
-        reviewQuestionInstance,
+        recallPrompt,
         answerDTO,
         currentUser.getEntity(),
         testabilitySettings.getCurrentUTCTimestamp());
@@ -92,10 +89,9 @@ class RestReviewQuestionController {
   @GetMapping(path = "/{reviewQuestionInstance}")
   @Transactional
   public AnsweredQuestion showQuestion(
-      @PathVariable("reviewQuestionInstance") @Schema(type = "integer")
-          ReviewQuestionInstance reviewQuestionInstance)
+      @PathVariable("reviewQuestionInstance") @Schema(type = "integer") RecallPrompt recallPrompt)
       throws UnexpectedNoAccessRightException {
-    currentUser.assertReadAuthorization(reviewQuestionInstance);
-    return reviewQuestionInstance.getAnsweredQuestion();
+    currentUser.assertReadAuthorization(recallPrompt);
+    return recallPrompt.getAnsweredQuestion();
   }
 }

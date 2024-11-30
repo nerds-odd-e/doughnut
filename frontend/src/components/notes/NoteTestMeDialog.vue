@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Note, ReviewQuestionInstance } from "@/generated/backend"
+import type { Note, RecallPrompt } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import type { PropType } from "vue"
@@ -24,9 +24,7 @@ const { selectedNote, storageAccessor } = defineProps({
     required: true,
   },
 })
-const reviewQuestionInstance = ref<ReviewQuestionInstance | undefined>(
-  undefined
-)
+const reviewQuestionInstance = ref<RecallPrompt | undefined>(undefined)
 const bottomOfTheChat = ref<HTMLElement | null>(null)
 
 const scrollToBottom = () => {

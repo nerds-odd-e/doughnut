@@ -2,26 +2,25 @@ package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.ReviewQuestionInstance;
+import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionFactory;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 
-public class ReviewQuestionInstanceBuilder extends EntityBuilder<ReviewQuestionInstance> {
+public class ReviewQuestionInstanceBuilder extends EntityBuilder<RecallPrompt> {
   private final PredefinedQuestionBuilder predefinedQuestionBuilder;
   private AnswerDTO answerDTO = null;
 
-  public ReviewQuestionInstanceBuilder(
-      MakeMe makeMe, ReviewQuestionInstance reviewQuestionInstance) {
-    super(makeMe, reviewQuestionInstance);
+  public ReviewQuestionInstanceBuilder(MakeMe makeMe, RecallPrompt recallPrompt) {
+    super(makeMe, recallPrompt);
     predefinedQuestionBuilder = new PredefinedQuestionBuilder(makeMe);
   }
 
   @Override
   protected void beforeCreate(boolean needPersist) {
     if (entity == null) {
-      entity = new ReviewQuestionInstance();
+      entity = new RecallPrompt();
       entity.setPredefinedQuestion(predefinedQuestionBuilder.please(needPersist));
     }
     if (answerDTO != null) {

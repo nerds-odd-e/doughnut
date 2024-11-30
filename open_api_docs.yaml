@@ -620,7 +620,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/ReviewQuestionInstance"
+                $ref: "#/components/schemas/RecallPrompt"
   /api/review-questions/{reviewQuestionInstance}/contest:
     post:
       tags:
@@ -813,7 +813,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/ReviewQuestionInstance"
+                $ref: "#/components/schemas/RecallPrompt"
   /api/review-questions/generate-question-without-save:
     post:
       tags:
@@ -2565,7 +2565,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/ReviewQuestionInstance"
+                $ref: "#/components/schemas/RecallPrompt"
   /api/notes/{note}/note-info:
     get:
       tags:
@@ -3476,7 +3476,7 @@ components:
           format: int32
         removedFromReview:
           type: boolean
-    ReviewQuestionInstance:
+    RecallPrompt:
       required:
       - bareQuestion
       - id

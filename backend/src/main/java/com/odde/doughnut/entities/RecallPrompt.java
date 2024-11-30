@@ -13,7 +13,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @JsonPropertyOrder({"id", "bareQuestion", "notebook"})
-public class ReviewQuestionInstance extends AnswerableQuestionInstance {
+public class RecallPrompt extends AnswerableQuestionInstance {
   public Notebook getNotebook() {
     return getPredefinedQuestion().getNote().getNotebook();
   }

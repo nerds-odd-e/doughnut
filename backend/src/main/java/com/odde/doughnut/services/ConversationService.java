@@ -4,7 +4,7 @@ import com.odde.doughnut.entities.AssessmentQuestionInstance;
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.ConversationMessage;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.ReviewQuestionInstance;
+import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -38,9 +38,9 @@ public class ConversationService {
   }
 
   public Conversation startConversationAboutReviewQuestion(
-      ReviewQuestionInstance reviewQuestionInstance, User initiator) {
+      RecallPrompt recallPrompt, User initiator) {
     Conversation conversation = initializeConversation(initiator);
-    conversation.setReviewQuestionInstance(reviewQuestionInstance);
+    conversation.setReviewQuestionInstance(recallPrompt);
     modelFactoryService.conversationRepository.save(conversation);
     return conversation;
   }

@@ -93,13 +93,13 @@ class ConversationMessageServiceTest {
 
   @Nested
   class ReviewQuestionConversationTest {
-    private ReviewQuestionInstance reviewQuestionInstance;
+    private RecallPrompt recallPrompt;
     private Note note;
 
     @BeforeEach
     void setup() {
       note = makeMe.aNote().creatorAndOwner(currentUser).please();
-      reviewQuestionInstance =
+      recallPrompt =
           makeMe.aReviewQuestionInstance().spellingQuestionOf(note).answerChoiceIndex(1).please();
     }
 
@@ -107,10 +107,10 @@ class ConversationMessageServiceTest {
     void shouldSetCorrectOwnershipAndSubject() {
       Conversation conversation =
           conversationService.startConversationAboutReviewQuestion(
-              reviewQuestionInstance, currentUser.getEntity());
+              recallPrompt, currentUser.getEntity());
 
       makeMe.refresh(conversation);
-      assertEquals(reviewQuestionInstance, conversation.getSubject().getReviewQuestionInstance());
+      assertEquals(recallPrompt, conversation.getSubject().getRecallPrompt());
       assertEquals(note.getNotebook().getOwnership(), conversation.getSubjectOwnership());
       assertEquals(currentUser.getEntity(), conversation.getConversationInitiator());
     }

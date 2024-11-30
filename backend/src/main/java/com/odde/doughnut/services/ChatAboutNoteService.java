@@ -55,16 +55,13 @@ public class ChatAboutNoteService {
       AssistantThread newThread;
       if (conversation.getAiAssistantThreadId() == null) {
         List<MessageRequest> initialMessages = new ArrayList<>();
-        if (conversation.getSubject().getReviewQuestionInstance() != null) {
+        if (conversation.getSubject().getRecallPrompt() != null) {
           MessageRequest msg =
               MessageRequest.builder()
                   .role("assistant")
                   .content(
                       "User attempted to answer the following question about the note of focus:\n"
-                          + conversation
-                              .getSubject()
-                              .getReviewQuestionInstance()
-                              .getQuestionDetails())
+                          + conversation.getSubject().getRecallPrompt().getQuestionDetails())
                   .build();
           initialMessages.add(msg);
         }

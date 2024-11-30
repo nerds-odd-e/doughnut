@@ -155,13 +155,9 @@ public class ModelFactoryService {
   }
 
   public void updateMemoryTrackerAfterAnsweringQuestion(
-      User user,
-      Timestamp currentUTCTimestamp,
-      Boolean correct,
-      ReviewQuestionInstance reviewQuestionInstance) {
+      User user, Timestamp currentUTCTimestamp, Boolean correct, RecallPrompt recallPrompt) {
     MemoryTracker memoryTracker =
-        toUserModel(user)
-            .getMemoryTrackerFor(reviewQuestionInstance.getPredefinedQuestion().getNote());
+        toUserModel(user).getMemoryTrackerFor(recallPrompt.getPredefinedQuestion().getNote());
     if (memoryTracker != null) {
       toMemoryTrackerModel(memoryTracker).markAsRepeated(currentUTCTimestamp, correct);
     }

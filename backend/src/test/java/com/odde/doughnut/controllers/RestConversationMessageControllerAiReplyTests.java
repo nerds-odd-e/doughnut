@@ -9,7 +9,7 @@ import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.ConversationMessage;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NotebookAssistant;
-import com.odde.doughnut.entities.ReviewQuestionInstance;
+import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
@@ -311,18 +311,17 @@ public class RestConversationMessageControllerAiReplyTests {
 
   @Nested
   class ReviewQuestionConversationTests {
-    ReviewQuestionInstance reviewQuestionInstance;
+    RecallPrompt recallPrompt;
     Note questionNote;
 
     @BeforeEach
     void setup() {
       questionNote = makeMe.aNote().creatorAndOwner(currentUser).please();
-      reviewQuestionInstance =
-          makeMe.aReviewQuestionInstance().spellingQuestionOf(questionNote).please();
+      recallPrompt = makeMe.aReviewQuestionInstance().spellingQuestionOf(questionNote).please();
       conversation =
           makeMe
               .aConversation()
-              .forAReviewQuestionInstance(reviewQuestionInstance)
+              .forAReviewQuestionInstance(recallPrompt)
               .from(currentUser)
               .please();
 
@@ -370,7 +369,7 @@ public class RestConversationMessageControllerAiReplyTests {
       verify(openAiApi).createThread(threadRequestArgumentCaptor.capture());
 
       // Verify the question details were included in the message
-      String expectedQuestionDetails = reviewQuestionInstance.getQuestionDetails();
+      String expectedQuestionDetails = recallPrompt.getQuestionDetails();
       MessageRequest second = threadRequestArgumentCaptor.getValue().getMessages().get(1);
       assertThat(second.getContent().toString())
           .contains("User attempted to answer")

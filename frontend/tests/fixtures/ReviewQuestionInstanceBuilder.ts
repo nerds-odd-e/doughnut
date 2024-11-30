@@ -1,10 +1,10 @@
-import type { ReviewQuestionInstance } from "@/generated/backend"
+import type { RecallPrompt } from "@/generated/backend"
 import Builder from "./Builder"
 import generateId from "./generateId"
 import PredefinedQuestionBuilder from "./PredefinedQuestionBuilder"
 import NotebookBuilder from "./NotebookBuilder"
 
-class ReviewQuestionInstanceBuilder extends Builder<ReviewQuestionInstance> {
+class ReviewQuestionInstanceBuilder extends Builder<RecallPrompt> {
   predefinedQuestionBuilder = new PredefinedQuestionBuilder()
 
   withQuestionStem(stem: string) {
@@ -17,7 +17,7 @@ class ReviewQuestionInstanceBuilder extends Builder<ReviewQuestionInstance> {
     return this
   }
 
-  do(): ReviewQuestionInstance {
+  do(): RecallPrompt {
     const predefinedQuestion = this.predefinedQuestionBuilder.do()
     return {
       id: generateId(),

@@ -128,9 +128,8 @@ public class MakeMe extends MakeMeWithoutDB {
     return new ReviewQuestionInstanceBuilder(this, null);
   }
 
-  public ReviewQuestionInstanceBuilder theReviewQuestionInstance(
-      ReviewQuestionInstance reviewQuestionInstance) {
-    return new ReviewQuestionInstanceBuilder(this, reviewQuestionInstance);
+  public ReviewQuestionInstanceBuilder theReviewQuestionInstance(RecallPrompt recallPrompt) {
+    return new ReviewQuestionInstanceBuilder(this, recallPrompt);
   }
 
   public PredefinedQuestion buildAQuestionForLinkingNote(

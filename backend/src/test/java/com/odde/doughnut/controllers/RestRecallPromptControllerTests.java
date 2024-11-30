@@ -42,7 +42,7 @@ import org.springframework.web.server.ResponseStatusException;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class RestReviewQuestionInstanceControllerTests {
+class RestRecallPromptControllerTests {
   @Mock OpenAiApi openAiApi;
   @Autowired ModelFactoryService modelFactoryService;
   @Autowired MakeMe makeMe;
@@ -76,7 +76,7 @@ class RestReviewQuestionInstanceControllerTests {
   @Nested
   class answer {
     MemoryTracker memoryTracker;
-    ReviewQuestionInstance reviewQuestionInstance;
+    RecallPrompt recallPrompt;
     AnswerDTO answerDTO = new AnswerDTO();
 
     @BeforeEach
@@ -88,7 +88,7 @@ class RestReviewQuestionInstanceControllerTests {
               .by(currentUser)
               .forgettingCurveAndNextReviewAt(200)
               .please();
-      reviewQuestionInstance =
+      recallPrompt =
           makeMe.aReviewQuestionInstance().approvedSpellingQuestionOf(answerNote).please();
       answerDTO.setSpellingAnswer(answerNote.getTopicConstructor());
     }
@@ -96,7 +96,7 @@ class RestReviewQuestionInstanceControllerTests {
     @Test
     void shouldValidateTheAnswerAndUpdateMemoryTracker() {
       Integer oldRepetitionCount = memoryTracker.getRepetitionCount();
-      AnsweredQuestion answerResult = controller.answerQuiz(reviewQuestionInstance, answerDTO);
+      AnsweredQuestion answerResult = controller.answerQuiz(recallPrompt, answerDTO);
       assertTrue(answerResult.answer.getCorrect());
       assertThat(memoryTracker.getRepetitionCount(), greaterThan(oldRepetitionCount));
     }
@@ -105,7 +105,7 @@ class RestReviewQuestionInstanceControllerTests {
     void shouldNoteIncreaseIndexIfRepeatImmediately() {
       testabilitySettings.timeTravelTo(memoryTracker.getLastReviewedAt());
       Integer oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
-      controller.answerQuiz(reviewQuestionInstance, answerDTO);
+      controller.answerQuiz(recallPrompt, answerDTO);
       assertThat(memoryTracker.getForgettingCurveIndex(), equalTo(oldForgettingCurveIndex));
     }
 
@@ -113,7 +113,7 @@ class RestReviewQuestionInstanceControllerTests {
     void shouldIncreaseTheIndex() {
       testabilitySettings.timeTravelTo(memoryTracker.getNextReviewAt());
       Integer oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
-      controller.answerQuiz(reviewQuestionInstance, answerDTO);
+      controller.answerQuiz(recallPrompt, answerDTO);
       assertThat(memoryTracker.getForgettingCurveIndex(), greaterThan(oldForgettingCurveIndex));
       assertThat(
           memoryTracker.getLastReviewedAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
@@ -124,14 +124,14 @@ class RestReviewQuestionInstanceControllerTests {
       AnswerDTO answer = new AnswerDTO();
       assertThrows(
           ResponseStatusException.class,
-          () -> nullUserController().answerQuiz(reviewQuestionInstance, answer));
+          () -> nullUserController().answerQuiz(recallPrompt, answer));
     }
 
     @Nested
     class WrongAnswer {
       @BeforeEach
       void setup() {
-        reviewQuestionInstance =
+        recallPrompt =
             makeMe
                 .aReviewQuestionInstance()
                 .approvedSpellingQuestionOf(memoryTracker.getNote())
@@ -143,7 +143,7 @@ class RestReviewQuestionInstanceControllerTests {
       void shouldValidateTheWrongAnswer() {
         testabilitySettings.timeTravelTo(memoryTracker.getNextReviewAt());
         Integer oldRepetitionCount = memoryTracker.getRepetitionCount();
-        AnsweredQuestion answerResult = controller.answerQuiz(reviewQuestionInstance, answerDTO);
+        AnsweredQuestion answerResult = controller.answerQuiz(recallPrompt, answerDTO);
         assertFalse(answerResult.answer.getCorrect());
         assertThat(memoryTracker.getRepetitionCount(), greaterThan(oldRepetitionCount));
       }
@@ -153,14 +153,14 @@ class RestReviewQuestionInstanceControllerTests {
         testabilitySettings.timeTravelTo(memoryTracker.getNextReviewAt());
         Timestamp lastReviewedAt = memoryTracker.getLastReviewedAt();
         Integer oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
-        controller.answerQuiz(reviewQuestionInstance, answerDTO);
+        controller.answerQuiz(recallPrompt, answerDTO);
         assertThat(memoryTracker.getForgettingCurveIndex(), lessThan(oldForgettingCurveIndex));
         assertThat(memoryTracker.getLastReviewedAt(), equalTo(lastReviewedAt));
       }
 
       @Test
       void shouldRepeatTheNextDay() {
-        controller.answerQuiz(reviewQuestionInstance, answerDTO);
+        controller.answerQuiz(recallPrompt, answerDTO);
         assertThat(
             memoryTracker.getNextReviewAt(),
             lessThan(
@@ -172,14 +172,13 @@ class RestReviewQuestionInstanceControllerTests {
 
   @Nested
   class RegenerateQuestion {
-    ReviewQuestionInstance reviewQuestionInstance;
+    RecallPrompt recallPrompt;
     Note note;
 
     @BeforeEach
     void setUp() {
       note = makeMe.aNote().please();
-      reviewQuestionInstance =
-          makeMe.aReviewQuestionInstance().approvedSpellingQuestionOf(note).please();
+      recallPrompt = makeMe.aReviewQuestionInstance().approvedSpellingQuestionOf(note).please();
     }
 
     @Test
@@ -193,7 +192,7 @@ class RestReviewQuestionInstanceControllerTests {
                     makeMe.modelFactoryService,
                     makeMe.aNullUserModelPlease(),
                     testabilitySettings);
-            restAiController.regenerate(reviewQuestionInstance);
+            restAiController.regenerate(recallPrompt);
           });
     }
 
@@ -210,7 +209,7 @@ class RestReviewQuestionInstanceControllerTests {
           .mockRetrieveRun()
           .mockCancelRun("my-run-id");
 
-      ReviewQuestionInstance regeneratedQuestion = controller.regenerate(reviewQuestionInstance);
+      RecallPrompt regeneratedQuestion = controller.regenerate(recallPrompt);
 
       Assertions.assertThat(
               regeneratedQuestion.getBareQuestion().getMultipleChoicesQuestion().getStem())
@@ -220,7 +219,7 @@ class RestReviewQuestionInstanceControllerTests {
 
   @Nested
   class Contest {
-    ReviewQuestionInstance reviewQuestionInstance;
+    RecallPrompt recallPrompt;
     QuestionEvaluation questionEvaluation = new QuestionEvaluation();
 
     @BeforeEach
@@ -231,7 +230,7 @@ class RestReviewQuestionInstanceControllerTests {
 
       MCQWithAnswer aiGeneratedQuestion = makeMe.aMCQWithAnswer().please();
       Note note = makeMe.aNote().please();
-      reviewQuestionInstance =
+      recallPrompt =
           makeMe
               .aReviewQuestionInstance()
               .ofAIGeneratedQuestion(aiGeneratedQuestion, note)
@@ -249,14 +248,14 @@ class RestReviewQuestionInstanceControllerTests {
                     makeMe.modelFactoryService,
                     makeMe.aNullUserModelPlease(),
                     testabilitySettings);
-            restAiController.contest(reviewQuestionInstance);
+            restAiController.contest(recallPrompt);
           });
     }
 
     @Test
     void rejected() {
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(questionEvaluation, "");
-      ReviewQuestionContestResult contest = controller.contest(reviewQuestionInstance);
+      ReviewQuestionContestResult contest = controller.contest(recallPrompt);
       assertTrue(contest.rejected);
     }
 
@@ -267,7 +266,7 @@ class RestReviewQuestionInstanceControllerTests {
       globalSettingsService
           .globalSettingEvaluation()
           .setKeyValue(makeMe.aTimestamp().please(), "gpt-new");
-      controller.contest(reviewQuestionInstance);
+      controller.contest(recallPrompt);
       ArgumentCaptor<ChatCompletionRequest> argumentCaptor =
           ArgumentCaptor.forClass(ChatCompletionRequest.class);
       verify(openAiApi, times(1)).createChatCompletion(argumentCaptor.capture());
@@ -278,7 +277,7 @@ class RestReviewQuestionInstanceControllerTests {
     void acceptTheContest() {
       questionEvaluation.feasibleQuestion = false;
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(questionEvaluation, "");
-      ReviewQuestionContestResult contest = controller.contest(reviewQuestionInstance);
+      ReviewQuestionContestResult contest = controller.contest(recallPrompt);
       assertFalse(contest.rejected);
     }
   }
@@ -304,9 +303,9 @@ class RestReviewQuestionInstanceControllerTests {
       makeMe.aNote().under(note).please();
       MemoryTracker rp = makeMe.aMemoryTrackerFor(note).by(currentUser).please();
 
-      ReviewQuestionInstance reviewQuestionInstance = controller.generateRandomQuestion(rp);
+      RecallPrompt recallPrompt = controller.generateRandomQuestion(rp);
 
-      assertThat(reviewQuestionInstance.getId(), notNullValue());
+      assertThat(recallPrompt.getId(), notNullValue());
     }
 
     @Test
@@ -343,22 +342,20 @@ class RestReviewQuestionInstanceControllerTests {
 
     @Test
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
-      ReviewQuestionInstance reviewQuestionInstance = makeMe.aReviewQuestionInstance().please();
+      RecallPrompt recallPrompt = makeMe.aReviewQuestionInstance().please();
       assertThrows(
-          UnexpectedNoAccessRightException.class,
-          () -> controller.showQuestion(reviewQuestionInstance));
+          UnexpectedNoAccessRightException.class, () -> controller.showQuestion(recallPrompt));
     }
 
     @Test
     void canSeeNoteThatHasReadAccess() throws UnexpectedNoAccessRightException {
       Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
-      ReviewQuestionInstance reviewQuestionInstance =
+      RecallPrompt recallPrompt =
           makeMe.aReviewQuestionInstance().spellingQuestionOf(note).please();
-      makeMe.theReviewQuestionInstance(reviewQuestionInstance).answerSpelling("wrong").please();
+      makeMe.theReviewQuestionInstance(recallPrompt).answerSpelling("wrong").please();
       makeMe.refresh(currentUser.getEntity());
-      AnsweredQuestion answeredQuestion = controller.showQuestion(reviewQuestionInstance);
-      assertThat(
-          answeredQuestion.reviewQuestionInstanceId, equalTo(reviewQuestionInstance.getId()));
+      AnsweredQuestion answeredQuestion = controller.showQuestion(recallPrompt);
+      assertThat(answeredQuestion.reviewQuestionInstanceId, equalTo(recallPrompt.getId()));
     }
   }
 }

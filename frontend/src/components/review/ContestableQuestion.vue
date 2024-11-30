@@ -36,10 +36,7 @@
 </template>
 
 <script setup lang="ts">
-import type {
-  AnsweredQuestion,
-  ReviewQuestionInstance,
-} from "@/generated/backend"
+import type { AnsweredQuestion, RecallPrompt } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import type { PropType } from "vue"
@@ -52,7 +49,7 @@ import QuestionDisplay from "./QuestionDisplay.vue"
 const { managedApi } = useLoadingApi()
 const props = defineProps({
   reviewQuestionInstance: {
-    type: Object as PropType<ReviewQuestionInstance>,
+    type: Object as PropType<RecallPrompt>,
     required: true,
   },
   storageAccessor: {
@@ -67,7 +64,7 @@ const currentQuestion = ref(props.reviewQuestionInstance)
 const answeredQuestion = ref<AnsweredQuestion | undefined>(undefined)
 const prevQuestions = ref<
   {
-    quizeQuestion: ReviewQuestionInstance
+    quizeQuestion: RecallPrompt
     badQuestionReason: string | undefined
   }[]
 >([])

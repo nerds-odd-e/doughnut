@@ -420,19 +420,18 @@ class RestConversationMessageControllerTest {
 
   @Nested
   class StartConversationAboutReviewQuestionTests {
-    ReviewQuestionInstance reviewQuestionInstance;
+    RecallPrompt recallPrompt;
 
     @BeforeEach
     void setup() {
       Note note = makeMe.aNote().please();
-      reviewQuestionInstance =
+      recallPrompt =
           makeMe.aReviewQuestionInstance().spellingQuestionOf(note).answerSpelling("a").please();
     }
 
     @Test
     void shouldStartConversation() {
-      Conversation conversation =
-          controller.startConversationAboutReviewQuestion(reviewQuestionInstance);
+      Conversation conversation = controller.startConversationAboutReviewQuestion(recallPrompt);
       List<Conversation> conversations =
           (List<Conversation>) modelFactoryService.conversationRepository.findAll();
       assertEquals(1, conversations.size());
@@ -441,12 +440,10 @@ class RestConversationMessageControllerTest {
 
     @Test
     void shouldSetReviewQuestionInstanceAsSubject() {
-      Conversation conversation =
-          controller.startConversationAboutReviewQuestion(reviewQuestionInstance);
+      Conversation conversation = controller.startConversationAboutReviewQuestion(recallPrompt);
       makeMe.refresh(conversation);
-      assertEquals(reviewQuestionInstance, conversation.getSubject().getReviewQuestionInstance());
-      assertEquals(
-          reviewQuestionInstance.getNotebook().getOwnership(), conversation.getSubjectOwnership());
+      assertEquals(recallPrompt, conversation.getSubject().getRecallPrompt());
+      assertEquals(recallPrompt.getNotebook().getOwnership(), conversation.getSubjectOwnership());
     }
   }
 }

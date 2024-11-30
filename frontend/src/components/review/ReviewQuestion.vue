@@ -10,7 +10,7 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import type { AnswerDTO, ReviewQuestionInstance } from "@/generated/backend"
+import type { AnswerDTO, RecallPrompt } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import usePopups from "../commons/Popups/usePopups"
 import QuestionDisplay from "../review/QuestionDisplay.vue"
@@ -20,7 +20,7 @@ const { popups } = usePopups()
 
 const props = defineProps({
   reviewQuestionInstance: {
-    type: Object as PropType<ReviewQuestionInstance>,
+    type: Object as PropType<RecallPrompt>,
     required: true,
   },
 })

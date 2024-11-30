@@ -19,29 +19,26 @@ public class RecallQuestionService {
         new PredefinedQuestionService(openAiApi, modelFactoryService, randomizer);
   }
 
-  public ReviewQuestionInstance generateAQuestionOfRandomType(Note note, User user) {
+  public RecallPrompt generateAQuestionOfRandomType(Note note, User user) {
     PredefinedQuestion question =
         predefinedQuestionService.generateAQuestionOfRandomType(note, user);
     if (question == null) {
       return null;
     }
-    ReviewQuestionInstance reviewQuestionInstance = new ReviewQuestionInstance();
-    reviewQuestionInstance.setPredefinedQuestion(question);
-    return modelFactoryService.save(reviewQuestionInstance);
+    RecallPrompt recallPrompt = new RecallPrompt();
+    recallPrompt.setPredefinedQuestion(question);
+    return modelFactoryService.save(recallPrompt);
   }
 
-  public ReviewQuestionContestResult contest(ReviewQuestionInstance reviewQuestionInstance) {
-    return predefinedQuestionService.contest(reviewQuestionInstance.getPredefinedQuestion());
+  public ReviewQuestionContestResult contest(RecallPrompt recallPrompt) {
+    return predefinedQuestionService.contest(recallPrompt.getPredefinedQuestion());
   }
 
   public AnsweredQuestion answerQuestion(
-      ReviewQuestionInstance reviewQuestionInstance,
-      AnswerDTO answerDTO,
-      User user,
-      Timestamp currentUTCTimestamp) {
-    Answer answer = modelFactoryService.createAnswerForQuestion(reviewQuestionInstance, answerDTO);
+      RecallPrompt recallPrompt, AnswerDTO answerDTO, User user, Timestamp currentUTCTimestamp) {
+    Answer answer = modelFactoryService.createAnswerForQuestion(recallPrompt, answerDTO);
     modelFactoryService.updateMemoryTrackerAfterAnsweringQuestion(
-        user, currentUTCTimestamp, answer.getCorrect(), reviewQuestionInstance);
-    return reviewQuestionInstance.getAnsweredQuestion();
+        user, currentUTCTimestamp, answer.getCorrect(), recallPrompt);
+    return recallPrompt.getAnsweredQuestion();
   }
 }

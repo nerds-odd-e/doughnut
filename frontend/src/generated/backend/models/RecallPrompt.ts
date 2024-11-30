@@ -4,7 +4,7 @@
 /* eslint-disable */
 import type { BareQuestion } from './BareQuestion';
 import type { Notebook } from './Notebook';
-export type ReviewQuestionInstance = {
+export type RecallPrompt = {
     id: number;
     bareQuestion: BareQuestion;
     notebook?: Notebook;

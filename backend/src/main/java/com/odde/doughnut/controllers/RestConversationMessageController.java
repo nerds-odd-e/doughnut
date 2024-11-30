@@ -4,7 +4,7 @@ import com.odde.doughnut.entities.AssessmentQuestionInstance;
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.ConversationMessage;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.ReviewQuestionInstance;
+import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
@@ -100,9 +100,8 @@ public class RestConversationMessageController {
     currentUser.assertAuthorization(conversation);
     try {
       Note note = conversation.getSubject().getNote();
-      if (note == null && conversation.getSubject().getReviewQuestionInstance() != null) {
-        note =
-            conversation.getSubject().getReviewQuestionInstance().getPredefinedQuestion().getNote();
+      if (note == null && conversation.getSubject().getRecallPrompt() != null) {
+        note = conversation.getSubject().getRecallPrompt().getPredefinedQuestion().getNote();
       }
       if (note == null) {
         throw new RuntimeException(
@@ -138,9 +137,8 @@ public class RestConversationMessageController {
 
   @PostMapping("/review-question/{reviewQuestion}")
   public Conversation startConversationAboutReviewQuestion(
-      @PathVariable("reviewQuestion") @Schema(type = "integer")
-          ReviewQuestionInstance reviewQuestionInstance) {
+      @PathVariable("reviewQuestion") @Schema(type = "integer") RecallPrompt recallPrompt) {
     return conversationService.startConversationAboutReviewQuestion(
-        reviewQuestionInstance, currentUser.getEntity());
+        recallPrompt, currentUser.getEntity());
   }
 }

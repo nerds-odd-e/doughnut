@@ -48,10 +48,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from "vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
-import type {
-  AnsweredQuestion,
-  ReviewQuestionInstance,
-} from "@/generated/backend"
+import type { AnsweredQuestion, RecallPrompt } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import _ from "lodash"
@@ -77,9 +74,7 @@ const emit = defineEmits<{
 
 // Composable for question fetching logic
 const useQuestionFetching = (props: QuizProps) => {
-  const reviewQuestionCache = ref<
-    Record<number, ReviewQuestionInstance | undefined>
-  >({})
+  const reviewQuestionCache = ref<Record<number, RecallPrompt | undefined>>({})
   const eagerFetchUntil = ref(0)
   const fetching = ref(false)
   const { managedApi } = useLoadingApi()
