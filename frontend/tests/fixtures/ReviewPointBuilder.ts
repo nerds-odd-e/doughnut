@@ -3,7 +3,7 @@ import Builder from "./Builder"
 import NoteBuilder from "./NoteBuilder"
 import generateId from "./generateId"
 
-class ReviewPointBuilder extends Builder<MemoryTracker> {
+class MemoryTrackerBuilder extends Builder<MemoryTracker> {
   data: MemoryTracker
 
   constructor() {
@@ -20,37 +20,37 @@ class ReviewPointBuilder extends Builder<MemoryTracker> {
     }
   }
 
-  initialReviewedAt(initialReviewedAt: string): ReviewPointBuilder {
+  initialReviewedAt(initialReviewedAt: string): MemoryTrackerBuilder {
     this.data.initialReviewedAt = initialReviewedAt
     return this
   }
 
-  nextReviewAt(nextReviewAt: string): ReviewPointBuilder {
+  nextReviewAt(nextReviewAt: string): MemoryTrackerBuilder {
     this.data.nextReviewAt = nextReviewAt
     return this
   }
 
-  repetitionCount(repetitionCount: number): ReviewPointBuilder {
+  repetitionCount(repetitionCount: number): MemoryTrackerBuilder {
     this.data.repetitionCount = repetitionCount
     return this
   }
 
-  forgettingCurveIndex(forgettingCurveIndex: number): ReviewPointBuilder {
+  forgettingCurveIndex(forgettingCurveIndex: number): MemoryTrackerBuilder {
     this.data.forgettingCurveIndex = forgettingCurveIndex
     return this
   }
 
-  removedFromReview(removedFromReview: boolean): ReviewPointBuilder {
+  removedFromReview(removedFromReview: boolean): MemoryTrackerBuilder {
     this.data.removedFromReview = removedFromReview
     return this
   }
 
-  ofNote(note: NoteRealm): ReviewPointBuilder {
+  ofNote(note: NoteRealm): MemoryTrackerBuilder {
     this.data.note = note.note
     return this
   }
 
-  ofLink(link: Note): ReviewPointBuilder {
+  ofLink(link: Note): MemoryTrackerBuilder {
     this.data.note = link
     return this
   }
@@ -60,4 +60,4 @@ class ReviewPointBuilder extends Builder<MemoryTracker> {
   }
 }
 
-export default ReviewPointBuilder
+export default MemoryTrackerBuilder

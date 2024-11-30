@@ -4,21 +4,20 @@ import helper from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
 
 describe("RecentlyLearnedNotes", () => {
-  const mockReviewPoints = [
-    makeMe.aReviewPoint
+  const mockMemoryTrackers = [
+    makeMe.aMemoryTracker
       .initialReviewedAt("2024-01-01T00:00:00Z")
       .removedFromReview(false)
       .please(),
-    makeMe.aReviewPoint
+    makeMe.aMemoryTracker
       .initialReviewedAt("2024-01-02T00:00:00Z")
       .removedFromReview(true)
       .please(),
   ]
 
   beforeEach(() => {
-    helper.managedApi.restMemoryTrackerController.getRecentReviewPoints = vitest
-      .fn()
-      .mockResolvedValue(mockReviewPoints)
+    helper.managedApi.restMemoryTrackerController.getRecentMemoryTrackers =
+      vitest.fn().mockResolvedValue(mockMemoryTrackers)
   })
 
   it("fetches and displays recent review points", async () => {
@@ -28,7 +27,7 @@ describe("RecentlyLearnedNotes", () => {
 
     // Verify API was called
     expect(
-      helper.managedApi.restMemoryTrackerController.getRecentReviewPoints
+      helper.managedApi.restMemoryTrackerController.getRecentMemoryTrackers
     ).toBeCalled()
 
     // Verify review points are displayed

@@ -53,7 +53,7 @@ describe("repeat page", () => {
 
   describe("normal view", () => {
     const noteRealm = makeMe.aNoteRealm.please()
-    const memoryTracker = makeMe.aReviewPoint.ofNote(noteRealm).please()
+    const memoryTracker = makeMe.aMemoryTracker.ofNote(noteRealm).please()
     const { note } = memoryTracker
 
     beforeEach(() => {
@@ -71,7 +71,7 @@ describe("repeat page", () => {
 
   it("minimized view for link", async () => {
     const link = makeMe.aLink.please()
-    const memoryTracker = makeMe.aReviewPoint.ofLink(link).please()
+    const memoryTracker = makeMe.aMemoryTracker.ofLink(link).please()
     mockedInitialReviewCall.mockResolvedValue([memoryTracker.note])
     const wrapper = renderer
       .withStorageProps({ minimized: true })

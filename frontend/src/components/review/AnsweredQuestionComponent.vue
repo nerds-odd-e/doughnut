@@ -1,9 +1,9 @@
 <template>
   <div v-if="note">
     <div
-      v-if="!toggleReviewPoint"
+      v-if="!toggleMemoryTracker"
       class="review-point-abbr"
-      @click="toggleReviewPoint = true"
+      @click="toggleMemoryTracker = true"
     >
       <label class="me-1"><strong>Note reviewed: </strong></label>
       <NoteTopicComponent v-bind="{ noteTopic: note.noteTopic }" />
@@ -43,7 +43,7 @@ const { answeredQuestion } = defineProps({
   },
 })
 
-const toggleReviewPoint = ref(false)
+const toggleMemoryTracker = ref(false)
 const note = answeredQuestion?.note
 </script>
 

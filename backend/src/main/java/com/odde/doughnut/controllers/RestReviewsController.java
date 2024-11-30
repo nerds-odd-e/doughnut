@@ -66,11 +66,11 @@ class RestReviewsController {
   public MemoryTracker create(@RequestBody InitialInfo initialInfo) {
     currentUser.assertLoggedIn();
     MemoryTracker memoryTracker =
-        MemoryTracker.buildReviewPointForNote(
+        MemoryTracker.buildMemoryTrackerForNote(
             modelFactoryService.entityManager.find(Note.class, initialInfo.noteId));
     memoryTracker.setRemovedFromReview(initialInfo.skipReview);
 
-    MemoryTrackerModel memoryTrackerModel = modelFactoryService.toReviewPointModel(memoryTracker);
+    MemoryTrackerModel memoryTrackerModel = modelFactoryService.toMemoryTrackerModel(memoryTracker);
     memoryTrackerModel.initialReview(
         testabilitySettings.getCurrentUTCTimestamp(), currentUser.getEntity());
     return memoryTrackerModel.getEntity();
@@ -85,6 +85,6 @@ class RestReviewsController {
     ZoneId timeZone = ZoneId.of(timezone);
     Reviewing reviewing =
         currentUser.createReviewing(testabilitySettings.getCurrentUTCTimestamp(), timeZone);
-    return reviewing.getDueReviewPoints(dueInDays == null ? 0 : dueInDays);
+    return reviewing.getDueMemoryTrackers(dueInDays == null ? 0 : dueInDays);
   }
 }

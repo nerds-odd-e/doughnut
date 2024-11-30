@@ -17,7 +17,7 @@ import lombok.Setter;
 @Entity
 @Table(name = "memory_tracker")
 public class MemoryTracker extends EntityIdentifiedByIdOnly {
-  public static MemoryTracker buildReviewPointForNote(Note note) {
+  public static MemoryTracker buildMemoryTrackerForNote(Note note) {
     MemoryTracker entity = new MemoryTracker();
     entity.setNote(note);
     return entity;

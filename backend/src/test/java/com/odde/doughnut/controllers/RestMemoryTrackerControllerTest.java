@@ -62,7 +62,7 @@ class RestMemoryTrackerControllerTest {
 
       @Test
       void shouldNotBeAbleToSeeOthers() {
-        rp = makeMe.aReviewPointBy(makeMe.aUser().toModelPlease()).please();
+        rp = makeMe.aMemoryTrackerBy(makeMe.aUser().toModelPlease()).please();
         assertThrows(UnexpectedNoAccessRightException.class, () -> controller.show(rp));
       }
 
@@ -95,7 +95,7 @@ class RestMemoryTrackerControllerTest {
     }
 
     @Test
-    void whenTheReviewPointDoesNotExist() {
+    void whenTheMemoryTrackerDoesNotExist() {
       SelfEvaluation selfEvaluation =
           new SelfEvaluation() {
             {
@@ -137,7 +137,7 @@ class RestMemoryTrackerControllerTest {
   @Nested
   class MarkAsReviewed {
     @Test
-    void itMustUpdateTheReviewPointRecord() {
+    void itMustUpdateTheMemoryTrackerRecord() {
       Note note = makeMe.aNote().please();
       MemoryTracker rp = makeMe.aMemoryTrackerFor(note).by(userModel).please();
       Integer oldRepetitionCount = rp.getRepetitionCount();
@@ -147,30 +147,30 @@ class RestMemoryTrackerControllerTest {
   }
 
   @Nested
-  class GetRecentReviewPoints {
+  class GetRecentMemoryTrackers {
     @Test
-    void shouldReturnEmptyListWhenNoReviewPoints() {
-      List<MemoryTracker> memoryTrackers = controller.getRecentReviewPoints();
+    void shouldReturnEmptyListWhenNoMemoryTrackers() {
+      List<MemoryTracker> memoryTrackers = controller.getRecentMemoryTrackers();
       assertThat(memoryTrackers, empty());
     }
 
     @Test
-    void shouldReturnReviewPointsForCurrentUser() {
+    void shouldReturnMemoryTrackersForCurrentUser() {
       MemoryTracker rp1 = makeMe.aMemoryTrackerFor(makeMe.aNote().please()).by(userModel).please();
       MemoryTracker rp2 = makeMe.aMemoryTrackerFor(makeMe.aNote().please()).by(userModel).please();
 
-      List<MemoryTracker> memoryTrackers = controller.getRecentReviewPoints();
+      List<MemoryTracker> memoryTrackers = controller.getRecentMemoryTrackers();
 
       assertThat(memoryTrackers, hasSize(2));
       assertThat(memoryTrackers, containsInAnyOrder(rp1, rp2));
     }
 
     @Test
-    void shouldNotReturnReviewPointsFromOtherUsers() {
+    void shouldNotReturnMemoryTrackersFromOtherUsers() {
       UserModel otherUser = makeMe.aUser().toModelPlease();
-      makeMe.aReviewPointBy(otherUser).please();
+      makeMe.aMemoryTrackerBy(otherUser).please();
 
-      List<MemoryTracker> memoryTrackers = controller.getRecentReviewPoints();
+      List<MemoryTracker> memoryTrackers = controller.getRecentMemoryTrackers();
 
       assertThat(memoryTrackers, empty());
     }
@@ -180,7 +180,7 @@ class RestMemoryTrackerControllerTest {
       userModel = makeMe.aNullUserModelPlease();
       controller =
           new RestMemoryTrackerController(modelFactoryService, userModel, testabilitySettings);
-      assertThrows(ResponseStatusException.class, () -> controller.getRecentReviewPoints());
+      assertThrows(ResponseStatusException.class, () -> controller.getRecentMemoryTrackers());
     }
   }
 

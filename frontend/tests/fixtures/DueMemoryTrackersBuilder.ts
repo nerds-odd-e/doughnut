@@ -1,7 +1,7 @@
 import type { DueMemoryTrackers } from "@/generated/backend"
 import Builder from "./Builder"
 
-class RepetitionBuilder extends Builder<DueMemoryTrackers> {
+class DueMemoryTrackersBuilder extends Builder<DueMemoryTrackers> {
   reviewPointIdstoRepeat: number[] = []
 
   toRepeat(reviewPointIds: number[]) {
@@ -18,4 +18,4 @@ class RepetitionBuilder extends Builder<DueMemoryTrackers> {
   }
 }
 
-export default RepetitionBuilder
+export default DueMemoryTrackersBuilder

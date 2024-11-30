@@ -321,14 +321,14 @@ export const assumeNotePage = (noteTopic?: string) => {
     memoryTracker() {
       clickNotePageMoreOptionsButton('Note Review Settings')
       return {
-        expectReviewPointInfo(attrs: { [key: string]: string }) {
+        expectMemoryTrackerInfo(attrs: { [key: string]: string }) {
           for (const k in attrs) {
             cy.contains(k)
               .findByText(attrs[k] ?? '')
               .should('be.visible')
           }
         },
-        removeReviewPointFromReview() {
+        removeMemoryTrackerFromReview() {
           cy.findByRole('button', {
             name: 'remove this note from review',
           }).click()

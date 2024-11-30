@@ -7,7 +7,7 @@ const assumeAnsweredQuestionPage = () => {
       // but the text changes
       cy.get('.alert-success').should('exist')
     },
-    showReviewPoint(noteTopic?: string) {
+    showMemoryTracker(noteTopic?: string) {
       cy.findByText('Note reviewed:').click()
       return assumeNotePage(noteTopic).memoryTracker()
     },

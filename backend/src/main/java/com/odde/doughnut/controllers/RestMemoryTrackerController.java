@@ -61,7 +61,7 @@ class RestMemoryTrackerController {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The memory tracker does not exist.");
     }
     modelFactoryService
-        .toReviewPointModel(memoryTracker)
+        .toMemoryTrackerModel(memoryTracker)
         .updateForgettingCurve(selfEvaluation.adjustment);
     return memoryTracker;
   }
@@ -73,13 +73,13 @@ class RestMemoryTrackerController {
       @RequestParam("successful") boolean successful) {
     currentUser.assertLoggedIn();
     modelFactoryService
-        .toReviewPointModel(memoryTracker)
+        .toMemoryTrackerModel(memoryTracker)
         .markAsRepeated(testabilitySettings.getCurrentUTCTimestamp(), successful);
     return memoryTracker;
   }
 
   @GetMapping("/recent")
-  public List<MemoryTracker> getRecentReviewPoints() {
+  public List<MemoryTracker> getRecentMemoryTrackers() {
     currentUser.assertLoggedIn();
     return modelFactoryService.memoryTrackerRepository.findLast100ByUser(
         currentUser.getEntity().getId());

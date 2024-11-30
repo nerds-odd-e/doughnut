@@ -6,7 +6,7 @@
   />
   <template v-if="memoryTracker">
     <h6>Memory Tracker</h6>
-    <NoteInfoReviewPoint
+    <NoteInfoMemoryTracker
       v-model="memoryTracker"
       @update:model-value="onSelfEvaluated($event)"
     />
@@ -18,7 +18,7 @@ import type { NoteInfo, MemoryTracker } from "@/generated/backend"
 import type { PropType } from "vue"
 import { defineComponent } from "vue"
 import ReviewSettingForm from "../review/ReviewSettingForm.vue"
-import NoteInfoReviewPoint from "./NoteInfoReviewPoint.vue"
+import NoteInfoMemoryTracker from "./NoteInfoMemoryTracker.vue"
 
 export default defineComponent({
   props: {
@@ -35,7 +35,7 @@ export default defineComponent({
       return this.noteInfo.reviewSetting
     },
   },
-  components: { ReviewSettingForm, NoteInfoReviewPoint },
+  components: { ReviewSettingForm, NoteInfoMemoryTracker },
   methods: {
     onSelfEvaluated(memoryTracker: MemoryTracker) {
       this.memoryTracker = memoryTracker

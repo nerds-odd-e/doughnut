@@ -38,7 +38,7 @@ public class MemoryTrackerBuilder extends EntityBuilder<MemoryTracker> {
   }
 
   public MemoryTrackerModel toModelPlease() {
-    return makeMe.modelFactoryService.toReviewPointModel(please());
+    return makeMe.modelFactoryService.toMemoryTrackerModel(please());
   }
 
   @Override

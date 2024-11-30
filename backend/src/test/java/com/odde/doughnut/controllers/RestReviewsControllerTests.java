@@ -106,12 +106,12 @@ class RestReviewsControllerTests {
        4                         | Europe/Paris | 1
        12                        | Europe/Paris | 0
        """)
-    void shouldGetReviewPointsBasedOnTimezone(
+    void shouldGetMemoryTrackersBasedOnTimezone(
         int nextReviewAtHours, String timezone, int expectedCount) {
       Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();
       testabilitySettings.timeTravelTo(currentTime);
       makeMe
-          .aReviewPointBy(currentUser)
+          .aMemoryTrackerBy(currentUser)
           .nextReviewAt(TimestampOperations.addHoursToTimestamp(currentTime, nextReviewAtHours))
           .please();
       DueMemoryTrackers dueMemoryTrackers = controller.repeatReview(timezone, null);

@@ -33,7 +33,10 @@ public class Reviewing {
       return Stream.empty();
     }
     List<Integer> alreadyInitialReviewed =
-        getNewReviewPointsOfToday().stream().map(MemoryTracker::getNote).map(Note::getId).toList();
+        getNewMemoryTrackersOfToday().stream()
+            .map(MemoryTracker::getNote)
+            .map(Note::getId)
+            .toList();
     return Stream.concat(
             getSubscriptionModelStream()
                 .flatMap(
@@ -56,13 +59,13 @@ public class Reviewing {
   private int notLearntCount() {
     Integer subscribedCount =
         getSubscriptionModelStream()
-            .map(this::getPendingNewReviewPointCount)
+            .map(this::getPendingNewMemoryTrackerCount)
             .reduce(Integer::sum)
             .orElse(0);
-    return subscribedCount + getPendingNewReviewPointCount(userModel);
+    return subscribedCount + getPendingNewMemoryTrackerCount(userModel);
   }
 
-  private int getPendingNewReviewPointCount(ReviewScope reviewScope) {
+  private int getPendingNewMemoryTrackerCount(ReviewScope reviewScope) {
     return reviewScope.getThingsHaveNotBeenReviewedAtAllCount();
   }
 
@@ -74,13 +77,13 @@ public class Reviewing {
   }
 
   private int remainingDailyNewNotesCount() {
-    long sameDayCount = getNewReviewPointsOfToday().size();
+    long sameDayCount = getNewMemoryTrackersOfToday().size();
     return (int) (userModel.entity.getDailyNewNotesCount() - sameDayCount);
   }
 
-  private List<MemoryTracker> getNewReviewPointsOfToday() {
+  private List<MemoryTracker> getNewMemoryTrackersOfToday() {
     Timestamp oneDayAgo = TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, -24);
-    return userModel.getRecentReviewPoints(oneDayAgo).stream()
+    return userModel.getRecentMemoryTrackers(oneDayAgo).stream()
         .filter(p -> userModel.isInitialReviewOnSameDay(p, currentUTCTimestamp, timeZone))
         .filter(p -> !p.getRemovedFromReview())
         .toList();
@@ -91,7 +94,7 @@ public class Reviewing {
         .map(modelFactoryService::toSubscriptionModel);
   }
 
-  public DueMemoryTrackers getDueReviewPoints(int dueInDays) {
+  public DueMemoryTrackers getDueMemoryTrackers(int dueInDays) {
     List<Integer> toRepeat =
         getMemoryTrackersNeedToRepeat(dueInDays).map(MemoryTracker::getId).toList();
     DueMemoryTrackers dueMemoryTrackers = new DueMemoryTrackers();

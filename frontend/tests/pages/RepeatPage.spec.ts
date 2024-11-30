@@ -54,28 +54,30 @@ describe("repeat page", () => {
   mockBrowserTimeZone("Asia/Shanghai", beforeEach, afterEach)
 
   it("redirect to review page if nothing to repeat", async () => {
-    const repetition = makeMe.aDueReviewPointsList.please()
+    const repetition = makeMe.aDueMemoryTrackersList.please()
     mockedRepeatCall.mockResolvedValue(repetition)
     await mountPage()
     expect(mockedRepeatCall).toHaveBeenCalledWith("Asia/Shanghai", 0)
   })
 
   describe('repeat page with "just review" quiz', () => {
-    const firstReviewPointId = 123
-    const secondReviewPointId = 456
+    const firstMemoryTrackerId = 123
+    const secondMemoryTrackerId = 456
     const mockedRandomQuestionCall = vi.fn()
-    const mockedReviewPointCall = vi.fn()
+    const mockedMemoryTrackerCall = vi.fn()
 
     beforeEach(() => {
       vi.useFakeTimers()
       helper.managedApi.restMemoryTrackerController.show1 =
-        mockedReviewPointCall.mockResolvedValue(makeMe.aReviewPoint.please())
+        mockedMemoryTrackerCall.mockResolvedValue(
+          makeMe.aMemoryTracker.please()
+        )
       helper.managedApi.silent.restReviewQuestionController.generateRandomQuestion =
         mockedRandomQuestionCall
       mockedRandomQuestionCall.mockRejectedValueOnce(makeMe.anApiError.please())
       mockedRepeatCall.mockResolvedValue(
-        makeMe.aDueReviewPointsList
-          .toRepeat([firstReviewPointId, secondReviewPointId, 3])
+        makeMe.aDueMemoryTrackersList
+          .toRepeat([firstMemoryTrackerId, secondMemoryTrackerId, 3])
           .please()
       )
     })
@@ -83,7 +85,9 @@ describe("repeat page", () => {
     it("shows the progress", async () => {
       await mountPage()
       expect(teleportTarget.textContent).toContain("0/3")
-      expect(mockedRandomQuestionCall).toHaveBeenCalledWith(firstReviewPointId)
+      expect(mockedRandomQuestionCall).toHaveBeenCalledWith(
+        firstMemoryTrackerId
+      )
     })
 
     it("should show progress", async () => {
@@ -101,12 +105,14 @@ describe("repeat page", () => {
       await flushPromises()
       await wrapper.find("button.btn-primary").trigger("click")
       expect(mockedMarkAsRepeatedCall).toHaveBeenCalledWith(
-        firstReviewPointId,
+        firstMemoryTrackerId,
         true
       )
       await flushPromises()
       expect(teleportTarget.textContent).toContain("1/3")
-      expect(mockedRandomQuestionCall).toHaveBeenCalledWith(secondReviewPointId)
+      expect(mockedRandomQuestionCall).toHaveBeenCalledWith(
+        secondMemoryTrackerId
+      )
     })
 
     it("should move current memory tracker to end when requested", async () => {

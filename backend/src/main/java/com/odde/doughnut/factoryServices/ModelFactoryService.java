@@ -65,7 +65,7 @@ public class ModelFactoryService {
     return new UserModel(user, this);
   }
 
-  public MemoryTrackerModel toReviewPointModel(MemoryTracker memoryTracker) {
+  public MemoryTrackerModel toMemoryTrackerModel(MemoryTracker memoryTracker) {
     return new MemoryTrackerModel(memoryTracker, this);
   }
 
@@ -154,7 +154,7 @@ public class ModelFactoryService {
     return answer;
   }
 
-  public void updateReviewPointAfterAnsweringQuestion(
+  public void updateMemoryTrackerAfterAnsweringQuestion(
       User user,
       Timestamp currentUTCTimestamp,
       Boolean correct,
@@ -163,7 +163,7 @@ public class ModelFactoryService {
         toUserModel(user)
             .getMemoryTrackerFor(reviewQuestionInstance.getPredefinedQuestion().getNote());
     if (memoryTracker != null) {
-      toReviewPointModel(memoryTracker).markAsRepeated(currentUTCTimestamp, correct);
+      toMemoryTrackerModel(memoryTracker).markAsRepeated(currentUTCTimestamp, correct);
     }
   }
 }

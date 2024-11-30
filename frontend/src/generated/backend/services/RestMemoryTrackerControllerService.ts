@@ -110,7 +110,7 @@ export class RestMemoryTrackerControllerService {
      * @returns MemoryTracker OK
      * @throws ApiError
      */
-    public getRecentReviewPoints(): CancelablePromise<Array<MemoryTracker>> {
+    public getRecentMemoryTrackers(): CancelablePromise<Array<MemoryTracker>> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/memory-trackers/recent',

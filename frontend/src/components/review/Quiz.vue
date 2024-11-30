@@ -5,7 +5,7 @@
       <div v-if="!currentReviewQuestion">
         <JustReview
           v-bind="{
-            reviewPointId: currentReviewPointId,
+            reviewPointId: currentMemoryTrackerId,
             storageAccessor,
           }"
           @reviewed="onAnswered($event)"
@@ -127,15 +127,17 @@ const useQuestionFetching = (props: QuizProps) => {
 const { reviewQuestionCache, fetchQuestion } = useQuestionFetching(props)
 
 // Computed properties with better naming
-const currentReviewPointId = computed(() => reviewPointIdAt(props.currentIndex))
+const currentMemoryTrackerId = computed(() =>
+  reviewPointIdAt(props.currentIndex)
+)
 const currentQuestionFetched = computed(() => {
-  const reviewPointId = currentReviewPointId.value
+  const reviewPointId = currentMemoryTrackerId.value
   return (
     reviewPointId !== undefined && reviewPointId in reviewQuestionCache.value
   )
 })
 const currentReviewQuestion = computed(() => {
-  const reviewPointId = currentReviewPointId.value
+  const reviewPointId = currentMemoryTrackerId.value
   return reviewPointId !== undefined
     ? reviewQuestionCache.value[reviewPointId]
     : undefined
@@ -162,7 +164,7 @@ const moveToEnd = () => {
 }
 
 // Watchers
-watch(() => currentReviewPointId.value, fetchQuestion)
+watch(() => currentMemoryTrackerId.value, fetchQuestion)
 
 // Lifecycle hooks
 onMounted(() => {

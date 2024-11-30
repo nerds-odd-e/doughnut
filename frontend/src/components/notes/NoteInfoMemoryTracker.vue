@@ -1,23 +1,23 @@
 <template>
-  <div class="alert alert-danger" v-if="localReviewPoint.removedFromReview">
+  <div class="alert alert-danger" v-if="localMemoryTracker.removedFromReview">
     This memory tracker has been removed from reviewing.
   </div>
   <label
     >Repetition Count:
     <span class="statistics-value">{{
-      localReviewPoint.repetitionCount
+      localMemoryTracker.repetitionCount
     }}</span></label
   >
   <label
     >Forgetting Curive Index:
     <span class="statistics-value">{{
-      localReviewPoint.forgettingCurveIndex
+      localMemoryTracker.forgettingCurveIndex
     }}</span></label
   >
   <label
     >Next Review:
     <span class="statistics-value">{{
-      new Date(localReviewPoint.nextReviewAt).toLocaleString()
+      new Date(localMemoryTracker.nextReviewAt).toLocaleString()
     }}</span></label
   >
   <div class="btn-group" role="group" aria-label="First group">
@@ -66,14 +66,14 @@ const props = defineProps({
 
 const emit = defineEmits(["update:modelValue"])
 
-const localReviewPoint = ref<MemoryTracker>(props.modelValue)
+const localMemoryTracker = ref<MemoryTracker>(props.modelValue)
 const { managedApi } = useLoadingApi()
 const { popups } = usePopups()
 
 watch(
   () => props.modelValue,
   (newVal) => {
-    localReviewPoint.value = newVal
+    localMemoryTracker.value = newVal
   },
   { immediate: true }
 )
@@ -81,12 +81,12 @@ watch(
 const selfEvaluate = async (adjustment: number) => {
   const memoryTracker =
     await managedApi.restMemoryTrackerController.selfEvaluate(
-      localReviewPoint.value.id,
+      localMemoryTracker.value.id,
       {
         adjustment,
       }
     )
-  localReviewPoint.value = memoryTracker
+  localMemoryTracker.value = memoryTracker
   emit("update:modelValue", memoryTracker)
 }
 
@@ -100,9 +100,9 @@ const removeFromReview = async () => {
   }
   const memoryTracker =
     await managedApi.restMemoryTrackerController.removeFromRepeating(
-      localReviewPoint.value.id
+      localMemoryTracker.value.id
     )
-  localReviewPoint.value = memoryTracker
+  localMemoryTracker.value = memoryTracker
   emit("update:modelValue", memoryTracker)
 }
 </script>

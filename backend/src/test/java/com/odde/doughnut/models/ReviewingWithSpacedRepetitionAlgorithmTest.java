@@ -48,7 +48,7 @@ public class ReviewingWithSpacedRepetitionAlgorithmTest {
     @Test
     void whenThereIsNoReviewedNotesForUser() {
       MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(anotherUser).please();
-      assertThat(getOneReviewPointNeedToRepeat(daysAfterBase(memoryTracker, 1)), is(nullValue()));
+      assertThat(getOneMemoryTrackerNeedToRepeat(daysAfterBase(memoryTracker, 1)), is(nullValue()));
     }
 
     @ParameterizedTest
@@ -75,7 +75,7 @@ public class ReviewingWithSpacedRepetitionAlgorithmTest {
               .afterNthStrictRepetition(repetitionDone)
               .please();
       MemoryTracker mostUrgentMemoryTracker =
-          getOneReviewPointNeedToRepeat(daysAfterBase(memoryTracker, reviewDay));
+          getOneMemoryTrackerNeedToRepeat(daysAfterBase(memoryTracker, reviewDay));
       assertThat(mostUrgentMemoryTracker != null, is(expectedToRepeat));
     }
 
@@ -94,7 +94,7 @@ public class ReviewingWithSpacedRepetitionAlgorithmTest {
         memoryTracker.setNextReviewAt(
             makeMe.aTimestamp().of(2, lastRepeatHour).fromShanghai().please());
         final Timestamp timestamp = makeMe.aTimestamp().of(2, currentHour).fromShanghai().please();
-        MemoryTracker mostUrgentMemoryTracker = getOneReviewPointNeedToRepeat(timestamp);
+        MemoryTracker mostUrgentMemoryTracker = getOneMemoryTrackerNeedToRepeat(timestamp);
         assertThat(mostUrgentMemoryTracker != null, is(expectedToRepeat));
       }
     }
@@ -110,7 +110,7 @@ public class ReviewingWithSpacedRepetitionAlgorithmTest {
         "2, 1, 115",
         "2, 100, 100",
       })
-      void aReviewPointHasBeenReviewedStrictly(
+      void aMemoryTrackerHasBeenReviewedStrictly(
           int ntimes, Integer daysDelay, int expectedForgettingCurveIndex) {
         MemoryTrackerModel memoryTracker =
             makeMe
@@ -129,7 +129,7 @@ public class ReviewingWithSpacedRepetitionAlgorithmTest {
     }
   }
 
-  private MemoryTracker getOneReviewPointNeedToRepeat(Timestamp timestamp) {
+  private MemoryTracker getOneMemoryTrackerNeedToRepeat(Timestamp timestamp) {
     return userModel
         .getMemoryTrackerNeedToRepeat(timestamp, ZoneId.of("Asia/Shanghai"))
         .findFirst()

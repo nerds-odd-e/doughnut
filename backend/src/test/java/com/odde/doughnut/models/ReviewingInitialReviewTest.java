@@ -88,13 +88,13 @@ public class ReviewingInitialReviewTest {
         anotherNote = makeMe.aNote("another note").creatorAndOwner(userModel).please();
       }
 
-      private List<Note> getAllDueReviewPoints() {
+      private List<Note> getAllDueMemoryTrackers() {
         return reviewingOnDay1.getDueInitialMemoryTrackers().collect(Collectors.toList());
       }
 
       @Test
       void shouldReturnLinkBeforeAnotherNote() {
-        List<Note> memoryTrackers = getAllDueReviewPoints();
+        List<Note> memoryTrackers = getAllDueMemoryTrackers();
         assertThat(memoryTrackers, hasSize(4));
         assertThat(memoryTrackers.get(0), equalTo(note1));
         assertThat(memoryTrackers.get(2), equalTo(note1ToNote2));
@@ -112,8 +112,8 @@ public class ReviewingInitialReviewTest {
         }
 
         @Test
-        void shouldReturnReviewPointForLowerLevelNoteOrLink() {
-          List<Note> memoryTrackers = getAllDueReviewPoints();
+        void shouldReturnMemoryTrackerForLowerLevelNoteOrLink() {
+          List<Note> memoryTrackers = getAllDueMemoryTrackers();
           assertThat(memoryTrackers, hasSize(4));
           assertThat(memoryTrackers.get(0), equalTo(anotherNote));
           assertThat(memoryTrackers.get(1), equalTo(note2));
@@ -124,7 +124,7 @@ public class ReviewingInitialReviewTest {
         @Test
         void shouldReturnLinksOrderedByLevels() {
           Note aLevel2Link = makeMe.aLink().between(anotherNote, note2).please();
-          List<Note> memoryTrackers = getAllDueReviewPoints();
+          List<Note> memoryTrackers = getAllDueMemoryTrackers();
           assertThat(memoryTrackers, hasSize(5));
           assertThat(memoryTrackers.get(0), equalTo(anotherNote));
           assertThat(memoryTrackers.get(1), equalTo(note2));
@@ -133,9 +133,9 @@ public class ReviewingInitialReviewTest {
         }
 
         @Test
-        void shouldNotReturnReviewPointForLinkIfCreatedByOtherPeople() {
+        void shouldNotReturnMemoryTrackerForLinkIfCreatedByOtherPeople() {
           makeMe.theNote(note1).notebookOwnership(makeMe.aUser().please()).please();
-          List<Note> memoryTrackers = getAllDueReviewPoints();
+          List<Note> memoryTrackers = getAllDueMemoryTrackers();
           assertThat(memoryTrackers, hasSize(2));
           assertThat(memoryTrackers.get(0), equalTo(anotherNote));
           assertThat(memoryTrackers.get(1), equalTo(note2));
@@ -218,12 +218,12 @@ public class ReviewingInitialReviewTest {
     }
 
     @Test
-    void shouldReturnReviewPointForNote() {
+    void shouldReturnMemoryTrackerForNote() {
       assertThat(getFirstInitialMemoryTracker(reviewingOnDay1), equalTo(note1));
     }
 
     @Test
-    void shouldReturnReviewPointForLink() {
+    void shouldReturnMemoryTrackerForLink() {
       makeMe.theNote(note2).skipReview().please();
       makeMe.theNote(note1).skipReview().linkTo(note2).please();
       Note noteToReview = getFirstInitialMemoryTracker(reviewingOnDay1);

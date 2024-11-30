@@ -40,7 +40,7 @@ public class ReviewService {
       User user,
       Timestamp currentUTCTimestamp) {
     Answer answer = modelFactoryService.createAnswerForQuestion(reviewQuestionInstance, answerDTO);
-    modelFactoryService.updateReviewPointAfterAnsweringQuestion(
+    modelFactoryService.updateMemoryTrackerAfterAnsweringQuestion(
         user, currentUTCTimestamp, answer.getCorrect(), reviewQuestionInstance);
     return reviewQuestionInstance.getAnsweredQuestion();
   }

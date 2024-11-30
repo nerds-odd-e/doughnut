@@ -2,14 +2,14 @@ import ApiErrorBuilder from "./ApiErrorBuilder"
 import BazaarNotebooksBuilder from "./BazaarNotebooksBuilder"
 import CircleBuilder from "./CircleBuilder"
 import CircleNoteBuilder from "./CircleNoteBuilder"
-import DueReviewPointsBuilder from "./DueReviewPointsBuilder"
+import DueMemoryTrackersBuilder from "./DueMemoryTrackersBuilder"
 import LinkBuilder from "./LinkBuilder"
 import NoteBuilder from "./NoteBuilder"
 import NoteRealmBuilder from "./NoteRealmBuilder"
 import NotebookBuilder from "./NotebookBuilder"
 import PredefinedQuestionBuilder from "./PredefinedQuestionBuilder"
 import ReviewQuestionInstanceBuilder from "./ReviewQuestionInstanceBuilder"
-import ReviewPointBuilder from "./ReviewPointBuilder"
+import MemoryTrackerBuilder from "./MemoryTrackerBuilder"
 import SuggestedQuestionForFineTuningBuilder from "./SuggestedQuestionForFineTuningBuilder"
 import UserBuilder from "./UserBuilder"
 import WikidataEntityBuilder from "./WikidataEntityBuilder"
@@ -32,16 +32,16 @@ class MakeMe {
     return new NoteRealmBuilder()
   }
 
-  static get aReviewPoint(): ReviewPointBuilder {
-    return new ReviewPointBuilder()
+  static get aMemoryTracker(): MemoryTrackerBuilder {
+    return new MemoryTrackerBuilder()
   }
 
   static get aLink(): LinkBuilder {
     return new LinkBuilder()
   }
 
-  static get aDueReviewPointsList(): DueReviewPointsBuilder {
-    return new DueReviewPointsBuilder()
+  static get aDueMemoryTrackersList(): DueMemoryTrackersBuilder {
+    return new DueMemoryTrackersBuilder()
   }
 
   static get aReviewQuestionInstance(): ReviewQuestionInstanceBuilder {

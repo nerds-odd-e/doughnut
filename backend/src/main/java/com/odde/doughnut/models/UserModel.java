@@ -51,7 +51,7 @@ public class UserModel implements ReviewScope {
         entity.getId(), entity.getOwnership().getId());
   }
 
-  public List<MemoryTracker> getRecentReviewPoints(Timestamp since) {
+  public List<MemoryTracker> getRecentMemoryTrackers(Timestamp since) {
     return modelFactoryService.memoryTrackerRepository.findAllByUserAndInitialReviewedAtGreaterThan(
         entity, since);
   }

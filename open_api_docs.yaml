@@ -2796,7 +2796,7 @@ paths:
     get:
       tags:
       - rest-memory-tracker-controller
-      operationId: getRecentReviewPoints
+      operationId: getRecentMemoryTrackers
       responses:
         "500":
           description: Internal Server Error

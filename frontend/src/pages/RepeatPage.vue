@@ -17,7 +17,7 @@
       :eager-fetch-count="eagerFetchCount ?? 5"
       :storage-accessor="storageAccessor"
       @answered="onAnswered($event)"
-      @move-to-end="moveReviewPointToEnd"
+      @move-to-end="moveMemoryTrackerToEnd"
     />
     <template v-else-if="!minimized">
       <div class="alert alert-success">
@@ -115,7 +115,7 @@ const onAnswered = (answerResult: AnsweredQuestion) => {
   }
 }
 
-const moveReviewPointToEnd = (index: number) => {
+const moveMemoryTrackerToEnd = (index: number) => {
   const currentToRepeat = toRepeat.value
   if (!currentToRepeat) return
 

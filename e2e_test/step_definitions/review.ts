@@ -172,8 +172,8 @@ Then(
   (noteTopic: string, data: DataTable) => {
     start
       .assumeAnsweredQuestionPage()
-      .showReviewPoint(noteTopic)
-      .expectReviewPointInfo(data.hashes()[0] ?? {})
+      .showMemoryTracker(noteTopic)
+      .expectMemoryTrackerInfo(data.hashes()[0] ?? {})
   }
 )
 
@@ -181,8 +181,8 @@ Then('choose to remove the last memory tracker from reviews', () => {
   start
     .assumeAnsweredQuestionPage()
     .goToLastResult()
-    .showReviewPoint()
-    .removeReviewPointFromReview()
+    .showMemoryTracker()
+    .removeMemoryTrackerFromReview()
 })
 
 Then('the choice {string} should be correct', (choice: string) => {
