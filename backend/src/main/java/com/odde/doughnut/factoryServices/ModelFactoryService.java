@@ -161,7 +161,7 @@ public class ModelFactoryService {
       ReviewQuestionInstance reviewQuestionInstance) {
     MemoryTracker memoryTracker =
         toUserModel(user)
-            .getReviewPointFor(reviewQuestionInstance.getPredefinedQuestion().getNote());
+            .getMemoryTrackerFor(reviewQuestionInstance.getPredefinedQuestion().getNote());
     if (memoryTracker != null) {
       toReviewPointModel(memoryTracker).markAsRepeated(currentUTCTimestamp, correct);
     }

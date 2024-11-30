@@ -47,7 +47,7 @@ class DescriptionLinkTargetQuizFactoryTest {
             .linkTo(target)
             .please();
     subjectNote = source.getLinks().get(0);
-    memoryTracker = makeMe.aReviewPointFor(subjectNote).by(user).inMemoryPlease();
+    memoryTracker = makeMe.aMemoryTrackerFor(subjectNote).by(user).inMemoryPlease();
     anotherSource = makeMe.aNote("pompeii").under(top).please();
   }
 

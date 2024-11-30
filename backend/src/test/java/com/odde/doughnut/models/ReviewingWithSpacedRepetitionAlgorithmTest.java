@@ -47,7 +47,7 @@ public class ReviewingWithSpacedRepetitionAlgorithmTest {
 
     @Test
     void whenThereIsNoReviewedNotesForUser() {
-      MemoryTracker memoryTracker = makeMe.aReviewPointFor(note).by(anotherUser).please();
+      MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(anotherUser).please();
       assertThat(getOneReviewPointNeedToRepeat(daysAfterBase(memoryTracker, 1)), is(nullValue()));
     }
 
@@ -70,7 +70,7 @@ public class ReviewingWithSpacedRepetitionAlgorithmTest {
         Integer repetitionDone, Integer reviewDay, Boolean expectedToRepeat) {
       MemoryTracker memoryTracker =
           makeMe
-              .aReviewPointFor(note)
+              .aMemoryTrackerFor(note)
               .by(userModel)
               .afterNthStrictRepetition(repetitionDone)
               .please();
@@ -90,7 +90,7 @@ public class ReviewingWithSpacedRepetitionAlgorithmTest {
       })
       void atHourInTheNextDay(
           Integer lastRepeatHour, Integer currentHour, Boolean expectedToRepeat) {
-        MemoryTracker memoryTracker = makeMe.aReviewPointFor(note).by(userModel).please();
+        MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(userModel).please();
         memoryTracker.setNextReviewAt(
             makeMe.aTimestamp().of(2, lastRepeatHour).fromShanghai().please());
         final Timestamp timestamp = makeMe.aTimestamp().of(2, currentHour).fromShanghai().please();
@@ -114,7 +114,7 @@ public class ReviewingWithSpacedRepetitionAlgorithmTest {
           int ntimes, Integer daysDelay, int expectedForgettingCurveIndex) {
         MemoryTrackerModel memoryTracker =
             makeMe
-                .aReviewPointFor(note)
+                .aMemoryTrackerFor(note)
                 .by(userModel)
                 .afterNthStrictRepetition(ntimes)
                 .toModelPlease();

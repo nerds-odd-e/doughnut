@@ -66,7 +66,7 @@ class WhichSpecHasInstanceQuizFactoryTest {
       }
 
       @Test
-      void shouldBeInvalidWhenNoViceReviewPoint() {
+      void shouldBeInvalidWhenNoViceMemoryTracker() {
         assertThat(buildQuestion(), nullValue());
       }
 
@@ -77,7 +77,7 @@ class WhichSpecHasInstanceQuizFactoryTest {
         void setup() {
           Note link = source.getLinks().get(1);
 
-          makeMe.aReviewPointFor(link).by(user).please();
+          makeMe.aMemoryTrackerFor(link).by(user).please();
         }
 
         @Test

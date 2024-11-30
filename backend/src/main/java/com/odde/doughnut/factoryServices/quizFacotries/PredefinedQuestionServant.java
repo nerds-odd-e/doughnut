@@ -50,19 +50,19 @@ public class PredefinedQuestionServant {
     return randomizer.randomlyChoose(maxFillingOptionCount, candidates).toList();
   }
 
-  public Stream<Note> getSiblingLinksOfSameLinkTypeHavingReviewPoint(Note link) {
-    return linksWithReviewPoint(link.getSiblingLinksOfSameLinkType(this.user));
+  public Stream<Note> getSiblingLinksOfSameLinkTypeHavingMemoryTracker(Note link) {
+    return linksWithMemoryTracker(link.getSiblingLinksOfSameLinkType(this.user));
   }
 
-  public Stream<Note> getLinksFromSameSourceHavingReviewPoint(Note link) {
+  public Stream<Note> getLinksFromSameSourceHavingMemoryTracker(Note link) {
     List<Note> list =
         new NoteViewer(this.user, link.getParent())
             .linksOfTypeThroughDirect(candidateQuestionLinkTypes);
-    return linksWithReviewPoint(list.stream()).filter(l -> !link.equals(l));
+    return linksWithMemoryTracker(list.stream()).filter(l -> !link.equals(l));
   }
 
-  private Stream<Note> linksWithReviewPoint(Stream<Note> cousinLinksOfSameLinkType) {
-    return cousinLinksOfSameLinkType.filter(l -> getReviewPoint(l) != null);
+  private Stream<Note> linksWithMemoryTracker(Stream<Note> cousinLinksOfSameLinkType) {
+    return cousinLinksOfSameLinkType.filter(l -> getMemoryTracker(l) != null);
   }
 
   public Note getParentGrandLink(Note link) {
@@ -88,9 +88,9 @@ public class PredefinedQuestionServant {
     return chooseFillingOptionsRandomly(backwardPeers);
   }
 
-  public MemoryTracker getReviewPoint(Note thing) {
+  public MemoryTracker getMemoryTracker(Note thing) {
     UserModel userModel = modelFactoryService.toUserModel(user);
-    return userModel.getReviewPointFor(thing);
+    return userModel.getMemoryTrackerFor(thing);
   }
 
   public List<Note> chooseFromCohortAvoidUncles(Note note, Note answerNote) {

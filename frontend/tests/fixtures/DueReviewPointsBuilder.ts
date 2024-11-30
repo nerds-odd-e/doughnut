@@ -1,7 +1,7 @@
-import type { DueReviewPoints } from "@/generated/backend"
+import type { DueMemoryTrackers } from "@/generated/backend"
 import Builder from "./Builder"
 
-class RepetitionBuilder extends Builder<DueReviewPoints> {
+class RepetitionBuilder extends Builder<DueMemoryTrackers> {
   reviewPointIdstoRepeat: number[] = []
 
   toRepeat(reviewPointIds: number[]) {
@@ -10,7 +10,7 @@ class RepetitionBuilder extends Builder<DueReviewPoints> {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  do(): DueReviewPoints {
+  do(): DueMemoryTrackers {
     return {
       toRepeat: this.reviewPointIdstoRepeat,
       dueInDays: 0,

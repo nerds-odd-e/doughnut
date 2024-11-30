@@ -5,7 +5,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.odde.doughnut.controllers.dto.DueReviewPoints;
+import com.odde.doughnut.controllers.dto.DueMemoryTrackers;
 import com.odde.doughnut.controllers.dto.InitialInfo;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -114,8 +114,8 @@ class RestReviewsControllerTests {
           .aReviewPointBy(currentUser)
           .nextReviewAt(TimestampOperations.addHoursToTimestamp(currentTime, nextReviewAtHours))
           .please();
-      DueReviewPoints dueReviewPoints = controller.repeatReview(timezone, null);
-      assertThat(dueReviewPoints.getToRepeat(), hasSize(expectedCount));
+      DueMemoryTrackers dueMemoryTrackers = controller.repeatReview(timezone, null);
+      assertThat(dueMemoryTrackers.getToRepeat(), hasSize(expectedCount));
     }
   }
 }

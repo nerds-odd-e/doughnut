@@ -10,19 +10,23 @@ import org.springframework.data.repository.query.Param;
 public interface NoteReviewRepository extends CrudRepository<Note, Integer> {
   String selectThingsFrom = "SELECT n  from Note n  ";
 
-  @Query(value = selectThingsFrom + selectNoteThings + joinReviewPoint + whereClaus + orderByDate)
+  @Query(value = selectThingsFrom + selectNoteThings + joinMemoryTracker + whereClaus + orderByDate)
   Stream<Note> findByOwnershipWhereThereIsNoMemoryTracker(Integer userId, Integer ownershipId);
 
   @Query(
       value =
-          "SELECT count(1) as count from Note n " + selectNoteThings + joinReviewPoint + whereClaus)
+          "SELECT count(1) as count from Note n "
+              + selectNoteThings
+              + joinMemoryTracker
+              + whereClaus)
   int countByOwnershipWhereThereIsNoMemoryTracker(Integer userId, Integer ownershipId);
 
-  @Query(value = selectThingsFrom + joinReviewPoint + whereClaus + fromNotebook + orderByDate)
+  @Query(value = selectThingsFrom + joinMemoryTracker + whereClaus + fromNotebook + orderByDate)
   Stream<Note> findByAncestorWhereThereIsNoMemoryTracker(Integer userId, Integer notebookId);
 
   @Query(
-      value = "SELECT count(1) as count from Note n " + joinReviewPoint + whereClaus + fromNotebook)
+      value =
+          "SELECT count(1) as count from Note n " + joinMemoryTracker + whereClaus + fromNotebook)
   int countByAncestorWhereThereIsNoMemoryTracker(Integer userId, Integer notebookId);
 
   @Query(value = "SELECT count(1) as count from Note n " + " WHERE n.id in :noteIds" + fromNotebook)
@@ -34,7 +38,7 @@ public interface NoteReviewRepository extends CrudRepository<Note, Integer> {
           + "   AND COALESCE(n.reviewSetting.skipReview, FALSE) = FALSE "
           + "   AND n.deletedAt IS NULL ";
 
-  String joinReviewPoint = " LEFT JOIN n.memoryTrackers rp ON rp.user.id = :userId";
+  String joinMemoryTracker = " LEFT JOIN n.memoryTrackers rp ON rp.user.id = :userId";
 
   String orderByDate = " ORDER BY n.reviewSetting.level, n.createdAt, n.id";
 

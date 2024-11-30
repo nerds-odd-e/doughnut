@@ -84,7 +84,7 @@ class RestReviewQuestionInstanceControllerTests {
       Note answerNote = makeMe.aNote().rememberSpelling().please();
       memoryTracker =
           makeMe
-              .aReviewPointFor(answerNote)
+              .aMemoryTrackerFor(answerNote)
               .by(currentUser)
               .forgettingCurveAndNextReviewAt(200)
               .please();
@@ -94,7 +94,7 @@ class RestReviewQuestionInstanceControllerTests {
     }
 
     @Test
-    void shouldValidateTheAnswerAndUpdateReviewPoint() {
+    void shouldValidateTheAnswerAndUpdateMemoryTracker() {
       Integer oldRepetitionCount = memoryTracker.getRepetitionCount();
       AnsweredQuestion answerResult = controller.answerQuiz(reviewQuestionInstance, answerDTO);
       assertTrue(answerResult.answer.getCorrect());
@@ -302,7 +302,7 @@ class RestReviewQuestionInstanceControllerTests {
       // another note is needed, otherwise the note will be the only note in the notebook, and the
       // question cannot be generated.
       makeMe.aNote().under(note).please();
-      MemoryTracker rp = makeMe.aReviewPointFor(note).by(currentUser).please();
+      MemoryTracker rp = makeMe.aMemoryTrackerFor(note).by(currentUser).please();
 
       ReviewQuestionInstance reviewQuestionInstance = controller.generateRandomQuestion(rp);
 
@@ -313,7 +313,7 @@ class RestReviewQuestionInstanceControllerTests {
     void shouldIncludeFileSearchInTools() {
       Note note = makeMe.aNote().details("description long enough.").rememberSpelling().please();
       makeMe.aNote().under(note).please();
-      MemoryTracker rp = makeMe.aReviewPointFor(note).by(currentUser).please();
+      MemoryTracker rp = makeMe.aMemoryTrackerFor(note).by(currentUser).please();
       MCQWithAnswer jsonQuestion =
           makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
 

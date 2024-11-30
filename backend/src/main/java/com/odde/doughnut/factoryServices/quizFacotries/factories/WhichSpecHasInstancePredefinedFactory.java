@@ -16,7 +16,7 @@ public class WhichSpecHasInstancePredefinedFactory extends QuestionOptionsFactor
 
   @Override
   public void findCategoricalLink() {
-    List<Note> candidates = servant.getLinksFromSameSourceHavingReviewPoint(link).toList();
+    List<Note> candidates = servant.getLinksFromSameSourceHavingMemoryTracker(link).toList();
     instanceLink = servant.randomizer.chooseOneRandomly(candidates).orElse(null);
   }
 

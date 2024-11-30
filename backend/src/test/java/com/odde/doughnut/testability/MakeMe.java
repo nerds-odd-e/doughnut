@@ -84,7 +84,7 @@ public class MakeMe extends MakeMeWithoutDB {
     return object;
   }
 
-  public MemoryTrackerBuilder aReviewPointFor(Note note) {
+  public MemoryTrackerBuilder aMemoryTrackerFor(Note note) {
     MemoryTracker memoryTracker = MemoryTracker.buildReviewPointForNote(note);
     MemoryTrackerBuilder memoryTrackerBuilder = new MemoryTrackerBuilder(memoryTracker, this);
     memoryTrackerBuilder.entity.setNote(note);
@@ -93,7 +93,7 @@ public class MakeMe extends MakeMeWithoutDB {
 
   public MemoryTrackerBuilder aReviewPointBy(UserModel user) {
     Note note = aNote().please();
-    return aReviewPointFor(note).by(user);
+    return aMemoryTrackerFor(note).by(user);
   }
 
   public CircleBuilder aCircle() {

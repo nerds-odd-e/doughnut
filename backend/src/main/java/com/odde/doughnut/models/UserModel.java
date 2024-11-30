@@ -76,7 +76,7 @@ public class UserModel implements ReviewScope {
     return memoryTracker.isInitialReviewOnSameDay(currentUTCTimestamp, timeZone);
   }
 
-  public MemoryTracker getReviewPointFor(Note note) {
+  public MemoryTracker getMemoryTrackerFor(Note note) {
     if (entity == null) return null;
     return modelFactoryService.memoryTrackerRepository.findByUserAndNote(
         entity.getId(), note.getId());

@@ -82,7 +82,7 @@ class FromDifferentPartAsQuizFactoryTest {
       @BeforeEach
       void setup() {
         makeMe.aLink().between(tall, objective, LinkType.TAGGED_BY).please();
-        makeMe.aReviewPointFor(kindSubjective).by(user).please();
+        makeMe.aMemoryTrackerFor(kindSubjective).by(user).please();
       }
 
       @Test
@@ -95,7 +95,7 @@ class FromDifferentPartAsQuizFactoryTest {
 
         @BeforeEach
         void setup() {
-          makeMe.aReviewPointFor(prettySubjective).by(user).please();
+          makeMe.aMemoryTrackerFor(prettySubjective).by(user).please();
         }
 
         @Test

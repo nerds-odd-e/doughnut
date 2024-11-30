@@ -4,7 +4,7 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
-public class DueReviewPoints {
+public class DueMemoryTrackers {
   @Getter @Setter private List<Integer> toRepeat;
   @Getter @Setter private Integer dueInDays;
 }

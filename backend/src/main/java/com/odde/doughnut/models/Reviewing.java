@@ -1,6 +1,6 @@
 package com.odde.doughnut.models;
 
-import com.odde.doughnut.controllers.dto.DueReviewPoints;
+import com.odde.doughnut.controllers.dto.DueMemoryTrackers;
 import com.odde.doughnut.controllers.dto.ReviewStatus;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
@@ -27,7 +27,7 @@ public class Reviewing {
     this.modelFactoryService = modelFactoryService;
   }
 
-  public Stream<Note> getDueInitialReviewPoints() {
+  public Stream<Note> getDueInitialMemoryTrackers() {
     int count = remainingDailyNewNotesCount();
     if (count == 0) {
       return Stream.empty();
@@ -67,7 +67,7 @@ public class Reviewing {
   }
 
   private int toInitialReviewCount() {
-    if (getDueInitialReviewPoints().findFirst().isEmpty()) {
+    if (getDueInitialMemoryTrackers().findFirst().isEmpty()) {
       return 0;
     }
     return Math.min(remainingDailyNewNotesCount(), notLearntCount());
@@ -91,13 +91,13 @@ public class Reviewing {
         .map(modelFactoryService::toSubscriptionModel);
   }
 
-  public DueReviewPoints getDueReviewPoints(int dueInDays) {
+  public DueMemoryTrackers getDueReviewPoints(int dueInDays) {
     List<Integer> toRepeat =
         getMemoryTrackersNeedToRepeat(dueInDays).map(MemoryTracker::getId).toList();
-    DueReviewPoints dueReviewPoints = new DueReviewPoints();
-    dueReviewPoints.setDueInDays(dueInDays);
-    dueReviewPoints.setToRepeat(toRepeat);
-    return dueReviewPoints;
+    DueMemoryTrackers dueMemoryTrackers = new DueMemoryTrackers();
+    dueMemoryTrackers.setDueInDays(dueInDays);
+    dueMemoryTrackers.setToRepeat(toRepeat);
+    return dueMemoryTrackers;
   }
 
   public ReviewStatus getReviewStatus() {

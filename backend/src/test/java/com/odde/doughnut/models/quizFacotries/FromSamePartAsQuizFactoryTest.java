@@ -77,7 +77,7 @@ class FromSamePartAsQuizFactoryTest {
       }
 
       @Test
-      void shouldBeInvalidWhenNoViceReviewPoint() {
+      void shouldBeInvalidWhenNoViceMemoryTracker() {
         assertThat(buildQuestion(), nullValue());
       }
 
@@ -85,7 +85,7 @@ class FromSamePartAsQuizFactoryTest {
       class WhenThereIsViceMemoryTracker {
         @BeforeEach
         void setup() {
-          makeMe.aReviewPointFor(cousin).by(user).please();
+          makeMe.aMemoryTrackerFor(cousin).by(user).please();
         }
 
         @Test

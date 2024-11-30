@@ -2467,7 +2467,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/DueReviewPoints"
+                $ref: "#/components/schemas/DueMemoryTrackers"
   /api/reviews/overview:
     get:
       tags:
@@ -4017,7 +4017,7 @@ components:
           $ref: "#/components/schemas/User"
         externalIdentifier:
           type: string
-    DueReviewPoints:
+    DueMemoryTrackers:
       type: object
       properties:
         toRepeat:

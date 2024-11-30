@@ -31,7 +31,7 @@ public class FromDifferentPartAsPredefinedFactory extends QuestionOptionsFactory
       return null;
     }
     List<Note> cousinLinks =
-        servant.getSiblingLinksOfSameLinkTypeHavingReviewPoint(link).collect(Collectors.toList());
+        servant.getSiblingLinksOfSameLinkTypeHavingMemoryTracker(link).collect(Collectors.toList());
     return servant.chooseFillingOptionsRandomly(cousinLinks).stream()
         .map(Note::getParent)
         .collect(Collectors.toList());

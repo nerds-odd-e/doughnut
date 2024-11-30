@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type DueReviewPoints = {
+export type DueMemoryTrackers = {
     toRepeat?: Array<number>;
     dueInDays?: number;
 };

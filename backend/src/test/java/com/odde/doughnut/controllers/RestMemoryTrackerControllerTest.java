@@ -51,7 +51,7 @@ class RestMemoryTrackerControllerTest {
       void setup() {
         // fix the time
         testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
-        rp = makeMe.aReviewPointFor(makeMe.aNote().please()).by(userModel).please();
+        rp = makeMe.aMemoryTrackerFor(makeMe.aNote().please()).by(userModel).please();
       }
 
       @Test
@@ -82,7 +82,7 @@ class RestMemoryTrackerControllerTest {
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
       userModel = makeMe.aNullUserModelPlease();
       MemoryTracker memoryTracker =
-          makeMe.aReviewPointFor(makeMe.aNote().please()).inMemoryPlease();
+          makeMe.aMemoryTrackerFor(makeMe.aNote().please()).inMemoryPlease();
       SelfEvaluation selfEvaluation =
           new SelfEvaluation() {
             {
@@ -112,7 +112,7 @@ class RestMemoryTrackerControllerTest {
 
       @BeforeEach
       void setup() {
-        rp = makeMe.aReviewPointFor(makeMe.aNote().please()).by(userModel).please();
+        rp = makeMe.aMemoryTrackerFor(makeMe.aNote().please()).by(userModel).please();
       }
 
       @Test
@@ -139,7 +139,7 @@ class RestMemoryTrackerControllerTest {
     @Test
     void itMustUpdateTheReviewPointRecord() {
       Note note = makeMe.aNote().please();
-      MemoryTracker rp = makeMe.aReviewPointFor(note).by(userModel).please();
+      MemoryTracker rp = makeMe.aMemoryTrackerFor(note).by(userModel).please();
       Integer oldRepetitionCount = rp.getRepetitionCount();
       controller.markAsRepeated(rp, true);
       assertThat(rp.getRepetitionCount(), equalTo(oldRepetitionCount + 1));
@@ -156,8 +156,8 @@ class RestMemoryTrackerControllerTest {
 
     @Test
     void shouldReturnReviewPointsForCurrentUser() {
-      MemoryTracker rp1 = makeMe.aReviewPointFor(makeMe.aNote().please()).by(userModel).please();
-      MemoryTracker rp2 = makeMe.aReviewPointFor(makeMe.aNote().please()).by(userModel).please();
+      MemoryTracker rp1 = makeMe.aMemoryTrackerFor(makeMe.aNote().please()).by(userModel).please();
+      MemoryTracker rp2 = makeMe.aMemoryTrackerFor(makeMe.aNote().please()).by(userModel).please();
 
       List<MemoryTracker> memoryTrackers = controller.getRecentReviewPoints();
 
@@ -194,8 +194,8 @@ class RestMemoryTrackerControllerTest {
 
     @Test
     void shouldReturnRecentlyReviewedPointsForCurrentUser() {
-      MemoryTracker rp1 = makeMe.aReviewPointFor(makeMe.aNote().please()).by(userModel).please();
-      MemoryTracker rp2 = makeMe.aReviewPointFor(makeMe.aNote().please()).by(userModel).please();
+      MemoryTracker rp1 = makeMe.aMemoryTrackerFor(makeMe.aNote().please()).by(userModel).please();
+      MemoryTracker rp2 = makeMe.aMemoryTrackerFor(makeMe.aNote().please()).by(userModel).please();
 
       // Mark as reviewed
       controller.markAsRepeated(rp1, true);

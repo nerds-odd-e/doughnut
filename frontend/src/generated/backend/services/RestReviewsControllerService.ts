@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { DueReviewPoints } from '../models/DueReviewPoints';
+import type { DueMemoryTrackers } from '../models/DueMemoryTrackers';
 import type { InitialInfo } from '../models/InitialInfo';
 import type { MemoryTracker } from '../models/MemoryTracker';
 import type { Note } from '../models/Note';
@@ -32,13 +32,13 @@ export class RestReviewsControllerService {
     /**
      * @param timezone
      * @param dueindays
-     * @returns DueReviewPoints OK
+     * @returns DueMemoryTrackers OK
      * @throws ApiError
      */
     public repeatReview(
         timezone: string,
         dueindays?: number,
-    ): CancelablePromise<DueReviewPoints> {
+    ): CancelablePromise<DueMemoryTrackers> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/reviews/repeat',

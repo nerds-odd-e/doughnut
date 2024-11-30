@@ -40,7 +40,7 @@ public class ReviewingInitialReviewTest {
   @Test
   void whenThereIsNoNotesForUser() {
     makeMe.aNote().creatorAndOwner(anotherUser).please();
-    assertThat(getFirstInitialReviewPoint(reviewingOnDay1), is(nullValue()));
+    assertThat(getFirstInitialMemoryTracker(reviewingOnDay1), is(nullValue()));
     assertThat(reviewingOnDay1.getReviewStatus().toInitialReviewCount, equalTo(0));
   }
 
@@ -58,23 +58,23 @@ public class ReviewingInitialReviewTest {
     @Test
     void shouldReturnTheFirstNoteAndThenTheSecondWhenThereAreTwo() {
       assertThat(reviewingOnDay1.getReviewStatus().toInitialReviewCount, equalTo(2));
-      assertThat(getFirstInitialReviewPoint(reviewingOnDay1), equalTo(note1));
-      makeMe.aReviewPointFor(note1).by(userModel).initiallyReviewedOn(day1).please();
+      assertThat(getFirstInitialMemoryTracker(reviewingOnDay1), equalTo(note1));
+      makeMe.aMemoryTrackerFor(note1).by(userModel).initiallyReviewedOn(day1).please();
       assertThat(reviewingOnDay1.getReviewStatus().toInitialReviewCount, equalTo(1));
-      assertThat(getFirstInitialReviewPoint(reviewingOnDay1), equalTo(note2));
+      assertThat(getFirstInitialMemoryTracker(reviewingOnDay1), equalTo(note2));
     }
 
     @Test
     void shouldReturnTheSecondNoteIfItsLevelIsLower() {
       makeMe.theNote(note1).level(2).please();
       makeMe.theNote(note2).level(1).please();
-      assertThat(getFirstInitialReviewPoint(reviewingOnDay1), equalTo(note2));
+      assertThat(getFirstInitialMemoryTracker(reviewingOnDay1), equalTo(note2));
     }
 
     @Test
     void shouldNotIncludeNoteThatIsSkippedForReview() {
       makeMe.theNote(note1).skipReview().linkTo(note2).please();
-      assertThat(getFirstInitialReviewPoint(reviewingOnDay1), equalTo(note2));
+      assertThat(getFirstInitialMemoryTracker(reviewingOnDay1), equalTo(note2));
     }
 
     @Nested
@@ -89,7 +89,7 @@ public class ReviewingInitialReviewTest {
       }
 
       private List<Note> getAllDueReviewPoints() {
-        return reviewingOnDay1.getDueInitialReviewPoints().collect(Collectors.toList());
+        return reviewingOnDay1.getDueInitialMemoryTrackers().collect(Collectors.toList());
       }
 
       @Test
@@ -153,46 +153,46 @@ public class ReviewingInitialReviewTest {
 
       @Test
       void shouldReturnOneIfUsersDailySettingIsOne() {
-        assertThat(getFirstInitialReviewPoint(reviewingOnDay1), equalTo(note1));
+        assertThat(getFirstInitialMemoryTracker(reviewingOnDay1), equalTo(note1));
       }
 
       @Test
       void shouldNotIncludeNotesThatAreAlreadyReviewed() {
-        makeMe.aReviewPointFor(note1).by(userModel).initiallyReviewedOn(day1).please();
-        assertThat(getFirstInitialReviewPoint(reviewingOnDay1), is(nullValue()));
+        makeMe.aMemoryTrackerFor(note1).by(userModel).initiallyReviewedOn(day1).please();
+        assertThat(getFirstInitialMemoryTracker(reviewingOnDay1), is(nullValue()));
       }
 
       @Test
-      void shouldNotCountSkippedReviewPoint() {
+      void shouldNotCountSkippedMemoryTracker() {
         makeMe
-            .aReviewPointFor(note1)
+            .aMemoryTrackerFor(note1)
             .by(userModel)
             .initiallyReviewedOn(day1)
             .removedFromReview()
             .please();
-        assertThat(getFirstInitialReviewPoint(reviewingOnDay1), is(note2));
+        assertThat(getFirstInitialMemoryTracker(reviewingOnDay1), is(note2));
       }
 
       @Test
       void shouldIncludeNotesThatAreReviewedByOtherPeople() {
-        makeMe.aReviewPointFor(note1).by(anotherUser).initiallyReviewedOn(day1).please();
-        assertThat(getFirstInitialReviewPoint(reviewingOnDay1), equalTo(note1));
+        makeMe.aMemoryTrackerFor(note1).by(anotherUser).initiallyReviewedOn(day1).please();
+        assertThat(getFirstInitialMemoryTracker(reviewingOnDay1), equalTo(note1));
       }
 
       @Test
       void theDailyCountShouldNotBeResetOnSameDayDifferentHour() {
-        makeMe.aReviewPointFor(note1).by(userModel).initiallyReviewedOn(day1).please();
+        makeMe.aMemoryTrackerFor(note1).by(userModel).initiallyReviewedOn(day1).please();
         Timestamp day1_23 = makeMe.aTimestamp().of(1, 23).fromShanghai().please();
         Reviewing reviewing = userModel.createReviewing(day1_23, ZoneId.of("Asia/Shanghai"));
-        assertThat(getFirstInitialReviewPoint(reviewing), is(nullValue()));
+        assertThat(getFirstInitialMemoryTracker(reviewing), is(nullValue()));
       }
 
       @Test
       void theDailyCountShouldBeResetOnNextDay() {
-        makeMe.aReviewPointFor(note1).by(userModel).initiallyReviewedOn(day1).please();
+        makeMe.aMemoryTrackerFor(note1).by(userModel).initiallyReviewedOn(day1).please();
         Timestamp day2 = makeMe.aTimestamp().of(2, 1).fromShanghai().please();
         Reviewing reviewing = userModel.createReviewing(day2, ZoneId.of("Asia/Shanghai"));
-        assertThat(getFirstInitialReviewPoint(reviewing), equalTo(note2));
+        assertThat(getFirstInitialMemoryTracker(reviewing), equalTo(note2));
       }
     }
   }
@@ -219,22 +219,22 @@ public class ReviewingInitialReviewTest {
 
     @Test
     void shouldReturnReviewPointForNote() {
-      assertThat(getFirstInitialReviewPoint(reviewingOnDay1), equalTo(note1));
+      assertThat(getFirstInitialMemoryTracker(reviewingOnDay1), equalTo(note1));
     }
 
     @Test
     void shouldReturnReviewPointForLink() {
       makeMe.theNote(note2).skipReview().please();
       makeMe.theNote(note1).skipReview().linkTo(note2).please();
-      Note noteToReview = getFirstInitialReviewPoint(reviewingOnDay1);
+      Note noteToReview = getFirstInitialMemoryTracker(reviewingOnDay1);
       assertThat(noteToReview.getParent(), equalTo(note1));
     }
 
     @Test
     void reviewedMoreThanPlanned() {
-      makeMe.aReviewPointFor(note1).by(userModel).initiallyReviewedOn(day1).please();
-      makeMe.aReviewPointFor(note2).by(userModel).initiallyReviewedOn(day1).please();
-      assertThat(getFirstInitialReviewPoint(reviewingOnDay1), nullValue());
+      makeMe.aMemoryTrackerFor(note1).by(userModel).initiallyReviewedOn(day1).please();
+      makeMe.aMemoryTrackerFor(note2).by(userModel).initiallyReviewedOn(day1).please();
+      assertThat(getFirstInitialMemoryTracker(reviewingOnDay1), nullValue());
     }
   }
 
@@ -251,11 +251,11 @@ public class ReviewingInitialReviewTest {
 
     @Test
     void shouldNotBeReviewed() {
-      assertThat(getFirstInitialReviewPoint(reviewingOnDay1), is(nullValue()));
+      assertThat(getFirstInitialMemoryTracker(reviewingOnDay1), is(nullValue()));
     }
   }
 
-  private Note getFirstInitialReviewPoint(Reviewing reviewing) {
-    return reviewing.getDueInitialReviewPoints().findFirst().orElse(null);
+  private Note getFirstInitialMemoryTracker(Reviewing reviewing) {
+    return reviewing.getDueInitialMemoryTrackers().findFirst().orElse(null);
   }
 }

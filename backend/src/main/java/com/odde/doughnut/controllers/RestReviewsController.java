@@ -1,6 +1,6 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.dto.DueReviewPoints;
+import com.odde.doughnut.controllers.dto.DueMemoryTrackers;
 import com.odde.doughnut.controllers.dto.InitialInfo;
 import com.odde.doughnut.controllers.dto.ReviewStatus;
 import com.odde.doughnut.entities.*;
@@ -58,7 +58,7 @@ class RestReviewsController {
     Reviewing reviewing =
         currentUser.createReviewing(testabilitySettings.getCurrentUTCTimestamp(), timeZone);
 
-    return reviewing.getDueInitialReviewPoints().toList();
+    return reviewing.getDueInitialMemoryTrackers().toList();
   }
 
   @PostMapping(path = "")
@@ -78,7 +78,7 @@ class RestReviewsController {
 
   @GetMapping(value = {"/repeat"})
   @Transactional
-  public DueReviewPoints repeatReview(
+  public DueMemoryTrackers repeatReview(
       @RequestParam(value = "timezone") String timezone,
       @RequestParam(value = "dueindays", required = false) Integer dueInDays) {
     currentUser.assertLoggedIn();

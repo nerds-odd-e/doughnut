@@ -34,7 +34,8 @@ public class MemoryTrackerModelTest {
     @Test
     void initialReviewShouldSetBothInitialAndLastReviewAt() {
       Note note = makeMe.aNote().creatorAndOwner(userModel).please();
-      MemoryTrackerModel memoryTracker = makeMe.aReviewPointFor(note).by(userModel).toModelPlease();
+      MemoryTrackerModel memoryTracker =
+          makeMe.aMemoryTrackerFor(note).by(userModel).toModelPlease();
       memoryTracker.initialReview(day1, userModel.getEntity());
       assertThat(memoryTracker.getEntity().getInitialReviewedAt(), equalTo(day1));
       assertThat(memoryTracker.getEntity().getLastReviewedAt(), equalTo(day1));

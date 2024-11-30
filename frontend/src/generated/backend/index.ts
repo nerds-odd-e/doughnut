@@ -35,7 +35,7 @@ export type { CurrentUserInfo } from './models/CurrentUserInfo';
 export type { Delta } from './models/Delta';
 export type { DeltaContent } from './models/DeltaContent';
 export type { DeltaOfRunStep } from './models/DeltaOfRunStep';
-export type { DueReviewPoints } from './models/DueReviewPoints';
+export type { DueMemoryTrackers } from './models/DueMemoryTrackers';
 export { DummyForGeneratingTypes } from './models/DummyForGeneratingTypes';
 export type { ExpiresAfter } from './models/ExpiresAfter';
 export type { FailureReport } from './models/FailureReport';

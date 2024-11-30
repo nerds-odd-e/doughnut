@@ -42,7 +42,7 @@ public class FromSamePartAsPredefinedFactory extends QuestionOptionsFactory {
   protected Note getAnswerLink(PredefinedQuestionServant servant) {
     if (cachedAnswerLink == null) {
       List<Note> backwardPeers =
-          servant.getSiblingLinksOfSameLinkTypeHavingReviewPoint(link).toList();
+          servant.getSiblingLinksOfSameLinkTypeHavingMemoryTracker(link).toList();
       cachedAnswerLink = servant.randomizer.chooseOneRandomly(backwardPeers).orElse(null);
     }
     return cachedAnswerLink;
