@@ -20,13 +20,13 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-public class ReviewingInitialReviewTest {
+public class RecallServiceInitialReviewTest {
   @Autowired MakeMe makeMe;
   UserModel userModel;
   UserModel anotherUser;
   Timestamp day1;
   Timestamp day0;
-  Reviewing reviewingOnDay1;
+  RecallService recallServiceOnDay1;
 
   @BeforeEach
   void setup() {
@@ -34,14 +34,14 @@ public class ReviewingInitialReviewTest {
     anotherUser = makeMe.aUser().toModelPlease();
     day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
     day0 = makeMe.aTimestamp().of(0, 8).fromShanghai().please();
-    reviewingOnDay1 = userModel.createReviewing(day1, ZoneId.of("Asia/Shanghai"));
+    recallServiceOnDay1 = userModel.createReviewing(day1, ZoneId.of("Asia/Shanghai"));
   }
 
   @Test
   void whenThereIsNoNotesForUser() {
     makeMe.aNote().creatorAndOwner(anotherUser).please();
-    assertThat(getFirstInitialMemoryTracker(reviewingOnDay1), is(nullValue()));
-    assertThat(reviewingOnDay1.getReviewStatus().toInitialReviewCount, equalTo(0));
+    assertThat(getFirstInitialMemoryTracker(recallServiceOnDay1), is(nullValue()));
+    assertThat(recallServiceOnDay1.getReviewStatus().toInitialReviewCount, equalTo(0));
   }
 
   @Nested
@@ -57,24 +57,24 @@ public class ReviewingInitialReviewTest {
 
     @Test
     void shouldReturnTheFirstNoteAndThenTheSecondWhenThereAreTwo() {
-      assertThat(reviewingOnDay1.getReviewStatus().toInitialReviewCount, equalTo(2));
-      assertThat(getFirstInitialMemoryTracker(reviewingOnDay1), equalTo(note1));
+      assertThat(recallServiceOnDay1.getReviewStatus().toInitialReviewCount, equalTo(2));
+      assertThat(getFirstInitialMemoryTracker(recallServiceOnDay1), equalTo(note1));
       makeMe.aMemoryTrackerFor(note1).by(userModel).initiallyReviewedOn(day1).please();
-      assertThat(reviewingOnDay1.getReviewStatus().toInitialReviewCount, equalTo(1));
-      assertThat(getFirstInitialMemoryTracker(reviewingOnDay1), equalTo(note2));
+      assertThat(recallServiceOnDay1.getReviewStatus().toInitialReviewCount, equalTo(1));
+      assertThat(getFirstInitialMemoryTracker(recallServiceOnDay1), equalTo(note2));
     }
 
     @Test
     void shouldReturnTheSecondNoteIfItsLevelIsLower() {
       makeMe.theNote(note1).level(2).please();
       makeMe.theNote(note2).level(1).please();
-      assertThat(getFirstInitialMemoryTracker(reviewingOnDay1), equalTo(note2));
+      assertThat(getFirstInitialMemoryTracker(recallServiceOnDay1), equalTo(note2));
     }
 
     @Test
     void shouldNotIncludeNoteThatIsSkippedForReview() {
       makeMe.theNote(note1).skipReview().linkTo(note2).please();
-      assertThat(getFirstInitialMemoryTracker(reviewingOnDay1), equalTo(note2));
+      assertThat(getFirstInitialMemoryTracker(recallServiceOnDay1), equalTo(note2));
     }
 
     @Nested
@@ -89,7 +89,7 @@ public class ReviewingInitialReviewTest {
       }
 
       private List<Note> getAllDueMemoryTrackers() {
-        return reviewingOnDay1.getDueInitialMemoryTrackers().collect(Collectors.toList());
+        return recallServiceOnDay1.getDueInitialMemoryTrackers().collect(Collectors.toList());
       }
 
       @Test
@@ -153,13 +153,13 @@ public class ReviewingInitialReviewTest {
 
       @Test
       void shouldReturnOneIfUsersDailySettingIsOne() {
-        assertThat(getFirstInitialMemoryTracker(reviewingOnDay1), equalTo(note1));
+        assertThat(getFirstInitialMemoryTracker(recallServiceOnDay1), equalTo(note1));
       }
 
       @Test
       void shouldNotIncludeNotesThatAreAlreadyReviewed() {
         makeMe.aMemoryTrackerFor(note1).by(userModel).initiallyReviewedOn(day1).please();
-        assertThat(getFirstInitialMemoryTracker(reviewingOnDay1), is(nullValue()));
+        assertThat(getFirstInitialMemoryTracker(recallServiceOnDay1), is(nullValue()));
       }
 
       @Test
@@ -170,29 +170,30 @@ public class ReviewingInitialReviewTest {
             .initiallyReviewedOn(day1)
             .removedFromReview()
             .please();
-        assertThat(getFirstInitialMemoryTracker(reviewingOnDay1), is(note2));
+        assertThat(getFirstInitialMemoryTracker(recallServiceOnDay1), is(note2));
       }
 
       @Test
       void shouldIncludeNotesThatAreReviewedByOtherPeople() {
         makeMe.aMemoryTrackerFor(note1).by(anotherUser).initiallyReviewedOn(day1).please();
-        assertThat(getFirstInitialMemoryTracker(reviewingOnDay1), equalTo(note1));
+        assertThat(getFirstInitialMemoryTracker(recallServiceOnDay1), equalTo(note1));
       }
 
       @Test
       void theDailyCountShouldNotBeResetOnSameDayDifferentHour() {
         makeMe.aMemoryTrackerFor(note1).by(userModel).initiallyReviewedOn(day1).please();
         Timestamp day1_23 = makeMe.aTimestamp().of(1, 23).fromShanghai().please();
-        Reviewing reviewing = userModel.createReviewing(day1_23, ZoneId.of("Asia/Shanghai"));
-        assertThat(getFirstInitialMemoryTracker(reviewing), is(nullValue()));
+        RecallService recallService =
+            userModel.createReviewing(day1_23, ZoneId.of("Asia/Shanghai"));
+        assertThat(getFirstInitialMemoryTracker(recallService), is(nullValue()));
       }
 
       @Test
       void theDailyCountShouldBeResetOnNextDay() {
         makeMe.aMemoryTrackerFor(note1).by(userModel).initiallyReviewedOn(day1).please();
         Timestamp day2 = makeMe.aTimestamp().of(2, 1).fromShanghai().please();
-        Reviewing reviewing = userModel.createReviewing(day2, ZoneId.of("Asia/Shanghai"));
-        assertThat(getFirstInitialMemoryTracker(reviewing), equalTo(note2));
+        RecallService recallService = userModel.createReviewing(day2, ZoneId.of("Asia/Shanghai"));
+        assertThat(getFirstInitialMemoryTracker(recallService), equalTo(note2));
       }
     }
   }
@@ -219,14 +220,14 @@ public class ReviewingInitialReviewTest {
 
     @Test
     void shouldReturnMemoryTrackerForNote() {
-      assertThat(getFirstInitialMemoryTracker(reviewingOnDay1), equalTo(note1));
+      assertThat(getFirstInitialMemoryTracker(recallServiceOnDay1), equalTo(note1));
     }
 
     @Test
     void shouldReturnMemoryTrackerForLink() {
       makeMe.theNote(note2).skipReview().please();
       makeMe.theNote(note1).skipReview().linkTo(note2).please();
-      Note noteToReview = getFirstInitialMemoryTracker(reviewingOnDay1);
+      Note noteToReview = getFirstInitialMemoryTracker(recallServiceOnDay1);
       assertThat(noteToReview.getParent(), equalTo(note1));
     }
 
@@ -234,7 +235,7 @@ public class ReviewingInitialReviewTest {
     void reviewedMoreThanPlanned() {
       makeMe.aMemoryTrackerFor(note1).by(userModel).initiallyReviewedOn(day1).please();
       makeMe.aMemoryTrackerFor(note2).by(userModel).initiallyReviewedOn(day1).please();
-      assertThat(getFirstInitialMemoryTracker(reviewingOnDay1), nullValue());
+      assertThat(getFirstInitialMemoryTracker(recallServiceOnDay1), nullValue());
     }
   }
 
@@ -251,11 +252,11 @@ public class ReviewingInitialReviewTest {
 
     @Test
     void shouldNotBeReviewed() {
-      assertThat(getFirstInitialMemoryTracker(reviewingOnDay1), is(nullValue()));
+      assertThat(getFirstInitialMemoryTracker(recallServiceOnDay1), is(nullValue()));
     }
   }
 
-  private Note getFirstInitialMemoryTracker(Reviewing reviewing) {
-    return reviewing.getDueInitialMemoryTrackers().findFirst().orElse(null);
+  private Note getFirstInitialMemoryTracker(RecallService recallService) {
+    return recallService.getDueInitialMemoryTrackers().findFirst().orElse(null);
   }
 }

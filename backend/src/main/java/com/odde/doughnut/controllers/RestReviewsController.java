@@ -6,7 +6,7 @@ import com.odde.doughnut.controllers.dto.ReviewStatus;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.MemoryTrackerModel;
-import com.odde.doughnut.models.Reviewing;
+import com.odde.doughnut.models.RecallService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
 import jakarta.annotation.Resource;
@@ -55,10 +55,10 @@ class RestReviewsController {
   public List<Note> initialReview(@RequestParam(value = "timezone") String timezone) {
     currentUser.assertLoggedIn();
     ZoneId timeZone = ZoneId.of(timezone);
-    Reviewing reviewing =
+    RecallService recallService =
         currentUser.createReviewing(testabilitySettings.getCurrentUTCTimestamp(), timeZone);
 
-    return reviewing.getDueInitialMemoryTrackers().toList();
+    return recallService.getDueInitialMemoryTrackers().toList();
   }
 
   @PostMapping(path = "")
@@ -83,8 +83,8 @@ class RestReviewsController {
       @RequestParam(value = "dueindays", required = false) Integer dueInDays) {
     currentUser.assertLoggedIn();
     ZoneId timeZone = ZoneId.of(timezone);
-    Reviewing reviewing =
+    RecallService recallService =
         currentUser.createReviewing(testabilitySettings.getCurrentUTCTimestamp(), timeZone);
-    return reviewing.getDueMemoryTrackers(dueInDays == null ? 0 : dueInDays);
+    return recallService.getDueMemoryTrackers(dueInDays == null ? 0 : dueInDays);
   }
 }

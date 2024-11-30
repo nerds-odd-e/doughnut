@@ -67,8 +67,8 @@ public class UserModel implements ReviewScope {
     return modelFactoryService.memoryTrackerRepository.countByUserNotRemoved(entity.getId());
   }
 
-  public Reviewing createReviewing(Timestamp currentUTCTimestamp, ZoneId timeZone) {
-    return new Reviewing(this, currentUTCTimestamp, timeZone, modelFactoryService);
+  public RecallService createReviewing(Timestamp currentUTCTimestamp, ZoneId timeZone) {
+    return new RecallService(this, currentUTCTimestamp, timeZone, modelFactoryService);
   }
 
   boolean isInitialReviewOnSameDay(

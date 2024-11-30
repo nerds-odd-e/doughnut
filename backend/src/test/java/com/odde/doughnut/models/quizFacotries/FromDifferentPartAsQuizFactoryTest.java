@@ -130,7 +130,7 @@ class FromDifferentPartAsQuizFactoryTest {
         }
 
         @Nested
-        class WhenTheReviewingSourceNoteIsAlsoTaggedByADifferentPart {
+        class WhenTheRecallServiceSourceNoteIsAlsoTaggedByADifferentPart {
 
           @BeforeEach
           void setup() {

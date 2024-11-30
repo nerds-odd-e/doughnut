@@ -10,13 +10,13 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class Reviewing {
+public class RecallService {
   private final UserModel userModel;
   private final Timestamp currentUTCTimestamp;
   private final ZoneId timeZone;
   private final ModelFactoryService modelFactoryService;
 
-  public Reviewing(
+  public RecallService(
       UserModel user,
       Timestamp currentUTCTimestamp,
       ZoneId timeZone,
