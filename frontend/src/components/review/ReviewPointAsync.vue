@@ -36,9 +36,10 @@ export default defineComponent({
   },
   methods: {
     async fetchData() {
-      this.memoryTracker = await this.managedApi.restReviewPointController.show(
-        this.reviewPointId
-      )
+      this.memoryTracker =
+        await this.managedApi.restReviewPointController.show1(
+          this.reviewPointId
+        )
     },
   },
   watch: {

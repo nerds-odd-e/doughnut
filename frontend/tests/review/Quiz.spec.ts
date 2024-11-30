@@ -16,7 +16,7 @@ describe("repeat page", () => {
     helper.managedApi.restNoteController.show = vi
       .fn()
       .mockResolvedValue(makeMe.aNote.please())
-    helper.managedApi.restReviewPointController.show = vi
+    helper.managedApi.restReviewPointController.show1 = vi
       .fn()
       .mockResolvedValue(makeMe.aReviewPoint.please())
     helper.managedApi.silent.restReviewQuestionController.generateRandomQuestion =

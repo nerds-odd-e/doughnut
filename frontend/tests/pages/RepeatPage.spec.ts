@@ -68,7 +68,7 @@ describe("repeat page", () => {
 
     beforeEach(() => {
       vi.useFakeTimers()
-      helper.managedApi.restReviewPointController.show =
+      helper.managedApi.restReviewPointController.show1 =
         mockedReviewPointCall.mockResolvedValue(makeMe.aReviewPoint.please())
       helper.managedApi.silent.restReviewQuestionController.generateRandomQuestion =
         mockedRandomQuestionCall
