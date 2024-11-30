@@ -6,10 +6,11 @@ import com.odde.doughnut.controllers.dto.ReviewStatus;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.MemoryTrackerModel;
-import com.odde.doughnut.models.RecallService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.RecallService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import jakarta.annotation.Resource;
+import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,8 +46,8 @@ class RestReviewsController {
   public ReviewStatus overview(@RequestParam(value = "timezone") String timezone) {
     currentUser.assertLoggedIn();
     ZoneId timeZone = ZoneId.of(timezone);
-    return currentUser
-        .createReviewing(testabilitySettings.getCurrentUTCTimestamp(), timeZone)
+    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
+    return new RecallService(currentUser, currentUTCTimestamp, timeZone, modelFactoryService)
         .getReviewStatus();
   }
 
@@ -55,10 +56,11 @@ class RestReviewsController {
   public List<Note> initialReview(@RequestParam(value = "timezone") String timezone) {
     currentUser.assertLoggedIn();
     ZoneId timeZone = ZoneId.of(timezone);
-    RecallService recallService =
-        currentUser.createReviewing(testabilitySettings.getCurrentUTCTimestamp(), timeZone);
+    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
 
-    return recallService.getDueInitialMemoryTrackers().toList();
+    return new RecallService(currentUser, currentUTCTimestamp, timeZone, modelFactoryService)
+        .getDueInitialMemoryTrackers()
+        .toList();
   }
 
   @PostMapping(path = "")
@@ -83,8 +85,8 @@ class RestReviewsController {
       @RequestParam(value = "dueindays", required = false) Integer dueInDays) {
     currentUser.assertLoggedIn();
     ZoneId timeZone = ZoneId.of(timezone);
-    RecallService recallService =
-        currentUser.createReviewing(testabilitySettings.getCurrentUTCTimestamp(), timeZone);
-    return recallService.getDueMemoryTrackers(dueInDays == null ? 0 : dueInDays);
+    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
+    return new RecallService(currentUser, currentUTCTimestamp, timeZone, modelFactoryService)
+        .getDueMemoryTrackers(dueInDays == null ? 0 : dueInDays);
   }
 }

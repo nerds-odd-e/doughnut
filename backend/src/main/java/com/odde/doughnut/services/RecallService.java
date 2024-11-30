@@ -1,10 +1,14 @@
-package com.odde.doughnut.models;
+package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.DueMemoryTrackers;
 import com.odde.doughnut.controllers.dto.ReviewStatus;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.models.ReviewScope;
+import com.odde.doughnut.models.SubscriptionModel;
+import com.odde.doughnut.models.TimestampOperations;
+import com.odde.doughnut.models.UserModel;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.util.List;
@@ -78,19 +82,19 @@ public class RecallService {
 
   private int remainingDailyNewNotesCount() {
     long sameDayCount = getNewMemoryTrackersOfToday().size();
-    return (int) (userModel.entity.getDailyNewNotesCount() - sameDayCount);
+    return (int) (userModel.getEntity().getDailyNewNotesCount() - sameDayCount);
   }
 
   private List<MemoryTracker> getNewMemoryTrackersOfToday() {
     Timestamp oneDayAgo = TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, -24);
     return userModel.getRecentMemoryTrackers(oneDayAgo).stream()
-        .filter(p -> userModel.isInitialReviewOnSameDay(p, currentUTCTimestamp, timeZone))
+        .filter(p -> p.isInitialReviewOnSameDay(currentUTCTimestamp, timeZone))
         .filter(p -> !p.getRemovedFromReview())
         .toList();
   }
 
   private Stream<SubscriptionModel> getSubscriptionModelStream() {
-    return userModel.entity.getSubscriptions().stream()
+    return userModel.getEntity().getSubscriptions().stream()
         .map(modelFactoryService::toSubscriptionModel);
   }
 
@@ -106,10 +110,15 @@ public class RecallService {
   public ReviewStatus getReviewStatus() {
     ReviewStatus reviewStatus = new ReviewStatus();
     reviewStatus.toRepeatCount = (int) getMemoryTrackersNeedToRepeat(0).count();
-    reviewStatus.learntCount = userModel.learntCount();
+    reviewStatus.learntCount = learntCount();
     reviewStatus.notLearntCount = notLearntCount();
     reviewStatus.toInitialReviewCount = toInitialReviewCount();
 
     return reviewStatus;
+  }
+
+  private int learntCount() {
+    return modelFactoryService.memoryTrackerRepository.countByUserNotRemoved(
+        userModel.getEntity().getId());
   }
 }

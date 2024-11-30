@@ -63,19 +63,6 @@ public class UserModel implements ReviewScope {
         .findAllByUserAndNextReviewAtLessThanEqualOrderByNextReviewAt(entity.getId(), timestamp);
   }
 
-  int learntCount() {
-    return modelFactoryService.memoryTrackerRepository.countByUserNotRemoved(entity.getId());
-  }
-
-  public RecallService createReviewing(Timestamp currentUTCTimestamp, ZoneId timeZone) {
-    return new RecallService(this, currentUTCTimestamp, timeZone, modelFactoryService);
-  }
-
-  boolean isInitialReviewOnSameDay(
-      MemoryTracker memoryTracker, Timestamp currentUTCTimestamp, ZoneId timeZone) {
-    return memoryTracker.isInitialReviewOnSameDay(currentUTCTimestamp, timeZone);
-  }
-
   public MemoryTracker getMemoryTrackerFor(Note note) {
     if (entity == null) return null;
     return modelFactoryService.memoryTrackerRepository.findByUserAndNote(

@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.services.RecallService;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
 import java.time.ZoneId;
@@ -34,7 +35,9 @@ public class RecallServiceInitialReviewTest {
     anotherUser = makeMe.aUser().toModelPlease();
     day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
     day0 = makeMe.aTimestamp().of(0, 8).fromShanghai().please();
-    recallServiceOnDay1 = userModel.createReviewing(day1, ZoneId.of("Asia/Shanghai"));
+    recallServiceOnDay1 =
+        new RecallService(
+            userModel, day1, ZoneId.of("Asia/Shanghai"), userModel.modelFactoryService);
   }
 
   @Test
@@ -184,7 +187,8 @@ public class RecallServiceInitialReviewTest {
         makeMe.aMemoryTrackerFor(note1).by(userModel).initiallyReviewedOn(day1).please();
         Timestamp day1_23 = makeMe.aTimestamp().of(1, 23).fromShanghai().please();
         RecallService recallService =
-            userModel.createReviewing(day1_23, ZoneId.of("Asia/Shanghai"));
+            new RecallService(
+                userModel, day1_23, ZoneId.of("Asia/Shanghai"), userModel.modelFactoryService);
         assertThat(getFirstInitialMemoryTracker(recallService), is(nullValue()));
       }
 
@@ -192,7 +196,9 @@ public class RecallServiceInitialReviewTest {
       void theDailyCountShouldBeResetOnNextDay() {
         makeMe.aMemoryTrackerFor(note1).by(userModel).initiallyReviewedOn(day1).please();
         Timestamp day2 = makeMe.aTimestamp().of(2, 1).fromShanghai().please();
-        RecallService recallService = userModel.createReviewing(day2, ZoneId.of("Asia/Shanghai"));
+        RecallService recallService =
+            new RecallService(
+                userModel, day2, ZoneId.of("Asia/Shanghai"), userModel.modelFactoryService);
         assertThat(getFirstInitialMemoryTracker(recallService), equalTo(note2));
       }
     }
