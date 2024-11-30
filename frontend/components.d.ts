@@ -64,6 +64,7 @@ declare module 'vue' {
     ManageBazaar: typeof import('./src/components/admin/ManageBazaar.vue')['default']
     ManageModel: typeof import('./src/components/admin/ManageModel.vue')['default']
     ManageModelInner: typeof import('./src/components/admin/ManageModelInner.vue')['default']
+    MemoryTrackerAsync: typeof import('./src/components/review/MemoryTrackerAsync.vue')['default']
     MessageCenterButton: typeof import('./src/components/toolbars/MessageCenterButton.vue')['default']
     Modal: typeof import('./src/components/commons/Modal.vue')['default']
     NoteAccessoryAsync: typeof import('./src/components/notes/accessory/NoteAccessoryAsync.vue')['default']

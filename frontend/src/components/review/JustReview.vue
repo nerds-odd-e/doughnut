@@ -1,5 +1,5 @@
 <template>
-  <ReviewPointAsync
+  <MemoryTrackerAsync
     v-if="reviewPointId"
     v-bind="{
       reviewPointId,
@@ -17,7 +17,7 @@ import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import type { PropType } from "vue"
 import { defineComponent } from "vue"
-import ReviewPointAsync from "./ReviewPointAsync.vue"
+import MemoryTrackerAsync from "./MemoryTrackerAsync.vue"
 import SelfEvaluateButtons from "./SelfEvaluateButtons.vue"
 
 export default defineComponent({
@@ -32,7 +32,7 @@ export default defineComponent({
     },
   },
   components: {
-    ReviewPointAsync,
+    MemoryTrackerAsync,
     SelfEvaluateButtons,
   },
   emits: ["reviewed"],
