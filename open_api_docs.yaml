@@ -1230,7 +1230,7 @@ paths:
   /api/memory-trackers/{memoryTracker}/self-evaluate:
     post:
       tags:
-      - rest-review-point-controller
+      - rest-memory-tracker-controller
       operationId: selfEvaluate
       parameters:
       - name: memoryTracker
@@ -1260,7 +1260,7 @@ paths:
   /api/memory-trackers/{memoryTracker}/remove:
     post:
       tags:
-      - rest-review-point-controller
+      - rest-memory-tracker-controller
       operationId: removeFromRepeating
       parameters:
       - name: memoryTracker
@@ -2266,7 +2266,7 @@ paths:
   /api/memory-trackers/{memoryTracker}/mark-as-repeated:
     patch:
       tags:
-      - rest-review-point-controller
+      - rest-memory-tracker-controller
       operationId: markAsRepeated
       parameters:
       - name: memoryTracker
@@ -2751,7 +2751,7 @@ paths:
   /api/memory-trackers/{memoryTracker}:
     get:
       tags:
-      - rest-review-point-controller
+      - rest-memory-tracker-controller
       operationId: show_1
       parameters:
       - name: memoryTracker
@@ -2775,7 +2775,7 @@ paths:
   /api/memory-trackers/recently-reviewed:
     get:
       tags:
-      - rest-review-point-controller
+      - rest-memory-tracker-controller
       operationId: getRecentlyReviewedPoints
       responses:
         "500":
@@ -2795,7 +2795,7 @@ paths:
   /api/memory-trackers/recent:
     get:
       tags:
-      - rest-review-point-controller
+      - rest-memory-tracker-controller
       operationId: getRecentReviewPoints
       responses:
         "500":

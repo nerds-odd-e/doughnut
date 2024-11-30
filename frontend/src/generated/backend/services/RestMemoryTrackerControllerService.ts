@@ -6,7 +6,7 @@ import type { MemoryTracker } from '../models/MemoryTracker';
 import type { SelfEvaluation } from '../models/SelfEvaluation';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
-export class RestReviewPointControllerService {
+export class RestMemoryTrackerControllerService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
      * @param memoryTracker

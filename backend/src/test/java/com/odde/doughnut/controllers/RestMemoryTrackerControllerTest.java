@@ -32,12 +32,13 @@ class RestMemoryTrackerControllerTest {
 
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
   private UserModel userModel;
-  RestReviewPointController controller;
+  RestMemoryTrackerController controller;
 
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
-    controller = new RestReviewPointController(modelFactoryService, userModel, testabilitySettings);
+    controller =
+        new RestMemoryTrackerController(modelFactoryService, userModel, testabilitySettings);
   }
 
   @Nested
@@ -178,7 +179,7 @@ class RestMemoryTrackerControllerTest {
     void shouldRequireUserToBeLoggedIn() {
       userModel = makeMe.aNullUserModelPlease();
       controller =
-          new RestReviewPointController(modelFactoryService, userModel, testabilitySettings);
+          new RestMemoryTrackerController(modelFactoryService, userModel, testabilitySettings);
       assertThrows(ResponseStatusException.class, () -> controller.getRecentReviewPoints());
     }
   }
@@ -210,7 +211,7 @@ class RestMemoryTrackerControllerTest {
     void shouldRequireUserToBeLoggedIn() {
       userModel = makeMe.aNullUserModelPlease();
       controller =
-          new RestReviewPointController(modelFactoryService, userModel, testabilitySettings);
+          new RestMemoryTrackerController(modelFactoryService, userModel, testabilitySettings);
       assertThrows(ResponseStatusException.class, () -> controller.getRecentlyReviewedPoints());
     }
   }

@@ -41,7 +41,7 @@ export default defineComponent({
       if (this.reviewPointId === undefined) {
         return
       }
-      await this.managedApi.restReviewPointController.markAsRepeated(
+      await this.managedApi.restMemoryTrackerController.markAsRepeated(
         this.reviewPointId,
         successful
       )

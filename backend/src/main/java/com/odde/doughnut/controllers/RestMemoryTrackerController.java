@@ -16,14 +16,14 @@ import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/memory-trackers")
-class RestReviewPointController {
+class RestMemoryTrackerController {
   private final ModelFactoryService modelFactoryService;
   private UserModel currentUser;
 
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
-  public RestReviewPointController(
+  public RestMemoryTrackerController(
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
       TestabilitySettings testabilitySettings) {

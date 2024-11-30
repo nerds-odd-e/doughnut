@@ -37,7 +37,7 @@ export default defineComponent({
   methods: {
     async fetchData() {
       this.memoryTracker =
-        await this.managedApi.restReviewPointController.show1(
+        await this.managedApi.restMemoryTrackerController.show1(
           this.reviewPointId
         )
     },

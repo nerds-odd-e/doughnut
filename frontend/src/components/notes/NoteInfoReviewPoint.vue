@@ -79,12 +79,13 @@ watch(
 )
 
 const selfEvaluate = async (adjustment: number) => {
-  const memoryTracker = await managedApi.restReviewPointController.selfEvaluate(
-    localReviewPoint.value.id,
-    {
-      adjustment,
-    }
-  )
+  const memoryTracker =
+    await managedApi.restMemoryTrackerController.selfEvaluate(
+      localReviewPoint.value.id,
+      {
+        adjustment,
+      }
+    )
   localReviewPoint.value = memoryTracker
   emit("update:modelValue", memoryTracker)
 }
@@ -98,7 +99,7 @@ const removeFromReview = async () => {
     return
   }
   const memoryTracker =
-    await managedApi.restReviewPointController.removeFromRepeating(
+    await managedApi.restMemoryTrackerController.removeFromRepeating(
       localReviewPoint.value.id
     )
   localReviewPoint.value = memoryTracker

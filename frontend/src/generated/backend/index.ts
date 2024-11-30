@@ -156,12 +156,12 @@ export { RestFineTuningDataControllerService } from './services/RestFineTuningDa
 export { RestGlobalSettingsControllerService } from './services/RestGlobalSettingsControllerService';
 export { RestHealthCheckControllerService } from './services/RestHealthCheckControllerService';
 export { RestLinkControllerService } from './services/RestLinkControllerService';
+export { RestMemoryTrackerControllerService } from './services/RestMemoryTrackerControllerService';
 export { RestNotebookCertificateApprovalControllerService } from './services/RestNotebookCertificateApprovalControllerService';
 export { RestNotebookControllerService } from './services/RestNotebookControllerService';
 export { RestNoteControllerService } from './services/RestNoteControllerService';
 export { RestNoteCreationControllerService } from './services/RestNoteCreationControllerService';
 export { RestPredefinedQuestionControllerService } from './services/RestPredefinedQuestionControllerService';
-export { RestReviewPointControllerService } from './services/RestReviewPointControllerService';
 export { RestReviewQuestionControllerService } from './services/RestReviewQuestionControllerService';
 export { RestReviewsControllerService } from './services/RestReviewsControllerService';
 export { RestSubscriptionControllerService } from './services/RestSubscriptionControllerService';

@@ -68,7 +68,7 @@ describe("repeat page", () => {
 
     beforeEach(() => {
       vi.useFakeTimers()
-      helper.managedApi.restReviewPointController.show1 =
+      helper.managedApi.restMemoryTrackerController.show1 =
         mockedReviewPointCall.mockResolvedValue(makeMe.aReviewPoint.please())
       helper.managedApi.silent.restReviewQuestionController.generateRandomQuestion =
         mockedRandomQuestionCall
@@ -93,7 +93,7 @@ describe("repeat page", () => {
         .answerCorrect(false)
         .please()
       const mockedMarkAsRepeatedCall = vi.fn().mockResolvedValue(answerResult)
-      helper.managedApi.restReviewPointController.markAsRepeated =
+      helper.managedApi.restMemoryTrackerController.markAsRepeated =
         mockedMarkAsRepeatedCall
       const reviewQuestionInstance = makeMe.aReviewQuestionInstance.please()
       mockedRandomQuestionCall.mockResolvedValueOnce(reviewQuestionInstance)
