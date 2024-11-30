@@ -425,8 +425,7 @@ class RestConversationMessageControllerTest {
     @BeforeEach
     void setup() {
       Note note = makeMe.aNote().please();
-      recallPrompt =
-          makeMe.aReviewQuestionInstance().spellingQuestionOf(note).answerSpelling("a").please();
+      recallPrompt = makeMe.aRecallPrompt().spellingQuestionOf(note).answerSpelling("a").please();
     }
 
     @Test

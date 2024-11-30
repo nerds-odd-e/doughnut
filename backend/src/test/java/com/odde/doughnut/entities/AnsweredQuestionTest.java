@@ -37,7 +37,7 @@ class AnsweredQuestionTest {
     void correct() {
       AnsweredQuestion answer =
           makeMe
-              .aReviewQuestionInstance()
+              .aRecallPrompt()
               .useFactory(spellingQuizFactory)
               .answerSpelling("this")
               .please(false)
@@ -49,7 +49,7 @@ class AnsweredQuestionTest {
     void correctWhenThereAreExtraSpace() {
       AnsweredQuestion answer =
           makeMe
-              .aReviewQuestionInstance()
+              .aRecallPrompt()
               .useFactory(spellingQuizFactory)
               .answerSpelling("this ")
               .please(false)
@@ -61,7 +61,7 @@ class AnsweredQuestionTest {
     void literalAnswer() {
       AnsweredQuestion answerResult =
           makeMe
-              .aReviewQuestionInstance()
+              .aRecallPrompt()
               .useFactory(spellingQuizFactory)
               .answerSpelling("this / that")
               .please(false)

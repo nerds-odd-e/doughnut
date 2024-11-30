@@ -8,11 +8,11 @@ import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 
-public class ReviewQuestionInstanceBuilder extends EntityBuilder<RecallPrompt> {
+public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
   private final PredefinedQuestionBuilder predefinedQuestionBuilder;
   private AnswerDTO answerDTO = null;
 
-  public ReviewQuestionInstanceBuilder(MakeMe makeMe, RecallPrompt recallPrompt) {
+  public RecallPromptBuilder(MakeMe makeMe, RecallPrompt recallPrompt) {
     super(makeMe, recallPrompt);
     predefinedQuestionBuilder = new PredefinedQuestionBuilder(makeMe);
   }
@@ -28,41 +28,39 @@ public class ReviewQuestionInstanceBuilder extends EntityBuilder<RecallPrompt> {
     }
   }
 
-  public ReviewQuestionInstanceBuilder spellingQuestionOf(Note note) {
+  public RecallPromptBuilder spellingQuestionOf(Note note) {
     this.predefinedQuestionBuilder.spellingQuestionOf(note);
     return this;
   }
 
-  public ReviewQuestionInstanceBuilder approvedSpellingQuestionOf(Note note) {
+  public RecallPromptBuilder approvedSpellingQuestionOf(Note note) {
     this.predefinedQuestionBuilder.approvedSpellingQuestionOf(note);
     return this;
   }
 
-  public ReviewQuestionInstanceBuilder ofAIGeneratedQuestion(
-      MCQWithAnswer mcqWithAnswer, Note note) {
+  public RecallPromptBuilder ofAIGeneratedQuestion(MCQWithAnswer mcqWithAnswer, Note note) {
     this.predefinedQuestionBuilder.ofAIGeneratedQuestion(mcqWithAnswer, note);
     return this;
   }
 
-  public ReviewQuestionInstanceBuilder useFactory(
-      PredefinedQuestionFactory predefinedQuestionFactory) {
+  public RecallPromptBuilder useFactory(PredefinedQuestionFactory predefinedQuestionFactory) {
     this.predefinedQuestionBuilder.useFactory(predefinedQuestionFactory);
 
     return this;
   }
 
-  public ReviewQuestionInstanceBuilder answer(AnswerDTO answerDTO) {
+  public RecallPromptBuilder answer(AnswerDTO answerDTO) {
     this.answerDTO = answerDTO;
     return this;
   }
 
-  public ReviewQuestionInstanceBuilder answerChoiceIndex(int index) {
+  public RecallPromptBuilder answerChoiceIndex(int index) {
     AnswerDTO dto = new AnswerDTO();
     dto.setChoiceIndex(index);
     return answer(dto);
   }
 
-  public ReviewQuestionInstanceBuilder answerSpelling(String answer) {
+  public RecallPromptBuilder answerSpelling(String answer) {
     AnswerDTO dto = new AnswerDTO();
     dto.setSpellingAnswer(answer);
     return answer(dto);

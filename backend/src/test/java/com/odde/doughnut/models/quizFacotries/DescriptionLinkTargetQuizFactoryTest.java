@@ -88,7 +88,7 @@ class DescriptionLinkTargetQuizFactoryTest {
     void correct() {
       AnsweredQuestion answerResult =
           makeMe
-              .aReviewQuestionInstance()
+              .aRecallPrompt()
               .useFactory(getQuizQuestionFactory())
               .answerChoiceIndex(1)
               .please(false)

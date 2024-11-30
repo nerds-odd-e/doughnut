@@ -88,8 +88,7 @@ class RestRecallPromptControllerTests {
               .by(currentUser)
               .forgettingCurveAndNextReviewAt(200)
               .please();
-      recallPrompt =
-          makeMe.aReviewQuestionInstance().approvedSpellingQuestionOf(answerNote).please();
+      recallPrompt = makeMe.aRecallPrompt().approvedSpellingQuestionOf(answerNote).please();
       answerDTO.setSpellingAnswer(answerNote.getTopicConstructor());
     }
 
@@ -132,10 +131,7 @@ class RestRecallPromptControllerTests {
       @BeforeEach
       void setup() {
         recallPrompt =
-            makeMe
-                .aReviewQuestionInstance()
-                .approvedSpellingQuestionOf(memoryTracker.getNote())
-                .please();
+            makeMe.aRecallPrompt().approvedSpellingQuestionOf(memoryTracker.getNote()).please();
         answerDTO.setSpellingAnswer("wrong");
       }
 
@@ -178,7 +174,7 @@ class RestRecallPromptControllerTests {
     @BeforeEach
     void setUp() {
       note = makeMe.aNote().please();
-      recallPrompt = makeMe.aReviewQuestionInstance().approvedSpellingQuestionOf(note).please();
+      recallPrompt = makeMe.aRecallPrompt().approvedSpellingQuestionOf(note).please();
     }
 
     @Test
@@ -231,10 +227,7 @@ class RestRecallPromptControllerTests {
       MCQWithAnswer aiGeneratedQuestion = makeMe.aMCQWithAnswer().please();
       Note note = makeMe.aNote().please();
       recallPrompt =
-          makeMe
-              .aReviewQuestionInstance()
-              .ofAIGeneratedQuestion(aiGeneratedQuestion, note)
-              .please();
+          makeMe.aRecallPrompt().ofAIGeneratedQuestion(aiGeneratedQuestion, note).please();
     }
 
     @Test
@@ -342,7 +335,7 @@ class RestRecallPromptControllerTests {
 
     @Test
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
-      RecallPrompt recallPrompt = makeMe.aReviewQuestionInstance().please();
+      RecallPrompt recallPrompt = makeMe.aRecallPrompt().please();
       assertThrows(
           UnexpectedNoAccessRightException.class, () -> controller.showQuestion(recallPrompt));
     }
@@ -350,9 +343,8 @@ class RestRecallPromptControllerTests {
     @Test
     void canSeeNoteThatHasReadAccess() throws UnexpectedNoAccessRightException {
       Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
-      RecallPrompt recallPrompt =
-          makeMe.aReviewQuestionInstance().spellingQuestionOf(note).please();
-      makeMe.theReviewQuestionInstance(recallPrompt).answerSpelling("wrong").please();
+      RecallPrompt recallPrompt = makeMe.aRecallPrompt().spellingQuestionOf(note).please();
+      makeMe.theRecallPrompt(recallPrompt).answerSpelling("wrong").please();
       makeMe.refresh(currentUser.getEntity());
       AnsweredQuestion answeredQuestion = controller.showQuestion(recallPrompt);
       assertThat(answeredQuestion.reviewQuestionInstanceId, equalTo(recallPrompt.getId()));

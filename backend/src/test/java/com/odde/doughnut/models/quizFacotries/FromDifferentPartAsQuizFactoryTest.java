@@ -181,7 +181,7 @@ class FromDifferentPartAsQuizFactoryTest {
           void correct() {
             AnsweredQuestion answerResult =
                 makeMe
-                    .aReviewQuestionInstance()
+                    .aRecallPrompt()
                     .useFactory(predefinedQuestionFactory)
                     .answerChoiceIndex(2)
                     .please(false)
@@ -193,7 +193,7 @@ class FromDifferentPartAsQuizFactoryTest {
           void wrongWhenChooseCousin() {
             AnsweredQuestion answerResult =
                 makeMe
-                    .aReviewQuestionInstance()
+                    .aRecallPrompt()
                     .useFactory(predefinedQuestionFactory)
                     .answerChoiceIndex(1)
                     .please(false)

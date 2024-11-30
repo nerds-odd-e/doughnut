@@ -3,7 +3,7 @@ import Builder from "./Builder"
 import generateId from "./generateId"
 import PredefinedQuestionBuilder from "./PredefinedQuestionBuilder"
 
-class ReviewQuestionInstanceBuilder extends Builder<AssessmentQuestionInstance> {
+class AssessmentQuestionInstanceBuilder extends Builder<AssessmentQuestionInstance> {
   predefinedQuestionBuilder = new PredefinedQuestionBuilder()
 
   withQuestionStem(stem: string) {
@@ -25,4 +25,4 @@ class ReviewQuestionInstanceBuilder extends Builder<AssessmentQuestionInstance> 
   }
 }
 
-export default ReviewQuestionInstanceBuilder
+export default AssessmentQuestionInstanceBuilder

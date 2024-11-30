@@ -317,7 +317,7 @@ public class RestConversationMessageControllerAiReplyTests {
     @BeforeEach
     void setup() {
       questionNote = makeMe.aNote().creatorAndOwner(currentUser).please();
-      recallPrompt = makeMe.aReviewQuestionInstance().spellingQuestionOf(questionNote).please();
+      recallPrompt = makeMe.aRecallPrompt().spellingQuestionOf(questionNote).please();
       conversation =
           makeMe
               .aConversation()

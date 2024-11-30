@@ -11,7 +11,7 @@ import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.MakeMe;
-import com.odde.doughnut.testability.builders.ReviewQuestionInstanceBuilder;
+import com.odde.doughnut.testability.builders.RecallPromptBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -72,8 +72,8 @@ class AIGeneratedQuizFactoryTest {
     }
   }
 
-  private ReviewQuestionInstanceBuilder questionBuilder() {
-    return makeMe.aReviewQuestionInstance().ofAIGeneratedQuestion(mcqWithAnswer, note);
+  private RecallPromptBuilder questionBuilder() {
+    return makeMe.aRecallPrompt().ofAIGeneratedQuestion(mcqWithAnswer, note);
   }
 
   private RecallPrompt buildQuestion() {

@@ -99,8 +99,7 @@ class ConversationMessageServiceTest {
     @BeforeEach
     void setup() {
       note = makeMe.aNote().creatorAndOwner(currentUser).please();
-      recallPrompt =
-          makeMe.aReviewQuestionInstance().spellingQuestionOf(note).answerChoiceIndex(1).please();
+      recallPrompt = makeMe.aRecallPrompt().spellingQuestionOf(note).answerChoiceIndex(1).please();
     }
 
     @Test
