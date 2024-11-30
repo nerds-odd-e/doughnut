@@ -13,7 +13,7 @@ describe("repeat page", () => {
   beforeEach(() => {
     vi.resetAllMocks()
     vi.useFakeTimers()
-    helper.managedApi.restNoteController.show1 = vi
+    helper.managedApi.restNoteController.show = vi
       .fn()
       .mockResolvedValue(makeMe.aNote.please())
     helper.managedApi.restReviewPointController.show = vi
@@ -23,11 +23,14 @@ describe("repeat page", () => {
       mockedRandomQuestionCall
   })
 
-  const mountPage = async (reviewPoints: number[], eagerFetchCount: number) => {
+  const mountPage = async (
+    memoryTrackers: number[],
+    eagerFetchCount: number
+  ) => {
     const wrapper = helper
       .component(Quiz)
       .withStorageProps({
-        reviewPoints,
+        memoryTrackers,
         currentIndex: 0,
         eagerFetchCount,
       })

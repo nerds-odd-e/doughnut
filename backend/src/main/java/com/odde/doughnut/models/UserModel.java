@@ -1,7 +1,7 @@
 package com.odde.doughnut.models;
 
+import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -51,20 +51,20 @@ public class UserModel implements ReviewScope {
         entity.getId(), entity.getOwnership().getId());
   }
 
-  public List<ReviewPoint> getRecentReviewPoints(Timestamp since) {
-    return modelFactoryService.reviewPointRepository.findAllByUserAndInitialReviewedAtGreaterThan(
+  public List<MemoryTracker> getRecentReviewPoints(Timestamp since) {
+    return modelFactoryService.memoryTrackerRepository.findAllByUserAndInitialReviewedAtGreaterThan(
         entity, since);
   }
 
-  public Stream<ReviewPoint> getReviewPointsNeedToRepeat(
+  public Stream<MemoryTracker> getReviewPointsNeedToRepeat(
       Timestamp currentUTCTimestamp, ZoneId timeZone) {
     final Timestamp timestamp = TimestampOperations.alignByHalfADay(currentUTCTimestamp, timeZone);
-    return modelFactoryService.reviewPointRepository
+    return modelFactoryService.memoryTrackerRepository
         .findAllByUserAndNextReviewAtLessThanEqualOrderByNextReviewAt(entity.getId(), timestamp);
   }
 
   int learntCount() {
-    return modelFactoryService.reviewPointRepository.countByUserNotRemoved(entity.getId());
+    return modelFactoryService.memoryTrackerRepository.countByUserNotRemoved(entity.getId());
   }
 
   public Reviewing createReviewing(Timestamp currentUTCTimestamp, ZoneId timeZone) {
@@ -72,13 +72,13 @@ public class UserModel implements ReviewScope {
   }
 
   boolean isInitialReviewOnSameDay(
-      ReviewPoint reviewPoint, Timestamp currentUTCTimestamp, ZoneId timeZone) {
-    return reviewPoint.isInitialReviewOnSameDay(currentUTCTimestamp, timeZone);
+      MemoryTracker memoryTracker, Timestamp currentUTCTimestamp, ZoneId timeZone) {
+    return memoryTracker.isInitialReviewOnSameDay(currentUTCTimestamp, timeZone);
   }
 
-  public ReviewPoint getReviewPointFor(Note note) {
+  public MemoryTracker getReviewPointFor(Note note) {
     if (entity == null) return null;
-    return modelFactoryService.reviewPointRepository.findByUserAndNote(
+    return modelFactoryService.memoryTrackerRepository.findByUserAndNote(
         entity.getId(), note.getId());
   }
 

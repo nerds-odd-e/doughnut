@@ -12,7 +12,7 @@
     <Quiz
       v-if="toRepeatCount !== 0"
       :minimized="minimized"
-      :review-points="toRepeat"
+      :memory-trackers="toRepeat"
       :current-index="currentIndex"
       :eager-fetch-count="eagerFetchCount ?? 5"
       :storage-accessor="storageAccessor"

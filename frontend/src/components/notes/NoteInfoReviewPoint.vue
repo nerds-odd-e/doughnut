@@ -50,7 +50,7 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { ref, watch } from "vue"
-import type { ReviewPoint } from "@/generated/backend"
+import type { MemoryTracker } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import usePopups from "../commons/Popups/usePopups"
 import SvgNoReview from "../svgs/SvgNoReview.vue"
@@ -59,14 +59,14 @@ import SvgHappy from "../svgs/SvgHappy.vue"
 
 const props = defineProps({
   modelValue: {
-    type: Object as PropType<ReviewPoint>,
+    type: Object as PropType<MemoryTracker>,
     required: true,
   },
 })
 
 const emit = defineEmits(["update:modelValue"])
 
-const localReviewPoint = ref<ReviewPoint>(props.modelValue)
+const localReviewPoint = ref<MemoryTracker>(props.modelValue)
 const { managedApi } = useLoadingApi()
 const { popups } = usePopups()
 

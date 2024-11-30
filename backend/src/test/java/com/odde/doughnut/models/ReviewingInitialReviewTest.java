@@ -78,7 +78,7 @@ public class ReviewingInitialReviewTest {
     }
 
     @Nested
-    class ReviewPointFromLink {
+    class MemoryTrackerFromLink {
       Note note1ToNote2;
       Note anotherNote;
 
@@ -94,12 +94,12 @@ public class ReviewingInitialReviewTest {
 
       @Test
       void shouldReturnLinkBeforeAnotherNote() {
-        List<Note> reviewPoints = getAllDueReviewPoints();
-        assertThat(reviewPoints, hasSize(4));
-        assertThat(reviewPoints.get(0), equalTo(note1));
-        assertThat(reviewPoints.get(2), equalTo(note1ToNote2));
-        assertThat(reviewPoints.get(1), equalTo(note2));
-        assertThat(reviewPoints.get(3), equalTo(anotherNote));
+        List<Note> memoryTrackers = getAllDueReviewPoints();
+        assertThat(memoryTrackers, hasSize(4));
+        assertThat(memoryTrackers.get(0), equalTo(note1));
+        assertThat(memoryTrackers.get(2), equalTo(note1ToNote2));
+        assertThat(memoryTrackers.get(1), equalTo(note2));
+        assertThat(memoryTrackers.get(3), equalTo(anotherNote));
       }
 
       @Nested
@@ -113,32 +113,32 @@ public class ReviewingInitialReviewTest {
 
         @Test
         void shouldReturnReviewPointForLowerLevelNoteOrLink() {
-          List<Note> reviewPoints = getAllDueReviewPoints();
-          assertThat(reviewPoints, hasSize(4));
-          assertThat(reviewPoints.get(0), equalTo(anotherNote));
-          assertThat(reviewPoints.get(1), equalTo(note2));
-          assertThat(reviewPoints.get(2), equalTo(note1));
-          assertThat(reviewPoints.get(3), equalTo(note1ToNote2));
+          List<Note> memoryTrackers = getAllDueReviewPoints();
+          assertThat(memoryTrackers, hasSize(4));
+          assertThat(memoryTrackers.get(0), equalTo(anotherNote));
+          assertThat(memoryTrackers.get(1), equalTo(note2));
+          assertThat(memoryTrackers.get(2), equalTo(note1));
+          assertThat(memoryTrackers.get(3), equalTo(note1ToNote2));
         }
 
         @Test
         void shouldReturnLinksOrderedByLevels() {
           Note aLevel2Link = makeMe.aLink().between(anotherNote, note2).please();
-          List<Note> reviewPoints = getAllDueReviewPoints();
-          assertThat(reviewPoints, hasSize(5));
-          assertThat(reviewPoints.get(0), equalTo(anotherNote));
-          assertThat(reviewPoints.get(1), equalTo(note2));
-          assertThat(reviewPoints.get(2), equalTo(aLevel2Link));
-          assertThat(reviewPoints.get(4), equalTo(note1ToNote2));
+          List<Note> memoryTrackers = getAllDueReviewPoints();
+          assertThat(memoryTrackers, hasSize(5));
+          assertThat(memoryTrackers.get(0), equalTo(anotherNote));
+          assertThat(memoryTrackers.get(1), equalTo(note2));
+          assertThat(memoryTrackers.get(2), equalTo(aLevel2Link));
+          assertThat(memoryTrackers.get(4), equalTo(note1ToNote2));
         }
 
         @Test
         void shouldNotReturnReviewPointForLinkIfCreatedByOtherPeople() {
           makeMe.theNote(note1).notebookOwnership(makeMe.aUser().please()).please();
-          List<Note> reviewPoints = getAllDueReviewPoints();
-          assertThat(reviewPoints, hasSize(2));
-          assertThat(reviewPoints.get(0), equalTo(anotherNote));
-          assertThat(reviewPoints.get(1), equalTo(note2));
+          List<Note> memoryTrackers = getAllDueReviewPoints();
+          assertThat(memoryTrackers, hasSize(2));
+          assertThat(memoryTrackers.get(0), equalTo(anotherNote));
+          assertThat(memoryTrackers.get(1), equalTo(note2));
         }
       }
     }

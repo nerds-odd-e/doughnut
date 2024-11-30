@@ -26,7 +26,7 @@ public class User extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   @Getter
   @Setter
-  private List<ReviewPoint> reviewPoints = new ArrayList<>();
+  private List<MemoryTracker> memoryTrackers = new ArrayList<>();
 
   @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
   @PrimaryKeyJoinColumn

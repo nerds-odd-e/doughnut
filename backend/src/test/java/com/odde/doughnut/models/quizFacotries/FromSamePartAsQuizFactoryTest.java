@@ -82,7 +82,7 @@ class FromSamePartAsQuizFactoryTest {
       }
 
       @Nested
-      class WhenThereIsViceReviewPoint {
+      class WhenThereIsViceMemoryTracker {
         @BeforeEach
         void setup() {
           makeMe.aReviewPointFor(cousin).by(user).please();

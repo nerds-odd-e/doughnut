@@ -34,7 +34,7 @@ public interface NoteReviewRepository extends CrudRepository<Note, Integer> {
           + "   AND COALESCE(n.reviewSetting.skipReview, FALSE) = FALSE "
           + "   AND n.deletedAt IS NULL ";
 
-  String joinReviewPoint = " LEFT JOIN n.reviewPoints rp ON rp.user.id = :userId";
+  String joinReviewPoint = " LEFT JOIN n.memoryTrackers rp ON rp.user.id = :userId";
 
   String orderByDate = " ORDER BY n.reviewSetting.level, n.createdAt, n.id";
 

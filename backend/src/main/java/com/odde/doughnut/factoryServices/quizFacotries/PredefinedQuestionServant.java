@@ -88,7 +88,7 @@ public class PredefinedQuestionServant {
     return chooseFillingOptionsRandomly(backwardPeers);
   }
 
-  public ReviewPoint getReviewPoint(Note thing) {
+  public MemoryTracker getReviewPoint(Note thing) {
     UserModel userModel = modelFactoryService.toUserModel(user);
     return userModel.getReviewPointFor(thing);
   }

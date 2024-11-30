@@ -7,10 +7,10 @@ import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
 
-public class ReviewPointBuilder extends EntityBuilder<ReviewPoint> {
+public class ReviewPointBuilder extends EntityBuilder<MemoryTracker> {
 
-  public ReviewPointBuilder(ReviewPoint reviewPoint, MakeMe makeMe) {
-    super(makeMe, reviewPoint);
+  public ReviewPointBuilder(MemoryTracker memoryTracker, MakeMe makeMe) {
+    super(makeMe, memoryTracker);
     initiallyReviewedOn(makeMe.aTimestamp().of(0, 0).please());
   }
 

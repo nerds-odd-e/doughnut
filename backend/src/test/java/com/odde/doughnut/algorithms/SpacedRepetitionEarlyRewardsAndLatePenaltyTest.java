@@ -9,8 +9,8 @@ import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 
+import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.testability.MakeMe;
@@ -79,10 +79,10 @@ public class SpacedRepetitionEarlyRewardsAndLatePenaltyTest {
     MakeMe makeMe = MakeMe.makeMeWithoutFactoryService();
     User user = makeMe.aUser().withSpaceIntervals("3, 6, 9, 12, 15").inMemoryPlease();
     Note note = makeMe.aNote().inMemoryPlease();
-    ReviewPoint reviewPoint =
+    MemoryTracker memoryTracker =
         makeMe.aReviewPointFor(note).by(user).afterNthStrictRepetition(3).inMemoryPlease();
-    reviewPoint.reviewedSuccessfully(
-        TimestampOperations.addHoursToTimestamp(reviewPoint.getNextReviewAt(), delayInHours));
-    return reviewPoint.getForgettingCurveIndex();
+    memoryTracker.reviewedSuccessfully(
+        TimestampOperations.addHoursToTimestamp(memoryTracker.getNextReviewAt(), delayInHours));
+    return memoryTracker.getForgettingCurveIndex();
   }
 }

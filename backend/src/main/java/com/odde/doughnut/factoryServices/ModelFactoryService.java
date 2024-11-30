@@ -19,7 +19,7 @@ public class ModelFactoryService {
   @Autowired public NoteRepository noteRepository;
   @Autowired public UserRepository userRepository;
   @Autowired public BazaarNotebookRepository bazaarNotebookRepository;
-  @Autowired public ReviewPointRepository reviewPointRepository;
+  @Autowired public MemoryTrackerRepository memoryTrackerRepository;
   @Autowired public CircleRepository circleRepository;
   @Autowired public FailureReportRepository failureReportRepository;
   @Autowired public NotebookAssistantRepository notebookAssistantRepository;
@@ -65,8 +65,8 @@ public class ModelFactoryService {
     return new UserModel(user, this);
   }
 
-  public ReviewPointModel toReviewPointModel(ReviewPoint reviewPoint) {
-    return new ReviewPointModel(reviewPoint, this);
+  public ReviewPointModel toReviewPointModel(MemoryTracker memoryTracker) {
+    return new ReviewPointModel(memoryTracker, this);
   }
 
   public CircleModel toCircleModel(Circle circle) {
@@ -159,11 +159,11 @@ public class ModelFactoryService {
       Timestamp currentUTCTimestamp,
       Boolean correct,
       ReviewQuestionInstance reviewQuestionInstance) {
-    ReviewPoint reviewPoint =
+    MemoryTracker memoryTracker =
         toUserModel(user)
             .getReviewPointFor(reviewQuestionInstance.getPredefinedQuestion().getNote());
-    if (reviewPoint != null) {
-      toReviewPointModel(reviewPoint).markAsRepeated(currentUTCTimestamp, correct);
+    if (memoryTracker != null) {
+      toReviewPointModel(memoryTracker).markAsRepeated(currentUTCTimestamp, correct);
     }
   }
 }

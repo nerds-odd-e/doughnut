@@ -87,7 +87,7 @@ public class Note extends EntityIdentifiedByIdOnly {
 
   @OneToMany(mappedBy = "note")
   @JsonIgnore
-  private Set<ReviewPoint> reviewPoints;
+  private Set<MemoryTracker> memoryTrackers;
 
   @Column(name = "updated_at")
   @Getter

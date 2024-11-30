@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-public class ReviewPointModelTest {
+public class MemoryTrackerModelTest {
   @Autowired MakeMe makeMe;
   UserModel userModel;
   Timestamp day1;

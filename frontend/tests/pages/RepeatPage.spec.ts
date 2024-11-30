@@ -35,7 +35,7 @@ afterEach(() => {
 
 beforeEach(() => {
   vitest.resetAllMocks()
-  helper.managedApi.restNoteController.show1 = vi
+  helper.managedApi.restNoteController.show = vi
     .fn()
     .mockResolvedValue(makeMe.aNote.please())
   helper.managedApi.restReviewsController.repeatReview = mockedRepeatCall

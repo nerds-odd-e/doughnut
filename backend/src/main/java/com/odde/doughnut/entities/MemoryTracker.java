@@ -16,16 +16,16 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "memory_tracker")
-public class ReviewPoint extends EntityIdentifiedByIdOnly {
-  public static ReviewPoint buildReviewPointForNote(Note note) {
-    ReviewPoint entity = new ReviewPoint();
+public class MemoryTracker extends EntityIdentifiedByIdOnly {
+  public static MemoryTracker buildReviewPointForNote(Note note) {
+    MemoryTracker entity = new MemoryTracker();
     entity.setNote(note);
     return entity;
   }
 
   @Override
   public String toString() {
-    return "ReviewPoint{" + "id=" + id + '}';
+    return "MemoryTracker{" + "id=" + id + '}';
   }
 
   @ManyToOne
@@ -73,7 +73,7 @@ public class ReviewPoint extends EntityIdentifiedByIdOnly {
   @Setter
   private Boolean removedFromReview = false;
 
-  private ReviewPoint() {}
+  private MemoryTracker() {}
 
   public boolean isInitialReviewOnSameDay(Timestamp currentTime, ZoneId timeZone) {
     return TimestampOperations.getDayId(getInitialReviewedAt(), timeZone)

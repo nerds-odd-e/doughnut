@@ -46,7 +46,7 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
       case Subscription obj -> assertReadAuthorization(obj);
       case ReviewQuestionInstance obj -> assertReadAuthorizationReviewQuizQuestionInstance(obj);
       case PredefinedQuestion obj -> assertReadAuthorizationPredefinedQuestion(obj);
-      case ReviewPoint obj -> assertReadAuthorizationReviewPoint(obj);
+      case MemoryTracker obj -> assertReadAuthorizationReviewPoint(obj);
       case User obj -> assertAuthorizationUser(obj);
       default ->
           throw new ResponseStatusException(
@@ -54,7 +54,7 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
     }
   }
 
-  private void assertReadAuthorizationReviewPoint(ReviewPoint object)
+  private void assertReadAuthorizationReviewPoint(MemoryTracker object)
       throws UnexpectedNoAccessRightException {
     assertAuthorizationUser(object.getUser());
   }

@@ -1,10 +1,10 @@
-import type { Note, NoteRealm, ReviewPoint } from "@/generated/backend"
+import type { Note, NoteRealm, MemoryTracker } from "@/generated/backend"
 import Builder from "./Builder"
 import NoteBuilder from "./NoteBuilder"
 import generateId from "./generateId"
 
-class ReviewPointBuilder extends Builder<ReviewPoint> {
-  data: ReviewPoint
+class ReviewPointBuilder extends Builder<MemoryTracker> {
+  data: MemoryTracker
 
   constructor() {
     super()
@@ -55,7 +55,7 @@ class ReviewPointBuilder extends Builder<ReviewPoint> {
     return this
   }
 
-  do(): ReviewPoint {
+  do(): MemoryTracker {
     return this.data
   }
 }

@@ -138,7 +138,7 @@ export default class StoredApiCollection implements StoredApi {
 
   private loadNote(noteId: Doughnut.ID) {
     this.managedApi.restNoteController
-      .show1(noteId)
+      .show(noteId)
       .then((noteRealm) => this.storage.refreshNoteRealm(noteRealm))
   }
 

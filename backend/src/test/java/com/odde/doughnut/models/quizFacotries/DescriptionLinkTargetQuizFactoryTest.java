@@ -31,7 +31,7 @@ class DescriptionLinkTargetQuizFactoryTest {
   Note target;
   Note source;
   Note anotherSource;
-  ReviewPoint reviewPoint;
+  MemoryTracker memoryTracker;
   Note subjectNote;
 
   @BeforeEach
@@ -47,7 +47,7 @@ class DescriptionLinkTargetQuizFactoryTest {
             .linkTo(target)
             .please();
     subjectNote = source.getLinks().get(0);
-    reviewPoint = makeMe.aReviewPointFor(subjectNote).by(user).inMemoryPlease();
+    memoryTracker = makeMe.aReviewPointFor(subjectNote).by(user).inMemoryPlease();
     anotherSource = makeMe.aNote("pompeii").under(top).please();
   }
 

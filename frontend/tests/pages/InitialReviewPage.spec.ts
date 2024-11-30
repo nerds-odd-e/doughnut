@@ -38,7 +38,7 @@ beforeEach(() => {
     mockedInitialReviewCall
   helper.managedApi.restNoteController.getNoteInfo =
     mockedNoteInfoCall.mockResolvedValue({})
-  helper.managedApi.restNoteController.show1 = mockedGetNoteCall
+  helper.managedApi.restNoteController.show = mockedGetNoteCall
   renderer = helper.component(InitialReviewPage).withStorageProps({})
 })
 

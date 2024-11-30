@@ -14,7 +14,7 @@
 </template>
 
 <script lang="ts">
-import type { NoteInfo, ReviewPoint } from "@/generated/backend"
+import type { NoteInfo, MemoryTracker } from "@/generated/backend"
 import type { PropType } from "vue"
 import { defineComponent } from "vue"
 import ReviewSettingForm from "../review/ReviewSettingForm.vue"
@@ -37,7 +37,7 @@ export default defineComponent({
   },
   components: { ReviewSettingForm, NoteInfoReviewPoint },
   methods: {
-    onSelfEvaluated(reviewPoint: ReviewPoint) {
+    onSelfEvaluated(reviewPoint: MemoryTracker) {
       this.reviewPoint = reviewPoint
     },
   },

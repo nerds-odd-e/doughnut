@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { Note } from './Note';
-export type ReviewPoint = {
+export type MemoryTracker = {
     id: number;
     note: Note;
     lastReviewedAt?: string;

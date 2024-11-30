@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { ReviewPoint } from '../models/ReviewPoint';
+import type { MemoryTracker } from '../models/MemoryTracker';
 import type { SelfEvaluation } from '../models/SelfEvaluation';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -11,16 +11,16 @@ export class RestReviewPointControllerService {
     /**
      * @param reviewPoint
      * @param requestBody
-     * @returns ReviewPoint OK
+     * @returns MemoryTracker OK
      * @throws ApiError
      */
     public selfEvaluate(
         reviewPoint: number,
         requestBody: SelfEvaluation,
-    ): CancelablePromise<ReviewPoint> {
+    ): CancelablePromise<MemoryTracker> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/review-points/{reviewPoint}/self-evaluate',
+            url: '/api/memory-trackers/{reviewPoint}/self-evaluate',
             path: {
                 'reviewPoint': reviewPoint,
             },
@@ -33,15 +33,15 @@ export class RestReviewPointControllerService {
     }
     /**
      * @param reviewPoint
-     * @returns ReviewPoint OK
+     * @returns MemoryTracker OK
      * @throws ApiError
      */
     public removeFromRepeating(
         reviewPoint: number,
-    ): CancelablePromise<ReviewPoint> {
+    ): CancelablePromise<MemoryTracker> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/review-points/{reviewPoint}/remove',
+            url: '/api/memory-trackers/{reviewPoint}/remove',
             path: {
                 'reviewPoint': reviewPoint,
             },
@@ -53,16 +53,16 @@ export class RestReviewPointControllerService {
     /**
      * @param reviewPoint
      * @param successful
-     * @returns ReviewPoint OK
+     * @returns MemoryTracker OK
      * @throws ApiError
      */
     public markAsRepeated(
         reviewPoint: number,
         successful: boolean,
-    ): CancelablePromise<ReviewPoint> {
+    ): CancelablePromise<MemoryTracker> {
         return this.httpRequest.request({
             method: 'PATCH',
-            url: '/api/review-points/{reviewPoint}/mark-as-repeated',
+            url: '/api/memory-trackers/{reviewPoint}/mark-as-repeated',
             path: {
                 'reviewPoint': reviewPoint,
             },
@@ -76,15 +76,15 @@ export class RestReviewPointControllerService {
     }
     /**
      * @param reviewPoint
-     * @returns ReviewPoint OK
+     * @returns MemoryTracker OK
      * @throws ApiError
      */
-    public show(
+    public show1(
         reviewPoint: number,
-    ): CancelablePromise<ReviewPoint> {
+    ): CancelablePromise<MemoryTracker> {
         return this.httpRequest.request({
             method: 'GET',
-            url: '/api/review-points/{reviewPoint}',
+            url: '/api/memory-trackers/{reviewPoint}',
             path: {
                 'reviewPoint': reviewPoint,
             },
@@ -94,26 +94,26 @@ export class RestReviewPointControllerService {
         });
     }
     /**
-     * @returns ReviewPoint OK
+     * @returns MemoryTracker OK
      * @throws ApiError
      */
-    public getRecentlyReviewedPoints(): CancelablePromise<Array<ReviewPoint>> {
+    public getRecentlyReviewedPoints(): CancelablePromise<Array<MemoryTracker>> {
         return this.httpRequest.request({
             method: 'GET',
-            url: '/api/review-points/recently-reviewed',
+            url: '/api/memory-trackers/recently-reviewed',
             errors: {
                 500: `Internal Server Error`,
             },
         });
     }
     /**
-     * @returns ReviewPoint OK
+     * @returns MemoryTracker OK
      * @throws ApiError
      */
-    public getRecentReviewPoints(): CancelablePromise<Array<ReviewPoint>> {
+    public getRecentReviewPoints(): CancelablePromise<Array<MemoryTracker>> {
         return this.httpRequest.request({
             method: 'GET',
-            url: '/api/review-points/recent',
+            url: '/api/memory-trackers/recent',
             errors: {
                 500: `Internal Server Error`,
             },

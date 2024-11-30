@@ -71,7 +71,7 @@ class WhichSpecHasInstanceQuizFactoryTest {
       }
 
       @Nested
-      class WhenTheSecondLinkHasReviewPoint {
+      class WhenTheSecondLinkHasMemoryTracker {
 
         @BeforeEach
         void setup() {

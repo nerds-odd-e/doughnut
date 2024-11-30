@@ -1,13 +1,13 @@
 package com.odde.doughnut.models;
 
-import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;
 
-public record ReviewPointModel(ReviewPoint entity, ModelFactoryService modelFactoryService) {
+public record ReviewPointModel(MemoryTracker entity, ModelFactoryService modelFactoryService) {
 
-  public ReviewPoint getEntity() {
+  public MemoryTracker getEntity() {
     return entity;
   }
 

@@ -63,14 +63,14 @@ class RestReviewsController {
 
   @PostMapping(path = "")
   @Transactional
-  public ReviewPoint create(@RequestBody InitialInfo initialInfo) {
+  public MemoryTracker create(@RequestBody InitialInfo initialInfo) {
     currentUser.assertLoggedIn();
-    ReviewPoint reviewPoint =
-        ReviewPoint.buildReviewPointForNote(
+    MemoryTracker memoryTracker =
+        MemoryTracker.buildReviewPointForNote(
             modelFactoryService.entityManager.find(Note.class, initialInfo.noteId));
-    reviewPoint.setRemovedFromReview(initialInfo.skipReview);
+    memoryTracker.setRemovedFromReview(initialInfo.skipReview);
 
-    ReviewPointModel reviewPointModel = modelFactoryService.toReviewPointModel(reviewPoint);
+    ReviewPointModel reviewPointModel = modelFactoryService.toReviewPointModel(memoryTracker);
     reviewPointModel.initialReview(
         testabilitySettings.getCurrentUTCTimestamp(), currentUser.getEntity());
     return reviewPointModel.getEntity();

@@ -1,7 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.SelfEvaluation;
-import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 @RestController
-@RequestMapping("/api/review-points")
+@RequestMapping("/api/memory-trackers")
 class RestReviewPointController {
   private final ModelFactoryService modelFactoryService;
   private UserModel currentUser;
@@ -33,62 +33,62 @@ class RestReviewPointController {
   }
 
   @GetMapping("/{reviewPoint}")
-  public ReviewPoint show(
-      @PathVariable("reviewPoint") @Schema(type = "integer") ReviewPoint reviewPoint)
+  public MemoryTracker show(
+      @PathVariable("reviewPoint") @Schema(type = "integer") MemoryTracker memoryTracker)
       throws UnexpectedNoAccessRightException {
     currentUser.assertLoggedIn();
-    currentUser.assertReadAuthorization(reviewPoint);
-    return reviewPoint;
+    currentUser.assertReadAuthorization(memoryTracker);
+    return memoryTracker;
   }
 
   @PostMapping(path = "/{reviewPoint}/remove")
   @Transactional
-  public ReviewPoint removeFromRepeating(
-      @PathVariable("reviewPoint") @Schema(type = "integer") ReviewPoint reviewPoint) {
-    reviewPoint.setRemovedFromReview(true);
-    reviewPoint.setLastReviewedAt(testabilitySettings.getCurrentUTCTimestamp());
-    modelFactoryService.save(reviewPoint);
-    return reviewPoint;
+  public MemoryTracker removeFromRepeating(
+      @PathVariable("reviewPoint") @Schema(type = "integer") MemoryTracker memoryTracker) {
+    memoryTracker.setRemovedFromReview(true);
+    memoryTracker.setLastReviewedAt(testabilitySettings.getCurrentUTCTimestamp());
+    modelFactoryService.save(memoryTracker);
+    return memoryTracker;
   }
 
   @PostMapping(path = "/{reviewPoint}/self-evaluate")
   @Transactional
-  public ReviewPoint selfEvaluate(
-      @PathVariable("reviewPoint") @Schema(type = "integer") ReviewPoint reviewPoint,
+  public MemoryTracker selfEvaluate(
+      @PathVariable("reviewPoint") @Schema(type = "integer") MemoryTracker memoryTracker,
       @RequestBody SelfEvaluation selfEvaluation) {
     currentUser.assertLoggedIn();
-    if (reviewPoint == null || reviewPoint.getId() == null) {
+    if (memoryTracker == null || memoryTracker.getId() == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The review point does not exist.");
     }
     modelFactoryService
-        .toReviewPointModel(reviewPoint)
+        .toReviewPointModel(memoryTracker)
         .updateForgettingCurve(selfEvaluation.adjustment);
-    return reviewPoint;
+    return memoryTracker;
   }
 
   @PatchMapping(path = "/{reviewPoint}/mark-as-repeated")
   @Transactional
-  public ReviewPoint markAsRepeated(
-      @PathVariable("reviewPoint") @Schema(type = "integer") ReviewPoint reviewPoint,
+  public MemoryTracker markAsRepeated(
+      @PathVariable("reviewPoint") @Schema(type = "integer") MemoryTracker memoryTracker,
       @RequestParam("successful") boolean successful) {
     currentUser.assertLoggedIn();
     modelFactoryService
-        .toReviewPointModel(reviewPoint)
+        .toReviewPointModel(memoryTracker)
         .markAsRepeated(testabilitySettings.getCurrentUTCTimestamp(), successful);
-    return reviewPoint;
+    return memoryTracker;
   }
 
   @GetMapping("/recent")
-  public List<ReviewPoint> getRecentReviewPoints() {
+  public List<MemoryTracker> getRecentReviewPoints() {
     currentUser.assertLoggedIn();
-    return modelFactoryService.reviewPointRepository.findLast100ByUser(
+    return modelFactoryService.memoryTrackerRepository.findLast100ByUser(
         currentUser.getEntity().getId());
   }
 
   @GetMapping("/recently-reviewed")
-  public List<ReviewPoint> getRecentlyReviewedPoints() {
+  public List<MemoryTracker> getRecentlyReviewedPoints() {
     currentUser.assertLoggedIn();
-    return modelFactoryService.reviewPointRepository.findLast100ReviewedByUser(
+    return modelFactoryService.memoryTrackerRepository.findLast100ReviewedByUser(
         currentUser.getEntity().getId());
   }
 }

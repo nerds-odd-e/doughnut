@@ -5,8 +5,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 
+import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
@@ -47,8 +47,8 @@ public class ReviewingWithSpacedRepetitionAlgorithmTest {
 
     @Test
     void whenThereIsNoReviewedNotesForUser() {
-      ReviewPoint reviewPoint = makeMe.aReviewPointFor(note).by(anotherUser).please();
-      assertThat(getOneReviewPointNeedToRepeat(daysAfterBase(reviewPoint, 1)), is(nullValue()));
+      MemoryTracker memoryTracker = makeMe.aReviewPointFor(note).by(anotherUser).please();
+      assertThat(getOneReviewPointNeedToRepeat(daysAfterBase(memoryTracker, 1)), is(nullValue()));
     }
 
     @ParameterizedTest
@@ -68,15 +68,15 @@ public class ReviewingWithSpacedRepetitionAlgorithmTest {
     })
     void whenThereIsOneReviewedNotesForUser(
         Integer repetitionDone, Integer reviewDay, Boolean expectedToRepeat) {
-      ReviewPoint reviewPoint =
+      MemoryTracker memoryTracker =
           makeMe
               .aReviewPointFor(note)
               .by(userModel)
               .afterNthStrictRepetition(repetitionDone)
               .please();
-      ReviewPoint mostUrgentReviewPoint =
-          getOneReviewPointNeedToRepeat(daysAfterBase(reviewPoint, reviewDay));
-      assertThat(mostUrgentReviewPoint != null, is(expectedToRepeat));
+      MemoryTracker mostUrgentMemoryTracker =
+          getOneReviewPointNeedToRepeat(daysAfterBase(memoryTracker, reviewDay));
+      assertThat(mostUrgentMemoryTracker != null, is(expectedToRepeat));
     }
 
     @Nested
@@ -90,12 +90,12 @@ public class ReviewingWithSpacedRepetitionAlgorithmTest {
       })
       void atHourInTheNextDay(
           Integer lastRepeatHour, Integer currentHour, Boolean expectedToRepeat) {
-        ReviewPoint reviewPoint = makeMe.aReviewPointFor(note).by(userModel).please();
-        reviewPoint.setNextReviewAt(
+        MemoryTracker memoryTracker = makeMe.aReviewPointFor(note).by(userModel).please();
+        memoryTracker.setNextReviewAt(
             makeMe.aTimestamp().of(2, lastRepeatHour).fromShanghai().please());
         final Timestamp timestamp = makeMe.aTimestamp().of(2, currentHour).fromShanghai().please();
-        ReviewPoint mostUrgentReviewPoint = getOneReviewPointNeedToRepeat(timestamp);
-        assertThat(mostUrgentReviewPoint != null, is(expectedToRepeat));
+        MemoryTracker mostUrgentMemoryTracker = getOneReviewPointNeedToRepeat(timestamp);
+        assertThat(mostUrgentMemoryTracker != null, is(expectedToRepeat));
       }
     }
 
@@ -129,14 +129,15 @@ public class ReviewingWithSpacedRepetitionAlgorithmTest {
     }
   }
 
-  private ReviewPoint getOneReviewPointNeedToRepeat(Timestamp timestamp) {
+  private MemoryTracker getOneReviewPointNeedToRepeat(Timestamp timestamp) {
     return userModel
         .getReviewPointsNeedToRepeat(timestamp, ZoneId.of("Asia/Shanghai"))
         .findFirst()
         .orElse(null);
   }
 
-  private Timestamp daysAfterBase(ReviewPoint reviewPoint, Integer reviewDay) {
-    return TimestampOperations.addHoursToTimestamp(reviewPoint.getLastReviewedAt(), reviewDay * 24);
+  private Timestamp daysAfterBase(MemoryTracker memoryTracker, Integer reviewDay) {
+    return TimestampOperations.addHoursToTimestamp(
+        memoryTracker.getLastReviewedAt(), reviewDay * 24);
   }
 }

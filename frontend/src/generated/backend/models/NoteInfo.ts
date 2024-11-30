@@ -2,11 +2,11 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { MemoryTracker } from './MemoryTracker';
 import type { NoteRealm } from './NoteRealm';
-import type { ReviewPoint } from './ReviewPoint';
 import type { ReviewSetting } from './ReviewSetting';
 export type NoteInfo = {
-    reviewPoint?: ReviewPoint;
+    memoryTracker?: MemoryTracker;
     note: NoteRealm;
     createdAt: string;
     reviewSetting?: ReviewSetting;

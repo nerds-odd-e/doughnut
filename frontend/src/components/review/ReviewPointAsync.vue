@@ -7,7 +7,7 @@
 
 <script lang="ts">
 import ContentLoader from "@/components/commons/ContentLoader.vue"
-import type { ReviewPoint } from "@/generated/backend"
+import type { MemoryTracker } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import type { PropType } from "vue"
@@ -31,7 +31,7 @@ export default defineComponent({
   },
   data() {
     return {
-      reviewPoint: undefined as ReviewPoint | undefined,
+      reviewPoint: undefined as MemoryTracker | undefined,
     }
   },
   methods: {

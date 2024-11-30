@@ -16,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Note, ReviewPoint } from "@/generated/backend"
+import type { Note, MemoryTracker } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
 import type { StorageAccessor } from "@/store/createNoteStorage"
@@ -34,8 +34,8 @@ const { note } = defineProps<{
 
 // Emits
 const emit = defineEmits<{
-  (e: "reloadNeeded", data: ReviewPoint): void
-  (e: "initialReviewDone", data: ReviewPoint): void
+  (e: "reloadNeeded", data: MemoryTracker): void
+  (e: "initialReviewDone", data: MemoryTracker): void
 }>()
 
 // Composables

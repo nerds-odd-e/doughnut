@@ -61,7 +61,7 @@ import JustReview from "./JustReview.vue"
 // Interface definitions for better type safety
 interface QuizProps {
   minimized?: boolean
-  reviewPoints: number[]
+  memoryTrackers: number[]
   currentIndex: number
   eagerFetchCount: number
   storageAccessor: StorageAccessor
@@ -143,8 +143,8 @@ const currentReviewQuestion = computed(() => {
 
 // Methods
 const reviewPointIdAt = (index: number): number | undefined => {
-  if (props.reviewPoints && index < props.reviewPoints.length) {
-    return props.reviewPoints[index]
+  if (props.memoryTrackers && index < props.memoryTrackers.length) {
+    return props.memoryTrackers[index]
   }
   return undefined
 }
@@ -154,7 +154,7 @@ const onAnswered = (answerResult: AnsweredQuestion) => {
 }
 
 const canMoveToEnd = computed(() => {
-  return props.currentIndex < (props.reviewPoints?.length ?? 0) - 1
+  return props.currentIndex < (props.memoryTrackers?.length ?? 0) - 1
 })
 
 const moveToEnd = () => {

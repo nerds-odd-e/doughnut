@@ -48,10 +48,10 @@ class RestReviewQuestionController {
   @GetMapping("/{reviewPoint}/random-question")
   @Transactional
   public ReviewQuestionInstance generateRandomQuestion(
-      @PathVariable("reviewPoint") @Schema(type = "integer") ReviewPoint reviewPoint) {
+      @PathVariable("reviewPoint") @Schema(type = "integer") MemoryTracker memoryTracker) {
     currentUser.assertLoggedIn();
     return reviewService.generateAQuestionOfRandomType(
-        reviewPoint.getNote(), currentUser.getEntity());
+        memoryTracker.getNote(), currentUser.getEntity());
   }
 
   @PostMapping("/{reviewQuestionInstance}/regenerate")

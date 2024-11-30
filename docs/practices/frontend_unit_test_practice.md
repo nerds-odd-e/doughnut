@@ -19,7 +19,7 @@
    - Use real component instances when possible
    - Example from NoteShow.spec.ts:
    ```typescript
-   helper.managedApi.restNoteController.show1 = vitest
+   helper.managedApi.restNoteController.show = vitest
      .fn()
      .mockResolvedValue(note)
    ```

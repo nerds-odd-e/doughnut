@@ -8,7 +8,7 @@ describe("all in note show page", () => {
     const noteRealm = makeMe.aNoteRealm.inCircle("a circle").please()
 
     beforeEach(() => {
-      helper.managedApi.restNoteController.show1 = vi
+      helper.managedApi.restNoteController.show = vi
         .fn()
         .mockResolvedValue(noteRealm)
     })
@@ -19,7 +19,7 @@ describe("all in note show page", () => {
         .withStorageProps({ noteId: noteRealm.id })
         .render()
       await screen.findByText(noteRealm.note.noteTopic.topicConstructor)
-      expect(helper.managedApi.restNoteController.show1).toBeCalledWith(
+      expect(helper.managedApi.restNoteController.show).toBeCalledWith(
         noteRealm.id
       )
     })

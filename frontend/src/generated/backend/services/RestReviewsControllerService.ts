@@ -4,8 +4,8 @@
 /* eslint-disable */
 import type { DueReviewPoints } from '../models/DueReviewPoints';
 import type { InitialInfo } from '../models/InitialInfo';
+import type { MemoryTracker } from '../models/MemoryTracker';
 import type { Note } from '../models/Note';
-import type { ReviewPoint } from '../models/ReviewPoint';
 import type { ReviewStatus } from '../models/ReviewStatus';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -13,12 +13,12 @@ export class RestReviewsControllerService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
      * @param requestBody
-     * @returns ReviewPoint OK
+     * @returns MemoryTracker OK
      * @throws ApiError
      */
     public create(
         requestBody: InitialInfo,
-    ): CancelablePromise<ReviewPoint> {
+    ): CancelablePromise<MemoryTracker> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/reviews',

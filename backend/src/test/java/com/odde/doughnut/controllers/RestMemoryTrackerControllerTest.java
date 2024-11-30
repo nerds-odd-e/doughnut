@@ -6,8 +6,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.dto.SelfEvaluation;
+import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
@@ -26,7 +26,7 @@ import org.springframework.web.server.ResponseStatusException;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class RestReviewPointControllerTest {
+class RestMemoryTrackerControllerTest {
   @Autowired ModelFactoryService modelFactoryService;
   @Autowired MakeMe makeMe;
 
@@ -43,8 +43,8 @@ class RestReviewPointControllerTest {
   @Nested
   class Show {
     @Nested
-    class WhenThereIsAReviewPoint {
-      ReviewPoint rp;
+    class WhenThereIsAMemoryTracker {
+      MemoryTracker rp;
 
       @BeforeEach
       void setup() {
@@ -55,8 +55,8 @@ class RestReviewPointControllerTest {
 
       @Test
       void shouldBeAbleToSeeOwn() throws UnexpectedNoAccessRightException {
-        ReviewPoint reviewPoint = controller.show(rp);
-        assertThat(reviewPoint, equalTo(rp));
+        MemoryTracker memoryTracker = controller.show(rp);
+        assertThat(memoryTracker, equalTo(rp));
       }
 
       @Test
@@ -80,7 +80,8 @@ class RestReviewPointControllerTest {
     @Test
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
       userModel = makeMe.aNullUserModelPlease();
-      ReviewPoint reviewPoint = makeMe.aReviewPointFor(makeMe.aNote().please()).inMemoryPlease();
+      MemoryTracker memoryTracker =
+          makeMe.aReviewPointFor(makeMe.aNote().please()).inMemoryPlease();
       SelfEvaluation selfEvaluation =
           new SelfEvaluation() {
             {
@@ -89,7 +90,7 @@ class RestReviewPointControllerTest {
           };
       assertThrows(
           ResponseStatusException.class,
-          () -> controller.selfEvaluate(reviewPoint, selfEvaluation));
+          () -> controller.selfEvaluate(memoryTracker, selfEvaluation));
     }
 
     @Test
@@ -105,8 +106,8 @@ class RestReviewPointControllerTest {
     }
 
     @Nested
-    class WhenThereIsAReviewPoint {
-      ReviewPoint rp;
+    class WhenThereIsAMemoryTracker {
+      MemoryTracker rp;
 
       @BeforeEach
       void setup() {
@@ -137,7 +138,7 @@ class RestReviewPointControllerTest {
     @Test
     void itMustUpdateTheReviewPointRecord() {
       Note note = makeMe.aNote().please();
-      ReviewPoint rp = makeMe.aReviewPointFor(note).by(userModel).please();
+      MemoryTracker rp = makeMe.aReviewPointFor(note).by(userModel).please();
       Integer oldRepetitionCount = rp.getRepetitionCount();
       controller.markAsRepeated(rp, true);
       assertThat(rp.getRepetitionCount(), equalTo(oldRepetitionCount + 1));
@@ -148,19 +149,19 @@ class RestReviewPointControllerTest {
   class GetRecentReviewPoints {
     @Test
     void shouldReturnEmptyListWhenNoReviewPoints() {
-      List<ReviewPoint> reviewPoints = controller.getRecentReviewPoints();
-      assertThat(reviewPoints, empty());
+      List<MemoryTracker> memoryTrackers = controller.getRecentReviewPoints();
+      assertThat(memoryTrackers, empty());
     }
 
     @Test
     void shouldReturnReviewPointsForCurrentUser() {
-      ReviewPoint rp1 = makeMe.aReviewPointFor(makeMe.aNote().please()).by(userModel).please();
-      ReviewPoint rp2 = makeMe.aReviewPointFor(makeMe.aNote().please()).by(userModel).please();
+      MemoryTracker rp1 = makeMe.aReviewPointFor(makeMe.aNote().please()).by(userModel).please();
+      MemoryTracker rp2 = makeMe.aReviewPointFor(makeMe.aNote().please()).by(userModel).please();
 
-      List<ReviewPoint> reviewPoints = controller.getRecentReviewPoints();
+      List<MemoryTracker> memoryTrackers = controller.getRecentReviewPoints();
 
-      assertThat(reviewPoints, hasSize(2));
-      assertThat(reviewPoints, containsInAnyOrder(rp1, rp2));
+      assertThat(memoryTrackers, hasSize(2));
+      assertThat(memoryTrackers, containsInAnyOrder(rp1, rp2));
     }
 
     @Test
@@ -168,9 +169,9 @@ class RestReviewPointControllerTest {
       UserModel otherUser = makeMe.aUser().toModelPlease();
       makeMe.aReviewPointBy(otherUser).please();
 
-      List<ReviewPoint> reviewPoints = controller.getRecentReviewPoints();
+      List<MemoryTracker> memoryTrackers = controller.getRecentReviewPoints();
 
-      assertThat(reviewPoints, empty());
+      assertThat(memoryTrackers, empty());
     }
 
     @Test
@@ -186,23 +187,23 @@ class RestReviewPointControllerTest {
   class GetRecentlyReviewedPoints {
     @Test
     void shouldReturnEmptyListWhenNoReviewedPoints() {
-      List<ReviewPoint> reviewPoints = controller.getRecentlyReviewedPoints();
-      assertThat(reviewPoints, empty());
+      List<MemoryTracker> memoryTrackers = controller.getRecentlyReviewedPoints();
+      assertThat(memoryTrackers, empty());
     }
 
     @Test
     void shouldReturnRecentlyReviewedPointsForCurrentUser() {
-      ReviewPoint rp1 = makeMe.aReviewPointFor(makeMe.aNote().please()).by(userModel).please();
-      ReviewPoint rp2 = makeMe.aReviewPointFor(makeMe.aNote().please()).by(userModel).please();
+      MemoryTracker rp1 = makeMe.aReviewPointFor(makeMe.aNote().please()).by(userModel).please();
+      MemoryTracker rp2 = makeMe.aReviewPointFor(makeMe.aNote().please()).by(userModel).please();
 
       // Mark as reviewed
       controller.markAsRepeated(rp1, true);
       controller.markAsRepeated(rp2, true);
 
-      List<ReviewPoint> reviewPoints = controller.getRecentlyReviewedPoints();
+      List<MemoryTracker> memoryTrackers = controller.getRecentlyReviewedPoints();
 
-      assertThat(reviewPoints, hasSize(2));
-      assertThat(reviewPoints, containsInAnyOrder(rp1, rp2));
+      assertThat(memoryTrackers, hasSize(2));
+      assertThat(memoryTrackers, containsInAnyOrder(rp1, rp2));
     }
 
     @Test

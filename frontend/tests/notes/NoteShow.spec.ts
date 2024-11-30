@@ -19,7 +19,7 @@ describe("new/updated pink banner", () => {
     "should show fresher color if recently updated",
     async (updatedAt, expectedColor) => {
       const note = makeMe.aNoteRealm.updatedAtDate(updatedAt).please()
-      helper.managedApi.restNoteController.show1 = vitest
+      helper.managedApi.restNoteController.show = vitest
         .fn()
         .mockResolvedValue(note)
 
@@ -42,9 +42,7 @@ describe("note wth children", () => {
   const note = makeMe.aNoteRealm.please()
 
   const render = (n: NoteRealm) => {
-    helper.managedApi.restNoteController.show1 = vitest
-      .fn()
-      .mockResolvedValue(n)
+    helper.managedApi.restNoteController.show = vitest.fn().mockResolvedValue(n)
     helper
       .component(NoteShow)
       .withStorageProps({
@@ -56,7 +54,7 @@ describe("note wth children", () => {
 
   it("should call the api", async () => {
     render(note)
-    expect(helper.managedApi.restNoteController.show1).toBeCalledWith(note.id)
+    expect(helper.managedApi.restNoteController.show).toBeCalledWith(note.id)
   })
 
   it("should not render children control if no child", async () => {
@@ -69,7 +67,7 @@ describe("note wth children", () => {
 describe("conversation maximize/minimize", () => {
   it("should maximize conversation when maximize button is clicked", async () => {
     const note = makeMe.aNoteRealm.please()
-    helper.managedApi.restNoteController.show1 = vitest
+    helper.managedApi.restNoteController.show = vitest
       .fn()
       .mockResolvedValue(note)
 
@@ -105,7 +103,7 @@ describe("conversation maximize/minimize", () => {
 
   it("should restore maximized state before closing conversation", async () => {
     const note = makeMe.aNoteRealm.please()
-    helper.managedApi.restNoteController.show1 = vitest
+    helper.managedApi.restNoteController.show = vitest
       .fn()
       .mockResolvedValue(note)
 

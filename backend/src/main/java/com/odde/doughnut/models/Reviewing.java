@@ -2,8 +2,8 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.controllers.dto.DueReviewPoints;
 import com.odde.doughnut.controllers.dto.ReviewStatus;
+import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;
 import java.time.ZoneId;
@@ -33,7 +33,7 @@ public class Reviewing {
       return Stream.empty();
     }
     List<Integer> alreadyInitialReviewed =
-        getNewReviewPointsOfToday().stream().map(ReviewPoint::getNote).map(Note::getId).toList();
+        getNewReviewPointsOfToday().stream().map(MemoryTracker::getNote).map(Note::getId).toList();
     return Stream.concat(
             getSubscriptionModelStream()
                 .flatMap(
@@ -48,7 +48,7 @@ public class Reviewing {
     return reviewScope.getThingHaveNotBeenReviewedAtAll().limit(count);
   }
 
-  private Stream<ReviewPoint> getReviewPointsNeedToRepeat(int dueInDays) {
+  private Stream<MemoryTracker> getReviewPointsNeedToRepeat(int dueInDays) {
     return userModel.getReviewPointsNeedToRepeat(
         TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, dueInDays * 24), timeZone);
   }
@@ -78,7 +78,7 @@ public class Reviewing {
     return (int) (userModel.entity.getDailyNewNotesCount() - sameDayCount);
   }
 
-  private List<ReviewPoint> getNewReviewPointsOfToday() {
+  private List<MemoryTracker> getNewReviewPointsOfToday() {
     Timestamp oneDayAgo = TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, -24);
     return userModel.getRecentReviewPoints(oneDayAgo).stream()
         .filter(p -> userModel.isInitialReviewOnSameDay(p, currentUTCTimestamp, timeZone))
@@ -93,7 +93,7 @@ public class Reviewing {
 
   public DueReviewPoints getDueReviewPoints(int dueInDays) {
     List<Integer> toRepeat =
-        getReviewPointsNeedToRepeat(dueInDays).map(ReviewPoint::getId).toList();
+        getReviewPointsNeedToRepeat(dueInDays).map(MemoryTracker::getId).toList();
     DueReviewPoints dueReviewPoints = new DueReviewPoints();
     dueReviewPoints.setDueInDays(dueInDays);
     dueReviewPoints.setToRepeat(toRepeat);

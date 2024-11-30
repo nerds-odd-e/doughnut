@@ -75,14 +75,14 @@ class RestReviewQuestionInstanceControllerTests {
 
   @Nested
   class answer {
-    ReviewPoint reviewPoint;
+    MemoryTracker memoryTracker;
     ReviewQuestionInstance reviewQuestionInstance;
     AnswerDTO answerDTO = new AnswerDTO();
 
     @BeforeEach
     void setup() {
       Note answerNote = makeMe.aNote().rememberSpelling().please();
-      reviewPoint =
+      memoryTracker =
           makeMe
               .aReviewPointFor(answerNote)
               .by(currentUser)
@@ -95,28 +95,28 @@ class RestReviewQuestionInstanceControllerTests {
 
     @Test
     void shouldValidateTheAnswerAndUpdateReviewPoint() {
-      Integer oldRepetitionCount = reviewPoint.getRepetitionCount();
+      Integer oldRepetitionCount = memoryTracker.getRepetitionCount();
       AnsweredQuestion answerResult = controller.answerQuiz(reviewQuestionInstance, answerDTO);
       assertTrue(answerResult.answer.getCorrect());
-      assertThat(reviewPoint.getRepetitionCount(), greaterThan(oldRepetitionCount));
+      assertThat(memoryTracker.getRepetitionCount(), greaterThan(oldRepetitionCount));
     }
 
     @Test
     void shouldNoteIncreaseIndexIfRepeatImmediately() {
-      testabilitySettings.timeTravelTo(reviewPoint.getLastReviewedAt());
-      Integer oldForgettingCurveIndex = reviewPoint.getForgettingCurveIndex();
+      testabilitySettings.timeTravelTo(memoryTracker.getLastReviewedAt());
+      Integer oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
       controller.answerQuiz(reviewQuestionInstance, answerDTO);
-      assertThat(reviewPoint.getForgettingCurveIndex(), equalTo(oldForgettingCurveIndex));
+      assertThat(memoryTracker.getForgettingCurveIndex(), equalTo(oldForgettingCurveIndex));
     }
 
     @Test
     void shouldIncreaseTheIndex() {
-      testabilitySettings.timeTravelTo(reviewPoint.getNextReviewAt());
-      Integer oldForgettingCurveIndex = reviewPoint.getForgettingCurveIndex();
+      testabilitySettings.timeTravelTo(memoryTracker.getNextReviewAt());
+      Integer oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
       controller.answerQuiz(reviewQuestionInstance, answerDTO);
-      assertThat(reviewPoint.getForgettingCurveIndex(), greaterThan(oldForgettingCurveIndex));
+      assertThat(memoryTracker.getForgettingCurveIndex(), greaterThan(oldForgettingCurveIndex));
       assertThat(
-          reviewPoint.getLastReviewedAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
+          memoryTracker.getLastReviewedAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
     }
 
     @Test
@@ -134,35 +134,35 @@ class RestReviewQuestionInstanceControllerTests {
         reviewQuestionInstance =
             makeMe
                 .aReviewQuestionInstance()
-                .approvedSpellingQuestionOf(reviewPoint.getNote())
+                .approvedSpellingQuestionOf(memoryTracker.getNote())
                 .please();
         answerDTO.setSpellingAnswer("wrong");
       }
 
       @Test
       void shouldValidateTheWrongAnswer() {
-        testabilitySettings.timeTravelTo(reviewPoint.getNextReviewAt());
-        Integer oldRepetitionCount = reviewPoint.getRepetitionCount();
+        testabilitySettings.timeTravelTo(memoryTracker.getNextReviewAt());
+        Integer oldRepetitionCount = memoryTracker.getRepetitionCount();
         AnsweredQuestion answerResult = controller.answerQuiz(reviewQuestionInstance, answerDTO);
         assertFalse(answerResult.answer.getCorrect());
-        assertThat(reviewPoint.getRepetitionCount(), greaterThan(oldRepetitionCount));
+        assertThat(memoryTracker.getRepetitionCount(), greaterThan(oldRepetitionCount));
       }
 
       @Test
       void shouldNotChangeTheLastReviewedAtTime() {
-        testabilitySettings.timeTravelTo(reviewPoint.getNextReviewAt());
-        Timestamp lastReviewedAt = reviewPoint.getLastReviewedAt();
-        Integer oldForgettingCurveIndex = reviewPoint.getForgettingCurveIndex();
+        testabilitySettings.timeTravelTo(memoryTracker.getNextReviewAt());
+        Timestamp lastReviewedAt = memoryTracker.getLastReviewedAt();
+        Integer oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
         controller.answerQuiz(reviewQuestionInstance, answerDTO);
-        assertThat(reviewPoint.getForgettingCurveIndex(), lessThan(oldForgettingCurveIndex));
-        assertThat(reviewPoint.getLastReviewedAt(), equalTo(lastReviewedAt));
+        assertThat(memoryTracker.getForgettingCurveIndex(), lessThan(oldForgettingCurveIndex));
+        assertThat(memoryTracker.getLastReviewedAt(), equalTo(lastReviewedAt));
       }
 
       @Test
       void shouldRepeatTheNextDay() {
         controller.answerQuiz(reviewQuestionInstance, answerDTO);
         assertThat(
-            reviewPoint.getNextReviewAt(),
+            memoryTracker.getNextReviewAt(),
             lessThan(
                 TimestampOperations.addHoursToTimestamp(
                     testabilitySettings.getCurrentUTCTimestamp(), 25)));
@@ -302,7 +302,7 @@ class RestReviewQuestionInstanceControllerTests {
       // another note is needed, otherwise the note will be the only note in the notebook, and the
       // question cannot be generated.
       makeMe.aNote().under(note).please();
-      ReviewPoint rp = makeMe.aReviewPointFor(note).by(currentUser).please();
+      MemoryTracker rp = makeMe.aReviewPointFor(note).by(currentUser).please();
 
       ReviewQuestionInstance reviewQuestionInstance = controller.generateRandomQuestion(rp);
 
@@ -313,7 +313,7 @@ class RestReviewQuestionInstanceControllerTests {
     void shouldIncludeFileSearchInTools() {
       Note note = makeMe.aNote().details("description long enough.").rememberSpelling().please();
       makeMe.aNote().under(note).please();
-      ReviewPoint rp = makeMe.aReviewPointFor(note).by(currentUser).please();
+      MemoryTracker rp = makeMe.aReviewPointFor(note).by(currentUser).please();
       MCQWithAnswer jsonQuestion =
           makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
 
