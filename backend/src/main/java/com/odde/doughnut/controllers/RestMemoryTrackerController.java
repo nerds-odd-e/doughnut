@@ -86,7 +86,7 @@ class RestMemoryTrackerController {
   }
 
   @GetMapping("/recently-reviewed")
-  public List<MemoryTracker> getRecentlyReviewedPoints() {
+  public List<MemoryTracker> getRecentlyReviewed() {
     currentUser.assertLoggedIn();
     return modelFactoryService.memoryTrackerRepository.findLast100ReviewedByUser(
         currentUser.getEntity().getId());

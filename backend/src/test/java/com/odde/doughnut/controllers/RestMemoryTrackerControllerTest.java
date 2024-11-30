@@ -185,10 +185,10 @@ class RestMemoryTrackerControllerTest {
   }
 
   @Nested
-  class GetRecentlyReviewedPoints {
+  class GetRecentlyReviewed {
     @Test
-    void shouldReturnEmptyListWhenNoReviewedPoints() {
-      List<MemoryTracker> memoryTrackers = controller.getRecentlyReviewedPoints();
+    void shouldReturnEmptyListWhenNoReviewed() {
+      List<MemoryTracker> memoryTrackers = controller.getRecentlyReviewed();
       assertThat(memoryTrackers, empty());
     }
 
@@ -201,7 +201,7 @@ class RestMemoryTrackerControllerTest {
       controller.markAsRepeated(rp1, true);
       controller.markAsRepeated(rp2, true);
 
-      List<MemoryTracker> memoryTrackers = controller.getRecentlyReviewedPoints();
+      List<MemoryTracker> memoryTrackers = controller.getRecentlyReviewed();
 
       assertThat(memoryTrackers, hasSize(2));
       assertThat(memoryTrackers, containsInAnyOrder(rp1, rp2));
@@ -212,7 +212,7 @@ class RestMemoryTrackerControllerTest {
       userModel = makeMe.aNullUserModelPlease();
       controller =
           new RestMemoryTrackerController(modelFactoryService, userModel, testabilitySettings);
-      assertThrows(ResponseStatusException.class, () -> controller.getRecentlyReviewedPoints());
+      assertThrows(ResponseStatusException.class, () -> controller.getRecentlyReviewed());
     }
   }
 }
