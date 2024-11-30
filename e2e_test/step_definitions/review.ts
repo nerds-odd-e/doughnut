@@ -168,7 +168,7 @@ Then('I should see that my last answer is correct', () => {
 })
 
 Then(
-  'I should see the review point info of note {string}',
+  'I should see the memory tracker info of note {string}',
   (noteTopic: string, data: DataTable) => {
     start
       .assumeAnsweredQuestionPage()
@@ -177,7 +177,7 @@ Then(
   }
 )
 
-Then('choose to remove the last review point from reviews', () => {
+Then('choose to remove the last memory tracker from reviews', () => {
   start
     .assumeAnsweredQuestionPage()
     .goToLastResult()

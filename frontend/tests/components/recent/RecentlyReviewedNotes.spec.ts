@@ -44,7 +44,7 @@ describe("RecentlyReviewedNotes", () => {
     const headers = wrapper.findAll("thead th")
     expect(headers).toHaveLength(6)
 
-    // Verify removed review point has correct styling
+    // Verify removed memory tracker has correct styling
     const removedRow = rows[1]
     expect(removedRow?.classes()).toContain("removed")
   })

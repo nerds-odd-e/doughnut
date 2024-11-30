@@ -58,7 +58,7 @@ class RestReviewPointController {
       @RequestBody SelfEvaluation selfEvaluation) {
     currentUser.assertLoggedIn();
     if (memoryTracker == null || memoryTracker.getId() == null) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The review point does not exist.");
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The memory tracker does not exist.");
     }
     modelFactoryService
         .toReviewPointModel(memoryTracker)

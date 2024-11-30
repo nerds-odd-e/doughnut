@@ -333,7 +333,7 @@ export const assumeNotePage = (noteTopic?: string) => {
             name: 'remove this note from review',
           }).click()
           cy.findByRole('button', { name: 'OK' }).click()
-          cy.findByText('This review point has been removed from reviewing.')
+          cy.findByText('This memory tracker has been removed from reviewing.')
         },
       }
     },

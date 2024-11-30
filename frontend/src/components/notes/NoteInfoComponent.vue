@@ -5,7 +5,7 @@
     @level-changed="$emit('levelChanged', $event)"
   />
   <template v-if="reviewPoint">
-    <h6>Review Point</h6>
+    <h6>Memory Tracker</h6>
     <NoteInfoReviewPoint
       v-model="reviewPoint"
       @update:model-value="onSelfEvaluated($event)"

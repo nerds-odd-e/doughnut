@@ -109,7 +109,7 @@ describe("repeat page", () => {
       expect(mockedRandomQuestionCall).toHaveBeenCalledWith(secondReviewPointId)
     })
 
-    it("should move current review point to end when requested", async () => {
+    it("should move current memory tracker to end when requested", async () => {
       const wrapper = await mountPage()
 
       // Initial order should be [123, 456, 3]

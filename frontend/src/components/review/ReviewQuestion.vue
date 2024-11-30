@@ -38,7 +38,7 @@ const submitAnswer = async (answerData: AnswerDTO) => {
     emits("answered", answerResult)
   } catch (_e) {
     await popups.alert(
-      "This review point doesn't exist any more or is being skipped now. Moving on to the next review point..."
+      "This memory tracker doesn't exist any more or is being skipped now. Moving on to the next memory tracker..."
     )
   }
 }

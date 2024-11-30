@@ -35,7 +35,7 @@ describe("RecentlyLearnedNotes", () => {
     const rows = wrapper.findAll("tbody tr")
     expect(rows).toHaveLength(2)
 
-    // Verify removed review point has correct styling
+    // Verify removed memory tracker has correct styling
     const removedRow = rows[1]
     expect(removedRow?.classes()).toContain("removed")
   })
