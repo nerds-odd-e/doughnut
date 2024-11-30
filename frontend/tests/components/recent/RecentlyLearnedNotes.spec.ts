@@ -20,7 +20,7 @@ describe("RecentlyLearnedNotes", () => {
       vitest.fn().mockResolvedValue(mockMemoryTrackers)
   })
 
-  it("fetches and displays recent review points", async () => {
+  it("fetches and displays recent memory trackers", async () => {
     const wrapper = helper.component(RecentlyLearnedNotes).withRouter().mount()
 
     await flushPromises()
@@ -30,7 +30,7 @@ describe("RecentlyLearnedNotes", () => {
       helper.managedApi.restMemoryTrackerController.getRecentMemoryTrackers
     ).toBeCalled()
 
-    // Verify review points are displayed
+    // Verify memory trackers are displayed
     const rows = wrapper.findAll("tbody tr")
     expect(rows).toHaveLength(2)
 

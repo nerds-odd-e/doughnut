@@ -46,7 +46,7 @@
             <h2>You have reviewed all the old notes for today.</h2>
             <p>You can still review more more.</p>
             <i
-              >This will take some review points from the future for you If you
+              >This will take some memory trackers from the future for you If you
               forsee that you will be busy in the next week or two, you two, you
               can do more repetition now.
             </i>

@@ -39,7 +39,7 @@ describe("repetition page", () => {
         .currentRoute({ name: "repeat" })
         .mount()
       await flushPromises()
-      wrapper.find(".review-point-abbr").trigger("click")
+      wrapper.find(".memory-tracker-abbr").trigger("click")
       await flushPromises()
       expect(mockedShowAnswerCall).toHaveBeenCalledWith(REVIEW_QUESTION_ID)
     })
@@ -51,7 +51,7 @@ describe("repetition page", () => {
         .currentRoute({ name: "repeat-noteShow", params: { noteId: 123 } })
         .mount()
       await flushPromises()
-      wrapper.find(".review-point-abbr").trigger("click")
+      wrapper.find(".memory-tracker-abbr").trigger("click")
     })
 
     describe("conversation button", () => {

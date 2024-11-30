@@ -37,7 +37,7 @@ describe("RecentlyReviewedNotes", () => {
       helper.managedApi.restMemoryTrackerController.getRecentlyReviewed
     ).toBeCalled()
 
-    // Verify review points are displayed
+    // Verify memory trackers are displayed
     const rows = wrapper.findAll("tbody tr")
     expect(rows).toHaveLength(2)
 

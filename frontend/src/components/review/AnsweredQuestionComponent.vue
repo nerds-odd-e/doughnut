@@ -2,7 +2,7 @@
   <div v-if="note">
     <div
       v-if="!toggleMemoryTracker"
-      class="review-point-abbr"
+      class="memory-tracker-abbr"
       @click="toggleMemoryTracker = true"
     >
       <label class="me-1"><strong>Note reviewed: </strong></label>
@@ -48,7 +48,7 @@ const note = answeredQuestion?.note
 </script>
 
 <style lang="sass" scoped>
-.review-point-abbr
+.memory-tracker-abbr
   border: 1px solid #ccc
   width: 100%
   border-radius: 5px
