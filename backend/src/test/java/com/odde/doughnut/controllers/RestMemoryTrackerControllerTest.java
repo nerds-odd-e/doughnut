@@ -193,7 +193,7 @@ class RestMemoryTrackerControllerTest {
     }
 
     @Test
-    void shouldReturnRecentlyReviewedPointsForCurrentUser() {
+    void shouldReturnRecentlyReviewedForCurrentUser() {
       MemoryTracker rp1 = makeMe.aMemoryTrackerFor(makeMe.aNote().please()).by(userModel).please();
       MemoryTracker rp2 = makeMe.aMemoryTrackerFor(makeMe.aNote().please()).by(userModel).please();
 

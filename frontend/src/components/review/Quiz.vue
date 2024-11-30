@@ -5,7 +5,7 @@
       <div v-if="!currentReviewQuestion">
         <JustReview
           v-bind="{
-            reviewPointId: currentMemoryTrackerId,
+            memoryTrackerId: currentMemoryTrackerId,
             storageAccessor,
           }"
           @reviewed="onAnswered($event)"
@@ -90,19 +90,19 @@ const useQuestionFetching = (props: QuizProps) => {
       index < props.currentIndex + props.eagerFetchCount;
       index++
     ) {
-      const reviewPointId = reviewPointIdAt(index)
-      if (reviewPointId === undefined) break
+      const memoryTrackerId = memoryTrackerIdAt(index)
+      if (memoryTrackerId === undefined) break
 
-      if (reviewPointId in reviewQuestionCache.value) continue
+      if (memoryTrackerId in reviewQuestionCache.value) continue
 
       try {
         const question =
           await managedApi.silent.restReviewQuestionController.generateRandomQuestion(
-            reviewPointId
+            memoryTrackerId
           )
-        reviewQuestionCache.value[reviewPointId] = question
+        reviewQuestionCache.value[memoryTrackerId] = question
       } catch (e) {
-        reviewQuestionCache.value[reviewPointId] = undefined
+        reviewQuestionCache.value[memoryTrackerId] = undefined
       }
     }
   }
@@ -128,23 +128,24 @@ const { reviewQuestionCache, fetchQuestion } = useQuestionFetching(props)
 
 // Computed properties with better naming
 const currentMemoryTrackerId = computed(() =>
-  reviewPointIdAt(props.currentIndex)
+  memoryTrackerIdAt(props.currentIndex)
 )
 const currentQuestionFetched = computed(() => {
-  const reviewPointId = currentMemoryTrackerId.value
+  const memoryTrackerId = currentMemoryTrackerId.value
   return (
-    reviewPointId !== undefined && reviewPointId in reviewQuestionCache.value
+    memoryTrackerId !== undefined &&
+    memoryTrackerId in reviewQuestionCache.value
   )
 })
 const currentReviewQuestion = computed(() => {
-  const reviewPointId = currentMemoryTrackerId.value
-  return reviewPointId !== undefined
-    ? reviewQuestionCache.value[reviewPointId]
+  const memoryTrackerId = currentMemoryTrackerId.value
+  return memoryTrackerId !== undefined
+    ? reviewQuestionCache.value[memoryTrackerId]
     : undefined
 })
 
 // Methods
-const reviewPointIdAt = (index: number): number | undefined => {
+const memoryTrackerIdAt = (index: number): number | undefined => {
   if (props.memoryTrackers && index < props.memoryTrackers.length) {
     return props.memoryTrackers[index]
   }

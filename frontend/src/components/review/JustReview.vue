@@ -1,14 +1,14 @@
 <template>
   <MemoryTrackerAsync
-    v-if="reviewPointId"
+    v-if="memoryTrackerId"
     v-bind="{
-      reviewPointId,
+      memoryTrackerId,
       storageAccessor,
     }"
   />
   <SelfEvaluateButtons
     @self-evaluated-memory-state="justReivew($event)"
-    :key="reviewPointId"
+    :key="memoryTrackerId"
   />
 </template>
 
@@ -25,7 +25,7 @@ export default defineComponent({
     return { ...useLoadingApi() }
   },
   props: {
-    reviewPointId: Number,
+    memoryTrackerId: Number,
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
       required: true,
@@ -38,11 +38,11 @@ export default defineComponent({
   emits: ["reviewed"],
   methods: {
     async justReivew(successful: boolean) {
-      if (this.reviewPointId === undefined) {
+      if (this.memoryTrackerId === undefined) {
         return
       }
       await this.managedApi.restMemoryTrackerController.markAsRepeated(
-        this.reviewPointId,
+        this.memoryTrackerId,
         successful
       )
       this.$emit("reviewed")

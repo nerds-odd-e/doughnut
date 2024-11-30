@@ -19,7 +19,7 @@ export default defineComponent({
     return useLoadingApi()
   },
   props: {
-    reviewPointId: { type: Number, required: true },
+    memoryTrackerId: { type: Number, required: true },
     storageAccessor: {
       type: Object as PropType<StorageAccessor>,
       required: true,
@@ -38,12 +38,12 @@ export default defineComponent({
     async fetchData() {
       this.memoryTracker =
         await this.managedApi.restMemoryTrackerController.show1(
-          this.reviewPointId
+          this.memoryTrackerId
         )
     },
   },
   watch: {
-    reviewPointId() {
+    memoryTrackerId() {
       this.fetchData()
     },
   },

@@ -2,17 +2,17 @@ import type { DueMemoryTrackers } from "@/generated/backend"
 import Builder from "./Builder"
 
 class DueMemoryTrackersBuilder extends Builder<DueMemoryTrackers> {
-  reviewPointIdstoRepeat: number[] = []
+  memoryTrackerIdstoRepeat: number[] = []
 
-  toRepeat(reviewPointIds: number[]) {
-    this.reviewPointIdstoRepeat = reviewPointIds
+  toRepeat(memoryTrackerIds: number[]) {
+    this.memoryTrackerIdstoRepeat = memoryTrackerIds
     return this
   }
 
   // eslint-disable-next-line class-methods-use-this
   do(): DueMemoryTrackers {
     return {
-      toRepeat: this.reviewPointIdstoRepeat,
+      toRepeat: this.memoryTrackerIdstoRepeat,
       dueInDays: 0,
     }
   }
