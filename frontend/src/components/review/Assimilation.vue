@@ -10,7 +10,7 @@
     />
     <AssimilationButtons
       :key="buttonKey"
-      @do-onboarding="processForm"
+      @assimilate="processForm"
     />
   </ContainerPage>
 </template>
