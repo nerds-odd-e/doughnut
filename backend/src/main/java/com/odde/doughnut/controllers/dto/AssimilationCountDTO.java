@@ -7,5 +7,6 @@ import lombok.Data;
 @AllArgsConstructor
 public class AssimilationCountDTO {
   private int dueCount;
-  private int totalRemainingCount;
+  private int assimilatedCountOfTheDay;
+  private int totalUnassimilatedCount;
 }

@@ -48,8 +48,7 @@ class RestRecallsController {
     ReviewStatus reviewStatus = new ReviewStatus();
     reviewStatus.toRepeatCount = recallService.getToRecallCount();
     reviewStatus.learntCount = assimilationService.learntCount();
-    reviewStatus.notLearntCount = assimilationService.notLearntCount();
-    reviewStatus.toInitialReviewCount = assimilationService.toInitialReviewCount();
+    reviewStatus.notLearntCount = assimilationService.unassimilatedCount();
 
     return reviewStatus;
   }

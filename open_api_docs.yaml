@@ -4056,7 +4056,6 @@ components:
       required:
       - learntCount
       - notLearntCount
-      - toInitialReviewCount
       - toRepeatCount
       type: object
       properties:
@@ -4067,9 +4066,6 @@ components:
           type: integer
           format: int32
         notLearntCount:
-          type: integer
-          format: int32
-        toInitialReviewCount:
           type: integer
           format: int32
     NoteInfo:
@@ -4184,7 +4180,10 @@ components:
         dueCount:
           type: integer
           format: int32
-        totalRemainingCount:
+        assimilatedCountOfTheDay:
+          type: integer
+          format: int32
+        totalUnassimilatedCount:
           type: integer
           format: int32
     Annotation:

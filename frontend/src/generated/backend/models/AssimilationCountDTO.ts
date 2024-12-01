@@ -4,6 +4,7 @@
 /* eslint-disable */
 export type AssimilationCountDTO = {
     dueCount?: number;
-    totalRemainingCount?: number;
+    assimilatedCountOfTheDay?: number;
+    totalUnassimilatedCount?: number;
 };
 

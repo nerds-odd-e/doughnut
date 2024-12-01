@@ -6,6 +6,5 @@ export type ReviewStatus = {
     toRepeatCount: number;
     learntCount: number;
     notLearntCount: number;
-    toInitialReviewCount: number;
 };
 
