@@ -138,6 +138,6 @@ public class RecallServiceWithSpacedRepetitionAlgorithmTest {
 
   private Timestamp daysAfterBase(MemoryTracker memoryTracker, Integer reviewDay) {
     return TimestampOperations.addHoursToTimestamp(
-        memoryTracker.getLastReviewedAt(), reviewDay * 24);
+        memoryTracker.getLastRecalledAt(), reviewDay * 24);
   }
 }

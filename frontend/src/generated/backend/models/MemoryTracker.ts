@@ -6,7 +6,7 @@ import type { Note } from './Note';
 export type MemoryTracker = {
     id: number;
     note: Note;
-    lastReviewedAt?: string;
+    lastRecalledAt?: string;
     nextReviewAt: string;
     initialReviewedAt?: string;
     repetitionCount?: number;

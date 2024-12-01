@@ -46,7 +46,7 @@ class RestMemoryTrackerController {
   public MemoryTracker removeFromRepeating(
       @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker) {
     memoryTracker.setRemovedFromTracking(true);
-    memoryTracker.setLastReviewedAt(testabilitySettings.getCurrentUTCTimestamp());
+    memoryTracker.setLastRecalledAt(testabilitySettings.getCurrentUTCTimestamp());
     modelFactoryService.save(memoryTracker);
     return memoryTracker;
   }

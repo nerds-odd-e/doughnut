@@ -10,7 +10,7 @@ class MemoryTrackerBuilder extends Builder<MemoryTracker> {
     super()
     this.data = {
       id: generateId(),
-      lastReviewedAt: "",
+      lastRecalledAt: "",
       nextReviewAt: "",
       initialReviewedAt: "",
       repetitionCount: 0,

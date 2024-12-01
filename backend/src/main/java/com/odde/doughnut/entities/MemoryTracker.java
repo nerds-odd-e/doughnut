@@ -45,7 +45,7 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   @Column(name = "last_recalled_at")
   @Getter
   @Setter
-  private Timestamp lastReviewedAt;
+  private Timestamp lastRecalledAt;
 
   @Column(name = "next_recall_at")
   @Getter
@@ -82,7 +82,7 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
 
   public Timestamp calculateNextReviewAt() {
     return TimestampOperations.addHoursToTimestamp(
-        getLastReviewedAt(), forgettingCurve().getRepeatInHours());
+        getLastRecalledAt(), forgettingCurve().getRepeatInHours());
   }
 
   private ForgettingCurve forgettingCurve() {
@@ -100,7 +100,7 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
 
     setForgettingCurveIndex(forgettingCurve().succeeded(delayInHours));
 
-    setLastReviewedAt(currentUTCTimestamp);
+    setLastRecalledAt(currentUTCTimestamp);
     setNextReviewAt(calculateNextReviewAt());
   }
 }

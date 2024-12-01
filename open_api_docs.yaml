@@ -3459,7 +3459,7 @@ components:
           format: int32
         note:
           $ref: "#/components/schemas/Note"
-        lastReviewedAt:
+        lastRecalledAt:
           type: string
           format: date-time
         nextReviewAt:

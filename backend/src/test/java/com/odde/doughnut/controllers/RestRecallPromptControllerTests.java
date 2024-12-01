@@ -102,7 +102,7 @@ class RestRecallPromptControllerTests {
 
     @Test
     void shouldNoteIncreaseIndexIfRepeatImmediately() {
-      testabilitySettings.timeTravelTo(memoryTracker.getLastReviewedAt());
+      testabilitySettings.timeTravelTo(memoryTracker.getLastRecalledAt());
       Integer oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
       controller.answerQuiz(recallPrompt, answerDTO);
       assertThat(memoryTracker.getForgettingCurveIndex(), equalTo(oldForgettingCurveIndex));
@@ -115,7 +115,7 @@ class RestRecallPromptControllerTests {
       controller.answerQuiz(recallPrompt, answerDTO);
       assertThat(memoryTracker.getForgettingCurveIndex(), greaterThan(oldForgettingCurveIndex));
       assertThat(
-          memoryTracker.getLastReviewedAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
+          memoryTracker.getLastRecalledAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
     }
 
     @Test
@@ -145,13 +145,13 @@ class RestRecallPromptControllerTests {
       }
 
       @Test
-      void shouldNotChangeTheLastReviewedAtTime() {
+      void shouldNotChangeTheLastRecalledAtTime() {
         testabilitySettings.timeTravelTo(memoryTracker.getNextReviewAt());
-        Timestamp lastReviewedAt = memoryTracker.getLastReviewedAt();
+        Timestamp lastRecalledAt = memoryTracker.getLastRecalledAt();
         Integer oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
         controller.answerQuiz(recallPrompt, answerDTO);
         assertThat(memoryTracker.getForgettingCurveIndex(), lessThan(oldForgettingCurveIndex));
-        assertThat(memoryTracker.getLastReviewedAt(), equalTo(lastReviewedAt));
+        assertThat(memoryTracker.getLastRecalledAt(), equalTo(lastRecalledAt));
       }
 
       @Test
