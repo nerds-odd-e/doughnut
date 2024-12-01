@@ -1,6 +1,6 @@
 @usingMockedOpenAiService
 Feature: Question generation by AI
-  As a learner, I want to use AI to generate review questions based on my note and its context.
+  As a learner, I want to use AI to generate questions based on my note and its context.
   So that I can remember my note better and potentially get new inspiration.
 
   Background:

@@ -157,7 +157,7 @@ describe("ConversationInner", () => {
     })
   })
 
-  describe("Default review questions", () => {
+  describe("Default questions", () => {
     it("shows default messages for review conversations with no messages", async () => {
       const reviewConversation = {
         ...conversation,

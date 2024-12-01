@@ -61,7 +61,7 @@ export class RestConversationMessageControllerService {
     ): CancelablePromise<Conversation> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/conversation/review-question/{recallPrompt}',
+            url: '/api/conversation/recall-prompt/{recallPrompt}',
             path: {
                 'recallPrompt': recallPrompt,
             },

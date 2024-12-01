@@ -1503,7 +1503,7 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/SseEmitter"
-  /api/conversation/review-question/{recallPrompt}:
+  /api/conversation/recall-prompt/{recallPrompt}:
     post:
       tags:
       - rest-conversation-message-controller

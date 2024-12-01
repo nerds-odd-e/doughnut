@@ -105,7 +105,7 @@ public class RestConversationMessageController {
       }
       if (note == null) {
         throw new RuntimeException(
-            "Only note or review question related conversation can have AI reply");
+            "Only note or recall prompt related conversation can have AI reply");
       }
       return notebookAssistantForNoteServiceFactory
           .createChatAboutNoteService(note)
@@ -135,7 +135,7 @@ public class RestConversationMessageController {
     return conversationService.getConversationsAboutNote(note, currentUser.getEntity());
   }
 
-  @PostMapping("/review-question/{recallPrompt}")
+  @PostMapping("/recall-prompt/{recallPrompt}")
   public Conversation startConversationAboutRecallPrompt(
       @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt) {
     return conversationService.startConversationAboutRecallPrompt(
