@@ -34,9 +34,9 @@ class MemoryTrackerOnboardingController {
     this.testabilitySettings = testabilitySettings;
   }
 
-  @GetMapping("/initial")
+  @GetMapping("/onboarding")
   @Transactional(readOnly = true)
-  public List<Note> initialReview(@RequestParam(value = "timezone") String timezone) {
+  public List<Note> onboarding(@RequestParam(value = "timezone") String timezone) {
     currentUser.assertLoggedIn();
     ZoneId timeZone = ZoneId.of(timezone);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
@@ -48,7 +48,7 @@ class MemoryTrackerOnboardingController {
 
   @PostMapping(path = "")
   @Transactional
-  public MemoryTracker create(@RequestBody InitialInfo initialInfo) {
+  public MemoryTracker onboard(@RequestBody InitialInfo initialInfo) {
     currentUser.assertLoggedIn();
     MemoryTracker memoryTracker =
         MemoryTracker.buildMemoryTrackerForNote(

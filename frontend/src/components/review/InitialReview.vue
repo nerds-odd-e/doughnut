@@ -58,7 +58,7 @@ const processForm = async (skipMemoryTracking: boolean) => {
   }
 
   managedApi.memoryTrackerOnboardingController
-    .create({
+    .onboard({
       noteId: note.id,
       skipMemoryTracking,
     })

@@ -1261,7 +1261,7 @@ paths:
     post:
       tags:
       - memory-tracker-onboarding-controller
-      operationId: create
+      operationId: onboard
       requestBody:
         content:
           application/json:
@@ -2786,11 +2786,11 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/MemoryTracker"
-  /api/memory-tracker-onboarding/initial:
+  /api/memory-tracker-onboarding/onboarding:
     get:
       tags:
       - memory-tracker-onboarding-controller
-      operationId: initialReview
+      operationId: onboarding
       parameters:
       - name: timezone
         in: query

@@ -63,7 +63,7 @@ const initialReviewDone = () => {
 
 const loadInitialReview = () => {
   managedApi.memoryTrackerOnboardingController
-    .initialReview(timezoneParam())
+    .onboarding(timezoneParam())
     .then((resp) => {
       if (resp.length === 0) {
         router.push({ name: "recalls" })

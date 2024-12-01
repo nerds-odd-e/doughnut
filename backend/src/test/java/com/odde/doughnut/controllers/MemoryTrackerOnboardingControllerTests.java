@@ -51,14 +51,14 @@ class MemoryTrackerOnboardingControllerTests {
     void initialReview() {
       Note n = makeMe.aNote().creatorAndOwner(currentUser).please();
       assertThat(n.getId(), notNullValue());
-      List<Note> memoryTrackerWithRecallSettings = controller.initialReview("Asia/Shanghai");
+      List<Note> memoryTrackerWithRecallSettings = controller.onboarding("Asia/Shanghai");
       assertThat(memoryTrackerWithRecallSettings, hasSize(1));
     }
 
     @Test
     void notLoggedIn() {
       assertThrows(
-          ResponseStatusException.class, () -> nullUserController().initialReview("Asia/Shanghai"));
+          ResponseStatusException.class, () -> nullUserController().onboarding("Asia/Shanghai"));
     }
   }
 
@@ -67,7 +67,7 @@ class MemoryTrackerOnboardingControllerTests {
     @Test
     void create() {
       InitialInfo info = new InitialInfo();
-      assertThrows(ResponseStatusException.class, () -> nullUserController().create(info));
+      assertThrows(ResponseStatusException.class, () -> nullUserController().onboard(info));
     }
   }
 }

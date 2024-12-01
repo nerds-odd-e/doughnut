@@ -14,7 +14,7 @@ export class MemoryTrackerOnboardingControllerService {
      * @returns MemoryTracker OK
      * @throws ApiError
      */
-    public create(
+    public onboard(
         requestBody: InitialInfo,
     ): CancelablePromise<MemoryTracker> {
         return this.httpRequest.request({
@@ -32,12 +32,12 @@ export class MemoryTrackerOnboardingControllerService {
      * @returns Note OK
      * @throws ApiError
      */
-    public initialReview(
+    public onboarding(
         timezone: string,
     ): CancelablePromise<Array<Note>> {
         return this.httpRequest.request({
             method: 'GET',
-            url: '/api/memory-tracker-onboarding/initial',
+            url: '/api/memory-tracker-onboarding/onboarding',
             query: {
                 'timezone': timezone,
             },
