@@ -52,7 +52,7 @@ public class UserModel implements ReviewScope {
   }
 
   public List<MemoryTracker> getRecentMemoryTrackers(Timestamp since) {
-    return modelFactoryService.memoryTrackerRepository.findAllByUserAndOnboardedAtGreaterThan(
+    return modelFactoryService.memoryTrackerRepository.findAllByUserAndAssimilatedAtGreaterThan(
         entity, since);
   }
 

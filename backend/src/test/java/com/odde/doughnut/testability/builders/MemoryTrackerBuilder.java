@@ -24,7 +24,7 @@ public class MemoryTrackerBuilder extends EntityBuilder<MemoryTracker> {
   }
 
   public MemoryTrackerBuilder initiallyReviewedOn(Timestamp reviewTimestamp) {
-    entity.setOnboardedAt(reviewTimestamp);
+    entity.setAssimilatedAt(reviewTimestamp);
     entity.setLastRecalledAt(reviewTimestamp);
     entity.setNextRecallAt(reviewTimestamp);
     return this;

@@ -11,9 +11,9 @@ public record MemoryTrackerModel(MemoryTracker entity, ModelFactoryService model
     return entity;
   }
 
-  public void onboard(Timestamp currentUTCTimestamp, User user) {
+  public void assimilate(Timestamp currentUTCTimestamp, User user) {
     entity.setUser(user);
-    entity.setOnboardedAt(currentUTCTimestamp);
+    entity.setAssimilatedAt(currentUTCTimestamp);
     entity.setLastRecalledAt(currentUTCTimestamp);
     updateForgettingCurve(0);
   }

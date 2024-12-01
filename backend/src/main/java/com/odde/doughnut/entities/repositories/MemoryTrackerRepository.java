@@ -10,7 +10,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 public interface MemoryTrackerRepository extends CrudRepository<MemoryTracker, Integer> {
-  List<MemoryTracker> findAllByUserAndOnboardedAtGreaterThan(User user, Timestamp since);
+  List<MemoryTracker> findAllByUserAndAssimilatedAtGreaterThan(User user, Timestamp since);
 
   @Query(value = "SELECT count(*) " + byUserId, nativeQuery = true)
   int countByUserNotRemoved(Integer userId);
@@ -32,7 +32,7 @@ public interface MemoryTrackerRepository extends CrudRepository<MemoryTracker, I
           "SELECT * "
               + " FROM memory_tracker rp "
               + " WHERE rp.user_id = :userId "
-              + " ORDER BY onboarded_at DESC LIMIT 100",
+              + " ORDER BY assimilated_at DESC LIMIT 100",
       nativeQuery = true)
   List<MemoryTracker> findLast100ByUser(Integer userId);
 

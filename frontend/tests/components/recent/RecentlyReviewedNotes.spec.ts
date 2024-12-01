@@ -6,14 +6,14 @@ import makeMe from "@tests/fixtures/makeMe"
 describe("RecentlyReviewedNotes", () => {
   const mockMemoryTrackers = [
     makeMe.aMemoryTracker
-      .onboardedAt("2024-01-01T00:00:00Z")
+      .assimilatedAt("2024-01-01T00:00:00Z")
       .nextRecallAt("2024-01-08T00:00:00Z")
       .repetitionCount(3)
       .forgettingCurveIndex(2)
       .removedFromTracking(false)
       .please(),
     makeMe.aMemoryTracker
-      .onboardedAt("2024-01-02T00:00:00Z")
+      .assimilatedAt("2024-01-02T00:00:00Z")
       .nextRecallAt("2024-01-09T00:00:00Z")
       .repetitionCount(1)
       .forgettingCurveIndex(1)

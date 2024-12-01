@@ -3671,7 +3671,7 @@ components:
         nextRecallAt:
           type: string
           format: date-time
-        onboardedAt:
+        assimilatedAt:
           type: string
           format: date-time
         repetitionCount:

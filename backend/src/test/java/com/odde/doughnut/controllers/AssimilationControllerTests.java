@@ -44,9 +44,9 @@ class AssimilationControllerTests {
   }
 
   @Nested
-  class Onboarding {
+  class Assimilating {
     @Test
-    void onboarding() {
+    void assimilating() {
       Note n = makeMe.aNote().creatorAndOwner(currentUser).please();
       assertThat(n.getId(), notNullValue());
       List<Note> memoryTrackerWithRecallSettings = controller.assimilating("Asia/Shanghai");

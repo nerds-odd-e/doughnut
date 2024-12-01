@@ -19,7 +19,7 @@
           <td>
             <NoteTopicWithLink :noteTopic="point.note.noteTopic" />
           </td>
-          <td>{{ new Date(point.onboardedAt!).toLocaleString() }}</td>
+          <td>{{ new Date(point.assimilatedAt!).toLocaleString() }}</td>
           <td>{{ new Date(point.nextRecallAt!).toLocaleString() }}</td>
           <td>{{ point.repetitionCount }}</td>
           <td>{{ point.forgettingCurveIndex }}</td>

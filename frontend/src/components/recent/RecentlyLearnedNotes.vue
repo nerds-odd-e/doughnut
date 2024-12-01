@@ -16,7 +16,7 @@
           <td>
             <NoteTopicWithLink :noteTopic="point.note.noteTopic" />
           </td>
-          <td>{{ new Date(point.onboardedAt!).toLocaleString() }}</td>
+          <td>{{ new Date(point.assimilatedAt!).toLocaleString() }}</td>
           <td>{{ point.removedFromTracking ? 'Removed' : 'Active' }}</td>
         </tr>
       </tbody>

@@ -57,7 +57,7 @@ class AssimilationController {
     memoryTracker.setRemovedFromTracking(initialInfo.skipMemoryTracking);
 
     MemoryTrackerModel memoryTrackerModel = modelFactoryService.toMemoryTrackerModel(memoryTracker);
-    memoryTrackerModel.onboard(
+    memoryTrackerModel.assimilate(
         testabilitySettings.getCurrentUTCTimestamp(), currentUser.getEntity());
     return memoryTrackerModel.getEntity();
   }
