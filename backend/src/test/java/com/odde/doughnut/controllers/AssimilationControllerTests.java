@@ -70,9 +70,9 @@ class AssimilationControllerTests {
   }
 
   @Nested
-  class GetOnboardingCount {
+  class GetAssimilationCount {
     @Test
-    void shouldReturnOnboardingCountsForLoggedInUser() {
+    void shouldReturnAssimilationCountsForLoggedInUser() {
       // Create a note that needs onboarding
       Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
       assertThat(note.getId(), notNullValue());

@@ -29,10 +29,10 @@ public class MemoryTrackerModelTest {
   }
 
   @Nested
-  class Onboarding {
+  class Assimilating {
 
     @Test
-    void onboardingShouldSetBothInitialAndLastReviewAt() {
+    void assimilatingShouldSetBothInitialAndLastReviewAt() {
       Note note = makeMe.aNote().creatorAndOwner(userModel).please();
       MemoryTrackerModel memoryTracker =
           makeMe.aMemoryTrackerFor(note).by(userModel).toModelPlease();

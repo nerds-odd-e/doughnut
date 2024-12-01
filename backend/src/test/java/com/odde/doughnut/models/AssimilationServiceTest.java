@@ -44,7 +44,7 @@ public class AssimilationServiceTest {
   void whenThereIsNoNotesForUser() {
     makeMe.aNote().creatorAndOwner(anotherUser).please();
     assertThat(getFirstInitialMemoryTracker(assimilationService), is(nullValue()));
-    assertThat(assimilationService.getOnboardingCounts().getDueCount(), equalTo(0));
+    assertThat(assimilationService.getCounts().getDueCount(), equalTo(0));
   }
 
   @Nested
@@ -60,10 +60,10 @@ public class AssimilationServiceTest {
 
     @Test
     void shouldReturnTheFirstNoteAndThenTheSecondWhenThereAreTwo() {
-      assertThat(assimilationService.getOnboardingCounts().getDueCount(), equalTo(2));
+      assertThat(assimilationService.getCounts().getDueCount(), equalTo(2));
       assertThat(getFirstInitialMemoryTracker(assimilationService), equalTo(note1));
       makeMe.aMemoryTrackerFor(note1).by(userModel).initiallyReviewedOn(day1).please();
-      assertThat(assimilationService.getOnboardingCounts().getDueCount(), equalTo(1));
+      assertThat(assimilationService.getCounts().getDueCount(), equalTo(1));
       assertThat(getFirstInitialMemoryTracker(assimilationService), equalTo(note2));
     }
 

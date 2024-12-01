@@ -97,7 +97,7 @@ public class AssimilationService {
     return Math.min(remainingDailyNewNotesCount(), notLearntCount());
   }
 
-  public AssimilationCountDTO getOnboardingCounts() {
+  public AssimilationCountDTO getCounts() {
     return new AssimilationCountDTO(toInitialReviewCount(), notLearntCount());
   }
 }
