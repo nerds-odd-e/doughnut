@@ -20,12 +20,28 @@ export const assimilation = () => {
       })
       return {
         expectToAssimilateAndTotal(toAssimilateAndTotal: string) {
-          const [assimlatedTodayCount, toAssimilateCountForToday] =
+          const [assimlatedTodayCount, toAssimilateCountForToday, totalCount] =
             toAssimilateAndTotal.split('/')
+
           cy.get('.progress-bar').should(
             'contain',
             `Assimilating: ${assimlatedTodayCount}/${toAssimilateCountForToday}`
           )
+          // Click progress bar to show tooltip
+          cy.get('.progress-bar').first().click()
+
+          // Check tooltip content
+          cy.get('.tooltip-content').within(() => {
+            cy.contains(
+              `Daily Progress: ${assimlatedTodayCount} / ${toAssimilateCountForToday}`
+            )
+            cy.contains(
+              `Total Progress: ${assimlatedTodayCount} / ${totalCount}`
+            )
+          })
+
+          // Close tooltip
+          cy.get('.tooltip-popup').click()
         },
       }
     },
