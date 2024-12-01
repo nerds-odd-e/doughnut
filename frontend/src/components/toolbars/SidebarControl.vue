@@ -9,7 +9,12 @@
         </li>
         <li role="button" class="list-item" :class="{ active: isActiveRoute(['notebooks', 'noteShow']) }" title="My Notebooks">
           <router-link :to="{ name: 'notebooks' }" class="d-flex flex-column align-items-center gap-1">
-            <SvgJournalText />
+            <div class="icon-container">
+              <SvgJournalText />
+              <div v-if="dueCount && dueCount > 0" class="due-count">
+                {{ dueCount }}
+              </div>
+            </div>
             <span class="menu-label">Notebooks</span>
           </router-link>
         </li>
@@ -113,8 +118,9 @@ import SvgChat from "@/components/svgs/SvgChat.vue"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import UserProfileDialog from "./UserProfileDialog.vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
+import { ref, watch } from "vue"
 
-defineProps({
+const { user } = defineProps({
   user: { type: Object as PropType<User> },
 })
 defineEmits(["updateUser"])
@@ -125,7 +131,24 @@ const isActiveRoute = (routeNames: string[]) => {
   return routeNames.includes(route.name as string)
 }
 
+const dueCount = ref<number | undefined>(undefined)
 const { managedApi } = useLoadingApi()
+
+const fetchDueCount = async () => {
+  const count =
+    await managedApi.memoryTrackerOnboardingController.getOnboardingCount("UTC")
+  dueCount.value = count.dueCount
+}
+
+watch(
+  () => user,
+  () => {
+    if (user) {
+      fetchDueCount()
+    }
+  },
+  { immediate: true }
+)
 
 const logout = async () => {
   await managedApi.logout()
@@ -248,5 +271,31 @@ a[href="https://odd-e.com"] {
   .menu-label {
     display: none;
   }
+}
+
+.icon-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+.due-count {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #66b0ff;
+  color: white;
+  border-radius: 50%;
+  min-width: 16px;
+  height: 16px;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  z-index: 1;
 }
 </style>
