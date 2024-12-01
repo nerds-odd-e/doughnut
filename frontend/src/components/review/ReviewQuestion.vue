@@ -1,10 +1,10 @@
 <template>
   <QuestionDisplay
     v-bind="{
-      bareQuestion: reviewQuestionInstance.bareQuestion,
+      bareQuestion: recallPrompt.bareQuestion,
     }"
     @answer="submitAnswer($event)"
-    :key="reviewQuestionInstance.id"
+    :key="recallPrompt.id"
    />
 </template>
 
@@ -19,7 +19,7 @@ const { managedApi } = useLoadingApi()
 const { popups } = usePopups()
 
 const props = defineProps({
-  reviewQuestionInstance: {
+  recallPrompt: {
     type: Object as PropType<RecallPrompt>,
     required: true,
   },
@@ -31,7 +31,7 @@ const submitAnswer = async (answerData: AnswerDTO) => {
   try {
     const answerResult =
       await managedApi.restReviewQuestionController.answerQuiz(
-        props.reviewQuestionInstance.id,
+        props.recallPrompt.id,
         answerData
       )
 

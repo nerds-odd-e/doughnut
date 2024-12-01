@@ -55,27 +55,27 @@ class RestReviewQuestionController {
         memoryTracker.getNote(), currentUser.getEntity());
   }
 
-  @PostMapping("/{reviewQuestionInstance}/regenerate")
+  @PostMapping("/{recallPrompt}/regenerate")
   @Transactional
   public RecallPrompt regenerate(
-      @PathVariable("reviewQuestionInstance") @Schema(type = "integer") RecallPrompt recallPrompt) {
+      @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt) {
     currentUser.assertLoggedIn();
     return recallQuestionService.generateAQuestionOfRandomType(
         recallPrompt.getPredefinedQuestion().getNote(), currentUser.getEntity());
   }
 
-  @PostMapping("/{reviewQuestionInstance}/contest")
+  @PostMapping("/{recallPrompt}/contest")
   @Transactional
   public ReviewQuestionContestResult contest(
-      @PathVariable("reviewQuestionInstance") @Schema(type = "integer") RecallPrompt recallPrompt) {
+      @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt) {
     currentUser.assertLoggedIn();
     return recallQuestionService.contest(recallPrompt);
   }
 
-  @PostMapping("/{reviewQuestionInstance}/answer")
+  @PostMapping("/{recallPrompt}/answer")
   @Transactional
   public AnsweredQuestion answerQuiz(
-      @PathVariable("reviewQuestionInstance") @Schema(type = "integer") RecallPrompt recallPrompt,
+      @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt,
       @Valid @RequestBody AnswerDTO answerDTO) {
     currentUser.assertLoggedIn();
 
@@ -86,10 +86,10 @@ class RestReviewQuestionController {
         testabilitySettings.getCurrentUTCTimestamp());
   }
 
-  @GetMapping(path = "/{reviewQuestionInstance}")
+  @GetMapping(path = "/{recallPrompt}")
   @Transactional
   public AnsweredQuestion showQuestion(
-      @PathVariable("reviewQuestionInstance") @Schema(type = "integer") RecallPrompt recallPrompt)
+      @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt)
       throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(recallPrompt);
     return recallPrompt.getAnsweredQuestion();

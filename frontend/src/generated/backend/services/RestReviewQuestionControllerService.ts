@@ -11,18 +11,18 @@ import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestReviewQuestionControllerService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
-     * @param reviewQuestionInstance
+     * @param recallPrompt
      * @returns RecallPrompt OK
      * @throws ApiError
      */
     public regenerate(
-        reviewQuestionInstance: number,
+        recallPrompt: number,
     ): CancelablePromise<RecallPrompt> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/review-questions/{reviewQuestionInstance}/regenerate',
+            url: '/api/review-questions/{recallPrompt}/regenerate',
             path: {
-                'reviewQuestionInstance': reviewQuestionInstance,
+                'recallPrompt': recallPrompt,
             },
             errors: {
                 500: `Internal Server Error`,
@@ -30,18 +30,18 @@ export class RestReviewQuestionControllerService {
         });
     }
     /**
-     * @param reviewQuestionInstance
+     * @param recallPrompt
      * @returns ReviewQuestionContestResult OK
      * @throws ApiError
      */
     public contest(
-        reviewQuestionInstance: number,
+        recallPrompt: number,
     ): CancelablePromise<ReviewQuestionContestResult> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/review-questions/{reviewQuestionInstance}/contest',
+            url: '/api/review-questions/{recallPrompt}/contest',
             path: {
-                'reviewQuestionInstance': reviewQuestionInstance,
+                'recallPrompt': recallPrompt,
             },
             errors: {
                 500: `Internal Server Error`,
@@ -49,20 +49,20 @@ export class RestReviewQuestionControllerService {
         });
     }
     /**
-     * @param reviewQuestionInstance
+     * @param recallPrompt
      * @param requestBody
      * @returns AnsweredQuestion OK
      * @throws ApiError
      */
     public answerQuiz(
-        reviewQuestionInstance: number,
+        recallPrompt: number,
         requestBody: AnswerDTO,
     ): CancelablePromise<AnsweredQuestion> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/review-questions/{reviewQuestionInstance}/answer',
+            url: '/api/review-questions/{recallPrompt}/answer',
             path: {
-                'reviewQuestionInstance': reviewQuestionInstance,
+                'recallPrompt': recallPrompt,
             },
             body: requestBody,
             mediaType: 'application/json',
@@ -91,18 +91,18 @@ export class RestReviewQuestionControllerService {
         });
     }
     /**
-     * @param reviewQuestionInstance
+     * @param recallPrompt
      * @returns AnsweredQuestion OK
      * @throws ApiError
      */
     public showQuestion(
-        reviewQuestionInstance: number,
+        recallPrompt: number,
     ): CancelablePromise<AnsweredQuestion> {
         return this.httpRequest.request({
             method: 'GET',
-            url: '/api/review-questions/{reviewQuestionInstance}',
+            url: '/api/review-questions/{recallPrompt}',
             path: {
-                'reviewQuestionInstance': reviewQuestionInstance,
+                'recallPrompt': recallPrompt,
             },
             errors: {
                 500: `Internal Server Error`,

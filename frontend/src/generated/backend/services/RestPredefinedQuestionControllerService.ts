@@ -10,18 +10,18 @@ import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestPredefinedQuestionControllerService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
-     * @param reviewQuestionInstance
+     * @param recallPrompt
      * @returns PredefinedQuestion OK
      * @throws ApiError
      */
     public toggleApproval(
-        reviewQuestionInstance: number,
+        recallPrompt: number,
     ): CancelablePromise<PredefinedQuestion> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/review-questions/{reviewQuestionInstance}/toggle-approval',
+            url: '/api/review-questions/{recallPrompt}/toggle-approval',
             path: {
-                'reviewQuestionInstance': reviewQuestionInstance,
+                'recallPrompt': recallPrompt,
             },
             errors: {
                 500: `Internal Server Error`,

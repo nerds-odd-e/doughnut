@@ -14,7 +14,7 @@
       <ContestableQuestion
         v-else
         v-bind="{
-          reviewQuestionInstance: currentReviewQuestion,
+          recallPrompt: currentReviewQuestion,
           storageAccessor,
         }"
         @answered="onAnswered($event)"

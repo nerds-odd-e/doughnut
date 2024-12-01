@@ -1,7 +1,7 @@
 <template>
   <ContestableQuestion
-    v-if="reviewQuestionInstance"
-    v-bind="{ reviewQuestionInstance, storageAccessor }"
+    v-if="recallPrompt"
+    v-bind="{ recallPrompt, storageAccessor }"
     @need-scroll="scrollToBottom"
   />
 
@@ -24,7 +24,7 @@ const { selectedNote, storageAccessor } = defineProps({
     required: true,
   },
 })
-const reviewQuestionInstance = ref<RecallPrompt | undefined>(undefined)
+const recallPrompt = ref<RecallPrompt | undefined>(undefined)
 const bottomOfTheChat = ref<HTMLElement | null>(null)
 
 const scrollToBottom = () => {
@@ -34,7 +34,7 @@ const scrollToBottom = () => {
 }
 
 const generateQuestion = async () => {
-  reviewQuestionInstance.value =
+  recallPrompt.value =
     await managedApi.restReviewQuestionController.generateQuestion(
       selectedNote.id
     )

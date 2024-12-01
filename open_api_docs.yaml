@@ -573,13 +573,13 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/MemoryTracker"
-  /api/review-questions/{reviewQuestionInstance}/toggle-approval:
+  /api/review-questions/{recallPrompt}/toggle-approval:
     post:
       tags:
       - rest-predefined-question-controller
       operationId: toggleApproval
       parameters:
-      - name: reviewQuestionInstance
+      - name: recallPrompt
         in: path
         required: true
         schema:
@@ -597,13 +597,13 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PredefinedQuestion"
-  /api/review-questions/{reviewQuestionInstance}/regenerate:
+  /api/review-questions/{recallPrompt}/regenerate:
     post:
       tags:
       - rest-review-question-controller
       operationId: regenerate
       parameters:
-      - name: reviewQuestionInstance
+      - name: recallPrompt
         in: path
         required: true
         schema:
@@ -621,13 +621,13 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/RecallPrompt"
-  /api/review-questions/{reviewQuestionInstance}/contest:
+  /api/review-questions/{recallPrompt}/contest:
     post:
       tags:
       - rest-review-question-controller
       operationId: contest
       parameters:
-      - name: reviewQuestionInstance
+      - name: recallPrompt
         in: path
         required: true
         schema:
@@ -645,13 +645,13 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ReviewQuestionContestResult"
-  /api/review-questions/{reviewQuestionInstance}/answer:
+  /api/review-questions/{recallPrompt}/answer:
     post:
       tags:
       - rest-review-question-controller
       operationId: answerQuiz
       parameters:
-      - name: reviewQuestionInstance
+      - name: recallPrompt
         in: path
         required: true
         schema:
@@ -2518,13 +2518,13 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Note"
-  /api/review-questions/{reviewQuestionInstance}:
+  /api/review-questions/{recallPrompt}:
     get:
       tags:
       - rest-review-question-controller
       operationId: showQuestion
       parameters:
-      - name: reviewQuestionInstance
+      - name: recallPrompt
         in: path
         required: true
         schema:

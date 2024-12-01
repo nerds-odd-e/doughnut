@@ -1,7 +1,7 @@
 <template>
   <BasicBreadcrumb
-    v-if="reviewQuestionInstance.notebook"
-    :ancestors="[reviewQuestionInstance.notebook.headNoteTopic]"
+    v-if="recallPrompt.notebook"
+    :ancestors="[recallPrompt.notebook.headNoteTopic]"
   />
   <div v-for="(q, index) in prevQuestions" :key="index">
     <h3>Previous Question Contested ...</h3>
@@ -10,7 +10,7 @@
   </div>
   <p v-if="currentQuestionLegitMessage">{{ currentQuestionLegitMessage }}</p>
   <ContentLoader v-if="regenerating" />
-  <div class="review-question-instance" v-else>
+  <div class="recall-prompt" v-else>
     <AnsweredQuestionComponent
       v-if="answeredQuestion"
       :answered-question="answeredQuestion"
@@ -18,7 +18,7 @@
     />
     <div v-else>
     <ReviewQuestion
-      :review-question-instance="currentQuestion"
+      :recall-prompt="currentQuestion"
       @answered="onAnswered($event)"
     />
       <a
@@ -48,7 +48,7 @@ import QuestionDisplay from "./QuestionDisplay.vue"
 
 const { managedApi } = useLoadingApi()
 const props = defineProps({
-  reviewQuestionInstance: {
+  recallPrompt: {
     type: Object as PropType<RecallPrompt>,
     required: true,
   },
@@ -60,7 +60,7 @@ const props = defineProps({
 const emit = defineEmits(["need-scroll", "answered"])
 const regenerating = ref(false)
 const currentQuestionLegitMessage = ref<string | undefined>(undefined)
-const currentQuestion = ref(props.reviewQuestionInstance)
+const currentQuestion = ref(props.recallPrompt)
 const answeredQuestion = ref<AnsweredQuestion | undefined>(undefined)
 const prevQuestions = ref<
   {
@@ -103,7 +103,7 @@ const onAnswered = (answer: AnsweredQuestion) => {
 </script>
 
 <style lang="scss" scoped>
-.review-question-instance {
+.recall-prompt {
   overflow-y: auto;
 }
 </style>

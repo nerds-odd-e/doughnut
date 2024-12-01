@@ -108,21 +108,21 @@ const removeChoice = () => {
 }
 
 const submitQuestion = async () => {
-  const reviewQuestionInstance = predefinedQuestion.value
+  const recallPrompt = predefinedQuestion.value
   const response =
     await managedApi.restPredefinedQuestionController.addQuestionManually(
       props.note.id,
-      reviewQuestionInstance
+      recallPrompt
     )
   emit("close-dialog", response)
 }
 
 const refineQuestion = async () => {
-  const reviewQuestionInstance = predefinedQuestion.value
+  const recallPrompt = predefinedQuestion.value
   predefinedQuestion.value =
     await managedApi.restPredefinedQuestionController.refineQuestion(
       props.note.id,
-      reviewQuestionInstance
+      recallPrompt
     )
 }
 
