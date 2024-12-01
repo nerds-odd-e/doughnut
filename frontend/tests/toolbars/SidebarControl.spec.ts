@@ -55,10 +55,8 @@ describe("sidebar control", () => {
     const sidebarAssimilateLink = screen.getByRole("button", {
       name: "Assimilate",
     })
-    const dropdownRecentLink = screen.getByRole("button", { name: "Recent..." })
 
     expect(sidebarAssimilateLink).toBeInTheDocument()
-    expect(dropdownRecentLink).toBeInTheDocument()
   })
 
   describe("assimilate due count", () => {

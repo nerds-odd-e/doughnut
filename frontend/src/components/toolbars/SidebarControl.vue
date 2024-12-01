@@ -7,14 +7,8 @@
             <span class="menu-label">Note</span>
           </router-link>
         </li>
-        <li role="button" class="list-item" :class="{ active: isActiveRoute(['recalls', 'initial', 'repeat']) }" title="Daily Recall">
-          <router-link :to="{ name: 'recalls' }" class="d-flex flex-column align-items-center gap-1">
-            <SvgCalendarCheck />
-            <span class="menu-label">Recall</span>
-          </router-link>
-        </li>
         <li role="button" class="list-item" :class="{ active: isActiveRoute(['recent']) }" title="Assimilate">
-          <router-link :to="{ name: 'recent' }" class="d-flex flex-column align-items-center gap-1">
+          <router-link :to="{ name: 'initial' }" class="d-flex flex-column align-items-center gap-1">
             <div class="icon-container">
               <SvgClockHistory />
               <div v-if="dueCount && dueCount > 0" class="due-count">
@@ -22,6 +16,12 @@
               </div>
             </div>
             <span class="menu-label">Assimilate</span>
+          </router-link>
+        </li>
+        <li role="button" class="list-item" :class="{ active: isActiveRoute(['recalls', 'initial', 'repeat']) }" title="Daily Recall">
+          <router-link :to="{ name: 'recalls' }" class="d-flex flex-column align-items-center gap-1">
+            <SvgCalendarCheck />
+            <span class="menu-label">Recall</span>
           </router-link>
         </li>
         <li role="button" class="list-item" :class="{ active: isActiveRoute(['bazaar']) }" title="Bazaar">
