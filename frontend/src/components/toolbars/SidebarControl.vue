@@ -1,6 +1,12 @@
 <template>
   <div v-if="user" class="sidebar-container">
       <ul class="list-group">
+        <li role="button" class="list-item" :class="{ active: isActiveRoute(['notebooks', 'noteShow']) }" title="My Notes">
+          <router-link :to="{ name: 'notebooks' }" class="d-flex flex-column align-items-center gap-1">
+            <SvgJournalText />
+            <span class="menu-label">Note</span>
+          </router-link>
+        </li>
         <li role="button" class="list-item" :class="{ active: isActiveRoute(['recalls', 'initial', 'repeat']) }" title="Daily Recall">
           <router-link :to="{ name: 'recalls' }" class="d-flex flex-column align-items-center gap-1">
             <SvgCalendarCheck />
@@ -16,12 +22,6 @@
               </div>
             </div>
             <span class="menu-label">Assimilate</span>
-          </router-link>
-        </li>
-        <li role="button" class="list-item" :class="{ active: isActiveRoute(['notebooks', 'noteShow']) }" title="My Notebooks">
-          <router-link :to="{ name: 'notebooks' }" class="d-flex flex-column align-items-center gap-1">
-            <SvgJournalText />
-            <span class="menu-label">Notebooks</span>
           </router-link>
         </li>
         <li role="button" class="list-item" :class="{ active: isActiveRoute(['bazaar']) }" title="Bazaar">

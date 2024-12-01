@@ -24,13 +24,20 @@ describe("sidebar control", () => {
     expect(assimilateLink).toBeInTheDocument()
   })
 
-  it("highlights the notebooks link when on notebooks page", () => {
+  it("highlights the note link when on notebooks page", () => {
     useRouteValue.name = "notebooks"
 
     helper.component(SidebarControl).withProps({ user }).render()
 
-    const notebooksLink = screen.getByRole("button", { name: "Notebooks" })
-    expect(notebooksLink).toHaveClass("active")
+    const noteLink = screen.getByRole("button", { name: "Note" })
+    expect(noteLink).toHaveClass("active")
+  })
+
+  it("shows note link in sidebar", async () => {
+    helper.component(SidebarControl).withProps({ user }).render()
+
+    const noteLink = screen.getByRole("button", { name: "Note" })
+    expect(noteLink).toBeInTheDocument()
   })
 
   it("highlights the circles link when on circle show page", () => {
