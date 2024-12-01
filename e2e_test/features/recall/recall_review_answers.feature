@@ -28,4 +28,4 @@ Feature: Repetition Quiz
     And I am repeat-reviewing my old note on day 2
     And I type my answer "sedition"
     When choose to remove the last memory tracker from recalls
-    Then On day 100 I should have "1/1" note for initial review and "0/0" for repeat
+    Then On day 100 I should have "1/1" note for assimilation and "0/0" for repeat

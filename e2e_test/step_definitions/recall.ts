@@ -46,22 +46,19 @@ Then('I should see that I have old notes to repeat', () => {
   cy.findByRole('button', { name: 'Start reviewing old notes' })
 })
 
-Then('I should see that I have new notes to learn', () => {
-  cy.findByRole('button', { name: 'Start reviewing new notes' })
-})
+Then(
+  'I should see that I have {int} new notes to learn',
+  (numberOfNotes: number) => {
+    start.assimilation().expectCount(numberOfNotes)
+  }
+)
 
 Then(
-  'On day {int} I should have {string} note for initial review and {string} for repeat',
-  (day: number, numberOfOnboardings: string, numberOfRepeats: string) => {
+  'On day {int} I should have {string} note for assimilation and {string} for repeat',
+  (day: number, toAssimilateAndTotal: string, numberOfRepeats: string) => {
     start.testability().backendTimeTravelTo(day, 8)
+    start.assimilation().expectToAssimilateAndTotal(toAssimilateAndTotal)
     cy.routerToReviews()
-    cy.contains(numberOfOnboardings, {
-      selector: '.doughnut-ring .initial-review',
-    })
-    cy.routerToReviews()
-    cy.findByText(numberOfOnboardings, {
-      selector: '.number-of-onboardings',
-    })
     cy.findByText(numberOfRepeats, { selector: '.number-of-repeats' })
   }
 )

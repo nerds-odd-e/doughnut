@@ -1,7 +1,6 @@
 import AssimilationPage from "@/pages/AssimilationPage.vue"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { useRouter } from "vue-router"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
@@ -43,11 +42,13 @@ beforeEach(() => {
 })
 
 describe("repeat page", () => {
-  it("redirect to review page if nothing to review", async () => {
+  it("shows completion message when nothing to review", async () => {
     mockedInitialReviewCall.mockResolvedValue([])
-    renderer.currentRoute({ name: "assimilate" }).mount()
+    const wrapper = renderer.currentRoute({ name: "assimilate" }).mount()
     await flushPromises()
-    expect(useRouter().push).toHaveBeenCalledWith({ name: "recalls" })
+    expect(wrapper.text()).toContain(
+      "You have achieved your daily new notes goal"
+    )
     expect(mockedInitialReviewCall).toBeCalledWith("Europe/Amsterdam")
   })
 

@@ -28,5 +28,5 @@ Feature: Review Pages
     When It's day 2, 9 hour
     And I go to the recalls page
     Then I should see that I have old notes to repeat
-    And I should see that I have new notes to learn
+    And I should see that I have 4 new notes to learn
 
