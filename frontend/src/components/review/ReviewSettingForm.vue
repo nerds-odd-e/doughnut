@@ -16,10 +16,10 @@
   />
   <CheckInput
     scope-name="review_setting"
-    field="skipReview"
-    :model-value="formData.skipReview"
-    :error-message="errors.skipReview"
-    @update:model-value="updateModelValue({ skipReview: $event })"
+    field="skipMemoryTracking"
+    :model-value="formData.skipMemoryTracking"
+    :error-message="errors.skipMemoryTracking"
+    @update:model-value="updateModelValue({ skipMemoryTracking: $event })"
   />
 </template>
 

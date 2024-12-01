@@ -84,9 +84,9 @@ class TestabilityRestController {
     @Setter
     private String parentTopic;
 
-    @JsonProperty("Skip Review")
+    @JsonProperty("Skip Memory Tracking")
     @Setter
-    private Boolean skipReview;
+    private Boolean skipMemoryTracking;
 
     @JsonProperty("Image Url")
     @Setter
@@ -108,8 +108,8 @@ class TestabilityRestController {
       note.setTopicConstructor(topic);
       note.setDetails(details);
       note.setUpdatedAt(currentUTCTimestamp);
-      if (skipReview != null) {
-        note.getReviewSetting().setSkipReview(skipReview);
+      if (skipMemoryTracking != null) {
+        note.getReviewSetting().setSkipMemoryTracking(skipMemoryTracking);
       }
       content.setImageMask(imageMask);
       content.setImageUrl(imageUrl);

@@ -5,7 +5,7 @@ Feature: Bazaar subscription
 
   Background:
     Given there are some notes for existing user "another_old_learner"
-      | Topic            | Parent Topic| Skip Review|
+      | Topic            | Parent Topic| Skip Memory Tracking|
       | Shape            |             | true       |
       | Square           | Shape       |            |
       | Triangle         | Shape       |            |
@@ -33,7 +33,7 @@ Feature: Bazaar subscription
     And  On day 2 I repeat old "Square, My memo, end " and initial review new "Triangle, end       "
     And  I should be able to edit the subscription to notebook "Shape"
 
-  Scenario: No "add to learning" button for skip-review notebook
+  Scenario: No "add to learning" button for notebook with skip memory tracking
     Given I am logged in as "another_old_learner"
     When I change notebook "Shape" to skip review
     Then I can not see add the notebook "Shape" to my learning in the bazaar

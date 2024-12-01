@@ -4,7 +4,7 @@
 /* eslint-disable */
 export type ReviewSetting = {
     rememberSpelling?: boolean;
-    skipReview?: boolean;
+    skipMemoryTracking?: boolean;
     level?: number;
 };
 

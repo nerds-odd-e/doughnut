@@ -23,7 +23,7 @@ import lombok.Setter;
 @Data
 @Embeddable
 public class NotebookSettings {
-  @Column(name = "skip_review_entirely")
+  @Column(name = "skip_memory_tracking_entirely")
   Boolean skipReviewEntirely = false;
 
   @Column(name = "number_of_questions_in_assessment")

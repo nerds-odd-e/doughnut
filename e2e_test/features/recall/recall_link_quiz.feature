@@ -5,7 +5,7 @@ Feature: Repetition Link Quiz
     Given I am logged in as an existing user
     And I have a notebook with the head note "Space" which skips review
     And there are some notes:
-      | Topic            | Skip Review| Parent Topic|
+      | Topic            | Skip Memory Tracking| Parent Topic|
       | Moon             | true       | Space       |
       | Earth            | true       | Space       |
       | Mars             | true       | Space       |

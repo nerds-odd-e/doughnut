@@ -1,0 +1,2 @@
+ALTER TABLE notebook
+RENAME COLUMN skip_review_entirely TO skip_memory_tracking_entirely;

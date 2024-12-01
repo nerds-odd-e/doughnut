@@ -4,6 +4,6 @@
 /* eslint-disable */
 export type InitialInfo = {
     noteId?: number;
-    skipReview?: boolean;
+    skipMemoryTracking?: boolean;
 };
 

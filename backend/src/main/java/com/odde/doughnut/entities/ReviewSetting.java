@@ -16,7 +16,7 @@ public class ReviewSetting {
   @Column(name = "skip_memory_tracking")
   @Getter
   @Setter
-  private Boolean skipReview = false;
+  private Boolean skipMemoryTracking = false;
 
   @Getter @Setter private Integer level = defaultLevel;
 }

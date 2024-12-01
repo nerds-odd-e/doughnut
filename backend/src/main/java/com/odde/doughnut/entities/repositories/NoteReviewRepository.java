@@ -35,7 +35,7 @@ public interface NoteReviewRepository extends CrudRepository<Note, Integer> {
   String whereClaus =
       " WHERE "
           + "   rp IS NULL "
-          + "   AND COALESCE(n.reviewSetting.skipReview, FALSE) = FALSE "
+          + "   AND COALESCE(n.reviewSetting.skipMemoryTracking, FALSE) = FALSE "
           + "   AND n.deletedAt IS NULL ";
 
   String joinMemoryTracker = " LEFT JOIN n.memoryTrackers rp ON rp.user.id = :userId";

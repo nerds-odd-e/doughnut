@@ -37,7 +37,7 @@ When('I change notebook {string} to skip review', (noteTopic: string) => {
     .routerToNotebooksPage()
     .notebookCard(noteTopic)
     .editNotebookSettings()
-    .skipReview()
+    .skipMemoryTracking()
 })
 
 When('I request for an approval for notebook {string}', (notebook: string) => {

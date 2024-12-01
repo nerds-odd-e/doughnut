@@ -6,7 +6,7 @@ export type NoteTestData = {
     Topic?: string;
     Details?: string;
     'Parent Topic'?: string;
-    'Skip Review'?: boolean;
+    'Skip Memory Tracking'?: boolean;
     'Image Url'?: string;
     'Image Mask'?: string;
     'Wikidata Id'?: string;

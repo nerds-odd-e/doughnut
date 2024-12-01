@@ -46,7 +46,9 @@ Given('I have a notebook with the head note {string}', (noteTopic: string) => {
 Given(
   'I have a notebook with the head note {string} which skips review',
   (noteTopic: string) => {
-    start.testability().injectNotes([{ Topic: noteTopic, 'Skip Review': true }])
+    start
+      .testability()
+      .injectNotes([{ Topic: noteTopic, 'Skip Memory Tracking': true }])
   }
 )
 

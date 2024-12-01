@@ -46,8 +46,8 @@ const { popups } = usePopups()
 const buttonKey = computed(() => note.id)
 
 // Methods
-const processForm = async (skipReview: boolean) => {
-  if (skipReview) {
+const processForm = async (skipMemoryTracking: boolean) => {
+  if (skipMemoryTracking) {
     if (
       !(await popups.confirm(
         "Confirm to hide this note from reviewing in the future?"
@@ -60,10 +60,10 @@ const processForm = async (skipReview: boolean) => {
   managedApi.restRecallsController
     .create({
       noteId: note.id,
-      skipReview,
+      skipMemoryTracking,
     })
     .then((data) => {
-      if (skipReview) {
+      if (skipMemoryTracking) {
         emit("reloadNeeded", data)
       } else {
         emit("initialReviewDone", data)

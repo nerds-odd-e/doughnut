@@ -11,7 +11,7 @@ const notebookSettingsPopup = () => {
       cy.formField(setting).fieldShouldHaveValue(value)
     },
 
-    skipReview() {
+    skipMemoryTracking() {
       cy.formField('Skip Review Entirely').check()
       clickButton('Update')
     },

@@ -3231,7 +3231,7 @@ components:
           type: string
         Parent Topic:
           type: string
-        Skip Review:
+        Skip Memory Tracking:
           type: boolean
         Image Url:
           type: string
@@ -3445,7 +3445,7 @@ components:
         noteId:
           type: integer
           format: int32
-        skipReview:
+        skipMemoryTracking:
           type: boolean
     MemoryTracker:
       required:
@@ -3635,7 +3635,7 @@ components:
       properties:
         rememberSpelling:
           type: boolean
-        skipReview:
+        skipMemoryTracking:
           type: boolean
         level:
           type: integer

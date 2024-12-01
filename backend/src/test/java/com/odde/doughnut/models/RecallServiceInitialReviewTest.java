@@ -76,7 +76,7 @@ public class RecallServiceInitialReviewTest {
 
     @Test
     void shouldNotIncludeNoteThatIsSkippedForReview() {
-      makeMe.theNote(note1).skipReview().linkTo(note2).please();
+      makeMe.theNote(note1).skipMemoryTracking().linkTo(note2).please();
       assertThat(getFirstInitialMemoryTracker(recallServiceOnDay1), equalTo(note2));
     }
 
@@ -212,7 +212,7 @@ public class RecallServiceInitialReviewTest {
     @BeforeEach
     void setup() {
       User anotherUser = makeMe.aUser().please();
-      Note top = makeMe.aNote().skipReview().creatorAndOwner(anotherUser).please();
+      Note top = makeMe.aNote().skipMemoryTracking().creatorAndOwner(anotherUser).please();
       note1 = makeMe.aNote().under(top).please();
       note2 = makeMe.aNote().under(top).please();
       makeMe
@@ -231,8 +231,8 @@ public class RecallServiceInitialReviewTest {
 
     @Test
     void shouldReturnMemoryTrackerForLink() {
-      makeMe.theNote(note2).skipReview().please();
-      makeMe.theNote(note1).skipReview().linkTo(note2).please();
+      makeMe.theNote(note2).skipMemoryTracking().please();
+      makeMe.theNote(note1).skipMemoryTracking().linkTo(note2).please();
       Note noteToReview = getFirstInitialMemoryTracker(recallServiceOnDay1);
       assertThat(noteToReview.getParent(), equalTo(note1));
     }

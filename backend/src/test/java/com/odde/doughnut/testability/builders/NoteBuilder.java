@@ -118,8 +118,8 @@ public class NoteBuilder extends EntityBuilder<Note> {
     makeMe.refresh(entity);
   }
 
-  public NoteBuilder skipReview() {
-    entity.getReviewSetting().setSkipReview(true);
+  public NoteBuilder skipMemoryTracking() {
+    entity.getReviewSetting().setSkipMemoryTracking(true);
     return this;
   }
 
