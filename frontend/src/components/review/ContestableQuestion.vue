@@ -17,7 +17,7 @@
       :storage-accessor="storageAccessor"
     />
     <div v-else>
-    <ReviewQuestion
+    <ReviewQuestionPrompt
       :recall-prompt="currentQuestion"
       @answered="onAnswered($event)"
     />
@@ -43,7 +43,7 @@ import type { PropType } from "vue"
 import { ref } from "vue"
 import BasicBreadcrumb from "../commons/BasicBreadcrumb.vue"
 import AnsweredQuestionComponent from "./AnsweredQuestionComponent.vue"
-import ReviewQuestion from "./ReviewQuestion.vue"
+import ReviewQuestionPrompt from "./ReviewQuestionPrompt.vue"
 import QuestionDisplay from "./QuestionDisplay.vue"
 
 const { managedApi } = useLoadingApi()

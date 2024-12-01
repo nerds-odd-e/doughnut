@@ -2,7 +2,7 @@
   <div v-if="!minimized" class="content">
     <ContentLoader v-if="!currentQuestionFetched" />
     <template v-else>
-      <div v-if="!currentReviewQuestion">
+      <div v-if="!currentRecallPrompt">
         <JustReview
           v-bind="{
             memoryTrackerId: currentMemoryTrackerId,
@@ -14,11 +14,11 @@
       <ContestableQuestion
         v-else
         v-bind="{
-          recallPrompt: currentReviewQuestion,
+          recallPrompt: currentRecallPrompt,
           storageAccessor,
         }"
         @answered="onAnswered($event)"
-        :key="currentReviewQuestion.id"
+        :key="currentRecallPrompt.id"
       />
       <button
         v-if="canMoveToEnd"
@@ -74,7 +74,7 @@ const emit = defineEmits<{
 
 // Composable for question fetching logic
 const useQuestionFetching = (props: QuizProps) => {
-  const reviewQuestionCache = ref<Record<number, RecallPrompt | undefined>>({})
+  const recallPromptCache = ref<Record<number, RecallPrompt | undefined>>({})
   const eagerFetchUntil = ref(0)
   const fetching = ref(false)
   const { managedApi } = useLoadingApi()
@@ -88,16 +88,16 @@ const useQuestionFetching = (props: QuizProps) => {
       const memoryTrackerId = memoryTrackerIdAt(index)
       if (memoryTrackerId === undefined) break
 
-      if (memoryTrackerId in reviewQuestionCache.value) continue
+      if (memoryTrackerId in recallPromptCache.value) continue
 
       try {
         const question =
           await managedApi.silent.restRecallPromptController.generateRandomQuestion(
             memoryTrackerId
           )
-        reviewQuestionCache.value[memoryTrackerId] = question
+        recallPromptCache.value[memoryTrackerId] = question
       } catch (e) {
-        reviewQuestionCache.value[memoryTrackerId] = undefined
+        recallPromptCache.value[memoryTrackerId] = undefined
       }
     }
   }
@@ -113,13 +113,13 @@ const useQuestionFetching = (props: QuizProps) => {
   }
 
   return {
-    reviewQuestionCache,
+    recallPromptCache,
     fetchQuestion,
   }
 }
 
 // Use the composable
-const { reviewQuestionCache, fetchQuestion } = useQuestionFetching(props)
+const { recallPromptCache, fetchQuestion } = useQuestionFetching(props)
 
 // Computed properties with better naming
 const currentMemoryTrackerId = computed(() =>
@@ -128,14 +128,13 @@ const currentMemoryTrackerId = computed(() =>
 const currentQuestionFetched = computed(() => {
   const memoryTrackerId = currentMemoryTrackerId.value
   return (
-    memoryTrackerId !== undefined &&
-    memoryTrackerId in reviewQuestionCache.value
+    memoryTrackerId !== undefined && memoryTrackerId in recallPromptCache.value
   )
 })
-const currentReviewQuestion = computed(() => {
+const currentRecallPrompt = computed(() => {
   const memoryTrackerId = currentMemoryTrackerId.value
   return memoryTrackerId !== undefined
-    ? reviewQuestionCache.value[memoryTrackerId]
+    ? recallPromptCache.value[memoryTrackerId]
     : undefined
 })
 

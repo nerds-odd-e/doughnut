@@ -127,6 +127,7 @@ declare module 'vue' {
     QuillEditor: typeof import('./src/components/form/QuillEditor.vue')['default']
     Quiz: typeof import('./src/components/review/Quiz.vue')['default']
     RadioButtons: typeof import('./src/components/form/RadioButtons.vue')['default']
+    RecallPromptComponent: typeof import('./src/components/review/RecallPromptComponent.vue')['default']
     RecentlyAddedNotes: typeof import('./src/components/recent/RecentlyAddedNotes.vue')['default']
     RecentlyLearnedNotes: typeof import('./src/components/recent/RecentlyLearnedNotes.vue')['default']
     RecentlyReviewedNotes: typeof import('./src/components/recent/RecentlyReviewedNotes.vue')['default']
