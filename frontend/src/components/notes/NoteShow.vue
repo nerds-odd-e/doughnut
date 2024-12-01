@@ -1,19 +1,21 @@
 <template>
-  <NoteRealmLoader v-bind="{ noteId, storageAccessor }">
-    <template #default="{ noteRealm }">
-      <ContentLoader v-if="!noteRealm" />
-      <NoteShowInner
-        v-else
-        v-bind="{
-          noteRealm,
-          expandChildren,
-          storageAccessor,
-          noConversationButton,
-        }"
-        :key="noteId"
-      />
-    </template>
-  </NoteRealmLoader>
+  <div class="note-show-container">
+    <NoteRealmLoader v-bind="{ noteId, storageAccessor }">
+      <template #default="{ noteRealm }">
+        <ContentLoader v-if="!noteRealm" />
+        <NoteShowInner
+          v-else
+          v-bind="{
+            noteRealm,
+            expandChildren,
+            storageAccessor,
+            noConversationButton,
+          }"
+          :key="noteId"
+        />
+      </template>
+    </NoteRealmLoader>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -33,3 +35,11 @@ defineProps({
   },
 })
 </script>
+
+<style scoped>
+.note-show-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+</style>

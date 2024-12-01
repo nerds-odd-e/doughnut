@@ -1,8 +1,7 @@
 <template>
-  <div class="note-show-container">
-    <template
-      v-if="!conversationMaximized"
-    >
+  <template
+    v-if="!conversationMaximized"
+  >
     <NoteToolbar
       v-if="!readonly"
       v-bind="{
@@ -60,17 +59,16 @@
         </ul>
       </div>
     </div>
-    </template>
+  </template>
 
-    <div class="conversation-wrapper" v-if="showConversation" :class="{ 'maximized': conversationMaximized }">
-      <NoteConversation
-        :note-id="noteRealm.id"
-        :storage-accessor="storageAccessor"
-        :is-maximized="conversationMaximized"
-        @close-dialog="showConversation = false"
-        @toggle-maximize="conversationMaximized = !conversationMaximized"
-      />
-    </div>
+  <div class="conversation-wrapper" v-if="showConversation" :class="{ 'maximized': conversationMaximized }">
+    <NoteConversation
+      :note-id="noteRealm.id"
+      :storage-accessor="storageAccessor"
+      :is-maximized="conversationMaximized"
+      @close-dialog="showConversation = false"
+      @toggle-maximize="conversationMaximized = !conversationMaximized"
+    />
   </div>
 </template>
 
@@ -110,12 +108,6 @@ const toLocalDateString = (date: string) => {
 </script>
 
 <style scoped>
-.note-show-container {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
 .note-content-wrapper {
   flex: 1;
   min-height: 0;
