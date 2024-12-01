@@ -17,18 +17,11 @@ describe("sidebar control", () => {
     user = makeMe.aUser.please()
   })
 
-  it("shows recent notes link in sidebar", async () => {
+  it("shows onboard link in sidebar", async () => {
     helper.component(SidebarControl).withProps({ user }).render()
 
-    const recentLink = screen.getByRole("button", { name: "Recent" })
-    expect(recentLink).toBeInTheDocument()
-  })
-
-  it("shows circles link in sidebar", async () => {
-    helper.component(SidebarControl).withProps({ user }).render()
-
-    const circlesLink = screen.getByRole("button", { name: "Circles" })
-    expect(circlesLink).toBeInTheDocument()
+    const onboardLink = screen.getByRole("button", { name: "Onboard" })
+    expect(onboardLink).toBeInTheDocument()
   })
 
   it("highlights the notebooks link when on notebooks page", () => {
@@ -49,7 +42,7 @@ describe("sidebar control", () => {
     expect(circlesLink).toHaveClass("active")
   })
 
-  describe("notebooks due count", () => {
+  describe("onboard due count", () => {
     it("shows due count when there are due items", async () => {
       helper.managedApi.memoryTrackerOnboardingController.getOnboardingCount =
         vitest.fn().mockResolvedValue({ dueCount: 5 })

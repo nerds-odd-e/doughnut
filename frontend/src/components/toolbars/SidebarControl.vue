@@ -7,21 +7,21 @@
             <span class="menu-label">Recall</span>
           </router-link>
         </li>
-        <li role="button" class="list-item" :class="{ active: isActiveRoute(['notebooks', 'noteShow']) }" title="My Notebooks">
-          <router-link :to="{ name: 'notebooks' }" class="d-flex flex-column align-items-center gap-1">
+        <li role="button" class="list-item" :class="{ active: isActiveRoute(['recent']) }" title="Onboard">
+          <router-link :to="{ name: 'recent' }" class="d-flex flex-column align-items-center gap-1">
             <div class="icon-container">
-              <SvgJournalText />
+              <SvgClockHistory />
               <div v-if="dueCount && dueCount > 0" class="due-count">
                 {{ dueCount }}
               </div>
             </div>
-            <span class="menu-label">Notebooks</span>
+            <span class="menu-label">Onboard</span>
           </router-link>
         </li>
-        <li role="button" class="list-item" :class="{ active: isActiveRoute(['recent']) }" title="Recent">
-          <router-link :to="{ name: 'recent' }" class="d-flex flex-column align-items-center gap-1">
-            <SvgClockHistory />
-            <span class="menu-label">Recent</span>
+        <li role="button" class="list-item" :class="{ active: isActiveRoute(['notebooks', 'noteShow']) }" title="My Notebooks">
+          <router-link :to="{ name: 'notebooks' }" class="d-flex flex-column align-items-center gap-1">
+            <SvgJournalText />
+            <span class="menu-label">Notebooks</span>
           </router-link>
         </li>
         <li role="button" class="list-item" :class="{ active: isActiveRoute(['bazaar']) }" title="Bazaar">
