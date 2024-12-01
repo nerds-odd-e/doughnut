@@ -92,7 +92,7 @@ class ConversationMessageServiceTest {
   }
 
   @Nested
-  class ReviewQuestionConversationTest {
+  class QuestionConversationTest {
     private RecallPrompt recallPrompt;
     private Note note;
 

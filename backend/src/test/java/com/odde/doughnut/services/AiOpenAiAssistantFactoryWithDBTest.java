@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.odde.doughnut.controllers.dto.ReviewQuestionContestResult;
+import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.PredefinedQuestion;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
@@ -69,8 +69,8 @@ class AiOpenAiAssistantFactoryWithDBTest {
     @Test
     void rejected() {
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(questionEvaluation, "");
-      ReviewQuestionContestResult contest =
-          aiQuestionGenerator.getReviewQuestionContestResult(predefinedQuestion);
+      QuestionContestResult contest =
+          aiQuestionGenerator.getQuestionContestResult(predefinedQuestion);
       assertTrue(contest.rejected);
       Assertions.assertThat(contest.reason)
           .isEqualTo("This seems to be a legitimate question. Please answer it.");
@@ -80,8 +80,8 @@ class AiOpenAiAssistantFactoryWithDBTest {
     void acceptTheContest() {
       questionEvaluation.feasibleQuestion = false;
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(questionEvaluation, "");
-      ReviewQuestionContestResult contest =
-          aiQuestionGenerator.getReviewQuestionContestResult(predefinedQuestion);
+      QuestionContestResult contest =
+          aiQuestionGenerator.getQuestionContestResult(predefinedQuestion);
       assertFalse(contest.rejected);
     }
 
@@ -91,7 +91,7 @@ class AiOpenAiAssistantFactoryWithDBTest {
           new ObjectMapper().readTree(""), "");
       assertThrows(
           RuntimeException.class,
-          () -> aiQuestionGenerator.getReviewQuestionContestResult(predefinedQuestion));
+          () -> aiQuestionGenerator.getQuestionContestResult(predefinedQuestion));
     }
   }
 }

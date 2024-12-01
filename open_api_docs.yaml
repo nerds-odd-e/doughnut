@@ -783,7 +783,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/ReviewQuestionContestResult"
+                $ref: "#/components/schemas/QuestionContestResult"
   /api/recall-prompts/{recallPrompt}/answer:
     post:
       tags:
@@ -3518,7 +3518,7 @@ components:
           $ref: "#/components/schemas/BareQuestion"
         notebook:
           $ref: "#/components/schemas/Notebook"
-    ReviewQuestionContestResult:
+    QuestionContestResult:
       type: object
       properties:
         reason:

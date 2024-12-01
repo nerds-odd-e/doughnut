@@ -419,7 +419,7 @@ class RestConversationMessageControllerTest {
   }
 
   @Nested
-  class StartConversationAboutReviewQuestionTests {
+  class StartConversationAboutRecallPrompt {
     RecallPrompt recallPrompt;
 
     @BeforeEach

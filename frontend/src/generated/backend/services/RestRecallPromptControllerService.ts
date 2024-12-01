@@ -5,7 +5,7 @@
 import type { AnswerDTO } from '../models/AnswerDTO';
 import type { AnsweredQuestion } from '../models/AnsweredQuestion';
 import type { RecallPrompt } from '../models/RecallPrompt';
-import type { ReviewQuestionContestResult } from '../models/ReviewQuestionContestResult';
+import type { QuestionContestResult } from '../models/QuestionContestResult';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestRecallPromptControllerService {
@@ -31,12 +31,12 @@ export class RestRecallPromptControllerService {
     }
     /**
      * @param recallPrompt
-     * @returns ReviewQuestionContestResult OK
+     * @returns QuestionContestResult OK
      * @throws ApiError
      */
     public contest(
         recallPrompt: number,
-    ): CancelablePromise<ReviewQuestionContestResult> {
+    ): CancelablePromise<QuestionContestResult> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/recall-prompts/{recallPrompt}/contest',

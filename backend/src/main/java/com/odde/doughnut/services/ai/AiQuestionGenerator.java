@@ -1,7 +1,7 @@
 package com.odde.doughnut.services.ai;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.odde.doughnut.controllers.dto.ReviewQuestionContestResult;
+import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.PredefinedQuestion;
 import com.odde.doughnut.services.GlobalSettingsService;
@@ -32,13 +32,12 @@ public record AiQuestionGenerator(
         .orElse(null);
   }
 
-  public ReviewQuestionContestResult getReviewQuestionContestResult(
-      PredefinedQuestion predefinedQuestion) {
+  public QuestionContestResult getQuestionContestResult(PredefinedQuestion predefinedQuestion) {
     return forNote(
             predefinedQuestion.getNote(),
             globalSettingsService.globalSettingEvaluation().getValue())
         .evaluateQuestion(predefinedQuestion.getMcqWithAnswer())
-        .map(e -> e.getReviewQuestionContestResult(predefinedQuestion.getCorrectAnswerIndex()))
+        .map(e -> e.getQuestionContestResult(predefinedQuestion.getCorrectAnswerIndex()))
         .orElse(null);
   }
 

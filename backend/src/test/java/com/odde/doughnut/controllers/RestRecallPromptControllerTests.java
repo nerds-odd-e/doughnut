@@ -7,8 +7,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import com.odde.doughnut.controllers.dto.AnswerDTO;
+import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.controllers.dto.Randomization;
-import com.odde.doughnut.controllers.dto.ReviewQuestionContestResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -248,7 +248,7 @@ class RestRecallPromptControllerTests {
     @Test
     void rejected() {
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(questionEvaluation, "");
-      ReviewQuestionContestResult contest = controller.contest(recallPrompt);
+      QuestionContestResult contest = controller.contest(recallPrompt);
       assertTrue(contest.rejected);
     }
 
@@ -270,7 +270,7 @@ class RestRecallPromptControllerTests {
     void acceptTheContest() {
       questionEvaluation.feasibleQuestion = false;
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(questionEvaluation, "");
-      ReviewQuestionContestResult contest = controller.contest(recallPrompt);
+      QuestionContestResult contest = controller.contest(recallPrompt);
       assertFalse(contest.rejected);
     }
   }

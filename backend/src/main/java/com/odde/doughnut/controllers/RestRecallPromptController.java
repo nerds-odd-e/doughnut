@@ -1,7 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.AnswerDTO;
-import com.odde.doughnut.controllers.dto.ReviewQuestionContestResult;
+import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -66,7 +66,7 @@ class RestRecallPromptController {
 
   @PostMapping("/{recallPrompt}/contest")
   @Transactional
-  public ReviewQuestionContestResult contest(
+  public QuestionContestResult contest(
       @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt) {
     currentUser.assertLoggedIn();
     return recallQuestionService.contest(recallPrompt);

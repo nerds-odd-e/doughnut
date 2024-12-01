@@ -1,6 +1,6 @@
 package com.odde.doughnut.services;
 
-import com.odde.doughnut.controllers.dto.ReviewQuestionContestResult;
+import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.PredefinedQuestion;
@@ -52,8 +52,8 @@ public class PredefinedQuestionService {
     return question;
   }
 
-  public ReviewQuestionContestResult contest(PredefinedQuestion predefinedQuestion) {
-    return aiQuestionGenerator.getReviewQuestionContestResult(predefinedQuestion);
+  public QuestionContestResult contest(PredefinedQuestion predefinedQuestion) {
+    return aiQuestionGenerator.getQuestionContestResult(predefinedQuestion);
   }
 
   public PredefinedQuestion generateAQuestionOfRandomType(Note note, User user) {

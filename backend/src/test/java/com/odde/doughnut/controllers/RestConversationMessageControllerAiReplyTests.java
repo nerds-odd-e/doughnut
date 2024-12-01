@@ -310,7 +310,7 @@ public class RestConversationMessageControllerAiReplyTests {
   }
 
   @Nested
-  class ReviewQuestionConversationTests {
+  class RecallPromptConversationTests {
     RecallPrompt recallPrompt;
     Note questionNote;
 
@@ -331,7 +331,7 @@ public class RestConversationMessageControllerAiReplyTests {
     }
 
     @Test
-    void shouldUseNoteFromReviewQuestion()
+    void shouldUseNoteFromRecallPrompt()
         throws UnexpectedNoAccessRightException, BadRequestException {
       controller.getAiReply(conversation);
 

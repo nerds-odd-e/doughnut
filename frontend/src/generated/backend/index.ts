@@ -98,7 +98,7 @@ export type { RecallPrompt } from './models/RecallPrompt';
 export type { RedirectToNoteResponse } from './models/RedirectToNoteResponse';
 export type { RequiredAction } from './models/RequiredAction';
 export type { ResponseJsonSchema } from './models/ResponseJsonSchema';
-export type { ReviewQuestionContestResult } from './models/ReviewQuestionContestResult';
+export type { QuestionContestResult } from './models/QuestionContestResult';
 export type { ReviewSetting } from './models/ReviewSetting';
 export type { ReviewStatus } from './models/ReviewStatus';
 export type { Run } from './models/Run';

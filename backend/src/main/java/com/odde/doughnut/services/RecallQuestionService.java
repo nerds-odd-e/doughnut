@@ -1,7 +1,7 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.AnswerDTO;
-import com.odde.doughnut.controllers.dto.ReviewQuestionContestResult;
+import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.Randomizer;
@@ -30,7 +30,7 @@ public class RecallQuestionService {
     return modelFactoryService.save(recallPrompt);
   }
 
-  public ReviewQuestionContestResult contest(RecallPrompt recallPrompt) {
+  public QuestionContestResult contest(RecallPrompt recallPrompt) {
     return predefinedQuestionService.contest(recallPrompt.getPredefinedQuestion());
   }
 
