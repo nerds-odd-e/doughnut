@@ -4,11 +4,11 @@
 /* eslint-disable */
 import type { MemoryTracker } from './MemoryTracker';
 import type { NoteRealm } from './NoteRealm';
-import type { ReviewSetting } from './ReviewSetting';
+import type { RecallSetting } from './RecallSetting';
 export type NoteInfo = {
     memoryTracker?: MemoryTracker;
     note: NoteRealm;
     createdAt: string;
-    reviewSetting?: ReviewSetting;
+    recallSetting?: RecallSetting;
 };
 

@@ -62,7 +62,7 @@
         <div class="dropdown-menu dropdown-menu-end">
           <PopButton
             btn-class="dropdown-item btn-primary"
-            title="Note Review Settings"
+            title="Note Recall Settings"
           >
             <NoteInfoBar v-bind="{ noteId: note.id }" />
           </PopButton>

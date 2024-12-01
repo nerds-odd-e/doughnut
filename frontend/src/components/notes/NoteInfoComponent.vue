@@ -1,7 +1,7 @@
 <template>
-  <h6>Review Settings</h6>
-  <ReviewSettingForm
-    v-bind="{ noteId: noteInfo.note.id, reviewSetting }"
+  <h6>Recall Settings</h6>
+  <RecallSettingForm
+    v-bind="{ noteId: noteInfo.note.id, recallSetting }"
     @level-changed="$emit('levelChanged', $event)"
   />
   <template v-if="memoryTracker">
@@ -17,7 +17,7 @@
 import type { NoteInfo, MemoryTracker } from "@/generated/backend"
 import type { PropType } from "vue"
 import { defineComponent } from "vue"
-import ReviewSettingForm from "../review/ReviewSettingForm.vue"
+import RecallSettingForm from "../review/RecallSettingForm.vue"
 import NoteInfoMemoryTracker from "./NoteInfoMemoryTracker.vue"
 
 export default defineComponent({
@@ -31,11 +31,11 @@ export default defineComponent({
     }
   },
   computed: {
-    reviewSetting() {
-      return this.noteInfo.reviewSetting
+    recallSetting() {
+      return this.noteInfo.recallSetting
     },
   },
-  components: { ReviewSettingForm, NoteInfoMemoryTracker },
+  components: { RecallSettingForm, NoteInfoMemoryTracker },
   methods: {
     onSelfEvaluated(memoryTracker: MemoryTracker) {
       this.memoryTracker = memoryTracker

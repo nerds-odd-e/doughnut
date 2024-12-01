@@ -109,7 +109,7 @@ class TestabilityRestController {
       note.setDetails(details);
       note.setUpdatedAt(currentUTCTimestamp);
       if (skipMemoryTracking != null) {
-        note.getReviewSetting().setSkipMemoryTracking(skipMemoryTracking);
+        note.getRecallSetting().setSkipMemoryTracking(skipMemoryTracking);
       }
       content.setImageMask(imageMask);
       content.setImageUrl(imageUrl);

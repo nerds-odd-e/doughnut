@@ -24,7 +24,7 @@
 </template>
 
 <script lang="ts">
-import type { ReviewSetting } from "@/generated/backend"
+import type { RecallSetting } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { PropType } from "vue"
 import { defineComponent, computed, ref } from "vue"
@@ -35,8 +35,8 @@ export default defineComponent({
   components: { CheckInput, RadioButtons },
   props: {
     noteId: { type: Number, required: true },
-    reviewSetting: {
-      type: Object as PropType<ReviewSetting>,
+    recallSetting: {
+      type: Object as PropType<RecallSetting>,
       required: false,
     },
   },
@@ -44,8 +44,8 @@ export default defineComponent({
   setup(props, { emit }) {
     const { managedApi } = useLoadingApi()
 
-    const formData = ref<ReviewSetting>(props.reviewSetting || {})
-    const errors = ref<Partial<Record<keyof ReviewSetting, string>>>({})
+    const formData = ref<RecallSetting>(props.recallSetting || {})
+    const errors = ref<Partial<Record<keyof RecallSetting, string>>>({})
 
     const levelAsString = computed(() =>
       formData.value.level !== undefined
@@ -58,13 +58,13 @@ export default defineComponent({
       label: level.toString(),
     }))
 
-    const updateModelValue = (newValue: Partial<ReviewSetting>) => {
+    const updateModelValue = (newValue: Partial<RecallSetting>) => {
       formData.value = {
         ...formData.value,
         ...newValue,
       }
       managedApi.restNoteController
-        .updateReviewSetting(props.noteId, formData.value)
+        .updateRecallSetting(props.noteId, formData.value)
         .then(() => {
           if (newValue.level !== undefined) {
             emit("levelChanged", newValue.level)

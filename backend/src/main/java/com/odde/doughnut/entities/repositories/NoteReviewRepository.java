@@ -35,12 +35,12 @@ public interface NoteReviewRepository extends CrudRepository<Note, Integer> {
   String whereClaus =
       " WHERE "
           + "   rp IS NULL "
-          + "   AND COALESCE(n.reviewSetting.skipMemoryTracking, FALSE) = FALSE "
+          + "   AND COALESCE(n.recallSetting.skipMemoryTracking, FALSE) = FALSE "
           + "   AND n.deletedAt IS NULL ";
 
   String joinMemoryTracker = " LEFT JOIN n.memoryTrackers rp ON rp.user.id = :userId";
 
-  String orderByDate = " ORDER BY n.reviewSetting.level, n.createdAt, n.id";
+  String orderByDate = " ORDER BY n.recallSetting.level, n.createdAt, n.id";
 
   String fromNotebook = "   AND n.notebook.id = :notebookId ";
 

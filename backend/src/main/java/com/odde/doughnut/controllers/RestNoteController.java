@@ -110,7 +110,7 @@ class RestNoteController {
     noteInfo.setMemoryTracker(currentUser.getMemoryTrackerFor(note));
     noteInfo.setNote(new NoteViewer(currentUser.getEntity(), note).toJsonObject());
     noteInfo.setCreatedAt(note.getCreatedAt());
-    noteInfo.setReviewSetting(note.getReviewSetting());
+    noteInfo.setRecallSetting(note.getRecallSetting());
     return noteInfo;
   }
 
@@ -163,18 +163,18 @@ class RestNoteController {
 
   @PostMapping(value = "/{note}/review-setting")
   @Transactional
-  public RedirectToNoteResponse updateReviewSetting(
+  public RedirectToNoteResponse updateRecallSetting(
       @PathVariable("note") @Schema(type = "integer") Note note,
-      @Valid @RequestBody ReviewSetting reviewSetting)
+      @Valid @RequestBody RecallSetting recallSetting)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
-    BeanUtils.copyProperties(reviewSetting, note.getReviewSetting());
+    BeanUtils.copyProperties(recallSetting, note.getRecallSetting());
     modelFactoryService.save(note);
     note.getLinksAndRefers()
         .forEach(
             link -> {
-              link.getReviewSetting()
-                  .setLevel(Math.max(link.getReviewSetting().getLevel(), reviewSetting.getLevel()));
+              link.getRecallSetting()
+                  .setLevel(Math.max(link.getRecallSetting().getLevel(), recallSetting.getLevel()));
               modelFactoryService.save(link);
             });
     return new RedirectToNoteResponse(note.getId());

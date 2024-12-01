@@ -7,8 +7,8 @@ import type { NoteAccessory } from '../models/NoteAccessory';
 import type { NoteInfo } from '../models/NoteInfo';
 import type { NoteRealm } from '../models/NoteRealm';
 import type { NoteTopic } from '../models/NoteTopic';
+import type { RecallSetting } from '../models/RecallSetting';
 import type { RedirectToNoteResponse } from '../models/RedirectToNoteResponse';
-import type { ReviewSetting } from '../models/ReviewSetting';
 import type { SearchTerm } from '../models/SearchTerm';
 import type { WikidataAssociationCreation } from '../models/WikidataAssociationCreation';
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -67,9 +67,9 @@ export class RestNoteControllerService {
      * @returns RedirectToNoteResponse OK
      * @throws ApiError
      */
-    public updateReviewSetting(
+    public updateRecallSetting(
         note: number,
-        requestBody: ReviewSetting,
+        requestBody: RecallSetting,
     ): CancelablePromise<RedirectToNoteResponse> {
         return this.httpRequest.request({
             method: 'POST',

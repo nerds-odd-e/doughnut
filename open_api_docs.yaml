@@ -964,7 +964,7 @@ paths:
     post:
       tags:
       - rest-note-controller
-      operationId: updateReviewSetting
+      operationId: updateRecallSetting
       parameters:
       - name: note
         in: path
@@ -975,7 +975,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ReviewSetting"
+              $ref: "#/components/schemas/RecallSetting"
         required: true
       responses:
         "500":
@@ -3630,7 +3630,7 @@ components:
           type: boolean
         allMyCircles:
           type: boolean
-    ReviewSetting:
+    RecallSetting:
       type: object
       properties:
         rememberSpelling:
@@ -4061,8 +4061,8 @@ components:
         createdAt:
           type: string
           format: date-time
-        reviewSetting:
-          $ref: "#/components/schemas/ReviewSetting"
+        recallSetting:
+          $ref: "#/components/schemas/RecallSetting"
     NotebooksViewedByUser:
       required:
       - notebooks

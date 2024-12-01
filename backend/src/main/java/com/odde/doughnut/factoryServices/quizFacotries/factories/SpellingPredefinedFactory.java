@@ -2,7 +2,7 @@ package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.PredefinedQuestion;
-import com.odde.doughnut.entities.ReviewSetting;
+import com.odde.doughnut.entities.RecallSetting;
 import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionNotPossibleException;
 import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
@@ -28,8 +28,8 @@ public class SpellingPredefinedFactory extends PredefinedQuestionFactory {
     if (answerNote.isDetailsBlankHtml()) {
       return false;
     }
-    ReviewSetting reviewSetting = answerNote.getReviewSetting();
-    return reviewSetting != null && reviewSetting.getRememberSpelling();
+    RecallSetting recallSetting = answerNote.getRecallSetting();
+    return recallSetting != null && recallSetting.getRememberSpelling();
   }
 
   private String getStem() {

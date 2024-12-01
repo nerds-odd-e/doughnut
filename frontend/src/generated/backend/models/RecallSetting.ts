@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type ReviewSetting = {
+export type RecallSetting = {
     rememberSpelling?: boolean;
     skipMemoryTracking?: boolean;
     level?: number;

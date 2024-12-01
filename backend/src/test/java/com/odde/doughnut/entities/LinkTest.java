@@ -34,14 +34,14 @@ public class LinkTest {
     void shouldGetSourceLevelWhenItIsHigher() {
       makeMe.theNote(source).level(5).please();
       Note link = makeMe.aLink().between(source, target).inMemoryPlease();
-      assertThat(link.getReviewSetting().getLevel(), is(5));
+      assertThat(link.getRecallSetting().getLevel(), is(5));
     }
 
     @Test
     void shouldGetTargetLevelWhenItIsHigher() {
       makeMe.theNote(target).level(5).please();
       Note link = makeMe.aLink().between(source, target).inMemoryPlease();
-      assertThat(link.getReviewSetting().getLevel(), is(5));
+      assertThat(link.getRecallSetting().getLevel(), is(5));
     }
   }
 }

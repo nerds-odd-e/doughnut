@@ -134,11 +134,11 @@ public class ModelFactoryService {
     final Note note = new Note();
     note.initialize(creator, sourceNote, currentUTCTimestamp, ":" + type.label);
     note.setTargetNote(targetNote);
-    note.getReviewSetting()
+    note.getRecallSetting()
         .setLevel(
             Math.max(
-                sourceNote.getReviewSetting().getLevel(),
-                targetNote.getReviewSetting().getLevel()));
+                sourceNote.getRecallSetting().getLevel(),
+                targetNote.getRecallSetting().getLevel()));
 
     return note;
   }

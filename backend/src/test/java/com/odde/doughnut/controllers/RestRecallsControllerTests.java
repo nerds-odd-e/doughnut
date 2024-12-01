@@ -63,8 +63,8 @@ class RestRecallsControllerTests {
     void initialReview() {
       Note n = makeMe.aNote().creatorAndOwner(currentUser).please();
       assertThat(n.getId(), notNullValue());
-      List<Note> memoryTrackerWithReviewSettings = controller.initialReview("Asia/Shanghai");
-      assertThat(memoryTrackerWithReviewSettings, hasSize(1));
+      List<Note> memoryTrackerWithRecallSettings = controller.initialReview("Asia/Shanghai");
+      assertThat(memoryTrackerWithRecallSettings, hasSize(1));
     }
 
     @Test

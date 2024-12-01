@@ -123,7 +123,7 @@ public class Note extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   private List<PredefinedQuestion> predefinedQuestions = new ArrayList<>();
 
-  @Embedded @JsonIgnore @Getter private ReviewSetting reviewSetting = new ReviewSetting();
+  @Embedded @JsonIgnore @Getter private RecallSetting recallSetting = new RecallSetting();
 
   @JsonIgnore
   public List<Note> getChildren() {

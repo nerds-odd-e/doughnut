@@ -240,7 +240,7 @@ class RestNoteControllerTests {
   }
 
   @Nested
-  class UpdateReviewSetting {
+  class UpdateRecallSetting {
     Note source;
     Note target;
     Note link;
@@ -254,22 +254,22 @@ class RestNoteControllerTests {
 
     @Test
     void shouldUpdateLinkLevel() throws UnexpectedNoAccessRightException {
-      @Valid ReviewSetting reviewSetting = new ReviewSetting();
-      reviewSetting.setLevel(4);
-      controller.updateReviewSetting(source, reviewSetting);
+      @Valid RecallSetting recallSetting = new RecallSetting();
+      recallSetting.setLevel(4);
+      controller.updateRecallSetting(source, recallSetting);
       assertThat(getLevel(link), is(4));
     }
 
     @Test
     void shouldUpdateReferenceLevel() throws UnexpectedNoAccessRightException {
-      @Valid ReviewSetting reviewSetting = new ReviewSetting();
-      reviewSetting.setLevel(4);
-      controller.updateReviewSetting(target, reviewSetting);
+      @Valid RecallSetting recallSetting = new RecallSetting();
+      recallSetting.setLevel(4);
+      controller.updateRecallSetting(target, recallSetting);
       assertThat(getLevel(link), is(4));
     }
 
     private static Integer getLevel(Note link) {
-      return link.getReviewSetting().getLevel();
+      return link.getRecallSetting().getLevel();
     }
   }
 
