@@ -10,7 +10,7 @@
       @resume="resume"
     >
     </ProgressBar>
-    <Onboarding
+    <Assimilation
       v-if="!minimized && note"
       v-bind="{ note, storageAccessor }"
       @initial-review-done="initialReviewDone"
@@ -28,7 +28,7 @@ import type { Note } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import ProgressBar from "@/components/commons/ProgressBar.vue"
-import Onboarding from "@/components/review/Onboarding.vue"
+import Assimilation from "@/components/review/Assimilation.vue"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import ContainerPage from "./commons/ContainerPage.vue"
 

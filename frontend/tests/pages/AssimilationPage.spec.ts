@@ -1,4 +1,4 @@
-import OnboardingPage from "@/pages/OnboardingPage.vue"
+import AssimilationPage from "@/pages/AssimilationPage.vue"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { useRouter } from "vue-router"
@@ -15,7 +15,7 @@ vitest.mock("vue-router", () => ({
   }),
 }))
 
-let renderer: RenderingHelper<typeof OnboardingPage>
+let renderer: RenderingHelper<typeof AssimilationPage>
 const mockedInitialReviewCall = vi.fn()
 const mockedNoteInfoCall = vi.fn()
 const mockedGetNoteCall = vi.fn()
@@ -39,7 +39,7 @@ beforeEach(() => {
   helper.managedApi.restNoteController.getNoteInfo =
     mockedNoteInfoCall.mockResolvedValue({})
   helper.managedApi.restNoteController.show = mockedGetNoteCall
-  renderer = helper.component(OnboardingPage).withStorageProps({})
+  renderer = helper.component(AssimilationPage).withStorageProps({})
 })
 
 describe("repeat page", () => {

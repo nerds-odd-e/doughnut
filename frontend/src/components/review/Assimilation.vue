@@ -8,7 +8,7 @@
       :key="note.id"
       @level-changed="$emit('reloadNeeded', $event)"
     />
-    <OnboardingButtons
+    <AssimilationButtons
       :key="buttonKey"
       @do-onboarding="processForm"
     />
@@ -22,7 +22,7 @@ import ContainerPage from "@/pages/commons/ContainerPage.vue"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import usePopups from "../commons/Popups/usePopups"
 import NoteInfoBar from "../notes/NoteInfoBar.vue"
-import OnboardingButtons from "./OnboardingButtons.vue"
+import AssimilationButtons from "./AssimilationButtons.vue"
 import NoteWithBreadcrumb from "./NoteWithBreadcrumb.vue"
 import { computed } from "vue"
 
