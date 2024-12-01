@@ -10,7 +10,7 @@
     :conversations="conversations"
     :selectedConversation="conversation"
     :allow-new-conversation="allowNewConversation"
-    :default-messages="showDefaultMessages ? defaultReviewQuestions : undefined"
+    :default-messages="showDefaultMessages ? defaultQuestions : undefined"
   >
     <template #messages v-if="currentConversationMessages !== undefined">
       <div
@@ -153,7 +153,7 @@ watch(() => conversation, fetchConversationMessages)
 const handleSendMessageAndInviteAI = (message: string) =>
   handleSendMessage(message, true)
 
-const defaultReviewQuestions = [
+const defaultQuestions = [
   "Why is my answer wrong?",
   "I think the question is wrong. Please check.",
   "Please explain the question and answer to me.",
