@@ -98,10 +98,10 @@ export type { QuestionSuggestionParams } from './models/QuestionSuggestionParams
 export { Randomization } from './models/Randomization';
 export type { RecallPrompt } from './models/RecallPrompt';
 export type { RecallSetting } from './models/RecallSetting';
+export type { RecallStatus } from './models/RecallStatus';
 export type { RedirectToNoteResponse } from './models/RedirectToNoteResponse';
 export type { RequiredAction } from './models/RequiredAction';
 export type { ResponseJsonSchema } from './models/ResponseJsonSchema';
-export type { ReviewStatus } from './models/ReviewStatus';
 export type { Run } from './models/Run';
 export type { RunImage } from './models/RunImage';
 export type { RunStep } from './models/RunStep';

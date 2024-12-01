@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { DueMemoryTrackers } from '../models/DueMemoryTrackers';
-import type { ReviewStatus } from '../models/ReviewStatus';
+import type { RecallStatus } from '../models/RecallStatus';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestRecallsControllerService {
@@ -32,12 +32,12 @@ export class RestRecallsControllerService {
     }
     /**
      * @param timezone
-     * @returns ReviewStatus OK
+     * @returns RecallStatus OK
      * @throws ApiError
      */
     public overview(
         timezone: string,
-    ): CancelablePromise<ReviewStatus> {
+    ): CancelablePromise<RecallStatus> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/recalls/overview',

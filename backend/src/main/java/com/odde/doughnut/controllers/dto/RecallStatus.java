@@ -2,8 +2,7 @@ package com.odde.doughnut.controllers.dto;
 
 import jakarta.validation.constraints.NotNull;
 
-public class ReviewStatus {
+public class RecallStatus {
   @NotNull public int toRepeatCount;
   @NotNull public int learntCount;
-  @NotNull public int notLearntCount;
 }

@@ -2491,7 +2491,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/ReviewStatus"
+                $ref: "#/components/schemas/RecallStatus"
   /api/recall-prompts/{recallPrompt}:
     get:
       tags:
@@ -4052,10 +4052,9 @@ components:
         dueInDays:
           type: integer
           format: int32
-    ReviewStatus:
+    RecallStatus:
       required:
       - learntCount
-      - notLearntCount
       - toRepeatCount
       type: object
       properties:
@@ -4063,9 +4062,6 @@ components:
           type: integer
           format: int32
         learntCount:
-          type: integer
-          format: int32
-        notLearntCount:
           type: integer
           format: int32
     NoteInfo:

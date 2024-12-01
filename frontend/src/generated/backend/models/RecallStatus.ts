@@ -2,9 +2,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type ReviewStatus = {
+export type RecallStatus = {
     toRepeatCount: number;
     learntCount: number;
-    notLearntCount: number;
 };
 

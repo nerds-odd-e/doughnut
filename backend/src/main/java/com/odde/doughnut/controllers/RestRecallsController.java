@@ -1,10 +1,9 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.DueMemoryTrackers;
-import com.odde.doughnut.controllers.dto.ReviewStatus;
+import com.odde.doughnut.controllers.dto.RecallStatus;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.AssimilationService;
 import com.odde.doughnut.services.RecallService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import jakarta.annotation.Resource;
@@ -38,19 +37,17 @@ class RestRecallsController {
 
   @GetMapping("/overview")
   @Transactional(readOnly = true)
-  public ReviewStatus overview(@RequestParam(value = "timezone") String timezone) {
+  public RecallStatus overview(@RequestParam(value = "timezone") String timezone) {
     currentUser.assertLoggedIn();
     ZoneId timeZone = ZoneId.of(timezone);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    AssimilationService assimilationService =
-        new AssimilationService(currentUser, modelFactoryService, currentUTCTimestamp, timeZone);
-    RecallService recallService = new RecallService(currentUser, currentUTCTimestamp, timeZone);
-    ReviewStatus reviewStatus = new ReviewStatus();
-    reviewStatus.toRepeatCount = recallService.getToRecallCount();
-    reviewStatus.learntCount = assimilationService.learntCount();
-    reviewStatus.notLearntCount = assimilationService.unassimilatedCount();
+    RecallService recallService =
+        new RecallService(currentUser, currentUTCTimestamp, timeZone, modelFactoryService);
+    RecallStatus recallStatus = new RecallStatus();
+    recallStatus.toRepeatCount = recallService.getToRecallCount();
+    recallStatus.learntCount = recallService.learntCount();
 
-    return reviewStatus;
+    return recallStatus;
   }
 
   @GetMapping(value = {"/repeat"})
@@ -61,7 +58,7 @@ class RestRecallsController {
     currentUser.assertLoggedIn();
     ZoneId timeZone = ZoneId.of(timezone);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    return new RecallService(currentUser, currentUTCTimestamp, timeZone)
+    return new RecallService(currentUser, currentUTCTimestamp, timeZone, modelFactoryService)
         .getDueMemoryTrackers(dueInDays == null ? 0 : dueInDays);
   }
 }

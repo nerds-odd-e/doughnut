@@ -34,7 +34,7 @@ public class AssimilationService {
     return reviewScope.getThingHaveNotBeenReviewedAtAll().limit(count);
   }
 
-  public int unassimilatedCount() {
+  private int unassimilatedCount() {
     Integer subscribedCount =
         getSubscriptionModelStream()
             .map(this::getPendingNewMemoryTrackerCount)
@@ -50,11 +50,6 @@ public class AssimilationService {
   private Stream<SubscriptionModel> getSubscriptionModelStream() {
     return userModel.getEntity().getSubscriptions().stream()
         .map(modelFactoryService::toSubscriptionModel);
-  }
-
-  public int learntCount() {
-    return modelFactoryService.memoryTrackerRepository.countByUserNotRemoved(
-        userModel.getEntity().getId());
   }
 
   public Stream<Note> getDueInitialMemoryTrackers() {
@@ -94,15 +89,11 @@ public class AssimilationService {
         .toList();
   }
 
-  private int toInitialReviewCount() {
-    if (getDueInitialMemoryTrackers().findFirst().isEmpty()) {
-      return 0;
-    }
-    return Math.min(remainingDailyNewNotesCount(), unassimilatedCount());
-  }
-
   public AssimilationCountDTO getCounts() {
-    return new AssimilationCountDTO(
-        toInitialReviewCount(), getAssimilatedCountOfTheDay(), unassimilatedCount());
+    int result = 0;
+    if (getDueInitialMemoryTrackers().findFirst().isPresent()) {
+      result = Math.min(remainingDailyNewNotesCount(), unassimilatedCount());
+    }
+    return new AssimilationCountDTO(result, getAssimilatedCountOfTheDay(), unassimilatedCount());
   }
 }
