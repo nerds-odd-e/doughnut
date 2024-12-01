@@ -4,7 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.services.OnboardingService;
+import com.odde.doughnut.services.AssimilationService;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
 import java.time.ZoneId;
@@ -21,13 +21,13 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-public class OnboardingServiceTest {
+public class AssimilationServiceTest {
   @Autowired MakeMe makeMe;
   UserModel userModel;
   UserModel anotherUser;
   Timestamp day1;
   Timestamp day0;
-  OnboardingService recallServiceOnDay1;
+  AssimilationService assimilationService;
 
   @BeforeEach
   void setup() {
@@ -35,16 +35,16 @@ public class OnboardingServiceTest {
     anotherUser = makeMe.aUser().toModelPlease();
     day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
     day0 = makeMe.aTimestamp().of(0, 8).fromShanghai().please();
-    recallServiceOnDay1 =
-        new OnboardingService(
+    assimilationService =
+        new AssimilationService(
             userModel, makeMe.modelFactoryService, day1, ZoneId.of("Asia/Shanghai"));
   }
 
   @Test
   void whenThereIsNoNotesForUser() {
     makeMe.aNote().creatorAndOwner(anotherUser).please();
-    assertThat(getFirstInitialMemoryTracker(recallServiceOnDay1), is(nullValue()));
-    assertThat(recallServiceOnDay1.getOnboardingCounts().getDueCount(), equalTo(0));
+    assertThat(getFirstInitialMemoryTracker(assimilationService), is(nullValue()));
+    assertThat(assimilationService.getOnboardingCounts().getDueCount(), equalTo(0));
   }
 
   @Nested
@@ -60,24 +60,24 @@ public class OnboardingServiceTest {
 
     @Test
     void shouldReturnTheFirstNoteAndThenTheSecondWhenThereAreTwo() {
-      assertThat(recallServiceOnDay1.getOnboardingCounts().getDueCount(), equalTo(2));
-      assertThat(getFirstInitialMemoryTracker(recallServiceOnDay1), equalTo(note1));
+      assertThat(assimilationService.getOnboardingCounts().getDueCount(), equalTo(2));
+      assertThat(getFirstInitialMemoryTracker(assimilationService), equalTo(note1));
       makeMe.aMemoryTrackerFor(note1).by(userModel).initiallyReviewedOn(day1).please();
-      assertThat(recallServiceOnDay1.getOnboardingCounts().getDueCount(), equalTo(1));
-      assertThat(getFirstInitialMemoryTracker(recallServiceOnDay1), equalTo(note2));
+      assertThat(assimilationService.getOnboardingCounts().getDueCount(), equalTo(1));
+      assertThat(getFirstInitialMemoryTracker(assimilationService), equalTo(note2));
     }
 
     @Test
     void shouldReturnTheSecondNoteIfItsLevelIsLower() {
       makeMe.theNote(note1).level(2).please();
       makeMe.theNote(note2).level(1).please();
-      assertThat(getFirstInitialMemoryTracker(recallServiceOnDay1), equalTo(note2));
+      assertThat(getFirstInitialMemoryTracker(assimilationService), equalTo(note2));
     }
 
     @Test
     void shouldNotIncludeNoteThatIsSkippedForReview() {
       makeMe.theNote(note1).skipMemoryTracking().linkTo(note2).please();
-      assertThat(getFirstInitialMemoryTracker(recallServiceOnDay1), equalTo(note2));
+      assertThat(getFirstInitialMemoryTracker(assimilationService), equalTo(note2));
     }
 
     @Nested
@@ -92,7 +92,7 @@ public class OnboardingServiceTest {
       }
 
       private List<Note> getAllDueMemoryTrackers() {
-        return recallServiceOnDay1.getDueInitialMemoryTrackers().collect(Collectors.toList());
+        return assimilationService.getDueInitialMemoryTrackers().collect(Collectors.toList());
       }
 
       @Test
@@ -156,13 +156,13 @@ public class OnboardingServiceTest {
 
       @Test
       void shouldReturnOneIfUsersDailySettingIsOne() {
-        assertThat(getFirstInitialMemoryTracker(recallServiceOnDay1), equalTo(note1));
+        assertThat(getFirstInitialMemoryTracker(assimilationService), equalTo(note1));
       }
 
       @Test
       void shouldNotIncludeNotesThatAreAlreadyReviewed() {
         makeMe.aMemoryTrackerFor(note1).by(userModel).initiallyReviewedOn(day1).please();
-        assertThat(getFirstInitialMemoryTracker(recallServiceOnDay1), is(nullValue()));
+        assertThat(getFirstInitialMemoryTracker(assimilationService), is(nullValue()));
       }
 
       @Test
@@ -173,21 +173,21 @@ public class OnboardingServiceTest {
             .initiallyReviewedOn(day1)
             .removedFromTracking()
             .please();
-        assertThat(getFirstInitialMemoryTracker(recallServiceOnDay1), is(note2));
+        assertThat(getFirstInitialMemoryTracker(assimilationService), is(note2));
       }
 
       @Test
       void shouldIncludeNotesThatAreReviewedByOtherPeople() {
         makeMe.aMemoryTrackerFor(note1).by(anotherUser).initiallyReviewedOn(day1).please();
-        assertThat(getFirstInitialMemoryTracker(recallServiceOnDay1), equalTo(note1));
+        assertThat(getFirstInitialMemoryTracker(assimilationService), equalTo(note1));
       }
 
       @Test
       void theDailyCountShouldNotBeResetOnSameDayDifferentHour() {
         makeMe.aMemoryTrackerFor(note1).by(userModel).initiallyReviewedOn(day1).please();
         Timestamp day1_23 = makeMe.aTimestamp().of(1, 23).fromShanghai().please();
-        OnboardingService recallService =
-            new OnboardingService(
+        AssimilationService recallService =
+            new AssimilationService(
                 userModel, makeMe.modelFactoryService, day1_23, ZoneId.of("Asia/Shanghai"));
         assertThat(getFirstInitialMemoryTracker(recallService), is(nullValue()));
       }
@@ -196,8 +196,8 @@ public class OnboardingServiceTest {
       void theDailyCountShouldBeResetOnNextDay() {
         makeMe.aMemoryTrackerFor(note1).by(userModel).initiallyReviewedOn(day1).please();
         Timestamp day2 = makeMe.aTimestamp().of(2, 1).fromShanghai().please();
-        OnboardingService recallService =
-            new OnboardingService(
+        AssimilationService recallService =
+            new AssimilationService(
                 userModel, makeMe.modelFactoryService, day2, ZoneId.of("Asia/Shanghai"));
         assertThat(getFirstInitialMemoryTracker(recallService), equalTo(note2));
       }
@@ -226,14 +226,14 @@ public class OnboardingServiceTest {
 
     @Test
     void shouldReturnMemoryTrackerForNote() {
-      assertThat(getFirstInitialMemoryTracker(recallServiceOnDay1), equalTo(note1));
+      assertThat(getFirstInitialMemoryTracker(assimilationService), equalTo(note1));
     }
 
     @Test
     void shouldReturnMemoryTrackerForLink() {
       makeMe.theNote(note2).skipMemoryTracking().please();
       makeMe.theNote(note1).skipMemoryTracking().linkTo(note2).please();
-      Note noteToReview = getFirstInitialMemoryTracker(recallServiceOnDay1);
+      Note noteToReview = getFirstInitialMemoryTracker(assimilationService);
       assertThat(noteToReview.getParent(), equalTo(note1));
     }
 
@@ -241,7 +241,7 @@ public class OnboardingServiceTest {
     void reviewedMoreThanPlanned() {
       makeMe.aMemoryTrackerFor(note1).by(userModel).initiallyReviewedOn(day1).please();
       makeMe.aMemoryTrackerFor(note2).by(userModel).initiallyReviewedOn(day1).please();
-      assertThat(getFirstInitialMemoryTracker(recallServiceOnDay1), nullValue());
+      assertThat(getFirstInitialMemoryTracker(assimilationService), nullValue());
     }
   }
 
@@ -258,11 +258,11 @@ public class OnboardingServiceTest {
 
     @Test
     void shouldNotBeReviewed() {
-      assertThat(getFirstInitialMemoryTracker(recallServiceOnDay1), is(nullValue()));
+      assertThat(getFirstInitialMemoryTracker(assimilationService), is(nullValue()));
     }
   }
 
-  private Note getFirstInitialMemoryTracker(OnboardingService recallService) {
+  private Note getFirstInitialMemoryTracker(AssimilationService recallService) {
     return recallService.getDueInitialMemoryTrackers().findFirst().orElse(null);
   }
 }

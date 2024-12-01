@@ -4,7 +4,7 @@ import com.odde.doughnut.controllers.dto.DueMemoryTrackers;
 import com.odde.doughnut.controllers.dto.ReviewStatus;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.OnboardingService;
+import com.odde.doughnut.services.AssimilationService;
 import com.odde.doughnut.services.RecallService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import jakarta.annotation.Resource;
@@ -42,14 +42,14 @@ class RestRecallsController {
     currentUser.assertLoggedIn();
     ZoneId timeZone = ZoneId.of(timezone);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    OnboardingService onboardingService =
-        new OnboardingService(currentUser, modelFactoryService, currentUTCTimestamp, timeZone);
+    AssimilationService assimilationService =
+        new AssimilationService(currentUser, modelFactoryService, currentUTCTimestamp, timeZone);
     RecallService recallService = new RecallService(currentUser, currentUTCTimestamp, timeZone);
     ReviewStatus reviewStatus = new ReviewStatus();
     reviewStatus.toRepeatCount = recallService.getToRecallCount();
-    reviewStatus.learntCount = onboardingService.learntCount();
-    reviewStatus.notLearntCount = onboardingService.notLearntCount();
-    reviewStatus.toInitialReviewCount = onboardingService.toInitialReviewCount();
+    reviewStatus.learntCount = assimilationService.learntCount();
+    reviewStatus.notLearntCount = assimilationService.notLearntCount();
+    reviewStatus.toInitialReviewCount = assimilationService.toInitialReviewCount();
 
     return reviewStatus;
   }

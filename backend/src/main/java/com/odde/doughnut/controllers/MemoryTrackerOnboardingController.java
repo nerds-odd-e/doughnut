@@ -6,7 +6,7 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.MemoryTrackerModel;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.OnboardingService;
+import com.odde.doughnut.services.AssimilationService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import jakarta.annotation.Resource;
 import java.sql.Timestamp;
@@ -42,7 +42,7 @@ class MemoryTrackerOnboardingController {
     ZoneId timeZone = ZoneId.of(timezone);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
 
-    return new OnboardingService(currentUser, modelFactoryService, currentUTCTimestamp, timeZone)
+    return new AssimilationService(currentUser, modelFactoryService, currentUTCTimestamp, timeZone)
         .getDueInitialMemoryTrackers()
         .toList();
   }
@@ -70,7 +70,7 @@ class MemoryTrackerOnboardingController {
     ZoneId timeZone = ZoneId.of(timezone);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
 
-    return new OnboardingService(currentUser, modelFactoryService, currentUTCTimestamp, timeZone)
+    return new AssimilationService(currentUser, modelFactoryService, currentUTCTimestamp, timeZone)
         .getOnboardingCounts();
   }
 }

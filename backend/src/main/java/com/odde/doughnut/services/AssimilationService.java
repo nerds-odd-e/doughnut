@@ -13,13 +13,13 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class OnboardingService {
+public class AssimilationService {
   private final UserModel userModel;
   private final ModelFactoryService modelFactoryService;
   private final Timestamp currentUTCTimestamp;
   private final ZoneId timeZone;
 
-  public OnboardingService(
+  public AssimilationService(
       UserModel user,
       ModelFactoryService modelFactoryService,
       Timestamp currentUTCTimestamp,
