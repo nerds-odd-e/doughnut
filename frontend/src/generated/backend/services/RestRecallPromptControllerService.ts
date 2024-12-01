@@ -4,8 +4,8 @@
 /* eslint-disable */
 import type { AnswerDTO } from '../models/AnswerDTO';
 import type { AnsweredQuestion } from '../models/AnsweredQuestion';
-import type { RecallPrompt } from '../models/RecallPrompt';
 import type { QuestionContestResult } from '../models/QuestionContestResult';
+import type { RecallPrompt } from '../models/RecallPrompt';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestRecallPromptControllerService {
