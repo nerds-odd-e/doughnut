@@ -549,30 +549,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/GlobalAiModelSettings"
-  /api/recalls:
-    post:
-      tags:
-      - rest-recalls-controller
-      operationId: create
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/InitialInfo"
-        required: true
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/MemoryTracker"
   /api/recall-prompts/{recallPrompt}/regenerate:
     post:
       tags:
@@ -1268,6 +1244,30 @@ paths:
         required: true
         schema:
           type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/MemoryTracker"
+  /api/memory-tracker-onboarding:
+    post:
+      tags:
+      - memory-tracker-onboarding-controller
+      operationId: create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InitialInfo"
+        required: true
       responses:
         "500":
           description: Internal Server Error
@@ -2492,32 +2492,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ReviewStatus"
-  /api/recalls/initial:
-    get:
-      tags:
-      - rest-recalls-controller
-      operationId: initialReview
-      parameters:
-      - name: timezone
-        in: query
-        required: true
-        schema:
-          type: string
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Note"
   /api/recall-prompts/{recallPrompt}:
     get:
       tags:
@@ -2812,6 +2786,32 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/MemoryTracker"
+  /api/memory-tracker-onboarding/initial:
+    get:
+      tags:
+      - memory-tracker-onboarding-controller
+      operationId: initialReview
+      parameters:
+      - name: timezone
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Note"
   /api/healthcheck:
     get:
       tags:
@@ -3439,43 +3439,6 @@ components:
           type: string
         othersModel:
           type: string
-    InitialInfo:
-      type: object
-      properties:
-        noteId:
-          type: integer
-          format: int32
-        skipMemoryTracking:
-          type: boolean
-    MemoryTracker:
-      required:
-      - id
-      - nextRecallAt
-      - note
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        note:
-          $ref: "#/components/schemas/Note"
-        lastRecalledAt:
-          type: string
-          format: date-time
-        nextRecallAt:
-          type: string
-          format: date-time
-        onboardedAt:
-          type: string
-          format: date-time
-        repetitionCount:
-          type: integer
-          format: int32
-        forgettingCurveIndex:
-          type: integer
-          format: int32
-        removedFromTracking:
-          type: boolean
     RecallPrompt:
       required:
       - bareQuestion
@@ -3666,6 +3629,43 @@ components:
         adjustment:
           type: integer
           format: int32
+    MemoryTracker:
+      required:
+      - id
+      - nextRecallAt
+      - note
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        note:
+          $ref: "#/components/schemas/Note"
+        lastRecalledAt:
+          type: string
+          format: date-time
+        nextRecallAt:
+          type: string
+          format: date-time
+        onboardedAt:
+          type: string
+          format: date-time
+        repetitionCount:
+          type: integer
+          format: int32
+        forgettingCurveIndex:
+          type: integer
+          format: int32
+        removedFromTracking:
+          type: boolean
+    InitialInfo:
+      type: object
+      properties:
+        noteId:
+          type: integer
+          format: int32
+        skipMemoryTracking:
+          type: boolean
     LinkCreation:
       required:
       - linkType

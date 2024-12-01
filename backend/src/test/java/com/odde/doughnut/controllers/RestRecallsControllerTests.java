@@ -2,19 +2,15 @@ package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.dto.DueMemoryTrackers;
-import com.odde.doughnut.controllers.dto.InitialInfo;
-import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.sql.Timestamp;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -49,7 +45,7 @@ class RestRecallsControllerTests {
   }
 
   @Nested
-  class overall {
+  class Overall {
     @Test
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
       assertThrows(
@@ -58,33 +54,7 @@ class RestRecallsControllerTests {
   }
 
   @Nested
-  class initalReview {
-    @Test
-    void initialReview() {
-      Note n = makeMe.aNote().creatorAndOwner(currentUser).please();
-      assertThat(n.getId(), notNullValue());
-      List<Note> memoryTrackerWithRecallSettings = controller.initialReview("Asia/Shanghai");
-      assertThat(memoryTrackerWithRecallSettings, hasSize(1));
-    }
-
-    @Test
-    void notLoggedIn() {
-      assertThrows(
-          ResponseStatusException.class, () -> nullUserController().initialReview("Asia/Shanghai"));
-    }
-  }
-
-  @Nested
-  class createInitialReviewPoiint {
-    @Test
-    void create() {
-      InitialInfo info = new InitialInfo();
-      assertThrows(ResponseStatusException.class, () -> nullUserController().create(info));
-    }
-  }
-
-  @Nested
-  class repeat {
+  class Repeat {
     @Test
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
       assertThrows(
@@ -98,14 +68,14 @@ class RestRecallsControllerTests {
         delimiter = '|',
         textBlock =
             """
-       next review at (in hours) | timezone     | expected count
-      #------------------------------------------------------------
-       -1                        | Asia/Tokyo   | 1
-       0                         | Asia/Tokyo   | 1
-       4                         | Asia/Tokyo   | 0
-       4                         | Europe/Paris | 1
-       12                        | Europe/Paris | 0
-       """)
+                next review at (in hours) | timezone     | expected count
+                #------------------------------------------------------------
+                -1                        | Asia/Tokyo   | 1
+                0                         | Asia/Tokyo   | 1
+                4                         | Asia/Tokyo   | 0
+                4                         | Europe/Paris | 1
+                12                        | Europe/Paris | 0
+                """)
     void shouldGetMemoryTrackersBasedOnTimezone(
         int nextRecallAtHours, String timezone, int expectedCount) {
       Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();

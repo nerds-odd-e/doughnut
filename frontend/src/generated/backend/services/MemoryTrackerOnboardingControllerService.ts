@@ -2,29 +2,26 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { DueMemoryTrackers } from '../models/DueMemoryTrackers';
-import type { ReviewStatus } from '../models/ReviewStatus';
+import type { InitialInfo } from '../models/InitialInfo';
+import type { MemoryTracker } from '../models/MemoryTracker';
+import type { Note } from '../models/Note';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
-export class RestRecallsControllerService {
+export class MemoryTrackerOnboardingControllerService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
-     * @param timezone
-     * @param dueindays
-     * @returns DueMemoryTrackers OK
+     * @param requestBody
+     * @returns MemoryTracker OK
      * @throws ApiError
      */
-    public repeatReview(
-        timezone: string,
-        dueindays?: number,
-    ): CancelablePromise<DueMemoryTrackers> {
+    public create(
+        requestBody: InitialInfo,
+    ): CancelablePromise<MemoryTracker> {
         return this.httpRequest.request({
-            method: 'GET',
-            url: '/api/recalls/repeat',
-            query: {
-                'timezone': timezone,
-                'dueindays': dueindays,
-            },
+            method: 'POST',
+            url: '/api/memory-tracker-onboarding',
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
                 500: `Internal Server Error`,
             },
@@ -32,15 +29,15 @@ export class RestRecallsControllerService {
     }
     /**
      * @param timezone
-     * @returns ReviewStatus OK
+     * @returns Note OK
      * @throws ApiError
      */
-    public overview(
+    public initialReview(
         timezone: string,
-    ): CancelablePromise<ReviewStatus> {
+    ): CancelablePromise<Array<Note>> {
         return this.httpRequest.request({
             method: 'GET',
-            url: '/api/recalls/overview',
+            url: '/api/memory-tracker-onboarding/initial',
             query: {
                 'timezone': timezone,
             },

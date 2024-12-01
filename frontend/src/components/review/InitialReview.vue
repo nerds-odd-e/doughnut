@@ -57,7 +57,7 @@ const processForm = async (skipMemoryTracking: boolean) => {
     }
   }
 
-  managedApi.restRecallsController
+  managedApi.memoryTrackerOnboardingController
     .create({
       noteId: note.id,
       skipMemoryTracking,

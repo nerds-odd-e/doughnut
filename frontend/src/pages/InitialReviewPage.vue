@@ -62,7 +62,7 @@ const initialReviewDone = () => {
 }
 
 const loadInitialReview = () => {
-  managedApi.restRecallsController
+  managedApi.memoryTrackerOnboardingController
     .initialReview(timezoneParam())
     .then((resp) => {
       if (resp.length === 0) {
