@@ -1,11 +1,11 @@
 package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.dto.InitialInfo;
+import com.odde.doughnut.controllers.dto.OnboardingCountDTO;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
@@ -68,6 +68,27 @@ class MemoryTrackerOnboardingControllerTests {
     void create() {
       InitialInfo info = new InitialInfo();
       assertThrows(ResponseStatusException.class, () -> nullUserController().onboard(info));
+    }
+  }
+
+  @Nested
+  class GetOnboardingCount {
+    @Test
+    void shouldReturnOnboardingCountsForLoggedInUser() {
+      // Create a note that needs onboarding
+      Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
+      assertThat(note.getId(), notNullValue());
+
+      OnboardingCountDTO counts = controller.getOnboardingCount("Asia/Shanghai");
+
+      assertThat(counts.getDueCount(), equalTo(1));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenUserNotLoggedIn() {
+      assertThrows(
+          ResponseStatusException.class,
+          () -> nullUserController().getOnboardingCount("Asia/Shanghai"));
     }
   }
 }

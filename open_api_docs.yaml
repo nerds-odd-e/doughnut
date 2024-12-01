@@ -2812,6 +2812,30 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Note"
+  /api/memory-tracker-onboarding/count:
+    get:
+      tags:
+      - memory-tracker-onboarding-controller
+      operationId: getOnboardingCount
+      parameters:
+      - name: timezone
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/OnboardingCountDTO"
   /api/healthcheck:
     get:
       tags:
@@ -4091,6 +4115,15 @@ components:
           type: string
         target:
           type: string
+    OnboardingCountDTO:
+      type: object
+      properties:
+        dueCount:
+          type: integer
+          format: int32
+        totalRemainingCount:
+          type: integer
+          format: int32
     FailureReport:
       required:
       - createDatetime

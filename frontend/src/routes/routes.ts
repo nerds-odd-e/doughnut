@@ -19,7 +19,7 @@ import MessageCenterPage from "../pages/MessageCenterPage.vue"
 import RecentPage from "@/pages/RecentPage.vue"
 import CirclesPage from "@/pages/CirclesPage.vue"
 
-const NestedInitialReviewPage = NestedPage(OnboardingPage, "initial")
+const NestedOnboardingPage = NestedPage(OnboardingPage, "initial")
 const NestedRepeatPage = NestedPage(RepeatPage, "repeat")
 
 // Please start most of the path with "/d/"
@@ -106,7 +106,7 @@ const routes = [
   {
     path: "/d/recalls/initial",
     name: "initial",
-    component: NestedInitialReviewPage,
+    component: NestedOnboardingPage,
     children: nestedNoteAndLinkRoutes("initial-"),
     meta: { useNoteStorageAccessor: true },
   },

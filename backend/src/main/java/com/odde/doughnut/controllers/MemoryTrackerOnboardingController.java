@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.InitialInfo;
+import com.odde.doughnut.controllers.dto.OnboardingCountDTO;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.MemoryTrackerModel;
@@ -59,5 +60,19 @@ class MemoryTrackerOnboardingController {
     memoryTrackerModel.onboarding(
         testabilitySettings.getCurrentUTCTimestamp(), currentUser.getEntity());
     return memoryTrackerModel.getEntity();
+  }
+
+  @GetMapping("/count")
+  @Transactional(readOnly = true)
+  public OnboardingCountDTO getOnboardingCount(@RequestParam(value = "timezone") String timezone) {
+    currentUser.assertLoggedIn();
+    ZoneId timeZone = ZoneId.of(timezone);
+    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
+
+    RecallService recallService =
+        new RecallService(currentUser, currentUTCTimestamp, timeZone, modelFactoryService);
+
+    return new OnboardingCountDTO(
+        recallService.toInitialReviewCount(), recallService.notLearntCount());
   }
 }

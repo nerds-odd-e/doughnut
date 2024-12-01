@@ -60,7 +60,7 @@ public class RecallService {
         TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, dueInDays * 24), timeZone);
   }
 
-  private int notLearntCount() {
+  public int notLearntCount() {
     Integer subscribedCount =
         getSubscriptionModelStream()
             .map(this::getPendingNewMemoryTrackerCount)
@@ -73,7 +73,7 @@ public class RecallService {
     return reviewScope.getThingsHaveNotBeenReviewedAtAllCount();
   }
 
-  private int toInitialReviewCount() {
+  public int toInitialReviewCount() {
     if (getDueInitialMemoryTrackers().findFirst().isEmpty()) {
       return 0;
     }

@@ -5,6 +5,7 @@
 import type { InitialInfo } from '../models/InitialInfo';
 import type { MemoryTracker } from '../models/MemoryTracker';
 import type { Note } from '../models/Note';
+import type { OnboardingCountDTO } from '../models/OnboardingCountDTO';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class MemoryTrackerOnboardingControllerService {
@@ -38,6 +39,25 @@ export class MemoryTrackerOnboardingControllerService {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/memory-tracker-onboarding/onboarding',
+            query: {
+                'timezone': timezone,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param timezone
+     * @returns OnboardingCountDTO OK
+     * @throws ApiError
+     */
+    public getOnboardingCount(
+        timezone: string,
+    ): CancelablePromise<OnboardingCountDTO> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/memory-tracker-onboarding/count',
             query: {
                 'timezone': timezone,
             },
