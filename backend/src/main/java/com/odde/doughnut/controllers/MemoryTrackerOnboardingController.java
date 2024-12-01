@@ -69,10 +69,7 @@ class MemoryTrackerOnboardingController {
     ZoneId timeZone = ZoneId.of(timezone);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
 
-    RecallService recallService =
-        new RecallService(currentUser, currentUTCTimestamp, timeZone, modelFactoryService);
-
-    return new OnboardingCountDTO(
-        recallService.toInitialReviewCount(), recallService.notLearntCount());
+    return new RecallService(currentUser, currentUTCTimestamp, timeZone, modelFactoryService)
+        .getOnboardingCounts();
   }
 }

@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.services.OnboardingService;
 import com.odde.doughnut.services.RecallService;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
@@ -21,13 +22,13 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-public class RecallServiceInitialReviewTest {
+public class OnboardingServiceTest {
   @Autowired MakeMe makeMe;
   UserModel userModel;
   UserModel anotherUser;
   Timestamp day1;
   Timestamp day0;
-  RecallService recallServiceOnDay1;
+  OnboardingService recallServiceOnDay1;
 
   @BeforeEach
   void setup() {
@@ -44,7 +45,7 @@ public class RecallServiceInitialReviewTest {
   void whenThereIsNoNotesForUser() {
     makeMe.aNote().creatorAndOwner(anotherUser).please();
     assertThat(getFirstInitialMemoryTracker(recallServiceOnDay1), is(nullValue()));
-    assertThat(recallServiceOnDay1.getReviewStatus().toInitialReviewCount, equalTo(0));
+    assertThat(recallServiceOnDay1.getOnboardingCounts().getDueCount(), equalTo(0));
   }
 
   @Nested
@@ -60,10 +61,10 @@ public class RecallServiceInitialReviewTest {
 
     @Test
     void shouldReturnTheFirstNoteAndThenTheSecondWhenThereAreTwo() {
-      assertThat(recallServiceOnDay1.getReviewStatus().toInitialReviewCount, equalTo(2));
+      assertThat(recallServiceOnDay1.getOnboardingCounts().getDueCount(), equalTo(2));
       assertThat(getFirstInitialMemoryTracker(recallServiceOnDay1), equalTo(note1));
       makeMe.aMemoryTrackerFor(note1).by(userModel).initiallyReviewedOn(day1).please();
-      assertThat(recallServiceOnDay1.getReviewStatus().toInitialReviewCount, equalTo(1));
+      assertThat(recallServiceOnDay1.getOnboardingCounts().getDueCount(), equalTo(1));
       assertThat(getFirstInitialMemoryTracker(recallServiceOnDay1), equalTo(note2));
     }
 
@@ -262,7 +263,7 @@ public class RecallServiceInitialReviewTest {
     }
   }
 
-  private Note getFirstInitialMemoryTracker(RecallService recallService) {
+  private Note getFirstInitialMemoryTracker(OnboardingService recallService) {
     return recallService.getDueInitialMemoryTrackers().findFirst().orElse(null);
   }
 }
