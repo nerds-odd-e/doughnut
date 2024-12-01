@@ -52,18 +52,18 @@ export class RestConversationMessageControllerService {
         });
     }
     /**
-     * @param reviewQuestion
+     * @param recallPrompt
      * @returns Conversation OK
      * @throws ApiError
      */
-    public startConversationAboutReviewQuestion(
-        reviewQuestion: number,
+    public startConversationAboutRecallPrompt(
+        recallPrompt: number,
     ): CancelablePromise<Conversation> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/conversation/review-question/{reviewQuestion}',
+            url: '/api/conversation/review-question/{recallPrompt}',
             path: {
-                'reviewQuestion': reviewQuestion,
+                'recallPrompt': recallPrompt,
             },
             errors: {
                 500: `Internal Server Error`,

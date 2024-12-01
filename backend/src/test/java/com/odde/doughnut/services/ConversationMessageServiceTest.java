@@ -105,7 +105,7 @@ class ConversationMessageServiceTest {
     @Test
     void shouldSetCorrectOwnershipAndSubject() {
       Conversation conversation =
-          conversationService.startConversationAboutReviewQuestion(
+          conversationService.startConversationAboutRecallPrompt(
               recallPrompt, currentUser.getEntity());
 
       makeMe.refresh(conversation);

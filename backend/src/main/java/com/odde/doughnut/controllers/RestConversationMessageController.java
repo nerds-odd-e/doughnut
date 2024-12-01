@@ -39,7 +39,7 @@ public class RestConversationMessageController {
       @PathVariable("assessmentQuestion") @Schema(type = "integer")
           AssessmentQuestionInstance assessmentQuestionInstance) {
     Conversation conversation =
-        conversationService.startConversationAboutReviewQuestion(
+        conversationService.startConversationAboutRecallPrompt(
             assessmentQuestionInstance, currentUser.getEntity());
     conversationService.addMessageToConversation(conversation, currentUser.getEntity(), feedback);
     return conversation;
@@ -135,10 +135,10 @@ public class RestConversationMessageController {
     return conversationService.getConversationsAboutNote(note, currentUser.getEntity());
   }
 
-  @PostMapping("/review-question/{reviewQuestion}")
-  public Conversation startConversationAboutReviewQuestion(
-      @PathVariable("reviewQuestion") @Schema(type = "integer") RecallPrompt recallPrompt) {
-    return conversationService.startConversationAboutReviewQuestion(
+  @PostMapping("/review-question/{recallPrompt}")
+  public Conversation startConversationAboutRecallPrompt(
+      @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt) {
+    return conversationService.startConversationAboutRecallPrompt(
         recallPrompt, currentUser.getEntity());
   }
 }

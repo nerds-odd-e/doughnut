@@ -430,7 +430,7 @@ class RestConversationMessageControllerTest {
 
     @Test
     void shouldStartConversation() {
-      Conversation conversation = controller.startConversationAboutReviewQuestion(recallPrompt);
+      Conversation conversation = controller.startConversationAboutRecallPrompt(recallPrompt);
       List<Conversation> conversations =
           (List<Conversation>) modelFactoryService.conversationRepository.findAll();
       assertEquals(1, conversations.size());
@@ -439,7 +439,7 @@ class RestConversationMessageControllerTest {
 
     @Test
     void shouldSetRecallPromptAsSubject() {
-      Conversation conversation = controller.startConversationAboutReviewQuestion(recallPrompt);
+      Conversation conversation = controller.startConversationAboutRecallPrompt(recallPrompt);
       makeMe.refresh(conversation);
       assertEquals(recallPrompt, conversation.getSubject().getRecallPrompt());
       assertEquals(recallPrompt.getNotebook().getOwnership(), conversation.getSubjectOwnership());

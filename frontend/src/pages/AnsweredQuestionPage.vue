@@ -58,7 +58,7 @@ const startConversation = async () => {
   if (!answeredQuestion.value) return
 
   const conversation =
-    await managedApi.restConversationMessageController.startConversationAboutReviewQuestion(
+    await managedApi.restConversationMessageController.startConversationAboutRecallPrompt(
       answeredQuestion.value.recallPromptId
     )
 

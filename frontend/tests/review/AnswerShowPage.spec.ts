@@ -28,7 +28,7 @@ describe("repetition page", () => {
         mockedShowAnswerCall.mockResolvedValue(answeredQuestion)
       helper.managedApi.restNoteController.show =
         mockedNotePositionCall.mockResolvedValue(makeMe.aNoteRealm.please())
-      helper.managedApi.restConversationMessageController.startConversationAboutReviewQuestion =
+      helper.managedApi.restConversationMessageController.startConversationAboutRecallPrompt =
         mockedStartConversationCall.mockResolvedValue({ id: 123 })
     })
 
