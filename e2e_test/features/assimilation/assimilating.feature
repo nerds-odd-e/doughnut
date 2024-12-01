@@ -1,5 +1,5 @@
-Feature: Initial Review
-    As a learner, I want to review my notes. When notes are reviewed for the first time,
+Feature: Assimilating
+    As a learner, I want to recall my notes. When user's memory of a note is tracked for the first time,
     there should be a daily max and I should be able to give some of my initial impression
     of the note, and/or choose to skip it for any further recalls.
 

@@ -1,4 +1,4 @@
-Feature: Editing when memory tracker onboarding
+Feature: Editing when assimilating
 
   Background:
     Given I am logged in as an existing user

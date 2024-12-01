@@ -103,8 +103,8 @@ jobs:
         spec:
           - |
             e2e_test/features/a*/**
-            e2e_test/features/b*/**
           - |
+            e2e_test/features/b*/**
             e2e_test/features/c*/**
             e2e_test/features/f*/**
             e2e_test/features/l*/**
