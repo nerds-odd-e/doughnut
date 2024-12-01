@@ -57,7 +57,10 @@ Then(
   'On day {int} I should have {string} note for assimilation and {string} for repeat',
   (day: number, toAssimilateAndTotal: string, numberOfRepeats: string) => {
     start.testability().backendTimeTravelTo(day, 8)
-    start.assimilation().expectToAssimilateAndTotal(toAssimilateAndTotal)
+    start
+      .assimilation()
+      .goToAssimilationPage()
+      .expectToAssimilateAndTotal(toAssimilateAndTotal)
     cy.routerToReviews()
     cy.findByText(numberOfRepeats, { selector: '.number-of-repeats' })
   }

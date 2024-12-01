@@ -5,7 +5,7 @@
       <thead>
         <tr>
           <th>Note</th>
-          <th>Initial Review</th>
+          <th>Assimilated</th>
           <th>Status</th>
         </tr>
       </thead>

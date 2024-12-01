@@ -11,7 +11,7 @@
         >
         </span>
         <span class="progress-text">
-          Initial Review: {{ finished }}/{{ finished + remainingInitialReviewCountForToday }}
+          Assimilating: {{ finished }}/{{ finished + remainingInitialReviewCountForToday }}
         </span>
       </span>
     </div>

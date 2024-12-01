@@ -66,7 +66,7 @@ describe("repeat page", () => {
       const wrapper = renderer.currentRoute({ name: "assimilate" }).mount()
       await flushPromises()
       expect(wrapper.findAll(".paused")).toHaveLength(0)
-      expect(teleportTarget.textContent).toContain("Initial Review: 0/2")
+      expect(teleportTarget.textContent).toContain("Assimilating: 0/2")
     })
   })
 })

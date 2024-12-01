@@ -1,14 +1,32 @@
 export const assimilation = () => {
+  const getAssimilateListItemInSidebar = (
+    fn: ($el: Cypress.Chainable<JQuery<HTMLElement>>) => void
+  ) =>
+    cy
+      .get('.sidebar-control')
+      .within(() => fn(cy.get('li[title="Assimilate"]')))
+
   return {
     expectCount(numberOfNotes: number) {
-      cy.get('.sidebar-control').within(() => {
-        cy.get('li[title="Assimilate"]').within(() => {
-          cy.findByText(`${numberOfNotes}`, { selector: '.due-count' })
-        })
+      getAssimilateListItemInSidebar(($el) => {
+        $el.findByText(`${numberOfNotes}`, { selector: '.due-count' })
       })
+      return this
     },
-    expectToAssimilateAndTotal(_toAssimilateAndTotal: string) {
-      //
+    goToAssimilationPage() {
+      cy.routerToRoot()
+      getAssimilateListItemInSidebar(($el) => {
+        $el.click()
+      })
+      return {
+        expectToAssimilateAndTotal(toAssimilateAndTotal: string) {
+          const [toAssimilateCountForToday] = toAssimilateAndTotal.split('/')
+          cy.get('.progress-bar').should(
+            'contain',
+            `Assimilating: 0/${toAssimilateCountForToday}`
+          )
+        },
+      }
     },
   }
 }
