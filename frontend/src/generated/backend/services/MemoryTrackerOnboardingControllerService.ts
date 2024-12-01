@@ -2,10 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { AssimilationCountDTO } from '../models/AssimilationCountDTO';
 import type { InitialInfo } from '../models/InitialInfo';
 import type { MemoryTracker } from '../models/MemoryTracker';
 import type { Note } from '../models/Note';
-import type { OnboardingCountDTO } from '../models/OnboardingCountDTO';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class MemoryTrackerOnboardingControllerService {
@@ -49,12 +49,12 @@ export class MemoryTrackerOnboardingControllerService {
     }
     /**
      * @param timezone
-     * @returns OnboardingCountDTO OK
+     * @returns AssimilationCountDTO OK
      * @throws ApiError
      */
     public getOnboardingCount(
         timezone: string,
-    ): CancelablePromise<OnboardingCountDTO> {
+    ): CancelablePromise<AssimilationCountDTO> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/memory-tracker-onboarding/count',

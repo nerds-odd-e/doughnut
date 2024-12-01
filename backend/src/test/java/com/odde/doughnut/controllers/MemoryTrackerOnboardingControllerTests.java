@@ -4,8 +4,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.odde.doughnut.controllers.dto.AssimilationCountDTO;
 import com.odde.doughnut.controllers.dto.InitialInfo;
-import com.odde.doughnut.controllers.dto.OnboardingCountDTO;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
@@ -79,7 +79,7 @@ class MemoryTrackerOnboardingControllerTests {
       Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
       assertThat(note.getId(), notNullValue());
 
-      OnboardingCountDTO counts = controller.getOnboardingCount("Asia/Shanghai");
+      AssimilationCountDTO counts = controller.getOnboardingCount("Asia/Shanghai");
 
       assertThat(counts.getDueCount(), equalTo(1));
     }

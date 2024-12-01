@@ -1,6 +1,6 @@
 package com.odde.doughnut.services;
 
-import com.odde.doughnut.controllers.dto.OnboardingCountDTO;
+import com.odde.doughnut.controllers.dto.AssimilationCountDTO;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -97,7 +97,7 @@ public class OnboardingService {
     return Math.min(remainingDailyNewNotesCount(), notLearntCount());
   }
 
-  public OnboardingCountDTO getOnboardingCounts() {
-    return new OnboardingCountDTO(toInitialReviewCount(), notLearntCount());
+  public AssimilationCountDTO getOnboardingCounts() {
+    return new AssimilationCountDTO(toInitialReviewCount(), notLearntCount());
   }
 }

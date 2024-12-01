@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type OnboardingCountDTO = {
+export type AssimilationCountDTO = {
     dueCount?: number;
     totalRemainingCount?: number;
 };

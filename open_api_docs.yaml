@@ -2835,7 +2835,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/OnboardingCountDTO"
+                $ref: "#/components/schemas/AssimilationCountDTO"
   /api/healthcheck:
     get:
       tags:
@@ -4115,7 +4115,7 @@ components:
           type: string
         target:
           type: string
-    OnboardingCountDTO:
+    AssimilationCountDTO:
       type: object
       properties:
         dueCount:
