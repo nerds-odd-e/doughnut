@@ -15,7 +15,7 @@
     }}</span></label
   >
   <label
-    >Next Review:
+    >Next Recall:
     <span class="statistics-value">{{
       new Date(localMemoryTracker.nextReviewAt).toLocaleString()
     }}</span></label

@@ -20,15 +20,15 @@
     </div>
     <div class="col-sm-6">
       <div class="card text-white bg-primary mb-3">
-        <div class="card-header">Review</div>
+        <div class="card-header">Recall</div>
         <div class="card-body">
           <p class="card-text">
-            Review your notes before you are about to forget. Test your memory
+            Recall your notes before you are about to forget. Test your memory
             and update your notes with new realizations.
           </p>
           <p v-if="!user">Please login</p>
           <router-link class="btn btn-light" v-else :to="{ name: 'recalls' }">
-            Start Review
+            Start Recall
           </router-link>
         </div>
       </div>

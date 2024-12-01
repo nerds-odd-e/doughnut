@@ -1,5 +1,5 @@
 <template>
-  <h2 class="display-3">Reviews</h2>
+  <h2 class="display-3">Recalls</h2>
   <div class="row">
     <div class="col-sm-6">
       <div class="card text-white bg-primary mb-3">

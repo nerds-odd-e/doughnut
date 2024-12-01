@@ -5,9 +5,9 @@
       <thead>
         <tr>
           <th>Note</th>
-          <th>Initial Review</th>
-          <th>Next Review</th>
-          <th>Review Count</th>
+          <th>Initial Recall</th>
+          <th>Next Recall</th>
+          <th>Recall Count</th>
           <th>Curve Index</th>
           <th>Status</th>
         </tr>

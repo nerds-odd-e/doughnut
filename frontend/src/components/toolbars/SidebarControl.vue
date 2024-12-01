@@ -1,10 +1,10 @@
 <template>
   <div v-if="user" class="sidebar-container">
       <ul class="list-group">
-        <li role="button" class="list-item" :class="{ active: isActiveRoute(['recalls', 'initial', 'repeat']) }" title="Daily Review">
+        <li role="button" class="list-item" :class="{ active: isActiveRoute(['recalls', 'initial', 'repeat']) }" title="Daily Recall">
           <router-link :to="{ name: 'recalls' }" class="d-flex flex-column align-items-center gap-1">
             <SvgCalendarCheck />
-            <span class="menu-label">Review</span>
+            <span class="menu-label">Recall</span>
           </router-link>
         </li>
         <li role="button" class="list-item" :class="{ active: isActiveRoute(['notebooks', 'noteShow']) }" title="My Notebooks">
