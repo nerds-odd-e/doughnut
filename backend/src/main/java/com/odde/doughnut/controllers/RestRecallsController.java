@@ -24,15 +24,15 @@ import org.springframework.web.context.annotation.SessionScope;
 
 @RestController
 @SessionScope
-@RequestMapping("/api/reviews")
-class RestReviewsController {
+@RequestMapping("/api/recalls")
+class RestRecallsController {
   private final ModelFactoryService modelFactoryService;
   private final UserModel currentUser;
 
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
-  public RestReviewsController(
+  public RestRecallsController(
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
       TestabilitySettings testabilitySettings) {

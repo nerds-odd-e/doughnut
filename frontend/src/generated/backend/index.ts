@@ -163,7 +163,7 @@ export { RestNoteControllerService } from './services/RestNoteControllerService'
 export { RestNoteCreationControllerService } from './services/RestNoteCreationControllerService';
 export { RestPredefinedQuestionControllerService } from './services/RestPredefinedQuestionControllerService';
 export { RestRecallPromptControllerService } from './services/RestRecallPromptControllerService';
-export { RestReviewsControllerService } from './services/RestReviewsControllerService';
+export { RestRecallsControllerService } from './services/RestRecallsControllerService';
 export { RestSubscriptionControllerService } from './services/RestSubscriptionControllerService';
 export { RestTextContentControllerService } from './services/RestTextContentControllerService';
 export { RestUserControllerService } from './services/RestUserControllerService';

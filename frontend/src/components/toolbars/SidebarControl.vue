@@ -1,8 +1,8 @@
 <template>
   <div v-if="user" class="sidebar-container">
       <ul class="list-group">
-        <li role="button" class="list-item" :class="{ active: isActiveRoute(['reviews', 'initial', 'repeat']) }" title="Daily Review">
-          <router-link :to="{ name: 'reviews' }" class="d-flex flex-column align-items-center gap-1">
+        <li role="button" class="list-item" :class="{ active: isActiveRoute(['recalls', 'initial', 'repeat']) }" title="Daily Review">
+          <router-link :to="{ name: 'recalls' }" class="d-flex flex-column align-items-center gap-1">
             <SvgCalendarCheck />
             <span class="menu-label">Review</span>
           </router-link>

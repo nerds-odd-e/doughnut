@@ -9,7 +9,7 @@ import type { Note } from '../models/Note';
 import type { ReviewStatus } from '../models/ReviewStatus';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
-export class RestReviewsControllerService {
+export class RestRecallsControllerService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
      * @param requestBody
@@ -21,7 +21,7 @@ export class RestReviewsControllerService {
     ): CancelablePromise<MemoryTracker> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/reviews',
+            url: '/api/recalls',
             body: requestBody,
             mediaType: 'application/json',
             errors: {
@@ -41,7 +41,7 @@ export class RestReviewsControllerService {
     ): CancelablePromise<DueMemoryTrackers> {
         return this.httpRequest.request({
             method: 'GET',
-            url: '/api/reviews/repeat',
+            url: '/api/recalls/repeat',
             query: {
                 'timezone': timezone,
                 'dueindays': dueindays,
@@ -61,7 +61,7 @@ export class RestReviewsControllerService {
     ): CancelablePromise<ReviewStatus> {
         return this.httpRequest.request({
             method: 'GET',
-            url: '/api/reviews/overview',
+            url: '/api/recalls/overview',
             query: {
                 'timezone': timezone,
             },
@@ -80,7 +80,7 @@ export class RestReviewsControllerService {
     ): CancelablePromise<Array<Note>> {
         return this.httpRequest.request({
             method: 'GET',
-            url: '/api/reviews/initial',
+            url: '/api/recalls/initial',
             query: {
                 'timezone': timezone,
             },

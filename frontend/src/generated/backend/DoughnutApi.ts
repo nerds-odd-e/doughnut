@@ -26,7 +26,7 @@ import { RestNoteControllerService } from './services/RestNoteControllerService'
 import { RestNoteCreationControllerService } from './services/RestNoteCreationControllerService';
 import { RestPredefinedQuestionControllerService } from './services/RestPredefinedQuestionControllerService';
 import { RestRecallPromptControllerService } from './services/RestRecallPromptControllerService';
-import { RestReviewsControllerService } from './services/RestReviewsControllerService';
+import { RestRecallsControllerService } from './services/RestRecallsControllerService';
 import { RestSubscriptionControllerService } from './services/RestSubscriptionControllerService';
 import { RestTextContentControllerService } from './services/RestTextContentControllerService';
 import { RestUserControllerService } from './services/RestUserControllerService';
@@ -55,7 +55,7 @@ export class DoughnutApi {
     public readonly restNoteCreationController: RestNoteCreationControllerService;
     public readonly restPredefinedQuestionController: RestPredefinedQuestionControllerService;
     public readonly restRecallPromptController: RestRecallPromptControllerService;
-    public readonly restReviewsController: RestReviewsControllerService;
+    public readonly restRecallsController: RestRecallsControllerService;
     public readonly restSubscriptionController: RestSubscriptionControllerService;
     public readonly restTextContentController: RestTextContentControllerService;
     public readonly restUserController: RestUserControllerService;
@@ -95,7 +95,7 @@ export class DoughnutApi {
         this.restNoteCreationController = new RestNoteCreationControllerService(this.request);
         this.restPredefinedQuestionController = new RestPredefinedQuestionControllerService(this.request);
         this.restRecallPromptController = new RestRecallPromptControllerService(this.request);
-        this.restReviewsController = new RestReviewsControllerService(this.request);
+        this.restRecallsController = new RestRecallsControllerService(this.request);
         this.restSubscriptionController = new RestSubscriptionControllerService(this.request);
         this.restTextContentController = new RestTextContentControllerService(this.request);
         this.restUserController = new RestUserControllerService(this.request);

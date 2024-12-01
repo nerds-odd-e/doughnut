@@ -16,7 +16,7 @@ const { managedApi } = useLoadingApi()
 const reviewing = ref<ReviewStatus | undefined>(undefined) // Replace 'any' with proper type from your API
 
 const fetchData = async () => {
-  reviewing.value = await managedApi.restReviewsController.overview(
+  reviewing.value = await managedApi.restRecallsController.overview(
     timezoneParam()
   )
 }

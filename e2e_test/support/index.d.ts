@@ -21,7 +21,7 @@ declare namespace Cypress {
     formField(label: string): Chainable<any>
     assignFieldValue(value: string): Chainable<any>
     fieldShouldHaveValue(value: string): Chainable<any>
-    initialReviewInSequence(reviews: any): Chainable<any>
+    initialReviewInSequence(recalls: any): Chainable<any>
     initialReviewNotes(noteTopics: any): Chainable<any>
     initialReviewOneNoteIfThereIs({
       review_type,

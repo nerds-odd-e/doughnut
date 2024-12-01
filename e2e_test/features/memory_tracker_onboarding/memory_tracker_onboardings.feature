@@ -1,7 +1,7 @@
 Feature: Initial Review
     As a learner, I want to review my notes. When notes are reviewed for the first time,
     there should be a daily max and I should be able to give some of my initial impression
-    of the note, and/or choose to skip it for any further reviews.
+    of the note, and/or choose to skip it for any further recalls.
 
   Background:
       Given I am logged in as an existing user

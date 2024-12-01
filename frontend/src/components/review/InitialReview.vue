@@ -57,7 +57,7 @@ const processForm = async (skipReview: boolean) => {
     }
   }
 
-  managedApi.restReviewsController
+  managedApi.restRecallsController
     .create({
       noteId: note.id,
       skipReview,

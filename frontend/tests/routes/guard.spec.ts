@@ -27,8 +27,8 @@ describe("router guards", () => {
     expect(next).toHaveBeenCalledWith()
   })
 
-  it("when in repeat-quiz, and going to reviews", async () => {
-    await guard({ name: "reviews" }, next)
+  it("when in repeat-quiz, and going to recalls", async () => {
+    await guard({ name: "recalls" }, next)
     expect(next).toHaveBeenCalledTimes(1)
   })
 })

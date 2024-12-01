@@ -24,8 +24,8 @@ Feature: Repetition Quiz
       | 1                |
 
   @mockBrowserTime
-  Scenario: I can remove a note from further reviews
+  Scenario: I can remove a note from further recalls
     And I am repeat-reviewing my old note on day 2
     And I type my answer "sedition"
-    When choose to remove the last memory tracker from reviews
+    When choose to remove the last memory tracker from recalls
     Then On day 100 I should have "1/1" note for initial review and "0/0" for repeat

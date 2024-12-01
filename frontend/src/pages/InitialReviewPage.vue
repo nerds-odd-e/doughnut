@@ -56,17 +56,17 @@ const initialReviewDone = () => {
   finished.value += 1
   notes.value.shift()
   if (notes.value.length === 0) {
-    router.push({ name: "reviews" })
+    router.push({ name: "recalls" })
     return
   }
 }
 
 const loadInitialReview = () => {
-  managedApi.restReviewsController
+  managedApi.restRecallsController
     .initialReview(timezoneParam())
     .then((resp) => {
       if (resp.length === 0) {
-        router.push({ name: "reviews" })
+        router.push({ name: "recalls" })
         return
       }
       notes.value = resp

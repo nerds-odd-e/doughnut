@@ -34,7 +34,7 @@ afterEach(() => {
 mockBrowserTimeZone("Europe/Amsterdam", beforeEach, afterEach)
 
 beforeEach(() => {
-  helper.managedApi.restReviewsController.initialReview =
+  helper.managedApi.restRecallsController.initialReview =
     mockedInitialReviewCall
   helper.managedApi.restNoteController.getNoteInfo =
     mockedNoteInfoCall.mockResolvedValue({})
@@ -47,7 +47,7 @@ describe("repeat page", () => {
     mockedInitialReviewCall.mockResolvedValue([])
     renderer.currentRoute({ name: "initial" }).mount()
     await flushPromises()
-    expect(useRouter().push).toHaveBeenCalledWith({ name: "reviews" })
+    expect(useRouter().push).toHaveBeenCalledWith({ name: "recalls" })
     expect(mockedInitialReviewCall).toBeCalledWith("Europe/Amsterdam")
   })
 

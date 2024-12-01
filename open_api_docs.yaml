@@ -549,10 +549,10 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/GlobalAiModelSettings"
-  /api/reviews:
+  /api/recalls:
     post:
       tags:
-      - rest-reviews-controller
+      - rest-recalls-controller
       operationId: create
       requestBody:
         content:
@@ -2438,10 +2438,10 @@ paths:
                   type: object
                   additionalProperties:
                     type: object
-  /api/reviews/repeat:
+  /api/recalls/repeat:
     get:
       tags:
-      - rest-reviews-controller
+      - rest-recalls-controller
       operationId: repeatReview
       parameters:
       - name: timezone
@@ -2468,10 +2468,10 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/DueMemoryTrackers"
-  /api/reviews/overview:
+  /api/recalls/overview:
     get:
       tags:
-      - rest-reviews-controller
+      - rest-recalls-controller
       operationId: overview
       parameters:
       - name: timezone
@@ -2492,10 +2492,10 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ReviewStatus"
-  /api/reviews/initial:
+  /api/recalls/initial:
     get:
       tags:
-      - rest-reviews-controller
+      - rest-recalls-controller
       operationId: initialReview
       parameters:
       - name: timezone

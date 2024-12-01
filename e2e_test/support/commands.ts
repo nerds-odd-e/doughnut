@@ -256,7 +256,7 @@ Cypress.Commands.add('yesIRemember', () => {
 })
 
 Cypress.Commands.add('routerToInitialReview', () => {
-  cy.routerPush('/d/reviews/initial', 'initial', {})
+  cy.routerPush('/d/recalls/initial', 'initial', {})
 })
 
 Cypress.Commands.add('routerToRoot', () => {
@@ -265,16 +265,16 @@ Cypress.Commands.add('routerToRoot', () => {
 
 Cypress.Commands.add('routerToReviews', () => {
   cy.routerToRoot()
-  cy.routerPush('/d/reviews', 'reviews', {})
+  cy.routerPush('/d/recalls', 'recalls', {})
 })
 
 Cypress.Commands.add('routerToRepeatReview', () => {
-  cy.routerPush('/d/reviews/repeat', 'repeat', {})
+  cy.routerPush('/d/recalls/repeat', 'repeat', {})
 })
 
-Cypress.Commands.add('initialReviewInSequence', (reviews) => {
+Cypress.Commands.add('initialReviewInSequence', (recalls) => {
   cy.routerToInitialReview()
-  reviews.forEach((initialReview: string) => {
+  recalls.forEach((initialReview: string) => {
     cy.initialReviewOneNoteIfThereIs(initialReview)
   })
 })

@@ -38,7 +38,7 @@ Then(
   }
 )
 
-Given('I go to the reviews page', () => {
+Given('I go to the recalls page', () => {
   cy.routerToReviews()
 })
 
@@ -60,14 +60,14 @@ Then(
     })
     cy.routerToReviews()
     cy.findByText(numberOfOnboardings, {
-      selector: '.number-of-initial-reviews',
+      selector: '.number-of-onboardings',
     })
     cy.findByText(numberOfRepeats, { selector: '.number-of-repeats' })
   }
 )
 
 Then('it should move to review page', () => {
-  cy.url().should('eq', `${Cypress.config().baseUrl}/reviews`)
+  cy.url().should('eq', `${Cypress.config().baseUrl}/recalls`)
 })
 
 Then('I initial review {string}', (noteTopic) => {
@@ -180,7 +180,7 @@ Then(
   }
 )
 
-Then('choose to remove the last memory tracker from reviews', () => {
+Then('choose to remove the last memory tracker from recalls', () => {
   start
     .assumeAnsweredQuestionPage()
     .goToLastResult()

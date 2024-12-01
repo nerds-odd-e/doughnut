@@ -38,7 +38,7 @@ beforeEach(() => {
   helper.managedApi.restNoteController.show = vi
     .fn()
     .mockResolvedValue(makeMe.aNote.please())
-  helper.managedApi.restReviewsController.repeatReview = mockedRepeatCall
+  helper.managedApi.restRecallsController.repeatReview = mockedRepeatCall
   renderer = helper
     .component(RepeatPage)
     .withStorageProps({ eagerFetchCount: 1 })

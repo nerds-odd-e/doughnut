@@ -5,7 +5,7 @@
       <div class="card text-white bg-primary mb-3">
         <div class="card-header">
           Learn New Notes
-          <span class="badge bg-secondary number-of-initial-reviews">
+          <span class="badge bg-secondary number-of-onboardings">
             {{
               `${reviewing.toInitialReviewCount}/${reviewing.notLearntCount}`
             }}
