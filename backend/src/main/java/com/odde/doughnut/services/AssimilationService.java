@@ -90,10 +90,15 @@ public class AssimilationService {
   }
 
   public AssimilationCountDTO getCounts() {
-    int result = 0;
+    int totalUnassimilatedCount = unassimilatedCount();
+    int assimilatedCountOfTheDay = getAssimilatedCountOfTheDay();
+    int dueCount = 0;
     if (getDueInitialMemoryTrackers().findFirst().isPresent()) {
-      result = Math.min(remainingDailyNewNotesCount(), unassimilatedCount());
+      dueCount =
+          Math.min(
+              (userModel.getEntity().getDailyNewNotesCount() - assimilatedCountOfTheDay),
+              totalUnassimilatedCount);
     }
-    return new AssimilationCountDTO(result, getAssimilatedCountOfTheDay(), unassimilatedCount());
+    return new AssimilationCountDTO(dueCount, assimilatedCountOfTheDay, totalUnassimilatedCount);
   }
 }
