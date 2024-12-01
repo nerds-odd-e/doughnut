@@ -2,9 +2,9 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.DueMemoryTrackers;
 import com.odde.doughnut.controllers.dto.ReviewStatus;
-import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.OnboardingService;
 import com.odde.doughnut.services.RecallService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import jakarta.annotation.Resource;
@@ -42,8 +42,16 @@ class RestRecallsController {
     currentUser.assertLoggedIn();
     ZoneId timeZone = ZoneId.of(timezone);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    return new RecallService(currentUser, currentUTCTimestamp, timeZone, modelFactoryService)
-        .getReviewStatus();
+    OnboardingService onboardingService =
+        new OnboardingService(currentUser, modelFactoryService, currentUTCTimestamp, timeZone);
+    RecallService recallService = new RecallService(currentUser, currentUTCTimestamp, timeZone);
+    ReviewStatus reviewStatus = new ReviewStatus();
+    reviewStatus.toRepeatCount = recallService.getToRecallCount();
+    reviewStatus.learntCount = onboardingService.learntCount();
+    reviewStatus.notLearntCount = onboardingService.notLearntCount();
+    reviewStatus.toInitialReviewCount = onboardingService.toInitialReviewCount();
+
+    return reviewStatus;
   }
 
   @GetMapping(value = {"/repeat"})
@@ -54,7 +62,7 @@ class RestRecallsController {
     currentUser.assertLoggedIn();
     ZoneId timeZone = ZoneId.of(timezone);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    return new RecallService(currentUser, currentUTCTimestamp, timeZone, modelFactoryService)
+    return new RecallService(currentUser, currentUTCTimestamp, timeZone)
         .getDueMemoryTrackers(dueInDays == null ? 0 : dueInDays);
   }
 }

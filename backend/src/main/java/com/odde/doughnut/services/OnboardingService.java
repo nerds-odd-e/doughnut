@@ -14,10 +14,10 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public class OnboardingService {
-  protected final UserModel userModel;
-  protected final ModelFactoryService modelFactoryService;
-  protected final Timestamp currentUTCTimestamp;
-  protected final ZoneId timeZone;
+  private final UserModel userModel;
+  private final ModelFactoryService modelFactoryService;
+  private final Timestamp currentUTCTimestamp;
+  private final ZoneId timeZone;
 
   public OnboardingService(
       UserModel user,
@@ -47,12 +47,12 @@ public class OnboardingService {
     return reviewScope.getThingsHaveNotBeenReviewedAtAllCount();
   }
 
-  protected Stream<SubscriptionModel> getSubscriptionModelStream() {
+  private Stream<SubscriptionModel> getSubscriptionModelStream() {
     return userModel.getEntity().getSubscriptions().stream()
         .map(modelFactoryService::toSubscriptionModel);
   }
 
-  protected int learntCount() {
+  public int learntCount() {
     return modelFactoryService.memoryTrackerRepository.countByUserNotRemoved(
         userModel.getEntity().getId());
   }
@@ -77,7 +77,7 @@ public class OnboardingService {
         .limit(count);
   }
 
-  protected int remainingDailyNewNotesCount() {
+  private int remainingDailyNewNotesCount() {
     long sameDayCount = getNewMemoryTrackersOfToday().size();
     return (int) (userModel.getEntity().getDailyNewNotesCount() - sameDayCount);
   }

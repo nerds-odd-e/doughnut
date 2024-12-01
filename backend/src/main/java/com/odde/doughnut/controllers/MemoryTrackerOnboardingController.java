@@ -42,7 +42,7 @@ class MemoryTrackerOnboardingController {
     ZoneId timeZone = ZoneId.of(timezone);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
 
-    return new OnboardingService(currentUser,modelFactoryService, currentUTCTimestamp, timeZone)
+    return new OnboardingService(currentUser, modelFactoryService, currentUTCTimestamp, timeZone)
         .getDueInitialMemoryTrackers()
         .toList();
   }

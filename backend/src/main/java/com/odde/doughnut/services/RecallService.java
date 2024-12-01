@@ -1,9 +1,7 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.DueMemoryTrackers;
-import com.odde.doughnut.controllers.dto.ReviewStatus;
 import com.odde.doughnut.entities.MemoryTracker;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
 import java.sql.Timestamp;
@@ -11,14 +9,16 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class RecallService extends OnboardingService {
+public class RecallService {
 
-  public RecallService(
-      UserModel user,
-      Timestamp currentUTCTimestamp,
-      ZoneId timeZone,
-      ModelFactoryService modelFactoryService) {
-    super(user, modelFactoryService, currentUTCTimestamp, timeZone);
+  private final UserModel userModel;
+  private final Timestamp currentUTCTimestamp;
+  private final ZoneId timeZone;
+
+  public RecallService(UserModel userModel, Timestamp currentUTCTimestamp, ZoneId timeZone) {
+    this.userModel = userModel;
+    this.currentUTCTimestamp = currentUTCTimestamp;
+    this.timeZone = timeZone;
   }
 
   private Stream<MemoryTracker> getMemoryTrackersNeedToRepeat(int dueInDays) {
@@ -35,13 +35,7 @@ public class RecallService extends OnboardingService {
     return dueMemoryTrackers;
   }
 
-  public ReviewStatus getReviewStatus() {
-    ReviewStatus reviewStatus = new ReviewStatus();
-    reviewStatus.toRepeatCount = (int) getMemoryTrackersNeedToRepeat(0).count();
-    reviewStatus.learntCount = learntCount();
-    reviewStatus.notLearntCount = notLearntCount();
-    reviewStatus.toInitialReviewCount = toInitialReviewCount();
-
-    return reviewStatus;
+  public int getToRecallCount() {
+    return (int) getMemoryTrackersNeedToRepeat(0).count();
   }
 }

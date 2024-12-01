@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.*;
 
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.services.OnboardingService;
-import com.odde.doughnut.services.RecallService;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
 import java.time.ZoneId;
@@ -37,8 +36,8 @@ public class OnboardingServiceTest {
     day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
     day0 = makeMe.aTimestamp().of(0, 8).fromShanghai().please();
     recallServiceOnDay1 =
-        new RecallService(
-            userModel, day1, ZoneId.of("Asia/Shanghai"), userModel.modelFactoryService);
+        new OnboardingService(
+            userModel, makeMe.modelFactoryService, day1, ZoneId.of("Asia/Shanghai"));
   }
 
   @Test
@@ -187,9 +186,9 @@ public class OnboardingServiceTest {
       void theDailyCountShouldNotBeResetOnSameDayDifferentHour() {
         makeMe.aMemoryTrackerFor(note1).by(userModel).initiallyReviewedOn(day1).please();
         Timestamp day1_23 = makeMe.aTimestamp().of(1, 23).fromShanghai().please();
-        RecallService recallService =
-            new RecallService(
-                userModel, day1_23, ZoneId.of("Asia/Shanghai"), userModel.modelFactoryService);
+        OnboardingService recallService =
+            new OnboardingService(
+                userModel, makeMe.modelFactoryService, day1_23, ZoneId.of("Asia/Shanghai"));
         assertThat(getFirstInitialMemoryTracker(recallService), is(nullValue()));
       }
 
@@ -197,9 +196,9 @@ public class OnboardingServiceTest {
       void theDailyCountShouldBeResetOnNextDay() {
         makeMe.aMemoryTrackerFor(note1).by(userModel).initiallyReviewedOn(day1).please();
         Timestamp day2 = makeMe.aTimestamp().of(2, 1).fromShanghai().please();
-        RecallService recallService =
-            new RecallService(
-                userModel, day2, ZoneId.of("Asia/Shanghai"), userModel.modelFactoryService);
+        OnboardingService recallService =
+            new OnboardingService(
+                userModel, makeMe.modelFactoryService, day2, ZoneId.of("Asia/Shanghai"));
         assertThat(getFirstInitialMemoryTracker(recallService), equalTo(note2));
       }
     }
