@@ -26,13 +26,13 @@ public class MemoryTrackerBuilder extends EntityBuilder<MemoryTracker> {
   public MemoryTrackerBuilder initiallyReviewedOn(Timestamp reviewTimestamp) {
     entity.setInitialReviewedAt(reviewTimestamp);
     entity.setLastRecalledAt(reviewTimestamp);
-    entity.setNextReviewAt(reviewTimestamp);
+    entity.setNextRecallAt(reviewTimestamp);
     return this;
   }
 
   public MemoryTrackerBuilder afterNthStrictRepetition(Integer repetitionDone) {
     for (int i = 0; i < repetitionDone; i++) {
-      entity.reviewedSuccessfully(entity.getNextReviewAt());
+      entity.reviewedSuccessfully(entity.getNextRecallAt());
     }
     return this;
   }
@@ -44,9 +44,9 @@ public class MemoryTrackerBuilder extends EntityBuilder<MemoryTracker> {
   @Override
   protected void beforeCreate(boolean needPersist) {}
 
-  public MemoryTrackerBuilder forgettingCurveAndNextReviewAt(int value) {
+  public MemoryTrackerBuilder forgettingCurveAndNextRecallAt(int value) {
     entity.setForgettingCurveIndex(value);
-    entity.setNextReviewAt(entity.calculateNextReviewAt());
+    entity.setNextRecallAt(entity.calculateNextRecallAt());
     return this;
   }
 
@@ -55,8 +55,8 @@ public class MemoryTrackerBuilder extends EntityBuilder<MemoryTracker> {
     return this;
   }
 
-  public MemoryTrackerBuilder nextReviewAt(Timestamp timestamp) {
-    entity.setNextReviewAt(timestamp);
+  public MemoryTrackerBuilder nextRecallAt(Timestamp timestamp) {
+    entity.setNextRecallAt(timestamp);
     return this;
   }
 }

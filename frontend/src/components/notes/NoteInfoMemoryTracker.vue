@@ -17,7 +17,7 @@
   <label
     >Next Recall:
     <span class="statistics-value">{{
-      new Date(localMemoryTracker.nextReviewAt).toLocaleString()
+      new Date(localMemoryTracker.nextRecallAt).toLocaleString()
     }}</span></label
   >
   <div class="btn-group" role="group" aria-label="First group">

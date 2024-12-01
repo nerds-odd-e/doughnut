@@ -3450,7 +3450,7 @@ components:
     MemoryTracker:
       required:
       - id
-      - nextReviewAt
+      - nextRecallAt
       - note
       type: object
       properties:
@@ -3462,7 +3462,7 @@ components:
         lastRecalledAt:
           type: string
           format: date-time
-        nextReviewAt:
+        nextRecallAt:
           type: string
           format: date-time
         initialReviewedAt:

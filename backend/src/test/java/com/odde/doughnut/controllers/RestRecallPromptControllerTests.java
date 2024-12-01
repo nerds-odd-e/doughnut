@@ -86,7 +86,7 @@ class RestRecallPromptControllerTests {
           makeMe
               .aMemoryTrackerFor(answerNote)
               .by(currentUser)
-              .forgettingCurveAndNextReviewAt(200)
+              .forgettingCurveAndNextRecallAt(200)
               .please();
       recallPrompt = makeMe.aRecallPrompt().approvedSpellingQuestionOf(answerNote).please();
       answerDTO.setSpellingAnswer(answerNote.getTopicConstructor());
@@ -110,7 +110,7 @@ class RestRecallPromptControllerTests {
 
     @Test
     void shouldIncreaseTheIndex() {
-      testabilitySettings.timeTravelTo(memoryTracker.getNextReviewAt());
+      testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
       Integer oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
       controller.answerQuiz(recallPrompt, answerDTO);
       assertThat(memoryTracker.getForgettingCurveIndex(), greaterThan(oldForgettingCurveIndex));
@@ -137,7 +137,7 @@ class RestRecallPromptControllerTests {
 
       @Test
       void shouldValidateTheWrongAnswer() {
-        testabilitySettings.timeTravelTo(memoryTracker.getNextReviewAt());
+        testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
         Integer oldRepetitionCount = memoryTracker.getRepetitionCount();
         AnsweredQuestion answerResult = controller.answerQuiz(recallPrompt, answerDTO);
         assertFalse(answerResult.answer.getCorrect());
@@ -146,7 +146,7 @@ class RestRecallPromptControllerTests {
 
       @Test
       void shouldNotChangeTheLastRecalledAtTime() {
-        testabilitySettings.timeTravelTo(memoryTracker.getNextReviewAt());
+        testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
         Timestamp lastRecalledAt = memoryTracker.getLastRecalledAt();
         Integer oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
         controller.answerQuiz(recallPrompt, answerDTO);
@@ -158,7 +158,7 @@ class RestRecallPromptControllerTests {
       void shouldRepeatTheNextDay() {
         controller.answerQuiz(recallPrompt, answerDTO);
         assertThat(
-            memoryTracker.getNextReviewAt(),
+            memoryTracker.getNextRecallAt(),
             lessThan(
                 TimestampOperations.addHoursToTimestamp(
                     testabilitySettings.getCurrentUTCTimestamp(), 25)));

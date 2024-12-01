@@ -107,12 +107,12 @@ class RestRecallsControllerTests {
        12                        | Europe/Paris | 0
        """)
     void shouldGetMemoryTrackersBasedOnTimezone(
-        int nextReviewAtHours, String timezone, int expectedCount) {
+        int nextRecallAtHours, String timezone, int expectedCount) {
       Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();
       testabilitySettings.timeTravelTo(currentTime);
       makeMe
           .aMemoryTrackerBy(currentUser)
-          .nextReviewAt(TimestampOperations.addHoursToTimestamp(currentTime, nextReviewAtHours))
+          .nextRecallAt(TimestampOperations.addHoursToTimestamp(currentTime, nextRecallAtHours))
           .please();
       DueMemoryTrackers dueMemoryTrackers = controller.repeatReview(timezone, null);
       assertThat(dueMemoryTrackers.getToRepeat(), hasSize(expectedCount));

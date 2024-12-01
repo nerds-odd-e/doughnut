@@ -39,8 +39,8 @@ public abstract class TimestampOperations {
     return systemLocalDateTime.withZoneSameInstant(timeZone);
   }
 
-  public static long getDiffInHours(Timestamp currentUTCTimestamp, Timestamp nextReviewAt) {
-    long diff = currentUTCTimestamp.getTime() - nextReviewAt.getTime();
+  public static long getDiffInHours(Timestamp currentUTCTimestamp, Timestamp nextRecallAt) {
+    long diff = currentUTCTimestamp.getTime() - nextRecallAt.getTime();
     return TimeUnit.HOURS.convert(diff, TimeUnit.MILLISECONDS);
   }
 

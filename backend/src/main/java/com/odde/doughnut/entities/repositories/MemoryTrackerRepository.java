@@ -19,10 +19,10 @@ public interface MemoryTrackerRepository extends CrudRepository<MemoryTracker, I
       value =
           "SELECT * "
               + byUserId
-              + " AND rp.next_recall_at <= :nextReviewAt ORDER BY rp.next_recall_at",
+              + " AND rp.next_recall_at <= :nextRecallAt ORDER BY rp.next_recall_at",
       nativeQuery = true)
-  Stream<MemoryTracker> findAllByUserAndNextReviewAtLessThanEqualOrderByNextReviewAt(
-      Integer userId, @Param("nextReviewAt") Timestamp nextReviewAt);
+  Stream<MemoryTracker> findAllByUserAndNextRecallAtLessThanEqualOrderByNextRecallAt(
+      Integer userId, @Param("nextRecallAt") Timestamp nextRecallAt);
 
   @Query(value = "SELECT * " + byUserId + "AND rp.note_id =:noteId", nativeQuery = true)
   MemoryTracker findByUserAndNote(Integer userId, @Param("noteId") Integer noteId);

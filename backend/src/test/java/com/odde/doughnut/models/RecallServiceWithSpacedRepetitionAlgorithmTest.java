@@ -91,7 +91,7 @@ public class RecallServiceWithSpacedRepetitionAlgorithmTest {
       void atHourInTheNextDay(
           Integer lastRepeatHour, Integer currentHour, Boolean expectedToRepeat) {
         MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(userModel).please();
-        memoryTracker.setNextReviewAt(
+        memoryTracker.setNextRecallAt(
             makeMe.aTimestamp().of(2, lastRepeatHour).fromShanghai().please());
         final Timestamp timestamp = makeMe.aTimestamp().of(2, currentHour).fromShanghai().please();
         MemoryTracker mostUrgentMemoryTracker = getOneMemoryTrackerNeedToRepeat(timestamp);
@@ -120,7 +120,7 @@ public class RecallServiceWithSpacedRepetitionAlgorithmTest {
                 .toModelPlease();
         memoryTracker.markAsRepeated(
             TimestampOperations.addHoursToTimestamp(
-                memoryTracker.getEntity().getNextReviewAt(), daysDelay * 24),
+                memoryTracker.getEntity().getNextRecallAt(), daysDelay * 24),
             true);
         assertThat(
             memoryTracker.getEntity().getForgettingCurveIndex(),

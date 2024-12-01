@@ -60,7 +60,7 @@ public class UserModel implements ReviewScope {
       Timestamp currentUTCTimestamp, ZoneId timeZone) {
     final Timestamp timestamp = TimestampOperations.alignByHalfADay(currentUTCTimestamp, timeZone);
     return modelFactoryService.memoryTrackerRepository
-        .findAllByUserAndNextReviewAtLessThanEqualOrderByNextReviewAt(entity.getId(), timestamp);
+        .findAllByUserAndNextRecallAtLessThanEqualOrderByNextRecallAt(entity.getId(), timestamp);
   }
 
   public MemoryTracker getMemoryTrackerFor(Note note) {

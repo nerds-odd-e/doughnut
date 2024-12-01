@@ -30,7 +30,7 @@ public record MemoryTrackerModel(MemoryTracker entity, ModelFactoryService model
 
   public void updateForgettingCurve(int adjustment) {
     entity.setForgettingCurveIndex(entity.getForgettingCurveIndex() + adjustment);
-    entity.setNextReviewAt(entity.calculateNextReviewAt());
+    entity.setNextRecallAt(entity.calculateNextRecallAt());
     this.modelFactoryService.save(entity);
   }
 }

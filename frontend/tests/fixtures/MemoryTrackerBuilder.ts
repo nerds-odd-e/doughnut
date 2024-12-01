@@ -11,7 +11,7 @@ class MemoryTrackerBuilder extends Builder<MemoryTracker> {
     this.data = {
       id: generateId(),
       lastRecalledAt: "",
-      nextReviewAt: "",
+      nextRecallAt: "",
       initialReviewedAt: "",
       repetitionCount: 0,
       forgettingCurveIndex: 0,
@@ -25,8 +25,8 @@ class MemoryTrackerBuilder extends Builder<MemoryTracker> {
     return this
   }
 
-  nextReviewAt(nextReviewAt: string): MemoryTrackerBuilder {
-    this.data.nextReviewAt = nextReviewAt
+  nextRecallAt(nextRecallAt: string): MemoryTrackerBuilder {
+    this.data.nextRecallAt = nextRecallAt
     return this
   }
 

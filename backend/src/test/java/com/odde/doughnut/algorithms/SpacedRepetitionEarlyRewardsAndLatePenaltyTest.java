@@ -82,7 +82,7 @@ public class SpacedRepetitionEarlyRewardsAndLatePenaltyTest {
     MemoryTracker memoryTracker =
         makeMe.aMemoryTrackerFor(note).by(user).afterNthStrictRepetition(3).inMemoryPlease();
     memoryTracker.reviewedSuccessfully(
-        TimestampOperations.addHoursToTimestamp(memoryTracker.getNextReviewAt(), delayInHours));
+        TimestampOperations.addHoursToTimestamp(memoryTracker.getNextRecallAt(), delayInHours));
     return memoryTracker.getForgettingCurveIndex();
   }
 }

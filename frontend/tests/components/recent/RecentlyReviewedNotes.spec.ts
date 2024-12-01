@@ -7,14 +7,14 @@ describe("RecentlyReviewedNotes", () => {
   const mockMemoryTrackers = [
     makeMe.aMemoryTracker
       .initialReviewedAt("2024-01-01T00:00:00Z")
-      .nextReviewAt("2024-01-08T00:00:00Z")
+      .nextRecallAt("2024-01-08T00:00:00Z")
       .repetitionCount(3)
       .forgettingCurveIndex(2)
       .removedFromTracking(false)
       .please(),
     makeMe.aMemoryTracker
       .initialReviewedAt("2024-01-02T00:00:00Z")
-      .nextReviewAt("2024-01-09T00:00:00Z")
+      .nextRecallAt("2024-01-09T00:00:00Z")
       .repetitionCount(1)
       .forgettingCurveIndex(1)
       .removedFromTracking(true)

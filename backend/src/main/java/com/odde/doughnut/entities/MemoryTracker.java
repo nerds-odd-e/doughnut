@@ -51,7 +51,7 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   @Getter
   @Setter
   @NotNull
-  private Timestamp nextReviewAt;
+  private Timestamp nextRecallAt;
 
   @Column(name = "onboarded_at")
   @Getter
@@ -80,7 +80,7 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
         == TimestampOperations.getDayId(currentTime, timeZone);
   }
 
-  public Timestamp calculateNextReviewAt() {
+  public Timestamp calculateNextRecallAt() {
     return TimestampOperations.addHoursToTimestamp(
         getLastRecalledAt(), forgettingCurve().getRepeatInHours());
   }
@@ -91,16 +91,16 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
 
   public void reviewFailed(Timestamp currentUTCTimestamp) {
     setForgettingCurveIndex(forgettingCurve().failed());
-    setNextReviewAt(TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, 12));
+    setNextRecallAt(TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, 12));
   }
 
   public void reviewedSuccessfully(Timestamp currentUTCTimestamp) {
     long delayInHours =
-        TimestampOperations.getDiffInHours(currentUTCTimestamp, calculateNextReviewAt());
+        TimestampOperations.getDiffInHours(currentUTCTimestamp, calculateNextRecallAt());
 
     setForgettingCurveIndex(forgettingCurve().succeeded(delayInHours));
 
     setLastRecalledAt(currentUTCTimestamp);
-    setNextReviewAt(calculateNextReviewAt());
+    setNextRecallAt(calculateNextRecallAt());
   }
 }

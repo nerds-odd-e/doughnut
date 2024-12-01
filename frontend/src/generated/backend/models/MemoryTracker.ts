@@ -7,7 +7,7 @@ export type MemoryTracker = {
     id: number;
     note: Note;
     lastRecalledAt?: string;
-    nextReviewAt: string;
+    nextRecallAt: string;
     initialReviewedAt?: string;
     repetitionCount?: number;
     forgettingCurveIndex?: number;
