@@ -13,7 +13,7 @@ Feature: Repetition Link Quiz
 
   Scenario Outline: "Belongs to" question
     Given It's day 1, 8 hour
-    And I do these initial reviews in sequence:
+    And I do these memory tracker onboardings in sequence:
       | Review Type | Topic |
       | single note | Moon  |
     When I am repeat-reviewing my old note on day 2

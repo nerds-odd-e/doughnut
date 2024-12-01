@@ -1,4 +1,4 @@
-Feature: Editing when initial review
+Feature: Editing when memory tracker onboarding
 
   Background:
     Given I am logged in as an existing user

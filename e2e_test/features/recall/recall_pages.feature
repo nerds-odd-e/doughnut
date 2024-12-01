@@ -12,7 +12,7 @@ Feature: Review Pages
     And there is "similar to" link between note "Sedition" and "Sedation"
 
   Scenario: Different review pages for different notes
-    * I do these initial reviews in sequence:
+    * I do these memory tracker onboardings in sequence:
       | Review Type  | Topic    | Additional Info             |
       | single note  | Sedition | Incite violence             |
       | single note  | Sedation | Put to sleep                |
@@ -22,7 +22,7 @@ Feature: Review Pages
 
   Scenario: Index page
     Given It's day 1, 8 hour
-    And I do these initial reviews in sequence:
+    And I do these memory tracker onboardings in sequence:
       | Review Type | Topic    |
       | single note | Sedition |
     When It's day 2, 9 hour

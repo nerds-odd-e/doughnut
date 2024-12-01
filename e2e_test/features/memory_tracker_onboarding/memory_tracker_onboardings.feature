@@ -10,30 +10,30 @@ Feature: Initial Review
 
   Scenario: First day of review
       Given It's day 1, 8 hour
-      Then I do these initial reviews in sequence:
+      Then I do these memory tracker onboardings in sequence:
           | Review Type   | Topic      |
           | single note   | Note 1     |
           | single note   | Note 2     |
           | initial done  |            |
       Given It's day 1, 9 hour
-      Then I do these initial reviews in sequence:
+      Then I do these memory tracker onboardings in sequence:
           | Review Type   | Topic      |
           | initial done  |            |
 
   Scenario: First day review only part of the daily number
       Given It's day 1, 8 hour
-      Then I do these initial reviews in sequence:
+      Then I do these memory tracker onboardings in sequence:
           | Review Type   | Topic      |
           | single note   | Note 1     |
       Given It's day 1, 9 hour
-      Then I do these initial reviews in sequence:
+      Then I do these memory tracker onboardings in sequence:
           | Review Type   | Topic      |
           | single note   | Note 2     |
           | initial done  |            |
 
   Scenario: Skip review
       Given It's day 1, 8 hour
-      When I do these initial reviews in sequence:
+      When I do these memory tracker onboardings in sequence:
           | Review Type   | Topic      | Skip  |
           | single note   | Note 1     | yes   |
           | single note   | Note 2     | no    |
