@@ -19,7 +19,7 @@ public interface MemoryTrackerRepository extends CrudRepository<MemoryTracker, I
       value =
           "SELECT * "
               + byUserId
-              + " AND rp.next_review_at <= :nextReviewAt ORDER BY rp.next_review_at",
+              + " AND rp.next_recall_at <= :nextReviewAt ORDER BY rp.next_recall_at",
       nativeQuery = true)
   Stream<MemoryTracker> findAllByUserAndNextReviewAtLessThanEqualOrderByNextReviewAt(
       Integer userId, @Param("nextReviewAt") Timestamp nextReviewAt);
@@ -32,7 +32,7 @@ public interface MemoryTrackerRepository extends CrudRepository<MemoryTracker, I
           "SELECT * "
               + " FROM memory_tracker rp "
               + " WHERE rp.user_id = :userId "
-              + " ORDER BY initial_reviewed_at DESC LIMIT 100",
+              + " ORDER BY onboarded_at DESC LIMIT 100",
       nativeQuery = true)
   List<MemoryTracker> findLast100ByUser(Integer userId);
 
@@ -41,13 +41,13 @@ public interface MemoryTrackerRepository extends CrudRepository<MemoryTracker, I
           "SELECT * "
               + " FROM memory_tracker rp "
               + " WHERE rp.user_id = :userId "
-              + " AND rp.last_reviewed_at IS NOT NULL "
-              + " ORDER BY last_reviewed_at DESC LIMIT 100",
+              + " AND rp.last_recalled_at IS NOT NULL "
+              + " ORDER BY last_recalled_at DESC LIMIT 100",
       nativeQuery = true)
   List<MemoryTracker> findLast100ReviewedByUser(Integer userId);
 
   String byUserId =
       " FROM memory_tracker rp "
           + " WHERE rp.user_id = :userId "
-          + "   AND rp.removed_from_review IS FALSE ";
+          + "   AND rp.removed_from_tracking IS FALSE ";
 }

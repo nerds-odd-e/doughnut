@@ -13,7 +13,7 @@ public class ReviewSetting {
   @Setter
   private Boolean rememberSpelling = false;
 
-  @Column(name = "skip_review")
+  @Column(name = "skip_memory_tracking")
   @Getter
   @Setter
   private Boolean skipReview = false;

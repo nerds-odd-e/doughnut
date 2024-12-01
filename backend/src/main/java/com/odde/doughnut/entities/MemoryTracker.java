@@ -42,18 +42,18 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   @Setter
   private User user;
 
-  @Column(name = "last_reviewed_at")
+  @Column(name = "last_recalled_at")
   @Getter
   @Setter
   private Timestamp lastReviewedAt;
 
-  @Column(name = "next_review_at")
+  @Column(name = "next_recall_at")
   @Getter
   @Setter
   @NotNull
   private Timestamp nextReviewAt;
 
-  @Column(name = "initial_reviewed_at")
+  @Column(name = "onboarded_at")
   @Getter
   @Setter
   private Timestamp initialReviewedAt;
@@ -68,7 +68,7 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   @Setter
   private Integer forgettingCurveIndex = ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX;
 
-  @Column(name = "removed_from_review")
+  @Column(name = "removed_from_tracking")
   @Getter
   @Setter
   private Boolean removedFromReview = false;
