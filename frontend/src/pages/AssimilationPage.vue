@@ -7,11 +7,11 @@
       >
         <span
           class="progress"
-          :style="`width: ${(assimilatedCountOfTheDay || 0) * 100 / ((assimilatedCountOfTheDay || 0) + remainingInitialReviewCountForToday)}%`"
+          :style="`width: ${(assimilatedCountOfTheDay || 0) * 100 / plannedForTheDay}%`"
         >
         </span>
         <span class="progress-text">
-          Assimilating: {{ assimilatedCountOfTheDay || 0 }}/{{ (assimilatedCountOfTheDay || 0) + remainingInitialReviewCountForToday }}
+          Assimilating: {{ assimilatedCountOfTheDay || 0 }}/{{ plannedForTheDay }}
         </span>
       </span>
     </div>
@@ -60,6 +60,12 @@ const notes = ref<Note[] | undefined>(undefined)
 const note = computed(() => notes.value?.[0])
 const remainingInitialReviewCountForToday = computed(
   () => notes.value?.length || 0
+)
+
+const plannedForTheDay = computed(
+  () =>
+    (assimilatedCountOfTheDay.value || 0) +
+    remainingInitialReviewCountForToday.value
 )
 
 const initialReviewDone = () => {
