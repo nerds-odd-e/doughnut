@@ -1,4 +1,4 @@
-import InitialReviewPage from "@/pages/InitialReviewPage.vue"
+import OnboardingPage from "@/pages/OnboardingPage.vue"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { useRouter } from "vue-router"
@@ -15,7 +15,7 @@ vitest.mock("vue-router", () => ({
   }),
 }))
 
-let renderer: RenderingHelper<typeof InitialReviewPage>
+let renderer: RenderingHelper<typeof OnboardingPage>
 const mockedInitialReviewCall = vi.fn()
 const mockedNoteInfoCall = vi.fn()
 const mockedGetNoteCall = vi.fn()
@@ -39,7 +39,7 @@ beforeEach(() => {
   helper.managedApi.restNoteController.getNoteInfo =
     mockedNoteInfoCall.mockResolvedValue({})
   helper.managedApi.restNoteController.show = mockedGetNoteCall
-  renderer = helper.component(InitialReviewPage).withStorageProps({})
+  renderer = helper.component(OnboardingPage).withStorageProps({})
 })
 
 describe("repeat page", () => {

@@ -46,9 +46,9 @@ class MemoryTrackerOnboardingControllerTests {
   }
 
   @Nested
-  class InitialReview {
+  class Onboarding {
     @Test
-    void initialReview() {
+    void onboarding() {
       Note n = makeMe.aNote().creatorAndOwner(currentUser).please();
       assertThat(n.getId(), notNullValue());
       List<Note> memoryTrackerWithRecallSettings = controller.onboarding("Asia/Shanghai");

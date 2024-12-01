@@ -11,7 +11,7 @@ public record MemoryTrackerModel(MemoryTracker entity, ModelFactoryService model
     return entity;
   }
 
-  public void initialReview(Timestamp currentUTCTimestamp, User user) {
+  public void onboarding(Timestamp currentUTCTimestamp, User user) {
     entity.setUser(user);
     entity.setOnboardedAt(currentUTCTimestamp);
     entity.setLastRecalledAt(currentUTCTimestamp);

@@ -56,7 +56,7 @@ class MemoryTrackerOnboardingController {
     memoryTracker.setRemovedFromTracking(initialInfo.skipMemoryTracking);
 
     MemoryTrackerModel memoryTrackerModel = modelFactoryService.toMemoryTrackerModel(memoryTracker);
-    memoryTrackerModel.initialReview(
+    memoryTrackerModel.onboarding(
         testabilitySettings.getCurrentUTCTimestamp(), currentUser.getEntity());
     return memoryTrackerModel.getEntity();
   }

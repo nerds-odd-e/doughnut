@@ -274,8 +274,8 @@ Cypress.Commands.add('routerToRepeatReview', () => {
 
 Cypress.Commands.add('initialReviewInSequence', (recalls) => {
   cy.routerToInitialReview()
-  recalls.forEach((initialReview: string) => {
-    cy.initialReviewOneNoteIfThereIs(initialReview)
+  recalls.forEach((onboarding: string) => {
+    cy.initialReviewOneNoteIfThereIs(onboarding)
   })
 })
 
