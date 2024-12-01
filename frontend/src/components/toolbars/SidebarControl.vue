@@ -135,13 +135,20 @@ const isActiveRoute = (routeNames: string[]) => {
   return routeNames.includes(route.name as string)
 }
 
-const { dueCount, setDueCount } = useAssimilationCount()
+const {
+  dueCount,
+  setDueCount,
+  setAssimilatedCountOfTheDay,
+  setTotalUnassimilatedCount,
+} = useAssimilationCount()
 const { managedApi } = useLoadingApi()
 
 const fetchDueCount = async () => {
   const count =
     await managedApi.assimilationController.getAssimilationCount("UTC")
   setDueCount(count.dueCount)
+  setAssimilatedCountOfTheDay(count.assimilatedCountOfTheDay)
+  setTotalUnassimilatedCount(count.totalUnassimilatedCount)
 }
 
 watch(

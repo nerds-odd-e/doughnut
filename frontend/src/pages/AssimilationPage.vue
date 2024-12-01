@@ -7,11 +7,11 @@
       >
         <span
           class="progress"
-          :style="`width: ${(finished * 100) / (finished + remainingInitialReviewCountForToday)}%`"
+          :style="`width: ${(assimilatedCountOfTheDay || 0) * 100 / ((assimilatedCountOfTheDay || 0) + remainingInitialReviewCountForToday)}%`"
         >
         </span>
         <span class="progress-text">
-          Assimilating: {{ finished }}/{{ finished + remainingInitialReviewCountForToday }}
+          Assimilating: {{ assimilatedCountOfTheDay || 0 }}/{{ (assimilatedCountOfTheDay || 0) + remainingInitialReviewCountForToday }}
         </span>
       </span>
     </div>
@@ -52,7 +52,9 @@ defineProps({
 })
 defineEmits(["update-reviewing"])
 
-const finished = ref(0)
+const { setDueCount, assimilatedCountOfTheDay, incrementAssimilatedCount } =
+  useAssimilationCount()
+
 const notes = ref<Note[] | undefined>(undefined)
 
 const note = computed(() => notes.value?.[0])
@@ -60,10 +62,8 @@ const remainingInitialReviewCountForToday = computed(
   () => notes.value?.length || 0
 )
 
-const { setDueCount } = useAssimilationCount()
-
 const initialReviewDone = () => {
-  finished.value += 1
+  incrementAssimilatedCount()
   notes.value?.shift()
   setDueCount(notes.value?.length)
 }
