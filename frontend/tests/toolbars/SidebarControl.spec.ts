@@ -49,6 +49,18 @@ describe("sidebar control", () => {
     expect(circlesLink).toHaveClass("active")
   })
 
+  it("shows assimilate link in both sidebar and dropdown menu", async () => {
+    helper.component(SidebarControl).withProps({ user }).render()
+
+    const sidebarAssimilateLink = screen.getByRole("button", {
+      name: "Assimilate",
+    })
+    const dropdownRecentLink = screen.getByRole("button", { name: "Recent..." })
+
+    expect(sidebarAssimilateLink).toBeInTheDocument()
+    expect(dropdownRecentLink).toBeInTheDocument()
+  })
+
   describe("assimilate due count", () => {
     it("shows due count when there are due items", async () => {
       helper.managedApi.assimilationController.getAssimilationCount = vitest

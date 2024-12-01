@@ -67,6 +67,9 @@
               >
                 Admin Dashboard
               </router-link>
+              <router-link role="button" class="dropdown-item" :to="{ name: 'recent' }">
+                <SvgClockHistory class="me-2" />Recent...
+              </router-link>
               <PopButton btn-class="dropdown-item" title="user settings">
                 <template #button_face> Settings for {{ user.name }}</template>
                 <template #default="{ closer }">
