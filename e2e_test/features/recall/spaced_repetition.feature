@@ -11,9 +11,9 @@ Feature: Spaced-repetition
 
     @mockBrowserTime
     Scenario: The review page
-        Given On day 1 I should have "1/3" note for assimilation and "0/0" for repeat
+        Given On day 1 I should have "0/1/3" note for assimilation and "0/0" for repeat
         When I initial review "Note 1"
-        Then On day 1 I should have "0/2" note for assimilation and "0/1" for repeat
+        Then On day 1 I should have "1/1/2" note for assimilation and "0/1" for repeat
         And On day 2 I should have "1/2" note for assimilation and "1/1" for repeat
 
     @mockBrowserTime
@@ -34,4 +34,4 @@ Feature: Spaced-repetition
         * On day 3 I repeat old "Note 2, end         " and initial review new "Note 3, end "
         Given I ask to do more repetition
         When I repeat more old "Note 1         "
-        Then On day 4 I should have "0/0" note for assimilation and "1/3" for repeat
+        Then On day 4 I should have "3/3/0" note for assimilation and "1/3" for repeat

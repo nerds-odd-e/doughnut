@@ -20,10 +20,11 @@ export const assimilation = () => {
       })
       return {
         expectToAssimilateAndTotal(toAssimilateAndTotal: string) {
-          const [toAssimilateCountForToday] = toAssimilateAndTotal.split('/')
+          const [assimlatedTodayCount, toAssimilateCountForToday] =
+            toAssimilateAndTotal.split('/')
           cy.get('.progress-bar').should(
             'contain',
-            `Assimilating: 0/${toAssimilateCountForToday}`
+            `Assimilating: ${assimlatedTodayCount}/${toAssimilateCountForToday}`
           )
         },
       }
