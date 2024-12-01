@@ -40,14 +40,14 @@
 </template>
 
 <script lang="ts">
-import type { ReviewStatus } from "@/generated/backend"
+import type { RecallStatus } from "@/generated/backend"
 import type { PropType } from "vue"
 import { defineComponent } from "vue"
 
 export default defineComponent({
   props: {
     reviewing: {
-      type: Object as PropType<ReviewStatus>,
+      type: Object as PropType<RecallStatus>,
       required: true,
     },
   },
