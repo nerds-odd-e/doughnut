@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/review-questions")
+@RequestMapping("/api/predefined-questions")
 class RestPredefinedQuestionController {
   private final ModelFactoryService modelFactoryService;
   private final PredefinedQuestionService predefinedQuestionService;
