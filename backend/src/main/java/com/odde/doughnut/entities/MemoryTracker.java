@@ -71,7 +71,7 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   @Column(name = "removed_from_tracking")
   @Getter
   @Setter
-  private Boolean removedFromReview = false;
+  private Boolean removedFromTracking = false;
 
   private MemoryTracker() {}
 

@@ -15,7 +15,7 @@
       <tbody>
         <tr v-for="point in memoryTrackers"
             :key="point.id"
-            :class="{ 'removed': point.removedFromReview }">
+            :class="{ 'removed': point.removedFromTracking }">
           <td>
             <NoteTopicWithLink :noteTopic="point.note.noteTopic" />
           </td>
@@ -23,7 +23,7 @@
           <td>{{ new Date(point.nextReviewAt!).toLocaleString() }}</td>
           <td>{{ point.repetitionCount }}</td>
           <td>{{ point.forgettingCurveIndex }}</td>
-          <td>{{ point.removedFromReview ? 'Removed' : 'Active' }}</td>
+          <td>{{ point.removedFromTracking ? 'Removed' : 'Active' }}</td>
         </tr>
       </tbody>
     </table>

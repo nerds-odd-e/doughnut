@@ -10,14 +10,14 @@ describe("RecentlyReviewedNotes", () => {
       .nextReviewAt("2024-01-08T00:00:00Z")
       .repetitionCount(3)
       .forgettingCurveIndex(2)
-      .removedFromReview(false)
+      .removedFromTracking(false)
       .please(),
     makeMe.aMemoryTracker
       .initialReviewedAt("2024-01-02T00:00:00Z")
       .nextReviewAt("2024-01-09T00:00:00Z")
       .repetitionCount(1)
       .forgettingCurveIndex(1)
-      .removedFromReview(true)
+      .removedFromTracking(true)
       .please(),
   ]
 

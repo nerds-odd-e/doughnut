@@ -69,7 +69,7 @@ class RestMemoryTrackerControllerTest {
       @Test
       void removeAndUpdateLastReviewedAt() {
         controller.removeFromRepeating(rp);
-        assertThat(rp.getRemovedFromReview(), is(true));
+        assertThat(rp.getRemovedFromTracking(), is(true));
         assertThat(rp.getLastReviewedAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
       }
     }

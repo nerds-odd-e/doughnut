@@ -3474,7 +3474,7 @@ components:
         forgettingCurveIndex:
           type: integer
           format: int32
-        removedFromReview:
+        removedFromTracking:
           type: boolean
     RecallPrompt:
       required:

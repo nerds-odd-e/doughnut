@@ -89,7 +89,7 @@ public class RecallService {
     Timestamp oneDayAgo = TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, -24);
     return userModel.getRecentMemoryTrackers(oneDayAgo).stream()
         .filter(p -> p.isInitialReviewOnSameDay(currentUTCTimestamp, timeZone))
-        .filter(p -> !p.getRemovedFromReview())
+        .filter(p -> !p.getRemovedFromTracking())
         .toList();
   }
 

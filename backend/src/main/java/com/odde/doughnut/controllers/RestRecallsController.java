@@ -70,7 +70,7 @@ class RestRecallsController {
     MemoryTracker memoryTracker =
         MemoryTracker.buildMemoryTrackerForNote(
             modelFactoryService.entityManager.find(Note.class, initialInfo.noteId));
-    memoryTracker.setRemovedFromReview(initialInfo.skipMemoryTracking);
+    memoryTracker.setRemovedFromTracking(initialInfo.skipMemoryTracking);
 
     MemoryTrackerModel memoryTrackerModel = modelFactoryService.toMemoryTrackerModel(memoryTracker);
     memoryTrackerModel.initialReview(

@@ -7,11 +7,11 @@ describe("RecentlyLearnedNotes", () => {
   const mockMemoryTrackers = [
     makeMe.aMemoryTracker
       .initialReviewedAt("2024-01-01T00:00:00Z")
-      .removedFromReview(false)
+      .removedFromTracking(false)
       .please(),
     makeMe.aMemoryTracker
       .initialReviewedAt("2024-01-02T00:00:00Z")
-      .removedFromReview(true)
+      .removedFromTracking(true)
       .please(),
   ]
 

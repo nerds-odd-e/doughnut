@@ -11,6 +11,6 @@ export type MemoryTracker = {
     initialReviewedAt?: string;
     repetitionCount?: number;
     forgettingCurveIndex?: number;
-    removedFromReview?: boolean;
+    removedFromTracking?: boolean;
 };
 

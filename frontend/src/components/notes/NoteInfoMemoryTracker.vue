@@ -1,6 +1,6 @@
 <template>
-  <div class="alert alert-danger" v-if="localMemoryTracker.removedFromReview">
-    This memory tracker has been removed from reviewing.
+  <div class="alert alert-danger" v-if="localMemoryTracker.removedFromTracking">
+    This memory tracker has been removed from tracking.
   </div>
   <label
     >Repetition Count:

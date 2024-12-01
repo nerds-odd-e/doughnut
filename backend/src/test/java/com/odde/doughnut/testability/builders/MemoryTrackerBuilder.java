@@ -50,8 +50,8 @@ public class MemoryTrackerBuilder extends EntityBuilder<MemoryTracker> {
     return this;
   }
 
-  public MemoryTrackerBuilder removedFromReview() {
-    entity.setRemovedFromReview(true);
+  public MemoryTrackerBuilder removedFromTracking() {
+    entity.setRemovedFromTracking(true);
     return this;
   }
 

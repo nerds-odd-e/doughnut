@@ -171,7 +171,7 @@ public class RecallServiceInitialReviewTest {
             .aMemoryTrackerFor(note1)
             .by(userModel)
             .initiallyReviewedOn(day1)
-            .removedFromReview()
+            .removedFromTracking()
             .please();
         assertThat(getFirstInitialMemoryTracker(recallServiceOnDay1), is(note2));
       }

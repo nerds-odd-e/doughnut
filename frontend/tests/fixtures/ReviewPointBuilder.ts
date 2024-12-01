@@ -15,7 +15,7 @@ class MemoryTrackerBuilder extends Builder<MemoryTracker> {
       initialReviewedAt: "",
       repetitionCount: 0,
       forgettingCurveIndex: 0,
-      removedFromReview: false,
+      removedFromTracking: false,
       note: new NoteBuilder().do(),
     }
   }
@@ -40,8 +40,8 @@ class MemoryTrackerBuilder extends Builder<MemoryTracker> {
     return this
   }
 
-  removedFromReview(removedFromReview: boolean): MemoryTrackerBuilder {
-    this.data.removedFromReview = removedFromReview
+  removedFromTracking(removedFromTracking: boolean): MemoryTrackerBuilder {
+    this.data.removedFromTracking = removedFromTracking
     return this
   }
 
