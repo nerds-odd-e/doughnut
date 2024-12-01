@@ -20,7 +20,7 @@ Feature: Review Pages
       | link         | Sedition | similar to; Sedation        |
       | initial done |          |                             |
 
-  Scenario: Index page
+  Scenario: Count of recall and assimilate notes
     Given It's day 1, 8 hour
     And I do these memory tracker onboardings in sequence:
       | Review Type | Topic    |
@@ -28,5 +28,5 @@ Feature: Review Pages
     When It's day 2, 9 hour
     And I go to the recalls page
     Then I should see that I have old notes to repeat
-    And I should see that I have 4 new notes to learn
+    And I should see that I have 3 new notes to assimilate
 

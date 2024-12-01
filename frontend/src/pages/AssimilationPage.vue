@@ -40,6 +40,7 @@ import Assimilation from "@/components/review/Assimilation.vue"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import ContainerPage from "./commons/ContainerPage.vue"
 import TeleportToHeadStatus from "@/pages/commons/TeleportToHeadStatus.vue"
+import { useAssimilationCount } from "@/composables/useAssimilationCount"
 
 const { managedApi } = useLoadingApi()
 
@@ -59,9 +60,12 @@ const remainingInitialReviewCountForToday = computed(
   () => notes.value?.length || 0
 )
 
+const { setDueCount } = useAssimilationCount()
+
 const initialReviewDone = () => {
   finished.value += 1
   notes.value?.shift()
+  setDueCount(notes.value?.length)
 }
 
 const loadInitialReview = () => {
@@ -69,6 +73,7 @@ const loadInitialReview = () => {
     .assimilating(timezoneParam())
     .then((resp) => {
       notes.value = resp
+      setDueCount(resp.length)
     })
 }
 

@@ -121,7 +121,8 @@ import SvgChat from "@/components/svgs/SvgChat.vue"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import UserProfileDialog from "./UserProfileDialog.vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { ref, watch } from "vue"
+import { watch } from "vue"
+import { useAssimilationCount } from "@/composables/useAssimilationCount"
 
 const { user } = defineProps({
   user: { type: Object as PropType<User> },
@@ -134,13 +135,13 @@ const isActiveRoute = (routeNames: string[]) => {
   return routeNames.includes(route.name as string)
 }
 
-const dueCount = ref<number | undefined>(undefined)
+const { dueCount, setDueCount } = useAssimilationCount()
 const { managedApi } = useLoadingApi()
 
 const fetchDueCount = async () => {
   const count =
     await managedApi.assimilationController.getAssimilationCount("UTC")
-  dueCount.value = count.dueCount
+  setDueCount(count.dueCount)
 }
 
 watch(

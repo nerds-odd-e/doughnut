@@ -47,7 +47,7 @@ Then('I should see that I have old notes to repeat', () => {
 })
 
 Then(
-  'I should see that I have {int} new notes to learn',
+  'I should see that I have {int} new notes to assimilate',
   (numberOfNotes: number) => {
     start.assimilation().expectCount(numberOfNotes)
   }
