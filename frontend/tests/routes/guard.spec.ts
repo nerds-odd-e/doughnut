@@ -23,7 +23,7 @@ describe("router guards", () => {
   })
 
   it("when in repeat, and going to a route that doesnot have nested route", async () => {
-    await guard({ name: "initial", params: { noteId: 3 } }, next)
+    await guard({ name: "assimilate", params: { noteId: 3 } }, next)
     expect(next).toHaveBeenCalledWith()
   })
 

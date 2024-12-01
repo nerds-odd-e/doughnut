@@ -45,7 +45,7 @@ beforeEach(() => {
 describe("repeat page", () => {
   it("redirect to review page if nothing to review", async () => {
     mockedInitialReviewCall.mockResolvedValue([])
-    renderer.currentRoute({ name: "initial" }).mount()
+    renderer.currentRoute({ name: "assimilate" }).mount()
     await flushPromises()
     expect(useRouter().push).toHaveBeenCalledWith({ name: "recalls" })
     expect(mockedInitialReviewCall).toBeCalledWith("Europe/Amsterdam")
@@ -62,7 +62,7 @@ describe("repeat page", () => {
     })
 
     it("normal view", async () => {
-      const wrapper = renderer.currentRoute({ name: "initial" }).mount()
+      const wrapper = renderer.currentRoute({ name: "assimilate" }).mount()
       await flushPromises()
       expect(wrapper.findAll(".paused")).toHaveLength(0)
       expect(teleportTarget.textContent).toContain("Initial Review: 0/2")
@@ -75,7 +75,7 @@ describe("repeat page", () => {
     mockedInitialReviewCall.mockResolvedValue([memoryTracker.note])
     const wrapper = renderer
       .withStorageProps({ minimized: true })
-      .currentRoute({ name: "initial" })
+      .currentRoute({ name: "assimilate" })
       .mount()
     await flushPromises()
     expect(useRouter().push).toHaveBeenCalledTimes(0)

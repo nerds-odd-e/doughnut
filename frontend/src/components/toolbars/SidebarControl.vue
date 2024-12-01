@@ -7,8 +7,8 @@
             <span class="menu-label">Note</span>
           </router-link>
         </li>
-        <li role="button" class="list-item" :class="{ active: isActiveRoute(['recent']) }" title="Assimilate">
-          <router-link :to="{ name: 'initial' }" class="d-flex flex-column align-items-center gap-1">
+        <li role="button" class="list-item" :class="{ active: isActiveRoute(['assimilate']) }" title="Assimilate">
+          <router-link :to="{ name: 'assimilate' }" class="d-flex flex-column align-items-center gap-1">
             <div class="icon-container">
               <SvgClockHistory />
               <div v-if="dueCount && dueCount > 0" class="due-count">
@@ -18,7 +18,7 @@
             <span class="menu-label">Assimilate</span>
           </router-link>
         </li>
-        <li role="button" class="list-item" :class="{ active: isActiveRoute(['recalls', 'initial', 'repeat']) }" title="Daily Recall">
+        <li role="button" class="list-item" :class="{ active: isActiveRoute(['recalls', 'repeat']) }" title="Daily Recall">
           <router-link :to="{ name: 'recalls' }" class="d-flex flex-column align-items-center gap-1">
             <SvgCalendarCheck />
             <span class="menu-label">Recall</span>

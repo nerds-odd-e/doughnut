@@ -50,7 +50,7 @@ const notes = ref([] as Note[])
 const note = computed(() => notes.value[0])
 const remainingInitialReviewCountForToday = computed(() => notes.value.length)
 const resume = () => {
-  router.push({ name: "initial" })
+  router.push({ name: "assimilate" })
 }
 const initialReviewDone = () => {
   finished.value += 1

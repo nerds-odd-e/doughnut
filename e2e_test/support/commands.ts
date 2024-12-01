@@ -256,7 +256,7 @@ Cypress.Commands.add('yesIRemember', () => {
 })
 
 Cypress.Commands.add('routerToInitialReview', () => {
-  cy.routerPush('/d/recalls/initial', 'initial', {})
+  cy.routerPush('/d/recalls/assimilate', 'assimilate', {})
 })
 
 Cypress.Commands.add('routerToRoot', () => {

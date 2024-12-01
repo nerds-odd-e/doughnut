@@ -20,7 +20,7 @@
             v-if="reviewing.toInitialReviewCount > 0"
             role="button"
             class="btn btn-light"
-            :to="{ name: 'initial' }"
+            :to="{ name: 'assimilate' }"
           >
             Start reviewing new notes
           </router-link>
