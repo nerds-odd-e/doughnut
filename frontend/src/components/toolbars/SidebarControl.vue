@@ -7,7 +7,7 @@
             <span class="menu-label">Recall</span>
           </router-link>
         </li>
-        <li role="button" class="list-item" :class="{ active: isActiveRoute(['recent']) }" title="Onboard">
+        <li role="button" class="list-item" :class="{ active: isActiveRoute(['recent']) }" title="Assimilate">
           <router-link :to="{ name: 'recent' }" class="d-flex flex-column align-items-center gap-1">
             <div class="icon-container">
               <SvgClockHistory />
@@ -15,7 +15,7 @@
                 {{ dueCount }}
               </div>
             </div>
-            <span class="menu-label">Onboard</span>
+            <span class="menu-label">Assimilate</span>
           </router-link>
         </li>
         <li role="button" class="list-item" :class="{ active: isActiveRoute(['notebooks', 'noteShow']) }" title="My Notebooks">
