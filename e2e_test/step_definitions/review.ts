@@ -52,14 +52,14 @@ Then('I should see that I have new notes to learn', () => {
 
 Then(
   'On day {int} I should have {string} note for initial review and {string} for repeat',
-  (day: number, numberOfInitialReviews: string, numberOfRepeats: string) => {
+  (day: number, numberOfOnboardings: string, numberOfRepeats: string) => {
     start.testability().backendTimeTravelTo(day, 8)
     cy.routerToReviews()
-    cy.contains(numberOfInitialReviews, {
+    cy.contains(numberOfOnboardings, {
       selector: '.doughnut-ring .initial-review',
     })
     cy.routerToReviews()
-    cy.findByText(numberOfInitialReviews, {
+    cy.findByText(numberOfOnboardings, {
       selector: '.number-of-initial-reviews',
     })
     cy.findByText(numberOfRepeats, { selector: '.number-of-repeats' })

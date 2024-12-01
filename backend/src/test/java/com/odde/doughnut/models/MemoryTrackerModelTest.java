@@ -32,7 +32,7 @@ public class MemoryTrackerModelTest {
   class InitialReview {
 
     @Test
-    void initialReviewShouldSetBothInitialAndLastReviewAt() {
+    void onboardingShouldSetBothInitialAndLastReviewAt() {
       Note note = makeMe.aNote().creatorAndOwner(userModel).please();
       MemoryTrackerModel memoryTracker =
           makeMe.aMemoryTrackerFor(note).by(userModel).toModelPlease();
