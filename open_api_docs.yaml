@@ -573,169 +573,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/MemoryTracker"
-  /api/review-questions/{recallPrompt}/toggle-approval:
-    post:
-      tags:
-      - rest-predefined-question-controller
-      operationId: toggleApproval
-      parameters:
-      - name: recallPrompt
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PredefinedQuestion"
-  /api/review-questions/{predefinedQuestion}/suggest-fine-tuning:
-    post:
-      tags:
-      - rest-predefined-question-controller
-      operationId: suggestQuestionForFineTuning
-      parameters:
-      - name: predefinedQuestion
-        in: path
-        required: true
-        schema:
-          type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/QuestionSuggestionCreationParams"
-        required: true
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/SuggestedQuestionForFineTuning"
-  /api/review-questions/{note}/refine-question:
-    post:
-      tags:
-      - rest-predefined-question-controller
-      operationId: refineQuestion
-      parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/PredefinedQuestion"
-        required: true
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PredefinedQuestion"
-  /api/review-questions/{note}/note-questions:
-    get:
-      tags:
-      - rest-predefined-question-controller
-      operationId: getAllQuestionByNote
-      parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/PredefinedQuestion"
-    post:
-      tags:
-      - rest-predefined-question-controller
-      operationId: addQuestionManually
-      parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/PredefinedQuestion"
-        required: true
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PredefinedQuestion"
-  /api/review-questions/generate-question-without-save:
-    post:
-      tags:
-      - rest-predefined-question-controller
-      operationId: generateQuestionWithoutSave
-      parameters:
-      - name: note
-        in: query
-        required: true
-        schema:
-          type: integer
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PredefinedQuestion"
   /api/recall-prompts/{recallPrompt}/regenerate:
     post:
       tags:
@@ -838,6 +675,169 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/RecallPrompt"
+  /api/predefined-questions/{predefinedQuestion}/toggle-approval:
+    post:
+      tags:
+      - rest-predefined-question-controller
+      operationId: toggleApproval
+      parameters:
+      - name: predefinedQuestion
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PredefinedQuestion"
+  /api/predefined-questions/{predefinedQuestion}/suggest-fine-tuning:
+    post:
+      tags:
+      - rest-predefined-question-controller
+      operationId: suggestQuestionForFineTuning
+      parameters:
+      - name: predefinedQuestion
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuestionSuggestionCreationParams"
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/SuggestedQuestionForFineTuning"
+  /api/predefined-questions/{note}/refine-question:
+    post:
+      tags:
+      - rest-predefined-question-controller
+      operationId: refineQuestion
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PredefinedQuestion"
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PredefinedQuestion"
+  /api/predefined-questions/{note}/note-questions:
+    get:
+      tags:
+      - rest-predefined-question-controller
+      operationId: getAllQuestionByNote
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PredefinedQuestion"
+    post:
+      tags:
+      - rest-predefined-question-controller
+      operationId: addQuestionManually
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PredefinedQuestion"
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PredefinedQuestion"
+  /api/predefined-questions/generate-question-without-save:
+    post:
+      tags:
+      - rest-predefined-question-controller
+      operationId: generateQuestionWithoutSave
+      parameters:
+      - name: note
+        in: query
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PredefinedQuestion"
   /api/notes/{referenceNote}/create-after:
     post:
       tags:
@@ -3476,35 +3476,6 @@ components:
           format: int32
         removedFromReview:
           type: boolean
-    QuestionSuggestionCreationParams:
-      type: object
-      properties:
-        comment:
-          type: string
-        isPositiveFeedback:
-          type: boolean
-    SuggestedQuestionForFineTuning:
-      required:
-      - id
-      - preservedQuestion
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        comment:
-          type: string
-        preservedQuestion:
-          $ref: "#/components/schemas/MCQWithAnswer"
-        preservedNoteContent:
-          type: string
-        realCorrectAnswers:
-          type: string
-        createdAt:
-          type: string
-          format: date-time
-        positiveFeedback:
-          type: boolean
     RecallPrompt:
       required:
       - bareQuestion
@@ -3567,6 +3538,35 @@ components:
         recallPromptId:
           type: integer
           format: int32
+    QuestionSuggestionCreationParams:
+      type: object
+      properties:
+        comment:
+          type: string
+        isPositiveFeedback:
+          type: boolean
+    SuggestedQuestionForFineTuning:
+      required:
+      - id
+      - preservedQuestion
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        comment:
+          type: string
+        preservedQuestion:
+          $ref: "#/components/schemas/MCQWithAnswer"
+        preservedNoteContent:
+          type: string
+        realCorrectAnswers:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        positiveFeedback:
+          type: boolean
     NoteCreationDTO:
       required:
       - topicConstructor

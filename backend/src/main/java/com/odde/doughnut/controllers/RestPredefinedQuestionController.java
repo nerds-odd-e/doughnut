@@ -92,10 +92,11 @@ class RestPredefinedQuestionController {
     return predefinedQuestionService.refineAIQuestion(note, predefinedQuestion);
   }
 
-  @PostMapping("/{recallPrompt}/toggle-approval")
+  @PostMapping("/{predefinedQuestion}/toggle-approval")
   @Transactional
   public PredefinedQuestion toggleApproval(
-      @PathVariable("recallPrompt") @Schema(type = "integer") PredefinedQuestion predefinedQuestion)
+      @PathVariable("predefinedQuestion") @Schema(type = "integer")
+          PredefinedQuestion predefinedQuestion)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(predefinedQuestion.getNote());
     return predefinedQuestionService.toggleApproval(predefinedQuestion);

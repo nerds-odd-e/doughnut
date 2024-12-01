@@ -10,18 +10,18 @@ import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestPredefinedQuestionControllerService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
-     * @param recallPrompt
+     * @param predefinedQuestion
      * @returns PredefinedQuestion OK
      * @throws ApiError
      */
     public toggleApproval(
-        recallPrompt: number,
+        predefinedQuestion: number,
     ): CancelablePromise<PredefinedQuestion> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/review-questions/{recallPrompt}/toggle-approval',
+            url: '/api/predefined-questions/{predefinedQuestion}/toggle-approval',
             path: {
-                'recallPrompt': recallPrompt,
+                'predefinedQuestion': predefinedQuestion,
             },
             errors: {
                 500: `Internal Server Error`,
@@ -40,7 +40,7 @@ export class RestPredefinedQuestionControllerService {
     ): CancelablePromise<SuggestedQuestionForFineTuning> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/review-questions/{predefinedQuestion}/suggest-fine-tuning',
+            url: '/api/predefined-questions/{predefinedQuestion}/suggest-fine-tuning',
             path: {
                 'predefinedQuestion': predefinedQuestion,
             },
@@ -63,7 +63,7 @@ export class RestPredefinedQuestionControllerService {
     ): CancelablePromise<PredefinedQuestion> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/review-questions/{note}/refine-question',
+            url: '/api/predefined-questions/{note}/refine-question',
             path: {
                 'note': note,
             },
@@ -84,7 +84,7 @@ export class RestPredefinedQuestionControllerService {
     ): CancelablePromise<Array<PredefinedQuestion>> {
         return this.httpRequest.request({
             method: 'GET',
-            url: '/api/review-questions/{note}/note-questions',
+            url: '/api/predefined-questions/{note}/note-questions',
             path: {
                 'note': note,
             },
@@ -105,7 +105,7 @@ export class RestPredefinedQuestionControllerService {
     ): CancelablePromise<PredefinedQuestion> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/review-questions/{note}/note-questions',
+            url: '/api/predefined-questions/{note}/note-questions',
             path: {
                 'note': note,
             },
@@ -126,7 +126,7 @@ export class RestPredefinedQuestionControllerService {
     ): CancelablePromise<PredefinedQuestion> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/review-questions/generate-question-without-save',
+            url: '/api/predefined-questions/generate-question-without-save',
             query: {
                 'note': note,
             },
