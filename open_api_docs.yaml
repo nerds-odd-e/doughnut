@@ -3465,7 +3465,7 @@ components:
         nextRecallAt:
           type: string
           format: date-time
-        initialReviewedAt:
+        onboardedAt:
           type: string
           format: date-time
         repetitionCount:

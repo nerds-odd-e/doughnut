@@ -13,7 +13,7 @@ public record MemoryTrackerModel(MemoryTracker entity, ModelFactoryService model
 
   public void initialReview(Timestamp currentUTCTimestamp, User user) {
     entity.setUser(user);
-    entity.setInitialReviewedAt(currentUTCTimestamp);
+    entity.setOnboardedAt(currentUTCTimestamp);
     entity.setLastRecalledAt(currentUTCTimestamp);
     updateForgettingCurve(0);
   }

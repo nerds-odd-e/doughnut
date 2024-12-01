@@ -56,7 +56,7 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   @Column(name = "onboarded_at")
   @Getter
   @Setter
-  private Timestamp initialReviewedAt;
+  private Timestamp onboardedAt;
 
   @Column(name = "repetition_count")
   @Getter
@@ -76,7 +76,7 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   private MemoryTracker() {}
 
   public boolean isInitialReviewOnSameDay(Timestamp currentTime, ZoneId timeZone) {
-    return TimestampOperations.getDayId(getInitialReviewedAt(), timeZone)
+    return TimestampOperations.getDayId(getOnboardedAt(), timeZone)
         == TimestampOperations.getDayId(currentTime, timeZone);
   }
 

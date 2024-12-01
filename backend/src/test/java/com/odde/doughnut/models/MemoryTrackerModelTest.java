@@ -37,7 +37,7 @@ public class MemoryTrackerModelTest {
       MemoryTrackerModel memoryTracker =
           makeMe.aMemoryTrackerFor(note).by(userModel).toModelPlease();
       memoryTracker.initialReview(day1, userModel.getEntity());
-      assertThat(memoryTracker.getEntity().getInitialReviewedAt(), equalTo(day1));
+      assertThat(memoryTracker.getEntity().getOnboardedAt(), equalTo(day1));
       assertThat(memoryTracker.getEntity().getLastRecalledAt(), equalTo(day1));
     }
   }

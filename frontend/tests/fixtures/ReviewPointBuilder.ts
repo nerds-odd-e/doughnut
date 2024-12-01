@@ -12,7 +12,7 @@ class MemoryTrackerBuilder extends Builder<MemoryTracker> {
       id: generateId(),
       lastRecalledAt: "",
       nextRecallAt: "",
-      initialReviewedAt: "",
+      onboardedAt: "",
       repetitionCount: 0,
       forgettingCurveIndex: 0,
       removedFromTracking: false,
@@ -20,8 +20,8 @@ class MemoryTrackerBuilder extends Builder<MemoryTracker> {
     }
   }
 
-  initialReviewedAt(initialReviewedAt: string): MemoryTrackerBuilder {
-    this.data.initialReviewedAt = initialReviewedAt
+  onboardedAt(onboardedAt: string): MemoryTrackerBuilder {
+    this.data.onboardedAt = onboardedAt
     return this
   }
 

@@ -10,7 +10,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 public interface MemoryTrackerRepository extends CrudRepository<MemoryTracker, Integer> {
-  List<MemoryTracker> findAllByUserAndInitialReviewedAtGreaterThan(User user, Timestamp since);
+  List<MemoryTracker> findAllByUserAndOnboardedAtGreaterThan(User user, Timestamp since);
 
   @Query(value = "SELECT count(*) " + byUserId, nativeQuery = true)
   int countByUserNotRemoved(Integer userId);
