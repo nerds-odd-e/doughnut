@@ -3,9 +3,9 @@
   <div class="form-container">
     <CheckInput
       scope-name="notebook"
-      field="skipReviewEntirely"
-      v-model="formData.skipReviewEntirely"
-      :error-message="errors.skipReviewEntirely"
+      field="skipMemoryTrackingEntirely"
+      v-model="formData.skipMemoryTrackingEntirely"
+      :error-message="errors.skipMemoryTrackingEntirely"
     />
     <TextInput
       scope-name="notebook"
@@ -48,19 +48,19 @@ const props = defineProps({
 })
 
 const {
-  skipReviewEntirely,
+  skipMemoryTrackingEntirely,
   numberOfQuestionsInAssessment,
   certificateExpiry = "1y",
 } = props.notebook.notebookSettings
 
 const formData = ref({
-  skipReviewEntirely,
+  skipMemoryTrackingEntirely,
   numberOfQuestionsInAssessment,
   certificateExpiry,
 })
 
 const errors = ref({
-  skipReviewEntirely: undefined as string | undefined,
+  skipMemoryTrackingEntirely: undefined as string | undefined,
   numberOfQuestionsInAssessment: undefined as string | undefined,
   certificateExpiry: undefined as string | undefined,
 })

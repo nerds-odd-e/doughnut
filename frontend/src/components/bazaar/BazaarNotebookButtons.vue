@@ -1,7 +1,7 @@
 <template>
   <div class="btn-group btn-group-sm">
     <PopButton
-      v-if="!notebook.notebookSettings.skipReviewEntirely"
+      v-if="!notebook.notebookSettings.skipMemoryTrackingEntirely"
       title="Add to my learning"
     >
       <template #button_face>

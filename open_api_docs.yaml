@@ -3400,7 +3400,7 @@ components:
     NotebookSettings:
       type: object
       properties:
-        skipReviewEntirely:
+        skipMemoryTrackingEntirely:
           type: boolean
         numberOfQuestionsInAssessment:
           type: integer

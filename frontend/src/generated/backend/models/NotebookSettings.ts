@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type NotebookSettings = {
-    skipReviewEntirely?: boolean;
+    skipMemoryTrackingEntirely?: boolean;
     numberOfQuestionsInAssessment?: number;
     certificateExpiry?: string;
 };

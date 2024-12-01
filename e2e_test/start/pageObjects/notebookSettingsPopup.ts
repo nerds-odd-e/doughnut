@@ -12,7 +12,7 @@ const notebookSettingsPopup = () => {
     },
 
     skipMemoryTracking() {
-      cy.formField('Skip Review Entirely').check()
+      cy.formField('Skip Memory Tracking Entirely').check()
       clickButton('Update')
     },
     requestForNotebookApproval() {

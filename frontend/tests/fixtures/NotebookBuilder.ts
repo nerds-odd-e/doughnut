@@ -14,7 +14,7 @@ class NotebookBuilder extends Builder<Notebook> {
       id: generateId(),
       headNoteTopic: this.notebuilder.data.noteTopic,
       notebookSettings: {
-        skipReviewEntirely: false,
+        skipMemoryTrackingEntirely: false,
       },
       updated_at: new Date().toISOString(),
     }

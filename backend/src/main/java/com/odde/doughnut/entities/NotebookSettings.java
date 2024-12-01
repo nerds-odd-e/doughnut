@@ -24,7 +24,7 @@ import lombok.Setter;
 @Embeddable
 public class NotebookSettings {
   @Column(name = "skip_memory_tracking_entirely")
-  Boolean skipReviewEntirely = false;
+  Boolean skipMemoryTrackingEntirely = false;
 
   @Column(name = "number_of_questions_in_assessment")
   Integer numberOfQuestionsInAssessment;
@@ -40,7 +40,7 @@ public class NotebookSettings {
 
   @JsonIgnore
   public void update(NotebookSettings value) {
-    setSkipReviewEntirely(value.getSkipReviewEntirely());
+    setSkipMemoryTrackingEntirely(value.getSkipMemoryTrackingEntirely());
     setNumberOfQuestionsInAssessment(value.getNumberOfQuestionsInAssessment());
     setCertificateExpiry(value.getCertificateExpiry());
   }
