@@ -68,17 +68,4 @@ describe("repeat page", () => {
       expect(teleportTarget.textContent).toContain("Initial Review: 0/2")
     })
   })
-
-  it("minimized view for link", async () => {
-    const link = makeMe.aLink.please()
-    const memoryTracker = makeMe.aMemoryTracker.ofLink(link).please()
-    mockedInitialReviewCall.mockResolvedValue([memoryTracker.note])
-    const wrapper = renderer
-      .withStorageProps({ minimized: true })
-      .currentRoute({ name: "assimilate" })
-      .mount()
-    await flushPromises()
-    expect(useRouter().push).toHaveBeenCalledTimes(0)
-    expect(wrapper.findAll(".paused")).toHaveLength(1)
-  })
 })

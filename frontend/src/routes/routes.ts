@@ -19,7 +19,6 @@ import MessageCenterPage from "../pages/MessageCenterPage.vue"
 import RecentPage from "@/pages/RecentPage.vue"
 import CirclesPage from "@/pages/CirclesPage.vue"
 
-const NestedOnboardingPage = NestedPage(AssimilationPage, "assimilate")
 const NestedRepeatPage = NestedPage(RepeatPage, "repeat")
 
 // Please start most of the path with "/d/"
@@ -106,8 +105,7 @@ const routes = [
   {
     path: "/d/recalls/assimilate",
     name: "assimilate",
-    component: NestedOnboardingPage,
-    children: nestedNoteAndLinkRoutes("assimilate-"),
+    component: AssimilationPage,
     meta: { useNoteStorageAccessor: true },
   },
   {
