@@ -347,7 +347,7 @@ class RestRecallPromptControllerTests {
       makeMe.theRecallPrompt(recallPrompt).answerSpelling("wrong").please();
       makeMe.refresh(currentUser.getEntity());
       AnsweredQuestion answeredQuestion = controller.showQuestion(recallPrompt);
-      assertThat(answeredQuestion.reviewQuestionInstanceId, equalTo(recallPrompt.getId()));
+      assertThat(answeredQuestion.recallPromptId, equalTo(recallPrompt.getId()));
     }
   }
 }

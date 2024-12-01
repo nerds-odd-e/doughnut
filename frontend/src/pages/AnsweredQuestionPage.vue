@@ -40,8 +40,8 @@ import { useRouter } from "vue-router"
 const router = useRouter()
 const { managedApi } = useLoadingApi()
 
-const { reviewQuestionInstanceId } = defineProps({
-  reviewQuestionInstanceId: { type: Number, required: true },
+const { recallPromptId } = defineProps({
+  recallPromptId: { type: Number, required: true },
   storageAccessor: {
     type: Object as PropType<StorageAccessor>,
     required: true,
@@ -51,9 +51,7 @@ const answeredQuestion = ref<AnsweredQuestion | undefined>()
 
 const fetchData = async () => {
   answeredQuestion.value =
-    await managedApi.restReviewQuestionController.showQuestion(
-      reviewQuestionInstanceId
-    )
+    await managedApi.restReviewQuestionController.showQuestion(recallPromptId)
 }
 
 const startConversation = async () => {
@@ -61,7 +59,7 @@ const startConversation = async () => {
 
   const conversation =
     await managedApi.restConversationMessageController.startConversationAboutReviewQuestion(
-      answeredQuestion.value.reviewQuestionInstanceId
+      answeredQuestion.value.recallPromptId
     )
 
   router.push({
@@ -70,7 +68,7 @@ const startConversation = async () => {
   })
 }
 
-watch(() => reviewQuestionInstanceId, fetchData, { immediate: true })
+watch(() => recallPromptId, fetchData, { immediate: true })
 
 onMounted(fetchData)
 </script>

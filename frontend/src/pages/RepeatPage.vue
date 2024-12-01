@@ -80,10 +80,10 @@ const toRepeatCount = computed(
 const viewLastResult = (cursor: number | undefined) => {
   previousResultCursor.value = cursor
   if (currentResult.value) {
-    const { reviewQuestionInstanceId } = currentResult.value
+    const { recallPromptId } = currentResult.value
     $router.push({
       name: "repeat-answer",
-      params: { reviewQuestionInstanceId },
+      params: { recallPromptId },
     })
     return
   }

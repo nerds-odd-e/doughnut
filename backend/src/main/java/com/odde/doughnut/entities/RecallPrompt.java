@@ -29,7 +29,7 @@ public class RecallPrompt extends AnswerableQuestionInstance {
     answerResult.note = getPredefinedQuestion().getNote();
     answerResult.predefinedQuestion = getPredefinedQuestion();
     answerResult.answerDisplay = answer.getAnswerDisplay(this.getBareQuestion());
-    answerResult.reviewQuestionInstanceId = id;
+    answerResult.recallPromptId = id;
     return answerResult;
   }
 

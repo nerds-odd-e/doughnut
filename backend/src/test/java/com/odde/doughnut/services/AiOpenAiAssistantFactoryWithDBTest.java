@@ -44,7 +44,7 @@ class AiOpenAiAssistantFactoryWithDBTest {
   @Nested
   class ContestQuestion {
     private OpenAIChatCompletionMock openAIChatCompletionMock;
-    PredefinedQuestion reviewQuestionInstance;
+    PredefinedQuestion predefinedQuestion;
     QuestionEvaluation questionEvaluation = new QuestionEvaluation();
 
     @BeforeEach
@@ -62,7 +62,7 @@ class AiOpenAiAssistantFactoryWithDBTest {
               .correctChoiceIndex(0)
               .please();
       Note note = makeMe.aNote().please();
-      reviewQuestionInstance =
+      predefinedQuestion =
           makeMe.aPredefinedQuestion().ofAIGeneratedQuestion(aiGeneratedQuestion, note).please();
     }
 
@@ -70,7 +70,7 @@ class AiOpenAiAssistantFactoryWithDBTest {
     void rejected() {
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(questionEvaluation, "");
       ReviewQuestionContestResult contest =
-          aiQuestionGenerator.getReviewQuestionContestResult(reviewQuestionInstance);
+          aiQuestionGenerator.getReviewQuestionContestResult(predefinedQuestion);
       assertTrue(contest.rejected);
       Assertions.assertThat(contest.reason)
           .isEqualTo("This seems to be a legitimate question. Please answer it.");
@@ -81,7 +81,7 @@ class AiOpenAiAssistantFactoryWithDBTest {
       questionEvaluation.feasibleQuestion = false;
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(questionEvaluation, "");
       ReviewQuestionContestResult contest =
-          aiQuestionGenerator.getReviewQuestionContestResult(reviewQuestionInstance);
+          aiQuestionGenerator.getReviewQuestionContestResult(predefinedQuestion);
       assertFalse(contest.rejected);
     }
 
@@ -91,7 +91,7 @@ class AiOpenAiAssistantFactoryWithDBTest {
           new ObjectMapper().readTree(""), "");
       assertThrows(
           RuntimeException.class,
-          () -> aiQuestionGenerator.getReviewQuestionContestResult(reviewQuestionInstance));
+          () -> aiQuestionGenerator.getReviewQuestionContestResult(predefinedQuestion));
     }
   }
 }

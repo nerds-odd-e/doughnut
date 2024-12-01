@@ -41,8 +41,7 @@ class AnsweredQuestionBuilder extends Builder<AnsweredQuestion> {
       answerDisplay: "",
       note: this.noteToUse ?? makeMe.aNote.please(),
       predefinedQuestion: makeMe.aPredefinedQuestion.please(),
-      reviewQuestionInstanceId:
-        this.reviewQuestionInstanceIdToUse ?? generateId(),
+      recallPromptId: this.reviewQuestionInstanceIdToUse ?? generateId(),
     }
   }
 }

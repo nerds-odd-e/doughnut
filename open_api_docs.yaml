@@ -3524,7 +3524,7 @@ components:
       required:
       - answer
       - predefinedQuestion
-      - reviewQuestionInstanceId
+      - recallPromptId
       type: object
       properties:
         note:
@@ -3535,7 +3535,7 @@ components:
           $ref: "#/components/schemas/Answer"
         answerDisplay:
           type: string
-        reviewQuestionInstanceId:
+        recallPromptId:
           type: integer
           format: int32
     QuestionSuggestionCreationParams:

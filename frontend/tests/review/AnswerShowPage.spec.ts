@@ -35,7 +35,7 @@ describe("repetition page", () => {
     it("click on note when doing review", async () => {
       const wrapper = helper
         .component(AnsweredQuestionPage)
-        .withStorageProps({ reviewQuestionInstanceId: REVIEW_QUESTION_ID })
+        .withStorageProps({ recallPromptId: REVIEW_QUESTION_ID })
         .currentRoute({ name: "repeat" })
         .mount()
       await flushPromises()
@@ -47,7 +47,7 @@ describe("repetition page", () => {
     it("click on note when doing review and in a nested page", async () => {
       const wrapper = helper
         .component(AnsweredQuestionPage)
-        .withStorageProps({ reviewQuestionInstanceId: REVIEW_QUESTION_ID })
+        .withStorageProps({ recallPromptId: REVIEW_QUESTION_ID })
         .currentRoute({ name: "repeat-noteShow", params: { noteId: 123 } })
         .mount()
       await flushPromises()
@@ -58,7 +58,7 @@ describe("repetition page", () => {
       it("should start a conversation and redirect to message center", async () => {
         const wrapper = helper
           .component(AnsweredQuestionPage)
-          .withStorageProps({ reviewQuestionInstanceId: REVIEW_QUESTION_ID })
+          .withStorageProps({ recallPromptId: REVIEW_QUESTION_ID })
           .mount()
 
         await flushPromises()
@@ -84,7 +84,7 @@ describe("repetition page", () => {
         mockedShowAnswerCall.mockResolvedValue(undefined)
         const wrapper = helper
           .component(AnsweredQuestionPage)
-          .withStorageProps({ reviewQuestionInstanceId: REVIEW_QUESTION_ID })
+          .withStorageProps({ recallPromptId: REVIEW_QUESTION_ID })
           .mount()
 
         expect(wrapper.find(".conversation-button").exists()).toBe(false)

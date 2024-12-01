@@ -10,6 +10,6 @@ export type AnsweredQuestion = {
     predefinedQuestion: PredefinedQuestion;
     answer: Answer;
     answerDisplay?: string;
-    reviewQuestionInstanceId: number;
+    recallPromptId: number;
 };
 

@@ -40,7 +40,7 @@ const noteAndLinkRoutes = [
     meta: { useNoteStorageAccessor: true },
   },
   {
-    path: `/d/answers/:reviewQuestionInstanceId`,
+    path: `/d/answers/:recallPromptId`,
     name: "answer",
     component: AnsweredQuestionPage,
     props: true,
