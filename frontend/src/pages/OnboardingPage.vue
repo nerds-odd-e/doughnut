@@ -62,13 +62,15 @@ const initialReviewDone = () => {
 }
 
 const loadInitialReview = () => {
-  managedApi.assimilationController.onboarding(timezoneParam()).then((resp) => {
-    if (resp.length === 0) {
-      router.push({ name: "recalls" })
-      return
-    }
-    notes.value = resp
-  })
+  managedApi.assimilationController
+    .assimilating(timezoneParam())
+    .then((resp) => {
+      if (resp.length === 0) {
+        router.push({ name: "recalls" })
+        return
+      }
+      notes.value = resp
+    })
 }
 
 onMounted(() => {

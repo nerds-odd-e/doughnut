@@ -136,7 +136,7 @@ const { managedApi } = useLoadingApi()
 
 const fetchDueCount = async () => {
   const count =
-    await managedApi.assimilationController.getOnboardingCount("UTC")
+    await managedApi.assimilationController.getAssimilationCount("UTC")
   dueCount.value = count.dueCount
 }
 

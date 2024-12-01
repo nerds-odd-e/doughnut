@@ -15,7 +15,7 @@ export class AssimilationControllerService {
      * @returns MemoryTracker OK
      * @throws ApiError
      */
-    public onboard(
+    public assimilate(
         requestBody: InitialInfo,
     ): CancelablePromise<MemoryTracker> {
         return this.httpRequest.request({
@@ -30,15 +30,15 @@ export class AssimilationControllerService {
     }
     /**
      * @param timezone
-     * @returns Note OK
+     * @returns AssimilationCountDTO OK
      * @throws ApiError
      */
-    public onboarding(
+    public getAssimilationCount(
         timezone: string,
-    ): CancelablePromise<Array<Note>> {
+    ): CancelablePromise<AssimilationCountDTO> {
         return this.httpRequest.request({
             method: 'GET',
-            url: '/api/assimilation/onboarding',
+            url: '/api/assimilation/count',
             query: {
                 'timezone': timezone,
             },
@@ -49,15 +49,15 @@ export class AssimilationControllerService {
     }
     /**
      * @param timezone
-     * @returns AssimilationCountDTO OK
+     * @returns Note OK
      * @throws ApiError
      */
-    public getOnboardingCount(
+    public assimilating(
         timezone: string,
-    ): CancelablePromise<AssimilationCountDTO> {
+    ): CancelablePromise<Array<Note>> {
         return this.httpRequest.request({
             method: 'GET',
-            url: '/api/assimilation/count',
+            url: '/api/assimilation/assimilating',
             query: {
                 'timezone': timezone,
             },

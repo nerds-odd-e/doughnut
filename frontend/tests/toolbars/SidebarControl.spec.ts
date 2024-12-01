@@ -44,7 +44,7 @@ describe("sidebar control", () => {
 
   describe("assimilate due count", () => {
     it("shows due count when there are due items", async () => {
-      helper.managedApi.assimilationController.getOnboardingCount = vitest
+      helper.managedApi.assimilationController.getAssimilationCount = vitest
         .fn()
         .mockResolvedValue({ dueCount: 5 })
 
@@ -57,7 +57,7 @@ describe("sidebar control", () => {
     })
 
     it("does not show due count when there are no due items", async () => {
-      helper.managedApi.assimilationController.getOnboardingCount = vitest
+      helper.managedApi.assimilationController.getAssimilationCount = vitest
         .fn()
         .mockResolvedValue({ dueCount: 0 })
 
@@ -70,7 +70,8 @@ describe("sidebar control", () => {
 
     it("fetches due count when user changes", async () => {
       const mockGetCount = vitest.fn().mockResolvedValue({ dueCount: 3 })
-      helper.managedApi.assimilationController.getOnboardingCount = mockGetCount
+      helper.managedApi.assimilationController.getAssimilationCount =
+        mockGetCount
 
       const { rerender } = helper
         .component(SidebarControl)

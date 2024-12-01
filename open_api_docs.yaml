@@ -1814,7 +1814,7 @@ paths:
     post:
       tags:
       - assimilation-controller
-      operationId: onboard
+      operationId: assimilate
       requestBody:
         content:
           application/json:
@@ -3020,11 +3020,35 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BazaarNotebook"
-  /api/assimilation/onboarding:
+  /api/assimilation/count:
     get:
       tags:
       - assimilation-controller
-      operationId: onboarding
+      operationId: getAssimilationCount
+      parameters:
+      - name: timezone
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AssimilationCountDTO"
+  /api/assimilation/assimilating:
+    get:
+      tags:
+      - assimilation-controller
+      operationId: assimilating
       parameters:
       - name: timezone
         in: query
@@ -3046,30 +3070,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Note"
-  /api/assimilation/count:
-    get:
-      tags:
-      - assimilation-controller
-      operationId: getOnboardingCount
-      parameters:
-      - name: timezone
-        in: query
-        required: true
-        schema:
-          type: string
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/AssimilationCountDTO"
   /api/assessment:
     get:
       tags:

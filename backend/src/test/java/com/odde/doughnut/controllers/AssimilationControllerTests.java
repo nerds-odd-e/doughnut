@@ -49,14 +49,14 @@ class AssimilationControllerTests {
     void onboarding() {
       Note n = makeMe.aNote().creatorAndOwner(currentUser).please();
       assertThat(n.getId(), notNullValue());
-      List<Note> memoryTrackerWithRecallSettings = controller.onboarding("Asia/Shanghai");
+      List<Note> memoryTrackerWithRecallSettings = controller.assimilating("Asia/Shanghai");
       assertThat(memoryTrackerWithRecallSettings, hasSize(1));
     }
 
     @Test
     void notLoggedIn() {
       assertThrows(
-          ResponseStatusException.class, () -> nullUserController().onboarding("Asia/Shanghai"));
+          ResponseStatusException.class, () -> nullUserController().assimilating("Asia/Shanghai"));
     }
   }
 
@@ -65,7 +65,7 @@ class AssimilationControllerTests {
     @Test
     void create() {
       InitialInfo info = new InitialInfo();
-      assertThrows(ResponseStatusException.class, () -> nullUserController().onboard(info));
+      assertThrows(ResponseStatusException.class, () -> nullUserController().assimilate(info));
     }
   }
 
@@ -77,7 +77,7 @@ class AssimilationControllerTests {
       Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
       assertThat(note.getId(), notNullValue());
 
-      AssimilationCountDTO counts = controller.getOnboardingCount("Asia/Shanghai");
+      AssimilationCountDTO counts = controller.getAssimilationCount("Asia/Shanghai");
 
       assertThat(counts.getDueCount(), equalTo(1));
     }
@@ -86,7 +86,7 @@ class AssimilationControllerTests {
     void shouldThrowExceptionWhenUserNotLoggedIn() {
       assertThrows(
           ResponseStatusException.class,
-          () -> nullUserController().getOnboardingCount("Asia/Shanghai"));
+          () -> nullUserController().getAssimilationCount("Asia/Shanghai"));
     }
   }
 }

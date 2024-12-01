@@ -58,7 +58,7 @@ const processForm = async (skipMemoryTracking: boolean) => {
   }
 
   managedApi.assimilationController
-    .onboard({
+    .assimilate({
       noteId: note.id,
       skipMemoryTracking,
     })

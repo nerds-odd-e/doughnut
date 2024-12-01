@@ -35,9 +35,9 @@ class AssimilationController {
     this.testabilitySettings = testabilitySettings;
   }
 
-  @GetMapping("/onboarding")
+  @GetMapping("/assimilating")
   @Transactional(readOnly = true)
-  public List<Note> onboarding(@RequestParam(value = "timezone") String timezone) {
+  public List<Note> assimilating(@RequestParam(value = "timezone") String timezone) {
     currentUser.assertLoggedIn();
     ZoneId timeZone = ZoneId.of(timezone);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
@@ -49,7 +49,7 @@ class AssimilationController {
 
   @PostMapping(path = "")
   @Transactional
-  public MemoryTracker onboard(@RequestBody InitialInfo initialInfo) {
+  public MemoryTracker assimilate(@RequestBody InitialInfo initialInfo) {
     currentUser.assertLoggedIn();
     MemoryTracker memoryTracker =
         MemoryTracker.buildMemoryTrackerForNote(
@@ -64,7 +64,7 @@ class AssimilationController {
 
   @GetMapping("/count")
   @Transactional(readOnly = true)
-  public AssimilationCountDTO getOnboardingCount(
+  public AssimilationCountDTO getAssimilationCount(
       @RequestParam(value = "timezone") String timezone) {
     currentUser.assertLoggedIn();
     ZoneId timeZone = ZoneId.of(timezone);
