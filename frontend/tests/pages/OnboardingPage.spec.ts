@@ -34,8 +34,7 @@ afterEach(() => {
 mockBrowserTimeZone("Europe/Amsterdam", beforeEach, afterEach)
 
 beforeEach(() => {
-  helper.managedApi.memoryTrackerOnboardingController.onboarding =
-    mockedInitialReviewCall
+  helper.managedApi.assimilationController.onboarding = mockedInitialReviewCall
   helper.managedApi.restNoteController.getNoteInfo =
     mockedNoteInfoCall.mockResolvedValue({})
   helper.managedApi.restNoteController.show = mockedGetNoteCall

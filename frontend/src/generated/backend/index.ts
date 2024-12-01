@@ -143,7 +143,7 @@ export type { WikidataAssociationCreation } from './models/WikidataAssociationCr
 export type { WikidataEntityData } from './models/WikidataEntityData';
 export type { WikidataSearchEntity } from './models/WikidataSearchEntity';
 
-export { MemoryTrackerOnboardingControllerService } from './services/MemoryTrackerOnboardingControllerService';
+export { AssimilationControllerService } from './services/AssimilationControllerService';
 export { RestAiAssistantCreationControllerService } from './services/RestAiAssistantCreationControllerService';
 export { RestAiAudioControllerService } from './services/RestAiAudioControllerService';
 export { RestAiControllerService } from './services/RestAiControllerService';

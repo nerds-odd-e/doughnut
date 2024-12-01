@@ -5,7 +5,7 @@
 import type { BaseHttpRequest } from './core/BaseHttpRequest';
 import type { OpenAPIConfig } from './core/OpenAPI';
 import { FetchHttpRequest } from './core/FetchHttpRequest';
-import { MemoryTrackerOnboardingControllerService } from './services/MemoryTrackerOnboardingControllerService';
+import { AssimilationControllerService } from './services/AssimilationControllerService';
 import { RestAiAssistantCreationControllerService } from './services/RestAiAssistantCreationControllerService';
 import { RestAiAudioControllerService } from './services/RestAiAudioControllerService';
 import { RestAiControllerService } from './services/RestAiControllerService';
@@ -35,7 +35,7 @@ import { RestWikidataControllerService } from './services/RestWikidataController
 import { TestabilityRestControllerService } from './services/TestabilityRestControllerService';
 type HttpRequestConstructor = new (config: OpenAPIConfig) => BaseHttpRequest;
 export class DoughnutApi {
-    public readonly memoryTrackerOnboardingController: MemoryTrackerOnboardingControllerService;
+    public readonly assimilationController: AssimilationControllerService;
     public readonly restAiAssistantCreationController: RestAiAssistantCreationControllerService;
     public readonly restAiAudioController: RestAiAudioControllerService;
     public readonly restAiController: RestAiControllerService;
@@ -76,7 +76,7 @@ export class DoughnutApi {
             HEADERS: config?.HEADERS,
             ENCODE_PATH: config?.ENCODE_PATH,
         });
-        this.memoryTrackerOnboardingController = new MemoryTrackerOnboardingControllerService(this.request);
+        this.assimilationController = new AssimilationControllerService(this.request);
         this.restAiAssistantCreationController = new RestAiAssistantCreationControllerService(this.request);
         this.restAiAudioController = new RestAiAudioControllerService(this.request);
         this.restAiController = new RestAiControllerService(this.request);

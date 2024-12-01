@@ -62,15 +62,13 @@ const initialReviewDone = () => {
 }
 
 const loadInitialReview = () => {
-  managedApi.memoryTrackerOnboardingController
-    .onboarding(timezoneParam())
-    .then((resp) => {
-      if (resp.length === 0) {
-        router.push({ name: "recalls" })
-        return
-      }
-      notes.value = resp
-    })
+  managedApi.assimilationController.onboarding(timezoneParam()).then((resp) => {
+    if (resp.length === 0) {
+      router.push({ name: "recalls" })
+      return
+    }
+    notes.value = resp
+  })
 }
 
 onMounted(() => {

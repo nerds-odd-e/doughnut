@@ -8,7 +8,7 @@ import type { MemoryTracker } from '../models/MemoryTracker';
 import type { Note } from '../models/Note';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
-export class MemoryTrackerOnboardingControllerService {
+export class AssimilationControllerService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
      * @param requestBody
@@ -20,7 +20,7 @@ export class MemoryTrackerOnboardingControllerService {
     ): CancelablePromise<MemoryTracker> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/memory-tracker-onboarding',
+            url: '/api/assimilation',
             body: requestBody,
             mediaType: 'application/json',
             errors: {
@@ -38,7 +38,7 @@ export class MemoryTrackerOnboardingControllerService {
     ): CancelablePromise<Array<Note>> {
         return this.httpRequest.request({
             method: 'GET',
-            url: '/api/memory-tracker-onboarding/onboarding',
+            url: '/api/assimilation/onboarding',
             query: {
                 'timezone': timezone,
             },
@@ -57,7 +57,7 @@ export class MemoryTrackerOnboardingControllerService {
     ): CancelablePromise<AssimilationCountDTO> {
         return this.httpRequest.request({
             method: 'GET',
-            url: '/api/memory-tracker-onboarding/count',
+            url: '/api/assimilation/count',
             query: {
                 'timezone': timezone,
             },

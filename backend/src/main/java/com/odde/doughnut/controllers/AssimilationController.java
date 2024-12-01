@@ -18,15 +18,15 @@ import org.springframework.web.context.annotation.SessionScope;
 
 @RestController
 @SessionScope
-@RequestMapping("/api/memory-tracker-onboarding")
-class MemoryTrackerOnboardingController {
+@RequestMapping("/api/assimilation")
+class AssimilationController {
   private final ModelFactoryService modelFactoryService;
   private final UserModel currentUser;
 
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
-  public MemoryTrackerOnboardingController(
+  public AssimilationController(
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
       TestabilitySettings testabilitySettings) {

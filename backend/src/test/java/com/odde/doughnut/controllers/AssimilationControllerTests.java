@@ -24,24 +24,22 @@ import org.springframework.web.server.ResponseStatusException;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class MemoryTrackerOnboardingControllerTests {
+class AssimilationControllerTests {
   @Autowired private ModelFactoryService modelFactoryService;
   @Autowired private MakeMe makeMe;
   private UserModel currentUser;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
-  private MemoryTrackerOnboardingController controller;
+  private AssimilationController controller;
 
   @BeforeEach
   void setup() {
     currentUser = makeMe.aUser().toModelPlease();
-    controller =
-        new MemoryTrackerOnboardingController(
-            modelFactoryService, currentUser, testabilitySettings);
+    controller = new AssimilationController(modelFactoryService, currentUser, testabilitySettings);
   }
 
-  MemoryTrackerOnboardingController nullUserController() {
-    return new MemoryTrackerOnboardingController(
+  AssimilationController nullUserController() {
+    return new AssimilationController(
         modelFactoryService, makeMe.aNullUserModelPlease(), testabilitySettings);
   }
 
