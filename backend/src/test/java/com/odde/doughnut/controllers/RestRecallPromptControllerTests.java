@@ -52,7 +52,7 @@ class RestRecallPromptControllerTests {
   OpenAIAssistantMocker openAIAssistantMocker;
   OpenAIAssistantThreadMocker openAIAssistantThreadMocker;
 
-  RestReviewQuestionController controller;
+  RestRecallPromptController controller;
 
   @BeforeEach
   void setup() {
@@ -60,7 +60,7 @@ class RestRecallPromptControllerTests {
     openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
     currentUser = makeMe.aUser().toModelPlease();
     controller =
-        new RestReviewQuestionController(
+        new RestRecallPromptController(
             openAiApi, modelFactoryService, currentUser, testabilitySettings);
 
     // Initialize assistant mocker
@@ -68,8 +68,8 @@ class RestRecallPromptControllerTests {
     openAIAssistantThreadMocker = openAIAssistantMocker.mockThreadCreation(null);
   }
 
-  RestReviewQuestionController nullUserController() {
-    return new RestReviewQuestionController(
+  RestRecallPromptController nullUserController() {
+    return new RestRecallPromptController(
         openAiApi, modelFactoryService, makeMe.aNullUserModelPlease(), testabilitySettings);
   }
 
@@ -182,8 +182,8 @@ class RestRecallPromptControllerTests {
       assertThrows(
           ResponseStatusException.class,
           () -> {
-            RestReviewQuestionController restAiController =
-                new RestReviewQuestionController(
+            RestRecallPromptController restAiController =
+                new RestRecallPromptController(
                     openAiApi,
                     makeMe.modelFactoryService,
                     makeMe.aNullUserModelPlease(),
@@ -235,8 +235,8 @@ class RestRecallPromptControllerTests {
       assertThrows(
           ResponseStatusException.class,
           () -> {
-            RestReviewQuestionController restAiController =
-                new RestReviewQuestionController(
+            RestRecallPromptController restAiController =
+                new RestRecallPromptController(
                     openAiApi,
                     makeMe.modelFactoryService,
                     makeMe.aNullUserModelPlease(),

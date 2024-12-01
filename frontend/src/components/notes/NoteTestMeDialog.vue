@@ -35,7 +35,7 @@ const scrollToBottom = () => {
 
 const generateQuestion = async () => {
   recallPrompt.value =
-    await managedApi.restReviewQuestionController.generateQuestion(
+    await managedApi.restRecallPromptController.generateQuestion(
       selectedNote.id
     )
   scrollToBottom()

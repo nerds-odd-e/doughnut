@@ -8,7 +8,7 @@ import type { RecallPrompt } from '../models/RecallPrompt';
 import type { ReviewQuestionContestResult } from '../models/ReviewQuestionContestResult';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
-export class RestReviewQuestionControllerService {
+export class RestRecallPromptControllerService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
      * @param recallPrompt
@@ -20,7 +20,7 @@ export class RestReviewQuestionControllerService {
     ): CancelablePromise<RecallPrompt> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/review-questions/{recallPrompt}/regenerate',
+            url: '/api/recall-prompts/{recallPrompt}/regenerate',
             path: {
                 'recallPrompt': recallPrompt,
             },
@@ -39,7 +39,7 @@ export class RestReviewQuestionControllerService {
     ): CancelablePromise<ReviewQuestionContestResult> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/review-questions/{recallPrompt}/contest',
+            url: '/api/recall-prompts/{recallPrompt}/contest',
             path: {
                 'recallPrompt': recallPrompt,
             },
@@ -60,7 +60,7 @@ export class RestReviewQuestionControllerService {
     ): CancelablePromise<AnsweredQuestion> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/review-questions/{recallPrompt}/answer',
+            url: '/api/recall-prompts/{recallPrompt}/answer',
             path: {
                 'recallPrompt': recallPrompt,
             },
@@ -81,7 +81,7 @@ export class RestReviewQuestionControllerService {
     ): CancelablePromise<RecallPrompt> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/review-questions/generate-question',
+            url: '/api/recall-prompts/generate-question',
             query: {
                 'note': note,
             },
@@ -100,7 +100,7 @@ export class RestReviewQuestionControllerService {
     ): CancelablePromise<AnsweredQuestion> {
         return this.httpRequest.request({
             method: 'GET',
-            url: '/api/review-questions/{recallPrompt}',
+            url: '/api/recall-prompts/{recallPrompt}',
             path: {
                 'recallPrompt': recallPrompt,
             },
@@ -119,7 +119,7 @@ export class RestReviewQuestionControllerService {
     ): CancelablePromise<RecallPrompt> {
         return this.httpRequest.request({
             method: 'GET',
-            url: '/api/review-questions/{memoryTracker}/random-question',
+            url: '/api/recall-prompts/{memoryTracker}/random-question',
             path: {
                 'memoryTracker': memoryTracker,
             },

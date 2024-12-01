@@ -51,7 +51,7 @@ const answeredQuestion = ref<AnsweredQuestion | undefined>()
 
 const fetchData = async () => {
   answeredQuestion.value =
-    await managedApi.restReviewQuestionController.showQuestion(recallPromptId)
+    await managedApi.restRecallPromptController.showQuestion(recallPromptId)
 }
 
 const startConversation = async () => {

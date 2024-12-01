@@ -162,7 +162,7 @@ export { RestNotebookControllerService } from './services/RestNotebookController
 export { RestNoteControllerService } from './services/RestNoteControllerService';
 export { RestNoteCreationControllerService } from './services/RestNoteCreationControllerService';
 export { RestPredefinedQuestionControllerService } from './services/RestPredefinedQuestionControllerService';
-export { RestReviewQuestionControllerService } from './services/RestReviewQuestionControllerService';
+export { RestRecallPromptControllerService } from './services/RestRecallPromptControllerService';
 export { RestReviewsControllerService } from './services/RestReviewsControllerService';
 export { RestSubscriptionControllerService } from './services/RestSubscriptionControllerService';
 export { RestTextContentControllerService } from './services/RestTextContentControllerService';

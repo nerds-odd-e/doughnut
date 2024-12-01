@@ -597,84 +597,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PredefinedQuestion"
-  /api/review-questions/{recallPrompt}/regenerate:
-    post:
-      tags:
-      - rest-review-question-controller
-      operationId: regenerate
-      parameters:
-      - name: recallPrompt
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/RecallPrompt"
-  /api/review-questions/{recallPrompt}/contest:
-    post:
-      tags:
-      - rest-review-question-controller
-      operationId: contest
-      parameters:
-      - name: recallPrompt
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ReviewQuestionContestResult"
-  /api/review-questions/{recallPrompt}/answer:
-    post:
-      tags:
-      - rest-review-question-controller
-      operationId: answerQuiz
-      parameters:
-      - name: recallPrompt
-        in: path
-        required: true
-        schema:
-          type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/AnswerDTO"
-        required: true
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/AnsweredQuestion"
   /api/review-questions/{predefinedQuestion}/suggest-fine-tuning:
     post:
       tags:
@@ -790,30 +712,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PredefinedQuestion"
-  /api/review-questions/generate-question:
-    post:
-      tags:
-      - rest-review-question-controller
-      operationId: generateQuestion
-      parameters:
-      - name: note
-        in: query
-        required: true
-        schema:
-          type: integer
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/RecallPrompt"
   /api/review-questions/generate-question-without-save:
     post:
       tags:
@@ -838,6 +736,108 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PredefinedQuestion"
+  /api/recall-prompts/{recallPrompt}/regenerate:
+    post:
+      tags:
+      - rest-recall-prompt-controller
+      operationId: regenerate
+      parameters:
+      - name: recallPrompt
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RecallPrompt"
+  /api/recall-prompts/{recallPrompt}/contest:
+    post:
+      tags:
+      - rest-recall-prompt-controller
+      operationId: contest
+      parameters:
+      - name: recallPrompt
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ReviewQuestionContestResult"
+  /api/recall-prompts/{recallPrompt}/answer:
+    post:
+      tags:
+      - rest-recall-prompt-controller
+      operationId: answerQuiz
+      parameters:
+      - name: recallPrompt
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnswerDTO"
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AnsweredQuestion"
+  /api/recall-prompts/generate-question:
+    post:
+      tags:
+      - rest-recall-prompt-controller
+      operationId: generateQuestion
+      parameters:
+      - name: note
+        in: query
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RecallPrompt"
   /api/notes/{referenceNote}/create-after:
     post:
       tags:
@@ -2518,10 +2518,10 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Note"
-  /api/review-questions/{recallPrompt}:
+  /api/recall-prompts/{recallPrompt}:
     get:
       tags:
-      - rest-review-question-controller
+      - rest-recall-prompt-controller
       operationId: showQuestion
       parameters:
       - name: recallPrompt
@@ -2542,10 +2542,10 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/AnsweredQuestion"
-  /api/review-questions/{memoryTracker}/random-question:
+  /api/recall-prompts/{memoryTracker}/random-question:
     get:
       tags:
-      - rest-review-question-controller
+      - rest-recall-prompt-controller
       operationId: generateRandomQuestion
       parameters:
       - name: memoryTracker
@@ -3476,6 +3476,35 @@ components:
           format: int32
         removedFromReview:
           type: boolean
+    QuestionSuggestionCreationParams:
+      type: object
+      properties:
+        comment:
+          type: string
+        isPositiveFeedback:
+          type: boolean
+    SuggestedQuestionForFineTuning:
+      required:
+      - id
+      - preservedQuestion
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        comment:
+          type: string
+        preservedQuestion:
+          $ref: "#/components/schemas/MCQWithAnswer"
+        preservedNoteContent:
+          type: string
+        realCorrectAnswers:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        positiveFeedback:
+          type: boolean
     RecallPrompt:
       required:
       - bareQuestion
@@ -3538,35 +3567,6 @@ components:
         recallPromptId:
           type: integer
           format: int32
-    QuestionSuggestionCreationParams:
-      type: object
-      properties:
-        comment:
-          type: string
-        isPositiveFeedback:
-          type: boolean
-    SuggestedQuestionForFineTuning:
-      required:
-      - id
-      - preservedQuestion
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        comment:
-          type: string
-        preservedQuestion:
-          $ref: "#/components/schemas/MCQWithAnswer"
-        preservedNoteContent:
-          type: string
-        realCorrectAnswers:
-          type: string
-        createdAt:
-          type: string
-          format: date-time
-        positiveFeedback:
-          type: boolean
     NoteCreationDTO:
       required:
       - topicConstructor

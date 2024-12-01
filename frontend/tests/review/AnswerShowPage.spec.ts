@@ -24,7 +24,7 @@ describe("repetition page", () => {
 
     beforeEach(async () => {
       vitest.resetAllMocks()
-      helper.managedApi.restReviewQuestionController.showQuestion =
+      helper.managedApi.restRecallPromptController.showQuestion =
         mockedShowAnswerCall.mockResolvedValue(answeredQuestion)
       helper.managedApi.restNoteController.show =
         mockedNotePositionCall.mockResolvedValue(makeMe.aNoteRealm.please())

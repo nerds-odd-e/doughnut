@@ -72,7 +72,7 @@ describe("repeat page", () => {
         mockedMemoryTrackerCall.mockResolvedValue(
           makeMe.aMemoryTracker.please()
         )
-      helper.managedApi.silent.restReviewQuestionController.generateRandomQuestion =
+      helper.managedApi.silent.restRecallPromptController.generateRandomQuestion =
         mockedRandomQuestionCall
       mockedRandomQuestionCall.mockRejectedValueOnce(makeMe.anApiError.please())
       mockedRepeatCall.mockResolvedValue(

@@ -92,7 +92,7 @@ const useQuestionFetching = (props: QuizProps) => {
 
       try {
         const question =
-          await managedApi.silent.restReviewQuestionController.generateRandomQuestion(
+          await managedApi.silent.restRecallPromptController.generateRandomQuestion(
             memoryTrackerId
           )
         reviewQuestionCache.value[memoryTrackerId] = question
