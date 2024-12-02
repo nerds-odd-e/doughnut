@@ -10,10 +10,10 @@ describe("router guards", () => {
     next = vi.fn()
   })
   it("when in repeat, go to nested noteShow", async () => {
-    await guard({ name: "noteShow", params: { noteId: 3 } }, next)
+    await guard({ name: "answer", params: { recallPromptId: 3 } }, next)
     expect(next).toHaveBeenCalledWith({
-      name: "repeat-noteShow",
-      params: { noteId: 3 },
+      name: "repeat-answer",
+      params: { recallPromptId: 3 },
     })
   })
 

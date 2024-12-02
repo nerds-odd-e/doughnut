@@ -27,6 +27,21 @@ const NestedRepeatPage = NestedPage(RepeatPage, "repeat")
 
 const noteAndLinkRoutes = [
   {
+    path: `/d/answers/:recallPromptId`,
+    name: "answer",
+    component: AnsweredQuestionPage,
+    props: true,
+    meta: { useNoteStorageAccessor: true },
+  },
+]
+
+const nestedNoteAndLinkRoutes = (prefix: string) =>
+  noteAndLinkRoutes.map((route) => ({ ...route, name: prefix + route.name }))
+
+const routes = [
+  ...noteAndLinkRoutes.map((route) => ({ ...route, path: `${route.path}` })),
+  { path: "/", name: "root", component: HomePage },
+  {
     path: "/d/notebooks",
     name: "notebooks",
     component: NotebooksPage,
@@ -39,27 +54,12 @@ const noteAndLinkRoutes = [
     meta: { useNoteStorageAccessor: true },
   },
   {
-    path: `/d/answers/:recallPromptId`,
-    name: "answer",
-    component: AnsweredQuestionPage,
-    props: true,
-    meta: { useNoteStorageAccessor: true },
-  },
-  {
     path: "/d/circles/:circleId",
     name: "circleShow",
     component: CircleShowPage,
     props: true,
     meta: { useNoteStorageAccessor: true },
   },
-]
-
-const nestedNoteAndLinkRoutes = (prefix: string) =>
-  noteAndLinkRoutes.map((route) => ({ ...route, name: prefix + route.name }))
-
-const routes = [
-  ...noteAndLinkRoutes.map((route) => ({ ...route, path: `${route.path}` })),
-  { path: "/", name: "root", component: HomePage },
   {
     path: "/d/bazaar",
     name: "bazaar",
