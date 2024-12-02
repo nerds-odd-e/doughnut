@@ -10,7 +10,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import java.sql.Timestamp;
-import java.time.ZoneId;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -74,11 +73,6 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   private Boolean removedFromTracking = false;
 
   private MemoryTracker() {}
-
-  public boolean isInitialReviewOnSameDay(Timestamp currentTime, ZoneId timeZone) {
-    return TimestampOperations.getDayId(getAssimilatedAt(), timeZone)
-        == TimestampOperations.getDayId(currentTime, timeZone);
-  }
 
   public Timestamp calculateNextRecallAt() {
     return TimestampOperations.addHoursToTimestamp(

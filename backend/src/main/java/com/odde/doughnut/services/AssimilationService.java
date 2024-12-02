@@ -34,15 +34,6 @@ public class AssimilationService {
     return reviewScope.getThingHaveNotBeenReviewedAtAll().limit(count);
   }
 
-  private int unassimilatedCount() {
-    Integer subscribedCount =
-        getSubscriptionModelStream()
-            .map(this::getPendingNewMemoryTrackerCount)
-            .reduce(Integer::sum)
-            .orElse(0);
-    return subscribedCount + getPendingNewMemoryTrackerCount(userModel);
-  }
-
   private int getPendingNewMemoryTrackerCount(ReviewScope reviewScope) {
     return reviewScope.getThingsHaveNotBeenReviewedAtAllCount();
   }
@@ -53,7 +44,8 @@ public class AssimilationService {
   }
 
   public Stream<Note> getDueInitialMemoryTrackers() {
-    int count = remainingDailyNewNotesCount();
+    long sameDayCount = getAssimilatedCountOfTheDay();
+    int count = (int) (userModel.getEntity().getDailyNewNotesCount() - sameDayCount);
     if (count <= 0) {
       return Stream.empty();
     }
@@ -72,25 +64,26 @@ public class AssimilationService {
         .limit(count);
   }
 
-  private int remainingDailyNewNotesCount() {
-    long sameDayCount = getAssimilatedCountOfTheDay();
-    return (int) (userModel.getEntity().getDailyNewNotesCount() - sameDayCount);
-  }
-
   private int getAssimilatedCountOfTheDay() {
     return getNewMemoryTrackersOfToday().size();
   }
 
   private List<MemoryTracker> getNewMemoryTrackersOfToday() {
-    Timestamp oneDayAgo = TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, -24);
-    return userModel.getRecentMemoryTrackers(oneDayAgo).stream()
-        .filter(p -> p.isInitialReviewOnSameDay(currentUTCTimestamp, timeZone))
+    Timestamp startOfDay = TimestampOperations.getStartOfDay(currentUTCTimestamp, timeZone);
+
+    return userModel.getRecentMemoryTrackers(startOfDay).stream()
+        .filter(p -> p.getAssimilatedAt().after(startOfDay))
         .filter(p -> !p.getRemovedFromTracking())
         .toList();
   }
 
   public AssimilationCountDTO getCounts() {
-    int totalUnassimilatedCount = unassimilatedCount();
+    Integer subscribedCount =
+        getSubscriptionModelStream()
+            .map(this::getPendingNewMemoryTrackerCount)
+            .reduce(Integer::sum)
+            .orElse(0);
+    int totalUnassimilatedCount = subscribedCount + getPendingNewMemoryTrackerCount(userModel);
     int assimilatedCountOfTheDay = getAssimilatedCountOfTheDay();
     int dueCount = 0;
     if (getDueInitialMemoryTrackers().findFirst().isPresent()) {

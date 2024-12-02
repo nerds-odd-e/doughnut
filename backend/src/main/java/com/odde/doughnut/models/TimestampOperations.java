@@ -2,6 +2,7 @@ package com.odde.doughnut.models;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -51,5 +52,19 @@ public abstract class TimestampOperations {
             .localizedBy(Locale.ENGLISH);
     Instant instant = Instant.parse(inputTime.substring(1));
     return formatter.format(instant) + (inputTime.startsWith("-") ? " B.C." : "");
+  }
+
+  public static Timestamp getStartOfDay(Timestamp timestamp, ZoneId zoneId) {
+    LocalDateTime localDateTime =
+        timestamp
+            .toInstant()
+            .atZone(zoneId)
+            .toLocalDateTime()
+            .withHour(0)
+            .withMinute(0)
+            .withSecond(0)
+            .withNano(0);
+
+    return Timestamp.from(localDateTime.atZone(zoneId).toInstant());
   }
 }
