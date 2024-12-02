@@ -1,8 +1,8 @@
 <template>
   <div class="d-flex flex-grow-1 overflow-auto h-full">
     <aside
-      class="d-md-block flex-shrink-0 overflow-auto me-3"
-      :class="{ 'd-none': sidebarCollapsedForSmallScreen }"
+      class="flex-shrink-0 overflow-auto me-3 sidebar"
+      :class="{ 'sidebar-collapsed': sidebarCollapsed }"
     >
       <NoteSidebar
         v-if="noteRealm"
@@ -12,16 +12,13 @@
         }"
       />
     </aside>
-    <main
-      class="flex-grow-1 overflow-visible"
-      :class="{ 'd-none': !sidebarCollapsedForSmallScreen }"
-    >
+    <main class="flex-grow-1 overflow-visible main-content">
       <NoteShow
         v-bind="{
           noteId,
           expandChildren: true,
           storageAccessor,
-          onToggleSidebar: toggleSideBar,
+          onToggleSidebar: () => sidebarCollapsed = !sidebarCollapsed,
         }"
       />
     </main>
@@ -47,20 +44,46 @@ const noteRealm = computed(() => {
   return props.storageAccessor.refOfNoteRealm(props.noteId).value
 })
 
-const sidebarCollapsedForSmallScreen = ref(true)
-
-const toggleSideBar = () => {
-  sidebarCollapsedForSmallScreen.value = !sidebarCollapsedForSmallScreen.value
-}
+const sidebarCollapsed = ref(false)
 </script>
 
 <style scoped lang="scss">
 @import '@/styles/_variables.scss';
 
 aside {
-  width: 100%;
+  width: 18rem;
+  transition: transform 0.3s ease;
+}
+
+.sidebar {
+  @media (max-width: $mobile-breakpoint) {
+    position: absolute;
+    z-index: 1000;
+    background: white;
+    height: 100%;
+    transform: translateX(0);
+
+    &.sidebar-collapsed {
+      transform: translateX(-100%);
+    }
+  }
+
   @media (min-width: $mobile-breakpoint) {
-    width: 18rem;
+    &.sidebar-collapsed {
+      width: 0;
+      margin: 0;
+      overflow: hidden;
+    }
+  }
+}
+
+.main-content {
+  @media (max-width: $mobile-breakpoint) {
+    margin-left: 0;
+
+    .sidebar:not(.sidebar-collapsed) + & {
+      display: none;
+    }
   }
 }
 

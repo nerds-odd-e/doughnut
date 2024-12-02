@@ -7,7 +7,7 @@
             <button
               v-if="onToggleSidebar"
               role="button"
-              class="d-md-none btn btn-sm"
+              class="btn btn-sm"
               title="toggle sidebar"
               @click="(e: MouseEvent) => onToggleSidebar?.(e)"
             >
