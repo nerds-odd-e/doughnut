@@ -1,7 +1,9 @@
 <template>
   <ContainerPage>
     <main>
-      <NoteWithBreadcrumb v-bind="{ note, storageAccessor }" />
+      <NoteShow
+        v-bind="{ noteId: note.id, storageAccessor, expandChildren: false }"
+      />
     </main>
     <NoteInfoBar
       :note-id="note.id"
@@ -23,9 +25,8 @@ import type { StorageAccessor } from "@/store/createNoteStorage"
 import usePopups from "../commons/Popups/usePopups"
 import NoteInfoBar from "../notes/NoteInfoBar.vue"
 import AssimilationButtons from "./AssimilationButtons.vue"
-import NoteWithBreadcrumb from "./NoteWithBreadcrumb.vue"
+import NoteShow from "../notes/NoteShow.vue"
 import { computed } from "vue"
-
 // Props
 const { note } = defineProps<{
   note: Note
