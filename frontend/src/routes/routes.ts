@@ -14,9 +14,12 @@ import FailureReportPage from "@/pages/FailureReportPage.vue"
 import AnsweredQuestionPage from "@/pages/AnsweredQuestionPage.vue"
 import AdminDashboardPage from "@/pages/AdminDashboardPage.vue"
 import NonproductionOnlyLoginPage from "@/pages/NonproductionOnlyLoginPage.vue"
+import NestedPage from "../pages/commons/NestedPage"
 import MessageCenterPage from "../pages/MessageCenterPage.vue"
 import RecentPage from "@/pages/RecentPage.vue"
 import CirclesPage from "@/pages/CirclesPage.vue"
+
+const NestedRepeatPage = NestedPage(RepeatPage, "repeat")
 
 // Please start most of the path with "/d/"
 // so that the server will render the page correctly
@@ -50,6 +53,9 @@ const noteAndLinkRoutes = [
     meta: { useNoteStorageAccessor: true },
   },
 ]
+
+const nestedNoteAndLinkRoutes = (prefix: string) =>
+  noteAndLinkRoutes.map((route) => ({ ...route, name: prefix + route.name }))
 
 const routes = [
   ...noteAndLinkRoutes.map((route) => ({ ...route, path: `${route.path}` })),
@@ -105,7 +111,8 @@ const routes = [
   {
     path: "/d/recalls/repeat",
     name: "repeat",
-    component: RepeatPage,
+    component: NestedRepeatPage,
+    children: [...nestedNoteAndLinkRoutes("repeat-")],
     meta: { useNoteStorageAccessor: true },
   },
   {
