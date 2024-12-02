@@ -19,7 +19,7 @@
           </router-link>
         </li>
         <li role="button" class="list-item" :class="{ active: isActiveRoute(['recalls', 'repeat']) }" title="Daily Recall">
-          <router-link :to="{ name: 'recalls' }" class="d-flex flex-column align-items-center gap-1">
+          <router-link :to="{ name: 'repeat' }" class="d-flex flex-column align-items-center gap-1">
             <div class="icon-container">
               <SvgCalendarCheck />
               <div v-if="toRepeatCount && toRepeatCount > 0" class="recall-count">
