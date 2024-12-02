@@ -123,6 +123,7 @@ import UserProfileDialog from "./UserProfileDialog.vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { watch } from "vue"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
+import timezoneParam from "@/managedApi/window/timezoneParam"
 
 const { user } = defineProps({
   user: { type: Object as PropType<User> },
@@ -144,8 +145,9 @@ const {
 const { managedApi } = useLoadingApi()
 
 const fetchDueCount = async () => {
-  const count =
-    await managedApi.assimilationController.getAssimilationCount("UTC")
+  const count = await managedApi.assimilationController.getAssimilationCount(
+    timezoneParam()
+  )
   setDueCount(count.dueCount)
   setAssimilatedCountOfTheDay(count.assimilatedCountOfTheDay)
   setTotalUnassimilatedCount(count.totalUnassimilatedCount)

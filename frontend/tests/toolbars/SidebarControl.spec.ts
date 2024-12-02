@@ -4,6 +4,7 @@ import { screen } from "@testing-library/vue"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
+import timezoneParam from "@/managedApi/window/timezoneParam"
 
 const useRouteValue = { name: "" }
 vitest.mock("vue-router", () => ({
@@ -101,6 +102,17 @@ describe("sidebar control", () => {
       await flushPromises()
 
       expect(mockGetCount).toHaveBeenCalledTimes(2)
+    })
+
+    it("calls getAssimilationCount with the correct timezone", async () => {
+      const mockGetCount = vitest.fn().mockResolvedValue({ dueCount: 3 })
+      helper.managedApi.assimilationController.getAssimilationCount =
+        mockGetCount
+
+      helper.component(SidebarControl).withProps({ user }).render()
+      await flushPromises()
+
+      expect(mockGetCount).toHaveBeenCalledWith(timezoneParam())
     })
   })
 })
