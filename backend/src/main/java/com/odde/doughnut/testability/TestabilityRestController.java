@@ -254,7 +254,7 @@ class TestabilityRestController {
   @Transactional
   public String updateCurrentUser(@RequestBody HashMap<String, String> userInfo) {
     if (userInfo.containsKey("daily_new_notes_count")) {
-      currentUser.setAndSaveDailyNewNotesCount(
+      currentUser.setAndSavedailyAssimilationCount(
           Integer.valueOf(userInfo.get("daily_new_notes_count")));
     }
     if (userInfo.containsKey("space_intervals")) {

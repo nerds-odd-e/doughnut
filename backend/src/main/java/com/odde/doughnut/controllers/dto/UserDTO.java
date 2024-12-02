@@ -14,7 +14,7 @@ public class UserDTO {
   @Setter
   private String name;
 
-  @Getter @Setter private Integer dailyNewNotesCount = 15;
+  @Getter @Setter private Integer dailyAssimilationCount = 15;
 
   @Pattern(regexp = "^\\d+((,\\s*\\d+){1,1000})*$", message = "must be numbers separated by ','")
   @Getter

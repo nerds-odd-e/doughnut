@@ -152,7 +152,7 @@ public class AssimilationServiceTest {
 
       @BeforeEach
       void setup() {
-        userModel.setAndSaveDailyNewNotesCount(1);
+        userModel.setAndSavedailyAssimilationCount(1);
       }
 
       @Test

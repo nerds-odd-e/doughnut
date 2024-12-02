@@ -42,11 +42,11 @@ class RestUserControllerTest {
     UserDTO dto = new UserDTO();
     dto.setName("new name");
     dto.setSpaceIntervals("1,2,3,4,5,6,7,8,9,10,11,12,13,14,15");
-    dto.setDailyNewNotesCount(12);
+    dto.setDailyAssimilationCount(12);
     User response = controller.updateUser(userModel.getEntity(), dto);
     assertThat(response.getName(), equalTo(dto.getName()));
     assertThat(response.getSpaceIntervals(), equalTo(dto.getSpaceIntervals()));
-    assertThat(response.getDailyNewNotesCount(), equalTo(dto.getDailyNewNotesCount()));
+    assertThat(response.getDailyAssimilationCount(), equalTo(dto.getDailyAssimilationCount()));
   }
 
   @Test

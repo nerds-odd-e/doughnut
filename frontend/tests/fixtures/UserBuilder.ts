@@ -12,7 +12,7 @@ class UserBuilder extends Builder<User> {
       name: "a name",
       externalIdentifier: `user ${generateId()}`,
       ownership: { id: 0 },
-      dailyNewNotesCount: 5,
+      dailyAssimilationCount: 5,
       spaceIntervals: "",
       admin: false,
     }

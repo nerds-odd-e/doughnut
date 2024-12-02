@@ -40,7 +40,7 @@ public class UserBuilder extends EntityBuilder<User> {
   public void beforeCreate(boolean needPersist) {}
 
   public UserBuilder dailyAssimilationCount(int i) {
-    entity.setDailyNewNotesCount(i);
+    entity.setDailyAssimilationCount(i);
     return this;
   }
 }

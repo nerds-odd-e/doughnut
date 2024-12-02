@@ -3169,7 +3169,7 @@ components:
           type: string
         ownership:
           $ref: "#/components/schemas/Ownership"
-        dailyNewNotesCount:
+        dailyAssimilationCount:
           type: integer
           format: int32
         spaceIntervals:
@@ -3953,7 +3953,7 @@ components:
           maxLength: 100
           minLength: 1
           type: string
-        dailyNewNotesCount:
+        dailyAssimilationCount:
           type: integer
           format: int32
         spaceIntervals:

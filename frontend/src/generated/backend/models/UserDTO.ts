@@ -4,7 +4,7 @@
 /* eslint-disable */
 export type UserDTO = {
     name: string;
-    dailyNewNotesCount?: number;
+    dailyAssimilationCount?: number;
     spaceIntervals?: string;
 };
 

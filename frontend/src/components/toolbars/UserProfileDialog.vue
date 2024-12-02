@@ -16,9 +16,9 @@
         />
         <TextInput
           scope-name="user"
-          field="dailyNewNotesCount"
-          v-model="formData.dailyNewNotesCount"
-          :error-message="errors.dailyNewNotesCount"
+          field="dailyAssimilationCount"
+          v-model="formData.dailyAssimilationCount"
+          :error-message="errors.dailyAssimilationCount"
         />
         <TextInput
           scope-name="user"

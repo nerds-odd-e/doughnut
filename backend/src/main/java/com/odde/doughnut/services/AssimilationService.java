@@ -61,7 +61,7 @@ public class AssimilationService {
   }
 
   private int getRemainingDailyAssimilationCount() {
-    return userModel.getEntity().getDailyNewNotesCount() - getAssimilatedCountOfTheDay();
+    return userModel.getEntity().getDailyAssimilationCount() - getAssimilatedCountOfTheDay();
   }
 
   public AssimilationCountDTO getCounts() {
@@ -70,7 +70,7 @@ public class AssimilationService {
             calculateSubscribedCount(),
             userModel.getUnassimilatedNoteCount(),
             getAssimilatedCountOfTheDay(),
-            userModel.getEntity().getDailyNewNotesCount());
+            userModel.getEntity().getDailyAssimilationCount());
     return counter.toDTO();
   }
 

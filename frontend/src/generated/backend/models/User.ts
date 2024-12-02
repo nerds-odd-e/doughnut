@@ -8,7 +8,7 @@ export type User = {
     name: string;
     externalIdentifier: string;
     ownership?: Ownership;
-    dailyNewNotesCount?: number;
+    dailyAssimilationCount?: number;
     spaceIntervals?: string;
     admin?: boolean;
 };

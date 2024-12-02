@@ -29,8 +29,8 @@ public class UserModel implements ReviewScope {
     return entity.getName();
   }
 
-  public void setAndSaveDailyNewNotesCount(Integer dailyNewNotesCount) {
-    entity.setDailyNewNotesCount(dailyNewNotesCount);
+  public void setAndSavedailyAssimilationCount(Integer dailyAssimilationCount) {
+    entity.setDailyAssimilationCount(dailyAssimilationCount);
     modelFactoryService.save(entity);
   }
 

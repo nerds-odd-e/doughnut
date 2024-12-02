@@ -37,7 +37,7 @@ public class User extends EntityIdentifiedByIdOnly {
   @Column(name = "daily_new_notes_count")
   @Getter
   @Setter
-  private Integer dailyNewNotesCount = 15;
+  private Integer dailyAssimilationCount = 15;
 
   @Column(name = "space_intervals")
   @Getter

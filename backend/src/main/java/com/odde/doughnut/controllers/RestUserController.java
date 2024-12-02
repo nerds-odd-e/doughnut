@@ -45,7 +45,7 @@ class RestUserController {
     currentUser.assertAuthorization(user);
     user.setName(updates.getName());
     user.setSpaceIntervals(updates.getSpaceIntervals());
-    user.setDailyNewNotesCount(updates.getDailyNewNotesCount());
+    user.setDailyAssimilationCount(updates.getDailyAssimilationCount());
     modelFactoryService.save(user);
     return user;
   }
