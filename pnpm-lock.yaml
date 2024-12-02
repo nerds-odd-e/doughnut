@@ -158,8 +158,8 @@ importers:
         specifier: ^7.1.2
         version: 7.1.2(webpack@5.95.0(esbuild@0.24.0))
       es-toolkit:
-        specifier: ^1.27.0
-        version: 1.27.0
+        specifier: ^1.29.0
+        version: 1.29.0
       jsdom:
         specifier: ^25.0.1
         version: 25.0.1
@@ -2153,8 +2153,8 @@ packages:
   es-module-lexer@1.5.4:
     resolution: {integrity: sha512-MVNK56NiMrOwitFB7cqDwq0CQutbw+0BvLshJSse0MUNU+y1FC3bUS/AQg7oUng+/wKrrki7JfmwtVHkVfPLlw==}
 
-  es-toolkit@1.27.0:
-    resolution: {integrity: sha512-ETSFA+ZJArcuSCpzD2TjAy6UHpx4E4uqFsoDg9F/nTLogrLmVVZQ+zNxco5h7cWnA1nNak07IXsLcaSMih+ZPQ==}
+  es-toolkit@1.29.0:
+    resolution: {integrity: sha512-GjTll+E6APcfAQA09D89HdT8Qn2Yb+TeDSDBTMcxAo+V+w1amAtCI15LJu4YPH/UCPoSo/F47Gr1LIM0TE0lZA==}
 
   esbuild@0.24.0:
     resolution: {integrity: sha512-FuLPevChGDshgSicjisSooU0cemp/sGXR841D5LHMB7mTVOmsEHcAxaH3irL53+8YDIeVNQEySh4DaYU/iuPqQ==}
@@ -7047,7 +7047,7 @@ snapshots:
 
   es-module-lexer@1.5.4: {}
 
-  es-toolkit@1.27.0: {}
+  es-toolkit@1.29.0: {}
 
   esbuild@0.24.0:
     optionalDependencies:
