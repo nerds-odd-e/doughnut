@@ -19,6 +19,7 @@
           expandChildren: true,
           storageAccessor,
           onToggleSidebar: () => sidebarCollapsed = !sidebarCollapsed,
+          showConversation: Boolean(route.query.conversation),
         }"
       />
     </main>
@@ -31,6 +32,7 @@ import { computed, ref } from "vue"
 import NoteShow from "../components/notes/NoteShow.vue"
 import NoteSidebar from "../components/notes/NoteSidebar.vue"
 import type { StorageAccessor } from "../store/createNoteStorage"
+import { useRoute } from "vue-router"
 
 const props = defineProps({
   noteId: { type: Number, required: true },
@@ -45,6 +47,8 @@ const noteRealm = computed(() => {
 })
 
 const sidebarCollapsed = ref(window.innerWidth < 700)
+
+const route = useRoute()
 </script>
 
 <style scoped lang="scss">

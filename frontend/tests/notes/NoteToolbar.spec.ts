@@ -7,6 +7,7 @@ it("displays menu items when dropdown is open", async () => {
   const noteRealm = makeMe.aNoteRealm.topicConstructor("Dummy Title").please()
   const wrapper = helper
     .component(NoteToolbar)
+    .withRouter()
     .withStorageProps({
       note: noteRealm.note,
     })

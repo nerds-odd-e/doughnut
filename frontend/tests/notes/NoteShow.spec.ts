@@ -25,6 +25,7 @@ describe("new/updated pink banner", () => {
 
       const wrapper = helper
         .component(NoteShow)
+        .withRouter()
         .withStorageProps({
           noteId: note.id,
           expandChildren: true,
@@ -45,6 +46,7 @@ describe("note wth children", () => {
     helper.managedApi.restNoteController.show = vitest.fn().mockResolvedValue(n)
     helper
       .component(NoteShow)
+      .withRouter()
       .withStorageProps({
         noteId: n.id,
         expandChildren: true,

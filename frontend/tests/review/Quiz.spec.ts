@@ -27,6 +27,7 @@ describe("repeat page", () => {
   ) => {
     const wrapper = helper
       .component(Quiz)
+      .withRouter()
       .withStorageProps({
         memoryTrackers,
         currentIndex: 0,

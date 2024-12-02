@@ -33,11 +33,10 @@
                 note: noteRealm.note,
                 storageAccessor,
                 asMarkdown,
-                conversationButton: showConversation || noConversationButton,
+                conversationButton: showConversationRef || noConversationButton,
               }"
               @note-accessory-updated="updatedNoteAccessory = $event"
               @edit-as-markdown="asMarkdown = $event"
-              @show-conversations="showConversation = true"
             />
             <div
               class="note-content-wrapper"
@@ -96,14 +95,14 @@
 
           <div
             class="conversation-wrapper"
-            v-if="showConversation"
+            v-if="showConversationRef"
             :class="{ maximized: conversationMaximized }"
           >
             <NoteConversation
               :note-id="noteRealm.id"
               :storage-accessor="storageAccessor"
               :is-maximized="conversationMaximized"
-              @close-dialog="showConversation = false"
+              @close-dialog="handleCloseConversation"
               @toggle-maximize="conversationMaximized = !conversationMaximized"
             />
           </div>
@@ -114,7 +113,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, ref, type PropType, type Ref } from "vue"
+import { computed, inject, ref, type PropType, type Ref, watch } from "vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import NoteRealmLoader from "./NoteRealmLoader.vue"
 import type { NoteAccessory, User } from "@/generated/backend"
@@ -129,11 +128,13 @@ import { reverseLabel } from "../../models/linkTypeOptions"
 import NoteConversation from "../conversations/NoteConversation.vue"
 import TeleportToHeadStatus from "@/pages/commons/TeleportToHeadStatus.vue"
 import BreadcrumbWithCircle from "../../components/toolbars/BreadcrumbWithCircle.vue"
+import { useRouter } from "vue-router"
 
-defineProps({
+const props = defineProps({
   noteId: { type: Number, required: true },
   expandChildren: { type: Boolean, required: true },
   noConversationButton: { type: Boolean, default: false },
+  showConversation: { type: Boolean, default: false },
   storageAccessor: {
     type: Object as PropType<StorageAccessor>,
     required: true,
@@ -141,12 +142,32 @@ defineProps({
   onToggleSidebar: { type: Function, required: false },
 })
 
+const router = useRouter()
+const showConversationRef = ref(props.showConversation)
+
+// Watch for prop changes
+watch(
+  () => props.showConversation,
+  (newVal) => {
+    showConversationRef.value = newVal
+  }
+)
+
+// Update URL when conversation is closed
+const handleCloseConversation = () => {
+  showConversationRef.value = false
+  router.replace({
+    name: "noteShow",
+    params: { noteId: props.noteId },
+    query: {},
+  })
+}
+
 const currentUser = inject<Ref<User | undefined>>("currentUser")
 const readonly = computed(() => !currentUser?.value)
 
 const updatedNoteAccessory = ref<NoteAccessory | undefined>(undefined)
 const asMarkdown = ref(false)
-const showConversation = ref(false)
 const conversationMaximized = ref(false)
 
 const toLocalDateString = (date: string) => {

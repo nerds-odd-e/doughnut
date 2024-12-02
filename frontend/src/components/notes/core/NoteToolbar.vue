@@ -31,7 +31,11 @@
       <NoteSendMessageButton
         v-if="!conversationButton"
         v-bind="{ noteId: note.id }"
-        @show-conversations="$emit('show-conversations')"
+        @show-conversations="() => router.push({
+          name: 'noteShow',
+          params: { noteId: note.id },
+          query: { conversation: 'true' }
+        })"
       />
 
       <WikidataButton v-bind="{ note, storageAccessor }" />
@@ -169,6 +173,7 @@ import NoteEditImageDialog from "../accessory/NoteEditImageDialog.vue"
 import NoteEditUrlDialog from "../accessory/NoteEditUrlDialog.vue"
 import NoteAudioTools from "../accessory/NoteAudioTools.vue"
 import SvgRobot from "@/components/svgs/SvgRobot.vue"
+import { useRouter } from "vue-router"
 
 const { storageAccessor, note } = defineProps<{
   storageAccessor: StorageAccessor
@@ -179,11 +184,9 @@ const { storageAccessor, note } = defineProps<{
 
 const audioTools = ref(false)
 
-const emit = defineEmits([
-  "note-accessory-updated",
-  "edit-as-markdown",
-  "show-conversations",
-])
+const router = useRouter()
+
+const emit = defineEmits(["note-accessory-updated", "edit-as-markdown"])
 
 const noteAccessoriesUpdated = (closer: () => void, na: NoteAccessory) => {
   if (na) {

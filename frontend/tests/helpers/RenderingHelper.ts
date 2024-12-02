@@ -62,11 +62,13 @@ class RenderingHelper<T = DefineComponent> {
     return this
   }
 
-  withRouter() {
-    const router = createRouter({
-      history: createWebHistory(),
-      routes,
-    })
+  withRouter(routerParam?: ReturnType<typeof createRouter>) {
+    const router =
+      routerParam ??
+      createRouter({
+        history: createWebHistory(),
+        routes,
+      })
     this.withPlugin(router)
     return this
   }
