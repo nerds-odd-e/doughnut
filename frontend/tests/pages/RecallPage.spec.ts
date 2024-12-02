@@ -1,4 +1,4 @@
-import RepeatPage from "@/pages/RepeatPage.vue"
+import RecallPage from "@/pages/RecallPage.vue"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { useRouter } from "vue-router"
@@ -19,7 +19,7 @@ vitest.mock("vue-router", () => ({
 
 useRouter().currentRoute.value.name = "repeat"
 
-let renderer: RenderingHelper<typeof RepeatPage>
+let renderer: RenderingHelper<typeof RecallPage>
 const mockedRepeatCall = vi.fn()
 
 let teleportTarget: HTMLDivElement
@@ -40,7 +40,7 @@ beforeEach(() => {
     .mockResolvedValue(makeMe.aNote.please())
   helper.managedApi.restRecallsController.repeatReview = mockedRepeatCall
   renderer = helper
-    .component(RepeatPage)
+    .component(RecallPage)
     .withStorageProps({ eagerFetchCount: 1 })
 })
 

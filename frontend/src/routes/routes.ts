@@ -6,7 +6,7 @@ import NoteShowPage from "@/pages/NoteShowPage.vue"
 import AssessmentAndCertificateHistoryPage from "@/pages/AssessmentAndCertificateHistoryPage.vue"
 import AssessmentPage from "@/pages/AssessmentPage.vue"
 import ReviewHome from "@/pages/ReviewHome.vue"
-import RepeatPage from "@/pages/RepeatPage.vue"
+import RecallPage from "@/pages/RecallPage.vue"
 import AssimilationPage from "@/pages/AssimilationPage.vue"
 import CircleShowPage from "@/pages/CircleShowPage.vue"
 import CircleJoinPage from "@/pages/CircleJoinPage.vue"
@@ -19,7 +19,7 @@ import MessageCenterPage from "../pages/MessageCenterPage.vue"
 import RecentPage from "@/pages/RecentPage.vue"
 import CirclesPage from "@/pages/CirclesPage.vue"
 
-const NestedRepeatPage = NestedPage(RepeatPage, "repeat")
+const NestedRepeatPage = NestedPage(RecallPage, "repeat")
 
 // Please start most of the path with "/d/"
 // so that the server will render the page correctly

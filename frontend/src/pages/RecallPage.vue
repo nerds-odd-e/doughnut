@@ -1,5 +1,5 @@
 <template>
-  <RepeatProgressBar
+  <RecallProgressBar
     v-bind="{
       finished,
       toRepeatCount,
@@ -7,7 +7,7 @@
     }"
     @view-last-result="viewLastResult($event)"
   >
-  </RepeatProgressBar>
+  </RecallProgressBar>
   <template v-if="toRepeat != undefined">
     <Quiz
       v-if="toRepeatCount !== 0"
@@ -40,7 +40,7 @@
 
 <script setup lang="ts">
 import Quiz from "@/components/review/Quiz.vue"
-import RepeatProgressBar from "@/components/review/RepeatProgressBar.vue"
+import RecallProgressBar from "@/components/review/RecallProgressBar.vue"
 import type { AnsweredQuestion } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import getEnvironment from "@/managedApi/window/getEnvironment"
