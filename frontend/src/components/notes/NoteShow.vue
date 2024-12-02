@@ -26,7 +26,7 @@
 
         <ContentLoader v-if="!noteRealm" />
         <template v-else>
-          <template v-if="!conversationMaximized">
+          <template v-if="!toolMaximized">
             <NoteToolbar
               v-if="!readonly"
               v-bind="{
@@ -41,8 +41,8 @@
             <div
               class="note-content-wrapper"
               :class="{
-                'with-conversation': showConversation,
-                minimized: conversationMaximized,
+                'with-tool': showConversation,
+                minimized: toolMaximized,
               }"
             >
               <div id="main-note-content" class="col-md-9">
@@ -94,16 +94,16 @@
           </template>
 
           <div
-            class="conversation-wrapper"
+            class="tool-wrapper"
             v-if="showConversationRef"
-            :class="{ maximized: conversationMaximized }"
+            :class="{ maximized: toolMaximized }"
           >
             <NoteConversation
               :note-id="noteRealm.id"
               :storage-accessor="storageAccessor"
-              :is-maximized="conversationMaximized"
+              :is-maximized="toolMaximized"
               @close-dialog="handleCloseConversation"
-              @toggle-maximize="conversationMaximized = !conversationMaximized"
+              @toggle-maximize="toolMaximized = !toolMaximized"
             />
           </div>
         </template>
@@ -168,7 +168,7 @@ const readonly = computed(() => !currentUser?.value)
 
 const updatedNoteAccessory = ref<NoteAccessory | undefined>(undefined)
 const asMarkdown = ref(false)
-const conversationMaximized = ref(false)
+const toolMaximized = ref(false)
 
 const toLocalDateString = (date: string) => {
   return new Date(date).toLocaleDateString()
@@ -189,11 +189,11 @@ const toLocalDateString = (date: string) => {
   overflow: auto;
 }
 
-.note-content-wrapper.with-conversation {
+.note-content-wrapper.with-tool {
   height: 50%;
 }
 
-.conversation-wrapper {
+.tool-wrapper {
   height: 50%;
   border-top: 1px solid #e9ecef;
   flex: 1;
@@ -212,7 +212,7 @@ const toLocalDateString = (date: string) => {
   overflow: hidden;
 }
 
-.conversation-wrapper.maximized {
+.tool-wrapper.maximized {
   height: calc(100% - 50px);
 }
 </style>
