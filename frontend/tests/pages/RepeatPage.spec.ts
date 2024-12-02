@@ -6,7 +6,6 @@ import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import mockBrowserTimeZone from "@tests/helpers/mockBrowserTimeZone"
-import { useRecallData } from "@/composables/useRecallData"
 
 vitest.mock("vue-router", () => ({
   useRouter: () => ({
@@ -35,13 +34,6 @@ afterEach(() => {
 })
 
 beforeEach(() => {
-  // Reset useRecallData values
-  const { setToRepeatCount, setToRepeat, clearPreviousResults } =
-    useRecallData()
-  setToRepeatCount(undefined)
-  setToRepeat(undefined, false)
-  clearPreviousResults()
-
   vitest.resetAllMocks()
   helper.managedApi.restNoteController.show = vi
     .fn()
@@ -125,7 +117,6 @@ describe("repeat page", () => {
 
     it("should move current memory tracker to end when requested", async () => {
       const wrapper = await mountPage()
-      await flushPromises()
 
       // Initial order should be [123, 456, 3]
       expect(wrapper.vm.toRepeat).toEqual([123, 456, 3])
