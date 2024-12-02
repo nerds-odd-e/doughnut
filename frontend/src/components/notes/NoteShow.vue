@@ -5,10 +5,11 @@
         <TeleportToHeadStatus>
           <div class="btn-group">
             <button
+              v-if="onToggleSidebar"
               role="button"
               class="d-md-none btn btn-sm"
               title="toggle sidebar"
-              @click="(e: MouseEvent) => onToggleSidebar(e)"
+              @click="(e: MouseEvent) => onToggleSidebar?.(e)"
             >
               <span class="navbar-toggler-icon"></span>
             </button>
@@ -137,8 +138,7 @@ defineProps({
     type: Object as PropType<StorageAccessor>,
     required: true,
   },
-  sidebarCollapsed: { type: Boolean, required: true },
-  onToggleSidebar: { type: Function, required: true },
+  onToggleSidebar: { type: Function, required: false },
 })
 
 const currentUser = inject<Ref<User | undefined>>("currentUser")

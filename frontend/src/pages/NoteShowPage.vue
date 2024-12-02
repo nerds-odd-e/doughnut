@@ -21,7 +21,6 @@
           noteId,
           expandChildren: true,
           storageAccessor,
-          sidebarCollapsed: sidebarCollapsedForSmallScreen,
           onToggleSidebar: toggleSideBar,
         }"
       />
