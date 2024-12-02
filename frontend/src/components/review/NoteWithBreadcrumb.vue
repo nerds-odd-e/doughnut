@@ -1,5 +1,4 @@
 <template>
-  <Breadcrumb v-bind="{ noteTopic: note.noteTopic }" />
   <NoteShow
     v-bind="{
       noteId: note.id,
@@ -14,7 +13,6 @@ import type { PropType } from "vue"
 import type { Note } from "@/generated/backend"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import NoteShow from "../notes/NoteShow.vue"
-import Breadcrumb from "../toolbars/Breadcrumb.vue"
 
 defineProps({
   note: {

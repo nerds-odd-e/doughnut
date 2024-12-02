@@ -1,25 +1,4 @@
 <template>
-  <TeleportToHeadStatus>
-    <div class="btn-group">
-      <button
-        role="button"
-        class="d-md-none btn btn-sm"
-        title="toggle sidebar"
-        @click="toggleSideBar"
-      >
-        <span class="navbar-toggler-icon"></span>
-      </button>
-    </div>
-    <ScrollTo />
-    <BreadcrumbWithCircle
-      v-if="noteRealm"
-      v-bind="{
-        fromBazaar: noteRealm?.fromBazaar,
-        circle: noteRealm.notebook?.circle,
-        noteTopic: noteRealm?.note.noteTopic,
-      }"
-    />
-  </TeleportToHeadStatus>
   <div class="d-flex flex-grow-1 overflow-auto h-full">
     <aside
       class="d-md-block flex-shrink-0 overflow-auto me-3"
@@ -42,6 +21,8 @@
           noteId,
           expandChildren: true,
           storageAccessor,
+          sidebarCollapsed: sidebarCollapsedForSmallScreen,
+          onToggleSidebar: toggleSideBar,
         }"
       />
     </main>
@@ -51,11 +32,8 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { computed, ref } from "vue"
-import ScrollTo from "@/components/commons/ScrollTo.vue"
 import NoteShow from "../components/notes/NoteShow.vue"
 import NoteSidebar from "../components/notes/NoteSidebar.vue"
-import TeleportToHeadStatus from "@/pages/commons/TeleportToHeadStatus.vue"
-import BreadcrumbWithCircle from "../components/toolbars/BreadcrumbWithCircle.vue"
 import type { StorageAccessor } from "../store/createNoteStorage"
 
 const props = defineProps({

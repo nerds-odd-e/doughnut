@@ -2,6 +2,27 @@
   <div class="note-show-container">
     <NoteRealmLoader v-bind="{ noteId, storageAccessor }">
       <template #default="{ noteRealm }">
+        <TeleportToHeadStatus>
+          <div class="btn-group">
+            <button
+              role="button"
+              class="d-md-none btn btn-sm"
+              title="toggle sidebar"
+              @click="(e: MouseEvent) => onToggleSidebar(e)"
+            >
+              <span class="navbar-toggler-icon"></span>
+            </button>
+          </div>
+          <BreadcrumbWithCircle
+            v-if="noteRealm"
+            v-bind="{
+              fromBazaar: noteRealm?.fromBazaar,
+              circle: noteRealm.notebook?.circle,
+              noteTopic: noteRealm?.note.noteTopic,
+            }"
+          />
+        </TeleportToHeadStatus>
+
         <ContentLoader v-if="!noteRealm" />
         <template v-else>
           <template v-if="!conversationMaximized">
@@ -105,6 +126,8 @@ import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue"
 import LinkOfNote from "../links/LinkOfNote.vue"
 import { reverseLabel } from "../../models/linkTypeOptions"
 import NoteConversation from "../conversations/NoteConversation.vue"
+import TeleportToHeadStatus from "@/pages/commons/TeleportToHeadStatus.vue"
+import BreadcrumbWithCircle from "../../components/toolbars/BreadcrumbWithCircle.vue"
 
 defineProps({
   noteId: { type: Number, required: true },
@@ -114,6 +137,8 @@ defineProps({
     type: Object as PropType<StorageAccessor>,
     required: true,
   },
+  sidebarCollapsed: { type: Boolean, required: true },
+  onToggleSidebar: { type: Function, required: true },
 })
 
 const currentUser = inject<Ref<User | undefined>>("currentUser")
