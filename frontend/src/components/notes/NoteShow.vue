@@ -40,10 +40,7 @@
             />
             <div
               class="note-content-wrapper"
-              :class="{
-                'with-tool': showConversation,
-                minimized: toolMaximized,
-              }"
+              :class="{ minimized: toolMaximized, }"
             >
               <div id="main-note-content" class="col-md-9">
                 <NoteTextContent
@@ -189,18 +186,13 @@ const toLocalDateString = (date: string) => {
   overflow: auto;
 }
 
-.note-content-wrapper.with-tool {
-  height: 50%;
-}
-
 .tool-wrapper {
-  height: 50%;
+  max-height: 50%;
   border-top: 1px solid #e9ecef;
   flex: 1;
   display: flex;
   flex-direction: column;
   background-color: #f8f9fa;
-  min-height: 0;
 }
 
 .refers {
@@ -214,5 +206,6 @@ const toLocalDateString = (date: string) => {
 
 .tool-wrapper.maximized {
   height: calc(100% - 50px);
+  max-height: 100%;
 }
 </style>
