@@ -39,6 +39,7 @@
               @edit-as-markdown="asMarkdown = $event"
             />
             <div
+              class="note-content-wrapper"
               :class="{
                 'with-conversation': showConversation,
                 minimized: conversationMaximized,
@@ -181,11 +182,14 @@ const toLocalDateString = (date: string) => {
   height: 100%;
 }
 
-.with-conversation {
+.note-content-wrapper {
   flex: 1;
   min-height: 0;
   transition: height 0.3s ease;
   overflow: auto;
+}
+
+.note-content-wrapper.with-conversation {
   height: 50%;
 }
 
@@ -203,7 +207,7 @@ const toLocalDateString = (date: string) => {
   border-left: 1px solid #e9ecef;
 }
 
-.minimized {
+.note-content-wrapper.minimized {
   height: 50px;
   overflow: hidden;
 }
