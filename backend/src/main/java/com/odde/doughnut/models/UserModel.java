@@ -40,13 +40,13 @@ public class UserModel implements ReviewScope {
   }
 
   @Override
-  public int getThingsHaveNotBeenReviewedAtAllCount() {
+  public int getUnassimilatedNoteCount() {
     return modelFactoryService.noteReviewRepository.countByOwnershipWhereThereIsNoMemoryTracker(
         entity.getId(), entity.getOwnership().getId());
   }
 
   @Override
-  public Stream<Note> getThingHaveNotBeenReviewedAtAll() {
+  public Stream<Note> getUnassimilatedNotes() {
     return modelFactoryService.noteReviewRepository.findByOwnershipWhereThereIsNoMemoryTracker(
         entity.getId(), entity.getOwnership().getId());
   }

@@ -93,7 +93,7 @@ public class AssimilationServiceTest {
       }
 
       private List<Note> getAllDueMemoryTrackers() {
-        return assimilationService.getDueInitialMemoryTrackers().collect(Collectors.toList());
+        return assimilationService.getNotesToAssimilate().collect(Collectors.toList());
       }
 
       @Test
@@ -314,7 +314,7 @@ public class AssimilationServiceTest {
 
     @Test
     void getDueInitialMemoryTrackersShouldWorkWithLazyEvaluation() {
-      List<Note> memoryTrackers = earlyMorningService.getDueInitialMemoryTrackers().toList();
+      List<Note> memoryTrackers = earlyMorningService.getNotesToAssimilate().toList();
       assertThat(memoryTrackers, hasSize(0));
     }
 
@@ -326,6 +326,6 @@ public class AssimilationServiceTest {
   }
 
   private Note getFirstInitialMemoryTracker(AssimilationService recallService) {
-    return recallService.getDueInitialMemoryTrackers().findFirst().orElse(null);
+    return recallService.getNotesToAssimilate().findFirst().orElse(null);
   }
 }

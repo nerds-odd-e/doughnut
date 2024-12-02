@@ -43,7 +43,7 @@ class AssimilationController {
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
 
     return new AssimilationService(currentUser, modelFactoryService, currentUTCTimestamp, timeZone)
-        .getDueInitialMemoryTrackers()
+        .getNotesToAssimilate()
         .toList();
   }
 

@@ -16,13 +16,13 @@ public class SubscriptionModel implements ReviewScope {
   }
 
   @Override
-  public int getThingsHaveNotBeenReviewedAtAllCount() {
+  public int getUnassimilatedNoteCount() {
     return modelFactoryService.noteReviewRepository.countByAncestorWhereThereIsNoMemoryTracker(
         entity.getUser().getId(), entity.getNotebook().getId());
   }
 
   @Override
-  public Stream<Note> getThingHaveNotBeenReviewedAtAll() {
+  public Stream<Note> getUnassimilatedNotes() {
     return modelFactoryService.noteReviewRepository.findByAncestorWhereThereIsNoMemoryTracker(
         entity.getUser().getId(), entity.getNotebook().getId());
   }

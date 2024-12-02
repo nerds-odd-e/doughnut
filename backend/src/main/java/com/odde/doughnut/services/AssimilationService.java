@@ -30,12 +30,8 @@ public class AssimilationService {
     this.timeZone = timeZone;
   }
 
-  private Stream<Note> getDueNewMemoryTracker(ReviewScope reviewScope, int count) {
-    return reviewScope.getThingHaveNotBeenReviewedAtAll().limit(count);
-  }
-
-  private int getPendingNewMemoryTrackerCount(ReviewScope reviewScope) {
-    return reviewScope.getThingsHaveNotBeenReviewedAtAllCount();
+  private Stream<Note> getDueNoteToAssimilate(ReviewScope reviewScope, int count) {
+    return reviewScope.getUnassimilatedNotes().limit(count);
   }
 
   private Stream<SubscriptionModel> getSubscriptionModelStream() {
@@ -43,63 +39,58 @@ public class AssimilationService {
         .map(modelFactoryService::toSubscriptionModel);
   }
 
-  public Stream<Note> getDueInitialMemoryTrackers() {
-    int remainingDailyCount = getRemainingDailyNewNotesCount();
+  public Stream<Note> getNotesToAssimilate() {
+    int remainingDailyCount = getRemainingDailyAssimilationCount();
     if (remainingDailyCount <= 0) {
       return Stream.empty();
     }
 
-    List<Integer> todaysReviewedNoteIds = getTodaysReviewedNoteIds();
+    List<Integer> assimilatedNoteIdsForToday =
+        getNotesAssimilatedToday().stream().map(MemoryTracker::getNote).map(Note::getId).toList();
+
     return Stream.concat(
-            getSubscriptionDueNotes(todaysReviewedNoteIds),
-            getDueNewMemoryTracker(userModel, remainingDailyCount))
+            getDueNoteFromSubscription(assimilatedNoteIdsForToday),
+            getDueNoteToAssimilate(userModel, remainingDailyCount))
         .limit(remainingDailyCount);
   }
 
-  private Stream<Note> getSubscriptionDueNotes(List<Integer> todaysReviewedNoteIds) {
+  private Stream<Note> getDueNoteFromSubscription(List<Integer> todaysReviewedNoteIds) {
     return getSubscriptionModelStream()
-        .flatMap(sub -> getDueNewMemoryTracker(
-            sub,
-            sub.needToLearnCountToday(todaysReviewedNoteIds)
-        ));
+        .flatMap(
+            sub -> getDueNoteToAssimilate(sub, sub.needToLearnCountToday(todaysReviewedNoteIds)));
   }
 
-  private List<Integer> getTodaysReviewedNoteIds() {
-    return getNewMemoryTrackersOfToday().stream()
-        .map(MemoryTracker::getNote)
-        .map(Note::getId)
-        .toList();
-  }
-
-  private int getRemainingDailyNewNotesCount() {
+  private int getRemainingDailyAssimilationCount() {
     return userModel.getEntity().getDailyNewNotesCount() - getAssimilatedCountOfTheDay();
   }
 
   public AssimilationCountDTO getCounts() {
-    AssimilationCounter counter = new AssimilationCounter(
-        calculateSubscribedCount(),
-        getPendingNewMemoryTrackerCount(userModel),
-        getAssimilatedCountOfTheDay(),
-        userModel.getEntity().getDailyNewNotesCount()
-    );
+    AssimilationCounter counter =
+        new AssimilationCounter(
+            calculateSubscribedCount(),
+            userModel.getUnassimilatedNoteCount(),
+            getAssimilatedCountOfTheDay(),
+            userModel.getEntity().getDailyNewNotesCount());
     return counter.toDTO();
   }
 
   private int calculateSubscribedCount() {
     return getSubscriptionModelStream()
-        .mapToInt(this::getPendingNewMemoryTrackerCount)
+        .mapToInt(SubscriptionModel::getUnassimilatedNoteCount)
         .sum();
   }
 
   private int getAssimilatedCountOfTheDay() {
-    return getNewMemoryTrackersOfToday().size();
+    return getNotesAssimilatedToday().size();
   }
 
-  private List<MemoryTracker> getNewMemoryTrackersOfToday() {
+  private List<MemoryTracker> getNotesAssimilatedToday() {
     Timestamp oneDayAgo = TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, -24);
     return userModel.getRecentMemoryTrackers(oneDayAgo).stream()
-        .filter(p -> TimestampOperations.getDayId(p.getAssimilatedAt(), timeZone)
-            == TimestampOperations.getDayId(currentUTCTimestamp, timeZone))
+        .filter(
+            p ->
+                TimestampOperations.getDayId(p.getAssimilatedAt(), timeZone)
+                    == TimestampOperations.getDayId(currentUTCTimestamp, timeZone))
         .filter(p -> !p.getRemovedFromTracking())
         .toList();
   }
