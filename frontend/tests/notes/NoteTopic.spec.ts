@@ -26,7 +26,8 @@ describe("note topic", () => {
 
     it("should have link to target", async () => {
       const wrapper = mountComponent(linkingNote)
-      const link = wrapper.find("a.router-link")
+      const links = wrapper.findAll("a.router-link")
+      const link = links[1]!
       expect(link.exists()).toBe(true)
       expect(JSON.parse(link.attributes("to")!)).toMatchObject({
         name: "noteShow",

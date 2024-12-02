@@ -173,6 +173,13 @@ Cypress.Commands.add('startSearching', () => {
   start.assumeNotePage().toolbarButton('search note').click()
 })
 
+Cypress.Commands.add('initialReviewInSequence', (recalls) => {
+  cy.routerToInitialReview()
+  recalls.forEach((onboarding: string) => {
+    cy.initialReviewOneNoteIfThereIs(onboarding)
+  })
+})
+
 Cypress.Commands.add(
   'initialReviewOneNoteIfThereIs',
   ({
@@ -217,7 +224,7 @@ Cypress.Commands.add(
               '; '
             )
             if (typeof topic === 'string') {
-              cy.findByText(topic)
+              cy.findByText(topic, { selector: 'main *' })
             }
 
             if (typeof targetNote === 'string') {
@@ -270,13 +277,6 @@ Cypress.Commands.add('routerToReviews', () => {
 
 Cypress.Commands.add('routerToRepeatReview', () => {
   cy.routerPush('/d/recalls/repeat', 'repeat', {})
-})
-
-Cypress.Commands.add('initialReviewInSequence', (recalls) => {
-  cy.routerToInitialReview()
-  recalls.forEach((onboarding: string) => {
-    cy.initialReviewOneNoteIfThereIs(onboarding)
-  })
 })
 
 Cypress.Commands.add('initialReviewNotes', (noteTopics: string) => {

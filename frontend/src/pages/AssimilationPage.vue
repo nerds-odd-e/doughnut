@@ -1,5 +1,4 @@
 <template>
-  <TeleportToHeadStatus>
     <div class="flex-grow-1">
       <div class="progress-container">
         <span
@@ -42,7 +41,6 @@
         </div>
       </div>
     </div>
-  </TeleportToHeadStatus>
   <ContainerPage v-bind="{ contentLoaded: notes !== undefined }">
     <div v-if="notes?.length === 0" class="text-center py-8">
       You have achieved your daily new notes goal.
@@ -66,7 +64,6 @@ import timezoneParam from "@/managedApi/window/timezoneParam"
 import Assimilation from "@/components/review/Assimilation.vue"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import ContainerPage from "./commons/ContainerPage.vue"
-import TeleportToHeadStatus from "@/pages/commons/TeleportToHeadStatus.vue"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
 
 const { managedApi } = useLoadingApi()

@@ -19,13 +19,6 @@ const mockedInitialReviewCall = vi.fn()
 const mockedNoteInfoCall = vi.fn()
 const mockedGetNoteCall = vi.fn()
 
-let teleportTarget: HTMLDivElement
-
-beforeEach(() => {
-  teleportTarget = document.createElement("div")
-  teleportTarget.id = "head-status"
-  document.body.appendChild(teleportTarget)
-})
 afterEach(() => {
   document.body.innerHTML = ""
 })
@@ -66,7 +59,7 @@ describe("repeat page", () => {
       const wrapper = renderer.currentRoute({ name: "assimilate" }).mount()
       await flushPromises()
       expect(wrapper.findAll(".paused")).toHaveLength(0)
-      expect(teleportTarget.textContent).toContain("Assimilating: 0/2")
+      expect(wrapper.element.textContent).toContain("Assimilating: 0/2")
     })
   })
 })

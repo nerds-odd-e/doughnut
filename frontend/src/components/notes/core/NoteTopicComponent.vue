@@ -1,5 +1,13 @@
 <template>
   <template v-if="noteTopic.targetNoteTopic">
+    <NoteTopicWithLink
+      v-if="noteTopic.parentNoteTopic"
+      v-bind="{
+        noteTopic: noteTopic.parentNoteTopic,
+        iconized: iconizedTarget,
+      }"
+    />
+    &nbsp;
     <span class="link-type" style="font-size: 50%">
       {{ linkType }}
     </span>
