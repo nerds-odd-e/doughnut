@@ -3,6 +3,7 @@ package com.odde.doughnut.models;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
+import com.odde.doughnut.controllers.dto.AssimilationCountDTO;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.services.AssimilationService;
 import com.odde.doughnut.testability.MakeMe;
@@ -62,7 +63,7 @@ public class AssimilationServiceTest {
     void shouldReturnTheFirstNoteAndThenTheSecondWhenThereAreTwo() {
       assertThat(assimilationService.getCounts().getDueCount(), equalTo(2));
       assertThat(getFirstInitialMemoryTracker(assimilationService), equalTo(note1));
-      makeMe.aMemoryTrackerFor(note1).by(userModel).initiallyReviewedOn(day1).please();
+      makeMe.aMemoryTrackerFor(note1).by(userModel).assimilatedAt(day1).please();
       assertThat(assimilationService.getCounts().getDueCount(), equalTo(1));
       assertThat(getFirstInitialMemoryTracker(assimilationService), equalTo(note2));
     }
@@ -161,7 +162,7 @@ public class AssimilationServiceTest {
 
       @Test
       void shouldNotIncludeNotesThatAreAlreadyReviewed() {
-        makeMe.aMemoryTrackerFor(note1).by(userModel).initiallyReviewedOn(day1).please();
+        makeMe.aMemoryTrackerFor(note1).by(userModel).assimilatedAt(day1).please();
         assertThat(getFirstInitialMemoryTracker(assimilationService), is(nullValue()));
       }
 
@@ -170,7 +171,7 @@ public class AssimilationServiceTest {
         makeMe
             .aMemoryTrackerFor(note1)
             .by(userModel)
-            .initiallyReviewedOn(day1)
+            .assimilatedAt(day1)
             .removedFromTracking()
             .please();
         assertThat(getFirstInitialMemoryTracker(assimilationService), is(note2));
@@ -178,13 +179,13 @@ public class AssimilationServiceTest {
 
       @Test
       void shouldIncludeNotesThatAreReviewedByOtherPeople() {
-        makeMe.aMemoryTrackerFor(note1).by(anotherUser).initiallyReviewedOn(day1).please();
+        makeMe.aMemoryTrackerFor(note1).by(anotherUser).assimilatedAt(day1).please();
         assertThat(getFirstInitialMemoryTracker(assimilationService), equalTo(note1));
       }
 
       @Test
       void theDailyCountShouldNotBeResetOnSameDayDifferentHour() {
-        makeMe.aMemoryTrackerFor(note1).by(userModel).initiallyReviewedOn(day1).please();
+        makeMe.aMemoryTrackerFor(note1).by(userModel).assimilatedAt(day1).please();
         Timestamp day1_23 = makeMe.aTimestamp().of(1, 23).fromShanghai().please();
         AssimilationService recallService =
             new AssimilationService(
@@ -194,7 +195,7 @@ public class AssimilationServiceTest {
 
       @Test
       void theDailyCountShouldBeResetOnNextDay() {
-        makeMe.aMemoryTrackerFor(note1).by(userModel).initiallyReviewedOn(day1).please();
+        makeMe.aMemoryTrackerFor(note1).by(userModel).assimilatedAt(day1).please();
         Timestamp day2 = makeMe.aTimestamp().of(2, 1).fromShanghai().please();
         AssimilationService recallService =
             new AssimilationService(
@@ -239,8 +240,8 @@ public class AssimilationServiceTest {
 
     @Test
     void reviewedMoreThanPlanned() {
-      makeMe.aMemoryTrackerFor(note1).by(userModel).initiallyReviewedOn(day1).please();
-      makeMe.aMemoryTrackerFor(note2).by(userModel).initiallyReviewedOn(day1).please();
+      makeMe.aMemoryTrackerFor(note1).by(userModel).assimilatedAt(day1).please();
+      makeMe.aMemoryTrackerFor(note2).by(userModel).assimilatedAt(day1).please();
       assertThat(getFirstInitialMemoryTracker(assimilationService), nullValue());
     }
   }
@@ -259,6 +260,69 @@ public class AssimilationServiceTest {
     @Test
     void shouldNotBeReviewed() {
       assertThat(getFirstInitialMemoryTracker(assimilationService), is(nullValue()));
+    }
+  }
+
+  @Nested
+  class WhenReviewedMoreThanDailyLimitLastNight {
+    Note note1;
+    Note note2;
+    Note note3;
+    Note note4;
+    AssimilationService earlyMorningService;
+    Timestamp lastNight;
+    Timestamp earlyMorning;
+
+    @BeforeEach
+    void setup() {
+      makeMe.theUser(userModel.getEntity()).dailyAssimilationCount(2).please();
+      // Set up subscription notes
+      User anotherUser = makeMe.aUser().please();
+      Note top = makeMe.aNote().skipMemoryTracking().creatorAndOwner(anotherUser).please();
+      note1 = makeMe.aNote().under(top).please();
+      note2 = makeMe.aNote().under(top).please();
+      note3 = makeMe.aNote().under(top).please();
+      note4 = makeMe.aNote().under(top).please();
+
+      // Set up subscription with daily limit of 1
+      makeMe
+          .aSubscription()
+          .forNotebook(top.getNotebook())
+          .forUser(userModel.entity)
+          .daily(1)
+          .please();
+
+      // Set up a note that belongs to the user
+      makeMe.aNote().creatorAndOwner(userModel).please();
+
+      makeMe.refresh(userModel.getEntity());
+
+      // Set up timestamps for last night 11pm and next day 6am
+      lastNight = makeMe.aTimestamp().of(1, 23).fromShanghai().please();
+      earlyMorning = makeMe.aTimestamp().of(2, 6).fromShanghai().please();
+
+      // Review more notes than daily limit last night
+      makeMe.aMemoryTrackerFor(note1).by(userModel).assimilatedAt(lastNight).please();
+      makeMe.aMemoryTrackerFor(note2).by(userModel).assimilatedAt(lastNight).please();
+      makeMe.aMemoryTrackerFor(note3).by(userModel).assimilatedAt(lastNight).please();
+
+      // Create service for early morning check
+      earlyMorningService =
+          new AssimilationService(
+              userModel, makeMe.modelFactoryService, earlyMorning, ZoneId.of("Asia/Shanghai"));
+    }
+
+    @Test
+    void getDueInitialMemoryTrackersShouldWorkWithLazyEvaluation() {
+      List<Note> memoryTrackers = earlyMorningService.getDueInitialMemoryTrackers().toList();
+      assertThat(memoryTrackers, hasSize(2));
+      assertThat(memoryTrackers.get(0), equalTo(note4));
+    }
+
+    @Test
+    void getCountsShouldFailWithNegativeCount() {
+      AssimilationCountDTO counts = earlyMorningService.getCounts();
+      assertThat(counts.getDueCount(), equalTo(2));
     }
   }
 

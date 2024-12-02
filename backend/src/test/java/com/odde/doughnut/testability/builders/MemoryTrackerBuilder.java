@@ -11,7 +11,7 @@ public class MemoryTrackerBuilder extends EntityBuilder<MemoryTracker> {
 
   public MemoryTrackerBuilder(MemoryTracker memoryTracker, MakeMe makeMe) {
     super(makeMe, memoryTracker);
-    initiallyReviewedOn(makeMe.aTimestamp().of(0, 0).please());
+    assimilatedAt(makeMe.aTimestamp().of(0, 0).please());
   }
 
   public MemoryTrackerBuilder by(UserModel userModel) {
@@ -23,7 +23,7 @@ public class MemoryTrackerBuilder extends EntityBuilder<MemoryTracker> {
     return this;
   }
 
-  public MemoryTrackerBuilder initiallyReviewedOn(Timestamp reviewTimestamp) {
+  public MemoryTrackerBuilder assimilatedAt(Timestamp reviewTimestamp) {
     entity.setAssimilatedAt(reviewTimestamp);
     entity.setLastRecalledAt(reviewTimestamp);
     entity.setNextRecallAt(reviewTimestamp);

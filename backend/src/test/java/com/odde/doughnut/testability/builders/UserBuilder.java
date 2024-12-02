@@ -18,6 +18,10 @@ public class UserBuilder extends EntityBuilder<User> {
     setInfo(userName);
   }
 
+  public UserBuilder(MakeMe makeMe, User user) {
+    super(makeMe, user);
+  }
+
   private void setInfo(String userName) {
     entity.setExternalIdentifier(userName);
     entity.setName(userName);
@@ -34,4 +38,9 @@ public class UserBuilder extends EntityBuilder<User> {
 
   @Override
   public void beforeCreate(boolean needPersist) {}
+
+  public UserBuilder dailyAssimilationCount(int i) {
+    entity.setDailyNewNotesCount(i);
+    return this;
+  }
 }
