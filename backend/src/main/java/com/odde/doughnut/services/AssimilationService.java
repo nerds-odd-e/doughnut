@@ -44,24 +44,51 @@ public class AssimilationService {
   }
 
   public Stream<Note> getDueInitialMemoryTrackers() {
-    long sameDayCount = getAssimilatedCountOfTheDay();
-    int count = (int) (userModel.getEntity().getDailyNewNotesCount() - sameDayCount);
-    if (count <= 0) {
+    int remainingDailyCount = getRemainingDailyNewNotesCount();
+    if (remainingDailyCount <= 0) {
       return Stream.empty();
     }
-    List<Integer> alreadyInitialReviewed =
-        getNewMemoryTrackersOfToday().stream()
-            .map(MemoryTracker::getNote)
-            .map(Note::getId)
-            .toList();
+
+    List<Integer> todaysReviewedNoteIds = getTodaysReviewedNoteIds();
     return Stream.concat(
-            getSubscriptionModelStream()
-                .flatMap(
-                    sub ->
-                        getDueNewMemoryTracker(
-                            sub, sub.needToLearnCountToday(alreadyInitialReviewed))),
-            getDueNewMemoryTracker(userModel, count))
-        .limit(count);
+            getSubscriptionDueNotes(todaysReviewedNoteIds),
+            getDueNewMemoryTracker(userModel, remainingDailyCount))
+        .limit(remainingDailyCount);
+  }
+
+  private Stream<Note> getSubscriptionDueNotes(List<Integer> todaysReviewedNoteIds) {
+    return getSubscriptionModelStream()
+        .flatMap(sub -> getDueNewMemoryTracker(
+            sub,
+            sub.needToLearnCountToday(todaysReviewedNoteIds)
+        ));
+  }
+
+  private List<Integer> getTodaysReviewedNoteIds() {
+    return getNewMemoryTrackersOfToday().stream()
+        .map(MemoryTracker::getNote)
+        .map(Note::getId)
+        .toList();
+  }
+
+  private int getRemainingDailyNewNotesCount() {
+    return userModel.getEntity().getDailyNewNotesCount() - getAssimilatedCountOfTheDay();
+  }
+
+  public AssimilationCountDTO getCounts() {
+    AssimilationCounter counter = new AssimilationCounter(
+        calculateSubscribedCount(),
+        getPendingNewMemoryTrackerCount(userModel),
+        getAssimilatedCountOfTheDay(),
+        userModel.getEntity().getDailyNewNotesCount()
+    );
+    return counter.toDTO();
+  }
+
+  private int calculateSubscribedCount() {
+    return getSubscriptionModelStream()
+        .mapToInt(this::getPendingNewMemoryTrackerCount)
+        .sum();
   }
 
   private int getAssimilatedCountOfTheDay() {
@@ -69,29 +96,11 @@ public class AssimilationService {
   }
 
   private List<MemoryTracker> getNewMemoryTrackersOfToday() {
-    Timestamp startOfDay = TimestampOperations.getStartOfDay(currentUTCTimestamp, timeZone);
-
-    return userModel.getRecentMemoryTrackers(startOfDay).stream()
-        .filter(p -> p.getAssimilatedAt().after(startOfDay))
+    Timestamp oneDayAgo = TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, -24);
+    return userModel.getRecentMemoryTrackers(oneDayAgo).stream()
+        .filter(p -> TimestampOperations.getDayId(p.getAssimilatedAt(), timeZone)
+            == TimestampOperations.getDayId(currentUTCTimestamp, timeZone))
         .filter(p -> !p.getRemovedFromTracking())
         .toList();
-  }
-
-  public AssimilationCountDTO getCounts() {
-    Integer subscribedCount =
-        getSubscriptionModelStream()
-            .map(this::getPendingNewMemoryTrackerCount)
-            .reduce(Integer::sum)
-            .orElse(0);
-    int totalUnassimilatedCount = subscribedCount + getPendingNewMemoryTrackerCount(userModel);
-    int assimilatedCountOfTheDay = getAssimilatedCountOfTheDay();
-    int dueCount = 0;
-    if (getDueInitialMemoryTrackers().findFirst().isPresent()) {
-      dueCount =
-          Math.min(
-              (userModel.getEntity().getDailyNewNotesCount() - assimilatedCountOfTheDay),
-              totalUnassimilatedCount);
-    }
-    return new AssimilationCountDTO(dueCount, assimilatedCountOfTheDay, totalUnassimilatedCount);
   }
 }
