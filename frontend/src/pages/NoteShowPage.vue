@@ -44,7 +44,7 @@ const noteRealm = computed(() => {
   return props.storageAccessor.refOfNoteRealm(props.noteId).value
 })
 
-const sidebarCollapsed = ref(false)
+const sidebarCollapsed = ref(window.innerWidth < 700)
 </script>
 
 <style scoped lang="scss">
@@ -52,7 +52,7 @@ const sidebarCollapsed = ref(false)
 
 aside {
   width: 18rem;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, width 0.3s ease, margin 0.3s ease;
 }
 
 .sidebar {
@@ -61,14 +61,21 @@ aside {
     z-index: 1000;
     background: white;
     height: 100%;
-    transform: translateX(0);
+    transform: translateX(-100%);
 
     &.sidebar-collapsed {
       transform: translateX(-100%);
     }
+
+    &:not(.sidebar-collapsed) {
+      transform: translateX(0);
+    }
   }
 
   @media (min-width: $mobile-breakpoint) {
+    transform: translateX(0);
+    width: 18rem;
+
     &.sidebar-collapsed {
       width: 0;
       margin: 0;
