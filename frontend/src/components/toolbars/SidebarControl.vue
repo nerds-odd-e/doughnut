@@ -20,7 +20,12 @@
         </li>
         <li role="button" class="list-item" :class="{ active: isActiveRoute(['recalls', 'repeat']) }" title="Daily Recall">
           <router-link :to="{ name: 'recalls' }" class="d-flex flex-column align-items-center gap-1">
-            <SvgCalendarCheck />
+            <div class="icon-container">
+              <SvgCalendarCheck />
+              <div v-if="toRepeatCount && toRepeatCount > 0" class="recall-count">
+                {{ toRepeatCount }}
+              </div>
+            </div>
             <span class="menu-label">Recall</span>
           </router-link>
         </li>
@@ -124,6 +129,7 @@ import useLoadingApi from "@/managedApi/useLoadingApi"
 import { watch } from "vue"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
 import timezoneParam from "@/managedApi/window/timezoneParam"
+import { useRecallData } from "@/composables/useRecallData"
 
 const { user } = defineProps({
   user: { type: Object as PropType<User> },
@@ -143,6 +149,7 @@ const {
   setTotalUnassimilatedCount,
 } = useAssimilationCount()
 const { managedApi } = useLoadingApi()
+const { toRepeatCount, setToRepeatCount } = useRecallData()
 
 const fetchDueCount = async () => {
   const count = await managedApi.assimilationController.getAssimilationCount(
@@ -153,11 +160,19 @@ const fetchDueCount = async () => {
   setTotalUnassimilatedCount(count.totalUnassimilatedCount)
 }
 
+const fetchRecallCount = async () => {
+  const overview = await managedApi.restRecallsController.overview(
+    timezoneParam()
+  )
+  setToRepeatCount(overview.toRepeatCount)
+}
+
 watch(
   () => user,
   () => {
     if (user) {
       fetchDueCount()
+      fetchRecallCount()
     }
   },
   { immediate: true }
@@ -300,6 +315,23 @@ a[href="https://odd-e.com"] {
   top: -6px;
   right: -6px;
   background: #66b0ff;
+  color: white;
+  border-radius: 50%;
+  min-width: 16px;
+  height: 16px;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  z-index: 1;
+}
+
+.recall-count {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #4CAF50;
   color: white;
   border-radius: 50%;
   min-width: 16px;

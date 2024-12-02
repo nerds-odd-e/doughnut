@@ -115,4 +115,51 @@ describe("sidebar control", () => {
       expect(mockGetCount).toHaveBeenCalledWith(timezoneParam())
     })
   })
+
+  describe("recall count", () => {
+    it("shows recall count when there are items to repeat", async () => {
+      helper.managedApi.restRecallsController.overview = vitest
+        .fn()
+        .mockResolvedValue({ toRepeatCount: 789 })
+
+      helper.component(SidebarControl).withProps({ user }).render()
+      await flushPromises()
+
+      const recallCount = screen.getByText("789")
+      expect(recallCount).toBeInTheDocument()
+      expect(recallCount).toHaveClass("recall-count")
+    })
+
+    it("does not show recall count when there are no items to repeat", async () => {
+      helper.managedApi.restRecallsController.overview = vitest
+        .fn()
+        .mockResolvedValue({ toRepeatCount: 0 })
+
+      helper.component(SidebarControl).withProps({ user }).render()
+      await flushPromises()
+
+      const recallCount = screen.queryByText("0")
+      expect(recallCount).not.toBeInTheDocument()
+    })
+
+    it("fetches recall count when user changes", async () => {
+      const mockGetOverview = vitest
+        .fn()
+        .mockResolvedValue({ toRepeatCount: 3 })
+      helper.managedApi.restRecallsController.overview = mockGetOverview
+
+      const { rerender } = helper
+        .component(SidebarControl)
+        .withProps({ user })
+        .render()
+      await flushPromises()
+
+      const newUser = { ...user, id: 2 }
+      await rerender({ user: newUser })
+      await flushPromises()
+
+      expect(mockGetOverview).toHaveBeenCalledTimes(2)
+      expect(mockGetOverview).toHaveBeenCalledWith(timezoneParam())
+    })
+  })
 })

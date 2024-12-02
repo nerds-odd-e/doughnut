@@ -50,9 +50,11 @@ import type { StorageAccessor } from "@/store/createNoteStorage"
 import _ from "lodash"
 import type { PropType } from "vue"
 import { computed, onMounted, ref } from "vue"
+import { useRecallData } from "@/composables/useRecallData"
 
 const $router = useRouter()
 const { managedApi } = useLoadingApi()
+const { decrementToRepeatCount } = useRecallData()
 defineProps({
   minimized: Boolean,
   eagerFetchCount: Number,
@@ -109,6 +111,7 @@ const loadMore = async (dueInDays?: number) => {
 const onAnswered = (answerResult: AnsweredQuestion) => {
   currentIndex.value += 1
   previousResults.value.push(answerResult)
+  decrementToRepeatCount()
   if (!answerResult) return
   if (!answerResult.answer.correct) {
     viewLastResult(previousResults.value.length - 1)
