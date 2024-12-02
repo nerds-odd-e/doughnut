@@ -26,21 +26,21 @@
 
         <ContentLoader v-if="!noteRealm" />
         <template v-else>
-          <template v-if="!toolMaximized">
+          <template v-if="!isMinimized">
             <NoteToolbar
               v-if="!readonly"
               v-bind="{
                 note: noteRealm.note,
                 storageAccessor,
                 asMarkdown,
-                conversationButton: showConversationRef || noConversationButton,
+                conversationButton: noConversationButton,
               }"
               @note-accessory-updated="updatedNoteAccessory = $event"
               @edit-as-markdown="asMarkdown = $event"
             />
             <div
               class="note-content-wrapper"
-              :class="{ minimized: toolMaximized, }"
+              :class="{ minimized: isMinimized }"
             >
               <div id="main-note-content" class="col-md-9">
                 <NoteTextContent
@@ -90,19 +90,10 @@
             </div>
           </template>
 
-          <div
-            class="tool-wrapper"
-            v-if="showConversationRef"
-            :class="{ maximized: toolMaximized }"
-          >
-            <NoteConversation
-              :note-id="noteRealm.id"
-              :storage-accessor="storageAccessor"
-              :is-maximized="toolMaximized"
-              @close-dialog="handleCloseConversation"
-              @toggle-maximize="toolMaximized = !toolMaximized"
-            />
-          </div>
+          <slot
+            name="note-conversation"
+            :note-realm="noteRealm"
+          />
         </template>
       </template>
     </NoteRealmLoader>
@@ -110,7 +101,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, ref, type PropType, type Ref, watch } from "vue"
+import { computed, inject, ref, type PropType, type Ref } from "vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import NoteRealmLoader from "./NoteRealmLoader.vue"
 import type { NoteAccessory, User } from "@/generated/backend"
@@ -122,50 +113,26 @@ import NoteToolbar from "./core/NoteToolbar.vue"
 import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue"
 import LinkOfNote from "../links/LinkOfNote.vue"
 import { reverseLabel } from "../../models/linkTypeOptions"
-import NoteConversation from "../conversations/NoteConversation.vue"
 import TeleportToHeadStatus from "@/pages/commons/TeleportToHeadStatus.vue"
 import BreadcrumbWithCircle from "../../components/toolbars/BreadcrumbWithCircle.vue"
-import { useRouter } from "vue-router"
 
-const props = defineProps({
+defineProps({
   noteId: { type: Number, required: true },
   expandChildren: { type: Boolean, required: true },
   noConversationButton: { type: Boolean, default: false },
-  showConversation: { type: Boolean, default: false },
   storageAccessor: {
     type: Object as PropType<StorageAccessor>,
     required: true,
   },
   onToggleSidebar: { type: Function, required: false },
+  isMinimized: { type: Boolean, default: false },
 })
-
-const router = useRouter()
-const showConversationRef = ref(props.showConversation)
-
-// Watch for prop changes
-watch(
-  () => props.showConversation,
-  (newVal) => {
-    showConversationRef.value = newVal
-  }
-)
-
-// Update URL when conversation is closed
-const handleCloseConversation = () => {
-  showConversationRef.value = false
-  router.replace({
-    name: "noteShow",
-    params: { noteId: props.noteId },
-    query: {},
-  })
-}
 
 const currentUser = inject<Ref<User | undefined>>("currentUser")
 const readonly = computed(() => !currentUser?.value)
 
 const updatedNoteAccessory = ref<NoteAccessory | undefined>(undefined)
 const asMarkdown = ref(false)
-const toolMaximized = ref(false)
 
 const toLocalDateString = (date: string) => {
   return new Date(date).toLocaleDateString()
@@ -186,15 +153,6 @@ const toLocalDateString = (date: string) => {
   overflow: auto;
 }
 
-.tool-wrapper {
-  max-height: 50%;
-  border-top: 1px solid #e9ecef;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  background-color: #f8f9fa;
-}
-
 .refers {
   border-left: 1px solid #e9ecef;
 }
@@ -202,10 +160,5 @@ const toLocalDateString = (date: string) => {
 .note-content-wrapper.minimized {
   height: 50px;
   overflow: hidden;
-}
-
-.tool-wrapper.maximized {
-  height: calc(100% - 50px);
-  max-height: 100%;
 }
 </style>

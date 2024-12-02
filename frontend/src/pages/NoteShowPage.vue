@@ -19,9 +19,21 @@
           expandChildren: true,
           storageAccessor,
           onToggleSidebar: () => sidebarCollapsed = !sidebarCollapsed,
-          showConversation: Boolean(route.query.conversation),
+          isMinimized: isContentMinimized,
         }"
-      />
+      >
+        <template #note-conversation="{ noteRealm }">
+          <div class="conversation-wrapper" v-if="Boolean(route.query.conversation)">
+            <NoteConversation
+              :note-id="noteRealm.id"
+              :storage-accessor="storageAccessor"
+              :is-maximized="isContentMinimized"
+              @close-dialog="handleCloseConversation"
+              @toggle-maximize="toggleMaximize"
+              />
+          </div>
+        </template>
+      </NoteShow>
     </main>
   </div>
 </template>
@@ -32,7 +44,10 @@ import { computed, ref } from "vue"
 import NoteShow from "../components/notes/NoteShow.vue"
 import NoteSidebar from "../components/notes/NoteSidebar.vue"
 import type { StorageAccessor } from "../store/createNoteStorage"
-import { useRoute } from "vue-router"
+import { useRoute, useRouter } from "vue-router"
+import NoteConversation from "../components/conversations/NoteConversation.vue"
+
+const router = useRouter()
 
 const props = defineProps({
   noteId: { type: Number, required: true },
@@ -49,6 +64,20 @@ const noteRealm = computed(() => {
 const sidebarCollapsed = ref(window.innerWidth < 700)
 
 const route = useRoute()
+
+const isContentMinimized = ref(false)
+
+const toggleMaximize = () => {
+  isContentMinimized.value = !isContentMinimized.value
+}
+
+const handleCloseConversation = () => {
+  router.replace({
+    name: "noteShow",
+    params: { noteId: props.noteId },
+    query: {},
+  })
+}
 </script>
 
 <style scoped lang="scss">
@@ -100,5 +129,14 @@ aside {
 
 .h-full {
   height: 100%;
+}
+
+.conversation-wrapper {
+  max-height: 50%;
+  border-top: 1px solid #e9ecef;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: #f8f9fa;
 }
 </style>
