@@ -54,7 +54,7 @@ public class AssimilationService {
 
   public Stream<Note> getDueInitialMemoryTrackers() {
     int count = remainingDailyNewNotesCount();
-    if (count == 0) {
+    if (count <= 0) {
       return Stream.empty();
     }
     List<Integer> alreadyInitialReviewed =

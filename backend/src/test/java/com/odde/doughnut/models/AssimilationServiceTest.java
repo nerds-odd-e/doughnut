@@ -270,8 +270,8 @@ public class AssimilationServiceTest {
     Note note3;
     Note note4;
     AssimilationService earlyMorningService;
-    Timestamp lastNight;
     Timestamp earlyMorning;
+    Timestamp lateMorning;
 
     @BeforeEach
     void setup() {
@@ -298,31 +298,30 @@ public class AssimilationServiceTest {
       makeMe.refresh(userModel.getEntity());
 
       // Set up timestamps for last night 11pm and next day 6am
-      lastNight = makeMe.aTimestamp().of(1, 23).fromShanghai().please();
-      earlyMorning = makeMe.aTimestamp().of(2, 6).fromShanghai().please();
+      earlyMorning = makeMe.aTimestamp().of(1, 6).fromShanghai().please();
+      lateMorning = makeMe.aTimestamp().of(1, 10).fromShanghai().please();
 
       // Review more notes than daily limit last night
-      makeMe.aMemoryTrackerFor(note1).by(userModel).assimilatedAt(lastNight).please();
-      makeMe.aMemoryTrackerFor(note2).by(userModel).assimilatedAt(lastNight).please();
-      makeMe.aMemoryTrackerFor(note3).by(userModel).assimilatedAt(lastNight).please();
+      makeMe.aMemoryTrackerFor(note1).by(userModel).assimilatedAt(earlyMorning).please();
+      makeMe.aMemoryTrackerFor(note2).by(userModel).assimilatedAt(earlyMorning).please();
+      makeMe.aMemoryTrackerFor(note3).by(userModel).assimilatedAt(earlyMorning).please();
 
       // Create service for early morning check
       earlyMorningService =
           new AssimilationService(
-              userModel, makeMe.modelFactoryService, earlyMorning, ZoneId.of("Asia/Shanghai"));
+              userModel, makeMe.modelFactoryService, lateMorning, ZoneId.of("Asia/Shanghai"));
     }
 
     @Test
     void getDueInitialMemoryTrackersShouldWorkWithLazyEvaluation() {
       List<Note> memoryTrackers = earlyMorningService.getDueInitialMemoryTrackers().toList();
-      assertThat(memoryTrackers, hasSize(2));
-      assertThat(memoryTrackers.get(0), equalTo(note4));
+      assertThat(memoryTrackers, hasSize(0));
     }
 
     @Test
     void getCountsShouldFailWithNegativeCount() {
       AssimilationCountDTO counts = earlyMorningService.getCounts();
-      assertThat(counts.getDueCount(), equalTo(2));
+      assertThat(counts.getDueCount(), equalTo(0));
     }
   }
 
