@@ -1,13 +1,15 @@
 <template>
   <template v-if="noteTopic.targetNoteTopic">
-    <NoteTopicWithLink
-      v-if="noteTopic.parentNoteTopic"
-      v-bind="{
-        noteTopic: noteTopic.parentNoteTopic,
-        iconized: iconizedTarget,
-      }"
-    />
-    &nbsp;
+    <template v-if="full">
+      <NoteTopicWithLink
+        v-if="noteTopic.parentNoteTopic"
+        v-bind="{
+          noteTopic: noteTopic.parentNoteTopic,
+          iconized: iconizedTarget,
+        }"
+      />
+      &nbsp;
+    </template>
     <span class="link-type" style="font-size: 50%">
       {{ linkType }}
     </span>
@@ -41,6 +43,7 @@ import NoteTopicWithLink from "../NoteTopicWithLink.vue"
 
 const props = defineProps({
   noteTopic: { type: Object as PropType<NoteTopic>, required: true },
+  full: { type: Boolean, default: false },
 })
 
 const reactiveProps = ref(props)

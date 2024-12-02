@@ -1,6 +1,6 @@
 <template>
   <h2 role="topic" @click="editingLink = true">
-    <NoteTopicComponent v-bind="{ noteTopic: noteTopic }" />
+    <NoteTopicComponent v-bind="{ noteTopic: noteTopic, full: true }" />
   </h2>
   <Breadcrumb
     v-if="noteTopic.targetNoteTopic"
