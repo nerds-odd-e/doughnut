@@ -119,7 +119,9 @@ export const assumeNotePage = (noteTopic?: string) => {
       })
     },
     changeLinkType: function (linkType: string, target: string) {
-      cy.findByRole('topic').click()
+      cy.findByRole('topic').within(() => {
+        cy.get('.link-type').click()
+      })
       cy.clickRadioByLabel(linkType)
       cy.pageIsNotLoading()
       this.expectLinkingTopic(linkType, target)
