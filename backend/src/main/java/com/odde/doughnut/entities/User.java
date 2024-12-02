@@ -34,7 +34,7 @@ public class User extends EntityIdentifiedByIdOnly {
   @Setter
   private Ownership ownership = new Ownership();
 
-  @Column(name = "daily_new_notes_count")
+  @Column(name = "daily_assimilation_count")
   @Getter
   @Setter
   private Integer dailyAssimilationCount = 15;

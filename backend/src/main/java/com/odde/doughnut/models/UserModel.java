@@ -29,7 +29,7 @@ public class UserModel implements ReviewScope {
     return entity.getName();
   }
 
-  public void setAndSavedailyAssimilationCount(Integer dailyAssimilationCount) {
+  public void setAndSaveDailyAssimilationCount(Integer dailyAssimilationCount) {
     entity.setDailyAssimilationCount(dailyAssimilationCount);
     modelFactoryService.save(entity);
   }

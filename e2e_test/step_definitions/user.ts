@@ -73,7 +73,7 @@ Then('My name {string} is in the user action menu', (name: string) => {
 Then('my daily new notes to review is set to {int}', (number: string) => {
   start
     .testability()
-    .updateCurrentUserSettingsWith({ daily_new_notes_count: number })
+    .updateCurrentUserSettingsWith({ daily_assimilation_count: number })
 })
 
 Then('my space setting is {string}', (number: string) => {

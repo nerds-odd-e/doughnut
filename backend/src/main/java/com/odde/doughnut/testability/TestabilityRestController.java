@@ -253,9 +253,9 @@ class TestabilityRestController {
   @PostMapping("/update_current_user")
   @Transactional
   public String updateCurrentUser(@RequestBody HashMap<String, String> userInfo) {
-    if (userInfo.containsKey("daily_new_notes_count")) {
-      currentUser.setAndSavedailyAssimilationCount(
-          Integer.valueOf(userInfo.get("daily_new_notes_count")));
+    if (userInfo.containsKey("daily_assimilation_count")) {
+      currentUser.setAndSaveDailyAssimilationCount(
+          Integer.valueOf(userInfo.get("daily_assimilation_count")));
     }
     if (userInfo.containsKey("space_intervals")) {
       currentUser.setAndSaveSpaceIntervals(userInfo.get("space_intervals"));
