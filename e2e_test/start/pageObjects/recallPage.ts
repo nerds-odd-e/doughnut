@@ -28,6 +28,7 @@ const recallPage = () => {
       cy.findByRole('button', { name: 'Load more from next 3 days' }).click()
     },
     recallNotes(noteTopics: string) {
+      cy.pageIsNotLoading()
       commonSenseSplit(noteTopics, ',').forEach((topic) => {
         if (topic === 'end') {
           cy.findByText(
