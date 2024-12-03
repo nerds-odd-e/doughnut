@@ -11,7 +11,8 @@
   </RecallProgressBar>
   <template v-if="toRepeat != undefined">
     <Quiz
-      v-if="toRepeatCount !== 0 && !currentResult"
+      v-if="toRepeatCount !== 0"
+      v-show="!currentResult"
       :memory-trackers="toRepeat"
       :current-index="currentIndex"
       :eager-fetch-count="eagerFetchCount ?? 5"
