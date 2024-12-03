@@ -24,7 +24,7 @@
       v-if="currentResult"
       v-bind="{ answeredQuestion: currentResult, storageAccessor }"
     />
-    <template v-else>
+    <template v-else-if="toRepeatCount === 0">
       <div class="alert alert-success">
         You have finished all repetitions for this half a day!
       </div>
