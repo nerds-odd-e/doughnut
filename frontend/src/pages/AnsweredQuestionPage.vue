@@ -5,26 +5,6 @@
       v-else
       v-bind="{ answeredQuestion, storageAccessor }"
     />
-    <button
-      v-if="answeredQuestion"
-      class="conversation-button"
-      title="Start a conversation about this question"
-      @click="startConversation"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-      </svg>
-    </button>
   </div>
 </template>
 
@@ -35,9 +15,7 @@ import type { AnsweredQuestion } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import { onMounted, ref, watch, type PropType } from "vue"
-import { useRouter } from "vue-router"
 
-const router = useRouter()
 const { managedApi } = useLoadingApi()
 
 const { recallPromptId } = defineProps({
@@ -52,20 +30,6 @@ const answeredQuestion = ref<AnsweredQuestion | undefined>()
 const fetchData = async () => {
   answeredQuestion.value =
     await managedApi.restRecallPromptController.showQuestion(recallPromptId)
-}
-
-const startConversation = async () => {
-  if (!answeredQuestion.value) return
-
-  const conversation =
-    await managedApi.restConversationMessageController.startConversationAboutRecallPrompt(
-      answeredQuestion.value.recallPromptId
-    )
-
-  router.push({
-    name: "messageCenter",
-    params: { conversationId: conversation.id },
-  })
 }
 
 watch(() => recallPromptId, fetchData, { immediate: true })

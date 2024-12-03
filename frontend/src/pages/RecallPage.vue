@@ -21,7 +21,7 @@
       @move-to-end="moveMemoryTrackerToEnd"
     />
     <AnsweredQuestionComponent
-      v-else-if="currentResult"
+      v-if="currentResult"
       v-bind="{ answeredQuestion: currentResult, storageAccessor }"
     />
     <template v-else>
