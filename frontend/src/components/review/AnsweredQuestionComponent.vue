@@ -4,7 +4,7 @@
       class="note-under-question"
       @click="navigateToNote"
     >
-      <label class="me-1"><strong>Note reviewed: </strong></label>
+      <label class="me-1"><strong>Note under question: </strong></label>
       <NoteTopicComponent v-bind="{ noteTopic: note.noteTopic, full: true }" />
     </div>
   </div>
@@ -83,7 +83,14 @@ const navigateToNote = () => {
   border: 1px solid #ccc
   width: 100%
   border-radius: 5px
-  padding: 2px
+  padding: 8px 12px
+  margin-top: 10px
+  background-color: #f9f9f9
+  cursor: pointer
+  transition: background-color 0.3s
+
+  &:hover
+    background-color: #e0e0e0
 
 .conversation-button
   position: fixed

@@ -8,7 +8,7 @@ const assumeAnsweredQuestionPage = () => {
       cy.get('.alert-success').should('exist')
     },
     showMemoryTracker(noteTopic?: string) {
-      cy.findByText('Note reviewed:').click()
+      cy.findByText('Note under question:').click()
       return assumeNotePage(noteTopic).memoryTracker()
     },
     goToLastResult: () => {
