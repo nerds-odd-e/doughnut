@@ -151,10 +151,13 @@ const toLocalDateString = (date: string) => {
   min-height: 0;
   transition: height 0.3s ease;
   overflow: auto;
+  display: flex;
+  gap: 1rem;
 }
 
 .refers {
   border-left: 1px solid #e9ecef;
+  padding-left: 1rem;
 }
 
 .note-content-wrapper.minimized {
