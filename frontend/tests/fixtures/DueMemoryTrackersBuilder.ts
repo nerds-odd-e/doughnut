@@ -14,6 +14,8 @@ class DueMemoryTrackersBuilder extends Builder<DueMemoryTrackers> {
     return {
       toRepeat: this.memoryTrackerIdstoRepeat,
       dueInDays: 0,
+      toRepeatCount: 10,
+      learntCount: 100,
     }
   }
 }

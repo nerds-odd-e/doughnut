@@ -41,13 +41,8 @@ class RestRecallsController {
     currentUser.assertLoggedIn();
     ZoneId timeZone = ZoneId.of(timezone);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    RecallService recallService =
-        new RecallService(currentUser, currentUTCTimestamp, timeZone, modelFactoryService);
-    RecallStatus recallStatus = new RecallStatus();
-    recallStatus.toRepeatCount = recallService.getToRecallCount();
-    recallStatus.learntCount = recallService.learntCount();
-
-    return recallStatus;
+    return new RecallService(currentUser, currentUTCTimestamp, timeZone, modelFactoryService)
+        .getRecallStatus();
   }
 
   @GetMapping(value = {"/recalling"})

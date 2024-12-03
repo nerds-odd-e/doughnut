@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.dto.DueMemoryTrackers;
+import com.odde.doughnut.controllers.dto.RecallStatus;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
@@ -51,6 +52,17 @@ class RestRecallsControllerTests {
       assertThrows(
           ResponseStatusException.class, () -> nullUserController().overview("Asia/Shanghai"));
     }
+
+    @Test
+    void shouldReturnCorrectRecallWindowEndTime() {
+      Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();
+      testabilitySettings.timeTravelTo(currentTime);
+
+      RecallStatus status = controller.overview("Asia/Shanghai");
+
+      assertEquals(
+          TimestampOperations.addHoursToTimestamp(currentTime, 24), status.getRecallWindowEndAt());
+    }
   }
 
   @Nested
@@ -86,6 +98,21 @@ class RestRecallsControllerTests {
           .please();
       DueMemoryTrackers dueMemoryTrackers = controller.recalling(timezone, null);
       assertThat(dueMemoryTrackers.getToRepeat(), hasSize(expectedCount));
+    }
+
+    @Test
+    void shouldIncludeRecallStatusInDueMemoryTrackers() {
+      Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();
+      testabilitySettings.timeTravelTo(currentTime);
+      makeMe.aMemoryTrackerBy(currentUser).nextRecallAt(currentTime).please();
+
+      DueMemoryTrackers dueMemoryTrackers = controller.recalling("Asia/Shanghai", 0);
+
+      assertEquals(1, dueMemoryTrackers.toRepeatCount);
+      assertEquals(1, dueMemoryTrackers.learntCount);
+      assertEquals(
+          TimestampOperations.addHoursToTimestamp(currentTime, 24),
+          dueMemoryTrackers.getRecallWindowEndAt());
     }
   }
 }

@@ -4042,8 +4042,20 @@ components:
         externalIdentifier:
           type: string
     DueMemoryTrackers:
+      required:
+      - learntCount
+      - toRepeatCount
       type: object
       properties:
+        toRepeatCount:
+          type: integer
+          format: int32
+        learntCount:
+          type: integer
+          format: int32
+        recallWindowEndAt:
+          type: string
+          format: date-time
         toRepeat:
           type: array
           items:
@@ -4064,6 +4076,9 @@ components:
         learntCount:
           type: integer
           format: int32
+        recallWindowEndAt:
+          type: string
+          format: date-time
     NoteInfo:
       required:
       - createdAt

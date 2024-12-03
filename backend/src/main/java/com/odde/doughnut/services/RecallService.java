@@ -1,6 +1,7 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.DueMemoryTrackers;
+import com.odde.doughnut.controllers.dto.RecallStatus;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.TimestampOperations;
@@ -38,12 +39,28 @@ public class RecallService {
         TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, dueInDays * 24), timeZone);
   }
 
+  public RecallStatus getRecallStatus() {
+    RecallStatus recallStatus = new RecallStatus();
+    recallStatus.toRepeatCount = getToRecallCount();
+    recallStatus.learntCount = learntCount();
+    recallStatus.setRecallWindowEndAt(
+        TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, 24));
+    return recallStatus;
+  }
+
   public DueMemoryTrackers getDueMemoryTrackers(int dueInDays) {
     List<Integer> toRepeat =
         getMemoryTrackersNeedToRepeat(dueInDays).map(MemoryTracker::getId).toList();
     DueMemoryTrackers dueMemoryTrackers = new DueMemoryTrackers();
     dueMemoryTrackers.setDueInDays(dueInDays);
     dueMemoryTrackers.setToRepeat(toRepeat);
+
+    // Set recall status (always based on dueInDays=0)
+    RecallStatus status = getRecallStatus();
+    dueMemoryTrackers.toRepeatCount = status.toRepeatCount;
+    dueMemoryTrackers.learntCount = status.learntCount;
+    dueMemoryTrackers.setRecallWindowEndAt(status.getRecallWindowEndAt());
+
     return dueMemoryTrackers;
   }
 

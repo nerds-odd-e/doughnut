@@ -5,5 +5,6 @@
 export type RecallStatus = {
     toRepeatCount: number;
     learntCount: number;
+    recallWindowEndAt?: string;
 };
 

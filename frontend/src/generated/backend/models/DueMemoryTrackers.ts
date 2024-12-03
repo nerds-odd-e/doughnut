@@ -3,6 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 export type DueMemoryTrackers = {
+    toRepeatCount: number;
+    learntCount: number;
+    recallWindowEndAt?: string;
     toRepeat?: Array<number>;
     dueInDays?: number;
 };
