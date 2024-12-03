@@ -10,7 +10,7 @@
   </RecallProgressBar>
   <template v-if="toRepeat != undefined">
     <Quiz
-      v-if="toRepeatCount !== 0"
+      v-if="toRepeatCount !== 0 && !currentResult"
       :minimized="minimized"
       :memory-trackers="toRepeat"
       :current-index="currentIndex"
@@ -18,6 +18,10 @@
       :storage-accessor="storageAccessor"
       @answered="onAnswered($event)"
       @move-to-end="moveMemoryTrackerToEnd"
+    />
+    <AnsweredQuestionComponent
+      v-else-if="currentResult"
+      v-bind="{ answeredQuestion: currentResult, storageAccessor }"
     />
     <template v-else-if="!minimized">
       <div class="alert alert-success">
@@ -41,18 +45,17 @@
 <script setup lang="ts">
 import Quiz from "@/components/review/Quiz.vue"
 import RecallProgressBar from "@/components/review/RecallProgressBar.vue"
+import AnsweredQuestionComponent from "@/components/review/AnsweredQuestionComponent.vue"
 import type { AnsweredQuestion } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import getEnvironment from "@/managedApi/window/getEnvironment"
 import timezoneParam from "@/managedApi/window/timezoneParam"
-import { useRouter } from "vue-router"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import _ from "lodash"
 import type { PropType } from "vue"
 import { computed, onMounted, ref } from "vue"
 import { useRecallData } from "@/composables/useRecallData"
 
-const $router = useRouter()
 const { managedApi } = useLoadingApi()
 const { decrementToRepeatCount } = useRecallData()
 defineProps({
@@ -81,15 +84,6 @@ const toRepeatCount = computed(
 
 const viewLastResult = (cursor: number | undefined) => {
   previousResultCursor.value = cursor
-  if (currentResult.value) {
-    const { recallPromptId } = currentResult.value
-    $router.push({
-      name: "repeat-answer",
-      params: { recallPromptId },
-    })
-    return
-  }
-  $router.push({ name: "repeat" })
 }
 
 const loadMore = async (dueInDays?: number) => {
