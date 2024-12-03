@@ -158,6 +158,7 @@ declare module 'vue' {
     SvgAddSibling: typeof import('./src/components/svgs/SvgAddSibling.vue')['default']
     SvgAgree: typeof import('./src/components/svgs/SvgAgree.vue')['default']
     SvgAssessment: typeof import('./src/components/svgs/SvgAssessment.vue')['default']
+    SvgAssimilate: typeof import('./src/components/svgs/SvgAssimilate.vue')['default']
     SvgAssociation: typeof import('./src/components/svgs/SvgAssociation.vue')['default']
     SvgAudioInput: typeof import('./src/components/svgs/SvgAudioInput.vue')['default']
     SvgBackward: typeof import('./src/components/svgs/SvgBackward.vue')['default']

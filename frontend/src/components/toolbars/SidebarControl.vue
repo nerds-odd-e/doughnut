@@ -10,7 +10,7 @@
         <li role="button" class="list-item" :class="{ active: isActiveRoute(['assimilate']) }" title="Assimilate">
           <router-link :to="{ name: 'assimilate' }" class="d-flex flex-column align-items-center gap-1">
             <div class="icon-container">
-              <SvgClockHistory />
+              <SvgAssimilate />
               <div v-if="dueCount && dueCount > 0" class="due-count">
                 {{ dueCount }}
               </div>
@@ -73,7 +73,7 @@
                 Admin Dashboard
               </router-link>
               <router-link role="button" class="dropdown-item" :to="{ name: 'recent' }">
-                <SvgClockHistory class="me-2" />Recent...
+                <SvgAssimilate class="me-2" />Recent...
               </router-link>
               <PopButton btn-class="dropdown-item" title="user settings">
                 <template #button_face> Settings for {{ user.name }}</template>
@@ -119,7 +119,7 @@ import MessageCenterButton from "@/components/toolbars/MessageCenterButton.vue"
 import { useRoute } from "vue-router"
 import SvgCalendarCheck from "@/components/svgs/SvgCalendarCheck.vue"
 import SvgJournalText from "@/components/svgs/SvgJournalText.vue"
-import SvgClockHistory from "@/components/svgs/SvgClockHistory.vue"
+import SvgAssimilate from "@/components/svgs/SvgAssimilate.vue"
 import SvgShop from "@/components/svgs/SvgShop.vue"
 import SvgPeople from "@/components/svgs/SvgPeople.vue"
 import SvgChat from "@/components/svgs/SvgChat.vue"
