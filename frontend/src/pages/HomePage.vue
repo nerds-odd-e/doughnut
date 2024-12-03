@@ -120,17 +120,18 @@ const updateFlowPath = () => {
   const curveRadius = 20
   const arrowSize = 8
   const wrapPadding = 80
-  const edgeMargin = 40
+  const edgeMargin = 60
   const sideMargin = 60
   const leftOffset = 60
   const connectionGap = 40
+  const iconWidth = 70
 
   if (positions[0] && positions[1] && positions[2]) {
     const pathData = `
-      M ${positions[0].x + connectionGap + leftOffset},${positions[0].y}
-      H ${positions[1].x - connectionGap + leftOffset}
-      M ${positions[1].x + connectionGap + leftOffset},${positions[1].y}
-      H ${positions[2].x - connectionGap + leftOffset}
+      M ${positions[0].x + connectionGap + leftOffset - iconWidth},${positions[0].y}
+      H ${positions[1].x - connectionGap + leftOffset - iconWidth}
+      M ${positions[1].x + connectionGap + leftOffset - iconWidth},${positions[1].y}
+      H ${positions[2].x - connectionGap + leftOffset - iconWidth}
       M ${positions[2].x + leftOffset},${positions[2].y}
       h ${wrapPadding}
       q ${curveRadius} 0 ${curveRadius} ${curveRadius}
@@ -140,14 +141,23 @@ const updateFlowPath = () => {
       q -${curveRadius} 0 -${curveRadius} -${curveRadius}
       v -${svgRect.height - positions[0].y - edgeMargin}
       q 0 -${curveRadius} ${curveRadius} -${curveRadius}
-      H ${positions[0].x - spacing + leftOffset}
+      H ${positions[0].x - spacing + leftOffset - iconWidth}
     `
     path.setAttribute("d", pathData)
 
     const arrowPositions = [
-      { x: positions[1].x - connectionGap + leftOffset, y: positions[1].y },
-      { x: positions[2].x - connectionGap + leftOffset, y: positions[2].y },
-      { x: positions[0].x - spacing + leftOffset, y: positions[0].y },
+      {
+        x: positions[1].x - connectionGap + leftOffset - iconWidth,
+        y: positions[1].y,
+      },
+      {
+        x: positions[2].x - connectionGap + leftOffset - iconWidth,
+        y: positions[2].y,
+      },
+      {
+        x: positions[0].x - spacing + leftOffset - iconWidth,
+        y: positions[0].y,
+      },
     ]
 
     const arrowHeads = document.querySelectorAll(
