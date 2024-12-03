@@ -149,7 +149,8 @@ const {
   setTotalUnassimilatedCount,
 } = useAssimilationCount()
 const { managedApi } = useLoadingApi()
-const { toRepeatCount, setToRepeatCount } = useRecallData()
+const { toRepeatCount, setToRepeatCount, setRecallWindowEndAt } =
+  useRecallData()
 
 const fetchDueCount = async () => {
   const count = await managedApi.assimilationController.getAssimilationCount(
@@ -165,6 +166,7 @@ const fetchRecallCount = async () => {
     timezoneParam()
   )
   setToRepeatCount(overview.toRepeatCount)
+  setRecallWindowEndAt(overview.recallWindowEndAt)
 }
 
 watch(

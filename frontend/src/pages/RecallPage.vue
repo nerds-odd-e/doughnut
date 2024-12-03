@@ -57,7 +57,12 @@ import { computed, onMounted, ref, onActivated, onDeactivated } from "vue"
 import { useRecallData } from "@/composables/useRecallData"
 
 const { managedApi } = useLoadingApi()
-const { decrementToRepeatCount } = useRecallData()
+const {
+  setToRepeatCount,
+  decrementToRepeatCount,
+  recallWindowEndAt,
+  setRecallWindowEndAt,
+} = useRecallData()
 defineProps({
   eagerFetchCount: Number,
   storageAccessor: {
@@ -87,16 +92,19 @@ const viewLastResult = (cursor: number | undefined) => {
 }
 
 const loadMore = async (dueInDays?: number) => {
-  toRepeat.value = (
-    await managedApi.restRecallsController.recalling(timezoneParam(), dueInDays)
-  ).toRepeat
+  const response = await managedApi.restRecallsController.recalling(
+    timezoneParam(),
+    dueInDays
+  )
+  toRepeat.value = response.toRepeat
   currentIndex.value = 0
   if (toRepeat.value?.length === 0) {
-    return
+    return response
   }
   if (getEnvironment() !== "testing") {
     toRepeat.value = _.shuffle(toRepeat.value)
   }
+  return response
 }
 
 const onAnswered = (answerResult: AnsweredQuestion) => {
@@ -122,15 +130,22 @@ const moveMemoryTrackerToEnd = (index: number) => {
   ]
 }
 
+const loadCurrentDueRecalls = async () => {
+  toRepeat.value = undefined
+  const response = await loadMore(0)
+  setToRepeatCount(response.toRepeatCount)
+  setRecallWindowEndAt(response.recallWindowEndAt)
+}
+
 onMounted(() => {
-  loadMore(0)
+  loadCurrentDueRecalls()
 })
 
 onActivated(() => {
   isProgressBarVisible.value = true
-  if (!previousResultCursor.value) {
-    toRepeat.value = undefined
-    loadMore(0)
+  const currentTime = new Date().toISOString()
+  if (recallWindowEndAt.value && currentTime > recallWindowEndAt.value) {
+    loadCurrentDueRecalls()
   }
 })
 
