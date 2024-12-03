@@ -4,9 +4,6 @@
       <h1 class="welcome-text">Welcome {{ user?.name || 'To Doughnut' }}!</h1>
 
       <div class="learning-process">
-        <div class="globe-icon">
-          <span class="icon">🌐</span>
-        </div>
         <div class="flow-container">
           <div class="learning-flow-group">
             <svg class="flow-background" preserveAspectRatio="none">
@@ -40,9 +37,6 @@
               </div>
             </div>
           </div>
-        </div>
-        <div class="lightbulb-icon">
-          <span class="icon">💡</span>
         </div>
       </div>
     </div>
@@ -248,16 +242,6 @@ onUnmounted(() => {
   height: 50px;
   transform: translateY(-50%);
   z-index: 1;
-}
-
-.globe-icon,
-.lightbulb-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  font-size: 1.5rem;
 }
 
 .will-fly {
@@ -476,10 +460,5 @@ onUnmounted(() => {
   .flow-background {
     display: none;
   }
-}
-
-.ending {
-  text-align: center;
-  padding: 2rem;
 }
 </style>
