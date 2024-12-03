@@ -131,8 +131,6 @@ declare module 'vue' {
     RecentlyAddedNotes: typeof import('./src/components/recent/RecentlyAddedNotes.vue')['default']
     RecentlyLearnedNotes: typeof import('./src/components/recent/RecentlyLearnedNotes.vue')['default']
     RecentlyReviewedNotes: typeof import('./src/components/recent/RecentlyReviewedNotes.vue')['default']
-    RepeatProgressBar: typeof import('./src/components/review/RepeatProgressBar.vue')['default']
-    ResumeButton: typeof import('./src/components/commons/ResumeButton.vue')['default']
     ReviewWelcome: typeof import('./src/components/review/ReviewWelcome.vue')['default']
     RichMarkdownEditor: typeof import('./src/components/form/RichMarkdownEditor.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
