@@ -14,18 +14,15 @@ import FailureReportPage from "@/pages/FailureReportPage.vue"
 import AnsweredQuestionPage from "@/pages/AnsweredQuestionPage.vue"
 import AdminDashboardPage from "@/pages/AdminDashboardPage.vue"
 import NonproductionOnlyLoginPage from "@/pages/NonproductionOnlyLoginPage.vue"
-import NestedPage from "../pages/commons/NestedPage"
 import MessageCenterPage from "../pages/MessageCenterPage.vue"
 import RecentPage from "@/pages/RecentPage.vue"
 import CirclesPage from "@/pages/CirclesPage.vue"
 
-const NestedRepeatPage = NestedPage(RecallPage, "repeat")
-
 // Please start most of the path with "/d/"
 // so that the server will render the page correctly
 // when refreshing the page or directly accessing the URL.
-
-const noteAndLinkRoutes = [
+const routes = [
+  { path: "/", name: "root", component: HomePage },
   {
     path: `/d/answers/:recallPromptId`,
     name: "answer",
@@ -33,14 +30,6 @@ const noteAndLinkRoutes = [
     props: true,
     meta: { useNoteStorageAccessor: true },
   },
-]
-
-const nestedNoteAndLinkRoutes = (prefix: string) =>
-  noteAndLinkRoutes.map((route) => ({ ...route, name: prefix + route.name }))
-
-const routes = [
-  ...noteAndLinkRoutes.map((route) => ({ ...route, path: `${route.path}` })),
-  { path: "/", name: "root", component: HomePage },
   {
     path: "/d/notebooks",
     name: "notebooks",
@@ -111,8 +100,7 @@ const routes = [
   {
     path: "/d/recalls/repeat",
     name: "repeat",
-    component: NestedRepeatPage,
-    children: [...nestedNoteAndLinkRoutes("repeat-")],
+    component: RecallPage,
     meta: { useNoteStorageAccessor: true },
   },
   {
