@@ -67,6 +67,7 @@ declare module 'vue' {
     MemoryTrackerAsync: typeof import('./src/components/review/MemoryTrackerAsync.vue')['default']
     MessageCenterButton: typeof import('./src/components/toolbars/MessageCenterButton.vue')['default']
     Modal: typeof import('./src/components/commons/Modal.vue')['default']
+    NavigationItem: typeof import('./src/components/navigation/NavigationItem.vue')['default']
     NoteAccessoryAsync: typeof import('./src/components/notes/accessory/NoteAccessoryAsync.vue')['default']
     NoteAccessoryDisplay: typeof import('./src/components/notes/accessory/NoteAccessoryDisplay.vue')['default']
     NoteAddQuestion: typeof import('./src/components/notes/NoteAddQuestion.vue')['default']

@@ -1,102 +1,68 @@
 <template>
   <div v-if="user" class="sidebar-container">
-      <ul class="list-group">
-        <li role="button" class="list-item" :class="{ active: isActiveRoute(['notebooks', 'noteShow']) }" title="My Notes">
-          <router-link :to="{ name: 'notebooks' }" class="d-flex flex-column align-items-center gap-1">
-            <SvgJournalText />
-            <span class="menu-label">Note</span>
-          </router-link>
+    <ul class="list-group">
+      <template v-if="!isHomePage">
+        <li v-for="item in upperNavItems" role="button" title="item.label" :key="item.name" class="list-item"
+        :class="{ active: item.isActive }">
+          <NavigationItem v-bind="item" />
         </li>
-        <li role="button" class="list-item" :class="{ active: isActiveRoute(['assimilate']) }" title="Assimilate">
-          <router-link :to="{ name: 'assimilate' }" class="d-flex flex-column align-items-center gap-1">
-            <div class="icon-container">
-              <SvgAssimilate />
-              <div v-if="dueCount && dueCount > 0" class="due-count">
-                {{ dueCount }}
-              </div>
+      </template>
+
+      <template v-if="!isHomePage">
+        <li v-for="item in lowerNavItems" role="button" title="item.label" :key="item.name" class="list-item"
+        :class="{ active: item.isActive }">
+          <NavigationItem v-bind="item" />
+        </li>
+      </template>
+
+      <li role="button" class="list-item" title="User Actions">
+        <div class="dropup w-100">
+          <a
+            aria-label="User actions"
+            data-bs-toggle="dropdown"
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
+            <div class="d-flex flex-column align-items-center gap-1">
+              <SvgMissingAvatar width="24" height="24" />
+              <span class="menu-label">Account</span>
             </div>
-            <span class="menu-label">Assimilate</span>
-          </router-link>
-        </li>
-        <li role="button" class="list-item" :class="{ active: isActiveRoute(['recall']) }" title="Recall">
-          <router-link :to="{ name: 'recall' }" class="d-flex flex-column align-items-center gap-1">
-            <div class="icon-container">
-              <SvgCalendarCheck />
-              <div v-if="toRepeatCount && toRepeatCount > 0" class="recall-count">
-                {{ toRepeatCount }}
-              </div>
-            </div>
-            <span class="menu-label">Recall</span>
-          </router-link>
-        </li>
-        <li role="button" class="list-item" :class="{ active: isActiveRoute(['bazaar']) }" title="Bazaar">
-          <router-link :to="{ name: 'bazaar' }" class="d-flex flex-column align-items-center gap-1">
-            <SvgShop />
-            <span class="menu-label">Bazaar</span>
-          </router-link>
-        </li>
-        <li role="button" class="list-item" :class="{ active: isActiveRoute(['circles', 'circleShow', 'circleJoin']) }" title="Circles">
-          <router-link :to="{ name: 'circles' }" class="d-flex flex-column align-items-center gap-1">
-            <SvgPeople />
-            <span class="menu-label">Circles</span>
-          </router-link>
-        </li>
-        <li role="button" class="list-item" :class="{ active: isActiveRoute(['messageCenter']) }" title="Messages">
-          <MessageCenterButton :user="user">
-            <SvgChat />
-            <template #label>
-              <span class="menu-label">Messages</span>
-            </template>
-          </MessageCenterButton>
-        </li>
-        <li role="button" class="list-item" title="User Actions">
-          <div class="dropup w-100">
-            <a
-              aria-label="User actions"
-              data-bs-toggle="dropdown"
-              data-toggle="dropdown"
-              aria-haspopup="true"
-              aria-expanded="false"
+          </a>
+          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <router-link
+              v-if="user?.admin"
+              role="button"
+              class="dropdown-item"
+              :to="{ name: 'adminDashboard' }"
             >
-              <div class="d-flex flex-column align-items-center gap-1">
-                <SvgMissingAvatar width="24" height="24" />
-                <span class="menu-label">Account</span>
-              </div>
-            </a>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-              <router-link
-                v-if="user?.admin"
-                role="button"
-                class="dropdown-item"
-                :to="{ name: 'adminDashboard' }"
-              >
-                Admin Dashboard
-              </router-link>
-              <router-link role="button" class="dropdown-item" :to="{ name: 'recent' }">
-                <SvgAssimilate class="me-2" />Recent...
-              </router-link>
-              <PopButton btn-class="dropdown-item" title="user settings">
-                <template #button_face> Settings for {{ user.name }}</template>
-                <template #default="{ closer }">
-                  <UserProfileDialog
-                    v-bind="{ user }"
-                    @user-updated="
-                      if ($event) {
-                        $emit('updateUser', $event);
-                      }
-                      closer();
-                    "
-                  />
-                </template>
-              </PopButton>
-              <router-link role="button" class="dropdown-item" :to="{ name: 'messageCenter' }">Message center</router-link>
-              <router-link role="button" class="dropdown-item" :to="{ name: 'assessmentAndCertificateHistory' }">My Assessments and Certificates</router-link>
-              <a href="#" class="dropdown-item" role="button" @click="logout">Logout</a>
-            </div>
+              Admin Dashboard
+            </router-link>
+            <router-link role="button" class="dropdown-item" :to="{ name: 'recent' }">
+              <SvgAssimilate class="me-2" />Recent...
+            </router-link>
+            <PopButton btn-class="dropdown-item" title="user settings">
+              <template #button_face> Settings for {{ user.name }}</template>
+              <template #default="{ closer }">
+                <UserProfileDialog
+                  v-bind="{ user }"
+                  @user-updated="
+                    if ($event) {
+                      $emit('updateUser', $event);
+                    }
+                    closer();
+                  "
+                />
+              </template>
+            </PopButton>
+            <router-link role="button" class="dropdown-item" :to="{ name: 'messageCenter' }">Message center</router-link>
+            <router-link role="button" class="dropdown-item" :to="{ name: 'assessmentAndCertificateHistory' }">My Assessments and Certificates</router-link>
+            <a href="#" class="dropdown-item" role="button" @click="logout">Logout</a>
           </div>
-        </li>
-      </ul>
-    </div>
+        </div>
+      </li>
+    </ul>
+  </div>
   <LoginButton v-else />
   <span class="vertical-text">Doughnut by</span>
   <a href="https://odd-e.com" target="_blank">
@@ -115,14 +81,8 @@ import type { User } from "@/generated/backend"
 import type { PropType } from "vue"
 import LoginButton from "@/components/toolbars/LoginButton.vue"
 import SvgMissingAvatar from "@/components/svgs/SvgMissingAvatar.vue"
-import MessageCenterButton from "@/components/toolbars/MessageCenterButton.vue"
 import { useRoute } from "vue-router"
-import SvgCalendarCheck from "@/components/svgs/SvgCalendarCheck.vue"
-import SvgJournalText from "@/components/svgs/SvgJournalText.vue"
 import SvgAssimilate from "@/components/svgs/SvgAssimilate.vue"
-import SvgShop from "@/components/svgs/SvgShop.vue"
-import SvgPeople from "@/components/svgs/SvgPeople.vue"
-import SvgChat from "@/components/svgs/SvgChat.vue"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import UserProfileDialog from "./UserProfileDialog.vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
@@ -130,6 +90,9 @@ import { watch } from "vue"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import { useRecallData } from "@/composables/useRecallData"
+import { computed } from "vue"
+import { useNavigationItems } from "@/composables/useNavigationItems"
+import NavigationItem from "@/components/navigation/NavigationItem.vue"
 
 const { user } = defineProps({
   user: { type: Object as PropType<User> },
@@ -137,20 +100,14 @@ const { user } = defineProps({
 defineEmits(["updateUser"])
 
 const route = useRoute()
+const { upperNavItems, lowerNavItems } = useNavigationItems()
 
-const isActiveRoute = (routeNames: string[]) => {
-  return routeNames.includes(route.name as string)
-}
+const isHomePage = computed(() => route.name === "home")
 
-const {
-  dueCount,
-  setDueCount,
-  setAssimilatedCountOfTheDay,
-  setTotalUnassimilatedCount,
-} = useAssimilationCount()
+const { setDueCount, setAssimilatedCountOfTheDay, setTotalUnassimilatedCount } =
+  useAssimilationCount()
 const { managedApi } = useLoadingApi()
-const { toRepeatCount, setToRepeatCount, setRecallWindowEndAt } =
-  useRecallData()
+const { setToRepeatCount, setRecallWindowEndAt } = useRecallData()
 
 const fetchDueCount = async () => {
   const count = await managedApi.assimilationController.getAssimilationCount(
