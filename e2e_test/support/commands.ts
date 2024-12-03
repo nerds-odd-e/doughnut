@@ -285,19 +285,6 @@ Cypress.Commands.add('initialReviewNotes', (noteTopics: string) => {
   )
 })
 
-Cypress.Commands.add('repeatReviewNotes', (noteTopics: string) => {
-  commonSenseSplit(noteTopics, ',').forEach((topic) => {
-    if (topic === 'end') {
-      cy.findByText(
-        'You have finished all repetitions for this half a day!'
-      ).should('be.visible')
-    } else {
-      cy.findByText(topic, { selector: 'h2 *' })
-      cy.yesIRemember()
-    }
-  })
-})
-
 Cypress.Commands.add(
   'shouldSeeQuizWithOptions',
   (questionParts: string[], options: string) => {

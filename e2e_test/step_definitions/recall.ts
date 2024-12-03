@@ -23,7 +23,7 @@ Then('I recall {string}', (repeatNotes: string) => {
 })
 
 Then('I repeat more old {string}', (repeatNotes: string) => {
-  cy.repeatReviewNotes(repeatNotes)
+  start.recall().assumeRecallPage().recallNotes(repeatNotes)
 })
 
 Then(

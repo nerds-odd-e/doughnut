@@ -33,7 +33,6 @@ declare namespace Cypress {
     pageIsNotLoading(): Chainable<any>
     clearFocusedText(): Chainable<any>
     replaceFocusedTextAndEnter(test: any): Chainable<any>
-    repeatReviewNotes(noteTopics: string): Chainable<any>
     routerPush(fallback: any, name: any, params: any): Chainable<any>
     routerToRoot(): Chainable<any>
     routerToInitialReview(): Chainable<any>

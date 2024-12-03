@@ -1,3 +1,5 @@
+import { commonSenseSplit } from 'support/string_util'
+
 const recallPage = () => {
   return {
     expectToRecallCounts(numberOfRecalls: string) {
@@ -25,8 +27,17 @@ const recallPage = () => {
     repeatMore() {
       cy.findByRole('button', { name: 'Load more from next 3 days' }).click()
     },
-    recallNotes(repeatNotes: string) {
-      cy.repeatReviewNotes(repeatNotes)
+    recallNotes(noteTopics: string) {
+      commonSenseSplit(noteTopics, ',').forEach((topic) => {
+        if (topic === 'end') {
+          cy.findByText(
+            'You have finished all repetitions for this half a day!'
+          ).should('be.visible')
+        } else {
+          cy.findByText(topic, { selector: 'h2 *' })
+          cy.yesIRemember()
+        }
+      })
     },
   }
 }
@@ -47,6 +58,9 @@ export const recall = () => {
       getRecallListItemInSidebar(($el) => {
         $el.click()
       })
+      return recallPage()
+    },
+    assumeRecallPage() {
       return recallPage()
     },
   }
