@@ -1,3 +1,5 @@
+import { commonSenseSplit } from 'support/string_util'
+
 export const assimilation = () => {
   const getAssimilateListItemInSidebar = (
     fn: ($el: Cypress.Chainable<JQuery<HTMLElement>>) => void
@@ -46,6 +48,14 @@ export const assimilation = () => {
         assimilate(assimilations: Record<string, string>[]) {
           assimilations.forEach((assimilation) => {
             cy.initialReviewOneNoteIfThereIs(assimilation)
+          })
+        },
+        assimilateNotes(noteTopics: string) {
+          commonSenseSplit(noteTopics, ', ').map((topic: string) => {
+            return {
+              'Review Type': topic === 'end' ? 'initial done' : 'single note',
+              Topic: topic,
+            }
           })
         },
       }

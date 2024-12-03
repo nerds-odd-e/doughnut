@@ -31,7 +31,7 @@ Then(
   (day: number, repeatNotes: string, initialNotes: string) => {
     start.testability().timeTravelTo(day, 8)
     start.recall().goToRecallPage().recallNotes(repeatNotes)
-    cy.initialReviewNotes(initialNotes)
+    start.assimilation().goToAssimilationPage().assimilateNotes(initialNotes)
   }
 )
 
@@ -70,8 +70,8 @@ Then('it should move to review page', () => {
   cy.url().should('eq', `${Cypress.config().baseUrl}/recalls`)
 })
 
-Then('I initial review {string}', (noteTopic) => {
-  cy.initialReviewNotes(noteTopic)
+Then('I initial review {string}', (noteTopic: string) => {
+  start.assimilation().goToAssimilationPage().assimilateNotes(noteTopic)
 })
 
 Then(
@@ -79,7 +79,7 @@ Then(
   (noteTopic: string, day: number) => {
     start.testability().injectNotes([{ Topic: noteTopic }])
     start.testability().backendTimeTravelTo(day, 8)
-    cy.initialReviewNotes(noteTopic)
+    start.assimilation().goToAssimilationPage().assimilateNotes(noteTopic)
   }
 )
 
@@ -87,7 +87,7 @@ Then(
   'I learned one note {string} on day {int}',
   (noteTopic: string, day: number) => {
     start.testability().backendTimeTravelTo(day, 8)
-    cy.initialReviewNotes(noteTopic)
+    start.assimilation().goToAssimilationPage().assimilateNotes(noteTopic)
   }
 )
 

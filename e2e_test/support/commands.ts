@@ -259,20 +259,6 @@ Cypress.Commands.add('routerToRoot', () => {
   cy.routerPush('/', 'root', {})
 })
 
-Cypress.Commands.add('initialReviewNotes', (noteTopics: string) => {
-  start
-    .assimilation()
-    .goToAssimilationPage()
-    .assimilate(
-      commonSenseSplit(noteTopics, ', ').map((topic: string) => {
-        return {
-          'Review Type': topic === 'end' ? 'initial done' : 'single note',
-          Topic: topic,
-        }
-      })
-    )
-})
-
 Cypress.Commands.add(
   'shouldSeeQuizWithOptions',
   (questionParts: string[], options: string) => {
