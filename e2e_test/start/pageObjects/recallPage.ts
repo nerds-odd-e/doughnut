@@ -25,6 +25,9 @@ const recallPage = () => {
     repeatMore() {
       cy.findByRole('button', { name: 'Load more from next 3 days' }).click()
     },
+    recallNotes(repeatNotes: string) {
+      cy.repeatReviewNotes(repeatNotes)
+    },
   }
 }
 export const recall = () => {

@@ -19,7 +19,7 @@ Given('I ask to do more repetition', () => {
 })
 
 Then('I recall {string}', (repeatNotes: string) => {
-  cy.goAndRepeatReviewNotes(repeatNotes)
+  start.recall().goToRecallPage().recallNotes(repeatNotes)
 })
 
 Then('I repeat more old {string}', (repeatNotes: string) => {
@@ -30,7 +30,7 @@ Then(
   'On day {int} I recall {string} and initial review new {string}',
   (day: number, repeatNotes: string, initialNotes: string) => {
     start.testability().timeTravelTo(day, 8)
-    cy.goAndRepeatReviewNotes(repeatNotes)
+    start.recall().goToRecallPage().recallNotes(repeatNotes)
     cy.initialReviewNotes(initialNotes)
   }
 )

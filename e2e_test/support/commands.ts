@@ -298,12 +298,6 @@ Cypress.Commands.add('repeatReviewNotes', (noteTopics: string) => {
   })
 })
 
-Cypress.Commands.add('goAndRepeatReviewNotes', (noteTopics: string) => {
-  if (noteTopics.trim() === '') return
-  cy.routerToRepeatReview()
-  cy.repeatReviewNotes(noteTopics)
-})
-
 Cypress.Commands.add(
   'shouldSeeQuizWithOptions',
   (questionParts: string[], options: string) => {
