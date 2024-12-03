@@ -51,12 +51,14 @@ export const assimilation = () => {
           })
         },
         assimilateNotes(noteTopics: string) {
-          commonSenseSplit(noteTopics, ', ').map((topic: string) => {
-            return {
-              'Review Type': topic === 'end' ? 'initial done' : 'single note',
-              Topic: topic,
-            }
-          })
+          return this.assimilate(
+            commonSenseSplit(noteTopics, ', ').map((topic: string) => {
+              return {
+                'Review Type': topic === 'end' ? 'initial done' : 'single note',
+                Topic: topic,
+              }
+            })
+          )
         },
       }
     },
