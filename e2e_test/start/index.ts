@@ -4,6 +4,7 @@ import mock_services from './mock_services/index'
 import { questionGenerationService } from './questionGenerationService'
 import testability from './testability'
 import { assimilation } from './pageObjects/assimilationPage'
+import { recall } from './pageObjects/recallPage'
 
 const start = {
   ...basicActions,
@@ -11,6 +12,7 @@ const start = {
   questionGenerationService,
   testability,
   assimilation,
+  recall,
 }
 export default start
 export { mock_services }

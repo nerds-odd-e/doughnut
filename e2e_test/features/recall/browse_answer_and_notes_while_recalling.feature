@@ -25,6 +25,14 @@ Feature: Browse answers and notes while recalling
       | Repetition Count |
       | 1                |
 
+  Scenario: Browse notes while recalling and come back
+    Given I am repeat-reviewing my old note on day 2
+    And I type my answer "riot"
+    And I should see that my answer "riot" is incorrect
+    When I visit all my notebooks
+    And I go to the recalls page
+    Then I should see that my answer "riot" is incorrect
+
   @mockBrowserTime
   Scenario: I can remove a note from further recalls
     Given I am repeat-reviewing my old note on day 2

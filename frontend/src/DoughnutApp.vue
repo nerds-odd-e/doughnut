@@ -84,7 +84,11 @@ onMounted(async () => {
       <div class="main-content">
         <UserNewRegisterPage v-if="newUser" @update-user="user = $event" />
         <template v-else-if="userLoaded">
-          <router-view v-bind="routeViewProps" />
+          <router-view v-slot="{ Component }">
+            <KeepAlive :include="['RecallPage']">
+              <component v-bind="routeViewProps" :is="Component" />
+            </KeepAlive>
+          </router-view>
         </template>
       </div>
     </div>

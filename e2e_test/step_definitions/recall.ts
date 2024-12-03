@@ -35,8 +35,12 @@ Then(
   }
 )
 
-Given('I go to the recalls page', () => {
+Given('I go to the recalls page1', () => {
   cy.routerToReviews()
+})
+
+Given('I go to the recalls page', () => {
+  start.recall().goToRecallPage()
 })
 
 Then('I should see that I have old notes to repeat', () => {

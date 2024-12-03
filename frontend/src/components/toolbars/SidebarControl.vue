@@ -18,7 +18,7 @@
             <span class="menu-label">Assimilate</span>
           </router-link>
         </li>
-        <li role="button" class="list-item" :class="{ active: isActiveRoute(['recalls', 'repeat']) }" title="Daily Recall">
+        <li role="button" class="list-item" :class="{ active: isActiveRoute(['recalls', 'repeat']) }" title="Recall">
           <router-link :to="{ name: 'repeat' }" class="d-flex flex-column align-items-center gap-1">
             <div class="icon-container">
               <SvgCalendarCheck />
