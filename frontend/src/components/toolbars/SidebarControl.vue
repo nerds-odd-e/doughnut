@@ -2,14 +2,14 @@
   <div v-if="user" class="sidebar-container">
     <ul class="list-group">
       <template v-if="!isHomePage">
-        <li v-for="item in upperNavItems" role="button" title="item.label" :key="item.name" class="list-item"
+        <li v-for="item in upperNavItems" role="button" :title="item.label" :key="item.name" class="list-item"
         :class="{ active: item.isActive }">
           <NavigationItem v-bind="item" />
         </li>
       </template>
 
       <template v-if="!isHomePage">
-        <li v-for="item in lowerNavItems" role="button" title="item.label" :key="item.name" class="list-item"
+        <li v-for="item in lowerNavItems" role="button" :title="item.label" :key="item.name" class="list-item"
         :class="{ active: item.isActive }">
           <NavigationItem v-bind="item" />
         </li>
