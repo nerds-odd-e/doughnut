@@ -1,12 +1,20 @@
 export function messageCenterIndicator() {
-  const counter = cy.get('#top-navbar-message-icon').get('.unread-count')
+  const getMessageInSidebar = (
+    fn: ($el: Cypress.Chainable<JQuery<HTMLElement>>) => void
+  ) =>
+    cy.get('.sidebar-control').within(() => fn(cy.get('li[title="Messages"]')))
 
   return {
-    expectNoCount() {
-      counter.should('not.exist')
+    expectCount(numberOfNotes: number) {
+      getMessageInSidebar(($el) => {
+        $el.findByText(`${numberOfNotes}`, { selector: '.unread-count' })
+      })
+      return this
     },
-    expectCount(unreadMessageCount: number) {
-      counter.should('contain', unreadMessageCount)
+    expectNoCount() {
+      getMessageInSidebar(($el) => {
+        $el.get('.unread-count').should('not.exist')
+      })
     },
   }
 }

@@ -47,7 +47,7 @@ defineProps<{
   height: 24px;
 }
 
-.due-count, .recall-count {
+.due-count, .recall-count, .unread-count {
   position: absolute;
   top: -6px;
   right: -6px;
@@ -68,6 +68,10 @@ defineProps<{
 
 .recall-count {
   background: #4CAF50;
+}
+
+.unread-count {
+  background: #d07027;
 }
 
 .label {

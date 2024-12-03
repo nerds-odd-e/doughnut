@@ -8,6 +8,7 @@ import SvgCalendarCheck from "@/components/svgs/SvgCalendarCheck.vue"
 import SvgShop from "@/components/svgs/SvgShop.vue"
 import SvgPeople from "@/components/svgs/SvgPeople.vue"
 import SvgChat from "@/components/svgs/SvgChat.vue"
+import { messageCenterConversations } from "@/store/messageStore"
 
 export function useNavigationItems() {
   const route = useRoute()
@@ -58,6 +59,8 @@ export function useNavigationItems() {
       name: "messageCenter",
       label: "Messages",
       icon: SvgChat,
+      badge: messageCenterConversations.unreadConversations.length,
+      badgeClass: "unread-count",
       isActive: ["messageCenter"].includes(route.name as string),
     },
   ])

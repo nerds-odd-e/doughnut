@@ -93,6 +93,7 @@ import { useRecallData } from "@/composables/useRecallData"
 import { computed } from "vue"
 import { useNavigationItems } from "@/composables/useNavigationItems"
 import NavigationItem from "@/components/navigation/NavigationItem.vue"
+import { messageCenterConversations } from "@/store/messageStore"
 
 const { user } = defineProps({
   user: { type: Object as PropType<User> },
@@ -126,12 +127,18 @@ const fetchRecallCount = async () => {
   setRecallWindowEndAt(overview.recallWindowEndAt)
 }
 
+const fetchUnreadMessageCount = async () => {
+  messageCenterConversations.unreadConversations =
+    await managedApi.restConversationMessageController.getUnreadConversations()
+}
+
 watch(
   () => user,
   () => {
     if (user) {
       fetchDueCount()
       fetchRecallCount()
+      fetchUnreadMessageCount()
     }
   },
   { immediate: true }
@@ -260,46 +267,4 @@ a[href="https://odd-e.com"] {
   }
 }
 
-.icon-container {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-}
-
-.due-count {
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  background: #66b0ff;
-  color: white;
-  border-radius: 50%;
-  min-width: 16px;
-  height: 16px;
-  font-size: 0.75rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 4px;
-  z-index: 1;
-}
-
-.recall-count {
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  background: #4CAF50;
-  color: white;
-  border-radius: 50%;
-  min-width: 16px;
-  height: 16px;
-  font-size: 0.75rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 4px;
-  z-index: 1;
-}
 </style>

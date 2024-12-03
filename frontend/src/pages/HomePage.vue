@@ -11,8 +11,10 @@
           <div class="learning-flow-group">
             <svg class="flow-background" preserveAspectRatio="none">
               <rect width="100%" height="100%" fill="rgba(255,0,0,0.1)" />
-              <g class="arrows" fill="none" stroke="black" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                <path class="flow-path" />
+              <g class="arrows" fill="none" stroke="rgba(0,0,0,0.6)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <path class="flow-path">
+                  <animate attributeName="stroke-dashoffset" from="1000" to="0" dur="3s" repeatCount="indefinite" />
+                </path>
                 <path class="arrow-marker" />
                 <path class="arrow-marker" />
                 <path class="arrow-marker" />
@@ -390,12 +392,39 @@ onUnmounted(() => {
   height: 100%;
   z-index: 1;
   overflow: visible;
+
+  .arrows {
+    filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.3));
+
+    path {
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 1000 10;
+      filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.5));
+    }
+
+    .flow-path {
+      animation: glowPulse 1.5s ease-in-out infinite;
+    }
+
+    .arrow-marker {
+      animation: glowPulse 1.5s ease-in-out infinite;
+    }
+  }
 }
 
-.arrows {
-  path {
-    stroke-linecap: round;
-    stroke-linejoin: round;
+@keyframes glowPulse {
+  0% {
+    filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.4));
+    stroke: rgba(0, 0, 0, 0.6);
+  }
+  50% {
+    filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.6));
+    stroke: rgba(0, 0, 0, 0.8);
+  }
+  100% {
+    filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.4));
+    stroke: rgba(0, 0, 0, 0.6);
   }
 }
 
