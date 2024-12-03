@@ -60,7 +60,14 @@ public class ChatAboutNoteService {
               MessageRequest.builder()
                   .role("assistant")
                   .content(
-                      "User attempted to answer the following question about the note of focus:\n"
+                      """
+                    User attempted to answer the following question about the note of focus.
+                    Please note that user is not prompted with the specific note of focus,
+                    but only with the broader notebook name. A question that is not possible to answer
+                    is regarded as a wrong question.
+                    Here's the question definition and user's answer:
+
+                    """
                           + conversation.getSubject().getRecallPrompt().getQuestionDetails())
                   .build();
           initialMessages.add(msg);

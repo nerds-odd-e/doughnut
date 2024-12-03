@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.odde.doughnut.services.ai.MCQWithAnswer;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -37,12 +38,13 @@ public class RecallPrompt extends AnswerableQuestionInstance {
   public String getQuestionDetails() {
     ObjectMapper mapper = new ObjectMapper();
     ObjectNode questionDetails = mapper.createObjectNode();
-    questionDetails.put("question", getBareQuestion().toString());
-    questionDetails.put("correctAnswerIndex", getPredefinedQuestion().getCorrectAnswerIndex());
-
+    MCQWithAnswer mcqWithAnswer = getPredefinedQuestion().getMcqWithAnswer();
+    questionDetails.set(
+        "originalQuestionDefinition", mapper.convertValue(mcqWithAnswer, ObjectNode.class));
     if (getAnswer() != null) {
       questionDetails.put("userAnswer", getAnswer().getChoiceIndex());
-      questionDetails.put("isCorrect", getAnswer().getCorrect());
+      questionDetails.put(
+          "userAnswerWasMarkedAs", getAnswer().getCorrect() ? "correct" : "incorrect");
     }
     return questionDetails.toPrettyString();
   }
