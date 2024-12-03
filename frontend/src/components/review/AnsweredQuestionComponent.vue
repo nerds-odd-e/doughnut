@@ -6,7 +6,7 @@
       @click="toggleMemoryTracker = true"
     >
       <label class="me-1"><strong>Note reviewed: </strong></label>
-      <NoteTopicComponent v-bind="{ noteTopic: note.noteTopic }" />
+      <NoteTopicComponent v-bind="{ noteTopic: note.noteTopic, full: true }" />
     </div>
     <div v-else>
       <NoteWithBreadcrumb
@@ -50,6 +50,7 @@ import type { PropType } from "vue"
 import { ref } from "vue"
 import type { StorageAccessor } from "../../store/createNoteStorage"
 import QuestionDisplay from "./QuestionDisplay.vue"
+import NoteTopicComponent from "@/components/notes/core/NoteTopicComponent.vue"
 import { useRouter } from "vue-router"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 
