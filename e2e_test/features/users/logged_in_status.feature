@@ -20,7 +20,7 @@ Feature: Logged in status
   @usingMockedOpenAiService
   Scenario: Session timeout out when post
     Given I added and learned one note "Fungible" on day 1
-    And I am repeat-reviewing my old note on day 2
+    And I am recalling my note on day 2
     And my session is logged out
     When I choose yes I remember
     Then I login as "old_learner" I should see "Fungible"

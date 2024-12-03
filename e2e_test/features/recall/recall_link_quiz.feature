@@ -16,7 +16,7 @@ Feature: Repetition Link Quiz
     And I assimilate these in sequence:
       | Review Type | Topic |
       | single note | Moon  |
-    When I am repeat-reviewing my old note on day 2
+    When I am recalling my note on day 2
     Then I should be asked link question "Moon" "a specialization of" with options "Earth, Mars"
     When I choose answer "<answer>"
     Then I should see that my answer <result>

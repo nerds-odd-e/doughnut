@@ -16,7 +16,7 @@ Feature: Repetition Quiz
       | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
       | What is the meaning of sedition? | to incite violence | to sleep           | Open Water Diver   |
     And I learned one note "sedition" on day 1
-    When I am repeat-reviewing my old note on day 2
+    When I am recalling my note on day 2
     Then I should be asked "What is the meaning of sedition?"
     When I choose answer "<answer>"
     Then I should see that my answer <result>

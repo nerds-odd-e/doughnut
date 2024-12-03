@@ -304,11 +304,6 @@ Cypress.Commands.add('goAndRepeatReviewNotes', (noteTopics: string) => {
   cy.repeatReviewNotes(noteTopics)
 })
 
-Cypress.Commands.add('repeatMore', () => {
-  cy.routerToRepeatReview()
-  cy.findByRole('button', { name: 'Load more from next 3 days' }).click()
-})
-
 Cypress.Commands.add(
   'shouldSeeQuizWithOptions',
   (questionParts: string[], options: string) => {

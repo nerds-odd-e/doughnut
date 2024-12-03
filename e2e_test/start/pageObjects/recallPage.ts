@@ -22,6 +22,9 @@ const recallPage = () => {
       // Close tooltip
       cy.get('.tooltip-popup').click()
     },
+    repeatMore() {
+      cy.findByRole('button', { name: 'Load more from next 3 days' }).click()
+    },
   }
 }
 export const recall = () => {

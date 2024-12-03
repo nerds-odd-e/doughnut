@@ -15,7 +15,7 @@ Given("It's day {int}, {int} hour", (day: number, hour: number) => {
 })
 
 Given('I ask to do more repetition', () => {
-  cy.repeatMore()
+  start.recall().goToRecallPage().repeatMore()
 })
 
 Then('I recall {string}', (repeatNotes: string) => {
@@ -91,12 +91,12 @@ Then(
   }
 )
 
-Then('I am repeat-reviewing my old note on day {int}', (day: number) => {
+Then('I am recalling my note on day {int}', (day: number) => {
   start.testability().backendTimeTravelTo(day, 8)
-  cy.routerToRepeatReview()
+  start.recall().goToRecallPage()
 })
 
-Then('I am learning new note on day {int}', (day: number) => {
+Then('I am assimilating new note on day {int}', (day: number) => {
   start.testability().backendTimeTravelTo(day, 8)
   cy.routerToInitialReview()
 })
