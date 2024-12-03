@@ -73,7 +73,7 @@ class AssimilationControllerTests {
   class GetAssimilationCount {
     @Test
     void shouldReturnAssimilationCountsForLoggedInUser() {
-      // Create a note that needs onboarding
+      // Create a note that needs assimilation
       Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
       assertThat(note.getId(), notNullValue());
 

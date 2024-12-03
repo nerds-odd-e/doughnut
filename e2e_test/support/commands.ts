@@ -175,8 +175,8 @@ Cypress.Commands.add('startSearching', () => {
 
 Cypress.Commands.add('initialReviewInSequence', (recalls) => {
   cy.routerToInitialReview()
-  recalls.forEach((onboarding: string) => {
-    cy.initialReviewOneNoteIfThereIs(onboarding)
+  recalls.forEach((assimilation: string) => {
+    cy.initialReviewOneNoteIfThereIs(assimilation)
   })
 })
 

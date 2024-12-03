@@ -1,6 +1,6 @@
 @usingMockedOpenAiService
-Feature: Repetition Quiz
-  As a learner, I want to use quizzes in my repetition to help and gamify my learning.
+Feature: Reviewing answers when recalling
+  As a learner, I want to review my answers when recalling so that I can see my progress.
 
   Background:
     Given I am logged in as an existing user

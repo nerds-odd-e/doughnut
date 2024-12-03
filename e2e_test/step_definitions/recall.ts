@@ -6,12 +6,9 @@ import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import { DataTable } from '@cucumber/cucumber'
 import start from '../start'
 
-Then(
-  'I do these memory tracker onboardings in sequence:',
-  (data: DataTable) => {
-    cy.initialReviewInSequence(data.hashes())
-  }
-)
+Then('I assimilate these in sequence:', (data: DataTable) => {
+  cy.initialReviewInSequence(data.hashes())
+})
 
 Given("It's day {int}, {int} hour", (day: number, hour: number) => {
   start.testability().backendTimeTravelTo(day, hour)
