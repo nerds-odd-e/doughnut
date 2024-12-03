@@ -1,17 +1,11 @@
 <template>
   <div v-if="note">
     <div
-      v-if="!toggleMemoryTracker"
-      class="memory-tracker-abbr"
-      @click="toggleMemoryTracker = true"
+      class="note-under-question"
+      @click="navigateToNote"
     >
       <label class="me-1"><strong>Note reviewed: </strong></label>
       <NoteTopicComponent v-bind="{ noteTopic: note.noteTopic, full: true }" />
-    </div>
-    <div v-else>
-      <NoteWithBreadcrumb
-        v-bind="{ note, storageAccessor }"
-      />
     </div>
   </div>
   <QuestionDisplay
@@ -47,8 +41,6 @@
 <script setup lang="ts">
 import type { AnsweredQuestion } from "@/generated/backend"
 import type { PropType } from "vue"
-import { ref } from "vue"
-import type { StorageAccessor } from "../../store/createNoteStorage"
 import QuestionDisplay from "./QuestionDisplay.vue"
 import NoteTopicComponent from "@/components/notes/core/NoteTopicComponent.vue"
 import { useRouter } from "vue-router"
@@ -57,18 +49,13 @@ import useLoadingApi from "@/managedApi/useLoadingApi"
 const router = useRouter()
 const { managedApi } = useLoadingApi()
 
-const { answeredQuestion, storageAccessor } = defineProps({
+const { answeredQuestion } = defineProps({
   answeredQuestion: {
     type: Object as PropType<AnsweredQuestion>,
     required: true,
   },
-  storageAccessor: {
-    type: Object as PropType<StorageAccessor>,
-    required: true,
-  },
 })
 
-const toggleMemoryTracker = ref(false)
 const note = answeredQuestion?.note
 
 const startConversation = async () => {
@@ -82,10 +69,17 @@ const startConversation = async () => {
     params: { conversationId: conversation.id },
   })
 }
+
+const navigateToNote = () => {
+  router.push({
+    name: "noteShow",
+    params: { noteId: answeredQuestion.note?.id },
+  })
+}
 </script>
 
 <style lang="sass" scoped>
-.memory-tracker-abbr
+.note-under-question
   border: 1px solid #ccc
   width: 100%
   border-radius: 5px

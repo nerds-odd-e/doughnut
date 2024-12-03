@@ -10,8 +10,8 @@ vitest.mock("vue-router", () => ({
   }),
 }))
 
-describe("repetition page", () => {
-  describe("repetition page for a link", () => {
+describe("answered question page", () => {
+  describe("answered question page for a link", () => {
     const REVIEW_QUESTION_ID = 1
     const link = makeMe.aLink.please()
     const mockedShowAnswerCall = vi.fn()
@@ -39,7 +39,7 @@ describe("repetition page", () => {
         .currentRoute({ name: "repeat" })
         .mount()
       await flushPromises()
-      wrapper.find(".memory-tracker-abbr").trigger("click")
+      wrapper.find(".note-under-question").trigger("click")
       await flushPromises()
       expect(mockedShowAnswerCall).toHaveBeenCalledWith(REVIEW_QUESTION_ID)
     })
@@ -51,7 +51,7 @@ describe("repetition page", () => {
         .currentRoute({ name: "repeat-noteShow", params: { noteId: 123 } })
         .mount()
       await flushPromises()
-      wrapper.find(".memory-tracker-abbr").trigger("click")
+      wrapper.find(".note-under-question").trigger("click")
     })
 
     describe("conversation button", () => {

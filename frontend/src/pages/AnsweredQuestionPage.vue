@@ -3,7 +3,7 @@
     <ContentLoader v-if="!answeredQuestion" />
     <AnsweredQuestionComponent
       v-else
-      v-bind="{ answeredQuestion, storageAccessor }"
+      v-bind="{ answeredQuestion }"
     />
   </div>
 </template>
