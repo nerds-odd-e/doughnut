@@ -10,11 +10,9 @@
         <div class="flow-container">
           <div class="learning-flow-group">
             <svg class="flow-background" preserveAspectRatio="none">
-              <rect width="100%" height="100%" fill="rgba(255,0,0,0.1)" />
+              <rect width="100%" height="100%" fill="none" />
               <g class="arrows" fill="none" stroke="rgba(0,0,0,0.6)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                <path class="flow-path">
-                  <animate attributeName="stroke-dashoffset" from="1000" to="0" dur="3s" repeatCount="indefinite" />
-                </path>
+                <path class="flow-path"/>
                 <path class="arrow-marker" />
                 <path class="arrow-marker" />
                 <path class="arrow-marker" />
@@ -62,6 +60,11 @@
       </div>
     </div>
   </div>
+  <div class="ending">
+    <p>Our goal of note taking is not to remember, but to forget.</p>
+    <p>Doughnut will eventually become our digital twin, our shadow.</p>
+    <p>It will think independently, for us, as us.</p>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -78,15 +81,15 @@ const lowerHalf = ref<HTMLElement>()
 const isScrolling = ref(false)
 
 const cardTitles = [
-  "Import to Taking notes",
-  "Ideas about assimilate",
+  "Taking notes is only the beginning",
+  "Assimilate to become truely yours",
   "Recall is better than review",
 ]
 
 const cardDescriptions = [
-  "Some text about taking notes...",
-  "Some text about assimilation...",
-  "Some text about recall...",
+  "Capture what you saw, what you heard, what you read, your thoughts and ideas, with the help of AI tools. Your notebooks learn as you learn.",
+  "Start to understand your notes, and tracking your memories about them. Decide what to keep and what to let go.",
+  "Using AI generated questions to help you recall the notes to keep your memories alive. Improve the notes stucture continously as we learn.",
 ]
 
 const handleScroll = () => {
@@ -330,6 +333,7 @@ onUnmounted(() => {
 
   h3 {
     margin-bottom: 1rem;
+    font-size: 1.1rem;
   }
 
   p {
@@ -399,7 +403,7 @@ onUnmounted(() => {
     path {
       stroke-linecap: round;
       stroke-linejoin: round;
-      stroke-dasharray: 1000 10;
+      stroke-dasharray: 10 5;
       filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.5));
     }
 
@@ -472,5 +476,10 @@ onUnmounted(() => {
   .flow-background {
     display: none;
   }
+}
+
+.ending {
+  text-align: center;
+  padding: 2rem;
 }
 </style>
