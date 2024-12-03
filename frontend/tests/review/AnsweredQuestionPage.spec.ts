@@ -36,7 +36,7 @@ describe("answered question page", () => {
       const wrapper = helper
         .component(AnsweredQuestionPage)
         .withStorageProps({ recallPromptId: REVIEW_QUESTION_ID })
-        .currentRoute({ name: "repeat" })
+        .currentRoute({ name: "recall" })
         .mount()
       await flushPromises()
       wrapper.find(".note-under-question").trigger("click")

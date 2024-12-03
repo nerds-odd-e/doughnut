@@ -90,14 +90,14 @@ const routes = [
     }),
   },
   {
-    path: "/d/recalls/assimilate",
+    path: "/d/assimilate",
     name: "assimilate",
     component: AssimilationPage,
     meta: { useNoteStorageAccessor: true },
   },
   {
-    path: "/d/recalls/repeat",
-    name: "repeat",
+    path: "/d/recall",
+    name: "recall",
     component: RecallPage,
     meta: { useNoteStorageAccessor: true },
   },

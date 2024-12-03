@@ -11,13 +11,13 @@ vitest.mock("vue-router", () => ({
   useRouter: () => ({
     currentRoute: {
       value: {
-        name: "repeat",
+        name: "recall",
       },
     },
   }),
 }))
 
-useRouter().currentRoute.value.name = "repeat"
+useRouter().currentRoute.value.name = "recall"
 
 let renderer: RenderingHelper<typeof RecallPage>
 const mockedRepeatCall = vi.fn()
@@ -46,7 +46,7 @@ beforeEach(() => {
 
 describe("repeat page", () => {
   const mountPage = async () => {
-    const wrapper = renderer.currentRoute({ name: "repeat" }).mount()
+    const wrapper = renderer.currentRoute({ name: "recall" }).mount()
     await flushPromises()
     return wrapper
   }

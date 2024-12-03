@@ -98,7 +98,7 @@ Then('I am recalling my note on day {int}', (day: number) => {
 
 Then('I am assimilating new note on day {int}', (day: number) => {
   start.testability().backendTimeTravelTo(day, 8)
-  cy.routerToInitialReview()
+  start.assimilation().goToAssimilationPage()
 })
 
 Then(

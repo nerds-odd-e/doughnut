@@ -18,8 +18,8 @@
             <span class="menu-label">Assimilate</span>
           </router-link>
         </li>
-        <li role="button" class="list-item" :class="{ active: isActiveRoute(['recalls', 'repeat']) }" title="Recall">
-          <router-link :to="{ name: 'repeat' }" class="d-flex flex-column align-items-center gap-1">
+        <li role="button" class="list-item" :class="{ active: isActiveRoute(['recall']) }" title="Recall">
+          <router-link :to="{ name: 'recall' }" class="d-flex flex-column align-items-center gap-1">
             <div class="icon-container">
               <SvgCalendarCheck />
               <div v-if="toRepeatCount && toRepeatCount > 0" class="recall-count">

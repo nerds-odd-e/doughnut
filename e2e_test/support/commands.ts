@@ -174,7 +174,7 @@ Cypress.Commands.add('startSearching', () => {
 })
 
 Cypress.Commands.add('initialReviewInSequence', (recalls) => {
-  cy.routerToInitialReview()
+  start.assimilation().goToAssimilationPage()
   recalls.forEach((assimilation: string) => {
     cy.initialReviewOneNoteIfThereIs(assimilation)
   })
@@ -262,16 +262,8 @@ Cypress.Commands.add('yesIRemember', () => {
   })
 })
 
-Cypress.Commands.add('routerToInitialReview', () => {
-  cy.routerPush('/d/recalls/assimilate', 'assimilate', {})
-})
-
 Cypress.Commands.add('routerToRoot', () => {
   cy.routerPush('/', 'root', {})
-})
-
-Cypress.Commands.add('routerToRepeatReview', () => {
-  cy.routerPush('/d/recalls/repeat', 'repeat', {})
 })
 
 Cypress.Commands.add('initialReviewNotes', (noteTopics: string) => {
