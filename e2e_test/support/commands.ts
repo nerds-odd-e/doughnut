@@ -270,11 +270,6 @@ Cypress.Commands.add('routerToRoot', () => {
   cy.routerPush('/', 'root', {})
 })
 
-Cypress.Commands.add('routerToReviews', () => {
-  cy.routerToRoot()
-  cy.routerPush('/d/recalls', 'recalls', {})
-})
-
 Cypress.Commands.add('routerToRepeatReview', () => {
   cy.routerPush('/d/recalls/repeat', 'repeat', {})
 })

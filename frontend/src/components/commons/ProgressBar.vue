@@ -3,7 +3,7 @@
     <div class="flex-shrink-0">
       <slot name="buttons" />
     </div>
-    <div class="flex-grow-1" @click.prevent="goHome()">
+    <div class="flex-grow-1" @click.prevent="$emit('showMore')">
       <span
         :class="`progress-bar ${!!$slots.default ? 'thin' : ''}`"
         v-if="toRepeatCount !== null"
@@ -22,7 +22,6 @@
 </template>
 
 <script setup lang="ts">
-import usePopups from "@/components/commons/Popups/usePopups"
 import TeleportToHeadStatus from "@/pages/commons/TeleportToHeadStatus.vue"
 
 defineProps({
@@ -31,13 +30,7 @@ defineProps({
   title: String,
 })
 
-defineEmits(["resume"])
-
-const goHome = async () => {
-  if (await usePopups().popups.confirm("Confirm to leave the reviewing?")) {
-    window.location.href = "/"
-  }
-}
+defineEmits(["resume", "showMore"])
 </script>
 
 <style lang="scss" scoped>

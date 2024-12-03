@@ -26,7 +26,6 @@ Feature: Review Pages
       | Review Type | Topic    |
       | single note | Sedition |
     When It's day 2, 9 hour
-    And I go to the recalls page1
-    Then I should see that I have old notes to repeat
+    Then I should see that I have 1 notes to recall
     And I should see that I have 3 new notes to assimilate
 

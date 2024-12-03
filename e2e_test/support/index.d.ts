@@ -37,7 +37,6 @@ declare namespace Cypress {
     goAndRepeatReviewNotes(noteTopics: string): Chainable<any>
     repeatMore(): Chainable<any>
     routerPush(fallback: any, name: any, params: any): Chainable<any>
-    routerToReviews(): Chainable<any>
     routerToRoot(): Chainable<any>
     routerToInitialReview(): Chainable<any>
     routerToRepeatReview(): Chainable<any>

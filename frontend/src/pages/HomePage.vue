@@ -27,7 +27,7 @@
             and update your notes with new realizations.
           </p>
           <p v-if="!user">Please login</p>
-          <router-link class="btn btn-light" v-else :to="{ name: 'recalls' }">
+          <router-link class="btn btn-light" v-else :to="{ name: 'repeat' }">
             Start Recall
           </router-link>
         </div>

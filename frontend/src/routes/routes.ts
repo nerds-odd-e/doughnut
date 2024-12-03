@@ -5,7 +5,6 @@ import NotebooksPage from "@/pages/NotebooksPage.vue"
 import NoteShowPage from "@/pages/NoteShowPage.vue"
 import AssessmentAndCertificateHistoryPage from "@/pages/AssessmentAndCertificateHistoryPage.vue"
 import AssessmentPage from "@/pages/AssessmentPage.vue"
-import ReviewHome from "@/pages/ReviewHome.vue"
 import RecallPage from "@/pages/RecallPage.vue"
 import AssimilationPage from "@/pages/AssimilationPage.vue"
 import CircleShowPage from "@/pages/CircleShowPage.vue"
@@ -90,7 +89,6 @@ const routes = [
       notebookId: Number(route.params.notebookId),
     }),
   },
-  { path: "/d/recalls", name: "recalls", component: ReviewHome },
   {
     path: "/d/recalls/assimilate",
     name: "assimilate",

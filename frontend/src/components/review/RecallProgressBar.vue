@@ -1,8 +1,9 @@
 <template>
   <div class="header" :class="previousResultCursor ? 'repeat-paused' : ''">
     <ProgressBar
-      v-bind="{ title: `Repetition: `, finished, toRepeatCount }"
+      v-bind="{ title: `Recalling: `, finished, toRepeatCount }"
       @resume="$emit('viewLastResult', undefined)"
+      @showMore="$emit('showMore')"
     >
       <template #buttons>
         <div class="btn-group btn-group-sm">
@@ -57,7 +58,7 @@ defineProps({
   toRepeatCount: { type: Number, required: true },
   previousResultCursor: Number,
 })
-defineEmits(["viewLastResult"])
+defineEmits(["viewLastResult", "showMore"])
 </script>
 
 <style lang="scss" scoped>

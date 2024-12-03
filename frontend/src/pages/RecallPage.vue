@@ -7,8 +7,17 @@
       previousResultCursor,
     }"
     @view-last-result="viewLastResult($event)"
+    @show-more="showTooltip = true"
   >
   </RecallProgressBar>
+
+  <div v-if="showTooltip" class="tooltip-popup" @click="showTooltip = false">
+    <div class="tooltip-content">
+      <p>Daily Progress: {{ finished }} / {{ finished + toRepeatCount }}</p>
+      <p>Total assimilated: {{ finished }} / {{ totalCount }}</p>
+    </div>
+  </div>
+
   <template v-if="toRepeat != undefined">
     <Quiz
       v-if="toRepeatCount !== 0"
@@ -77,6 +86,7 @@ const currentIndex = ref(0)
 const previousResults = ref<(AnsweredQuestion | undefined)[]>([])
 const previousResultCursor = ref<number | undefined>(undefined)
 const isProgressBarVisible = ref(true)
+const showTooltip = ref(false)
 
 const currentResult = computed(() => {
   if (previousResultCursor.value === undefined) return undefined
@@ -86,6 +96,9 @@ const currentResult = computed(() => {
 const finished = computed(() => previousResults.value.length)
 const toRepeatCount = computed(
   () => (toRepeat.value?.length ?? 0) - currentIndex.value
+)
+const totalCount = computed(
+  () => (toRepeat.value?.length ?? 0) + finished.value
 )
 
 const viewLastResult = (cursor: number | undefined) => {
@@ -159,3 +172,30 @@ defineExpose({
   currentIndex,
 })
 </script>
+
+<style lang="scss" scoped>
+.tooltip-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.tooltip-content {
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+
+  p {
+    margin: 0.5rem 0;
+    color: #333;
+  }
+}
+</style>
