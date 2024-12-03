@@ -1,12 +1,11 @@
 <template>
   <div v-if="note">
-    <div
+    <fieldset
       class="note-under-question"
-      @click="navigateToNote"
     >
-      <label class="me-1"><strong>Note under question: </strong></label>
-      <NoteTopicComponent v-bind="{ noteTopic: note.noteTopic, full: true }" />
-    </div>
+      <legend>Note under question</legend>
+      <Breadcrumb v-bind="{ noteTopic: note.noteTopic, includingSelf: true }" />
+    </fieldset>
   </div>
   <QuestionDisplay
     v-if="answeredQuestion.predefinedQuestion"
@@ -42,9 +41,9 @@
 import type { AnsweredQuestion } from "@/generated/backend"
 import type { PropType } from "vue"
 import QuestionDisplay from "./QuestionDisplay.vue"
-import NoteTopicComponent from "@/components/notes/core/NoteTopicComponent.vue"
 import { useRouter } from "vue-router"
 import useLoadingApi from "@/managedApi/useLoadingApi"
+import Breadcrumb from "@/components/toolbars/Breadcrumb.vue"
 
 const router = useRouter()
 const { managedApi } = useLoadingApi()
@@ -69,13 +68,6 @@ const startConversation = async () => {
     params: { conversationId: conversation.id },
   })
 }
-
-const navigateToNote = () => {
-  router.push({
-    name: "noteShow",
-    params: { noteId: answeredQuestion.note?.id },
-  })
-}
 </script>
 
 <style lang="sass" scoped>
@@ -86,11 +78,6 @@ const navigateToNote = () => {
   padding: 8px 12px
   margin-top: 10px
   background-color: #f9f9f9
-  cursor: pointer
-  transition: background-color 0.3s
-
-  &:hover
-    background-color: #e0e0e0
 
 .conversation-button
   position: fixed

@@ -44,33 +44,6 @@ describe("answered question page", () => {
       expect(mockedShowAnswerCall).toHaveBeenCalledWith(REVIEW_QUESTION_ID)
     })
 
-    it("click on note when doing review and in a nested page", async () => {
-      const wrapper = helper
-        .component(AnsweredQuestionPage)
-        .withStorageProps({ recallPromptId: REVIEW_QUESTION_ID })
-        .currentRoute({ name: "repeat-noteShow", params: { noteId: 123 } })
-        .mount()
-      await flushPromises()
-      wrapper.find(".note-under-question").trigger("click")
-    })
-
-    it("should navigate to note when clicking note-under-question", async () => {
-      const wrapper = helper
-        .component(AnsweredQuestionPage)
-        .withStorageProps({ recallPromptId: REVIEW_QUESTION_ID })
-        .mount()
-
-      await flushPromises()
-
-      wrapper.find(".note-under-question").trigger("click")
-      await flushPromises()
-
-      expect(mockedPush).toHaveBeenCalledWith({
-        name: "noteShow",
-        params: { noteId: link.id },
-      })
-    })
-
     describe("conversation button", () => {
       it("should start a conversation and redirect to message center", async () => {
         const wrapper = helper
