@@ -54,6 +54,23 @@ describe("answered question page", () => {
       wrapper.find(".note-under-question").trigger("click")
     })
 
+    it("should navigate to note when clicking note-under-question", async () => {
+      const wrapper = helper
+        .component(AnsweredQuestionPage)
+        .withStorageProps({ recallPromptId: REVIEW_QUESTION_ID })
+        .mount()
+
+      await flushPromises()
+
+      wrapper.find(".note-under-question").trigger("click")
+      await flushPromises()
+
+      expect(mockedPush).toHaveBeenCalledWith({
+        name: "noteShow",
+        params: { noteId: link.id },
+      })
+    })
+
     describe("conversation button", () => {
       it("should start a conversation and redirect to message center", async () => {
         const wrapper = helper
