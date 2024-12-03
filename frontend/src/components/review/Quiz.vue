@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!minimized" class="content">
+  <div class="content">
     <ContentLoader v-if="!currentQuestionFetched" />
     <template v-else>
       <div v-if="!currentRecallPrompt">
@@ -57,7 +57,6 @@ import JustReview from "./JustReview.vue"
 
 // Interface definitions for better type safety
 interface QuizProps {
-  minimized?: boolean
   memoryTrackers: number[]
   currentIndex: number
   eagerFetchCount: number

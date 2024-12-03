@@ -123,11 +123,6 @@ const handleCloseDialog = () => {
   min-height: 0;
 }
 
-.subject-container.minimized {
-  height: 50px;
-  overflow: hidden;
-}
-
 .conversation-messages.maximized {
   height: calc(100% - 50px);
 }

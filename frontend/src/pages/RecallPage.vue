@@ -11,7 +11,6 @@
   <template v-if="toRepeat != undefined">
     <Quiz
       v-if="toRepeatCount !== 0 && !currentResult"
-      :minimized="minimized"
       :memory-trackers="toRepeat"
       :current-index="currentIndex"
       :eager-fetch-count="eagerFetchCount ?? 5"
@@ -23,7 +22,7 @@
       v-else-if="currentResult"
       v-bind="{ answeredQuestion: currentResult, storageAccessor }"
     />
-    <template v-else-if="!minimized">
+    <template v-else>
       <div class="alert alert-success">
         You have finished all repetitions for this half a day!
       </div>
@@ -59,7 +58,6 @@ import { useRecallData } from "@/composables/useRecallData"
 const { managedApi } = useLoadingApi()
 const { decrementToRepeatCount } = useRecallData()
 defineProps({
-  minimized: Boolean,
   eagerFetchCount: Number,
   storageAccessor: {
     type: Object as PropType<StorageAccessor>,
