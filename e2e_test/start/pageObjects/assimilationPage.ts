@@ -43,6 +43,11 @@ export const assimilation = () => {
           // Close tooltip
           cy.get('.tooltip-popup').click()
         },
+        assimilate(assimilations: Record<string, string>[]) {
+          assimilations.forEach((assimilation) => {
+            cy.initialReviewOneNoteIfThereIs(assimilation)
+          })
+        },
       }
     },
   }

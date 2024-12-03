@@ -7,7 +7,7 @@ import { DataTable } from '@cucumber/cucumber'
 import start from '../start'
 
 Then('I assimilate these in sequence:', (data: DataTable) => {
-  cy.initialReviewInSequence(data.hashes())
+  start.assimilation().goToAssimilationPage().assimilate(data.hashes())
 })
 
 Given("It's day {int}, {int} hour", (day: number, hour: number) => {

@@ -173,13 +173,6 @@ Cypress.Commands.add('startSearching', () => {
   start.assumeNotePage().toolbarButton('search note').click()
 })
 
-Cypress.Commands.add('initialReviewInSequence', (recalls) => {
-  start.assimilation().goToAssimilationPage()
-  recalls.forEach((assimilation: string) => {
-    cy.initialReviewOneNoteIfThereIs(assimilation)
-  })
-})
-
 Cypress.Commands.add(
   'initialReviewOneNoteIfThereIs',
   ({
@@ -267,14 +260,17 @@ Cypress.Commands.add('routerToRoot', () => {
 })
 
 Cypress.Commands.add('initialReviewNotes', (noteTopics: string) => {
-  cy.initialReviewInSequence(
-    commonSenseSplit(noteTopics, ', ').map((topic: string) => {
-      return {
-        'Review Type': topic === 'end' ? 'initial done' : 'single note',
-        Topic: topic,
-      }
-    })
-  )
+  start
+    .assimilation()
+    .goToAssimilationPage()
+    .assimilate(
+      commonSenseSplit(noteTopics, ', ').map((topic: string) => {
+        return {
+          'Review Type': topic === 'end' ? 'initial done' : 'single note',
+          Topic: topic,
+        }
+      })
+    )
 })
 
 Cypress.Commands.add(
