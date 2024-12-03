@@ -18,7 +18,7 @@ Given('I ask to do more repetition', () => {
   cy.repeatMore()
 })
 
-Then('I repeat old {string}', (repeatNotes: string) => {
+Then('I recall {string}', (repeatNotes: string) => {
   cy.goAndRepeatReviewNotes(repeatNotes)
 })
 
@@ -27,9 +27,9 @@ Then('I repeat more old {string}', (repeatNotes: string) => {
 })
 
 Then(
-  'On day {int} I repeat old {string} and initial review new {string}',
+  'On day {int} I recall {string} and initial review new {string}',
   (day: number, repeatNotes: string, initialNotes: string) => {
-    start.testability().backendTimeTravelTo(day, 8)
+    start.testability().timeTravelTo(day, 8)
     cy.goAndRepeatReviewNotes(repeatNotes)
     cy.initialReviewNotes(initialNotes)
   }

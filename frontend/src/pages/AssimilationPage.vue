@@ -43,7 +43,12 @@
     </div>
   <ContainerPage v-bind="{ contentLoaded: notes !== undefined }">
     <div v-if="notes?.length === 0" class="text-center py-8">
-      You have achieved your daily new notes goal.
+      <TeleportToHeadStatus>
+        Assimilated {{ assimilatedCountOfTheDay }} notes today.
+      </TeleportToHeadStatus>
+      <h1 class="celebration-message">
+        🎉 Congratulations! You've achieved your daily assimilation goal! 🎯
+      </h1>
     </div>
     <Assimilation
       v-if="note"
@@ -65,6 +70,7 @@ import Assimilation from "@/components/review/Assimilation.vue"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import ContainerPage from "./commons/ContainerPage.vue"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
+import TeleportToHeadStatus from "@/pages/commons/TeleportToHeadStatus.vue"
 
 const { managedApi } = useLoadingApi()
 
@@ -188,6 +194,26 @@ const showTooltip = ref(false)
   p {
     margin: 0.5rem 0;
     color: #333;
+  }
+}
+
+.celebration-message {
+  font-size: 1.8rem;
+  color: #2c3e50;
+  font-weight: bold;
+  margin: 1rem 0;
+  animation: bounce 1s ease;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-20px);
+  }
+  60% {
+    transform: translateY(-10px);
   }
 }
 </style>

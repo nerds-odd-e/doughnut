@@ -1,10 +1,5 @@
 <template>
-  <ResumeButton
-    v-if="paused"
-    @resume="$emit('resume')"
-    v-bind="{ finished, toRepeatCount }"
-  />
-  <TeleportToHeadStatus v-else-if="title">
+  <TeleportToHeadStatus v-if="title">
     <div class="flex-shrink-0">
       <slot name="buttons" />
     </div>
@@ -29,10 +24,8 @@
 <script setup lang="ts">
 import usePopups from "@/components/commons/Popups/usePopups"
 import TeleportToHeadStatus from "@/pages/commons/TeleportToHeadStatus.vue"
-import ResumeButton from "./ResumeButton.vue"
 
 defineProps({
-  paused: { type: Boolean, required: true },
   finished: { type: Number, required: true },
   toRepeatCount: { type: Number, required: true },
   title: String,

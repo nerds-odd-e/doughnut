@@ -189,7 +189,7 @@ Cypress.Commands.add(
     Skip: skip,
   }) => {
     if (reviewType === 'initial done') {
-      cy.findByText('You have achieved your daily new notes goal.').should(
+      cy.contains("You've achieved your daily assimilation goal").should(
         'be.visible'
       )
     } else {

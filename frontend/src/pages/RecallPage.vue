@@ -1,5 +1,6 @@
 <template>
   <RecallProgressBar
+    v-if="isProgressBarVisible"
     v-bind="{
       finished,
       toRepeatCount,
@@ -52,7 +53,7 @@ import timezoneParam from "@/managedApi/window/timezoneParam"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import _ from "lodash"
 import type { PropType } from "vue"
-import { computed, onMounted, ref } from "vue"
+import { computed, onMounted, ref, onActivated, onDeactivated } from "vue"
 import { useRecallData } from "@/composables/useRecallData"
 
 const { managedApi } = useLoadingApi()
@@ -69,6 +70,7 @@ const toRepeat = ref<number[] | undefined>(undefined)
 const currentIndex = ref(0)
 const previousResults = ref<(AnsweredQuestion | undefined)[]>([])
 const previousResultCursor = ref<number | undefined>(undefined)
+const isProgressBarVisible = ref(true)
 
 const currentResult = computed(() => {
   if (previousResultCursor.value === undefined) return undefined
@@ -125,6 +127,18 @@ const moveMemoryTrackerToEnd = (index: number) => {
 
 onMounted(() => {
   loadMore(0)
+})
+
+onActivated(() => {
+  isProgressBarVisible.value = true
+  if (!previousResultCursor.value) {
+    toRepeat.value = undefined
+    loadMore(0)
+  }
+})
+
+onDeactivated(() => {
+  isProgressBarVisible.value = false
 })
 
 defineExpose({
