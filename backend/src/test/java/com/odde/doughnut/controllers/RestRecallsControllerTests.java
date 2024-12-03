@@ -59,7 +59,7 @@ class RestRecallsControllerTests {
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
       assertThrows(
           ResponseStatusException.class,
-          () -> nullUserController().repeatReview("Asia/Shanghai", null));
+          () -> nullUserController().recalling("Asia/Shanghai", null));
     }
 
     @ParameterizedTest
@@ -84,7 +84,7 @@ class RestRecallsControllerTests {
           .aMemoryTrackerBy(currentUser)
           .nextRecallAt(TimestampOperations.addHoursToTimestamp(currentTime, nextRecallAtHours))
           .please();
-      DueMemoryTrackers dueMemoryTrackers = controller.repeatReview(timezone, null);
+      DueMemoryTrackers dueMemoryTrackers = controller.recalling(timezone, null);
       assertThat(dueMemoryTrackers.getToRepeat(), hasSize(expectedCount));
     }
   }

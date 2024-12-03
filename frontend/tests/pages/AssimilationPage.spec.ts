@@ -40,7 +40,7 @@ describe("repeat page", () => {
     const wrapper = renderer.currentRoute({ name: "assimilate" }).mount()
     await flushPromises()
     expect(wrapper.text()).toContain(
-      "You have achieved your daily new notes goal"
+      "Congratulations! You've achieved your daily assimilation goal!"
     )
     expect(mockedInitialReviewCall).toBeCalledWith("Europe/Amsterdam")
   })

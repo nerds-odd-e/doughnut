@@ -88,10 +88,7 @@ const viewLastResult = (cursor: number | undefined) => {
 
 const loadMore = async (dueInDays?: number) => {
   toRepeat.value = (
-    await managedApi.restRecallsController.repeatReview(
-      timezoneParam(),
-      dueInDays
-    )
+    await managedApi.restRecallsController.recalling(timezoneParam(), dueInDays)
   ).toRepeat
   currentIndex.value = 0
   if (toRepeat.value?.length === 0) {

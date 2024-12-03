@@ -2438,11 +2438,11 @@ paths:
                   type: object
                   additionalProperties:
                     type: object
-  /api/recalls/repeat:
+  /api/recalls/recalling:
     get:
       tags:
       - rest-recalls-controller
-      operationId: repeatReview
+      operationId: recalling
       parameters:
       - name: timezone
         in: query

@@ -50,9 +50,9 @@ class RestRecallsController {
     return recallStatus;
   }
 
-  @GetMapping(value = {"/repeat"})
+  @GetMapping(value = {"/recalling"})
   @Transactional
-  public DueMemoryTrackers repeatReview(
+  public DueMemoryTrackers recalling(
       @RequestParam(value = "timezone") String timezone,
       @RequestParam(value = "dueindays", required = false) Integer dueInDays) {
     currentUser.assertLoggedIn();

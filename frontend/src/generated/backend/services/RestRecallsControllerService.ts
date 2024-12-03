@@ -14,13 +14,13 @@ export class RestRecallsControllerService {
      * @returns DueMemoryTrackers OK
      * @throws ApiError
      */
-    public repeatReview(
+    public recalling(
         timezone: string,
         dueindays?: number,
     ): CancelablePromise<DueMemoryTrackers> {
         return this.httpRequest.request({
             method: 'GET',
-            url: '/api/recalls/repeat',
+            url: '/api/recalls/recalling',
             query: {
                 'timezone': timezone,
                 'dueindays': dueindays,
