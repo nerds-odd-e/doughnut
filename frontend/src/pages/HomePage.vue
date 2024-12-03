@@ -461,4 +461,9 @@ onUnmounted(() => {
     display: none;
   }
 }
+
+.ending {
+  text-align: center;
+  padding: 2rem;
+}
 </style>

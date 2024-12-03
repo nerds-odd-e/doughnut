@@ -64,7 +64,7 @@
     </ul>
   </div>
   <LoginButton v-else />
-  <span class="vertical-text">Doughnut by</span>
+  <router-link to="/" class="vertical-text">Doughnut by</router-link>
   <a href="https://odd-e.com" target="_blank">
     <img
       src="/odd-e.png"
@@ -213,6 +213,7 @@ const logout = async () => {
   white-space: nowrap;
   margin-top: 1rem;
   align-self: center;
+  text-decoration: none;
 }
 
 a[href="https://odd-e.com"] {

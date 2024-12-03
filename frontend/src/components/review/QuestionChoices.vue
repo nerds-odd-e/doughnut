@@ -90,6 +90,10 @@ export default defineComponent({
       box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25)
     &:disabled
       opacity: 0.65
+    -webkit-tap-highlight-color: transparent
+    -webkit-touch-callout: none
+    -webkit-user-select: none
+    user-select: none
 
 .is-correct
   background-color: #00ff00 !important
