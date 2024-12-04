@@ -9,6 +9,7 @@ import {
   type TopicTitleReplacement,
 } from "@/generated/backend"
 import { flushPromises } from "@vue/test-utils"
+import createNoteStorage from "@/store/createNoteStorage"
 
 class MockIntersectionObserver {
   readonly root: Element | null = null
@@ -81,15 +82,16 @@ const createRunResponse = (functionName: string, args: object) => ({
 })
 
 const setupTestData = () => {
-  const note = makeMe.aNote.details("").please()
+  const noteRealm = makeMe.aNoteRealm.please()
+  const note = noteRealm.note
   const conversation = makeMe.aConversation.note(note).please()
-  return { note, conversation }
+  return { note, noteRealm, conversation }
 }
 
-const mountComponent = (conversation) => {
+const mountComponent = (conversation, storageAccessor) => {
   return helper
     .component(AiResponse)
-    .withStorageProps({ conversation, aiReplyTrigger: 0 })
+    .withProps({ conversation, aiReplyTrigger: 0, storageAccessor })
     .mount()
 }
 
@@ -110,17 +112,21 @@ const submitMessageAndSimulateRunResponse = async (wrapper, runResponse) => {
 describe("ConversationInner", () => {
   let wrapper
   let note
+  let noteRealm
   let conversation
+  let storageAccessor
 
   beforeEach(() => {
+    storageAccessor = createNoteStorage(helper.managedApi)
     helper.managedApi.eventSource.restConversationMessageController.getAiReply =
       vi.fn()
 
     const testData = setupTestData()
     note = testData.note
+    noteRealm = testData.noteRealm
     conversation = testData.conversation
 
-    wrapper = mountComponent(conversation)
+    wrapper = mountComponent(conversation, storageAccessor)
   })
 
   describe("AI Reply", () => {
@@ -263,6 +269,54 @@ describe("ConversationInner", () => {
       })
 
       expect(wrapper.find(".completion-text").exists()).toBe(false)
+    })
+
+    it("handles completion with character deletion", async () => {
+      noteRealm.note.details = "Hello world"
+      storageAccessor.refreshNoteRealm(noteRealm)
+      await submitMessageAndSimulateRunResponse(
+        wrapper,
+        createRunResponse(
+          DummyForGeneratingTypes.aiToolName.COMPLETE_NOTE_DETAILS,
+          {
+            completion: " friends!",
+            deleteFromEnd: 6,
+          }
+        )
+      )
+
+      // Accept the suggestion
+      await wrapper.find('button[class*="btn-primary"]').trigger("click")
+      await flushPromises()
+
+      // Should delete "world" and add "friends!"
+      expect(
+        helper.managedApi.restTextContentController.updateNoteDetails
+      ).toHaveBeenCalledWith(note.id, { details: "Hello friends!" })
+    })
+
+    it("handles over-deletion by removing all content", async () => {
+      noteRealm.note.details = "Hello world"
+      storageAccessor.refreshNoteRealm(noteRealm)
+      await submitMessageAndSimulateRunResponse(
+        wrapper,
+        createRunResponse(
+          DummyForGeneratingTypes.aiToolName.COMPLETE_NOTE_DETAILS,
+          {
+            completion: "Completely new text",
+            deleteFromEnd: 20, // More than "Hello world" length
+          }
+        )
+      )
+
+      // Accept the suggestion
+      await wrapper.find('button[class*="btn-primary"]').trigger("click")
+      await flushPromises()
+
+      // Should delete everything and add new text
+      expect(
+        helper.managedApi.restTextContentController.updateNoteDetails
+      ).toHaveBeenCalledWith(note.id, { details: "Completely new text" })
     })
   })
 

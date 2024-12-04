@@ -255,11 +255,10 @@ export default class StoredApiCollection implements StoredApi {
     if (!value) return
     const currentNote = this.storage.refOfNoteRealm(noteId).value?.note
     const old = currentNote?.details ?? ""
-    return this.updateTextField(
-      noteId,
-      "edit details",
-      old + (value.completion ?? "")
-    )
+    const deleteCount = Math.min(value.deleteFromEnd ?? 0, old.length)
+    const newContent =
+      old.slice(0, old.length - deleteCount) + (value.completion ?? "")
+    await this.updateTextField(noteId, "edit details", newContent)
   }
 
   private async undoInner() {
