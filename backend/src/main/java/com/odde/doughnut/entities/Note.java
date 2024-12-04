@@ -265,7 +265,7 @@ public class Note extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   private String getContextPathString() {
     return getAncestors().stream()
-        .map(note -> "[" + note.getTopicConstructor() + "](" + note.getUri() + ")")
+        .map(Note::getContextualPathItem)
         .collect(Collectors.joining(PATH_DELIMITER));
   }
 
@@ -340,6 +340,11 @@ public class Note extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public boolean isLink() {
     return getTargetNote() != null;
+  }
+
+  @JsonIgnore
+  private String getContextualPathItem() {
+    return "[" + getTopicConstructor() + "](" + getUri() + ")";
   }
 
   public static class NoteBrief {
