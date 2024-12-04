@@ -118,7 +118,10 @@ public class NoteTest {
 
       Note.NoteBrief brief = note.getNoteBrief();
 
-      assertThat(brief.contextPath, equalTo("Grandparent › Parent"));
+      assertThat(
+          brief.contextPath,
+          equalTo(
+              "[Grandparent](/n" + grandparent.getId() + ") › [Parent](/n" + parent.getId() + ")"));
       assertThat(brief.topic, equalTo("Child"));
     }
   }

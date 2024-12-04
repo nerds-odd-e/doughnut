@@ -265,7 +265,7 @@ public class Note extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   private String getContextPathString() {
     return getAncestors().stream()
-        .map(Note::getTopicConstructor)
+        .map(note -> "[" + note.getTopicConstructor() + "](" + note.getUri() + ")")
         .collect(Collectors.joining(PATH_DELIMITER));
   }
 
