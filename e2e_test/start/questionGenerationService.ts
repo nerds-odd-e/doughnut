@@ -5,6 +5,7 @@ export const questionGenerationService = () => ({
   resetAndStubAskingMCQByChatCompletion: (record: Record<string, string>) => {
     const mcqWithAnswer: MCQWithAnswer = {
       correctChoiceIndex: 0,
+      strictChoiceOrder: true,
       multipleChoicesQuestion: {
         stem: record['Question Stem']!,
         choices: [
@@ -28,6 +29,7 @@ export const questionGenerationService = () => ({
   resetAndStubAskingMCQ: (record: Record<string, string>) => {
     const mcqWithAnswer: MCQWithAnswer = {
       correctChoiceIndex: 0,
+      strictChoiceOrder: true,
       multipleChoicesQuestion: {
         stem: record['Question Stem']!,
         choices: [

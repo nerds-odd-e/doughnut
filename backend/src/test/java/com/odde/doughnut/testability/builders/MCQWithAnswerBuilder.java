@@ -32,4 +32,9 @@ public class MCQWithAnswerBuilder {
     mcqWithAnswer.setCorrectChoiceIndex(i);
     return this;
   }
+
+  public MCQWithAnswerBuilder strictChoiceOrder(boolean b) {
+    mcqWithAnswer.setStrictChoiceOrder(b);
+    return this;
+  }
 }

@@ -108,6 +108,7 @@ Given(
           choices: ['choice 1', 'choice 2'],
         },
         correctChoiceIndex: 0,
+        strictChoiceOrder: true,
       },
     }))
     const negatives = Array.from({ length: negative }, (_, index) => ({
@@ -120,6 +121,7 @@ Given(
           choices: ['choice 1', 'choice 2'],
         },
         correctChoiceIndex: 0,
+        strictChoiceOrder: true,
       },
     }))
 
