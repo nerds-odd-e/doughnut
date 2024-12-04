@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type ContextualPathItem = {
-    topic?: string;
+    title?: string;
     uri?: string;
 };
 

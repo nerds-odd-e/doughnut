@@ -103,7 +103,7 @@ public class NoteTest {
       Note.NoteBrief brief = note.getNoteBrief();
 
       assertThat(brief.uri, equalTo("/n" + note.getId()));
-      assertThat(brief.topic, equalTo("Test Topic"));
+      assertThat(brief.title, equalTo("Test Topic"));
       assertThat(brief.details, equalTo("Test Details"));
       assertThat(brief.contextualPath, empty());
       assertThat(brief.createdAt, notNullValue());
@@ -120,11 +120,11 @@ public class NoteTest {
       Note.NoteBrief brief = note.getNoteBrief();
 
       assertThat(brief.contextualPath, hasSize(2));
-      assertThat(brief.contextualPath.get(0).topic, equalTo("Grandparent"));
+      assertThat(brief.contextualPath.get(0).title, equalTo("Grandparent"));
       assertThat(brief.contextualPath.get(0).uri, equalTo("/n" + grandparent.getId()));
-      assertThat(brief.contextualPath.get(1).topic, equalTo("Parent"));
+      assertThat(brief.contextualPath.get(1).title, equalTo("Parent"));
       assertThat(brief.contextualPath.get(1).uri, equalTo("/n" + parent.getId()));
-      assertThat(brief.topic, equalTo("Child"));
+      assertThat(brief.title, equalTo("Child"));
     }
 
     @Test

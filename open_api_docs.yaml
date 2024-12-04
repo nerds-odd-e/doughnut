@@ -4124,7 +4124,7 @@ components:
     ContextualPathItem:
       type: object
       properties:
-        topic:
+        title:
           type: string
         uri:
           type: string
@@ -4137,7 +4137,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ContextualPathItem"
-        topic:
+        title:
           type: string
         details:
           type: string

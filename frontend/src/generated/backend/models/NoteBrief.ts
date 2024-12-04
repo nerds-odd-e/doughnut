@@ -6,7 +6,7 @@ import type { ContextualPathItem } from './ContextualPathItem';
 export type NoteBrief = {
     uri?: string;
     contextualPath?: Array<ContextualPathItem>;
-    topic?: string;
+    title?: string;
     details?: string;
     createdAt?: string;
     parent?: string;

@@ -340,15 +340,10 @@ public class Note extends EntityIdentifiedByIdOnly {
     return getTargetNote() != null;
   }
 
-  @JsonIgnore
-  private String getContextualPathItem() {
-    return "[" + getTopicConstructor() + "](" + getUri() + ")";
-  }
-
   public static class NoteBrief {
     public String uri;
     public List<ContextualPathItem> contextualPath;
-    public String topic;
+    public String title;
     public String details;
     public String createdAt;
     public String parent;
@@ -356,11 +351,11 @@ public class Note extends EntityIdentifiedByIdOnly {
   }
 
   public static class ContextualPathItem {
-    public String topic;
+    public String title;
     public String uri;
 
-    public ContextualPathItem(String topic, String uri) {
-      this.topic = topic;
+    public ContextualPathItem(String title, String uri) {
+      this.title = title;
       this.uri = uri;
     }
   }
@@ -381,7 +376,7 @@ public class Note extends EntityIdentifiedByIdOnly {
     noteBrief.uri = getUri();
     noteBrief.contextualPath =
         getAncestors().stream().map(Note::toContextualPathItem).collect(Collectors.toList());
-    noteBrief.topic = getTopicConstructor();
+    noteBrief.title = getTopicConstructor();
     noteBrief.details = getDetails();
     noteBrief.createdAt =
         TimestampOperations.getZonedDateTime(getCreatedAt(), ZoneId.systemDefault()).toString();
