@@ -381,7 +381,7 @@ describe("NoteAudioTools", () => {
     })
   })
 
-  describe("Topic suggestion", () => {
+  describe("Title suggestion", () => {
     beforeEach(() => {
       // Reset mocks and wrapper before each test
       vi.clearAllMocks()
@@ -392,7 +392,7 @@ describe("NoteAudioTools", () => {
         .mockResolvedValue({ completionFromAudio: "text" })
     })
 
-    it("suggests topic for power-of-2 audio processes", async () => {
+    it("suggests title for power-of-2 audio processes", async () => {
       const note = makeMe.aNote.topicConstructor("Untitled").please()
       wrapper = helper
         .component(NoteAudioTools)
@@ -401,7 +401,7 @@ describe("NoteAudioTools", () => {
 
       helper.managedApi.restAiController.suggestTopicTitle = vi
         .fn()
-        .mockResolvedValue({ topic: "Suggested Topic" })
+        .mockResolvedValue({ title: "Suggested Title" })
 
       // Simulate 9 audio processes (should trigger on 1st, 2nd, 4th, 8th calls)
       for (let i = 0; i < 9; i++) {
@@ -417,7 +417,7 @@ describe("NoteAudioTools", () => {
       ).toHaveBeenCalledTimes(4)
     })
 
-    it("does not update topic when suggestion is empty", async () => {
+    it("does not update title when suggestion is empty", async () => {
       const note = makeMe.aNote.topicConstructor("Untitled").please()
       wrapper = helper
         .component(NoteAudioTools)
@@ -426,7 +426,7 @@ describe("NoteAudioTools", () => {
 
       helper.managedApi.restAiController.suggestTopicTitle = vi
         .fn()
-        .mockResolvedValue({ topic: "" })
+        .mockResolvedValue({ title: "" })
 
       await wrapper.vm.processAudio(new Blob())
 

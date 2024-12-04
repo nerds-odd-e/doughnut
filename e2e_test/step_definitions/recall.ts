@@ -77,7 +77,7 @@ Then('I initial review {string}', (noteTopic: string) => {
 Then(
   'I added and learned one note {string} on day {int}',
   (noteTopic: string, day: number) => {
-    start.testability().injectNotes([{ Topic: noteTopic }])
+    start.testability().injectNotes([{ Title: noteTopic }])
     start.testability().backendTimeTravelTo(day, 8)
     start.assimilation().goToAssimilationPage().assimilateNotes(noteTopic)
   }

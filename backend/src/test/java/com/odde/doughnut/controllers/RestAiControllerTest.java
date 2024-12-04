@@ -258,7 +258,7 @@ class RestAiControllerTest {
               argThat(
                   request -> {
                     assertThat(request.getAdditionalInstructions())
-                        .contains("Please suggest a better topic title for the note");
+                        .contains("Please suggest a better title for the note");
                     return true;
                   }));
     }
