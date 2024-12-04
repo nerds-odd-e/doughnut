@@ -263,7 +263,7 @@ public class Note extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  public String getContextPathString() {
+  private String getContextPathString() {
     return getAncestors().stream()
         .map(Note::getTopicConstructor)
         .collect(Collectors.joining(PATH_DELIMITER));
@@ -364,7 +364,7 @@ public class Note extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public NoteBrief getNoteBrief() {
     NoteBrief noteBrief = new NoteBrief();
-    noteBrief.uri = "https://doughnut.odd-e.com/n" + getId();
+    noteBrief.uri = getUri();
     noteBrief.contextPath = getContextPathString();
     noteBrief.topic = getTopicConstructor();
     noteBrief.details = getDetails();
@@ -375,6 +375,11 @@ public class Note extends EntityIdentifiedByIdOnly {
           targetNote.getContextPathString() + PATH_DELIMITER + targetNote.getTopicConstructor();
     }
     return noteBrief;
+  }
+
+  @JsonIgnore
+  private String getUri() {
+    return "/n" + getId();
   }
 
   public void initialize(
