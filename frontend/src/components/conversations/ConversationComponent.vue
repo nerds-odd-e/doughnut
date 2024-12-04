@@ -21,6 +21,7 @@
         v-else-if="conversation.subject?.answeredQuestion"
         v-bind="{
           answeredQuestion: conversation.subject.answeredQuestion,
+          conversationButton: false,
           storageAccessor,
         }"
       />

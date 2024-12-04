@@ -14,6 +14,7 @@
     <AnsweredQuestionComponent
       v-if="answeredQuestion"
       :answered-question="answeredQuestion"
+      :conversation-button="true"
       :storage-accessor="storageAccessor"
     />
     <div v-else>

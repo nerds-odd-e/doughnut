@@ -31,7 +31,7 @@
     />
     <AnsweredQuestionComponent
       v-if="currentResult"
-      v-bind="{ answeredQuestion: currentResult, storageAccessor }"
+      v-bind="{ answeredQuestion: currentResult, conversationButton: true, storageAccessor }"
     />
     <template v-else-if="toRepeatCount === 0">
       <div class="alert alert-success">

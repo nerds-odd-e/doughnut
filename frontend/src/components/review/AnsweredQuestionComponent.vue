@@ -16,7 +16,10 @@
     }"
   />
   <AnswerResult v-bind="{ answeredQuestion }" />
-  <ConversationButton :recall-prompt-id="answeredQuestion.recallPromptId" />
+  <ConversationButton
+    v-if="conversationButton"
+    :recall-prompt-id="answeredQuestion.recallPromptId"
+  />
 </template>
 
 <script setup lang="ts">
@@ -26,9 +29,13 @@ import QuestionDisplay from "./QuestionDisplay.vue"
 import Breadcrumb from "@/components/toolbars/Breadcrumb.vue"
 import ConversationButton from "./ConversationButton.vue"
 
-const { answeredQuestion } = defineProps({
+const { answeredQuestion, conversationButton } = defineProps({
   answeredQuestion: {
     type: Object as PropType<AnsweredQuestion>,
+    required: true,
+  },
+  conversationButton: {
+    type: Boolean,
     required: true,
   },
 })
