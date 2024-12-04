@@ -10,7 +10,12 @@ import lombok.NoArgsConstructor;
 public class NoteDetailsCompletion {
 
   @JsonPropertyDescription(
-      "The completion of the note details to be appended to the existing note details. Add necessary white space or new line at the beginning to connect to existing details. Note that the existing details may be empty or end with incomplete word. Leave empty if the existing details are already complete. The context should be in markdown format.")
+      "The completion of the note details to be appended to the existing note details. Add necessary white space or new line at the beginning to connect to existing details. The context should be in markdown format.")
   @JsonProperty(required = true)
   public String completion;
+
+  @JsonPropertyDescription(
+      "Number of characters to delete from the end of existing details before appending the completion. Use this to remove trailing spaces, incomplete words, or punctuation. Default is 0.")
+  @JsonProperty(defaultValue = "0")
+  public Integer deleteFromEnd = 0;
 }

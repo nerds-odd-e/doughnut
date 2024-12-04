@@ -4,5 +4,6 @@
 /* eslint-disable */
 export type NoteDetailsCompletion = {
     completion: string;
+    deleteFromEnd?: number;
 };
 

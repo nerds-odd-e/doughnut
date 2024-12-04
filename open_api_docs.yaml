@@ -4488,6 +4488,9 @@ components:
       properties:
         completion:
           type: string
+        deleteFromEnd:
+          type: integer
+          format: int32
     RequiredAction:
       type: object
       properties:
