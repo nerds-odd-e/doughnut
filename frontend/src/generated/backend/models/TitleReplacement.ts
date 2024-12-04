@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type TopicTitleReplacement = {
-    newTopic: string;
+export type TitleReplacement = {
+    newTitle: string;
 };
 

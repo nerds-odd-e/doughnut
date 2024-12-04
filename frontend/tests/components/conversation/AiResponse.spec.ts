@@ -6,7 +6,7 @@ import {
   DummyForGeneratingTypes,
   type Message,
   type MessageDelta,
-  type TopicTitleReplacement,
+  type TitleReplacement,
 } from "@/generated/backend"
 import { flushPromises } from "@vue/test-utils"
 import createNoteStorage from "@/store/createNoteStorage"
@@ -443,9 +443,9 @@ describe("ConversationInner", () => {
       await submitMessageAndSimulateRunResponse(
         wrapper,
         createRunResponse(
-          DummyForGeneratingTypes.aiToolName.SUGGEST_NOTE_TOPIC_TITLE,
-          <TopicTitleReplacement>{
-            newTopic: testTitle,
+          DummyForGeneratingTypes.aiToolName.SUGGEST_NOTE_TITLE,
+          <TitleReplacement>{
+            newTitle: testTitle,
           }
         )
       )

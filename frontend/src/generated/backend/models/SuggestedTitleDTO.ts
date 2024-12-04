@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type SuggestedTopicDTO = {
-    topic?: string;
+export type SuggestedTitleDTO = {
+    title?: string;
 };
 

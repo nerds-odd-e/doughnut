@@ -10,14 +10,14 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class TopicTitleReplacement {
+public class TitleReplacement {
   @NotNull
   @Size(min = 1, max = Note.MAX_TITLE_LENGTH)
   @JsonPropertyDescription(
-      "The topic to be replaced for the "
+      "The title to be replaced for the "
           + NOTE_OF_CURRENT_FOCUS
           + ". Max size is "
           + Note.MAX_TITLE_LENGTH)
   @JsonProperty(required = true)
-  public String newTopic;
+  public String newTitle;
 }

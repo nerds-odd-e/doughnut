@@ -18,20 +18,20 @@ public final class NoteAutomationService {
     this.notebookAssistantForNoteService = notebookAssistantForNoteService;
   }
 
-  public String suggestTopicTitle() throws JsonProcessingException {
+  public String suggestTitle() throws JsonProcessingException {
     String instructions =
-        "Please suggest a better topic title for the note by calling the function. Don't change it if it's already good enough.";
+        "Please suggest a better title for the note by calling the function. Don't change it if it's already good enough.";
 
     AiTool tool = AiToolFactory.suggestNoteTopicTitle();
-    TopicTitleReplacement replacement =
+    TitleReplacement replacement =
         notebookAssistantForNoteService
             .createThreadWithNoteInfo(List.of())
             .withTool(tool)
             .withAdditionalInstructions(instructions)
             .run()
             .getRunResult()
-            .getAssumedToolCallArgument(TopicTitleReplacement.class);
-    return replacement != null ? replacement.newTopic : null;
+            .getAssumedToolCallArgument(TitleReplacement.class);
+    return replacement != null ? replacement.newTitle : null;
   }
 
   private String appendAdditionalInstructions(String instructions, AudioUploadDTO config) {

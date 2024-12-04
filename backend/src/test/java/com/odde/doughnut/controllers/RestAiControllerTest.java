@@ -7,7 +7,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.odde.doughnut.controllers.dto.SuggestedTopicDTO;
+import com.odde.doughnut.controllers.dto.SuggestedTitleDTO;
 import com.odde.doughnut.controllers.dto.ToolCallResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -15,7 +15,7 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
 import com.odde.doughnut.services.ai.OtherAiServices;
-import com.odde.doughnut.services.ai.TopicTitleReplacement;
+import com.odde.doughnut.services.ai.TitleReplacement;
 import com.odde.doughnut.services.ai.tools.AiToolName;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIAssistantMocker;
@@ -232,11 +232,11 @@ class RestAiControllerTest {
       testNote = makeMe.aNote().creatorAndOwner(currentUser).please();
       openAIAssistantMocker = new OpenAIAssistantMocker(openAiApi);
       openAIAssistantThreadMocker = openAIAssistantMocker.mockThreadCreation(null);
-      TopicTitleReplacement suggestedTopic = new TopicTitleReplacement();
-      suggestedTopic.setNewTopic("Suggested Title");
+      TitleReplacement suggestedTopic = new TitleReplacement();
+      suggestedTopic.setNewTitle("Suggested Title");
       openAIAssistantThreadMocker
           .mockCreateRunInProcess("my-run-id")
-          .aRunThatRequireAction(suggestedTopic, AiToolName.SUGGEST_NOTE_TOPIC_TITLE.getValue())
+          .aRunThatRequireAction(suggestedTopic, AiToolName.SUGGEST_NOTE_TITLE.getValue())
           .mockRetrieveRun()
           .mockCancelRun("my-run-id");
     }
@@ -244,8 +244,8 @@ class RestAiControllerTest {
     @Test
     void shouldReturnSuggestedTopicTitle()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
-      SuggestedTopicDTO result = controller.suggestTopicTitle(testNote);
-      assertThat(result.getTopic()).isEqualTo("Suggested Title");
+      SuggestedTitleDTO result = controller.suggestTopicTitle(testNote);
+      assertThat(result.getTitle()).isEqualTo("Suggested Title");
     }
 
     @Test

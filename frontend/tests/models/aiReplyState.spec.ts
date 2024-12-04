@@ -176,9 +176,8 @@ describe("aiReplyState", () => {
               {
                 id: "call-2",
                 function: {
-                  name: DummyForGeneratingTypes.aiToolName
-                    .SUGGEST_NOTE_TOPIC_TITLE,
-                  arguments: JSON.stringify({ newTopic: "test title" }),
+                  name: DummyForGeneratingTypes.aiToolName.SUGGEST_NOTE_TITLE,
+                  arguments: JSON.stringify({ newTitle: "test title" }),
                 },
               },
             ],
@@ -230,9 +229,8 @@ describe("aiReplyState", () => {
               {
                 id: "call-2",
                 function: {
-                  name: DummyForGeneratingTypes.aiToolName
-                    .SUGGEST_NOTE_TOPIC_TITLE,
-                  arguments: JSON.stringify({ newTopic: "test title" }),
+                  name: DummyForGeneratingTypes.aiToolName.SUGGEST_NOTE_TITLE,
+                  arguments: JSON.stringify({ newTitle: "test title" }),
                 },
               },
             ],

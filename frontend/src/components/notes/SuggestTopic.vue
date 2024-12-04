@@ -38,8 +38,8 @@ export default defineComponent({
       }
 
       if (this.replaceOrAppendTopic === "Append") {
-        const newTopic = `${this.originalTopic} / ${this.suggestedTopic}`
-        this.$emit("suggestedTopicSelected", newTopic)
+        const newTitle = `${this.originalTopic} / ${this.suggestedTopic}`
+        this.$emit("suggestedTopicSelected", newTitle)
       }
     },
   },

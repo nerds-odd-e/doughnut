@@ -117,10 +117,10 @@ const shouldSuggestTopic = (callCount: number): boolean => {
 const updateTopicIfSuggested = async (noteId: number) => {
   const suggestedTopic =
     await managedApi.restAiController.suggestTopicTitle(noteId)
-  if (suggestedTopic?.topic) {
+  if (suggestedTopic?.title) {
     await storageAccessor
       .storedApi()
-      .updateTextField(noteId, "edit topic", suggestedTopic.topic)
+      .updateTextField(noteId, "edit topic", suggestedTopic.title)
   }
 }
 

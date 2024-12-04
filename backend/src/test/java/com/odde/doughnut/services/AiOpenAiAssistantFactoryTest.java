@@ -53,7 +53,7 @@ class AiOpenAiAssistantFactoryTest {
 
       Optional<AiTool> topicTitleTool =
           tools.stream()
-              .filter(t -> t.name().equals(AiToolName.SUGGEST_NOTE_TOPIC_TITLE.getValue()))
+              .filter(t -> t.name().equals(AiToolName.SUGGEST_NOTE_TITLE.getValue()))
               .findFirst();
 
       assertTrue(topicTitleTool.isPresent());
@@ -70,7 +70,7 @@ class AiOpenAiAssistantFactoryTest {
 
       Optional<AiTool> topicTitleTool =
           tools.stream()
-              .filter(t -> t.name().equals(AiToolName.SUGGEST_NOTE_TOPIC_TITLE.getValue()))
+              .filter(t -> t.name().equals(AiToolName.SUGGEST_NOTE_TITLE.getValue()))
               .findFirst();
 
       FunctionTool tool = (FunctionTool) topicTitleTool.get().getTool();

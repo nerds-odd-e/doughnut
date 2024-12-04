@@ -71,14 +71,12 @@ public class RestAiController {
 
   @PostMapping("/suggest-topic-title/{note}")
   @Transactional
-  public SuggestedTopicDTO suggestTopicTitle(
+  public SuggestedTitleDTO suggestTopicTitle(
       @PathVariable(value = "note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException, JsonProcessingException {
     currentUser.assertAuthorization(note);
     String title =
-        notebookAssistantForNoteServiceFactory
-            .createNoteAutomationService(note)
-            .suggestTopicTitle();
-    return new SuggestedTopicDTO(title);
+        notebookAssistantForNoteServiceFactory.createNoteAutomationService(note).suggestTitle();
+    return new SuggestedTitleDTO(title);
   }
 }

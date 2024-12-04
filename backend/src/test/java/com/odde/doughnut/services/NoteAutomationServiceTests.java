@@ -54,7 +54,7 @@ class NoteAutomationServiceTests {
         .aCompletedRun()
         .mockRetrieveRun();
 
-    String result = service.suggestTopicTitle();
+    String result = service.suggestTitle();
 
     assertThat(result, is(nullValue()));
   }

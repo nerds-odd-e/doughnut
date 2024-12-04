@@ -1935,7 +1935,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/SuggestedTopicDTO"
+                $ref: "#/components/schemas/SuggestedTitleDTO"
   /api/ai/submit-tool-results/{threadId}/{runId}:
     post:
       tags:
@@ -3917,10 +3917,10 @@ components:
             $ref: "#/components/schemas/AssessmentQuestionInstance"
         certifiable:
           type: boolean
-    SuggestedTopicDTO:
+    SuggestedTitleDTO:
       type: object
       properties:
-        topic:
+        title:
           type: string
     ToolCallResult:
       type: object
@@ -4315,13 +4315,13 @@ components:
           $ref: "#/components/schemas/Run"
         noteDetailsCompletion:
           $ref: "#/components/schemas/NoteDetailsCompletion"
-        topicTitleReplacement:
-          $ref: "#/components/schemas/TopicTitleReplacement"
+        titleReplacement:
+          $ref: "#/components/schemas/TitleReplacement"
         aiToolName:
           type: string
           enum:
           - complete_note_details
-          - suggest_note_topic_title
+          - suggest_note_title
           - ask_single_answer_multiple_choice_question
     ExpiresAfter:
       type: object
@@ -4676,6 +4676,15 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Annotation"
+    TitleReplacement:
+      required:
+      - newTitle
+      type: object
+      properties:
+        newTitle:
+          maxLength: 150
+          minLength: 1
+          type: string
     Tool:
       type: object
       properties:
@@ -4773,15 +4782,6 @@ components:
           $ref: "#/components/schemas/CodeInterpreterResources"
         file_search:
           $ref: "#/components/schemas/FileSearchResources"
-    TopicTitleReplacement:
-      required:
-      - newTopic
-      type: object
-      properties:
-        newTopic:
-          maxLength: 150
-          minLength: 1
-          type: string
     TruncationStrategy:
       type: object
       properties:
