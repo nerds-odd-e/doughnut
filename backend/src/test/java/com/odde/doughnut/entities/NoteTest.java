@@ -98,10 +98,7 @@ public class NoteTest {
   class NoteBrief {
     @Test
     void shouldIncludeBasicNoteInformation() {
-      Note note = makeMe.aNote()
-          .titleConstructor("Test Topic")
-          .details("Test Details")
-          .please();
+      Note note = makeMe.aNote().titleConstructor("Test Topic").details("Test Details").please();
 
       Note.NoteBrief brief = note.getNoteBrief();
 
@@ -115,17 +112,9 @@ public class NoteTest {
 
     @Test
     void shouldIncludeContextPathWithAncestors() {
-      Note grandparent = makeMe.aNote()
-          .titleConstructor("Grandparent")
-          .please();
-      Note parent = makeMe.aNote()
-          .titleConstructor("Parent")
-          .under(grandparent)
-          .please();
-      Note note = makeMe.aNote()
-          .titleConstructor("Child")
-          .under(parent)
-          .please();
+      Note grandparent = makeMe.aNote().titleConstructor("Grandparent").please();
+      Note parent = makeMe.aNote().titleConstructor("Parent").under(grandparent).please();
+      Note note = makeMe.aNote().titleConstructor("Child").under(parent).please();
 
       Note.NoteBrief brief = note.getNoteBrief();
 
