@@ -19,7 +19,7 @@ Feature: Note creation/edit for a location
   @usingMockedWikidataService
   Scenario: Existing Note wikidata edited by user
     When there are some notes:
-      | Topic            | Details     | Parent Topic|
+      | Title            | Details     | Parent Title|
       | Singapore        | The red dot | places      |
     And I associate the note "Singapore" with wikidata id "Q334"
     Then the note details on the current page should be "Location: 1.3'N, 103.8'E\nThe red dot"

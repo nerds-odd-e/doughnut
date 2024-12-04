@@ -5,7 +5,7 @@ Feature: Review Pages
     Given I am logged in as an existing user
     And I have a notebook with the head note "English" which skips review
     And there are some notes:
-      | Topic    | Details         | Image Url   | Parent Topic |
+      | Title    | Details         | Image Url   | Parent Title |
       | Sedition | Incite violence |             | English      |
       | Sedation | Put to sleep    |             | English      |
       | Sedative | Sleep medicine  | a_slide.jpg | English      |

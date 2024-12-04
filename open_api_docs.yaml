@@ -3252,11 +3252,11 @@ components:
     NoteTestData:
       type: object
       properties:
-        Topic:
+        Title:
           type: string
         Details:
           type: string
-        Parent Topic:
+        Parent Title:
           type: string
         Skip Memory Tracking:
           type: boolean

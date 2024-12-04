@@ -8,7 +8,7 @@ Feature: search note
     And I have a notebook with the head note "Sedation" and details "Put to sleep"
     And I have a notebook with the head note "Sedative" and details "Sleep medicine"
     And there are some notes:
-      | Topic    | Parent Topic |
+      | Title    | Parent Title |
       | Physical | Sedation     |
       | Magical  | Sedation     |
 

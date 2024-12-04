@@ -53,7 +53,7 @@ Feature: Note Edit
 
   Scenario: Edit a note topic should update the sidebar
     Given there are some notes:
-      | Topic | Parent Topic   |
+      | Title | Parent Title   |
       | TDD   | LeSS in Action |
     When I update note topic "TDD" to become "Critical thinking"
     Then I should see the note tree in the sidebar

@@ -64,7 +64,7 @@ const notePage = {
 Example:
 ```gherkin
 Given there are some notes:
-  | Topic    | Parent Topic | Skip Memory Tracking |
+  | Title    | Parent Title | Skip Memory Tracking |
   | Shape    |              | true        |
   | Square   | Shape        |             |
 ```

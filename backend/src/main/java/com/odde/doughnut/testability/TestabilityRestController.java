@@ -73,16 +73,16 @@ class TestabilityRestController {
   }
 
   static class NoteTestData {
-    @JsonProperty("Topic")
-    public String topic;
+    @JsonProperty("Title")
+    public String title;
 
     @JsonProperty("Details")
     @Setter
     private String details;
 
-    @JsonProperty("Parent Topic")
+    @JsonProperty("Parent Title")
     @Setter
-    private String parentTopic;
+    private String parentTitle;
 
     @JsonProperty("Skip Memory Tracking")
     @Setter
@@ -102,10 +102,10 @@ class TestabilityRestController {
 
     private Note buildNote(User user, Timestamp currentUTCTimestamp) {
       Note note =
-          new NoteConstructionService(user, currentUTCTimestamp, null).createNote(null, topic);
+          new NoteConstructionService(user, currentUTCTimestamp, null).createNote(null, title);
       NoteAccessory content = note.getOrInitializeNoteAccessory();
 
-      note.setTopicConstructor(topic);
+      note.setTopicConstructor(title);
       note.setDetails(details);
       note.setUpdatedAt(currentUTCTimestamp);
       if (skipMemoryTracking != null) {
@@ -138,15 +138,15 @@ class TestabilityRestController {
         ModelFactoryService modelFactoryService) {
       noteTestData.forEach(
           injection -> {
-            Note note = titleNoteMap.get(injection.topic);
+            Note note = titleNoteMap.get(injection.title);
 
-            if (Strings.isBlank(injection.parentTopic)) {
+            if (Strings.isBlank(injection.parentTitle)) {
               note.buildNotebookForHeadNote(ownership, user);
               modelFactoryService.save(note.getNotebook());
             } else {
               note.setParentNote(
                   getParentNote(
-                      titleNoteMap, modelFactoryService.noteRepository, injection.parentTopic));
+                      titleNoteMap, modelFactoryService.noteRepository, injection.parentTitle));
             }
           });
     }
@@ -160,7 +160,7 @@ class TestabilityRestController {
 
     private void saveByOriginalOrder(
         Map<String, Note> titleNoteMap, ModelFactoryService modelFactoryService) {
-      noteTestData.forEach((inject -> modelFactoryService.save(titleNoteMap.get(inject.topic))));
+      noteTestData.forEach((inject -> modelFactoryService.save(titleNoteMap.get(inject.title))));
     }
   }
 

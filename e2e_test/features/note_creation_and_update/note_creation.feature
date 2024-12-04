@@ -5,7 +5,7 @@ Feature: Nested Note creation
   Background:
     Given I am logged in as an existing user
     And I have a notebook with head note "LeSS in Action" and notes:
-      | Topic | Parent Topic   |
+      | Title | Parent Title   |
       | team  | LeSS in Action |
       | tech  | LeSS in Action |
 

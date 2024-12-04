@@ -3,7 +3,7 @@ Feature: link edit and remove
   Background:
     Given I am logged in as an existing user
     And I have a notebook with head note "Space" and notes:
-      | Topic | Parent Topic |
+      | Title | Parent Title |
       | Moon  | Space        |
       | Earth | Space        |
       | Mars  | Space        |

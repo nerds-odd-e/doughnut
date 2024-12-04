@@ -8,7 +8,7 @@ Feature: Notebook assistant
   Background:
     Given I am logged in as an admin
     And I have a notebook with head note "Vertical farming" and notes:
-      | Topic       | Parent Topic     |
+      | Title       | Parent Title     |
       | Acquaponics | Vertical farming |
 
 

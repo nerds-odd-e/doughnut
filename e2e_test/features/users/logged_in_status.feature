@@ -10,7 +10,7 @@ Feature: Logged in status
 
   Scenario: User logout because of session timeout
     Given I have a notebook with head note "Shape" and notes:
-      | Topic    | Parent Topic |
+      | Title    | Parent Title |
       | Triangle | Shape        |
     And I navigate to "My Notes/Shape" note
     When my session is logged out

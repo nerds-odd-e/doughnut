@@ -5,7 +5,7 @@ Feature: Bazaar subscription
 
   Background:
     Given there are some notes for existing user "another_old_learner"
-      | Topic            | Parent Topic| Skip Memory Tracking|
+      | Title            | Parent Title| Skip Memory Tracking|
       | Shape            |             | true       |
       | Square           | Shape       |            |
       | Triangle         | Shape       |            |

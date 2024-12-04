@@ -3,9 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 export type NoteTestData = {
-    Topic?: string;
+    Title?: string;
     Details?: string;
-    'Parent Topic'?: string;
+    'Parent Title'?: string;
     'Skip Memory Tracking'?: boolean;
     'Image Url'?: string;
     'Image Mask'?: string;

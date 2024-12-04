@@ -4,7 +4,7 @@ Feature: Note tree view
   Background:
     Given I am logged in as an existing user
     And I have a notebook with head note "LeSS in Action" and notes:
-      | Topic            | Parent Topic   |
+      | Title            | Parent Title   |
       | TDD              | LeSS in Action |
       | ATDD             | LeSS in Action |
       | CI               | LeSS in Action |

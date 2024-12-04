@@ -6,7 +6,7 @@ Feature: Repetition Quiz
     Given I am logged in as an existing user
     And I have a notebook with the head note "English" which skips review
     And there are some notes:
-      | Topic            | Details                        | Parent Topic|
+      | Title            | Details                        | Parent Title|
       | sedition         | Sedition means incite violence | English     |
       | sedation         | Put to sleep is sedation       | English     |
     And the OpenAI service is unavailable due to invalid system token

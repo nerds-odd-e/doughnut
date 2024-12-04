@@ -82,8 +82,8 @@ const testability = () => {
       const notes: Record<string, string>[] = [
         { Topic: notebook },
         ...new Array(numberOfNotes).fill(0).map((_, index) => ({
-          Topic: `Note about ${index}`,
-          'Parent Topic': notebook,
+          Title: `Note about ${index}`,
+          'Parent Title': notebook,
         })),
       ]
       return this.injectNotes(notes, creatorId)

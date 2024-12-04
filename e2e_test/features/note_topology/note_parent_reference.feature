@@ -5,7 +5,7 @@ Feature: Note parent reference
   Background:
     Given I am logged in as an existing user
     And I have a notebook with head note "LeSS in Action" and notes:
-      | Topic                    | Parent Topic   |
+      | Title                    | Parent Title   |
       | Usually, %P is in-person | LeSS in Action |
 
   Scenario: the note should be rendered with parent reference

@@ -6,7 +6,7 @@ Feature: see recent note update
     Given I am logged in as an existing user
     And I let the server to time travel to 100 hours ago
     And I have a notebook with head note "World" and notes:
-      | Topic   | Parent Topic | Details           |
+      | Title   | Parent Title | Details           |
       | Germany | World        |                   |
       | Japan   | World        |                   |
       | Berlin  | Germany      | Berlin has a wall |

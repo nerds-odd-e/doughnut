@@ -7,7 +7,7 @@ Feature: Bazaar sharing
 
   Scenario: Contributing To Bazaar
     Given I have a notebook with head note "Shape" and notes:
-      | Topic    | Details                   | Parent Topic |
+      | Title    | Details                   | Parent Title |
       | Square   | four equal straight sides | Shape        |
       | Triangle | three sides shape         | Shape        |
     When I choose to share my notebook "Shape"

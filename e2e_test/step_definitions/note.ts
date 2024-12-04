@@ -32,15 +32,15 @@ Given(
 
 Given('there are some notes:', (data: DataTable) => {
   data.hashes().forEach((note) => {
-    if (!note['Parent Topic']) {
-      throw new Error('Parent Topic is required for all notes')
+    if (!note['Parent Title']) {
+      throw new Error('Parent Title is required for all notes')
     }
   })
   start.testability().injectNotes(data.hashes())
 })
 
 Given('I have a notebook with the head note {string}', (noteTopic: string) => {
-  start.testability().injectNotes([{ Topic: noteTopic }])
+  start.testability().injectNotes([{ Title: noteTopic }])
 })
 
 Given(
@@ -48,14 +48,14 @@ Given(
   (noteTopic: string) => {
     start
       .testability()
-      .injectNotes([{ Topic: noteTopic, 'Skip Memory Tracking': true }])
+      .injectNotes([{ Title: noteTopic, 'Skip Memory Tracking': true }])
   }
 )
 
 Given(
   'I have a notebook with the head note {string} and details {string}',
   (noteTopic: string, details: string) => {
-    start.testability().injectNotes([{ Topic: noteTopic, Details: details }])
+    start.testability().injectNotes([{ Title: noteTopic, Details: details }])
   }
 )
 
@@ -69,7 +69,7 @@ Given(
 Given(
   'there is a notebook with head note {string} from user {string} shared to the Bazaar',
   (noteTopic: string, externalIdentifier: string | undefined) => {
-    start.testability().injectNotes([{ Topic: noteTopic }], externalIdentifier)
+    start.testability().injectNotes([{ Title: noteTopic }], externalIdentifier)
     start.testability().shareToBazaar(noteTopic)
   }
 )
@@ -80,7 +80,7 @@ Given(
     const notes = Array(to - from + 1)
       .fill(0)
       .map((_, i) => {
-        return { Topic: `Note ${i + from}` }
+        return { Title: `Note ${i + from}` }
       })
     start.testability().injectNotes(notes)
   }

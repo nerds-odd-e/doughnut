@@ -4,7 +4,7 @@ Feature: Self assessment with random notes and questions
   Background:
     Given I am logged in as an existing user
     And I have a notebook with head note "Countries" and notes:
-      | Topic     | Parent Topic |
+      | Title     | Parent Title |
       | Singapore | Countries    |
       | Vietnam   | Countries    |
     And notebook "Countries" is shared to the Bazaar
