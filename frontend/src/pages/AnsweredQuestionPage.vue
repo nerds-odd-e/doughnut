@@ -36,27 +36,3 @@ watch(() => recallPromptId, fetchData, { immediate: true })
 
 onMounted(fetchData)
 </script>
-
-<style scoped>
-.conversation-button {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-  transition: background-color 0.3s;
-}
-
-.conversation-button:hover {
-  background-color: #45a049;
-}
-</style>

@@ -34,6 +34,7 @@ declare module 'vue' {
     CircleNewDialog: typeof import('./src/components/circles/CircleNewDialog.vue')['default']
     ContentLoader: typeof import('./src/components/commons/ContentLoader.vue')['default']
     ContestableQuestion: typeof import('./src/components/review/ContestableQuestion.vue')['default']
+    ConversationButton: typeof import('./src/components/review/ConversationButton.vue')['default']
     ConversationComponent: typeof import('./src/components/conversations/ConversationComponent.vue')['default']
     ConversationInner: typeof import('./src/components/conversations/ConversationInner.vue')['default']
     ConversationTemplate: typeof import('./src/components/conversations/ConversationTemplate.vue')['default']
