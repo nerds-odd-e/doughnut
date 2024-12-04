@@ -8,6 +8,6 @@ export type NoteBrief = {
     topic?: string;
     details?: string;
     createdAt?: string;
-    target?: string;
+    object?: string;
 };
 

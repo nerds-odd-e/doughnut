@@ -348,7 +348,7 @@ public class Note extends EntityIdentifiedByIdOnly {
     public String topic;
     public String details;
     public String createdAt;
-    public String target;
+    public String object;
   }
 
   @JsonIgnore
@@ -371,7 +371,7 @@ public class Note extends EntityIdentifiedByIdOnly {
     noteBrief.createdAt =
         TimestampOperations.getZonedDateTime(getCreatedAt(), ZoneId.systemDefault()).toString();
     if (targetNote != null) {
-      noteBrief.target =
+      noteBrief.object =
           targetNote.getContextPathString() + PATH_DELIMITER + targetNote.getTopicConstructor();
     }
     return noteBrief;

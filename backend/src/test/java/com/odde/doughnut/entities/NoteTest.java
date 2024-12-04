@@ -107,7 +107,7 @@ public class NoteTest {
       assertThat(brief.details, equalTo("Test Details"));
       assertThat(brief.contextualPath, equalTo(""));
       assertThat(brief.createdAt, notNullValue());
-      assertThat(brief.target, nullValue());
+      assertThat(brief.object, nullValue());
     }
 
     @Test
