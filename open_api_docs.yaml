@@ -4126,7 +4126,7 @@ components:
       properties:
         uri:
           type: string
-        contextPath:
+        contextualPath:
           type: string
         topic:
           type: string

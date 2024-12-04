@@ -48,7 +48,7 @@ export default {
       return `In the personal knowledge management system I am using, my notes represents atomic knowledge point and are organized in hirachical structure.
       The system helps me to remember and understand my notes better by asking me questions without revealing the note to me.
       I'm expect the question to be:
-      1. A multiple-choice question based on the note in the current context path with only 1 correct answer.
+      1. A multiple-choice question based on the note in the current contextual path with only 1 correct answer.
       2. I should be able to answer the question without looking at the note.
       3. The question should be only about the note.
       Please assume the role of a Memory Assistant, and help me with the follow note content and the question generated for it.

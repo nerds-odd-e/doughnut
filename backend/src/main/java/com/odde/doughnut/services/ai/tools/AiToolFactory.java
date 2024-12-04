@@ -22,9 +22,9 @@ public class AiToolFactory {
       Please assume the role of a Memory Assistant, which involves helping me to actively recall, and reinforce information from my notes. As a Memory Assistant, focus on creating exercises that stimulate memory and comprehension. Please adhere to the following steps and guidelines:
 
       1. MUST first search the JSON file to retrieve related context of the note of focus (e.g., parent notes, child notes, and linked notes).
-      2. Then generate a MCQ based on the note in the current context path, only for the note of focus
+      2. Then generate a MCQ based on the note in the current contextual path, only for the note of focus
       3. The retrieved content is used to ensure accuracy and avoid conflicts or ambiguities.
-      4. Only the top-level of the context path is visible to the user; Avoid referencing the “note of focus”; frame questions naturally without revealing its existence.
+      4. Only the top-level of the contextual path is visible to the user; Avoid referencing the “note of focus”; frame questions naturally without revealing its existence.
       5. Provide 2 to 4 choices with only 1 correct answer.
       6. Vary the lengths of the choice texts so that the correct answer isn't consistently the longest.
       7. If there's insufficient information in the note to create a question, leave the 'stem' field empty.
@@ -41,7 +41,7 @@ public class AiToolFactory {
     String messageBody =
         """
 Please assume the role of a learner, who has learned the note of focus as well as many other notes.
-Only the top-level of the context path is visible to you.
+Only the top-level of the contextual path is visible to you.
 Without the specific note of focus and its more detailed contexts revealed to you,
 please critically check if the following question makes sense and is possible to you:
 
@@ -67,8 +67,8 @@ please critically check if the following question makes sense and is possible to
         """
 Please assume the role of a Memory Assistant, which involves helping me review, recall, and reinforce information from my notes. As a Memory Assistant, focus on creating exercises that stimulate memory and comprehension. Please adhere to the following guidelines:
 
-      1. Review the below MCQ which is based on the note in the current context path, the MCQ could be incomplete or incorrect.
-      2. Only the top-level of the context path is visible to the user.
+      1. Review the below MCQ which is based on the note in the current contextual path, the MCQ could be incomplete or incorrect.
+      2. Only the top-level of the contextual path is visible to the user.
       3. Provide 2 to 4 choices with only 1 correct answer.
       4. Vary the lengths of the choice texts so that the correct answer isn't consistently the longest.
       5. Provide a better question based on my question and the note. Please correct any grammar.
@@ -120,7 +120,7 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
   public static AiTool suggestNoteTopicTitle() {
     return new AiTool(
         AiToolName.SUGGEST_NOTE_TOPIC_TITLE.getValue(),
-        "Generate a concise and accurate note topic (a title) based on the note content and pass it to the function for the use to update their note. The topic should be a single word, a phrase or at most a single sentence that captures the atomic concept of the note. It should be specific within the note's context path and do not need to include general information that's already in the context path. Keep the existing topic if it's already correct and concise.",
+        "Generate a concise and accurate note topic (a title) based on the note content and pass it to the function for the use to update their note. The topic should be a single word, a phrase or at most a single sentence that captures the atomic concept of the note. It should be specific within the note's contextual path and do not need to include general information that's already in the contextual path. Keep the existing topic if it's already correct and concise.",
         TopicTitleReplacement.class);
   }
 

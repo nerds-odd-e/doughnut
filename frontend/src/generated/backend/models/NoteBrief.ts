@@ -4,7 +4,7 @@
 /* eslint-disable */
 export type NoteBrief = {
     uri?: string;
-    contextPath?: string;
+    contextualPath?: string;
     topic?: string;
     details?: string;
     createdAt?: string;

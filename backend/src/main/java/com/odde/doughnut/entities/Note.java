@@ -344,7 +344,7 @@ public class Note extends EntityIdentifiedByIdOnly {
 
   public static class NoteBrief {
     public String uri;
-    public String contextPath;
+    public String contextualPath;
     public String topic;
     public String details;
     public String createdAt;
@@ -365,7 +365,7 @@ public class Note extends EntityIdentifiedByIdOnly {
   public NoteBrief getNoteBrief() {
     NoteBrief noteBrief = new NoteBrief();
     noteBrief.uri = getUri();
-    noteBrief.contextPath = getContextPathString();
+    noteBrief.contextualPath = getContextPathString();
     noteBrief.topic = getTopicConstructor();
     noteBrief.details = getDetails();
     noteBrief.createdAt =
