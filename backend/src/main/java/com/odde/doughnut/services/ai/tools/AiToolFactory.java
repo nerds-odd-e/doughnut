@@ -19,7 +19,7 @@ public class AiToolFactory {
   public static AiToolList mcqWithAnswerAiTool() {
     return new AiToolList(
         """
-      Please assume the role of a Memory Assistant, which involves helping me review, recall, and reinforce information from my notes. As a Memory Assistant, focus on creating exercises that stimulate memory and comprehension. Please adhere to the following steps and guidelines:
+      Please assume the role of a Memory Assistant, which involves helping me to actively recall, and reinforce information from my notes. As a Memory Assistant, focus on creating exercises that stimulate memory and comprehension. Please adhere to the following steps and guidelines:
 
       1. MUST first search the JSON file to retrieve related context of the note of focus (e.g., parent notes, child notes, and linked notes).
       2. Then generate a MCQ based on the note in the current context path, only for the note of focus
