@@ -4121,21 +4121,32 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Subscription"
+    ContextualPathItem:
+      type: object
+      properties:
+        topic:
+          type: string
+        uri:
+          type: string
     NoteBrief:
       type: object
       properties:
         uri:
           type: string
         contextualPath:
-          type: string
+          type: array
+          items:
+            $ref: "#/components/schemas/ContextualPathItem"
         topic:
           type: string
         details:
           type: string
         createdAt:
           type: string
-        object:
-          type: string
+        objectPath:
+          type: array
+          items:
+            $ref: "#/components/schemas/ContextualPathItem"
     FailureReport:
       required:
       - createDatetime

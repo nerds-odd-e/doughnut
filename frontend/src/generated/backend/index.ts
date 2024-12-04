@@ -29,6 +29,7 @@ export type { CircleForUserView } from './models/CircleForUserView';
 export type { CircleJoiningByInvitation } from './models/CircleJoiningByInvitation';
 export type { CodeInterpreterResources } from './models/CodeInterpreterResources';
 export type { CodeInterpreterTool } from './models/CodeInterpreterTool';
+export type { ContextualPathItem } from './models/ContextualPathItem';
 export type { Conversation } from './models/Conversation';
 export type { ConversationMessage } from './models/ConversationMessage';
 export type { ConversationSubject } from './models/ConversationSubject';

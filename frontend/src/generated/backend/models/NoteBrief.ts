@@ -2,12 +2,13 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { ContextualPathItem } from './ContextualPathItem';
 export type NoteBrief = {
     uri?: string;
-    contextualPath?: string;
+    contextualPath?: Array<ContextualPathItem>;
     topic?: string;
     details?: string;
     createdAt?: string;
-    object?: string;
+    objectPath?: Array<ContextualPathItem>;
 };
 

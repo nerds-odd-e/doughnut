@@ -263,10 +263,8 @@ public class Note extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  private String getContextPathString() {
-    return getAncestors().stream()
-        .map(Note::getContextualPathItem)
-        .collect(Collectors.joining(PATH_DELIMITER));
+  private ContextualPathItem toContextualPathItem() {
+    return new ContextualPathItem(getTopicConstructor(), getUri());
   }
 
   @JsonIgnore
@@ -349,11 +347,21 @@ public class Note extends EntityIdentifiedByIdOnly {
 
   public static class NoteBrief {
     public String uri;
-    public String contextualPath;
+    public List<ContextualPathItem> contextualPath;
     public String topic;
     public String details;
     public String createdAt;
-    public String object;
+    public List<ContextualPathItem> objectPath;
+  }
+
+  public static class ContextualPathItem {
+    public String topic;
+    public String uri;
+
+    public ContextualPathItem(String topic, String uri) {
+      this.topic = topic;
+      this.uri = uri;
+    }
   }
 
   @JsonIgnore
@@ -370,14 +378,18 @@ public class Note extends EntityIdentifiedByIdOnly {
   public NoteBrief getNoteBrief() {
     NoteBrief noteBrief = new NoteBrief();
     noteBrief.uri = getUri();
-    noteBrief.contextualPath = getContextPathString();
+    noteBrief.contextualPath =
+        getAncestors().stream().map(Note::toContextualPathItem).collect(Collectors.toList());
     noteBrief.topic = getTopicConstructor();
     noteBrief.details = getDetails();
     noteBrief.createdAt =
         TimestampOperations.getZonedDateTime(getCreatedAt(), ZoneId.systemDefault()).toString();
     if (targetNote != null) {
-      noteBrief.object =
-          targetNote.getContextPathString() + PATH_DELIMITER + targetNote.getTopicConstructor();
+      List<ContextualPathItem> objectPath =
+          new ArrayList<>(
+              targetNote.getAncestors().stream().map(Note::toContextualPathItem).toList());
+      objectPath.add(targetNote.toContextualPathItem());
+      noteBrief.objectPath = objectPath;
     }
     return noteBrief;
   }
