@@ -196,6 +196,7 @@ describe("ConversationInner", () => {
 
   describe("Tool Call Handling", () => {
     const testCompletion = "**bold completion**"
+    const renderedCompletion = "bold completion"
     const threadId = "thread-123"
     const runId = "run-123"
     const toolCallId = "call-456"
@@ -213,6 +214,34 @@ describe("ConversationInner", () => {
             completion: testCompletion,
           }
         )
+      )
+    })
+
+    it("formats completion suggestion correctly based on existing content", async () => {
+      // Test empty note details
+      noteRealm.note.details = ""
+      storageAccessor.refreshNoteRealm(noteRealm)
+      await submitMessageAndSimulateRunResponse(
+        wrapper,
+        createRunResponse(
+          DummyForGeneratingTypes.aiToolName.COMPLETE_NOTE_DETAILS,
+          { completion: testCompletion }
+        )
+      )
+      expect(wrapper.find(".completion-text").text()).toBe(renderedCompletion)
+
+      // Test with existing note details
+      noteRealm.note.details = "Existing content"
+      storageAccessor.refreshNoteRealm(noteRealm)
+      await submitMessageAndSimulateRunResponse(
+        wrapper,
+        createRunResponse(
+          DummyForGeneratingTypes.aiToolName.COMPLETE_NOTE_DETAILS,
+          { completion: testCompletion }
+        )
+      )
+      expect(wrapper.find(".completion-text").text()).toBe(
+        `...${renderedCompletion}`
       )
     })
 
@@ -284,6 +313,9 @@ describe("ConversationInner", () => {
           }
         )
       )
+
+      // Check the formatted suggestion shows with ellipsis
+      expect(wrapper.find(".completion-text").text()).toBe("... friends!")
 
       // Accept the suggestion
       await wrapper.find('button[class*="btn-primary"]').trigger("click")
