@@ -84,7 +84,7 @@ describe("in place edit on title", () => {
     await wrapper.find('[role="topic"] input').setValue("updated")
     wrapper.unmount()
     expect(mockedUpdateTopicCall).toBeCalledWith(note.id, {
-      topicConstructor: "updated",
+      newTitle: "updated",
     })
   })
 
@@ -108,7 +108,7 @@ describe("in place edit on title", () => {
     await editTitle(wrapper, "updated")
     await wrapper.find('[role="topic"] input').trigger("blur")
     expect(mockedUpdateTopicCall).toBeCalledWith(note.id, {
-      topicConstructor: "updated",
+      newTitle: "updated",
     })
   })
 
@@ -117,7 +117,7 @@ describe("in place edit on title", () => {
     await editTitle(wrapper, "updated")
 
     await wrapper.setProps({
-      note: { ...note, topicConstructor: "different value" },
+      note: { ...note, opicConstructor: "different value" },
     })
     expect(
       wrapper.find<HTMLInputElement>('[role="topic"] input').element.value
@@ -133,7 +133,7 @@ describe("in place edit on title", () => {
         ...note,
         noteTopology: {
           ...note.noteTopology,
-          topicConstructor: "different value",
+          titleOrPredicate: "different value",
         },
       },
     })

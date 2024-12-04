@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.NoteUpdateDetailsDTO;
-import com.odde.doughnut.controllers.dto.NoteUpdateTopicDTO;
+import com.odde.doughnut.controllers.dto.NoteUpdateTitleDTO;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -43,16 +43,16 @@ class RestTextContentControllerTests {
 
   @Nested
   class updateNoteTopticTest {
-    NoteUpdateTopicDTO noteUpdateTopicDTO = new NoteUpdateTopicDTO();
+    NoteUpdateTitleDTO noteUpdateTitleDTO = new NoteUpdateTitleDTO();
 
     @BeforeEach
     void setup() {
-      noteUpdateTopicDTO.setTopicConstructor("new title");
+      noteUpdateTitleDTO.setNewTitle("new title");
     }
 
     @Test
     void shouldBeAbleToSaveNoteTopic() throws UnexpectedNoAccessRightException, IOException {
-      NoteRealm response = controller.updateNoteTopicConstructor(note, noteUpdateTopicDTO);
+      NoteRealm response = controller.updateNoteTopicConstructor(note, noteUpdateTitleDTO);
       assertThat(response.getId(), equalTo(note.getId()));
       assertThat(response.getNote().getTopicConstructor(), equalTo("new title"));
     }
@@ -62,7 +62,7 @@ class RestTextContentControllerTests {
       note = makeMe.aNote("another").creatorAndOwner(makeMe.aUser().please()).please();
       assertThrows(
           UnexpectedNoAccessRightException.class,
-          () -> controller.updateNoteTopicConstructor(note, noteUpdateTopicDTO));
+          () -> controller.updateNoteTopicConstructor(note, noteUpdateTitleDTO));
     }
   }
 

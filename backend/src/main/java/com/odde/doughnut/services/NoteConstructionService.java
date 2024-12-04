@@ -73,8 +73,7 @@ public record NoteConstructionService(
       throws InterruptedException, IOException, BindException {
     try {
       Note note =
-          createNoteWithWikidataInfo(
-              parentNote, wikidataIdWithApi, noteCreation.getTopicConstructor());
+          createNoteWithWikidataInfo(parentNote, wikidataIdWithApi, noteCreation.getNewTitle());
       return new NoteCreationRresult(
           new NoteViewer(user, note).toJsonObject(),
           new NoteViewer(user, parentNote).toJsonObject());

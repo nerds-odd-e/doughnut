@@ -3,21 +3,21 @@
     <fieldset :disabled="processing">
       <div class="topic-search-container">
         <NoteFormTopicOnly
-          v-model="creationData.topicConstructor"
-          :error-message="noteFormErrors.topicConstructor"
+          v-model="creationData.newTitle"
+          :error-message="noteFormErrors.newTitle"
           @focus="showDropdown = true"
           @blur="onTopicBlur"
         />
         <SuggestTopic
-          :original-topic="creationData.topicConstructor"
+          :original-topic="creationData.newTitle"
           :suggested-topic="suggestedTopic"
           @suggested-topic-selected="takeSuggestedTopic"
         />
         <SearchResults
-          v-show="showDropdown && creationData.topicConstructor"
+          v-show="showDropdown && creationData.newTitle"
           v-bind="{
             noteId: referenceNote.id,
-            inputSearchKey: creationData.topicConstructor,
+            inputSearchKey: creationData.newTitle,
             isDropdown: true
           }"
           class="topic-search-results"
@@ -25,7 +25,7 @@
       </div>
 
       <WikidataSearchByLabel
-        :search-key="creationData.topicConstructor"
+        :search-key="creationData.newTitle"
         v-model="creationData.wikidataId"
         :error-message="noteFormErrors.wikidataId"
         @selected="onSelectWikidataEntry"
@@ -66,12 +66,12 @@ const emit = defineEmits<{
 
 // Reactive state
 const creationData = ref<NoteCreationDTO>({
-  topicConstructor: "Untitled",
+  newTitle: "Untitled",
   wikidataId: "",
 })
 
 const noteFormErrors = ref({
-  topicConstructor: undefined as undefined | string,
+  newTitle: undefined as undefined | string,
   wikidataId: undefined as undefined | string,
 })
 
@@ -84,7 +84,7 @@ const processForm = async () => {
   if (processing.value) return
   processing.value = true
   noteFormErrors.value.wikidataId = undefined
-  noteFormErrors.value.topicConstructor = undefined
+  noteFormErrors.value.newTitle = undefined
 
   const api = props.storageAccessor.storedApi()
   try {
@@ -100,7 +100,7 @@ const processForm = async () => {
     emit("closeDialog")
   } catch (res: unknown) {
     noteFormErrors.value = {
-      topicConstructor: undefined,
+      newTitle: undefined,
       wikidataId: undefined,
       ...(res as object),
     }
@@ -110,11 +110,11 @@ const processForm = async () => {
 }
 
 const onSelectWikidataEntry = (selectedSuggestion: WikidataSearchEntity) => {
-  const currentLabel = creationData.value.topicConstructor.toUpperCase()
+  const currentLabel = creationData.value.newTitle.toUpperCase()
   const newLabel = selectedSuggestion.label.toUpperCase()
 
   if (currentLabel === newLabel) {
-    creationData.value.topicConstructor = selectedSuggestion.label
+    creationData.value.newTitle = selectedSuggestion.label
     suggestedTopic.value = ""
   } else {
     suggestedTopic.value = selectedSuggestion.label
@@ -124,7 +124,7 @@ const onSelectWikidataEntry = (selectedSuggestion: WikidataSearchEntity) => {
 }
 
 const takeSuggestedTopic = (topic: string) => {
-  creationData.value.topicConstructor = topic
+  creationData.value.newTitle = topic
   suggestedTopic.value = ""
 }
 

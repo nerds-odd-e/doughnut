@@ -221,7 +221,7 @@ class RestConversationMessageControllerTest {
     }
 
     @Test
-    void topicOwnerShouldBeAbleToReply() throws UnexpectedNoAccessRightException {
+    void ownerShouldBeAbleToReply() throws UnexpectedNoAccessRightException {
       String message = "This is a message";
       makeMe
           .theNotebook(assessmentQuestionInstance.getAssessmentAttempt().getNotebook())

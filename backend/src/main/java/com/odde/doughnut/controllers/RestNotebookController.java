@@ -56,7 +56,7 @@ class RestNotebookController {
             .getOwnership()
             .createAndPersistNotebook(
                 userEntity, testabilitySettings.getCurrentUTCTimestamp(),
-                modelFactoryService, noteCreation.getTopicConstructor());
+                modelFactoryService, noteCreation.getNewTitle());
     return new RedirectToNoteResponse(note.getId());
   }
 

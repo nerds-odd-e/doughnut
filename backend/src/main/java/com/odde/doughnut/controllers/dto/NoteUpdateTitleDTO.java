@@ -6,10 +6,10 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
-public class NoteUpdateTopicDTO {
+public class NoteUpdateTitleDTO {
   @Size(min = 1, max = Note.MAX_TITLE_LENGTH)
   @Getter
   @Setter
   @NotNull
-  private String topicConstructor = "";
+  private String newTitle = "";
 }

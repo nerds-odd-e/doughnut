@@ -1,8 +1,8 @@
 <template>
   <form @submit.prevent.once="processForm">
     <NoteFormTopicOnly
-      v-model="noteFormData.topicConstructor"
-      :error-message="errors.topicConstructor"
+      v-model="noteFormData.newTitle"
+      :error-message="errors.newTitle"
     />
     <input type="submit" value="Submit" class="btn btn-primary" />
   </form>
@@ -24,8 +24,8 @@ export default {
   },
   data() {
     return {
-      noteFormData: { topicConstructor: "" } as NoteCreationDTO,
-      errors: { topicConstructor: undefined as undefined | string },
+      noteFormData: { newTitle: "" } as NoteCreationDTO,
+      errors: { newTitle: undefined as undefined | string },
     }
   },
   methods: {

@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type NoteUpdateTopicDTO = {
-    topicConstructor: string;
+export type NoteUpdateTitleDTO = {
+    newTitle: string;
 };
 

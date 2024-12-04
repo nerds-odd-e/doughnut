@@ -4,7 +4,7 @@
 /* eslint-disable */
 import type { NoteRealm } from '../models/NoteRealm';
 import type { NoteUpdateDetailsDTO } from '../models/NoteUpdateDetailsDTO';
-import type { NoteUpdateTopicDTO } from '../models/NoteUpdateTopicDTO';
+import type { NoteUpdateTitleDTO } from '../models/NoteUpdateTitleDTO';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestTextContentControllerService {
@@ -17,7 +17,7 @@ export class RestTextContentControllerService {
      */
     public updateNoteTopicConstructor(
         note: number,
-        requestBody: NoteUpdateTopicDTO,
+        requestBody: NoteUpdateTitleDTO,
     ): CancelablePromise<NoteRealm> {
         return this.httpRequest.request({
             method: 'PATCH',

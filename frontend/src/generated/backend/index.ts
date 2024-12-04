@@ -88,7 +88,7 @@ export type { NotesTestData } from './models/NotesTestData';
 export type { NoteTestData } from './models/NoteTestData';
 export { NoteTopology } from './models/NoteTopology';
 export type { NoteUpdateDetailsDTO } from './models/NoteUpdateDetailsDTO';
-export type { NoteUpdateTopicDTO } from './models/NoteUpdateTopicDTO';
+export type { NoteUpdateTitleDTO } from './models/NoteUpdateTitleDTO';
 export type { Ownership } from './models/Ownership';
 export type { PredefinedQuestion } from './models/PredefinedQuestion';
 export type { PredefinedQuestionsTestData } from './models/PredefinedQuestionsTestData';

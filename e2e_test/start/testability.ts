@@ -80,7 +80,7 @@ const testability = () => {
       creatorId?: string
     ) {
       const notes: Record<string, string>[] = [
-        { Topic: notebook },
+        { Title: notebook },
         ...new Array(numberOfNotes).fill(0).map((_, index) => ({
           Title: `Note about ${index}`,
           'Parent Title': notebook,

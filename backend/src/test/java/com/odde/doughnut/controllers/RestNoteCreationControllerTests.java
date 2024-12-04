@@ -81,7 +81,7 @@ class RestNoteCreationControllerTests {
     @BeforeEach
     void setup() {
       parent = makeMe.aNote().creatorAndOwner(userModel).please();
-      noteCreation.setTopicConstructor("new title");
+      noteCreation.setNewTitle("new title");
     }
 
     @Test
@@ -236,7 +236,7 @@ class RestNoteCreationControllerTests {
         mockWikidataHumanEntity("Q8337", null, "Q34660");
         mockWikidataEntity("Q34660", "Canada");
         noteCreation.setWikidataId("Q8337");
-        noteCreation.setTopicConstructor("Johnny boy");
+        noteCreation.setNewTitle("Johnny boy");
         NoteRealm note = controller.createNote(parent, noteCreation).getCreated();
 
         assertEquals("Johnny boy", note.getNote().getTopicConstructor());
@@ -252,7 +252,7 @@ class RestNoteCreationControllerTests {
         mockWikidataEntity("Q34660", "J. K. Rowling");
         mockWikidataEntity("Q12345", "The girl sat next to the window");
         noteCreation.setWikidataId("Q8337");
-        noteCreation.setTopicConstructor("Harry Potter");
+        noteCreation.setNewTitle("Harry Potter");
       }
 
       @Test
@@ -301,7 +301,7 @@ class RestNoteCreationControllerTests {
       Note parent = makeMe.aNote().creatorAndOwner(userModel).please();
       referenceNote = makeMe.aNote().under(parent).please();
       makeMe.aNote("next sibling").under(parent).please();
-      noteCreation.setTopicConstructor("new note");
+      noteCreation.setNewTitle("new note");
     }
 
     @Test

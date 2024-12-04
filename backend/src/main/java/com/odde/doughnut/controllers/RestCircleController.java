@@ -105,7 +105,7 @@ class RestCircleController {
                 currentUser.getEntity(),
                 testabilitySettings.getCurrentUTCTimestamp(),
                 modelFactoryService,
-                noteCreation.getTopicConstructor());
+                noteCreation.getNewTitle());
     return new RedirectToNoteResponse(note.getId());
   }
 }

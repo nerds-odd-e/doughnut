@@ -457,7 +457,7 @@ describe("ConversationInner", () => {
 
       expect(
         helper.managedApi.restTextContentController.updateNoteTopicConstructor
-      ).toHaveBeenCalledWith(note.id, { topicConstructor: testTitle })
+      ).toHaveBeenCalledWith(note.id, { newTitle: testTitle })
 
       expect(
         helper.managedApi.restAiController.submitToolCallsResult

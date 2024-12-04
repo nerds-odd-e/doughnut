@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type NoteCreationDTO = {
-    topicConstructor: string;
+    newTitle: string;
     wikidataId?: string;
 };
 
