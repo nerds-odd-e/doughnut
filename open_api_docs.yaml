@@ -3850,6 +3850,7 @@ components:
     NoteDetailsCompletion:
       required:
       - completion
+      - deleteFromEnd
       type: object
       properties:
         completion:

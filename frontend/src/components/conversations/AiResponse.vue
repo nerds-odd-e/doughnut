@@ -85,7 +85,12 @@
 <script setup lang="ts">
 import { ref, computed, watch } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import type { Conversation, Note, NoteDetailsCompletion, ToolCallResult } from "@/generated/backend"
+import type {
+  Conversation,
+  Note,
+  NoteDetailsCompletion,
+  ToolCallResult,
+} from "@/generated/backend"
 import SvgRobot from "@/components/svgs/SvgRobot.vue"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import markdownizer from "../form/markdownizer"

@@ -449,7 +449,7 @@ describe("NoteAudioTools", () => {
 
     it("stores and reuses thread context between calls", async () => {
       const mockResponse1: TextFromAudioWithCallInfo = {
-        completionFromAudio: { completion: "text1" },
+        completionFromAudio: { completion: "text1", deleteFromEnd: 0 },
         toolCallInfo: {
           threadId: "thread-123",
           runId: "run-123",
@@ -458,7 +458,7 @@ describe("NoteAudioTools", () => {
       }
 
       const mockResponse2: TextFromAudioWithCallInfo = {
-        completionFromAudio: { completion: "text2" },
+        completionFromAudio: { completion: "text2", deleteFromEnd: 0 },
         toolCallInfo: {
           threadId: "thread-123",
           runId: "run-124",
@@ -501,7 +501,7 @@ describe("NoteAudioTools", () => {
 
     it("maintains thread context even after errors", async () => {
       const mockResponse: TextFromAudioWithCallInfo = {
-        completionFromAudio: { completion: "text1" },
+        completionFromAudio: { completion: "text1", deleteFromEnd: 0 },
         toolCallInfo: {
           threadId: "thread-123",
           runId: "run-123",

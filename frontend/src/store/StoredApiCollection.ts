@@ -54,7 +54,10 @@ export interface StoredApi {
     value: string
   ): Promise<void>
 
-  completeDetails(noteId: Doughnut.ID, value?: NoteDetailsCompletion): Promise<void>
+  completeDetails(
+    noteId: Doughnut.ID,
+    value?: NoteDetailsCompletion
+  ): Promise<void>
 
   updateWikidataId(
     noteId: Doughnut.ID,
@@ -252,7 +255,11 @@ export default class StoredApiCollection implements StoredApi {
     if (!value) return
     const currentNote = this.storage.refOfNoteRealm(noteId).value?.note
     const old = currentNote?.details ?? ""
-    return this.updateTextField(noteId, "edit details", old + (value.completion ?? ""))
+    return this.updateTextField(
+      noteId,
+      "edit details",
+      old + (value.completion ?? "")
+    )
   }
 
   private async undoInner() {
