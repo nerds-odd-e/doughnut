@@ -65,7 +65,7 @@ class RestAiAudioControllerTests {
 
   private void setupMocks() {
     TextFromAudioWithCallInfo completionMarkdownFromAudio = new TextFromAudioWithCallInfo();
-    completionMarkdownFromAudio.setCompletionFromAudio(new NoteDetailsCompletion("test123", 0));
+    completionMarkdownFromAudio.setCompletionFromAudio(new NoteDetailsCompletion(0, "test123"));
     openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
     openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(
         completionMarkdownFromAudio, "audio_transcription_to_text");
