@@ -4143,10 +4143,10 @@ components:
           type: string
         createdAt:
           type: string
-        objectPath:
-          type: array
-          items:
-            $ref: "#/components/schemas/ContextualPathItem"
+        parent:
+          type: string
+        object:
+          type: string
     FailureReport:
       required:
       - createDatetime

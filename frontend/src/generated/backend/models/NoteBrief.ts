@@ -9,6 +9,7 @@ export type NoteBrief = {
     topic?: string;
     details?: string;
     createdAt?: string;
-    objectPath?: Array<ContextualPathItem>;
+    parent?: string;
+    object?: string;
 };
 

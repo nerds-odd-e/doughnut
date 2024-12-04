@@ -107,7 +107,8 @@ public class NoteTest {
       assertThat(brief.details, equalTo("Test Details"));
       assertThat(brief.contextualPath, empty());
       assertThat(brief.createdAt, notNullValue());
-      assertThat(brief.objectPath, nullValue());
+      assertThat(brief.parent, nullValue());
+      assertThat(brief.object, nullValue());
     }
 
     @Test
@@ -119,16 +120,23 @@ public class NoteTest {
       Note.NoteBrief brief = note.getNoteBrief();
 
       assertThat(brief.contextualPath, hasSize(2));
-
-      // Check first item (Grandparent)
       assertThat(brief.contextualPath.get(0).topic, equalTo("Grandparent"));
       assertThat(brief.contextualPath.get(0).uri, equalTo("/n" + grandparent.getId()));
-
-      // Check second item (Parent)
       assertThat(brief.contextualPath.get(1).topic, equalTo("Parent"));
       assertThat(brief.contextualPath.get(1).uri, equalTo("/n" + parent.getId()));
-
       assertThat(brief.topic, equalTo("Child"));
+    }
+
+    @Test
+    void shouldIncludeParentAndObjectUris() {
+      Note parent = makeMe.aNote().titleConstructor("Parent").please();
+      Note target = makeMe.aNote().titleConstructor("Target").please();
+      Note note = makeMe.aLink().between(parent, target).please();
+
+      Note.NoteBrief brief = note.getNoteBrief();
+
+      assertThat(brief.parent, equalTo("/n" + parent.getId()));
+      assertThat(brief.object, equalTo("/n" + target.getId()));
     }
   }
 }

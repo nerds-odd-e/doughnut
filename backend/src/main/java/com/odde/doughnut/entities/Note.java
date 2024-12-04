@@ -351,7 +351,8 @@ public class Note extends EntityIdentifiedByIdOnly {
     public String topic;
     public String details;
     public String createdAt;
-    public List<ContextualPathItem> objectPath;
+    public String parent;
+    public String object;
   }
 
   public static class ContextualPathItem {
@@ -384,13 +385,8 @@ public class Note extends EntityIdentifiedByIdOnly {
     noteBrief.details = getDetails();
     noteBrief.createdAt =
         TimestampOperations.getZonedDateTime(getCreatedAt(), ZoneId.systemDefault()).toString();
-    if (targetNote != null) {
-      List<ContextualPathItem> objectPath =
-          new ArrayList<>(
-              targetNote.getAncestors().stream().map(Note::toContextualPathItem).toList());
-      objectPath.add(targetNote.toContextualPathItem());
-      noteBrief.objectPath = objectPath;
-    }
+    noteBrief.parent = getParent() != null ? getParent().getUri() : null;
+    noteBrief.object = targetNote != null ? targetNote.getUri() : null;
     return noteBrief;
   }
 
