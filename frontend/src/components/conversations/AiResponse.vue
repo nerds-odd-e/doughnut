@@ -318,10 +318,12 @@ const formattedCompletionSuggestion = computed(() => {
 
   // Get the text to be deleted (last N characters)
   const textToDelete = currentDetails.slice(-deleteFromEnd) || currentDetails
-  const remainingText = currentDetails.slice(0, -deleteFromEnd)
 
-  // Format with markdown strikethrough
-  return `${remainingText}~~${textToDelete}~~${completion}`
+  // Replace spaces and newlines with placeholder characters
+  const strikeThroughText = textToDelete.replace(/ /g, "·").replace(/\n/g, "↵")
+
+  // Format with markdown strikethrough using the placeholder
+  return `~~${strikeThroughText}~~${completion}`
 })
 
 defineExpose({

@@ -257,16 +257,14 @@ describe("ConversationInner", () => {
       )
 
       // The markdown ~~world~~ should render as strikethrough text
-      expect(wrapper.find(".completion-text").text()).toBe(
-        "Hello world friends!"
-      )
+      expect(wrapper.find(".completion-text").text()).toBe("world friends!")
       expect(wrapper.find(".completion-text").html()).toContain(
         "<del>world</del>"
       )
     })
 
     it("handles strikethrough when deleteFromEnd is larger than existing content", async () => {
-      noteRealm.note.details = "Short text"
+      noteRealm.note.details = "Short\ntext"
       storageAccessor.refreshNoteRealm(noteRealm)
       await submitMessageAndSimulateRunResponse(
         wrapper,
@@ -278,10 +276,7 @@ describe("ConversationInner", () => {
 
       // The entire existing text should be struck through
       expect(wrapper.find(".completion-text").text()).toBe(
-        "Short textNew content"
-      )
-      expect(wrapper.find(".completion-text").html()).toContain(
-        "<del>Short text</del>"
+        "Short↵textNew content"
       )
     })
 
@@ -355,8 +350,11 @@ describe("ConversationInner", () => {
       )
 
       // Check the formatted suggestion shows with ellipsis
-      expect(wrapper.find(".completion-text").text()).toBe("... friends!")
+      expect(wrapper.find(".completion-text").text()).toBe("·world friends!")
 
+      expect(wrapper.find(".completion-text").html()).toContain(
+        "<del>·world</del>"
+      )
       // Accept the suggestion
       await wrapper.find('button[class*="btn-primary"]').trigger("click")
       await flushPromises()
