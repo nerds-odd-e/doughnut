@@ -14,6 +14,7 @@ class SuggestQuestionForFineTuningBuilder extends Builder<SuggestedQuestionForFi
           choices: ["Paris", "London", "Berlin"],
         },
         correctChoiceIndex: 1,
+        strictChoiceOrder: false,
       },
       preservedNoteContent: "this is the note content",
       comment: "",

@@ -3203,6 +3203,7 @@ components:
       required:
       - correctChoiceIndex
       - multipleChoicesQuestion
+      - strictChoiceOrder
       type: object
       properties:
         multipleChoicesQuestion:

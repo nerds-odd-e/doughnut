@@ -15,7 +15,7 @@ public class NoteDetailsCompletion {
   public String completion;
 
   @JsonPropertyDescription(
-      "Number of characters to delete from the end of existing details before appending the completion. Use this to remove trailing spaces, incomplete words, or punctuation. Default is 0.")
-  @JsonProperty(defaultValue = "0")
-  public Integer deleteFromEnd = 0;
+      "Number of characters to delete from the end of existing details before appending the completion. Use this to remove trailing spaces, incomplete words, or punctuation. 0 means no deletion.")
+  @JsonProperty(required = true)
+  public Integer deleteFromEnd;
 }
