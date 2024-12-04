@@ -15,4 +15,9 @@ public class MCQWithAnswer {
   @JsonPropertyDescription("Index of the correct choice. 0-based.")
   @JsonProperty(required = true)
   private int correctChoiceIndex;
+
+  @JsonPropertyDescription(
+      "If true, the order of choices should not be randomized due to interdependent statements like 'None of the above'")
+  @JsonProperty(defaultValue = "false")
+  private boolean strictChoiceOrder = false;
 }
