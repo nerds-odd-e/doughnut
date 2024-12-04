@@ -93,4 +93,44 @@ public class NoteTest {
       assertNull(child.getImageWithMask());
     }
   }
+
+  @Nested
+  class NoteBrief {
+    @Test
+    void shouldIncludeBasicNoteInformation() {
+      Note note = makeMe.aNote()
+          .titleConstructor("Test Topic")
+          .details("Test Details")
+          .please();
+
+      Note.NoteBrief brief = note.getNoteBrief();
+
+      assertThat(brief.uri, equalTo("/n" + note.getId()));
+      assertThat(brief.topic, equalTo("Test Topic"));
+      assertThat(brief.details, equalTo("Test Details"));
+      assertThat(brief.contextPath, equalTo(""));
+      assertThat(brief.createdAt, notNullValue());
+      assertThat(brief.target, nullValue());
+    }
+
+    @Test
+    void shouldIncludeContextPathWithAncestors() {
+      Note grandparent = makeMe.aNote()
+          .titleConstructor("Grandparent")
+          .please();
+      Note parent = makeMe.aNote()
+          .titleConstructor("Parent")
+          .under(grandparent)
+          .please();
+      Note note = makeMe.aNote()
+          .titleConstructor("Child")
+          .under(parent)
+          .please();
+
+      Note.NoteBrief brief = note.getNoteBrief();
+
+      assertThat(brief.contextPath, equalTo("Grandparent › Parent"));
+      assertThat(brief.topic, equalTo("Child"));
+    }
+  }
 }
