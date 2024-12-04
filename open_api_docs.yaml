@@ -3210,6 +3210,8 @@ components:
         correctChoiceIndex:
           type: integer
           format: int32
+        strictChoiceOrder:
+          type: boolean
     MultipleChoicesQuestion:
       required:
       - choices
