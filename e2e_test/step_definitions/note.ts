@@ -23,9 +23,9 @@ defineParameterType({
 
 Given(
   'I have a notebook with head note {string} and notes:',
-  (notebookTopic: string, data: DataTable) => {
+  (notebookTitle: string, data: DataTable) => {
     const notes = data.hashes()
-    notes.unshift({ Topic: notebookTopic })
+    notes.unshift({ Title: notebookTitle })
     start.testability().injectNotes(notes)
   }
 )

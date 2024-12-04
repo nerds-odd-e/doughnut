@@ -30,7 +30,6 @@ import lombok.Setter;
 @JsonPropertyOrder({"topic", "noteTopic", "details", "parentId", "linkType", "updatedAt"})
 public class Note extends EntityIdentifiedByIdOnly {
   public static final int MAX_TITLE_LENGTH = 150;
-  private static final String PATH_DELIMITER = " › ";
   public static final String NOTE_OF_CURRENT_FOCUS = "note of current focus";
 
   @OneToOne

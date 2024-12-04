@@ -61,7 +61,7 @@ class AiOpenAiAssistantFactoryTest {
           topicTitleTool
               .get()
               .description()
-              .contains("Generate a concise and accurate note topic"));
+              .contains("Generate a concise and accurate note title"));
     }
 
     @Test

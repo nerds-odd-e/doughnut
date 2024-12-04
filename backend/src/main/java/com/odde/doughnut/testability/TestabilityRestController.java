@@ -152,10 +152,10 @@ class TestabilityRestController {
     }
 
     private Note getParentNote(
-        Map<String, Note> titleNoteMap, NoteRepository noteRepository, String parentTopic) {
-      Note parentNote = titleNoteMap.get(parentTopic);
+        Map<String, Note> titleNoteMap, NoteRepository noteRepository, String parentTitle) {
+      Note parentNote = titleNoteMap.get(parentTitle);
       if (parentNote != null) return parentNote;
-      return noteRepository.findFirstByTopicConstructor(parentTopic);
+      return noteRepository.findFirstByTopicConstructor(parentTitle);
     }
 
     private void saveByOriginalOrder(

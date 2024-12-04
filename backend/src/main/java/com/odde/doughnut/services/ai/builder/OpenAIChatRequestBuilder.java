@@ -11,7 +11,7 @@ import java.util.List;
 
 public class OpenAIChatRequestBuilder {
   public static final String systemInstruction =
-      "This is a PKM system using hierarchical notes, each with a topic and details, to capture atomic concepts.";
+      "This is a PKM system using hierarchical notes, each with a title and details, to capture atomic concepts.";
   public final List<ChatMessage> messages = new ArrayList<>();
   private final List<ChatTool> chatTools = new ArrayList<>();
   ChatCompletionRequest.ChatCompletionRequestBuilder builder = ChatCompletionRequest.builder();
