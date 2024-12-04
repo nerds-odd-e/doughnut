@@ -225,7 +225,7 @@ describe("ConversationInner", () => {
         wrapper,
         createRunResponse(
           DummyForGeneratingTypes.aiToolName.COMPLETE_NOTE_DETAILS,
-          { completion: testCompletion }
+          { completion: testCompletion, deleteFromEnd: 0 }
         )
       )
       expect(wrapper.find(".completion-text").text()).toBe(renderedCompletion)
@@ -237,11 +237,51 @@ describe("ConversationInner", () => {
         wrapper,
         createRunResponse(
           DummyForGeneratingTypes.aiToolName.COMPLETE_NOTE_DETAILS,
-          { completion: testCompletion }
+          { completion: testCompletion, deleteFromEnd: 0 }
         )
       )
       expect(wrapper.find(".completion-text").text()).toBe(
         `...${renderedCompletion}`
+      )
+    })
+
+    it("formats completion suggestion with strikethrough for deleted content", async () => {
+      noteRealm.note.details = "Hello world"
+      storageAccessor.refreshNoteRealm(noteRealm)
+      await submitMessageAndSimulateRunResponse(
+        wrapper,
+        createRunResponse(
+          DummyForGeneratingTypes.aiToolName.COMPLETE_NOTE_DETAILS,
+          { completion: " friends!", deleteFromEnd: 5 }
+        )
+      )
+
+      // The markdown ~~world~~ should render as strikethrough text
+      expect(wrapper.find(".completion-text").text()).toBe(
+        "Hello world friends!"
+      )
+      expect(wrapper.find(".completion-text").html()).toContain(
+        "<del>world</del>"
+      )
+    })
+
+    it("handles strikethrough when deleteFromEnd is larger than existing content", async () => {
+      noteRealm.note.details = "Short text"
+      storageAccessor.refreshNoteRealm(noteRealm)
+      await submitMessageAndSimulateRunResponse(
+        wrapper,
+        createRunResponse(
+          DummyForGeneratingTypes.aiToolName.COMPLETE_NOTE_DETAILS,
+          { completion: "New content", deleteFromEnd: 20 }
+        )
+      )
+
+      // The entire existing text should be struck through
+      expect(wrapper.find(".completion-text").text()).toBe(
+        "Short textNew content"
+      )
+      expect(wrapper.find(".completion-text").html()).toContain(
+        "<del>Short text</del>"
       )
     })
 

@@ -310,9 +310,18 @@ watch(
 const formattedCompletionSuggestion = computed(() => {
   if (!completionSuggestion.value) return ""
   const currentDetails = conversation.subject?.note?.details?.trim() || ""
-  return currentDetails
-    ? `...${completionSuggestion.value.completion}`
-    : completionSuggestion.value.completion
+  const { completion, deleteFromEnd } = completionSuggestion.value
+
+  if (!currentDetails) return completion
+
+  if (!deleteFromEnd) return `...${completion}`
+
+  // Get the text to be deleted (last N characters)
+  const textToDelete = currentDetails.slice(-deleteFromEnd) || currentDetails
+  const remainingText = currentDetails.slice(0, -deleteFromEnd)
+
+  // Format with markdown strikethrough
+  return `${remainingText}~~${textToDelete}~~${completion}`
 })
 
 defineExpose({
