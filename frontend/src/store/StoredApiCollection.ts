@@ -1,4 +1,5 @@
 import type {
+  NoteDetailsCompletion,
   NoteMoveDTO,
   NoteRealm,
   WikidataAssociationCreation,
@@ -53,7 +54,7 @@ export interface StoredApi {
     value: string
   ): Promise<void>
 
-  appendDetails(noteId: Doughnut.ID, value: string): Promise<void>
+  completeDetails(noteId: Doughnut.ID, value?: NoteDetailsCompletion): Promise<void>
 
   updateWikidataId(
     noteId: Doughnut.ID,
@@ -247,10 +248,11 @@ export default class StoredApiCollection implements StoredApi {
     await this.updateTextContentWithoutUndo(noteId, field, value)
   }
 
-  async appendDetails(noteId: Doughnut.ID, value: string) {
+  async completeDetails(noteId: Doughnut.ID, value?: NoteDetailsCompletion) {
+    if (!value) return
     const currentNote = this.storage.refOfNoteRealm(noteId).value?.note
     const old = currentNote?.details ?? ""
-    return this.updateTextField(noteId, "edit details", old + value)
+    return this.updateTextField(noteId, "edit details", old + (value.completion ?? ""))
   }
 
   private async undoInner() {

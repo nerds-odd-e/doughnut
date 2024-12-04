@@ -85,7 +85,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import type { Conversation, Note, ToolCallResult } from "@/generated/backend"
+import type { Conversation, Note, NoteDetailsCompletion, ToolCallResult } from "@/generated/backend"
 import SvgRobot from "@/components/svgs/SvgRobot.vue"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import markdownizer from "../form/markdownizer"
@@ -117,7 +117,7 @@ const lastErrorMessage = ref<string | undefined>()
 
 const aiStatus = ref<string | undefined>()
 
-const completionSuggestion = ref<string | undefined>()
+const completionSuggestion = ref<NoteDetailsCompletion | undefined>()
 
 const topicTitleSuggestion = ref<string | undefined>()
 
@@ -243,7 +243,7 @@ const handleAcceptCompletion = () => {
   return handleToolCallAccept(async (note) => {
     await storageAccessor
       .storedApi()
-      .appendDetails(note.id, completionSuggestion.value!)
+      .completeDetails(note.id, completionSuggestion.value!)
   })
 }
 
@@ -306,8 +306,8 @@ const formattedCompletionSuggestion = computed(() => {
   if (!completionSuggestion.value) return ""
   const currentDetails = conversation.subject?.note?.details?.trim() || ""
   return currentDetails
-    ? `...${completionSuggestion.value}`
-    : completionSuggestion.value
+    ? `...${completionSuggestion.value.completion}`
+    : completionSuggestion.value.completion
 })
 
 defineExpose({

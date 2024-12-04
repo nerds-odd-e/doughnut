@@ -21,7 +21,7 @@ export interface AiActionContext {
   append: (text: string) => void
   reset: () => Promise<void>
   appendNoteDetails: (
-    completion: string,
+    completion: NoteDetailsCompletion,
     threadId: string,
     runId: string,
     toolCallId: string
@@ -84,7 +84,7 @@ export const createAiReplyStates = (
                 functionArgs
               ) as NoteDetailsCompletion
               result = await context.appendNoteDetails(
-                contentToAppend!.completion,
+                contentToAppend,
                 response.thread_id!,
                 response.id!,
                 toolCall.id!

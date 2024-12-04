@@ -147,7 +147,7 @@ describe("aiReplyState", () => {
       )
 
       expect(mockContext.appendNoteDetails).toHaveBeenCalledWith(
-        "test content",
+        { completion: "test content" },
         "thread-123",
         "run-123",
         "call-1"
@@ -192,7 +192,7 @@ describe("aiReplyState", () => {
       )
 
       expect(mockContext.appendNoteDetails).toHaveBeenCalledWith(
-        "test content",
+        { completion: "test content" },
         "thread-123",
         "run-123",
         "call-1"
