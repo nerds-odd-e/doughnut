@@ -23,7 +23,8 @@ public class PredefinedQuestionService {
     this.modelFactoryService = modelFactoryService;
     this.randomizer = randomizer;
     this.aiQuestionGenerator =
-        new AiQuestionGenerator(openAiApi, new GlobalSettingsService(modelFactoryService));
+        new AiQuestionGenerator(
+            openAiApi, new GlobalSettingsService(modelFactoryService), randomizer);
   }
 
   public PredefinedQuestion addQuestion(Note note, PredefinedQuestion predefinedQuestion) {

@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.PredefinedQuestion;
+import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
@@ -38,7 +39,8 @@ class AiOpenAiAssistantFactoryWithDBTest {
     MockitoAnnotations.openMocks(this);
     GlobalSettingsService globalSettingsService =
         new GlobalSettingsService(makeMe.modelFactoryService);
-    aiQuestionGenerator = new AiQuestionGenerator(openAiApi, globalSettingsService);
+    aiQuestionGenerator =
+        new AiQuestionGenerator(openAiApi, globalSettingsService, new NonRandomizer());
   }
 
   @Nested

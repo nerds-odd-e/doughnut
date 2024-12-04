@@ -11,11 +11,12 @@ import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.client.OpenAiApi;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public record AiQuestionGenerator(
-    OpenAiApi openAiApi, GlobalSettingsService globalSettingsService) {
+    OpenAiApi openAiApi,
+    GlobalSettingsService globalSettingsService,
+    com.odde.doughnut.models.Randomizer randomizer) {
 
   public MCQWithAnswer getAiGeneratedQuestion(Note note) {
     NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory =
@@ -36,7 +37,7 @@ public record AiQuestionGenerator(
   private MCQWithAnswer shuffleChoices(MCQWithAnswer original) {
     List<String> choices = new ArrayList<>(original.getMultipleChoicesQuestion().getChoices());
     String correctChoice = choices.get(original.getCorrectChoiceIndex());
-    Collections.shuffle(choices);
+    randomizer.shuffle(choices);
     int newCorrectIndex = choices.indexOf(correctChoice);
 
     MultipleChoicesQuestion shuffledQuestion =

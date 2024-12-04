@@ -7,6 +7,7 @@ import static org.mockito.Mockito.verify;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.models.randomizers.RealRandomizer;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.tools.AiToolName;
 import com.odde.doughnut.testability.MakeMe;
@@ -37,7 +38,8 @@ class AiQuestionGeneratorTests {
   @BeforeEach
   void setup() {
     GlobalSettingsService globalSettingsService = new GlobalSettingsService(modelFactoryService);
-    aiQuestionGenerator = new AiQuestionGenerator(openAiApi, globalSettingsService);
+    aiQuestionGenerator =
+        new AiQuestionGenerator(openAiApi, globalSettingsService, new RealRandomizer());
 
     // Initialize assistant mocker
     openAIAssistantMocker = new OpenAIAssistantMocker(openAiApi);
