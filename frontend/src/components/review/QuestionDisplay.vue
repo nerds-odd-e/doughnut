@@ -4,7 +4,7 @@
       style="white-space: pre-wrap"
       data-test="stem"
       v-if="bareQuestion.multipleChoicesQuestion.stem"
-      v-html="bareQuestion.multipleChoicesQuestion.stem"
+      v-html="stemHtml"
     ></div>
 
     <div
@@ -37,12 +37,13 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import { ref } from "vue"
+import { ref, computed } from "vue"
 import type { Answer, AnswerDTO, BareQuestion } from "@/generated/backend"
 import TextInput from "../form/TextInput.vue"
 import QuestionChoices from "./QuestionChoices.vue"
+import markdownizer from "../form/markdownizer"
 
-defineProps({
+const props = defineProps({
   bareQuestion: {
     type: Object as PropType<BareQuestion>,
     required: true,
@@ -53,6 +54,14 @@ defineProps({
 })
 const emits = defineEmits(["answer"])
 const spellingAnswer = ref("")
+
+const stemHtml = computed(() => {
+  return props.bareQuestion.multipleChoicesQuestion.stem
+    ? markdownizer.markdownToHtml(
+        props.bareQuestion.multipleChoicesQuestion.stem
+      )
+    : ""
+})
 
 const submitAnswer = async (answerData: AnswerDTO) => {
   emits("answer", answerData)

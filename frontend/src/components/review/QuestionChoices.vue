@@ -10,7 +10,7 @@
         @click.once="submitAnswer({ choiceIndex: index })"
         :disabled="disabled"
       >
-        <div v-html="choice" />
+        <div v-html="getChoiceHtml(choice)" />
       </button>
     </li>
   </ol>
@@ -21,6 +21,7 @@
 <script lang="ts">
 import type { AnswerDTO } from "@/generated/backend"
 import { defineComponent } from "vue"
+import markdownizer from "../form/markdownizer"
 
 export default defineComponent({
   props: {
@@ -46,6 +47,9 @@ export default defineComponent({
     },
     async submitAnswer(answerData: AnswerDTO) {
       this.$emit("answer", answerData)
+    },
+    getChoiceHtml(choice: string) {
+      return markdownizer.markdownToHtml(choice)
     },
   },
 })
