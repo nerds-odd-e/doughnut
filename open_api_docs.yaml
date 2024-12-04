@@ -3853,11 +3853,11 @@ components:
       - deleteFromEnd
       type: object
       properties:
-        completion:
-          type: string
         deleteFromEnd:
           type: integer
           format: int32
+        completion:
+          type: string
     TextFromAudioWithCallInfo:
       type: object
       properties:
