@@ -169,7 +169,7 @@ const processAudio = async (chunk: AudioChunk): Promise<string | undefined> => {
 
     await storageAccessor
       .storedApi()
-      .appendDetails(note.id, response?.completionMarkdownFromAudio ?? "")
+      .appendDetails(note.id, response?.completionFromAudio?.completion ?? "")
 
     threadContext.value.callCount++
     if (shouldSuggestTopic(threadContext.value.callCount)) {

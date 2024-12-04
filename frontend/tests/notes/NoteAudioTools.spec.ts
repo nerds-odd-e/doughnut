@@ -345,7 +345,7 @@ describe("NoteAudioTools", () => {
     expect(flushButton.attributes("disabled")).toBeDefined()
 
     // Resolve the processing
-    resolveProcess!({ completionMarkdownFromAudio: "test" })
+    resolveProcess!({ completionFromAudio: "test" })
     await processPromise2
     await flushPromises()
 
@@ -389,7 +389,7 @@ describe("NoteAudioTools", () => {
         vi.fn()
       helper.managedApi.restAiAudioController.audioToText = vi
         .fn()
-        .mockResolvedValue({ completionMarkdownFromAudio: "text" })
+        .mockResolvedValue({ completionFromAudio: "text" })
     })
 
     it("suggests topic for power-of-2 audio processes", async () => {
@@ -449,7 +449,7 @@ describe("NoteAudioTools", () => {
 
     it("stores and reuses thread context between calls", async () => {
       const mockResponse1: TextFromAudioWithCallInfo = {
-        completionMarkdownFromAudio: "text1",
+        completionFromAudio: { completion: "text1" },
         toolCallInfo: {
           threadId: "thread-123",
           runId: "run-123",
@@ -458,7 +458,7 @@ describe("NoteAudioTools", () => {
       }
 
       const mockResponse2: TextFromAudioWithCallInfo = {
-        completionMarkdownFromAudio: "text2",
+        completionFromAudio: { completion: "text2" },
         toolCallInfo: {
           threadId: "thread-123",
           runId: "run-124",
@@ -501,7 +501,7 @@ describe("NoteAudioTools", () => {
 
     it("maintains thread context even after errors", async () => {
       const mockResponse: TextFromAudioWithCallInfo = {
-        completionMarkdownFromAudio: "text1",
+        completionFromAudio: { completion: "text1" },
         toolCallInfo: {
           threadId: "thread-123",
           runId: "run-123",
@@ -601,7 +601,7 @@ describe("NoteAudioTools", () => {
 
     beforeEach(() => {
       audioToTextForNoteMock = vi.fn().mockResolvedValue({
-        completionMarkdownFromAudio: "text",
+        completionFromAudio: "text",
         toolCallInfo: {
           threadId: "thread-123",
           runId: "run-123",
@@ -631,7 +631,7 @@ describe("NoteAudioTools", () => {
 
   it("should handle returned timestamp from audio processing", async () => {
     const mockResponse = {
-      completionMarkdownFromAudio: "text",
+      completionFromAudio: "text",
       endTimestamp: "00:00:37,270",
       toolCallInfo: {
         threadId: "thread-123",

@@ -2,9 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { NoteDetailsCompletion } from './NoteDetailsCompletion';
 import type { ToolCallInfo } from './ToolCallInfo';
 export type TextFromAudioWithCallInfo = {
-    completionMarkdownFromAudio?: string;
+    completionFromAudio?: NoteDetailsCompletion;
     rawSRT?: string;
     toolCallInfo?: ToolCallInfo;
     endTimestamp?: string;

@@ -80,6 +80,7 @@ public final class NoteAutomationService {
           """
             You convert SRT-format audio transcriptions into coherent paragraphs with proper punctuation, formatted in Markdown. Guidelines:
               •	Output only function calls to append the processed text to existing notes, adding necessary whitespace or a new line at the beginning.
+              •	Delete any trailing content from the previous content to rephrase or correct it.
               •	Do not translate the text unless requested.
               • Do not interpret the text. Do not use reported speech.
               •	Leave unclear parts unchanged.
@@ -101,7 +102,7 @@ public final class NoteAutomationService {
       case OpenAiRunRequiredAction action -> {
         final TextFromAudioWithCallInfo textFromAudio = new TextFromAudioWithCallInfo();
         NoteDetailsCompletion noteDetails = (NoteDetailsCompletion) action.getFirstArgument();
-        textFromAudio.setCompletionMarkdownFromAudio(noteDetails.completion);
+        textFromAudio.setCompletionFromAudio(noteDetails);
         textFromAudio.setToolCallInfo(action.getToolCallInfo());
         yield textFromAudio;
       }

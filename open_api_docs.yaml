@@ -3846,11 +3846,21 @@ components:
           type: string
         isMidSpeech:
           type: boolean
+    NoteDetailsCompletion:
+      required:
+      - completion
+      type: object
+      properties:
+        completion:
+          type: string
+        deleteFromEnd:
+          type: integer
+          format: int32
     TextFromAudioWithCallInfo:
       type: object
       properties:
-        completionMarkdownFromAudio:
-          type: string
+        completionFromAudio:
+          $ref: "#/components/schemas/NoteDetailsCompletion"
         rawSRT:
           type: string
         toolCallInfo:
@@ -4481,16 +4491,6 @@ components:
           type: string
         delta:
           $ref: "#/components/schemas/Delta"
-    NoteDetailsCompletion:
-      required:
-      - completion
-      type: object
-      properties:
-        completion:
-          type: string
-        deleteFromEnd:
-          type: integer
-          format: int32
     RequiredAction:
       type: object
       properties:

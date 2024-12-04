@@ -65,7 +65,7 @@ class RestAiAudioControllerTests {
 
   private void setupMocks() {
     TextFromAudioWithCallInfo completionMarkdownFromAudio = new TextFromAudioWithCallInfo();
-    completionMarkdownFromAudio.setCompletionMarkdownFromAudio("test123");
+    completionMarkdownFromAudio.setCompletionFromAudio(new NoteDetailsCompletion("test123", 0));
     openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
     openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(
         completionMarkdownFromAudio, "audio_transcription_to_text");
@@ -100,22 +100,22 @@ class RestAiAudioControllerTests {
     @ValueSource(strings = {"podcast.mp3", "podcast.m4a", "podcast.wav"})
     void convertingFormat(String filename) throws Exception {
       audioUploadDTO.setUploadAudioFile(createMockAudioFile(filename));
-      String result =
+      NoteDetailsCompletion result =
           controller
               .audioToText(audioUploadDTO)
-              .map(TextFromAudioWithCallInfo::getCompletionMarkdownFromAudio)
-              .orElse("");
-      assertEquals("test123", result);
+              .map(TextFromAudioWithCallInfo::getCompletionFromAudio)
+              .orElseThrow();
+      assertEquals("test123", result.completion);
     }
 
     @Test
     void convertAudioToText() throws IOException {
-      String resp =
+      NoteDetailsCompletion resp =
           controller
               .audioToText(audioUploadDTO)
-              .map(TextFromAudioWithCallInfo::getCompletionMarkdownFromAudio)
-              .orElse("");
-      assertThat(resp, equalTo("test123"));
+              .map(TextFromAudioWithCallInfo::getCompletionFromAudio)
+              .orElseThrow();
+      assertThat(resp.completion, equalTo("test123"));
     }
 
     @Test
@@ -216,7 +216,8 @@ class RestAiAudioControllerTests {
                     return true;
                   }));
       assertNotNull(result);
-      assertThat(result.getCompletionMarkdownFromAudio(), equalTo("text from audio transcription"));
+      assertThat(
+          result.getCompletionFromAudio().completion, equalTo("text from audio transcription"));
     }
 
     @Test
@@ -252,7 +253,7 @@ class RestAiAudioControllerTests {
       TextFromAudioWithCallInfo result = controller.audioToTextForNote(note, audioUploadDTO);
 
       assertNotNull(result);
-      assertEquals("text from audio transcription", result.getCompletionMarkdownFromAudio());
+      assertEquals("text from audio transcription", result.getCompletionFromAudio().completion);
       assertEquals("my-run-id", result.getToolCallInfo().getRunId());
       verify(openAiApi)
           .submitToolOutputs(
@@ -295,7 +296,7 @@ class RestAiAudioControllerTests {
       // Verify
       assertNotNull(result);
       assertEquals(
-          "fallback text from audio transcription", result.getCompletionMarkdownFromAudio());
+          "fallback text from audio transcription", result.getCompletionFromAudio().completion);
       verify(openAiApi).submitToolOutputs(eq("existing-thread"), eq("my-run-id"), any());
       verify(openAiApi).createThread(any());
     }
