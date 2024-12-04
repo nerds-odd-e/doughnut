@@ -12,8 +12,8 @@
       Target:
       <strong
         ><NoteTopicComponent
-          v-if="targetNoteTopic"
-          v-bind="{ noteTopic: targetNoteTopic }"
+          v-if="targetNoteTopology"
+          v-bind="{ noteTopology: targetNoteTopology }"
       /></strong>
     </div>
     <button class="btn btn-secondary go-back-button" @click="$emit('goBack')">
@@ -26,7 +26,7 @@
 import type { PropType } from "vue"
 import { ref } from "vue"
 import type { Note } from "@/generated/backend"
-import { LinkCreation, NoteTopic } from "@/generated/backend"
+import { LinkCreation, NoteTopology } from "@/generated/backend"
 import LinkTypeSelect from "./LinkTypeSelect.vue"
 import NoteTopicComponent from "../notes/core/NoteTopicComponent.vue"
 import SvgGoBack from "../svgs/SvgGoBack.vue"
@@ -37,7 +37,10 @@ const { popups } = usePopups()
 
 const props = defineProps({
   note: { type: Object as PropType<Note>, required: true },
-  targetNoteTopic: { type: Object as PropType<NoteTopic>, required: true },
+  targetNoteTopology: {
+    type: Object as PropType<NoteTopology>,
+    required: true,
+  },
   storageAccessor: {
     type: Object as PropType<StorageAccessor>,
     required: true,
@@ -47,7 +50,7 @@ const props = defineProps({
 const emit = defineEmits(["success", "goBack"])
 
 const formData = ref<LinkCreation>({
-  linkType: NoteTopic.linkType.NO_LINK,
+  linkType: NoteTopology.linkType.NO_LINK,
 })
 
 const linkFormErrors = ref({
@@ -58,7 +61,7 @@ const linkTypeSelected = async (linkType: LinkCreation["linkType"]) => {
   if (props.note.parentId === null) {
     if (
       !(await popups.confirm(
-        `"${props.note.noteTopic.topicConstructor}" is a top level notebook. Do you want to move it under other notebook?`
+        `"${props.note.noteTopology.titleOrPredicate}" is a top level notebook. Do you want to move it under other notebook?`
       ))
     ) {
       return
@@ -66,10 +69,10 @@ const linkTypeSelected = async (linkType: LinkCreation["linkType"]) => {
   }
 
   try {
-    if (linkType !== NoteTopic.linkType.NO_LINK) {
+    if (linkType !== NoteTopology.linkType.NO_LINK) {
       await props.storageAccessor
         .storedApi()
-        .createLink(props.note.id, props.targetNoteTopic.id, {
+        .createLink(props.note.id, props.targetNoteTopology.id, {
           linkType: formData.value.linkType,
         })
     }

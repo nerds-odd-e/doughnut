@@ -2,9 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { NoteTopic } from './NoteTopic';
+import type { NoteTopology } from './NoteTopology';
 export type Note = {
-    noteTopic: NoteTopic;
+    noteTopology: NoteTopology;
     details?: string;
     parentId?: number;
     updatedAt: string;

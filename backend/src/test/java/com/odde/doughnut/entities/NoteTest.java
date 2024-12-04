@@ -37,14 +37,14 @@ public class NoteTest {
                 "<strong>this is a very long sentence</strong> that contains very little meaning. The purpose is to test the truncate.")
             .please();
     assertThat(
-        note.getNoteTopic().getShortDetails(),
+        note.getNoteTopology().getShortDetails(),
         equalTo("this is a very long sentence that contains very li..."));
   }
 
   @Test
   void shortDetailsShouldBeNullIfEmpty() {
     Note note = makeMe.aNote().details("").please();
-    assertThat(note.getNoteTopic().getShortDetails(), nullValue());
+    assertThat(note.getNoteTopology().getShortDetails(), nullValue());
   }
 
   @Nested
@@ -63,7 +63,7 @@ public class NoteTest {
     @Test
     void replaceParentPlaceholder() {
       assertThat(
-          linkingNote.getNoteTopic().getTargetNoteTopic().getTopicConstructor(),
+          linkingNote.getNoteTopology().getObjectNoteTopology().getTitleOrPredicate(),
           equalTo(target.getTopicConstructor()));
     }
 
@@ -71,7 +71,7 @@ public class NoteTest {
     void linkOfLink() {
       Note linkOfLink = makeMe.aLink().between(parent, linkingNote).please();
       assertThat(
-          linkOfLink.getNoteTopic().getTargetNoteTopic().getTargetNoteTopic().getId(),
+          linkOfLink.getNoteTopology().getObjectNoteTopology().getObjectNoteTopology().getId(),
           equalTo(target.getId()));
     }
   }

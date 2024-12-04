@@ -7,14 +7,14 @@
 </template>
 
 <script setup lang="ts">
-import { NoteTopic } from "@/generated/backend"
+import { NoteTopology } from "@/generated/backend"
 import type { PropType } from "vue"
 import { computed } from "vue"
 import BasicBreadcrumb from "@/components/commons/BasicBreadcrumb.vue"
 
 const props = defineProps({
-  noteTopic: {
-    type: Object as PropType<NoteTopic>,
+  noteTopology: {
+    type: Object as PropType<NoteTopology>,
     required: true,
   },
   includingSelf: {
@@ -24,16 +24,16 @@ const props = defineProps({
 })
 
 const ancestors = computed(() => {
-  const result: NoteTopic[] = []
-  let currentTopic = props.noteTopic
+  const result: NoteTopology[] = []
+  let currentTopology = props.noteTopology
 
   if (props.includingSelf) {
-    result.push(currentTopic)
+    result.push(currentTopology)
   }
 
-  while (currentTopic.parentNoteTopic) {
-    result.unshift(currentTopic.parentNoteTopic)
-    currentTopic = currentTopic.parentNoteTopic
+  while (currentTopology.parentOrSubjectNoteTopology) {
+    result.unshift(currentTopology.parentOrSubjectNoteTopology)
+    currentTopology = currentTopology.parentOrSubjectNoteTopology
   }
   return result
 })

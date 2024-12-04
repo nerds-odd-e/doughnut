@@ -116,7 +116,7 @@ class RestNoteController {
 
   @PostMapping("/search")
   @Transactional
-  public List<NoteTopic> searchForLinkTarget(@Valid @RequestBody SearchTerm searchTerm)
+  public List<NoteTopology> searchForLinkTarget(@Valid @RequestBody SearchTerm searchTerm)
       throws UnexpectedNoAccessRightException {
     currentUser.assertLoggedIn();
     SearchTermModel searchTermModel =
@@ -126,7 +126,7 @@ class RestNoteController {
 
   @PostMapping("/{note}/search")
   @Transactional
-  public List<NoteTopic> searchForLinkTargetWithin(
+  public List<NoteTopology> searchForLinkTargetWithin(
       @PathVariable("note") @Schema(type = "integer") Note note,
       @Valid @RequestBody SearchTerm searchTerm)
       throws UnexpectedNoAccessRightException {

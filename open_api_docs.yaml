@@ -935,7 +935,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/NoteTopic"
+                  $ref: "#/components/schemas/NoteTopology"
   /api/notes/{note}/review-setting:
     post:
       tags:
@@ -1017,7 +1017,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/NoteTopic"
+                  $ref: "#/components/schemas/NoteTopology"
   /api/notes/move_after/{note}/{targetNote}/{asFirstChild}:
     post:
       tags:
@@ -3339,12 +3339,12 @@ components:
       required:
       - createdAt
       - id
-      - noteTopic
+      - noteTopology
       - updatedAt
       type: object
       properties:
-        noteTopic:
-          $ref: "#/components/schemas/NoteTopic"
+        noteTopology:
+          $ref: "#/components/schemas/NoteTopology"
         details:
           type: string
         parentId:
@@ -3365,16 +3365,16 @@ components:
           readOnly: true
         wikidataId:
           type: string
-    NoteTopic:
+    NoteTopology:
       required:
       - id
-      - topicConstructor
+      - titleOrPredicate
       type: object
       properties:
         id:
           type: integer
           format: int32
-        topicConstructor:
+        titleOrPredicate:
           type: string
         shortDetails:
           type: string
@@ -3396,10 +3396,10 @@ components:
           - before
           - similar to
           - confused with
-        targetNoteTopic:
-          $ref: "#/components/schemas/NoteTopic"
-        parentNoteTopic:
-          $ref: "#/components/schemas/NoteTopic"
+        objectNoteTopology:
+          $ref: "#/components/schemas/NoteTopology"
+        parentOrSubjectNoteTopology:
+          $ref: "#/components/schemas/NoteTopology"
     Notebook:
       required:
       - headNoteTopic
@@ -3418,7 +3418,7 @@ components:
         creatorId:
           type: string
         headNoteTopic:
-          $ref: "#/components/schemas/NoteTopic"
+          $ref: "#/components/schemas/NoteTopology"
         circle:
           $ref: "#/components/schemas/Circle"
         updated_at:

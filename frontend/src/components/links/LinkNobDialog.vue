@@ -4,9 +4,9 @@
     Source:
     <strong>
       <NoteTopicWithLink
-        v-if="noteTopic.parentNoteTopic"
+        v-if="noteTopology.parentOrSubjectNoteTopology"
         class="link-title"
-        v-bind="{ noteTopic: noteTopic.parentNoteTopic }"
+        v-bind="{ noteTopology: noteTopology.parentOrSubjectNoteTopology }"
       />
     </strong>
   </div>
@@ -22,16 +22,16 @@
     Target:
     <strong>
       <NoteTopicWithLink
-        v-if="noteTopic.targetNoteTopic"
+        v-if="noteTopology.objectNoteTopology"
         class="link-title"
-        v-bind="{ noteTopic: noteTopic.targetNoteTopic }"
+        v-bind="{ noteTopology: noteTopology.objectNoteTopology }"
       />
     </strong>
   </div>
 </template>
 
 <script lang="ts">
-import { LinkCreation, NoteTopic } from "@/generated/backend"
+import { LinkCreation, NoteTopology } from "@/generated/backend"
 import type { PropType } from "vue"
 import { defineComponent } from "vue"
 import type { StorageAccessor } from "../../store/createNoteStorage"
@@ -44,8 +44,8 @@ export default defineComponent({
     return { ...usePopups() }
   },
   props: {
-    noteTopic: {
-      type: Object as PropType<NoteTopic>,
+    noteTopology: {
+      type: Object as PropType<NoteTopology>,
       required: true,
     },
     storageAccessor: {
@@ -63,7 +63,7 @@ export default defineComponent({
   data() {
     return {
       formData: {
-        linkType: this.noteTopic.linkType,
+        linkType: this.noteTopology.linkType,
         fromTargetPerspective: this.inverseIcon,
       } as LinkCreation,
       linkFormErrors: { linkType: undefined as string | undefined },
@@ -74,7 +74,7 @@ export default defineComponent({
     updateLink() {
       this.storageAccessor
         .storedApi()
-        .updateLink(this.noteTopic.id, this.formData)
+        .updateLink(this.noteTopology.id, this.formData)
         .then(() => this.$emit("closeDialog"))
         .catch((error) => {
           this.linkFormErrors = error

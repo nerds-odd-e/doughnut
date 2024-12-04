@@ -39,8 +39,8 @@ Cypress.Commands.add('dialogDisappeared', () => {
 
 Cypress.Commands.add('expectBreadcrumb', (items: string) => {
   cy.get('.breadcrumb').within(() =>
-    commonSenseSplit(items, ', ').forEach((noteTopic: string) =>
-      cy.findByText(noteTopic)
+    commonSenseSplit(items, ', ').forEach((noteTopology: string) =>
+      cy.findByText(noteTopology)
     )
   )
 })
@@ -154,8 +154,8 @@ Cypress.Commands.add(
   }
 )
 
-Cypress.Commands.add('clickButtonOnCardBody', (noteTopic, buttonTitle) => {
-  cy.findCardTitle(noteTopic).then(($card) => {
+Cypress.Commands.add('clickButtonOnCardBody', (noteTopology, buttonTitle) => {
+  cy.findCardTitle(noteTopology).then(($card) => {
     cy.wrap($card)
       .parent()
       .parent()
@@ -284,9 +284,9 @@ Cypress.Commands.add('undoLast', (undoType: string) => {
   cy.pageIsNotLoading()
 })
 
-Cypress.Commands.add('noteByTitle', (noteTopic: string) => {
+Cypress.Commands.add('noteByTitle', (noteTopology: string) => {
   return cy
-    .findCardTitle(noteTopic)
+    .findCardTitle(noteTopology)
     .parent()
     .invoke('attr', 'href')
     .then(($attr) => {

@@ -1,13 +1,13 @@
 <template>
   <span class="link-link">
-    <LinkNob v-bind="{ noteTopic }" v-if="!!reverse" :inverse-icon="true" />
+    <LinkNob v-bind="{ noteTopology }" v-if="!!reverse" :inverse-icon="true" />
     <router-link
       :to="{ name: 'noteShow', params: { noteId: note.id } }"
       class="link-title text-decoration-none"
     >
-      <NoteTopicComponent v-if="noteTopic" v-bind="{ noteTopic }" />
+      <NoteTopicComponent v-if="noteTopology" v-bind="{ noteTopology }" />
     </router-link>
-    <LinkNob v-bind="{ noteTopic }" v-if="!reverse" :inverse-icon="false" />
+    <LinkNob v-bind="{ noteTopology }" v-if="!reverse" :inverse-icon="false" />
   </span>
 </template>
 
@@ -31,10 +31,10 @@ export default defineComponent({
   },
   components: { NoteTopicComponent, LinkNob },
   computed: {
-    noteTopic() {
+    noteTopology() {
       return this.reverse
-        ? this.note.noteTopic.parentNoteTopic!
-        : this.note.noteTopic.targetNoteTopic!
+        ? this.note.noteTopology.parentOrSubjectNoteTopology!
+        : this.note.noteTopology.objectNoteTopology!
     },
     fontColor() {
       return this.reverse ? colors.target : colors.source

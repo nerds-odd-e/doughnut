@@ -14,8 +14,8 @@ When('I start searching', () => {
 
 When(
   'I am creating a linking note under note {string}',
-  (noteTopic: string) => {
-    start.jumpToNotePage(noteTopic).startSearchingAndLinkNote()
+  (noteTopology: string) => {
+    start.jumpToNotePage(noteTopology).startSearchingAndLinkNote()
   }
 )
 
@@ -105,9 +105,9 @@ When(
 
 Then(
   'I should see {string} has link {string} {string}',
-  (noteTopic: string, linkType: string, targetNoteTopics: string) => {
+  (noteTopology: string, linkType: string, targetNoteTopics: string) => {
     start
-      .jumpToNotePage(noteTopic)
+      .jumpToNotePage(noteTopology)
       .expectLinkingChildren(linkType, targetNoteTopics)
   }
 )
@@ -124,17 +124,17 @@ Then(
 
 Then(
   'I should see {string} has no link to {string}',
-  (noteTopic: string, targetTitle: string) => {
-    start.jumpToNotePage(noteTopic)
+  (noteTopology: string, targetTitle: string) => {
+    start.jumpToNotePage(noteTopology)
     cy.findByText(targetTitle, { selector: 'main *' }).should('not.exist')
   }
 )
 
 Then(
   'I change the link from {string} to {string} to {string}',
-  (noteTopic: string, targetTitle: string, linkType: string) => {
+  (noteTopology: string, targetTitle: string, linkType: string) => {
     start
-      .jumpToNotePage(noteTopic)
+      .jumpToNotePage(noteTopology)
       .navigateToLinkingChild(targetTitle)
       .changeLinkType(linkType, targetTitle)
   }
@@ -142,11 +142,11 @@ Then(
 
 Then(
   'I change the reference from {string} to {string} to {string}',
-  (noteTopic: string, referenceTitle: string, linkType: string) => {
+  (noteTopology: string, referenceTitle: string, linkType: string) => {
     start
-      .jumpToNotePage(noteTopic)
+      .jumpToNotePage(noteTopology)
       .navigateToReference(referenceTitle)
-      .changeLinkType(linkType, noteTopic)
+      .changeLinkType(linkType, noteTopology)
   }
 )
 
@@ -156,11 +156,11 @@ Then('I should be able to delete the link', () => {
 
 Then(
   'I delete the link from {string} to {string}',
-  (noteTopic: string, targetTitle: string) => {
+  (noteTopology: string, targetTitle: string) => {
     start
-      .jumpToNotePage(noteTopic)
+      .jumpToNotePage(noteTopology)
       .navigateToLinkingChild(targetTitle)
       .deleteNote()
-    start.assumeNotePage(noteTopic) // remain on the same note page
+    start.assumeNotePage(noteTopology) // remain on the same note page
   }
 )

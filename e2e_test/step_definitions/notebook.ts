@@ -11,15 +11,18 @@ import {
 } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 
-Given('I choose to share my notebook {string}', (noteTopic: string) => {
-  start.routerToNotebooksPage().notebookCard(noteTopic).shareNotebookToBazaar()
+Given('I choose to share my notebook {string}', (noteTopology: string) => {
+  start
+    .routerToNotebooksPage()
+    .notebookCard(noteTopology)
+    .shareNotebookToBazaar()
 })
 
 Then(
   'I should see readonly notebook {string} in my notes',
-  (noteTopic: string) => {
+  (noteTopology: string) => {
     start.routerToNotebooksPage()
-    cy.findByText(noteTopic).click()
+    cy.findByText(noteTopology).click()
     cy.pageIsNotLoading()
     start.assumeNotePage().editNoteImage().shouldNotExist()
   }
@@ -27,15 +30,18 @@ Then(
 
 Then(
   'I should be able to edit the subscription to notebook {string}',
-  (noteTopic: string) => {
-    start.routerToNotebooksPage().notebookCard(noteTopic).updateSubscription()
+  (noteTopology: string) => {
+    start
+      .routerToNotebooksPage()
+      .notebookCard(noteTopology)
+      .updateSubscription()
   }
 )
 
-When('I change notebook {string} to skip review', (noteTopic: string) => {
+When('I change notebook {string} to skip review', (noteTopology: string) => {
   start
     .routerToNotebooksPage()
-    .notebookCard(noteTopic)
+    .notebookCard(noteTopology)
     .editNotebookSettings()
     .skipMemoryTracking()
 })
@@ -50,10 +56,10 @@ When('I request for an approval for notebook {string}', (notebook: string) => {
 
 When(
   'the approval for the notebook {string} is {string}',
-  (noteTopic: string, status: string) => {
+  (noteTopology: string, status: string) => {
     start
       .routerToNotebooksPage()
-      .notebookCard(noteTopic)
+      .notebookCard(noteTopology)
       .editNotebookSettings()
       .expectNotebookApprovalStatus(status)
   }
@@ -61,17 +67,17 @@ When(
 
 Then(
   'I should see the status {string} of the approval for notebook {string}',
-  (status: string, noteTopic: string) => {
+  (status: string, noteTopology: string) => {
     start
       .routerToNotebooksPage()
-      .notebookCard(noteTopic)
+      .notebookCard(noteTopology)
       .editNotebookSettings()
       .expectNotebookApprovalStatus(status)
   }
 )
 
-Then('I unsubscribe from notebook {string}', (noteTopic: string) => {
-  start.routerToNotebooksPage().notebookCard(noteTopic).unsubscribe()
+Then('I unsubscribe from notebook {string}', (noteTopology: string) => {
+  start.routerToNotebooksPage().notebookCard(noteTopology).unsubscribe()
 })
 
 Given(

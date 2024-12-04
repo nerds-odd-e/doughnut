@@ -86,7 +86,7 @@ export type { NoteMoveDTO } from './models/NoteMoveDTO';
 export type { NoteRealm } from './models/NoteRealm';
 export type { NotesTestData } from './models/NotesTestData';
 export type { NoteTestData } from './models/NoteTestData';
-export { NoteTopic } from './models/NoteTopic';
+export { NoteTopology } from './models/NoteTopology';
 export type { NoteUpdateDetailsDTO } from './models/NoteUpdateDetailsDTO';
 export type { NoteUpdateTopicDTO } from './models/NoteUpdateTopicDTO';
 export type { Ownership } from './models/Ownership';

@@ -10,8 +10,8 @@ export const bazaarOrCircle = () => {
       findNotebookCardButton(notebook, 'Start Assessment').click()
       return assumeAssessmentPage()
     },
-    expectNoAddToMyLearningButton(noteTopic: string) {
-      findNotebookCardButton(noteTopic, addToMyLearning).shouldNotExist()
+    expectNoAddToMyLearningButton(noteTopology: string) {
+      findNotebookCardButton(noteTopology, addToMyLearning).shouldNotExist()
     },
     subscribe(notebook: string, dailyLearningCount: string) {
       findNotebookCardButton(notebook, addToMyLearning).click()

@@ -14,7 +14,7 @@
             :key="point.id"
             :class="{ 'removed': point.removedFromTracking }">
           <td>
-            <NoteTopicWithLink :noteTopic="point.note.noteTopic" />
+            <NoteTopicWithLink :noteTopology="point.note.noteTopology" />
           </td>
           <td>{{ new Date(point.assimilatedAt!).toLocaleString() }}</td>
           <td>{{ point.removedFromTracking ? 'Removed' : 'Active' }}</td>

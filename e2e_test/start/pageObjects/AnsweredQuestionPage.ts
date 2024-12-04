@@ -7,13 +7,13 @@ const assumeAnsweredQuestionPage = () => {
       // but the text changes
       cy.get('.alert-success').should('exist')
     },
-    showMemoryTracker(noteTopic?: string) {
+    showMemoryTracker(noteTopology?: string) {
       cy.findByText('Note under question')
         .parent()
         .within(() => {
           cy.get('a').last().click()
         })
-      return assumeNotePage(noteTopic).memoryTracker()
+      return assumeNotePage(noteTopology).memoryTracker()
     },
     goToLastResult: () => {
       cy.findByRole('button', { name: 'view last result' }).click()

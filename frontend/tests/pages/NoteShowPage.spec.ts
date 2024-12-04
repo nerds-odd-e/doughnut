@@ -31,7 +31,7 @@ describe("all in note show page", () => {
         .withStorageProps({ noteId: noteRealm.id })
         .withRouter(router)
         .render()
-      await screen.findByText(noteRealm.note.noteTopic.topicConstructor)
+      await screen.findByText(noteRealm.note.noteTopology.titleOrPredicate)
       expect(helper.managedApi.restNoteController.show).toBeCalledWith(
         noteRealm.id
       )

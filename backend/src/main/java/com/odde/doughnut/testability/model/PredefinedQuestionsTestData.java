@@ -19,7 +19,7 @@ public class PredefinedQuestionsTestData {
   @Setter
   static class PredefinedQuestionTestData {
     @JsonProperty("Note Topic")
-    private String noteTopic;
+    private String noteTopology;
 
     @JsonProperty("Question")
     private String question;
@@ -52,7 +52,7 @@ public class PredefinedQuestionsTestData {
             question ->
                 question.buildPredefinedQuestion(
                     factoryService.noteRepository.findFirstInNotebookByTopicConstructor(
-                        notebookTitle, question.noteTopic)))
+                        notebookTitle, question.noteTopology)))
         .collect(Collectors.toList());
   }
 }

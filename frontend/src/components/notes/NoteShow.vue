@@ -19,7 +19,7 @@
             v-bind="{
               fromBazaar: noteRealm?.fromBazaar,
               circle: noteRealm.notebook?.circle,
-              noteTopic: noteRealm?.note.noteTopic,
+              noteTopology: noteRealm?.note.noteTopology,
             }"
           />
         </TeleportToHeadStatus>
@@ -77,7 +77,7 @@
               <div class="col-md-3 refers" v-if="noteRealm.refers">
                 <ul>
                   <li v-for="link in noteRealm.refers" :key="link.id">
-                    <span>{{ reverseLabel(link.noteTopic.linkType) }} </span>
+                    <span>{{ reverseLabel(link.noteTopology.linkType) }} </span>
                     <LinkOfNote
                       class="link-multi"
                       :key="link.id"

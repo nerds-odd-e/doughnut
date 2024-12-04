@@ -131,7 +131,10 @@ describe("in place edit on title", () => {
     await wrapper.setProps({
       note: {
         ...note,
-        noteTopic: { ...note.noteTopic, topicConstructor: "different value" },
+        noteTopology: {
+          ...note.noteTopology,
+          topicConstructor: "different value",
+        },
       },
     })
     await wrapper.find('[role="topic"]').trigger("click")
@@ -209,13 +212,13 @@ describe("in place edit on title", () => {
     it("should dispay target", async () => {
       const wrapper = mountComponent(linkingNote)
       expect(wrapper.text()).toContain(
-        linkingNote.noteTopic.targetNoteTopic?.topicConstructor
+        linkingNote.noteTopology.objectNoteTopology?.titleOrPredicate
       )
     })
 
     it("should dispay breadcrumbs", async () => {
       const wrapper = mountComponent(linkingNote)
-      expect(wrapper.text()).toContain(note.noteTopic.topicConstructor)
+      expect(wrapper.text()).toContain(note.noteTopology.titleOrPredicate)
     })
   })
 })

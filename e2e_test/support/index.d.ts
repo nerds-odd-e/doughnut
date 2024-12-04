@@ -6,7 +6,7 @@ declare namespace Cypress {
   interface Chainable<Subject = any> {
     dismissLastErrorMessage(): Chainable<any>
     cleanDownloadFolder(): Chainable<any>
-    clickButtonOnCardBody(noteTopic: any, buttonTitle: any): Chainable<any>
+    clickButtonOnCardBody(noteTopology: any, buttonTitle: any): Chainable<any>
     clickRadioByLabel(labelText: any): Chainable<any>
     dialogDisappeared(): Chainable<any>
     expectBreadcrumb(
@@ -27,7 +27,7 @@ declare namespace Cypress {
       additional_info,
       skip,
     }: any): Chainable<any>
-    noteByTitle(noteTopic: string): Chainable<any>
+    noteByTitle(noteTopology: string): Chainable<any>
     pageIsNotLoading(): Chainable<any>
     clearFocusedText(): Chainable<any>
     replaceFocusedTextAndEnter(test: any): Chainable<any>

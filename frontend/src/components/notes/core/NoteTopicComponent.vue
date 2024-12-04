@@ -1,10 +1,10 @@
 <template>
-  <template v-if="noteTopic.targetNoteTopic">
+  <template v-if="noteTopology.objectNoteTopology">
     <template v-if="full">
       <NoteTopicWithLink
-        v-if="noteTopic.parentNoteTopic"
+        v-if="noteTopology.parentOrSubjectNoteTopology"
         v-bind="{
-          noteTopic: noteTopic.parentNoteTopic,
+          noteTopology: noteTopology.parentOrSubjectNoteTopology,
           iconized: iconizedTarget,
         }"
       />
@@ -18,12 +18,12 @@
     <span>
       <NoteTopicComponent
         v-if="iconizedTarget"
-        v-bind="{ noteTopic: noteTopic.targetNoteTopic }"
+        v-bind="{ noteTopology: noteTopology.objectNoteTopology }"
       />
       <NoteTopicWithLink
         class="hover-underline"
         v-bind="{
-          noteTopic: noteTopic.targetNoteTopic,
+          noteTopology: noteTopology.objectNoteTopology,
           iconized: iconizedTarget,
         }"
       />
@@ -37,28 +37,28 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { computed, ref } from "vue"
-import { NoteTopic } from "@/generated/backend"
+import { NoteTopology } from "@/generated/backend"
 import SvgLinkTypeIcon from "@/components/svgs/SvgLinkTypeIcon.vue"
 import NoteTopicWithLink from "../NoteTopicWithLink.vue"
 
 const props = defineProps({
-  noteTopic: { type: Object as PropType<NoteTopic>, required: true },
+  noteTopology: { type: Object as PropType<NoteTopology>, required: true },
   full: { type: Boolean, default: false },
 })
 
 const reactiveProps = ref(props)
 
 const linkType = computed(() =>
-  reactiveProps.value.noteTopic.topicConstructor.substring(1)
+  reactiveProps.value.noteTopology.titleOrPredicate.substring(1)
 )
 const topic = computed(() =>
-  reactiveProps.value.noteTopic.topicConstructor?.replace(
+  reactiveProps.value.noteTopology.titleOrPredicate?.replace(
     "%P",
-    `[${reactiveProps.value.noteTopic.parentNoteTopic?.topicConstructor}]`
+    `[${reactiveProps.value.noteTopology.parentOrSubjectNoteTopology?.titleOrPredicate}]`
   )
 )
 const iconizedTarget = computed(
-  () => !!reactiveProps.value.noteTopic.shortDetails
+  () => !!reactiveProps.value.noteTopology.shortDetails
 )
 </script>
 

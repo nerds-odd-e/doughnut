@@ -1,20 +1,20 @@
 <template>
   <router-link
-    :to="{ name: 'noteShow', params: { noteId: noteTopic.id } }"
+    :to="{ name: 'noteShow', params: { noteId: noteTopology.id } }"
     class="text-decoration-none"
   >
-    <NoteTopicComponent v-if="!iconized" v-bind="{ noteTopic }" />
+    <NoteTopicComponent v-if="!iconized" v-bind="{ noteTopology }" />
     <span v-else>🔗</span>
   </router-link>
 </template>
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import { NoteTopic } from "@/generated/backend"
+import { NoteTopology } from "@/generated/backend"
 import NoteTopicComponent from "./core/NoteTopicComponent.vue"
 
 defineProps({
-  noteTopic: { type: Object as PropType<NoteTopic>, required: true },
+  noteTopology: { type: Object as PropType<NoteTopology>, required: true },
   iconized: { type: Boolean, required: false },
 })
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <Breadcrumb v-bind="{ noteTopic }">
+  <Breadcrumb v-bind="{ noteTopology }">
     <template #topLink>
       <li v-if="fromBazaar" class="breadcrumb-item">
         <router-link :to="{ name: 'bazaar' }">Bazaar</router-link>
@@ -29,12 +29,12 @@
 </template>
 
 <script setup lang="ts">
-import type { Circle, NoteTopic } from "@/generated/backend"
+import type { Circle, NoteTopology } from "@/generated/backend"
 import type { PropType } from "vue"
 
 defineProps({
-  noteTopic: {
-    type: Object as PropType<NoteTopic>,
+  noteTopology: {
+    type: Object as PropType<NoteTopology>,
     required: true,
   },
   circle: {

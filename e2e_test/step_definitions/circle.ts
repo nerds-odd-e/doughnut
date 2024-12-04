@@ -43,27 +43,27 @@ Given(
 
 When(
   'I create a notebook {string} in circle {string}',
-  (noteTopic: string, circleName: string) => {
-    start.navigateToCircle(circleName).creatingNotebook(noteTopic)
+  (noteTopology: string, circleName: string) => {
+    start.navigateToCircle(circleName).creatingNotebook(noteTopology)
   }
 )
 
 When(
   'I should see the notebook {string} in circle {string}',
-  (noteTopic: string, circleName: string) => {
+  (noteTopology: string, circleName: string) => {
     start.navigateToCircle(circleName)
-    cy.findCardTitle(noteTopic)
+    cy.findCardTitle(noteTopology)
   }
 )
 
 When(
   'I add a note {string} under {string}',
-  (noteTopic: string, parentNoteTopic: string) => {
+  (noteTopology: string, parentNoteTopic: string) => {
     start
       .assumeNotePage()
       .navigateToChild(parentNoteTopic)
       .addingChildNote()
-      .createNote(noteTopic)
+      .createNote(noteTopology)
   }
 )
 

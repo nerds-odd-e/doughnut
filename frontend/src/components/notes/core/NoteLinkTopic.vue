@@ -1,15 +1,15 @@
 <template>
   <h2 role="topic" @click="editingLink = true">
-    <NoteTopicComponent v-bind="{ noteTopic: noteTopic, full: true }" />
+    <NoteTopicComponent v-bind="{ noteTopology: noteTopology, full: true }" />
   </h2>
   <Breadcrumb
-    v-if="noteTopic.targetNoteTopic"
-    v-bind="{ noteTopic: noteTopic.targetNoteTopic }"
+    v-if="noteTopology.objectNoteTopology"
+    v-bind="{ noteTopology: noteTopology.objectNoteTopology }"
   />
   <Modal v-if="!readonly && editingLink" @close_request="editingLink = false">
     <template #body>
       <LinkNobDialog
-        v-bind="{ noteTopic, inverseIcon: false, storageAccessor }"
+        v-bind="{ noteTopology, inverseIcon: false, storageAccessor }"
         @close-dialog="editingLink = false"
       />
     </template>
@@ -19,7 +19,7 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { ref } from "vue"
-import { NoteTopic } from "@/generated/backend"
+import { NoteTopology } from "@/generated/backend"
 import { type StorageAccessor } from "../../../store/createNoteStorage"
 import NoteTopicComponent from "./NoteTopicComponent.vue"
 import Modal from "../../commons/Modal.vue"
@@ -27,7 +27,7 @@ import LinkNobDialog from "../../links/LinkNobDialog.vue"
 import Breadcrumb from "../../toolbars/Breadcrumb.vue"
 
 defineProps({
-  noteTopic: { type: Object as PropType<NoteTopic>, required: true },
+  noteTopology: { type: Object as PropType<NoteTopology>, required: true },
   readonly: { type: Boolean, default: false },
   storageAccessor: {
     type: Object as PropType<StorageAccessor>,

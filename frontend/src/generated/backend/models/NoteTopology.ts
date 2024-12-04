@@ -2,15 +2,15 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type NoteTopic = {
+export type NoteTopology = {
     id: number;
-    topicConstructor: string;
+    titleOrPredicate: string;
     shortDetails?: string;
-    linkType?: NoteTopic.linkType;
-    targetNoteTopic?: NoteTopic;
-    parentNoteTopic?: NoteTopic;
+    linkType?: NoteTopology.linkType;
+    objectNoteTopology?: NoteTopology;
+    parentOrSubjectNoteTopology?: NoteTopology;
 };
-export namespace NoteTopic {
+export namespace NoteTopology {
     export enum linkType {
         NO_LINK = 'no link',
         RELATED_TO = 'related to',

@@ -177,15 +177,15 @@ const testability = () => {
       ])
     },
 
-    getInjectedNoteIdByTitle(noteTopic: string) {
+    getInjectedNoteIdByTitle(noteTopology: string) {
       return cy
         .get(`@${injectedNoteIdMapAliasName}`)
         .then((injectedNoteIdMap) => {
           expect(
             injectedNoteIdMap,
-            `"${noteTopic}" is not in the injected note. Did you created during the test?`
-          ).haveOwnPropertyDescriptor(noteTopic)
-          return injectedNoteIdMap[noteTopic]
+            `"${noteTopology}" is not in the injected note. Did you created during the test?`
+          ).haveOwnPropertyDescriptor(noteTopology)
+          return injectedNoteIdMap[noteTopology]
         })
     },
 
@@ -228,9 +228,9 @@ const testability = () => {
       postToTestabilityApi(cy, 'trigger_exception', { failOnStatusCode: false })
     },
 
-    shareToBazaar(noteTopic: string) {
+    shareToBazaar(noteTopology: string) {
       postToTestabilityApiSuccessfully(cy, 'share_to_bazaar', {
-        body: { noteTopic },
+        body: { noteTopology },
       })
     },
 

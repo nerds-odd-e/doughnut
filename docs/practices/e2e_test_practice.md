@@ -31,8 +31,8 @@
 
 Example:
 ```typescript
-When('I start a conversation about the note {string}', (noteTopic: string) => {
-  start.jumpToNotePage(noteTopic).startAConversationAboutNote()
+When('I start a conversation about the note {string}', (noteTopology: string) => {
+  start.jumpToNotePage(noteTopology).startAConversationAboutNote()
 })
 ```
 

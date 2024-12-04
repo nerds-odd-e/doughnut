@@ -4,11 +4,11 @@ import testability from './testability'
 
 export const higherOrderActions = {
   stubOpenAIQuestionGenerationAndSeeTheQuestion: (
-    noteTopic: string,
+    noteTitle: string,
     question: Record<string, string>
   ) => {
-    testability().injectNotes([{ Topic: noteTopic }])
+    testability().injectNotes([{ Title: noteTitle }])
     questionGenerationService().resetAndStubAskingMCQ(question)
-    return basicActions.jumpToNotePage(noteTopic).testMe()
+    return basicActions.jumpToNotePage(noteTitle).testMe()
   },
 }

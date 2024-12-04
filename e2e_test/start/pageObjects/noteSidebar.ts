@@ -2,9 +2,9 @@ export const noteSidebar = () => {
   cy.get('aside').should('exist')
 
   return {
-    expand: (noteTopic: string) => {
+    expand: (noteTopology: string) => {
       cy.get('aside').within(() => {
-        cy.findByText(noteTopic)
+        cy.findByText(noteTopology)
           .parent()
           .parent()
           .within(() => {

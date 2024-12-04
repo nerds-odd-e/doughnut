@@ -54,7 +54,7 @@ const toggleChildren = (noteId: number) => {
 }
 
 watch(
-  () => props.activeNoteRealm.note.noteTopic.parentNoteTopic,
+  () => props.activeNoteRealm.note.noteTopology.parentOrSubjectNoteTopology,
   (parentNoteTopic) => {
     const uniqueIds = new Set([
       ...expandedIds.value,
@@ -63,7 +63,7 @@ watch(
     let cursor = parentNoteTopic
     while (cursor) {
       uniqueIds.add(cursor.id)
-      cursor = cursor.parentNoteTopic
+      cursor = cursor.parentOrSubjectNoteTopology
     }
     expandedIds.value = Array.from(uniqueIds)
   },

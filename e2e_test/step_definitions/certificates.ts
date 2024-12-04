@@ -3,16 +3,16 @@ import '../support/string_util'
 import start from '../start'
 import { DataTable } from '@cucumber/cucumber'
 
-When('I have a notebook with the name {string}', (noteTopic: string) => {
-  start.routerToNotebooksPage().creatingNotebook(noteTopic)
+When('I have a notebook with the name {string}', (noteTopology: string) => {
+  start.routerToNotebooksPage().creatingNotebook(noteTopology)
 })
 
 Then(
   'I should see the default expiration of {string} note to be 1 year',
-  (noteTopic: string) => {
+  (noteTopology: string) => {
     start
       .routerToNotebooksPage()
-      .notebookCard(noteTopic)
+      .notebookCard(noteTopology)
       .editNotebookSettings()
       .assertNoteHasSettingWithValue('Certificate Expiry', '1y')
   }

@@ -9,7 +9,10 @@ describe("A child card of a note", () => {
       .topicConstructor("this is a note")
       .details("the details")
       .please()
-    helper.component(Card).withProps({ noteTopic: note.noteTopic }).render()
+    helper
+      .component(Card)
+      .withProps({ noteTopology: note.noteTopology })
+      .render()
     await screen.findByText("this is a note")
     await screen.findByText("the details, just shorter")
   })

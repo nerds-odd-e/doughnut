@@ -39,23 +39,26 @@ Given('there are some notes:', (data: DataTable) => {
   start.testability().injectNotes(data.hashes())
 })
 
-Given('I have a notebook with the head note {string}', (noteTopic: string) => {
-  start.testability().injectNotes([{ Title: noteTopic }])
-})
+Given(
+  'I have a notebook with the head note {string}',
+  (noteTopology: string) => {
+    start.testability().injectNotes([{ Title: noteTopology }])
+  }
+)
 
 Given(
   'I have a notebook with the head note {string} which skips review',
-  (noteTopic: string) => {
+  (noteTopology: string) => {
     start
       .testability()
-      .injectNotes([{ Title: noteTopic, 'Skip Memory Tracking': true }])
+      .injectNotes([{ Title: noteTopology, 'Skip Memory Tracking': true }])
   }
 )
 
 Given(
   'I have a notebook with the head note {string} and details {string}',
-  (noteTopic: string, details: string) => {
-    start.testability().injectNotes([{ Title: noteTopic, Details: details }])
+  (noteTopology: string, details: string) => {
+    start.testability().injectNotes([{ Title: noteTopology, Details: details }])
   }
 )
 
@@ -68,9 +71,11 @@ Given(
 
 Given(
   'there is a notebook with head note {string} from user {string} shared to the Bazaar',
-  (noteTopic: string, externalIdentifier: string | undefined) => {
-    start.testability().injectNotes([{ Title: noteTopic }], externalIdentifier)
-    start.testability().shareToBazaar(noteTopic)
+  (noteTopology: string, externalIdentifier: string | undefined) => {
+    start
+      .testability()
+      .injectNotes([{ Title: noteTopology }], externalIdentifier)
+    start.testability().shareToBazaar(noteTopology)
   }
 )
 
@@ -98,21 +103,21 @@ Given(
 
 Given(
   'I add the following question for the note {string}:',
-  (noteTopic: string, data: DataTable) => {
+  (noteTopology: string, data: DataTable) => {
     expect(data.hashes().length, 'please add one question at a time.').to.equal(
       1
     )
-    start.jumpToNotePage(noteTopic).addQuestion(data.hashes()[0]!)
+    start.jumpToNotePage(noteTopology).addQuestion(data.hashes()[0]!)
   }
 )
 
 Given(
   'I refine the following question for the note {string}:',
-  (noteTopic: string, data: DataTable) => {
+  (noteTopology: string, data: DataTable) => {
     expect(data.hashes().length, 'please add one question at a time.').to.equal(
       1
     )
-    start.jumpToNotePage(noteTopic).refineQuestion(data.hashes()[0]!)
+    start.jumpToNotePage(noteTopology).refineQuestion(data.hashes()[0]!)
   }
 )
 
@@ -126,16 +131,16 @@ When('I create a notebook with empty topic', () => {
 
 When(
   'I update note {string} to become:',
-  (noteTopic: string, data: DataTable) => {
-    start.jumpToNotePage(noteTopic).editTextContent(data.hashes()[0]!)
+  (noteTopology: string, data: DataTable) => {
+    start.jumpToNotePage(noteTopology).editTextContent(data.hashes()[0]!)
   }
 )
 
 When(
   'I update note accessories of {string} to become:',
-  (noteTopic: string, data: DataTable) => {
+  (noteTopology: string, data: DataTable) => {
     start
-      .jumpToNotePage(noteTopic)
+      .jumpToNotePage(noteTopology)
       .updateNoteImage(data.hashes()[0]!)
       .updateNoteUrl(data.hashes()[0]!)
   }
@@ -143,8 +148,8 @@ When(
 
 When(
   'I should see note {string} has a image and a url {string}',
-  (noteTopic: string, expectedUrl: string) => {
-    start.jumpToNotePage(noteTopic)
+  (noteTopology: string, expectedUrl: string) => {
+    start.jumpToNotePage(noteTopology)
     cy.get('#note-image').should('exist')
     cy.findByLabelText('Url:').should('have.attr', 'href', expectedUrl)
   }
@@ -152,41 +157,43 @@ When(
 
 When(
   'I can change the topic {string} to {string}',
-  (noteTopic: string, newNoteTopic: string) => {
-    start.assumeNotePage(noteTopic).editTextContent({ topic: newNoteTopic })
+  (noteTopology: string, newNoteTopic: string) => {
+    start.assumeNotePage(noteTopology).editTextContent({ topic: newNoteTopic })
     start.assumeNotePage(newNoteTopic)
   }
 )
 
 Given(
   'I update note topic {string} to become {string}',
-  (noteTopic: string, newNoteTopic: string) => {
-    start.jumpToNotePage(noteTopic).editTextContent({ topic: newNoteTopic })
+  (noteTopology: string, newNoteTopic: string) => {
+    start.jumpToNotePage(noteTopology).editTextContent({ topic: newNoteTopic })
   }
 )
 
 Given(
   'I update note {string} details from {string} to become {string}',
-  (noteTopic: string, noteDetails: string, newNoteDetails: string) => {
+  (noteTopology: string, noteDetails: string, newNoteDetails: string) => {
     cy.findByText(noteDetails).click({ force: true })
-    start.assumeNotePage(noteTopic).editTextContent({ Details: newNoteDetails })
+    start
+      .assumeNotePage(noteTopology)
+      .editTextContent({ Details: newNoteDetails })
   }
 )
 
 When(
   'I update note {string} with details {string}',
-  (noteTopic: string, newDetails: string) => {
-    start.jumpToNotePage(noteTopic).editTextContent({ Details: newDetails })
+  (noteTopology: string, newDetails: string) => {
+    start.jumpToNotePage(noteTopology).editTextContent({ Details: newDetails })
     start.assumeNotePage().findNoteDetails(newDetails)
   }
 )
 
 When(
   'I create a note belonging to {string}:',
-  (noteTopic: string, data: DataTable) => {
+  (noteTopology: string, data: DataTable) => {
     expect(data.hashes().length).to.equal(1)
     start
-      .jumpToNotePage(noteTopic)
+      .jumpToNotePage(noteTopology)
       .addingChildNote()
       .createNoteWithAttributes(data.hashes()[0]!)
   }
@@ -223,20 +230,20 @@ Then(
   }
 )
 
-When('I delete notebook {string}', (noteTopic: string) => {
-  start.jumpToNotePage(noteTopic).deleteNote()
+When('I delete notebook {string}', (noteTopology: string) => {
+  start.jumpToNotePage(noteTopology).deleteNote()
 })
 
 When(
   'I delete note {string} at {int}:00',
-  (noteTopic: string, hour: number) => {
+  (noteTopology: string, hour: number) => {
     start.testability().backendTimeTravelTo(0, hour)
-    start.jumpToNotePage(noteTopic).deleteNote()
+    start.jumpToNotePage(noteTopology).deleteNote()
   }
 )
 
-When('I delete note {string}', (noteTopic: string) => {
-  start.jumpToNotePage(noteTopic).deleteNote()
+When('I delete note {string}', (noteTopology: string) => {
+  start.jumpToNotePage(noteTopology).deleteNote()
 })
 
 When('I should see that the note creation is not successful', () => {
@@ -246,20 +253,22 @@ When('I should see that the note creation is not successful', () => {
 
 Then(
   'I should see the note {string} is marked as deleted',
-  (noteTopic: string) => {
-    start.jumpToNotePage(noteTopic)
+  (noteTopology: string) => {
+    start.jumpToNotePage(noteTopology)
     cy.findByText('This note has been deleted')
   }
 )
 
 Then(
   'I should not see note {string} at the top level of all my notes',
-  (noteTopic: string) => {
+  (noteTopology: string) => {
     cy.pageIsNotLoading()
     cy.get('.path-and-content').within(() => {
       cy.findByText('Notebooks')
     })
-    cy.get('main').within(() => cy.findCardTitle(noteTopic).should('not.exist'))
+    cy.get('main').within(() =>
+      cy.findCardTitle(noteTopology).should('not.exist')
+    )
   }
 )
 
@@ -267,18 +276,18 @@ When('I navigate to {notepath} note', (notePath: NotePath) => {
   start.routerToNotebooksPage().navigateToPath(notePath)
 })
 
-When('I click the child note {string}', (noteTopic: string) => {
-  start.assumeNotePage().navigateToChild(noteTopic)
+When('I click the child note {string}', (noteTopology: string) => {
+  start.assumeNotePage().navigateToChild(noteTopology)
 })
 
-When('I move note {string} left', (noteTopic: string) => {
-  start.jumpToNotePage(noteTopic)
+When('I move note {string} left', (noteTopology: string) => {
+  start.jumpToNotePage(noteTopology)
   cy.findByText('Move This Note').click()
   cy.findByRole('button', { name: 'Move Left' }).click()
 })
 
-When('I move note {string} right', (noteTopic: string) => {
-  start.jumpToNotePage(noteTopic)
+When('I move note {string} right', (noteTopology: string) => {
+  start.jumpToNotePage(noteTopology)
   cy.findByText('Move This Note').click()
   cy.findByRole('button', { name: 'Move Right' }).click()
 })
@@ -308,12 +317,12 @@ Then(
 
 When(
   'I should be asked to log in again when I click the link {string}',
-  (noteTopic: string) => {
+  (noteTopology: string) => {
     cy.on('uncaught:exception', () => {
       return false
     })
     cy.get('main').within(() => {
-      cy.findCardTitle(noteTopic).click()
+      cy.findCardTitle(noteTopology).click()
     })
     cy.get('#username').should('exist')
   }
@@ -384,8 +393,8 @@ Then(
   }
 )
 
-When('I generate an image for {string}', (noteTopic: string) => {
-  start.jumpToNotePage(noteTopic).aiGenerateImage()
+When('I generate an image for {string}', (noteTopology: string) => {
+  start.jumpToNotePage(noteTopology).aiGenerateImage()
 })
 
 Then('I should find an art created by the ai', () => {
@@ -394,9 +403,9 @@ Then('I should find an art created by the ai', () => {
 
 Given(
   'I request to complete the details for the note {string}',
-  (noteTopic: string) => {
+  (noteTopology: string) => {
     start
-      .jumpToNotePage(noteTopic)
+      .jumpToNotePage(noteTopology)
       .startAConversationAboutNote()
       .replyToConversationAndInviteAiToReply(
         'Please complete the note details.'
@@ -409,33 +418,33 @@ Then('I should see a notification of a bad request', () => {
   start.assumeConversationAboutNotePage().expectErrorMessage('Bad Request')
 })
 
-When('I start to chat about the note {string}', (noteTopic: string) => {
-  start.jumpToNotePage(noteTopic).startAConversationAboutNote()
+When('I start to chat about the note {string}', (noteTopology: string) => {
+  start.jumpToNotePage(noteTopology).startAConversationAboutNote()
 })
 
 Then('I should see a child note {string}', (childTopic: string) => {
   start.assumeNotePage().expectChildren([{ 'note-topic': childTopic }])
 })
 
-When('I collapse the children of note {string}', (noteTopic: string) => {
-  start.assumeNotePage(noteTopic).collapseChildren()
+When('I collapse the children of note {string}', (noteTopology: string) => {
+  start.assumeNotePage(noteTopology).collapseChildren()
 })
 
-When('I expand the children of note {string}', (noteTopic: string) => {
-  start.assumeNotePage(noteTopic).expandChildren()
+When('I expand the children of note {string}', (noteTopology: string) => {
+  start.assumeNotePage(noteTopology).expandChildren()
 })
 
 When(
   'I expand the children of note {string} in the sidebar',
-  (noteTopic: string) => {
-    start.noteSidebar().expand(noteTopic)
+  (noteTopology: string) => {
+    start.noteSidebar().expand(noteTopology)
   }
 )
 
 When(
   'I should see the note {string} with {int} children collapsed',
-  (noteTopic: string, childrenCount: number) => {
-    start.assumeNotePage(noteTopic).collapsedChildrenWithCount(childrenCount)
+  (noteTopology: string, childrenCount: number) => {
+    start.assumeNotePage(noteTopology).collapsedChildrenWithCount(childrenCount)
   }
 )
 
@@ -443,21 +452,21 @@ Then('I should see the children notes:', (data: DataTable) => {
   cy.get('main').within(() => cy.expectNoteCards(data.hashes()))
 })
 
-When('I route to the note {string}', (noteTopic: string) => {
-  start.jumpToNotePage(noteTopic)
+When('I route to the note {string}', (noteTopology: string) => {
+  start.jumpToNotePage(noteTopology)
 })
 
 When(
   'I should see the questions in the question list of the note {string}:',
-  (noteTopic: string, data: DataTable) => {
-    start.jumpToNotePage(noteTopic).expectQuestionsInList(data.hashes())
+  (noteTopology: string, data: DataTable) => {
+    start.jumpToNotePage(noteTopology).expectQuestionsInList(data.hashes())
   }
 )
 
 Given(
   'I toggle the approval of the question {string} of the topic {string}',
-  (recallPrompt: string, noteTopic: string) => {
-    start.jumpToNotePage(noteTopic).toggleApproval(recallPrompt)
+  (recallPrompt: string, noteTopology: string) => {
+    start.jumpToNotePage(noteTopology).toggleApproval(recallPrompt)
   }
 )
 
@@ -480,8 +489,8 @@ Then('the question in the form becomes:', (data: DataTable) => {
 
 When(
   'I update note {string} details using markdown to become:',
-  (noteTopic: string, newDetails: string) => {
-    start.jumpToNotePage(noteTopic).updateDetailsAsMarkdown(newDetails)
+  (noteTopology: string, newDetails: string) => {
+    start.jumpToNotePage(noteTopology).updateDetailsAsMarkdown(newDetails)
   }
 )
 
@@ -497,10 +506,10 @@ Then(
 
 When(
   'I create a note after {string}:',
-  (noteTopic: string, data: DataTable) => {
+  (noteTopology: string, data: DataTable) => {
     expect(data.hashes().length).to.equal(1)
     start
-      .jumpToNotePage(noteTopic)
+      .jumpToNotePage(noteTopology)
       .addingNextSiblingNote()
       .createNoteWithAttributes(data.hashes()[0]!)
   }

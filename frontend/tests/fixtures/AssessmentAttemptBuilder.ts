@@ -11,7 +11,7 @@ class AssessmentAttemptBuilder extends Builder<AssessmentAttempt> {
 
   forNotebook(notebook: Notebook) {
     this.data.notebookId = notebook.id
-    this.data.notebookTitle = notebook.headNoteTopic.topicConstructor
+    this.data.notebookTitle = notebook.headNoteTopic.titleOrPredicate
 
     return this
   }

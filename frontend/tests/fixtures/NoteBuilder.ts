@@ -1,5 +1,5 @@
 import type { Note, NoteRealm } from "@/generated/backend"
-import { NoteTopic } from "@/generated/backend"
+import { NoteTopology } from "@/generated/backend"
 import Builder from "./Builder"
 import generateId from "./generateId"
 
@@ -11,9 +11,9 @@ class NoteBuilder extends Builder<Note> {
     const id = generateId()
     this.data = {
       id,
-      noteTopic: {
+      noteTopology: {
         id,
-        topicConstructor: "Note1.1.1",
+        titleOrPredicate: "Note1.1.1",
       },
       details: "<p>Desc</p>",
       wikidataId: "",
@@ -31,7 +31,7 @@ class NoteBuilder extends Builder<Note> {
   }
 
   topicConstructor(value: string): NoteBuilder {
-    this.data.noteTopic.topicConstructor = value
+    this.data.noteTopology.titleOrPredicate = value
     return this
   }
 
@@ -42,7 +42,7 @@ class NoteBuilder extends Builder<Note> {
 
   details(value: string): NoteBuilder {
     this.data.details = value
-    this.data.noteTopic.shortDetails = `${value}, just shorter`
+    this.data.noteTopology.shortDetails = `${value}, just shorter`
     return this
   }
 
@@ -55,7 +55,7 @@ class NoteBuilder extends Builder<Note> {
 
   underNote(value: Note): NoteBuilder {
     this.data.parentId = value.id
-    this.data.noteTopic.parentNoteTopic = value.noteTopic
+    this.data.noteTopology.parentOrSubjectNoteTopology = value.noteTopology
     return this
   }
 
@@ -69,19 +69,19 @@ class NoteBuilder extends Builder<Note> {
     return this
   }
 
-  linkType(value: NoteTopic.linkType): NoteBuilder {
+  linkType(value: NoteTopology.linkType): NoteBuilder {
     this.topicConstructor(`:${value}`)
     // default target
-    this.data.noteTopic.targetNoteTopic = {
+    this.data.noteTopology.objectNoteTopology = {
       id: generateId(),
       linkType: value,
-      topicConstructor: "a target",
+      titleOrPredicate: "a target",
     }
     return this
   }
 
   target(note: Note): NoteBuilder {
-    this.data.noteTopic.targetNoteTopic = note.noteTopic
+    this.data.noteTopology.objectNoteTopology = note.noteTopology
     return this
   }
 

@@ -12,7 +12,7 @@ const myNotebooksPage = () => {
     ...notebookList(),
     navigateToPath(notePath: NotePath) {
       return notePath.path.reduce(
-        (page, noteTopic) => page.navigateToChild(noteTopic),
+        (page, noteTopology) => page.navigateToChild(noteTopology),
         assumeNotePage()
       )
     },

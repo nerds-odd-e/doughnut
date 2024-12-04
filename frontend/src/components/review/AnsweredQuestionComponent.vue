@@ -4,7 +4,7 @@
       class="note-under-question"
     >
       <legend>Note under question</legend>
-      <Breadcrumb v-bind="{ noteTopic: note.noteTopic, includingSelf: true }" />
+      <Breadcrumb v-bind="{ noteTopology: note.noteTopology, includingSelf: true }" />
     </fieldset>
   </div>
   <QuestionDisplay

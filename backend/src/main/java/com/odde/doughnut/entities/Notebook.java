@@ -5,7 +5,7 @@ import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.odde.doughnut.controllers.dto.NoteTopic;
+import com.odde.doughnut.controllers.dto.NoteTopology;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.models.Randomizer;
 import jakarta.persistence.*;
@@ -157,8 +157,8 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   }
 
   @NonNull
-  public NoteTopic getHeadNoteTopic() {
-    return headNote.getNoteTopic();
+  public NoteTopology getHeadNoteTopic() {
+    return headNote.getNoteTopology();
   }
 
   public Circle getCircle() {

@@ -4,7 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.odde.doughnut.controllers.dto.NoteTopic;
+import com.odde.doughnut.controllers.dto.NoteTopology;
 import com.odde.doughnut.controllers.dto.SearchTerm;
 import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.Note;
@@ -42,7 +42,7 @@ public class UserModelSearchTest {
     anotherUser = makeMe.aUser().toModelPlease();
   }
 
-  private List<NoteTopic> search() {
+  private List<NoteTopology> search() {
     return searchTermModel.searchForNotesInRelateTo(note);
   }
 
@@ -61,7 +61,7 @@ public class UserModelSearchTest {
   void theSearchIsCaseInsensitive() {
     Note anotherNote = makeMe.aNote("Some Note").under(note).please();
     searchTerm.setSearchKey("not");
-    assertThat(search(), contains(anotherNote.getNoteTopic()));
+    assertThat(search(), contains(anotherNote.getNoteTopology()));
   }
 
   @Test
@@ -115,7 +115,7 @@ public class UserModelSearchTest {
       searchTerm.setSearchKey(commonPhrase);
       searchTerm.setAllMyNotebooksAndSubscriptions(allMyNotebooksAndSubscriptions);
       searchTerm.setAllMyCircles(allMyCircle);
-      List<NoteTopic> actual = search();
+      List<NoteTopology> actual = search();
       assertThat(actual, hasSize(expectedCount));
       assertThat(
           actual,
@@ -125,11 +125,11 @@ public class UserModelSearchTest {
 
     Object[] expectedNotes(
         boolean expectOtherNotebooks, boolean expectSubscription, boolean expectCircleNote) {
-      List<NoteTopic> result = new ArrayList<>();
-      result.add(noteInTheSameNotebook.getNoteTopic());
-      if (expectOtherNotebooks) result.add(noteFromMyOtherNotebook.getNoteTopic());
-      if (expectSubscription) result.add(subscribedBazaarNote.getNoteTopic());
-      if (expectCircleNote) result.add(circleNote.getNoteTopic());
+      List<NoteTopology> result = new ArrayList<>();
+      result.add(noteInTheSameNotebook.getNoteTopology());
+      if (expectOtherNotebooks) result.add(noteFromMyOtherNotebook.getNoteTopology());
+      if (expectSubscription) result.add(subscribedBazaarNote.getNoteTopology());
+      if (expectCircleNote) result.add(circleNote.getNoteTopology());
       return result.toArray();
     }
   }

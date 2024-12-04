@@ -10,7 +10,7 @@ describe("LinkNoteFinalize", () => {
       .component(LinkNoteFinalize)
       .withStorageProps({
         note,
-        targetNoteTopic: note.note.noteTopic,
+        targetNoteTopic: note.note.noteTopology,
       })
       .mount()
     await wrapper.find(".go-back-button").trigger("click")
@@ -30,7 +30,7 @@ describe("LinkNoteFinalize", () => {
       .component(LinkNoteFinalize)
       .withStorageProps({
         note,
-        targetNoteTopic: note.note.noteTopic,
+        targetNoteTopic: note.note.noteTopology,
       })
       .mount()
 

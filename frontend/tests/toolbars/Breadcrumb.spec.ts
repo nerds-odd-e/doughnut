@@ -14,7 +14,7 @@ describe("breadcrumb with circles", () => {
   it("render the breadcrumber", async () => {
     const wrapper = helper
       .component(BreadcrumbWithCircle)
-      .withProps({ fromBazaar: false, noteTopic: parentNote.noteTopic })
+      .withProps({ fromBazaar: false, noteTopology: parentNote.noteTopology })
       .mount()
     expect(wrapper.find(".breadcrumb-item").text()).toEqual("My Notes")
   })
@@ -22,7 +22,7 @@ describe("breadcrumb with circles", () => {
   it("view note belongs to other people in bazaar", async () => {
     helper
       .component(BreadcrumbWithCircle)
-      .withProps({ fromBazaar: true, noteTopic: parentNote.noteTopic })
+      .withProps({ fromBazaar: true, noteTopology: parentNote.noteTopology })
       .render()
     await screen.findByText("Bazaar")
   })
@@ -30,7 +30,7 @@ describe("breadcrumb with circles", () => {
   it("show ancestors in correct order", async () => {
     helper
       .component(BreadcrumbWithCircle)
-      .withProps({ fromBazaar: false, noteTopic: grandChild.noteTopic })
+      .withProps({ fromBazaar: false, noteTopology: grandChild.noteTopology })
       .render()
     const items = screen.getAllByText(/parent|child/)
     expect(items[0]).toHaveTextContent("parent")

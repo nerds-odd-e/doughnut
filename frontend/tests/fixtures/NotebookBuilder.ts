@@ -12,7 +12,7 @@ class NotebookBuilder extends Builder<Notebook> {
     super()
     this.data = {
       id: generateId(),
-      headNoteTopic: this.notebuilder.data.noteTopic,
+      headNoteTopic: this.notebuilder.data.noteTopology,
       notebookSettings: {
         skipMemoryTrackingEntirely: false,
       },
@@ -36,7 +36,7 @@ class NotebookBuilder extends Builder<Notebook> {
   }
 
   do(): Notebook {
-    this.data.headNoteTopic = this.notebuilder.do().noteTopic
+    this.data.headNoteTopic = this.notebuilder.do().noteTopology
     return this.data
   }
 }

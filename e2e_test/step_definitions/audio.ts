@@ -18,9 +18,12 @@ Given(
   }
 )
 
-When('I start recording audio for the note {string}', (noteTopic: string) => {
-  start.jumpToNotePage(noteTopic).audioTools().startRecording()
-})
+When(
+  'I start recording audio for the note {string}',
+  (noteTopology: string) => {
+    start.jumpToNotePage(noteTopology).audioTools().startRecording()
+  }
+)
 
 When('I stop recording audio', () => {
   start.assumeAudioTools().stopRecording()

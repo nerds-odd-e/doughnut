@@ -10,16 +10,16 @@ Then('I should see {string} shared in the Bazaar', (notebooks: string) => {
   start.navigateToBazaar().expectNotebooks(notebooks)
 })
 
-Then('notebook {string} is shared to the Bazaar', (noteTopic: string) => {
-  start.testability().shareToBazaar(noteTopic)
+Then('notebook {string} is shared to the Bazaar', (noteTopology: string) => {
+  start.testability().shareToBazaar(noteTopology)
 })
 
 Then("there shouldn't be any note edit button", () => {
   start.assumeNotePage().addingChildNoteButton().shouldNotExist()
 })
 
-When('I open the notebook {string} in the Bazaar', (noteTopic: string) => {
-  cy.findCardTitle(noteTopic).click()
+When('I open the notebook {string} in the Bazaar', (noteTopology: string) => {
+  cy.findCardTitle(noteTopology).click()
 })
 
 When(
@@ -45,24 +45,24 @@ Then(
 
 Then(
   'I can not see add the notebook {string} to my learning in the bazaar',
-  (noteTopic: string) => {
-    start.navigateToBazaar().expectNoAddToMyLearningButton(noteTopic)
+  (noteTopology: string) => {
+    start.navigateToBazaar().expectNoAddToMyLearningButton(noteTopology)
   }
 )
 
-Then("I should see I've subscribed to {string}", (noteTopic: string) => {
-  cy.findCardTitle(noteTopic)
+Then("I should see I've subscribed to {string}", (noteTopology: string) => {
+  cy.findCardTitle(noteTopology)
 })
 
 Then('I should see message that says {string}', (message: string) => {
   cy.findByText(message)
 })
 
-Then("I should see I've not subscribed to {string}", (noteTopic: string) => {
+Then("I should see I've not subscribed to {string}", (noteTopology: string) => {
   cy.findByText('Subscribed Notes').should('exist')
-  cy.findCardTitle(noteTopic).should('not.exist')
+  cy.findCardTitle(noteTopology).should('not.exist')
 })
 
-Then('I should see it has link to {string}', (noteTopic: string) => {
-  start.assumeNotePage().navigateToReference(noteTopic)
+Then('I should see it has link to {string}', (noteTopology: string) => {
+  start.assumeNotePage().navigateToReference(noteTopology)
 })

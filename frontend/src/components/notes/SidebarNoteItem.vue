@@ -20,7 +20,7 @@
       <NoteTopicWithLink
         class="card-title"
         :class="{ 'active-topic': noteRealm.id === activeNoteRealm.note.id }"
-        v-bind="{ noteTopic: noteRealm.note.noteTopic }"
+        v-bind="{ noteTopology: noteRealm.note.noteTopology }"
         @click.stop
       />
       <ScrollTo v-if="noteRealm.id === activeNoteRealm.note.id" />

@@ -25,12 +25,12 @@ function filterAttributes(
     )
 }
 
-export const assumeNotePage = (noteTopic?: string) => {
+export const assumeNotePage = (noteTopology?: string) => {
   const findNoteTopic = (topic) =>
     cy.findByText(topic, { selector: '[role=topic] *' })
 
-  if (noteTopic) {
-    findNoteTopic(noteTopic)
+  if (noteTopology) {
+    findNoteTopic(noteTopology)
   }
 
   const privateToolbarButton = (btnTextOrTitle: string) => {
@@ -61,11 +61,11 @@ export const assumeNotePage = (noteTopic?: string) => {
   }
 
   return {
-    navigateToChild: (noteTopic: string) => {
+    navigateToChild: (noteTopology: string) => {
       cy.get('main').within(() => {
-        cy.findCardTitle(noteTopic).click()
+        cy.findCardTitle(noteTopology).click()
       })
-      return assumeNotePage(noteTopic)
+      return assumeNotePage(noteTopology)
     },
     collapseChildren: () => {
       cy.get('main').within(() => {

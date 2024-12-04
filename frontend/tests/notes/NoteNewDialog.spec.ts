@@ -35,7 +35,7 @@ describe("adding new note", () => {
   const note = makeMe.aNote.topicConstructor("mythical").please()
 
   it("search for duplicate", async () => {
-    mockedSearchWithin.mockResolvedValue([note.noteTopic])
+    mockedSearchWithin.mockResolvedValue([note.noteTopology])
     const wrapper = helper
       .component(NoteNewDialog)
       .withStorageProps({ referenceNote: note, insertMode: "as-child" })

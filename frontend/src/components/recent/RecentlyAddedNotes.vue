@@ -13,10 +13,10 @@
       <tbody>
         <tr v-for="note in notes" :key="note.id">
           <td>
-            <NoteTopicWithLink :noteTopic="note.note.noteTopic" />
+            <NoteTopicWithLink :noteTopology="note.note.noteTopology" />
           </td>
           <td>
-            {{ note.notebook?.headNoteTopic?.topicConstructor }}
+            {{ note.notebook?.headNoteTopic?.titleOrPredicate }}
           </td>
           <td>{{ new Date(note.note.createdAt).toLocaleString() }}</td>
           <td>{{ new Date(note.note.updatedAt).toLocaleString() }}</td>

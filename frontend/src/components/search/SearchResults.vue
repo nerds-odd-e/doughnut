@@ -20,20 +20,20 @@
 
     <div v-else-if="isDropdown" class="dropdown-list">
       <NoteTopicWithLink
-        v-for="noteTopic in searchResult"
-        :key="noteTopic.id"
-        :note-topic="noteTopic"
+        v-for="noteTopology in searchResult"
+        :key="noteTopology.id"
+        :noteTopology="noteTopology"
       />
     </div>
 
     <Cards
       v-else
       class="search-result"
-      :note-topics="searchResult"
+      :noteTopologies="searchResult"
       :columns="3"
     >
-      <template #button="{ noteTopic }">
-        <slot name="button" :note-topic="noteTopic" />
+      <template #button="{ noteTopology }">
+        <slot name="button" :note-topology="noteTopology" />
       </template>
     </Cards>
   </div>
@@ -41,7 +41,7 @@
 
 <script setup lang="ts">
 import type { SearchTerm } from "@/generated/backend"
-import { NoteTopic } from "@/generated/backend"
+import { NoteTopology } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { debounce } from "mini-debounce"
 import { ref, computed, watch, onMounted, onBeforeUnmount } from "vue"
@@ -58,7 +58,7 @@ const props = defineProps({
 
 // Emit slot for template
 defineSlots<{
-  button: (props: { noteTopic: NoteTopic }) => void
+  button: (props: { noteTopology: NoteTopology }) => void
 }>()
 
 const { managedApi } = useLoadingApi()
@@ -77,14 +77,14 @@ const oldSearchTerm = ref<SearchTerm>({
 })
 
 const cache = ref<{
-  global: Record<string, NoteTopic[]>
-  local: Record<string, NoteTopic[]>
+  global: Record<string, NoteTopology[]>
+  local: Record<string, NoteTopology[]>
 }>({
   global: {},
   local: {},
 })
 
-const recentResult = ref<NoteTopic[] | undefined>()
+const recentResult = ref<NoteTopology[] | undefined>()
 const timeoutId = ref<ReturnType<typeof setTimeout>>()
 
 // Computed properties

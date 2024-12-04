@@ -38,16 +38,16 @@ export default {
 
   // jumptoNotePage is faster than navigateToPage
   //    it uses the note id memorized when creating them with testability api
-  jumpToNotePage: (noteTopic: string, forceLoadPage = false) => {
+  jumpToNotePage: (noteTopology: string, forceLoadPage = false) => {
     testability()
-      .getInjectedNoteIdByTitle(noteTopic)
+      .getInjectedNoteIdByTitle(noteTopology)
       .then((noteId) => {
         const url = `/n${noteId}`
         if (forceLoadPage) cy.visit(url)
         else cy.routerPush(url, 'noteShow', { noteId: noteId })
       })
 
-    return assumeNotePage(noteTopic)
+    return assumeNotePage(noteTopology)
   },
   navigateToAssessmentAndCertificatePage() {
     return systemSidebar().userOptions().myAssessmentAndCertificateHistory()

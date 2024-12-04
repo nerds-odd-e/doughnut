@@ -10,7 +10,7 @@ describe("note topic", () => {
     return helper
       .component(NoteTopicComponent)
       .withProps({
-        noteTopic: n.noteTopic,
+        noteTopology: n.noteTopology,
       })
       .mount()
   }
@@ -33,16 +33,16 @@ describe("note topic", () => {
         name: "noteShow",
         params: { noteId: target.id },
       })
-      expect(link.text()).toBe(target.noteTopic.topicConstructor)
+      expect(link.text()).toBe(target.noteTopology.titleOrPredicate)
     })
 
     it("if linking note has details the link is an icon", async () => {
-      linkingNote.noteTopic.shortDetails = "exist"
+      linkingNote.noteTopology.shortDetails = "exist"
       const wrapper = mountComponent(linkingNote)
       const link = wrapper.find("a.router-link")
       expect(link.exists()).toBe(true)
       expect(link.text()).toBe("🔗")
-      expect(wrapper.text()).toContain(target.noteTopic.topicConstructor)
+      expect(wrapper.text()).toContain(target.noteTopology.titleOrPredicate)
     })
   })
 })

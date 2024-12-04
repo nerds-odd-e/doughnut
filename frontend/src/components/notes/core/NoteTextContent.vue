@@ -3,12 +3,12 @@
     This note has been deleted
   </div>
   <NoteLinkTopic
-    v-if="note.noteTopic.targetNoteTopic"
-    v-bind="{ noteTopic: note.noteTopic, readonly, storageAccessor }"
+    v-if="note.noteTopology.objectNoteTopology"
+    v-bind="{ noteTopology: note.noteTopology, readonly, storageAccessor }"
   />
   <NoteEditableTopic
     v-else
-    v-bind="{ noteTopic: note.noteTopic, readonly, storageAccessor }"
+    v-bind="{ noteTopology: note.noteTopology, readonly, storageAccessor }"
   />
   <div role="details" class="note-details">
     <NoteEditableDetails

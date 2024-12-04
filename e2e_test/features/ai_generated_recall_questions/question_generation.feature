@@ -7,7 +7,7 @@ Feature: Question generation by AI
     Given I am logged in as an existing user
 
   Scenario Outline: testing myself with generated question for a note
-    Given I've got the following question for a note with topic "Scuba Diving":
+    Given I've got the following question for a note with title "Scuba Diving":
       | Question Stem                                       | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
       | What is the most common scuba diving certification? | Rescue Diver   | Divemaster         | Open Water Diver   |
     Then I should be asked "What is the most common scuba diving certification?"

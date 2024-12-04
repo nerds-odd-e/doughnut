@@ -7,11 +7,11 @@ import org.springframework.lang.NonNull;
 
 @NoArgsConstructor
 @Data
-public class NoteTopic {
+public class NoteTopology {
   @NonNull private Integer id;
-  @NonNull private String topicConstructor;
+  @NonNull private String titleOrPredicate;
   private String shortDetails;
   private LinkType linkType;
-  private NoteTopic targetNoteTopic;
-  private NoteTopic parentNoteTopic;
+  private NoteTopology objectNoteTopology;
+  private NoteTopology parentOrSubjectNoteTopology;
 }

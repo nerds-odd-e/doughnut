@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import { NoteTopic } from "@/generated/backend"
+import { NoteTopology } from "@/generated/backend"
 import type { PropType } from "vue"
 import { computed } from "vue"
 import { linkTypeOptions } from "../../models/linkTypeOptions"
@@ -23,7 +23,7 @@ import SvgLinkTypeIcon from "../svgs/SvgLinkTypeIcon.vue"
 const { allowEmpty } = defineProps({
   scopeName: String,
   modelValue: {
-    type: String as PropType<NoteTopic.linkType>,
+    type: String as PropType<NoteTopology.linkType>,
     required: true,
   },
   errorMessage: String,

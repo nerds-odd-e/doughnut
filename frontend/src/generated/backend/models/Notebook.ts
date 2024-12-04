@@ -4,13 +4,13 @@
 /* eslint-disable */
 import type { Circle } from './Circle';
 import type { NotebookSettings } from './NotebookSettings';
-import type { NoteTopic } from './NoteTopic';
+import type { NoteTopology } from './NoteTopology';
 export type Notebook = {
     id: number;
     certifiable?: boolean;
     notebookSettings: NotebookSettings;
     creatorId?: string;
-    headNoteTopic: NoteTopic;
+    headNoteTopic: NoteTopology;
     circle?: Circle;
     updated_at: string;
 };

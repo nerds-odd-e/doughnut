@@ -10,7 +10,7 @@ import com.odde.doughnut.algorithms.ClozedString;
 import com.odde.doughnut.algorithms.HtmlOrMarkdown;
 import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.algorithms.SiblingOrder;
-import com.odde.doughnut.controllers.dto.NoteTopic;
+import com.odde.doughnut.controllers.dto.NoteTopology;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.TimestampOperations;
 import jakarta.persistence.*;
@@ -27,7 +27,7 @@ import lombok.Setter;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "note")
-@JsonPropertyOrder({"topic", "noteTopic", "details", "parentId", "linkType", "updatedAt"})
+@JsonPropertyOrder({"topic", "noteTopology", "details", "parentId", "linkType", "updatedAt"})
 public class Note extends EntityIdentifiedByIdOnly {
   public static final int MAX_TITLE_LENGTH = 150;
   public static final String NOTE_OF_CURRENT_FOCUS = "note of current focus";
@@ -305,19 +305,19 @@ public class Note extends EntityIdentifiedByIdOnly {
   }
 
   @org.springframework.lang.NonNull
-  public NoteTopic getNoteTopic() {
-    NoteTopic noteTopic = new NoteTopic();
-    noteTopic.setId(getId());
-    noteTopic.setTopicConstructor(getTopicConstructor());
-    noteTopic.setShortDetails(new HtmlOrMarkdown(getDetails()).beginning(50));
-    noteTopic.setLinkType(getLinkType());
+  public NoteTopology getNoteTopology() {
+    NoteTopology noteTopology = new NoteTopology();
+    noteTopology.setId(getId());
+    noteTopology.setTitleOrPredicate(getTopicConstructor());
+    noteTopology.setShortDetails(new HtmlOrMarkdown(getDetails()).beginning(50));
+    noteTopology.setLinkType(getLinkType());
     if (getParent() != null) {
-      noteTopic.setParentNoteTopic(getParent().getNoteTopic());
+      noteTopology.setParentOrSubjectNoteTopology(getParent().getNoteTopology());
     }
     if (getTargetNote() != null) {
-      noteTopic.setTargetNoteTopic(getTargetNote().getNoteTopic());
+      noteTopology.setObjectNoteTopology(getTargetNote().getNoteTopology());
     }
-    return noteTopic;
+    return noteTopology;
   }
 
   @JsonIgnore

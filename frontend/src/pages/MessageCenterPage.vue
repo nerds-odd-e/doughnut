@@ -125,7 +125,7 @@ const conversationTopic = (conversation: Conversation) => {
   return (
     conversation.subject?.assessmentQuestionInstance?.bareQuestion
       .multipleChoicesQuestion.stem ||
-    conversation.subject?.note?.noteTopic?.topicConstructor
+    conversation.subject?.note?.noteTopology?.titleOrPredicate
   )
 }
 

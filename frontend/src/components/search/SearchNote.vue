@@ -8,17 +8,17 @@
       v-focus
     />
     <SearchResults v-bind="{ noteId, inputSearchKey }">
-      <template #button="{ noteTopic }">
+      <template #button="{ noteTopology }">
         <div class="btn-group">
           <button
             class="btn btn-primary"
-            @click.prevent="emit('selected', noteTopic)"
+            @click.prevent="emit('selected', noteTopology)"
           >
             Link
           </button>
           <button
             class="btn btn-sm btn-secondary"
-            @click.prevent="emit('moveUnder', noteTopic)"
+            @click.prevent="emit('moveUnder', noteTopology)"
           >
             Move Under
           </button>
@@ -32,15 +32,15 @@
 import { ref } from "vue"
 import TextInput from "../form/TextInput.vue"
 import SearchResults from "./SearchResults.vue"
-import type { NoteTopic } from "@/generated/backend"
+import type { NoteTopology } from "@/generated/backend"
 
 defineProps<{
   noteId?: number
 }>()
 
 const emit = defineEmits<{
-  (e: "selected", noteTopic: NoteTopic): void
-  (e: "moveUnder", noteTopic: NoteTopic): void
+  (e: "selected", noteTopology: NoteTopology): void
+  (e: "moveUnder", noteTopology: NoteTopology): void
 }>()
 
 const inputSearchKey = ref("")

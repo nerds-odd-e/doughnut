@@ -6,7 +6,7 @@ import type { NoteAccessoriesDTO } from '../models/NoteAccessoriesDTO';
 import type { NoteAccessory } from '../models/NoteAccessory';
 import type { NoteInfo } from '../models/NoteInfo';
 import type { NoteRealm } from '../models/NoteRealm';
-import type { NoteTopic } from '../models/NoteTopic';
+import type { NoteTopology } from '../models/NoteTopology';
 import type { RecallSetting } from '../models/RecallSetting';
 import type { RedirectToNoteResponse } from '../models/RedirectToNoteResponse';
 import type { SearchTerm } from '../models/SearchTerm';
@@ -41,13 +41,13 @@ export class RestNoteControllerService {
     /**
      * @param note
      * @param requestBody
-     * @returns NoteTopic OK
+     * @returns NoteTopology OK
      * @throws ApiError
      */
     public searchForLinkTargetWithin(
         note: number,
         requestBody: SearchTerm,
-    ): CancelablePromise<Array<NoteTopic>> {
+    ): CancelablePromise<Array<NoteTopology>> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/notes/{note}/search',
@@ -105,12 +105,12 @@ export class RestNoteControllerService {
     }
     /**
      * @param requestBody
-     * @returns NoteTopic OK
+     * @returns NoteTopology OK
      * @throws ApiError
      */
     public searchForLinkTarget(
         requestBody: SearchTerm,
-    ): CancelablePromise<Array<NoteTopic>> {
+    ): CancelablePromise<Array<NoteTopology>> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/notes/search',

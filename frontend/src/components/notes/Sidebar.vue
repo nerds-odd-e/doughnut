@@ -28,9 +28,9 @@ const props = defineProps({
 
 const headNoteId = computed(() => {
   if (!props.activeNoteRealm) return undefined
-  let cursor = props.activeNoteRealm.note.noteTopic
-  while (cursor.parentNoteTopic) {
-    cursor = cursor.parentNoteTopic
+  let cursor = props.activeNoteRealm.note.noteTopology
+  while (cursor.parentOrSubjectNoteTopology) {
+    cursor = cursor.parentOrSubjectNoteTopology
   }
   return cursor.id
 })

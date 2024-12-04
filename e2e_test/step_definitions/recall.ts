@@ -70,24 +70,24 @@ Then('it should move to review page', () => {
   cy.url().should('eq', `${Cypress.config().baseUrl}/recalls`)
 })
 
-Then('I initial review {string}', (noteTopic: string) => {
-  start.assimilation().goToAssimilationPage().assimilateNotes(noteTopic)
+Then('I initial review {string}', (noteTopology: string) => {
+  start.assimilation().goToAssimilationPage().assimilateNotes(noteTopology)
 })
 
 Then(
   'I added and learned one note {string} on day {int}',
-  (noteTopic: string, day: number) => {
-    start.testability().injectNotes([{ Title: noteTopic }])
+  (noteTopology: string, day: number) => {
+    start.testability().injectNotes([{ Title: noteTopology }])
     start.testability().backendTimeTravelTo(day, 8)
-    start.assimilation().goToAssimilationPage().assimilateNotes(noteTopic)
+    start.assimilation().goToAssimilationPage().assimilateNotes(noteTopology)
   }
 )
 
 Then(
   'I learned one note {string} on day {int}',
-  (noteTopic: string, day: number) => {
+  (noteTopology: string, day: number) => {
     start.testability().backendTimeTravelTo(day, 8)
-    start.assimilation().goToAssimilationPage().assimilateNotes(noteTopic)
+    start.assimilation().goToAssimilationPage().assimilateNotes(noteTopology)
   }
 )
 
@@ -103,8 +103,8 @@ Then('I am assimilating new note on day {int}', (day: number) => {
 
 Then(
   'I set the level of {string} to be {int}',
-  (noteTopic: string, level: number) => {
-    start.assumeNotePage(noteTopic)
+  (noteTopology: string, level: number) => {
+    start.assumeNotePage(noteTopology)
     cy.formField('Level').then(($control) => {
       cy.wrap($control).within(() => {
         cy.findByRole('button', { name: `${level}` }).click()
@@ -132,8 +132,8 @@ Then(
 
 Then(
   'I should be asked link question {string} {string} with options {string}',
-  (noteTopic: string, linkType: string, options: string) => {
-    cy.shouldSeeQuizWithOptions([noteTopic, linkType], options)
+  (noteTopology: string, linkType: string, options: string) => {
+    cy.shouldSeeQuizWithOptions([noteTopology, linkType], options)
   }
 )
 
@@ -142,13 +142,16 @@ Then('I type my answer {string}', (answer: string) => {
   cy.replaceFocusedTextAndEnter(answer)
 })
 
-Then('I choose answer {string}', (noteTopic: string) => {
-  cy.findByRole('button', { name: noteTopic }).click()
+Then('I choose answer {string}', (noteTopology: string) => {
+  cy.findByRole('button', { name: noteTopology }).click()
 })
 
-Then('I should see the information of note {string}', (noteTopic: string) => {
-  start.assumeNotePage(noteTopic)
-})
+Then(
+  'I should see the information of note {string}',
+  (noteTopology: string) => {
+    start.assumeNotePage(noteTopology)
+  }
+)
 
 Then('I should see that my answer {string} is incorrect', (answer) => {
   cy.findByText(`Your answer \`${answer}\` is incorrect.`)
@@ -173,10 +176,10 @@ Then('I should see that my last answer is correct', () => {
 
 Then(
   'I should see the memory tracker info of note {string}',
-  (noteTopic: string, data: DataTable) => {
+  (noteTopology: string, data: DataTable) => {
     start
       .assumeAnsweredQuestionPage()
-      .showMemoryTracker(noteTopic)
+      .showMemoryTracker(noteTopology)
       .expectMemoryTrackerInfo(data.hashes()[0] ?? {})
   }
 )
@@ -198,10 +201,10 @@ Then('the choice {string} should be incorrect', (choice: string) => {
 })
 
 When(
-  "I've got the following question for a note with topic {string}:",
-  (noteTopic: string, question: DataTable) => {
+  "I've got the following question for a note with title {string}:",
+  (noteTitle: string, question: DataTable) => {
     start.stubOpenAIQuestionGenerationAndSeeTheQuestion(
-      noteTopic,
+      noteTitle,
       question.hashes()[0] ?? {}
     )
   }
@@ -241,9 +244,9 @@ Then(
 
 Then(
   'I suggest the question {string} of the note {string} as a good example',
-  (questionStem: string, noteTopic: string) => {
+  (questionStem: string, noteTopology: string) => {
     start
-      .jumpToNotePage(noteTopic)
+      .jumpToNotePage(noteTopology)
       .openQuestionList()
       .suggestingQuestionForFineTuning(questionStem)
       .suggestingPositiveFeedbackForFineTuning()
@@ -252,9 +255,9 @@ Then(
 
 Then(
   'I suggest the question {string} of the note {string} as a bad example',
-  (questionStem: string, noteTopic: string) => {
+  (questionStem: string, noteTopology: string) => {
     start
-      .jumpToNotePage(noteTopic)
+      .jumpToNotePage(noteTopology)
       .openQuestionList()
       .suggestingQuestionForFineTuning(questionStem)
       .suggestingNegativeFeedbackFineTuningExclusion()

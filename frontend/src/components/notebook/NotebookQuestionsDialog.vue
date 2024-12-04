@@ -1,7 +1,7 @@
 <template>
   <div class="notebook-questions-list">
     <div v-for="note in notes">
-      <h3>{{note.noteTopic.topicConstructor}}</h3>
+      <h3>{{note.noteTopology.titleOrPredicate}}</h3>
       <Questions :note="note" />
     </div>
   </div>

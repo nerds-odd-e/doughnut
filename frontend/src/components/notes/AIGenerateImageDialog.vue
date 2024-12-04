@@ -33,7 +33,7 @@ export default defineComponent({
   },
   data() {
     return {
-      prompt: this.note.noteTopic.topicConstructor,
+      prompt: this.note.noteTopology.titleOrPredicate,
       b64Json: undefined as string | undefined,
       promptError: undefined as string | undefined,
     }

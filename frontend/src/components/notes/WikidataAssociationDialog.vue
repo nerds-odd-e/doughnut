@@ -2,7 +2,7 @@
   <h3>
     Associate
     <strong
-      ><NoteTopicComponent v-bind="{ noteTopic: note.noteTopic }"
+      ><NoteTopicComponent v-bind="{ noteTopology: note.noteTopology }"
     /></strong>
     Wikidata
   </h3>
@@ -22,7 +22,7 @@
   <form v-else @submit.prevent="save">
     <p>
       Confirm to associate
-      <strong>NoteTopic v-bind="{ noteTopic: note.noteTopic }" /></strong> with
+      <strong>NoteTopology v-bind="{ noteTopology: note.noteTopology }" /></strong> with
       <strong>{{ conflictWikidataTitle }}</strong
       >?
     </p>
@@ -98,7 +98,7 @@ const validateAndSave = async () => {
     if (
       res.WikidataTitleInEnglish !== "" &&
       res.WikidataTitleInEnglish.toUpperCase() !==
-        props.note.noteTopic.topicConstructor.toUpperCase()
+        props.note.noteTopology.titleOrPredicate.toUpperCase()
     ) {
       conflictWikidataTitle.value = res.WikidataTitleInEnglish
       return

@@ -245,7 +245,7 @@ class TestabilityRestController {
   @PostMapping("/share_to_bazaar")
   @Transactional
   public String shareToBazaar(@RequestBody HashMap<String, String> map) {
-    Note note = noteRepository.findFirstByTopicConstructor(map.get("noteTopic"));
+    Note note = noteRepository.findFirstByTopicConstructor(map.get("noteTopology"));
     modelFactoryService.toBazaarModel().shareNotebook(note.getNotebook());
     return "OK";
   }
