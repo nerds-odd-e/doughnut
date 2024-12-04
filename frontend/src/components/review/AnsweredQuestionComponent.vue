@@ -16,20 +16,15 @@
     }"
   />
   <AnswerResult v-bind="{ answeredQuestion }" />
-  <ConversationButton @click="startConversation" />
+  <ConversationButton :recall-prompt-id="answeredQuestion.recallPromptId" />
 </template>
 
 <script setup lang="ts">
 import type { AnsweredQuestion } from "@/generated/backend"
 import type { PropType } from "vue"
 import QuestionDisplay from "./QuestionDisplay.vue"
-import { useRouter } from "vue-router"
-import useLoadingApi from "@/managedApi/useLoadingApi"
 import Breadcrumb from "@/components/toolbars/Breadcrumb.vue"
 import ConversationButton from "./ConversationButton.vue"
-
-const router = useRouter()
-const { managedApi } = useLoadingApi()
 
 const { answeredQuestion } = defineProps({
   answeredQuestion: {
@@ -39,18 +34,6 @@ const { answeredQuestion } = defineProps({
 })
 
 const note = answeredQuestion?.note
-
-const startConversation = async () => {
-  const conversation =
-    await managedApi.restConversationMessageController.startConversationAboutRecallPrompt(
-      answeredQuestion.recallPromptId
-    )
-
-  router.push({
-    name: "messageCenter",
-    params: { conversationId: conversation.id },
-  })
-}
 </script>
 
 <style lang="sass" scoped>

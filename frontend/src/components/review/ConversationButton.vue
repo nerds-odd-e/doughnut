@@ -2,7 +2,7 @@
   <button
     class="conversation-button"
     title="Start a conversation about this question"
-    @click="$emit('click')"
+    @click="startConversation"
   >
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -21,9 +21,27 @@
 </template>
 
 <script setup lang="ts">
-defineEmits<{
-  (e: "click"): void
+import { useRouter } from "vue-router"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+
+const props = defineProps<{
+  recallPromptId: number
 }>()
+
+const router = useRouter()
+const { managedApi } = useLoadingApi()
+
+const startConversation = async () => {
+  const conversation =
+    await managedApi.restConversationMessageController.startConversationAboutRecallPrompt(
+      props.recallPromptId
+    )
+
+  router.push({
+    name: "messageCenter",
+    params: { conversationId: conversation.id },
+  })
+}
 </script>
 
 <style lang="sass" scoped>
@@ -46,4 +64,4 @@ defineEmits<{
 
   &:hover
     background-color: #45a049
-</style> 
+</style>
