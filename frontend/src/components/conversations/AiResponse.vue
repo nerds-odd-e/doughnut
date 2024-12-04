@@ -216,7 +216,8 @@ const handleToolCallAccept = async (action: (note: Note) => Promise<void>) => {
 
   try {
     isProcessingToolCall.value = true
-    const note = conversation.subject?.note
+    const note =
+      conversation.subject?.note || conversation.subject?.answeredQuestion?.note
     if (!note) {
       console.error("No note found in conversation")
       return

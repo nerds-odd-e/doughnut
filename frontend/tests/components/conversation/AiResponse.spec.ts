@@ -84,7 +84,7 @@ const createRunResponse = (functionName: string, args: object) => ({
 const setupTestData = () => {
   const noteRealm = makeMe.aNoteRealm.please()
   const note = noteRealm.note
-  const conversation = makeMe.aConversation.note(note).please()
+  const conversation = makeMe.aConversation.forANote(note).please()
   return { note, noteRealm, conversation }
 }
 
@@ -387,6 +387,44 @@ describe("ConversationInner", () => {
       expect(
         helper.managedApi.restTextContentController.updateNoteDetails
       ).toHaveBeenCalledWith(note.id, { details: "Completely new text" })
+    })
+
+    describe("Note Access", () => {
+      beforeEach(async () => {
+        helper.managedApi.restAiController.submitToolCallsResult = vi.fn()
+        helper.managedApi.restTextContentController.updateNoteDetails = vi.fn()
+      })
+
+      it("fails to handle completion when note is in answeredQuestion but not in subject", async () => {
+        // Create conversation with note in answeredQuestion but not in subject
+        const answeredQuestion = makeMe.anAnsweredQuestion
+          .withNote(note)
+          .please()
+        const conversation = makeMe.aConversation
+          .forAnsweredQuestion(answeredQuestion)
+          .please()
+
+        const wrapper = mountComponent(conversation, storageAccessor)
+
+        // Simulate completion suggestion
+        await submitMessageAndSimulateRunResponse(
+          wrapper,
+          createRunResponse(
+            DummyForGeneratingTypes.aiToolName.COMPLETE_NOTE_DETAILS,
+            {
+              completion: "test completion",
+            }
+          )
+        )
+
+        // Try to accept the completion
+        await wrapper.find('button[class*="btn-primary"]').trigger("click")
+        await flushPromises()
+
+        expect(
+          helper.managedApi.restTextContentController.updateNoteDetails
+        ).toHaveBeenCalled()
+      })
     })
   })
 

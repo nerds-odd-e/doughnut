@@ -21,7 +21,7 @@ afterEach(() => {
 describe("ConversationComponent", () => {
   let wrapper
   const note = makeMe.aNote.please()
-  const conversation = makeMe.aConversation.note(note).please()
+  const conversation = makeMe.aConversation.forANote(note).please()
   const user = makeMe.aUser.please()
 
   beforeEach(() => {
@@ -50,7 +50,7 @@ describe("ConversationComponent", () => {
   describe("maximize/restore functionality", () => {
     it("should toggle maximize state when maximize button is clicked", async () => {
       const note = makeMe.aNote.please()
-      const conversation = makeMe.aConversation.note(note).please()
+      const conversation = makeMe.aConversation.forANote(note).please()
       const user = makeMe.aUser.please()
 
       const wrapper = helper

@@ -32,7 +32,7 @@ beforeAll(() => {
 
 const setupTestData = () => {
   const note = makeMe.aNote.details("").please()
-  const conversation = makeMe.aConversation.note(note).please()
+  const conversation = makeMe.aConversation.forANote(note).please()
   const user = makeMe.aUser.please()
   return { note, conversation, user }
 }
