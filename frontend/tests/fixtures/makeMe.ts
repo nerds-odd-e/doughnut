@@ -1,23 +1,24 @@
 import ApiErrorBuilder from "./ApiErrorBuilder"
+import AnsweredQuestionBuilder from "./AnsweredQuestionBuilder"
+import AssessmentAttemptBuilder from "./AssessmentAttemptBuilder"
+import AssessmentQuestionInstanceBuilder from "./AssessmentQuestionInstanceBuilder"
+import BareQuestionBuilder from "./BareQuestionBuilder"
 import BazaarNotebooksBuilder from "./BazaarNotebooksBuilder"
 import CircleBuilder from "./CircleBuilder"
 import CircleNoteBuilder from "./CircleNoteBuilder"
+import ConversationBuilder from "./ConversationBuilder"
 import DueMemoryTrackersBuilder from "./DueMemoryTrackersBuilder"
 import LinkBuilder from "./LinkBuilder"
+import MemoryTrackerBuilder from "./MemoryTrackerBuilder"
 import NoteBuilder from "./NoteBuilder"
 import NoteRealmBuilder from "./NoteRealmBuilder"
 import NotebookBuilder from "./NotebookBuilder"
 import PredefinedQuestionBuilder from "./PredefinedQuestionBuilder"
 import RecallPromptBuilder from "./RecallPromptBuilder"
-import MemoryTrackerBuilder from "./MemoryTrackerBuilder"
 import SuggestedQuestionForFineTuningBuilder from "./SuggestedQuestionForFineTuningBuilder"
 import UserBuilder from "./UserBuilder"
 import WikidataEntityBuilder from "./WikidataEntityBuilder"
 import WikidataSearchEntityBuilder from "./WikidataSearchEntityBuilder"
-import AssessmentAttemptBuilder from "./AssessmentAttemptBuilder"
-import AssessmentQuestionInstanceBuilder from "./AssessmentQuestionInstanceBuilder"
-import ConversationBuilder from "./ConversationBuilder"
-import AnsweredQuestionBuilder from "./AnsweredQuestionBuilder"
 
 class MakeMe {
   static get aUser() {
@@ -98,6 +99,10 @@ class MakeMe {
 
   static get anAnsweredQuestion(): AnsweredQuestionBuilder {
     return new AnsweredQuestionBuilder()
+  }
+
+  static get aBareQuestion(): BareQuestionBuilder {
+    return new BareQuestionBuilder()
   }
 }
 
