@@ -177,7 +177,7 @@ Cypress.Commands.add(
   'initialReviewOneNoteIfThereIs',
   ({
     'Review Type': reviewType,
-    Title: topic,
+    Title: title,
     'Additional Info': additionalInfo,
     Skip: skip,
   }) => {
@@ -186,7 +186,7 @@ Cypress.Commands.add(
         'be.visible'
       )
     } else {
-      cy.findByText(topic, { selector: 'main *' })
+      cy.findByText(title, { selector: 'main *' })
       switch (reviewType) {
         case 'single note': {
           if (additionalInfo) {
@@ -216,8 +216,8 @@ Cypress.Commands.add(
               additionalInfo,
               '; '
             )
-            if (typeof topic === 'string') {
-              cy.findByText(topic, { selector: 'main *' })
+            if (typeof title === 'string') {
+              cy.findByText(title, { selector: 'main *' })
             }
 
             if (typeof targetNote === 'string') {
@@ -244,8 +244,8 @@ Cypress.Commands.add(
   }
 )
 
-Cypress.Commands.add('findCardTitle', (topic) =>
-  cy.findByText(topic, { selector: '.card-title .title-text' })
+Cypress.Commands.add('findCardTitle', (title) =>
+  cy.findByText(title, { selector: '.card-title .title-text' })
 )
 
 Cypress.Commands.add('yesIRemember', () => {

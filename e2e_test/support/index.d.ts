@@ -15,7 +15,7 @@ declare namespace Cypress {
     ): Chainable<any>
     expectFieldErrorMessage(field: string, message: string): Chainable<any>
     expectNoteCards(expectedCards: any): Chainable<any>
-    findCardTitle(topic: string): Chainable<any>
+    findCardTitle(title: string): Chainable<any>
     expectAMapTo(latitude: string, longitude: string): Chainable<any>
     failure(): Chainable<any>
     formField(label: string): Chainable<any>
@@ -23,7 +23,7 @@ declare namespace Cypress {
     fieldShouldHaveValue(value: string): Chainable<any>
     initialReviewOneNoteIfThereIs({
       review_type,
-      topic,
+      title,
       additional_info,
       skip,
     }: any): Chainable<any>

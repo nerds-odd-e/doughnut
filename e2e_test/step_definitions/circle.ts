@@ -57,10 +57,10 @@ When(
 
 When(
   'I add a note {string} under {string}',
-  (noteTopology: string, parentNoteTopic: string) => {
+  (noteTopology: string, parentNoteTitle: string) => {
     start
       .assumeCirclePage()
-      .navigateToChild(parentNoteTopic)
+      .navigateToChild(parentNoteTitle)
       .addingChildNote()
       .createNote(noteTopology)
   }
@@ -79,10 +79,10 @@ When('I am on {string} circle page', (circleName: string) => {
 
 When(
   'There is a notebook {string} in circle {string} by {string}',
-  (topic: string, circleName: string, externalIdentifier: string) => {
+  (title: string, circleName: string, externalIdentifier: string) => {
     start
       .testability()
-      .injectNotes([{ Title: topic }], externalIdentifier, circleName)
+      .injectNotes([{ Title: title }], externalIdentifier, circleName)
   }
 )
 

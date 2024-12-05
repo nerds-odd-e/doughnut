@@ -12,15 +12,15 @@ import start, { mock_services } from '../start'
 
 When(
   'I associate the note {string} with wikidata id {string}',
-  (topic: string, wikiID: string) => {
-    start.jumpToNotePage(topic).wikidataOptions().associate(wikiID)
+  (title: string, wikiID: string) => {
+    start.jumpToNotePage(title).wikidataOptions().associate(wikiID)
   }
 )
 
 When(
   'I change the note {string} to associate with wikidata id {string}',
-  (topic: string, wikiID: string) => {
-    start.jumpToNotePage(topic).wikidataOptions().reassociationWith(wikiID)
+  (title: string, wikiID: string) => {
+    start.jumpToNotePage(title).wikidataOptions().reassociationWith(wikiID)
   }
 )
 
@@ -87,9 +87,9 @@ Then(
 
 Then(
   'the Wiki association of note {string} should link to {string}',
-  (topic: string, associationUrl: string) => {
+  (ttile: string, associationUrl: string) => {
     start
-      .assumeNotePage(topic)
+      .assumeNotePage(ttile)
       .wikidataOptions()
       .hasAssociation()
       .expectALinkThatOpensANewWindowWithURL(associationUrl)

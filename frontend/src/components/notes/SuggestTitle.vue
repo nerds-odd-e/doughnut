@@ -5,8 +5,8 @@
       v-model="replaceOrAppendTopic"
       scope-name="topicRadio"
       :options="[
-        { value: 'Replace', label: 'Replace topic' },
-        { value: 'Append', label: 'Append topic' },
+        { value: 'Replace', label: 'Replace title' },
+        { value: 'Append', label: 'Append title' },
       ]"
       @update:model-value="updateModelValue"
     />
