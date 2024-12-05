@@ -116,4 +116,17 @@ public class GraphRAGServiceTest {
         result.relatedNotes.get(2).uriAndTitle,
         equalTo(String.format("[Parent](/n%d)", parent.getId())));
   }
+
+  @Test
+  void shouldNotDuplicateParentInRelatedNotes() {
+    Note parent = makeMe.aNote().titleConstructor("Parent").please();
+    Note note = makeMe.aNote().titleConstructor("Test Note").under(parent).please();
+
+    GraphRAGResult result = graphRAGService.retrieve(note, 0);
+
+    assertThat(result.relatedNotes, hasSize(1));
+    assertThat(
+        result.relatedNotes.get(0).uriAndTitle,
+        equalTo(String.format("[Parent](/n%d)", parent.getId())));
+  }
 }
