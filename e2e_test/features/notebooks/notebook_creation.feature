@@ -6,7 +6,7 @@ Feature: Notebook creation
   Scenario: Create a new notebooks
     When I create a notebook with topic "Sedation"
     Then I should see these notes belonging to the user at the top level of all my notes
-      | Topic    |
+      | Title    |
       | Sedation |
 
   Scenario: Create a new note with invalid information

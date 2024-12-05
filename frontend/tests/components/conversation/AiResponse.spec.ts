@@ -428,7 +428,7 @@ describe("ConversationInner", () => {
     })
   })
 
-  describe("Topic Title Generation", () => {
+  describe("Title Title Generation", () => {
     const testTitle = "Generated Title"
     const threadId = "thread-123"
     const runId = "run-123"

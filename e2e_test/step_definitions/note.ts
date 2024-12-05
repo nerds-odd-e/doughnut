@@ -164,7 +164,7 @@ When(
 )
 
 Given(
-  'I update note topic {string} to become {string}',
+  'I update note title {string} to become {string}',
   (noteTopology: string, newNoteTopic: string) => {
     start.jumpToNotePage(noteTopology).editTextContent({ topic: newNoteTopic })
   }
@@ -247,7 +247,7 @@ When('I delete note {string}', (noteTopology: string) => {
 })
 
 When('I should see that the note creation is not successful', () => {
-  cy.expectFieldErrorMessage('Topic', 'size must be between 1 and 150')
+  cy.expectFieldErrorMessage('Title', 'size must be between 1 and 150')
   cy.dismissLastErrorMessage()
 })
 

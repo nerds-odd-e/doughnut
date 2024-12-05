@@ -177,7 +177,7 @@ Cypress.Commands.add(
   'initialReviewOneNoteIfThereIs',
   ({
     'Review Type': reviewType,
-    Topic: topic,
+    Title: topic,
     'Additional Info': additionalInfo,
     Skip: skip,
   }) => {

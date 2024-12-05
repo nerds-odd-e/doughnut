@@ -11,13 +11,13 @@ Feature: Notebook questions
 
   Scenario: View all questions in a notebook
     When I add questions to the following notes in the notebook "LeSS in Action"
-      | Topic | Question                |
+      | Title | Question                |
       | team  | Who is the team?        |
       | tech  | What is the technology? |
     Then I should see the following questions for the topics in the notebook "LeSS in Action":
-      | Topic | Question                |
+      | Title | Question                |
       | team  | Who is the team?        |
       | tech  | What is the technology? |
     And I should see that there are no questions for "LeSS in Action" for the following topics:
-      | Topic |
+      | Title |
       | management  |

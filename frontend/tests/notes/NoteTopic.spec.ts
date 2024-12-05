@@ -5,7 +5,7 @@ import type { ComponentPublicInstance } from "vue"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 
-describe("note topic", () => {
+describe("note title", () => {
   const mountComponent = (n: Note): VueWrapper<ComponentPublicInstance> => {
     return helper
       .component(NoteTopicComponent)

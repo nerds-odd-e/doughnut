@@ -98,12 +98,12 @@ public class NoteTest {
   class NoteBrief {
     @Test
     void shouldIncludeBasicNoteInformation() {
-      Note note = makeMe.aNote().titleConstructor("Test Topic").details("Test Details").please();
+      Note note = makeMe.aNote().titleConstructor("Test Title").details("Test Details").please();
 
       Note.NoteBrief brief = note.getNoteBrief();
 
       assertThat(brief.uri, equalTo("/n" + note.getId()));
-      assertThat(brief.title, equalTo("Test Topic"));
+      assertThat(brief.title, equalTo("Test Title"));
       assertThat(brief.details, equalTo("Test Details"));
       assertThat(brief.contextualPath, empty());
       assertThat(brief.createdAt, notNullValue());

@@ -52,10 +52,10 @@ export const assimilation = () => {
         },
         assimilateNotes(noteTopics: string) {
           return this.assimilate(
-            commonSenseSplit(noteTopics, ', ').map((topic: string) => {
+            commonSenseSplit(noteTopics, ', ').map((title: string) => {
               return {
-                'Review Type': topic === 'end' ? 'initial done' : 'single note',
-                Topic: topic,
+                'Review Type': title === 'end' ? 'initial done' : 'single note',
+                Title: title,
               }
             })
           )

@@ -11,7 +11,7 @@ Feature: Nested Note creation
 
   Scenario: Create a new note belonging to another note
     When I create a note belonging to "LeSS in Action":
-      | Topic        |
+      | Title        |
       | Re-quirement |
     Then I should see the note tree in the sidebar
       | note-topic   |
@@ -26,13 +26,13 @@ Feature: Nested Note creation
 
   Scenario: Create a new note with incorrect info
     When I create a note belonging to "LeSS in Action":
-      | Topic |
+      | Title |
       |       |
     Then I should see that the note creation is not successful
 
   Scenario: Create a new note as next sibling
     When I create a note after "team":
-      | Topic        |
+      | Title        |
       | coordination |
     Then I should see the note tree in the sidebar
       | note-topic   |

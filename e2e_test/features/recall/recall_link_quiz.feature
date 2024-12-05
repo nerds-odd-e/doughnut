@@ -14,7 +14,7 @@ Feature: Repetition Link Quiz
   Scenario Outline: "Belongs to" question
     Given It's day 1, 8 hour
     And I assimilate these in sequence:
-      | Review Type | Topic |
+      | Review Type | Title |
       | single note | Moon  |
     When I am recalling my note on day 2
     Then I should be asked link question "Moon" "a specialization of" with options "Earth, Mars"

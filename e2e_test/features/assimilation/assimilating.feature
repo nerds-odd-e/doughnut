@@ -11,30 +11,30 @@ Feature: Assimilating
   Scenario: First day of review
       Given It's day 1, 8 hour
       Then I assimilate these in sequence:
-          | Review Type   | Topic      |
+          | Review Type   | Title      |
           | single note   | Note 1     |
           | single note   | Note 2     |
           | initial done  |            |
       Given It's day 1, 9 hour
       Then I assimilate these in sequence:
-          | Review Type   | Topic      |
+          | Review Type   | Title      |
           | initial done  |            |
 
   Scenario: First day review only part of the daily number
       Given It's day 1, 8 hour
       Then I assimilate these in sequence:
-          | Review Type   | Topic      |
+          | Review Type   | Title      |
           | single note   | Note 1     |
       Given It's day 1, 9 hour
       Then I assimilate these in sequence:
-          | Review Type   | Topic      |
+          | Review Type   | Title      |
           | single note   | Note 2     |
           | initial done  |            |
 
   Scenario: Skip review
       Given It's day 1, 8 hour
       When I assimilate these in sequence:
-          | Review Type   | Topic      | Skip  |
+          | Review Type   | Title      | Skip  |
           | single note   | Note 1     | yes   |
           | single note   | Note 2     | no    |
           | single note   | Note 3     | no    |

@@ -1,6 +1,6 @@
 <template>
   <template v-if="suggestedTopic">
-    <label>Suggested Topic: {{ suggestedTopic }}</label>
+    <label>Suggested Title: {{ suggestedTopic }}</label>
     <RadioButtons
       v-model="replaceOrAppendTopic"
       scope-name="topicRadio"

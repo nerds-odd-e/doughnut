@@ -57,14 +57,14 @@ class FineTuningServiceTest {
 
     @Test
     void shouldReturnGoodTrainingDataIfHavingReadingAuth_whenCallGetGoodTrainingData() {
-      Note note = makeMe.aNote().titleConstructor("Test Topic").please();
+      Note note = makeMe.aNote().titleConstructor("Test Title").please();
       makeMe.aQuestionSuggestionForFineTunining().ofNote(note).positive().please();
       List<OpenAIChatGPTFineTuningExample> goodOpenAIChatGPTFineTuningExampleList =
           fineTuningService.getQuestionGenerationTrainingExamples();
       assertEquals(1, goodOpenAIChatGPTFineTuningExampleList.size());
       List<ChatMessageForFineTuning> goodTrainingData =
           goodOpenAIChatGPTFineTuningExampleList.get(0).getMessages();
-      assertThat(goodTrainingData.get(0).getContent(), containsString("Test Topic"));
+      assertThat(goodTrainingData.get(0).getContent(), containsString("Test Title"));
       assertThat(
           goodTrainingData.get(1).getContent(),
           containsString("assume the role of a Memory Assistant"));

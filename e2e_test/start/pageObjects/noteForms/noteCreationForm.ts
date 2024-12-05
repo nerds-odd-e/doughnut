@@ -1,21 +1,21 @@
 import submittableForm from '../../submittableForm'
 
 const noteCreationForm = {
-  createNote: (topic: string) => {
+  createNote: (title: string) => {
     submittableForm.submitWith({
-      Topic: topic,
+      Title: title,
     })
   },
-  createNoteWithWikidataId: (topic: string, wikidataId?: string) => {
+  createNoteWithWikidataId: (title: string, wikidataId?: string) => {
     submittableForm.submitWith({
-      Topic: topic,
+      Title: title,
       'Wikidata Id': wikidataId,
     })
   },
   createNoteWithAttributes(attributes: Record<string, string>) {
-    const { Topic, 'Wikidata Id': wikidataId, ...remainingAttrs } = attributes
+    const { Title, 'Wikidata Id': wikidataId, ...remainingAttrs } = attributes
     expect(Object.keys(remainingAttrs)).to.have.lengthOf(0)
-    return this.createNoteWithWikidataId(Topic!, wikidataId)
+    return this.createNoteWithWikidataId(Title!, wikidataId)
   },
 }
 

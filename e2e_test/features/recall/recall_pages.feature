@@ -13,7 +13,7 @@ Feature: Review Pages
 
   Scenario: Different review pages for different notes
     * I assimilate these in sequence:
-      | Review Type  | Topic    | Additional Info             |
+      | Review Type  | Title    | Additional Info             |
       | single note  | Sedition | Incite violence             |
       | single note  | Sedation | Put to sleep                |
       | image note   | Sedative | Sleep medicine; a_slide.jpg |
@@ -23,7 +23,7 @@ Feature: Review Pages
   Scenario: Count of recall and assimilate notes
     Given It's day 1, 8 hour
     And I assimilate these in sequence:
-      | Review Type | Topic    |
+      | Review Type | Title    |
       | single note | Sedition |
     When It's day 2, 9 hour
     Then I should see that I have 1 notes to recall

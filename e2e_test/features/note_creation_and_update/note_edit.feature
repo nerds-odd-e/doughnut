@@ -8,15 +8,15 @@ Feature: Note Edit
 
   Scenario: Edit a note
     And I update note "LeSS in Action" to become:
-      | Topic     | Details           |
+      | Title     | Details           |
       | Odd-e CSD | Our best training |
     Then I should see "Odd-e CSD" in the page
     And I should see these notes belonging to the user at the top level of all my notes
-      | Topic     | Details           |
+      | Title     | Details           |
       | Odd-e CSD | Our best training |
 
-  Scenario: Edit a note topic and edit details and undo
-    Given I update note topic "LeSS in Action" to become "Odd-e CSD"
+  Scenario: Edit a note title and edit details and undo
+    Given I update note title "LeSS in Action" to become "Odd-e CSD"
     And I should see "Odd-e CSD" in the page
     And I update note "Odd-e CSD" details from "An awesome training" to become "A super awesome training"
     And I should see "A super awesome training" in the page
@@ -28,7 +28,7 @@ Feature: Note Edit
 
   Scenario: Edit a note details with bullet points
     When I update note "LeSS in Action" to become:
-      | Topic     | Details     |
+      | Title     | Details     |
       | Odd-e CSD | * must join |
     Then I should see "must join" in the page
 
@@ -51,11 +51,11 @@ Feature: Note Edit
       | li             | Specification by Example |
       | li.ql-indent-1 | Living documentation     |
 
-  Scenario: Edit a note topic should update the sidebar
+  Scenario: Edit a note title should update the sidebar
     Given there are some notes:
       | Title | Parent Title   |
       | TDD   | LeSS in Action |
-    When I update note topic "TDD" to become "Critical thinking"
+    When I update note title "TDD" to become "Critical thinking"
     Then I should see the note tree in the sidebar
       | note-topic        |
       | Critical thinking |
