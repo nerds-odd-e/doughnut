@@ -3,13 +3,13 @@
     <tbody>
       <tr v-for="bazaarNotebook in notebooks" :key="bazaarNotebook.id">
         <td>
-          <NoteTopicWithLink
-            v-bind="{ noteTopology: bazaarNotebook.notebook.headNoteTopic }"
+          <NotebookLink
+            :notebook="bazaarNotebook.notebook"
           />
         </td>
         <td>
           <button
-            class="btn btn-dange"
+            class="btn btn-danger"
             @click="removeFromBazaar(bazaarNotebook)"
           >
             Remove
@@ -24,7 +24,7 @@
 import { onMounted, ref } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { BazaarNotebook } from "@/generated/backend"
-import NoteTopicWithLink from "../notes/NoteTopicWithLink.vue"
+import NotebookLink from "../notes/NotebookLink.vue"
 import usePopups from "../commons/Popups/usePopups"
 
 const { managedApi } = useLoadingApi()

@@ -11,10 +11,15 @@ const myNotebooksPage = () => {
   return {
     ...notebookList(),
     navigateToPath(notePath: NotePath) {
-      return notePath.path.reduce(
+      return notePath.path.reduce<ReturnType<typeof assumeNotePage>>(
         (page, noteTopology) => page.navigateToChild(noteTopology),
-        assumeNotePage()
+        // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+        this as any
       )
+    },
+    navigateToChild(notebook: string) {
+      cy.findByText(notebook, { selector: '.notebook-card *' }).click()
+      return assumeNotePage()
     },
     creatingNotebook(notebookTopic: string) {
       cy.findByText('Add New Notebook').click()
