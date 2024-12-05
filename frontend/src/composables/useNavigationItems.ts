@@ -2,7 +2,7 @@ import { computed } from "vue"
 import { useRoute } from "vue-router"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
 import { useRecallData } from "@/composables/useRecallData"
-import SvgJournalText from "@/components/svgs/SvgJournalText.vue"
+import SvgNote from "@/components/svgs/SvgNote.vue"
 import SvgAssimilate from "@/components/svgs/SvgAssimilate.vue"
 import SvgCalendarCheck from "@/components/svgs/SvgCalendarCheck.vue"
 import SvgShop from "@/components/svgs/SvgShop.vue"
@@ -19,7 +19,7 @@ export function useNavigationItems() {
     {
       name: "notebooks",
       label: "Note",
-      icon: SvgJournalText,
+      icon: SvgNote,
       isActive: ["notebooks", "noteShow"].includes(route.name as string),
     },
     {
