@@ -4,13 +4,21 @@
       <NotebookNewButton>Add New Notebook</NotebookNewButton>
     </p>
     <main>
-      <NotebookViewCards v-if="notebooks" :notebooks="notebooks" :user="user" />
+      <NotebookCardsWithButtons v-if="notebooks" :notebooks="notebooks">
+        <template #default="{ notebook }">
+          <NotebookButtons v-bind="{ notebook, user }" class="card-header-btn" />
+        </template>
+      </NotebookCardsWithButtons>
     </main>
     <h2>Subscribed Notes</h2>
-    <NotebookSubscriptionCards
-      :subscriptions="subscriptions"
-      @updated="fetchData()"
-    />
+    <NotebookCardsWithButtons v-if="subscriptions" :notebooks="subscriptions?.map((s) => s.notebook!)">
+      <template #default="{ notebook }">
+        <SubscriptionNoteButtons
+          :subscription="subscriptions.find((s) => s.notebook === notebook)"
+          @updated="fetchData()"
+        />
+      </template>
+    </NotebookCardsWithButtons>
   </ContainerPage>
 </template>
 
@@ -19,8 +27,9 @@ import { inject, onMounted, ref, type Ref } from "vue"
 import type { Notebook, Subscription, User } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import NotebookNewButton from "@/components/notebook/NotebookNewButton.vue"
-import NotebookViewCards from "@/components/notebook/NotebookViewCards.vue"
-import NotebookSubscriptionCards from "@/components/subscriptions/NotebookSubscriptionCards.vue"
+import NotebookCardsWithButtons from "@/components/notebook/NotebookCardsWithButtons.vue"
+import NotebookButtons from "@/components/notebook/NotebookButtons.vue"
+import SubscriptionNoteButtons from "@/components/subscriptions/SubscriptionNoteButtons.vue"
 import ContainerPage from "./commons/ContainerPage.vue"
 
 const { managedApi } = useLoadingApi()
