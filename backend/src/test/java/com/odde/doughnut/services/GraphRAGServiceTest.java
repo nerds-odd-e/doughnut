@@ -204,16 +204,10 @@ public class GraphRAGServiceTest {
   @Test
   void shouldIncludeChildWhenTokenBudgetJustEnough() {
     Note parent = makeMe.aNote().titleConstructor("Parent").please();
-    Note child =
-        makeMe
-            .aNote()
-            .titleConstructor("Child")
-            .details("Det") // "Child" + "Det" = 8 chars ≈ 2.13 tokens, rounds up to 3
-            .under(parent)
-            .please();
+    Note child = makeMe.aNote().titleConstructor("Child").details("D").under(parent).please();
 
     // Test with exactly enough tokens
-    GraphRAGResult result = graphRAGService.retrieve(parent, 3);
+    GraphRAGResult result = graphRAGService.retrieve(parent, 15);
 
     // Child should be included
     assertThat(result.focusNote.children, hasSize(1));
@@ -224,7 +218,7 @@ public class GraphRAGServiceTest {
         hasItem(String.format("[Child](/n%d)", child.getId())));
 
     // Test with one token less
-    result = graphRAGService.retrieve(parent, 2);
+    result = graphRAGService.retrieve(parent, 14);
     assertThat(result.focusNote.children, empty());
     assertThat(
         result.relatedNotes.stream()

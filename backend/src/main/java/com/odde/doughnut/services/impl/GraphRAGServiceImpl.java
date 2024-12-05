@@ -1,5 +1,7 @@
 package com.odde.doughnut.services.impl;
 
+import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
+
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.graphRAG.*;
 import java.util.ArrayList;
@@ -32,12 +34,9 @@ public class GraphRAGServiceImpl {
     return new BareNote(formatUriAndTitle(note), truncateDetails(note.getDetails()), null, null);
   }
 
-  private int estimateTokens(Note note) {
-    int totalChars = note.getTopicConstructor().length();
-    if (note.getDetails() != null) {
-      totalChars += note.getDetails().length();
-    }
-    return (int) Math.ceil(totalChars / CHARACTERS_PER_TOKEN);
+  private int estimateTokens(BareNote note) {
+    String jsonString = defaultObjectMapper().valueToTree(note).toString();
+    return (int) Math.ceil(jsonString.length() / CHARACTERS_PER_TOKEN);
   }
 
   public GraphRAGResult retrieve(Note focusNote, int tokenBudget) {
@@ -57,7 +56,7 @@ public class GraphRAGServiceImpl {
             buildContextualPath(focusNote),
             tokenBudget >= 3
                 ? focusNote.getChildren().stream()
-                    .filter(child -> estimateTokens(child) <= tokenBudget)
+                    .filter(child -> estimateTokens(createRelatedNote(child)) <= tokenBudget)
                     .map(this::formatUriAndTitle)
                     .collect(Collectors.toList())
                 : Collections.emptyList(),
@@ -83,9 +82,10 @@ public class GraphRAGServiceImpl {
     int remainingTokens = tokenBudget;
     if (remainingTokens > 0) {
       for (Note child : focusNote.getChildren()) {
-        int childTokens = estimateTokens(child);
+        BareNote childNote = createRelatedNote(child);
+        int childTokens = estimateTokens(childNote);
         if (childTokens <= remainingTokens) {
-          relatedNotes.add(createRelatedNote(child));
+          relatedNotes.add(childNote);
           remainingTokens -= childTokens;
         }
       }
