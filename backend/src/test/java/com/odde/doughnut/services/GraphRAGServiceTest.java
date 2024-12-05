@@ -129,4 +129,31 @@ public class GraphRAGServiceTest {
         result.relatedNotes.get(0).uriAndTitle,
         equalTo(String.format("[Parent](/n%d)", parent.getId())));
   }
+
+  @Test
+  void shouldIncludeObjectContextualPathForReificationNote() {
+    Note objectGrandparent = makeMe.aNote().titleConstructor("Object Grandparent").please();
+    Note objectParent =
+        makeMe.aNote().titleConstructor("Object Parent").under(objectGrandparent).please();
+    Note target = makeMe.aNote().titleConstructor("Object").under(objectParent).please();
+    Note subject = makeMe.aNote().titleConstructor("Subject").please();
+    Note note = makeMe.aLink().between(subject, target).please();
+
+    GraphRAGResult result = graphRAGService.retrieve(note, 0);
+
+    // Check object's ancestors are in related notes
+    assertThat(result.relatedNotes, hasSize(4)); // subject + target + target's 2 ancestors
+    assertThat(
+        result.relatedNotes.get(0).uriAndTitle,
+        equalTo(String.format("[Subject](/n%d)", subject.getId())));
+    assertThat(
+        result.relatedNotes.get(1).uriAndTitle,
+        equalTo(String.format("[Object](/n%d)", target.getId())));
+    assertThat(
+        result.relatedNotes.get(2).uriAndTitle,
+        equalTo(String.format("[Object Grandparent](/n%d)", objectGrandparent.getId())));
+    assertThat(
+        result.relatedNotes.get(3).uriAndTitle,
+        equalTo(String.format("[Object Parent](/n%d)", objectParent.getId())));
+  }
 }

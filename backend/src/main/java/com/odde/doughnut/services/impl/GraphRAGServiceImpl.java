@@ -60,6 +60,10 @@ public class GraphRAGServiceImpl {
     if (focusNote.getTargetNote() != null) {
       Note target = focusNote.getTargetNote();
       relatedNotes.add(createRelatedNote(target));
+      // Add object's ancestors to related notes (Priority 1)
+      for (Note ancestor : target.getAncestors()) {
+        relatedNotes.add(createRelatedNote(ancestor));
+      }
     }
 
     return new GraphRAGResult(focus, relatedNotes);
