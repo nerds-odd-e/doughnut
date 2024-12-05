@@ -1,6 +1,6 @@
 <template>
   <div v-if="recallPrompt.notebook" class="notebook-source">
-    From notebook: <NoteTopicWithLink :noteTopology="recallPrompt.notebook.headNoteTopic" />
+    From notebook: <NotebookLink :notebook="recallPrompt.notebook" />
   </div>
   <div v-for="(q, index) in prevQuestions" :key="index">
     <h3>Previous Question Contested ...</h3>
@@ -41,7 +41,7 @@ import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import type { PropType } from "vue"
 import { ref } from "vue"
-import NoteTopicWithLink from "../notes/NoteTopicWithLink.vue"
+import NotebookLink from "../notes/NotebookLink.vue"
 import AnsweredQuestionComponent from "./AnsweredQuestionComponent.vue"
 import RecallPromptComponent from "./RecallPromptComponent.vue"
 import QuestionDisplay from "./QuestionDisplay.vue"
