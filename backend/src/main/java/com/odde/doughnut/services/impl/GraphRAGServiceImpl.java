@@ -27,6 +27,10 @@ public class GraphRAGServiceImpl {
     return note.getAncestors().stream().map(this::formatUriAndTitle).collect(Collectors.toList());
   }
 
+  private BareNote createRelatedNote(Note note) {
+    return new BareNote(formatUriAndTitle(note), truncateDetails(note.getDetails()), null, null);
+  }
+
   public GraphRAGResult retrieve(Note focusNote, int tokenBudget) {
     String uriAndTitle = formatUriAndTitle(focusNote);
     String detailsTruncated = focusNote.getDetails();
@@ -50,16 +54,12 @@ public class GraphRAGServiceImpl {
     List<BareNote> relatedNotes = new ArrayList<>();
     // Add ancestors to related notes (Priority 1)
     for (Note ancestor : focusNote.getAncestors()) {
-      relatedNotes.add(
-          new BareNote(
-              formatUriAndTitle(ancestor), truncateDetails(ancestor.getDetails()), null, null));
+      relatedNotes.add(createRelatedNote(ancestor));
     }
     // Add object note to related notes (Priority 1)
     if (focusNote.getTargetNote() != null) {
       Note target = focusNote.getTargetNote();
-      relatedNotes.add(
-          new BareNote(
-              formatUriAndTitle(target), truncateDetails(target.getDetails()), null, null));
+      relatedNotes.add(createRelatedNote(target));
     }
 
     return new GraphRAGResult(focus, relatedNotes);
