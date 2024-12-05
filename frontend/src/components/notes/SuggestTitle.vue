@@ -1,8 +1,8 @@
 <template>
-  <template v-if="suggestedTopic">
-    <label>Suggested Title: {{ suggestedTopic }}</label>
+  <template v-if="suggestedTitle">
+    <label>Suggested Title: {{ suggestedTitle }}</label>
     <RadioButtons
-      v-model="replaceOrAppendTopic"
+      v-model="replaceOrAppendTitle"
       scope-name="topicRadio"
       :options="[
         { value: 'Replace', label: 'Replace title' },
@@ -13,35 +13,29 @@
   </template>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue"
+<script setup lang="ts">
+import { ref } from "vue"
 import RadioButtons from "../form/RadioButtons.vue"
 
-export default defineComponent({
-  components: {
-    RadioButtons,
-  },
-  props: {
-    originalTopic: { type: String, required: true },
-    suggestedTopic: { type: String, required: true },
-  },
-  emits: ["suggestedTopicSelected"],
-  data() {
-    return {
-      replaceOrAppendTopic: "",
-    }
-  },
-  methods: {
-    updateModelValue() {
-      if (this.replaceOrAppendTopic === "Replace") {
-        this.$emit("suggestedTopicSelected", this.suggestedTopic)
-      }
+const props = defineProps<{
+  originalTitle: string
+  suggestedTitle: string
+}>()
 
-      if (this.replaceOrAppendTopic === "Append") {
-        const newTitle = `${this.originalTopic} / ${this.suggestedTopic}`
-        this.$emit("suggestedTopicSelected", newTitle)
-      }
-    },
-  },
-})
+const emit = defineEmits<{
+  suggestedTitleSelected: [title: string]
+}>()
+
+const replaceOrAppendTitle = ref("")
+
+const updateModelValue = () => {
+  if (replaceOrAppendTitle.value === "Replace") {
+    emit("suggestedTitleSelected", props.suggestedTitle)
+  }
+
+  if (replaceOrAppendTitle.value === "Append") {
+    const newTitle = `${props.originalTitle} / ${props.suggestedTitle}`
+    emit("suggestedTitleSelected", newTitle)
+  }
+}
 </script>

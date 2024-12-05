@@ -19,7 +19,7 @@
     >
       <NoteTitleWithLink
         class="card-title"
-        :class="{ 'active-topic': noteRealm.id === activeNoteRealm.note.id }"
+        :class="{ 'active-title': noteRealm.id === activeNoteRealm.note.id }"
         v-bind="{ noteTopology: noteRealm.note.noteTopology }"
         @click.stop
       />
@@ -100,7 +100,7 @@ const toggleChildren = (noteId: number) => {
   border-left: 1px solid gray !important;
 }
 
-.active-topic {
+.active-title {
   font-weight: bold;
 }
 

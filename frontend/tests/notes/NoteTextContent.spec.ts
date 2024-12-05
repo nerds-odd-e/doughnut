@@ -5,7 +5,7 @@ import type { ComponentPublicInstance } from "vue"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 
-const mockedUpdateTopicCall = vi.fn()
+const mockedUpdateTitleCall = vi.fn()
 
 describe("in place edit on title", () => {
   const note = makeMe.aNote.topicConstructor("Dummy Title").please()
@@ -25,7 +25,7 @@ describe("in place edit on title", () => {
   beforeEach(() => {
     vi.resetAllMocks()
     helper.managedApi.restTextContentController.updateNoteTitle =
-      mockedUpdateTopicCall
+      mockedUpdateTitleCall
   })
 
   it("should display text field when one single click on title", async () => {
@@ -83,7 +83,7 @@ describe("in place edit on title", () => {
     await wrapper.find('[role="title"]').trigger("click")
     await wrapper.find('[role="title"] input').setValue("updated")
     wrapper.unmount()
-    expect(mockedUpdateTopicCall).toBeCalledWith(note.id, {
+    expect(mockedUpdateTitleCall).toBeCalledWith(note.id, {
       newTitle: "updated",
     })
   })
@@ -107,7 +107,7 @@ describe("in place edit on title", () => {
     const wrapper = mountComponent(note)
     await editTitle(wrapper, "updated")
     await wrapper.find('[role="title"] input').trigger("blur")
-    expect(mockedUpdateTopicCall).toBeCalledWith(note.id, {
+    expect(mockedUpdateTitleCall).toBeCalledWith(note.id, {
       newTitle: "updated",
     })
   })
@@ -123,7 +123,7 @@ describe("in place edit on title", () => {
       wrapper.find<HTMLInputElement>('[role="title"] input').element.value
     ).toBe("updated")
 
-    expect(mockedUpdateTopicCall).not.toBeCalled()
+    expect(mockedUpdateTitleCall).not.toBeCalled()
   })
 
   it("should change content if there's no unsaved changed but change from prop", async () => {
@@ -147,10 +147,10 @@ describe("in place edit on title", () => {
     let wrapper: VueWrapper<ComponentPublicInstance>
     beforeEach(async () => {
       wrapper = mountComponent(note)
-      mockedUpdateTopicCall.mockRejectedValueOnce(
+      mockedUpdateTitleCall.mockRejectedValueOnce(
         makeMe.anApiError
           .ofBindingError({
-            topic: "size must be between 1 and 100",
+            title: "size must be between 1 and 100",
           })
           .please()
       )
@@ -168,7 +168,7 @@ describe("in place edit on title", () => {
       await editTitleThenBlur(wrapper)
       await flushPromises()
       expect(wrapper.findAll(".error-msg")).toHaveLength(0)
-      expect(mockedUpdateTopicCall).toBeCalledTimes(2)
+      expect(mockedUpdateTitleCall).toBeCalledTimes(2)
     })
   })
 
@@ -177,7 +177,7 @@ describe("in place edit on title", () => {
     const wrapper = mountComponent(note)
     await flushPromises()
     wrapper.unmount()
-    expect(mockedUpdateTopicCall).toBeCalledTimes(0)
+    expect(mockedUpdateTitleCall).toBeCalledTimes(0)
   })
 
   describe("with mocked window.confirm", () => {
@@ -195,7 +195,7 @@ describe("in place edit on title", () => {
 
     it("should display error when no authorization to save", async () => {
       const wrapper = mountComponent(note)
-      mockedUpdateTopicCall.mockRejectedValueOnce(
+      mockedUpdateTitleCall.mockRejectedValueOnce(
         makeMe.anApiError.of401().please()
       )
       await editTitleThenBlur(wrapper)

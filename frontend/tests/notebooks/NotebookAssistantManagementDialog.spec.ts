@@ -38,7 +38,7 @@ describe("NotebookAssistantManagementDialog.vue", () => {
 
   it("calls the API and triggers the file download when the button is clicked", async () => {
     // Mock API response
-    const noteBriefs = [{ id: 1, topic: "Note 1", content: "Test content" }]
+    const noteBriefs = [{ id: 1, title: "Note 1", details: "Test content" }]
     mockedDump.mockResolvedValue(noteBriefs)
 
     // Find the button and trigger click

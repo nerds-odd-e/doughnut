@@ -72,7 +72,7 @@ const setError = (errs: unknown) => {
   if (typeof errs === "object" && errs !== null && "status" in errs) {
     if (errs.status === 401) {
       errors.value = {
-        topic:
+        title:
           "You are not authorized to edit this note. Perhaps you are not logged in?",
       }
       return

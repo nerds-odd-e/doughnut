@@ -30,7 +30,7 @@
     </span>
   </template>
   <template v-else>
-    <span class="title-text">{{ topic }} </span>
+    <span class="title-text">{{ title }} </span>
   </template>
 </template>
 
@@ -51,7 +51,7 @@ const reactiveProps = ref(props)
 const linkType = computed(() =>
   reactiveProps.value.noteTopology.titleOrPredicate.substring(1)
 )
-const topic = computed(() =>
+const title = computed(() =>
   reactiveProps.value.noteTopology.titleOrPredicate?.replace(
     "%P",
     `[${reactiveProps.value.noteTopology.parentOrSubjectNoteTopology?.titleOrPredicate}]`

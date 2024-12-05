@@ -1,17 +1,17 @@
 <template>
   <form @submit.prevent="processForm">
     <fieldset :disabled="processing">
-      <div class="topic-search-container">
+      <div class="title-search-container">
         <NoteFormTitleOnly
           v-model="creationData.newTitle"
           :error-message="noteFormErrors.newTitle"
           @focus="showDropdown = true"
-          @blur="onTopicBlur"
+          @blur="onTitleBlur"
         />
         <SuggestTitle
-          :original-topic="creationData.newTitle"
-          :suggested-topic="suggestedTopic"
-          @suggested-topic-selected="takeSuggestedTopic"
+          :original-title="creationData.newTitle"
+          :suggested-title="suggestedTitle"
+          @suggested-title-selected="takeSuggestedTitle"
         />
         <SearchResults
           v-show="showDropdown && creationData.newTitle"
@@ -20,7 +20,7 @@
             inputSearchKey: creationData.newTitle,
             isDropdown: true
           }"
-          class="topic-search-results"
+          class="title-search-results"
         />
       </div>
 
@@ -75,7 +75,7 @@ const noteFormErrors = ref({
   wikidataId: undefined as undefined | string,
 })
 
-const suggestedTopic = ref("")
+const suggestedTitle = ref("")
 const processing = ref(false)
 const showDropdown = ref(false)
 
@@ -115,20 +115,20 @@ const onSelectWikidataEntry = (selectedSuggestion: WikidataSearchEntity) => {
 
   if (currentLabel === newLabel) {
     creationData.value.newTitle = selectedSuggestion.label
-    suggestedTopic.value = ""
+    suggestedTitle.value = ""
   } else {
-    suggestedTopic.value = selectedSuggestion.label
+    suggestedTitle.value = selectedSuggestion.label
   }
 
   creationData.value.wikidataId = selectedSuggestion.id
 }
 
-const takeSuggestedTopic = (topic: string) => {
-  creationData.value.newTitle = topic
-  suggestedTopic.value = ""
+const takeSuggestedTitle = (title: string) => {
+  creationData.value.newTitle = title
+  suggestedTitle.value = ""
 }
 
-const onTopicBlur = () => {
+const onTitleBlur = () => {
   setTimeout(() => {
     showDropdown.value = false
   }, 200)
@@ -136,11 +136,11 @@ const onTopicBlur = () => {
 </script>
 
 <style lang="sass" scoped>
-.topic-search-container
+.title-search-container
   position: relative
   margin-bottom: 1rem
 
-.topic-search-results
+.title-search-results
   position: absolute
   top: 100%
   left: 0

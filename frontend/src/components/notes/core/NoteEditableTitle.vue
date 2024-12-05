@@ -13,7 +13,7 @@
         :readonly="readonly"
         @update:model-value="update(noteTopology.id, $event)"
         @blur="blur"
-        :error-message="errors.topic"
+        :error-message="errors.title"
       >
         <h2><NoteTitleComponent v-bind="{ noteTopology }" /></h2>
       </EditableText>
