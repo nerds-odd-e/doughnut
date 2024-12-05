@@ -1,4 +1,4 @@
-import NoteTopicComponent from "@/components/notes/core/NoteTitleComponent.vue"
+import NoteTitleComponent from "@/components/notes/core/NoteTitleComponent.vue"
 import type { Note } from "@/generated/backend"
 import { VueWrapper } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"
@@ -8,7 +8,7 @@ import helper from "@tests/helpers"
 describe("note title", () => {
   const mountComponent = (n: Note): VueWrapper<ComponentPublicInstance> => {
     return helper
-      .component(NoteTopicComponent)
+      .component(NoteTitleComponent)
       .withProps({
         noteTopology: n.noteTopology,
       })

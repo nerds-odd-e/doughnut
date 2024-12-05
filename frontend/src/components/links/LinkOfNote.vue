@@ -5,7 +5,7 @@
       :to="{ name: 'noteShow', params: { noteId: note.id } }"
       class="link-title text-decoration-none"
     >
-      <NoteTopicComponent v-if="noteTopology" v-bind="{ noteTopology }" />
+      <NoteTitleComponent v-if="noteTopology" v-bind="{ noteTopology }" />
     </router-link>
     <LinkNob v-bind="{ noteTopology }" v-if="!reverse" :inverse-icon="false" />
   </span>
@@ -17,7 +17,7 @@ import type { PropType } from "vue"
 import { defineComponent } from "vue"
 import { colors } from "../../colors"
 import type { StorageAccessor } from "../../store/createNoteStorage"
-import NoteTopicComponent from "../notes/core/NoteTitleComponent.vue"
+import NoteTitleComponent from "../notes/core/NoteTitleComponent.vue"
 import LinkNob from "./LinkNob.vue"
 
 export default defineComponent({
@@ -29,7 +29,7 @@ export default defineComponent({
       required: true,
     },
   },
-  components: { NoteTopicComponent, LinkNob },
+  components: { NoteTitleComponent, LinkNob },
   computed: {
     noteTopology() {
       return this.reverse

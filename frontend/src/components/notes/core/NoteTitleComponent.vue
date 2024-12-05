@@ -16,7 +16,7 @@
     <SvgLinkTypeIcon :link-type="linkType" :inverse-icon="true" />
     &nbsp;
     <span>
-      <NoteTopicComponent
+      <NoteTitleComponent
         v-if="iconizedTarget"
         v-bind="{ noteTopology: noteTopology.objectNoteTopology }"
       />

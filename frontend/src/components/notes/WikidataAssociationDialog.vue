@@ -2,7 +2,7 @@
   <h3>
     Associate
     <strong
-      ><NoteTopicComponent v-bind="{ noteTopology: note.noteTopology }"
+      ><NoteTitleComponent v-bind="{ noteTopology: note.noteTopology }"
     /></strong>
     Wikidata
   </h3>
@@ -45,7 +45,7 @@ import type { Note, WikidataAssociationCreation } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import TextInput from "../form/TextInput.vue"
-import NoteTopicComponent from "./core/NoteTitleComponent.vue"
+import NoteTitleComponent from "./core/NoteTitleComponent.vue"
 
 interface WikidataError {
   body: {

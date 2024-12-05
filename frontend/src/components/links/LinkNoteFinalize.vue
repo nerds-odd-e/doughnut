@@ -11,7 +11,7 @@
     <div>
       Target:
       <strong
-        ><NoteTopicComponent
+        ><NoteTitleComponent
           v-if="targetNoteTopology"
           v-bind="{ noteTopology: targetNoteTopology }"
       /></strong>
@@ -28,7 +28,7 @@ import { ref } from "vue"
 import type { Note } from "@/generated/backend"
 import { LinkCreation, NoteTopology } from "@/generated/backend"
 import LinkTypeSelect from "./LinkTypeSelect.vue"
-import NoteTopicComponent from "../notes/core/NoteTitleComponent.vue"
+import NoteTitleComponent from "../notes/core/NoteTitleComponent.vue"
 import SvgGoBack from "../svgs/SvgGoBack.vue"
 import usePopups from "../commons/Popups/usePopups"
 import type { StorageAccessor } from "../../store/createNoteStorage"

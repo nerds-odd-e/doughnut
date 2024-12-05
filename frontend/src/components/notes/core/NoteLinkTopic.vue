@@ -1,6 +1,6 @@
 <template>
   <h2 role="topic" @click="editingLink = true">
-    <NoteTopicComponent v-bind="{ noteTopology: noteTopology, full: true }" />
+    <NoteTitleComponent v-bind="{ noteTopology: noteTopology, full: true }" />
   </h2>
   <Breadcrumb
     v-if="noteTopology.objectNoteTopology"
@@ -21,7 +21,7 @@ import type { PropType } from "vue"
 import { ref } from "vue"
 import { NoteTopology } from "@/generated/backend"
 import { type StorageAccessor } from "../../../store/createNoteStorage"
-import NoteTopicComponent from "./NoteTitleComponent.vue"
+import NoteTitleComponent from "./NoteTitleComponent.vue"
 import Modal from "../../commons/Modal.vue"
 import LinkNobDialog from "../../links/LinkNobDialog.vue"
 import Breadcrumb from "../../toolbars/Breadcrumb.vue"
