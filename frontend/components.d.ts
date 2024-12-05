@@ -76,6 +76,7 @@ declare module 'vue' {
     NotebookAssistantManagementDialog: typeof import('./src/components/notebook/NotebookAssistantManagementDialog.vue')['default']
     NotebookBazaarViewCards: typeof import('./src/components/bazaar/NotebookBazaarViewCards.vue')['default']
     NotebookButtons: typeof import('./src/components/notebook/NotebookButtons.vue')['default']
+    NotebookCard: typeof import('./src/components/notebooks/NotebookCard.vue')['default']
     NotebookCardsWithButtons: typeof import('./src/components/notebook/NotebookCardsWithButtons.vue')['default']
     NotebookCertificateRequest: typeof import('./src/components/notebook/NotebookCertificateRequest.vue')['default']
     NotebookEditDialog: typeof import('./src/components/notebook/NotebookEditDialog.vue')['default']

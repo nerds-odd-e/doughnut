@@ -5,20 +5,20 @@
       v-for="notebook in notebooks"
       :key="notebook.id"
     >
-      <Card :noteTopology="notebook.headNoteTopic">
+      <NotebookCard :notebook="notebook">
         <template #cardHeader>
           <span class="card-header d-flex flex-row-reverse p-0">
             <slot :notebook="notebook" />
           </span>
         </template>
-      </Card>
+      </NotebookCard>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { Notebook } from "@/generated/backend"
-import Card from "../notes/Card.vue"
+import NotebookCard from "../notebooks/NotebookCard.vue"
 
 defineProps<{
   notebooks: Notebook[]
