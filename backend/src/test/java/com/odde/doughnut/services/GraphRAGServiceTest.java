@@ -80,4 +80,26 @@ public class GraphRAGServiceTest {
             longObjectDetails.substring(
                 0, GraphRAGServiceImpl.RELATED_NOTE_DETAILS_TRUNCATE_LENGTH)));
   }
+
+  @Test
+  void shouldIncludeFullContextualPathForDeeplyNestedNote() {
+    Note greatGrandparent = makeMe.aNote().titleConstructor("Great Grandparent").please();
+    Note grandparent =
+        makeMe.aNote().titleConstructor("Grandparent").under(greatGrandparent).please();
+    Note parent = makeMe.aNote().titleConstructor("Parent").under(grandparent).please();
+    Note note = makeMe.aNote().titleConstructor("Test Note").under(parent).please();
+
+    GraphRAGResult result = graphRAGService.retrieve(note, 0);
+
+    assertThat(result.focusNote.contextualPath, hasSize(3));
+    assertThat(
+        result.focusNote.contextualPath.get(0),
+        equalTo(String.format("[Great Grandparent](/n%d)", greatGrandparent.getId())));
+    assertThat(
+        result.focusNote.contextualPath.get(1),
+        equalTo(String.format("[Grandparent](/n%d)", grandparent.getId())));
+    assertThat(
+        result.focusNote.contextualPath.get(2),
+        equalTo(String.format("[Parent](/n%d)", parent.getId())));
+  }
 }

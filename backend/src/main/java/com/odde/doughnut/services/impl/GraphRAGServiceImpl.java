@@ -5,6 +5,7 @@ import com.odde.doughnut.services.graphRAG.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,10 +24,7 @@ public class GraphRAGServiceImpl {
   }
 
   private List<String> buildContextualPath(Note note) {
-    if (note.getParent() == null) {
-      return Collections.emptyList();
-    }
-    return Collections.singletonList(formatUriAndTitle(note.getParent()));
+    return note.getAncestors().stream().map(this::formatUriAndTitle).collect(Collectors.toList());
   }
 
   public GraphRAGResult retrieve(Note focusNote, int tokenBudget) {
