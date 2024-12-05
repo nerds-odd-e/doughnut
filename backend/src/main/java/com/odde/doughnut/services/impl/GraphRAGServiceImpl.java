@@ -10,8 +10,17 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class GraphRAGServiceImpl implements GraphRAGService {
+  private static final int RELATED_NOTE_DETAILS_TRUNCATE_LENGTH = 1000;
+
   private String formatUriAndTitle(Note note) {
     return String.format("[%s](%s)", note.getTopicConstructor(), note.getUri());
+  }
+
+  private String truncateDetails(String details) {
+    if (details == null || details.length() <= RELATED_NOTE_DETAILS_TRUNCATE_LENGTH) {
+      return details;
+    }
+    return details.substring(0, RELATED_NOTE_DETAILS_TRUNCATE_LENGTH);
   }
 
   private List<String> buildContextualPath(Note note) {
@@ -24,7 +33,7 @@ public class GraphRAGServiceImpl implements GraphRAGService {
   @Override
   public GraphRAGResult retrieve(Note focusNote, int tokenBudget) {
     String uriAndTitle = formatUriAndTitle(focusNote);
-    String detailsTruncated = focusNote.getNoteTopology().getShortDetails();
+    String detailsTruncated = focusNote.getDetails();
     String parentUriAndTitle =
         focusNote.getParent() != null ? formatUriAndTitle(focusNote.getParent()) : null;
 

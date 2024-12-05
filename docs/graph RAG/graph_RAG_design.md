@@ -27,8 +27,10 @@ This data structure is for the external consumption of the Graph RAG.
 It might be different from how the Doughnut internal data structure is organized.
 
 * BareNote {uri_and_title, details_truncated, parent_uri_and_title, object_uri_and_title}.
+* Note: For all notes except the focus note, details_truncated is limited to 1000 characters.
 * NoteWithContextualPath: {contextualPath[]: as_a_list_of_uri_and_titles, ...BareNote}.
 * FocusNote: {children[]: as_a_list_of_uri_and_titles, referrings[]: as_a_list_of_uri_and_titles, prior_siblings[]: as_a_list_of_uri_and_titles, younger_siblings[]: as_a_list_of_uri_and_titles, ...NoteWithContextualPath}.
+* Note: The focus note's details are not truncated.
 * Overall: {focusNote: FocusNote, related_notes[]: as_a_list_of_BareNote_or_NoteWithContextualPath}.
 
 ##	Priorities
