@@ -16,16 +16,11 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import type { Notebook } from "@/generated/backend"
-import type { PropType } from "vue"
-import { defineComponent } from "vue"
 import Card from "../notes/Card.vue"
 
-export default defineComponent({
-  props: {
-    notebooks: Array as PropType<Array<Notebook>>,
-  },
-  components: { Card },
-})
+defineProps<{
+  notebooks: Notebook[]
+}>()
 </script>
