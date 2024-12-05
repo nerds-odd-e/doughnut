@@ -51,8 +51,8 @@ class RestTextContentControllerTests {
     }
 
     @Test
-    void shouldBeAbleToSaveNoteTopic() throws UnexpectedNoAccessRightException, IOException {
-      NoteRealm response = controller.updateNoteTopicConstructor(note, noteUpdateTitleDTO);
+    void shouldBeAbleToSaveNoteTitle() throws UnexpectedNoAccessRightException {
+      NoteRealm response = controller.updateNoteTitle(note, noteUpdateTitleDTO);
       assertThat(response.getId(), equalTo(note.getId()));
       assertThat(response.getNote().getTopicConstructor(), equalTo("new title"));
     }
@@ -62,7 +62,7 @@ class RestTextContentControllerTests {
       note = makeMe.aNote("another").creatorAndOwner(makeMe.aUser().please()).please();
       assertThrows(
           UnexpectedNoAccessRightException.class,
-          () -> controller.updateNoteTopicConstructor(note, noteUpdateTitleDTO));
+          () -> controller.updateNoteTitle(note, noteUpdateTitleDTO));
     }
   }
 

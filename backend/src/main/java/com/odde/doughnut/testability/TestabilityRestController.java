@@ -155,7 +155,7 @@ class TestabilityRestController {
         Map<String, Note> titleNoteMap, NoteRepository noteRepository, String parentTitle) {
       Note parentNote = titleNoteMap.get(parentTitle);
       if (parentNote != null) return parentNote;
-      return noteRepository.findFirstByTopicConstructor(parentTitle);
+      return noteRepository.findFirstByTitle(parentTitle);
     }
 
     private void saveByOriginalOrder(
@@ -245,7 +245,7 @@ class TestabilityRestController {
   @PostMapping("/share_to_bazaar")
   @Transactional
   public String shareToBazaar(@RequestBody HashMap<String, String> map) {
-    Note note = noteRepository.findFirstByTopicConstructor(map.get("noteTopology"));
+    Note note = noteRepository.findFirstByTitle(map.get("noteTopology"));
     modelFactoryService.toBazaarModel().shareNotebook(note.getNotebook());
     return "OK";
   }

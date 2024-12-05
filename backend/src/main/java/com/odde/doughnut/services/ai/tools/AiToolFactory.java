@@ -114,10 +114,10 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
 
   public static List<AiTool> getAllAssistantTools() {
     return List.of(
-        completeNoteDetails(), suggestNoteTopicTitle(), askSingleAnswerMultipleChoiceQuestion());
+        completeNoteDetails(), suggestNoteTitle(), askSingleAnswerMultipleChoiceQuestion());
   }
 
-  public static AiTool suggestNoteTopicTitle() {
+  public static AiTool suggestNoteTitle() {
     return new AiTool(
         AiToolName.SUGGEST_NOTE_TITLE.getValue(),
         "Generate a concise and accurate note title based on the note content and pass it to the function for the use to update their note. The title should be a single word, a phrase or at most a single sentence that captures the atomic concept of the note. It should be specific within the note's contextual path and do not need to include general information that's already in the contextual path. Keep the existing title if it's already correct and concise.",

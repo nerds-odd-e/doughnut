@@ -437,8 +437,7 @@ describe("ConversationInner", () => {
     beforeEach(async () => {
       helper.managedApi.restAiController.submitToolCallsResult = vi.fn()
       helper.managedApi.restAiController.cancelRun = vi.fn()
-      helper.managedApi.restTextContentController.updateNoteTopicConstructor =
-        vi.fn()
+      helper.managedApi.restTextContentController.updateNoteTitle = vi.fn()
 
       await submitMessageAndSimulateRunResponse(
         wrapper,
@@ -456,7 +455,7 @@ describe("ConversationInner", () => {
       await flushPromises()
 
       expect(
-        helper.managedApi.restTextContentController.updateNoteTopicConstructor
+        helper.managedApi.restTextContentController.updateNoteTitle
       ).toHaveBeenCalledWith(note.id, { newTitle: testTitle })
 
       expect(
@@ -473,7 +472,7 @@ describe("ConversationInner", () => {
       await flushPromises()
 
       expect(
-        helper.managedApi.restTextContentController.updateNoteTopicConstructor
+        helper.managedApi.restTextContentController.updateNoteTitle
       ).not.toHaveBeenCalled()
 
       expect(helper.managedApi.restAiController.cancelRun).toHaveBeenCalledWith(
@@ -491,7 +490,7 @@ describe("ConversationInner", () => {
       await flushPromises()
 
       expect(
-        helper.managedApi.restTextContentController.updateNoteTopicConstructor
+        helper.managedApi.restTextContentController.updateNoteTitle
       ).not.toHaveBeenCalled()
 
       expect(

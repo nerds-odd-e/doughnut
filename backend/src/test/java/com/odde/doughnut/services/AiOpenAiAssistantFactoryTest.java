@@ -48,7 +48,7 @@ class AiOpenAiAssistantFactoryTest {
   @Nested
   class AiToolsTest {
     @Test
-    void shouldHaveToolForGeneratingTopicTitle() {
+    void shouldHaveToolForGeneratingTitle() {
       List<AiTool> tools = AiToolFactory.getAllAssistantTools();
 
       Optional<AiTool> topicTitleTool =
@@ -65,7 +65,7 @@ class AiOpenAiAssistantFactoryTest {
     }
 
     @Test
-    void shouldHaveStrictToolForGeneratingTopicTitle() {
+    void shouldHaveStrictToolForGeneratingTitle() {
       List<AiTool> tools = AiToolFactory.getAllAssistantTools();
 
       Optional<AiTool> topicTitleTool =

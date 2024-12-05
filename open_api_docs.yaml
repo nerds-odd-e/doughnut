@@ -2098,11 +2098,11 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/User"
-  /api/text_content/{note}/topic-constructor:
+  /api/text_content/{note}/title:
     patch:
       tags:
       - rest-text-content-controller
-      operationId: updateNoteTopicConstructor
+      operationId: updateNoteTitle
       parameters:
       - name: note
         in: path

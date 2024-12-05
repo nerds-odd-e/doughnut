@@ -121,10 +121,9 @@ export default class StoredApiCollection implements StoredApi {
     content: string
   ) {
     if (field === "edit topic") {
-      return this.managedApi.restTextContentController.updateNoteTopicConstructor(
-        noteId,
-        { newTitle: content }
-      )
+      return this.managedApi.restTextContentController.updateNoteTitle(noteId, {
+        newTitle: content,
+      })
     }
     return this.managedApi.restTextContentController.updateNoteDetails(noteId, {
       details: content,

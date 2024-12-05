@@ -15,13 +15,13 @@ export class RestTextContentControllerService {
      * @returns NoteRealm OK
      * @throws ApiError
      */
-    public updateNoteTopicConstructor(
+    public updateNoteTitle(
         note: number,
         requestBody: NoteUpdateTitleDTO,
     ): CancelablePromise<NoteRealm> {
         return this.httpRequest.request({
             method: 'PATCH',
-            url: '/api/text_content/{note}/topic-constructor',
+            url: '/api/text_content/{note}/title',
             path: {
                 'note': note,
             },

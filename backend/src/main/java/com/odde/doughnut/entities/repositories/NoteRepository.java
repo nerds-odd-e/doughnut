@@ -9,10 +9,10 @@ import org.springframework.data.repository.query.Param;
 
 public interface NoteRepository extends CrudRepository<Note, Integer> {
   String selectFromNote = "SELECT n FROM Note n";
-  String searchForTopicLike = " WHERE n.topicConstructor LIKE :pattern AND n.deletedAt IS NULL ";
+  String searchForTitleLike = " WHERE n.topicConstructor LIKE :pattern AND n.deletedAt IS NULL ";
 
   @Query(value = selectFromNote + " where n.topicConstructor = :key")
-  Note findFirstByTopicConstructor(@Param("key") String key);
+  Note findFirstByTitle(@Param("key") String key);
 
   @Query(
       value =
@@ -20,18 +20,17 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
               + " WHERE n.notebook.id = ("
               + "SELECT nhn.notebook_id FROM NotebookHeadNote nhn WHERE nhn.head_note_id = (SELECT rn.id FROM Note rn WHERE rn.topicConstructor = :title)"
               + ") AND n.topicConstructor = :key")
-  Note findFirstInNotebookByTopicConstructor(
-      @Param("title") String notebookTitle, @Param("key") String key);
+  Note findFirstInNotebookByTitle(@Param("title") String notebookTitle, @Param("key") String key);
 
   @Query(
-      value = selectFromNote + searchForTopicLike + "  AND n.notebook.ownership.user.id = :userId ")
+      value = selectFromNote + searchForTitleLike + "  AND n.notebook.ownership.user.id = :userId ")
   Stream<Note> searchForUserInAllMyNotebooks(Integer userId, String pattern);
 
   @Query(
       value =
           selectFromNote
               + " JOIN n.notebook.subscriptions s ON s.user.id = :userId "
-              + searchForTopicLike)
+              + searchForTitleLike)
   Stream<Note> searchForUserInAllMySubscriptions(Integer userId, @Param("pattern") String pattern);
 
   @Query(
@@ -39,10 +38,10 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
           selectFromNote
               + "              JOIN n.notebook.ownership.circle.members m"
               + "                ON m.id = :userId "
-              + searchForTopicLike)
+              + searchForTitleLike)
   Stream<Note> searchForUserInAllMyCircle(Integer userId, @Param("pattern") String pattern);
 
-  @Query(value = selectFromNote + searchForTopicLike + " AND n.notebook.id = :notebookId ")
+  @Query(value = selectFromNote + searchForTitleLike + " AND n.notebook.id = :notebookId ")
   Stream<Note> searchInNotebook(Integer notebookId, @Param("pattern") String pattern);
 
   @Query(

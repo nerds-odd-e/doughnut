@@ -24,7 +24,7 @@ describe("in place edit on title", () => {
 
   beforeEach(() => {
     vi.resetAllMocks()
-    helper.managedApi.restTextContentController.updateNoteTopicConstructor =
+    helper.managedApi.restTextContentController.updateNoteTitle =
       mockedUpdateTopicCall
   })
 

@@ -36,9 +36,9 @@ class RestTextContentController {
     this.testabilitySettings = testabilitySettings;
   }
 
-  @PatchMapping(path = "/{note}/topic-constructor")
+  @PatchMapping(path = "/{note}/title")
   @Transactional
-  public NoteRealm updateNoteTopicConstructor(
+  public NoteRealm updateNoteTitle(
       @PathVariable(name = "note") @Schema(type = "integer") Note note,
       @Valid @RequestBody NoteUpdateTitleDTO topicDTO)
       throws UnexpectedNoAccessRightException {

@@ -222,7 +222,7 @@ class RestAiControllerTest {
   }
 
   @Nested
-  class SuggestTopicTitle {
+  class SuggestNoteTitle {
     Note testNote;
     OpenAIAssistantMocker openAIAssistantMocker;
     OpenAIAssistantThreadMocker openAIAssistantThreadMocker;
@@ -242,7 +242,7 @@ class RestAiControllerTest {
     }
 
     @Test
-    void shouldReturnSuggestedTopicTitle()
+    void shouldReturnSuggestedTitle()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
       SuggestedTitleDTO result = controller.suggestTopicTitle(testNote);
       assertThat(result.getTitle()).isEqualTo("Suggested Title");

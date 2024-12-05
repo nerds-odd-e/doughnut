@@ -27,7 +27,7 @@ import lombok.Setter;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "note")
-@JsonPropertyOrder({"topic", "noteTopology", "details", "parentId", "linkType", "updatedAt"})
+@JsonPropertyOrder({"noteTopology", "details", "parentId", "linkType", "updatedAt"})
 public class Note extends EntityIdentifiedByIdOnly {
   public static final int MAX_TITLE_LENGTH = 150;
   public static final String NOTE_OF_CURRENT_FOCUS = "note of current focus";

@@ -48,7 +48,7 @@ class NoteAutomationServiceTests {
   }
 
   @Test
-  void shouldHandleCompletedRunWhenSuggestingTopicTitle() throws JsonProcessingException {
+  void shouldHandleCompletedRunWhenSuggestingTitle() throws JsonProcessingException {
     openAIAssistantThreadMocker
         .mockCreateRunInProcess("my-run-id")
         .aCompletedRun()

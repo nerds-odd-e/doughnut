@@ -385,8 +385,7 @@ describe("NoteAudioTools", () => {
     beforeEach(() => {
       // Reset mocks and wrapper before each test
       vi.clearAllMocks()
-      helper.managedApi.restTextContentController.updateNoteTopicConstructor =
-        vi.fn()
+      helper.managedApi.restTextContentController.updateNoteTitle = vi.fn()
       helper.managedApi.restAiAudioController.audioToText = vi
         .fn()
         .mockResolvedValue({ completionFromAudio: "text" })
@@ -413,7 +412,7 @@ describe("NoteAudioTools", () => {
         helper.managedApi.restAiController.suggestTopicTitle
       ).toHaveBeenCalledTimes(4)
       expect(
-        helper.managedApi.restTextContentController.updateNoteTopicConstructor
+        helper.managedApi.restTextContentController.updateNoteTitle
       ).toHaveBeenCalledTimes(4)
     })
 
@@ -434,7 +433,7 @@ describe("NoteAudioTools", () => {
         helper.managedApi.restAiController.suggestTopicTitle
       ).toHaveBeenCalled()
       expect(
-        helper.managedApi.restTextContentController.updateNoteTopicConstructor
+        helper.managedApi.restTextContentController.updateNoteTitle
       ).not.toHaveBeenCalled()
     })
   })

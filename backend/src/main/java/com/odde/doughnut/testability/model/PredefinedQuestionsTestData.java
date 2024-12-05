@@ -51,7 +51,7 @@ public class PredefinedQuestionsTestData {
         .map(
             question ->
                 question.buildPredefinedQuestion(
-                    factoryService.noteRepository.findFirstInNotebookByTopicConstructor(
+                    factoryService.noteRepository.findFirstInNotebookByTitle(
                         notebookTitle, question.noteTopology)))
         .collect(Collectors.toList());
   }
