@@ -7,6 +7,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.graphRAG.GraphRAGResult;
 import com.odde.doughnut.services.impl.GraphRAGServiceImpl;
 import com.odde.doughnut.testability.MakeMe;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -173,5 +174,30 @@ public class GraphRAGServiceTest {
             .map(note -> note.uriAndTitle)
             .noneMatch(uri -> uri.contains("Child")),
         equalTo(true));
+  }
+
+  @Test
+  void shouldIncludeChildrenWhenTokenBudgetIsLarge() {
+    Note parent = makeMe.aNote().titleConstructor("Parent").please();
+    Note child1 = makeMe.aNote().titleConstructor("First Child").under(parent).please();
+    Note child2 = makeMe.aNote().titleConstructor("Second Child").under(parent).please();
+
+    GraphRAGResult result = graphRAGService.retrieve(parent, Integer.MAX_VALUE);
+
+    // Children should be in focus note's children list
+    assertThat(result.focusNote.children, hasSize(2));
+    assertThat(
+        result.focusNote.children.get(0),
+        equalTo(String.format("[First Child](/n%d)", child1.getId())));
+    assertThat(
+        result.focusNote.children.get(1),
+        equalTo(String.format("[Second Child](/n%d)", child2.getId())));
+
+    // Children should also be in related notes
+    assertThat(
+        result.relatedNotes.stream().map(note -> note.uriAndTitle).collect(Collectors.toList()),
+        hasItems(
+            String.format("[First Child](/n%d)", child1.getId()),
+            String.format("[Second Child](/n%d)", child2.getId())));
   }
 }

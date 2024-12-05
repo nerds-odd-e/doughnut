@@ -46,7 +46,11 @@ public class GraphRAGServiceImpl {
             parentUriAndTitle,
             objectUriAndTitle,
             buildContextualPath(focusNote),
-            Collections.emptyList(),
+            tokenBudget > 0
+                ? focusNote.getChildren().stream()
+                    .map(this::formatUriAndTitle)
+                    .collect(Collectors.toList())
+                : Collections.emptyList(),
             Collections.emptyList(),
             Collections.emptyList(),
             Collections.emptyList());
@@ -63,6 +67,12 @@ public class GraphRAGServiceImpl {
       // Add object's ancestors to related notes (Priority 1)
       for (Note ancestor : target.getAncestors()) {
         relatedNotes.add(createRelatedNote(ancestor));
+      }
+    }
+    // Add children to related notes (Priority 2)
+    if (tokenBudget > 0) {
+      for (Note child : focusNote.getChildren()) {
+        relatedNotes.add(createRelatedNote(child));
       }
     }
 
