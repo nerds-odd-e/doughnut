@@ -34,6 +34,8 @@ defineProps({
   border-left: none;
   box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
   background: linear-gradient(to right, #f5f5f5 0%, #ffffff 5%);
+  height: 200px;
+  overflow: hidden;
 }
 
 .notebook-binding {
