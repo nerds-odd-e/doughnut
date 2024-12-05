@@ -19,7 +19,7 @@
     </div>
 
     <div v-else-if="isDropdown" class="dropdown-list">
-      <NoteTopicWithLink
+      <NoteTitleWithLink
         v-for="noteTopology in searchResult"
         :key="noteTopology.id"
         :noteTopology="noteTopology"
@@ -47,7 +47,7 @@ import { debounce } from "mini-debounce"
 import { ref, computed, watch, onMounted, onBeforeUnmount } from "vue"
 import CheckInput from "../form/CheckInput.vue"
 import Cards from "../notes/Cards.vue"
-import NoteTopicWithLink from "../notes/NoteTopicWithLink.vue"
+import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue"
 
 // Props definition
 const props = defineProps({

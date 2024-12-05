@@ -3,7 +3,7 @@
   <div v-if="!!inverseIcon">
     Source:
     <strong>
-      <NoteTopicWithLink
+      <NoteTitleWithLink
         v-if="noteTopology.parentOrSubjectNoteTopology"
         class="link-title"
         v-bind="{ noteTopology: noteTopology.parentOrSubjectNoteTopology }"
@@ -21,7 +21,7 @@
   <div v-if="!inverseIcon">
     Target:
     <strong>
-      <NoteTopicWithLink
+      <NoteTitleWithLink
         v-if="noteTopology.objectNoteTopology"
         class="link-title"
         v-bind="{ noteTopology: noteTopology.objectNoteTopology }"
@@ -36,7 +36,7 @@ import type { PropType } from "vue"
 import { defineComponent } from "vue"
 import type { StorageAccessor } from "../../store/createNoteStorage"
 import usePopups from "../commons/Popups/usePopups"
-import NoteTopicWithLink from "../notes/NoteTopicWithLink.vue"
+import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue"
 import LinkTypeSelect from "./LinkTypeSelect.vue"
 
 export default defineComponent({
@@ -58,7 +58,7 @@ export default defineComponent({
   emits: ["closeDialog"],
   components: {
     LinkTypeSelect,
-    NoteTopicWithLink,
+    NoteTitleWithLink,
   },
   data() {
     return {

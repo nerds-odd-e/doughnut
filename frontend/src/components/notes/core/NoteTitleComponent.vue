@@ -1,7 +1,7 @@
 <template>
   <template v-if="noteTopology.objectNoteTopology">
     <template v-if="full">
-      <NoteTopicWithLink
+      <NoteTitleWithLink
         v-if="noteTopology.parentOrSubjectNoteTopology"
         v-bind="{
           noteTopology: noteTopology.parentOrSubjectNoteTopology,
@@ -20,7 +20,7 @@
         v-if="iconizedTarget"
         v-bind="{ noteTopology: noteTopology.objectNoteTopology }"
       />
-      <NoteTopicWithLink
+      <NoteTitleWithLink
         class="hover-underline"
         v-bind="{
           noteTopology: noteTopology.objectNoteTopology,
@@ -39,7 +39,7 @@ import type { PropType } from "vue"
 import { computed, ref } from "vue"
 import { NoteTopology } from "@/generated/backend"
 import SvgLinkTypeIcon from "@/components/svgs/SvgLinkTypeIcon.vue"
-import NoteTopicWithLink from "../NoteTopicWithLink.vue"
+import NoteTitleWithLink from "../NoteTitleWithLink.vue"
 
 const props = defineProps({
   noteTopology: { type: Object as PropType<NoteTopology>, required: true },

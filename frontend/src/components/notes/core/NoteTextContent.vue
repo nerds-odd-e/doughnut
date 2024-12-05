@@ -2,7 +2,7 @@
   <div class="alert alert-warning" v-if="note.deletedAt">
     This note has been deleted
   </div>
-  <NoteLinkTopic
+  <NoteTitleAsPredicate
     v-if="note.noteTopology.objectNoteTopology"
     v-bind="{ noteTopology: note.noteTopology, readonly, storageAccessor }"
   />
@@ -22,7 +22,7 @@ import { type PropType } from "vue"
 import type { Note } from "@/generated/backend"
 import type { StorageAccessor } from "../../../store/createNoteStorage"
 import NoteEditableTopic from "./NoteEditableTopic.vue"
-import NoteLinkTopic from "./NoteLinkTopic.vue"
+import NoteTitleAsPredicate from "./NoteTitleAsPredicate.vue"
 import NoteEditableDetails from "./NoteEditableDetails.vue"
 
 defineProps({

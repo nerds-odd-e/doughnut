@@ -1,6 +1,6 @@
 <template>
   <form @submit.prevent.once="processForm">
-    <NoteFormTopicOnly
+    <NoteFormTitleOnly
       v-model="noteFormData.newTitle"
       :error-message="errors.newTitle"
     />
@@ -9,7 +9,7 @@
 </template>
 
 <script lang="ts">
-import NoteFormTopicOnly from "@/components/notes/NoteFormTopicOnly.vue"
+import NoteFormTitleOnly from "@/components/notes/NoteFormTitleOnly.vue"
 import type { Circle, NoteCreationDTO } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { PropType } from "vue"
@@ -20,7 +20,7 @@ export default {
   },
   props: { circle: { type: Object as PropType<Circle> } },
   components: {
-    NoteFormTopicOnly,
+    NoteFormTitleOnly,
   },
   data() {
     return {

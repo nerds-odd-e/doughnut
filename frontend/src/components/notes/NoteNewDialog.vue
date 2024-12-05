@@ -2,7 +2,7 @@
   <form @submit.prevent="processForm">
     <fieldset :disabled="processing">
       <div class="topic-search-container">
-        <NoteFormTopicOnly
+        <NoteFormTitleOnly
           v-model="creationData.newTitle"
           :error-message="noteFormErrors.newTitle"
           @focus="showDropdown = true"
@@ -45,7 +45,7 @@ import type { InsertMode } from "@/models/InsertMode"
 import type { StorageAccessor } from "../../store/createNoteStorage"
 import { ref } from "vue"
 import SearchResults from "../search/SearchResults.vue"
-import NoteFormTopicOnly from "./NoteFormTopicOnly.vue"
+import NoteFormTitleOnly from "./NoteFormTitleOnly.vue"
 import SuggestTitle from "./SuggestTitle.vue"
 import WikidataSearchByLabel from "./WikidataSearchByLabel.vue"
 import { useRouter } from "vue-router"

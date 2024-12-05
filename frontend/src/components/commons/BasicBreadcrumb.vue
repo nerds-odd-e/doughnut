@@ -9,7 +9,7 @@
       v-for="noteTopology in ancestors"
       :key="noteTopology.id"
     >
-      <NoteTopicWithLink v-bind="{ noteTopology: noteTopology }" />
+      <NoteTitleWithLink v-bind="{ noteTopology: noteTopology }" />
     </li>
     <li class="breadcrumb-item" v-if="$slots.additional">
       <slot name="additional" />
@@ -20,7 +20,7 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { NoteTopology } from "@/generated/backend"
-import NoteTopicWithLink from "../notes/NoteTopicWithLink.vue"
+import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue"
 
 defineProps({ ancestors: Array as PropType<NoteTopology[]> })
 </script>

@@ -13,7 +13,7 @@
       <tbody>
         <tr v-for="note in notes" :key="note.id">
           <td>
-            <NoteTopicWithLink :noteTopology="note.note.noteTopology" />
+            <NoteTitleWithLink :noteTopology="note.note.noteTopology" />
           </td>
           <td>
             <NotebookLink v-if="note.notebook" :notebook="note.notebook" />
@@ -30,7 +30,7 @@
 import { ref, onMounted } from "vue"
 import type { NoteRealm } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import NoteTopicWithLink from "@/components/notes/NoteTopicWithLink.vue"
+import NoteTitleWithLink from "@/components/notes/NoteTitleWithLink.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import NotebookLink from "@/components/notes/NotebookLink.vue"
 

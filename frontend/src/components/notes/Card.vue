@@ -7,7 +7,7 @@
     >
       <div class="card-body">
         <h5>
-          <NoteTopicWithLink v-bind="{ noteTopology }" class="card-title" />
+          <NoteTitleWithLink v-bind="{ noteTopology }" class="card-title" />
         </h5>
         <p v-if="noteTopology.shortDetails" class="note-short-details">
           {{ noteTopology.shortDetails }}
@@ -23,7 +23,7 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { NoteTopology } from "@/generated/backend"
-import NoteTopicWithLink from "./NoteTopicWithLink.vue"
+import NoteTitleWithLink from "./NoteTitleWithLink.vue"
 
 defineProps({
   noteTopology: { type: Object as PropType<NoteTopology>, required: true },

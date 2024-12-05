@@ -17,7 +17,7 @@
       class="d-flex w-100 justify-content-between align-items-start note-content"
       @click="toggleChildren(noteRealm.id)"
     >
-      <NoteTopicWithLink
+      <NoteTitleWithLink
         class="card-title"
         :class="{ 'active-topic': noteRealm.id === activeNoteRealm.note.id }"
         v-bind="{ noteTopology: noteRealm.note.noteTopology }"
@@ -54,7 +54,7 @@
 <script setup lang="ts">
 import type { Note, NoteRealm } from "@/generated/backend"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
-import NoteTopicWithLink from "./NoteTopicWithLink.vue"
+import NoteTitleWithLink from "./NoteTitleWithLink.vue"
 import SidebarInner from "./SidebarInner.vue"
 import { computed } from "vue"
 import type { StorageAccessor } from "@/store/createNoteStorage"

@@ -17,7 +17,7 @@
             :key="point.id"
             :class="{ 'removed': point.removedFromTracking }">
           <td>
-            <NoteTopicWithLink :noteTopology="point.note.noteTopology" />
+            <NoteTitleWithLink :noteTopology="point.note.noteTopology" />
           </td>
           <td>{{ new Date(point.assimilatedAt!).toLocaleString() }}</td>
           <td>{{ new Date(point.nextRecallAt!).toLocaleString() }}</td>
@@ -34,7 +34,7 @@
 import { ref, onMounted } from "vue"
 import type { MemoryTracker } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import NoteTopicWithLink from "@/components/notes/NoteTopicWithLink.vue"
+import NoteTitleWithLink from "@/components/notes/NoteTitleWithLink.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 
 const { managedApi } = useLoadingApi()

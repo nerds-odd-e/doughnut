@@ -1,7 +1,7 @@
 <template>
   <Breadcrumb v-bind="{ noteTopology }" />
   <h5>
-    <NoteTopicWithLink v-bind="{ noteTopology }" class="card-title" />
+    <NoteTitleWithLink v-bind="{ noteTopology }" class="card-title" />
   </h5>
 </template>
 
