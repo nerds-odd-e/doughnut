@@ -1,8 +1,7 @@
 <template>
-  <BasicBreadcrumb
-    v-if="recallPrompt.notebook"
-    :ancestors="[recallPrompt.notebook.headNoteTopic]"
-  />
+  <div v-if="recallPrompt.notebook" class="notebook-source">
+    From notebook: <NoteTopicWithLink :noteTopology="recallPrompt.notebook.headNoteTopic" />
+  </div>
   <div v-for="(q, index) in prevQuestions" :key="index">
     <h3>Previous Question Contested ...</h3>
     <p>{{ q.badQuestionReason }}</p>
@@ -42,7 +41,7 @@ import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import type { PropType } from "vue"
 import { ref } from "vue"
-import BasicBreadcrumb from "../commons/BasicBreadcrumb.vue"
+import NoteTopicWithLink from "../notes/NoteTopicWithLink.vue"
 import AnsweredQuestionComponent from "./AnsweredQuestionComponent.vue"
 import RecallPromptComponent from "./RecallPromptComponent.vue"
 import QuestionDisplay from "./QuestionDisplay.vue"
@@ -106,5 +105,8 @@ const onAnswered = (answer: AnsweredQuestion) => {
 <style lang="scss" scoped>
 .recall-prompt {
   overflow-y: auto;
+}
+.notebook-source {
+  margin-bottom: 1rem;
 }
 </style>

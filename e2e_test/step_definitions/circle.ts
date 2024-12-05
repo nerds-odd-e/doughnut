@@ -83,7 +83,7 @@ When(
   (topic: string, circleName: string, externalIdentifier: string) => {
     start
       .testability()
-      .injectNotes([{ Topic: topic }], externalIdentifier, circleName)
+      .injectNotes([{ Title: topic }], externalIdentifier, circleName)
   }
 )
 
