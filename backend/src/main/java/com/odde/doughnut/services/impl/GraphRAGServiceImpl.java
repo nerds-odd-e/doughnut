@@ -48,6 +48,13 @@ public class GraphRAGServiceImpl {
             Collections.emptyList());
 
     List<BareNote> relatedNotes = new ArrayList<>();
+    // Add ancestors to related notes (Priority 1)
+    for (Note ancestor : focusNote.getAncestors()) {
+      relatedNotes.add(
+          new BareNote(
+              formatUriAndTitle(ancestor), truncateDetails(ancestor.getDetails()), null, null));
+    }
+    // Add object note to related notes (Priority 1)
     if (focusNote.getTargetNote() != null) {
       Note target = focusNote.getTargetNote();
       relatedNotes.add(

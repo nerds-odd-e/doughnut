@@ -70,12 +70,15 @@ public class GraphRAGServiceTest {
         result.focusNote.objectUriAndTitle,
         equalTo(String.format("[Object](/n%d)", target.getId())));
 
-    assertThat(result.relatedNotes, hasSize(1));
+    assertThat(result.relatedNotes, hasSize(2));
     assertThat(
         result.relatedNotes.get(0).uriAndTitle,
+        equalTo(String.format("[Subject](/n%d)", parent.getId())));
+    assertThat(
+        result.relatedNotes.get(1).uriAndTitle,
         equalTo(String.format("[Object](/n%d)", target.getId())));
     assertThat(
-        result.relatedNotes.get(0).detailsTruncated,
+        result.relatedNotes.get(1).detailsTruncated,
         equalTo(
             longObjectDetails.substring(
                 0, GraphRAGServiceImpl.RELATED_NOTE_DETAILS_TRUNCATE_LENGTH)));
@@ -100,6 +103,17 @@ public class GraphRAGServiceTest {
         equalTo(String.format("[Grandparent](/n%d)", grandparent.getId())));
     assertThat(
         result.focusNote.contextualPath.get(2),
+        equalTo(String.format("[Parent](/n%d)", parent.getId())));
+
+    assertThat(result.relatedNotes, hasSize(3));
+    assertThat(
+        result.relatedNotes.get(0).uriAndTitle,
+        equalTo(String.format("[Great Grandparent](/n%d)", greatGrandparent.getId())));
+    assertThat(
+        result.relatedNotes.get(1).uriAndTitle,
+        equalTo(String.format("[Grandparent](/n%d)", grandparent.getId())));
+    assertThat(
+        result.relatedNotes.get(2).uriAndTitle,
         equalTo(String.format("[Parent](/n%d)", parent.getId())));
   }
 }
