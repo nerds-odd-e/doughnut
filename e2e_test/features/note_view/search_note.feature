@@ -25,5 +25,5 @@ Feature: search note
   @mockBrowserTime
   Scenario: Search when adding new note
     Given I am creating a note under "My Notes/Sedation"
-    When I type "ph" in the topic
+    When I type "ph" in the title
     Then I should see "Physical" as the possible duplicate

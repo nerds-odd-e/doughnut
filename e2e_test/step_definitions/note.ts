@@ -121,11 +121,11 @@ Given(
   }
 )
 
-When('I create a notebook with topic {string}', (notebookTopic: string) => {
-  start.routerToNotebooksPage().creatingNotebook(notebookTopic)
+When('I create a notebook with the title {string}', (notebookTitle: string) => {
+  start.routerToNotebooksPage().creatingNotebook(notebookTitle)
 })
 
-When('I create a notebook with empty topic', () => {
+When('I create a notebook with empty title', () => {
   start.routerToNotebooksPage().creatingNotebook('')
 })
 
@@ -156,17 +156,17 @@ When(
 )
 
 When(
-  'I can change the topic {string} to {string}',
-  (noteTopology: string, newNoteTopic: string) => {
-    start.assumeNotePage(noteTopology).editTextContent({ title: newNoteTopic })
-    start.assumeNotePage(newNoteTopic)
+  'I can change the title {string} to {string}',
+  (noteTopology: string, newNoteTitle: string) => {
+    start.assumeNotePage(noteTopology).editTextContent({ title: newNoteTitle })
+    start.assumeNotePage(newNoteTitle)
   }
 )
 
 Given(
   'I update note title {string} to become {string}',
-  (noteTopology: string, newNoteTopic: string) => {
-    start.jumpToNotePage(noteTopology).editTextContent({ title: newNoteTopic })
+  (noteTopology: string, newNoteTitle: string) => {
+    start.jumpToNotePage(noteTopology).editTextContent({ title: newNoteTitle })
   }
 )
 
@@ -203,9 +203,9 @@ When('I am creating a note under {notepath}', (notePath: NotePath) => {
   start.routerToNotebooksPage().navigateToPath(notePath).addingChildNote()
 })
 
-Then('I should see {string} in breadcrumb', (noteTopics: string) => {
+Then('I should see {string} in breadcrumb', (noteTitles: string) => {
   cy.pageIsNotLoading()
-  cy.expectBreadcrumb(noteTopics)
+  cy.expectBreadcrumb(noteTitles)
 })
 
 When('I visit all my notebooks', () => {
@@ -293,9 +293,9 @@ When('I move note {string} right', (noteTopology: string) => {
 
 When(
   'I should see {string} is before {string} in {string}',
-  (noteTopic1: string, noteTopic2: string, parentNoteTopic: string) => {
-    start.jumpToNotePage(parentNoteTopic)
-    const matcher = new RegExp(`${noteTopic1}.*${noteTopic2}`, 'g')
+  (noteTitle1: string, noteTitle2: string, parentNoteTitle: string) => {
+    start.jumpToNotePage(parentNoteTitle)
+    const matcher = new RegExp(`${noteTitle1}.*${noteTitle2}`, 'g')
 
     cy.get('.card-title').then(($els) => {
       const texts = Array.from($els, (el) => el.innerText)
@@ -364,9 +364,9 @@ When('I undo {string} again', (undoType: string) => {
 })
 
 Then(
-  'the deleted notebook with topic {string} should be restored',
-  (topic: string) => {
-    start.assumeNotePage(topic)
+  'the deleted notebook with title {string} should be restored',
+  (title: string) => {
+    start.assumeNotePage(title)
   }
 )
 
@@ -374,7 +374,7 @@ Then('there should be no more undo to do', () => {
   cy.get('.btn[title="undo"]').should('not.exist')
 })
 
-Then('I type {string} in the topic', (content: string) => {
+Then('I type {string} in the title', (content: string) => {
   cy.focused().clear().type(content)
 })
 
@@ -421,8 +421,8 @@ When('I start to chat about the note {string}', (noteTopology: string) => {
   start.jumpToNotePage(noteTopology).startAConversationAboutNote()
 })
 
-Then('I should see a child note {string}', (childTopic: string) => {
-  start.assumeNotePage().expectChildren([{ 'note-title': childTopic }])
+Then('I should see a child note {string}', (childTitle: string) => {
+  start.assumeNotePage().expectChildren([{ 'note-title': childTitle }])
 })
 
 When('I collapse the children of note {string}', (noteTopology: string) => {
@@ -459,13 +459,6 @@ When(
   'I should see the questions in the question list of the note {string}:',
   (noteTopology: string, data: DataTable) => {
     start.jumpToNotePage(noteTopology).expectQuestionsInList(data.hashes())
-  }
-)
-
-Given(
-  'I toggle the approval of the question {string} of the topic {string}',
-  (recallPrompt: string, noteTopology: string) => {
-    start.jumpToNotePage(noteTopology).toggleApproval(recallPrompt)
   }
 )
 

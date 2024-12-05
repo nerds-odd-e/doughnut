@@ -27,9 +27,9 @@ const recallPage = () => {
     repeatMore() {
       cy.findByRole('button', { name: 'Load more from next 3 days' }).click()
     },
-    recallNotes(noteTopics: string) {
+    recallNotes(noteTitles: string) {
       cy.pageIsNotLoading()
-      commonSenseSplit(noteTopics, ',').forEach((topic) => {
+      commonSenseSplit(noteTitles, ',').forEach((topic) => {
         if (topic === 'end') {
           cy.findByText(
             'You have finished all repetitions for this half a day!'

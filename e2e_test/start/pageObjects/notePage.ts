@@ -237,13 +237,6 @@ export const assumeNotePage = (noteTopology?: string) => {
     refineQuestion(row: Record<string, string>) {
       this.openQuestionList().addQuestionPage().refineQuestion(row)
     },
-    toggleApproval(question: string) {
-      this.openQuestionList()
-      cy.findByText(question)
-        .parent('tr')
-        .find('input[type="checkbox"]')
-        .click()
-    },
     expectQuestionsInList(expectedQuestions: Record<string, string>[]) {
       this.openQuestionList().expectQuestion(expectedQuestions)
     },

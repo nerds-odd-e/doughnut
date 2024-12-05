@@ -7,7 +7,7 @@ Feature: Editing when assimilating
 
   Scenario: Update note
     When I am assimilating new note on day 1
-    Then I can change the topic "hard" to "harder"
+    Then I can change the title "hard" to "harder"
 
   Scenario: Update recall setting
     Given I am assimilating new note on day 1

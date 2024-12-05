@@ -50,9 +50,9 @@ export const assimilation = () => {
             cy.initialReviewOneNoteIfThereIs(assimilation)
           })
         },
-        assimilateNotes(noteTopics: string) {
+        assimilateNotes(noteTitles: string) {
           return this.assimilate(
-            commonSenseSplit(noteTopics, ', ').map((title: string) => {
+            commonSenseSplit(noteTitles, ', ').map((title: string) => {
               return {
                 'Review Type': title === 'end' ? 'initial done' : 'single note',
                 Title: title,
