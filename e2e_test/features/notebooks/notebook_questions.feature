@@ -14,10 +14,10 @@ Feature: Notebook questions
       | Title | Question                |
       | team  | Who is the team?        |
       | tech  | What is the technology? |
-    Then I should see the following questions for the topics in the notebook "LeSS in Action":
+    Then I should see the following questions for the notes in the notebook "LeSS in Action":
       | Title | Question                |
       | team  | Who is the team?        |
       | tech  | What is the technology? |
-    And I should see that there are no questions for "LeSS in Action" for the following topics:
+    And I should see that there are no questions for "LeSS in Action" for the following notes:
       | Title |
       | management  |

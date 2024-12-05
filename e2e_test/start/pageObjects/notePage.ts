@@ -26,11 +26,11 @@ function filterAttributes(
 }
 
 export const assumeNotePage = (noteTopology?: string) => {
-  const findNoteTopic = (topic) =>
-    cy.findByText(topic, { selector: '[role=title] *' })
+  const findNoteTitle = (title) =>
+    cy.findByText(title, { selector: '[role=title] *' })
 
   if (noteTopology) {
-    findNoteTopic(noteTopology)
+    findNoteTitle(noteTopology)
   }
 
   const privateToolbarButton = (btnTextOrTitle: string) => {
@@ -84,7 +84,7 @@ export const assumeNotePage = (noteTopology?: string) => {
     linkNoteTo: (target: string) => {
       const findLink = () =>
         cy
-          .findByText(target, { selector: 'main .topic-text' })
+          .findByText(target, { selector: 'main .title-text' })
           .parent()
           .parent()
           .parent()
@@ -130,7 +130,7 @@ export const assumeNotePage = (noteTopology?: string) => {
     navigateToReference: (referenceTopic: string) => {
       cy.get('main').within(() => {
         cy.findByText(referenceTopic, {
-          selector: '.link-link .topic-text',
+          selector: '.link-link .title-text',
         }).click()
       })
       return assumeNotePage()

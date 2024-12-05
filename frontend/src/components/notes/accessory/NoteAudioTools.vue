@@ -119,7 +119,7 @@ const updateTopicIfSuggested = async (noteId: number) => {
   if (suggestedTopic?.title) {
     await storageAccessor
       .storedApi()
-      .updateTextField(noteId, "edit topic", suggestedTopic.title)
+      .updateTextField(noteId, "edit title", suggestedTopic.title)
   }
 }
 

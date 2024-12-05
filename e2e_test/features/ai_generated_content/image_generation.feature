@@ -6,7 +6,7 @@ Feature: Generate image
     And I have a notebook with the head note "Animals"
 
   @usingMockedOpenAiService
-  Scenario: get an image for a note based on its topic
+  Scenario: get an image for a note based on its title
     Given OpenAI always return image of a moon
     When I generate an image for "Animals"
     Then I should find an art created by the ai

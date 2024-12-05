@@ -12,5 +12,5 @@ Feature: Note parent reference
     When I navigate to "My Notes/LeSS in Action" note
     Then I should see a child note "Usually, [LeSS in Action] is in-person"
 
-  Scenario: the topic constructor is editable
+  Scenario: the title is editable
     When I navigate to "My Notes/LeSS in Action/Usually, [LeSS in Action] is in-person" note

@@ -245,7 +245,7 @@ Cypress.Commands.add(
 )
 
 Cypress.Commands.add('findCardTitle', (topic) =>
-  cy.findByText(topic, { selector: '.card-title .topic-text' })
+  cy.findByText(topic, { selector: '.card-title .title-text' })
 )
 
 Cypress.Commands.add('yesIRemember', () => {

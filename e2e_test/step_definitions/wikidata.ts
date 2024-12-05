@@ -103,8 +103,8 @@ Given(
   }
 )
 
-When('I search with topic {string} on Wikidata', (topic: string) => {
-  cy.focused().clear().type(topic)
+When('I search with phrase {string} on Wikidata', (phrase: string) => {
+  cy.focused().clear().type(phrase)
   cy.findByRole('button', { name: 'Wikidata Id' }).click()
 })
 

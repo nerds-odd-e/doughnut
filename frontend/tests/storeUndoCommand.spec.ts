@@ -9,7 +9,7 @@ describe("storeUndoCommand", () => {
     it("should push textContent into store state noteUndoHistories ", () => {
       histories.addEditingToUndoHistory(
         note.id,
-        "edit topic",
+        "edit title",
         note.note.noteTopology.titleOrPredicate
       )
 

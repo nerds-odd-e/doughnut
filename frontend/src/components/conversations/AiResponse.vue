@@ -258,7 +258,7 @@ const handleAcceptTitle = () => {
   return handleToolCallAccept(async (note) => {
     await storageAccessor
       .storedApi()
-      .updateTextField(note.id, "edit topic", topicTitleSuggestion.value!)
+      .updateTextField(note.id, "edit title", topicTitleSuggestion.value!)
   })
 }
 

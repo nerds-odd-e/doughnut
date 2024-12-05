@@ -50,7 +50,7 @@ export interface StoredApi {
 
   updateTextField(
     noteId: Doughnut.ID,
-    field: "edit topic" | "edit details",
+    field: "edit title" | "edit details",
     value: string
   ): Promise<void>
 
@@ -107,7 +107,7 @@ export default class StoredApiCollection implements StoredApi {
 
   private async updateTextContentWithoutUndo(
     noteId: Doughnut.ID,
-    field: "edit topic" | "edit details",
+    field: "edit title" | "edit details",
     content: string
   ) {
     return this.storage.refreshNoteRealm(
@@ -117,10 +117,10 @@ export default class StoredApiCollection implements StoredApi {
 
   private async callUpdateApi(
     noteId: Doughnut.ID,
-    field: "edit topic" | "edit details",
+    field: "edit title" | "edit details",
     content: string
   ) {
-    if (field === "edit topic") {
+    if (field === "edit title") {
       return this.managedApi.restTextContentController.updateNoteTitle(noteId, {
         newTitle: content,
       })
@@ -233,13 +233,13 @@ export default class StoredApiCollection implements StoredApi {
 
   async updateTextField(
     noteId: Doughnut.ID,
-    field: "edit topic" | "edit details",
+    field: "edit title" | "edit details",
     value: string
   ) {
     const currentNote = this.storage.refOfNoteRealm(noteId).value?.note
     if (currentNote) {
       const old =
-        field === "edit topic"
+        field === "edit title"
           ? currentNote.noteTopology.titleOrPredicate
           : currentNote.details
       if (old === value) {
@@ -265,7 +265,7 @@ export default class StoredApiCollection implements StoredApi {
     if (!undone) throw new Error("undo history is empty")
     this.noteEditingHistory.popUndoHistory()
     if (
-      undone.type === "edit topic" ||
+      undone.type === "edit title" ||
       (undone.type === "edit details" && undone.textContent !== undefined)
     ) {
       return this.updateTextContentWithoutUndo(

@@ -1,6 +1,6 @@
 Feature: Note Edit
   As a learner, I want to edit and undo editing for single user,
-  with topic and details only within a session.
+  with title and details only within a session.
 
   Background:
     Given I am logged in as an existing user
@@ -22,7 +22,7 @@ Feature: Note Edit
     And I should see "A super awesome training" in the page
     When I undo "edit details"
     Then I should see "An awesome training" in the page
-    When I undo "edit topic" again
+    When I undo "edit title" again
     Then I should see "LeSS in Action" in the page
     And there should be no more undo to do
 

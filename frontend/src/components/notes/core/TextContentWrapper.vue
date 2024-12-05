@@ -17,7 +17,7 @@ import { type StorageAccessor } from "../../../store/createNoteStorage"
 
 const { storageAccessor, field, value } = defineProps({
   field: {
-    type: String as PropType<"edit topic" | "edit details">,
+    type: String as PropType<"edit title" | "edit details">,
     required: true,
   },
   value: {

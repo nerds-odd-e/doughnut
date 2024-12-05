@@ -29,6 +29,6 @@ describe("undo editing", () => {
     await wrapper.find('[role="title"] input').trigger("blur")
     await flushPromises()
 
-    expect(histories.peekUndo()).toMatchObject({ type: "edit topic" })
+    expect(histories.peekUndo()).toMatchObject({ type: "edit title" })
   })
 })

@@ -25,7 +25,7 @@ Feature: Nested Note Create with wikidata
   Scenario: Select one of the Wikidata entries from the search result
     Given Wikidata search result always has "Dog" with ID "Q11399"
     When I am creating a note under "My Notes/Animals"
-    And I search with topic "dog" on Wikidata
+    And I search with phrase "dog" on Wikidata
     And I select wikidataID "Q11399" from the Wikidata search result
     Then I should see that the "Title" becomes "Dog"
     Then I should see that the "Wikidata Id" becomes "Q11399"

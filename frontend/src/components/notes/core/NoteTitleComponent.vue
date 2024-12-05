@@ -30,7 +30,7 @@
     </span>
   </template>
   <template v-else>
-    <span class="topic-text">{{ topic }} </span>
+    <span class="title-text">{{ topic }} </span>
   </template>
 </template>
 

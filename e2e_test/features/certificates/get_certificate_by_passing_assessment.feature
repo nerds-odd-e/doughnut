@@ -1,6 +1,6 @@
 Feature: Get certificate by an assessment
   As a trainer, I want to provide certificates to learners who pass assessments,
-  so that they can demonstrate their skill level on the topic.
+  so that they can demonstrate their skill level on the note.
 
   As a learner, I want to obtain a certificate when I pass an assessment,
   so that I can showcase my expertise.

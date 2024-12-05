@@ -9,14 +9,14 @@ export default () => ({
       .click()
     return addQuestionPage()
   },
-  expectNoQuestionsForTopic: (topicName: string) => {
+  expectNoQuestionsForNote: (topicName: string) => {
     cy.get('.notebook-questions-list')
       .findByText(topicName)
       .parent()
       .findByText('No questions')
       .should('exist')
   },
-  expectOnlyQuestionsForTopic: (topicName: string, question: string) => {
+  expectOnlyQuestionsForNote: (topicName: string, question: string) => {
     cy.get('.notebook-questions-list')
       .findByText(topicName)
       .parent()

@@ -2,7 +2,7 @@
   <TextContentWrapper
     :value="noteTopology.titleOrPredicate"
     :storage-accessor="storageAccessor"
-    field="edit topic"
+    field="edit title"
   >
     <template #default="{ value, update, blur, errors }">
       <EditableText

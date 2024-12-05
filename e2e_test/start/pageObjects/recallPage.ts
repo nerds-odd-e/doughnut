@@ -29,13 +29,13 @@ const recallPage = () => {
     },
     recallNotes(noteTitles: string) {
       cy.pageIsNotLoading()
-      commonSenseSplit(noteTitles, ',').forEach((topic) => {
-        if (topic === 'end') {
+      commonSenseSplit(noteTitles, ',').forEach((title) => {
+        if (title === 'end') {
           cy.findByText(
             'You have finished all repetitions for this half a day!'
           ).should('be.visible')
         } else {
-          cy.findByText(topic, { selector: 'h2 *' })
+          cy.findByText(title, { selector: 'h2 *' })
           cy.yesIRemember()
         }
       })
