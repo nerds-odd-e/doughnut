@@ -244,14 +244,14 @@ class RestAiControllerTest {
     @Test
     void shouldReturnSuggestedTitle()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
-      SuggestedTitleDTO result = controller.suggestTopicTitle(testNote);
+      SuggestedTitleDTO result = controller.suggestTitle(testNote);
       assertThat(result.getTitle()).isEqualTo("Suggested Title");
     }
 
     @Test
     void shouldCallCreateThreadWithRightMessage()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
-      controller.suggestTopicTitle(testNote);
+      controller.suggestTitle(testNote);
       verify(openAiApi)
           .createRun(
               any(),
@@ -271,7 +271,7 @@ class RestAiControllerTest {
               new OtherAiServices(openAiApi),
               makeMe.aNullUserModelPlease());
 
-      assertThrows(ResponseStatusException.class, () -> controller.suggestTopicTitle(testNote));
+      assertThrows(ResponseStatusException.class, () -> controller.suggestTitle(testNote));
     }
   }
 }

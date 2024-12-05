@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type PredefinedQuestionTestData = {
-    'Note Topic'?: string;
+    'Note Title'?: string;
     Question?: string;
     Answer?: string;
     'One Wrong Choice'?: string;

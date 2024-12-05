@@ -10,7 +10,7 @@ Feature: Improve OpenAI Question Generation using User Feedback
     Given I am logged in as an existing user
     And I have a notebook with the head note "Who Let the Dogs Out"
     And there are questions in the notebook "Who Let the Dogs Out" for the note:
-      | Note Topic           | Question                          | Answer         | One Wrong Choice |
+      | Note Title           | Question                          | Answer         | One Wrong Choice |
       | Who Let the Dogs Out | Who wrote 'Who Let the Dogs Out'? | Anslem Douglas | Baha Men         |
 
 

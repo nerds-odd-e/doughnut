@@ -1912,11 +1912,11 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/AssessmentAttempt"
-  /api/ai/suggest-topic-title/{note}:
+  /api/ai/suggest-title/{note}:
     post:
       tags:
       - rest-ai-controller
-      operationId: suggestTopicTitle
+      operationId: suggestTitle
       parameters:
       - name: note
         in: path
@@ -3283,7 +3283,7 @@ components:
     PredefinedQuestionTestData:
       type: object
       properties:
-        Note Topic:
+        Note Title:
           type: string
         Question:
           type: string

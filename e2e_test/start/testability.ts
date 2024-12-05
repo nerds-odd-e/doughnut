@@ -109,7 +109,7 @@ const testability = () => {
       )
         .fill(0)
         .map((_, index) => ({
-          'Note Topic': `Note about ${index}`,
+          'Note Title': `Note about ${index}`,
           Question: `Is ${index} * ${index} = ${index * index}?`,
           Answer: 'Yes',
           'One Wrong Choice': 'No',

@@ -115,8 +115,7 @@ const shouldSuggestTopic = (callCount: number): boolean => {
 }
 
 const updateTopicIfSuggested = async (noteId: number) => {
-  const suggestedTopic =
-    await managedApi.restAiController.suggestTopicTitle(noteId)
+  const suggestedTopic = await managedApi.restAiController.suggestTitle(noteId)
   if (suggestedTopic?.title) {
     await storageAccessor
       .storedApi()

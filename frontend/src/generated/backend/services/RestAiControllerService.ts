@@ -15,12 +15,12 @@ export class RestAiControllerService {
      * @returns SuggestedTitleDTO OK
      * @throws ApiError
      */
-    public suggestTopicTitle(
+    public suggestTitle(
         note: number,
     ): CancelablePromise<SuggestedTitleDTO> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/ai/suggest-topic-title/{note}',
+            url: '/api/ai/suggest-title/{note}',
             path: {
                 'note': note,
             },

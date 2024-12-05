@@ -6,7 +6,7 @@ Feature: Quiz Question Management
     Given I am logged in as an existing user
     And I have a notebook with the head note "The cow joke"
     And there are questions in the notebook "The cow joke" for the note:
-      | Note Topic   | Question             | Answer | One Wrong Choice |
+      | Note Title   | Question             | Answer | One Wrong Choice |
       | The cow joke | What does a cow say? | moo    | woo              |
 
   Scenario: Manually add a question to the note successfully

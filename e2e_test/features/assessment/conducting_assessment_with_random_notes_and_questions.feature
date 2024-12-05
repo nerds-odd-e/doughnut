@@ -9,7 +9,7 @@ Feature: Self assessment with random notes and questions
       | Vietnam   | Countries    |
     And notebook "Countries" is shared to the Bazaar
     And there are questions in the notebook "Countries" for the note:
-      | Note Topic | Question                         | Answer | One Wrong Choice | Approved |
+      | Note Title | Question                         | Answer | One Wrong Choice | Approved |
       | Singapore  | Where in the world is Singapore? | Asia   | euro             | true     |
       | Vietnam    | Most famous food of Vietnam?     | Pho    | bread            | true     |
     And I set the number of questions per assessment of the notebook "Countries" to 1

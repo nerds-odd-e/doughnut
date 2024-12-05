@@ -69,9 +69,9 @@ public class RestAiController {
     otherAiServices.resumeRun(threadId, runId).cancelRun();
   }
 
-  @PostMapping("/suggest-topic-title/{note}")
+  @PostMapping("/suggest-title/{note}")
   @Transactional
-  public SuggestedTitleDTO suggestTopicTitle(
+  public SuggestedTitleDTO suggestTitle(
       @PathVariable(value = "note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException, JsonProcessingException {
     currentUser.assertAuthorization(note);

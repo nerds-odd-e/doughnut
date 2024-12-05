@@ -398,7 +398,7 @@ describe("NoteAudioTools", () => {
         .withStorageProps({ note })
         .mount()
 
-      helper.managedApi.restAiController.suggestTopicTitle = vi
+      helper.managedApi.restAiController.suggestTitle = vi
         .fn()
         .mockResolvedValue({ title: "Suggested Title" })
 
@@ -407,9 +407,9 @@ describe("NoteAudioTools", () => {
         await wrapper.vm.processAudio(new Blob())
       }
 
-      // Should call suggestTopicTitle 4 times (on calls 1, 2, 4, and 8)
+      // Should call suggestTitle 4 times (on calls 1, 2, 4, and 8)
       expect(
-        helper.managedApi.restAiController.suggestTopicTitle
+        helper.managedApi.restAiController.suggestTitle
       ).toHaveBeenCalledTimes(4)
       expect(
         helper.managedApi.restTextContentController.updateNoteTitle
@@ -423,15 +423,13 @@ describe("NoteAudioTools", () => {
         .withStorageProps({ note })
         .mount()
 
-      helper.managedApi.restAiController.suggestTopicTitle = vi
+      helper.managedApi.restAiController.suggestTitle = vi
         .fn()
         .mockResolvedValue({ title: "" })
 
       await wrapper.vm.processAudio(new Blob())
 
-      expect(
-        helper.managedApi.restAiController.suggestTopicTitle
-      ).toHaveBeenCalled()
+      expect(helper.managedApi.restAiController.suggestTitle).toHaveBeenCalled()
       expect(
         helper.managedApi.restTextContentController.updateNoteTitle
       ).not.toHaveBeenCalled()
