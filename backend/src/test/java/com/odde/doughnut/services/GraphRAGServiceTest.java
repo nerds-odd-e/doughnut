@@ -200,4 +200,36 @@ public class GraphRAGServiceTest {
             String.format("[First Child](/n%d)", child1.getId()),
             String.format("[Second Child](/n%d)", child2.getId())));
   }
+
+  @Test
+  void shouldIncludeChildWhenTokenBudgetJustEnough() {
+    Note parent = makeMe.aNote().titleConstructor("Parent").please();
+    Note child =
+        makeMe
+            .aNote()
+            .titleConstructor("Child")
+            .details("Det") // "Child" + "Det" = 8 chars ≈ 2.13 tokens, rounds up to 3
+            .under(parent)
+            .please();
+
+    // Test with exactly enough tokens
+    GraphRAGResult result = graphRAGService.retrieve(parent, 3);
+
+    // Child should be included
+    assertThat(result.focusNote.children, hasSize(1));
+    assertThat(
+        result.focusNote.children.get(0), equalTo(String.format("[Child](/n%d)", child.getId())));
+    assertThat(
+        result.relatedNotes.stream().map(note -> note.uriAndTitle).collect(Collectors.toList()),
+        hasItem(String.format("[Child](/n%d)", child.getId())));
+
+    // Test with one token less
+    result = graphRAGService.retrieve(parent, 2);
+    assertThat(result.focusNote.children, empty());
+    assertThat(
+        result.relatedNotes.stream()
+            .map(note -> note.uriAndTitle)
+            .noneMatch(uri -> uri.contains("Child")),
+        equalTo(true));
+  }
 }
