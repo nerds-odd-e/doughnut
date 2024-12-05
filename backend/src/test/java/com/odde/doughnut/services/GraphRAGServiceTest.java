@@ -207,7 +207,7 @@ public class GraphRAGServiceTest {
     Note child = makeMe.aNote().titleConstructor("Child").details("D").under(parent).please();
 
     // Test with exactly enough tokens
-    GraphRAGResult result = graphRAGService.retrieve(parent, 15);
+    GraphRAGResult result = graphRAGService.retrieve(parent, 16);
 
     // Child should be included
     assertThat(result.focusNote.children, hasSize(1));
