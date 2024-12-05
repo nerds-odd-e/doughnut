@@ -19,7 +19,7 @@ Then("there shouldn't be any note edit button", () => {
 })
 
 When('I open the notebook {string} in the Bazaar', (noteTopology: string) => {
-  cy.findCardTitle(noteTopology).click()
+  start.navigateToBazaar().navigateToChild(noteTopology)
 })
 
 When(
