@@ -4,6 +4,23 @@ import { assumeNotePage } from './notePage'
 export const notebookList = () => {
   cy.pageIsNotLoading()
   return {
+    expectNotebookCards: (notebooks: Record<string, string>[]) => {
+      cy.get('.notebook-card .card-title').should(
+        'have.length',
+        notebooks.length
+      )
+      notebooks.forEach((elem) => {
+        for (const propName in elem) {
+          if (propName === 'Title') {
+            cy.findByText(elem[propName]!, {
+              selector: '.notebook-card .card-title',
+            })
+          } else {
+            cy.findByText(elem[propName]!)
+          }
+        }
+      })
+    },
     expectNotebooks: (notebooks: string) => {
       cy.pageIsNotLoading()
       cy.get('.notebook-card .card-title').then(($els) => {

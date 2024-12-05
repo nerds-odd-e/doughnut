@@ -215,8 +215,7 @@ When('I visit all my notebooks', () => {
 Then(
   'I should see these notes belonging to the user at the top level of all my notes',
   (data: DataTable) => {
-    start.routerToNotebooksPage()
-    cy.expectNoteCards(data.hashes())
+    start.routerToNotebooksPage().expectNotebookCards(data.hashes())
   }
 )
 
