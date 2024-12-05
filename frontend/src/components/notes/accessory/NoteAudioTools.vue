@@ -110,7 +110,7 @@ const isPowerOfTwo = (n: number): boolean => {
   return n > 0 && (n & (n - 1)) === 0
 }
 
-const shouldSuggestTopic = (callCount: number): boolean => {
+const shouldSuggestTitle = (callCount: number): boolean => {
   return isPowerOfTwo(callCount)
 }
 
@@ -171,7 +171,7 @@ const processAudio = async (chunk: AudioChunk): Promise<string | undefined> => {
       .completeDetails(note.id, response?.completionFromAudio)
 
     threadContext.value.callCount++
-    if (shouldSuggestTopic(threadContext.value.callCount)) {
+    if (shouldSuggestTitle(threadContext.value.callCount)) {
       updateTopicIfSuggested(note.id)
     }
 

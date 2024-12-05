@@ -154,7 +154,7 @@ declare module 'vue' {
     SuggestedQuestionList: typeof import('./src/components/admin/SuggestedQuestionList.vue')['default']
     SuggestedQuestionRow: typeof import('./src/components/admin/SuggestedQuestionRow.vue')['default']
     SuggestQuestionForFineTuning: typeof import('./src/components/ai/SuggestQuestionForFineTuning.vue')['default']
-    SuggestTopic: typeof import('./src/components/notes/SuggestTopic.vue')['default']
+    SuggestTitle: typeof import('./src/components/notes/SuggestTitle.vue')['default']
     SvgAdd: typeof import('./src/components/svgs/SvgAdd.vue')['default']
     SvgAddChild: typeof import('./src/components/svgs/SvgAddChild.vue')['default']
     SvgAddSibling: typeof import('./src/components/svgs/SvgAddSibling.vue')['default']

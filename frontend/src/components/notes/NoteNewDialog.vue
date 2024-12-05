@@ -8,7 +8,7 @@
           @focus="showDropdown = true"
           @blur="onTopicBlur"
         />
-        <SuggestTopic
+        <SuggestTitle
           :original-topic="creationData.newTitle"
           :suggested-topic="suggestedTopic"
           @suggested-topic-selected="takeSuggestedTopic"
@@ -46,7 +46,7 @@ import type { StorageAccessor } from "../../store/createNoteStorage"
 import { ref } from "vue"
 import SearchResults from "../search/SearchResults.vue"
 import NoteFormTopicOnly from "./NoteFormTopicOnly.vue"
-import SuggestTopic from "./SuggestTopic.vue"
+import SuggestTitle from "./SuggestTitle.vue"
 import WikidataSearchByLabel from "./WikidataSearchByLabel.vue"
 import { useRouter } from "vue-router"
 
