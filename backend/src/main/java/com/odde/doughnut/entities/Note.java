@@ -390,7 +390,7 @@ public class Note extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  private String getUri() {
+  public String getUri() {
     return "/n" + getId();
   }
 

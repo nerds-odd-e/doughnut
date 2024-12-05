@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class GraphRAGServiceImpl implements GraphRAGService {
   private String formatUriAndTitle(Note note) {
-    return String.format("[%s](/n%d)", note.getTopicConstructor(), note.getId());
+    return String.format("[%s](%s)", note.getTopicConstructor(), note.getUri());
   }
 
   private List<String> buildContextualPath(Note note) {
