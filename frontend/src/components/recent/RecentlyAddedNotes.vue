@@ -16,7 +16,7 @@
             <NoteTopicWithLink :noteTopology="note.note.noteTopology" />
           </td>
           <td>
-            {{ note.notebook?.headNoteTopic?.titleOrPredicate }}
+            <NotebookLink v-if="note.notebook" :notebook="note.notebook" />
           </td>
           <td>{{ new Date(note.note.createdAt).toLocaleString() }}</td>
           <td>{{ new Date(note.note.updatedAt).toLocaleString() }}</td>
@@ -32,6 +32,7 @@ import type { NoteRealm } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import NoteTopicWithLink from "@/components/notes/NoteTopicWithLink.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
+import NotebookLink from "@/components/notes/NotebookLink.vue"
 
 const { managedApi } = useLoadingApi()
 const notes = ref<NoteRealm[] | undefined>(undefined)
