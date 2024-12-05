@@ -36,13 +36,15 @@ public class GraphRAGServiceImpl implements GraphRAGService {
     String detailsTruncated = focusNote.getDetails();
     String parentUriAndTitle =
         focusNote.getParent() != null ? formatUriAndTitle(focusNote.getParent()) : null;
+    String objectUriAndTitle =
+        focusNote.getTargetNote() != null ? formatUriAndTitle(focusNote.getTargetNote()) : null;
 
     FocusNote focus =
         new FocusNote(
             uriAndTitle,
             detailsTruncated,
             parentUriAndTitle,
-            null,
+            objectUriAndTitle,
             buildContextualPath(focusNote),
             Collections.emptyList(),
             Collections.emptyList(),

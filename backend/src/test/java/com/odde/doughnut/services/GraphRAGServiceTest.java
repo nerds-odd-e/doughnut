@@ -104,4 +104,30 @@ public class GraphRAGServiceTest {
     assertThat(parent.getDetails().length(), equalTo(2000));
     assertThat(result.focusNote.detailsTruncated, equalTo("Test Details"));
   }
+
+  @Test
+  void shouldIncludeObjectForReificationNote() {
+    Note parent = makeMe.aNote().titleConstructor("Subject").please();
+    Note target = makeMe.aNote().titleConstructor("Object").details("Object Details").please();
+    Note note = makeMe.aLink().between(parent, target).please();
+
+    GraphRAGResult result = graphRAGService.retrieve(note, 0);
+
+    // Check object relationship
+    assertThat(
+        result.focusNote.objectUriAndTitle,
+        equalTo(String.format("[Object](/n%d)", target.getId())));
+
+    // Other properties should remain as before
+    assertThat(
+        result.focusNote.uriAndTitle,
+        equalTo(String.format("[%s](/n%d)", note.getTopicConstructor(), note.getId())));
+    assertThat(
+        result.focusNote.parentUriAndTitle,
+        equalTo(String.format("[Subject](/n%d)", parent.getId())));
+    assertThat(result.focusNote.contextualPath, hasSize(1));
+    assertThat(
+        result.focusNote.contextualPath.get(0),
+        equalTo(String.format("[Subject](/n%d)", parent.getId())));
+  }
 }
