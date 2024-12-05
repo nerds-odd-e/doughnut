@@ -41,16 +41,66 @@ It might be different from how the Doughnut internal data structure is organized
 
 ## Retrieval Algorithm
 
-1.	Input:
-  *	FocusNote, n (budget for retrieval).
-2.	Steps:
-  *	Step 1: Fetch Priority 0 (FocusNote).
-  *	Step 2: Fetch Priority 1 notes in one go.
-  *	Step 3: Retrieve Priority 2, 3, and 4 notes in a ratio (e.g., 3:2:1).
-  *	Step 4: Deduplicate notes using processed_uris to avoid redundancy and infinite loops.
-  *	Step 5: Continue fetching until n notes are reached or all priorities are exhausted.
-3.	Output:
-  *	Overall
+### Input
+
+  - `FocusNote`: The main note of interest.
+  - `n`: Token budget for retrieval.
+  - `relevance_threshold`: Minimum relevance score for a note to be considered.
+
+### Steps
+
+1. **Initialize**
+   - Fetch the `FocusNote` (Priority 0) and include it in the result.
+   - Initialize a priority queue (`noteQueue`) to hold related notes with their relevance scores.
+   - Initialize a set (`processed_uris`) to track URIs of already processed notes.
+   - Estimate the token cost of including `FocusNote` and deduct it from the token budget (`remaining_tokens`).
+
+2. **Fetch Priority 1 Notes**
+   - Retrieve all Priority 1 notes (`Parent`, `Object`, `ContextualPath`, `ObjectContextualPath`).
+   - Add these notes to `noteQueue` with their relevance scores.
+   - Deduplicate notes by skipping those already in `processed_uris`.
+
+3. **Iterative Retrieval**
+   - While `remaining_tokens > 0` and `noteQueue` is not empty:
+     - Pop the highest-scoring note from `noteQueue`.
+     - Estimate the token cost of including this note.
+     - If the estimated token cost exceeds `remaining_tokens`, skip this note.
+     - Otherwise:
+       - Add the note to the result list.
+       - Deduct its token cost from `remaining_tokens`.
+       - Mark its URI as processed by adding it to `processed_uris`.
+       - Retrieve related notes (e.g., Priority 2, 3, and 4 notes).
+       - Add newly retrieved notes to `noteQueue` with updated relevance scores.
+
+4. **Relevance Scoring**
+   - Calculate relevance scores for notes based on:
+     - Proximity to the `FocusNote` (e.g., Parent > Sibling > Cousin).
+     - Semantic similarity between note titles and details.
+     - User-defined priorities or historical access patterns.
+
+5. **Deduplication**
+   - Maintain the `processed_uris` set to avoid adding duplicate notes.
+   - Skip any notes already processed during any retrieval stage.
+
+6. **Token Budget Management**
+   - For each note, estimate the token cost based on its size (e.g., details, relationships).
+   - Prioritize including higher-relevance notes that fit within the `remaining_tokens`.
+
+7. **Finalize Results**
+   - Collect all included notes into the `Overall` object:
+     - `FocusNote`: The main note with its relationships.
+     - `related_notes`: A normalized list of notes ranked by relevance, containing `BareNote` or `NoteWithContextualPath` as appropriate.
+
+### Output
+
+- An `Overall` object containing:
+  - `FocusNote`: The focus note with full details and relationships.
+  - `related_notes`: A ranked list of related notes within the token budget.
+
+### Notes
+- The algorithm ensures that the highest-relevance notes are prioritized within the given token budget.
+- Deduplication and error handling mechanisms are in place to prevent redundancy and infinite loops.
+- The use of relevance scores allows for dynamic adjustment based on the context and user preferences.
 
 ## Prompting the AI
 
