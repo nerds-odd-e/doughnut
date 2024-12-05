@@ -1,7 +1,7 @@
 <template>
   <TextInput
     scope-name="note"
-    field="topic"
+    field="Title"
     :model-value="modelValue"
     :error-message="errorMessage"
     :initial-select-all="true"

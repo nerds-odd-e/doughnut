@@ -17,10 +17,6 @@ const myNotebooksPage = () => {
         this as any
       )
     },
-    navigateToChild(notebook: string) {
-      cy.findByText(notebook, { selector: '.notebook-card *' }).click()
-      return assumeNotePage()
-    },
     creatingNotebook(notebookTopic: string) {
       cy.findByText('Add New Notebook').click()
       return noteCreationForm.createNote(notebookTopic)

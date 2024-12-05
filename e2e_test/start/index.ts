@@ -5,6 +5,7 @@ import { questionGenerationService } from './questionGenerationService'
 import testability from './testability'
 import { assimilation } from './pageObjects/assimilationPage'
 import { recall } from './pageObjects/recallPage'
+import { assumeCirclePage } from './pageObjects/circlePage'
 
 const start = {
   ...basicActions,
@@ -13,6 +14,7 @@ const start = {
   testability,
   assimilation,
   recall,
+  assumeCirclePage,
 }
 export default start
 export { mock_services }

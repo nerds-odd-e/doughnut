@@ -1,4 +1,5 @@
 import { commonSenseSplit } from '../../support/string_util'
+import { assumeNotePage } from './notePage'
 
 export const notebookList = () => {
   cy.pageIsNotLoading()
@@ -9,6 +10,10 @@ export const notebookList = () => {
         const cardTitles = Array.from($els, (el) => el.innerText)
         expect(cardTitles).to.deep.eq(commonSenseSplit(notebooks, ','))
       })
+    },
+    navigateToChild(notebook: string) {
+      cy.findByText(notebook, { selector: '.notebook-card *' }).click()
+      return assumeNotePage()
     },
   }
 }

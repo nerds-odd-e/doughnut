@@ -50,9 +50,8 @@ When(
 
 When(
   'I should see the notebook {string} in circle {string}',
-  (noteTopology: string, circleName: string) => {
-    start.navigateToCircle(circleName)
-    cy.findCardTitle(noteTopology)
+  (notebook: string, circleName: string) => {
+    start.navigateToCircle(circleName).expectNotebooks(notebook)
   }
 )
 
@@ -60,7 +59,7 @@ When(
   'I add a note {string} under {string}',
   (noteTopology: string, parentNoteTopic: string) => {
     start
-      .assumeNotePage()
+      .assumeCirclePage()
       .navigateToChild(parentNoteTopic)
       .addingChildNote()
       .createNote(noteTopology)
