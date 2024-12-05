@@ -47,6 +47,20 @@ public class GraphRAGServiceImpl {
     String objectUriAndTitle =
         focusNote.getTargetNote() != null ? formatUriAndTitle(focusNote.getTargetNote()) : null;
 
+    // Calculate children that fit within budget
+    List<Note> childrenWithinBudget = new ArrayList<>();
+    int remainingTokens = tokenBudget;
+    if (remainingTokens > 0) {
+      for (Note child : focusNote.getChildren()) {
+        BareNote childNote = createRelatedNote(child);
+        int childTokens = estimateTokens(childNote);
+        if (childTokens <= remainingTokens) {
+          childrenWithinBudget.add(child);
+          remainingTokens -= childTokens;
+        }
+      }
+    }
+
     FocusNote focus =
         new FocusNote(
             uriAndTitle,
@@ -54,12 +68,7 @@ public class GraphRAGServiceImpl {
             parentUriAndTitle,
             objectUriAndTitle,
             buildContextualPath(focusNote),
-            tokenBudget >= 3
-                ? focusNote.getChildren().stream()
-                    .filter(child -> estimateTokens(createRelatedNote(child)) <= tokenBudget)
-                    .map(this::formatUriAndTitle)
-                    .collect(Collectors.toList())
-                : Collections.emptyList(),
+            childrenWithinBudget.stream().map(this::formatUriAndTitle).collect(Collectors.toList()),
             Collections.emptyList(),
             Collections.emptyList(),
             Collections.emptyList());
@@ -79,16 +88,8 @@ public class GraphRAGServiceImpl {
       }
     }
     // Add children to related notes (Priority 2)
-    int remainingTokens = tokenBudget;
-    if (remainingTokens > 0) {
-      for (Note child : focusNote.getChildren()) {
-        BareNote childNote = createRelatedNote(child);
-        int childTokens = estimateTokens(childNote);
-        if (childTokens <= remainingTokens) {
-          relatedNotes.add(childNote);
-          remainingTokens -= childTokens;
-        }
-      }
+    for (Note child : childrenWithinBudget) {
+      relatedNotes.add(createRelatedNote(child));
     }
 
     return new GraphRAGResult(focus, relatedNotes);

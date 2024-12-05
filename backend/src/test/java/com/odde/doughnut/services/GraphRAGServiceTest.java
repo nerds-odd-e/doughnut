@@ -226,4 +226,33 @@ public class GraphRAGServiceTest {
             .noneMatch(uri -> uri.contains("Child")),
         equalTo(true));
   }
+
+  @Test
+  void shouldIncludeOnlyFirstChildWhenTokenBudgetOnlyAllowsOne() {
+    Note parent = makeMe.aNote().titleConstructor("Parent").please();
+    Note child1 =
+        makeMe.aNote().titleConstructor("First Child").details("D1").under(parent).please();
+    Note child2 =
+        makeMe.aNote().titleConstructor("Second Child").details("D2").under(parent).please();
+
+    // Test with budget enough for only one child
+    GraphRAGResult result = graphRAGService.retrieve(parent, 26);
+
+    // Only first child should be in focus note's children list
+    assertThat(result.focusNote.children, hasSize(1));
+    assertThat(
+        result.focusNote.children.get(0),
+        equalTo(String.format("[First Child](/n%d)", child1.getId())));
+
+    // Only first child should be in related notes
+    assertThat(result.relatedNotes, hasSize(1));
+    assertThat(
+        result.relatedNotes.get(0).uriAndTitle,
+        equalTo(String.format("[First Child](/n%d)", child1.getId())));
+
+    // Test with budget enough for both children
+    result = graphRAGService.retrieve(parent, 52);
+    assertThat(result.focusNote.children, hasSize(2));
+    assertThat(result.relatedNotes, hasSize(2));
+  }
 }
