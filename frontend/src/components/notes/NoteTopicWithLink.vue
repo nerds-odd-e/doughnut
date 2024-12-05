@@ -11,7 +11,7 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { NoteTopology } from "@/generated/backend"
-import NoteTopicComponent from "./core/NoteTopicComponent.vue"
+import NoteTopicComponent from "./core/NoteTitleComponent.vue"
 
 defineProps({
   noteTopology: { type: Object as PropType<NoteTopology>, required: true },

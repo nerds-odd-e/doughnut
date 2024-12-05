@@ -45,7 +45,7 @@ import type { Note, WikidataAssociationCreation } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import TextInput from "../form/TextInput.vue"
-import NoteTopicComponent from "./core/NoteTopicComponent.vue"
+import NoteTopicComponent from "./core/NoteTitleComponent.vue"
 
 interface WikidataError {
   body: {

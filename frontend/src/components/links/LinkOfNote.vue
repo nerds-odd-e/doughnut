@@ -17,7 +17,7 @@ import type { PropType } from "vue"
 import { defineComponent } from "vue"
 import { colors } from "../../colors"
 import type { StorageAccessor } from "../../store/createNoteStorage"
-import NoteTopicComponent from "../notes/core/NoteTopicComponent.vue"
+import NoteTopicComponent from "../notes/core/NoteTitleComponent.vue"
 import LinkNob from "./LinkNob.vue"
 
 export default defineComponent({

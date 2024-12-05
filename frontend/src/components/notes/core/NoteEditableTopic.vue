@@ -27,7 +27,7 @@ import { NoteTopology } from "@/generated/backend"
 import { type StorageAccessor } from "../../../store/createNoteStorage"
 import EditableText from "../../form/EditableText.vue"
 import TextContentWrapper from "./TextContentWrapper.vue"
-import NoteTopicComponent from "./NoteTopicComponent.vue"
+import NoteTopicComponent from "./NoteTitleComponent.vue"
 
 defineProps({
   noteTopology: { type: Object as PropType<NoteTopology>, required: true },

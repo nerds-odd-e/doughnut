@@ -1,4 +1,4 @@
-import NoteTopicComponent from "@/components/notes/core/NoteTopicComponent.vue"
+import NoteTopicComponent from "@/components/notes/core/NoteTitleComponent.vue"
 import type { Note } from "@/generated/backend"
 import { VueWrapper } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"
