@@ -27,7 +27,7 @@ function filterAttributes(
 
 export const assumeNotePage = (noteTopology?: string) => {
   const findNoteTopic = (topic) =>
-    cy.findByText(topic, { selector: '[role=topic] *' })
+    cy.findByText(topic, { selector: '[role=title] *' })
 
   if (noteTopology) {
     findNoteTopic(noteTopology)
@@ -119,7 +119,7 @@ export const assumeNotePage = (noteTopology?: string) => {
       })
     },
     changeLinkType: function (linkType: string, target: string) {
-      cy.findByRole('topic').within(() => {
+      cy.findByRole('title').within(() => {
         cy.get('.link-type').click()
       })
       cy.clickRadioByLabel(linkType)
@@ -272,7 +272,7 @@ export const assumeNotePage = (noteTopology?: string) => {
     moveUpAmongSiblings() {
       cy.pageIsNotLoading()
       // Find current note in sidebar
-      cy.findByRole('topic')
+      cy.findByRole('title')
         .invoke('text')
         .then((currentTopic) => {
           // Find the note in sidebar
@@ -298,7 +298,7 @@ export const assumeNotePage = (noteTopology?: string) => {
     moveDownAmongSiblings() {
       cy.pageIsNotLoading()
       // Find current note in sidebar
-      cy.findByRole('topic')
+      cy.findByRole('title')
         .invoke('text')
         .then((currentTopic) => {
           // Find the note in sidebar

@@ -1,5 +1,5 @@
 <template>
-  <h2 role="topic" @click="editingLink = true">
+  <h2 role="title" @click="editingLink = true">
     <NoteTitleComponent v-bind="{ noteTopology: noteTopology, full: true }" />
   </h2>
   <Breadcrumb

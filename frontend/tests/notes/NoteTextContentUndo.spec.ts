@@ -24,9 +24,9 @@ describe("undo editing", () => {
       })
       .mount()
 
-    await wrapper.find('[role="topic"]').trigger("click")
-    await wrapper.find('[role="topic"] input').setValue(updatedTitle)
-    await wrapper.find('[role="topic"] input').trigger("blur")
+    await wrapper.find('[role="title"]').trigger("click")
+    await wrapper.find('[role="title"] input').setValue(updatedTitle)
+    await wrapper.find('[role="title"] input').trigger("blur")
     await flushPromises()
 
     expect(histories.peekUndo()).toMatchObject({ type: "edit topic" })

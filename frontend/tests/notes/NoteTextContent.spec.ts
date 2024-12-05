@@ -30,26 +30,26 @@ describe("in place edit on title", () => {
 
   it("should display text field when one single click on title", async () => {
     const wrapper = mountComponent(note)
-    expect(wrapper.findAll('[role="topic"] input')).toHaveLength(0)
-    await wrapper.find('[role="topic"] h2').trigger("click")
+    expect(wrapper.findAll('[role="title"] input')).toHaveLength(0)
+    await wrapper.find('[role="title"] h2').trigger("click")
 
     await flushPromises()
 
-    expect(wrapper.findAll('[role="topic"] input')).toHaveLength(1)
-    expect(wrapper.findAll('[role="topic"] h2')).toHaveLength(0)
+    expect(wrapper.findAll('[role="title"] input')).toHaveLength(1)
+    expect(wrapper.findAll('[role="title"] h2')).toHaveLength(0)
   })
 
   it("should not save change when not unmount", async () => {
     const wrapper = mountComponent(note)
-    await wrapper.find('[role="topic"]').trigger("click")
-    await wrapper.find('[role="topic"] input').setValue("updated")
+    await wrapper.find('[role="title"]').trigger("click")
+    await wrapper.find('[role="title"] input').setValue("updated")
     wrapper.unmount()
   })
 
   it("is not editable when readonly", async () => {
     const wrapper = mountComponent(note, true)
-    await wrapper.find('[role="topic"]').trigger("click")
-    expect(wrapper.findAll("[role='topic'] input")).toHaveLength(0)
+    await wrapper.find('[role="title"]').trigger("click")
+    expect(wrapper.findAll("[role='title'] input")).toHaveLength(0)
   })
 
   const getPlaceholder = (wrapper: VueWrapper<ComponentPublicInstance>) => {
@@ -80,8 +80,8 @@ describe("in place edit on title", () => {
 
   it("should save change when unmount", async () => {
     const wrapper = mountComponent(note)
-    await wrapper.find('[role="topic"]').trigger("click")
-    await wrapper.find('[role="topic"] input').setValue("updated")
+    await wrapper.find('[role="title"]').trigger("click")
+    await wrapper.find('[role="title"] input').setValue("updated")
     wrapper.unmount()
     expect(mockedUpdateTopicCall).toBeCalledWith(note.id, {
       newTitle: "updated",
@@ -92,21 +92,21 @@ describe("in place edit on title", () => {
     wrapper: VueWrapper<ComponentPublicInstance>,
     newValue: string
   ) => {
-    await wrapper.find('[role="topic"]').trigger("click")
-    await wrapper.find('[role="topic"] input').setValue(newValue)
+    await wrapper.find('[role="title"]').trigger("click")
+    await wrapper.find('[role="title"] input').setValue(newValue)
   }
 
   const editTitleThenBlur = async (
     wrapper: VueWrapper<ComponentPublicInstance>
   ) => {
     await editTitle(wrapper, "updated")
-    await wrapper.find('[role="topic"] input').trigger("blur")
+    await wrapper.find('[role="title"] input').trigger("blur")
   }
 
   it("should save content when blur text field title", async () => {
     const wrapper = mountComponent(note)
     await editTitle(wrapper, "updated")
-    await wrapper.find('[role="topic"] input').trigger("blur")
+    await wrapper.find('[role="title"] input').trigger("blur")
     expect(mockedUpdateTopicCall).toBeCalledWith(note.id, {
       newTitle: "updated",
     })
@@ -120,7 +120,7 @@ describe("in place edit on title", () => {
       note: { ...note, opicConstructor: "different value" },
     })
     expect(
-      wrapper.find<HTMLInputElement>('[role="topic"] input').element.value
+      wrapper.find<HTMLInputElement>('[role="title"] input').element.value
     ).toBe("updated")
 
     expect(mockedUpdateTopicCall).not.toBeCalled()
@@ -137,9 +137,9 @@ describe("in place edit on title", () => {
         },
       },
     })
-    await wrapper.find('[role="topic"]').trigger("click")
+    await wrapper.find('[role="title"]').trigger("click")
     expect(
-      wrapper.find<HTMLInputElement>('[role="topic"] input').element.value
+      wrapper.find<HTMLInputElement>('[role="title"] input').element.value
     ).toBe("different value")
   })
 

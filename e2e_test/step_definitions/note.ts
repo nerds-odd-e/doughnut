@@ -158,7 +158,7 @@ When(
 When(
   'I can change the topic {string} to {string}',
   (noteTopology: string, newNoteTopic: string) => {
-    start.assumeNotePage(noteTopology).editTextContent({ topic: newNoteTopic })
+    start.assumeNotePage(noteTopology).editTextContent({ title: newNoteTopic })
     start.assumeNotePage(newNoteTopic)
   }
 )
@@ -166,7 +166,7 @@ When(
 Given(
   'I update note title {string} to become {string}',
   (noteTopology: string, newNoteTopic: string) => {
-    start.jumpToNotePage(noteTopology).editTextContent({ topic: newNoteTopic })
+    start.jumpToNotePage(noteTopology).editTextContent({ title: newNoteTopic })
   }
 )
 
