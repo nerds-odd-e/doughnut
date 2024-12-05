@@ -9,7 +9,7 @@
     <tbody>
     <tr v-for="approval in approvals" :key="approval.id">
       <td>
-        <NoteTopicWithLink v-bind="{ noteTopology: approval.notebook.headNoteTopic }" />
+        <NotebookLink :notebook="approval.notebook" />
       </td>
       <td>
         {{ approval.notebook.creatorId }}
@@ -35,7 +35,7 @@
 import { onMounted, ref } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { NotebookCertificateApproval } from "@/generated/backend"
-import NoteTopicWithLink from "@/components/notes/NoteTopicWithLink.vue"
+import NotebookLink from "@/components/notes/NotebookLink.vue"
 import usePopups from "../commons/Popups/usePopups"
 
 const { popups } = usePopups()
