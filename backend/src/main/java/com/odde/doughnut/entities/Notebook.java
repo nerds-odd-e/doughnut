@@ -5,7 +5,6 @@ import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.odde.doughnut.controllers.dto.NoteTopology;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.models.Randomizer;
 import jakarta.persistence.*;
@@ -19,15 +18,7 @@ import org.springframework.lang.NonNull;
 
 @Entity
 @Table(name = "notebook")
-@JsonPropertyOrder({
-  "id",
-  "headNote",
-  "certifiable",
-  "notebookSettings",
-  "creatorId",
-  "headNoteTopic",
-  "circle"
-})
+@JsonPropertyOrder({"id", "certifiable", "notebookSettings", "creatorId", "title", "circle"})
 public class Notebook extends EntityIdentifiedByIdOnly {
   @OneToOne
   @JoinColumn(name = "creator_id")
@@ -157,8 +148,17 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   }
 
   @NonNull
-  public NoteTopology getHeadNoteTopic() {
-    return headNote.getNoteTopology();
+  public String getTitle() {
+    return headNote.getTopicConstructor();
+  }
+
+  @NonNull
+  public Integer getHeadNoteId() {
+    return headNote.getId();
+  }
+
+  public String getShortDetails() {
+    return headNote.getShortDetails();
   }
 
   public Circle getCircle() {

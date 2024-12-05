@@ -3402,9 +3402,10 @@ components:
           $ref: "#/components/schemas/NoteTopology"
     Notebook:
       required:
-      - headNoteTopic
+      - headNoteId
       - id
       - notebookSettings
+      - title
       - updated_at
       type: object
       properties:
@@ -3417,13 +3418,18 @@ components:
           $ref: "#/components/schemas/NotebookSettings"
         creatorId:
           type: string
-        headNoteTopic:
-          $ref: "#/components/schemas/NoteTopology"
+        title:
+          type: string
         circle:
           $ref: "#/components/schemas/Circle"
         updated_at:
           type: string
           format: date-time
+        shortDetails:
+          type: string
+        headNoteId:
+          type: integer
+          format: int32
     NotebookSettings:
       type: object
       properties:

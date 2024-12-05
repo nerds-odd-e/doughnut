@@ -5,7 +5,7 @@ export const notebookList = () => {
   return {
     expectNotebooks: (notebooks: string) => {
       cy.pageIsNotLoading()
-      cy.get('h5 .topic-text').then(($els) => {
+      cy.get('.notebook-card .card-title').then(($els) => {
         const cardTitles = Array.from($els, (el) => el.innerText)
         expect(cardTitles).to.deep.eq(commonSenseSplit(notebooks, ','))
       })

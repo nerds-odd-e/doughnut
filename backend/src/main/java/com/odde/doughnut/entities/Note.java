@@ -309,7 +309,7 @@ public class Note extends EntityIdentifiedByIdOnly {
     NoteTopology noteTopology = new NoteTopology();
     noteTopology.setId(getId());
     noteTopology.setTitleOrPredicate(getTopicConstructor());
-    noteTopology.setShortDetails(new HtmlOrMarkdown(getDetails()).beginning(50));
+    noteTopology.setShortDetails(getShortDetails());
     noteTopology.setLinkType(getLinkType());
     if (getParent() != null) {
       noteTopology.setParentOrSubjectNoteTopology(getParent().getNoteTopology());
@@ -318,6 +318,11 @@ public class Note extends EntityIdentifiedByIdOnly {
       noteTopology.setObjectNoteTopology(getTargetNote().getNoteTopology());
     }
     return noteTopology;
+  }
+
+  @JsonIgnore
+  public String getShortDetails() {
+    return new HtmlOrMarkdown(getDetails()).beginning(50);
   }
 
   @JsonIgnore

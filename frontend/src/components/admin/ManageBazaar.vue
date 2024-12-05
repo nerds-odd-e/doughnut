@@ -39,7 +39,7 @@ const fetchData = async () => {
 const removeFromBazaar = async (bazaarNotebook: BazaarNotebook) => {
   if (
     await popups.confirm(
-      `Are you sure you want to remove "${bazaarNotebook.notebook.headNoteTopic.titleOrPredicate}" from the bazaar?`
+      `Are you sure you want to remove "${bazaarNotebook.notebook.title}" from the bazaar?`
     )
   ) {
     notebooks.value = await managedApi.restBazaarController.removeFromBazaar(

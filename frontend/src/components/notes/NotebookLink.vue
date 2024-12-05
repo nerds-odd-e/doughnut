@@ -1,10 +1,10 @@
 <template>
   <router-link
-    :to="{ name: 'noteShow', params: { noteId: notebook.headNoteTopic.id } }"
+    :to="{ name: 'noteShow', params: { noteId: notebook.headNoteId } }"
     class="text-decoration-none"
   >
     <SvgNotebook class="me-1" />
-    <span>{{ notebook.headNoteTopic.titleOrPredicate }}</span>
+    <span>{{ notebook.title }}</span>
   </router-link>
 </template>
 

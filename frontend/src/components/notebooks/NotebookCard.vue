@@ -3,15 +3,15 @@
     <div class="notebook-binding"></div>
     <slot name="cardHeader" />
     <router-link
-      :to="{ name: 'noteShow', params: { noteId: notebook.headNoteTopic.id } }"
+      :to="{ name: 'noteShow', params: { noteId: notebook.headNoteId } }"
       class="text-decoration-none"
     >
       <div class="card-body">
         <h5 class="card-title">
-          {{ notebook.headNoteTopic.titleOrPredicate }}
+          {{ notebook.title }}
         </h5>
-        <p v-if="notebook.headNoteTopic.shortDetails" class="note-short-details">
-          {{ notebook.headNoteTopic.shortDetails }}
+        <p v-if="notebook.shortDetails" class="note-short-details">
+          {{ notebook.shortDetails }}
         </p>
       </div>
     </router-link>
