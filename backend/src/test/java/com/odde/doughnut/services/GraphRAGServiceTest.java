@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.*;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.graphRAG.GraphRAGResult;
+import com.odde.doughnut.services.impl.GraphRAGServiceImpl;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,15 +109,27 @@ public class GraphRAGServiceTest {
   @Test
   void shouldIncludeObjectForReificationNote() {
     Note parent = makeMe.aNote().titleConstructor("Subject").please();
-    Note target = makeMe.aNote().titleConstructor("Object").details("Object Details").please();
+    String longObjectDetails = generateLongDetails(2000);
+    Note target = makeMe.aNote().titleConstructor("Object").details(longObjectDetails).please();
     Note note = makeMe.aLink().between(parent, target).please();
 
     GraphRAGResult result = graphRAGService.retrieve(note, 0);
 
-    // Check object relationship
+    // Check object relationship in focus note
     assertThat(
         result.focusNote.objectUriAndTitle,
         equalTo(String.format("[Object](/n%d)", target.getId())));
+
+    // Check object note in related notes list
+    assertThat(result.relatedNotes, hasSize(1));
+    assertThat(
+        result.relatedNotes.get(0).uriAndTitle,
+        equalTo(String.format("[Object](/n%d)", target.getId())));
+    assertThat(
+        result.relatedNotes.get(0).detailsTruncated,
+        equalTo(
+            longObjectDetails.substring(
+                0, GraphRAGServiceImpl.RELATED_NOTE_DETAILS_TRUNCATE_LENGTH)));
 
     // Other properties should remain as before
     assertThat(

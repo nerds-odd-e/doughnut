@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class GraphRAGServiceImpl implements GraphRAGService {
-  private static final int RELATED_NOTE_DETAILS_TRUNCATE_LENGTH = 1000;
+  public static final int RELATED_NOTE_DETAILS_TRUNCATE_LENGTH = 1000;
 
   private String formatUriAndTitle(Note note) {
     return String.format("[%s](%s)", note.getTopicConstructor(), note.getUri());
@@ -51,6 +51,14 @@ public class GraphRAGServiceImpl implements GraphRAGService {
             Collections.emptyList(),
             Collections.emptyList());
 
-    return new GraphRAGResult(focus, new ArrayList<>());
+    List<BareNote> relatedNotes = new ArrayList<>();
+    if (focusNote.getTargetNote() != null) {
+      Note target = focusNote.getTargetNote();
+      relatedNotes.add(
+          new BareNote(
+              formatUriAndTitle(target), truncateDetails(target.getDetails()), null, null));
+    }
+
+    return new GraphRAGResult(focus, relatedNotes);
   }
 }
