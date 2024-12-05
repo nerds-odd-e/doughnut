@@ -156,4 +156,22 @@ public class GraphRAGServiceTest {
         result.relatedNotes.get(3).uriAndTitle,
         equalTo(String.format("[Object Parent](/n%d)", objectParent.getId())));
   }
+
+  @Test
+  void shouldNotIncludeChildrenWhenTokenBudgetIsZero() {
+    Note parent = makeMe.aNote().titleConstructor("Parent").please();
+    Note child = makeMe.aNote().titleConstructor("Child").under(parent).please();
+
+    GraphRAGResult result = graphRAGService.retrieve(parent, 0);
+
+    // Children should not be in focus note's children list
+    assertThat(result.focusNote.children, empty());
+
+    // Child should not be in related notes (only Priority 1 items in related notes)
+    assertThat(
+        result.relatedNotes.stream()
+            .map(note -> note.uriAndTitle)
+            .noneMatch(uri -> uri.contains("Child")),
+        equalTo(true));
+  }
 }
