@@ -18,7 +18,16 @@ import org.springframework.lang.NonNull;
 
 @Entity
 @Table(name = "notebook")
-@JsonPropertyOrder({"id", "certifiable", "notebookSettings", "creatorId", "title", "circle"})
+@JsonPropertyOrder({
+  "id",
+  "certifiable",
+  "notebookSettings",
+  "creatorId",
+  "title",
+  "circle",
+  "headNoteId",
+  "shortDetails"
+})
 public class Notebook extends EntityIdentifiedByIdOnly {
   @OneToOne
   @JoinColumn(name = "creator_id")

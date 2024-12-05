@@ -11,8 +11,8 @@ export type Notebook = {
     creatorId?: string;
     title: string;
     circle?: Circle;
-    updated_at: string;
-    shortDetails?: string;
     headNoteId: number;
+    shortDetails?: string;
+    updated_at: string;
 };
 

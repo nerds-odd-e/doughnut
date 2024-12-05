@@ -3422,14 +3422,14 @@ components:
           type: string
         circle:
           $ref: "#/components/schemas/Circle"
-        updated_at:
-          type: string
-          format: date-time
-        shortDetails:
-          type: string
         headNoteId:
           type: integer
           format: int32
+        shortDetails:
+          type: string
+        updated_at:
+          type: string
+          format: date-time
     NotebookSettings:
       type: object
       properties:
