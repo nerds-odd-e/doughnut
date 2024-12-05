@@ -107,7 +107,7 @@ onMounted(async () => {
 $sidebar-width: 64px;
 $sidebar-height-tablet: 70px;
 $sidebar-height-mobile: 55px;
-$global-bar-height: 45px;
+$global-bar-height: 51px;
 
 .app-container {
   display: flex;

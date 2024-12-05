@@ -1,6 +1,6 @@
 <template>
   <div v-if="recallPrompt.notebook" class="notebook-source">
-    From notebook: <NotebookLink :notebook="recallPrompt.notebook" />
+    <NotebookLink :notebook="recallPrompt.notebook" />
   </div>
   <div v-for="(q, index) in prevQuestions" :key="index">
     <h3>Previous Question Contested ...</h3>
