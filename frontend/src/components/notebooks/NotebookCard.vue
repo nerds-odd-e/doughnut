@@ -44,12 +44,8 @@ defineProps({
   left: 0;
   top: 0;
   bottom: 0;
-  width: 20px;
-  background: linear-gradient(to right,
-    #e0e0e0 0%,
-    #f0f0f0 50%,
-    #e0e0e0 100%
-  );
+  width: 12px;
+  background: #e0e0e0;
   border-right: 1px solid #ccc;
   border-radius: 3px 0 0 3px;
 
@@ -77,7 +73,7 @@ defineProps({
 }
 
 .card-body {
-  margin-left: 20px;
+  margin-left: 12px;
   padding: 1rem 1.25rem;
 }
 
