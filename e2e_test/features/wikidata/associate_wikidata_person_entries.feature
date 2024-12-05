@@ -33,7 +33,7 @@ Feature: Note creation should have details if wikidata is a person
       | Title     | Wikidata Id |
       | Confucius | Q4604       |
     Then I should see "My Notes/People/Confucius" with these children
-      | note-topic |
+      | note-title |
       | Lu         |
 
   @usingMockedWikidataService

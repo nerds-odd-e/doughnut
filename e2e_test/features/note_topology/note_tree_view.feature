@@ -18,7 +18,7 @@ Feature: Note tree view
     Then I should see the note "LeSS in Action" with 3 children collapsed
     When I expand the children of note "LeSS in Action"
     Then I should see the children notes:
-      | note-topic |
+      | note-title |
       | TDD        |
       | ATDD       |
       | CI         |
@@ -28,7 +28,7 @@ Feature: Note tree view
     And I navigate to "My Notes/LeSS in Action" note
     When I expand the side bar
     Then I should see the note tree in the sidebar
-      | note-topic |
+      | note-title |
       | TDD        |
       | ATDD       |
       | CI         |
@@ -36,14 +36,14 @@ Feature: Note tree view
   Scenario: Side bar should show the whole notebook
     When I navigate to "My Notes/LeSS in Action/TDD" note
     Then I should see the note tree in the sidebar
-      | note-topic |
+      | note-title |
       | TDD        |
       | TPP        |
       | ATDD       |
       | CI         |
     When I route to the note "ATDD"
     Then I should see the note tree in the sidebar
-      | note-topic |
+      | note-title |
       | TDD        |
       | TPP        |
       | ATDD       |
@@ -54,7 +54,7 @@ Feature: Note tree view
     Given I navigate to "My Notes/LeSS in Action" note
     When I expand the children of note "TDD" in the sidebar
     Then I should see the note tree in the sidebar
-      | note-topic |
+      | note-title |
       | TDD        |
       | TPP        |
       | ATDD       |

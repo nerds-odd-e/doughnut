@@ -14,12 +14,12 @@ Feature: Nested Note creation
       | Title        |
       | Re-quirement |
     Then I should see the note tree in the sidebar
-      | note-topic   |
+      | note-title   |
       | team         |
       | tech         |
       | Re-quirement |
     And I should see "My Notes/LeSS in Action" with these children
-      | note-topic   |
+      | note-title   |
       | team         |
       | tech         |
       | Re-quirement |
@@ -35,12 +35,12 @@ Feature: Nested Note creation
       | Title        |
       | coordination |
     Then I should see the note tree in the sidebar
-      | note-topic   |
+      | note-title   |
       | team         |
       | coordination |
       | tech         |
     And I should see "My Notes/LeSS in Action" with these children
-      | note-topic   |
+      | note-title   |
       | team         |
       | coordination |
       | tech         |

@@ -57,5 +57,5 @@ Feature: Note Edit
       | TDD   | LeSS in Action |
     When I update note title "TDD" to become "Critical thinking"
     Then I should see the note tree in the sidebar
-      | note-topic        |
+      | note-title        |
       | Critical thinking |

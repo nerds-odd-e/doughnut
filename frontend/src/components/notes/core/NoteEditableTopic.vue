@@ -7,7 +7,7 @@
     <template #default="{ value, update, blur, errors }">
       <EditableText
         role="topic"
-        class="note-topic"
+        class="note-title"
         scope-name="note"
         :model-value="value"
         :readonly="readonly"

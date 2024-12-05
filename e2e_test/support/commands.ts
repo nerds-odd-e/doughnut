@@ -97,7 +97,7 @@ Cypress.Commands.add(
     cy.get('.card-title').should('have.length', expectedCards.length)
     expectedCards.forEach((elem) => {
       for (const propName in elem) {
-        if (propName === 'note-topic') {
+        if (propName === 'note-title') {
           cy.findCardTitle(elem[propName]!)
         } else {
           cy.findByText(elem[propName]!)

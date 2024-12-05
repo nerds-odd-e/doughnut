@@ -37,7 +37,7 @@ defineProps({
 </script>
 
 <style scoped>
-.note-topic {
+.note-title {
   margin-top: 0px;
   padding-top: 10px;
   color: black;

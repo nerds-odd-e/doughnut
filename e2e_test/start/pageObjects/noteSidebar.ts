@@ -22,7 +22,7 @@ export const noteSidebar = () => {
       cy.get('aside ul li .card-title').then(($els) => {
         const actualNotes = Array.from($els, (el) => el.innerText)
         const expectedNoteTopics = expectedNotes.map(
-          (note) => note['note-topic']
+          (note) => note['note-title']
         )
 
         // Check both length and order

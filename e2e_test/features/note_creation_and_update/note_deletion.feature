@@ -26,10 +26,10 @@ Feature: Note deletion
     And I delete note "tech" at 14:00
     When I undo "delete note"
     And I should see "My Notes/LeSS in Action/tech" with these children
-      | note-topic |
+      | note-title |
       | CI System  |
     When I undo "delete note" again
     And I should see "My Notes/LeSS in Action/tech" with these children
-      | note-topic |
+      | note-title |
       | CI System  |
       | TDD        |

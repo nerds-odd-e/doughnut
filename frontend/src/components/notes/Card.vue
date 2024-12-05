@@ -15,7 +15,7 @@
       </div>
     </router-link>
     <div class="card-footer" v-if="$slots.button">
-      <slot name="button" :note-topic="noteTopology" />
+      <slot name="button" :note-title="noteTopology" />
     </div>
   </div>
 </template>

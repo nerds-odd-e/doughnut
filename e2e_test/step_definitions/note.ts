@@ -423,7 +423,7 @@ When('I start to chat about the note {string}', (noteTopology: string) => {
 })
 
 Then('I should see a child note {string}', (childTopic: string) => {
-  start.assumeNotePage().expectChildren([{ 'note-topic': childTopic }])
+  start.assumeNotePage().expectChildren([{ 'note-title': childTopic }])
 })
 
 When('I collapse the children of note {string}', (noteTopology: string) => {

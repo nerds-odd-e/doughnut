@@ -40,7 +40,7 @@ describe("adding new note", () => {
       .component(NoteNewDialog)
       .withStorageProps({ referenceNote: note, insertMode: "as-child" })
       .mount()
-    await wrapper.find("input#note-topic").setValue("myth")
+    await wrapper.find("input#note-title").setValue("myth")
 
     vi.runOnlyPendingTimers()
     await flushPromises()
@@ -60,7 +60,7 @@ describe("adding new note", () => {
         .component(NoteNewDialog)
         .withStorageProps({ referenceNote: note, insertMode: "as-child" })
         .mount({ attachTo: document.body })
-      await wrapper.find("input#note-topic").setValue("note title")
+      await wrapper.find("input#note-title").setValue("note title")
       vi.clearAllTimers()
     })
 
@@ -92,7 +92,7 @@ describe("adding new note", () => {
     })
 
     const titleInput = () => {
-      return wrapper.find("input#note-topic")
+      return wrapper.find("input#note-title")
     }
 
     const searchWikidata = async (key: string) => {

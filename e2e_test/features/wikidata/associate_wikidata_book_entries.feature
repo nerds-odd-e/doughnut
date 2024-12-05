@@ -17,6 +17,6 @@ Feature: Note creation for a book
       | Title                         | Wikidata Id     |
       | The C Programming Language    | Q1137974        |
     Then I should see "My Notes/My Favourite Books/The C Programming Language" with these children
-      | note-topic      |
+      | note-title      |
       | Dennis Ritchie  |
       | Brian Kernighan |
