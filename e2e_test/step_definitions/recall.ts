@@ -125,8 +125,7 @@ Then('I choose yes I remember', () => {
 Then(
   'I should be asked spelling question {string} from notebook {string}',
   (question: string, notebook: string) => {
-    cy.expectBreadcrumb(notebook)
-    cy.findByText(question).should('be.visible')
+    start.assumeQuestionPage(question).forNotebook(notebook)
   }
 )
 

@@ -6,6 +6,9 @@ const assumeQuestionPage = (stem?: string) => {
   const getChoice = (choice: string) =>
     question().findAllByRole('button', { name: choice })
   return {
+    forNotebook(notebook: string) {
+      cy.findByText(notebook, { selector: '.notebook-source *' })
+    },
     isDisabled() {
       question().find('ol button').should('be.disabled')
     },
