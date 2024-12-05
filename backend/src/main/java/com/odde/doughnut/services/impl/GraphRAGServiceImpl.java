@@ -1,7 +1,6 @@
 package com.odde.doughnut.services.impl;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.services.GraphRAGService;
 import com.odde.doughnut.services.graphRAG.*;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,7 +8,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 @Service
-public class GraphRAGServiceImpl implements GraphRAGService {
+public class GraphRAGServiceImpl {
   public static final int RELATED_NOTE_DETAILS_TRUNCATE_LENGTH = 1000;
 
   private String formatUriAndTitle(Note note) {
@@ -30,7 +29,6 @@ public class GraphRAGServiceImpl implements GraphRAGService {
     return Collections.singletonList(formatUriAndTitle(note.getParent()));
   }
 
-  @Override
   public GraphRAGResult retrieve(Note focusNote, int tokenBudget) {
     String uriAndTitle = formatUriAndTitle(focusNote);
     String detailsTruncated = focusNote.getDetails();

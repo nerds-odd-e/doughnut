@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class GraphRAGServiceTest {
   @Autowired private MakeMe makeMe;
 
-  @Autowired private GraphRAGService graphRAGService;
+  @Autowired private GraphRAGServiceImpl graphRAGService;
 
   private String generateLongDetails(int length) {
     StringBuilder sb = new StringBuilder();
