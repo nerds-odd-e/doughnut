@@ -147,6 +147,25 @@ public class GraphRAGServiceTest {
           result.getRelatedNotes().get(0).getRelationToFocusNote(),
           equalTo(RelationshipToFocusNote.Parent));
     }
+
+    @Test
+    void shouldNotDuplicateNoteInRelatedNotesWhenItIsAlsoAChild() {
+      // Create a child note that is also the object of the focus note
+      makeMe.theNote(target).under(note).please();
+      makeMe.refresh(note);
+
+      GraphRAGResult result = graphRAGService.retrieve(note, 1000);
+
+      // Should be in both object and children lists of focus note
+      assertThat(
+          result.getFocusNote().getObjectUriAndTitle(),
+          equalTo("[Target Note](/n" + target.getId() + ")"));
+      assertThat(
+          result.getFocusNote().getChildren(), contains("[Target Note](/n" + target.getId() + ")"));
+
+      // But should appear only once in related notes
+      assertThat(result.getRelatedNotes(), hasSize(2)); // parent and child/object
+    }
   }
 
   @Nested

@@ -3,7 +3,9 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.graphRAG.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class GraphRAGService {
   public static final int RELATED_NOTE_DETAILS_TRUNCATE_LENGTH = 500;
@@ -11,6 +13,7 @@ public class GraphRAGService {
 
   private final PriorityLayer firstPriorityLayer;
   private int remainingBudget;
+  private Map<Note, BareNote> addedNotes;
 
   public GraphRAGService() {
     // Create handlers
@@ -40,11 +43,19 @@ public class GraphRAGService {
 
   public BareNote addNoteToRelatedNotes(
       List<BareNote> relatedNotes, Note note, RelationshipToFocusNote relationship) {
+    // Check if note was already added with a higher priority relationship
+    BareNote existingNote = addedNotes.get(note);
+    if (existingNote != null) {
+      // Note was already added, don't add it again
+      return existingNote;
+    }
+
     int tokens = estimateTokens(note);
     if (tokens <= remainingBudget) {
       BareNote bareNote = BareNote.fromNote(note, relationship);
       relatedNotes.add(bareNote);
       remainingBudget -= tokens;
+      addedNotes.put(note, bareNote);
       return bareNote;
     }
     return null;
@@ -52,6 +63,7 @@ public class GraphRAGService {
 
   public GraphRAGResult retrieve(Note focusNote, int tokenBudgetForRelatedNotes) {
     remainingBudget = tokenBudgetForRelatedNotes;
+    addedNotes = new HashMap<>();
     GraphRAGResult result = new GraphRAGResult();
     FocusNote focus = FocusNote.fromNote(focusNote);
     List<BareNote> relatedNotes = new ArrayList<>();
