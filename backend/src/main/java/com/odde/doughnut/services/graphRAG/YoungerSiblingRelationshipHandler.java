@@ -4,34 +4,19 @@ import com.odde.doughnut.entities.Note;
 import java.util.List;
 
 public class YoungerSiblingRelationshipHandler extends RelationshipHandler {
-  private int currentSiblingIndex = -1;
-  private boolean exhausted = false;
-  private List<Note> siblings;
+  private int currentSiblingIndex;
+  private final List<Note> siblings;
 
   public YoungerSiblingRelationshipHandler(Note relatingNote) {
     super(RelationshipToFocusNote.YoungerSibling, relatingNote);
+    siblings = relatingNote.getSiblings();
+    currentSiblingIndex = siblings.indexOf(relatingNote) + 1;
   }
 
   @Override
   public Note handle() {
-    if (exhausted) {
-      return null;
-    }
-
-    if (relatingNote.getParent() != null) {
-      if (siblings == null) {
-        siblings = relatingNote.getSiblings();
-      }
-
-      if (currentSiblingIndex == -1) {
-        currentSiblingIndex = siblings.indexOf(relatingNote) + 1;
-      }
-
-      if (currentSiblingIndex < siblings.size()) {
-        return siblings.get(currentSiblingIndex++);
-      } else {
-        exhausted = true;
-      }
+    if (currentSiblingIndex < siblings.size()) {
+      return siblings.get(currentSiblingIndex++);
     }
     return null;
   }
