@@ -10,20 +10,21 @@ public class PriorSiblingRelationshipHandler extends RelationshipHandler {
   public PriorSiblingRelationshipHandler(Note relatingNote) {
     super(RelationshipToFocusNote.PriorSibling, relatingNote);
     siblings = relatingNote.getSiblings();
-    currentIndex = 0;
+    int focusIndex = siblings.indexOf(relatingNote);
+    currentIndex = focusIndex - 1; // Start from newest prior sibling
   }
 
   @Override
   public Note handle() {
-    int focusIndex = siblings.indexOf(relatingNote);
-    if (currentIndex < focusIndex) {
-      return siblings.get(currentIndex++);
+    if (currentIndex >= 0) { // Process prior siblings from newest to oldest
+      return siblings.get(currentIndex--);
     }
     return null;
   }
 
   @Override
   public void afterHandledSuccessfully(FocusNote focus, BareNote addedNote) {
-    focus.getPriorSiblings().add(addedNote.getUriAndTitle());
+    // Add to back to maintain creation order (oldest to newest)
+    focus.getPriorSiblings().addFirst(addedNote.getUriAndTitle());
   }
 }

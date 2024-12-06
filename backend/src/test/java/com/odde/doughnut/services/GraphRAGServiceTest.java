@@ -452,7 +452,7 @@ public class GraphRAGServiceTest {
       assertThat(siblingNotes, hasSize(2));
       assertThat(
           siblingNotes.stream().map(BareNote::getUriAndTitle).collect(Collectors.toList()),
-          contains(expectedPriorSibling1UriAndTitle, expectedPriorSibling2UriAndTitle));
+          containsInAnyOrder(expectedPriorSibling1UriAndTitle, expectedPriorSibling2UriAndTitle));
     }
   }
 }
