@@ -1,5 +1,6 @@
 package com.odde.doughnut.services;
 
+import static com.odde.doughnut.services.graphRAG.GraphRAGConstants.RELATED_NOTE_DETAILS_TRUNCATE_LENGTH;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
@@ -94,7 +95,7 @@ public class GraphRAGServiceTest {
       assertThat(result.getRelatedNotes(), hasSize(1));
       assertThat(
           result.getRelatedNotes().get(0).getDetails(),
-          equalTo("a".repeat(GraphRAGService.RELATED_NOTE_DETAILS_TRUNCATE_LENGTH) + "..."));
+          equalTo("a".repeat(RELATED_NOTE_DETAILS_TRUNCATE_LENGTH) + "..."));
     }
   }
 
@@ -326,7 +327,7 @@ public class GraphRAGServiceTest {
       @Test
       void shouldAlternateBetweenChildrenAndYoungerSiblingsWhenBudgetIsLimited() {
         // Set budget to only allow two notes
-        GraphRAGResult result = graphRAGService.retrieve(focusNote, 21);
+        GraphRAGResult result = graphRAGService.retrieve(focusNote, 27);
 
         // Verify in related notes
         List<BareNote> relatedNotes = result.getRelatedNotes();

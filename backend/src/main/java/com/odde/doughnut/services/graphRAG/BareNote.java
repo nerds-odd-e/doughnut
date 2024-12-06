@@ -1,7 +1,8 @@
 package com.odde.doughnut.services.graphRAG;
 
+import static com.odde.doughnut.services.graphRAG.GraphRAGConstants.RELATED_NOTE_DETAILS_TRUNCATE_LENGTH;
+
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.services.GraphRAGService;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -29,10 +30,9 @@ public class BareNote {
   }
 
   private static String truncateDetails(String details) {
-    if (details == null
-        || details.length() <= GraphRAGService.RELATED_NOTE_DETAILS_TRUNCATE_LENGTH) {
+    if (details == null || details.length() <= RELATED_NOTE_DETAILS_TRUNCATE_LENGTH) {
       return details;
     }
-    return details.substring(0, GraphRAGService.RELATED_NOTE_DETAILS_TRUNCATE_LENGTH) + "...";
+    return details.substring(0, RELATED_NOTE_DETAILS_TRUNCATE_LENGTH) + "...";
   }
 }
