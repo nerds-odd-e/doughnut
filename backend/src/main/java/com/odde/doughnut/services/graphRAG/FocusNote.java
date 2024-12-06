@@ -17,6 +17,7 @@ public class FocusNote {
   private final List<String> priorSiblings = new ArrayList<>();
   private final List<String> youngerSiblings = new ArrayList<>();
   private final List<String> contextualPath = new ArrayList<>();
+  private final List<String> referrings = new ArrayList<>();
 
   public static FocusNote fromNote(Note note) {
     FocusNote focusNote = new FocusNote();

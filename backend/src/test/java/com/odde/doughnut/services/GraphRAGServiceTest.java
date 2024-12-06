@@ -616,4 +616,48 @@ public class GraphRAGServiceTest {
       }
     }
   }
+
+  @Nested
+  class WhenNoteHasReferringNotes {
+    private Note focusNote;
+    private Note referringParent1;
+    private Note referringNote1;
+    private Note referringParent2;
+    private Note referringNote2;
+    private String expectedReferringNote1UriAndTitle;
+    private String expectedReferringNote2UriAndTitle;
+
+    @BeforeEach
+    void setup() {
+      focusNote = makeMe.aNote().titleConstructor("Focus Note").details("Focus Details").please();
+
+      // Create first referring note
+      referringParent1 = makeMe.aNote().titleConstructor("Referring Parent 1").please();
+      referringNote1 = makeMe.aLink().between(referringParent1, focusNote).please();
+
+      // Create second referring note
+      referringParent2 = makeMe.aNote().titleConstructor("Referring Parent 2").please();
+      referringNote2 = makeMe.aLink().between(referringParent2, focusNote).please();
+
+      expectedReferringNote1UriAndTitle = getUriAndTitle(referringNote1);
+      expectedReferringNote2UriAndTitle = getUriAndTitle(referringNote2);
+    }
+
+    @Test
+    void shouldIncludeReferringNotesInFocusNoteAndRelatedNotes() {
+      GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
+
+      // Verify referring notes are in focus note's list
+      assertThat(
+          result.getFocusNote().getReferrings(),
+          containsInAnyOrder(expectedReferringNote1UriAndTitle, expectedReferringNote2UriAndTitle));
+
+      // Verify referring notes are in related notes
+      assertRelatedNotesContain(
+          result,
+          RelationshipToFocusNote.ReferringNote,
+          expectedReferringNote1UriAndTitle,
+          expectedReferringNote2UriAndTitle);
+    }
+  }
 }
