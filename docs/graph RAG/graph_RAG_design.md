@@ -53,45 +53,42 @@ It might be different from how the Doughnut internal data structure is organized
 
 1. **Initialize**
    - Fetch the `FocusNote` (Priority 0) and include it in the result.
+   - Estimate and deduct the token cost of `FocusNote` from the token budget.
+   - If remaining budget <= 0, return only the `FocusNote`.
    - Initialize a priority queue (`noteQueue`) to hold related notes with their relevance scores.
-   - Initialize a set (`processed_uris`) to track URIs of already processed notes.
-   - Estimate the token cost of including `FocusNote` and deduct it from the token budget (`remaining_tokens`).
+   - Initialize cursors for each relationship type to track progress.
+   - Initialize a set of active relationship types (those with remaining unprocessed notes).
 
 2. **Fetch Priority 1 Notes**
    - Retrieve all Priority 1 notes (`Parent`, `Object`, `ContextualPath`, `ObjectContextualPath`).
-   - Add these notes to `noteQueue` with their relevance scores.
-   - Deduplicate notes by skipping those already in `processed_uris`.
+   - Add these notes to result (they are not subject to round-robin selection).
+   - Deduct their token costs from the budget.
 
 3. **Iterative Retrieval**
-   - While `remaining_tokens > 0` and `noteQueue` is not empty:
-     - Pop the highest-scoring note from `noteQueue`.
-     - Estimate the token cost of including this note.
-     - If the estimated token cost exceeds `remaining_tokens`, skip this note.
-     - Otherwise:
-       - Add the note to the result list.
-       - Deduct its token cost from `remaining_tokens`.
-       - Mark its URI as processed by adding it to `processed_uris`.
-       - Retrieve related notes (e.g., Priority 2, 3, and 4 notes).
-       - Add newly retrieved notes to `noteQueue` with updated relevance scores.
+   - While `remaining_tokens > 0`:
+     - For each priority level (2-4):
+       - If priority level has active relationship types:
+         - Get the next relationship type in rotation
+         - Fetch next unprocessed note from that relationship type
+         - If relationship type is exhausted, remove it from active types
+         - If note's token cost fits within budget:
+           - Add note to result
+           - Deduct token cost from budget
+         - Move cursor to next position for this relationship type
+       - If no active relationship types in this level, skip to next priority
 
-4. **Relevance Scoring**
-   - Calculate relevance scores for notes based on:
-     - Proximity to the `FocusNote` (e.g., Parent > Sibling > Cousin).
-     - Semantic similarity between note titles and details.
-     - User-defined priorities or historical access patterns.
-
-5. **Deduplication**
+4. **Deduplication**
    - Maintain the `processed_uris` set to avoid adding duplicate notes.
    - Skip any notes already processed during any retrieval stage.
 
-6. **Token Budget Management**
+5. **Token Budget Management**
    - For each note, estimate the token cost based on its size (e.g., details, relationships).
-   - Prioritize including higher-relevance notes that fit within the `remaining_tokens`.
+   - Stop processing when budget is exhausted.
 
-7. **Finalize Results**
+6. **Finalize Results**
    - Collect all included notes into the `Overall` object:
      - `FocusNote`: The main note with its relationships.
-     - `related_notes`: A normalized list of notes ranked by relevance, containing `BareNote` or `NoteWithContextualPath` as appropriate.
+     - `related_notes`: A list of notes in order of processing.
 
 ### Output
 
