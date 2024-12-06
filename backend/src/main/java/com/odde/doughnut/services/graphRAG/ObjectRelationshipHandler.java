@@ -14,15 +14,11 @@ public class ObjectRelationshipHandler extends RelationshipHandler {
   }
 
   @Override
-  public BareNote handle(Note focusNote, FocusNote focus, List<BareNote> relatedNotes) {
+  public Note handle(Note focusNote, FocusNote focus, List<BareNote> relatedNotes) {
     if (exhausted) {
       return null;
     }
     exhausted = true;
-    if (focusNote.getTargetNote() != null) {
-      return graphRAGService.addNoteToRelatedNotes(
-          relatedNotes, focusNote.getTargetNote(), getRelationshipToFocusNote());
-    }
-    return null;
+    return focusNote.getTargetNote();
   }
 }

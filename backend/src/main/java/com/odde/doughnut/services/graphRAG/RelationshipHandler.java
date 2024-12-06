@@ -11,7 +11,7 @@ public abstract class RelationshipHandler {
     this.relationshipToFocusNote = relationshipToFocusNote;
   }
 
-  public abstract BareNote handle(Note focusNote, FocusNote focus, List<BareNote> relatedNotes);
+  public abstract Note handle(Note focusNote, FocusNote focus, List<BareNote> relatedNotes);
 
   public void afterHandledSuccessfully(FocusNote focusNote, BareNote addedNote) {}
 }

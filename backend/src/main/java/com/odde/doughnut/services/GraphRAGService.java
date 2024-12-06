@@ -21,8 +21,9 @@ public class GraphRAGService {
         new YoungerSiblingRelationshipHandler(this);
 
     // Set up priority layers
-    PriorityLayer priorityOneLayer = new PriorityLayer(parentHandler, objectHandler);
-    PriorityLayer priorityTwoLayer = new PriorityLayer(childrenHandler, youngerSiblingHandler);
+    PriorityLayer priorityOneLayer = new PriorityLayer(this, parentHandler, objectHandler);
+    PriorityLayer priorityTwoLayer =
+        new PriorityLayer(this, childrenHandler, youngerSiblingHandler);
 
     priorityOneLayer.setNextLayer(priorityTwoLayer);
     this.firstPriorityLayer = priorityOneLayer;

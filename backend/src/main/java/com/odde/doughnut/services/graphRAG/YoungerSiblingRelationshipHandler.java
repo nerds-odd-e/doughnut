@@ -15,7 +15,7 @@ public class YoungerSiblingRelationshipHandler extends RelationshipHandler {
   }
 
   @Override
-  public BareNote handle(Note focusNote, FocusNote focus, List<BareNote> relatedNotes) {
+  public Note handle(Note focusNote, FocusNote focus, List<BareNote> relatedNotes) {
     if (exhausted) {
       return null;
     }
@@ -27,13 +27,9 @@ public class YoungerSiblingRelationshipHandler extends RelationshipHandler {
       }
 
       if (currentSiblingIndex < siblings.size()) {
-        Note youngerSibling = siblings.get(currentSiblingIndex);
-        BareNote addedNote =
-            graphRAGService.addNoteToRelatedNotes(
-                relatedNotes, youngerSibling, RelationshipToFocusNote.YoungerSibling);
-
         currentSiblingIndex++;
-        return addedNote;
+        return siblings.get(currentSiblingIndex);
+
       } else {
         exhausted = true;
       }

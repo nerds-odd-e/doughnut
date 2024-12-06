@@ -1,22 +1,22 @@
 package com.odde.doughnut.services.graphRAG;
 
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.services.GraphRAGService;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Setter;
 
 public class PriorityLayer {
   private final List<RelationshipHandler> handlers;
-  private PriorityLayer nextLayer;
+  private final GraphRAGService graphRAGService;
+  @Setter private PriorityLayer nextLayer;
 
-  public PriorityLayer(RelationshipHandler... handlers) {
+  public PriorityLayer(GraphRAGService graphRAGService, RelationshipHandler... handlers) {
+    this.graphRAGService = graphRAGService;
     if (handlers.length == 0) {
       throw new IllegalArgumentException("At least one handler is required");
     }
     this.handlers = new ArrayList<>(List.of(handlers));
-  }
-
-  public void setNextLayer(PriorityLayer nextLayer) {
-    this.nextLayer = nextLayer;
   }
 
   public void handle(Note focusNote, FocusNote focus, List<BareNote> relatedNotes) {
@@ -24,7 +24,11 @@ public class PriorityLayer {
     for (RelationshipHandler handler : handlers) {
       BareNote result;
       do {
-        result = handler.handle(focusNote, focus, relatedNotes);
+        Note relatedNote = handler.handle(focusNote, focus, relatedNotes);
+
+        result =
+            graphRAGService.addNoteToRelatedNotes(
+                relatedNotes, relatedNote, handler.getRelationshipToFocusNote());
         if (result != null) {
           handler.afterHandledSuccessfully(focus, result);
         }

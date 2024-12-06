@@ -15,19 +15,15 @@ public class ChildRelationshipHandler extends RelationshipHandler {
   }
 
   @Override
-  public BareNote handle(Note focusNote, FocusNote focus, List<BareNote> relatedNotes) {
+  public Note handle(Note focusNote, FocusNote focus, List<BareNote> relatedNotes) {
     if (exhausted) {
       return null;
     }
     List<Note> children = focusNote.getChildren();
 
     if (currentChildIndex < children.size()) {
-      Note child = children.get(currentChildIndex);
-      BareNote addedNote =
-          graphRAGService.addNoteToRelatedNotes(relatedNotes, child, RelationshipToFocusNote.Child);
-
       currentChildIndex++;
-      return addedNote;
+      return children.get(currentChildIndex);
     } else {
       exhausted = true;
     }
