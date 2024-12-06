@@ -2,11 +2,10 @@ package com.odde.doughnut.services.graphRAG;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.odde.doughnut.entities.Note;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
-@EqualsAndHashCode
 public class UriAndTitle {
-  private final Note note;
+  @Getter private final Note note;
 
   private UriAndTitle(Note note) {
     this.note = note;

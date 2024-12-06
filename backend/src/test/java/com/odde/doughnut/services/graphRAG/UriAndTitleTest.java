@@ -33,17 +33,4 @@ class UriAndTitleTest {
     String json = mapper.writeValueAsString(uriAndTitle);
     assertThat(json, equalTo("\"[Test Note](/n123)\""));
   }
-
-  @Test
-  void shouldTreatSameNoteAsEqual() {
-    Note note = mock(Note.class);
-    UriAndTitle link1 = UriAndTitle.fromNote(note);
-    UriAndTitle link2 = UriAndTitle.fromNote(note);
-    Note differentNote = mock(Note.class);
-    UriAndTitle link3 = UriAndTitle.fromNote(differentNote);
-
-    assertThat(link1, equalTo(link2));
-    assertThat(link1.hashCode(), equalTo(link2.hashCode()));
-    assertThat(link1.equals(link3), equalTo(false));
-  }
 }
