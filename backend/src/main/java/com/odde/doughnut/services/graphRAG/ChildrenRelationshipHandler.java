@@ -15,14 +15,13 @@ public class ChildrenRelationshipHandler extends RelationshipHandler {
   public void handle(Note focusNote, FocusNote focus, List<BareNote> relatedNotes, int budget) {
     List<Note> children = focusNote.getChildren();
     for (Note child : children) {
-      int tokens = graphRAGService.estimateTokens(child);
-      if (tokens <= budget) {
-        String childUriAndTitle = child.getUriAndTitle();
-        focus.getChildren().add(childUriAndTitle);
+      BareNote addedNote =
+          graphRAGService.addNoteToRelatedNotes(
+              relatedNotes, child, RelationshipToFocusNote.Child, budget);
 
-        graphRAGService.addNoteToRelatedNotes(
-            relatedNotes, child, RelationshipToFocusNote.Child, budget);
-        budget -= tokens;
+      if (addedNote != null) {
+        focus.getChildren().add(addedNote.getUriAndTitle());
+        budget -= addedNote.getDetails().length() / GraphRAGService.CHARACTERS_PER_TOKEN;
       }
     }
     handleNext(focusNote, focus, relatedNotes, budget);

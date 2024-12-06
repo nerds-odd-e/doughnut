@@ -22,7 +22,7 @@ public class GraphRAGService {
     this.relationshipChain = parentHandler;
   }
 
-  public int estimateTokens(Note note) {
+  private int estimateTokens(Note note) {
     int detailsLength =
         note.getDetails() != null
             ? Math.min(note.getDetails().length(), RELATED_NOTE_DETAILS_TRUNCATE_LENGTH)
@@ -31,13 +31,15 @@ public class GraphRAGService {
     return (int) Math.ceil((detailsLength + titleLength) / CHARACTERS_PER_TOKEN);
   }
 
-  public List<BareNote> addNoteToRelatedNotes(
+  public BareNote addNoteToRelatedNotes(
       List<BareNote> relatedNotes, Note note, RelationshipToFocusNote relationship, int budget) {
     int tokens = estimateTokens(note);
     if (tokens <= budget) {
-      relatedNotes.add(BareNote.fromNote(note, relationship));
+      BareNote bareNote = BareNote.fromNote(note, relationship);
+      relatedNotes.add(bareNote);
+      return bareNote;
     }
-    return relatedNotes;
+    return null;
   }
 
   public GraphRAGResult retrieve(Note focusNote, int tokenBudgetForRelatedNotes) {
