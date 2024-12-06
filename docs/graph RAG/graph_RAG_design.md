@@ -51,34 +51,46 @@ This data structure is for the external consumption of the Graph RAG. It might b
 1. **Initialize**
    - Fetch the `FocusNote` (Priority 0) and include it in the result.
    - Estimate the token cost of `FocusNote` but exclude it from the budget.
-   - Initialize cursors for each priority level pointing to a relationship type.
+   - Deduct the focus note's token cost from the overall available space.
+   - Initialize cursors for each priority level, pointing to their relationship types.
    - Initialize cursors for each relationship type to track progress.
+   - Prepare a **dependency queue** to dynamically add new relationship types as they are discovered.
 
 2. **Iterative Retrieval**
    - While `remaining_tokens > 0`:
      - For each priority level (1-4):
-       - For the count of `(4 - priority number)`:
-         - Fetch 1 note from the relationship type pointed to by the cursor of this priority level:
-           - Within the relationship type, fetch the next unprocessed note.
+       - Fetch up to `(5 - priority number)` notes from this level before giving the next priority level an opportunity.
+       - Within the priority level:
+         - Alternate between fetching one note from each relationship type.
+         - For the relationship type pointed to by the cursor:
+           - Fetch the next unprocessed note from this relationship.
            - If the note's token cost exceeds the remaining budget:
-             - Stop the process and return the result.
-           - Skip if the note is already in the `related_notes`.
-           - Otherwise, add the note to `related_notes` and deduct its token cost from the budget.
-           - Update the focus note relationships (e.g., for a `PriorSibling`, add its `uri_and_title` to the beginning of the `prior_siblings` list).
+             - Skip the note and continue with the next relationship.
+           - If the note is already in `related_notes`, skip it.
+           - Otherwise:
+             - Add the note to `related_notes`.
+             - Deduct its token cost from the budget.
+             - Update the focus note relationships dynamically (e.g., if a `PriorSibling` is fetched, add its `uri_and_title` to the beginning of the `prior_siblings` list in the `FocusNote`).
+             - Add any new relationship types discovered (e.g., fetching a `Child` might trigger a `ReifiedChildObject`) to the **dependency queue** for processing later.
            - Move the cursor to the next position for this relationship type.
-         - If the relationship type is exhausted, remove it from active relationship types of this priority level.
-       - Move the cursor to the next relationship in this priority level.
-       - If no active relationship types in this priority level, skip to the next priority level.
+         - If a relationship type is exhausted, remove it from active relationship types for this priority level.
+       - Move the cursor to the next relationship type in this priority level.
+       - If no active relationship types remain in this priority level, move to the next priority level.
 
-3. **Token Budget Management**
-   - `CHARACTERS_PER_TOKEN = 3.75`
-   - For each note, estimate the token cost by using `ObjectMapper` to get the size of a `BareNote` or `FocusNote`.
-   - Stop processing when the budget is exhausted.
+3. **Dynamic Dependency Management**
+   - As new relationship types are discovered during note retrieval (e.g., a `Child` leading to `ReifiedChildObject`), add them to the **dependency queue**.
+   - Process the dependency queue to initialize or reinitialize cursors for these relationships.
+   - Prioritize processing dependencies within their appropriate priority level.
+
+4. **Token Budget Management**
+   - Use `CHARACTERS_PER_TOKEN = 3.75` to estimate the token cost of each note.
+   - Ensure the token cost accounts for all dynamic fields, such as added siblings or children, before deducting from the budget.
+   - Stop processing when the token budget is exhausted.
 
 ### Output
 
 - A `GraphRAGResult` object containing:
-  - `FocusNote`: The focus note with full details and relationships.
+  - `FocusNote`: The focus note with full details and dynamically updated relationships.
   - `related_notes`: A ranked list of related notes within the token budget.
 
 ## Links Between Relationship Types
