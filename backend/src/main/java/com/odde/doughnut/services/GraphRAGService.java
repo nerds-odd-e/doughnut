@@ -11,13 +11,16 @@ public class GraphRAGService {
     ContextualPathRelationshipHandler contextualPathHandler =
         new ContextualPathRelationshipHandler(focusNote);
     ChildRelationshipHandler childrenHandler = new ChildRelationshipHandler(focusNote);
+    PriorSiblingRelationshipHandler priorSiblingHandler =
+        new PriorSiblingRelationshipHandler(focusNote);
     YoungerSiblingRelationshipHandler youngerSiblingHandler =
         new YoungerSiblingRelationshipHandler(focusNote);
 
     // Set up priority layers
     PriorityLayer priorityOneLayer =
         new PriorityLayer(parentHandler, objectHandler, contextualPathHandler);
-    PriorityLayer priorityTwoLayer = new PriorityLayer(childrenHandler, youngerSiblingHandler);
+    PriorityLayer priorityTwoLayer =
+        new PriorityLayer(childrenHandler, priorSiblingHandler, youngerSiblingHandler);
 
     priorityOneLayer.setNextLayer(priorityTwoLayer);
 

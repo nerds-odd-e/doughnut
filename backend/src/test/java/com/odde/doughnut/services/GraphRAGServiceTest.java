@@ -399,4 +399,60 @@ public class GraphRAGServiceTest {
       assertThat(contextualNotes.get(0).getUriAndTitle(), equalTo(expectedGrandParentUriAndTitle));
     }
   }
+
+  @Nested
+  class WhenNoteHasPriorSiblings {
+    private Note parent;
+    private Note priorSibling1;
+    private Note priorSibling2;
+    private Note focusNote;
+    private String expectedPriorSibling1UriAndTitle;
+    private String expectedPriorSibling2UriAndTitle;
+
+    @BeforeEach
+    void setup() {
+      parent = makeMe.aNote().titleConstructor("Parent Note").please();
+      priorSibling1 =
+          makeMe
+              .aNote()
+              .under(parent)
+              .titleConstructor("Prior One")
+              .details("Sibling 1 Details")
+              .please();
+      priorSibling2 =
+          makeMe
+              .aNote()
+              .under(parent)
+              .titleConstructor("Prior Two")
+              .details("Sibling 2 Details")
+              .please();
+      focusNote = makeMe.aNote().under(parent).titleConstructor("Focus Note").please();
+      expectedPriorSibling1UriAndTitle = "[Prior One](/n" + priorSibling1.getId() + ")";
+      expectedPriorSibling2UriAndTitle = "[Prior Two](/n" + priorSibling2.getId() + ")";
+    }
+
+    @Test
+    void shouldIncludePriorSiblingsInFocusNoteListInOrder() {
+      GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
+
+      assertThat(
+          result.getFocusNote().getPriorSiblings(),
+          contains(expectedPriorSibling1UriAndTitle, expectedPriorSibling2UriAndTitle));
+    }
+
+    @Test
+    void shouldIncludePriorSiblingsInRelatedNotes() {
+      GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
+
+      List<BareNote> siblingNotes =
+          result.getRelatedNotes().stream()
+              .filter(n -> n.getRelationToFocusNote() == RelationshipToFocusNote.PriorSibling)
+              .collect(Collectors.toList());
+
+      assertThat(siblingNotes, hasSize(2));
+      assertThat(
+          siblingNotes.stream().map(BareNote::getUriAndTitle).collect(Collectors.toList()),
+          contains(expectedPriorSibling1UriAndTitle, expectedPriorSibling2UriAndTitle));
+    }
+  }
 }

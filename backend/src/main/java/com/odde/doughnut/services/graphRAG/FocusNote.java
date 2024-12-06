@@ -14,6 +14,7 @@ public class FocusNote {
   private String parentUriAndTitle;
   private String objectUriAndTitle;
   private final List<String> children = new ArrayList<>();
+  private final List<String> priorSiblings = new ArrayList<>();
   private final List<String> youngerSiblings = new ArrayList<>();
   private final List<String> contextualPath = new ArrayList<>();
 
