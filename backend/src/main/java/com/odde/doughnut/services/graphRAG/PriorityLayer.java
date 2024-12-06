@@ -9,9 +9,10 @@ public class PriorityLayer {
   private final List<RelationshipHandler> handlers;
   @Setter private PriorityLayer nextLayer;
   private int notesProcessedSinceLastLayerSwitch = 0;
-  private static final int NOTES_BEFORE_NEXT_LAYER = 3;
+  private final int notesBeforeNextLayer;
 
-  public PriorityLayer(RelationshipHandler... handlers) {
+  public PriorityLayer(int notesBeforeNextLayer, RelationshipHandler... handlers) {
+    this.notesBeforeNextLayer = notesBeforeNextLayer;
     this.handlers = new ArrayList<>();
     if (handlers != null && handlers.length > 0) {
       this.handlers.addAll(List.of(handlers));
@@ -27,16 +28,15 @@ public class PriorityLayer {
       // If we've processed enough notes or can't process more in current layer,
       // give next layer a chance if it exists
       if (nextLayer != null
-          && (notesProcessedSinceLastLayerSwitch >= NOTES_BEFORE_NEXT_LAYER
-              || !continueProcessing)) {
+          && (notesProcessedSinceLastLayerSwitch >= notesBeforeNextLayer || !continueProcessing)) {
         // Use handle instead of processCurrentLayer for proper recursion
         nextLayer.handle(builder);
 
         // Reset counter after giving next layer a chance
         notesProcessedSinceLastLayerSwitch = 0;
 
-        // Try current layer again only if we stopped due to NOTES_BEFORE_NEXT_LAYER limit
-        if (notesProcessedSinceLastLayerSwitch >= NOTES_BEFORE_NEXT_LAYER) {
+        // Try current layer again only if we stopped due to notesBeforeNextLayer limit
+        if (notesProcessedSinceLastLayerSwitch >= notesBeforeNextLayer) {
           continueProcessing = true;
         }
       }
@@ -64,7 +64,7 @@ public class PriorityLayer {
           anyHandlerProcessed = true;
 
           // If we've hit the limit, give next layer a chance
-          if (notesProcessedSinceLastLayerSwitch >= NOTES_BEFORE_NEXT_LAYER) {
+          if (notesProcessedSinceLastLayerSwitch >= notesBeforeNextLayer) {
             break;
           }
         }

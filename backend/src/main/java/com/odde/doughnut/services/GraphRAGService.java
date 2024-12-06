@@ -18,7 +18,7 @@ public class GraphRAGService {
         new ContextualPathRelationshipHandler(focusNote);
 
     // Create priority three layer first so we can pass it to ChildRelationshipHandler
-    PriorityLayer priorityThreeLayer = new PriorityLayer();
+    PriorityLayer priorityThreeLayer = new PriorityLayer(2);
 
     ChildRelationshipHandler childrenHandler =
         new ChildRelationshipHandler(focusNote, priorityThreeLayer);
@@ -29,12 +29,17 @@ public class GraphRAGService {
     ReferringNoteRelationshipHandler referringNoteHandler =
         new ReferringNoteRelationshipHandler(focusNote, priorityThreeLayer);
 
-    // Set up priority layers
+    // Set up priority layers with number of notes to process before switching
     PriorityLayer priorityOneLayer =
-        new PriorityLayer(parentHandler, objectHandler, contextualPathHandler);
+        new PriorityLayer(
+            3, // Process 3 notes before switching to layer 2
+            new RelationshipHandler[] {parentHandler, objectHandler, contextualPathHandler});
     PriorityLayer priorityTwoLayer =
         new PriorityLayer(
-            childrenHandler, priorSiblingHandler, youngerSiblingHandler, referringNoteHandler);
+            3, // Process 3 notes before switching to layer 3
+            new RelationshipHandler[] {
+              childrenHandler, priorSiblingHandler, youngerSiblingHandler, referringNoteHandler
+            });
 
     priorityOneLayer.setNextLayer(priorityTwoLayer);
     priorityTwoLayer.setNextLayer(priorityThreeLayer);
