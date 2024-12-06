@@ -11,21 +11,22 @@ public class GraphRAGResultBuilder {
   private final Map<Note, BareNote> addedNotes = new HashMap<>();
   private final List<BareNote> relatedNotes = new ArrayList<>();
   private final FocusNote focus;
+  private final TokenCountingStrategy tokenCountingStrategy;
 
-  public GraphRAGResultBuilder(Note focusNote, int tokenBudget) {
+  public GraphRAGResultBuilder(
+      Note focusNote, int tokenBudget, TokenCountingStrategy tokenCountingStrategy) {
     this.remainingBudget = tokenBudget;
     this.focus = FocusNote.fromNote(focusNote);
+    this.tokenCountingStrategy = tokenCountingStrategy;
   }
 
   public BareNote addNoteToRelatedNotes(Note note, RelationshipToFocusNote relationship) {
-    // Check if note was already added with a higher priority relationship
     BareNote existingNote = addedNotes.get(note);
     if (existingNote != null) {
-      // Note was already added, don't add it again
       return existingNote;
     }
 
-    int tokens = estimateTokens(note);
+    int tokens = tokenCountingStrategy.estimateTokens(note);
     if (tokens <= remainingBudget) {
       BareNote bareNote = BareNote.fromNote(note, relationship);
       relatedNotes.add(bareNote);
@@ -34,16 +35,6 @@ public class GraphRAGResultBuilder {
       return bareNote;
     }
     return null;
-  }
-
-  private int estimateTokens(Note note) {
-    int detailsLength =
-        note.getDetails() != null
-            ? Math.min(
-                note.getDetails().length(), GraphRAGConstants.RELATED_NOTE_DETAILS_TRUNCATE_LENGTH)
-            : 0;
-    int titleLength = note.getTopicConstructor().length();
-    return (int) Math.ceil((detailsLength + titleLength) / GraphRAGConstants.CHARACTERS_PER_TOKEN);
   }
 
   public FocusNote getFocusNote() {

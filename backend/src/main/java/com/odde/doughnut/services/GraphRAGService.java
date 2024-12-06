@@ -4,6 +4,12 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.graphRAG.*;
 
 public class GraphRAGService {
+  private final TokenCountingStrategy tokenCountingStrategy;
+
+  public GraphRAGService(TokenCountingStrategy tokenCountingStrategy) {
+    this.tokenCountingStrategy = tokenCountingStrategy;
+  }
+
   public GraphRAGResult retrieve(Note focusNote, int tokenBudgetForRelatedNotes) {
     // Create handlers with the focus note
     ParentRelationshipHandler parentHandler = new ParentRelationshipHandler(focusNote);
@@ -29,7 +35,7 @@ public class GraphRAGService {
     priorityTwoLayer.setNextLayer(priorityThreeLayer);
 
     GraphRAGResultBuilder builder =
-        new GraphRAGResultBuilder(focusNote, tokenBudgetForRelatedNotes);
+        new GraphRAGResultBuilder(focusNote, tokenBudgetForRelatedNotes, tokenCountingStrategy);
     priorityOneLayer.handle(builder);
     return builder.build();
   }

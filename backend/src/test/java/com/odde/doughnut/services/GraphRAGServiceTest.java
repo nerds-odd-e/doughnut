@@ -5,9 +5,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.services.graphRAG.BareNote;
-import com.odde.doughnut.services.graphRAG.GraphRAGResult;
-import com.odde.doughnut.services.graphRAG.RelationshipToFocusNote;
+import com.odde.doughnut.services.graphRAG.*;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,7 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class GraphRAGServiceTest {
   @Autowired private MakeMe makeMe;
 
-  private final GraphRAGService graphRAGService = new GraphRAGService();
+  private final GraphRAGService graphRAGService =
+      new GraphRAGService(new OneTokenPerNoteStrategy());
 
   // Helper methods for common test operations
   private List<BareNote> getNotesWithRelationship(
@@ -100,7 +99,7 @@ public class GraphRAGServiceTest {
 
     @Test
     void shouldNotIncludeParentInRelatedNotesWhenBudgetIsTooSmall() {
-      GraphRAGResult result = graphRAGService.retrieve(note, 5);
+      GraphRAGResult result = graphRAGService.retrieve(note, 0);
 
       assertThat(result.getFocusNote().getParentUriAndTitle(), equalTo(expectedParentUriAndTitle));
       assertThat(result.getRelatedNotes(), empty());
@@ -158,7 +157,7 @@ public class GraphRAGServiceTest {
 
     @Test
     void shouldKeepObjectInFocusNoteEvenWhenBudgetOnlyAllowsParent() {
-      GraphRAGResult result = graphRAGService.retrieve(note, 6); // Only enough for parent
+      GraphRAGResult result = graphRAGService.retrieve(note, 1); // Only enough for parent
 
       // Object URI should still be in focus note
       assertThat(result.getFocusNote().getObjectUriAndTitle(), equalTo(expectedTargetUriAndTitle));
@@ -245,11 +244,8 @@ public class GraphRAGServiceTest {
 
     @Test
     void shouldOnlyIncludeChildrenThatFitInBudget() {
-      // Make child2's details longer so it won't fit in the small budget
-      child2.setDetails("a".repeat(1000));
-
       // Set budget to only allow one child
-      GraphRAGResult result = graphRAGService.retrieve(parent, 10);
+      GraphRAGResult result = graphRAGService.retrieve(parent, 1);
 
       // Only child1 should be in focus note's children list
       assertThat(result.getFocusNote().getChildren(), contains(expectedChild1UriAndTitle));
@@ -344,7 +340,7 @@ public class GraphRAGServiceTest {
       @Test
       void shouldAlternateBetweenChildrenAndYoungerSiblingsWhenBudgetIsLimited() {
         // Set budget to only allow two notes
-        GraphRAGResult result = graphRAGService.retrieve(focusNote, 27);
+        GraphRAGResult result = graphRAGService.retrieve(focusNote, 3);
 
         // Verify in related notes
         List<BareNote> relatedNotes = result.getRelatedNotes();
