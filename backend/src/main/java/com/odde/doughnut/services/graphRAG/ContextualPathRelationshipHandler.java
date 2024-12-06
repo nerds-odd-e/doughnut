@@ -18,12 +18,6 @@ public class ContextualPathRelationshipHandler extends RelationshipHandler {
     if (currentIndex < ancestors.size()) {
       return ancestors.get(currentIndex++);
     }
-
     return null;
-  }
-
-  @Override
-  public void afterHandledSuccessfully(FocusNote focus, BareNote addedNote) {
-    focus.getContextualPath().add(addedNote.getUriAndTitle());
   }
 }

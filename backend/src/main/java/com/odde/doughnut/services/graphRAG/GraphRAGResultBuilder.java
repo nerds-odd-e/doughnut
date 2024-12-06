@@ -7,14 +7,12 @@ import java.util.List;
 import java.util.Map;
 
 public class GraphRAGResultBuilder {
-  private final int initialBudget;
   private int remainingBudget;
   private final Map<Note, BareNote> addedNotes = new HashMap<>();
   private final List<BareNote> relatedNotes = new ArrayList<>();
   private final FocusNote focus;
 
   public GraphRAGResultBuilder(Note focusNote, int tokenBudget) {
-    this.initialBudget = tokenBudget;
     this.remainingBudget = tokenBudget;
     this.focus = FocusNote.fromNote(focusNote);
   }

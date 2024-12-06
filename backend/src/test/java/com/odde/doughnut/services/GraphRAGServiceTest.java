@@ -376,7 +376,7 @@ public class GraphRAGServiceTest {
 
     @Test
     void shouldIncludeAncestorsInContextualPathInOrder() {
-      GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
+      GraphRAGResult result = graphRAGService.retrieve(focusNote, 0);
 
       // Should be in contextual path in order from root to parent
       assertThat(
