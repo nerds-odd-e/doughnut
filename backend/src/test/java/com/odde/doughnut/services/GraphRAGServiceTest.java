@@ -82,5 +82,18 @@ public class GraphRAGServiceTest {
       assertThat(result.getFocusNote().getContextualPath(), contains(expectedParentUriAndTitle));
       assertThat(result.getRelatedNotes(), empty());
     }
+
+    @Test
+    void shouldTruncateParentDetailsInRelatedNotes() {
+      String longDetails = "a".repeat(2000);
+      parent.setDetails(longDetails);
+
+      GraphRAGResult result = graphRAGService.retrieve(note, 1000);
+
+      assertThat(result.getRelatedNotes(), hasSize(1));
+      assertThat(
+          result.getRelatedNotes().get(0).getDetails(),
+          equalTo("a".repeat(GraphRAGService.RELATED_NOTE_DETAILS_TRUNCATE_LENGTH) + "..."));
+    }
   }
 }

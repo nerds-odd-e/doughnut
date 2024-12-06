@@ -18,25 +18,35 @@ public class GraphRAGService {
     return (int) Math.ceil((detailsLength + titleLength) / CHARACTERS_PER_TOKEN);
   }
 
+  private List<BareNote> addNoteToRelatedNotes(
+      List<BareNote> relatedNotes, Note note, RelationshipToFocusNote relationship, int budget) {
+    int tokens = estimateTokens(note);
+    if (tokens <= budget) {
+      relatedNotes.add(BareNote.fromNote(note, relationship));
+    }
+    return relatedNotes;
+  }
+
   public GraphRAGResult retrieve(Note focusNote, int tokenBudgetForRelatedNotes) {
     GraphRAGResult result = new GraphRAGResult();
     FocusNote focus = FocusNote.fromNote(focusNote);
+    List<BareNote> relatedNotes = new ArrayList<>();
 
     // Add contextual path if parent exists
     if (focusNote.getParent() != null) {
       String parentUriAndTitle = focusNote.getParent().getUriAndTitle();
       focus.getContextualPath().add(parentUriAndTitle);
 
-      // Add parent to related notes only if budget is enough
-      int parentTokens = estimateTokens(focusNote.getParent());
-      if (tokenBudgetForRelatedNotes >= parentTokens) {
-        List<BareNote> relatedNotes = new ArrayList<>();
-        relatedNotes.add(BareNote.fromNote(focusNote.getParent(), RelationshipToFocusNote.Parent));
-        result.setRelatedNotes(relatedNotes);
-      }
+      // Add parent to related notes if budget allows
+      addNoteToRelatedNotes(
+          relatedNotes,
+          focusNote.getParent(),
+          RelationshipToFocusNote.Parent,
+          tokenBudgetForRelatedNotes);
     }
 
     result.setFocusNote(focus);
+    result.setRelatedNotes(relatedNotes);
     return result;
   }
 }
