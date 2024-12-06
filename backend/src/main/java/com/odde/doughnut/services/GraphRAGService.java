@@ -16,9 +16,12 @@ public class GraphRAGService {
     ParentRelationshipHandler parentHandler = new ParentRelationshipHandler(this);
     ObjectRelationshipHandler objectHandler = new ObjectRelationshipHandler(this);
     ChildrenRelationshipHandler childrenHandler = new ChildrenRelationshipHandler(this);
+    YoungerSiblingRelationshipHandler youngerSiblingHandler =
+        new YoungerSiblingRelationshipHandler(this);
 
     parentHandler.setNext(objectHandler);
     objectHandler.setNext(childrenHandler);
+    childrenHandler.setNext(youngerSiblingHandler);
     this.relationshipChain = parentHandler;
   }
 
