@@ -7,6 +7,8 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.graphRAG.GraphRAGResult;
 import com.odde.doughnut.services.graphRAG.RelationshipToFocusNote;
 import com.odde.doughnut.testability.MakeMe;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -41,46 +43,44 @@ public class GraphRAGServiceTest {
     assertThat(result.getFocusNote().getDetails().length(), equalTo(2000));
   }
 
-  @Test
-  void shouldIncludeParentInContextualPathOfFocusNote() {
-    Note parent = makeMe.aNote().titleConstructor("Parent Note").please();
-    Note note = makeMe.aNote().under(parent).please();
+  @Nested
+  class WhenNoteHasParent {
+    private Note parent;
+    private Note note;
+    private String expectedParentUriAndTitle;
 
-    GraphRAGResult result = graphRAGService.retrieve(note, 1000);
+    @BeforeEach
+    void setup() {
+      parent = makeMe.aNote().titleConstructor("Parent Note").details("Parent Details").please();
+      note = makeMe.aNote().under(parent).please();
+      expectedParentUriAndTitle = "[Parent Note](/n" + parent.getId() + ")";
+    }
 
-    assertThat(
-        result.getFocusNote().getParentUriAndTitle(),
-        equalTo("[Parent Note](/n" + parent.getId() + ")"));
-    assertThat(result.getFocusNote().getContextualPath(), hasSize(1));
-    assertThat(
-        result.getFocusNote().getContextualPath().get(0),
-        equalTo("[Parent Note](/n" + parent.getId() + ")"));
-  }
+    @Test
+    void shouldIncludeParentInFocusNoteAndContextualPath() {
+      GraphRAGResult result = graphRAGService.retrieve(note, 1000);
 
-  @Test
-  void shouldIncludeParentInRelatedNotesWhenBudgetAllows() {
-    Note parent = makeMe.aNote().titleConstructor("Parent Note").details("Parent Details").please();
-    Note note = makeMe.aNote().under(parent).please();
+      assertThat(result.getFocusNote().getParentUriAndTitle(), equalTo(expectedParentUriAndTitle));
+      assertThat(result.getFocusNote().getContextualPath(), contains(expectedParentUriAndTitle));
+    }
 
-    GraphRAGResult result = graphRAGService.retrieve(note, 1000);
+    @Test
+    void shouldIncludeParentInRelatedNotesWhenBudgetAllows() {
+      GraphRAGResult result = graphRAGService.retrieve(note, 1000);
 
-    assertThat(result.getRelatedNotes(), hasSize(1));
-    assertThat(
-        result.getRelatedNotes().get(0).getRelationToFocusNote(),
-        equalTo(RelationshipToFocusNote.Parent));
-  }
+      assertThat(result.getRelatedNotes(), hasSize(1));
+      assertThat(
+          result.getRelatedNotes().get(0).getRelationToFocusNote(),
+          equalTo(RelationshipToFocusNote.Parent));
+    }
 
-  @Test
-  void shouldNotIncludeParentInRelatedNotesWhenBudgetIsTooSmall() {
-    Note parent = makeMe.aNote().titleConstructor("Parent Note").details("Parent Details").please();
-    Note note = makeMe.aNote().under(parent).please();
+    @Test
+    void shouldNotIncludeParentInRelatedNotesWhenBudgetIsTooSmall() {
+      GraphRAGResult result = graphRAGService.retrieve(note, 5);
 
-    GraphRAGResult result = graphRAGService.retrieve(note, 5);
-
-    assertThat(
-        result.getFocusNote().getParentUriAndTitle(),
-        equalTo("[Parent Note](/n" + parent.getId() + ")"));
-    assertThat(result.getFocusNote().getContextualPath(), hasSize(1));
-    assertThat(result.getRelatedNotes(), empty());
+      assertThat(result.getFocusNote().getParentUriAndTitle(), equalTo(expectedParentUriAndTitle));
+      assertThat(result.getFocusNote().getContextualPath(), contains(expectedParentUriAndTitle));
+      assertThat(result.getRelatedNotes(), empty());
+    }
   }
 }
