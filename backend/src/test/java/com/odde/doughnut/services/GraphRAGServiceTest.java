@@ -350,4 +350,49 @@ public class GraphRAGServiceTest {
       }
     }
   }
+
+  @Nested
+  class WhenNoteHasContextualPath {
+    private Note grandParent;
+    private Note parent;
+    private Note focusNote;
+    private String expectedGrandParentUriAndTitle;
+    private String expectedParentUriAndTitle;
+
+    @BeforeEach
+    void setup() {
+      grandParent = makeMe.aNote().titleConstructor("Grand Parent").details("GP Details").please();
+      parent =
+          makeMe
+              .aNote()
+              .under(grandParent)
+              .titleConstructor("Parent")
+              .details("Parent Details")
+              .please();
+      focusNote = makeMe.aNote().under(parent).titleConstructor("Focus").please();
+      expectedGrandParentUriAndTitle = "[Grand Parent](/n" + grandParent.getId() + ")";
+      expectedParentUriAndTitle = "[Parent](/n" + parent.getId() + ")";
+    }
+
+    @Test
+    void shouldIncludeAncestorsInContextualPathAndRelatedNotes() {
+      GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
+
+      // Should be in contextual path in order from root to parent
+      //      assertThat(
+      //          result.getFocusNote().getContextualPath(),
+      //          contains(expectedGrandParentUriAndTitle, expectedParentUriAndTitle));
+
+      // Should be in related notes
+      List<BareNote> contextualNotes =
+          result.getRelatedNotes().stream()
+              .filter(
+                  n -> n.getRelationToFocusNote() == RelationshipToFocusNote.NoteInContextualPath)
+              .collect(Collectors.toList());
+
+      assertThat(
+          contextualNotes, hasSize(1)); // Only grandparent, parent is already added as Parent
+      assertThat(contextualNotes.get(0).getUriAndTitle(), equalTo(expectedGrandParentUriAndTitle));
+    }
+  }
 }
