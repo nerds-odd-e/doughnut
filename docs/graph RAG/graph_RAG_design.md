@@ -112,3 +112,10 @@ Most of the relationship types can retrieve the note they need from the focus no
 - Present the `FocusNote` with its details.
 - Provide a normalized note list ranked by relevance (high to low).
 - Explain that relationships between notes can be inferred via `uri_and_title` fields.
+
+## Key Design Pattern Suggestions for Graph RAG Algorithm
+
+- **Strategy Pattern**: Encapsulate retrieval logic for each relationship type to enhance modularity and enable dynamic switching between strategies.
+- **Factory Method**: Simplify and centralize the creation of retrieval strategies, allowing easy addition of new relationship types.
+- **Chain of Responsibility/Iterator**: Manage the iteration across priorities and relationship types dynamically and flexibly.
+- **Observer Pattern**: Handle dynamic updates to the `FocusNote` and notify other components when relationships change.
