@@ -6,24 +6,28 @@ import java.util.List;
 public class ChildRelationshipHandler extends RelationshipHandler {
   private int currentChildIndex = 0;
   private boolean exhausted = false;
+  private List<Note> children;
 
-  public ChildRelationshipHandler() {
-    super(RelationshipToFocusNote.Child);
+  public ChildRelationshipHandler(Note relatingNote) {
+    super(RelationshipToFocusNote.Child, relatingNote);
   }
 
   @Override
-  public Note handle(Note focusNote) {
+  public Note handle() {
     if (exhausted) {
       return null;
     }
-    List<Note> children = focusNote.getChildren();
+
+    if (children == null) {
+      children = relatingNote.getChildren();
+    }
 
     if (currentChildIndex < children.size()) {
       return children.get(currentChildIndex++);
     } else {
       exhausted = true;
+      return null;
     }
-    return null;
   }
 
   @Override

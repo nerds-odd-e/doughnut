@@ -5,12 +5,15 @@ import lombok.Getter;
 
 public abstract class RelationshipHandler {
   @Getter protected final RelationshipToFocusNote relationshipToFocusNote;
+  protected final Note relatingNote;
 
-  protected RelationshipHandler(RelationshipToFocusNote relationshipToFocusNote) {
+  protected RelationshipHandler(
+      RelationshipToFocusNote relationshipToFocusNote, Note relatingNote) {
     this.relationshipToFocusNote = relationshipToFocusNote;
+    this.relatingNote = relatingNote;
   }
 
-  public abstract Note handle(Note focusNote);
+  public abstract Note handle();
 
   public void afterHandledSuccessfully(FocusNote focusNote, BareNote addedNote) {}
 }

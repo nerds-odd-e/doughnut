@@ -5,16 +5,16 @@ import com.odde.doughnut.entities.Note;
 public class ObjectRelationshipHandler extends RelationshipHandler {
   private boolean exhausted = false;
 
-  public ObjectRelationshipHandler() {
-    super(RelationshipToFocusNote.Object);
+  public ObjectRelationshipHandler(Note relatingNote) {
+    super(RelationshipToFocusNote.Object, relatingNote);
   }
 
   @Override
-  public Note handle(Note focusNote) {
+  public Note handle() {
     if (exhausted) {
       return null;
     }
     exhausted = true;
-    return focusNote.getTargetNote();
+    return relatingNote.getTargetNote();
   }
 }

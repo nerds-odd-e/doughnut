@@ -4,28 +4,23 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.graphRAG.*;
 
 public class GraphRAGService {
-  private final PriorityLayer firstPriorityLayer;
-
-  public GraphRAGService() {
-    // Create handlers
-    ParentRelationshipHandler parentHandler = new ParentRelationshipHandler();
-    ObjectRelationshipHandler objectHandler = new ObjectRelationshipHandler();
-    ChildRelationshipHandler childrenHandler = new ChildRelationshipHandler();
+  public GraphRAGResult retrieve(Note focusNote, int tokenBudgetForRelatedNotes) {
+    // Create handlers with the focus note
+    ParentRelationshipHandler parentHandler = new ParentRelationshipHandler(focusNote);
+    ObjectRelationshipHandler objectHandler = new ObjectRelationshipHandler(focusNote);
+    ChildRelationshipHandler childrenHandler = new ChildRelationshipHandler(focusNote);
     YoungerSiblingRelationshipHandler youngerSiblingHandler =
-        new YoungerSiblingRelationshipHandler();
+        new YoungerSiblingRelationshipHandler(focusNote);
 
     // Set up priority layers
     PriorityLayer priorityOneLayer = new PriorityLayer(parentHandler, objectHandler);
     PriorityLayer priorityTwoLayer = new PriorityLayer(childrenHandler, youngerSiblingHandler);
 
     priorityOneLayer.setNextLayer(priorityTwoLayer);
-    this.firstPriorityLayer = priorityOneLayer;
-  }
 
-  public GraphRAGResult retrieve(Note focusNote, int tokenBudgetForRelatedNotes) {
     GraphRAGResultBuilder builder =
         new GraphRAGResultBuilder(focusNote, tokenBudgetForRelatedNotes);
-    firstPriorityLayer.handle(focusNote, builder);
+    priorityOneLayer.handle(builder);
     return builder.build();
   }
 }

@@ -16,14 +16,13 @@ public class PriorityLayer {
     this.handlers = new ArrayList<>(List.of(handlers));
   }
 
-  public void handle(Note focusNote, GraphRAGResultBuilder builder) {
+  public void handle(GraphRAGResultBuilder builder) {
     boolean anyHandlerActive;
 
     do {
       anyHandlerActive = false;
-      // Try each handler once in this round
       for (RelationshipHandler handler : handlers) {
-        Note relatedNote = handler.handle(focusNote);
+        Note relatedNote = handler.handle();
 
         if (relatedNote != null) {
           BareNote result =
@@ -37,7 +36,7 @@ public class PriorityLayer {
     } while (anyHandlerActive);
 
     if (nextLayer != null) {
-      nextLayer.handle(focusNote, builder);
+      nextLayer.handle(builder);
     }
   }
 }
