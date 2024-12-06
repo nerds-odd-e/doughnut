@@ -27,9 +27,9 @@ public class NoteQuestionGenerationService {
 
     MCQWithAnswer question =
         notebookAssistantForNoteService
-            .createThreadWithNoteInfo(List.of(message))
+            .createThreadWithNoteInfo1(List.of(message))
             .withTool(AiToolFactory.askSingleAnswerMultipleChoiceQuestion())
-            .withFileSearch()
+            //            .withFileSearch()
             .withModelName(globalSettingsService.globalSettingQuestionGeneration().getValue())
             .run()
             .getRunResult()

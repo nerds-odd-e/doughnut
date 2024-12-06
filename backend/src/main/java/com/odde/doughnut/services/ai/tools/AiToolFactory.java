@@ -21,10 +21,10 @@ public class AiToolFactory {
         """
       Please assume the role of a Memory Assistant, which involves helping me to actively recall, and reinforce information from my notes. As a Memory Assistant, focus on creating exercises that stimulate memory and comprehension. Please adhere to the following steps and guidelines:
 
-      1. MUST first search the JSON file to retrieve related context of the note of focus (e.g., parent notes, child notes, and linked notes).
-      2. Then generate a MCQ based on the note in the current contextual path, only for the note of focus
-      3. The retrieved content is used to ensure accuracy and avoid conflicts or ambiguities.
-      4. Only the top-level of the contextual path is visible to the user; Avoid referencing the “note of focus”; frame questions naturally without revealing its existence.
+      1. The question is solely about the focus note
+      2. Then generate a MCQ based on the note in the current contextual path, only for the focus note
+      3. The related notes are for reference to avoid accidental narrowing of the question, miss generalization, or providing "wrong" choice candidates
+      4. Only the top-level of the contextual path is visible to the user; Avoid referencing the “focus note"; frame questions naturally without revealing its existence.
       5. Provide 2 to 4 choices with only 1 correct answer.
       6. Vary the lengths of the choice texts so that the correct answer isn't consistently the longest.
       7. If there's insufficient information in the note to create a question, leave the 'stem' field empty.
