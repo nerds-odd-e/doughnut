@@ -15,14 +15,18 @@ public class GraphRAGService {
         new PriorSiblingRelationshipHandler(focusNote);
     YoungerSiblingRelationshipHandler youngerSiblingHandler =
         new YoungerSiblingRelationshipHandler(focusNote);
+    ReifiedChildObjectRelationshipHandler reifiedChildObjectHandler =
+        new ReifiedChildObjectRelationshipHandler(focusNote);
 
     // Set up priority layers
     PriorityLayer priorityOneLayer =
         new PriorityLayer(parentHandler, objectHandler, contextualPathHandler);
     PriorityLayer priorityTwoLayer =
         new PriorityLayer(childrenHandler, priorSiblingHandler, youngerSiblingHandler);
+    PriorityLayer priorityThreeLayer = new PriorityLayer(reifiedChildObjectHandler);
 
     priorityOneLayer.setNextLayer(priorityTwoLayer);
+    priorityTwoLayer.setNextLayer(priorityThreeLayer);
 
     GraphRAGResultBuilder builder =
         new GraphRAGResultBuilder(focusNote, tokenBudgetForRelatedNotes);

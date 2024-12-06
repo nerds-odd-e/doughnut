@@ -455,4 +455,47 @@ public class GraphRAGServiceTest {
           containsInAnyOrder(expectedPriorSibling1UriAndTitle, expectedPriorSibling2UriAndTitle));
     }
   }
+
+  @Nested
+  class WhenNoteHasReifiedChildObject {
+    private Note focusNote;
+    private Note childNote;
+    private Note targetNote;
+    private String expectedChildUriAndTitle;
+    private String expectedTargetUriAndTitle;
+
+    @BeforeEach
+    void setup() {
+      focusNote = makeMe.aNote().titleConstructor("Focus Note").please();
+
+      // Create the target note first
+      targetNote =
+          makeMe.aNote().titleConstructor("Target Note").details("Target Details").please();
+
+      // Create a link between parent and target
+      childNote = makeMe.aLink().between(focusNote, targetNote).please();
+      makeMe.refresh(childNote);
+
+      expectedChildUriAndTitle =
+          "[" + childNote.getTopicConstructor() + "](/n" + childNote.getId() + ")";
+      expectedTargetUriAndTitle = "[Target Note](/n" + targetNote.getId() + ")";
+    }
+
+    @Test
+    void shouldIncludeChildObjectInRelatedNotes() {
+      GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
+
+      List<BareNote> reifiedChildObjectNotes =
+          result.getRelatedNotes().stream()
+              .filter(n -> n.getRelationToFocusNote() == RelationshipToFocusNote.ReifiedChildObject)
+              .collect(Collectors.toList());
+
+      assertThat(reifiedChildObjectNotes, hasSize(1));
+      assertThat(
+          reifiedChildObjectNotes.get(0).getUriAndTitle(), equalTo(expectedTargetUriAndTitle));
+
+      // Child should still be in children list
+      assertThat(result.getFocusNote().getChildren(), contains(expectedChildUriAndTitle));
+    }
+  }
 }
