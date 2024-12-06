@@ -26,12 +26,9 @@ public class ChildrenRelationshipHandler extends RelationshipHandler {
       }
 
       currentChildIndex++;
-      // Process next child before moving to next handler
       handle(focusNote, focus, relatedNotes);
     } else {
-      // Reset for next use
       currentChildIndex = 0;
-      handleNext(focusNote, focus, relatedNotes);
     }
   }
 }

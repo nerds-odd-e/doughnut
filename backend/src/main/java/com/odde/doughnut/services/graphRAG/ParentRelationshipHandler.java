@@ -20,6 +20,5 @@ public class ParentRelationshipHandler extends RelationshipHandler {
       graphRAGService.addNoteToRelatedNotes(
           relatedNotes, focusNote.getParent(), RelationshipToFocusNote.Parent);
     }
-    handleNext(focusNote, focus, relatedNotes);
   }
 }

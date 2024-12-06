@@ -17,6 +17,5 @@ public class ObjectRelationshipHandler extends RelationshipHandler {
       graphRAGService.addNoteToRelatedNotes(
           relatedNotes, focusNote.getTargetNote(), RelationshipToFocusNote.Object);
     }
-    handleNext(focusNote, focus, relatedNotes);
   }
 }

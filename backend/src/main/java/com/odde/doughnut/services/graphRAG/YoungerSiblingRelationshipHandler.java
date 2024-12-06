@@ -18,7 +18,6 @@ public class YoungerSiblingRelationshipHandler extends RelationshipHandler {
       List<Note> siblings = focusNote.getSiblings();
 
       if (currentSiblingIndex == -1) {
-        // First time: find focus note's index
         currentSiblingIndex = siblings.indexOf(focusNote) + 1;
       }
 
@@ -33,15 +32,10 @@ public class YoungerSiblingRelationshipHandler extends RelationshipHandler {
         }
 
         currentSiblingIndex++;
-        // Process next sibling before moving to next handler
         handle(focusNote, focus, relatedNotes);
       } else {
-        // Reset for next use
         currentSiblingIndex = -1;
-        handleNext(focusNote, focus, relatedNotes);
       }
-    } else {
-      handleNext(focusNote, focus, relatedNotes);
     }
   }
 }
