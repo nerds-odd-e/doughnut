@@ -69,4 +69,18 @@ public class GraphRAGServiceTest {
         result.getRelatedNotes().get(0).getRelationToFocusNote(),
         equalTo(RelationshipToFocusNote.Parent));
   }
+
+  @Test
+  void shouldNotIncludeParentInRelatedNotesWhenBudgetIsTooSmall() {
+    Note parent = makeMe.aNote().titleConstructor("Parent Note").details("Parent Details").please();
+    Note note = makeMe.aNote().under(parent).please();
+
+    GraphRAGResult result = graphRAGService.retrieve(note, 5);
+
+    assertThat(
+        result.getFocusNote().getParentUriAndTitle(),
+        equalTo("[Parent Note](/n" + parent.getId() + ")"));
+    assertThat(result.getFocusNote().getContextualPath(), hasSize(1));
+    assertThat(result.getRelatedNotes(), empty());
+  }
 }
