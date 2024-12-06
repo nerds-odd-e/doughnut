@@ -1,10 +1,20 @@
 package com.odde.doughnut.services.graphRAG;
 
 public enum RelationshipToFocusNote {
-  Itself,
+  Self,
   Parent,
-  Ancestor,
   Object,
-  ObjectAncestor,
-  Child
+  Child,
+  PriorSibling,
+  YoungerSibling,
+  ReferringNote,
+  NoteInContextualPath,
+  NoteInObjectContextualPath,
+  ReifiedChildObject,
+  ParentSibling,
+  ObjectParentSibling,
+  ParentSiblingChild,
+  ObjectParentSiblingChild,
+  NoteInReferringContextualPath,
+  ReferringCousin
 }

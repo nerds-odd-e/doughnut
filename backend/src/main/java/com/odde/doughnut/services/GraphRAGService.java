@@ -8,6 +8,8 @@ public class GraphRAGService {
   public static final double CHARACTERS_PER_TOKEN = 3.75;
 
   public GraphRAGResult retrieve(Note focusNote, int tokenBudgetForRelatedNotes) {
-    return null;
+    GraphRAGResult result = new GraphRAGResult();
+    result.setFocusNote(FocusNote.fromNote(focusNote));
+    return result;
   }
 }
