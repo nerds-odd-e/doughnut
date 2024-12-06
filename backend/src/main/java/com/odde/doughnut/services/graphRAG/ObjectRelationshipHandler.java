@@ -9,6 +9,7 @@ public class ObjectRelationshipHandler extends RelationshipHandler {
   private boolean exhausted = false;
 
   public ObjectRelationshipHandler(GraphRAGService graphRAGService) {
+    super(RelationshipToFocusNote.Object);
     this.graphRAGService = graphRAGService;
   }
 
@@ -20,7 +21,7 @@ public class ObjectRelationshipHandler extends RelationshipHandler {
     exhausted = true;
     if (focusNote.getTargetNote() != null) {
       return graphRAGService.addNoteToRelatedNotes(
-          relatedNotes, focusNote.getTargetNote(), RelationshipToFocusNote.Object);
+          relatedNotes, focusNote.getTargetNote(), getRelationshipToFocusNote());
     }
     return null;
   }

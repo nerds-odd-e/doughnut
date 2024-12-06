@@ -10,6 +10,7 @@ public class YoungerSiblingRelationshipHandler extends RelationshipHandler {
   boolean exhausted = false;
 
   public YoungerSiblingRelationshipHandler(GraphRAGService graphRAGService) {
+    super(RelationshipToFocusNote.YoungerSibling);
     this.graphRAGService = graphRAGService;
   }
 

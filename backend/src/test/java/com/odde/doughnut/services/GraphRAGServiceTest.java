@@ -64,7 +64,6 @@ public class GraphRAGServiceTest {
       GraphRAGResult result = graphRAGService.retrieve(note, 1000);
 
       assertThat(result.getFocusNote().getParentUriAndTitle(), equalTo(expectedParentUriAndTitle));
-      assertThat(result.getFocusNote().getContextualPath(), contains(expectedParentUriAndTitle));
     }
 
     @Test
@@ -82,7 +81,6 @@ public class GraphRAGServiceTest {
       GraphRAGResult result = graphRAGService.retrieve(note, 5);
 
       assertThat(result.getFocusNote().getParentUriAndTitle(), equalTo(expectedParentUriAndTitle));
-      assertThat(result.getFocusNote().getContextualPath(), contains(expectedParentUriAndTitle));
       assertThat(result.getRelatedNotes(), empty());
     }
 

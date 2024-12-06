@@ -9,6 +9,7 @@ public class ParentRelationshipHandler extends RelationshipHandler {
   private boolean exhausted = false;
 
   public ParentRelationshipHandler(GraphRAGService graphRAGService) {
+    super(RelationshipToFocusNote.Parent);
     this.graphRAGService = graphRAGService;
   }
 
@@ -19,9 +20,6 @@ public class ParentRelationshipHandler extends RelationshipHandler {
     }
     exhausted = true;
     if (focusNote.getParent() != null) {
-      String parentUriAndTitle = focusNote.getParent().getUriAndTitle();
-      focus.getContextualPath().add(parentUriAndTitle);
-
       return graphRAGService.addNoteToRelatedNotes(
           relatedNotes, focusNote.getParent(), RelationshipToFocusNote.Parent);
     }

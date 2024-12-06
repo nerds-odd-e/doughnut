@@ -4,12 +4,13 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.GraphRAGService;
 import java.util.List;
 
-public class ChildrenRelationshipHandler extends RelationshipHandler {
+public class ChildRelationshipHandler extends RelationshipHandler {
   private final GraphRAGService graphRAGService;
   private int currentChildIndex = 0;
   private boolean exhausted = false;
 
-  public ChildrenRelationshipHandler(GraphRAGService graphRAGService) {
+  public ChildRelationshipHandler(GraphRAGService graphRAGService) {
+    super(RelationshipToFocusNote.Child);
     this.graphRAGService = graphRAGService;
   }
 

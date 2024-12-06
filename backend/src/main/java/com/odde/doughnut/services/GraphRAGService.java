@@ -16,7 +16,7 @@ public class GraphRAGService {
     // Create handlers
     ParentRelationshipHandler parentHandler = new ParentRelationshipHandler(this);
     ObjectRelationshipHandler objectHandler = new ObjectRelationshipHandler(this);
-    ChildrenRelationshipHandler childrenHandler = new ChildrenRelationshipHandler(this);
+    ChildRelationshipHandler childrenHandler = new ChildRelationshipHandler(this);
     YoungerSiblingRelationshipHandler youngerSiblingHandler =
         new YoungerSiblingRelationshipHandler(this);
 
