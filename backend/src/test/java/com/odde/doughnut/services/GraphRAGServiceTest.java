@@ -739,4 +739,56 @@ public class GraphRAGServiceTest {
           getNotesWithRelationship(result, RelationshipToFocusNote.ReferringSubject), empty());
     }
   }
+
+  @Nested
+  class WhenNoteHasParentSiblings {
+    private Note grandParent;
+    private Note parent;
+    private Note parentSibling1;
+    private Note parentSibling2;
+    private Note focusNote;
+    private String expectedParentSibling1UriAndTitle;
+    private String expectedParentSibling2UriAndTitle;
+
+    @BeforeEach
+    void setup() {
+      grandParent = makeMe.aNote().titleConstructor("Grand Parent").please();
+      parent = makeMe.aNote().under(grandParent).titleConstructor("Parent").please();
+      parentSibling1 =
+          makeMe.aNote().under(grandParent).titleConstructor("Parent Sibling 1").please();
+      parentSibling2 =
+          makeMe.aNote().under(grandParent).titleConstructor("Parent Sibling 2").please();
+      focusNote = makeMe.aNote().under(parent).titleConstructor("Focus Note").please();
+
+      expectedParentSibling1UriAndTitle = getUriAndTitle(parentSibling1);
+      expectedParentSibling2UriAndTitle = getUriAndTitle(parentSibling2);
+    }
+
+    @Test
+    void shouldIncludeParentSiblingsInRelatedNotes() {
+      GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
+
+      // Verify parent siblings are in related notes
+      assertRelatedNotesContain(
+          result,
+          RelationshipToFocusNote.ParentSibling,
+          expectedParentSibling1UriAndTitle,
+          expectedParentSibling2UriAndTitle);
+    }
+
+    @Test
+    void shouldNotIncludeParentSiblingsWhenBudgetIsLimited() {
+      // Set budget to only allow parent
+      GraphRAGResult result = graphRAGService.retrieve(focusNote, 1);
+
+      // Verify only parent is included
+      assertThat(result.getRelatedNotes(), hasSize(1));
+      assertThat(
+          result.getRelatedNotes().get(0).getRelationToFocusNote(),
+          equalTo(RelationshipToFocusNote.Parent));
+
+      // Verify no parent siblings are included
+      assertThat(getNotesWithRelationship(result, RelationshipToFocusNote.ParentSibling), empty());
+    }
+  }
 }
