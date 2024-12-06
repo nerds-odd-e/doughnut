@@ -626,6 +626,8 @@ public class GraphRAGServiceTest {
     private Note referringNote2;
     private String expectedReferringNote1UriAndTitle;
     private String expectedReferringNote2UriAndTitle;
+    private String expectedReferringParent1UriAndTitle;
+    private String expectedReferringParent2UriAndTitle;
 
     @BeforeEach
     void setup() {
@@ -641,10 +643,12 @@ public class GraphRAGServiceTest {
 
       expectedReferringNote1UriAndTitle = getUriAndTitle(referringNote1);
       expectedReferringNote2UriAndTitle = getUriAndTitle(referringNote2);
+      expectedReferringParent1UriAndTitle = getUriAndTitle(referringParent1);
+      expectedReferringParent2UriAndTitle = getUriAndTitle(referringParent2);
     }
 
     @Test
-    void shouldIncludeReferringNotesInFocusNoteAndRelatedNotes() {
+    void shouldIncludeReferringNotesAndTheirSubjectsWhenBudgetIsEnough() {
       GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
 
       // Verify referring notes are in focus note's list
@@ -658,6 +662,31 @@ public class GraphRAGServiceTest {
           RelationshipToFocusNote.ReferringNote,
           expectedReferringNote1UriAndTitle,
           expectedReferringNote2UriAndTitle);
+
+      // Verify referring subjects are in related notes
+      assertRelatedNotesContain(
+          result,
+          RelationshipToFocusNote.ReferringSubject,
+          expectedReferringParent1UriAndTitle,
+          expectedReferringParent2UriAndTitle);
+    }
+
+    @Test
+    void shouldNotIncludeReferringSubjectsWhenBudgetIsLimited() {
+      // Set budget to only allow referring notes
+      GraphRAGResult result = graphRAGService.retrieve(focusNote, 2);
+
+      // Verify only referring notes are included
+      assertThat(result.getRelatedNotes(), hasSize(2));
+      assertThat(
+          result.getRelatedNotes().stream()
+              .map(BareNote::getRelationToFocusNote)
+              .collect(Collectors.toList()),
+          everyItem(equalTo(RelationshipToFocusNote.ReferringNote)));
+
+      // Verify no referring subjects are included
+      assertThat(
+          getNotesWithRelationship(result, RelationshipToFocusNote.ReferringSubject), empty());
     }
   }
 }

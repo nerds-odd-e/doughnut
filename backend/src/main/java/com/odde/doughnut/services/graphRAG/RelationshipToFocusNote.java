@@ -8,6 +8,7 @@ public enum RelationshipToFocusNote {
   PriorSibling,
   YoungerSibling,
   ReferringNote,
+  ReferringSubject,
   NoteInContextualPath,
   NoteInObjectContextualPath,
   ReifiedChildObject,
