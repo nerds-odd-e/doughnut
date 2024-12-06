@@ -30,7 +30,7 @@ public class ChildrenRelationshipHandler extends RelationshipHandler {
       }
 
       currentChildIndex++;
-      handle(focusNote, focus, relatedNotes);
+      return addedNote;
     } else {
       exhausted = true;
     }

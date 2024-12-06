@@ -22,7 +22,10 @@ public class PriorityLayer {
   public void handle(Note focusNote, FocusNote focus, List<BareNote> relatedNotes) {
     // Handle each handler in this layer
     for (RelationshipHandler handler : handlers) {
-      handler.handle(focusNote, focus, relatedNotes);
+      BareNote result;
+      do {
+        result = handler.handle(focusNote, focus, relatedNotes);
+      } while (result != null);
     }
 
     // Move to next layer if exists

@@ -36,7 +36,7 @@ public class YoungerSiblingRelationshipHandler extends RelationshipHandler {
         }
 
         currentSiblingIndex++;
-        handle(focusNote, focus, relatedNotes);
+        return addedNote;
       } else {
         exhausted = true;
       }
