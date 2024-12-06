@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.*;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.graphRAG.GraphRAGResult;
+import com.odde.doughnut.services.graphRAG.RelationshipToFocusNote;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
@@ -55,6 +56,9 @@ public class GraphRAGServiceTest {
     assertThat(
         result.focusNote.contextualPath.get(0),
         equalTo(String.format("[Parent Note](/n%d)", parent.getId())));
+    assertThat(
+        result.relatedNotes.get(0).relationshipToFocusNote,
+        equalTo(RelationshipToFocusNote.Parent));
   }
 
   @Test
@@ -81,6 +85,12 @@ public class GraphRAGServiceTest {
         result.relatedNotes.get(1).detailsTruncated,
         equalTo(
             longObjectDetails.substring(0, GraphRAGService.RELATED_NOTE_DETAILS_TRUNCATE_LENGTH)));
+    assertThat(
+        result.relatedNotes.get(0).relationshipToFocusNote,
+        equalTo(RelationshipToFocusNote.Parent));
+    assertThat(
+        result.relatedNotes.get(1).relationshipToFocusNote,
+        equalTo(RelationshipToFocusNote.Object));
   }
 
   @Test
@@ -114,6 +124,15 @@ public class GraphRAGServiceTest {
     assertThat(
         result.relatedNotes.get(2).uriAndTitle,
         equalTo(String.format("[Parent](/n%d)", parent.getId())));
+    assertThat(
+        result.relatedNotes.get(0).relationshipToFocusNote,
+        equalTo(RelationshipToFocusNote.Ancestor));
+    assertThat(
+        result.relatedNotes.get(1).relationshipToFocusNote,
+        equalTo(RelationshipToFocusNote.Ancestor));
+    assertThat(
+        result.relatedNotes.get(2).relationshipToFocusNote,
+        equalTo(RelationshipToFocusNote.Parent));
   }
 
   @Test
@@ -154,6 +173,18 @@ public class GraphRAGServiceTest {
     assertThat(
         result.relatedNotes.get(3).uriAndTitle,
         equalTo(String.format("[Object Parent](/n%d)", objectParent.getId())));
+    assertThat(
+        result.relatedNotes.get(0).relationshipToFocusNote,
+        equalTo(RelationshipToFocusNote.Parent));
+    assertThat(
+        result.relatedNotes.get(1).relationshipToFocusNote,
+        equalTo(RelationshipToFocusNote.Object));
+    assertThat(
+        result.relatedNotes.get(2).relationshipToFocusNote,
+        equalTo(RelationshipToFocusNote.ObjectAncestor));
+    assertThat(
+        result.relatedNotes.get(3).relationshipToFocusNote,
+        equalTo(RelationshipToFocusNote.ObjectAncestor));
   }
 
   @Test
@@ -197,6 +228,11 @@ public class GraphRAGServiceTest {
         hasItems(
             String.format("[First Child](/n%d)", child1.getId()),
             String.format("[Second Child](/n%d)", child2.getId())));
+    assertThat(
+        result.relatedNotes.stream()
+            .map(note -> note.relationshipToFocusNote)
+            .collect(Collectors.toList()),
+        everyItem(equalTo(RelationshipToFocusNote.Child)));
   }
 
   @Test
@@ -204,8 +240,10 @@ public class GraphRAGServiceTest {
     Note parent = makeMe.aNote().titleConstructor("Parent").please();
     Note child = makeMe.aNote().titleConstructor("Child").details("D").under(parent).please();
 
+    int requiredTokens = 25; // Base token requirement
+
     // Test with exactly enough tokens
-    GraphRAGResult result = graphRAGService.retrieve(parent, 16);
+    GraphRAGResult result = graphRAGService.retrieve(parent, requiredTokens);
 
     // Child should be included
     assertThat(result.focusNote.children, hasSize(1));
@@ -216,7 +254,7 @@ public class GraphRAGServiceTest {
         hasItem(String.format("[Child](/n%d)", child.getId())));
 
     // Test with one token less
-    result = graphRAGService.retrieve(parent, 14);
+    result = graphRAGService.retrieve(parent, requiredTokens - 1);
     assertThat(result.focusNote.children, empty());
     assertThat(
         result.relatedNotes.stream()
@@ -230,11 +268,10 @@ public class GraphRAGServiceTest {
     Note parent = makeMe.aNote().titleConstructor("Parent").please();
     Note child1 =
         makeMe.aNote().titleConstructor("First Child").details("D1").under(parent).please();
-    Note child2 =
-        makeMe.aNote().titleConstructor("Second Child").details("D2").under(parent).please();
+    makeMe.aNote().titleConstructor("Second Child").details("D2").under(parent).please();
 
     // Test with budget enough for only one child
-    GraphRAGResult result = graphRAGService.retrieve(parent, 26);
+    GraphRAGResult result = graphRAGService.retrieve(parent, 27);
 
     // Only first child should be in focus note's children list
     assertThat(result.focusNote.children, hasSize(1));
@@ -249,7 +286,7 @@ public class GraphRAGServiceTest {
         equalTo(String.format("[First Child](/n%d)", child1.getId())));
 
     // Test with budget enough for both children
-    result = graphRAGService.retrieve(parent, 52);
+    result = graphRAGService.retrieve(parent, 56);
     assertThat(result.focusNote.children, hasSize(2));
     assertThat(result.relatedNotes, hasSize(2));
   }

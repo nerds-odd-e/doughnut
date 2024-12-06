@@ -11,7 +11,12 @@ public class NoteWithContextualPath extends BareNote {
       String parentUriAndTitle,
       String objectUriAndTitle,
       List<String> contextualPath) {
-    super(uriAndTitle, detailsTruncated, parentUriAndTitle, objectUriAndTitle);
+    super(
+        uriAndTitle,
+        detailsTruncated,
+        parentUriAndTitle,
+        objectUriAndTitle,
+        RelationshipToFocusNote.Itself);
     this.contextualPath = contextualPath;
   }
 }

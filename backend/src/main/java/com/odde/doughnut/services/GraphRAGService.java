@@ -30,8 +30,9 @@ public class GraphRAGService {
     return note.getAncestors().stream().map(this::formatUriAndTitle).collect(Collectors.toList());
   }
 
-  private BareNote createRelatedNote(Note note) {
-    return new BareNote(formatUriAndTitle(note), truncateDetails(note.getDetails()), null, null);
+  private BareNote createRelatedNote(Note note, RelationshipToFocusNote relationship) {
+    return new BareNote(
+        formatUriAndTitle(note), truncateDetails(note.getDetails()), null, null, relationship);
   }
 
   private int estimateTokens(BareNote note) {
@@ -52,7 +53,7 @@ public class GraphRAGService {
     int remainingTokens = tokenBudget;
     if (remainingTokens > 0) {
       for (Note child : focusNote.getChildren()) {
-        BareNote childNote = createRelatedNote(child);
+        BareNote childNote = createRelatedNote(child, RelationshipToFocusNote.Child);
         int childTokens = estimateTokens(childNote);
         if (childTokens <= remainingTokens) {
           childrenWithinBudget.add(child);
@@ -76,20 +77,25 @@ public class GraphRAGService {
     List<BareNote> relatedNotes = new ArrayList<>();
     // Add ancestors to related notes (Priority 1)
     for (Note ancestor : focusNote.getAncestors()) {
-      relatedNotes.add(createRelatedNote(ancestor));
+      relatedNotes.add(
+          createRelatedNote(
+              ancestor,
+              ancestor.equals(focusNote.getParent())
+                  ? RelationshipToFocusNote.Parent
+                  : RelationshipToFocusNote.Ancestor));
     }
     // Add object note to related notes (Priority 1)
     if (focusNote.getTargetNote() != null) {
       Note target = focusNote.getTargetNote();
-      relatedNotes.add(createRelatedNote(target));
+      relatedNotes.add(createRelatedNote(target, RelationshipToFocusNote.Object));
       // Add object's ancestors to related notes (Priority 1)
       for (Note ancestor : target.getAncestors()) {
-        relatedNotes.add(createRelatedNote(ancestor));
+        relatedNotes.add(createRelatedNote(ancestor, RelationshipToFocusNote.ObjectAncestor));
       }
     }
     // Add children to related notes (Priority 2)
     for (Note child : childrenWithinBudget) {
-      relatedNotes.add(createRelatedNote(child));
+      relatedNotes.add(createRelatedNote(child, RelationshipToFocusNote.Child));
     }
 
     return new GraphRAGResult(focus, relatedNotes);
