@@ -6,16 +6,25 @@ import java.util.List;
 public class ChildRelationshipHandler extends RelationshipHandler {
   private int currentChildIndex = 0;
   private final List<Note> children;
+  private final PriorityLayer priorityThreeLayer;
 
-  public ChildRelationshipHandler(Note relatingNote) {
+  public ChildRelationshipHandler(Note relatingNote, PriorityLayer priorityThreeLayer) {
     super(RelationshipToFocusNote.Child, relatingNote);
-    children = relatingNote.getChildren();
+    this.children = relatingNote.getChildren();
+    this.priorityThreeLayer = priorityThreeLayer;
   }
 
   @Override
   public Note handle() {
     if (currentChildIndex < children.size()) {
-      return children.get(currentChildIndex++);
+      Note child = children.get(currentChildIndex++);
+
+      // If this child is a reified note, add its object to priority 3
+      if (child.getTargetNote() != null && priorityThreeLayer != null) {
+        priorityThreeLayer.addHandler(new ReifiedChildObjectRelationshipHandler(child));
+      }
+
+      return child;
     }
     return null;
   }

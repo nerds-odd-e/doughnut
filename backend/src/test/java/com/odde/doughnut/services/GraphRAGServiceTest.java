@@ -472,7 +472,7 @@ public class GraphRAGServiceTest {
   @Nested
   class WhenNoteHasReifiedChildObject {
     private Note focusNote;
-    private Note childNote;
+    private Note reifiedChild;
     private Note targetNote;
     private String expectedChildUriAndTitle;
     private String expectedTargetUriAndTitle;
@@ -486,11 +486,11 @@ public class GraphRAGServiceTest {
           makeMe.aNote().titleConstructor("Target Note").details("Target Details").please();
 
       // Create a link between parent and target
-      childNote = makeMe.aLink().between(focusNote, targetNote).please();
-      makeMe.refresh(childNote);
+      reifiedChild = makeMe.aLink().between(focusNote, targetNote).please();
+      makeMe.refresh(reifiedChild);
 
       expectedChildUriAndTitle =
-          "[" + childNote.getTopicConstructor() + "](/n" + childNote.getId() + ")";
+          "[" + reifiedChild.getTopicConstructor() + "](/n" + reifiedChild.getId() + ")";
       expectedTargetUriAndTitle = "[Target Note](/n" + targetNote.getId() + ")";
     }
 
@@ -530,7 +530,7 @@ public class GraphRAGServiceTest {
         expectedRegularChild1UriAndTitle = getUriAndTitle(regularChild1);
         expectedRegularChild2UriAndTitle = getUriAndTitle(regularChild2);
         expectedRegularChild3UriAndTitle = getUriAndTitle(regularChild3);
-        expectedChildUriAndTitle = getUriAndTitle(childNote);
+        expectedChildUriAndTitle = getUriAndTitle(reifiedChild);
         expectedTargetUriAndTitle = getUriAndTitle(targetNote);
       }
 
@@ -584,6 +584,35 @@ public class GraphRAGServiceTest {
         // Verify the reified child object is included
         assertRelatedNotesContain(
             result, RelationshipToFocusNote.ReifiedChildObject, expectedTargetUriAndTitle);
+      }
+
+      @Test
+      void shouldNotIncludeReifiedChildObjectWhenItComesAfterRegularChildrenAndBudgetIsLimited() {
+        // Delete existing reified child
+        makeMe.theNote(reifiedChild).after(regularChild3);
+        makeMe.refresh(focusNote);
+
+        // Set budget to allow only 4 notes
+        GraphRAGResult result = graphRAGService.retrieve(focusNote, 4);
+
+        // Verify related notes
+        List<BareNote> relatedNotes = result.getRelatedNotes();
+        assertThat(relatedNotes, hasSize(4));
+
+        // Verify relationships are all children
+        assertThat(
+            relatedNotes.stream()
+                .map(BareNote::getRelationToFocusNote)
+                .collect(Collectors.toList()),
+            contains(
+                RelationshipToFocusNote.Child,
+                RelationshipToFocusNote.Child,
+                RelationshipToFocusNote.Child,
+                RelationshipToFocusNote.Child));
+
+        // Verify no reified child object is included
+        assertThat(
+            getNotesWithRelationship(result, RelationshipToFocusNote.ReifiedChildObject), empty());
       }
     }
   }

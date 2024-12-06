@@ -12,10 +12,10 @@ public class PriorityLayer {
   private static final int NOTES_BEFORE_NEXT_LAYER = 3;
 
   public PriorityLayer(RelationshipHandler... handlers) {
-    if (handlers.length == 0) {
-      throw new IllegalArgumentException("At least one handler is required");
+    this.handlers = new ArrayList<>();
+    if (handlers != null && handlers.length > 0) {
+      this.handlers.addAll(List.of(handlers));
     }
-    this.handlers = new ArrayList<>(List.of(handlers));
   }
 
   public void handle(GraphRAGResultBuilder builder) {
@@ -72,5 +72,9 @@ public class PriorityLayer {
     }
 
     return anyHandlerProcessed;
+  }
+
+  public void addHandler(RelationshipHandler handler) {
+    handlers.add(handler);
   }
 }
