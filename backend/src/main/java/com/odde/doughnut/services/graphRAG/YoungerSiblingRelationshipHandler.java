@@ -6,6 +6,7 @@ import java.util.List;
 
 public class YoungerSiblingRelationshipHandler extends RelationshipHandler {
   private final GraphRAGService graphRAGService;
+  private int currentSiblingIndex = -1; // -1 means we haven't found focus note index yet
 
   public YoungerSiblingRelationshipHandler(GraphRAGService graphRAGService) {
     this.graphRAGService = graphRAGService;
@@ -15,10 +16,14 @@ public class YoungerSiblingRelationshipHandler extends RelationshipHandler {
   public void handle(Note focusNote, FocusNote focus, List<BareNote> relatedNotes) {
     if (focusNote.getParent() != null) {
       List<Note> siblings = focusNote.getSiblings();
-      int focusIndex = siblings.indexOf(focusNote);
 
-      for (int i = focusIndex + 1; i < siblings.size(); i++) {
-        Note youngerSibling = siblings.get(i);
+      if (currentSiblingIndex == -1) {
+        // First time: find focus note's index
+        currentSiblingIndex = siblings.indexOf(focusNote) + 1;
+      }
+
+      if (currentSiblingIndex < siblings.size()) {
+        Note youngerSibling = siblings.get(currentSiblingIndex);
         BareNote addedNote =
             graphRAGService.addNoteToRelatedNotes(
                 relatedNotes, youngerSibling, RelationshipToFocusNote.YoungerSibling);
@@ -26,8 +31,17 @@ public class YoungerSiblingRelationshipHandler extends RelationshipHandler {
         if (addedNote != null) {
           focus.getYoungerSiblings().add(addedNote.getUriAndTitle());
         }
+
+        currentSiblingIndex++;
+        // Process next sibling before moving to next handler
+        handle(focusNote, focus, relatedNotes);
+      } else {
+        // Reset for next use
+        currentSiblingIndex = -1;
+        handleNext(focusNote, focus, relatedNotes);
       }
+    } else {
+      handleNext(focusNote, focus, relatedNotes);
     }
-    handleNext(focusNote, focus, relatedNotes);
   }
 }
