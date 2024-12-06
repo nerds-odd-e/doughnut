@@ -790,5 +790,63 @@ public class GraphRAGServiceTest {
       // Verify no parent siblings are included
       assertThat(getNotesWithRelationship(result, RelationshipToFocusNote.ParentSibling), empty());
     }
+
+    @Nested
+    class WhenParentSiblingsHaveChildren {
+      private Note parentSibling1Child1;
+      private Note parentSibling1Child2;
+      private Note parentSibling2Child1;
+      private String expectedParentSibling1Child1UriAndTitle;
+      private String expectedParentSibling1Child2UriAndTitle;
+      private String expectedParentSibling2Child1UriAndTitle;
+
+      @BeforeEach
+      void setup() {
+        parentSibling1Child1 =
+            makeMe.aNote().under(parentSibling1).titleConstructor("PS1 Child 1").please();
+        parentSibling1Child2 =
+            makeMe.aNote().under(parentSibling1).titleConstructor("PS1 Child 2").please();
+        parentSibling2Child1 =
+            makeMe.aNote().under(parentSibling2).titleConstructor("PS2 Child 1").please();
+
+        expectedParentSibling1Child1UriAndTitle = getUriAndTitle(parentSibling1Child1);
+        expectedParentSibling1Child2UriAndTitle = getUriAndTitle(parentSibling1Child2);
+        expectedParentSibling2Child1UriAndTitle = getUriAndTitle(parentSibling2Child1);
+      }
+
+      @Test
+      void shouldIncludeParentSiblingChildrenInRelatedNotes() {
+        GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
+
+        // Verify parent sibling children are in related notes
+        assertRelatedNotesContain(
+            result,
+            RelationshipToFocusNote.ParentSiblingChild,
+            expectedParentSibling1Child1UriAndTitle,
+            expectedParentSibling1Child2UriAndTitle,
+            expectedParentSibling2Child1UriAndTitle);
+      }
+
+      @Test
+      void shouldNotIncludeParentSiblingChildrenWhenBudgetIsLimited() {
+        // Set budget to only allow parent, parent siblings, and contextual path
+        GraphRAGResult result = graphRAGService.retrieve(focusNote, 4);
+
+        // Verify only parent, parent siblings, and contextual path are included
+        assertThat(
+            result.getRelatedNotes().stream()
+                .map(BareNote::getRelationToFocusNote)
+                .collect(Collectors.toList()),
+            containsInAnyOrder(
+                RelationshipToFocusNote.Parent,
+                RelationshipToFocusNote.ParentSibling,
+                RelationshipToFocusNote.ParentSibling,
+                RelationshipToFocusNote.NoteInContextualPath));
+
+        // Verify no parent sibling children are included
+        assertThat(
+            getNotesWithRelationship(result, RelationshipToFocusNote.ParentSiblingChild), empty());
+      }
+    }
   }
 }

@@ -11,6 +11,9 @@ public class GraphRAGService {
   }
 
   public GraphRAGResult retrieve(Note focusNote, int tokenBudgetForRelatedNotes) {
+    // Create priority four layer first so we can pass it to ParentSiblingHandler
+    PriorityLayer priorityFourLayer = new PriorityLayer(2);
+
     // Create handlers with the focus note
     ParentRelationshipHandler parentHandler = new ParentRelationshipHandler(focusNote);
     ObjectRelationshipHandler objectHandler = new ObjectRelationshipHandler(focusNote);
@@ -19,7 +22,7 @@ public class GraphRAGService {
     NoteInObjectContextualPathRelationshipHandler objectContextualPathHandler =
         new NoteInObjectContextualPathRelationshipHandler(focusNote);
 
-    // Create priority three layer first so we can pass it to ChildRelationshipHandler
+    // Create priority three layer so we can pass it to ChildRelationshipHandler
     PriorityLayer priorityThreeLayer = new PriorityLayer(2);
 
     ChildRelationshipHandler childrenHandler =
@@ -31,16 +34,15 @@ public class GraphRAGService {
     ReferringNoteRelationshipHandler referringNoteHandler =
         new ReferringNoteRelationshipHandler(focusNote, priorityThreeLayer);
     ParentSiblingRelationshipHandler parentSiblingHandler =
-        new ParentSiblingRelationshipHandler(focusNote);
+        new ParentSiblingRelationshipHandler(focusNote, priorityFourLayer);
 
     // Set up priority layers with number of notes to process before switching
     PriorityLayer priorityOneLayer =
         new PriorityLayer(
-            3, // Process 3 notes before switching to layer 2
-            new RelationshipHandler[] {parentHandler, objectHandler, contextualPathHandler});
+            3, new RelationshipHandler[] {parentHandler, objectHandler, contextualPathHandler});
     PriorityLayer priorityTwoLayer =
         new PriorityLayer(
-            3, // Process 3 notes before switching to layer 3
+            3,
             new RelationshipHandler[] {
               childrenHandler,
               priorSiblingHandler,
@@ -52,6 +54,7 @@ public class GraphRAGService {
 
     priorityOneLayer.setNextLayer(priorityTwoLayer);
     priorityTwoLayer.setNextLayer(priorityThreeLayer);
+    priorityThreeLayer.setNextLayer(priorityFourLayer);
 
     GraphRAGResultBuilder builder =
         new GraphRAGResultBuilder(focusNote, tokenBudgetForRelatedNotes, tokenCountingStrategy);
