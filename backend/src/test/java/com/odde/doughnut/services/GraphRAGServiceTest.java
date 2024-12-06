@@ -4,9 +4,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.services.graphRAG.BareNote;
 import com.odde.doughnut.services.graphRAG.GraphRAGResult;
 import com.odde.doughnut.services.graphRAG.RelationshipToFocusNote;
 import com.odde.doughnut.testability.MakeMe;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -145,6 +148,60 @@ public class GraphRAGServiceTest {
       assertThat(
           result.getRelatedNotes().get(0).getRelationToFocusNote(),
           equalTo(RelationshipToFocusNote.Parent));
+    }
+  }
+
+  @Nested
+  class WhenNoteHasChildren {
+    private Note parent;
+    private Note child1;
+    private Note child2;
+    private String expectedChild1UriAndTitle;
+    private String expectedChild2UriAndTitle;
+
+    @BeforeEach
+    void setup() {
+      parent = makeMe.aNote().titleConstructor("Parent Note").please();
+      child1 =
+          makeMe
+              .aNote()
+              .under(parent)
+              .titleConstructor("Child One")
+              .details("Child 1 Details")
+              .please();
+      child2 =
+          makeMe
+              .aNote()
+              .under(parent)
+              .titleConstructor("Child Two")
+              .details("Child 2 Details")
+              .please();
+      expectedChild1UriAndTitle = "[Child One](/n" + child1.getId() + ")";
+      expectedChild2UriAndTitle = "[Child Two](/n" + child2.getId() + ")";
+    }
+
+    @Test
+    void shouldIncludeChildrenInFocusNoteList() {
+      GraphRAGResult result = graphRAGService.retrieve(parent, 1000);
+
+      assertThat(
+          result.getFocusNote().getChildren(),
+          containsInAnyOrder(expectedChild1UriAndTitle, expectedChild2UriAndTitle));
+    }
+
+    @Test
+    void shouldIncludeChildrenInRelatedNotes() {
+      GraphRAGResult result = graphRAGService.retrieve(parent, 1000);
+
+      List<BareNote> childNotes =
+          result.getRelatedNotes().stream()
+              .filter(n -> n.getRelationToFocusNote() == RelationshipToFocusNote.Child)
+              .collect(Collectors.toList());
+
+      assertThat(childNotes, hasSize(2));
+      assertThat(
+          childNotes.stream().map(BareNote::getUriAndTitle).collect(Collectors.toList()),
+          containsInAnyOrder(expectedChild1UriAndTitle, expectedChild2UriAndTitle));
     }
   }
 }

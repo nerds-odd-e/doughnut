@@ -122,11 +122,11 @@ Most of the relationship types can retrieve the note they need from the focus no
 
 ## Candidate scenarios
 
-- Retrieving Just the Focus Note
-- Retrieving the Focus Note with Its Direct Parent
-- Retrieving the Focus Note having a parent but the budget is not enough for fetching the parent to related_notes
-- Related note details are truncated
-- Retrieving the Focus Note with Its Direct Object
++ Retrieving Just the Focus Note
++ Retrieving the Focus Note with Its Direct Parent
++ Retrieving the Focus Note having a parent but the budget is not enough for fetching the parent to related_notes
++ Related note details are truncated
++ Retrieving the Focus Note with Its Direct Object
 - Retrieving the Focus Note and Its Immediate Children
 - Handling Token Budget Limitations While Fetching a Complex Relationship Graph
 - Prioritizing Relationships by Importance (e.g., Parent and Object Before Siblings or Referrings)

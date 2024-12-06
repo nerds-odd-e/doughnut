@@ -15,7 +15,10 @@ public class GraphRAGService {
     // Set up the chain in priority order
     ParentRelationshipHandler parentHandler = new ParentRelationshipHandler(this);
     ObjectRelationshipHandler objectHandler = new ObjectRelationshipHandler(this);
+    ChildrenRelationshipHandler childrenHandler = new ChildrenRelationshipHandler(this);
+
     parentHandler.setNext(objectHandler);
+    objectHandler.setNext(childrenHandler);
     this.relationshipChain = parentHandler;
   }
 
