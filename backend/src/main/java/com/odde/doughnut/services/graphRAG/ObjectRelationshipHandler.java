@@ -12,11 +12,11 @@ public class ObjectRelationshipHandler extends RelationshipHandler {
   }
 
   @Override
-  public void handle(Note focusNote, FocusNote focus, List<BareNote> relatedNotes, int budget) {
+  public void handle(Note focusNote, FocusNote focus, List<BareNote> relatedNotes) {
     if (focusNote.getTargetNote() != null) {
       graphRAGService.addNoteToRelatedNotes(
-          relatedNotes, focusNote.getTargetNote(), RelationshipToFocusNote.Object, budget);
+          relatedNotes, focusNote.getTargetNote(), RelationshipToFocusNote.Object);
     }
-    handleNext(focusNote, focus, relatedNotes, budget);
+    handleNext(focusNote, focus, relatedNotes);
   }
 }

@@ -10,13 +10,11 @@ public abstract class RelationshipHandler {
     this.next = next;
   }
 
-  public abstract void handle(
-      Note focusNote, FocusNote focus, List<BareNote> relatedNotes, int budget);
+  public abstract void handle(Note focusNote, FocusNote focus, List<BareNote> relatedNotes);
 
-  protected void handleNext(
-      Note focusNote, FocusNote focus, List<BareNote> relatedNotes, int budget) {
+  protected void handleNext(Note focusNote, FocusNote focus, List<BareNote> relatedNotes) {
     if (next != null) {
-      next.handle(focusNote, focus, relatedNotes, budget);
+      next.handle(focusNote, focus, relatedNotes);
     }
   }
 }

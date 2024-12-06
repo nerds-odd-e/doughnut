@@ -12,14 +12,14 @@ public class ParentRelationshipHandler extends RelationshipHandler {
   }
 
   @Override
-  public void handle(Note focusNote, FocusNote focus, List<BareNote> relatedNotes, int budget) {
+  public void handle(Note focusNote, FocusNote focus, List<BareNote> relatedNotes) {
     if (focusNote.getParent() != null) {
       String parentUriAndTitle = focusNote.getParent().getUriAndTitle();
       focus.getContextualPath().add(parentUriAndTitle);
 
       graphRAGService.addNoteToRelatedNotes(
-          relatedNotes, focusNote.getParent(), RelationshipToFocusNote.Parent, budget);
+          relatedNotes, focusNote.getParent(), RelationshipToFocusNote.Parent);
     }
-    handleNext(focusNote, focus, relatedNotes, budget);
+    handleNext(focusNote, focus, relatedNotes);
   }
 }

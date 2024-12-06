@@ -12,7 +12,7 @@ public class YoungerSiblingRelationshipHandler extends RelationshipHandler {
   }
 
   @Override
-  public void handle(Note focusNote, FocusNote focus, List<BareNote> relatedNotes, int budget) {
+  public void handle(Note focusNote, FocusNote focus, List<BareNote> relatedNotes) {
     if (focusNote.getParent() != null) {
       List<Note> siblings = focusNote.getSiblings();
       int focusIndex = siblings.indexOf(focusNote);
@@ -21,14 +21,13 @@ public class YoungerSiblingRelationshipHandler extends RelationshipHandler {
         Note youngerSibling = siblings.get(i);
         BareNote addedNote =
             graphRAGService.addNoteToRelatedNotes(
-                relatedNotes, youngerSibling, RelationshipToFocusNote.YoungerSibling, budget);
+                relatedNotes, youngerSibling, RelationshipToFocusNote.YoungerSibling);
 
         if (addedNote != null) {
           focus.getYoungerSiblings().add(addedNote.getUriAndTitle());
-          budget -= addedNote.getDetails().length() / GraphRAGService.CHARACTERS_PER_TOKEN;
         }
       }
     }
-    handleNext(focusNote, focus, relatedNotes, budget);
+    handleNext(focusNote, focus, relatedNotes);
   }
 }

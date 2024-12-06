@@ -10,6 +10,7 @@ public class GraphRAGService {
   public static final double CHARACTERS_PER_TOKEN = 3.75;
 
   private final RelationshipHandler relationshipChain;
+  private int remainingBudget;
 
   public GraphRAGService() {
     // Set up the chain in priority order
@@ -35,22 +36,24 @@ public class GraphRAGService {
   }
 
   public BareNote addNoteToRelatedNotes(
-      List<BareNote> relatedNotes, Note note, RelationshipToFocusNote relationship, int budget) {
+      List<BareNote> relatedNotes, Note note, RelationshipToFocusNote relationship) {
     int tokens = estimateTokens(note);
-    if (tokens <= budget) {
+    if (tokens <= remainingBudget) {
       BareNote bareNote = BareNote.fromNote(note, relationship);
       relatedNotes.add(bareNote);
+      remainingBudget -= tokens;
       return bareNote;
     }
     return null;
   }
 
   public GraphRAGResult retrieve(Note focusNote, int tokenBudgetForRelatedNotes) {
+    remainingBudget = tokenBudgetForRelatedNotes;
     GraphRAGResult result = new GraphRAGResult();
     FocusNote focus = FocusNote.fromNote(focusNote);
     List<BareNote> relatedNotes = new ArrayList<>();
 
-    relationshipChain.handle(focusNote, focus, relatedNotes, tokenBudgetForRelatedNotes);
+    relationshipChain.handle(focusNote, focus, relatedNotes);
 
     result.setFocusNote(focus);
     result.setRelatedNotes(relatedNotes);
