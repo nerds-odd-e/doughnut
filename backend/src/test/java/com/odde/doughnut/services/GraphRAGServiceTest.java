@@ -505,47 +505,86 @@ public class GraphRAGServiceTest {
       assertThat(result.getFocusNote().getChildren(), contains(expectedChildUriAndTitle));
     }
 
-    @Test
-    void shouldAlternateBetweenPriorityLevelsWhenBudgetIsLimited() {
-      // Add three regular children
-      Note regularChild1 =
-          makeMe.aNote().under(focusNote).titleConstructor("Regular Child 1").please();
-      Note regularChild2 =
-          makeMe.aNote().under(focusNote).titleConstructor("Regular Child 2").please();
-      Note regularChild3 =
-          makeMe.aNote().under(focusNote).titleConstructor("Regular Child 3").please();
+    @Nested
+    class WhenHasMultipleRegularChildren {
+      private Note regularChild1;
+      private Note regularChild2;
+      private Note regularChild3;
+      private String expectedRegularChild1UriAndTitle;
+      private String expectedRegularChild2UriAndTitle;
+      private String expectedRegularChild3UriAndTitle;
+      private String expectedChildUriAndTitle;
+      private String expectedTargetUriAndTitle;
 
-      makeMe.refresh(focusNote);
-      String expectedRegularChild1UriAndTitle = getUriAndTitle(regularChild1);
-      String expectedRegularChild2UriAndTitle = getUriAndTitle(regularChild2);
+      @BeforeEach
+      void setup() {
+        // Add three regular children
+        regularChild1 =
+            makeMe.aNote().under(focusNote).titleConstructor("Regular Child 1").please();
+        regularChild2 =
+            makeMe.aNote().under(focusNote).titleConstructor("Regular Child 2").please();
+        regularChild3 =
+            makeMe.aNote().under(focusNote).titleConstructor("Regular Child 3").please();
 
-      // Set budget to allow only 4 notes
-      GraphRAGResult result = graphRAGService.retrieve(focusNote, 4);
+        makeMe.refresh(focusNote);
+        expectedRegularChild1UriAndTitle = getUriAndTitle(regularChild1);
+        expectedRegularChild2UriAndTitle = getUriAndTitle(regularChild2);
+        expectedRegularChild3UriAndTitle = getUriAndTitle(regularChild3);
+        expectedChildUriAndTitle = getUriAndTitle(childNote);
+        expectedTargetUriAndTitle = getUriAndTitle(targetNote);
+      }
 
-      // Verify related notes
-      List<BareNote> relatedNotes = result.getRelatedNotes();
-      assertThat(relatedNotes, hasSize(4));
+      @Test
+      void shouldAlternateBetweenPriorityLevelsWhenBudgetIsLimited() {
+        // Set budget to allow only 4 notes
+        GraphRAGResult result = graphRAGService.retrieve(focusNote, 4);
 
-      // Should have three children
-      assertThat(
-          result.getFocusNote().getChildren(),
-          containsInAnyOrder(
-              expectedRegularChild1UriAndTitle,
-              expectedRegularChild2UriAndTitle,
-              expectedChildUriAndTitle));
+        // Verify related notes
+        List<BareNote> relatedNotes = result.getRelatedNotes();
+        assertThat(relatedNotes, hasSize(4));
 
-      // Verify relationships in order
-      assertThat(
-          relatedNotes.stream().map(BareNote::getRelationToFocusNote).collect(Collectors.toList()),
-          contains(
-              RelationshipToFocusNote.Child,
-              RelationshipToFocusNote.Child,
-              RelationshipToFocusNote.Child,
-              RelationshipToFocusNote.ReifiedChildObject));
+        // Should have three children
+        assertThat(
+            result.getFocusNote().getChildren(),
+            containsInAnyOrder(
+                expectedRegularChild1UriAndTitle,
+                expectedRegularChild2UriAndTitle,
+                expectedChildUriAndTitle));
 
-      // Verify the reified child object is included
-      assertRelatedNotesContain(
-          result, RelationshipToFocusNote.ReifiedChildObject, expectedTargetUriAndTitle);
+        // Verify relationships in order
+        assertThat(
+            relatedNotes.stream()
+                .map(BareNote::getRelationToFocusNote)
+                .collect(Collectors.toList()),
+            contains(
+                RelationshipToFocusNote.Child,
+                RelationshipToFocusNote.Child,
+                RelationshipToFocusNote.Child,
+                RelationshipToFocusNote.ReifiedChildObject));
+
+        // Verify the reified child object is included
+        assertRelatedNotesContain(
+            result, RelationshipToFocusNote.ReifiedChildObject, expectedTargetUriAndTitle);
+      }
+
+      @Test
+      void shouldIncludeAllChildrenWhenBudgetIsEnough() {
+        // Set budget to allow all notes
+        GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
+
+        // Verify related notes include all children and the reified child object
+        assertThat(
+            result.getFocusNote().getChildren(),
+            containsInAnyOrder(
+                expectedRegularChild1UriAndTitle,
+                expectedRegularChild2UriAndTitle,
+                expectedRegularChild3UriAndTitle,
+                expectedChildUriAndTitle));
+
+        // Verify the reified child object is included
+        assertRelatedNotesContain(
+            result, RelationshipToFocusNote.ReifiedChildObject, expectedTargetUriAndTitle);
+      }
     }
   }
 }
