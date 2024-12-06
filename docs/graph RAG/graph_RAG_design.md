@@ -119,3 +119,35 @@ Most of the relationship types can retrieve the note they need from the focus no
 - **Factory Method**: Simplify and centralize the creation of retrieval strategies, allowing easy addition of new relationship types.
 - **Chain of Responsibility/Iterator**: Manage the iteration across priorities and relationship types dynamically and flexibly.
 - **Observer Pattern**: Handle dynamic updates to the `FocusNote` and notify other components when relationships change.
+
+## Candidate scenarios
+
+- Retrieving Just the Focus Note
+- Retrieving the Focus Note with Its Direct Parent
+- Retrieving the Focus Note having a parent but the budget is not enough for fetching the parent to related_notes
+- Retrieving the Focus Note with Its Direct Object
+- Retrieving the Focus Note and Its Immediate Children
+- Handling Token Budget Limitations While Fetching a Complex Relationship Graph
+- Prioritizing Relationships by Importance (e.g., Parent and Object Before Siblings or Referrings)
+- Adjusting Note Details (Truncated vs Full) to Stay Within Budget
+- Retrieving the Focus Note and Its Immediate Siblings (Prior and Younger)
+- Retrieving the Focus Note with Its Referring Notes
+- Dropping Lower-Priority Notes to Include Higher-Priority Notes Within Budget
+- Exhausting Budget Before All Relationships Are Retrieved
+- Retrieving the Focus Note with Its Contextual Path
+- Retrieving the Focus Note with Its Object’s Contextual Path
+- Fetching a Minimal Subset of Relationships When the Budget Is Very Small
+- Retrieving the Focus Note and a Few Prioritized Related Notes (Based on Token Budget)
+- Splitting Retrieval Across Multiple Requests to Respect Budget
+- Retrieving the Focus Note and Reified Child Objects
+- Retrieving the Focus Note and Parent Siblings
+- Retrieving the Focus Note and Object Parent Siblings
+- Retrieving the Focus Note with Parent Sibling Children
+- Retrieving the Focus Note with Object Parent Sibling Children
+- Retrieving the Focus Note with Notes in the Referring Contextual Path
+- Retrieving the Focus Note with Referring Cousins
+- Dynamically Rebalancing Retrieval Strategy When New Relationships Are Discovered Mid-Retrieval
+- Combining Multiple Relationship Types in a Single Retrieval (Parent, Object, Children, Siblings, Referrings)
+- Dynamically Discovering and Fetching Newly Introduced Relationship Types During Retrieval
+- Reporting Budget Overruns and Skipped Notes Due to Insufficient Budget
+- Continuously Updating the Focus Note’s Lists (Siblings, Children) as New Notes Are Retrieved
