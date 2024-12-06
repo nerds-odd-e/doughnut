@@ -132,5 +132,19 @@ public class GraphRAGServiceTest {
               .getUriAndTitle(),
           equalTo(expectedTargetUriAndTitle));
     }
+
+    @Test
+    void shouldKeepObjectInFocusNoteEvenWhenBudgetOnlyAllowsParent() {
+      GraphRAGResult result = graphRAGService.retrieve(note, 6); // Only enough for parent
+
+      // Object URI should still be in focus note
+      assertThat(result.getFocusNote().getObjectUriAndTitle(), equalTo(expectedTargetUriAndTitle));
+
+      // Only parent should be in related notes
+      assertThat(result.getRelatedNotes(), hasSize(1));
+      assertThat(
+          result.getRelatedNotes().get(0).getRelationToFocusNote(),
+          equalTo(RelationshipToFocusNote.Parent));
+    }
   }
 }
