@@ -37,4 +37,15 @@ public class GraphRAGServiceTest {
     assertThat(result.getFocusNote().getObjectUriAndTitle(), nullValue());
     assertThat(result.getRelatedNotes(), empty());
   }
+
+  @Test
+  void shouldNotTruncateFocusNoteDetailsEvenIfItIsVeryLong() {
+    String longDetails = "a".repeat(2000);
+    Note note = makeMe.aNote().titleConstructor("Test Note").details(longDetails).please();
+
+    GraphRAGResult result = graphRAGService.retrieve(note, 0);
+
+    assertThat(result.getFocusNote().getDetails(), equalTo(longDetails));
+    assertThat(result.getFocusNote().getDetails().length(), equalTo(2000));
+  }
 }
