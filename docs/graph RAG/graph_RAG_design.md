@@ -130,16 +130,11 @@ Most of the relationship types can retrieve the note they need from the focus no
 + Retrieving the Focus Note and Its Immediate Children
 + Handling Token Budget Limitations While Fetching a Complex Relationship Graph
 - Prioritizing Relationships by Importance (e.g., Parent and Object Before Siblings or Referrings)
-- Retrieving the Focus Note and Its Immediate Siblings (Prior and Younger)
++ Retrieving the Focus Note and Its Immediate Siblings (Prior and Younger)
 - Retrieving the Focus Note with Its Referring Notes
-- Dropping Lower-Priority Notes to Include Higher-Priority Notes Within Budget
-- Exhausting Budget Before All Relationships Are Retrieved
-- Retrieving the Focus Note with Its Contextual Path
-- Retrieving the Focus Note with Its Object’s Contextual Path
-- Fetching a Minimal Subset of Relationships When the Budget Is Very Small
-- Retrieving the Focus Note and a Few Prioritized Related Notes (Based on Token Budget)
-- Splitting Retrieval Across Multiple Requests to Respect Budget
-- Retrieving the Focus Note and Reified Child Objects
++ Retrieving the Focus Note with Its Contextual Path
++ Retrieving the Focus Note with Its Object’s Contextual Path
++ Retrieving the Focus Note and Reified Child Objects
 - Retrieving the Focus Note and Parent Siblings
 - Retrieving the Focus Note and Object Parent Siblings
 - Retrieving the Focus Note with Parent Sibling Children
