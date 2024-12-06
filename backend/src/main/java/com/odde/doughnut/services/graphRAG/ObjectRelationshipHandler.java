@@ -6,16 +6,22 @@ import java.util.List;
 
 public class ObjectRelationshipHandler extends RelationshipHandler {
   private final GraphRAGService graphRAGService;
+  private boolean exhausted = false;
 
   public ObjectRelationshipHandler(GraphRAGService graphRAGService) {
     this.graphRAGService = graphRAGService;
   }
 
   @Override
-  public void handle(Note focusNote, FocusNote focus, List<BareNote> relatedNotes) {
+  public BareNote handle(Note focusNote, FocusNote focus, List<BareNote> relatedNotes) {
+    if (exhausted) {
+      return null;
+    }
+    exhausted = true;
     if (focusNote.getTargetNote() != null) {
-      graphRAGService.addNoteToRelatedNotes(
+      return graphRAGService.addNoteToRelatedNotes(
           relatedNotes, focusNote.getTargetNote(), RelationshipToFocusNote.Object);
     }
+    return null;
   }
 }

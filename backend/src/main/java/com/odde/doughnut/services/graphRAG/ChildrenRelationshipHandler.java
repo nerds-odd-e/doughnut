@@ -7,13 +7,17 @@ import java.util.List;
 public class ChildrenRelationshipHandler extends RelationshipHandler {
   private final GraphRAGService graphRAGService;
   private int currentChildIndex = 0;
+  private boolean exhausted = false;
 
   public ChildrenRelationshipHandler(GraphRAGService graphRAGService) {
     this.graphRAGService = graphRAGService;
   }
 
   @Override
-  public void handle(Note focusNote, FocusNote focus, List<BareNote> relatedNotes) {
+  public BareNote handle(Note focusNote, FocusNote focus, List<BareNote> relatedNotes) {
+    if (exhausted) {
+      return null;
+    }
     List<Note> children = focusNote.getChildren();
 
     if (currentChildIndex < children.size()) {
@@ -28,7 +32,8 @@ public class ChildrenRelationshipHandler extends RelationshipHandler {
       currentChildIndex++;
       handle(focusNote, focus, relatedNotes);
     } else {
-      currentChildIndex = 0;
+      exhausted = true;
     }
+    return null;
   }
 }
