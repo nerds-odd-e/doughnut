@@ -20,25 +20,25 @@ public class PriorityLayer {
   }
 
   public void handle(Note focusNote, FocusNote focus, List<BareNote> relatedNotes) {
-    // Handle each handler in this layer
-    for (RelationshipHandler handler : handlers) {
-      BareNote result;
-      do {
+    boolean anyHandlerActive;
+
+    do {
+      anyHandlerActive = false;
+      // Try each handler once in round-robin fashion
+      for (RelationshipHandler handler : handlers) {
         Note relatedNote = handler.handle(focusNote);
 
-        if (relatedNote == null) {
-          break;
+        if (relatedNote != null) {
+          anyHandlerActive = true;
+          BareNote result =
+              graphRAGService.addNoteToRelatedNotes(
+                  relatedNotes, relatedNote, handler.getRelationshipToFocusNote());
+          if (result != null) {
+            handler.afterHandledSuccessfully(focus, result);
+          }
         }
-        result =
-            graphRAGService.addNoteToRelatedNotes(
-                relatedNotes, relatedNote, handler.getRelationshipToFocusNote());
-        if (result != null) {
-          handler.afterHandledSuccessfully(focus, result);
-        } else {
-          break;
-        }
-      } while (true);
-    }
+      }
+    } while (anyHandlerActive);
 
     // Move to next layer if exists
     if (nextLayer != null) {

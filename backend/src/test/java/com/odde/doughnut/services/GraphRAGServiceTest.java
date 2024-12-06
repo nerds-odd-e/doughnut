@@ -278,5 +278,56 @@ public class GraphRAGServiceTest {
           siblingNotes.stream().map(BareNote::getUriAndTitle).collect(Collectors.toList()),
           contains(expectedYoungerSibling1UriAndTitle, expectedYoungerSibling2UriAndTitle));
     }
+
+    @Nested
+    class AndAlsoHasChildren {
+      private Note child1;
+      private Note child2;
+      private String expectedChild1UriAndTitle;
+
+      @BeforeEach
+      void setup() {
+        child1 =
+            makeMe
+                .aNote()
+                .under(focusNote)
+                .titleConstructor("Child One")
+                .details("Child 1 Details")
+                .please();
+        child2 =
+            makeMe
+                .aNote()
+                .under(focusNote)
+                .titleConstructor("Child Two")
+                .details("Child 2 Details")
+                .please();
+        expectedChild1UriAndTitle = "[Child One](/n" + child1.getId() + ")";
+      }
+
+      @Test
+      void shouldAlternateBetweenChildrenAndYoungerSiblingsWhenBudgetIsLimited() {
+        // Set budget to only allow two notes
+        GraphRAGResult result = graphRAGService.retrieve(focusNote, 21);
+
+        // Verify in related notes
+        List<BareNote> relatedNotes = result.getRelatedNotes();
+        assertThat(relatedNotes, hasSize(3));
+
+        // Should have one child and one younger sibling
+        assertThat(result.getFocusNote().getChildren(), contains(expectedChild1UriAndTitle));
+        assertThat(
+            result.getFocusNote().getYoungerSiblings(),
+            contains(expectedYoungerSibling1UriAndTitle));
+
+        assertThat(
+            relatedNotes.stream()
+                .map(BareNote::getRelationToFocusNote)
+                .collect(Collectors.toList()),
+            containsInAnyOrder(
+                RelationshipToFocusNote.Parent,
+                RelationshipToFocusNote.Child,
+                RelationshipToFocusNote.YoungerSibling));
+      }
+    }
   }
 }
