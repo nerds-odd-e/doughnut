@@ -125,6 +125,11 @@ public class Note extends EntityIdentifiedByIdOnly {
   @Embedded @JsonIgnore @Getter private RecallSetting recallSetting = new RecallSetting();
 
   @JsonIgnore
+  public String getUriAndTitle() {
+    return String.format("[%s](%s)", getTopicConstructor(), getUri());
+  }
+
+  @JsonIgnore
   public List<Note> getChildren() {
     return filterDeletedUnmodifiableNoteList(children);
   }
