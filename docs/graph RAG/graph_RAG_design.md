@@ -37,7 +37,7 @@ It might be different from how the Doughnut internal data structure is organized
 
 *	Priority 0: FocusNote.
 *	Priority 1: Parent, Object, ContextualPath, ObjectContextualPath.
-*	Priority 2: Child, ReifiedChild, PriorSibling, YoungerSibling, ReferringNote.
+*	Priority 2: Child, PriorSibling, YoungerSibling, ReferringNote.
 *	Priority 3: ReifiedChildObject, ParentSibling, ObjectParentSibling, ReferringSubject.
 *	Priority 4: ParentSiblingChild, ObjectParentSiblingChild, ReferringPath, ReferringCousins, DistantObjectLinks.
 

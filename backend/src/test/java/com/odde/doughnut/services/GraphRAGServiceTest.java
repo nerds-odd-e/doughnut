@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.*;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.graphRAG.GraphRAGResult;
-import com.odde.doughnut.services.impl.GraphRAGServiceImpl;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
@@ -20,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class GraphRAGServiceTest {
   @Autowired private MakeMe makeMe;
 
-  @Autowired private GraphRAGServiceImpl graphRAGService;
+  @Autowired private GraphRAGService graphRAGService;
 
   private String generateLongDetails(int length) {
     StringBuilder sb = new StringBuilder();
@@ -81,8 +80,7 @@ public class GraphRAGServiceTest {
     assertThat(
         result.relatedNotes.get(1).detailsTruncated,
         equalTo(
-            longObjectDetails.substring(
-                0, GraphRAGServiceImpl.RELATED_NOTE_DETAILS_TRUNCATE_LENGTH)));
+            longObjectDetails.substring(0, GraphRAGService.RELATED_NOTE_DETAILS_TRUNCATE_LENGTH)));
   }
 
   @Test
