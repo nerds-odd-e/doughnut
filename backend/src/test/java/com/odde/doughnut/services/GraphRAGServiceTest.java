@@ -375,15 +375,19 @@ public class GraphRAGServiceTest {
     }
 
     @Test
-    void shouldIncludeAncestorsInContextualPathAndRelatedNotes() {
+    void shouldIncludeAncestorsInContextualPathInOrder() {
       GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
 
       // Should be in contextual path in order from root to parent
-      //      assertThat(
-      //          result.getFocusNote().getContextualPath(),
-      //          contains(expectedGrandParentUriAndTitle, expectedParentUriAndTitle));
+      assertThat(
+          result.getFocusNote().getContextualPath(),
+          contains(expectedGrandParentUriAndTitle, expectedParentUriAndTitle));
+    }
 
-      // Should be in related notes
+    @Test
+    void shouldIncludeNonParentAncestorsInRelatedNotes() {
+      GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
+
       List<BareNote> contextualNotes =
           result.getRelatedNotes().stream()
               .filter(

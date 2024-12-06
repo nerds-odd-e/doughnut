@@ -5,23 +5,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ContextualPathRelationshipHandler extends RelationshipHandler {
-  private List<Note> ancestors;
+  private final List<Note> ancestors;
   private int currentIndex = 0;
 
   public ContextualPathRelationshipHandler(Note relatingNote) {
     super(RelationshipToFocusNote.NoteInContextualPath, relatingNote);
+    ancestors = new ArrayList<>(relatingNote.getAncestors());
   }
 
   @Override
   public Note handle() {
-    if (ancestors == null) {
-      ancestors = new ArrayList<>(relatingNote.getAncestors());
-      // Remove immediate parent as it's handled by ParentRelationshipHandler
-      if (!ancestors.isEmpty()) {
-        ancestors.remove(ancestors.size() - 1);
-      }
-    }
-
     if (currentIndex < ancestors.size()) {
       return ancestors.get(currentIndex++);
     }
@@ -31,7 +24,6 @@ public class ContextualPathRelationshipHandler extends RelationshipHandler {
 
   @Override
   public void afterHandledSuccessfully(FocusNote focus, BareNote addedNote) {
-    // Add to beginning since we're processing from root to parent
-    focus.getContextualPath().add(0, addedNote.getUriAndTitle());
+    focus.getContextualPath().add(addedNote.getUriAndTitle());
   }
 }
