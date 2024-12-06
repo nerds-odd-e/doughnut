@@ -45,6 +45,15 @@ public class GraphRAGService {
           tokenBudgetForRelatedNotes);
     }
 
+    // Add target/object note if exists
+    if (focusNote.getTargetNote() != null) {
+      addNoteToRelatedNotes(
+          relatedNotes,
+          focusNote.getTargetNote(),
+          RelationshipToFocusNote.Object,
+          tokenBudgetForRelatedNotes);
+    }
+
     result.setFocusNote(focus);
     result.setRelatedNotes(relatedNotes);
     return result;

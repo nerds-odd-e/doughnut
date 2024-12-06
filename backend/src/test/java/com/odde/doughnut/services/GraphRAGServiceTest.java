@@ -96,4 +96,41 @@ public class GraphRAGServiceTest {
           equalTo("a".repeat(GraphRAGService.RELATED_NOTE_DETAILS_TRUNCATE_LENGTH) + "..."));
     }
   }
+
+  @Nested
+  class WhenNoteHasObject {
+    private Note parent;
+    private Note target;
+    private Note note;
+    private String expectedTargetUriAndTitle;
+
+    @BeforeEach
+    void setup() {
+      parent = makeMe.aNote().titleConstructor("Parent Note").please();
+      target = makeMe.aNote().titleConstructor("Target Note").details("Target Details").please();
+      note = makeMe.aLink().between(parent, target).please();
+      expectedTargetUriAndTitle = "[Target Note](/n" + target.getId() + ")";
+    }
+
+    @Test
+    void shouldIncludeObjectInFocusNote() {
+      GraphRAGResult result = graphRAGService.retrieve(note, 1000);
+
+      assertThat(result.getFocusNote().getObjectUriAndTitle(), equalTo(expectedTargetUriAndTitle));
+    }
+
+    @Test
+    void shouldIncludeObjectInRelatedNotes() {
+      GraphRAGResult result = graphRAGService.retrieve(note, 1000);
+
+      assertThat(result.getRelatedNotes(), hasSize(2));
+      assertThat(
+          result.getRelatedNotes().stream()
+              .filter(n -> n.getRelationToFocusNote() == RelationshipToFocusNote.Object)
+              .findFirst()
+              .get()
+              .getUriAndTitle(),
+          equalTo(expectedTargetUriAndTitle));
+    }
+  }
 }
