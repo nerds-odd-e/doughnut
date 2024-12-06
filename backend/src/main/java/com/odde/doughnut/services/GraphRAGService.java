@@ -9,21 +9,23 @@ public class GraphRAGService {
   public static final int RELATED_NOTE_DETAILS_TRUNCATE_LENGTH = 500;
   public static final double CHARACTERS_PER_TOKEN = 3.75;
 
-  private final RelationshipHandler relationshipChain;
+  private final PriorityLayer firstPriorityLayer;
   private int remainingBudget;
 
   public GraphRAGService() {
-    // Set up the chain in priority order
+    // Create handlers
     ParentRelationshipHandler parentHandler = new ParentRelationshipHandler(this);
     ObjectRelationshipHandler objectHandler = new ObjectRelationshipHandler(this);
     ChildrenRelationshipHandler childrenHandler = new ChildrenRelationshipHandler(this);
     YoungerSiblingRelationshipHandler youngerSiblingHandler =
         new YoungerSiblingRelationshipHandler(this);
 
-    parentHandler.setNext(objectHandler);
-    objectHandler.setNext(childrenHandler);
-    childrenHandler.setNext(youngerSiblingHandler);
-    this.relationshipChain = parentHandler;
+    // Set up priority layers
+    PriorityLayer priorityOneLayer = new PriorityLayer(parentHandler, objectHandler);
+    PriorityLayer priorityTwoLayer = new PriorityLayer(childrenHandler, youngerSiblingHandler);
+
+    priorityOneLayer.setNextLayer(priorityTwoLayer);
+    this.firstPriorityLayer = priorityOneLayer;
   }
 
   private int estimateTokens(Note note) {
@@ -53,7 +55,7 @@ public class GraphRAGService {
     FocusNote focus = FocusNote.fromNote(focusNote);
     List<BareNote> relatedNotes = new ArrayList<>();
 
-    relationshipChain.handle(focusNote, focus, relatedNotes);
+    firstPriorityLayer.handle(focusNote, focus, relatedNotes);
 
     result.setFocusNote(focus);
     result.setRelatedNotes(relatedNotes);
