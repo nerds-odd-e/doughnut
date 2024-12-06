@@ -48,6 +48,9 @@ public class GraphRAGServiceTest {
 
     GraphRAGResult result = graphRAGService.retrieve(note, 1000);
 
+    assertThat(
+        result.getFocusNote().getParentUriAndTitle(),
+        equalTo("[Parent Note](/n" + parent.getId() + ")"));
     assertThat(result.getFocusNote().getContextualPath(), hasSize(1));
     assertThat(
         result.getFocusNote().getContextualPath().get(0),
