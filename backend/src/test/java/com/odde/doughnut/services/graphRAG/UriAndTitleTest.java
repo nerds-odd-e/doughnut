@@ -12,12 +12,6 @@ import org.junit.jupiter.api.Test;
 class UriAndTitleTest {
 
   @Test
-  void shouldCreateMarkdownLinkFromTitleAndUri() {
-    UriAndTitle uriAndTitle = new UriAndTitle("Test Title", "/test/uri");
-    assertThat(uriAndTitle.toString(), equalTo("[Test Title](/test/uri)"));
-  }
-
-  @Test
   void shouldCreateMarkdownLinkFromNote() {
     Note note = mock(Note.class);
     when(note.getTopicConstructor()).thenReturn("Test Note");
@@ -29,18 +23,24 @@ class UriAndTitleTest {
 
   @Test
   void shouldSerializeToMarkdownLinkString() throws Exception {
-    UriAndTitle uriAndTitle = new UriAndTitle("Test Title", "/test/uri");
+    Note note = mock(Note.class);
+    when(note.getTopicConstructor()).thenReturn("Test Note");
+    when(note.getId()).thenReturn(123);
+
+    UriAndTitle uriAndTitle = UriAndTitle.fromNote(note);
     ObjectMapper mapper = new ObjectMapper();
 
     String json = mapper.writeValueAsString(uriAndTitle);
-    assertThat(json, equalTo("\"[Test Title](/test/uri)\""));
+    assertThat(json, equalTo("\"[Test Note](/n123)\""));
   }
 
   @Test
-  void shouldTreatSameMarkdownLinkAsEqual() {
-    UriAndTitle link1 = new UriAndTitle("Test", "/uri");
-    UriAndTitle link2 = new UriAndTitle("Test", "/uri");
-    UriAndTitle link3 = new UriAndTitle("Different", "/uri");
+  void shouldTreatSameNoteAsEqual() {
+    Note note = mock(Note.class);
+    UriAndTitle link1 = UriAndTitle.fromNote(note);
+    UriAndTitle link2 = UriAndTitle.fromNote(note);
+    Note differentNote = mock(Note.class);
+    UriAndTitle link3 = UriAndTitle.fromNote(differentNote);
 
     assertThat(link1, equalTo(link2));
     assertThat(link1.hashCode(), equalTo(link2.hashCode()));

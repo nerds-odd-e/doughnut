@@ -6,19 +6,19 @@ import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode
 public class UriAndTitle {
-  private final String markdownLink;
+  private final Note note;
 
-  public UriAndTitle(String title, String uri) {
-    this.markdownLink = String.format("[%s](%s)", title, uri);
+  private UriAndTitle(Note note) {
+    this.note = note;
   }
 
   @JsonValue
   @Override
   public String toString() {
-    return markdownLink;
+    return String.format("[%s](%s)", note.getTopicConstructor(), "/n" + note.getId());
   }
 
   public static UriAndTitle fromNote(Note note) {
-    return new UriAndTitle(note.getTopicConstructor(), "/n" + note.getId());
+    return new UriAndTitle(note);
   }
 }
