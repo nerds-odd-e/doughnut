@@ -22,7 +22,7 @@ public class GraphRAGService {
     this.relationshipChain = parentHandler;
   }
 
-  private int estimateTokens(Note note) {
+  public int estimateTokens(Note note) {
     int detailsLength =
         note.getDetails() != null
             ? Math.min(note.getDetails().length(), RELATED_NOTE_DETAILS_TRUNCATE_LENGTH)

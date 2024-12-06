@@ -203,5 +203,26 @@ public class GraphRAGServiceTest {
           childNotes.stream().map(BareNote::getUriAndTitle).collect(Collectors.toList()),
           containsInAnyOrder(expectedChild1UriAndTitle, expectedChild2UriAndTitle));
     }
+
+    @Test
+    void shouldOnlyIncludeChildrenThatFitInBudget() {
+      // Make child2's details longer so it won't fit in the small budget
+      child2.setDetails("a".repeat(1000));
+
+      // Set budget to only allow one child
+      GraphRAGResult result = graphRAGService.retrieve(parent, 10);
+
+      // Only child1 should be in focus note's children list
+      assertThat(result.getFocusNote().getChildren(), contains(expectedChild1UriAndTitle));
+
+      // Only child1 should be in related notes
+      List<BareNote> childNotes =
+          result.getRelatedNotes().stream()
+              .filter(n -> n.getRelationToFocusNote() == RelationshipToFocusNote.Child)
+              .collect(Collectors.toList());
+
+      assertThat(childNotes, hasSize(1));
+      assertThat(childNotes.get(0).getUriAndTitle(), equalTo(expectedChild1UriAndTitle));
+    }
   }
 }
