@@ -16,6 +16,8 @@ public class GraphRAGService {
     ObjectRelationshipHandler objectHandler = new ObjectRelationshipHandler(focusNote);
     ContextualPathRelationshipHandler contextualPathHandler =
         new ContextualPathRelationshipHandler(focusNote);
+    NoteInObjectContextualPathRelationshipHandler objectContextualPathHandler =
+        new NoteInObjectContextualPathRelationshipHandler(focusNote);
 
     // Create priority three layer first so we can pass it to ChildRelationshipHandler
     PriorityLayer priorityThreeLayer = new PriorityLayer(2);
@@ -38,7 +40,11 @@ public class GraphRAGService {
         new PriorityLayer(
             3, // Process 3 notes before switching to layer 3
             new RelationshipHandler[] {
-              childrenHandler, priorSiblingHandler, youngerSiblingHandler, referringNoteHandler
+              childrenHandler,
+              priorSiblingHandler,
+              youngerSiblingHandler,
+              referringNoteHandler,
+              objectContextualPathHandler
             });
 
     priorityOneLayer.setNextLayer(priorityTwoLayer);

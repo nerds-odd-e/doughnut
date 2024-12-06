@@ -185,7 +185,57 @@ public class GraphRAGServiceTest {
           result.getFocusNote().getChildren(), contains("[Target Note](/n" + target.getId() + ")"));
 
       // But should appear only once in related notes
-      assertThat(result.getRelatedNotes(), hasSize(2)); // parent and child/object
+      assertThat(result.getRelatedNotes(), hasSize(3)); // parent and child/object
+    }
+
+    @Nested
+    class WhenObjectHasContextualPath {
+      private Note objectGrandParent;
+      private Note objectParent;
+      private String expectedObjectGrandParentUriAndTitle;
+      private String expectedObjectParentUriAndTitle;
+
+      @BeforeEach
+      void setup() {
+        objectGrandParent = makeMe.aNote().titleConstructor("Object Grand Parent").please();
+        objectParent =
+            makeMe.aNote().under(objectGrandParent).titleConstructor("Object Parent").please();
+        makeMe.theNote(target).under(objectParent).please();
+        makeMe.refresh(target);
+
+        expectedObjectGrandParentUriAndTitle = getUriAndTitle(objectGrandParent);
+        expectedObjectParentUriAndTitle = getUriAndTitle(objectParent);
+      }
+
+      @Test
+      void shouldIncludeObjectContextualPathInRelatedNotes() {
+        GraphRAGResult result = graphRAGService.retrieve(note, 1000);
+
+        // Verify object's contextual path notes are in related notes
+        assertRelatedNotesContain(
+            result,
+            RelationshipToFocusNote.NoteInObjectContextualPath,
+            expectedObjectGrandParentUriAndTitle,
+            expectedObjectParentUriAndTitle);
+      }
+
+      @Test
+      void shouldNotIncludeObjectContextualPathWhenBudgetIsLimited() {
+        // Set budget to only allow object
+        GraphRAGResult result = graphRAGService.retrieve(note, 2);
+
+        // Verify object is included but not its contextual path
+        assertThat(
+            result.getRelatedNotes().stream()
+                .map(BareNote::getRelationToFocusNote)
+                .collect(Collectors.toList()),
+            contains(RelationshipToFocusNote.Parent, RelationshipToFocusNote.Object));
+
+        // Verify no object contextual path notes are included
+        assertThat(
+            getNotesWithRelationship(result, RelationshipToFocusNote.NoteInObjectContextualPath),
+            empty());
+      }
     }
   }
 
