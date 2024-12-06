@@ -14,11 +14,11 @@ public class GraphRAGService {
 
   public GraphRAGService() {
     // Create handlers
-    ParentRelationshipHandler parentHandler = new ParentRelationshipHandler(this);
-    ObjectRelationshipHandler objectHandler = new ObjectRelationshipHandler(this);
-    ChildRelationshipHandler childrenHandler = new ChildRelationshipHandler(this);
+    ParentRelationshipHandler parentHandler = new ParentRelationshipHandler();
+    ObjectRelationshipHandler objectHandler = new ObjectRelationshipHandler();
+    ChildRelationshipHandler childrenHandler = new ChildRelationshipHandler();
     YoungerSiblingRelationshipHandler youngerSiblingHandler =
-        new YoungerSiblingRelationshipHandler(this);
+        new YoungerSiblingRelationshipHandler();
 
     // Set up priority layers
     PriorityLayer priorityOneLayer = new PriorityLayer(this, parentHandler, objectHandler);

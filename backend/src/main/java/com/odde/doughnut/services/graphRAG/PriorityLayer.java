@@ -24,15 +24,20 @@ public class PriorityLayer {
     for (RelationshipHandler handler : handlers) {
       BareNote result;
       do {
-        Note relatedNote = handler.handle(focusNote, focus, relatedNotes);
+        Note relatedNote = handler.handle(focusNote);
 
+        if (relatedNote == null) {
+          break;
+        }
         result =
             graphRAGService.addNoteToRelatedNotes(
                 relatedNotes, relatedNote, handler.getRelationshipToFocusNote());
         if (result != null) {
           handler.afterHandledSuccessfully(focus, result);
+        } else {
+          break;
         }
-      } while (result != null);
+      } while (true);
     }
 
     // Move to next layer if exists
