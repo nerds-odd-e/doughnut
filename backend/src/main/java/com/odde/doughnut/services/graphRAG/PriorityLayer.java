@@ -25,6 +25,9 @@ public class PriorityLayer {
       BareNote result;
       do {
         result = handler.handle(focusNote, focus, relatedNotes);
+        if (result != null) {
+          handler.afterHandledSuccessfully(focus, result);
+        }
       } while (result != null);
     }
 

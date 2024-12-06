@@ -31,10 +31,6 @@ public class YoungerSiblingRelationshipHandler extends RelationshipHandler {
             graphRAGService.addNoteToRelatedNotes(
                 relatedNotes, youngerSibling, RelationshipToFocusNote.YoungerSibling);
 
-        if (addedNote != null) {
-          focus.getYoungerSiblings().add(addedNote.getUriAndTitle());
-        }
-
         currentSiblingIndex++;
         return addedNote;
       } else {
@@ -42,5 +38,10 @@ public class YoungerSiblingRelationshipHandler extends RelationshipHandler {
       }
     }
     return null;
+  }
+
+  @Override
+  public void afterHandledSuccessfully(FocusNote focus, BareNote addedNote) {
+    focus.getYoungerSiblings().add(addedNote.getUriAndTitle());
   }
 }

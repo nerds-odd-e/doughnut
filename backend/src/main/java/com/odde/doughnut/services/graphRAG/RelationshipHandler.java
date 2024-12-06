@@ -5,4 +5,6 @@ import java.util.List;
 
 public abstract class RelationshipHandler {
   public abstract BareNote handle(Note focusNote, FocusNote focus, List<BareNote> relatedNotes);
+
+  public void afterHandledSuccessfully(FocusNote focusNote, BareNote addedNote) {}
 }
