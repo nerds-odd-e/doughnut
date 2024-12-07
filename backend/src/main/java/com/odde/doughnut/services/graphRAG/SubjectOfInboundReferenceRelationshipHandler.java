@@ -2,14 +2,14 @@ package com.odde.doughnut.services.graphRAG;
 
 import com.odde.doughnut.entities.Note;
 
-public class InboundReferenceSubjectRelationshipHandler extends RelationshipHandler {
+public class SubjectOfInboundReferenceRelationshipHandler extends RelationshipHandler {
   private final Note inboundReferenceNote;
   private boolean handled = false;
   private final PriorityLayer priorityFourLayer;
 
-  public InboundReferenceSubjectRelationshipHandler(
+  public SubjectOfInboundReferenceRelationshipHandler(
       Note inboundReferenceNote, PriorityLayer priorityFourLayer) {
-    super(RelationshipToFocusNote.InboundReferenceSubject, inboundReferenceNote);
+    super(RelationshipToFocusNote.SubjectOfInboundReference, inboundReferenceNote);
     this.inboundReferenceNote = inboundReferenceNote;
     this.priorityFourLayer = priorityFourLayer;
   }

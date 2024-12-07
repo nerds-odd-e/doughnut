@@ -642,7 +642,7 @@ public class GraphRAGServiceTest {
       // Verify inbound reference subjects are in related notes
       assertRelatedNotesContain(
           result,
-          RelationshipToFocusNote.InboundReferenceSubject,
+          RelationshipToFocusNote.SubjectOfInboundReference,
           inboundReferenceParent1,
           inboundReferenceParent2);
     }
@@ -662,7 +662,7 @@ public class GraphRAGServiceTest {
 
       // Verify no inbound reference subjects are included
       assertThat(
-          getNotesWithRelationship(result, RelationshipToFocusNote.InboundReferenceSubject),
+          getNotesWithRelationship(result, RelationshipToFocusNote.SubjectOfInboundReference),
           empty());
     }
   }

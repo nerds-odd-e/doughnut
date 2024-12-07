@@ -25,7 +25,7 @@ public class InboundReferenceRelationshipHandler extends RelationshipHandler {
       // Add referring subject to priority 3
       if (priorityThreeLayer != null) {
         priorityThreeLayer.addHandler(
-            new InboundReferenceSubjectRelationshipHandler(referringNote, priorityFourLayer));
+            new SubjectOfInboundReferenceRelationshipHandler(referringNote, priorityFourLayer));
       }
 
       // Add referring contextual path to priority 4
