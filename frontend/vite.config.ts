@@ -94,6 +94,12 @@ export default defineConfig({
       input: {
         main: fileURLToPath(new URL('index.html', import.meta.url)),
       },
+      output: {
+        assetFileNames: (assetInfo) => {
+          if (assetInfo.name === 'main.css') return 'assets/main.css';
+          return 'assets/[name]-[hash][extname]';
+        },
+      },
     },
   },
 })
