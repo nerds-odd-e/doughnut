@@ -17,20 +17,30 @@ public final class OpenAiRunRequiredAction extends OpenAiOngoingRun implements O
     super(openAiApiHandler, updatedRun, tool);
   }
 
-  public Object getFirstArgument() throws JsonProcessingException {
+  public Object getTheOnlyArgument() throws JsonProcessingException {
     return objectMapper.readValue(
-        getFirstToolCall().getFunction().getArguments().toString(), tool.parameterClass());
+        getTheOnlyToolCall().getFunction().getArguments().toString(), tool.parameterClass());
   }
 
-  public ToolCallInfo getToolCallInfo() {
+  public Object getLastArgument() throws JsonProcessingException {
+    return objectMapper.readValue(
+        getLastToolCall().getFunction().getArguments().toString(), tool.parameterClass());
+  }
+
+  public ToolCall getLastToolCall() {
+    RequiredAction requiredAction = run.getRequiredAction();
+    return requiredAction.getSubmitToolOutputs().getToolCalls().getLast();
+  }
+
+  public ToolCallInfo getTheOnlyToolCallInfo() {
     ToolCallInfo toolCallInfo = new ToolCallInfo();
     toolCallInfo.setThreadId(run.getThreadId());
     toolCallInfo.setRunId(run.getId());
-    toolCallInfo.setToolCallId(getFirstToolCall().getId());
+    toolCallInfo.setToolCallId(getTheOnlyToolCall().getId());
     return toolCallInfo;
   }
 
-  private ToolCall getFirstToolCall() {
+  private ToolCall getTheOnlyToolCall() {
     RequiredAction requiredAction = run.getRequiredAction();
     int size = requiredAction.getSubmitToolOutputs().getToolCalls().size();
     if (size != 1) {

@@ -33,7 +33,7 @@ public class NoteQuestionGenerationService {
             .withModelName(globalSettingsService.globalSettingQuestionGeneration().getValue())
             .run()
             .getRunResult()
-            .getAssumedToolCallArgument(MCQWithAnswer.class);
+            .getLastToolCallArgument(MCQWithAnswer.class);
     if (question != null
         && question.getMultipleChoicesQuestion().getStem() != null
         && !Strings.isBlank(question.getMultipleChoicesQuestion().getStem())) {

@@ -101,9 +101,9 @@ public final class NoteAutomationService {
     return switch (runExpectingAction.getRunResult()) {
       case OpenAiRunRequiredAction action -> {
         final TextFromAudioWithCallInfo textFromAudio = new TextFromAudioWithCallInfo();
-        NoteDetailsCompletion noteDetails = (NoteDetailsCompletion) action.getFirstArgument();
+        NoteDetailsCompletion noteDetails = (NoteDetailsCompletion) action.getTheOnlyArgument();
         textFromAudio.setCompletionFromAudio(noteDetails);
-        textFromAudio.setToolCallInfo(action.getToolCallInfo());
+        textFromAudio.setToolCallInfo(action.getTheOnlyToolCallInfo());
         yield textFromAudio;
       }
       case OpenAiRunCompleted _ ->
