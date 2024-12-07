@@ -1,16 +1,17 @@
 package com.odde.doughnut.services.graphRAG;
 
 import com.odde.doughnut.entities.Note;
-import lombok.Setter;
 
 public class ObjectOfReifiedChildRelationshipHandler extends RelationshipHandler {
   private final Note targetNote;
   private boolean handled = false;
-  @Setter private PriorityLayer priorityFourLayer;
+  private final PriorityLayer priorityFourLayer;
 
-  public ObjectOfReifiedChildRelationshipHandler(Note reifiedChild) {
+  public ObjectOfReifiedChildRelationshipHandler(
+      Note reifiedChild, PriorityLayer priorityFourLayer) {
     super(RelationshipToFocusNote.ObjectOfReifiedChild, reifiedChild);
     this.targetNote = reifiedChild.getTargetNote();
+    this.priorityFourLayer = priorityFourLayer;
   }
 
   @Override
