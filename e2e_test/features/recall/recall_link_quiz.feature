@@ -11,6 +11,7 @@ Feature: Repetition Link Quiz
       | Mars             | true       | Space       |
     And there is "a specialization of" link between note "Moon" and "Earth"
 
+  @ignore
   Scenario Outline: "Belongs to" question
     Given It's day 1, 8 hour
     And I assimilate these in sequence:

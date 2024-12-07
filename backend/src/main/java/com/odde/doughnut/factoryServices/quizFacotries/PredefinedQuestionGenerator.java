@@ -7,7 +7,6 @@ import com.odde.doughnut.factoryServices.quizFacotries.factories.AiQuestionFacto
 import com.odde.doughnut.factoryServices.quizFacotries.factories.SpellingPredefinedFactory;
 import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,14 +39,10 @@ public record PredefinedQuestionGenerator(
 
   private List<PredefinedQuestionFactory> getPredefinedQuestionFactories(
       AiQuestionGenerator questionGenerator) {
+    AiQuestionFactory aiQuestionFactory = new AiQuestionFactory(note, questionGenerator);
     if (!note.isLink()) {
-      return List.of(
-          new AiQuestionFactory(note, questionGenerator), new SpellingPredefinedFactory(note));
+      return List.of(aiQuestionFactory, new SpellingPredefinedFactory(note));
     }
-    PredefinedQuestionServant servant =
-        new PredefinedQuestionServant(user, randomizer, modelFactoryService);
-    return Arrays.stream(note.getLinkType().getQuestionTypes())
-        .map(t -> t.factoryForLinkingNote.apply(note, servant))
-        .toList();
+    return List.of(aiQuestionFactory);
   }
 }
