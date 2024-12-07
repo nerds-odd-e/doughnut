@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class BareNoteTest {
+class GraphRAGResultTest {
   @Autowired private MakeMe makeMe;
   private final ObjectMapper objectMapper = new ObjectMapper();
   private static final String PARENT_URI_AND_TITLE = "parentUriAndTitle";
