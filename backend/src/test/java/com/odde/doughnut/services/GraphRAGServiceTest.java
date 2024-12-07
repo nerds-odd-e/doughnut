@@ -4,6 +4,8 @@ import static com.odde.doughnut.services.graphRAG.GraphRAGConstants.RELATED_NOTE
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.graphRAG.*;
 import com.odde.doughnut.testability.MakeMe;
@@ -742,6 +744,24 @@ public class GraphRAGServiceTest {
         assertThat(
             getNotesWithRelationship(result, RelationshipToFocusNote.ParentSiblingChild), empty());
       }
+    }
+  }
+
+  @Nested
+  class JsonSerialization {
+    @Test
+    void shouldIncludeRelatedNotesFieldInJson() throws Exception {
+      Note note = makeMe.aNote().titleConstructor("Test Note").please();
+      Note child = makeMe.aNote().under(note).titleConstructor("Child Note").please();
+
+      GraphRAGResult result = graphRAGService.retrieve(note, 1000);
+
+      ObjectMapper objectMapper = new ObjectMapper();
+      JsonNode jsonNode = objectMapper.valueToTree(result);
+
+      assertThat(jsonNode.has("relatedNotes"), is(true));
+      assertThat(jsonNode.get("relatedNotes").isArray(), is(true));
+      assertThat(jsonNode.get("relatedNotes").size(), equalTo(1));
     }
   }
 }
