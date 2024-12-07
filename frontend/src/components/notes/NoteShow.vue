@@ -44,39 +44,41 @@
               class="note-content-wrapper"
               :class="{ 'daisy-collapse daisy-collapse-arrow': isMinimized }"
             >
-              <div id="main-note-content" class="daisy-flex daisy-flex-col daisy-w-9/12">
-                <NoteTextContent
-                  v-bind="{
-                    note: noteRealm.note,
-                    asMarkdown,
-                    readonly,
-                    storageAccessor,
-                  }"
-                />
-                <NoteAccessoryAsync
-                  v-bind="{ noteId: noteRealm.id, updatedNoteAccessory, readonly }"
-                />
-                <NoteRecentUpdateIndicator
-                  v-bind="{
-                    id: noteRealm.id,
-                    updatedAt: noteRealm.note.updatedAt,
-                  }"
-                >
-                  <p>
-                    <span class="daisy-mr-3">
-                      Created: {{ toLocalDateString(noteRealm.note.createdAt) }}
-                    </span>
-                    <span>
-                      Last updated: {{ toLocalDateString(noteRealm.note.updatedAt) }}
-                    </span>
-                  </p>
-                </NoteRecentUpdateIndicator>
-                <ChildrenNotes
-                  v-bind="{ expandChildren, readonly, storageAccessor }"
-                  :notes="noteRealm.children ?? []"
-                />
+              <div class="main-note-content">
+                <div id="main-note-content" class="daisy-flex daisy-flex-col daisy-w-9/12">
+                  <NoteTextContent
+                    v-bind="{
+                      note: noteRealm.note,
+                      asMarkdown,
+                      readonly,
+                      storageAccessor,
+                    }"
+                  />
+                  <NoteAccessoryAsync
+                    v-bind="{ noteId: noteRealm.id, updatedNoteAccessory, readonly }"
+                  />
+                  <NoteRecentUpdateIndicator
+                    v-bind="{
+                      id: noteRealm.id,
+                      updatedAt: noteRealm.note.updatedAt,
+                    }"
+                  >
+                    <p>
+                      <span class="daisy-mr-3">
+                        Created: {{ toLocalDateString(noteRealm.note.createdAt) }}
+                      </span>
+                      <span>
+                        Last updated: {{ toLocalDateString(noteRealm.note.updatedAt) }}
+                      </span>
+                    </p>
+                  </NoteRecentUpdateIndicator>
+                  <ChildrenNotes
+                    v-bind="{ expandChildren, readonly, storageAccessor }"
+                    :notes="noteRealm.children ?? []"
+                  />
+                </div>
               </div>
-              <div class="daisy-w-3/12 inboundReferencea" v-if="noteRealm.inboundReferencea">
+              <div class="inbound-references" v-if="noteRealm.inboundReferencea">
                 <ul class="daisy-menu daisy-menu-compact">
                   <li v-for="link in noteRealm.inboundReferencea" :key="link.id">
                     <span>{{ reverseLabel(link.noteTopology.linkType) }} </span>
@@ -141,22 +143,36 @@ const toLocalDateString = (date: string) => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import '@/styles/_variables.scss';
+
 .note-show-container {
   @apply daisy-flex daisy-flex-col daisy-h-full;
+  container-type: inline-size;
 }
 
 .note-content-wrapper {
-  @apply daisy-flex-1 daisy-min-h-0 daisy-overflow-auto daisy-flex daisy-gap-4; /* CHANGED: Bootstrap gap-3 -> daisy-gap-4 */
-  transition: height 0.3s ease;
+  @apply daisy-flex-1 daisy-min-h-0 daisy-overflow-auto daisy-flex daisy-gap-4 daisy-flex-wrap;
 }
 
-.inboundReferencea {
-  @apply daisy-border-l daisy-border-base-300 daisy-pl-4;
+.main-note-content {
+  @apply daisy-flex daisy-flex-col daisy-flex-1 daisy-min-w-[300px];
 }
 
-.note-content-wrapper.minimized {
-  @apply daisy-h-12 daisy-overflow-hidden;
+.inbound-references {
+  @apply daisy-border-l daisy-border-base-300 daisy-pl-4 daisy-w-full;
+}
+
+@container (min-width: #{$mobile-breakpoint}) {
+  .inbound-references {
+    @apply daisy-w-3/12;
+  }
+}
+
+@container (max-width: #{$mobile-breakpoint - 1px}) {
+  .inbound-references {
+    @apply daisy-border-l-0 daisy-border-t daisy-border-base-300 daisy-pl-0 daisy-pt-4 daisy-mt-4;
+  }
 }
 
 .daisy-btn-group {
