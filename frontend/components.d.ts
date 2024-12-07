@@ -135,6 +135,7 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     ScrollTo: typeof import('./src/components/commons/ScrollTo.vue')['default']
+    SeamlessTextEditor: typeof import('./src/components/form/SeamlessTextEditor.vue')['default']
     SearchNote: typeof import('./src/components/search/SearchNote.vue')['default']
     SearchResults: typeof import('./src/components/search/SearchResults.vue')['default']
     Select: typeof import('./src/components/form/Select.vue')['default']

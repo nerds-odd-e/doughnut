@@ -27,7 +27,7 @@ function filterAttributes(
 
 export const assumeNotePage = (noteTopology?: string) => {
   const findNoteTitle = (title) =>
-    cy.findByText(title, { selector: '[role=title] *' })
+    cy.findByText(title, { selector: '[role=title]' })
 
   if (noteTopology) {
     findNoteTitle(noteTopology)

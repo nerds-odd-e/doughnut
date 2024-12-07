@@ -30,26 +30,25 @@ describe("in place edit on title", () => {
 
   it("should display text field when one single click on title", async () => {
     const wrapper = mountComponent(note)
-    expect(wrapper.findAll('[role="title"] input')).toHaveLength(0)
-    await wrapper.find('[role="title"] h2').trigger("click")
-
     await flushPromises()
-
-    expect(wrapper.findAll('[role="title"] input')).toHaveLength(1)
-    expect(wrapper.findAll('[role="title"] h2')).toHaveLength(0)
+    const titleEl = wrapper.find('[role="title"]').element as HTMLElement
+    expect(titleEl.getAttribute("contenteditable")).toBe("true")
   })
 
   it("should not save change when not unmount", async () => {
     const wrapper = mountComponent(note)
-    await wrapper.find('[role="title"]').trigger("click")
-    await wrapper.find('[role="title"] input').setValue("updated")
+    await flushPromises()
+    const titleEl = wrapper.find('[role="title"]').element as HTMLElement
+    titleEl.innerText = "updated"
+    titleEl.dispatchEvent(new Event("input"))
     wrapper.unmount()
   })
 
   it("is not editable when readonly", async () => {
     const wrapper = mountComponent(note, true)
-    await wrapper.find('[role="title"]').trigger("click")
-    expect(wrapper.findAll("[role='title'] input")).toHaveLength(0)
+    await flushPromises()
+    const titleEl = wrapper.find('[role="title"]').element as HTMLElement
+    expect(titleEl.getAttribute("contenteditable")).toBe("false")
   })
 
   const getPlaceholder = (wrapper: VueWrapper<ComponentPublicInstance>) => {
@@ -80,8 +79,9 @@ describe("in place edit on title", () => {
 
   it("should save change when unmount", async () => {
     const wrapper = mountComponent(note)
-    await wrapper.find('[role="title"]').trigger("click")
-    await wrapper.find('[role="title"] input').setValue("updated")
+    const titleEl = wrapper.find('[role="title"]').element as HTMLElement
+    titleEl.innerText = "updated"
+    titleEl.dispatchEvent(new Event("input"))
     wrapper.unmount()
     expect(mockedUpdateTitleCall).toBeCalledWith(note.id, {
       newTitle: "updated",
@@ -92,21 +92,26 @@ describe("in place edit on title", () => {
     wrapper: VueWrapper<ComponentPublicInstance>,
     newValue: string
   ) => {
-    await wrapper.find('[role="title"]').trigger("click")
-    await wrapper.find('[role="title"] input').setValue(newValue)
+    await flushPromises()
+    const titleEl = wrapper.find('[role="title"]').element as HTMLElement
+    titleEl.innerText = newValue
+    titleEl.dispatchEvent(new Event("input"))
   }
 
   const editTitleThenBlur = async (
     wrapper: VueWrapper<ComponentPublicInstance>
   ) => {
     await editTitle(wrapper, "updated")
-    await wrapper.find('[role="title"] input').trigger("blur")
+    const titleEl = wrapper.find('[role="title"]').element as HTMLElement
+    titleEl.dispatchEvent(new Event("blur"))
   }
 
   it("should save content when blur text field title", async () => {
     const wrapper = mountComponent(note)
+    await flushPromises()
     await editTitle(wrapper, "updated")
-    await wrapper.find('[role="title"] input').trigger("blur")
+    const titleEl = wrapper.find('[role="title"]').element as HTMLElement
+    titleEl.dispatchEvent(new Event("blur"))
     expect(mockedUpdateTitleCall).toBeCalledWith(note.id, {
       newTitle: "updated",
     })
@@ -119,9 +124,8 @@ describe("in place edit on title", () => {
     await wrapper.setProps({
       note: { ...note, opicConstructor: "different value" },
     })
-    expect(
-      wrapper.find<HTMLInputElement>('[role="title"] input').element.value
-    ).toBe("updated")
+    const titleEl = wrapper.find('[role="title"]').element as HTMLElement
+    expect(titleEl.innerText).toBe("updated")
 
     expect(mockedUpdateTitleCall).not.toBeCalled()
   })
@@ -137,10 +141,8 @@ describe("in place edit on title", () => {
         },
       },
     })
-    await wrapper.find('[role="title"]').trigger("click")
-    expect(
-      wrapper.find<HTMLInputElement>('[role="title"] input').element.value
-    ).toBe("different value")
+    const titleEl = wrapper.find('[role="title"]').element as HTMLElement
+    expect(titleEl.innerText).toBe("different value")
   })
 
   describe("saved and having error", () => {
@@ -159,7 +161,7 @@ describe("in place edit on title", () => {
     })
 
     it("should display error when saving failed", async () => {
-      expect(wrapper.find(".error-msg").text()).toBe(
+      expect(wrapper.find(".error-message").text()).toBe(
         "size must be between 1 and 100"
       )
     })
@@ -167,7 +169,7 @@ describe("in place edit on title", () => {
     it("should clean up errors when editing", async () => {
       await editTitleThenBlur(wrapper)
       await flushPromises()
-      expect(wrapper.findAll(".error-msg")).toHaveLength(0)
+      expect(wrapper.findAll(".error-message")).toHaveLength(0)
       expect(mockedUpdateTitleCall).toBeCalledTimes(2)
     })
   })
@@ -200,7 +202,7 @@ describe("in place edit on title", () => {
       )
       await editTitleThenBlur(wrapper)
       await flushPromises()
-      expect(wrapper.find(".error-msg").text()).toBe(
+      expect(wrapper.find(".error-message").text()).toBe(
         "You are not authorized to edit this note. Perhaps you are not logged in?"
       )
     })

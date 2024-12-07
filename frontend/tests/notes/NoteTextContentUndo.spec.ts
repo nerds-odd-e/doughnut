@@ -24,9 +24,10 @@ describe("undo editing", () => {
       })
       .mount()
 
-    await wrapper.find('[role="title"]').trigger("click")
-    await wrapper.find('[role="title"] input').setValue(updatedTitle)
-    await wrapper.find('[role="title"] input').trigger("blur")
+    const titleEl = wrapper.find('[role="title"]').element as HTMLElement
+    titleEl.innerText = updatedTitle
+    titleEl.dispatchEvent(new Event("input"))
+    titleEl.dispatchEvent(new Event("blur"))
     await flushPromises()
 
     expect(histories.peekUndo()).toMatchObject({ type: "edit title" })
