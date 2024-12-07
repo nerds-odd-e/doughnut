@@ -23,9 +23,9 @@ public class GraphRAGResultBuilder {
       return existingNote;
     }
 
-    int tokens = tokenCountingStrategy.estimateTokens(note);
+    BareNote bareNote = BareNote.fromNote(note, relationship);
+    int tokens = tokenCountingStrategy.estimateTokens(bareNote);
     if (tokens <= remainingBudget) {
-      BareNote bareNote = BareNote.fromNote(note, relationship);
       result.getRelatedNotes().add(bareNote);
       remainingBudget -= tokens;
       addedNotes.put(note, bareNote);
