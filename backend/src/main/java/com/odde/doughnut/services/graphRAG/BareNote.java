@@ -6,46 +6,43 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.odde.doughnut.entities.Note;
 import lombok.Getter;
-import lombok.Setter;
 
-@Getter
-@Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class BareNote {
-  private UriAndTitle uriAndTitle;
-  private String details;
+  @Getter private UriAndTitle uriAndTitle;
+  @Getter private String details;
   private UriAndTitle parentUriAndTitle;
-  private UriAndTitle objectUriAndTitle;
-  private RelationshipToFocusNote relationToFocusNote;
+  @Getter private UriAndTitle objectUriAndTitle;
+  @Getter private RelationshipToFocusNote relationToFocusNote;
 
   @JsonProperty("parentUriAndTitle")
-  public UriAndTitle getParentUriAndTitleJson() {
+  public UriAndTitle getParentUriAndTitle() {
     return objectUriAndTitle == null ? parentUriAndTitle : null;
   }
 
   @JsonProperty("subjectUriAndTitle")
-  public UriAndTitle getSubjectUriAndTitleJson() {
+  public UriAndTitle getSubjectUriAndTitle() {
     return objectUriAndTitle != null ? parentUriAndTitle : null;
   }
 
   protected static void initializeFromNote(
       BareNote bareNote, Note note, RelationshipToFocusNote relation) {
-    bareNote.setUriAndTitle(UriAndTitle.fromNote(note));
-    bareNote.setDetails(note.getDetails());
-    bareNote.setRelationToFocusNote(relation);
+    bareNote.uriAndTitle = UriAndTitle.fromNote(note);
+    bareNote.details = note.getDetails();
+    bareNote.relationToFocusNote = relation;
 
     if (note.getParent() != null) {
-      bareNote.setParentUriAndTitle(UriAndTitle.fromNote(note.getParent()));
+      bareNote.parentUriAndTitle = UriAndTitle.fromNote(note.getParent());
     }
     if (note.getTargetNote() != null) {
-      bareNote.setObjectUriAndTitle(UriAndTitle.fromNote(note.getTargetNote()));
+      bareNote.objectUriAndTitle = UriAndTitle.fromNote(note.getTargetNote());
     }
   }
 
   public static BareNote fromNote(Note note, RelationshipToFocusNote relation) {
     BareNote bareNote = new BareNote();
     initializeFromNote(bareNote, note, relation);
-    bareNote.setDetails(truncateDetails(bareNote.getDetails()));
+    bareNote.details = truncateDetails(bareNote.details);
     return bareNote;
   }
 
