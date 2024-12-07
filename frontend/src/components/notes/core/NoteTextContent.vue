@@ -35,20 +35,3 @@ defineProps({
   },
 })
 </script>
-
-<style scoped>
-.note-title {
-  margin-top: 0px;
-  padding-top: 10px;
-  color: black;
-}
-
-.outdated-label {
-  display: inline-block;
-  height: 100%;
-  vertical-align: middle;
-  margin-left: 20px;
-  padding-bottom: 10px;
-  color: red;
-}
-</style>

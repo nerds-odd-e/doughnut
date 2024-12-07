@@ -37,3 +37,10 @@ defineProps({
 
 const editingLink = ref<boolean>(false)
 </script>
+
+<style scoped>
+h2 {
+  font-size: 1.5rem;
+  font-weight: 400;
+}
+</style>
