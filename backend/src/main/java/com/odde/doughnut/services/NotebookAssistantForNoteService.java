@@ -1,7 +1,6 @@
 package com.odde.doughnut.services;
 
-import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.AssistantThread;
 import com.odde.doughnut.services.ai.OpenAiAssistant;
@@ -34,7 +33,7 @@ public class NotebookAssistantForNoteService {
     GraphRAGService graphRAGService =
         new GraphRAGService(new CharacterBasedTokenCountingStrategy());
     GraphRAGResult retrieve = graphRAGService.retrieve(note, 5000);
-    String prettyString = defaultObjectMapper().valueToTree(retrieve).toPrettyString();
+    String prettyString = new ObjectMapper().valueToTree(retrieve).toPrettyString();
     String noteDescription =
         """
         Focus Note and the notes related to it:
