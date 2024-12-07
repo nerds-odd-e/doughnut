@@ -34,52 +34,45 @@ public class GraphRAGServiceTest {
         .collect(Collectors.toList());
   }
 
-  private String getUriAndTitle(Note note) {
-    return "[" + note.getTopicConstructor() + "](/n" + note.getId() + ")";
-  }
-
   private void assertRelatedNotesContain(
       GraphRAGResult result, RelationshipToFocusNote relationship, Note... expectedNotes) {
     List<BareNote> notes = getNotesWithRelationship(result, relationship);
     assertThat(notes, hasSize(expectedNotes.length));
-    assertThat(
-        notes.stream()
-            .map(bareNote -> bareNote.getUriAndTitle().getNote())
-            .collect(Collectors.toList()),
-        containsInAnyOrder(expectedNotes));
+    assertThat(notes, containsInAnyOrder(expectedNotes));
   }
 
-  @Test
-  void shouldRetrieveJustTheFocusNoteWithZeroBudget() {
-    Note note = makeMe.aNote().titleConstructor("Test Note").details("Test Details").please();
+  @Nested
+  class SimpleNoteWithNoParentOrChild {
+    @Test
+    void shouldRetrieveJustTheFocusNoteWithZeroBudget() {
+      Note note = makeMe.aNote().titleConstructor("Test Note").details("Test Details").please();
 
-    GraphRAGResult result = graphRAGService.retrieve(note, 0);
+      GraphRAGResult result = graphRAGService.retrieve(note, 0);
 
-    assertThat(result.getFocusNote().getDetails(), equalTo("Test Details"));
-    assertThat(result.getRelatedNotes(), empty());
-  }
+      assertThat(result.getFocusNote().getDetails(), equalTo("Test Details"));
+      assertThat(result.getRelatedNotes(), empty());
+    }
 
-  @Test
-  void shouldNotTruncateFocusNoteDetailsEvenIfItIsVeryLong() {
-    String longDetails = "a".repeat(2000);
-    Note note = makeMe.aNote().titleConstructor("Test Note").details(longDetails).please();
+    @Test
+    void shouldNotTruncateFocusNoteDetailsEvenIfItIsVeryLong() {
+      String longDetails = "a".repeat(2000);
+      Note note = makeMe.aNote().titleConstructor("Test Note").details(longDetails).please();
 
-    GraphRAGResult result = graphRAGService.retrieve(note, 0);
+      GraphRAGResult result = graphRAGService.retrieve(note, 0);
 
-    assertThat(result.getFocusNote().getDetails().length(), equalTo(2000));
+      assertThat(result.getFocusNote().getDetails().length(), equalTo(2000));
+    }
   }
 
   @Nested
   class WhenNoteHasParent {
     private Note parent;
     private Note note;
-    private String expectedParentUriAndTitle;
 
     @BeforeEach
     void setup() {
       parent = makeMe.aNote().titleConstructor("Parent Note").details("Parent Details").please();
       note = makeMe.aNote().under(parent).please();
-      expectedParentUriAndTitle = "[Parent Note](/n" + parent.getId() + ")";
     }
 
     @Test
@@ -123,24 +116,21 @@ public class GraphRAGServiceTest {
 
   @Nested
   class WhenNoteHasObject {
-    private Note parent;
-    private Note target;
+    private Note object;
     private Note note;
-    private String expectedTargetUriAndTitle;
 
     @BeforeEach
     void setup() {
-      parent = makeMe.aNote().titleConstructor("Parent Note").please();
-      target = makeMe.aNote().titleConstructor("Target Note").details("Target Details").please();
-      note = makeMe.aLink().between(parent, target).please();
-      expectedTargetUriAndTitle = "[Target Note](/n" + target.getId() + ")";
+      Note parent = makeMe.aNote().titleConstructor("Parent Note").please();
+      object = makeMe.aNote().titleConstructor("Object Note").details("Object Details").please();
+      note = makeMe.aLink().between(parent, object).please();
     }
 
     @Test
     void shouldIncludeObjectInFocusNote() {
       GraphRAGResult result = graphRAGService.retrieve(note, 1000);
 
-      assertThat(result.getFocusNote().getObjectUriAndTitle(), equalTo(target));
+      assertThat(result.getFocusNote().getObjectUriAndTitle(), equalTo(object));
     }
 
     @Test
@@ -153,7 +143,7 @@ public class GraphRAGServiceTest {
               .filter(n -> n.getRelationToFocusNote() == RelationshipToFocusNote.Object)
               .findFirst()
               .get(),
-          equalTo(target));
+          equalTo(object));
     }
 
     @Test
@@ -161,7 +151,7 @@ public class GraphRAGServiceTest {
       GraphRAGResult result = graphRAGService.retrieve(note, 1); // Only enough for parent
 
       // Object URI should still be in focus note
-      assertThat(result.getFocusNote().getObjectUriAndTitle(), equalTo(target));
+      assertThat(result.getFocusNote().getObjectUriAndTitle(), equalTo(object));
 
       // Only parent should be in related notes
       assertThat(result.getRelatedNotes(), hasSize(1));
@@ -173,14 +163,14 @@ public class GraphRAGServiceTest {
     @Test
     void shouldNotDuplicateNoteInRelatedNotesWhenItIsAlsoAChild() {
       // Create a child note that is also the object of the focus note
-      makeMe.theNote(target).under(note).please();
+      makeMe.theNote(object).under(note).please();
       makeMe.refresh(note);
 
       GraphRAGResult result = graphRAGService.retrieve(note, 1000);
 
       // Should be in both object and children lists of focus note
-      assertThat(result.getFocusNote().getObjectUriAndTitle(), equalTo(target));
-      assertThat(result.getFocusNote().getChildren(), contains(target));
+      assertThat(result.getFocusNote().getObjectUriAndTitle(), equalTo(object));
+      assertThat(result.getFocusNote().getChildren(), contains(object));
 
       // But should appear only once in related notes
       assertThat(result.getRelatedNotes(), hasSize(3)); // parent and child/object
@@ -190,19 +180,14 @@ public class GraphRAGServiceTest {
     class WhenObjectHasContextualPath {
       private Note objectGrandParent;
       private Note objectParent;
-      private String expectedObjectGrandParentUriAndTitle;
-      private String expectedObjectParentUriAndTitle;
 
       @BeforeEach
       void setup() {
         objectGrandParent = makeMe.aNote().titleConstructor("Object Grand Parent").please();
         objectParent =
             makeMe.aNote().under(objectGrandParent).titleConstructor("Object Parent").please();
-        makeMe.theNote(target).under(objectParent).please();
-        makeMe.refresh(target);
-
-        expectedObjectGrandParentUriAndTitle = getUriAndTitle(objectGrandParent);
-        expectedObjectParentUriAndTitle = getUriAndTitle(objectParent);
+        makeMe.theNote(object).under(objectParent).please();
+        makeMe.refresh(object);
       }
 
       @Test
@@ -242,8 +227,6 @@ public class GraphRAGServiceTest {
     private Note parent;
     private Note child1;
     private Note child2;
-    private String expectedChild1UriAndTitle;
-    private String expectedChild2UriAndTitle;
 
     @BeforeEach
     void setup() {
@@ -262,8 +245,6 @@ public class GraphRAGServiceTest {
               .titleConstructor("Child Two")
               .details("Child 2 Details")
               .please();
-      expectedChild1UriAndTitle = "[Child One](/n" + child1.getId() + ")";
-      expectedChild2UriAndTitle = "[Child Two](/n" + child2.getId() + ")";
     }
 
     @Test
@@ -307,14 +288,13 @@ public class GraphRAGServiceTest {
 
   @Nested
   class WhenNoteHasYoungerSiblings {
-    private Note parent;
     private Note focusNote;
     private Note youngerSibling1;
     private Note youngerSibling2;
 
     @BeforeEach
     void setup() {
-      parent = makeMe.aNote().titleConstructor("Parent Note").please();
+      Note parent = makeMe.aNote().titleConstructor("Parent Note").please();
       focusNote = makeMe.aNote().under(parent).titleConstructor("Focus Note").please();
       youngerSibling1 =
           makeMe
@@ -351,8 +331,6 @@ public class GraphRAGServiceTest {
     @Nested
     class AndAlsoHasChildren {
       private Note child1;
-      private Note child2;
-      private String expectedChild1UriAndTitle;
 
       @BeforeEach
       void setup() {
@@ -363,14 +341,12 @@ public class GraphRAGServiceTest {
                 .titleConstructor("Child One")
                 .details("Child 1 Details")
                 .please();
-        child2 =
-            makeMe
-                .aNote()
-                .under(focusNote)
-                .titleConstructor("Child Two")
-                .details("Child 2 Details")
-                .please();
-        expectedChild1UriAndTitle = "[Child One](/n" + child1.getId() + ")";
+        makeMe
+            .aNote()
+            .under(focusNote)
+            .titleConstructor("Child Two")
+            .details("Child 2 Details")
+            .please();
       }
 
       @Test
@@ -403,8 +379,6 @@ public class GraphRAGServiceTest {
     private Note grandParent;
     private Note parent;
     private Note focusNote;
-    private String expectedGrandParentUriAndTitle;
-    private String expectedParentUriAndTitle;
 
     @BeforeEach
     void setup() {
@@ -417,8 +391,6 @@ public class GraphRAGServiceTest {
               .details("Parent Details")
               .please();
       focusNote = makeMe.aNote().under(parent).titleConstructor("Focus").please();
-      expectedGrandParentUriAndTitle = "[Grand Parent](/n" + grandParent.getId() + ")";
-      expectedParentUriAndTitle = "[Parent](/n" + parent.getId() + ")";
     }
 
     @Test
@@ -451,14 +423,13 @@ public class GraphRAGServiceTest {
 
   @Nested
   class WhenNoteHasPriorSiblings {
-    private Note parent;
     private Note priorSibling1;
     private Note priorSibling2;
     private Note focusNote;
 
     @BeforeEach
     void setup() {
-      parent = makeMe.aNote().titleConstructor("Parent Note").please();
+      Note parent = makeMe.aNote().titleConstructor("Parent Note").please();
       priorSibling1 =
           makeMe
               .aNote()
@@ -503,32 +474,26 @@ public class GraphRAGServiceTest {
   class WhenNoteHasReifiedChildObject {
     private Note focusNote;
     private Note reifiedChild;
-    private Note targetNote;
-    private String expectedChildUriAndTitle;
-    private String expectedTargetUriAndTitle;
+    private Note objectNote;
 
     @BeforeEach
     void setup() {
       focusNote = makeMe.aNote().titleConstructor("Focus Note").please();
 
-      // Create the target note first
-      targetNote =
-          makeMe.aNote().titleConstructor("Target Note").details("Target Details").please();
+      // Create the object note first
+      objectNote =
+          makeMe.aNote().titleConstructor("Object Note").details("Object Details").please();
 
-      // Create a link between parent and target
-      reifiedChild = makeMe.aLink().between(focusNote, targetNote).please();
+      // Create a link between parent and object
+      reifiedChild = makeMe.aLink().between(focusNote, objectNote).please();
       makeMe.refresh(reifiedChild);
-
-      expectedChildUriAndTitle =
-          "[" + reifiedChild.getTopicConstructor() + "](/n" + reifiedChild.getId() + ")";
-      expectedTargetUriAndTitle = "[Target Note](/n" + targetNote.getId() + ")";
     }
 
     @Test
     void shouldIncludeChildObjectInRelatedNotes() {
       GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
 
-      assertRelatedNotesContain(result, RelationshipToFocusNote.ReifiedChildObject, targetNote);
+      assertRelatedNotesContain(result, RelationshipToFocusNote.ReifiedChildObject, objectNote);
 
       // Child should still be in children list
       assertThat(result.getFocusNote().getChildren(), contains(UriAndTitle.fromNote(reifiedChild)));
@@ -539,11 +504,6 @@ public class GraphRAGServiceTest {
       private Note regularChild1;
       private Note regularChild2;
       private Note regularChild3;
-      private String expectedRegularChild1UriAndTitle;
-      private String expectedRegularChild2UriAndTitle;
-      private String expectedRegularChild3UriAndTitle;
-      private String expectedChildUriAndTitle;
-      private String expectedTargetUriAndTitle;
 
       @BeforeEach
       void setup() {
@@ -556,11 +516,6 @@ public class GraphRAGServiceTest {
             makeMe.aNote().under(focusNote).titleConstructor("Regular Child 3").please();
 
         makeMe.refresh(focusNote);
-        expectedRegularChild1UriAndTitle = getUriAndTitle(regularChild1);
-        expectedRegularChild2UriAndTitle = getUriAndTitle(regularChild2);
-        expectedRegularChild3UriAndTitle = getUriAndTitle(regularChild3);
-        expectedChildUriAndTitle = getUriAndTitle(reifiedChild);
-        expectedTargetUriAndTitle = getUriAndTitle(targetNote);
       }
 
       @Test
@@ -589,7 +544,7 @@ public class GraphRAGServiceTest {
                 RelationshipToFocusNote.ReifiedChildObject));
 
         // Verify the reified child object is included
-        assertRelatedNotesContain(result, RelationshipToFocusNote.ReifiedChildObject, targetNote);
+        assertRelatedNotesContain(result, RelationshipToFocusNote.ReifiedChildObject, objectNote);
       }
 
       @Test
@@ -603,7 +558,7 @@ public class GraphRAGServiceTest {
             containsInAnyOrder(regularChild1, regularChild2, regularChild3, reifiedChild));
 
         // Verify the reified child object is included
-        assertRelatedNotesContain(result, RelationshipToFocusNote.ReifiedChildObject, targetNote);
+        assertRelatedNotesContain(result, RelationshipToFocusNote.ReifiedChildObject, objectNote);
       }
 
       @Test
@@ -644,10 +599,6 @@ public class GraphRAGServiceTest {
     private Note referringNote1;
     private Note referringParent2;
     private Note referringNote2;
-    private String expectedReferringNote1UriAndTitle;
-    private String expectedReferringNote2UriAndTitle;
-    private String expectedReferringParent1UriAndTitle;
-    private String expectedReferringParent2UriAndTitle;
 
     @BeforeEach
     void setup() {
@@ -660,11 +611,6 @@ public class GraphRAGServiceTest {
       // Create second referring note
       referringParent2 = makeMe.aNote().titleConstructor("Referring Parent 2").please();
       referringNote2 = makeMe.aLink().between(referringParent2, focusNote).please();
-
-      expectedReferringNote1UriAndTitle = getUriAndTitle(referringNote1);
-      expectedReferringNote2UriAndTitle = getUriAndTitle(referringNote2);
-      expectedReferringParent1UriAndTitle = getUriAndTitle(referringParent1);
-      expectedReferringParent2UriAndTitle = getUriAndTitle(referringParent2);
     }
 
     @Test
@@ -708,26 +654,19 @@ public class GraphRAGServiceTest {
 
   @Nested
   class WhenNoteHasParentSiblings {
-    private Note grandParent;
-    private Note parent;
     private Note parentSibling1;
     private Note parentSibling2;
     private Note focusNote;
-    private String expectedParentSibling1UriAndTitle;
-    private String expectedParentSibling2UriAndTitle;
 
     @BeforeEach
     void setup() {
-      grandParent = makeMe.aNote().titleConstructor("Grand Parent").please();
-      parent = makeMe.aNote().under(grandParent).titleConstructor("Parent").please();
+      Note grandParent = makeMe.aNote().titleConstructor("Grand Parent").please();
+      Note parent = makeMe.aNote().under(grandParent).titleConstructor("Parent").please();
       parentSibling1 =
           makeMe.aNote().under(grandParent).titleConstructor("Parent Sibling 1").please();
       parentSibling2 =
           makeMe.aNote().under(grandParent).titleConstructor("Parent Sibling 2").please();
       focusNote = makeMe.aNote().under(parent).titleConstructor("Focus Note").please();
-
-      expectedParentSibling1UriAndTitle = getUriAndTitle(parentSibling1);
-      expectedParentSibling2UriAndTitle = getUriAndTitle(parentSibling2);
     }
 
     @Test
@@ -759,9 +698,6 @@ public class GraphRAGServiceTest {
       private Note parentSibling1Child1;
       private Note parentSibling1Child2;
       private Note parentSibling2Child1;
-      private String expectedParentSibling1Child1UriAndTitle;
-      private String expectedParentSibling1Child2UriAndTitle;
-      private String expectedParentSibling2Child1UriAndTitle;
 
       @BeforeEach
       void setup() {
@@ -771,10 +707,6 @@ public class GraphRAGServiceTest {
             makeMe.aNote().under(parentSibling1).titleConstructor("PS1 Child 2").please();
         parentSibling2Child1 =
             makeMe.aNote().under(parentSibling2).titleConstructor("PS2 Child 1").please();
-
-        expectedParentSibling1Child1UriAndTitle = getUriAndTitle(parentSibling1Child1);
-        expectedParentSibling1Child2UriAndTitle = getUriAndTitle(parentSibling1Child2);
-        expectedParentSibling2Child1UriAndTitle = getUriAndTitle(parentSibling2Child1);
       }
 
       @Test
