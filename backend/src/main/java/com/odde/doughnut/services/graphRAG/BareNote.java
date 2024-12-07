@@ -9,21 +9,21 @@ import lombok.Setter;
 @Getter
 @Setter
 public class BareNote {
-  private String uriAndTitle;
+  private UriAndTitle uriAndTitle;
   private String details;
-  private String parentUriAndTitle;
-  private String objectUriAndTitle;
+  private UriAndTitle parentUriAndTitle;
+  private UriAndTitle objectUriAndTitle;
   private RelationshipToFocusNote relationToFocusNote;
 
   public static BareNote fromNote(Note note, RelationshipToFocusNote relation) {
     BareNote bareNote = new BareNote();
-    bareNote.setUriAndTitle(note.getUriAndTitle());
+    bareNote.setUriAndTitle(UriAndTitle.fromNote(note));
     bareNote.setDetails(truncateDetails(note.getDetails()));
     if (note.getParent() != null) {
-      bareNote.setParentUriAndTitle(note.getParent().getUriAndTitle());
+      bareNote.setParentUriAndTitle(UriAndTitle.fromNote(note.getParent()));
     }
     if (note.getTargetNote() != null) {
-      bareNote.setObjectUriAndTitle(note.getTargetNote().getUriAndTitle());
+      bareNote.setObjectUriAndTitle(UriAndTitle.fromNote(note.getTargetNote()));
     }
     bareNote.setRelationToFocusNote(relation);
     return bareNote;
@@ -34,5 +34,21 @@ public class BareNote {
       return details;
     }
     return details.substring(0, RELATED_NOTE_DETAILS_TRUNCATE_LENGTH) + "...";
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof BareNote) {
+      return uriAndTitle.equals(((BareNote) obj).uriAndTitle);
+    }
+    if (obj instanceof Note) {
+      return uriAndTitle.equals(obj);
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return uriAndTitle.hashCode();
   }
 }

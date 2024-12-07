@@ -9,31 +9,31 @@ import lombok.Setter;
 @Getter
 @Setter
 public class FocusNote {
-  private String uriAndTitle;
+  private UriAndTitle uriAndTitle;
   private String details;
-  private String parentUriAndTitle;
-  private String objectUriAndTitle;
-  private final List<String> children = new ArrayList<>();
-  private final List<String> priorSiblings = new ArrayList<>();
-  private final List<String> youngerSiblings = new ArrayList<>();
-  private final List<String> contextualPath = new ArrayList<>();
-  private final List<String> referrings = new ArrayList<>();
+  private UriAndTitle parentUriAndTitle;
+  private UriAndTitle objectUriAndTitle;
+  private final List<UriAndTitle> children = new ArrayList<>();
+  private final List<UriAndTitle> priorSiblings = new ArrayList<>();
+  private final List<UriAndTitle> youngerSiblings = new ArrayList<>();
+  private final List<UriAndTitle> contextualPath = new ArrayList<>();
+  private final List<UriAndTitle> referrings = new ArrayList<>();
 
   public static FocusNote fromNote(Note note) {
     FocusNote focusNote = new FocusNote();
-    focusNote.setUriAndTitle(note.getUriAndTitle());
+    focusNote.setUriAndTitle(UriAndTitle.fromNote(note));
     focusNote.setDetails(note.getDetails());
 
     // Set parent and contextual path
     if (note.getParent() != null) {
-      focusNote.setParentUriAndTitle(note.getParent().getUriAndTitle());
+      focusNote.setParentUriAndTitle(UriAndTitle.fromNote(note.getParent()));
       // Add all ancestors to contextual path in order (root to parent)
       note.getAncestors()
-          .forEach(ancestor -> focusNote.getContextualPath().add(ancestor.getUriAndTitle()));
+          .forEach(ancestor -> focusNote.getContextualPath().add(UriAndTitle.fromNote(ancestor)));
     }
 
     if (note.getTargetNote() != null) {
-      focusNote.setObjectUriAndTitle(note.getTargetNote().getUriAndTitle());
+      focusNote.setObjectUriAndTitle(UriAndTitle.fromNote(note.getTargetNote()));
     }
     return focusNote;
   }

@@ -20,4 +20,20 @@ public class UriAndTitle {
   public static UriAndTitle fromNote(Note note) {
     return new UriAndTitle(note);
   }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof UriAndTitle) {
+      return note.equals(((UriAndTitle) obj).note);
+    }
+    if (obj instanceof Note) {
+      return note.equals(obj);
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return note.hashCode();
+  }
 }
