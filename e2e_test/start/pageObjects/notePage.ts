@@ -130,7 +130,7 @@ export const assumeNotePage = (noteTopology?: string) => {
     navigateToReference: (referenceTopic: string) => {
       cy.get('main').within(() => {
         cy.findByText(referenceTopic, {
-          selector: '.link-link .title-text',
+          selector: '.link-container .title-text',
         }).click()
       })
       return assumeNotePage()
