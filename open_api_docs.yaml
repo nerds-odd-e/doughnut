@@ -4221,6 +4221,10 @@ components:
           - InboundReferenceToObjectOfReifiedChild
         details:
           type: string
+        contextualPath:
+          type: array
+          items:
+            type: string
         children:
           type: array
           items:
@@ -4230,10 +4234,6 @@ components:
           items:
             type: string
         youngerSiblings:
-          type: array
-          items:
-            type: string
-        contextualPath:
           type: array
           items:
             type: string

@@ -11,10 +11,10 @@ export type FocusNote = {
     parentUriAndTitle?: string;
     relationToFocusNote?: FocusNote.relationToFocusNote;
     details?: string;
+    contextualPath?: Array<string>;
     children?: Array<string>;
     priorSiblings?: Array<string>;
     youngerSiblings?: Array<string>;
-    contextualPath?: Array<string>;
     inboundReferences?: Array<string>;
 };
 export namespace FocusNote {
