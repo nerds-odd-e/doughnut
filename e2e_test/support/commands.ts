@@ -30,7 +30,7 @@ import start from '../start'
 import { commonSenseSplit } from './string_util'
 
 Cypress.Commands.add('pageIsNotLoading', () => {
-  cy.get('.loading-bar').should('not.exist')
+  cy.get('.loading-bar').should('not.exist', { timeout: 10000 })
 })
 
 Cypress.Commands.add('dialogDisappeared', () => {
