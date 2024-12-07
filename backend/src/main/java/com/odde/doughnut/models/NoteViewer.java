@@ -17,14 +17,10 @@ public class NoteViewer {
 
   public NoteRealm toJsonObject() {
     NoteRealm nvb = new NoteRealm(note);
-    nvb.setRefers(getRefers());
+    nvb.setInboundReferencea(note.getInboundReferences().stream().filter(this::allowed).toList());
     nvb.setFromBazaar(viewer == null || !viewer.owns(note.getNotebook()));
 
     return nvb;
-  }
-
-  public List<Note> getRefers() {
-    return note.getRefers().stream().filter(l -> allowed(l)).toList();
   }
 
   public List<Note> linksOfTypeThroughDirect(List<LinkType> linkTypes) {
@@ -35,7 +31,7 @@ public class NoteViewer {
   }
 
   public Stream<Note> linksOfTypeThroughReverse(LinkType linkType) {
-    return note.getRefers().stream()
+    return note.getInboundReferences().stream()
         .filter(l -> l.getLinkType().equals(linkType))
         .filter(l -> allowed(l));
   }

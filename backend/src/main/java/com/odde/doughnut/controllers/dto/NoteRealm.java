@@ -8,9 +8,17 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
-@JsonPropertyOrder({"id", "note", "fromBazaar", "circle", "children", "refers", "notebook"})
+@JsonPropertyOrder({
+  "id",
+  "note",
+  "fromBazaar",
+  "circle",
+  "children",
+  "inboundReferencea",
+  "notebook"
+})
 public class NoteRealm {
-  @Getter @Setter private List<Note> refers;
+  @Getter @Setter private List<Note> inboundReferencea;
 
   @NotNull @Getter private Note note;
 

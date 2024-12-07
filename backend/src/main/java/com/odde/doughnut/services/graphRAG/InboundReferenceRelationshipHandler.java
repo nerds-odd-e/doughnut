@@ -12,7 +12,7 @@ public class InboundReferenceRelationshipHandler extends RelationshipHandler {
   public InboundReferenceRelationshipHandler(
       Note relatingNote, PriorityLayer priorityThreeLayer, PriorityLayer priorityFourLayer) {
     super(RelationshipToFocusNote.InboundReference, relatingNote);
-    this.inboundReferenceNotes = relatingNote.getRefers();
+    this.inboundReferenceNotes = relatingNote.getInboundReferences();
     this.priorityThreeLayer = priorityThreeLayer;
     this.priorityFourLayer = priorityFourLayer;
   }

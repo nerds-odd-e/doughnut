@@ -9,7 +9,7 @@ export type NoteRealm = {
     note: Note;
     fromBazaar?: boolean;
     children?: Array<Note>;
-    refers?: Array<Note>;
+    inboundReferencea?: Array<Note>;
     notebook?: Notebook;
 };
 

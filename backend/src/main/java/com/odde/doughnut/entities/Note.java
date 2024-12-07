@@ -77,7 +77,7 @@ public class Note extends EntityIdentifiedByIdOnly {
   private Timestamp deletedAt;
 
   @OneToMany(mappedBy = "targetNote")
-  private List<Note> refers = new ArrayList<>();
+  private List<Note> inboundReferences = new ArrayList<>();
 
   @OneToMany(mappedBy = "parent", cascade = CascadeType.DETACH)
   @JsonIgnore
@@ -145,8 +145,8 @@ public class Note extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  public List<Note> getRefers() {
-    return filterDeletedUnmodifiableNoteList(refers);
+  public List<Note> getInboundReferences() {
+    return filterDeletedUnmodifiableNoteList(inboundReferences);
   }
 
   public static <T extends Note> List<T> filterDeletedUnmodifiableNoteList(List<T> notes) {
@@ -297,7 +297,7 @@ public class Note extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public Stream<Note> getLinksAndRefers() {
-    return Stream.concat(getLinks().stream(), getRefers().stream());
+    return Stream.concat(getLinks().stream(), getInboundReferences().stream());
   }
 
   @JsonIgnore

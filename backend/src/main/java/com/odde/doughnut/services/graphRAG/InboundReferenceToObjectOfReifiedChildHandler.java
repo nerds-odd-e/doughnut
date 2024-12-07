@@ -9,7 +9,7 @@ public class InboundReferenceToObjectOfReifiedChildHandler extends RelationshipH
 
   public InboundReferenceToObjectOfReifiedChildHandler(Note objectNote) {
     super(RelationshipToFocusNote.InboundReferenceToObjectOfReifiedChild, objectNote);
-    this.inboundReferences = objectNote.getRefers();
+    this.inboundReferences = objectNote.getInboundReferences();
   }
 
   @Override

@@ -35,6 +35,7 @@ public class AiToolFactory {
         6. **Ensure Question Self-Sufficiency**:
            - Ensure the question is standalone and provides all necessary context within the stem or choices.
            - Avoid vague phrasing like "this X" or "the following X" unless the X is explicitly defined in the stem or choices.
+           - IMPORTANT: Avoid using "this note"!!! User won't know which note you are referring to.
         7. **Empty Stems When Necessary**: Leave the question stem empty if there’s insufficient information to create a meaningful question.
         8. **Make sure correct choice index is accurate**:
            - The correct choice is also exclusive, and plausible.

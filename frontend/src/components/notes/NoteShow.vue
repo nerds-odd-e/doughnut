@@ -76,9 +76,9 @@
                   :notes="noteRealm.children ?? []"
                 />
               </div>
-              <div class="daisy-w-3/12 refers" v-if="noteRealm.refers">
+              <div class="daisy-w-3/12 inboundReferencea" v-if="noteRealm.inboundReferencea">
                 <ul class="daisy-menu daisy-menu-compact">
-                  <li v-for="link in noteRealm.refers" :key="link.id">
+                  <li v-for="link in noteRealm.inboundReferencea" :key="link.id">
                     <span>{{ reverseLabel(link.noteTopology.linkType) }} </span>
                     <LinkOfNote
                       class="link-multi"
@@ -151,7 +151,7 @@ const toLocalDateString = (date: string) => {
   transition: height 0.3s ease;
 }
 
-.refers {
+.inboundReferencea {
   @apply daisy-border-l daisy-border-base-300 daisy-pl-4;
 }
 
