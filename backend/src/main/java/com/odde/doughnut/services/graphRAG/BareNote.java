@@ -5,10 +5,21 @@ import static com.odde.doughnut.services.graphRAG.GraphRAGConstants.RELATED_NOTE
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.doughnut.entities.Note;
 import lombok.Getter;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonPropertyOrder({
+  "uri",
+  "title",
+  "details",
+  "predicate",
+  "objectUriAndTitle",
+  "parentUriAndTitle",
+  "subjectUriAndTitle",
+  "relationToFocusNote"
+})
 public class BareNote {
   private final Note note;
   @Getter private final String details;

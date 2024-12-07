@@ -100,10 +100,17 @@ class GraphRAGResultTest {
 
       // Act
       JsonNode jsonNode = objectMapper.valueToTree(focusNote);
+      String jsonString = objectMapper.writeValueAsString(focusNote);
 
       // Assert
       assertThat(jsonNode.has(PARENT_URI_AND_TITLE), is(true));
       assertThat(jsonNode.get(PARENT_URI_AND_TITLE).asText(), containsString("Parent Note"));
+
+      // Assert property order
+      assertThat(jsonString, startsWith("{\"uri\":"));
+      assertThat(jsonString.indexOf("\"title\":"), is(greaterThan(jsonString.indexOf("\"uri\":"))));
+      assertThat(
+          jsonString.indexOf("\"details\":"), is(greaterThan(jsonString.indexOf("\"title\":"))));
     }
   }
 }
