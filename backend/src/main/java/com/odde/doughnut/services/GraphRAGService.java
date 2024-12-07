@@ -26,7 +26,7 @@ public class GraphRAGService {
     PriorityLayer priorityThreeLayer = new PriorityLayer(2);
 
     ChildRelationshipHandler childrenHandler =
-        new ChildRelationshipHandler(focusNote, priorityThreeLayer);
+        new ChildRelationshipHandler(focusNote, priorityThreeLayer, priorityFourLayer);
     PriorSiblingRelationshipHandler priorSiblingHandler =
         new PriorSiblingRelationshipHandler(focusNote);
     YoungerSiblingRelationshipHandler youngerSiblingHandler =

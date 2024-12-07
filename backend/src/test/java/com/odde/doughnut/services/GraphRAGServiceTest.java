@@ -783,4 +783,58 @@ public class GraphRAGServiceTest {
       assertThat(relatedNote.has("relationToFocusNote"), is(true));
     }
   }
+
+  @Nested
+  class WhenObjectOfReifiedChildHasInboundReferences {
+    private Note focusNote;
+    private Note reifiedChild;
+    private Note objectNote;
+    private Note inboundReference1;
+    private Note inboundReference2;
+
+    @BeforeEach
+    void setup() {
+      focusNote = makeMe.aNote().titleConstructor("Focus Note").please();
+
+      // Create the object note first
+      objectNote =
+          makeMe.aNote().titleConstructor("Object Note").details("Object Details").please();
+
+      // Create a link between parent and object
+      reifiedChild = makeMe.aLink().between(focusNote, objectNote).please();
+
+      // Create inbound references to the object note
+      Note referenceParent1 = makeMe.aNote().titleConstructor("Reference Parent 1").please();
+      inboundReference1 = makeMe.aLink().between(referenceParent1, objectNote).please();
+
+      Note referenceParent2 = makeMe.aNote().titleConstructor("Reference Parent 2").please();
+      inboundReference2 = makeMe.aLink().between(referenceParent2, objectNote).please();
+
+      makeMe.refresh(objectNote);
+    }
+
+    @Test
+    void shouldIncludeInboundReferencesToObjectOfReifiedChild() {
+      GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
+
+      // Verify inbound references to object are included
+      assertRelatedNotesContain(
+          result,
+          RelationshipToFocusNote.InboundReferenceToObjectOfReifiedChild,
+          inboundReference1,
+          inboundReference2);
+    }
+
+    @Test
+    void shouldNotIncludeInboundReferencesToObjectWhenBudgetIsLimited() {
+      // Set budget to only allow up to object of reified child
+      GraphRAGResult result = graphRAGService.retrieve(focusNote, 3);
+
+      // Verify no inbound references to object are included
+      assertThat(
+          getNotesWithRelationship(
+              result, RelationshipToFocusNote.InboundReferenceToObjectOfReifiedChild),
+          empty());
+    }
+  }
 }

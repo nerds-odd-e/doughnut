@@ -7,11 +7,14 @@ public class ChildRelationshipHandler extends RelationshipHandler {
   private int currentChildIndex = 0;
   private final List<Note> children;
   private final PriorityLayer priorityThreeLayer;
+  private final PriorityLayer priorityFourLayer;
 
-  public ChildRelationshipHandler(Note relatingNote, PriorityLayer priorityThreeLayer) {
+  public ChildRelationshipHandler(
+      Note relatingNote, PriorityLayer priorityThreeLayer, PriorityLayer priorityFourLayer) {
     super(RelationshipToFocusNote.Child, relatingNote);
     this.children = relatingNote.getChildren();
     this.priorityThreeLayer = priorityThreeLayer;
+    this.priorityFourLayer = priorityFourLayer;
   }
 
   @Override
@@ -21,7 +24,10 @@ public class ChildRelationshipHandler extends RelationshipHandler {
 
       // If this child is a reified note, add its object to priority 3
       if (child.getTargetNote() != null && priorityThreeLayer != null) {
-        priorityThreeLayer.addHandler(new ObjectOfReifiedChildRelationshipHandler(child));
+        ObjectOfReifiedChildRelationshipHandler handler =
+            new ObjectOfReifiedChildRelationshipHandler(child);
+        handler.setPriorityFourLayer(priorityFourLayer);
+        priorityThreeLayer.addHandler(handler);
       }
 
       return child;
