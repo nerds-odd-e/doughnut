@@ -3,15 +3,15 @@
     <NoteRealmLoader v-bind="{ noteId, storageAccessor }">
       <template #default="{ noteRealm }">
         <TeleportToHeadStatus>
-          <div class="btn-group">
+          <div class="daisy-btn-group">
             <button
               v-if="onToggleSidebar"
               role="button"
-              class="btn btn-sm"
+              class="daisy-btn daisy-btn-sm"
               title="toggle sidebar"
               @click="(e: MouseEvent) => onToggleSidebar?.(e)"
             >
-              <span class="navbar-toggler-icon"></span>
+              <span class="daisy-btn-square-icon"></span>
             </button>
           </div>
           <BreadcrumbWithCircle
@@ -40,9 +40,9 @@
             />
             <div
               class="note-content-wrapper"
-              :class="{ minimized: isMinimized }"
+              :class="{ 'daisy-collapse daisy-collapse-arrow': isMinimized }"
             >
-              <div id="main-note-content" class="col-md-9">
+              <div id="main-note-content" class="daisy-flex daisy-flex-col daisy-w-9/12">
                 <NoteTextContent
                   v-bind="{
                     note: noteRealm.note,
@@ -61,7 +61,7 @@
                   }"
                 >
                   <p>
-                    <span class="me-3">
+                    <span class="daisy-mr-3">
                       Created: {{ toLocalDateString(noteRealm.note.createdAt) }}
                     </span>
                     <span>
@@ -74,8 +74,8 @@
                   :notes="noteRealm.children ?? []"
                 />
               </div>
-              <div class="col-md-3 refers" v-if="noteRealm.refers">
-                <ul>
+              <div class="daisy-w-3/12 refers" v-if="noteRealm.refers">
+                <ul class="daisy-menu daisy-menu-compact">
                   <li v-for="link in noteRealm.refers" :key="link.id">
                     <span>{{ reverseLabel(link.noteTopology.linkType) }} </span>
                     <LinkOfNote
@@ -141,27 +141,19 @@ const toLocalDateString = (date: string) => {
 
 <style scoped>
 .note-show-container {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
+  @apply daisy-flex daisy-flex-col daisy-h-full;
 }
 
 .note-content-wrapper {
-  flex: 1;
-  min-height: 0;
+  @apply daisy-flex-1 daisy-min-h-0 daisy-overflow-auto daisy-flex daisy-gap-4; /* CHANGED: Bootstrap gap-3 -> daisy-gap-4 */
   transition: height 0.3s ease;
-  overflow: auto;
-  display: flex;
-  gap: 1rem;
 }
 
 .refers {
-  border-left: 1px solid #e9ecef;
-  padding-left: 1rem;
+  @apply daisy-border-l daisy-border-base-300 daisy-pl-4;
 }
 
 .note-content-wrapper.minimized {
-  height: 50px;
-  overflow: hidden;
+  @apply daisy-h-12 daisy-overflow-hidden;
 }
 </style>

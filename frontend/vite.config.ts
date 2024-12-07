@@ -11,6 +11,8 @@ import { defineConfig } from 'vite'
 import checker from 'vite-plugin-checker'
 import viteCompression from 'vite-plugin-compression'
 import tsconfigPaths from 'vite-tsconfig-paths'
+import tailwindcss from 'tailwindcss'
+import autoprefixer from 'autoprefixer'
 
 export default defineConfig({
   resolve: {
@@ -40,6 +42,12 @@ export default defineConfig({
         quietDeps: true,
         warnRuleAsError: false
       },
+    },
+    postcss: {
+      plugins: [
+	tailwindcss(),
+	autoprefixer(),
+      ],
     },
   },
   optimizeDeps: {

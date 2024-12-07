@@ -39,7 +39,9 @@
     "src/**/*.tsx",
     "src/**/*.vue",
     "tests/**/*.ts",
-    "tests/**/*.d.ts"
+    "tests/**/*.d.ts",
+    "postcss.config.ts",
+    "tailwind.config.ts"
   ],
   "exclude": [
     "node_modules",
