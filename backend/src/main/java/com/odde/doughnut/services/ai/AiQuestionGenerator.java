@@ -25,7 +25,7 @@ public record AiQuestionGenerator(
         notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(note);
     try {
       MCQWithAnswer original = service.generateQuestion();
-      if (original != null && Boolean.FALSE.equals(original.isStrictChoiceOrder())) {
+      if (original != null && !original.isStrictChoiceOrder()) {
         return shuffleChoices(original);
       }
       return original;

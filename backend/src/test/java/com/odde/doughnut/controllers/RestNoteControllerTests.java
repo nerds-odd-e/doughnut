@@ -11,6 +11,7 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.graphRAG.GraphRAGResult;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -296,6 +297,43 @@ class RestNoteControllerTests {
       assertThrows(
           ResponseStatusException.class,
           () -> controller.searchForLinkTargetWithin(note, searchTerm));
+    }
+  }
+
+  @Nested
+  class GraphTests {
+    Note rootNote;
+    Note child1;
+
+    @BeforeEach
+    void setup() {
+      rootNote = makeMe.aNote("Root").creatorAndOwner(userModel).please();
+      child1 = makeMe.aNote("Child 1").under(rootNote).please();
+      makeMe.refresh(rootNote);
+    }
+
+    @Test
+    void shouldReturnGraphWithDefaultTokenLimit() throws UnexpectedNoAccessRightException {
+      GraphRAGResult result = controller.getGraph(rootNote, 5000);
+
+      assertThat(result.getFocusNote().getUri(), equalTo(rootNote.getUri()));
+      assertThat(result.getRelatedNotes(), is(not(empty())));
+    }
+
+    @Test
+    void shouldRespectCustomTokenLimit() throws UnexpectedNoAccessRightException {
+      GraphRAGResult result = controller.getGraph(rootNote, 1);
+      assertThat(result.getRelatedNotes(), is(empty()));
+    }
+
+    @Test
+    void shouldNotAllowAccessToUnauthorizedNotes() {
+      User otherUser = makeMe.aUser().please();
+      Note unauthorizedNote = makeMe.aNote().creatorAndOwner(otherUser).please();
+
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.getGraph(unauthorizedNote, 5000));
     }
   }
 }

@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { GraphRAGResult } from '../models/GraphRAGResult';
 import type { NoteAccessoriesDTO } from '../models/NoteAccessoriesDTO';
 import type { NoteAccessory } from '../models/NoteAccessory';
 import type { NoteInfo } from '../models/NoteInfo';
@@ -220,6 +221,30 @@ export class RestNoteControllerService {
             url: '/api/notes/{note}/note-info',
             path: {
                 'note': note,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param note
+     * @param tokenLimit
+     * @returns GraphRAGResult OK
+     * @throws ApiError
+     */
+    public getGraph(
+        note: number,
+        tokenLimit: number = 5000,
+    ): CancelablePromise<GraphRAGResult> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/notes/{note}/graph',
+            path: {
+                'note': note,
+            },
+            query: {
+                'tokenLimit': tokenLimit,
             },
             errors: {
                 500: `Internal Server Error`,

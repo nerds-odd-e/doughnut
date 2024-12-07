@@ -11,7 +11,10 @@ import com.odde.doughnut.models.NoteMotionModel;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.SearchTermModel;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.GraphRAGService;
 import com.odde.doughnut.services.WikidataService;
+import com.odde.doughnut.services.graphRAG.CharacterBasedTokenCountingStrategy;
+import com.odde.doughnut.services.graphRAG.GraphRAGResult;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.services.wikidataApis.WikidataIdWithApi;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -214,5 +217,17 @@ class RestNoteController {
         .stream()
         .map(note -> new NoteViewer(currentUser.getEntity(), note).toJsonObject())
         .toList();
+  }
+
+  @GetMapping("/{note}/graph")
+  public GraphRAGResult getGraph(
+      @PathVariable("note") @Schema(type = "integer") Note note,
+      @RequestParam(defaultValue = "5000") int tokenLimit)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertReadAuthorization(note);
+
+    GraphRAGService graphRAGService =
+        new GraphRAGService(new CharacterBasedTokenCountingStrategy());
+    return graphRAGService.retrieve(note, tokenLimit);
   }
 }

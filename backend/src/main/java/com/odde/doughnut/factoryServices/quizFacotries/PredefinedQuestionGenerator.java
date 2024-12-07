@@ -15,8 +15,7 @@ public record PredefinedQuestionGenerator(
 
   public PredefinedQuestion generateAQuestionOfRandomType(AiQuestionGenerator questionGenerator) {
     List<PredefinedQuestionFactory> factories = getPredefinedQuestionFactories(questionGenerator);
-    PredefinedQuestion result = generateAQuestionOfFirstPossibleType(randomizer.shuffle(factories));
-    return result;
+    return generateAQuestionOfFirstPossibleType(randomizer.shuffle(factories));
   }
 
   private Optional<PredefinedQuestion> buildOne(

@@ -2564,6 +2564,37 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NoteInfo"
+  /api/notes/{note}/graph:
+    get:
+      tags:
+      - rest-note-controller
+      operationId: getGraph
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: tokenLimit
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 5000
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/GraphRAGResult"
   /api/notes/{note}/accessory:
     get:
       tags:
@@ -4114,6 +4145,111 @@ components:
           format: date-time
         recallSetting:
           $ref: "#/components/schemas/RecallSetting"
+    BareNote:
+      type: object
+      properties:
+        uri:
+          type: string
+        subjectUriAndTitle:
+          type: string
+        predicate:
+          type: string
+        title:
+          type: string
+        objectUriAndTitle:
+          type: string
+        parentUriAndTitle:
+          type: string
+        relationToFocusNote:
+          type: string
+          enum:
+          - Self
+          - Parent
+          - Object
+          - Child
+          - PriorSibling
+          - YoungerSibling
+          - InboundReference
+          - SubjectOfInboundReference
+          - AncestorInContextualPath
+          - AncestorInObjectContextualPath
+          - ObjectOfReifiedChild
+          - SiblingOfParent
+          - SiblingOfParentOfObject
+          - ChildOfSiblingOfParent
+          - ChildOfSiblingOfParentOfObject
+          - InboundReferenceContextualPath
+          - SiblingOfSubjectOfInboundReference
+          - InboundReferenceToObjectOfReifiedChild
+        details:
+          type: string
+    FocusNote:
+      type: object
+      properties:
+        uri:
+          type: string
+        subjectUriAndTitle:
+          type: string
+        predicate:
+          type: string
+        title:
+          type: string
+        objectUriAndTitle:
+          type: string
+        parentUriAndTitle:
+          type: string
+        relationToFocusNote:
+          type: string
+          enum:
+          - Self
+          - Parent
+          - Object
+          - Child
+          - PriorSibling
+          - YoungerSibling
+          - InboundReference
+          - SubjectOfInboundReference
+          - AncestorInContextualPath
+          - AncestorInObjectContextualPath
+          - ObjectOfReifiedChild
+          - SiblingOfParent
+          - SiblingOfParentOfObject
+          - ChildOfSiblingOfParent
+          - ChildOfSiblingOfParentOfObject
+          - InboundReferenceContextualPath
+          - SiblingOfSubjectOfInboundReference
+          - InboundReferenceToObjectOfReifiedChild
+        details:
+          type: string
+        children:
+          type: array
+          items:
+            type: string
+        priorSiblings:
+          type: array
+          items:
+            type: string
+        youngerSiblings:
+          type: array
+          items:
+            type: string
+        contextualPath:
+          type: array
+          items:
+            type: string
+        inboundReferences:
+          type: array
+          items:
+            type: string
+    GraphRAGResult:
+      type: object
+      properties:
+        focusNote:
+          $ref: "#/components/schemas/FocusNote"
+        relatedNotes:
+          type: array
+          items:
+            $ref: "#/components/schemas/BareNote"
     NotebooksViewedByUser:
       required:
       - notebooks
