@@ -44,7 +44,7 @@
               class="note-content-wrapper"
               :class="{ 'daisy-collapse daisy-collapse-arrow': isMinimized }"
             >
-              <div id="main-note-content" class="daisy-flex daisy-flex-col daisy-w-9/12">
+              <div id="main-note-content" class="daisy-flex daisy-flex-col daisy-w-full lg:daisy-w-9/12">
                 <NoteTextContent
                   v-bind="{
                     note: noteRealm.note,
@@ -76,7 +76,7 @@
                   :notes="noteRealm.children ?? []"
                 />
               </div>
-              <div class="daisy-w-3/12 inboundReferencea" v-if="noteRealm.inboundReferencea">
+              <div class="daisy-w-full lg:daisy-w-3/12 inboundReferencea" v-if="noteRealm.inboundReferencea && noteRealm.inboundReferencea.length > 0">
                 <ul class="daisy-menu daisy-menu-compact">
                   <li v-for="link in noteRealm.inboundReferencea" :key="link.id">
                     <span>{{ reverseLabel(link.noteTopology.linkType) }} </span>
@@ -147,12 +147,15 @@ const toLocalDateString = (date: string) => {
 }
 
 .note-content-wrapper {
-  @apply daisy-flex-1 daisy-min-h-0 daisy-overflow-auto daisy-flex daisy-gap-4; /* CHANGED: Bootstrap gap-3 -> daisy-gap-4 */
-  transition: height 0.3s ease;
+  @apply daisy-flex-1 daisy-min-h-0 daisy-overflow-auto daisy-flex daisy-flex-col lg:daisy-flex-row daisy-gap-4;
+}
+
+#main-note-content {
+  @apply daisy-flex daisy-flex-col daisy-w-full lg:daisy-w-9/12;
 }
 
 .inboundReferencea {
-  @apply daisy-border-l daisy-border-base-300 daisy-pl-4;
+  @apply daisy-border-l daisy-border-base-300 daisy-pl-4 daisy-w-full lg:daisy-w-3/12 daisy-bg-amber-50/50;
 }
 
 .note-content-wrapper.minimized {
