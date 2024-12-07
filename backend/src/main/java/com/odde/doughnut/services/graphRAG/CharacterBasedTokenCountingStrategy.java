@@ -1,10 +1,15 @@
 package com.odde.doughnut.services.graphRAG;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
+
 public class CharacterBasedTokenCountingStrategy implements TokenCountingStrategy {
+  private final ObjectMapper objectMapper = new ObjectMapper();
+
+  @SneakyThrows
   @Override
   public int estimateTokens(BareNote bareNote) {
-    String details = bareNote.getDetails();
-    if (details == null) return 1;
-    return details.length() / 4 + 1;
+    String jsonString = objectMapper.writeValueAsString(bareNote);
+    return (int) Math.ceil(jsonString.length() / 3.75);
   }
 }
