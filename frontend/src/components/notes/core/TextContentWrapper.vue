@@ -57,6 +57,9 @@ const wrapperClass = computed(() => {
 })
 
 const onUpdate = (noteId: number, newValue: string) => {
+  if (field === "edit title" && !newValue.trim()) {
+    return
+  }
   version.value += 1
   errors.value = {}
   localValue.value = newValue

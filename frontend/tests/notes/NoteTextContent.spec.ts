@@ -182,6 +182,26 @@ describe("in place edit on title", () => {
     expect(mockedUpdateTitleCall).toBeCalledTimes(0)
   })
 
+  describe("blank title handling", () => {
+    it.each([
+      { case: "empty string", value: "" },
+      { case: "spaces only", value: "   " },
+      { case: "newlines only", value: "\n\n" },
+      { case: "mixed whitespace", value: " \n \t " },
+    ])("should not save when title is $case", async ({ value }) => {
+      const wrapper = mountComponent(note)
+      await flushPromises()
+
+      const titleEl = wrapper.find('[role="title"]').element as HTMLElement
+      titleEl.innerText = value
+      titleEl.dispatchEvent(new Event("input"))
+      titleEl.dispatchEvent(new Event("blur"))
+      await flushPromises()
+
+      expect(mockedUpdateTitleCall).not.toBeCalled()
+    })
+  })
+
   describe("with mocked window.confirm", () => {
     // eslint-disable-next-line no-alert
     const jsdomConfirm = window.confirm
