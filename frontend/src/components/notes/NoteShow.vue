@@ -77,15 +77,23 @@
                 />
               </div>
               <div class="daisy-w-full lg:daisy-w-3/12 inboundReferences" v-if="noteRealm.inboundReferences && noteRealm.inboundReferences.length > 0">
-                <ul class="daisy-menu daisy-menu-compact">
-                  <li v-for="link in noteRealm.inboundReferences" :key="link.id">
-                    <span>{{ reverseLabel(link.noteTopology.linkType) }} </span>
-                    <LinkOfNote
-                      class="link-multi"
+                <h3 class="daisy-text-lg daisy-font-medium daisy-mb-2">Referenced by</h3>
+                <ul class="daisy-menu daisy-bg-base-100 daisy-rounded-lg daisy-shadow-sm">
+                  <li v-for="link in noteRealm.inboundReferences"
                       :key="link.id"
-                      v-bind="{ note: link, storageAccessor }"
-                      :reverse="true"
-                    />
+                      class="daisy-menu-item daisy-hover:daisy-bg-base-200 daisy-transition-colors daisy-py-2"
+                  >
+                    <div class="daisy-flex daisy-items-center daisy-gap-2">
+                      <span class="daisy-text-sm daisy-text-base-content/70">
+                        {{ reverseLabel(link.noteTopology.linkType) }}
+                      </span>
+                      <LinkOfNote
+                        class="link-multi"
+                        :key="link.id"
+                        v-bind="{ note: link, storageAccessor }"
+                        :reverse="true"
+                      />
+                    </div>
                   </li>
                 </ul>
               </div>
