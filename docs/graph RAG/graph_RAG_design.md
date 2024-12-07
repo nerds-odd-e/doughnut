@@ -10,7 +10,7 @@ Key relationships in the note graph include:
 - Parent-child relationships (including reified children)
 - Sibling relationships (prior and younger siblings)
 - Object relationships (for reification notes)
-- Reference relationships (notes referring to the current note)
+- Reference relationships (inbound references to the current note)
 - Extended relationships (parent siblings, cousins, etc.)
 
 The contextual path represents the hierarchical chain from root to parent, providing navigational context for any note.
@@ -29,12 +29,12 @@ The Graph RAG system aims to retrieve a focused view of a note and its most rele
 - **FocusNote**: Extended note representation including:
   - All BareNote fields (untruncated)
   - Contextual path
-  - Lists of related notes (children, siblings, referring notes)
+  - Lists of related notes (children, siblings, inbound references)
 
 - **RelationshipToFocusNote**: Enumeration of possible relationships:
   - Direct: Self, Parent, Object, Child
   - Sibling: PriorSibling, YoungerSibling
-  - Reference: ReferringNote, ReifiedChildObject
+  - Reference: InboundReference, ReifiedChildObject
   - Contextual: NoteInContextualPath, NoteInObjectContextualPath
   - Extended: ParentSibling, ObjectParentSibling, ParentSiblingChild, etc.
 
@@ -52,18 +52,18 @@ The system uses a layered priority approach:
 
 2. **Direct Relations** (Priority 2)
    - Children, Siblings (Prior/Younger)
-   - Referring Notes
+   - Inbound References
    - Contextual Path Notes
 
 3. **Extended Relations** (Priority 3)
    - Reified Child Objects
    - Parent/Object Siblings
-   - Referring Note Subjects
+   - Inbound Reference Subjects
 
 4. **Distant Relations** (Priority 4)
    - Parent Sibling Children
    - Object Parent Sibling Children
-   - Notes in Referring Contextual Paths
+   - Notes in Inbound Reference Contextual Paths
 
 ## Retrieval Algorithm
 
@@ -109,7 +109,7 @@ The system manages complex relationship dependencies:
 
 - **Indirect Dependencies**
   - ParentSibling → ParentSiblingChild
-  - ReferringNote → NoteInReferringContextualPath
+  - InboundReference → NoteInInboundReferenceContextualPath
 
 ## Implementation Considerations
 
