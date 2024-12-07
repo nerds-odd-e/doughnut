@@ -762,6 +762,10 @@ public class GraphRAGServiceTest {
       assertThat(jsonNode.has("relatedNotes"), is(true));
       assertThat(jsonNode.get("relatedNotes").isArray(), is(true));
       assertThat(jsonNode.get("relatedNotes").size(), equalTo(1));
+
+      // Verify the structure of the related note
+      JsonNode relatedNote = jsonNode.get("relatedNotes").get(0);
+      assertThat(relatedNote.has("relationToFocusNote"), is(true));
     }
   }
 }

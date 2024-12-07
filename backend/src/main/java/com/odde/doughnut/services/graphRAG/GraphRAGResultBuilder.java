@@ -1,22 +1,19 @@
 package com.odde.doughnut.services.graphRAG;
 
 import com.odde.doughnut.entities.Note;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class GraphRAGResultBuilder {
   private int remainingBudget;
   private final Map<Note, BareNote> addedNotes = new HashMap<>();
-  private final List<BareNote> relatedNotes = new ArrayList<>();
-  private final FocusNote focus;
+  private final GraphRAGResult result;
   private final TokenCountingStrategy tokenCountingStrategy;
 
   public GraphRAGResultBuilder(
       Note focusNote, int tokenBudget, TokenCountingStrategy tokenCountingStrategy) {
     this.remainingBudget = tokenBudget;
-    this.focus = FocusNote.fromNote(focusNote);
+    this.result = new GraphRAGResult(FocusNote.fromNote(focusNote));
     this.tokenCountingStrategy = tokenCountingStrategy;
   }
 
@@ -29,7 +26,7 @@ public class GraphRAGResultBuilder {
     int tokens = tokenCountingStrategy.estimateTokens(note);
     if (tokens <= remainingBudget) {
       BareNote bareNote = BareNote.fromNote(note, relationship);
-      relatedNotes.add(bareNote);
+      result.getRelatedNotes().add(bareNote);
       remainingBudget -= tokens;
       addedNotes.put(note, bareNote);
       return bareNote;
@@ -38,13 +35,10 @@ public class GraphRAGResultBuilder {
   }
 
   public FocusNote getFocusNote() {
-    return focus;
+    return result.getFocusNote();
   }
 
   public GraphRAGResult build() {
-    GraphRAGResult result = new GraphRAGResult();
-    result.setFocusNote(focus);
-    result.setRelatedNotes(relatedNotes);
     return result;
   }
 }
