@@ -9,41 +9,37 @@ import lombok.Getter;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class BareNote {
-  @Getter private UriAndTitle uriAndTitle;
-  @Getter private String details;
-  private UriAndTitle parentUriAndTitle;
-  @Getter private UriAndTitle objectUriAndTitle;
-  @Getter private RelationshipToFocusNote relationToFocusNote;
+  private final Note note;
+  @Getter private final UriAndTitle uriAndTitle;
+  @Getter private final String details;
+  @Getter private final UriAndTitle objectUriAndTitle;
+  @Getter private final RelationshipToFocusNote relationToFocusNote;
+
+  protected BareNote(Note note, String details, RelationshipToFocusNote relation) {
+    this.note = note;
+    this.uriAndTitle = UriAndTitle.fromNote(note);
+    this.details = details;
+    this.relationToFocusNote = relation;
+    this.objectUriAndTitle =
+        note.getTargetNote() != null ? UriAndTitle.fromNote(note.getTargetNote()) : null;
+  }
 
   @JsonProperty("parentUriAndTitle")
   public UriAndTitle getParentUriAndTitle() {
-    return objectUriAndTitle == null ? parentUriAndTitle : null;
+    return objectUriAndTitle == null && note.getParent() != null
+        ? UriAndTitle.fromNote(note.getParent())
+        : null;
   }
 
   @JsonProperty("subjectUriAndTitle")
   public UriAndTitle getSubjectUriAndTitle() {
-    return objectUriAndTitle != null ? parentUriAndTitle : null;
-  }
-
-  protected static void initializeFromNote(
-      BareNote bareNote, Note note, RelationshipToFocusNote relation) {
-    bareNote.uriAndTitle = UriAndTitle.fromNote(note);
-    bareNote.details = note.getDetails();
-    bareNote.relationToFocusNote = relation;
-
-    if (note.getParent() != null) {
-      bareNote.parentUriAndTitle = UriAndTitle.fromNote(note.getParent());
-    }
-    if (note.getTargetNote() != null) {
-      bareNote.objectUriAndTitle = UriAndTitle.fromNote(note.getTargetNote());
-    }
+    return objectUriAndTitle != null && note.getParent() != null
+        ? UriAndTitle.fromNote(note.getParent())
+        : null;
   }
 
   public static BareNote fromNote(Note note, RelationshipToFocusNote relation) {
-    BareNote bareNote = new BareNote();
-    initializeFromNote(bareNote, note, relation);
-    bareNote.details = truncateDetails(bareNote.details);
-    return bareNote;
+    return new BareNote(note, truncateDetails(note.getDetails()), relation);
   }
 
   private static String truncateDetails(String details) {
@@ -55,13 +51,9 @@ public class BareNote {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof BareNote) {
-      return uriAndTitle.equals(((BareNote) obj).uriAndTitle);
-    }
-    if (obj instanceof Note) {
-      return uriAndTitle.equals(obj);
-    }
-    return false;
+    return obj instanceof Note
+        ? uriAndTitle.equals(obj)
+        : obj instanceof BareNote && uriAndTitle.equals(((BareNote) obj).uriAndTitle);
   }
 
   @Override
