@@ -21,7 +21,7 @@ public class ChildRelationshipHandler extends RelationshipHandler {
 
       // If this child is a reified note, add its object to priority 3
       if (child.getTargetNote() != null && priorityThreeLayer != null) {
-        priorityThreeLayer.addHandler(new ReifiedChildObjectRelationshipHandler(child));
+        priorityThreeLayer.addHandler(new ObjectOfReifiedChildRelationshipHandler(child));
       }
 
       return child;

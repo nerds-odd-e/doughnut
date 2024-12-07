@@ -17,10 +17,10 @@ public class GraphRAGService {
     // Create handlers with the focus note
     ParentRelationshipHandler parentHandler = new ParentRelationshipHandler(focusNote);
     ObjectRelationshipHandler objectHandler = new ObjectRelationshipHandler(focusNote);
-    ContextualPathRelationshipHandler contextualPathHandler =
-        new ContextualPathRelationshipHandler(focusNote);
-    NoteInObjectContextualPathRelationshipHandler objectContextualPathHandler =
-        new NoteInObjectContextualPathRelationshipHandler(focusNote);
+    AncestorInContextualPathRelationshipHandler contextualPathHandler =
+        new AncestorInContextualPathRelationshipHandler(focusNote);
+    AncestorInObjectContextualPathRelationshipHandler objectContextualPathHandler =
+        new AncestorInObjectContextualPathRelationshipHandler(focusNote);
 
     // Create priority three layer so we can pass it to ChildRelationshipHandler
     PriorityLayer priorityThreeLayer = new PriorityLayer(2);
@@ -33,10 +33,10 @@ public class GraphRAGService {
         new YoungerSiblingRelationshipHandler(focusNote);
     InboundReferenceRelationshipHandler referringNoteHandler =
         new InboundReferenceRelationshipHandler(focusNote, priorityThreeLayer, priorityFourLayer);
-    ParentSiblingRelationshipHandler parentSiblingHandler =
-        new ParentSiblingRelationshipHandler(focusNote, priorityFourLayer);
-    ObjectParentSiblingRelationshipHandler objectParentSiblingHandler =
-        new ObjectParentSiblingRelationshipHandler(focusNote, priorityFourLayer);
+    SiblingOfParentRelationshipHandler parentSiblingHandler =
+        new SiblingOfParentRelationshipHandler(focusNote, priorityFourLayer);
+    SiblingOfParentOfObjectRelationshipHandler objectParentSiblingHandler =
+        new SiblingOfParentOfObjectRelationshipHandler(focusNote, priorityFourLayer);
 
     // Set up priority layers with number of notes to process before switching
     PriorityLayer priorityOneLayer =

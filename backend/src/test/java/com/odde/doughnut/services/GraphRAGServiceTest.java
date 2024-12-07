@@ -199,7 +199,7 @@ public class GraphRAGServiceTest {
         // Verify object's contextual path notes are in related notes
         assertRelatedNotesContain(
             result,
-            RelationshipToFocusNote.NoteInObjectContextualPath,
+            RelationshipToFocusNote.AncestorInObjectContextualPath,
             objectGrandParent,
             objectParent);
       }
@@ -218,7 +218,8 @@ public class GraphRAGServiceTest {
 
         // Verify no object contextual path notes are included
         assertThat(
-            getNotesWithRelationship(result, RelationshipToFocusNote.NoteInObjectContextualPath),
+            getNotesWithRelationship(
+                result, RelationshipToFocusNote.AncestorInObjectContextualPath),
             empty());
       }
     }
@@ -414,7 +415,9 @@ public class GraphRAGServiceTest {
       List<BareNote> contextualNotes =
           result.getRelatedNotes().stream()
               .filter(
-                  n -> n.getRelationToFocusNote() == RelationshipToFocusNote.NoteInContextualPath)
+                  n ->
+                      n.getRelationToFocusNote()
+                          == RelationshipToFocusNote.AncestorInContextualPath)
               .collect(Collectors.toList());
 
       assertThat(
@@ -495,7 +498,7 @@ public class GraphRAGServiceTest {
     void shouldIncludeChildObjectInRelatedNotes() {
       GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
 
-      assertRelatedNotesContain(result, RelationshipToFocusNote.ReifiedChildObject, objectNote);
+      assertRelatedNotesContain(result, RelationshipToFocusNote.ObjectOfReifiedChild, objectNote);
 
       // Child should still be in children list
       assertThat(result.getFocusNote().getChildren(), contains(UriAndTitle.fromNote(reifiedChild)));
@@ -543,10 +546,10 @@ public class GraphRAGServiceTest {
                 RelationshipToFocusNote.Child,
                 RelationshipToFocusNote.Child,
                 RelationshipToFocusNote.Child,
-                RelationshipToFocusNote.ReifiedChildObject));
+                RelationshipToFocusNote.ObjectOfReifiedChild));
 
         // Verify the reified child object is included
-        assertRelatedNotesContain(result, RelationshipToFocusNote.ReifiedChildObject, objectNote);
+        assertRelatedNotesContain(result, RelationshipToFocusNote.ObjectOfReifiedChild, objectNote);
       }
 
       @Test
@@ -560,7 +563,7 @@ public class GraphRAGServiceTest {
             containsInAnyOrder(regularChild1, regularChild2, regularChild3, reifiedChild));
 
         // Verify the reified child object is included
-        assertRelatedNotesContain(result, RelationshipToFocusNote.ReifiedChildObject, objectNote);
+        assertRelatedNotesContain(result, RelationshipToFocusNote.ObjectOfReifiedChild, objectNote);
       }
 
       @Test
@@ -589,7 +592,8 @@ public class GraphRAGServiceTest {
 
         // Verify no reified child object is included
         assertThat(
-            getNotesWithRelationship(result, RelationshipToFocusNote.ReifiedChildObject), empty());
+            getNotesWithRelationship(result, RelationshipToFocusNote.ObjectOfReifiedChild),
+            empty());
       }
     }
   }
@@ -686,7 +690,7 @@ public class GraphRAGServiceTest {
 
       // Verify parent siblings are in related notes
       assertRelatedNotesContain(
-          result, RelationshipToFocusNote.ParentSibling, parentSibling1, parentSibling2);
+          result, RelationshipToFocusNote.SiblingOfParent, parentSibling1, parentSibling2);
     }
 
     @Test
@@ -701,7 +705,8 @@ public class GraphRAGServiceTest {
           equalTo(RelationshipToFocusNote.Parent));
 
       // Verify no parent siblings are included
-      assertThat(getNotesWithRelationship(result, RelationshipToFocusNote.ParentSibling), empty());
+      assertThat(
+          getNotesWithRelationship(result, RelationshipToFocusNote.SiblingOfParent), empty());
     }
 
     @Nested
@@ -727,7 +732,7 @@ public class GraphRAGServiceTest {
         // Verify parent sibling children are in related notes
         assertRelatedNotesContain(
             result,
-            RelationshipToFocusNote.ParentSiblingChild,
+            RelationshipToFocusNote.ChildOfSiblingOfParent,
             parentSibling1Child1,
             parentSibling1Child2,
             parentSibling2Child1);
@@ -745,13 +750,14 @@ public class GraphRAGServiceTest {
                 .collect(Collectors.toList()),
             containsInAnyOrder(
                 RelationshipToFocusNote.Parent,
-                RelationshipToFocusNote.ParentSibling,
-                RelationshipToFocusNote.ParentSibling,
-                RelationshipToFocusNote.NoteInContextualPath));
+                RelationshipToFocusNote.SiblingOfParent,
+                RelationshipToFocusNote.SiblingOfParent,
+                RelationshipToFocusNote.AncestorInContextualPath));
 
         // Verify no parent sibling children are included
         assertThat(
-            getNotesWithRelationship(result, RelationshipToFocusNote.ParentSiblingChild), empty());
+            getNotesWithRelationship(result, RelationshipToFocusNote.ChildOfSiblingOfParent),
+            empty());
       }
     }
   }

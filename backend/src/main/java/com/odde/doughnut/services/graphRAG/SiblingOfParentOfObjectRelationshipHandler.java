@@ -2,13 +2,13 @@ package com.odde.doughnut.services.graphRAG;
 
 import com.odde.doughnut.entities.Note;
 
-public class ObjectParentSiblingRelationshipHandler extends SpiralSiblingRelationshipHandler {
+public class SiblingOfParentOfObjectRelationshipHandler extends SpiralSiblingRelationshipHandler {
   private final PriorityLayer priorityFourLayer;
 
-  public ObjectParentSiblingRelationshipHandler(
+  public SiblingOfParentOfObjectRelationshipHandler(
       Note relatingNote, PriorityLayer priorityFourLayer) {
     super(
-        RelationshipToFocusNote.ObjectParentSibling,
+        RelationshipToFocusNote.SiblingOfParentOfObject,
         relatingNote,
         relatingNote.getTargetNote() != null ? relatingNote.getTargetNote().getParent() : null);
     this.priorityFourLayer = priorityFourLayer;
@@ -19,7 +19,7 @@ public class ObjectParentSiblingRelationshipHandler extends SpiralSiblingRelatio
     Note objectParentSibling = super.handle();
     if (objectParentSibling != null && priorityFourLayer != null) {
       priorityFourLayer.addHandler(
-          new ObjectParentSiblingChildRelationshipHandler(objectParentSibling));
+          new ChildOfSiblingOfParentOfObjectRelationshipHandler(objectParentSibling));
     }
     return objectParentSibling;
   }

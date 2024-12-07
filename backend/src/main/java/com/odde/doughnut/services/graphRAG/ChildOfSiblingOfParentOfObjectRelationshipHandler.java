@@ -3,13 +3,13 @@ package com.odde.doughnut.services.graphRAG;
 import com.odde.doughnut.entities.Note;
 import java.util.List;
 
-public class ParentSiblingChildRelationshipHandler extends RelationshipHandler {
+public class ChildOfSiblingOfParentOfObjectRelationshipHandler extends RelationshipHandler {
   private final List<Note> children;
   private int currentIndex = 0;
 
-  public ParentSiblingChildRelationshipHandler(Note parentSibling) {
-    super(RelationshipToFocusNote.ParentSiblingChild, parentSibling);
-    this.children = parentSibling.getChildren();
+  public ChildOfSiblingOfParentOfObjectRelationshipHandler(Note objectParentSibling) {
+    super(RelationshipToFocusNote.ChildOfSiblingOfParentOfObject, objectParentSibling);
+    this.children = objectParentSibling.getChildren();
   }
 
   @Override

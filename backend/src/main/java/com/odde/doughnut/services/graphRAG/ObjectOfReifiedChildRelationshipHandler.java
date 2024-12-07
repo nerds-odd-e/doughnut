@@ -2,12 +2,12 @@ package com.odde.doughnut.services.graphRAG;
 
 import com.odde.doughnut.entities.Note;
 
-public class ReifiedChildObjectRelationshipHandler extends RelationshipHandler {
+public class ObjectOfReifiedChildRelationshipHandler extends RelationshipHandler {
   private final Note targetNote;
   private boolean handled = false;
 
-  public ReifiedChildObjectRelationshipHandler(Note reifiedChild) {
-    super(RelationshipToFocusNote.ReifiedChildObject, reifiedChild);
+  public ObjectOfReifiedChildRelationshipHandler(Note reifiedChild) {
+    super(RelationshipToFocusNote.ObjectOfReifiedChild, reifiedChild);
     this.targetNote = reifiedChild.getTargetNote();
   }
 
