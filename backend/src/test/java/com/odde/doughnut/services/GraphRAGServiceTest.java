@@ -595,55 +595,60 @@ public class GraphRAGServiceTest {
   }
 
   @Nested
-  class WhenNoteHasReferringNotes {
+  class WhenNoteHasInboundReferenceNotes {
     private Note focusNote;
-    private Note referringParent1;
-    private Note referringNote1;
-    private Note referringParent2;
-    private Note referringNote2;
+    private Note inboundReferenceParent1;
+    private Note inboundReferenceNote1;
+    private Note inboundReferenceParent2;
+    private Note inboundReferenceNote2;
 
     @BeforeEach
     void setup() {
       focusNote = makeMe.aNote().titleConstructor("Focus Note").details("Focus Details").please();
 
-      // Create first referring note
-      referringParent1 = makeMe.aNote().titleConstructor("Referring Parent 1").please();
-      referringNote1 = makeMe.aLink().between(referringParent1, focusNote).please();
+      // Create first inbound reference note
+      inboundReferenceParent1 =
+          makeMe.aNote().titleConstructor("Inbound Reference Parent 1").please();
+      inboundReferenceNote1 = makeMe.aLink().between(inboundReferenceParent1, focusNote).please();
 
-      // Create second referring note
-      referringParent2 = makeMe.aNote().titleConstructor("Referring Parent 2").please();
-      referringNote2 = makeMe.aLink().between(referringParent2, focusNote).please();
+      // Create second inbound reference note
+      inboundReferenceParent2 =
+          makeMe.aNote().titleConstructor("Inbound Reference Parent 2").please();
+      inboundReferenceNote2 = makeMe.aLink().between(inboundReferenceParent2, focusNote).please();
     }
 
     @Test
-    void shouldIncludeReferringNotesAndTheirSubjectsWhenBudgetIsEnough() {
+    void shouldIncludeInboundReferenceNotesAndTheirSubjectsWhenBudgetIsEnough() {
       GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
 
-      // Verify referring notes are in focus note's list
+      // Verify inbound reference notes are in focus note's list
       assertThat(
           result.getFocusNote().getInboundReferences().stream()
               .map(UriAndTitle::getNote)
               .collect(Collectors.toList()),
-          containsInAnyOrder(referringNote1, referringNote2));
+          containsInAnyOrder(inboundReferenceNote1, inboundReferenceNote2));
 
-      // Verify referring notes are in related notes
+      // Verify inbound reference notes are in related notes
       assertRelatedNotesContain(
-          result, RelationshipToFocusNote.InboundReference, referringNote1, referringNote2);
+          result,
+          RelationshipToFocusNote.InboundReference,
+          inboundReferenceNote1,
+          inboundReferenceNote2);
 
-      // Verify referring subjects are in related notes
+      // Verify inbound reference subjects are in related notes
       assertRelatedNotesContain(
           result,
           RelationshipToFocusNote.InboundReferenceSubject,
-          referringParent1,
-          referringParent2);
+          inboundReferenceParent1,
+          inboundReferenceParent2);
     }
 
     @Test
-    void shouldNotIncludeReferringSubjectsWhenBudgetIsLimited() {
-      // Set budget to only allow referring notes
+    void shouldNotIncludeInboundReferenceSubjectsWhenBudgetIsLimited() {
+      // Set budget to only allow inbound reference notes
       GraphRAGResult result = graphRAGService.retrieve(focusNote, 3);
 
-      // Verify only referring notes are included
+      // Verify only inbound reference notes are included
       assertThat(result.getRelatedNotes(), hasSize(2));
       assertThat(
           result.getRelatedNotes().stream()
@@ -651,7 +656,7 @@ public class GraphRAGServiceTest {
               .collect(Collectors.toList()),
           everyItem(equalTo(RelationshipToFocusNote.InboundReference)));
 
-      // Verify no referring subjects are included
+      // Verify no inbound reference subjects are included
       assertThat(
           getNotesWithRelationship(result, RelationshipToFocusNote.InboundReferenceSubject),
           empty());

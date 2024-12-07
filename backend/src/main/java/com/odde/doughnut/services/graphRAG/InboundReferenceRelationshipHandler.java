@@ -4,7 +4,7 @@ import com.odde.doughnut.entities.Note;
 import java.util.List;
 
 public class InboundReferenceRelationshipHandler extends RelationshipHandler {
-  private final List<Note> referringNotes;
+  private final List<Note> inboundReferenceNotes;
   private int currentIndex = 0;
   private final PriorityLayer priorityThreeLayer;
   private final PriorityLayer priorityFourLayer;
@@ -12,15 +12,15 @@ public class InboundReferenceRelationshipHandler extends RelationshipHandler {
   public InboundReferenceRelationshipHandler(
       Note relatingNote, PriorityLayer priorityThreeLayer, PriorityLayer priorityFourLayer) {
     super(RelationshipToFocusNote.InboundReference, relatingNote);
-    this.referringNotes = relatingNote.getRefers();
+    this.inboundReferenceNotes = relatingNote.getRefers();
     this.priorityThreeLayer = priorityThreeLayer;
     this.priorityFourLayer = priorityFourLayer;
   }
 
   @Override
   public Note handle() {
-    if (currentIndex < referringNotes.size()) {
-      Note referringNote = referringNotes.get(currentIndex++);
+    if (currentIndex < inboundReferenceNotes.size()) {
+      Note referringNote = inboundReferenceNotes.get(currentIndex++);
 
       // Add referring subject to priority 3
       if (priorityThreeLayer != null) {
