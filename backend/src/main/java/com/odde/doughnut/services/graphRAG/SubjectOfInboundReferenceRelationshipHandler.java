@@ -23,7 +23,7 @@ public class SubjectOfInboundReferenceRelationshipHandler extends RelationshipHa
       // Push cousins (children of referring subject) to layer 4
       if (priorityFourLayer != null) {
         priorityFourLayer.addHandler(
-            new InboundReferenceCousinRelationshipHandler(referringSubject));
+            new SiblingOfSubjectOfInboundReferenceRelationshipHandler(referringSubject));
       }
 
       return referringSubject;
