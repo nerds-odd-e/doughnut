@@ -16,7 +16,7 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
     this.data = {
       id: noteData.id,
       note: noteData,
-      inboundReferencea: [],
+      inboundReferences: [],
       children: [],
       notebook: new NotebookBuilder().please(),
     }

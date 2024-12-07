@@ -14,11 +14,11 @@ import lombok.Setter;
   "fromBazaar",
   "circle",
   "children",
-  "inboundReferencea",
+  "inboundReferences",
   "notebook"
 })
 public class NoteRealm {
-  @Getter @Setter private List<Note> inboundReferencea;
+  @Getter @Setter private List<Note> inboundReferences;
 
   @NotNull @Getter private Note note;
 

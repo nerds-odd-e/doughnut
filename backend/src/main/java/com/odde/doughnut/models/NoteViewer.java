@@ -17,7 +17,7 @@ public class NoteViewer {
 
   public NoteRealm toJsonObject() {
     NoteRealm nvb = new NoteRealm(note);
-    nvb.setInboundReferencea(note.getInboundReferences().stream().filter(this::allowed).toList());
+    nvb.setInboundReferences(note.getInboundReferences().stream().filter(this::allowed).toList());
     nvb.setFromBazaar(viewer == null || !viewer.owns(note.getNotebook()));
 
     return nvb;

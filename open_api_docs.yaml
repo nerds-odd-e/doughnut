@@ -3602,7 +3602,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Note"
-        inboundReferencea:
+        inboundReferences:
           type: array
           items:
             $ref: "#/components/schemas/Note"
