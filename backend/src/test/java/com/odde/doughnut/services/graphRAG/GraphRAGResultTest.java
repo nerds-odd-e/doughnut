@@ -71,6 +71,24 @@ class GraphRAGResultTest {
       assertThat(jsonNode.has("predicate"), is(true));
       assertThat(jsonNode.get("predicate").asText(), is(":a specialization of"));
     }
+
+    @Test
+    void shouldHaveCorrectPropertyOrderForReifiedNote() throws Exception {
+      // Act
+      String jsonString = objectMapper.writeValueAsString(jsonNode);
+
+      // Assert property order
+      assertThat(jsonString, startsWith("{\"uri\":"));
+      assertThat(
+          jsonString.indexOf("\"subjectUriAndTitle\":"),
+          is(greaterThan(jsonString.indexOf("\"uri\":"))));
+      assertThat(
+          jsonString.indexOf("\"predicate\":"),
+          is(greaterThan(jsonString.indexOf("\"subjectUriAndTitle\":"))));
+      assertThat(
+          jsonString.indexOf("\"objectUriAndTitle\":"),
+          is(greaterThan(jsonString.indexOf("\"predicate\":"))));
+    }
   }
 
   @Test

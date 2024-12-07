@@ -12,13 +12,13 @@ import lombok.Getter;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
   "uri",
-  "title",
-  "details",
+  "subjectUriAndTitle",
   "predicate",
+  "title",
   "objectUriAndTitle",
   "parentUriAndTitle",
-  "subjectUriAndTitle",
-  "relationToFocusNote"
+  "relationToFocusNote",
+  "details"
 })
 public class BareNote {
   private final Note note;
