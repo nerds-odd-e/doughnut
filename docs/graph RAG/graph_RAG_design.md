@@ -34,9 +34,12 @@ The Graph RAG system aims to retrieve a focused view of a note and its most rele
 - **RelationshipToFocusNote**: Enumeration of possible relationships:
   - Direct: Self, Parent, Object, Child
   - Sibling: PriorSibling, YoungerSibling
-  - Reference: InboundReference, ReifiedChildObject
-  - Contextual: NoteInContextualPath, NoteInObjectContextualPath
-  - Extended: ParentSibling, ObjectParentSibling, ParentSiblingChild, etc.
+  - Reference: InboundReference, SubjectOfInboundReference
+  - Contextual: AncestorInContextualPath, AncestorInObjectContextualPath
+  - Reification: ObjectOfReifiedChild
+  - Extended Family: SiblingOfParent, SiblingOfParentOfObject
+  - Cousins: ChildOfSiblingOfParent, ChildOfSiblingOfParentOfObject
+  - Reference Context: InboundReferenceContextualPath, InboundReferenceCousin
 
 - **GraphRAGResult**: Complete result containing:
   - Focus note
@@ -53,17 +56,17 @@ The system uses a layered priority approach:
 2. **Direct Relations** (Priority 2)
    - Children, Siblings (Prior/Younger)
    - Inbound References
-   - Contextual Path Notes
+   - Ancestors in Contextual Paths
 
 3. **Extended Relations** (Priority 3)
-   - Reified Child Objects
-   - Parent/Object Siblings
-   - Inbound Reference Subjects
+   - Objects of Reified Children
+   - Siblings of Parent/Parent of Object
+   - Subjects of Inbound References
 
 4. **Distant Relations** (Priority 4)
-   - Parent Sibling Children
-   - Object Parent Sibling Children
-   - Notes in Inbound Reference Contextual Paths
+   - Children of Parent's Siblings
+   - Children of Object's Parent's Siblings
+   - Inbound Reference Context (Contextual Path and Cousins)
 
 ## Retrieval Algorithm
 
@@ -103,13 +106,14 @@ The system uses a layered priority approach:
 The system manages complex relationship dependencies:
 
 - **Direct Dependencies**
-  - Child → ReifiedChildObject
-  - Parent → ParentSibling
-  - Object → ObjectParentSibling
+  - Child → ObjectOfReifiedChild
+  - Parent → SiblingOfParent
+  - Object → SiblingOfParentOfObject
 
 - **Indirect Dependencies**
-  - ParentSibling → ParentSiblingChild
-  - InboundReference → NoteInInboundReferenceContextualPath
+  - SiblingOfParent → ChildOfSiblingOfParent
+  - SiblingOfParentOfObject → ChildOfSiblingOfParentOfObject
+  - InboundReference → InboundReferenceContextualPath, InboundReferenceCousin
 
 ## Implementation Considerations
 
