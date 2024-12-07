@@ -66,8 +66,7 @@ class FineTuningServiceTest {
           goodOpenAIChatGPTFineTuningExampleList.get(0).getMessages();
       assertThat(goodTrainingData.get(0).getContent(), containsString("Test Title"));
       assertThat(
-          goodTrainingData.get(1).getContent(),
-          containsString("assume the role of a Memory Assistant"));
+          goodTrainingData.get(1).getContent(), containsString("Please act as a Memory Assistant"));
     }
 
     @Test
