@@ -2,120 +2,130 @@
 
 ## Concepts
 
-In Doughnut, notes are atomic knowledge points that are organized in a hierarchical structure within a notebook. Each note has a parent note unless it is the root note of the notebook. A note contains a title and details and is associated with a `uri`. The title and `uri` are often represented in the markdown inline link format `[title](uri)`. While the `uri` is unique, the title is for readability and can be duplicated and subject to change.
+In Doughnut, notes are atomic knowledge points organized hierarchically within notebooks. Each note (except root notes) has a parent and contains a title, details, and a unique URI. The title and URI are commonly represented as markdown links `[title](uri)`.
 
-A note can become a reification if it has an object note. Then the parent becomes the subject and the title is the predicate. It can still have details. The object note can be from another notebook.
+A note becomes a reification when it links to an object note, with its parent becoming the subject and its title serving as the predicate. Reification notes can still contain details, and their object notes may come from different notebooks.
 
-Therefore, it can be inferred that a note can have children. Some of the children might be reifications, which represent a relationship between the parent (called the subject now) and the object note.
+Key relationships in the note graph include:
+- Parent-child relationships (including reified children)
+- Sibling relationships (prior and younger siblings)
+- Object relationships (for reification notes)
+- Reference relationships (notes referring to the current note)
+- Extended relationships (parent siblings, cousins, etc.)
 
-The contextual path is the path (as a list of `uri_and_titles`) from the root note to the parent, including the parent. The root note is always included unless the note itself is the root.
+The contextual path represents the hierarchical chain from root to parent, providing navigational context for any note.
 
-It can also be inferred that a note can have referring reifications, where it is the object note of another reification note.
-
-It can also be inferred that a note can have siblings, which are notes that have the same parent. The siblings are ordered. So a note may have prior siblings and younger siblings.
-
-There are more distantly linked notes, e.g., parent siblings, object siblings, and parent sibling child (cousin), etc.
-
-The goal of the Graph RAG is for a given focus note and a budget token count (excluding the focus note), to retrieve the overall state of the focus note and the most relevant related notes for the given budget. The focus note contains the note content and `uri_and_title` of the relationships it has. Other notes are in a normalized list from highest to lowest relevance within the budget.
-
-The result is used to give the context of the focus note to an LLM, or to retrieve data related to a note when asked by an AI assistant.
+The Graph RAG system aims to retrieve a focused view of a note and its most relevant related notes within a specified token budget. This view includes both direct relationships (parent, children) and extended relationships (siblings, cousins), prioritized by relevance.
 
 ## Data Structures
 
-This data structure is for the external consumption of the Graph RAG. It might be different from how the Doughnut internal data structure is organized.
+### Core Components
+- **BareNote**: Basic note representation containing:
+  - URI and title
+  - Details (truncated for non-focus notes)
+  - Parent and object references
+  - Relationship to focus note
 
-- **BareNote**: `{uri_and_title, details, parent_uri_and_title, object_uri_and_title, relationToFocusNote}`.
-  - **Note**: For all notes except the focus note, details are truncated to `TRUNCATE_LENGTH=1000` characters, with ellipsis.
-- **FocusNote**: `{...BareNote, contextualPath[]: as_a_list_of_uri_and_titles, children[]: as_a_list_of_uri_and_titles, referrings[]: as_a_list_of_uri_and_titles, prior_siblings[]: as_a_list_of_uri_and_titles, younger_siblings[]: as_a_list_of_uri_and_titles }`.
-  - **Note**: The focus note's details are not truncated.
-- **RelationToFocusNote**: An enum of the relationship of the note to the focus note (including `Self`, `Parent`, `Object`, `Child`, `PriorSibling`, `YoungerSibling`, `ReferringNote`, `NoteInContextualPath`, `NoteInObjectContextualPath`, `ReifiedChildObject`, `ParentSibling`, `ObjectParentSibling`, `ParentSiblingChild`, `ObjectParentSiblingChild`, `NoteInReferringContextualPath`, `ReferringCousin`).
-- **GraphRAGResult**: `{focusNote: FocusNote, related_notes[]: as_a_list_of_BareNote}`.
+- **FocusNote**: Extended note representation including:
+  - All BareNote fields (untruncated)
+  - Contextual path
+  - Lists of related notes (children, siblings, referring notes)
+
+- **RelationshipToFocusNote**: Enumeration of possible relationships:
+  - Direct: Self, Parent, Object, Child
+  - Sibling: PriorSibling, YoungerSibling
+  - Reference: ReferringNote, ReifiedChildObject
+  - Contextual: NoteInContextualPath, NoteInObjectContextualPath
+  - Extended: ParentSibling, ObjectParentSibling, ParentSiblingChild, etc.
+
+- **GraphRAGResult**: Complete result containing:
+  - Focus note
+  - Prioritized list of related notes
 
 ## Priorities
 
-- **Priority 0**: FocusNote.
-- **Priority 1**: Parent, Object.
-- **Priority 2**: Child, PriorSibling, YoungerSibling, ReferringNote, NoteInContextualPath, NoteInObjectContextualPath.
-- **Priority 3**: ReifiedChildObject, ParentSibling, ObjectParentSibling, ReferringSubject.
-- **Priority 4**: ParentSiblingChild, ObjectParentSiblingChild, NoteInReferringContextualPath, ReferringCousin.
+The system uses a layered priority approach:
+
+1. **Core Context** (Priority 1)
+   - Parent and Object relationships
+   - Essential for understanding the note's immediate context
+
+2. **Direct Relations** (Priority 2)
+   - Children, Siblings (Prior/Younger)
+   - Referring Notes
+   - Contextual Path Notes
+
+3. **Extended Relations** (Priority 3)
+   - Reified Child Objects
+   - Parent/Object Siblings
+   - Referring Note Subjects
+
+4. **Distant Relations** (Priority 4)
+   - Parent Sibling Children
+   - Object Parent Sibling Children
+   - Notes in Referring Contextual Paths
 
 ## Retrieval Algorithm
 
 ### Input
+- Focus Note
+- Token Budget (excluding focus note)
 
-- `FocusNote`: The main note of interest.
-- `n`: Token budget for retrieval (excluding the focus note).
+### Process
 
-### Steps
+1. **Initialization**
+   - Create priority layers with their handlers
+   - Initialize the result builder with focus note
+   - Calculate initial token budget
 
-1. **Initialize**
-   - Fetch the `FocusNote` (Priority 0) and include it in the result.
-   - Estimate the token cost of `FocusNote` but exclude it from the budget.
-   - Deduct the focus note's token cost from the overall available space.
-   - Initialize cursors for each priority level, pointing to their relationship types.
-   - Initialize cursors for each relationship type to track progress.
-   - Prepare a **dependency queue** to dynamically add new relationship types as they are discovered.
+2. **Priority-Based Processing**
+   - For each priority layer:
+     - Process a fixed number of notes before moving to next layer
+     - Return to higher priority layers periodically
+     - Continue until budget exhausted or no more notes to process
 
-2. **Iterative Retrieval**
-   - While `remaining_tokens > 0`:
-     - For each priority level (1-4):
-       - Fetch up to `(5 - priority number)` notes from this level before giving the next priority level an opportunity.
-       - Within the priority level:
-         - Alternate between fetching one note from each relationship type.
-         - For the relationship type pointed to by the cursor:
-           - Fetch the next unprocessed note from this relationship.
-           - If the note's token cost exceeds the remaining budget:
-             - Skip the note and continue with the next relationship.
-           - If the note is already in `related_notes`, skip it.
-           - Otherwise:
-             - Add the note to `related_notes`.
-             - Deduct its token cost from the budget.
-             - Update the focus note relationships dynamically (e.g., if a `PriorSibling` is fetched, add its `uri_and_title` to the beginning of the `prior_siblings` list in the `FocusNote`).
-             - Add any new relationship types discovered (e.g., fetching a `Child` might trigger a `ReifiedChildObject`) to the **dependency queue** for processing later.
-           - Move the cursor to the next position for this relationship type.
-         - If a relationship type is exhausted, remove it from active relationship types for this priority level.
-       - Move the cursor to the next relationship type in this priority level.
-       - If no active relationship types remain in this priority level, move to the next priority level.
+3. **Relationship Handler Processing**
+   - Each handler manages a specific relationship type
+   - Handlers retrieve notes in relevance order
+   - Track processed notes to avoid duplicates
+   - Update focus note's relationship lists dynamically
 
-3. **Dynamic Dependency Management**
-   - As new relationship types are discovered during note retrieval (e.g., a `Child` leading to `ReifiedChildObject`), add them to the **dependency queue**.
-   - Process the dependency queue to initialize or reinitialize cursors for these relationships.
-   - Prioritize processing dependencies within their appropriate priority level.
-
-4. **Token Budget Management**
-   - Use `CHARACTERS_PER_TOKEN = 3.75` to estimate the token cost of each note.
-   - Ensure the token cost accounts for all dynamic fields, such as added siblings or children, before deducting from the budget.
-   - Stop processing when the token budget is exhausted.
+4. **Budget Management**
+   - Track remaining tokens
+   - Consider relationship metadata in token counts
+   - Stop processing when budget exhausted
 
 ### Output
+- Complete GraphRAGResult with focus note and prioritized related notes
 
-- A `GraphRAGResult` object containing:
-  - `FocusNote`: The focus note with full details and dynamically updated relationships.
-  - `related_notes`: A ranked list of related notes within the token budget.
+## Relationship Dependencies
 
-## Links Between Relationship Types
+The system manages complex relationship dependencies:
 
-Most of the relationship types can retrieve the note they need from the focus note and maintain a cursor. However, some relationships are discovered while fetching a note of another relationship type.
+- **Direct Dependencies**
+  - Child → ReifiedChildObject
+  - Parent → ParentSibling
+  - Object → ObjectParentSibling
 
-- **Fetching Dependencies**:
-  - Fetching a note in a relationship might also affect the `FocusNote`. For example:
-    - A `PriorSibling` not only adds the note to `related_notes`, but also updates the `prior_siblings` list of the `FocusNote`. The new sibling is added at the beginning of the list (since prior siblings are fetched in closeness order) but maintains the original sibling order in the list.
-- **Dependency Hierarchy**:
-  - `Self`: Parent, Object, PriorSibling, YoungerSibling, ReferringNote, NoteInContextualPath, NoteInObjectContextualPath, ParentSibling, ObjectParentSibling.
-  - `Child`: ReifiedChildObject.
-  - `ParentSibling`: ParentSiblingChild.
-  - `ObjectParentSibling`: ObjectParentSiblingChild.
-  - `ReferringNote`: NoteInReferringContextualPath, ReferringCousin.
+- **Indirect Dependencies**
+  - ParentSibling → ParentSiblingChild
+  - ReferringNote → NoteInReferringContextualPath
 
-## Prompting the AI
+## Implementation Considerations
 
-- Present the `FocusNote` with its details.
-- Provide a normalized note list ranked by relevance (high to low).
-- Explain that relationships between notes can be inferred via `uri_and_title` fields.
+- Use priority layers to manage relationship processing order
+- Implement flexible token counting strategies
+- Handle dynamic relationship discovery
+- Maintain relationship consistency in focus note
+- Support efficient note deduplication
+- Enable extensibility for new relationship types
 
-## Key Design Pattern Suggestions for Graph RAG Algorithm
+## Usage Guidelines
 
-- **Strategy Pattern**: Encapsulate retrieval logic for each relationship type to enhance modularity and enable dynamic switching between strategies.
-- **Factory Method**: Simplify and centralize the creation of retrieval strategies, allowing easy addition of new relationship types.
-- **Chain of Responsibility/Iterator**: Manage the iteration across priorities and relationship types dynamically and flexibly.
-- **Observer Pattern**: Handle dynamic updates to the `FocusNote` and notify other components when relationships change.
+The Graph RAG system provides contextual information for:
+- AI-assisted note navigation
+- Context-aware question answering
+- Related content discovery
+- Knowledge graph exploration
+
+The retrieved context should be formatted to emphasize relationship hierarchies and relevance ordering when used with AI models.
