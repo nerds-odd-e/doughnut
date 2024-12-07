@@ -12,47 +12,30 @@ public class GraphRAGService {
 
   public GraphRAGResult retrieve(Note focusNote, int tokenBudgetForRelatedNotes) {
     // Create priority four layer first so we can pass it to ParentSiblingHandler
-    PriorityLayer priorityFourLayer = new PriorityLayer(1);
-
-    // Create handlers with the focus note
-    ParentRelationshipHandler parentHandler = new ParentRelationshipHandler(focusNote);
-    ObjectRelationshipHandler objectHandler = new ObjectRelationshipHandler(focusNote);
-    AncestorInContextualPathRelationshipHandler contextualPathHandler =
-        new AncestorInContextualPathRelationshipHandler(focusNote);
-    AncestorInObjectContextualPathRelationshipHandler objectContextualPathHandler =
-        new AncestorInObjectContextualPathRelationshipHandler(focusNote);
-
-    // Create priority three layer so we can pass it to ChildRelationshipHandler
+    PriorityLayer priorityFourLayer = new PriorityLayer(2);
     PriorityLayer priorityThreeLayer = new PriorityLayer(2);
-
-    ChildRelationshipHandler childrenHandler =
-        new ChildRelationshipHandler(focusNote, priorityThreeLayer, priorityFourLayer);
-    PriorSiblingRelationshipHandler priorSiblingHandler =
-        new PriorSiblingRelationshipHandler(focusNote);
-    YoungerSiblingRelationshipHandler youngerSiblingHandler =
-        new YoungerSiblingRelationshipHandler(focusNote);
-    InboundReferenceRelationshipHandler referringNoteHandler =
-        new InboundReferenceRelationshipHandler(focusNote, priorityThreeLayer, priorityFourLayer);
-    SiblingOfParentRelationshipHandler parentSiblingHandler =
-        new SiblingOfParentRelationshipHandler(focusNote, priorityFourLayer);
-    SiblingOfParentOfObjectRelationshipHandler objectParentSiblingHandler =
-        new SiblingOfParentOfObjectRelationshipHandler(focusNote, priorityFourLayer);
 
     // Set up priority layers with number of notes to process before switching
     PriorityLayer priorityOneLayer =
         new PriorityLayer(
-            3, new RelationshipHandler[] {parentHandler, objectHandler, contextualPathHandler});
+            3,
+            new RelationshipHandler[] {
+              new ParentRelationshipHandler(focusNote),
+              new ObjectRelationshipHandler(focusNote),
+              new AncestorInContextualPathRelationshipHandler(focusNote)
+            });
     PriorityLayer priorityTwoLayer =
         new PriorityLayer(
             3,
             new RelationshipHandler[] {
-              childrenHandler,
-              priorSiblingHandler,
-              youngerSiblingHandler,
-              referringNoteHandler,
-              objectContextualPathHandler,
-              parentSiblingHandler,
-              objectParentSiblingHandler
+              new ChildRelationshipHandler(focusNote, priorityThreeLayer, priorityFourLayer),
+              new PriorSiblingRelationshipHandler(focusNote),
+              new YoungerSiblingRelationshipHandler(focusNote),
+              new InboundReferenceRelationshipHandler(
+                  focusNote, priorityThreeLayer, priorityFourLayer),
+              new AncestorInObjectContextualPathRelationshipHandler(focusNote),
+              new SiblingOfParentRelationshipHandler(focusNote, priorityFourLayer),
+              new SiblingOfParentOfObjectRelationshipHandler(focusNote, priorityFourLayer)
             });
 
     priorityOneLayer.setNextLayer(priorityTwoLayer);

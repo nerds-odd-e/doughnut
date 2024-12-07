@@ -40,6 +40,7 @@ The Graph RAG system aims to retrieve a focused view of a note and its most rele
   - Extended Family: SiblingOfParent, SiblingOfParentOfObject
   - Cousins: ChildOfSiblingOfParent, ChildOfSiblingOfParentOfObject
   - Reference Context: InboundReferenceContextualPath, SiblingOfSubjectOfInboundReference
+  - Reified Child References: InboundReferenceToObjectOfReifiedChild
 
 - **GraphRAGResult**: Complete result containing:
   - Focus note
@@ -67,6 +68,7 @@ The system uses a layered priority approach:
    - Children of Parent's Siblings
    - Children of Object's Parent's Siblings
    - Inbound Reference Context (Contextual Path and Siblings of Reference Subjects)
+   - Inbound References to Objects of Reified Children
 
 ## Retrieval Algorithm
 
@@ -109,6 +111,7 @@ The system manages complex relationship dependencies:
   - Child → ObjectOfReifiedChild
   - Parent → SiblingOfParent
   - Object → SiblingOfParentOfObject
+  - ObjectOfReifiedChild → InboundReferenceToObjectOfReifiedChild
 
 - **Indirect Dependencies**
   - SiblingOfParent → ChildOfSiblingOfParent
