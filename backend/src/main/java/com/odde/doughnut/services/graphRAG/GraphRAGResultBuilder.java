@@ -12,9 +12,10 @@ public class GraphRAGResultBuilder {
 
   public GraphRAGResultBuilder(
       Note focusNote, int tokenBudget, TokenCountingStrategy tokenCountingStrategy) {
-    this.remainingBudget = tokenBudget;
-    this.result = new GraphRAGResult(FocusNote.fromNote(focusNote));
     this.tokenCountingStrategy = tokenCountingStrategy;
+    FocusNote focus = FocusNote.fromNote(focusNote);
+    this.result = new GraphRAGResult(focus);
+    this.remainingBudget = tokenBudget - tokenCountingStrategy.estimateTokens(focus);
   }
 
   public BareNote addNoteToRelatedNotes(Note note, RelationshipToFocusNote relationship) {
