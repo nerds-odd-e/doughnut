@@ -7,11 +7,13 @@
             <button
               v-if="onToggleSidebar"
               role="button"
-              class="daisy-btn daisy-btn-sm"
+              class="daisy-btn daisy-btn-sm daisy-btn-ghost"
               title="toggle sidebar"
               @click="(e: MouseEvent) => onToggleSidebar?.(e)"
             >
+            <div class="daisy-w-4 daisy-h-4 daisy-flex daisy-items-center daisy-justify-center">
               <span class="daisy-btn-square-icon"></span>
+            </div>
             </button>
           </div>
           <BreadcrumbWithCircle
@@ -155,5 +157,17 @@ const toLocalDateString = (date: string) => {
 
 .note-content-wrapper.minimized {
   @apply daisy-h-12 daisy-overflow-hidden;
+}
+
+.daisy-btn-group {
+  @apply daisy-flex daisy-items-center;
+}
+
+.daisy-btn {
+  @apply daisy-min-w-[2rem] daisy-min-h-[2rem] daisy-flex daisy-items-center daisy-justify-center;
+}
+
+.daisy-btn-square-icon {
+  @apply daisy-flex daisy-items-center daisy-justify-center daisy-text-base daisy-leading-none;
 }
 </style>
