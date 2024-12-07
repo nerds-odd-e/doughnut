@@ -15,17 +15,24 @@ public class BareNote {
   private UriAndTitle objectUriAndTitle;
   private RelationshipToFocusNote relationToFocusNote;
 
-  public static BareNote fromNote(Note note, RelationshipToFocusNote relation) {
-    BareNote bareNote = new BareNote();
+  protected static void initializeFromNote(
+      BareNote bareNote, Note note, RelationshipToFocusNote relation) {
     bareNote.setUriAndTitle(UriAndTitle.fromNote(note));
-    bareNote.setDetails(truncateDetails(note.getDetails()));
+    bareNote.setDetails(note.getDetails());
+    bareNote.setRelationToFocusNote(relation);
+
     if (note.getParent() != null) {
       bareNote.setParentUriAndTitle(UriAndTitle.fromNote(note.getParent()));
     }
     if (note.getTargetNote() != null) {
       bareNote.setObjectUriAndTitle(UriAndTitle.fromNote(note.getTargetNote()));
     }
-    bareNote.setRelationToFocusNote(relation);
+  }
+
+  public static BareNote fromNote(Note note, RelationshipToFocusNote relation) {
+    BareNote bareNote = new BareNote();
+    initializeFromNote(bareNote, note, relation);
+    bareNote.setDetails(truncateDetails(bareNote.getDetails()));
     return bareNote;
   }
 
