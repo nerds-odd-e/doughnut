@@ -10,30 +10,35 @@ import lombok.Getter;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class BareNote {
   private final Note note;
-  @Getter private final UriAndTitle uriAndTitle;
   @Getter private final String details;
-  @Getter private final UriAndTitle objectUriAndTitle;
   @Getter private final RelationshipToFocusNote relationToFocusNote;
 
   protected BareNote(Note note, String details, RelationshipToFocusNote relation) {
     this.note = note;
-    this.uriAndTitle = UriAndTitle.fromNote(note);
     this.details = details;
     this.relationToFocusNote = relation;
-    this.objectUriAndTitle =
-        note.getTargetNote() != null ? UriAndTitle.fromNote(note.getTargetNote()) : null;
+  }
+
+  @JsonProperty("uriAndTitle")
+  public UriAndTitle getUriAndTitle() {
+    return UriAndTitle.fromNote(note);
+  }
+
+  @JsonProperty("objectUriAndTitle")
+  public UriAndTitle getObjectUriAndTitle() {
+    return note.getTargetNote() != null ? UriAndTitle.fromNote(note.getTargetNote()) : null;
   }
 
   @JsonProperty("parentUriAndTitle")
   public UriAndTitle getParentUriAndTitle() {
-    return objectUriAndTitle == null && note.getParent() != null
+    return getObjectUriAndTitle() == null && note.getParent() != null
         ? UriAndTitle.fromNote(note.getParent())
         : null;
   }
 
   @JsonProperty("subjectUriAndTitle")
   public UriAndTitle getSubjectUriAndTitle() {
-    return objectUriAndTitle != null && note.getParent() != null
+    return getObjectUriAndTitle() != null && note.getParent() != null
         ? UriAndTitle.fromNote(note.getParent())
         : null;
   }
@@ -52,12 +57,12 @@ public class BareNote {
   @Override
   public boolean equals(Object obj) {
     return obj instanceof Note
-        ? uriAndTitle.equals(obj)
-        : obj instanceof BareNote && uriAndTitle.equals(((BareNote) obj).uriAndTitle);
+        ? getUriAndTitle().equals(obj)
+        : obj instanceof BareNote && getUriAndTitle().equals(((BareNote) obj).getUriAndTitle());
   }
 
   @Override
   public int hashCode() {
-    return uriAndTitle.hashCode();
+    return getUriAndTitle().hashCode();
   }
 }

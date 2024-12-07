@@ -57,6 +57,20 @@ class BareNoteTest {
     assertThat(jsonNode.get("subjectUriAndTitle").asText(), containsString("Parent Note"));
   }
 
+  @Test
+  void shouldHaveExpectedFieldNamesForNoteWithoutParent() throws Exception {
+    // Arrange
+    Note note = makeMe.aNote().titleConstructor("Root Note").details("Some details").please();
+    BareNote bareNote = BareNote.fromNote(note, RelationshipToFocusNote.Child);
+
+    // Act
+    JsonNode jsonNode = objectMapper.valueToTree(bareNote);
+
+    // Assert
+    assertThat(
+        jsonNode::fieldNames, containsInAnyOrder("uriAndTitle", "details", "relationToFocusNote"));
+  }
+
   @Nested
   class FocusNoteTest {
     @Test
