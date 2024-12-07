@@ -2,6 +2,7 @@ package com.odde.doughnut.services.graphRAG;
 
 import static com.odde.doughnut.services.graphRAG.GraphRAGConstants.RELATED_NOTE_DETAILS_TRUNCATE_LENGTH;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.odde.doughnut.entities.Note;
@@ -19,9 +20,19 @@ public class BareNote {
     this.relationToFocusNote = relation;
   }
 
-  @JsonProperty("uriAndTitle")
+  @JsonIgnore
   public UriAndTitle getUriAndTitle() {
     return UriAndTitle.fromNote(note);
+  }
+
+  @JsonProperty("uri")
+  public String getUri() {
+    return note.getUri();
+  }
+
+  @JsonProperty("title")
+  public String getTitle() {
+    return note.getTopicConstructor();
   }
 
   @JsonProperty("objectUriAndTitle")

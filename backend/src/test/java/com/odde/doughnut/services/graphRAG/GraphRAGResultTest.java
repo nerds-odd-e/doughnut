@@ -68,7 +68,7 @@ class GraphRAGResultTest {
 
     // Assert
     assertThat(
-        jsonNode::fieldNames, containsInAnyOrder("uriAndTitle", "details", "relationToFocusNote"));
+        jsonNode::fieldNames, containsInAnyOrder("uri", "title", "details", "relationToFocusNote"));
   }
 
   @Nested
