@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.testability.MakeMe;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,23 +39,38 @@ class GraphRAGResultTest {
     assertThat(jsonNode.get(PARENT_URI_AND_TITLE).asText(), containsString("Parent Note"));
   }
 
-  @Test
-  void shouldIncludeSubjectUriAndTitleButNotParentUriAndTitleWhenNoteIsReified() throws Exception {
-    // Arrange
-    Note parent = makeMe.aNote().titleConstructor("Parent Note").please();
-    Note targetNote =
-        makeMe.aNote().titleConstructor("Target Note").details("Target Details").please();
-    Note note = makeMe.aLink().between(parent, targetNote).please();
+  @Nested
+  class ReifiedNoteTest {
+    private Note parent;
+    private Note targetNote;
+    private Note note;
+    private JsonNode jsonNode;
 
-    BareNote bareNote = BareNote.fromNote(note, RelationshipToFocusNote.Child);
+    @BeforeEach
+    void setup() {
+      parent = makeMe.aNote().titleConstructor("Parent Note").please();
+      targetNote =
+          makeMe.aNote().titleConstructor("Target Note").details("Target Details").please();
+      note = makeMe.aLink().between(parent, targetNote).please();
 
-    // Act
-    JsonNode jsonNode = objectMapper.valueToTree(bareNote);
+      BareNote bareNote = BareNote.fromNote(note, RelationshipToFocusNote.Child);
+      jsonNode = objectMapper.valueToTree(bareNote);
+    }
 
-    // Assert
-    assertThat(jsonNode.has(PARENT_URI_AND_TITLE), is(false));
-    assertThat(jsonNode.has("subjectUriAndTitle"), is(true));
-    assertThat(jsonNode.get("subjectUriAndTitle").asText(), containsString("Parent Note"));
+    @Test
+    void shouldIncludeSubjectUriAndTitleButNotParentUriAndTitleWhenNoteIsReified() {
+      // Assert
+      assertThat(jsonNode.has(PARENT_URI_AND_TITLE), is(false));
+      assertThat(jsonNode.has("subjectUriAndTitle"), is(true));
+      assertThat(jsonNode.get("subjectUriAndTitle").asText(), containsString("Parent Note"));
+    }
+
+    @Test
+    void shouldHavePredicateFieldInsteadOfTitleWhenNoteIsReified() {
+      assertThat(jsonNode.has("title"), is(false));
+      assertThat(jsonNode.has("predicate"), is(true));
+      assertThat(jsonNode.get("predicate").asText(), is(":a specialization of"));
+    }
   }
 
   @Test
@@ -88,26 +104,6 @@ class GraphRAGResultTest {
       // Assert
       assertThat(jsonNode.has(PARENT_URI_AND_TITLE), is(true));
       assertThat(jsonNode.get(PARENT_URI_AND_TITLE).asText(), containsString("Parent Note"));
-    }
-
-    @Test
-    void shouldIncludeSubjectUriAndTitleButNotParentUriAndTitleWhenNoteIsReified()
-        throws Exception {
-      // Arrange
-      Note parent = makeMe.aNote().titleConstructor("Parent Note").please();
-      Note targetNote =
-          makeMe.aNote().titleConstructor("Target Note").details("Target Details").please();
-      Note note = makeMe.aLink().between(parent, targetNote).please();
-
-      FocusNote focusNote = FocusNote.fromNote(note);
-
-      // Act
-      JsonNode jsonNode = objectMapper.valueToTree(focusNote);
-
-      // Assert
-      assertThat(jsonNode.has(PARENT_URI_AND_TITLE), is(false));
-      assertThat(jsonNode.has("subjectUriAndTitle"), is(true));
-      assertThat(jsonNode.get("subjectUriAndTitle").asText(), containsString("Parent Note"));
     }
   }
 }

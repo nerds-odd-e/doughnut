@@ -32,7 +32,12 @@ public class BareNote {
 
   @JsonProperty("title")
   public String getTitle() {
-    return note.getTopicConstructor();
+    return getObjectUriAndTitle() != null ? null : note.getTopicConstructor();
+  }
+
+  @JsonProperty("predicate")
+  public String getPredicate() {
+    return getObjectUriAndTitle() != null ? note.getTopicConstructor() : null;
   }
 
   @JsonProperty("objectUriAndTitle")
