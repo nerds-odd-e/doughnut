@@ -31,8 +31,8 @@ public class GraphRAGService {
         new PriorSiblingRelationshipHandler(focusNote);
     YoungerSiblingRelationshipHandler youngerSiblingHandler =
         new YoungerSiblingRelationshipHandler(focusNote);
-    ReferringNoteRelationshipHandler referringNoteHandler =
-        new ReferringNoteRelationshipHandler(focusNote, priorityThreeLayer, priorityFourLayer);
+    InboundReferenceRelationshipHandler referringNoteHandler =
+        new InboundReferenceRelationshipHandler(focusNote, priorityThreeLayer, priorityFourLayer);
     ParentSiblingRelationshipHandler parentSiblingHandler =
         new ParentSiblingRelationshipHandler(focusNote, priorityFourLayer);
     ObjectParentSiblingRelationshipHandler objectParentSiblingHandler =

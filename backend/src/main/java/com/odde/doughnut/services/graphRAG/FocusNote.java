@@ -11,7 +11,7 @@ public class FocusNote extends BareNote {
   private final List<UriAndTitle> priorSiblings = new ArrayList<>();
   private final List<UriAndTitle> youngerSiblings = new ArrayList<>();
   private final List<UriAndTitle> contextualPath = new ArrayList<>();
-  private final List<UriAndTitle> referrings = new ArrayList<>();
+  private final List<UriAndTitle> inboundReferences = new ArrayList<>();
 
   private FocusNote(Note note) {
     super(note, note.getDetails(), RelationshipToFocusNote.Self);

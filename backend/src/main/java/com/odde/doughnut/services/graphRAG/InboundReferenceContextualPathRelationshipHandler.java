@@ -3,13 +3,13 @@ package com.odde.doughnut.services.graphRAG;
 import com.odde.doughnut.entities.Note;
 import java.util.List;
 
-public class NoteInReferringContextualPathRelationshipHandler extends RelationshipHandler {
+public class InboundReferenceContextualPathRelationshipHandler extends RelationshipHandler {
   private final List<Note> contextualPath;
   private int currentIndex = 0;
 
-  public NoteInReferringContextualPathRelationshipHandler(Note referringNote) {
-    super(RelationshipToFocusNote.NoteInReferringContextualPath, referringNote);
-    this.contextualPath = referringNote.getAncestors();
+  public InboundReferenceContextualPathRelationshipHandler(Note inboundReferenceNote) {
+    super(RelationshipToFocusNote.InboundReferenceContextualPath, inboundReferenceNote);
+    this.contextualPath = inboundReferenceNote.getAncestors();
   }
 
   @Override

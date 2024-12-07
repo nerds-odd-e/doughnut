@@ -621,18 +621,21 @@ public class GraphRAGServiceTest {
 
       // Verify referring notes are in focus note's list
       assertThat(
-          result.getFocusNote().getReferrings().stream()
+          result.getFocusNote().getInboundReferences().stream()
               .map(UriAndTitle::getNote)
               .collect(Collectors.toList()),
           containsInAnyOrder(referringNote1, referringNote2));
 
       // Verify referring notes are in related notes
       assertRelatedNotesContain(
-          result, RelationshipToFocusNote.ReferringNote, referringNote1, referringNote2);
+          result, RelationshipToFocusNote.InboundReference, referringNote1, referringNote2);
 
       // Verify referring subjects are in related notes
       assertRelatedNotesContain(
-          result, RelationshipToFocusNote.ReferringSubject, referringParent1, referringParent2);
+          result,
+          RelationshipToFocusNote.InboundReferenceSubject,
+          referringParent1,
+          referringParent2);
     }
 
     @Test
@@ -646,11 +649,12 @@ public class GraphRAGServiceTest {
           result.getRelatedNotes().stream()
               .map(BareNote::getRelationToFocusNote)
               .collect(Collectors.toList()),
-          everyItem(equalTo(RelationshipToFocusNote.ReferringNote)));
+          everyItem(equalTo(RelationshipToFocusNote.InboundReference)));
 
       // Verify no referring subjects are included
       assertThat(
-          getNotesWithRelationship(result, RelationshipToFocusNote.ReferringSubject), empty());
+          getNotesWithRelationship(result, RelationshipToFocusNote.InboundReferenceSubject),
+          empty());
     }
   }
 

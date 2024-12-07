@@ -3,15 +3,15 @@ package com.odde.doughnut.services.graphRAG;
 import com.odde.doughnut.entities.Note;
 import java.util.List;
 
-public class ReferringNoteRelationshipHandler extends RelationshipHandler {
+public class InboundReferenceRelationshipHandler extends RelationshipHandler {
   private final List<Note> referringNotes;
   private int currentIndex = 0;
   private final PriorityLayer priorityThreeLayer;
   private final PriorityLayer priorityFourLayer;
 
-  public ReferringNoteRelationshipHandler(
+  public InboundReferenceRelationshipHandler(
       Note relatingNote, PriorityLayer priorityThreeLayer, PriorityLayer priorityFourLayer) {
-    super(RelationshipToFocusNote.ReferringNote, relatingNote);
+    super(RelationshipToFocusNote.InboundReference, relatingNote);
     this.referringNotes = relatingNote.getRefers();
     this.priorityThreeLayer = priorityThreeLayer;
     this.priorityFourLayer = priorityFourLayer;
@@ -25,13 +25,13 @@ public class ReferringNoteRelationshipHandler extends RelationshipHandler {
       // Add referring subject to priority 3
       if (priorityThreeLayer != null) {
         priorityThreeLayer.addHandler(
-            new ReferringSubjectRelationshipHandler(referringNote, priorityFourLayer));
+            new InboundReferenceSubjectRelationshipHandler(referringNote, priorityFourLayer));
       }
 
       // Add referring contextual path to priority 4
       if (priorityFourLayer != null) {
         priorityFourLayer.addHandler(
-            new NoteInReferringContextualPathRelationshipHandler(referringNote));
+            new InboundReferenceContextualPathRelationshipHandler(referringNote));
       }
 
       return referringNote;
@@ -41,6 +41,6 @@ public class ReferringNoteRelationshipHandler extends RelationshipHandler {
 
   @Override
   public void afterHandledSuccessfully(FocusNote focus, BareNote addedNote) {
-    focus.getReferrings().add(addedNote.getUriAndTitle());
+    focus.getInboundReferences().add(addedNote.getUriAndTitle());
   }
 }
