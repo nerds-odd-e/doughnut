@@ -22,16 +22,4 @@ export const notebookCard = (notebook: string) => ({
     findNotebookCardButton(notebook, 'Edit notebook settings').click()
     return notebookSettingsPopup()
   },
-  notebookAssistant() {
-    findNotebookCardButton(notebook, 'Notebook Assistant').click()
-    return {
-      create(instruction: string) {
-        cy.formField('Additional Instruction').type(instruction)
-        cy.findByRole('button', {
-          name: 'Create Assistant For Notebook',
-        }).click()
-        cy.pageIsNotLoading()
-      },
-    }
-  },
 })

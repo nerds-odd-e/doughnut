@@ -5,7 +5,7 @@
       <template #button_face>
         <SvgEditNotebook />
       </template>
-      <NotebookEditDialog v-bind="{ notebook }" />
+      <NotebookEditDialog v-bind="{ notebook, user }" />
     </PopButton>
     <PopButton
       title="Move to ..."
@@ -24,17 +24,6 @@
         <SvgRaiseHand />
       </template>
       <NotebookQuestionsDialog v-bind="{ notebook }" />
-    </PopButton>
-    <PopButton title="Notebook Assistant" v-if="user?.admin">
-      <template #button_face>
-        <SvgRobot />
-      </template>
-      <template #default="{ closer }">
-        <NotebookAssistantManagementDialog
-          v-bind="{ notebook }"
-          @close="closer()"
-        />
-      </template>
     </PopButton>
     <button
       class="btn btn-sm"
@@ -59,9 +48,7 @@ import useLoadingApi from "@/managedApi/useLoadingApi"
 import NotebookEditDialog from "./NotebookEditDialog.vue"
 import NotebookMoveDialog from "./NotebookMoveDialog.vue"
 import NotebookQuestionsDialog from "./NotebookQuestionsDialog.vue"
-import NotebookAssistantManagementDialog from "./NotebookAssistantManagementDialog.vue"
 import BazaarNotebookButtons from "@/components/bazaar/BazaarNotebookButtons.vue"
-import SvgRobot from "../svgs/SvgRobot.vue"
 
 const { managedApi } = useLoadingApi()
 const router = useRouter()

@@ -117,8 +117,8 @@ Given(
     start
       .routerToNotebooksPage()
       .notebookCard(notebook)
-      .notebookAssistant()
-      .create(instruction)
+      .editNotebookSettings()
+      .updateNotebookAssistantSetting(instruction)
   }
 )
 
