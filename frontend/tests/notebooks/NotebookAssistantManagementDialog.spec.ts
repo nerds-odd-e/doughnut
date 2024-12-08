@@ -10,6 +10,7 @@ describe("NotebookAssistantManagementDialog.vue", () => {
   let wrapper
   const notebook = makeMe.aNotebook.please()
   const mockedDump = vitest.fn()
+  const mockedUpdateAiAssistant = vitest.fn()
   const originalCreateObjectURL = URL.createObjectURL
   const originalRevokeObjectURL = URL.revokeObjectURL
 
@@ -17,6 +18,8 @@ describe("NotebookAssistantManagementDialog.vue", () => {
     global.URL.createObjectURL = vitest.fn()
     global.URL.revokeObjectURL = vitest.fn()
     helper.managedApi.restNotebookController.downloadNotebookDump = mockedDump
+    helper.managedApi.restNotebookController.updateAiAssistant =
+      mockedUpdateAiAssistant
     wrapper = helper
       .component(NotebookAssistantManagementDialog)
       .withProps({
@@ -31,29 +34,42 @@ describe("NotebookAssistantManagementDialog.vue", () => {
     global.URL.revokeObjectURL = originalRevokeObjectURL
   })
 
-  it("renders the download button", () => {
-    const downloadButton = wrapper.findAll("button")
-    expect(downloadButton[1].text()).toContain("Download Notebook Dump")
+  describe("AI Instructions Form", () => {
+    it("updates AI instructions when form is submitted", async () => {
+      const instructions = "Please use simple English."
+      await wrapper
+        .find('input[name="additionalInstruction"]')
+        .setValue(instructions)
+      await wrapper.find("form").trigger("submit")
+
+      expect(mockedUpdateAiAssistant).toHaveBeenCalledWith(
+        notebook.id,
+        instructions
+      )
+    })
   })
 
-  it("calls the API and triggers the file download when the button is clicked", async () => {
-    // Mock API response
-    const noteBriefs = [{ id: 1, title: "Note 1", details: "Test content" }]
-    mockedDump.mockResolvedValue(noteBriefs)
+  describe("Assistant Creation and Download", () => {
+    it("renders the buttons", () => {
+      const buttons = wrapper.findAll("button")
+      expect(buttons).toHaveLength(3) // Update, Create, and Download buttons
+      expect(buttons[1].text()).toContain("Create Assistant For Notebook")
+      expect(buttons[2].text()).toContain("Download Notebook Dump")
+    })
 
-    // Find the button and trigger click
-    const downloadButton = wrapper.findAll("button")[1]
-    await downloadButton.trigger("click")
+    it("downloads notebook dump when button is clicked", async () => {
+      const noteBriefs = [{ id: 1, title: "Note 1", details: "Test content" }]
+      mockedDump.mockResolvedValue(noteBriefs)
 
-    // Wait for any pending promises to resolve
-    await flushPromises()
+      await wrapper.findAll("button")[2].trigger("click")
+      await flushPromises()
 
-    // Check if the file-saver was called with the correct options
-    expect(saveAs).toHaveBeenCalledWith(
-      new Blob([JSON.stringify(noteBriefs, null, 2)], {
-        type: "application/json",
-      }),
-      "notebook-dump.json"
-    )
+      expect(saveAs).toHaveBeenCalledWith(
+        new Blob([JSON.stringify(noteBriefs, null, 2)], {
+          type: "application/json",
+        }),
+        "notebook-dump.json"
+      )
+    })
   })
 })

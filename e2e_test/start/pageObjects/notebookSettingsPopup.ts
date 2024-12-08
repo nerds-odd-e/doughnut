@@ -43,8 +43,8 @@ const notebookSettingsPopup = () => {
       clickButton('Update')
       cy.pageIsNotLoading()
     },
-    createCustomizedAssistant(instruction: string) {
-      cy.formField('Additional Instruction').type(instruction)
+    createCustomizedAssistant() {
+      cy.formField('Additional Instruction').type('Please use simple English.')
       cy.findByRole('button', {
         name: 'Create Assistant For Notebook',
       }).click()
@@ -52,7 +52,7 @@ const notebookSettingsPopup = () => {
     },
     updateAiAssistantInstructions(instruction: string) {
       cy.formField('Additional Instruction').type(instruction)
-      clickButton('Update Assistant Settings')
+      clickButton('Update Notebook AI Assistant Settings')
       cy.pageIsNotLoading()
     },
   }

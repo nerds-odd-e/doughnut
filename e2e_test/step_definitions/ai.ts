@@ -123,13 +123,13 @@ Given(
 )
 
 Given(
-  'I create an assistant for my notebook {string} with additional instruction {string}',
-  (notebook: string, instruction: string) => {
+  'I create a customized assistant for my notebook {string}',
+  (notebook: string) => {
     start
       .routerToNotebooksPage()
       .notebookCard(notebook)
       .editNotebookSettings()
-      .createCustomizedAssistant(instruction)
+      .createCustomizedAssistant()
   }
 )
 
