@@ -57,7 +57,7 @@ public class NoteTest {
     void setup() {
       parent = makeMe.aNote().titleConstructor("parent").please();
       target = makeMe.aNote().please();
-      linkingNote = makeMe.aLink().between(parent, target).please();
+      linkingNote = makeMe.aReification().between(parent, target).please();
     }
 
     @Test
@@ -69,7 +69,7 @@ public class NoteTest {
 
     @Test
     void linkOfLink() {
-      Note linkOfLink = makeMe.aLink().between(parent, linkingNote).please();
+      Note linkOfLink = makeMe.aReification().between(parent, linkingNote).please();
       assertThat(
           linkOfLink.getNoteTopology().getObjectNoteTopology().getObjectNoteTopology().getId(),
           equalTo(target.getId()));
@@ -131,7 +131,7 @@ public class NoteTest {
     void shouldIncludeParentAndObjectUris() {
       Note parent = makeMe.aNote().titleConstructor("Parent").please();
       Note target = makeMe.aNote().titleConstructor("Target").please();
-      Note note = makeMe.aLink().between(parent, target).please();
+      Note note = makeMe.aReification().between(parent, target).please();
 
       Note.NoteBrief brief = note.getNoteBrief();
 

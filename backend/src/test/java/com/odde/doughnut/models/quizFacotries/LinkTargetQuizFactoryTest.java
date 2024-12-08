@@ -42,7 +42,7 @@ class LinkTargetQuizFactoryTest {
 
   @Test
   void shouldReturnNullIfCannotFindEnoughOptions() {
-    makeMe.aLink().between(source, anotherTarget).please();
+    makeMe.aReification().between(source, anotherTarget).please();
 
     assertThat(buildLinkTargetQuizQuestion(), is(nullValue()));
   }

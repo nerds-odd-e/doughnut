@@ -34,7 +34,7 @@ class OpenAIChatAboutNoteRequestBuilderBaseTest {
   void messageShouldContainTarget() {
     Note to = makeMe.aNote().inMemoryPlease();
     Note from = makeMe.aNote().inMemoryPlease();
-    Note note = makeMe.aLink().between(from, to).inMemoryPlease();
+    Note note = makeMe.aReification().between(from, to).inMemoryPlease();
     String content = getNoteOfFocusDescription(note);
     assertThat(content, containsString("object"));
   }

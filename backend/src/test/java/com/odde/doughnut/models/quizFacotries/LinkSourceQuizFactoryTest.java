@@ -39,7 +39,7 @@ class LinkSourceQuizFactoryTest {
 
   @Test
   void shouldReturnNullIfCannotFindEnoughOptions() {
-    makeMe.aLink().between(anotherSource, target).please();
+    makeMe.aReification().between(anotherSource, target).please();
     PredefinedQuestion actual = buildLinkSourcePredefinedQuestion();
     assertThat(actual, is(nullValue()));
   }

@@ -250,7 +250,7 @@ class RestNoteControllerTests {
     void setup() {
       source = makeMe.aNote().creatorAndOwner(userModel).please();
       target = makeMe.aNote().creatorAndOwner(userModel).please();
-      link = makeMe.aLink().between(source, target).please();
+      link = makeMe.aReification().between(source, target).please();
     }
 
     @Test

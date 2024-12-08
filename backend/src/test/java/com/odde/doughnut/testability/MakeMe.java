@@ -116,8 +116,8 @@ public class MakeMe extends MakeMeWithoutDB {
     return new SubscriptionBuilder(this, new Subscription());
   }
 
-  public LinkBuilder aLink() {
-    return new LinkBuilder(this);
+  public ReificationBuilder aReification() {
+    return new ReificationBuilder(this);
   }
 
   public UserModel aNullUserModelPlease() {

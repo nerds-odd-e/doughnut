@@ -51,7 +51,7 @@ class GraphRAGResultTest {
       parent = makeMe.aNote().titleConstructor("Parent Note").please();
       targetNote =
           makeMe.aNote().titleConstructor("Target Note").details("Target Details").please();
-      note = makeMe.aLink().between(parent, targetNote).please();
+      note = makeMe.aReification().between(parent, targetNote).please();
 
       BareNote bareNote = BareNote.fromNote(note, RelationshipToFocusNote.Child);
       jsonNode = objectMapper.valueToTree(bareNote);

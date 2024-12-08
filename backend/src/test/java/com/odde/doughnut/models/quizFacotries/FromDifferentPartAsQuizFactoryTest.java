@@ -51,10 +51,11 @@ class FromDifferentPartAsQuizFactoryTest {
     pretty = makeMe.aNote("pretty").under(top).please();
     kind = makeMe.aNote("kind").under(top).please();
     tall = makeMe.aNote("tall").under(top).please();
-    subjectivePerspective = makeMe.aLink().between(subjective, perspective, LinkType.PART).please();
-    makeMe.aLink().between(objective, perspective, LinkType.PART).please();
-    kindSubjective = makeMe.aLink().between(kind, subjective, LinkType.TAGGED_BY).please();
-    uglySubjective = makeMe.aLink().between(ugly, subjective, LinkType.TAGGED_BY).please();
+    subjectivePerspective =
+        makeMe.aReification().between(subjective, perspective, LinkType.PART).please();
+    makeMe.aReification().between(objective, perspective, LinkType.PART).please();
+    kindSubjective = makeMe.aReification().between(kind, subjective, LinkType.TAGGED_BY).please();
+    uglySubjective = makeMe.aReification().between(ugly, subjective, LinkType.TAGGED_BY).please();
   }
 
   @Test
@@ -68,7 +69,8 @@ class FromDifferentPartAsQuizFactoryTest {
 
     @BeforeEach
     void setup() {
-      prettySubjective = makeMe.aLink().between(pretty, subjective, LinkType.TAGGED_BY).please();
+      prettySubjective =
+          makeMe.aReification().between(pretty, subjective, LinkType.TAGGED_BY).please();
     }
 
     @Test
@@ -81,7 +83,7 @@ class FromDifferentPartAsQuizFactoryTest {
 
       @BeforeEach
       void setup() {
-        makeMe.aLink().between(tall, objective, LinkType.TAGGED_BY).please();
+        makeMe.aReification().between(tall, objective, LinkType.TAGGED_BY).please();
         makeMe.aMemoryTrackerFor(kindSubjective).by(user).please();
       }
 
@@ -120,7 +122,7 @@ class FromDifferentPartAsQuizFactoryTest {
         class WhenTheSupposedDifferentChoiceIsAlsoHavingTheSamePart {
           @BeforeEach
           void setup() {
-            makeMe.aLink().between(tall, subjective, LinkType.TAGGED_BY).please();
+            makeMe.aReification().between(tall, subjective, LinkType.TAGGED_BY).please();
           }
 
           @Test
@@ -134,7 +136,7 @@ class FromDifferentPartAsQuizFactoryTest {
 
           @BeforeEach
           void setup() {
-            makeMe.aLink().between(ugly, objective, LinkType.TAGGED_BY).please();
+            makeMe.aReification().between(ugly, objective, LinkType.TAGGED_BY).please();
           }
 
           @Test
@@ -150,9 +152,9 @@ class FromDifferentPartAsQuizFactoryTest {
             @BeforeEach
             void setup() {
               Note axiom = makeMe.aNote("objective").under(top).please();
-              makeMe.aLink().between(axiom, perspective, LinkType.PART).please();
+              makeMe.aReification().between(axiom, perspective, LinkType.PART).please();
               pi = makeMe.aNote("pi").under(top).please();
-              makeMe.aLink().between(pi, axiom, LinkType.TAGGED_BY).please();
+              makeMe.aReification().between(pi, axiom, LinkType.TAGGED_BY).please();
             }
 
             @Test
@@ -162,7 +164,7 @@ class FromDifferentPartAsQuizFactoryTest {
 
             @Test
             void whenTheOptionOfTheThirdPerspectiveIsAlsoObjective() {
-              makeMe.aLink().between(pi, objective, LinkType.TAGGED_BY).please();
+              makeMe.aReification().between(pi, objective, LinkType.TAGGED_BY).please();
               assertThat(buildQuestion(), not(nullValue())); // wrong, this should be null
             }
           }

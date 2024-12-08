@@ -125,7 +125,7 @@ public class GraphRAGServiceTest {
     void setup() {
       Note parent = makeMe.aNote().titleConstructor("Parent Note").please();
       object = makeMe.aNote().titleConstructor("Object Note").details("Object Details").please();
-      note = makeMe.aLink().between(parent, object).please();
+      note = makeMe.aReification().between(parent, object).please();
     }
 
     @Test
@@ -490,7 +490,7 @@ public class GraphRAGServiceTest {
           makeMe.aNote().titleConstructor("Object Note").details("Object Details").please();
 
       // Create a link between parent and object
-      reifiedChild = makeMe.aLink().between(focusNote, objectNote).please();
+      reifiedChild = makeMe.aReification().between(focusNote, objectNote).please();
       makeMe.refresh(reifiedChild);
     }
 
@@ -613,12 +613,14 @@ public class GraphRAGServiceTest {
       // Create first inbound reference note
       inboundReferenceParent1 =
           makeMe.aNote().titleConstructor("Inbound Reference Parent 1").please();
-      inboundReferenceNote1 = makeMe.aLink().between(inboundReferenceParent1, focusNote).please();
+      inboundReferenceNote1 =
+          makeMe.aReification().between(inboundReferenceParent1, focusNote).please();
 
       // Create second inbound reference note
       inboundReferenceParent2 =
           makeMe.aNote().titleConstructor("Inbound Reference Parent 2").please();
-      inboundReferenceNote2 = makeMe.aLink().between(inboundReferenceParent2, focusNote).please();
+      inboundReferenceNote2 =
+          makeMe.aReification().between(inboundReferenceParent2, focusNote).please();
     }
 
     @Test
@@ -801,14 +803,14 @@ public class GraphRAGServiceTest {
           makeMe.aNote().titleConstructor("Object Note").details("Object Details").please();
 
       // Create a link between parent and object
-      reifiedChild = makeMe.aLink().between(focusNote, objectNote).please();
+      reifiedChild = makeMe.aReification().between(focusNote, objectNote).please();
 
       // Create inbound references to the object note
       Note referenceParent1 = makeMe.aNote().titleConstructor("Reference Parent 1").please();
-      inboundReference1 = makeMe.aLink().between(referenceParent1, objectNote).please();
+      inboundReference1 = makeMe.aReification().between(referenceParent1, objectNote).please();
 
       Note referenceParent2 = makeMe.aNote().titleConstructor("Reference Parent 2").please();
-      inboundReference2 = makeMe.aLink().between(referenceParent2, objectNote).please();
+      inboundReference2 = makeMe.aReification().between(referenceParent2, objectNote).please();
 
       makeMe.refresh(objectNote);
     }

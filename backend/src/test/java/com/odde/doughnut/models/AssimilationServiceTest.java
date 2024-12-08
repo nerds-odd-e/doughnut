@@ -88,7 +88,7 @@ public class AssimilationServiceTest {
 
       @BeforeEach
       void thereIsALinkAndAnotherNote() {
-        note1ToNote2 = makeMe.aLink().between(note1, note2).please();
+        note1ToNote2 = makeMe.aReification().between(note1, note2).please();
         anotherNote = makeMe.aNote("another note").creatorAndOwner(userModel).please();
       }
 
@@ -127,7 +127,7 @@ public class AssimilationServiceTest {
 
         @Test
         void shouldReturnLinksOrderedByLevels() {
-          Note aLevel2Link = makeMe.aLink().between(anotherNote, note2).please();
+          Note aLevel2Link = makeMe.aReification().between(anotherNote, note2).please();
           List<Note> memoryTrackers = getAllDueMemoryTrackers();
           assertThat(memoryTrackers, hasSize(5));
           assertThat(memoryTrackers.get(0), equalTo(anotherNote));

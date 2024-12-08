@@ -33,14 +33,14 @@ class LinkSourceWithinSameLinkTypeQuizFactoryTest {
     top = makeMe.aNote().creatorAndOwner(user).please();
     target = makeMe.aNote("sauce").under(top).please();
     source = makeMe.aNote("tomato sauce").under(top).please();
-    sourceTarget = makeMe.aLink().between(source, target).please();
+    sourceTarget = makeMe.aReification().between(source, target).please();
     Note cheese = makeMe.aNote("Note cheese").under(top).please();
     anotherSource = makeMe.aNote("blue cheese").under(top).linkTo(cheese).please();
   }
 
   @Test
   void shouldReturnNullIfCannotFindEnoughOptions() {
-    makeMe.aLink().between(anotherSource, target).please();
+    makeMe.aReification().between(anotherSource, target).please();
     assertThat(buildLinkTargetQuizQuestion(), is(nullValue()));
   }
 
@@ -64,7 +64,7 @@ class LinkSourceWithinSameLinkTypeQuizFactoryTest {
 
     @Test
     void shouldIncludeOneLinkFromEachFillingOptions() {
-      makeMe.aLink().between(anotherSource, top).please();
+      makeMe.aReification().between(anotherSource, top).please();
       PredefinedQuestion predefinedQuestion = buildLinkTargetQuizQuestion();
       List<String> options =
           predefinedQuestion.getBareQuestion().getMultipleChoicesQuestion().getChoices();

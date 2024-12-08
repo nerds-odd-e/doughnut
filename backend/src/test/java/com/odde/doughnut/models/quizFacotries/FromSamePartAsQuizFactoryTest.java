@@ -44,9 +44,10 @@ class FromSamePartAsQuizFactoryTest {
     ugly = makeMe.aNote("ugly").under(top).please();
     pretty = makeMe.aNote("pretty").under(top).please();
     tall = makeMe.aNote("tall").under(top).please();
-    subjectivePerspective = makeMe.aLink().between(subjective, perspective, LinkType.PART).please();
-    makeMe.aLink().between(objective, perspective, LinkType.PART).please();
-    uglySubjective = makeMe.aLink().between(ugly, subjective, LinkType.TAGGED_BY).please();
+    subjectivePerspective =
+        makeMe.aReification().between(subjective, perspective, LinkType.PART).please();
+    makeMe.aReification().between(objective, perspective, LinkType.PART).please();
+    uglySubjective = makeMe.aReification().between(ugly, subjective, LinkType.TAGGED_BY).please();
   }
 
   @Test
@@ -60,7 +61,7 @@ class FromSamePartAsQuizFactoryTest {
 
     @BeforeEach
     void setup() {
-      cousin = makeMe.aLink().between(pretty, subjective, LinkType.TAGGED_BY).please();
+      cousin = makeMe.aReification().between(pretty, subjective, LinkType.TAGGED_BY).please();
     }
 
     @Test
@@ -73,7 +74,7 @@ class FromSamePartAsQuizFactoryTest {
 
       @BeforeEach
       void setup() {
-        makeMe.aLink().between(tall, objective, LinkType.TAGGED_BY).please();
+        makeMe.aReification().between(tall, objective, LinkType.TAGGED_BY).please();
       }
 
       @Test

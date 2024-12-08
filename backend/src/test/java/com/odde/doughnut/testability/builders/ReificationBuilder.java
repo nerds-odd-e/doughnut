@@ -6,10 +6,10 @@ import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
 
-public class LinkBuilder extends EntityBuilder<Note> {
+public class ReificationBuilder extends EntityBuilder<Note> {
   User creator = null;
 
-  public LinkBuilder(MakeMe makeMe) {
+  public ReificationBuilder(MakeMe makeMe) {
     super(makeMe, null);
   }
 
@@ -37,12 +37,12 @@ public class LinkBuilder extends EntityBuilder<Note> {
     }
   }
 
-  public LinkBuilder creator(User user) {
+  public ReificationBuilder creator(User user) {
     this.creator = user;
     return this;
   }
 
-  public LinkBuilder between(Note from, Note to, LinkType linkType) {
+  public ReificationBuilder between(Note from, Note to, LinkType linkType) {
     this.entity =
         ModelFactoryService.buildALink(
             from, to, null, linkType, new Timestamp(System.currentTimeMillis()));
@@ -50,7 +50,7 @@ public class LinkBuilder extends EntityBuilder<Note> {
     return this;
   }
 
-  public LinkBuilder between(Note from, Note to) {
+  public ReificationBuilder between(Note from, Note to) {
     return between(from, to, LinkType.SPECIALIZE);
   }
 }

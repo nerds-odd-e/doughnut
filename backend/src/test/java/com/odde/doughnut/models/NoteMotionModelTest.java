@@ -142,7 +142,7 @@ public class NoteMotionModelTest {
 
       @BeforeEach
       void setup() {
-        linkingNote = makeMe.aLink().between(topNote, secondChild).please();
+        linkingNote = makeMe.aReification().between(topNote, secondChild).please();
         makeMe.theNote(linkingNote).after(firstChild).please();
         makeMe.refresh(topNote);
       }
@@ -192,7 +192,7 @@ public class NoteMotionModelTest {
         throws CyclicLinkDetectedException, MovementNotPossibleException {
       // Create a linking note under secondChild
       Note targetNote = makeMe.aNote("targetNote").please();
-      Note linkingNote = makeMe.aLink().between(secondChild, targetNote).please();
+      Note linkingNote = makeMe.aReification().between(secondChild, targetNote).please();
 
       move(secondChild, otherNotebook, true);
 
