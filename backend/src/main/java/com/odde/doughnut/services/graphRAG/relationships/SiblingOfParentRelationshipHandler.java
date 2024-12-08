@@ -1,6 +1,7 @@
-package com.odde.doughnut.services.graphRAG;
+package com.odde.doughnut.services.graphRAG.relationships;
 
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.services.graphRAG.PriorityLayer;
 
 public class SiblingOfParentRelationshipHandler extends SpiralSiblingRelationshipHandler {
   private final PriorityLayer priorityFourLayer;

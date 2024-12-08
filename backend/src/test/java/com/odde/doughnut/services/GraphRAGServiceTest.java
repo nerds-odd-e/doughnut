@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.graphRAG.*;
+import com.odde.doughnut.services.graphRAG.relationships.RelationshipToFocusNote;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
 import java.util.stream.Collectors;

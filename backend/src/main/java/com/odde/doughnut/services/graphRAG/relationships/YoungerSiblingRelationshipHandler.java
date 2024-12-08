@@ -1,6 +1,8 @@
-package com.odde.doughnut.services.graphRAG;
+package com.odde.doughnut.services.graphRAG.relationships;
 
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.services.graphRAG.BareNote;
+import com.odde.doughnut.services.graphRAG.FocusNote;
 import java.util.List;
 
 public class YoungerSiblingRelationshipHandler extends RelationshipHandler {

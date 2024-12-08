@@ -2,6 +2,7 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.graphRAG.*;
+import com.odde.doughnut.services.graphRAG.relationships.*;
 
 public class GraphRAGService {
   private final TokenCountingStrategy tokenCountingStrategy;

@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.services.graphRAG.relationships.RelationshipToFocusNote;
 import java.sql.Timestamp;
 import lombok.Getter;
 

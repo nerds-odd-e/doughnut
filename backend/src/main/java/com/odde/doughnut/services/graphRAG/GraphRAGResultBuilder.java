@@ -1,6 +1,7 @@
 package com.odde.doughnut.services.graphRAG;
 
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.services.graphRAG.relationships.RelationshipToFocusNote;
 import java.util.HashMap;
 import java.util.Map;
 

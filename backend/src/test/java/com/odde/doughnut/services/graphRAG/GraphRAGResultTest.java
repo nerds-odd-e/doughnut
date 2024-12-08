@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.services.graphRAG.relationships.RelationshipToFocusNote;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
