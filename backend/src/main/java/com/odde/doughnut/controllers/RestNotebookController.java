@@ -3,6 +3,7 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NotebooksViewedByUser;
 import com.odde.doughnut.controllers.dto.RedirectToNoteResponse;
+import com.odde.doughnut.controllers.dto.UpdateAiAssistantRequest;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.NotebookAiAssistant;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -124,7 +125,7 @@ class RestNotebookController {
   @Transactional
   public NotebookAiAssistant updateAiAssistant(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
-      @RequestBody String additionalInstructions)
+      @RequestBody UpdateAiAssistantRequest request)
       throws UnexpectedNoAccessRightException {
 
     currentUser.assertAuthorization(notebook);
@@ -137,7 +138,7 @@ class RestNotebookController {
       assistant.setCreatedAt(testabilitySettings.getCurrentUTCTimestamp());
     }
 
-    assistant.setAdditionalInstructionsToAi(additionalInstructions);
+    assistant.setAdditionalInstructionsToAi(request.getAdditionalInstructions());
     assistant.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
 
     return modelFactoryService.notebookAiAssistantRepository.save(assistant);

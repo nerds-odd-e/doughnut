@@ -139,6 +139,7 @@ export type { ToolCallResult } from './models/ToolCallResult';
 export type { ToolChoice } from './models/ToolChoice';
 export type { ToolResources } from './models/ToolResources';
 export type { TruncationStrategy } from './models/TruncationStrategy';
+export type { UpdateAiAssistantRequest } from './models/UpdateAiAssistantRequest';
 export type { Usage } from './models/Usage';
 export type { User } from './models/User';
 export type { UserDTO } from './models/UserDTO';

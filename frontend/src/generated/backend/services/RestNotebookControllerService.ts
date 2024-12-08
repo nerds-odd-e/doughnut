@@ -10,6 +10,7 @@ import type { NotebooksViewedByUser } from '../models/NotebooksViewedByUser';
 import type { NoteBrief } from '../models/NoteBrief';
 import type { NoteCreationDTO } from '../models/NoteCreationDTO';
 import type { RedirectToNoteResponse } from '../models/RedirectToNoteResponse';
+import type { UpdateAiAssistantRequest } from '../models/UpdateAiAssistantRequest';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestNotebookControllerService {
@@ -142,7 +143,7 @@ export class RestNotebookControllerService {
      */
     public updateAiAssistant(
         notebook: number,
-        requestBody: string,
+        requestBody: UpdateAiAssistantRequest,
     ): CancelablePromise<NotebookAiAssistant> {
         return this.httpRequest.request({
             method: 'PATCH',

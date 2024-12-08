@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.odde.doughnut.controllers.dto.UpdateAiAssistantRequest;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.NotebookAiAssistant;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -190,7 +191,10 @@ class RestNotebookControllerTest {
     @Test
     void shouldCreateNewAiAssistantWhenNotExists() throws UnexpectedNoAccessRightException {
       String instructions = "Some AI instructions";
-      NotebookAiAssistant result = controller.updateAiAssistant(notebook, instructions);
+      UpdateAiAssistantRequest request = new UpdateAiAssistantRequest();
+      request.setAdditionalInstructions(instructions);
+
+      NotebookAiAssistant result = controller.updateAiAssistant(notebook, request);
 
       assertThat(result.getNotebook().getId(), equalTo(notebook.getId()));
       assertThat(result.getAdditionalInstructionsToAi(), equalTo(instructions));
@@ -202,11 +206,15 @@ class RestNotebookControllerTest {
     void shouldUpdateExistingAiAssistant() throws UnexpectedNoAccessRightException {
       // Create initial assistant
       String initialInstructions = "Initial instructions";
-      NotebookAiAssistant initial = controller.updateAiAssistant(notebook, initialInstructions);
+      UpdateAiAssistantRequest initialRequest = new UpdateAiAssistantRequest();
+      initialRequest.setAdditionalInstructions(initialInstructions);
+      NotebookAiAssistant initial = controller.updateAiAssistant(notebook, initialRequest);
 
       // Update with new instructions
       String newInstructions = "New instructions";
-      NotebookAiAssistant result = controller.updateAiAssistant(notebook, newInstructions);
+      UpdateAiAssistantRequest newRequest = new UpdateAiAssistantRequest();
+      newRequest.setAdditionalInstructions(newInstructions);
+      NotebookAiAssistant result = controller.updateAiAssistant(notebook, newRequest);
 
       assertThat(result.getId(), equalTo(initial.getId()));
       assertThat(result.getAdditionalInstructionsToAi(), equalTo(newInstructions));
@@ -219,9 +227,12 @@ class RestNotebookControllerTest {
       User anotherUser = makeMe.aUser().please();
       Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
 
+      UpdateAiAssistantRequest request = new UpdateAiAssistantRequest();
+      request.setAdditionalInstructions("Some instructions");
+
       assertThrows(
           UnexpectedNoAccessRightException.class,
-          () -> controller.updateAiAssistant(note.getNotebook(), "Some instructions"));
+          () -> controller.updateAiAssistant(note.getNotebook(), request));
     }
   }
 
@@ -245,7 +256,9 @@ class RestNotebookControllerTest {
     void shouldReturnExistingAssistant() throws UnexpectedNoAccessRightException {
       // Create initial assistant
       String instructions = "Initial instructions";
-      NotebookAiAssistant created = controller.updateAiAssistant(notebook, instructions);
+      UpdateAiAssistantRequest request = new UpdateAiAssistantRequest();
+      request.setAdditionalInstructions(instructions);
+      NotebookAiAssistant created = controller.updateAiAssistant(notebook, request);
 
       NotebookAiAssistant result = controller.getAiAssistant(notebook);
       assertThat(result.getId(), equalTo(created.getId()));

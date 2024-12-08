@@ -39,10 +39,9 @@ const additionalInstruction = ref("")
 const emit = defineEmits(["close"])
 
 const updateAiInstructions = async () => {
-  await managedApi.restNotebookController.updateAiAssistant(
-    props.notebook.id,
-    additionalInstruction.value
-  )
+  await managedApi.restNotebookController.updateAiAssistant(props.notebook.id, {
+    additionalInstructions: additionalInstruction.value,
+  })
 }
 
 const createAssistantForNotebook = async () => {
