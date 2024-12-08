@@ -21,32 +21,41 @@ public final class NotebookAssistantForNoteServiceFactory {
     this.openAiApiHandler = new OpenAiApiHandler(openAiApi);
   }
 
-  private OpenAiAssistant getAssistantServiceForNotebook(Notebook notebook) {
-    String assistantId;
+  private String getNotebookAssistantId(Notebook notebook) {
     NotebookAssistant assistant = notebook.getNotebookAssistant();
     if (assistant != null) {
-      assistantId = assistant.getAssistantId();
-    } else {
-      assistantId = globalSettingsService.defaultAssistantId().getValue();
+      return assistant.getAssistantId();
     }
-    return new OpenAiAssistant(openAiApiHandler, assistantId);
+    return null;
   }
 
   private NotebookAssistantForNoteService getNotebookAssistantForNoteService(Note note) {
+    String assistantId = getNotebookAssistantId(note.getNotebook());
+    if (assistantId != null) {
+      return getServiceByAssistantId(assistantId, note);
+    }
+    return getDefaultAssistantForNoteService(note);
+  }
+
+  private NotebookAssistantForNoteService getDefaultAssistantForNoteService(Note note) {
+    return getServiceByAssistantId(globalSettingsService.defaultAssistantId().getValue(), note);
+  }
+
+  private NotebookAssistantForNoteService getServiceByAssistantId(String assistantId, Note note) {
     OpenAiAssistant assistantServiceForNotebook =
-        getAssistantServiceForNotebook(note.getNotebook());
+        new OpenAiAssistant(openAiApiHandler, assistantId);
     return new NotebookAssistantForNoteService(assistantServiceForNotebook, note);
   }
 
   public NoteAutomationService createNoteAutomationService(Note note) {
     NotebookAssistantForNoteService notebookAssistantForNoteService =
-        getNotebookAssistantForNoteService(note);
+        getDefaultAssistantForNoteService(note);
     return new NoteAutomationService(notebookAssistantForNoteService);
   }
 
   public NoteQuestionGenerationService createNoteQuestionGenerationService(Note note) {
     NotebookAssistantForNoteService notebookAssistantForNoteService =
-        getNotebookAssistantForNoteService(note);
+        getDefaultAssistantForNoteService(note);
     return new NoteQuestionGenerationService(
         globalSettingsService, notebookAssistantForNoteService);
   }
