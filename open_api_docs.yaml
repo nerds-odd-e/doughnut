@@ -2755,7 +2755,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/NoteBrief"
+                  $ref: "#/components/schemas/BareNote"
   /api/notebook_certificate_approvals/get-all-pending-request:
     get:
       tags:
@@ -4328,32 +4328,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Subscription"
-    ContextualPathItem:
-      type: object
-      properties:
-        title:
-          type: string
-        uri:
-          type: string
-    NoteBrief:
-      type: object
-      properties:
-        uri:
-          type: string
-        contextualPath:
-          type: array
-          items:
-            $ref: "#/components/schemas/ContextualPathItem"
-        title:
-          type: string
-        details:
-          type: string
-        createdAt:
-          type: string
-        parent:
-          type: string
-        object:
-          type: string
     FailureReport:
       required:
       - createDatetime

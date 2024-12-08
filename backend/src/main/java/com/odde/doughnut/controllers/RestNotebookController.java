@@ -11,6 +11,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.BazaarModel;
 import com.odde.doughnut.models.JsonViewer;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.graphRAG.BareNote;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
@@ -107,7 +108,7 @@ class RestNotebookController {
   }
 
   @GetMapping("/{notebook}/dump")
-  public List<Note.NoteBrief> downloadNotebookDump(
+  public List<BareNote> downloadNotebookDump(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(notebook);

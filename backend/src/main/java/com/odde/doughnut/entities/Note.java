@@ -12,17 +12,16 @@ import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.algorithms.SiblingOrder;
 import com.odde.doughnut.controllers.dto.NoteTopology;
 import com.odde.doughnut.models.NoteViewer;
-import com.odde.doughnut.models.TimestampOperations;
+import com.odde.doughnut.services.graphRAG.BareNote;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.sql.Timestamp;
-import java.time.ZoneId;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.lang.NonNull;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -309,7 +308,7 @@ public class Note extends EntityIdentifiedByIdOnly {
     return noteAccessory;
   }
 
-  @org.springframework.lang.NonNull
+  @NonNull
   public NoteTopology getNoteTopology() {
     NoteTopology noteTopology = new NoteTopology();
     noteTopology.setId(getId());
@@ -349,16 +348,6 @@ public class Note extends EntityIdentifiedByIdOnly {
     return getTargetNote() != null;
   }
 
-  public static class NoteBrief {
-    public String uri;
-    public List<ContextualPathItem> contextualPath;
-    public String title;
-    public String details;
-    public String createdAt;
-    public String parent;
-    public String object;
-  }
-
   public static class ContextualPathItem {
     public String title;
     public String uri;
@@ -371,27 +360,13 @@ public class Note extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public String getNoteDescription() {
-    String prettyString = defaultObjectMapper().valueToTree(getNoteBrief()).toPrettyString();
+    String prettyString =
+        defaultObjectMapper().valueToTree(BareNote.fromNoteWithoutTruncate(this)).toPrettyString();
     return """
         The %s (in JSON format):
         %s
         """
         .formatted(NOTE_OF_CURRENT_FOCUS, prettyString);
-  }
-
-  @JsonIgnore
-  public NoteBrief getNoteBrief() {
-    NoteBrief noteBrief = new NoteBrief();
-    noteBrief.uri = getUri();
-    noteBrief.contextualPath =
-        getAncestors().stream().map(Note::toContextualPathItem).collect(Collectors.toList());
-    noteBrief.title = getTopicConstructor();
-    noteBrief.details = getDetails();
-    noteBrief.createdAt =
-        TimestampOperations.getZonedDateTime(getCreatedAt(), ZoneId.systemDefault()).toString();
-    noteBrief.parent = getParent() != null ? getParent().getUri() : null;
-    noteBrief.object = targetNote != null ? targetNote.getUri() : null;
-    return noteBrief;
   }
 
   @JsonIgnore

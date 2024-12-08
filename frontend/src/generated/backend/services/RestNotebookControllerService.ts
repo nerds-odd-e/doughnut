@@ -2,12 +2,12 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { BareNote } from '../models/BareNote';
 import type { Note } from '../models/Note';
 import type { Notebook } from '../models/Notebook';
 import type { NotebookAiAssistant } from '../models/NotebookAiAssistant';
 import type { NotebookSettings } from '../models/NotebookSettings';
 import type { NotebooksViewedByUser } from '../models/NotebooksViewedByUser';
-import type { NoteBrief } from '../models/NoteBrief';
 import type { NoteCreationDTO } from '../models/NoteCreationDTO';
 import type { RedirectToNoteResponse } from '../models/RedirectToNoteResponse';
 import type { UpdateAiAssistantRequest } from '../models/UpdateAiAssistantRequest';
@@ -192,12 +192,12 @@ export class RestNotebookControllerService {
     }
     /**
      * @param notebook
-     * @returns NoteBrief OK
+     * @returns BareNote OK
      * @throws ApiError
      */
     public downloadNotebookDump(
         notebook: number,
-    ): CancelablePromise<Array<NoteBrief>> {
+    ): CancelablePromise<Array<BareNote>> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/notebooks/{notebook}/dump',

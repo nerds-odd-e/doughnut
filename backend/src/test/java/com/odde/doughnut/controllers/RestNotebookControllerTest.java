@@ -12,6 +12,7 @@ import com.odde.doughnut.entities.NotebookAiAssistant;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.graphRAG.BareNote;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.PredefinedQuestionBuilder;
@@ -131,7 +132,7 @@ class RestNotebookControllerTest {
 
     @Test
     void whenAuthorized() throws UnexpectedNoAccessRightException {
-      List<Note.NoteBrief> noteBriefs = controller.downloadNotebookDump(notebook);
+      List<BareNote> noteBriefs = controller.downloadNotebookDump(notebook);
       assertThat(noteBriefs, hasSize(1));
     }
   }

@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.models.Randomizer;
+import com.odde.doughnut.services.graphRAG.BareNote;
 import jakarta.persistence.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -109,18 +110,18 @@ public class Notebook extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public String getNotebookDump() {
-    List<Note.NoteBrief> noteBriefs = getNoteBriefs();
+    List<BareNote> noteBriefs = getNoteBriefs();
     return defaultObjectMapper().valueToTree(noteBriefs).toPrettyString();
   }
 
   @JsonIgnore
-  public List<Note.NoteBrief> getNoteBriefs() {
-    List<Note.NoteBrief> noteBriefs =
+  public List<BareNote> getNoteBriefs() {
+    List<BareNote> noteBriefs =
         notes.stream()
             .sorted(
                 Comparator.comparing(Note::getParentId, Comparator.nullsFirst(Integer::compare))
                     .thenComparing(Note::getSiblingOrder, Comparator.nullsFirst(Long::compare)))
-            .map(Note::getNoteBrief)
+            .map(n -> BareNote.fromNoteWithoutTruncate(n))
             .toList();
     ;
     return noteBriefs;

@@ -74,6 +74,10 @@ public class BareNote {
     return new BareNote(note, truncateDetails(note.getDetails()), relation);
   }
 
+  public static BareNote fromNoteWithoutTruncate(Note note) {
+    return new BareNote(note, note.getDetails(), null);
+  }
+
   private static String truncateDetails(String details) {
     if (details == null || details.length() <= RELATED_NOTE_DETAILS_TRUNCATE_LENGTH) {
       return details;
