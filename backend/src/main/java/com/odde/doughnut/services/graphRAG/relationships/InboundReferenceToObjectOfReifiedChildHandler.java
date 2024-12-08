@@ -1,6 +1,8 @@
 package com.odde.doughnut.services.graphRAG.relationships;
 
 import com.odde.doughnut.entities.Note;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class InboundReferenceToObjectOfReifiedChildHandler extends RelationshipHandler {
@@ -9,7 +11,8 @@ public class InboundReferenceToObjectOfReifiedChildHandler extends RelationshipH
 
   public InboundReferenceToObjectOfReifiedChildHandler(Note objectNote) {
     super(RelationshipToFocusNote.InboundReferenceToObjectOfReifiedChild, objectNote);
-    this.inboundReferences = objectNote.getInboundReferences();
+    this.inboundReferences = new ArrayList<>(objectNote.getInboundReferences());
+    Collections.shuffle(this.inboundReferences);
   }
 
   @Override

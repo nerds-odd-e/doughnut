@@ -1,6 +1,8 @@
 package com.odde.doughnut.services.graphRAG.relationships;
 
 import com.odde.doughnut.entities.Note;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class InboundReferenceContextualPathRelationshipHandler extends RelationshipHandler {
@@ -9,7 +11,8 @@ public class InboundReferenceContextualPathRelationshipHandler extends Relations
 
   public InboundReferenceContextualPathRelationshipHandler(Note inboundReferenceNote) {
     super(RelationshipToFocusNote.InboundReferenceContextualPath, inboundReferenceNote);
-    this.contextualPath = inboundReferenceNote.getAncestors();
+    this.contextualPath = new ArrayList<>(inboundReferenceNote.getAncestors());
+    Collections.shuffle(this.contextualPath);
   }
 
   @Override

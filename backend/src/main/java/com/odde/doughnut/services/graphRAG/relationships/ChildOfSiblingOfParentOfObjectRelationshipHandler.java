@@ -1,6 +1,8 @@
 package com.odde.doughnut.services.graphRAG.relationships;
 
 import com.odde.doughnut.entities.Note;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ChildOfSiblingOfParentOfObjectRelationshipHandler extends RelationshipHandler {
@@ -9,7 +11,8 @@ public class ChildOfSiblingOfParentOfObjectRelationshipHandler extends Relations
 
   public ChildOfSiblingOfParentOfObjectRelationshipHandler(Note objectParentSibling) {
     super(RelationshipToFocusNote.ChildOfSiblingOfParentOfObject, objectParentSibling);
-    this.children = objectParentSibling.getChildren();
+    this.children = new ArrayList<>(objectParentSibling.getChildren());
+    Collections.shuffle(this.children);
   }
 
   @Override
