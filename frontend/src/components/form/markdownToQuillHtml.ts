@@ -6,6 +6,23 @@ export default function markdownToQuillHtml(
   const renderer = new marked.Renderer()
   let indentLevel = -1 // Variable to track indentation level
 
+  // Add this new helper function at the top
+  const convertHtmlList = (html: string): string => {
+    return html
+      .replace(/<ul>/g, "<ol>")
+      .replace(/<\/ul>/g, "</ol>")
+      .replace(/<li>/g, '<li data-list="bullet">')
+  }
+
+  // Override the html method to handle raw HTML
+  renderer.html = function (html: string | Tokens.Generic): string {
+    const htmlContent = typeof html === "string" ? html : html.text
+    if (htmlContent.includes("<ul>") || htmlContent.includes("<li>")) {
+      return convertHtmlList(htmlContent)
+    }
+    return htmlContent
+  }
+
   // Override the list method
   renderer.list = function (token: Tokens.List): string {
     indentLevel++ // Entering a list increases indent level
@@ -63,6 +80,6 @@ export default function markdownToQuillHtml(
   // Parse the tokens into HTML
   const result = parser.parse(tokens)
 
-  // Clean up the HTML output
-  return result.trim().replace(/>\s+</g, "><")
+  // Modify the final return to handle any remaining HTML list conversions
+  return convertHtmlList(result.trim().replace(/>\s+</g, "><"))
 }

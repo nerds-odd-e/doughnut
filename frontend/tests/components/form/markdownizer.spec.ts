@@ -50,6 +50,13 @@ describe("Markdown and HTML Conversion Tests", () => {
       expect(elm.querySelectorAll("ol").length).toBe(1)
       expect(elm.querySelector("li.ql-indent-2")).not.toBeNull()
     })
+
+    it("raw HTML with ul/li is rendered as Quill editor format", () => {
+      const markdown = "<ul><li>list item</li></ul>"
+      const elm = markdownToHTMLElement(markdown)
+      expect(elm.querySelectorAll("ol").length).toBe(1)
+      expect(elm?.querySelector("li[data-list='bullet']")).not.toBeNull()
+    })
   })
 
   describe("Html to markdown", () => {
