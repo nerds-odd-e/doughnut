@@ -1,6 +1,6 @@
 <template>
   <button
-    class="btn btn-sm"
+    class="daisy-btn daisy-btn-sm daisy-btn-ghost daisy-gap-2"
     role="button"
     title="Wiki Association"
     @click="onClickWikidata"

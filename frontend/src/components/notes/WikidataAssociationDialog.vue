@@ -1,41 +1,46 @@
 <template>
-  <h3>
-    Associate
-    <strong
-      ><NoteTitleComponent v-bind="{ noteTopology: note.noteTopology }"
-    /></strong>
-    Wikidata
-  </h3>
-  <form v-if="!conflictWikidataTitle" @submit.prevent="validateAndSave">
-    <TextInput
-      scope-name="wikidataID"
-      field="wikidataID"
-      v-model="associationData.wikidataId"
-      :error-message="wikidataIdError"
-      placeholder="example: `Q12345`"
-      v-focus
-    />
-
-    <input type="submit" value="Save" class="btn btn-primary" />
-  </form>
-
-  <form v-else @submit.prevent="save">
-    <p>
-      Confirm to associate
-      <strong>NoteTopology v-bind="{ noteTopology: note.noteTopology }" /></strong> with
-      <strong>{{ conflictWikidataTitle }}</strong
-      >?
-    </p>
-
-    <input
-      type="cancel"
-      value="Cancel"
-      class="btn btn-secondary"
-      @click="conflictWikidataTitle = undefined"
-    />
-
-    <input type="submit" value="Confirm" class="btn btn-primary" />
-  </form>
+<div class="daisy-card daisy-w-96 daisy-bg-base-100">
+  <div class="daisy-card-body">
+    <h3 class="daisy-card-title">
+      Associate
+      <strong
+        ><NoteTitleComponent v-bind="{ noteTopology: note.noteTopology }"
+      /></strong>
+      Wikidata
+    </h3>
+    <form v-if="!conflictWikidataTitle" @submit.prevent="validateAndSave">
+      <TextInput
+        scope-name="wikidataID"
+        field="wikidataID"
+        v-model="associationData.wikidataId"
+        :error-message="wikidataIdError"
+        placeholder="example: `Q12345`"
+        v-focus
+      />
+  
+      <input type="submit" value="Save" class="daisy-btn daisy-btn-primary daisy-mt-4" />
+    </form>
+  
+    <form v-else @submit.prevent="save">
+      <p class="daisy-py-4">
+        Confirm to associate
+        <strong>NoteTopology v-bind="{ noteTopology: note.noteTopology }" /></strong> with
+        <strong>{{ conflictWikidataTitle }}</strong
+        >?
+      </p>
+      <div class="daisy-flex daisy-gap-2 daisy-justify-end">
+        <input
+          type="cancel"
+          value="Cancel"
+          class="daisy-btn daisy-btn-ghost"
+          @click="conflictWikidataTitle = undefined"
+        />
+    
+        <input type="submit" value="Confirm" class="daisy-btn daisy-btn-primary" />
+      </div>
+    </form>
+  </div>
+</div>
 </template>
 
 <script setup lang="ts">
