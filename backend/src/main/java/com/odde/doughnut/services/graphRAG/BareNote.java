@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.doughnut.entities.Note;
+import java.sql.Timestamp;
 import lombok.Getter;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -18,7 +19,8 @@ import lombok.Getter;
   "objectUriAndTitle",
   "parentUriAndTitle",
   "relationToFocusNote",
-  "details"
+  "details",
+  "createdAt"
 })
 public class BareNote {
   private final Note note;
@@ -68,6 +70,11 @@ public class BareNote {
     return getObjectUriAndTitle() != null && note.getParent() != null
         ? UriAndTitle.fromNote(note.getParent())
         : null;
+  }
+
+  @JsonProperty("createdAt")
+  public Timestamp getCreatedAt() {
+    return note.getCreatedAt();
   }
 
   public static BareNote fromNote(Note note, RelationshipToFocusNote relation) {
