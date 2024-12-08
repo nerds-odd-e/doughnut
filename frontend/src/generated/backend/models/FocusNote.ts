@@ -11,6 +11,7 @@ export type FocusNote = {
     parentUriAndTitle?: string;
     relationToFocusNote?: FocusNote.relationToFocusNote;
     details?: string;
+    createdAt?: string;
     contextualPath?: Array<string>;
     children?: Array<string>;
     priorSiblings?: Array<string>;
