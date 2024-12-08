@@ -4,6 +4,7 @@
 /* eslint-disable */
 import type { Note } from '../models/Note';
 import type { Notebook } from '../models/Notebook';
+import type { NotebookAiAssistant } from '../models/NotebookAiAssistant';
 import type { NotebookSettings } from '../models/NotebookSettings';
 import type { NotebooksViewedByUser } from '../models/NotebooksViewedByUser';
 import type { NoteBrief } from '../models/NoteBrief';
@@ -109,6 +110,29 @@ export class RestNotebookControllerService {
                 'notebook': notebook,
                 'circle': circle,
             },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param notebook
+     * @param requestBody
+     * @returns NotebookAiAssistant OK
+     * @throws ApiError
+     */
+    public updateAiAssistant(
+        notebook: number,
+        requestBody: string,
+    ): CancelablePromise<NotebookAiAssistant> {
+        return this.httpRequest.request({
+            method: 'PATCH',
+            url: '/api/notebooks/{notebook}/ai-assistant',
+            path: {
+                'notebook': notebook,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
                 500: `Internal Server Error`,
             },
