@@ -112,13 +112,24 @@ Given(
 )
 
 Given(
+  'I set my notebook {string} to use additional AI instruction {string}',
+  (notebook: string, instruction: string) => {
+    start
+      .routerToNotebooksPage()
+      .notebookCard(notebook)
+      .editNotebookSettings()
+      .updateAiAssistantInstructions(instruction)
+  }
+)
+
+Given(
   'I create an assistant for my notebook {string} with additional instruction {string}',
   (notebook: string, instruction: string) => {
     start
       .routerToNotebooksPage()
       .notebookCard(notebook)
       .editNotebookSettings()
-      .updateNotebookAssistantSetting(instruction)
+      .createCustomizedAssistant(instruction)
   }
 )
 

@@ -183,6 +183,7 @@ class RestNotebookControllerTest {
 
     @BeforeEach
     void setup() {
+      testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
       notebook = makeMe.aNotebook().creatorAndOwner(userModel).please();
     }
 
