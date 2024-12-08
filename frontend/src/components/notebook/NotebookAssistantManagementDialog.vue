@@ -25,7 +25,7 @@
 import type { Notebook } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { PropType } from "vue"
-import { ref } from "vue"
+import { ref, onMounted } from "vue"
 import { saveAs } from "file-saver"
 import TextInput from "../form/TextInput.vue"
 
@@ -64,6 +64,23 @@ const downloadNotebookDump = async () => {
   })
   saveAs(blob, "notebook-dump.json")
 }
+
+const loadCurrentSettings = async () => {
+  try {
+    const assistant = await managedApi.restNotebookController.getAiAssistant(
+      props.notebook.id
+    )
+    if (assistant) {
+      additionalInstruction.value = assistant.additionalInstructionsToAi || ""
+    }
+  } catch (error) {
+    console.error("Failed to load AI assistant settings:", error)
+  }
+}
+
+onMounted(async () => {
+  await loadCurrentSettings()
+})
 </script>
 
 <style scoped>

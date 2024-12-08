@@ -224,4 +224,42 @@ class RestNotebookControllerTest {
           () -> controller.updateAiAssistant(note.getNotebook(), "Some instructions"));
     }
   }
+
+  @Nested
+  class GetNotebookAiAssistant {
+    private Notebook notebook;
+
+    @BeforeEach
+    void setup() {
+      testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
+      notebook = makeMe.aNotebook().creatorAndOwner(userModel).please();
+    }
+
+    @Test
+    void shouldReturnNullWhenAssistantNotExists() throws UnexpectedNoAccessRightException {
+      NotebookAiAssistant result = controller.getAiAssistant(notebook);
+      assertThat(result, equalTo(null));
+    }
+
+    @Test
+    void shouldReturnExistingAssistant() throws UnexpectedNoAccessRightException {
+      // Create initial assistant
+      String instructions = "Initial instructions";
+      NotebookAiAssistant created = controller.updateAiAssistant(notebook, instructions);
+
+      NotebookAiAssistant result = controller.getAiAssistant(notebook);
+      assertThat(result.getId(), equalTo(created.getId()));
+      assertThat(result.getAdditionalInstructionsToAi(), equalTo(instructions));
+    }
+
+    @Test
+    void shouldNotAllowUnauthorizedAccess() {
+      User anotherUser = makeMe.aUser().please();
+      Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
+
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.getAiAssistant(note.getNotebook()));
+    }
+  }
 }

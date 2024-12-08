@@ -1,0 +1,53 @@
+# Add this under the /api/notebooks/{notebook}/ai-assistant path
+  /api/notebooks/{notebook}/ai-assistant:
+    get:
+      operationId: getAiAssistant
+      parameters:
+        - name: notebook
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: The notebook AI assistant settings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotebookAiAssistant'
+    patch:
+      operationId: updateAiAssistant
+      parameters:
+        - name: notebook
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: string
+      responses:
+        '200':
+          description: The updated notebook AI assistant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotebookAiAssistant'
+
+# Add this under components/schemas if not already present
+    NotebookAiAssistant:
+      type: object
+      properties:
+        id:
+          type: integer
+        additionalInstructionsToAi:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time

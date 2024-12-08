@@ -142,4 +142,13 @@ class RestNotebookController {
 
     return modelFactoryService.notebookAiAssistantRepository.save(assistant);
   }
+
+  @GetMapping("/{notebook}/ai-assistant")
+  public NotebookAiAssistant getAiAssistant(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
+      throws UnexpectedNoAccessRightException {
+
+    currentUser.assertAuthorization(notebook);
+    return modelFactoryService.notebookAiAssistantRepository.findByNotebookId(notebook.getId());
+  }
 }

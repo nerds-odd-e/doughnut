@@ -117,6 +117,25 @@ export class RestNotebookControllerService {
     }
     /**
      * @param notebook
+     * @returns NotebookAiAssistant OK
+     * @throws ApiError
+     */
+    public getAiAssistant(
+        notebook: number,
+    ): CancelablePromise<NotebookAiAssistant> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/notebooks/{notebook}/ai-assistant',
+            path: {
+                'notebook': notebook,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param notebook
      * @param requestBody
      * @returns NotebookAiAssistant OK
      * @throws ApiError

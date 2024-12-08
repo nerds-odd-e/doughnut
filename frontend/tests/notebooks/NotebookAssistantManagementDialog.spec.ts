@@ -3,6 +3,7 @@ import { saveAs } from "file-saver"
 import NotebookAssistantManagementDialog from "@/components/notebook/NotebookAssistantManagementDialog.vue"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
+import type { NotebookAiAssistant } from "@/generated/backend"
 
 vitest.mock("file-saver", () => ({ saveAs: vitest.fn() }))
 
@@ -11,6 +12,7 @@ describe("NotebookAssistantManagementDialog.vue", () => {
   const notebook = makeMe.aNotebook.please()
   const mockedDump = vitest.fn()
   const mockedUpdateAiAssistant = vitest.fn()
+  const mockedGetAiAssistant = vitest.fn()
   const originalCreateObjectURL = URL.createObjectURL
   const originalRevokeObjectURL = URL.revokeObjectURL
 
@@ -20,6 +22,9 @@ describe("NotebookAssistantManagementDialog.vue", () => {
     helper.managedApi.restNotebookController.downloadNotebookDump = mockedDump
     helper.managedApi.restNotebookController.updateAiAssistant =
       mockedUpdateAiAssistant
+    helper.managedApi.restNotebookController.getAiAssistant =
+      mockedGetAiAssistant
+    mockedGetAiAssistant.mockResolvedValue(null) // default to no existing settings
     wrapper = helper
       .component(NotebookAssistantManagementDialog)
       .withProps({
@@ -70,6 +75,40 @@ describe("NotebookAssistantManagementDialog.vue", () => {
         }),
         "notebook-dump.json"
       )
+    })
+  })
+
+  describe("Component Initialization", () => {
+    it("loads empty settings when no assistant exists", async () => {
+      mockedGetAiAssistant.mockResolvedValue(null)
+      wrapper = helper
+        .component(NotebookAssistantManagementDialog)
+        .withProps({ notebook })
+        .mount()
+      await flushPromises()
+
+      const input = wrapper.find('input[name="additionalInstruction"]')
+      expect(input.element.value).toBe("")
+    })
+
+    it("loads existing settings when assistant exists", async () => {
+      const existingInstructions = "Existing instructions"
+      const mockAssistant: Partial<NotebookAiAssistant> = {
+        additionalInstructionsToAi: existingInstructions,
+        id: 1,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }
+      mockedGetAiAssistant.mockResolvedValue(mockAssistant)
+
+      wrapper = helper
+        .component(NotebookAssistantManagementDialog)
+        .withProps({ notebook })
+        .mount()
+      await flushPromises()
+
+      const input = wrapper.find('input[name="additionalInstruction"]')
+      expect(input.element.value).toBe(existingInstructions)
     })
   })
 })

@@ -2264,6 +2264,29 @@ paths:
               schema:
                 $ref: "#/components/schemas/Notebook"
   /api/notebooks/{notebook}/ai-assistant:
+    get:
+      tags:
+      - rest-notebook-controller
+      operationId: getAiAssistant
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/NotebookAiAssistant"
     patch:
       tags:
       - rest-notebook-controller
