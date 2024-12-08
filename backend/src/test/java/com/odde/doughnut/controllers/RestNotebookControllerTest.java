@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.NotebookAiAssistant;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
@@ -173,6 +174,53 @@ class RestNotebookControllerTest {
       predefinedQuestionBuilder.approvedSpellingQuestionOf(notebook.getNotes().get(0)).please();
       List<Note> result = controller.getNotes(notebook);
       assertThat(result.get(0).getPredefinedQuestions(), hasSize(1));
+    }
+  }
+
+  @Nested
+  class UpdateNotebookAiAssistant {
+    private Notebook notebook;
+
+    @BeforeEach
+    void setup() {
+      notebook = makeMe.aNotebook().creatorAndOwner(userModel).please();
+    }
+
+    @Test
+    void shouldCreateNewAiAssistantWhenNotExists() throws UnexpectedNoAccessRightException {
+      String instructions = "Some AI instructions";
+      NotebookAiAssistant result = controller.updateAiAssistant(notebook, instructions);
+
+      assertThat(result.getNotebook().getId(), equalTo(notebook.getId()));
+      assertThat(result.getAdditionalInstructionsToAi(), equalTo(instructions));
+      assertThat(result.getCreatedAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
+      assertThat(result.getUpdatedAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
+    }
+
+    @Test
+    void shouldUpdateExistingAiAssistant() throws UnexpectedNoAccessRightException {
+      // Create initial assistant
+      String initialInstructions = "Initial instructions";
+      NotebookAiAssistant initial = controller.updateAiAssistant(notebook, initialInstructions);
+
+      // Update with new instructions
+      String newInstructions = "New instructions";
+      NotebookAiAssistant result = controller.updateAiAssistant(notebook, newInstructions);
+
+      assertThat(result.getId(), equalTo(initial.getId()));
+      assertThat(result.getAdditionalInstructionsToAi(), equalTo(newInstructions));
+      assertThat(result.getCreatedAt(), equalTo(initial.getCreatedAt()));
+      assertThat(result.getUpdatedAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
+    }
+
+    @Test
+    void shouldNotAllowUnauthorizedUpdate() {
+      User anotherUser = makeMe.aUser().please();
+      Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
+
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.updateAiAssistant(note.getNotebook(), "Some instructions"));
     }
   }
 }

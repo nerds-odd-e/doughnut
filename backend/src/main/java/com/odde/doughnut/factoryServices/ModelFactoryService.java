@@ -35,6 +35,8 @@ public class ModelFactoryService {
   @Autowired
   public QuestionSuggestionForFineTuningRepository questionSuggestionForFineTuningRepository;
 
+  @Autowired public NotebookAiAssistantRepository notebookAiAssistantRepository;
+
   public NoteModel toNoteModel(Note note) {
     return new NoteModel(note, this);
   }
