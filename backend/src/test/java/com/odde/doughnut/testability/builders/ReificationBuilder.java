@@ -37,20 +37,14 @@ public class ReificationBuilder extends EntityBuilder<Note> {
     }
   }
 
-  public ReificationBuilder creator(User user) {
-    this.creator = user;
-    return this;
-  }
-
-  public ReificationBuilder between(Note from, Note to, LinkType linkType) {
+  public NoteBuilder between(Note from, Note to, LinkType linkType) {
     this.entity =
         ModelFactoryService.buildALink(
             from, to, null, linkType, new Timestamp(System.currentTimeMillis()));
-    creator(from.getCreator());
-    return this;
+    return new NoteBuilder(entity, makeMe);
   }
 
-  public ReificationBuilder between(Note from, Note to) {
+  public NoteBuilder between(Note from, Note to) {
     return between(from, to, LinkType.SPECIALIZE);
   }
 }

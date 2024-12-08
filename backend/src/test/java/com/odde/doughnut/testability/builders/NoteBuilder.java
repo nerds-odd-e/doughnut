@@ -15,7 +15,7 @@ import org.apache.logging.log4j.util.Strings;
 public class NoteBuilder extends EntityBuilder<Note> {
   static final TestObjectCounter titleCounter = new TestObjectCounter(n -> "title" + n);
 
-  List<ReificationBuilder> reificationBuilders = new ArrayList<>();
+  List<NoteBuilder> reificationBuilders = new ArrayList<>();
   private List<PredefinedQuestionBuilder> predefinedQuestionBuilders = new ArrayList<>();
   private List<NoteBuilder> childrenBuilders = new ArrayList<>();
 
@@ -115,7 +115,8 @@ public class NoteBuilder extends EntityBuilder<Note> {
         && predefinedQuestionBuilders.isEmpty()
         && childrenBuilders.isEmpty()
         && !needPersist) return;
-    makeMe.refresh(entity);
+    if (entity.getTargetNote() != null) makeMe.refresh(entity.getParent());
+    else makeMe.refresh(entity);
   }
 
   public NoteBuilder skipMemoryTracking() {
