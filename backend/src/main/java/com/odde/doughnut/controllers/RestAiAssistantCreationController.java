@@ -1,6 +1,5 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.dto.NotebookAssistantCreationParams;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.NotebookAssistant;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -60,18 +59,13 @@ public class RestAiAssistantCreationController {
   @PostMapping("/recreate-notebook/{notebook}")
   @Transactional
   public NotebookAssistant recreateNotebookAssistant(
-      @PathVariable(value = "notebook") @Schema(type = "integer") Notebook notebook,
-      @RequestBody NotebookAssistantCreationParams notebookAssistantCreationParams)
+      @PathVariable(value = "notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException, IOException {
     currentUser.assertAdminAuthorization();
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     NotebookAssistant notebookAssistant =
         assistantCreationService.recreateNotebookAssistant(
-            currentUTCTimestamp,
-            currentUser.getEntity(),
-            notebook,
-            notebookAssistantCreationParams.getAdditionalInstruction(),
-            getModelName());
+            currentUTCTimestamp, currentUser.getEntity(), notebook, getModelName());
     this.modelFactoryService.save(notebookAssistant);
     return notebookAssistant;
   }

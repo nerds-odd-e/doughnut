@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.ConversationMessage;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.NotebookAiAssistant;
 import com.odde.doughnut.entities.NotebookAssistant;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -245,8 +246,32 @@ public class RestConversationMessageControllerAiReplyTests {
       verify(openAiApi).createRunStream(any(), captor.capture());
 
       assertThat(captor.getValue().getAdditionalInstructions())
-          .isEqualTo(
+          .contains(
               "User is seeking for having a conversation, so don't call functions to update the note unless user asks explicitly.");
+    }
+
+    @Test
+    void shouldIncludeNotebookAiAssistantInstructionsInRun()
+        throws UnexpectedNoAccessRightException, BadRequestException {
+      // Setup notebook AI assistant with custom instructions
+      NotebookAiAssistant notebookAiAssistant = new NotebookAiAssistant();
+      notebookAiAssistant.setNotebook(note.getNotebook());
+      notebookAiAssistant.setAdditionalInstructionsToAi("Always use Spanish.");
+      notebookAiAssistant.setCreatedAt(currentUTCTimestamp);
+      notebookAiAssistant.setUpdatedAt(currentUTCTimestamp);
+      makeMe.modelFactoryService.save(notebookAiAssistant);
+      makeMe.refresh(note.getNotebook());
+
+      controller.getAiReply(conversation);
+
+      ArgumentCaptor<RunCreateRequest> captor = ArgumentCaptor.forClass(RunCreateRequest.class);
+      verify(openAiApi).createRunStream(any(), captor.capture());
+
+      String instructions = captor.getValue().getAdditionalInstructions();
+      assertThat(instructions)
+          .contains(
+              "User is seeking for having a conversation, so don't call functions to update the note unless user asks explicitly.")
+          .contains("Always use Spanish.");
     }
   }
 

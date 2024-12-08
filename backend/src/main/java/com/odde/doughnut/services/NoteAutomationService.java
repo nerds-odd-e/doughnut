@@ -27,7 +27,7 @@ public final class NoteAutomationService {
         notebookAssistantForNoteService
             .createThreadWithNoteInfo(List.of())
             .withTool(tool)
-            .withAdditionalInstructions(instructions)
+            .withAdditionalAdditionalInstructions(instructions)
             .run()
             .getRunResult()
             .getAssumedToolCallArgument(TitleReplacement.class);
@@ -94,7 +94,7 @@ public final class NoteAutomationService {
           notebookAssistantForNoteService
               .createThreadWithNoteInfo(List.of(message))
               .withTool(AiToolFactory.completeNoteDetails())
-              .withAdditionalInstructions(instructions)
+              .withAdditionalAdditionalInstructions(instructions)
               .run();
     }
 

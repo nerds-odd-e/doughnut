@@ -2,6 +2,7 @@ package com.odde.doughnut.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.NotebookAiAssistant;
 import com.odde.doughnut.services.ai.AssistantThread;
 import com.odde.doughnut.services.ai.OpenAiAssistant;
 import com.odde.doughnut.services.graphRAG.CharacterBasedTokenCountingStrategy;
@@ -26,7 +27,7 @@ public class NotebookAssistantForNoteService {
     if (!additionalMessages.isEmpty()) {
       messages.addAll(additionalMessages);
     }
-    return assistantService.createThread(messages);
+    return assistantService.createThread(messages, getNotebookAssistantInstructions());
   }
 
   protected AssistantThread createThreadWithNoteInfo1(List<MessageRequest> additionalMessages) {
@@ -45,10 +46,18 @@ public class NotebookAssistantForNoteService {
     if (!additionalMessages.isEmpty()) {
       messages.addAll(additionalMessages);
     }
-    return assistantService.createThread(messages);
+    return assistantService.createThread(messages, getNotebookAssistantInstructions());
   }
 
   public AssistantThread getThread(String threadId) {
-    return assistantService.getThread(threadId);
+    return assistantService.getThread(threadId, getNotebookAssistantInstructions());
+  }
+
+  private String getNotebookAssistantInstructions() {
+    NotebookAiAssistant notebookAiAssistant = note.getNotebook().getNotebookAiAssistant();
+    if (notebookAiAssistant == null) {
+      return null;
+    }
+    return notebookAiAssistant.getAdditionalInstructionsToAi();
   }
 }

@@ -123,7 +123,7 @@ public class ChatAboutNoteService {
 
     public SseEmitter getReplyStream() {
       return thread
-          .withAdditionalInstructions(
+          .withAdditionalAdditionalInstructions(
               "User is seeking for having a conversation, so don't call functions to update the note unless user asks explicitly.")
           .runStream()
           .getSseEmitter(

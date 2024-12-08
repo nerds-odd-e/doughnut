@@ -2029,12 +2029,6 @@ paths:
         required: true
         schema:
           type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/NotebookAssistantCreationParams"
-        required: true
       responses:
         "500":
           description: Internal Server Error
@@ -4021,11 +4015,6 @@ components:
       type: object
       properties:
         b64encoded:
-          type: string
-    NotebookAssistantCreationParams:
-      type: object
-      properties:
-        additionalInstruction:
           type: string
     NotebookAssistant:
       required:

@@ -14,13 +14,14 @@ public final class OpenAiAssistant {
     this.assistantId = assistantId;
   }
 
-  public AssistantThread getThread(String threadId) {
-    return new AssistantThread(assistantId, threadId, openAiApiHandler);
+  public AssistantThread getThread(String threadId, String additionalInstructions) {
+    return new AssistantThread(assistantId, threadId, openAiApiHandler, additionalInstructions);
   }
 
-  public AssistantThread createThread(List<MessageRequest> additionalMessages) {
+  public AssistantThread createThread(
+      List<MessageRequest> additionalMessages, String additionalInstructions) {
     ThreadRequest threadRequest = ThreadRequest.builder().messages(additionalMessages).build();
     String threadId = openAiApiHandler.createThread(threadRequest).getId();
-    return getThread(threadId);
+    return getThread(threadId, additionalInstructions);
   }
 }

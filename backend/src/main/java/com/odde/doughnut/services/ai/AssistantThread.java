@@ -11,6 +11,7 @@ import io.reactivex.Flowable;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
+import org.apache.logging.log4j.util.Strings;
 
 public class AssistantThread {
   private final String assistantId;
@@ -21,10 +22,15 @@ public class AssistantThread {
   private String additionalInstructions;
   private String modelName;
 
-  public AssistantThread(String assistantId, String threadId, OpenAiApiHandler openAiApiHandler) {
+  public AssistantThread(
+      String assistantId,
+      String threadId,
+      OpenAiApiHandler openAiApiHandler,
+      String additionalInstructions) {
     this.assistantId = assistantId;
     this.threadId = threadId;
     this.openAiApiHandler = openAiApiHandler;
+    this.additionalInstructions = additionalInstructions;
   }
 
   public AssistantThread withTool(AiTool tool) {
@@ -38,8 +44,14 @@ public class AssistantThread {
     return this;
   }
 
-  public AssistantThread withAdditionalInstructions(String instructions) {
-    this.additionalInstructions = instructions;
+  public AssistantThread withAdditionalAdditionalInstructions(String instructions) {
+    if (instructions != null && !instructions.isEmpty()) {
+      if (additionalInstructions == null) {
+        additionalInstructions = instructions;
+      } else {
+        this.additionalInstructions += "\n\n" + instructions;
+      }
+    }
     return this;
   }
 
@@ -57,7 +69,7 @@ public class AssistantThread {
   private RunCreateRequest.RunCreateRequestBuilder getCreateRequestBuilder() {
     RunCreateRequest.RunCreateRequestBuilder builder =
         RunCreateRequest.builder().assistantId(assistantId);
-    if (additionalInstructions != null) {
+    if (!Strings.isEmpty(additionalInstructions)) {
       builder.additionalInstructions(additionalInstructions);
     }
     if (modelName != null) {

@@ -8,14 +8,16 @@
       field="additionalInstruction"
       label="Additional Instructions to AI"
     />
-    <button type="submit">Update Notebook AI Assistant Settings</button>
+    <button type="submit" class="btn btn-primary">
+      Update Notebook AI Assistant Settings
+    </button>
   </form>
 
   <div class="mt-4">
-    <button @click.prevent="createAssistantForNotebook">
+    <button @click.prevent="createAssistantForNotebook" class="btn btn-danger">
       Create Assistant For Notebook
     </button>
-    <button @click.prevent="downloadNotebookDump">
+    <button @click.prevent="downloadNotebookDump" class="btn btn-success">
       Download Notebook Dump
     </button>
   </div>
@@ -46,10 +48,7 @@ const updateAiInstructions = async () => {
 
 const createAssistantForNotebook = async () => {
   await managedApi.restAiAssistantCreationController.recreateNotebookAssistant(
-    props.notebook.id,
-    {
-      additionalInstruction: additionalInstruction.value,
-    }
+    props.notebook.id
   )
   emit("close")
 }

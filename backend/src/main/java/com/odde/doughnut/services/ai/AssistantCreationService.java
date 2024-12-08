@@ -50,11 +50,7 @@ public class AssistantCreationService {
   }
 
   public NotebookAssistant recreateNotebookAssistant(
-      Timestamp currentUTCTimestamp,
-      User creator,
-      Notebook notebook,
-      String additionalInstruction,
-      String modelName)
+      Timestamp currentUTCTimestamp, User creator, Notebook notebook, String modelName)
       throws IOException {
     String fileContent = notebook.getNotebookDump();
     String assistantName =
@@ -66,10 +62,9 @@ public class AssistantCreationService {
         AssistantRequest.builder()
             .model(modelName)
             .name(assistantName)
-            .toolResources(tooResources)
-            .instructions(
-                OpenAIChatRequestBuilder.systemInstruction + "\n\n" + additionalInstruction)
+            .instructions(OpenAIChatRequestBuilder.systemInstruction)
             .tools(toolList)
+            .toolResources(tooResources)
             .build();
     Assistant notebookAssistant = openAiApiHandler.createAssistant(assistantRequest);
     return notebook.buildOrEditNotebookAssistant(
