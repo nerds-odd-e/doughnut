@@ -1,38 +1,46 @@
 <template>
-  <form @submit.prevent="processForm">
-    <fieldset :disabled="processing">
-      <div class="title-search-container">
-        <NoteFormTitleOnly
-          v-model="creationData.newTitle"
-          :error-message="noteFormErrors.newTitle"
-          @focus="showDropdown = true"
-          @blur="onTitleBlur"
-        />
-        <SuggestTitle
-          :original-title="creationData.newTitle"
-          :suggested-title="suggestedTitle"
-          @suggested-title-selected="takeSuggestedTitle"
-        />
-        <SearchResults
-          v-show="showDropdown && creationData.newTitle"
-          v-bind="{
-            noteId: referenceNote.id,
-            inputSearchKey: creationData.newTitle,
-            isDropdown: true
-          }"
-          class="title-search-results"
-        />
-      </div>
-
-      <WikidataSearchByLabel
-        :search-key="creationData.newTitle"
-        v-model="creationData.wikidataId"
-        :error-message="noteFormErrors.wikidataId"
-        @selected="onSelectWikidataEntry"
-      />
-      <input type="submit" value="Submit" class="btn btn-primary" />
-    </fieldset>
-  </form>
+  <div class="daisy-card daisy-w-full daisy-bg-base-100">
+    <div class="daisy-card-body">
+      <form @submit.prevent="processForm">
+        <fieldset :disabled="processing">
+          <div class="title-search-container">
+            <NoteFormTitleOnly
+              v-model="creationData.newTitle"
+              :error-message="noteFormErrors.newTitle"
+              @focus="showDropdown = true"
+              @blur="onTitleBlur"
+            />
+            <SuggestTitle
+              :original-title="creationData.newTitle"
+              :suggested-title="suggestedTitle"
+              @suggested-title-selected="takeSuggestedTitle"
+            />
+            <SearchResults
+              v-show="showDropdown && creationData.newTitle"
+              v-bind="{
+                noteId: referenceNote.id,
+                inputSearchKey: creationData.newTitle,
+                isDropdown: true
+              }"
+              class="title-search-results"
+            />
+          </div>
+    
+          <WikidataSearchByLabel
+            :search-key="creationData.newTitle"
+            v-model="creationData.wikidataId"
+            :error-message="noteFormErrors.wikidataId"
+            @selected="onSelectWikidataEntry"
+          />
+          <input
+            type="submit"
+            value="Submit"
+            class="daisy-btn daisy-btn-primary daisy-mt-4"
+          />
+        </fieldset>
+      </form>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -148,17 +156,8 @@ const onTitleBlur = () => {
   z-index: 1000
 
 .secondary-info
-  margin-top: 1rem
-  padding: 5px
-  margin: 0
-  border: 1px solid #ccc
-  border-radius: 4px
-  color: #999
-  font-size: smaller
+  @apply daisy-mt-4 daisy-p-2 daisy-border daisy-border-base-300 daisy-rounded-lg daisy-text-base-content daisy-text-sm
 
   legend
-    font-size: 1.2rem
-    margin-bottom: 0.5rem
-    float: none
-    width: auto
+    @apply daisy-text-lg daisy-mb-2 daisy-float-none daisy-w-auto
 </style>
