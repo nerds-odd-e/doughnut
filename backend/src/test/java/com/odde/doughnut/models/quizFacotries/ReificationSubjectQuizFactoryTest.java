@@ -18,28 +18,28 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class LinkSourceQuizFactoryTest {
+class ReificationSubjectQuizFactoryTest {
   @Autowired MakeMe makeMe;
   User user;
   Note top;
-  Note target;
-  Note source;
-  Note anotherSource;
-  Note subjectNote;
+  Note object;
+  Note subject;
+  Note anotherSubject;
+  Note reification;
 
   @BeforeEach
   void setup() {
     user = makeMe.aUser().please();
     top = makeMe.aNote().creatorAndOwner(user).please();
-    target = makeMe.aNote("sauce").under(top).please();
-    source = makeMe.aNote("tomato sauce").under(top).linkTo(target).please();
-    anotherSource = makeMe.aNote("blue cheese").under(top).please();
-    subjectNote = source.getLinks().get(0);
+    object = makeMe.aNote("sauce").under(top).please();
+    subject = makeMe.aNote("tomato sauce").under(top).linkTo(object).please();
+    anotherSubject = makeMe.aNote("blue cheese").under(top).please();
+    reification = subject.getLinks().get(0);
   }
 
   @Test
   void shouldReturnNullIfCannotFindEnoughOptions() {
-    makeMe.aReification().between(anotherSource, target).please();
+    makeMe.aReification().between(anotherSubject, object).please();
     PredefinedQuestion actual = buildLinkSourcePredefinedQuestion();
     assertThat(actual, is(nullValue()));
   }
@@ -54,16 +54,16 @@ class LinkSourceQuizFactoryTest {
           containsString("Which one <em>is immediately a specialization of</em>:"));
       assertThat(
           predefinedQuestion.getBareQuestion().getMultipleChoicesQuestion().getStem(),
-          containsString(target.getTopicConstructor()));
+          containsString(object.getTopicConstructor()));
       List<String> options =
           predefinedQuestion.getBareQuestion().getMultipleChoicesQuestion().getChoices();
       assertThat(options, hasSize(2));
-      assertThat(anotherSource.getTopicConstructor(), in(options));
+      assertThat(anotherSubject.getTopicConstructor(), in(options));
       assertThat("tomato sauce", in(options));
     }
   }
 
   private PredefinedQuestion buildLinkSourcePredefinedQuestion() {
-    return makeMe.buildAQuestionForLinkingNote(LinkQuestionType.LINK_SOURCE, subjectNote, user);
+    return makeMe.buildAQuestionForLinkingNote(LinkQuestionType.LINK_SOURCE, reification, user);
   }
 }

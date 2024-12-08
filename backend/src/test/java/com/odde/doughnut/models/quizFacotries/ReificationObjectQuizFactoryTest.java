@@ -21,28 +21,28 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class LinkTargetQuizFactoryTest {
+class ReificationObjectQuizFactoryTest {
   @Autowired MakeMe makeMe;
   User user;
   Note top;
-  Note target;
-  Note source;
-  Note anotherTarget;
-  Note subjectNote;
+  Note object;
+  Note subject;
+  Note anotherObject;
+  Note reification;
 
   @BeforeEach
   void setup() {
     user = makeMe.aUser().please();
     top = makeMe.aNote().creatorAndOwner(user).please();
-    target = makeMe.aNote("target").under(top).please();
-    source = makeMe.aNote("source").under(top).linkTo(target).please();
-    anotherTarget = makeMe.aNote("another note").under(top).please();
-    subjectNote = source.getLinks().get(0);
+    object = makeMe.aNote("target").under(top).please();
+    subject = makeMe.aNote("source").under(top).linkTo(object).please();
+    anotherObject = makeMe.aNote("another note").under(top).please();
+    reification = subject.getLinks().get(0);
   }
 
   @Test
   void shouldReturnNullIfCannotFindEnoughOptions() {
-    makeMe.aReification().between(source, anotherTarget).please();
+    makeMe.aReification().between(subject, anotherObject).please();
 
     assertThat(buildLinkTargetQuizQuestion(), is(nullValue()));
   }
@@ -57,12 +57,12 @@ class LinkTargetQuizFactoryTest {
           equalTo("<mark>source</mark> is a specialization of:"));
       List<String> options =
           predefinedQuestion.getBareQuestion().getMultipleChoicesQuestion().getChoices();
-      assertThat(anotherTarget.getTopicConstructor(), in(options));
-      assertThat(target.getTopicConstructor(), in(options));
+      assertThat(anotherObject.getTopicConstructor(), in(options));
+      assertThat(object.getTopicConstructor(), in(options));
     }
   }
 
   private PredefinedQuestion buildLinkTargetQuizQuestion() {
-    return makeMe.buildAQuestionForLinkingNote(LinkQuestionType.LINK_TARGET, subjectNote, user);
+    return makeMe.buildAQuestionForLinkingNote(LinkQuestionType.LINK_TARGET, reification, user);
   }
 }
