@@ -4,6 +4,7 @@ import { VueWrapper, flushPromises } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
+import { nextTick } from "vue"
 
 const mockedUpdateTitleCall = vi.fn()
 

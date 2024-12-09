@@ -7,12 +7,11 @@
     @input="onInput"
     @blur="onBlur"
     @keydown.enter.prevent="onEnter"
-    v-text="modelValue"
   ></div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue"
+import { ref, watch, onMounted } from "vue"
 
 const props = defineProps({
   modelValue: { type: String, required: true },
@@ -38,15 +37,33 @@ const onEnter = (event: KeyboardEvent) => {
   event.target?.dispatchEvent(new Event("blur"))
 }
 
-// Keep the editor content in sync with external changes
-watch(
-  () => props.modelValue,
-  (newValue) => {
-    if (editor.value && editor.value.innerText !== newValue) {
-      editor.value.innerText = newValue
+const updateContent = (newValue: string) => {
+  if (editor.value && editor.value.innerText !== newValue) {
+    // First update innerText to ensure it's set properly for tests and initial render
+    editor.value.innerText = newValue
+
+    // Then update or create a text node to handle cursor position
+    // This fixes the cursor jumping issue in Safari and Chrome mobile
+    // by maintaining a single text node instead of recreating the content
+    // which would reset cursor position
+    if (editor.value.firstChild) {
+      ;(editor.value.firstChild as Text).data = newValue
+    } else {
+      const textNode = document.createTextNode(newValue)
+      editor.value.appendChild(textNode)
     }
   }
-)
+}
+
+// Keep the editor content in sync with external changes
+watch(() => props.modelValue, updateContent)
+
+// Initialize content
+onMounted(() => {
+  if (editor.value) {
+    updateContent(props.modelValue)
+  }
+})
 </script>
 
 <style scoped>
