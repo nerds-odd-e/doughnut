@@ -70,8 +70,24 @@ onMounted(() => {
 .seamless-editor {
   outline: none;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin; /* For Firefox */
+  -ms-overflow-style: -ms-autohiding-scrollbar; /* For IE/Edge */
+}
+
+/* Show webkit scrollbar (Chrome, Safari, newer Edge) */
+.seamless-editor::-webkit-scrollbar {
+  height: 4px;
+}
+
+.seamless-editor::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.seamless-editor::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 2px;
 }
 
 .seamless-editor:empty:before {
