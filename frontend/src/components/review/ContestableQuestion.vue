@@ -1,5 +1,5 @@
 <template>
-  <div v-if="recallPrompt.notebook" class="daisy-mb-4">
+  <div v-if="recallPrompt.notebook" class="notebook-source daisy-mb-4">
     <NotebookLink :notebook="recallPrompt.notebook" />
   </div>
   <div v-for="(q, index) in prevQuestions"
@@ -16,7 +16,7 @@
     {{ currentQuestionLegitMessage }}
   </p>
   <ContentLoader v-if="regenerating" />
-  <div class="daisy-overflow-y-auto" v-else>
+  <div class="recall-prompt daisy-overflow-y-auto" v-else>
     <AnsweredQuestionComponent
       v-if="answeredQuestion"
       :answered-question="answeredQuestion"
@@ -33,7 +33,7 @@
         title="Doesn't make sense?"
         id="try-again"
         v-if="currentQuestion"
-        class="daisy-btn daisy-btn-ghost daisy-btn-sm"
+        class="btn daisy-btn daisy-btn-ghost daisy-btn-sm"
         @click="contest"
       >
         <SvgContest />
@@ -108,3 +108,18 @@ const onAnswered = (answer: AnsweredQuestion) => {
   emit("answered", answeredQuestion.value)
 }
 </script>
+
+<style lang="scss" scoped>
+.recall-prompt {
+  overflow-y: auto;
+}
+
+.notebook-source {
+  margin-bottom: 1rem;
+}
+
+/* These styles are to-be replaced by DaisyUI classes:
+.recall-prompt -> daisy-overflow-y-auto
+.notebook-source -> daisy-mb-4
+*/
+</style>
