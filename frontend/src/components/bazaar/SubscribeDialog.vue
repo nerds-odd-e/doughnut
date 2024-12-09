@@ -1,5 +1,5 @@
 <template>
-  <div class="daisy-card daisy-w-96 daisy-bg-base-100 daisy-shadow-xl">
+  <div class="daisy-card daisy-w-96 daisy-shadow-xl">
     <div class="daisy-card-body">
       <h3 class="daisy-card-title">Add to my learning</h3>
       <p v-if="!loggedIn">Please login first</p>

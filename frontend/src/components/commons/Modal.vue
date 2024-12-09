@@ -2,7 +2,7 @@
   <Teleport to="body">
     <div class="modal-mask">
       <div class="modal-wrapper" @mousedown.self="$emit('close_request')">
-        <div :class="sidebarStyle">
+        <div :class="sidebarStyle" class="daisy-bg-base-100 daisy-text-base-content">
           <button class="close-button" @click="$emit('close_request')">
             <SvgClose />
           </button>
@@ -96,7 +96,6 @@ onUnmounted(() => {
   overflow: auto;
   margin: 0px auto;
   padding: 20px 30px;
-  background-color: #fff;
   border-radius: 2px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
   transition: all 0.3s ease;

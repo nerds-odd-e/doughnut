@@ -78,7 +78,7 @@
               </div>
               <div class="daisy-w-full lg:daisy-w-3/12 inboundReferences" v-if="noteRealm.inboundReferences && noteRealm.inboundReferences.length > 0">
                 <h3 class="daisy-text-lg daisy-font-medium daisy-mb-2">Referenced by</h3>
-                <ul class="daisy-menu daisy-bg-base-100 daisy-rounded-lg daisy-shadow-sm">
+                <ul class="daisy-menu daisy-rounded-lg daisy-shadow-sm">
                   <li v-for="link in noteRealm.inboundReferences"
                       :key="link.id"
                       class="daisy-menu-item daisy-hover:daisy-bg-base-200 daisy-transition-colors daisy-py-2"

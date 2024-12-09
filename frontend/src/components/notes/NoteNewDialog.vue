@@ -1,5 +1,5 @@
 <template>
-  <div class="daisy-card daisy-w-full daisy-bg-base-100">
+  <div class="daisy-card daisy-w-full">
     <div class="daisy-card-body">
       <form @submit.prevent="processForm">
         <fieldset :disabled="processing">
@@ -25,7 +25,7 @@
               class="title-search-results"
             />
           </div>
-    
+
           <WikidataSearchByLabel
             :search-key="creationData.newTitle"
             v-model="creationData.wikidataId"
