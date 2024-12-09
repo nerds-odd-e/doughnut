@@ -1,9 +1,8 @@
 # Technology Stack
 
-- [Nix](https://nix.dev/)
-- [nix flakes](https://nix.dev/concepts/)
+- [Lix](https://lix.systems/)
 - [direnv](https://direnv.net/)
-- [Azul Zulu OpenJDK 22](https://docs.azul.com/core/release/22-ga/release-notes/release-notes)
+- [Azul Zulu OpenJDK 23](https://docs.azul.com/core/release/22-ga/release-notes)
 - [Spring Boot](https://spring.io/guides)
 - [Flyway](https://flywaydb.org)
 - [Gradle](https://gradle.org/)
@@ -19,7 +18,8 @@
 - [vue-router 4](https://router.vuejs.org/)
 - [Vitest](https://vitest.dev/)
 - [Vue Testing Library](https://testing-library.com/docs/vue-testing-library/intro/)
-- [Bootstrap 5](https://getbootstrap.com/docs/5.2/getting-started/introduction/)
+- [DaisyUI](https://daisyui.com/)
+- [Bootstrap 5](https://getbootstrap.com/docs/5.2/getting-started/introduction/) ***[WIP to be replaced by DaiyUI]***
 - [MySQL 8.0](https://dev.mysql.com/doc/refman/8.0/en/)
 - [Github Actions](https://docs.github.com/en/actions)
 - [git-secret](https://git-secret.io)
