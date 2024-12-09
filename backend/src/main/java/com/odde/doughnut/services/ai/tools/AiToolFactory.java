@@ -19,22 +19,25 @@ public class AiToolFactory {
   public static AiToolList mcqWithAnswerAiTool() {
     return new AiToolList(
         """
-        Please act as a Memory Assistant, helping me recall and reinforce information from my notes. My notes are atomic pieces of knowledge organized hierarchically and can include reifications to form lateral links. Your task is to create memory-stimulating exercises by adhering to these steps and guidelines:
+        Please act as a Question Designer, testing my memory, mastery and understanding of my focus note.
+        My notes are atomic pieces of knowledge organized hierarchically and can include reifications to form lateral links.
+        Your task is to create a memory-stimulating question by adhering to these guidelines:
 
-        1. **Focus on the Focus Note**: Formulate questions centered exclusively around the focus note (its title and details), ensuring no direct mention or explicit reference to it.
+        1. **Focus on the Focus Note**: Formulate one question EXCLUSIVELY around the focus note (its title / subject-predicate-object and details).
         2. **Leverage the Extended Graph**:
-           - Use the contextual path and related notes to enrich the question formulation.
-           - Avoid accidental bias by ensuring the focus note isn’t assumed to be the sole specialization of a general concept.
-           - Related notes often serve as excellent distractor choices for the MCQs.
-        3. **Context Visibility**: Assume the top-level of the focus note’s contextual path is visible to the user, but avoid explicitly mentioning the focus note itself.
+           - Use other focus note info and related notes to enrich the question formulation.
+           - Avoid accidental bias by ensuring the focus note isn’t falsely assumed to be the sole specialization of a general concept.
+           - Related notes often serve as excellent distractor choices for the MCQs. But avoid more than 1 correct answers.
+        3. **Context Visibility**:
+           - Avoid explicitly mentioning the focus note title in stem
+           - Focus note can appear in the choices when necessary.
         4. **Generate Multiple-Choice Questions (MCQs)**:
-           - Provide 2 to 4 options, with ONLY one correct answer.
+           - Provide 2 to 3 options, with ONLY one correct answer.
            - Vary the length of answer choices to avoid patterns where the correct answer is consistently the longest.
-        5. **Use Markdown Formatting**:
            - Use markdown for both the question stem and the answer choices.
         6. **Ensure Question Self-Sufficiency**:
-           - Ensure the question is standalone and provides all necessary context within the stem or choices.
-           - Avoid vague phrasing like "this X", "the below X" or "the following X" unless the X is explicitly defined in the stem or choices.
+           - Ensure the question provides all necessary context within the stem and choices.
+           - Avoid vague phrasing like "this X" or "the following X" unless the X is explicitly defined in the stem or choices.
            - IMPORTANT: Avoid using "this note"!!! User won't know which note you are referring to.
         7. **Empty Stems When Necessary**: Leave the question stem empty if there’s insufficient information to create a meaningful question.
         8. **Make sure correct choice index is accurate**:
@@ -43,7 +46,6 @@ public class AiToolFactory {
         9. **Output Handling**:
            - MUST provide the question via the function `%s`. If question generation fails, still output using this function.
            - Create only one question and make only one call to the function.
-        10. **Flexible Choice Ordering**: Avoid setting `strictChoiceOrder` to `true` unless it’s the most appropriate option for the question.
 
       """
             .formatted(ASK_SINGLE_ANSWER_MULTIPLE_CHOICE_QUESTION.getValue()),

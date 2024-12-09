@@ -105,7 +105,7 @@ class NoteQuestionGenerationServiceTests {
       assertThat(instructionMessage.getRole(), is("user"));
       assertThat(
           instructionMessage.getContent().toString(),
-          containsString("Please act as a Memory Assistant"));
+          containsString("Please act as a Question Designer"));
     }
 
     @Test
