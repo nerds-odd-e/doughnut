@@ -66,7 +66,7 @@ onMounted(async () => {
 
 <template>
   <Popups />
-  <div class="app-container">
+  <div class="app-container daisy-bg-base-100 daisy-text-base-content">
     <div class="sidebar-control">
       <SidebarControl
         :user="user"

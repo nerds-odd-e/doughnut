@@ -2,7 +2,7 @@
   <Teleport to="body">
     <div class="modal-mask">
       <div class="modal-wrapper" @mousedown.self="$emit('close_request')">
-        <div :class="sidebarStyle" class="daisy-bg-base-100 daisy-text-base-content">
+        <div :class="sidebarStyle" class="daisy-bg-base-200 daisy-text-base-content">
           <button class="close-button" @click="$emit('close_request')">
             <SvgClose />
           </button>

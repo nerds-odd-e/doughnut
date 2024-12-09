@@ -4,7 +4,7 @@
   </div>
   <div v-for="(q, index) in prevQuestions"
     :key="index"
-    class="daisy-card daisy-bg-base-100 daisy-shadow-sm daisy-mb-4"
+    class="daisy-card daisy-shadow-sm daisy-mb-4"
   >
     <div class="daisy-card-body">
       <h3 class="daisy-card-title">Previous Question Contested ...</h3>

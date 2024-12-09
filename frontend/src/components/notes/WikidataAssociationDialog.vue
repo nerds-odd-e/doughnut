@@ -1,5 +1,5 @@
 <template>
-<div class="daisy-card daisy-w-96 daisy-bg-base-100">
+<div class="daisy-card daisy-w-96">
   <div class="daisy-card-body">
     <h3 class="daisy-card-title">
       Associate
@@ -17,10 +17,10 @@
         placeholder="example: `Q12345`"
         v-focus
       />
-  
+
       <input type="submit" value="Save" class="daisy-btn daisy-btn-primary daisy-mt-4" />
     </form>
-  
+
     <form v-else @submit.prevent="save">
       <p class="daisy-py-4">
         Confirm to associate
@@ -35,7 +35,7 @@
           class="daisy-btn daisy-btn-ghost"
           @click="conflictWikidataTitle = undefined"
         />
-    
+
         <input type="submit" value="Confirm" class="daisy-btn daisy-btn-primary" />
       </div>
     </form>
