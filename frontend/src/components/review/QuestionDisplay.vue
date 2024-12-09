@@ -1,7 +1,7 @@
 <template>
-  <div class="quiz-instruction" data-test="question-section">
+  <div class="quiz-instruction daisy-relative daisy-mt-5" data-test="question-section">
     <div
-      style="white-space: pre-wrap"
+      class="daisy-whitespace-pre-wrap"
       data-test="stem"
       v-if="bareQuestion.multipleChoicesQuestion.stem"
       v-html="stemHtml"
@@ -21,7 +21,11 @@
           placeholder="put your answer here"
           v-focus
         />
-        <input type="submit" value="Answer" class="btn btn-primary btn-lg btn-block" />
+        <input
+          type="submit"
+          value="Answer"
+          class="daisy-btn daisy-btn-primary daisy-btn-lg daisy-w-full"
+        />
       </form>
     </div>
     <QuestionChoices
@@ -72,12 +76,5 @@ const submitAnswer = async (answerData: AnswerDTO) => {
 .quiz-instruction {
   position: relative;
   margin-top: 20px;
-}
-
-.mark-question {
-  button {
-    border: none;
-    background: none;
-  }
 }
 </style>

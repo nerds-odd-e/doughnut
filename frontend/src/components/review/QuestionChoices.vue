@@ -1,16 +1,30 @@
 <template>
-  <ol class="choices" v-if="choices && choices.length > 0">
-    <li class="choice" v-for="(choice, index) in choices" :key="index">
+  <ol class="choices  daisy-flex daisy-flex-wrap daisy-flex-row daisy-justify-start daisy-list-none daisy-p-0" v-if="choices && choices.length > 0">
+    <li
+      class="choice daisy-w-[46%] daisy-min-h-[80px] daisy-m-[2%] sm:daisy-w-full"
+      v-for="(choice, index) in choices"
+      :key="index"
+    >
       <button
-        :class="{
-          'is-correct': isOptionCorrect(index),
-          'is-incorrect': !isOptionCorrect(index),
-          'is-selected': isSelectedOption(index),
-        }"
+        :class="[
+          'daisy-w-full daisy-h-full daisy-flex daisy-justify-center daisy-items-center',
+          'daisy-rounded-lg daisy-bg-base-200 daisy-text-base-content',
+          'hover:daisy-bg-primary hover:daisy-text-primary-content',
+          'focus:daisy-outline-none focus:daisy-ring-2 focus:daisy-ring-primary',
+          'disabled:daisy-opacity-65 daisy-transition-colors daisy-select-none',
+          {
+            'is-correct': isOptionCorrect(index),
+            'is-incorrect': !isOptionCorrect(index),
+            'is-selected': isSelectedOption(index),
+          }
+        ]"
         @click.once="submitAnswer({ choiceIndex: index })"
         :disabled="disabled"
       >
-        <div v-html="getChoiceHtml(choice)" />
+        <div
+          v-html="getChoiceHtml(choice)"
+          class="daisy-whitespace-normal daisy-break-words"
+        />
       </button>
     </li>
   </ol>
@@ -70,34 +84,6 @@ export default defineComponent({
   margin: 2%
   @media(max-width: 500px)
     width: 100%
-  button
-    width: 100%
-    height: 100%
-    display: flex
-    justify-content: center
-    align-items: center
-    border: 0
-    border-radius: 0.5rem
-    background-color: #e8e9ea
-    color: #212529
-    text-decoration: none
-    white-space: normal
-    word-break: break-word
-    cursor: pointer
-    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out
-    &:hover
-      color: #fff
-      background-color: #007bff
-      border-color: #007bff
-    &:focus
-      outline: 0
-      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25)
-    &:disabled
-      opacity: 0.65
-    -webkit-tap-highlight-color: transparent
-    -webkit-touch-callout: none
-    -webkit-user-select: none
-    user-select: none
 
 .is-correct
   background-color: #00ff00 !important
@@ -105,4 +91,10 @@ export default defineComponent({
 .is-selected
   font-weight: bold
   background-color: orange !important
+
+button
+  border: 0
+  -webkit-tap-highlight-color: transparent
+  -webkit-touch-callout: none
+  -webkit-user-select: none
 </style>
