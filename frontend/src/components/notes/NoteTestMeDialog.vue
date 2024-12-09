@@ -5,7 +5,10 @@
     @need-scroll="scrollToBottom"
   />
 
-  <div ref="bottomOfTheChat" style="height: 140px; display: block"></div>
+  <div
+    ref="bottomOfTheChat"
+    class="daisy-h-36 daisy-block"
+  ></div>
 </template>
 
 <script setup lang="ts">

@@ -1,22 +1,29 @@
 <template>
-  <div v-if="recallPrompt.notebook" class="notebook-source">
+  <div v-if="recallPrompt.notebook" class="daisy-mb-4">
     <NotebookLink :notebook="recallPrompt.notebook" />
   </div>
-  <div v-for="(q, index) in prevQuestions" :key="index">
-    <h3>Previous Question Contested ...</h3>
-    <p>{{ q.badQuestionReason }}</p>
-    <QuestionDisplay :bare-question="q.quizeQuestion.bareQuestion" :disabled="true" />
+  <div v-for="(q, index) in prevQuestions"
+    :key="index"
+    class="daisy-card daisy-bg-base-100 daisy-shadow-sm daisy-mb-4"
+  >
+    <div class="daisy-card-body">
+      <h3 class="daisy-card-title">Previous Question Contested ...</h3>
+      <p class="daisy-text-base-content">{{ q.badQuestionReason }}</p>
+      <QuestionDisplay :bare-question="q.quizeQuestion.bareQuestion" :disabled="true" />
+    </div>
   </div>
-  <p v-if="currentQuestionLegitMessage">{{ currentQuestionLegitMessage }}</p>
+  <p v-if="currentQuestionLegitMessage" class="daisy-text-warning daisy-mb-4">
+    {{ currentQuestionLegitMessage }}
+  </p>
   <ContentLoader v-if="regenerating" />
-  <div class="recall-prompt" v-else>
+  <div class="daisy-overflow-y-auto" v-else>
     <AnsweredQuestionComponent
       v-if="answeredQuestion"
       :answered-question="answeredQuestion"
       :conversation-button="true"
       :storage-accessor="storageAccessor"
     />
-    <div v-else>
+    <div v-else class="daisy-flex daisy-flex-col daisy-gap-4">
     <RecallPromptComponent
       :recall-prompt="currentQuestion"
       @answered="onAnswered($event)"
@@ -26,7 +33,7 @@
         title="Doesn't make sense?"
         id="try-again"
         v-if="currentQuestion"
-        class="btn"
+        class="daisy-btn daisy-btn-ghost daisy-btn-sm"
         @click="contest"
       >
         <SvgContest />
@@ -101,12 +108,3 @@ const onAnswered = (answer: AnsweredQuestion) => {
   emit("answered", answeredQuestion.value)
 }
 </script>
-
-<style lang="scss" scoped>
-.recall-prompt {
-  overflow-y: auto;
-}
-.notebook-source {
-  margin-bottom: 1rem;
-}
-</style>

@@ -22,7 +22,7 @@
       />
       <button
         v-if="canMoveToEnd"
-        class="btn btn-icon"
+        class="daisy-btn daisy-btn-ghost daisy-btn-circle"
         title="Move to end of list"
         @click="moveToEnd"
       >
