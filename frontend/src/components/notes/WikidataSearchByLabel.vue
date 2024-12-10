@@ -16,7 +16,7 @@
         @change="onSelectSearchResult"
         @blur="removeSearchSuggestions"
         v-model="selectedOption"
-        class="popup-select daisy-select daisy-select-bordered"
+        class="popup-select daisy-select daisy-select-bordered daisy-bg-base-100"
       >
         <option disabled value="">- Choose Wikidata Search Result -</option>
         <option
@@ -102,8 +102,5 @@ export default defineComponent({
   left: 0;
   z-index: 9999;
   cursor: pointer;
-  &.daisy-select {
-    @apply daisy-bg-base-100;
-  }
 }
 </style>

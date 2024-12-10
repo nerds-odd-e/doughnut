@@ -1,5 +1,5 @@
 <template>
-  <div class="note-show-container">
+  <div class="note-show-container daisy-flex daisy-flex-col daisy-h-full">
     <NoteRealmLoader v-bind="{ noteId, storageAccessor }">
       <template #default="{ noteRealm }">
         <TeleportToHeadStatus>
@@ -41,8 +41,8 @@
               @edit-as-markdown="asMarkdown = $event"
             />
             <div
-              class="note-content-wrapper"
-              :class="{ 'daisy-collapse daisy-collapse-arrow': isMinimized }"
+              class="note-content-wrapper daisy-flex-1 daisy-min-h-0 daisy-overflow-auto daisy-flex daisy-flex-col lg:daisy-flex-row daisy-gap-4"
+              :class="{ minimized: isMinimized }"
             >
               <div id="main-note-content" class="daisy-flex daisy-flex-col daisy-w-full lg:daisy-w-9/12">
                 <NoteTextContent
@@ -76,7 +76,10 @@
                   :notes="noteRealm.children ?? []"
                 />
               </div>
-              <div class="daisy-w-full lg:daisy-w-3/12 inboundReferences" v-if="noteRealm.inboundReferences && noteRealm.inboundReferences.length > 0">
+              <div
+	        v-if="noteRealm.inboundReferences && noteRealm.inboundReferences?.length > 0"
+                class="daisy-w-full lg:daisy-w-3/12 daisy-border-l daisy-border-base-300 daisy-pl-4 daisy-bg-amber-50/50"
+	      >
                 <h3 class="daisy-text-lg daisy-font-medium daisy-mb-2">Referenced by</h3>
                 <ul class="daisy-menu daisy-rounded-lg daisy-shadow-sm">
                   <li v-for="link in noteRealm.inboundReferences"
@@ -151,34 +154,21 @@ const toLocalDateString = (date: string) => {
 
 <style scoped>
 .note-show-container {
-  @apply daisy-flex daisy-flex-col daisy-h-full;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .note-content-wrapper {
-  @apply daisy-flex-1 daisy-min-h-0 daisy-overflow-auto daisy-flex daisy-flex-col lg:daisy-flex-row daisy-gap-4;
-}
-
-#main-note-content {
-  @apply daisy-flex daisy-flex-col daisy-w-full lg:daisy-w-9/12;
-}
-
-.inboundReferences {
-  @apply daisy-border-l daisy-border-base-300 daisy-pl-4 daisy-w-full lg:daisy-w-3/12 daisy-bg-amber-50/50;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  display: flex;
+  gap: 1rem;
 }
 
 .note-content-wrapper.minimized {
-  @apply daisy-h-12 daisy-overflow-hidden;
-}
-
-.daisy-btn-group {
-  @apply daisy-flex daisy-items-center;
-}
-
-.daisy-btn {
-  @apply daisy-min-w-[2rem] daisy-min-h-[2rem] daisy-flex daisy-items-center daisy-justify-center;
-}
-
-.daisy-btn-square-icon {
-  @apply daisy-flex daisy-items-center daisy-justify-center daisy-text-base daisy-leading-none;
+  height: 3rem;
+  overflow: hidden;
 }
 </style>

@@ -1,9 +1,9 @@
 <template>
-  <span class="link-container">
+  <span class="link-container daisy-inline-flex daisy-items-center daisy-gap-1">
     <LinkNob v-bind="{ noteTopology }" v-if="!!reverse" :inverse-icon="true" />
     <router-link
       :to="{ name: 'noteShow', params: { noteId: note.id } }"
-      class="link-title"
+      class="link-title daisy-no-underline daisy-font-medium hover:daisy-underline daisy-transition-all"
     >
       <NoteTitleComponent v-if="noteTopology" v-bind="{ noteTopology }" />
     </router-link>
@@ -47,12 +47,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.link-container {
-  @apply daisy-inline-flex daisy-items-center daisy-gap-1;
-}
-
 .link-title {
-  @apply daisy-no-underline daisy-font-medium hover:daisy-underline daisy-transition-all;
   color: v-bind(fontColor);
 }
 </style>

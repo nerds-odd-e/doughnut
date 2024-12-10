@@ -156,8 +156,14 @@ const onTitleBlur = () => {
   z-index: 1000
 
 .secondary-info
-  @apply daisy-mt-4 daisy-p-2 daisy-border daisy-border-base-300 daisy-rounded-lg daisy-text-base-content daisy-text-sm
+  margin-top: 1rem
+  padding: 0.5rem
+  border: 1px solid #e5e7eb
+  border-radius: 0.5rem
 
   legend
-    @apply daisy-text-lg daisy-mb-2 daisy-float-none daisy-w-auto
+    font-size: 1.125rem
+    margin-bottom: 0.5rem
+    float: none
+    width: auto
 </style>
