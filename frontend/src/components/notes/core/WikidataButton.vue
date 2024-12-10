@@ -1,11 +1,12 @@
 <template>
-  <div v-if="note.wikidataId" class="daisy-btn-group">
-    <div class="daisy-dropdown">
+  <div v-if="note.wikidataId" class="btn-group">
+    <div class="dropdown">
       <button
         id="dropdownMenuButton"
         aria-expanded="false"
         aria-haspopup="true"
-        class="daisy-btn daisy-btn-ghost"
+        class="btn dropdown-toggle"
+        data-bs-toggle="dropdown"
         tabindex="0"
         role="button"
         title="wikidata options"
@@ -13,7 +14,7 @@
         <SvgWikidata />
       </button>
 
-      <div class="daisy-dropdown-content daisy-menu daisy-p-2 daisy-shadow daisy-bg-base-100 daisy-rounded-box">
+      <div class="dropdown-menu">
         <NoteWikidataAssociation :wikidata-id="note.wikidataId" />
         <WikidataIdEditButton
           v-bind="{ note, storageAccessor }"

@@ -1,18 +1,16 @@
 <template>
-  <div class="daisy-relative" style="z-index: 1001;">
-    <PopButton title="associate wikidata">
-      <template #button_face>
-        <SvgWikidata />
-        {{ title || "" }}
-      </template>
-      <template #default="{ closer }">
-        <WikidataAssociationDialog
-          v-bind="{ note, storageAccessor }"
-          @close-dialog="closer"
-        />
-      </template>
-    </PopButton>
-  </div>
+  <PopButton title="associate wikidata">
+    <template #button_face>
+      <SvgWikidata />
+      {{ title || "" }}
+    </template>
+    <template #default="{ closer }">
+      <WikidataAssociationDialog
+        v-bind="{ note, storageAccessor }"
+        @close-dialog="closer"
+      />
+    </template>
+  </PopButton>
 </template>
 
 <script lang="ts">
