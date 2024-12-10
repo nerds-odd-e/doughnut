@@ -1,6 +1,6 @@
 <template>
-  <nav class="navbar justify-content-between bg-light">
-    <div class="btn-group btn-group-sm">
+  <nav class="daisy-navbar daisy-bg-base-200">
+    <div class="daisy-btn-group daisy-btn-group-sm">
       <NoteNewButton
         button-title="Add Child Note"
         v-bind="{ referenceNote: note, insertMode: 'as-child', storageAccessor }"
