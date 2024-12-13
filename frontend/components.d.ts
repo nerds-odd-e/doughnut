@@ -60,6 +60,7 @@ declare module 'vue' {
     Lnk: typeof import('./src/components/svgs/link_types/Lnk.vue')['default']
     LoadingThinBar: typeof import('./src/components/commons/LoadingThinBar.vue')['default']
     LoginButton: typeof import('./src/components/toolbars/LoginButton.vue')['default']
+    MainMenu: typeof import('./src/components/toolbars/MainMenu.vue')['default']
     ManageAssistant: typeof import('./src/components/admin/ManageAssistant.vue')['default']
     ManageBazaar: typeof import('./src/components/admin/ManageBazaar.vue')['default']
     ManageModel: typeof import('./src/components/admin/ManageModel.vue')['default']

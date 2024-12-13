@@ -1,4 +1,4 @@
-import SidebarControl from "@/components/toolbars/SidebarControl.vue"
+import MainMenu from "@/components/toolbars/MainMenu.vue"
 import type { User } from "@/generated/backend/models/User"
 import { screen } from "@testing-library/vue"
 import makeMe from "@tests/fixtures/makeMe"
@@ -11,15 +11,15 @@ vitest.mock("vue-router", () => ({
   useRoute: () => useRouteValue,
 }))
 
-describe("sidebar control", () => {
+describe("main menu", () => {
   let user: User
 
   beforeEach(() => {
     user = makeMe.aUser.please()
   })
 
-  it("shows assimilate link in sidebar", async () => {
-    helper.component(SidebarControl).withProps({ user }).render()
+  it("shows assimilate link in main menu", async () => {
+    helper.component(MainMenu).withProps({ user }).render()
 
     const assimilateLink = screen.getByRole("button", { name: "Assimilate" })
     expect(assimilateLink).toBeInTheDocument()
@@ -28,14 +28,14 @@ describe("sidebar control", () => {
   it("highlights the note link when on notebooks page", () => {
     useRouteValue.name = "notebooks"
 
-    helper.component(SidebarControl).withProps({ user }).render()
+    helper.component(MainMenu).withProps({ user }).render()
 
     const noteLink = screen.getByRole("button", { name: "Note" })
     expect(noteLink).toHaveClass("active")
   })
 
-  it("shows note link in sidebar", async () => {
-    helper.component(SidebarControl).withProps({ user }).render()
+  it("shows note link in main menu", async () => {
+    helper.component(MainMenu).withProps({ user }).render()
 
     const noteLink = screen.getByRole("button", { name: "Note" })
     expect(noteLink).toBeInTheDocument()
@@ -44,20 +44,20 @@ describe("sidebar control", () => {
   it("highlights the circles link when on circle show page", () => {
     useRouteValue.name = "circleShow"
 
-    helper.component(SidebarControl).withProps({ user }).render()
+    helper.component(MainMenu).withProps({ user }).render()
 
     const circlesLink = screen.getByRole("button", { name: "Circles" })
     expect(circlesLink).toHaveClass("active")
   })
 
-  it("shows assimilate link in both sidebar and dropdown menu", async () => {
-    helper.component(SidebarControl).withProps({ user }).render()
+  it("shows assimilate link in both main menu and dropdown menu", async () => {
+    helper.component(MainMenu).withProps({ user }).render()
 
-    const sidebarAssimilateLink = screen.getByRole("button", {
+    const mainMenuAssimilateLink = screen.getByRole("button", {
       name: "Assimilate",
     })
 
-    expect(sidebarAssimilateLink).toBeInTheDocument()
+    expect(mainMenuAssimilateLink).toBeInTheDocument()
   })
 
   describe("assimilate due count", () => {
@@ -66,7 +66,7 @@ describe("sidebar control", () => {
         .fn()
         .mockResolvedValue({ dueCount: 5 })
 
-      helper.component(SidebarControl).withProps({ user }).render()
+      helper.component(MainMenu).withProps({ user }).render()
       await flushPromises()
 
       const dueCount = screen.getByText("5")
@@ -79,7 +79,7 @@ describe("sidebar control", () => {
         .fn()
         .mockResolvedValue({ dueCount: 0 })
 
-      helper.component(SidebarControl).withProps({ user }).render()
+      helper.component(MainMenu).withProps({ user }).render()
       await flushPromises()
 
       const dueCount = screen.queryByText("0")
@@ -92,7 +92,7 @@ describe("sidebar control", () => {
         mockGetCount
 
       const { rerender } = helper
-        .component(SidebarControl)
+        .component(MainMenu)
         .withProps({ user })
         .render()
       await flushPromises()
@@ -109,7 +109,7 @@ describe("sidebar control", () => {
       helper.managedApi.assimilationController.getAssimilationCount =
         mockGetCount
 
-      helper.component(SidebarControl).withProps({ user }).render()
+      helper.component(MainMenu).withProps({ user }).render()
       await flushPromises()
 
       expect(mockGetCount).toHaveBeenCalledWith(timezoneParam())
@@ -122,7 +122,7 @@ describe("sidebar control", () => {
         .fn()
         .mockResolvedValue({ toRepeatCount: 789 })
 
-      helper.component(SidebarControl).withProps({ user }).render()
+      helper.component(MainMenu).withProps({ user }).render()
       await flushPromises()
 
       const recallCount = screen.getByText("789")
@@ -135,7 +135,7 @@ describe("sidebar control", () => {
         .fn()
         .mockResolvedValue({ toRepeatCount: 0 })
 
-      helper.component(SidebarControl).withProps({ user }).render()
+      helper.component(MainMenu).withProps({ user }).render()
       await flushPromises()
 
       const recallCount = screen.queryByText("0")
@@ -149,7 +149,7 @@ describe("sidebar control", () => {
       helper.managedApi.restRecallsController.overview = mockGetOverview
 
       const { rerender } = helper
-        .component(SidebarControl)
+        .component(MainMenu)
         .withProps({ user })
         .render()
       await flushPromises()

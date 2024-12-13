@@ -11,7 +11,7 @@ import ManagedApi from "./managedApi/ManagedApi"
 import GlobalBar from "./components/toolbars/GlobalBar.vue"
 import type { User } from "./generated/backend"
 import getEnvironment from "./managedApi/window/getEnvironment"
-import SidebarControl from "./components/toolbars/SidebarControl.vue"
+import MainMenu from "./components/toolbars/MainMenu.vue"
 
 interface RouteViewProps {
   storageAccessor?: typeof storageAccessor.value
@@ -68,7 +68,7 @@ onMounted(async () => {
   <Popups />
   <div class="daisy-flex daisy-h-dvh daisy-bg-base-100 daisy-text-base-content">
     <div class="main-menu">
-      <SidebarControl
+      <MainMenu
         :user="user"
         @update-user="user = $event"
       />
