@@ -4,7 +4,7 @@
       <ul v-if="user" class="list-group daisy-flex-1">
         <template v-if="!isHomePage">
           <li v-for="item in upperNavItems" role="button" :title="item.label" :key="item.name" class="list-item">
-            <NavigationItem v-bind="{ ...item, to: item.name }" />
+            <NavigationItem v-bind="{ ...item }" />
           </li>
         </template>
 
@@ -14,7 +14,7 @@
           </li>
         </template>
 
-        <li role="button" class="list-item" title="User Actions">
+        <li class="list-item">
           <NavigationItem
             label="Account"
             :icon="SvgMissingAvatar"

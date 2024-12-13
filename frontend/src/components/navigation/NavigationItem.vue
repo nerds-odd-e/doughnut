@@ -8,8 +8,8 @@
     }"
   >
     <router-link
-      v-if="to && !hasDropdown"
-      :to="{ name: to }"
+      v-if="name && !hasDropdown"
+      :to="{ name: name }"
       class="daisy-flex daisy-flex-col daisy-items-center daisy-gap-2"
     >
       <div class="icon-container">
@@ -24,6 +24,7 @@
     <details v-if="hasDropdown" ref="dropdownTrigger" class="daisy-dropdown">
       <summary
         tabindex="0"
+        role="button"
         class="daisy-flex daisy-flex-col daisy-items-center daisy-gap-2 cursor-pointer list-none"
         :aria-label="label"
       >
@@ -54,7 +55,7 @@ const closeDropdown = () => {
 }
 
 defineProps<{
-  to?: string
+  name?: string
   label: string
   icon: Component
   isActive: boolean

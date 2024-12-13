@@ -12,7 +12,7 @@ export const systemSidebar = () => {
       return this.userOptions().adminDashboard()
     },
     userOptions() {
-      cy.findByRole('button', { name: 'User actions' }).click()
+      cy.findByRole('button', { name: 'Account' }).click()
       return {
         adminDashboard() {
           cy.findByText('Admin Dashboard').click({ force: true })
