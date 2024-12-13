@@ -1,5 +1,5 @@
 <template>
-  <div v-if="user" class="sidebar-container daisy-h-full">
+  <div v-if="user" class="sidebar-container daisy-w-full daisy-h-full">
     <div class="daisy-flex daisy-flex-col daisy-h-full">
       <ul class="list-group daisy-flex-1">
         <template v-if="!isHomePage">
@@ -153,10 +153,6 @@ const logout = async () => {
 </script>
 
 <style lang="scss" scoped>
-.sidebar-container {
-  width: 100%;
-}
-
 .list-group {
   list-style: none;
   padding: 0;
@@ -192,7 +188,6 @@ const logout = async () => {
 
 @media (max-width: theme('screens.lg')) {
   .sidebar-container {
-    width: 100%;
     height: auto;
     display: block;
 
