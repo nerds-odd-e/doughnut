@@ -113,7 +113,7 @@ $global-bar-height: 51px;
   display: flex;
   background-color: #2d2d2d;
   flex-direction: column;
-  height: 100vh;
+  height: 100%;
   width: $sidebar-width;
   color: #e0e0e0;
   position: fixed;

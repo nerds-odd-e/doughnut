@@ -87,7 +87,7 @@
                       class="daisy-menu-item daisy-hover:daisy-bg-base-200 daisy-transition-colors daisy-py-2"
                   >
                     <div class="daisy-flex daisy-items-center daisy-gap-2">
-                      <span class="daisy-text-smdaisy-text-base-content/70">
+                      <span class="daisy-text-sm daisy-text-base-content/70">
                         {{ reverseLabel(link.noteTopology.linkType) }}
                       </span>
                       <LinkOfNote
