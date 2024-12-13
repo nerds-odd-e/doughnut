@@ -3,10 +3,7 @@ import { commonSenseSplit } from 'support/string_util'
 export const assimilation = () => {
   const getAssimilateListItemInSidebar = (
     fn: ($el: Cypress.Chainable<JQuery<HTMLElement>>) => void
-  ) =>
-    cy
-      .get('.sidebar-control')
-      .within(() => fn(cy.get('li[title="Assimilate"]')))
+  ) => cy.get('.main-menu').within(() => fn(cy.get('li[title="Assimilate"]')))
 
   return {
     expectCount(numberOfNotes: number) {

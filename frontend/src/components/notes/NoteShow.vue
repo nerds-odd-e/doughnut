@@ -151,7 +151,6 @@ const toLocalDateString = (date: string) => {
   return new Date(date).toLocaleDateString()
 }
 </script>
-
 <style scoped>
 .note-show-container {
   display: flex;
@@ -172,3 +171,4 @@ const toLocalDateString = (date: string) => {
   overflow: hidden;
 }
 </style>
+

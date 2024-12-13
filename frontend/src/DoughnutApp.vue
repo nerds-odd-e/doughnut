@@ -102,8 +102,6 @@ onMounted(async () => {
 </template>
 
 <style scoped lang="scss">
-@import '@/styles/_variables.scss';
-
 $main-menu-width: 64px;
 $main-menu-height-tablet: 70px;
 $main-menu-height-mobile: 55px;
@@ -141,7 +139,7 @@ $global-bar-height: 51px;
   height: calc(100vh - #{$global-bar-height});
 }
 
-@media (max-width: $tablet-breakpoint) {
+@media (max-width: theme('screens.lg')) {
   .main-menu {
     position: fixed;
     top: 0;
@@ -164,7 +162,7 @@ $global-bar-height: 51px;
   }
 }
 
-@media (max-width: $mobile-breakpoint) {
+@media (max-width: theme('screens.md')) {
   .main-menu {
     height: $main-menu-height-mobile;
   }

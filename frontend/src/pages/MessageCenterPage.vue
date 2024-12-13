@@ -162,8 +162,6 @@ const handleConversationChanged = (conversationId: number) => {
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/_variables.scss';
-
 .message-center-container {
   display: flex;
   flex-direction: column;
@@ -174,18 +172,18 @@ const handleConversationChanged = (conversationId: number) => {
   flex: 0 0 auto;
   overflow-y: auto;
   max-height: 300px; /* Limit height on mobile */
-  border-right: 1px solid #e0e0e0; /* Add this line */
+  border-right: 1px solid #e0e0e0;
 }
 
 .conversation {
   flex: 1 1 auto;
   overflow-y: auto;
-  min-height: 200px; /* Ensure minimum height for content */
+  min-height: 200px;
   display: flex;
   flex-direction: column;
 }
 
-@media (min-width: $mobile-breakpoint) {
+@media (min-width: theme('screens.md')) {
   .message-center-container {
     flex-direction: row;
   }
@@ -221,7 +219,7 @@ const handleConversationChanged = (conversationId: number) => {
 .info-heading {
   padding: 10px 20px;
   display: inline-block;
-  color: #808080; /* Grayed out color */
+  color: #808080;
 }
 
 .no-conversation-message {
@@ -233,10 +231,10 @@ const handleConversationChanged = (conversationId: number) => {
 }
 
 .large-svg-message {
-  width: 120px; /* Adjust this value to make the SVG twice as big */
-  height: 120px; /* Adjust this value to make the SVG twice as big */
+  width: 120px;
+  height: 120px;
   margin-bottom: 20px;
-  opacity: 0.5; /* This makes the SVG half-tone */
+  opacity: 0.5;
 }
 
 .list-group-item.active {
@@ -258,7 +256,7 @@ const handleConversationChanged = (conversationId: number) => {
   background-color: #e9ecef;
 }
 
-@media (max-width: $mobile-breakpoint) {
+@media (max-width: theme('screens.md')) {
   .hide-on-mobile {
     display: none !important;
   }

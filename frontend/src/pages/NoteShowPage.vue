@@ -81,15 +81,13 @@ const handleCloseConversation = () => {
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/_variables.scss';
-
 aside {
   width: 18rem;
   transition: transform 0.3s ease, width 0.3s ease, margin 0.3s ease;
 }
 
 .sidebar {
-  @media (max-width: $mobile-breakpoint) {
+  @media (max-width: theme('screens.md')) {
     position: absolute;
     z-index: 1000;
     background: white;
@@ -105,7 +103,7 @@ aside {
     }
   }
 
-  @media (min-width: $mobile-breakpoint) {
+  @media (min-width: theme('screens.md')) {
     transform: translateX(0);
     width: 18rem;
 
@@ -118,7 +116,7 @@ aside {
 }
 
 .main-content {
-  @media (max-width: $mobile-breakpoint) {
+  @media (max-width: theme('screens.md')) {
     margin-left: 0;
 
     .sidebar:not(.sidebar-collapsed) + & {

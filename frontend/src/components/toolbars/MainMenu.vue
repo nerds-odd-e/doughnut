@@ -151,8 +151,6 @@ const logout = async () => {
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/_variables.scss';
-
 .sidebar-container {
   display: flex;
   flex-direction: column;
@@ -221,7 +219,7 @@ a[href="https://odd-e.com"] {
   margin-bottom: 1rem;
 }
 
-@media (max-width: $tablet-breakpoint) {
+@media (max-width: theme('screens.lg')) {
   .sidebar-container {
     width: 100%;
     height: auto;
@@ -262,7 +260,7 @@ a[href="https://odd-e.com"] {
   }
 }
 
-@media (max-width: $mobile-breakpoint) {
+@media (max-width: theme('screens.md')) {
   .menu-label {
     display: none;
   }

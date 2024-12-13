@@ -45,7 +45,7 @@ const recallPage = () => {
 export const recall = () => {
   const getRecallListItemInSidebar = (
     fn: ($el: Cypress.Chainable<JQuery<HTMLElement>>) => void
-  ) => cy.get('.sidebar-control').within(() => fn(cy.get('li[title="Recall"]')))
+  ) => cy.get('.main-menu').within(() => fn(cy.get('li[title="Recall"]')))
 
   return {
     expectCount(numberOfNotes: number) {

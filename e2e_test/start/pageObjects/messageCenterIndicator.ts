@@ -1,8 +1,7 @@
 export function messageCenterIndicator() {
   const getMessageInSidebar = (
     fn: ($el: Cypress.Chainable<JQuery<HTMLElement>>) => void
-  ) =>
-    cy.get('.sidebar-control').within(() => fn(cy.get('li[title="Messages"]')))
+  ) => cy.get('.main-menu').within(() => fn(cy.get('li[title="Messages"]')))
 
   return {
     expectCount(numberOfNotes: number) {
