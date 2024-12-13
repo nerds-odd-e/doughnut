@@ -1,12 +1,12 @@
 <template>
   <Breadcrumb v-bind="{ noteTopology }">
     <template #topLink>
-      <li v-if="fromBazaar" class="breadcrumb-item">
+      <li v-if="fromBazaar">
         <router-link :to="{ name: 'bazaar' }">Bazaar</router-link>
       </li>
       <template v-else>
         <template v-if="circle">
-          <li class="breadcrumb-item">
+          <li>
             <router-link
               :to="{
                 name: 'circleShow',
