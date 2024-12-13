@@ -1,4 +1,4 @@
-# UI Design Practices
+# UI Design Guideline
 
 ## Use DaisyUI
 

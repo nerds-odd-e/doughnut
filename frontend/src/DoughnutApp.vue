@@ -66,7 +66,7 @@ onMounted(async () => {
 
 <template>
   <Popups />
-  <div class="app-container daisy-bg-base-100 daisy-text-base-content">
+  <div class="daisy-flex daisy-h-dvh daisy-bg-base-100 daisy-text-base-content">
     <div class="sidebar-control">
       <SidebarControl
         :user="user"
@@ -109,12 +109,6 @@ $sidebar-height-tablet: 70px;
 $sidebar-height-mobile: 55px;
 $global-bar-height: 51px;
 
-.app-container {
-  display: flex;
-  min-height: 100vh;
-  height: 100vh;
-}
-
 .sidebar-control {
   display: flex;
   background-color: #2d2d2d;
@@ -148,21 +142,6 @@ $global-bar-height: 51px;
 }
 
 @media (max-width: $tablet-breakpoint) {
-  .app-container {
-    flex-direction: column;
-  }
-
-  .sidebar-control {
-    position: fixed;
-    top: 0;
-    left: 0;
-    flex-direction: row;
-    width: 100%;
-    height: $sidebar-height-tablet;
-    padding: 0.5rem;
-    z-index: 200;
-  }
-
   .path-and-content {
     margin-left: 0;
     margin-top: $sidebar-height-tablet;
@@ -175,10 +154,6 @@ $global-bar-height: 51px;
 }
 
 @media (max-width: $mobile-breakpoint) {
-  .sidebar-control {
-    height: $sidebar-height-mobile;
-  }
-
   .path-and-content {
     margin-top: $sidebar-height-mobile;
     height: calc(100vh - #{$sidebar-height-mobile});
