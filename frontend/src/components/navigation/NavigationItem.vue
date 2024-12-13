@@ -1,8 +1,11 @@
 <template>
   <router-link
     :to="{ name }"
-    class="nav-item daisy-text-neutral-content"
-    :class="{ 'daisy-text-primary': isActive }"
+    class="nav-item daisy-text-neutral-content daisy-rounded-lg daisy-px-2"
+    :class="{
+      'daisy-text-primary daisy-bg-primary/10': isActive,
+      'hover:daisy-bg-base-content/5': !isActive
+    }"
   >
     <div class="icon-container">
       <component :is="icon" width="24" height="24" />
@@ -34,6 +37,7 @@ defineProps<{
   align-items: center;
   text-decoration: none;
   gap: 0.5rem;
+  transition: background-color 0.2s ease;
 }
 
 .icon-container {

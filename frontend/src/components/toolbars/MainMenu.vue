@@ -1,7 +1,7 @@
 <template>
-  <div v-if="user" class="sidebar-container daisy-w-full daisy-h-full">
+  <div class="sidebar-container daisy-w-full daisy-h-full">
     <div class="daisy-flex daisy-flex-col daisy-h-full">
-      <ul class="list-group daisy-flex-1">
+      <ul v-if="user" class="list-group daisy-flex-1">
         <template v-if="!isHomePage">
           <li v-for="item in upperNavItems" role="button" :title="item.label" :key="item.name" class="list-item">
             <NavigationItem v-bind="item" />
@@ -25,7 +25,7 @@
             >
               <div class="d-flex flex-column align-items-center gap-1">
                 <SvgMissingAvatar width="24" height="24" />
-                <span class="menu-label">Account</span>
+                <span class="label">Account</span>
               </div>
             </a>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -61,6 +61,7 @@
           </div>
         </li>
       </ul>
+      <LoginButton v-else />
       <div class="daisy-flex daisy-flex-col daisy-items-center">
         <router-link
           to="/"
@@ -79,7 +80,6 @@
       </div>
     </div>
   </div>
-  <LoginButton v-else />
 </template>
 
 <script setup lang="ts">
@@ -173,8 +173,8 @@ const logout = async () => {
   display: flex;
   justify-content: center;
 
-  .menu-label {
-    font-size: 0.7rem;
+  .label {
+    font-size: 0.8rem;
     line-height: 1;
   }
 }
@@ -204,16 +204,10 @@ const logout = async () => {
   a[href="https://odd-e.com"] {
     display: none;
   }
-
-  .list-item {
-    .menu-label {
-      font-size: 0.65rem;
-    }
-  }
 }
 
 @media (max-width: theme('screens.md')) {
-  .menu-label {
+  :deep(.label) {
     display: none;
   }
 }
