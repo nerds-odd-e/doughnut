@@ -1,43 +1,69 @@
 <template>
-  <router-link
-    :to="{ name }"
+  <div
     class="nav-item daisy-text-neutral-content daisy-rounded-lg daisy-px-2"
     :class="{
       'daisy-text-primary daisy-bg-primary/10': isActive,
-      'hover:daisy-bg-base-content/5': !isActive
+      'hover:daisy-bg-base-content/5': !isActive,
+      'daisy-dropdown daisy-dropdown-end lg:daisy-dropdown-right': hasDropdown
     }"
   >
-    <div class="icon-container">
-      <component :is="icon" width="24" height="24" />
-      <div v-if="badge" :class="badgeClass">
-        {{ badge }}
+    <router-link
+      v-if="to && !hasDropdown"
+      :to="{ name: to }"
+      class="daisy-flex daisy-flex-col daisy-items-center daisy-gap-2"
+    >
+      <div class="icon-container">
+        <component :is="icon" width="24" height="24" />
+        <div v-if="badge" :class="badgeClass">
+          {{ badge }}
+        </div>
       </div>
-    </div>
-    <span class="label">{{ label }}</span>
-  </router-link>
+      <span class="label">{{ label }}</span>
+    </router-link>
+
+    <label
+      v-if="hasDropdown"
+      tabindex="0"
+      class="daisy-flex daisy-flex-col daisy-items-center daisy-gap-2 cursor-pointer"
+      :aria-label="label"
+    >
+      <div class="icon-container">
+        <component :is="icon" width="24" height="24" />
+        <div v-if="badge" :class="badgeClass">
+          {{ badge }}
+        </div>
+      </div>
+      <span class="label">{{ label }}</span>
+    </label>
+
+    <slot name="dropdown"></slot>
+  </div>
 </template>
 
 <script setup lang="ts">
 import type { Component } from "vue"
 
 defineProps<{
-  name: string
+  to?: string
   label: string
   icon: Component
   isActive: boolean
   badge?: number
   badgeClass?: string
+  hasDropdown?: boolean
 }>()
 </script>
 
 <style lang="scss" scoped>
 .nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   text-decoration: none;
-  gap: 0.5rem;
   transition: background-color 0.2s ease;
+  position: relative;
+}
+
+.nav-item a {
+  text-decoration: none;
+  color: inherit;
 }
 
 .icon-container {

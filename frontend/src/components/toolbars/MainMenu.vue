@@ -4,70 +4,67 @@
       <ul v-if="user" class="list-group daisy-flex-1">
         <template v-if="!isHomePage">
           <li v-for="item in upperNavItems" role="button" :title="item.label" :key="item.name" class="list-item">
-            <NavigationItem v-bind="item" />
+            <NavigationItem v-bind="{ ...item, to: item.name }" />
           </li>
         </template>
 
         <template v-if="!isHomePage">
           <li v-for="item in lowerNavItems" role="button" :title="item.label" :key="item.name" class="list-item">
-            <NavigationItem v-bind="item" />
+            <NavigationItem v-bind="{ ...item, to: item.name }" />
           </li>
         </template>
 
         <li role="button" class="list-item" title="User Actions">
-          <div class="daisy-dropdown">
-            <label
-              tabindex="0"
-              class="daisy-btn daisy-btn-ghost"
-              aria-label="User actions"
-            >
-              <div class="daisy-flex daisy-flex-col daisy-items-center daisy-gap-1">
-                <SvgMissingAvatar width="24" height="24" />
-                <span class="label">Account</span>
-              </div>
-            </label>
-            <ul tabindex="0" class="daisy-dropdown-content daisy-menu daisy-p-2 daisy-bg-base-100 daisy-rounded-box daisy-w-52 daisy-shadow">
-              <li v-if="user?.admin">
-                <router-link :to="{ name: 'adminDashboard' }">
-                  Admin Dashboard
-                </router-link>
-              </li>
-              <li>
-                <router-link :to="{ name: 'recent' }">
-                  <SvgAssimilate class="daisy-mr-2" />Recent...
-                </router-link>
-              </li>
-              <li>
-                <PopButton class="daisy-w-full daisy-text-left" title="user settings">
-                  <template #button_face>Settings for {{ user.name }}</template>
-                  <template #default="{ closer }">
-                    <UserProfileDialog
-                      v-bind="{ user }"
-                      @user-updated="
-                        if ($event) {
-                          $emit('updateUser', $event);
-                        }
-                        closer();
-                      "
-                    />
-                  </template>
-                </PopButton>
-              </li>
-              <li>
-                <router-link :to="{ name: 'messageCenter' }">
-                  Message center
-                </router-link>
-              </li>
-              <li>
-                <router-link :to="{ name: 'assessmentAndCertificateHistory' }">
-                  My Assessments and Certificates
-                </router-link>
-              </li>
-              <li>
-                <a href="#" @click="logout">Logout</a>
-              </li>
-            </ul>
-          </div>
+          <NavigationItem
+            label="Account"
+            :icon="SvgMissingAvatar"
+            :has-dropdown="true"
+            :is-active="false"
+          >
+            <template #dropdown>
+              <ul tabindex="0" class="daisy-dropdown-content daisy-menu daisy-p-2 daisy-bg-base-100 daisy-rounded-box daisy-w-52 daisy-shadow">
+                <li v-if="user?.admin">
+                  <router-link :to="{ name: 'adminDashboard' }">
+                    Admin Dashboard
+                  </router-link>
+                </li>
+                <li>
+                  <router-link :to="{ name: 'recent' }">
+                    <SvgAssimilate class="daisy-mr-2" />Recent...
+                  </router-link>
+                </li>
+                <li>
+                  <PopButton class="daisy-w-full daisy-text-left" title="user settings">
+                    <template #button_face>Settings for {{ user.name }}</template>
+                    <template #default="{ closer }">
+                      <UserProfileDialog
+                        v-bind="{ user }"
+                        @user-updated="
+                          if ($event) {
+                            $emit('updateUser', $event);
+                          }
+                          closer();
+                        "
+                      />
+                    </template>
+                  </PopButton>
+                </li>
+                <li>
+                  <router-link :to="{ name: 'messageCenter' }">
+                    Message center
+                  </router-link>
+                </li>
+                <li>
+                  <router-link :to="{ name: 'assessmentAndCertificateHistory' }">
+                    My Assessments and Certificates
+                  </router-link>
+                </li>
+                <li>
+                  <a href="#" @click="logout">Logout</a>
+                </li>
+              </ul>
+            </template>
+          </NavigationItem>
         </li>
       </ul>
       <LoginButton v-else />
