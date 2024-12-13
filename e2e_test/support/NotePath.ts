@@ -6,7 +6,9 @@ class NotePath {
   path: string[]
 
   constructor(value: string) {
-    this.path = commonSenseSplit(value ?? '', '/')
+    // Remove quotes from start and end if present
+    const cleanValue = (value ?? '').replace(/^"|"$/g, '')
+    this.path = commonSenseSplit(cleanValue, '/')
   }
 }
 
