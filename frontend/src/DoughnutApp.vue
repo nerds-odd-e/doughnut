@@ -120,6 +120,13 @@ $global-bar-height: 51px;
 
 .global-bar {
   height: $global-bar-height;
+  max-width: 100vw;
+}
+
+@media (min-width: theme('screens.lg')) {
+  .global-bar {
+    max-width: calc(100vw - #{$main-menu-width});
+  }
 }
 
 .main-content {
