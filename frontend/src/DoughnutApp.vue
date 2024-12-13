@@ -67,7 +67,7 @@ onMounted(async () => {
 <template>
   <Popups />
   <div class="daisy-flex daisy-h-dvh daisy-bg-base-100 daisy-text-base-content">
-    <div class="main-menu daisy-flex daisy-bg-neutral daisy-text-neutral-content">
+    <div class="main-menu daisy-flex daisy-bg-neutral daisy-text-neutral-content daisy-z-[10000] daisy-p-2">
       <MainMenu
         :user="user"
         @update-user="user = $event"
@@ -111,7 +111,6 @@ $global-bar-height: 51px;
   height: 100%;
   width: $main-menu-width;
   position: fixed;
-  z-index: 10000;
 }
 
 .path-and-content {
@@ -134,7 +133,6 @@ $global-bar-height: 51px;
     left: 0;
     width: 100%;
     height: $main-menu-height-tablet;
-    padding: 0.5rem;
     z-index: 200;
   }
 
