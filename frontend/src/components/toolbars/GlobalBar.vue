@@ -1,5 +1,5 @@
 <template>
-  <nav class="daisy-navbar daisy-bg-base-200">
+  <nav class="daisy-navbar">
     <div class="daisy-flex daisy-justify-between daisy-w-full">
       <div class="daisy-flex daisy-flex-grow" id="head-status" />
       <div class="daisy-join daisy-join-horizontal">

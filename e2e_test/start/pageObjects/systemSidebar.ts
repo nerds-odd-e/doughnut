@@ -33,7 +33,7 @@ export const systemSidebar = () => {
           cy.findByRole('button', { name: 'Logout' }).click({ force: true })
         },
         myAssessmentAndCertificateHistory() {
-          cy.findByRole('button', {
+          cy.findByRole('link', {
             name: 'My Assessments and Certificates',
           }).click({ force: true })
           return assumeAssessmentAndCertificateHistoryPage()
