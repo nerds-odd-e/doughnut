@@ -179,19 +179,6 @@ const logout = async () => {
     font-size: 0.7rem;
     line-height: 1;
   }
-
-  :deep(a) {
-    text-decoration: none;
-    color: inherit;
-  }
-
-  &.active {
-    background-color: #404040;
-
-    :deep(a) {
-      color: #66b0ff;
-    }
-  }
 }
 
 .vertical-text {

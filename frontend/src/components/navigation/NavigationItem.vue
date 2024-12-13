@@ -2,7 +2,7 @@
   <router-link
     :to="{ name }"
     class="nav-item"
-    :class="{ active: isActive }"
+    :class="{ 'daisy-text-primary': isActive }"
   >
     <div class="icon-container">
       <component :is="icon" width="24" height="24" />
@@ -33,12 +33,7 @@ defineProps<{
   flex-direction: column;
   align-items: center;
   text-decoration: none;
-  color: inherit;
   gap: 0.5rem;
-
-  &.active {
-    color: #66b0ff;
-  }
 }
 
 .icon-container {
