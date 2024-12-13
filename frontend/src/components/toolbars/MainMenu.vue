@@ -62,13 +62,17 @@
         </li>
       </ul>
       <div class="daisy-flex daisy-flex-col daisy-items-center">
-        <router-link to="/" class="vertical-text">Doughnut by</router-link>
+        <router-link
+          to="/"
+          class="brand-text [writing-mode:vertical-lr] daisy-text-center daisy-py-4 daisy-font-bold daisy-text-neutral-400 daisy-whitespace-nowrap daisy-no-underline"
+        >
+          Doughnut by
+        </router-link>
         <a href="https://odd-e.com" target="_blank" class="daisy-mb-4">
           <img
             src="/odd-e.png"
             width="35"
             height="35"
-            class="d-inline-block align-top"
             alt=""
           />
         </a>
@@ -175,17 +179,6 @@ const logout = async () => {
   }
 }
 
-.vertical-text {
-  writing-mode: vertical-lr;
-  transform: none;
-  text-align: center;
-  padding: 1rem 0;
-  font-weight: bold;
-  color: #a0a0a0;
-  white-space: nowrap;
-  text-decoration: none;
-}
-
 @media (max-width: theme('screens.lg')) {
   .sidebar-container {
     height: auto;
@@ -207,7 +200,7 @@ const logout = async () => {
     }
   }
 
-  .vertical-text,
+  .brand-text,
   a[href="https://odd-e.com"] {
     display: none;
   }
