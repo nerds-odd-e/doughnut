@@ -8,7 +8,7 @@
       <button
         :class="[
           'daisy-w-full daisy-h-full daisy-flex daisy-justify-center daisy-items-center',
-          'daisy-rounded-lg daisy-bg-base-200 daisy-text-base-content',
+          'daisy-rounded-lg daisy-bg-base-200',
           'hover:daisy-bg-primary hover:daisy-text-primary-content',
           'focus:daisy-outline-none focus:daisy-ring-2 focus:daisy-ring-primary',
           'disabled:daisy-opacity-65 daisy-transition-colors daisy-select-none',

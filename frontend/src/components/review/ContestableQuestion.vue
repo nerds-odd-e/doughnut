@@ -8,7 +8,7 @@
   >
     <div class="daisy-card-body">
       <h3 class="daisy-card-title">Previous Question Contested ...</h3>
-      <p class="daisy-text-base-content">{{ q.badQuestionReason }}</p>
+      <p>{{ q.badQuestionReason }}</p>
       <QuestionDisplay :bare-question="q.quizeQuestion.bareQuestion" :disabled="true" />
     </div>
   </div>
