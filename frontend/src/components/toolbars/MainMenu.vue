@@ -21,46 +21,53 @@
             :has-dropdown="true"
             :is-active="false"
           >
-            <template #dropdown>
+            <template #dropdown="slotProps">
               <ul tabindex="0" class="daisy-dropdown-content daisy-menu daisy-p-2 daisy-bg-base-100 daisy-rounded-box daisy-w-52 daisy-shadow">
                 <li v-if="user?.admin">
-                  <router-link :to="{ name: 'adminDashboard' }">
+                  <router-link :to="{ name: 'adminDashboard' }" @click="slotProps.closeDropdown">
                     Admin Dashboard
                   </router-link>
                 </li>
                 <li>
-                  <router-link :to="{ name: 'recent' }">
+                  <router-link :to="{ name: 'recent' }" @click="slotProps.closeDropdown">
                     <SvgAssimilate class="daisy-mr-2" />Recent...
                   </router-link>
                 </li>
                 <li>
-                  <PopButton class="daisy-w-full daisy-text-left" title="user settings">
-                    <template #button_face>Settings for {{ user.name }}</template>
-                    <template #default="{ closer }">
-                      <UserProfileDialog
-                        v-bind="{ user }"
-                        @user-updated="
-                          if ($event) {
-                            $emit('updateUser', $event);
-                          }
-                          closer();
-                        "
-                      />
-                    </template>
-                  </PopButton>
+                  <div
+                    class="daisy-w-full daisy-text-left"
+                    @click="slotProps.closeDropdown"
+                  >
+                    <PopButton title="user settings">
+                      <template #button_face>Settings for {{ user.name }}</template>
+                      <template #default="{ closer }">
+                        <UserProfileDialog
+                          v-bind="{ user }"
+                          @user-updated="
+                            if ($event) {
+                              $emit('updateUser', $event);
+                            }
+                            closer();
+                          "
+                        />
+                      </template>
+                    </PopButton>
+                  </div>
                 </li>
                 <li>
-                  <router-link :to="{ name: 'messageCenter' }">
+                  <router-link :to="{ name: 'messageCenter' }" @click="slotProps.closeDropdown">
                     Message center
                   </router-link>
                 </li>
                 <li>
-                  <router-link :to="{ name: 'assessmentAndCertificateHistory' }">
+                  <router-link :to="{ name: 'assessmentAndCertificateHistory' }" @click="slotProps.closeDropdown">
                     My Assessments and Certificates
                   </router-link>
                 </li>
                 <li>
-                  <a href="#" @click="logout">Logout</a>
+                  <a href="#" @click="(e) => { e.preventDefault(); logout(); slotProps.closeDropdown(); }">
+                    Logout
+                  </a>
                 </li>
               </ul>
             </template>
@@ -98,23 +105,24 @@ import SvgAssimilate from "@/components/svgs/SvgAssimilate.vue"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import UserProfileDialog from "./UserProfileDialog.vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { watch } from "vue"
+import { watch, computed } from "vue"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import { useRecallData } from "@/composables/useRecallData"
-import { computed } from "vue"
 import { useNavigationItems } from "@/composables/useNavigationItems"
 import NavigationItem from "@/components/navigation/NavigationItem.vue"
 import { messageCenterConversations } from "@/store/messageStore"
 
-const { user } = defineProps({
-  user: { type: Object as PropType<User> },
+const props = defineProps({
+  user: { type: Object as PropType<User>, required: false }
 })
-defineEmits(["updateUser"])
+
+defineEmits<{
+  (e: 'updateUser', user: User): void
+}>()
 
 const route = useRoute()
 const { upperNavItems, lowerNavItems } = useNavigationItems()
-
 const isHomePage = computed(() => route.name === "home")
 
 const { setDueCount, setAssimilatedCountOfTheDay, setTotalUnassimilatedCount } =
@@ -145,9 +153,9 @@ const fetchUnreadMessageCount = async () => {
 }
 
 watch(
-  () => user,
+  () => props.user,
   () => {
-    if (user) {
+    if (props.user) {
       fetchDueCount()
       fetchRecallCount()
       fetchUnreadMessageCount()

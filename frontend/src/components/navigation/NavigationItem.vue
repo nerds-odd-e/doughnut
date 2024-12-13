@@ -21,27 +21,37 @@
       <span class="label">{{ label }}</span>
     </router-link>
 
-    <label
-      v-if="hasDropdown"
-      tabindex="0"
-      class="daisy-flex daisy-flex-col daisy-items-center daisy-gap-2 cursor-pointer"
-      :aria-label="label"
-    >
-      <div class="icon-container">
-        <component :is="icon" width="24" height="24" />
-        <div v-if="badge" :class="badgeClass">
-          {{ badge }}
+    <details v-if="hasDropdown" ref="dropdownTrigger" class="daisy-dropdown">
+      <summary
+        tabindex="0"
+        class="daisy-flex daisy-flex-col daisy-items-center daisy-gap-2 cursor-pointer list-none"
+        :aria-label="label"
+      >
+        <div class="icon-container">
+          <component :is="icon" width="24" height="24" />
+          <div v-if="badge" :class="badgeClass">
+            {{ badge }}
+          </div>
         </div>
-      </div>
-      <span class="label">{{ label }}</span>
-    </label>
+        <span class="label">{{ label }}</span>
+      </summary>
 
-    <slot name="dropdown"></slot>
+      <slot name="dropdown" :closeDropdown="closeDropdown"></slot>
+    </details>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { Component } from "vue"
+import { ref } from 'vue'
+
+const dropdownTrigger = ref<HTMLDetailsElement | null>(null)
+
+const closeDropdown = () => {
+  if (dropdownTrigger.value) {
+    dropdownTrigger.value.open = false
+  }
+}
 
 defineProps<{
   to?: string
@@ -101,5 +111,12 @@ defineProps<{
 
 .label {
   font-size: 0.8rem;
+}
+
+summary::marker {
+  display: none;
+}
+summary::-webkit-details-marker {
+  display: none;
 }
 </style>
