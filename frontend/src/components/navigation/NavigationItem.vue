@@ -1,7 +1,7 @@
 <template>
   <router-link
     :to="{ name }"
-    class="nav-item"
+    class="nav-item daisy-text-neutral-content"
     :class="{ 'daisy-text-primary': isActive }"
   >
     <div class="icon-container">
