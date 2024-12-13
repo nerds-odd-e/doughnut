@@ -44,6 +44,6 @@ defineEmits(["updateUser", "clearErrorMessage"])
 
 <style scoped lang="scss">
 .daisy-navbar {
-  border-bottom: 1px solid hsl(var(--b2));
+  min-height: 100%;
 }
 </style>
