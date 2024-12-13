@@ -1,7 +1,7 @@
 <template>
-  <div class="d-flex flex-grow-1 overflow-auto h-full">
+  <div class="daisy-flex daisy-flex-grow daisy-overflow-auto daisy-h-full">
     <aside
-      class="flex-shrink-0 overflow-auto me-3 sidebar"
+      class="daisy-flex-none daisy-overflow-auto daisy-mr-3 sidebar"
       :class="{ 'sidebar-collapsed': sidebarCollapsed }"
     >
       <NoteSidebar
@@ -12,7 +12,7 @@
         }"
       />
     </aside>
-    <main class="flex-grow-1 overflow-visible main-content">
+    <main class="daisy-flex-grow daisy-overflow-visible main-content">
       <NoteShow
         v-bind="{
           noteId,
@@ -123,10 +123,6 @@ aside {
       display: none;
     }
   }
-}
-
-.h-full {
-  height: 100%;
 }
 
 .conversation-wrapper {

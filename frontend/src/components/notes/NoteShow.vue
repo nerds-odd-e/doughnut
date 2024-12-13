@@ -166,7 +166,6 @@ const toLocalDateString = (date: string) => {
 .note-show-container {
   display: flex;
   flex-direction: column;
-  height: 100%;
 }
 
 .note-content-wrapper {
