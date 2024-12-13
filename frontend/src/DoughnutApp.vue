@@ -67,7 +67,7 @@ onMounted(async () => {
 <template>
   <Popups />
   <div class="daisy-flex daisy-h-dvh daisy-bg-base-100 daisy-text-base-content">
-    <div class="main-menu">
+    <div class="main-menu daisy-flex daisy-bg-neutral daisy-text-neutral-content">
       <MainMenu
         :user="user"
         @update-user="user = $event"
@@ -108,12 +108,8 @@ $main-menu-height-mobile: 55px;
 $global-bar-height: 51px;
 
 .main-menu {
-  display: flex;
-  background-color: #2d2d2d;
-  flex-direction: column;
   height: 100%;
   width: $main-menu-width;
-  color: #e0e0e0;
   position: fixed;
   z-index: 10000;
 }
@@ -144,7 +140,6 @@ $global-bar-height: 51px;
     position: fixed;
     top: 0;
     left: 0;
-    flex-direction: row;
     width: 100%;
     height: $main-menu-height-tablet;
     padding: 0.5rem;

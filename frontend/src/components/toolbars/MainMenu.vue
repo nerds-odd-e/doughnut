@@ -1,79 +1,83 @@
 <template>
-  <div v-if="user" class="sidebar-container">
-    <ul class="list-group">
-      <template v-if="!isHomePage">
-        <li v-for="item in upperNavItems" role="button" :title="item.label" :key="item.name" class="list-item"
-        :class="{ active: item.isActive }">
-          <NavigationItem v-bind="item" />
-        </li>
-      </template>
+  <div v-if="user" class="sidebar-container daisy-h-full">
+    <div class="daisy-flex daisy-flex-col daisy-h-full">
+      <ul class="list-group daisy-flex-1">
+        <template v-if="!isHomePage">
+          <li v-for="item in upperNavItems" role="button" :title="item.label" :key="item.name" class="list-item"
+          :class="{ active: item.isActive }">
+            <NavigationItem v-bind="item" />
+          </li>
+        </template>
 
-      <template v-if="!isHomePage">
-        <li v-for="item in lowerNavItems" role="button" :title="item.label" :key="item.name" class="list-item"
-        :class="{ active: item.isActive }">
-          <NavigationItem v-bind="item" />
-        </li>
-      </template>
+        <template v-if="!isHomePage">
+          <li v-for="item in lowerNavItems" role="button" :title="item.label" :key="item.name" class="list-item"
+          :class="{ active: item.isActive }">
+            <NavigationItem v-bind="item" />
+          </li>
+        </template>
 
-      <li role="button" class="list-item" title="User Actions">
-        <div class="dropup w-100">
-          <a
-            aria-label="User actions"
-            data-bs-toggle="dropdown"
-            data-toggle="dropdown"
-            aria-haspopup="true"
-            aria-expanded="false"
-          >
-            <div class="d-flex flex-column align-items-center gap-1">
-              <SvgMissingAvatar width="24" height="24" />
-              <span class="menu-label">Account</span>
-            </div>
-          </a>
-          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            <router-link
-              v-if="user?.admin"
-              role="button"
-              class="dropdown-item"
-              :to="{ name: 'adminDashboard' }"
+        <li role="button" class="list-item" title="User Actions">
+          <div class="dropup w-100">
+            <a
+              aria-label="User actions"
+              data-bs-toggle="dropdown"
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
             >
-              Admin Dashboard
-            </router-link>
-            <router-link role="button" class="dropdown-item" :to="{ name: 'recent' }">
-              <SvgAssimilate class="me-2" />Recent...
-            </router-link>
-            <PopButton btn-class="dropdown-item" title="user settings">
-              <template #button_face> Settings for {{ user.name }}</template>
-              <template #default="{ closer }">
-                <UserProfileDialog
-                  v-bind="{ user }"
-                  @user-updated="
-                    if ($event) {
-                      $emit('updateUser', $event);
-                    }
-                    closer();
-                  "
-                />
-              </template>
-            </PopButton>
-            <router-link role="button" class="dropdown-item" :to="{ name: 'messageCenter' }">Message center</router-link>
-            <router-link role="button" class="dropdown-item" :to="{ name: 'assessmentAndCertificateHistory' }">My Assessments and Certificates</router-link>
-            <a href="#" class="dropdown-item" role="button" @click="logout">Logout</a>
+              <div class="d-flex flex-column align-items-center gap-1">
+                <SvgMissingAvatar width="24" height="24" />
+                <span class="menu-label">Account</span>
+              </div>
+            </a>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <router-link
+                v-if="user?.admin"
+                role="button"
+                class="dropdown-item"
+                :to="{ name: 'adminDashboard' }"
+              >
+                Admin Dashboard
+              </router-link>
+              <router-link role="button" class="dropdown-item" :to="{ name: 'recent' }">
+                <SvgAssimilate class="me-2" />Recent...
+              </router-link>
+              <PopButton btn-class="dropdown-item" title="user settings">
+                <template #button_face> Settings for {{ user.name }}</template>
+                <template #default="{ closer }">
+                  <UserProfileDialog
+                    v-bind="{ user }"
+                    @user-updated="
+                      if ($event) {
+                        $emit('updateUser', $event);
+                      }
+                      closer();
+                    "
+                  />
+                </template>
+              </PopButton>
+              <router-link role="button" class="dropdown-item" :to="{ name: 'messageCenter' }">Message center</router-link>
+              <router-link role="button" class="dropdown-item" :to="{ name: 'assessmentAndCertificateHistory' }">My Assessments and Certificates</router-link>
+              <a href="#" class="dropdown-item" role="button" @click="logout">Logout</a>
+            </div>
           </div>
-        </div>
-      </li>
-    </ul>
+        </li>
+      </ul>
+      <div class="daisy-flex daisy-flex-col daisy-items-center">
+        <router-link to="/" class="vertical-text">Doughnut by</router-link>
+        <a href="https://odd-e.com" target="_blank" class="daisy-mb-4">
+          <img
+            src="/odd-e.png"
+            width="35"
+            height="35"
+            class="d-inline-block align-top"
+            alt=""
+          />
+        </a>
+      </div>
+    </div>
   </div>
   <LoginButton v-else />
-  <router-link to="/" class="vertical-text">Doughnut by</router-link>
-  <a href="https://odd-e.com" target="_blank">
-    <img
-      src="/odd-e.png"
-      width="35"
-      height="35"
-      class="d-inline-block align-top"
-      alt=""
-    />
-  </a>
 </template>
 
 <script setup lang="ts">
@@ -152,28 +156,14 @@ const logout = async () => {
 
 <style lang="scss" scoped>
 .sidebar-container {
-  display: flex;
-  flex-direction: column;
-  height: auto;
-  overflow: hidden;
   width: 100%;
-
-  :deep(.dropup) {
-    position: static;
-
-    .dropdown-menu {
-      position: fixed;
-      bottom: 60px;
-      left: 0;
-      z-index: 10000;
-    }
-  }
 }
 
 .list-group {
   list-style: none;
   padding: 0;
   margin: 0;
+  width: 100%;
 }
 
 .list-item {
@@ -181,6 +171,9 @@ const logout = async () => {
   padding: 0.5rem;
   background: none;
   text-align: center;
+  width: 100%;
+  display: flex;
+  justify-content: center;
 
   .menu-label {
     font-size: 0.7rem;
@@ -209,14 +202,7 @@ const logout = async () => {
   font-weight: bold;
   color: #a0a0a0;
   white-space: nowrap;
-  margin-top: 1rem;
-  align-self: center;
   text-decoration: none;
-}
-
-a[href="https://odd-e.com"] {
-  align-self: center;
-  margin-bottom: 1rem;
 }
 
 @media (max-width: theme('screens.lg')) {
@@ -234,17 +220,10 @@ a[href="https://odd-e.com"] {
     }
 
     .list-item {
+      width: auto;
       border: none;
       padding: 0.5rem;
       background: none;
-    }
-
-    .admin-dashboard {
-      display: none;
-    }
-
-    .fixed-bottom-bar {
-      display: none;
     }
   }
 
