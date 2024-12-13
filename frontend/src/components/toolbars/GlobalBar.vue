@@ -1,27 +1,25 @@
 <template>
-  <nav class="daisy-navbar">
-    <div class="daisy-flex daisy-justify-between daisy-w-full">
-      <div class="daisy-flex daisy-flex-grow" id="head-status" />
-      <div class="daisy-join daisy-join-horizontal">
-        <PopButton v-if="user" title="search note">
-          <template #button_face>
-            <SvgSearch />
-          </template>
-          <template #default="{ closer }">
-            <LinkNoteDialog
-              v-bind="{ storageAccessor }"
-              @close-dialog="closer"
-            />
-          </template>
-        </PopButton>
-        <NoteUndoButton v-bind="{ storageAccessor }" />
-      </div>
-      <ApiStatus
-        v-if="user"
-        :api-status="apiStatus"
-        @clear-error-message="$emit('clearErrorMessage')"
-      />
+  <nav class="daisy-navbar daisy-max-w-full daisy-flex daisy-justify-between">
+    <div class="daisy-flex daisy-flex-1 daisy-overflow-x-auto" id="head-status" />
+    <div class="daisy-join daisy-join-horizontal daisy-flex-none">
+      <PopButton v-if="user" title="search note">
+        <template #button_face>
+          <SvgSearch />
+        </template>
+        <template #default="{ closer }">
+          <LinkNoteDialog
+            v-bind="{ storageAccessor }"
+            @close-dialog="closer"
+          />
+        </template>
+      </PopButton>
+      <NoteUndoButton v-bind="{ storageAccessor }" />
     </div>
+    <ApiStatus
+      v-if="user"
+      :api-status="apiStatus"
+      @clear-error-message="$emit('clearErrorMessage')"
+    />
   </nav>
 </template>
 

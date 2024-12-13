@@ -1,6 +1,6 @@
 <template>
-  <div class="text-sm daisy-breadcrumbs">
-    <ul>
+  <div class="daisy-text-sm daisy-breadcrumbs daisy-max-w-full">
+    <ul class="daisy-m-0 daisy-pl-0">
       <slot name="topLink" />
       <li
         v-for="noteTopology in ancestors"
@@ -22,11 +22,3 @@ import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue"
 
 defineProps({ ancestors: Array as PropType<NoteTopology[]> })
 </script>
-
-<style lang="scss" scoped>
-.daisy-breadcrumbs {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-</style>

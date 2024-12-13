@@ -38,7 +38,7 @@ Cypress.Commands.add('dialogDisappeared', () => {
 })
 
 Cypress.Commands.add('expectBreadcrumb', (items: string) => {
-  cy.get('.breadcrumb').within(() =>
+  cy.get('.daisy-breadcrumbs').within(() =>
     commonSenseSplit(items, ', ').forEach((noteTopology: string) =>
       cy.findByText(noteTopology)
     )
