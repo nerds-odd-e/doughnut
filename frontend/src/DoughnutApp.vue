@@ -142,6 +142,17 @@ $global-bar-height: 51px;
 }
 
 @media (max-width: $tablet-breakpoint) {
+  .main-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    flex-direction: row;
+    width: 100%;
+    height: $main-menu-height-tablet;
+    padding: 0.5rem;
+    z-index: 200;
+  }
+
   .path-and-content {
     margin-left: 0;
     margin-top: $main-menu-height-tablet;
@@ -154,6 +165,10 @@ $global-bar-height: 51px;
 }
 
 @media (max-width: $mobile-breakpoint) {
+  .main-menu {
+    height: $main-menu-height-mobile;
+  }
+
   .path-and-content {
     margin-top: $main-menu-height-mobile;
     height: calc(100vh - #{$main-menu-height-mobile});
