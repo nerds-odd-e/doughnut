@@ -3,15 +3,13 @@
     <div class="daisy-flex daisy-flex-col daisy-h-full">
       <ul class="list-group daisy-flex-1">
         <template v-if="!isHomePage">
-          <li v-for="item in upperNavItems" role="button" :title="item.label" :key="item.name" class="list-item"
-          :class="{ active: item.isActive }">
+          <li v-for="item in upperNavItems" role="button" :title="item.label" :key="item.name" class="list-item">
             <NavigationItem v-bind="item" />
           </li>
         </template>
 
         <template v-if="!isHomePage">
-          <li v-for="item in lowerNavItems" role="button" :title="item.label" :key="item.name" class="list-item"
-          :class="{ active: item.isActive }">
+          <li v-for="item in lowerNavItems" role="button" :title="item.label" :key="item.name" class="list-item">
             <NavigationItem v-bind="item" />
           </li>
         </template>
