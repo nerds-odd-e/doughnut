@@ -73,15 +73,15 @@ onMounted(async () => {
         @update-user="user = $event"
       />
     </div>
-    <div class="path-and-content">
-      <div class="sticky-top">
+    <div class="daisy-flex daisy-flex-col daisy-flex-grow path-and-content">
+      <div class="daisy-sticky daisy-top-0 daisy-z-100 sticky-top">
         <GlobalBar
           v-bind="{ storageAccessor, user, apiStatus }"
           @update-user="user = $event"
           @clear-error-message="clearErrorMessage($event)"
         />
       </div>
-      <div class="main-content">
+      <div class="daisy-flex-grow daisy-overflow-y-auto main-content">
         <UserNewRegisterPage v-if="newUser" @update-user="user = $event" />
         <template v-else-if="userLoaded">
           <router-view v-slot="{ Component }">
@@ -115,24 +115,16 @@ $global-bar-height: 51px;
 }
 
 .path-and-content {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
   margin-left: $main-menu-width;
-  height: 100vh;
+  height: 100%;
 }
 
 .sticky-top {
-  position: sticky;
-  top: 0;
-  z-index: 100;
   height: $global-bar-height;
 }
 
 .main-content {
-  flex-grow: 1;
-  overflow-y: auto;
-  height: calc(100vh - #{$global-bar-height});
+  height: calc(100% - #{$global-bar-height});
 }
 
 @media (max-width: theme('screens.lg')) {
@@ -149,11 +141,11 @@ $global-bar-height: 51px;
   .path-and-content {
     margin-left: 0;
     margin-top: $main-menu-height-tablet;
-    height: calc(100vh - #{$main-menu-height-tablet});
+    height: calc(100% - #{$main-menu-height-tablet});
   }
 
   .main-content {
-    height: calc(100vh - #{$main-menu-height-tablet} - #{$global-bar-height});
+    height: calc(100% - #{$global-bar-height});
   }
 }
 
@@ -164,11 +156,11 @@ $global-bar-height: 51px;
 
   .path-and-content {
     margin-top: $main-menu-height-mobile;
-    height: calc(100vh - #{$main-menu-height-mobile});
+    height: calc(100% - #{$main-menu-height-mobile});
   }
 
   .main-content {
-    height: calc(100vh - #{$main-menu-height-mobile} - #{$global-bar-height});
+    height: calc(100% - #{$global-bar-height});
   }
 }
 </style>
