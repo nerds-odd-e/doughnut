@@ -1,27 +1,27 @@
 <template>
-  <nav class="navbar justify-content-between bg-white">
-      <div class="d-flex flex-grow-1 justify-content-between">
-        <div class="d-flex flex-grow-1" id="head-status" />
-        <div class="btn-group btn-group-sm">
-          <PopButton v-if="user" title="search note">
-            <template #button_face>
-              <SvgSearch />
-            </template>
-            <template #default="{ closer }">
-              <LinkNoteDialog
-                v-bind="{ storageAccessor }"
-                @close-dialog="closer"
-              />
-            </template>
-          </PopButton>
-          <NoteUndoButton v-bind="{ storageAccessor }" />
-        </div>
-        <ApiStatus
-          v-if="user"
-          :api-status="apiStatus"
-          @clear-error-message="$emit('clearErrorMessage')"
-        />
+  <nav class="daisy-navbar daisy-bg-base-200">
+    <div class="daisy-flex daisy-justify-between daisy-w-full">
+      <div class="daisy-flex daisy-flex-grow" id="head-status" />
+      <div class="daisy-join daisy-join-horizontal">
+        <PopButton v-if="user" title="search note">
+          <template #button_face>
+            <SvgSearch />
+          </template>
+          <template #default="{ closer }">
+            <LinkNoteDialog
+              v-bind="{ storageAccessor }"
+              @close-dialog="closer"
+            />
+          </template>
+        </PopButton>
+        <NoteUndoButton v-bind="{ storageAccessor }" />
       </div>
+      <ApiStatus
+        v-if="user"
+        :api-status="apiStatus"
+        @clear-error-message="$emit('clearErrorMessage')"
+      />
+    </div>
   </nav>
 </template>
 
@@ -43,7 +43,7 @@ defineEmits(["updateUser", "clearErrorMessage"])
 </script>
 
 <style scoped lang="scss">
-.global-bar {
-  border-bottom: 1px solid #e9ecef;
+.daisy-navbar {
+  border-bottom: 1px solid hsl(var(--b2));
 }
 </style>
