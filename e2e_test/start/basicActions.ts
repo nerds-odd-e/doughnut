@@ -9,7 +9,7 @@ import { navigateToCircle } from './pageObjects/circlePage'
 import { assumeNotePage } from './pageObjects/notePage'
 import { routerToMyNotebooksPage } from './pageObjects/myNotebooksPage'
 import { noteSidebar } from './pageObjects/noteSidebar'
-import { systemSidebar } from './pageObjects/systemSidebar'
+import { mainMenu } from './pageObjects/mainMenu'
 import { navigateToMessageCenter } from './pageObjects/messageCenterPage'
 import testability from './testability'
 import { logins } from './logins'
@@ -21,7 +21,7 @@ import { navigateToMyCircles } from './pageObjects/myCirclesPage'
 export default {
   navigateToBazaar,
   noteSidebar,
-  systemSidebar,
+  mainMenu,
   assumeNotePage,
   assumeAudioTools,
   assumeAssessmentPage,
@@ -50,7 +50,7 @@ export default {
     return assumeNotePage(noteTopology)
   },
   navigateToAssessmentAndCertificatePage() {
-    return systemSidebar().userOptions().myAssessmentAndCertificateHistory()
+    return mainMenu().userOptions().myAssessmentAndCertificateHistory()
   },
   loginAsAdminAndGoToAdminDashboard() {
     this.reloginAsAdmin()

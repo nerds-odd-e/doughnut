@@ -1,4 +1,4 @@
-import { systemSidebar } from './systemSidebar'
+import { mainMenu } from './mainMenu'
 
 export const assumeMessageCenterPage = () => {
   cy.findByText('Message Center').should('be.visible')
@@ -41,5 +41,5 @@ export const assumeMessageCenterPage = () => {
 }
 
 export const navigateToMessageCenter = () => {
-  return systemSidebar().myMessageCenter()
+  return mainMenu().myMessageCenter()
 }

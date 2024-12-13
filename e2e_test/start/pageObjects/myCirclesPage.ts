@@ -1,7 +1,7 @@
-import { systemSidebar } from './systemSidebar'
+import { mainMenu } from './mainMenu'
 
 export const navigateToMyCircles = () => {
-  systemSidebar()
+  mainMenu()
   cy.get('.main-menu').within(() => {
     cy.findByRole('button', { name: 'Circles' }).click()
   })

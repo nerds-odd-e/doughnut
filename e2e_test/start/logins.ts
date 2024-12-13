@@ -1,5 +1,5 @@
 import start from './'
-import { systemSidebar } from './pageObjects/systemSidebar'
+import { mainMenu } from './pageObjects/mainMenu'
 
 export const logins = {
   logout() {
@@ -46,7 +46,7 @@ export const logins = {
 
   goToAdminDashboard: () => {
     cy.reload()
-    return systemSidebar().adminDashboard()
+    return mainMenu().adminDashboard()
   },
 
   loginAsAdmin() {

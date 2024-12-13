@@ -3,7 +3,7 @@ import { assumeAdminDashboardPage } from './adminPages/adminDashboardPage'
 import { assumeAssessmentAndCertificateHistoryPage } from './assessmentAndCertificateHistoryPage'
 import { messageCenterIndicator } from './messageCenterIndicator'
 
-export const systemSidebar = () => {
+export const mainMenu = () => {
   routerToMyNotebooksPage()
   cy.pageIsNotLoading()
 

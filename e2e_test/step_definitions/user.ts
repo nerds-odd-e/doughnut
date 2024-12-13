@@ -67,7 +67,7 @@ Then('I should see {string} in the page', (content) => {
 })
 
 Then('My name {string} is in the user action menu', (name: string) => {
-  start.systemSidebar().userOptions().userSettings(name)
+  start.mainMenu().userOptions().userSettings(name)
 })
 
 Then('my daily new notes to review is set to {int}', (number: string) => {
@@ -121,16 +121,12 @@ Then(
 )
 
 Then('I edit user profile to change my name to {string}', (name: string) => {
-  start
-    .systemSidebar()
-    .userOptions()
-    .userSettings('Old Learner')
-    .changeName(name)
+  start.mainMenu().userOptions().userSettings('Old Learner').changeName(name)
 })
 
 Then('I logout via the UI', () => {
   cy.visit('/')
-  start.systemSidebar().userOptions().logout()
+  start.mainMenu().userOptions().logout()
 })
 
 Then('I should be on the welcome page and asked to login', () => {
