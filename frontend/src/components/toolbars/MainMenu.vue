@@ -114,11 +114,11 @@ import NavigationItem from "@/components/navigation/NavigationItem.vue"
 import { messageCenterConversations } from "@/store/messageStore"
 
 const props = defineProps({
-  user: { type: Object as PropType<User>, required: false }
+  user: { type: Object as PropType<User>, required: false },
 })
 
 defineEmits<{
-  (e: 'updateUser', user: User): void
+  (e: "updateUser", user: User): void
 }>()
 
 const route = useRoute()
