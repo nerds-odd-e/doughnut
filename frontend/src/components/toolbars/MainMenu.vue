@@ -15,49 +15,58 @@
         </template>
 
         <li role="button" class="list-item" title="User Actions">
-          <div class="dropup w-100">
-            <a
+          <div class="daisy-dropdown">
+            <label
+              tabindex="0"
+              class="daisy-btn daisy-btn-ghost"
               aria-label="User actions"
-              data-bs-toggle="dropdown"
-              data-toggle="dropdown"
-              aria-haspopup="true"
-              aria-expanded="false"
             >
-              <div class="d-flex flex-column align-items-center gap-1">
+              <div class="daisy-flex daisy-flex-col daisy-items-center daisy-gap-1">
                 <SvgMissingAvatar width="24" height="24" />
                 <span class="label">Account</span>
               </div>
-            </a>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-              <router-link
-                v-if="user?.admin"
-                role="button"
-                class="dropdown-item"
-                :to="{ name: 'adminDashboard' }"
-              >
-                Admin Dashboard
-              </router-link>
-              <router-link role="button" class="dropdown-item" :to="{ name: 'recent' }">
-                <SvgAssimilate class="me-2" />Recent...
-              </router-link>
-              <PopButton btn-class="dropdown-item" title="user settings">
-                <template #button_face> Settings for {{ user.name }}</template>
-                <template #default="{ closer }">
-                  <UserProfileDialog
-                    v-bind="{ user }"
-                    @user-updated="
-                      if ($event) {
-                        $emit('updateUser', $event);
-                      }
-                      closer();
-                    "
-                  />
-                </template>
-              </PopButton>
-              <router-link role="button" class="dropdown-item" :to="{ name: 'messageCenter' }">Message center</router-link>
-              <router-link role="button" class="dropdown-item" :to="{ name: 'assessmentAndCertificateHistory' }">My Assessments and Certificates</router-link>
-              <a href="#" class="dropdown-item" role="button" @click="logout">Logout</a>
-            </div>
+            </label>
+            <ul tabindex="0" class="daisy-dropdown-content daisy-menu daisy-p-2 daisy-bg-base-100 daisy-rounded-box daisy-w-52 daisy-shadow">
+              <li v-if="user?.admin">
+                <router-link :to="{ name: 'adminDashboard' }">
+                  Admin Dashboard
+                </router-link>
+              </li>
+              <li>
+                <router-link :to="{ name: 'recent' }">
+                  <SvgAssimilate class="daisy-mr-2" />Recent...
+                </router-link>
+              </li>
+              <li>
+                <PopButton class="daisy-w-full daisy-text-left" title="user settings">
+                  <template #button_face>Settings for {{ user.name }}</template>
+                  <template #default="{ closer }">
+                    <UserProfileDialog
+                      v-bind="{ user }"
+                      @user-updated="
+                        if ($event) {
+                          $emit('updateUser', $event);
+                        }
+                        closer();
+                      "
+                    />
+                  </template>
+                </PopButton>
+              </li>
+              <li>
+                <router-link :to="{ name: 'messageCenter' }">
+                  Message center
+                </router-link>
+              </li>
+              <li>
+                <router-link :to="{ name: 'assessmentAndCertificateHistory' }">
+                  My Assessments and Certificates
+                </router-link>
+              </li>
+              <li>
+                <a href="#" @click="logout">Logout</a>
+              </li>
+            </ul>
           </div>
         </li>
       </ul>
@@ -187,7 +196,6 @@ const logout = async () => {
     .list-group {
       flex-direction: row;
       flex-wrap: nowrap;
-      overflow-x: auto;
       justify-content: center;
       gap: 1rem;
     }
@@ -209,6 +217,10 @@ const logout = async () => {
 @media (max-width: theme('screens.md')) {
   :deep(.label) {
     display: none;
+  }
+
+  .daisy-dropdown {
+    @apply daisy-dropdown-end;
   }
 }
 

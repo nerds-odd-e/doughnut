@@ -74,7 +74,7 @@ onMounted(async () => {
       />
     </div>
     <div class="daisy-flex daisy-flex-col daisy-flex-grow path-and-content">
-      <div class="daisy-sticky daisy-top-0 daisy-z-100 sticky-top">
+      <div class="daisy-sticky daisy-top-0 daisy-z-100 global-bar">
         <GlobalBar
           v-bind="{ storageAccessor, user, apiStatus }"
           @update-user="user = $event"
@@ -118,7 +118,7 @@ $global-bar-height: 51px;
   height: 100%;
 }
 
-.sticky-top {
+.global-bar {
   height: $global-bar-height;
 }
 
