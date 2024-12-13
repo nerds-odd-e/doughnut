@@ -32,7 +32,7 @@ Feature: Note creation should have details if wikidata is a person
     When I create a note belonging to "People":
       | Title     | Wikidata Id |
       | Confucius | Q4604       |
-    Then I should see "My Notes/People/Confucius" with these children
+    Then I should see "People/Confucius" with these children
       | note-title |
       | Lu         |
 
@@ -41,5 +41,5 @@ Feature: Note creation should have details if wikidata is a person
     When I create a note belonging to "People":
       | Title           | Wikidata Id |
       | Wang Chien-ming | Q706446     |
-    Then I should see note "My Notes/People/Wang Chien-ming" has link "related to" "Taiwan"
+    Then I should see note "People/Wang Chien-ming" has link "related to" "Taiwan"
 # this check is not sufficient, should check new note is not create for taiwan

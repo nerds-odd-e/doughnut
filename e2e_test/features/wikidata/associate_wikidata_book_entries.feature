@@ -16,7 +16,7 @@ Feature: Note creation for a book
     When I create a note belonging to "My Favourite Books":
       | Title                         | Wikidata Id     |
       | The C Programming Language    | Q1137974        |
-    Then I should see "My Notes/My Favourite Books/The C Programming Language" with these children
+    Then I should see "My Favourite Books/The C Programming Language" with these children
       | note-title      |
       | Dennis Ritchie  |
       | Brian Kernighan |

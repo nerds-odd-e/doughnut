@@ -5,13 +5,6 @@
         <router-link :to="{ name: 'bazaar' }">Bazaar</router-link>
       </li>
       <template v-else>
-        <li class="breadcrumb-item" v-if="!circle">
-          <router-link
-            v-if="fromBazaar !== undefined"
-            :to="{ name: 'notebooks' }"
-            >My Notes</router-link
-          >
-        </li>
         <template v-if="circle">
           <li class="breadcrumb-item">
             <router-link

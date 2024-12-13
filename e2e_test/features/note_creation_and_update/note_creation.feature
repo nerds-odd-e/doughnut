@@ -18,7 +18,7 @@ Feature: Nested Note creation
       | team         |
       | tech         |
       | Re-quirement |
-    And I should see "My Notes/LeSS in Action" with these children
+    And I should see "LeSS in Action" with these children
       | note-title   |
       | team         |
       | tech         |
@@ -39,7 +39,7 @@ Feature: Nested Note creation
       | team         |
       | coordination |
       | tech         |
-    And I should see "My Notes/LeSS in Action" with these children
+    And I should see "LeSS in Action" with these children
       | note-title   |
       | team         |
       | coordination |

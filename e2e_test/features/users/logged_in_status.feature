@@ -12,7 +12,7 @@ Feature: Logged in status
     Given I have a notebook with head note "Shape" and notes:
       | Title    | Parent Title |
       | Triangle | Shape        |
-    And I navigate to "My Notes/Shape" note
+    And I navigate to "Shape" note
     When my session is logged out
     Then I should be asked to log in again when I click the link "Triangle"
 

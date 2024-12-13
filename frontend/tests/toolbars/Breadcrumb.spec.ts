@@ -11,14 +11,6 @@ describe("breadcrumb with circles", () => {
     .please()
   const grandChild = makeMe.aNote.underNote(child).please()
 
-  it("render the breadcrumber", async () => {
-    const wrapper = helper
-      .component(BreadcrumbWithCircle)
-      .withProps({ fromBazaar: false, noteTopology: parentNote.noteTopology })
-      .mount()
-    expect(wrapper.find(".breadcrumb-item").text()).toEqual("My Notes")
-  })
-
   it("view note belongs to other people in bazaar", async () => {
     helper
       .component(BreadcrumbWithCircle)
