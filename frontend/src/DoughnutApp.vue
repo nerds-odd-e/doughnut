@@ -67,7 +67,7 @@ onMounted(async () => {
 <template>
   <Popups />
   <div class="daisy-flex daisy-h-dvh daisy-bg-base-100 daisy-text-base-content">
-    <div class="sidebar-control">
+    <div class="main-menu">
       <SidebarControl
         :user="user"
         @update-user="user = $event"
@@ -104,17 +104,17 @@ onMounted(async () => {
 <style scoped lang="scss">
 @import '@/styles/_variables.scss';
 
-$sidebar-width: 64px;
-$sidebar-height-tablet: 70px;
-$sidebar-height-mobile: 55px;
+$main-menu-width: 64px;
+$main-menu-height-tablet: 70px;
+$main-menu-height-mobile: 55px;
 $global-bar-height: 51px;
 
-.sidebar-control {
+.main-menu {
   display: flex;
   background-color: #2d2d2d;
   flex-direction: column;
   height: 100%;
-  width: $sidebar-width;
+  width: $main-menu-width;
   color: #e0e0e0;
   position: fixed;
   z-index: 10000;
@@ -124,7 +124,7 @@ $global-bar-height: 51px;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  margin-left: $sidebar-width;
+  margin-left: $main-menu-width;
   height: 100vh;
 }
 
@@ -144,23 +144,23 @@ $global-bar-height: 51px;
 @media (max-width: $tablet-breakpoint) {
   .path-and-content {
     margin-left: 0;
-    margin-top: $sidebar-height-tablet;
-    height: calc(100vh - #{$sidebar-height-tablet});
+    margin-top: $main-menu-height-tablet;
+    height: calc(100vh - #{$main-menu-height-tablet});
   }
 
   .main-content {
-    height: calc(100vh - #{$sidebar-height-tablet} - #{$global-bar-height});
+    height: calc(100vh - #{$main-menu-height-tablet} - #{$global-bar-height});
   }
 }
 
 @media (max-width: $mobile-breakpoint) {
   .path-and-content {
-    margin-top: $sidebar-height-mobile;
-    height: calc(100vh - #{$sidebar-height-mobile});
+    margin-top: $main-menu-height-mobile;
+    height: calc(100vh - #{$main-menu-height-mobile});
   }
 
   .main-content {
-    height: calc(100vh - #{$sidebar-height-mobile} - #{$global-bar-height});
+    height: calc(100vh - #{$main-menu-height-mobile} - #{$global-bar-height});
   }
 }
 </style>
