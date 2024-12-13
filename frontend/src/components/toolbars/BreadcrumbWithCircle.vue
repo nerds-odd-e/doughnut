@@ -12,7 +12,7 @@
             >My Notes</router-link
           >
         </li>
-        <template v-else>
+        <template v-if="circle">
           <li class="breadcrumb-item">
             <router-link
               :to="{

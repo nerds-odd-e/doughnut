@@ -1,7 +1,7 @@
 import { routerToMyNotebooksPage } from './myNotebooksPage'
 import { assumeAdminDashboardPage } from './adminPages/adminDashboardPage'
 import { assumeAssessmentAndCertificateHistoryPage } from './assessmentAndCertificateHistoryPage'
-import { assumeMessageCenterPage } from './messageCenterPage'
+import { messageCenterIndicator } from './messageCenterIndicator'
 
 export const systemSidebar = () => {
   routerToMyNotebooksPage()
@@ -38,14 +38,10 @@ export const systemSidebar = () => {
           }).click({ force: true })
           return assumeAssessmentAndCertificateHistoryPage()
         },
-        myMessageCenter() {
-          cy.findByRole('button', {
-            name: 'Message center',
-          }).click({ force: true })
-
-          return assumeMessageCenterPage()
-        },
       }
+    },
+    myMessageCenter() {
+      return messageCenterIndicator().go()
     },
   }
 }

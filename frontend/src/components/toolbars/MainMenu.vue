@@ -55,11 +55,6 @@
                   </div>
                 </li>
                 <li>
-                  <router-link :to="{ name: 'messageCenter' }" @click="slotProps.closeDropdown">
-                    Message center
-                  </router-link>
-                </li>
-                <li>
                   <router-link :to="{ name: 'assessmentAndCertificateHistory' }" @click="slotProps.closeDropdown">
                     My Assessments and Certificates
                   </router-link>

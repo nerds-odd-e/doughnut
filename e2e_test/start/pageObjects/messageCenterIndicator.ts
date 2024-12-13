@@ -1,3 +1,5 @@
+import { assumeMessageCenterPage } from './messageCenterPage'
+
 export function messageCenterIndicator() {
   const getMessageInSidebar = (
     fn: ($el: Cypress.Chainable<JQuery<HTMLElement>>) => void
@@ -14,6 +16,12 @@ export function messageCenterIndicator() {
       getMessageInSidebar(($el) => {
         $el.get('.unread-count').should('not.exist')
       })
+    },
+    go() {
+      getMessageInSidebar(($el) => {
+        $el.click()
+      })
+      return assumeMessageCenterPage()
     },
   }
 }

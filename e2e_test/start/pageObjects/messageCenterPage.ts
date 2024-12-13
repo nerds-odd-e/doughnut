@@ -41,5 +41,5 @@ export const assumeMessageCenterPage = () => {
 }
 
 export const navigateToMessageCenter = () => {
-  return systemSidebar().userOptions().myMessageCenter()
+  return systemSidebar().myMessageCenter()
 }
