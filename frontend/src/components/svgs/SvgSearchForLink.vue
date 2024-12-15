@@ -3,7 +3,7 @@
     width="25px"
     height="25px"
     x="0px" y="0px"
-	 viewBox="0 0 487.95 487.95" style="enable-background:new 0 0 487.95 487.95;" xml:space="preserve">
+	 viewBox="0 0 487.95 487.95" style="enable-background:new 0 0 487.95 487.95;" xml:space="preserve" fill="currentColor">
 <g>
     <svg
       viewBox="-150 -150 1000 1000"
