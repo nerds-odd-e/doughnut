@@ -1,7 +1,7 @@
 <template>
   <div class="daisy-flex daisy-flex-grow daisy-overflow-auto daisy-h-full">
     <aside
-      class="daisy-flex-none daisy-overflow-auto daisy-mr-3 sidebar"
+      class="daisy-flex-none daisy-overflow-auto daisy-px-3 sidebar"
       :class="{ 'sidebar-collapsed': sidebarCollapsed }"
     >
       <NoteSidebar
@@ -83,6 +83,7 @@ const handleCloseConversation = () => {
 <style scoped lang="scss">
 aside {
   width: 18rem;
+  height: 100%;
   transition: transform 0.3s ease, width 0.3s ease, margin 0.3s ease;
 }
 
@@ -91,7 +92,6 @@ aside {
     position: absolute;
     z-index: 1000;
     background: white;
-    height: 100%;
     transform: translateX(-100%);
 
     &.sidebar-collapsed {

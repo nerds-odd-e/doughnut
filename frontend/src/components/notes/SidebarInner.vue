@@ -1,5 +1,8 @@
 <template>
-  <ul v-if="(noteRealm?.children?.length ?? 0) > 0" class="list-group">
+  <ul
+    v-if="(noteRealm?.children?.length ?? 0) > 0"
+    class="daisy-list-group daisy-text-sm daisy-pl-[1rem]"
+  >
     <SidebarNoteItem
       v-for="note in noteRealm?.children"
       :key="note.id"

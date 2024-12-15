@@ -1,6 +1,6 @@
 <template>
   <li
-    class="list-group-item list-group-item-action pb-0 pe-0 border-0"
+    class="daisy-list-group-item daisy-list-group-item-action daisy-py-2 daisy-pb-0 daisy-pe-0 daisy-border-0"
     :class="{
       'active-item': noteRealm.id === activeNoteRealm.note.id,
       'dragging': draggedNote?.id === noteRealm.id,
@@ -14,7 +14,7 @@
     @dragend="onDragEnd"
   >
     <div
-      class="d-flex w-100 justify-content-between align-items-start note-content"
+      class="daisy-flex daisy-w-full daisy-justify-between daisy-items-start daisy-note-content"
       @click="toggleChildren(noteRealm.id)"
     >
       <NoteTitleWithLink

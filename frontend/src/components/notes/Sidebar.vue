@@ -1,14 +1,16 @@
 <template>
-  <SidebarInner
-    :class="{ 'is-disabled': !activeNoteRealm }"
-    v-if="activeNoteRealm && headNoteId"
-    v-bind="{
-      noteId: headNoteId,
-      activeNoteRealm: activeNoteRealm,
-      storageAccessor,
-    }"
-    :key="headNoteId"
-  />
+  <div class="daisy-ml-[-1rem]">
+    <SidebarInner
+      :class="{ 'is-disabled': !activeNoteRealm }"
+      v-if="activeNoteRealm && headNoteId"
+      v-bind="{
+        noteId: headNoteId,
+        activeNoteRealm: activeNoteRealm,
+        storageAccessor,
+      }"
+      :key="headNoteId"
+    />
+  </div>
 </template>
 
 <script setup lang="ts">
