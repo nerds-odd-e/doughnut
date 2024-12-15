@@ -28,15 +28,19 @@
         </template>
       </PopButton>
 
-      <NoteSendMessageButton
+      <a
         v-if="!conversationButton"
-        v-bind="{ noteId: note.id }"
-        @show-conversations="() => router.push({
+        class="daisy-btn daisy-btn-ghost daisy-btn-sm"
+        role="button"
+        @click="() => router.push({
           name: 'noteShow',
           params: { noteId: note.id },
           query: { conversation: 'true' }
         })"
-      />
+        title="Star a conversation about this note"
+      >
+        <SvgChat />
+      </a>
 
       <WikidataButton v-bind="{ note, storageAccessor }" />
 
@@ -165,7 +169,6 @@ import Questions from "../Questions.vue"
 import NoteInfoBar from "../NoteInfoBar.vue"
 import SvgMarkdown from "@/components/svgs/SvgMarkdown.vue"
 import SvgRichContent from "@/components/svgs/SvgRichContent.vue"
-import NoteSendMessageButton from "./NoteSendMessageButton.vue"
 import SvgImage from "../../svgs/SvgImage.vue"
 import SvgAudioInput from "../../svgs/SvgAudioInput.vue"
 import SvgUrlIndicator from "../../svgs/SvgUrlIndicator.vue"
@@ -174,6 +177,7 @@ import NoteEditUrlDialog from "../accessory/NoteEditUrlDialog.vue"
 import NoteAudioTools from "../accessory/NoteAudioTools.vue"
 import SvgRobot from "@/components/svgs/SvgRobot.vue"
 import { useRouter } from "vue-router"
+import SvgChat from "@/components/svgs/SvgChat.vue"
 
 const { storageAccessor, note } = defineProps<{
   storageAccessor: StorageAccessor
