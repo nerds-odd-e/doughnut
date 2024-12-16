@@ -34,7 +34,7 @@ const assumeQuestionSection = () => {
         .invoke('text')
     },
     answerFirstOption() {
-      return this.getQuestionSection().get('button').first().click()
+      return this.getQuestionSection().find('button').first().click()
     },
     answerFromTable(answersTable: Record<string, string>[]) {
       return this.getStemText().then((stem) => {
