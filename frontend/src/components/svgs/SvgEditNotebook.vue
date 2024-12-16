@@ -6,6 +6,7 @@
     y="0px"
     viewBox="0 0 489.9 489.9"
     style="enable-background: new 0 0 489.9 489.9"
+    fill="currentColor"
     xml:space="preserve"
   >
     <g>

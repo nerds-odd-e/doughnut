@@ -26,7 +26,7 @@
       <NotebookQuestionsDialog v-bind="{ notebook }" />
     </PopButton>
     <button
-      class="daisy-btn daisy-btn-sm"
+      class="daisy-btn daisy-btn-ghost daisy-btn-sm"
       title="Share notebook to bazaar"
       @click="shareNotebook()"
     >
