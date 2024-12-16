@@ -21,7 +21,6 @@ declare module 'vue' {
     AssimilationButtons: typeof import('./src/components/review/AssimilationButtons.vue')['default']
     BasicBreadcrumb: typeof import('./src/components/commons/BasicBreadcrumb.vue')['default']
     BazaarNotebookButtons: typeof import('./src/components/bazaar/BazaarNotebookButtons.vue')['default']
-    BrandBar: typeof import('./src/components/toolbars/BrandBar.vue')['default']
     Breadcrumb: typeof import('./src/components/toolbars/Breadcrumb.vue')['default']
     BreadcrumbWithCircle: typeof import('./src/components/toolbars/BreadcrumbWithCircle.vue')['default']
     Card: typeof import('./src/components/notes/Card.vue')['default']

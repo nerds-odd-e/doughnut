@@ -3,8 +3,6 @@ import { createRouter, createWebHistory } from "vue-router"
 
 import routes from "./routes/routes"
 import "./assets/daisyui.css"
-import "bootstrap/scss/bootstrap.scss"
-import "bootstrap"
 import DoughnutAppVue from "./DoughnutApp.vue"
 
 const router = createRouter({

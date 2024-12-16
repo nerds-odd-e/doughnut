@@ -52,9 +52,6 @@ export default defineConfig({
       ],
     },
   },
-  optimizeDeps: {
-    include: ['@popperjs/core'],
-  },
   plugins: [
     tsconfigPaths(),
     checker({
