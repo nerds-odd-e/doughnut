@@ -9,15 +9,15 @@
     />
     <SearchResults v-bind="{ noteId, inputSearchKey }">
       <template #button="{ noteTopology }">
-        <div class="btn-group">
+        <div class="daisy-join">
           <button
-            class="btn btn-primary"
+            class="daisy-btn daisy-btn-primary"
             @click.prevent="emit('selected', noteTopology)"
           >
             Link
           </button>
           <button
-            class="btn btn-sm btn-secondary"
+            class="daisy-btn daisy-btn-secondary"
             @click.prevent="emit('moveUnder', noteTopology)"
           >
             Move Under

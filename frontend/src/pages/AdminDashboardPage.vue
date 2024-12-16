@@ -1,66 +1,43 @@
 <template>
   <ContainerPage v-bind="{ title: 'Admin Dashboard' }" />
-  <ul class="nav nav-tabs">
-    <li class="nav-item">
-      <a
-        :class="`nav-link ${activePage === 'fineTuningData' ? 'active' : ''}`"
-        role="button"
-        href="#"
-        @click="activePage = 'fineTuningData'"
-        >Fine Tuning Data</a
-      >
-    </li>
-    <li class="nav-item">
-      <a
-        :class="`nav-link ${activePage === 'failureReport' ? 'active' : ''}`"
-        role="button"
-        href="#"
-        @click="activePage = 'failureReport'"
-      >
-        Failure Reports</a
-      >
-    </li>
-    <li class="nav-item">
-      <a
-        :class="`nav-link ${activePage === 'manageModel' ? 'active' : ''}`"
-        role="button"
-        href="#"
-        @click="activePage = 'manageModel'"
-      >
-        Manage Models</a
-      >
-    </li>
-    <li class="nav-item">
-      <a
-        :class="`nav-link ${activePage === 'manageAssistant' ? 'active' : ''}`"
-        role="button"
-        href="#"
-        @click="activePage = 'manageAssistant'"
-      >
-        Manage Assistant</a
-      >
-    </li>
-    <li class="nav-item">
-      <a
-        :class="`nav-link ${activePage === 'manageBazaar' ? 'active' : ''}`"
-        role="button"
-        href="#"
-        @click="activePage = 'manageBazaar'"
-      >
-        Manage Bazaar</a
-      >
-    </li>
-    <li class="nav-item">
-      <a
-        :class="`nav-link ${activePage === 'certificateRequests' ? 'active' : ''}`"
-        role="button"
-        href="#"
-        @click="activePage = 'certificateRequests'"
-      >
-       Certification Requests</a
-      >
-    </li>
-  </ul>
+  <div class="daisy-tabs">
+    <a
+      :class="`daisy-tab ${activePage === 'fineTuningData' ? 'daisy-tab-active' : ''}`"
+      role="button"
+      href="#"
+      @click="activePage = 'fineTuningData'"
+    >Fine Tuning Data</a>
+    <a
+      :class="`daisy-tab ${activePage === 'failureReport' ? 'daisy-tab-active' : ''}`"
+      role="button"
+      href="#"
+      @click="activePage = 'failureReport'"
+    >Failure Reports</a>
+    <a
+      :class="`daisy-tab ${activePage === 'manageModel' ? 'daisy-tab-active' : ''}`"
+      role="button"
+      href="#"
+      @click="activePage = 'manageModel'"
+    >Manage Models</a>
+    <a
+      :class="`daisy-tab ${activePage === 'manageAssistant' ? 'daisy-tab-active' : ''}`"
+      role="button"
+      href="#"
+      @click="activePage = 'manageAssistant'"
+    >Manage Assistant</a>
+    <a
+      :class="`daisy-tab ${activePage === 'manageBazaar' ? 'daisy-tab-active' : ''}`"
+      role="button"
+      href="#"
+      @click="activePage = 'manageBazaar'"
+    >Manage Bazaar</a>
+    <a
+      :class="`daisy-tab ${activePage === 'certificateRequests' ? 'daisy-tab-active' : ''}`"
+      role="button"
+      href="#"
+      @click="activePage = 'certificateRequests'"
+    >Certification Requests</a>
+  </div>
   <FineTuningData v-if="activePage === 'fineTuningData'" />
   <FailureReportList v-if="activePage === 'failureReport'" />
   <ManageModel v-if="activePage === 'manageModel'" />

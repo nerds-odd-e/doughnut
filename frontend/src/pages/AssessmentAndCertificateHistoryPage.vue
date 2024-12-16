@@ -9,12 +9,12 @@
       type="text"
       v-model="filterText"
       placeholder="Filter by notebook title"
-      class="form-control mb-2"
+      class="daisy-form-control daisy-mb-2"
     />
-    <input type="checkbox" v-model="filterByCertificate" class="form-check-input"
+    <input type="checkbox" v-model="filterByCertificate" class="daisy-check"
       id="filterByCertificate"
      />
-    <label class="form-check-label" for="filterByCertificate">Filter by Certificate</label>
+    <label class="daisy-label" for="filterByCertificate">Filter by Certificate</label>
     <div>
       <table class="assessment-table mt-2">
         <thead>
@@ -32,7 +32,7 @@
             <td>{{ assessmentAndCertificateHistory.isPass ? "Pass" : "Fail" }}</td>
             <td>
               <PopButton
-                btn-class="btn btn-light"
+                btn-class="daisy-btn daisy-btn-light"
                 title="View Certificate"
                 v-if="assessmentAndCertificateHistory.isPass"
               >
