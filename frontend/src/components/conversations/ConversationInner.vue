@@ -16,8 +16,8 @@
       <div
         v-for="conversationMessage in currentConversationMessages"
         :key="conversationMessage.id"
-        class="daisy-d-flex daisy-mb-3"
-        :class="{ 'daisy-justify-content-end': isCurrentUser(conversationMessage.sender?.id || 0) }"
+        class="daisy-flex daisy-mb-3"
+        :class="{ 'daisy-justify-end': isCurrentUser(conversationMessage.sender?.id || 0) }"
       >
         <div
           v-if="!isCurrentUser(conversationMessage.sender?.id || 0)"
@@ -176,12 +176,6 @@ const showDefaultMessages = computed(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.status-bar {
-  background-color: #f8f9fa;
-  padding: 0.5rem;
-  border-radius: 0.25rem;
 }
 
 .user-message {

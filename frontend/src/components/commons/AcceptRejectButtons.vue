@@ -6,7 +6,7 @@
     <div class="suggestion-content daisy-mb-2">
       <slot name="content" />
     </div>
-    <div class="daisy-d-flex daisy-gap-2">
+    <div class="daisy-flex daisy-gap-2">
       <button
         v-if="!hideAccept"
         class="daisy-btn daisy-btn-primary daisy-btn-sm"

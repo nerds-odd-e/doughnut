@@ -1,5 +1,5 @@
 <template>
-  <div v-if="currentAiReply" class="daisy-d-flex daisy-mb-3">
+  <div v-if="currentAiReply" class="daisy-flex daisy-mb-3">
     <div class="message-avatar daisy-me-2" title="AI Assistant">
       <SvgRobot />
     </div>
@@ -8,7 +8,7 @@
     />
   </div>
 
-  <div v-if="completionSuggestion" class="daisy-d-flex daisy-mb-3">
+  <div v-if="completionSuggestion" class="daisy-flex daisy-mb-3">
     <div class="message-avatar daisy-me-2" title="AI Assistant">
       <SvgRobot />
     </div>
@@ -34,14 +34,14 @@
     {{ lastErrorMessage }}
   </div>
 
-  <div v-if="aiStatus" class="daisy-d-flex daisy-align-items-center status-bar daisy-mb-3">
+  <div v-if="aiStatus" class="daisy-flex daisy-align-items-center status-bar daisy-mb-3">
     <div class="daisy-spinner-border daisy-spinner-border-sm daisy-me-2" role="status">
       <span class="daisy-visually-hidden">Loading...</span>
     </div>
     <small class="daisy-text-secondary">{{ aiStatus }}</small>
   </div>
 
-  <div v-if="topicTitleSuggestion" class="daisy-d-flex daisy-mb-3">
+  <div v-if="topicTitleSuggestion" class="daisy-flex daisy-mb-3">
     <div class="message-avatar daisy-me-2" title="AI Assistant">
       <SvgRobot />
     </div>
@@ -60,7 +60,7 @@
     </AcceptRejectButtons>
   </div>
 
-  <div v-if="unknownRequestSuggestion" class="daisy-d-flex daisy-mb-3">
+  <div v-if="unknownRequestSuggestion" class="daisy-flex daisy-mb-3">
     <div class="message-avatar daisy-me-2" title="AI Assistant">
       <SvgRobot />
     </div>

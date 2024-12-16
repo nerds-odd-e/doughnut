@@ -1,6 +1,6 @@
 <template>
   <div class="dialog-bar">
-    <div class="daisy-d-flex daisy-align-items-center daisy-gap-2">
+    <div class="daisy-flex daisy-align-items-center daisy-gap-2">
       <select
         v-if="conversations?.length && conversations.length > 1"
         class="conversation-select"
@@ -25,7 +25,7 @@
       </button>
     </div>
     <div class="daisy-spacer"></div>
-    <div class="daisy-d-flex daisy-align-items-center daisy-gap-2">
+    <div class="daisy-flex daisy-align-items-center daisy-gap-2">
       <button
         class="maximize-button"
         @click="$emit('toggle-maximize')"
