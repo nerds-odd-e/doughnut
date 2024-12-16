@@ -1,7 +1,7 @@
 <template>
-  <div class="conversation-container">
+  <div class="conversation-container daisy-flex daisy-flex-col daisy-flex-1 min-h-0">
     <!-- Upper half -->
-    <div class="subject-container" v-if="!isMaximized">
+    <div v-if="!isMaximized" class="daisy-flex-1 daisy-overflow-auto daisy-p-4 daisy-border-b daisy-border-base-300">
       <NoteShow
         v-if="conversation.subject?.note?.id"
         v-bind="{
@@ -28,7 +28,7 @@
     </div>
 
     <!-- Lower half -->
-    <div class="conversation-messages" :class="{ 'maximized': isMaximized }">
+    <div class="subject-container daisy-flex-1 daisy-flex daisy-flex-col daisy-bg-base-200 min-h-0" :class="{ 'maximized': isMaximized }">
       <ConversationInner
         v-bind="{
           conversation,
@@ -102,30 +102,7 @@ const handleCloseDialog = () => {
 </script>
 
 <style scoped>
-.conversation-container {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-height: 0;
-}
-
-.subject-container {
-  flex: 1;
-  overflow-y: auto;
-  border-bottom: 1px solid #dee2e6;
-  padding: 1rem;
-}
-
-.conversation-messages {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  background-color: #f8f9fa;
-  min-height: 0;
-}
-
-.conversation-messages.maximized {
+.maximized {
   height: calc(100% - 50px);
 }
-
 </style>

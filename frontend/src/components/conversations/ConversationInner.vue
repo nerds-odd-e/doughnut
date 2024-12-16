@@ -187,18 +187,18 @@ const showDefaultMessages = computed(() => {
 
 .completion-text {
   font-style: italic;
-  color: #666;
+  color: var(--daisy-base-content/60);
 }
 
 .title-suggestion {
   font-style: italic;
-  color: #666;
+  color: var(--daisy-base-content/60);
   font-weight: bold;
 }
 
 .unknown-request {
   font-family: monospace;
-  background-color: #f8f9fa;
+  @apply daisy-bg-base-200;
   padding: 0.5rem;
   border-radius: 0.25rem;
   white-space: pre-wrap;
