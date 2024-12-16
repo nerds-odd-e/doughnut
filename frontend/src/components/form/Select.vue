@@ -1,7 +1,7 @@
 <template>
   <InputWithType v-bind="{ scopeName, field, errorMessage }">
     <select
-      :class="`select-control form-control ${!!errorMessage ? 'is-invalid' : ''}`"
+      :class="`daisy-select daisy-select-bordered ${!!errorMessage ? 'daisy-select-error' : ''}`"
       :id="`${scopeName}-${field}`"
       :name="scopeName"
       v-model="localValue"
