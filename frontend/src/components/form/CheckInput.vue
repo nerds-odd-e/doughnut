@@ -2,7 +2,7 @@
   <InputWithType v-bind="{ scopeName, field, errorMessage, beforeLabel: true }">
     <input
       type="checkbox"
-      :class="`form-check-input ${!!errorMessage ? 'is-invalid' : ''}`"
+      :class="`daisy-checkbox ${!!errorMessage ? 'daisy-checkbox-error' : ''}`"
       :id="`${scopeName}-${field}`"
       :name="field"
       :checked="modelValue"

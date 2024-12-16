@@ -1,6 +1,6 @@
 <template>
   <div class="dialog-bar">
-    <div class="d-flex align-items-center gap-2">
+    <div class="daisy-d-flex daisy-align-items-center daisy-gap-2">
       <select
         v-if="conversations?.length && conversations.length > 1"
         class="conversation-select"
@@ -17,15 +17,15 @@
       </select>
       <button
         v-if="allowNewConversation"
-        class="btn btn-sm btn-outline-primary"
+        class="daisy-btn daisy-btn-sm daisy-btn-outline-primary"
         @click="$emit('new-conversation')"
         aria-label="New Conversation"
       >
       +
       </button>
     </div>
-    <div class="spacer"></div>
-    <div class="d-flex align-items-center gap-2">
+    <div class="daisy-spacer"></div>
+    <div class="daisy-d-flex daisy-align-items-center daisy-gap-2">
       <button
         class="maximize-button"
         @click="$emit('toggle-maximize')"
