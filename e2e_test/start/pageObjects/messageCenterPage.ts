@@ -11,7 +11,7 @@ export const assumeMessageCenterPage = () => {
     },
     expectMessageDisplayAtUserSide(message: string) {
       cy.findByText(message)
-        .parents('.justify-content-end')
+        .parents('.daisy-justify-content-end')
         .should('be.visible')
       return this
     },
@@ -19,7 +19,7 @@ export const assumeMessageCenterPage = () => {
       cy.findByText(message)
         .parent()
         .should('be.visible')
-        .and('not.have.class', 'justify-content-end')
+        .and('not.have.class', 'daisy-justify-content-end')
       return this
     },
     conversation(conversationSubject: string) {

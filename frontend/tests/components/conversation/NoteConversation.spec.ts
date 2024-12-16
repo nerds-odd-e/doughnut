@@ -150,7 +150,7 @@ describe("NoteConversation", () => {
     expect(wrapper.findComponent(ConversationInner).exists()).toBe(true)
 
     // Click new conversation button
-    await wrapper.find("button.btn-outline-primary").trigger("click")
+    await wrapper.find("button.daisy-btn-outline-primary").trigger("click")
 
     // Verify we're now showing the ConversationTemplate
     expect(wrapper.findComponent(ConversationTemplate).exists()).toBe(true)
