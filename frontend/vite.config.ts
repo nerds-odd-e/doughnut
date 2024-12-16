@@ -3,7 +3,6 @@ import { URL, fileURLToPath } from 'node:url'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import AutoImport from 'unplugin-auto-import/vite'
-import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import Components from 'unplugin-vue-components/vite'
 import { VueRouterAutoImports } from 'unplugin-vue-router'
 import VueRouter from 'unplugin-vue-router/vite'
@@ -34,15 +33,6 @@ export default defineConfig({
   },
   css: {
     devSourcemap: true,
-    preprocessorOptions: {
-      scss: {
-	additionalData: '@use "sass:math";',
-	charset: false,
-	logger: { silent: true },
-        quietDeps: true,
-        warnRuleAsError: false
-      },
-    },
     postcss: {
       plugins: [
 	tailwindcss({
@@ -67,13 +57,10 @@ export default defineConfig({
     VueRouter(),
     vueJsx(),
     AutoImport({
-      resolvers: [ElementPlusResolver({ importStyle: 'sass' })],
       imports: ['vue', 'vue-router', 'vitest', VueRouterAutoImports],
       dts: true, // generate TypeScript declaration
     }),
-    Components({
-      resolvers: [ElementPlusResolver({ importStyle: 'sass' })],
-    }),
+    Components({}),
     viteCompression(),
   ],
   server: {
