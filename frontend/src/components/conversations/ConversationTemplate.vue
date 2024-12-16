@@ -1,5 +1,5 @@
 <template>
-  <div class="dialog-bar">
+  <div class="dialog-bar daisy-bg-base-300">
     <div class="daisy-flex daisy-align-items-center daisy-gap-2">
       <select
         v-if="conversations?.length && conversations.length > 1"
@@ -79,21 +79,21 @@
     <slot name="messages" />
   </div>
 
-  <div class="bottom-container">
+  <div class="bottom-container daisy-bg-base-100">
     <div v-if="defaultMessages" class="default-messages">
       <button
         v-for="(message, index) in defaultMessages"
         :key="index"
-        class="default-message-button"
+        class="default-message-button daisy-bg-base-200 daisy-text-base-content"
         @click="handleDefaultMessageClick(message)"
       >
         {{ message }}
       </button>
     </div>
 
-    <div class="chat-controls">
+    <div class="chat-controls daisy-bg-base-100">
       <form
-        class="chat-input-form"
+        class="chat-input-form daisy-bg-base-200"
         @submit.prevent="handleSendMessageWithAI()"
         :disabled="!trimmedMessage"
       >
@@ -211,7 +211,6 @@ const handleDefaultMessageClick = (message: string) => {
 
 .chat-controls {
   flex-shrink: 0;
-  background-color: white;
   box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
   padding: 1rem;
 }
@@ -220,7 +219,6 @@ const handleDefaultMessageClick = (message: string) => {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background-color: #f8f9fa;
   border-radius: 8px;
   padding: 0.5rem;
 }
@@ -241,8 +239,8 @@ const handleDefaultMessageClick = (message: string) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #0d6efd;
-  color: white;
+  background-color: hsl(var(--p) / 1);
+  color: hsl(var(--pc) / 1);
   border: none;
   border-radius: 50%;
   width: 36px;
@@ -253,11 +251,11 @@ const handleDefaultMessageClick = (message: string) => {
 }
 
 .send-button:hover {
-  background-color: #0b5ed7;
+  background-color: hsl(var(--pf) / 1);
 }
 
 .send-button:disabled {
-  background-color: #ccc;
+  background-color: hsl(var(--n) / 1);
   cursor: not-allowed;
 }
 
@@ -271,8 +269,7 @@ const handleDefaultMessageClick = (message: string) => {
   justify-content: space-between;
   align-items: center;
   padding: 0.5rem 1rem;
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #dee2e6;
+  border-bottom: 1px solid hsl(var(--b3) / 1);
 }
 
 .minimize-button,
@@ -289,32 +286,32 @@ const handleDefaultMessageClick = (message: string) => {
 
 .minimize-button:hover,
 .maximize-button:hover {
-  background-color: #e9ecef;
+  background-color: hsl(var(--b3));
 }
 
 .conversation-select {
   padding: 0.25rem;
   border-radius: 4px;
-  border: 1px solid #dee2e6;
-  background-color: white;
+  border: 1px solid hsl(var(--b3));
+  background-color: hsl(var(--b1));
   font-size: 0.9rem;
 }
 
 .send-button.with-ai {
-  background-color: #198754;  /* Bootstrap's success color */
+  background-color: hsl(var(--su) / 1);
 }
 
 .send-button.with-ai:hover {
-  background-color: #157347;
+  background-color: hsl(var(--su) / 1);
+  opacity: 0.8;
 }
 
 .send-button.with-ai:disabled {
-  background-color: #ccc;
+  background-color: hsl(var(--n) / 1);
 }
 
 .bottom-container {
   flex-shrink: 0;
-  background-color: white;
   box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
   padding: 1rem;
 }
@@ -335,15 +332,15 @@ const handleDefaultMessageClick = (message: string) => {
 .default-message-button {
   text-align: left;
   padding: 0.75rem 1rem;
-  background-color: #f8f9fa;
-  border: 1px solid #dee2e6;
+  background-color: hsl(var(--b2));
+  border: 1px solid hsl(var(--b3));
   border-radius: 0.5rem;
   cursor: pointer;
   transition: background-color 0.2s;
-  color: #6c757d;  /* Bootstrap's gray-600 color */
+  color: hsl(var(--nc));
 }
 
 .default-message-button:hover {
-  background-color: #e9ecef;
+  background-color: hsl(var(--b3));
 }
 </style>
