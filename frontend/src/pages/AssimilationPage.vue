@@ -1,5 +1,5 @@
 <template>
-    <div class="flex-grow-1">
+    <div class="daisy-flex-grow">
       <div class="progress-container">
         <span
           :class="`progress-bar ${false ? 'thin' : ''}`"
