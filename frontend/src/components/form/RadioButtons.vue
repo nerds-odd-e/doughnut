@@ -1,9 +1,9 @@
 <template>
   <InputWithType v-bind="{ scopeName, field, errorMessage }">
-    <output :id="`${scopeName}-${field}`" role="radiogroup" class="btn-group">
+    <output :id="`${scopeName}-${field}`" role="radiogroup" class="daisy-join flex flex-wrap">
       <template v-for="option in options" :key="option.value">
         <input
-          class="btn-check"
+          class="daisy-join-item daisy-hidden"
           type="radio"
           :value="option.value"
           :id="`${scopeName}-${option.value}`"
@@ -13,7 +13,7 @@
         <label
           role="button"
           :title="option.title"
-          class="btn btn-outline-primary text-nowrap"
+          :class="['daisy-btn', 'daisy-btn-outline', 'daisy-join-item', 'daisy-text-nowrap', { 'daisy-bg-primary daisy-border-primary': modelValue === option.value }]"
           :for="`${scopeName}-${option.value}`"
         >
           <slot name="labelAddition" :value="option.value" />
@@ -46,7 +46,7 @@ const selectionChanged = (event: Event) => {
 </script>
 
 <style scoped>
-.btn-group {
+.join {
   flex-wrap: wrap;
 }
 
