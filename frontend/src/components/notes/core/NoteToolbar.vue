@@ -44,14 +44,14 @@
 
       <WikidataButton v-bind="{ note, storageAccessor }" />
 
-      <button v-if="!asMarkdown" class="btn" title="Edit as markdown" @click="$emit('edit-as-markdown', true)">
+      <button v-if="!asMarkdown" class="daisy-btn daisy-btn-ghost daisy-btn-sm" title="Edit as markdown" @click="$emit('edit-as-markdown', true)">
         <SvgMarkdown />
       </button>
-      <button v-else class="btn" title="Edit as rich content" @click="$emit('edit-as-markdown', false)">
+      <button v-else class="daisy-btn daisy-btn-ghost daisy-btn-sm" title="Edit as rich content" @click="$emit('edit-as-markdown', false)">
         <SvgRichContent />
       </button>
 
-      <button class="btn" title="Audio tools" v-if="!audioTools" @click="audioTools = true">
+      <button class="daisy-btn daisy-btn-ghost daisy-btn-sm" title="Audio tools" v-if="!audioTools" @click="audioTools = true">
         <SvgAudioInput />
       </button>
 

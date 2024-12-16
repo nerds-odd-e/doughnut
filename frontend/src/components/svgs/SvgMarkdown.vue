@@ -7,7 +7,7 @@
     xml:space="preserve"
     viewBox="0 0 16 16"
     xmlns="http://www.w3.org/2000/svg"
-    fill="#000000"
+    fill="currentColor"
     class="bi bi-markdown"
   >
     <g id="SVGRepo_bgCarrier" stroke-width="0"></g>

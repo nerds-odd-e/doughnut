@@ -347,7 +347,7 @@ export const assumeNotePage = (noteTopology?: string) => {
         },
         reassociationWith(wikiID: string) {
           openWikidataOptions()
-          privateToolbarButton('Edit Wikidata Id').click()
+          privateToolbarButton('Edit Wikidata ID').click()
           cy.replaceFocusedTextAndEnter(wikiID)
         },
         hasAssociation() {

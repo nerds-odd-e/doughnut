@@ -10,6 +10,7 @@
     viewBox="0 0 300.112 300.112"
     style="enable-background: new 0 0 300.112 300.112"
     xml:space="preserve"
+    fill="currentColor"
   >
     <g>
       <g>
