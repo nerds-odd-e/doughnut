@@ -21,24 +21,24 @@ export default defineConfig({
     }
   },
   test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: ['./tests/setupVitest.js'],
     exclude: [
       'packages/template/*',
       'node_modules/**/*.spec.js',
       'node_modules/**/*.test.js',
       'node_modules/**/test.js',
     ],
-    globals: true,
-    environment: 'jsdom',
-    setupFiles: ['./tests/setupVitest.js'],
   },
   css: {
     devSourcemap: true,
     postcss: {
       plugins: [
-	tailwindcss({
+        tailwindcss({
           config: './tailwind.config.ts',
         }),
-	autoprefixer(),
+        autoprefixer(),
       ],
     },
   },
@@ -58,7 +58,7 @@ export default defineConfig({
     vueJsx(),
     AutoImport({
       imports: ['vue', 'vue-router', 'vitest', VueRouterAutoImports],
-      dts: true, // generate TypeScript declaration
+      dts: true,
     }),
     Components({}),
     viteCompression(),
@@ -81,6 +81,10 @@ export default defineConfig({
         main: fileURLToPath(new URL('index.html', import.meta.url)),
       },
       output: {
+        manualChunks: {
+          'vue-vendor': ['vue', 'vue-router'],
+          'ui-vendor': ['quill', 'gsap', 'marked', 'turndown']
+        },
         assetFileNames: (assetInfo) => {
           if (assetInfo.name === 'main.css') return 'assets/main.css';
           return 'assets/[name]-[hash][extname]';
@@ -88,4 +92,8 @@ export default defineConfig({
       },
     },
   },
+  optimizeDeps: {
+    include: ['vue', 'vue-router', 'quill', 'gsap', 'marked', 'turndown'],
+    exclude: ['fsevents']
+  }
 })

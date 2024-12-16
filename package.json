@@ -69,7 +69,7 @@
     "process": "^0.11.10",
     "superagent": "^10.1.1",
     "syncpack": "^13.0.0",
-    "typescript": "5.6.3",
+    "typescript": "5.7.2",
     "util": "^0.12.5",
     "wait-on": "^8.0.1"
   },
