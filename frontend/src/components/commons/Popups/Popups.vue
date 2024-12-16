@@ -13,7 +13,7 @@
         <div>
           <pre style="white-space: pre-wrap">{{ popupInfo.message }}</pre>
         </div>
-        <button class="btn btn-success" @click="resolve(true)">OK</button>
+        <button class="daisy-btn daisy-btn-success" @click="resolve(true)">OK</button>
       </template>
     </Modal>
 
@@ -30,8 +30,8 @@
         <div>
           <span>{{ popupInfo.message }}</span>
         </div>
-        <button class="btn btn-success" @click="resolve(true)">OK</button>
-        <button class="btn btn-secondary" @click="resolve(false)">
+        <button class="daisy-btn daisy-btn-success" @click="resolve(true)">OK</button>
+        <button class="daisy-btn daisy-btn-secondary" @click="resolve(false)">
           Cancel
         </button>
       </template>

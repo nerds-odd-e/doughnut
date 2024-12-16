@@ -8,7 +8,7 @@
       :autofocus="true"
       :error-message="errors.invitationCode"
     />
-    <input type="submit" value="Join" class="btn btn-primary" />
+    <input type="submit" value="Join" class="daisy-btn daisy-btn-primary" />
   </form>
 </template>
 

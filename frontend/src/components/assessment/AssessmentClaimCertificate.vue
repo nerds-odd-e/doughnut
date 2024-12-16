@@ -1,6 +1,6 @@
 <template>
   <PopButton
-    btn-class="btn btn-light"
+    btn-class="daisy-btn daisy-btn-light"
     title="View Certificate"
   >
     <CertificatePopup

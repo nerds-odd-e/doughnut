@@ -1,5 +1,5 @@
 <template>
-  <div class="btn-group btn-group-sm">
+  <div class="daisy-btn-group daisy-btn-group-sm">
     <PopButton
       v-if="!notebook.notebookSettings.skipMemoryTrackingEntirely"
       title="Add to my learning"
@@ -14,11 +14,11 @@
         />
       </template>
     </PopButton>
-    <button class="btn" title="Start Assessment" @click="openAssessmentPage">
+    <button class="daisy-btn" title="Start Assessment" @click="openAssessmentPage">
       <SvgAssessment />
     </button>
   </div>
-  <div v-if="notebook.certifiable" class="p-1 certification-icon" >
+  <div v-if="notebook.certifiable" class="daisy-p-1 certification-icon" >
     <SvgCertifiedAssessment/>
   </div>
 </template>
