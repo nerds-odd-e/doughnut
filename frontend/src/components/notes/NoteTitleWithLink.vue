@@ -1,7 +1,7 @@
 <template>
   <router-link
     :to="{ name: 'noteShow', params: { noteId: noteTopology.id } }"
-    class="daisy-text-decoration-none"
+    class="text-decoration-none"
   >
     <NoteTitleComponent v-if="!iconized" v-bind="{ noteTopology }" />
     <span v-else>🔗</span>
