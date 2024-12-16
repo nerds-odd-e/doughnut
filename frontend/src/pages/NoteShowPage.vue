@@ -126,7 +126,6 @@ aside {
 }
 
 .conversation-wrapper {
-  max-height: 50%;
   border-top: 1px solid #e9ecef;
   flex: 1;
   display: flex;

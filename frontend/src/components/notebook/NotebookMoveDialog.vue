@@ -1,5 +1,4 @@
 <template>
-  <h2>Move notebook to</h2>
   <h3>Move notebook to</h3>
   <div class="overflow-auto" style="max-height: 200px">
     <ul class="list-group">

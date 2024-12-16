@@ -1,6 +1,5 @@
 <template>
   <h3>Edit notebook settings</h3>
-  <div class="form-container">
     <CheckInput
       scope-name="notebook"
       field="skipMemoryTrackingEntirely"
@@ -23,7 +22,6 @@
     <button class="btn btn-primary btn-layout mt-2" @click="processForm">
       Update
     </button>
-  </div>
   <hr/>
   <div>
     <NotebookCertificateRequest v-bind="{ notebook }" />
