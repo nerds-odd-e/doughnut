@@ -20,8 +20,8 @@ it("displays menu items when dropdown is open", async () => {
   await dropdownToggleButton.trigger("click")
 
   // Check if menu items exist
-  expect(wrapper.find(".dropdown-menu").exists()).toBe(true)
-  expect(wrapper.find(".dropdown-menu").text()).toContain(
+  expect(wrapper.find(".daisy-dropdown-content").exists()).toBe(true)
+  expect(wrapper.find(".daisy-dropdown-content").text()).toContain(
     "Questions for the note"
   )
 })
