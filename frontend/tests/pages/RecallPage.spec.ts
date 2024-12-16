@@ -103,7 +103,7 @@ describe("repeat page", () => {
       mockedRandomQuestionCall.mockResolvedValueOnce(recallPrompt)
       vi.runOnlyPendingTimers()
       await flushPromises()
-      await wrapper.find("button.btn-primary").trigger("click")
+      await wrapper.find("button.daisy-btn-primary").trigger("click")
       expect(mockedMarkAsRepeatedCall).toHaveBeenCalledWith(
         firstMemoryTrackerId,
         true

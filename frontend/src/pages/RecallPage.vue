@@ -34,17 +34,17 @@
       v-bind="{ answeredQuestion: currentResult, conversationButton: true, storageAccessor }"
     />
     <template v-else-if="toRepeatCount === 0">
-      <div class="alert alert-success">
+      <div class="daisy-alert daisy-alert-success">
         You have finished all repetitions for this half a day!
       </div>
       <div>
-        <button role="button" class="btn btn-secondary" @click="loadMore(3)">
+        <button role="button" class="daisy-btn daisy-btn-secondary" @click="loadMore(3)">
           Load more from next 3 days
         </button>
-        <button role="button" class="btn btn-secondary" @click="loadMore(7)">
+        <button role="button" class="daisy-btn daisy-btn-secondary" @click="loadMore(7)">
           Load more from next 7 days
         </button>
-        <button role="button" class="btn btn-secondary" @click="loadMore(14)">
+        <button role="button" class="daisy-btn daisy-btn-secondary" @click="loadMore(14)">
           Load more from next 14 days
         </button>
       </div>

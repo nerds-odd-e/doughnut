@@ -13,12 +13,12 @@
     <template v-else>
       <div class="message-center-container">
         <div class="sidebar" :class="{ 'hide-on-mobile': !showSidebarOnMobile }">
-          <ul class="list-group">
+          <ul class="daisy-menu">
             <li
               v-for="conversation in conversations"
               :key="conversation.id"
-              class="list-group-item list-group-item-action"
-              :class="{ 'active': conversationId === conversation.id }"
+              class="daisy-menu-item"
+              :class="{ 'daisy-active': conversationId === conversation.id }"
               @click="selectConversation(conversation)"
             >
               <div>{{ conversationTopic(conversation) }}</div>
@@ -171,7 +171,7 @@ const handleConversationChanged = (conversationId: number) => {
 .sidebar {
   flex: 0 0 auto;
   overflow-y: auto;
-  max-height: 300px; /* Limit height on mobile */
+  max-height: 300px;
   border-right: 1px solid #e0e0e0;
 }
 
@@ -190,7 +190,7 @@ const handleConversationChanged = (conversationId: number) => {
 
   .sidebar {
     flex: 0 0 25%;
-    max-height: none; /* Remove max-height limit on larger screens */
+    max-height: none;
   }
 
   .conversation {
@@ -235,12 +235,6 @@ const handleConversationChanged = (conversationId: number) => {
   height: 120px;
   margin-bottom: 20px;
   opacity: 0.5;
-}
-
-.list-group-item.active {
-  background-color: #007bff;
-  color: white;
-  border-color: #007bff;
 }
 
 .mobile-back-button {

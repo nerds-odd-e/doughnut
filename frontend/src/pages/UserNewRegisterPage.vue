@@ -13,7 +13,7 @@
         :error-message="errors.name"
         placeholder="Nickname"
       />
-      <input type="submit" value="Submit" class="btn btn-primary" />
+      <input type="submit" value="Submit" class="daisy-btn daisy-btn-primary" />
     </form>
   </ContainerPage>
 </template>
