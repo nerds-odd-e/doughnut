@@ -2,7 +2,7 @@
   <div role="accessory">
     <ShowImage
       v-if="noteAccessory.imageWithMask"
-      class="text-center"
+      class="daisy-text-center"
       v-bind="noteAccessory.imageWithMask"
       :opacity="0.2"
     />

@@ -1,8 +1,14 @@
 <template>
-  <div
-    :class="`row row-cols-1 row-cols-md-${columns - 1} row-cols-lg-${columns} g-3`"
-  >
-    <div class="col" v-for="noteTopology in noteTopologies" :key="noteTopology.id">
+  <div class="daisy-grid daisy-gap-3" :class="{
+    'daisy-grid-cols-1': true,
+    'md:daisy-grid-cols-3': columns === 4,
+    'lg:daisy-grid-cols-4': columns === 4,
+    'md:daisy-grid-cols-2': columns === 3,
+    'lg:daisy-grid-cols-3': columns === 3,
+    'md:daisy-grid-cols-1': columns === 2,
+    'lg:daisy-grid-cols-2': columns === 2,
+  }">
+    <div v-for="noteTopology in noteTopologies" :key="noteTopology.id">
       <Card v-bind="{ noteTopology: noteTopology }">
         <template #button v-if="$slots.button">
           <slot name="button" :note-topology="noteTopology" />

@@ -72,27 +72,10 @@ defineProps({
   }
 }
 
-.card-body {
-  margin-left: 12px;
-  padding: 1rem 1.25rem;
-}
-
 .notebook-card:hover {
   background: linear-gradient(to right, #f0f0f0 0%, #f8f9fa 5%);
   transform: translateY(-2px);
   transition: all 0.2s ease;
-}
-
-/* Add ruled paper effect */
-.card-body {
-  background-image: linear-gradient(#e5e5e5 1px, transparent 1px);
-  background-size: 100% 2rem;
-  background-position: 0 1rem;
-}
-
-.card-title {
-  color: #2c3e50;
-  margin-bottom: 1.5rem;
 }
 
 .note-short-details {
