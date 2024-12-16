@@ -1,7 +1,7 @@
 <template>
   <InputWithType v-bind="{ scopeName, field, errorMessage }">
     <input
-      :class="`file-input-control form-control ${!!errorMessage ? 'is-invalid' : ''}`"
+      :class="`daisy-file-input daisy-w-full ${!!errorMessage ? 'daisy-file-input-error' : ''}`"
       :id="`${scopeName}-${field}`"
       type="file"
       :name="field"

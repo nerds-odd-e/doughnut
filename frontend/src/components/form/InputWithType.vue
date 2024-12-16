@@ -18,9 +18,9 @@
           </div>
         </template>
         <slot />
-        <div class="daisy-text-error daisy-text-sm" v-if="!!errorMessage">{{ errorMessage }}</div>
       </div>
     </template>
+    <div class="daisy-text-error daisy-text-sm" v-if="!!errorMessage">{{ errorMessage }}</div>
   </div>
 </template>
 

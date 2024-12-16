@@ -301,7 +301,10 @@ Cypress.Commands.add('noteByTitle', (noteTopology: string) => {
 Cypress.Commands.add(
   'expectFieldErrorMessage',
   (field: string, message: string) => {
-    cy.formField(field).siblings('.error-msg').findByText(message)
+    cy.formField(field)
+      .parent()
+      .siblings('.daisy-text-error')
+      .findByText(message)
   }
 )
 
