@@ -1,9 +1,9 @@
 <template>
   <TeleportToHeadStatus v-if="title">
-    <div class="flex-shrink-0">
+    <div class="daisy-flex-shrink-0">
       <slot name="buttons" />
     </div>
-    <div class="flex-grow-1" @click.prevent="$emit('showMore')">
+    <div class="daisy-flex-grow-1" @click.prevent="$emit('showMore')">
       <span
         :class="`progress-bar ${!!$slots.default ? 'thin' : ''}`"
         v-if="toRepeatCount !== null"
