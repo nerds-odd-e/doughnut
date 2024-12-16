@@ -4,9 +4,9 @@
   </TeleportToHeadStatus>
 
   <div :class="[
-    containerClass,
-    'daisy-container daisy-mx-auto',
-    { 'daisy-h-full daisy-min-h-full': props.fullHeight }
+    'daisy-mx-auto',
+    { 'daisy-h-full daisy-min-h-full': props.fullHeight },
+    { 'daisy-container daisy-mt-3': !props.fullHeight }
   ]">
     <ContentLoader v-if="!contentLoaded" />
     <template v-else>
@@ -18,7 +18,6 @@
 <script setup lang="ts">
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import TeleportToHeadStatus from "@/pages/commons/TeleportToHeadStatus.vue"
-import { computed } from "vue"
 
 interface Props {
   title?: string
@@ -30,16 +29,5 @@ const props = withDefaults(defineProps<Props>(), {
   fullHeight: false,
   contentLoaded: true,
 })
-
-const containerClass = computed(() => ({
-  "container-full-height": props.fullHeight,
-  "container mt-3": !props.fullHeight,
-}))
 </script>
-<style scoped>
-.container-full-height {
-  height: 100%;
-  min-height: 100%;
-}
-</style>
 
