@@ -95,7 +95,7 @@ export const assumeNotePage = (noteTopology?: string) => {
           })
         },
         goto: () => {
-          findLink().get('.link-type').click()
+          findLink().find('.link-type').click()
         },
       }
     },
