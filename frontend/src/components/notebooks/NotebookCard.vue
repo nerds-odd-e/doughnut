@@ -7,7 +7,7 @@
       class="no-underline"
     >
       <div class="daisy-card-body">
-        <h5 class="daisy-card-title">
+        <h5 class="daisy-card-title card-title">
           {{ notebook.title }}
         </h5>
         <p v-if="notebook.shortDetails" class="note-short-details">

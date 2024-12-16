@@ -1,8 +1,8 @@
 <template>
-  <div v-if="notes.length > 0" class="row">
-    <div class="col-auto bg-light p-0" style="width: 40px">
+  <div v-if="notes.length > 0" class="daisy-flex">
+    <div class="daisy-w-10 daisy-p-0">
       <button
-        class="btn btn-sm"
+        class="daisy-btn daisy-btn-sm"
         v-if="internalExpandChildren"
         role="button"
         title="collapse children"
@@ -11,7 +11,7 @@
         <SvgCollapse />
       </button>
       <button
-        class="btn btn-sm"
+        class="daisy-btn daisy-btn-sm"
         v-else
         role="button"
         title="expand children"
@@ -20,7 +20,7 @@
         <SvgExpand />
       </button>
     </div>
-    <div class="col">
+    <div class="daisy-flex-1">
       <div v-if="!internalExpandChildren">
         <div role="collapsed-children-count">{{ notes.length }}</div>
       </div>
