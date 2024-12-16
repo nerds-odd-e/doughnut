@@ -3,7 +3,7 @@
     <slot name="cardHeader" />
     <router-link
       :to="{ name: 'noteShow', params: { noteId: noteTopology.id } }"
-      class="text-decoration-none"
+      class="daisy-text-decoration-none"
     >
       <div class="card-body">
         <h5>
