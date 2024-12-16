@@ -1,5 +1,5 @@
 <template>
-  <div class="btn-group btn-group-sm">
+  <div class="daisy-btn-group daisy-btn-group-sm">
     <BazaarNotebookButtons v-if="notebook.circle" :notebook="notebook" :logged-in="true" />
     <PopButton title="Edit notebook settings">
       <template #button_face>
@@ -26,7 +26,7 @@
       <NotebookQuestionsDialog v-bind="{ notebook }" />
     </PopButton>
     <button
-      class="btn btn-sm"
+      class="daisy-btn daisy-btn-sm"
       title="Share notebook to bazaar"
       @click="shareNotebook()"
     >

@@ -8,16 +8,16 @@
       field="additionalInstruction"
       label="Additional Instructions to AI"
     />
-    <button type="submit" class="btn btn-primary">
+    <button type="submit" class="daisy-btn daisy-btn-primary">
       Update Notebook AI Assistant Settings
     </button>
   </form>
 
-  <div class="mt-4">
-    <button @click.prevent="createAssistantForNotebook" class="btn btn-danger">
+  <div class="daisy-mt-4">
+    <button @click.prevent="createAssistantForNotebook" class="daisy-btn daisy-btn-error">
       Create Assistant For Notebook
     </button>
-    <button @click.prevent="downloadNotebookDump" class="btn btn-success">
+    <button @click.prevent="downloadNotebookDump" class="daisy-btn daisy-btn-success">
       Download Notebook Dump
     </button>
   </div>
