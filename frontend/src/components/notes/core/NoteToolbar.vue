@@ -55,89 +55,99 @@
         <SvgAudioInput />
       </button>
 
-      <div class="dropdown">
+      <div class="daisy-dropdown daisy-dropdown-end">
         <button
-          id="dropdownMenuButton"
-          aria-expanded="false"
-          aria-haspopup="true"
-          class="btn dropdown-toggle"
-          data-bs-toggle="dropdown"
-          role="button"
+          tabindex="0"
+          class="daisy-btn daisy-btn-ghost daisy-btn-sm"
           title="more options"
         >
           <SvgCog />
         </button>
-        <div class="dropdown-menu dropdown-menu-end">
-          <PopButton
-            btn-class="dropdown-item btn-primary"
-            title="Note Recall Settings"
-          >
-            <NoteInfoBar v-bind="{ noteId: note.id }" />
-          </PopButton>
+        <ul tabindex="0" class="daisy-dropdown-content daisy-menu daisy-p-2 daisy-bg-base-300 daisy-rounded-box daisy-w-52 daisy-shadow daisy-z-50">
+          <li>
+            <PopButton
+              btn-class="daisy-w-full"
+              title="Note Recall Settings"
+            >
+              <NoteInfoBar v-bind="{ noteId: note.id }" />
+            </PopButton>
+          </li>
 
-          <PopButton title="Test me" sidebar="right">
-            <template #button_face>
-              <SvgRobot />
-              <span class="ms-2">Test me</span>
-            </template>
-            <template #default="{ closer }">
-              <NoteTestMeDialog
-                v-bind="{ selectedNote: note, storageAccessor }"
-                @close-dialog="closer"
-              />
-            </template>
-          </PopButton>
+          <li>
+            <PopButton title="Test me" sidebar="right">
+              <template #button_face>
+                <SvgRobot />
+                <span class="ms-2">Test me</span>
+              </template>
+              <template #default="{ closer }">
+                <NoteTestMeDialog
+                  v-bind="{ selectedNote: note, storageAccessor }"
+                  @close-dialog="closer"
+                />
+              </template>
+            </PopButton>
+          </li>
 
-          <PopButton
-            btn-class="dropdown-item btn-primary"
-            title="Generate Image with DALL-E"
-          >
-            <AIGenerateImageDialog v-bind="{ note, storageAccessor }" />
-          </PopButton>
+          <li>
+            <PopButton
+              btn-class="daisy-w-full"
+              title="Generate Image with DALL-E"
+            >
+              <AIGenerateImageDialog v-bind="{ note, storageAccessor }" />
+            </PopButton>
+          </li>
 
-          <PopButton
-            btn-class="dropdown-item btn-primary"
-            title="Edit Note Image"
-          >
-            <template #button_face>
-              <SvgImage />
-              <span class="ms-2">Edit Note Image</span>
-            </template>
-            <template #default="{ closer }">
-              <NoteEditImageDialog
-                v-bind="{ noteId: note.id }"
-                @close-dialog="noteAccessoriesUpdated(closer, $event)"
-              />
-            </template>
-          </PopButton>
+          <li>
+            <PopButton
+              btn-class="daisy-w-full"
+              title="Edit Note Image"
+            >
+              <template #button_face>
+                <SvgImage />
+                <span class="ms-2">Edit Note Image</span>
+              </template>
+              <template #default="{ closer }">
+                <NoteEditImageDialog
+                  v-bind="{ noteId: note.id }"
+                  @close-dialog="noteAccessoriesUpdated(closer, $event)"
+                />
+              </template>
+            </PopButton>
+          </li>
 
-          <PopButton
-            btn-class="dropdown-item btn-primary"
-            title="Edit Note URL"
-          >
-            <template #button_face>
-              <SvgUrlIndicator />
-              <span class="ms-2">Edit Note URL</span>
-            </template>
-            <template #default="{ closer }">
-              <NoteEditUrlDialog
-                v-bind="{ noteId: note.id }"
-                @close-dialog="noteAccessoriesUpdated(closer, $event)"
-              />
-            </template>
-          </PopButton>
+          <li>
+            <PopButton
+              btn-class="daisy-w-full"
+              title="Edit Note URL"
+            >
+              <template #button_face>
+                <SvgUrlIndicator />
+                <span class="ms-2">Edit Note URL</span>
+              </template>
+              <template #default="{ closer }">
+                <NoteEditUrlDialog
+                  v-bind="{ noteId: note.id }"
+                  @close-dialog="noteAccessoriesUpdated(closer, $event)"
+                />
+              </template>
+            </PopButton>
+          </li>
 
-          <PopButton
-            btn-class="dropdown-item btn-primary"
-            title="Questions for the note"
-          >
-            <Questions v-bind="{ note }" />
-          </PopButton>
-          <NoteDeleteButton
-            class="dropdown-item"
-            v-bind="{ noteId: note.id, storageAccessor }"
-          />
-        </div>
+          <li>
+            <PopButton
+              btn-class="daisy-w-full"
+              title="Questions for the note"
+            >
+              <Questions v-bind="{ note }" />
+            </PopButton>
+          </li>
+          <li>
+            <NoteDeleteButton
+              class="daisy-w-full"
+              v-bind="{ noteId: note.id, storageAccessor }"
+            />
+          </li>
+        </ul>
       </div>
     </div>
   </nav>
