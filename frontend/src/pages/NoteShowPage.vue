@@ -1,5 +1,5 @@
 <template>
-  <div class="daisy-flex daisy-flex-grow daisy-overflow-auto daisy-h-full">
+  <div class="daisy-flex daisy-flex-grow daisy-overflow-auto daisy-h-full daisy-relative">
     <aside
       class="daisy-flex-none daisy-overflow-auto daisy-px-3 sidebar"
       :class="{ 'sidebar-collapsed': sidebarCollapsed }"

@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="daisy-container">
     <div>
       <label
         >Question Generation

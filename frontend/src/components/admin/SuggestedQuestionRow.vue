@@ -6,17 +6,17 @@
     <td>{{ suggestedQuestion.positiveFeedback ? "Positive" : "Negative" }}</td>
     <td>{{ suggestedQuestion.comment }}</td>
     <td>
-      <div class="btn-group" role="group">
+      <div class="daisy-btn-group" role="group">
         <button
           v-if="!suggestedQuestion.positiveFeedback"
-          class="btn btn-sm"
+          class="daisy-btn daisy-btn-sm"
           @click="duplicateQuestion(suggestedQuestion)"
         >
           Duplicate
         </button>
-        <button class="btn btn-sm" @click="chatStarter">Chat</button>
+        <button class="daisy-btn daisy-btn-sm" @click="chatStarter">Chat</button>
         <button
-          class="btn btn-sm"
+          class="daisy-btn daisy-btn-sm"
           @click="deleteSuggestedQuestion(suggestedQuestion)"
         >
           Del

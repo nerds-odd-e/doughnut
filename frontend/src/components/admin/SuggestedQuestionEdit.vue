@@ -48,7 +48,7 @@
       placeholder="Add a comment about the question"
     />
   </div>
-  <button class="btn btn-success" @click="suggestQuestionForFineTuning">
+  <button class="daisy-btn daisy-btn-success" @click="suggestQuestionForFineTuning">
     Save
   </button>
 </template>

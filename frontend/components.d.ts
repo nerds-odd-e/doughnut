@@ -98,7 +98,6 @@ declare module 'vue' {
     NoteNewDialog: typeof import('./src/components/notes/NoteNewDialog.vue')['default']
     NoteRealmLoader: typeof import('./src/components/notes/NoteRealmLoader.vue')['default']
     NoteRecentUpdateIndicator: typeof import('./src/components/notes/NoteRecentUpdateIndicator.vue')['default']
-    NoteSendMessageButton: typeof import('./src/components/notes/core/NoteSendMessageButton.vue')['default']
     NoteShow: typeof import('./src/components/notes/NoteShow.vue')['default']
     NoteSidebar: typeof import('./src/components/notes/NoteSidebar.vue')['default']
     NoteTestMeDialog: typeof import('./src/components/notes/NoteTestMeDialog.vue')['default']
@@ -142,7 +141,6 @@ declare module 'vue' {
     SelfEvaluateButtons: typeof import('./src/components/review/SelfEvaluateButtons.vue')['default']
     ShowImage: typeof import('./src/components/notes/accessory/ShowImage.vue')['default']
     Sidebar: typeof import('./src/components/notes/Sidebar.vue')['default']
-    SidebarControl: typeof import('./src/components/toolbars/SidebarControl.vue')['default']
     SidebarInner: typeof import('./src/components/notes/SidebarInner.vue')['default']
     SidebarNoteItem: typeof import('./src/components/notes/SidebarNoteItem.vue')['default']
     SubscribeDialog: typeof import('./src/components/bazaar/SubscribeDialog.vue')['default']
@@ -245,7 +243,6 @@ declare module 'vue' {
     Waveform: typeof import('./src/components/notes/accessory/Waveform.vue')['default']
     WikidataAssociationDialog: typeof import('./src/components/notes/WikidataAssociationDialog.vue')['default']
     WikidataButton: typeof import('./src/components/notes/core/WikidataButton.vue')['default']
-    WikidataIdEditButton: typeof import('./src/components/notes/core/WikidataIdEditButton.vue')['default']
     WikidataSearchByLabel: typeof import('./src/components/notes/WikidataSearchByLabel.vue')['default']
   }
 }
