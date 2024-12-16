@@ -1,12 +1,10 @@
 <template>
-  <div v-if="note.wikidataId" class="btn-group">
-    <div class="dropdown">
+  <div v-if="note.wikidataId">
+    <div class="daisy-dropdown">
       <button
-        id="dropdownMenuButton"
         aria-expanded="false"
         aria-haspopup="true"
-        class="btn dropdown-toggle"
-        data-bs-toggle="dropdown"
+        class="daisy-btn daisy-dropdown-toggle"
         tabindex="0"
         role="button"
         title="wikidata options"
@@ -14,40 +12,52 @@
         <SvgWikidata />
       </button>
 
-      <div class="dropdown-menu">
-        <NoteWikidataAssociation :wikidata-id="note.wikidataId" />
-        <WikidataIdEditButton
-          v-bind="{ note, storageAccessor }"
-          title="Edit Wikidata Id"
-        />
-      </div>
+      <ul class="daisy-dropdown-content daisy-menu daisy-p-2 daisy-bg-base-300 daisy-rounded-box daisy-w-52 daisy-shadow daisy-z-50">
+        <li>
+          <NoteWikidataAssociation :wikidata-id="note.wikidataId" />
+        </li>
+        <li>
+          <PopButton title="associate wikidata">
+            <template #button_face>
+              <SvgWikidata />
+              Edit Wikidata ID
+            </template>
+            <template #default="{ closer }">
+              <WikidataAssociationDialog
+                v-bind="{ note, storageAccessor }"
+                @close-dialog="closer"
+              />
+            </template>
+          </PopButton>
+        </li>
+      </ul>
     </div>
   </div>
-  <WikidataIdEditButton v-else v-bind="{ note, storageAccessor }" />
+  <PopButton v-else title="associate wikidata">
+    <template #button_face>
+      <SvgWikidata />
+      {{ title || "" }}
+    </template>
+    <template #default="{ closer }">
+      <WikidataAssociationDialog
+        v-bind="{ note, storageAccessor }"
+        @close-dialog="closer"
+      />
+    </template>
+  </PopButton>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import type { Note } from "@/generated/backend"
 import type { StorageAccessor } from "@/store/createNoteStorage"
-import type { PropType } from "vue"
-import { defineComponent } from "vue"
+import PopButton from "../../commons/Popups/PopButton.vue"
 import SvgWikidata from "../../svgs/SvgWikidata.vue"
-import WikidataIdEditButton from "./WikidataIdEditButton.vue"
+import WikidataAssociationDialog from "../WikidataAssociationDialog.vue"
+import NoteWikidataAssociation from "../NoteWikidataAssociation.vue"
 
-export default defineComponent({
-  props: {
-    storageAccessor: {
-      type: Object as PropType<StorageAccessor>,
-      required: true,
-    },
-    note: {
-      type: Object as PropType<Note>,
-      required: true,
-    },
-  },
-  components: {
-    SvgWikidata,
-    WikidataIdEditButton,
-  },
-})
+defineProps<{
+  storageAccessor: StorageAccessor
+  note: Note
+  title?: string
+}>()
 </script>

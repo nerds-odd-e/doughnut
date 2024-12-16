@@ -269,7 +269,9 @@ export const assumeNotePage = (noteTopology?: string) => {
         .invoke('text')
         .then((currentTopic) => {
           // Find the note in sidebar
-          cy.get('.list-group-item').contains(currentTopic).as('currentNote')
+          cy.get('.daisy-list-group-item')
+            .contains(currentTopic)
+            .as('currentNote')
           // Find previous sibling
           cy.get('@currentNote')
             .parents('li')
@@ -295,7 +297,9 @@ export const assumeNotePage = (noteTopology?: string) => {
         .invoke('text')
         .then((currentTopic) => {
           // Find the note in sidebar
-          cy.get('.list-group-item').contains(currentTopic).as('currentNote')
+          cy.get('.daisy-list-group-item')
+            .contains(currentTopic)
+            .as('currentNote')
           // Find next sibling
           cy.get('@currentNote')
             .parents('li')

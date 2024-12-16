@@ -10,40 +10,35 @@
   </button>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
+import { defineProps } from "vue"
 import SvgAssociation from "@/components/svgs/SvgAssociation.vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import nonBlockingPopup from "@/managedApi/window/nonBlockingPopup"
-import { defineComponent } from "vue"
 
-export default defineComponent({
-  setup() {
-    return useLoadingApi()
-  },
-  props: {
-    wikidataId: { type: String, required: true },
-  },
-  components: {
-    SvgAssociation,
-  },
-  methods: {
-    onClickWikidata() {
-      nonBlockingPopup(this.wikiUrl())
-    },
-    async wikiUrl() {
-      const wikipediaEnglishUrl = await this.getWikidataItem()
-      if (wikipediaEnglishUrl !== "") {
-        return wikipediaEnglishUrl
-      }
-      return `https://www.wikidata.org/wiki/${this.wikidataId}`
-    },
-    async getWikidataItem() {
-      return (
-        await this.managedApi.restWikidataController.fetchWikidataEntityDataById(
-          this.wikidataId
-        )
-      ).WikipediaEnglishUrl
-    },
-  },
-})
+const props = defineProps<{
+  wikidataId: string
+}>()
+
+const { managedApi } = useLoadingApi()
+
+const getWikidataItem = async () => {
+  return (
+    await managedApi.restWikidataController.fetchWikidataEntityDataById(
+      props.wikidataId
+    )
+  ).WikipediaEnglishUrl
+}
+
+const wikiUrl = async () => {
+  const wikipediaEnglishUrl = await getWikidataItem()
+  if (wikipediaEnglishUrl !== "") {
+    return wikipediaEnglishUrl
+  }
+  return `https://www.wikidata.org/wiki/${props.wikidataId}`
+}
+
+const onClickWikidata = () => {
+  nonBlockingPopup(wikiUrl())
+}
 </script>

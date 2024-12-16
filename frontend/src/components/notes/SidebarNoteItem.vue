@@ -14,7 +14,7 @@
     @dragend="onDragEnd"
   >
     <div
-      class="daisy-flex daisy-w-full daisy-justify-between daisy-items-start daisy-note-content"
+      class="daisy-flex daisy-w-full daisy-justify-between daisy-items-start note-content"
       @click="toggleChildren(noteRealm.id)"
     >
       <NoteTitleWithLink

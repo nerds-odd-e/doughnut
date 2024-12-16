@@ -1,5 +1,5 @@
 <template>
-  <a
+  <button
     :class="`daisy-btn daisy-btn-ghost daisy-btn-sm ${btnClass ?? ''}`"
     :aria-label="ariaLabel"
     role="button"
@@ -10,7 +10,7 @@
     <template v-if="!$slots.button_face">
       {{ title }}
     </template>
-  </a>
+  </button>
   <Modal v-if="show" :sidebar="sidebar" @close_request="closeDialog">
     <template #body>
       <slot name="default" :closer="closeDialog" />
