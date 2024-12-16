@@ -14,7 +14,6 @@
           <template #default="{ notebook }">
             <NotebookButtons
               v-bind="{ notebook, user }"
-              class="card-header-btn"
             />
           </template>
         </NotebookCardsWithButtons>

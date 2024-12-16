@@ -6,7 +6,7 @@
     <main>
       <NotebookCardsWithButtons v-if="notebooks" :notebooks="notebooks">
         <template #default="{ notebook }">
-          <NotebookButtons v-bind="{ notebook, user }" class="card-header-btn" />
+          <NotebookButtons v-bind="{ notebook, user }" />
         </template>
       </NotebookCardsWithButtons>
     </main>
