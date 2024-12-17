@@ -39,6 +39,7 @@ defineEmits(["resume", "showMore"])
   background-color: gray;
   height: 25px;
   border-radius: 10px;
+  position: relative;
 
   &.thin {
     height: 5px;
@@ -52,6 +53,10 @@ defineEmits(["resume", "showMore"])
 .progress {
   background-color: blue;
   height: 100%;
+
+  &.secondary {
+    background-color: #4CAF50;
+  }
 }
 
 .progress-text {

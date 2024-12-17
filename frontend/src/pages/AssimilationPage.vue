@@ -6,11 +6,11 @@
           :title="`Daily Progress: ${assimilatedCountOfTheDay || 0} completed out of ${plannedForTheDay} planned for today`"
           @click="showTooltip = true"
         >
-          <span
+          <div
             class="progress"
             :style="`width: ${(assimilatedCountOfTheDay || 0) * 100 / plannedForTheDay}%`"
           >
-          </span>
+          </div>
           <span class="progress-text">
             Assimilating: {{ assimilatedCountOfTheDay || 0 }}/{{ plannedForTheDay }}
           </span>
