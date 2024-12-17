@@ -1,3 +1,4 @@
+import "vitest-fetch-mock"
 import type { ApiStatus } from "@/managedApi/ManagedApi"
 import ManagedApi from "@/managedApi/ManagedApi"
 
