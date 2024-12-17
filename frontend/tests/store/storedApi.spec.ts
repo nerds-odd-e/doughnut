@@ -1,32 +1,28 @@
-import "vitest-fetch-mock"
-import ManagedApi from "@/managedApi/ManagedApi"
 import type { Router } from "vue-router"
 import createNoteStorage from "@/store/createNoteStorage"
 import makeMe from "@tests/fixtures/makeMe"
-
-beforeEach(() => {
-  fetchMock.resetMocks()
-})
+import helper from "@tests/helpers"
 
 describe("storedApiCollection", () => {
   const note = makeMe.aNoteRealm.please()
-  const history = createNoteStorage(new ManagedApi({ states: [], errors: [] }))
+  const managedApi = helper.managedApi
+  const storageAccessor = createNoteStorage(managedApi)
   const routerReplace = vitest.fn()
   const router = { replace: routerReplace } as unknown as Router
-  const sa = history.storedApi()
+  const sa = storageAccessor.storedApi()
 
   describe("delete note", () => {
+    let deleteNote
+
     beforeEach(() => {
-      fetchMock.mockResponseOnce(JSON.stringify({}))
+      deleteNote = vi.fn().mockResolvedValue(note)
+      managedApi.restNoteController.deleteNote = deleteNote
     })
 
     it("should call the api", async () => {
       await sa.deleteNote(router, note.id)
-      expect(fetch).toHaveBeenCalledTimes(1)
-      expect(fetch).toHaveBeenCalledWith(
-        `/api/notes/${note.id}/delete`,
-        expect.anything()
-      )
+      expect(deleteNote).toHaveBeenCalledTimes(1)
+      expect(deleteNote).toHaveBeenCalledWith(note.id)
       expect(routerReplace).toHaveBeenCalledTimes(1)
     })
   })
