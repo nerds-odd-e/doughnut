@@ -29,10 +29,12 @@ describe("storedApiCollection", () => {
 
   describe("completeDetails", () => {
     let updateNoteDetails
+    let noteRef
 
     beforeEach(() => {
       updateNoteDetails = vi.fn().mockResolvedValue(note)
       managedApi.restTextContentController.updateNoteDetails = updateNoteDetails
+      noteRef = storageAccessor.refOfNoteRealm(note.id)
     })
 
     it("should do nothing when no completion value is provided", async () => {
@@ -41,10 +43,7 @@ describe("storedApiCollection", () => {
     })
 
     it("should update note details with completion", async () => {
-      const existingNote = { ...note, note: { details: "Hello " } }
-      storageAccessor.refOfNoteRealm = vi
-        .fn()
-        .mockReturnValue({ value: existingNote })
+      noteRef.value = { ...note, note: { details: "Hello " } }
 
       await sa.completeDetails(note.id, {
         completion: "world!",
@@ -57,10 +56,7 @@ describe("storedApiCollection", () => {
     })
 
     it("should delete characters before adding completion", async () => {
-      const existingNote = { ...note, note: { details: "Hello world" } }
-      storageAccessor.refOfNoteRealm = vi
-        .fn()
-        .mockReturnValue({ value: existingNote })
+      noteRef.value = { ...note, note: { details: "Hello world" } }
 
       await sa.completeDetails(note.id, {
         completion: "!",
