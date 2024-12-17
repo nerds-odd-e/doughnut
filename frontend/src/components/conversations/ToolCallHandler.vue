@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue"
+import { computed, ref } from "vue"
 import type {
   NoteDetailsCompletion,
   Note,
@@ -41,7 +41,6 @@ interface Suggestion {
 
 const props = defineProps<{
   suggestion?: Suggestion
-  isProcessing: boolean
   note?: Note
   storageAccessor?: StorageAccessor
 }>()
@@ -50,6 +49,8 @@ const emit = defineEmits<{
   (e: "resolved", result: ToolCallResult): void
   (e: "rejected", error: Error): void
 }>()
+
+const isProcessing = ref(false)
 
 const suggestionTitle = computed(() => {
   switch (props.suggestion?.suggestionType) {
@@ -115,28 +116,28 @@ const handleAccept = async () => {
   if (!props.suggestion || !props.note || !props.storageAccessor) return
 
   try {
+    isProcessing.value = true
     switch (props.suggestion.suggestionType) {
-      case "completion":
+      case "completion": {
+        const content = props.suggestion.content as NoteDetailsCompletion
         await props.storageAccessor
           .storedApi()
-          .completeDetails(
-            props.note.id,
-            props.suggestion.content as NoteDetailsCompletion
-          )
+          .completeDetails(props.note.id, content)
         break
-      case "title":
+      }
+      case "title": {
+        const content = props.suggestion.content as string
         await props.storageAccessor
           .storedApi()
-          .updateTextField(
-            props.note.id,
-            "edit title",
-            props.suggestion.content as string
-          )
+          .updateTextField(props.note.id, "edit title", content)
         break
+      }
     }
     emit("resolved", { status: "accepted" })
   } catch (error) {
     emit("rejected", error as Error)
+  } finally {
+    isProcessing.value = false
   }
 }
 

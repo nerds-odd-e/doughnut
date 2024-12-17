@@ -14,7 +14,6 @@
     </div>
     <ToolCallHandler
       :suggestion="currentSuggestion"
-      :isProcessing="isProcessingToolCall"
       :note="currentNote"
       :storageAccessor="storageAccessor"
       @resolved="handleToolCallResolved"
@@ -70,8 +69,6 @@ const lastErrorMessage = ref<string | undefined>()
 
 const aiStatus = ref<string | undefined>()
 
-const isProcessingToolCall = ref(false)
-
 const toolCallResolver = ref<{
   resolve: (result: ToolCallResult) => void
   reject: (error: Error) => void
@@ -120,24 +117,14 @@ const clearToolCallState = () => {
   currentSuggestion.value = undefined
 }
 
-const handleToolCallResolved = async (result: ToolCallResult) => {
-  try {
-    isProcessingToolCall.value = true
-    toolCallResolver.value?.resolve(result)
-    clearToolCallState()
-  } finally {
-    isProcessingToolCall.value = false
-  }
+const handleToolCallResolved = (result: ToolCallResult) => {
+  toolCallResolver.value?.resolve(result)
+  clearToolCallState()
 }
 
-const handleToolCallRejected = async (error: Error) => {
-  try {
-    isProcessingToolCall.value = true
-    toolCallResolver.value?.reject(error)
-    clearToolCallState()
-  } finally {
-    isProcessingToolCall.value = false
-  }
+const handleToolCallRejected = (error: Error) => {
+  toolCallResolver.value?.reject(error)
+  clearToolCallState()
 }
 
 const currentNote = computed(
