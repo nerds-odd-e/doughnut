@@ -72,15 +72,6 @@ const aiStatus = ref<string | undefined>()
 
 const isProcessingToolCall = ref(false)
 
-const pendingToolCall = ref<
-  | {
-      threadId: string
-      runId: string
-      toolCallId: string
-    }
-  | undefined
->()
-
 const toolCallResolver = ref<{
   resolve: (result: ToolCallResult) => void
   reject: (error: Error) => void
@@ -118,18 +109,13 @@ const createAiActionContext = (): AiActionContext => ({
   },
   async handleSuggestion(suggestion: Suggestion) {
     currentSuggestion.value = suggestion
-    return createToolCallPromise()
+    return new Promise<ToolCallResult>((resolve, reject) => {
+      toolCallResolver.value = { resolve, reject }
+    })
   },
 })
 
-const createToolCallPromise = () => {
-  return new Promise<ToolCallResult>((resolve, reject) => {
-    toolCallResolver.value = { resolve, reject }
-  })
-}
-
 const clearToolCallState = () => {
-  pendingToolCall.value = undefined
   toolCallResolver.value = null
   currentSuggestion.value = undefined
 }
