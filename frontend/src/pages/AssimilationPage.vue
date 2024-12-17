@@ -1,8 +1,7 @@
 <template>
-    <div class="daisy-flex-grow">
       <div class="progress-container">
-        <span
-          :class="`progress-bar ${false ? 'thin' : ''}`"
+        <div
+          :class="`daisy-progress-bar ${false ? 'thin' : ''}`"
           v-if="remainingInitialReviewCountForToday !== null"
           :title="`Daily Progress: ${assimilatedCountOfTheDay || 0} completed out of ${plannedForTheDay} planned for today`"
           @click="showTooltip = true"
@@ -15,9 +14,9 @@
           <span class="progress-text">
             Assimilating: {{ assimilatedCountOfTheDay || 0 }}/{{ plannedForTheDay }}
           </span>
-        </span>
-        <span
-          class="progress-bar thin"
+        </div>
+        <div
+          class="daisy-progress-bar thin"
           v-if="totalUnassimilatedCount !== undefined"
           :title="`Total Progress: ${assimilatedCountOfTheDay || 0} completed out of ${totalPlannedCount} total notes to assimilate`"
           @click="showTooltip = true"
@@ -30,7 +29,7 @@
           <span class="progress-text">
             Total: {{ assimilatedCountOfTheDay || 0 }}/{{ totalPlannedCount }}
           </span>
-        </span>
+        </div>
 
         <!-- Popup tooltip -->
         <div v-if="showTooltip" class="tooltip-popup" @click="showTooltip = false">
@@ -40,7 +39,6 @@
           </div>
         </div>
       </div>
-    </div>
   <ContainerPage v-bind="{ contentLoaded: notes !== undefined }">
     <div v-if="notes?.length === 0" class="text-center py-8">
       <TeleportToHeadStatus>
@@ -138,7 +136,7 @@ const showTooltip = ref(false)
   position: relative;
 }
 
-.progress-bar {
+.daisy-progress-bar {
   width: 100%;
   background-color: gray;
   height: 25px;

@@ -4,8 +4,8 @@
       <slot name="buttons" />
     </div>
     <div class="daisy-flex-grow" @click.prevent="$emit('showMore')">
-      <span
-        :class="`progress-bar ${!!$slots.default ? 'thin' : ''}`"
+      <div
+        :class="`daisy-progress-bar ${!!$slots.default ? 'thin' : ''}`"
         v-if="toRepeatCount !== null"
       >
         <span
@@ -16,7 +16,7 @@
         <span class="progress-text">
           {{ title }}{{ finished }}/{{ finished + toRepeatCount }}
         </span>
-      </span>
+      </div>
     </div>
   </TeleportToHeadStatus>
 </template>
@@ -34,12 +34,11 @@ defineEmits(["resume", "showMore"])
 </script>
 
 <style lang="scss" scoped>
-.progress-bar {
+.daisy-progress-bar {
   width: 100%;
   background-color: gray;
   height: 25px;
   border-radius: 10px;
-  position: relative;
 
   &.thin {
     height: 5px;
