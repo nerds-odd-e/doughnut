@@ -86,6 +86,8 @@ const toolCallResolver = ref<{
   reject: (error: Error) => void
 } | null>(null)
 
+const currentSuggestion = ref<Suggestion | undefined>()
+
 const scrollIndex = computed(
   () =>
     (currentAiReply.value ? currentAiReply.value.length : 0) +
@@ -100,8 +102,6 @@ watch(
     emit("scroll-to", scrollIndex)
   }
 )
-
-const currentSuggestion = ref<Suggestion | undefined>()
 
 const createAiActionContext = (): AiActionContext => ({
   set(text: string) {
@@ -118,6 +118,7 @@ const createAiActionContext = (): AiActionContext => ({
   },
   async handleSuggestion(suggestion: Suggestion) {
     currentSuggestion.value = suggestion
+    console.log("currentSuggestion", currentSuggestion.value)
     return createToolCallPromise()
   },
 })
