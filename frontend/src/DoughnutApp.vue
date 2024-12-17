@@ -102,7 +102,7 @@ onMounted(async () => {
 </template>
 
 <style scoped lang="scss">
-$main-menu-width: 64px;
+$main-menu-width: 70px;
 $main-menu-height-tablet: 70px;
 $main-menu-height-mobile: 55px;
 $global-bar-height: 51px;

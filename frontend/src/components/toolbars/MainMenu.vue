@@ -172,6 +172,13 @@ const logout = async () => {
   width: 100%;
   display: flex;
   justify-content: center;
+  align-items: center;
+
+  :deep(.navigation-item) {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
 
   .label {
     font-size: 0.8rem;

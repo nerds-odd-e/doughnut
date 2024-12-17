@@ -46,7 +46,7 @@ Given("I'm on the login page", () => {
 When('I identify myself as a new user', () => {
   cy.get('#username').type('user')
   cy.get('#password').type('password')
-  cy.get('form.form-signin').submit()
+  cy.get('form').submit()
 })
 
 When('I should be asked to create my profile', () => {
@@ -115,7 +115,7 @@ Then(
   (username: string, expectation: string) => {
     cy.get('#username').type(username)
     cy.get('#password').type('password')
-    cy.get('form.form-signin').submit()
+    cy.get('form').submit()
     start.assumeNotePage(expectation)
   }
 )
