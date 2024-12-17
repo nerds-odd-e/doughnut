@@ -8,26 +8,18 @@
     />
   </div>
 
-  <div v-if="completionSuggestion" class="daisy-flex daisy-mb-3">
+  <div v-if="currentSuggestion" class="daisy-flex daisy-mb-3">
     <div class="message-avatar daisy-me-2" title="AI Assistant">
       <SvgRobot />
     </div>
-    <AcceptRejectButtons
-      :disabled="isProcessingToolCall"
-      @accept="handleAcceptCompletion"
-      @cancel="handleCancellation"
-      @skip="handleSkip"
-    >
-      <template #title>
-        Suggested completion:
-      </template>
-      <template #content>
-        <div
-          class="completion-text"
-          v-html="markdowntToHtml(formattedCompletionSuggestion)"
-        />
-      </template>
-    </AcceptRejectButtons>
+    <ToolCallHandler
+      :suggestion="currentSuggestion"
+      :isProcessing="isProcessingToolCall"
+      :note="currentNote"
+      :storageAccessor="storageAccessor"
+      @resolved="handleToolCallResolved"
+      @rejected="handleToolCallRejected"
+    />
   </div>
 
   <div v-if="lastErrorMessage" class="last-error-message daisy-text-danger daisy-mb-3">
@@ -40,46 +32,6 @@
     </div>
     <small class="daisy-text-secondary">{{ aiStatus }}</small>
   </div>
-
-  <div v-if="topicTitleSuggestion" class="daisy-flex daisy-mb-3">
-    <div class="message-avatar daisy-me-2" title="AI Assistant">
-      <SvgRobot />
-    </div>
-    <AcceptRejectButtons
-      :disabled="isProcessingToolCall"
-      @accept="handleAcceptTitle"
-      @cancel="handleCancellation"
-      @skip="handleSkip"
-    >
-      <template #title>
-        Suggested title:
-      </template>
-      <template #content>
-        <div class="title-suggestion">{{ topicTitleSuggestion }}</div>
-      </template>
-    </AcceptRejectButtons>
-  </div>
-
-  <div v-if="unknownRequestSuggestion" class="daisy-flex daisy-mb-3">
-    <div class="message-avatar daisy-me-2" title="AI Assistant">
-      <SvgRobot />
-    </div>
-    <AcceptRejectButtons
-      :disabled="isProcessingToolCall"
-      @cancel="handleCancellation"
-      @skip="handleSkip"
-      :hideAccept="true"
-    >
-      <template #title>
-        Unknown tool call: {{ unknownRequestSuggestion.functionName }}
-      </template>
-      <template #content>
-        <div class="unknown-request">
-          <pre>{{ unknownRequestSuggestion.rawJson }}</pre>
-        </div>
-      </template>
-    </AcceptRejectButtons>
-  </div>
 </template>
 
 <script setup lang="ts">
@@ -87,7 +39,6 @@ import { ref, computed, watch } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type {
   Conversation,
-  Note,
   NoteDetailsCompletion,
   ToolCallResult,
 } from "@/generated/backend"
@@ -98,7 +49,7 @@ import {
   createAiReplyStates,
   type AiActionContext,
 } from "@/models/aiReplyState"
-import AcceptRejectButtons from "@/components/commons/AcceptRejectButtons.vue"
+import ToolCallHandler from "./ToolCallHandler.vue"
 
 const { conversation, storageAccessor, aiReplyTrigger } = defineProps<{
   conversation: Conversation
@@ -211,68 +162,52 @@ const clearToolCallState = () => {
   toolCallResolver.value = null
 }
 
-const handleToolCallAccept = async (action: (note: Note) => Promise<void>) => {
-  if (!pendingToolCall.value || isProcessingToolCall.value) return
-
-  try {
-    isProcessingToolCall.value = true
-    const note =
-      conversation.subject?.note || conversation.subject?.answeredQuestion?.note
-    if (!note) {
-      console.error("No note found in conversation")
-      return
-    }
-
-    await action(note)
-    toolCallResolver.value?.resolve({ status: "accepted" })
-    clearToolCallState()
-  } finally {
-    isProcessingToolCall.value = false
-  }
+const handleToolCallResolved = (result: ToolCallResult) => {
+  toolCallResolver.value?.resolve(result)
+  clearToolCallState()
   emit("ai-response-done")
 }
 
-const handleCancellation = async () => {
-  if (!pendingToolCall.value || isProcessingToolCall.value) return
+const handleToolCallRejected = (error: Error) => {
+  toolCallResolver.value?.reject(error)
+  clearToolCallState()
+}
 
-  try {
-    isProcessingToolCall.value = true
-    toolCallResolver.value?.reject(new Error("Tool call was rejected"))
-    clearToolCallState()
-  } finally {
-    isProcessingToolCall.value = false
+const currentNote = computed(
+  () =>
+    conversation.subject?.note || conversation.subject?.answeredQuestion?.note
+)
+
+const currentSuggestion = computed(() => {
+  if (completionSuggestion.value && pendingToolCall.value) {
+    return {
+      suggestionType: "completion" as const,
+      content: completionSuggestion.value,
+      threadId: pendingToolCall.value.threadId,
+      runId: pendingToolCall.value.runId,
+      toolCallId: pendingToolCall.value.toolCallId,
+    }
   }
-}
-
-const handleAcceptCompletion = () => {
-  if (!completionSuggestion.value) return
-  return handleToolCallAccept(async (note) => {
-    await storageAccessor
-      .storedApi()
-      .completeDetails(note.id, completionSuggestion.value!)
-  })
-}
-
-const handleAcceptTitle = () => {
-  if (!topicTitleSuggestion.value) return
-  return handleToolCallAccept(async (note) => {
-    await storageAccessor
-      .storedApi()
-      .updateTextField(note.id, "edit title", topicTitleSuggestion.value!)
-  })
-}
-
-const handleSkip = async () => {
-  if (!pendingToolCall.value || isProcessingToolCall.value) return
-
-  try {
-    isProcessingToolCall.value = true
-    toolCallResolver.value?.resolve({ status: "skipped" })
-    clearToolCallState()
-  } finally {
-    isProcessingToolCall.value = false
+  if (topicTitleSuggestion.value && pendingToolCall.value) {
+    return {
+      suggestionType: "title" as const,
+      content: topicTitleSuggestion.value,
+      threadId: pendingToolCall.value.threadId,
+      runId: pendingToolCall.value.runId,
+      toolCallId: pendingToolCall.value.toolCallId,
+    }
   }
-}
+  if (unknownRequestSuggestion.value && pendingToolCall.value) {
+    return {
+      suggestionType: "unknown" as const,
+      content: unknownRequestSuggestion.value,
+      threadId: pendingToolCall.value.threadId,
+      runId: pendingToolCall.value.runId,
+      toolCallId: pendingToolCall.value.toolCallId,
+    }
+  }
+  return undefined
+})
 
 const getAiReply = async () => {
   const states = createAiReplyStates(
@@ -307,25 +242,6 @@ watch(
     await getAiReply()
   }
 )
-
-const formattedCompletionSuggestion = computed(() => {
-  if (!completionSuggestion.value) return ""
-  const currentDetails = conversation.subject?.note?.details?.trim() || ""
-  const { completion, deleteFromEnd } = completionSuggestion.value
-
-  if (!currentDetails) return completion
-
-  if (!deleteFromEnd) return `...${completion}`
-
-  // Get the text to be deleted (last N characters)
-  const textToDelete = currentDetails.slice(-deleteFromEnd) || currentDetails
-
-  // Replace spaces and newlines with placeholder characters
-  const strikeThroughText = textToDelete.replace(/ /g, "·").replace(/\n/g, "↵")
-
-  // Format with markdown strikethrough using the placeholder
-  return `~~${strikeThroughText}~~${completion}`
-})
 
 defineExpose({
   getAiReply,

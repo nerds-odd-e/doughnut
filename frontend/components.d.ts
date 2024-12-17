@@ -237,6 +237,7 @@ declare module 'vue' {
     TextInput: typeof import('./src/components/form/TextInput.vue')['default']
     Tool: typeof import('./src/components/svgs/link_types/Tool.vue')['default']
     ToolbarOver: typeof import('./src/components/commons/ToolbarOver.vue')['default']
+    ToolCallHandler: typeof import('./src/components/conversations/ToolCallHandler.vue')['default']
     UrlFormBody: typeof import('./src/components/notes/accessory/UrlFormBody.vue')['default']
     UserProfileDialog: typeof import('./src/components/toolbars/UserProfileDialog.vue')['default']
     Waveform: typeof import('./src/components/notes/accessory/Waveform.vue')['default']
