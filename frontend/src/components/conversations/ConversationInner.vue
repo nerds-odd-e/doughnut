@@ -185,17 +185,6 @@ const showDefaultMessages = computed(() => {
   font-family: inherit;
 }
 
-.completion-text {
-  font-style: italic;
-  color: var(--daisy-base-content/60);
-}
-
-.title-suggestion {
-  font-style: italic;
-  color: var(--daisy-base-content/60);
-  font-weight: bold;
-}
-
 .unknown-request {
   font-family: monospace;
   @apply daisy-bg-base-200;
