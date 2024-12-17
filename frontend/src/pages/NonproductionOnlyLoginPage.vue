@@ -10,9 +10,9 @@
     {{ errorMessage }}
   </div>
 
-  <div class="vh-100 d-flex justify-content-center align-items-center">
-    <form @submit.prevent="handleSubmit" class="text-center form-signin">
-      <div class="mb-3">
+  <div class="daisy-min-h-screen daisy-flex daisy-justify-center daisy-items-center">
+    <form @submit.prevent="handleSubmit" class="daisy-text-center">
+      <div class="daisy-form-control daisy-mb-4">
         <label for="username" class="daisy-label">Username</label>
         <input
           type="text"
@@ -22,7 +22,7 @@
           required
         />
       </div>
-      <div class="mb-3">
+      <div class="daisy-form-control daisy-mb-4">
         <label for="password" class="daisy-label">Password</label>
         <input
           type="password"

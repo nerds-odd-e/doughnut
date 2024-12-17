@@ -2,8 +2,9 @@
 
 ## Use DaisyUI
 
-Many places in the current design are using Bootstrap and custom CSS. But we are gradually converting to DaisyUI, and make custom CSS as less as possible. At least, the custom CSS should be netural and compatible with the themes.
-
-* Use "daisy-*" prefix for the classes.
+* Use DaisyUI and tailwind
+* Use "daisy-*" prefix for the DaisyUI classes, e.g. `daisy-btn`, `daisy-alert`, `daisy-tab`, etc.
+* Do not use bootstrap classes.
+* Choose classes that are neutral and compatible with the themes. Avoid using arbitrary colors.
 
 

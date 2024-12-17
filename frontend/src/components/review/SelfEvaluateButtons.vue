@@ -66,10 +66,10 @@ export default defineComponent({
   content: "";
   background-color: red;
   width: v-bind(loadingWidth);
-  height: 100%;
+  height: 2px;
   top: 0;
   right: 0;
-  position: absolute;
+  position:relative;
   opacity: 0.5;
 }
 </style>
