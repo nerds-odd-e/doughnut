@@ -139,7 +139,6 @@ const handleToolCallResolved = async (result: ToolCallResult) => {
     isProcessingToolCall.value = true
     toolCallResolver.value?.resolve(result)
     clearToolCallState()
-    emit("ai-response-done")
   } finally {
     isProcessingToolCall.value = false
   }
