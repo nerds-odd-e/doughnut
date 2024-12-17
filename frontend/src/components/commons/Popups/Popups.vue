@@ -19,7 +19,7 @@
 
     <Modal
       v-if="popupInfo.type === 'confirm'"
-      class="popups"
+      class="popups daisy-z-[9998]"
       :isPopup="true"
       @close_request="resolve(false)"
     >
@@ -77,9 +77,3 @@ export default defineComponent({
   },
 })
 </script>
-
-<style lang="scss" scoped>
-.popups {
-  z-index: 9998;
-}
-</style>

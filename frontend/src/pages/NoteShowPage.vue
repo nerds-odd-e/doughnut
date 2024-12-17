@@ -23,7 +23,10 @@
         }"
       >
         <template #note-conversation="{ noteRealm }">
-          <div class="conversation-wrapper" v-if="Boolean(route.query.conversation)">
+          <div
+            v-if="Boolean(route.query.conversation)"
+            class="conversation-wrapper daisy-border-t daisy-border-base-200 daisy-flex-1 daisy-flex daisy-flex-col daisy-bg-base-100/50"
+          >
             <NoteConversation
               :note-id="noteRealm.id"
               :storage-accessor="storageAccessor"
@@ -123,13 +126,5 @@ aside {
       display: none;
     }
   }
-}
-
-.conversation-wrapper {
-  border-top: 1px solid #e9ecef;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  background-color: #f8f9fa;
 }
 </style>
