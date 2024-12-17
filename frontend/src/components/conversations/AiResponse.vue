@@ -118,7 +118,6 @@ const createAiActionContext = (): AiActionContext => ({
   },
   async handleSuggestion(suggestion: Suggestion) {
     currentSuggestion.value = suggestion
-    console.log("currentSuggestion", currentSuggestion.value)
     return createToolCallPromise()
   },
 })
