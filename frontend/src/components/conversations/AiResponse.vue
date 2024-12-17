@@ -135,15 +135,25 @@ const clearToolCallState = () => {
   currentSuggestion.value = undefined
 }
 
-const handleToolCallResolved = (result: ToolCallResult) => {
-  toolCallResolver.value?.resolve(result)
-  clearToolCallState()
-  emit("ai-response-done")
+const handleToolCallResolved = async (result: ToolCallResult) => {
+  try {
+    isProcessingToolCall.value = true
+    toolCallResolver.value?.resolve(result)
+    clearToolCallState()
+    emit("ai-response-done")
+  } finally {
+    isProcessingToolCall.value = false
+  }
 }
 
-const handleToolCallRejected = (error: Error) => {
-  toolCallResolver.value?.reject(error)
-  clearToolCallState()
+const handleToolCallRejected = async (error: Error) => {
+  try {
+    isProcessingToolCall.value = true
+    toolCallResolver.value?.reject(error)
+    clearToolCallState()
+  } finally {
+    isProcessingToolCall.value = false
+  }
 }
 
 const currentNote = computed(
