@@ -37,11 +37,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import type {
-  Conversation,
-  NoteDetailsCompletion,
-  ToolCallResult,
-} from "@/generated/backend"
+import type { Conversation, ToolCallResult } from "@/generated/backend"
 import SvgRobot from "@/components/svgs/SvgRobot.vue"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import markdownizer from "../form/markdownizer"
@@ -74,18 +70,6 @@ const lastErrorMessage = ref<string | undefined>()
 
 const aiStatus = ref<string | undefined>()
 
-const completionSuggestion = ref<NoteDetailsCompletion | undefined>()
-
-const topicTitleSuggestion = ref<string | undefined>()
-
-const unknownRequestSuggestion = ref<
-  | {
-      rawJson: string
-      functionName: string
-    }
-  | undefined
->()
-
 const isProcessingToolCall = ref(false)
 
 const pendingToolCall = ref<
@@ -105,11 +89,9 @@ const toolCallResolver = ref<{
 const scrollIndex = computed(
   () =>
     (currentAiReply.value ? currentAiReply.value.length : 0) +
-    (completionSuggestion.value ? 1 : 0) +
     (lastErrorMessage.value ? 1 : 0) +
     (aiStatus.value ? 1 : 0) +
-    (topicTitleSuggestion.value ? 1 : 0) +
-    (unknownRequestSuggestion.value ? 1 : 0)
+    (currentSuggestion.value ? 1 : 0)
 )
 
 watch(
@@ -147,9 +129,6 @@ const createToolCallPromise = () => {
 }
 
 const clearToolCallState = () => {
-  completionSuggestion.value = undefined
-  topicTitleSuggestion.value = undefined
-  unknownRequestSuggestion.value = undefined
   pendingToolCall.value = undefined
   toolCallResolver.value = null
   currentSuggestion.value = undefined
