@@ -139,10 +139,9 @@ export default class StoredApiCollection implements StoredApi {
     )
   }
 
-  private loadNote(noteId: Doughnut.ID) {
-    this.managedApi.restNoteController
-      .show(noteId)
-      .then((noteRealm) => this.storage.refreshNoteRealm(noteRealm))
+  private async loadNote(noteId: Doughnut.ID) {
+    const noteRealm = await this.managedApi.restNoteController.show(noteId)
+    return this.storage.refreshNoteRealm(noteRealm)
   }
 
   getNoteRealmRefAndReloadPosition(noteId: Doughnut.ID) {
@@ -252,7 +251,12 @@ export default class StoredApiCollection implements StoredApi {
 
   async completeDetails(noteId: Doughnut.ID, value?: NoteDetailsCompletion) {
     if (!value) return
-    const currentNote = this.storage.refOfNoteRealm(noteId).value?.note
+
+    let currentNote = this.storage.refOfNoteRealm(noteId).value?.note
+    if (!currentNote) {
+      currentNote = (await this.loadNote(noteId)).note
+    }
+
     const old = currentNote?.details ?? ""
     const deleteCount = Math.min(value.deleteFromEnd ?? 0, old.length)
     const newContent =

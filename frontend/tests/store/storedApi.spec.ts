@@ -29,11 +29,14 @@ describe("storedApiCollection", () => {
 
   describe("completeDetails", () => {
     let updateNoteDetails
+    let showNote
     let noteRef
 
     beforeEach(() => {
       updateNoteDetails = vi.fn().mockResolvedValue(note)
+      showNote = vi.fn().mockResolvedValue(note)
       managedApi.restTextContentController.updateNoteDetails = updateNoteDetails
+      managedApi.restNoteController.show = showNote
       noteRef = storageAccessor.refOfNoteRealm(note.id)
     })
 
@@ -65,6 +68,20 @@ describe("storedApiCollection", () => {
 
       expect(updateNoteDetails).toHaveBeenCalledWith(note.id, {
         details: "Hello !",
+      })
+    })
+
+    it("should load note first if not in storage", async () => {
+      noteRef.value = undefined
+
+      await sa.completeDetails(note.id, {
+        completion: "world!",
+        deleteFromEnd: 0,
+      })
+
+      expect(showNote).toHaveBeenCalledWith(note.id)
+      expect(updateNoteDetails).toHaveBeenCalledWith(note.id, {
+        details: "<p>Desc</p>world!",
       })
     })
   })
