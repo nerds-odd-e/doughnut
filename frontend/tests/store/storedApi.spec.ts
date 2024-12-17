@@ -26,4 +26,50 @@ describe("storedApiCollection", () => {
       expect(routerReplace).toHaveBeenCalledTimes(1)
     })
   })
+
+  describe("completeDetails", () => {
+    let updateNoteDetails
+
+    beforeEach(() => {
+      updateNoteDetails = vi.fn().mockResolvedValue(note)
+      managedApi.restTextContentController.updateNoteDetails = updateNoteDetails
+    })
+
+    it("should do nothing when no completion value is provided", async () => {
+      await sa.completeDetails(note.id)
+      expect(updateNoteDetails).not.toHaveBeenCalled()
+    })
+
+    it("should update note details with completion", async () => {
+      const existingNote = { ...note, note: { details: "Hello " } }
+      storageAccessor.refOfNoteRealm = vi
+        .fn()
+        .mockReturnValue({ value: existingNote })
+
+      await sa.completeDetails(note.id, {
+        completion: "world!",
+        deleteFromEnd: 0,
+      })
+
+      expect(updateNoteDetails).toHaveBeenCalledWith(note.id, {
+        details: "Hello world!",
+      })
+    })
+
+    it("should delete characters before adding completion", async () => {
+      const existingNote = { ...note, note: { details: "Hello world" } }
+      storageAccessor.refOfNoteRealm = vi
+        .fn()
+        .mockReturnValue({ value: existingNote })
+
+      await sa.completeDetails(note.id, {
+        completion: "!",
+        deleteFromEnd: 5,
+      })
+
+      expect(updateNoteDetails).toHaveBeenCalledWith(note.id, {
+        details: "Hello !",
+      })
+    })
+  })
 })
