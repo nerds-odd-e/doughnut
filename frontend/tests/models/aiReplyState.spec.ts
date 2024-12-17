@@ -14,9 +14,7 @@ describe("aiReplyState", () => {
     set: vi.fn(),
     append: vi.fn(),
     reset: vi.fn(),
-    appendNoteDetails: vi.fn(),
-    setTopicTitle: vi.fn(),
-    unknownRequest: vi.fn(),
+    handleSuggestion: vi.fn(),
   }
 
   const mockAiController = {
@@ -118,8 +116,7 @@ describe("aiReplyState", () => {
     }
 
     beforeEach(() => {
-      mockContext.appendNoteDetails.mockResolvedValue({ status: "accepted" })
-      mockContext.setTopicTitle.mockResolvedValue({ status: "accepted" })
+      mockContext.handleSuggestion.mockResolvedValue({ status: "accepted" })
     })
 
     it("handles single tool call successfully", async () => {
@@ -146,12 +143,13 @@ describe("aiReplyState", () => {
         JSON.stringify(run)
       )
 
-      expect(mockContext.appendNoteDetails).toHaveBeenCalledWith(
-        { completion: "test content" },
-        "thread-123",
-        "run-123",
-        "call-1"
-      )
+      expect(mockContext.handleSuggestion).toHaveBeenCalledWith({
+        suggestionType: "completion",
+        content: { completion: "test content" },
+        threadId: "thread-123",
+        runId: "run-123",
+        toolCallId: "call-1",
+      })
       expect(mockAiController.submitToolCallsResult).toHaveBeenCalledWith(
         "thread-123",
         "run-123",
@@ -190,18 +188,20 @@ describe("aiReplyState", () => {
         JSON.stringify(run)
       )
 
-      expect(mockContext.appendNoteDetails).toHaveBeenCalledWith(
-        { completion: "test content" },
-        "thread-123",
-        "run-123",
-        "call-1"
-      )
-      expect(mockContext.setTopicTitle).toHaveBeenCalledWith(
-        "test title",
-        "thread-123",
-        "run-123",
-        "call-2"
-      )
+      expect(mockContext.handleSuggestion).toHaveBeenCalledWith({
+        suggestionType: "completion",
+        content: { completion: "test content" },
+        threadId: "thread-123",
+        runId: "run-123",
+        toolCallId: "call-1",
+      })
+      expect(mockContext.handleSuggestion).toHaveBeenCalledWith({
+        suggestionType: "title",
+        content: "test title",
+        threadId: "thread-123",
+        runId: "run-123",
+        toolCallId: "call-2",
+      })
       expect(mockAiController.submitToolCallsResult).toHaveBeenCalledWith(
         "thread-123",
         "run-123",
@@ -226,19 +226,12 @@ describe("aiReplyState", () => {
                   arguments: JSON.stringify({ completion: "test content" }),
                 },
               },
-              {
-                id: "call-2",
-                function: {
-                  name: DummyForGeneratingTypes.aiToolName.SUGGEST_NOTE_TITLE,
-                  arguments: JSON.stringify({ newTitle: "test title" }),
-                },
-              },
             ],
           },
         },
       }
 
-      mockContext.setTopicTitle.mockRejectedValue(
+      mockContext.handleSuggestion.mockRejectedValue(
         new Error("Tool call was rejected")
       )
 
@@ -254,7 +247,7 @@ describe("aiReplyState", () => {
       expect(mockAiController.submitToolCallsResult).not.toHaveBeenCalled()
     })
 
-    it("handles unknown tool call through unknownRequest", async () => {
+    it("handles unknown tool call through handleSuggestion", async () => {
       const unknownToolName = "unknown_tool"
       const unknownToolArgs = { test: "data" }
       const run = {
@@ -274,20 +267,23 @@ describe("aiReplyState", () => {
         },
       }
 
-      mockContext.unknownRequest.mockResolvedValue({ status: "skipped" })
+      mockContext.handleSuggestion.mockResolvedValue({ status: "skipped" })
 
       const states = createAiReplyStates(mockContext, mockAiController)
       await states["thread.run.requires_action"]?.handleEvent(
         JSON.stringify(run)
       )
 
-      expect(mockContext.unknownRequest).toHaveBeenCalledWith(
-        JSON.stringify(unknownToolArgs),
-        unknownToolName,
-        "thread-123",
-        "run-123",
-        "call-1"
-      )
+      expect(mockContext.handleSuggestion).toHaveBeenCalledWith({
+        suggestionType: "unknown",
+        content: {
+          rawJson: JSON.stringify(unknownToolArgs),
+          functionName: unknownToolName,
+        },
+        threadId: "thread-123",
+        runId: "run-123",
+        toolCallId: "call-1",
+      })
       expect(mockAiController.submitToolCallsResult).toHaveBeenCalledWith(
         "thread-123",
         "run-123",

@@ -1,15 +1,14 @@
-import {
-  type Message,
-  type MessageDelta,
-  type Run,
-  type RunStep,
-  type DeltaOfRunStep,
-  type NoteDetailsCompletion,
-  type TitleReplacement,
-  type ToolCallResult,
-  DummyForGeneratingTypes,
+import type {
+  Message,
+  MessageDelta,
+  Run,
+  RunStep,
+  DeltaOfRunStep,
+  ToolCallResult,
 } from "@/generated/backend"
+import { DummyForGeneratingTypes } from "@/generated/backend"
 import type { RestAiControllerService } from "@/generated/backend/services/RestAiControllerService"
+import { createSuggestion } from "./suggestions"
 
 export type AiReplyState = {
   handleEvent: (data: string) => Promise<void>
@@ -20,24 +19,8 @@ export interface AiActionContext {
   set: (text: string) => void
   append: (text: string) => void
   reset: () => Promise<void>
-  appendNoteDetails: (
-    completion: NoteDetailsCompletion,
-    threadId: string,
-    runId: string,
-    toolCallId: string
-  ) => Promise<ToolCallResult>
-  setTopicTitle: (
-    title: string,
-    threadId: string,
-    runId: string,
-    toolCallId: string
-  ) => Promise<ToolCallResult>
-  unknownRequest: (
-    rawJson: string,
-    functionName: string,
-    threadId: string,
-    runId: string,
-    toolCallId: string
+  handleSuggestion: (
+    suggestion: ReturnType<typeof createSuggestion>
   ) => Promise<ToolCallResult>
 }
 
@@ -80,35 +63,38 @@ export const createAiReplyStates = (
               functionName ===
               DummyForGeneratingTypes.aiToolName.COMPLETE_NOTE_DETAILS
             ) {
-              const contentToAppend = JSON.parse(
-                functionArgs
-              ) as NoteDetailsCompletion
-              result = await context.appendNoteDetails(
-                contentToAppend,
-                response.thread_id!,
-                response.id!,
-                toolCall.id!
+              result = await context.handleSuggestion(
+                createSuggestion(
+                  "completion",
+                  JSON.parse(functionArgs),
+                  response.thread_id!,
+                  response.id!,
+                  toolCall.id!
+                )
               )
             } else if (
               functionName ===
               DummyForGeneratingTypes.aiToolName.SUGGEST_NOTE_TITLE
             ) {
-              const titleGeneration = JSON.parse(
-                functionArgs
-              ) as TitleReplacement
-              result = await context.setTopicTitle(
-                titleGeneration.newTitle,
-                response.thread_id!,
-                response.id!,
-                toolCall.id!
+              const { newTitle } = JSON.parse(functionArgs)
+              result = await context.handleSuggestion(
+                createSuggestion(
+                  "title",
+                  newTitle,
+                  response.thread_id!,
+                  response.id!,
+                  toolCall.id!
+                )
               )
             } else {
-              result = await context.unknownRequest(
-                functionArgs,
-                functionName!,
-                response.thread_id!,
-                response.id!,
-                toolCall.id!
+              result = await context.handleSuggestion(
+                createSuggestion(
+                  "unknown",
+                  { rawJson: functionArgs, functionName: functionName! },
+                  response.thread_id!,
+                  response.id!,
+                  toolCall.id!
+                )
               )
             }
 

@@ -50,6 +50,7 @@ import {
   type AiActionContext,
 } from "@/models/aiReplyState"
 import ToolCallHandler from "./ToolCallHandler.vue"
+import { type Suggestion } from "@/models/suggestions"
 
 const { conversation, storageAccessor, aiReplyTrigger } = defineProps<{
   conversation: Conversation
@@ -118,6 +119,8 @@ watch(
   }
 )
 
+const currentSuggestion = ref<Suggestion | undefined>()
+
 const createAiActionContext = (): AiActionContext => ({
   set(text: string) {
     currentAiReply.value = text
@@ -131,19 +134,8 @@ const createAiActionContext = (): AiActionContext => ({
     emit("ai-response-done")
     currentAiReply.value = undefined
   },
-  async appendNoteDetails(completion, threadId, runId, toolCallId) {
-    completionSuggestion.value = completion
-    pendingToolCall.value = { threadId, runId, toolCallId }
-    return createToolCallPromise()
-  },
-  async setTopicTitle(title, threadId, runId, toolCallId) {
-    topicTitleSuggestion.value = title
-    pendingToolCall.value = { threadId, runId, toolCallId }
-    return createToolCallPromise()
-  },
-  async unknownRequest(rawJson, functionName, threadId, runId, toolCallId) {
-    unknownRequestSuggestion.value = { rawJson, functionName }
-    pendingToolCall.value = { threadId, runId, toolCallId }
+  async handleSuggestion(suggestion: Suggestion) {
+    currentSuggestion.value = suggestion
     return createToolCallPromise()
   },
 })
@@ -160,6 +152,7 @@ const clearToolCallState = () => {
   unknownRequestSuggestion.value = undefined
   pendingToolCall.value = undefined
   toolCallResolver.value = null
+  currentSuggestion.value = undefined
 }
 
 const handleToolCallResolved = (result: ToolCallResult) => {
@@ -177,37 +170,6 @@ const currentNote = computed(
   () =>
     conversation.subject?.note || conversation.subject?.answeredQuestion?.note
 )
-
-const currentSuggestion = computed(() => {
-  if (completionSuggestion.value && pendingToolCall.value) {
-    return {
-      suggestionType: "completion" as const,
-      content: completionSuggestion.value,
-      threadId: pendingToolCall.value.threadId,
-      runId: pendingToolCall.value.runId,
-      toolCallId: pendingToolCall.value.toolCallId,
-    }
-  }
-  if (topicTitleSuggestion.value && pendingToolCall.value) {
-    return {
-      suggestionType: "title" as const,
-      content: topicTitleSuggestion.value,
-      threadId: pendingToolCall.value.threadId,
-      runId: pendingToolCall.value.runId,
-      toolCallId: pendingToolCall.value.toolCallId,
-    }
-  }
-  if (unknownRequestSuggestion.value && pendingToolCall.value) {
-    return {
-      suggestionType: "unknown" as const,
-      content: unknownRequestSuggestion.value,
-      threadId: pendingToolCall.value.threadId,
-      runId: pendingToolCall.value.runId,
-      toolCallId: pendingToolCall.value.toolCallId,
-    }
-  }
-  return undefined
-})
 
 const getAiReply = async () => {
   const states = createAiReplyStates(
