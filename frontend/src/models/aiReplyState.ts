@@ -8,7 +8,7 @@ import type {
 } from "@/generated/backend"
 import { DummyForGeneratingTypes } from "@/generated/backend"
 import type { RestAiControllerService } from "@/generated/backend/services/RestAiControllerService"
-import { createSuggestion } from "./suggestions"
+import { type Suggestion } from "./suggestions"
 
 export type AiReplyState = {
   handleEvent: (data: string) => Promise<void>
@@ -19,9 +19,7 @@ export interface AiActionContext {
   set: (text: string) => void
   append: (text: string) => void
   reset: () => Promise<void>
-  handleSuggestion: (
-    suggestion: ReturnType<typeof createSuggestion>
-  ) => Promise<ToolCallResult>
+  handleSuggestion: (suggestion: Suggestion) => Promise<ToolCallResult>
 }
 
 export const createAiReplyStates = (
@@ -63,39 +61,33 @@ export const createAiReplyStates = (
               functionName ===
               DummyForGeneratingTypes.aiToolName.COMPLETE_NOTE_DETAILS
             ) {
-              result = await context.handleSuggestion(
-                createSuggestion(
-                  "completion",
-                  JSON.parse(functionArgs),
-                  response.thread_id!,
-                  response.id!,
-                  toolCall.id!
-                )
-              )
+              result = await context.handleSuggestion({
+                suggestionType: "completion",
+                content: JSON.parse(functionArgs),
+                threadId: response.thread_id!,
+                runId: response.id!,
+                toolCallId: toolCall.id!,
+              })
             } else if (
               functionName ===
               DummyForGeneratingTypes.aiToolName.SUGGEST_NOTE_TITLE
             ) {
               const { newTitle } = JSON.parse(functionArgs)
-              result = await context.handleSuggestion(
-                createSuggestion(
-                  "title",
-                  newTitle,
-                  response.thread_id!,
-                  response.id!,
-                  toolCall.id!
-                )
-              )
+              result = await context.handleSuggestion({
+                suggestionType: "title",
+                content: newTitle,
+                threadId: response.thread_id!,
+                runId: response.id!,
+                toolCallId: toolCall.id!,
+              })
             } else {
-              result = await context.handleSuggestion(
-                createSuggestion(
-                  "unknown",
-                  { rawJson: functionArgs, functionName: functionName! },
-                  response.thread_id!,
-                  response.id!,
-                  toolCall.id!
-                )
-              )
+              result = await context.handleSuggestion({
+                suggestionType: "unknown",
+                content: { rawJson: functionArgs, functionName: functionName! },
+                threadId: response.thread_id!,
+                runId: response.id!,
+                toolCallId: toolCall.id!,
+              })
             }
 
             results[toolCall.id!] = result

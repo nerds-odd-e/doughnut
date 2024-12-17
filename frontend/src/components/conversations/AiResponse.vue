@@ -13,6 +13,7 @@
       <SvgRobot />
     </div>
     <ToolCallHandler
+      v-if="currentSuggestion"
       :suggestion="currentSuggestion"
       :note="currentNote"
       :storageAccessor="storageAccessor"

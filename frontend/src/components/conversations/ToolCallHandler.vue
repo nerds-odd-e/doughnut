@@ -1,6 +1,5 @@
 <template>
   <AcceptRejectButtons
-    v-if="suggestion"
     :disabled="isProcessing"
     @accept="handleAccept"
     @cancel="handleCancel"
@@ -26,21 +25,10 @@ import type {
 import AcceptRejectButtons from "@/components/commons/AcceptRejectButtons.vue"
 import markdownizer from "../form/markdownizer"
 import type { StorageAccessor } from "@/store/createNoteStorage"
-
-interface Suggestion {
-  suggestionType: "completion" | "title" | "unknown"
-  content: {
-    completion: NoteDetailsCompletion
-    title: string
-    unknown: { rawJson: string; functionName: string }
-  }[Suggestion["suggestionType"]]
-  threadId: string
-  runId: string
-  toolCallId: string
-}
+import type { Suggestion } from "@/models/suggestions"
 
 const props = defineProps<{
-  suggestion?: Suggestion
+  suggestion: Suggestion
   note?: Note
   storageAccessor?: StorageAccessor
 }>()
@@ -99,9 +87,7 @@ const formattedContent = computed(() => {
   switch (props.suggestion.suggestionType) {
     case "completion":
       return markdownizer.markdownToHtml(
-        formatCompletionSuggestion(
-          props.suggestion.content as NoteDetailsCompletion
-        )
+        formatCompletionSuggestion(props.suggestion.content)
       )
     case "title":
       return props.suggestion.content
@@ -119,14 +105,14 @@ const handleAccept = async () => {
     isProcessing.value = true
     switch (props.suggestion.suggestionType) {
       case "completion": {
-        const content = props.suggestion.content as NoteDetailsCompletion
+        const content = props.suggestion.content
         await props.storageAccessor
           .storedApi()
           .completeDetails(props.note.id, content)
         break
       }
       case "title": {
-        const content = props.suggestion.content as string
+        const content = props.suggestion.content
         await props.storageAccessor
           .storedApi()
           .updateTextField(props.note.id, "edit title", content)
