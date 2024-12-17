@@ -1,20 +1,20 @@
 <template>
   <div class="sidebar-container daisy-w-full daisy-h-full">
     <div class="daisy-flex daisy-flex-col daisy-h-full">
-      <ul v-if="user" class="list-group daisy-flex-1">
+      <ul v-if="user" class="daisy-menu daisy-w-full daisy-flex-1">
         <template v-if="!isHomePage">
-          <li v-for="item in upperNavItems" role="button" :title="item.label" :key="item.name" class="list-item">
+          <li v-for="item in upperNavItems" role="button" :title="item.label" :key="item.name" class="daisy-menu-item">
             <NavigationItem v-bind="{ ...item }" />
           </li>
         </template>
 
         <template v-if="!isHomePage">
-          <li v-for="item in lowerNavItems" role="button" :title="item.label" :key="item.name" class="list-item">
+          <li v-for="item in lowerNavItems" role="button" :title="item.label" :key="item.name" class="daisy-menu-item">
             <NavigationItem v-bind="{ ...item, to: item.name }" />
           </li>
         </template>
 
-        <li class="list-item">
+        <li class="daisy-menu-item">
           <NavigationItem
             label="Account"
             :icon="SvgMissingAvatar"
@@ -166,17 +166,8 @@ const logout = async () => {
 </script>
 
 <style lang="scss" scoped>
-.list-group {
-  list-style: none;
+.daisy-menu-item {
   padding: 0;
-  margin: 0;
-  width: 100%;
-}
-
-.list-item {
-  border: none;
-  padding: 0.5rem;
-  background: none;
   text-align: center;
   width: 100%;
   display: flex;
@@ -193,18 +184,15 @@ const logout = async () => {
     height: auto;
     display: block;
 
-    .list-group {
+    .daisy-menu {
       flex-direction: row;
       flex-wrap: nowrap;
       justify-content: center;
       gap: 1rem;
     }
 
-    .list-item {
+    .daisy-menu-item {
       width: auto;
-      border: none;
-      padding: 0.5rem;
-      background: none;
     }
   }
 

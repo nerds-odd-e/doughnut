@@ -67,7 +67,7 @@ onMounted(async () => {
 <template>
   <Popups />
   <div class="daisy-flex daisy-h-dvh daisy-bg-base-100 daisy-text-base-content">
-    <div class="main-menu daisy-flex daisy-bg-neutral daisy-text-neutral-content daisy-z-[10000] daisy-p-2">
+    <div class="main-menu daisy-flex daisy-bg-neutral daisy-text-neutral-content daisy-z-[10000]">
       <MainMenu
         :user="user"
         @update-user="user = $event"
