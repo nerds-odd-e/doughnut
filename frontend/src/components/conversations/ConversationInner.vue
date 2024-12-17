@@ -162,7 +162,7 @@ const defaultQuestions = [
 
 const showDefaultMessages = computed(() => {
   return (
-    conversation.subject?.answeredQuestion !== undefined &&
+    conversation.subject?.answeredQuestion &&
     (!currentConversationMessages.value ||
       currentConversationMessages.value.length === 0)
   )
