@@ -56,8 +56,19 @@ public final class OtherAiServices {
 
   public Optional<TextFromAudioWithCallInfo> getTextFromAudio(
       String modelName, String transcriptionFromAudio) {
+    return getTextFromAudio(modelName, transcriptionFromAudio, null);
+  }
+
+  public Optional<TextFromAudioWithCallInfo> getTextFromAudio(
+      String modelName, String transcriptionFromAudio, String additionalInstructions) {
 
     OpenAIChatRequestBuilder chatAboutNoteRequestBuilder = getOpenAIChatRequestBuilder(modelName);
+
+    if (additionalInstructions != null && !additionalInstructions.isEmpty()) {
+      chatAboutNoteRequestBuilder.addSystemMessage(
+          "Additional instruction:\n" + additionalInstructions);
+    }
+
     AiToolList questionEvaluationAiTool =
         AiToolFactory.transcriptionToTextAiTool(transcriptionFromAudio);
     return openAiApiHandler

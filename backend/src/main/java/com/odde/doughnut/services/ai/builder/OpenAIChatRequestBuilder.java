@@ -34,7 +34,8 @@ public class OpenAIChatRequestBuilder {
   }
 
   public OpenAIChatRequestBuilder addTool(AiToolList tool) {
-    tool.addToChat(this);
+    addChatTools(tool.getFunctions().values());
+    addUserMessage(tool.getMessageBody());
     return this;
   }
 

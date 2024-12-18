@@ -23,6 +23,7 @@ import com.odde.doughnut.testability.OpenAIAssistantThreadMocker;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.theokanning.openai.OpenAiError;
 import com.theokanning.openai.OpenAiHttpException;
+import com.theokanning.openai.completion.chat.ChatMessage;
 import io.reactivex.Single;
 import java.io.IOException;
 import okhttp3.RequestBody;
@@ -147,6 +148,49 @@ class RestAiAudioControllerTests {
       assertNotNull(result);
       assertEquals("00:00:09,000", result.getEndTimestamp());
       assertEquals(fullSRT, result.getRawSRT());
+    }
+
+    @Test
+    void shouldIncludeAdditionalInstructions() throws IOException {
+      // Setup
+      audioUploadDTO.setAdditionalProcessingInstructions("Translate to Spanish");
+
+      // Execute
+      controller.audioToText(audioUploadDTO);
+
+      // Verify
+      verify(openAiApi)
+          .createChatCompletion(
+              argThat(
+                  request -> {
+                    assertThat(
+                        request.getMessages().stream()
+                            .filter(m -> "system".equals(m.getRole()))
+                            .findFirst()
+                            .map(ChatMessage::getTextContent)
+                            .orElse(""),
+                        containsString("Additional instruction:\nTranslate to Spanish"));
+                    return true;
+                  }));
+    }
+
+    @Test
+    void shouldWorkWithoutAdditionalInstructions() throws IOException {
+      // Execute
+      controller.audioToText(audioUploadDTO);
+
+      // Verify
+      verify(openAiApi)
+          .createChatCompletion(
+              argThat(
+                  request -> {
+                    boolean hasNoAdditionalInstructions =
+                        request.getMessages().stream()
+                            .filter(m -> "system".equals(m.getRole()))
+                            .noneMatch(m -> m.getTextContent().contains("Additional instruction"));
+                    assertTrue(hasNoAdditionalInstructions);
+                    return true;
+                  }));
     }
   }
 

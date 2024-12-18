@@ -52,7 +52,8 @@ class RestAiAudioController {
     return otherAiServices
         .getTextFromAudio(
             getGlobalSettingsService().globalSettingOthers().getValue(),
-            processedResult.getProcessedSRT())
+            processedResult.getProcessedSRT(),
+            audioFile.getAdditionalProcessingInstructions())
         .map(
             textFromAudioWithCallInfo -> {
               textFromAudioWithCallInfo.setEndTimestamp(processedResult.getEndTimestamp());
