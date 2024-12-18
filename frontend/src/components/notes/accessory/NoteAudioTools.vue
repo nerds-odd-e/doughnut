@@ -149,33 +149,30 @@ const isProcessing = ref(false)
 const processAudio = async (chunk: AudioChunk): Promise<string | undefined> => {
   isProcessing.value = true
   try {
-    const response = await managedApi.restAiAudioController.audioToTextForNote(
-      note.id,
-      {
-        uploadAudioFile: chunk.data,
-        threadId: threadContext.value.threadId,
-        runId: threadContext.value.runId,
-        toolCallId: threadContext.value.toolCallId,
-        additionalProcessingInstructions: processingInstructions.value,
-        isMidSpeech: chunk.isMidSpeech,
-      }
-    )
+    const response = await managedApi.restAiAudioController.audioToText({
+      uploadAudioFile: chunk.data,
+      threadId: threadContext.value.threadId,
+      runId: threadContext.value.runId,
+      toolCallId: threadContext.value.toolCallId,
+      additionalProcessingInstructions: processingInstructions.value,
+      isMidSpeech: chunk.isMidSpeech,
+      previousContentToAppendTo: note.details,
+    })
 
-    // Store thread context for next calls
-    threadContext.value.threadId = response?.toolCallInfo?.threadId
-    threadContext.value.runId = response?.toolCallInfo?.runId
-    threadContext.value.toolCallId = response?.toolCallInfo?.toolCallId
+    if (!response) {
+      throw new Error("Failed to process audio")
+    }
 
     await storageAccessor
       .storedApi()
-      .completeDetails(note.id, response?.completionFromAudio)
+      .completeDetails(note.id, response.completionFromAudio)
 
     threadContext.value.callCount++
     if (shouldSuggestTitle(threadContext.value.callCount)) {
       updateTopicIfSuggested(note.id)
     }
 
-    return response?.endTimestamp
+    return response.endTimestamp
   } catch (error) {
     errors.value = error as Record<string, string | undefined>
     return undefined

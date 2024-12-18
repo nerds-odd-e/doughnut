@@ -122,10 +122,10 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
             """
             + transcriptionFromAudio,
         List.of(
-            FunctionDefinition.<TextFromAudio>builder()
+            FunctionDefinition.<NoteDetailsCompletion>builder()
                 .name("audio_transcription_to_text")
                 .description("Convert audio transcription to text")
-                .parametersDefinitionByClass(TextFromAudio.class)
+                .parametersDefinitionByClass(NoteDetailsCompletion.class)
                 .build()));
   }
 
