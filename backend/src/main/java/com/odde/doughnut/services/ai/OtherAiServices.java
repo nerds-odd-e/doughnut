@@ -55,18 +55,29 @@ public final class OtherAiServices {
   }
 
   public Optional<TextFromAudioWithCallInfo> getTextFromAudio(
-      String modelName, String transcriptionFromAudio) {
-    return getTextFromAudio(modelName, transcriptionFromAudio, null);
-  }
-
-  public Optional<TextFromAudioWithCallInfo> getTextFromAudio(
-      String modelName, String transcriptionFromAudio, String additionalInstructions) {
+      String modelName,
+      String transcriptionFromAudio,
+      String additionalInstructions,
+      String previousContent) {
 
     OpenAIChatRequestBuilder chatAboutNoteRequestBuilder = getOpenAIChatRequestBuilder(modelName);
 
     if (additionalInstructions != null && !additionalInstructions.isEmpty()) {
       chatAboutNoteRequestBuilder.addSystemMessage(
           "Additional instruction:\n" + additionalInstructions);
+    }
+
+    if (previousContent != null && !previousContent.isEmpty()) {
+      try {
+        String jsonContent =
+            String.format(
+                "{\"previousContentToAppendTo\": %s}",
+                new ObjectMapper().writeValueAsString(previousContent));
+        chatAboutNoteRequestBuilder.addUserMessage(
+            "Previous content (in JSON format):\n" + jsonContent);
+      } catch (JsonProcessingException e) {
+        return Optional.empty();
+      }
     }
 
     AiToolList questionEvaluationAiTool =

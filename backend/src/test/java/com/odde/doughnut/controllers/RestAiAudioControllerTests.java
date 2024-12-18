@@ -192,6 +192,57 @@ class RestAiAudioControllerTests {
                     return true;
                   }));
     }
+
+    @Test
+    void shouldIncludePreviousContentAsUserMessage() throws IOException {
+      // Setup
+      String previousContent = "Previous text with trailing space ";
+      audioUploadDTO.setPreviousContentToAppendTo(previousContent);
+
+      // Execute
+      controller.audioToText(audioUploadDTO);
+
+      // Verify
+      verify(openAiApi)
+          .createChatCompletion(
+              argThat(
+                  request -> {
+                    String expectedJson =
+                        "{\"previousContentToAppendTo\": \"Previous text with trailing space \"}";
+                    assertThat(
+                        request.getMessages().stream()
+                            .filter(m -> "user".equals(m.getRole()))
+                            .map(ChatMessage::getTextContent)
+                            .anyMatch(
+                                content ->
+                                    content.contains(
+                                        "Previous content (in JSON format):\n" + expectedJson)),
+                        equalTo(true));
+                    return true;
+                  }));
+    }
+
+    @Test
+    void shouldWorkWithoutPreviousContent() throws IOException {
+      // Execute
+      controller.audioToText(audioUploadDTO);
+
+      // Verify
+      verify(openAiApi)
+          .createChatCompletion(
+              argThat(
+                  request -> {
+                    boolean hasNoPreviousContent =
+                        request.getMessages().stream()
+                            .filter(m -> "user".equals(m.getRole()))
+                            .noneMatch(
+                                m ->
+                                    m.getTextContent()
+                                        .contains("Previous content (in JSON format):"));
+                    assertTrue(hasNoPreviousContent);
+                    return true;
+                  }));
+    }
   }
 
   @Nested
