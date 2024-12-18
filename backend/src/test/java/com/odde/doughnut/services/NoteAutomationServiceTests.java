@@ -2,10 +2,8 @@ package com.odde.doughnut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.odde.doughnut.controllers.dto.AudioUploadDTO;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.OpenAiAssistant;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
@@ -57,19 +55,5 @@ class NoteAutomationServiceTests {
     String result = service.suggestTitle();
 
     assertThat(result, is(nullValue()));
-  }
-
-  @Test
-  void shouldThrowExceptionWhenAudioTranscriptionGetsCompletedRun() {
-    openAIAssistantThreadMocker
-        .mockCreateRunInProcess("my-run-id")
-        .aCompletedRun()
-        .mockRetrieveRun();
-
-    AudioUploadDTO config = new AudioUploadDTO();
-
-    assertThrows(
-        IllegalStateException.class,
-        () -> service.audioTranscriptionToArticle("test transcription", config));
   }
 }

@@ -94,8 +94,4 @@ public class AssistantThread {
     MessageRequest messageRequest = MessageRequest.builder().role("assistant").content(msg).build();
     openAiApiHandler.createMessage(threadId, messageRequest);
   }
-
-  public OpenAiOngoingRun resumeRun(String runId) {
-    return new OpenAiRunResumed(openAiApiHandler, threadId, runId, tools.get(0));
-  }
 }

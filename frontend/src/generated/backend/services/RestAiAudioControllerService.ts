@@ -26,27 +26,4 @@ export class RestAiAudioControllerService {
             },
         });
     }
-    /**
-     * @param noteId
-     * @param formData
-     * @returns TextFromAudioWithCallInfo OK
-     * @throws ApiError
-     */
-    public audioToTextForNote(
-        noteId: number,
-        formData?: AudioUploadDTO,
-    ): CancelablePromise<TextFromAudioWithCallInfo> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/api/audio/audio-to-text/{noteId}',
-            path: {
-                'noteId': noteId,
-            },
-            formData: formData,
-            mediaType: 'multipart/form-data',
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
 }
