@@ -133,6 +133,15 @@ const toggleAdvancedOptions = () => {
 
 const isProcessing = ref(false)
 
+const getLastContentChunk = (
+  content: string | undefined,
+  maxLength = 500
+): string => {
+  if (!content) return ""
+  if (content.length <= maxLength) return content
+  return `...${content.slice(-maxLength)}`
+}
+
 const processAudio = async (chunk: AudioChunk): Promise<string | undefined> => {
   isProcessing.value = true
   try {
@@ -140,7 +149,7 @@ const processAudio = async (chunk: AudioChunk): Promise<string | undefined> => {
       uploadAudioFile: chunk.data,
       additionalProcessingInstructions: processingInstructions.value,
       isMidSpeech: chunk.isMidSpeech,
-      previousNoteDetailsToAppendTo: note.details,
+      previousNoteDetailsToAppendTo: getLastContentChunk(note.details),
     })
 
     if (!response) {

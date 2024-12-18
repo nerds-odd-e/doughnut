@@ -691,4 +691,76 @@ describe("NoteAudioTools", () => {
       expect(errorElement?.textContent?.trim()).toBe("Test error message")
     })
   })
+
+  describe("Previous content handling", () => {
+    let audioToTextMock: ReturnType<typeof vi.fn>
+
+    beforeEach(() => {
+      audioToTextMock = vi.fn().mockResolvedValue({
+        completionFromAudio: { completion: "text", deleteFromEnd: 0 },
+        endTimestamp: "00:00:37,270",
+      })
+      helper.managedApi.restAiAudioController.audioToText = audioToTextMock
+    })
+
+    it("sends full content when under 500 characters", async () => {
+      const shortContent = "Short content"
+      const noteWithShortContent = makeMe.aNote.details(shortContent).please()
+      wrapper = helper
+        .component(NoteAudioTools)
+        .withStorageProps({ note: noteWithShortContent })
+        .mount()
+
+      await wrapper.vm.processAudio({
+        data: new Blob(),
+        isMidSpeech: true,
+      })
+
+      expect(audioToTextMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          previousNoteDetailsToAppendTo: shortContent,
+        })
+      )
+    })
+
+    it("truncates content over 500 characters and adds ellipsis", async () => {
+      const longContent = "a".repeat(600)
+      const noteWithLongContent = makeMe.aNote.details(longContent).please()
+      wrapper = helper
+        .component(NoteAudioTools)
+        .withStorageProps({ note: noteWithLongContent })
+        .mount()
+
+      await wrapper.vm.processAudio({
+        data: new Blob(),
+        isMidSpeech: true,
+      })
+
+      const expectedContent = `...${"a".repeat(500)}`
+      expect(audioToTextMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          previousNoteDetailsToAppendTo: expectedContent,
+        })
+      )
+    })
+
+    it("handles null content", async () => {
+      const noteWithNullContent = makeMe.aNote.details(undefined).please()
+      wrapper = helper
+        .component(NoteAudioTools)
+        .withStorageProps({ note: noteWithNullContent })
+        .mount()
+
+      await wrapper.vm.processAudio({
+        data: new Blob(),
+        isMidSpeech: true,
+      })
+
+      expect(audioToTextMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          previousNoteDetailsToAppendTo: "",
+        })
+      )
+    })
+  })
 })
