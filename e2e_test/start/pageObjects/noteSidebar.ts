@@ -1,4 +1,5 @@
 export const noteSidebar = () => {
+  cy.findByRole('button', { name: 'toggle sidebar' }).click()
   cy.get('aside').should('exist')
 
   return {

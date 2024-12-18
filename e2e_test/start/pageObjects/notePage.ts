@@ -6,6 +6,7 @@ import noteCreationForm from './noteForms/noteCreationForm'
 import { questionListPage } from './questionListPage'
 import { assumeQuestionPage } from './QuizQuestionPage'
 import { assumeNoteTargetSearchDialog } from './noteTargetSearchDialog'
+import { noteSidebar } from './noteSidebar'
 
 function filterAttributes(
   attributes: Record<string, string>,
@@ -264,6 +265,7 @@ export const assumeNotePage = (noteTopology?: string) => {
 
     moveUpAmongSiblings() {
       cy.pageIsNotLoading()
+      noteSidebar()
       // Find current note in sidebar
       cy.findByRole('title')
         .invoke('text')
@@ -292,6 +294,7 @@ export const assumeNotePage = (noteTopology?: string) => {
     },
     moveDownAmongSiblings() {
       cy.pageIsNotLoading()
+      noteSidebar()
       // Find current note in sidebar
       cy.findByRole('title')
         .invoke('text')

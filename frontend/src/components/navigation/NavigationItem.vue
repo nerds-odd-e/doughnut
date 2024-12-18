@@ -10,7 +10,7 @@
     <router-link
       v-if="name && !hasDropdown"
       :to="{ name: name }"
-      class="daisy-flex daisy-flex-col daisy-items-center daisy-gap-2"
+      class="daisy-flex daisy-flex-col daisy-items-center"
     >
       <div class="icon-container">
         <component :is="icon" width="24" height="24" />
@@ -25,7 +25,7 @@
       <summary
         tabindex="0"
         role="button"
-        class="daisy-flex daisy-flex-col daisy-items-center daisy-gap-2 cursor-pointer list-none"
+        class="daisy-flex daisy-flex-col daisy-items-center cursor-pointer list-none"
         :aria-label="label"
       >
         <div class="icon-container">

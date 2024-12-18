@@ -11,7 +11,7 @@ Then('I am on a window {int} * {int}', (width: number, height: number) => {
 })
 
 Then('I expand the side bar', () => {
-  cy.findByRole('button', { name: 'toggle sidebar' }).click()
+  start.noteSidebar()
 })
 
 Then('I should see the note tree in the sidebar', (data: DataTable) => {
@@ -25,6 +25,7 @@ Then('I move the note {string} up among its siblings', (noteToMove: string) => {
 Then(
   'I move the note {string} down among its siblings',
   (noteToMove: string) => {
+    start.routerToNotebooksPage()
     start.jumpToNotePage(noteToMove).moveDownAmongSiblings()
   }
 )
