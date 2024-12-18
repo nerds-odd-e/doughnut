@@ -27,6 +27,8 @@ import NoteInfoBar from "../notes/NoteInfoBar.vue"
 import AssimilationButtons from "./AssimilationButtons.vue"
 import NoteShow from "../notes/NoteShow.vue"
 import { computed } from "vue"
+import { useRecallData } from "@/composables/useRecallData"
+
 // Props
 const { note } = defineProps<{
   note: Note
@@ -42,6 +44,7 @@ const emit = defineEmits<{
 // Composables
 const { managedApi } = useLoadingApi()
 const { popups } = usePopups()
+const { totalAssimilatedCount } = useRecallData()
 
 // Computed
 const buttonKey = computed(() => note.id)
@@ -49,27 +52,28 @@ const buttonKey = computed(() => note.id)
 // Methods
 const processForm = async (skipMemoryTracking: boolean) => {
   if (skipMemoryTracking) {
-    if (
-      !(await popups.confirm(
-        "Confirm to hide this note from reviewing in the future?"
-      ))
-    ) {
+    const confirmed = await popups.confirm(
+      "Confirm to hide this note from reviewing in the future?"
+    )
+    if (!confirmed) {
       return
     }
   }
 
-  managedApi.assimilationController
-    .assimilate({
-      noteId: note.id,
-      skipMemoryTracking,
-    })
-    .then((data) => {
-      if (skipMemoryTracking) {
-        emit("reloadNeeded", data)
-      } else {
-        emit("initialReviewDone", data)
-      }
-    })
+  const data = await managedApi.assimilationController.assimilate({
+    noteId: note.id,
+    skipMemoryTracking,
+  })
+
+  if (totalAssimilatedCount.value !== undefined) {
+    totalAssimilatedCount.value += 1
+  }
+
+  if (skipMemoryTracking) {
+    emit("reloadNeeded", data)
+  } else {
+    emit("initialReviewDone", data)
+  }
 }
 </script>
 
