@@ -31,7 +31,7 @@ public class AudioUploadDTO {
   @JsonProperty("isMidSpeech")
   private boolean isMidSpeech;
 
-  private String previousContentToAppendTo;
+  private String previousNoteDetailsToAppendTo;
 
   @JsonIgnore
   public boolean hasValidThreadAndRunId() {

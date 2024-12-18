@@ -3929,7 +3929,7 @@ components:
           type: string
         toolCallId:
           type: string
-        previousContentToAppendTo:
+        previousNoteDetailsToAppendTo:
           type: string
         isMidSpeech:
           type: boolean

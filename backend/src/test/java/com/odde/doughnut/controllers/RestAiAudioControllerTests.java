@@ -196,7 +196,7 @@ class RestAiAudioControllerTests {
     void shouldIncludePreviousContentAsUserMessage() throws IOException {
       // Setup
       String previousContent = "Previous text with trailing space ";
-      audioUploadDTO.setPreviousContentToAppendTo(previousContent);
+      audioUploadDTO.setPreviousNoteDetailsToAppendTo(previousContent);
 
       // Execute
       controller.audioToText(audioUploadDTO);
@@ -207,7 +207,7 @@ class RestAiAudioControllerTests {
               argThat(
                   request -> {
                     String expectedJson =
-                        "{\"previousContentToAppendTo\": \"Previous text with trailing space \"}";
+                        "{\"previousNoteDetailsToAppendTo\": \"Previous text with trailing space \"}";
                     assertThat(
                         request.getMessages().stream()
                             .filter(m -> "user".equals(m.getRole()))

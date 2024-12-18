@@ -54,7 +54,7 @@ class RestAiAudioController {
             getGlobalSettingsService().globalSettingOthers().getValue(),
             processedResult.getProcessedSRT(),
             audioFile.getAdditionalProcessingInstructions(),
-            audioFile.getPreviousContentToAppendTo())
+            audioFile.getPreviousNoteDetailsToAppendTo())
         .map(
             noteDetailsCompletion -> {
               TextFromAudioWithCallInfo textFromAudioWithCallInfo = new TextFromAudioWithCallInfo();

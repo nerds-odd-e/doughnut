@@ -71,7 +71,7 @@ public final class OtherAiServices {
       try {
         String jsonContent =
             String.format(
-                "{\"previousContentToAppendTo\": %s}",
+                "{\"previousNoteDetailsToAppendTo\": %s}",
                 new ObjectMapper().writeValueAsString(previousContent));
         chatAboutNoteRequestBuilder.addUserMessage(
             "Previous content (in JSON format):\n" + jsonContent);

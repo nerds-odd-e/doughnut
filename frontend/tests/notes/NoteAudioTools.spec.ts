@@ -481,7 +481,7 @@ describe("NoteAudioTools", () => {
           threadId: undefined,
           runId: undefined,
           toolCallId: undefined,
-          previousContentToAppendTo: note.details,
+          previousNoteDetailsToAppendTo: note.details,
         })
       )
 
@@ -492,7 +492,7 @@ describe("NoteAudioTools", () => {
         helper.managedApi.restAiAudioController.audioToText
       ).toHaveBeenLastCalledWith(
         expect.objectContaining({
-          previousContentToAppendTo: note.details,
+          previousNoteDetailsToAppendTo: note.details,
         })
       )
     })
@@ -520,7 +520,7 @@ describe("NoteAudioTools", () => {
       const lastCall = audioToTextMock.mock.calls.pop()
       expect(lastCall).toBeDefined()
       expect(lastCall![0]).toMatchObject({
-        previousContentToAppendTo: note.details,
+        previousNoteDetailsToAppendTo: note.details,
       })
     })
   })
@@ -562,7 +562,7 @@ describe("NoteAudioTools", () => {
       ).toHaveBeenCalledWith(
         expect.objectContaining({
           additionalProcessingInstructions: "Test instructions",
-          previousContentToAppendTo: note.details,
+          previousNoteDetailsToAppendTo: note.details,
         })
       )
     })
@@ -586,11 +586,11 @@ describe("NoteAudioTools", () => {
       expect(calls.length).toBeGreaterThanOrEqual(2)
       expect(calls[0]?.[0]).toMatchObject({
         additionalProcessingInstructions: "Test instructions",
-        previousContentToAppendTo: note.details,
+        previousNoteDetailsToAppendTo: note.details,
       })
       expect(calls[1]?.[0]).toMatchObject({
         additionalProcessingInstructions: "Test instructions",
-        previousContentToAppendTo: note.details,
+        previousNoteDetailsToAppendTo: note.details,
       })
     })
   })
@@ -617,7 +617,7 @@ describe("NoteAudioTools", () => {
       expect(audioToTextMock).toHaveBeenCalledWith(
         expect.objectContaining({
           isMidSpeech: true,
-          previousContentToAppendTo: note.details,
+          previousNoteDetailsToAppendTo: note.details,
         })
       )
     })

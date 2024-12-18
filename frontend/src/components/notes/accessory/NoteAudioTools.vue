@@ -156,7 +156,7 @@ const processAudio = async (chunk: AudioChunk): Promise<string | undefined> => {
       toolCallId: threadContext.value.toolCallId,
       additionalProcessingInstructions: processingInstructions.value,
       isMidSpeech: chunk.isMidSpeech,
-      previousContentToAppendTo: note.details,
+      previousNoteDetailsToAppendTo: note.details,
     })
 
     if (!response) {
