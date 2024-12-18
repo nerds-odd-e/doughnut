@@ -4,7 +4,7 @@
 /* eslint-disable */
 export type DueMemoryTrackers = {
     toRepeatCount: number;
-    learntCount: number;
+    totalAssimilatedCount: number;
     recallWindowEndAt?: string;
     toRepeat?: Array<number>;
     dueInDays?: number;

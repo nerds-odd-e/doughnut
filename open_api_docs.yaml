@@ -4159,14 +4159,14 @@ components:
           type: string
     DueMemoryTrackers:
       required:
-      - learntCount
       - toRepeatCount
+      - totalAssimilatedCount
       type: object
       properties:
         toRepeatCount:
           type: integer
           format: int32
-        learntCount:
+        totalAssimilatedCount:
           type: integer
           format: int32
         recallWindowEndAt:
@@ -4182,14 +4182,14 @@ components:
           format: int32
     RecallStatus:
       required:
-      - learntCount
       - toRepeatCount
+      - totalAssimilatedCount
       type: object
       properties:
         toRepeatCount:
           type: integer
           format: int32
-        learntCount:
+        totalAssimilatedCount:
           type: integer
           format: int32
         recallWindowEndAt:

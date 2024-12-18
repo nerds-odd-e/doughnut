@@ -29,7 +29,7 @@ public class RecallService {
     this.modelFactoryService = modelFactoryService;
   }
 
-  public int learntCount() {
+  private int totalAssimilatedCount() {
     return modelFactoryService.memoryTrackerRepository.countByUserNotRemoved(
         userModel.getEntity().getId());
   }
@@ -42,7 +42,7 @@ public class RecallService {
   public RecallStatus getRecallStatus() {
     RecallStatus recallStatus = new RecallStatus();
     recallStatus.toRepeatCount = getToRecallCount();
-    recallStatus.learntCount = learntCount();
+    recallStatus.totalAssimilatedCount = totalAssimilatedCount();
     recallStatus.setRecallWindowEndAt(
         TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, 24));
     return recallStatus;
@@ -58,7 +58,7 @@ public class RecallService {
     // Set recall status (always based on dueInDays=0)
     RecallStatus status = getRecallStatus();
     dueMemoryTrackers.toRepeatCount = status.toRepeatCount;
-    dueMemoryTrackers.learntCount = status.learntCount;
+    dueMemoryTrackers.totalAssimilatedCount = status.totalAssimilatedCount;
     dueMemoryTrackers.setRecallWindowEndAt(status.getRecallWindowEndAt());
 
     return dueMemoryTrackers;

@@ -7,6 +7,6 @@ import lombok.Setter;
 
 public class RecallStatus {
   @NotNull public int toRepeatCount;
-  @NotNull public int learntCount;
+  @NotNull public int totalAssimilatedCount;
   @Getter @Setter private Timestamp recallWindowEndAt;
 }

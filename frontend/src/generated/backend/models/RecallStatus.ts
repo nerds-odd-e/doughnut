@@ -4,7 +4,7 @@
 /* eslint-disable */
 export type RecallStatus = {
     toRepeatCount: number;
-    learntCount: number;
+    totalAssimilatedCount: number;
     recallWindowEndAt?: string;
 };
 
