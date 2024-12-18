@@ -235,6 +235,7 @@ public class OpenAiApiHandler {
   public Optional<JsonNode> requestAndGetFunctionCallArguments(
       AiToolList tool, OpenAIChatRequestBuilder chatAboutNoteRequestBuilder1) {
     ChatCompletionRequest chatRequest = chatAboutNoteRequestBuilder1.addTool(tool).build();
+    System.out.println(chatRequest);
     return getFirstToolCallArguments(chatRequest);
   }
 

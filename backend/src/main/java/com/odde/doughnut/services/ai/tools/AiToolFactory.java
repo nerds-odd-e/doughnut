@@ -109,22 +109,22 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
   public static AiToolList transcriptionToTextAiTool(String transcriptionFromAudio) {
     return new AiToolList(
         """
-            You are a helpful assistant for converting audio transcription in SRT format to text of paragraphs. Your task is to convert the following audio transcription to text with meaningful punctuations and paragraphs.
-             * fix obvious audio transcription mistakes.
-             * Do not translate the text to another language (unless asked to).
-             * If the transcription is not clear, leave the text as it is.
-             * Don't add any additional information than what is in the transcription.
-             * the completionMarkdownFromAudio is to be appended after the previousTrailingNoteDetails, so add necessary white space or new line at the beginning to connect to existing text.
-             * The context should be in markdown format.
+            You convert SRT-format audio transcriptions into coherent paragraphs with proper punctuation, formatted in Markdown. Guidelines:
+              •	Output only function calls to append the processed text to existing note details, adding necessary whitespace or a new line at the beginning.
+              •	Do not translate the text unless requested.
+              • Do not interpret the text. Do not use reported speech.
+              •	Leave unclear parts unchanged.
+              •	Do not add any information not present in the transcription.
+              •	The transcription may be truncated; do not add new lines or whitespace at the end.
 
-             Here's the transcription from audio:
+             Here's the new transcription from audio:
              ------------
             """
             + transcriptionFromAudio,
         List.of(
             FunctionDefinition.<NoteDetailsCompletion>builder()
                 .name(AiToolName.COMPLETE_NOTE_DETAILS.getValue())
-                .description("Convert audio transcription to text")
+                .description("Convert audio transcription to text and append to the note details")
                 .parametersDefinitionByClass(NoteDetailsCompletion.class)
                 .build()));
   }
