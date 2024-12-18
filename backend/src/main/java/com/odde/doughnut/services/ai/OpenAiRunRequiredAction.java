@@ -32,14 +32,6 @@ public final class OpenAiRunRequiredAction extends OpenAiOngoingRun implements O
     return requiredAction.getSubmitToolOutputs().getToolCalls().getLast();
   }
 
-  public ToolCallInfo getTheOnlyToolCallInfo() {
-    ToolCallInfo toolCallInfo = new ToolCallInfo();
-    toolCallInfo.setThreadId(run.getThreadId());
-    toolCallInfo.setRunId(run.getId());
-    toolCallInfo.setToolCallId(getTheOnlyToolCall().getId());
-    return toolCallInfo;
-  }
-
   private ToolCall getTheOnlyToolCall() {
     RequiredAction requiredAction = run.getRequiredAction();
     int size = requiredAction.getSubmitToolOutputs().getToolCalls().size();

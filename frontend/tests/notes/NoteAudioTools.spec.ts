@@ -478,9 +478,6 @@ describe("NoteAudioTools", () => {
         helper.managedApi.restAiAudioController.audioToText
       ).toHaveBeenLastCalledWith(
         expect.objectContaining({
-          threadId: undefined,
-          runId: undefined,
-          toolCallId: undefined,
           previousNoteDetailsToAppendTo: note.details,
         })
       )

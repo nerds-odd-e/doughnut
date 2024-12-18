@@ -4,11 +4,7 @@
 /* eslint-disable */
 export type AudioUploadDTO = {
     uploadAudioFile?: Blob;
-    audioData?: string;
     additionalProcessingInstructions?: string;
-    threadId?: string;
-    runId?: string;
-    toolCallId?: string;
     previousNoteDetailsToAppendTo?: string;
     isMidSpeech?: boolean;
 };

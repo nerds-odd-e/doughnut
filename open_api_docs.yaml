@@ -3889,16 +3889,7 @@ components:
         uploadAudioFile:
           type: string
           format: binary
-        audioData:
-          type: string
-          format: byte
         additionalProcessingInstructions:
-          type: string
-        threadId:
-          type: string
-        runId:
-          type: string
-        toolCallId:
           type: string
         previousNoteDetailsToAppendTo:
           type: string
@@ -3922,18 +3913,7 @@ components:
           $ref: "#/components/schemas/NoteDetailsCompletion"
         rawSRT:
           type: string
-        toolCallInfo:
-          $ref: "#/components/schemas/ToolCallInfo"
         endTimestamp:
-          type: string
-    ToolCallInfo:
-      type: object
-      properties:
-        threadId:
-          type: string
-        runId:
-          type: string
-        toolCallId:
           type: string
     InitialInfo:
       type: object

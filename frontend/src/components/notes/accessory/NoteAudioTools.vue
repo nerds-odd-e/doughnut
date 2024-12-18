@@ -123,22 +123,9 @@ const updateTopicIfSuggested = async (noteId: number) => {
   }
 }
 
-interface ThreadContext {
-  threadId?: string
-  runId?: string
-  toolCallId?: string
-  callCount: number
-}
-
-const threadContext = ref<ThreadContext>({
-  threadId: undefined,
-  runId: undefined,
-  toolCallId: undefined,
-  callCount: 0,
-})
-
 const showAdvancedOptions = ref(false)
 const processingInstructions = ref("")
+const callCount = ref(0)
 
 const toggleAdvancedOptions = () => {
   showAdvancedOptions.value = !showAdvancedOptions.value
@@ -151,9 +138,6 @@ const processAudio = async (chunk: AudioChunk): Promise<string | undefined> => {
   try {
     const response = await managedApi.restAiAudioController.audioToText({
       uploadAudioFile: chunk.data,
-      threadId: threadContext.value.threadId,
-      runId: threadContext.value.runId,
-      toolCallId: threadContext.value.toolCallId,
       additionalProcessingInstructions: processingInstructions.value,
       isMidSpeech: chunk.isMidSpeech,
       previousNoteDetailsToAppendTo: note.details,
@@ -167,8 +151,8 @@ const processAudio = async (chunk: AudioChunk): Promise<string | undefined> => {
       .storedApi()
       .completeDetails(note.id, response.completionFromAudio)
 
-    threadContext.value.callCount++
-    if (shouldSuggestTitle(threadContext.value.callCount)) {
+    callCount.value++
+    if (shouldSuggestTitle(callCount.value)) {
       updateTopicIfSuggested(note.id)
     }
 

@@ -21,11 +21,7 @@ public class AudioUploadDTO {
       })
   private MultipartFile uploadAudioFile;
 
-  private byte[] audioData;
   private String additionalProcessingInstructions;
-  private String threadId;
-  private String runId;
-  private String toolCallId;
 
   @JsonProperty("isMidSpeech")
   private boolean isMidSpeech;
