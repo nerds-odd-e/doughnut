@@ -41,6 +41,15 @@ const openAiAssistantCreatedRunMocker = (
                 completion: hash.arguments?.match(/"(.*)"/)?.[1],
               }
             )
+          case 'suggest note title':
+            return createRequiresActionRun(
+              runId,
+              threadId,
+              'suggest_note_title',
+              {
+                newTitle: hash.arguments?.match(/"(.*)"/)?.[1],
+              }
+            )
           default:
             throw new Error(`Unknown response: ${hash.response}`)
         }

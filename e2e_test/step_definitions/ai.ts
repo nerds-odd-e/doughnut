@@ -83,7 +83,6 @@ Given(
       .stubCreateRuns('thread-123', [runId])
       .aRun(runId)
       .stubRetrieveRunsThatRequireAction(data.hashes())
-      .stubSubmitToolOutputs()
   }
 )
 

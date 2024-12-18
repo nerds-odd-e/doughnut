@@ -12,11 +12,10 @@ Feature: Recording a live audio and append to note details
 
       """
     And OpenAI assistant will reply below for user messages in a non-stream run "run123":
-      | response                | arguments                 |
-      | complete note details   |"Let's talk about data structure today."|
-    And OpenAI assistant can accept tool call results submission and run cancellation for run "run123"
+      | response           | arguments         |
+      | suggest note title | "This is a title" |
     And the OpenAI completion service will return the following response for the transcription to text request:
-      | request contains              | response         |
+      | request contains                | response                               |
       | its talk about dada struct day. | Let's talk about data structure today. |
     And the browser is mocked to give permission to record audio
 
