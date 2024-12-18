@@ -27,7 +27,7 @@
       <span
         role="button"
         title="expand children"
-        class="badge rounded-pill"
+        class="daisy-badge daisy-cursor-pointer"
         >{{ childrenCount ?? "..." }}</span
       >
       <div
@@ -108,12 +108,6 @@ const toggleChildren = (noteId: number) => {
   position: relative;
   border-radius: 0 !important;
   min-height: 24px; // Ensure minimum height for drag target
-}
-
-.badge {
-  cursor: pointer;
-  background-color: #aaa;
-  font-weight: initial;
 }
 
 .note-item {
