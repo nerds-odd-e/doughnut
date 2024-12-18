@@ -123,7 +123,8 @@ const isHomePage = computed(() => route.name === "home")
 const { setDueCount, setAssimilatedCountOfTheDay, setTotalUnassimilatedCount } =
   useAssimilationCount()
 const { managedApi } = useLoadingApi()
-const { setToRepeatCount, setRecallWindowEndAt } = useRecallData()
+const { setToRepeatCount, setRecallWindowEndAt, setTotalAssimilatedCount } =
+  useRecallData()
 
 const fetchDueCount = async () => {
   const count = await managedApi.assimilationController.getAssimilationCount(
@@ -140,6 +141,7 @@ const fetchRecallCount = async () => {
   )
   setToRepeatCount(overview.toRepeatCount)
   setRecallWindowEndAt(overview.recallWindowEndAt)
+  setTotalAssimilatedCount(overview.totalAssimilatedCount)
 }
 
 const fetchUnreadMessageCount = async () => {

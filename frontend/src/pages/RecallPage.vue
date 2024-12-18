@@ -18,7 +18,7 @@
   >
     <div class="tooltip-content daisy-bg-white daisy-p-4 daisy-rounded-lg daisy-shadow-lg">
       <p class="daisy-my-2 daisy-text-neutral">Daily Progress: {{ finished }} / {{ finished + toRepeatCount }}</p>
-      <p class="daisy-my-2 daisy-text-neutral">Total assimilated: {{ finished }} / {{ totalCount }}</p>
+      <p class="daisy-my-2 daisy-text-neutral">Total assimilated: {{ finished }} / {{ totalAssimilatedCount }}</p>
     </div>
   </div>
 
@@ -76,6 +76,7 @@ const {
   decrementToRepeatCount,
   recallWindowEndAt,
   setRecallWindowEndAt,
+  totalAssimilatedCount,
 } = useRecallData()
 defineProps({
   eagerFetchCount: Number,
@@ -100,9 +101,6 @@ const currentResult = computed(() => {
 const finished = computed(() => previousResults.value.length)
 const toRepeatCount = computed(
   () => (toRepeat.value?.length ?? 0) - currentIndex.value
-)
-const totalCount = computed(
-  () => (toRepeat.value?.length ?? 0) + finished.value
 )
 
 const viewLastResult = (cursor: number | undefined) => {
