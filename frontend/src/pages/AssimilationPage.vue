@@ -1,50 +1,50 @@
 <template>
-      <div class="progress-container">
+      <div class="progress-container daisy-relative">
         <div
-          :class="`daisy-progress-bar ${false ? 'thin' : ''}`"
+          :class="`daisy-progress-bar daisy-w-full daisy-bg-gray-500 daisy-h-[25px] daisy-rounded-lg daisy-relative daisy-cursor-help ${false ? 'daisy-h-[5px]' : ''}`"
           v-if="remainingInitialReviewCountForToday !== null"
           :title="`Daily Progress: ${assimilatedCountOfTheDay || 0} completed out of ${plannedForTheDay} planned for today`"
           @click="showTooltip = true"
         >
           <div
-            class="progress"
+            class="progress daisy-h-full daisy-bg-blue-500"
             :style="`width: ${(assimilatedCountOfTheDay || 0) * 100 / plannedForTheDay}%`"
           >
           </div>
-          <span class="progress-text">
+          <span class="progress-text daisy-absolute daisy-top-1/2 daisy-left-1/2 daisy-transform daisy--translate-x-1/2 daisy--translate-y-1/2 daisy-text-white">
             Assimilating: {{ assimilatedCountOfTheDay || 0 }}/{{ plannedForTheDay }}
           </span>
         </div>
         <div
-          class="daisy-progress-bar thin"
+          class="daisy-progress-bar daisy-w-full daisy-bg-gray-500 daisy-h-[5px] daisy-rounded-lg daisy-relative daisy-cursor-help"
           v-if="totalUnassimilatedCount !== undefined"
           :title="`Total Progress: ${assimilatedCountOfTheDay || 0} completed out of ${totalPlannedCount} total notes to assimilate`"
           @click="showTooltip = true"
         >
           <span
-            class="progress secondary"
+            class="progress daisy-block daisy-h-full daisy-bg-green-500"
             :style="`width: ${(assimilatedCountOfTheDay || 0) * 100 / totalPlannedCount}%`"
           >
           </span>
-          <span class="progress-text">
+          <span class="progress-text daisy-hidden">
             Total: {{ assimilatedCountOfTheDay || 0 }}/{{ totalPlannedCount }}
           </span>
         </div>
 
         <!-- Popup tooltip -->
-        <div v-if="showTooltip" class="tooltip-popup" @click="showTooltip = false">
-          <div class="tooltip-content">
-            <p>Daily Progress: {{ assimilatedCountOfTheDay || 0 }} / {{ plannedForTheDay }}</p>
-            <p>Total Progress: {{ assimilatedCountOfTheDay || 0 }} / {{ totalPlannedCount }}</p>
+        <div v-if="showTooltip" class="tooltip-popup daisy-fixed daisy-inset-0 daisy-bg-black/50 daisy-flex daisy-justify-center daisy-items-center daisy-z-[1000]" @click="showTooltip = false">
+          <div class="tooltip-content daisy-bg-white daisy-p-4 daisy-rounded-lg daisy-shadow-lg">
+            <p class="daisy-my-2 daisy-text-neutral">Daily Progress: {{ assimilatedCountOfTheDay || 0 }} / {{ plannedForTheDay }}</p>
+            <p class="daisy-my-2 daisy-text-neutral">Total Progress: {{ assimilatedCountOfTheDay || 0 }} / {{ totalPlannedCount }}</p>
           </div>
         </div>
       </div>
   <ContainerPage v-bind="{ contentLoaded: notes !== undefined }">
-    <div v-if="notes?.length === 0" class="text-center py-8">
+    <div v-if="notes?.length === 0" class="daisy-text-center daisy-py-8">
       <TeleportToHeadStatus>
         Assimilated {{ assimilatedCountOfTheDay }} notes today.
       </TeleportToHeadStatus>
-      <h1 class="celebration-message">
+      <h1 class="celebration-message daisy-text-3xl daisy-font-bold daisy-text-slate-700 daisy-my-4">
         🎉 Congratulations! You've achieved your daily assimilation goal! 🎯
       </h1>
     </div>
@@ -132,69 +132,6 @@ const showTooltip = ref(false)
 </script>
 
 <style lang="scss" scoped>
-.progress-container {
-  position: relative;
-}
-
-.daisy-progress-bar {
-  width: 100%;
-  background-color: gray;
-  height: 25px;
-  border-radius: 10px;
-  position: relative;
-  cursor: help;
-
-  &.thin {
-    height: 5px;
-
-    .progress-text {
-      display: none;
-    }
-  }
-}
-
-.progress {
-  background-color: blue;
-  height: 100%;
-
-  &.secondary {
-    background-color: #4CAF50;
-  }
-}
-
-.progress-text {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: white;
-}
-
-.tooltip-popup {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.tooltip-content {
-  background: white;
-  padding: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-
-  p {
-    margin: 0.5rem 0;
-    color: #333;
-  }
-}
-
 .celebration-message {
   font-size: 1.8rem;
   color: #2c3e50;
