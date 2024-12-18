@@ -343,7 +343,7 @@ describe("NoteAudioTools", () => {
     // Trigger audio processing
     const processPromise2 = wrapper.vm.processAudio({
       data: new Blob(),
-      isMidSpeech: true
+      isMidSpeech: true,
     })
     await flushPromises()
 
@@ -353,7 +353,7 @@ describe("NoteAudioTools", () => {
     // Resolve the processing
     resolveProcess!({
       completionFromAudio: { completion: "test", deleteFromEnd: 0 },
-      endTimestamp: "00:00:37,270"
+      endTimestamp: "00:00:37,270",
     })
     await processPromise2
     await flushPromises()
@@ -451,7 +451,7 @@ describe("NoteAudioTools", () => {
     beforeEach(() => {
       audioToTextMock = vi.fn().mockResolvedValue({
         completionFromAudio: { completion: "text", deleteFromEnd: 0 },
-        endTimestamp: "00:00:37,270"
+        endTimestamp: "00:00:37,270",
       })
       helper.managedApi.restAiAudioController.audioToText = audioToTextMock
     })
@@ -459,12 +459,12 @@ describe("NoteAudioTools", () => {
     it("stores and reuses thread context between calls", async () => {
       const mockResponse1 = {
         completionFromAudio: { completion: "text1", deleteFromEnd: 0 },
-        endTimestamp: "00:00:37,270"
+        endTimestamp: "00:00:37,270",
       }
 
       const mockResponse2 = {
         completionFromAudio: { completion: "text2", deleteFromEnd: 0 },
-        endTimestamp: "00:00:47,270"
+        endTimestamp: "00:00:47,270",
       }
 
       audioToTextMock
@@ -474,31 +474,33 @@ describe("NoteAudioTools", () => {
       // First call
       await wrapper.vm.processAudio(new Blob())
 
-      expect(helper.managedApi.restAiAudioController.audioToText)
-        .toHaveBeenLastCalledWith(
-          expect.objectContaining({
-            threadId: undefined,
-            runId: undefined,
-            toolCallId: undefined,
-            previousContentToAppendTo: note.details
-          })
-        )
+      expect(
+        helper.managedApi.restAiAudioController.audioToText
+      ).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          threadId: undefined,
+          runId: undefined,
+          toolCallId: undefined,
+          previousContentToAppendTo: note.details,
+        })
+      )
 
       // Second call should include previous thread context
       await wrapper.vm.processAudio(new Blob())
 
-      expect(helper.managedApi.restAiAudioController.audioToText)
-        .toHaveBeenLastCalledWith(
-          expect.objectContaining({
-            previousContentToAppendTo: note.details
-          })
-        )
+      expect(
+        helper.managedApi.restAiAudioController.audioToText
+      ).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          previousContentToAppendTo: note.details,
+        })
+      )
     })
 
     it("maintains thread context even after errors", async () => {
       const mockResponse = {
         completionFromAudio: { completion: "text1", deleteFromEnd: 0 },
-        endTimestamp: "00:00:37,270"
+        endTimestamp: "00:00:37,270",
       }
 
       audioToTextMock
@@ -518,7 +520,7 @@ describe("NoteAudioTools", () => {
       const lastCall = audioToTextMock.mock.calls.pop()
       expect(lastCall).toBeDefined()
       expect(lastCall![0]).toMatchObject({
-        previousContentToAppendTo: note.details
+        previousContentToAppendTo: note.details,
       })
     })
   })
@@ -529,7 +531,7 @@ describe("NoteAudioTools", () => {
     beforeEach(() => {
       audioToTextMock = vi.fn().mockResolvedValue({
         completionFromAudio: { completion: "text", deleteFromEnd: 0 },
-        endTimestamp: "00:00:37,270"
+        endTimestamp: "00:00:37,270",
       })
       helper.managedApi.restAiAudioController.audioToText = audioToTextMock
     })
@@ -555,13 +557,14 @@ describe("NoteAudioTools", () => {
       const testBlob = new Blob(["test"])
       await wrapper.vm.processAudio(testBlob)
 
-      expect(helper.managedApi.restAiAudioController.audioToText)
-        .toHaveBeenCalledWith(
-          expect.objectContaining({
-            additionalProcessingInstructions: "Test instructions",
-            previousContentToAppendTo: note.details
-          })
-        )
+      expect(
+        helper.managedApi.restAiAudioController.audioToText
+      ).toHaveBeenCalledWith(
+        expect.objectContaining({
+          additionalProcessingInstructions: "Test instructions",
+          previousContentToAppendTo: note.details,
+        })
+      )
     })
 
     it("maintains processing instructions between recordings", async () => {
@@ -583,11 +586,11 @@ describe("NoteAudioTools", () => {
       expect(calls.length).toBeGreaterThanOrEqual(2)
       expect(calls[0]?.[0]).toMatchObject({
         additionalProcessingInstructions: "Test instructions",
-        previousContentToAppendTo: note.details
+        previousContentToAppendTo: note.details,
       })
       expect(calls[1]?.[0]).toMatchObject({
         additionalProcessingInstructions: "Test instructions",
-        previousContentToAppendTo: note.details
+        previousContentToAppendTo: note.details,
       })
     })
   })
@@ -598,7 +601,7 @@ describe("NoteAudioTools", () => {
     beforeEach(() => {
       audioToTextMock = vi.fn().mockResolvedValue({
         completionFromAudio: { completion: "text", deleteFromEnd: 0 },
-        endTimestamp: "00:00:37,270"
+        endTimestamp: "00:00:37,270",
       })
       helper.managedApi.restAiAudioController.audioToText = audioToTextMock
     })
@@ -614,7 +617,7 @@ describe("NoteAudioTools", () => {
       expect(audioToTextMock).toHaveBeenCalledWith(
         expect.objectContaining({
           isMidSpeech: true,
-          previousContentToAppendTo: note.details
+          previousContentToAppendTo: note.details,
         })
       )
     })
@@ -623,7 +626,7 @@ describe("NoteAudioTools", () => {
   it("should handle returned timestamp from audio processing", async () => {
     const mockResponse = {
       completionFromAudio: { completion: "text", deleteFromEnd: 0 },
-      endTimestamp: "00:00:37,270"
+      endTimestamp: "00:00:37,270",
     }
 
     helper.managedApi.restAiAudioController.audioToText = vi

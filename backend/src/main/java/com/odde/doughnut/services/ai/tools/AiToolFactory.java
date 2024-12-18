@@ -123,7 +123,7 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
             + transcriptionFromAudio,
         List.of(
             FunctionDefinition.<NoteDetailsCompletion>builder()
-                .name("audio_transcription_to_text")
+                .name(AiToolName.COMPLETE_NOTE_DETAILS.getValue())
                 .description("Convert audio transcription to text")
                 .parametersDefinitionByClass(NoteDetailsCompletion.class)
                 .build()));

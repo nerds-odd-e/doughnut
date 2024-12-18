@@ -90,6 +90,15 @@ const openAiChatCompletionStubber = (
         messages: [message],
       })
     },
+    stubAudioTranscriptToText(argumentsString: string) {
+      return stubSingleToolCall(
+        'complete_note_details',
+        JSON.stringify({
+          completion: argumentsString,
+          deleteFromEnd: 0,
+        })
+      )
+    },
     stubQuestionEvaluation(argumentsString: string) {
       return stubSingleToolCall('evaluate_question', argumentsString)
     },

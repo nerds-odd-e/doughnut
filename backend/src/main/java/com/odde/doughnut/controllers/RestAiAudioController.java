@@ -57,8 +57,7 @@ class RestAiAudioController {
             audioFile.getPreviousContentToAppendTo())
         .map(
             noteDetailsCompletion -> {
-              TextFromAudioWithCallInfo textFromAudioWithCallInfo =
-                  new TextFromAudioWithCallInfo();
+              TextFromAudioWithCallInfo textFromAudioWithCallInfo = new TextFromAudioWithCallInfo();
               textFromAudioWithCallInfo.setCompletionFromAudio(noteDetailsCompletion);
               textFromAudioWithCallInfo.setEndTimestamp(processedResult.getEndTimestamp());
               textFromAudioWithCallInfo.setRawSRT(processedResult.getProcessedSRT());

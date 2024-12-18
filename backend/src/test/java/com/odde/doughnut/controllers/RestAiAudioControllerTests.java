@@ -68,7 +68,7 @@ class RestAiAudioControllerTests {
     NoteDetailsCompletion completion = new NoteDetailsCompletion(0, "test123");
     openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
     openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(
-        completion, "audio_transcription_to_text");
+        completion, "complete_note_details");
     mockTranscriptionSrtResponse("test transcription");
   }
 

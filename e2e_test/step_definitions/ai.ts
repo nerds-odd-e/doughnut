@@ -88,6 +88,20 @@ Given(
 )
 
 Given(
+  'the OpenAI completion service will return the following response for the transcription to text request:',
+  (data: DataTable) => {
+    mock_services
+      .openAi()
+      .chatCompletion()
+      .requestMessageMatches({
+        role: 'user',
+        content: `.*${data.hashes()[0]!['request contains']}.*`,
+      })
+      .stubAudioTranscriptToText(data.hashes()[0]!.response!)
+  }
+)
+
+Given(
   'OpenAI assistant can accept tool call results submission and run cancellation for run {string}',
   (runId: string) => {
     mock_services
