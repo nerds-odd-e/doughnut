@@ -71,10 +71,3 @@ const submitAnswer = async (answerData: AnswerDTO) => {
   emits("answer", answerData)
 }
 </script>
-
-<style lang="scss" scoped>
-.quiz-instruction {
-  position: relative;
-  margin-top: 20px;
-}
-</style>
