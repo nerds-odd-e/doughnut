@@ -3929,6 +3929,8 @@ components:
           type: string
         toolCallId:
           type: string
+        previousContentToAppendTo:
+          type: string
         isMidSpeech:
           type: boolean
     NoteDetailsCompletion:

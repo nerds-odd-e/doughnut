@@ -9,6 +9,7 @@ export type AudioUploadDTO = {
     threadId?: string;
     runId?: string;
     toolCallId?: string;
+    previousContentToAppendTo?: string;
     isMidSpeech?: boolean;
 };
 
