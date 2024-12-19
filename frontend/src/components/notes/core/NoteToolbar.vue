@@ -44,23 +44,23 @@
 
       <div v-if="note.wikidataId">
         <div class="daisy-dropdown">
-          <button
+          <label
             tabindex="0"
             class="daisy-btn daisy-btn-ghost daisy-btn-sm"
             title="wikidata options"
           >
             <SvgWikidata />
-          </button>
+          </label>
 
-          <ul class="daisy-dropdown-content daisy-menu daisy-p-2 daisy-bg-base-300 daisy-rounded-box daisy-w-52 daisy-shadow daisy-z-50">
-            <li>
+          <ul tabindex="0" class="daisy-dropdown-content daisy-menu daisy-p-2 daisy-bg-base-300 daisy-rounded-box daisy-w-52 daisy-shadow daisy-z-50">
+            <li class="daisy-menu-item">
               <NoteWikidataAssociation :wikidata-id="note.wikidataId" />
             </li>
-            <li>
-              <PopButton title="associate wikidata">
+            <li class="daisy-menu-item">
+              <PopButton title="associate wikidata" class="w-full">
                 <template #button_face>
                   <SvgWikidata />
-                  Edit Wikidata ID
+                  <span class="ms-2">Edit Wikidata ID</span>
                 </template>
                 <template #default="{ closer }">
                   <WikidataAssociationDialog
