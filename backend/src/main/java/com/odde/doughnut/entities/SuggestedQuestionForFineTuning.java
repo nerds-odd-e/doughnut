@@ -7,6 +7,7 @@ import com.odde.doughnut.services.ai.*;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.ai.tools.AiToolList;
+import com.theokanning.openai.completion.chat.AssistantMessage;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -88,12 +89,18 @@ public class SuggestedQuestionForFineTuning extends EntityIdentifiedByIdOnly {
 
   private OpenAIChatGPTFineTuningExample getOpenAIChatGPTFineTuningExample(
       AiToolList tool, Object argument) {
-    List<ChatMessage> messages =
+    OpenAIChatRequestBuilder builder =
         new OpenAIChatRequestBuilder()
             .addSystemMessage(preservedNoteContent)
-            .addTool(tool)
-            .addFunctionCallMessage(argument, tool.getFirstFunctionName())
-            .buildMessages();
+            .responseJsonSchema(tool);
+
+    List<ChatMessage> messages = builder.buildMessages();
+
+    // Add the expected response as an assistant message
+    AssistantMessage assistantMessage =
+        new AssistantMessage(new ObjectMapper().valueToTree(argument).toString());
+    messages.add(assistantMessage);
+
     return OpenAIChatGPTFineTuningExample.from(messages);
   }
 
