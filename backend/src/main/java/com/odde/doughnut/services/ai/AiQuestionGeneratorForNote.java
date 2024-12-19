@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
-import com.odde.doughnut.services.ai.tools.AiToolList;
+import com.odde.doughnut.services.ai.tools.InstructionAndSchema;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import java.util.Optional;
 
@@ -12,14 +12,15 @@ public record AiQuestionGeneratorForNote(
     OpenAiApiHandler openAiApiHandler, OpenAIChatRequestBuilder chatAboutNoteRequestBuilder) {
 
   public Optional<QuestionEvaluation> evaluateQuestion(MCQWithAnswer question) {
-    AiToolList questionEvaluationAiTool = AiToolFactory.questionEvaluationAiTool(question);
+    InstructionAndSchema questionEvaluationAiTool =
+        AiToolFactory.questionEvaluationAiTool(question);
     return openAiApiHandler
         .requestAndGetJsonSchemaResult(questionEvaluationAiTool, chatAboutNoteRequestBuilder)
         .flatMap(QuestionEvaluation::getQuestionEvaluation);
   }
 
   public Optional<MCQWithAnswer> refineQuestion(MCQWithAnswer question) {
-    AiToolList questionEvaluationAiTool = AiToolFactory.questionRefineAiTool(question);
+    InstructionAndSchema questionEvaluationAiTool = AiToolFactory.questionRefineAiTool(question);
     return openAiApiHandler
         .requestAndGetJsonSchemaResult(questionEvaluationAiTool, chatAboutNoteRequestBuilder)
         .flatMap(

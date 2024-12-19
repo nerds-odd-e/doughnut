@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.ToolCallResult;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
-import com.odde.doughnut.services.ai.tools.AiToolList;
+import com.odde.doughnut.services.ai.tools.InstructionAndSchema;
 import com.theokanning.openai.assistants.assistant.Assistant;
 import com.theokanning.openai.assistants.assistant.AssistantRequest;
 import com.theokanning.openai.assistants.assistant.VectorStoreFileRequest;
@@ -219,7 +219,7 @@ public class OpenAiApiHandler {
   }
 
   public Optional<JsonNode> requestAndGetJsonSchemaResult(
-      AiToolList tool, OpenAIChatRequestBuilder openAIChatRequestBuilder) {
+      InstructionAndSchema tool, OpenAIChatRequestBuilder openAIChatRequestBuilder) {
     ChatCompletionRequest chatRequest = openAIChatRequestBuilder.responseJsonSchema(tool).build();
 
     return chatCompletion(chatRequest)

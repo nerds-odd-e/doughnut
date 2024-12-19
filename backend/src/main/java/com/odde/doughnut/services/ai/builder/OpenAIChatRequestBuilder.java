@@ -1,7 +1,7 @@
 package com.odde.doughnut.services.ai.builder;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.services.ai.tools.AiToolList;
+import com.odde.doughnut.services.ai.tools.InstructionAndSchema;
 import com.theokanning.openai.completion.chat.*;
 import com.theokanning.openai.function.FunctionDefinition;
 import java.util.ArrayList;
@@ -31,9 +31,9 @@ public class OpenAIChatRequestBuilder {
     return this;
   }
 
-  public OpenAIChatRequestBuilder responseJsonSchema(AiToolList tool) {
+  public OpenAIChatRequestBuilder responseJsonSchema(InstructionAndSchema tool) {
     addUserMessage(tool.getMessageBody());
-    FunctionDefinition schemaDefinition = tool.getFunctions().values().stream().findFirst().get();
+    FunctionDefinition schemaDefinition = tool.getFunctionDefinition();
     ResponseJsonSchema jsonSchema =
         ResponseJsonSchema.builder()
             .name(schemaDefinition.getName())

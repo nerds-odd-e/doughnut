@@ -16,8 +16,8 @@ public class AiToolFactory {
         MCQWithAnswer.class);
   }
 
-  public static AiToolList mcqWithAnswerAiTool() {
-    return new AiToolList(
+  public static InstructionAndSchema mcqWithAnswerAiTool() {
+    return new InstructionAndSchema(
         """
         Please act as a Question Designer, testing my memory, mastery and understanding of my focus note.
         My notes are atomic pieces of knowledge organized hierarchically and can include reifications to form lateral links.
@@ -49,10 +49,10 @@ public class AiToolFactory {
 
       """
             .formatted(ASK_SINGLE_ANSWER_MULTIPLE_CHOICE_QUESTION.getValue()),
-        List.of(askSingleAnswerMultipleChoiceQuestion().getFunctionDefinition()));
+        askSingleAnswerMultipleChoiceQuestion().getFunctionDefinition());
   }
 
-  public static AiToolList questionEvaluationAiTool(MCQWithAnswer question) {
+  public static InstructionAndSchema questionEvaluationAiTool(MCQWithAnswer question) {
     MultipleChoicesQuestion mcq = question.getMultipleChoicesQuestion();
 
     String messageBody =
@@ -67,17 +67,16 @@ please critically check if the following question makes sense and is possible to
 """
             .formatted(new ObjectMapper().valueToTree(mcq).toString());
 
-    return new AiToolList(
+    return new InstructionAndSchema(
         messageBody,
-        List.of(
-            FunctionDefinition.<QuestionEvaluation>builder()
-                .name("evaluate_question")
-                .description("answer and evaluate the feasibility of the question")
-                .parametersDefinitionByClass(QuestionEvaluation.class)
-                .build()));
+        FunctionDefinition.<QuestionEvaluation>builder()
+            .name("evaluate_question")
+            .description("answer and evaluate the feasibility of the question")
+            .parametersDefinitionByClass(QuestionEvaluation.class)
+            .build());
   }
 
-  public static AiToolList questionRefineAiTool(MCQWithAnswer question) {
+  public static InstructionAndSchema questionRefineAiTool(MCQWithAnswer question) {
     MultipleChoicesQuestion mcq = question.getMultipleChoicesQuestion();
 
     String messageBody =
@@ -96,18 +95,17 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
 """
             .formatted(new ObjectMapper().valueToTree(mcq).toString());
 
-    return new AiToolList(
+    return new InstructionAndSchema(
         messageBody,
-        List.of(
-            FunctionDefinition.<MCQWithAnswer>builder()
-                .name("refine_question")
-                .description("refine the question")
-                .parametersDefinitionByClass(MCQWithAnswer.class)
-                .build()));
+        FunctionDefinition.<MCQWithAnswer>builder()
+            .name("refine_question")
+            .description("refine the question")
+            .parametersDefinitionByClass(MCQWithAnswer.class)
+            .build());
   }
 
-  public static AiToolList transcriptionToTextAiTool(String transcriptionFromAudio) {
-    return new AiToolList(
+  public static InstructionAndSchema transcriptionToTextAiTool(String transcriptionFromAudio) {
+    return new InstructionAndSchema(
         """
             You convert SRT-format audio transcriptions into coherent paragraphs with proper punctuation, formatted in Markdown. Guidelines:
               •	Output only function calls to append the processed text to existing note details, adding necessary whitespace or a new line at the beginning.
@@ -121,12 +119,11 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
              ------------
             """
             + transcriptionFromAudio,
-        List.of(
-            FunctionDefinition.<NoteDetailsCompletion>builder()
-                .name(AiToolName.COMPLETE_NOTE_DETAILS.getValue())
-                .description("Convert audio transcription to text and append to the note details")
-                .parametersDefinitionByClass(NoteDetailsCompletion.class)
-                .build()));
+        FunctionDefinition.<NoteDetailsCompletion>builder()
+            .name(AiToolName.COMPLETE_NOTE_DETAILS.getValue())
+            .description("Convert audio transcription to text and append to the note details")
+            .parametersDefinitionByClass(NoteDetailsCompletion.class)
+            .build());
   }
 
   public static List<AiTool> getAllAssistantTools() {

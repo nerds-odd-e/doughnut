@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
-import com.odde.doughnut.services.ai.tools.AiToolList;
+import com.odde.doughnut.services.ai.tools.InstructionAndSchema;
 import com.odde.doughnut.services.openAiApis.FineTuningExamples;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.client.OpenAiApi;
@@ -80,7 +80,7 @@ public final class OtherAiServices {
       }
     }
 
-    AiToolList questionEvaluationAiTool =
+    InstructionAndSchema questionEvaluationAiTool =
         AiToolFactory.transcriptionToTextAiTool(transcriptionFromAudio);
     return openAiApiHandler
         .requestAndGetJsonSchemaResult(questionEvaluationAiTool, chatAboutNoteRequestBuilder)

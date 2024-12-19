@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.services.ai.*;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
-import com.odde.doughnut.services.ai.tools.AiToolList;
+import com.odde.doughnut.services.ai.tools.InstructionAndSchema;
 import com.theokanning.openai.completion.chat.AssistantMessage;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import jakarta.persistence.*;
@@ -77,18 +77,18 @@ public class SuggestedQuestionForFineTuning extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public OpenAIChatGPTFineTuningExample toQuestionGenerationFineTuningExample() {
-    AiToolList tool = AiToolFactory.mcqWithAnswerAiTool();
+    InstructionAndSchema tool = AiToolFactory.mcqWithAnswerAiTool();
     return getOpenAIChatGPTFineTuningExample(tool, getPreservedQuestion());
   }
 
   @JsonIgnore
   public OpenAIChatGPTFineTuningExample toQuestionEvaluationFineTuningData() {
-    AiToolList tool = AiToolFactory.questionEvaluationAiTool(getPreservedQuestion());
+    InstructionAndSchema tool = AiToolFactory.questionEvaluationAiTool(getPreservedQuestion());
     return getOpenAIChatGPTFineTuningExample(tool, getQuestionEvaluation());
   }
 
   private OpenAIChatGPTFineTuningExample getOpenAIChatGPTFineTuningExample(
-      AiToolList tool, Object argument) {
+      InstructionAndSchema tool, Object argument) {
     OpenAIChatRequestBuilder builder =
         new OpenAIChatRequestBuilder()
             .addSystemMessage(preservedNoteContent)
