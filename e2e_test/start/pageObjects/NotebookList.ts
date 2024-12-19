@@ -5,7 +5,7 @@ export const notebookList = () => {
   cy.pageIsNotLoading()
   return {
     expectNotebookCards: (notebooks: Record<string, string>[]) => {
-      cy.get('.notebook-card .card-title').should(
+      cy.get('.notebook-card .daisy-card-title').should(
         'have.length',
         notebooks.length
       )
@@ -13,7 +13,7 @@ export const notebookList = () => {
         for (const propName in elem) {
           if (propName === 'Title') {
             cy.findByText(elem[propName]!, {
-              selector: '.notebook-card .card-title',
+              selector: '.notebook-card .daisy-card-title',
             })
           } else {
             cy.findByText(elem[propName]!)
@@ -23,7 +23,7 @@ export const notebookList = () => {
     },
     expectNotebooks: (notebooks: string) => {
       cy.pageIsNotLoading()
-      cy.get('.notebook-card .card-title').then(($els) => {
+      cy.get('.notebook-card .daisy-card-title').then(($els) => {
         const cardTitles = Array.from($els, (el) => el.innerText)
         expect(cardTitles).to.deep.eq(commonSenseSplit(notebooks, ','))
       })

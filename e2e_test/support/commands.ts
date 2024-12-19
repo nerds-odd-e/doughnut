@@ -94,7 +94,7 @@ Cypress.Commands.add('clickRadioByLabel', (labelText) => {
 Cypress.Commands.add(
   'expectNoteCards',
   (expectedCards: Record<string, string>[]) => {
-    cy.get('.card-title').should('have.length', expectedCards.length)
+    cy.get('.daisy-card-title').should('have.length', expectedCards.length)
     expectedCards.forEach((elem) => {
       for (const propName in elem) {
         if (propName === 'note-title') {
@@ -245,7 +245,7 @@ Cypress.Commands.add(
 )
 
 Cypress.Commands.add('findCardTitle', (title) =>
-  cy.findByText(title, { selector: '.card-title .title-text' })
+  cy.findByText(title, { selector: '.daisy-card-title .title-text' })
 )
 
 Cypress.Commands.add('yesIRemember', () => {

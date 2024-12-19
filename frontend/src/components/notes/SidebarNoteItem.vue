@@ -18,7 +18,6 @@
       @click="toggleChildren(noteRealm.id)"
     >
       <NoteTitleWithLink
-        class="card-title"
         :class="{ 'active-title': noteRealm.id === activeNoteRealm.note.id }"
         v-bind="{ noteTopology: noteRealm.note.noteTopology }"
         @click.stop

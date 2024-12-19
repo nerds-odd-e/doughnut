@@ -20,7 +20,7 @@ export const noteSidebar = () => {
     },
     expectOrderedNotes(expectedNotes: Record<string, string>[]) {
       cy.pageIsNotLoading()
-      cy.get('aside ul li .card-title').then(($els) => {
+      cy.get('aside ul li .daisy-card-title').then(($els) => {
         const actualNotes = Array.from($els, (el) => el.innerText)
         const expectedNoteTopics = expectedNotes.map(
           (note) => note['note-title']
