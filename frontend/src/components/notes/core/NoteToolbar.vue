@@ -42,7 +42,48 @@
         <SvgChat />
       </a>
 
-      <WikidataButton v-bind="{ note, storageAccessor }" />
+      <div v-if="note.wikidataId">
+        <div class="daisy-dropdown">
+          <button
+            tabindex="0"
+            class="daisy-btn daisy-btn-ghost daisy-btn-sm"
+            title="wikidata options"
+          >
+            <SvgWikidata />
+          </button>
+
+          <ul class="daisy-dropdown-content daisy-menu daisy-p-2 daisy-bg-base-300 daisy-rounded-box daisy-w-52 daisy-shadow daisy-z-50">
+            <li>
+              <NoteWikidataAssociation :wikidata-id="note.wikidataId" />
+            </li>
+            <li>
+              <PopButton title="associate wikidata">
+                <template #button_face>
+                  <SvgWikidata />
+                  Edit Wikidata ID
+                </template>
+                <template #default="{ closer }">
+                  <WikidataAssociationDialog
+                    v-bind="{ note, storageAccessor }"
+                    @close-dialog="closer"
+                  />
+                </template>
+              </PopButton>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <PopButton v-else title="associate wikidata">
+        <template #button_face>
+          <SvgWikidata />
+        </template>
+        <template #default="{ closer }">
+          <WikidataAssociationDialog
+            v-bind="{ note, storageAccessor }"
+            @close-dialog="closer"
+          />
+        </template>
+      </PopButton>
 
       <button v-if="!asMarkdown" class="daisy-btn daisy-btn-ghost daisy-btn-sm" title="Edit as markdown" @click="$emit('edit-as-markdown', true)">
         <SvgMarkdown />
@@ -167,7 +208,6 @@ import type { NoteAccessory } from "@/generated/backend"
 import NoteNewButton from "./NoteNewButton.vue"
 import SvgAddChild from "../../svgs/SvgAddChild.vue"
 import SvgAddSibling from "../../svgs/SvgAddSibling.vue"
-import WikidataButton from "./WikidataButton.vue"
 import SvgSearchForLink from "../../svgs/SvgSearchForLink.vue"
 import LinkNoteDialog from "../../links/LinkNoteDialog.vue"
 import SvgCog from "../../svgs/SvgCog.vue"
@@ -188,6 +228,9 @@ import NoteAudioTools from "../accessory/NoteAudioTools.vue"
 import SvgRobot from "@/components/svgs/SvgRobot.vue"
 import { useRouter } from "vue-router"
 import SvgChat from "@/components/svgs/SvgChat.vue"
+import SvgWikidata from "../../svgs/SvgWikidata.vue"
+import WikidataAssociationDialog from "../WikidataAssociationDialog.vue"
+import NoteWikidataAssociation from "../NoteWikidataAssociation.vue"
 
 const { storageAccessor, note } = defineProps<{
   storageAccessor: StorageAccessor
