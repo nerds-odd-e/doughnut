@@ -45,6 +45,7 @@
       <div v-if="note.wikidataId">
         <div class="daisy-dropdown">
           <label
+            role="button"
             tabindex="0"
             class="daisy-btn daisy-btn-ghost daisy-btn-sm"
             title="wikidata options"

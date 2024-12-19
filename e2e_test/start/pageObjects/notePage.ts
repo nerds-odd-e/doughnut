@@ -41,13 +41,6 @@ export const assumeNotePage = (noteTopology?: string) => {
         getButton().click()
         return { ...submittableForm }
       },
-      clickIfNotOpen: () => {
-        getButton().then(($btn) => {
-          if ($btn.attr('aria-expanded') === 'false') {
-            cy.wrap($btn).click()
-          }
-        })
-      },
       shouldNotExist: () => getButton().should('not.exist'),
     }
   }
@@ -341,7 +334,7 @@ export const assumeNotePage = (noteTopology?: string) => {
     },
     wikidataOptions() {
       const openWikidataOptions = () =>
-        privateToolbarButton('wikidata options').clickIfNotOpen()
+        privateToolbarButton('wikidata options').click()
 
       return {
         associate(wikiID: string) {

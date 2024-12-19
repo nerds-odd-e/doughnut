@@ -4,7 +4,7 @@
 
     <!-- Drawer content -->
     <div class="daisy-drawer-content daisy-overflow-visible">
-      <main class="daisy-container daisy-mx-auto daisy-overflow-visible">
+      <main class="daisy-container daisy-mx-auto daisy-p-4 daisy-overflow-visible">
         <NoteShow
           v-bind="{
             noteId,
