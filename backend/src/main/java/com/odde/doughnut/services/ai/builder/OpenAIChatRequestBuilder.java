@@ -1,6 +1,5 @@
 package com.odde.doughnut.services.ai.builder;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.tools.AiToolList;
 import com.theokanning.openai.completion.chat.*;
@@ -29,12 +28,6 @@ public class OpenAIChatRequestBuilder {
 
   public OpenAIChatRequestBuilder maxTokens(int maxTokens) {
     builder.maxTokens(maxTokens);
-    return this;
-  }
-
-  public OpenAIChatRequestBuilder addTool(AiToolList tool) {
-    this.chatTools.addAll(tool.getFunctions().values().stream().map(ChatTool::new).toList());
-    addUserMessage(tool.getMessageBody());
     return this;
   }
 
@@ -73,18 +66,6 @@ public class OpenAIChatRequestBuilder {
 
   public OpenAIChatRequestBuilder addUserMessage(String message) {
     messages.add(new UserMessage(message));
-    return this;
-  }
-
-  public OpenAIChatRequestBuilder addFunctionCallMessage(
-      Object arguments, String evaluateQuestion) {
-    AssistantMessage msg = new AssistantMessage(null);
-    ChatFunctionCall chatFunctionCall =
-        new ChatFunctionCall(evaluateQuestion, new ObjectMapper().valueToTree(arguments));
-    ChatToolCall call = new ChatToolCall();
-    call.setFunction(chatFunctionCall);
-    msg.setToolCalls(List.of(call));
-    messages.add(msg);
     return this;
   }
 }

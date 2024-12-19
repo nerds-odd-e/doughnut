@@ -12,8 +12,4 @@ public class AiToolList {
     this.messageBody = message;
     functions.forEach(f -> this.functions.put(f.getName(), f));
   }
-
-  public String getFirstFunctionName() {
-    return functions.keySet().iterator().next();
-  }
 }
