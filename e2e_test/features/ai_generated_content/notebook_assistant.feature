@@ -13,7 +13,7 @@ Feature: Notebook assistant
 
 
   Scenario: The users will use the notebook assistant if exist
-    Given OpenAI creates an assistant of ID "assistant-id-1" for name "Assistant for notebook Vertical farming" with model "gpt-3.5-turbo"
+    Given OpenAI creates an assistant of ID "assistant-id-1" for name "Assistant for notebook Vertical farming" with model "gpt-4o-mini"
     And OpenAI accepts the vector file upload requests
     And I set my notebook "Vertical farming" to use additional AI instruction "Please use simple English."
     And I create a customized assistant for my notebook "Vertical farming"
