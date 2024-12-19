@@ -1,15 +1,5 @@
 <template>
   <h3>Link</h3>
-  <div v-if="!!inverseIcon">
-    Source:
-    <strong>
-      <NoteTitleWithLink
-        v-if="noteTopology.parentOrSubjectNoteTopology"
-        class="link-title"
-        v-bind="{ noteTopology: noteTopology.parentOrSubjectNoteTopology }"
-      />
-    </strong>
-  </div>
   <LinkTypeSelect
     field="linkType"
     scope-name="link"
@@ -18,7 +8,7 @@
     :inverse-icon="true"
     @update:model-value="updateLink"
   />
-  <div v-if="!inverseIcon">
+  <div>
     Target:
     <strong>
       <NoteTitleWithLink
@@ -30,58 +20,41 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
+import { ref } from "vue"
 import { LinkCreation, NoteTopology } from "@/generated/backend"
-import type { PropType } from "vue"
-import { defineComponent } from "vue"
 import type { StorageAccessor } from "../../store/createNoteStorage"
-import usePopups from "../commons/Popups/usePopups"
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue"
 import LinkTypeSelect from "./LinkTypeSelect.vue"
 
-export default defineComponent({
-  setup() {
-    return { ...usePopups() }
-  },
-  props: {
-    noteTopology: {
-      type: Object as PropType<NoteTopology>,
-      required: true,
-    },
-    storageAccessor: {
-      type: Object as PropType<StorageAccessor>,
-      required: true,
-    },
-    inverseIcon: Boolean,
-    colors: Object,
-  },
-  emits: ["closeDialog"],
-  components: {
-    LinkTypeSelect,
-    NoteTitleWithLink,
-  },
-  data() {
-    return {
-      formData: {
-        linkType: this.noteTopology.linkType,
-        fromTargetPerspective: this.inverseIcon,
-      } as LinkCreation,
-      linkFormErrors: { linkType: undefined as string | undefined },
-    }
-  },
+// Props definition
+const props = defineProps<{
+  noteTopology: NoteTopology
+  storageAccessor: StorageAccessor
+}>()
 
-  methods: {
-    updateLink() {
-      this.storageAccessor
-        .storedApi()
-        .updateLink(this.noteTopology.id, this.formData)
-        .then(() => this.$emit("closeDialog"))
-        .catch((error) => {
-          this.linkFormErrors = error
-        })
-    },
-  },
+// Emits definition
+const emit = defineEmits<{
+  (e: "closeDialog"): void
+}>()
+
+// Reactive state
+const formData = ref<LinkCreation>({
+  linkType: props.noteTopology.linkType!,
 })
+
+const linkFormErrors = ref<{ linkType?: string }>({ linkType: undefined })
+
+// Methods
+const updateLink = () => {
+  props.storageAccessor
+    .storedApi()
+    .updateLink(props.noteTopology.id, formData.value)
+    .then(() => emit("closeDialog"))
+    .catch((error) => {
+      linkFormErrors.value = error
+    })
+}
 </script>
 
 <style scoped>
