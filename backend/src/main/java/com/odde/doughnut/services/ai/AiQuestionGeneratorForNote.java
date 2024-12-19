@@ -14,14 +14,14 @@ public record AiQuestionGeneratorForNote(
   public Optional<QuestionEvaluation> evaluateQuestion(MCQWithAnswer question) {
     AiToolList questionEvaluationAiTool = AiToolFactory.questionEvaluationAiTool(question);
     return openAiApiHandler
-        .requestAndGetFunctionCallArguments(questionEvaluationAiTool, chatAboutNoteRequestBuilder)
+        .requestAndGetJsonSchemaResult(questionEvaluationAiTool, chatAboutNoteRequestBuilder)
         .flatMap(QuestionEvaluation::getQuestionEvaluation);
   }
 
   public Optional<MCQWithAnswer> refineQuestion(MCQWithAnswer question) {
     AiToolList questionEvaluationAiTool = AiToolFactory.questionRefineAiTool(question);
     return openAiApiHandler
-        .requestAndGetFunctionCallArguments(questionEvaluationAiTool, chatAboutNoteRequestBuilder)
+        .requestAndGetJsonSchemaResult(questionEvaluationAiTool, chatAboutNoteRequestBuilder)
         .flatMap(
             jsonNode -> {
               try {

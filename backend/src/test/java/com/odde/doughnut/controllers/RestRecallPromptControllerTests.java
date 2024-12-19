@@ -247,14 +247,14 @@ class RestRecallPromptControllerTests {
 
     @Test
     void rejected() {
-      openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(questionEvaluation, "");
+      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(questionEvaluation);
       QuestionContestResult contest = controller.contest(recallPrompt);
       assertTrue(contest.rejected);
     }
 
     @Test
     void useTheRightModel() {
-      openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(questionEvaluation, "");
+      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(questionEvaluation);
       GlobalSettingsService globalSettingsService = new GlobalSettingsService(modelFactoryService);
       globalSettingsService
           .globalSettingEvaluation()
@@ -269,7 +269,7 @@ class RestRecallPromptControllerTests {
     @Test
     void acceptTheContest() {
       questionEvaluation.feasibleQuestion = false;
-      openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(questionEvaluation, "");
+      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(questionEvaluation);
       QuestionContestResult contest = controller.contest(recallPrompt);
       assertFalse(contest.rejected);
     }

@@ -55,28 +55,6 @@ const openAiChatCompletionStubber = (
     )
   }
 
-  const stubSingleToolCall = (
-    functionName: string,
-    argumentsString: string
-  ) => {
-    return stubChatCompletion(
-      {
-        role: 'assistant',
-        tool_calls: [
-          {
-            id: 'tool-abc123',
-            type: 'function',
-            function: {
-              name: functionName,
-              arguments: argumentsString,
-            },
-          },
-        ],
-      },
-      'function_call'
-    )
-  }
-
   const stubJsonSchemaResponse = (argumentsString: string) => {
     return stubChatCompletion(
       {
@@ -89,10 +67,7 @@ const openAiChatCompletionStubber = (
 
   return {
     stubQuestionGeneration(argumentsString: string) {
-      return stubSingleToolCall(
-        'ask_single_answer_multiple_choice_question',
-        argumentsString
-      )
+      return stubJsonSchemaResponse(argumentsString)
     },
     requestDoesNotMessageMatch(message: MessageToMatch) {
       return openAiChatCompletionStubber(serviceMocker, bodyToMatch, {
@@ -108,7 +83,7 @@ const openAiChatCompletionStubber = (
       )
     },
     stubQuestionEvaluation(argumentsString: string) {
-      return stubSingleToolCall('evaluate_question', argumentsString)
+      return stubJsonSchemaResponse(argumentsString)
     },
   }
 }

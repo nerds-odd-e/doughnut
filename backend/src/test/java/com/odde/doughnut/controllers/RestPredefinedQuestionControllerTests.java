@@ -209,19 +209,15 @@ class RestPredefinedQuestionControllerTests {
 
     @Test
     void givenQuestion_thenReturnRefineQuestion() throws UnexpectedNoAccessRightException {
+      // Setup
       Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
       PredefinedQuestion predefinedQuestion = makeMe.aPredefinedQuestion().please();
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
-      openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(mcqWithAnswer, "");
-      PredefinedQuestion result = controller.refineQuestion(note, predefinedQuestion);
+      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(mcqWithAnswer);
 
-      assertEquals(0, result.getCorrectAnswerIndex());
-      assertEquals(
-          "a default question stem",
-          result.getBareQuestion().getMultipleChoicesQuestion().getStem());
-      assertEquals(
-          List.of("choice1", "choice2", "choice3"),
-          result.getBareQuestion().getMultipleChoicesQuestion().getChoices());
+      // Execute & Verify
+      PredefinedQuestion result = controller.refineQuestion(note, predefinedQuestion);
+      assertThat(result.getMcqWithAnswer(), equalTo(mcqWithAnswer));
     }
 
     @Test

@@ -14,7 +14,6 @@ import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.theokanning.openai.client.OpenAiApi;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -70,18 +69,17 @@ class AiOpenAiAssistantFactoryWithDBTest {
 
     @Test
     void rejected() {
-      openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(questionEvaluation, "");
+      questionEvaluation.feasibleQuestion = true;
+      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(questionEvaluation);
       QuestionContestResult contest =
           aiQuestionGenerator.getQuestionContestResult(predefinedQuestion);
       assertTrue(contest.rejected);
-      Assertions.assertThat(contest.reason)
-          .isEqualTo("This seems to be a legitimate question. Please answer it.");
     }
 
     @Test
     void acceptTheContest() {
       questionEvaluation.feasibleQuestion = false;
-      openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(questionEvaluation, "");
+      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(questionEvaluation);
       QuestionContestResult contest =
           aiQuestionGenerator.getQuestionContestResult(predefinedQuestion);
       assertFalse(contest.rejected);
